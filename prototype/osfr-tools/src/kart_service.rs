@@ -851,6 +851,75 @@ pub struct ServiceSnapshot {
     pub reward_taken: bool,
 }
 
+impl ServiceSnapshot {
+    /// Save-decision equality: persisted progress is equal. Three session-local fields are
+    /// excluded: the weapon tick clock (see [`crate::kart_weapons::WeaponState::save_decision_eq`]),
+    /// the observation flood counter and the last bulk-frame pose, which move on accepted
+    /// `33/6`/`33/17` frames. They are still persisted and restored. The exhaustive destructure
+    /// makes a field added later compared by default; give it an explicit decision here if it is
+    /// not.
+    pub(crate) fn save_decision_eq(&self, other: &Self) -> bool {
+        let Self {
+            phase,
+            context,
+            session,
+            bounds,
+            gate_band,
+            gate_curtains,
+            schedule_cursor,
+            countdown_started_ms,
+            countdown_offset_ms,
+            last_position,
+            last_claim_ms,
+            race_started_ms,
+            attempts,
+            observations: _session_observations,
+            countdown_sent,
+            last_boost_epoch,
+            claim_credit_m,
+            queued_items,
+            pickups,
+            pickups_consumed,
+            pickups_spawned,
+            pickup_respawn,
+            pickups_respawned,
+            pickups_pending,
+            shield_expiry,
+            weapon_effects,
+            weapons,
+            weapon_pose: _session_pose,
+            reward_taken,
+        } = self;
+        phase == &other.phase
+            && context == &other.context
+            && session == &other.session
+            && bounds == &other.bounds
+            && gate_band == &other.gate_band
+            && gate_curtains == &other.gate_curtains
+            && schedule_cursor == &other.schedule_cursor
+            && countdown_started_ms == &other.countdown_started_ms
+            && countdown_offset_ms == &other.countdown_offset_ms
+            && last_position == &other.last_position
+            && last_claim_ms == &other.last_claim_ms
+            && race_started_ms == &other.race_started_ms
+            && attempts == &other.attempts
+            && countdown_sent == &other.countdown_sent
+            && last_boost_epoch == &other.last_boost_epoch
+            && claim_credit_m == &other.claim_credit_m
+            && queued_items == &other.queued_items
+            && pickups == &other.pickups
+            && pickups_consumed == &other.pickups_consumed
+            && pickups_spawned == &other.pickups_spawned
+            && pickup_respawn == &other.pickup_respawn
+            && pickups_respawned == &other.pickups_respawned
+            && pickups_pending == &other.pickups_pending
+            && shield_expiry == &other.shield_expiry
+            && weapon_effects == &other.weapon_effects
+            && weapons.save_decision_eq(&other.weapons)
+            && reward_taken == &other.reward_taken
+    }
+}
+
 /// The bounded race service. One race at a time; the gate defaults off.
 pub struct KartService {
     content: KartServiceContent,

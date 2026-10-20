@@ -843,9 +843,9 @@ pub struct WeaponState {
     #[serde(default)]
     pub next_id: u32,
     /// Last tick clock, so a regressed tick is harmless. Every racing tick re-stamps it and
-    /// `validate_for` bounds it on restore. Equality is structural like every other field; the
-    /// kart save decision copies the new clock into the old state it compares (see
-    /// `Gameplay::tick_world`), so a clock-only tick alone is not a persisted change (F188).
+    /// `validate_for` bounds it on restore. It is persisted, but a clock-only tick is not a
+    /// save trigger: the kart save decision compares through [`Self::save_decision_eq`], which
+    /// decides every other field.
     #[serde(default)]
     pub last_tick_ms: u64,
 }
@@ -861,6 +861,20 @@ impl WeaponState {
 
     pub fn is_empty(&self) -> bool {
         self.weapons.is_empty() && self.effects.is_empty()
+    }
+
+    /// Save-decision equality: `last_tick_ms` is session-local (re-stamped every racing tick and
+    /// re-bounded by [`Self::validate_for`] on restore), so a clock-only tick is not a persisted
+    /// change. Every other field is named in the destructure, so a field added later is compared
+    /// by default.
+    pub(crate) fn save_decision_eq(&self, other: &Self) -> bool {
+        let Self {
+            weapons,
+            effects,
+            next_id,
+            last_tick_ms: _session_clock,
+        } = self;
+        weapons == &other.weapons && effects == &other.effects && next_id == &other.next_id
     }
 
     /// True while this id belongs to the local race (foreign ids must be refused).

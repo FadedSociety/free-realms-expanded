@@ -115,26 +115,31 @@ pub struct KartGatewayState {
 }
 
 impl KartGatewayState {
-    /// Whether a committed kart frame must write the character save. The observation flood budget
-    /// (`ServiceSnapshot::observations`) and the last weapon pose are persisted, but neither is
-    /// gameplay progress on its own: both move on accepted `33/6`/`33/17` bulk frames, and
-    /// treating either as a change wrote one character save per frame. They ride the next real
-    /// change and the unconditional end-of-session save; the restored values still bound a flooded
-    /// client and place its next weapon observation.
-    pub fn changed_for_save(mut self, after: &Self) -> bool {
-        if self == *after {
-            return false;
-        }
-        let mask = |state: &mut Self| {
-            if let Some(race) = state.race.as_mut() {
-                race.observations = 0;
-                race.weapon_pose = None;
+    /// Whether a committed kart frame must write the character save. Three session-local fields
+    /// are excluded: the weapon tick clock (re-stamped every racing tick), the observation flood
+    /// budget and the last weapon pose (both move on accepted `33/6`/`33/17` bulk frames). They
+    /// are persisted and restored, but they ride the next real change and the unconditional
+    /// end-of-session save. Every other field is named in the destructure, so a field added later
+    /// is compared by default.
+    pub fn changed_for_save(self, after: &Self) -> bool {
+        let Self {
+            version,
+            content_sha256,
+            next_instance,
+            active,
+            race,
+            last_paid_unix,
+        } = self;
+        version != after.version
+            || content_sha256 != after.content_sha256
+            || next_instance != after.next_instance
+            || active != after.active
+            || last_paid_unix != after.last_paid_unix
+            || match (race, &after.race) {
+                (Some(before), Some(after)) => !before.save_decision_eq(after),
+                (None, None) => false,
+                _ => true,
             }
-        };
-        mask(&mut self);
-        let mut after = after.clone();
-        mask(&mut after);
-        self != after
     }
 }
 

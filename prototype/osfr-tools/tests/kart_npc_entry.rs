@@ -798,9 +798,18 @@ fn a_disconnect_mid_race_survives_a_snapshot_with_the_prior_job() {
 
 // ---- gameplay tick: a clock-only racing tick must not request a save -------------------------
 
+/// The recovered original-journal record the opening loader parses: one quest with no objectives.
+/// All flags, rewards and counters are zero. The quest engine only hashes this file.
+fn synthetic_journal() -> Vec<u8> {
+    let mut journal = vec![0u8; 134];
+    journal[..4].copy_from_slice(&1i32.to_le_bytes());
+    journal
+}
+
 /// A self-contained gameplay package: synthetic class/inventory content (the payout tests' shape),
-/// a minimal category catalogue, encounter template and quest journal, plus this file's synthetic
-/// kart package with weapon effects enabled. No private lab content is required.
+/// a minimal category catalogue, encounter template, quest journal and opening/world content, plus
+/// this file's synthetic kart package with weapon effects enabled. No private lab content is
+/// required.
 struct GameplayFixture(PathBuf);
 
 impl GameplayFixture {
@@ -814,28 +823,6 @@ impl GameplayFixture {
         let path = Self::scratch();
         let fixture = Self(path);
         fixture.write_content(weapon_effects);
-        fixture
-    }
-
-    /// The full opening content the timeout test needs for its world return frame. Private lab
-    /// input; `OSFR_KART_GAMEPLAY_CONTENT` overrides the prepared gameplay directory.
-    fn private() -> Self {
-        let source = std::env::var_os("OSFR_KART_GAMEPLAY_CONTENT")
-            .map(PathBuf::from)
-            .unwrap_or_else(|| {
-                PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                    .join("../../../lab/references/opening-journal-text-v2/content")
-            });
-        assert!(
-            source.join("inventory.json").is_file() && source.join("opening.json").is_file(),
-            "the timeout test needs a prepared gameplay directory: {} \
-             (set OSFR_KART_GAMEPLAY_CONTENT)",
-            source.display()
-        );
-        let path = Self::scratch();
-        copy_tree(&source, &path);
-        let fixture = Self(path);
-        fixture.write_kart(true);
         fixture
     }
 
@@ -902,8 +889,9 @@ impl GameplayFixture {
         )
         .unwrap();
         // The gameplay loader requires one quest definition and its journal even though a kart
-        // tick never touches them.
-        let journal = [1u8, 0, 0, 0].repeat(8);
+        // tick never touches them. The opening journal also parses the recovered quest-record
+        // shape, so this fixture's journal is a valid one-quest record (see `synthetic_journal`).
+        let journal = synthetic_journal();
         fs::write(dir.join("journal.bin"), &journal).unwrap();
         fs::write(
             dir.join("quests.json"),
@@ -927,6 +915,83 @@ impl GameplayFixture {
                     "radius": 3.0, "time_limit_ms": 90_000, "cooldown_ms": 30_000,
                     "reward_coins": 10,
                 },
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        // The timeout exit needs a world to return to: the opening content supplies the encounter
+        // engine, and the encounter content supplies the world the kart return frame names.
+        let zone = json!({
+            "zone_id": 0, "name": "SyntheticWorld", "sky": "synthetic.xml",
+            "geometry_id": 101, "position": [10.0, 20.0, 30.0],
+            "rotation": [0.0, 0.0, 1.0], "tutorial": false,
+        });
+        fs::write(
+            dir.join("opening.json"),
+            serde_json::to_vec(&json!({
+                "schema_version": 1,
+                "scope": "synthetic kart timeout",
+                "reconstruction_notice": "synthetic fixture",
+                "initial_profiles": [PRIOR_JOB],
+                "actors": [{
+                    "guid": 2, "definition_id": 20, "name_id": 0,
+                    "name": "Synthetic guide", "model_id": 1,
+                    "model_file_name": "synthetic.adr", "zone_id": 0,
+                    "position": [0.0, 0.0, 0.0], "heading": 0.0,
+                    "interaction_radius": 12.0, "kind": "guide",
+                    "action": null, "required_profile": null, "provenance": "synthetic",
+                }],
+                "discoveries": [],
+                "stages": [{
+                    "id": 1617, "original_quest_id": null, "title_id": 0, "description_id": 0,
+                    "title": "Synthetic stage", "description": "Synthetic stage",
+                    "giver_guid": 2, "turnin_guid": 2, "ordered": true,
+                    "objectives": [{
+                        "id": 14096, "name_id": 0, "description_id": 0,
+                        "description": "Synthetic objective", "required": 1,
+                        "trigger": {"kind": "talk", "actor_guid": 2},
+                        "recovery": "synthetic",
+                    }],
+                    "reward": {"stage_id": 1617, "coins": 0, "items": []},
+                    "unlock_profiles": [], "provenance": "synthetic",
+                }],
+                "provenance": {},
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        fs::write(
+            dir.join("opening-abilities.json"),
+            serde_json::to_vec(&json!({
+                "schema_version": 1,
+                "basics": [{
+                    "profile_id": PRIOR_JOB, "definition_id": 4895, "name_id": 420172,
+                    "description_id": 0, "icon_id": 14290, "weapon_name_id": 131914,
+                }],
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        fs::write(
+            dir.join("encounters.json"),
+            serde_json::to_vec(&json!({
+                "schema_version": 1,
+                "template_file": "npc.bin",
+                "template_sha256": format!("{:x}", Sha256::digest(&template)),
+                "world": zone.clone(),
+                "world_enemies": [],
+                "dungeons": [{
+                    "id": 411, "title_id": 12, "description_id": 13, "objective_id": 14,
+                    "zone": zone,
+                    "guide": null,
+                    "enemies": [{
+                        "guid": 201, "definition_id": 500, "model_id": 3, "name_id": 100,
+                        "name": "Synthetic enemy", "texture_alias": "",
+                        "position": [2.0, 0.0, 0.0], "max_health": 100, "damage": 1,
+                        "boss": false,
+                    }],
+                    "reward_coins": 0, "reward_items": [],
+                }],
             }))
             .unwrap(),
         )
@@ -1094,6 +1159,11 @@ fn clock_only_racing_ticks_do_not_request_a_character_save() {
     let prior_job = game.state().profiles.unwrap().active;
     let green = enter_to_green(&mut game, &character);
     assert_eq!(game.state().profiles.unwrap().active, KART_JOB);
+    // The green tick requested a save, so this is the last persisted snapshot. The next two
+    // ticks are clock-only and would never be written; a real reconnect restores this older
+    // state, not the live `game.state()`.
+    let saved = game.state();
+    assert_eq!(race_clock(&game), green);
 
     // The green tick already settled the one-off node visibility; drain one more tick so the
     // assertion below isolates the weapon lifecycle clock.
@@ -1106,11 +1176,29 @@ fn clock_only_racing_ticks_do_not_request_a_character_save() {
     assert!(idle.replies.is_empty(), "a clock-only tick sends nothing");
     // The clock still advanced: the race was really ticking, not stalled.
     assert_eq!(race_clock(&game), green + 100);
+    assert_ne!(
+        saved
+            .kart_entry
+            .as_ref()
+            .unwrap()
+            .race
+            .as_ref()
+            .unwrap()
+            .weapons
+            .last_tick_ms,
+        race_clock(&game),
+        "the saved snapshot must be older than the live clock"
+    );
 
-    // The restore state is saved whenever it changes; a disconnect between two clock-only
-    // ticks still comes back in the racing phase.
-    let mut restored = fixture.load(Some(game.state()));
+    // A disconnect between two clock-only ticks restores the last persisted snapshot: the older
+    // clock and the prior job survive, and the next racing ticks still request no save.
+    let mut restored = fixture.load(Some(saved));
     assert_eq!(race_phase(&restored), RacePhase::Racing);
+    assert_eq!(
+        race_clock(&restored),
+        green,
+        "restore must start from the saved clock"
+    );
     assert_eq!(
         restored
             .state()
@@ -1153,9 +1241,50 @@ fn clock_only_racing_ticks_do_not_request_a_character_save() {
     assert!(!paid.changed, "a finished race pays and saves once");
 }
 
+/// Both kart save decisions use the type's save-decision equality: a re-stamped session weapon
+/// clock alone is not a persisted change, and every other field still requests a character save.
+#[test]
+fn a_re_stamped_session_weapon_clock_is_not_a_saved_change() {
+    let fixture = GameplayFixture::new();
+    let character = character();
+    let mut game = fixture.load(None);
+    game.set_dev_tools(true);
+    game.set_role(osfr_tools::account_store::AccountRole::Admin);
+    enter_to_green(&mut game, &character);
+    let before = game.state().kart_entry.unwrap();
+
+    let mut clock_only = before.clone();
+    clock_only.race.as_mut().unwrap().weapons.last_tick_ms += 50;
+    let clock = KartGateway::load(&fixture.0, Some(clock_only))
+        .unwrap()
+        .unwrap();
+    assert!(
+        !before.clone().changed_for_save(clock.state()),
+        "a re-stamped session clock alone is not a persisted change"
+    );
+
+    let mut race_progress = before.clone();
+    race_progress.race.as_mut().unwrap().attempts += 1;
+    let progressed = KartGateway::load(&fixture.0, Some(race_progress))
+        .unwrap()
+        .unwrap();
+    assert!(
+        before.clone().changed_for_save(progressed.state()),
+        "a race field must still request a save"
+    );
+
+    let mut entry = before.clone();
+    entry.active.as_mut().unwrap().previous_job = Some(PRIOR_JOB + 1);
+    let moved = KartGateway::load(&fixture.0, Some(entry)).unwrap().unwrap();
+    assert!(
+        before.changed_for_save(moved.state()),
+        "an entry field must still request a save"
+    );
+}
+
 #[test]
 fn a_timed_out_race_still_reports_the_abort_for_saving() {
-    let fixture = GameplayFixture::private();
+    let fixture = GameplayFixture::new();
     let character = character();
     let mut game = fixture.load(None);
     game.set_dev_tools(true);
