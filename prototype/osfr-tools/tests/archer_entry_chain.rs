@@ -117,7 +117,7 @@ fn path_chapter_completes_in_order_and_pays_once() {
     assert_eq!(archer_xp(&game), xp_before);
 
     now += 10;
-    let _ = release_end_screen(&mut game, &character, PATH, LUGABOW, now);
+    let _ = release_end_screen(&mut game, &character, PATH, LUGABOW, PATH_END_TEXT, now);
     now += 10;
     finish_quest(&mut game, &character, PATH, PATH_COINS, PATH_XP, now);
     assert_eq!(coins(&game), coins_before + PATH_COINS);
@@ -336,6 +336,62 @@ fn relog_keeps_completed_history_and_no_duplicate_reward() {
     assert_eq!(archer_xp(&game), final_xp);
 }
 
+/// The client's fourth Path step was added after the first chapter shipped. A
+/// save written by the old three-objective chapter cannot keep its counts:
+/// `repair_counters` resets a changed objective list by design (R). Pin that
+/// migration so the journal reset is visible and the chapter stays completable,
+/// and prove the reset pays nothing.
+#[test]
+fn three_objective_path_save_resets_and_stays_completable() {
+    let fixture = Fixture::new();
+    let mut game = fixture.game(None);
+    let mut now = 10_000;
+    let lugabow = content_position("greenwood_forest.json", LUGABOW);
+    let character = character_at(GREENWOOD, lugabow);
+    learn_archer(&mut game, &character, &mut now);
+    start_path(&mut game, &character, &mut now);
+    let (first, _, _) = talk_recruit(&mut game, BOLLYLOG, &mut now);
+    assert!(first.changed);
+    assert_eq!(counts(&game, PATH), vec![1, 0, 0, 0]);
+
+    // Rewrite the progress as the old chapter saved it: three counts and the
+    // held end screen at the third recruit.
+    let mut old = game.state();
+    let quests = old.npc_quests.as_mut().unwrap();
+    let progress = quests.quests.get_mut(&PATH).unwrap();
+    progress.counts = vec![1, 0, 0];
+    quests.pending_turnin = Some(PATH);
+    quests.pending_turnin_actor = Some(BRUGADUG);
+    let coins_before = coins(&game);
+    let xp_before = archer_xp(&game);
+
+    let mut reloaded = fixture.game(Some(old));
+    assert_eq!(
+        counts(&reloaded, PATH),
+        vec![0, 0, 0, 0],
+        "a changed objective list resets the counters (content-migration policy)"
+    );
+    assert_eq!(quest_status(&reloaded, PATH), QuestStatus::Active);
+    assert_eq!(pending_turnin(&reloaded), None);
+    assert_eq!(
+        reloaded
+            .state()
+            .npc_quests
+            .as_ref()
+            .unwrap()
+            .pending_turnin_actor,
+        None,
+        "the migration clears the held speaker too"
+    );
+    assert_eq!(coins(&reloaded), coins_before, "the reset pays nothing");
+    assert_eq!(archer_xp(&reloaded), xp_before, "the reset grants no XP");
+
+    complete_path_via_recruits(&mut reloaded, &mut now);
+    assert_eq!(quest_status(&reloaded, PATH), QuestStatus::Completed);
+    assert_eq!(coins(&reloaded), coins_before + PATH_COINS);
+    assert_eq!(archer_xp(&reloaded), xp_before + PATH_XP);
+}
+
 #[test]
 fn relog_replays_the_held_end_screen_at_its_speaker() {
     let fixture = Fixture::new();
@@ -397,6 +453,11 @@ fn relog_replays_the_held_end_screen_at_its_speaker() {
         u64::from_le_bytes(packets[end][6..14].try_into().unwrap()),
         LUGABOW,
         "the re-sent end screen must name the runtime speaker"
+    );
+    assert_eq!(
+        u32::from_le_bytes(packets[end][18..22].try_into().unwrap()),
+        PATH_END_TEXT,
+        "the re-sent end screen must carry the Path debrief text"
     );
 
     now += 10;

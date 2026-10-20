@@ -40,8 +40,12 @@ pub const TALK_LABEL: u32 = 3_300;
 pub const QUEST_CHOICE: i32 = 301;
 pub const PATH_COINS: u32 = 5;
 pub const PATH_XP: u32 = 15;
+/// The Path debrief locale id the 49/13 carries at byte 18..22.
+pub const PATH_END_TEXT: u32 = 9_701;
 pub const OATH_COINS: u32 = 10;
 pub const OATH_XP: u32 = 20;
+/// The Oath debrief locale id the 49/13 carries at byte 18..22.
+pub const OATH_END_TEXT: u32 = 77_038;
 pub const GREENWOOD: u32 = 6;
 pub const COBBLESTONE: u32 = 3;
 
@@ -294,12 +298,16 @@ pub fn accept(game: &mut Gameplay, character: &CharacterState, quest_id: u32, no
 }
 
 /// 26/6 releases the 49/13 that the final Talk held. Its speaker must be the
-/// runtime actor the client clicked, not the content key.
+/// runtime actor the client clicked, not the content key, and its end text must
+/// be the quest's debrief. `QuestEndPacket::ReadFields` (`00c7b990`) reads actor
+/// `6..14`, quest id `14..18`, end text `18..22`, animation `22..26`;
+/// `ShowQuestEndScreen` (`00a95420`) passes that third dword as the message id.
 pub fn release_end_screen(
     game: &mut Gameplay,
     character: &CharacterState,
     quest_id: u32,
     expected_actor: u64,
+    expected_end_text: u32,
     now: u64,
 ) -> Vec<u8> {
     let released = send(game, character, &dialogue_choice(QUEST_CHOICE), now);
@@ -313,6 +321,11 @@ pub fn release_end_screen(
         u64::from_le_bytes(end[6..14].try_into().unwrap()),
         expected_actor,
         "the end screen must name the clicked runtime actor"
+    );
+    assert_eq!(
+        u32::from_le_bytes(end[18..22].try_into().unwrap()),
+        expected_end_text,
+        "the end screen must carry the quest's debrief text"
     );
     end
 }
@@ -450,7 +463,7 @@ pub fn complete_path_via_recruits(game: &mut Gameplay, now: &mut u64) {
     );
 
     *now += 10;
-    let _ = release_end_screen(game, &character, PATH, LUGABOW, *now);
+    let _ = release_end_screen(game, &character, PATH, LUGABOW, PATH_END_TEXT, *now);
     *now += 10;
     finish_quest(game, &character, PATH, PATH_COINS, PATH_XP, *now);
 }
@@ -472,7 +485,7 @@ pub fn complete_oath_via_hilforn(game: &mut Gameplay, now: &mut u64) {
     );
 
     *now += 10;
-    let _ = release_end_screen(game, &character, OATH, HILFORN, *now);
+    let _ = release_end_screen(game, &character, OATH, HILFORN, OATH_END_TEXT, *now);
     *now += 10;
     finish_quest(game, &character, OATH, OATH_COINS, OATH_XP, *now);
 }
@@ -623,7 +636,7 @@ pub fn assert_enabled_archer_chapter_records() {
     );
     assert_eq!(
         path["end_text_string_id"].as_u64(),
-        Some(9_701),
+        Some(u64::from(PATH_END_TEXT)),
         "the Path end screen must carry the recovered debrief text"
     );
     assert_eq!(
@@ -643,7 +656,10 @@ pub fn assert_enabled_archer_chapter_records() {
     assert_eq!(oath["title_string_id"].as_u64(), Some(77_036));
     assert_eq!(oath["prerequisite_quest_ids"], serde_json::json!([PATH]));
     assert_eq!(oath["objectives"][0]["npc_id"].as_u64(), Some(HILFORN));
-    assert_eq!(oath["end_text_string_id"].as_u64(), Some(77_038));
+    assert_eq!(
+        oath["end_text_string_id"].as_u64(),
+        Some(u64::from(OATH_END_TEXT))
+    );
     assert_eq!(
         oath["rewards"][0]["coins"].as_u64(),
         Some(u64::from(OATH_COINS))
@@ -663,32 +679,49 @@ pub fn assert_enabled_archer_chapter_records() {
         assert_eq!(record["enabled"].as_bool(), Some(false));
     }
 
-    // Lugabow is a data-backed spawned trainer and quest giver.
+    // Lugabow (the Path giver and fourth objective) and Hilforn (the Oath
+    // target) are existing Legacy actors. Every Path target must have exactly
+    // one regional row: a duplicate would let `find` silently pick a different
+    // spawn/click anchor while the chain test stayed green.
     let npcs = read_json(&content_dir().join("npcs/greenwood_forest.json"));
-    let lugabow_row = npcs["records"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .find(|row| row["npc_id"].as_u64() == Some(LUGABOW))
-        .unwrap();
-    assert_eq!(lugabow_row["placement"].as_str(), Some("legacy_data"));
-    assert_eq!(lugabow_row["zone_id"].as_u64(), Some(u64::from(GREENWOOD)));
-    assert!(
-        lugabow_row["roles"]
+    let regional_rows = |content_key: u64| -> Vec<&Value> {
+        npcs["records"]
             .as_array()
             .unwrap()
             .iter()
-            .any(|role| role == "quest_giver")
-    );
+            .filter(|row| row["npc_id"].as_u64() == Some(content_key))
+            .collect()
+    };
+    for content_key in &path_targets {
+        let rows = regional_rows(*content_key);
+        assert_eq!(
+            rows.len(),
+            1,
+            "Path target {content_key} must have exactly one regional row"
+        );
+        assert_eq!(rows[0]["zone_id"].as_u64(), Some(u64::from(GREENWOOD)));
+        assert!(
+            rows[0]["roles"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .any(|role| role == "quest_giver"),
+            "Path target {content_key} must be a quest giver"
+        );
+    }
+
+    let lugabow_row = regional_rows(LUGABOW)[0];
+    assert_eq!(lugabow_row["placement"].as_str(), Some("legacy_data"));
     assert!(lugabow_row["position"].is_array());
 
     // The Oath objective's report target is a data-backed spawned quest giver.
-    let hilforn_row = npcs["records"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .find(|row| row["npc_id"].as_u64() == Some(HILFORN))
-        .unwrap();
+    let hilforn_rows = regional_rows(HILFORN);
+    assert_eq!(
+        hilforn_rows.len(),
+        1,
+        "Oath target {HILFORN} must have exactly one regional row"
+    );
+    let hilforn_row = hilforn_rows[0];
     assert_eq!(hilforn_row["placement"].as_str(), Some("legacy_data"));
     assert_eq!(hilforn_row["zone_id"].as_u64(), Some(u64::from(GREENWOOD)));
     assert!(
@@ -699,11 +732,18 @@ pub fn assert_enabled_archer_chapter_records() {
             .any(|role| role == "quest_giver")
     );
 
-    // Each enabled talk target has exactly one regional quest-giver row aligned to
-    // exactly one existing runtime actor, so the client can click the recruit it
-    // sees. Distinct runtime GUIDs and one row per key are real assertions: a
-    // duplicate row would make `find` silently pick the wrong anchor.
+    // Each enabled recruit also binds exactly one existing runtime actor, so the
+    // client can click the recruit it sees; Lugabow is spawned from its regional
+    // legacy_data row, never an extra spawn.
     let extra = read_json(&content_dir().join("npc_spawns_extra.json"));
+    assert!(
+        !extra["records"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|row| row["content_key"].as_u64() == Some(LUGABOW)),
+        "Path giver {LUGABOW} must not bind an extra spawn"
+    );
     let mut runtime_guids = BTreeSet::new();
     for (content_key, legacy_id, locale_id) in [
         (BOLLYLOG, 3_468_u64, 22_168_u64),
@@ -716,20 +756,8 @@ pub fn assert_enabled_archer_chapter_records() {
             runtime_guids.insert(runtime_guid),
             "recruit {content_key} reuses runtime actor id {runtime_guid}"
         );
-        let regional: Vec<&Value> = npcs["records"]
-            .as_array()
-            .unwrap()
-            .iter()
-            .filter(|row| row["npc_id"].as_u64() == Some(content_key))
-            .collect();
-        assert_eq!(
-            regional.len(),
-            1,
-            "content key {content_key} must have exactly one regional row"
-        );
-        let recruit = regional[0];
+        let recruit = regional_rows(content_key)[0];
         assert_eq!(recruit["name_string_id"].as_u64(), Some(locale_id));
-        assert_eq!(recruit["zone_id"].as_u64(), Some(u64::from(GREENWOOD)));
         assert_eq!(recruit["placement"].as_str(), Some("unanchored"));
         let position: [f32; 3] = serde_json::from_value(recruit["position"].clone()).unwrap();
         assert_eq!(
