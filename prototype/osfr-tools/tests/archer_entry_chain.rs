@@ -6,10 +6,10 @@
 //! Request/reply layouts used here:
 //! - 26/8 NPC interact: constructor `008b6bc0`; body is u64 target + u8 [0].
 //! - 26/10 menu select: constructor `00a36f80`; body is u64 target + i32 choice.
-//! - 26/6 dialogue response: reader `009f5890`; body is i32 response row
-//!   (301 is the quest row).
-//! - 49/2 quest reply: reader `00a86400` / sender `00a97d70`; u32 quest + u8 accept.
-//! - 49/14 end reply: constructor `00a864c0` / sender `00a97ef0`; u32 quest.
+//! - 26/6 dialogue response: constructor `009f5890`, sender `009f6740`; body is
+//!   i32 response row (301 is the quest row).
+//! - 49/2 quest reply: constructor `00a86400`, sender `00a97d70`; u32 quest + u8 accept.
+//! - 49/14 end reply: constructor `00a864c0`, sender `00a97ef0`; u32 quest.
 //! 49/1 offers and 49/13 end screens are parsed only for their quest id, at
 //! 6..10 and 14..18 respectively, matching the existing route tests. 49/13 also
 //! names its speaker at 6..14 (`QuestEndPacket::ReadFields` `00c7b990`; the client
@@ -36,7 +36,13 @@ fn lugabow_offers_path_only_to_archers() {
     let character = character_at(GREENWOOD, lugabow);
 
     activate_brawler(&mut game, &character, &mut now);
-    assert_no_offer(&mut game, &character, LUGABOW, &mut now);
+    assert_no_offer(
+        &mut game,
+        &character,
+        LUGABOW,
+        &mut now,
+        "Brawler at Lugabow",
+    );
 
     learn_archer(&mut game, &character, &mut now);
     offer(&mut game, &character, LUGABOW, PATH, now);
@@ -119,7 +125,9 @@ fn path_chapter_completes_in_order_and_pays_once() {
     now += 10;
     let _ = release_end_screen(&mut game, &character, PATH, LUGABOW, PATH_END_TEXT, now);
     now += 10;
-    finish_quest(&mut game, &character, PATH, PATH_COINS, PATH_XP, now);
+    finish_quest(
+        &mut game, &character, PATH, ARCHER, PATH_COINS, PATH_XP, now,
+    );
     assert_eq!(coins(&game), coins_before + PATH_COINS);
     assert_eq!(archer_xp(&game), xp_before + PATH_XP);
 
@@ -146,7 +154,7 @@ fn oath_chapter_requires_path_and_talks_to_hilforn() {
     start_path(&mut game, &character, &mut now);
 
     // Active Path blocks Oath: the prerequisite is not completed yet.
-    assert_no_offer(&mut game, &character, LUGABOW, &mut now);
+    assert_no_offer(&mut game, &character, LUGABOW, &mut now, "Oath before Path");
     assert!(
         !game
             .state()
@@ -172,7 +180,13 @@ fn oath_chapter_requires_path_and_talks_to_hilforn() {
     assert_eq!(archer_xp(&game), xp_after_path + OATH_XP);
     assert_eq!(quest_status(&game, OATH), QuestStatus::Completed);
     // Completed Path is not offered again.
-    assert_no_offer(&mut game, &character, LUGABOW, &mut now);
+    assert_no_offer(
+        &mut game,
+        &character,
+        LUGABOW,
+        &mut now,
+        "completed Path after Oath",
+    );
 }
 
 #[test]
@@ -313,7 +327,13 @@ fn relog_keeps_completed_history_and_no_duplicate_reward() {
     assert_eq!(archer_xp(&game), final_xp);
 
     // Neither quest is offered again.
-    assert_no_offer(&mut game, &character, LUGABOW, &mut now);
+    assert_no_offer(
+        &mut game,
+        &character,
+        LUGABOW,
+        &mut now,
+        "completed Path and Oath after relog",
+    );
     // Replaying the old packets pays nothing and changes no save byte.
     for (index, quest_id) in [PATH, OATH].into_iter().enumerate() {
         let offset = u64::try_from(index).unwrap();
@@ -473,6 +493,7 @@ fn relog_replays_the_held_end_screen_at_its_speaker() {
         &mut game,
         &visibility_character,
         PATH,
+        ARCHER,
         PATH_COINS,
         PATH_XP,
         now,

@@ -39822,11 +39822,32 @@
               "evidence": "title_string_id corrected from raw locale hash 1050035324 to Global.Text id 73752 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3090003,
+          "title": "Medic: House Call",
+          "title_string_id": 22989,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 3; name 'Medic: House Call'; title id cell ucdt 3150122236 / ugdt 1362261935"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 3; name 'Medic: House Call'; title id cell ucdt 3150122236 / ugdt 1362261935"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T197 giver fix: the guide's giver cell 9000000419 is not spawned by any data/content/npcs row; the spawned hospital quest giver is Nurse Naia 9000000161, and the quest definition now names her."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3090001,
         3090002,
+        3090003,
         3090009,
         3090011
       ],
@@ -40212,6 +40233,18 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) source explicitly says after row 10; mapped that page label to the preceding batch content key"
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 3; name 'Medic: House Call'; title id cell ucdt 3150122236 / ugdt 1362261935"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 3; name 'Medic: House Call'; title id cell ucdt 3150122236 / ugdt 1362261935"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T197 giver fix: House Call's giver is the spawned Nurse Naia 9000000161, not the unspawned 9000000419 named by the guide."
           }
         ],
         "quest_ids_given": [
@@ -40294,6 +40327,18 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) source explicitly says after row 10; mapped that page label to the preceding batch content key"
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 3; name 'Medic: House Call'; title id cell ucdt 3150122236 / ugdt 1362261935"
+          },
+          {
+            "kind": "wiki",
+            "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 3; name 'Medic: House Call'; title id cell ucdt 3150122236 / ugdt 1362261935"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T197 giver fix: House Call's giver is the spawned Nurse Naia 9000000161, not the unspawned 9000000419 named by the guide."
           }
         ],
         "quests_given_text": [

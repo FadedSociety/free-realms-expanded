@@ -5,11 +5,13 @@
 //! `QuestEngine`) with the same 26/8, 26/10, 26/6, 49/2 and 49/14 packets the gateway
 //! accepts. They do not call `QuestOutcome` or `finish_turnin` directly.
 //!
-//! Client request/reply layouts used here (verified in the client readers):
+//! Client request/reply layouts used here (verified in the client constructors and
+//! field readers):
 //! - 26/8 NPC interact: constructor `008b6bc0`; u64 target + u8 [0].
 //! - 26/10 menu select: constructor `00a36f80`; u64 target + i32 choice.
-//! - 26/6 dialogue response: reader `009f5890`; i32 row (301 is the quest row).
-//! - 49/2 quest reply: reader `00a86400` / sender `00a97d70`; u32 quest + u8 accept.
+//! - 26/6 dialogue response: constructor `009f5890`, sender `009f6740`; i32 row
+//!   (301 is the quest row).
+//! - 49/2 quest reply: constructor `00a86400`, sender `00a97d70`; u32 quest + u8 accept.
 //! - 49/14 end reply: constructor `00a864c0` / sender `00a97ef0`; u32 quest.
 //! 49/1 offers are read for their quest id at 6..10 (`QuestInfoPacket` reader
 //! `00c7bb60`); 49/13 end screens name the speaker at 6..14 and the quest at

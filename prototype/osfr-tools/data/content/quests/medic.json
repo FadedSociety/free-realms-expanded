@@ -75,9 +75,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T197: chapter step enabled as a single talk. 3090002 (Operation: Revival, Bixie Hive) stays disabled and is skipped by the 3090003 prerequisite."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1, row 1; the completion line '[Player] has shown Nurse Naia that [they have] what it takes to be a great medic.' is client locale hash 219584158 = Global.Text 24259. end_text_string_id is that recovered completion line; the offer intro stays 0 because the title block's T-1 slot 23047 is empty and no unambiguous intro line is recovered."
         }
       ],
       "description_string_id": 23049,
+      "end_text_string_id": 24259,
       "enabled": true
     },
     {
@@ -209,9 +214,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T197: historical coin/XP payout is unknown; 10 coins and 20 Medic XP are the W110/T194 referral fallback. The existing quest grant key pays it once."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1, row 3; the completion line 'By helping out with Doctor Gordon's workload, [player] found out why Greyli has been avoiding the hosptal.' is client locale hash 1171210927 = Global.Text 24266. end_text_string_id is that recovered completion line; the offer intro stays 0 because the title block's T-1 slot 22988 is empty and no unambiguous intro line is recovered."
         }
       ],
       "description_string_id": 22990,
+      "end_text_string_id": 24266,
       "enabled": true
     },
     {
