@@ -2,7 +2,7 @@
 //! Both halves must reach one atomic document (never two writes), and a refused replacement must
 //! leave the document and the live session untouched. The requests below run through
 //! `Session::dispatch_message`, the same staging/commit/save path a socket datagram takes.
-use super::test_support::{self, Scratch};
+use super::test_support::{self, Scene, Scratch, bin_test_target};
 use super::*;
 use osfr_tools::inventory::InventoryItem;
 
@@ -14,70 +14,11 @@ const ADOPTION_ITEM: i32 = 70_352;
 const PET_SPECIES: u32 = 1_000_015;
 
 /// A selected, world-loaded session, as `Session::new` + the handshake leave it.
-fn enter(options: &Options, id: u32) -> Session {
-    let mut session = Session::new(
-        SessionId(u64::from(id)),
-        format!("127.0.0.1:{}", 23_000 + id).parse().unwrap(),
-        SessionRequest {
-            id,
-            crc_length: 3,
-            buffer_size: 512,
-        },
-        options,
-        CRC_SEED,
-        None,
-        None,
-    )
-    .unwrap();
-    let mut login = 1u16.to_le_bytes().to_vec();
-    for (index, text) in ["f161-synthetic-ticket", "1.910.1.530630", ""]
-        .iter()
-        .enumerate()
-    {
-        login.extend((text.len() as u32).to_le_bytes());
-        login.extend(text.as_bytes());
-        if index == 0 {
-            login.extend(1u64.to_le_bytes());
-        }
-    }
-    session.gateway.handle(&login).unwrap();
-    session.gateway.handle(&wrap(&[13, 0])).unwrap();
-    session.gateway.handle(&wrap(&[10, 0])).unwrap();
-    session
-}
-
-/// One session and the shared containers a `Server` owns. Rebuilding it from `Options` is the
-/// gateway's restart path: the session loads the save and the pet roster again.
-struct Scene {
-    session: Session,
-    world: SharedWorld,
-    membership: World,
-    sessions: SessionMap,
-}
-
-impl Scene {
-    fn new(options: &Options, id: u32) -> Self {
-        Self {
-            session: enter(options, id),
-            world: SharedWorld::new(),
-            membership: World::runtime(),
-            sessions: SessionMap::new(),
-        }
-    }
-
-    fn send(&mut self, options: &Options, inner: &[u8], now: u64) -> Result<(), String> {
-        self.session
-            .dispatch_message(
-                &wrap(inner),
-                options,
-                now,
-                &mut self.world,
-                &mut self.membership,
-                &mut self.sessions,
-                None,
-            )
-            .map_err(|error| error.to_string())
-    }
+fn world_loaded(options: &Options, id: u32) -> Scene {
+    let mut scene = Scene::new(options, id);
+    scene.session.gateway.handle(&wrap(&[13, 0])).unwrap();
+    scene.session.gateway.handle(&wrap(&[10, 0])).unwrap();
+    scene
 }
 
 /// Add one owned adoption certificate to the live inventory, as a purchase or reward would.
@@ -146,30 +87,15 @@ fn carries_certificate(document: &serde_json::Value, defined: i32) -> bool {
         })
 }
 
-/// The gateway source is embedded by five integration tests, which compile this module too.
-/// `CARGO_BIN_NAME` is set only for the binary's own test target, so the scenario runs once
-/// there. An embedded copy says so on stderr (libtest does not capture a direct fd write), so a
-/// green integration-target line is not mistaken for a real run.
-fn bin_test_target() -> bool {
-    if option_env!("CARGO_BIN_NAME").is_some() {
-        return true;
-    }
-    use std::io::Write as _;
-    let _ = std::io::stderr().write_all(
-        b"f161: embedded gateway copy skipped; run `cargo test --bin osfr-gateway f161_`\n",
-    );
-    false
-}
-
 #[test]
 fn a_spent_certificate_and_its_pet_survive_a_restart_together() {
-    if !bin_test_target() {
+    if !bin_test_target("f161") {
         return;
     }
     let scratch = Scratch::new("f161-adopt");
     let state = scratch.state();
     let options = test_support::options(state.clone());
-    let mut scene = Scene::new(&options, 611);
+    let mut scene = world_loaded(&options, 611);
     grant_certificate(&mut scene.session);
     let movement = pose(&scene.session);
     scene
@@ -212,7 +138,7 @@ fn a_spent_certificate_and_its_pet_survive_a_restart_together() {
     // Restart exactly as the gateway does: a new session with fresh shared containers loads the
     // same save and roster, and only then may the character summon the pet by id.
     drop(scene);
-    let mut scene = Scene::new(&options, 612);
+    let mut scene = world_loaded(&options, 612);
     assert!(
         !owns_certificate(&scene.session),
         "the spent certificate must stay spent across the restart"
@@ -238,13 +164,13 @@ fn a_spent_certificate_and_its_pet_survive_a_restart_together() {
 fn a_refused_adoption_save_leaves_the_document_and_the_live_session_unchanged() {
     use std::os::windows::fs::OpenOptionsExt;
 
-    if !bin_test_target() {
+    if !bin_test_target("f161") {
         return;
     }
     let scratch = Scratch::new("f161-adopt-refused");
     let state = scratch.state();
     let options = test_support::options(state.clone());
-    let mut scene = Scene::new(&options, 621);
+    let mut scene = world_loaded(&options, 621);
     grant_certificate(&mut scene.session);
     let movement = pose(&scene.session);
     scene
@@ -299,7 +225,7 @@ fn a_refused_adoption_save_leaves_the_document_and_the_live_session_unchanged() 
     // `contain` -> `end_session`), so the client's retry is a reconnect, not the same session.
     // Drop the failed scene and load the same save in a fresh one, as the restart test does.
     drop(scene);
-    let mut scene = Scene::new(&options, 622);
+    let mut scene = world_loaded(&options, 622);
     assert!(
         owns_certificate(&scene.session),
         "the refused commit left the certificate on disk for the reconnect"

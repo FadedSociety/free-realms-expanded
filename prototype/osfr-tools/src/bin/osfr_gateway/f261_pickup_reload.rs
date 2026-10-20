@@ -1,89 +1,65 @@
 //! F261: every opcode-31 begin-zoning makes the client reload its scene, so
 //! `Session::commit_outcome` passes that fact into `Gateway::bind_run_instance` and the
-//! staged engine drops the old scene's ground pickups. The regression seeds a pickup
-//! through the real drop roll, knocks the player out and sends the client's free revive
-//! (41/122). The instance id does not change, so only the commit's own
-//! `outcome.began_zoning` (client begin-zoning body reader `0x008e4ae0`) can clear the
-//! drop. A tick on the revival spot afterwards must not pay the invisible heart.
+//! staged engine drops the old scene's ground pickups. The regression seeds the drop the
+//! way the server does: a real 36/10 basic attack kills a content field enemy whose
+//! `power_up_table` is the shipped guaranteed `boss` table, so the ground pickup is the
+//! server's own roll and no test-only seed API exists. It then knocks the player out and
+//! sends the client's free revive (41/122). The instance id does not change, so only the
+//! commit's own `outcome.began_zoning` (client begin-zoning body reader `0x008e4ae0`) can
+//! clear the drop. A fresh kill after the reload is still paid on the same spot, so the
+//! "does not heal" assertion is about the reload, not an inert tick.
 //! `Session::dispatch_message`, `Session::tick` and `Session::commit_outcome` are the same
 //! staging/commit/save path a socket datagram takes.
-use super::test_support::{self, Scratch};
+use super::test_support::{self, Scene, Scratch, bin_test_target};
 use super::*;
 
-/// A logged-in session; `[13,0]`/`[10,0]` drive world entry as ordinary commits.
-fn enter(options: &Options, id: u32) -> Session {
-    let mut session = Session::new(
-        SessionId(u64::from(id)),
-        format!("127.0.0.1:{}", 23_300 + id).parse().unwrap(),
-        SessionRequest {
-            id,
-            crc_length: 3,
-            buffer_size: 512,
-        },
-        options,
-        CRC_SEED,
-        None,
-        None,
+/// The copied campaign plus two synthetic field enemies on the world checkpoint, each rolling
+/// the shipped guaranteed `boss` table. `vendor_content` supplies the `npcs/` +
+/// `npc_spawns_extra.json` marker, so the session loads this directory's field and drop tables
+/// instead of the bundled `data/content` ones.
+struct DropContent {
+    path: PathBuf,
+    at: [f32; 3],
+}
+
+fn drop_content(scratch: &Scratch) -> DropContent {
+    let path = test_support::vendor_content(scratch);
+    let reference = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab/references/rust-gateway-reference");
+    let initial = Gateway::reference_state(&reference).unwrap();
+    // The same placement production uses: the copied encounters.json world position.
+    let at = Gameplay::initial_character(&path, initial)
+        .unwrap()
+        .position;
+    let enemy = |guid: u64| {
+        json!({
+            "guid": guid,
+            "definition_id": 400,
+            "model_id": 3,
+            "name_id": 100,
+            "name": "Synthetic wolf",
+            "texture_alias": "",
+            "position": at,
+            "max_health": 1,
+            "damage": 0,
+            "boss": false,
+            "power_up_table": "boss",
+            "respawn_seconds": 3_600,
+            "aggro_range": 8
+        })
+    };
+    let enemies = json!({"schema_version": 1, "enemies": [enemy(9_001), enemy(9_002)]});
+    fs::write(
+        path.join("field_enemies.json"),
+        serde_json::to_vec(&enemies).unwrap(),
     )
     .unwrap();
-    let mut login = 1u16.to_le_bytes().to_vec();
-    for (index, text) in ["f261-synthetic-ticket", "1.910.1.530630", ""]
-        .iter()
-        .enumerate()
-    {
-        login.extend((text.len() as u32).to_le_bytes());
-        login.extend(text.as_bytes());
-        if index == 0 {
-            login.extend(1u64.to_le_bytes());
-        }
-    }
-    session.gateway.handle(&login).unwrap();
-    session
-}
-
-/// One session and the containers a `Server` owns, without a listening socket.
-struct Scene {
-    session: Session,
-    world: SharedWorld,
-    membership: World,
-    sessions: SessionMap,
-}
-
-impl Scene {
-    fn new(options: &Options, id: u32) -> Self {
-        Self {
-            session: enter(options, id),
-            world: SharedWorld::new(),
-            membership: World::runtime(),
-            sessions: SessionMap::new(),
-        }
-    }
-
-    fn send(&mut self, options: &Options, inner: &[u8], now: u64) {
-        self.session
-            .dispatch_message(
-                &wrap(inner),
-                options,
-                now,
-                &mut self.world,
-                &mut self.membership,
-                &mut self.sessions,
-                None,
-            )
-            .unwrap();
-    }
-
-    fn tick(&mut self, options: &Options, now: u64) {
-        self.session
-            .tick(
-                options,
-                now,
-                &mut self.world,
-                &mut self.membership,
-                &mut self.sessions,
-            )
-            .unwrap();
-    }
+    fs::copy(
+        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/power_ups.json"),
+        path.join("power_ups.json"),
+    )
+    .unwrap();
+    DropContent { path, at }
 }
 
 fn pickup_count(session: &Session) -> usize {
@@ -105,6 +81,34 @@ fn health(session: &Session) -> u32 {
         .player_health
 }
 
+fn active_profile(session: &Session) -> i32 {
+    session
+        .gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .profiles
+        .unwrap()
+        .active
+}
+
+/// The client's 26/13 class selection (job id at bytes 4..8).
+fn class_selection(job: i32) -> Vec<u8> {
+    [vec![26, 0, 13, 0], job.to_le_bytes().to_vec()].concat()
+}
+
+/// The client's 36/10 targeted basic attack: bar 1, slot 0, one target GUID.
+fn basic_attack(target: u64) -> Vec<u8> {
+    [
+        vec![36, 0, 10, 0],
+        1_i32.to_le_bytes().to_vec(),
+        0_i32.to_le_bytes().to_vec(),
+        0_i32.to_le_bytes().to_vec(),
+        target.to_le_bytes().to_vec(),
+    ]
+    .concat()
+}
+
 /// The client's free revive: family 41/sub 122, header ids zero, paid = false
 /// (`0093bd80` free, `0093be30` paid; body 12-byte header + bool).
 fn free_revive() -> Vec<u8> {
@@ -124,53 +128,63 @@ fn wound(scene: &mut Scene, now: u64) -> (u32, u32) {
 
 #[test]
 fn f261_the_commit_clears_a_revive_reloads_ground_pickups() {
-    // The gateway source is embedded by integration harnesses, which compile this
-    // module too; the scenario runs once in the binary's own test target.
-    if option_env!("CARGO_BIN_NAME").is_none() {
+    if !bin_test_target("f261") {
         return;
     }
     let scratch = Scratch::new("f261-pickup");
-    let options = test_support::options(scratch.state());
-    let mut scene = Scene::new(&options, 261);
-    scene.send(&options, &[13, 0], 1_000);
-    scene.send(&options, &[10, 0], 1_001);
-    assert!(scene.session.gateway.is_world_loaded());
-    // The free revive returns here (the world checkpoint from encounters.json).
-    let checkpoint = scene.session.gateway.state().position;
+    let content = drop_content(&scratch);
+    let mut options = test_support::options(scratch.state());
+    options.content = Some(content.path.clone());
 
-    // Positive control: the tick pays a heart under the checkpoint, so "does not
-    // heal" below is an assertion about the reload, not about an inert tick.
-    scene
-        .session
-        .gateway
-        .seed_power_up_drop("boss", checkpoint, 2_000);
+    // The same seed `Server::new` installs before any session enters the scene.
+    let mut seed = load_gateway_template(&options).unwrap();
+    let field = seed.take_shared_fields().expect("the field enemies load");
+    let guids: Vec<u64> = field
+        .interest_candidates(false)
+        .iter()
+        .map(|npc| npc.guid)
+        .collect();
+    assert_eq!(guids.len(), 2, "both fixture enemies are on the field");
+    let (first, second) = (guids[0], guids[1]);
+
+    let mut scene = Scene::new(&options, 261);
+    // The membership owns the field; install it before the commit that enters the scene.
+    scene.membership.install_field_seed(0, field);
+    scene.send(&options, &[13, 0], 1_000).unwrap();
+    scene.send(&options, &[10, 0], 1_001).unwrap();
+    assert!(scene.session.gateway.is_world_loaded());
+    // The free revive returns to this checkpoint, where both enemies stand.
+    assert_eq!(
+        scene.session.gateway.state().position,
+        content.at,
+        "world entry uses the content checkpoint"
+    );
+
+    // Brawler's equipped starter weapon is the basic attack this scenario uses.
+    scene.send(&options, &class_selection(43), 1_100).unwrap();
+    assert_eq!(
+        active_profile(&scene.session),
+        43,
+        "the class selection is accepted"
+    );
+
+    // The server's own kill: the guaranteed boss table drops one ground heart.
+    scene.session.known_npcs.insert(first);
+    scene.send(&options, &basic_attack(first), 2_000).unwrap();
     assert_eq!(
         pickup_count(&scene.session),
         1,
         "the boss table drops a pickup"
     );
-    let (full, wounded) = wound(&mut scene, 2_100);
-    assert!(wounded < full);
-    scene.tick(&options, 2_200);
-    assert!(
-        health(&scene.session) > wounded,
-        "an ordinary tick collects the heart under the player"
-    );
-    assert_eq!(pickup_count(&scene.session), 0);
 
-    // A heart left from before the revive lies where the client comes back.
+    let full = health(&scene.session);
     scene
         .session
         .gateway
-        .seed_power_up_drop("boss", checkpoint, 3_000);
-    assert_eq!(pickup_count(&scene.session), 1);
-    scene
-        .session
-        .gateway
-        .receive_field_damage(full, 3_100, true)
+        .receive_field_damage(full, 2_100, true)
         .unwrap();
     assert_eq!(health(&scene.session), 0, "the knockout holds");
-    scene.send(&options, &free_revive(), 3_200);
+    scene.send(&options, &free_revive(), 2_200).unwrap();
     assert_eq!(health(&scene.session), full, "the free revive works");
     assert_eq!(
         pickup_count(&scene.session),
@@ -178,17 +192,31 @@ fn f261_the_commit_clears_a_revive_reloads_ground_pickups() {
         "a begin-zoning commit drops the old scene's ground pickups even into the same instance"
     );
 
-    // The client reloaded its scene; the ready handshake follows, then the tick on
+    // The client reloaded its scene and sends the ready handshake; the tick on
     // the spot must not pay the heart the client no longer shows.
-    scene.send(&options, &[13, 0], 3_300);
-    scene.send(&options, &[10, 0], 3_301);
-    let (full, wounded) = wound(&mut scene, 3_400);
-    assert!(wounded < full);
-    scene.tick(&options, 3_500);
+    scene.send(&options, &[13, 0], 2_300).unwrap();
+    scene.send(&options, &[10, 0], 2_301).unwrap();
+    scene.tick(&options, 2_400);
     assert_eq!(
         health(&scene.session),
-        wounded,
+        full,
         "the stale big heart must not heal after the reload"
+    );
+
+    // Positive control: a fresh kill after the reload is paid by the same spot tick.
+    scene.session.known_npcs.insert(second);
+    scene.send(&options, &basic_attack(second), 3_000).unwrap();
+    assert_eq!(
+        pickup_count(&scene.session),
+        1,
+        "the live heart is on the ground"
+    );
+    let (full, wounded) = wound(&mut scene, 3_100);
+    assert!(wounded < full);
+    scene.tick(&options, 3_200);
+    assert!(
+        health(&scene.session) > wounded,
+        "an ordinary tick collects the heart under the player"
     );
     assert_eq!(pickup_count(&scene.session), 0);
 }

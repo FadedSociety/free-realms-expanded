@@ -2223,14 +2223,6 @@ impl EncounterEngine {
         self.pickups.len()
     }
 
-    /// (R) Test/diagnostic: roll one kill's ground drop through the real drop
-    /// path (table, kind, actor guid and ttl), so a fixture can seed a pickup
-    /// without a live field. The gateway never calls this.
-    pub fn seed_power_up_drop(&mut self, table: &str, at: [f32; 3], now_ms: u64) {
-        let mut out = EncounterOutcome::default();
-        self.drop_power_ups(table, (0, now_ms), at, now_ms, 1, &mut out);
-    }
-
     /// Roll `table` for one participant of the kill and spawn each drop as a
     /// pickup actor. An unknown table, no loaded file or a full ground drops
     /// nothing. With several participants every chance is scaled by the file's

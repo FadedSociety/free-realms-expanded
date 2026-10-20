@@ -51,7 +51,6 @@ mod npc;
 mod npc_quests;
 mod npc_turnin;
 mod occupation;
-mod pickup_seed;
 /// Warpstone definitions, attunement and validated travel (W142).
 #[path = "restoration/piece_077.rs"]
 #[allow(dead_code)]
@@ -642,6 +641,13 @@ impl Gameplay {
             self.apply_encounter(result, &mut out)?;
         }
         Ok(out)
+    }
+
+    /// How many ground pickups this session still holds (tests and diagnostics).
+    pub fn pickup_count(&self) -> usize {
+        self.encounter
+            .as_ref()
+            .map_or(0, crate::encounter::EncounterEngine::pickup_count)
     }
 
     /// W158: another group member picked up a big heart; heal this player too.

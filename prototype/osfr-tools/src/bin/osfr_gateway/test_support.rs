@@ -1,6 +1,7 @@
 //! Shared setup for the gateway binary's `#[cfg(test)]` session modules: one scratch
-//! directory and one `Options` initializer, so a new option field is added once instead
-//! of in every test copy. Test-only; production never includes this file.
+//! directory, one `Options` initializer and one socket-less session fixture, so a new
+//! option field or handshake step is added once instead of in every test copy. Test-only;
+//! production never includes this file.
 use super::*;
 
 /// A clean temp directory; dropping it removes the directory and the saves in it.
@@ -149,4 +150,102 @@ pub fn options(state: PathBuf) -> Options {
         security_log: None,
         group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
     }
+}
+
+/// A logged-in session, before its world entry. The caller drives `[13,0]`/`[10,0]` either
+/// through `Gateway::handle` (a direct handshake) or through `Scene::send` (the session commit
+/// path), so each test keeps the entry route it is proving.
+pub fn enter(options: &Options, id: u32) -> Session {
+    let mut session = Session::new(
+        SessionId(u64::from(id)),
+        format!("127.0.0.1:{}", 23_000 + id).parse().unwrap(),
+        SessionRequest {
+            id,
+            crc_length: 3,
+            buffer_size: 512,
+        },
+        options,
+        CRC_SEED,
+        None,
+        None,
+    )
+    .unwrap();
+    let mut login = 1u16.to_le_bytes().to_vec();
+    for (index, text) in ["synthetic-ticket", "1.910.1.530630", ""]
+        .iter()
+        .enumerate()
+    {
+        login.extend((text.len() as u32).to_le_bytes());
+        login.extend(text.as_bytes());
+        if index == 0 {
+            login.extend(1u64.to_le_bytes());
+        }
+    }
+    session.gateway.handle(&login).unwrap();
+    session
+}
+
+/// One session and the containers a `Server` owns, without a listening socket.
+pub struct Scene {
+    pub session: Session,
+    pub world: SharedWorld,
+    pub membership: World,
+    pub sessions: SessionMap,
+}
+
+impl Scene {
+    pub fn new(options: &Options, id: u32) -> Self {
+        Self {
+            session: enter(options, id),
+            world: SharedWorld::new(),
+            membership: World::runtime(),
+            sessions: SessionMap::new(),
+        }
+    }
+
+    /// One client application message through `Session::dispatch_message`, the same
+    /// staging/commit/save path a socket datagram takes.
+    pub fn send(&mut self, options: &Options, inner: &[u8], now: u64) -> Result<(), String> {
+        self.session
+            .dispatch_message(
+                &wrap(inner),
+                options,
+                now,
+                &mut self.world,
+                &mut self.membership,
+                &mut self.sessions,
+                None,
+            )
+            .map_err(|error| error.to_string())
+    }
+
+    pub fn tick(&mut self, options: &Options, now: u64) {
+        self.session
+            .tick(
+                options,
+                now,
+                &mut self.world,
+                &mut self.membership,
+                &mut self.sessions,
+            )
+            .unwrap();
+    }
+}
+
+/// Whether this copy is the binary's own test target. The gateway source is embedded by five
+/// integration harnesses, which compile these test modules too; an embedded copy says so on
+/// stderr (libtest does not capture a direct fd write), so a green integration-target line is
+/// not mistaken for a real run.
+pub fn bin_test_target(tag: &str) -> bool {
+    if option_env!("CARGO_BIN_NAME").is_some() {
+        return true;
+    }
+    use std::io::Write as _;
+    let _ = std::io::stderr().write_all(
+        format!(
+            "{tag}: embedded gateway copy skipped; run `cargo test --bin osfr-gateway {tag}_`\n"
+        )
+        .as_bytes(),
+    );
+    false
 }
