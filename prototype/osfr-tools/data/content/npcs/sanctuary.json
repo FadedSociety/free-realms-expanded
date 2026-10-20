@@ -8807,6 +8807,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/chef.json, quest 3050020 binds giver_npc_id 9000000028 from the guide row and intro_text_string_id 387246 from the 49/1 intro; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2)\"."
           }
         ]
       },
@@ -13723,6 +13727,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/medic.json, quest 3090012 binds giver_npc_id 9000000052 from the guide row and intro_text_string_id 73782 from the 49/1 intro; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2)\"."
           }
         ]
       },
@@ -16915,6 +16923,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/medic.json, quest 3090008 binds giver_npc_id 9000000073 from the guide row and intro_text_string_id 76747 from the 49/1 intro; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2)\"."
           }
         ]
       },
@@ -35054,6 +35066,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/wizard.json, quest 3160033 binds giver_npc_id 9000000126 from the guide row and intro_text_string_id 76438 from the 49/1 intro; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2)\"."
           }
         ]
       },
@@ -40543,6 +40559,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/medic.json, quest 3090009 binds giver_npc_id 9000000161 from the guide row and intro_text_string_id 73360 from the 49/1 intro; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2)\"."
           }
         ]
       },
@@ -55093,6 +55113,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/warrior.json, quest 3150018 binds giver_npc_id 9000000205 from the guide row and intro_text_string_id 71435 from the 49/1 intro; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2)\"."
           }
         ]
       },

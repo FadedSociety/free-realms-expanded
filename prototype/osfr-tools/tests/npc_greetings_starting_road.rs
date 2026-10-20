@@ -3,7 +3,9 @@
 //! The service path (`NpcInteraction::interact` -> `select`) is the same one
 //! `gameplay/npc.rs` uses; the dispatch path (`Gameplay::handle_in_world`) drives
 //! the real router and `dialogue_packet_with`. The 26/3 body is the first dword
-//! after the header (client reader `009f5ae0`); the byte layout is pinned by
+//! after the header: client handler `00aa12e0` calls reader `00a9ef10` (stores
+//! that dword at object `+16`), and display routine `009f5ae0` passes it to the
+//! locale lookup before `:SetDialogText`. The byte layout is pinned by
 //! `tests/npc_interaction.rs::dialogue_26_3_synthetic_fixture_round_trips_exact_native_field_order`.
 //! Locale ids, hashes, dat lines and speaker proofs are in
 //! `notes/Research/NPC Greetings Starting Road.md`.
@@ -332,6 +334,14 @@ fn the_starting_road_npcs_have_recovered_greetings() {
             Some("legacy_data"),
             "NPC {npc_id}: must stay a spawned placement"
         );
+        assert!(
+            record["model_id"].as_u64().is_some_and(|id| id > 0),
+            "NPC {npc_id}: model id (NpcVisibility spawns model_id.unwrap_or(0))"
+        );
+        assert!(
+            record["name_string_id"].as_u64().is_some_and(|id| id > 0),
+            "NPC {npc_id}: name string id"
+        );
 
         let sources = record["field_sources"]["greeting_string_id"]
             .as_array()
@@ -401,18 +411,27 @@ fn missing_or_zero_greeting_still_falls_back_to_an_empty_body() {
         "an NPC without a greeting has no body"
     );
 
-    // A refused choice must leave the menu usable.
+    // A refused choice must leave the menu usable. Select Talk directly on the
+    // still-open menu (no second `interact`), so this fails if `select` consumes
+    // `active` on `InvalidOption`.
     let (zone, position) = service.location(BLANK).unwrap();
-    service.interact(BLANK, zone, position, None).unwrap();
+    let menu = service.interact(BLANK, zone, position, None).unwrap();
+    let talk = menu
+        .options
+        .iter()
+        .find(|option| option.action == NpcAction::Talk)
+        .expect("the blank NPC offers Talk");
     assert!(matches!(
         service.select(&select_request(BLANK, i32::MAX), zone, position, None),
         Err(NpcInteractionError::InvalidOption)
     ));
-    assert_eq!(
-        service_talk_body(&mut service, BLANK),
-        None,
-        "the refused choice must not consume the menu"
-    );
+    match service.select(&select_request(BLANK, talk.id), zone, position, None) {
+        Ok(NpcSelection::Talk(context)) => assert_eq!(
+            context.body_string_id, None,
+            "the refused choice must not consume the menu"
+        ),
+        _ => panic!("the refused choice must leave the menu usable"),
+    }
 
     // The real router still encodes 26/3 with a zero body and the one goodbye row.
     let mut game = Gameplay::load(&gameplay_dir(), None).expect("gameplay content loads");

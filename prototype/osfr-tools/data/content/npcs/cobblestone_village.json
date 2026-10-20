@@ -2411,6 +2411,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/archer.json, quest 3010010 binds giver_npc_id 9500000245 from the guide row and intro_text_string_id 388245 from the 49/1 intro; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2)\"."
           }
         ]
       },
