@@ -47,6 +47,7 @@ mod field_battle;
 mod jobs;
 mod npc;
 mod npc_quests;
+mod npc_turnin;
 mod occupation;
 /// Warpstone definitions, attunement and validated travel (W142).
 #[path = "restoration/piece_077.rs"]

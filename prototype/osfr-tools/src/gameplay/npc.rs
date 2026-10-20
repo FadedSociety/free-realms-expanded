@@ -30,57 +30,6 @@ impl Gameplay {
         Ok(packets)
     }
 
-    /// Reopen a saved pending turn-in only in a batch that also sends its speaker's 35/2
-    /// AddNpc. `ShowQuestEndScreen` (0x00A95420) resolves the packet's actor through the
-    /// client actor table first and does not retry when it is absent; sending the 49/13
-    /// from login synchronization put it before every visibility spawn.
-    pub(super) fn append_pending_turnin_screen(
-        &self,
-        packets: &mut Vec<Vec<u8>>,
-    ) -> io::Result<()> {
-        let Some(engine) = self.npc_quests.as_ref() else {
-            return Ok(());
-        };
-        let Some(actor_id) = engine.pending_turnin_actor() else {
-            return Ok(());
-        };
-        let Some(quest_id) = engine.state().pending_turnin else {
-            return Ok(());
-        };
-        let Some(runtime_actor) = packets.iter().find_map(|packet| {
-            let npc = crate::startup_world::parse_add_npc(packet).ok()?;
-            let same_npc = npc.actor_id == actor_id
-                || self
-                    .npc_visibility
-                    .as_ref()
-                    .and_then(|visibility| visibility.content_key(npc.actor_id))
-                    == Some(actor_id);
-            same_npc.then_some(npc.actor_id)
-        }) else {
-            return Ok(());
-        };
-        packets.push(engine.quest_end_packet(quest_id, runtime_actor)?);
-        Ok(())
-    }
-
-    /// Canonical runtime-GUID -> content-key map. Opening-scene actors are excluded from
-    /// this mapping. The turn-in replay does not use it: `pending_turnin_actor` is already
-    /// a saved content key and may be a Talk target rather than the formal turn-in NPC, so
-    /// the replay matches its spawn and visibility map directly, without that filter.
-    pub(super) fn content_npc_key(&self, runtime_guid: u64) -> Option<u64> {
-        if self.opening.as_ref().is_some_and(|opening| {
-            opening
-                .actors()
-                .iter()
-                .any(|actor| actor.guid == runtime_guid)
-        }) {
-            return None;
-        }
-        self.npc_visibility
-            .as_ref()
-            .and_then(|visibility| visibility.content_key(runtime_guid))
-    }
-
     pub(super) fn handle_npc_packet(
         &mut self,
         inner: &[u8],

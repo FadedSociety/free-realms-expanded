@@ -275,17 +275,6 @@ impl Gameplay {
         Ok(())
     }
 
-    /// Shared-field path: the same saved end screen, but a packet failure is logged for this
-    /// viewer instead of faulting the shared tick.
-    pub(super) fn append_shared_pending_end_screen(&self, packets: &mut Vec<Vec<u8>>) {
-        if let Err(error) = self.append_pending_turnin_screen(packets) {
-            npc_event(serde_json::json!({
-                "event": "pending_end_screen_refused",
-                "reason": error.to_string()
-            }));
-        }
-    }
-
     pub(super) fn append_npc_quest_login_sync(&mut self, out: &mut Outcome) -> io::Result<()> {
         if self.npc_quests_synced {
             return Ok(());
