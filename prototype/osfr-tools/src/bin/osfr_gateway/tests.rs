@@ -1334,3 +1334,9 @@ mod f261_pickup_reload;
 #[cfg(test)]
 #[path = "l011_vendor_save_failure.rs"]
 mod l011_vendor_save_failure;
+
+/// T258 (S12/L8): a quest-reward turn-in whose character save fails changes nothing and ends
+/// only that session. Test-only proof; no production code changes.
+#[cfg(test)]
+#[path = "quest_reward_save_failure.rs"]
+mod quest_reward_save_failure;
