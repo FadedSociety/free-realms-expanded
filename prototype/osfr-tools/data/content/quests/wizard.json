@@ -72,7 +72,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T242: the thieving Robgoblin Adept is not a resolved field actor and no spell-book item definition is proven, so the search is a server-verified camp position rather than a fabricated kill target (model_id) or item id (collect_item). The point is the ground under the drawable Robgoblin Camp NPC Squee (9000000949, legacy_data, Wilds), which is proven standable camp ground; the client's 'northwest' bearing is not resolvable in this server's world axes, so no compass claim is made. Radius 5 m keeps the point outside the 12 m NPC talk ring, so accepting at Fizzlesticks cannot complete it without moving."
+              "evidence": "(R) T242: the thieving Robgoblin Adept is not a resolved field actor and no spell-book item definition is proven, so the search is a server-verified camp position rather than a fabricated kill target (model_id) or item id (collect_item). The point is the ground under the drawable Robgoblin Camp NPC Squee (9500000949, legacy_data, Wilds), which is proven standable camp ground; the client's 'northwest' bearing is not resolvable in this server's world axes, so no compass claim is made. Radius 5 m keeps the point outside the 12 m NPC talk ring, so accepting at Fizzlesticks cannot complete it without moving."
             }
           ]
         },
@@ -164,7 +164,7 @@
           "source": [
             {
               "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1 row 2; description 22189 ('somewhere in the Robgoblin Camp'); intro 22190 ('Can you search that junkpile over there and try to find them?'); step 103129 ('Find Fizzlesticks' glasses in the Robgoblin Camp.', raw 3740861002) and step 38878 (return the glasses to Fizzlesticks, raw 3829448281)."
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1 row 2; description 22189 ('somewhere in the Robgoblin Camp'); intro 24948 (guide raw 2073760606, 'Fizzle me sticks! I can't find my glasses...'); step 103129 ('Find Fizzlesticks' glasses in the Robgoblin Camp.', raw 3740861002) and step 38878 (return the glasses to Fizzlesticks, raw 3829448281)."
             },
             {
               "kind": "reconstructed",
@@ -226,7 +226,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T242: the record's intro id 22187 resolved to a QA 'Blacksmithing!' string, so it was replaced with 22190, the locale id immediately after description 22189 whose text is Fizzlesticks asking the player to search the junkpile. The guide's 24948 is a dagger (wording-only) pitch candidate and is not used. End text 38882 replaces 22190, which is the intro line, not the debrief."
+          "evidence": "(R) T242/F268: the record's intro id 22187 resolved to a QA 'Blacksmithing!' string. The guide's row-2 pitch (raw 2073760606, a wording-only dagger match) resolves to locale 24948 and is used here. End text 38882 is the guide's recovered hand-in line; it replaces the stale 22190."
         },
         {
           "kind": "reconstructed",
@@ -234,7 +234,7 @@
         }
       ],
       "description_string_id": 22189,
-      "intro_text_string_id": 22190,
+      "intro_text_string_id": 24948,
       "end_text_string_id": 38882,
       "enabled": true
     },

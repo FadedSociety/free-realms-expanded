@@ -1,6 +1,6 @@
-//! T242: Fizzlesticks' first Wizard chapter, "Wizard: How to be a Wizard" (3160003) and
-//! "Wizard: I Can't Read This!" (3160004). The chapter is content-only; these tests drive
-//! the production request path (`Gameplay::handle_in_world` -> `gameplay/npc.rs` ->
+//! T242/F268: Fizzlesticks' first Wizard chapter, "Wizard: How to be a Wizard" (3160003)
+//! and "Wizard: I Can't Read This!" (3160004). The chapter is content-only; these tests
+//! drive the production request path (`Gameplay::handle_in_world` -> `gameplay/npc.rs` ->
 //! `QuestEngine`) plus the production position event (`Gameplay::on_location`, the exact
 //! call `gateway.rs` makes after movement validation).
 //!
@@ -17,8 +17,12 @@
 //! - 49/13 QuestEnd: writer/reader `00c7bbd0`/`00c7b990`; actor u64 at 6..14, quest i32 at
 //!   14..18, end-text locale at 18..22, animation at 22..26, reward bundle from 26.
 //! - 49/14 end reply: constructor `00a864c0`; i32 quest.
-//! 35/2 AddNpc (constructor `0091cac0`) draws Fizzlesticks and Nurble from their `legacy_data`
-//! regional rows; `enabled_wizard_chapter_records_are_complete_and_drawable` pins that.
+//! 35/2 AddNpc (constructor `0091cac0`) draws Fizzlesticks, Nurble and Squee from their
+//! `legacy_data` regional rows; `enabled_wizard_chapter_records_are_complete_and_drawable`
+//! pins that.
+//!
+//! The shared fixture and packet helpers live in `tests/support/npc_quest_chain.rs`; the
+//! Wizard vocabulary and reward assertions live in `tests/support/wizard_entry.rs`.
 //!
 //! The chapter fixture is the same opening play package the other chapter tests use
 //! (`lab/references/opening-anvil-placement-v1/content`); the repository's own
@@ -27,337 +31,35 @@
 //! fixture's `profiles.json` has no Wizard starter outfit, so the 26/13 switch to Wizard is
 //! not used here; the chapter asks only that Wizard is the active job.
 
+#[path = "support/wizard_entry.rs"]
+mod wizard_entry;
+
 use osfr_tools::{
     character_store::CharacterState,
-    gameplay::{Gameplay, GameplayState, Outcome},
-    npc_interaction::{QuestOfferPacket49_1, decode_quest_offer_49_1},
-    profiles::ProfileState,
+    gameplay::{Gameplay, Outcome},
     quest_engine::QuestStatus,
 };
 use serde_json::Value;
 use std::{
-    collections::{BTreeMap, BTreeSet},
     fs,
-    path::{Path, PathBuf},
+    path::PathBuf,
     sync::atomic::{AtomicU64, Ordering},
 };
-
-const CHARACTER: u64 = 242_017;
-const SECOND_CHARACTER: u64 = 242_018;
-const FIZZLESTICKS: u64 = 9_000_000_324;
-const NURBLE: u64 = 9_000_000_415;
-/// Drawable Robgoblin Camp NPC whose ground spot is the spell-book search area.
-const SQUEE: u64 = 9_500_000_949;
-const BOOK: u32 = 3_160_003;
-const GLASSES: u32 = 3_160_004;
-/// "Sticky Spell Book" (the Nurble cleaning errand) stays disabled in this slice.
-const STICKY: u32 = 3_160_005;
-const BOOK_TITLE: u32 = 20_859;
-const BOOK_DESCRIPTION: u32 = 20_860;
-const BOOK_INTRO: u32 = 24_947;
-const BOOK_END_TEXT: u32 = 9_797;
-const GLASSES_TITLE: u32 = 22_188;
-const GLASSES_DESCRIPTION: u32 = 22_189;
-const GLASSES_INTRO: u32 = 22_190;
-const GLASSES_END_TEXT: u32 = 38_882;
-const REWARD_COINS: u32 = 5;
-const REWARD_XP: u32 = 25;
-const WIZARD: i32 = 12;
-const BRAWLER: i32 = 43;
-/// The open continent is world zone 0; regional zone ids are content labels.
-const OPEN_WORLD: u32 = 0;
-/// Generic Talk option label in the reconstructed 26/9 menu (`npc_interaction.rs`).
-const TALK_LABEL: u32 = 3_300;
-/// First response row of the quest dialogue (client 26/6).
-const QUEST_CHOICE: i32 = 301;
+use wizard_entry::*;
 
 static NEXT_FIXTURE: AtomicU64 = AtomicU64::new(0);
 
-fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
+fn pending_offer(game: &Gameplay) -> Option<u32> {
+    game.state().npc_quests.as_ref().unwrap().pending_offer
 }
 
-fn reference_content() -> PathBuf {
-    std::env::var_os("OSFR_WIZARD_ENTRY_CONTENT")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| {
-            Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("../../../lab/references/opening-anvil-placement-v1/content")
-        })
-}
-
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(
-        &fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
-    )
-    .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-}
-
-fn copy_dir(source: &Path, destination: &Path) {
-    fs::create_dir_all(destination).unwrap();
-    for entry in fs::read_dir(source).unwrap() {
-        let entry = entry.unwrap();
-        let target = destination.join(entry.file_name());
-        if entry.file_type().unwrap().is_dir() {
-            copy_dir(&entry.path(), &target);
-        } else {
-            fs::copy(entry.path(), &target).unwrap();
-        }
-    }
-}
-
-/// One temporary play package. The fixture supplies profile/inventory content; the
-/// repository's `job_trainers.json`, `npcs/` and split quests are bound from `data/content`.
-struct Fixture(PathBuf);
-
-impl Fixture {
-    fn new() -> Self {
-        let source = reference_content();
-        assert!(
-            source.join("profiles.json").is_file() && source.join("inventory.json").is_file(),
-            "the wizard chapter needs the opening content fixture at {}",
-            source.display()
-        );
-        let directory = std::env::temp_dir().join(format!(
-            "osfr-wizard-entry-{}-{}",
-            std::process::id(),
-            NEXT_FIXTURE.fetch_add(1, Ordering::Relaxed)
-        ));
-        copy_dir(&source, &directory);
-        fs::copy(
-            content_dir().join("job_trainers.json"),
-            directory.join("job_trainers.json"),
-        )
-        .unwrap();
-        Self(directory)
-    }
-
-    fn game(&self, state: Option<GameplayState>) -> Gameplay {
-        self.game_for(state, CHARACTER)
-    }
-
-    fn game_for(&self, state: Option<GameplayState>, character_id: u64) -> Gameplay {
-        let mut game = Gameplay::load(&self.0, state).expect("opening fixture loads");
-        game.bind_npc_quest_catalogue(&content_dir(), character_id)
-            .expect("split quest content loads");
-        game
-    }
-
-    /// A saved Wizard: profile 12 unlocked and active at rank 1 (no experience). The client's
-    /// level-20 Medic unlock is the trainer row's prerequisite, not a quest gate.
-    fn wizard_state(&self) -> GameplayState {
-        let mut state = Gameplay::load(&self.0, None)
-            .expect("opening fixture loads")
-            .state();
-        state.profiles = Some(ProfileState {
-            version: 1,
-            active: WIZARD,
-            unlocked: BTreeSet::from([1, WIZARD, BRAWLER]),
-            experience: BTreeMap::new(),
-        });
-        state
-    }
-
-    /// A Wizard job the player has unlocked but is not playing.
-    fn unlocked_wizard_state(&self) -> GameplayState {
-        let mut state = self.wizard_state();
-        state.profiles = Some(ProfileState {
-            version: 1,
-            active: BRAWLER,
-            unlocked: BTreeSet::from([1, WIZARD, BRAWLER]),
-            experience: BTreeMap::new(),
-        });
-        state
-    }
-
-    fn wizard_game(&self) -> Gameplay {
-        self.game(Some(self.wizard_state()))
-    }
-
-    /// Reconnect: round-trip the saved state through JSON, then load it again.
-    fn reconnect(&self, game: &Gameplay) -> Gameplay {
-        let bytes = serde_json::to_vec(&game.state()).unwrap();
-        let state: GameplayState = serde_json::from_slice(&bytes).unwrap();
-        self.game(Some(state))
-    }
-}
-
-impl Drop for Fixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.0);
-    }
-}
-
-fn character_at(zone_id: u32, position: [f32; 3]) -> CharacterState {
-    CharacterState {
-        guid: CHARACTER,
-        zone_id,
-        position,
-        rotation: [1.0, 0.0, 0.0],
-    }
-}
-
-fn content_position(file: &str, npc_id: u64) -> [f32; 3] {
-    let document = read_json(&content_dir().join("npcs").join(file));
-    let row = document["records"]
-        .as_array()
+fn has_quest(game: &Gameplay, quest_id: u32) -> bool {
+    game.state()
+        .npc_quests
+        .as_ref()
         .unwrap()
-        .iter()
-        .find(|row| row["npc_id"].as_u64() == Some(npc_id))
-        .unwrap_or_else(|| panic!("NPC {npc_id} is defined in {file}"));
-    serde_json::from_value(row["position"].clone()).expect("NPC has a position")
-}
-
-/// The player standing in front of `npc_id` in the open continent.
-fn avatar_at(npc_id: u64) -> CharacterState {
-    character_at(OPEN_WORLD, content_position("wilds.json", npc_id))
-}
-
-fn npc_interact(target: u64) -> Vec<u8> {
-    let mut packet = vec![26, 0, 8, 0];
-    packet.extend(target.to_le_bytes());
-    packet.push(0);
-    packet
-}
-
-fn npc_select(target: u64, choice: i32) -> Vec<u8> {
-    let mut packet = vec![26, 0, 10, 0];
-    packet.extend(target.to_le_bytes());
-    packet.extend(choice.to_le_bytes());
-    packet
-}
-
-fn dialogue_choice(row: i32) -> Vec<u8> {
-    let mut packet = vec![26, 0, 6, 0];
-    packet.extend(row.to_le_bytes());
-    packet
-}
-
-fn quest_reply(quest_id: u32, accept: bool) -> Vec<u8> {
-    let mut packet = vec![49, 0, 2, 0, 0, 0];
-    packet.extend(quest_id.to_le_bytes());
-    packet.push(u8::from(accept));
-    packet
-}
-
-fn quest_end_reply(quest_id: u32) -> Vec<u8> {
-    let mut packet = vec![49, 0, 14, 0, 0, 0];
-    packet.extend(quest_id.to_le_bytes());
-    packet
-}
-
-fn select_job(profile: i32) -> Vec<u8> {
-    let mut packet = vec![26, 0, 13, 0];
-    packet.extend(profile.to_le_bytes());
-    packet
-}
-
-fn send(game: &mut Gameplay, character: &CharacterState, packet: &[u8], now: u64) -> Outcome {
-    game.handle_in_world(packet, character, now)
-        .unwrap_or_else(|error| {
-            panic!(
-                "packet {:?} was refused: {error}",
-                &packet[..packet.len().min(4)]
-            )
-        })
-}
-
-fn has_family(packet: &[u8], family: u16, subtype: u16, id: Option<u32>) -> bool {
-    if packet.len() < 6
-        || packet[..2] != family.to_le_bytes()
-        || packet[2..4] != subtype.to_le_bytes()
-    {
-        return false;
-    }
-    let Some(id) = id else { return true };
-    // 49/13 carries the turn-in speaker at 6..14 and the reply quest id at 14..18;
-    // the other family/subtype pairs used here carry their id at 6..10.
-    let offset = if (family, subtype) == (49, 13) { 14 } else { 6 };
-    packet
-        .get(offset..offset + 4)
-        .is_some_and(|bytes| u32::from_le_bytes(bytes.try_into().unwrap()) == id)
-}
-
-fn menu_option(outcome: &Outcome, label: u32) -> i32 {
-    let menu = outcome
-        .replies
-        .iter()
-        .find(|packet| packet.starts_with(&[26, 0, 9, 0]))
-        .expect("26/8 returns the 26/9 interaction menu");
-    let count = i32::from_le_bytes(menu[13..17].try_into().unwrap());
-    assert!(count > 0, "the interaction menu has no options");
-    (0..count)
-        .find_map(|index| {
-            let offset = 17 + usize::try_from(index).unwrap() * 28;
-            let id = i32::from_le_bytes(menu[offset..offset + 4].try_into().unwrap());
-            let string_id = u32::from_le_bytes(menu[offset + 8..offset + 12].try_into().unwrap());
-            (string_id == label).then_some(id)
-        })
-        .unwrap_or_else(|| panic!("menu label {label} is absent"))
-}
-
-fn interact(game: &mut Gameplay, character: &CharacterState, target: u64, now: u64) -> Outcome {
-    send(game, character, &npc_interact(target), now)
-}
-
-fn talk(game: &mut Gameplay, character: &CharacterState, target: u64, now: u64) -> Outcome {
-    let menu = interact(game, character, target, now);
-    let choice = menu_option(&menu, TALK_LABEL);
-    send(game, character, &npc_select(target, choice), now + 1)
-}
-
-/// Talk through the client's quest row and assert the 49/1 offer, decoded with the
-/// production reader.
-fn offer(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    target: u64,
-    quest_id: u32,
-    now: u64,
-) -> (Outcome, QuestOfferPacket49_1) {
-    let dialogue = talk(game, character, target, now);
-    assert!(
-        dialogue
-            .replies
-            .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
-        "Talk must open the 26/3 dialogue"
-    );
-    let offered = send(game, character, &dialogue_choice(QUEST_CHOICE), now + 2);
-    let offers: Vec<&Vec<u8>> = offered
-        .replies
-        .iter()
-        .filter(|packet| packet.starts_with(&[49, 0, 1, 0]))
-        .collect();
-    assert_eq!(offers.len(), 1, "one quest choice offers exactly one quest");
-    assert!(
-        has_family(offers[0], 49, 1, Some(quest_id)),
-        "quest {quest_id} was not offered"
-    );
-    let decoded = decode_quest_offer_49_1(offers[0]).expect("49/1 decodes");
-    assert_eq!(decoded.quest_id, quest_id);
-    assert_eq!(quest_status(game, quest_id), QuestStatus::Offered);
-    (offered, decoded)
-}
-
-fn accept(game: &mut Gameplay, character: &CharacterState, quest_id: u32, now: u64) -> Outcome {
-    let accepted = send(game, character, &quest_reply(quest_id, true), now);
-    assert!(
-        accepted
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 3, Some(quest_id))),
-        "quest {quest_id} did not send QuestAdd"
-    );
-    assert!(
-        accepted
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 8, None)),
-        "quest {quest_id} did not activate its first objective"
-    );
-    assert_eq!(quest_status(game, quest_id), QuestStatus::Active);
-    accepted
+        .quests
+        .contains_key(&quest_id)
 }
 
 /// `gateway.rs` sends the validated pose to `Gameplay::on_location`; that is the production
@@ -374,192 +76,6 @@ fn assert_visit_changes_nothing(game: &mut Gameplay, position: [f32; 3], now: u6
     assert_eq!(saved(game), before, "{label} changed the save bytes");
 }
 
-/// 26/6 releases the 49/13 held for the quest choice. `QuestEndPacket::ReadFields`
-/// (`00c7b990`) reads actor 6..14, quest 14..18, end text 18..22, animation 22..26; the
-/// reward bundle starts at 26 (`encode_quest_reward_bundle`): success byte, coins i32,
-/// stars i32, ..., display source guid, player guid, icon, name, rows.
-fn release_end_screen(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    quest_id: u32,
-    expected_actor: u64,
-    expected_end_text: u32,
-    now: u64,
-) -> Vec<u8> {
-    let released = send(game, character, &dialogue_choice(QUEST_CHOICE), now);
-    let end = released
-        .replies
-        .iter()
-        .find(|packet| has_family(packet, 49, 13, Some(quest_id)))
-        .cloned()
-        .unwrap_or_else(|| panic!("quest {quest_id} did not release its 49/13 end screen"));
-    assert_eq!(
-        u64::from_le_bytes(end[6..14].try_into().unwrap()),
-        expected_actor,
-        "the end screen must name the clicked runtime actor"
-    );
-    assert_eq!(
-        u32::from_le_bytes(end[18..22].try_into().unwrap()),
-        expected_end_text,
-        "the end screen must carry the quest's debrief text"
-    );
-    assert_eq!(
-        u32::from_le_bytes(end[22..26].try_into().unwrap()),
-        0,
-        "the animation dword is the (R) default"
-    );
-    assert_eq!(end[26], 1, "the reward bundle success byte");
-    assert_eq!(
-        i32::from_le_bytes(end[27..31].try_into().unwrap()),
-        REWARD_COINS as i32,
-        "the 49/13 reward bundle carries the coin row"
-    );
-    assert_eq!(
-        i32::from_le_bytes(end[31..35].try_into().unwrap()),
-        REWARD_XP as i32,
-        "the 49/13 reward bundle carries the job-XP row"
-    );
-    assert_eq!(
-        u32::from_le_bytes(end[83..87].try_into().unwrap()),
-        quest_title(quest_id),
-        "the reward display names the quest title"
-    );
-    assert_eq!(
-        u64::from_le_bytes(end[63..71].try_into().unwrap()),
-        FIZZLESTICKS,
-        "the reward display source is the quest giver"
-    );
-    assert_eq!(
-        u64::from_le_bytes(end[71..79].try_into().unwrap()),
-        CHARACTER,
-        "the reward display names the character"
-    );
-    end
-}
-
-fn finish_quest(game: &mut Gameplay, character: &CharacterState, quest_id: u32, now: u64) {
-    let coins_before = coins(game);
-    let xp_before = profile_xp(game, WIZARD);
-    let completed = send(game, character, &quest_end_reply(quest_id), now);
-    assert!(
-        completed.changed,
-        "quest {quest_id} turn-in did not change state"
-    );
-    assert!(
-        completed
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 4, Some(quest_id))),
-        "quest {quest_id} did not complete"
-    );
-    assert_eq!(coins(game), coins_before + REWARD_COINS);
-    assert_eq!(profile_xp(game, WIZARD), xp_before + REWARD_XP);
-    assert_eq!(quest_status(game, quest_id), QuestStatus::Completed);
-    assert_eq!(pending_turnin(game), None);
-}
-
-fn quest_title(quest_id: u32) -> u32 {
-    match quest_id {
-        BOOK => BOOK_TITLE,
-        GLASSES => GLASSES_TITLE,
-        other => panic!("quest {other} has no title in this chapter"),
-    }
-}
-
-fn counts(game: &Gameplay, quest_id: u32) -> Vec<u32> {
-    game.state().npc_quests.as_ref().unwrap().quests[&quest_id]
-        .counts
-        .clone()
-}
-
-fn quest_status(game: &Gameplay, quest_id: u32) -> QuestStatus {
-    game.state().npc_quests.as_ref().unwrap().quests[&quest_id]
-        .status
-        .clone()
-}
-
-fn has_quest(game: &Gameplay, quest_id: u32) -> bool {
-    game.state()
-        .npc_quests
-        .as_ref()
-        .unwrap()
-        .quests
-        .contains_key(&quest_id)
-}
-
-fn pending_offer(game: &Gameplay) -> Option<u32> {
-    game.state().npc_quests.as_ref().unwrap().pending_offer
-}
-
-fn pending_turnin(game: &Gameplay) -> Option<u32> {
-    game.state().npc_quests.as_ref().unwrap().pending_turnin
-}
-
-fn coins(game: &Gameplay) -> u32 {
-    game.state().inventory.coins
-}
-
-fn profile_xp(game: &Gameplay, profile: i32) -> u32 {
-    game.state()
-        .profiles
-        .as_ref()
-        .unwrap()
-        .experience
-        .get(&profile)
-        .copied()
-        .unwrap_or(0)
-}
-
-fn saved(game: &Gameplay) -> Vec<u8> {
-    serde_json::to_vec(&game.state()).unwrap()
-}
-
-fn assert_no_offer(game: &mut Gameplay, character: &CharacterState, target: u64, now: &mut u64) {
-    let before = saved(game);
-    *now += 10;
-    let menu = interact(game, character, target, *now);
-    let choice = menu_option(&menu, TALK_LABEL);
-    *now += 1;
-    let dialogue = send(game, character, &npc_select(target, choice), *now);
-    assert!(
-        !dialogue.changed,
-        "a Talk with nothing eligible must not change gameplay"
-    );
-    // The refusal must leave the NPC menu open: the same 26/9 option still starts a Talk.
-    *now += 1;
-    let again = send(game, character, &npc_select(target, choice), *now);
-    assert!(
-        again
-            .replies
-            .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
-        "a refused Talk consumed the open NPC menu"
-    );
-    *now += 8;
-    let closed = send(game, character, &dialogue_choice(QUEST_CHOICE), *now);
-    assert!(
-        !closed
-            .replies
-            .iter()
-            .any(|packet| packet.starts_with(&[49, 0, 1, 0])),
-        "no quest may be offered"
-    );
-    assert_eq!(saved(game), before, "the refusal changed the save bytes");
-}
-
-fn assert_packet_changes_nothing(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    packet: &[u8],
-    now: u64,
-    label: &str,
-) {
-    let before = saved(game);
-    let outcome = send(game, character, packet, now);
-    assert!(!outcome.changed, "{label} changed gameplay");
-    assert_eq!(saved(game), before, "{label} changed the save bytes");
-}
-
 #[test]
 fn fizzlesticks_offers_the_first_wizard_chapter_to_an_eligible_wizard() {
     let fixture = Fixture::new();
@@ -568,7 +84,13 @@ fn fizzlesticks_offers_the_first_wizard_chapter_to_an_eligible_wizard() {
 
     // An Adventurer sees no Wizard chapter; the open menu survives the refusal.
     let mut game = fixture.game(None);
-    assert_no_offer(&mut game, &character, FIZZLESTICKS, &mut now);
+    assert_no_offer(
+        &mut game,
+        &character,
+        FIZZLESTICKS,
+        &mut now,
+        "Adventurer at Fizzlesticks",
+    );
 
     // A character on another job sees no Wizard chapter, and the offer gate does not
     // depend on the menu being freshly opened.
@@ -576,31 +98,45 @@ fn fizzlesticks_offers_the_first_wizard_chapter_to_an_eligible_wizard() {
     let switched = send(&mut game, &character, &select_job(BRAWLER), now);
     assert!(switched.changed);
     assert_eq!(game.state().profiles.as_ref().unwrap().active, BRAWLER);
-    assert_no_offer(&mut game, &character, FIZZLESTICKS, &mut now);
+    assert_no_offer(
+        &mut game,
+        &character,
+        FIZZLESTICKS,
+        &mut now,
+        "Brawler at Fizzlesticks",
+    );
 
     // A Wizard the player has unlocked but is not playing is refused by the same job gate.
-    let mut inactive = fixture.game(Some(fixture.unlocked_wizard_state()));
-    assert_no_offer(&mut inactive, &character, FIZZLESTICKS, &mut now);
+    let mut inactive = fixture.game(Some(unlocked_wizard_state(&fixture)));
+    assert_no_offer(
+        &mut inactive,
+        &character,
+        FIZZLESTICKS,
+        &mut now,
+        "inactive Wizard at Fizzlesticks",
+    );
 
     // The active Wizard sees the first chapter, and only the first chapter.
-    let mut game = fixture.wizard_game();
-    let (_, offer) = offer(&mut game, &character, FIZZLESTICKS, BOOK, now);
+    let mut game = wizard_game(&fixture);
+    let offer = offered_card(&mut game, &character, FIZZLESTICKS, BOOK, now);
     assert_eq!(offer.intro_text_string_id, BOOK_INTRO);
-    assert_eq!(offer.field_2, BOOK_TITLE);
     assert_eq!(offer.name_string_id, BOOK_TITLE);
     assert_eq!(offer.description_string_id, BOOK_DESCRIPTION);
-    assert_eq!(offer.field_5, BOOK_TITLE);
     assert!(!offer.members_only);
-    assert_eq!(offer.reward_bundle_body.len(), 69);
-    // The offer card's bundle is the deliberate empty 69-byte placeholder: the exact coins
-    // and job XP are asserted on the 49/13 turn-in screen, which is where they are shown.
-    assert!(offer.reward_bundle_body.iter().all(|byte| *byte == 0));
+    // The 49/1 card's reward bundle is the pre-existing empty 69-byte placeholder; the
+    // exact coins and job XP are asserted on the 49/13 turn-in screen instead (F268 gap).
     assert_eq!(pending_offer(&game), Some(BOOK));
     assert_eq!(counts(&game, BOOK), vec![0, 0]);
     assert!(!has_quest(&game, GLASSES));
 
     // A second Talk while the offer is open starts nothing new and changes nothing.
-    assert_no_offer(&mut game, &character, FIZZLESTICKS, &mut now);
+    assert_no_offer(
+        &mut game,
+        &character,
+        FIZZLESTICKS,
+        &mut now,
+        "open offer at Fizzlesticks",
+    );
     assert_eq!(pending_offer(&game), Some(BOOK));
 
     // Accepting pays nothing yet.
@@ -614,7 +150,13 @@ fn fizzlesticks_offers_the_first_wizard_chapter_to_an_eligible_wizard() {
     assert_eq!(profile_xp(&game, WIZARD), xp_before);
     // The second quest stays gated behind the first.
     assert!(!has_quest(&game, GLASSES));
-    assert_no_offer(&mut game, &character, FIZZLESTICKS, &mut now);
+    assert_no_offer(
+        &mut game,
+        &character,
+        FIZZLESTICKS,
+        &mut now,
+        "first chapter accepted",
+    );
 }
 
 #[test]
@@ -624,7 +166,7 @@ fn the_spell_book_and_glasses_steps_advance_and_turn_in_once() {
     let book_search = content_position("wilds.json", SQUEE);
     let glasses_search = content_position("wilds.json", NURBLE);
     let mut now = 2_000;
-    let mut game = fixture.wizard_game();
+    let mut game = wizard_game(&fixture);
 
     now += 10;
     offer(&mut game, &character, FIZZLESTICKS, BOOK, now);
@@ -654,8 +196,14 @@ fn the_spell_book_and_glasses_steps_advance_and_turn_in_once() {
 
     // A talk to the wrong Robgoblin Camp NPC changes nothing.
     now += 10;
+    let wrong_before = saved(&game);
     let wrong = talk(&mut game, &avatar_at(NURBLE), NURBLE, now);
     assert!(!wrong.changed, "a talk to the wrong NPC changed gameplay");
+    assert_eq!(
+        saved(&game),
+        wrong_before,
+        "a talk to the wrong NPC changed the save bytes"
+    );
     assert_eq!(counts(&game, BOOK), vec![1, 0]);
 
     // Returning to Fizzlesticks completes the ordered step and holds the end screen.
@@ -677,16 +225,17 @@ fn the_spell_book_and_glasses_steps_advance_and_turn_in_once() {
     assert_eq!(profile_xp(&game, WIZARD), xp_before);
 
     now += 10;
-    release_end_screen(
+    release_wizard_end_screen(&mut game, &character, BOOK, BOOK_END_TEXT, now);
+    now += 10;
+    finish_quest(
         &mut game,
         &character,
         BOOK,
-        FIZZLESTICKS,
-        BOOK_END_TEXT,
+        WIZARD,
+        REWARD_COINS,
+        REWARD_XP,
         now,
     );
-    now += 10;
-    finish_quest(&mut game, &character, BOOK, now);
     assert_eq!(coins(&game), coins_before + REWARD_COINS);
     assert_eq!(profile_xp(&game, WIZARD), xp_before + REWARD_XP);
 
@@ -704,11 +253,10 @@ fn the_spell_book_and_glasses_steps_advance_and_turn_in_once() {
     // The second chapter opens only now: the next quest choice offers "I Can't Read This!"
     // and never re-offers the completed first record.
     now += 10;
-    let (_, offer) = offer(&mut game, &character, FIZZLESTICKS, GLASSES, now);
+    let offer = offered_card(&mut game, &character, FIZZLESTICKS, GLASSES, now);
     assert_eq!(offer.intro_text_string_id, GLASSES_INTRO);
     assert_eq!(offer.name_string_id, GLASSES_TITLE);
     assert_eq!(offer.description_string_id, GLASSES_DESCRIPTION);
-    assert_eq!(offer.field_2, GLASSES_TITLE);
     now += 10;
     accept(&mut game, &character, GLASSES, now);
     assert_eq!(counts(&game, GLASSES), vec![0, 0]);
@@ -737,16 +285,17 @@ fn the_spell_book_and_glasses_steps_advance_and_turn_in_once() {
     let coins_before = coins(&game);
     let xp_before = profile_xp(&game, WIZARD);
     now += 10;
-    release_end_screen(
+    release_wizard_end_screen(&mut game, &character, GLASSES, GLASSES_END_TEXT, now);
+    now += 10;
+    finish_quest(
         &mut game,
         &character,
         GLASSES,
-        FIZZLESTICKS,
-        GLASSES_END_TEXT,
+        WIZARD,
+        REWARD_COINS,
+        REWARD_XP,
         now,
     );
-    now += 10;
-    finish_quest(&mut game, &character, GLASSES, now);
     assert_eq!(coins(&game), coins_before + REWARD_COINS);
     assert_eq!(profile_xp(&game, WIZARD), xp_before + REWARD_XP);
     now += 10;
@@ -761,7 +310,13 @@ fn the_spell_book_and_glasses_steps_advance_and_turn_in_once() {
 
     // The Nurble cleaning errand stays disabled and is never offered.
     assert!(!has_quest(&game, STICKY));
-    assert_no_offer(&mut game, &character, FIZZLESTICKS, &mut now);
+    assert_no_offer(
+        &mut game,
+        &character,
+        FIZZLESTICKS,
+        &mut now,
+        "chapter complete at Fizzlesticks",
+    );
 }
 
 #[test]
@@ -772,7 +327,7 @@ fn forged_or_missing_objective_events_change_nothing() {
     let glasses_search = content_position("wilds.json", NURBLE);
     let far_away = [book_search[0] + 60.0, book_search[1], book_search[2]];
     let mut now = 3_000;
-    let mut game = fixture.wizard_game();
+    let mut game = wizard_game(&fixture);
     let coins_before = coins(&game);
     let xp_before = profile_xp(&game, WIZARD);
 
@@ -822,8 +377,14 @@ fn forged_or_missing_objective_events_change_nothing() {
     // The other chapter's search area is out of range for this step.
     assert_visit_changes_nothing(&mut game, glasses_search, now + 5, "out-of-range visit");
     // A talk to a wrong NPC changes nothing.
+    let wrong_before = saved(&game);
     let wrong = talk(&mut game, &avatar_at(NURBLE), NURBLE, now + 6);
     assert!(!wrong.changed);
+    assert_eq!(
+        saved(&game),
+        wrong_before,
+        "the wrong-NPC talk changed the save bytes"
+    );
     assert_eq!(counts(&game, BOOK), vec![0, 0]);
     assert_eq!(pending_turnin(&game), None);
     assert_eq!(coins(&game), coins_before);
@@ -835,16 +396,17 @@ fn forged_or_missing_objective_events_change_nothing() {
     now += 10;
     assert!(talk(&mut game, &character, FIZZLESTICKS, now).changed);
     now += 10;
-    release_end_screen(
+    release_wizard_end_screen(&mut game, &character, BOOK, BOOK_END_TEXT, now);
+    now += 10;
+    finish_quest(
         &mut game,
         &character,
         BOOK,
-        FIZZLESTICKS,
-        BOOK_END_TEXT,
+        WIZARD,
+        REWARD_COINS,
+        REWARD_XP,
         now,
     );
-    now += 10;
-    finish_quest(&mut game, &character, BOOK, now);
     let completed_coins = coins(&game);
     let completed_xp = profile_xp(&game, WIZARD);
     for (index, packet) in [
@@ -878,7 +440,7 @@ fn a_mid_chapter_reconnect_resumes_the_saved_progress() {
     let book_search = content_position("wilds.json", SQUEE);
     let glasses_search = content_position("wilds.json", NURBLE);
     let mut now = 4_000;
-    let mut game = fixture.wizard_game();
+    let mut game = wizard_game(&fixture);
     let starting_coins = coins(&game);
     let starting_xp = profile_xp(&game, WIZARD);
 
@@ -892,7 +454,7 @@ fn a_mid_chapter_reconnect_resumes_the_saved_progress() {
 
     // Disconnect after the first objective.
     let mid_bytes = saved(&game);
-    game = fixture.reconnect(&game);
+    game = reconnect(&fixture, &game);
     assert_eq!(
         saved(&game),
         mid_bytes,
@@ -917,7 +479,7 @@ fn a_mid_chapter_reconnect_resumes_the_saved_progress() {
     assert_eq!(counts(&game, BOOK), vec![1, 1]);
     assert_eq!(pending_turnin(&game), Some(BOOK));
     let held_bytes = saved(&game);
-    game = fixture.reconnect(&game);
+    game = reconnect(&fixture, &game);
     assert_eq!(saved(&game), held_bytes, "reload changed the held turn-in");
     assert_eq!(pending_turnin(&game), Some(BOOK));
     assert_eq!(coins(&game), starting_coins, "a disconnect pays nothing");
@@ -954,7 +516,15 @@ fn a_mid_chapter_reconnect_resumes_the_saved_progress() {
 
     // The client answers the re-sent end screen directly after the reconnect.
     now += 10;
-    finish_quest(&mut game, &character, BOOK, now);
+    finish_quest(
+        &mut game,
+        &character,
+        BOOK,
+        WIZARD,
+        REWARD_COINS,
+        REWARD_XP,
+        now,
+    );
     assert_eq!(coins(&game), starting_coins + REWARD_COINS);
     assert_eq!(profile_xp(&game, WIZARD), starting_xp + REWARD_XP);
 
@@ -968,21 +538,22 @@ fn a_mid_chapter_reconnect_resumes_the_saved_progress() {
     now += 10;
     assert!(talk(&mut game, &character, FIZZLESTICKS, now).changed);
     now += 10;
-    release_end_screen(
+    release_wizard_end_screen(&mut game, &character, GLASSES, GLASSES_END_TEXT, now);
+    now += 10;
+    finish_quest(
         &mut game,
         &character,
         GLASSES,
-        FIZZLESTICKS,
-        GLASSES_END_TEXT,
+        WIZARD,
+        REWARD_COINS,
+        REWARD_XP,
         now,
     );
-    now += 10;
-    finish_quest(&mut game, &character, GLASSES, now);
 
     let final_bytes = saved(&game);
     let final_coins = coins(&game);
     let final_xp = profile_xp(&game, WIZARD);
-    game = fixture.reconnect(&game);
+    game = reconnect(&fixture, &game);
     assert_eq!(
         saved(&game),
         final_bytes,
@@ -1014,6 +585,7 @@ fn a_malformed_wizard_record_fails_at_load() {
         &fixture,
         record(3_999_001, vec![talk_goal(1, 0)], vec![]),
         "zero objective target",
+        "invalid quest objective definition",
     );
     // An objective without provenance.
     let mut no_source = visit_goal(1, [0.0, 0.0, 0.0], 5.0);
@@ -1022,6 +594,7 @@ fn a_malformed_wizard_record_fails_at_load() {
         &fixture,
         record(3_999_001, vec![no_source], vec![]),
         "empty objective source",
+        "runtime quest objective requires provenance",
     );
     // Overlapping objective ids inside one record.
     assert_load_refused(
@@ -1032,6 +605,7 @@ fn a_malformed_wizard_record_fails_at_load() {
             vec![],
         ),
         "overlapping objective ids",
+        "invalid quest objective definition",
     );
     // A reward outside the wire bounds.
     let mut out_of_range = reward(5);
@@ -1044,6 +618,7 @@ fn a_malformed_wizard_record_fails_at_load() {
             vec![out_of_range],
         ),
         "out-of-range reward",
+        "invalid quest definition",
     );
     // A job-XP row that names no known job profile.
     let mut unknown_profile = reward(5);
@@ -1056,6 +631,7 @@ fn a_malformed_wizard_record_fails_at_load() {
             vec![unknown_profile],
         ),
         "unknown job profile",
+        "quest XP references unknown job profile",
     );
 }
 
@@ -1149,12 +725,18 @@ fn synthetic_content(quest: &Value) -> PathBuf {
     directory
 }
 
-fn assert_load_refused(fixture: &Fixture, quest: Value, label: &str) {
+fn assert_load_refused(fixture: &Fixture, quest: Value, label: &str, expected: &str) {
     let directory = synthetic_content(&quest);
     let mut game = fixture.game(None);
     let result = game.bind_npc_quest_catalogue(&directory, CHARACTER);
     let _ = fs::remove_dir_all(&directory);
-    assert!(result.is_err(), "{label} must be refused at content load");
+    let error = result
+        .err()
+        .unwrap_or_else(|| panic!("{label} must be refused at content load"));
+    assert!(
+        error.to_string().contains(expected),
+        "{label} must fail for {expected:?}, got: {error}"
+    );
     // The refusal left the previously bound catalogue in place and changed no save byte.
     assert_eq!(saved(&game), saved(&fixture.game(None)));
 }
@@ -1280,7 +862,11 @@ fn enabled_wizard_chapter_records_are_complete_and_drawable() {
         );
         rows[0]
     };
-    for (content_key, role) in [(FIZZLESTICKS, "trainer"), (NURBLE, "quest_giver")] {
+    for (content_key, role) in [
+        (FIZZLESTICKS, "trainer"),
+        (NURBLE, "quest_giver"),
+        (SQUEE, "quest_giver"),
+    ] {
         let row = regional(content_key);
         assert_eq!(row["placement"].as_str(), Some("legacy_data"));
         assert_eq!(row["zone_id"].as_u64(), Some(16));
@@ -1331,8 +917,8 @@ fn two_wizards_progress_independently() {
     };
     let book_search = content_position("wilds.json", SQUEE);
     let mut now = 5_000;
-    let mut first = fixture.wizard_game();
-    let mut second = fixture.game_for(Some(fixture.wizard_state()), SECOND_CHARACTER);
+    let mut first = wizard_game(&fixture);
+    let mut second = fixture.game_as(SECOND_CHARACTER, Some(wizard_state(&fixture)));
 
     for (game, character) in [
         (&mut first, &first_character),
