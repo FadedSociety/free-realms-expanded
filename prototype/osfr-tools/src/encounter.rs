@@ -20,6 +20,7 @@ use std::{
 };
 
 mod field;
+mod field_rewards;
 mod power_up_use;
 mod shared;
 mod skills;
@@ -768,6 +769,8 @@ pub struct EncounterEngine {
     /// yet to claim. Owned by the shared field; swapped in with it (empty for a
     /// solo engine).
     ledger: KillLedger,
+    /// (R) Coins and active-job XP for a field kill (`field_kill_rewards.json`).
+    field_rewards: Arc<field_rewards::FieldKillRewards>,
     /// Zone the pickups were dropped in; a different zone clears them.
     pickup_zone: Option<u32>,
     /// World instance this session's scene is bound to (`bind_run_instance`).
@@ -790,9 +793,12 @@ struct KillLedger {
 #[derive(Clone)]
 struct KillCredit {
     kill: (u64, u64),
-    table: String,
+    /// Power-up drop table; `None` for a reward-only field kill.
+    table: Option<String>,
     at: [f32; 3],
     participants: usize,
+    /// The field reward earned by this kill, carried until the claim.
+    reward: Option<(u32, u32)>,
     expires_ms: u64,
 }
 
@@ -1145,6 +1151,7 @@ impl EncounterEngine {
             next_pickup: 0,
             held_power_up: None,
             ledger: KillLedger::default(),
+            field_rewards: Arc::new(field_rewards::FieldKillRewards::load(directory)?),
             pickup_zone: None,
             pickup_instance: None,
         };
@@ -1979,6 +1986,7 @@ impl EncounterEngine {
             return Ok(EncounterOutcome::default());
         }
         let (definition, max_health, boss) = (a.definition_id, a.max_health, a.boss);
+        let level = a.level;
         let target_name = a.name.clone();
         let drop_table = a.power_up_table.clone();
         let health = s.health;
@@ -2159,80 +2167,23 @@ impl EncounterEngine {
                 .as_ref()
                 .is_none_or(|a| a.phase == EncounterPhase::Fighting)
             {
-                if let Some(table) = drop_table {
-                    let engaged = field_index.and_then(|i| self.field[i].target);
-                    self.drop_for_participants(
-                        &table, guid, killed_at, now_ms, hitters, engaged, &mut out,
-                    );
-                }
+                let reward =
+                    field_index.and_then(|_| self.field_rewards.reward_for(definition, level));
+                let engaged = field_index.and_then(|i| self.field[i].target);
+                self.credit_field_kill(
+                    drop_table.as_deref(),
+                    reward,
+                    guid,
+                    killed_at,
+                    now_ms,
+                    hitters,
+                    engaged,
+                    &mut out,
+                );
             }
         }
         self.present_results(&mut out);
         Ok(out)
-    }
-
-    /// A kill's drops: this engine's player rolls at once; in a shared field
-    /// every other player who took part (dealt damage within the window, or was
-    /// the enemy's target) is credited and rolls on their own engine at their
-    /// next shared tick. Bystanders get nothing.
-    #[allow(clippy::too_many_arguments)]
-    fn drop_for_participants(
-        &mut self,
-        table: &str,
-        enemy: u64,
-        at: [f32; 3],
-        now_ms: u64,
-        hitters: BTreeMap<u64, u64>,
-        engaged: Option<u64>,
-        out: &mut EncounterOutcome,
-    ) {
-        let kill = (enemy, now_ms);
-        let Some(killer) = self.shared_sender else {
-            self.drop_power_ups(table, kill, at, now_ms, 1, out);
-            return;
-        };
-        let window = self
-            .power_ups
-            .as_ref()
-            .map_or(30_000, |p| p.participation_window_ms());
-        let mut who: BTreeSet<u64> = hitters
-            .into_iter()
-            .filter(|&(_, last)| now_ms.saturating_sub(last) <= window)
-            .map(|(player, _)| player)
-            .collect();
-        who.extend(engaged.filter(|&g| g != 0));
-        who.insert(killer);
-        let participants = who.len();
-        self.drop_power_ups(table, kill, at, now_ms, participants, out);
-        for player in who.into_iter().filter(|&p| p != killer) {
-            let waiting = self.ledger.credits.entry(player).or_default();
-            if waiting.len() >= MAX_CREDITS {
-                waiting.remove(0);
-            }
-            waiting.push(KillCredit {
-                kill,
-                table: table.to_owned(),
-                at,
-                participants,
-                expires_ms: now_ms.saturating_add(CREDIT_TTL_MS),
-            });
-        }
-    }
-
-    /// Roll the drops other players earned for this engine's player.
-    fn claim_kill_credits(&mut self, player: u64, now_ms: u64, out: &mut EncounterOutcome) {
-        for credit in self.ledger.credits.remove(&player).unwrap_or_default() {
-            if now_ms < credit.expires_ms {
-                self.drop_power_ups(
-                    &credit.table,
-                    credit.kill,
-                    credit.at,
-                    now_ms,
-                    credit.participants,
-                    out,
-                );
-            }
-        }
     }
 
     /// Heal `percent` of max health and show the "+N" number. Says nothing when

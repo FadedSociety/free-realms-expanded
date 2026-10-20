@@ -43,6 +43,7 @@ use std::{
 
 mod content_reload;
 mod derby_session;
+mod encounter_rewards;
 mod field_battle;
 mod jobs;
 mod matchmaking_route;
@@ -5569,10 +5570,7 @@ impl Gameplay {
             || result.completed.is_some())
         .then(|| self.achievement_counters());
         for reward in result.rewards {
-            self.grant_reward(reward.coins, &reward.items, out)?;
-            if reward.job_xp > 0 {
-                self.award_job_xp(reward.job_xp, out)?;
-            }
+            self.apply_encounter_reward(reward, out)?;
         }
         for definition in result.defeated {
             let result = self

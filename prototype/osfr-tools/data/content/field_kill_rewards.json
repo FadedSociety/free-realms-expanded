@@ -1,0 +1,78 @@
+{
+  "schema_version": 1,
+  "level_rewards": [
+    {
+      "min_level": 1,
+      "max_level": 2,
+      "coins": 2,
+      "job_xp": 5,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Starter field band: 2 coins and 5 active-job XP per credited field kill. Local balance for the level-1/2 W102 wolves, bixies and shamans; below the W123 battle reference of 25 coins / 50 job XP for a three-enemy win. Not recovered 2014 reward data."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Free Realms wiki, Battles (final-era difficulty anchors 1/3/5/9/13) and the reviewed W102 Field Enemies note: level bands 1-2 and 3-4 cover the current field actors; the wiki does not publish per-kill coin or XP values."
+        }
+      ]
+    },
+    {
+      "min_level": 3,
+      "max_level": 4,
+      "coins": 4,
+      "job_xp": 10,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Highroad field band: 4 coins and 10 active-job XP per credited field kill, double the starter rate because the level-3 Highroad Hooligan carries 220 HP / 8 damage against the starter actors' 100 HP / 7 damage. Local balance, not recovered 2014 reward data."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "Free Realms wiki, Highroad Hijinx (difficulty 2 recommends level 3) and the reviewed W102 Field Enemies note's final-era level policy; no historical per-kill payout was recovered."
+        }
+      ]
+    },
+    {
+      "min_level": 5,
+      "max_level": 8,
+      "coins": 7,
+      "job_xp": 15,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Level 5-8 field band: 7 coins and 15 active-job XP per credited field kill, about 1.75x the level-3 band. No current field actor uses this band; it reserves a rate for level 5-8 roaming content. Local balance, not recovered 2014 reward data."
+        }
+      ]
+    },
+    {
+      "min_level": 9,
+      "max_level": 13,
+      "coins": 12,
+      "job_xp": 25,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Level 9-13 field band: 12 coins and 25 active-job XP per credited field kill, half the W123 battle win reference for a three-enemy fight. No current field actor uses this band; it reserves a rate for level 9-13 roaming content. Local balance, not recovered 2014 reward data."
+        }
+      ]
+    }
+  ],
+  "definition_overrides": [
+    {
+      "definition_id": 3156,
+      "coins": 2,
+      "job_xp": 5,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Hooligan Wolf (definition 3156, the three W102-F1 starter wolves) stays on the starter 2 coins / 5 job XP rate even if its authored level is later raised into a higher band. Local policy so the level-1 farm kind cannot be retuned into a faucet by a level edit."
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/Models.txt row 2470: model 3284 = wolf_generic.adr; locale 5100200 = Hooligan Wolf. These prove the resource identity of the kind, not any 2014 payout."
+        }
+      ]
+    }
+  ]
+}
