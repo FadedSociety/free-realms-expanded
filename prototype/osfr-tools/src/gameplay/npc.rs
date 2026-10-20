@@ -52,6 +52,21 @@ impl Gameplay {
         })
     }
 
+    /// Stage one NPC service choice: clone this player's gameplay, run the choice on the
+    /// clone, and commit it only when the choice reported a change. A refusal keeps the
+    /// live state, including the open menu and the pending offer.
+    fn commit_if_changed(
+        &mut self,
+        f: impl FnOnce(&mut Gameplay) -> io::Result<Outcome>,
+    ) -> io::Result<Outcome> {
+        let mut staged = self.clone();
+        let out = f(&mut staged)?;
+        if out.changed {
+            *self = staged;
+        }
+        Ok(out)
+    }
+
     pub(super) fn handle_npc_packet(
         &mut self,
         inner: &[u8],
@@ -384,40 +399,38 @@ impl Gameplay {
             let runtime_guid = u64::from_le_bytes(inner[4..12].try_into().unwrap());
             let option_id = i32::from_le_bytes(inner[12..16].try_into().unwrap());
             let Some(key) = self.content_npc_key(runtime_guid) else {
-                npc_event(serde_json::json!({
-                    "event": "npc_select",
-                    "guid": runtime_guid,
-                    "content_key": serde_json::Value::Null,
-                    "option": option_id,
-                    "outcome": "none",
-                    "reason": "unknown_runtime_guid"
-                }));
+                npc_event(select_event_with_reason(
+                    runtime_guid,
+                    None,
+                    option_id,
+                    "none",
+                    Some("unknown_runtime_guid"),
+                ));
                 return Ok(None);
             };
             if let Some(refusal) = self.busy_interaction_refusal() {
-                npc_event(serde_json::json!({
-                    "event": "npc_select",
-                    "guid": runtime_guid,
-                    "content_key": key,
-                    "option": option_id,
-                    "outcome": "refused",
-                    "reason": "busy"
-                }));
+                npc_event(select_event_with_reason(
+                    runtime_guid,
+                    Some(key),
+                    option_id,
+                    "refused",
+                    Some("busy"),
+                ));
                 return Ok(Some(refusal));
             }
-            // Stage the menu/shop mutation on a cheap clone (shared content, owned
-            // active state), then commit it to this staged Gameplay once the choice is
-            // read. The gateway only keeps this clone when the whole request succeeds,
-            // so a later failed child cannot leave the shared menu consumed.
+            // Clone the menu for the select() call only: the tables are Arc-backed and the
+            // owned active menu is small. Assigning it back ends the clone before any
+            // service call, so nothing is held across gameplay work or a save. The gateway
+            // only keeps this clone when the whole request succeeds, so a later failed child
+            // cannot leave the shared menu consumed.
             let Some(mut interaction) = self.npc_interaction.clone() else {
-                npc_event(serde_json::json!({
-                    "event": "npc_select",
-                    "guid": runtime_guid,
-                    "content_key": key,
-                    "option": option_id,
-                    "outcome": "none",
-                    "reason": "npc_content_unavailable"
-                }));
+                npc_event(select_event_with_reason(
+                    runtime_guid,
+                    Some(key),
+                    option_id,
+                    "none",
+                    Some("npc_content_unavailable"),
+                ));
                 return Ok(None);
             };
             let mut selection = inner.to_vec();
@@ -430,149 +443,17 @@ impl Gameplay {
             );
             self.npc_interaction = Some(interaction);
             let mut out = Outcome::default();
-            let mut race_gate = None;
-            let mut derby_gate = None;
-            let mut fish_gate = None;
-            let mut learn_trainer = None;
             let mut consume_menu = false;
             match selected {
-                Ok(NpcSelection::Talk(mut context)) => {
-                    let pending_before = self
-                        .npc_quests
-                        .as_ref()
-                        .and_then(|engine| engine.state().pending_turnin);
-                    if let Some(engine) = &mut self.npc_quests {
-                        let quest = engine
-                            .on_event(crate::quest_engine::QuestEvent::TalkToNpc { npc_id: key })?;
-                        // A completed talk step speaks its own line (Shakey's bubble was
-                        // blank in native run 215840).
-                        if let Some(line) = engine.step_dialogue_for(&quest) {
-                            context.body_string_id = Some(line);
-                        }
-                        self.append_npc_quest_outcome(quest, &mut out)?;
-                    }
-                    let pending_after = self
-                        .npc_quests
-                        .as_ref()
-                        .and_then(|engine| engine.state().pending_turnin);
-                    if let Some(quest_id) = pending_before {
-                        // Reopening is allowed only at the actor that opened the screen; a
-                        // different actor gets no packet and the pending state is untouched.
-                        let result = self
-                            .npc_quests
-                            .as_ref()
-                            .expect("pending turn-in requires the NPC quest engine")
-                            .reopen_turnin(quest_id, key);
-                        self.append_npc_quest_outcome(result, &mut out)?;
-                    } else if pending_after.is_none() {
-                        // `on_event` opens the screen itself when this Talk completed the
-                        // quest; beginning the same turn-in again would queue a second 49/13.
-                        let target_quest = self.npc_quests.as_ref().and_then(|engine| {
-                            self.npc_interaction
-                                .as_ref()?
-                                .named_target_quest_for_talk(key, engine)
-                        });
-                        if let Some(quest_id) = target_quest {
-                            let result = self
-                                .npc_quests
-                                .as_mut()
-                                .unwrap()
-                                .begin_named_target_turnin(quest_id, key);
-                            self.append_npc_quest_outcome(result, &mut out)?;
-                        }
-                    }
-                    let already_offering = out
-                        .replies
-                        .iter()
-                        .any(|packet| packet.starts_with(&[49, 0, 1, 0]));
-                    let turning_in = out
-                        .replies
-                        .iter()
-                        .any(|packet| packet.starts_with(&[49, 0, 13, 0]));
-                    self.pending_choice_packets.clear();
-                    let offer_outcome = if already_offering {
-                        "offer"
-                    } else if turning_in {
-                        // Same shape as the offer: the 49/13 end screen opens from a
-                        // dialog choice (run 202324 drew it over the open dialog).
-                        let (held, rest): (Vec<_>, Vec<_>) = std::mem::take(&mut out.replies)
-                            .into_iter()
-                            .partition(|packet| packet.starts_with(&[49, 0, 13, 0]));
-                        out.replies = rest;
-                        let quest_id = held
-                            .first()
-                            .and_then(|packet| packet.get(14..18))
-                            .map(|id| u32::from_le_bytes(id.try_into().unwrap()));
-                        match quest_id {
-                            Some(quest_id) => {
-                                self.pending_quest_choice = Some((runtime_guid, key, quest_id));
-                                self.pending_choice_packets = held;
-                                "quest_choice"
-                            }
-                            None => {
-                                out.replies.extend(held);
-                                "dialogue"
-                            }
-                        }
-                    } else {
-                        // (R) The client leaves the 26/10-to-quest action unresolved; W67 chooses
-                        // Talk as the server action that starts the separate 49/1 quest window.
-                        let quest_id = self.npc_quests.as_ref().and_then(|engine| {
-                            self.npc_interaction
-                                .as_ref()?
-                                .offerable_quest_for_talk(key, engine)
-                        });
-                        // Native runs 200411/201127: the offer window must sit on an
-                        // open NPC dialog, and the server's 26/4 EndDialog after the
-                        // reply restores camera and HUD. The quest is therefore a
-                        // dialog choice; choosing it (26/6) sends the 49/1 offer.
-                        if let Some(quest_id) = quest_id {
-                            self.pending_quest_choice = Some((runtime_guid, key, quest_id));
-                            "quest_choice"
-                        } else {
-                            "dialogue"
-                        }
-                    };
-                    let quest_choice = match (offer_outcome, self.pending_quest_choice) {
-                        ("quest_choice", Some((_, _, quest_id))) => {
-                            let title = self
-                                .npc_quests
-                                .as_ref()
-                                .and_then(|engine| engine.title_string_id(quest_id))
-                                .unwrap_or(0);
-                            Some(npc_interaction::quest_dialogue_choice(title))
-                        }
-                        _ => None,
-                    };
-                    let mut dialogue = dialogue_packet_with(&context, quest_choice)
-                        .map_err(|_| invalid("NPC dialogue could not be encoded"))?;
-                    patch_npc_actor(&mut dialogue, runtime_guid);
-                    self.last_npc_dialogue =
-                        Some((character.zone_id, runtime_guid, key, dialogue.clone()));
-                    // A quest offer is shown alone, like the original: the 49/1 window
-                    // draws its own speech bubble. (Earlier runs were silently ignored
-                    // because 49/1 was 120 bytes, not for lack of a 26/3; a leading 26/3
-                    // left a blank bubble and "Goodbye" behind the quest window.)
-                    if offer_outcome != "offer" {
-                        out.replies.push(dialogue);
-                    }
-                    let reason = if offer_outcome == "offer" {
-                        None
-                    } else if turning_in {
-                        Some("quest_turnin")
-                    } else if self.npc_quests.is_none() {
-                        Some("quest_engine_unavailable")
-                    } else {
-                        Some("no_eligible_quest")
-                    };
-                    npc_event(serde_json::json!({
-                        "event": "npc_select",
-                        "guid": runtime_guid,
-                        "content_key": key,
-                        "option": option_id,
-                        "outcome": offer_outcome,
-                        "reason": reason
-                    }));
+                Ok(NpcSelection::Talk(context)) => {
+                    self.talk_to_npc(
+                        runtime_guid,
+                        key,
+                        option_id,
+                        context,
+                        character.zone_id,
+                        &mut out,
+                    )?;
                 }
                 Ok(NpcSelection::Shop(mut window)) => {
                     // F228: the 66/42 window advertises the same resale price the Coin Shop
@@ -584,63 +465,66 @@ impl Gameplay {
                         merchant_packet(&window)
                             .map_err(|_| invalid("NPC merchant list could not be encoded"))?,
                     );
-                    npc_event(serde_json::json!({
-                        "event": "npc_select",
-                        "guid": runtime_guid,
-                        "content_key": key,
-                        "option": option_id,
-                        "outcome": "shop"
-                    }));
-                    npc_event(serde_json::json!({
-                        "event": "shop_open",
-                        "guid": runtime_guid,
-                        "content_key": key,
-                        "item_count": window.items.len()
-                    }));
+                    npc_event(select_event(runtime_guid, Some(key), option_id, "shop"));
+                    npc_event(shop_open_event(runtime_guid, key, window.items.len()));
                 }
                 Ok(NpcSelection::Race) => {
-                    race_gate = Some(key);
                     consume_menu = true;
-                    npc_event(serde_json::json!({
-                        "event": "npc_select",
-                        "guid": runtime_guid,
-                        "content_key": key,
-                        "option": option_id,
-                        "outcome": "race"
-                    }));
+                    npc_event(select_event(runtime_guid, Some(key), option_id, "race"));
+                    // (R) Ordinary entry: the NPC service proved range and that this exact
+                    // option was offered; the kart service decides admission. Staged, so a
+                    // failure after the job switch leaves the player exactly as they were.
+                    let busy = self.activity_busy();
+                    match self.kart_entry.as_ref().map(|kart| kart.admit(key, busy)) {
+                        Some(Ok(())) => {
+                            out =
+                                self.commit_if_changed(|staged| staged.begin_kart_race(character))?;
+                        }
+                        Some(Err(denied)) => out.replies.push(chat::system(denied.message())),
+                        None => out.replies.push(chat::system(
+                            crate::kart_gateway::EntryDenied::NoRace.message(),
+                        )),
+                    }
                 }
                 Ok(NpcSelection::Derby) => {
-                    derby_gate = Some(key);
                     consume_menu = true;
-                    npc_event(serde_json::json!({
-                        "event": "npc_select",
-                        "guid": runtime_guid,
-                        "content_key": key,
-                        "option": option_id,
-                        "outcome": "derby"
-                    }));
-                }
-                Ok(NpcSelection::Fish) => {
-                    fish_gate = Some(key);
-                    consume_menu = true;
-                    npc_event(serde_json::json!({
-                        "event": "npc_select",
-                        "guid": runtime_guid,
-                        "content_key": key,
-                        "option": option_id,
-                        "outcome": "fish"
-                    }));
+                    npc_event(select_event(runtime_guid, Some(key), option_id, "derby"));
+                    // (R) The NPC service proved range and that this exact option was offered;
+                    // the derby service decides admission. Staging keeps the job switch atomic.
+                    let busy = self.activity_busy();
+                    match self.derby.as_ref().map(|derby| derby.admit(key, busy)) {
+                        Some(Ok(())) => {
+                            out = self.commit_if_changed(|staged| {
+                                staged.begin_derby(character, now_ms)
+                            })?;
+                            // The dialog camera closes before the native 39/16 offer.
+                            out.replies.insert(0, END_DIALOG_26_4.to_vec());
+                        }
+                        Some(Err(denied)) => out.replies.push(chat::system(denied.message())),
+                        None => out.replies.push(chat::system(
+                            crate::derby_gateway::DerbyEntryDenied::Unavailable.message(),
+                        )),
+                    }
                 }
                 Ok(NpcSelection::Learn(trainer)) => {
-                    learn_trainer = Some(trainer);
                     consume_menu = true;
-                    npc_event(serde_json::json!({
-                        "event": "npc_select",
-                        "guid": runtime_guid,
-                        "content_key": key,
-                        "option": option_id,
-                        "outcome": "learn"
-                    }));
+                    npc_event(select_event(runtime_guid, Some(key), option_id, "learn"));
+                    // (R) Ordinary unlock: the NPC service proved range and that this exact
+                    // option was offered; `learn_job` decides the rest.
+                    out = self.commit_if_changed(|staged| staged.learn_job(&trainer))?;
+                    // Leave the NPC dialog camera first (see the fishing choice).
+                    out.replies.insert(0, END_DIALOG_26_4.to_vec());
+                }
+                Ok(NpcSelection::Fish) => {
+                    consume_menu = true;
+                    npc_event(select_event(runtime_guid, Some(key), option_id, "fish"));
+                    // (R) Ordinary entry: the NPC service proved range and that this exact
+                    // option was offered; the fishing service decides admission. Staged, so a
+                    // refusal leaves the player exactly as they were.
+                    out = self.commit_if_changed(|staged| staged.begin_fishing(key, character))?;
+                    // Leave the NPC dialog camera first (it otherwise outlives a menu choice,
+                    // as the quest accept showed in native run 200411).
+                    out.replies.insert(0, END_DIALOG_26_4.to_vec());
                 }
                 Ok(NpcSelection::Quest(quest)) => {
                     let has_offer = quest.outbound.iter().any(|message| {
@@ -652,94 +536,38 @@ impl Gameplay {
                         )
                     });
                     self.append_npc_quest_outcome(quest, &mut out)?;
-                    npc_event(serde_json::json!({
-                        "event": "npc_select",
-                        "guid": runtime_guid,
-                        "content_key": key,
-                        "option": option_id,
-                        "outcome": if has_offer { "offer" } else { "none" },
-                        "reason": if has_offer { serde_json::Value::Null } else { serde_json::json!("quest_turnin") }
-                    }));
+                    npc_event(select_event_with_reason(
+                        runtime_guid,
+                        Some(key),
+                        option_id,
+                        if has_offer { "offer" } else { "none" },
+                        if has_offer {
+                            None
+                        } else {
+                            Some("quest_turnin")
+                        },
+                    ));
                 }
                 Err(crate::npc_interaction::NpcInteractionError::NeedsQuestEngine) => {
                     out.replies
                         .push(chat::system("Quest data is unavailable in this area."));
-                    npc_event(serde_json::json!({
-                        "event": "npc_select",
-                        "guid": runtime_guid,
-                        "content_key": key,
-                        "option": option_id,
-                        "outcome": "none",
-                        "reason": "quest_engine_unavailable"
-                    }));
+                    npc_event(select_event_with_reason(
+                        runtime_guid,
+                        Some(key),
+                        option_id,
+                        "none",
+                        Some("quest_engine_unavailable"),
+                    ));
                 }
                 Err(_) => {
-                    npc_event(serde_json::json!({
-                        "event": "npc_select",
-                        "guid": runtime_guid,
-                        "content_key": key,
-                        "option": option_id,
-                        "outcome": "none",
-                        "reason": "selection_rejected"
-                    }));
+                    npc_event(select_event_with_reason(
+                        runtime_guid,
+                        Some(key),
+                        option_id,
+                        "none",
+                        Some("selection_rejected"),
+                    ));
                     return Err(invalid("NPC menu choice is unavailable"));
-                }
-            }
-            if let Some(gate) = race_gate {
-                // (R) Ordinary entry: the NPC service proved range and that this exact option
-                // was offered; the kart service decides admission. Staged, so a failure after
-                // the job switch leaves the player exactly as they were.
-                let busy = self.activity_busy();
-                match self.kart_entry.as_ref().map(|kart| kart.admit(gate, busy)) {
-                    Some(Ok(())) => {
-                        let mut staged = self.clone();
-                        out = staged.begin_kart_race(character)?;
-                        *self = staged;
-                    }
-                    Some(Err(denied)) => out.replies.push(chat::system(denied.message())),
-                    None => out.replies.push(chat::system(
-                        crate::kart_gateway::EntryDenied::NoRace.message(),
-                    )),
-                }
-            }
-            if let Some(gate) = derby_gate {
-                // (R) The NPC service proved range and that this exact option was offered;
-                // the derby service decides admission. Staging keeps the job switch atomic.
-                let busy = self.activity_busy();
-                match self.derby.as_ref().map(|derby| derby.admit(gate, busy)) {
-                    Some(Ok(())) => {
-                        let mut staged = self.clone();
-                        out = staged.begin_derby(character, now_ms)?;
-                        *self = staged;
-                    }
-                    Some(Err(denied)) => out.replies.push(chat::system(denied.message())),
-                    None => out.replies.push(chat::system(
-                        crate::derby_gateway::DerbyEntryDenied::Unavailable.message(),
-                    )),
-                }
-            }
-            if let Some(trainer) = learn_trainer {
-                // (R) Ordinary unlock: the NPC service proved range and that this exact option
-                // was offered; `learn_job` decides the rest.
-                let mut staged = self.clone();
-                out = staged.learn_job(&trainer)?;
-                // Leave the NPC dialog camera first (see the fishing choice).
-                out.replies.insert(0, END_DIALOG_26_4.to_vec());
-                if out.changed {
-                    *self = staged;
-                }
-            }
-            if let Some(gate) = fish_gate {
-                // (R) Ordinary entry: the NPC service proved range and that this exact option
-                // was offered; the fishing service decides admission. Staged, so a refusal
-                // leaves the player exactly as they were.
-                let mut staged = self.clone();
-                out = staged.begin_fishing(gate, character)?;
-                // Leave the NPC dialog camera first (it otherwise outlives a menu choice, as
-                // the quest accept showed in native run 200411).
-                out.replies.insert(0, END_DIALOG_26_4.to_vec());
-                if out.changed {
-                    *self = staged;
                 }
             }
             if consume_menu && out.changed {
@@ -917,6 +745,285 @@ impl Gameplay {
 
         Ok(None)
     }
+
+    /// Switches to Kart Driver and enters the track. Shared by the developer `realm race` command
+    /// and the ordinary NPC menu choice; the caller has already checked admission and `busy`.
+    pub(super) fn begin_kart_race(&mut self, character: &CharacterState) -> io::Result<Outcome> {
+        let mut out = Outcome::default();
+        let profiles = self
+            .profiles
+            .as_mut()
+            .ok_or_else(|| invalid("kart entry requires class content"))?;
+        let previous_job = profiles.active();
+        let outfit_before = self.inventory.profile_attachments(previous_job)?;
+        // (R) First use still unlocks Kart Driver for saves that predate trainers; the
+        // option is idempotent. W176 also offers the job from a trainer. The prior job is
+        // restored on exit.
+        let first_time = profiles.unlock(48)?;
+        profiles.activate(48)?;
+        if first_time {
+            self.give_starter_outfit(48, false, &mut out)?;
+        }
+        self.ensure_outfit(48, &mut out)?;
+        // Last, after the outfit repair: the 38/21 attachment list comes from what
+        // the player wears now (client reader `0x0091b080`).
+        out.replies.insert(
+            0,
+            self.profiles
+                .as_ref()
+                .unwrap()
+                .activation(48, &self.inventory)?,
+        );
+        self.announce_profile_outfit(character.guid, &outfit_before, previous_job != 48, &mut out)?;
+        let kart = self.kart_entry.as_mut().unwrap();
+        let (replies, scene) = kart.begin(character)?;
+        kart.set_previous_job(previous_job);
+        out.replies.extend(replies);
+        out.scene_zoning = Some(scene);
+        out.changed = true;
+        Ok(out)
+    }
+
+    /// W160 (R): start the fishing round the chosen guide offers. The caller stages `self`, so a
+    /// refusal (a chat line, `changed` false) leaves the player exactly as they were.
+    pub(super) fn begin_fishing(
+        &mut self,
+        gate: u64,
+        character: &CharacterState,
+    ) -> io::Result<Outcome> {
+        use crate::fishing_service::{EntryDenied, FISHERMAN_PROFILE};
+        let mut out = Outcome::default();
+        let busy = self.activity_busy();
+        let Some(spots) = self.fishing_spots.clone() else {
+            out.replies
+                .push(chat::system(EntryDenied::Unavailable.message()));
+            return Ok(out);
+        };
+        let Some(profiles) = self.profiles.as_mut() else {
+            out.replies
+                .push(chat::system(EntryDenied::Unavailable.message()));
+            return Ok(out);
+        };
+        // (R) The Fisherman chapter is built (quests/fisherman.json) and gated on the
+        // active job by its content. The trip unlocks 137; the player activates it from
+        // the job list (26/13), whose starter outfit the active play package supplies.
+        let _ = profiles.unlock(FISHERMAN_PROFILE);
+        let level = self.job_level(FISHERMAN_PROFILE);
+        // (R) Same bag floor as quest turn-ins: never below what the player already holds.
+        let rewards = self.reward_snapshot();
+        match self.fishing.enter(
+            &spots,
+            gate,
+            character.guid,
+            character.zone_id,
+            character.position,
+            busy,
+            level,
+            rewards,
+        ) {
+            Ok(change) => {
+                out.replies = change.replies;
+                out.changed = true;
+            }
+            Err(denied) => out.replies.push(chat::system(denied.message())),
+        }
+        Ok(out)
+    }
+
+    /// The Talk arm of one 26/10 choice. Quest events and the named turn-in run before
+    /// the dialogue packet; this only reads the menu, after those events, so no guard is
+    /// held across a service call or a save.
+    fn talk_to_npc(
+        &mut self,
+        runtime_guid: u64,
+        key: u64,
+        option_id: i32,
+        mut context: DialogueContext,
+        zone_id: u32,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        let pending_before = self
+            .npc_quests
+            .as_ref()
+            .and_then(|engine| engine.state().pending_turnin);
+        if let Some(engine) = &mut self.npc_quests {
+            let quest =
+                engine.on_event(crate::quest_engine::QuestEvent::TalkToNpc { npc_id: key })?;
+            // A completed talk step speaks its own line (Shakey's bubble was
+            // blank in native run 215840).
+            if let Some(line) = engine.step_dialogue_for(&quest) {
+                context.body_string_id = Some(line);
+            }
+            self.append_npc_quest_outcome(quest, out)?;
+        }
+        let pending_after = self
+            .npc_quests
+            .as_ref()
+            .and_then(|engine| engine.state().pending_turnin);
+        if let Some(quest_id) = pending_before {
+            // Reopening is allowed only at the actor that opened the screen; a
+            // different actor gets no packet and the pending state is untouched.
+            let result = self
+                .npc_quests
+                .as_ref()
+                .expect("pending turn-in requires the NPC quest engine")
+                .reopen_turnin(quest_id, key);
+            self.append_npc_quest_outcome(result, out)?;
+        } else if pending_after.is_none() {
+            // `on_event` opens the screen itself when this Talk completed the
+            // quest; beginning the same turn-in again would queue a second 49/13.
+            let target_quest = self.npc_quests.as_ref().and_then(|engine| {
+                self.npc_interaction
+                    .as_ref()?
+                    .named_target_quest_for_talk(key, engine)
+            });
+            if let Some(quest_id) = target_quest {
+                let result = self
+                    .npc_quests
+                    .as_mut()
+                    .unwrap()
+                    .begin_named_target_turnin(quest_id, key);
+                self.append_npc_quest_outcome(result, out)?;
+            }
+        }
+        let already_offering = out
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[49, 0, 1, 0]));
+        let turning_in = out
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[49, 0, 13, 0]));
+        self.pending_choice_packets.clear();
+        let offer_outcome = if already_offering {
+            "offer"
+        } else if turning_in {
+            // Same shape as the offer: the 49/13 end screen opens from a
+            // dialog choice (run 202324 drew it over the open dialog).
+            let (held, rest): (Vec<_>, Vec<_>) = std::mem::take(&mut out.replies)
+                .into_iter()
+                .partition(|packet| packet.starts_with(&[49, 0, 13, 0]));
+            out.replies = rest;
+            let quest_id = held
+                .first()
+                .and_then(|packet| packet.get(14..18))
+                .map(|id| u32::from_le_bytes(id.try_into().unwrap()));
+            match quest_id {
+                Some(quest_id) => {
+                    self.pending_quest_choice = Some((runtime_guid, key, quest_id));
+                    self.pending_choice_packets = held;
+                    "quest_choice"
+                }
+                None => {
+                    out.replies.extend(held);
+                    "dialogue"
+                }
+            }
+        } else {
+            // (R) The client leaves the 26/10-to-quest action unresolved; W67 chooses
+            // Talk as the server action that starts the separate 49/1 quest window.
+            let quest_id = self.npc_quests.as_ref().and_then(|engine| {
+                self.npc_interaction
+                    .as_ref()?
+                    .offerable_quest_for_talk(key, engine)
+            });
+            // Native runs 200411/201127: the offer window must sit on an
+            // open NPC dialog, and the server's 26/4 EndDialog after the
+            // reply restores camera and HUD. The quest is therefore a
+            // dialog choice; choosing it (26/6) sends the 49/1 offer.
+            if let Some(quest_id) = quest_id {
+                self.pending_quest_choice = Some((runtime_guid, key, quest_id));
+                "quest_choice"
+            } else {
+                "dialogue"
+            }
+        };
+        let quest_choice = match (offer_outcome, self.pending_quest_choice) {
+            ("quest_choice", Some((_, _, quest_id))) => {
+                let title = self
+                    .npc_quests
+                    .as_ref()
+                    .and_then(|engine| engine.title_string_id(quest_id))
+                    .unwrap_or(0);
+                Some(npc_interaction::quest_dialogue_choice(title))
+            }
+            _ => None,
+        };
+        let mut dialogue = dialogue_packet_with(&context, quest_choice)
+            .map_err(|_| invalid("NPC dialogue could not be encoded"))?;
+        patch_npc_actor(&mut dialogue, runtime_guid);
+        self.last_npc_dialogue = Some((zone_id, runtime_guid, key, dialogue.clone()));
+        // A quest offer is shown alone, like the original: the 49/1 window
+        // draws its own speech bubble. (Earlier runs were silently ignored
+        // because 49/1 was 120 bytes, not for lack of a 26/3; a leading 26/3
+        // left a blank bubble and "Goodbye" behind the quest window.)
+        if offer_outcome != "offer" {
+            out.replies.push(dialogue);
+        }
+        let reason = if offer_outcome == "offer" {
+            None
+        } else if turning_in {
+            Some("quest_turnin")
+        } else if self.npc_quests.is_none() {
+            Some("quest_engine_unavailable")
+        } else {
+            Some("no_eligible_quest")
+        };
+        npc_event(select_event_with_reason(
+            runtime_guid,
+            Some(key),
+            option_id,
+            offer_outcome,
+            reason,
+        ));
+        Ok(())
+    }
+}
+
+/// One `npc_select` telemetry row for the reason-less outcomes (shop, race, derby, fish
+/// and learn): the five-key shape the old literals emitted.
+fn select_event(
+    guid: u64,
+    content_key: Option<u64>,
+    option: i32,
+    outcome: &str,
+) -> serde_json::Value {
+    serde_json::json!({
+        "event": "npc_select",
+        "guid": guid,
+        "content_key": content_key,
+        "option": option,
+        "outcome": outcome
+    })
+}
+
+/// One `npc_select` row that carries `reason`; `None` serializes as null, as the old
+/// Talk and quest outcomes did.
+fn select_event_with_reason(
+    guid: u64,
+    content_key: Option<u64>,
+    option: i32,
+    outcome: &str,
+    reason: Option<&str>,
+) -> serde_json::Value {
+    serde_json::json!({
+        "event": "npc_select",
+        "guid": guid,
+        "content_key": content_key,
+        "option": option,
+        "outcome": outcome,
+        "reason": reason
+    })
+}
+
+/// The extra event a shop choice emits next to its `npc_select` row.
+fn shop_open_event(guid: u64, content_key: u64, item_count: usize) -> serde_json::Value {
+    serde_json::json!({
+        "event": "shop_open",
+        "guid": guid,
+        "content_key": content_key,
+        "item_count": item_count
+    })
 }
 
 /// Point a server-built NPC packet at the runtime actor the client knows. This is one
@@ -1046,4 +1153,92 @@ pub(super) fn quest_offer_packet_with(
         trailing_float_bits: 0,
         trailing_flags: [false; 2],
     })
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use std::collections::BTreeSet;
+
+    fn keys(value: &serde_json::Value) -> BTreeSet<&str> {
+        value
+            .as_object()
+            .expect("an event is a JSON object")
+            .keys()
+            .map(String::as_str)
+            .collect()
+    }
+
+    /// The five-key rows for the choices that have no reason today.
+    #[test]
+    fn select_event_keeps_the_five_key_reasonless_outcomes() {
+        let keys5 = BTreeSet::from(["event", "guid", "content_key", "option", "outcome"]);
+        for outcome in ["shop", "race", "derby", "fish", "learn"] {
+            let event = select_event(9, Some(11), 2, outcome);
+            assert_eq!(keys(&event), keys5, "{outcome}");
+            assert!(
+                !event.as_object().unwrap().contains_key("reason"),
+                "{outcome} gained a reason field"
+            );
+            assert_eq!(event["event"], "npc_select", "{outcome}");
+            assert_eq!(event["guid"], 9, "{outcome}");
+            assert_eq!(event["content_key"], 11, "{outcome}");
+            assert_eq!(event["option"], 2, "{outcome}");
+            assert_eq!(event["outcome"], outcome);
+        }
+    }
+
+    /// The six-key rows keep `reason`: null for the old null outcomes, a name otherwise.
+    #[test]
+    fn select_event_with_reason_keeps_null_versus_named() {
+        let keys6 = BTreeSet::from([
+            "event",
+            "guid",
+            "content_key",
+            "option",
+            "outcome",
+            "reason",
+        ]);
+        let unknown = select_event_with_reason(7, None, 3, "none", Some("unknown_runtime_guid"));
+        assert_eq!(keys(&unknown), keys6);
+        assert_eq!(unknown["event"], "npc_select");
+        assert_eq!(unknown["guid"], 7);
+        assert!(unknown["content_key"].is_null());
+        assert_eq!(unknown["option"], 3);
+        assert_eq!(unknown["outcome"], "none");
+        assert_eq!(unknown["reason"], "unknown_runtime_guid");
+
+        for (outcome, reason) in [
+            ("refused", Some("busy")),
+            ("offer", None),
+            ("dialogue", None),
+            ("quest_choice", Some("no_eligible_quest")),
+            ("quest_turnin", Some("quest_turnin")),
+            ("none", Some("npc_content_unavailable")),
+            ("none", Some("selection_rejected")),
+            ("none", Some("quest_engine_unavailable")),
+        ] {
+            let event = select_event_with_reason(9, Some(11), 2, outcome, reason);
+            assert_eq!(keys(&event), keys6, "{outcome}");
+            assert_eq!(event["content_key"], 11, "{outcome}");
+            assert_eq!(event["outcome"], outcome, "{outcome}");
+            assert_eq!(event["reason"].as_str(), reason, "{outcome}");
+            if reason.is_none() {
+                assert!(event["reason"].is_null(), "{outcome}");
+            }
+        }
+    }
+
+    #[test]
+    fn shop_open_keeps_its_extra_row() {
+        let event = shop_open_event(9, 11, 4);
+        assert_eq!(
+            keys(&event),
+            BTreeSet::from(["event", "guid", "content_key", "item_count"])
+        );
+        assert_eq!(event["event"], "shop_open");
+        assert_eq!(event["guid"], 9);
+        assert_eq!(event["content_key"], 11);
+        assert_eq!(event["item_count"], 4);
+    }
 }

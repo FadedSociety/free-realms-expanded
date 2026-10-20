@@ -1186,3 +1186,44 @@ fn a_failed_bundle_keeps_the_trainer_menu_usable() {
         "the failed bundle consumed the menu"
     );
 }
+
+/// S15: the choice path stages one selection at a time, so two Talk choices in
+/// one client bundle both read the same open menu and neither waits on the other.
+#[test]
+fn two_talk_choices_in_one_bundle_both_reach_the_open_menu() {
+    let content = Content::new();
+    let npcs = npc_rows();
+    let smith = trainers(&content)
+        .into_iter()
+        .find(|trainer| trainer.profile == 16)
+        .unwrap();
+    let position = trainer_position(&npcs, &smith);
+    let near = [position[0] + 2.0, position[1], position[2]];
+    let mut gateway = gateway_at(&content, state_for(&content, &smith, false), near);
+    click(&mut gateway, smith.npc, 2_000);
+    let before = gameplay_json(&gateway);
+    let both = gateway
+        .handle_at(
+            &bundle(&[
+                wrap(&choose_inner(smith.npc, 1)),
+                wrap(&choose_inner(smith.npc, 1)),
+            ]),
+            2_100,
+        )
+        .unwrap();
+    let bodies = bodies(&both);
+    assert_eq!(
+        bodies
+            .iter()
+            .filter(|body| body.starts_with(&[26, 0, 3, 0]))
+            .count(),
+        2,
+        "both Talk choices must open the dialogue: {:?}",
+        bodies
+    );
+    assert_eq!(
+        gameplay_json(&gateway),
+        before,
+        "Talk without a quest engine must not change the save"
+    );
+}

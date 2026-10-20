@@ -2530,44 +2530,6 @@ impl Gameplay {
         self.blocks(|gates| gates.start)
     }
 
-    /// Switches to Kart Driver and enters the track. Shared by the developer `realm race` command
-    /// and the ordinary NPC menu choice; the caller has already checked admission and `busy`.
-    fn begin_kart_race(&mut self, character: &CharacterState) -> io::Result<Outcome> {
-        let mut out = Outcome::default();
-        let profiles = self
-            .profiles
-            .as_mut()
-            .ok_or_else(|| invalid("kart entry requires class content"))?;
-        let previous_job = profiles.active();
-        let outfit_before = self.inventory.profile_attachments(previous_job)?;
-        // (R) First use still unlocks Kart Driver for saves that predate trainers; the
-        // option is idempotent. W176 also offers the job from a trainer. The prior job is
-        // restored on exit.
-        let first_time = profiles.unlock(48)?;
-        profiles.activate(48)?;
-        if first_time {
-            self.give_starter_outfit(48, false, &mut out)?;
-        }
-        self.ensure_outfit(48, &mut out)?;
-        // Last, after the outfit repair: the 38/21 attachment list comes from what
-        // the player wears now (client reader `0x0091b080`).
-        out.replies.insert(
-            0,
-            self.profiles
-                .as_ref()
-                .unwrap()
-                .activation(48, &self.inventory)?,
-        );
-        self.announce_profile_outfit(character.guid, &outfit_before, previous_job != 48, &mut out)?;
-        let kart = self.kart_entry.as_mut().unwrap();
-        let (replies, scene) = kart.begin(character)?;
-        kart.set_previous_job(previous_job);
-        out.replies.extend(replies);
-        out.scene_zoning = Some(scene);
-        out.changed = true;
-        Ok(out)
-    }
-
     /// Profile state for a reward transaction; a default one without class content.
     fn reward_profiles(&self) -> ProfileState {
         self.profiles
@@ -2613,48 +2575,6 @@ impl Gameplay {
         out.changed = true;
         self.npc_inventory_events(&before, out)?;
         Ok(())
-    }
-
-    /// W160 (R): start the fishing round the chosen guide offers. The caller stages `self`, so a
-    /// refusal (a chat line, `changed` false) leaves the player exactly as they were.
-    fn begin_fishing(&mut self, gate: u64, character: &CharacterState) -> io::Result<Outcome> {
-        use crate::fishing_service::{EntryDenied, FISHERMAN_PROFILE};
-        let mut out = Outcome::default();
-        let busy = self.activity_busy();
-        let Some(spots) = self.fishing_spots.clone() else {
-            out.replies
-                .push(chat::system(EntryDenied::Unavailable.message()));
-            return Ok(out);
-        };
-        let Some(profiles) = self.profiles.as_mut() else {
-            out.replies
-                .push(chat::system(EntryDenied::Unavailable.message()));
-            return Ok(out);
-        };
-        // (R) The Fisherman chapter is built (quests/fisherman.json) and gated on the
-        // active job by its content. The trip unlocks 137; the player activates it from
-        // the job list (26/13), whose starter outfit the active play package supplies.
-        let _ = profiles.unlock(FISHERMAN_PROFILE);
-        let level = self.job_level(FISHERMAN_PROFILE);
-        // (R) Same bag floor as quest turn-ins: never below what the player already holds.
-        let rewards = self.reward_snapshot();
-        match self.fishing.enter(
-            &spots,
-            gate,
-            character.guid,
-            character.zone_id,
-            character.position,
-            busy,
-            level,
-            rewards,
-        ) {
-            Ok(change) => {
-                out.replies = change.replies;
-                out.changed = true;
-            }
-            Err(denied) => out.replies.push(chat::system(denied.message())),
-        }
-        Ok(out)
     }
 
     /// W160: a packet while a fishing round exists. Hostile or out-of-order frames change
@@ -6070,3 +5990,6 @@ mod t018_station_refresh;
 
 #[cfg(test)]
 mod reward_adoption;
+
+#[cfg(test)]
+mod s15_npc_transactions;

@@ -135,7 +135,6 @@ impl Gameplay {
         let derby = self.derby.as_mut().unwrap();
         let offer = derby.begin_at(character, now_ms)?;
         derby.set_previous_job(previous_job);
-        out.replies.insert(0, END_DIALOG_26_4.to_vec());
         out.replies.push(offer);
         out.changed = true;
         Ok(out)
