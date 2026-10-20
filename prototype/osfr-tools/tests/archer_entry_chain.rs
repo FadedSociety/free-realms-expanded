@@ -10,10 +10,10 @@
 //!   i32 response row (301 is the quest row).
 //! - 49/2 quest reply: constructor `00a86400`, sender `00a97d70`; u32 quest + u8 accept.
 //! - 49/14 end reply: constructor `00a864c0`, sender `00a97ef0`; u32 quest.
-//! 49/1 offers and 49/13 end screens are parsed only for their quest id, at
-//! 6..10 and 14..18 respectively, matching the existing route tests. 49/13 also
-//! names its speaker at 6..14 (`QuestEndPacket::ReadFields` `00c7b990`; the client
-//! resolves it through `00984960` in `ShowQuestEndScreen` `00a95420`).
+//! 49/1 offers are asserted only by their quest id at 6..10. 49/13 end screens
+//! name the speaker at 6..14, the quest at 14..18 and the end-text locale id at
+//! 18..22 (`QuestEndPacket::ReadFields` `00c7b990`; `ShowQuestEndScreen`
+//! `00a95420` passes that third dword as the message id).
 //!
 //! The three recruit talk targets are existing unnamed Legacy Greenwood archer
 //! actors (spawn GUIDs 100000003468-3470) bound to the recruit content keys in

@@ -56,7 +56,8 @@ pub fn assert_enabled_medic_chapter_records() {
     );
 
     // Every enabled record has a spawned giver whose authored NPC row names the
-    // quest in both directions of the content graph.
+    // quest in both arrays and carries the record's client title id, the value
+    // the dialogue title and turn-in option are built from.
     let mut bindings = std::collections::BTreeMap::new();
     for entry in fs::read_dir(content_dir().join("npcs")).unwrap() {
         let path = entry.unwrap().path();
@@ -72,11 +73,15 @@ pub fn assert_enabled_medic_chapter_records() {
                 .flatten()
                 .filter_map(|id| id.as_u64())
                 .collect();
-            let quests_given: Vec<u64> = row["quests_given"]
+            let quests_given: Vec<(u64, Option<u64>)> = row["quests_given"]
                 .as_array()
                 .into_iter()
                 .flatten()
-                .filter_map(|row| row["quest_id"].as_u64())
+                .filter_map(|row| {
+                    row["quest_id"]
+                        .as_u64()
+                        .map(|id| (id, row["title_string_id"].as_u64()))
+                })
                 .collect();
             bindings.insert(id, (quest_ids_given, quests_given));
             if [NAIA, GORDON, GREYLI].contains(&id) {
@@ -123,9 +128,16 @@ pub fn assert_enabled_medic_chapter_records() {
             quest_ids_given.contains(&quest_id),
             "quest {quest_id}: giver {giver} omits it from quest_ids_given"
         );
-        assert!(
-            quests_given.contains(&quest_id),
-            "quest {quest_id}: giver {giver} omits it from quests_given"
+        let title_string_id = quests_given
+            .iter()
+            .find_map(|(id, title)| (*id == quest_id).then_some(*title))
+            .unwrap_or_else(|| {
+                panic!("quest {quest_id}: giver {giver} omits it from quests_given")
+            });
+        assert_eq!(
+            title_string_id,
+            record["title_string_id"].as_u64(),
+            "quest {quest_id}: giver {giver}'s quests_given title must match the quest record"
         );
         assert_eq!(record["job"].as_i64(), Some(i64::from(MEDIC)));
         let objectives = record["objectives"].as_array().unwrap();
