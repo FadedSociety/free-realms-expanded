@@ -323,7 +323,7 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
         .filter(|path| path.extension().and_then(|ext| ext.to_str()) == Some("json"))
         .collect();
     quest_files.sort();
-    assert_eq!(quest_files.len(), 17);
+    assert_eq!(quest_files.len(), 18);
     let mut quest_records = Vec::new();
     let mut quest_ids_by_giver = BTreeMap::<u64, Vec<u32>>::new();
     let mut resolved_giver_occurrences = 0usize;
@@ -373,7 +373,10 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
         &json!({"schema_version": 1, "records": quest_records}),
     );
     write_json(&scratch.join("pois.json"), &empty_file());
-    write_json(&scratch.join("items.json"), &referenced_items(&quest_records));
+    write_json(
+        &scratch.join("items.json"),
+        &referenced_items(&quest_records),
+    );
     write_json(&scratch.join("dungeons.json"), &empty_file());
     write_json(&scratch.join("minigames.json"), &empty_file());
 
@@ -463,12 +466,12 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     assert_eq!(db.zones.len(), 17);
     assert_eq!(db.npcs.len(), expected_npc_count);
     assert_eq!(db.jobs.len(), 17);
-    assert_eq!(db.quests.len(), 653);
+    assert_eq!(db.quests.len(), 654);
     assert_eq!(resolved_reference_ids.len(), 295);
     assert_eq!(unresolved_ids.len(), 170);
     assert_eq!(
         resolved_giver_occurrences + unresolved_giver_occurrences,
-        653
+        654
     );
     println!(
         "NPC refs: {} resolved, {} unresolved; quest giver occurrences: {} resolved, {} unresolved; positions: {} known, {} unknown",

@@ -79,7 +79,7 @@ fn job_batch_loads_and_npc_references_resolve_or_are_declared() {
             record
         }));
     }
-    assert_eq!(fs::read_dir(root.join("quests")).unwrap().count(), 17);
+    assert_eq!(fs::read_dir(root.join("quests")).unwrap().count(), 18);
 
     let mut referenced_npcs = HashSet::new();
     for job in jobs["records"].as_array().unwrap() {
@@ -143,7 +143,10 @@ fn job_batch_loads_and_npc_references_resolve_or_are_declared() {
         &json!({"schema_version": 1, "records": quest_records}),
     );
     write_json(&scratch.join("pois.json"), &empty_file());
-    write_json(&scratch.join("items.json"), &referenced_items(&quest_records));
+    write_json(
+        &scratch.join("items.json"),
+        &referenced_items(&quest_records),
+    );
     write_json(&scratch.join("dungeons.json"), &empty_file());
     write_json(&scratch.join("minigames.json"), &empty_file());
 

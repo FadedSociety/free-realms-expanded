@@ -1,0 +1,129 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3000200,
+      "title_string_id": 429342,
+      "giver_npc_id": 9000000189,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "zone_id": 0,
+          "position": [
+            -2184.513,
+            -31.53728,
+            328.1112
+          ],
+          "radius": 8.0,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "data/content/npcs/farnum_farmstead.json record 9000000165 (Pappy Farnum) position [-2184.513,-31.53728,328.1112]; the row's position_reason copies the built-content spawn from ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1954 and Resources/Npcs.json Id=3211."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T247: Pappy Farnum's farm is hunt stop 1 of 4. The 8.0 m search radius and the runtime zone 0 are local event-hunt policy, not recovered retail objective data; the NPC row's zone_id 5 is a content region label on the single open-world continent (src/npc_interaction.rs check_range)."
+            }
+          ]
+        },
+        {
+          "kind": "visit_position",
+          "id": 2,
+          "zone_id": 0,
+          "position": [
+            -1906.11908,
+            -39.79,
+            414.835853
+          ],
+          "radius": 8.0,
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T247: data/content/npcs/cobblestone_village.json record 9000000042 (Carlos Brazenfist) position [-1906.11908,-39.79,414.835853]; the row's own position_reason records a deterministic POI-derived offset, not a captured NPC transform. The hunt copies the row verbatim as the brief requires."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T247: the Cobblestone Brawling Ring is hunt stop 2 of 4. The 8.0 m search radius and the runtime zone 0 are local event-hunt policy, not recovered retail objective data."
+            }
+          ]
+        },
+        {
+          "kind": "visit_position",
+          "id": 3,
+          "zone_id": 0,
+          "position": [
+            -484.4253,
+            -7.069954,
+            203.0213
+          ],
+          "radius": 8.0,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "data/content/npcs/highroad_junction.json record 9000000402 (Merigold) position [-484.4253,-7.069954,203.0213]; the row's position_reason copies the built-content spawn from ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1655 and Resources/Npcs.json Id=2912."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T247: Highroad Junction / Merigold is hunt stop 3 of 4. The 8.0 m search radius and the runtime zone 0 are local event-hunt policy, not recovered retail objective data."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "npc_id": 9000000189,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md#Part A. Greeters and the new-player flow, row 39 (source cell [client] [video, weak] [wiki Samantha]): Samantha 9000000189 is the Cobblestone Village greeter and quest giver."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T247: the final step returns to the giver Samantha. A Talk to the quest's giver or its named Talk target completes the final objective and opens the normal 49/13 end screen (src/quest_engine.rs on_event)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 50,
+          "items": [],
+          "job_xp": {
+            "1": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T247: 50 coins and 25 Adventurer (profile 1) job XP for a four-stop admin-event hunt. These are local event values, not a recovered retail payout; profile 1 is the Adventurer job in data/content/jobs.json and is the profile this row names, not the active combat job."
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Research/Starting Quest Chains.md: the starting-region rows use five-coin rewards. This event quest deliberately pays a larger prize, recorded as (R) in the adjacent tag."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "lab/runs/client-baseline-20261014T203930Z/client/locale/en_us_data.dat line 65769: raw locale hash 2499109421 resolves to Global.Text id 429342, the stock title 'The Great Scavenger Hunt', reused for this event quest. No new locale row is authored."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T247: authored admin-event scavenger hunt at existing starting-road landmarks. Three VisitPosition stops at copied NPC-row positions and a return Talk to Samantha; no new NPC spawn, objective kind, reward path, packet or realm command. The quest is always offered; the admin starts the event with a broadcast."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T247: the stop order (Pappy's farm, brawling ring, Highroad Junction, Samantha), the 8.0 m radius and the 50-coin / 25-Adventurer-XP reward are local event policy. Notes/Design/World Builder.md records the admin-hunt intent: the admin broadcasts hints and the quest is the objective."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T247: the split loader requires every quest to be referenced by a jobs.json quest_ids list (src/quest_engine.rs from_split_content), so the Adventurer job lists 3000200. The giver offer itself comes from this record's giver_npc_id through QuestEngine::quest_ids_for_giver; no NPC row was edited."
+        }
+      ],
+      "enabled": true
+    }
+  ]
+}
