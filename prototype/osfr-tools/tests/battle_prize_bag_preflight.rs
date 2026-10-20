@@ -24,7 +24,10 @@ use std::{
     collections::{BTreeMap, BTreeSet},
     fs,
     path::{Path, PathBuf},
-    sync::{Mutex, OnceLock},
+    sync::{
+        Mutex, OnceLock,
+        atomic::{AtomicU64, Ordering},
+    },
 };
 
 const RUNTIME_CONTENT: &str = "../../../lab/reports/round70-native-20261016T061000Z/content";
@@ -216,8 +219,15 @@ fn shared_content(bundle: Bundle) -> PathBuf {
     if let Some(path) = cache.get(&bundle) {
         return path.clone();
     }
-    let root =
-        PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!("t243-prize-bag-{bundle:?}"));
+    // A concurrent test binary shares this build dir: the process id and a
+    // per-process serial keep every process's copy private, so one process can
+    // never rebuild the content another process is loading.
+    static SERIAL: AtomicU64 = AtomicU64::new(0);
+    let root = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!(
+        "t243-prize-bag-{}-{}-{bundle:?}",
+        std::process::id(),
+        SERIAL.fetch_add(1, Ordering::Relaxed)
+    ));
     // Rebuild only this build-dir scratch directory; the runtime content is
     // never written or removed.
     let _ = fs::remove_dir_all(&root);
@@ -786,5 +796,48 @@ fn a_refused_preflight_changes_nothing() {
         economy(&first, item),
         first_economy,
         "the first player's coins, prize count and stacks are unchanged"
+    );
+}
+
+/// Test 6: the bundle preflight must answer with `grant_bundle`'s own outcome,
+/// not a second copy of its loop. Every bundle the payout path would commit the
+/// preflight accepts, and every bundle it would commit nothing for the
+/// preflight refuses, so a rule added to `grant_bundle` reaches the start gate
+/// and the payout together. Bundles above the loader's 16-row bound are the one
+/// deliberate difference (`grant_bundle` has no row cap) and are pinned above.
+#[test]
+fn the_preflight_answers_like_the_payout_path() {
+    let (item, max_stack) = bounded_item();
+    let filler = filler_definition();
+    let inventory = runtime_inventory();
+    let before = serde_json::to_vec(inventory.state()).unwrap();
+    for bundle in [
+        vec![],
+        vec![(item, 1)],
+        vec![(item, max_stack)],
+        vec![(item, max_stack), (item, 1)],
+        vec![(filler, 1), (item, 1)],
+        vec![(item, max_stack + 1)],
+        vec![(item, 0)],
+        vec![(0, 1)],
+        vec![(i32::MAX, 1)],
+    ] {
+        let accepted = inventory.accepts_reward_bundle(&bundle);
+        let paid = inventory.clone().grant_bundle(0, &bundle).is_ok();
+        assert_eq!(
+            accepted, paid,
+            "the start preflight and the payout disagree for {bundle:?}"
+        );
+    }
+    // The one deliberate difference is the loader row bound: `grant_bundle`
+    // would pay seventeen valid rows, but no encounter can preview that bundle
+    // (test 4 pins the 16-row refusal).
+    let long: Vec<(i32, u32)> = (0..17).map(|_| (filler, 1)).collect();
+    assert!(!inventory.accepts_reward_bundle(&long));
+    assert!(inventory.clone().grant_bundle(0, &long).is_ok());
+    assert_eq!(
+        serde_json::to_vec(inventory.state()).unwrap(),
+        before,
+        "neither check changes the live bag"
     );
 }
