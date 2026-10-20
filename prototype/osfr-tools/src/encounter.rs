@@ -769,6 +769,10 @@ pub struct EncounterEngine {
     ledger: KillLedger,
     /// Zone the pickups were dropped in; a different zone clears them.
     pickup_zone: Option<u32>,
+    /// World instance this session's scene is bound to (`bind_run_instance`).
+    /// A different instance is a client scene reload, so the ground pickups are
+    /// gone too; the held power-up stays (player state).
+    pickup_instance: Option<i32>,
 }
 
 /// (R) Shared-field kill bookkeeping for power-up drops (W158 slice 2b).
@@ -863,6 +867,17 @@ impl EncounterEngine {
         if instance < 0 {
             return Err(invalid("negative encounter instance"));
         }
+        // (R) The session's membership instance is the scene the client loaded;
+        // binding a different one is a scene reload (opcode 31 begin-zoning,
+        // client reader 0x008e4ae0), so its ground pickups no longer exist
+        // there. The held power-up is player state and stays.
+        if self
+            .pickup_instance
+            .is_some_and(|previous| previous != instance)
+        {
+            self.pickups.clear();
+        }
+        self.pickup_instance = Some(instance);
         if let Some(active) = &mut self.state.active {
             let changed = active.instance_id != instance;
             active.instance_id = instance;
@@ -1127,6 +1142,7 @@ impl EncounterEngine {
             held_power_up: None,
             ledger: KillLedger::default(),
             pickup_zone: None,
+            pickup_instance: None,
         };
         engine.rebuild_behaviours()?;
         Ok(engine)
@@ -2243,14 +2259,6 @@ impl EncounterEngine {
             self.pickups.clear();
         }
         self.pickup_zone = Some(zone);
-    }
-
-    /// (R) A transfer into another instance of the same scene makes the client
-    /// reload that scene (opcode 31 / client begin-zoning reader 0x008e4ae0),
-    /// so its ground pickups are gone. The held power-up is player state, not
-    /// scene state, and stays.
-    pub fn discard_ground_pickups(&mut self) {
-        self.pickups.clear();
     }
 
     /// How many ground pickups this session still holds (tests and diagnostics).

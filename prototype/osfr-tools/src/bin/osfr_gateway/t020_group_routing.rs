@@ -874,3 +874,114 @@ fn forged_body_identities_do_not_select_another_character_or_invite() {
         Some([GUIDS[a], GUIDS[b]].as_slice())
     );
 }
+
+/// F182: the big-heart claim is keyed by the picker's committed instance, so
+/// the same authored kill id in another instance is a new kill, and a picker
+/// with no committed place claims nothing. Drives the real `Session::heal_group`.
+#[test]
+fn f182_a_big_heart_group_heal_claims_the_pickers_instance() {
+    let (mut server, keys, scratch) = server_rig("f182-heal");
+    // One group: A picks up the heart, B is the hurt member.
+    route_server(&mut server, keys[0], &invite(0, 1, 0));
+    let group = server.world.social.group_of(GUIDS[0]).unwrap();
+    route_server(&mut server, keys[1], &response(0, 1, group, true));
+    enter_member(&mut server.membership, GUIDS[0], None);
+    enter_member(&mut server.membership, GUIDS[1], None);
+    let hurt = damaged_gateway(&server, keys[1], 100);
+    hurt_member(&mut server, keys[1], &hurt);
+
+    group_heal(&mut server, keys[0], (7, 9));
+    let after_first = member_health(&server, keys[1]);
+    assert!(
+        after_first > 100,
+        "a big heart heals the hurt group member: {after_first}"
+    );
+    group_heal(&mut server, keys[0], (7, 9));
+    assert_eq!(
+        member_health(&server, keys[1]),
+        after_first,
+        "one group heal per kill"
+    );
+
+    // The same authored kill id in another instance is a new kill.
+    let child = server
+        .membership
+        .create_child_instance(
+            0,
+            0,
+            osfr_tools::world::InstanceKind::Encounter { encounter_id: 0 },
+            0,
+        )
+        .unwrap();
+    enter_member(&mut server.membership, GUIDS[0], Some(child));
+    enter_member(&mut server.membership, GUIDS[1], Some(child));
+    hurt_member(&mut server, keys[1], &hurt);
+    group_heal(&mut server, keys[0], (7, 9));
+    assert!(
+        member_health(&server, keys[1]) > 100,
+        "the same kill id in another instance is a separate kill"
+    );
+
+    // A picker with no committed place refuses without consuming the kill.
+    server.membership.leave(GUIDS[0], 0);
+    hurt_member(&mut server, keys[1], &hurt);
+    group_heal(&mut server, keys[0], (8, 10));
+    assert_eq!(member_health(&server, keys[1]), 100);
+    enter_member(&mut server.membership, GUIDS[0], Some(child));
+    group_heal(&mut server, keys[0], (8, 10));
+    assert!(
+        member_health(&server, keys[1]) > 100,
+        "a refused claim consumed nothing"
+    );
+
+    drop(server);
+    fs::remove_dir_all(scratch).unwrap();
+}
+
+fn enter_member(membership: &mut World, guid: u64, target: Option<i32>) {
+    let change = membership
+        .prepare_membership(guid, 0, target, WorldPose::ORIGIN, true, 0)
+        .unwrap();
+    membership.commit_membership(change);
+}
+
+/// One opening-campaign gateway for `key` at `health` (parsed once per test).
+fn damaged_gateway(server: &Server, key: SessionKey, health: u32) -> Gateway {
+    let content = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab/references/rust-opening-cooking-original-assets");
+    let character = server.sessions[&key].gateway.state().clone();
+    let mut state = Gameplay::load(&content, None).unwrap().state();
+    state.encounter.as_mut().unwrap().player_health = health;
+    Gateway::load_gameplay(&server.options.reference, character, &content, Some(state)).unwrap()
+}
+
+fn hurt_member(server: &mut Server, key: SessionKey, gateway: &Gateway) {
+    server.sessions.get_mut(&key).unwrap().gateway = gateway.clone();
+}
+
+fn member_health(server: &Server, key: SessionKey) -> u32 {
+    server
+        .sessions
+        .get(&key)
+        .unwrap()
+        .gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .encounter
+        .unwrap()
+        .player_health
+}
+
+fn group_heal(server: &mut Server, picker: SessionKey, kill: (u64, u64)) {
+    let session = server.sessions.remove(&picker).unwrap();
+    session
+        .heal_group(
+            osfr_tools::encounter::GroupHeal { percent: 50, kill },
+            &server.world,
+            &mut server.membership,
+            &mut server.sessions,
+        )
+        .unwrap();
+    server.sessions.insert(picker, session);
+}

@@ -700,30 +700,70 @@ fn t032_a_seeded_zone_is_seeded_by_public_entry() {
 
 #[test]
 fn t032_a_private_child_never_aliases_a_seeded_public_instance() {
-    use osfr_tools::world::{InstanceKind, World, WorldError, WorldPose};
+    use osfr_tools::world::{InstanceKind, World, WorldPose};
 
     let mut a = interest_engine();
     let seed = a.take_shared_fields().unwrap();
     let mut world = World::runtime();
-    // A private child takes id 1 before zone 1 is registered, then a seed is
-    // installed for zone 1: its zone-derived public id is already occupied.
+    // The free-id cursor gives this child id 1 before zone 1 is registered.
     let child = world
         .create_child_instance(0, 0, InstanceKind::Encounter { encounter_id: 0 }, 0)
         .unwrap();
     assert_eq!(child, 1);
     world.register_runtime_zone(scene_zone(1)).unwrap();
     world.install_field_seed(1, seed);
-    assert!(
-        matches!(
-            world.prepare_membership(101, 1, None, WorldPose::ORIGIN, true, 0),
-            Err(WorldError::PublicInstanceTaken(1))
-        ),
-        "the private child must never be accepted as the seeded public instance"
+    let entered = world.enter_public(101, 1, WorldPose::ORIGIN, 0).unwrap();
+    assert_ne!(
+        entered.instance_id, child,
+        "the public instance must take a free id, not replace the private child"
     );
-    assert_eq!(world.public_instance(1), None);
     assert_eq!(
         world.instance(child).unwrap().kind,
-        InstanceKind::Encounter { encounter_id: 0 }
+        InstanceKind::Encounter { encounter_id: 0 },
+        "the private child keeps its kind and id"
+    );
+    assert_eq!(
+        world.instance(entered.instance_id).unwrap().kind,
+        InstanceKind::Public
+    );
+}
+
+#[test]
+fn t032_a_seeded_zone_takes_a_free_public_id_when_a_child_holds_the_old_one() {
+    use osfr_tools::world::{InstanceKind, World, WorldPose};
+
+    let mut a = interest_engine();
+    let seed = a.take_shared_fields().unwrap();
+    let mut world = World::runtime();
+    let child = world
+        .create_child_instance(0, 0, InstanceKind::Encounter { encounter_id: 0 }, 0)
+        .unwrap();
+    assert_eq!(child, 1);
+    world.register_runtime_zone(scene_zone(1)).unwrap();
+    world.install_field_seed(1, seed);
+    let first = world
+        .prepare_membership(101, 1, None, WorldPose::ORIGIN, true, 0)
+        .unwrap();
+    let public = first.instance_id();
+    assert_ne!(
+        public, child,
+        "a taken id is never aliased as the seeded public instance"
+    );
+    world.commit_membership(first);
+    assert_eq!(world.public_instance(1), Some(public));
+    let second = world
+        .prepare_membership(202, 1, None, WorldPose::ORIGIN, true, 0)
+        .unwrap();
+    assert_eq!(
+        second.instance_id(),
+        public,
+        "a second entrant shares the zone's public instance"
+    );
+    world.commit_membership(second);
+    assert_eq!(
+        world.instance(child).unwrap().kind,
+        InstanceKind::Encounter { encounter_id: 0 },
+        "the private child was not aliased as public space"
     );
 }
 

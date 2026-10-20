@@ -559,13 +559,6 @@ impl Gameplay {
         }
         Ok(out)
     }
-    /// (R) An instance transfer replaces this session's scene even when the
-    /// zone id is unchanged; old ground pickups are no longer in the client.
-    pub fn discard_ground_pickups(&mut self) {
-        if let Some(encounter) = &mut self.encounter {
-            encounter.discard_ground_pickups();
-        }
-    }
     /// How many ground pickups this session still holds (tests and diagnostics).
     pub fn pickup_count(&self) -> usize {
         self.encounter

@@ -719,7 +719,6 @@ pub enum WorldError {
     DungeonHasNoZone(String),
     UnknownParent(InstanceId),
     PublicMustBeShared,
-    PublicInstanceTaken(InstanceId),
     PlayerNotInInstance(PlayerId),
     InvalidPose,
     NumericRange(&'static str),
@@ -736,9 +735,6 @@ impl std::fmt::Display for WorldError {
             Self::DungeonHasNoZone(id) => write!(out, "dungeon {id} has no zone mapping"),
             Self::UnknownParent(id) => write!(out, "unknown parent instance {id}"),
             Self::PublicMustBeShared => out.write_str("public instances are keyed by zone"),
-            Self::PublicInstanceTaken(id) => {
-                write!(out, "public instance id {id} is held by a private instance")
-            }
             Self::PlayerNotInInstance(id) => write!(out, "player {id} is not in that instance"),
             Self::InvalidPose => out.write_str("pose contains a non-finite component"),
             Self::NumericRange(field) => write!(out, "{field} is outside the wire range"),
@@ -810,21 +806,23 @@ impl World {
             .or_default()
             .extend(packets);
     }
-    /// True the first time a kill's big-heart group heal is claimed in
-    /// `instance` (R: one group heal per kill, however many participants picked
-    /// up a heart). Seeded instances reuse authored enemy GUIDs, so the same
-    /// (guid, ms) can be two real kills; the instance is part of the identity.
+    /// (R) One big-heart group heal per kill, however many participants picked
+    /// up a heart, claimed in the picker's committed instance. Seeded instances
+    /// reuse authored enemy GUIDs, so the same (guid, ms) can be two real kills;
+    /// the instance is part of the identity. Returns that instance, or `None`
+    /// when the player has no committed place or the kill was already claimed.
     /// The last 256 claims are remembered.
-    pub fn claim_group_heal(&mut self, instance: InstanceId, kill: (u64, u64)) -> bool {
+    pub fn claim_group_heal(&mut self, player: PlayerId, kill: (u64, u64)) -> Option<InstanceId> {
+        let instance = self.players.get(&player)?.instance_id;
         let claim = (instance, kill.0, kill.1);
         if self.group_heals.contains(&claim) {
-            return false;
+            return None;
         }
         if self.group_heals.len() >= 256 {
             self.group_heals.pop_front();
         }
         self.group_heals.push_back(claim);
-        true
+        Some(instance)
     }
     pub fn take_field_packets(&mut self, instance: InstanceId) -> Vec<Vec<u8>> {
         self.field_packets.remove(&instance).unwrap_or_default()
@@ -956,25 +954,8 @@ impl World {
             }
             id
         } else if zone_id == 0 || self.field_seeds.contains_key(&zone_id) {
-            // (R) Public instance identity follows the zone id, as zone 0
-            // already does; private children skip registered zone ids.
-            let id = match self.public_instance(zone_id) {
-                Some(id) => id,
-                None => i32::try_from(zone_id).map_err(|_| WorldError::NumericRange("zone id"))?,
-            };
-            match self.instances.get(&id) {
-                // (R) A scene registered after child allocation can find its
-                // zone-derived id held by a private instance. Fail closed
-                // rather than alias that instance into public space.
-                Some(row) if row.kind != InstanceKind::Public || row.zone_id != zone_id => {
-                    return Err(WorldError::PublicInstanceTaken(id));
-                }
-                Some(_) => {}
-                None => {
-                    instance =
-                        Some(self.make_instance(id, zone_id, InstanceKind::Public, None, now_ms)?)
-                }
-            }
+            let (id, staged) = self.stage_public(zone_id, now_ms)?;
+            instance = staged;
             id
         } else {
             if !self.instances.contains_key(&0) {
@@ -1086,6 +1067,58 @@ impl World {
         self.public_instances.get(&zone_id).copied()
     }
 
+    /// (R) A seeded scene, and zone 0, has one shared public instance. Reuse
+    /// the registered one; otherwise stage it under the scene's own id when
+    /// that id is free, or the lowest free id when a private child already
+    /// holds it. A private child is therefore never aliased as public space and
+    /// a legitimate entry is not refused for a taken id. Zone 0 keeps the
+    /// startup id 0. Public ids do not come from `next_instance_id`: that
+    /// cursor is seeded above the zone ids and belongs to private children.
+    fn stage_public(
+        &self,
+        zone_id: u32,
+        now_ms: u64,
+    ) -> Result<(InstanceId, Option<ZoneInstance>), WorldError> {
+        if !self.zones.contains_key(&zone_id) {
+            return Err(WorldError::UnknownZone(zone_id));
+        }
+        if let Some(id) = self.public_instances.get(&zone_id).copied() {
+            return Ok((id, None));
+        }
+        let id = if zone_id == 0 {
+            0
+        } else {
+            let derived =
+                i32::try_from(zone_id).map_err(|_| WorldError::NumericRange("zone id"))?;
+            if self.public_id_free(derived) {
+                derived
+            } else {
+                self.available_public_id()?
+            }
+        };
+        Ok((
+            id,
+            Some(self.make_instance(id, zone_id, InstanceKind::Public, None, now_ms)?),
+        ))
+    }
+
+    fn public_id_free(&self, id: InstanceId) -> bool {
+        id > 0
+            && !self.instances.contains_key(&id)
+            && !self.public_instances.values().any(|value| *value == id)
+    }
+
+    fn available_public_id(&self) -> Result<InstanceId, WorldError> {
+        (1..)
+            .find(|id| {
+                self.public_id_free(*id)
+                    && !u32::try_from(*id)
+                        .ok()
+                        .is_some_and(|zone_id| self.zones.contains_key(&zone_id))
+            })
+            .ok_or(WorldError::InstanceIdsExhausted)
+    }
+
     /// Enter the zone's shared public instance, creating it on first use.
     pub fn enter_public(
         &mut self,
@@ -1094,20 +1127,12 @@ impl World {
         pose: WorldPose,
         now_ms: u64,
     ) -> Result<EnterSequence, WorldError> {
-        let created = !self.public_instances.contains_key(&zone_id);
-        if created {
-            let zone = self
-                .zones
-                .get(&zone_id)
-                .ok_or(WorldError::UnknownZone(zone_id))?;
-            let id = i32::try_from(zone.id).map_err(|_| WorldError::NumericRange("zone id"))?;
-            // (R) Public instance identity follows the zone id so zone 0 keeps
-            // the existing startup identifier; private children use new ids.
-            let instance = self.make_instance(id, zone_id, InstanceKind::Public, None, now_ms)?;
+        let (id, instance) = self.stage_public(zone_id, now_ms)?;
+        let created = instance.is_some();
+        if let Some(instance) = instance {
             self.instances.insert(id, instance);
             self.public_instances.insert(zone_id, id);
         }
-        let id = self.public_instances[&zone_id];
         match self.enter_instance(player, id, pose, now_ms) {
             Ok(sequence) => Ok(sequence),
             Err(error) => {

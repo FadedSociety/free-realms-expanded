@@ -364,18 +364,35 @@ fn zoning_clears_pickups_but_not_the_held_power_up() {
 }
 
 #[test]
-fn a_same_zone_instance_transfer_discards_ground_pickups() {
-    let f = Fixture::new(&[Some("boss")]);
-    let mut e = f.load();
+fn an_instance_bind_discards_ground_pickups_but_not_the_held_power_up() {
+    let f = Fixture::new(&[Some("t_flame"), Some("boss")]);
+    let mut e = f.load_hurt(400);
     e.enter_zone(0);
-    let out = kill(&mut e, FIRST, 1_000);
-    assert_eq!(pickups(&out).len(), 1, "the kill dropped a big heart");
-    e.enter_zone(0); // a same-zone re-entry before the transfer keeps it
-    e.discard_ground_pickups(); // what Gateway::stage_instance_transfer stages
-    let after = e.tick(SPOT, 11, 1_200).unwrap();
+    // A first drop is picked up; the held kind is player state.
+    let first = pickups(&kill(&mut e, FIRST, 1_000))[0];
+    let taken = e.tick(SPOT, 11, 1_200).unwrap();
+    assert_eq!(removed(&taken), [first]);
+    assert_eq!(e.held_power_up(), Some("flame_wave"));
+    // A second drop is still on the ground when the session binds another
+    // membership instance: the client reloaded the scene, so it is gone.
+    kill(&mut e, FIRST + 1, 2_000);
+    assert_eq!(e.pickup_count(), 1);
     assert!(
-        removed(&after).is_empty(),
-        "a transfer to another instance must not pay out a pickup the client no longer has"
+        !e.bind_run_instance(0).unwrap(),
+        "the same instance keeps the drop"
+    );
+    assert_eq!(e.pickup_count(), 1);
+    e.bind_run_instance(1).unwrap();
+    assert_eq!(e.pickup_count(), 0, "a new instance is a scene reload");
+    assert_eq!(
+        e.held_power_up(),
+        Some("flame_wave"),
+        "the held power-up is player state, not scene state"
+    );
+    let after = e.tick(SPOT, 11, 2_200).unwrap();
+    assert!(
+        removed(&after).is_empty() && health(&after).is_none(),
+        "the old instance's drop must not pay out after the reload"
     );
 }
 

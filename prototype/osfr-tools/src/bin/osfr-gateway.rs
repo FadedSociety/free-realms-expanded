@@ -2358,17 +2358,10 @@ impl Session {
             return Ok(());
         };
         let zone = self.gateway.state().zone_id;
-        // A seeded field has the same kill id in every instance, so the claim is
-        // per instance; without a committed place there is nobody to heal.
-        let Some(instance) = membership
-            .player_location(self.character_guid)
-            .map(|l| l.instance_id)
-        else {
+        // (R) One heal per kill per instance: a seeded field reuses kill ids.
+        let Some(instance) = membership.claim_group_heal(self.character_guid, heal.kill) else {
             return Ok(());
         };
-        if !membership.claim_group_heal(instance, heal.kill) {
-            return Ok(());
-        }
         let members = world
             .social
             .group_members(group)
