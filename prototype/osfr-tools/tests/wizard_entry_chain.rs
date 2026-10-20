@@ -308,15 +308,14 @@ fn the_spell_book_and_glasses_steps_advance_and_turn_in_once() {
     );
     assert_eq!(coins(&game), coins_before + REWARD_COINS);
 
-    // The Nurble cleaning errand stays disabled and is never offered.
+    // T303 enables the next record: after both chapters, Fizzlesticks offers
+    // "Sticky Spell Book" and never re-offers the completed records.
     assert!(!has_quest(&game, STICKY));
-    assert_no_offer(
-        &mut game,
-        &character,
-        FIZZLESTICKS,
-        &mut now,
-        "chapter complete at Fizzlesticks",
-    );
+    now += 10;
+    let offer = offered_card(&mut game, &character, FIZZLESTICKS, STICKY, now);
+    assert_eq!(offer.intro_text_string_id, STICKY_INTRO);
+    assert_eq!(offer.name_string_id, STICKY_TITLE);
+    assert_eq!(offer.description_string_id, STICKY_DESCRIPTION);
 }
 
 #[test]
@@ -840,7 +839,7 @@ fn enabled_wizard_chapter_records_are_complete_and_drawable() {
             .iter()
             .map(|record| record["id"].as_u64().unwrap())
             .collect::<Vec<_>>(),
-        vec![u64::from(BOOK), u64::from(GLASSES)]
+        vec![u64::from(BOOK), u64::from(GLASSES), u64::from(STICKY)]
     );
     for record in &enabled {
         assert_eq!(record["giver_npc_id"].as_u64(), Some(FIZZLESTICKS));
@@ -981,13 +980,40 @@ fn enabled_wizard_chapter_records_are_complete_and_drawable() {
         );
     }
 
-    // The Nurble cleaning errand stays disabled.
+    // T303 enables the Nurble cleaning errand: two ordered Talks and the same 5/25
+    // first-chapter reward as the two records before it.
     let sticky = records
         .iter()
         .find(|record| record["id"].as_u64() == Some(u64::from(STICKY)))
         .unwrap();
-    assert_eq!(sticky["enabled"].as_bool(), Some(false));
-    assert_eq!(sticky["objectives"], serde_json::json!([]));
+    assert_eq!(sticky["enabled"].as_bool(), Some(true));
+    assert_eq!(
+        sticky["title_string_id"].as_u64(),
+        Some(u64::from(STICKY_TITLE))
+    );
+    assert_eq!(
+        sticky["description_string_id"].as_u64(),
+        Some(u64::from(STICKY_DESCRIPTION))
+    );
+    assert_eq!(
+        sticky["intro_text_string_id"].as_u64(),
+        Some(u64::from(STICKY_INTRO))
+    );
+    assert_eq!(
+        sticky["end_text_string_id"].as_u64(),
+        Some(u64::from(STICKY_END_TEXT))
+    );
+    assert_eq!(
+        sticky["prerequisite_quest_ids"],
+        serde_json::json!([GLASSES])
+    );
+    assert_eq!(sticky["objectives"][0]["kind"], "talk_to_npc");
+    assert_eq!(sticky["objectives"][0]["npc_id"].as_u64(), Some(NURBLE));
+    assert_eq!(sticky["objectives"][1]["kind"], "talk_to_npc");
+    assert_eq!(
+        sticky["objectives"][1]["npc_id"].as_u64(),
+        Some(FIZZLESTICKS)
+    );
 }
 
 #[test]

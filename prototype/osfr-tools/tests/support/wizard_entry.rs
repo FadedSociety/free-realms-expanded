@@ -27,7 +27,7 @@ pub const NURBLE: u64 = 9_000_000_415;
 pub const SQUEE: u64 = 9_500_000_949;
 pub const BOOK: u32 = 3_160_003;
 pub const GLASSES: u32 = 3_160_004;
-/// "Sticky Spell Book" (the Nurble cleaning errand) stays disabled in this slice.
+/// "Sticky Spell Book" (the Nurble cleaning errand), enabled by T303.
 pub const STICKY: u32 = 3_160_005;
 pub const BOOK_TITLE: u32 = 20_859;
 pub const BOOK_DESCRIPTION: u32 = 20_860;
@@ -38,6 +38,12 @@ pub const GLASSES_DESCRIPTION: u32 = 22_189;
 /// The guide's row-2 pitch (raw locale hash 2073760606); its match is wording-only (R).
 pub const GLASSES_INTRO: u32 = 24_948;
 pub const GLASSES_END_TEXT: u32 = 38_882;
+pub const STICKY_TITLE: u32 = 22_193;
+pub const STICKY_DESCRIPTION: u32 = 22_194;
+/// The guide's row-3 pitch (raw locale hash 3719837419); its match is wording-only (R).
+pub const STICKY_INTRO: u32 = 24_949;
+/// The guide's row-3 hand-in line (raw locale hash 2823854753).
+pub const STICKY_END_TEXT: u32 = 22_373;
 pub const REWARD_COINS: u32 = 5;
 pub const REWARD_XP: u32 = 25;
 pub const WIZARD: i32 = 12;
@@ -104,6 +110,7 @@ pub fn quest_title(quest_id: u32) -> u32 {
     match quest_id {
         BOOK => BOOK_TITLE,
         GLASSES => GLASSES_TITLE,
+        STICKY => STICKY_TITLE,
         other => panic!("quest {other} has no title in this chapter"),
     }
 }
@@ -131,13 +138,13 @@ pub fn release_wizard_end_screen(
         0,
         "the animation dword is the (R) default"
     );
-    assert_reward_rows(&end, quest_id);
+    assert_reward_rows(&end, quest_id, character.guid);
     end
 }
 
 /// The 49/13 reward bundle rows: success byte, coins i32, stars i32, ..., display
 /// source guid, player guid, icon, name (offsets per client reader `00c7b990`).
-fn assert_reward_rows(end: &[u8], quest_id: u32) {
+fn assert_reward_rows(end: &[u8], quest_id: u32, player_guid: u64) {
     assert_eq!(end[26], 1, "the reward bundle success byte");
     assert_eq!(
         i32::from_le_bytes(end[27..31].try_into().unwrap()),
@@ -161,7 +168,7 @@ fn assert_reward_rows(end: &[u8], quest_id: u32) {
     );
     assert_eq!(
         u64::from_le_bytes(end[71..79].try_into().unwrap()),
-        CHARACTER,
+        player_guid,
         "the reward display names the character"
     );
 }

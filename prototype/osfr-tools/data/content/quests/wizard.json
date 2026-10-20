@@ -240,21 +240,67 @@
     },
     {
       "id": 3160005,
+      "job": 12,
       "title_string_id": 22193,
       "giver_npc_id": 9000000324,
       "prerequisite_quest_ids": [
         3160004
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000415,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1 (Fizzlesticks, Robgoblin Camp), row 3; delivery steps raw 1281056681 -> locale 22211 ('Give the spell book to Nurble') and raw 1701507967 -> locale 103130 ('Give the Spell Book to Nurble in the Robgoblin Camp.'), resolved in lab/reports/locale-id-map.json. Nurble is the drawable Junkmaster row 9000000415 in npcs/wilds.json (legacy_data, model 189, name 20518)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T303: objective ordinal 1 is the server binding for the client's first delivery step (take the book to Nurble). The spell book is narrative, not a proven inventory item, so this is talk_to_npc rather than collect_item and no item is granted or consumed."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000324,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1 row 3; return steps raw 431477450 -> locale 22371 ('Return the clean and shiny spell book to Fizzlesticks in the Robgoblin Camp.') and raw 3878582851 -> locale 22227 ('Return the spell book to Fizzlesticks at the Robgoblin Camp.'), resolved in lab/reports/locale-id-map.json. Fizzlesticks 9000000324 is the giver row in npcs/wilds.json (legacy_data, model 191, name 20517)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T303: objective ordinal 2 is the server binding for the client's return step at the giver. The split loader keeps objectives ordered, so this Talk cannot complete before the Nurble Talk. turnin_npc_id defaults to the giver; no NPC quests_accepted row points at Nurble."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "12": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T303: the guide's reward cell for Band 1 row 3 is unknown. Five coins use the W110 small-referral fallback; 25 Wizard (profile 12) job XP matches rows 1-2's first-chapter rate (T242). No item is granted: the spell book is narrative, not an inventory item, and its definition mapping is unproven."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 3; name 'Sticky Spell Book (client has no \"Wizard:\" prefix)'; title id cell ucdt 690898156 / ugdt 266067796"
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1, row 3; name 'Sticky Spell Book' (the client has no 'Wizard:' prefix); title 22193 and description 22194 verified in lab/reports/locale-id-to-text.json; guide title ids ucdt 690898156 / ugdt 266067796; description raw 1649648269 -> locale 22194."
         },
         {
           "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 3; name 'Sticky Spell Book (client has no \"Wizard:\" prefix)'; title id cell ucdt 690898156 / ugdt 266067796"
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Band 1 row 3; Fizzlesticks at the Robgoblin Camp gives it after row 2, and Nurble does the cleaning (wiki Wizard page order)."
         },
         {
           "kind": "reconstructed",
@@ -262,31 +308,25 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+          "evidence": "(R) T303: job gate 12 (Wizard, jobs.json profile 12) at the schema's rank-1 default, the same gate as 3160003/3160004. Only the active Wizard is offered the record."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T303: prerequisite 3160004 is the guide's 'After 2' and the only ordering gate; the record is not offered while 3160004 is incomplete."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+          "evidence": "(R) T303: the two objectives are the client's Nurble delivery and the Fizzlesticks return, in that order. No item is fabricated for the spell book and no other Wizard record is enabled by this slice."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) source explicitly says after row 2; mapped that page label to the preceding batch content key"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T303: the guide's row-3 offer line raw 3719837419 (a wording-only dagger match) resolves to locale 24949 and the hand-in line raw 2823854753 resolves to locale 22373, both in lab/reports/locale-id-map.json; no prose is authored. 3040479417 (locale 103131) is a separate reminder line and is not used as a greeting."
         }
       ],
       "description_string_id": 22194,
-      "enabled": false
+      "intro_text_string_id": 24949,
+      "end_text_string_id": 22373,
+      "enabled": true
     },
     {
       "id": 3160006,
