@@ -203,7 +203,7 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
         regional_legacy >= 578,
         "regional NPCs dropped to {regional_legacy}"
     );
-    assert_eq!(extra_rows.len(), 3266);
+    assert_eq!(extra_rows.len(), 3267);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

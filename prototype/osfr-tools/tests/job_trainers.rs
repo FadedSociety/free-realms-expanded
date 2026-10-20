@@ -197,6 +197,22 @@ fn npc(rows: &[Value], id: u64) -> &Value {
         .expect("trainer NPC in content")
 }
 
+fn extra_rows() -> Vec<Value> {
+    let json: Value =
+        serde_json::from_slice(&fs::read(data().join("npc_spawns_extra.json")).unwrap()).unwrap();
+    json["records"].as_array().unwrap().clone()
+}
+
+/// The existing "must be drawn in game" rule: the regional row is data-backed, or an
+/// `npc_spawns_extra` spawn with a real model binds the same content key (T201 Dewey).
+fn is_drawn(extras: &[Value], npc: &Value, trainer: &Trainer) -> bool {
+    npc["placement"] == "legacy_data"
+        || extras.iter().any(|row| {
+            row["content_key"].as_u64() == Some(trainer.npc)
+                && row["model_id"].as_u64().is_some_and(|model| model > 0)
+        })
+}
+
 /// Start state with the trainer's prerequisite met when requested.
 fn profile_state(profiles: &Profiles, trainer: &Trainer, prerequisite: bool) -> ProfileState {
     let mut state = profiles.state().clone();
@@ -216,6 +232,7 @@ fn trainer_rows_match_the_job_and_spawned_npc_content() {
     let jobs: Value = serde_json::from_slice(&fs::read(data().join("jobs.json")).unwrap()).unwrap();
     let jobs = jobs["records"].as_array().unwrap();
     let npcs = npc_rows();
+    let extras = extra_rows();
     for trainer in &rows {
         let job = jobs
             .iter()
@@ -232,8 +249,8 @@ fn trainer_rows_match_the_job_and_spawned_npc_content() {
             "{} is an NPC trainer",
             trainer.job
         );
-        assert_eq!(
-            row["placement"], "legacy_data",
+        assert!(
+            is_drawn(&extras, row, trainer),
             "{}: the trainer must be drawn in game",
             trainer.job
         );

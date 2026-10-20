@@ -72005,6 +72005,45 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "spawn_guid": 9000000076,
+      "legacy_npc_id": null,
+      "content_key": 9000000076,
+      "model_id": 995,
+      "model_file_name": "human_m_warrior_01.agr",
+      "name": "Drill Sergeant Dewey",
+      "name_string_id": 22435,
+      "position": [
+        -1412.821604,
+        -27.631,
+        353.933558
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Models.txt row 995 = human_m_warrior_01.agr (the mirror of the client model table; the same file names the human and fairy Warrior job-outfit bodies referenced by Npcs.json Id=1532/1533/3572/3573). The Legacy Npcs.json has no Dewey row."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat: Global.Text.22435 resolves to 'Drill Sergeant Dewey'. The Snowhill content record 9000000076 stores name id 2900909981 in table ucdt; the AddNpc name field is a Global.Text id (client formats 'Global.Text.%d' at 0x01804c14), so the ucdt id would render a blank nameplate."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md:35 (row 35: Warrior trainer, starts the Warrior line, near the Snowhill town hall; client 3983863291 'near the town hall in Snowhill')."
+        },
+        {
+          "kind": "video",
+          "evidence": "Dsk5NVq5YMU/00302: nameplate title 'Warrior Trainer' (notes/Build Guides/Content/NPCs/NPCs - Snowhill.md:35). The frame names no model id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The spawn reuses the Snowhill POI position [-1412.821604, -27.631, 353.933558] and reuses NPC key 9000000076 as the runtime actor GUID, so the ordinary 26/8 click addresses the same content identity. (R) Heading 0.0 is deterministic; no recovered heading exists. (R) Model 995 human_m_warrior_01.agr is the client's human male Warrior body model, chosen to fit the video's 'Warrior Trainer' nameplate; the live model id is unknown. (R) The 9000000000-range actor GUID is this project's content-key space, not a recovered server GUID."
+        }
+      ],
+      "position_w": null
     }
   ]
 }
