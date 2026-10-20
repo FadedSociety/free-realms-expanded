@@ -4601,10 +4601,7 @@ impl Gameplay {
                 // literal names keep their case.
                 let raw = &text.trim()["realm ".len()..];
                 if tool && command.split_whitespace().next() == Some("broadcast") {
-                    match crate::world_notice::parse(raw) {
-                        Ok(text) => out.broadcast = Some(text.to_owned()),
-                        Err(error) => out.replies.push(chat::system(&error.to_string())),
-                    }
+                    crate::world_notice::stage(raw, &mut out);
                     return Ok(out);
                 }
                 if tool && self.developer_cheat(command, raw, character, now_ms, &mut out)? {
@@ -5957,10 +5954,7 @@ impl Gameplay {
             if let Some(command) = lower.strip_prefix("realm ") {
                 let raw = &text.trim()["realm ".len()..];
                 if command.split_whitespace().next() == Some("broadcast") {
-                    match crate::world_notice::parse(raw) {
-                        Ok(text) => out.broadcast = Some(text.to_owned()),
-                        Err(error) => out.replies.push(chat::system(&error.to_string())),
-                    }
+                    crate::world_notice::stage(raw, &mut out);
                     return Ok(out);
                 }
                 match command {

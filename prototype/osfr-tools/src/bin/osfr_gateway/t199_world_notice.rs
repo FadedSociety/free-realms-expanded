@@ -2,6 +2,8 @@
 //! Each session has its own reference guid, so several characters share one world without an
 //! account store; the admin role is the host dev role, and demotion uses the same server-owned
 //! `set_role` seam other denial tests use. Recipients that only receive need no content pack.
+//! The replay case goes through `Session::handle` with a real reliable datagram, so the
+//! transport duplicate check runs too; the other cases drive `Session::dispatch_message`.
 use super::f120_fishing_hour_reconnect::drain_replies;
 use super::*;
 use fixtures::{copy_tree, wrap};
@@ -120,7 +122,9 @@ impl Rig {
                 SessionRequest {
                     id: id as u32,
                     crc_length: 3,
-                    buffer_size: 512,
+                    // The 200-character escaped 15/3 packet is ~870 bytes; the 512-byte
+                    // datagram limit would fragment it and the drain helper skips fragments.
+                    buffer_size: 1400,
                 },
                 &options,
                 CRC_SEED,
@@ -166,6 +170,16 @@ impl Rig {
     }
 
     fn send(&mut self, index: usize, message: &[u8], now: u64) {
+        self.try_send_raw(index, &wrap(message), now).unwrap();
+    }
+
+    /// Send one already-framed top-level message; a combined 0/25 bundle is not re-wrapped.
+    fn try_send_raw(
+        &mut self,
+        index: usize,
+        message: &[u8],
+        now: u64,
+    ) -> Result<(), Box<dyn std::error::Error>> {
         let Rig {
             world,
             membership,
@@ -176,18 +190,53 @@ impl Rig {
         } = self;
         let key = keys[index];
         let mut session = sessions.remove(&key).unwrap();
-        session
-            .dispatch_message(
-                &wrap(message),
-                &options[index],
-                now,
-                world,
-                membership,
-                sessions,
-                None,
-            )
-            .unwrap();
+        let result = session.dispatch_message(
+            message,
+            &options[index],
+            now,
+            world,
+            membership,
+            sessions,
+            None,
+        );
         sessions.insert(key, session);
+        result
+    }
+
+    /// Send one reliable application packet through the real transport framing. The same
+    /// `sequence` twice is the client transport's duplicate/replay case.
+    fn reliable(&mut self, index: usize, inner: &[u8], sequence: u16, now: u64) {
+        let socket = UdpSocket::bind("127.0.0.1:0").unwrap();
+        let Rig {
+            world,
+            membership,
+            sessions,
+            keys,
+            options,
+            ..
+        } = self;
+        let key = keys[index];
+        let mut session = sessions.remove(&key).unwrap();
+        let mut payload = sequence.to_be_bytes().to_vec();
+        payload.extend(wrap(inner));
+        let wire = session.codec.encode(RELIABLE_DATA, &payload).unwrap();
+        let result = session.handle(
+            &socket,
+            &wire,
+            &options[index],
+            now,
+            world,
+            membership,
+            sessions,
+        );
+        sessions.insert(key, session);
+        result.unwrap();
+    }
+
+    /// Point this session's next save at a directory so its transaction fails after staging.
+    fn break_save(&mut self, index: usize) {
+        let key = self.keys[index];
+        self.sessions.get_mut(&key).unwrap().state_path = self.scratch.clone();
     }
 
     fn drain(&mut self, index: usize, now: u64) -> Vec<Vec<u8>> {
@@ -284,6 +333,17 @@ fn broadcast(text: &str) -> Vec<u8> {
     osfr_tools::chat::local_request(&format!("realm broadcast {text}"))
 }
 
+/// One combined SOE application bundle (`0/25`) of wrapped child messages.
+fn bundle(messages: &[Vec<u8>]) -> Vec<u8> {
+    let mut bytes = vec![0, 25];
+    for message in messages {
+        let child = wrap(message);
+        bytes.push(child.len() as u8);
+        bytes.extend(child);
+    }
+    bytes
+}
+
 #[test]
 fn admin_broadcast_reaches_every_online_session_once() {
     let mut rig = Rig::new("all", &[(1, true), (2, false), (3, false)]);
@@ -378,4 +438,162 @@ fn no_online_sessions_is_a_no_op() {
         "a session that never entered the world received the notice"
     );
     assert_eq!(rig.save(0), before);
+}
+
+#[test]
+fn invalid_text_is_refused_without_a_save_or_a_witness_notice() {
+    let mut rig = Rig::new("invalid", &[(1, true), (2, false)]);
+    let before = (rig.snapshot(0), rig.save(0));
+    let long = "a".repeat(201);
+    let cases = [
+        ("realm broadcast".to_owned(), "needs a message", None),
+        ("realm broadcast    ".to_owned(), "needs a message", None),
+        (
+            "realm broadcast line\r\nbreak".to_owned(),
+            "control characters",
+            Some("line\r\nbreak"),
+        ),
+        (
+            "realm broadcast line\tbreak".to_owned(),
+            "control characters",
+            Some("line\tbreak"),
+        ),
+        (
+            format!("realm broadcast {long}"),
+            "200 characters maximum",
+            Some(long.as_str()),
+        ),
+    ];
+    for (request, expected, payload) in cases {
+        rig.send(0, &osfr_tools::chat::local_request(&request), NOW);
+        let deliveries = rig.drain_all(NOW);
+        let refusal = system_texts(&deliveries[0]);
+        assert_eq!(refusal.len(), 1, "{request:?}: {refusal:?}");
+        assert!(refusal[0].contains(expected), "{request:?}: {refusal:?}");
+        if let Some(payload) = payload {
+            assert!(
+                !refusal[0].contains(payload),
+                "{request:?}: the refusal echoed the text: {refusal:?}"
+            );
+        }
+        assert!(
+            system_texts(&deliveries[1]).is_empty(),
+            "{request:?}: a witness received a refused notice"
+        );
+    }
+    assert_eq!(
+        rig.snapshot(0),
+        before.0,
+        "an invalid notice changed character state"
+    );
+    assert_eq!(rig.save(0), before.1, "an invalid notice wrote a save");
+}
+
+/// A combined bundle applies its children in order: the second child has no notice of its
+/// own and must not clear the one the first child staged.
+#[test]
+fn a_bundle_that_broadcasts_then_helps_keeps_the_notice() {
+    let mut rig = Rig::new("bundle", &[(1, true), (2, false)]);
+    let text = "Hunt at noon";
+    rig.try_send_raw(
+        0,
+        &bundle(&[
+            broadcast(text),
+            osfr_tools::chat::local_request("realm help"),
+        ]),
+        NOW,
+    )
+    .unwrap();
+    let deliveries = rig.drain_all(NOW);
+    let sender = system_texts(&deliveries[0]);
+    assert!(
+        sender.contains(&text.to_owned()),
+        "the bundle lost the notice: {sender:?}"
+    );
+    assert!(
+        sender.iter().any(|line| line.contains("Opening:")),
+        "the help reply is missing: {sender:?}"
+    );
+    assert_eq!(system_texts(&deliveries[1]), vec![text.to_owned()]);
+}
+
+#[test]
+fn a_failed_save_never_announces() {
+    let mut rig = Rig::new("failsave", &[(1, true), (2, false)]);
+    let before = rig.save(0);
+    rig.break_save(0);
+    // Past POSITION_SAVE_MS so the teleport's pose save is not deferred: it runs inside the
+    // transaction and fails, which must drop the notice staged beside it.
+    let now = NOW + 10_000;
+    let result = rig.try_send_raw(
+        0,
+        &bundle(&[
+            broadcast("Should never leave the server"),
+            osfr_tools::chat::local_request("realm goto 1 2 3"),
+        ]),
+        now,
+    );
+    assert!(result.is_err(), "the broken save must fail the transaction");
+    for (index, delivery) in rig.drain_all(now).into_iter().enumerate() {
+        assert!(
+            system_texts(&delivery).is_empty(),
+            "session {index} received a notice from a failed save: {delivery:?}"
+        );
+    }
+    assert_eq!(rig.save(0), before, "a failed transaction changed the save");
+}
+
+#[test]
+fn a_replayed_reliable_packet_announces_once() {
+    let mut rig = Rig::new("replay", &[(1, true), (2, false)]);
+    let text = "Only once";
+    let message = broadcast(text);
+    // The same client sequence twice: the receiver drops the second datagram as a duplicate
+    // before gameplay sees it, so the notice cannot fan out twice.
+    rig.reliable(0, &message, 0, NOW);
+    rig.reliable(0, &message, 0, NOW);
+    for (index, delivery) in rig.drain_all(NOW).into_iter().enumerate() {
+        assert_eq!(
+            system_texts(&delivery),
+            vec![text.to_owned()],
+            "session {index}"
+        );
+    }
+}
+
+#[test]
+fn maximum_length_escaped_text_reaches_each_recipient_byte_exactly() {
+    let mut rig = Rig::new("maximum", &[(1, true), (2, false), (3, false)]);
+    let text = "<&>".repeat(66) + "ab";
+    assert_eq!(text.chars().count(), 200);
+    rig.send(0, &broadcast(&text), NOW);
+    let escaped = text
+        .replace('&', "&amp;")
+        .replace('<', "&lt;")
+        .replace('>', "&gt;");
+    for (index, delivery) in rig.drain_all(NOW).into_iter().enumerate() {
+        assert_eq!(
+            system_texts(&delivery),
+            vec![escaped.clone()],
+            "session {index}"
+        );
+        let packet = delivery
+            .iter()
+            .find(|message| message.len() > 10 && &message[7..11] == [15, 0, 3, 0])
+            .unwrap_or_else(|| panic!("session {index}: no 15/3 packet: {delivery:?}"));
+        let inner = &packet[7..];
+        assert_eq!(&inner[..4], &[15, 0, 3, 0], "session {index}");
+        assert_eq!(
+            u32::from_le_bytes(inner[4..8].try_into().unwrap()) as usize,
+            escaped.len(),
+            "session {index}"
+        );
+        assert_eq!(
+            &inner[8..8 + escaped.len()],
+            escaped.as_bytes(),
+            "session {index}"
+        );
+        assert_eq!(inner.len(), 8 + escaped.len() + 1, "session {index}");
+        assert_eq!(inner[8 + escaped.len()], 1, "session {index}");
+    }
 }

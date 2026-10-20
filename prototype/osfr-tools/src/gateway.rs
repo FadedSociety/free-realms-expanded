@@ -1678,7 +1678,6 @@ impl Gateway {
                             && result.zoning.is_none()
                             && result.scene_zoning.is_none()
                             && result.shared_field.is_none()
-                            && result.broadcast.is_none()
                         {
                             // Known handlers may legitimately reply later (the
                             // social router runs after this); decided from the
@@ -1699,7 +1698,9 @@ impl Gateway {
                             }
                         }
                         outcome.shared_field = result.shared_field;
-                        outcome.broadcast = result.broadcast;
+                        // T199: a later non-broadcast child in the same bundle must not
+                        // clear an earlier notice; two broadcasts keep the last.
+                        outcome.broadcast = result.broadcast.or(outcome.broadcast.take());
                         outcome.nearby.extend(result.nearby);
                         outcome.dev_command_denials += usize::from(result.dev_command_denied);
                         outcome.applications.push(inner.clone());

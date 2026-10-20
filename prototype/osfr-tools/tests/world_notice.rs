@@ -1,10 +1,12 @@
 //! T199: `realm broadcast <text>` through the real gameplay request path.
-//! Multi-session fanout (one 15/3 per online session after commit) is exercised over the
-//! real socket path in `tests/multiplayer.rs`, where the two-session rig already lives.
+//! The multi-session commit/fanout path lives in the bin rig
+//! (`src/bin/osfr_gateway/t199_world_notice.rs`): it drives `Session::dispatch_message` and,
+//! for the replay case, `Session::handle` with a real reliable datagram (not a socket read).
 use osfr_tools::{
     account_store::AccountRole,
     character_store::CharacterState,
     chat,
+    cooking::{CookingPhase, CookingRun},
     gameplay::{Gameplay, Outcome},
     world_notice::{self, MAX_BROADCAST_BYTES, MAX_BROADCAST_CHARS, NoticeError},
 };
@@ -188,4 +190,45 @@ fn announcement_text_is_trimmed_escaped_and_never_echoes_the_command() {
     let packet = world_notice::encode(out.broadcast.as_deref().unwrap());
     assert_eq!(&packet[8..packet.len() - 1], b"&lt;hunt&gt; &amp; tips");
     assert!(!String::from_utf8_lossy(&packet).contains("realm"));
+}
+
+/// An active crafting movie owns the character: the opening path's intercept must refuse the
+/// command before the `realm` parser sees it, so the notice can never be staged mid-movie. The
+/// bin rig cannot reach a movie without the private cooking-station fixture, so the ordering is
+/// pinned here with the same `GameplayState` shape the station fixture saves.
+#[test]
+fn an_active_cooking_movie_refuses_the_broadcast_before_staging_it() {
+    let (game, character) = game(OPENING, AccountRole::Admin);
+    let mut state = game.state();
+    let cooking = state
+        .cooking
+        .as_mut()
+        .expect("the opening pack loads cooking content");
+    let instance = cooking.next_instance_id;
+    cooking.next_instance_id += 1;
+    cooking.active = Some(CookingRun {
+        instance_id: instance,
+        phase: CookingPhase::Playing,
+        data_sent: false,
+        round_stats: [[None; 4]; 6],
+        game_stats: [None; 4],
+        score: 0,
+    });
+    let mut movie = Gameplay::load(&content(OPENING), Some(state)).unwrap();
+    movie.set_dev_tools(true);
+    movie.set_role(AccountRole::Admin);
+    let before = movie.state();
+    let out = send(
+        &mut movie,
+        &character,
+        "realm broadcast Scavenger hunt at noon",
+    );
+    assert!(
+        out.broadcast.is_none(),
+        "the movie intercept let the notice through"
+    );
+    let texts = reply_texts(&out);
+    assert_eq!(texts.len(), 1, "{texts:?}");
+    assert!(texts[0].contains("Close the cooking game"), "{texts:?}");
+    assert_eq!(movie.state(), before, "the movie refusal changed state");
 }

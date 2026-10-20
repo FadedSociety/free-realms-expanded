@@ -1632,7 +1632,7 @@ impl Session {
         }
         let previous = self.gateway.state().clone();
         let mut staged_gateway = self.gateway.clone();
-        let outcome = match staged_gateway.handle_at(message, now_ms) {
+        let mut outcome = match staged_gateway.handle_at(message, now_ms) {
             Ok(outcome) => outcome,
             Err(error) => {
                 if let Some(trace) = &self.trace {
@@ -1654,7 +1654,10 @@ impl Session {
                 trace_gateway_message(trace, self.id.0, self.peer, transport, detail)?;
             }
         }
-        self.commit_outcome(
+        // T199: the notice is staged with the transaction, then fanned out only after
+        // `commit_outcome` succeeds. Nothing is queued for a refused or failed transaction.
+        let broadcast = outcome.broadcast.take();
+        let committed = self.commit_outcome(
             staged_gateway,
             previous,
             outcome,
@@ -1663,6 +1666,11 @@ impl Session {
             sessions,
             now_ms,
         )?;
+        if committed && let Some(text) = broadcast {
+            for delivery in delivery::broadcast_deliveries(&text, world) {
+                queue_delivery(self, sessions, world, delivery)?;
+            }
+        }
         Ok(())
     }
 
@@ -1922,7 +1930,7 @@ impl Session {
             let deliveries = staged_world.with_pets(deliveries);
             Ok((staged_world, deliveries, change, deferred))
         })();
-        let (staged_world, mut deliveries, change, deferred) = match prepared {
+        let (staged_world, deliveries, change, deferred) = match prepared {
             Ok(staged) => staged,
             // (R) A precommit transfer refusal keeps the live session/location/members.
             // Postcommit queue errors below still disconnect; they cannot roll back saves.
@@ -1945,9 +1953,6 @@ impl Session {
         }
         self.gateway = staged_gateway;
         *world = staged_world;
-        if let Some(text) = outcome.broadcast.take() {
-            deliveries.extend(delivery::broadcast_deliveries(&text, world));
-        }
         self.character_guid = self.gateway.state().guid;
         if outcome.state_changed {
             self.position_dirty = deferred;

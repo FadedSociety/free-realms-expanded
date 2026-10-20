@@ -28,7 +28,8 @@ pub(super) fn chat_error_delivery(
 
 /// T199: one wrapped 15/3 system line for every session that has entered the world
 /// (`chat_sessions`), including the sender. Encoded once; each recipient gets its own
-/// copy. A recipient that leaves before queueing is skipped by `queue_delivery`.
+/// copy. The caller queues these only after `commit_outcome` succeeds; a recipient that
+/// leaves before queueing is skipped by `queue_delivery`.
 pub(super) fn broadcast_deliveries(text: &str, world: &SharedWorld) -> Vec<Delivery> {
     let bytes = wrap_application(&osfr_tools::world_notice::encode(text));
     world

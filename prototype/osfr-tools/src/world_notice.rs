@@ -1,8 +1,11 @@
 //! `realm broadcast <text>`: one server-owned system line for every online session.
 //! The text is validated here and encoded by the existing 15/3 `ChatPacketDebugChat`
 //! writer (`chat::system`), so no second packet shape or per-recipient encoder exists.
-//! Evidence: notes/Build Guides/Gameplay/Social (Friends, Guilds, Chat).md mode 3
-//! (client reader 0x00b0f9d0, receive dispatcher 0x00b14350).
+//! Evidence (IDA, client 1.910.1.530630): receive dispatcher `0x00b14350` reads the shared
+//! two-u16 header (`0x00b0f550`) and, for subtype 3, constructs `0x00b0f9d0` and reads the
+//! body with `0x00b0f5f0` (called from `0x00b10a20`): two u16 header words, a u32 byte
+//! length, that many text bytes, then one flag byte. See
+//! notes/Build Guides/Gameplay/Social (Friends, Guilds, Chat).md mode 3.
 use std::fmt;
 
 /// Longest announcement in characters (R: local bound; no recovered native limit).
@@ -74,6 +77,16 @@ pub fn parse(command: &str) -> Result<&str, NoticeError> {
 /// The one 15/3 system-line encoder; markup escaping stays in `chat::system`.
 pub fn encode(text: &str) -> Vec<u8> {
     crate::chat::system(text)
+}
+
+/// Stage a `realm` line that starts with `broadcast`: the notice on success, one system
+/// refusal otherwise. Both realm dispatch paths call this so the rule lives in one place;
+/// a refusal never echoes the input.
+pub fn stage(raw: &str, out: &mut crate::gameplay::Outcome) {
+    match parse(raw) {
+        Ok(text) => out.broadcast = Some(text.to_owned()),
+        Err(error) => out.replies.push(crate::chat::system(&error.to_string())),
+    }
 }
 
 #[cfg(test)]
