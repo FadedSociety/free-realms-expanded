@@ -2402,11 +2402,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2992; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4326 (ModelId=201, ModelFileName=human_m_hooligan_archer_01.agr, NameId=388244)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.388245, JenkinsLookup2 hash 1419410905, line 37632, The guide row lists Eddie Eagle Eyes' Archer Contract: All Around Win; that quest's 49/1 offer intro is this first-person bounty line and its content giver is NPC 9500000245. Guide: notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md line 62. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": 2.559563,
       "model_id": 201,
-      "model_file_name": "human_m_hooligan_archer_01.agr"
+      "model_file_name": "human_m_hooligan_archer_01.agr",
+      "greeting_string_id": 388245
     },
     {
       "npc_id": 9500000246,
@@ -7564,11 +7575,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:805; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2049 (ModelId=960, ModelFileName=fairy_m_ricky_danger.agr, NameId=94007)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.94388, JenkinsLookup2 hash 3009508804, line 79476, The guide row quotes this exact line for Ricky Danger and his crashed kart. Guide: notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md line 40. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": 1.687972,
       "model_id": 960,
-      "model_file_name": "fairy_m_ricky_danger.agr"
+      "model_file_name": "fairy_m_ricky_danger.agr",
+      "greeting_string_id": 94388
     },
     {
       "npc_id": 9500000255,

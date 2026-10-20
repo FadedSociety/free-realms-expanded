@@ -341,11 +341,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1978; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3235 (ModelId=437, ModelFileName=human_f_anne.agr, NameId=19107)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.101014, JenkinsLookup2 hash 25578785, line 657, The guide row lists this line in Anne's wolf quest; the speaker asks the player to investigate wolves stealing \"our sheep\". Guide: notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md line 50. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -3.052718,
       "model_id": 437,
-      "model_file_name": "human_f_anne.agr"
+      "model_file_name": "human_f_anne.agr",
+      "greeting_string_id": 101014
     },
     {
       "npc_id": 9500000267,
@@ -1621,11 +1632,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1975; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3232 (ModelId=438, ModelFileName=human_m_andrew.agr, NameId=5101863)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.5100125, JenkinsLookup2 hash 1096004507, line 29009, The guide row names Cleetus the farm's smith/miner and quotes this line, marking the speaker inferred from the Gear Up! text; the full line teaches mining copper on the farm. Guide: notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md line 39. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: the speaker link is inferred from the guide row and the Gear Up! text (Cleetus is the farm's mining/forging trainer), as the guide marks it inferred; the fixed default Talk greeting is reconstructed policy and no text is invented."
+          }
         ]
       },
       "heading": 2.076398,
       "model_id": 438,
-      "model_file_name": "human_m_andrew.agr"
+      "model_file_name": "human_m_andrew.agr",
+      "greeting_string_id": 5100125
     },
     {
       "npc_id": 9500000269,
@@ -2902,11 +2924,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1977; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3234 (ModelId=424, ModelFileName=human_m_farmer_henry.agr, NameId=19093)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.391041, JenkinsLookup2 hash 409884327, line 10844, Speaker self-identifies (\"I'm just a humble farmer\"); the guide row quotes this exact line for Henry and links it to the Queen referral (Farnum's Free Advice). Guide: notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md line 40. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -2.591194,
       "model_id": 424,
-      "model_file_name": "human_m_farmer_henry.agr"
+      "model_file_name": "human_m_farmer_henry.agr",
+      "greeting_string_id": 391041
     },
     {
       "npc_id": 9500000271,
@@ -3248,11 +3281,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1967; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3224 (ModelId=438, ModelFileName=human_m_andrew.agr, NameId=391382)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.391391, JenkinsLookup2 hash 748680751, line 19698, The guide row names Houston the Garden Defense coach and quotes this exact tower-defense offer line. Guide: notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md line 59. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -1.081643,
       "model_id": 438,
-      "model_file_name": "human_m_andrew.agr"
+      "model_file_name": "human_m_andrew.agr",
+      "greeting_string_id": 391391
     },
     {
       "npc_id": 9000000396,
@@ -3846,11 +3890,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1281; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2538 (ModelId=782, ModelFileName=human_f_mae_farnum.agr, NameId=46913)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.5100509, JenkinsLookup2 hash 1665907717, line 44060, The guide row gives this as \"Her line\" for Mae; the full row is her Spice/Bat Meat and Gummyfruit/Rainleaf vendor speech. Guide: notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md line 38. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": 2.328618,
       "model_id": 782,
-      "model_file_name": "human_f_mae_farnum.agr"
+      "model_file_name": "human_f_mae_farnum.agr",
+      "greeting_string_id": 5100509
     },
     {
       "npc_id": 9500000272,

@@ -8798,11 +8798,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1159; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2416 (ModelId=355, ModelFileName=human_m_chef_01.agr, NameId=15300)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.387246, JenkinsLookup2 hash 4025149399, line 106464, The guide row lists Bordon Cloo's Chef: Reach Level 5; that quest's 49/1 offer intro is this first-person chef level-gate line and its content giver is NPC 9000000028. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 46. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -1.079174,
       "model_id": 355,
-      "model_file_name": "human_m_chef_01.agr"
+      "model_file_name": "human_m_chef_01.agr",
+      "greeting_string_id": 387246
     },
     {
       "npc_id": 9500000454,
@@ -13703,11 +13714,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1085; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2341 (ModelId=398, ModelFileName=fairy_sanctuary_m_01.adr, NameId=7612)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.73782, JenkinsLookup2 hash 1037330763, line 27464, The guide row lists Clover's Medic: Clover's Crisis; that quest's 49/1 offer intro is this first-person line about her stolen medical equipment and its content giver is NPC 9000000052. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 43. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -2.767629,
       "model_id": 398,
-      "model_file_name": "fairy_sanctuary_m_01.adr"
+      "model_file_name": "fairy_sanctuary_m_01.adr",
+      "greeting_string_id": 73782
     },
     {
       "npc_id": 9500000464,
@@ -16884,11 +16906,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2339 (ModelId=506, ModelFileName=human_m_doctor_gordon.agr). The asset exists in lab/extracted/client-assets/catalog.tsv."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.76747, JenkinsLookup2 hash 749030027, line 19712, The guide row lists Doctor Gordon's Medic: Surgical Precision; that quest's 49/1 offer intro is this first-person medic training line and its content giver is NPC 9000000073. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 42. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -3.029897,
       "model_id": 506,
-      "model_file_name": "human_m_doctor_gordon.agr"
+      "model_file_name": "human_m_doctor_gordon.agr",
+      "greeting_string_id": 76747
     },
     {
       "npc_id": 9500000469,
@@ -35012,11 +35045,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1143; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2400 (ModelId=642, ModelFileName=fairy_f_tcg_maple_sugarleaf.agr, NameId=22279)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.76438, JenkinsLookup2 hash 3336946750, line 88234, The guide row lists Karin Spellweaver's Wizard: Rescue Mission; that quest's 49/1 offer intro is this first-person rescue request and its content giver is NPC 9000000126. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 62. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -2.432466,
       "model_id": 642,
-      "model_file_name": "fairy_f_tcg_maple_sugarleaf.agr"
+      "model_file_name": "fairy_f_tcg_maple_sugarleaf.agr",
+      "greeting_string_id": 76438
     },
     {
       "npc_id": 9500000502,
@@ -40490,11 +40534,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1084; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2340 (ModelId=421, ModelFileName=human_f_nurse_naia.agr, NameId=7611)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.73360, JenkinsLookup2 hash 3668350740, line 97143, The guide row lists Nurse Naia's Medic: Supply Recovery; that quest's 49/1 offer intro is this first-person hospital-supply line and its content giver is NPC 9000000161. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 41. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -2.931572,
       "model_id": 421,
-      "model_file_name": "human_f_nurse_naia.agr"
+      "model_file_name": "human_f_nurse_naia.agr",
+      "greeting_string_id": 73360
     },
     {
       "npc_id": 9500000510,
@@ -55029,11 +55084,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1087; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2343 (ModelId=510, ModelFileName=human_m_sirwellington.agr, NameId=7652)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.71435, JenkinsLookup2 hash 614609494, line 16278, The guide row lists Sir Whittington's Warrior: Legend of Fastvi Frostflutter; that quest's 49/1 offer intro is this first-person warrior-legend line and its content giver is NPC 9000000205. Guide: notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 33. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -0.575941,
       "model_id": 510,
-      "model_file_name": "human_m_sirwellington.agr"
+      "model_file_name": "human_m_sirwellington.agr",
+      "greeting_string_id": 71435
     },
     {
       "npc_id": 9500000534,

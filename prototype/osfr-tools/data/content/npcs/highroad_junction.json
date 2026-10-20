@@ -768,11 +768,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1654; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2911 (ModelId=312, ModelFileName=human_m_freestyle_03.agr, NameId=116666)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.436533, JenkinsLookup2 hash 973814746, line 25781, The guide row quotes this exact line for Assistant Archy. Guide: notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md line 46. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -2.583142,
       "model_id": 312,
-      "model_file_name": "human_m_freestyle_03.agr"
+      "model_file_name": "human_m_freestyle_03.agr",
+      "greeting_string_id": 436533
     },
     {
       "npc_id": 9000000019,
@@ -1378,11 +1389,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1639; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2896 (ModelId=959, ModelFileName=fairy_m_auguste_frydaze.agr, NameId=103724)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.431140, JenkinsLookup2 hash 331589818, line 8783, The guide row quotes this exact Assistant Chef offer line for Auguste Frydaze. Guide: notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md line 47. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": 0.762188,
       "model_id": 959,
-      "model_file_name": "fairy_m_auguste_frydaze.agr"
+      "model_file_name": "fairy_m_auguste_frydaze.agr",
+      "greeting_string_id": 431140
     },
     {
       "npc_id": 9500000326,
@@ -5507,11 +5529,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1653; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2910 (ModelId=967, ModelFileName=human_m_harold.agr, NameId=103736)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T246: en_us_data.dat Global.Text.140509, JenkinsLookup2 hash 3003135002, line 79309, The guide row quotes this exact line for Harold at his wagon. Guide: notes/Build Guides/Content/NPCs/NPCs - Highroad Junction.md line 45. See notes/Research/NPC Greetings Starting Road.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T246: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -2.531558,
       "model_id": 967,
-      "model_file_name": "human_m_harold.agr"
+      "model_file_name": "human_m_harold.agr",
+      "greeting_string_id": 140509
     },
     {
       "npc_id": 9500000334,
