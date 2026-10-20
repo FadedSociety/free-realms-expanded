@@ -147,6 +147,18 @@ impl StoreCatalogue {
     fn item(&self, item_id: i32) -> Option<&StoreItem> {
         self.items.iter().find(|item| item.item_id == item_id)
     }
+
+    /// F228: a job starter outfit item is free issuance, so its sell price is 0. A row with
+    /// no sell price stays unsellable (`None`); the purchase price is unchanged.
+    fn zero_starter_sell_prices(&mut self, starter_items: &BTreeSet<i32>) {
+        for item in &mut self.items {
+            if starter_items.contains(&item.item_id)
+                && let Some(price) = item.sell_price_coins.as_mut()
+            {
+                *price = 0;
+            }
+        }
+    }
 }
 
 /// Inner application messages and the state-change indicator. Persist state before sending replies.
@@ -184,9 +196,14 @@ impl CoinShop {
     pub fn new(
         inventory_content: &Path,
         inventory: Inventory,
-        catalogue: StoreCatalogue,
+        mut catalogue: StoreCatalogue,
         bag_capacity: usize,
     ) -> io::Result<Self> {
+        // F228: a starter outfit item is granted free whenever its job is learned or reselected,
+        // so the store pays 0 for it however the player got a copy. Purchase prices are untouched.
+        catalogue.zero_starter_sell_prices(&crate::profiles::Profiles::starter_items_in(
+            inventory_content,
+        )?);
         Ok(Self {
             inventory_content: inventory_content.to_path_buf(),
             inventory,

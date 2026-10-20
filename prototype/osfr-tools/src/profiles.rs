@@ -202,6 +202,26 @@ impl Profiles {
             .map(Vec::as_slice)
             .unwrap_or_default()
     }
+    /// F228: every starter item id across every job profile. A starter outfit piece is granted
+    /// free when its job is learned or reselected, so the store resells it for 0 wherever the
+    /// player got that copy.
+    pub fn all_starter_items(&self) -> BTreeSet<i32> {
+        self.content
+            .starter_items
+            .values()
+            .flatten()
+            .copied()
+            .collect()
+    }
+    /// F228: [`Self::all_starter_items`] read from a content directory, without a player's
+    /// saved profile state (store pricing needs only the table). Absent `profiles.json` means
+    /// no starters; a present but invalid file fails closed.
+    pub fn starter_items_in(directory: &Path) -> io::Result<BTreeSet<i32>> {
+        if !directory.join("profiles.json").is_file() {
+            return Ok(BTreeSet::new());
+        }
+        Ok(Self::load(directory, None)?.all_starter_items())
+    }
     pub fn unlock(&mut self, profile: i32) -> io::Result<bool> {
         if !self.has_profile(profile) {
             return Err(invalid("unknown class unlock"));

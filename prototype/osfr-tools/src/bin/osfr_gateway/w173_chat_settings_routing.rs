@@ -523,12 +523,27 @@ fn account_budget_is_shared_across_sessions_and_not_across_accounts() {
     }
     assert_eq!(out_rows(first), 10, "the first session spends the burst");
 
+    // The budget refills at 5/s on the wall clock, so one refilled token can admit
+    // a single request while the account is still effectively exhausted. A bundle
+    // of the bucket's full burst proves sharing without racing that refill: a
+    // per-connection bucket admits all ten children, while a shared bucket drops
+    // the whole bundle on the first refusal.
+    let full_burst = || {
+        let mut bundle = vec![0, 25];
+        for _ in 0..10 {
+            let child = wrap(&ClaimWindow::list_request());
+            bundle.push(child.len() as u8);
+            bundle.extend(child);
+        }
+        bundle
+    };
+
     let second = &mut rig.sessions[1];
     second.recent_on = true;
     dispatch(
         second,
         &rig.options,
-        &wrap(&ClaimWindow::list_request()),
+        &full_burst(),
         1_000,
         &mut rig.world,
         &mut membership,
@@ -545,7 +560,7 @@ fn account_budget_is_shared_across_sessions_and_not_across_accounts() {
     dispatch(
         other,
         &rig.options,
-        &wrap(&ClaimWindow::list_request()),
+        &full_burst(),
         1_000,
         &mut rig.world,
         &mut membership,
@@ -553,7 +568,7 @@ fn account_budget_is_shared_across_sessions_and_not_across_accounts() {
     );
     assert_eq!(
         out_rows(other),
-        1,
-        "another account keeps its own allowance"
+        10,
+        "another account keeps its own full burst"
     );
 }

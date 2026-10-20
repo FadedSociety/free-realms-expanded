@@ -42,6 +42,7 @@ DEFAULT_CLIENT = ROOT / "lab" / "runs" / "client-baseline-20261014T203930Z" / "c
 DEFAULT_OUT = PROJECT / "prototype" / "osfr-tools" / "studio" / "report.json"
 INVENTORY = ROOT / "lab" / "reports" / "kart-weapons-probe-v20-20261010" / "content" / "inventory.json"
 DEFAULT_ITEM_CATALOGUE = ROOT / "lab" / "reports" / "round70-native-20261016T061000Z" / "content" / "item-catalogue.json"
+DEFAULT_PROFILES = DEFAULT_ITEM_CATALOGUE.with_name("profiles.json")
 LEGACY_RESOURCES = ROOT / "lab" / "references" / "FreeRealms-Legacy" / "src" / "Resources"
 
 MAX_PER_GROUP = 25        # findings kept per (severity, file, field, problem code)
@@ -328,6 +329,16 @@ def load_item_definitions(inventory_path, catalogue_path):
     out["limits"] = limit_report(inv_size, len(out["inventory_ids"]), cat_size,
                                  len(out["catalogue_ids"]), cat_total)
     return out
+
+
+def load_starter_item_ids(path):
+    """Every item id listed in any job profile's starter_items (F228)."""
+    document = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    rows = document.get("starter_items") if isinstance(document, dict) else None
+    if not isinstance(rows, dict):
+        raise ValueError("profiles.json has no starter_items object")
+    return {item for ids in rows.values() if isinstance(ids, list)
+            for item in ids if type(item) is int and item > 0}
 
 
 def item_references(content_dir):
@@ -673,6 +684,29 @@ class Checker:
     def add(self, severity, code, file, path, field, value, problem):
         self.findings.append({"severity": severity, "code": code, "file": file, "path": path,
                               "field": field, "value": value, "problem": problem})
+
+    def check_starter_sell_prices(self, starter_ids):
+        """F228: a job starter item is granted free, so its sell price must be 0."""
+        path = CONTENT / "stores.json"
+        if not path.is_file():
+            return
+        try:
+            rows = json.loads(path.read_text(encoding="utf-8")).get("items") or []
+        except (OSError, ValueError) as exc:
+            self.add("error", "json_invalid", "stores.json", "", "", None, f"cannot parse: {exc}")
+            return
+        for index, row in enumerate(rows):
+            if not isinstance(row, dict):
+                continue
+            item_id = row.get("item_id")
+            if type(item_id) is not int or item_id not in starter_ids:
+                continue
+            self.stats["starter_sell_price"] += 1
+            price = row.get("sell_price_coins")
+            if type(price) is int and price != 0:
+                self.add("error", "starter_item_sell_price", "stores.json",
+                         f"items[{index}].sell_price_coins", "sell_price_coins", price,
+                         f"job starter item {item_id} must sell for 0 coins")
 
     def text(self, value, table_hint=None):
         """-> (mode, text) with mode 'global' | 'raw' | None."""
@@ -1443,6 +1477,22 @@ def main():
         except (OSError, ValueError) as exc:
             checker.add("error", "json_invalid", rel, "", "", None, f"cannot parse: {exc}")
     checker.collect_ids(files)
+    starter_profiles = CONTENT / "profiles.json"
+    if not starter_profiles.is_file():
+        starter_profiles = DEFAULT_PROFILES
+    if starter_profiles.is_file():
+        try:
+            starter_ids = load_starter_item_ids(starter_profiles)
+        except (OSError, ValueError) as exc:
+            checker.add("error", "starter_items_invalid", starter_profiles.name,
+                        "starter_items", "starter_items", None, f"cannot read: {exc}")
+        else:
+            checker.tables["starter_items"] = {"path": str(starter_profiles),
+                                               "rows": len(starter_ids)}
+            checker.check_starter_sell_prices(starter_ids)
+    else:
+        checker.notes.append(f"no profiles.json ({DEFAULT_PROFILES}); starter sell-price "
+                             "check skipped")
     for rel, data in files:
         checker.check_file(rel, data)
     checker.finish()

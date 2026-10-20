@@ -14541,7 +14541,7 @@
           "item_name_id": 131914,
           "purchase_price_coins": 750,
           "member_price_coins": 675,
-          "sell_price_coins": 375,
+          "sell_price_coins": 0,
           "member_only": null,
           "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
           "source_tags": [
@@ -15041,7 +15041,7 @@
           "item_name_id": 131914,
           "purchase_price_coins": 750,
           "member_price_coins": 675,
-          "sell_price_coins": 375,
+          "sell_price_coins": 0,
           "member_only": null,
           "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
           "source_tags": [
