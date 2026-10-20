@@ -369,8 +369,7 @@ impl NpcVisibility {
         }
         let placements = content_dir.join("npc_placements.json");
         if placements.is_file() {
-            let rows: Rows<Placement> = read_rows(&placements)?;
-            for placement in &rows.records {
+            for placement in &read_placements(&placements)? {
                 result.place(placement);
             }
         }
@@ -411,6 +410,12 @@ impl NpcVisibility {
         });
         npcs.sort_by_key(|npc| npc.spawn.actor_id);
         self.placed.insert(placement.guid);
+    }
+
+    /// The placed GUIDs this view holds. Placement visibility is world state;
+    /// a session applies a saved placement file as a delta against this set.
+    pub fn placed_guids(&self) -> &BTreeSet<u64> {
+        &self.placed
     }
 
     /// Swap every placed NPC for `placements` (a reload of
@@ -642,6 +647,13 @@ fn read_rows<T: DeserializeOwned>(path: &Path) -> io::Result<Rows<T>> {
     }
     serde_json::from_slice(&bytes)
         .map_err(|error| invalid(format!("invalid NPC content JSON: {error}")))
+}
+
+/// Read the live placement table with the startup loader's size bound and row
+/// schema. A malformed or oversized file is an error, not an empty table: the
+/// caller keeps the rows it already has.
+pub fn read_placements(path: &Path) -> io::Result<Vec<Placement>> {
+    Ok(read_rows::<Placement>(path)?.records)
 }
 
 pub(crate) fn unframe_tunnel(bytes: &[u8]) -> io::Result<Vec<u8>> {

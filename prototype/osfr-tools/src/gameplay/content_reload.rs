@@ -23,6 +23,11 @@ impl Gameplay {
         self.encounter = staged.encounter;
         self.activities = staged.activities;
         self.npc_visibility = staged.npc_visibility;
+        // The file was just read: stamp it so the placement watch does not
+        // repeat the same removal/addition one tick later.
+        if what == "placements" || what == "all" {
+            self.placement_watch.observe(&self.placements_path());
+        }
         out.absorb(staged_out);
         Ok(done)
     }

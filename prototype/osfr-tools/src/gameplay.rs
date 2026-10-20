@@ -55,6 +55,7 @@ mod occupation;
 #[path = "restoration/piece_077.rs"]
 #[allow(dead_code)]
 mod piece_077;
+mod placement_watch;
 mod power_up_use;
 mod profile_outfit;
 /// Progress-driven achievement observation over authoritative gameplay state.
@@ -206,6 +207,7 @@ pub struct Gameplay {
     mystery_chests: Option<Arc<MysteryChests>>,
     pending_chest: Option<i32>,
     npc_visibility: Option<crate::world::NpcVisibility>,
+    placement_watch: placement_watch::PlacementWatch, // live stat; never saved
     npc_interaction: Option<NpcInteraction>,
     /// Last NPC Talk packet, retained only for the opt-in offer experiment.
     last_npc_dialogue: Option<(u32, u64, u64, Vec<u8>)>,
@@ -1117,6 +1119,7 @@ impl Gameplay {
             mystery_chests,
             pending_chest: None,
             npc_visibility,
+            placement_watch: placement_watch::PlacementWatch::default(),
             npc_interaction,
             last_npc_dialogue: None,
             pending_quest_choice: None,
@@ -1860,6 +1863,7 @@ impl Gameplay {
         };
         let mut out = self.tick_world(character, now_ms)?;
         self.tick_gathering_nodes(now_ms, &mut out)?;
+        self.tick_live_placements(now_ms, &mut out); // world visibility only, never saved
         out.replies.splice(0..0, fishing);
         self.settle_achievement_counters(&counters_before, &mut out)?;
         Ok(out)
@@ -3862,6 +3866,7 @@ impl Gameplay {
         if let Some(visibility) = self.npc_visibility.as_mut() {
             visibility.replace_placements(&records)?;
         }
+        self.placement_watch.observe(&self.placements_path());
         Ok(())
     }
 
@@ -3982,16 +3987,12 @@ impl Gameplay {
             )]),
         };
         records.push(placement.clone());
-        if let Err(error) = self.save_placements(records) {
+        if let Err(error) = self.save_placements(records.clone()) {
             return Ok(format!(
                 "Could not save the placement: {error}. Nothing changed."
             ));
         }
-        if let Some(visibility) = &mut self.npc_visibility {
-            visibility.place(&placement);
-            out.replies
-                .extend(visibility.update(character.zone_id, character.position)?);
-        }
+        self.apply_own_placement_write(&records, character, out)?;
         Ok(format!(
             "Placed NPC {guid}: model {model_id}, name {name_string_id}, at x {:.1}, y {:.2}, z {:.1}. realm unplace {guid} removes it.",
             position[0], position[1], position[2]
@@ -4023,16 +4024,12 @@ impl Gameplay {
             ));
         };
         records.retain(|r| r.guid != guid);
-        if let Err(error) = self.save_placements(records) {
+        if let Err(error) = self.save_placements(records.clone()) {
             return Ok(format!(
                 "Could not save the placements: {error}. Nothing changed."
             ));
         }
-        if let Some(visibility) = &mut self.npc_visibility {
-            visibility.remove(guid);
-            out.replies
-                .extend(visibility.update(character.zone_id, character.position)?);
-        }
+        self.apply_own_placement_write(&records, character, out)?;
         Ok(format!("Removed placed NPC {guid}."))
     }
 
