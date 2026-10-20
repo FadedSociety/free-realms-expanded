@@ -29,6 +29,8 @@ use std::io::{self, Read};
 use std::path::{Component, Path};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+mod pickup_seed;
+
 const MAX_MESSAGE: usize = 1_048_576;
 const MAX_REFERENCE: usize = 16_777_216;
 const MAX_BUNDLE_CHILDREN: usize = 128;

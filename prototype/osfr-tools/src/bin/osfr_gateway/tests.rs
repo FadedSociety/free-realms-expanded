@@ -1318,6 +1318,12 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
 #[path = "f161_pet_adoption_persist.rs"]
 mod f161_pet_adoption_persist;
 
+/// F261: the begin-zoning commit clears the previous scene's ground pickups on the staged
+/// clone, including a free revive into the instance the session is already bound to. Declared
+/// here because the hub file is at its line ceiling.
+#[path = "f261_pickup_reload.rs"]
+mod f261_pickup_reload;
+
 /// L011 (S12/L8): a vendor purchase whose character save fails changes nothing and ends
 /// only that session. Test-only proof; no production code changes. The `#[cfg(test)]`
 /// marker also lets `tests/spine_rules.rs` recognise this test-only file, so its fixture
