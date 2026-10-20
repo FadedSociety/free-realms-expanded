@@ -2874,9 +2874,8 @@ fn parse_social_request(bytes: &[u8]) -> io::Result<Option<SocialRequest>> {
                 SocialRequest::RemoveIgnore(name)
             }
         }
+        // 40/1 client reader `00912090`: the family/sub header, then `008fca60`.
         (40, 1) => {
-            r.u16()?;
-            r.u16()?;
             r.u64()?;
             r.social_name()?;
             r.u64()?;
@@ -2892,9 +2891,8 @@ fn parse_social_request(bytes: &[u8]) -> io::Result<Option<SocialRequest>> {
             r.social_name()?;
             SocialRequest::GroupLeave
         }
+        // 40/4 client reader `009121e0`: the header, then `008fca60`, one byte and five dwords.
         (40, 4) => {
-            r.u16()?;
-            r.u16()?;
             r.u64()?;
             r.social_name()?;
             r.u64()?;

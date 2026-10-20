@@ -206,8 +206,7 @@ fn group_header(sub: u16) -> Vec<u8> {
 
 fn invite(from: usize, to: usize, group_id: u32) -> Vec<u8> {
     let mut out = group_header(1);
-    out.extend_from_slice(&0i16.to_le_bytes());
-    out.extend_from_slice(&0i16.to_le_bytes());
+    // Client writer `00c235c0`: the family/sub header is followed by `00a95c50`.
     out.extend_from_slice(&GUIDS[from].to_le_bytes());
     put_name(&mut out, from);
     out.extend_from_slice(&GUIDS[to].to_le_bytes());
@@ -224,8 +223,7 @@ fn invite(from: usize, to: usize, group_id: u32) -> Vec<u8> {
 
 fn response(from: usize, to: usize, invite_id: u32, accepted: bool) -> Vec<u8> {
     let mut out = group_header(4);
-    out.extend_from_slice(&0i16.to_le_bytes());
-    out.extend_from_slice(&0i16.to_le_bytes());
+    // Client writer `00a97250`: the family/sub header is followed by `00a95c50`.
     out.extend_from_slice(&GUIDS[from].to_le_bytes());
     put_name(&mut out, from);
     out.extend_from_slice(&GUIDS[to].to_le_bytes());
@@ -653,6 +651,104 @@ fn same_group_reinvitation_binds_responses_to_the_new_generation() {
         Some([GUIDS[a], GUIDS[b]].as_slice())
     );
     assert_eq!(rig.world.social.group_invitee(GUIDS[b]), None);
+}
+
+#[test]
+fn native_group_packets_carry_no_padding_after_the_header() {
+    let mut rig = rig("native-wire");
+    let (a, b) = (0, 1);
+
+    // Client writer `00c235c0` -> `0090ae60` (u16 family, u16 subtype) + `00a95c50`
+    // (two guid/NameData records and the +0x120 dword) + five dwords. The fixture is
+    // byte-checked against reader `00912090` before it drives the router.
+    let request = invite(a, b, 0);
+    assert_eq!(&request[..4], &[40, 0, 1, 0]);
+    assert_eq!(&request[4..12], &GUIDS[a].to_le_bytes());
+    assert_eq!(&request[12..24], &[0; 12]);
+    assert_eq!(i32::from_le_bytes(request[24..28].try_into().unwrap()), 4);
+    assert_eq!(&request[28..32], NAMES[a].as_bytes());
+    assert_eq!(i32::from_le_bytes(request[32..36].try_into().unwrap()), 0);
+    assert_eq!(&request[36..44], &GUIDS[b].to_le_bytes());
+    assert_eq!(&request[56..60], &4i32.to_le_bytes());
+    assert_eq!(&request[60..64], NAMES[b].as_bytes());
+    assert_eq!(i32::from_le_bytes(request[64..68].try_into().unwrap()), 0);
+    assert_eq!(&request[68..72], &[0; 4]);
+    assert_eq!(&request[72..92], &[0; 20]);
+    assert_eq!(request.len(), 92, "header + records + dword + five dwords");
+
+    let invited = send(&mut rig, a, &request);
+    assert!(has(&invited, b, 40, 1));
+    let delivery = invited
+        .iter()
+        .find(|delivery| {
+            delivery.recipient == rig.sessions[b].id && family_sub(delivery) == (40, 1)
+        })
+        .unwrap();
+    let bytes = inner(delivery);
+    assert_eq!(&bytes[..4], &[40, 0, 1, 0]);
+    assert_eq!(
+        &bytes[4..12],
+        &GUIDS[a].to_le_bytes(),
+        "inviter guid follows the header"
+    );
+    assert_eq!(&bytes[36..44], &GUIDS[b].to_le_bytes());
+    let invite_id = u32::from_le_bytes(bytes[68..72].try_into().unwrap());
+    assert_ne!(invite_id, 0);
+    assert_eq!(&bytes[72..92], &[0; 20]);
+    assert_eq!(bytes.len(), 92);
+
+    let group_id = rig.world.social.group_of(GUIDS[a]).unwrap();
+    let pending = rig.world.social.group_invitee(GUIDS[b]);
+    let members = rig.world.social.group_members(group_id).unwrap().to_vec();
+    let groups = GUIDS.map(|guid| rig.world.social.group_of(guid));
+
+    // The old four-byte padding (the bug) is refused by the exact-length reader and
+    // changes nothing. Client writer `00a97250` order is header, record, byte, five dwords.
+    let response = response(a, b, invite_id, true);
+    assert_eq!(&response[..4], &[40, 0, 4, 0]);
+    assert_eq!(
+        u32::from_le_bytes(response[68..72].try_into().unwrap()),
+        invite_id
+    );
+    assert_eq!(response[72], 1);
+    assert_eq!(&response[73..93], &[0; 20]);
+    assert_eq!(response.len(), 93);
+    let mut padded = group_header(4);
+    padded.extend_from_slice(&[0; 4]);
+    padded.extend_from_slice(&response[4..]);
+    let refused = send(&mut rig, b, &padded);
+    assert!(refused.is_empty(), "a padded 40/4 is dropped by the parser");
+    assert_eq!(rig.world.social.group_invitee(GUIDS[b]), pending);
+    assert_eq!(
+        rig.world.social.group_members(group_id),
+        Some(members.as_slice())
+    );
+    assert_eq!(GUIDS.map(|guid| rig.world.social.group_of(guid)), groups);
+
+    // The native response is accepted and the server's 40/4 notice keeps the same order.
+    let accepted = send(&mut rig, b, &response);
+    assert!(has(&accepted, a, 40, 4));
+    assert_eq!(
+        rig.world.social.group_members(group_id),
+        Some([GUIDS[a], GUIDS[b]].as_slice())
+    );
+    let notice = accepted
+        .iter()
+        .find(|delivery| {
+            delivery.recipient == rig.sessions[a].id && family_sub(delivery) == (40, 4)
+        })
+        .unwrap();
+    let notice = inner(notice);
+    assert_eq!(&notice[..4], &[40, 0, 4, 0]);
+    assert_eq!(&notice[4..12], &GUIDS[a].to_le_bytes());
+    assert_eq!(&notice[36..44], &GUIDS[b].to_le_bytes());
+    assert_eq!(
+        u32::from_le_bytes(notice[68..72].try_into().unwrap()),
+        group_id
+    );
+    assert_eq!(notice[72], 1);
+    assert_eq!(&notice[73..93], &[0; 20]);
+    assert_eq!(notice.len(), 93);
 }
 
 #[test]

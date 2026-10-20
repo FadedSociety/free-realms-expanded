@@ -114,11 +114,13 @@ def social_name(first: str, last: str) -> bytes:
 
 
 def group_invite(sender_guid: int, sender: tuple[str, str], target: tuple[str, str]) -> bytes:
+    # Client writer 00c235c0: family/sub header, then 00a95c50 writes both
+    # guid/NameData records. The server resolves the target by name, so its guid is a placeholder.
     return (
         bytes((40, 0, 1, 0))
-        + struct.pack("<HHQ", 0, 0, 0)
-        + social_name(*sender)
         + struct.pack("<Q", sender_guid)
+        + social_name(*sender)
+        + struct.pack("<Q", 0)
         + social_name(*target)
         + struct.pack("<I5I", 0, 0, 0, 0, 0, 0)
     )

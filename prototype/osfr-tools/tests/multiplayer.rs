@@ -420,7 +420,6 @@ fn group_name(out: &mut Vec<u8>, first: &str, last: &str) {
 
 fn group_invite() -> Vec<u8> {
     let mut out = vec![40, 0, 1, 0];
-    out.extend_from_slice(&[0; 4]);
     out.extend_from_slice(&2u64.to_le_bytes());
     group_name(&mut out, "Aster", "One");
     out.extend_from_slice(&3u64.to_le_bytes());
@@ -432,7 +431,6 @@ fn group_invite() -> Vec<u8> {
 
 fn group_accept(invite_id: u32) -> Vec<u8> {
     let mut out = vec![40, 0, 4, 0];
-    out.extend_from_slice(&[0; 4]);
     out.extend_from_slice(&2u64.to_le_bytes());
     group_name(&mut out, "Aster", "One");
     out.extend_from_slice(&3u64.to_le_bytes());

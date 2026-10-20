@@ -1559,20 +1559,18 @@ fn write_group_name_data(out: &mut Vec<u8>, name: &SocialName) -> Result<(), Soc
     write_social_name(out, name)
 }
 
-/// 40/1 reader `0093daf0` case 1 / `00921640`; client writer `00c235c0` + `00a95c50`.
-/// Two short fields, two guid/NameData pairs, the echoed dword at +0x120, then five opaque
-/// dwords. `(R)` 40/1 puts the per-invitation generation in that slot (the pop-up is copied
-/// through `00a8b640` into the client's 40/4 answer); the server-built 40/4 notice passes the
-/// group id there instead. The original server meaning of the slot remains reconstructed.
+/// 40/1 reader `00912090`; client writer `00c235c0` + `00a95c50`.
+/// The 4-byte family/sub header (`0090ae60` writes 40 and 1) is followed by two
+/// guid/NameData pairs, the echoed dword at +0x120, then five opaque dwords. `(R)` 40/1 puts
+/// the per-invitation generation in that slot (the pop-up is copied through `00a8b640` into
+/// the client's 40/4 answer); the server-built 40/4 notice passes the group id there instead.
+/// The original server meaning of the slot remains reconstructed.
 fn encode_group_invite(
     echoed_id: u32,
     inviter: &SocialLists,
     target: &CharacterIdentity,
 ) -> Result<Vec<u8>, SocialError> {
     let mut out = group_header(1);
-    // (R) The two short control fields have no recovered meaning; emit zero.
-    out.extend_from_slice(&0i16.to_le_bytes());
-    out.extend_from_slice(&0i16.to_le_bytes());
     out.extend_from_slice(&inviter.character_guid.to_le_bytes());
     write_group_name_data(&mut out, &inviter.name)?;
     out.extend_from_slice(&target.character_guid.to_le_bytes());
@@ -1587,7 +1585,9 @@ fn encode_group_invite(
     Ok(out)
 }
 
-/// 40/4 uses the invite record, an accept byte, and five dwords (`00a97250`; reader `00921700`).
+/// 40/4 writer `00a97250` / reader `009121e0`: the family/sub header (`0090ae60` writes
+/// 40 and 4), the invite record (both guid/NameData pairs and the echoed dword), the accept
+/// byte, and five dwords.
 fn encode_group_accept_notice(data: &[u8], accepted: bool) -> Result<Vec<u8>, SocialError> {
     // `data` is a 40/1 payload; replace its family/sub header and insert the byte before opaque tail.
     if data.len() < 4 + 5 * 4 {
@@ -1635,6 +1635,46 @@ mod tests {
             name: SocialName::new(first, "Fixture").unwrap(),
         })
         .unwrap()
+    }
+
+    #[test]
+    fn group_invite_and_notice_bytes_match_the_client_reader_layout() {
+        let inviter = profile(10, 101, "FixtureA");
+        let target = profile(20, 202, "FixtureB");
+        let packet = encode_group_invite(77, &inviter, &target.identity()).unwrap();
+
+        // Client 40/1 reader `00912090`: family/sub header (`008d8e70`), then `008fca60`
+        // (two guid/NameData records and one dword), then the five trailing dwords. NameData
+        // is three i32 plus two length-prefixed strings: "FixtureA" + "Fixture" spans 12..47.
+        assert_eq!(&packet[..4], &[40, 0, 1, 0]);
+        assert_eq!(&packet[4..12], &101u64.to_le_bytes());
+        assert_eq!(&packet[12..24], &[0; 12]);
+        assert_eq!(i32::from_le_bytes(packet[24..28].try_into().unwrap()), 8);
+        assert_eq!(&packet[28..36], b"FixtureA");
+        assert_eq!(i32::from_le_bytes(packet[36..40].try_into().unwrap()), 7);
+        assert_eq!(&packet[40..47], b"Fixture");
+        assert_eq!(&packet[47..55], &202u64.to_le_bytes());
+        assert_eq!(&packet[55..67], &[0; 12]);
+        assert_eq!(i32::from_le_bytes(packet[67..71].try_into().unwrap()), 8);
+        assert_eq!(&packet[71..79], b"FixtureB");
+        assert_eq!(i32::from_le_bytes(packet[79..83].try_into().unwrap()), 7);
+        assert_eq!(&packet[83..90], b"Fixture");
+        assert_eq!(u32::from_le_bytes(packet[90..94].try_into().unwrap()), 77);
+        assert_eq!(&packet[94..114], &[0; 20]);
+        assert_eq!(packet.len(), 114, "no unread bytes after the five dwords");
+
+        // Client 40/4 writer `00a97250` / reader `009121e0`: the same record, then the
+        // accept byte before the five trailing dwords.
+        let accepted = encode_group_accept_notice(&packet, true).unwrap();
+        assert_eq!(&accepted[..4], &[40, 0, 4, 0]);
+        assert_eq!(&accepted[4..94], &packet[4..94]);
+        assert_eq!(accepted[94], 1);
+        assert_eq!(&accepted[95..115], &[0; 20]);
+        assert_eq!(accepted.len(), 115);
+        let declined = encode_group_accept_notice(&packet, false).unwrap();
+        assert_eq!(&declined[..4], &[40, 0, 4, 0]);
+        assert_eq!(declined[94], 0);
+        assert_eq!(declined.len(), 115);
     }
 
     #[test]

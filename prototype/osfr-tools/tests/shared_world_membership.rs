@@ -282,7 +282,6 @@ fn name_record(out: &mut Vec<u8>, guid: u64) {
 }
 fn group_request(accept: bool, invite_id: u32) -> Vec<u8> {
     let mut out = vec![40, 0, if accept { 4 } else { 1 }, 0];
-    out.extend([0; 4]);
     out.extend(101u64.to_le_bytes());
     name_record(&mut out, 101);
     out.extend(202u64.to_le_bytes());

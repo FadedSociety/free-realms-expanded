@@ -1,6 +1,6 @@
 ---
 type: research
-updated: 2026-10-13
+updated: 2026-10-19
 scope: W23 friends, ignore, and family-40 groups
 ---
 
@@ -41,15 +41,41 @@ The confirmed family-40 dispatcher is `0093daf0`. It handles invite, result, lea
 
 | Packet | Client evidence | Wire fact used here |
 |---|---|---|
-| 40/1 invite | sender `00c24d20`; writer `00c235c0`; receive case 1 -> `00921640` -> `00912090` | Two short fields, two guid/NameData records, group id, and five trailing dwords. `008dce80` initializes the five trailing dwords to zero; the two short fields have no recovered meaning and are zeroed (R). |
+| 40/1 invite | sender `00c24d20`; writer `00c235c0` -> `0090ae60` + `00a95c50`; receive case 1 -> `00921640` -> `00912090` -> `008d8e70` + `008fca60` | 4-byte family/sub header (u16 40, u16 1), two guid/NameData records, the echoed `+0x120` dword, and five trailing dwords. The two u16 are the header, not payload (see the layout below). `(R)` 40/1 carries the per-invitation generation in the `+0x120` slot; the server-built 40/4 notice puts the group id there instead. |
 | 40/2 invite result | dispatcher case 2 | One dword. Codes: 0 sent, 1 target not found, 3 target already grouped, 4 already has invite, 5 inviter not leader, 6 already invited, 7 group full. Code 2 has no client notice. |
 | 40/3 leave | sender `00a7e110`; dispatcher case 3 | Member guid pair and NameData. |
-| 40/4 accept/decline notice | writer `00a97250`; receive case 4 -> `00921700` -> `009121e0` | Shared guid/NameData records, one accept byte, five dwords. The notice updates every current group member. |
+| 40/4 accept/decline notice | writer `00a97250` -> `0090ae60` + `00a95c50`; receive case 4 -> `00921700` -> `009121e0` -> `008d8e70` + `008fca60` | 4-byte family/sub header (u16 40, u16 4), the same two guid/NameData records and `+0x120` dword, one accept byte, five dwords. The notice updates every current group member. |
 | 40/5 accept result | dispatcher case 5 | One dword: 1 no group, 2 no room, 3 not invited. |
 | 40/6 kick | senders `00a7e1c0`, `00a7e2e0`; dispatcher case 6 | Target guid pair and NameData. |
 | 40/7 kick result | dispatcher case 7 | One dword: 1 not in group, 2 not owner, 3 target not in group. |
 | 40/8 group update | receive case 8 -> `0092aed0` -> `009140f0` -> `008fcb20` | Two i16 values, count, then member rows. The i16 control values are emitted as zero (R). |
 | 40/9 member update | receive case 9 -> `00921680` -> `008fcb20` | Two i16 values, one member row, and one trailing byte. Its meaning is unresolved; emitted as zero (R). |
+
+#### Group packet byte layout (verified with IDA 2026-10-19)
+
+`008d8e70` is the family-40 header reader used by both the dispatcher `0093daf0`
+and the per-subtype readers. It reads exactly two `i16` values and stores them
+at object `+4` and `+8`; constructor `008a35c0` sets those fields to `40` and
+the subtype, and writer `0090ae60` writes those same two u16 values to the wire.
+There are no payload fields between that header and the record.
+
+- 40/1 (`00912090`, after `008d8e70`): `008fca60` reads `u64` inviter guid,
+  NameData, `u64` target guid, NameData, then one `u32` (the echoed `+0x120`
+  slot). Five `u32` follow: `00912090` reads them into `+78..+82`.
+- 40/4 (`009121e0`, after `008d8e70`): `008fca60` reads the same two records
+  and `u32`, then one accept byte (`+312`), then five `u32` (`+316..+332`).
+- Writer `00c235c0` (40/1) is `0090ae60` (u16 40, u16 1), then `00a95c50`
+  (both guid/NameData records and the `+72` dword), then five dwords from
+  `+78..+82`. Writer `00a97250` (40/4) is `0090ae60` (u16 40, u16 4),
+  `00a95c50`, the accept byte (`+312`), then five dwords (`+316..+332`).
+- NameData `008e7290` is three `i32` followed by two length-prefixed strings.
+  `00a95c50`'s `+72` dword is the 40/1 pop-up value the client copies through
+  `00a8b640` into its 40/4 answer (`(R)` per-invitation generation server-side).
+
+The earlier note's "two short fields" after the header were a misreading: those
+two u16 are the family/sub header itself. F224 removed the four extra bytes from
+the Rust parser and from `encode_group_invite`; the `t020_group_routing.rs`
+fixtures now match this layout.
 
 The member reader `008fcb20` reads two dwords, NameData, seven dwords at record offsets `+0x90..+0xa8`, two bytes at `+0xc4/+0xc5`, and a dword at `+0xc8`. Constructor `008dcd60` initializes the seven dwords to `[0, 0, 0, -1, -1, 1, 0]`, clears both bytes, and sets `+0xc8` to zero. Their full meanings are not recovered; the Rust row keeps these fields opaque.
 
