@@ -1,3 +1,7 @@
+#[path = "common/group_invite_wire.rs"]
+mod group_invite_wire;
+
+use group_invite_wire::invitation_id;
 use osfr_tools::{social_chat, social_lists};
 
 use social_lists::{
@@ -72,16 +76,6 @@ fn family(message: &social_lists::SocialMessage) -> u16 {
 
 fn result(message: &social_lists::SocialMessage) -> u32 {
     u32::from_le_bytes(message.bytes[4..8].try_into().unwrap())
-}
-
-/// The 40/1 dword at +0x120 that the client copies from the pop-up and echoes in 40/4.
-fn invitation_id(invites: &[social_lists::SocialMessage], target: u64) -> u32 {
-    let packet = invites
-        .iter()
-        .find(|packet| packet.recipient_guid == target && family(packet) == 40 && sub(packet) == 1)
-        .expect("target received a 40/1 invite");
-    let at = packet.bytes.len() - 6 * 4;
-    u32::from_le_bytes(packet.bytes[at..at + 4].try_into().unwrap())
 }
 
 #[test]
@@ -567,6 +561,37 @@ fn grouped_acceptance_is_refused_without_overlapping_party_membership() {
     );
     assert_eq!(social.group_invitee(202), None);
     assert_eq!(social.group_members(a_group), Some([101].as_slice()));
+}
+
+#[test]
+fn a_generation_from_a_previous_server_process_is_refused() {
+    let (mut before, directory) = service(3);
+    for guid in [101, 202] {
+        before.login(guid).unwrap();
+    }
+    let target = identity(20, 202, "FixtureB").name;
+    let old = before.invite_to_group(101, &target, &directory, 0).unwrap();
+    let stale = invitation_id(&old, 202);
+
+    // A restart keeps neither the pending invitations nor the generation namespace. The new
+    // process must not reissue the dword the target still holds in a pre-restart pop-up.
+    let (mut after, directory) = service(3);
+    for guid in [101, 202] {
+        after.login(guid).unwrap();
+    }
+    let renewed = after.invite_to_group(101, &target, &directory, 0).unwrap();
+    let fresh = invitation_id(&renewed, 202);
+    assert_ne!(stale, fresh);
+
+    let group_id = after.group_of(101).unwrap();
+    let refused = after.respond_group_invite(202, stale, true, 0).unwrap();
+    assert_eq!((family(&refused[0]), sub(&refused[0])), (40, 5));
+    assert_eq!(result(&refused[0]), 3);
+    assert_eq!(after.group_invitee(202), Some((group_id, 101)));
+    assert_eq!(after.group_members(group_id), Some([101].as_slice()));
+
+    after.respond_group_invite(202, fresh, true, 0).unwrap();
+    assert_eq!(after.group_members(group_id), Some([101, 202].as_slice()));
 }
 
 #[test]

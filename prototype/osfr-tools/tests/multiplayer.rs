@@ -25,6 +25,8 @@ use std::{
     time::Duration,
 };
 
+#[path = "common/group_invite_wire.rs"]
+mod group_invite_wire;
 #[path = "common/startup_selfdata_fixture.rs"]
 mod startup_selfdata_fixture;
 
@@ -428,14 +430,14 @@ fn group_invite() -> Vec<u8> {
     out
 }
 
-fn group_accept() -> Vec<u8> {
+fn group_accept(invite_id: u32) -> Vec<u8> {
     let mut out = vec![40, 0, 4, 0];
     out.extend_from_slice(&[0; 4]);
     out.extend_from_slice(&2u64.to_le_bytes());
     group_name(&mut out, "Aster", "One");
     out.extend_from_slice(&3u64.to_le_bytes());
     group_name(&mut out, "Beryl", "Two");
-    out.extend_from_slice(&1u32.to_le_bytes());
+    out.extend_from_slice(&invite_id.to_le_bytes());
     out.push(1);
     out.extend_from_slice(&[0; 20]);
     out
@@ -1121,8 +1123,16 @@ fn two_clients_share_world_routing_but_keep_their_sessions_and_saves() {
 
     let invite = group_invite();
     first.send(&mut server, &application(6, &invite));
-    let accepted = second.send(&mut server, &application(6, &group_accept()));
-    let mut group_updates = accepted;
+    let pending = second.drain(&mut server);
+    let invite_id = group_invite_wire::invite_generation(
+        pending
+            .iter()
+            .find(|message| is_family(message, 40, 1))
+            .expect("target received the 40/1 invite"),
+    );
+    let accepted = second.send(&mut server, &application(6, &group_accept(invite_id)));
+    let mut group_updates = pending;
+    group_updates.extend(accepted);
     group_updates.extend(first.drain(&mut server));
     group_updates.extend(second.drain(&mut server));
     assert!(

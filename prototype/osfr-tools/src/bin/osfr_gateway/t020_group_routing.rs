@@ -887,9 +887,9 @@ fn forged_body_identities_do_not_select_another_character_or_invite() {
 fn f182_a_big_heart_group_heal_claims_the_pickers_instance() {
     let (mut server, keys, scratch) = server_rig("f182-heal");
     // One group: A picks up the heart, B is the hurt member.
-    route_server(&mut server, keys[0], &invite(0, 1, 0));
-    let group = server.world.social.group_of(GUIDS[0]).unwrap();
-    route_server(&mut server, keys[1], &response(0, 1, group, true));
+    let invited = route_server(&mut server, keys[0], &invite(0, 1, 0));
+    let invite_id = invited_id(&invited, 1);
+    route_server(&mut server, keys[1], &response(0, 1, invite_id, true));
     enter_member(&mut server.membership, GUIDS[0], None);
     enter_member(&mut server.membership, GUIDS[1], None);
     let hurt = damaged_gateway(&server, keys[1], 100);

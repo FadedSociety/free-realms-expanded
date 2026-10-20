@@ -5,6 +5,8 @@ mod bot;
 #[path = "../src/bin/osfr-gateway.rs"]
 #[allow(dead_code)]
 mod gateway_runner;
+#[path = "common/group_invite_wire.rs"]
+mod group_invite_wire;
 #[path = "common/startup_selfdata_fixture.rs"]
 mod startup_selfdata_fixture;
 use gateway_runner::{Options, Server};
@@ -278,14 +280,14 @@ fn name_record(out: &mut Vec<u8>, guid: u64) {
     put_string(out, &numeric_name(guid));
     put_string(out, &numeric_name(guid));
 }
-fn group_request(accept: bool) -> Vec<u8> {
+fn group_request(accept: bool, invite_id: u32) -> Vec<u8> {
     let mut out = vec![40, 0, if accept { 4 } else { 1 }, 0];
     out.extend([0; 4]);
     out.extend(101u64.to_le_bytes());
     name_record(&mut out, 101);
     out.extend(202u64.to_le_bytes());
     name_record(&mut out, 202);
-    out.extend(u32::from(accept).to_le_bytes());
+    out.extend(invite_id.to_le_bytes());
     if accept {
         out.push(1);
     }
@@ -344,11 +346,13 @@ fn two_bot_socket_membership_and_transfer() {
     assert_eq!(actor_packets(&public[0], 1, 202), 1);
     assert_eq!(actor_packets(&public[1], 1, 101), 1);
     assert_eq!(f.host(|s| s.test_location(101).unwrap().1), 0);
-    // A real family-40 party, not an injected social state.
-    a.send_message(&bot::wrap(&group_request(false)), "40/1")
+    // A real family-40 party, not an injected social state. The answer echoes the
+    // generation from the delivered 40/1, not the group id.
+    a.send_message(&bot::wrap(&group_request(false, 0)), "40/1")
         .unwrap();
-    b.wait_for(PATIENCE, |m| is_sub(m, 40, 1)).unwrap();
-    b.send_message(&bot::wrap(&group_request(true)), "40/4")
+    let invite = b.wait_for(PATIENCE, |m| is_sub(m, 40, 1)).unwrap();
+    let invite_id = group_invite_wire::invite_generation(&invite);
+    b.send_message(&bot::wrap(&group_request(true, invite_id)), "40/4")
         .unwrap();
     a.wait_for(PATIENCE, |m| is_sub(m, 40, 2)).unwrap();
     let (i1, i2) = f.host(|s| (s.test_child(), s.test_child()));

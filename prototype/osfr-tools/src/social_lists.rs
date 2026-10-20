@@ -9,8 +9,10 @@ use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs::File,
+    hash::BuildHasher,
     io::{self, Read},
     path::Path,
+    sync::atomic::{AtomicU32, Ordering},
 };
 
 const SOCIAL_SCHEMA_VERSION: u32 = 1;
@@ -288,6 +290,16 @@ struct Group {
     members: Vec<u64>,
 }
 
+/// `(R)` A client can still hold a pop-up from before a server restart, so the generation
+/// namespace must not repeat across processes. The OS-seeded hasher gives each process a random
+/// start; the counter keeps two services built in one process distinct, which is how the restart
+/// regression constructs its "previous epoch".
+fn invite_epoch() -> u32 {
+    static SERVICES: AtomicU32 = AtomicU32::new(0);
+    std::collections::hash_map::RandomState::new()
+        .hash_one(SERVICES.fetch_add(1, Ordering::Relaxed)) as u32
+}
+
 #[derive(Clone, Copy, Debug)]
 struct PendingGroupInvite {
     /// `(R)` Membership target for an accepted invite; not unique per invitation because a
@@ -310,7 +322,9 @@ pub struct SocialService {
     /// Host policy copied with the service; never persisted and not part of the saved profile.
     group_invite_ttl_ms: u64,
     next_group_id: u32,
-    /// `(R)` Monotonic 40/1 generation; volatile and never persisted.
+    /// `(R)` 40/1 generation: a fresh nonzero random `invite_epoch` per service, then monotonic;
+    /// volatile and never persisted, so a restarted process starts a new namespace and a
+    /// pre-restart pop-up is refused.
     next_invite_id: u32,
     groups: BTreeMap<u32, Group>,
     member_group: BTreeMap<u64, u32>,
@@ -332,7 +346,7 @@ impl SocialService {
             max_group_members,
             group_invite_ttl_ms: DEFAULT_GROUP_INVITE_TTL_MS,
             next_group_id: 1,
-            next_invite_id: 1,
+            next_invite_id: invite_epoch().max(1),
             groups: BTreeMap::new(),
             member_group: BTreeMap::new(),
             group_invites: BTreeMap::new(),
@@ -804,12 +818,14 @@ impl SocialService {
             return Ok(vec![message(target_guid, encode_group_result(5, 3))]);
         };
         if invite.invite_id != invite_id {
-            // `(R)` `00a95c50` wrote the pop-up dword; the client copies it through `00a8b640`
-            // and echoes it here. Compare the per-invitation generation: a stale pop-up must
-            // not consume a same-group replacement invitation, which reuses the group id.
+            // `(R)` Client reader `008fca60` stores the 40/1 dword at pop-up record +0x120 and
+            // the 40/4 writer `00a983b0` copies it through `00a8b640`. Compare the
+            // per-invitation generation: a stale pop-up must not consume a same-group
+            // replacement invitation, which reuses the group id.
             return Ok(vec![message(target_guid, encode_group_result(5, 3))]);
         }
         let Some(group) = self.groups.get(&invite.group_id) else {
+            // The group is gone, so this invitation can never be accepted; drop the dead row.
             self.group_invites.remove(&target_guid);
             return Ok(vec![message(target_guid, encode_group_result(5, 1))]);
         };

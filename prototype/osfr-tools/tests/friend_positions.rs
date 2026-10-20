@@ -3,6 +3,10 @@
 //! readers cited in `social_lists.rs`; the scope rules are reconstructed policy (R).
 //! Canary values (guids, coordinates) must never appear in a packet to an out-of-scope recipient.
 
+#[path = "common/group_invite_wire.rs"]
+mod group_invite_wire;
+
+use group_invite_wire::invitation_id;
 use osfr_tools::social_lists::{
     CharacterIdentity, CharacterLookup, FriendPosition, GroupMemberRecord, GroupRecordName,
     LocationRequest, MAX_MAP_COORD, MAX_POSITION_ENTRIES, MapSpot, SocialError, SocialLists,
@@ -42,18 +46,6 @@ fn who(guid: u64) -> &'static str {
 
 fn name(guid: u64) -> SocialName {
     SocialName::new(who(guid), "Fixture").unwrap()
-}
-
-/// The 40/1 dword at +0x120 that the client copies from the pop-up and echoes in 40/4.
-fn invitation_id(messages: &[SocialMessage], target: u64) -> u32 {
-    let packet = messages
-        .iter()
-        .find(|message| {
-            message.recipient_guid == target && message.bytes.starts_with(&[40, 0, 1, 0])
-        })
-        .expect("target received a 40/1 invite");
-    let at = packet.bytes.len() - 6 * 4;
-    u32::from_le_bytes(packet.bytes[at..at + 4].try_into().unwrap())
 }
 
 /// Four online characters; every pair of `friends` is a mutual friendship.

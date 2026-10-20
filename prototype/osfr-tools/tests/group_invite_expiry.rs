@@ -1,5 +1,9 @@
+#[path = "common/group_invite_wire.rs"]
+mod group_invite_wire;
+
+use group_invite_wire::invitation_id;
 use osfr_tools::social_lists::{
-    CharacterIdentity, CharacterLookup, SocialLists, SocialMessage, SocialName, SocialService,
+    CharacterIdentity, CharacterLookup, SocialLists, SocialName, SocialService,
 };
 use std::collections::BTreeMap;
 
@@ -61,20 +65,6 @@ fn group_result(messages: &[osfr_tools::social_lists::SocialMessage], sub: u16) 
                 && u16::from_le_bytes([message.bytes[2], message.bytes[3]]) == sub
         })
         .map(|message| u32::from_le_bytes(message.bytes[4..8].try_into().unwrap()))
-}
-
-/// The 40/1 dword at +0x120 that the client copies from the pop-up and echoes in 40/4.
-fn invitation_id(messages: &[SocialMessage], target: u64) -> u32 {
-    let packet = messages
-        .iter()
-        .find(|message| {
-            message.recipient_guid == target
-                && u16::from_le_bytes([message.bytes[0], message.bytes[1]]) == 40
-                && u16::from_le_bytes([message.bytes[2], message.bytes[3]]) == 1
-        })
-        .expect("target received a 40/1 invite");
-    let at = packet.bytes.len() - 6 * 4;
-    u32::from_le_bytes(packet.bytes[at..at + 4].try_into().unwrap())
 }
 
 #[test]
