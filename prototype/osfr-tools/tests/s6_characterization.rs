@@ -1,9 +1,11 @@
 //! Packet-path characterization for S6: crafting station refusals, the movie
 //! gate, gathering bonuses and their negative cases.
 //!
-//! Requires the private lab content; every test is ignored by default. The
-//! movie drivers and the S6 fixture are the shared `tests/common` helpers, so a
-//! later protocol change updates one copy instead of a private duplicate.
+//! The packet-path tests require the private lab content and are ignored by
+//! default; `reward_count_excludes_rented_items` needs no content. The movie
+//! drivers, request bodies and S6 fixture are the shared `tests/common`
+//! helpers, so a later protocol change updates one copy instead of a private
+//! duplicate.
 //!
 //! Wire prefixes are the shipped client's request shapes: 26/8 builder
 //! 0x008b6bc0, 26/10 constructor 0x00a36f80, 26/13 sender 0x00938e10,
@@ -13,25 +15,36 @@
 mod cooking_movie;
 #[path = "common/forging_movie.rs"]
 mod forging_movie;
-#[path = "common/gateway_vendor.rs"]
-mod gateway_vendor;
+#[path = "common/gateway_packets.rs"]
+mod gateway_packets;
 #[path = "common/s6.rs"]
 mod s6;
 #[path = "common/smelting_movie.rs"]
 mod smelting_movie;
 
-use gateway_vendor::count_definition;
+use gateway_packets::{chat, interact, login as login_request, select};
 use osfr_tools::{
     account_store::AccountRole,
     gateway::{Gateway, GatewayOutcome},
+    inventory::{InventoryItem, InventoryState, RentalState},
 };
-use s6::{TutorialGoal, chat, chat_texts, interact, menu, reference};
+use s6::{TutorialGoal, chat_texts, reference};
 use serde_json::Value;
 use smelting_movie::{send, wrap};
 use std::{
     fs,
     path::{Path, PathBuf},
 };
+
+/// Count only owned stacks: a rented item is not a permanent reward.
+fn count_definition_owned(state: &InventoryState, definition_id: i32) -> u32 {
+    state
+        .items
+        .iter()
+        .filter(|item| item.definition_id == definition_id && item.rental.is_none())
+        .map(|item| item.count)
+        .sum()
+}
 
 const NOW: u64 = 1_000;
 const UNKNOWN_ACTOR: u64 = u64::MAX - 1;
@@ -119,7 +132,7 @@ fn bundle(children: &[Vec<u8>]) -> Vec<u8> {
 }
 
 fn login(game: &mut Gateway) {
-    game.handle_at(&gateway_vendor::login(), 0).unwrap();
+    game.handle_at(&login_request(), 0).unwrap();
     send(game, &13u16.to_le_bytes(), NOW);
     send(game, &10u16.to_le_bytes(), NOW);
 }
@@ -228,7 +241,7 @@ fn movie_active(game: &Gateway, case: Station) -> bool {
 }
 
 fn start_station(fixture: &mut StationFixture, case: Station) -> GatewayOutcome {
-    let out = send(&mut fixture.game, &interact(fixture.actor), NOW);
+    let out = send(&mut fixture.game, &select(fixture.actor, 1), NOW);
     assert!(
         movie_active(&fixture.game, case),
         "the {} station did not start its movie",
@@ -264,7 +277,7 @@ fn assert_station_refusals(case: Station) {
     ] {
         let mut fixture = station_fixture(case, accepted, active, supplies);
         let before = fixture.game.snapshot();
-        let out = send(&mut fixture.game, &interact(fixture.actor), NOW);
+        let out = send(&mut fixture.game, &select(fixture.actor, 1), NOW);
         assert_eq!(chat_texts(&out.replies), vec![expected.to_owned()]);
         assert_gateway_refusal(&out);
         assert_eq!(fixture.game.snapshot(), before);
@@ -312,8 +325,8 @@ fn prepare_terminal(fixture: &mut StationFixture, case: Station) {
             cooking_movie::rounds(&mut fixture.game, NOW);
         }
         14 => {
-            // ReadyForGameData publishes the native start followed by the five
-            // real movie messages; this caller knows the exact count.
+            // ReadyForGameData publishes OnGameDataMsg, one message per
+            // content phase and OnDataComplete: six replies for this content.
             let ready = smelting_movie::start(&mut fixture.game, NOW);
             assert_eq!(ready.replies.len(), 6);
             smelting_movie::rounds(&mut fixture.game, NOW);
@@ -362,8 +375,8 @@ fn assert_movie_gate(case: Station) {
     job.extend(1_i32.to_le_bytes());
     for packet in [
         job,
-        menu(UNKNOWN_ACTOR),
         interact(UNKNOWN_ACTOR),
+        select(UNKNOWN_ACTOR, 1),
         attack,
         equip,
     ] {
@@ -527,8 +540,8 @@ fn smelting_completion_advances_opening_craft_and_grants_every_bar() {
         expected
     );
     assert_eq!(
-        count_definition(&after.gameplay.as_ref().unwrap().inventory, 21785),
-        count_definition(&before.gameplay.as_ref().unwrap().inventory, 21785) + 5
+        count_definition_owned(&after.gameplay.as_ref().unwrap().inventory, 21785),
+        count_definition_owned(&before.gameplay.as_ref().unwrap().inventory, 21785) + 5
     );
     assert_eq!(
         after
@@ -583,12 +596,13 @@ fn assert_bonus_drop(
     let (mut game, actor, stage_id, objective_index) =
         gather_fixture(resource_id, profile, content, true, profile);
     let before = game.snapshot();
-    send(&mut game, &interact(actor), NOW);
+    send(&mut game, &select(actor, 1), NOW);
     let after = game.snapshot();
     for (definition, count) in expected {
         assert_eq!(
-            count_definition(&after.gameplay.as_ref().unwrap().inventory, *definition),
-            count_definition(&before.gameplay.as_ref().unwrap().inventory, *definition) + count,
+            count_definition_owned(&after.gameplay.as_ref().unwrap().inventory, *definition),
+            count_definition_owned(&before.gameplay.as_ref().unwrap().inventory, *definition)
+                + count,
             "definition {definition}"
         );
     }
@@ -606,11 +620,29 @@ fn assert_bonus_drop(
     );
 }
 
-fn assert_no_bonus_drop(resource_id: u32, profile: i32, content: &'static str, accepted: bool) {
+fn assert_no_bonus_drop(
+    resource_id: u32,
+    profile: i32,
+    content: &'static str,
+    accepted: bool,
+    expected_reply: Option<&str>,
+) {
     let (mut game, actor, stage_id, objective_index) =
         gather_fixture(resource_id, profile, content, accepted, profile);
     let before = game.snapshot();
-    let out = send(&mut game, &interact(actor), NOW);
+    let out = send(&mut game, &select(actor, 1), NOW);
+    let texts = chat_texts(&out.replies);
+    match expected_reply {
+        Some(prefix) => {
+            assert_eq!(texts.len(), 1, "the refused gather replies once");
+            assert!(
+                texts[0].starts_with(prefix),
+                "unexpected gather refusal: {:?}",
+                texts[0]
+            );
+        }
+        None => assert!(texts.is_empty(), "unexpected gather refusal: {texts:?}"),
+    }
     assert_gateway_refusal(&out);
     assert_eq!(game.snapshot(), before);
     assert_eq!(
@@ -618,6 +650,34 @@ fn assert_no_bonus_drop(resource_id: u32, profile: i32, content: &'static str, a
             [objective_index],
         0
     );
+}
+
+#[test]
+fn reward_count_excludes_rented_items() {
+    let item = |id, count, rental| InventoryItem {
+        definition_id: 21785,
+        tint: 0,
+        id,
+        count,
+        consumed_count: 0,
+        stored_count: 0,
+        last_cast_time: 0,
+        rental,
+        ability_count: 0,
+        activate_enabled: false,
+    };
+    let rental = RentalState {
+        expiration: i64::MAX,
+        upsells: 0,
+        bundle_id: 0,
+    };
+    let state = InventoryState {
+        coins: 0,
+        items: vec![item(1, 5, None), item(2, 3, Some(rental))],
+        equipment: Vec::new(),
+        next_instance_id: Some(3),
+    };
+    assert_eq!(count_definition_owned(&state, 21785), 5);
 }
 
 #[test]
@@ -637,7 +697,13 @@ fn opening_gather_bonus_drops_are_counted_only_with_valid_job_progress() {
         &[(2875, 1)],
     );
     // Wrong job: the same accepted step must not pay an item or a count.
-    assert_no_bonus_drop(1003, 1, "rust-opening", true);
+    assert_no_bonus_drop(
+        1003,
+        1,
+        "rust-opening",
+        true,
+        Some("Switch to Miner before using "),
+    );
     // Stage not accepted: the correct job alone must not pay either.
-    assert_no_bonus_drop(1003, 14, "rust-opening", false);
+    assert_no_bonus_drop(1003, 14, "rust-opening", false, None);
 }

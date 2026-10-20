@@ -2,14 +2,17 @@
 //! appliers. The packet-path characterization (station refusals, the movie
 //! gate, completion errors, gathering bonuses) lives in
 //! `tests/s6_characterization.rs` and reuses the shared movie drivers. The
-//! opening fixture, request bodies and content paths are the shared
-//! `tests/common/s6.rs` module so the two files cannot drift.
+//! opening fixture and content paths are the shared `tests/common/s6.rs`
+//! module; the request bodies are `tests/common/gateway_packets.rs`, so the
+//! two files cannot drift.
 //!
 //! Wire prefixes here are the shipped client's request shapes: 26/10
 //! constructor 0x00a36f80 and 26/8 builder 0x008b6bc0 for the NPC ordering
 //! check; the chat request reader is 0x00b11600.
 
 use super::*;
+#[path = "../../tests/common/gateway_packets.rs"]
+mod gateway_packets;
 #[path = "../../tests/common/s6.rs"]
 mod s6;
 use crate::{
@@ -17,7 +20,8 @@ use crate::{
     recipes::CraftingJob,
     smelting::{SmeltingOutcome, SmeltingTransaction},
 };
-use s6::{chat, chat_texts, interact, menu, w104_content};
+use gateway_packets::{chat, interact, select};
+use s6::{chat_texts, w104_content};
 use serde_json::Value;
 use std::fs;
 
@@ -116,7 +120,7 @@ fn active_for_test(case: Station) -> Tutorial {
     let mut tutorial = tutorial(case, true);
     grant_recipe_materials(&mut tutorial.game, case);
     let actor = tutorial.actor;
-    send(&mut tutorial, &interact(actor), NOW).unwrap();
+    send(&mut tutorial, &select(actor, 1), NOW).unwrap();
     let active = match case.profile {
         16 => tutorial.game.forging.as_ref().is_some_and(Forging::active),
         14 => tutorial
@@ -157,12 +161,18 @@ fn miner_gather_bonus_requires_the_active_miner_job() {
     game.profiles.as_mut().unwrap().activate(1).unwrap();
     let ore = game.material_count(2739);
     let coal = game.material_count(879);
+    let inventory = game.inventory.state().clone();
     let before = game.opening.as_ref().unwrap().state().stages[&fixture.stage_id].counts
         [fixture.objective_index];
     let out = game
-        .handle_in_world(&interact(fixture.actor.guid), &character, NOW)
+        .handle_in_world(&select(fixture.actor.guid, 1), &character, NOW)
         .unwrap();
     assert!(out.changed, "the gather must count for this fixture");
+    assert_eq!(
+        game.inventory.state(),
+        &inventory,
+        "the wrong job changed the inventory"
+    );
     assert_eq!(
         game.opening.as_ref().unwrap().state().stages[&fixture.stage_id].counts
             [fixture.objective_index],
@@ -352,7 +362,9 @@ fn real_regional_npc_reaches_the_npc_router_before_the_movie_gate() {
         position,
         rotation: [0.0, 0.0, 1.0],
     };
-    let out = game.handle_in_world(&menu(npc), &character, NOW).unwrap();
+    let out = game
+        .handle_in_world(&interact(npc), &character, NOW)
+        .unwrap();
     assert!(
         !chat_texts(&out.replies).contains(
             &"Close the forging game before changing jobs, equipment or interacting.".to_owned()

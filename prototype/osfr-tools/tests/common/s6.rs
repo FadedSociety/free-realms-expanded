@@ -1,12 +1,12 @@
 //! Shared S6 fixture: content paths, the opening stage/actor selected by a
-//! goal, and the client request bodies. `tests/s6_characterization.rs` wraps
-//! the same state in a `Gateway`; `src/gameplay/s6_characterization.rs` wraps
-//! it in a bare `Gameplay`. Only the state construction is shared.
-#![allow(dead_code)]
+//! goal, the reply-text extractor and the owned reward count. Request bodies
+//! live in `tests/common/gateway_packets.rs`. `tests/s6_characterization.rs`
+//! wraps the state in a `Gateway`; `src/gameplay/s6_characterization.rs` wraps
+//! it in a bare `Gameplay`.
 
 use osfr_tools::{
     gameplay::{Gameplay, GameplayState},
-    inventory::InventoryItem,
+    inventory::Inventory,
     opening::{OpeningActor, OpeningEngine, OpeningTrigger},
 };
 use std::path::PathBuf;
@@ -29,6 +29,7 @@ pub fn reference(content: &str) -> PathBuf {
     path
 }
 
+#[allow(dead_code)] // The packet test root uses forging/smelting content only.
 pub fn w104_content() -> PathBuf {
     let path = std::env::var_os("OSFR_S6_W104_CONTENT")
         .map(PathBuf::from)
@@ -42,39 +43,6 @@ pub fn w104_content() -> PathBuf {
         path.display()
     );
     path
-}
-
-/// Client chat request reader 0x00b11600: header, guid pair, two zero context
-/// records, the text and its trailing 28-byte block.
-pub fn chat(text: &str) -> Vec<u8> {
-    let mut packet = vec![15, 0, 1, 0, 0, 0];
-    packet.extend(1_u64.to_le_bytes());
-    packet.extend(0_u64.to_le_bytes());
-    for _ in 0..2 {
-        packet.extend([0; 12]);
-        packet.extend(0_u32.to_le_bytes());
-        packet.extend(0_u32.to_le_bytes());
-    }
-    packet.extend((text.len() as u32).to_le_bytes());
-    packet.extend(text.as_bytes());
-    packet.extend([0; 28]);
-    packet
-}
-
-/// Client 26/10 constructor 0x00a36f80: u64 target plus i32 choice.
-pub fn interact(guid: u64) -> Vec<u8> {
-    let mut packet = vec![26, 0, 10, 0];
-    packet.extend(guid.to_le_bytes());
-    packet.extend(1_i32.to_le_bytes());
-    packet
-}
-
-/// Client 26/8 constructor 0x008b6bc0: u64 target plus bool.
-pub fn menu(guid: u64) -> Vec<u8> {
-    let mut packet = vec![26, 0, 8, 0];
-    packet.extend(guid.to_le_bytes());
-    packet.push(0);
-    packet
 }
 
 fn inner(reply: &[u8]) -> &[u8] {
@@ -157,6 +125,15 @@ pub fn opening_fixture(
         })
         .expect("tutorial opening objective");
     let mut state = base.state();
+    if !supplies.is_empty() {
+        // Grant through the production inventory so the fixture gets validated
+        // stacks and instance ids instead of a hand-built item.
+        let mut inventory = Inventory::load(&content, Some(state.inventory)).unwrap();
+        for (definition, count) in supplies {
+            inventory.grant(0, *definition, *count).unwrap();
+        }
+        state.inventory = inventory.state().clone();
+    }
     for stage in engine.stages() {
         let progress = state
             .opening
@@ -204,9 +181,6 @@ pub fn opening_fixture(
         profiles.unlocked.insert(active);
         profiles.active = active;
     }
-    if !supplies.is_empty() {
-        add_items(&mut state, supplies);
-    }
     let actor = engine
         .actors()
         .iter()
@@ -225,34 +199,4 @@ pub fn opening_fixture(
         stage_id,
         objective_index,
     }
-}
-
-fn add_items(state: &mut GameplayState, items: &[(i32, u32)]) {
-    let mut next = state.inventory.next_instance_id.unwrap_or_else(|| {
-        i64::from(
-            state
-                .inventory
-                .items
-                .iter()
-                .map(|item| item.id)
-                .max()
-                .unwrap_or(0),
-        ) + 1
-    });
-    for (definition, count) in items {
-        state.inventory.items.push(InventoryItem {
-            definition_id: *definition,
-            tint: 0,
-            id: i32::try_from(next).unwrap(),
-            count: *count,
-            consumed_count: 0,
-            stored_count: 0,
-            last_cast_time: i64::from(i32::MAX),
-            rental: None,
-            ability_count: 0,
-            activate_enabled: false,
-        });
-        next += 1;
-    }
-    state.inventory.next_instance_id = Some(next);
 }

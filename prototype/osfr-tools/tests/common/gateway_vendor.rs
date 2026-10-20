@@ -7,7 +7,10 @@
 //! 165/5 sell body written by `00c75a70`/`00c76dd0` (Lua-facing `00c77030`).
 //! The 7-byte tunnel prefix mirrors the captured client wrapper (`005`, subtype
 //! `1`, payload length).
-#![allow(dead_code)] // The vendor suites use every helper; the S6 net includes only two.
+
+#[path = "gateway_packets.rs"]
+mod gateway_packets;
+pub use gateway_packets::{interact, login, select};
 
 use osfr_tools::{
     gateway::{Gateway, GatewayOutcome},
@@ -21,21 +24,6 @@ pub fn wrap(inner: &[u8]) -> Vec<u8> {
     let mut bytes = vec![5, 0, 1];
     bytes.extend((inner.len() as u32).to_le_bytes());
     bytes.extend(inner);
-    bytes
-}
-
-pub fn login() -> Vec<u8> {
-    let mut bytes = 1u16.to_le_bytes().to_vec();
-    for (i, text) in ["synthetic-ticket", "1.910.1.530630", ""]
-        .iter()
-        .enumerate()
-    {
-        bytes.extend((text.len() as u32).to_le_bytes());
-        bytes.extend(text.as_bytes());
-        if i == 0 {
-            bytes.extend(1u64.to_le_bytes());
-        }
-    }
     bytes
 }
 
@@ -98,19 +86,5 @@ pub fn sell_packet(merchant: u64, instance: i32, quantity: u32) -> Vec<u8> {
     packet.extend(merchant.to_le_bytes());
     packet.extend(instance.to_le_bytes());
     packet.extend(quantity.to_le_bytes());
-    packet
-}
-
-pub fn interact(npc_id: u64) -> Vec<u8> {
-    let mut packet = vec![26, 0, 8, 0];
-    packet.extend(npc_id.to_le_bytes());
-    packet.push(0);
-    packet
-}
-
-pub fn select(npc_id: u64, option: u32) -> Vec<u8> {
-    let mut packet = vec![26, 0, 10, 0];
-    packet.extend(npc_id.to_le_bytes());
-    packet.extend(option.to_le_bytes());
     packet
 }

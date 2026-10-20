@@ -230,7 +230,9 @@ fn private_mining_smelting_reward_atomic_once_restore_and_cancel() {
     let before = g.snapshot();
     select(&mut g, 1);
     assert_eq!(g.snapshot(), before); // Movie keeps Miner job.
-    smelting_movie::start(&mut g, 1_000);
+    // ReadyForGameData publishes OnGameDataMsg, one message per content phase
+    // and OnDataComplete: six replies for this content.
+    assert_eq!(smelting_movie::start(&mut g, 1_000).replies.len(), 6);
     smelting_movie::rounds(&mut g, 1_000);
     let win = payload_packet(instance(&g), "FRServer_GameWon\t900\t1").unwrap();
     // A malformed later child must roll back inventory, quest and victory.
@@ -339,7 +341,7 @@ fn private_mining_smelting_reward_atomic_once_restore_and_cancel() {
     login(&mut retry);
     position(&mut retry, forge.position);
     interact(&mut retry, forge.guid);
-    smelting_movie::start(&mut retry, 1_000);
+    assert_eq!(smelting_movie::start(&mut retry, 1_000).replies.len(), 6);
     let active = retry.snapshot();
     let old_id = instance(&retry);
     let mut disconnected =
