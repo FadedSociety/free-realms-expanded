@@ -4,10 +4,10 @@ Research snapshot: 2026-10-13. W19 registers the reviewed startup builders in th
 
 ## Runtime behavior
 
-- `src/lib.rs` registers `startup_messages`, `startup_world`, `startup_catalogues`, `startup_snapshot`, `account`, `account_store`, and `rewards`. Tests for registered modules now import `osfr_tools::...`; `startup_selfdata` remains unregistered and untouched.
+- `src/lib.rs` registers `startup_messages`, `startup_world`, `startup_catalogues`, `startup_snapshot`, `startup_selfdata`, `account`, `account_store`, and `rewards`. Tests for registered modules now import `osfr_tools::...`.
 - The gateway builds startup indices 00-06 and 08-45 from typed snapshot values and existing builders, preserving the eight-message login phase and 38-message ready phase. Opening gameplay still omits the 23 captured NPC rows as before.
-- Index 07 (opcode 12 self data) remains on its existing template-backed patch path. The gateway does not call `startup_selfdata`.
-- Template replay is disabled by default. Set `OSFR_GATEWAY_STARTUP_TEMPLATE_FALLBACK=1` (or `true`) for one-release rollback. Set it to `0` to use builders.
+- Index 07 (opcode 12 self data) is built from typed self data parsed from template 7; its action-bar rows remain the captured ones.
+- The gateway never replays captured startup bytes. The 46 captured templates are still loaded and hash-checked at startup, and only template 7 supplies the typed self-data seed.
 - Set `OSFR_GATEWAY_STARTUP_SNAPSHOT` to override the typed JSON path. With no override, the gateway uses `lab/content/startup-snapshot/startup.json`, derived from the configured reference directory under `lab/references`.
 - The ignored exporter writes only to `lab/content/startup-snapshot/startup.json`. It omits index 07 and has no fields for the player's name, GUID, owned inventory, or chat. Item definitions are static catalogue rows; their serialized record bytes come from the paired `rust-gameplay/inventory.json` and are checked against captured index 05.
 
@@ -22,17 +22,9 @@ No new native-client behavior was claimed or recovered in this integration. Pack
 
 `(R)` values remain capture-backed reconstruction: unknown settings fields, opaque opcode 193/2 tail, coin-store columns, ability tails, captured character HP/mana/journal/stat rows, and the type-2 value used when a gameplay zone override lacks a zone-type field. Snapshot values are a convenient seed for this private capture, not recovered retail definitions or account rules. Quick-chat text is not exported; NPC display strings and server MOTD are static captured content.
 
-## Export and rollback
+## Export
 
 Run the ignored test exporter with `OSFR_GATEWAY_REFERENCE` set to the private reference directory. It validates the reference manifest and packet hashes, parses the typed world/status data, builds each index except 07, compares all 45 complete tunnel messages byte-for-byte, then writes the JSON in the lab. The committed tree contains no raw captures or exported snapshot.
-
-Rollback for one release:
-
-```powershell
-$env:OSFR_GATEWAY_STARTUP_TEMPLATE_FALLBACK = '1'
-```
-
-The default is off. Remove the variable or set it to `0` after rollback.
 
 ## Verification
 
@@ -43,7 +35,7 @@ Private Rust target: `%USERPROFILE%\Documents\Projects\CartoonMMO\lab\build\W19`
 - `cargo test --test gateway startup_builders_use_typed_snapshot_and_keep_self_data_on_its_patch_path -- --exact` — 1 passed.
 - `cargo test --test gateway synthetic_startup_sequence_has_the_expected_phase_order_and_lengths -- --exact` — 1 passed; 8 login messages, 38 ready messages, tunnel lengths valid.
 - `cargo test --test startup_snapshot empty_snapshot_serializes_as_typed_json_and_loads -- --exact` — 1 passed.
-- Filtered ignored private gates passed: `gateway::built_startup_sequence_matches_the_captured_character_byte_for_byte`, `startup_messages::mapped_messages_reproduce_the_private_capture`, `startup_world::mapped_world_content_reproduces_capture_and_exports_typed_rows`, `startup_catalogues::mapped_catalogue_and_status_messages_reproduce_the_private_capture`, and `startup_snapshot::exports_typed_snapshot_to_lab_and_matches_all_45_builders`. Each was run with `-- --ignored --exact`; template fallback was explicitly `0`.
+- Filtered ignored private gates passed: `gateway::built_startup_sequence_matches_the_captured_character_byte_for_byte`, `startup_messages::mapped_messages_reproduce_the_private_capture`, `startup_world::mapped_world_content_reproduces_capture_and_exports_typed_rows`, `startup_catalogues::mapped_catalogue_and_status_messages_reproduce_the_private_capture`, and `startup_snapshot::exports_typed_snapshot_to_lab_and_matches_all_45_builders`. Each was run with `-- --ignored --exact`; the typed snapshot path was used.
 - Exported `lab/content/startup-snapshot/startup.json` (1,911,797 bytes). Gateway private oracle compared the complete 46-message sequence for the captured character; the 45 builder messages and unchanged index 07 all matched byte-for-byte.
 - Required whole ordinary command `scripts/cargo.ps1 test --no-fail-fast` exited 1. Every reported target passed except `quest_engine`, where `prerequisite_level_job_member_and_limit_gates_are_server_owned` and `source_tagged_opening_fixture_matches_the_existing_seventeen_stage_engine` failed. An isolated rerun without startup environment variables reproduced those two failing test names with differing assertion points. No `quest_engine` source or test file was changed; the cause remains open.
 - No release binary was built and no native client was launched. Native acceptance remains with the lead.

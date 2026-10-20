@@ -1,15 +1,15 @@
-//! Per-character application gateway backed by private, verified world templates.
+//! Per-character application gateway backed by a private, verified reference.
 //!
 //! Field layouts were checked against the supplied serializer and pinned
-//! Sanctuary packet definitions. Templates are local reference data, not a
-//! reconstructed content/gameplay service. This module never runs C# code.
+//! Sanctuary packet definitions. Startup messages are built from typed data,
+//! not replayed captured bytes. This module never runs C# code.
 
 use crate::character_store::CharacterState;
 use crate::dev_teleport;
 use crate::encounter::{ZoneTransition, zone_begin_packet};
 use crate::game_store::Snapshot;
 use crate::gameplay::{Gameplay, GameplayState};
-use crate::identity::{self, CharacterIdentity};
+use crate::identity::CharacterIdentity;
 use crate::movement::{
     self, Decision as MovementDecision, ExpectedDiscontinuity, MovementState, MovementUpdate,
     SpeedModifiers,
@@ -90,22 +90,12 @@ struct ProfileLayout {
 }
 
 #[derive(Clone)]
-struct Template {
-    kind: Kind,
-    bytes: Vec<u8>,
-}
-
-#[derive(Clone)]
 pub struct Gateway {
     state: CharacterState,
     version: String,
-    templates: Vec<Template>,
-    startup_snapshot: Option<StartupSnapshot>,
-    template_fallback: bool,
-    self_data_template: Option<SelfData>,
+    startup_snapshot: StartupSnapshot,
+    self_data_template: SelfData,
     profile_rank_offsets: BTreeMap<i32, usize>,
-    self_layout: SelfLayout,
-    zone_layout: ZoneLayout,
     logged_in: bool,
     ready: bool,
     loaded: bool,
@@ -316,7 +306,8 @@ fn derive_zone_layout(message: &[u8]) -> io::Result<ZoneLayout> {
     Ok(ZoneLayout { zone_id_offset })
 }
 
-fn load_reference(directory: &Path) -> io::Result<(Manifest, Vec<Template>)> {
+/// Validates all 46 captured templates, then returns template 7's bytes.
+fn load_reference(directory: &Path) -> io::Result<(Manifest, Vec<u8>)> {
     let bytes = read_bounded(&directory.join("manifest.json"), 65_536)?;
     let manifest: Manifest =
         serde_json::from_slice(&bytes).map_err(|_| invalid("invalid gateway manifest JSON"))?;
@@ -354,10 +345,7 @@ fn load_reference(directory: &Path) -> io::Result<(Manifest, Vec<Template>)> {
         if outer != 5 || u16::from_le_bytes(inner[..2].try_into().unwrap()) != file.opcode {
             return Err(invalid("template opcode mismatch"));
         }
-        templates.push(Template {
-            kind: file.kind,
-            bytes,
-        });
+        templates.push(bytes);
     }
     let expected = [41, 2, 166, 43, 144, 35, 193, 12];
     if manifest.templates[..8]
@@ -371,17 +359,17 @@ fn load_reference(directory: &Path) -> io::Result<(Manifest, Vec<Template>)> {
             "reference is not the verified initial world sequence",
         ));
     }
-    if derive_self_layout(&templates[7].bytes)? != manifest.self_layout
-        || derive_zone_layout(&templates[3].bytes)? != manifest.zone_layout
+    if derive_self_layout(&templates[7])? != manifest.self_layout
+        || derive_zone_layout(&templates[3])? != manifest.zone_layout
     {
         return Err(invalid("reference field offsets differ from proven layout"));
     }
     let sl = manifest.self_layout;
-    let self_bytes = &templates[7].bytes;
+    let self_bytes = &templates[7];
     let mut guid = Reader::new(&self_bytes[sl.guid_offset..]);
     let mut position = Reader::new(&self_bytes[sl.position_offset..]);
     let mut rotation = Reader::new(&self_bytes[sl.rotation_offset..]);
-    let mut zone = Reader::new(&templates[3].bytes[manifest.zone_layout.zone_id_offset..]);
+    let mut zone = Reader::new(&templates[3][manifest.zone_layout.zone_id_offset..]);
     if guid.u64()? != manifest.initial_state.guid
         || position.vector()? != manifest.initial_state.position
         || rotation.vector()? != manifest.initial_state.rotation
@@ -391,7 +379,7 @@ fn load_reference(directory: &Path) -> io::Result<(Manifest, Vec<Template>)> {
             "reference snapshot differs from serialized character",
         ));
     }
-    Ok((manifest, templates))
+    Ok((manifest, templates.swap_remove(7)))
 }
 
 enum Event {
@@ -691,22 +679,6 @@ fn wrapped(inner: &[u8]) -> Vec<u8> {
     message
 }
 
-/// PacketSendZoneDetails from the pinned community serializer (opcode 43).
-fn initial_zone(zone: &ZoneTransition) -> Vec<u8> {
-    let mut bytes = 43u16.to_le_bytes().to_vec();
-    bytes.extend((zone.name.len() as u32).to_le_bytes());
-    bytes.extend(zone.name.bytes());
-    bytes.extend(2i32.to_le_bytes());
-    bytes.extend([u8::from(zone.tutorial), 0]);
-    bytes.extend((zone.sky.len() as u32).to_le_bytes());
-    bytes.extend(zone.sky.bytes());
-    bytes.push(0);
-    bytes.extend(zone.zone_id.to_le_bytes());
-    bytes.extend(zone.geometry_id.to_le_bytes());
-    bytes.extend([0, 0]);
-    bytes
-}
-
 impl Gateway {
     /// (R) The server splits a fully parsed bundle into ordered commits before
     /// resolving shared actions; later movement can never move an earlier hit.
@@ -841,56 +813,31 @@ impl Gateway {
         profile_rank_offsets: BTreeMap<i32, usize>,
     ) -> io::Result<Self> {
         state.validate()?;
-        let (manifest, templates) = load_reference(directory)?;
-        let template_fallback = if snapshot_override.is_some() {
-            false
-        } else {
-            template_fallback_enabled()?
-        };
+        let (manifest, self_bytes) = load_reference(directory)?;
         // (R) The local account-store path assigns a distinct GUID to each character;
         // the shared startup template is patched with that GUID at send time.
-        let startup_snapshot = if template_fallback {
-            None
-        } else if let Some(snapshot) = snapshot_override {
+        let startup_snapshot = if let Some(snapshot) = snapshot_override {
             snapshot.validate()?;
-            Some(snapshot)
+            snapshot
         } else {
             let snapshot = StartupSnapshot::load(&configured_snapshot_path(directory)?)?;
             if snapshot.login.zone.zone_id != manifest.initial_state.zone_id {
                 return Err(invalid("startup snapshot belongs to another initial zone"));
             }
-            Some(snapshot)
+            snapshot
         };
         if let Some(game) = &mut gameplay {
-            if let Some(snapshot) = &startup_snapshot {
-                game.exclude_startup_npcs(snapshot.world.npc_spawns.iter().map(|npc| npc.actor_id));
-            } else if template_fallback {
-                let actor_guids = templates
+            game.exclude_startup_npcs(
+                startup_snapshot
+                    .world
+                    .npc_spawns
                     .iter()
-                    .skip(10)
-                    .take(23)
-                    .map(|template| {
-                        let (_, inner) = tunnel(&template.bytes)?;
-                        crate::startup_world::parse_add_npc(inner)
-                            .map(|npc| npc.actor_id)
-                            .map_err(|_| invalid("startup NPC template could not be parsed"))
-                    })
-                    .collect::<io::Result<Vec<_>>>()?;
-                game.exclude_startup_npcs(actor_guids);
-            }
+                    .map(|npc| npc.actor_id),
+            );
         }
-        let self_data_template = if template_fallback {
-            None
-        } else {
-            let bytes = &templates
-                .get(7)
-                .ok_or_else(|| invalid("self-data reference template is missing"))?
-                .bytes;
-            Some(
-                std::panic::catch_unwind(|| startup_selfdata::parse_self(bytes))
-                    .map_err(|_| invalid("invalid typed self-data reference template"))?,
-            )
-        };
+        let self_data_template =
+            std::panic::catch_unwind(|| startup_selfdata::parse_self(&self_bytes))
+                .map_err(|_| invalid("invalid typed self-data reference template"))?;
         if let Some(game) = &mut gameplay {
             if let Some(return_location) = game.abandon_battle_for_reconnect() {
                 if state.guid != return_location.guid {
@@ -924,13 +871,9 @@ impl Gateway {
         Ok(Self {
             state,
             version: manifest.client_version,
-            templates,
             startup_snapshot,
-            template_fallback,
             self_data_template,
             profile_rank_offsets,
-            self_layout: manifest.self_layout,
-            zone_layout: manifest.zone_layout,
             logged_in: false,
             ready: false,
             loaded: false,
@@ -1051,37 +994,14 @@ impl Gateway {
                 source: Vec::new(),
             });
         }
-        if let Some(snapshot) = &self.startup_snapshot {
-            let scene = &snapshot.login.zone;
-            return Ok(crate::content::Zone {
-                id: self.state.zone_id,
-                name: scene.name.clone(),
-                geometry_id: Some(scene.geometry_id),
-                zone_type: Some(scene.zone_type),
-                tutorial: Some(scene.tutorial),
-                sky: Some(scene.sky.clone()),
-                source: Vec::new(),
-            });
-        }
-        // Preserve the opt-in captured-template fallback using its already validated 43 row.
-        let (_, payload) = tunnel(&self.templates[3].bytes)?;
-        let mut reader = Reader::new(payload);
-        reader.u16()?;
-        let name = reader.string(4096)?.to_owned();
-        let zone_type = i32::try_from(reader.u32()?).map_err(|_| invalid("zone type overflow"))?;
-        let tutorial = reader.bool()?;
-        reader.bool()?;
-        let sky = reader.string(4096)?.to_owned();
-        reader.bool()?;
-        reader.u32()?;
-        let geometry_id = reader.u32()?;
+        let scene = &self.startup_snapshot.login.zone;
         Ok(crate::content::Zone {
             id: self.state.zone_id,
-            name,
-            geometry_id: Some(geometry_id),
-            zone_type: Some(zone_type),
-            tutorial: Some(tutorial),
-            sky: Some(sky),
+            name: scene.name.clone(),
+            geometry_id: Some(scene.geometry_id),
+            zone_type: Some(scene.zone_type),
+            tutorial: Some(scene.tutorial),
+            sky: Some(scene.sky.clone()),
             source: Vec::new(),
         })
     }
@@ -1145,16 +1065,10 @@ impl Gateway {
             .gameplay
             .as_ref()
             .and_then(Gameplay::active_profile)
-            .or_else(|| {
-                self.self_data_template
-                    .as_ref()
-                    .map(|data| data.jobs.active_profile_id as i32)
-            });
-        if let Some(profile) = profile {
-            look.active_profile = profile;
-            if let Some(game) = &self.gameplay {
-                look.attachments_wire = game.profile_attachments(profile)?;
-            }
+            .unwrap_or(self.self_data_template.jobs.active_profile_id as i32);
+        look.active_profile = profile;
+        if let Some(game) = &self.gameplay {
+            look.attachments_wire = game.profile_attachments(profile)?;
         }
         Ok(look)
     }
@@ -1338,7 +1252,10 @@ impl Gateway {
         if identity.guid != self.state.guid {
             return Err(invalid("identity GUID differs from character save"));
         }
-        let canonical_identity = creation_identity(&identity);
+        // (R) The creation identity type reserves GUID 1; self-data carries the
+        // selected character GUID in its separate identity field.
+        let mut canonical_identity = identity.clone();
+        canonical_identity.guid = 1;
         canonical_identity.validate()?;
         let changed = match self.gameplay.as_mut() {
             Some(game) => game.apply_identity(&canonical_identity)?,
@@ -1380,15 +1297,10 @@ impl Gateway {
     pub fn quick_chat_catalog(&self) -> crate::social_chat::QuickChatCatalog {
         crate::social_chat::QuickChatCatalog::from_rows(
             self.startup_snapshot
-                .as_ref()
-                .into_iter()
-                .flat_map(|snapshot| {
-                    snapshot
-                        .world
-                        .quick_chat
-                        .iter()
-                        .map(|row| (row.id, row.animation_id))
-                }),
+                .world
+                .quick_chat
+                .iter()
+                .map(|row| (row.id, row.animation_id)),
         )
     }
 
@@ -1957,74 +1869,13 @@ impl Gateway {
         Ok(outcome)
     }
 
-    fn templates_for(
-        &self,
-        kind: Kind,
-        state: &CharacterState,
-        gameplay: Option<&Gameplay>,
-    ) -> io::Result<Vec<Vec<u8>>> {
-        self.templates
-            .iter()
-            .enumerate()
-            .filter(|(index, t)| {
-                t.kind == kind
-                    && !(gameplay.is_some_and(Gameplay::is_opening) && (10..=32).contains(index))
-            })
-            .map(|(index, t)| {
-                let mut bytes = t.bytes.clone();
-                if index == 7 {
-                    bytes[self.self_layout.guid_offset..self.self_layout.guid_offset + 8]
-                        .copy_from_slice(&state.guid.to_le_bytes());
-                    for (offset, vector) in [
-                        (self.self_layout.position_offset, state.position),
-                        (self.self_layout.rotation_offset, state.rotation),
-                    ] {
-                        for (component, value) in vector.iter().enumerate() {
-                            bytes[offset + component * 4..offset + component * 4 + 4]
-                                .copy_from_slice(&value.to_le_bytes());
-                        }
-                    }
-                } else if index == 3 {
-                    bytes[self.zone_layout.zone_id_offset..self.zone_layout.zone_id_offset + 4]
-                        .copy_from_slice(&state.zone_id.to_le_bytes());
-                }
-                if index == 7 {
-                    if let Some(game) = gameplay {
-                        if let Some(identity) = &self.identity {
-                            bytes = game.patch_gender(&bytes, identity.gender)?;
-                        }
-                        bytes = game.patch_self(&bytes)?;
-                    }
-                    if let Some(identity) = &self.identity {
-                        bytes = identity::patch_self(&bytes, &creation_identity(identity))?;
-                    }
-                } else if index == 5 {
-                    if let Some(packet) = gameplay.and_then(Gameplay::definitions_packet) {
-                        bytes = wrapped(&packet);
-                    }
-                } else if index == 3 {
-                    if let Some(zone) = gameplay.and_then(Gameplay::current_zone) {
-                        bytes = wrapped(&initial_zone(&zone));
-                    }
-                }
-                Ok(bytes)
-            })
-            .collect()
-    }
-
     fn startup_for(
         &self,
         kind: Kind,
         state: &CharacterState,
         gameplay: Option<&Gameplay>,
     ) -> io::Result<Vec<Vec<u8>>> {
-        if self.template_fallback {
-            return self.templates_for(kind, state, gameplay);
-        }
-        let snapshot = self
-            .startup_snapshot
-            .as_ref()
-            .ok_or_else(|| invalid("typed startup snapshot is not loaded"))?;
+        let snapshot = &self.startup_snapshot;
         let range = match kind {
             Kind::Login => 0..8,
             Kind::Ready => 8..46,
@@ -2056,11 +1907,7 @@ impl Gateway {
         state: &CharacterState,
         gameplay: Option<&Gameplay>,
     ) -> io::Result<Vec<u8>> {
-        let mut data = self
-            .self_data_template
-            .as_ref()
-            .ok_or_else(|| invalid("typed self-data template is not loaded"))?
-            .clone();
+        let mut data = self.self_data_template.clone();
         data.identity.guid = state.guid;
         for index in 0..3 {
             data.transform.position[index] = state.position[index].to_bits();
@@ -2130,14 +1977,6 @@ impl Gateway {
     }
 }
 
-fn creation_identity(identity: &CharacterIdentity) -> CharacterIdentity {
-    let mut canonical = identity.clone();
-    // (R) The creation identity type reserves GUID 1; self-data carries the
-    // selected character GUID in its separate identity field.
-    canonical.guid = 1;
-    canonical
-}
-
 fn load_profile_rank_offsets(content: &Path) -> io::Result<BTreeMap<i32, usize>> {
     let path = content.join("profiles.json");
     let file = match fs::File::open(path) {
@@ -2176,20 +2015,6 @@ fn configured_snapshot_path(reference: &Path) -> io::Result<std::path::PathBuf> 
         .and_then(Path::parent)
         .ok_or_else(|| invalid("set OSFR_GATEWAY_STARTUP_SNAPSHOT to the typed startup JSON"))?;
     Ok(lab_root.join("content/startup-snapshot/startup.json"))
-}
-
-fn template_fallback_enabled() -> io::Result<bool> {
-    match std::env::var("OSFR_GATEWAY_STARTUP_TEMPLATE_FALLBACK") {
-        Ok(value) if value == "1" || value.eq_ignore_ascii_case("true") => Ok(true),
-        Ok(value) if value == "0" || value.eq_ignore_ascii_case("false") => Ok(false),
-        Ok(_) => Err(invalid(
-            "OSFR_GATEWAY_STARTUP_TEMPLATE_FALLBACK must be 0, 1, true, or false",
-        )),
-        Err(std::env::VarError::NotPresent) => Ok(false),
-        Err(std::env::VarError::NotUnicode(_)) => Err(invalid(
-            "OSFR_GATEWAY_STARTUP_TEMPLATE_FALLBACK is not Unicode",
-        )),
-    }
 }
 
 #[cfg(test)]
