@@ -3,11 +3,42 @@
   "records": [
     {
       "id": 3150001,
+      "job": 32,
       "title_string_id": 22526,
       "giver_npc_id": 9000000076,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000076,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 1, row W1; the battle-cry test is client 288078259 ('Show Drill Sergeant Dewey your battle cry'), 189135438 and 3900838064; the giver is Drill Sergeant Dewey 9000000076 (Snowhill row 35)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T257: ContentDb v1 has no free-text objective field, so the guide's battle-cry step is the server's single talk_to_npc objective at Dewey. The accept is the menu and Dewey hears the cry on the next Talk; no extra dialogue or item state is invented."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "32": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T257: every W1 reward cell in the guide is unknown. Five coins use the W110/T202 small-quest fallback and 25 Warrior (profile 32) job XP follows the T202/T242 first-chapter rate. The Student Warrior outfit is NOT granted: the T201 trainer already issues the starter gear and a second free copy would be a sellable duplicate."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -27,22 +58,30 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+          "evidence": "(R) T257: the guide's battle-cry step is one talk_to_npc objective at Dewey; the objective's own source carries the recovered battle-cry text."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T257: the guide's reward cell is unknown, so the row pays the W110/T202 small-quest fallback of 5 coins and 25 Warrior (profile 32) job XP. No item is granted; the T201 trainer's starter outfit is the only free gear."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T257: job gate 32 (Warrior) at the schema's rank-1 default. The retail W1 unlocked the job, but this server's T201/W176 trainer menu remains the unlock path, so the quest is offered only after learning Warrior and activating it; a non-Warrior cannot accept a reward for a locked profile."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T257: enabled as the first playable Warrior chapter step. 3150002 (unbuilt warm-up) and 3150003 (Hot Springs Haven dungeon) stay disabled and are skipped by W4's prerequisite."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T257: the client title block carries no description/intro/end-text ids for W1, so those fields stay absent (wire value 0); the offer intro and end screen are the documented lead text gap."
         }
       ],
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3150002,
@@ -149,13 +188,44 @@
     },
     {
       "id": 3150004,
+      "job": 32,
       "title_string_id": 22580,
       "giver_npc_id": 9000000155,
       "prerequisite_quest_ids": [
-        3150003
+        3150001
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000208,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 1, row W4; the report step is client 1569616597 ('Find Steele at the Snowhill warrior barracks'), 811662074, 3222909153 and 2641381951 ('Report to Steele'). The target is Steele 9000000208 (Snowhill row 34)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T257: ContentDb v1 has no free-text objective field, so the guide's report-to-Steele step is the server's single talk_to_npc objective at Steele. No practice-dummy or sword-test minigame state is invented."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "32": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T257: every W4 reward cell in the guide is unknown. Five coins use the W110/T202 small-quest fallback and 25 Warrior (profile 32) job XP follows the T202/T242 first-chapter rate. No item is granted; the T201 trainer's starter outfit remains the only free gear."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -175,28 +245,32 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) source explicitly says after row W3; mapped that page label to the preceding batch content key"
+          "evidence": "(R) T257: the guide's report step is one talk_to_npc objective at Steele; the objective's own source carries the recovered report text."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T257: the guide's reward cell is unknown, so the row pays the W110/T202 small-quest fallback of 5 coins and 25 Warrior (profile 32) job XP. No item is granted."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T257: prerequisite re-pointed from [3150003] to [3150001]. W2 (3150002) is unbuilt and its giver is not spawned; W3 (3150003) needs the Hot Springs Haven battle and stays disabled. W1 is therefore the explicit playtest entry into W4; the skipped steps keep their records and stay named here."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T257: job gate 32 (Warrior) at the schema's rank-1 default, matching W1. The quest is offered only while Warrior is the active unlocked job, so a non-Warrior cannot accept a reward for a locked profile."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T257: enabled as the second playable Warrior chapter step. The title 22580, description 22581 and intro 22579 are unchanged; the client title block has no end-text id, so the end screen stays 0 and the missing debrief is a documented lead text gap."
         }
       ],
       "description_string_id": 22581,
       "intro_text_string_id": 22579,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3150005,

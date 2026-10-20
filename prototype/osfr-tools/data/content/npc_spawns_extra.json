@@ -72044,6 +72044,84 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "spawn_guid": 9000000155,
+      "legacy_npc_id": null,
+      "content_key": 9000000155,
+      "model_id": 731,
+      "model_file_name": "fairy_f_morninglory.agr",
+      "name": "Morninglory",
+      "name_string_id": 5102192,
+      "position": [
+        265.81537,
+        50.78422,
+        169.9138
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Models.txt row 731 = fairy_f_morninglory.agr (the dedicated Morninglory body model, mirrored from the client model table). The Legacy Npcs.json has no Morninglory row."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat: Global.Text.5102192 resolves to 'Morninglory' (raw ucdt hash 972992330; the Snowhill row's other name id 3111485730 also resolves to Global.Text.16826 'Morninglory'). The AddNpc name field is a Global.Text id (client formats 'Global.Text.%d' at 0x01804c14), so the ucdt id would render blank."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md:45 (Morninglory gathers recruits near the Hot Springs Haven, northwest of Dewey, and gives W4 'One With Your Weapon'); client 3491114034 / 3712772048."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md:36 (row 36: runs the Warrior initiation rites, near the Hot Springs Haven; ucdt 972992330 / 3111485730)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T257: reuses Snowhill NPC key 9000000155 as the runtime actor GUID and the Snowhill row's reconstructed position [265.81537, 50.78422, 169.9138], so the ordinary 26/8 click addresses the same content identity. (R) Heading 0.0 is deterministic; no recovered heading exists. (R) Model 731 fairy_f_morninglory.agr is the Legacy model table's dedicated Morninglory body; it is present in the client catalog.tsv (Assets_005.pack entry 527, pack_17/000527.agr). (R) The 9000000000-range actor GUID is this project's content-key space, not a recovered server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000208,
+      "legacy_npc_id": null,
+      "content_key": 9000000208,
+      "model_id": 391,
+      "model_file_name": "fairy_m_warrior_01.agr",
+      "name": "Steele",
+      "name_string_id": 434620,
+      "position": [
+        55.284345,
+        30.987,
+        359.281601
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json has no Steele row and Models.txt has no Steele-specific model; the wiki NPC page describes Steele as a male pixie in the Snowhill Town Hall (lab/references/freerealms-wiki/wiki.sqlite page 2669). ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt row 391 = fairy_m_warrior_01.agr is the client's male fairy/pixie Warrior body model."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat: Global.Text.434620 resolves to 'Steele' (raw ucdt hash 1254774045; the Snowhill row's other name id 4283915563 also resolves to Global.Text.47830 'Steele'). The AddNpc name field is a Global.Text id (client formats 'Global.Text.%d' at 0x01804c14), so the ucdt id would render blank."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Warrior.md:46 (Steele is the Snowhill weapon trainer who receives the W4 report; client 1569616597 / 3222909153)."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md:34 (row 34: Warrior weapons trainer; ucdt 1254774045 / 4283915563)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T257: reuses Snowhill NPC key 9000000208 as the runtime actor GUID and the Snowhill row's reconstructed position [55.284345, 30.987, 359.281601], so the ordinary 26/8 click addresses the same content identity. (R) Heading 0.0 is deterministic; no recovered heading exists. (R) Model 391 fairy_m_warrior_01.agr is the client's male pixie/fairy Warrior body, chosen because Legacy has no Steele model and the wiki describes Steele as a male pixie; it is present in catalog.tsv (Assets_006.pack entry 592, pack_18/000592.agr). (R) The 9000000000-range actor GUID is this project's content-key space, not a recovered server GUID."
+        }
+      ],
+      "position_w": null
     }
   ]
 }
