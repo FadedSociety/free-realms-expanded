@@ -381,3 +381,323 @@ fn real_regional_npc_reaches_the_npc_router_before_the_movie_gate() {
         "a busy interaction must not open a menu"
     );
 }
+
+const UNKNOWN_ACTOR: u64 = u64::MAX - 1;
+/// The services' private profile constants: forging 16, cooking 45, smelting 14.
+const FORGING_PROFILE: i32 = 16;
+const COOKING_PROFILE: i32 = 45;
+const SMELTING_PROFILE: i32 = 14;
+
+/// The five crafting and gathering movies in the gate's intercept order. This
+/// table is the test's own copy, so the same matrix characterized the five
+/// per-engine blocks before they became one gate.
+#[derive(Clone, Copy)]
+enum Engine {
+    Forging,
+    Cooking,
+    Smelting,
+    Mining,
+    Harvesting,
+}
+
+impl Engine {
+    const ALL: [Engine; 5] = [
+        Engine::Forging,
+        Engine::Cooking,
+        Engine::Smelting,
+        Engine::Mining,
+        Engine::Harvesting,
+    ];
+
+    fn noun(self) -> &'static str {
+        match self {
+            Engine::Forging => "forging",
+            Engine::Cooking => "cooking",
+            Engine::Smelting => "smelting",
+            Engine::Mining => "mining",
+            Engine::Harvesting => "harvesting",
+        }
+    }
+
+    /// Whether this movie's engine still holds a run. Read from the saved state
+    /// so the check does not copy the production `active()` detection.
+    fn is_active(self, game: &Gameplay) -> bool {
+        let state = game.state();
+        match self {
+            Engine::Forging => state
+                .forging
+                .is_some_and(|forging| forging.active.is_some()),
+            Engine::Cooking => state
+                .cooking
+                .is_some_and(|cooking| cooking.active.is_some()),
+            Engine::Smelting => state
+                .smelting
+                .is_some_and(|smelting| smelting.active.is_some()),
+            Engine::Mining => state.mining.is_some_and(|mining| mining.active.is_some()),
+            Engine::Harvesting => state
+                .harvesting
+                .is_some_and(|harvesting| harvesting.active.is_some()),
+        }
+    }
+}
+
+fn w104_game() -> Gameplay {
+    Gameplay::load(&w104_content(), None).unwrap()
+}
+
+fn test_character() -> CharacterState {
+    CharacterState {
+        guid: 1,
+        zone_id: 0,
+        position: [0.0; 3],
+        rotation: [0.0, 0.0, 1.0],
+    }
+}
+
+/// Starts one movie on its engine as the production start path leaves it: the
+/// engine run is live and the movie's own tick clock is stamped.
+fn start(game: &mut Gameplay, engine: Engine) {
+    match engine {
+        Engine::Forging => {
+            let key = game.forging.as_ref().unwrap().recipe_key().to_owned();
+            let requirements = game.forging.as_ref().unwrap().requirements().to_vec();
+            game.forging
+                .as_mut()
+                .unwrap()
+                .begin_recipe(FORGING_PROFILE, &key, u8::MAX, true, &requirements)
+                .unwrap();
+            game.forging_tick_ms = Some(NOW);
+        }
+        Engine::Cooking => {
+            let key = game.cooking.as_ref().unwrap().recipe_key().to_owned();
+            let requirements = game.cooking.as_ref().unwrap().requirements().to_vec();
+            game.cooking
+                .as_mut()
+                .unwrap()
+                .begin_recipe(COOKING_PROFILE, &key, u8::MAX, true, &requirements)
+                .unwrap();
+        }
+        Engine::Smelting => {
+            let key = game.smelting.as_ref().unwrap().recipe_key().to_owned();
+            let requirements = game.smelting.as_ref().unwrap().requirements().to_vec();
+            game.smelting
+                .as_mut()
+                .unwrap()
+                .begin_recipe(SMELTING_PROFILE, &key, u8::MAX, true, &requirements)
+                .unwrap();
+        }
+        Engine::Mining => {
+            game.type8_mut(Gather::Mining)
+                .unwrap()
+                .begin(mining::MINER_PROFILE_ID)
+                .unwrap();
+            game.type8_tick_ms = Some(NOW);
+        }
+        Engine::Harvesting => {
+            game.type8_mut(Gather::Harvesting)
+                .unwrap()
+                .begin(harvesting::CHEF_PROFILE_ID)
+                .unwrap();
+            game.type8_tick_ms = Some(NOW);
+        }
+    }
+}
+
+fn running_movie_fixture(engine: Engine) -> (Gameplay, CharacterState) {
+    let mut game = w104_game();
+    start(&mut game, engine);
+    (game, test_character())
+}
+
+/// The five families a live movie refuses, one per blocked request shape. The
+/// ability writer 0x00a342e0 sends i32 bar, i32 slot, i32 target mode and a u64
+/// target id for mode 0.
+fn blocked_families() -> [Vec<u8>; 5] {
+    let mut job = vec![26, 0, 13, 0];
+    job.extend(1_i32.to_le_bytes());
+    let mut attack = vec![36, 0, 10, 0];
+    attack.extend([0; 12]);
+    attack.extend(UNKNOWN_ACTOR.to_le_bytes());
+    let mut equip = vec![42, 0, 3, 0];
+    equip.extend(i32::MAX.to_le_bytes());
+    equip.extend(1_i32.to_le_bytes());
+    equip.extend(0_i32.to_le_bytes());
+    [
+        job,
+        interact(UNKNOWN_ACTOR),
+        select(UNKNOWN_ACTOR, 1),
+        attack,
+        equip,
+    ]
+}
+
+#[test]
+#[ignore = "requires the private W104 content"]
+fn two_active_engines_keep_the_gate_intercept_order() {
+    // Only a direct fixture can make two engines active at once: the busy table
+    // and the load gate keep production to one. The first block in gate order
+    // answers, as the five if-blocks did.
+    let character = test_character();
+    let mut game = w104_game();
+    start(&mut game, Engine::Forging);
+    start(&mut game, Engine::Mining);
+    assert!(matches!(game.running_movie(), Some(Movie::Forging)));
+    let out = game
+        .handle_in_world(&interact(UNKNOWN_ACTOR), &character, NOW)
+        .unwrap();
+    assert_eq!(
+        chat_texts(&out.replies),
+        vec!["Close the forging game before changing jobs, equipment or interacting.".to_owned()]
+    );
+
+    let mut game = w104_game();
+    start(&mut game, Engine::Cooking);
+    start(&mut game, Engine::Smelting);
+    assert!(matches!(game.running_movie(), Some(Movie::Cooking)));
+    let out = game
+        .handle_in_world(&interact(UNKNOWN_ACTOR), &character, NOW)
+        .unwrap();
+    assert_eq!(
+        chat_texts(&out.replies),
+        vec!["Close the cooking game before changing jobs, equipment or interacting.".to_owned()]
+    );
+}
+
+#[test]
+#[ignore = "requires the private W104 content"]
+fn one_movie_gate_keeps_the_five_blocks_refusals_and_cancel() {
+    for engine in Engine::ALL {
+        let (mut game, character) = running_movie_fixture(engine);
+        let noun = engine.noun();
+        let before = game.state();
+
+        // 26/42 with a wrong length is refused with that movie's error and
+        // changes nothing.
+        let error = game
+            .handle_in_world(&[26, 0, 42, 0, 0], &character, NOW)
+            .err()
+            .expect("the malformed leave must be refused");
+        assert_eq!(error.to_string(), format!("invalid {noun} leave request"));
+        assert_eq!(
+            game.state(),
+            before,
+            "{noun}: the malformed leave changed the state"
+        );
+
+        // Every blocked family answers with that movie's text and stages nothing.
+        for packet in blocked_families() {
+            let out = game.handle_in_world(&packet, &character, NOW).unwrap();
+            assert_eq!(
+                chat_texts(&out.replies),
+                vec![format!(
+                    "Close the {noun} game before changing jobs, equipment or interacting."
+                )],
+                "{noun}: {packet:?}"
+            );
+            assert!(!out.changed, "{noun}: a blocked family changed the state");
+            assert_eq!(game.state(), before, "{noun}: {packet:?}");
+        }
+
+        // Other realm text and plain chat are answered and swallowed as before.
+        // `status` is an ordinary command, so the developer gate in front of the
+        // movie gate does not answer it first.
+        let out = game
+            .handle_in_world(&chat("realm status"), &character, NOW)
+            .unwrap();
+        assert_eq!(
+            chat_texts(&out.replies),
+            vec![format!(
+                "Close the {noun} game before other opening actions."
+            )]
+        );
+        assert_eq!(game.state(), before, "{noun}: realm text changed the state");
+        let out = game.handle_in_world(&chat(""), &character, NOW).unwrap();
+        assert!(
+            chat_texts(&out.replies).is_empty(),
+            "{noun}: plain chat was answered"
+        );
+        assert_eq!(game.state(), before, "{noun}: plain chat changed the state");
+
+        // 39/x reaches that movie's engine: a truncated header is its own error
+        // and leaves the run untouched.
+        let error = game
+            .handle_in_world(&[39, 0, 5], &character, NOW)
+            .err()
+            .expect("the truncated 39/x must reach the engine");
+        assert_eq!(error.to_string(), "truncated minigame header", "{noun}");
+        assert_eq!(game.state(), before, "{noun}: the 39/x error changed state");
+
+        // `realm exit` cancels the engine, applies its outcome and clears the
+        // movie's clock; the run grants nothing.
+        let out = game
+            .handle_in_world(&chat("realm exit"), &character, NOW)
+            .unwrap();
+        assert!(out.changed, "{noun}: exit changed nothing");
+        assert!(
+            !engine.is_active(&game),
+            "{noun}: exit left the movie active"
+        );
+        assert_eq!(game.forging_tick_ms, None, "{noun}: forging clock left");
+        assert_eq!(game.type8_tick_ms, None, "{noun}: type8 clock left");
+        assert_eq!(
+            &game.state().inventory,
+            &before.inventory,
+            "{noun}: exit paid an item"
+        );
+    }
+}
+
+#[test]
+#[ignore = "requires the private W104 content"]
+fn movie_tick_keeps_the_250ms_rule_for_every_engine() {
+    for engine in [Engine::Forging, Engine::Mining, Engine::Harvesting] {
+        let (mut game, character) = running_movie_fixture(engine);
+        let noun = engine.noun();
+        let clock = |game: &Gameplay| match engine {
+            Engine::Forging => game.forging_tick_ms,
+            _ => game.type8_tick_ms,
+        };
+        assert_eq!(clock(&game), Some(NOW), "{noun}: the start clock");
+        let before = game.state();
+        let out = game.tick(&character, NOW + 100).unwrap();
+        assert!(out.replies.is_empty(), "{noun}: a not-due tick replied");
+        assert_eq!(clock(&game), Some(NOW), "{noun}: a not-due tick stamped");
+        assert_eq!(
+            game.state(),
+            before,
+            "{noun}: a not-due tick advanced the run"
+        );
+
+        game.tick(&character, NOW + 250).unwrap();
+        assert_eq!(
+            clock(&game),
+            Some(NOW + 250),
+            "{noun}: the due tick did not stamp"
+        );
+        // Fifty milliseconds later is not due again; the stamp stays put.
+        game.tick(&character, NOW + 300).unwrap();
+        assert_eq!(clock(&game), Some(NOW + 250), "{noun}: an early restamp");
+    }
+
+    // Cooking and smelting run on client input alone: their world tick is the
+    // same no-op and neither clock is touched.
+    for engine in [Engine::Cooking, Engine::Smelting] {
+        let (mut game, character) = running_movie_fixture(engine);
+        let noun = engine.noun();
+        let before = game.state();
+        let out = game.tick(&character, NOW + 1_000).unwrap();
+        assert!(out.replies.is_empty(), "{noun}: the no-op tick replied");
+        assert_eq!(game.state(), before, "{noun}: the no-op tick changed state");
+        assert_eq!(game.forging_tick_ms, None);
+        assert_eq!(game.type8_tick_ms, None);
+    }
+
+    // A missing clock means no tick at all.
+    let (mut game, character) = running_movie_fixture(Engine::Forging);
+    game.forging_tick_ms = None;
+    let before = game.state();
+    let out = game.tick(&character, NOW + 5_000).unwrap();
+    assert!(out.replies.is_empty());
+    assert_eq!(game.forging_tick_ms, None);
+    assert_eq!(game.state(), before);
+}
