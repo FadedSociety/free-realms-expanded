@@ -50,19 +50,71 @@
     },
     {
       "id": 3160003,
+      "job": 12,
       "title_string_id": 20859,
       "giver_npc_id": 9000000324,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "zone_id": 0,
+          "position": [
+            -491.1717,
+            9.964384,
+            778.1584
+          ],
+          "radius": 5.0,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1 (Fizzlesticks, Robgoblin Camp), row 1; description 20860; step 20862 ('Search the wilds near the Robgoblin Camp for the thieving Robgoblin Adept!' resolved from raw 3029826073 in lab/reports/locale-id-map.json) and step 22207 ('The spell book thief was last seen heading northwest out of the Robgoblin Camp.')."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T242: the thieving Robgoblin Adept is not a resolved field actor and no spell-book item definition is proven, so the search is a server-verified camp position rather than a fabricated kill target (model_id) or item id (collect_item). The point is the ground under the drawable Robgoblin Camp NPC Squee (9000000949, legacy_data, Wilds), which is proven standable camp ground; the client's 'northwest' bearing is not resolvable in this server's world axes, so no compass claim is made. Radius 5 m keeps the point outside the 12 m NPC talk ring, so accepting at Fizzlesticks cannot complete it without moving."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000324,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Band 1 row 1; the hand-in is to Fizzlesticks in the Robgoblin Camp (raw 2492597487 resolves to locale 9797, the recovered 'that is my spell book' debrief)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T242: objective ordinal 2 is the server binding for the client's hand-in step. The giver is also the turn-in NPC; no separate turn-in row is recovered."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "12": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T242: the guide's reward cell for Band 1 row 1 is unknown. Five coins use the W110 small-referral fallback; 25 Wizard (profile 12) job XP is the first-chapter rate used by the T194/T202 multi-objective chapter precedent. No item is granted: the Amateur Wizard Wand definition mapping is unproven (T197 precedent), so the reward is coins and job XP only."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 1; name 'Wizard: How to be a Wizard'; title id cell ucdt 2048787144 / ugdt 1624230361"
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1, row 1; name 'Wizard: How to be a Wizard'; title 20859 and description 20860 verified in lab/reports/locale-id-to-text.json; guide title ids ucdt 2048787144 / ugdt 1624230361; intro 698508245 -> 24947 and end 2492597487 -> 9797 from lab/reports/locale-id-map.json."
         },
         {
           "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 1; name 'Wizard: How to be a Wizard'; title id cell ucdt 2048787144 / ugdt 1624230361"
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Band 1 row 1; Fizzlesticks at the Robgoblin Camp, start of the Wizard line (wiki Wizard page)."
         },
         {
           "kind": "reconstructed",
@@ -70,49 +122,95 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+          "evidence": "(R) T242: job gate 12 (Wizard, jobs.json profile 12) at the schema's rank-1 default. The chapter is offered only while Wizard is the active job, mirroring the T194 Archer chapter job gate. The client's level-20 Medic unlock is the trainer prerequisite in job_trainers.json (W176), not a quest gate."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T242: no prerequisite. The guide's row 1 is the start of the line and records no predecessor; the Wizard job gate is the only offer gate."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+          "evidence": "(R) T242: the two objectives are a server-verified camp search position and the Fizzlesticks hand-in. No item is fabricated for the spell book and no other Wizard record is enabled by this slice."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T242: intro/description/end text ids are client locale ids from the guide (intro 24947, description 20860, end 9797); no prose is authored."
         }
       ],
       "description_string_id": 20860,
-      "enabled": false
+      "intro_text_string_id": 24947,
+      "end_text_string_id": 9797,
+      "enabled": true
     },
     {
       "id": 3160004,
+      "job": 12,
       "title_string_id": 22188,
       "giver_npc_id": 9000000324,
       "prerequisite_quest_ids": [
         3160003
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "zone_id": 0,
+          "position": [
+            -475.6702,
+            9.8823,
+            781.8755
+          ],
+          "radius": 5.0,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1 row 2; description 22189 ('somewhere in the Robgoblin Camp'); intro 22190 ('Can you search that junkpile over there and try to find them?'); step 103129 ('Find Fizzlesticks' glasses in the Robgoblin Camp.', raw 3740861002) and step 38878 (return the glasses to Fizzlesticks, raw 3829448281)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T242: the camp junkpile is Nurble the junkmaster's ground spot (9000000415, legacy_data, Wilds), the drawable camp NPC the client text points at; \"Fizzlesticks' Reading Glasses\" has no proven item definition, so this is visit_position rather than collect_item. Radius 5 m keeps the point 8 m outside the 12 m Fizzlesticks talk ring even after the book hand-in."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000324,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Band 1 row 2; step 38878 ('Take the glasses back to Fizzlesticks in the Robgoblin Camp.') and the hand-in line raw 3980759232 -> locale 38882."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T242: objective ordinal 2 is the server binding for the client's hand-in step at the giver."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "12": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T242: the guide's reward cell for Band 1 row 2 is unknown. Five coins use the W110 small-referral fallback; 25 Wizard (profile 12) job XP matches row 1's first-chapter rate. No item is granted."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 2; name \"Wizard: I Can't Read This!\"; title id cell ucdt 2701944597 / ugdt 1368051160"
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1, row 2; name \"Wizard: I Can't Read This!\"; title 22188 and description 22189 verified in lab/reports/locale-id-to-text.json; guide title ids ucdt 2701944597 / ugdt 1368051160."
         },
         {
           "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Quest line > Band 1: unlocking the job and level 1 to 5 (Fizzlesticks, Robgoblin Camp), row 2; name \"Wizard: I Can't Read This!\"; title id cell ucdt 2701944597 / ugdt 1368051160"
+          "evidence": "notes/Build Guides/Content/Jobs/Wizard.md: Band 1 row 2; Fizzlesticks, after Band 1 row 1 (wiki Wizard page)."
         },
         {
           "kind": "reconstructed",
@@ -120,33 +218,25 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+          "evidence": "(R) T242: job gate 12 (Wizard, jobs.json profile 12) at the schema's rank-1 default, the same gate as row 1. The chapter is offered only while Wizard is the active job."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T242: prerequisite 3160003 is the guide's 'After 1'. It is the only ordering gate; the two quests are not offered together."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+          "evidence": "(R) T242: the record's intro id 22187 resolved to a QA 'Blacksmithing!' string, so it was replaced with 22190, the locale id immediately after description 22189 whose text is Fizzlesticks asking the player to search the junkpile. The guide's 24948 is a dagger (wording-only) pitch candidate and is not used. End text 38882 replaces 22190, which is the intro line, not the debrief."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) source explicitly says after row 1; mapped that page label to the preceding batch content key"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T242: the junkpile search is a server-verified position; no glasses item definition is proven and no prose is authored."
         }
       ],
       "description_string_id": 22189,
-      "intro_text_string_id": 22187,
-      "end_text_string_id": 22190,
-      "enabled": false
+      "intro_text_string_id": 22190,
+      "end_text_string_id": 38882,
+      "enabled": true
     },
     {
       "id": 3160005,
