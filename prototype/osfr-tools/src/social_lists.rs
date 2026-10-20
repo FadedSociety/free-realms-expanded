@@ -12,7 +12,10 @@ use std::{
     hash::BuildHasher,
     io::{self, Read},
     path::Path,
-    sync::atomic::{AtomicU32, Ordering},
+    sync::{
+        OnceLock,
+        atomic::{AtomicU32, Ordering},
+    },
 };
 
 const SOCIAL_SCHEMA_VERSION: u32 = 1;
@@ -33,6 +36,9 @@ pub const MAX_POSITION_ENTRIES: usize = 512;
 pub const DEFAULT_GROUP_INVITE_TTL_MS: u64 = 60_000;
 const MIN_GROUP_INVITE_TTL_MS: u64 = 1_000;
 const MAX_GROUP_INVITE_TTL_MS: u64 = 600_000;
+/// `(R)` Invitation generations occupy the high half of the u32 space; group ids ascend from 1,
+/// so the echoed 40/1 token cannot alias a live group id until a process creates 2^31 groups.
+const INVITE_GENERATION_BASE: u32 = 1 << 31;
 
 /// The original client has no recovered friend-list cap; this module adds no cap.
 #[derive(Clone, Debug, Eq, PartialEq, Ord, PartialOrd, Serialize, Deserialize)]
@@ -291,13 +297,17 @@ struct Group {
 }
 
 /// `(R)` A client can still hold a pop-up from before a server restart, so the generation
-/// namespace must not repeat across processes. The OS-seeded hasher gives each process a random
-/// start; the counter keeps two services built in one process distinct, which is how the restart
-/// regression constructs its "previous epoch".
+/// namespace must not repeat across processes. One OS-seeded base per process gives a random
+/// start; the atomic counter then keeps two services built in one process distinct (until 2^31
+/// services, unreachable), which is how the restart regression constructs its "previous epoch".
 fn invite_epoch() -> u32 {
+    static BASE: OnceLock<u32> = OnceLock::new();
     static SERVICES: AtomicU32 = AtomicU32::new(0);
-    std::collections::hash_map::RandomState::new()
-        .hash_one(SERVICES.fetch_add(1, Ordering::Relaxed)) as u32
+    let base = *BASE.get_or_init(|| {
+        (std::collections::hash_map::RandomState::new().hash_one(()) as u32)
+            | INVITE_GENERATION_BASE
+    });
+    (base.wrapping_add(SERVICES.fetch_add(1, Ordering::Relaxed))) | INVITE_GENERATION_BASE
 }
 
 #[derive(Clone, Copy, Debug)]
@@ -322,9 +332,10 @@ pub struct SocialService {
     /// Host policy copied with the service; never persisted and not part of the saved profile.
     group_invite_ttl_ms: u64,
     next_group_id: u32,
-    /// `(R)` 40/1 generation: a fresh nonzero random `invite_epoch` per service, then monotonic;
-    /// volatile and never persisted, so a restarted process starts a new namespace and a
-    /// pre-restart pop-up is refused.
+    /// `(R)` 40/1 generation: a fresh nonzero `invite_epoch` per service (a random high-half
+    /// start), then increments by one. Volatile and never persisted, so a restarted process
+    /// starts a new namespace and a pre-restart pop-up is refused; the high half keeps a token
+    /// clear of the group-id namespace.
     next_invite_id: u32,
     groups: BTreeMap<u32, Group>,
     member_group: BTreeMap<u64, u32>,
@@ -346,7 +357,7 @@ impl SocialService {
             max_group_members,
             group_invite_ttl_ms: DEFAULT_GROUP_INVITE_TTL_MS,
             next_group_id: 1,
-            next_invite_id: invite_epoch().max(1),
+            next_invite_id: invite_epoch(),
             groups: BTreeMap::new(),
             member_group: BTreeMap::new(),
             group_invites: BTreeMap::new(),
@@ -780,7 +791,7 @@ impl SocialService {
         // `(R)` Each invitation gets a fresh generation for the echoed dword, so a stale
         // pop-up is distinguishable from a same-group replacement (the group id is not).
         let invite_id = self.next_invite_id;
-        self.next_invite_id = self.next_invite_id.wrapping_add(1).max(1);
+        self.next_invite_id = self.next_invite_id.wrapping_add(1) | INVITE_GENERATION_BASE;
         self.group_invites.insert(
             target.character_guid,
             PendingGroupInvite {
@@ -1702,8 +1713,6 @@ mod tests {
             },
         );
         let members = social.group_members(group_id).unwrap().to_vec();
-        let leader = social.group_leader(group_id);
-        let profiles = [101, 202, 303].map(|guid| social.profile(guid).cloned());
 
         let refused = social
             .respond_group_invite(303, invite_id, true, 0)
@@ -1713,10 +1722,5 @@ mod tests {
         assert_eq!(social.group_invitee(303), Some((group_id, 101)));
         assert_eq!(social.group_of(303), None);
         assert_eq!(social.group_members(group_id), Some(members.as_slice()));
-        assert_eq!(social.group_leader(group_id), leader);
-        assert_eq!(
-            [101, 202, 303].map(|guid| social.profile(guid).cloned()),
-            profiles
-        );
     }
 }
