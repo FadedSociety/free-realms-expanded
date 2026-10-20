@@ -140,6 +140,45 @@ fn ledger(world: &SharedWorld, guid: u64) -> Vec<u64> {
     world.fishing_hours.get(&guid).cloned().unwrap_or_default()
 }
 
+/// Drain the replies the real session has queued, acknowledging each reliable batch the way the
+/// client does so the sender window keeps draining. The regression must inspect the bytes the
+/// real dispatch produced, not only a probe clone's prediction (review finding 6).
+fn drain_replies(session: &mut Session, now: u64) -> Vec<Vec<u8>> {
+    let mut messages = Vec::new();
+    loop {
+        let wires = session.sender.poll(now).unwrap();
+        if wires.is_empty() {
+            return messages;
+        }
+        let mut last = None;
+        for wire in wires {
+            let packet = session.codec.decode(&wire).unwrap();
+            if !matches!(packet.opcode, RELIABLE_DATA | RELIABLE_FRAGMENT)
+                || packet.payload.len() < 2
+            {
+                continue;
+            }
+            let sequence = u16::from_be_bytes([packet.payload[0], packet.payload[1]]);
+            last = Some(sequence);
+            // A two-byte reliable sequence prefixes each unfragmented application message.
+            if packet.opcode == RELIABLE_DATA && packet.payload.len() > 2 {
+                messages.push(packet.payload[2..].to_vec());
+            }
+        }
+        // A batch with no reliable packet cannot advance the sender window.
+        let Some(sequence) = last else {
+            return messages;
+        };
+        session
+            .sender
+            .acknowledge(&osfr_tools::soe::Packet {
+                opcode: CUMULATIVE_ACK,
+                payload: sequence.to_be_bytes().to_vec(),
+            })
+            .unwrap();
+    }
+}
+
 fn try_catch(
     session: &mut Session,
     options: &Options,
@@ -470,6 +509,9 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
     );
     let before_refusal = second.gateway.snapshot();
     let before_refusal_file = fs::read(&state_path).unwrap();
+    // Clear replies queued by the preceding login/enter/register requests so the drain after the
+    // attempt holds exactly this attempt's replies.
+    drain_replies(&mut second, caught_at + 60_000);
     let (blocked, blocked_at) = try_catch(
         &mut second,
         &options,
@@ -480,16 +522,15 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
     );
     assert!(!blocked.state_changed, "a capped catch requests no save");
     assert!(!blocked.gameplay_changed);
-    let replies = blocked.replies.concat();
+    let replies = drain_replies(&mut second, blocked_at);
     assert!(
-        String::from_utf8_lossy(&replies).contains("reward limit"),
+        String::from_utf8_lossy(&replies.concat()).contains("reward limit"),
         "the capped catch takes the refusal path"
     );
     // The cap refusal is an in-game escape, not a transaction refusal: the fish gets away
     // (138/14 result 0), so the attempt is intentionally consumed. The no-reward/no-save rule
     // is the transaction guarantee asserted below.
-    let escape = blocked
-        .replies
+    let escape = replies
         .iter()
         .find(|reply| reply.get(7..11) == Some(&[138u8, 0, 14, 0][..]))
         .expect("a capped catch must send a result");
@@ -533,7 +574,10 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
         vec![paid_again]
     );
     assert_eq!(ledger(&world, guid), vec![paid_again]);
-    // The lead's 313d8cc publication is restored; its idle-expiry gap is a lead follow-up, so
-    // this test does not pin the buggy outcome.
+    // Removed coverage: the idle-expiry assertion (an owner tick after the window must drop the
+    // expired timestamp) failed because the lead's restored publication republishes the
+    // session's history after the sweep. That is lead backlog L008; its fix filters the history
+    // before the insert and must restore the assertion here. This test does not pin the buggy
+    // outcome (review finding 5).
     assert_ne!(fs::read(&state_path).unwrap(), before_refusal_file);
 }
