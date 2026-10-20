@@ -422,10 +422,10 @@ impl Gameplay {
         self.append_shared_pending_end_screen(&mut packets);
         Ok((visible, packets))
     }
-    pub fn bind_run_instance(&mut self, instance: i32) -> io::Result<bool> {
+    pub fn bind_run_instance(&mut self, instance: i32, scene_reload: bool) -> io::Result<bool> {
         self.encounter
             .as_mut()
-            .map_or(Ok(false), |e| e.bind_run_instance(instance))
+            .map_or(Ok(false), |e| e.bind_run_instance(instance, scene_reload))
     }
     pub fn field_participant(
         &self,

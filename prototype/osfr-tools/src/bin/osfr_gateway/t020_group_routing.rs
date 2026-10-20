@@ -1042,6 +1042,73 @@ fn f182_a_big_heart_group_heal_claims_the_pickers_instance() {
     fs::remove_dir_all(scratch).unwrap();
 }
 
+/// F234: the heal filter is (zone, instance), not just zone. A group member in
+/// a child instance of the picker's zone must not be healed or saved; once the
+/// member moves into the picker's instance a fresh kill heals once.
+#[test]
+fn f234_a_cross_instance_group_member_is_not_healed_or_saved() {
+    let (mut server, keys, scratch) = server_rig("f234-heal");
+    let invited = route_server(&mut server, keys[0], &invite(0, 1, 0));
+    let invite_id = invited_id(&invited, 1);
+    let group = server.world.social.group_of(GUIDS[0]).unwrap();
+    route_server(&mut server, keys[1], &response(0, 1, invite_id, true));
+    // The 40/2 token is per invitation, not the group id: assert the party
+    // exists, so the cross-instance refusal below is not a solo no-op.
+    assert_eq!(
+        server.world.social.group_of(GUIDS[1]),
+        Some(group),
+        "the hurt member is in the picker's party"
+    );
+    // A is in zone 0's public instance; B is in a child of the same zone.
+    enter_member(&mut server.membership, GUIDS[0], None);
+    let child = server
+        .membership
+        .create_child_instance(
+            0,
+            0,
+            osfr_tools::world::InstanceKind::Encounter { encounter_id: 0 },
+            0,
+        )
+        .unwrap();
+    enter_member(&mut server.membership, GUIDS[1], Some(child));
+    let hurt = damaged_gateway(&server, keys[1], 100);
+    hurt_member(&mut server, keys[1], &hurt);
+    let save_path = server.sessions[&keys[1]].state_path.clone();
+    let saved_before = fs::read(&save_path).ok();
+
+    group_heal(&mut server, keys[0], (7, 9));
+    assert_eq!(
+        member_health(&server, keys[1]),
+        100,
+        "a member in another instance of the same zone is not healed"
+    );
+    assert_eq!(
+        fs::read(&save_path).ok(),
+        saved_before,
+        "the refused cross-instance heal writes no save"
+    );
+
+    // B joins A's instance: a fresh kill heals once per kill.
+    enter_member(&mut server.membership, GUIDS[1], None);
+    group_heal(&mut server, keys[0], (7, 10));
+    let healed = member_health(&server, keys[1]);
+    assert!(healed > 100, "the same-instance member is healed");
+    assert_ne!(
+        fs::read(&save_path).ok(),
+        saved_before,
+        "the accepted same-instance heal saves the member"
+    );
+    group_heal(&mut server, keys[0], (7, 10));
+    assert_eq!(
+        member_health(&server, keys[1]),
+        healed,
+        "one group heal per kill"
+    );
+
+    drop(server);
+    fs::remove_dir_all(scratch).unwrap();
+}
+
 fn enter_member(membership: &mut World, guid: u64, target: Option<i32>) {
     let change = membership
         .prepare_membership(guid, 0, target, WorldPose::ORIGIN, true, 0)

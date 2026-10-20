@@ -770,8 +770,8 @@ pub struct EncounterEngine {
     /// Zone the pickups were dropped in; a different zone clears them.
     pickup_zone: Option<u32>,
     /// World instance this session's scene is bound to (`bind_run_instance`).
-    /// A different instance is a client scene reload, so the ground pickups are
-    /// gone too; the held power-up stays (player state).
+    /// A begin-zoning reload (opcode 31) drops the ground pickups even into the
+    /// same instance; the held power-up stays (player state).
     pickup_instance: Option<i32>,
 }
 
@@ -863,17 +863,20 @@ impl Ground {
 }
 
 impl EncounterEngine {
-    pub fn bind_run_instance(&mut self, instance: i32) -> io::Result<bool> {
+    /// Bind the session to its membership instance. `scene_reload` is the
+    /// commit's begin-zoning fact: every opcode 31 begin-zoning (body reader
+    /// 0x008e4ae0) makes the client reload its scene, including into the same
+    /// world instance (a safe-location revive or a same-instance transfer), so
+    /// its ground pickups no longer exist there. A changed instance id is a
+    /// reload too. The held power-up is player state and stays.
+    pub fn bind_run_instance(&mut self, instance: i32, scene_reload: bool) -> io::Result<bool> {
         if instance < 0 {
             return Err(invalid("negative encounter instance"));
         }
-        // (R) The session's membership instance is the scene the client loaded;
-        // binding a different one is a scene reload (opcode 31 begin-zoning,
-        // client reader 0x008e4ae0), so its ground pickups no longer exist
-        // there. The held power-up is player state and stays.
-        if self
-            .pickup_instance
-            .is_some_and(|previous| previous != instance)
+        if scene_reload
+            || self
+                .pickup_instance
+                .is_some_and(|previous| previous != instance)
         {
             self.pickups.clear();
         }

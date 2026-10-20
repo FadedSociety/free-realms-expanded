@@ -441,7 +441,7 @@ mod unit {
             2,
         )
         .unwrap();
-        assert!(e.bind_run_instance(22).unwrap());
+        assert!(e.bind_run_instance(22, false).unwrap());
         let out = e.on_zone_ready(2, 0).unwrap();
         let packets: Vec<_> = out
             .replies

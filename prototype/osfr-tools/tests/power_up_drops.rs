@@ -378,11 +378,11 @@ fn an_instance_bind_discards_ground_pickups_but_not_the_held_power_up() {
     kill(&mut e, FIRST + 1, 2_000);
     assert_eq!(e.pickup_count(), 1);
     assert!(
-        !e.bind_run_instance(0).unwrap(),
+        !e.bind_run_instance(0, false).unwrap(),
         "the same instance keeps the drop"
     );
     assert_eq!(e.pickup_count(), 1);
-    e.bind_run_instance(1).unwrap();
+    e.bind_run_instance(1, false).unwrap();
     assert_eq!(e.pickup_count(), 0, "a new instance is a scene reload");
     assert_eq!(
         e.held_power_up(),
@@ -393,6 +393,34 @@ fn an_instance_bind_discards_ground_pickups_but_not_the_held_power_up() {
     assert!(
         removed(&after).is_empty() && health(&after).is_none(),
         "the old instance's drop must not pay out after the reload"
+    );
+}
+
+#[test]
+fn a_revive_or_same_instance_transfer_reload_discards_ground_pickups() {
+    // A free revive at the safe location and a host-authorized transfer to the
+    // current instance both send opcode 31 (reader 0x008e4ae0) with the same
+    // world instance: the client reloads its scene, so the old drop is gone.
+    let f = Fixture::new(&[Some("boss")]);
+    let mut e = f.load_hurt(400);
+    e.enter_zone(0);
+    kill(&mut e, FIRST, 1_000);
+    assert_eq!(e.pickup_count(), 1);
+    assert!(
+        !e.bind_run_instance(0, false).unwrap(),
+        "an ordinary commit is not a scene reload"
+    );
+    assert_eq!(e.pickup_count(), 1);
+    e.bind_run_instance(0, true).unwrap();
+    assert_eq!(
+        e.pickup_count(),
+        0,
+        "a begin-zoning reload clears the old scene's pickups"
+    );
+    let after = e.tick(SPOT, 11, 1_200).unwrap();
+    assert!(
+        removed(&after).is_empty() && health(&after).is_none(),
+        "the stale big heart must not heal after the reload"
     );
 }
 

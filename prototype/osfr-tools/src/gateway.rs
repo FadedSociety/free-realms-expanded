@@ -719,10 +719,10 @@ impl Gateway {
     pub fn take_shared_fields(&mut self) -> Option<crate::encounter::SharedFieldState> {
         self.gameplay.as_mut()?.take_shared_fields()
     }
-    pub fn bind_run_instance(&mut self, instance: i32) -> io::Result<bool> {
+    pub fn bind_run_instance(&mut self, instance: i32, scene_reload: bool) -> io::Result<bool> {
         self.gameplay
             .as_mut()
-            .map_or(Ok(false), |g| g.bind_run_instance(instance))
+            .map_or(Ok(false), |g| g.bind_run_instance(instance, scene_reload))
     }
     pub fn field_participant(&self) -> Option<crate::encounter::FieldParticipant> {
         self.gameplay.as_ref()?.field_participant(&self.state)

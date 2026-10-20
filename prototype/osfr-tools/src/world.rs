@@ -1090,10 +1090,10 @@ impl World {
         } else {
             let derived =
                 i32::try_from(zone_id).map_err(|_| WorldError::NumericRange("zone id"))?;
-            if self.public_id_free(derived) {
+            if self.instance_id_free(derived) {
                 derived
             } else {
-                self.available_public_id()?
+                self.available_public_id(i32::MAX)?
             }
         };
         Ok((
@@ -1102,20 +1102,29 @@ impl World {
         ))
     }
 
-    fn public_id_free(&self, id: InstanceId) -> bool {
+    /// One id-uniqueness rule for every instance space: a positive id no live
+    /// instance owns and no public scene maps.
+    fn instance_id_free(&self, id: InstanceId) -> bool {
         id > 0
             && !self.instances.contains_key(&id)
             && !self.public_instances.values().any(|value| *value == id)
     }
 
-    fn available_public_id(&self) -> Result<InstanceId, WorldError> {
-        (1..)
-            .find(|id| {
-                self.public_id_free(*id)
-                    && !u32::try_from(*id)
-                        .ok()
-                        .is_some_and(|zone_id| self.zones.contains_key(&zone_id))
-            })
+    /// A free id that is also no registered zone's own id, so an allocator
+    /// never shadows the scene that id belongs to.
+    fn instance_id_available(&self, id: InstanceId) -> bool {
+        self.instance_id_free(id)
+            && !u32::try_from(id)
+                .ok()
+                .is_some_and(|zone_id| self.zones.contains_key(&zone_id))
+    }
+
+    /// Lowest free public id at or below `max`. Production passes the whole
+    /// positive `i32` space; the explicit end keeps the scan total (`1..` would
+    /// overflow its `i32` successor at `MAX`) and lets a test reach exhaustion.
+    fn available_public_id(&self, max: InstanceId) -> Result<InstanceId, WorldError> {
+        (1..=max)
+            .find(|id| self.instance_id_available(*id))
             .ok_or(WorldError::InstanceIdsExhausted)
     }
 
@@ -1368,13 +1377,7 @@ impl World {
         loop {
             let id = next;
             next = id.checked_add(1).ok_or(WorldError::InstanceIdsExhausted)?;
-            if id > 0
-                && !self.instances.contains_key(&id)
-                && !self.public_instances.values().any(|value| *value == id)
-                && !u32::try_from(id)
-                    .ok()
-                    .is_some_and(|zone_id| self.zones.contains_key(&zone_id))
-            {
+            if self.instance_id_available(id) {
                 return Ok((id, next));
             }
         }
@@ -1491,4 +1494,61 @@ fn to_wire_npc(npc: &ContentNpcSpawn) -> Result<NpcSpawn, WorldError> {
     // (R) The content schema lacks the rest of 35/2's display, animation,
     // interaction, and unknown fields. `Default` keeps those fields zero/empty.
     Ok(row)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    fn zone(id: u32) -> Zone {
+        Zone {
+            id,
+            name: String::new(),
+            geometry_id: Some(0),
+            zone_type: Some(2),
+            tutorial: Some(false),
+            sky: Some(String::new()),
+            source: Vec::new(),
+        }
+    }
+
+    /// Occupy `ids` with private rows; the test does not need players.
+    fn occupy(world: &mut World, ids: impl IntoIterator<Item = InstanceId>) {
+        for id in ids {
+            let mut row = world.instances[&0].clone();
+            row.id = id;
+            row.kind = InstanceKind::Encounter { encounter_id: 0 };
+            world.instances.insert(id, row);
+        }
+    }
+
+    /// F234 BLOCKER: the public-id probe used to be an unbounded `1..` scan
+    /// whose `ok_or` was dead, so the documented refusal could never happen and
+    /// the `i32` successor overflowed at the top. The scan must end at `max`.
+    #[test]
+    fn the_public_id_scan_ends_at_its_bound_and_reports_exhaustion() {
+        let mut world = World::runtime();
+        occupy(&mut world, 1..=3);
+        assert_eq!(
+            world.available_public_id(3),
+            Err(WorldError::InstanceIdsExhausted),
+            "the scan must end at its bound, not borrow an id above it"
+        );
+        assert_eq!(world.available_public_id(4), Ok(4));
+    }
+
+    /// The public fallback and the private cursor share one availability
+    /// predicate: a registered zone's own id stays free for that zone's public
+    /// instance, and neither allocator shadows it.
+    #[test]
+    fn allocated_ids_keep_every_registered_zone_id_free() {
+        let mut world = World::runtime();
+        world.register_runtime_zone(zone(1)).unwrap();
+        assert_eq!(world.available_public_id(4), Ok(2));
+        assert_eq!(world.available_instance_id(), Ok((2, 3)));
+        assert!(
+            world.instance_id_free(1),
+            "the zone may still take its own id for its public instance"
+        );
+    }
 }

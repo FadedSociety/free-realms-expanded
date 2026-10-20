@@ -1774,7 +1774,9 @@ impl Session {
                     .unwrap_or(0),
             )?;
             // W111 gap: bind the existing solo run before Ready can emit 41/*.
-            let bound = staged_gateway.bind_run_instance(instance.world_instance_id()?)?;
+            // A begin-zoning reload also drops the old scene's ground pickups.
+            let bound = staged_gateway
+                .bind_run_instance(instance.world_instance_id()?, outcome.began_zoning)?;
             outcome.state_changed |= bound;
             let mut staged_world = world.clone();
             let cutoff = now_ms.saturating_sub(osfr_tools::fishing_service::HOUR_WINDOW_MS);
