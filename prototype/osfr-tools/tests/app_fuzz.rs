@@ -822,6 +822,17 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     // subtype without a snapshot change. The wildcard covers the family route.
     result.push(("soccer", words(76, 14, &[u32::MAX; 15])));
     result.push(("soccer", vec![76, 0, 0xff, 0xff]));
+    // T007: matchmaking list/stats and the explicit join refusal (queue id in the
+    // native 141/3 prefix), the in-progress list request, and the lobby close
+    // (family 101 has a three-byte header and a nonzero u32 lobby type).
+    result.push(("matchmaking", words(141, 1, &[u32::MAX; 2])));
+    result.push(("matchmaking", words(141, 3, &[u32::MAX; 6])));
+    result.push(("matchmaking", words(141, 13, &[u32::MAX; 2])));
+    result.push(("matchmaking", words(41, 129, &[u32::MAX; 4])));
+    result.push(("matchmaking", vec![101, 0, 9, 3, 0, 0, 0]));
+    // A guarded one-byte-sub family needs an unknown subtype seed for the source
+    // inventory; 101/0xff contains no understood lobby close.
+    result.push(("gameplay.handle_in_world", vec![101, 0, 0xff, 0xff]));
     result.push(("free_interaction", words(26, 20, &[])));
     result.push(("profile_notice", words(26, 26, &[0x30, 0x30])));
     result.push(("profile_notice", words(26, 37, &[0; 3])));

@@ -1,10 +1,12 @@
+use osfr_tools::activity_portal::{Activity, Kind};
 use osfr_tools::{matchmaking, minigame, players};
 use std::cell::Cell;
 use std::rc::Rc;
 
 use matchmaking::{
-    Clock, InviteMemberNotice, JoinResult, Matchmaking, MatchmakingError, Participant,
-    QueueDefinition, QueueEntry, QueueListResponse, QueueRow, QueueStatsResponse, RandomSource,
+    Clock, EmptyRunningListResponse, InviteMemberNotice, JoinResult, Listings, Matchmaking,
+    MatchmakingError, MatchmakingRefusal, Participant, QueueDefinition, QueueEntry,
+    QueueListResponse, QueueRow, QueueStatsRequest, QueueStatsResponse, RandomSource,
     SessionOutbound, TunnelFrame, decode_activity_launched, decode_cancel_match_request,
     decode_invite_response, decode_server_status, encode_activity_launched,
     encode_cancel_match_request, encode_invite_response, encode_member_state, encode_server_status,
@@ -156,6 +158,170 @@ fn queue_row_and_queue_list_use_recovered_fixed_width_layout() {
         QueueStatsResponse::decode(&stats.encode().unwrap()).unwrap(),
         stats
     );
+}
+
+fn activity(id: u32, kind: Kind) -> Activity {
+    Activity {
+        id,
+        name_id: 7001,
+        description_id: 7002,
+        icon_id: 7003,
+        difficulty: 2,
+        required_level: 5,
+        kind,
+    }
+}
+
+fn listings() -> Listings {
+    Listings::from_activities(&[activity(96, Kind::Battle)]).unwrap()
+}
+
+/// The native 141/3 fixed prefix: request id (u64), one u32, then the queue id.
+fn join_request(queue_id: u32) -> Vec<u8> {
+    let mut join = vec![141, 0, 3, 0];
+    join.extend(0x0102_0304_0506_0708u64.to_le_bytes());
+    join.extend(0u32.to_le_bytes());
+    join.extend(queue_id.to_le_bytes());
+    join
+}
+
+#[test]
+fn adapter_answers_list_stats_running_list_and_leave_lobby() {
+    let listings = listings();
+    let key = 0x0102_0304_0506_0708;
+
+    let listed = matchmaking::route(
+        &matchmaking::ListQueuesRequest { session_key: key }.encode(),
+        &listings,
+    )
+    .unwrap()
+    .unwrap();
+    let list = QueueListResponse::decode(&listed.replies[0]).unwrap();
+    assert_eq!(list.session_key, key);
+    assert_eq!(list.rows.len(), 1);
+    assert_eq!(list.rows[0].queue_id(), 96);
+    assert_eq!(list.rows[0].wire_dwords[1], 7001);
+    assert_eq!(list.rows[0].wire_dwords[3..=4], [1, 1]);
+    assert_eq!(list.rows[0].wire_dwords[15], 7002);
+    assert_eq!(list.rows[0].wire_dwords[16], 7003);
+
+    let stats_request = QueueStatsRequest { session_key: key };
+    assert_eq!(
+        stats_request.encode(),
+        [141, 0, 13, 0, 8, 7, 6, 5, 4, 3, 2, 1],
+        "native 00a83670 writes the two header words then the 8-byte field"
+    );
+    assert_eq!(
+        QueueStatsRequest::decode(&stats_request.encode()).unwrap(),
+        stats_request
+    );
+    let stats = matchmaking::route(&stats_request.encode(), &listings)
+        .unwrap()
+        .unwrap();
+    // Native 00a9d590: u64 key, then two count-prefixed u32 arrays.
+    assert_eq!(
+        stats.replies[0].as_slice(),
+        &[
+            141, 0, 14, 0, 8, 7, 6, 5, 4, 3, 2, 1, 1, 0, 0, 0, 0, 0, 0, 0, 1, 0, 0, 0, 0, 0, 0, 0
+        ]
+    );
+    let stats = QueueStatsResponse::decode(&stats.replies[0]).unwrap();
+    assert_eq!(stats.session_key, key);
+    assert_eq!(stats.values_a, [0]);
+    assert_eq!(stats.values_b, [0]);
+
+    let mut running = vec![41, 0, 129, 0];
+    running.extend([0; 16]);
+    let running = matchmaking::route(&running, &Listings::from_activities(&[]).unwrap())
+        .unwrap()
+        .unwrap();
+    assert_eq!(
+        running.replies,
+        [vec![41, 0, 130, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0]],
+        "41/130 clears the in-progress table with a zero count"
+    );
+    EmptyRunningListResponse::decode(&running.replies[0]).unwrap();
+
+    // 101 has a one-byte subtype; the body's u32 lobby type is not zero.
+    let leave = matchmaking::route(&[101, 0, 9, 3, 0, 0, 0], &listings)
+        .unwrap()
+        .unwrap();
+    assert!(leave.replies.is_empty() && leave.refusal.is_none());
+}
+
+#[test]
+fn adapter_refuses_join_and_rejects_malformed_known_requests() {
+    let listings = listings();
+    let refused = matchmaking::route(&join_request(96), &listings)
+        .unwrap()
+        .unwrap();
+    assert_eq!(
+        refused.refusal,
+        Some(MatchmakingRefusal::JoinUnavailable { queue_id: 96 })
+    );
+    assert!(refused.replies.is_empty());
+
+    for malformed in [
+        vec![141, 0, 1],
+        vec![141, 0, 1, 0],
+        vec![141, 0, 13, 0, 0],
+        vec![41, 0, 129, 0],
+        vec![101, 0, 9, 0],
+        {
+            // One byte short of the join prefix: the queue id is not there.
+            let mut short_join = vec![141, 0, 3, 0];
+            short_join.extend([0; 15]);
+            short_join
+        },
+    ] {
+        assert_eq!(
+            matchmaking::route(&malformed, &listings),
+            Err(MatchmakingError::InvalidPacket),
+            "{malformed:02x?}"
+        );
+    }
+}
+
+#[test]
+fn only_the_implemented_families_are_claimed() {
+    for packet in [
+        vec![141],
+        vec![141, 0],
+        vec![101, 0],
+        vec![26, 0, 1, 0],
+        vec![76, 0, 1, 0],
+        vec![167, 0, 1, 4],
+    ] {
+        assert!(!matchmaking::handles(&packet), "{packet:02x?}");
+    }
+    for packet in [vec![141, 0, 1, 0], vec![41, 0, 129, 0], vec![101, 0, 9]] {
+        assert!(matchmaking::handles(&packet), "{packet:02x?}");
+    }
+}
+
+#[test]
+fn listings_publish_only_field_battles() {
+    let listings = Listings::from_activities(&[
+        activity(96, Kind::Battle),
+        activity(20, Kind::Chess { row_id: 20 }),
+        activity(42, Kind::Soccer),
+    ])
+    .unwrap();
+    let list = QueueListResponse::decode(&listings.queue_list(7).unwrap()).unwrap();
+    let ids: Vec<u32> = list.rows.iter().map(QueueRow::queue_id).collect();
+    assert_eq!(ids, [96], "chess and soccer are portal rows, not queues");
+    let stats = QueueStatsResponse::decode(&listings.queue_stats(7).unwrap()).unwrap();
+    assert_eq!(stats.values_a, [0], "one statistics slot per published row");
+    assert_eq!(stats.values_b, [0]);
+}
+
+#[test]
+fn empty_listing_has_no_rows_and_zero_stats() {
+    let listings = Listings::from_activities(&[]).unwrap();
+    let list = QueueListResponse::decode(&listings.queue_list(7).unwrap()).unwrap();
+    assert!(list.rows.is_empty());
+    let stats = QueueStatsResponse::decode(&listings.queue_stats(7).unwrap()).unwrap();
+    assert!(stats.values_a.is_empty() && stats.values_b.is_empty());
 }
 
 #[test]

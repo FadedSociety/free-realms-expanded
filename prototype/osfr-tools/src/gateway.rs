@@ -481,6 +481,10 @@ fn application_handler(body: &[u8]) -> &'static str {
         return "warp";
     }
     match (word(0), word(2)) {
+        // T007: the matchmaking list/stats/join, the empty in-progress list, and the
+        // lobby close. Family 101 has a one-byte subtype, so 101/9 is matched on body[2].
+        (Some(101), _) if body.get(2) == Some(&9) => "matchmaking",
+        (Some(141), Some(1 | 3 | 13)) | (Some(41), Some(129)) => "matchmaking",
         (Some(15), Some(1)) => "social_chat",
         (Some(67), Some(2 | 3)) => "quick_chat",
         (Some(26), Some(4 | 6 | 8 | 10 | 23)) => "npc_interaction",
@@ -2088,11 +2092,21 @@ mod radial_routing {
             (58, 0, "warp"),
             (90, 0, "warp"),
             (122, 0, "warp"),
+            (141, 1, "matchmaking"),
+            (141, 3, "matchmaking"),
+            (141, 13, "matchmaking"),
+            (41, 129, "matchmaking"),
         ] {
             let mut body = head(family, sub);
             body.extend([0u8; 8]);
             assert_eq!(application_handler(&body), label, "{family}/{sub}");
         }
+        // T007: family 101 has a one-byte subtype; 101/9 carries a u32 lobby type.
+        assert_eq!(application_handler(&[101, 0, 9, 3, 0, 0, 0]), "matchmaking");
+        assert_eq!(
+            application_handler(&[101, 0, 1, 0]),
+            "gameplay.handle_in_world"
+        );
         // 167 carries a service byte and a one-byte sub: 1/2 Play and 1/4 Refresh only.
         assert_eq!(application_handler(&[167, 0, 1, 4]), "activity_portal");
         assert_eq!(application_handler(&[53, 0, 4, 0, 0, 0, 0, 1]), "pets");

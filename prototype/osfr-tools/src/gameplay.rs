@@ -45,6 +45,7 @@ mod content_reload;
 mod derby_session;
 mod field_battle;
 mod jobs;
+mod matchmaking_route;
 mod npc;
 mod npc_quests;
 mod npc_turnin;
@@ -2209,6 +2210,9 @@ impl Gameplay {
             });
         }
         if let Some(out) = self.handle_mounts(inner, character, now_ms)? {
+            return Ok(out);
+        }
+        if let Some(out) = self.handle_matchmaking(inner)? {
             return Ok(out);
         }
         if let Some(out) = self.handle_soccer(inner, character, now_ms)? {

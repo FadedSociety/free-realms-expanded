@@ -5,6 +5,7 @@
 //! those decisions. Wire codecs below are limited to layouts recovered from
 //! the client readers/writers cited in `notes/Research/Matchmaking Service.md`.
 
+use crate::activity_portal::{Activity, Kind};
 use crate::minigame::{MinigameRuns, RunSpec};
 use crate::players::SessionId;
 use std::collections::{BTreeMap, BTreeSet, VecDeque};
@@ -12,9 +13,22 @@ use std::fmt;
 
 const FAMILY_MATCHMAKING: u16 = 141;
 const FAMILY_GROUP_LAUNCH: u16 = 175;
+const FAMILY_LOBBY: u16 = 101;
+const FAMILY_ENCOUNTER: u16 = 41;
+const SUB_MATCH_JOIN: u16 = 3;
+const SUB_QUEUE_STATS: u16 = 13;
+const SUB_LOBBY_LEAVE: u8 = 9;
+const SUB_RUNNING_LIST_REQUEST: u16 = 129;
+const SUB_RUNNING_LIST_RESPONSE: u16 = 130;
 const MAX_WIRE_ROWS: usize = 4096;
 const QUEUE_ROW_BYTES: usize = 19 * 4 + 2;
 const OUTER_HEADER_BYTES: usize = 7;
+const RUNNING_LIST_REQUEST_LEN: usize = 12 + 8;
+const LEAVE_LOBBY_LEN: usize = 3 + 4;
+/// 141/3 body prefix through the queue id (reader order below).
+const JOIN_QUEUE_ID_IN_BODY: usize = 0x0c;
+const JOIN_BODY_PREFIX: usize = JOIN_QUEUE_ID_IN_BODY + 4;
+const EMPTY_RUNNING_LIST_LEN: usize = 12 + 4;
 
 /// Injected monotonic clock. Values must not move backwards (R).
 pub trait Clock {
@@ -888,6 +902,35 @@ impl ListQueuesRequest {
     }
 }
 
+/// 141/13. Native `00a83b80` constructs sub-op 13 through `00a7fd30` and sends
+/// it through `00a83670`, which writes the header pair and the 8 bytes at packet
+/// `+0x10`. The constructor does not initialize those bytes, so they are opaque
+/// (R); the 141/14 reply echoes them like the 141/1 key.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct QueueStatsRequest {
+    pub session_key: u64,
+}
+
+impl QueueStatsRequest {
+    pub fn encode(self) -> Vec<u8> {
+        Packet141 {
+            sub_op: SUB_QUEUE_STATS,
+            body: self.session_key.to_le_bytes().to_vec(),
+        }
+        .encode()
+    }
+
+    pub fn decode(bytes: &[u8]) -> Result<Self, MatchmakingError> {
+        let packet = Packet141::decode(bytes)?;
+        if packet.sub_op != SUB_QUEUE_STATS || packet.body.len() != 8 {
+            return Err(MatchmakingError::InvalidPacket);
+        }
+        Ok(Self {
+            session_key: read_u64(&packet.body, 0)?,
+        })
+    }
+}
+
 /// 141/6 client cancellation carries the request's two-word 64-bit id.
 pub fn encode_cancel_match_request(request_id: u64) -> Vec<u8> {
     Packet141 {
@@ -1075,6 +1118,202 @@ impl QueueStatsResponse {
             values_a,
             values_b,
         })
+    }
+}
+
+/// 41/130 with no in-progress rows. `EncounterRunningListResponsePacket`
+/// (`00aa3500`) sets sub-op 130 and zeroes the two 32-bit header words and the
+/// list; `00aa3640` reads the 12-byte encounter header through `008d6690`,
+/// then `00aa3390` reads the u32 row count. An empty reply is therefore the
+/// 12-byte header followed by a zero count.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct EmptyRunningListResponse;
+
+impl EmptyRunningListResponse {
+    pub fn encode(self) -> Vec<u8> {
+        let mut bytes = Vec::with_capacity(EMPTY_RUNNING_LIST_LEN);
+        bytes.extend(FAMILY_ENCOUNTER.to_le_bytes());
+        bytes.extend(SUB_RUNNING_LIST_RESPONSE.to_le_bytes());
+        bytes.extend(0u32.to_le_bytes()); // first encounter header word
+        bytes.extend(0u32.to_le_bytes()); // second encounter header word
+        bytes.extend(0u32.to_le_bytes()); // row count
+        bytes
+    }
+
+    pub fn decode(bytes: &[u8]) -> Result<Self, MatchmakingError> {
+        if bytes.len() != EMPTY_RUNNING_LIST_LEN
+            || read_u16(bytes, 0)? != FAMILY_ENCOUNTER
+            || read_u16(bytes, 2)? != SUB_RUNNING_LIST_RESPONSE
+            || read_u32(bytes, 4)? != 0
+            || read_u32(bytes, 8)? != 0
+            || read_u32(bytes, 12)? != 0
+        {
+            return Err(MatchmakingError::InvalidPacket);
+        }
+        Ok(Self)
+    }
+}
+
+/// The matchmaking rows backed by supported activities. Only field-battle rows
+/// are published: one solo queue per battle id, zero statistics (R). Chess and
+/// soccer use the activity portal, not the queue window. The row width and
+/// field order are the native 141/2 layout (`00a9d9c0`).
+#[derive(Debug)]
+pub struct Listings {
+    rows: Vec<QueueRow>,
+}
+
+impl Listings {
+    pub fn from_activities(activities: &[Activity]) -> Result<Self, MatchmakingError> {
+        let mut rows: Vec<QueueRow> = Vec::with_capacity(activities.len());
+        for activity in activities {
+            if activity.kind != Kind::Battle {
+                continue;
+            }
+            if activity.id == 0 || rows.iter().any(|row| row.queue_id() == activity.id) {
+                return Err(MatchmakingError::InvalidQueue);
+            }
+            rows.push(QueueRow::new(
+                activity.id,
+                activity.name_id,
+                0, // MatchType is not used by the current local activity route.
+                1, // min players
+                1, // max players
+                1, // min teams
+                1, // max teams
+                0, // max game-start delay
+                [0; 7],
+                activity.description_id,
+                activity.icon_id,
+                [0; 2],
+                0,
+                0,
+            ));
+        }
+        check_count(rows.len())?;
+        Ok(Self { rows })
+    }
+
+    pub fn queue_list(&self, session_key: u64) -> Result<Vec<u8>, MatchmakingError> {
+        QueueListResponse {
+            session_key,
+            rows: self.rows.clone(),
+        }
+        .encode()
+    }
+
+    pub fn queue_stats(&self, session_key: u64) -> Result<Vec<u8>, MatchmakingError> {
+        QueueStatsResponse {
+            session_key,
+            values_a: vec![0; self.rows.len()],
+            values_b: vec![0; self.rows.len()],
+        }
+        .encode()
+    }
+}
+
+/// A join is recognized but never enters queue state. Native `00c08e30` stores
+/// the selected queue id at packet `+0x24`; serializer `00c08910` writes the
+/// request subobject at packet `+0x10` as a u64, a u32, then the queue id, so
+/// the queue id is body `+0x0c` and the fixed prefix ends at body `+0x10`.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum MatchmakingRefusal {
+    /// The queue id the client asked for. It never creates queue state.
+    JoinUnavailable { queue_id: u32 },
+}
+
+impl MatchmakingRefusal {
+    /// (R) No recovered locale row; the client shows the same generic refusal.
+    pub fn message(self) -> &'static str {
+        match self {
+            Self::JoinUnavailable { .. } => "Matchmaking for that queue is not available.",
+        }
+    }
+}
+
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
+pub struct AdapterOutcome {
+    /// Wire replies for this request; empty when the request is refused.
+    pub replies: Vec<Vec<u8>>,
+    /// (R) Player-facing refusal; the caller renders it and changes nothing.
+    pub refusal: Option<MatchmakingRefusal>,
+}
+
+/// True when [`route`] may own `inner`. The gameplay handler asks this before
+/// building [`Listings`] for every unrelated in-world packet.
+pub fn handles(inner: &[u8]) -> bool {
+    inner.len() >= 3
+        && matches!(
+            read_u16(inner, 0),
+            Ok(FAMILY_LOBBY | FAMILY_ENCOUNTER | FAMILY_MATCHMAKING)
+        )
+}
+
+/// Parse the small, non-mutating lobby/matchmaking surface implemented here.
+///
+/// `None` means another handler owns the packet. A recognized but malformed
+/// request is an error, so it cannot be treated as idle or partially applied.
+/// A join is always a refusal: this adapter publishes the field-battle list but
+/// does not implement match formation or queue membership.
+pub fn route(
+    inner: &[u8],
+    listings: &Listings,
+) -> Result<Option<AdapterOutcome>, MatchmakingError> {
+    if !handles(inner) {
+        return Ok(None);
+    }
+    match read_u16(inner, 0)? {
+        FAMILY_LOBBY => {
+            // Client sender 00bb1a40, writer 00bb11b0: u16 family, u8 sub, u32 lobby type.
+            if inner[2] != SUB_LOBBY_LEAVE {
+                return Ok(None);
+            }
+            if inner.len() != LEAVE_LOBBY_LEN {
+                return Err(MatchmakingError::InvalidPacket);
+            }
+            Ok(Some(AdapterOutcome::default()))
+        }
+        FAMILY_ENCOUNTER => {
+            // Client sender 00a28d00 -> 00a26890: 12-byte header plus two u32.
+            if read_u16(inner, 2)? != SUB_RUNNING_LIST_REQUEST {
+                return Ok(None);
+            }
+            if inner.len() != RUNNING_LIST_REQUEST_LEN {
+                return Err(MatchmakingError::InvalidPacket);
+            }
+            Ok(Some(AdapterOutcome {
+                replies: vec![EmptyRunningListResponse.encode()],
+                refusal: None,
+            }))
+        }
+        FAMILY_MATCHMAKING => {
+            let packet = Packet141::decode(inner)?;
+            match packet.sub_op {
+                1 | SUB_QUEUE_STATS => {
+                    let reply = if packet.sub_op == 1 {
+                        listings.queue_list(ListQueuesRequest::decode(inner)?.session_key)?
+                    } else {
+                        listings.queue_stats(QueueStatsRequest::decode(inner)?.session_key)?
+                    };
+                    Ok(Some(AdapterOutcome {
+                        replies: vec![reply],
+                        refusal: None,
+                    }))
+                }
+                SUB_MATCH_JOIN => {
+                    if packet.body.len() < JOIN_BODY_PREFIX {
+                        return Err(MatchmakingError::InvalidPacket);
+                    }
+                    let queue_id = read_u32(&packet.body, JOIN_QUEUE_ID_IN_BODY)?;
+                    Ok(Some(AdapterOutcome {
+                        replies: Vec::new(),
+                        refusal: Some(MatchmakingRefusal::JoinUnavailable { queue_id }),
+                    }))
+                }
+                _ => Ok(None),
+            }
+        }
+        _ => Ok(None),
     }
 }
 
