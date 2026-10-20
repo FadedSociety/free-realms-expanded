@@ -362,6 +362,9 @@ fn three_objective_path_save_resets_and_stays_completable() {
     progress.counts = vec![1, 0, 0];
     quests.pending_turnin = Some(PATH);
     quests.pending_turnin_actor = Some(BRUGADUG);
+    // Load-time migrations must not replace the saved economy with a stale
+    // snapshot. Position is on `CharacterState`, not `GameplayState`.
+    let inventory_before = old.inventory.clone();
     let coins_before = coins(&game);
     let xp_before = archer_xp(&game);
 
@@ -385,6 +388,11 @@ fn three_objective_path_save_resets_and_stays_completable() {
     );
     assert_eq!(coins(&reloaded), coins_before, "the reset pays nothing");
     assert_eq!(archer_xp(&reloaded), xp_before, "the reset grants no XP");
+    assert_eq!(
+        reloaded.state().inventory,
+        inventory_before,
+        "the reset must not replace the saved inventory"
+    );
 
     complete_path_via_recruits(&mut reloaded, &mut now);
     assert_eq!(quest_status(&reloaded, PATH), QuestStatus::Completed);

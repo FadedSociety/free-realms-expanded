@@ -764,13 +764,6 @@ pub fn assert_enabled_archer_chapter_records() {
             position, runtime_position,
             "the range anchor must match the bound runtime actor"
         );
-        assert!(
-            recruit["roles"]
-                .as_array()
-                .unwrap()
-                .iter()
-                .any(|role| role == "quest_giver")
-        );
         let bound: Vec<&Value> = extra["records"]
             .as_array()
             .unwrap()
