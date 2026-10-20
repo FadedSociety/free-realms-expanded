@@ -1,23 +1,20 @@
+use gateway_reference::Reference;
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState},
     gateway::Gateway,
     quest_engine::{CharacterEligibility, QuestDenial, QuestEngine, QuestProgress, QuestStatus},
-    startup_snapshot::StartupSnapshot,
     startup_world,
 };
-use serde_json::{Value, json};
-use sha2::{Digest, Sha256};
+use serde_json::Value;
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs,
     path::{Path, PathBuf},
-    sync::atomic::{AtomicU64, Ordering},
-    time::{SystemTime, UNIX_EPOCH},
 };
 
-#[path = "common/startup_selfdata_fixture.rs"]
-mod startup_selfdata_fixture;
+#[path = "common/gateway_reference.rs"]
+mod gateway_reference;
 
 const CHARACTER: u64 = 101;
 const CLIENT_VERSION: &str = "1.910.1.530630";
@@ -207,174 +204,6 @@ fn application_body(packet: &[u8]) -> Option<&[u8]> {
     (packet.len() == length + 7).then_some(&packet[7..])
 }
 
-static NEXT_REFERENCE: AtomicU64 = AtomicU64::new(0);
-
-fn hex_bytes(text: &str) -> Vec<u8> {
-    text.as_bytes()
-        .chunks(2)
-        .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
-        .collect()
-}
-
-/// The typed self-data template must carry a row for every profile the gameplay content
-/// configures, or `Gateway::build_self_message` refuses the login. Copy each content
-/// profile's opaque prefix (the part before its equipment span) out of `profiles.json`;
-/// the gateway only pokes the rank fields inside that prefix.
-fn self_packet_with_content_profiles(
-    guid: u64,
-    position: [f32; 3],
-    rotation: [f32; 3],
-    content: &Path,
-) -> (Vec<u8>, usize, usize) {
-    let (packet, position_offset, rotation_offset) =
-        startup_selfdata_fixture::self_data_packet(guid, position, rotation);
-    let mut data = osfr_tools::startup_selfdata::parse_self(&packet);
-    let profiles: Value =
-        serde_json::from_slice(&fs::read(content.join("profiles.json")).unwrap()).unwrap();
-    data.jobs.profiles = profiles["profiles"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .map(|row| {
-            let record = hex_bytes(row["serialized_hex"].as_str().unwrap());
-            let equipment_offset =
-                usize::try_from(row["equipment_offset"].as_u64().unwrap()).unwrap();
-            osfr_tools::startup_selfdata::JobProfile {
-                map_key: u32::from_le_bytes(record[..4].try_into().unwrap()),
-                opaque_before_equipment_without_key: record[4..equipment_offset].to_vec(),
-                after_equipment_value: 0,
-                abilities: Vec::new(),
-                trailing_records: Vec::new(),
-            }
-        })
-        .collect();
-    (
-        osfr_tools::startup_selfdata::build_self(&data),
-        position_offset,
-        rotation_offset,
-    )
-}
-
-/// Synthetic gateway reference: the proven 46-template sequence `tests/gateway.rs` builds,
-/// plus a typed empty startup snapshot. The reconnect regression must run everywhere, so it
-/// never reads the private `lab/references/rust-gateway-reference` fixture.
-struct SyntheticReference {
-    root: PathBuf,
-}
-
-impl SyntheticReference {
-    fn new(content: &Path) -> Self {
-        let serial = NEXT_REFERENCE.fetch_add(1, Ordering::Relaxed);
-        let nanos = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_nanos();
-        let root = std::env::temp_dir().join(format!(
-            "osfr-f213-gateway-{}-{nanos}-{serial}",
-            std::process::id()
-        ));
-        let directory = root.join("references/gateway");
-        fs::create_dir_all(&directory).unwrap();
-        // The gateway derives this path from the reference: <root>/content/startup-snapshot.
-        let snapshot_dir = root.join("content/startup-snapshot");
-        fs::create_dir_all(&snapshot_dir).unwrap();
-        fs::write(
-            snapshot_dir.join("startup.json"),
-            serde_json::to_vec(&StartupSnapshot::empty()).unwrap(),
-        )
-        .unwrap();
-        let initial = CharacterState {
-            guid: 1,
-            zone_id: 0,
-            position: [1.0, 2.0, 3.0],
-            rotation: [0.1, 0.2, 0.3],
-        };
-        let (self_packet, position_offset, rotation_offset) = self_packet_with_content_profiles(
-            initial.guid,
-            initial.position,
-            initial.rotation,
-            content,
-        );
-        let mut zone = Vec::new();
-        put_string(&mut zone, "test zone");
-        zone.extend_from_slice(&2u32.to_le_bytes());
-        zone.extend_from_slice(&[0, 0]);
-        put_string(&mut zone, "sky");
-        zone.push(0);
-        let zone_id_offset = 9 + zone.len();
-        zone.extend_from_slice(&initial.zone_id.to_le_bytes());
-        zone.extend_from_slice(&5u32.to_le_bytes());
-        zone.extend_from_slice(&[0, 0]);
-        let zone_packet = template(43, &zone);
-        let mut templates = Vec::new();
-        for index in 0..46 {
-            let opcode = if index < 8 {
-                [41, 2, 166, 43, 144, 35, 193, 12][index]
-            } else if index == 8 {
-                67
-            } else if index == 45 {
-                14
-            } else {
-                200
-            };
-            let bytes = match index {
-                3 => zone_packet.clone(),
-                7 => self_packet.clone(),
-                _ => template(opcode, &[]),
-            };
-            let name = format!("{index:04}.bin");
-            fs::write(directory.join(&name), &bytes).unwrap();
-            templates.push(json!({
-                "kind": if index < 8 { "login" } else { "ready" },
-                "file": name,
-                "length": bytes.len(),
-                "sha256": format!("{:x}", Sha256::digest(&bytes)),
-                "opcode": opcode,
-            }));
-        }
-        let manifest = json!({
-            "schema_version": 1,
-            "client_version": CLIENT_VERSION,
-            "initial_state": initial,
-            "self_layout": {
-                "guid_offset": 21,
-                "position_offset": position_offset,
-                "rotation_offset": rotation_offset,
-            },
-            "zone_layout": { "zone_id_offset": zone_id_offset },
-            "templates": templates,
-        });
-        fs::write(
-            directory.join("manifest.json"),
-            serde_json::to_vec(&manifest).unwrap(),
-        )
-        .unwrap();
-        Self { root }
-    }
-
-    fn directory(&self) -> PathBuf {
-        self.root.join("references/gateway")
-    }
-}
-
-impl Drop for SyntheticReference {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.root);
-    }
-}
-
-fn put_string(bytes: &mut Vec<u8>, value: &str) {
-    bytes.extend_from_slice(&(value.len() as u32).to_le_bytes());
-    bytes.extend_from_slice(value.as_bytes());
-}
-
-/// One startup template: the tunnel header plus opcode and fields (`wrap`).
-fn template(opcode: u16, fields: &[u8]) -> Vec<u8> {
-    let mut inner = opcode.to_le_bytes().to_vec();
-    inner.extend_from_slice(fields);
-    wrap(&inner)
-}
-
 /// Drive the real gateway world-entry sequence for a saved pending turn-in and prove the
 /// directed 35/2 spawn is queued before the 49/13 end screen that resolves its actor.
 fn gateway_reconnect_orders_spawn_before_screen(
@@ -383,11 +212,12 @@ fn gateway_reconnect_orders_spawn_before_screen(
     speaker: u64,
     now: u64,
 ) {
-    let reference = SyntheticReference::new(&gameplay_dir());
+    let content = gameplay_dir();
+    let reference = Reference::new(CLIENT_VERSION, Some(content.as_path()));
     let mut gateway = Gateway::load_gameplay(
-        &reference.directory(),
+        &reference.directory,
         character.clone(),
-        &gameplay_dir(),
+        &content,
         Some(saved.clone()),
     )
     .expect("gateway loads the saved chapter");

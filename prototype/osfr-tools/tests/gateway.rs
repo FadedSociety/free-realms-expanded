@@ -1,4 +1,4 @@
-use osfr_tools::character_store::CharacterState;
+use gateway_reference::{Reference, initial_state};
 use osfr_tools::gateway::Gateway;
 use osfr_tools::startup_selfdata as typed_selfdata;
 use osfr_tools::startup_snapshot::StartupSnapshot;
@@ -6,23 +6,12 @@ use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::fs;
 use std::path::PathBuf;
-use std::sync::atomic::{AtomicU64, Ordering};
 use std::time::{SystemTime, UNIX_EPOCH};
 
-#[path = "common/startup_selfdata_fixture.rs"]
-mod startup_selfdata_fixture;
+#[path = "common/gateway_reference.rs"]
+mod gateway_reference;
 
-static NEXT_DIRECTORY: AtomicU64 = AtomicU64::new(0);
 const VERSION: &str = "synthetic.1";
-
-fn initial_state() -> CharacterState {
-    CharacterState {
-        guid: 1,
-        zone_id: 0,
-        position: [1.0, 2.0, 3.0],
-        rotation: [0.1, 0.2, 0.3],
-    }
-}
 
 fn string(bytes: &mut Vec<u8>, value: &str) {
     bytes.extend_from_slice(&(value.len() as u32).to_le_bytes());
@@ -78,76 +67,7 @@ fn bundle(messages: &[Vec<u8>]) -> Vec<u8> {
     bytes
 }
 
-struct Reference {
-    directory: PathBuf,
-    manifest: Value,
-}
-
 impl Reference {
-    fn new() -> Self {
-        let serial = NEXT_DIRECTORY.fetch_add(1, Ordering::Relaxed);
-        let time = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap()
-            .as_nanos();
-        let directory = std::env::temp_dir().join(format!(
-            "osfr-gateway-test-{}-{time}-{serial}",
-            std::process::id()
-        ));
-        fs::create_dir(&directory).unwrap();
-        let state = initial_state();
-        let (self_packet, position_offset, rotation_offset) =
-            startup_selfdata_fixture::self_data_packet(state.guid, state.position, state.rotation);
-        let mut zone = Vec::new();
-        string(&mut zone, "test zone");
-        zone.extend_from_slice(&2u32.to_le_bytes());
-        zone.extend_from_slice(&[0, 0]);
-        string(&mut zone, "sky");
-        zone.push(0);
-        let zone_id_offset = 9 + zone.len();
-        zone.extend_from_slice(&state.zone_id.to_le_bytes());
-        zone.extend_from_slice(&5u32.to_le_bytes());
-        zone.extend_from_slice(&[0, 0]);
-        let zone_packet = packet(43, &zone);
-        let mut templates = Vec::new();
-        for index in 0..46 {
-            let opcode = if index < 8 {
-                [41, 2, 166, 43, 144, 35, 193, 12][index]
-            } else if index == 8 {
-                67
-            } else if index == 45 {
-                14
-            } else {
-                200
-            };
-            let bytes = match index {
-                3 => zone_packet.clone(),
-                7 => self_packet.clone(),
-                _ => packet(opcode, &[]),
-            };
-            let name = format!("{index:04}.bin");
-            fs::write(directory.join(&name), &bytes).unwrap();
-            templates.push(json!({"kind":if index < 8 {"login"} else {"ready"},
-                "file":name,"length":bytes.len(),"sha256":format!("{:x}",Sha256::digest(&bytes)),"opcode":opcode}));
-        }
-        let manifest = json!({"schema_version":1,"client_version":VERSION,"initial_state":state,
-            "self_layout":{"guid_offset":21,"position_offset":position_offset,"rotation_offset":rotation_offset},
-            "zone_layout":{"zone_id_offset":zone_id_offset},"templates":templates});
-        let reference = Self {
-            directory,
-            manifest,
-        };
-        reference.write_manifest();
-        reference
-    }
-
-    fn write_manifest(&self) {
-        fs::write(
-            self.directory.join("manifest.json"),
-            serde_json::to_vec(&self.manifest).unwrap(),
-        )
-        .unwrap();
-    }
     fn gateway(&self) -> Gateway {
         Gateway::load_with_startup_snapshot(
             &self.directory,
@@ -166,7 +86,7 @@ impl Reference {
 
 #[test]
 fn synthetic_startup_sequence_has_the_expected_phase_order_and_lengths() {
-    let reference = Reference::new();
+    let reference = Reference::new(VERSION, None);
     let mut gateway = reference.gateway();
     let login_replies = gateway
         .handle(&login(1, VERSION, "ticket"))
@@ -221,18 +141,9 @@ fn built_startup_sequence_matches_the_captured_character_byte_for_byte() {
     }
 }
 
-impl Drop for Reference {
-    fn drop(&mut self) {
-        // This path was created directly under the process temp directory above.
-        if self.directory.parent() == Some(std::env::temp_dir().as_path()) {
-            let _ = fs::remove_dir_all(&self.directory);
-        }
-    }
-}
-
 #[test]
 fn typed_startup_builder_serializes_session_position_and_preserves_tail() {
-    let reference = Reference::new();
+    let reference = Reference::new(VERSION, None);
     assert_eq!(
         Gateway::reference_state(&reference.directory).unwrap(),
         initial_state()
@@ -280,7 +191,7 @@ fn typed_startup_builder_serializes_session_position_and_preserves_tail() {
 
 #[test]
 fn login_and_world_entry_are_validated_once_per_session() {
-    let reference = Reference::new();
+    let reference = Reference::new(VERSION, None);
     let mut gateway = reference.gateway();
     for bytes in [
         login(2, VERSION, "ticket"),
@@ -324,7 +235,7 @@ fn login_and_world_entry_are_validated_once_per_session() {
 
 #[test]
 fn position_updates_character_but_camera_does_not() {
-    let reference = Reference::new();
+    let reference = Reference::new(VERSION, None);
     let mut gateway = reference.ready();
     let xyz = [-100.0, 42.0, 30.0];
     let rotation = [0.8, 0.0, -0.4];
@@ -361,7 +272,7 @@ fn position_updates_character_but_camera_does_not() {
 
 #[test]
 fn rejected_position_snaps_back_with_the_server_location_message() {
-    let reference = Reference::new();
+    let reference = Reference::new(VERSION, None);
     let mut gateway = reference.ready();
     let original = gateway.state().clone();
     let outcome = gateway
@@ -383,7 +294,7 @@ fn rejected_position_snaps_back_with_the_server_location_message() {
 
 #[test]
 fn malformed_movement_and_bundle_failure_cannot_partially_commit() {
-    let reference = Reference::new();
+    let reference = Reference::new(VERSION, None);
     let mut gateway = reference.ready();
     let original = gateway.state().clone();
     let good = position(1, [50.0, 60.0, 70.0], [0.0; 3]);
@@ -420,7 +331,7 @@ fn malformed_movement_and_bundle_failure_cannot_partially_commit() {
 
 #[test]
 fn real_bundle_prefix_variants_and_tunnel_lengths_are_bounded() {
-    let reference = Reference::new();
+    let reference = Reference::new(VERSION, None);
     let mut gateway = reference.gateway();
     let mut messages = vec![
         login(1, VERSION, "ticket"),
@@ -452,7 +363,7 @@ fn real_bundle_prefix_variants_and_tunnel_lengths_are_bounded() {
 
 #[test]
 fn time_response_uses_current_seconds_and_original_packet_shape() {
-    let reference = Reference::new();
+    let reference = Reference::new(VERSION, None);
     let mut gateway = reference.ready();
     let before = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -473,22 +384,22 @@ fn time_response_uses_current_seconds_and_original_packet_shape() {
 
 #[test]
 fn corrupt_or_unproven_reference_is_rejected() {
-    let mut reference = Reference::new();
+    let mut reference = Reference::new(VERSION, None);
     reference.manifest["templates"][0]["sha256"] = json!("00".repeat(32));
     reference.write_manifest();
     assert!(Gateway::reference_state(&reference.directory).is_err());
-    let mut reference = Reference::new();
+    let mut reference = Reference::new(VERSION, None);
     reference.manifest["templates"][0]["file"] = json!("../outside.bin");
     reference.write_manifest();
     assert!(Gateway::reference_state(&reference.directory).is_err());
-    let mut reference = Reference::new();
+    let mut reference = Reference::new(VERSION, None);
     reference.manifest["self_layout"]["position_offset"] = json!(21);
     reference.write_manifest();
     assert!(Gateway::reference_state(&reference.directory).is_err());
     let mut other = initial_state();
     other.guid = 3;
     let mut gateway = Gateway::load_with_startup_snapshot(
-        &Reference::new().directory,
+        &Reference::new(VERSION, None).directory,
         other,
         StartupSnapshot::empty(),
     )
@@ -501,7 +412,7 @@ fn corrupt_or_unproven_reference_is_rejected() {
             .len(),
         8
     );
-    let reference = Reference::new();
+    let reference = Reference::new(VERSION, None);
     let mut other_zone = initial_state();
     other_zone.zone_id = 19;
     let error = Gateway::load_with_startup_snapshot(
@@ -577,7 +488,7 @@ fn quick_chat_catalog_carries_animation_ids_and_emote_context_follows_movement()
         item_id: 0,
         item_category: 0,
     };
-    let reference = Reference::new();
+    let reference = Reference::new(VERSION, None);
     let mut snapshot = StartupSnapshot::empty();
     snapshot.world.quick_chat = vec![row(11, 0), row(12, 3306), row(13, 3200)];
     let mut gateway =

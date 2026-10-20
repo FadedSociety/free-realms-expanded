@@ -154,6 +154,21 @@ fn f213_application_body(message: &[u8]) -> Option<&[u8]> {
     (message.len() == length + 7).then_some(&message[7..])
 }
 
+fn f213_bodies(sender: &mut ReliableSender, now: u64) -> Vec<Vec<u8>> {
+    let codec = Codec::new(CRC_SEED, 3, true, MAX_MESSAGE).unwrap();
+    sender
+        .poll(now)
+        .unwrap()
+        .iter()
+        .filter_map(|wire| {
+            let packet = codec.decode(wire).expect("the queued frame decodes");
+            assert_eq!(packet.opcode, RELIABLE_DATA);
+            // Reliable data: two-byte sequence, then the tunneled application body.
+            f213_application_body(&packet.payload[2..]).map(<[u8]>::to_vec)
+        })
+        .collect()
+}
+
 /// F213: the shipped shared-field fan-out (`Server::sync_field_views`, reached from the
 /// shared tick) must queue the saved opener's 35/2 before replaying the pending 49/13,
 /// and the screen must name that runtime actor. The service-only regression cannot see
@@ -240,27 +255,10 @@ fn f213_sync_field_views_replays_pending_end_screen_after_the_speaker_spawn() {
         before_sync,
         "replaying the saved end screen must not change saved state"
     );
-    let codec = Codec::new(CRC_SEED, 3, true, MAX_MESSAGE).unwrap();
-    let wires = server
-        .sessions
-        .get_mut(&keys[0])
-        .unwrap()
-        .sender
-        .poll(now + 10)
-        .unwrap();
-    let replies: Vec<Vec<u8>> = wires
-        .iter()
-        .map(|wire| {
-            let packet = codec.decode(wire).expect("the queued frame decodes");
-            assert_eq!(packet.opcode, RELIABLE_DATA);
-            // Reliable data: two-byte sequence, then the tunneled application body.
-            packet.payload[2..].to_vec()
-        })
-        .collect();
-    let bodies: Vec<&[u8]> = replies
-        .iter()
-        .filter_map(|reply| f213_application_body(reply))
-        .collect();
+    let bodies = f213_bodies(
+        &mut server.sessions.get_mut(&keys[0]).unwrap().sender,
+        now + 10,
+    );
     let spawn = bodies
         .iter()
         .position(|body| {
@@ -277,7 +275,7 @@ fn f213_sync_field_views_replays_pending_end_screen_after_the_speaker_spawn() {
         spawn < screen,
         "the 49/13 replay must follow the opener's 35/2 in the queued batch"
     );
-    let end = bodies[screen];
+    let end = &bodies[screen];
     // Client 49/13 QuestEndPacket::ReadFields 0x00c7b990 keeps the actor at 6..14 and the
     // 49/14 reply quest id at 14..18; the 35/2 AddNpc reader 0x00921a10 reads 4..12.
     assert_eq!(
@@ -291,5 +289,50 @@ fn f213_sync_field_views_replays_pending_end_screen_after_the_speaker_spawn() {
         "the replay keeps the quest id 49/14 sends back"
     );
     assert!(server.sessions[&keys[0]].known_npcs.contains(&F213_JONES));
+
+    // Readiness gating: an unready viewer keeps its instance but takes the hidden view.
+    // The saved 49/13 and the opener's 35/2 must not be queued; the known actor is removed.
+    let change = server
+        .membership
+        .prepare_membership(guid, 0, Some(0), pose, false, now + 4)
+        .expect("the shared scene accepts the unready viewer");
+    server.membership.commit_membership(change);
+    server
+        .sync_field_views(0, &field, false)
+        .expect("the unready view reconciles");
+    assert!(
+        !server.sessions[&keys[0]].known_npcs.contains(&F213_JONES),
+        "an unready viewer must drop the saved opener"
+    );
+    assert_eq!(
+        server.sessions[&keys[0]].gateway.snapshot(),
+        before_sync,
+        "the hidden view must not change saved state"
+    );
+    let bodies = f213_bodies(
+        &mut server.sessions.get_mut(&keys[0]).unwrap().sender,
+        now + 20,
+    );
+    assert!(
+        !bodies.iter().any(|body| body.starts_with(&[49, 0, 13, 0])),
+        "an unready viewer must not receive the saved end screen"
+    );
+    assert!(
+        !bodies.iter().any(|body| {
+            body.starts_with(&[35, 0, 2, 0])
+                && body.len() >= 12
+                && u64::from_le_bytes(body[4..12].try_into().unwrap()) == F213_JONES
+        }),
+        "an unready viewer must not receive the opener spawn"
+    );
+    assert!(
+        bodies.iter().any(|body| {
+            // Client removal reader 0x008d69f0: 4-byte prefix, 2 bytes, then the actor.
+            body.starts_with(&[35, 0, 3, 0])
+                && body.len() >= 14
+                && u64::from_le_bytes(body[6..14].try_into().unwrap()) == F213_JONES
+        }),
+        "the hidden view removes the actor the viewer knew"
+    );
     let _ = fs::remove_dir_all(scratch);
 }

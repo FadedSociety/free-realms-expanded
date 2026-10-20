@@ -54,19 +54,4 @@ impl Gameplay {
             .as_ref()
             .and_then(|visibility| visibility.content_key(runtime_guid))
     }
-
-    /// Canonical runtime-GUID -> content-key map for a client interaction target.
-    /// Opening-scene actors are excluded: they are driven by the opening trigger path, not
-    /// the generic NPC router.
-    pub(super) fn content_npc_key(&self, runtime_guid: u64) -> Option<u64> {
-        if self.opening.as_ref().is_some_and(|opening| {
-            opening
-                .actors()
-                .iter()
-                .any(|actor| actor.guid == runtime_guid)
-        }) {
-            return None;
-        }
-        self.content_key_for_turnin(runtime_guid)
-    }
 }

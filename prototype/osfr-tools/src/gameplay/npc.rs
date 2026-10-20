@@ -30,6 +30,16 @@ impl Gameplay {
         Ok(packets)
     }
 
+    /// Canonical runtime-GUID -> content-key map for a client interaction target; opening-scene
+    /// actors are excluded because the opening trigger path drives them, not the NPC router.
+    pub(super) fn content_npc_key(&self, runtime_guid: u64) -> Option<u64> {
+        let opening = self.opening.as_ref();
+        if opening.is_some_and(|o| o.actors().iter().any(|a| a.guid == runtime_guid)) {
+            return None;
+        }
+        self.content_key_for_turnin(runtime_guid)
+    }
+
     /// (R) A live activity closes ordinary regional NPC interaction. `handle_in_world_inner`
     /// reaches this router before the opening handlers' activity refusals, so the shared busy
     /// table has to hold here too. A refusal changes no menu, quest or save state.
