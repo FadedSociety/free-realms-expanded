@@ -145,12 +145,6 @@ pub fn relay(guid: u64, movement: &MovementState, impulse: JumpImpulse) -> Vec<u
     body
 }
 
-/// Build the optional relay body for one request: the final pose plus the last
-/// accepted 164 impulse. `None` when the request carried no accepted jump.
-pub fn body(guid: u64, movement: &MovementState, impulse: Option<JumpImpulse>) -> Option<Vec<u8>> {
-    impulse.map(|impulse| relay(guid, movement, impulse))
-}
-
 #[cfg(test)]
 mod tests {
     use super::*;

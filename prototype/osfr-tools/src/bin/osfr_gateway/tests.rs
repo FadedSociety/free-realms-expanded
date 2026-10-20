@@ -1255,7 +1255,8 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
     );
     // T266: a soft-over-speed jump is corrected for the sender and still relays
     // the pose the server committed (the clamp target), not the client's P62.
-    // The relay budget is per character; a normal cadence refills it.
+    // The sleep refills the shared account action budget (wall clock), not the
+    // relay budget, which follows the dispatch's `now_ms` (F309).
     std::thread::sleep(std::time::Duration::from_millis(120));
     sender
         .dispatch_message(
@@ -1289,7 +1290,8 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
         "the clamped sender receives the location correction"
     );
     // T266: a finite velocity over the relay bound is clamped, not refused (a
-    // refused body would end the session); the pose is still validated.
+    // refused body would end the session); the pose is still validated. The
+    // sleep refills the account action budget, not the dispatch-clock relay.
     std::thread::sleep(std::time::Duration::from_millis(120));
     sender
         .dispatch_message(
@@ -1319,8 +1321,11 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
             .vertical_velocity,
         osfr_tools::jump_relay::MAX_VERTICAL_SPEED
     );
-    // T266/F290: a 164 flood from one character is capped by the relay budget,
-    // while every accepted pose still fans out through opcode 125.
+    // T266/F290/F309: a 164 flood from one character is capped by the relay
+    // budget, while every accepted pose still fans out through opcode 125. The
+    // relay budget is clocked from the dispatch's `now_ms`, so the burst is
+    // deterministic even when these ten dispatches take longer than 100 ms under
+    // load. The sleep only refills the shared account action budget.
     std::thread::sleep(std::time::Duration::from_millis(400));
     for step in 0..10u64 {
         sender
@@ -1349,10 +1354,10 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
             })
             .count()
     };
-    assert!(count(&[164, 0]) >= 1, "the budget still allows its burst");
-    assert!(
-        count(&[164, 0]) <= osfr_tools::jump_relay::RELAY_BURST as usize,
-        "a 164 flood relays at most the per-character budget"
+    assert_eq!(
+        count(&[164, 0]),
+        osfr_tools::jump_relay::RELAY_BURST as usize,
+        "a 164 flood relays exactly the per-character burst on the dispatch clock"
     );
     assert_eq!(count(&[125, 0]), 10, "every accepted pose still fans out");
     // A normal ~0.5 s jump cadence is never dropped.
@@ -1407,6 +1412,222 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
     );
     drop(world);
     let _ = fs::remove_dir_all(&scratch);
+}
+
+/// F309: ending the owning session forgets the character's per-character relay
+/// budget. This charges `Security::jump_relays` through the real dispatch/commit
+/// path, then calls `Server::end_session`; a deleted or mis-keyed
+/// `forget_jump_relay` call leaves the key behind, so a reconnecting character
+/// inherits an exhausted budget and its jumps are silently dropped. The relay
+/// clock is the dispatch clock (`now_ms`), so the five-jump burst is deterministic.
+#[test]
+fn end_session_forgets_the_character_jump_relay_budget() {
+    let scratch = test_support::Scratch::new("f309-jump-leave");
+    let mut server = Server::new(test_support::options(scratch.state())).unwrap();
+    let mut login = 1u16.to_le_bytes().to_vec();
+    for (index, text) in ["jump-leave", "1.910.1.530630", ""].into_iter().enumerate() {
+        login.extend((text.len() as u32).to_le_bytes());
+        login.extend(text.as_bytes());
+        if index == 0 {
+            login.extend(1u64.to_le_bytes());
+        }
+    }
+    let (mut sender, recipient) = {
+        let new_session = |id: u64| {
+            Session::new(
+                SessionId(id),
+                format!("127.0.0.1:{}", 30_000 + id).parse().unwrap(),
+                SessionRequest {
+                    id: id as u32,
+                    crc_length: 3,
+                    buffer_size: 512,
+                },
+                &server.options,
+                CRC_SEED,
+                None,
+                None,
+            )
+            .unwrap()
+        };
+        (new_session(17), new_session(18))
+    };
+    for (message, now) in [
+        (login.clone(), 0u64),
+        (wrap(&[13, 0]), 100),
+        (wrap(&[10, 0]), 200),
+    ] {
+        sender
+            .dispatch_message(
+                &message,
+                &server.options,
+                now,
+                &mut server.world,
+                &mut server.membership,
+                &mut server.sessions,
+                None,
+            )
+            .unwrap();
+    }
+    let joined = server
+        .world
+        .players
+        .get(sender.id)
+        .expect("sender entered the world");
+    let zone = joined.zone;
+    let start = joined.position;
+    let character = joined.character_guid;
+    assert_eq!(
+        server.world.active_sessions.get(&character),
+        Some(&sender.id),
+        "the real join path owns the character's active session"
+    );
+    let mut presentation = osfr_tools::players::PlayerPresentation::default();
+    presentation.character_guid = 2;
+    let recipient_id = recipient.id;
+    server
+        .world
+        .players
+        .join_with_presentation(
+            recipient_id,
+            10_002,
+            2,
+            zone,
+            [start[0] + 1.0, start[1], start[2]],
+            0.0,
+            presentation,
+        )
+        .unwrap();
+    server.world.joined.insert(recipient_id);
+    let recipient_key = SessionKey {
+        peer: recipient.peer,
+        connection_id: recipient.request.id,
+    };
+    server
+        .world
+        .session_keys
+        .insert(recipient_id, recipient_key);
+    server.sessions.insert(recipient_key, recipient);
+    assert!(
+        server
+            .world
+            .players
+            .knows_character(recipient_id, character),
+        "the observer must already know the sender for a jump to be charged"
+    );
+    let jump = |step: u64| {
+        let mut inner = 164u16.to_le_bytes().to_vec();
+        inner.extend(character.to_le_bytes());
+        for value in [start[0] + step as f32, start[1], start[2], 0.0, 0.0, 1.0] {
+            inner.extend(value.to_le_bytes());
+        }
+        inner.extend([4, 255]);
+        inner.extend(0.5f32.to_le_bytes());
+        assert_eq!(inner.len(), osfr_tools::jump_relay::BODY_LEN);
+        wrap(&inner)
+    };
+    let relays = |server: &mut Server, now: u64| {
+        super::f120_fishing_hour_reconnect::drain_replies(
+            server.sessions.get_mut(&recipient_key).unwrap(),
+            now,
+        )
+        .iter()
+        .filter(|message| {
+            message
+                .get(7..)
+                .is_some_and(|inner| inner.starts_with(&[164, 0]))
+        })
+        .count()
+    };
+    // Four jumps spend the burst; the fifth is over budget and drops only the relay.
+    for step in 0..5u64 {
+        sender
+            .dispatch_message(
+                &jump(step),
+                &server.options,
+                1_000 + step * 10,
+                &mut server.world,
+                &mut server.membership,
+                &mut server.sessions,
+                None,
+            )
+            .unwrap();
+    }
+    assert_eq!(
+        relays(&mut server, 1_050),
+        osfr_tools::jump_relay::RELAY_BURST as usize,
+        "the dispatch clock pins the burst: the fifth jump is over budget"
+    );
+    assert_eq!(server.world.security.lock().unwrap().jump_relays.len(), 1);
+    // End the owning session: the leave path must forget the character's key.
+    let sender_key = SessionKey {
+        peer: sender.peer,
+        connection_id: sender.request.id,
+    };
+    server.end_session(sender_key, sender, "test_jump_leave");
+    assert!(
+        server.world.security.lock().unwrap().jump_relays.is_empty(),
+        "end_session must forget the character's relay budget"
+    );
+    // A reconnect starts a fresh burst through the same real dispatch path.
+    let mut reconnected = Session::new(
+        SessionId(21),
+        "127.0.0.1:30021".parse().unwrap(),
+        SessionRequest {
+            id: 21,
+            crc_length: 3,
+            buffer_size: 512,
+        },
+        &server.options,
+        CRC_SEED,
+        None,
+        None,
+    )
+    .unwrap();
+    assert_eq!(
+        reconnected.gateway.state().guid,
+        character,
+        "the reconnect loads the saved character"
+    );
+    for (message, now) in [
+        (login, 2_000u64),
+        (wrap(&[13, 0]), 2_100),
+        (wrap(&[10, 0]), 2_200),
+    ] {
+        reconnected
+            .dispatch_message(
+                &message,
+                &server.options,
+                now,
+                &mut server.world,
+                &mut server.membership,
+                &mut server.sessions,
+                None,
+            )
+            .unwrap();
+    }
+    assert!(
+        server
+            .world
+            .players
+            .knows_character(recipient_id, character),
+        "the observer knows the reconnected character"
+    );
+    reconnected
+        .dispatch_message(
+            &jump(5),
+            &server.options,
+            2_300,
+            &mut server.world,
+            &mut server.membership,
+            &mut server.sessions,
+            None,
+        )
+        .unwrap();
+    assert_eq!(
+        relays(&mut server, 2_350),
+        1,
+        "a reconnected character starts with a fresh relay burst"
+    );
 }
 
 /// F161: a pet adoption spends a certificate and adds a pet in one atomic document; a refused

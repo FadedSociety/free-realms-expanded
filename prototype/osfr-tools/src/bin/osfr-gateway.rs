@@ -1672,7 +1672,7 @@ impl Session {
             now_ms,
         )?;
         if committed {
-            delivery::post_commit(self, sessions, world, broadcast, jump)?;
+            delivery::post_commit(self, sessions, world, broadcast, jump, now_ms)?;
         }
         Ok(())
     }

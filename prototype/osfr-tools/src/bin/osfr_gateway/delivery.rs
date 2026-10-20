@@ -15,10 +15,12 @@ pub(super) fn wrap_application(inner: &[u8]) -> Vec<u8> {
 /// commit succeeds, like the T199 broadcast; the sender never receives its own
 /// jump. Each character has a relay budget: over budget the 164 is dropped
 /// silently, while the accepted pose still fans out through the 125 path.
+/// `now` is the dispatch's request clock, not the wall clock (F309).
 pub(super) fn jump_fanout(
     world: &SharedWorld,
     sender: SessionId,
     jump: Option<Vec<u8>>,
+    now: Instant,
 ) -> Vec<Delivery> {
     let Some(jump) = jump else {
         return Vec::new();
@@ -45,7 +47,7 @@ pub(super) fn jump_fanout(
             .lock()
             .unwrap_or_else(|error| error.into_inner())
             .jump_relays
-            .allow(character, Instant::now())
+            .allow(character, now)
     {
         return Vec::new();
     }
@@ -61,20 +63,24 @@ pub(super) fn jump_fanout(
 
 /// Queue the notices staged with a successful transaction: the T199 broadcast,
 /// then the T008/F290 jump relay. The caller passes only a committed outcome, so
-/// a refused or failed transaction queues neither.
+/// a refused or failed transaction queues neither. `now_ms` is the dispatch's
+/// monotonic server-uptime clock; anchoring it at the session start keeps the
+/// relay burst window deterministic under test load (F309).
 pub(super) fn post_commit(
     session: &mut Session,
     sessions: &mut SessionMap,
     world: &mut SharedWorld,
     broadcast: Option<String>,
     jump: Option<Vec<u8>>,
+    now_ms: u64,
 ) -> Result<(), Box<dyn std::error::Error>> {
     if let Some(text) = broadcast {
         for delivery in broadcast_deliveries(&text, world) {
             queue_delivery(session, sessions, world, delivery)?;
         }
     }
-    for delivery in jump_fanout(world, session.id, jump) {
+    let relay_at = session.session_start + Duration::from_millis(now_ms);
+    for delivery in jump_fanout(world, session.id, jump, relay_at) {
         queue_delivery(session, sessions, world, delivery)?;
     }
     Ok(())

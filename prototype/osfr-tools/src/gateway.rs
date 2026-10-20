@@ -1811,7 +1811,8 @@ impl Gateway {
             }
         }
         budget.stage(&outcome.replies[counted_replies..])?;
-        self.jump_relay = crate::jump_relay::body(state.guid, &movement_state, impulse);
+        self.jump_relay =
+            impulse.map(|impulse| crate::jump_relay::relay(state.guid, &movement_state, impulse));
         self.state = state;
         self.gameplay = gameplay;
         self.movement_state = movement_state;

@@ -1,8 +1,8 @@
 ---
 type: research-note
-task: T008 / F266 / F290 (integrates the D09 draft)
+task: T008 / F266 / F290 / F309 (integrates the D09 draft)
 updated: 2026-10-20
-status: implemented; F266 review blockers fixed and focused gates green in F290; native two-client acceptance pending
+status: implemented; F266 blockers fixed in F290 and the F290 review blockers fixed in F309; focused gates green; native two-client acceptance pending
 ---
 
 # Jump Relay (Opcode 164)
@@ -37,8 +37,10 @@ every address is in `lab/working/ida/FreeRealms.exe.i64`.
   the 8-byte id (`sub_984960`), rejects a missing actor or the local player
   (`[edi+0xc8]`), then applies the motion. At `0x0090e5f5` it tests
   `state >> 2 & 1`; bit 2 set uses the packet velocity, bit 2 clear substitutes
-  0.0 (`0x0090e60e`). The same state bits also choose the apply path at
-  `0x0090e614` (bit 2, then the low state bit).
+  0.0 (`0x0090e60e`). It also computes bit 1 (`state >> 1 & 1`, `0x0090e5ec`):
+  the apply path at `0x0090e614` is taken when bit 2 (`test al,al`) or bit 1
+  (`test cl,cl`) is set, and `0x0090e622` tests bit 0 (`state & 1`) to choose
+  between 0.0 and `sub_8B3180`.
 - Sender `0092e670`: writes the local actor id into the record's `+8/+0xc`
   from the actor vtable, the character position `+0x10..+0x1c`, the direction
   `+0x20..+0x2c`, a state byte at `+0x30` (bit 0 from a norm compare, bit 2
@@ -89,7 +91,7 @@ u8 unknown, f32 vertical_velocity`.
 
 ## Implementation
 
-- `src/jump_relay.rs`: `decode` (untrusted body), `JumpImpulse`, `body`/`relay`
+- `src/jump_relay.rs`: `decode` (untrusted body), `JumpImpulse`, `relay`
   (server-bound body), the (R) `RELAY_RATE_PER_SECOND`/`RELAY_BURST` constants,
   `OPCODE`, `BODY_LEN`, `MAX_VERTICAL_SPEED`; byte-level unit tests derived from
   reader `008e5ba0`, plus the budget test over `net_policy::KeyedBuckets`.
@@ -104,11 +106,14 @@ u8 unknown, f32 vertical_velocity`.
   delivery hook.
 - `src/bin/osfr_gateway/delivery.rs`: `jump_fanout` applies the directed
   visibility rule and the per-character budget; `post_commit` queues the
-  broadcast and the relay only after a successful commit.
+  broadcast and the relay only after a successful commit. F309 clocks the relay
+  budget from the dispatch's `now_ms` anchored at the session start, not from
+  the wall clock, so a slow host cannot refill the window mid-flood.
 - Tests: `src/bin/osfr_gateway/tests.rs` (real `dispatch_message`: accepted
   relay and decoded wire body, directed cap, no sender echo, flood cap, pose
   fanout while relays drop, normal-cadence recovery, refusal cases with an
-  unchanged pose, clamp, `[164, 125]` state/pose bundle, pre-Ready gate),
+  unchanged pose, clamp, `[164, 125]` state/pose bundle, pre-Ready gate, and the
+  F309 `end_session` leave cleanup plus reconnect burst),
   `src/jump_relay.rs` (byte layout, budget), `tests/gateway.rs` (reset and a
   later application child), and `tests/app_fuzz.rs` (hostile 164 seed).
 
@@ -127,5 +132,6 @@ u8 unknown, f32 vertical_velocity`.
   both poses are validated and the final pose is what observers receive through
   the normal 125 fanout.
 - The state/unknown bytes are relayed opaque beyond the recovered bits (bit 2
-  velocity selector; a low bit selects the apply path in `0090e470`).
+  velocity selector; bits 2/1 select the apply path and bit 0 the 0-vs-derived
+  value in `0090e470`).
 

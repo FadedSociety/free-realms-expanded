@@ -690,10 +690,15 @@ fn oversized_and_invalid_presentations_are_rejected_without_joining() {
     }
 }
 
-// T266 removed the server-side jump-relay window. The relay's only per-session
-// state is now the directed view, so keep the protected-pass name and pin that
-// the view is per session and dropped by `leave`: a rejoined session id must
-// rebuild its own relay audience instead of inheriting one.
+// T266 removed the server-side jump-relay window. F309 pinned the real
+// per-character relay budget and its leave cleanup through the real dispatch and
+// `Server::end_session` in `src/bin/osfr_gateway/tests.rs`
+// (`end_session_forgets_the_character_jump_relay_budget`), and this test now
+// also pins the budget object with the production rate/burst. This
+// protected-pass name stays pinned to the other half: the directed view is per
+// session and dropped by `leave`, so a rejoined session id must rebuild its own
+// relay audience instead of inheriting one. Only the lead can retire or rename
+// it.
 #[test]
 fn jump_relay_window_is_per_session_and_clears_on_leave() {
     let mut registry = registry(50.0, 10);
@@ -736,5 +741,29 @@ fn jump_relay_window_is_per_session_and_clears_on_leave() {
             .nearby_sessions(zone(8, 13), [0.0; 3])
             .contains(&SessionId(1)),
         "a rejoined session is visible to the relay audience again"
+    );
+    // F309: the relay budget itself is per character and forgotten on leave,
+    // with the production rate/burst. The gateway wiring (Security::jump_relays
+    // removed by Server::end_session) is pinned by the bin test named above.
+    let now = std::time::Instant::now();
+    let mut budget = osfr_tools::net_policy::KeyedBuckets::new(
+        osfr_tools::jump_relay::RELAY_RATE_PER_SECOND,
+        osfr_tools::jump_relay::RELAY_BURST,
+        8,
+    );
+    let burst = (0..8).filter(|_| budget.allow(1001, now)).count();
+    assert_eq!(
+        burst,
+        osfr_tools::jump_relay::RELAY_BURST as usize,
+        "the relay budget allows exactly its burst"
+    );
+    assert!(
+        budget.allow(1002, now),
+        "a second character has its own relay budget"
+    );
+    budget.remove(&1001);
+    assert!(
+        budget.allow(1001, now),
+        "leaving forgets the character's relay budget"
     );
 }
