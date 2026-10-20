@@ -312,6 +312,40 @@ fn choose_quest_row(
         .expect("quest dialogue choice is valid")
 }
 
+/// T252 enabled C1 (`3030004`, Brawler-gated) ahead of C3 in Carlos's quest list. This T101
+/// chapter keeps its own C3-C5 flow by accepting C1 and completing only its Talk step: Carlos
+/// then offers C3 exactly as before, and C1 stays on its Mongo step without touching any reward
+/// or combat assertion below.
+fn open_carlos_line(game: &mut Gameplay, character: &CharacterState, now: &mut u64) {
+    const FIRST: u32 = 3_030_004;
+    let mut at = character.clone();
+    at.position = npc_position("cobblestone_village.json", CARLOS);
+    *now += 100;
+    talk(game, &at, CARLOS, *now);
+    *now += 100;
+    let offered = choose_quest_row(game, &at, *now);
+    assert!(
+        offered
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 1, Some(FIRST))),
+        "T252's C1 must be Carlos's first offer to a Brawler"
+    );
+    *now += 100;
+    let accepted = game
+        .handle_in_world(&quest_reply(FIRST, true), &at, *now)
+        .expect("C1 accept is valid");
+    assert!(
+        accepted
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 3, None))
+    );
+    *now += 100;
+    // The follow-up Talk completes C1's Talk step and opens its Mongo step.
+    talk(game, &at, CARLOS, *now);
+}
+
 fn accept_quest(
     game: &mut Gameplay,
     character: &CharacterState,
@@ -656,6 +690,7 @@ fn complete_chapter(game: &mut Gameplay, character: &CharacterState, now: &mut u
     let mut at = character.clone();
 
     at.position = carlos;
+    open_carlos_line(game, character, now);
     accept_quest(game, &at, CARLOS, carlos, REFERRAL_TO_JONES, now);
     at.position = jones;
     let _ = open_end_screen(game, &at, JONES, REFERRAL_TO_JONES, now);
@@ -705,6 +740,7 @@ fn chapter_drives_npc_and_combat_paths_and_restores_pending_turnin() {
         carlos_adds[0].name_string_id, 20_671,
         "Carlos keeps the recovered locale name id"
     );
+    open_carlos_line(&mut game, &character, &mut now);
     accept_quest(
         &mut game,
         &character,
@@ -1041,15 +1077,31 @@ fn disabled_starting_quests_refuse_without_changing_state() {
     let mut engine =
         QuestEngine::from_split_content(&content_dir(), CHARACTER, eligibility(), None).unwrap();
     let before = engine.state().clone();
-    // C2 and the later Highroad records stay empty/disabled; their provenance must not
-    // claim objectives the server does not run (F135 review finding 4).
-    for quest_id in [3_030_004, 3_030_005, 3_030_009, 3_030_010] {
+    // The still-hollow starting records refuse, and their provenance must not claim objectives
+    // the server does not run (F135 review finding 4). T252 enabled C1/C2, so C1 now offers and
+    // C2 is gated on C1's completion instead.
+    for quest_id in [3_030_001, 3_030_002, 3_030_003, 3_030_009, 3_030_010] {
         let refused = engine.offer(quest_id, CARLOS);
         assert_eq!(refused.denial, Some(QuestDenial::Unavailable));
         assert!(!refused.changed);
         assert!(refused.outbound.is_empty());
         assert_eq!(engine.state(), &before);
     }
+    let gated = engine.offer(3_030_005, CARLOS);
+    assert_eq!(gated.denial, Some(QuestDenial::Prerequisite));
+    assert!(!gated.changed);
+    assert!(gated.outbound.is_empty());
+    assert_eq!(engine.state(), &before);
+    let offered = engine.offer(3_030_004, CARLOS);
+    assert_eq!(
+        offered.denial, None,
+        "T252's C1 is a real, offerable record"
+    );
+    assert!(offered.changed);
+    assert_eq!(
+        engine.state().quests[&3_030_004].status,
+        QuestStatus::Offered
+    );
 }
 
 #[test]
@@ -1076,9 +1128,9 @@ fn carlos_to_jones_to_blackspore_completes_in_order() {
 
 #[test]
 fn wrong_npc_and_wrong_enemy_do_not_advance() {
-    // Carlos gave C3 but is not its Jones turn-in step. With C1/C2 disabled and C3
-    // active he has nothing left to offer, so this is a genuine refusal rather than
-    // another NPC's legitimate quest choice.
+    // Carlos gave C3 but is not its Jones turn-in step. C1 is on its Mongo step (T252) and C2
+    // waits on C1's completion, so Carlos has nothing left to offer: this is a genuine refusal
+    // rather than another NPC's legitimate quest choice.
     let (mut game, character) = fresh_game();
     let mut now = 6_000;
     let carlos = npc_position("cobblestone_village.json", CARLOS);
@@ -1086,6 +1138,7 @@ fn wrong_npc_and_wrong_enemy_do_not_advance() {
     let mut at = character.clone();
 
     at.position = carlos;
+    open_carlos_line(&mut game, &at, &mut now);
     accept_quest(&mut game, &at, CARLOS, carlos, REFERRAL_TO_JONES, &mut now);
 
     // The wrong NPC's menu, Talk and dialogue row must leave the whole saved state

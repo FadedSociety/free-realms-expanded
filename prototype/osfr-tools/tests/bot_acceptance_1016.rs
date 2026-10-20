@@ -1187,10 +1187,13 @@ fn plan_quest(content: &Path, start: [f32; 3]) -> QuestPlan {
         let given = npc["quest_ids_given"]
             .as_array()
             .is_some_and(|ids| ids.iter().any(|g| *g == id));
+        // A job-gated quest is not offerable to this rig's default profile (T252's Brawler-only
+        // C1 at Carlos), so the plan keeps to quests the default character can accept.
         let free = quest["prerequisite_quest_ids"]
             .as_array()
             .is_none_or(|p| p.is_empty())
-            && quest["enabled"].as_bool().unwrap_or(true);
+            && quest["enabled"].as_bool().unwrap_or(true)
+            && quest["job"].is_null();
         let distance = planar(start, at);
         if given && free && best.as_ref().is_none_or(|(d, _)| distance < *d) {
             best = Some((

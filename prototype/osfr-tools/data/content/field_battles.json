@@ -916,6 +916,115 @@
           "icon_id": 730
         }
       ]
+    },
+    {
+      "id": 12400,
+      "title_id": 24276,
+      "description_id": 24277,
+      "objective_id": 24340,
+      "difficulty": 1,
+      "required_combat_level": 0,
+      "spawner": {
+        "guid": 100000124000,
+        "definition_id": 1240000,
+        "model_id": 3126,
+        "name_id": 24276,
+        "name": "Brawling Ring",
+        "texture_alias": "",
+        "position": [
+          -1908.92576,
+          -39.4,
+          410.69792
+        ],
+        "max_health": 1,
+        "damage": 0,
+        "boss": false
+      },
+      "enemies": [
+        {
+          "guid": 100000124001,
+          "definition_id": 1240001,
+          "model_id": 168,
+          "name_id": 20482,
+          "name": "Mongo",
+          "texture_alias": "",
+          "position": [
+            136.0,
+            -0.6,
+            175.0
+          ],
+          "max_health": 900,
+          "damage": 4,
+          "boss": true
+        }
+      ],
+      "reward_coins": 19,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Dungeons/King of the Ring.md: title 'King of the Ring!' (raw locale hash 422538418), panel description (345723870) 'Mongo is the toughest troll around! Defeat Mongo to put him in his place!', main goal 'Knock out Mongo!' (2228658347), entrance 'Click on the gate to the Brawling Ring behind Carlos to fight Mongo.' (2737772893), boss 'Mongo' (1145211958). The guide's numbers are raw locale hashes, not Global.Text ids: the wire fields use the same-text Global.Text rows 24276/24277/24340/20482, verified in lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat (Global.Text.<id> JenkinsLookup2 keys)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt maps gate model 3126 to hsg_wooden_gate_01.adr (row present in lab/extracted/client-assets/catalog.tsv as pack_15/001875.adr) and troll boss model 168 to troll_shaman.adr (pack_06/000735.adr); the Legacy NPC table (src/Resources/Npcs.json Id 19451 and 32579) also lists hsg_wooden_gate_01.adr as an NPC model, so a gate .adr is a proven actor model. The client also carries sg_mongo_combat.gzne (pack_14/003230.gzne) and sg_mongo_combatAreas.xml (pack_20/003712.xml), evidence that a dedicated Mongo combat scene existed; this slice reuses arena 9600 (R)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Prize rows from lab/reports/round70-native-20261016T061000Z/content/item-catalogue.json serialized definitions: Saved by the Bell Brawler Gloves 75855 (name 132863, icon 4988), Battle Item Mystery Pack 10482 (name 6666, icon 973), Small Health Potion 11002 (name 422909, icon 730); every icon id is in Resources/Images/Images.txt."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Dungeons/King of the Ring.md: difficulty 1, no combat-job requirement, the Brawling Ring behind Carlos Brazenfist in Cobblestone Village, the Brawler prize wheel (Battle Item Mystery Pack and Saved by the Bell Brawler Gloves) and the 19 Coins slot on every job's wheel."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Content-only playable slice: local battle id 12400, GUIDs, the gate position 5 m behind Carlos at its sampled terrain height [-1908.92576,-39.4,410.69792] (lab/terrain/zone_0.hgt samples -39.40 at the gate and -39.78 under Carlos), the marker's locale name id 24276 ('King of the Ring!') with the tool label 'Brawling Ring' (world::add_static_actor serializes spawn.npc_name, which it leaves empty, so the client nameplate must come from NameStringId), Mongo's 900 HP / 4 damage from battle 96's difficulty-1 boss template, arena 9600 reuse and the three-row wheel. The retail roster, scene binding, stats and per-job wheels are not recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The 19-coin payout is the guide's every-wheel coin slot, paid by the existing won-run reward rule; the engine's existing deterministic one-prize pick (now_ms % prizes) is not a recovered wheel animation, and the original stars payout is not modelled."
+        },
+        {
+          "kind": "client",
+          "evidence": "data/content/dungeons/king_of_the_ring.json crosswalk: dungeon_data.name_string_id 422538418, difficulty 1, entry minimum_combat_job_level 1 and the Cobblestone Village 'gate to the Brawling Ring' entrance with no generated encounter/rewards; this field-battle row is the playable backing. data/content/npcs/cobblestone_village.json: Carlos Brazenfist 9000000042 at [-1906.11908,-39.79,414.835853], facing quaternion [0,0.29361,0,0.95593], placement_source reconstructed_poi_name_match; the gate is 5.00 m along the reverse facing at the sampled terrain height."
+        }
+      ],
+      "nameplate_image_id": 11970,
+      "zone": {
+        "zone_id": 9600,
+        "name": "sg_random_encounter_clearing",
+        "sky": "sky_wilds24.xml",
+        "geometry_id": 214,
+        "position": [
+          136.0,
+          -0.5,
+          155.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tutorial": false
+      },
+      "icon_id": -1,
+      "prizes": [
+        {
+          "item_id": 75855,
+          "name_id": 132863,
+          "icon_id": 4988
+        },
+        {
+          "item_id": 10482,
+          "name_id": 6666,
+          "icon_id": 973
+        },
+        {
+          "item_id": 11002,
+          "name_id": 422909,
+          "icon_id": 730
+        }
+      ]
     }
   ]
 }

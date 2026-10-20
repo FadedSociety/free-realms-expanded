@@ -266,7 +266,8 @@ def scenario_from_content(content: Path) -> dict:
             giver = npcs.get(int(candidate.get("giver_npc_id", -1)))
             if (candidate.get("enabled", True) and not candidate.get("prerequisite_quest_ids")
                     and giver and giver.get("position")
-                    and int(candidate["id"]) in giver.get("quest_ids_given", [])):
+                    and int(candidate["id"]) in giver.get("quest_ids_given", [])
+                    and not candidate.get("job")):  # job-gated quests need that active profile
                 distance = math.dist(start_position, giver["position"]) if start_position else 0.0
                 quest_candidates.append((distance, int(candidate["id"]), candidate, giver))
     if not quest_candidates:

@@ -521,8 +521,9 @@ fn five_distinct_field_battles_load_with_the_existing_schema() {
 
     // T016 already integrated Stone Heart at this autopilot tip and retains
     // its own route test. T103 still completes the designated five-battle
-    // roster without deleting that adjacent work.
-    assert_eq!(ids, [96, 12301, 12302, STONE_HEART, 12310, 12311]);
+    // roster without deleting that adjacent work; T252 appends the Brawling
+    // Ring (12400) as the seventh row.
+    assert_eq!(ids, [96, 12301, 12302, STONE_HEART, 12310, 12311, 12400]);
     assert_eq!(ids.iter().filter(|id| TASK_ROSTER.contains(id)).count(), 5);
 
     let mut guids = BTreeSet::new();

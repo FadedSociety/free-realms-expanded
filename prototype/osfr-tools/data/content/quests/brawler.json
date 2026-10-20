@@ -155,105 +155,169 @@
     },
     {
       "id": 3030004,
+      "job": 43,
       "title_string_id": 140531,
       "giver_npc_id": 9000000042,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000042,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/King of the Ring.md: 'Talk to Carlos Brazenfist' (raw locale hash 1274467248 = Global.Text 47308); notes/Build Guides/Content/Jobs/Brawler.md row C1."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T252: objective ordinal 1 and target 9000000042 are server content bindings for the recovered Carlos talk step, not recovered retail objective identifiers."
+            }
+          ]
+        },
+        {
+          "kind": "complete_dungeon",
+          "id": 2,
+          "encounter_id": 12400,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/King of the Ring.md: 'Defeat Mongo in the brawling ring' (raw locale hash 1844179881 = Global.Text 94586) and the entrance step 'Interact with the gate to the Brawling Ring' (2842545697 = Global.Text 431096)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T252: objective ordinal 2 and encounter 12400 are server content bindings (the field_battles row). The battle's own 41/114 start screen is the gate step, so no separate gate objective is authored: the server observes the authoritative won run, not the click."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "43": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T252: the retail quest payout is unknown; five coins and 25 Brawler (profile 43) XP follow the W110/T101/T202 small-quest fallback. No item is granted because the Brawler trainer already grants the starter outfit, so a second free grant would be a sellable duplicate."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C1; name 'Brawler: Bringing Back Brazenfist'; title id cell ucdt 4039116213 / ugdt 3597755459"
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C1; name 'Brawler: Bringing Back Brazenfist'; title id cell ucdt 4039116213 / ugdt 3597755459 (Global.Text 140531). Description 'As a brawler, partner with Carlos Brazenfist in Cobblestone Village, to help him defeat Mongo and restore his honor.' (raw hash 3456933436)."
+        },
+        {
+          "kind": "client",
+          "evidence": "data/content/npcs/cobblestone_village.json: Carlos Brazenfist 9000000042 is a positioned quest giver with quests_given rows 3030004/3030005/3030006; his profile is 43 (data/content/jobs.json 'brawler')."
         },
         {
           "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C1; name 'Brawler: Bringing Back Brazenfist'; title id cell ucdt 4039116213 / ugdt 3597755459"
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md row C1/C2 and notes/Build Guides/Content/Dungeons/King of the Ring.md: the wiki's Brawler starter line names Bringing Back Brazenfist then Honor Lost, both from Carlos Brazenfist in Cobblestone Village."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) quest id 3030004 is a stable batch key; the guide does not provide a numeric server quest id"
+          "evidence": "(R) T252: quest id 3030004 is the existing stable batch key; the guide gives no numeric server quest id. The job gate (profile 43, rank 1) and encounter 12400 are server content bindings."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+          "evidence": "(R) T252: no numeric predecessor; C1 is the line's first quest and stays prerequisite-free. Step order is preserved by the objectives array (the split loader runs steps in order)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T252 enabled C1: the Mongo battle row 12400 now backs the recovered goal, so the two opening Cobblestone quests are playable in retail order (T101 had disabled them because the encounter was unbuilt)."
         }
       ],
       "description_string_id": 140532,
       "intro_text_string_id": 140530,
       "end_text_string_id": 140533,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3030005,
+      "job": 43,
       "title_string_id": 94283,
       "giver_npc_id": 9000000042,
       "prerequisite_quest_ids": [
         3030004
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "complete_dungeon",
+          "id": 1,
+          "encounter_id": 12400,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/King of the Ring.md: the guide's second Mongo fight and Carlos's hand-in 'Now that you've beaten Mongo, return to Carlos and get your reward.' (2203155873)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T252: objective ordinal 1 and encounter 12400 are server content bindings for the repeatable battle row; the fight is repeatable under the existing field-battle policy and the quest advances once."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000042,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Dungeons/King of the Ring.md: Carlos's thanks 'You did it! You beat Mongo! Now I can hold my head up high again.' (712452336)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T252: objective ordinal 2 and target 9000000042 are server content bindings for the recovered Carlos hand-in."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "43": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T252: the retail quest payout is unknown; five coins and 25 Brawler (profile 43) XP follow the W110/T101/T202 small-quest fallback. No item is granted because the Brawler trainer already grants the starter outfit, so a second free grant would be a sellable duplicate."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C2; name 'Brawler: Honor Lost'; title id cell ucdt 833784102 / ugdt 249251189"
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C2; name 'Brawler: Honor Lost'; title id cell ucdt 833784102 / ugdt 249251189 (Global.Text 94283)."
+        },
+        {
+          "kind": "client",
+          "evidence": "data/content/npcs/cobblestone_village.json: Carlos Brazenfist 9000000042 gives row 3030005; profile 43 from data/content/jobs.json 'brawler'."
         },
         {
           "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C2; name 'Brawler: Honor Lost'; title id cell ucdt 833784102 / ugdt 249251189"
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md row C1/C2 and notes/Build Guides/Content/Dungeons/King of the Ring.md: the wiki's Brawler starter line names Bringing Back Brazenfist then Honor Lost, both from Carlos Brazenfist in Cobblestone Village."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) quest id 3030005 is a stable batch key; the guide does not provide a numeric server quest id"
+          "evidence": "(R) T252: quest id 3030005 is the existing stable batch key; prerequisite 3030004 is the existing binding for the recovered C1 to C2 order."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) source explicitly says after row C1; mapped that page label to the preceding batch content key"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T252 enabled C2: its prerequisite is now completable because battle row 12400 backs the recovered Mongo fight."
         }
       ],
       "description_string_id": 94284,
       "intro_text_string_id": 94282,
       "end_text_string_id": 94285,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3030006,
