@@ -7,6 +7,8 @@ impl Gameplay {
     ///
     /// Both loads are fallible, so build them before touching live state: a refused
     /// rebind (corrupt content) keeps the bound catalogue and the saved progress.
+    /// A live rebind rebuilds from the bound engine (the saved copy was consumed by
+    /// the load-time bind), so it keeps in-flight quests instead of clearing them.
     pub fn bind_npc_quest_catalogue(
         &mut self,
         content_dir: &Path,
@@ -30,11 +32,16 @@ impl Gameplay {
             return Ok(());
         };
         let crosswalk = crate::quest_journal::load_crosswalk(source)?;
+        let state = self
+            .npc_quests
+            .as_ref()
+            .map(|engine| engine.state().clone())
+            .or_else(|| self.saved_npc_quests.clone());
         let engine = crate::quest_engine::QuestEngine::from_split_content(
             source,
             character_id,
             crate::quest_engine::CharacterEligibility::default(),
-            self.saved_npc_quests.clone(),
+            state,
         )?;
         self.npc_quests = Some(engine);
         self.saved_npc_quests = None;

@@ -17,6 +17,7 @@ pub use content_copy::copy_tree;
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState, Outcome},
+    npc_interaction::decode_quest_offer_49_1,
     quest_engine::QuestStatus,
 };
 use serde_json::Value;
@@ -299,8 +300,12 @@ pub fn offer(
         .filter(|packet| packet.starts_with(&[49, 0, 1, 0]))
         .collect();
     assert_eq!(offers.len(), 1, "one Talk offers exactly one quest");
-    assert!(
-        has_family(offers[0], 49, 1, Some(quest_id)),
+    // Decode with the production reader so a wrong field order or a corrupt
+    // packet fails here in every chapter, not only in the Wizard card test.
+    let decoded = decode_quest_offer_49_1(offers[0].as_slice())
+        .expect("the offered 49/1 decodes with the production reader");
+    assert_eq!(
+        decoded.quest_id, quest_id,
         "quest {quest_id} was not offered"
     );
     assert_eq!(quest_status(game, quest_id), QuestStatus::Offered);

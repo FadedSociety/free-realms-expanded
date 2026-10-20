@@ -652,10 +652,11 @@ fn a_refused_rebind_keeps_the_bound_catalogue_and_saved_progress() {
     assert!(visit(&mut game, book_search, now).changed);
     let in_progress = saved(&game);
 
-    // The live catalogue is not replaced by a refused rebind, so its next step still works.
+    // The corrupt record is read-only and reused for both refused binds.
     let directory = synthetic_content(&record(3_999_001, vec![talk_goal(1, 0)], vec![]));
+
+    // The live catalogue is not replaced by a refused rebind, so its next step still works.
     let refused = game.bind_npc_quest_catalogue(&directory, CHARACTER);
-    let _ = fs::remove_dir_all(&directory);
     assert!(
         refused.is_err(),
         "a zero-target record must be refused at content load"
@@ -672,13 +673,23 @@ fn a_refused_rebind_keeps_the_bound_catalogue_and_saved_progress() {
     );
     assert_eq!(pending_turnin(&game), Some(BOOK));
 
+    // A successful rebind on a live game rebuilds from the bound engine (the saved
+    // copy is consumed at load), so it keeps the in-flight chapter.
+    let advanced = saved(&game);
+    game.bind_npc_quest_catalogue(&content_dir(), CHARACTER)
+        .expect("the live rebind binds the good catalogue");
+    assert_eq!(
+        saved(&game),
+        advanced,
+        "a live rebind discarded the bound chapter progress"
+    );
+    assert_eq!(pending_turnin(&game), Some(BOOK));
+
     // A reconnect loads the save before binding: a refused bind must keep the saved
     // progress for the retry instead of consuming it.
     let state: GameplayState = serde_json::from_slice(&in_progress).unwrap();
     let mut reconnecting = Gameplay::load(fixture.path(), Some(state)).expect("save loads");
-    let directory = synthetic_content(&record(3_999_001, vec![talk_goal(1, 0)], vec![]));
     let refused = reconnecting.bind_npc_quest_catalogue(&directory, CHARACTER);
-    let _ = fs::remove_dir_all(&directory);
     assert!(
         refused.is_err(),
         "the corrupt reconnect content must be refused"
@@ -688,6 +699,7 @@ fn a_refused_rebind_keeps_the_bound_catalogue_and_saved_progress() {
         in_progress,
         "the refused bind consumed the saved NPC quest progress"
     );
+    let _ = fs::remove_dir_all(&directory);
     reconnecting
         .bind_npc_quest_catalogue(&content_dir(), CHARACTER)
         .expect("the retry binds the good catalogue");

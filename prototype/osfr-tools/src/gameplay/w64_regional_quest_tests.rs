@@ -105,6 +105,19 @@ fn live_quest_offers_require_real_level_and_the_active_job() {
     profile.experience.insert(43, 200);
     game.profiles = Some(Profiles::load(&reference(), Some(profile)).unwrap());
     game.bind_npc_quest_catalogue(&scratch, 1).unwrap();
+    assert_eq!(
+        game.npc_quests.as_ref().unwrap().state().pending_offer,
+        Some(INTRODUCE_YOURSELF_ID),
+        "a live rebind must keep the bound offer"
+    );
+    // Decline the kept offer so the job gate below, not the offered status, denies.
+    assert!(
+        game.npc_quests
+            .as_mut()
+            .unwrap()
+            .decline(INTRODUCE_YOURSELF_ID)
+            .changed
+    );
     assert!(
         !game
             .npc_quests
