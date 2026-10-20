@@ -89,6 +89,26 @@ impl Fixture {
         Self { path, character_id }
     }
 
+    /// Copy every repository content file this fixture does not already supply, so
+    /// `Gameplay::load` reads NPCs, field actors and `jobs.json` from the fixture's own
+    /// tree. Opening/profile/inventory files keep winning (`copy_missing`), the same
+    /// overlay T256's field fixture uses; the caller may then patch the scratch copy.
+    pub fn overlay_content(&self, source: &Path) {
+        fn copy_missing(from: &Path, to: &Path) {
+            for row in fs::read_dir(from).unwrap() {
+                let path = row.unwrap().path();
+                let target = to.join(path.file_name().unwrap());
+                if path.is_dir() {
+                    fs::create_dir_all(&target).unwrap();
+                    copy_missing(&path, &target);
+                } else if !target.exists() {
+                    fs::copy(path, target).unwrap();
+                }
+            }
+        }
+        copy_missing(source, &self.path);
+    }
+
     /// A copy without the opening scene and the campaign files that require it,
     /// so `Gameplay::on_location` cannot advance the opening story. Event-quest
     /// tests use it when their objective and wallet deltas must be exact.
