@@ -4652,7 +4652,7 @@
       ],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
-      "vendor_stock": "Crafting Supplies: Thorny Fasteners, Wooden Planks and Singing Coal (Blacksmith.md row 3; client 3250596704, 798476908, 860037929; video 2fhn8kePbKQ/00612).",
+      "vendor_stock": "Crafting Supplies: Thorny Fasteners, Wooden Planks and Singing Coal.",
       "vendor_stock_reason": null,
       "services": [
         "Thorny Fasteners, Wooden Planks (client 3250596704), Singing Coal (client 798476908, 860037929)."
@@ -4878,7 +4878,7 @@
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) T274: the vendor role classifies Bruno's stall; the explicit vendors.json item mapping authorizes the stock (src/npc_interaction.rs). The client strings and the video stall establish that he sells these components."
+            "evidence": "(R) T274: the vendor role authorizes the vendors.json stock mapping required by src/npc_interaction.rs; the client strings and the video stall establish that Bruno sells these components."
           }
         ],
         "enemy_kind": [

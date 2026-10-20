@@ -58,8 +58,8 @@ fn vendor_stock_is_loadable_and_supported_by_content_evidence() {
         })
         .collect();
 
-    // The production loader also validates NPC references, unique IDs, and prices. The NPC
-    // role is content classification; the explicit vendors.json mapping authorizes stock.
+    // The production loader also validates NPC references, vendor roles, unique IDs, and
+    // prices; the role and the explicit vendors.json mapping together authorize stock.
     NpcInteraction::load(&content.join("npcs"), &content.join("stores.json"))
         .expect("vendor content loads through the production NPC loader");
 

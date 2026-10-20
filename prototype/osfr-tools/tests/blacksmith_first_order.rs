@@ -21,7 +21,7 @@
 //!
 //! The shared quest fixture and packet helpers live in `tests/support/npc_quest_chain.rs`; the
 //! vendor packet and result decoders live in `tests/common/gateway_vendor.rs`.
-#[allow(dead_code, unused_imports)] // The shared vendor kit carries helpers this suite does not send.
+#[allow(dead_code)] // The shared vendor kit carries helpers this suite does not send.
 #[path = "common/gateway_vendor.rs"]
 mod gateway_vendor;
 #[path = "support/npc_quest_chain.rs"]

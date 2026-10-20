@@ -521,22 +521,20 @@ fn merchant_buy_66_43_is_parsed_only_for_an_open_vendor_session() {
     ));
 }
 
-/// A `vendors.json` mapping authorizes its own stock. The NPC `vendor` role only classifies
-/// the menu, so content regeneration that drops the role must not make the vendor record
-/// unloadable (the T274 review's failure mode).
+/// (R) The NPC `vendor` role and the explicit `vendors.json` mapping together authorize
+/// stock. A mapping for a role-less NPC must fail the load loudly instead of authorizing a
+/// sale; the F307 review found the mapping-only rule was an unsigned roles change.
 #[test]
-fn a_vendor_mapping_authorizes_stock_without_the_content_role() {
+fn a_vendor_mapping_without_the_content_role_is_refused() {
     let root = std::env::temp_dir().join(format!(
         "osfr-vendor-role-{}-{VENDOR_ID}",
         std::process::id()
     ));
     let _ = std::fs::remove_dir_all(&root);
     std::fs::create_dir_all(root.join("npcs")).expect("fixture NPC directory");
-    std::fs::write(
-        root.join("npcs/fixture.json"),
-        br#"{"schema_version":1,"records":[{"npc_id":9500000339,"name":"Fixture","zone_id":0,"position":[0.0,0.0,0.0],"roles":["ambient"],"vendor_stock":"synthetic"}]}"#,
-    )
-    .expect("fixture NPC writes");
+    let role_less = br#"{"schema_version":1,"records":[{"npc_id":9500000339,"name":"Fixture","zone_id":0,"position":[0.0,0.0,0.0],"roles":["ambient"],"vendor_stock":"synthetic"}]}"#;
+    let role_bearing = br#"{"schema_version":1,"records":[{"npc_id":9500000339,"name":"Fixture","zone_id":0,"position":[0.0,0.0,0.0],"roles":["vendor"],"vendor_stock":"synthetic"}]}"#;
+    std::fs::write(root.join("npcs/fixture.json"), role_less).expect("fixture NPC writes");
     std::fs::write(
         root.join("vendors.json"),
         br#"{"schema_version":1,"vendors":[{"npc_id":9500000339,"item_ids":[8]}]}"#,
@@ -548,16 +546,28 @@ fn a_vendor_mapping_authorizes_stock_without_the_content_role() {
     )
     .expect("fixture store writes");
 
+    let error = match NpcInteraction::load(&root.join("npcs"), &root.join("stores.json")) {
+        Err(error) => error,
+        Ok(_) => panic!("a mapping without the vendor role must refuse the load"),
+    };
+    assert_eq!(error.kind(), std::io::ErrorKind::InvalidData);
+    assert!(
+        error.to_string().contains("invalid vendor stock mapping"),
+        "unexpected refusal: {error}"
+    );
+
+    // Positive control: the reviewed role+mapping rule still loads and sells.
+    std::fs::write(root.join("npcs/fixture.json"), role_bearing).expect("fixture NPC writes");
     let mut service = NpcInteraction::load(&root.join("npcs"), &root.join("stores.json"))
-        .expect("the explicit mapping authorizes stock without the content role");
+        .expect("the role and the explicit mapping authorize stock");
     let menu = service
         .interact(VENDOR_ID, 0, [0.0; 3], None)
-        .expect("the role-less vendor opens its menu");
+        .expect("the vendor opens its menu");
     let shop = menu
         .options
         .iter()
         .find(|option| option.action == NpcAction::Shop)
-        .expect("the mapping adds the Shop action");
+        .expect("the role adds the Shop action");
     let NpcSelection::Shop(window) = service
         .select(&request_selection(VENDOR_ID, shop.id), 0, [0.0; 3], None)
         .expect("the Shop choice opens the mapped stock")
