@@ -622,11 +622,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2237; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3494 (ModelId=438, ModelFileName=human_m_andrew.agr, NameId=70339)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 45199, Global.Text.413790 (JenkinsLookup2 hash 1713126354). Speaker proof: first-person card-duelist line; Card Duelist quest 3040037 binds giver_npc_id 9000000005 and its offer intro is 413790 (\"Let's play a card game while I try to remember\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md:89; job guide notes/Build Guides/Content/Jobs/Card Duelist.md:129 (row 36). See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": 0.453381,
       "model_id": 438,
-      "model_file_name": "human_m_andrew.agr"
+      "model_file_name": "human_m_andrew.agr",
+      "greeting_string_id": 413790
     },
     {
       "npc_id": 9500000283,
@@ -4232,11 +4243,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2219; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3476 (ModelId=250, ModelFileName=chugawug_farmer_f.adr, NameId=5109)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 97222, Global.Text.24816 (JenkinsLookup2 hash 3672366051). Speaker proof: first-person Glugmort's Palate offer; the region guide quest row 177 quotes it and NPC row 61 lists the quest under Burnetta (\"Glugmort is never happy with any of the meals I cook for him\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md:61 and :177 (Glugmort's Palate row). See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -0.184061,
       "model_id": 250,
-      "model_file_name": "chugawug_farmer_f.adr"
+      "model_file_name": "chugawug_farmer_f.adr",
+      "greeting_string_id": 24816
     },
     {
       "npc_id": 9500000292,
@@ -6927,11 +6949,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3259; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4625 (ModelId=3019, ModelFileName=fairy_m_freestyle_Edmond.agr, NameId=428934)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 91771, Global.Text.429061 (JenkinsLookup2 hash 3466662338). Speaker proof: first-person Camp Troubles offer; the region guide quest row 153 quotes it and NPC row 40 names Edmond the Bigfoot-hunt giver (\"I know people are here for fun and games, but we've been having some troubles\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md:40 and :153 (Camp Troubles row). See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": 1.891452,
       "model_id": 3019,
-      "model_file_name": "fairy_m_freestyle_Edmond.agr"
+      "model_file_name": "fairy_m_freestyle_Edmond.agr",
+      "greeting_string_id": 429061
     },
     {
       "npc_id": 9500000298,
@@ -7366,11 +7399,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3248; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4614 (ModelId=3016, ModelFileName=human_m_freestyle_Jacen.agr, NameId=429028)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 30400, Global.Text.429370 (JenkinsLookup2 hash 1148190599). Speaker proof: first-person Bigfoot's Endangered offer; the region guide quest row 165 quotes it and NPC row 46 names Jacen the giver (\"Those mean ol' camp counselors from Camp Chatty just won't quit\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md:46 and :165 (Bigfoot's Endangered row). See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -1.800021,
       "model_id": 3016,
-      "model_file_name": "human_m_freestyle_Jacen.agr"
+      "model_file_name": "human_m_freestyle_Jacen.agr",
+      "greeting_string_id": 429370
     },
     {
       "npc_id": 9500000299,
@@ -8763,11 +8807,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3258; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4624 (ModelId=3017, ModelFileName=fairy_f_freestyle_Kaela.agr, NameId=428931)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 66657, Global.Text.429430 (JenkinsLookup2 hash 2531750111). Speaker proof: first-person Forest Friends offer; the region guide quest row 156 quotes it and NPC row 43 names Kaela the giver (\"I admit that I have a soft spot for our furry forest friends\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md:43 and :156 (Forest Friends row). See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": 2.602092,
       "model_id": 3017,
-      "model_file_name": "fairy_f_freestyle_Kaela.agr"
+      "model_file_name": "fairy_f_freestyle_Kaela.agr",
+      "greeting_string_id": 429430
     },
     {
       "npc_id": 9500000302,
@@ -11879,11 +11934,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2217; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3474 (ModelId=452, ModelFileName=chugawug_m_glugmort.adr, NameId=5102)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 10056, Global.Text.47871 (JenkinsLookup2 hash 379736909). Speaker proof: first-person Military Intelligence offer; the region guide quest row 167 quotes it and NPC row 59 lists Military Intelligence under Glugmort (\"If we're to fight off the Thugawugs\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md:59 and :167 (Military Intelligence row). See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": 0.694609,
       "model_id": 452,
-      "model_file_name": "chugawug_m_glugmort.adr"
+      "model_file_name": "chugawug_m_glugmort.adr",
+      "greeting_string_id": 47871
     },
     {
       "npc_id": 9500000308,
@@ -13059,11 +13125,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2191; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3448 (ModelId=222, ModelFileName=chugawug_f_02.adr, NameId=77570)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 62180, Global.Text.77548 (JenkinsLookup2 hash 2366800564). Speaker proof: first-person miner challenge; Miner quest 3100017 binds giver_npc_id 9000000337 and its offer intro is 77548 (\"All the miners here are so slow!\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md:114; job guide notes/Build Guides/Content/Jobs/Miner.md:47. See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -1.647537,
       "model_id": 222,
-      "model_file_name": "chugawug_f_02.adr"
+      "model_file_name": "chugawug_f_02.adr",
+      "greeting_string_id": 77548
     },
     {
       "npc_id": 9000000106,
@@ -13905,11 +13982,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1244; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2501 (ModelId=214, ModelFileName=chugawug_m_greenwood_archer_01.adr, NameId=22171)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 109263, Global.Text.383044 (JenkinsLookup2 hash 4136546835). Speaker proof: first-person archer-trainer line; Archer quest 3010007 binds giver_npc_id 9000000106 and its offer intro is 383044 (\"Training recruits near the lake has been tough\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md:66; job guide notes/Build Guides/Content/Jobs/Archer.md:85 (row 5). See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -0.022298,
       "model_id": 214,
-      "model_file_name": "chugawug_m_greenwood_archer_01.adr"
+      "model_file_name": "chugawug_m_greenwood_archer_01.adr",
+      "greeting_string_id": 383044
     },
     {
       "npc_id": 9500000309,
@@ -17000,11 +17088,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2210; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3467 (ModelId=215, ModelFileName=chugawug_f_greenwood_archer_01.adr, NameId=5104)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 78290, Global.Text.22074 (JenkinsLookup2 hash 2967121729). Speaker proof: first-person archer-trainer line; Archer quest 3010003 binds giver_npc_id 9000000387 and its offer intro is 22074 (\"I hereby take you under my wing\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md:60; job guide notes/Build Guides/Content/Jobs/Archer.md:46 (row 1). See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -1.259401,
       "model_id": 215,
-      "model_file_name": "chugawug_f_greenwood_archer_01.adr"
+      "model_file_name": "chugawug_f_greenwood_archer_01.adr",
+      "greeting_string_id": 22074
     },
     {
       "npc_id": 9500000314,
@@ -18424,11 +18523,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2170; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3427 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=77427)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 81310, Global.Text.94431 (JenkinsLookup2 hash 3079919145). Speaker proof: first-person blacksmith offer; Blacksmith quest 3020015 binds giver_npc_id 9000000405 and its offer intro is 94431 (\"I'm so glad you've arrived\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md:112; job guide notes/Build Guides/Content/Jobs/Blacksmith.md:51. See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -1.873876,
       "model_id": 548,
-      "model_file_name": "human_f_freestyle_06.agr"
+      "model_file_name": "human_f_freestyle_06.agr",
+      "greeting_string_id": 94431
     },
     {
       "npc_id": 9500000315,
@@ -21428,11 +21538,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2782; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4116 (ModelId=657, ModelFileName=fairy_m_freestyle_08.agr, NameId=389190)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 74126, Global.Text.389186 (JenkinsLookup2 hash 2813630996). Speaker proof: first-person adventurer entry-quest line; Adventurer quest 3000024 binds giver_npc_id 9000000444 and its offer intro is 389186 (\"These thugawugs stole my bag!\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md:91; job guide notes/Build Guides/Content/Jobs/Adventurer.md:112 (row D1). See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -1.455872,
       "model_id": 657,
-      "model_file_name": "fairy_m_freestyle_08.agr"
+      "model_file_name": "fairy_m_freestyle_08.agr",
+      "greeting_string_id": 389186
     },
     {
       "npc_id": 9500000320,
@@ -22728,11 +22849,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2171; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3428 (ModelId=438, ModelFileName=human_m_andrew.agr, NameId=73956)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 55027, Global.Text.94417 (JenkinsLookup2 hash 2088544163). Speaker proof: first-person blacksmith line; Blacksmith quest 3020014 binds giver_npc_id 9000000479 and its offer intro is 94417 (\"If Derp sent you, then you must be a skilled blacksmith\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md:113; job guide notes/Build Guides/Content/Jobs/Blacksmith.md:50. See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": 0.886334,
       "model_id": 438,
-      "model_file_name": "human_m_andrew.agr"
+      "model_file_name": "human_m_andrew.agr",
+      "greeting_string_id": 94417
     },
     {
       "npc_id": 9500000322,

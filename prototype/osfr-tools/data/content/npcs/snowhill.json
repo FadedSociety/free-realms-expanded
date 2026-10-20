@@ -4152,11 +4152,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2343; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3601 (ModelId=426, ModelFileName=human_m_brody_sparfist.agr, NameId=22436)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 109750, Global.Text.91267 (JenkinsLookup2 hash 4155254588). Speaker proof: first-person blacksmith line; Blacksmith quest 3020007 binds giver_npc_id 9000000033 and its offer intro is 91267 (\"I'll make sure he teaches you some new recipes\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Snowhill.md:50; job guide notes/Build Guides/Content/Jobs/Blacksmith.md:48. See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -2.292379,
       "model_id": 426,
-      "model_file_name": "human_m_brody_sparfist.agr"
+      "model_file_name": "human_m_brody_sparfist.agr",
+      "greeting_string_id": 91267
     },
     {
       "npc_id": 9500000729,
@@ -13055,8 +13066,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 9699, Global.Text.46059 (JenkinsLookup2 hash 365276068). Speaker proof: first-person warrior pitch; the Warrior guide names Dewey and quotes this line as his newcomer pitch (Warrior.md:44, \"speak with me again\"); Warrior quest 3150001 binds giver 9000000076 but records no intro. Region guide notes/Build Guides/Content/NPCs/NPCs - Snowhill.md:35; job guide notes/Build Guides/Content/Jobs/Warrior.md:44 and :82 (W1 row). Extra spawn: npc_spawns_extra.json spawn_guid/content_key 9000000076 model 995 name_string_id 22435, so the clicked actor resolves this regional row (T201). See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 46059
     },
     {
       "npc_id": 9500000744,
@@ -25990,11 +26012,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2374; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3694 (ModelId=354, ModelFileName=human_f_ninja_01.agr, NameId=21098)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 25918, Global.Text.78904 (JenkinsLookup2 hash 979442635). Speaker proof: first-person ninja line; Ninja quest 3110023 binds giver_npc_id 9000000151 and its offer intro is 78904 (\"Patterwings and I were translating secrets\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Snowhill.md:93; job guide notes/Build Guides/Content/Jobs/Ninja.md:57 (row F5). See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -0.96504,
       "model_id": 354,
-      "model_file_name": "human_f_ninja_01.agr"
+      "model_file_name": "human_f_ninja_01.agr",
+      "greeting_string_id": 78904
     },
     {
       "npc_id": 9500000756,
@@ -27702,8 +27735,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 17991, Global.Text.70892 (JenkinsLookup2 hash 682434084). Speaker proof: first-person warrior-rites speech; the Warrior guide W3 row attributes it to Morninglory (Warrior.md:84, \"Morninglory: \\\"Glad to see you could join us\\\"\" hash 682434084) and the NPC row names her as the rites host. Region guide notes/Build Guides/Content/NPCs/NPCs - Snowhill.md:36; job guide notes/Build Guides/Content/Jobs/Warrior.md:45 and :84 (W3 row). Extra spawn: npc_spawns_extra.json spawn_guid/content_key 9000000155 model 731 name_string_id 5102192, so the clicked actor resolves this regional row (T257). See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 70892
     },
     {
       "npc_id": 9500000758,
@@ -36423,11 +36467,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2341; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3599 (ModelId=48, ModelFileName=fairy_m_01.adr, NameId=3061)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 71745, Global.Text.78478 (JenkinsLookup2 hash 2726091184). Speaker proof: first-person blacksmith offer; Blacksmith quest 3020002 binds giver_npc_id 9000000206 and its offer intro is 78478 (\"Return with copper bars and I'll teach you the basics\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Snowhill.md:46; job guide notes/Build Guides/Content/Jobs/Blacksmith.md:46. See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -0.17456,
       "model_id": 48,
-      "model_file_name": "fairy_m_01.adr"
+      "model_file_name": "fairy_m_01.adr",
+      "greeting_string_id": 78478
     },
     {
       "npc_id": 9500000770,
@@ -39491,8 +39546,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 33068, Global.Text.387432 (JenkinsLookup2 hash 1250175886). Speaker proof: first-person weapon-trainer line; Warrior quest 3150005 binds giver_npc_id 9000000208 and its offer intro is 387432 (\"I think you should go talk to Caleb Sleepyswing\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Snowhill.md:34; job guide notes/Build Guides/Content/Jobs/Warrior.md:46 (Steele weapon trainer) and :86 (W5 row). Extra spawn: npc_spawns_extra.json spawn_guid/content_key 9000000208 model 391 name_string_id 434620, so the clicked actor resolves this regional row (T257). See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 387432
     },
     {
       "npc_id": 9500000773,
@@ -44257,11 +44323,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2358; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3655 (ModelId=35, ModelFileName=fairy_f_penelope.adr, NameId=3230)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 67797, Global.Text.76208 (JenkinsLookup2 hash 2576815658). Speaker proof: first-person miner line; Miner quest 3100004 binds giver_npc_id 9000000220 and its offer intro is 76208 (\"I dropped off a shipment of broken mining gear\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Snowhill.md:45; job guide notes/Build Guides/Content/Jobs/Miner.md:42. See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -0.516485,
       "model_id": 35,
-      "model_file_name": "fairy_f_penelope.adr"
+      "model_file_name": "fairy_f_penelope.adr",
+      "greeting_string_id": 76208
     },
     {
       "npc_id": 9500000777,
@@ -47520,11 +47597,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2318; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3575 (ModelId=49, ModelFileName=fairy_m_02.adr, NameId=70083)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T299: en_us_data.dat line 78056, Global.Text.74937 (JenkinsLookup2 hash 2958328408). Speaker proof: first-person wizard-trainer line; Wizard quest 3160016 binds giver_npc_id 9000000234 and its offer intro is 74937 (\"I think it's time for you to make your first wand\"). Region guide notes/Build Guides/Content/NPCs/NPCs - Snowhill.md:80; job guide notes/Build Guides/Content/Jobs/Wizard.md:48 and :94 (row 14). See notes/Autopilot/T299.md for the method and provenance."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T299: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -2.638704,
       "model_id": 49,
-      "model_file_name": "fairy_m_02.adr"
+      "model_file_name": "fairy_m_02.adr",
+      "greeting_string_id": 74937
     }
   ]
 }
