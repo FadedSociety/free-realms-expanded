@@ -96,15 +96,52 @@
     },
     {
       "id": 3070003,
+      "job": 137,
       "title_string_id": 417055,
+      "intro_text_string_id": 417054,
+      "description_string_id": 417056,
       "giver_npc_id": 9000000181,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000181,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Entry and tutorial, row E3; Reed Stillwater's tutorial line 676088078 'Learn all you need to know about fishing!' and the trainers table (2663118808) place this step at Reed."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T244: objective id 1 is the local authored step; the guide gives no retail objective id, counter or ordered-step table. The accept is Reed's 26/10 menu; the next Talk to Reed completes the step."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 10,
+          "items": [],
+          "job_xp": {
+            "137": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T244 playtest values: 10 coins and 25 Fisherman (profile 137) XP. The guides record no original Fisherman reward table; no item is granted because Reed's 'extra gear' item (2663118808) is unknown."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Entry and tutorial (titles without the \"Fisherman:\" prefix), row E3; name 'Learn to Fish!'; title id cell 3359670549 / 1197071914"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Trainers table, Reed Stillwater starts the line and unlocks the job; wiki Fisherman."
         },
         {
           "kind": "reconstructed",
@@ -116,38 +153,86 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T244: enabled the tutorial row with Reed's talk step. The guide's E3 text is the tutorial line; the objective id and Talk binding are local authored policy."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+          "evidence": "(R) T244: reward values are the playtest ladder (10 coins, 25 Fisherman XP); no original reward table was recovered."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T244: job 137 (Fisherman) gate. The tutorial is Reed's fishing lesson; it is offered only while Fisherman is active and unlocked, which also guarantees the job_xp profile is unlocked for turn-in."
         },
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         }
       ],
-      "description_string_id": 417056,
-      "intro_text_string_id": 417054,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3070004,
+      "job": 137,
       "title_string_id": 408259,
+      "intro_text_string_id": 408258,
+      "description_string_id": 408260,
+      "end_text_string_id": 408261,
       "giver_npc_id": 9000000181,
       "prerequisite_quest_ids": [
         3070003
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "minigame_id": 599,
+          "count": 1,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: row E4; Reed's line 465495327 'It's time to test out your new fishing gear. Take a short boat ride to Sacred Grove Shallows to catch your first fish!'"
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "data/content/fishing_spots.json: Reed Stillwater (9000000181) guides sacred_grove_shallows, game_id 599."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T244: objective id 1, minigame_id 599 and count 1 are local authored policy; 599 is the spot's stable game id, not the framework type 21. Only the fishing service's server-emitted FinishMinigame event after a paid catch advances it."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000181,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Reed is the giver and turn-in contact; data/content/npcs/stillwater_crossing.json binds 3070003/3070004 to Reed."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T244: objective id 2 returns the player to Reed. The guide's E4 text names the catch, not a retail return row; the Talk binding is local authored policy."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 10,
+          "items": [],
+          "job_xp": {
+            "137": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T244 playtest values: 10 coins and 25 Fisherman (profile 137) XP. The guides record no original Fisherman reward table; no item is granted because Reed's 'extra gear' item (2663118808) is unknown."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -155,7 +240,7 @@
         },
         {
           "kind": "wiki",
-          "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Entry and tutorial (titles without the \"Fisherman:\" prefix), row E4; name 'Testing the Waters'; title id cell 3481931046 / 2465040477"
+          "evidence": "notes/Build Guides/Content/Jobs/Fisherman.md: Quest line > Entry and tutorial, row E4; wiki Fisherman."
         },
         {
           "kind": "reconstructed",
@@ -167,29 +252,26 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) source explicitly says after row E3; mapped that page label to the preceding batch content key"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T244: enabled the catch-and-return row. The first step consumes Reed's Sacred Grove Shallows game id 599; the second returns to Reed. Objective ids and count are local authored policy."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T244: reward values are the playtest ladder (10 coins, 25 Fisherman XP); no original reward table was recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T244: job 137 (Fisherman) gate. The tutorial is Reed's fishing lesson; it is offered only while Fisherman is active and unlocked, which also guarantees the job_xp profile is unlocked for turn-in."
         },
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         }
       ],
-      "description_string_id": 408260,
-      "intro_text_string_id": 408258,
-      "end_text_string_id": 408261,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3070005,
