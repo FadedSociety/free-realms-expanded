@@ -4934,12 +4934,15 @@ impl Gameplay {
                     };
                     let chef_before = chef_resource.map(|id| self.gather_count(id));
                     let result = self.opening.as_mut().unwrap().on_interaction(guid)?;
+                    let accepted = result.accepted;
                     self.apply_opening(result, &mut out)?;
-                    if matches!(
-                        &actor.action,
-                        Some(crate::opening::OpeningTrigger::Interact { actor_guid })
-                            if *actor_guid == guid
-                    ) {
+                    if accepted
+                        && matches!(
+                            &actor.action,
+                            Some(crate::opening::OpeningTrigger::Interact { actor_guid })
+                                if *actor_guid == guid
+                        )
+                    {
                         self.npc_quest_event(
                             crate::quest_engine::QuestEvent::InteractNpc { npc_id: guid },
                             &mut out,

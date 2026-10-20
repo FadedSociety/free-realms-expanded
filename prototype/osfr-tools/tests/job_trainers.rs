@@ -943,7 +943,8 @@ fn gateway_refusals_leave_the_save_untouched() {
     assert_eq!(gameplay_json(&gateway), before);
     assert!(!unlocked(&gateway).contains(&2));
 
-    // A live Mining run makes the same trainer refuse as busy, with no unlock.
+    // A live Mining run refuses the interaction at the shared busy gate before the menu
+    // opens, so neither the activity nor the NPC interaction state changes.
     let position = trainer_position(&npcs, smith);
     let near = [position[0] + 2.0, position[1], position[2]];
     let mut state = state_for(&content, smith, false);
@@ -958,11 +959,33 @@ fn gateway_refusals_leave_the_save_untouched() {
         "{}",
         String::from_utf8_lossy(&started.replies.concat())
     );
-    let menu = click(&mut gateway, smith.npc, 2_600);
-    let choice = option_with_label(&menu, smith.label_string_id).unwrap();
     let before = gameplay_json(&gateway);
-    let refused = choose(&mut gateway, smith.npc, choice, 2_700).unwrap();
-    assert!(said(&bodies(&refused), "Finish what you are doing"));
+    let refused = click_result(&mut gateway, smith.npc, 2_600).unwrap();
+    assert!(
+        said(
+            &bodies(&refused),
+            "Finish the active activity before interacting."
+        ),
+        "{}",
+        String::from_utf8_lossy(&refused.replies.concat())
+    );
+    assert!(
+        bodies(&refused)
+            .iter()
+            .all(|reply| !reply.starts_with(&[26, 0, 9, 0])),
+        "a busy trainer must not open a menu"
+    );
+    assert!(!refused.state_changed && !refused.gameplay_changed);
+    assert_eq!(gameplay_json(&gateway), before);
+    assert!(!unlocked(&gateway).contains(&16));
+
+    // A choice sent without an open menu is refused by the same gate, still changing nothing.
+    let refused = choose(&mut gateway, smith.npc, 2, 2_700).unwrap();
+    assert!(said(
+        &bodies(&refused),
+        "Finish the active activity before interacting."
+    ));
+    assert!(!refused.state_changed && !refused.gameplay_changed);
     assert_eq!(gameplay_json(&gateway), before);
     assert!(!unlocked(&gateway).contains(&16));
 }

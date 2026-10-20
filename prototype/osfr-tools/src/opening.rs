@@ -56,6 +56,10 @@ pub struct OpeningOutcome {
     pub rewards: Vec<OpeningReward>,
     pub unlock_profiles: Vec<i32>,
     pub completed_opening: bool,
+    /// True only when [`OpeningEngine::on_interaction`] passed its range and job gates and
+    /// dispatched the actor's trigger. A refusal leaves it false, so callers withhold the
+    /// quest progress an accepted interaction emits.
+    pub accepted: bool,
 }
 
 #[derive(Clone, Debug, Serialize, Deserialize)]
@@ -646,7 +650,7 @@ impl OpeningEngine {
                 ..OpeningOutcome::default()
             });
         }
-        if let Some(action) = actor.action {
+        let mut outcome = if let Some(action) = actor.action {
             let event = match action {
                 OpeningTrigger::Gather { resource_id } => OpeningEvent::Gather {
                     resource_id,
@@ -660,12 +664,14 @@ impl OpeningEngine {
                     actor_id: actor_guid,
                 },
             };
-            self.on_event(event)
+            self.on_event(event)?
         } else {
             self.on_event(OpeningEvent::Talk {
                 actor_id: actor_guid,
-            })
-        }
+            })?
+        };
+        outcome.accepted = true;
+        Ok(outcome)
     }
 
     pub fn on_event(&mut self, event: OpeningEvent) -> io::Result<OpeningOutcome> {

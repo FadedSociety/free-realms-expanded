@@ -30,6 +30,18 @@ impl Gameplay {
         Ok(packets)
     }
 
+    /// (R) A live activity closes ordinary regional NPC interaction. `handle_in_world_inner`
+    /// reaches this router before the opening handlers' activity refusals, so the shared busy
+    /// table has to hold here too. A refusal changes no menu, quest or save state.
+    fn busy_interaction_refusal(&self) -> Option<Outcome> {
+        self.activity_busy().then(|| Outcome {
+            replies: vec![chat::system(
+                "Finish the active activity before interacting.",
+            )],
+            ..Outcome::default()
+        })
+    }
+
     pub(super) fn handle_npc_packet(
         &mut self,
         inner: &[u8],
@@ -279,6 +291,16 @@ impl Gameplay {
                 }));
                 return Ok(None);
             };
+            if let Some(refusal) = self.busy_interaction_refusal() {
+                npc_event(serde_json::json!({
+                    "event": "npc_interact",
+                    "guid": request.target,
+                    "content_key": key,
+                    "outcome": "refused",
+                    "reason": "busy"
+                }));
+                return Ok(Some(refusal));
+            }
             npc_event(serde_json::json!({
                 "event": "npc_interact",
                 "guid": request.target,
@@ -362,6 +384,17 @@ impl Gameplay {
                 }));
                 return Ok(None);
             };
+            if let Some(refusal) = self.busy_interaction_refusal() {
+                npc_event(serde_json::json!({
+                    "event": "npc_select",
+                    "guid": runtime_guid,
+                    "content_key": key,
+                    "option": option_id,
+                    "outcome": "refused",
+                    "reason": "busy"
+                }));
+                return Ok(Some(refusal));
+            }
             // Stage the menu/shop mutation on a cheap clone (shared content, owned
             // active state), then commit it to this staged Gameplay once the choice is
             // read. The gateway only keeps this clone when the whole request succeeds,

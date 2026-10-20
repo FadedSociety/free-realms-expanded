@@ -340,11 +340,9 @@ fn first_regional_npc(game: &Gameplay) -> (u64, u32, [f32; 3]) {
 #[test]
 #[ignore = "requires the private W104 content"]
 fn real_regional_npc_reaches_the_npc_router_before_the_movie_gate() {
-    // This pins the current (pre-existing) ordering for the lead's production
-    // decision: a real regional NPC answers 26/8 while a forging movie runs,
-    // because `handle_npc_packet` runs before `handle_opening_inner`. It needs
-    // the private `npc_visibility`/`npc_interaction` lookup and an active movie
-    // away from a station, so it cannot drive the packet path.
+    // The router still runs before `handle_opening_inner`'s movie gate, but the lead
+    // decision (2026-10-20) closes the interaction while an activity runs: the shared
+    // busy gate refuses before any menu opens and before any quest progress event.
     let directory = w104_content();
     let mut game = Gameplay::load(&directory, None).unwrap();
     let key = game.forging.as_ref().unwrap().recipe_key().to_owned();
@@ -365,16 +363,21 @@ fn real_regional_npc_reaches_the_npc_router_before_the_movie_gate() {
     let out = game
         .handle_in_world(&interact(npc), &character, NOW)
         .unwrap();
+    let texts = chat_texts(&out.replies);
     assert!(
-        !chat_texts(&out.replies).contains(
+        !texts.contains(
             &"Close the forging game before changing jobs, equipment or interacting.".to_owned()
         ),
         "the movie gate must not pre-empt the real NPC router"
     );
     assert!(
+        texts.contains(&"Finish the active activity before interacting.".to_owned()),
+        "the real NPC router must refuse the busy interaction: {texts:?}"
+    );
+    assert!(
         out.replies
             .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 9, 0])),
-        "the real NPC router must produce its menu"
+            .all(|packet| !packet.starts_with(&[26, 0, 9, 0])),
+        "a busy interaction must not open a menu"
     );
 }
