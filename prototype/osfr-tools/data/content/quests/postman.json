@@ -1608,7 +1608,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "4": 5
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T314: 5 coins use the W110/T202 small-referral fallback and 5 Postman (profile 4) job XP follows the T202 one-Talk referral rate. The guide row 29 reward cell is unknown; no item is granted, so this quest creates no free, sellable or re-grantable gear."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1640,7 +1654,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T314: guide row 29 records no reward value; the reward row carries the reconstructed 5 coins + 5 Postman (profile 4) XP placeholder"
         },
         {
           "kind": "reconstructed",
