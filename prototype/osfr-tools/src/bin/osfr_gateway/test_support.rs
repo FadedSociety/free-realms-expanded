@@ -103,6 +103,29 @@ pub fn vendor_content(scratch: &Scratch) -> PathBuf {
     content
 }
 
+/// True when `options` names the private lab fixture pair a session rig loads: the
+/// reference manifest plus the top-level content files `Server::new` opens. A clean
+/// checkout has neither, and a partial copy must be recognised here before the rig panics
+/// in setup. Files named *inside* the content (the actor template, the quest journal) are
+/// data-driven and deliberately not pinned, so renaming one cannot cause a false skip.
+pub fn fixtures_present(options: &Options) -> bool {
+    const CONTENT: [&str; 8] = [
+        "inventory.json",
+        "categories.json",
+        "profiles.json",
+        "opening.json",
+        "opening-abilities.json",
+        "combat.json",
+        "encounters.json",
+        "quests.json",
+    ];
+    options.reference.join("manifest.json").is_file()
+        && options
+            .content
+            .as_ref()
+            .is_some_and(|content| CONTENT.iter().all(|file| content.join(file).is_file()))
+}
+
 /// Options for a synthetic session on the bundled lab content, without a listener.
 pub fn options(state: PathBuf) -> Options {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");

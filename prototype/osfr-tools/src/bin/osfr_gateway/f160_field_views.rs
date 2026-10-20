@@ -56,6 +56,10 @@ fn sender(max_queued_bytes: usize) -> ReliableSender {
 /// ticking, the other viewer's removal is delivered, and a later tick retries.
 #[test]
 fn f160_a_full_reliable_queue_refuses_only_its_own_view() {
+    if !super::t020_group_routing::fixtures_present() {
+        eprintln!("skip f160-view: the private lab fixtures are absent");
+        return;
+    }
     let (mut server, keys, scratch) = super::t020_group_routing::server_rig("f160-view");
     let known = [131000108001_u64, 131000108002];
     // Both players are in field instance 0 and not ready: the F132 removal
@@ -169,27 +173,20 @@ fn f213_bodies(sender: &mut ReliableSender, now: u64) -> Vec<Vec<u8>> {
         .collect()
 }
 
-/// `server_rig` needs the target's private lab fixtures. A clean checkout must not fail
-/// this regression in setup (it reads as a product defect), so the test reports a visible
-/// skip and returns; it stays un-`#[ignore]`d, so it still counts as run and covers the
-/// shared-field path wherever the fixtures exist.
-fn f213_rig(name: &str) -> Option<(Server, [SessionKey; 3], PathBuf)> {
-    if !super::t020_group_routing::fixtures_present() {
-        eprintln!("skip {name}: the private lab fixtures are absent");
-        return None;
-    }
-    Some(super::t020_group_routing::server_rig(name))
-}
-
 /// F213: the shipped shared-field fan-out (`Server::sync_field_views`, reached from the
 /// shared tick) must queue the saved opener's 35/2 before replaying the pending 49/13,
 /// and the screen must name that runtime actor. The service-only regression cannot see
 /// the `known` set, readiness and queueing that this path adds.
 #[test]
 fn f213_sync_field_views_replays_pending_end_screen_after_the_speaker_spawn() {
-    let Some((mut server, keys, scratch)) = f213_rig("f213-turnin") else {
+    // `server_rig` needs the private lab fixture pair. A clean checkout must not fail this
+    // regression in setup (it reads as a product defect), so report a visible skip and
+    // return; the test stays un-`#[ignore]`d, so it still runs wherever the fixtures exist.
+    if !super::t020_group_routing::fixtures_present() {
+        eprintln!("skip f213-turnin: the private lab fixtures are absent");
         return;
-    };
+    }
+    let (mut server, keys, scratch) = super::t020_group_routing::server_rig("f213-turnin");
     let now = 1_000;
     let guid = server.sessions[&keys[0]].character_guid;
     let content = server

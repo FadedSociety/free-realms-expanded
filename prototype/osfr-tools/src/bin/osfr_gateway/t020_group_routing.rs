@@ -18,26 +18,11 @@ impl Drop for Rig {
 }
 
 fn options(scratch: &Path) -> Options {
-    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
+    // One canonical test options builder owns the lab paths; this rig only adds the
+    // world directory inside its own scratch directory.
     Options {
-        bind: "127.0.0.1:0".parse().unwrap(),
-        reference: root.join("references/rust-gateway-reference"),
-        state: scratch.join("character.json"),
-        content: Some(root.join("references/rust-opening-cooking-original-assets")),
-        identity: None,
-        account_store: None,
-        gateway_ticket: login::DEFAULT_GATEWAY_TICKET.into(),
-        handoff_key: Vec::new(),
-        seconds: 1,
-        dev_tools: false,
-        studio_port: 0,
-        client_logs: None,
-        terrain: None,
         world: Some(scratch.join("world")),
-        stock_text: None,
-        allow_lan: false,
-        security_log: None,
-        group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
+        ..super::tests::test_support::options(scratch.join("character.json"))
     }
 }
 
@@ -137,15 +122,51 @@ fn rig(name: &str) -> Rig {
     }
 }
 
-/// The private lab fixtures `options` points at. A checkout without them cannot build a
-/// `Server` rig; tests outside the lab skip visibly through this instead of failing setup.
+/// The private lab fixture pair `options` points at. A checkout without it (or with a
+/// partial copy) skips the session rigs visibly instead of failing `Server::new` in setup.
 pub(super) fn fixtures_present() -> bool {
-    let options = options(&std::env::temp_dir());
-    options.reference.join("manifest.json").is_file()
-        && options
-            .content
-            .as_ref()
-            .is_some_and(|content| content.join("inventory.json").is_file())
+    super::tests::test_support::fixtures_present(&options(&std::env::temp_dir()))
+}
+
+/// A partial fixture copy used to reach `Server::new` and panic in setup: the guard must
+/// require every lab file the rig opens, not just the first two.
+#[test]
+fn the_fixture_guard_requires_every_lab_file_server_new_opens() {
+    let scratch = super::tests::test_support::Scratch::new("fixture-guard");
+    let reference = scratch.path().join("reference");
+    let content = scratch.path().join("content");
+    let files = [
+        reference.join("manifest.json"),
+        content.join("inventory.json"),
+        content.join("categories.json"),
+        content.join("profiles.json"),
+        content.join("opening.json"),
+        content.join("opening-abilities.json"),
+        content.join("combat.json"),
+        content.join("encounters.json"),
+        content.join("quests.json"),
+    ];
+    for file in &files {
+        fs::create_dir_all(file.parent().unwrap()).unwrap();
+        fs::write(file, b"{}").unwrap();
+    }
+    let mut configured = options(scratch.path());
+    configured.reference = reference;
+    configured.content = Some(content);
+    assert!(
+        super::tests::test_support::fixtures_present(&configured),
+        "the complete fixture pair is present"
+    );
+    for file in &files {
+        let absent = file.with_extension("absent");
+        fs::rename(file, &absent).unwrap();
+        assert!(
+            !super::tests::test_support::fixtures_present(&configured),
+            "{} is required before the rig can load",
+            file.display()
+        );
+        fs::rename(&absent, file).unwrap();
+    }
 }
 
 pub(super) fn server_rig(name: &str) -> (Server, [SessionKey; 3], PathBuf) {
