@@ -226,13 +226,69 @@
     },
     {
       "id": 3090004,
+      "job": 11,
       "title_string_id": 77437,
       "giver_npc_id": 9000000073,
       "prerequisite_quest_ids": [
         3090003
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "zone_id": 0,
+          "position": [
+            -1444.961,
+            -37.04161,
+            70.83138
+          ],
+          "radius": 8.0,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1, row 4; the gather step is 'Collect the fruits and vegetables Doctor Gordon has requested.' (1158596127) and the count is ten of each type (2607425832)."
+            },
+            {
+              "kind": "client",
+              "evidence": "The visit anchor is Sunflower 9500000536, the Queensfields farm foreman row in npcs/sanctuary.json: legacy_data spawn at [-1444.961,-37.04161,70.83138], model 32, NameId 7669 (FabledRealms.lua:3177; Npcs.json Id=4513)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T278: harvesting is Chef-only on this server (harvesting.json binds CHEF_PROFILE_ID 45 and gameplay.rs apply_type8 refuses a non-Chef completion), so a Medic cannot perform the literal gather. The trip is expressed as a server-side visit_position at Sunflower's drawable farm ground; no item is granted or fabricated and no gather_resource objective is used."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000161,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1, row 4; 'Return the fruits and vegetables to Nurse Naia and talk to her.' (1428816954) and Naia's 'Doctor Gordon told me you would be coming...' (3902155436). The target is Nurse Naia 9000000161, a legacy_data spawn in npcs/sanctuary.json."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T278: the client has Nurse Naia make the vitamins after the hand-off, so the second local step is the recovered Naia talk; no item is handed in or consumed."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "11": 20
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T278: the guide row 4 reward cell is unknown. Five coins and 20 Medic (profile 11) job XP follow the existing W110/T194 referral fallback. No item is granted; the 'ten of each' fruit/vegetable list has no proven item definitions and the retail vitamins are not a recovered inventory item."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -241,6 +297,10 @@
         {
           "kind": "wiki",
           "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 4; name 'Medic: Palatable Pills'; title id cell ucdt 3179409013 / ugdt 2243629226"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1, row 4; objectives 1158596127 (collect the requested fruits and vegetables) and 1428816954 (return them to Nurse Naia); the count is ten of each type (2607425832)."
         },
         {
           "kind": "reconstructed",
@@ -252,10 +312,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -264,17 +320,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous. 77437 resolves to 'Medic: Palatable Pills'; 77438/77436/77439 are its recovered description, intro and completion lines."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T278 job 11 (Medic) gate, explicit content data rather than inferred from the file name. The chapter is offered only while Medic is active and after House Call 3090003."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T278: the literal 'collect ten of each' trip is abstracted as a visit_position at Sunflower's farm ground followed by the Naia talk. The harvesting minigame is Chef-only, so a Medic cannot gather and no item, node or job bypass is fabricated."
         }
       ],
       "description_string_id": 77438,
       "intro_text_string_id": 77436,
       "end_text_string_id": 77439,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3090005,
@@ -375,11 +435,46 @@
     },
     {
       "id": 3090006,
+      "job": 11,
+      "min_level": 5,
       "title_string_id": 387463,
       "giver_npc_id": 9000000073,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3090004,
+        3090005
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000073,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1, row 6; 'Reach Level 5 as a medic, and return to Doctor Gordon.' (3170726822), journal 'Achieve Level 5 as a Medic' (1322461447) and goal 'Reach Level 5 as a medic!' (408551618). The target is Doctor Gordon 9000000073, the legacy_data giver in npcs/sanctuary.json (FabledRealms.lua:1083; Npcs.json Id=2339)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T278: the classic level gate is the authored min_level 5 offer gate; ContentDb v1 has no level-up event objective, so the one local step is the recovered report back to Gordon."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "11": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T278: the guide row 6 reward cell is unknown. Five coins and 25 Medic (profile 11) job XP follow the existing W110/T194 referral fallback. No item is granted; the level-five ability lesson itself is not a reward item."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -394,6 +489,10 @@
           "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1: unlock to level 5 (Sanctuary), row 6; name 'Medic: Achieve Level 5'; title id cell ucdt 1924758543 / ugdt 1750174744"
         },
         {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1, row 6; the level gate is client text: 'Reach Level 5 as a medic, and return to Doctor Gordon.' (3170726822), journal 1322461447 and goal 408551618. 387463 resolves to 'Medic: Achieve Level 5'; 387464/387462/387465 are its recovered description, intro and completion lines."
+        },
+        {
           "kind": "reconstructed",
           "evidence": "(R) quest id 3090006 is a stable batch key; the guide does not provide a numeric server quest id"
         },
@@ -403,29 +502,29 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+          "evidence": "(R) T278 job 11 (Medic) gate, explicit content data rather than inferred from the file name."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1, row 6; the client goal is 'Reach Level 5 as a medic!' and the giver must make sure the Medic is strong enough. The level is never taken from a client claim; it is the server eligibility rank in content min_level."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T278 prerequisite: [3090004, 3090005] (Palatable Pills and Take Your Vitamins), both House Call branches. The guide's row order puts 3090005 after 3090004; the enabled records keep the two as parallel branches after House Call, so the level-five gate requires both (marked (R) order)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T278 min_level 5 offer gate. ContentDb v1 has no level-up event objective, so the one local step is the recovered report back to Gordon; the talk itself does not grant or check a level."
         }
       ],
       "description_string_id": 387464,
       "intro_text_string_id": 387462,
       "end_text_string_id": 387465,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3090007,

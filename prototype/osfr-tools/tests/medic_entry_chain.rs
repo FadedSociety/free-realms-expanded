@@ -197,6 +197,13 @@ fn complete_house_call(game: &mut Gameplay, now: &mut u64) {
 fn complete_vitamins(game: &mut Gameplay, now: &mut u64) {
     let gordon = npc_character(GORDON);
     let greyli = npc_character(GREYLI);
+    // T278 enables Palatable Pills (3090004), which Gordon offers before the
+    // vitamins. Take that branch out of the offer queue; it stays active so this
+    // helper does not pay its reward.
+    *now += 10;
+    offer(game, &gordon, GORDON, PILLS, *now);
+    *now += 10;
+    accept(game, &gordon, PILLS, *now);
     *now += 10;
     offer_checked(game, &gordon, GORDON, VITAMINS, *now);
     *now += 10;
@@ -418,6 +425,13 @@ fn take_your_vitamins_requires_house_call() {
         "Take Your Vitamins at the wrong giver",
     );
 
+    // T278 enables 3090004, offered first at Gordon; accepting it exposes the
+    // vitamins branch without paying the pills reward.
+    now += 10;
+    offer(&mut game, &gordon, GORDON, PILLS, now);
+    now += 10;
+    accept(&mut game, &gordon, PILLS, now);
+
     // The completed House Call unlocks the vitamins at Doctor Gordon.
     now += 10;
     offer_checked(&mut game, &gordon, GORDON, VITAMINS, now);
@@ -484,6 +498,13 @@ fn medic_xp_goes_to_medic_not_the_active_job() {
     complete_house_call(&mut game, &mut now);
     let medic_before = medic_xp(&game);
     assert_eq!(medic_before, EXAM_XP + HOUSE_XP);
+
+    // T278 enables 3090004, offered first at Gordon; accepting it exposes the
+    // vitamins branch without paying the pills reward.
+    now += 10;
+    offer(&mut game, &gordon, GORDON, PILLS, now);
+    now += 10;
+    accept(&mut game, &gordon, PILLS, now);
 
     now += 10;
     offer_checked(&mut game, &gordon, GORDON, VITAMINS, now);
