@@ -12,6 +12,7 @@
 //! staging/commit/save path a socket datagram takes.
 use super::test_support::{self, Scene, Scratch, bin_test_target};
 use super::*;
+use osfr_tools::item_bar::use_wire::{Target, encode_client_request_start_ability};
 
 /// The copied campaign plus two synthetic field enemies on the world checkpoint, each rolling
 /// the shipped guaranteed `boss` table. `vendor_content` supplies the `npcs/` +
@@ -22,11 +23,9 @@ struct DropContent {
     at: [f32; 3],
 }
 
-fn drop_content(scratch: &Scratch) -> DropContent {
+fn drop_content(scratch: &Scratch, options: &Options) -> DropContent {
     let path = test_support::vendor_content(scratch);
-    let reference = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/references/rust-gateway-reference");
-    let initial = Gateway::reference_state(&reference).unwrap();
+    let initial = Gateway::reference_state(&options.reference).unwrap();
     // The same placement production uses: the copied encounters.json world position.
     let at = Gameplay::initial_character(&path, initial)
         .unwrap()
@@ -92,21 +91,28 @@ fn active_profile(session: &Session) -> i32 {
         .active
 }
 
-/// The client's 26/13 class selection (job id at bytes 4..8).
+/// The world instance the player's membership row names, so the revive can prove it stayed.
+fn world_instance(scene: &Scene) -> i32 {
+    scene
+        .membership
+        .player_location(scene.session.gateway.state().guid)
+        .expect("the session is in the world membership")
+        .instance_id
+}
+
+/// The client's 26/13 class selection: `PlayClient::ChangeProfile` (`0x00938e10`) builds
+/// `CommandPacketSetProfile` (ctor `0x008a29f0`, family 26 / sub 13) and writes the one `i32`
+/// profile id at packet `+0x10`. The shared command writer `0x0090ac70` serializes family and
+/// sub as two `u16`s only, and the payload starts at `+0x10` (the 26/24 writer `0x00c21290`
+/// writes its dword the same way), so the body is 8 bytes.
 fn class_selection(job: i32) -> Vec<u8> {
     [vec![26, 0, 13, 0], job.to_le_bytes().to_vec()].concat()
 }
 
-/// The client's 36/10 targeted basic attack: bar 1, slot 0, one target GUID.
+/// The client's 36/10 targeted basic attack: bar 1, slot 0, one target GUID. The canonical
+/// codec is the same one the server parses (client writer `0x00a342e0`).
 fn basic_attack(target: u64) -> Vec<u8> {
-    [
-        vec![36, 0, 10, 0],
-        1_i32.to_le_bytes().to_vec(),
-        0_i32.to_le_bytes().to_vec(),
-        0_i32.to_le_bytes().to_vec(),
-        target.to_le_bytes().to_vec(),
-    ]
-    .concat()
+    encode_client_request_start_ability(1, 0, Target::Guid(target))
 }
 
 /// The client's free revive: family 41/sub 122, header ids zero, paid = false
@@ -132,11 +138,11 @@ fn f261_the_commit_clears_a_revive_reloads_ground_pickups() {
         return;
     }
     let scratch = Scratch::new("f261-pickup");
-    let content = drop_content(&scratch);
     let mut options = test_support::options(scratch.state());
+    let content = drop_content(&scratch, &options);
     options.content = Some(content.path.clone());
 
-    // The same seed `Server::new` installs before any session enters the scene.
+    // The same seed `Server::new` installs before any session exists.
     let mut seed = load_gateway_template(&options).unwrap();
     let field = seed.take_shared_fields().expect("the field enemies load");
     let guids: Vec<u64> = field
@@ -147,9 +153,7 @@ fn f261_the_commit_clears_a_revive_reloads_ground_pickups() {
     assert_eq!(guids.len(), 2, "both fixture enemies are on the field");
     let (first, second) = (guids[0], guids[1]);
 
-    let mut scene = Scene::new(&options, 261);
-    // The membership owns the field; install it before the commit that enters the scene.
-    scene.membership.install_field_seed(0, field);
+    let mut scene = Scene::with_field(&options, 261, field);
     scene.send(&options, &[13, 0], 1_000).unwrap();
     scene.send(&options, &[10, 0], 1_001).unwrap();
     assert!(scene.session.gateway.is_world_loaded());
@@ -159,6 +163,7 @@ fn f261_the_commit_clears_a_revive_reloads_ground_pickups() {
         content.at,
         "world entry uses the content checkpoint"
     );
+    let instance = world_instance(&scene);
 
     // Brawler's equipped starter weapon is the basic attack this scenario uses.
     scene.send(&options, &class_selection(43), 1_100).unwrap();
@@ -187,19 +192,27 @@ fn f261_the_commit_clears_a_revive_reloads_ground_pickups() {
     scene.send(&options, &free_revive(), 2_200).unwrap();
     assert_eq!(health(&scene.session), full, "the free revive works");
     assert_eq!(
+        world_instance(&scene),
+        instance,
+        "the free revive stays in the same world instance"
+    );
+    assert_eq!(
         pickup_count(&scene.session),
         0,
         "a begin-zoning commit drops the old scene's ground pickups even into the same instance"
     );
 
-    // The client reloaded its scene and sends the ready handshake; the tick on
-    // the spot must not pay the heart the client no longer shows.
+    // The client reloaded its scene and sends the ready handshake. Wound the player first:
+    // at full health a surviving big heart would heal zero and hide itself, but a wounded
+    // player would be healed by it.
     scene.send(&options, &[13, 0], 2_300).unwrap();
     scene.send(&options, &[10, 0], 2_301).unwrap();
+    let (full, wounded) = wound(&mut scene, 2_350);
+    assert!(wounded < full, "the player is wounded before the tick");
     scene.tick(&options, 2_400);
     assert_eq!(
         health(&scene.session),
-        full,
+        wounded,
         "the stale big heart must not heal after the reload"
     );
 

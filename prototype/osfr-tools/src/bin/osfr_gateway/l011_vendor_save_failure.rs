@@ -13,9 +13,8 @@
 //! `tests/common/gateway_vendor.rs` encode the same `MerchantBuyRequestV2` fields. The
 //! content pack, prices and starting state are the shared `tests/common/vendor_fixture.rs`.
 
-use super::test_support::{self, Scratch};
+use super::test_support::{self, Scene, Scratch};
 use super::*;
-use osfr_tools::game_store::Snapshot;
 
 // The shared test kit: this host uses a subset of its helpers.
 #[allow(dead_code)]
@@ -41,74 +40,17 @@ fn options(fixture: &VendorFixture, state: PathBuf) -> Options {
     options
 }
 
-/// One session plus the shared containers a `Server` owns; `Server::new` is not needed
-/// because this case asserts the transaction, not the teardown.
-struct Scene {
-    session: Session,
-    world: SharedWorld,
-    membership: World,
-    sessions: SessionMap,
-}
-
+// `Scene` is shared with the other session fixtures; this test keeps its own committed login
+// (`enter`) because that is the entry route it proves, and its vendor helper.
 impl Scene {
-    fn new(options: &Options, id: u32) -> Self {
-        let session = Session::new(
-            SessionId(u64::from(id)),
-            format!("127.0.0.1:{}", 34_000 + id).parse().unwrap(),
-            SessionRequest {
-                id,
-                crc_length: 3,
-                buffer_size: 1400,
-            },
-            options,
-            CRC_SEED,
-            None,
-            None,
-        )
-        .expect("vendor session loads");
-        Self {
-            session,
-            world: SharedWorld::new(),
-            membership: World::runtime(),
-            sessions: SessionMap::new(),
-        }
-    }
-
-    fn send(&mut self, options: &Options, inner: &[u8], now: u64) -> Result<(), String> {
-        self.session
-            .dispatch_message(
-                &wrap(inner),
-                options,
-                now,
-                &mut self.world,
-                &mut self.membership,
-                &mut self.sessions,
-                None,
-            )
-            .map_err(|error| error.to_string())
-    }
-
-    fn drain(&mut self, now: u64) -> Vec<Vec<u8>> {
-        super::super::f120_fishing_hour_reconnect::drain_replies(&mut self.session, now)
-    }
-
-    /// Login, Ready and Loaded, the three messages every world session sends first.
+    /// Login, Ready and Loaded, the three messages every world session sends first. The login
+    /// body is top-level; Ready and Loaded are tunneled application bodies.
     fn enter(&mut self, options: &Options, now: u64) {
         let guid = self.session.gateway.state().guid;
-        for (index, message) in [login(guid), wrap(&[13, 0]), wrap(&[10, 0])]
-            .into_iter()
-            .enumerate()
-        {
-            self.session
-                .dispatch_message(
-                    &message,
-                    options,
-                    now + index as u64,
-                    &mut self.world,
-                    &mut self.membership,
-                    &mut self.sessions,
-                    None,
-                )
+        self.dispatch(options, &login(guid), now)
+            .expect("login handles");
+        for (index, inner) in [vec![13, 0], vec![10, 0]].into_iter().enumerate() {
+            self.send(options, &inner, now + 1 + index as u64)
                 .expect("initialization message handles");
         }
     }
@@ -130,20 +72,6 @@ impl Scene {
             "the real vendor did not open its shop: {replies:?}"
         );
     }
-
-    fn snapshot(&self) -> Snapshot {
-        self.session.gateway.snapshot()
-    }
-
-    /// Break only the next save: the good save file is a component of the target path,
-    /// so `save` cannot create its temporary file beside it. The good bytes stay put.
-    fn break_next_save(&mut self, good_save: &Path) {
-        self.session.state_path = good_save.join("blocked.json");
-    }
-
-    fn repair_save(&mut self, good_save: &Path) {
-        self.session.state_path = good_save.to_owned();
-    }
 }
 
 #[test]
@@ -157,7 +85,7 @@ fn a_failed_vendor_save_changes_nothing_and_preserves_buy_back_state() {
         &character,
         &fixture.state(fixture.price() + 1_000, false),
     );
-    let mut scene = Scene::new(&options, 81);
+    let mut scene = Scene::unentered(&options, 81, 34_000 + 81, 1400);
     scene.enter(&options, 1_000);
     scene.open_shop(&fixture, &options, 1_100);
 
@@ -315,7 +243,7 @@ fn control_a_working_save_commits_the_same_purchase() {
         &character,
         &fixture.state(fixture.price() + 1_000, false),
     );
-    let mut scene = Scene::new(&options, 82);
+    let mut scene = Scene::unentered(&options, 82, 34_000 + 82, 1400);
     scene.enter(&options, 1_000);
     scene.open_shop(&fixture, &options, 1_100);
 

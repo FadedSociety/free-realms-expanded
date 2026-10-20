@@ -179,24 +179,29 @@ pub fn options(state: PathBuf) -> Options {
     }
 }
 
-/// A logged-in session, before its world entry. The caller drives `[13,0]`/`[10,0]` either
-/// through `Gateway::handle` (a direct handshake) or through `Scene::send` (the session commit
-/// path), so each test keeps the entry route it is proving.
-pub fn enter(options: &Options, id: u32) -> Session {
-    let mut session = Session::new(
+/// A session before its login, with the fixture's own port and datagram size.
+fn session(options: &Options, id: u32, port: u32, buffer_size: usize) -> Session {
+    Session::new(
         SessionId(u64::from(id)),
-        format!("127.0.0.1:{}", 23_000 + id).parse().unwrap(),
+        format!("127.0.0.1:{port}").parse().unwrap(),
         SessionRequest {
             id,
             crc_length: 3,
-            buffer_size: 512,
+            buffer_size,
         },
         options,
         CRC_SEED,
         None,
         None,
     )
-    .unwrap();
+    .unwrap()
+}
+
+/// A logged-in session, before its world entry. The caller drives `[13,0]`/`[10,0]` either
+/// through `Gateway::handle` (a direct handshake) or through `Scene::send` (the session commit
+/// path), so each test keeps the entry route it is proving.
+pub fn enter(options: &Options, id: u32) -> Session {
+    let mut session = session(options, id, 23_000 + id, 512);
     let mut login = 1u16.to_le_bytes().to_vec();
     for (index, text) in ["synthetic-ticket", "1.910.1.530630", ""]
         .iter()
@@ -242,12 +247,41 @@ impl Scene {
         }
     }
 
-    /// One client application message through `Session::dispatch_message`, the same
-    /// staging/commit/save path a socket datagram takes.
-    pub fn send(&mut self, options: &Options, inner: &[u8], now: u64) -> Result<(), String> {
+    /// Like `new`, but the field is on the membership before the session exists: the order
+    /// `Server::new` installs its seed in, so a login/enter path cannot see an empty field.
+    pub fn with_field(
+        options: &Options,
+        id: u32,
+        field: osfr_tools::encounter::SharedFieldState,
+    ) -> Self {
+        let mut membership = World::runtime();
+        membership.install_field_seed(0, field);
+        Self {
+            session: enter(options, id),
+            world: SharedWorld::new(),
+            membership,
+            sessions: SessionMap::new(),
+        }
+    }
+
+    /// Like `new`, but without the login: a test that drives the committed login itself keeps
+    /// its own handshake while sharing this staging path. `port` and `buffer_size` are the
+    /// fixture's, because the session codec reads the datagram limit.
+    pub fn unentered(options: &Options, id: u32, port: u32, buffer_size: usize) -> Self {
+        Self {
+            session: session(options, id, port, buffer_size),
+            world: SharedWorld::new(),
+            membership: World::runtime(),
+            sessions: SessionMap::new(),
+        }
+    }
+
+    /// One already-framed client message through `Session::dispatch_message`. A login body is
+    /// top-level and uses this directly; application bodies go through `send`.
+    pub fn dispatch(&mut self, options: &Options, message: &[u8], now: u64) -> Result<(), String> {
         self.session
             .dispatch_message(
-                &wrap(inner),
+                message,
                 options,
                 now,
                 &mut self.world,
@@ -256,6 +290,12 @@ impl Scene {
                 None,
             )
             .map_err(|error| error.to_string())
+    }
+
+    /// One client application message through `Session::dispatch_message`, the same
+    /// staging/commit/save path a socket datagram takes.
+    pub fn send(&mut self, options: &Options, inner: &[u8], now: u64) -> Result<(), String> {
+        self.dispatch(options, &wrap(inner), now)
     }
 
     /// `send` plus the replies it queued, for tests that assert on the bytes the client
