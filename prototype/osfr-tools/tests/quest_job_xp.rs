@@ -1169,14 +1169,20 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
     // The task decisions are accepted: T202 wrote the chapter job XP and gates, T241
     // extended the same table with the two live Farnum starting records, T279 adds
     // the independent Missing Sisters playtest entry, and T277 adds Local Hero.
-    let has_decision = |source: &Value| {
+    // A later task's decision tag counts only for the record that task decided, so a
+    // new quest cannot satisfy the table by carrying someone else's tag.
+    let has_decision = |quest_id: u32, source: &Value| {
+        let own_tag = match quest_id {
+            3_000_009 | 3_000_016 => "(R) T241:",
+            3_000_024 => "(R) T277:",
+            3_000_029 => "(R) T279:",
+            _ => "",
+        };
         source.as_array().is_some_and(|tags| {
             tags.iter().any(|tag| {
                 tag["evidence"].as_str().is_some_and(|text| {
                     text.starts_with("(R) T202:")
-                        || text.starts_with("(R) T241:")
-                        || text.starts_with("(R) T277:")
-                        || text.starts_with("(R) T279:")
+                        || (!own_tag.is_empty() && text.starts_with(own_tag))
                 })
             })
         })
@@ -1243,12 +1249,12 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
         );
         if job.is_some() {
             assert!(
-                has_decision(&record["source"]),
+                has_decision(quest_id, &record["source"]),
                 "{file}: quest {quest_id} carries its (R) job-gate decision"
             );
         }
         assert!(
-            has_decision(&reward["source"]),
+            has_decision(quest_id, &reward["source"]),
             "{file}: quest {quest_id} reward carries its (R) decision"
         );
     }

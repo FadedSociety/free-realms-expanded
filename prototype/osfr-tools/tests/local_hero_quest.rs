@@ -18,7 +18,8 @@
 //! - 49/9 ObjectiveUpdate / 49/10 GoalComplete / 49/8 ObjectiveActivated are the
 //!   existing T256 packets for a shared-field kill.
 //!
-//! The shared fixture and packet helpers live in `tests/support/npc_quest_chain.rs`.
+//! The shared fixture, packet builders and shared-field/objective helpers live in
+//! `tests/support/npc_quest_chain.rs`.
 
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
@@ -26,18 +27,20 @@ mod npc_quest_chain;
 use npc_quest_chain::*;
 use osfr_tools::{
     character_store::CharacterState,
-    encounter::{FieldParticipant, SharedFieldAction, SharedFieldState},
+    encounter::SharedFieldState,
     game_store,
     gameplay::{Gameplay, Outcome},
     quest_engine::QuestStatus,
 };
-use std::{collections::BTreeSet, fs, path::Path};
+use std::collections::BTreeSet;
 
 const QUEST: u32 = 3_000_024;
 const COURIER: u64 = 9_000_000_444;
-/// `title_string_id`, `intro_text_string_id` and `end_text_string_id` of 3000024.
+/// `title_string_id`, `intro_text_string_id`, `description_string_id` and
+/// `end_text_string_id` of 3000024.
 const TITLE_ID: u32 = 389_187;
 const INTRO_ID: u32 = 389_186;
+const DESCRIPTION_ID: u32 = 389_188;
 const END_TEXT: u32 = 389_189;
 /// The record's reward row and objective ordinals.
 const REWARD_COINS: u32 = 13;
@@ -53,7 +56,6 @@ const LIVE_HOOLIGANS: [u64; 3] = [131_000_102_004, 131_000_102_005, 131_000_102_
 const MID_HOOLIGAN: u64 = 131_000_102_015;
 const A: u64 = 101;
 const B: u64 = 202;
-const SWING_MS: u64 = 700;
 /// One field spawn cycle of `starting_highroad_hooligans`.
 const RESPAWN_WAIT_MS: u64 = 61_000;
 
@@ -86,23 +88,23 @@ fn game_with_job(fixture: &Fixture, character_id: u64, job: i32) -> Gameplay {
     fixture.game_as(character_id, Some(state))
 }
 
-/// The 49/1 offer carries the record's quest id, intro and card title.
+/// The 49/1 offer for the record carries the four screen fields at the client
+/// reader's offsets (intro, repeated title, card title, description).
 fn assert_offer(outcome: &Outcome) {
     let offer = outcome
         .replies
         .iter()
         .find(|packet| has_family(packet, 49, 1, Some(QUEST)))
         .expect("the Courier sends the 49/1 Local Hero offer");
+    let word = |offset: usize| u32::from_le_bytes(offer[offset..offset + 4].try_into().unwrap());
     assert_eq!(
-        u32::from_le_bytes(offer[10..14].try_into().unwrap()),
+        word(10),
         INTRO_ID,
-        "49/1 intro field (client reader 0x00c7bb60)"
+        "49/1 intro field (client reader 0x00c7b7a0)"
     );
-    assert_eq!(
-        u32::from_le_bytes(offer[18..22].try_into().unwrap()),
-        TITLE_ID,
-        "49/1 card title is Local Hero (389187)"
-    );
+    assert_eq!(word(14), TITLE_ID, "49/1 repeats the card title");
+    assert_eq!(word(18), TITLE_ID, "49/1 card title is Local Hero (389187)");
+    assert_eq!(word(22), DESCRIPTION_ID, "49/1 description field");
 }
 
 /// Accept Local Hero at the Courier through the real 26/8 -> 26/10 -> 26/6 ->
@@ -116,116 +118,25 @@ fn start_local_hero(fixture: &Fixture, character_id: u64) -> (Gameplay, u64) {
     (game, 1_020)
 }
 
-fn attack(
-    game: &mut Gameplay,
-    field: &mut SharedFieldState,
-    character: &CharacterState,
-    known: &BTreeSet<u64>,
-    target: u64,
-    now: u64,
-) -> Outcome {
-    game.handle_shared_field(
-        &SharedFieldAction::Ability { slot: 0, target },
-        field,
-        known,
-        character,
-        now,
-    )
-    .unwrap_or_else(|error| panic!("shared attack on {target} was refused: {error}"))
-}
-
-/// Swing until `target` dies, moving to its current position before each swing.
-fn kill_hooligan(
-    game: &mut Gameplay,
-    field: &mut SharedFieldState,
-    known: &BTreeSet<u64>,
-    player: u64,
-    target: u64,
-    now: u64,
-) -> (Outcome, u64) {
-    let mut now = now;
-    for _ in 0..16 {
-        let position = field
-            .position(target)
-            .unwrap_or_else(|| panic!("field target {target} exists"));
-        let character = player_at(player, position);
-        let outcome = attack(game, field, &character, known, target, now);
-        now += SWING_MS;
-        if field.health(target) == Some(0) {
-            return (outcome, now);
-        }
-    }
-    panic!("field target {target} did not die");
-}
-
-/// The shared-motion tick; dead actors respawn once `now >= respawn_at`.
-fn tick_field(
-    game: &mut Gameplay,
-    field: &mut SharedFieldState,
-    known: &BTreeSet<u64>,
-    player: u64,
-    now: u64,
-    elapsed: u64,
-) {
-    let participant = FieldParticipant {
-        guid: player,
-        // Far from the Highroad camp: the tick must only settle/respawn.
-        position: [0.0, 0.0, 0.0],
-        health: 1_000,
-        max_health: 1_000,
-        mitigation: 1.0,
-        grace_until: 0,
-        combat: true,
-        known_npcs: Some(known.clone()),
-    };
-    game.tick_shared_motion(field, &[participant], now, elapsed)
-        .expect("the shared field ticks");
-}
-
 /// Three live kills plus two kills after one respawn cycle.
 fn five_kills(
     game: &mut Gameplay,
     field: &mut SharedFieldState,
     known: &BTreeSet<u64>,
-    player: u64,
+    character: &CharacterState,
     mut now: u64,
 ) -> u64 {
     for target in LIVE_HOOLIGANS {
-        let (_, next) = kill_hooligan(game, field, known, player, target, now);
+        let (_, next) = kill_shared_target(game, field, known, character, target, now);
         now = next;
     }
     now += RESPAWN_WAIT_MS;
-    tick_field(game, field, known, player, now, RESPAWN_WAIT_MS);
+    tick_shared_field(game, field, known, character.guid, now, RESPAWN_WAIT_MS);
     for target in [LIVE_HOOLIGANS[0], LIVE_HOOLIGANS[1]] {
-        let (_, next) = kill_hooligan(game, field, known, player, target, now);
+        let (_, next) = kill_shared_target(game, field, known, character, target, now);
         now = next;
     }
     now
-}
-
-fn objective_update(outcome: &Outcome, quest: u32, objective: u32, current: u32) -> bool {
-    outcome.replies.iter().any(|packet| {
-        has_family(packet, 49, 9, Some(quest))
-            && packet.len() >= 18
-            && u32::from_le_bytes(packet[10..14].try_into().unwrap()) == objective
-            && u32::from_le_bytes(packet[14..18].try_into().unwrap()) == current
-    })
-}
-
-fn objective_complete(outcome: &Outcome, quest: u32, objective: u32) -> bool {
-    outcome.replies.iter().any(|packet| {
-        has_family(packet, 49, 10, Some(quest))
-            && packet.len() >= 14
-            && u32::from_le_bytes(packet[10..14].try_into().unwrap()) == objective
-    })
-}
-
-fn objective_activated(outcome: &Outcome, quest: u32, objective: u32) -> bool {
-    outcome.replies.iter().any(|packet| {
-        has_family(packet, 49, 8, Some(quest))
-            && packet.len() >= 14
-            && u32::from_le_bytes(packet[10..14].try_into().unwrap()) == objective
-    })
 }
 
 fn reward_packets(outcome: &Outcome, subtype: u16) -> usize {
@@ -234,48 +145,6 @@ fn reward_packets(outcome: &Outcome, subtype: u16) -> usize {
         .iter()
         .filter(|packet| has_family(packet, 38, subtype, None))
         .count()
-}
-
-/// Full `GameplayState` bytes plus the character-document bytes, so a refusal is
-/// proven to change neither the staged state nor its saved form.
-fn snapshot(game: &Gameplay, character: &CharacterState, path: &Path) -> (Vec<u8>, Vec<u8>) {
-    let state = serde_json::to_vec(&game.state()).expect("GameplayState serializes");
-    game_store::save(
-        path,
-        &game_store::Snapshot {
-            character: character.clone(),
-            gameplay: Some(game.state()),
-        },
-    )
-    .expect("the character document saves");
-    (state, fs::read(path).expect("the character document reads"))
-}
-
-fn assert_refusal(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    packet: &[u8],
-    now: u64,
-    label: &str,
-    save_path: &Path,
-) {
-    let before = snapshot(game, character, save_path);
-    let outcome = game.handle_in_world(packet, character, now);
-    if let Ok(outcome) = &outcome {
-        assert!(!outcome.changed, "{label} changed gameplay");
-        assert!(
-            !outcome
-                .replies
-                .iter()
-                .any(|reply| { has_family(reply, 49, 3, None) || has_family(reply, 49, 4, None) }),
-            "{label} added or completed a quest"
-        );
-    }
-    assert_eq!(
-        snapshot(game, character, save_path),
-        before,
-        "{label} changed the saved state or document"
-    );
 }
 
 #[test]
@@ -313,12 +182,20 @@ fn the_royal_courier_offers_local_hero_to_every_job() {
 fn five_hooligan_kills_advance_the_hunt_once() {
     let fixture = Fixture::new();
     let (mut game, mut now) = start_local_hero(&fixture, A);
+    let a_character = courier_character(A);
     let mut field = game
         .take_shared_fields()
         .expect("the opening field is available");
     let known = hooligans();
 
-    let (first, next) = kill_hooligan(&mut game, &mut field, &known, A, LIVE_HOOLIGANS[0], now);
+    let (first, next) = kill_shared_target(
+        &mut game,
+        &mut field,
+        &known,
+        &a_character,
+        LIVE_HOOLIGANS[0],
+        now,
+    );
     now = next;
     assert_eq!(counts(&game, QUEST), [1, 0], "one kill is one credit");
     assert!(
@@ -327,14 +204,15 @@ fn five_hooligan_kills_advance_the_hunt_once() {
     );
 
     for target in [LIVE_HOOLIGANS[1], LIVE_HOOLIGANS[2]] {
-        let (_, next) = kill_hooligan(&mut game, &mut field, &known, A, target, now);
+        let (_, next) =
+            kill_shared_target(&mut game, &mut field, &known, &a_character, target, now);
         now = next;
     }
     assert_eq!(counts(&game, QUEST), [3, 0]);
     // Replaying a request on the same corpse must not credit it twice.
     let saved = game.state();
     let corpse = player_at(A, field.position(LIVE_HOOLIGANS[0]).unwrap());
-    let replay = attack(
+    let replay = shared_attack(
         &mut game,
         &mut field,
         &corpse,
@@ -342,7 +220,7 @@ fn five_hooligan_kills_advance_the_hunt_once() {
         LIVE_HOOLIGANS[0],
         now,
     );
-    now += SWING_MS;
+    now += SHARED_ATTACK_INTERVAL_MS;
     assert!(
         !replay.changed && replay.replies.is_empty(),
         "a corpse replay changes nothing"
@@ -350,7 +228,14 @@ fn five_hooligan_kills_advance_the_hunt_once() {
     assert_eq!(game.state(), saved, "a corpse replay changed the save");
 
     // The level-7 930060 is a different kind and must not advance Local Hero.
-    let (mid, next) = kill_hooligan(&mut game, &mut field, &known, A, MID_HOOLIGAN, now);
+    let (mid, next) = kill_shared_target(
+        &mut game,
+        &mut field,
+        &known,
+        &a_character,
+        MID_HOOLIGAN,
+        now,
+    );
     now = next;
     assert_eq!(field.health(MID_HOOLIGAN), Some(0));
     assert_eq!(
@@ -366,7 +251,7 @@ fn five_hooligan_kills_advance_the_hunt_once() {
 
     // Three live actors plus one respawn cycle complete the five-kill hunt.
     now += RESPAWN_WAIT_MS;
-    tick_field(&mut game, &mut field, &known, A, now, RESPAWN_WAIT_MS);
+    tick_shared_field(&mut game, &mut field, &known, A, now, RESPAWN_WAIT_MS);
     for target in [LIVE_HOOLIGANS[0], LIVE_HOOLIGANS[1]] {
         assert!(
             field.health(target).unwrap() > 0,
@@ -375,7 +260,8 @@ fn five_hooligan_kills_advance_the_hunt_once() {
     }
     let mut fifth = Outcome::default();
     for target in [LIVE_HOOLIGANS[0], LIVE_HOOLIGANS[1]] {
-        let (outcome, next) = kill_hooligan(&mut game, &mut field, &known, A, target, now);
+        let (outcome, next) =
+            kill_shared_target(&mut game, &mut field, &known, &a_character, target, now);
         now = next;
         fifth = outcome;
     }
@@ -395,14 +281,14 @@ fn five_hooligan_kills_advance_the_hunt_once() {
 fn the_courier_turn_in_pays_thirteen_coins_and_adventurer_xp_once() {
     let fixture = Fixture::new();
     let (mut game, mut now) = start_local_hero(&fixture, A);
+    let courier = courier_character(A);
     let mut field = game
         .take_shared_fields()
         .expect("the opening field is available");
     let known = hooligans();
-    now = five_kills(&mut game, &mut field, &known, A, now);
+    now = five_kills(&mut game, &mut field, &known, &courier, now);
     assert_eq!(counts(&game, QUEST), [5, 0]);
 
-    let courier = courier_character(A);
     let talked = talk(&mut game, &courier, COURIER, now);
     now += 10;
     assert!(talked.changed, "the final Talk advances the objective");
@@ -460,12 +346,10 @@ fn a_refused_or_out_of_range_request_changes_nothing() {
     let fixture = Fixture::new();
     let mut game = game_with_job(&fixture, A, BRAWLER);
     let courier = courier_character(A);
-    let save_path = fixture.path().join("refusal-save.json");
     let mut now = 5_000;
 
     // A non-giver NPC's Talk cannot offer or start Local Hero.
     let vendor = player_at(A, content_position("greenwood_forest.json", 9_500_000_285));
-    let before = snapshot(&game, &courier, &save_path);
     assert_no_offer(
         &mut game,
         &vendor,
@@ -473,29 +357,22 @@ fn a_refused_or_out_of_range_request_changes_nothing() {
         &mut now,
         "Local Hero at a non-giver",
     );
-    assert_eq!(
-        snapshot(&game, &courier, &save_path),
-        before,
-        "the non-giver Talk changed the save"
-    );
 
     // Forged accept with no offer open.
-    assert_refusal(
+    assert_packet_changes_nothing(
         &mut game,
         &courier,
         &quest_reply(QUEST, true),
         now + 1,
         "forged Local Hero accept",
-        &save_path,
     );
     // A 49/14 with no pending end screen.
-    assert_refusal(
+    assert_packet_changes_nothing(
         &mut game,
         &courier,
         &quest_end_reply(QUEST),
         now + 2,
         "Local Hero turn-in with no end screen",
-        &save_path,
     );
 
     // 26/8 out of range is refused before any menu opens.
@@ -507,20 +384,20 @@ fn a_refused_or_out_of_range_request_changes_nothing() {
             courier.position[2],
         ],
     );
-    let before = snapshot(&game, &courier, &save_path);
+    let before = saved(&game);
     let refused = game.handle_in_world(&npc_interact(COURIER), &far, now + 3);
     assert!(refused.is_err(), "the out-of-range interact is refused");
     assert_eq!(
-        snapshot(&game, &courier, &save_path),
+        saved(&game),
         before,
-        "the out-of-range interact changed the save"
+        "the out-of-range interact changed the state"
     );
 
     // A real offer, then a duplicate offer attempt keeps the open offer intact.
     now += 10;
     let offered = offer(&mut game, &courier, COURIER, QUEST, now);
     assert_offer(&offered);
-    let held = snapshot(&game, &courier, &save_path);
+    let held = saved(&game);
     now += 10;
     let menu = interact(&mut game, &courier, COURIER, now);
     let choice = menu_option(&menu, TALK_LABEL);
@@ -542,20 +419,19 @@ fn a_refused_or_out_of_range_request_changes_nothing() {
     );
     assert!(!duplicate.changed);
     assert_eq!(
-        snapshot(&game, &courier, &save_path),
+        saved(&game),
         held,
-        "the duplicate offer attempt changed the save"
+        "the duplicate offer attempt changed the state"
     );
 
     // Accept, then a declined 49/2 with no pending offer is a refusal.
     accept(&mut game, &courier, QUEST, now + 3);
-    assert_refusal(
+    assert_packet_changes_nothing(
         &mut game,
         &courier,
         &quest_reply(QUEST, false),
         now + 4,
         "declined 49/2 with no pending offer",
-        &save_path,
     );
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Active);
 }
@@ -574,7 +450,7 @@ fn progress_survives_a_reconnect() {
         .expect("the opening field is available");
     let known = hooligans();
     for target in LIVE_HOOLIGANS {
-        let (_, next) = kill_hooligan(&mut game, &mut field, &known, A, target, now);
+        let (_, next) = kill_shared_target(&mut game, &mut field, &known, &character, target, now);
         now = next;
     }
     assert_eq!(counts(&game, QUEST), [3, 0]);
@@ -601,20 +477,19 @@ fn progress_survives_a_reconnect() {
         .take_shared_fields()
         .expect("the reloaded field is available");
     for target in [LIVE_HOOLIGANS[0], LIVE_HOOLIGANS[1]] {
-        let (_, next) = kill_hooligan(&mut game, &mut field, &known, A, target, now);
+        let (_, next) = kill_shared_target(&mut game, &mut field, &known, &character, target, now);
         now = next;
     }
     assert_eq!(counts(&game, QUEST), [5, 0]);
 
-    let courier = courier_character(A);
-    let talked = talk(&mut game, &courier, COURIER, now);
+    let talked = talk(&mut game, &character, COURIER, now);
     now += 10;
     assert!(talked.changed);
-    release_end_screen(&mut game, &courier, QUEST, COURIER, END_TEXT, now);
+    release_end_screen(&mut game, &character, QUEST, COURIER, END_TEXT, now);
     now += 10;
     finish_quest(
         &mut game,
-        &courier,
+        &character,
         QUEST,
         ADVENTURER,
         REWARD_COINS,
@@ -648,7 +523,7 @@ fn progress_survives_a_reconnect() {
     assert_eq!(profile_xp(&game, ADVENTURER), adventurer_before + REWARD_XP);
     assert_packet_changes_nothing(
         &mut game,
-        &courier,
+        &character,
         &quest_end_reply(QUEST),
         now + 10,
         "replayed turn-in after reload",
@@ -662,6 +537,8 @@ fn a_second_player_killing_the_same_hooligans_does_not_advance_the_first() {
     let fixture = Fixture::new();
     let (mut a, now) = start_local_hero(&fixture, A);
     let (mut b, _) = start_local_hero(&fixture, B);
+    let a_character = courier_character(A);
+    let b_character = courier_character(B);
     let mut field = a
         .take_shared_fields()
         .expect("the shared opening field is available");
@@ -669,17 +546,38 @@ fn a_second_player_killing_the_same_hooligans_does_not_advance_the_first() {
     let known = hooligans();
 
     let b_before = b.state();
-    let (_, now) = kill_hooligan(&mut a, &mut field, &known, A, LIVE_HOOLIGANS[0], now);
+    let (_, now) = kill_shared_target(
+        &mut a,
+        &mut field,
+        &known,
+        &a_character,
+        LIVE_HOOLIGANS[0],
+        now,
+    );
     assert_eq!(counts(&a, QUEST), [1, 0], "the killer is credited");
     assert_eq!(counts(&b, QUEST), [0, 0], "the bystander is not credited");
     assert_eq!(b.state(), b_before, "A's kill changed B's saved state");
 
-    let (_, now) = kill_hooligan(&mut b, &mut field, &known, B, LIVE_HOOLIGANS[1], now);
+    let (_, now) = kill_shared_target(
+        &mut b,
+        &mut field,
+        &known,
+        &b_character,
+        LIVE_HOOLIGANS[1],
+        now,
+    );
     assert_eq!(counts(&b, QUEST), [1, 0], "B's own kill credits B");
     assert_eq!(counts(&a, QUEST), [1, 0], "B's kill does not credit A");
     let b_after_own = b.state();
 
-    let (_, mut now) = kill_hooligan(&mut a, &mut field, &known, A, LIVE_HOOLIGANS[2], now);
+    let (_, mut now) = kill_shared_target(
+        &mut a,
+        &mut field,
+        &known,
+        &a_character,
+        LIVE_HOOLIGANS[2],
+        now,
+    );
     assert_eq!(counts(&a, QUEST), [2, 0]);
     assert_eq!(
         b.state(),
@@ -689,8 +587,15 @@ fn a_second_player_killing_the_same_hooligans_does_not_advance_the_first() {
 
     // Both players can still take their own kills from the same field.
     now += RESPAWN_WAIT_MS;
-    tick_field(&mut a, &mut field, &known, A, now, RESPAWN_WAIT_MS);
-    let (_, _) = kill_hooligan(&mut b, &mut field, &known, B, LIVE_HOOLIGANS[0], now);
+    tick_shared_field(&mut a, &mut field, &known, A, now, RESPAWN_WAIT_MS);
+    let (_, _) = kill_shared_target(
+        &mut b,
+        &mut field,
+        &known,
+        &b_character,
+        LIVE_HOOLIGANS[0],
+        now,
+    );
     assert_eq!(counts(&b, QUEST), [2, 0]);
     assert_eq!(counts(&a, QUEST), [2, 0]);
 }
@@ -715,6 +620,7 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
     assert_eq!(error.kind(), std::io::ErrorKind::InvalidData);
 
     let (mut b, mut now_b) = start_local_hero(&fixture, B);
+    let b_character = courier_character(B);
     let mut field = a
         .take_shared_fields()
         .expect("the stale session still has a shared field");
@@ -722,11 +628,25 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
     let known = hooligans();
 
     // A's kill is accepted but cannot credit the unbound stale state.
-    let (_, _) = kill_hooligan(&mut a, &mut field, &known, A, LIVE_HOOLIGANS[0], 10_000);
+    let (_, _) = kill_shared_target(
+        &mut a,
+        &mut field,
+        &known,
+        &courier_character(A),
+        LIVE_HOOLIGANS[0],
+        10_000,
+    );
     assert_eq!(counts(&a, QUEST), [0, 0], "the stale save is not credited");
 
     // B's engine in the same field still advances normally.
-    let (out, next) = kill_hooligan(&mut b, &mut field, &known, B, LIVE_HOOLIGANS[1], now_b);
+    let (out, next) = kill_shared_target(
+        &mut b,
+        &mut field,
+        &known,
+        &b_character,
+        LIVE_HOOLIGANS[1],
+        now_b,
+    );
     now_b = next;
     assert_eq!(counts(&b, QUEST), [1, 0]);
     assert!(
@@ -737,22 +657,22 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
     // Near-cap variant: A's reward cannot fit the wire i32 coin field. The
     // refusal is A's alone; B and the shared field stay usable.
     let (mut capped, mut now_c) = start_local_hero(&fixture, A);
+    let a_character = courier_character(A);
     let mut capped_field = capped
         .take_shared_fields()
         .expect("A's capped session has a field");
-    now_c = five_kills(&mut capped, &mut capped_field, &known, A, now_c);
-    let courier = courier_character(A);
-    let talked = talk(&mut capped, &courier, COURIER, now_c);
+    now_c = five_kills(&mut capped, &mut capped_field, &known, &a_character, now_c);
+    let talked = talk(&mut capped, &a_character, COURIER, now_c);
     now_c += 10;
     assert!(talked.changed);
     assert_eq!(pending_turnin(&capped), Some(QUEST));
-    release_end_screen(&mut capped, &courier, QUEST, COURIER, END_TEXT, now_c);
+    release_end_screen(&mut capped, &a_character, QUEST, COURIER, END_TEXT, now_c);
     now_c += 10;
     let mut state = capped.state();
     state.inventory.coins = i32::MAX as u32;
     let mut capped = fixture.game_as(A, Some(state));
     let before = saved(&capped);
-    let refused = capped.handle_in_world(&quest_end_reply(QUEST), &courier, now_c);
+    let refused = capped.handle_in_world(&quest_end_reply(QUEST), &a_character, now_c);
     assert!(
         refused.is_err(),
         "a coin grant past i32::MAX is refused for that player"
@@ -765,7 +685,14 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
     assert_eq!(pending_turnin(&capped), Some(QUEST));
 
     // B still kills and credits in the unchanged shared field.
-    let (_, _) = kill_hooligan(&mut b, &mut field, &known, B, LIVE_HOOLIGANS[2], now_b);
+    let (_, _) = kill_shared_target(
+        &mut b,
+        &mut field,
+        &known,
+        &b_character,
+        LIVE_HOOLIGANS[2],
+        now_b,
+    );
     assert_eq!(counts(&b, QUEST), [2, 0]);
     assert_eq!(field.health(LIVE_HOOLIGANS[2]), Some(0));
 }

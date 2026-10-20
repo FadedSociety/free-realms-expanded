@@ -24,12 +24,12 @@ mod npc_quest_chain;
 use npc_quest_chain::{
     CHARACTER, Fixture, accept, active_job, assert_no_offer, assert_packet_changes_nothing,
     character_at_for, coins, content_dir, content_position, counts, finish_quest, has_family,
-    npc_interact, offer, pending_offer, pending_turnin, profile_xp, quest_end_reply, quest_reply,
-    quest_status, read_json, release_end_screen, saved, select_job, send, talk,
+    kill_shared_target, npc_interact, objective_update, offer, pending_offer, pending_turnin,
+    profile_xp, quest_end_reply, quest_reply, quest_status, read_json, release_end_screen, saved,
+    select_job, send, talk,
 };
 use osfr_tools::{
     character_store::CharacterState,
-    encounter::{SharedFieldAction, SharedFieldState},
     game_store,
     gameplay::{Gameplay, GameplayState, Outcome},
     profiles::ProfileState,
@@ -64,9 +64,6 @@ const NPC_ROW_NAME_ID: u64 = 509_620_257;
 const GEOFFREY_MODEL: i32 = 415;
 /// `starting_farnum_wolves` W102-F1 centre; the quest's visit anchor.
 const WOLF_CENTRE: [f32; 3] = [-1899.204, -50.59, 307.902];
-/// `SharedFieldAction::Ability` slot 0 is the basic attack (T256's kill path).
-const ATTACK_SLOT: i32 = 0;
-const ATTACK_INTERVAL_MS: u64 = 700;
 
 fn character(guid: u64, position: [f32; 3]) -> CharacterState {
     character_at_for(guid, 0, position)
@@ -206,47 +203,6 @@ fn player(
     game.initialize_world(&character(character_id, position), 0)
         .expect("the opening world initializes");
     game
-}
-
-fn objective_update(replies: &[Vec<u8>], quest: u32, objective: u32, current: u32) -> bool {
-    replies.iter().any(|packet| {
-        has_family(packet, 49, 9, None)
-            && packet.len() >= 18
-            && u32::from_le_bytes(packet[6..10].try_into().unwrap()) == quest
-            && u32::from_le_bytes(packet[10..14].try_into().unwrap()) == objective
-            && u32::from_le_bytes(packet[14..18].try_into().unwrap()) == current
-    })
-}
-
-/// One shared-field basic attack; loop until the target dies (the Brawler's basic
-/// swing is 100, so a 180 HP camp wolf takes two swings).
-fn kill_shared(
-    game: &mut Gameplay,
-    field: &mut SharedFieldState,
-    at: &CharacterState,
-    known: &BTreeSet<u64>,
-    target: u64,
-    now: &mut u64,
-) -> Outcome {
-    for _ in 0..8 {
-        let out = game
-            .handle_shared_field(
-                &SharedFieldAction::Ability {
-                    slot: ATTACK_SLOT,
-                    target,
-                },
-                field,
-                known,
-                at,
-                *now,
-            )
-            .expect("the shared-field request is accepted");
-        *now += ATTACK_INTERVAL_MS;
-        if field.health(target) == Some(0) {
-            return out;
-        }
-    }
-    panic!("shared-field target {target} did not die");
 }
 
 /// A Talk to Geoffrey followed by the 26/6 that releases the held 49/13.
@@ -482,7 +438,8 @@ fn the_search_visit_three_wolf_kills_and_final_talk_pay_once() {
     for (index, (guid, position)) in wolves.iter().enumerate() {
         now += 100;
         let at = character(CHARACTER, [position[0] + 1.0, position[1], position[2]]);
-        let killed = kill_shared(&mut game, &mut field, &at, &known, *guid, &mut now);
+        let (killed, next) = kill_shared_target(&mut game, &mut field, &known, &at, *guid, now);
+        now = next;
         assert_eq!(field.health(*guid), Some(0), "wolf {index} is dead");
         assert_eq!(
             counts(&game, QUEST),
@@ -491,7 +448,7 @@ fn the_search_visit_three_wolf_kills_and_final_talk_pay_once() {
             index + 1
         );
         assert!(
-            objective_update(&killed.replies, QUEST, 2, index as u32 + 1),
+            objective_update(&killed, QUEST, 2, index as u32 + 1),
             "49/9 reports the objective counter"
         );
     }
@@ -571,7 +528,8 @@ fn a_second_player_cannot_credit_or_pay_the_first() {
     for (guid, position) in wolves.iter() {
         now += 100;
         let at = character(CHARACTER, [position[0] + 1.0, position[1], position[2]]);
-        kill_shared(&mut a, &mut field, &at, &known, *guid, &mut now);
+        let (_, next) = kill_shared_target(&mut a, &mut field, &known, &at, *guid, now);
+        now = next;
     }
     assert_eq!(counts(&a, QUEST), [1, 3, 0]);
     assert_eq!(
@@ -617,10 +575,10 @@ fn a_second_player_cannot_credit_or_pay_the_first() {
     let b_known: BTreeSet<u64> = mids.iter().map(|(guid, _)| *guid).collect();
     let b_at_wolf = character(OTHER, [position[0] + 1.0, position[1], position[2]]);
     now += 100;
-    let killed = kill_shared(&mut b, &mut field, &b_at_wolf, &b_known, target, &mut now);
+    let (killed, _) = kill_shared_target(&mut b, &mut field, &b_known, &b_at_wolf, target, now);
     assert_eq!(counts(&b, QUEST), [1, 1, 0], "B is credited for B's kill");
     assert!(
-        objective_update(&killed.replies, QUEST, 2, 1),
+        objective_update(&killed, QUEST, 2, 1),
         "B's 49/9 reports B's counter"
     );
     assert_eq!(counts(&a, QUEST), [1, 3, 1], "B's kill does not change A");
@@ -697,7 +655,8 @@ fn refusals_and_reconnect_change_nothing() {
     for (guid, position) in wolves.iter() {
         now += 100;
         let at = character(CHARACTER, [position[0] + 1.0, position[1], position[2]]);
-        kill_shared(&mut game, &mut field, &at, &known, *guid, &mut now);
+        let (_, next) = kill_shared_target(&mut game, &mut field, &known, &at, *guid, now);
+        now = next;
     }
     now += 100;
     let end = open_end_screen(&mut game, &at_geoffrey, now);
@@ -851,14 +810,15 @@ fn progress_survives_a_reconnect() {
     let mut field = game.take_shared_fields().expect("the shared field exists");
     now += 100;
     let (first, position) = wolves[0];
-    kill_shared(
+    let (_, next) = kill_shared_target(
         &mut game,
         &mut field,
-        &character(CHARACTER, [position[0] + 1.0, position[1], position[2]]),
         &known,
+        &character(CHARACTER, [position[0] + 1.0, position[1], position[2]]),
         first,
-        &mut now,
+        now,
     );
+    now = next;
     assert_eq!(counts(&game, QUEST), [1, 1, 0]);
 
     // Production save envelope, then the same bind a reconnecting session runs.
@@ -882,14 +842,15 @@ fn progress_survives_a_reconnect() {
     let mut field = game.take_shared_fields().expect("the shared field exists");
     for (guid, position) in wolves.iter().skip(1) {
         now += 100;
-        kill_shared(
+        let (_, next) = kill_shared_target(
             &mut game,
             &mut field,
-            &character(CHARACTER, [position[0] + 1.0, position[1], position[2]]),
             &known,
+            &character(CHARACTER, [position[0] + 1.0, position[1], position[2]]),
             *guid,
-            &mut now,
+            now,
         );
+        now = next;
     }
     assert_eq!(counts(&game, QUEST), [1, 3, 0]);
 
@@ -997,7 +958,8 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
     now += 100;
     let (a_target, position) = wolves[0];
     let a_at = character(CHARACTER, [position[0] + 1.0, position[1], position[2]]);
-    let out = kill_shared(&mut a, &mut field, &a_at, &known, a_target, &mut now);
+    let (out, next) = kill_shared_target(&mut a, &mut field, &known, &a_at, a_target, now);
+    now = next;
     assert_eq!(field.health(a_target), Some(0));
     assert!(
         !out.replies
@@ -1022,11 +984,11 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
     now += 100;
     let (b_target, position) = wolves[1];
     let b_at = character(OTHER, [position[0] + 1.0, position[1], position[2]]);
-    let out = kill_shared(&mut b, &mut field, &b_at, &known, b_target, &mut now);
+    let (out, _) = kill_shared_target(&mut b, &mut field, &known, &b_at, b_target, now);
     assert_eq!(field.health(b_target), Some(0));
     assert_eq!(counts(&b, QUEST), [1, 1, 0]);
     assert!(
-        objective_update(&out.replies, QUEST, 2, 1),
+        objective_update(&out, QUEST, 2, 1),
         "B's 49/9 still reports B's kill"
     );
     assert!(

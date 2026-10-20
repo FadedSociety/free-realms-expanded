@@ -1,10 +1,10 @@
 //! Shared fixture and packet helpers for the NPC quest-chain tests.
 //!
-//! `archer_entry.rs` (used by `archer_entry_chain.rs` and
-//! `archer_entry_content.rs`), `medic_entry_chain.rs` / `medic_entry_content.rs`,
-//! `quest_job_xp.rs`, `scavenger_hunt_quest.rs` and
-//! `shared_field_kill_quest_credit.rs` include this file with
-//! `#[path = "support/npc_quest_chain.rs"] mod npc_quest_chain;`. Test-only;
+//! Test files include this module with
+//! `#[path = "support/npc_quest_chain.rs"] mod npc_quest_chain;` (grep `tests`
+//! for the current consumers: the entry chains, `quest_job_xp.rs`, the
+//! story-quest suites including `missing_sisters_quest.rs` and
+//! `local_hero_quest.rs`, and `shared_field_kill_quest_credit.rs`). Test-only;
 //! production never copies content. The fixture supplies profile/inventory
 //! content; the repository's `job_trainers.json` and split quest/NPC content are
 //! bound from `data/content` exactly as the bundled play package does.
@@ -17,12 +17,14 @@ pub use content_copy::copy_tree;
 
 use osfr_tools::{
     character_store::CharacterState,
+    encounter::{FieldParticipant, SharedFieldAction, SharedFieldState},
     gameplay::{Gameplay, GameplayState, Outcome},
     npc_interaction::decode_quest_offer_49_1,
     quest_engine::QuestStatus,
 };
 use serde_json::Value;
 use std::{
+    collections::BTreeSet,
     fs,
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
@@ -628,4 +630,112 @@ pub fn assert_packet_changes_nothing(
         "{label} completed or added a quest"
     );
     assert_eq!(saved(game), before, "{label} changed the serialized state");
+}
+
+/// One shared-field basic attack (`SharedFieldAction::Ability` slot 0): the
+/// production request `Session::commit_outcome` runs. Panics on a refused
+/// request; a test that proves a refusal calls `Gameplay::handle_shared_field`
+/// directly so it can inspect the `io::Result`.
+pub fn shared_attack(
+    game: &mut Gameplay,
+    field: &mut SharedFieldState,
+    character: &CharacterState,
+    known: &BTreeSet<u64>,
+    target: u64,
+    now: u64,
+) -> Outcome {
+    game.handle_shared_field(
+        &SharedFieldAction::Ability { slot: 0, target },
+        field,
+        known,
+        character,
+        now,
+    )
+    .unwrap_or_else(|error| panic!("shared attack on {target} was refused: {error}"))
+}
+
+/// The basic-attack interval the field weapon table uses.
+pub const SHARED_ATTACK_INTERVAL_MS: u64 = 700;
+
+/// Attack `target` from its current field position until its health reaches
+/// zero; returns the lethal outcome and the next free timestamp. Reading the
+/// position before each swing covers wandering actors and stationary ones alike;
+/// `character` supplies the attacker's guid and zone.
+pub fn kill_shared_target(
+    game: &mut Gameplay,
+    field: &mut SharedFieldState,
+    known: &BTreeSet<u64>,
+    character: &CharacterState,
+    target: u64,
+    now: u64,
+) -> (Outcome, u64) {
+    let mut now = now;
+    for _ in 0..16 {
+        let position = field
+            .position(target)
+            .unwrap_or_else(|| panic!("field target {target} exists"));
+        let attacker = character_at_for(character.guid, character.zone_id, position);
+        let outcome = shared_attack(game, field, &attacker, known, target, now);
+        now += SHARED_ATTACK_INTERVAL_MS;
+        if field.health(target) == Some(0) {
+            return (outcome, now);
+        }
+    }
+    panic!("field target {target} did not die");
+}
+
+/// One shared-motion tick for a participant far from the field, so the tick only
+/// settles and respawns the actors. `elapsed` is the elapsed time the session
+/// reports for the same tick.
+pub fn tick_shared_field(
+    game: &mut Gameplay,
+    field: &mut SharedFieldState,
+    known: &BTreeSet<u64>,
+    player: u64,
+    now: u64,
+    elapsed: u64,
+) {
+    let participant = FieldParticipant {
+        guid: player,
+        position: [0.0, 0.0, 0.0],
+        health: 1_000,
+        max_health: 1_000,
+        mitigation: 1.0,
+        grace_until: 0,
+        combat: true,
+        known_npcs: Some(known.clone()),
+    };
+    game.tick_shared_motion(field, &[participant], now, elapsed)
+        .expect("the shared field ticks");
+}
+
+/// 49/9 `ObjectiveUpdate`: quest `6..10`, objective `10..14`, current `14..18`
+/// (client reader `0x00c7af60`).
+pub fn objective_update(outcome: &Outcome, quest: u32, objective: u32, current: u32) -> bool {
+    outcome.replies.iter().any(|packet| {
+        has_family(packet, 49, 9, Some(quest))
+            && packet.len() >= 18
+            && u32::from_le_bytes(packet[10..14].try_into().unwrap()) == objective
+            && u32::from_le_bytes(packet[14..18].try_into().unwrap()) == current
+    })
+}
+
+/// 49/10 `GoalComplete`: quest `6..10`, objective `10..14` (client reader
+/// `0x00c7b070`).
+pub fn objective_complete(outcome: &Outcome, quest: u32, objective: u32) -> bool {
+    outcome.replies.iter().any(|packet| {
+        has_family(packet, 49, 10, Some(quest))
+            && packet.len() >= 14
+            && u32::from_le_bytes(packet[10..14].try_into().unwrap()) == objective
+    })
+}
+
+/// 49/8 `ObjectiveActivated`: quest `6..10`, objective `10..14` (client reader
+/// `0x00c7aeb0`).
+pub fn objective_activated(outcome: &Outcome, quest: u32, objective: u32) -> bool {
+    outcome.replies.iter().any(|packet| {
+        has_family(packet, 49, 8, Some(quest))
+            && packet.len() >= 14
+            && u32::from_le_bytes(packet[10..14].try_into().unwrap()) == objective
+    })
 }
