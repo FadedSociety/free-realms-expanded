@@ -3,6 +3,7 @@
 use osfr_tools::trace;
 
 use osfr_tools::account_store::AccountStore;
+use osfr_tools::bundle_budget::BundleBudget;
 use osfr_tools::character_store::CharacterState;
 use osfr_tools::game_rules::{GameRuleSet, MembershipState, RulePolicy};
 use osfr_tools::game_store::{load_or_create, save};
@@ -451,6 +452,7 @@ struct Session {
     sent: u64,
     received: u64,
     trace: Option<trace::Trace>,
+    bundle_budget: BundleBudget,
 }
 
 #[derive(Clone, Debug)]
@@ -1093,6 +1095,7 @@ impl Session {
             sent: 0,
             received: 0,
             trace,
+            bundle_budget: BundleBudget::outside(),
         })
     }
 
@@ -1512,9 +1515,15 @@ impl Session {
         sessions: &mut SessionMap,
         transport: Option<(u16, Option<u16>, &'static str, bool)>,
     ) -> Result<(), Box<dyn std::error::Error>> {
-        self.dispatch_message_inner(
+        // One reply budget for the whole client message: `commit_outcome` charges the replies it
+        // is about to queue, which covers both the combat split and the shared-field/ride/pet
+        // replies `handle_at` did not count (F179).
+        self.bundle_budget = BundleBudget::message(message);
+        let result = self.dispatch_message_inner(
             message, options, now_ms, world, membership, sessions, transport, false,
-        )
+        );
+        self.bundle_budget = BundleBudget::outside();
+        result
     }
 
     fn dispatch_message_inner(
@@ -1726,6 +1735,7 @@ impl Session {
         outcome.pets_changed |= ended.pets_changed;
         outcome.replies.extend(ended.replies);
         outcome.nearby.extend(ended.nearby);
+        self.bundle_budget.stage(&outcome.replies)?;
         let current = staged_gateway.state().clone();
         let transfer = outcome.began_zoning || previous.zone_id != current.zone_id;
         let prepared = (|| -> Result<_, Box<dyn std::error::Error>> {
@@ -4597,77 +4607,6 @@ fn field_recipient_matches(loaded: bool, location: Option<(i32, bool)>, instance
     loaded && location.is_some_and(|(id, ready)| id == instance && ready)
 }
 
-#[cfg(test)]
-#[test]
-fn w127_other_instance_recipient_canary() {
-    assert!(field_recipient_matches(true, Some((0, true)), 0));
-    assert!(
-        !field_recipient_matches(true, Some((7, true)), 0),
-        "recipient assertion: another instance received field deltas"
-    );
-    // The field view path uses this same predicate: either signal alone hides it.
-    assert!(
-        !field_recipient_matches(true, Some((0, false)), 0),
-        "readiness loss alone"
-    );
-    assert!(
-        !field_recipient_matches(false, Some((0, true)), 0),
-        "world-load loss alone"
-    );
-    assert!(
-        field_recipient_matches(true, Some((0, true)), 0),
-        "readiness restored"
-    );
-    assert!(!field_recipient_matches(true, None, 0));
-}
-
-#[cfg(test)]
-#[test]
-fn shared_combat_budget_cannot_be_refunded_by_staging() {
-    let world = SharedWorld::new();
-    let clone = world.clone();
-    let now = Instant::now();
-    for _ in 0..20 {
-        assert!(clone.security.lock().unwrap().allow_combat(101, now));
-    }
-    assert!(!world.security.lock().unwrap().allow_combat(101, now));
-    drop(clone);
-    assert!(!world.security.lock().unwrap().allow_combat(101, now));
-    assert!(world.security.lock().unwrap().allow_combat(202, now));
-}
-
-/// Pins the shared combat budget's rate (10/s), burst (20) and key cap
-/// (`MAX_SESSIONS`): sixteen busy accounts refuse a seventeenth, 100 ms of idle
-/// time returns exactly one token, and two seconds of idle time lets the
-/// seventeenth in by evicting the refilled buckets.
-#[cfg(test)]
-#[test]
-fn shared_combat_budget_pins_rate_burst_and_session_cap() {
-    let world = SharedWorld::new();
-    let allow =
-        |account: u64, at: Instant| world.security.lock().unwrap().allow_combat(account, at);
-    let now = Instant::now();
-    for account in 1..=MAX_SESSIONS as u64 {
-        assert!(allow(account, now), "account {account}");
-    }
-    let seventeenth = MAX_SESSIONS as u64 + 1;
-    assert!(!allow(seventeenth, now));
-    assert_eq!(world.security.lock().unwrap().combat.len(), MAX_SESSIONS);
-
-    // Drain account 1, then 10/s returns exactly one token after 100 ms.
-    for _ in 1..20 {
-        assert!(allow(1, now));
-    }
-    let refilled = now + Duration::from_millis(100);
-    assert!(allow(1, refilled));
-    assert!(!allow(1, refilled));
-
-    // Every bucket that can pay a whole burst is idle and evicted.
-    let idle = now + Duration::from_secs(2);
-    assert!(allow(seventeenth, idle));
-    assert!(world.security.lock().unwrap().combat.len() <= MAX_SESSIONS);
-}
-
 /// W173: the chat channel switches and bubble colour (26/32, 26/33, 26/18) through
 /// `Session::route_application` with three sessions and no sockets.
 #[cfg(test)]
@@ -4692,3 +4631,27 @@ mod w163_trade_routing;
 #[cfg(test)]
 #[path = "osfr_gateway/lead_trade_commit.rs"]
 mod lead_trade_commit;
+
+/// W127 directed-field and shared combat-budget pins. The bodies live outside the hub, but
+/// these crate-root test names are part of the protected test list (F179).
+#[cfg(test)]
+#[path = "osfr_gateway/spine_pins.rs"]
+mod spine_pins;
+
+#[cfg(test)]
+#[test]
+fn w127_other_instance_recipient_canary() {
+    spine_pins::w127_other_instance_recipient_canary();
+}
+
+#[cfg(test)]
+#[test]
+fn shared_combat_budget_cannot_be_refunded_by_staging() {
+    spine_pins::shared_combat_budget_cannot_be_refunded_by_staging();
+}
+
+#[cfg(test)]
+#[test]
+fn shared_combat_budget_pins_rate_burst_and_session_cap() {
+    spine_pins::shared_combat_budget_pins_rate_burst_and_session_cap();
+}

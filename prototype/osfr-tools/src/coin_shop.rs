@@ -36,12 +36,15 @@ const MAX_CLIENT_TRANSACTIONS: usize = 4096;
 const MAX_BUY_BACK_WINDOW: usize = 100;
 /// (R) The client keeps a longer list; ten is the deployed server policy when data omits a limit.
 const DEFAULT_BUY_BACK_WINDOW: usize = 10;
-/// (R) The client's static item map has 4096 buckets (`00c75fc0`); a longer id list is refused.
+/// (R) Server policy, not a recovered client limit. The client's static item table is a
+/// `HashList<ItemDefinitionMetaData,4096,1024>` (vtable `01833bd8`), but the 165/2 reader does not
+/// cap the requested list; 4,096 ids keeps one request bounded.
 const MAX_DEFINITION_IDS: usize = 4096;
 /// Keep each 35/37 batch below the inbound packet cap. A single decoded row is at most 65,536
 /// bytes, so an exceptionally large row is sent alone.
 const MAX_DEFINITION_BATCH_BYTES: usize = 60 * 1024;
-/// (R) Bound one 165/2 answer before any record is copied. The prepared catalogue's largest row is
+/// (R) Server memory policy, not a recovered client limit (lead-accepted 2026-10-19, F179):
+/// bound one 165/2 answer before any record is copied. The prepared catalogue's largest row is
 /// 319 bytes, so 4,096 ids are about 1.3 MiB; four MiB leaves threefold headroom without letting
 /// a hostile list of maximum-size rows (65,536 bytes each) allocate the whole 32 MiB catalogue.
 const MAX_DEFINITION_REPLY_BYTES: usize = 4 * 1024 * 1024;

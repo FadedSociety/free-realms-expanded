@@ -262,30 +262,15 @@ fn wrap(inner: &[u8]) -> Vec<u8> {
 fn bundle(messages: &[Vec<u8>]) -> Vec<u8> {
     let mut bytes = vec![0, 25];
     for message in messages {
-        assert!(message.len() < 255);
-        bytes.push(message.len() as u8);
-        bytes.extend(message);
-    }
-    bytes
-}
-
-/// A bundle that uses the client's 16-bit child length, needed once a 165/2 list passes 255 bytes.
-fn large_bundle(messages: &[Vec<u8>]) -> Vec<u8> {
-    let mut bytes = vec![0, 25];
-    for message in messages {
         assert!(message.len() <= u16::MAX as usize);
-        match message.len() {
-            len if len < 255 => bytes.push(len as u8),
-            // 255 is the escape itself, so that length needs the 32-bit form below.
-            255 => {
-                bytes.push(255);
-                bytes.extend(255u16.to_be_bytes());
-                bytes.extend(255u32.to_be_bytes());
-            }
-            len => {
-                bytes.push(255);
-                bytes.extend((len as u16).to_be_bytes());
-            }
+        // The client's length escape: 0xff then a 16-bit big-endian length, and a 16-bit
+        // length of 255 means the 32-bit length follows.
+        bytes.push(255);
+        if message.len() == 255 {
+            bytes.extend(255u16.to_be_bytes());
+            bytes.extend(255u32.to_be_bytes());
+        } else {
+            bytes.extend((message.len() as u16).to_be_bytes());
         }
         bytes.extend(message);
     }
@@ -574,14 +559,14 @@ fn parse_definitions(packet: &[u8]) -> (bool, Vec<u32>) {
     (packet[4] == 1, ids)
 }
 
-/// One-record 35/37 batch. Rows have no per-record length, so the test fixture retains the
-/// expected record separately and compares the concatenated payload.
+/// A 35/37 batch. Rows have no per-record length, so the test fixture retains the expected
+/// records separately and compares the concatenated payload.
 fn parse_definition_batch(packet: &[u8]) -> (i32, Vec<u8>) {
     assert_eq!(&packet[..4], &[35, 0, 37, 0]);
     let payload_len = i32::from_le_bytes(packet[4..8].try_into().unwrap());
     let count = i32::from_le_bytes(packet[8..12].try_into().unwrap());
     assert_eq!(payload_len as usize + 8, packet.len());
-    assert_eq!(count, 1);
+    assert!(count >= 1, "an empty batch is never emitted");
     (count, packet[12..].to_vec())
 }
 
@@ -1420,7 +1405,9 @@ fn large_definitions(count: usize, size: usize) -> (Vec<Value>, Vec<u32>) {
 
 #[test]
 fn multiple_definition_batches_follow_request_order() {
-    let (rows, ids) = large_definitions(2, 40 * 1024);
+    let (rows, mut ids) = large_definitions(2, 40 * 1024);
+    // Descending ids: sorting the request would show in both the batches and the 165/3 list.
+    ids.reverse();
     let fixture = Fixture::with_definitions(rows);
     let inventory = Inventory::load(&fixture.content, None).unwrap();
     let mut gateway = fixture.connect(fixture.state());
@@ -1440,11 +1427,97 @@ fn multiple_definition_batches_follow_request_order() {
             "batch {index} must carry the requested row in order"
         );
     }
-    assert_eq!(parse_definitions(&replies[2]), (true, ids));
+    assert_eq!(parse_definitions(&replies[2]), (true, ids.clone()));
     assert_eq!(
         gateway.snapshot(),
         before,
         "definition delivery is read-only"
+    );
+}
+
+#[test]
+fn one_definition_batch_sorts_rows_but_the_id_list_follows_request_order() {
+    let (rows, mut ids) = large_definitions(2, 8);
+    ids.reverse();
+    let fixture = Fixture::with_definitions(rows);
+    let inventory = Inventory::load(&fixture.content, None).unwrap();
+    let mut gateway = fixture.connect(fixture.state());
+
+    let replies = send(&mut gateway, &definitions_packet(&ids));
+    assert_eq!(replies.len(), 2, "two tiny rows share one 35/37 batch");
+    let (count, payload) = parse_definition_batch(&replies[0]);
+    assert_eq!(count, 2);
+    // The existing encoder writes records in id order inside one batch (record ids are the
+    // definition ids); the batch sequence and the 165/3 list follow the request order.
+    let mut sorted = ids.clone();
+    sorted.sort_unstable();
+    let expected: Vec<u8> = sorted
+        .iter()
+        .flat_map(|id| {
+            inventory
+                .definition_record(*id as i32)
+                .unwrap()
+                .iter()
+                .copied()
+        })
+        .collect();
+    assert_eq!(
+        payload, expected,
+        "the batch keeps id order inside the batch"
+    );
+    assert_eq!(parse_definitions(&replies[1]), (true, ids));
+}
+
+#[test]
+fn a_refused_bundle_leaves_the_npc_menu_closed() {
+    // 26/8 opens the menu, then three large definition reads exceed the bundle budget. The
+    // staged Gameplay owns the menu, so the refusal must discard it with the rest of the bundle.
+    let (rows, ids) = large_definitions(60, 65_536);
+    let fixture = Fixture::with_definitions(rows);
+    let mut gateway = fixture.connect(fixture.state());
+    let before = gateway.snapshot();
+
+    let request = wrap(&definitions_packet(&ids));
+    let refused = gateway.handle_at(
+        &bundle(&[
+            wrap(&npc_request(8, None)),
+            request.clone(),
+            request.clone(),
+            request,
+        ]),
+        NOW,
+    );
+    assert!(refused.is_err(), "the bundle must be refused at the budget");
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "the refused bundle changed state"
+    );
+
+    let outcome = gateway
+        .handle_at(&wrap(&npc_request(10, Some(2))), NOW)
+        .unwrap();
+    assert!(
+        !outcome
+            .replies
+            .iter()
+            .any(|reply| reply[7..].starts_with(&[66, 0, 42, 0])),
+        "a refused bundle must not leave the NPC menu open"
+    );
+    assert_eq!(gateway.snapshot(), before);
+
+    // Positive control: the same interaction outside the refused bundle opens the shop.
+    gateway
+        .handle_at(&wrap(&npc_request(8, None)), NOW)
+        .unwrap();
+    let opened = gateway
+        .handle_at(&wrap(&npc_request(10, Some(2))), NOW)
+        .unwrap();
+    assert!(
+        inner_packets(&opened)
+            .iter()
+            .any(|packet| packet.starts_with(&[66, 0, 42, 0])),
+        "the fixture must still be able to open the shop"
     );
 }
 
@@ -1465,7 +1538,7 @@ fn definition_reply_over_budget_is_refused_before_records_are_copied() {
     assert_eq!(parse_definitions(&replies[0]), (false, vec![]));
     assert_eq!(gateway.snapshot(), before, "the refusal changed state");
 
-    // Canary: sixty rows stay under the budget and are each delivered before the answer.
+    // Positive control: sixty rows stay under the budget and are each delivered before the answer.
     let under = &ids[..60];
     let replies = send(&mut gateway, &definitions_packet(under));
     assert_eq!(replies.len(), under.len() + 1);
@@ -1486,7 +1559,7 @@ fn gateway_rejects_a_bundle_that_repeats_large_definition_requests() {
 
     let request = wrap(&definitions_packet(&ids));
     let refused = gateway.handle_at(
-        &large_bundle(&[request.clone(), request.clone(), request.clone()]),
+        &bundle(&[request.clone(), request.clone(), request.clone()]),
         NOW,
     );
     let error = match refused {
@@ -1503,9 +1576,9 @@ fn gateway_rejects_a_bundle_that_repeats_large_definition_requests() {
         "the refused bundle changed state"
     );
 
-    // Canary: two identical children stay inside the budget and are both answered.
+    // Positive control: two identical children stay inside the budget and are both answered.
     let answered = gateway
-        .handle_at(&large_bundle(&[request.clone(), request]), NOW)
+        .handle_at(&bundle(&[request.clone(), request]), NOW)
         .unwrap();
     assert_eq!(answered.replies.len(), 2 * (ids.len() + 1));
     assert_eq!(gateway.snapshot(), before);

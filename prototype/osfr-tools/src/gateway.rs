@@ -4,6 +4,7 @@
 //! Sanctuary packet definitions. Startup messages are built from typed data,
 //! not replayed captured bytes. This module never runs C# code.
 
+use crate::bundle_budget::BundleBudget;
 use crate::character_store::CharacterState;
 use crate::dev_teleport;
 use crate::encounter::{ZoneTransition, zone_begin_packet};
@@ -31,9 +32,6 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 const MAX_MESSAGE: usize = 1_048_576;
 const MAX_REFERENCE: usize = 16_777_216;
 const MAX_BUNDLE_CHILDREN: usize = 128;
-/// (R) One bundled request may not stage more replies than a single outbound budget can carry;
-/// repeating a large read in all 128 children must not accumulate an unbounded payload.
-const MAX_BUNDLE_REPLY_BYTES: usize = 8 * 1024 * 1024;
 
 fn invalid(message: &str) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, message)
@@ -1425,14 +1423,13 @@ impl Gateway {
         let mut last_movement_ms = self.last_movement_ms;
         let (mut logged_in, mut ready, mut loaded) = (self.logged_in, self.ready, self.loaded);
         let mut outcome = GatewayOutcome::default();
+        // Count only the replies appended since the previous event; a bundle must not rescan
+        // every earlier batch on each child (F179 item 19).
+        let mut budget = BundleBudget::bundle(combined);
+        let mut counted_replies = 0usize;
         for (event_index, event) in events.into_iter().enumerate() {
-            if combined
-                && outcome.replies.iter().map(Vec::len).sum::<usize>() > MAX_BUNDLE_REPLY_BYTES
-            {
-                return Err(invalid(
-                    "bundled application response exceeds the outbound budget",
-                ));
-            }
+            budget.stage(&outcome.replies[counted_replies..])?;
+            counted_replies = outcome.replies.len();
             match event {
                 Event::Login => {
                     if !logged_in {
@@ -1793,12 +1790,7 @@ impl Gateway {
                 }
             }
         }
-        if combined && outcome.replies.iter().map(Vec::len).sum::<usize>() > MAX_BUNDLE_REPLY_BYTES
-        {
-            return Err(invalid(
-                "bundled application response exceeds the outbound budget",
-            ));
-        }
+        budget.stage(&outcome.replies[counted_replies..])?;
         self.state = state;
         self.gameplay = gameplay;
         self.movement_state = movement_state;

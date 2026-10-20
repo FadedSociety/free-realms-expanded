@@ -577,6 +577,203 @@ fn live_outfit_fanout_respects_directed_visibility_cap() {
     }));
 }
 
+/// F179: the session splits a bundle that contains a combat/shared interaction before
+/// `handle_at`, so the library's per-message budget never sees the other children. The reply
+/// budget now accumulates across those ordered children; the third large definition read puts a
+/// read-only bundle over it and the dispatch is refused before that child commits.
+#[test]
+fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
+    use sha2::{Digest, Sha256};
+
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
+    let scratch = test_support::Scratch::new("f179-split");
+    let content = scratch.path().join("content");
+    fs::create_dir_all(content.join("npcs")).unwrap();
+    fs::create_dir_all(content.join("quests")).unwrap();
+    let source = std::env::var_os("OSFR_APP_FUZZ_CONTENT")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| root.join("reports/round59-native-20261015T124443Z/content"));
+    for entry in fs::read_dir(&source).unwrap() {
+        let path = entry.unwrap().path();
+        if path.is_file() {
+            fs::copy(&path, content.join(path.file_name().unwrap())).unwrap();
+        }
+    }
+    let provenance = json!([{"kind":"reconstructed","evidence":"F179 synthetic test policy"}]);
+    let write = |name: &str, value: serde_json::Value| {
+        fs::write(content.join(name), serde_json::to_vec(&value).unwrap()).unwrap();
+    };
+    write(
+        "npcs/synthetic.json",
+        json!({"schema_version":1,"records":[
+            {"npc_id":700,"name":"Synthetic NPC","zone_id":0,"position":[0.,0.,0.],
+             "placement":"legacy_data","model_id":1,"roles":["vendor"],"vendor_stock":"synthetic"}
+        ]}),
+    );
+    write(
+        "npc_spawns_extra.json",
+        json!({"schema_version":1,"records":[]}),
+    );
+    write(
+        "zones.json",
+        json!({"schema_version":1,"records":[{"id":0,"name":"Synthetic zone"}]}),
+    );
+    write(
+        "vendors.json",
+        json!({"schema_version":1,"vendors":[{"npc_id":700,"item_ids":[8]}]}),
+    );
+    write(
+        "stores.json",
+        json!({"schema_version":1,"marketplace":{
+            "enabled_on_handshake":false,"orders_enabled":false,
+            "payment_sources_enabled":false,"not_available_message":"disabled"},
+            "items":[{"item_id":8,"purchase_price_coins":15,"member_discount_percent":null,
+                      "member_price_coins":null,"sell_price_coins":7,"no_sale":false}]}),
+    );
+    write(
+        "quests/synthetic.json",
+        json!({"schema_version":1,"records":[{
+            "id":701,"title_string_id":1,"giver_npc_id":700,"prerequisite_quest_ids":[],
+            "objectives":[{"kind":"talk_to_npc","id":702,"npc_id":700,"source":provenance}],
+            "rewards":[{"coins":7,"items":[],"job_xp":{},"source":provenance}],"source":provenance
+        }]}),
+    );
+    write(
+        "jobs.json",
+        json!({"schema_version":1,"records":[{
+            "id":"synthetic","name":"Synthetic job","profile_id":null,"category":"freestyle",
+            "max_level":20,"members_only":false,"trainer_npc_ids":[],"quest_ids":[701],
+            "abilities":[],"source":provenance
+        }]}),
+    );
+    // 43 maximum-size rows are ~2.7 MiB per child: two children stay under the 8 MiB bundle
+    // budget, the third pushes the split bundle over it.
+    let ids: Vec<u32> = (0..43).map(|index| 930_000 + index).collect();
+    let definitions: Vec<serde_json::Value> = ids
+        .iter()
+        .map(|id| {
+            let mut bytes = (*id as i32).to_le_bytes().to_vec();
+            bytes.resize(65_536, 0x5a);
+            json!({
+                "id": *id as i32, "slot": 0, "class_id": 1, "default_tint": 0, "max_stack": 10,
+                "model": "", "texture": "", "tint_alias": "", "effect": 0, "wield_type": 0,
+                "serialized_hex": bytes.iter().map(|byte| format!("{byte:02x}")).collect::<String>(),
+                "sha256": format!("{:x}", Sha256::digest(&bytes))
+            })
+        })
+        .collect();
+    write(
+        "item-catalogue.json",
+        json!({"schema_version":1,"definitions":definitions}),
+    );
+
+    let mut options = test_support::options(scratch.state());
+    options.content = Some(content);
+    let mut server = Server::new(options).unwrap();
+    let mut session = Session::new(
+        SessionId(179),
+        "127.0.0.1:12347".parse().unwrap(),
+        SessionRequest {
+            id: 179,
+            crc_length: 3,
+            buffer_size: 512,
+        },
+        &server.options,
+        CRC_SEED,
+        None,
+        None,
+    )
+    .unwrap();
+    let mut login = 1u16.to_le_bytes().to_vec();
+    for (i, value) in ["f179", "1.910.1.530630", ""].into_iter().enumerate() {
+        login.extend((value.len() as u32).to_le_bytes());
+        login.extend(value.as_bytes());
+        if i == 0 {
+            login.extend(1u64.to_le_bytes());
+        }
+    }
+    session.gateway.handle(&login).unwrap();
+    session.gateway.handle(&wrap(&[13, 0])).unwrap();
+    session.gateway.handle(&wrap(&[10, 0])).unwrap();
+    let before = session.gateway.snapshot();
+
+    let mut request = vec![165, 0, 2, 0];
+    request.extend((ids.len() as i32).to_le_bytes());
+    ids.iter().for_each(|id| request.extend(id.to_le_bytes()));
+    let mut select = vec![26, 0, 10, 0];
+    select.extend(700u64.to_le_bytes());
+    select.extend(2i32.to_le_bytes());
+    let children = [
+        wrap(&select),
+        wrap(&request),
+        wrap(&request),
+        wrap(&request),
+    ];
+    let mut bundle = vec![0, 25];
+    for child in &children {
+        assert!(child.len() < 255);
+        bundle.push(child.len() as u8);
+        bundle.extend(child);
+    }
+    let refused = session.dispatch_message(
+        &bundle,
+        &server.options,
+        1000,
+        &mut server.world,
+        &mut server.membership,
+        &mut server.sessions,
+        None,
+    );
+    let error = match refused {
+        Ok(_) => panic!("the split bundle staged more than the outbound budget"),
+        Err(error) => error,
+    };
+    assert!(
+        error.to_string().contains("outbound budget"),
+        "expected the reply budget refusal, got {error}"
+    );
+    assert_eq!(
+        session.gateway.snapshot(),
+        before,
+        "the refused child changed state"
+    );
+
+    // Positive control: one definition read alone stays under the per-request cap.
+    session
+        .dispatch_message(
+            &wrap(&request),
+            &server.options,
+            1000,
+            &mut server.world,
+            &mut server.membership,
+            &mut server.sessions,
+            None,
+        )
+        .unwrap();
+    assert_eq!(session.gateway.snapshot(), before);
+
+    // A whole (non-split) bundle still answers after a refused split: the budget is reset for
+    // every top-level message, so the refused message's bytes cannot charge the next one.
+    let mut ordinary = vec![0, 25];
+    for child in [wrap(&request), wrap(&request)] {
+        assert!(child.len() < 255);
+        ordinary.push(child.len() as u8);
+        ordinary.extend(child);
+    }
+    session
+        .dispatch_message(
+            &ordinary,
+            &server.options,
+            1000,
+            &mut server.world,
+            &mut server.membership,
+            &mut server.sessions,
+            None,
+        )
+        .expect("a whole bundle under the 8 MiB budget must not be charged twice");
+    assert_eq!(session.gateway.snapshot(), before);
+}
+
 /// Session-test scratch directory and `Options` builder, shared with `lead_trade_commit`.
 #[path = "test_support.rs"]
 pub(crate) mod test_support;
