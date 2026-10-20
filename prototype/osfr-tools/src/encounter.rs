@@ -678,6 +678,10 @@ pub struct EncounterOutcome {
     pub zoning: Option<ZoneTransition>,
     pub rewards: Vec<EncounterReward>,
     pub completed: Option<u32>,
+    /// The encounter/dungeon id reported on the **win transition** for regional
+    /// `CompleteDungeon` quest credit. `completed` still marks the results Close and
+    /// drives the opening story destination; do not use one field for both.
+    pub win_completed: Option<u32>,
     /// Positive definition ids defeated here; `0` names no quest target.
     pub defeated: Vec<i32>,
     pub feedback: Option<String>,
@@ -1356,6 +1360,7 @@ impl EncounterEngine {
             total.replies.extend(out.replies);
             total.rewards.extend(out.rewards);
             total.defeated.extend(out.defeated);
+            total.win_completed = total.win_completed.or(out.win_completed);
             if out.feedback.is_some() {
                 total.feedback = out.feedback;
             }
@@ -1857,25 +1862,22 @@ impl EncounterEngine {
     }
 
     fn interact(&self, guid: u64, position: [f32; 3]) -> EncounterOutcome {
-        if let Some((d, guide)) = self
-            .dungeon()
-            .and_then(|d| d.guide.as_ref().map(|guide| (d, guide)))
+        if let Some(guide) = self.dungeon().and_then(|d| d.guide.as_ref())
+            && guid == guide.guid
+            && distance(position, guide.position) <= 12.0
         {
-            if guid == guide.guid && distance(position, guide.position) <= 12.0 {
-                let _ = d;
-                let phase = &self.state.active.as_ref().unwrap().phase;
-                let entries = if *phase == EncounterPhase::Lost {
-                    vec![(RETRY, 432500), (EXIT, 4826)]
-                } else if *phase == EncounterPhase::Fighting && !self.armed {
-                    vec![(START, 386175), (EXIT, 4826)]
-                } else {
-                    vec![(EXIT, 4826)]
-                };
-                return EncounterOutcome {
-                    replies: vec![menu(guid, &guide.name, &entries, false)],
-                    ..Default::default()
-                };
-            }
+            let phase = &self.state.active.as_ref().unwrap().phase;
+            let entries = if *phase == EncounterPhase::Lost {
+                vec![(RETRY, 432500), (EXIT, 4826)]
+            } else if *phase == EncounterPhase::Fighting && !self.armed {
+                vec![(START, 386175), (EXIT, 4826)]
+            } else {
+                vec![(EXIT, 4826)]
+            };
+            return EncounterOutcome {
+                replies: vec![menu(guid, &guide.name, &entries, false)],
+                ..Default::default()
+            };
         }
         if let Some((a, s)) = self.enemy(guid) {
             if s.health > 0 && distance(position, s.position) <= 3.0 {
@@ -2128,6 +2130,7 @@ impl EncounterEngine {
                     );
                     let repeatable = d.guide.is_none();
                     self.state.active.as_mut().unwrap().phase = EncounterPhase::Won;
+                    out.win_completed = Some(id);
                     // The cave rewards once; overworld battles every win (R).
                     // Repeatable battles are never recorded: their ids are not in the
                     // opening content that validates `rewarded` at load.
@@ -2688,8 +2691,7 @@ impl EncounterEngine {
         zone.zone_id = a.return_location.zone_id;
         zone.position = a.return_location.position;
         zone.rotation = a.return_location.rotation;
-        let mut remove_state = minigame(19, a.instance_id, a.encounter_id); // exact header only
-        remove_state.shrink_to_fit();
+        let remove_state = minigame(19, a.instance_id, a.encounter_id); // exact header only
         let results_presented = self.results_presented;
         let mut replies = vec![
             rules(false),
@@ -2711,7 +2713,7 @@ impl EncounterEngine {
         })
     }
 
-    pub fn retry(&mut self, profile_id: i32, now_ms: u64) -> io::Result<EncounterOutcome> {
+    pub fn retry(&mut self, _profile_id: i32, _now_ms: u64) -> io::Result<EncounterOutcome> {
         if self
             .state
             .active
@@ -2732,7 +2734,6 @@ impl EncounterEngine {
         a.phase = EncounterPhase::Loading;
         self.state.player_health = self.max_health;
         self.reset_session();
-        let _ = (profile_id, now_ms);
         Ok(EncounterOutcome {
             changed: true,
             zoning: self.zone(),
@@ -2769,7 +2770,7 @@ fn details_packet(
     instance: i32,
     text: [i32; 5],
     enemy_count: usize,
-    profile: i32,
+    _profile: i32,
     launch: bool,
     prizes: &[Prize],
 ) -> Vec<u8> {
@@ -2790,7 +2791,6 @@ fn details_packet(
         // jobs of this type whose rank meets the difficulty (00c8ff30), and
         // only enables at all when it is non-zero. Combat jobs are type 2
         // (profile definitions: Brawler, Medic, Wizard, Ninja, ...).
-        let _ = profile;
         for v in [
             title_id,
             icon_id,

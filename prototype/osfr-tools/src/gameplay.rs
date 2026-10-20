@@ -5385,6 +5385,12 @@ impl Gameplay {
                 }
             }
         }
+        if let Some(id) = result.win_completed {
+            self.npc_quest_event(
+                crate::quest_engine::QuestEvent::CompleteDungeon { encounter_id: id },
+                out,
+            )?;
+        }
         if let Some(id) = result.completed {
             let result = self
                 .opening
@@ -5392,12 +5398,6 @@ impl Gameplay {
                 .unwrap()
                 .on_event(OpeningEvent::DungeonCompleted { encounter_id: id })?;
             self.apply_opening(result, out)?;
-            // `completed` is set by EncounterEngine only when a won run exits. Entry,
-            // losses, retries and duplicate result/close messages leave it empty.
-            self.npc_quest_event(
-                crate::quest_engine::QuestEvent::CompleteDungeon { encounter_id: id },
-                out,
-            )?;
         }
         if let Some(zone) = result.zoning {
             out.zoning = Some(if result.completed.is_some() {

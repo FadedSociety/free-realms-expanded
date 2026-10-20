@@ -99,6 +99,7 @@ pub(super) fn merge_skill_outcome(out: &mut EncounterOutcome, other: EncounterOu
     out.rewards.extend(other.rewards);
     out.defeated.extend(other.defeated);
     out.completed = other.completed.or(out.completed);
+    out.win_completed = other.win_completed.or(out.win_completed);
     if other.feedback.is_some() {
         out.feedback = other.feedback;
     }

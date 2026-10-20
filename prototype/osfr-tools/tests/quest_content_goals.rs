@@ -603,8 +603,8 @@ fn authored_complete_dungeon_advances_only_on_a_win() {
     );
     assert_eq!(
         count(&won.state(), DUNGEON_QUEST),
-        0,
-        "the win alone must not claim terminal completion"
+        1,
+        "the win transition credits the terminal dungeon objective"
     );
 
     now += 100;
@@ -612,7 +612,11 @@ fn authored_complete_dungeon_advances_only_on_a_win() {
         .handle_in_world(&close_encounter(instance), &arena, now)
         .unwrap();
     assert!(closed.changed);
-    assert_eq!(count(&won.state(), DUNGEON_QUEST), 1);
+    assert_eq!(
+        count(&won.state(), DUNGEON_QUEST),
+        1,
+        "the results close does not credit again"
+    );
     let after_win = saved(&won);
     now += 100;
     assert!(

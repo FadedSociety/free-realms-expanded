@@ -28,6 +28,7 @@ use chain::{
 };
 use osfr_tools::{
     character_store::CharacterState,
+    chat,
     encounter::{EncounterEngine, EncounterPhase},
     gameplay::{Gameplay, GameplayState},
     inventory::Inventory,
@@ -84,8 +85,13 @@ fn gameplay_content() -> PathBuf {
 /// A fresh gameplay session over the shipped opening content and the bundled NPC, battle and
 /// quest content, bound exactly as `Gateway::load_gameplay` does for a real login.
 fn load_game(saved: Option<GameplayState>) -> Gameplay {
+    load_game_for(CHARACTER, saved)
+}
+
+/// A session bound to its own character id, so two players keep separate quest ledgers.
+fn load_game_for(character_id: u64, saved: Option<GameplayState>) -> Gameplay {
     let mut game = Gameplay::load(&gameplay_content(), saved).expect("opening content loads");
-    game.bind_npc_quest_catalogue(&content_dir(), CHARACTER)
+    game.bind_npc_quest_catalogue(&content_dir(), character_id)
         .expect("split quest content loads");
     game
 }
@@ -667,15 +673,24 @@ fn the_mongo_win_completes_bringing_back_brazenfist_once() {
     );
     assert_eq!(
         counts(&game, FIRST),
-        vec![1, 0],
-        "the objective completes on the won run's close, not on the kill"
+        vec![1, 1],
+        "the win credits the dungeon objective before the results close"
     );
 
     at += 100;
     let closed = send(&mut game, &character, &[26, 0, 42, 0], at);
     assert!(closed.zoning.is_some());
-    assert_eq!(counts(&game, FIRST), vec![1, 1], "the won run completes C1");
+    assert_eq!(
+        counts(&game, FIRST),
+        vec![1, 1],
+        "the results Close does not credit C1 again"
+    );
     assert_eq!(pending_turnin(&game), None);
+    assert_eq!(
+        economy(&game),
+        won,
+        "the results Close pays no second reward"
+    );
 
     // A replayed results Close pays nothing.
     let after_close = saved(&game);
@@ -1385,8 +1400,9 @@ fn the_fight_survives_a_reconnect_mid_battle() {
         "replayed turn-in after reconnect",
     );
 
-    // A disconnect between the killing blow and the results Close keeps the loot but loses the
-    // objective credit: the encounter is dropped at load and only `exit()` reports the win.
+    // A disconnect between the killing blow and the results Close keeps the loot and the
+    // objective credit: the win transition reported the completion, so the dropped run is the
+    // only thing the reconnect loses.
     let (mut game, mut character, mut at) = brawler_at(carlos_position());
     accept_first(&mut game, &character, &mut at);
     let before = economy(&game);
@@ -1396,18 +1412,35 @@ fn the_fight_survives_a_reconnect_mid_battle() {
     win_mongo(&mut game, &mut character, &mut at);
     let paid = economy(&game);
     assert_eq!(paid.coins, before.coins + BATTLE_COINS);
-    let reloaded = load_game(Some(game.state()));
+    assert_eq!(
+        counts(&game, FIRST),
+        vec![1, 1],
+        "the win already credited the dungeon objective"
+    );
+    let mut reloaded = load_game(Some(game.state()));
+    assert_eq!(
+        counts(&reloaded, FIRST),
+        vec![1, 1],
+        "the win credit survives the dropped run"
+    );
     assert_eq!(
         economy(&reloaded),
         paid,
-        "the wheel reward survives the drop"
-    );
-    assert_eq!(
-        counts(&reloaded, FIRST),
-        vec![1, 0],
-        "an unclosed won run has not reported the completion yet"
+        "the wheel reward survives the drop and is not paid again"
     );
     assert!(reloaded.state().encounter.unwrap().active.is_none());
+
+    // The credited objective is still handed in once after the reconnect.
+    character.zone_id = 0;
+    character.position = carlos_position();
+    at += 100;
+    reloaded
+        .initialize_world(&character, at)
+        .expect("reconnected world");
+    at += 100;
+    pay_first(&mut reloaded, &character, &mut at);
+    assert_eq!(reloaded.state().inventory.coins, paid.coins + QUEST_COINS);
+    assert_eq!(profile_xp(&reloaded, BRAWLER), paid.brawler_xp + QUEST_XP);
 }
 
 #[test]
@@ -1585,4 +1618,211 @@ fn a_failed_quest_event_for_one_player_does_not_stop_the_other() {
     assert_eq!(active_phase(&b), Some(EncounterPhase::Fighting));
     assert_eq!(mongo_health(&b), Some(900));
     assert!(a.state().encounter.unwrap().active.is_none());
+}
+
+/// Mongo's default reach/attack schedule: stand still at the boss and let the arena
+/// tick until the player is knocked out.
+fn lose_mongo(game: &mut Gameplay, character: &mut CharacterState, at: &mut u64) {
+    character.position = mongo_position(game);
+    for _ in 0..400 {
+        *at += 1_000;
+        game.tick(character, *at).expect("the arena tick runs");
+        if active_phase(game) == Some(EncounterPhase::Lost) {
+            return;
+        }
+    }
+    panic!("Mongo must knock the idle player out");
+}
+
+#[test]
+fn a_loss_or_retry_does_not_credit_the_completion() {
+    let (mut game, mut character, mut at) = brawler_at(carlos_position());
+    accept_first(&mut game, &character, &mut at);
+    let details = open_gate(&mut game, &character, at);
+    enter_arena(&mut game, &mut character, &details, &mut at);
+    let before = economy(&game);
+    let quests_before = game.state().npc_quests.clone();
+    let inventory_before = game.state().inventory.clone();
+    assert_eq!(counts(&game, FIRST), vec![1, 0]);
+
+    lose_mongo(&mut game, &mut character, &mut at);
+    assert_eq!(active_phase(&game), Some(EncounterPhase::Lost));
+    assert_eq!(
+        game.state().npc_quests,
+        quests_before,
+        "the loss credited C1"
+    );
+    assert_eq!(
+        game.state().inventory,
+        inventory_before,
+        "the loss paid a reward"
+    );
+    assert_eq!(counts(&game, FIRST), vec![1, 0], "the loss credited C1");
+
+    // The lost run is retried (the ordinary `realm retry` route for a battle without a
+    // guide); the retry must not credit or pay either.
+    at += 100;
+    let retried = send(
+        &mut game,
+        &character,
+        &chat::local_request("realm retry"),
+        at,
+    );
+    let zone = retried.zoning.expect("Retry restarts the arena");
+    assert_eq!(zone.zone_id, ARENA_ZONE);
+    assert_eq!(active_phase(&game), Some(EncounterPhase::Loading));
+    assert_eq!(
+        game.state().npc_quests,
+        quests_before,
+        "the retry credited C1"
+    );
+    assert_eq!(
+        game.state().inventory,
+        inventory_before,
+        "the retry paid a reward"
+    );
+    assert_eq!(economy(&game), before, "the retry paid a battle reward");
+    assert_eq!(counts(&game, FIRST), vec![1, 0]);
+
+    character.zone_id = zone.zone_id;
+    character.position = zone.position;
+    at += 100;
+    game.initialize_world(&character, at)
+        .expect("the retried arena loads");
+    assert_eq!(active_phase(&game), Some(EncounterPhase::Fighting));
+
+    at += 100;
+    win_mongo(&mut game, &mut character, &mut at);
+    assert_eq!(
+        counts(&game, FIRST),
+        vec![1, 1],
+        "the retried win credits the objective once"
+    );
+    let paid = economy(&game);
+    assert_eq!(paid.coins, before.coins + BATTLE_COINS, "the win pays once");
+
+    at += 100;
+    assert!(
+        send(&mut game, &character, &[26, 0, 42, 0], at)
+            .zoning
+            .is_some()
+    );
+    assert_eq!(
+        counts(&game, FIRST),
+        vec![1, 1],
+        "the close credits the retried win again"
+    );
+    assert_eq!(economy(&game), paid, "the close pays the win again");
+}
+
+#[test]
+fn two_players_win_separately_and_credit_only_themselves() {
+    let (mut a, mut a_character, mut a_at) = brawler_at(carlos_position());
+    accept_first(&mut a, &a_character, &mut a_at);
+
+    let mut b = load_game_for(OTHER, None);
+    let mut b_character = character_at_for(OTHER, 0, carlos_position());
+    let mut b_at = now();
+    switch_to_brawler(&mut b, &b_character, b_at);
+    b_at += 100;
+    b.initialize_world(&b_character, b_at)
+        .expect("second world entry");
+    accept_first(&mut b, &b_character, &mut b_at);
+
+    // A's win credits A's active objective only.
+    let a_before_win = economy(&a);
+    let b_before = saved(&b);
+    let details = open_gate(&mut a, &a_character, a_at);
+    enter_arena(&mut a, &mut a_character, &details, &mut a_at);
+    a_at += 100;
+    win_mongo(&mut a, &mut a_character, &mut a_at);
+    assert_eq!(counts(&a, FIRST), vec![1, 1], "A's win credits A");
+    assert_eq!(counts(&b, FIRST), vec![1, 0], "A's win credits B");
+    assert_eq!(saved(&b), b_before, "A's win changed B's session");
+    let a_paid = economy(&a);
+    assert_eq!(
+        a_paid.coins,
+        a_before_win.coins + BATTLE_COINS,
+        "A's win pays A once"
+    );
+    a_at += 100;
+    assert!(
+        send(&mut a, &a_character, &[26, 0, 42, 0], a_at)
+            .zoning
+            .is_some()
+    );
+
+    // B's own run credits B and leaves A alone.
+    let a_after_win = saved(&a);
+    let b_before_run = economy(&b);
+    let details = open_gate(&mut b, &b_character, b_at);
+    enter_arena(&mut b, &mut b_character, &details, &mut b_at);
+    b_at += 100;
+    win_mongo(&mut b, &mut b_character, &mut b_at);
+    assert_eq!(counts(&b, FIRST), vec![1, 1], "B's win credits B");
+    assert_eq!(counts(&a, FIRST), vec![1, 1], "B's win changed A's credit");
+    assert_eq!(saved(&a), a_after_win, "B's win changed A's session");
+    assert_eq!(economy(&a), a_paid, "A's battle was paid by A's win only");
+    assert_eq!(
+        economy(&b).coins,
+        b_before_run.coins + BATTLE_COINS,
+        "B's own win pays B once"
+    );
+}
+
+#[test]
+fn a_replayed_close_or_results_packet_does_not_double_count() {
+    let (mut game, mut character, mut at) = brawler_at(carlos_position());
+    accept_first(&mut game, &character, &mut at);
+    let details = open_gate(&mut game, &character, at);
+    enter_arena(&mut game, &mut character, &details, &mut at);
+    at += 100;
+    win_mongo(&mut game, &mut character, &mut at);
+    let paid = economy(&game);
+    assert_eq!(counts(&game, FIRST), vec![1, 1]);
+    let credited = saved(&game);
+
+    // A stale start-screen frame while the results are open changes nothing.
+    for _ in 0..2 {
+        at += 100;
+        let replay = game
+            .handle_in_world(&details, &character, at)
+            .expect("a stale 41/114 frame is a clean refusal");
+        assert!(!replay.changed, "the stale frame changed the won run");
+        assert!(replay.replies.is_empty(), "the stale frame sent a packet");
+    }
+    assert_eq!(
+        counts(&game, FIRST),
+        vec![1, 1],
+        "the stale frame double-counted C1"
+    );
+    assert_eq!(saved(&game), credited, "the stale frame changed the save");
+
+    // The results Close once, then every replay of it (or of the details frame)
+    // is inert: no second counter and no second payment.
+    at += 100;
+    assert!(
+        send(&mut game, &character, &[26, 0, 42, 0], at)
+            .zoning
+            .is_some()
+    );
+    let closed = saved(&game);
+    for packet in [[26_u8, 0, 42, 0].as_slice(), details.as_slice()] {
+        for _ in 0..2 {
+            at += 100;
+            let replay = game
+                .handle_in_world(packet, &character, at)
+                .expect("a replayed results frame is a clean refusal");
+            assert!(!replay.changed, "the replay changed gameplay");
+            assert!(replay.replies.is_empty(), "the replay sent a packet");
+            assert!(replay.zoning.is_none(), "the replay zoned the player");
+        }
+        assert_eq!(saved(&game), closed, "the replay changed the closed save");
+        assert_eq!(
+            counts(&game, FIRST),
+            vec![1, 1],
+            "the replay double-counted C1"
+        );
+        assert_eq!(economy(&game), paid, "the replay paid a reward again");
+    }
 }

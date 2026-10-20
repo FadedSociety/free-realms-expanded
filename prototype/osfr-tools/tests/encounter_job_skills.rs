@@ -233,7 +233,16 @@ fn pure_dot_arms_an_arena_and_stops_at_victory_without_repeating_rewards() {
     );
     assert_eq!(win.defeated, [401]);
     assert_eq!(win.rewards.len(), 1);
-    assert!(e.tick([0.0; 3], 12, 2000).unwrap().rewards.is_empty());
+    // The DoT lands the killing blow, so the win transition must still name the
+    // completed encounter for regional quest credit; the results-Close field stays empty.
+    assert_eq!(win.win_completed, Some(411));
+    assert_eq!(win.completed, None);
+    let after = e.tick([0.0; 3], 12, 2000).unwrap();
+    assert!(after.rewards.is_empty());
+    assert_eq!(
+        after.win_completed, None,
+        "a second tick must not re-credit"
+    );
 }
 #[test]
 fn buff_changes_damage_and_mitigation_then_expires_without_stacking() {
