@@ -20,16 +20,16 @@ use serde_json::json;
 use std::{
     fs,
     path::{Path, PathBuf},
-    sync::atomic::{AtomicU64, Ordering},
 };
+
+#[path = "round70_content.rs"]
+mod round70_content;
 
 /// The shipped representative selected-hub vendor and its added stock row.
 pub const REPRESENTATIVE_VENDOR: u64 = 9_500_000_045;
 pub const REPRESENTATIVE_ITEM: i32 = 76_427;
 /// The fixture's seeded pre-login item, which the buy-back probe sells and restores.
 pub const SEEDED_ITEM: i32 = 75_060;
-
-static NEXT: AtomicU64 = AtomicU64::new(0);
 
 pub struct VendorFixture {
     content: PathBuf,
@@ -50,39 +50,9 @@ impl Drop for VendorFixture {
 impl VendorFixture {
     /// Build one single-vendor pack under `root`; `label` names it for debugging.
     pub fn new(root: &Path, label: &str) -> Self {
-        let lab = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
-        let reference = lab.join("references/rust-gateway-reference");
-        let source = lab.join("reports/round70-native-20261016T061000Z/content");
+        let reference = round70_content::reference();
+        let content = round70_content::build(root, label, &[]);
         let data = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
-        let content = root.join(format!(
-            "{label}-{}-{}",
-            std::process::id(),
-            NEXT.fetch_add(1, Ordering::Relaxed)
-        ));
-        fs::create_dir_all(content.join("npcs")).expect("fixture content creates");
-        for file in [
-            "inventory.json",
-            "quests.json",
-            "quest-journal.bin",
-            "combat.json",
-            "combat-template.bin",
-            "categories.json",
-        ] {
-            fs::copy(source.join(file), content.join(file))
-                .unwrap_or_else(|error| panic!("fixture {file} copies: {error}"));
-        }
-        if fs::hard_link(
-            source.join("item-catalogue.json"),
-            content.join("item-catalogue.json"),
-        )
-        .is_err()
-        {
-            fs::copy(
-                source.join("item-catalogue.json"),
-                content.join("item-catalogue.json"),
-            )
-            .expect("item catalogue copies");
-        }
         for file in ["stores.json", "zones.json"] {
             fs::copy(data.join(file), content.join(file))
                 .unwrap_or_else(|error| panic!("fixture {file} copies: {error}"));

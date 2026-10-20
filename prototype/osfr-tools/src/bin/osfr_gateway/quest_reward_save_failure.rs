@@ -15,22 +15,31 @@
 //! reader `00c7acd0` (u16 family + u32 subtype header); 49/13 reader `00c7b990` reads the
 //! 8-byte speaker, then quest id / end text / animation, then the reward bundle consumed by
 //! `008e7930`; `ShowQuestEndScreen` `00a95420` resolves the speaker through the client actor
-//! table. 26/6 (`009f5890`), 26/8 (`008b6bc0`), 26/10 (`00a36f80`) and 49/2 (`00a86400`) are
-//! the request shapes already pinned by `tests/quest_job_xp.rs`.
+//! table. The 26/8 (`008b6bc0`), 26/10 (`00a36f80`), 26/6 (`009f5890`) and 49/2 (`00a86400`)
+//! bodies are the shared `tests/common/gateway_vendor.rs` encoders.
 //!
-//! Synthetic content: the round70 inventory/catalogue/profiles used by the T250 save-failure
-//! rig, plus one giver NPC, one job row and two `talk_to_npc` quests. Each quest pays coins, one
-//! real catalogue item (8, a `bowl_basic.adr` stack) and Adventurer (profile 1) job XP.
+//! Synthetic content: the shared round70 base (`tests/common/round70_content.rs`) plus one
+//! giver NPC, one job row and two `talk_to_npc` quests. Each quest pays coins, one real
+//! catalogue item (8, a `bowl_basic.adr` stack) and Adventurer (profile 1) job XP.
 
-use super::test_support::{self, Scratch};
+use super::test_support::{self, Scene, Scratch};
 use super::*;
 use osfr_tools::{
     character_store::CharacterState,
-    game_store::Snapshot,
     gameplay::{Gameplay, GameplayState},
     inventory::InventoryItem,
     quest_engine::QuestStatus,
 };
+
+// The shared test kit: this host uses a subset of each module's helpers.
+#[allow(dead_code)]
+#[path = "../../../tests/common/gateway_vendor.rs"]
+mod gateway_vendor;
+#[allow(dead_code)]
+#[path = "../../../tests/common/round70_content.rs"]
+mod round70_content;
+
+use gateway_vendor::{count_definition, interact, login, select};
 
 /// The synthetic giver's content key. `NpcVisibility` maps a `legacy_data` regional row's actor
 /// GUID to its own content key, so the client-facing GUID and the quest NPC key are equal.
@@ -50,12 +59,15 @@ const PROFILE: i32 = 1;
 const TALK_OPTION: u32 = 1;
 /// Quest dialog row that opens the offer or releases the held end screen (`009f5890`).
 const QUEST_CHOICE: i32 = 301;
-/// Item the full-bag case stacks to the 100-slot bag limit; also real and already in the
-/// inventory catalogue.
+/// Item the full-bag case stacks to the bag limit; also real and already in the inventory
+/// catalogue.
 const FILLER_ITEM: i32 = 75_060;
+/// (R) The pre-existing production bag floor for a turn-in: `gameplay/npc.rs` computes
+/// `items.len().max(100)`, not content data. If the lead moves that cap to content, this
+/// fixture must follow it or the bag is no longer full.
+const BAG_SLOTS: usize = 100;
 
-/// The round70 content package the T250 save-failure rig copies, minus `opening.json` and the
-/// campaign files so a zone-0 character is supported, plus `profiles.json` for job XP.
+/// The shared round70 content plus one giver NPC, one job row and two quests.
 struct Fixture {
     scratch: Scratch,
     content: PathBuf,
@@ -63,39 +75,32 @@ struct Fixture {
 }
 
 impl Fixture {
-    fn new(tag: &str) -> Self {
-        let scratch = Scratch::new(tag);
-        let lab = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
-        let reference = lab.join("references/rust-gateway-reference");
-        let source = lab.join("reports/round70-native-20261016T061000Z/content");
-        let content = scratch.path().join("content");
-        fs::create_dir_all(content.join("npcs")).expect("fixture NPC directory creates");
-        fs::create_dir_all(content.join("quests")).expect("fixture quest directory creates");
-        for file in [
+    /// Run only in the gateway binary's own test target, and only with the private `lab/`
+    /// fixtures: an embedded copy and a clean checkout skip instead of failing in setup.
+    fn ready() -> bool {
+        if !test_support::bin_test_target("t258") {
+            return false;
+        }
+        let source = round70_content::source();
+        let present = [
             "inventory.json",
             "quests.json",
-            "quest-journal.bin",
-            "combat.json",
-            "combat-template.bin",
-            "categories.json",
             "profiles.json",
-        ] {
-            fs::copy(source.join(file), content.join(file))
-                .unwrap_or_else(|error| panic!("fixture {file} copies: {error}"));
+            "item-catalogue.json",
+        ]
+        .iter()
+        .all(|file| source.join(file).is_file())
+            && super::super::t020_group_routing::fixtures_present();
+        if !present {
+            eprintln!("t258: private lab fixture absent; skipping");
         }
-        // 69 MB; link rather than copy, exactly like `tests/common/vendor_purchase.rs`.
-        if fs::hard_link(
-            source.join("item-catalogue.json"),
-            content.join("item-catalogue.json"),
-        )
-        .is_err()
-        {
-            fs::copy(
-                source.join("item-catalogue.json"),
-                content.join("item-catalogue.json"),
-            )
-            .expect("item catalogue copies");
-        }
+        present
+    }
+
+    fn new(tag: &str) -> Self {
+        let scratch = Scratch::new(tag);
+        let content = round70_content::build(scratch.path(), "content", &["profiles.json"]);
+        fs::create_dir_all(content.join("quests")).expect("fixture quest directory creates");
 
         let provenance = json!([{
             "kind": "reconstructed",
@@ -171,7 +176,7 @@ impl Fixture {
         Self {
             scratch,
             content,
-            reference,
+            reference: round70_content::reference(),
         }
     }
 
@@ -198,15 +203,15 @@ impl Fixture {
         state
     }
 
-    /// The 100-slot bag `gameplay/npc.rs` applies to a turn-in: one occupied filler stack per
-    /// slot, so adding the reward item makes 101.
+    /// The bag `gameplay/npc.rs` refuses a reward into: one occupied filler stack per slot,
+    /// so adding the reward item makes one more than the capacity.
     fn full_bag_state(&self) -> GameplayState {
         let mut state = self.state();
-        for id in 100_000..100_100 {
+        for offset in 0..BAG_SLOTS {
             state.inventory.items.push(InventoryItem {
                 definition_id: FILLER_ITEM,
                 tint: 0,
-                id,
+                id: 100_000 + offset as i32,
                 count: 1,
                 consumed_count: 0,
                 stored_count: 0,
@@ -216,19 +221,8 @@ impl Fixture {
                 activate_enabled: false,
             });
         }
-        state.inventory.next_instance_id = Some(100_100);
+        state.inventory.next_instance_id = Some(100_000 + BAG_SLOTS as i64);
         state
-    }
-
-    fn save(&self, path: &Path, character: &CharacterState, gameplay: &GameplayState) {
-        osfr_tools::game_store::save(
-            path,
-            &Snapshot {
-                character: character.clone(),
-                gameplay: Some(gameplay.clone()),
-            },
-        )
-        .expect("fixture save writes");
     }
 
     fn options(&self, state: PathBuf) -> Options {
@@ -275,22 +269,6 @@ fn write_json(path: PathBuf, value: serde_json::Value) {
     .unwrap_or_else(|error| panic!("fixture {} writes: {error}", path.display()));
 }
 
-/// 26/8 (client constructor `008b6bc0`): u64 target plus the trailing boolean byte.
-fn interact(target: u64) -> Vec<u8> {
-    let mut packet = vec![26, 0, 8, 0];
-    packet.extend(target.to_le_bytes());
-    packet.push(0);
-    packet
-}
-
-/// 26/10 (client constructor `00a36f80`): u64 target plus i32 choice.
-fn select(target: u64, choice: u32) -> Vec<u8> {
-    let mut packet = vec![26, 0, 10, 0];
-    packet.extend(target.to_le_bytes());
-    packet.extend(choice.to_le_bytes());
-    packet
-}
-
 /// 26/6 (client constructor `009f5890`): one i32 response row.
 fn dialogue_choice(row: i32) -> Vec<u8> {
     let mut packet = vec![26, 0, 6, 0];
@@ -313,123 +291,16 @@ fn quest_end_reply(quest_id: u32) -> Vec<u8> {
     packet
 }
 
-/// The synthetic login body every non-account-store session sends: u16 count, three
-/// length-prefixed strings, and the account guid after the ticket.
-fn login(guid: u64) -> Vec<u8> {
-    let mut bytes = 1u16.to_le_bytes().to_vec();
-    for (index, text) in ["t258-synthetic-ticket", "1.910.1.530630", ""]
-        .iter()
-        .enumerate()
-    {
-        bytes.extend((text.len() as u32).to_le_bytes());
-        bytes.extend(text.as_bytes());
-        if index == 0 {
-            bytes.extend(guid.to_le_bytes());
-        }
+/// Ready and Loaded, the two messages every world session sends after login. `Scene::new`
+/// already sent the login; the entry replies are drained so each case reads only its own.
+fn enter(scene: &mut Scene, options: &Options, now: &mut u64) {
+    for message in [[13, 0], [10, 0]] {
+        scene
+            .send(options, &message, *now)
+            .expect("world entry commits");
+        *now += 10;
     }
-    bytes
-}
-
-/// One session plus the shared containers `Session::dispatch_message` needs. `Server::new` is
-/// not used here: these cases prove the transaction and its save, not the teardown.
-struct Scene {
-    session: Session,
-    world: SharedWorld,
-    membership: World,
-    sessions: SessionMap,
-}
-
-impl Scene {
-    fn new(options: &Options, id: u32) -> Self {
-        let session = Session::new(
-            SessionId(u64::from(id)),
-            format!("127.0.0.1:{}", 35_000 + id).parse().unwrap(),
-            SessionRequest {
-                id,
-                crc_length: 3,
-                buffer_size: 1400,
-            },
-            options,
-            CRC_SEED,
-            None,
-            None,
-        )
-        .expect("quest session loads");
-        Self {
-            session,
-            world: SharedWorld::new(),
-            membership: World::runtime(),
-            sessions: SessionMap::new(),
-        }
-    }
-
-    fn dispatch(&mut self, options: &Options, inner: &[u8], now: u64) -> Result<(), String> {
-        self.session
-            .dispatch_message(
-                &wrap(inner),
-                options,
-                now,
-                &mut self.world,
-                &mut self.membership,
-                &mut self.sessions,
-                None,
-            )
-            .map_err(|error| error.to_string())
-    }
-
-    fn send(&mut self, options: &Options, inner: &[u8], now: u64) -> Vec<Vec<u8>> {
-        self.dispatch(options, inner, now).unwrap_or_else(|error| {
-            panic!(
-                "packet {:?} was refused: {error}",
-                &inner[..inner.len().min(4)]
-            )
-        });
-        self.drain(now)
-    }
-
-    fn drain(&mut self, now: u64) -> Vec<Vec<u8>> {
-        super::super::f120_fishing_hour_reconnect::drain_replies(&mut self.session, now)
-    }
-
-    /// Login, Ready and Loaded: the three messages every world session sends first.
-    fn enter(&mut self, options: &Options, now: &mut u64) -> Vec<Vec<u8>> {
-        let guid = self.session.gateway.state().guid;
-        for message in [login(guid), wrap(&[13, 0]), wrap(&[10, 0])] {
-            self.session
-                .dispatch_message(
-                    &message,
-                    options,
-                    *now,
-                    &mut self.world,
-                    &mut self.membership,
-                    &mut self.sessions,
-                    None,
-                )
-                .expect("initialization message handles");
-            *now += 10;
-        }
-        self.drain(*now)
-    }
-
-    fn snapshot(&self) -> Snapshot {
-        self.session.gateway.snapshot()
-    }
-
-    fn gameplay(&self) -> GameplayState {
-        self.snapshot()
-            .gameplay
-            .expect("the session has gameplay state")
-    }
-
-    /// Break only the next save: the good save file is a component of the target path, so the
-    /// save cannot create its temporary file beside it. The good bytes stay put.
-    fn break_next_save(&mut self, good_save: &Path) {
-        self.session.state_path = good_save.join("blocked.json");
-    }
-
-    fn repair_save(&mut self, good_save: &Path) {
-        self.session.state_path = good_save.to_owned();
-    }
+    scene.drain(*now);
 }
 
 /// The session's drained replies keep the client application wrapper (`005`, subtype 1,
@@ -464,14 +335,8 @@ fn coins(state: &GameplayState) -> u32 {
     state.inventory.coins
 }
 
-fn count_definition(state: &GameplayState, definition_id: i32) -> u32 {
-    state
-        .inventory
-        .items
-        .iter()
-        .filter(|item| item.definition_id == definition_id)
-        .map(|item| item.count)
-        .sum()
+fn count_items(state: &GameplayState) -> usize {
+    state.inventory.items.len()
 }
 
 fn profile_xp(state: &GameplayState) -> u32 {
@@ -505,35 +370,42 @@ fn pending_turnin(state: &GameplayState) -> Option<u32> {
         .pending_turnin
 }
 
+fn gameplay(scene: &Scene) -> GameplayState {
+    scene
+        .snapshot()
+        .gameplay
+        .expect("the session has gameplay state")
+}
+
 /// Offer and accept one synthetic quest through the real 26/8 -> 26/10 -> 26/6 -> 49/2
 /// interaction path.
 fn accept_quest(scene: &mut Scene, options: &Options, quest_id: u32, now: &mut u64) {
     *now += 10;
-    let menu = scene.send(options, &interact(GIVER), *now);
+    let menu = scene.exchange(options, &interact(GIVER), *now);
     assert!(
         has_family(&menu, 26, 9),
         "the giver did not return its 26/9 menu: {menu:?}"
     );
     *now += 10;
-    let dialogue = scene.send(options, &select(GIVER, TALK_OPTION), *now);
+    let dialogue = scene.exchange(options, &select(GIVER, TALK_OPTION), *now);
     assert!(
         has_family(&dialogue, 26, 3),
         "Talk did not open the 26/3 dialogue: {dialogue:?}"
     );
     *now += 10;
-    let offered = scene.send(options, &dialogue_choice(QUEST_CHOICE), *now);
+    let offered = scene.exchange(options, &dialogue_choice(QUEST_CHOICE), *now);
     assert!(
         has_quest_packet(&offered, 1, quest_id),
         "quest {quest_id} was not offered: {offered:?}"
     );
     *now += 10;
-    let accepted = scene.send(options, &quest_reply(quest_id, true), *now);
+    let accepted = scene.exchange(options, &quest_reply(quest_id, true), *now);
     assert!(
         has_quest_packet(&accepted, 3, quest_id),
         "quest {quest_id} did not send QuestAdd: {accepted:?}"
     );
     assert_eq!(
-        quest_status(&scene.gameplay(), quest_id),
+        quest_status(&gameplay(scene), quest_id),
         QuestStatus::Active
     );
 }
@@ -542,21 +414,21 @@ fn accept_quest(scene: &mut Scene, options: &Options, quest_id: u32, now: &mut u
 /// with the client's 26/6 row.
 fn complete_quest(scene: &mut Scene, options: &Options, quest_id: u32, now: &mut u64) {
     *now += 10;
-    let menu = scene.send(options, &interact(GIVER), *now);
+    let menu = scene.exchange(options, &interact(GIVER), *now);
     assert!(
         has_family(&menu, 26, 9),
         "the giver did not return its 26/9 menu: {menu:?}"
     );
     *now += 10;
-    let dialogue = scene.send(options, &select(GIVER, TALK_OPTION), *now);
+    let dialogue = scene.exchange(options, &select(GIVER, TALK_OPTION), *now);
     assert!(
         has_family(&dialogue, 26, 3),
         "the turn-in Talk did not open the 26/3 dialogue: {dialogue:?}"
     );
-    let state = scene.gameplay();
+    let state = gameplay(scene);
     assert_eq!(pending_turnin(&state), Some(quest_id));
     *now += 10;
-    let released = scene.send(options, &dialogue_choice(QUEST_CHOICE), *now);
+    let released = scene.exchange(options, &dialogue_choice(QUEST_CHOICE), *now);
     let end = released
         .iter()
         .find(|packet| {
@@ -574,38 +446,36 @@ fn complete_quest(scene: &mut Scene, options: &Options, quest_id: u32, now: &mut
     );
 }
 
-fn count_items(state: &GameplayState) -> usize {
-    state.inventory.items.len()
-}
-
 #[test]
 fn a_working_turn_in_pays_coins_items_and_xp_once() {
+    if !Fixture::ready() {
+        return;
+    }
     let fixture = Fixture::new("t258-control");
-    let options = fixture.options(fixture.scratch.path().join("character.json"));
-    let character = fixture.character();
-    fixture.save(&options.state, &character, &fixture.state());
+    let options = fixture.options(fixture.scratch.state());
+    test_support::save_character(&options.state, &fixture.character(), &fixture.state());
     let mut scene = Scene::new(&options, 91);
     let mut now = 1_000;
-    scene.enter(&options, &mut now);
-    let before = scene.gameplay();
+    enter(&mut scene, &options, &mut now);
+    let before = gameplay(&scene);
 
     accept_quest(&mut scene, &options, CONTROL_QUEST, &mut now);
     complete_quest(&mut scene, &options, CONTROL_QUEST, &mut now);
     let pending_save = fs::read(&options.state).expect("the pending save is readable");
     now += 10;
     scene
-        .dispatch(&options, &quest_end_reply(CONTROL_QUEST), now)
+        .send(&options, &quest_end_reply(CONTROL_QUEST), now)
         .expect("a turn-in with a working save commits");
 
-    let after = scene.gameplay();
+    let after = gameplay(&scene);
     assert_eq!(
         coins(&after),
         coins(&before) + CONTROL_COINS,
         "the turn-in did not pay its configured coins"
     );
     assert_eq!(
-        count_definition(&after, REWARD_ITEM),
-        count_definition(&before, REWARD_ITEM) + 1,
+        count_definition(&after.inventory, REWARD_ITEM),
+        count_definition(&before.inventory, REWARD_ITEM) + 1,
         "the turn-in did not grant its configured item"
     );
     assert_eq!(
@@ -625,7 +495,7 @@ fn a_working_turn_in_pays_coins_items_and_xp_once() {
     let completed = scene.snapshot();
     now += 10;
     scene
-        .dispatch(&options, &quest_end_reply(CONTROL_QUEST), now)
+        .send(&options, &quest_end_reply(CONTROL_QUEST), now)
         .expect("a completed turn-in replay is refused without an error");
     assert_eq!(
         scene.snapshot(),
@@ -641,23 +511,25 @@ fn a_working_turn_in_pays_coins_items_and_xp_once() {
 
 #[test]
 fn a_failed_save_leaves_the_character_and_save_unchanged() {
+    if !Fixture::ready() {
+        return;
+    }
     let fixture = Fixture::new("t258-failed-save");
-    let options = fixture.options(fixture.scratch.path().join("character.json"));
-    let character = fixture.character();
-    fixture.save(&options.state, &character, &fixture.state());
+    let options = fixture.options(fixture.scratch.state());
+    test_support::save_character(&options.state, &fixture.character(), &fixture.state());
     let mut scene = Scene::new(&options, 92);
     let mut now = 1_000;
-    scene.enter(&options, &mut now);
+    enter(&mut scene, &options, &mut now);
 
     // A good save first: the control quest is paid and committed.
     accept_quest(&mut scene, &options, CONTROL_QUEST, &mut now);
     complete_quest(&mut scene, &options, CONTROL_QUEST, &mut now);
     now += 10;
     scene
-        .dispatch(&options, &quest_end_reply(CONTROL_QUEST), now)
+        .send(&options, &quest_end_reply(CONTROL_QUEST), now)
         .expect("the control turn-in commits");
     assert_eq!(
-        quest_status(&scene.gameplay(), CONTROL_QUEST),
+        quest_status(&gameplay(&scene), CONTROL_QUEST),
         QuestStatus::Completed
     );
 
@@ -674,7 +546,7 @@ fn a_failed_save_leaves_the_character_and_save_unchanged() {
     scene.break_next_save(&options.state);
     now += 10;
     let error = scene
-        .dispatch(&options, &quest_end_reply(SECOND_QUEST), now)
+        .send(&options, &quest_end_reply(SECOND_QUEST), now)
         .expect_err("a turn-in whose save fails must not commit");
     assert!(
         error.contains("os error"),
@@ -693,15 +565,15 @@ fn a_failed_save_leaves_the_character_and_save_unchanged() {
         before,
         "a failed save installed part of the turn-in"
     );
-    let after_state = scene.gameplay();
+    let after_state = gameplay(&scene);
     assert_eq!(
         coins(&after_state),
         coins(&before_state),
         "a failed turn-in spent or paid coins"
     );
     assert_eq!(
-        count_definition(&after_state, REWARD_ITEM),
-        count_definition(&before_state, REWARD_ITEM),
+        count_definition(&after_state.inventory, REWARD_ITEM),
+        count_definition(&before_state.inventory, REWARD_ITEM),
         "a failed turn-in granted its item"
     );
     assert_eq!(
@@ -731,21 +603,132 @@ fn a_failed_save_leaves_the_character_and_save_unchanged() {
     );
 }
 
+/// The fixture's gateway for one seeded character, loaded through the production loader
+/// before any handshake.
+fn fixture_gateway(fixture: &Fixture, guid: u64) -> Gateway {
+    let mut character = fixture.character();
+    character.guid = guid;
+    let mut gateway = Gateway::load_gameplay(
+        &fixture.reference,
+        character,
+        &fixture.content,
+        Some(fixture.state()),
+    )
+    .expect("the fixture gateway loads");
+    gateway.set_dev_tools(false);
+    gateway.set_role(osfr_tools::account_store::AccountRole::Player);
+    gateway
+}
+
+/// Drive one session to the held 49/13 end screen through `Session::dispatch_message`: the
+/// login/Ready/Loaded handshake that registers its membership row, then the offer/accept and
+/// the Talk turn-in release.
+fn stage_pending_turnin(server: &mut Server, session: &mut Session, guid: u64, now: &mut u64) {
+    for message in [login(guid), wrap(&[13, 0]), wrap(&[10, 0])] {
+        session
+            .dispatch_message(
+                &message,
+                &server.options,
+                *now,
+                &mut server.world,
+                &mut server.membership,
+                &mut server.sessions,
+                None,
+            )
+            .expect("the handshake commits");
+        *now += 10;
+    }
+    assert!(
+        server.membership.player_location(guid).is_some(),
+        "the committed handshake must register the membership row this case removes"
+    );
+    for packet in [
+        interact(GIVER),
+        select(GIVER, TALK_OPTION),
+        dialogue_choice(QUEST_CHOICE),
+        quest_reply(CONTROL_QUEST, true),
+        interact(GIVER),
+        select(GIVER, TALK_OPTION),
+        dialogue_choice(QUEST_CHOICE),
+    ] {
+        session
+            .dispatch_message(
+                &wrap(&packet),
+                &server.options,
+                *now,
+                &mut server.world,
+                &mut server.membership,
+                &mut server.sessions,
+                None,
+            )
+            .expect("the quest interaction commits");
+        *now += 10;
+    }
+    let state = session
+        .gateway
+        .snapshot()
+        .gameplay
+        .expect("the staged session has gameplay state");
+    assert_eq!(
+        pending_turnin(&state),
+        Some(CONTROL_QUEST),
+        "the staged session must hold the turn-in end screen"
+    );
+}
+
 /// The full server path: a real UDP 49/14 whose save fails ends A through `contain`, while B
 /// stays in the world and later turns in its own quest with a working save.
 #[test]
 fn a_failed_save_ends_only_that_session() {
+    if !Fixture::ready() {
+        return;
+    }
     let fixture = Fixture::new("t258-server");
     let (mut server, keys, server_scratch) = super::super::t020_group_routing::server_rig("t258");
     let a_guid = server.sessions[&keys[0]].character_guid;
     let b_guid = server.sessions[&keys[1]].character_guid;
-
     let a_save = fixture.scratch.path().join("a-character.json");
     let b_save = fixture.scratch.path().join("b-character.json");
-    let a_gateway = pending_turnin_gateway(&fixture, a_guid, &a_save);
-    let b_gateway = pending_turnin_gateway(&fixture, b_guid, &b_save);
-    let a_good_save = fs::read(&a_save).expect("A's good save is readable");
+    let mut now = 1_000;
+
+    // Every survivor gets a real socket: the ending session's leave fanout must not hit a
+    // closed port, or Windows reports the ICMP reset on the server socket's next receive.
+    let b_socket = UdpSocket::bind("127.0.0.1:0").expect("B socket binds");
+    b_socket
+        .set_read_timeout(Some(Duration::from_millis(100)))
+        .expect("B read timeout sets");
+    let mut bystander = server
+        .sessions
+        .remove(&keys[1])
+        .expect("the bystander session exists");
+    bystander.peer = b_socket.local_addr().expect("B address");
+    bystander.gateway = fixture_gateway(&fixture, b_guid);
+    bystander.state_path = b_save.clone();
+    bystander.character_guid = b_guid;
+    let b_key = SessionKey {
+        peer: bystander.peer,
+        connection_id: bystander.request.id,
+    };
+    server.world.session_keys.insert(bystander.id, b_key);
+    stage_pending_turnin(&mut server, &mut bystander, b_guid, &mut now);
     let b_good_save = fs::read(&b_save).expect("B's good save is readable");
+    server.sessions.insert(b_key, bystander);
+
+    let c_socket = UdpSocket::bind("127.0.0.1:0").expect("C socket binds");
+    c_socket
+        .set_read_timeout(Some(Duration::from_millis(100)))
+        .expect("C read timeout sets");
+    let mut survivor = server
+        .sessions
+        .remove(&keys[2])
+        .expect("the second survivor exists");
+    survivor.peer = c_socket.local_addr().expect("C address");
+    let c_key = SessionKey {
+        peer: survivor.peer,
+        connection_id: survivor.request.id,
+    };
+    server.world.session_keys.insert(survivor.id, c_key);
+    server.sessions.insert(c_key, survivor);
 
     // A real client socket at the victim session's peer address; the 49/14 arrives over UDP.
     let client = UdpSocket::bind("127.0.0.1:0").expect("client socket binds");
@@ -754,7 +737,7 @@ fn a_failed_save_ends_only_that_session() {
         .remove(&keys[0])
         .expect("the seeded victim session exists");
     victim.peer = client.local_addr().expect("client address");
-    victim.gateway = a_gateway;
+    victim.gateway = fixture_gateway(&fixture, a_guid);
     victim.state_path = a_save.clone();
     victim.character_guid = a_guid;
     let a_key = SessionKey {
@@ -762,21 +745,12 @@ fn a_failed_save_ends_only_that_session() {
         connection_id: victim.request.id,
     };
     server.world.session_keys.insert(victim.id, a_key);
+    stage_pending_turnin(&mut server, &mut victim, a_guid, &mut now);
+    let a_good_save = fs::read(&a_save).expect("A's good save is readable");
+    // Break only the next save: the good save file is a component of the target path.
+    victim.state_path = a_save.join("blocked.json");
+    let victim_id = victim.id;
     server.sessions.insert(a_key, victim);
-    server
-        .sessions
-        .get_mut(&a_key)
-        .expect("the victim session is present")
-        .state_path = a_save.join("blocked.json");
-
-    // B keeps its seeded session identity and joins with its own pending turn-in.
-    let bystander = server
-        .sessions
-        .get_mut(&keys[1])
-        .expect("the bystander session exists");
-    assert_eq!(bystander.character_guid, b_guid);
-    bystander.gateway = b_gateway;
-    bystander.state_path = b_save.clone();
 
     let survivors: Vec<u64> = server
         .world
@@ -799,7 +773,6 @@ fn a_failed_save_ends_only_that_session() {
     client
         .send_to(&wire, server.local_addr().expect("server address"))
         .expect("turn-in datagram sends");
-    let victim_id = server.sessions[&a_key].id;
     server
         .step()
         .expect("one failed session must not stop the server");
@@ -816,17 +789,27 @@ fn a_failed_save_ends_only_that_session() {
     assert!(!server.world.players.contains(victim_id));
     assert!(server.world.chat_session(victim_id).is_none());
     assert!(!server.world.session_keys.contains_key(&victim_id));
+    assert!(
+        server.membership.player_location(a_guid).is_none(),
+        "the ended session left a membership row"
+    );
     assert_eq!(
         fs::read(&a_save).expect("A's good save is still readable"),
         a_good_save,
         "the ended session wrote a partial save"
     );
-    assert!(
-        survivors
-            .iter()
-            .all(|guid| server.world.active_sessions.contains_key(guid)),
-        "the ended session removed a survivor's world row"
-    );
+    for (guid, key) in survivors.iter().zip([b_key, c_key]) {
+        let id = server.world.active_sessions[guid];
+        assert_eq!(
+            server.world.session_keys.get(&id),
+            Some(&key),
+            "the ended session changed survivor {guid}'s session key"
+        );
+        assert!(
+            server.sessions.contains_key(&key),
+            "another session ended with the victim"
+        );
+    }
     assert_eq!(
         fs::read(&b_save).expect("B's good save is readable"),
         b_good_save,
@@ -834,28 +817,29 @@ fn a_failed_save_ends_only_that_session() {
     );
 
     // B is untouched by A's failure and its own turn-in still commits and saves.
-    let before_b = server.sessions[&keys[1]]
+    now += 10;
+    let before_b = server.sessions[&b_key]
         .gateway
         .snapshot()
         .gameplay
         .expect("B has gameplay state");
     let mut bystander = server
         .sessions
-        .remove(&keys[1])
+        .remove(&b_key)
         .expect("the bystander session exists");
     bystander
         .dispatch_message(
             &wrap(&quest_end_reply(CONTROL_QUEST)),
             &server.options,
-            2_000,
+            now,
             &mut server.world,
             &mut server.membership,
             &mut server.sessions,
             None,
         )
         .expect("B's own turn-in keeps working after A's failed save");
-    server.sessions.insert(keys[1], bystander);
-    let after_b = server.sessions[&keys[1]]
+    server.sessions.insert(b_key, bystander);
+    let after_b = server.sessions[&b_key]
         .gateway
         .snapshot()
         .gameplay
@@ -866,8 +850,8 @@ fn a_failed_save_ends_only_that_session() {
         "B's turn-in did not pay after A's failure"
     );
     assert_eq!(
-        count_definition(&after_b, REWARD_ITEM),
-        count_definition(&before_b, REWARD_ITEM) + 1
+        count_definition(&after_b.inventory, REWARD_ITEM),
+        count_definition(&before_b.inventory, REWARD_ITEM) + 1
     );
     assert_eq!(profile_xp(&after_b), profile_xp(&before_b) + CONTROL_XP);
     assert_eq!(
@@ -879,8 +863,15 @@ fn a_failed_save_ends_only_that_session() {
         b_good_save,
         "B's committed turn-in did not write B's own save"
     );
-    assert!(server.sessions.contains_key(&keys[1]));
-    assert!(server.sessions.contains_key(&keys[2]));
+    assert!(server.sessions.contains_key(&b_key));
+    assert!(server.sessions.contains_key(&c_key));
+
+    // Drain each survivor's leave fanout, then prove the server keeps stepping and ends no
+    // other session.
+    let mut buffer = [0; 65_535];
+    for socket in [&b_socket, &c_socket] {
+        while socket.recv_from(&mut buffer).is_ok() {}
+    }
     server.next_tick_ms = 0;
     server.step().expect("the surviving sessions keep stepping");
     assert_eq!(server.sessions.len(), 2);
@@ -889,74 +880,25 @@ fn a_failed_save_ends_only_that_session() {
     let _ = fs::remove_dir_all(server_scratch);
 }
 
-/// A `Gateway` driven into the pending-turn-in state through the same packet bodies, saved so a
-/// session can load it; used only for the two-session server case.
-fn pending_turnin_gateway(fixture: &Fixture, guid: u64, save: &Path) -> Gateway {
-    let mut character = fixture.character();
-    character.guid = guid;
-    let mut gateway = Gateway::load_gameplay(
-        &fixture.reference,
-        character,
-        &fixture.content,
-        Some(fixture.state()),
-    )
-    .expect("the fixture gateway loads");
-    gateway.set_dev_tools(false);
-    gateway.set_role(osfr_tools::account_store::AccountRole::Player);
-    let mut now = 1_000;
-    for message in [login(guid), wrap(&[13, 0]), wrap(&[10, 0])] {
-        gateway
-            .handle_at(&message, now)
-            .expect("initialization message handles");
-        now += 10;
-    }
-    for packet in [
-        interact(GIVER),
-        select(GIVER, TALK_OPTION),
-        dialogue_choice(QUEST_CHOICE),
-        quest_reply(CONTROL_QUEST, true),
-    ] {
-        gateway
-            .handle_at(&wrap(&packet), now)
-            .expect("quest acceptance handles");
-        now += 10;
-    }
-    for packet in [
-        interact(GIVER),
-        select(GIVER, TALK_OPTION),
-        dialogue_choice(QUEST_CHOICE),
-    ] {
-        gateway
-            .handle_at(&wrap(&packet), now)
-            .expect("quest completion handles");
-        now += 10;
-    }
-    let state = gateway
-        .snapshot()
-        .gameplay
-        .expect("the pending gateway has gameplay state");
-    assert_eq!(pending_turnin(&state), Some(CONTROL_QUEST));
-    osfr_tools::game_store::save(save, &gateway.snapshot()).expect("the good save writes");
-    gateway
-}
-
 #[test]
 fn a_failed_save_does_not_consume_the_turn_in() {
+    if !Fixture::ready() {
+        return;
+    }
     let fixture = Fixture::new("t258-reconnect");
-    let options = fixture.options(fixture.scratch.path().join("character.json"));
-    let character = fixture.character();
-    fixture.save(&options.state, &character, &fixture.state());
+    let options = fixture.options(fixture.scratch.state());
+    test_support::save_character(&options.state, &fixture.character(), &fixture.state());
     let mut scene = Scene::new(&options, 94);
     let mut now = 1_000;
-    scene.enter(&options, &mut now);
+    enter(&mut scene, &options, &mut now);
     accept_quest(&mut scene, &options, CONTROL_QUEST, &mut now);
     complete_quest(&mut scene, &options, CONTROL_QUEST, &mut now);
-    let before = scene.gameplay();
+    let before = gameplay(&scene);
     let good_save = fs::read(&options.state).expect("the good save is readable");
     scene.break_next_save(&options.state);
     now += 10;
     let error = scene
-        .dispatch(&options, &quest_end_reply(CONTROL_QUEST), now)
+        .send(&options, &quest_end_reply(CONTROL_QUEST), now)
         .expect_err("a turn-in whose save fails must not commit");
     assert!(
         error.contains("os error"),
@@ -967,8 +909,8 @@ fn a_failed_save_does_not_consume_the_turn_in() {
     // A fresh session loads the good save through the production reconnect path.
     let mut reconnected = Scene::new(&options, 95);
     let mut later = now + 100;
-    reconnected.enter(&options, &mut later);
-    let loaded = reconnected.gameplay();
+    enter(&mut reconnected, &options, &mut later);
+    let loaded = gameplay(&reconnected);
     assert_eq!(
         pending_turnin(&loaded),
         Some(CONTROL_QUEST),
@@ -981,21 +923,21 @@ fn a_failed_save_does_not_consume_the_turn_in() {
     );
     assert_eq!(coins(&loaded), coins(&before), "the failed save paid coins");
     assert_eq!(
-        count_definition(&loaded, REWARD_ITEM),
-        count_definition(&before, REWARD_ITEM)
+        count_definition(&loaded.inventory, REWARD_ITEM),
+        count_definition(&before.inventory, REWARD_ITEM)
     );
     assert_eq!(profile_xp(&loaded), profile_xp(&before));
 
     // The working reconnect pays it exactly once.
     later += 10;
     reconnected
-        .dispatch(&options, &quest_end_reply(CONTROL_QUEST), later)
+        .send(&options, &quest_end_reply(CONTROL_QUEST), later)
         .expect("the reconnected turn-in commits");
-    let paid = reconnected.gameplay();
+    let paid = gameplay(&reconnected);
     assert_eq!(coins(&paid), coins(&before) + CONTROL_COINS);
     assert_eq!(
-        count_definition(&paid, REWARD_ITEM),
-        count_definition(&before, REWARD_ITEM) + 1
+        count_definition(&paid.inventory, REWARD_ITEM),
+        count_definition(&before.inventory, REWARD_ITEM) + 1
     );
     assert_eq!(profile_xp(&paid), profile_xp(&before) + CONTROL_XP);
     assert_eq!(quest_status(&paid, CONTROL_QUEST), QuestStatus::Completed);
@@ -1008,7 +950,7 @@ fn a_failed_save_does_not_consume_the_turn_in() {
 
     later += 10;
     reconnected
-        .dispatch(&options, &quest_end_reply(CONTROL_QUEST), later)
+        .send(&options, &quest_end_reply(CONTROL_QUEST), later)
         .expect("the replayed turn-in is refused without an error");
     assert_eq!(
         reconnected.snapshot().gameplay.expect("gameplay exists"),
@@ -1023,18 +965,20 @@ fn a_failed_save_does_not_consume_the_turn_in() {
 
 #[test]
 fn a_replay_after_a_successful_turn_in_pays_nothing_more() {
+    if !Fixture::ready() {
+        return;
+    }
     let fixture = Fixture::new("t258-replay");
-    let options = fixture.options(fixture.scratch.path().join("character.json"));
-    let character = fixture.character();
-    fixture.save(&options.state, &character, &fixture.state());
+    let options = fixture.options(fixture.scratch.state());
+    test_support::save_character(&options.state, &fixture.character(), &fixture.state());
     let mut scene = Scene::new(&options, 96);
     let mut now = 1_000;
-    scene.enter(&options, &mut now);
+    enter(&mut scene, &options, &mut now);
     accept_quest(&mut scene, &options, CONTROL_QUEST, &mut now);
     complete_quest(&mut scene, &options, CONTROL_QUEST, &mut now);
     now += 10;
     scene
-        .dispatch(&options, &quest_end_reply(CONTROL_QUEST), now)
+        .send(&options, &quest_end_reply(CONTROL_QUEST), now)
         .expect("the first turn-in commits");
     let paid = scene.snapshot();
     let paid_save = fs::read(&options.state).expect("the paid save is readable");
@@ -1042,7 +986,7 @@ fn a_replay_after_a_successful_turn_in_pays_nothing_more() {
     for round in 0..2 {
         now += 10;
         scene
-            .dispatch(&options, &quest_end_reply(CONTROL_QUEST), now)
+            .send(&options, &quest_end_reply(CONTROL_QUEST), now)
             .expect("a same-session replay is refused without an error");
         assert_eq!(
             scene.snapshot(),
@@ -1058,7 +1002,7 @@ fn a_replay_after_a_successful_turn_in_pays_nothing_more() {
 
     let mut reconnected = Scene::new(&options, 97);
     let mut later = now + 100;
-    reconnected.enter(&options, &mut later);
+    enter(&mut reconnected, &options, &mut later);
     let restored = reconnected.snapshot();
     let restored_save = fs::read(&options.state).expect("the restored save is readable");
     assert_eq!(
@@ -1070,7 +1014,7 @@ fn a_replay_after_a_successful_turn_in_pays_nothing_more() {
     );
     later += 10;
     reconnected
-        .dispatch(&options, &quest_end_reply(CONTROL_QUEST), later)
+        .send(&options, &quest_end_reply(CONTROL_QUEST), later)
         .expect("a replay after reconnect is refused without an error");
     assert_eq!(
         reconnected.snapshot(),
@@ -1086,14 +1030,16 @@ fn a_replay_after_a_successful_turn_in_pays_nothing_more() {
 
 #[test]
 fn a_full_bag_refuses_the_turn_in_and_changes_nothing() {
+    if !Fixture::ready() {
+        return;
+    }
     let fixture = Fixture::new("t258-full-bag");
-    let options = fixture.options(fixture.scratch.path().join("character.json"));
-    let character = fixture.character();
+    let options = fixture.options(fixture.scratch.state());
     let full = fixture.full_bag_state();
-    fixture.save(&options.state, &character, &full);
+    test_support::save_character(&options.state, &fixture.character(), &full);
     let mut scene = Scene::new(&options, 98);
     let mut now = 1_000;
-    scene.enter(&options, &mut now);
+    enter(&mut scene, &options, &mut now);
     accept_quest(&mut scene, &options, CONTROL_QUEST, &mut now);
     complete_quest(&mut scene, &options, CONTROL_QUEST, &mut now);
 
@@ -1101,17 +1047,17 @@ fn a_full_bag_refuses_the_turn_in_and_changes_nothing() {
     let before_save = fs::read(&options.state).expect("the good save is readable");
     assert_eq!(
         count_items(before.gameplay.as_ref().expect("full-bag gameplay")),
-        100,
+        BAG_SLOTS,
         "fixture setup: the bag is full"
     );
     now += 10;
     scene
-        .dispatch(&options, &quest_end_reply(CONTROL_QUEST), now)
+        .send(&options, &quest_end_reply(CONTROL_QUEST), now)
         .expect("a full bag is a refusal, not a save failure");
     let refused_replies = scene.drain(now);
     assert!(
-        !has_quest_packet(&refused_replies, 4, CONTROL_QUEST),
-        "a full-bag refusal still completed the quest: {refused_replies:?}"
+        refused_replies.is_empty(),
+        "a full-bag refusal must be silent, not a client-visible reply: {refused_replies:?}"
     );
 
     // The reward never became a quest completion, coin, item, XP or save change.
@@ -1120,10 +1066,10 @@ fn a_full_bag_refuses_the_turn_in_and_changes_nothing() {
         before,
         "a full-bag refusal changed the character"
     );
-    let after = scene.gameplay();
+    let after = gameplay(&scene);
     assert_eq!(quest_status(&after, CONTROL_QUEST), QuestStatus::Active);
     assert_eq!(pending_turnin(&after), Some(CONTROL_QUEST));
-    assert_eq!(count_items(&after), 100);
+    assert_eq!(count_items(&after), BAG_SLOTS);
     assert_eq!(
         fs::read(&options.state).expect("the good save is readable"),
         before_save,
@@ -1132,35 +1078,58 @@ fn a_full_bag_refuses_the_turn_in_and_changes_nothing() {
 
     // The session is still healthy: the same giver reopens its menu.
     now += 10;
-    let menu = scene.send(&options, &interact(GIVER), now);
+    let menu = scene.exchange(&options, &interact(GIVER), now);
     assert!(
         has_family(&menu, 26, 9),
         "the full-bag refusal ended the NPC session: {menu:?}"
     );
 }
 
-/// Gate-only proof: the save under test is `commit_outcome`'s save, which runs before the staged
-/// gateway is installed. The failure cases drive `Session::dispatch_message`; the canary run
-/// restored the production save path and made them red.
+/// Return the body of the first `signature` in `source`, from its `{` to the matching `}`.
+/// Braces inside the body's string literals matter only when they are unbalanced, and this
+/// function is pinned against the real hub text.
+fn function_body<'a>(source: &'a str, signature: &str) -> Option<&'a str> {
+    let start = source.find(signature)?;
+    let open = start + source[start..].find('{')?;
+    let mut depth = 0usize;
+    for (offset, byte) in source[open..].bytes().enumerate() {
+        match byte {
+            b'{' => depth += 1,
+            b'}' => {
+                depth -= 1;
+                if depth == 0 {
+                    return Some(&source[open..=open + offset]);
+                }
+            }
+            _ => {}
+        }
+    }
+    None
+}
+
+/// Gate-only proof: the save under test is `commit_outcome`'s save, which runs inside that
+/// function (the slice stops at its closing brace, before the next method) and before the
+/// staged gateway is installed. The failure cases drive `Session::dispatch_message`.
 #[test]
 fn the_save_failure_harness_is_the_real_commit_path() {
+    if !test_support::bin_test_target("t258") {
+        return;
+    }
     let production = include_str!(concat!(
         env!("CARGO_MANIFEST_DIR"),
         "/src/bin/osfr-gateway.rs"
     ));
-    let save = production
+    let commit = function_body(production, "fn commit_outcome(")
+        .expect("commit_outcome must exist in the gateway hub");
+    let save = commit
         .find("save(&self.state_path, &staged_gateway.snapshot())?;")
         .expect("commit_outcome must save the staged character");
-    let install = production
+    let install = commit
         .find("self.gateway = staged_gateway;")
         .expect("commit_outcome must install the staged gateway");
     assert!(
         save < install,
         "the staged gateway is installed before its save: the transaction is not all-or-nothing"
-    );
-    assert!(
-        production.contains("fn commit_outcome("),
-        "the save-ordering pin is aimed at the wrong function"
     );
     assert!(
         production.contains("fn dispatch_message("),

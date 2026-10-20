@@ -15,7 +15,7 @@
 
 use super::test_support::{self, Scratch};
 use super::*;
-use osfr_tools::{character_store::CharacterState, game_store::Snapshot, gameplay::GameplayState};
+use osfr_tools::game_store::Snapshot;
 
 // The shared test kit: this host uses a subset of its helpers.
 #[allow(dead_code)]
@@ -32,17 +32,6 @@ use gateway_vendor::{
 use vendor_fixture::{REPRESENTATIVE_ITEM, REPRESENTATIVE_VENDOR, SEEDED_ITEM, VendorFixture};
 
 const BUY_TRANSACTION: u32 = 108_901;
-
-fn save_character(path: &Path, character: &CharacterState, gameplay: &GameplayState) {
-    osfr_tools::game_store::save(
-        path,
-        &Snapshot {
-            character: character.clone(),
-            gameplay: Some(gameplay.clone()),
-        },
-    )
-    .expect("fixture save writes");
-}
 
 fn options(fixture: &VendorFixture, state: PathBuf) -> Options {
     let mut options = test_support::options(state);
@@ -163,7 +152,7 @@ fn a_failed_vendor_save_changes_nothing_and_preserves_buy_back_state() {
     let fixture = VendorFixture::new(scratch.path(), "content");
     let options = options(&fixture, scratch.state());
     let character = fixture.character();
-    save_character(
+    test_support::save_character(
         &options.state,
         &character,
         &fixture.state(fixture.price() + 1_000, false),
@@ -321,7 +310,7 @@ fn control_a_working_save_commits_the_same_purchase() {
     let fixture = VendorFixture::new(scratch.path(), "content");
     let options = options(&fixture, scratch.state());
     let character = fixture.character();
-    save_character(
+    test_support::save_character(
         &options.state,
         &character,
         &fixture.state(fixture.price() + 1_000, false),
@@ -384,7 +373,7 @@ fn a_failed_vendor_save_ends_only_that_session() {
     character.guid = victim_guid;
     let save_path = scratch.state();
     let gameplay = fixture.state(fixture.price() + 1_000, false);
-    save_character(&save_path, &character, &gameplay);
+    test_support::save_character(&save_path, &character, &gameplay);
     let mut gateway = Gateway::load_gameplay(
         &server.options.reference,
         character,

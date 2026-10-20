@@ -3,6 +3,7 @@
 //! option field or handshake step is added once instead of in every test copy. Test-only;
 //! production never includes this file.
 use super::*;
+use osfr_tools::{game_store::Snapshot, gameplay::GameplayState};
 
 /// A clean temp directory; dropping it removes the directory and the saves in it.
 pub struct Scratch(PathBuf);
@@ -185,6 +186,18 @@ pub fn enter(options: &Options, id: u32) -> Session {
     session
 }
 
+/// Write one character save envelope through the production `game_store::save`.
+pub fn save_character(path: &Path, character: &CharacterState, gameplay: &GameplayState) {
+    save(
+        path,
+        &Snapshot {
+            character: character.clone(),
+            gameplay: Some(gameplay.clone()),
+        },
+    )
+    .expect("fixture save writes");
+}
+
 /// One session and the containers a `Server` owns, without a listening socket.
 pub struct Scene {
     pub session: Session,
@@ -217,6 +230,36 @@ impl Scene {
                 None,
             )
             .map_err(|error| error.to_string())
+    }
+
+    /// `send` plus the replies it queued, for tests that assert on the bytes the client
+    /// sees. A refusal fails the test: these cases drive requests that must commit.
+    pub fn exchange(&mut self, options: &Options, inner: &[u8], now: u64) -> Vec<Vec<u8>> {
+        self.send(options, inner, now).unwrap_or_else(|error| {
+            panic!(
+                "packet {:?} was refused: {error}",
+                &inner[..inner.len().min(4)]
+            )
+        });
+        self.drain(now)
+    }
+
+    pub fn drain(&mut self, now: u64) -> Vec<Vec<u8>> {
+        super::super::f120_fishing_hour_reconnect::drain_replies(&mut self.session, now)
+    }
+
+    pub fn snapshot(&self) -> Snapshot {
+        self.session.gateway.snapshot()
+    }
+
+    /// Break only the next save: the good save file is a component of the target path, so
+    /// `save` cannot create its temporary file beside it. The good bytes stay put.
+    pub fn break_next_save(&mut self, good_save: &Path) {
+        self.session.state_path = good_save.join("blocked.json");
+    }
+
+    pub fn repair_save(&mut self, good_save: &Path) {
+        self.session.state_path = good_save.to_owned();
     }
 
     pub fn tick(&mut self, options: &Options, now: u64) {
