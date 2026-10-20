@@ -8011,7 +8011,8 @@
       ],
       "roles": [
         "quest_giver",
-        "trainer"
+        "trainer",
+        "vendor"
       ],
       "enemy_kind": null,
       "location_evidence": [
@@ -8454,6 +8455,10 @@
           }
         ],
         "roles": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T275: the Chef guide Vendors/Ingredients list and video ukTXIyG6EKI/00006 recover a 12-coin cooking-supply shop; the client names Bordon Cloo as the Chef recipe seller (2840821030, store names 102334807 and 1311255679) and the video shows the Sanctuary map in the same set. The vendor role authorizes the 9000000028 vendors.json stock key used by the production NpcInteraction loader; nameplate, greeting, model and position are unchanged."
+          },
           {
             "kind": "client",
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 46; source cell: [client] [video `ukTXIyG6EKI/00320` (quest tracker only)] [wiki]"

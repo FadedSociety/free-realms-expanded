@@ -32,6 +32,7 @@
       "note": "NPC-to-ticket association remains an inference; store frame does not name seller or zone"
     },
     "runtime_mapping_policy": "(R) Evidence-mapped catalogue definitions with a non-null stores.json price; no startup-only restriction.",
+    "video_stock_policy": "(R) T275: the Chef guide/video cooking-supply shop is Bordon Cloo stock; its 12 ingredient ids are resolved by exact default-locale display name and confirmed by the Chef recipes in data/content/recipes.json.",
     "w118": {
       "catalogue": {
         "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
@@ -51,23 +52,23 @@
     "t108_gender_pair_policy": "(R) Two identical wiki Sells entries for one exact default locale name map to one male and one female catalogue definition only when those are the only positive-priced candidates; no colour or item-family substitution."
   },
   "coverage": {
-    "vendor_keys_total": 193,
-    "vendors_with_item_ids": 99,
+    "vendor_keys_total": 194,
+    "vendors_with_item_ids": 100,
     "vendors_without_item_ids": 94,
     "wiki_npc_pages_with_sells_lists": 94,
     "unique_wiki_stock_names": 1133,
-    "named_video_stock_claims_without_item_id": 1,
+    "named_video_stock_claims_without_item_id": 0,
     "named_content_stock_claims": 5,
     "item_names_considered": 1139,
-    "items_resolved": 1051,
+    "items_resolved": 1063,
     "items_ambiguous": 20,
     "items_unmatched": 82,
     "unique_name_id_matches_missing_from_startup": 0,
     "no_exact_name_id_match": 81,
     "member_only_flags_recovered": 0,
-    "items_with_stores_price": 1049,
+    "items_with_stores_price": 1061,
     "mapped_items_without_stores_price": 2,
-    "vendors_with_runtime_item_ids": 95
+    "vendors_with_runtime_item_ids": 96
   },
   "vendors": [
     {
@@ -40915,9 +40916,9 @@
           "item_name": "Snowhill Ice Cream: Chocolate",
           "source_stock_name": "Snowhill Ice Cream: Chocolate",
           "item_name_id": 23306,
-          "purchase_price_coins": 5,
-          "member_price_coins": 4,
-          "sell_price_coins": 2,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
           "member_only": null,
           "price_basis": "(R) stores.json reference price; no captured retail NPC quote.",
           "source_tags": [
@@ -47107,6 +47108,533 @@
       "stock_completeness": "empty_after_t230_sc_move",
       "item_ids": [],
       "items": []
+    },
+    {
+      "npc_id": 9000000028,
+      "npc_name": "Bordon Cloo",
+      "npc_content_file": "sanctuary.json",
+      "vendor_stock_description": "Cooking supplies at 12 coins each: Spice, Bat Meat, Mystery Meat, Spider Meat, Bear Meat, Butter, Egg, Broth, Sugar, Chocolate Bar, Snowhill Ice Cream: Chocolate and Snowhill Ice Cream: Vanilla (Chef guide Vendors/Ingredients; video ukTXIyG6EKI/00006). (R) The video name plate is unreadable; the Bordon Cloo identity comes from the client Chef-vendor text (2840821030, store names 102334807 and 1311255679) and the Sanctuary map frame ukTXIyG6EKI/00320 in the same video.",
+      "items": [
+        {
+          "item_id": 2900,
+          "item_name": "Spice",
+          "source_stock_name": "Spice",
+          "item_name_id": 23310,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
+          "member_only": null,
+          "price_basis": "(R) Stores.json reference price; the Chef guide/video vendor lists this ingredient at 12 coins each.",
+          "source_tags": [
+            "client",
+            "video",
+            "guide",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "video_and_client",
+            "guide": "notes/Build Guides/Content/Jobs/Chef.md",
+            "guide_section": "Vendors",
+            "video": "ukTXIyG6EKI/00006",
+            "listed_as": "Spice",
+            "claim": "12-coin cooking-supply shop row"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "inventory-baseline",
+            "catalogue_row_sha256": "33fdea9474811e76851504c4b425a167eed54b346293c1a9676259ec80cc347e",
+            "name_id": 23310,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "Spice",
+            "mapping_policy": "(R) unique exact default locale display-name match. The id is also the ingredient bound by the Chef recipes in data/content/recipes.json; duplicate printings 30573 and 30576 (NoSale) and 10005-10008 (category 42) are excluded by that recipe binding."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 2900,
+            "scope": "(R) reference price, not a captured NPC quote"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 2862,
+          "item_name": "Bat Meat",
+          "source_stock_name": "Bat Meat",
+          "item_name_id": 18597,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
+          "member_only": null,
+          "price_basis": "(R) Stores.json reference price; the Chef guide/video vendor lists this ingredient at 12 coins each.",
+          "source_tags": [
+            "client",
+            "video",
+            "guide",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "video_and_client",
+            "guide": "notes/Build Guides/Content/Jobs/Chef.md",
+            "guide_section": "Vendors",
+            "video": "ukTXIyG6EKI/00006",
+            "listed_as": "Bat Meat",
+            "claim": "12-coin cooking-supply shop row"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "inventory-baseline",
+            "catalogue_row_sha256": "056331997a65449834a6763965e995590dc4f9112e8af7c2e84b5bbfd5637a8a",
+            "name_id": 18597,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "Bat Meat",
+            "mapping_policy": "(R) unique exact default locale display-name match. The id is also the ingredient bound by the Chef recipes in data/content/recipes.json; duplicate printings 30573 and 30576 (NoSale) and 10005-10008 (category 42) are excluded by that recipe binding."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 2862,
+            "scope": "(R) reference price, not a captured NPC quote"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 2859,
+          "item_name": "Mystery Meat",
+          "source_stock_name": "Mystery Meat",
+          "item_name_id": 18585,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
+          "member_only": null,
+          "price_basis": "(R) Stores.json reference price; the Chef guide/video vendor lists this ingredient at 12 coins each.",
+          "source_tags": [
+            "client",
+            "video",
+            "guide",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "video_and_client",
+            "guide": "notes/Build Guides/Content/Jobs/Chef.md",
+            "guide_section": "Vendors",
+            "video": "ukTXIyG6EKI/00006",
+            "listed_as": "Mystery Meat",
+            "claim": "12-coin cooking-supply shop row"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "4e29da8bcfd8a28ce6079b630985a8205349c6964752dfff4a374ea158d17796",
+            "name_id": 18585,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "Mystery Meat",
+            "mapping_policy": "(R) unique exact default locale display-name match. The id is also the ingredient bound by the Chef recipes in data/content/recipes.json; duplicate printings 30573 and 30576 (NoSale) and 10005-10008 (category 42) are excluded by that recipe binding."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 2859,
+            "scope": "(R) reference price, not a captured NPC quote"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 2861,
+          "item_name": "Spider Meat",
+          "source_stock_name": "Spider Meat",
+          "item_name_id": 18593,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
+          "member_only": null,
+          "price_basis": "(R) Stores.json reference price; the Chef guide/video vendor lists this ingredient at 12 coins each.",
+          "source_tags": [
+            "client",
+            "video",
+            "guide",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "video_and_client",
+            "guide": "notes/Build Guides/Content/Jobs/Chef.md",
+            "guide_section": "Vendors",
+            "video": "ukTXIyG6EKI/00006",
+            "listed_as": "Spider Meat",
+            "claim": "12-coin cooking-supply shop row"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "eff49a0d9275e6e89cc5292247e55b8f573b47cdd999b149ddc8b966c58f6ca5",
+            "name_id": 18593,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "Spider Meat",
+            "mapping_policy": "(R) unique exact default locale display-name match. The id is also the ingredient bound by the Chef recipes in data/content/recipes.json; duplicate printings 30573 and 30576 (NoSale) and 10005-10008 (category 42) are excluded by that recipe binding."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 2861,
+            "scope": "(R) reference price, not a captured NPC quote"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 2860,
+          "item_name": "Bear Meat",
+          "source_stock_name": "Bear Meat",
+          "item_name_id": 18589,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
+          "member_only": null,
+          "price_basis": "(R) Stores.json reference price; the Chef guide/video vendor lists this ingredient at 12 coins each.",
+          "source_tags": [
+            "client",
+            "video",
+            "guide",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "video_and_client",
+            "guide": "notes/Build Guides/Content/Jobs/Chef.md",
+            "guide_section": "Vendors",
+            "video": "ukTXIyG6EKI/00006",
+            "listed_as": "Bear Meat",
+            "claim": "12-coin cooking-supply shop row"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "8510b0ad1af7135b75a22adb57747c343dd4950292437e7d5f3413a8809d73c4",
+            "name_id": 18589,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "Bear Meat",
+            "mapping_policy": "(R) unique exact default locale display-name match. The id is also the ingredient bound by the Chef recipes in data/content/recipes.json; duplicate printings 30573 and 30576 (NoSale) and 10005-10008 (category 42) are excluded by that recipe binding."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 2860,
+            "scope": "(R) reference price, not a captured NPC quote"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 2902,
+          "item_name": "Butter",
+          "source_stock_name": "Butter",
+          "item_name_id": 23312,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
+          "member_only": null,
+          "price_basis": "(R) Stores.json reference price; the Chef guide/video vendor lists this ingredient at 12 coins each.",
+          "source_tags": [
+            "client",
+            "video",
+            "guide",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "video_and_client",
+            "guide": "notes/Build Guides/Content/Jobs/Chef.md",
+            "guide_section": "Vendors",
+            "video": "ukTXIyG6EKI/00006",
+            "listed_as": "Butter",
+            "claim": "12-coin cooking-supply shop row"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "3e3fa9fcd167df1d55779b717c03de18113e533508d6fd258dcde60a6c0d99a1",
+            "name_id": 23312,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "Butter",
+            "mapping_policy": "(R) unique exact default locale display-name match. The id is also the ingredient bound by the Chef recipes in data/content/recipes.json; duplicate printings 30573 and 30576 (NoSale) and 10005-10008 (category 42) are excluded by that recipe binding."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 2902,
+            "scope": "(R) reference price, not a captured NPC quote"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 2897,
+          "item_name": "Egg",
+          "source_stock_name": "Egg",
+          "item_name_id": 23307,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
+          "member_only": null,
+          "price_basis": "(R) Stores.json reference price; the Chef guide/video vendor lists this ingredient at 12 coins each.",
+          "source_tags": [
+            "client",
+            "video",
+            "guide",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "video_and_client",
+            "guide": "notes/Build Guides/Content/Jobs/Chef.md",
+            "guide_section": "Vendors",
+            "video": "ukTXIyG6EKI/00006",
+            "listed_as": "Egg",
+            "claim": "12-coin cooking-supply shop row"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "260ae54ff3232a09a96ffefc29f94636063d879e5a9ef44b2f8ea3d5daa51dfc",
+            "name_id": 23307,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "Egg",
+            "mapping_policy": "(R) unique exact default locale display-name match. The id is also the ingredient bound by the Chef recipes in data/content/recipes.json; duplicate printings 30573 and 30576 (NoSale) and 10005-10008 (category 42) are excluded by that recipe binding."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 2897,
+            "scope": "(R) reference price, not a captured NPC quote"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 2899,
+          "item_name": "Broth",
+          "source_stock_name": "Broth",
+          "item_name_id": 23309,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
+          "member_only": null,
+          "price_basis": "(R) Stores.json reference price; the Chef guide/video vendor lists this ingredient at 12 coins each.",
+          "source_tags": [
+            "client",
+            "video",
+            "guide",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "video_and_client",
+            "guide": "notes/Build Guides/Content/Jobs/Chef.md",
+            "guide_section": "Vendors",
+            "video": "ukTXIyG6EKI/00006",
+            "listed_as": "Broth",
+            "claim": "12-coin cooking-supply shop row"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "8d105023d2264adf6fb64b712e64f1f94f471b82688364d9d3a5c380ac2e6cdf",
+            "name_id": 23309,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "Broth",
+            "mapping_policy": "(R) unique exact default locale display-name match. The id is also the ingredient bound by the Chef recipes in data/content/recipes.json; duplicate printings 30573 and 30576 (NoSale) and 10005-10008 (category 42) are excluded by that recipe binding."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 2899,
+            "scope": "(R) reference price, not a captured NPC quote"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 2906,
+          "item_name": "Sugar",
+          "source_stock_name": "Sugar",
+          "item_name_id": 23316,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
+          "member_only": null,
+          "price_basis": "(R) Stores.json reference price; the Chef guide/video vendor lists this ingredient at 12 coins each.",
+          "source_tags": [
+            "client",
+            "video",
+            "guide",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "video_and_client",
+            "guide": "notes/Build Guides/Content/Jobs/Chef.md",
+            "guide_section": "Vendors",
+            "video": "ukTXIyG6EKI/00006",
+            "listed_as": "Sugar",
+            "claim": "12-coin cooking-supply shop row"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "b44d9b646ed69ebdf7da61b7741e0af3727e239708659c1f8ea1f97f1e2ecef1",
+            "name_id": 23316,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "Sugar",
+            "mapping_policy": "(R) unique exact default locale display-name match. The id is also the ingredient bound by the Chef recipes in data/content/recipes.json; duplicate printings 30573 and 30576 (NoSale) and 10005-10008 (category 42) are excluded by that recipe binding."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 2906,
+            "scope": "(R) reference price, not a captured NPC quote"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 2898,
+          "item_name": "Chocolate Bar",
+          "source_stock_name": "Chocolate Bar",
+          "item_name_id": 23308,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
+          "member_only": null,
+          "price_basis": "(R) Stores.json reference price; the Chef guide/video vendor lists this ingredient at 12 coins each.",
+          "source_tags": [
+            "client",
+            "video",
+            "guide",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "video_and_client",
+            "guide": "notes/Build Guides/Content/Jobs/Chef.md",
+            "guide_section": "Vendors",
+            "video": "ukTXIyG6EKI/00006",
+            "listed_as": "Chocolate Bar",
+            "claim": "12-coin cooking-supply shop row"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "inventory-baseline",
+            "catalogue_row_sha256": "dc83651f8209a9a500b3fe56511097eda5e7429f7eb9ec8c390944854337164f",
+            "name_id": 23308,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "Chocolate Bar",
+            "mapping_policy": "(R) unique exact default locale display-name match. The id is also the ingredient bound by the Chef recipes in data/content/recipes.json; duplicate printings 30573 and 30576 (NoSale) and 10005-10008 (category 42) are excluded by that recipe binding."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 2898,
+            "scope": "(R) reference price, not a captured NPC quote"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 2896,
+          "item_name": "Snowhill Ice Cream: Chocolate",
+          "source_stock_name": "Snowhill Ice Cream: Chocolate",
+          "item_name_id": 23306,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
+          "member_only": null,
+          "price_basis": "(R) Stores.json reference price; the Chef guide/video vendor lists this ingredient at 12 coins each.",
+          "source_tags": [
+            "client",
+            "video",
+            "guide",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "video_and_client",
+            "guide": "notes/Build Guides/Content/Jobs/Chef.md",
+            "guide_section": "Vendors",
+            "video": "ukTXIyG6EKI/00006",
+            "listed_as": "Snowhill Ice Cream: Chocolate",
+            "claim": "12-coin cooking-supply shop row"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "inventory-baseline",
+            "catalogue_row_sha256": "f464255355b183ad6d1fc53341252ce1bfd9c0d3799dcf43d2df1cd4ea0f04c8",
+            "name_id": 23306,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "Snowhill Ice Cream: Chocolate",
+            "mapping_policy": "(R) unique exact default locale display-name match. The id is also the ingredient bound by the Chef recipes in data/content/recipes.json; duplicate printings 30573 and 30576 (NoSale) and 10005-10008 (category 42) are excluded by that recipe binding."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 2896,
+            "scope": "(R) reference price, not a captured NPC quote"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 2895,
+          "item_name": "Snowhill Ice Cream: Vanilla",
+          "source_stock_name": "Snowhill Ice Cream: Vanilla",
+          "item_name_id": 23305,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
+          "member_only": null,
+          "price_basis": "(R) Stores.json reference price; the Chef guide/video vendor lists this ingredient at 12 coins each.",
+          "source_tags": [
+            "client",
+            "video",
+            "guide",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "video_and_client",
+            "guide": "notes/Build Guides/Content/Jobs/Chef.md",
+            "guide_section": "Vendors",
+            "video": "ukTXIyG6EKI/00006",
+            "listed_as": "Snowhill Ice Cream: Vanilla",
+            "claim": "12-coin cooking-supply shop row"
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "df7c766e6c3fbba27330d5e22fe0c9033b5612bd8d43437afaba52d323f432a3",
+            "name_id": 23305,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "Snowhill Ice Cream: Vanilla",
+            "mapping_policy": "(R) unique exact default locale display-name match. The id is also the ingredient bound by the Chef recipes in data/content/recipes.json; duplicate printings 30573 and 30576 (NoSale) and 10005-10008 (category 42) are excluded by that recipe binding."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 2895,
+            "scope": "(R) reference price, not a captured NPC quote"
+          },
+          "runtime_eligible": true
+        }
+      ],
+      "item_ids": [
+        2900,
+        2862,
+        2859,
+        2861,
+        2860,
+        2902,
+        2897,
+        2899,
+        2906,
+        2898,
+        2896,
+        2895
+      ],
+      "stock_completeness": "all_named_evidence_items_mapped"
     }
   ]
 }
