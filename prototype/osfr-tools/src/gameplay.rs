@@ -2679,8 +2679,8 @@ impl Gameplay {
                 .push(chat::system(EntryDenied::Unavailable.message()));
             return Ok(out);
         };
-        // (R) The Fisherman quest line is not built, so the first trip unlocks the job (no
-        // outfit change: fishing needs no active job, a quest video shows an Archer fishing).
+        // (R) The Fisherman chapter is built (quests/fisherman.json); the first trip only
+        // unlocks the job, and no shipped starter outfit can activate 137 (T244/F270 review).
         let _ = profiles.unlock(FISHERMAN_PROFILE);
         let level = self.job_level(FISHERMAN_PROFILE);
         // (R) Same bag floor as quest turn-ins: never below what the player already holds.

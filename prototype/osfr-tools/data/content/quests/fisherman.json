@@ -96,7 +96,6 @@
     },
     {
       "id": 3070003,
-      "job": 137,
       "title_string_id": 417055,
       "intro_text_string_id": 417054,
       "description_string_id": 417056,
@@ -161,7 +160,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T244: job 137 (Fisherman) gate. The tutorial is Reed's fishing lesson; it is offered only while Fisherman is active and unlocked, which also guarantees the job_xp profile is unlocked for turn-in."
+          "evidence": "(R) F270: no active-job gate. The shipped content has no Fisherman (137) starter outfit, so learning 137 at Reed unlocks it but the 26/13 switch cannot activate it; the tutorial stays reachable from any job and its 25 XP still maps to 137. The turn-in refuses without a grant until 137 is learned, so a paid reward always has its profile unlocked."
         },
         {
           "kind": "reconstructed",
@@ -172,7 +171,6 @@
     },
     {
       "id": 3070004,
-      "job": 137,
       "title_string_id": 408259,
       "intro_text_string_id": 408258,
       "description_string_id": 408260,
@@ -264,7 +262,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T244: job 137 (Fisherman) gate. The tutorial is Reed's fishing lesson; it is offered only while Fisherman is active and unlocked, which also guarantees the job_xp profile is unlocked for turn-in."
+          "evidence": "(R) F270: no active-job gate. The shipped content has no Fisherman (137) starter outfit, so learning 137 at Reed unlocks it but the 26/13 switch cannot activate it; the tutorial stays reachable from any job and its 25 XP still maps to 137. The turn-in refuses without a grant until 137 is learned, so a paid reward always has its profile unlocked."
         },
         {
           "kind": "reconstructed",

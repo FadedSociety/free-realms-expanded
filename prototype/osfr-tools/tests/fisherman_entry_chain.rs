@@ -1,5 +1,13 @@
-//! T244: Reed Stillwater's Fisherman entry chapter ("Learn to Fish!" 3070003 and
+//! F270: Reed Stillwater's Fisherman entry chapter ("Learn to Fish!" 3070003 and
 //! "Testing the Waters" 3070004) driven through the real NPC -> quest -> fishing path.
+//!
+//! T244 gated both records on the *active* Fisherman profile 137. The shipped content
+//! cannot activate 137: Reed's trainer row unlocks it, but `profiles.json` has no
+//! `starter_items[137]` and the 26/13 switch is refused with "outfit is missing". F270
+//! follows the reviewed fallback: the two records have no `job` gate, and a normal
+//! character learns 137 at Reed through the production trainer menu (unlocked, not
+//! active) before taking the chapter. Every test starts from the real `initial_state`
+//! (active Adventurer 1, unlocked {1,43}); none seeds `active: 137`.
 //!
 //! Client evidence (2014 client, IDA database `lab/working/ida/FreeRealms.exe.i64`):
 //! - 26/8 interact constructor `008b6bc0`: u64 actor + one flag byte.
@@ -15,37 +23,40 @@
 //!   reel writer `00b6a4d0` (handle + flag); result reader `00b66be0` carries no
 //!   coin or XP field, so the quest count cannot come from a client result.
 //!
+//! The forged 39/18 and 39/14 forms are built from the server's own writers
+//! (`mining::game_over` and `payload_packet_for`): a client cannot reach
+//! `npc_minigame_win`, which only inspects server-generated replies after a paid catch.
+//!
 //! The catch event is the server's own `QuestEvent::FinishMinigame { minigame_id }`
 //! from `fishing_service::settle_catch`, where `minigame_id` is the spot's
 //! `game_id` (599 for Reed's Sacred Grove Shallows), never the framework type 21.
 
+#[path = "support/npc_quest_chain.rs"]
+mod npc_quest_chain;
+
+use npc_quest_chain::*;
 use osfr_tools::{
     character_store::CharacterState,
     fishing::Handle,
-    gameplay::Gameplay,
+    gameplay::Outcome,
+    npc_interaction::{decode_dialogue_26_3, decode_quest_offer_49_1},
     quest_engine::{QuestProgress, QuestStatus},
 };
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
-use std::{
-    fs,
-    path::{Path, PathBuf},
-    sync::atomic::{AtomicU64, Ordering},
-};
+use std::{collections::BTreeSet, fs, io, path::Path};
 
 const REED: u64 = 9_000_000_181;
 /// An ordinary spawned Stillwater Crossing vendor near Reed: a real in-range
 /// NPC that must not advance Reed's quest.
 const NEWMAN: u64 = 9_500_000_793;
+const DEFAULT_PROFILE: i32 = 1;
+const BRAWLER_PROFILE: i32 = 43;
 const FISHERMAN_PROFILE: i32 = 137;
 const LEARN_TO_FISH: u32 = 3_070_003;
 const TESTING_THE_WATERS: u32 = 3_070_004;
 const SACRED_GROVE_GAME_ID: i32 = 599;
-const REED_POSITION: [f32; 3] = [-1319.765, -65.62, 898.9357];
-const NEWMAN_POSITION: [f32; 3] = [-1283.267, -57.52569, 852.1632];
 const STILLWATER_ZONE: u32 = 14;
-const FISH_MENU_STRING_ID: u32 = 73_552;
-const TALK_CHOICE: i32 = 301;
 const GOODBYE_CHOICE: u32 = 300;
 const ACTOR: Handle = Handle {
     id: 0x1122_3344,
@@ -53,46 +64,11 @@ const ACTOR: Handle = Handle {
 };
 /// The fishing service's timer base; bite 1,500 ms, nibble 900 ms, reel window 7 s.
 const FISH_T0: u64 = 1_000_000;
-const CHARACTER: u64 = 0x0000_00a1_b2c3_d4e5;
-static NEXT_FIXTURE: AtomicU64 = AtomicU64::new(0);
 
-fn crate_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-}
+// ---- content lookups ----------------------------------------------------------------------
 
-fn bundled() -> PathBuf {
-    crate_dir().join("data/content")
-}
-
-fn opening_reference() -> PathBuf {
-    crate_dir().join("../../../lab/references/rust-opening-cooking-original-assets")
-}
-
-fn digest(bytes: &[u8]) -> String {
-    format!("{:x}", Sha256::digest(bytes))
-}
-
-fn hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
-}
-
-fn copy_tree(source: &Path, destination: &Path) {
-    fs::create_dir_all(destination).unwrap();
-    for entry in fs::read_dir(source).unwrap() {
-        let entry = entry.unwrap();
-        let target = destination.join(entry.file_name());
-        if entry.file_type().unwrap().is_dir() {
-            copy_tree(&entry.path(), &target);
-        } else {
-            fs::copy(entry.path(), target).unwrap();
-        }
-    }
-}
-
-/// Every item id `fishing_spots.json` binds to a fish size.
-fn fish_item_ids() -> std::collections::BTreeSet<i32> {
-    let value: Value =
-        serde_json::from_slice(&fs::read(bundled().join("fishing_spots.json")).unwrap()).unwrap();
+fn fish_item_ids() -> BTreeSet<i32> {
+    let value = read_json(&content_dir().join("fishing_spots.json"));
     value["items"]
         .as_object()
         .unwrap()
@@ -103,131 +79,78 @@ fn fish_item_ids() -> std::collections::BTreeSet<i32> {
         .collect()
 }
 
-/// A private content directory: the reviewed opening reference (profiles, inventory,
-/// combat, opening) plus the repository's real fishing spots and trainer catalogue.
-/// The inventory is widened with a stub definition for every fish item so a catch can
-/// be stored; the spot file itself is the shipped one, so 599 is the tested value.
-struct Fixture(PathBuf);
-
-impl Fixture {
-    fn new(active_profile: i32) -> Self {
-        let reference = opening_reference();
-        assert!(
-            reference.join("profiles.json").is_file() && reference.join("opening.json").is_file(),
-            "the opening reference is required at {}",
-            reference.display()
-        );
-        let dir = std::env::temp_dir().join(format!(
-            "osfr-t244-{}-{}",
-            std::process::id(),
-            NEXT_FIXTURE.fetch_add(1, Ordering::Relaxed)
-        ));
-        let _ = fs::remove_dir_all(&dir);
-        copy_tree(&reference, &dir);
-        fs::copy(
-            bundled().join("fishing_spots.json"),
-            dir.join("fishing_spots.json"),
-        )
-        .unwrap();
-        fs::copy(
-            bundled().join("job_trainers.json"),
-            dir.join("job_trainers.json"),
-        )
-        .unwrap();
-
-        // Fisherman active/unlocked, or Brawler active with Fisherman unlocked: the
-        // second case proves the job gate follows the active job, not the unlock.
-        let mut profiles: Value =
-            serde_json::from_slice(&fs::read(dir.join("profiles.json")).unwrap()).unwrap();
-        profiles["default_state"]["active"] = json!(active_profile);
-        profiles["default_state"]["unlocked"] = json!([1, 43, FISHERMAN_PROFILE]);
-        fs::write(
-            dir.join("profiles.json"),
-            serde_json::to_vec(&profiles).unwrap(),
-        )
-        .unwrap();
-
-        let mut inventory: Value =
-            serde_json::from_slice(&fs::read(dir.join("inventory.json")).unwrap()).unwrap();
-        let definitions = inventory["definitions"].as_array_mut().unwrap();
-        let known: std::collections::BTreeSet<i32> = definitions
-            .iter()
-            .filter_map(|row| row["id"].as_i64().map(|id| id as i32))
-            .collect();
-        for id in fish_item_ids() {
-            if known.contains(&id) {
-                continue;
-            }
-            let bytes = [id.to_le_bytes(), 8i32.to_le_bytes()].concat();
-            definitions.push(json!({
-                "id": id,
-                "slot": 3,
-                "class_id": 1,
-                "default_tint": 5,
-                "max_stack": 10,
-                "model": "fixture.adr",
-                "texture": "fixture",
-                "tint_alias": "fixture",
-                "effect": 0,
-                "wield_type": 0,
-                "serialized_hex": hex(&bytes),
-                "sha256": digest(&bytes)
-            }));
-        }
-        fs::write(
-            dir.join("inventory.json"),
-            serde_json::to_vec(&inventory).unwrap(),
-        )
-        .unwrap();
-        Self(dir)
-    }
+/// Reed's trainer row in `job_trainers.json` (profile 137): the production label the
+/// test selects, never a hand-copied string id.
+fn fisherman_trainer_label() -> u32 {
+    read_json(&content_dir().join("job_trainers.json"))["trainers"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["profile"] == json!(FISHERMAN_PROFILE))
+        .expect("Reed teaches Fisherman")["label_string_id"]
+        .as_u64()
+        .unwrap() as u32
 }
 
-impl Drop for Fixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.0);
+/// The fishing menu label is content (`fishing_spots.json`), as the service reads it.
+fn fish_menu_label() -> u32 {
+    read_json(&content_dir().join("fishing_spots.json"))["menu_string_id"]
+        .as_u64()
+        .unwrap() as u32
+}
+
+fn reed_position() -> [f32; 3] {
+    content_position("stillwater_crossing.json", REED)
+}
+
+fn newman_position() -> [f32; 3] {
+    content_position("stillwater_crossing.json", NEWMAN)
+}
+
+fn digest(bytes: &[u8]) -> String {
+    format!("{:x}", Sha256::digest(bytes))
+}
+
+fn hex(bytes: &[u8]) -> String {
+    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
+}
+
+/// Widen the fixture inventory with a stub definition for every fish item the real
+/// spot file binds, so a catch can be stored. The spot file itself is shipped content.
+fn add_fish_definitions(directory: &Path) {
+    let path = directory.join("inventory.json");
+    let mut inventory: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    let known: BTreeSet<i32> = inventory["definitions"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|row| row["id"].as_i64().map(|id| id as i32))
+        .collect();
+    let definitions = inventory["definitions"].as_array_mut().unwrap();
+    for id in fish_item_ids() {
+        if known.contains(&id) {
+            continue;
+        }
+        let bytes = [id.to_le_bytes(), 8i32.to_le_bytes()].concat();
+        definitions.push(json!({
+            "id": id,
+            "slot": 3,
+            "class_id": 1,
+            "default_tint": 5,
+            "max_stack": 10,
+            "model": "fixture.adr",
+            "texture": "fixture",
+            "tint_alias": "fixture",
+            "effect": 0,
+            "wield_type": 0,
+            "serialized_hex": hex(&bytes),
+            "sha256": digest(&bytes)
+        }));
     }
+    fs::write(&path, serde_json::to_vec(&inventory).unwrap()).unwrap();
 }
 
 // ---- packets ------------------------------------------------------------------------------
-
-fn npc_interact(target: u64) -> Vec<u8> {
-    // Client 26/8 constructor 0x008b6bc0: u64 target plus one flag byte.
-    let mut packet = vec![26, 0, 8, 0];
-    packet.extend(target.to_le_bytes());
-    packet.push(0);
-    packet
-}
-
-fn npc_select(target: u64, option: i32) -> Vec<u8> {
-    // Client 26/10 constructor 0x00a36f80: u64 target plus i32 choice.
-    let mut packet = vec![26, 0, 10, 0];
-    packet.extend(target.to_le_bytes());
-    packet.extend(option.to_le_bytes());
-    packet
-}
-
-fn dialogue_choice(choice: i32) -> Vec<u8> {
-    // Client 26/6: one i32 response row (reader 0x009f5890).
-    let mut packet = vec![26, 0, 6, 0];
-    packet.extend(choice.to_le_bytes());
-    packet
-}
-
-fn quest_reply(quest_id: u32, accept: bool) -> Vec<u8> {
-    // Captured 49/2 wire: 6-byte header, u32 quest id, u8 accept (0x00a86400).
-    let mut packet = vec![49, 0, 2, 0, 0, 0];
-    packet.extend(quest_id.to_le_bytes());
-    packet.push(u8::from(accept));
-    packet
-}
-
-fn quest_end_reply(quest_id: u32) -> Vec<u8> {
-    // 49/14 QuestEndReplyPacket constructor 0x00a864c0: one quest id.
-    let mut packet = vec![49, 0, 14, 0, 0, 0];
-    packet.extend(quest_id.to_le_bytes());
-    packet
-}
 
 fn fishing_request(sub: u16, body: &[u8]) -> Vec<u8> {
     let mut packet = vec![138, 0];
@@ -246,14 +169,9 @@ fn register() -> Vec<u8> {
     fishing_request(2, &body)
 }
 
-fn cast_at(distance: f32) -> Vec<u8> {
+fn cast_at(origin: [f32; 3], distance: f32) -> Vec<u8> {
     let mut body = handle_bytes();
-    for coordinate in [
-        REED_POSITION[0] + distance,
-        REED_POSITION[1],
-        REED_POSITION[2],
-        1.0f32,
-    ] {
+    for coordinate in [origin[0] + distance, origin[1], origin[2], 1.0f32] {
         body.extend(coordinate.to_le_bytes());
     }
     body.push(0);
@@ -275,95 +193,84 @@ fn lifecycle(sub: u8, instance: i32) -> Vec<u8> {
     packet
 }
 
+/// A forged framework game-over, byte-for-byte the server's `mining::game_over`
+/// writer shape (39/18): instance, -1, the real 599 game id, won byte.
+fn forged_game_over(instance: i32) -> Vec<u8> {
+    let mut packet = vec![39, 0, 18];
+    for value in [instance, -1, SACRED_GROVE_GAME_ID] {
+        packet.extend(value.to_le_bytes());
+    }
+    packet.push(1);
+    packet
+}
+
+/// A forged 39/14 `OnGameWonMsg`, byte-for-byte the server's `payload_packet_for`
+/// writer shape: instance, -1, the real 599 game id, length, text, terminator.
+fn forged_game_won(instance: i32) -> Vec<u8> {
+    let text = b"OnGameWonMsg";
+    let mut packet = vec![39, 0, 14];
+    for value in [instance, -1, SACRED_GROVE_GAME_ID] {
+        packet.extend(value.to_le_bytes());
+    }
+    packet.extend(((text.len() + 1) as i32).to_le_bytes());
+    packet.extend(text);
+    packet.push(0);
+    packet
+}
+
 // ---- assertions on the server's own packets ----------------------------------------------
 
 fn find<'a>(packets: &'a [Vec<u8>], prefix: &[u8]) -> Option<&'a Vec<u8>> {
     packets.iter().find(|packet| packet.starts_with(prefix))
 }
 
-fn menu_options(packets: &[Vec<u8>]) -> Vec<(i32, u32)> {
-    let menu = find(packets, &[26, 0, 9, 0]).expect("26/8 returns the 26/9 menu");
-    let count = i32::from_le_bytes(menu[13..17].try_into().unwrap());
-    (0..count)
-        .map(|index| {
-            let at = 17 + index as usize * 28;
-            (
-                i32::from_le_bytes(menu[at..at + 4].try_into().unwrap()),
-                u32::from_le_bytes(menu[at + 8..at + 12].try_into().unwrap()),
-            )
-        })
-        .collect()
-}
-
-fn menu_option(options: &[(i32, u32)], label: u32) -> i32 {
-    options
-        .iter()
-        .find_map(|(id, option_label)| (*option_label == label).then_some(*id))
-        .unwrap_or_else(|| panic!("menu has no option labelled {label}: {options:?}"))
-}
-
-fn dialogue_rows(packet: &[u8]) -> Vec<[u32; 5]> {
-    assert!(packet.starts_with(&[26, 0, 3, 0]), "not a 26/3 dialogue");
-    let count = u32::from_le_bytes(packet[25..29].try_into().unwrap()) as usize;
-    (0..count)
-        .map(|index| {
-            let at = 29 + index * 20;
-            let mut row = [0u32; 5];
-            for (slot, value) in row.iter_mut().enumerate() {
-                let start = at + slot * 4;
-                *value = u32::from_le_bytes(packet[start..start + 4].try_into().unwrap());
-            }
-            row
-        })
-        .collect()
+fn offer_fields(packet: &[u8]) -> (u32, u32, u32, u32, u32) {
+    // 49/1 body reader 0x00c7b7a0, decoded by the production decoder. Wire dword 2
+    // (`field_2`) is not shown by the client; the third is the card name.
+    let offer = decode_quest_offer_49_1(packet).expect("49/1 decodes");
+    (
+        offer.quest_id,
+        offer.intro_text_string_id,
+        offer.name_string_id,
+        offer.description_string_id,
+        offer.field_2,
+    )
 }
 
 fn quest_choice_title(rows: &[[u32; 5]]) -> Option<u32> {
     rows.iter()
-        .find(|row| row[0] == TALK_CHOICE as u32)
+        .find(|row| row[0] == QUEST_CHOICE as u32)
         .map(|row| row[2])
 }
 
-fn offer_fields(packet: &[u8]) -> (u32, u32, u32, u32, u32) {
-    // 49/1 body reader 0x00c7b7a0: qid, intro, then five screen dwords; the
-    // third of those (wire name) is the client card title (probe run 143124).
-    assert_eq!(&packet[..6], &[49, 0, 1, 0, 0, 0]);
-    let word = |at: usize| u32::from_le_bytes(packet[at..at + 4].try_into().unwrap());
-    (word(6), word(10), word(18), word(22), word(14))
-}
-
-fn end_screen_fields(packet: &[u8]) -> (u32, u32) {
-    // 49/13 reader 0x00c7b990: 8-byte actor at 6, quest id at 14, end text at 18.
-    assert_eq!(&packet[..6], &[49, 0, 13, 0, 0, 0]);
-    (
-        u32::from_le_bytes(packet[14..18].try_into().unwrap()),
-        u32::from_le_bytes(packet[18..22].try_into().unwrap()),
-    )
+fn dialogue_rows(packet: &[u8]) -> Vec<[u32; 5]> {
+    decode_dialogue_26_3(packet).expect("26/3 decodes").choices
 }
 
 // ---- the rig ------------------------------------------------------------------------------
 
 struct Rig {
-    game: Gameplay,
+    game: osfr_tools::gameplay::Gameplay,
     character: CharacterState,
     fixture: Fixture,
     now: u64,
 }
 
 impl Rig {
-    fn new(active_profile: i32) -> Self {
-        let fixture = Fixture::new(active_profile);
-        let mut game = Gameplay::load(&fixture.0, None).expect("fixture gameplay loads");
-        game.bind_npc_quest_catalogue(&fixture.0, CHARACTER)
-            .expect("split quest catalogue binds");
+    /// The reviewed opening fixture plus the repository's real fishing spot file and
+    /// fish definitions; the profile/inventory `initial_state` is untouched.
+    fn new() -> Self {
+        let fixture = Fixture::new();
+        fs::copy(
+            content_dir().join("fishing_spots.json"),
+            fixture.path().join("fishing_spots.json"),
+        )
+        .unwrap();
+        add_fish_definitions(fixture.path());
+        let game = fixture.game_as(CHARACTER, None);
         Self {
             game,
-            character: CharacterState {
-                guid: CHARACTER,
-                zone_id: STILLWATER_ZONE,
-                position: REED_POSITION,
-                rotation: [0.0, 0.0, 1.0],
-            },
+            character: character_at(STILLWATER_ZONE, reed_position()),
             fixture,
             now: 10_000,
         }
@@ -374,14 +281,13 @@ impl Rig {
         self.now
     }
 
-    fn send(&mut self, packet: &[u8], now: u64) -> Vec<Vec<u8>> {
-        self.send_at(packet, now).expect("in-world request")
+    fn send_at(&mut self, packet: &[u8], now: u64) -> io::Result<Outcome> {
+        self.game.handle_in_world(packet, &self.character, now)
     }
 
-    fn send_at(&mut self, packet: &[u8], now: u64) -> std::io::Result<Vec<Vec<u8>>> {
-        self.game
-            .handle_in_world(packet, &self.character, now)
-            .map(|outcome| outcome.replies)
+    fn send(&mut self, packet: &[u8]) -> Outcome {
+        let now = self.stamp();
+        self.send_at(packet, now).expect("in-world request")
     }
 
     fn tick(&mut self, now: u64) -> Vec<Vec<u8>> {
@@ -395,86 +301,109 @@ impl Rig {
         self.game.tick(character, now).expect("world tick");
     }
 
-    fn interact(&mut self, npc: u64) -> Vec<Vec<u8>> {
+    fn interact_at(&mut self, target: u64) -> Outcome {
         let now = self.stamp();
-        self.send(&npc_interact(npc), now)
+        interact(&mut self.game, &self.character, target, now)
     }
 
     /// Select the generic Talk option (option id 1) and return the 26/3 dialogue rows.
-    fn talk(&mut self, npc: u64) -> Vec<[u32; 5]> {
-        let menu = self.interact(npc);
-        let options = menu_options(&menu);
-        assert_eq!(options[0], (1, 3300), "Talk is always the first option");
+    fn talk_at(&mut self, target: u64) -> Vec<[u32; 5]> {
         let now = self.stamp();
-        let replies = self.send(&npc_select(npc, 1), now);
-        let dialogue = find(&replies, &[26, 0, 3, 0]).expect("26/10 Talk opens the 26/3 dialogue");
+        let outcome = talk(&mut self.game, &self.character, target, now);
+        let dialogue =
+            find(&outcome.replies, &[26, 0, 3, 0]).expect("26/10 Talk opens the 26/3 dialogue");
         dialogue_rows(dialogue)
     }
 
-    fn choose(&mut self) -> Vec<Vec<u8>> {
+    /// Learn Fisherman through Reed's production trainer menu. The job is unlocked,
+    /// never activated: the shipped content has no 137 starter outfit.
+    fn learn_fisherman(&mut self) {
+        assert_eq!(
+            active_job(&self.game),
+            DEFAULT_PROFILE,
+            "the real initial_state is active Adventurer"
+        );
+        let menu = self.interact_at(REED);
+        let learn = menu_option(&menu, fisherman_trainer_label());
+        let learned = self.send(&npc_select(REED, learn));
+        assert!(learned.changed, "Reed's trainer choice must commit");
+        let text = String::from_utf8_lossy(&learned.replies.concat()).into_owned();
+        assert!(
+            text.contains("cannot be selected yet"),
+            "the fixture must still report the missing Fisherman outfit: {text}"
+        );
+        let state = self.game.state();
+        let profiles = state.profiles.as_ref().unwrap();
+        assert!(
+            profiles.unlocked.contains(&FISHERMAN_PROFILE),
+            "Reed must unlock Fisherman"
+        );
+        assert_eq!(
+            profiles.active, DEFAULT_PROFILE,
+            "learning a job must not activate it"
+        );
+
+        // The 26/13 switch is still refused by the pre-existing missing outfit. The
+        // chapter no longer depends on it, so this is the canary for the content gap.
+        let before = saved(&self.game);
+        let refused = self.send(&select_job(FISHERMAN_PROFILE));
+        assert!(!refused.changed, "an outfit-less switch must be refused");
+        assert!(
+            !refused
+                .replies
+                .iter()
+                .any(|packet| packet.starts_with(&[38, 0, 21, 0])),
+            "a refused switch must not send an activation"
+        );
+        assert_eq!(saved(&self.game), before);
+    }
+
+    /// A real 26/13 switch to the Brawler (its starter outfit is complete).
+    fn switch_to_brawler(&mut self) {
+        let switched = self.send(&select_job(BRAWLER_PROFILE));
+        assert!(switched.changed, "Brawler must activate");
+        assert_eq!(active_job(&self.game), BRAWLER_PROFILE);
+    }
+
+    fn offer(&mut self, quest_id: u32) -> Outcome {
         let now = self.stamp();
-        self.send(&dialogue_choice(TALK_CHOICE), now)
+        offer(&mut self.game, &self.character, REED, quest_id, now)
     }
 
-    fn take_offer(&mut self, npc: u64) -> (Vec<[u32; 5]>, Vec<u8>) {
-        let rows = self.talk(npc);
-        assert!(
-            rows.iter().any(|row| row[0] == TALK_CHOICE as u32),
-            "Talk must carry the quest choice row"
-        );
-        let replies = self.choose();
-        let offer = find(&replies, &[49, 0, 1, 0])
-            .expect("26/6 releases the 49/1 offer")
-            .clone();
-        (rows, offer)
-    }
-
-    fn take_end_screen(&mut self, npc: u64) -> Vec<u8> {
-        let rows = self.talk(npc);
-        assert!(
-            rows.iter().any(|row| row[0] == TALK_CHOICE as u32),
-            "Talk must carry the held end-screen choice"
-        );
-        let replies = self.choose();
-        find(&replies, &[49, 0, 13, 0])
-            .expect("26/6 releases the 49/13 end screen")
-            .clone()
-    }
-
-    fn accept(&mut self, quest_id: u32) -> Vec<Vec<u8>> {
+    fn accept_offer(&mut self, quest_id: u32) -> Outcome {
         let now = self.stamp();
-        let replies = self.send(&quest_reply(quest_id, true), now);
-        assert!(
-            find(&replies, &[49, 0, 3, 0]).is_some(),
-            "49/2 accept returns the 49/3 quest record"
-        );
-        replies
+        accept(&mut self.game, &self.character, quest_id, now)
     }
 
-    fn turn_in(&mut self, quest_id: u32) -> Vec<Vec<u8>> {
+    fn take_end(&mut self, quest_id: u32, end_text: u32) -> Vec<u8> {
+        let _ = self.talk_at(REED);
+        assert_eq!(
+            pending_turnin(&self.game),
+            Some(quest_id),
+            "the final Talk must hold the 49/13 end screen"
+        );
         let now = self.stamp();
-        let replies = self.send(&quest_end_reply(quest_id), now);
-        assert!(
-            find(&replies, &[49, 0, 4, 0]).is_some(),
-            "49/14 returns the 49/4 completion"
+        release_end_screen(
+            &mut self.game,
+            &self.character,
+            quest_id,
+            REED,
+            end_text,
+            now,
+        )
+    }
+
+    fn turn_in(&mut self, quest_id: u32, coins_award: u32, xp_award: u32) {
+        let now = self.stamp();
+        finish_quest(
+            &mut self.game,
+            &self.character,
+            quest_id,
+            FISHERMAN_PROFILE,
+            coins_award,
+            xp_award,
+            now,
         );
-        replies
-    }
-
-    fn coins(&self) -> u32 {
-        self.game.state().inventory.coins
-    }
-
-    fn fisherman_xp(&self) -> u32 {
-        self.game
-            .state()
-            .profiles
-            .as_ref()
-            .unwrap()
-            .experience
-            .get(&FISHERMAN_PROFILE)
-            .copied()
-            .unwrap_or(0)
     }
 
     fn progress(&self, quest_id: u32) -> Option<QuestProgress> {
@@ -490,9 +419,16 @@ impl Rig {
             .status
     }
 
-    /// The persisted character save, as the gateway would write it.
+    fn coins(&self) -> u32 {
+        coins(&self.game)
+    }
+
+    fn fisherman_xp(&self) -> u32 {
+        profile_xp(&self.game, FISHERMAN_PROFILE)
+    }
+
     fn save(&self) -> Vec<u8> {
-        serde_json::to_vec(&self.game.state()).unwrap()
+        saved(&self.game)
     }
 
     /// The saved state a refused fishing frame must not touch.
@@ -527,9 +463,7 @@ impl Rig {
             now,
         } = self;
         drop(game);
-        let mut game = Gameplay::load(&fixture.0, Some(save)).expect("saved gameplay reloads");
-        game.bind_npc_quest_catalogue(&fixture.0, character.guid)
-            .expect("split quest catalogue rebinds");
+        let game = fixture.game_as(character.guid, Some(save));
         Self {
             game,
             character,
@@ -541,30 +475,34 @@ impl Rig {
 
 /// Accept 3070003 and complete it with Reed's own Talk step.
 fn finish_learn_to_fish(rig: &mut Rig) {
-    let (_, offer) = rig.take_offer(REED);
-    assert_eq!(offer_fields(&offer).0, LEARN_TO_FISH);
-    rig.accept(LEARN_TO_FISH);
-    let end = rig.take_end_screen(REED);
-    assert_eq!(end_screen_fields(&end).0, LEARN_TO_FISH);
-    rig.turn_in(LEARN_TO_FISH);
+    let offer = rig.offer(LEARN_TO_FISH);
+    assert_eq!(
+        offer_fields(find(&offer.replies, &[49, 0, 1, 0]).unwrap()).0,
+        LEARN_TO_FISH
+    );
+    rig.accept_offer(LEARN_TO_FISH);
+    rig.take_end(LEARN_TO_FISH, 0);
+    rig.turn_in(LEARN_TO_FISH, 10, 25);
     assert_eq!(rig.status(LEARN_TO_FISH), QuestStatus::Completed);
 }
 
 /// Accept 3070004 (after 3070003) so its catch objective is active.
 fn accept_testing_the_waters(rig: &mut Rig) {
-    let (_, offer) = rig.take_offer(REED);
-    assert_eq!(offer_fields(&offer).0, TESTING_THE_WATERS);
-    rig.accept(TESTING_THE_WATERS);
+    let offer = rig.offer(TESTING_THE_WATERS);
+    assert_eq!(
+        offer_fields(find(&offer.replies, &[49, 0, 1, 0]).unwrap()),
+        (TESTING_THE_WATERS, 408_258, 408_259, 408_260, 408_259)
+    );
+    rig.accept_offer(TESTING_THE_WATERS);
     assert_eq!(rig.status(TESTING_THE_WATERS), QuestStatus::Active);
-    assert_eq!(rig.progress(TESTING_THE_WATERS).unwrap().counts, [0, 0]);
+    assert_eq!(counts(&rig.game, TESTING_THE_WATERS), vec![0, 0]);
 }
 
 /// Open Reed's menu, take the fishing trip, and return (39/16 offer, instance id).
 fn enter_fishing(rig: &mut Rig) -> (Vec<u8>, i32) {
-    let menu = rig.interact(REED);
-    let fish = menu_option(&menu_options(&menu), FISH_MENU_STRING_ID);
-    let now = rig.stamp();
-    let replies = rig.send(&npc_select(REED, fish), now);
+    let menu = rig.interact_at(REED);
+    let fish = menu_option(&menu, fish_menu_label());
+    let replies = rig.send(&npc_select(REED, fish)).replies;
     let offer = find(&replies, &[39, 0, 16])
         .expect("the guide's Fish option returns the 39/16 offer")
         .clone();
@@ -580,16 +518,14 @@ fn enter_fishing(rig: &mut Rig) -> (Vec<u8>, i32) {
 /// Start the round and register the actor; ready to cast.
 fn start_round(rig: &mut Rig) -> i32 {
     let (_, instance) = enter_fishing(rig);
-    let now = rig.stamp();
-    let go = rig.send(&lifecycle(5, instance), now);
+    let go = rig.send(&lifecycle(5, instance));
     assert!(
-        find(&go, &[41, 0, 2]).is_some(),
+        find(&go.replies, &[41, 0, 2]).is_some(),
         "39/5 starts the encounter (41/2), not an empty run"
     );
-    let now = rig.stamp();
-    let registered = rig.send(&register(), now);
+    let registered = rig.send(&register());
     assert!(
-        find(&registered, &[138, 0, 3, 0]).is_some(),
+        find(&registered.replies, &[138, 0, 3, 0]).is_some(),
         "138/2 registration is acknowledged"
     );
     instance
@@ -597,46 +533,103 @@ fn start_round(rig: &mut Rig) -> i32 {
 
 fn cast_and_hook(rig: &mut Rig) {
     let now = FISH_T0 + 10;
-    rig.send(&cast_at(10.0), now);
+    rig.send_at(&cast_at(reed_position(), 10.0), now)
+        .expect("cast accepted");
     rig.tick(FISH_T0 + 1_510);
     rig.tick(FISH_T0 + 2_410);
 }
 
-fn leave_round(rig: &mut Rig, instance: i32) -> Vec<Vec<u8>> {
-    let now = rig.stamp();
-    rig.send(&lifecycle(6, instance), now)
+fn leave_round(rig: &mut Rig, instance: i32) -> Outcome {
+    rig.send(&lifecycle(6, instance))
 }
 
 // ---- gates --------------------------------------------------------------------------------
 
 #[test]
-fn reed_offers_the_two_fisherman_quests_in_order() {
-    let mut rig = Rig::new(FISHERMAN_PROFILE);
+fn a_normal_character_learns_fisherman_and_reaches_the_chapter() {
+    let mut rig = Rig::new();
+    {
+        let state = rig.game.state();
+        let profiles = state.profiles.as_ref().unwrap();
+        assert_eq!(
+            profiles.active, DEFAULT_PROFILE,
+            "the real initial_state is active Adventurer"
+        );
+        assert_eq!(
+            profiles.unlocked,
+            BTreeSet::from([DEFAULT_PROFILE, BRAWLER_PROFILE]),
+            "the fixture must not seed Fisherman"
+        );
+    }
+    rig.learn_fisherman();
 
-    // The guide menu already exposes the fishing trip; the quest itself opens from Talk.
-    let options = menu_options(&rig.interact(REED));
-    assert_eq!(options[0], (1, 3300));
-    assert!(
-        options
-            .iter()
-            .any(|(_, label)| *label == FISH_MENU_STRING_ID)
-    );
-
-    let (rows, offer) = rig.take_offer(REED);
+    let coins = rig.coins();
+    let xp = rig.fisherman_xp();
+    let rows = rig.talk_at(REED);
     assert_eq!(
         quest_choice_title(&rows),
         Some(417_055),
-        "Learn to Fish! title"
+        "Learn to Fish! is offered after the real trainer path"
     );
+    let offer = rig.offer(LEARN_TO_FISH);
     assert_eq!(
-        offer_fields(&offer),
+        offer_fields(find(&offer.replies, &[49, 0, 1, 0]).unwrap()),
         (LEARN_TO_FISH, 417_054, 417_055, 417_056, 417_055),
         "49/1 quest id, intro, card title, description"
     );
-    rig.accept(LEARN_TO_FISH);
+    rig.accept_offer(LEARN_TO_FISH);
     assert_eq!(rig.status(LEARN_TO_FISH), QuestStatus::Active);
-    let after_accept = rig.progress(LEARN_TO_FISH).unwrap();
-    assert_eq!(after_accept.counts, [0]);
+    rig.take_end(LEARN_TO_FISH, 0);
+    rig.turn_in(LEARN_TO_FISH, 10, 25);
+    assert_eq!(rig.coins(), coins + 10);
+    assert_eq!(rig.fisherman_xp(), xp + 25);
+    assert_eq!(rig.status(LEARN_TO_FISH), QuestStatus::Completed);
+}
+
+#[test]
+fn the_chapter_is_offered_on_another_active_job_and_pays_fisherman_xp() {
+    let mut rig = Rig::new();
+    rig.learn_fisherman();
+    rig.switch_to_brawler();
+    let brawler_xp = profile_xp(&rig.game, BRAWLER_PROFILE);
+    let xp = rig.fisherman_xp();
+
+    // T244's Brawler edge case was "no quest"; F270 removes the active-job gate, so
+    // the chapter is offered on another job and still pays the explicit 137 profile.
+    let rows = rig.talk_at(REED);
+    assert_eq!(quest_choice_title(&rows), Some(417_055));
+    rig.offer(LEARN_TO_FISH);
+    rig.accept_offer(LEARN_TO_FISH);
+    rig.take_end(LEARN_TO_FISH, 0);
+    rig.turn_in(LEARN_TO_FISH, 10, 25);
+    assert_eq!(rig.fisherman_xp(), xp + 25);
+    assert_eq!(
+        profile_xp(&rig.game, BRAWLER_PROFILE),
+        brawler_xp,
+        "the active Brawler must not gain Fisherman quest XP"
+    );
+}
+
+#[test]
+fn reed_offers_the_two_fisherman_quests_in_order() {
+    let mut rig = Rig::new();
+    rig.learn_fisherman();
+
+    // The guide menu already exposes the fishing trip; the quest itself opens from Talk.
+    let menu = rig.interact_at(REED);
+    assert_eq!(
+        menu_option(&menu, TALK_LABEL),
+        1,
+        "Talk is the first option"
+    );
+    let _fish = menu_option(&menu, fish_menu_label());
+
+    let rows = rig.talk_at(REED);
+    assert_eq!(quest_choice_title(&rows), Some(417_055));
+    rig.offer(LEARN_TO_FISH);
+    rig.accept_offer(LEARN_TO_FISH);
+    assert_eq!(rig.status(LEARN_TO_FISH), QuestStatus::Active);
+    assert_eq!(rig.progress(LEARN_TO_FISH).unwrap().counts, [0]);
     assert!(
         rig.progress(TESTING_THE_WATERS).is_none(),
         "3070004 is not even offered before 3070003 completes"
@@ -644,52 +637,30 @@ fn reed_offers_the_two_fisherman_quests_in_order() {
 
     // A forged 49/2 for the follow-up is refused with a byte-identical save.
     let before = rig.save();
-    let now = rig.stamp();
-    let forged = rig.send(&quest_reply(TESTING_THE_WATERS, true), now);
-    assert!(find(&forged, &[49, 0, 3, 0]).is_none());
+    let forged = rig.send(&quest_reply(TESTING_THE_WATERS, true));
+    assert!(find(&forged.replies, &[49, 0, 3, 0]).is_none());
     assert_eq!(rig.save(), before);
 
-    let end = rig.take_end_screen(REED);
-    assert_eq!(
-        end_screen_fields(&end),
-        (LEARN_TO_FISH, 0),
-        "no E3 end text id"
-    );
-    rig.turn_in(LEARN_TO_FISH);
+    // 3070003 has no end-text id, so its 49/13 end text is 0.
+    rig.take_end(LEARN_TO_FISH, 0);
+    rig.turn_in(LEARN_TO_FISH, 10, 25);
     assert_eq!(rig.status(LEARN_TO_FISH), QuestStatus::Completed);
 
-    let rows = rig.talk(REED);
+    let rows = rig.talk_at(REED);
+    assert_eq!(quest_choice_title(&rows), Some(408_259));
+    let offer = rig.offer(TESTING_THE_WATERS);
     assert_eq!(
-        quest_choice_title(&rows),
-        Some(408_259),
-        "Testing the Waters title"
+        offer_fields(find(&offer.replies, &[49, 0, 1, 0]).unwrap()),
+        (TESTING_THE_WATERS, 408_258, 408_259, 408_260, 408_259)
     );
-    let (_, offer) = rig.take_offer(REED);
-    assert_eq!(
-        offer_fields(&offer),
-        (TESTING_THE_WATERS, 408_258, 408_259, 408_260, 408_259),
-        "49/1 quest id, intro, card title, description"
-    );
-    rig.accept(TESTING_THE_WATERS);
+    rig.accept_offer(TESTING_THE_WATERS);
     assert_eq!(rig.status(TESTING_THE_WATERS), QuestStatus::Active);
-
-    // A character on another active job sees neither chapter, even with Fisherman unlocked.
-    let mut brawler = Rig::new(43);
-    let before = brawler.save();
-    let rows = brawler.talk(REED);
-    assert_eq!(rows, vec![[GOODBYE_CHOICE, 17, 8_075, 0, 18]]);
-    let closed = brawler.choose();
-    assert!(find(&closed, &[49, 0, 1, 0]).is_none());
-    assert_eq!(brawler.save(), before, "a refused Talk changes nothing");
-    let now = brawler.stamp();
-    let forged = brawler.send(&quest_reply(LEARN_TO_FISH, true), now);
-    assert!(find(&forged, &[49, 0, 3, 0]).is_none());
-    assert_eq!(brawler.save(), before);
 }
 
 #[test]
 fn learning_then_catching_and_turning_in_pays_once() {
-    let mut rig = Rig::new(FISHERMAN_PROFILE);
+    let mut rig = Rig::new();
+    rig.learn_fisherman();
     let coins = rig.coins();
     let xp = rig.fisherman_xp();
     finish_learn_to_fish(&mut rig);
@@ -700,9 +671,11 @@ fn learning_then_catching_and_turning_in_pays_once() {
 
     let instance = start_round(&mut rig);
     cast_and_hook(&mut rig);
-    let caught = rig.send(&reel(), FISH_T0 + 2_420);
+    let caught = rig
+        .send_at(&reel(), FISH_T0 + 2_420)
+        .expect("reel accepted");
     assert!(
-        find(&caught, &[138, 0, 14, 0]).is_some(),
+        find(&caught.replies, &[138, 0, 14, 0]).is_some(),
         "the paid catch sends the 138/14 result"
     );
     assert_eq!(rig.fishing_items(), 1, "exactly one fish is paid");
@@ -723,13 +696,8 @@ fn learning_then_catching_and_turning_in_pays_once() {
     assert_eq!(rig.fishing_items(), 1);
     assert_eq!(rig.coins(), coins + 10);
 
-    let end = rig.take_end_screen(REED);
-    assert_eq!(
-        end_screen_fields(&end),
-        (TESTING_THE_WATERS, 408_261),
-        "49/13 end text and quest id"
-    );
-    rig.turn_in(TESTING_THE_WATERS);
+    rig.take_end(TESTING_THE_WATERS, 408_261);
+    rig.turn_in(TESTING_THE_WATERS, 10, 25);
     assert_eq!(rig.coins(), coins + 20);
     assert_eq!(rig.fisherman_xp(), xp + 60);
     assert_eq!(rig.status(TESTING_THE_WATERS), QuestStatus::Completed);
@@ -737,13 +705,12 @@ fn learning_then_catching_and_turning_in_pays_once() {
 
     // Replays pay nothing and the completed chapter is not offered again.
     let before = rig.save();
-    let now = rig.stamp();
-    let replayed = rig.send(&quest_end_reply(TESTING_THE_WATERS), now);
-    assert!(find(&replayed, &[49, 0, 4, 0]).is_none());
+    let replayed = rig.send(&quest_end_reply(TESTING_THE_WATERS));
+    assert!(find(&replayed.replies, &[49, 0, 4, 0]).is_none());
     assert_eq!(rig.save(), before);
-    let rows = rig.talk(REED);
+    let rows = rig.talk_at(REED);
     assert!(
-        rows.iter().all(|row| row[0] != TALK_CHOICE as u32),
+        rows.iter().all(|row| row[0] != QUEST_CHOICE as u32),
         "a completed chapter is not re-offered: {rows:?}"
     );
     assert_eq!(rig.coins(), coins + 20);
@@ -753,7 +720,8 @@ fn learning_then_catching_and_turning_in_pays_once() {
 
 #[test]
 fn a_quit_escape_or_disconnect_does_not_count_the_catch() {
-    let mut rig = Rig::new(FISHERMAN_PROFILE);
+    let mut rig = Rig::new();
+    rig.learn_fisherman();
     finish_learn_to_fish(&mut rig);
     accept_testing_the_waters(&mut rig);
     let before = rig.subject_state();
@@ -811,15 +779,18 @@ fn a_quit_escape_or_disconnect_does_not_count_the_catch() {
     // The chapter is still playable after every failure.
     let instance = start_round(&mut rig);
     cast_and_hook(&mut rig);
-    let caught = rig.send(&reel(), FISH_T0 + 2_420);
-    assert!(find(&caught, &[138, 0, 14, 0]).is_some());
+    let caught = rig
+        .send_at(&reel(), FISH_T0 + 2_420)
+        .expect("reel accepted");
+    assert!(find(&caught.replies, &[138, 0, 14, 0]).is_some());
     assert_eq!(rig.progress(TESTING_THE_WATERS).unwrap().counts, [1, 0]);
     leave_round(&mut rig, instance);
 }
 
 #[test]
 fn a_forged_or_missing_completion_changes_nothing() {
-    let mut rig = Rig::new(FISHERMAN_PROFILE);
+    let mut rig = Rig::new();
+    rig.learn_fisherman();
     finish_learn_to_fish(&mut rig);
     accept_testing_the_waters(&mut rig);
     let coins = rig.coins();
@@ -827,42 +798,44 @@ fn a_forged_or_missing_completion_changes_nothing() {
 
     // A real, in-range NPC that is not Reed cannot advance the return step.
     let before = rig.save();
-    rig.character.position = NEWMAN_POSITION;
-    let menu = rig.interact(NEWMAN);
-    assert!(find(&menu, &[26, 0, 9, 0]).is_some(), "Newman is reachable");
-    let rows = rig.talk(NEWMAN);
+    rig.character.position = newman_position();
+    let rows = rig.talk_at(NEWMAN);
     assert_eq!(rows, vec![[GOODBYE_CHOICE, 17, 8_075, 0, 18]]);
-    let closed = rig.choose();
-    assert!(find(&closed, &[49, 0, 13, 0]).is_none());
-    rig.character.position = REED_POSITION;
+    let closed = rig.send(&dialogue_choice(QUEST_CHOICE));
+    assert!(find(&closed.replies, &[49, 0, 13, 0]).is_none());
+    rig.character.position = reed_position();
     assert_eq!(rig.save(), before, "a wrong NPC changes nothing");
 
     // A replayed 49/14 with no open end screen is refused.
-    let now = rig.stamp();
-    let replayed = rig.send(&quest_end_reply(TESTING_THE_WATERS), now);
-    assert!(find(&replayed, &[49, 0, 4, 0]).is_none());
+    let replayed = rig.send(&quest_end_reply(TESTING_THE_WATERS));
+    assert!(find(&replayed.replies, &[49, 0, 4, 0]).is_none());
     assert_eq!(rig.save(), before, "replayed 49/14 changes nothing");
 
-    // A non-Fisherman cannot turn in Reed's chapter (no pending end screen exists).
-    let mut brawler = Rig::new(43);
-    let brawler_before = brawler.save();
-    let brawler_coins = brawler.coins();
-    let now = brawler.stamp();
-    let refused = brawler.send(&quest_end_reply(LEARN_TO_FISH), now);
-    assert!(find(&refused, &[49, 0, 4, 0]).is_none());
-    assert_eq!(brawler.save(), brawler_before);
-    assert_eq!(brawler.coins(), brawler_coins);
-    assert_eq!(brawler.fisherman_xp(), 0);
+    // A character who never learned Fisherman has no pending end screen to settle.
+    let mut stranger = Rig::new();
+    let stranger_before = stranger.save();
+    let stranger_coins = stranger.coins();
+    let refused = stranger.send(&quest_end_reply(LEARN_TO_FISH));
+    assert!(find(&refused.replies, &[49, 0, 4, 0]).is_none());
+    assert_eq!(stranger.save(), stranger_before);
+    assert_eq!(stranger.coins(), stranger_coins);
+    assert_eq!(stranger.fisherman_xp(), 0);
 
     // A live round: forged completion frames are refused and leave it intact.
     let instance = start_round(&mut rig);
     cast_and_hook(&mut rig);
     // The shared busy table: an active fishing round closes ordinary NPC interaction,
     // so the quest cannot be advanced while the minigame owns the player.
-    let busy = rig.interact(REED);
+    let before_busy = rig.save();
+    let busy = rig.interact_at(REED);
     assert!(
-        find(&busy, &[26, 0, 9, 0]).is_none(),
+        find(&busy.replies, &[26, 0, 9, 0]).is_none(),
         "a fishing round refuses the Reed menu"
+    );
+    assert_eq!(
+        rig.save(),
+        before_busy,
+        "a refused Reed menu changes nothing"
     );
     let live = rig.save();
 
@@ -873,19 +846,24 @@ fn a_forged_or_missing_completion_changes_nothing() {
     let _ = rig.send_at(&forged_result, FISH_T0 + 2_420);
     assert_eq!(rig.save(), live, "forged 138/14 changes nothing");
 
-    // A forged framework game-over with type 21 must not complete a 599 objective.
-    let mut forged_over = vec![39, 0, 18];
-    forged_over.extend(1i32.to_le_bytes());
-    forged_over.extend((-1i32).to_le_bytes());
-    forged_over.extend(21i32.to_le_bytes());
-    forged_over.push(1);
-    let _ = rig.send_at(&forged_over, FISH_T0 + 2_430);
-    assert_eq!(rig.save(), live, "forged 39/18 (type 21) changes nothing");
+    // The forged frames carry the real 599 game id in both server-written forms, so
+    // they would match a 599 objective if any client frame reached `npc_minigame_win`.
+    let _ = rig.send_at(&forged_game_over(1), FISH_T0 + 2_430);
+    assert_eq!(rig.save(), live, "forged 39/18 (game 599) changes nothing");
+    assert_eq!(rig.progress(TESTING_THE_WATERS).unwrap().counts, [0, 0]);
+    let _ = rig.send_at(&forged_game_won(1), FISH_T0 + 2_435);
+    assert_eq!(
+        rig.save(),
+        live,
+        "forged 39/14 OnGameWonMsg (game 599) changes nothing"
+    );
     assert_eq!(rig.progress(TESTING_THE_WATERS).unwrap().counts, [0, 0]);
 
     // The forged frames did not damage the live round: the real catch still counts.
-    let caught = rig.send(&reel(), FISH_T0 + 2_440);
-    assert!(find(&caught, &[138, 0, 14, 0]).is_some());
+    let caught = rig
+        .send_at(&reel(), FISH_T0 + 2_440)
+        .expect("reel accepted");
+    assert!(find(&caught.replies, &[138, 0, 14, 0]).is_some());
     assert_eq!(rig.progress(TESTING_THE_WATERS).unwrap().counts, [1, 0]);
     assert_eq!(rig.coins(), coins, "the catch pays no coins");
     assert_eq!(rig.fisherman_xp(), xp + 10);
@@ -894,9 +872,7 @@ fn a_forged_or_missing_completion_changes_nothing() {
 
 #[test]
 fn the_two_records_load_with_the_real_game_id_and_giver() {
-    let content = bundled();
-    let document: Value =
-        serde_json::from_slice(&fs::read(content.join("quests/fisherman.json")).unwrap()).unwrap();
+    let document = read_json(&content_dir().join("quests/fisherman.json"));
     let records = document["records"].as_array().unwrap();
     let find_record = |id: u32| {
         records
@@ -907,7 +883,10 @@ fn the_two_records_load_with_the_real_game_id_and_giver() {
 
     let learn = find_record(LEARN_TO_FISH);
     assert_eq!(learn["enabled"], json!(true));
-    assert_eq!(learn["job"], json!(FISHERMAN_PROFILE));
+    assert!(
+        learn.get("job").is_none(),
+        "F270: the chapter has no active-job gate; 137 cannot be activated"
+    );
     assert_eq!(learn["giver_npc_id"], json!(REED));
     assert_eq!(learn["prerequisite_quest_ids"], json!([]));
     let objectives = learn["objectives"].as_array().unwrap();
@@ -920,7 +899,10 @@ fn the_two_records_load_with_the_real_game_id_and_giver() {
 
     let testing = find_record(TESTING_THE_WATERS);
     assert_eq!(testing["enabled"], json!(true));
-    assert_eq!(testing["job"], json!(FISHERMAN_PROFILE));
+    assert!(
+        testing.get("job").is_none(),
+        "F270: the follow-up has no active-job gate either"
+    );
     assert_eq!(testing["giver_npc_id"], json!(REED));
     assert_eq!(testing["prerequisite_quest_ids"], json!([LEARN_TO_FISH]));
     let objectives = testing["objectives"].as_array().unwrap();
@@ -939,8 +921,7 @@ fn the_two_records_load_with_the_real_game_id_and_giver() {
     assert_eq!(find_record(3_070_002)["enabled"], json!(false));
 
     // Reed's fishing spot is the real game id 599, not the framework type 21.
-    let spots: Value =
-        serde_json::from_slice(&fs::read(content.join("fishing_spots.json")).unwrap()).unwrap();
+    let spots = read_json(&content_dir().join("fishing_spots.json"));
     let reed_spot = spots["spots"]
         .as_array()
         .unwrap()
@@ -953,8 +934,7 @@ fn the_two_records_load_with_the_real_game_id_and_giver() {
     assert_eq!(objectives[0]["minigame_id"], reed_spot["game_id"]);
 
     // The same NPC is the Fisherman trainer and gives both records.
-    let trainers: Value =
-        serde_json::from_slice(&fs::read(content.join("job_trainers.json")).unwrap()).unwrap();
+    let trainers = read_json(&content_dir().join("job_trainers.json"));
     assert!(
         trainers["trainers"]
             .as_array()
@@ -963,9 +943,7 @@ fn the_two_records_load_with_the_real_game_id_and_giver() {
             .any(|row| { row["npc"] == json!(REED) && row["profile"] == json!(FISHERMAN_PROFILE) })
     );
 
-    let npcs: Value =
-        serde_json::from_slice(&fs::read(content.join("npcs/stillwater_crossing.json")).unwrap())
-            .unwrap();
+    let npcs = read_json(&content_dir().join("npcs/stillwater_crossing.json"));
     let reed = npcs["records"]
         .as_array()
         .unwrap()
@@ -1022,10 +1000,15 @@ fn assert_reward_shape(record: &Value) {
 
 #[test]
 fn two_fishermen_fish_the_same_spot_independently() {
-    let mut first = Rig::new(FISHERMAN_PROFILE);
-    let mut second = Rig::new(FISHERMAN_PROFILE);
+    let mut first = Rig::new();
+    let mut second = Rig::new();
+    for rig in [&mut first, &mut second] {
+        rig.learn_fisherman();
+    }
     let first_coins = first.coins();
     let second_coins = second.coins();
+    let first_xp = first.fisherman_xp();
+    let second_xp = second.fisherman_xp();
     for rig in [&mut first, &mut second] {
         finish_learn_to_fish(rig);
         accept_testing_the_waters(rig);
@@ -1044,14 +1027,16 @@ fn two_fishermen_fish_the_same_spot_independently() {
     // The first player quits; the second still lands the same round.
     leave_round(&mut first, first_instance);
     assert_eq!(first.fishing_items(), 0);
-    let caught = second.send(&reel(), FISH_T0 + 2_420);
-    assert!(find(&caught, &[138, 0, 14, 0]).is_some());
+    let caught = second
+        .send_at(&reel(), FISH_T0 + 2_420)
+        .expect("reel accepted");
+    assert!(find(&caught.replies, &[138, 0, 14, 0]).is_some());
     assert_eq!(second.fishing_items(), 1);
     leave_round(&mut second, second_instance);
     assert_eq!(first.progress(TESTING_THE_WATERS).unwrap().counts, [0, 0]);
     assert_eq!(second.progress(TESTING_THE_WATERS).unwrap().counts, [1, 0]);
     assert_eq!(first.coins(), first_coins + 10);
     assert_eq!(second.coins(), second_coins + 10);
-    assert_eq!(first.fisherman_xp(), 25);
-    assert_eq!(second.fisherman_xp(), 35);
+    assert_eq!(first.fisherman_xp(), first_xp + 25);
+    assert_eq!(second.fisherman_xp(), second_xp + 35);
 }
