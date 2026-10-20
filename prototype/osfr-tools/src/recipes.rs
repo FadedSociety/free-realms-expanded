@@ -27,6 +27,19 @@ impl CraftingJob {
         }
     }
 
+    /// The filter column of the native recipe row. Proven by the preserved
+    /// `RecipeData` rows: Miner rows 4/5 carry 9, Chef rows 33-59 carry 10 and
+    /// Blacksmith rows 155/165 carry 12 (`PacketSendSelfToClient.json`; raw
+    /// bytes in `lab/references/rust-gateway-reference/0007-login.bin`, body
+    /// offset 189344). This is not the profile id (14/45/16).
+    pub const fn recipe_filter(self) -> u32 {
+        match self {
+            Self::Chef => 10,
+            Self::Blacksmith => 12,
+            Self::Miner => 9,
+        }
+    }
+
     /// (R) The opening tutorial station's local craft id for this job.
     pub const fn opening_recipe_id(self) -> u32 {
         match self {
@@ -240,10 +253,19 @@ impl RecipeCatalog {
         self.records.iter().find(|recipe| recipe.key == key)
     }
 
-    /// Encode learned records for the native recipe table. The client row has
-    /// no recovered policy fields for description, tint, membership or filter;
-    /// those values are local defaults (R). Missing pattern presentation falls
-    /// back to the output item so a learned row remains displayable.
+    /// Encode learned records for the native recipe table.
+    ///
+    /// `name_id`, `icon_id`, `tint_key` and `item_definition_id` describe the
+    /// crafted **product** and come from the recipe output. The preserved
+    /// `RecipeData` rows read by `0090a720` carry the product there (captured
+    /// recipe 4: name 104, icon 462, item 21785; recipe 51: name 38663, icon
+    /// 1006, item 21825). The pattern item is only a fallback when the output
+    /// presentation or catalogue row is unavailable, so a learned row stays
+    /// displayable. A future row field must state explicitly whether it carries
+    /// the product or the pattern.
+    ///
+    /// The client row has no recovered description, membership or `+0x1c`
+    /// policy fields; those values remain local defaults (R).
     pub fn wire_rows(
         &self,
         learned: &HashSet<u32>,
@@ -258,9 +280,19 @@ impl RecipeCatalog {
                 continue;
             };
             let presentation = inventory
-                .presentation(pattern_id)
-                .or_else(|_| inventory.presentation(recipe.output.definition_id))
+                .presentation(recipe.output.definition_id)
+                .or_else(|_| inventory.presentation(pattern_id))
                 .ok();
+            let output_id = u32::try_from(recipe.output.definition_id).unwrap_or(0);
+            // The captured row's final item word is the product id (reader
+            // 0090a720); the pattern id is only the fallback when the output
+            // has no catalogue row.
+            let item_definition_id =
+                if output_id > 0 && inventory.has_definition(recipe.output.definition_id) {
+                    output_id
+                } else {
+                    u32::try_from(pattern_id).unwrap_or(0)
+                };
             let components = recipe
                 .ingredients
                 .iter()
@@ -288,9 +320,9 @@ impl RecipeCatalog {
                     description_id: 0, // (R) Recipe description string mapping is unavailable.
                     unknown_1c: 0,
                     members_only: false,
-                    filter_type: recipe.job_profile_id as u32, // (R) Stable local filter mapping.
+                    filter_type: recipe.job.recipe_filter(),
                     components,
-                    item_definition_id: pattern_id as u32,
+                    item_definition_id,
                     passes_requirement: true,
                     unknown_2c: 0,
                 },
@@ -574,6 +606,9 @@ pub struct RecipeWireComponent {
     pub item_definition_id: u32,
 }
 
+/// One native `RecipeData` row. `name_id`, `icon_id`, `tint_key` and
+/// `item_definition_id` are the crafted **product's**; the pattern item only
+/// supplies a fallback presentation when the product is unavailable.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct RecipeWireRow {
     pub id: u32,
