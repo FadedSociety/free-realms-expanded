@@ -1,6 +1,7 @@
 //! Basic native hotbars from private, pinned community metadata.
 //! This presents one supported basic attack per combat job. Encounter damage,
 //! cooldowns and targeting remain reconstructed; original skills are not implied.
+use crate::power_ups::Slot as PowerUpSlot;
 use serde::Deserialize;
 use std::{
     collections::BTreeMap,
@@ -314,6 +315,20 @@ impl OpeningAbilities {
     /// Definitions precede their toolbar. Noncombat jobs receive eight empty
     /// slots so switching jobs clears the prior combat toolbar.
     pub fn activation(&self, profile_id: i32, level: u32) -> io::Result<Vec<Vec<u8>>> {
+        self.activation_with_power_up(profile_id, level, None)
+    }
+
+    /// `activation` with a held power-up on its own key slot
+    /// (`power_ups::SLOT`). The authored job row below it is not moved: the
+    /// client's bar shows the kind instead for as long as it is held, which is
+    /// the locale's "add super shield to bar" behavior, and the same row comes
+    /// back on the next activation once the kind is used.
+    pub fn activation_with_power_up(
+        &self,
+        profile_id: i32,
+        level: u32,
+        power_up: Option<&PowerUpSlot>,
+    ) -> io::Result<Vec<Vec<u8>>> {
         if profile_id <= 0 {
             return Err(invalid("invalid hotbar profile"));
         }
@@ -324,66 +339,59 @@ impl OpeningAbilities {
         if let Some(basic) = self.basics.get(&profile_id) {
             // The evidenced 36/13 definition is 160 bytes. All optional fields
             // are zero for the supported basic attack: no mana/aura/AoE effects.
-            let mut definition = vec![0; 160];
-            definition[..4].copy_from_slice(&[36, 0, 13, 0]);
-            for (offset, value) in [
-                (4, basic.definition_id),
-                (10, basic.name_id),
-                (14, basic.description_id),
-                (18, basic.icon_id),
-            ] {
-                definition[offset..offset + 4].copy_from_slice(&value.to_le_bytes());
-            }
-            replies.push(definition);
-            for value in [
-                3,
+            replies.push(definition(
+                basic.definition_id,
+                basic.name_id,
+                basic.description_id,
+                basic.icon_id,
+                0,
+            ));
+            ability_entry(
+                &mut toolbar,
                 basic.definition_id,
                 0,
                 basic.icon_id,
                 basic.weapon_name_id,
-                4,
-                0,
-                1,
-                basic.definition_id,
-                0,
-            ] {
-                put(&mut toolbar, value);
-            }
-            toolbar.push(1); // ForceDismount, as in the pinned CreateToolbarSlot.
-            for ability in self.job_bar(profile_id, level) {
+            );
+            for (index, ability) in self.job_bar(profile_id, level).into_iter().enumerate() {
+                if let Some(power_up) =
+                    power_up.filter(|_| index as i32 + 1 == crate::power_ups::SLOT)
+                {
+                    replies.push(definition(
+                        power_up.definition_id,
+                        power_up.name_id,
+                        0,
+                        power_up.icon_id,
+                        0,
+                    ));
+                    ability_entry(
+                        &mut toolbar,
+                        power_up.definition_id,
+                        0,
+                        power_up.icon_id,
+                        power_up.name_id,
+                    );
+                    continue;
+                }
                 let Some(ability) = ability else {
                     // Not learned yet: the slot stays empty (keys keep their order).
                     put(&mut toolbar, 0);
                     continue;
                 };
-                // 36/13 layout: id 4, name 10, description 14, icon 18, energy cost 50.
-                let mut definition = vec![0; 160];
-                definition[..4].copy_from_slice(&[36, 0, 13, 0]);
-                for (offset, value) in [
-                    (4, ability.definition_id),
-                    (10, ability.name_id),
-                    (14, ability.description_id),
-                    (18, ability.icon_id),
-                    (50, ability.energy_cost),
-                ] {
-                    definition[offset..offset + 4].copy_from_slice(&value.to_le_bytes());
-                }
-                replies.push(definition);
-                for value in [
-                    3,
+                replies.push(definition(
+                    ability.definition_id,
+                    ability.name_id,
+                    ability.description_id,
+                    ability.icon_id,
+                    ability.energy_cost,
+                ));
+                ability_entry(
+                    &mut toolbar,
                     ability.definition_id,
                     ability.energy_cost,
                     ability.icon_id,
                     ability.name_id,
-                    4,
-                    0,
-                    1,
-                    ability.definition_id,
-                    0,
-                ] {
-                    put(&mut toolbar, value);
-                }
-                toolbar.push(1);
+                );
             }
         } else {
             toolbar.extend([0; 32]);
@@ -391,4 +399,55 @@ impl OpeningAbilities {
         replies.push(toolbar);
         Ok(replies)
     }
+}
+
+/// The evidenced 160-byte 36/13 definition: id at 4, name at 10, description
+/// at 14, icon at 18 and energy cost at 50; optional fields stay zero.
+fn definition(
+    id: i32,
+    name_id: i32,
+    description_id: i32,
+    icon_id: i32,
+    energy_cost: i32,
+) -> Vec<u8> {
+    let mut definition = vec![0; 160];
+    definition[..4].copy_from_slice(&[36, 0, 13, 0]);
+    for (offset, value) in [
+        (4, id),
+        (10, name_id),
+        (14, description_id),
+        (18, icon_id),
+        (50, energy_cost),
+    ] {
+        definition[offset..offset + 4].copy_from_slice(&value.to_le_bytes());
+    }
+    definition
+}
+
+/// One type-3 toolbar entry, byte-for-byte the row the pinned
+/// `CreateToolbarSlot`/36/5 reader already accepts: type, definition id,
+/// energy cost, icon, name, then the self-cast selector pair (4, 0, 1) and the
+/// trailing ForceDismount byte.
+fn ability_entry(
+    toolbar: &mut Vec<u8>,
+    definition_id: i32,
+    energy_cost: i32,
+    icon_id: i32,
+    name_id: i32,
+) {
+    for value in [
+        3,
+        definition_id,
+        energy_cost,
+        icon_id,
+        name_id,
+        4,
+        0,
+        1,
+        definition_id,
+        0,
+    ] {
+        put(toolbar, value);
+    }
+    toolbar.push(1);
 }

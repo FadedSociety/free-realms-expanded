@@ -91,6 +91,32 @@ pub struct Pickup {
     pub source: String,
 }
 
+/// Zero-based job-toolbar index a held power-up occupies and the client sends
+/// when the player presses its key: the third slot, `ActionBarSlot3` (default
+/// `3`; binding table 0x1b4198c row 21 keysym 0x33). The regular-controller
+/// input dispatcher `00b02880` case 21 calls `DispatchActionBarSlot`
+/// `008a7eb0` with slot 2, and the `AbilityProcessor` sends 36/10 bar 1 slot 2
+/// (writer `00a342e0`). The client has no separate combat power-up input: the
+/// `UsePowerup` action (row 15, default Control_L) belongs to the demolition
+/// derby/minigame controllers and is never dispatched by `00b02880`. The
+/// locale dev note "power ups - add super shield to bar" makes the slot
+/// server-owned, so the held kind uses its own key here. (T222 research.)
+pub const SLOT: i32 = 2;
+
+/// Base of the synthetic 36/13 definition id a held kind is shown under,
+/// clear of the authored job definitions (3784..24097) the client also
+/// caches. (R) The original server's definition id is unrecovered.
+pub const DEFINITION_BASE: i32 = 90_000_000;
+
+/// One held kind as the client's own key slot needs it: the synthetic
+/// definition id, the client name id and the icon id.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct Slot {
+    pub definition_id: i32,
+    pub name_id: i32,
+    pub icon_id: i32,
+}
+
 /// Who shares a kill (R, W158 slice 2b): every player who dealt damage to the
 /// enemy within `window_ms` (or was its target) gets their own roll. When more
 /// than one player took part, each roll's chances are multiplied by
@@ -144,6 +170,18 @@ impl PowerUps {
 
     pub fn kind(&self, id: &str) -> Option<&Kind> {
         self.kinds.get(id)
+    }
+
+    /// The held kind's own key-slot record. `None` for an unknown id or a kind
+    /// that cannot be shown (validation requires a stored kind to carry a name
+    /// and icon, so an accepted file always resolves one).
+    pub fn slot(&self, id: &str) -> Option<Slot> {
+        let kind = self.kind(id)?;
+        Some(Slot {
+            definition_id: DEFINITION_BASE.checked_add(i32::try_from(kind.name_id?).ok()?)?,
+            name_id: i32::try_from(kind.name_id?).ok()?,
+            icon_id: i32::try_from(kind.icon_id?).ok()?,
+        })
     }
 
     /// How long after its last hit a player still shares a kill.
@@ -216,6 +254,13 @@ impl Kind {
             .is_none_or(|t| t.len() == TIERS && t.iter().all(|&x| in_range(x, 0.01, 1000.0)));
         self.model_id > 0
             && sourced(&self.source)
+            // A stored kind is shown on the client's key slot, so it needs a
+            // name and an icon; automatic kinds are applied at the pickup.
+            && (self.auto
+                || (self.name_id.is_some_and(|v| v > 0)
+                    && self.icon_id.is_some_and(|v| v > 0)))
+            && self.name_id.is_none_or(|v| i32::try_from(v).is_ok())
+            && self.icon_id.is_none_or(|v| i32::try_from(v).is_ok())
             && self.scale.is_none_or(|s| in_range(s, 0.25, 4.0))
             && self.heal_pct_max.is_none_or(|v| (1..=100).contains(&v))
             && self.energy.is_none_or(|v| (1..=100).contains(&v))

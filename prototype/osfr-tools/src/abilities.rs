@@ -917,7 +917,12 @@ fn build_respawn_window(window: RespawnWindow) -> Vec<u8> {
     bytes
 }
 
-fn build_effect_tag(tag_id: i32, duration_ms: u64, icon_id: i32, name_id: i32) -> Vec<u8> {
+pub(crate) fn build_effect_tag(
+    tag_id: i32,
+    duration_ms: u64,
+    icon_id: i32,
+    name_id: i32,
+) -> Vec<u8> {
     // Client family-38 dispatcher `009392c0`, sub 16 reader `008d8870` reads id plus tag blob.
     // The existing effect codec writes the 85-byte 38/16 row. Unknown tag members stay zero (R).
     let duration_seconds = duration_ms.saturating_add(999) / 1000; // (R) round up for client display

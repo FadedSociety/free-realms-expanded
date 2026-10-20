@@ -37,13 +37,7 @@ impl Gameplay {
                 if let Some(abilities) = self.abilities.as_mut() {
                     abilities.load_job_abilities(&path)?;
                     let profile = self.profiles.as_ref().unwrap().active();
-                    let level = self.job_level(profile);
-                    out.replies.extend(
-                        self.abilities
-                            .as_ref()
-                            .unwrap()
-                            .activation(profile, level)?,
-                    );
+                    out.replies.extend(self.ability_activation_for(profile)?);
                     done.push("job abilities");
                 }
             }

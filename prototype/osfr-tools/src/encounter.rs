@@ -20,6 +20,7 @@ use std::{
 };
 
 mod field;
+mod power_up_use;
 mod shared;
 mod skills;
 use self::field::Wander;

@@ -54,6 +54,7 @@ mod occupation;
 #[path = "restoration/piece_077.rs"]
 #[allow(dead_code)]
 mod piece_077;
+mod power_up_use;
 mod profile_outfit;
 /// Progress-driven achievement observation over authoritative gameplay state.
 mod progression;
@@ -461,17 +462,28 @@ impl Gameplay {
     ) -> io::Result<Outcome> {
         use crate::encounter::SharedFieldAction;
         let mut out = Outcome::default();
-        let Some(profiles) = &self.profiles else {
-            return Ok(out);
-        };
-        let profile = profiles.active();
-        let Some(abilities) = &self.abilities else {
+        let Some(profile) = self
+            .profiles
+            .as_ref()
+            .map(crate::profiles::Profiles::active)
+        else {
             return Ok(out);
         };
         let slot = match *action {
             SharedFieldAction::Ability { slot, .. } => Some(slot),
             SharedFieldAction::Select { choice: 103, .. } => Some(0),
             _ => None,
+        };
+        // T222: the held power-up owns its key slot on the shared field too.
+        if let Some(slot) = slot {
+            if let Some(outcome) =
+                self.use_power_up_request(slot, character, now_ms, Some(field))?
+            {
+                return Ok(outcome);
+            }
+        }
+        let Some(abilities) = &self.abilities else {
+            return Ok(out);
         };
         if let Some(slot) = slot {
             if !abilities.supports_basic(profile) {
@@ -1715,12 +1727,7 @@ impl Gameplay {
                 .unwrap()
                 .activation(profile, &self.inventory)?,
         );
-        out.replies.extend(
-            self.abilities
-                .as_ref()
-                .unwrap()
-                .activation(profile, self.job_level(profile))?,
-        );
+        out.replies.extend(self.ability_activation_for(profile)?);
         let result = self
             .opening
             .as_mut()
@@ -1980,6 +1987,10 @@ impl Gameplay {
             return Ok(out);
         }
         self.sync_field_quests(&mut out)?;
+        let held = self
+            .encounter
+            .as_ref()
+            .and_then(|e| e.held_power_up().map(str::to_owned));
         if let Some(encounter) = &mut self.encounter {
             // W158: pickups left in another zone are already gone from the client.
             encounter.enter_zone(character.zone_id);
@@ -1989,6 +2000,12 @@ impl Gameplay {
                 now_ms,
             )?;
             self.apply_encounter(result, &mut out)?;
+        }
+        // T222: a pickup or a stale-table clear changes the held kind, so the
+        // client bar must show the kind or the restored job slot at once.
+        if self.encounter.as_ref().and_then(|e| e.held_power_up()) != held.as_deref() {
+            let profile = self.profiles.as_ref().unwrap().active();
+            out.replies.extend(self.ability_activation_for(profile)?);
         }
         Ok(out)
     }
@@ -3017,10 +3034,10 @@ impl Gameplay {
                     .unwrap_or(0);
                 out.changed |= profiles.set_experience((level - 1) * 100);
                 out.replies.extend(profiles.experience_packets(previous));
-                if let Some(abilities) = self.abilities.as_ref() {
-                    if abilities.unlocks_between(profile, before, level) || level < before {
-                        out.replies.extend(abilities.activation(profile, level)?);
-                    }
+                if self.abilities.as_ref().is_some_and(|abilities| {
+                    abilities.unlocks_between(profile, before, level) || level < before
+                }) {
+                    out.replies.extend(self.ability_activation_for(profile)?);
                 }
                 self.sync_player_level(out);
                 self.refresh_npc_quest_eligibility(current_unix_seconds());
@@ -4679,12 +4696,7 @@ impl Gameplay {
                 .inventory
                 .profile_attachments(self.profiles.as_ref().unwrap().active())?;
             if let Some(changed) = self.stage_job_selection(id, &mut out)? {
-                out.replies.extend(
-                    self.abilities
-                        .as_ref()
-                        .unwrap()
-                        .activation(id, self.job_level(id))?,
-                );
+                out.replies.extend(self.ability_activation_for(id)?);
                 self.sync_player_level(&mut out);
                 self.opening_equipment_events(&mut out)?;
                 self.sync_world_stage(&mut out)?;
@@ -5047,11 +5059,7 @@ impl Gameplay {
         // job at this level resolve; any other id is silently dropped (no state change).
         if inner.starts_with(&[36, 0, 12, 0]) {
             let id = crate::abilities::parse_definition_request(inner)?;
-            let loaded = self
-                .abilities
-                .as_ref()
-                .unwrap()
-                .activation(active_profile, self.job_level(active_profile))?;
+            let loaded = self.ability_activation_for(active_profile)?;
             out.replies
                 .extend(crate::abilities::definition_reply(&loaded, id));
             return Ok(out);
@@ -5069,6 +5077,11 @@ impl Gameplay {
             let slot = i32::from_le_bytes(inner[8..12].try_into().unwrap());
             // Job abilities on slots 1.. (keys 2..): targeted (type 0) requests.
             if bar == 1 && slot >= 1 {
+                // T222: the held power-up owns its key slot; nothing held
+                // falls through to the job ability below.
+                if let Some(outcome) = self.use_power_up_request(slot, character, now_ms, None)? {
+                    return Ok(outcome);
+                }
                 let ability = self
                     .abilities
                     .as_ref()
@@ -5673,12 +5686,7 @@ impl Gameplay {
                 .select(43, &self.inventory)?;
             out.changed = true;
             out.replies.push(reply);
-            out.replies.extend(
-                self.abilities
-                    .as_ref()
-                    .unwrap()
-                    .activation(43, self.job_level(43))?,
-            );
+            out.replies.extend(self.ability_activation_for(43)?);
             out.replies
                 .push(chat::system("Switched to Brawler for the opening cave."));
             self.opening_equipment_events(out)?;
@@ -5852,12 +5860,7 @@ impl Gameplay {
             .as_ref()
             .is_some_and(|a| a.unlocks_between(profile, before, after))
         {
-            out.replies.extend(
-                self.abilities
-                    .as_ref()
-                    .unwrap()
-                    .activation(profile, after)?,
-            );
+            out.replies.extend(self.ability_activation_for(profile)?);
         }
         if after != before {
             self.sync_player_level(out);
