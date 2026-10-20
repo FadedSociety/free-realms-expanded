@@ -8,6 +8,9 @@
 mod cooking_movie;
 #[path = "common/forging_movie.rs"]
 mod forging_movie;
+#[allow(dead_code)] // Only the shared reply-text extractor is used here.
+#[path = "common/s6.rs"]
+mod s6;
 #[path = "common/station.rs"]
 mod station;
 
@@ -16,6 +19,7 @@ use osfr_tools::{
     gameplay::{Gameplay, GameplayState},
     gateway::{Gateway, GatewayOutcome},
     inventory::InventoryItem,
+    recipes::CraftingJob,
     smelting,
 };
 use serde_json::Value;
@@ -423,4 +427,54 @@ fn a_refused_world_station_request_changes_nothing() {
         assert_eq!(gateway.snapshot(), refused, "recipe {}", case.recipe);
         assert!(recipe_at(&gateway, case.craft).is_none());
     }
+}
+
+#[test]
+fn a_wrong_job_recipe_request_changes_nothing() {
+    // Chef recipe 70 at the cooking table while the active job is Miner, the
+    // gateway-level partner of `recipe_book_route` (which needs private
+    // content). The wrong-job refusal must not start a run or touch the save.
+    let case = &CASES[0];
+    let (gateway, content, reference) = gateway_at(case, case.station);
+    let mut state = gateway.snapshot().gameplay.unwrap();
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.active = CraftingJob::Miner.profile_id();
+    profiles.unlocked.insert(profiles.active);
+    let mut gateway = Gateway::load_gameplay(
+        &reference,
+        gateway.snapshot().character,
+        &content,
+        Some(state),
+    )
+    .unwrap();
+    login(&mut gateway);
+    let before = gateway.snapshot();
+    assert_eq!(
+        before
+            .gameplay
+            .as_ref()
+            .unwrap()
+            .profiles
+            .as_ref()
+            .unwrap()
+            .active,
+        CraftingJob::Miner.profile_id(),
+        "the fixture must be on a real wrong job"
+    );
+    let outcome = book_start(&mut gateway, case.recipe);
+    assert!(!outcome.state_changed && !outcome.gameplay_changed);
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "a wrong-job recipe request changes nothing"
+    );
+    assert!(
+        recipe_at(&gateway, case.craft).is_none(),
+        "the Chef recipe must not start on the Miner"
+    );
+    let chat = s6::chat_texts(&outcome.replies);
+    assert!(
+        chat.iter().any(|text| text.contains("Switch to Chef")),
+        "{chat:?}"
+    );
 }

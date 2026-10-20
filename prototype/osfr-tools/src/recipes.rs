@@ -125,6 +125,9 @@ pub struct Recipe {
     pub name: String,
     pub recipe_id: Option<u32>,
     pub candidate_recipe_id: Option<u32>,
+    /// The learned-pattern item the recipe row falls back to. When present it
+    /// must be a positive definition id (`validate_recipe`); `None` means the
+    /// recipe is never emitted as a wire row.
     pub recipe_item_definition_id: Option<i32>,
     pub job: CraftingJob,
     pub job_profile_id: i32,
@@ -443,12 +446,13 @@ fn validate_recipe(recipe: &Recipe, item_definitions: &HashSet<i32>) -> io::Resu
         || recipe.minigame_id.is_some_and(|id| id == 0)
         || recipe.recipe_id.is_some_and(|id| id == 0)
         || recipe.candidate_recipe_id.is_some_and(|id| id == 0)
+        || recipe.recipe_item_definition_id.is_some_and(|id| id <= 0)
         || recipe
             .required_job_rank
             .is_some_and(|rank| !(1..=20).contains(&rank))
     {
         return Err(invalid(format!(
-            "recipe {} has an invalid id, type, or job rank",
+            "recipe {} has an invalid id, pattern, type, or job rank",
             recipe.key
         )));
     }

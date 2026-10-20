@@ -385,3 +385,30 @@ fn recipe_schema_rejects_unknown_fields_and_dangling_items() {
     let _ = fs::remove_file(temp);
     assert!(result.is_err());
 }
+
+#[test]
+fn runtime_catalogue_rejects_a_non_positive_pattern_item_id() {
+    // `load_runtime` builds its item set from the recipe file itself, so a
+    // non-positive pattern id passes the item-reference check. It must be
+    // refused explicitly or `wire_rows` would emit item definition id 0.
+    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/recipes.json");
+    let raw = fs::read_to_string(&path).unwrap();
+    for invalid in ["0", "-1"] {
+        let mutated = raw.replacen(
+            "\"recipe_item_definition_id\": 848",
+            &format!("\"recipe_item_definition_id\": {invalid}"),
+            1,
+        );
+        assert_ne!(mutated, raw, "the fixture must carry pattern 848");
+        let directory =
+            std::env::temp_dir().join(format!("recipes-pattern-{}-{invalid}", std::process::id()));
+        fs::create_dir_all(&directory).unwrap();
+        fs::write(directory.join("recipes.json"), &mutated).unwrap();
+        let result = RecipeCatalog::load_runtime(&directory);
+        let _ = fs::remove_dir_all(&directory);
+        let error = result
+            .expect_err("a non-positive pattern item id must refuse to load")
+            .to_string();
+        assert!(error.contains("invalid id, pattern"), "{error}");
+    }
+}

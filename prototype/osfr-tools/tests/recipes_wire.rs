@@ -41,9 +41,13 @@ fn emitted_row(catalog: &RecipeCatalog, inventory: &Inventory, id: u32) -> Recip
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 
 /// A scratch copy of the catalogue fixture with the captured recipe-51 product
-/// definition merged in. Item 21825 is in the deployed item catalogue but not
-/// in the checked-in inventory fixture. The fixture copy uses the canonical
-/// `tests/common/content_copy.rs` helper.
+/// definition merged in. Item 21825 is absent from the checked-in
+/// `rust-opening-cooking-original-assets/inventory.json`; it is present in the
+/// 58,835-definition runtime catalogue at
+/// `lab/reports/round70-native-20261016T061000Z/content/item-catalogue.json`
+/// (SHA-256 `76394d874a5b1a89f8ff8778ca89675324eedfddeab8b23496e3d71dc35577e5`),
+/// which is outside this checkout, so the test merges the captured
+/// presentation. The fixture copy uses `tests/common/content_copy.rs`.
 struct CapturedProductContent(PathBuf);
 
 impl CapturedProductContent {
