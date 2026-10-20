@@ -21,7 +21,7 @@ keys too). It also counts source evidence ({kind, evidence} entries, source tags
 and "(R)" tags per file. Findings in *_unresolved.json files are warnings, not
 errors: those files hold candidates by design. Nothing is modified.
 
-Usage: python -I project/scripts/content_check.py [--client DIR] [--item-catalogue FILE] [--out FILE] [--strict]
+Usage: python -I project/scripts/content_check.py [--client DIR] [--content DIR] [--item-catalogue FILE] [--out FILE] [--strict]
 """
 import argparse
 import collections
@@ -42,7 +42,7 @@ DEFAULT_CLIENT = ROOT / "lab" / "runs" / "client-baseline-20261014T203930Z" / "c
 DEFAULT_OUT = PROJECT / "prototype" / "osfr-tools" / "studio" / "report.json"
 INVENTORY = ROOT / "lab" / "reports" / "kart-weapons-probe-v20-20261010" / "content" / "inventory.json"
 DEFAULT_ITEM_CATALOGUE = ROOT / "lab" / "reports" / "round70-native-20261016T061000Z" / "content" / "item-catalogue.json"
-DEFAULT_PROFILES = DEFAULT_ITEM_CATALOGUE.with_name("profiles.json")
+STARTER_ITEMS_FIXTURE = Path(__file__).resolve().parent / "fixtures" / "starter_items.json"
 LEGACY_RESOURCES = ROOT / "lab" / "references" / "FreeRealms-Legacy" / "src" / "Resources"
 
 MAX_PER_GROUP = 25        # findings kept per (severity, file, field, problem code)
@@ -332,13 +332,16 @@ def load_item_definitions(inventory_path, catalogue_path):
 
 
 def load_starter_item_ids(path):
-    """Every item id listed in any job profile's starter_items (F228)."""
+    """Every item id in a job profile's starter_items table (F228), or a committed fixture."""
     document = json.loads(Path(path).read_text(encoding="utf-8-sig"))
     rows = document.get("starter_items") if isinstance(document, dict) else None
-    if not isinstance(rows, dict):
-        raise ValueError("profiles.json has no starter_items object")
-    return {item for ids in rows.values() if isinstance(ids, list)
-            for item in ids if type(item) is int and item > 0}
+    if isinstance(rows, dict):
+        values = [item for ids in rows.values() if isinstance(ids, list) for item in ids]
+    elif isinstance(rows, list):
+        values = rows
+    else:
+        raise ValueError(f"{path} has no starter_items table")
+    return {item for item in values if type(item) is int and item > 0}
 
 
 def item_references(content_dir):
@@ -686,27 +689,52 @@ class Checker:
                               "field": field, "value": value, "problem": problem})
 
     def check_starter_sell_prices(self, starter_ids):
-        """F228: a job starter item is granted free, so its sell price must be 0."""
-        path = CONTENT / "stores.json"
-        if not path.is_file():
-            return
-        try:
-            rows = json.loads(path.read_text(encoding="utf-8")).get("items") or []
-        except (OSError, ValueError) as exc:
-            self.add("error", "json_invalid", "stores.json", "", "", None, f"cannot parse: {exc}")
-            return
-        for index, row in enumerate(rows):
-            if not isinstance(row, dict):
-                continue
-            item_id = row.get("item_id")
-            if type(item_id) is not int or item_id not in starter_ids:
-                continue
-            self.stats["starter_sell_price"] += 1
-            price = row.get("sell_price_coins")
-            if type(price) is int and price != 0:
-                self.add("error", "starter_item_sell_price", "stores.json",
-                         f"items[{index}].sell_price_coins", "sell_price_coins", price,
-                         f"job starter item {item_id} must sell for 0 coins")
+        """F228: a job starter item is granted free, so its store and vendor sell price is 0."""
+        stores = CONTENT / "stores.json"
+        if stores.is_file():
+            try:
+                rows = json.loads(stores.read_text(encoding="utf-8")).get("items") or []
+            except (OSError, ValueError) as exc:
+                self.add("error", "json_invalid", "stores.json", "", "", None,
+                         f"cannot parse: {exc}")
+                rows = []
+            for index, row in enumerate(rows):
+                if not isinstance(row, dict):
+                    continue
+                item_id = row.get("item_id")
+                if type(item_id) is not int or item_id not in starter_ids:
+                    continue
+                self.stats["starter_sell_price"] += 1
+                price = row.get("sell_price_coins")
+                if type(price) is int and price != 0:
+                    self.add("error", "starter_item_sell_price", "stores.json",
+                             f"items[{index}].sell_price_coins", "sell_price_coins", price,
+                             f"job starter item {item_id} must sell for 0 coins")
+        vendors = CONTENT / "vendors.json"
+        if vendors.is_file():
+            try:
+                records = json.loads(vendors.read_text(encoding="utf-8")).get("vendors") or []
+            except (OSError, ValueError) as exc:
+                self.add("error", "json_invalid", "vendors.json", "", "", None,
+                         f"cannot parse: {exc}")
+                records = []
+            for vendor_index, vendor in enumerate(records):
+                if not isinstance(vendor, dict):
+                    continue
+                for item_index, row in enumerate(vendor.get("items") or []):
+                    if not isinstance(row, dict):
+                        continue
+                    item_id = row.get("item_id")
+                    if type(item_id) is not int or item_id not in starter_ids:
+                        continue
+                    self.stats["starter_sell_price"] += 1
+                    price = row.get("sell_price_coins")
+                    if type(price) is int and price != 0:
+                        self.add("error", "starter_item_sell_price", "vendors.json",
+                                 f"vendors[{vendor_index}].items[{item_index}].sell_price_coins",
+                                 "sell_price_coins", price,
+                                 f"job starter item {item_id} (NPC {vendor.get('npc_id')}) "
+                                 "must sell for 0 coins")
 
     def text(self, value, table_hint=None):
         """-> (mode, text) with mode 'global' | 'raw' | None."""
@@ -1453,13 +1481,17 @@ def cap_findings(findings):
 
 
 def main():
+    global CONTENT
     ap = argparse.ArgumentParser(description=__doc__.split("\n")[0])
     ap.add_argument("--client", type=Path, default=DEFAULT_CLIENT, help="client install dir")
+    ap.add_argument("--content", type=Path, default=CONTENT,
+                    help="content directory to check (authored content or a play package)")
     ap.add_argument("--out", type=Path, default=DEFAULT_OUT, help="JSON report path")
     ap.add_argument("--item-catalogue", type=Path,
                     help="optional generated runtime item catalogue (defaults to the round70 play package when present)")
     ap.add_argument("--strict", action="store_true", help="exit 1 when errors exist")
     args = ap.parse_args()
+    CONTENT = args.content
     t0 = time.perf_counter()
 
     item_catalogue = args.item_catalogue
@@ -1479,7 +1511,7 @@ def main():
     checker.collect_ids(files)
     starter_profiles = CONTENT / "profiles.json"
     if not starter_profiles.is_file():
-        starter_profiles = DEFAULT_PROFILES
+        starter_profiles = STARTER_ITEMS_FIXTURE
     if starter_profiles.is_file():
         try:
             starter_ids = load_starter_item_ids(starter_profiles)
@@ -1491,8 +1523,9 @@ def main():
                                                "rows": len(starter_ids)}
             checker.check_starter_sell_prices(starter_ids)
     else:
-        checker.notes.append(f"no profiles.json ({DEFAULT_PROFILES}); starter sell-price "
-                             "check skipped")
+        checker.add("error", "starter_items_missing", "profiles.json",
+                    "starter_items", "starter_items", None,
+                    f"no profiles.json and no starter fixture ({STARTER_ITEMS_FIXTURE})")
     for rel, data in files:
         checker.check_file(rel, data)
     checker.finish()

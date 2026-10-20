@@ -574,7 +574,12 @@ impl Gameplay {
                         "reason": reason
                     }));
                 }
-                Ok(NpcSelection::Shop(window)) => {
+                Ok(NpcSelection::Shop(mut window)) => {
+                    // F228: the 66/42 window advertises the same resale price the Coin Shop
+                    // pays; a job starter item is free issuance, so show 0, not the raw row.
+                    if let Some(profiles) = &self.profiles {
+                        window.zero_starter_sell_prices(&profiles.all_starter_items());
+                    }
                     out.replies.push(
                         merchant_packet(&window)
                             .map_err(|_| invalid("NPC merchant list could not be encoded"))?,

@@ -152,12 +152,24 @@ impl StoreCatalogue {
     /// no sell price stays unsellable (`None`); the purchase price is unchanged.
     fn zero_starter_sell_prices(&mut self, starter_items: &BTreeSet<i32>) {
         for item in &mut self.items {
-            if starter_items.contains(&item.item_id)
-                && let Some(price) = item.sell_price_coins.as_mut()
-            {
-                *price = 0;
-            }
+            item.sell_price_coins =
+                starter_sell_price(item.item_id, item.sell_price_coins, starter_items);
         }
+    }
+}
+
+/// F228: a job starter outfit item is free issuance, so every copy resells for 0 wherever the
+/// player got it. The Coin Shop catalogue and the 66/42 merchant window both apply this one
+/// rule. A row with no sell price stays unsellable (`None`).
+pub fn starter_sell_price(
+    item_id: i32,
+    sell_price: Option<u32>,
+    starter_items: &BTreeSet<i32>,
+) -> Option<u32> {
+    if starter_items.contains(&item_id) {
+        sell_price.map(|_| 0)
+    } else {
+        sell_price
     }
 }
 
@@ -198,12 +210,15 @@ impl CoinShop {
         inventory: Inventory,
         mut catalogue: StoreCatalogue,
         bag_capacity: usize,
+        profiles: Option<&crate::profiles::Profiles>,
     ) -> io::Result<Self> {
         // F228: a starter outfit item is granted free whenever its job is learned or reselected,
-        // so the store pays 0 for it however the player got a copy. Purchase prices are untouched.
-        catalogue.zero_starter_sell_prices(&crate::profiles::Profiles::starter_items_in(
-            inventory_content,
-        )?);
+        // so the store pays 0 for it however the player got a copy. Reuse the session's loaded
+        // profiles: a second parse would also reject a package whose saved progression is valid
+        // but whose unused `default_state` is not. Purchase prices are untouched.
+        if let Some(profiles) = profiles {
+            catalogue.zero_starter_sell_prices(&profiles.all_starter_items());
+        }
         Ok(Self {
             inventory_content: inventory_content.to_path_buf(),
             inventory,

@@ -25,7 +25,7 @@ fn inventory_with_coins(directory: &Path, coins: u32) -> Inventory {
 
 fn shop(directory: &Path, inventory: Inventory, capacity: usize) -> CoinShop {
     let catalogue = StoreCatalogue::load(&catalogue_path()).expect("store catalogue loads");
-    CoinShop::new(directory, inventory, catalogue, capacity).expect("shop state loads")
+    CoinShop::new(directory, inventory, catalogue, capacity, None).expect("shop state loads")
 }
 
 fn count_definition(state: &InventoryState, definition_id: i32) -> u32 {

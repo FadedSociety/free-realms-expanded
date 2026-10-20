@@ -107,7 +107,7 @@ fn buying_each_ride_with_coins_grants_it() {
         state.coins = 1_000_000;
         let inventory = Inventory::load(&directory, Some(state)).expect("coins are valid");
         let store = StoreCatalogue::load(&content().join("stores.json")).expect("stores load");
-        let mut shop = CoinShop::new(&directory, inventory, store, usize::MAX).expect("shop");
+        let mut shop = CoinShop::new(&directory, inventory, store, usize::MAX, None).expect("shop");
         let bought = shop.buy_vendor(1, item, 1).expect("buy runs");
         assert_eq!(
             bought.result_code,

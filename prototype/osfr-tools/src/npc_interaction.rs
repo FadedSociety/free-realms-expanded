@@ -114,6 +114,21 @@ pub struct MerchantWindow {
     pub items: Vec<MerchantItem>,
 }
 
+impl MerchantWindow {
+    /// F228: a starter outfit item is free issuance, so the window advertises the same 0 the
+    /// Coin Shop pays rather than the raw reference row. A row with no sell price stays
+    /// unsellable (`None`).
+    pub fn zero_starter_sell_prices(&mut self, starter_items: &BTreeSet<i32>) {
+        for item in &mut self.items {
+            item.sell_price_coins = osfr_tools::coin_shop::starter_sell_price(
+                item.item_id,
+                item.sell_price_coins,
+                starter_items,
+            );
+        }
+    }
+}
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct DialogueContext {
     pub body_string_id: Option<u32>,

@@ -198,8 +198,9 @@ fn unequip_weapon(gateway: &mut Gateway) {
     );
 }
 
-/// Interact with the synthetic vendor and choose its Shop option (Talk is option 1).
-fn open_shop(gateway: &mut Gateway) {
+/// Interact with the synthetic vendor and choose its Shop option (Talk is option 1). Returns the
+/// 66/42 window as sent, so a test can read the advertised prices.
+fn open_shop(gateway: &mut Gateway) -> Vec<Vec<u8>> {
     let menu = request(gateway, &interact(VENDOR));
     assert!(
         menu.iter().any(|packet| packet.starts_with(&[26, 0, 9, 0])),
@@ -212,6 +213,25 @@ fn open_shop(gateway: &mut Gateway) {
             .any(|packet| packet.starts_with(&[66, 0, 42, 0])),
         "the vendor opened no shop window"
     );
+    opened
+}
+
+/// The 66/42 rows `00b29cd0`/`00b2e620` read: item id, purchase price and sell price in the
+/// first three entry dwords (semantic values are (R)).
+fn merchant_rows(replies: &[Vec<u8>]) -> Vec<(i32, u32, u32)> {
+    let packet = replies
+        .iter()
+        .find(|packet| packet.starts_with(&[66, 0, 42, 0]))
+        .expect("the shop window reply");
+    let word = |at: usize| u32::from_le_bytes(packet[at..at + 4].try_into().unwrap());
+    let count = word(32) as usize;
+    assert_eq!(packet.len(), 36 + count * 38, "66/42 must match its reader");
+    (0..count)
+        .map(|index| {
+            let at = 36 + index * 38;
+            (word(at) as i32, word(at + 4), word(at + 8))
+        })
+        .collect()
 }
 
 struct Fixture {
@@ -345,7 +365,19 @@ fn a_regranted_starter_weapon_sells_for_zero_and_a_normal_item_keeps_its_price()
         learned_bow
     );
 
-    open_shop(&mut gateway);
+    let shop_window = open_shop(&mut gateway);
+    // F228: the 66/42 window advertises the same resale price the sale pays. The fixture keeps
+    // the raw 375 in its synthetic stores.json, so only the shared starter rule can make this 0.
+    let rows = merchant_rows(&shop_window);
+    assert_eq!(rows.len(), 2, "both vendor items are listed: {rows:?}");
+    assert!(
+        rows.contains(&(STARTER_BOW, 10, 0)),
+        "the starter row must advertise 0, not {STARTER_SELL_PRICE}: {rows:?}"
+    );
+    assert!(
+        rows.contains(&(NORMAL_ITEM, 15, NORMAL_SELL_PRICE)),
+        "a non-starter keeps its advertised price: {rows:?}"
+    );
     // The equipped weapon is refused, and the refusal changes nothing (the shop stays open in
     // the canary below). A starter item is only sellable once it is off the body.
     let before_refusal = gateway.snapshot();
@@ -411,4 +443,26 @@ fn a_regranted_starter_weapon_sells_for_zero_and_a_normal_item_keeps_its_price()
         coins_before - 25 + NORMAL_SELL_PRICE
     );
     assert_eq!(count_definition(&inventory_of(&gateway), NORMAL_ITEM), 0);
+}
+
+/// F228 regression: the store rule reuses the session's already-loaded profiles. It used to
+/// parse `profiles.json` a second time with no saved state, so a package whose saved progression
+/// was valid but whose unused `default_state` was not failed at shop construction.
+#[test]
+fn a_saved_package_loads_with_an_invalid_unused_default_state() {
+    let fixture = Fixture::new();
+    let saved = Gameplay::load(&fixture.content, None)
+        .expect("the fixture's default state loads")
+        .state();
+    let path = fixture.content.join("profiles.json");
+    let mut document: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    document["default_state"]["active"] = json!(999_999);
+    fs::write(&path, serde_json::to_vec(&document).unwrap()).unwrap();
+    assert!(
+        Gameplay::load(&fixture.content, None).is_err(),
+        "canary: an invalid default_state must be refused when it is the state"
+    );
+    let loaded = Gameplay::load(&fixture.content, Some(saved))
+        .expect("a valid saved progression must load even when default_state is unused");
+    assert!(loaded.state().profiles.is_some());
 }

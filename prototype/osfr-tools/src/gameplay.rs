@@ -958,6 +958,7 @@ impl Gameplay {
                 inventory.clone(),
                 catalogue,
                 100,
+                profiles.as_ref(),
             )?)
         } else {
             None

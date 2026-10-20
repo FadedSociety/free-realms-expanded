@@ -196,7 +196,7 @@ impl Counter {
         tweak(&mut state);
         let inventory = Inventory::load(&directory, Some(state)).expect("test state is valid");
         let catalogue = StoreCatalogue::load(&content_dir().join("stores.json")).unwrap();
-        let shop = CoinShop::new(&directory, inventory, catalogue, usize::MAX).unwrap();
+        let shop = CoinShop::new(&directory, inventory, catalogue, usize::MAX, None).unwrap();
         let data = content_dir();
         let mut service =
             NpcInteraction::load(&data.join("npcs"), &data.join("stores.json")).unwrap();
@@ -881,7 +881,7 @@ fn buy_back_window_is_bounded_store_data() {
     });
     state.next_instance_id = Some(900_100);
     let inventory = Inventory::load(&inventory_path, Some(state)).unwrap();
-    let mut shop = CoinShop::new(&inventory_path, inventory, catalogue, usize::MAX).unwrap();
+    let mut shop = CoinShop::new(&inventory_path, inventory, catalogue, usize::MAX, None).unwrap();
     let ids: Vec<u32> = (0..4)
         .map(|_| shop.sell(900_030, 1).unwrap().transaction_id)
         .collect();

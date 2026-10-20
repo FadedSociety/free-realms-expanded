@@ -159,7 +159,7 @@ impl Counter {
         tweak(&mut state);
         let inventory = Inventory::load(&directory, Some(state)).expect("test state is valid");
         let catalogue = StoreCatalogue::load(&content_dir().join("stores.json")).unwrap();
-        let shop = CoinShop::new(&directory, inventory, catalogue, usize::MAX).unwrap();
+        let shop = CoinShop::new(&directory, inventory, catalogue, usize::MAX, None).unwrap();
         let data = content_dir();
         let mut service =
             NpcInteraction::load(&data.join("npcs"), &data.join("stores.json")).unwrap();
