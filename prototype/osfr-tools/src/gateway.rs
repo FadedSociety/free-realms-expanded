@@ -137,6 +137,9 @@ pub struct GatewayOutcome {
     /// W162's ride actor, its rider's attachment and their removal, and T027's live 35/6 equip
     /// change / 35/7 job switch.
     pub nearby: Vec<Vec<u8>>,
+    /// T199: `realm broadcast` text gameplay staged for one post-commit fanout to every
+    /// online chat session. Session-only: dropped when the transaction is refused or fails.
+    pub broadcast: Option<String>,
     /// Inner application payloads that passed the gateway parser, in request order.
     pub applications: Vec<Vec<u8>>,
     pub state_changed: bool,
@@ -1759,6 +1762,7 @@ impl Gateway {
                             && result.zoning.is_none()
                             && result.scene_zoning.is_none()
                             && result.shared_field.is_none()
+                            && result.broadcast.is_none()
                         {
                             // Known handlers may legitimately reply later (the
                             // social router runs after this); decided from the
@@ -1779,6 +1783,7 @@ impl Gateway {
                             }
                         }
                         outcome.shared_field = result.shared_field;
+                        outcome.broadcast = result.broadcast;
                         outcome.nearby.extend(result.nearby);
                         outcome.dev_command_denials += usize::from(result.dev_command_denied);
                         outcome.applications.push(inner.clone());

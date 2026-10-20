@@ -264,6 +264,9 @@ pub struct Outcome {
     /// attachment and their removal, and T027's live 35/6 equip change / 35/7 job switch. The
     /// gateway fans them out through the player registry's interest set.
     pub nearby: Vec<Vec<u8>>,
+    /// T199: a `realm broadcast` notice set by `realm broadcast <text>`. Session-only:
+    /// the gateway fans it out once after a successful commit and never saves it.
+    pub broadcast: Option<String>,
     /// W177: the saved top-level pet roster changed and must be written through its own
     /// `game_store` seam after the normal character snapshot commits.
     pub pets_changed: bool,
@@ -284,6 +287,7 @@ impl Outcome {
             relocation,
             group_heal,
             nearby,
+            broadcast,
             pets_changed,
         } = other;
         self.dev_command_denied |= dev_command_denied;
@@ -295,6 +299,7 @@ impl Outcome {
         self.relocation = relocation.or(self.relocation.take());
         self.group_heal = group_heal.or(self.group_heal.take());
         self.nearby.extend(nearby);
+        self.broadcast = broadcast.or(self.broadcast.take());
         self.pets_changed |= pets_changed;
     }
 }
@@ -4611,6 +4616,13 @@ impl Gameplay {
                 // Same byte offsets as `command` (ASCII lowercasing keeps lengths):
                 // literal names keep their case.
                 let raw = &text.trim()["realm ".len()..];
+                if tool && command.split_whitespace().next() == Some("broadcast") {
+                    match crate::world_notice::parse(raw) {
+                        Ok(text) => out.broadcast = Some(text.to_owned()),
+                        Err(error) => out.replies.push(chat::system(&error.to_string())),
+                    }
+                    return Ok(out);
+                }
                 if tool && self.developer_cheat(command, raw, character, now_ms, &mut out)? {
                     return Ok(out);
                 }
@@ -5956,6 +5968,14 @@ impl Gameplay {
         if let Some(text) = text {
             let lower = text.trim().to_ascii_lowercase();
             if let Some(command) = lower.strip_prefix("realm ") {
+                let raw = &text.trim()["realm ".len()..];
+                if command.split_whitespace().next() == Some("broadcast") {
+                    match crate::world_notice::parse(raw) {
+                        Ok(text) => out.broadcast = Some(text.to_owned()),
+                        Err(error) => out.replies.push(chat::system(&error.to_string())),
+                    }
+                    return Ok(out);
+                }
                 match command {
                     "help" => out.replies.push(chat::system("Local play: realm quest / realm quests / realm attack / realm respawn / realm race / realm status / realm inventory. Native inventory equip/unequip also works. Combat and checkpoint rules are reconstructed for this local build.")),
                     "attack" => {

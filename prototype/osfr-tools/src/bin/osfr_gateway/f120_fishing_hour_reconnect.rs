@@ -143,7 +143,8 @@ fn ledger(world: &SharedWorld, guid: u64) -> Vec<u64> {
 /// Drain the replies the real session has queued, acknowledging each reliable batch the way the
 /// client does so the sender window keeps draining. The regression must inspect the bytes the
 /// real dispatch produced, not only a probe clone's prediction (review finding 6).
-fn drain_replies(session: &mut Session, now: u64) -> Vec<Vec<u8>> {
+/// Also used by the T199 broadcast fanout test.
+pub(super) fn drain_replies(session: &mut Session, now: u64) -> Vec<Vec<u8>> {
     let mut messages = Vec::new();
     loop {
         let wires = session.sender.poll(now).unwrap();

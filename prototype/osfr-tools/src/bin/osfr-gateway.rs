@@ -32,6 +32,10 @@ use osfr_tools::studio;
 use osfr_tools::trade::{TradeMessage, TradeService, TradeSettlement};
 use osfr_tools::world::{NpcVisibility, World, WorldPose};
 
+#[path = "osfr_gateway/delivery.rs"]
+mod delivery;
+use delivery::{chat_error_delivery, wrap_application};
+
 /// Studio savestates sit next to the character save.
 fn savestate_dir(state_path: &std::path::Path) -> PathBuf {
     state_path
@@ -1911,7 +1915,7 @@ impl Session {
             let deliveries = staged_world.with_pets(deliveries);
             Ok((staged_world, deliveries, change, deferred))
         })();
-        let (staged_world, deliveries, change, deferred) = match prepared {
+        let (staged_world, mut deliveries, change, deferred) = match prepared {
             Ok(staged) => staged,
             // (R) A precommit transfer refusal keeps the live session/location/members.
             // Postcommit queue errors below still disconnect; they cannot roll back saves.
@@ -1934,6 +1938,9 @@ impl Session {
         }
         self.gateway = staged_gateway;
         *world = staged_world;
+        if let Some(text) = outcome.broadcast.take() {
+            deliveries.extend(delivery::broadcast_deliveries(&text, world));
+        }
         self.character_guid = self.gateway.state().guid;
         if outcome.state_changed {
             self.position_dirty = deferred;
@@ -2713,18 +2720,6 @@ fn queue_delivery(
     Ok(())
 }
 
-fn chat_error_delivery(error: social_chat::ChatError, recipient: SessionId) -> Vec<Delivery> {
-    error
-        .client_reply()
-        .map(|bytes| {
-            vec![Delivery {
-                recipient,
-                bytes: wrap_application(&bytes),
-            }]
-        })
-        .unwrap_or_default()
-}
-
 /// The character and whether it was added (true) or removed (false), for the registry's AddPc
 /// (35/1) and RemovePlayer (35/3) tunnel frames; `None` for every other delivery.
 fn rider_event(frame: &[u8]) -> Option<(u64, bool)> {
@@ -2738,13 +2733,6 @@ fn rider_event(frame: &[u8]) -> Option<(u64, bool)> {
         )),
         _ => None,
     }
-}
-
-fn wrap_application(inner: &[u8]) -> Vec<u8> {
-    let mut out = vec![5, 0, 1];
-    out.extend_from_slice(&(inner.len() as u32).to_le_bytes());
-    out.extend_from_slice(inner);
-    out
 }
 
 fn login_character_binding(message: &[u8]) -> io::Result<Option<(u64, String)>> {
@@ -4505,6 +4493,10 @@ mod tests;
 #[cfg(test)]
 #[path = "osfr_gateway/f120_fishing_hour_reconnect.rs"]
 mod f120_fishing_hour_reconnect;
+
+#[cfg(test)]
+#[path = "osfr_gateway/t199_world_notice.rs"]
+mod t199_world_notice;
 
 #[cfg(test)]
 #[path = "osfr_gateway/isolation.rs"]
