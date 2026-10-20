@@ -30,6 +30,11 @@ mod field_enemy_fixture;
 
 use field_enemy_fixture::{Fixture as EngineFixture, content_dir, content_path, spawned};
 
+#[path = "support/packets.rs"]
+mod packets;
+
+use packets::{carrier, count, packet};
+
 /// The four new actors in file order: GUID, authored level, spawn area and the
 /// byte-identical W102 centre they repeat.
 const HIGH: [(u64, u32, &str, [f32; 3]); 4] = [
@@ -406,38 +411,6 @@ fn kill(
         now_ms += 700;
     }
     panic!("field actor {target} did not die");
-}
-
-fn count(replies: &[Vec<u8>], family: u16, subtype: u16) -> usize {
-    replies
-        .iter()
-        .filter(|packet| {
-            packet.starts_with(&family.to_le_bytes()) && packet[2..4] == subtype.to_le_bytes()
-        })
-        .count()
-}
-
-/// The one reply of a family/subtype, asserted byte-for-byte.
-fn packet<'a>(replies: &'a [Vec<u8>], family: u16, subtype: u16) -> &'a [u8] {
-    replies
-        .iter()
-        .find(|packet| {
-            packet.starts_with(&family.to_le_bytes()) && packet[2..4] == subtype.to_le_bytes()
-        })
-        .unwrap_or_else(|| panic!("missing {family}/{subtype}"))
-}
-
-fn carrier(family: u16, subtype: u16, values: &[i32]) -> Vec<u8> {
-    let mut bytes = vec![
-        family as u8,
-        (family >> 8) as u8,
-        subtype as u8,
-        (subtype >> 8) as u8,
-    ];
-    for value in values {
-        bytes.extend(value.to_le_bytes());
-    }
-    bytes
 }
 
 fn bank(game: &Gameplay) -> (u32, BTreeMap<i32, u32>) {

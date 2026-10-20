@@ -2,9 +2,10 @@
 //!
 //! The session fixture, its private content copy, the saved-state reload, the
 //! NPC menu/dialogue/turn-in packets and the 49/x objective assertions all come
-//! from the canonical `tests/support/npc_quest_chain.rs` module. This file adds
-//! only the synthetic shared-field population, the sessions inside it and the
-//! shared-field requests.
+//! from the canonical `tests/support/npc_quest_chain.rs` module; the 38/x reply
+//! helpers (`count`, `packet`, `carrier`) come from `tests/support/packets.rs`.
+//! This file adds only the synthetic shared-field population, the sessions
+//! inside it and the shared-field requests.
 //!
 //! Every test drives a production seam: `Gameplay::handle_shared_field` (the
 //! request `Session::commit_outcome` runs), `Gameplay::tick_shared_effects` (the
@@ -17,6 +18,8 @@
 //! population shared by two sessions, as in `tests/shared_field_state.rs`.
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
+#[path = "support/packets.rs"]
+mod packets;
 
 use npc_quest_chain::{
     Fixture, character_at_for, content_dir, content_position, counts, finish_quest, has_family,
@@ -29,6 +32,7 @@ use osfr_tools::{
     gameplay::{Gameplay, GameplayState, Outcome},
     quest_engine::{CharacterEligibility, QuestEngine, QuestState, QuestStatus},
 };
+use packets::{carrier, count, packet};
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -195,20 +199,6 @@ fn attack(
     )
 }
 
-fn count(replies: &[Vec<u8>], family: u16, subtype: u16) -> usize {
-    replies
-        .iter()
-        .filter(|packet| has_family(packet, family, subtype, None))
-        .count()
-}
-
-fn packet(replies: &[Vec<u8>], family: u16, subtype: u16) -> Option<&[u8]> {
-    replies
-        .iter()
-        .find(|packet| has_family(packet, family, subtype, None))
-        .map(Vec::as_slice)
-}
-
 fn removes(replies: &[Vec<u8>], guid: u64) -> usize {
     replies
         .iter()
@@ -225,15 +215,6 @@ fn enemy_hp(replies: &[Vec<u8>], guid: u64) -> Option<u32> {
             && packet.get(4..12) == Some(guid.to_le_bytes().as_slice()))
         .then(|| u32::from_le_bytes(packet[12..16].try_into().unwrap()))
     })
-}
-
-/// 38/14 job row: profile, rank, progress, three zero fields (reader `008d86e0`).
-fn job_experience_packet(profile: i32, rank: i32, progress: i32) -> Vec<u8> {
-    let mut packet = vec![38, 0, 14, 0];
-    for value in [profile, rank, progress, 0, 0, 0] {
-        packet.extend(value.to_le_bytes());
-    }
-    packet
 }
 
 #[test]
@@ -305,14 +286,17 @@ fn a_shared_field_kill_credits_the_killer_quest_once() {
             .contains(&objective_activated_packet(QUEST, TALK_OBJECTIVE, 1)),
         "the completed kill goal activates the Talk objective"
     );
-    // Field-kill coin/XP rewards (T240) still ride the same outcome.
+    // Field-kill coin/XP rewards (T240) still ride the same outcome. 38/19 is
+    // one i32 balance; its client constructor `0x0089e670` reads one i32 after
+    // the header. 38/14 is profile, rank, progress and three zero fields
+    // (reader `0x008d86e0`).
     assert_eq!(
         packet(&fifth.replies, 38, 19),
-        Some([38_u8, 0, 19, 0, 10, 0, 0, 0].as_slice())
+        [38_u8, 0, 19, 0, 10, 0, 0, 0].as_slice()
     );
     assert_eq!(
         packet(&fifth.replies, 38, 14),
-        Some(job_experience_packet(BRAWLER, 1, 25).as_slice())
+        carrier(38, 14, &[BRAWLER, 1, 25, 0, 0, 0]).as_slice()
     );
     assert_eq!(opening_counts(&game), [1, 1, 5]);
 }

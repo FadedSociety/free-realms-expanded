@@ -27,6 +27,11 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "support/packets.rs"]
+mod packets;
+
+use packets::{carrier, count, packet};
+
 const ENEMY: u64 = 131000109001;
 const ENEMY_TWO: u64 = 131000109002;
 const LEVEL_ONE: i32 = 930108;
@@ -286,38 +291,6 @@ fn switch_job(
     let mut select = vec![26, 0, 13, 0];
     select.extend(profile.to_le_bytes());
     game.handle_in_world(&select, character, now_ms).unwrap()
-}
-
-fn count(replies: &[Vec<u8>], family: u16, subtype: u16) -> usize {
-    replies
-        .iter()
-        .filter(|packet| {
-            packet.starts_with(&family.to_le_bytes()) && packet[2..4] == subtype.to_le_bytes()
-        })
-        .count()
-}
-
-/// The one reply of a family/subtype; the tests assert its exact bytes.
-fn packet<'a>(replies: &'a [Vec<u8>], family: u16, subtype: u16) -> &'a [u8] {
-    replies
-        .iter()
-        .find(|packet| {
-            packet.starts_with(&family.to_le_bytes()) && packet[2..4] == subtype.to_le_bytes()
-        })
-        .unwrap_or_else(|| panic!("missing {family}/{subtype}"))
-}
-
-fn carrier(family: u16, subtype: u16, values: &[i32]) -> Vec<u8> {
-    let mut bytes = vec![
-        family as u8,
-        (family >> 8) as u8,
-        subtype as u8,
-        (subtype >> 8) as u8,
-    ];
-    for value in values {
-        bytes.extend(value.to_le_bytes());
-    }
-    bytes
 }
 
 fn bank(game: &Gameplay) -> (u32, BTreeMap<i32, u32>) {
