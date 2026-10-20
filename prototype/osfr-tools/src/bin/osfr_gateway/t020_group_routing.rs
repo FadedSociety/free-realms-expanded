@@ -150,6 +150,19 @@ pub(super) fn server_rig(name: &str) -> (Server, [SessionKey; 3], PathBuf) {
     (server, keys, scratch)
 }
 
+impl Server {
+    /// Test probe: the three session-keyed membership views that join/leave must move together.
+    /// Used by the socket test, which reaches the real `join_player` through login and transfer.
+    pub fn test_membership(&self, guid: u64) -> Option<(bool, bool, bool)> {
+        let id = *self.world.active_sessions.get(&guid)?;
+        Some((
+            self.world.joined.contains(&id),
+            self.world.players.contains(id),
+            self.world.chat_sessions.contains_key(&id),
+        ))
+    }
+}
+
 fn send(rig: &mut Rig, index: usize, packet: &[u8]) -> Vec<Delivery> {
     send_at(rig, index, packet, 1_000)
 }
@@ -691,23 +704,13 @@ fn disconnect_dissolves_the_party_and_clears_party_chat_for_the_survivor() {
 
 #[test]
 fn chat_identity_is_the_live_registry_row_through_join_leave_and_end_session() {
-    // `joined`, the chat member and the player row are seeded together (as `join_player`
-    // does); join/leave/end_session must keep all three in lockstep.
+    // The production join is covered through the real socket by
+    // `two_bot_socket_membership_and_transfer`; this test drives the leave and end-session
+    // halves of the same three-way invariant.
     let mut rig = rig("chat-identity");
-    for (index, session) in rig.sessions.iter().enumerate() {
-        assert!(rig.world.joined.contains(&session.id));
-        assert!(rig.world.players.contains(session.id));
-        let chat = rig
-            .world
-            .chat_session(session.id)
-            .expect("a joined session has a chat identity");
-        assert_eq!(chat.character_guid, GUIDS[index]);
-        assert_eq!(chat.name.first, NAMES[index]);
-        assert!(chat.is_member);
-        let player = rig.world.players.get(session.id).unwrap();
-        assert_eq!(chat.position, player.position);
-        assert_eq!(chat.zone_id, player.zone.zone_id);
-    }
+    assert!(rig.world.joined.contains(&rig.sessions[1].id));
+    assert!(rig.world.players.contains(rig.sessions[1].id));
+    assert!(rig.world.chat_session(rig.sessions[1].id).is_some());
     rig.world.leave_player(rig.sessions[1].id);
     assert!(!rig.world.joined.contains(&rig.sessions[1].id));
     assert!(!rig.world.players.contains(rig.sessions[1].id));
@@ -724,11 +727,13 @@ fn chat_identity_is_the_live_registry_row_through_join_leave_and_end_session() {
         server.world.chat_session(survivor).unwrap().name.first,
         NAMES[0]
     );
+    assert_eq!(server.test_membership(GUIDS[1]), Some((true, true, true)));
     let session = server.sessions.remove(&keys[1]).unwrap();
     server.end_session(keys[1], session, "test_identity");
     assert!(!server.world.joined.contains(&ended));
     assert!(!server.world.players.contains(ended));
     assert!(server.world.chat_session(ended).is_none());
+    assert_eq!(server.test_membership(GUIDS[0]), Some((true, true, true)));
     assert_eq!(
         server.world.chat_session(survivor).unwrap().name.first,
         NAMES[0]

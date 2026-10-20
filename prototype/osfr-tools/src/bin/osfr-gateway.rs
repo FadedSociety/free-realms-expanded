@@ -473,6 +473,7 @@ struct SharedWorld {
     social_paths: BTreeMap<u64, PathBuf>,
     session_keys: BTreeMap<SessionId, SessionKey>,
     active_sessions: BTreeMap<u64, SessionId>,
+    /// Lockstep: `joined` ⇔ player registry row ⇔ chat member; `join_player`/`leave_player` keep all three.
     joined: BTreeSet<SessionId>,
     chat_sessions: BTreeMap<SessionId, ChatMember>,
     chat_history: ChatHistory,

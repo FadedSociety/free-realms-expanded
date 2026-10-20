@@ -328,6 +328,16 @@ fn two_bot_socket_membership_and_transfer() {
     f.ready(101, &mut a, &mut b);
     b.send_message(&packet(10, &[]), "10").unwrap();
     let mut public = f.ready(202, &mut a, &mut b);
+    // The real socket join runs `SharedWorld::join_player`: `joined`, the player row and the
+    // chat member must appear together. A join that skips `joined` leaves the session looking
+    // unjoined, which diverges ride/chat/spawn from the registry.
+    for guid in [101, 202] {
+        assert_eq!(
+            f.host(move |s| s.test_membership(guid)),
+            Some((true, true, true)),
+            "real join membership for {guid}"
+        );
+    }
     settle(&mut a, &mut b, &mut public, |m| {
         actor_packets(&m[0], 1, 202) >= 1 && actor_packets(&m[1], 1, 101) >= 1
     });
@@ -348,6 +358,14 @@ fn two_bot_socket_membership_and_transfer() {
     collect(&mut a, &mut b, Duration::from_millis(500));
     f.host(move |s| s.test_transfer(202, i2, false)).unwrap();
     let mut isolated = f.ready(202, &mut a, &mut b);
+    // Both transfers ran `leave_player` and joined again; the three sets stay in lockstep.
+    for guid in [101, 202] {
+        assert_eq!(
+            f.host(move |s| s.test_membership(guid)),
+            Some((true, true, true)),
+            "post-transfer membership for {guid}"
+        );
+    }
     let tail = collect(&mut a, &mut b, Duration::from_millis(500));
     for i in 0..2 {
         isolated[i].extend(tail[i].clone());
@@ -431,7 +449,7 @@ fn two_bot_socket_membership_and_transfer() {
         });
         assert_chat(&messages[1], seq);
     }
-    let before = f.host(|s| s.test_location(202).unwrap());
+    let before = f.host(|s| (s.test_location(202).unwrap(), s.test_membership(202)));
     let save_path = f.root.join("characters/202.json");
     // B's move was a pose-only change; the gateway defers that save by up to POSITION_SAVE_MS
     // ((R), 5 s). Wait for that write first, so `saved` is the settled file and the byte
@@ -457,11 +475,20 @@ fn two_bot_socket_membership_and_transfer() {
     forged.push(1);
     b.send_message(&bot::wrap(&forged), "41/103").unwrap();
     collect(&mut a, &mut b, Duration::from_millis(500));
-    assert_eq!(before, f.host(|s| s.test_location(202).unwrap()));
+    assert_eq!(
+        before,
+        f.host(|s| (s.test_location(202).unwrap(), s.test_membership(202)))
+    );
     assert!(f.host(|s| s.test_transfer(202, -1, false)).is_err());
-    assert_eq!(before, f.host(|s| s.test_location(202).unwrap()));
+    assert_eq!(
+        before,
+        f.host(|s| (s.test_location(202).unwrap(), s.test_membership(202)))
+    );
     assert!(f.host(move |s| s.test_transfer(202, i1, true)).is_err());
-    assert_eq!(before, f.host(|s| s.test_location(202).unwrap()));
+    assert_eq!(
+        before,
+        f.host(|s| (s.test_location(202).unwrap(), s.test_membership(202)))
+    );
     assert_eq!(saved, fs::read(&save_path).unwrap());
     let rejected = collect(&mut a, &mut b, Duration::from_millis(500));
     assert!(
