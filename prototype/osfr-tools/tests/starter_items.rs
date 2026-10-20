@@ -335,7 +335,7 @@ impl Fixture {
         .unwrap();
         gateway.set_dev_tools(false);
         gateway.set_role(AccountRole::Player);
-        for packet in [login(), wrap(&[13, 0]), wrap(&[10, 0])] {
+        for packet in [login(1), wrap(&[13, 0]), wrap(&[10, 0])] {
             gateway.handle_at(&packet, NOW).unwrap();
         }
         gateway

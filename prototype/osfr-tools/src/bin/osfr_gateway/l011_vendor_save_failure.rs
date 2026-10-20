@@ -1,248 +1,46 @@
 //! L011 (Security Model S12/L8): a vendor purchase whose character save fails changes
 //! nothing and ends only that session. Test-only; no production code changes.
 //!
-//! Production path (read in `Session::commit_outcome`, `src/bin/osfr-gateway.rs:1686`):
-//! the 66/43 purchase runs on a cloned `Gateway`, then `save` runs at line 1936 BEFORE
-//! `self.gateway = staged_gateway` (line 1968) and `*world = staged_world` (line 1969).
-//! A save error returns `Err` from `commit_outcome`; `dispatch_message_inner` propagates
-//! it (`?` at line 1677), and `Server::step`'s `contain` error arm ends that one session
-//! (`step`, line 3747 -> `end_session`). The test writes no test-only hook: the next save
-//! targets a path under a file, exactly as `isolation.rs` and T199 break a save.
+//! Production path: `Session::commit_outcome` stages the whole 66/43 purchase on a cloned
+//! `Gateway` and a cloned `SharedWorld`, calls `save` on the staged snapshot, and only then
+//! installs the staged gateway/world (`self.gateway = staged_gateway`, `*world = staged_world`).
+//! A save error returns `Err` from `commit_outcome`; `dispatch_message_inner` propagates it
+//! with `?`, and `Server::step`'s `contain` error arm ends that one session through
+//! `end_session`. The test writes no test-only hook: the next save targets a path under a
+//! file, exactly as `isolation.rs` and T199 break a save.
 //!
-//! 66/43 request shape: client serializer `00b3ab20`; the gateway test helper in
-//! `tests/common/gateway_vendor.rs` encodes the same `MerchantBuyRequestV2` fields.
+//! 66/43 request shape: client serializer `00b3ab20`; the shared vendor helpers in
+//! `tests/common/gateway_vendor.rs` encode the same `MerchantBuyRequestV2` fields. The
+//! content pack, prices and starting state are the shared `tests/common/vendor_fixture.rs`.
 
 use super::test_support::{self, Scratch};
 use super::*;
-use osfr_tools::{
-    character_store::CharacterState,
-    game_store::Snapshot,
-    gameplay::{Gameplay, GameplayState},
-    inventory::{InventoryItem, InventoryState},
-    npc_interaction::{MerchantBuyRequestV2, NpcAction, NpcInteraction, encode_merchant_buy_66_43},
+use osfr_tools::{character_store::CharacterState, game_store::Snapshot, gameplay::GameplayState};
+
+// The shared test kit: this host uses a subset of its helpers.
+#[allow(dead_code)]
+#[path = "../../../tests/common/gateway_vendor.rs"]
+mod gateway_vendor;
+#[allow(dead_code)]
+#[path = "../../../tests/common/vendor_fixture.rs"]
+mod vendor_fixture;
+
+use gateway_vendor::{
+    count_definition, interact, login, merchant_status, select, sell_packet, vendor_buy_packet,
 };
+use vendor_fixture::{REPRESENTATIVE_ITEM, REPRESENTATIVE_VENDOR, SEEDED_ITEM, VendorFixture};
 
-#[path = "../../../tests/common/gateway_packets.rs"]
-mod gateway_packets;
-use gateway_packets::{interact, select};
-
-/// The shipped representative selected-hub vendor and new stock row used by
-/// `tests/common/vendor_purchase.rs`.
-const REPRESENTATIVE_VENDOR: u64 = 9_500_000_045;
-const REPRESENTATIVE_ITEM: i32 = 76_427;
-/// The fixture's seeded pre-login item, sold then bought back around the failed purchase.
-const SEEDED_ITEM: i32 = 75_060;
 const BUY_TRANSACTION: u32 = 108_901;
 
-/// A content pack with one real vendor, built the way `tests/common/vendor_purchase.rs`
-/// builds `w178-vendor-gateway`; only the NPC's zone/position moves to zone 0.
-struct VendorFixture {
-    scratch: Scratch,
-    content: PathBuf,
-    reference: PathBuf,
-    zone: u32,
-    position: [f32; 3],
-    option: u32,
-    price: u32,
-    sell_price: u32,
-}
-
-impl VendorFixture {
-    fn new(tag: &str) -> Self {
-        let scratch = Scratch::new(tag);
-        let lab = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
-        let reference = lab.join("references/rust-gateway-reference");
-        let source = lab.join("reports/round70-native-20261016T061000Z/content");
-        let data = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
-        let content = scratch.path().join("content");
-        fs::create_dir_all(content.join("npcs")).expect("fixture content creates");
-        for file in [
-            "inventory.json",
-            "quests.json",
-            "quest-journal.bin",
-            "combat.json",
-            "combat-template.bin",
-            "categories.json",
-        ] {
-            fs::copy(source.join(file), content.join(file))
-                .unwrap_or_else(|error| panic!("fixture {file} copies: {error}"));
-        }
-        if fs::hard_link(
-            source.join("item-catalogue.json"),
-            content.join("item-catalogue.json"),
-        )
-        .is_err()
-        {
-            fs::copy(
-                source.join("item-catalogue.json"),
-                content.join("item-catalogue.json"),
-            )
-            .expect("item catalogue copies");
-        }
-        for file in ["stores.json", "zones.json"] {
-            fs::copy(data.join(file), content.join(file))
-                .unwrap_or_else(|error| panic!("fixture {file} copies: {error}"));
-        }
-
-        let vendors = read_json(&data.join("vendors.json"));
-        let vendor = vendors["vendors"]
-            .as_array()
-            .expect("vendor records are an array")
-            .iter()
-            .find(|vendor| vendor["npc_id"].as_u64() == Some(REPRESENTATIVE_VENDOR))
-            .expect("the representative vendor exists")
-            .clone();
-        fs::write(
-            content.join("vendors.json"),
-            serde_json::to_vec(&json!({"schema_version": 1, "vendors": [vendor]}))
-                .expect("fixture vendors serialize"),
-        )
-        .expect("fixture vendors write");
-
-        let npcs = read_json(&data.join("npcs/blackspore_swamp.json"));
-        let mut npc = npcs["records"]
-            .as_array()
-            .expect("NPC records are an array")
-            .iter()
-            .find(|npc| npc["npc_id"].as_u64() == Some(REPRESENTATIVE_VENDOR))
-            .expect("the representative NPC exists")
-            .clone();
-        npc["zone_id"] = json!(0);
-        npc["zone"] = json!("FabledRealms");
-        npc["position"] = json!([0.0, 0.0, 0.0]);
-        npc["heading"] = json!(0.0);
-        npc["placement"] = json!("legacy_data");
-        fs::write(
-            content.join("npcs/melninster.json"),
-            serde_json::to_vec(&json!({"schema_version": 1, "records": [npc]}))
-                .expect("fixture NPC serializes"),
-        )
-        .expect("fixture NPC writes");
-        fs::write(
-            content.join("npc_spawns_extra.json"),
-            br#"{"schema_version":1,"records":[]}"#,
-        )
-        .expect("fixture spawn overlay writes");
-
-        let mut service = NpcInteraction::load(&content.join("npcs"), &content.join("stores.json"))
-            .expect("fixture NPC content loads");
-        let (zone, position) = service
-            .location(REPRESENTATIVE_VENDOR)
-            .expect("the representative vendor has a location");
-        let menu = service
-            .interact(REPRESENTATIVE_VENDOR, zone, position, None)
-            .expect("the representative vendor opens");
-        let option = u32::try_from(
-            menu.options
-                .iter()
-                .find(|option| option.action == NpcAction::Shop)
-                .expect("the representative vendor exposes a shop option")
-                .id,
-        )
-        .expect("the shop option id fits the client field");
-        let price = store_price(
-            &data.join("stores.json"),
-            REPRESENTATIVE_ITEM,
-            "purchase_price_coins",
-        );
-        let sell_price = store_price(&data.join("stores.json"), SEEDED_ITEM, "sell_price_coins");
-        Self {
-            scratch,
-            content,
-            reference,
-            zone,
-            position,
-            option,
-            price,
-            sell_price,
-        }
-    }
-
-    fn character(&self) -> CharacterState {
-        let mut character =
-            Gateway::reference_state(&self.reference).expect("reference character loads");
-        character.zone_id = self.zone;
-        character.position = self.position;
-        character.rotation = [0.0; 3];
-        character
-    }
-
-    fn state(&self) -> GameplayState {
-        let mut state = Gameplay::load(&self.content, None)
-            .expect("fixture gameplay content loads")
-            .state();
-        state.inventory.items.clear();
-        for entry in &mut state.inventory.equipment {
-            entry.item_id = 0;
-        }
-        state.inventory.coins = self.price + 1_000;
-        state.inventory.items.push(InventoryItem {
-            definition_id: SEEDED_ITEM,
-            tint: 0,
-            id: 1,
-            count: 1,
-            consumed_count: 0,
-            stored_count: 0,
-            last_cast_time: 0,
-            rental: None,
-            ability_count: 0,
-            activate_enabled: false,
-        });
-        state.inventory.next_instance_id = Some(2);
-        state
-    }
-
-    fn save(&self, path: &Path, character: &CharacterState, gameplay: &GameplayState) {
-        osfr_tools::game_store::save(
-            path,
-            &Snapshot {
-                character: character.clone(),
-                gameplay: Some(gameplay.clone()),
-            },
-        )
-        .expect("fixture save writes");
-    }
-}
-
-fn read_json(path: &Path) -> serde_json::Value {
-    serde_json::from_slice(&fs::read(path).expect("content file reads"))
-        .unwrap_or_else(|error| panic!("{} parses: {error}", path.display()))
-}
-
-/// The authoritative Coin price for `item` from `stores.json` (`purchase_price_coins`
-/// or `sell_price_coins`).
-fn store_price(stores: &Path, item: i32, field: &str) -> u32 {
-    let document = read_json(stores);
-    let price = document["items"]
-        .as_array()
-        .expect("store items are an array")
-        .iter()
-        .find(|row| row["item_id"].as_i64() == Some(i64::from(item)))
-        .and_then(|row| row[field].as_u64())
-        .unwrap_or_else(|| panic!("item {item} has {field}"));
-    u32::try_from(price).expect("the store price fits a Coin balance")
-}
-
-fn vendor_buy() -> Vec<u8> {
-    // Client serializer 00b3ab20; the same library encoder is byte-pinned by
-    // `vendor_stock_coverage::vendor_buy_wire_matches_the_client_reader_layout`.
-    encode_merchant_buy_66_43(&MerchantBuyRequestV2 {
-        initial_dwords: [REPRESENTATIVE_ITEM as u32, 0],
-        context_dwords: [0; 3],
-        context_bytes: Vec::new(),
-        trailing_dwords: [1, 0, BUY_TRANSACTION],
-    })
-    .expect("66/43 request encodes")
-}
-
-/// 165/5 body (client 00c75a70 / 00c76dd0): u64 merchant (0 = the open shop) +
-/// u32 item instance + u32 quantity.
-fn sell(instance: i32) -> Vec<u8> {
-    let mut packet = vec![165, 0, 5, 0];
-    packet.extend(0u64.to_le_bytes());
-    packet.extend(instance.to_le_bytes());
-    packet.extend(1u32.to_le_bytes());
-    packet
+fn save_character(path: &Path, character: &CharacterState, gameplay: &GameplayState) {
+    osfr_tools::game_store::save(
+        path,
+        &Snapshot {
+            character: character.clone(),
+            gameplay: Some(gameplay.clone()),
+        },
+    )
+    .expect("fixture save writes");
 }
 
 /// 165/12 body (client 00c76600): the sale transaction id plus a context dword.
@@ -253,36 +51,10 @@ fn buy_back(transaction: u32) -> Vec<u8> {
     packet
 }
 
-fn count_definition(state: &InventoryState, definition_id: i32) -> u32 {
-    state
-        .items
-        .iter()
-        .filter(|item| item.definition_id == definition_id)
-        .map(|item| item.count)
-        .sum()
-}
-
-/// The client's synthetic login body: u16 count, three length-prefixed strings, the
-/// account guid after the ticket.
-fn login(guid: u64) -> Vec<u8> {
-    let mut bytes = 1u16.to_le_bytes().to_vec();
-    for (index, text) in ["l011-synthetic-ticket", "1.910.1.530630", ""]
-        .iter()
-        .enumerate()
-    {
-        bytes.extend((text.len() as u32).to_le_bytes());
-        bytes.extend(text.as_bytes());
-        if index == 0 {
-            bytes.extend(guid.to_le_bytes());
-        }
-    }
-    bytes
-}
-
 fn options(fixture: &VendorFixture, state: PathBuf) -> Options {
     let mut options = test_support::options(state);
-    options.reference = fixture.reference.clone();
-    options.content = Some(fixture.content.clone());
+    options.reference = fixture.reference().to_owned();
+    options.content = Some(fixture.content().to_owned());
     options.dev_tools = false;
     options
 }
@@ -362,8 +134,12 @@ impl Scene {
     fn open_shop(&mut self, fixture: &VendorFixture, options: &Options, now: u64) {
         self.send(options, &interact(REPRESENTATIVE_VENDOR), now)
             .expect("vendor interaction handles");
-        self.send(options, &select(REPRESENTATIVE_VENDOR, fixture.option), now)
-            .expect("shop selection handles");
+        self.send(
+            options,
+            &select(REPRESENTATIVE_VENDOR, fixture.option()),
+            now,
+        )
+        .expect("shop selection handles");
         let replies = self.drain(now);
         assert!(
             replies
@@ -390,17 +166,22 @@ impl Scene {
 
 #[test]
 fn a_failed_vendor_save_changes_nothing_and_preserves_buy_back_state() {
-    let fixture = VendorFixture::new("l011-failed-save");
-    let options = options(&fixture, fixture.scratch.path().join("character.json"));
+    let scratch = Scratch::new("l011-failed-save");
+    let fixture = VendorFixture::new(scratch.path(), "content");
+    let options = options(&fixture, scratch.state());
     let character = fixture.character();
-    fixture.save(&options.state, &character, &fixture.state());
+    save_character(
+        &options.state,
+        &character,
+        &fixture.state(fixture.price() + 1_000, false),
+    );
     let mut scene = Scene::new(&options, 81);
     scene.enter(&options, 1_000);
     scene.open_shop(&fixture, &options, 1_100);
 
     // Seed the Coin Shop's buy-back window with a real 165/5 sale.
     scene
-        .send(&options, &sell(1), 1_200)
+        .send(&options, &sell_packet(0, 1, 1), 1_200)
         .expect("the seeded sale handles");
     let sold = scene.drain(1_200);
     let transaction = sold
@@ -427,7 +208,7 @@ fn a_failed_vendor_save_changes_nothing_and_preserves_buy_back_state() {
         .clone();
     assert_eq!(
         before_inventory.coins,
-        fixture.price + 1_000 + fixture.sell_price,
+        fixture.price() + 1_000 + fixture.sell_price(),
         "fixture setup: the sale paid its price"
     );
     assert_eq!(count_definition(&before_inventory, SEEDED_ITEM), 0);
@@ -436,7 +217,11 @@ fn a_failed_vendor_save_changes_nothing_and_preserves_buy_back_state() {
 
     // Check 1: the purchase transaction fails when its save cannot be written.
     let error = scene
-        .send(&options, &vendor_buy(), 1_300)
+        .send(
+            &options,
+            &vendor_buy_packet(BUY_TRANSACTION, REPRESENTATIVE_ITEM, 1),
+            1_300,
+        )
         .expect_err("a vendor purchase with a failed save must not commit");
     assert!(
         error.contains("os error"),
@@ -450,8 +235,8 @@ fn a_failed_vendor_save_changes_nothing_and_preserves_buy_back_state() {
     scene.repair_save(&options.state);
 
     // Check 2: the in-memory character is unchanged. `snapshot()` carries the character
-    // pose and the inventory; the session-only Coin Shop buy-back window is not part of
-    // that type, so the buy-back probe at the end of this test covers it behaviourally.
+    // pose and the inventory; the session-only Coin Shop idempotency cache is not part of
+    // that type, so the retry below proves it behaviourally.
     assert_eq!(
         scene.snapshot(),
         before,
@@ -479,10 +264,46 @@ fn a_failed_vendor_save_changes_nothing_and_preserves_buy_back_state() {
         "a failed purchase wrote the character save"
     );
 
+    // Check 4: the same 66/43 transaction is not cached as a success. A regression that
+    // installs the staged Coin Shop before the save error is handled would answer this
+    // retry from `vendor_transactions` without charging or granting.
+    scene
+        .send(
+            &options,
+            &vendor_buy_packet(BUY_TRANSACTION, REPRESENTATIVE_ITEM, 1),
+            1_400,
+        )
+        .expect("the same transaction must commit once the save is writable");
+    let retried = scene.drain(1_400);
+    let completion = retried
+        .iter()
+        .find(|packet| packet[7..].starts_with(&[66, 0, 44, 0]))
+        .expect("the retried purchase answers 66/44");
+    assert_eq!(
+        merchant_status(&completion[7..]),
+        1,
+        "the retried purchase was served as a refusal"
+    );
+    let committed = scene
+        .snapshot()
+        .gameplay
+        .expect("committed gameplay exists")
+        .inventory;
+    assert_eq!(
+        committed.coins,
+        before_inventory.coins - fixture.price(),
+        "the retried purchase was served from the failed transaction's cache"
+    );
+    assert_eq!(
+        count_definition(&committed, REPRESENTATIVE_ITEM),
+        count_definition(&before_inventory, REPRESENTATIVE_ITEM) + 1,
+        "the retried purchase did not grant the item"
+    );
+
     // The buy-back window is part of the same staged Coin Shop state: the sale record
     // survives with the same id and price, and the shop still serves its open session.
     scene
-        .send(&options, &buy_back(transaction), 1_400)
+        .send(&options, &buy_back(transaction), 1_500)
         .expect("the buy-back handles after the failed purchase");
     let after_buy_back = scene
         .snapshot()
@@ -491,7 +312,7 @@ fn a_failed_vendor_save_changes_nothing_and_preserves_buy_back_state() {
         .inventory;
     assert_eq!(
         after_buy_back.coins,
-        before_inventory.coins - fixture.sell_price,
+        before_inventory.coins - fixture.price() - fixture.sell_price(),
         "the failed purchase consumed or repriced the buy-back sale"
     );
     assert_eq!(
@@ -503,10 +324,15 @@ fn a_failed_vendor_save_changes_nothing_and_preserves_buy_back_state() {
 
 #[test]
 fn control_a_working_save_commits_the_same_purchase() {
-    let fixture = VendorFixture::new("l011-control");
-    let options = options(&fixture, fixture.scratch.path().join("character.json"));
+    let scratch = Scratch::new("l011-control");
+    let fixture = VendorFixture::new(scratch.path(), "content");
+    let options = options(&fixture, scratch.state());
     let character = fixture.character();
-    fixture.save(&options.state, &character, &fixture.state());
+    save_character(
+        &options.state,
+        &character,
+        &fixture.state(fixture.price() + 1_000, false),
+    );
     let mut scene = Scene::new(&options, 82);
     scene.enter(&options, 1_000);
     scene.open_shop(&fixture, &options, 1_100);
@@ -520,7 +346,11 @@ fn control_a_working_save_commits_the_same_purchase() {
         .clone();
     let good_save = fs::read(&options.state).expect("the good save is readable");
     scene
-        .send(&options, &vendor_buy(), 1_200)
+        .send(
+            &options,
+            &vendor_buy_packet(BUY_TRANSACTION, REPRESENTATIVE_ITEM, 1),
+            1_200,
+        )
         .expect("a vendor purchase with a working save commits");
     let after = scene.snapshot();
     let after_inventory = after
@@ -531,7 +361,7 @@ fn control_a_working_save_commits_the_same_purchase() {
         .clone();
     assert_eq!(
         after_inventory.coins,
-        before_inventory.coins - fixture.price,
+        before_inventory.coins - fixture.price(),
         "the control purchase did not spend the authoritative price"
     );
     assert_eq!(
@@ -546,11 +376,12 @@ fn control_a_working_save_commits_the_same_purchase() {
     );
 }
 
-/// Assertion 4: the save failure inside `Server::step` ends only that session, and the
-/// shared world keeps no ghost row for it.
+/// Assertion 5: the save failure inside `Server::step` ends only that session, the victim
+/// leaves no world or membership row, and the surviving sessions still answer a datagram.
 #[test]
 fn a_failed_vendor_save_ends_only_that_session() {
-    let fixture = VendorFixture::new("l011-server");
+    let scratch = Scratch::new("l011-server");
+    let fixture = VendorFixture::new(scratch.path(), "content");
     let (mut server, keys, server_scratch) = super::super::t020_group_routing::server_rig("l011");
     let victim_id = server.sessions[&keys[0]].id;
     let victim_guid = server.sessions[&keys[0]].character_guid;
@@ -558,41 +389,18 @@ fn a_failed_vendor_save_ends_only_that_session() {
     // The vendor character reuses the seeded world row's guid.
     let mut character = fixture.character();
     character.guid = victim_guid;
-    let gameplay = fixture.state();
-    let save_path = fixture.scratch.path().join("character.json");
-    fixture.save(&save_path, &character, &gameplay);
+    let save_path = scratch.state();
+    let gameplay = fixture.state(fixture.price() + 1_000, false);
+    save_character(&save_path, &character, &gameplay);
     let mut gateway = Gateway::load_gameplay(
         &server.options.reference,
         character,
-        &fixture.content,
+        fixture.content(),
         Some(gameplay),
     )
     .expect("vendor gateway loads");
     gateway.set_dev_tools(false);
     gateway.set_role(osfr_tools::account_store::AccountRole::Player);
-    for (index, message) in [
-        login(victim_guid),
-        wrap(&[13, 0]),
-        wrap(&[10, 0]),
-        wrap(&interact(REPRESENTATIVE_VENDOR)),
-    ]
-    .into_iter()
-    .enumerate()
-    {
-        gateway
-            .handle_at(&message, 1_000 + index as u64)
-            .expect("vendor handshake handles");
-    }
-    let opened = gateway
-        .handle_at(&wrap(&select(REPRESENTATIVE_VENDOR, fixture.option)), 1_004)
-        .expect("the shop selection handles");
-    assert!(
-        opened
-            .replies
-            .iter()
-            .any(|packet| packet[7..].starts_with(&[66, 0, 42, 0])),
-        "the vendor shop did not open on the real gateway"
-    );
 
     // A real client socket at the session's peer address; the buy arrives over UDP.
     let client = UdpSocket::bind("127.0.0.1:0").expect("client socket binds");
@@ -607,6 +415,51 @@ fn a_failed_vendor_save_ends_only_that_session() {
         peer: victim.peer,
         connection_id: victim.request.id,
     };
+    // Handshake through the production dispatch: the committed login/Ready/Loaded is what
+    // registers the victim's membership row that `end_session` must remove.
+    for (index, message) in [login(victim_guid), wrap(&[13, 0]), wrap(&[10, 0])]
+        .into_iter()
+        .enumerate()
+    {
+        victim
+            .dispatch_message(
+                &message,
+                &server.options,
+                1_000 + index as u64,
+                &mut server.world,
+                &mut server.membership,
+                &mut server.sessions,
+                None,
+            )
+            .expect("the victim handshake handles");
+    }
+    assert_eq!(
+        victim.character_guid, victim_guid,
+        "the committed handshake must keep the fixture guid"
+    );
+    assert!(
+        server.membership.player_location(victim_guid).is_some(),
+        "fixture setup: the committed handshake registers membership"
+    );
+    let mut opened = Vec::new();
+    for inner in [
+        interact(REPRESENTATIVE_VENDOR),
+        select(REPRESENTATIVE_VENDOR, fixture.option()),
+    ] {
+        opened.extend(
+            victim
+                .gateway
+                .handle_at(&wrap(&inner), 1_003)
+                .expect("the vendor interaction handles")
+                .replies,
+        );
+    }
+    assert!(
+        opened
+            .iter()
+            .any(|packet| packet[7..].starts_with(&[66, 0, 42, 0])),
+        "the vendor shop did not open on the real gateway"
+    );
     server.world.session_keys.insert(victim.id, key);
     server.sessions.insert(key, victim);
 
@@ -619,6 +472,36 @@ fn a_failed_vendor_save_ends_only_that_session() {
         .filter(|guid| *guid != victim_guid)
         .collect();
     assert_eq!(survivors.len(), 2, "the seeded world has two survivors");
+    // Give every survivor a real socket. The rig seeds them with one shared fake peer, so
+    // the ending session's leave fanout would hit a closed UDP port; the ICMP reset then
+    // makes the next `Server::step` receive stop before its queued datagram.
+    let mut survivor_sockets = Vec::new();
+    let mut survivor_keys = Vec::new();
+    for guid in &survivors {
+        let id = server.world.active_sessions[guid];
+        let seeded = server.world.session_keys[&id];
+        let socket = UdpSocket::bind("127.0.0.1:0").expect("survivor socket binds");
+        socket
+            .set_read_timeout(Some(Duration::from_millis(100)))
+            .expect("survivor read timeout sets");
+        let mut session = server
+            .sessions
+            .remove(&seeded)
+            .expect("the seeded survivor session exists");
+        session.peer = socket.local_addr().expect("survivor address");
+        let key = SessionKey {
+            peer: session.peer,
+            connection_id: session.request.id,
+        };
+        server.world.session_keys.insert(session.id, key);
+        server.sessions.insert(key, session);
+        survivor_sockets.push(socket);
+        survivor_keys.push(key);
+    }
+    let survivor_client = &survivor_sockets[0];
+    let survivor_key = survivor_keys[0];
+    let survivor_login_guid = server.sessions[&survivor_key].gateway.state().guid;
+
     server
         .sessions
         .get_mut(&key)
@@ -627,7 +510,11 @@ fn a_failed_vendor_save_ends_only_that_session() {
     let wire = {
         let session = &server.sessions[&key];
         let mut payload = 0u16.to_be_bytes().to_vec();
-        payload.extend(wrap(&vendor_buy()));
+        payload.extend(wrap(&vendor_buy_packet(
+            BUY_TRANSACTION,
+            REPRESENTATIVE_ITEM,
+            1,
+        )));
         session
             .codec
             .encode(RELIABLE_DATA, &payload)
@@ -652,28 +539,80 @@ fn a_failed_vendor_save_ends_only_that_session() {
     assert!(!server.world.players.contains(victim_id));
     assert!(server.world.chat_session(victim_id).is_none());
     assert!(!server.world.session_keys.contains_key(&victim_id));
+    assert!(
+        server.membership.player_location(victim_guid).is_none(),
+        "the ended session left a membership row"
+    );
     assert_eq!(
         fs::read(&save_path).expect("the good save is still readable"),
         good_save,
         "the ended session wrote a partial save"
     );
-    assert!(
-        server.sessions.contains_key(&keys[1]) && server.sessions.contains_key(&keys[2]),
-        "another session ended with the victim"
-    );
+    for (guid, key) in survivors.iter().zip(&survivor_keys) {
+        let id = server.world.active_sessions[guid];
+        assert_eq!(
+            server.world.session_keys.get(&id),
+            Some(key),
+            "the ended session changed survivor {guid}'s session key"
+        );
+        assert!(
+            server.sessions.contains_key(key),
+            "another session ended with the victim"
+        );
+    }
     assert_eq!(
         server.world.active_sessions.len(),
         2,
         "the ended session left a world ghost"
     );
-    assert!(
-        survivors
-            .iter()
-            .all(|guid| server.world.active_sessions.contains_key(guid)),
-        "the ended session removed a survivor's world row"
-    );
+
+    // Drain whatever the ending session's leave fanout queued to the survivor, then prove
+    // its next real datagram is still handled and answered.
+    let mut buffer = [0; 65_535];
+    while survivor_client.recv_from(&mut buffer).is_ok() {}
+    let wire = {
+        let session = &server.sessions[&survivor_key];
+        let mut payload = 0u16.to_be_bytes().to_vec();
+        payload.extend(login(survivor_login_guid));
+        session
+            .codec
+            .encode(RELIABLE_DATA, &payload)
+            .expect("survivor login datagram encodes")
+    };
+    survivor_client
+        .send_to(&wire, server.local_addr().expect("server address"))
+        .expect("survivor datagram sends");
     server.next_tick_ms = 0;
     server.step().expect("the surviving sessions keep stepping");
+    assert!(
+        server.sessions[&survivor_key].gateway.is_logged_in(),
+        "the surviving session did not handle its next datagram"
+    );
+    let mut answered = false;
+    loop {
+        match survivor_client.recv_from(&mut buffer) {
+            Ok((length, _)) => {
+                let packet = server.sessions[&survivor_key]
+                    .codec
+                    .decode(&buffer[..length])
+                    .expect("the survivor's reply decodes");
+                answered |= matches!(packet.opcode, RELIABLE_DATA | RELIABLE_FRAGMENT);
+            }
+            Err(error)
+                if matches!(
+                    error.kind(),
+                    io::ErrorKind::WouldBlock | io::ErrorKind::TimedOut
+                ) =>
+            {
+                break;
+            }
+            Err(error) => panic!("survivor reply read fails: {error}"),
+        }
+    }
+    assert!(
+        answered,
+        "the surviving session did not answer its next datagram"
+    );
     assert_eq!(server.sessions.len(), 2);
 
     drop(server);

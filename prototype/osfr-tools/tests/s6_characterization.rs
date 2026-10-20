@@ -132,7 +132,7 @@ fn bundle(children: &[Vec<u8>]) -> Vec<u8> {
 }
 
 fn login(game: &mut Gateway) {
-    game.handle_at(&login_request(), 0).unwrap();
+    game.handle_at(&login_request(1), 0).unwrap();
     send(game, &13u16.to_le_bytes(), NOW);
     send(game, &10u16.to_le_bytes(), NOW);
 }

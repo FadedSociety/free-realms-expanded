@@ -40,9 +40,9 @@ pub fn select(npc_id: u64, option: u32) -> Vec<u8> {
 }
 
 /// Synthetic ticket login: u16 count, then three length-prefixed strings, with
-/// the account guid after the ticket.
-#[allow(dead_code)] // The vendor suites build their login through `gateway_vendor`.
-pub fn login() -> Vec<u8> {
+/// `guid` after the ticket. The client compares that guid with the character it
+/// loaded (gateway `parse_message` login arm), so the caller supplies it.
+pub fn login(guid: u64) -> Vec<u8> {
     let mut bytes = 1u16.to_le_bytes().to_vec();
     for (i, text) in ["synthetic-ticket", "1.910.1.530630", ""]
         .iter()
@@ -51,7 +51,7 @@ pub fn login() -> Vec<u8> {
         bytes.extend((text.len() as u32).to_le_bytes());
         bytes.extend(text.as_bytes());
         if i == 0 {
-            bytes.extend(1u64.to_le_bytes());
+            bytes.extend(guid.to_le_bytes());
         }
     }
     bytes
