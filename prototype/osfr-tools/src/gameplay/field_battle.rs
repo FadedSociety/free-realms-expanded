@@ -21,14 +21,21 @@ pub(super) enum BattleStart {
 
 impl Gameplay {
     /// A field battle is playable only when every previewed prize can be
-    /// granted by the loaded item catalogue: a known definition whose quantity
-    /// fits one stack.
+    /// granted by the loaded item catalogue and the whole previewed bundle fits
+    /// this bag: individual stacks must resolve, and together the rows must not
+    /// need a stack the bag has no room for.
     pub(super) fn battle_prizes_available(&self, id: u32) -> bool {
-        self.encounter.as_ref().is_some_and(|encounter| {
+        let bundle = std::cell::RefCell::new(Vec::new());
+        let rows_available = self.encounter.as_ref().is_some_and(|encounter| {
             encounter.battle_prizes_available(id, |item, quantity| {
-                self.inventory.accepts_reward(item, quantity)
+                let accepted = self.inventory.accepts_reward(item, quantity);
+                if accepted {
+                    bundle.borrow_mut().push((item, quantity));
+                }
+                accepted
             })
-        })
+        });
+        rows_available && self.inventory.accepts_reward_bundle(&bundle.into_inner())
     }
 
     /// Start a battle from a production path other than the open start screen.

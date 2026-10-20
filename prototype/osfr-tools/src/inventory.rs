@@ -23,8 +23,14 @@ use sha2::{Digest, Sha256};
 #[path = "inventory_v2_fixes.rs"]
 mod v2_fixes;
 
-const MAX_ITEMS: usize = 4096;
+/// Occupied stacks one player's bag may hold. `validate_state` rejects a save
+/// above it and `grant` refuses a new stack at it.
+pub const MAX_ITEMS: usize = 4096;
 const MAX_CONTENT: usize = 4 * 1024 * 1024;
+/// (R) The encounter reward loader refuses a bundle with more than 16 item rows
+/// (`src/encounter.rs`). A preflight that can see a longer list is not a bundle
+/// this server could ever pay.
+const MAX_REWARD_BUNDLE: usize = 16;
 // Reconstructed resource limits (R), separate from the player-owned item cap.
 const MAX_CATALOGUE_FILE: u64 = 128 * 1024 * 1024;
 const MAX_CATALOGUE_ROWS: usize = 65_536;
@@ -500,7 +506,9 @@ impl Inventory {
 
     /// Whether this catalogue can grant `quantity` of `definition_id` as one
     /// stack, using the same bound as `grant_with_tint`. A content preflight
-    /// uses this to refuse an unpayable reward before entry or a payout.
+    /// uses this to refuse an unpayable reward before entry or a payout. It
+    /// checks one row at a time; a whole payout goes through
+    /// `accepts_reward_bundle`.
     pub fn accepts_reward(&self, definition_id: i32, quantity: u32) -> bool {
         quantity > 0
             && self
@@ -508,6 +516,30 @@ impl Inventory {
                 .definitions
                 .get(&definition_id)
                 .is_some_and(|definition| definition.fits_one_stack(quantity))
+    }
+
+    /// Whether one clone of this bag could grant every `(definition_id,
+    /// quantity)` row in order, through the same `grant` path a real payout
+    /// uses. This is the **bundle** preflight: `accepts_reward` checks one row's
+    /// catalogue and stack bounds, but two rows that each pass can still need a
+    /// second stack when the bag is full, or overflow `MAX_ITEMS` together.
+    ///
+    /// State-only and read-only for the live bag: it mutates a clone and keeps
+    /// none of the clone's reply packets. An empty list fits. A non-positive
+    /// definition, a zero quantity or a list longer than the reward loader's
+    /// 16-row bound is `false`, never a panic.
+    pub fn accepts_reward_bundle(&self, items: &[(i32, u32)]) -> bool {
+        if items.len() > MAX_REWARD_BUNDLE
+            || items
+                .iter()
+                .any(|&(definition, quantity)| definition <= 0 || quantity == 0)
+        {
+            return false;
+        }
+        let mut staged = self.clone();
+        items
+            .iter()
+            .all(|&(definition, quantity)| staged.grant(0, definition, quantity).is_ok())
     }
 
     /// Whether the login 35/37 catalogue already carried this row to the client.
