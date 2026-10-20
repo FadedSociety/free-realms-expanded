@@ -316,7 +316,11 @@ mod unit {
         let out = b.shared_effects(&mut field, 202, 1100).unwrap();
         assert_eq!(hp(&out), 0);
         assert_eq!(field.health(E + 10), Some(0));
-        assert!(out.defeated.is_empty() && out.rewards.is_empty() && out.completed.is_none());
+        // T256: the caster's DoT lands both lethal hits, so its own engine
+        // reports both defeats (the caster's quest credit); the T240 payout
+        // is still unclaimed.
+        assert_eq!(out.defeated, [930108, 930108]);
+        assert!(out.rewards.is_empty() && out.completed.is_none());
         let out = a.shared_effects(&mut field, 101, 2000).unwrap();
         assert!(out.replies.is_empty());
         assert!(

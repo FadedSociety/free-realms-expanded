@@ -484,7 +484,17 @@ fn w127_exact_death_respawn_clock_and_no_personal_credit() {
             .unwrap();
         assert_eq!(hp_values(&out.replies), vec![hp]);
         assert_eq!(hits_from(&out.replies, who), 1);
-        assert!(out.defeated.is_empty() && out.rewards.is_empty());
+        // T256: only the engine that lands the lethal hit reports the defeat.
+        if hp == 0 {
+            assert_eq!(
+                out.defeated,
+                [930108],
+                "the lethal hitter gets the kill event"
+            );
+        } else {
+            assert!(out.defeated.is_empty());
+        }
+        assert!(out.rewards.is_empty());
     }
     assert_eq!(field.respawn_at(E), Some(2600));
     for engine in [&mut a, &mut b] {
@@ -607,7 +617,17 @@ fn t032_private_instance_field_is_one_shared_death_for_two_members() {
             .unwrap();
         assert_eq!(hp_values(&out.replies), vec![hp]);
         assert_eq!(hits_from(&out.replies, who), 1);
-        assert!(out.defeated.is_empty() && out.rewards.is_empty());
+        // T256: only the engine that lands the lethal hit reports the defeat.
+        if hp == 0 {
+            assert_eq!(
+                out.defeated,
+                [930108],
+                "the lethal hitter gets the kill event"
+            );
+        } else {
+            assert!(out.defeated.is_empty());
+        }
+        assert!(out.rewards.is_empty());
         world.install_field(child, field.clone());
         for member in [101, 202] {
             let (instance, shared) = world.field_for_player(member, 0).unwrap();

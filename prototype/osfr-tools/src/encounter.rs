@@ -678,6 +678,7 @@ pub struct EncounterOutcome {
     pub zoning: Option<ZoneTransition>,
     pub rewards: Vec<EncounterReward>,
     pub completed: Option<u32>,
+    /// Positive definition ids defeated here; `0` names no quest target.
     pub defeated: Vec<i32>,
     pub feedback: Option<String>,
     /// A group heal power-up was picked up (the engine heals only its own
@@ -2081,7 +2082,8 @@ impl EncounterEngine {
             if boss {
                 out.replies.push(boss_display(guid, false));
             }
-            if self.shared_sender.is_none() {
+            // T256: the shared field also credits the killer's own quests.
+            if definition > 0 {
                 out.defeated.push(definition);
             }
             self.kiting.remove(&guid);
