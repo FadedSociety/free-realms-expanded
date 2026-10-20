@@ -1779,8 +1779,15 @@ impl Session {
             let owns_character = self.selected_character
                 && staged_gateway.state().guid == self.character_guid
                 && staged_world.active_sessions.get(&self.character_guid) == Some(&self.id);
+            // L008: the session's own history is not swept, so filter it by the same cutoff;
+            // otherwise an idle owner republishes a timestamp the retain above just expired.
             if owns_character
-                && let Some(hours) = staged_gateway.fishing_hour_history()
+                && let Some(hours) = staged_gateway.fishing_hour_history().map(|hours| {
+                    hours
+                        .into_iter()
+                        .filter(|at| *at > cutoff)
+                        .collect::<Vec<_>>()
+                })
                 && !hours.is_empty()
             {
                 staged_world

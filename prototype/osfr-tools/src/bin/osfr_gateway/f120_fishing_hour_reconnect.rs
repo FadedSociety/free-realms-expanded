@@ -575,10 +575,20 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
         vec![paid_again]
     );
     assert_eq!(ledger(&world, guid), vec![paid_again]);
-    // Removed coverage: the idle-expiry assertion (an owner tick after the window must drop the
-    // expired timestamp) failed because the lead's restored publication republishes the
-    // session's history after the sweep. That is lead backlog L008; its fix filters the history
-    // before the insert and must restore the assertion here. This test does not pin the buggy
-    // outcome (review finding 5).
+    // L008 (review finding 5): an idle owner's tick after the window closes must drop the expired
+    // timestamp, not republish it from the session's in-memory history.
+    second
+        .tick(
+            &options,
+            paid_again + osfr_tools::fishing_service::HOUR_WINDOW_MS + 1,
+            &mut world,
+            &mut membership,
+            &mut sessions,
+        )
+        .unwrap();
+    assert!(
+        ledger(&world, guid).is_empty(),
+        "an expired history was republished"
+    );
     assert_ne!(fs::read(&state_path).unwrap(), before_refusal_file);
 }
