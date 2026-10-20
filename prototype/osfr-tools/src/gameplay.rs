@@ -1893,10 +1893,12 @@ impl Gameplay {
                     .as_mut()
                     .unwrap()
                     .settle(character.guid, &live)?;
-                out.replies.extend(settled.replies);
+                out.replies.extend(settled.replies.iter().cloned());
                 if let Some(rewards) = settled.reward_state {
                     staged.adopt_reward_state(rewards, &mut out)?;
                 }
+                // T259: the settled server result credits FinishMinigame once per match.
+                staged.npc_minigame_win(&settled.replies, &mut out)?;
             }
             *self = staged;
             return Ok(out);

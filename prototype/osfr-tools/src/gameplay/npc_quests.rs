@@ -275,6 +275,10 @@ impl Gameplay {
 
     // Only inspect server-generated results after a successful payout. Never
     // interpret an incoming win/score packet as quest authority (R policy).
+    // A settled soccer match is one such result: `tick_world` calls this once
+    // per settlement with the server-built replies (`39/14` reader 0x009b89e0;
+    // `39/18` `ApplyMiniGameGameOverResult` 0x009ad480, body 0x009b7ec0: shared
+    // header, `u8 won`, three `i32`).
     pub(super) fn npc_minigame_win(
         &mut self,
         replies: &[Vec<u8>],
