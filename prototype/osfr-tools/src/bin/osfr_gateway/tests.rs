@@ -765,13 +765,20 @@ fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
 /// which is the `Err(_) if transfer` refusal path. The control bundle's last read fits by 528
 /// bytes; in the real bundle the same read is over by 371 because the refused transfer's 899
 /// staged bytes stayed charged. A refund (F264's `release`) would make the last read fit, so this
-/// test would fail.
+/// test would fail. The control also establishes the live `World` membership; the refusal must
+/// leave that membership, the public instance and the save path unchanged (F322 review finding 1).
+/// The body's name says what it pins; the old F264 name is a thin alias below because
+/// `lab/autopilot/protected-pass.txt` still selects it.
 #[test]
-fn a_refused_precommit_transfer_releases_its_reply_budget() {
+fn a_refused_precommit_transfer_keeps_its_staged_bytes_until_dispatch_end() {
     let scratch = test_support::Scratch::new("f286-transfer");
     let content = test_support::vendor_content(&scratch);
-    // 43 maximum-size rows: two reads are ~2.7 MiB each; the 41-row read leaves 62,567 bytes of
-    // the 8 MiB budget, and the 62,000-byte row's read charges 62,039.
+    // Each staged reply is charged with its 7-byte application wrapper (`wrapped`). The 26/10
+    // trigger stages no reply. A 43-row read charges 43*(7+12+65,536) + (7+181) = 2,819,053;
+    // the 41-row read charges 41*65,555 + (7+173) = 2,687,935. Those three reads leave 62,567
+    // bytes of the 8 MiB budget; the 62,000-byte row's read charges (7+12+62,000) + (7+13) =
+    // 62,039, so the control fits by 528. The refused transfer's staged replies charge
+    // 394+418+87 = 899, putting the real bundle 371 over the budget.
     let ids: Vec<u32> = (0..43).map(|index| 930_000 + index).collect();
     test_support::item_catalogue(
         &content,
@@ -836,7 +843,10 @@ fn a_refused_precommit_transfer_releases_its_reply_budget() {
         }
         bundle
     };
-    let mut dispatch = |session: &mut Session, message: &[u8]| {
+    let dispatch = |session: &mut Session,
+                    server: &mut Server,
+                    message: &[u8]|
+     -> Result<(), Box<dyn std::error::Error>> {
         session.dispatch_message(
             message,
             &server.options,
@@ -848,17 +858,27 @@ fn a_refused_precommit_transfer_releases_its_reply_budget() {
         )
     };
     // The same children without the transfer child fit the budget: the last read is accepted.
-    dispatch(&mut session, &bundle(false))
+    dispatch(&mut session, &mut server, &bundle(false))
         .expect("the control bundle must fit the 8 MiB bundle budget");
     assert_eq!(
         session.gateway.snapshot(),
         before,
         "the control bundle changed character or gameplay state"
     );
+    // The control bundle is the positive control: it fits, and it also establishes the
+    // session's live membership. A refusal must leave that live row and public instance alone;
+    // the character+gameplay `Snapshot` above cannot see either (review finding 1).
+    let player = session.character_guid;
+    let membership = server.membership.player_location(player).cloned();
+    assert!(
+        membership.is_some(),
+        "the control bundle must establish live membership before the refusal"
+    );
+    let public_instance = server.membership.public_instance(0);
     // The transfer cannot commit: its precommit save has nowhere to write. Its staged bytes stay
     // charged to the message, so the identical last read is now over the budget.
     fs::remove_dir_all(scratch.path()).unwrap();
-    let error = dispatch(&mut session, &bundle(true))
+    let error = dispatch(&mut session, &mut server, &bundle(true))
         .expect_err("the refused transfer's staged replies must stay charged");
     assert!(
         error.to_string().contains("outbound budget"),
@@ -875,10 +895,33 @@ fn a_refused_precommit_transfer_releases_its_reply_budget() {
         "the refused transfer's bundle changed character or gameplay state"
     );
     assert_eq!(
+        server.membership.player_location(player),
+        membership.as_ref(),
+        "a refused precommit transfer changed live membership"
+    );
+    assert_eq!(
+        server.membership.public_instance(0),
+        public_instance,
+        "a refused precommit transfer changed the public instance"
+    );
+    assert!(
+        !scratch.state().exists(),
+        "a refused precommit transfer wrote a save"
+    );
+    assert_eq!(
         session.bundle_budget.used(),
         None,
         "a dispatch must reset the bundle budget"
     );
+}
+
+/// The F264 protected name (`lab/autopilot/protected-pass.txt`, and the six integration suites that
+/// embed this module): an alias for the test above. It keeps the historical selector working while
+/// the real test name says that the refused transfer's staged bytes stay charged until the dispatch
+/// ends, not that a refund happens. F322 review finding 4.
+#[test]
+fn a_refused_precommit_transfer_releases_its_reply_budget() {
+    a_refused_precommit_transfer_keeps_its_staged_bytes_until_dispatch_end();
 }
 
 /// Session-test scratch directory and `Options` builder, shared with `lead_trade_commit`.

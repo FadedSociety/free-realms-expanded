@@ -1,5 +1,9 @@
 //! W88: synthetic public checks; private W84 rows are read only in the ignored gate.
 use osfr_tools::inventory::Inventory;
+#[path = "common/item_catalogue.rs"]
+#[allow(dead_code)]
+mod item_catalogue;
+
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{
@@ -12,10 +16,7 @@ static SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 fn row(id: i32, marker: i32) -> Value {
     let bytes = [id.to_le_bytes(), marker.to_le_bytes()].concat();
-    json!({"id":id,"slot":0,"class_id":1,"default_tint":0,"max_stack":10,
-        "model":"","texture":"","tint_alias":"","effect":0,"wield_type":0,
-        "serialized_hex":bytes.iter().map(|b|format!("{b:02x}")).collect::<String>(),
-        "sha256":format!("{:x}",Sha256::digest(&bytes))})
+    item_catalogue::row(id, bytes)
 }
 
 fn request(id: i32) -> Vec<u8> {
@@ -51,14 +52,7 @@ impl Fixture {
         Self(path)
     }
     fn catalogue(&self, rows: Vec<Value>) {
-        fs::write(
-            self.0.join("item-catalogue.json"),
-            serde_json::to_vec(&json!({
-                "schema_version":1,"definitions":rows
-            }))
-            .unwrap(),
-        )
-        .unwrap();
+        item_catalogue::write(&self.0, &rows);
     }
 }
 impl Drop for Fixture {

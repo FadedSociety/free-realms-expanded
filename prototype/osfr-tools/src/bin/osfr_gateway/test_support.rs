@@ -5,6 +5,10 @@
 use super::*;
 use osfr_tools::{game_store::Snapshot, gameplay::GameplayState};
 
+#[path = "../../../tests/common/item_catalogue.rs"]
+#[allow(dead_code)]
+mod item_catalogue;
+
 /// A clean temp directory; dropping it removes the directory and the saves in it.
 pub struct Scratch(PathBuf);
 
@@ -107,27 +111,14 @@ pub fn vendor_content(scratch: &Scratch) -> PathBuf {
 
 /// Writes an item catalogue with one synthetic definition per `(id, serialized size)` row. Each
 /// record starts with its id and repeats `0x5a` to `size`, so a caller controls the 165/2
-/// definition reply sizes it exercises.
+/// definition reply sizes it exercises. The row and envelope builders are shared with the
+/// integration `inventory_catalogue` fixture (`tests/common/item_catalogue.rs`).
 pub fn item_catalogue(content: &Path, rows: &[(u32, usize)]) {
-    use sha2::{Digest, Sha256};
     let definitions: Vec<serde_json::Value> = rows
         .iter()
-        .map(|(id, size)| {
-            let mut bytes = (*id as i32).to_le_bytes().to_vec();
-            bytes.resize(*size, 0x5a);
-            json!({
-                "id": *id as i32, "slot": 0, "class_id": 1, "default_tint": 0, "max_stack": 10,
-                "model": "", "texture": "", "tint_alias": "", "effect": 0, "wield_type": 0,
-                "serialized_hex": bytes.iter().map(|byte| format!("{byte:02x}")).collect::<String>(),
-                "sha256": format!("{:x}", Sha256::digest(&bytes))
-            })
-        })
+        .map(|(id, size)| item_catalogue::sized_row(*id, *size))
         .collect();
-    fs::write(
-        content.join("item-catalogue.json"),
-        serde_json::to_vec(&json!({"schema_version":1,"definitions":definitions})).unwrap(),
-    )
-    .unwrap();
+    item_catalogue::write(content, &definitions);
 }
 
 /// True when `options` names the private lab fixture pair a session rig loads: the

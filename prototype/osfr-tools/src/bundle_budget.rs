@@ -53,7 +53,8 @@ impl BundleBudget {
         Ok(())
     }
 
-    /// Reply bytes charged so far; None outside a bundle.
+    /// Reply bytes charged so far; None outside a bundle. Observation only: the budget tests are
+    /// its only callers; the server never reads it.
     pub fn used(&self) -> Option<usize> {
         self.0
     }
