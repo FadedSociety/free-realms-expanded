@@ -66,6 +66,8 @@ const GROSH: u64 = 9_000_000_335;
 const CLEETUS: u64 = 9_000_000_050;
 /// T279: the Royal Palace giver of "Chapter 1: The Missing Sisters".
 const GEOFFREY: u64 = 9_000_000_330;
+/// T277: the Greenwood Forest Royal Courier of the independent "Local Hero" entry.
+const ROYAL_COURIER: u64 = 9_000_000_444;
 
 const INTRODUCE_YOURSELF: u32 = 3_000_020;
 const BURDEN_OF_FAME: u32 = 3_080_001;
@@ -1001,7 +1003,7 @@ fn content_overflow_is_rejected_at_load() {
 fn configured_job_xp_and_job_gates_match_the_task_table() {
     let content = content_dir();
     // (file, quest id, giver, prerequisites, reward coins, job gate, profile, XP)
-    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 15] = [
+    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 16] = [
         (
             "adventurer.json",
             INTRODUCE_YOURSELF,
@@ -1148,18 +1150,32 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             ADVENTURER,
             25,
         ),
+        // T277: the Royal Courier's independent Local Hero entry. Like T279 it has
+        // no prerequisite and no job gate; its 25 XP pays the explicit Adventurer
+        // profile and its 13 coins are the guide's final popup.
+        (
+            "adventurer.json",
+            3_000_024,
+            ROYAL_COURIER,
+            &[],
+            13,
+            None,
+            ADVENTURER,
+            25,
+        ),
     ];
 
     let mut listed = BTreeSet::new();
     // The task decisions are accepted: T202 wrote the chapter job XP and gates, T241
-    // extended the same table with the two live Farnum starting records, and T279
-    // adds the independent Missing Sisters playtest entry.
+    // extended the same table with the two live Farnum starting records, T279 adds
+    // the independent Missing Sisters playtest entry, and T277 adds Local Hero.
     let has_decision = |source: &Value| {
         source.as_array().is_some_and(|tags| {
             tags.iter().any(|tag| {
                 tag["evidence"].as_str().is_some_and(|text| {
                     text.starts_with("(R) T202:")
                         || text.starts_with("(R) T241:")
+                        || text.starts_with("(R) T277:")
                         || text.starts_with("(R) T279:")
                 })
             })

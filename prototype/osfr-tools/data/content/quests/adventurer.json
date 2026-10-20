@@ -1852,12 +1852,46 @@
       "title_string_id": 389187,
       "giver_npc_id": 9000000444,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "model_id": 930050,
+          "count": 5,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D1; the client text is the thugawug variant, while the video shows 'Defeat the Hooligan Bullies - 1/10' (3jLPsxADZ1w)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T277: the live level-3 field Hooligan definition 930050 (data/content/field_enemies.json, starting_highroad_hooligans) is the only counted kill kind; neither the guide's exact thugawug variant nor the video's ten-kill Hooligan Bullies is proven to be 930050. Five kills is the playtest count for the three live actors plus one 60 s respawn cycle; the per-kill 6/3 coin popups are the field enemies' own T240 payout, not this quest's."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000444,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D1; objective cell 'Talk to the Royal Courier'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T277: the final Talk to the Courier is the hand-in; the guide gives no stolen-message item definition, so no item is invented or required."
+            }
+          ]
+        }
+      ],
       "rewards": [
         {
           "coins": 13,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "1": 25
+          },
           "source": [
             {
               "kind": "client",
@@ -1870,6 +1904,10 @@
             {
               "kind": "wiki",
               "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part D. Chapter 1 entry quests and Take a Number, row D1; reward cell 'Per-kill coin popups \"You receive 6 coins\" and \"3 coins\"; final popup \"You receive 11 stars and 13 coins\" (3jLPsxADZ1w/00178)'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T277: 25 Adventurer (profile 1) XP is the T202 small-quest rung; the guide gives no XP number. 13 coins is the guide's final popup; the per-kill 6/3 popups are the field enemies' own T240 payout and are not paid again here."
             }
           ]
         }
@@ -1914,12 +1952,16 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W110: DISABLED: Guide has thugawug and video Hooligan Bullies variants (10); field_enemies has generic Hooligan 930050, not a proven exact variant. No exact target or stolen message acquisition route."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T277: re-enabled. The W110 blocker is resolved without inventing content: the live 930050 field Hooligan is the only proven field kind in the region, and the guide's final Talk to the Courier is the hand-in, so no stolen-message item is required. No NPC, spawn, packet, save-schema or production Rust change."
         }
       ],
       "description_string_id": 389188,
       "intro_text_string_id": 389186,
       "end_text_string_id": 389189,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000025,
