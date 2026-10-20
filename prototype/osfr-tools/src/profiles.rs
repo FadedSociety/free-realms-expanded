@@ -304,14 +304,26 @@ impl Profiles {
         previous != Some(xp)
     }
 
+    /// Whether `add_experience(amount)` would succeed for the active job.
+    pub fn can_add_experience(&self, amount: u32) -> bool {
+        self.state
+            .experience
+            .get(&self.state.active)
+            .copied()
+            .unwrap_or(0)
+            .checked_add(amount)
+            .is_some()
+    }
+
     pub fn add_experience(&mut self, amount: u32) -> io::Result<bool> {
         if amount == 0 {
             return Ok(false);
         }
+        if !self.can_add_experience(amount) {
+            return Err(invalid("class experience overflow"));
+        }
         let xp = self.state.experience.entry(self.state.active).or_default();
-        *xp = xp
-            .checked_add(amount)
-            .ok_or_else(|| invalid("class experience overflow"))?;
+        *xp += amount;
         Ok(true)
     }
 

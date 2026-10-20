@@ -2985,8 +2985,8 @@ impl Server {
     /// collected; the server and every other field keep running.
     ///
     /// Dormant by default: a field nobody is in (at any readiness) ticks once more, which drops
-    /// departed casters' DoTs and kill credits, then sleeps until someone enters. Its clocks are
-    /// absolute and motion clamps the first elapsed step, so waking needs no catch-up.
+    /// departed casters' DoTs and expired kill credits, then sleeps until someone enters. Its
+    /// clocks are absolute and motion clamps the first elapsed step, so waking needs no catch-up.
     fn tick_shared_fields(&mut self, now_ms: u64) {
         let instances = self.membership.field_instances();
         self.faulted_fields
@@ -3043,7 +3043,7 @@ impl Server {
                 }
             }
         }
-        field.retain_casters(&active.iter().map(|(_, player)| player.guid).collect());
+        field.retain_casters(&active.iter().map(|(_, p)| p.guid).collect(), now_ms);
         field.set_active_quests(&quests);
         // (R) Current poses/caps first. Hold only already-known corpses through
         // lethal HP delivery, then remove once. New observers get current HP,

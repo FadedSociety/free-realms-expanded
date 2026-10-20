@@ -829,19 +829,25 @@ impl Inventory {
         visible
     }
 
-    pub fn grant_coins(&mut self, amount: u32) -> io::Result<InventoryOutcome> {
-        let coins = self
-            .state
+    /// Whether `grant_coins(amount)` would succeed on the live balance: the
+    /// stored total is a `u32` but the wire coin field is `i32`.
+    pub fn can_grant_coins(&self, amount: u32) -> bool {
+        self.state
             .coins
             .checked_add(amount)
-            .filter(|coins| *coins <= i32::MAX as u32)
-            .ok_or_else(|| invalid("coin balance overflow"))?;
+            .is_some_and(|coins| coins <= i32::MAX as u32)
+    }
+
+    pub fn grant_coins(&mut self, amount: u32) -> io::Result<InventoryOutcome> {
+        if !self.can_grant_coins(amount) {
+            return Err(invalid("coin balance overflow"));
+        }
         if amount == 0 {
             return Ok(InventoryOutcome::default());
         }
-        self.state.coins = coins;
+        self.state.coins += amount;
         let mut reply = header(38, 19);
-        put(&mut reply, coins as i32);
+        put(&mut reply, self.state.coins as i32);
         Ok(InventoryOutcome {
             replies: vec![reply],
             changed: true,

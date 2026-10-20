@@ -1415,3 +1415,8 @@ mod l011_vendor_save_failure;
 #[cfg(test)]
 #[path = "quest_reward_save_failure.rs"]
 mod quest_reward_save_failure;
+
+/// F276: a refused field replay through the real session writes no character save.
+#[cfg(test)]
+#[path = "f276_field_session_save.rs"]
+mod f276_field_session_save;

@@ -55,11 +55,18 @@ impl FieldKillRewards {
     /// Load `field_kill_rewards.json` from a content directory. A missing file
     /// is an empty table (old test packages); a bad file is an error.
     pub(super) fn load(directory: impl AsRef<Path>) -> io::Result<Self> {
-        match fs::read(directory.as_ref().join(FILE)) {
-            Ok(bytes) => Self::parse(&bytes),
-            Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(Self::default()),
-            Err(error) => Err(error),
+        let path = directory.as_ref().join(FILE);
+        // Refuse an oversized package before allocating it. `parse` keeps the
+        // same bound for bytes handed in directly.
+        match fs::metadata(&path) {
+            Ok(metadata) if metadata.len() > MAX_BYTES as u64 => {
+                return Err(invalid("field kill reward content too large"));
+            }
+            Ok(_) => {}
+            Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(Self::default()),
+            Err(error) => return Err(error),
         }
+        Self::parse(&fs::read(path)?)
     }
 
     fn parse(bytes: &[u8]) -> io::Result<Self> {
@@ -136,14 +143,8 @@ fn validate_source(source: &[crate::content::SourceTag]) -> io::Result<()> {
         return Err(invalid("field kill reward row needs provenance"));
     }
     for tag in source {
-        let (evidence, reconstructed) = match tag {
-            crate::content::SourceTag::Client(evidence)
-            | crate::content::SourceTag::Video(evidence)
-            | crate::content::SourceTag::Wiki(evidence)
-            | crate::content::SourceTag::LegacyData(evidence) => (evidence, false),
-            crate::content::SourceTag::Reconstructed(evidence) => (evidence, true),
-        };
-        if evidence.trim().is_empty() || reconstructed && !evidence.starts_with("(R)") {
+        let evidence = tag.evidence();
+        if evidence.trim().is_empty() || tag.is_reconstructed() && !evidence.starts_with("(R)") {
             return Err(invalid("invalid field kill reward provenance"));
         }
     }
@@ -359,14 +360,53 @@ mod tests {
     }
 
     #[test]
-    fn a_missing_table_is_empty_and_the_shipped_table_loads() {
+    fn a_missing_table_is_empty_and_the_shipped_content_matches_its_actors() {
         let missing =
             std::env::temp_dir().join(format!("osfr-field-rewards-missing-{}", std::process::id()));
         assert!(FieldKillRewards::load(&missing).unwrap().bands.is_empty());
         let shipped = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
-        let rewards = FieldKillRewards::load(shipped).unwrap();
-        assert_eq!(rewards.reward_for(940102, 1), Some((2, 5)));
-        assert_eq!(rewards.reward_for(930050, 3), Some((4, 10)));
-        assert_eq!(rewards.reward_for(3156, 3), Some((2, 5)));
+        let rewards = FieldKillRewards::load(&shipped).unwrap();
+        // Every shipped actor must reach a row. A level-14+ actor or an unknown
+        // definition would pay nothing, and this fails until the table decides.
+        let field: serde_json::Value =
+            serde_json::from_slice(&fs::read(shipped.join("field_enemies.json")).unwrap()).unwrap();
+        let actors = field["enemies"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|actor| {
+                (
+                    actor["definition_id"].as_i64().unwrap() as i32,
+                    actor["level"].as_u64().unwrap_or(1) as u32,
+                )
+            })
+            .collect::<Vec<_>>();
+        for (definition_id, level) in &actors {
+            assert!(
+                rewards.reward_for(*definition_id, *level).is_some(),
+                "shipped field actor {definition_id} at level {level} has no reward row"
+            );
+        }
+        // The shipped levels 1/3/5/7/9/10 exercise every band; the level-5
+        // Hooligan Wolves stay on the definition override (2/5).
+        for (definition_id, level, expected) in [
+            (940102, 1, (2, 5)),
+            (930050, 3, (4, 10)),
+            (3156, 1, (2, 5)),
+            (3156, 5, (2, 5)),
+            (930060, 7, (7, 15)),
+            (930025, 9, (12, 25)),
+            (930053, 10, (12, 25)),
+        ] {
+            assert!(
+                actors.contains(&(definition_id, level)),
+                "the shipped field content no longer has {definition_id} at level {level}"
+            );
+            assert_eq!(
+                rewards.reward_for(definition_id, level),
+                Some(expected),
+                "{definition_id} level {level}"
+            );
+        }
     }
 }

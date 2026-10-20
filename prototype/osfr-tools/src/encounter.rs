@@ -794,7 +794,8 @@ struct KillLedger {
 #[derive(Clone)]
 struct KillCredit {
     kill: (u64, u64),
-    /// Power-up drop table; `None` for a reward-only field kill.
+    /// Power-up drop table; `None` for a reward-only field kill and cleared by
+    /// `SharedFieldState::retain_casters` for a player who left the field.
     table: Option<String>,
     at: [f32; 3],
     participants: usize,

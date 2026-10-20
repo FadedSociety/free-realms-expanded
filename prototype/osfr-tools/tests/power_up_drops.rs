@@ -576,7 +576,7 @@ fn a_participant_who_left_the_field_loses_the_drop() {
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     hit(&mut s.b, &mut s.field, B, FIRST, 100);
     s.field
-        .retain_casters(&std::collections::BTreeSet::from([B]));
+        .retain_casters(&std::collections::BTreeSet::from([B]), 200);
     assert!(
         spawned(&s.a.shared_effects(&mut s.field, A, 200).unwrap()).is_empty(),
         "A is no longer in the instance"

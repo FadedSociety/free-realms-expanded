@@ -117,17 +117,39 @@ impl SharedFieldState {
     }
     /// (R) Leaving the ready instance drops its caster-owned DoTs. No disconnected
     /// account can retain an unbounded effect entry or a second ticking path.
-    pub fn retain_casters(&mut self, ready: &BTreeSet<u64>) {
+    ///
+    /// (R) A kill credit already earned survives the player's absence until its
+    /// TTL (F276: a reconnect must still collect it). The field-owned drop does
+    /// not: a player who left the field keeps only the coin/job-XP pair.
+    pub fn retain_casters(&mut self, ready: &BTreeSet<u64>, now_ms: u64) {
         self.dots
             .retain(|caster, dots| ready.contains(caster) && !dots.is_empty());
         // Players who left the field neither share future kills nor keep drops.
-        self.kills
-            .credits
-            .retain(|player, _| ready.contains(player));
+        for (player, credits) in &mut self.kills.credits {
+            let present = ready.contains(player);
+            credits.retain_mut(|credit| {
+                if now_ms >= credit.expires_ms {
+                    return false;
+                }
+                if present {
+                    return true;
+                }
+                credit.table = None;
+                credit
+                    .reward
+                    .is_some_and(|(coins, job_xp)| coins > 0 || job_xp > 0)
+            });
+        }
+        self.kills.credits.retain(|_, credits| !credits.is_empty());
         for hitters in self.kills.hits.values_mut() {
             hitters.retain(|player, _| ready.contains(player));
         }
         self.kills.hits.retain(|_, hitters| !hitters.is_empty());
+    }
+
+    /// Pending kill credits for one player (tests and diagnostics).
+    pub fn pending_kill_credits(&self, player: u64) -> usize {
+        self.kills.credits.get(&player).map_or(0, Vec::len)
     }
     pub fn due(&mut self, now_ms: u64) -> Option<u64> {
         let elapsed = self

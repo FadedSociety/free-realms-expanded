@@ -28,7 +28,7 @@ pub enum SourceTag {
 }
 
 impl SourceTag {
-    fn evidence(&self) -> &str {
+    pub(crate) fn evidence(&self) -> &str {
         match self {
             Self::Client(value)
             | Self::Video(value)
@@ -38,7 +38,7 @@ impl SourceTag {
         }
     }
 
-    fn is_reconstructed(&self) -> bool {
+    pub(crate) fn is_reconstructed(&self) -> bool {
         matches!(self, Self::Reconstructed(_))
     }
 }

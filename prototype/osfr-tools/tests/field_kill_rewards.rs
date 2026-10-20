@@ -1,13 +1,21 @@
-//! T240: field-enemy kills pay coins and active-job XP once per credited player.
+//! T240/F276: field-enemy kills pay coins and active-job XP once per credited player.
 //!
 //! Every test drives the production shared-field seams: `handle_shared_field`
-//! (attack), `tick_shared_effects` (claim), `Gameplay::load` (content/reconnect)
-//! and `Gameplay::reload_content` (the dev reload path). The reward table is
+//! (attack), `tick_shared_effects` (claim), `Gameplay::load` (content/reconnect),
+//! `Gameplay::reload_content` (the dev reload path) and, for a battle win,
+//! `handle_in_world` (realm battle/win). The reward table is
 //! `data/content/field_kill_rewards.json`; the field actors stay in
-//! `field_enemies.json` with their existing schema.
+//! `field_enemies.json` with their existing schema. F276 adds the disconnect
+//! prune (`retain_casters`, the real shared-tick call), the mid-fight reload
+//! proof, the battle-reward gate and the shipped level-band assertions. The
+//! real-session save guard lives in the gateway binary
+//! (`src/bin/osfr_gateway/f276_field_session_save.rs`), because only the
+//! binary writes the character save.
 use osfr_tools::{
+    account_store::AccountRole,
     character_store::CharacterState,
-    encounter::{SharedFieldAction, SharedFieldState},
+    chat,
+    encounter::{EncounterPhase, SharedFieldAction, SharedFieldState},
     game_store::{self, Snapshot},
     gameplay::{Gameplay, Outcome},
 };
@@ -354,10 +362,9 @@ fn a_solo_field_kill_pays_once_and_only_the_active_job() {
     assert_eq!(xp.get(&35), None, "only the active job is paid");
     assert_eq!(xp.get(&NONCOMBAT), None);
 
-    // A save taken after the kill is what a reconnect would load. Replaying the
-    // lethal hit or hitting the corpse must change neither it nor the runtime.
-    let path = save(&game, &fixture, &character);
-    let saved_before = fs::read(&path).unwrap();
+    // Replaying the lethal hit or hitting the corpse must change nothing. The
+    // gateway only saves when the action changed state, and the real-session
+    // save guard for that rule is `f276_field_session_save` in the binary.
     let state_before = game.state();
     let field_before = field_view(&field, ENEMY);
     let replay = attack(
@@ -382,9 +389,6 @@ fn a_solo_field_kill_pays_once_and_only_the_active_job() {
     assert!(!corpse.changed && corpse.replies.is_empty());
     assert_eq!(game.state(), state_before);
     assert_eq!(field_view(&field, ENEMY), field_before);
-    assert_eq!(fs::read(&path).unwrap(), saved_before);
-    let stored = game_store::load_or_create(&path, character.clone()).unwrap();
-    assert_eq!(stored.gameplay, Some(state_before));
 }
 
 #[test]
@@ -675,7 +679,17 @@ fn an_overflowing_job_xp_refuses_the_whole_payout() {
     let out = b
         .tick_shared_effects(&mut field, &b_character, killed_at + 50)
         .unwrap();
-    assert!(!out.changed && out.replies.is_empty());
+    assert!(!out.changed);
+    assert_eq!(
+        count(&out.replies, 38, 19),
+        0,
+        "the coins are not half-paid"
+    );
+    assert_eq!(count(&out.replies, 38, 14), 0, "the XP is not half-paid");
+    assert!(
+        system_text(&out.replies).contains("at its limit"),
+        "the refusal is shown to the player"
+    );
     let after = bank(&b);
     assert_eq!(after.0, before.0, "the coins are not half-paid");
     assert_eq!(after.1.get(&35), Some(&b_xp), "the XP is not half-paid");
@@ -689,7 +703,7 @@ fn an_overflowing_job_xp_refuses_the_whole_payout() {
 }
 
 #[test]
-fn a_field_kill_survives_a_mid_fight_reload() {
+fn a_field_kill_credit_survives_an_unrelated_content_reload() {
     let fixture = Fixture::new(vec![actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 500)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
@@ -710,7 +724,7 @@ fn a_field_kill_survives_a_mid_fight_reload() {
     let mut admin = player(&fixture, 999, 43, [0.0; 3], 0, None);
     fixture.write_field(&json!({
         "schema_version": 1,
-        "enemies": [actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 900)]
+        "enemies": [actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 100)]
     }));
     // The reward table changes too; the pending pair is already carried.
     fixture.write_rewards(&levels(9, 9));
@@ -725,6 +739,31 @@ fn a_field_kill_survives_a_mid_fight_reload() {
     );
     assert_eq!(field_view(&field, ENEMY), field_before);
 
+    // `realm reload` touches only the reloading session: a session loaded now
+    // reads the new 9/9 table (the table is loaded with the engine).
+    let mut fresh = player(&fixture, 888, 43, [0.0; 3], 0, None);
+    let mut fresh_field = fresh.take_shared_fields().unwrap();
+    let fresh_character = character_at(888, [0.0; 3]);
+    let (fresh_kill, _) = kill(
+        &mut fresh,
+        &mut fresh_field,
+        &fresh_character,
+        &known,
+        ENEMY,
+        0,
+    );
+    assert_eq!(
+        packet(&fresh_kill.replies, 38, 19),
+        [38u8, 0, 19, 0, 9, 0, 0, 0].as_slice(),
+        "a new engine reads the rewritten table"
+    );
+    assert_eq!(fresh.state().inventory.coins, 9);
+    assert_eq!(
+        fresh.state().profiles.unwrap().experience.get(&43),
+        Some(&9)
+    );
+
+    // The pending credit still pays its carried pair, not the new table.
     let paid = b
         .tick_shared_effects(&mut field, &b_character, killed_at + 50)
         .unwrap();
@@ -732,6 +771,10 @@ fn a_field_kill_survives_a_mid_fight_reload() {
         packet(&paid.replies, 38, 19),
         [38u8, 0, 19, 0, 2, 0, 0, 0].as_slice(),
         "the credit pays its carried pair, not the reloaded table"
+    );
+    assert_eq!(
+        packet(&paid.replies, 38, 14),
+        carrier(38, 14, &[43, 1, 5, 0, 0, 0]).as_slice()
     );
     assert_eq!(b.state().inventory.coins, 2);
     assert_eq!(b.state().profiles.unwrap().experience.get(&43), Some(&5));
@@ -763,17 +806,36 @@ fn a_credit_survives_a_reconnect_and_expires_once() {
     save(&b, &fixture, &b_character);
     let before = bank(&b);
     drop(b);
-    // The world-owned shared field keeps the pending pair across the session
-    // reset (the production liveness prune is unchanged).
+    // The real disconnect: the next shared-field tick sees B leave the ready
+    // set (`Server::tick_shared_instance` calls `retain_casters(&active)`).
+    assert_eq!(
+        field.pending_kill_credits(b_character.guid),
+        1,
+        "the kill credited the non-killer"
+    );
+    field.retain_casters(&BTreeSet::from([a_character.guid]), killed_at + 25);
+    assert_eq!(
+        field.pending_kill_credits(b_character.guid),
+        1,
+        "a disconnect inside the TTL keeps the earned pair"
+    );
     let mut b = reconnect(&fixture, &b_character);
     assert_eq!(bank(&b), before, "the save alone carries no credit");
-    b.tick_shared_effects(&mut field, &b_character, killed_at + 50)
+    let claimed = b
+        .tick_shared_effects(&mut field, &b_character, killed_at + 50)
         .unwrap();
+    assert_eq!(count(&claimed.replies, 38, 19), 1);
+    assert_eq!(
+        packet(&claimed.replies, 38, 14),
+        carrier(38, 14, &[43, 1, 5, 0, 0, 0]).as_slice(),
+        "the reconnected player receives the carried job XP"
+    );
     assert_eq!(b.state().inventory.coins, 2);
     assert_eq!(
         b.state().profiles.as_ref().unwrap().experience.get(&43),
         Some(&5)
     );
+    assert_eq!(field.pending_kill_credits(b_character.guid), 0);
     let paid = bank(&b);
     let again = b
         .tick_shared_effects(&mut field, &b_character, killed_at + 100)
@@ -811,9 +873,126 @@ fn a_credit_survives_a_reconnect_and_expires_once() {
         killed_at + 20_700,
     );
     let before = bank(&b);
+    // The TTL bounds what a departed player keeps: the same prune removes an
+    // expired credit instead of retaining it forever.
+    field.retain_casters(
+        &BTreeSet::from([a_character.guid]),
+        second_at + CREDIT_TTL_MS + 1,
+    );
+    assert_eq!(
+        field.pending_kill_credits(b_character.guid),
+        0,
+        "an expired credit is not retained for a departed player"
+    );
     let expired = b
         .tick_shared_effects(&mut field, &b_character, second_at + CREDIT_TTL_MS + 1)
         .unwrap();
     assert!(!expired.changed && expired.replies.is_empty());
     assert_eq!(bank(&b), before);
+}
+
+/// System chat lines (`chat::system`) as text.
+fn system_text(replies: &[Vec<u8>]) -> String {
+    replies
+        .iter()
+        .filter(|packet| packet.starts_with(&[15, 0, 3, 0]))
+        .map(|packet| {
+            let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
+            String::from_utf8_lossy(&packet[8..8 + length]).into_owned()
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+/// Start `battle` through the production dev route and load its arena the way
+/// the client does (a zone transfer, then Ready/Loaded -> `initialize_world`),
+/// which is what moves the encounter from Loading to Fighting.
+fn start_battle(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    battle: u32,
+    now_ms: u64,
+) -> CharacterState {
+    let started = game
+        .handle_in_world(
+            &chat::local_request(&format!("realm battle {battle}")),
+            character,
+            now_ms,
+        )
+        .unwrap();
+    let zoning = started.zoning.expect("the battle starts its arena");
+    let arena = CharacterState {
+        zone_id: zoning.zone_id,
+        position: zoning.position,
+        rotation: zoning.rotation,
+        ..character.clone()
+    };
+    game.initialize_world(&arena, now_ms + 100).unwrap();
+    arena
+}
+
+/// F276: the representability gate also covers the one non-field encounter
+/// reward (a battle win). A player at the coin cap gets no half-payout, one
+/// explicit system line, and the battle still completes; another player is paid.
+#[test]
+fn a_battle_reward_at_the_coin_cap_is_refused_with_feedback() {
+    // Overworld battle 12310: 25 coins, one prize row and no combat-level
+    // requirement, started through the production dev route.
+    let fixture = Fixture::new(vec![actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 500)]);
+    let at = [1.0, 0.0, 0.0];
+    let character = character_at(101, at);
+    let mut capped = player(&fixture, 101, 43, at, i32::MAX as u32, None);
+    capped.set_dev_tools(true);
+    capped.set_role(AccountRole::Admin);
+    let arena = start_battle(&mut capped, &character, 12310, 100);
+    let items_before = capped.state().inventory.items.len();
+    let won = capped
+        .handle_in_world(&chat::local_request("realm win"), &arena, 400)
+        .unwrap();
+    assert!(
+        won.changed,
+        "the battle still completes: {}",
+        system_text(&won.replies)
+    );
+    let text = system_text(&won.replies);
+    assert!(
+        text.contains("at its limit"),
+        "the player is told the reward was refused: {text}"
+    );
+    let state = capped.state();
+    assert_eq!(
+        state.inventory.coins,
+        i32::MAX as u32,
+        "the coins are not half-paid"
+    );
+    assert_eq!(
+        state.inventory.items.len(),
+        items_before,
+        "the prize is not half-paid"
+    );
+    assert_eq!(
+        state
+            .encounter
+            .and_then(|encounter| encounter.active)
+            .map(|active| active.phase),
+        Some(EncounterPhase::Won)
+    );
+
+    // The same battle pays a player below the cap: the refusal above is the
+    // cap, not a battle that carries no reward.
+    let paid_character = character_at(202, at);
+    let mut paid = player(&fixture, 202, 43, at, 0, None);
+    paid.set_dev_tools(true);
+    paid.set_role(AccountRole::Admin);
+    let paid_arena = start_battle(&mut paid, &paid_character, 12310, 100);
+    let paid_items_before = paid.state().inventory.items.len();
+    paid.handle_in_world(&chat::local_request("realm win"), &paid_arena, 400)
+        .unwrap();
+    let state = paid.state();
+    assert_eq!(state.inventory.coins, 25, "battle 12310 pays its 25 coins");
+    assert_eq!(
+        state.inventory.items.len(),
+        paid_items_before + 1,
+        "one prize row is granted"
+    );
 }
