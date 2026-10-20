@@ -1121,11 +1121,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2805; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4139 (ModelId=645, ModelFileName=human_f_tcg_ari_the_fish.agr, NameId=74099)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.115443, JenkinsLookup2 hash 1892561356, line 49906. The content quest record data/content/quests/card_duelist.json quest 3040025 (giver_npc_id 9500000869) binds intro_text_string_id 115443 as this offer speech for title Global.Text.115444. The Card Duelist job guide's Proof is in the Cards row names Ari the Fish the giver, and this first-person confession is the quest offer ('I can't keep up this charade anymore'). The Wilds guide row 201 places Ari at a camp south of Merry Vale. Guide: notes/Build Guides/Content/Jobs/Card Duelist.md line 110. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271/T298: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/card_duelist.json, quest 3040025 binds giver_npc_id 9500000869 from the guide row and intro_text_string_id 115443 as the offer speech; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous\"."
+          }
         ]
       },
       "heading": -0.065546,
       "model_id": 645,
-      "model_file_name": "human_f_tcg_ari_the_fish.agr"
+      "model_file_name": "human_f_tcg_ari_the_fish.agr",
+      "greeting_string_id": 115443
     },
     {
       "npc_id": 9000000243,
@@ -1669,11 +1684,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2278; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3535 (ModelId=499, ModelFileName=human_f_aster.agr, NameId=41571)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.387488, JenkinsLookup2 hash 3163514493, line 83481. The content quest record data/content/quests/warrior.json quest 3150010 (giver_npc_id 9000000243) binds intro_text_string_id 387488 as this offer speech for title Global.Text.387489. The Warrior job guide's Achieve Level 10 row names Aster the giver, and this first-person gate speech is the quest offer ('You want to help me? As if! ... Come back when you are at least a level 10 warrior'). The Wilds guide row 197 places Aster on the road south of Merry Vale. Guide: notes/Build Guides/Content/Jobs/Warrior.md line 101. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271/T298: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/warrior.json, quest 3150010 binds giver_npc_id 9000000243 from the guide row and intro_text_string_id 387488 as the offer speech; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous\"."
+          }
         ]
       },
       "heading": 2.723394,
       "model_id": 499,
-      "model_file_name": "human_f_aster.agr"
+      "model_file_name": "human_f_aster.agr",
+      "greeting_string_id": 387488
     },
     {
       "npc_id": 9500000870,
@@ -4410,11 +4440,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1882; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3139 (ModelId=77, ModelFileName=troll_forest.adr, NameId=40460)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.73378, JenkinsLookup2 hash 2001002164, line 52697. The Wilds guide's Bluz row cites this line in The Queen's Favor; the line names Bluz in the speaker role and closes 'for me', so Bluz is the speaker. Guide: notes/Build Guides/Content/NPCs/NPCs - Wilds.md line 126. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": 0.804633,
       "model_id": 77,
-      "model_file_name": "troll_forest.adr"
+      "model_file_name": "troll_forest.adr",
+      "greeting_string_id": 73378
     },
     {
       "npc_id": 9500000877,
@@ -9419,11 +9460,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1785; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3042 (ModelId=1317, ModelFileName=human_m_chase_wheeler.agr, NameId=395167)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.394709, JenkinsLookup2 hash 1007521181, line 26689. The content quest record data/content/quests/kart_driver.json quest 3080029 (giver_npc_id 9000000273) binds intro_text_string_id 394709 as this offer speech for title Global.Text.394710. The Kart Driver job guide's Sweetwater Sasparilla Sponsorship row names Chase Wheeler the giver, and this first-person line is the quest offer ('Unlike Linx, I don't have any sour grapes after a loss'). The Wilds guide row 180 places Chase at the Thunder Falls Speedway. Guide: notes/Build Guides/Content/Jobs/Kart Driver.md line 92. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271/T298: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/kart_driver.json, quest 3080029 binds giver_npc_id 9000000273 from the guide row and intro_text_string_id 394709 as the offer speech; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous\"."
+          }
         ]
       },
       "heading": 1.076215,
       "model_id": 1317,
-      "model_file_name": "human_m_chase_wheeler.agr"
+      "model_file_name": "human_m_chase_wheeler.agr",
+      "greeting_string_id": 394709
     },
     {
       "npc_id": 9500000887,
@@ -13834,11 +13890,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2090; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3347 (ModelId=8, ModelFileName=humanchild_m_tshirtwithbaggypants.adr, NameId=23716)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.25001, JenkinsLookup2 hash 1008851474, line 26732. The Wilds guide's Desi row lists this first-person plea among her dog-rescue quest text; the speaker owns Lucy, Desi's dog ('Please, you've got to help me! ... kidnapped my dog, Lucy'). Guide: notes/Build Guides/Content/NPCs/NPCs - Wilds.md line 42. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -0.131675,
       "model_id": 8,
-      "model_file_name": "humanchild_m_tshirtwithbaggypants.adr"
+      "model_file_name": "humanchild_m_tshirtwithbaggypants.adr",
+      "greeting_string_id": 25001
     },
     {
       "npc_id": 9500000894,
@@ -15052,11 +15119,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2146; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3403 (ModelId=202, ModelFileName=human_m_hooligan_boss_01.agr, NameId=139355)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.130251, JenkinsLookup2 hash 4010850362, line 106064. The content quest record data/content/quests/postman.json quest 3130033 (giver_npc_id 9000000317) binds intro_text_string_id 130251 as this offer speech for title Global.Text.130252. The Postman job guide's Outpost Ordeal row names Emahl the giver, and this first-person threat is the quest offer ('We plan on destroying all the mail'). The Wilds guide row 106 places Emahl in the PCA Camp. Guide: notes/Build Guides/Content/Jobs/Postman.md line 129. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271/T298: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/postman.json, quest 3130033 binds giver_npc_id 9000000317 from the guide row and intro_text_string_id 130251 as the offer speech; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous\"."
+          }
         ]
       },
       "heading": 0.23937,
       "model_id": 202,
-      "model_file_name": "human_m_hooligan_boss_01.agr"
+      "model_file_name": "human_m_hooligan_boss_01.agr",
+      "greeting_string_id": 130251
     },
     {
       "npc_id": 9500000896,
@@ -16330,11 +16412,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:107; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1327 (ModelId=191, ModelFileName=robgoblin_m_mage.adr, NameId=20517)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.24947, JenkinsLookup2 hash 698508245, line 18388. The content quest record data/content/quests/wizard.json quest 3160003 (giver_npc_id 9000000324) binds intro_text_string_id 24947 as this offer speech for title Global.Text.20859. The Wizard job guide's How to be a Wizard row names Fizzlesticks the giver and quotes this first-person errand offer ('That no-good Robgoblin Adept stole my spell book!'). The Wilds guide row 89 lists him as the Robgoblin Camp Wizard trainer. Guide: notes/Build Guides/Content/Jobs/Wizard.md line 76. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271/T298: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/wizard.json, quest 3160003 binds giver_npc_id 9000000324 from the guide row and intro_text_string_id 24947 as the offer speech; that record marks the intro id reconstructed: \"(R) T242: intro/description/end text ids are client locale ids from the guide (intro 24947, description 20860, end 9797); no prose is authored.\"."
+          }
         ]
       },
       "heading": -0.363666,
       "model_id": 191,
-      "model_file_name": "robgoblin_m_mage.adr"
+      "model_file_name": "robgoblin_m_mage.adr",
+      "greeting_string_id": 24947
     },
     {
       "npc_id": 9500000898,
@@ -18635,11 +18732,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2730; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4064 (ModelId=187, ModelFileName=robgoblin_f_cook.adr, NameId=15854)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.73077, JenkinsLookup2 hash 3466351639, line 91803. The content quest record data/content/quests/chef.json quest 3050030 (giver_npc_id 9000000332) binds intro_text_string_id 73077 as this offer speech for title Global.Text.73078. The Chef job guide's Family Style! row names Glerga the giver, and this first-person speech is the quest offer ('I sto--er, I perfected a couple recipes'). The Wilds guide row 90 places Glerga at the Robgoblin Camp cooking table. Guide: notes/Build Guides/Content/Jobs/Chef.md line 136. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271/T298: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/chef.json, quest 3050030 binds giver_npc_id 9000000332 from the guide row and intro_text_string_id 73077 as the offer speech; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous\"."
+          }
         ]
       },
       "heading": 2.82114,
       "model_id": 187,
-      "model_file_name": "robgoblin_f_cook.adr"
+      "model_file_name": "robgoblin_f_cook.adr",
+      "greeting_string_id": 73077
     },
     {
       "npc_id": 9500000903,
@@ -20269,11 +20381,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1838; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3095 (ModelId=166, ModelFileName=troll_peasant_01.adr, NameId=20955)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.78924, JenkinsLookup2 hash 2060862346, line 54301. The content quest record data/content/quests/ninja.json quest 3110002 (giver_npc_id 9000000335) binds intro_text_string_id 78924 as this offer speech for title Global.Text.78925. The Ninja job guide's Stolen Away row names Grosh the giver, and this troll first-person order is the quest offer ('Troll Summoner kidnap for Queen... You go find him... You defeat him'). The Wilds guide row 115 places Grosh in the Forest Troll Village. Guide: notes/Build Guides/Content/Jobs/Ninja.md line 70. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271/T298: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/ninja.json, quest 3110002 binds giver_npc_id 9000000335 from the guide row and intro_text_string_id 78924 as the offer speech; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous\"."
+          }
         ]
       },
       "heading": -1.585102,
       "model_id": 166,
-      "model_file_name": "troll_peasant_01.adr"
+      "model_file_name": "troll_peasant_01.adr",
+      "greeting_string_id": 78924
     },
     {
       "npc_id": 9500000906,
@@ -21104,11 +21231,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2802; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4136 (ModelId=8, ModelFileName=humanchild_m_tshirtwithbaggypants.adr, NameId=37013)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.9599, JenkinsLookup2 hash 2276171514, line 59936. The Wilds guide's Greta row attributes this first-person lost-brother line to Hans ('Hans says ... She's by the road? Ok, thanks!'); he names his sister Greta, and the Hans row at line 199 places him east of her. Guide: notes/Build Guides/Content/NPCs/NPCs - Wilds.md line 198. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -1.72684,
       "model_id": 8,
-      "model_file_name": "humanchild_m_tshirtwithbaggypants.adr"
+      "model_file_name": "humanchild_m_tshirtwithbaggypants.adr",
+      "greeting_string_id": 9599
     },
     {
       "npc_id": 9000000347,
@@ -21656,11 +21794,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2080; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3337 (ModelId=313, ModelFileName=human_m_freestyle_04.agr, NameId=115490)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.104327, JenkinsLookup2 hash 2193026908, line 57742. The content quest record data/content/quests/card_duelist.json quest 3040027 (giver_npc_id 9000000347) binds intro_text_string_id 104327 as this offer speech for title Global.Text.104328. The Card Duelist job guide's Playing a Prodigy row names Herme Fickleleaf the giver, and this first-person referral is the quest offer ('I can't promise Maple is still where she said she would be'). The Wilds guide row 40 places Herme near The Roadhouse. Guide: notes/Build Guides/Content/Jobs/Card Duelist.md line 112. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271/T298: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/card_duelist.json, quest 3040027 binds giver_npc_id 9000000347 from the guide row and intro_text_string_id 104327 as the offer speech; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous\"."
+          }
         ]
       },
       "heading": -1.502993,
       "model_id": 313,
-      "model_file_name": "human_m_freestyle_04.agr"
+      "model_file_name": "human_m_freestyle_04.agr",
+      "greeting_string_id": 104327
     },
     {
       "npc_id": 9500000908,
@@ -30848,11 +31001,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:106; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1326 (ModelId=189, ModelFileName=robgoblin_m_bruiser.adr, NameId=20518)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.141009, JenkinsLookup2 hash 2705176635, line 71216. The content quest record data/content/quests/brawler.json quest 3030028 (giver_npc_id 9000000415) binds intro_text_string_id 141009 as this offer speech for title Global.Text.141010. The Brawler job guide's One Man's Junk... row names Nurble the giver, and this first-person line is the quest offer ('a lot of my precious junk... I am unable to pay Andrew... I'll repay the rest of my debt'). The Wilds guide row 91 places Nurble at the Robgoblin Camp junk pile. Guide: notes/Build Guides/Content/Jobs/Brawler.md line 136. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271/T298: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/brawler.json, quest 3030028 binds giver_npc_id 9000000415 from the guide row and intro_text_string_id 141009 as the offer speech; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous\"."
+          }
         ]
       },
       "heading": 1.339543,
       "model_id": 189,
-      "model_file_name": "robgoblin_m_bruiser.adr"
+      "model_file_name": "robgoblin_m_bruiser.adr",
+      "greeting_string_id": 141009
     },
     {
       "npc_id": 9500000926,
@@ -40557,11 +40725,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2097; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3354 (ModelId=377, ModelFileName=fairy_farmer_f.adr, NameId=18719)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.391043, JenkinsLookup2 hash 3886409354, line 102718. The content quest record data/content/quests/adventurer.json quest 3000027 (giver_npc_id 9000000477) binds intro_text_string_id 391043 as this offer speech for title Global.Text.391044. The Adventurer job guide's Sharing Your Talents row names Starshine the giver, and this first-person invitation is the quest offer ('share your talents... I'm sure there are people all over Sacred Grove that could use your help'). The Wilds guide row 74 places Starshine in front of a Pixie Nursery house. Guide: notes/Build Guides/Content/Jobs/Adventurer.md line 115. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271/T298: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/adventurer.json, quest 3000027 binds giver_npc_id 9000000477 from the guide row and intro_text_string_id 391043 as the offer speech; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous\"."
+          }
         ]
       },
       "heading": 1.958433,
       "model_id": 377,
-      "model_file_name": "fairy_farmer_f.adr"
+      "model_file_name": "fairy_farmer_f.adr",
+      "greeting_string_id": 391043
     },
     {
       "npc_id": 9000000482,
@@ -42281,11 +42464,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2076; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3333 (ModelId=496, ModelFileName=human_m_treasurehunter.agr, NameId=71252)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.73492, JenkinsLookup2 hash 1322558947, line 35003. The content quest record data/content/quests/medic.json quest 3090010 (giver_npc_id 9000000488) binds intro_text_string_id 73492 as this offer speech for title Global.Text.73493. The Medic job guide's Medic on a Mission row names Terrence the giver, and this first-person order is the quest offer ('Those medical supplies need to get back to Sanctuary!'). The Wilds guide row 36 places Terrence at The Roadhouse. Guide: notes/Build Guides/Content/Jobs/Medic.md line 87. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271/T298: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/medic.json, quest 3090010 binds giver_npc_id 9000000488 from the guide row and intro_text_string_id 73492 as the offer speech; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous\"."
+          }
         ]
       },
       "heading": 2.335237,
       "model_id": 496,
-      "model_file_name": "human_m_treasurehunter.agr"
+      "model_file_name": "human_m_treasurehunter.agr",
+      "greeting_string_id": 73492
     },
     {
       "npc_id": 9500000952,
@@ -43323,11 +43521,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1856; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3113 (ModelId=167, ModelFileName=troll_peasant_02.adr, NameId=20957)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.20984, JenkinsLookup2 hash 217873432, line 5721. The Wilds guide's Troggers row lists this first-person pig-keeper plea as his Rescue Porky quest text ('Queen take too many of my pigs'). Guide: notes/Build Guides/Content/NPCs/NPCs - Wilds.md line 124. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": -2.636127,
       "model_id": 167,
-      "model_file_name": "troll_peasant_02.adr"
+      "model_file_name": "troll_peasant_02.adr",
+      "greeting_string_id": 20984
     },
     {
       "npc_id": 9000000495,
@@ -45520,11 +45729,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1840; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3097 (ModelId=168, ModelFileName=troll_shaman.adr, NameId=20956)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.21014, JenkinsLookup2 hash 932035218, line 24650. The Wilds guide's Voggun row attributes this first-person teaching line to him ('Me help you now. I teach you runecasting recipe.'). Guide: notes/Build Guides/Content/NPCs/NPCs - Wilds.md line 116. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          }
         ]
       },
       "heading": 0.916769,
       "model_id": 168,
-      "model_file_name": "troll_shaman.adr"
+      "model_file_name": "troll_shaman.adr",
+      "greeting_string_id": 21014
     },
     {
       "npc_id": 9500000959,

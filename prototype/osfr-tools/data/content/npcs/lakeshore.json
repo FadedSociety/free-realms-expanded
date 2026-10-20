@@ -12597,11 +12597,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:4149; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=23617 (ModelId=366, ModelFileName=fairy_f_freestyle_03.agr, NameId=40410)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.41207, JenkinsLookup2 hash 3015081219, line 79651. The Lakeshore guide row 45 names Raeya Alderspark the giver of Flickering Flames; Global.Text.41207 is the first-person offer line immediately before the quest title Global.Text.41208 ('our campfire... I am running out of supplies'), matching the guide's description of her campfire and its bixie-wax and flame-flower supplies. Guide: notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md line 45. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: the offer-speech link is inferred from locale adjacency, not recovered from a client greeting binding. Global.Text.41207 is the first-person line immediately before the quest title Global.Text.41208, and the guide row names the NPC the giver; no recovered server greeting or phase table exists."
+          }
         ]
       },
       "heading": -1.745226,
       "model_id": 366,
-      "model_file_name": "fairy_f_freestyle_03.agr"
+      "model_file_name": "fairy_f_freestyle_03.agr",
+      "greeting_string_id": 41207
     },
     {
       "npc_id": 9000000185,
@@ -15856,11 +15871,26 @@
             "kind": "reconstructed",
             "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.24829, JenkinsLookup2 hash 1824578395, line 48173. The content quest record data/content/quests/ninja.json quest 3110001 (giver_npc_id 9000000223) binds intro_text_string_id 24829 as this offer speech for title Global.Text.20960. The Ninja job guide's entry row E1 names Ty the giver of Ninja: The Ninja Path and records this first-person offer as his pitch to a newcomer ('Part of me wants to help... Are you willing to fight for the good of others?'). The Lakeshore guide row 39 lists Ty as the town's Ninja trainer. Guide: notes/Build Guides/Content/Jobs/Ninja.md line 69. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271/T298: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/ninja.json, quest 3110001 binds giver_npc_id 9000000223 from the guide row and intro_text_string_id 24829 as the offer speech; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous\"."
+          }
         ]
       },
       "heading": 0.067937,
       "model_id": 907,
-      "model_file_name": "human_m_ty_downtrodden.agr"
+      "model_file_name": "human_m_ty_downtrodden.agr",
+      "greeting_string_id": 24829
     },
     {
       "npc_id": 9500000367,
@@ -16630,11 +16660,26 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1815; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3072 (ModelId=32, ModelFileName=fairy_m_farmer_01.adr, NameId=19672)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T298: en_us_data.dat Global.Text.409412, JenkinsLookup2 hash 1256773114, line 33294. The content quest record data/content/quests/fisherman.json quest 3070033 (giver_npc_id 9000000233) binds intro_text_string_id 409412 as this offer speech for title Global.Text.409413. The Fisherman job guide's An Offering row names Waterwings the giver, and this first-person locale line is the quest offer about the chugawug meal delivery ('while I clean up'). The Lakeshore guide row 29 names him the renowned fisherman. Guide: notes/Build Guides/Content/Jobs/Fisherman.md line 124. See notes/Research/NPC Greetings Lakeshore and Wilds.md for the locale line, hash and anchors."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T298: use this verified speaker's locale speech as the fixed default Talk greeting; the original server greeting/phase binding is not recovered and no text is invented."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) F271/T298: this speaker link is inferred through reconstructed quest text, not recovered from a client greeting binding. In data/content/quests/fisherman.json, quest 3070033 binds giver_npc_id 9000000233 from the guide row and intro_text_string_id 409412 as the offer speech; that record marks the intro id reconstructed: \"(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous\"."
+          }
         ]
       },
       "heading": -0.648879,
       "model_id": 32,
-      "model_file_name": "fairy_m_farmer_01.adr"
+      "model_file_name": "fairy_m_farmer_01.adr",
+      "greeting_string_id": 409412
     }
   ]
 }
