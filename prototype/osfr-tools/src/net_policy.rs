@@ -96,6 +96,11 @@ impl<K: Ord> KeyedBuckets<K> {
         self.buckets.len()
     }
 
+    /// Forget one key so its next `allow` starts with a full burst.
+    pub fn remove(&mut self, key: &K) {
+        self.buckets.remove(key);
+    }
+
     pub fn is_empty(&self) -> bool {
         self.buckets.is_empty()
     }
@@ -138,6 +143,16 @@ mod tests {
         let later = start + std::time::Duration::from_millis(400); // 2 tokens
         assert!(bucket.take(1.0, 5.0, 10.0, later) && bucket.take(1.0, 5.0, 10.0, later));
         assert!(!bucket.take(1.0, 5.0, 10.0, later));
+    }
+
+    #[test]
+    fn removing_a_key_starts_it_with_a_fresh_burst() {
+        let now = Instant::now();
+        let mut limiter = KeyedBuckets::new(1.0, 1.0, 4);
+        assert!(limiter.allow(7, now) && !limiter.allow(7, now));
+        limiter.remove(&7);
+        assert!(limiter.allow(7, now), "a forgotten key gets a full burst");
+        assert_eq!(limiter.len(), 1);
     }
 
     #[test]

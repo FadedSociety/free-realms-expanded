@@ -10,9 +10,11 @@ pub(super) fn wrap_application(inner: &[u8]) -> Vec<u8> {
     out
 }
 
-/// T008: one opcode-164 jump body to the sessions whose directed view contains
-/// the sender (the `ride_fanout` visibility rule). Called after the commit
-/// succeeds, like the T199 broadcast; the sender never receives its own jump.
+/// T008/F290: one opcode-164 jump body to the sessions whose directed view
+/// contains the sender (the `ride_fanout` visibility rule). Called after the
+/// commit succeeds, like the T199 broadcast; the sender never receives its own
+/// jump. Each character has a relay budget: over budget the 164 is dropped
+/// silently, while the accepted pose still fans out through the 125 path.
 pub(super) fn jump_fanout(
     world: &SharedWorld,
     sender: SessionId,
@@ -29,19 +31,63 @@ pub(super) fn jump_fanout(
     else {
         return Vec::new();
     };
-    let bytes = wrap_application(&jump);
-    world
+    let viewers = world
         .players
         .nearby_sessions(zone, position)
         .into_iter()
         .filter(|recipient| {
             *recipient != sender && world.players.knows_character(*recipient, character)
         })
+        .collect::<Vec<_>>();
+    if viewers.is_empty()
+        || !world
+            .security
+            .lock()
+            .unwrap_or_else(|error| error.into_inner())
+            .jump_relays
+            .allow(character, Instant::now())
+    {
+        return Vec::new();
+    }
+    let bytes = wrap_application(&jump);
+    viewers
+        .into_iter()
         .map(|recipient| Delivery {
             recipient,
             bytes: bytes.clone(),
         })
         .collect()
+}
+
+/// Queue the notices staged with a successful transaction: the T199 broadcast,
+/// then the T008/F290 jump relay. The caller passes only a committed outcome, so
+/// a refused or failed transaction queues neither.
+pub(super) fn post_commit(
+    session: &mut Session,
+    sessions: &mut SessionMap,
+    world: &mut SharedWorld,
+    broadcast: Option<String>,
+    jump: Option<Vec<u8>>,
+) -> Result<(), Box<dyn std::error::Error>> {
+    if let Some(text) = broadcast {
+        for delivery in broadcast_deliveries(&text, world) {
+            queue_delivery(session, sessions, world, delivery)?;
+        }
+    }
+    for delivery in jump_fanout(world, session.id, jump) {
+        queue_delivery(session, sessions, world, delivery)?;
+    }
+    Ok(())
+}
+
+/// Drop a character's relay budget when its session ends.
+pub(super) fn forget_jump_relay(world: &SharedWorld, character: u64) {
+    world
+        .security
+        .lock()
+        .unwrap_or_else(|error| error.into_inner())
+        .jump_relays
+        .remove(&character);
 }
 
 /// One client-refusal reply, or nothing when the error has no client form.

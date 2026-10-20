@@ -111,7 +111,7 @@ pub struct Gateway {
     movement_state: MovementState,
     expected_discontinuity: Option<ExpectedDiscontinuity>,
     last_movement_ms: Option<u64>,
-    /// T008: final-pose opcode-164 relay body; the host takes it once after commit.
+    /// Staged opcode-164 relay body; the host takes it once after commit.
     jump_relay: Option<Vec<u8>>,
     trace_enabled: bool,
     // (R) Server-only authorization seam; no client parser sets an instance id.
@@ -386,13 +386,11 @@ enum Event {
     Login,
     Ready,
     Loaded,
-    /// `Some(vertical_velocity)` is the native opcode-164 jump update.
-    Position(MovementUpdate, Option<f32>),
+    Position(MovementUpdate, Option<crate::jump_relay::JumpImpulse>),
     Camera,
     Time,
     Application(Vec<u8>),
 }
-
 // (R) Account writes cannot participate in a staged character transaction.
 fn reject_bundled_role_changes(events: &[Event], guid: u64) -> io::Result<()> {
     if events.iter().any(|event| match event {
@@ -631,7 +629,7 @@ fn parse_message(message: &[u8], state: &CharacterState, version: &str) -> io::R
                     // Native jump reader 008e5ba0 / writer 009127f0: 40-byte body.
                     let jump = crate::jump_relay::decode(inner, state.guid)?;
                     reader.take(38)?;
-                    Event::Position(jump.movement(), Some(jump.vertical_velocity))
+                    Event::Position(jump.movement(), Some(jump.impulse()))
                 }
                 126 => {
                     reader.vector()?;
@@ -1408,6 +1406,7 @@ impl Gateway {
             MovementState::new(self.state.zone_id, self.state.position, self.state.rotation);
         self.expected_discontinuity = None;
         self.last_movement_ms = None;
+        self.jump_relay = None;
     }
 
     pub fn handle(&mut self, message: &[u8]) -> io::Result<GatewayOutcome> {
@@ -1643,6 +1642,7 @@ impl Gateway {
                     outcome.replies.push(wrapped(&inner));
                 }
                 Event::Application(inner) => {
+                    impulse = None;
                     if let Some(game) = gameplay.as_mut() {
                         if !loaded && !(ready && game.accepts_kart_loading_application(&inner)) {
                             set_trace(
@@ -1811,7 +1811,7 @@ impl Gateway {
             }
         }
         budget.stage(&outcome.replies[counted_replies..])?;
-        self.jump_relay = impulse.map(|v| crate::jump_relay::relay(state.guid, &movement_state, v));
+        self.jump_relay = crate::jump_relay::body(state.guid, &movement_state, impulse);
         self.state = state;
         self.gameplay = gameplay;
         self.movement_state = movement_state;

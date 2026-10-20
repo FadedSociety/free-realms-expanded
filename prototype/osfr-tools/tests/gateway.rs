@@ -50,6 +50,16 @@ fn position(guid: u64, xyz: [f32; 3], rotation: [f32; 3]) -> Vec<u8> {
     packet(125, &fields)
 }
 
+fn jump(guid: u64, xyz: [f32; 3], velocity: f32) -> Vec<u8> {
+    let mut fields = guid.to_le_bytes().to_vec();
+    for value in xyz.into_iter().chain([0.0, 0.0, 1.0]) {
+        fields.extend_from_slice(&value.to_le_bytes());
+    }
+    fields.extend_from_slice(&[4, 255]);
+    fields.extend_from_slice(&velocity.to_le_bytes());
+    packet(164, &fields)
+}
+
 fn bundle(messages: &[Vec<u8>]) -> Vec<u8> {
     let mut bytes = vec![0, 25];
     for message in messages {
@@ -268,6 +278,44 @@ fn position_updates_character_but_camera_does_not() {
         .as_u64()
         .unwrap() as usize;
     assert_eq!(&replies[7][offset..offset + 4], &xyz[0].to_le_bytes());
+}
+
+#[test]
+fn reset_session_drops_a_staged_jump_relay() {
+    let reference = Reference::new(VERSION, None);
+    let mut gateway = reference.ready();
+    let xyz = [4.0, 2.0, 3.0];
+    gateway.handle(&jump(1, xyz, 4.5)).unwrap();
+    assert!(gateway.take_jump_relay().is_some());
+    gateway.handle(&jump(1, xyz, 4.5)).unwrap();
+    gateway.reset_session();
+    assert!(
+        gateway.take_jump_relay().is_none(),
+        "a reset session must not keep a staged jump body"
+    );
+}
+
+#[test]
+fn an_application_child_after_a_jump_drops_the_staged_relay() {
+    let reference = Reference::new(VERSION, None);
+    let mut gateway = reference.ready();
+    gateway.handle(&jump(1, [4.0, 2.0, 3.0], 4.5)).unwrap();
+    assert!(gateway.take_jump_relay().is_some());
+    // A later application child can relocate or zone the character (the
+    // gameplay path returns `relocation`/`zoning` there); the impulse must not
+    // survive it. Here gameplay is absent, so the child is forwarded instead.
+    let out = gateway
+        .handle(&bundle(&[
+            jump(1, [5.0, 2.0, 3.0], 4.5),
+            wrapped(5, &[16, 0]),
+        ]))
+        .unwrap();
+    assert_eq!(out.applications, vec![vec![16, 0]]);
+    assert_eq!(gateway.state().position, [5.0, 2.0, 3.0]);
+    assert!(
+        gateway.take_jump_relay().is_none(),
+        "a later application child must drop the jump relay body"
+    );
 }
 
 #[test]

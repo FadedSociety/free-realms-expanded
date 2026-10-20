@@ -9,6 +9,7 @@ use osfr_tools::game_rules::{GameRuleSet, MembershipState, RulePolicy};
 use osfr_tools::game_store::{load_or_create, save};
 use osfr_tools::gameplay::Gameplay;
 use osfr_tools::gateway::{Gateway, GatewayOutcome};
+use osfr_tools::jump_relay::{RELAY_BURST, RELAY_RATE_PER_SECOND};
 use osfr_tools::login;
 use osfr_tools::mounts::{MountTail, RidePose, RideView};
 use osfr_tools::net_policy::{Bucket, IpLimiter, KeyedBuckets};
@@ -35,7 +36,7 @@ use osfr_tools::world::{NpcVisibility, World, WorldPose};
 
 #[path = "osfr_gateway/delivery.rs"]
 mod delivery;
-use delivery::{chat_error_delivery, jump_fanout, wrap_application};
+use delivery::{chat_error_delivery, wrap_application};
 #[path = "osfr_gateway/t006_guilds.rs"]
 mod t006_guilds;
 
@@ -507,6 +508,8 @@ struct ChatMember {
 struct Security {
     budgets: social_chat::ActionBudgets,
     combat: KeyedBuckets<u64>,
+    // (R) Per-character opcode-164 relay budget; over budget only the relay drops.
+    jump_relays: KeyedBuckets<u64>,
     log: Option<SecurityLog>,
 }
 
@@ -516,6 +519,7 @@ impl Default for Security {
             budgets: social_chat::ActionBudgets::default(),
             // (R) Shared, nonrefundable account budget, 10/s burst 20; bounded keys.
             combat: KeyedBuckets::new(10., 20., MAX_SESSIONS),
+            jump_relays: KeyedBuckets::new(RELAY_RATE_PER_SECOND, RELAY_BURST, MAX_SESSIONS),
             log: None,
         }
     }
@@ -1688,15 +1692,8 @@ impl Session {
             sessions,
             now_ms,
         )?;
-        if committed && let Some(text) = broadcast {
-            for delivery in delivery::broadcast_deliveries(&text, world) {
-                queue_delivery(self, sessions, world, delivery)?;
-            }
-        }
         if committed {
-            for delivery in jump_fanout(world, self.id, jump) {
-                queue_delivery(self, sessions, world, delivery)?;
-            }
+            delivery::post_commit(self, sessions, world, broadcast, jump)?;
         }
         Ok(())
     }
@@ -4472,6 +4469,7 @@ impl Server {
                 self.start.elapsed().as_millis() as u64,
             );
             self.world.active_sessions.remove(&session.character_guid);
+            delivery::forget_jump_relay(&self.world, session.character_guid);
         }
         self.world.session_keys.remove(&session.id);
         for delivery in deliveries {

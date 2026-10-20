@@ -986,7 +986,9 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
         for value in position.into_iter().chain(direction) {
             inner.extend(value.to_le_bytes());
         }
-        inner.extend([2, 255]);
+        // Native sender `0092e670` forces state bit 2; the 125 pose below keeps
+        // a state without it, so the bundle pins which byte the relay uses.
+        inner.extend([4, 255]);
         inner.extend(velocity.to_le_bytes());
         assert_eq!(inner.len(), osfr_tools::jump_relay::BODY_LEN);
         inner
@@ -1021,7 +1023,8 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
     let relay = osfr_tools::jump_relay::decode(&relayed[0], character).unwrap();
     assert_eq!(relay.position, [start[0] + 0.5, start[1], start[2]]);
     assert_eq!(relay.vertical_velocity, 0.5);
-    assert_eq!((relay.state, relay.unknown), (2, 255));
+    assert_eq!((relay.state, relay.unknown), (4, 255));
+    assert_eq!(relay.state & 4, 4, "bit 2 carries the jump velocity");
     assert!(
         jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
             sessions.get_mut(&non_viewer_key).unwrap(),
@@ -1170,6 +1173,7 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
     );
     // T266 finding 1: a 164 followed by a 125 in one bundle still relays, at the
     // bundle's final committed pose (P4) rather than the stale 164 pose (P3).
+    // T266/F290: the 125's state (2, no bit 2) must not replace the 164's state.
     let mut newer = 125u16.to_le_bytes().to_vec();
     newer.extend(character.to_le_bytes());
     for value in [start[0] + 4.0, start[1], start[2], 0.0, 0.0, 1.0] {
@@ -1213,12 +1217,20 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
         "the relay uses the final pose, not the stale 164 pose"
     );
     assert_eq!(relayed.vertical_velocity, 3.0);
+    assert_eq!(
+        (relayed.state, relayed.unknown),
+        (4, 255),
+        "the relay keeps the 164's state bytes, not the later 125 pose's"
+    );
+    assert_eq!(relayed.state & 4, 4, "bit 2 carries the jump velocity");
     assert!(
         sender.gateway.take_jump_relay().is_none(),
         "the host consumed the relay body"
     );
     // T266: a soft-over-speed jump is corrected for the sender and still relays
     // the pose the server committed (the clamp target), not the client's P62.
+    // The relay budget is per character; a normal cadence refills it.
+    std::thread::sleep(std::time::Duration::from_millis(120));
     sender
         .dispatch_message(
             &jump(62.0),
@@ -1252,6 +1264,7 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
     );
     // T266: a finite velocity over the relay bound is clamped, not refused (a
     // refused body would end the session); the pose is still validated.
+    std::thread::sleep(std::time::Duration::from_millis(120));
     sender
         .dispatch_message(
             &wrap(&jump_body(
@@ -1279,6 +1292,64 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
             .unwrap()
             .vertical_velocity,
         osfr_tools::jump_relay::MAX_VERTICAL_SPEED
+    );
+    // T266/F290: a 164 flood from one character is capped by the relay budget,
+    // while every accepted pose still fans out through opcode 125.
+    std::thread::sleep(std::time::Duration::from_millis(400));
+    for step in 0..10u64 {
+        sender
+            .dispatch_message(
+                &jump(7.0 + step as f32 * 0.25),
+                &options,
+                1_800 + step * 10,
+                &mut world,
+                &mut membership,
+                &mut sessions,
+                None,
+            )
+            .unwrap();
+    }
+    let flood = super::f120_fishing_hour_reconnect::drain_replies(
+        sessions.get_mut(&recipient_key).unwrap(),
+        1_890,
+    );
+    let count = |inner: &[u8]| {
+        flood
+            .iter()
+            .filter(|message| {
+                message
+                    .get(7..)
+                    .is_some_and(|bytes| bytes.starts_with(inner))
+            })
+            .count()
+    };
+    assert!(count(&[164, 0]) >= 1, "the budget still allows its burst");
+    assert!(
+        count(&[164, 0]) <= osfr_tools::jump_relay::RELAY_BURST as usize,
+        "a 164 flood relays at most the per-character budget"
+    );
+    assert_eq!(count(&[125, 0]), 10, "every accepted pose still fans out");
+    // A normal ~0.5 s jump cadence is never dropped.
+    std::thread::sleep(std::time::Duration::from_millis(500));
+    sender
+        .dispatch_message(
+            &jump(10.0),
+            &options,
+            2_000,
+            &mut world,
+            &mut membership,
+            &mut sessions,
+            None,
+        )
+        .unwrap();
+    assert_eq!(
+        jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
+            sessions.get_mut(&recipient_key).unwrap(),
+            2_000,
+        ))
+        .len(),
+        1,
+        "a normal jump after the flood relays"
     );
     // The world-entry gate is shared with opcode 125: a jump before Ready is refused.
     let mut early = new_session(20);
