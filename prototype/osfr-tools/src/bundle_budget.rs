@@ -31,17 +31,32 @@ impl BundleBudget {
     }
 
     /// Charge replies about to be staged; a bundle over the budget is refused before commit.
-    pub fn stage(&mut self, replies: &[Vec<u8>]) -> io::Result<()> {
+    /// Returns the bytes charged so a caller that discards them can [`Self::release`] them.
+    pub fn stage(&mut self, replies: &[Vec<u8>]) -> io::Result<usize> {
         let Some(used) = &mut self.0 else {
-            return Ok(());
+            return Ok(0);
         };
-        *used = used.saturating_add(replies.iter().map(Vec::len).sum::<usize>());
+        let charged = replies.iter().map(Vec::len).sum::<usize>();
+        *used = used.saturating_add(charged);
         if *used > MAX_BUNDLE_REPLY_BYTES {
             return Err(io::Error::new(
                 io::ErrorKind::InvalidData,
                 "bundled application response exceeds the outbound budget",
             ));
         }
-        Ok(())
+        Ok(charged)
+    }
+
+    /// Drop a charge whose replies were discarded before queueing (a refused precommit
+    /// transfer). A refusal must not charge later children for replies nobody receives.
+    pub fn release(&mut self, bytes: usize) {
+        if let Some(used) = &mut self.0 {
+            *used = used.saturating_sub(bytes);
+        }
+    }
+
+    /// Reply bytes charged so far; None outside a bundle.
+    pub fn used(&self) -> Option<usize> {
+        self.0
     }
 }

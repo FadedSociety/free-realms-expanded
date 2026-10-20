@@ -577,75 +577,18 @@ fn live_outfit_fanout_respects_directed_visibility_cap() {
     }));
 }
 
-/// F179: the session splits a bundle that contains a combat/shared interaction before
+/// F179/F264: the session splits a bundle that contains a combat/shared interaction before
 /// `handle_at`, so the library's per-message budget never sees the other children. The reply
-/// budget now accumulates across those ordered children; the third large definition read puts a
-/// read-only bundle over it and the dispatch is refused before that child commits.
+/// budget accumulates across those ordered children; the third large definition read puts a
+/// read-only bundle over it and the dispatch is refused before that child commits. The pose
+/// child dispatched first must survive that refusal: only the session's ordered per-child split
+/// commits it, so the assertion proves the split ran rather than a whole-bundle `handle_at`.
 #[test]
 fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
     use sha2::{Digest, Sha256};
 
-    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
     let scratch = test_support::Scratch::new("f179-split");
-    let content = scratch.path().join("content");
-    fs::create_dir_all(content.join("npcs")).unwrap();
-    fs::create_dir_all(content.join("quests")).unwrap();
-    let source = std::env::var_os("OSFR_APP_FUZZ_CONTENT")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| root.join("reports/round59-native-20261015T124443Z/content"));
-    for entry in fs::read_dir(&source).unwrap() {
-        let path = entry.unwrap().path();
-        if path.is_file() {
-            fs::copy(&path, content.join(path.file_name().unwrap())).unwrap();
-        }
-    }
-    let provenance = json!([{"kind":"reconstructed","evidence":"F179 synthetic test policy"}]);
-    let write = |name: &str, value: serde_json::Value| {
-        fs::write(content.join(name), serde_json::to_vec(&value).unwrap()).unwrap();
-    };
-    write(
-        "npcs/synthetic.json",
-        json!({"schema_version":1,"records":[
-            {"npc_id":700,"name":"Synthetic NPC","zone_id":0,"position":[0.,0.,0.],
-             "placement":"legacy_data","model_id":1,"roles":["vendor"],"vendor_stock":"synthetic"}
-        ]}),
-    );
-    write(
-        "npc_spawns_extra.json",
-        json!({"schema_version":1,"records":[]}),
-    );
-    write(
-        "zones.json",
-        json!({"schema_version":1,"records":[{"id":0,"name":"Synthetic zone"}]}),
-    );
-    write(
-        "vendors.json",
-        json!({"schema_version":1,"vendors":[{"npc_id":700,"item_ids":[8]}]}),
-    );
-    write(
-        "stores.json",
-        json!({"schema_version":1,"marketplace":{
-            "enabled_on_handshake":false,"orders_enabled":false,
-            "payment_sources_enabled":false,"not_available_message":"disabled"},
-            "items":[{"item_id":8,"purchase_price_coins":15,"member_discount_percent":null,
-                      "member_price_coins":null,"sell_price_coins":7,"no_sale":false}]}),
-    );
-    write(
-        "quests/synthetic.json",
-        json!({"schema_version":1,"records":[{
-            "id":701,"title_string_id":1,"giver_npc_id":700,"prerequisite_quest_ids":[],
-            "objectives":[{"kind":"talk_to_npc","id":702,"npc_id":700,"source":provenance}],
-            "rewards":[{"coins":7,"items":[],"job_xp":{},"source":provenance}],"source":provenance
-        }]}),
-    );
-    write(
-        "jobs.json",
-        json!({"schema_version":1,"records":[{
-            "id":"synthetic","name":"Synthetic job","profile_id":null,"category":"freestyle",
-            "max_level":20,"members_only":false,"trainer_npc_ids":[],"quest_ids":[701],
-            "abilities":[],"source":provenance
-        }]}),
-    );
+    let content = test_support::vendor_content(&scratch);
     // 43 maximum-size rows are ~2.7 MiB per child: two children stay under the 8 MiB bundle
     // budget, the third pushes the split bundle over it.
     let ids: Vec<u32> = (0..43).map(|index| 930_000 + index).collect();
@@ -662,10 +605,11 @@ fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
             })
         })
         .collect();
-    write(
-        "item-catalogue.json",
-        json!({"schema_version":1,"definitions":definitions}),
-    );
+    fs::write(
+        content.join("item-catalogue.json"),
+        serde_json::to_vec(&json!({"schema_version":1,"definitions":definitions})).unwrap(),
+    )
+    .unwrap();
 
     let mut options = test_support::options(scratch.state());
     options.content = Some(content);
@@ -695,16 +639,48 @@ fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
     session.gateway.handle(&login).unwrap();
     session.gateway.handle(&wrap(&[13, 0])).unwrap();
     session.gateway.handle(&wrap(&[10, 0])).unwrap();
+    let start = session.gateway.state().clone();
+    // Client reader `008e5940`: u16 family/subtype, u64 actor, position xyz, rotation xyz,
+    // then the two tail bytes.
+    let pose_at = |dx: f32| {
+        let mut pose = vec![125, 0];
+        pose.extend(start.guid.to_le_bytes());
+        for value in [start.position[0] + dx, start.position[1], start.position[2]]
+            .into_iter()
+            .chain(start.rotation)
+        {
+            pose.extend(value.to_le_bytes());
+        }
+        pose.extend([2, 255]);
+        wrap(&pose)
+    };
+    // The first movement attunes the nearby warpstone (a gameplay change); do it before the
+    // snapshot so the split bundle's own pose only moves the character.
+    session
+        .dispatch_message(
+            &pose_at(0.25),
+            &server.options,
+            900,
+            &mut server.world,
+            &mut server.membership,
+            &mut server.sessions,
+            None,
+        )
+        .unwrap();
     let before = session.gateway.snapshot();
-
     let mut request = vec![165, 0, 2, 0];
     request.extend((ids.len() as i32).to_le_bytes());
     ids.iter().for_each(|id| request.extend(id.to_le_bytes()));
-    let mut select = vec![26, 0, 10, 0];
-    select.extend(700u64.to_le_bytes());
-    select.extend(2i32.to_le_bytes());
+    // The combat trigger only has to make the session split the bundle; a selection for an
+    // unknown actor changes nothing. Client constructor `00a36f80`: u64 actor, i32 option.
+    let mut trigger = vec![26, 0, 10, 0];
+    trigger.extend(u64::MAX.to_le_bytes());
+    trigger.extend(0i32.to_le_bytes());
+    // The pose is dispatched first and committed on its own: that commit survives the later
+    // refusal, which a whole-bundle `handle_at` would roll back instead.
     let children = [
-        wrap(&select),
+        pose_at(0.75),
+        wrap(&trigger),
         wrap(&request),
         wrap(&request),
         wrap(&request),
@@ -733,9 +709,19 @@ fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
         "expected the reply budget refusal, got {error}"
     );
     assert_eq!(
-        session.gateway.snapshot(),
-        before,
-        "the refused child changed state"
+        session.gateway.state().position[0],
+        start.position[0] + 0.75,
+        "the split's first child must commit before the crossing child is refused"
+    );
+    assert_eq!(
+        session.gateway.snapshot().gameplay,
+        before.gameplay,
+        "the refused read changed gameplay state"
+    );
+    assert_eq!(
+        session.bundle_budget.used(),
+        None,
+        "a dispatch must reset the bundle budget"
     );
 
     // Positive control: one definition read alone stays under the per-request cap.
@@ -750,7 +736,7 @@ fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
             None,
         )
         .unwrap();
-    assert_eq!(session.gateway.snapshot(), before);
+    assert_eq!(session.gateway.snapshot().gameplay, before.gameplay);
 
     // A whole (non-split) bundle still answers after a refused split: the budget is reset for
     // every top-level message, so the refused message's bytes cannot charge the next one.
@@ -771,12 +757,109 @@ fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
             None,
         )
         .expect("a whole bundle under the 8 MiB budget must not be charged twice");
-    assert_eq!(session.gateway.snapshot(), before);
+    assert_eq!(session.gateway.snapshot().gameplay, before.gameplay);
+    // The reset, not the next dispatch arming the budget again, must leave it outside: a tick's
+    // replies after a successful bundle would otherwise charge an already-finished message.
+    assert_eq!(session.bundle_budget.used(), None);
+}
+
+/// F264: a begin-zoning child that refuses before its commit discards its staged replies;
+/// those bytes must not stay charged against the later children of the same split bundle
+/// (F179 finding 4). `realm race` is a real zone transfer; deleting the save directory makes
+/// its precommit save fail, which is the `Err(_) if transfer` refusal path.
+#[test]
+fn a_refused_precommit_transfer_releases_its_reply_budget() {
+    let scratch = test_support::Scratch::new("f264-transfer");
+    let content = test_support::vendor_content(&scratch);
+
+    let mut options = test_support::options(scratch.state());
+    options.content = Some(content);
+    // `realm race` is the developer entry to the recovered kart scene transfer.
+    options.dev_tools = true;
+    let mut server = Server::new(options).unwrap();
+    let mut session = Session::new(
+        SessionId(264),
+        "127.0.0.1:12348".parse().unwrap(),
+        SessionRequest {
+            id: 264,
+            crc_length: 3,
+            buffer_size: 512,
+        },
+        &server.options,
+        CRC_SEED,
+        None,
+        None,
+    )
+    .unwrap();
+    let mut login = 1u16.to_le_bytes().to_vec();
+    for (i, value) in ["f264", "1.910.1.530630", ""].into_iter().enumerate() {
+        login.extend((value.len() as u32).to_le_bytes());
+        login.extend(value.as_bytes());
+        if i == 0 {
+            login.extend(1u64.to_le_bytes());
+        }
+    }
+    session.gateway.handle(&login).unwrap();
+    session.gateway.handle(&wrap(&[13, 0])).unwrap();
+    session.gateway.handle(&wrap(&[10, 0])).unwrap();
+    let zone_id = session.gateway.state().zone_id;
+    // The transfer cannot commit: its precommit save has nowhere to write.
+    fs::remove_dir_all(scratch.path()).unwrap();
+    let mut trigger = vec![26, 0, 10, 0];
+    trigger.extend(u64::MAX.to_le_bytes());
+    trigger.extend(0i32.to_le_bytes());
+    // A later child the discarded charge must not refuse: one small definition read.
+    let mut read = vec![165, 0, 2, 0];
+    read.extend(1i32.to_le_bytes());
+    read.extend(8u32.to_le_bytes());
+    let mut bundle = vec![0, 25];
+    for child in [
+        wrap(&osfr_tools::chat::local_request("realm race")),
+        wrap(&trigger),
+        wrap(&read),
+    ] {
+        assert!(child.len() < 255);
+        bundle.push(child.len() as u8);
+        bundle.extend(child);
+    }
+    session
+        .dispatch_message(
+            &bundle,
+            &server.options,
+            1000,
+            &mut server.world,
+            &mut server.membership,
+            &mut server.sessions,
+            None,
+        )
+        .unwrap();
+    let (released, used) = session
+        .bundle_refusal
+        .expect("the split bundle must reach the precommit transfer refusal");
+    assert!(
+        released > 0,
+        "the refused transfer staged no replies to release"
+    );
+    assert_eq!(
+        used, 0,
+        "the refused transfer's staged replies stayed charged to the split bundle"
+    );
+    assert_eq!(
+        session.gateway.state().zone_id,
+        zone_id,
+        "a refused precommit transfer must not commit the move"
+    );
+    assert_eq!(
+        session.bundle_budget.used(),
+        None,
+        "a dispatch must reset the bundle budget"
+    );
 }
 
 /// Session-test scratch directory and `Options` builder, shared with `lead_trade_commit`.
+#[cfg(test)]
 #[path = "test_support.rs"]
-pub(crate) mod test_support;
+pub(super) mod test_support;
 
 /// T008: the opcode-164 jump body reaches exactly the sessions whose directed
 /// view contains the sender, and the relay window is throttled per session.
