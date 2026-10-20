@@ -2,19 +2,23 @@
 //!
 //! The package is synthetic and intentionally small. It exercises the real native opcode 34
 //! codec, the real 39/16 offer -> 39/5 Go exchange, the client phase/countdown acknowledgements,
-//! the results hold, the reportless close, cancellation and save compatibility. All timing and
-//! combat values are reconstructed test policy (R). F164 deliberately pays nothing: every
-//! collision is client-reported, so the tests assert that a fabricated contact cannot mint coins.
+//! the results hold, the completion payout, cancellation and save compatibility. All timing and
+//! combat values are reconstructed test policy (R). T219 pays a flat completion reward when the
+//! server-observed match reaches its results phase; contacts, damage and score never change the
+//! amount, and the paid-match ledger pays each instance once.
 
 use osfr_tools::{
     character_store::CharacterState,
     derby::{
-        DerbyConfig, DerbyMessage, DerbyRules, DerbyVehicleTemplate, ParticipantKey,
+        DerbyConfig, DerbyMessage, DerbyPhase, DerbyRules, DerbyVehicleTemplate, ParticipantKey,
         VehicleHitReport, decode_inner, encode_inner,
     },
-    derby_gateway::{DEMO_DERBY_DRIVER_PROFILE, DerbyGates, DerbyGateway, DerbyGatewayContent},
+    derby_gateway::{
+        DEMO_DERBY_DRIVER_PROFILE, DerbyGates, DerbyGateway, DerbyGatewayContent,
+        DerbyGatewayState, FIRST_DERBY_INSTANCE, MAX_COMPLETION_REWARD, MAX_PAID_MATCHES,
+    },
     game_store,
-    gameplay::Gameplay,
+    gameplay::{Gameplay, GameplayState},
     harvesting,
     mining::Type8Engine,
 };
@@ -30,6 +34,10 @@ const OWNER: ParticipantKey = ParticipantKey(0x1000_0000_0000_0001);
 const OTHER: ParticipantKey = ParticipantKey(0x1000_0000_0000_0002);
 const GATE: u64 = 9_000_000_301;
 const INSTANCE_GAME: i32 = 39;
+/// (R) Synthetic package payout, small enough for the fixture wallet.
+const COMPLETION_COINS: u32 = 25;
+/// (R) Synthetic Demo Derby Driver XP for the same completion.
+const COMPLETION_XP: u32 = 10;
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
 struct Fixture {
@@ -251,6 +259,17 @@ fn character() -> CharacterState {
     }
 }
 
+/// The routed NPC gate is at the origin and the interaction radius is 12 m, so a routed
+/// character stands there (the `character()` helper above stays far away for gateway-only tests).
+fn routed_character() -> CharacterState {
+    CharacterState {
+        guid: OWNER.raw(),
+        zone_id: 0,
+        position: [0.0; 3],
+        rotation: [0.0, 0.0, 1.0],
+    }
+}
+
 fn content() -> DerbyGatewayContent {
     DerbyGatewayContent {
         schema_version: 1,
@@ -293,6 +312,8 @@ fn content() -> DerbyGatewayContent {
             },
         },
         pickups: Vec::new(),
+        completion_reward_coins: COMPLETION_COINS,
+        completion_reward_xp: COMPLETION_XP,
         reward: None,
     }
 }
@@ -323,12 +344,16 @@ fn quit_request(instance: i32) -> Vec<u8> {
     bytes
 }
 
-fn register() -> Vec<u8> {
+fn register_for(key: ParticipantKey) -> Vec<u8> {
     encode_inner(&DerbyMessage::RegisterPlayer {
-        key: OWNER,
+        key,
         unknown_key: 0,
     })
     .unwrap()
+}
+
+fn register() -> Vec<u8> {
+    register_for(OWNER)
 }
 
 fn pose(key: ParticipantKey, position: [f32; 3]) -> Vec<u8> {
@@ -376,25 +401,160 @@ fn npc_choice(choice: i32) -> Vec<u8> {
     bytes
 }
 
+fn phase_for(key: ParticipantKey, phase: i32) -> Vec<u8> {
+    encode_inner(&DerbyMessage::PlayerPhase { key, phase }).unwrap()
+}
+
 fn phase(phase: i32) -> Vec<u8> {
-    encode_inner(&DerbyMessage::PlayerPhase { key: OWNER, phase }).unwrap()
+    phase_for(OWNER, phase)
+}
+
+fn countdown_for(key: ParticipantKey, count: u32) -> Vec<u8> {
+    encode_inner(&DerbyMessage::CountdownStatus { key, count }).unwrap()
 }
 
 fn countdown(count: u32) -> Vec<u8> {
-    encode_inner(&DerbyMessage::CountdownStatus { key: OWNER, count }).unwrap()
+    countdown_for(OWNER, count)
 }
 
 fn messages(packets: &[Vec<u8>]) -> Vec<DerbyMessage> {
     packets
         .iter()
+        .filter(|packet| packet.starts_with(&[34, 0]))
         .map(|packet| decode_inner(packet).unwrap())
         .collect()
+}
+
+fn offer_instance(outcome: &osfr_tools::gameplay::Outcome) -> i32 {
+    outcome
+        .replies
+        .iter()
+        .find(|packet| packet.starts_with(&[39, 0, 16]))
+        .map(|packet| i32::from_le_bytes(packet[3..7].try_into().unwrap()))
+        .expect("derby offer")
+}
+
+/// Open the configured NPC menu and take the derby option; returns the offered instance id.
+fn enter_derby(game: &mut Gameplay, character: &CharacterState, base: u64) -> i32 {
+    let menu = game.handle_in_world(&npc_menu(), character, base).unwrap();
+    assert!(menu.replies.iter().any(|packet| packet[..3] == [26, 0, 9]));
+    let entered = game
+        .handle_in_world(&npc_choice(2), character, base + 100)
+        .unwrap();
+    assert!(entered.changed);
+    offer_instance(&entered)
+}
+
+/// Register the offered match and return the server-created NPC driver key.
+fn register_and_npc(game: &mut Gameplay, character: &CharacterState, base: u64) -> ParticipantKey {
+    let key = ParticipantKey(character.guid);
+    let setup = game
+        .handle_in_world(&register_for(key), character, base + 400)
+        .unwrap();
+    messages(&setup.replies)
+        .into_iter()
+        .find_map(|message| match message {
+            DerbyMessage::CreateVehicle(vehicle) if vehicle.key != key => Some(vehicle.key),
+            _ => None,
+        })
+        .expect("NPC vehicle")
+}
+
+/// Drive the client-owned phase and countdown acknowledgements to the running phase.
+fn acknowledge_readiness(game: &mut Gameplay, character: &CharacterState, base: u64) {
+    let key = ParticipantKey(character.guid);
+    for phase_value in 3..=8 {
+        let out = game
+            .handle_in_world(
+                &phase_for(key, phase_value),
+                character,
+                base + 1_000 + phase_value as u64,
+            )
+            .unwrap();
+        assert!(!out.replies.is_empty(), "phase {phase_value}");
+    }
+    for value in (0..=4).rev() {
+        let out = game
+            .handle_in_world(
+                &countdown_for(key, value),
+                character,
+                base + 2_000 + (4 - value) as u64,
+            )
+            .unwrap();
+        assert!(!out.replies.is_empty(), "countdown {value}");
+    }
+    assert_eq!(game.derby_phase(), Some(DerbyPhase::Running));
+}
+
+/// Start the offered match and drive the client-owned readiness gates to Running; returns the
+/// server-created NPC driver key.
+fn run_to_running(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    instance: i32,
+    base: u64,
+) -> ParticipantKey {
+    let started = game
+        .handle_in_world(&start_request(instance), character, base + 300)
+        .unwrap();
+    assert!(
+        started
+            .replies
+            .iter()
+            .any(|packet| packet[..3] == [39, 0, 17])
+    );
+    let npc = register_and_npc(game, character, base);
+    acknowledge_readiness(game, character, base);
+    npc
+}
+
+fn hit_for(reporter: ParticipantKey, npc: ParticipantKey, impact: f32) -> Vec<u8> {
+    encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
+        reporter,
+        other: npc,
+        impact_bits: impact.to_bits(),
+    }))
+    .unwrap()
+}
+
+fn hit(npc: ParticipantKey, impact: f32) -> Vec<u8> {
+    hit_for(OWNER, npc, impact)
+}
+
+/// Send a fresh pose and one accepted contact per impact. The last contact must reach the results
+/// phase; its replies (including the completion payout) are returned.
+fn drive_to_results(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    npc: ParticipantKey,
+    impacts: &[f32],
+    base: u64,
+) -> Vec<Vec<u8>> {
+    let key = ParticipantKey(character.guid);
+    game.handle_in_world(&pose(key, [0.0, 0.0, 0.0]), character, base + 2_900)
+        .unwrap();
+    let mut replies = Vec::new();
+    for (index, impact) in impacts.iter().enumerate() {
+        let out = game
+            .handle_in_world(
+                &hit_for(key, npc, *impact),
+                character,
+                base + 3_000 + index as u64 * 200,
+            )
+            .unwrap();
+        replies = out.replies;
+        if game.derby_phase() == Some(DerbyPhase::Results) {
+            assert_eq!(index + 1, impacts.len(), "the match ended early");
+        }
+    }
+    assert_eq!(game.derby_phase(), Some(DerbyPhase::Results));
+    replies
 }
 
 #[test]
 fn npc_entry_reaches_running_results_and_closes_once() {
     let fixture = Fixture::new();
-    let mut gateway = DerbyGateway::load(&fixture.path).unwrap().unwrap();
+    let mut gateway = DerbyGateway::load(&fixture.path, None).unwrap().unwrap();
     assert_eq!(gateway.gate_npcs(), &[GATE]);
     assert!(gateway.admit(OTHER.raw(), false).is_err());
     assert!(gateway.admit(GATE, true).is_err());
@@ -484,7 +644,7 @@ fn npc_entry_reaches_running_results_and_closes_once() {
 #[test]
 fn inactive_close_is_inert() {
     let fixture = Fixture::new();
-    let mut gateway = DerbyGateway::load(&fixture.path).unwrap().unwrap();
+    let mut gateway = DerbyGateway::load(&fixture.path, None).unwrap().unwrap();
     assert!(!gateway.close(&[26, 0, 42, 0]).unwrap());
     assert_eq!(gateway.phase(), None);
 }
@@ -492,7 +652,7 @@ fn inactive_close_is_inert() {
 #[test]
 fn offer_cancel_and_running_quit_retire_without_rewards_and_stale_quit_is_inert() {
     let fixture = Fixture::new();
-    let mut gateway = DerbyGateway::load(&fixture.path).unwrap().unwrap();
+    let mut gateway = DerbyGateway::load(&fixture.path, None).unwrap().unwrap();
 
     gateway.begin(&character()).unwrap();
     let cancelled = gateway.cancel(&[26, 0, 42, 0]).unwrap();
@@ -797,7 +957,7 @@ fn predecessor_content_keys_load_instead_of_failing_the_world() {
         document[key] = value;
         fs::write(&path, serde_json::to_vec(&document).unwrap()).unwrap();
     }
-    let mut gateway = DerbyGateway::load(&fixture.path)
+    let mut gateway = DerbyGateway::load(&fixture.path, None)
         .expect("F117 content must not fail the world load")
         .expect("the derby route stays enabled");
     assert_eq!(gateway.gate_npcs(), &[GATE]);
@@ -900,23 +1060,74 @@ fn offer_cancel_through_gameplay_restores_the_job_and_keeps_stale_quit_inert() {
     assert_eq!(game.state(), after);
 }
 
+/// The F164 regression, kept by name for the routed offer. A fabricated stationary collision is a
+/// client report, so it is resolved by the server (it damages the NPC) but it cannot pay by itself:
+/// T219 pays only at the server-observed results phase. Leaving before results therefore pays
+/// nothing and writes no ledger row.
 #[test]
 fn gameplay_routes_the_npc_offer_and_closes_a_fabricated_contact_without_paying() {
     let fixture = GameplayFixture::new();
     let mut game = Gameplay::load(&fixture.path, None).unwrap();
-    let character = CharacterState {
-        guid: OWNER.raw(),
-        zone_id: 0,
-        position: [0.0; 3],
-        rotation: [0.0, 0.0, 1.0],
-    };
-    let before = game.state().clone();
+    let character = routed_character();
+    let before = game.state();
+    let before_coins = before.inventory.coins;
+
+    let menu = game
+        .handle_in_world(&npc_menu(), &character, 1_000)
+        .unwrap();
+    assert!(menu.replies.iter().any(|packet| packet[..3] == [26, 0, 9]));
+    assert!(
+        game.handle_in_world(&npc_choice(99), &character, 1_100)
+            .is_err()
+    );
+    assert!(!game.derby_active());
+    assert_eq!(game.state(), before);
+
+    let entered = game
+        .handle_in_world(&npc_choice(2), &character, 1_200)
+        .unwrap();
+    assert!(entered.changed);
+    let instance = offer_instance(&entered);
+    let npc = run_to_running(&mut game, &character, instance, 1_000);
+
+    game.handle_in_world(&pose(OWNER, [0.0, 0.0, 0.0]), &character, 3_200)
+        .unwrap();
+    let contact = game
+        .handle_in_world(&hit(npc, 5.0), &character, 3_300)
+        .unwrap();
+    assert!(
+        !contact.replies.is_empty(),
+        "the fabricated contact is resolved"
+    );
+    assert_eq!(game.derby_phase(), Some(DerbyPhase::Running));
+    assert_eq!(game.state().inventory.coins, before_coins);
+    assert_eq!(game.state().derby, None, "a contact writes no ledger row");
+    assert!(
+        !contact
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[50, 0, 1])),
+        "a contact sends no reward bundle"
+    );
+
+    let quit = game
+        .handle_in_world(&quit_request(instance), &character, 3_500)
+        .unwrap();
+    assert!(quit.changed);
+    assert!(!game.derby_active());
+    assert_eq!(game.state().inventory.coins, before_coins);
+    assert_eq!(game.state().derby, None);
+}
+
+#[test]
+fn gameplay_routes_the_offer_pays_one_completion_and_ignores_replays() {
+    let fixture = GameplayFixture::new();
+    let mut game = Gameplay::load(&fixture.path, None).unwrap();
+    let character = routed_character();
+    let before = game.state();
     let before_job = before.profiles.as_ref().unwrap().active;
     let before_coins = before.inventory.coins;
-    assert_ne!(
-        before_job,
-        osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE
-    );
+    assert_ne!(before_job, DEMO_DERBY_DRIVER_PROFILE);
 
     let menu = game
         .handle_in_world(&npc_menu(), &character, 1_000)
@@ -934,13 +1145,8 @@ fn gameplay_routes_the_npc_offer_and_closes_a_fabricated_contact_without_paying(
         .unwrap();
     assert!(entered.changed);
     assert!(game.derby_active());
-    assert_eq!(
-        game.active_profile(),
-        Some(osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)
-    );
-    let driver_outfit = game
-        .profile_attachments(osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)
-        .unwrap();
+    assert_eq!(game.active_profile(), Some(DEMO_DERBY_DRIVER_PROFILE));
+    let driver_outfit = game.profile_attachments(DEMO_DERBY_DRIVER_PROFILE).unwrap();
     let entry_switch = entered
         .nearby
         .iter()
@@ -953,18 +1159,14 @@ fn gameplay_routes_the_npc_offer_and_closes_a_fabricated_contact_without_paying(
         &entry_switch[12..entry_switch.len() - 4],
         &driver_outfit[..]
     );
-    let offer = entered
-        .replies
-        .iter()
-        .find(|packet| packet.starts_with(&[39, 0, 16]))
-        .expect("NPC choice emits the derby offer");
-    let instance = i32::from_le_bytes(offer[3..7].try_into().unwrap());
+    let instance = offer_instance(&entered);
     let saved = game.state();
     assert_eq!(
         saved.profiles.as_ref().unwrap().active,
         before_job,
         "the temporary Derby Driver job is never persisted"
     );
+    assert!(saved.derby.is_none(), "an unpaid match writes no ledger");
     let restored = Gameplay::load(&fixture.path, Some(saved)).unwrap();
     assert!(!restored.derby_active());
     assert_eq!(
@@ -988,57 +1190,76 @@ fn gameplay_routes_the_npc_offer_and_closes_a_fabricated_contact_without_paying(
             .iter()
             .any(|packet| packet.starts_with(&[35, 0, 20]))
     );
+    let npc = register_and_npc(&mut game, &character, 1_000);
+    acknowledge_readiness(&mut game, &character, 1_000);
+    assert_eq!(
+        game.state().inventory.coins,
+        before_coins,
+        "playing a match is not paying"
+    );
 
-    let setup = game
-        .handle_in_world(&register(), &character, 1_400)
-        .unwrap();
-    let npc = messages(&setup.replies)
-        .into_iter()
-        .find_map(|message| match message {
-            DerbyMessage::CreateVehicle(vehicle) if vehicle.key != OWNER => Some(vehicle.key),
-            _ => None,
-        })
-        .expect("NPC vehicle");
-    for phase_value in 3..=8 {
-        let out = game
-            .handle_in_world(&phase(phase_value), &character, 2_000 + phase_value as u64)
-            .unwrap();
-        assert!(!out.replies.is_empty(), "phase {phase_value}");
-    }
-    for value in (0..=4).rev() {
-        let out = game
-            .handle_in_world(&countdown(value), &character, 3_000 + (4 - value) as u64)
-            .unwrap();
-        assert!(!out.replies.is_empty(), "countdown {value}");
-    }
-    let mid_match = game.state();
-    assert_eq!(mid_match.profiles.as_ref().unwrap().active, before_job);
-    let restored = Gameplay::load(&fixture.path, Some(mid_match)).unwrap();
-    assert!(!restored.derby_active());
-    assert_eq!(restored.active_profile(), Some(before_job));
-    assert_eq!(restored.state().inventory.coins, before_coins);
-
-    // A fabricated stationary contact: the client reports the identity pose at the NPC's authored
-    // start transform and a bounded impact, then reaches results. F164 grants nothing for it.
-    game.handle_in_world(&pose(OWNER, [0.0, 0.0, 0.0]), &character, 3_900)
-        .unwrap();
-    let hit = encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
-        reporter: OWNER,
-        other: npc,
-        impact_bits: 20.0_f32.to_bits(),
-    }))
-    .unwrap();
-    let results = game.handle_in_world(&hit, &character, 4_000).unwrap();
+    // A stationary fabricated contact finishes the match. The payout is flat: it does not depend
+    // on the contact, the damage or the score, and it is paid at the results phase.
+    let results = drive_to_results(&mut game, &character, npc, &[20.0], 1_000);
     assert!(
-        messages(&results.replies).contains(&DerbyMessage::GameState(10)),
+        messages(&results).contains(&DerbyMessage::GameState(10)),
         "results state"
     );
+    let paid = game.state();
+    assert_eq!(
+        paid.inventory.coins,
+        before_coins + COMPLETION_COINS,
+        "one flat completion payout"
+    );
+    assert_eq!(
+        paid.profiles
+            .as_ref()
+            .unwrap()
+            .experience
+            .get(&DEMO_DERBY_DRIVER_PROFILE),
+        Some(&COMPLETION_XP),
+        "the completion also pays the driver XP once"
+    );
+    assert_eq!(
+        paid.derby.as_ref().unwrap().paid_matches,
+        vec![instance],
+        "the paid match instance is recorded"
+    );
+    let coin_update = results
+        .iter()
+        .find(|packet| packet.starts_with(&[38, 0, 19]))
+        .expect("the coin update");
+    assert_eq!(
+        i32::from_le_bytes(coin_update[4..8].try_into().unwrap()),
+        (before_coins + COMPLETION_COINS) as i32
+    );
+    // 50/1 layout from client reader 0x008e7930: coins at inner offset 4, XP/stars at 8.
+    let bundle = results
+        .iter()
+        .find(|packet| packet.starts_with(&[50, 0, 1]))
+        .expect("the reward bundle");
+    assert_eq!(
+        i32::from_le_bytes(bundle[4..8].try_into().unwrap()),
+        COMPLETION_COINS as i32
+    );
+    assert_eq!(
+        i32::from_le_bytes(bundle[8..12].try_into().unwrap()),
+        COMPLETION_XP as i32
+    );
+
+    // The same contact report in the results phase is a repeat, not a second finish.
+    let replay = game
+        .handle_in_world(&hit(npc, 20.0), &character, 4_200)
+        .unwrap();
+    assert!(!replay.changed);
+    assert!(replay.replies.is_empty());
+    assert_eq!(game.state(), paid, "a repeated results record pays nothing");
+
     let close_ready = game.tick(&character, 5_000).unwrap();
     assert_eq!(
         messages(&close_ready.replies),
         vec![DerbyMessage::GameState(11)]
     );
-
     let closed = game
         .handle_in_world(&[26, 0, 42, 0], &character, 5_100)
         .unwrap();
@@ -1051,8 +1272,8 @@ fn gameplay_routes_the_npc_offer_and_closes_a_fabricated_contact_without_paying(
     );
     assert_eq!(
         game.state().inventory.coins,
-        before_coins,
-        "a fabricated contact cannot mint coins"
+        before_coins + COMPLETION_COINS,
+        "closing the results screen pays nothing more"
     );
     assert!(
         !closed
@@ -1087,13 +1308,344 @@ fn gameplay_routes_the_npc_offer_and_closes_a_fabricated_contact_without_paying(
             .any(|packet| packet.starts_with(&[35, 0, 7, 0]))
     );
 
-    let replay = game
+    let replay_close = game
         .handle_in_world(&[26, 0, 42, 0], &character, 5_200)
         .unwrap();
-    assert!(!replay.changed);
-    assert_eq!(game.state().inventory.coins, before_coins);
+    assert!(!replay_close.changed);
     let reloaded = Gameplay::load(&fixture.path, Some(game.state())).unwrap();
     assert!(!reloaded.derby_active());
     assert_eq!(reloaded.active_profile(), Some(before_job));
-    assert_eq!(reloaded.state().inventory.coins, before_coins);
+    assert_eq!(
+        reloaded.state().inventory.coins,
+        before_coins + COMPLETION_COINS
+    );
+    assert_eq!(
+        reloaded.state().derby.unwrap().paid_matches,
+        vec![instance],
+        "the ledger survives the reconnect"
+    );
+}
+
+/// The time limit is a server-side finish too: a player who stays to the results phase without
+/// reporting a single contact is paid. This also covers the session-tick payout path.
+#[test]
+fn staying_to_the_time_limit_pays_without_any_contact() {
+    let fixture = GameplayFixture::new();
+    let path = fixture.path.join("derby_entry.json");
+    let mut content: serde_json::Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    content["rules"]["score_target"] = json!(null);
+    content["rules"]["time_limit_ms"] = json!(1_000);
+    fs::write(&path, serde_json::to_vec(&content).unwrap()).unwrap();
+    let mut game = Gameplay::load(&fixture.path, None).unwrap();
+    let character = routed_character();
+    let before_coins = game.state().inventory.coins;
+
+    let instance = enter_derby(&mut game, &character, 1_000);
+    run_to_running(&mut game, &character, instance, 1_000);
+    let results = game.tick(&character, 4_100).unwrap();
+    assert!(messages(&results.replies).contains(&DerbyMessage::GameState(10)));
+    assert_eq!(game.derby_phase(), Some(DerbyPhase::Results));
+    assert!(
+        results
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[50, 0, 1]))
+    );
+    let paid = game.state();
+    assert_eq!(paid.inventory.coins, before_coins + COMPLETION_COINS);
+    assert_eq!(paid.derby.unwrap().paid_matches, vec![instance]);
+}
+
+/// Leaving or disconnecting before the results phase pays nothing and writes no ledger.
+#[test]
+fn leaving_or_resetting_before_results_pays_nothing() {
+    let fixture = GameplayFixture::new();
+    let character = routed_character();
+    let before_coins = Gameplay::load(&fixture.path, None)
+        .unwrap()
+        .state()
+        .inventory
+        .coins;
+
+    let mut game = Gameplay::load(&fixture.path, None).unwrap();
+    let instance = enter_derby(&mut game, &character, 1_000);
+    run_to_running(&mut game, &character, instance, 1_000);
+    let quit = game
+        .handle_in_world(&quit_request(instance), &character, 3_500)
+        .unwrap();
+    assert!(quit.changed);
+    assert!(!game.derby_active());
+    let after_quit = game.state();
+    assert_eq!(after_quit.inventory.coins, before_coins);
+    assert!(
+        after_quit.derby.is_none(),
+        "an unfinished match writes no ledger row"
+    );
+
+    let mut game = Gameplay::load(&fixture.path, None).unwrap();
+    let instance = enter_derby(&mut game, &character, 5_000);
+    let npc = run_to_running(&mut game, &character, instance, 5_000);
+    game.reset_session();
+    assert!(!game.derby_active());
+    assert_eq!(game.state().inventory.coins, before_coins);
+    assert!(game.state().derby.is_none());
+    // The old contact report cannot finish a match that the disconnect dropped.
+    let replay = game
+        .handle_in_world(&hit(npc, 20.0), &character, 9_000)
+        .unwrap();
+    assert!(!replay.changed);
+    assert_eq!(game.state().inventory.coins, before_coins);
+}
+
+/// Contacts and damage never size the payout: a match that needed four reports pays the same flat
+/// amount as one that needed a single report.
+/// A reconnect keeps the ledger, the old match cannot pay again, and the next match is a new
+/// instance that pays again: farming finished matches is allowed.
+#[test]
+fn a_reconnect_keeps_the_ledger_and_the_next_match_pays_again() {
+    let fixture = GameplayFixture::new();
+    let character = routed_character();
+    let before_coins = Gameplay::load(&fixture.path, None)
+        .unwrap()
+        .state()
+        .inventory
+        .coins;
+    let mut game = Gameplay::load(&fixture.path, None).unwrap();
+    let first = enter_derby(&mut game, &character, 1_000);
+    let npc = run_to_running(&mut game, &character, first, 1_000);
+    drive_to_results(&mut game, &character, npc, &[20.0], 1_000);
+    assert_eq!(
+        game.state().inventory.coins,
+        before_coins + COMPLETION_COINS
+    );
+
+    // Reconnect from the serialized save payload, not just the live struct: the ledger is what
+    // the character save carries across a disconnect.
+    let saved: GameplayState =
+        serde_json::from_slice(&serde_json::to_vec(&game.state()).unwrap()).unwrap();
+    assert_eq!(
+        saved.derby.as_ref().unwrap().paid_matches,
+        vec![first],
+        "the paid ledger survives the save encoding"
+    );
+    let mut game = Gameplay::load(&fixture.path, Some(saved)).unwrap();
+    assert!(!game.derby_active());
+    assert_eq!(
+        game.state().inventory.coins,
+        before_coins + COMPLETION_COINS
+    );
+    let replay = game
+        .handle_in_world(&hit(npc, 20.0), &character, 7_000)
+        .unwrap();
+    assert!(!replay.changed);
+    assert_eq!(
+        game.state().inventory.coins,
+        before_coins + COMPLETION_COINS,
+        "the old match cannot pay after a reconnect"
+    );
+
+    let second = enter_derby(&mut game, &character, 8_000);
+    assert!(
+        second > first,
+        "a paid instance id is not reissued across a reconnect"
+    );
+    let npc = run_to_running(&mut game, &character, second, 8_000);
+    drive_to_results(&mut game, &character, npc, &[20.0], 8_000);
+    let farmed = game.state();
+    assert_eq!(farmed.inventory.coins, before_coins + 2 * COMPLETION_COINS);
+    assert_eq!(
+        farmed
+            .profiles
+            .as_ref()
+            .unwrap()
+            .experience
+            .get(&DEMO_DERBY_DRIVER_PROFILE),
+        Some(&(2 * COMPLETION_XP))
+    );
+    assert_eq!(farmed.derby.unwrap().paid_matches, vec![first, second]);
+}
+
+#[test]
+fn collision_reports_never_change_the_payout() {
+    let fixture = GameplayFixture::new();
+    let character = routed_character();
+    let before_coins = Gameplay::load(&fixture.path, None)
+        .unwrap()
+        .state()
+        .inventory
+        .coins;
+
+    let mut single = Gameplay::load(&fixture.path, None).unwrap();
+    let instance = enter_derby(&mut single, &character, 1_000);
+    let npc = run_to_running(&mut single, &character, instance, 1_000);
+    drive_to_results(&mut single, &character, npc, &[20.0], 1_000);
+    assert_eq!(
+        single.state().inventory.coins,
+        before_coins + COMPLETION_COINS
+    );
+
+    let mut several = Gameplay::load(&fixture.path, None).unwrap();
+    let instance = enter_derby(&mut several, &character, 1_000);
+    let npc = run_to_running(&mut several, &character, instance, 1_000);
+    drive_to_results(&mut several, &character, npc, &[5.0, 5.0, 5.0, 5.0], 1_000);
+    let longer = several.state();
+    assert_eq!(
+        longer.inventory.coins,
+        before_coins + COMPLETION_COINS,
+        "a longer match pays the same flat completion"
+    );
+    assert_eq!(
+        longer
+            .profiles
+            .as_ref()
+            .unwrap()
+            .experience
+            .get(&DEMO_DERBY_DRIVER_PROFILE),
+        Some(&COMPLETION_XP)
+    );
+}
+
+/// The ledger is keyed by character and match instance: two characters whose saves both allocate
+/// the same instance id are each paid exactly once.
+#[test]
+fn two_characters_with_the_same_match_instance_are_each_paid_once() {
+    let first_fixture = GameplayFixture::new();
+    let second_fixture = GameplayFixture::new();
+    let mut first = Gameplay::load(&first_fixture.path, None).unwrap();
+    let mut second = Gameplay::load(&second_fixture.path, None).unwrap();
+    let owner = routed_character();
+    let other = CharacterState {
+        guid: OTHER.raw(),
+        ..routed_character()
+    };
+    let owner_coins = first.state().inventory.coins;
+    let other_coins = second.state().inventory.coins;
+
+    let first_instance = enter_derby(&mut first, &owner, 1_000);
+    let second_instance = enter_derby(&mut second, &other, 1_000);
+    assert_eq!(
+        first_instance, second_instance,
+        "each save allocates its own private instance ids"
+    );
+    let first_npc = run_to_running(&mut first, &owner, first_instance, 1_000);
+    let second_npc = run_to_running(&mut second, &other, second_instance, 1_000);
+    drive_to_results(&mut first, &owner, first_npc, &[20.0], 1_000);
+    drive_to_results(&mut second, &other, second_npc, &[20.0], 1_000);
+
+    for (game, coins, guid) in [
+        (&first, owner_coins, owner.guid),
+        (&second, other_coins, other.guid),
+    ] {
+        let paid = game.state();
+        assert_eq!(
+            paid.inventory.coins,
+            coins + COMPLETION_COINS,
+            "character {guid} is paid once"
+        );
+        assert_eq!(
+            paid.derby.as_ref().unwrap().paid_matches,
+            vec![first_instance],
+            "each character keeps its own ledger for the same match id"
+        );
+    }
+}
+
+/// The ledger is bounded: the newest `MAX_PAID_MATCHES` matches are kept, each match is paid once,
+/// and a reload resumes the instance counter above the newest kept row.
+#[test]
+fn the_paid_ledger_is_bounded_and_resumes_above_it() {
+    let fixture = Fixture::new();
+    let mut gateway = DerbyGateway::load(&fixture.path, None).unwrap().unwrap();
+    let mut paid = Vec::new();
+    for _ in 0..(MAX_PAID_MATCHES + 3) {
+        gateway.begin(&character()).unwrap();
+        let instance = gateway.instance_id().unwrap();
+        gateway.start(&start_request(instance)).unwrap();
+        let setup = gateway.handle(&register(), 1_400).unwrap();
+        let npc = messages(&setup)
+            .into_iter()
+            .find_map(|message| match message {
+                DerbyMessage::CreateVehicle(vehicle) if vehicle.key != OWNER => Some(vehicle.key),
+                _ => None,
+            })
+            .expect("NPC vehicle");
+        for phase_value in 3..=8 {
+            gateway
+                .handle(&phase(phase_value), 2_000 + phase_value as u64)
+                .unwrap();
+        }
+        for value in (0..=4).rev() {
+            gateway
+                .handle(&countdown(value), 3_000 + (4 - value) as u64)
+                .unwrap();
+        }
+        gateway
+            .handle(&pose(OWNER, [0.0, 0.0, 0.0]), 3_900)
+            .unwrap();
+        let hit = encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
+            reporter: OWNER,
+            other: npc,
+            impact_bits: 20.0_f32.to_bits(),
+        }))
+        .unwrap();
+        gateway.handle(&hit, 4_000).unwrap();
+        assert_eq!(gateway.phase(), Some(DerbyPhase::Results));
+        assert_eq!(gateway.take_completion(), Some(instance));
+        assert_eq!(gateway.take_completion(), None, "one match pays once");
+        gateway.exit();
+        paid.push(instance);
+    }
+
+    let saved = gateway.saved_state().expect("paid ledger");
+    assert_eq!(saved.paid_matches.len(), MAX_PAID_MATCHES);
+    assert_eq!(saved.paid_matches.last().copied(), paid.last().copied());
+    assert!(
+        !saved.paid_matches.contains(&paid[0]),
+        "the oldest row is dropped, not the newest"
+    );
+    let mut restored = DerbyGateway::load(&fixture.path, Some(&saved))
+        .unwrap()
+        .unwrap();
+    restored.begin(&character()).unwrap();
+    assert!(
+        restored.instance_id().unwrap() > *paid.last().unwrap(),
+        "a paid instance id is not reissued after a reload"
+    );
+}
+
+/// Content and save bounds fail closed instead of paying an unbounded or malformed ledger.
+#[test]
+fn completion_content_and_ledger_bounds_fail_closed() {
+    let fixture = Fixture::new();
+    let path = fixture.path.join("derby_entry.json");
+    let mut content: serde_json::Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    content["completion_reward_coins"] = json!(MAX_COMPLETION_REWARD + 1);
+    fs::write(&path, serde_json::to_vec(&content).unwrap()).unwrap();
+    let error = DerbyGateway::load(&fixture.path, None)
+        .err()
+        .expect("an over-bound reward is refused");
+    assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+
+    let clean = Fixture::new();
+    for paid_matches in [vec![0], vec![-1], vec![1; MAX_PAID_MATCHES + 1]] {
+        let ledger = DerbyGatewayState {
+            paid_matches,
+            ..Default::default()
+        };
+        let error = DerbyGateway::load(&clean.path, Some(&ledger))
+            .err()
+            .expect("a malformed ledger is refused");
+        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+    }
+    // A ledger inside the bounds loads and resumes the counter above its newest row.
+    let first = FIRST_DERBY_INSTANCE as i32;
+    let ledger = DerbyGatewayState {
+        paid_matches: vec![first, first + 5],
+        ..Default::default()
+    };
+    let mut gateway = DerbyGateway::load(&clean.path, Some(&ledger))
+        .unwrap()
+        .unwrap();
+    gateway.begin(&character()).unwrap();
+    assert_eq!(gateway.instance_id(), Some(first + 6));
 }

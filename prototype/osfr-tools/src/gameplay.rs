@@ -110,7 +110,8 @@ pub struct GameplayState {
     pub harvesting: Option<Type8State>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub kart_entry: Option<crate::kart_gateway::KartGatewayState>,
-    /// Predecessor derby save shapes only (see `DerbyGatewayState`); never written now.
+    /// The derby completion ledger (see `DerbyGatewayState`); predecessor-only saves may also
+    /// carry `previous_job`/`last_paid_unix`, which are not written back.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub derby: Option<crate::derby_gateway::DerbyGatewayState>,
     /// Chess's daily coin ledger; absent until the first paid win.
@@ -1073,7 +1074,7 @@ impl Gameplay {
                 );
             }
         }
-        let derby = crate::derby_gateway::DerbyGateway::load(directory)?;
+        let derby = crate::derby_gateway::DerbyGateway::load(directory, saved_derby.as_ref())?;
         if let (Some(derby), Some(interaction)) = (&derby, &mut npc_interaction) {
             let unknown = interaction.set_derby_gates(derby.gate_npcs(), derby.menu_string_id());
             for npc in unknown {
@@ -1353,7 +1354,10 @@ impl Gameplay {
             mining: self.mining.as_ref().map(|m| m.state().clone()),
             harvesting: self.harvesting.as_ref().map(|h| h.state().clone()),
             kart_entry: self.kart_entry.as_ref().map(|k| k.state().clone()),
-            derby: None,
+            derby: self
+                .derby
+                .as_ref()
+                .and_then(crate::derby_gateway::DerbyGateway::saved_state),
             chess: self.chess.as_ref().and_then(ChessService::ledger),
             warpstones: Some(self.warp.state()).filter(|s| !s.is_empty()),
             item_bar: Some(self.item_bar.clone()).filter(|b| !b.is_empty()),
@@ -2626,8 +2630,8 @@ impl Gameplay {
 
     /// Adopt the inventory and profiles from a staged minigame transaction.
     ///
-    /// Soccer ticks, fishing catches, and chess results use this path. Derby Close,
-    /// progression-extras claims, and quest turn-in deliberately keep their
+    /// Soccer ticks, fishing catches, chess results and the derby completion payout use
+    /// this path. Progression-extras claims and quest turn-in deliberately keep their
     /// existing payout implementations because their rollback and commit
     /// ordering differ.
     fn adopt_reward_state(&mut self, next: RewardState, out: &mut Outcome) -> io::Result<()> {

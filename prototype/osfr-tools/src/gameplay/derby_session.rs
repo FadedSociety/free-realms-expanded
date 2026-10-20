@@ -1,5 +1,6 @@
-//! Derby gameplay integration: job switching, cancellation, reportless close, and session ticking.
+//! Derby gameplay integration: job switching, completion payout, cancellation and session ticking.
 use super::*;
+use crate::derby_gateway::DerbyGateway;
 
 /// Predecessor saves recorded the job a connection-local match replaced. Current saves keep the
 /// profile itself on that job (`saved_profile_state`), so only an older save carries this marker.
@@ -82,6 +83,7 @@ impl Gameplay {
             replies,
             ..Default::default()
         };
+        staged.pay_derby_completion(character, &mut out)?;
         if let Some(job) = previous_job {
             staged.restore_job(job, character.guid, &mut out)?;
             out.replies
@@ -139,9 +141,9 @@ impl Gameplay {
         Ok(out)
     }
 
-    /// Route the native derby records while this session owns a match. The final 26/42 Close
-    /// retires the match and restores the job; it grants nothing (F164), and an early, malformed
-    /// or replayed Close changes nothing.
+    /// Route the native derby records while this session owns a match. The results phase pays the
+    /// flat completion reward (once per match instance); the final 26/42 Close only retires the
+    /// match and restores the job. An early, malformed or replayed record changes nothing.
     pub(super) fn handle_derby(
         &mut self,
         inner: &[u8],
@@ -181,8 +183,38 @@ impl Gameplay {
         if inner.starts_with(&[34, 0]) {
             out.replies = self.derby.as_mut().unwrap().handle(inner, now_ms)?;
             out.changed = !out.replies.is_empty();
+            self.pay_derby_completion(character, &mut out)?;
         }
         Ok(out)
+    }
+
+    /// Pay the flat completion reward when this session's match reaches the results phase.
+    ///
+    /// The trigger is the server-observed lifecycle (`DerbyPhase::Results`), never a collision, a
+    /// score or a client-supplied result. `DerbyGateway::take_completion` records the match
+    /// instance in the ledger as it hands it over, so a repeated record or a reconnect cannot pay
+    /// the same match twice. The grant is staged with `rewards::apply_grant` over
+    /// `reward_snapshot()` and adopted by `adopt_reward_state` (the shared minigame reward path),
+    /// so any refusal leaves coins, XP and the ledger untouched.
+    fn pay_derby_completion(
+        &mut self,
+        character: &CharacterState,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        let Some(instance) = self.derby.as_mut().and_then(DerbyGateway::take_completion) else {
+            return Ok(());
+        };
+        let grant = self
+            .derby
+            .as_ref()
+            .unwrap()
+            .completion_grant(character.guid);
+        let rewards = self.reward_snapshot();
+        let key = format!("derby-completion-{instance}");
+        let (next, replies) = crate::rewards::apply_grant(&rewards, &grant, &key)
+            .map_err(|error| invalid(format!("derby completion payout: {error}")))?;
+        out.replies.extend(replies);
+        self.adopt_reward_state(next, out)
     }
 
     fn cancel_derby(&mut self, inner: &[u8], character: &CharacterState) -> io::Result<Outcome> {

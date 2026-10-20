@@ -3,11 +3,16 @@
 //! The packet and match rules stay in `derby.rs`; this module binds one authenticated character to
 //! one opt-in content package. The gate list is reconstructed policy (R), like the kart gates: an
 //! NPC lists the derby only when named in `derby_gates.json`. Entry, phase acknowledgements and the
-//! results hold use the existing native type-11 lifecycle. F164 withholds derby payouts: every
-//! collision is a client `34/16` report, so no server-verified outcome exists to pay from. The
-//! F117 paid-run cooldown went with that payout; the older `reward` and `reward_cooldown_s` keys
-//! are still accepted and ignored so F117-era operator content loads (F206 migration). No
-//! source-derived rule is invented here; all tunable numbers come from `derby_entry.json`.
+//! results hold use the existing native type-11 lifecycle.
+//!
+//! T219 pays a flat completion reward: the server-observed match reaching its results phase with
+//! this character still in it. Every collision is a client `34/16` report, so the payout is
+//! deliberately independent of contacts, damage and score; only finishing matters, and farming
+//! finished matches is allowed. `paid_matches` records every paid match instance in the character
+//! save, so a repeated results record or a reconnect cannot pay twice, and the instance counter
+//! resumes above the ledger so a paid id is not reissued. F164's `reward` row and F117's
+//! `reward_cooldown_s` stay accepted and ignored for F206 migration. No source-derived rule is
+//! invented here; all tunable numbers come from `derby_entry.json`.
 
 use crate::{
     character_store::CharacterState,
@@ -15,10 +20,11 @@ use crate::{
         DEMO_DERBY_LOBBY_NAME_ID, DerbyAction, DerbyError, DerbyPhase, DerbyPickup, DerbyRules,
         DerbyService, DerbyVehicleTemplate, ParticipantKey,
     },
+    rewards::{RewardDisplay, RewardGrant},
 };
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::BTreeSet,
+    collections::{BTreeMap, BTreeSet},
     io::{self, Read},
     path::Path,
     sync::Arc,
@@ -36,12 +42,14 @@ pub const MAX_DERBY_GATES: usize = 16;
 
 const MAX_CONTENT_BYTES: usize = 512 * 1024;
 const MAX_GATES_BYTES: usize = 16 * 1024;
+/// (R) Upper bound on each completion reward, so content cannot mint unlimited coins or XP.
+pub const MAX_COMPLETION_REWARD: u32 = 10_000;
+/// Save-size bound on the paid-match ledger; the newest rows are kept.
+pub const MAX_PAID_MATCHES: usize = 32;
 const ACTIVE_STATUS_MASK: u32 = (1 << crate::derby::DERBY_ACTIVE_STATUS_BIT) | 1;
 
 /// One opt-in derby package. `vehicle`, `rules` and `pickups` are the service's existing typed
-/// content; this wrapper adds only the game id. New packages carry no reward row: F164 withholds
-/// derby payouts because every collision is a client report, not a server-verified outcome. The
-/// retired F117 row is accepted below only so an older package still loads.
+/// content; this wrapper adds the game id and the flat completion reward.
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct DerbyGatewayContent {
@@ -51,8 +59,15 @@ pub struct DerbyGatewayContent {
     pub rules: DerbyRules,
     #[serde(default)]
     pub pickups: Vec<DerbyPickup>,
+    /// (R) Flat coins for finishing a match, paid once per match instance. A package with zero
+    /// coins and zero XP pays nothing, so an operator file without these keys still loads.
+    #[serde(default)]
+    pub completion_reward_coins: u32,
+    /// (R) Demo Derby Driver XP for the same completion; 0 pays no XP.
+    #[serde(default)]
+    pub completion_reward_xp: u32,
     /// Retired F117 payout row. Accepted and ignored only so an operator's F117-era
-    /// `derby_entry.json` still loads; nothing reads it and no derby payout exists (F206).
+    /// `derby_entry.json` still loads; `completion_reward_coins`/`_xp` replaced it (F206/T219).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub reward: Option<serde_json::Value>,
 }
@@ -71,11 +86,8 @@ pub struct DerbyGates {
     pub reward_cooldown_s: Option<u64>,
 }
 
-/// Predecessor derby save shapes. T023 wrote the job a connection-local match replaced; F117
-/// wrote a paid-run epoch. F164 grants no derby reward, so neither is written again, but both
-/// must still load. `last_paid_unix` is accepted and ignored; `previous_job` is restored at load,
-/// and the unlock it left in the profile snapshot is dropped when content retired that job
-/// (`Profiles::load_with_retired_job`).
+/// Derby save data. T023 wrote `previous_job` and F117 wrote `last_paid_unix`; both are accepted
+/// and neither is written again. Current saves carry `paid_matches`, the completion ledger.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct DerbyGatewayState {
@@ -83,6 +95,12 @@ pub struct DerbyGatewayState {
     pub previous_job: Option<i32>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_paid_unix: Option<u64>,
+    /// Paid match instances, oldest first, at most the newest `MAX_PAID_MATCHES`. The save belongs
+    /// to one character, so (this ledger, instance id) is the (character, match) key and another
+    /// character's identical instance id is a different match. `next_instance` resumes above the
+    /// newest row, so a pruned id is never reissued to a character that was paid for it.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub paid_matches: Vec<i32>,
 }
 
 fn default_menu_string_id() -> u32 {
@@ -117,6 +135,8 @@ pub struct DerbyGateway {
     owner: Option<ParticipantKey>,
     next_instance: u32,
     previous_job: Option<i32>,
+    /// Completion ledger, newest last; see `DerbyGatewayState::paid_matches`.
+    paid_matches: Vec<i32>,
 }
 
 fn invalid(message: impl ToString) -> io::Error {
@@ -168,16 +188,42 @@ fn load_gates(directory: &Path) -> io::Result<Option<DerbyGates>> {
 }
 
 impl DerbyGateway {
-    /// Load the content package and its optional NPC gate list. Absent content leaves the route
-    /// disabled; malformed present content rejects the world load instead of degrading silently.
-    pub fn load(directory: &Path) -> io::Result<Option<Self>> {
+    /// Load the content package, its optional NPC gate list and this character's completion
+    /// ledger. Absent content leaves the route disabled; malformed present content or ledger
+    /// rejects the world load instead of degrading silently.
+    pub fn load(directory: &Path, saved: Option<&DerbyGatewayState>) -> io::Result<Option<Self>> {
         let path = directory.join("derby_entry.json");
         let Some(bytes) = read_regular_limited(&path, MAX_CONTENT_BYTES, "derby content")? else {
             return Ok(None);
         };
         let content: DerbyGatewayContent =
             serde_json::from_slice(&bytes).map_err(|error| invalid(error.to_string()))?;
-        Ok(Some(Self::new(content, load_gates(directory)?)?))
+        let mut gateway = Self::new(content, load_gates(directory)?)?;
+        gateway.restore_ledger(saved)?;
+        Ok(Some(gateway))
+    }
+
+    /// Restore the paid-match ledger and resume the instance counter above its newest row. A
+    /// non-positive or oversized ledger fails the load rather than risking a second payout.
+    fn restore_ledger(&mut self, saved: Option<&DerbyGatewayState>) -> io::Result<()> {
+        let Some(saved) = saved else {
+            return Ok(());
+        };
+        if saved.paid_matches.len() > MAX_PAID_MATCHES
+            || saved.paid_matches.iter().any(|instance| *instance <= 0)
+        {
+            return Err(invalid("invalid derby paid-match ledger"));
+        }
+        self.paid_matches = saved.paid_matches.clone();
+        let newest = self
+            .paid_matches
+            .iter()
+            .map(|instance| *instance as u32)
+            .max();
+        self.next_instance = newest.map_or(FIRST_DERBY_INSTANCE, |newest| {
+            newest.saturating_add(1).max(FIRST_DERBY_INSTANCE)
+        });
+        Ok(())
     }
 
     /// Build a gateway from typed content. This is also the strict content validator used by tests
@@ -201,6 +247,7 @@ impl DerbyGateway {
             owner: None,
             next_instance: FIRST_DERBY_INSTANCE,
             previous_job: None,
+            paid_matches: Vec::new(),
         })
     }
 
@@ -376,7 +423,7 @@ impl DerbyGateway {
     }
 
     /// Accept the framework Close once the results screen has enabled it. The close retires the
-    /// match; F164 grants nothing, because every collision is a client `34/16` report.
+    /// match and pays nothing: the completion reward is already settled at the results phase.
     pub fn close(&mut self, packet: &[u8]) -> io::Result<bool> {
         let Some(service) = &self.service else {
             return Ok(false);
@@ -392,6 +439,61 @@ impl DerbyGateway {
             self.service = Some(staged);
         }
         Ok(accepted)
+    }
+
+    /// Take the finished match this session may be paid for: the live match is showing its results
+    /// and the ledger has no row for its instance. Taking records the instance, so the same match
+    /// never yields a second claim. `None` when the package grants nothing or the match is not
+    /// finished.
+    pub fn take_completion(&mut self) -> Option<i32> {
+        if self.content.completion_reward_coins == 0 && self.content.completion_reward_xp == 0 {
+            return None;
+        }
+        let instance = self
+            .service
+            .as_ref()
+            .filter(|service| service.phase() == DerbyPhase::Results)
+            .map(DerbyService::instance_id)?;
+        if instance <= 0 || self.paid_matches.contains(&instance) {
+            return None;
+        }
+        self.paid_matches.push(instance);
+        if self.paid_matches.len() > MAX_PAID_MATCHES {
+            self.paid_matches.remove(0);
+        }
+        Some(instance)
+    }
+
+    /// The one flat completion grant this package pays. It never carries items and never derives
+    /// from a contact report, a score or a match duration; `display` is the ordinary reward toast.
+    /// (R) The amounts are content, not recovered retail values.
+    pub fn completion_grant(&self, guid: u64) -> RewardGrant {
+        let job_xp = match self.content.completion_reward_xp {
+            0 => BTreeMap::new(),
+            xp => BTreeMap::from([(DEMO_DERBY_DRIVER_PROFILE, xp)]),
+        };
+        RewardGrant {
+            coins: self.content.completion_reward_coins,
+            items: Vec::new(),
+            job_xp,
+            display: RewardDisplay {
+                source_guid: guid,
+                player_guid: guid,
+                reward_kind: 0,
+                icon_id: 0,
+                name_id: 0,
+                rows: Vec::new(),
+            },
+        }
+    }
+
+    /// The ledger to persist; `None` keeps a save with no paid match byte-identical.
+    pub fn saved_state(&self) -> Option<DerbyGatewayState> {
+        (!self.paid_matches.is_empty()).then(|| DerbyGatewayState {
+            previous_job: None,
+            last_paid_unix: None,
+            paid_matches: self.paid_matches.clone(),
+        })
     }
 
     /// Retire the live match and return the job to restore.
@@ -426,6 +528,8 @@ fn validate_content(content: &DerbyGatewayContent) -> io::Result<()> {
         || content.rules.score_target.is_none() && content.rules.time_limit_ms.is_none()
         || content.rules.score_target == Some(0)
         || content.rules.time_limit_ms == Some(0)
+        || content.completion_reward_coins > MAX_COMPLETION_REWARD
+        || content.completion_reward_xp > MAX_COMPLETION_REWARD
         || content
             .vehicle
             .start_transform_bits

@@ -37,6 +37,8 @@ const NPC: u64 = 700;
 const QUEST: u32 = 701;
 const CHEST: i32 = 910_190;
 const LOOT: i32 = 910_191;
+/// (R) Synthetic derby package payout, small enough for the fixture wallet.
+const DERBY_COINS: u32 = 25;
 static NEXT: AtomicU64 = AtomicU64::new(0);
 
 fn wrap(inner: &[u8]) -> Vec<u8> {
@@ -305,6 +307,8 @@ impl Fixture {
                     "time_limit_ms": null,
                     "config": {"value_a_bits": 0, "value_b": 0}
                 },
+                "completion_reward_coins": DERBY_COINS,
+                "completion_reward_xp": 10,
                 "pickups": [],
             }),
         );
@@ -474,7 +478,11 @@ impl Fixture {
     }
 
     fn active_derby(&self) -> (Gateway, ParticipantKey, i32) {
-        let mut gateway = self.gateway(true, false);
+        self.active_derby_with(self.gateway(true, false))
+    }
+
+    /// Drive a gateway into a running derby match through the routed NPC menu.
+    fn active_derby_with(&self, mut gateway: Gateway) -> (Gateway, ParticipantKey, i32) {
         let guid = gateway.state().guid;
         let mut menu = vec![26, 0, 8, 0];
         menu.extend(NPC.to_le_bytes());
@@ -537,6 +545,23 @@ impl Fixture {
             Some(osfr_tools::derby::DerbyPhase::Running)
         );
         (gateway, npc, instance)
+    }
+
+    /// A logged-in gateway whose wallet is at the wire maximum, so any coin grant overflows.
+    fn gateway_with_max_coins(&self) -> Gateway {
+        let mut state = self.state();
+        state.inventory.coins = i32::MAX as u32;
+        let mut character = Gateway::reference_state(&self.reference).unwrap();
+        character.position = [0.; 3];
+        let mut gateway =
+            Gateway::load_gameplay(&self.reference, character, &self.content, Some(state)).unwrap();
+        gateway.set_dev_tools(false);
+        gateway.set_role(AccountRole::Player);
+        gateway.set_trace_enabled(false);
+        for packet in [login(), wrap(&[13, 0]), wrap(&[10, 0])] {
+            gateway.handle_at(&packet, NOW).unwrap();
+        }
+        gateway
     }
 }
 
@@ -1053,7 +1078,7 @@ fn active_derby_hostile_records_cancel_and_tick_transitions_are_bounded() {
         .unwrap();
     assert_eq!(gateway.snapshot(), after_quit);
 
-    let (mut gateway, npc, _) = fixture.active_derby();
+    let (mut gateway, npc, instance) = fixture.active_derby();
     let guid = gateway.state().guid;
     gateway
         .handle_at(&wrap(&derby_pose(guid, [0.0, 0.0, 0.0])), 3_900)
@@ -1086,6 +1111,13 @@ fn active_derby_hostile_records_cancel_and_tick_transitions_are_bounded() {
         impact_bits: 20.0_f32.to_bits(),
     }))
     .unwrap();
+    let before_payout = gateway
+        .snapshot()
+        .gameplay
+        .as_ref()
+        .unwrap()
+        .inventory
+        .coins;
     let results = gateway.handle_at(&wrap(&hit), 4_000).unwrap();
     assert!(
         results
@@ -1094,6 +1126,32 @@ fn active_derby_hostile_records_cancel_and_tick_transitions_are_bounded() {
             .filter_map(|packet| unwrap_reply(packet))
             .any(|packet| *packet == [34, 0, 1, 0, 10, 0, 0, 0])
     );
+    let paid = gateway.snapshot();
+    let paid_game = paid.gameplay.as_ref().unwrap();
+    assert_eq!(
+        paid_game.inventory.coins,
+        before_payout + DERBY_COINS,
+        "the results phase pays one flat completion reward"
+    );
+    assert_eq!(
+        paid_game.derby.as_ref().unwrap().paid_matches,
+        vec![instance],
+        "the paid match instance is recorded in the save"
+    );
+    assert!(
+        results
+            .replies
+            .iter()
+            .filter_map(|packet| unwrap_reply(packet))
+            .any(|packet| packet.starts_with(&[50, 0, 1])),
+        "the completion sends the reward bundle"
+    );
+
+    // Replaying the finished match's record while its results screen is up pays nothing more.
+    let replay = gateway.handle_at(&wrap(&hit), 4_100).unwrap();
+    assert!(!replay.gameplay_changed);
+    assert_eq!(gateway.snapshot(), paid, "a replayed result pays nothing");
+
     let close_ready = gateway.tick_at(5_000).unwrap();
     assert!(
         close_ready
@@ -1102,13 +1160,6 @@ fn active_derby_hostile_records_cancel_and_tick_transitions_are_bounded() {
             .filter_map(|packet| unwrap_reply(packet))
             .any(|packet| *packet == [34, 0, 1, 0, 11, 0, 0, 0])
     );
-    let before_coins = gateway
-        .snapshot()
-        .gameplay
-        .as_ref()
-        .unwrap()
-        .inventory
-        .coins;
     let closed = gateway.handle_at(&wrap(&[26, 0, 42, 0]), 5_100).unwrap();
     assert!(closed.gameplay_changed);
     assert!(!gateway.gameplay().unwrap().derby_active());
@@ -1118,21 +1169,21 @@ fn active_derby_hostile_records_cancel_and_tick_transitions_are_bounded() {
             .iter()
             .filter_map(|packet| unwrap_reply(packet))
             .any(|packet| packet.starts_with(&[50, 0, 1])),
-        "a fabricated stationary contact must not send a reward bundle"
+        "closing the results screen pays nothing"
+    );
+    let after_close = gateway.snapshot();
+    let after_close_game = after_close.gameplay.as_ref().unwrap();
+    assert_eq!(
+        after_close_game.inventory.coins,
+        before_payout + DERBY_COINS,
+        "the close pays nothing more"
     );
     assert_eq!(
-        gateway
-            .snapshot()
-            .gameplay
-            .as_ref()
-            .unwrap()
-            .inventory
-            .coins,
-        before_coins,
-        "a fabricated stationary contact cannot mint coins"
+        after_close_game.derby.as_ref().unwrap().paid_matches,
+        vec![instance]
     );
 
-    // No reward means no cooldown: the gate offers another reportless match at once.
+    // Farming is allowed: the gate offers another match at once, and a new match is a new id.
     let mut menu = vec![26, 0, 8, 0];
     menu.extend(NPC.to_le_bytes());
     menu.push(0);
@@ -1141,12 +1192,16 @@ fn active_derby_hostile_records_cancel_and_tick_transitions_are_bounded() {
     choice.extend(NPC.to_le_bytes());
     choice.extend(3_i32.to_le_bytes());
     let reentered = gateway.handle_at(&wrap(&choice), 5_300).unwrap();
+    let next_instance = reentered
+        .replies
+        .iter()
+        .filter_map(|packet| unwrap_reply(packet))
+        .find(|packet| packet.starts_with(&[39, 0, 16]))
+        .map(|packet| i32::from_le_bytes(packet[3..7].try_into().unwrap()))
+        .expect("a second derby offer");
     assert!(
-        reentered
-            .replies
-            .iter()
-            .filter_map(|packet| unwrap_reply(packet))
-            .any(|packet| packet.starts_with(&[39, 0, 16]))
+        next_instance > instance,
+        "the instance counter resumes above the paid ledger"
     );
     assert!(gateway.gameplay().unwrap().derby_active());
     let cancelled = gateway.handle_at(&wrap(&[26, 0, 42, 0]), 5_400).unwrap();
@@ -1155,8 +1210,57 @@ fn active_derby_hostile_records_cancel_and_tick_transitions_are_bounded() {
     gateway.reset_session();
     let after_reset = gateway.snapshot();
     let after_reset_game = after_reset.gameplay.as_ref().unwrap();
-    assert_eq!(after_reset_game.inventory.coins, before_coins);
+    assert_eq!(
+        after_reset_game.inventory.coins,
+        before_payout + DERBY_COINS
+    );
+    assert_eq!(
+        after_reset_game.derby.as_ref().unwrap().paid_matches,
+        vec![instance],
+        "a reset keeps the completion ledger"
+    );
     assert!(!gateway.gameplay().unwrap().derby_active());
+}
+
+/// T219 gate 4: a completion payout that cannot be applied (this wallet is already at the wire
+/// maximum) is a refusal. The application is dropped, the match stays running, the wallet and the
+/// ledger are unchanged, and the session keeps serving this player; no other player is involved.
+#[test]
+fn a_refused_derby_completion_payout_changes_nothing() {
+    let fixture = Fixture::new();
+    let (mut gateway, npc, _) = fixture.active_derby_with(fixture.gateway_with_max_coins());
+    let guid = gateway.state().guid;
+    gateway
+        .handle_at(&wrap(&derby_pose(guid, [0.0, 0.0, 0.0])), 3_900)
+        .unwrap();
+    let before = gateway.snapshot();
+    let hit = encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
+        reporter: ParticipantKey(guid),
+        other: npc,
+        impact_bits: 20.0_f32.to_bits(),
+    }))
+    .unwrap();
+    let refused = gateway.handle_at(&wrap(&hit), 4_000).unwrap();
+    bounded(&refused);
+    assert!(
+        !refused
+            .replies
+            .iter()
+            .filter_map(|packet| unwrap_reply(packet))
+            .any(|packet| packet.starts_with(&[50, 0, 1])),
+        "a refused payout sends no reward bundle"
+    );
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "a refused payout changes nothing"
+    );
+    assert_eq!(
+        gateway.gameplay().unwrap().derby_phase(),
+        Some(osfr_tools::derby::DerbyPhase::Running),
+        "the refused results transition is rolled back, not half applied"
+    );
+    follow_up(&mut gateway);
 }
 
 #[test]
