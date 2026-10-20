@@ -682,9 +682,7 @@
       "job": 43,
       "title_string_id": 4420074,
       "giver_npc_id": 9000000050,
-      "prerequisite_quest_ids": [
-        3000008
-      ],
+      "prerequisite_quest_ids": [],
       "objectives": [
         {
           "kind": "defeat",
@@ -722,8 +720,14 @@
         {
           "coins": 18,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "43": 25
+          },
           "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T241: 25 Brawler (profile 43) XP is playtest tuning for this five-wolf hunt; the guide's reward cell records only the 18 coins."
+            },
             {
               "kind": "client",
               "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part A. Opening arc (Briarwood Caverns, Farnum Farmstead, Cobblestone Village, Royal Palace), row A9; reward cell '18 coins [wiki]'"
@@ -766,13 +770,13 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W110: DISABLED: Predecessor 3000008 blocked; guide requires switching to Brawler, but split Quest cannot express job requirements/selection. Kill targets exist."
+          "evidence": "(R) T241: playtest entry. The authored predecessor 3000008 (a crafting quest) stays disabled, so this record drops that prerequisite until the crafting path opens; restore 3000008 -> 3000009 then. The record already carried the Brawler profile 43 gate, which the split Quest job field stores."
         }
       ],
       "description_string_id": 4420075,
       "intro_text_string_id": 4420073,
       "end_text_string_id": 4420076,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000010,
@@ -1208,6 +1212,7 @@
     },
     {
       "id": 3000016,
+      "job": 14,
       "title_string_id": 5100483,
       "giver_npc_id": 9000000050,
       "prerequisite_quest_ids": [],
@@ -1215,7 +1220,7 @@
         {
           "kind": "gather_resource",
           "id": 1,
-          "resource_id": 1003,
+          "resource_id": 2739,
           "quantity": 5,
           "source": [
             {
@@ -1228,7 +1233,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) W110: large batch quantity is unknown; proposed five reuses opening mining count and remains disabled."
+              "evidence": "(R) T241: the live Snowhill copper-vein node path counts the mined item definition (Copper Ore 2739, gameplay.rs:5398; mining.json output), not the one-time opening gather key 1003; quantity five is playtest tuning for the batch."
             }
           ]
         },
@@ -1252,8 +1257,14 @@
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "14": 15
+          },
           "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T241: 15 Miner (profile 14) XP is playtest tuning for the five-ore batch; the record's existing five-coin fallback is unchanged."
+            },
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
@@ -1288,13 +1299,13 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W110: DISABLED: Opening Copper resource is one-time stage-gated; batch size unspecified. Proposed five is (R), not an exact recovered batch count."
+          "evidence": "(R) T241: enabled for the live Snowhill copper veins; the one-time opening stage 910014 owns resource key 1003 and stays closed, so this regional record listens to the lifted Copper Ore item definition 2739 the ordinary node path emits. The Miner profile 14 gate matches the node's job requirement."
         }
       ],
       "description_string_id": 5100484,
       "intro_text_string_id": 5100482,
       "end_text_string_id": 5100485,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000017,

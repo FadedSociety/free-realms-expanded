@@ -39,6 +39,7 @@ use std::{
 
 const CHARACTER: u64 = 202_017;
 const ADVENTURER: i32 = 1;
+const MINER: i32 = 14;
 const NINJA: i32 = 2;
 const BRAWLER: i32 = 43;
 const CHEF: i32 = 45;
@@ -53,6 +54,7 @@ const AUGUSTE: u64 = 9_000_000_019;
 const RICARDO: u64 = 9_000_000_178;
 const TY: u64 = 9_000_000_223;
 const GROSH: u64 = 9_000_000_335;
+const CLEETUS: u64 = 9_000_000_050;
 
 const INTRODUCE_YOURSELF: u32 = 3_000_020;
 const BURDEN_OF_FAME: u32 = 3_080_001;
@@ -947,7 +949,7 @@ fn content_overflow_is_rejected_at_load() {
 fn configured_job_xp_and_job_gates_match_the_task_table() {
     let content = content_dir();
     // (file, quest id, giver, prerequisites, reward coins, job gate, profile, XP)
-    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 12] = [
+    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 14] = [
         (
             "adventurer.json",
             INTRODUCE_YOURSELF,
@@ -1059,15 +1061,40 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             NINJA,
             20,
         ),
+        // T241: the live Farnum starting pair. Fighting the Pack is a playtest entry
+        // (the disabled 3000008 predecessor is dropped); Copper Collection listens to the
+        // Copper Ore item definition the ordinary Snowhill node path emits.
+        (
+            "adventurer.json",
+            3_000_009,
+            CLEETUS,
+            &[],
+            18,
+            Some(BRAWLER),
+            BRAWLER,
+            25,
+        ),
+        (
+            "adventurer.json",
+            3_000_016,
+            CLEETUS,
+            &[],
+            5,
+            Some(MINER),
+            MINER,
+            15,
+        ),
     ];
 
     let mut listed = BTreeSet::new();
-    let has_t202 = |source: &Value| {
+    // Both task decisions are accepted: T202 wrote the chapter job XP and gates, T241
+    // extended the same table with the two live Farnum starting records.
+    let has_decision = |source: &Value| {
         source.as_array().is_some_and(|tags| {
             tags.iter().any(|tag| {
-                tag["evidence"]
-                    .as_str()
-                    .is_some_and(|text| text.starts_with("(R) T202:"))
+                tag["evidence"].as_str().is_some_and(|text| {
+                    text.starts_with("(R) T202:") || text.starts_with("(R) T241:")
+                })
             })
         })
     };
@@ -1133,18 +1160,17 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
         );
         if job.is_some() {
             assert!(
-                has_t202(&record["source"]),
-                "{file}: quest {quest_id} carries the T202 (R) job-gate decision"
+                has_decision(&record["source"]),
+                "{file}: quest {quest_id} carries its (R) job-gate decision"
             );
         }
         assert!(
-            has_t202(&reward["source"]),
-            "{file}: quest {quest_id} reward carries the T202 (R) decision"
+            has_decision(&reward["source"]),
+            "{file}: quest {quest_id} reward carries its (R) decision"
         );
     }
 
-    // Only the listed IDs gained XP or a job gate in these four files. The disabled
-    // C1 record 3000009 already carried its Brawler gate before this slice.
+    // Only the listed IDs gained XP or a job gate in these four files.
     for file in [
         "adventurer.json",
         "chef.json",
@@ -1165,12 +1191,8 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
                     "{file}: quest {id} gained unexpected job XP"
                 );
             }
-            if record.get("job").is_none() {
-                continue;
-            }
-            assert_eq!(
-                (file, id, record["job"].as_i64()),
-                ("adventurer.json", 3_000_009, Some(i64::from(BRAWLER))),
+            assert!(
+                record.get("job").is_none(),
                 "{file}: quest {id} gained an unexpected job gate"
             );
         }
