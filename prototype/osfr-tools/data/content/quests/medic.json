@@ -3,11 +3,42 @@
   "records": [
     {
       "id": 3090001,
+      "job": 11,
       "title_string_id": 23048,
       "giver_npc_id": 9000000161,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000161,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1, row 1; objective texts 'Take Nurse Naia's test to see if you're ready to become a medic.' (3503681096) and 'Talk to Nurse Naia when you are ready to take the test.' (2928150053). The target is Nurse Naia 9000000161, a legacy_data spawn in npcs/sanctuary.json."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T197: the retail quest is Nurse Naia's three-question exam (guide Overview questions 1223254944, 2136427033, 2523135785; pass/fail lines 836266468, 3993954191, 1302975110, 437707728). ContentDb v1 has no exam or multiple-choice objective and the correct answers are not in the recovered locale, so the local step is the guide's take-the-test talk to Naia. No answer state, reward-by-score or second interaction is invented."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "11": 15
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T197: row 1 reward cell is unknown. Five coins use the existing W110/T194 small-referral fallback and 15 Medic (profile 11) job XP follows the same policy. The guide's Student Medic Hammer belongs to unlocking the job, not to this quest's reward cell, so no item is inferred."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -27,10 +58,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -39,15 +66,19 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T197: job 11 (Medic) gate. The chapter is offered only after learning Medic from Naia (job_trainers.json row) and activating it; the gate is explicit content data, not inferred from the file name."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T197: chapter step enabled as a single talk. 3090002 (Operation: Revival, Bixie Hive) stays disabled and is skipped by the 3090003 prerequisite."
         }
       ],
       "description_string_id": 23049,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3090002,
@@ -96,13 +127,44 @@
     },
     {
       "id": 3090003,
+      "job": 11,
       "title_string_id": 22989,
-      "giver_npc_id": 9000000419,
+      "giver_npc_id": 9000000161,
       "prerequisite_quest_ids": [
-        3090002
+        3090001
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000488,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1, row 3; objective texts 'Perform a House Call to Greyli in Queensfields.' (342789579) and 'As a medic, talk to Greyli Dustywings' (1387828253). The target is Greyli Dustywings 9500000488, a legacy_data spawn in npcs/sanctuary.json."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T197: 3090002 (Operation: Revival, Bixie Hive) is unavailable and stays disabled, so this chapter follows the completed exam as the task requires. The single talk is the whole local step; the client completion line 1171210927 is neutral."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 10,
+          "items": [],
+          "job_xp": {
+            "11": 20
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T197: row 3 reward cell is unknown. Ten coins use the existing W110/T194 referral fallback and 20 Medic (profile 11) job XP follows the same policy. No item, membership bonus or random loot is inferred."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -122,10 +184,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -134,15 +192,27 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: row 3 names Nurse Naia as the giver; the client text (1406705376, 2451581503, 2531400609) has Doctor Gordon handing the case over. Naia is the spawned hospital quest giver."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T197 giver fix: the previous giver 9000000419 is not spawned in any data/content/npcs row (npcs_unresolved.json lists it as 'Nurse Naia (wiki). Gordon is named in the text'), so the quest could not be offered. Corrected to Nurse Naia 9000000161, the spawned legacy_data hospital quest giver."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T197 prerequisite: the guide's row 3 follows row 2 (Bixie Hive, 3090002), which stays disabled; this chapter now follows the completed exam 3090001."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T197: historical coin/XP payout is unknown; 10 coins and 20 Medic XP are the W110/T194 referral fallback. The existing quest grant key pays it once."
         }
       ],
       "description_string_id": 22990,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3090004,
@@ -198,13 +268,48 @@
     },
     {
       "id": 3090005,
+      "job": 11,
       "title_string_id": 23019,
       "giver_npc_id": 9000000073,
       "prerequisite_quest_ids": [
-        3090004
+        3090003
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000488,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 1, row 5; objective 'As a medic, talk to Greyli Dustywings and let him know when he should take his vitamins' (812984915) and description 23020 ('Doctor Gordon has made some vitamins for Greyli... Talk to Greyli and let him know when he should take his vitamins'). The target is Greyli Dustywings 9500000488, a legacy_data spawn in npcs/sanctuary.json."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T197: 3090004 (Palatable Pills, collect ten fruits and vegetables) is unavailable and stays disabled, so this chapter follows House Call as the task requires. The final talk is the only recovered step; the client gives no return-to-Gordon objective."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T197: with a single final talk objective the engine opens the 49/13 end screen at the named talk target (Greyli) rather than at the giver, because quest_engine::on_event treats a completed Talk objective as a turn-in actor; the 49/14 then pays the quest. This is the same recovered rule the T194 Archer Oath chain uses at Hilforn."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {
+            "11": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T197: row 5 reward cell is unknown. Fifteen coins use the existing W110/T194 referral fallback and 25 Medic (profile 11) job XP follows the same policy. The wiki's Amateur Medic Scalpel (level 1 weapon) is not proven in the shipped item definitions, so no item is granted; the scalpel remains a later-slice gap."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -224,10 +329,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -236,15 +337,31 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Medic.md: row 5 giver is Doctor Gordon; npcs/sanctuary.json binds quest_ids_given 3090005 to Doctor Gordon 9000000073."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T197: Doctor Gordon 9000000073 was an unanchored, never-spawned regional row, so this giver was unreachable. This slice corrects that row to its Legacy spawn (FabledRealms.lua:1083; Npcs.json Id=2339) and records that provenance in the NPC row's field sources."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T197 prerequisite: the guide's row 5 follows row 4 (Palatable Pills, 3090004), which stays disabled; this chapter follows the completed House Call 3090003."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T197: historical coin/XP payout is unknown; 15 coins and 25 Medic XP are the W110/T194 referral fallback, paid once by the existing quest grant key."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T197: the known Amateur Medic Scalpel reward is omitted because its exact item definition is not proven in the shipped catalogue; no invented item is granted."
         }
       ],
       "description_string_id": 23020,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3090006,

@@ -15949,11 +15949,11 @@
       ],
       "name": "Doctor Gordon",
       "name_reason": null,
-      "name_string_id": 823955810,
+      "name_string_id": 7610,
       "name_string_ids": [
         {
-          "table": "unspecified",
-          "id": 823955810
+          "table": "client_locale",
+          "id": 7610
         }
       ],
       "name_string_id_reason": null,
@@ -16265,29 +16265,23 @@
       ],
       "services_reason": null,
       "position": [
-        -1414.403079,
-        -27.631,
-        348.912988
+        -1166.028,
+        6.622923,
+        373.1792
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.9016198145155808,
+        -0.9984409154137853,
         0.0,
-        0.43252943260879895
+        0.055818799948426125
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 5,
-          "poi_name": "Sanctuary",
-          "match_score": 0
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform.",
+      "position_reason": "Legacy built-content spawn coordinates copied from ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1083; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2339 (ModelId=506, ModelFileName=human_m_doctor_gordon.agr, NameId=7610). (R) T197: the earlier unanchored row never spawned, so Doctor Gordon could not offer the Medic chapter; this uses the same Legacy data as Nurse Naia (row 1084) and Greyli Dustywings (row 2284).",
       "source": [
         {
           "kind": "client",
@@ -16300,6 +16294,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1083 zone:spawnNpcWithGuid(2339, 100000002339, -1166.028, 6.622923, 373.1792, -3.029897); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2339 (NameId=7610, ModelId=506, ModelFileName=human_m_doctor_gordon.agr). (R) T197: same Legacy source as Nurse Naia (row 1084) and Greyli Dustywings (row 2284); the earlier unanchored row never spawned, so the Medic chapter giver was unreachable."
         }
       ],
       "field_sources": {
@@ -16367,22 +16365,22 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 42; source cell: [client] [wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2339 (NameId=7610). NameId resolves in the client locale table to 'Doctor Gordon'."
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 42; source cell: [client] [wiki]"
+            "kind": "client",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2339 NameId=7610 matches Global.Text 7610."
           }
         ],
         "name_string_ids": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 42; source cell: [client] [wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2339 (NameId=7610). NameId resolves in the client locale table to 'Doctor Gordon'."
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 42; source cell: [client] [wiki]"
+            "kind": "client",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2339 NameId=7610 matches Global.Text 7610."
           }
         ],
         "name_string_id_reason": [
@@ -16801,18 +16799,22 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 5 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1083 zone:spawnNpcWithGuid(2339, 100000002339, -1166.028, 6.622923, 373.1792, -3.029897)."
           },
           {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "client",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2339 (NameId=7610 'Doctor Gordon', ModelId=506, ModelFileName=human_m_doctor_gordon.agr)."
           }
         ],
         "position_reason": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1083 places Legacy NPC 2339 (Doctor Gordon) next to Nurse Naia (row 1084)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "evidence": "(R) T197: this row is no longer an unanchored zone-centre guess; the transform is the Legacy built-content spawn row."
           }
         ],
         "position_w": [
@@ -16823,45 +16825,70 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 5 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1083 heading -3.029897."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) T197: Legacy heading converted to the stored Y-axis yaw quaternion [0, sin(h/2), 0, cos(h/2)] the same way as the other Legacy NPC rows; the server reads the heading directly."
           }
         ],
         "placement": [
           {
+            "kind": "legacy-data",
+            "evidence": "legacy_data: an exact zone:spawnNpcWithGuid row exists in FabledRealms.lua:1083."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "evidence": "(R) T197: legacy_data replaces unanchored so NpcVisibility spawns the existing content row; no new NPC identity is added."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "legacy_data_spawn: ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1083."
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "legacy-data",
+            "evidence": "high: exact Legacy spawn row and Legacy NPC identity (Npcs.json Id=2339)."
           }
         ],
         "placement_candidates": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) T197: empty because the position is not a POI-name reconstruction; the earlier POI id 5 zone-centre candidate is superseded."
           }
         ],
         "capture_match": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+            "evidence": "(R) T197: null because the Legacy spawn is not one of the 23 startup AddNpc capture rows; no capture join is claimed."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1083 heading -3.029897."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2339 (ModelId=506, ModelFileName=human_m_doctor_gordon.agr)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2339 (ModelId=506, ModelFileName=human_m_doctor_gordon.agr). The asset exists in lab/extracted/client-assets/catalog.tsv."
           }
         ]
-      }
+      },
+      "heading": -3.029897,
+      "model_id": 506,
+      "model_file_name": "human_m_doctor_gordon.agr"
     },
     {
       "npc_id": 9500000469,
