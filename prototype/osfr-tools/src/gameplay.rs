@@ -535,11 +535,14 @@ impl Gameplay {
             SharedFieldAction::Select { choice: 103, .. } => Some(0),
             _ => None,
         };
-        // T222: the held power-up owns its key slot on the shared field too.
-        if let Some(slot) = slot {
-            if let Some(outcome) =
-                self.use_power_up_request(slot, character, now_ms, Some(field))?
-            {
+        // T222: the held power-up owns its key slot on the shared field too,
+        // under the same interest restriction as a job ability.
+        if slot == Some(crate::power_ups::SLOT) && self.held_power_up().is_some() {
+            let presence = field.restrict_to(known);
+            let result =
+                self.use_power_up_request(crate::power_ups::SLOT, character, now_ms, Some(field));
+            field.restore_presence(presence);
+            if let Some(outcome) = result? {
                 return Ok(outcome);
             }
         }
@@ -2018,12 +2021,7 @@ impl Gameplay {
             )?;
             self.apply_encounter(result, &mut out)?;
         }
-        // T222: a pickup or a stale-table clear changes the held kind, so the
-        // client bar must show the kind or the restored job slot at once.
-        if self.encounter.as_ref().and_then(|e| e.held_power_up()) != held.as_deref() {
-            let profile = self.profiles.as_ref().unwrap().active();
-            out.replies.extend(self.ability_activation_for(profile)?);
-        }
+        self.refresh_power_up_slot(held.as_deref(), &mut out)?;
         Ok(out)
     }
 

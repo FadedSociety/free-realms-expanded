@@ -171,45 +171,30 @@ impl EncounterEngine {
                 } => Some((radius, max_targets, centered_on_caster)),
                 _ => None,
             });
-            let states: Vec<&EnemyState> = match &self.state.active {
-                Some(a) => a.enemies.iter().collect(),
-                None => self
-                    .state
-                    .world_enemies
-                    .iter()
-                    .chain(self.field.iter().filter(|f| f.present).map(|f| &f.state))
-                    .collect(),
-            };
-            let mut nearby: Vec<_> = states
-                .into_iter()
-                .filter(|s| self.enemy(s.guid).is_some() && s.health > 0 && !s.dormant)
-                .collect();
+            let nearby = self.living_enemies();
             let caster_area = area.is_some_and(|(_, _, caster)| caster);
             let select_range = if caster_area { area.unwrap().0 } else { range };
             // (R) A non-hostile/self target selects the nearest enemy; an explicit
             // hostile target out of reach fails instead of silently hitting another.
             let selected = nearby
                 .iter()
-                .find(|s| s.guid == target)
                 .copied()
+                .find(|(guid, _)| *guid == target)
                 .or_else(|| {
                     nearby
                         .iter()
                         .copied()
-                        .filter(|s| distance(position, s.position) <= select_range)
-                        .min_by(|a, b| {
-                            (self.shielded(a.guid), distance(position, a.position))
-                                .partial_cmp(&(
-                                    self.shielded(b.guid),
-                                    distance(position, b.position),
-                                ))
+                        .filter(|(_, at)| distance(position, *at) <= select_range)
+                        .min_by(|(a_guid, a_at), (b_guid, b_at)| {
+                            (self.shielded(*a_guid), distance(position, *a_at))
+                                .partial_cmp(&(self.shielded(*b_guid), distance(position, *b_at)))
                                 .unwrap_or(std::cmp::Ordering::Equal)
                         })
                 });
-            let Some(selected) = selected else {
+            let Some((selected_guid, selected_at)) = selected else {
                 return Ok(refuse(288));
             };
-            if distance(position, selected.position) > select_range {
+            if distance(position, selected_at) > select_range {
                 return Ok(refuse(288));
             }
             if self
@@ -218,33 +203,13 @@ impl EncounterEngine {
             {
                 return Ok(refuse(287));
             }
-            let center = if caster_area {
-                position
-            } else {
-                selected.position
-            };
+            let center = if caster_area { position } else { selected_at };
             let (radius, limit, _) = area.unwrap_or((0.0, 1, false));
-            nearby.retain(|s| {
-                if area.is_some() {
-                    distance(center, s.position) <= radius
-                } else {
-                    s.guid == selected.guid
-                }
-            });
-            nearby.sort_by(|a, b| {
-                (
-                    a.guid != selected.guid,
-                    distance(center, a.position),
-                    a.guid,
-                )
-                    .partial_cmp(&(
-                        b.guid != selected.guid,
-                        distance(center, b.position),
-                        b.guid,
-                    ))
-                    .unwrap_or(std::cmp::Ordering::Equal)
-            });
-            targets.extend(nearby.into_iter().take(limit).map(|s| s.guid));
+            targets = if area.is_some() {
+                self.area_targets(center, radius, limit as usize, Some(selected_guid))
+            } else {
+                vec![selected_guid]
+            };
             if targets.is_empty() {
                 return Ok(refuse(288));
             }
@@ -288,40 +253,16 @@ impl EncounterEngine {
                     multiplier,
                     duration_ms,
                     interval_ms,
-                } => {
-                    for &guid in &targets {
-                        if self.enemy(guid).is_some_and(|(_, s)| s.health > 0)
-                            && !self.shielded(guid)
-                        {
-                            self.skills.dots.insert(
-                                (guid, ability.definition_id),
-                                SkillDot {
-                                    damage: (base as f32 * multiplier).round() as u32,
-                                    next_ms: now_ms.saturating_add(interval_ms),
-                                    until_ms: now_ms.saturating_add(duration_ms),
-                                    interval_ms,
-                                },
-                            );
-                        }
-                    }
-                }
+                } => self.apply_dot(
+                    &targets,
+                    ability.definition_id,
+                    (base as f32 * multiplier).round() as u32,
+                    duration_ms,
+                    interval_ms,
+                    now_ms,
+                ),
                 JobEffect::Stun { duration_ms } => {
-                    for &guid in &targets {
-                        if self.enemy(guid).is_some_and(|(_, s)| s.health > 0)
-                            && !self.shielded(guid)
-                        {
-                            self.skills
-                                .stuns
-                                .entry(guid)
-                                .and_modify(|until| {
-                                    *until = (*until).max(now_ms.saturating_add(duration_ms))
-                                })
-                                .or_insert(now_ms.saturating_add(duration_ms));
-                            self.moving.remove(&guid);
-                            out.replies.push(animation(guid, 1, true));
-                            out.replies.push(animation(guid, 1401, false)); // client com_stunned
-                        }
-                    }
+                    self.apply_stun(&targets, duration_ms, now_ms, &mut out)
                 }
                 JobEffect::Buff {
                     recipient,
@@ -339,7 +280,7 @@ impl EncounterEngine {
                         crit_damage: crit_damage_bonus,
                     };
                     if recipient == EffectRecipient::Caster {
-                        self.skills.caster_buffs.insert(ability.definition_id, buff);
+                        self.apply_caster_buff(ability.definition_id, buff);
                     } else {
                         for &guid in &targets {
                             if self.enemy(guid).is_some_and(|(_, s)| s.health > 0)
@@ -381,6 +322,104 @@ impl EncounterEngine {
             now_ms.saturating_add(ability.cooldown_ms),
         );
         Ok(out)
+    }
+
+    /// Every live, present, non-dormant enemy, as (guid, position). Job
+    /// abilities and the held power-up select their targets from here.
+    pub(super) fn living_enemies(&self) -> Vec<(u64, [f32; 3])> {
+        let states: Vec<&EnemyState> = match &self.state.active {
+            Some(a) => a.enemies.iter().collect(),
+            None => self
+                .state
+                .world_enemies
+                .iter()
+                .chain(self.field.iter().filter(|f| f.present).map(|f| &f.state))
+                .collect(),
+        };
+        states
+            .into_iter()
+            .filter(|s| self.enemy(s.guid).is_some() && s.health > 0 && !s.dormant)
+            .map(|s| (s.guid, s.position))
+            .collect()
+    }
+
+    /// The nearest `max_targets` living enemies within `radius` of `center`,
+    /// `primary` first (ties by distance, then guid). Shared by a job
+    /// ability's area and the held power-up's caster-centred area.
+    pub(super) fn area_targets(
+        &self,
+        center: [f32; 3],
+        radius: f32,
+        max_targets: usize,
+        primary: Option<u64>,
+    ) -> Vec<u64> {
+        let mut targets: Vec<(u64, [f32; 3])> = self
+            .living_enemies()
+            .into_iter()
+            .filter(|(_, at)| distance(center, *at) <= radius)
+            .collect();
+        targets.sort_by(|(a_guid, a_at), (b_guid, b_at)| {
+            (Some(*a_guid) != primary, distance(center, *a_at), *a_guid)
+                .partial_cmp(&(Some(*b_guid) != primary, distance(center, *b_at), *b_guid))
+                .unwrap_or(std::cmp::Ordering::Equal)
+        });
+        targets.truncate(max_targets);
+        targets.into_iter().map(|(guid, _)| guid).collect()
+    }
+
+    /// The authored burn: one refreshing entry per target/definition. A
+    /// shielded summoner, like a dead target, never takes it.
+    pub(super) fn apply_dot(
+        &mut self,
+        targets: &[u64],
+        definition_id: i32,
+        damage: u32,
+        duration_ms: u64,
+        interval_ms: u64,
+        now_ms: u64,
+    ) {
+        for &guid in targets {
+            if self.enemy(guid).is_some_and(|(_, s)| s.health > 0) && !self.shielded(guid) {
+                self.skills.dots.insert(
+                    (guid, definition_id),
+                    SkillDot {
+                        damage,
+                        next_ms: now_ms.saturating_add(interval_ms),
+                        until_ms: now_ms.saturating_add(duration_ms),
+                        interval_ms,
+                    },
+                );
+            }
+        }
+    }
+
+    /// Freeze each living, unshielded target until `now_ms + duration_ms` and
+    /// send the client's `com_stunned` clip (1401).
+    pub(super) fn apply_stun(
+        &mut self,
+        targets: &[u64],
+        duration_ms: u64,
+        now_ms: u64,
+        out: &mut EncounterOutcome,
+    ) {
+        for &guid in targets {
+            if self.enemy(guid).is_some_and(|(_, s)| s.health > 0) && !self.shielded(guid) {
+                let until = now_ms.saturating_add(duration_ms);
+                self.skills
+                    .stuns
+                    .entry(guid)
+                    .and_modify(|current| *current = (*current).max(until))
+                    .or_insert(until);
+                self.moving.remove(&guid);
+                out.replies.push(animation(guid, 1, true));
+                out.replies.push(animation(guid, 1401, false)); // client com_stunned
+            }
+        }
+    }
+
+    /// A caster-private buff (the player's own damage/mitigation fold).
+    pub(super) fn apply_caster_buff(&mut self, definition_id: i32, buff: SkillBuff) {
+        self.skills.caster_buffs.insert(definition_id, buff);
     }
 
     pub(super) fn tick_job_effects(

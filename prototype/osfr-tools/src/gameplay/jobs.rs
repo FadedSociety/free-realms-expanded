@@ -122,9 +122,9 @@ impl Gameplay {
             .inventory
             .profile_attachments(self.profiles.as_ref().unwrap().active())?;
         self.profiles.as_mut().unwrap().activate(job)?;
-        if let Some(abilities) = &self.abilities {
-            out.replies
-                .extend(abilities.activation(job, self.job_level(job))?);
+        // The bar goes through the power-up seam: a held kind keeps its slot.
+        if self.abilities.is_some() {
+            out.replies.extend(self.ability_activation_for(job)?);
         }
         self.sync_player_level(out);
         self.ensure_outfit(job, out)?;

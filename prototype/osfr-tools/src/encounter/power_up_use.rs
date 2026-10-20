@@ -3,7 +3,9 @@
 //! The 2014 client has no separate combat power-up input. `ActionBarSlot3`
 //! (default `3`; binding table 0x1b4198c row 21, keysym 0x33) is dispatched by
 //! the regular-controller input dispatcher `00b02880` case 21 into
-//! `DispatchActionBarSlot` `008a7eb0` with slot 2, and the AbilityProcessor
+//! `DispatchActionBarSlot` `008a7eb0` with slot 2; the alternate-bar flag it
+//! passes selects mode 1 (job bar) normally and mode 2 (item bar) while the
+//! alternate bar is held. The job path is `009cf430` and the AbilityProcessor
 //! sends 36/10 bar 1 slot 2 (writer `00a342e0`). The `UsePowerup` action (row
 //! 15, default Control_L) belongs to the demolition-derby/minigame controllers
 //! and is not handled by `00b02880`. The locale dev note "power ups - add super
@@ -16,7 +18,7 @@
 //! target. Super Shield's `speed_pct` has no server-side movement model and is
 //! display-only for now.
 
-use super::skills::{SkillBuff, SkillDot, merge_skill_outcome};
+use super::skills::{SkillBuff, merge_skill_outcome};
 use super::*;
 
 impl EncounterEngine {
@@ -25,6 +27,15 @@ impl EncounterEngine {
         self.power_ups
             .as_ref()?
             .slot(self.held_power_up.as_deref()?)
+    }
+
+    /// The active fight's battle tier, 1..5: a field battle's authored
+    /// `difficulty`. The overworld and the opening cave carry no battle tier,
+    /// so they count as tier 1.
+    fn battle_tier(&self) -> usize {
+        self.dungeon()
+            .and_then(|d| self.battles.iter().find(|b| b.id == d.id))
+            .map_or(1, |b| b.difficulty.clamp(1, 5) as usize)
     }
 
     /// Use the held power-up at the server's position. `None` means nothing is
@@ -71,80 +82,43 @@ impl EncounterEngine {
         // Consume first: nothing below can run a second time for this hold.
         self.held_power_up = None;
         self.skills.expire(now_ms);
-        // (R) The overworld has no battle tier; the player's job-level weapon
-        // tier picks the authored damage curve (the same x1.75 steps).
-        let tier = (weapon_tier(self.job_level).clamp(1, 5) - 1) as usize;
+        // (R) The battle tier indexes the authored curve. The current basic
+        // already carries the job level's weapon scale, so the curve is
+        // applied exactly once (a tier-1 Fight uses the plain basic).
+        let tier = self.battle_tier() - 1;
         let (_, base) = profile_stats(profile, 0);
-        let base = (base as f32 * self.damage_scale).max(0.0).round() as u32;
+        let base = (base as f32 * self.damage_scale).round() as u32;
         let mut out = EncounterOutcome::default();
         if let Some(area) = &kind.area {
-            let states: Vec<(u64, [f32; 3])> = match &self.state.active {
-                Some(active) => active
-                    .enemies
-                    .iter()
-                    .map(|s| (s.guid, s.position))
-                    .collect(),
-                None => self
-                    .state
-                    .world_enemies
-                    .iter()
-                    .chain(self.field.iter().filter(|f| f.present).map(|f| &f.state))
-                    .map(|s| (s.guid, s.position))
-                    .collect(),
-            };
-            let mut targets: Vec<(u64, [f32; 3])> = states
-                .into_iter()
-                .filter(|(guid, at)| {
-                    self.enemy(*guid)
-                        .is_some_and(|(_, s)| s.health > 0 && !s.dormant)
-                        && distance(position, *at) <= area.radius as f32
-                })
-                .collect();
-            targets.sort_by(|a, b| {
-                distance(position, a.1)
-                    .total_cmp(&distance(position, b.1))
-                    .then_with(|| a.0.cmp(&b.0))
-            });
-            targets.truncate(area.max_targets as usize);
+            let targets = self.area_targets(
+                position,
+                area.radius as f32,
+                area.max_targets as usize,
+                None,
+            );
             if let Some(multiplier) = kind.damage_by_tier.as_ref().and_then(|t| t.get(tier)) {
                 let damage = (base as f32 * *multiplier as f32).round() as u32;
-                for (guid, at) in &targets {
-                    merge_skill_outcome(
-                        &mut out,
-                        self.strike_damage(*guid, *at, f32::MAX, damage, now_ms, false)?,
-                    );
-                }
-            }
-            if let Some(burn) = &kind.burn {
-                let damage = (base as f32 * burn.multiplier as f32).round() as u32;
-                for (guid, _) in &targets {
-                    if self.enemy(*guid).is_some_and(|(_, s)| s.health > 0) {
-                        self.skills.dots.insert(
-                            (*guid, slot.definition_id),
-                            SkillDot {
-                                damage,
-                                next_ms: now_ms.saturating_add(u64::from(burn.interval_ms)),
-                                until_ms: now_ms.saturating_add(u64::from(burn.duration_ms)),
-                                interval_ms: u64::from(burn.interval_ms),
-                            },
+                for &guid in &targets {
+                    if let Some(at) = self.enemy(guid).map(|(_, s)| s.position) {
+                        merge_skill_outcome(
+                            &mut out,
+                            self.strike_damage(guid, at, f32::MAX, damage, now_ms, false)?,
                         );
                     }
                 }
             }
+            if let Some(burn) = &kind.burn {
+                self.apply_dot(
+                    &targets,
+                    slot.definition_id,
+                    (base as f32 * burn.multiplier as f32).round() as u32,
+                    u64::from(burn.duration_ms),
+                    u64::from(burn.interval_ms),
+                    now_ms,
+                );
+            }
             if let Some(stun_ms) = kind.stun_ms {
-                for (guid, _) in &targets {
-                    if self.enemy(*guid).is_some_and(|(_, s)| s.health > 0) {
-                        let until = now_ms.saturating_add(u64::from(stun_ms));
-                        self.skills
-                            .stuns
-                            .entry(*guid)
-                            .and_modify(|current| *current = (*current).max(until))
-                            .or_insert(until);
-                        self.moving.remove(guid);
-                        out.replies.push(animation(*guid, 1, true));
-                        out.replies.push(animation(*guid, 1401, false)); // com_stunned
-                    }
-                }
+                self.apply_stun(&targets, u64::from(stun_ms), now_ms, &mut out);
             }
         }
         // Super Shield: a 0.0 damage-taken buff is the server's invulnerability.
@@ -153,7 +127,7 @@ impl EncounterEngine {
         if kind.invulnerable || kind.speed_pct.is_some() {
             let duration = kind.duration_ms.unwrap_or(0);
             if duration > 0 {
-                self.skills.caster_buffs.insert(
+                self.apply_caster_buff(
                     slot.definition_id,
                     SkillBuff {
                         until_ms: now_ms.saturating_add(u64::from(duration)),

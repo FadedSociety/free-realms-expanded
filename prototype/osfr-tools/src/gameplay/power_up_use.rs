@@ -15,9 +15,9 @@ impl Gameplay {
     }
 
     /// The toolbar (36/13 definitions, then 36/5) with the held power-up on its
-    /// own key slot. Every path that sends the job bar goes through here, so a
-    /// held kind cannot be lost by a job switch, level-up or reload and cannot
-    /// linger after it is used.
+    /// own key slot. Every path that sends a job toolbar goes through here, so
+    /// a held kind cannot be lost by a job switch, level-up, derby return or
+    /// reload and cannot linger after it is used.
     pub(crate) fn ability_activation_for(&self, profile: i32) -> io::Result<Vec<Vec<u8>>> {
         let abilities = self
             .abilities
@@ -25,6 +25,22 @@ impl Gameplay {
             .ok_or_else(|| invalid("ability content is not loaded"))?;
         let power_up = self.encounter.as_ref().and_then(|e| e.held_power_up_slot());
         abilities.activation_with_power_up(profile, self.job_level(profile), power_up.as_ref())
+    }
+
+    /// After a world tick, resend the toolbar only when a pickup or a
+    /// stale-table clear changed the held kind (the client shows the kind
+    /// only as a bar slot).
+    pub(crate) fn refresh_power_up_slot(
+        &self,
+        held_before: Option<&str>,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        if self.held_power_up() == held_before {
+            return Ok(());
+        }
+        let profile = self.profiles.as_ref().unwrap().active();
+        out.replies.extend(self.ability_activation_for(profile)?);
+        Ok(())
     }
 
     /// Handle a job-bar slot request for the held power-up. `None` means no
