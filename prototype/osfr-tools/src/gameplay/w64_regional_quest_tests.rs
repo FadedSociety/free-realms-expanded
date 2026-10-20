@@ -1214,6 +1214,20 @@ fn native_save_samantha_uses_localized_quest_offer_and_reply_state() {
         1,
         "3000021 is both a named target and a Talk completion; it must queue one end screen"
     );
+    // T202 populated only the reward bundle's XP dword; the 6-byte header, 20-byte
+    // end-screen ids and 69-byte bundle keep the 99-byte total. The stars are the
+    // quest's configured job XP (3000021 pays 20), read at bundle offset 31..35 by
+    // the client reward reader `008e7930`.
+    assert_eq!(
+        end_screens[0].len(),
+        99,
+        "the populated reward bundle keeps the client-reader length"
+    );
+    assert_eq!(
+        i32::from_le_bytes(end_screens[0][31..35].try_into().unwrap()),
+        20,
+        "the end screen displays the quest's configured job XP"
+    );
     assert!(
         u64::from_le_bytes(end_screens[0][6..14].try_into().unwrap()) == target_id
             && u32::from_le_bytes(end_screens[0][14..18].try_into().unwrap())

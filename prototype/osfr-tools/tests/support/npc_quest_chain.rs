@@ -1,13 +1,18 @@
 //! Shared fixture and packet helpers for the NPC quest-chain tests.
 //!
 //! `archer_entry.rs` (used by `archer_entry_chain.rs` and
-//! `archer_entry_content.rs`) and `medic_entry_chain.rs` / `medic_entry_content.rs`
-//! include this file with
+//! `archer_entry_content.rs`), `medic_entry_chain.rs` / `medic_entry_content.rs`
+//! and `quest_job_xp.rs` include this file with
 //! `#[path = "support/npc_quest_chain.rs"] mod npc_quest_chain;`. Test-only;
 //! production never copies content. The fixture supplies profile/inventory
 //! content; the repository's `job_trainers.json` and split quest/NPC content are
 //! bound from `data/content` exactly as the bundled play package does.
 #![allow(dead_code)]
+
+#[path = "../common/content_copy.rs"]
+mod content_copy;
+
+pub use content_copy::copy_tree;
 
 use osfr_tools::{
     character_store::CharacterState,
@@ -49,64 +54,65 @@ pub fn read_json(path: &Path) -> Value {
     .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
 }
 
-fn copy_dir(source: &Path, destination: &Path) {
-    fs::create_dir_all(destination).unwrap();
-    for entry in fs::read_dir(source).unwrap() {
-        let entry = entry.unwrap();
-        let target = destination.join(entry.file_name());
-        if entry.file_type().unwrap().is_dir() {
-            copy_dir(&entry.path(), &target);
-        } else {
-            fs::copy(entry.path(), &target).unwrap();
-        }
-    }
+pub struct Fixture {
+    path: PathBuf,
+    character_id: u64,
 }
-
-pub struct Fixture(PathBuf);
 
 impl Fixture {
     pub fn new() -> Self {
+        Self::for_character(CHARACTER)
+    }
+
+    /// A private content copy whose `game` binds this character's quest and reward
+    /// ledger; two sessions in the same fixture need separate character ids.
+    pub fn for_character(character_id: u64) -> Self {
         let source = reference_content();
         assert!(
             source.join("profiles.json").is_file() && source.join("inventory.json").is_file(),
             "the quest chapter needs the opening content fixture at {}",
             source.display()
         );
-        let directory = std::env::temp_dir().join(format!(
+        let path = std::env::temp_dir().join(format!(
             "osfr-npc-quest-chain-{}-{}",
             std::process::id(),
             NEXT_FIXTURE.fetch_add(1, Ordering::Relaxed)
         ));
-        copy_dir(&source, &directory);
+        copy_tree(&source, &path);
         fs::copy(
             content_dir().join("job_trainers.json"),
-            directory.join("job_trainers.json"),
+            path.join("job_trainers.json"),
         )
         .unwrap();
-        Self(directory)
+        Self { path, character_id }
     }
 
     pub fn path(&self) -> &Path {
-        &self.0
+        &self.path
     }
 
     pub fn game(&self, state: Option<GameplayState>) -> Gameplay {
-        self.game_as(CHARACTER, state)
+        self.game_as(self.character_id, state)
     }
 
     /// Bind the split catalogue for a specific character, so a second session in
     /// the same fixture owns its own quest and reward ledger.
     pub fn game_as(&self, character_id: u64, state: Option<GameplayState>) -> Gameplay {
-        let mut game = Gameplay::load(&self.0, state).expect("opening fixture loads");
+        let mut game = Gameplay::load(&self.path, state).expect("opening fixture loads");
         game.bind_npc_quest_catalogue(&content_dir(), character_id)
             .expect("split quest content loads");
         game
+    }
+
+    /// Reload the saved character through the same production bind the session uses.
+    pub fn reload(&self, game: &Gameplay) -> Gameplay {
+        self.game(Some(game.state()))
     }
 }
 
 impl Drop for Fixture {
     fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.0);
+        let _ = fs::remove_dir_all(&self.path);
     }
 }
 
@@ -225,6 +231,19 @@ pub fn talk(game: &mut Gameplay, character: &CharacterState, target: u64, now: u
     let menu = interact(game, character, target, now);
     let choice = menu_option(&menu, TALK_LABEL);
     send(game, character, &npc_select(target, choice), now + 1)
+}
+
+/// Complete one ordered Talk objective. A final target opens the pending end screen,
+/// which the client releases with its 26/6 dialogue choice.
+pub fn talk_step(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    target: u64,
+    now: u64,
+    label: &str,
+) {
+    let talked = talk(game, character, target, now);
+    assert!(talked.changed, "{label} did not advance its objective");
 }
 
 pub fn offer(

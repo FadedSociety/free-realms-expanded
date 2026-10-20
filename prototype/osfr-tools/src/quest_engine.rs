@@ -1946,6 +1946,23 @@ impl QuestEngine {
             .definitions
             .get(&quest_id)
             .ok_or_else(|| invalid("pending quest definition disappeared"))?;
+        // (R) The job gate is an offer gate, so a save written before this reward row
+        // gained its job XP can hold an active quest whose reward names a profile the
+        // character has not unlocked. Refuse without a grant, but release the pending
+        // end screen: a hard error here would leave `pending_turnin` set forever and
+        // block both a retry after unlocking the job and `abandon` (F249 review). The
+        // unlock rule itself lives in `rewards::locked_job_profile`.
+        if rewards::locked_job_profile(&definition.reward, &reward_state.profiles).is_some() {
+            self.state.clear_pending_turnin();
+            return Ok((
+                QuestOutcome {
+                    changed: true,
+                    denial: Some(QuestDenial::Job),
+                    ..QuestOutcome::default()
+                },
+                reward_state.clone(),
+            ));
+        }
         let grant_key = format!("quest:{}:{}", self.character_id, quest_id);
         let (next_reward_state, reward_packets) =
             rewards::apply_grant(reward_state, &definition.reward, &grant_key)?;
@@ -2277,10 +2294,15 @@ fn definition_from_content(
                 .ok_or_else(|| invalid("quest XP reward overflow"))?;
         }
     }
-    for profile in reward.job_xp.keys() {
-        if *profile <= 0 || !job_profile_ids.values().any(|id| id == profile) {
-            return Err(invalid("quest XP references an unknown job profile"));
-        }
+    if let Some(profile) = crate::content::job_xp_profile_unknown(&reward.job_xp, |profile| {
+        job_profile_ids.values().any(|id| *id == profile)
+    }) {
+        // (R) The content-DB path checks the same key rule in
+        // `content::validate_reward`; `scripts/content_check.py` audits authored JSON.
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidData,
+            format!("quest XP references unknown job profile {profile}"),
+        ));
     }
     Ok(QuestDefinition {
         id: quest.id,

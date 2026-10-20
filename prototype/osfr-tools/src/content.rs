@@ -937,6 +937,19 @@ fn positive_goal_field(owner: &str, field: &str, value: u64) -> Result<(), Conte
     Ok(())
 }
 
+/// (R) Job XP may only name a positive profile id declared by `jobs.json`. The split
+/// quest loader (`quest_engine::definition_from_content`) shares this rule, so the two
+/// content paths cannot drift; `scripts/content_check.py` audits the authored JSON.
+pub(crate) fn job_xp_profile_unknown(
+    job_xp: &BTreeMap<i32, u32>,
+    profile_known: impl Fn(i32) -> bool,
+) -> Option<i32> {
+    job_xp
+        .keys()
+        .copied()
+        .find(|profile| *profile <= 0 || !profile_known(*profile))
+}
+
 fn validate_reward(
     owner: &str,
     reward: &RewardGrant,
@@ -951,7 +964,9 @@ fn validate_reward(
             items.contains(&item.definition_id.to_string()),
         )?;
     }
-    for profile_id in reward.job_xp.keys() {
+    if let Some(profile_id) = job_xp_profile_unknown(&reward.job_xp, |profile_id| {
+        job_profiles.contains(&profile_id.to_string())
+    }) {
         reference(
             owner,
             "reward.job_xp.profile_id",

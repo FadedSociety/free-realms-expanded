@@ -78,6 +78,16 @@ impl RewardState {
     }
 }
 
+/// The first non-zero `job_xp` entry the profile snapshot has not unlocked. `apply_grant`
+/// refuses such a grant; `QuestEngine::finish_turnin` pre-checks the same rule so a save written
+/// before a quest gained its job XP becomes a clean refusal instead of an error (R).
+pub(crate) fn locked_job_profile(grant: &RewardGrant, profiles: &ProfileState) -> Option<i32> {
+    grant.job_xp.iter().find_map(|(&profile_id, &amount)| {
+        (amount > 0 && (profile_id <= 0 || !profiles.unlocked.contains(&profile_id)))
+            .then_some(profile_id)
+    })
+}
+
 /// Apply one grant to a clone and return its ordered inner packets. The input is never mutated;
 /// persistence and send-after-save ordering remain the caller's responsibility.
 pub fn apply_grant(
@@ -96,6 +106,10 @@ pub fn apply_grant(
     }
     if state.inventory.state().items.len() > state.bag_capacity {
         return Err(invalid("inventory exceeds configured bag capacity"));
+    }
+    // Granting only to unlocked jobs is server authorization policy (R).
+    if locked_job_profile(grant, &state.profiles).is_some() {
+        return Err(invalid("reward XP references a locked profile"));
     }
 
     let total_xp = grant.job_xp.values().try_fold(0u32, |total, amount| {
@@ -117,10 +131,6 @@ pub fn apply_grant(
     for (&profile_id, &amount) in &grant.job_xp {
         if amount == 0 {
             continue;
-        }
-        // Granting only to unlocked jobs is server authorization policy (R).
-        if profile_id <= 0 || !next.profiles.unlocked.contains(&profile_id) {
-            return Err(invalid("reward XP references a locked profile"));
         }
         let previous = next
             .profiles

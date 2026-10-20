@@ -1,4 +1,4 @@
-//! T202: the playable job quest lines pay their quest's job XP.
+//! T202/F249: the playable job quest lines pay their quest's job XP.
 //!
 //! The change is content-only for the reward rows and job gates; these tests drive the
 //! production in-world router (`Gameplay::handle_in_world` -> `gameplay/npc.rs` ->
@@ -17,14 +17,24 @@
 //! `00c7bb60`); 49/13 end screens name the speaker at 6..14 and the quest at
 //! 14..18 (`QuestEndPacket::ReadFields` `00c7b990`, resolved by `00984960` in
 //! `ShowQuestEndScreen` `00a95420`). The 49/13 reward bundle is the body consumed
-//! by `008e7930`; its second dword after the coin count is the displayed XP total.
-//! Job XP is delivered by the same 38/14 progress packet (`008d86e0`, six i32:
-//! profile, rank, progress, 0, 0, 0) and 38/18 rank packet (`008d8910`, profile and
-//! rank) that `rewards::experience_packets` already writes.
+//! by `008e7930`; its coin dword is at packet offset 27..31 and its displayed XP
+//! total at 31..35. Job XP is delivered by the same 38/14 progress packet
+//! (`008d86e0`, six i32: profile, rank, progress, 0, 0, 0) and 38/18 rank packet
+//! (`008d8910`, profile and rank) that `rewards::experience_packets` already
+//! writes.
 
+#[path = "support/npc_quest_chain.rs"]
+mod npc_quest_chain;
+
+use npc_quest_chain::{
+    Fixture, accept, assert_no_offer, assert_packet_changes_nothing,
+    character_at_for as character_in_zone, coins, content_dir, copy_tree, counts, finish_quest,
+    interact, menu_option, npc_interact, npc_select, offer, pending_turnin, profile_xp,
+    quest_end_reply, quest_reply, quest_status, saved, select_job, send, talk, talk_step,
+};
 use osfr_tools::{
     character_store::CharacterState,
-    gameplay::{Gameplay, GameplayState, Outcome},
+    gameplay::Gameplay,
     npc_interaction::NpcInteraction,
     profiles::ProfileState,
     quest_engine::{CharacterEligibility, QuestEngine, QuestStatus},
@@ -33,8 +43,7 @@ use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs,
-    path::{Path, PathBuf},
-    sync::atomic::{AtomicU64, Ordering},
+    path::Path,
 };
 
 const CHARACTER: u64 = 202_017;
@@ -61,100 +70,18 @@ const BURDEN_OF_FAME: u32 = 3_080_001;
 const RANGER_REQUISITION: u32 = 3_050_011;
 const NINJA_PATH: u32 = 3_110_001;
 
-const TALK_LABEL: u32 = 3_300;
-const QUEST_CHOICE: i32 = 301;
+/// The 49/13 end text (`end_text_string_id`) of each quest, from `data/content/quests`.
+const INTRODUCE_END_TEXT: u32 = 0;
+const BURDEN_END_TEXT: u32 = 104_108;
+const RANGER_END_TEXT: u32 = 104_136;
+const NINJA_END_TEXT: u32 = 9_731;
 
-static NEXT_FIXTURE: AtomicU64 = AtomicU64::new(0);
+const SIMONE: u64 = 9_000_000_467;
 
-fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
+/// `job_trainers.json` row for Simone's Chef lesson (profile 45).
+const LEARN_CHEF_LABEL: u32 = 413_021;
 
-fn reference_content() -> PathBuf {
-    std::env::var_os("OSFR_QUEST_JOB_XP_CONTENT")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| {
-            Path::new(env!("CARGO_MANIFEST_DIR"))
-                .join("../../../lab/references/opening-anvil-placement-v1/content")
-        })
-}
-
-fn copy_dir(source: &Path, destination: &Path) {
-    fs::create_dir_all(destination).unwrap();
-    for entry in fs::read_dir(source).unwrap() {
-        let entry = entry.unwrap();
-        let target = destination.join(entry.file_name());
-        if entry.file_type().unwrap().is_dir() {
-            copy_dir(&entry.path(), &target);
-        } else {
-            fs::copy(entry.path(), &target).unwrap();
-        }
-    }
-}
-
-/// Opening profile/inventory content; the repository's split quest and NPC content is
-/// bound exactly as the bundled play package binds it (`bind_npc_quest_catalogue`).
-struct Fixture(PathBuf);
-
-impl Fixture {
-    fn new() -> Self {
-        let source = reference_content();
-        assert!(
-            source.join("profiles.json").is_file() && source.join("inventory.json").is_file(),
-            "the job-XP chapter needs the opening content fixture at {}",
-            source.display()
-        );
-        let directory = std::env::temp_dir().join(format!(
-            "osfr-quest-job-xp-{}-{}",
-            std::process::id(),
-            NEXT_FIXTURE.fetch_add(1, Ordering::Relaxed)
-        ));
-        copy_dir(&source, &directory);
-        // A new character starts with only the Brawler outfit. The capture also holds the
-        // full per-profile default outfit; promote it to the fixture's initial state so the
-        // production `ProcessProfileSwap` gate can wear the Kart Driver and Ninja outfits.
-        let inventory_path = directory.join("inventory.json");
-        let mut manifest: Value =
-            serde_json::from_slice(&fs::read(&inventory_path).unwrap()).unwrap();
-        manifest["initial_state"] = manifest["default_state"].clone();
-        fs::write(&inventory_path, serde_json::to_vec(&manifest).unwrap()).unwrap();
-        Self(directory)
-    }
-
-    fn load(&self, state: GameplayState, character_id: u64) -> Gameplay {
-        let mut game = Gameplay::load(&self.0, Some(state)).expect("saved opening fixture loads");
-        game.bind_npc_quest_catalogue(&content_dir(), character_id)
-            .expect("split quest content loads");
-        game
-    }
-
-    fn fresh(&self, active: i32, unlocked: &[i32]) -> Gameplay {
-        self.fresh_as(active, unlocked, CHARACTER)
-    }
-
-    fn fresh_as(&self, active: i32, unlocked: &[i32], character_id: u64) -> Gameplay {
-        let mut state = Gameplay::load(&self.0, None)
-            .expect("opening fixture loads")
-            .state();
-        state.profiles = Some(ProfileState {
-            version: 1,
-            active,
-            unlocked: unlocked.iter().copied().collect(),
-            experience: BTreeMap::new(),
-        });
-        self.load(state, character_id)
-    }
-
-    fn reload(&self, game: &Gameplay) -> Gameplay {
-        self.load(game.state(), CHARACTER)
-    }
-}
-
-impl Drop for Fixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.0);
-    }
-}
+static NEXT_SCRATCH: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
 
 fn spawn_location(npc_id: u64) -> (u32, [f32; 3]) {
     let content = content_dir();
@@ -165,194 +92,59 @@ fn spawn_location(npc_id: u64) -> (u32, [f32; 3]) {
 }
 
 fn character_at(npc_id: u64) -> CharacterState {
+    character_at_for(CHARACTER, npc_id)
+}
+
+fn character_at_for(guid: u64, npc_id: u64) -> CharacterState {
     let (zone_id, position) = spawn_location(npc_id);
-    CharacterState {
-        guid: CHARACTER,
-        zone_id,
-        position,
-        rotation: [1.0, 0.0, 0.0],
-    }
+    character_in_zone(guid, zone_id, position)
 }
 
-fn npc_interact(target: u64) -> Vec<u8> {
-    let mut packet = vec![26, 0, 8, 0];
-    packet.extend(target.to_le_bytes());
-    packet.push(0);
-    packet
-}
-
-fn npc_select(target: u64, choice: i32) -> Vec<u8> {
-    let mut packet = vec![26, 0, 10, 0];
-    packet.extend(target.to_le_bytes());
-    packet.extend(choice.to_le_bytes());
-    packet
-}
-
-fn dialogue_choice(row: i32) -> Vec<u8> {
-    let mut packet = vec![26, 0, 6, 0];
-    packet.extend(row.to_le_bytes());
-    packet
-}
-
-fn quest_reply(quest_id: u32, accept: bool) -> Vec<u8> {
-    let mut packet = vec![49, 0, 2, 0, 0, 0];
-    packet.extend(quest_id.to_le_bytes());
-    packet.push(u8::from(accept));
-    packet
-}
-
-fn quest_end_reply(quest_id: u32) -> Vec<u8> {
-    let mut packet = vec![49, 0, 14, 0, 0, 0];
-    packet.extend(quest_id.to_le_bytes());
-    packet
-}
-
-fn select_job(profile: i32) -> Vec<u8> {
-    let mut packet = vec![26, 0, 13, 0];
-    packet.extend(profile.to_le_bytes());
-    packet
-}
-
-fn send(game: &mut Gameplay, character: &CharacterState, packet: &[u8], now: u64) -> Outcome {
-    game.handle_in_world(packet, character, now)
-        .unwrap_or_else(|error| {
-            panic!(
-                "packet {:?} was refused: {error}",
-                &packet[..packet.len().min(4)]
-            )
-        })
-}
-
-fn has_family(packet: &[u8], family: u16, subtype: u16, id: Option<u32>) -> bool {
-    if packet.len() < 6
-        || packet[..2] != family.to_le_bytes()
-        || packet[2..4] != subtype.to_le_bytes()
-    {
-        return false;
-    }
-    let Some(id) = id else { return true };
-    // 49/13 carries the turn-in speaker at 6..14 and the quest id at 14..18;
-    // the other pairs used here carry their id at 6..10.
-    let offset = if (family, subtype) == (49, 13) { 14 } else { 6 };
-    packet
-        .get(offset..offset + 4)
-        .is_some_and(|bytes| u32::from_le_bytes(bytes.try_into().unwrap()) == id)
-}
-
-fn menu_option(outcome: &Outcome, label: u32) -> i32 {
-    let menu = outcome
-        .replies
-        .iter()
-        .find(|packet| packet.starts_with(&[26, 0, 9, 0]))
-        .expect("26/8 returns the 26/9 interaction menu");
-    let count = i32::from_le_bytes(menu[13..17].try_into().unwrap());
-    assert!(count > 0, "the interaction menu has no options");
-    (0..count)
-        .find_map(|index| {
-            let offset = 17 + usize::try_from(index).unwrap() * 28;
-            let id = i32::from_le_bytes(menu[offset..offset + 4].try_into().unwrap());
-            let string_id = u32::from_le_bytes(menu[offset + 8..offset + 12].try_into().unwrap());
-            (string_id == label).then_some(id)
-        })
-        .unwrap_or_else(|| panic!("menu label {label} is absent"))
-}
-
-fn interact(game: &mut Gameplay, character: &CharacterState, target: u64, now: u64) -> Outcome {
-    send(game, character, &npc_interact(target), now)
-}
-
-fn talk(game: &mut Gameplay, character: &CharacterState, target: u64, now: u64) -> Outcome {
-    let menu = interact(game, character, target, now);
-    let choice = menu_option(&menu, TALK_LABEL);
-    send(game, character, &npc_select(target, choice), now + 1)
-}
-
-fn offer(game: &mut Gameplay, character: &CharacterState, giver: u64, quest_id: u32, now: u64) {
-    let dialogue = talk(game, character, giver, now);
-    assert!(
-        dialogue
-            .replies
-            .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
-        "Talk must open the 26/3 dialogue"
-    );
-    let offered = send(game, character, &dialogue_choice(QUEST_CHOICE), now + 1);
-    assert!(
-        offered
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 1, Some(quest_id))),
-        "quest {quest_id} was not offered"
-    );
-    assert_eq!(quest_status(game, quest_id), QuestStatus::Offered);
-}
-
-fn accept(game: &mut Gameplay, character: &CharacterState, quest_id: u32, now: u64) {
-    let accepted = send(game, character, &quest_reply(quest_id, true), now);
-    assert!(
-        accepted
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 3, Some(quest_id))),
-        "quest {quest_id} did not send QuestAdd"
-    );
-    assert_eq!(quest_status(game, quest_id), QuestStatus::Active);
-}
-
-/// Complete one ordered Talk objective. A final target opens the pending end screen,
-/// which the client releases with its 26/6 dialogue choice.
-fn talk_step(game: &mut Gameplay, character: &CharacterState, target: u64, now: u64, label: &str) {
-    let talked = talk(game, character, target, now);
-    assert!(talked.changed, "{label} did not advance its objective");
-}
-
+/// 26/6 releases the 49/13 the final Talk held. These rows carry no display rows, so the
+/// client-reader bundle (`008e7930`) is exactly 99 bytes and the stars dword at `31..35`
+/// must be the quest's configured job XP; the shared helper checks the actor and end text.
 fn release_end_screen(
     game: &mut Gameplay,
     character: &CharacterState,
     quest_id: u32,
     expected_actor: u64,
-    now: u64,
-) {
-    let released = send(game, character, &dialogue_choice(QUEST_CHOICE), now);
-    let end = released
-        .replies
-        .iter()
-        .find(|packet| has_family(packet, 49, 13, Some(quest_id)))
-        .unwrap_or_else(|| panic!("quest {quest_id} did not release its 49/13 end screen"));
-    assert_eq!(
-        u64::from_le_bytes(end[6..14].try_into().unwrap()),
-        expected_actor,
-        "the end screen must name the clicked runtime actor"
-    );
-}
-
-fn finish_quest(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    quest_id: u32,
-    expected_coins: u32,
-    profile: i32,
+    expected_end_text: u32,
     expected_xp: u32,
     now: u64,
-) {
-    let coins_before = coins(game);
-    let xp_before = profile_xp(game, profile);
-    let completed = send(game, character, &quest_end_reply(quest_id), now);
-    assert!(
-        completed.changed,
-        "quest {quest_id} turn-in did not change state"
+) -> Vec<u8> {
+    let end = npc_quest_chain::release_end_screen(
+        game,
+        character,
+        quest_id,
+        expected_actor,
+        expected_end_text,
+        now,
     );
-    assert!(
-        completed
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 4, Some(quest_id))),
-        "quest {quest_id} did not complete"
+    assert_eq!(
+        end.len(),
+        99,
+        "quest {quest_id}: the populated reward bundle keeps the client-reader length"
     );
-    assert_eq!(coins(game), coins_before + expected_coins);
-    assert_eq!(profile_xp(game, profile), xp_before + expected_xp);
-    assert_eq!(quest_status(game, quest_id), QuestStatus::Completed);
-    assert_eq!(pending_turnin(game), None);
+    assert_eq!(
+        i32::from_le_bytes(end[31..35].try_into().unwrap()),
+        i32::try_from(expected_xp).unwrap(),
+        "quest {quest_id}: the end screen displays its configured job XP"
+    );
+    end
+}
+
+/// Seed a profile snapshot for the cases direct play cannot reach: the captured opening
+/// inventory has no Kart Driver or Ninja starter outfit. The positive Chef gate is
+/// exercised through the real trainer and job switch instead.
+fn seeded(fixture: &Fixture, active: i32, unlocked: &[i32]) -> Gameplay {
+    let mut state = fixture.game(None).state();
+    state.profiles = Some(ProfileState {
+        version: 1,
+        active,
+        unlocked: unlocked.iter().copied().collect(),
+        experience: BTreeMap::new(),
+    });
+    fixture.game(Some(state))
 }
 
 fn switch_job(game: &mut Gameplay, character: &CharacterState, profile: i32, now: u64) {
@@ -369,115 +161,35 @@ fn switch_job(game: &mut Gameplay, character: &CharacterState, profile: i32, now
     assert_eq!(active_job(game), profile);
 }
 
-fn counts(game: &Gameplay, quest_id: u32) -> Vec<u32> {
-    game.state().npc_quests.as_ref().unwrap().quests[&quest_id]
-        .counts
-        .clone()
-}
-
-fn quest_status(game: &Gameplay, quest_id: u32) -> QuestStatus {
-    game.state().npc_quests.as_ref().unwrap().quests[&quest_id]
-        .status
-        .clone()
-}
-
-fn pending_turnin(game: &Gameplay) -> Option<u32> {
-    game.state().npc_quests.as_ref().unwrap().pending_turnin
-}
-
 fn active_job(game: &Gameplay) -> i32 {
     game.state().profiles.as_ref().unwrap().active
 }
 
-fn coins(game: &Gameplay) -> u32 {
-    game.state().inventory.coins
-}
-
-fn profile_xp(game: &Gameplay, profile: i32) -> u32 {
-    game.state()
-        .profiles
-        .as_ref()
-        .unwrap()
-        .experience
-        .get(&profile)
-        .copied()
-        .unwrap_or(0)
-}
-
-fn saved(game: &Gameplay) -> Vec<u8> {
-    serde_json::to_vec(&game.state()).unwrap()
-}
-
-/// A refusal must leave coins, items, profile XP, quest counters and the save bytes equal.
-fn assert_no_change(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    packet: &[u8],
-    now: u64,
-    label: &str,
-) {
-    let before = saved(game);
-    let outcome = send(game, character, packet, now);
-    assert!(!outcome.changed, "{label} changed gameplay");
-    assert_eq!(saved(game), before, "{label} changed the save bytes");
-}
-
-fn assert_no_offer(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    target: u64,
-    now: &mut u64,
-    label: &str,
-) {
-    let before = saved(game);
-    *now += 10;
-    let menu = interact(game, character, target, *now);
-    let choice = menu_option(&menu, TALK_LABEL);
-    *now += 1;
-    let dialogue = send(game, character, &npc_select(target, choice), *now);
-    assert!(
-        !dialogue
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 1, None)),
-        "{label}: a Talk with nothing eligible offered a quest"
-    );
-    *now += 1;
-    let closed = send(game, character, &dialogue_choice(QUEST_CHOICE), *now);
-    assert!(
-        !closed
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 1, None) || has_family(packet, 49, 13, None)),
-        "{label}: no quest may be offered or turned in"
-    );
-    assert_eq!(
-        saved(game),
-        before,
-        "{label}: the refusal changed the save bytes"
-    );
-}
-
-fn assert_no_offer_at(game: &mut Gameplay, target: u64, now: &mut u64, label: &str) {
-    let character = character_at(target);
-    assert_no_offer(game, &character, target, now, label);
-}
-
-fn introduce_yourself(game: &mut Gameplay, now: &mut u64) {
-    let merigold = character_at(MERIGOLD);
-    let raina = character_at(RAINA);
+fn introduce_yourself(game: &mut Gameplay, character: &CharacterState, now: &mut u64) {
+    let merigold = CharacterState {
+        guid: character.guid,
+        ..character_at(MERIGOLD)
+    };
     *now += 10;
     offer(game, &merigold, MERIGOLD, INTRODUCE_YOURSELF, *now);
     *now += 10;
     accept(game, &merigold, INTRODUCE_YOURSELF, *now);
     *now += 10;
-    talk_step(game, &raina, RAINA, *now, "Introduce Yourself");
+    talk_step(game, character, RAINA, *now, "Introduce Yourself");
     assert_eq!(counts(game, INTRODUCE_YOURSELF), [1]);
     assert_eq!(pending_turnin(game), Some(INTRODUCE_YOURSELF));
     *now += 10;
-    release_end_screen(game, &raina, INTRODUCE_YOURSELF, RAINA, *now);
+    release_end_screen(
+        game,
+        character,
+        INTRODUCE_YOURSELF,
+        RAINA,
+        INTRODUCE_END_TEXT,
+        15,
+        *now,
+    );
     *now += 10;
-    finish_quest(game, &raina, INTRODUCE_YOURSELF, 5, ADVENTURER, 15, *now);
+    finish_quest(game, character, INTRODUCE_YOURSELF, ADVENTURER, 5, 15, *now);
 }
 
 fn burden_of_fame(game: &mut Gameplay, now: &mut u64) {
@@ -501,9 +213,17 @@ fn burden_of_fame(game: &mut Gameplay, now: &mut u64) {
     assert_eq!(counts(game, BURDEN_OF_FAME), [1, 1, 1, 1]);
     assert_eq!(pending_turnin(game), Some(BURDEN_OF_FAME));
     *now += 10;
-    release_end_screen(game, &raina, BURDEN_OF_FAME, RAINA, *now);
+    release_end_screen(
+        game,
+        &raina,
+        BURDEN_OF_FAME,
+        RAINA,
+        BURDEN_END_TEXT,
+        25,
+        *now,
+    );
     *now += 10;
-    finish_quest(game, &raina, BURDEN_OF_FAME, 5, KART_DRIVER, 25, *now);
+    finish_quest(game, &raina, BURDEN_OF_FAME, KART_DRIVER, 5, 25, *now);
 }
 
 fn ranger_requisition(game: &mut Gameplay, now: &mut u64) {
@@ -518,9 +238,17 @@ fn ranger_requisition(game: &mut Gameplay, now: &mut u64) {
     assert_eq!(counts(game, RANGER_REQUISITION), [1]);
     assert_eq!(pending_turnin(game), Some(RANGER_REQUISITION));
     *now += 10;
-    release_end_screen(game, &ricardo, RANGER_REQUISITION, RICARDO, *now);
+    release_end_screen(
+        game,
+        &ricardo,
+        RANGER_REQUISITION,
+        RICARDO,
+        RANGER_END_TEXT,
+        20,
+        *now,
+    );
     *now += 10;
-    finish_quest(game, &ricardo, RANGER_REQUISITION, 0, CHEF, 20, *now);
+    finish_quest(game, &ricardo, RANGER_REQUISITION, CHEF, 0, 20, *now);
 }
 
 fn ninja_path(game: &mut Gameplay, now: &mut u64) {
@@ -535,73 +263,131 @@ fn ninja_path(game: &mut Gameplay, now: &mut u64) {
     assert_eq!(counts(game, NINJA_PATH), [1]);
     assert_eq!(pending_turnin(game), Some(NINJA_PATH));
     *now += 10;
-    release_end_screen(game, &grosh, NINJA_PATH, GROSH, *now);
+    release_end_screen(game, &grosh, NINJA_PATH, GROSH, NINJA_END_TEXT, 15, *now);
     *now += 10;
-    finish_quest(game, &grosh, NINJA_PATH, 0, NINJA, 15, *now);
+    finish_quest(game, &grosh, NINJA_PATH, NINJA, 0, 15, *now);
 }
 
 #[test]
-fn each_enabled_quest_pays_its_configured_job_xp_once() {
-    let fixture = Fixture::new();
-    let mut game = fixture.fresh(ADVENTURER, &[1, 2, 43, 45, 48]);
+fn adventurer_line_pays_its_job_xp_once() {
+    let fixture = Fixture::for_character(CHARACTER);
+    let mut game = fixture.game(None);
     let mut now = 1_000;
     let raina = character_at(RAINA);
-    let auguste = character_at(AUGUSTE);
-    let ty = character_at(TY);
 
-    introduce_yourself(&mut game, &mut now);
+    introduce_yourself(&mut game, &raina, &mut now);
     assert_eq!(profile_xp(&game, ADVENTURER), 15);
-
-    now += 10;
-    switch_job(&mut game, &raina, KART_DRIVER, now);
-    burden_of_fame(&mut game, &mut now);
-    assert_eq!(profile_xp(&game, KART_DRIVER), 25);
-
-    now += 10;
-    switch_job(&mut game, &auguste, CHEF, now);
-    ranger_requisition(&mut game, &mut now);
-    assert_eq!(profile_xp(&game, CHEF), 20);
-
-    now += 10;
-    switch_job(&mut game, &ty, NINJA, now);
-    ninja_path(&mut game, &mut now);
-    assert_eq!(profile_xp(&game, NINJA), 15);
-
-    assert_eq!(profile_xp(&game, BRAWLER), 0, "no other job is paid");
-    assert_eq!(coins(&game), 10, "the existing coin rows are unchanged");
+    assert_eq!(coins(&game), 5, "the existing coin row is unchanged");
 
     let finished = saved(&game);
-    let finished_coins = coins(&game);
-    for (quest_id, profile) in [
-        (INTRODUCE_YOURSELF, ADVENTURER),
-        (BURDEN_OF_FAME, KART_DRIVER),
-        (RANGER_REQUISITION, CHEF),
-        (NINJA_PATH, NINJA),
-    ] {
-        let before = profile_xp(&game, profile);
-        now += 1;
-        assert_no_change(
-            &mut game,
-            &raina,
-            &quest_end_reply(quest_id),
-            now,
-            "duplicate turn-in",
-        );
-        assert_eq!(profile_xp(&game, profile), before);
-    }
+    now += 10;
+    assert_packet_changes_nothing(
+        &mut game,
+        &raina,
+        &quest_end_reply(INTRODUCE_YOURSELF),
+        now,
+        "duplicate turn-in",
+    );
+    assert_eq!(profile_xp(&game, ADVENTURER), 15);
     assert_eq!(
         saved(&game),
         finished,
         "a duplicate turn-in changed the save"
     );
-    assert_eq!(coins(&game), finished_coins);
+}
+
+#[test]
+fn chef_trainer_unlock_opens_the_job_gate_and_pays() {
+    let fixture = Fixture::for_character(CHARACTER);
+    let mut game = fixture.game(None);
+    let mut now = 2_000;
+    let simone = character_at(SIMONE);
+    let auguste = character_at(AUGUSTE);
+
+    // Chef is not unlocked at character creation: the line is not offered.
+    assert_no_offer(&mut game, &auguste, AUGUSTE, &mut now, "Chef before unlock");
+
+    // The real trainer path unlocks Chef; the job list switch makes it active.
+    now += 10;
+    let menu = interact(&mut game, &simone, SIMONE, now);
+    let learn = menu_option(&menu, LEARN_CHEF_LABEL);
+    now += 10;
+    let learned = send(&mut game, &simone, &npc_select(SIMONE, learn), now);
+    assert!(learned.changed, "Simone's Chef lesson must commit");
+    assert!(
+        game.state()
+            .profiles
+            .as_ref()
+            .unwrap()
+            .unlocked
+            .contains(&CHEF),
+        "the trainer must unlock Chef"
+    );
+    // Unlocked is not enough: the gate reads the active job.
+    assert_no_offer(
+        &mut game,
+        &auguste,
+        AUGUSTE,
+        &mut now,
+        "Chef unlocked but inactive",
+    );
+    switch_job(&mut game, &simone, CHEF, now + 1);
+
+    ranger_requisition(&mut game, &mut now);
+    assert_eq!(profile_xp(&game, CHEF), 20);
+    assert_eq!(active_job(&game), CHEF, "the turn-in must not switch jobs");
+}
+
+#[test]
+fn kart_line_pays_its_job_xp_once() {
+    let fixture = Fixture::for_character(CHARACTER);
+    let mut game = seeded(&fixture, KART_DRIVER, &[1, KART_DRIVER]);
+    let mut now = 3_000;
+
+    let raina = character_at(RAINA);
+    introduce_yourself(&mut game, &raina, &mut now);
+    burden_of_fame(&mut game, &mut now);
+    assert_eq!(profile_xp(&game, KART_DRIVER), 25);
+    assert_eq!(profile_xp(&game, ADVENTURER), 15);
+    assert_eq!(coins(&game), 10);
+
+    let finished = saved(&game);
+    now += 10;
+    assert_packet_changes_nothing(
+        &mut game,
+        &raina,
+        &quest_end_reply(BURDEN_OF_FAME),
+        now,
+        "duplicate Kart turn-in",
+    );
+    assert_eq!(profile_xp(&game, KART_DRIVER), 25);
+    assert_eq!(saved(&game), finished);
+}
+
+#[test]
+fn ninja_line_pays_its_job_xp_once() {
+    let fixture = Fixture::for_character(CHARACTER);
+    let mut game = seeded(&fixture, NINJA, &[1, NINJA]);
+    let mut now = 4_000;
+
+    ninja_path(&mut game, &mut now);
+    assert_eq!(profile_xp(&game, NINJA), 15);
+    assert_eq!(coins(&game), 0, "the zero-coin Ninja row pays XP only");
+}
+
+#[test]
+fn each_enabled_quest_pays_its_configured_job_xp_once() {
+    adventurer_line_pays_its_job_xp_once();
+    chef_trainer_unlock_opens_the_job_gate_and_pays();
+    kart_line_pays_its_job_xp_once();
+    ninja_line_pays_its_job_xp_once();
 }
 
 #[test]
 fn xp_follows_the_quest_job_not_the_active_job() {
-    let fixture = Fixture::new();
-    let mut game = fixture.fresh(NINJA, &[1, 2, 43]);
-    let mut now = 2_000;
+    let fixture = Fixture::for_character(CHARACTER);
+    let mut game = seeded(&fixture, NINJA, &[1, NINJA, BRAWLER]);
+    let mut now = 5_000;
     let ty = character_at(TY);
     let grosh = character_at(GROSH);
 
@@ -611,7 +397,15 @@ fn xp_follows_the_quest_job_not_the_active_job() {
     now += 10;
     talk_step(&mut game, &grosh, GROSH, now, "Ninja: The Ninja Path");
     now += 10;
-    release_end_screen(&mut game, &grosh, NINJA_PATH, GROSH, now);
+    release_end_screen(
+        &mut game,
+        &grosh,
+        NINJA_PATH,
+        GROSH,
+        NINJA_END_TEXT,
+        15,
+        now,
+    );
 
     // The engine does not recheck the offer-time job at turn-in; the explicit content
     // map still pays profile 2 after the player switched to Brawler.
@@ -619,7 +413,7 @@ fn xp_follows_the_quest_job_not_the_active_job() {
     let brawler_before = profile_xp(&game, BRAWLER);
     switch_job(&mut game, &grosh, BRAWLER, now);
     now += 10;
-    finish_quest(&mut game, &grosh, NINJA_PATH, 0, NINJA, 15, now);
+    finish_quest(&mut game, &grosh, NINJA_PATH, NINJA, 0, 15, now);
 
     assert_eq!(
         active_job(&game),
@@ -636,13 +430,13 @@ fn xp_follows_the_quest_job_not_the_active_job() {
 
 #[test]
 fn job_locked_quest_is_not_offered() {
-    let fixture = Fixture::new();
-    let mut game = fixture.fresh(ADVENTURER, &[1, 43]);
-    let mut now = 3_000;
+    let fixture = Fixture::for_character(CHARACTER);
+    let mut game = seeded(&fixture, ADVENTURER, &[1, BRAWLER]);
+    let mut now = 6_000;
     let raina = character_at(RAINA);
 
     // Qualify the Kart prerequisite as the default Adventurer, then switch to Brawler.
-    introduce_yourself(&mut game, &mut now);
+    introduce_yourself(&mut game, &raina, &mut now);
     now += 10;
     switch_job(&mut game, &raina, BRAWLER, now);
     assert!(
@@ -655,13 +449,26 @@ fn job_locked_quest_is_not_offered() {
             .contains(&CHEF)
     );
 
-    assert_no_offer_at(&mut game, AUGUSTE, &mut now, "Brawler at the Chef giver");
-    assert_no_offer_at(&mut game, TY, &mut now, "Brawler at the Ninja giver");
-    assert_no_offer_at(
+    assert_no_offer(
         &mut game,
+        &character_at(AUGUSTE),
+        AUGUSTE,
+        &mut now,
+        "Brawler at Chef",
+    );
+    assert_no_offer(
+        &mut game,
+        &character_at(TY),
+        TY,
+        &mut now,
+        "Brawler at Ninja",
+    );
+    assert_no_offer(
+        &mut game,
+        &raina,
         RAINA,
         &mut now,
-        "Brawler at the Kart giver with the prerequisite complete",
+        "Brawler at Kart with the prerequisite complete",
     );
     let state = game.state();
     let quests = &state.npc_quests.as_ref().unwrap().quests;
@@ -673,11 +480,168 @@ fn job_locked_quest_is_not_offered() {
     }
 }
 
+/// A pre-T202 save accepted these lines without a job gate. Its reward now names a
+/// locked profile, so the turn-in must refuse without a grant and release the pending
+/// end screen instead of raising a hard error that blocks both retry and abandon.
+#[test]
+fn locked_profile_turnin_is_refused_cleanly() {
+    let fixture = Fixture::for_character(CHARACTER);
+    let mut game = seeded(&fixture, CHEF, &[1, CHEF]);
+    let mut now = 7_000;
+    let auguste = character_at(AUGUSTE);
+    let ricardo = character_at(RICARDO);
+
+    offer(&mut game, &auguste, AUGUSTE, RANGER_REQUISITION, now);
+    now += 10;
+    accept(&mut game, &auguste, RANGER_REQUISITION, now);
+    now += 10;
+    talk_step(
+        &mut game,
+        &ricardo,
+        RICARDO,
+        now,
+        "Chef: Ranger Requisition",
+    );
+    assert_eq!(pending_turnin(&game), Some(RANGER_REQUISITION));
+
+    // Rewrite the saved profile snapshot as a pre-T202 Brawler save: the quest stays
+    // active and pending, but Chef is no longer unlocked.
+    let mut legacy = game.state();
+    legacy.profiles = Some(ProfileState {
+        version: 1,
+        active: BRAWLER,
+        unlocked: BTreeSet::from([1, BRAWLER]),
+        experience: BTreeMap::new(),
+    });
+    let mut game = fixture.game(Some(legacy));
+    let inventory_before = game.state().inventory;
+    now += 10;
+    let refused = send(
+        &mut game,
+        &ricardo,
+        &quest_end_reply(RANGER_REQUISITION),
+        now,
+    );
+
+    assert!(
+        refused.changed,
+        "the released end screen must be persisted for a relog"
+    );
+    assert_eq!(pending_turnin(&game), None, "the end screen is released");
+    assert_eq!(
+        quest_status(&game, RANGER_REQUISITION),
+        QuestStatus::Active,
+        "a refusal does not complete the quest"
+    );
+    assert_eq!(game.state().inventory, inventory_before, "no loot or coins");
+    assert_eq!(profile_xp(&game, CHEF), 0, "no XP is paid to a locked job");
+    assert_eq!(profile_xp(&game, BRAWLER), 0);
+    assert!(
+        refused
+            .replies
+            .iter()
+            .all(|packet| packet.starts_with(&[26, 0, 4, 0])),
+        "a refused turn-in sends no completion or reward packet: {:?}",
+        refused
+            .replies
+            .iter()
+            .map(|packet| &packet[..packet.len().min(4)])
+            .collect::<Vec<_>>()
+    );
+
+    // The released handshake survives a reconnect, and old packets stay inert.
+    game = fixture.reload(&game);
+    assert_eq!(pending_turnin(&game), None);
+    assert_eq!(quest_status(&game, RANGER_REQUISITION), QuestStatus::Active);
+    now += 10;
+    assert_packet_changes_nothing(
+        &mut game,
+        &ricardo,
+        &quest_end_reply(RANGER_REQUISITION),
+        now,
+        "replayed 49/14 after a locked-profile refusal",
+    );
+
+    // Not wedged: the quest can now be abandoned, which the pending screen blocked.
+    let mut abandon = vec![26, 0, 23, 0, 0, 0];
+    abandon.extend(RANGER_REQUISITION.to_le_bytes());
+    now += 10;
+    let abandoned = send(&mut game, &ricardo, &abandon, now);
+    assert!(abandoned.changed, "abandon must succeed after the refusal");
+    assert_eq!(
+        quest_status(&game, RANGER_REQUISITION),
+        QuestStatus::Abandoned
+    );
+}
+
+/// The 49/14 handler builds a synthetic profile snapshot when the server has no class
+/// content; the locked-profile guard must hold on that fallback too (review blocker 1).
+#[test]
+fn locked_profile_turnin_refuses_without_profile_content() {
+    let fixture = Fixture::for_character(CHARACTER);
+    let mut game = seeded(&fixture, CHEF, &[1, CHEF]);
+    let mut now = 8_000;
+    let auguste = character_at(AUGUSTE);
+    let ricardo = character_at(RICARDO);
+
+    offer(&mut game, &auguste, AUGUSTE, RANGER_REQUISITION, now);
+    now += 10;
+    accept(&mut game, &auguste, RANGER_REQUISITION, now);
+    now += 10;
+    talk_step(
+        &mut game,
+        &ricardo,
+        RICARDO,
+        now,
+        "Chef: Ranger Requisition",
+    );
+    let pending = game.state().npc_quests;
+
+    let scratch = std::env::temp_dir().join(format!(
+        "osfr-quest-job-xp-noprofile-{}",
+        std::process::id()
+    ));
+    let _ = fs::remove_dir_all(&scratch);
+    copy_tree(fixture.path(), &scratch);
+    // Strip class and opening content: the server has no profiles.json and no opening
+    // campaign, so `self.profiles` stays None and 49/14 takes its synthetic fallback.
+    for file in [
+        "profiles.json",
+        "opening.json",
+        "smelting.json",
+        "forging-campaign.json",
+        "cooking-campaign.json",
+    ] {
+        let _ = fs::remove_file(scratch.join(file));
+    }
+    let mut state = Gameplay::load(&scratch, None)
+        .expect("no-profile fixture loads")
+        .state();
+    state.npc_quests = pending;
+    state.profiles = None;
+    let mut game = Gameplay::load(&scratch, Some(state)).expect("no-profile save loads");
+    game.bind_npc_quest_catalogue(&content_dir(), CHARACTER)
+        .expect("split content binds without profiles");
+    assert!(game.state().profiles.is_none());
+
+    now += 10;
+    let refused = send(
+        &mut game,
+        &ricardo,
+        &quest_end_reply(RANGER_REQUISITION),
+        now,
+    );
+    assert!(refused.changed);
+    assert_eq!(pending_turnin(&game), None);
+    assert_eq!(quest_status(&game, RANGER_REQUISITION), QuestStatus::Active);
+    let _ = fs::remove_dir_all(&scratch);
+}
+
 #[test]
 fn refused_turn_in_changes_nothing() {
-    let fixture = Fixture::new();
-    let mut game = fixture.fresh(CHEF, &[1, 45]);
-    let mut now = 4_000;
+    let fixture = Fixture::for_character(CHARACTER);
+    let mut game = seeded(&fixture, CHEF, &[1, CHEF]);
+    let mut now = 9_000;
     let auguste = character_at(AUGUSTE);
     let ricardo = character_at(RICARDO);
     let far = CharacterState {
@@ -695,7 +659,7 @@ fn refused_turn_in_changes_nothing() {
 
     // Missing objective: the 49/14 has no pending screen to settle.
     now += 10;
-    assert_no_change(
+    assert_packet_changes_nothing(
         &mut game,
         &ricardo,
         &quest_end_reply(RANGER_REQUISITION),
@@ -704,7 +668,7 @@ fn refused_turn_in_changes_nothing() {
     );
     // Wrong quest while the real turn-in is not pending either.
     now += 10;
-    assert_no_change(
+    assert_packet_changes_nothing(
         &mut game,
         &ricardo,
         &quest_end_reply(INTRODUCE_YOURSELF),
@@ -732,7 +696,15 @@ fn refused_turn_in_changes_nothing() {
     );
     assert_eq!(pending_turnin(&game), Some(RANGER_REQUISITION));
     now += 10;
-    release_end_screen(&mut game, &ricardo, RANGER_REQUISITION, RICARDO, now);
+    release_end_screen(
+        &mut game,
+        &ricardo,
+        RANGER_REQUISITION,
+        RICARDO,
+        RANGER_END_TEXT,
+        20,
+        now,
+    );
     let held = saved(&game);
 
     // The formal giver Auguste is not the actor that opened the screen: the Talk
@@ -756,12 +728,12 @@ fn refused_turn_in_changes_nothing() {
     assert_eq!(saved(&game), held);
 
     now += 10;
-    finish_quest(&mut game, &ricardo, RANGER_REQUISITION, 0, CHEF, 20, now);
+    finish_quest(&mut game, &ricardo, RANGER_REQUISITION, CHEF, 0, 20, now);
     let finished = saved(&game);
     let finished_coins = coins(&game);
     let finished_xp = profile_xp(&game, CHEF);
     now += 10;
-    assert_no_change(
+    assert_packet_changes_nothing(
         &mut game,
         &ricardo,
         &quest_end_reply(RANGER_REQUISITION),
@@ -769,7 +741,7 @@ fn refused_turn_in_changes_nothing() {
         "replayed 49/14",
     );
     now += 10;
-    assert_no_change(
+    assert_packet_changes_nothing(
         &mut game,
         &auguste,
         &quest_reply(RANGER_REQUISITION, true),
@@ -783,9 +755,9 @@ fn refused_turn_in_changes_nothing() {
 
 #[test]
 fn xp_survives_relog_and_is_not_repaid() {
-    let fixture = Fixture::new();
-    let mut game = fixture.fresh(NINJA, &[1, 2, 43]);
-    let mut now = 5_000;
+    let fixture = Fixture::for_character(CHARACTER);
+    let mut game = seeded(&fixture, NINJA, &[1, NINJA, BRAWLER]);
+    let mut now = 10_000;
     let ty = character_at(TY);
     let grosh = character_at(GROSH);
 
@@ -805,7 +777,7 @@ fn xp_survives_relog_and_is_not_repaid() {
     // The replayed 49/13 arrives with the speaker spawn; the client's 49/14 settles
     // the pending screen without needing the session-only held packet.
     now += 10;
-    finish_quest(&mut game, &grosh, NINJA_PATH, 0, NINJA, 15, now);
+    finish_quest(&mut game, &grosh, NINJA_PATH, NINJA, 0, 15, now);
     let finished = saved(&game);
 
     game = fixture.reload(&game);
@@ -815,9 +787,15 @@ fn xp_survives_relog_and_is_not_repaid() {
     assert_eq!(pending_turnin(&game), None);
 
     // The completed quest is not offered again, and old packets pay nothing.
-    assert_no_offer_at(&mut game, TY, &mut now, "completed Ninja quest after relog");
+    assert_no_offer(
+        &mut game,
+        &ty,
+        TY,
+        &mut now,
+        "completed Ninja quest after relog",
+    );
     now += 10;
-    assert_no_change(
+    assert_packet_changes_nothing(
         &mut game,
         &grosh,
         &quest_end_reply(NINJA_PATH),
@@ -825,7 +803,7 @@ fn xp_survives_relog_and_is_not_repaid() {
         "replayed turn-in after relog",
     );
     now += 10;
-    assert_no_change(
+    assert_packet_changes_nothing(
         &mut game,
         &ty,
         &quest_reply(NINJA_PATH, true),
@@ -838,13 +816,16 @@ fn xp_survives_relog_and_is_not_repaid() {
 
 #[test]
 fn two_players_are_paid_independently() {
-    let fixture = Fixture::new();
-    let mut first = fixture.fresh_as(ADVENTURER, &[1], 202_101);
-    let mut second = fixture.fresh_as(ADVENTURER, &[1], 202_102);
-    let mut now = 6_000;
+    let first_fixture = Fixture::for_character(202_101);
+    let second_fixture = Fixture::for_character(202_102);
+    let mut first = first_fixture.game(None);
+    let mut second = second_fixture.game(None);
+    let mut now = 11_000;
 
-    introduce_yourself(&mut first, &mut now);
-    introduce_yourself(&mut second, &mut now);
+    let first_character = character_at_for(202_101, RAINA);
+    let second_character = character_at_for(202_102, RAINA);
+    introduce_yourself(&mut first, &first_character, &mut now);
+    introduce_yourself(&mut second, &second_character, &mut now);
 
     for game in [&first, &second] {
         assert_eq!(
@@ -865,10 +846,79 @@ fn two_players_are_paid_independently() {
     );
 }
 
+/// The client reads the displayed reward XP from the 49/13 bundle (reader
+/// `008e7930`: success byte at 26, coins at 27..31, stars at 31..35). Every
+/// configured row must reach that dword; the profile XP alone is not enough.
+#[test]
+fn reward_bundle_displays_each_configured_job_xp_total() {
+    let content = content_dir();
+    let engine =
+        QuestEngine::from_split_content(&content, 1, CharacterEligibility::default(), None)
+            .expect("split quest content loads");
+    let listed: [(&str, u32); 12] = [
+        ("adventurer.json", 3_000_020),
+        ("adventurer.json", 3_000_021),
+        ("adventurer.json", 3_000_022),
+        ("adventurer.json", 3_000_059),
+        ("adventurer.json", 3_000_060),
+        ("chef.json", 3_050_004),
+        ("chef.json", 3_050_011),
+        ("kart_driver.json", 3_080_001),
+        ("kart_driver.json", 3_080_002),
+        ("ninja.json", 3_110_001),
+        ("ninja.json", 3_110_002),
+        ("ninja.json", 3_110_004),
+    ];
+    for (file, quest_id) in listed {
+        let document: Value = serde_json::from_slice(
+            &fs::read(content.join("quests").join(file))
+                .unwrap_or_else(|error| panic!("{file}: {error}")),
+        )
+        .unwrap();
+        let record = document["records"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|record| record["id"].as_u64() == Some(u64::from(quest_id)))
+            .unwrap_or_else(|| panic!("{file}: quest {quest_id} exists"));
+        let rewards = record["rewards"].as_array().unwrap();
+        let coins: u64 = rewards
+            .iter()
+            .map(|reward| reward["coins"].as_u64().unwrap())
+            .sum();
+        let xp: u64 = rewards
+            .iter()
+            .flat_map(|reward| reward["job_xp"].as_object().into_iter().flatten())
+            .map(|(_, amount)| amount.as_u64().unwrap())
+            .sum();
+        let packet = engine
+            .quest_end_packet(quest_id, 9_000_000_001)
+            .unwrap_or_else(|error| panic!("quest {quest_id} end screen: {error}"));
+        assert_eq!(
+            packet.len(),
+            99,
+            "quest {quest_id}: no display rows, so the client-reader bundle is 99 bytes"
+        );
+        assert_eq!(
+            u32::from_le_bytes(packet[14..18].try_into().unwrap()),
+            quest_id
+        );
+        assert_eq!(
+            u32::from_le_bytes(packet[27..31].try_into().unwrap()),
+            coins as u32,
+            "quest {quest_id}: authored coins are the bundle's coin dword"
+        );
+        assert_eq!(
+            i32::from_le_bytes(packet[31..35].try_into().unwrap()),
+            xp as i32,
+            "quest {quest_id}: authored job XP is the bundle's displayed XP dword"
+        );
+    }
+}
+
 fn copy_split_content(source: &Path, target: &Path) {
-    fs::create_dir_all(target.join("quests")).unwrap();
-    copy_dir(&source.join("quests"), &target.join("quests"));
-    copy_dir(&source.join("npcs"), &target.join("npcs"));
+    copy_tree(&source.join("quests"), &target.join("quests"));
+    copy_tree(&source.join("npcs"), &target.join("npcs"));
     fs::copy(source.join("jobs.json"), target.join("jobs.json")).unwrap();
 }
 
@@ -888,11 +938,11 @@ fn set_ninja_entry_job_xp(directory: &Path, job_xp: Value) {
 
 #[test]
 fn content_overflow_is_rejected_at_load() {
-    let fixture = Fixture::new();
+    let fixture = Fixture::for_character(CHARACTER);
     let scratch = std::env::temp_dir().join(format!(
         "osfr-quest-job-xp-load-{}-{}",
         std::process::id(),
-        NEXT_FIXTURE.fetch_add(1, Ordering::Relaxed)
+        NEXT_SCRATCH.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
     ));
     let eligibility = CharacterEligibility {
         member: true,
@@ -925,7 +975,7 @@ fn content_overflow_is_rejected_at_load() {
     };
     assert_eq!(error.kind(), std::io::ErrorKind::InvalidData);
 
-    let mut game = Gameplay::load(&fixture.0, None).expect("opening fixture loads");
+    let mut game = Gameplay::load(fixture.path(), None).expect("opening fixture loads");
     let before = saved(&game);
     let error = match game.bind_npc_quest_catalogue(&scratch, CHARACTER) {
         Ok(()) => panic!("the request path must refuse the bad content"),

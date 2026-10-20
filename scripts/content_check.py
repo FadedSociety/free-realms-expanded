@@ -1230,6 +1230,39 @@ class Checker:
         if job is not None and not (type(job) is int and 0 < job <= 0x7fffffff
                                     and job in self.job_profiles):
             error("job", job, "quest job must be a positive profile_id from jobs.json")
+        # T202 reward rows: the split loader rejects an unknown job_xp profile and a
+        # per-grant total over the reward bundle's i32 XP field; audit the same rule
+        # here so --strict cannot pass content the server will refuse at bind.
+        rewards = quest.get("rewards")
+        if rewards is not None and not isinstance(rewards, list):
+            error("rewards", rewards, "quest rewards must be a list")
+        else:
+            total_job_xp = 0
+            for index, reward in enumerate(rewards or []):
+                if not isinstance(reward, dict):
+                    error(f"rewards[{index}]", reward, "quest reward row must be an object")
+                    continue
+                job_xp = reward.get("job_xp")
+                if job_xp is None:
+                    continue
+                field = f"rewards[{index}].job_xp"
+                if not isinstance(job_xp, dict):
+                    error(field, job_xp, "quest job_xp must be an object")
+                    continue
+                for profile, amount in job_xp.items():
+                    profile_id = (int(profile) if isinstance(profile, str) and profile.isdigit()
+                                  else None)
+                    if (profile_id is None or profile_id <= 0
+                            or profile_id not in self.job_profiles):
+                        error(field, profile,
+                              "quest job_xp key must be a positive profile_id from jobs.json")
+                    if not (type(amount) is int and 0 <= amount <= 0x7fffffff):
+                        error(field, amount, "quest job_xp amount must be a non-negative i32")
+                    elif profile_id is not None:
+                        total_job_xp += amount
+            if total_job_xp > 0x7fffffff:
+                error("rewards", total_job_xp,
+                      "quest job_xp total must fit the reward bundle i32 field")
         goals = quest.get("objectives")
         if not isinstance(goals, list) or len(goals) > 64:
             error("objectives", goals, "quest objectives must be a list of at most 64")
