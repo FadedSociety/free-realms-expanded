@@ -2,7 +2,8 @@
 //!
 //! `archer_entry.rs` (used by `archer_entry_chain.rs` and
 //! `archer_entry_content.rs`), `medic_entry_chain.rs` / `medic_entry_content.rs`,
-//! `quest_job_xp.rs` and `scavenger_hunt_quest.rs` include this file with
+//! `quest_job_xp.rs`, `scavenger_hunt_quest.rs` and
+//! `shared_field_kill_quest_credit.rs` include this file with
 //! `#[path = "support/npc_quest_chain.rs"] mod npc_quest_chain;`. Test-only;
 //! production never copies content. The fixture supplies profile/inventory
 //! content; the repository's `job_trainers.json` and split quest/NPC content are
@@ -114,6 +115,36 @@ impl Fixture {
 
     pub fn path(&self) -> &Path {
         &self.path
+    }
+
+    /// Replace the shared field population with `enemies`. The reference opening
+    /// content has no `field_enemies.json`, so this also makes the private copy
+    /// the session's NPC content root (the spawn catalogue, store and vendor
+    /// files are copied from `data/content`) and copies T240's
+    /// `field_kill_rewards.json`; `Gameplay::load` then reads the synthetic field
+    /// through its production path instead of the bundled one. The split quest
+    /// catalogue is still bound from `data/content` by [`Self::game_as`].
+    pub fn with_field_enemies(self, enemies: &[Value]) -> Self {
+        for name in [
+            "zones.json",
+            "npc_spawns_extra.json",
+            "stores.json",
+            "vendors.json",
+            "field_kill_rewards.json",
+        ] {
+            fs::copy(content_dir().join(name), self.path.join(name)).unwrap();
+        }
+        copy_tree(&content_dir().join("npcs"), &self.path.join("npcs"));
+        fs::write(
+            self.path.join("field_enemies.json"),
+            serde_json::to_vec(&serde_json::json!({
+                "schema_version": 1,
+                "enemies": enemies,
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        self
     }
 
     pub fn game(&self, state: Option<GameplayState>) -> Gameplay {
@@ -237,6 +268,52 @@ pub fn has_family(packet: &[u8], family: u16, subtype: u16, id: Option<u32>) -> 
         .is_some_and(|bytes| u32::from_le_bytes(bytes.try_into().unwrap()) == id)
 }
 
+/// Full 49/8 `ObjectiveActivated` packet: the 6-byte family/subtype header
+/// (`0x00c7acd0`), quest id, objective id, required count, and the reconstructed
+/// (R) visible-notification bool. Body reader `0x00c7aeb0` (through `0x00c7b570`);
+/// apply `0x00c7a910`.
+pub fn objective_activated_packet(quest_id: u32, objective_id: u32, required: u32) -> Vec<u8> {
+    let mut packet = vec![49, 0, 8, 0, 0, 0];
+    for value in [quest_id, objective_id, required] {
+        packet.extend(value.to_le_bytes());
+    }
+    packet.push(0);
+    packet
+}
+
+/// Full 49/9 `QuestObjectiveUpdatePacket`: header, quest id, objective id,
+/// current counter, progress float, (R) notification bool and one (R)
+/// unresolved trailing dword. Reader `0x00c7af60` reads exactly that order.
+pub fn objective_update_packet(
+    quest_id: u32,
+    objective_id: u32,
+    current: u32,
+    progress: f32,
+) -> Vec<u8> {
+    let mut packet = vec![49, 0, 9, 0, 0, 0];
+    for value in [quest_id, objective_id, current] {
+        packet.extend(value.to_le_bytes());
+    }
+    packet.extend(progress.to_le_bytes());
+    packet.push(0);
+    packet.extend(0_i32.to_le_bytes());
+    packet
+}
+
+/// Full 49/10 `QuestObjectiveCompletePacket`: header, quest id, objective id,
+/// progress float, one (R) unresolved dword and the (R) completion bool. Reader
+/// `0x00c7b070` reads exactly that order.
+pub fn objective_complete_packet(quest_id: u32, objective_id: u32, progress: f32) -> Vec<u8> {
+    let mut packet = vec![49, 0, 10, 0, 0, 0];
+    for value in [quest_id, objective_id] {
+        packet.extend(value.to_le_bytes());
+    }
+    packet.extend(progress.to_le_bytes());
+    packet.extend(0_i32.to_le_bytes());
+    packet.push(0);
+    packet
+}
+
 pub fn menu_option(outcome: &Outcome, label: u32) -> i32 {
     let menu = outcome
         .replies
@@ -334,9 +411,10 @@ pub fn accept(game: &mut Gameplay, character: &CharacterState, quest_id: u32, no
 
 /// 26/6 releases the 49/13 that the final Talk held. Its speaker must be the
 /// runtime actor the client clicked, not the content key, and its end text must
-/// be the quest's debrief. `QuestEndPacket::ReadFields` (`00c7b990`) reads actor
-/// `6..14`, quest id `14..18`, end text `18..22`, animation `22..26`;
-/// `ShowQuestEndScreen` (`00a95420`) passes that third dword as the message id.
+/// be the quest's debrief. `QuestEndPacket::ReadFields` (`00c7b990`) reads the
+/// common header, actor `6..14`, quest id `14..18`, end text `18..22`, one more
+/// dword at `22..26`, the reward bundle (`008e7930`), then a trailing float;
+/// `ShowQuestEndScreen` (`00a95420`) passes the end text dword as the message id.
 pub fn release_end_screen(
     game: &mut Gameplay,
     character: &CharacterState,

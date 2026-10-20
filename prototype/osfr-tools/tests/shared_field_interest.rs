@@ -454,6 +454,11 @@ fn scene_zone(id: u32) -> osfr_tools::content::Zone {
     }
 }
 
+// The protected name's "no personal credit" means T240 *reward* credit: a
+// shared hit reports no `rewards` here (the payout is claimed by its owner's
+// tick). Since T256 the engine that lands the lethal hit also reports its own
+// `defeated` event, which is that hitter's personal quest credit; both are
+// pinned below.
 #[test]
 fn w127_exact_death_respawn_clock_and_no_personal_credit() {
     let mut a = interest_engine();
@@ -545,6 +550,9 @@ fn w127_exact_death_respawn_clock_and_no_personal_credit() {
     );
 }
 
+// "One shared death" is about HP and respawn. Since T256 the engine that lands
+// the lethal hit also reports that defeat (its personal quest credit), which
+// the assertions below now expect; the protected name predates that split.
 #[test]
 fn t032_private_instance_field_is_one_shared_death_for_two_members() {
     use osfr_tools::world::{InstanceKind, World, WorldPose};

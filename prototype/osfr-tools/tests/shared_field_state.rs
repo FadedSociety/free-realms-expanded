@@ -281,6 +281,10 @@ mod unit {
         assert!(world.field_for_player(101, 0).is_none());
         assert_eq!(world.field(0).unwrap().health(E), Some(300));
     }
+    // The protected name's "no personal credit" means T240 *reward* credit:
+    // the shared DoT pays no `rewards` here. Since T256 the caster's engine
+    // reports the defeats it lands, which is that caster's personal quest credit
+    // (asserted below). Rename only when the protected list is refreshed.
     #[test]
     fn area_and_dot_damage_share_hp_and_never_deliver_personal_credit() {
         use osfr_tools::opening_abilities::JobAbility;
