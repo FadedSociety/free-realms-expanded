@@ -231,6 +231,8 @@ fn same_group_reinvitation_gets_a_fresh_generation_and_refuses_the_old_one() {
     assert_eq!(group_result(&second, 2), Some(0));
     let fresh_id = invitation_id(&second, 202);
     assert_ne!(stale_id, fresh_id);
+    // The echoed generation is not the group id, so a group-id guard cannot accept it.
+    assert_ne!(fresh_id, group_id);
     let pending = social.group_invitee(202);
     assert_eq!(pending, Some((group_id, 101)));
 

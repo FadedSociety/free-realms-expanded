@@ -1702,6 +1702,8 @@ mod tests {
             },
         );
         let members = social.group_members(group_id).unwrap().to_vec();
+        let leader = social.group_leader(group_id);
+        let profiles = [101, 202, 303].map(|guid| social.profile(guid).cloned());
 
         let refused = social
             .respond_group_invite(303, invite_id, true, 0)
@@ -1711,5 +1713,10 @@ mod tests {
         assert_eq!(social.group_invitee(303), Some((group_id, 101)));
         assert_eq!(social.group_of(303), None);
         assert_eq!(social.group_members(group_id), Some(members.as_slice()));
+        assert_eq!(social.group_leader(group_id), leader);
+        assert_eq!(
+            [101, 202, 303].map(|guid| social.profile(guid).cloned()),
+            profiles
+        );
     }
 }

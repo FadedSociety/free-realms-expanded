@@ -618,6 +618,9 @@ fn same_group_reinvitation_binds_responses_to_the_new_generation() {
     assert_eq!(result_for(&replacement, a, 2), Some(0));
     let fresh_id = invited_id(&replacement, b);
     assert_ne!(stale_id, fresh_id);
+    // The echoed generation is not the live group id, so a group-id guard (the F134 bug)
+    // cannot accept the fresh pop-up either.
+    assert_ne!(fresh_id, group_id);
     let pending = rig.world.social.group_invitee(GUIDS[b]);
     assert_eq!(pending, Some((group_id, GUIDS[a])));
     let members = rig.world.social.group_members(group_id).unwrap().to_vec();
