@@ -409,4 +409,17 @@ mod tests {
             );
         }
     }
+
+    #[test]
+    fn the_shipped_table_covers_the_high_band_and_pays_nothing_past_20() {
+        let shipped = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        let rewards = FieldKillRewards::load(shipped).unwrap();
+        assert_eq!(rewards.reward_for(930053, 10), Some((12, 25)));
+        assert_eq!(rewards.reward_for(930025, 13), Some((12, 25)));
+        assert_eq!(rewards.reward_for(930025, 14), Some((18, 35)));
+        assert_eq!(rewards.reward_for(930025, 20), Some((18, 35)));
+        assert_eq!(rewards.reward_for(930025, 21), None);
+        // The wolf override still owns every level-14 definition-3156 kill.
+        assert_eq!(rewards.reward_for(3156, 14), Some((2, 5)));
+    }
 }

@@ -56,6 +56,18 @@
           "evidence": "(R) Level 9-13 field band: 12 coins and 25 active-job XP per credited field kill, half the W123 battle win reference for a three-enemy fight. The two level-9 MID-T1/MID-T2 shamans (definition 930025) and the two level-10 MID-Q1/MID-Q2 Hooligans (definition 930053) use this band. Local balance, not recovered 2014 reward data."
         }
       ]
+    },
+    {
+      "min_level": 14,
+      "max_level": 20,
+      "coins": 18,
+      "job_xp": 35,
+      "source": [
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Level 14-20 field band: 18 coins and 35 active-job XP per credited field kill, above the level 9-13 band and below the W123 battle reference of 25 coins / 50 job XP for a three-enemy win. Added for the level-14 high Wilds shaman camp; levels 15-20 reserve the same rate for future high field actors. Local balance, not recovered 2014 reward data."
+        }
+      ]
     }
   ],
   "definition_overrides": [

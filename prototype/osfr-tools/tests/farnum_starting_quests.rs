@@ -1,6 +1,6 @@
 //! T241: the two live Farnum starting quests, driven through the production paths.
 //!
-//! Fighting the Pack (3000009) counts five always-on Hooligan Wolves (definition 3156)
+//! Fighting the Pack (3000009) counts five of the seven live Hooligan Wolves (definition 3156)
 //! killed through the field Attack menu; Cleetus' Copper Collection (3000016) counts five
 //! Copper Ore (item definition 2739) gathered from the Snowhill copper-vein nodes through
 //! the ordinary Type8 mining round. Both are offered by Cleetus Farnum (9000000050) and
@@ -214,8 +214,8 @@ fn character_at(position: [f32; 3]) -> CharacterState {
 
 /// The always-on Hooligan Wolves (definition 3156). Empty `quest_ids` is
 /// production's "present without a quest" rule. Production credits every defeat
-/// by definition id, so T245's level-5 `MID-F` camp is part of this population:
-/// five live wolves, not three.
+/// by definition id, so T245's level-5 `MID-F` camp and T296's level-11/12
+/// `HIGH-F` camp are part of this population: seven live wolves, not three.
 fn wolves() -> Vec<(u64, [f32; 3])> {
     read_json(&content_dir().join("field_enemies.json"))["enemies"]
         .as_array()
@@ -532,8 +532,8 @@ fn fighting_the_pack_counts_five_live_wolves_and_pays_once() {
     let wolves = wolves();
     assert_eq!(
         wolves.len(),
-        5,
-        "five always-on wolves are live: three starter plus the two level-5 MID-F camp"
+        7,
+        "seven always-on wolves are live: three starter, two level-5 MID-F and two level-11/12 HIGH-F"
     );
 
     let offered = offer(&mut game, &character, CLEETUS, FIGHTING_THE_PACK, 1_000);
@@ -545,11 +545,11 @@ fn fighting_the_pack_counts_five_live_wolves_and_pays_once() {
     assert_eq!(counts(&game, FIGHTING_THE_PACK), [0, 0]);
 
     let mut now = 2_000;
-    // All five are live at once. Production credits every 3156 defeat, so the
-    // two level-5 MID-F camp wolves count and the quest completes without
-    // waiting for the authored 45 s respawn: the production rule the previous
-    // W102-area filter hid.
-    for (index, (guid, position)) in wolves.iter().copied().enumerate() {
+    // The first five are the three starter wolves and T245's two level-5 MID-F
+    // camp wolves. Production credits every 3156 defeat, so the quest completes
+    // on those five without waiting for the authored 45 s respawn: the
+    // production rule the previous W102-area filter hid.
+    for (index, (guid, position)) in wolves.iter().copied().take(5).enumerate() {
         assert!(
             kill_wolf(&mut game, position, guid, &mut now),
             "wolf {index} died through the production attack path"
@@ -557,6 +557,13 @@ fn fighting_the_pack_counts_five_live_wolves_and_pays_once() {
         assert_eq!(count(&game, FIGHTING_THE_PACK, 0), index as u32 + 1);
     }
     assert_eq!(count(&game, FIGHTING_THE_PACK, 0), 5);
+    // T296's two level-11/12 HIGH-F wolves share definition 3156. They are
+    // part of the same live population; killing them after the five goal
+    // cannot advance the counter past 5.
+    for (guid, position) in wolves.iter().copied().skip(5) {
+        assert!(kill_wolf(&mut game, position, guid, &mut now));
+        assert_eq!(count(&game, FIGHTING_THE_PACK, 0), 5);
+    }
 
     // The reward map names Brawler. Switching the active job must not switch the payer:
     // the support rule is explicit-profile, pinned by
@@ -924,11 +931,12 @@ fn the_two_new_records_load_and_their_targets_exist() {
     );
 
     // The kill target is a real always-on field population. T245's two level-5
-    // MID-F camp wolves share the definition, so production counts five.
+    // MID-F camp wolves and T296's two level-11/12 HIGH-F wolves share the
+    // definition, so production counts seven.
     assert_eq!(
         wolves().len(),
-        5,
-        "five always-on 3156 wolves: three starter plus the MID-F camp"
+        7,
+        "seven always-on 3156 wolves: three starter, the MID-F camp and the HIGH-F camp"
     );
 
     // The gather target exists in the Snowhill copper pool, and the shipped Mining18
@@ -988,7 +996,11 @@ fn a_mid_quest_reconnect_keeps_progress_and_pays_no_extra() {
     let mut game = fixture.game(BRAWLER, &[ADVENTURER, MINER, BRAWLER]);
     let character = character_at(cleetus_position());
     let wolves = wolves();
-    assert_eq!(wolves.len(), 5);
+    assert_eq!(
+        wolves.len(),
+        7,
+        "three starter, two MID-F and two HIGH-F live wolves"
+    );
 
     offer(&mut game, &character, CLEETUS, FIGHTING_THE_PACK, 1_000);
     accept(&mut game, &character, FIGHTING_THE_PACK, 1_100);

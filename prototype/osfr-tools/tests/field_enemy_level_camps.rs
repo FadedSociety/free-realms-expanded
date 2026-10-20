@@ -293,8 +293,8 @@ fn four_mid_level_camps_load_with_valid_bands_and_ids() {
         .collect();
     assert_eq!(
         always_on.len(),
-        20,
-        "12 starter + 8 mid-level always-on actors"
+        24,
+        "12 starter + 8 mid-level + 4 high-level always-on actors"
     );
     assert_eq!(
         spawned, always_on,
@@ -398,10 +398,14 @@ fn the_actor_and_group_counts_stay_inside_the_loader_bounds() {
     let groups = field["spawn_groups"].as_array().unwrap();
     assert_eq!(
         enemies.len(),
-        24,
-        "12 starter + 4 quest-gated + 8 mid-level actors"
+        28,
+        "12 starter + 4 quest-gated + 8 mid-level + 4 high-level actors"
     );
-    assert_eq!(groups.len(), 8, "four starter + four mid-level groups");
+    assert_eq!(
+        groups.len(),
+        10,
+        "four starter + four mid-level + two high-level groups"
+    );
     assert!(enemies.len() <= 64, "64 actors max");
     assert!(groups.len() <= 64, "64 groups max");
 
