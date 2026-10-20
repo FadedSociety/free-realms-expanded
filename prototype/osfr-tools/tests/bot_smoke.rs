@@ -315,6 +315,7 @@ fn options(root: &Path, reference: PathBuf, account_store: Option<PathBuf>) -> O
         allow_lan: false,
         security_log: None,
         group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
+        guild_invite_ttl_ms: osfr_tools::guilds::DEFAULT_INVITE_WINDOW_MS,
     }
 }
 

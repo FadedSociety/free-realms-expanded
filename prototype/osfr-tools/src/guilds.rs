@@ -11,6 +11,8 @@ use std::{
     path::Path,
 };
 
+use crate::social_chat::{NameData, put_name_data};
+
 pub const GUILD_FAMILY: u16 = 129;
 pub const MAX_GUILD_MEMBERS: usize = 100; // (R) Wiki-era cap; no cap is encoded by the client.
 const SCHEMA_VERSION: u32 = 1; // (R) Local server-wide JSON format.
@@ -56,51 +58,10 @@ impl GuildRank {
 pub struct GuildMember {
     pub character_guid: u64,
     pub rank: GuildRank,
-    /// Display-name snapshot, refreshed at login. Client `NameData` strings: first, last.
-    /// The three numeric `NameData` fields are not supplied by character identity and stay 0.
+    /// Display-name snapshot, refreshed at login; the client's `NameData` (three numeric
+    /// fields stay 0 because character identity supplies none).
     #[serde(default)]
-    pub name: GuildMemberName,
-}
-
-/// First and last name as the guild roster and member notices display them.
-#[derive(Clone, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
-#[serde(deny_unknown_fields)]
-pub struct GuildMemberName {
-    pub first: String,
-    pub last: String,
-}
-
-impl GuildMemberName {
-    pub fn new(first: impl Into<String>, last: impl Into<String>) -> Self {
-        Self {
-            first: first.into(),
-            last: last.into(),
-        }
-    }
-
-    fn is_valid(&self) -> bool {
-        // Match the host's social-name cap (128 bytes per part) and reject control characters.
-        self.first.len() <= 128
-            && self.last.len() <= 128
-            && !self
-                .first
-                .chars()
-                .chain(self.last.chars())
-                .any(char::is_control)
-    }
-
-    /// First and last name joined for client display and for 129/3 name lookup.
-    pub fn display(&self) -> String {
-        [self.first.trim(), self.last.trim()]
-            .into_iter()
-            .filter(|part| !part.is_empty())
-            .collect::<Vec<_>>()
-            .join(" ")
-    }
-
-    pub fn matches_display(&self, raw: &str) -> bool {
-        self.display().eq_ignore_ascii_case(raw.trim())
-    }
+    pub name: NameData,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
@@ -130,7 +91,6 @@ pub struct GuildRosterEntry {
 pub enum GuildResultCode {
     NameNotValid,
     NameAlreadyExists,
-    NameRequestPending,
     CantRenameAtThisTime,
     MotdTooLong,
     MemberCountExceeded,
@@ -138,7 +98,6 @@ pub enum GuildResultCode {
     InviteeInMaxGuilds,
     InvitePlayerNotFound,
     CreateRequirementsNotMet,
-    PendingInviteTimedOut,
     PromoteAtMaxRank,
     PromoteAtMinRank,
     PromoteCantPromoteAbove,
@@ -158,7 +117,6 @@ impl GuildResultCode {
         match self {
             Self::NameNotValid => "GuildNameNotValid",
             Self::NameAlreadyExists => "GuildNameAlreadyExists",
-            Self::NameRequestPending => "GuildNameRequestPending",
             Self::CantRenameAtThisTime => "GuildCantRenameAtThisTime",
             Self::MotdTooLong => "GuildMotdTooLong",
             Self::MemberCountExceeded => "GuildMemberCountExceeded",
@@ -166,7 +124,6 @@ impl GuildResultCode {
             Self::InviteeInMaxGuilds => "GuildInviteeInMaxGuilds",
             Self::InvitePlayerNotFound => "GuildInvitePlayerNotFound",
             Self::CreateRequirementsNotMet => "GuildCreateRequirementsNotMet",
-            Self::PendingInviteTimedOut => "GuildPendingInviteTimedOut",
             Self::PromoteAtMaxRank => "GuildPromoteAtMaxRank",
             Self::PromoteAtMinRank => "GuildPromoteAtMinRank",
             Self::PromoteCantPromoteAbove => "GuildPromoteCantPromoteAbove",
@@ -208,7 +165,6 @@ impl GuildError {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum GuildNoticeKind {
     InviteReceived { inviter_guid: u64 },
-    InviteSent { target_guid: u64 },
     InviteAccepted { member_guid: u64 },
     InviteDeclined { target_guid: u64 },
     InviteTimedOut { target_guid: u64 },
@@ -258,7 +214,9 @@ pub struct GuildStore {
     next_guild_guid: u64,
     guilds: BTreeMap<u64, Guild>,
     character_refs: BTreeMap<u64, CharacterGuildRef>,
+    /// Live members. The 129/22 roster row bool (`00b1bfc0`) and 129/17 presence read this.
     online: BTreeSet<u64>,
+    /// Runtime invitations only (never persisted); expiry is applied on use and swept lazily.
     pending_invites: BTreeMap<u64, PendingInvite>,
 }
 
@@ -297,6 +255,12 @@ impl GuildStore {
         self.online.contains(&character_guid)
     }
 
+    /// Mark a live member online without a presence notice (a guild's creator is connected
+    /// by definition). Returns whether the member was offline before.
+    pub fn mark_online(&mut self, character_guid: u64) -> bool {
+        self.online.insert(character_guid)
+    }
+
     /// A runtime invitation exists for this character; its expiry is applied on use.
     pub fn has_pending_invite(&self, character_guid: u64) -> bool {
         self.pending_invites.contains_key(&character_guid)
@@ -307,7 +271,7 @@ impl GuildStore {
         &mut self,
         founder_guid: u64,
         name: &str,
-        founder_name: &GuildMemberName,
+        founder_name: &NameData,
         eligible: bool,
     ) -> Result<u64, GuildError> {
         if founder_guid == 0 {
@@ -439,20 +403,13 @@ impl GuildStore {
                 expires_at_ms,
             },
         );
-        Ok(vec![
-            self.notice(
-                actor_guid,
-                guild_guid,
-                GuildNoticeKind::InviteSent { target_guid },
-            ),
-            self.notice(
-                target_guid,
-                guild_guid,
-                GuildNoticeKind::InviteReceived {
-                    inviter_guid: actor_guid,
-                },
-            ),
-        ])
+        Ok(vec![self.notice(
+            target_guid,
+            guild_guid,
+            GuildNoticeKind::InviteReceived {
+                inviter_guid: actor_guid,
+            },
+        )])
     }
 
     pub fn accept_invite(
@@ -461,7 +418,7 @@ impl GuildStore {
         guild_guid: u64,
         now_ms: u64,
         target_ignores_inviter: bool,
-        member_name: &GuildMemberName,
+        member_name: &NameData,
     ) -> Result<Vec<GuildNotice>, GuildError> {
         let pending = *self
             .pending_invites
@@ -635,11 +592,13 @@ impl GuildStore {
             .rank = GuildRank::Leader;
         let was_online = self.online.remove(&character_guid);
         self.remove_member(guild_guid, character_guid);
+        // The successor's client record is promoted (status 4, rank Leader); the departing
+        // leader and the rest see the membership removed (status 3), never a demotion.
         let mut notices = self.broadcast(
             guild_guid,
-            GuildNoticeKind::LeadershipTransferred {
-                from_guid: character_guid,
-                to_guid: successor_guid,
+            GuildNoticeKind::RankChanged {
+                member_guid: successor_guid,
+                rank: GuildRank::Leader,
             },
             None,
         );
@@ -654,9 +613,8 @@ impl GuildStore {
             notices.push(self.notice(
                 character_guid,
                 guild_guid,
-                GuildNoticeKind::LeadershipTransferred {
-                    from_guid: character_guid,
-                    to_guid: successor_guid,
+                GuildNoticeKind::MemberLeft {
+                    member_guid: character_guid,
                 },
             ));
         }
@@ -844,7 +802,7 @@ impl GuildStore {
             .guild_guid_for(character_guid)
             .ok_or(GuildError::CharacterNotMember)?;
         // (R) Presence notices fan out to connected guild members; repeat login is idempotent.
-        if !self.online.insert(character_guid) {
+        if !self.mark_online(character_guid) {
             return Ok(Vec::new());
         }
         Ok(self.broadcast(
@@ -891,7 +849,10 @@ impl GuildStore {
     }
 
     /// Refresh one member's display-name snapshot. Returns whether the store changed.
-    pub fn set_member_name(&mut self, character_guid: u64, name: &GuildMemberName) -> bool {
+    pub fn set_member_name(&mut self, character_guid: u64, name: &NameData) -> bool {
+        if !name.is_valid() {
+            return false;
+        }
         let Some(guild_guid) = self.guild_guid_for(character_guid) else {
             return false;
         };
@@ -1110,7 +1071,9 @@ impl GuildStore {
     }
 }
 
-const DEFAULT_INVITE_WINDOW_MS: u64 = 120_000; // (R) longer than the client's 60 s pop-up
+/// (R) Server invite window: longer than the client's 60 s pop-up, bounded like group invites.
+pub const DEFAULT_INVITE_WINDOW_MS: u64 = 120_000;
+pub const MAX_INVITE_WINDOW_MS: u64 = 600_000;
 
 /// Server-to-client family-129 encoders. Field order comes from the client readers; field
 /// meanings that the map does not resolve are documented per message and written as zero.
@@ -1120,16 +1083,9 @@ fn guild_header(sub: u16) -> Vec<u8> {
     bytes
 }
 
-/// `NameData` (`008e7290`): three dwords, then first and last name strings.
-fn put_name_data(out: &mut Vec<u8>, name: &GuildMemberName) {
-    for _ in 0..3 {
-        out.extend_from_slice(&0i32.to_le_bytes());
-    }
-    put_string(out, &name.first);
-    put_string(out, &name.last);
-}
-
-fn default_guild_name(name: &GuildMemberName) -> String {
+/// `NameData` (`008e7290`) is written by `social_chat::put_name_data`; guilds and chat share
+/// the one encoder.
+fn default_guild_name(name: &NameData) -> String {
     let first: String = name.first.trim().chars().take(24).collect();
     if first.is_empty() {
         "New Guild".into()
@@ -1152,12 +1108,18 @@ pub fn can_create_message(recipient_guid: u64, allowed: bool) -> GuildMessage {
 ///
 /// The first leading pair keys the client's cached guild record (`00b1ec10` compares it).
 /// The writer of the second pair is not recovered, so it repeats the guild guid (R).
-/// Member items are keyed by the xor of the member guid halves, matching `0106e330`. The role
-/// body is read into role-entry `+0..+0x10` by `00b19350`; `ResolveGuildRoleName` (`00b1a510`)
-/// looks the entry up by the member's rank key, then reads `+8` as the default role id (1..4)
-/// and `+0xc` as the custom name string id (-1 when unset). The role guid at `+0` and the
-/// trailing dword are written zero (R).
-pub fn full_data_message(recipient_guid: u64, guild: &Guild) -> GuildMessage {
+/// Member items are keyed by the xor of the member guid halves, matching `0106e330`. The member
+/// bool at `+180` is the online flag (`00b1bfc0`; `00b1b340` copies 129/17 `+172` into it), so
+/// it is written from the store's live online set. The role body is read into role-entry
+/// `+0..+0x10` by `00b19350`; `ResolveGuildRoleName` (`00b1a510`) looks the entry up by the
+/// member's rank key, then reads `+8` as the default role id (1..4) and `+0xc` as the custom
+/// name string id (-1 when unset). The role guid at `+0` and the trailing dword are written
+/// zero (R).
+pub fn full_data_message(
+    recipient_guid: u64,
+    guild: &Guild,
+    online: &BTreeSet<u64>,
+) -> GuildMessage {
     let mut bytes = guild_header(22);
     bytes.extend_from_slice(&guild.guid.to_le_bytes());
     bytes.extend_from_slice(&guild.guid.to_le_bytes());
@@ -1172,8 +1134,8 @@ pub fn full_data_message(recipient_guid: u64, guild: &Guild) -> GuildMessage {
         bytes.extend_from_slice(&member.character_guid.to_le_bytes());
         bytes.extend_from_slice(&(member.rank as u32).to_le_bytes());
         put_name_data(&mut bytes, &member.name);
-        // (+0xb4) HasLocation: false, because 129/15 is not answered (R).
-        bytes.push(0);
+        // (+0xb4) Online: the same flag 129/17 carries; 00b1bfc0 stores it at member +180.
+        bytes.push(u8::from(online.contains(&member.character_guid)));
         for _ in 0..4 {
             bytes.extend_from_slice(&0u32.to_le_bytes());
         }
@@ -1200,13 +1162,14 @@ pub fn full_data_message(recipient_guid: u64, guild: &Guild) -> GuildMessage {
 }
 
 /// 129/17 `GuildMemberStatusUpdatePacket` (`00b1c840`): guild guid, member guid, name data,
-/// status code, online flag, rank id, then four dwords. The four trailing fields
-/// (world/profile fields) are unresolved and zero.
+/// rank id, online flag, status code, then four dwords. `00b1d7d0` switches on the status
+/// (`+176`) and `00b1b340` copies the rank (`+168`) and online flag (`+172`) into the member
+/// record. The four trailing fields (world/profile fields) are unresolved and zero.
 pub fn member_status_message(
     recipient_guid: u64,
     guild_guid: u64,
     member_guid: u64,
-    name: &GuildMemberName,
+    name: &NameData,
     rank: GuildRank,
     online: bool,
     status: u32,
@@ -1215,9 +1178,9 @@ pub fn member_status_message(
     bytes.extend_from_slice(&guild_guid.to_le_bytes());
     bytes.extend_from_slice(&member_guid.to_le_bytes());
     put_name_data(&mut bytes, name);
-    bytes.extend_from_slice(&status.to_le_bytes());
-    bytes.push(u8::from(online));
     bytes.extend_from_slice(&(rank as u32).to_le_bytes());
+    bytes.push(u8::from(online));
+    bytes.extend_from_slice(&status.to_le_bytes());
     for _ in 0..4 {
         bytes.extend_from_slice(&0u32.to_le_bytes());
     }
@@ -1235,7 +1198,7 @@ pub fn invite_notification_message(
     recipient_guid: u64,
     inviter_guid: u64,
     guild_guid: u64,
-    inviter_name: &GuildMemberName,
+    inviter_name: &NameData,
     guild_name: &str,
 ) -> GuildMessage {
     let mut bytes = guild_header(24);
@@ -1245,7 +1208,7 @@ pub fn invite_notification_message(
     bytes.extend_from_slice(&0u32.to_le_bytes()); // (R) unused dword
     bytes.extend_from_slice(&0u64.to_le_bytes()); // (R) unused pair
     put_name_data(&mut bytes, inviter_name);
-    put_name_data(&mut bytes, &GuildMemberName::default()); // (R) invitee name unused
+    put_name_data(&mut bytes, &NameData::default()); // (R) invitee name unused
     put_string(&mut bytes, guild_name);
     GuildMessage {
         recipient_guid,
@@ -1254,7 +1217,7 @@ pub fn invite_notification_message(
 }
 
 /// 129/27 `GuildInviteAcceptNotificationPacket` (`00b1d5b0`): one `NameData`.
-pub fn invite_accepted_message(recipient_guid: u64, name: &GuildMemberName) -> GuildMessage {
+pub fn invite_accepted_message(recipient_guid: u64, name: &NameData) -> GuildMessage {
     let mut bytes = guild_header(27);
     put_name_data(&mut bytes, name);
     GuildMessage {
@@ -1267,7 +1230,7 @@ pub fn invite_accepted_message(recipient_guid: u64, name: &GuildMemberName) -> G
 /// that selects the timed-out message (`00b1d6c0`).
 pub fn invite_result_message(
     recipient_guid: u64,
-    name: &GuildMemberName,
+    name: &NameData,
     timed_out: bool,
 ) -> GuildMessage {
     let mut bytes = guild_header(28);
@@ -1316,7 +1279,7 @@ pub fn disbanded_message(recipient_guid: u64, guild_guid: u64, name: &str) -> Gu
 /// never names the actor.
 pub struct GuildCaller<'a> {
     pub character_guid: u64,
-    pub name: &'a GuildMemberName,
+    pub name: &'a NameData,
     /// Any job at level 15 satisfies the client locale; the host supplies the result (R).
     pub eligible: bool,
     /// Invite: the target ignores the caller. Accept/decline: the caller ignores the inviter.
@@ -1440,7 +1403,6 @@ impl GuildService {
         if actor == 0 {
             return out;
         }
-        self.store.expire_invites(now_ms, self.invite_window_ms);
         match request {
             GuildRequest::Create { name, .. } => {
                 let requested = if name.is_empty() {
@@ -1454,6 +1416,9 @@ impl GuildService {
                 {
                     Ok(guild_guid) => {
                         self.dirty = true;
+                        // The creator is a connected session; the 129/22 roster reads the
+                        // live online set for every member row.
+                        self.store.mark_online(actor);
                         out.messages.push(can_create_message(actor, false));
                         let guild_name = self.guild_name(guild_guid);
                         out.messages
@@ -1584,7 +1549,13 @@ impl GuildService {
                     caller.name,
                 ) {
                     Ok(notices) => {
-                        self.dirty = true;
+                        // A timed-out or ignored accept only touched runtime pending state;
+                        // only an actual join is persisted and gets a roster (checklist: apply
+                        // deltas, refusals change nothing).
+                        let joined = self.store.guild_guid_for(actor) == Some(guild_guid);
+                        if joined {
+                            self.dirty = true;
+                        }
                         let snapshot = self.snapshot(guild_guid);
                         let guild_name = self.guild_name(guild_guid);
                         out.messages.extend(self.notice_messages(
@@ -1593,7 +1564,9 @@ impl GuildService {
                             &guild_name,
                             Some(caller.name),
                         ));
-                        self.push_full_data(&mut out, actor, guild_guid);
+                        if joined {
+                            self.push_full_data(&mut out, actor, guild_guid);
+                        }
                     }
                     Err(error) => push_error(&mut out.messages, actor, error),
                 }
@@ -1672,16 +1645,15 @@ impl GuildService {
                 // and answered with silence, so the client keeps its cached locations.
             }
         }
+        // Runtime invite cleanup is a map bound, not part of the request outcome: it runs
+        // after the request was answered, so a refusal is decided against the pending rows
+        // it found and only runtime state is reclaimed (the persisted store stays clean).
+        self.store.expire_invites(now_ms, self.invite_window_ms);
         out
     }
 
     /// Roster and create-eligibility messages for one world login, then presence notices.
-    pub fn login(
-        &mut self,
-        character_guid: u64,
-        name: &GuildMemberName,
-        eligible: bool,
-    ) -> GuildOutcome {
+    pub fn login(&mut self, character_guid: u64, name: &NameData, eligible: bool) -> GuildOutcome {
         let mut out = GuildOutcome::default();
         if self.store.set_member_name(character_guid, name) {
             self.dirty = true;
@@ -1691,6 +1663,9 @@ impl GuildService {
                 .push(can_create_message(character_guid, eligible));
             return out;
         };
+        // Presence must be current before the roster is built: the joining member's own
+        // 129/22 row reads the live online set (`00b1bfc0` stores it at member +180).
+        let notices = self.store.login(character_guid).unwrap_or_default();
         self.push_full_data(&mut out, character_guid, guild_guid);
         out.messages.push(can_create_message(character_guid, false));
         // 129/17 code 6 tells the joining client which other members are online.
@@ -1712,7 +1687,6 @@ impl GuildService {
                 ));
             }
         }
-        let notices = self.store.login(character_guid).unwrap_or_default();
         let snapshot = self.snapshot(guild_guid);
         let guild_name = self.guild_name(guild_guid);
         out.messages
@@ -1743,7 +1717,7 @@ impl GuildService {
             .unwrap_or_default()
     }
 
-    fn snapshot(&self, guild_guid: u64) -> BTreeMap<u64, (GuildMemberName, GuildRank)> {
+    fn snapshot(&self, guild_guid: u64) -> BTreeMap<u64, (NameData, GuildRank)> {
         self.store
             .guild(guild_guid)
             .map(|guild| {
@@ -1812,7 +1786,8 @@ impl GuildService {
         let Some(guild) = self.store.guild(guild_guid) else {
             return;
         };
-        out.messages.push(full_data_message(recipient_guid, guild));
+        out.messages
+            .push(full_data_message(recipient_guid, guild, &self.store.online));
     }
 
     /// Encode typed notices. `actor_name` is the authenticated caller of a decline/timeout
@@ -1820,9 +1795,9 @@ impl GuildService {
     fn notice_messages(
         &self,
         notices: &[GuildNotice],
-        snapshot: &BTreeMap<u64, (GuildMemberName, GuildRank)>,
+        snapshot: &BTreeMap<u64, (NameData, GuildRank)>,
         guild_name: &str,
-        actor_name: Option<&GuildMemberName>,
+        actor_name: Option<&NameData>,
     ) -> Vec<GuildMessage> {
         let mut out = Vec::new();
         for notice in notices {
@@ -1840,7 +1815,6 @@ impl GuildService {
                         ));
                     }
                 }
-                GuildNoticeKind::InviteSent { .. } => {}
                 GuildNoticeKind::InviteAccepted { member_guid } => {
                     if let Some((name, _)) = snapshot.get(member_guid) {
                         out.push(invite_accepted_message(recipient, name));
@@ -1848,12 +1822,12 @@ impl GuildService {
                 }
                 GuildNoticeKind::InviteDeclined { .. } => out.push(invite_result_message(
                     recipient,
-                    actor_name.unwrap_or(&GuildMemberName::default()),
+                    actor_name.unwrap_or(&NameData::default()),
                     false,
                 )),
                 GuildNoticeKind::InviteTimedOut { .. } => out.push(invite_result_message(
                     recipient,
-                    actor_name.unwrap_or(&GuildMemberName::default()),
+                    actor_name.unwrap_or(&NameData::default()),
                     true,
                 )),
                 GuildNoticeKind::MemberJoined { member_guid } => {
@@ -2192,7 +2166,7 @@ mod tests {
     /// invitation when the late accept is refused (checklist 1).
     #[test]
     fn refused_accept_keeps_the_pending_invite() {
-        let member = |text: &str| GuildMemberName::new(text, "");
+        let member = |text: &str| NameData::new(text, "");
         let mut store = GuildStore::new();
         let invited_guild = store
             .create_guild(1, "Guild-A", &member("A"), true)

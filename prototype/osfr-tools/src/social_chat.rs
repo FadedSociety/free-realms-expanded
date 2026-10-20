@@ -149,15 +149,25 @@ impl ChatChannel {
     }
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 pub struct NameData {
+    /// (R) Three client metadata words (locale name ids); character identity supplies none.
+    #[serde(default)]
     pub fields: [i32; 3],
     pub first: String,
     pub last: String,
 }
 
 impl NameData {
-    fn display_name(&self) -> String {
+    pub fn new(first: impl Into<String>, last: impl Into<String>) -> Self {
+        Self {
+            fields: [0; 3],
+            first: first.into(),
+            last: last.into(),
+        }
+    }
+
+    pub(crate) fn display_name(&self) -> String {
         [self.first.trim(), self.last.trim()]
             .into_iter()
             .filter(|part| !part.is_empty())
@@ -167,6 +177,22 @@ impl NameData {
 
     fn matches(&self, other: &Self) -> bool {
         self.first.eq_ignore_ascii_case(&other.first) && self.last.eq_ignore_ascii_case(&other.last)
+    }
+
+    /// Whether the joined display name equals `raw` (case-insensitive), for name invites.
+    pub fn matches_display(&self, raw: &str) -> bool {
+        self.display_name().eq_ignore_ascii_case(raw.trim())
+    }
+
+    /// A bounded name that can be persisted and written as wire `NameData`.
+    pub fn is_valid(&self) -> bool {
+        self.first.len() <= MAX_NAME_BYTES
+            && self.last.len() <= MAX_NAME_BYTES
+            && !self
+                .first
+                .chars()
+                .chain(self.last.chars())
+                .any(char::is_control)
     }
 }
 
@@ -298,15 +324,25 @@ fn put_string(out: &mut Vec<u8>, value: &str) -> Result<(), ChatError> {
     Ok(())
 }
 
-fn put_name(out: &mut Vec<u8>, name: &NameData) -> Result<(), ChatError> {
+/// Write one client `NameData` (`008e7290`): three dwords, then first and last strings.
+/// Callers that accept client text check the bounds and use `put_name` instead.
+pub(crate) fn put_name_data(out: &mut Vec<u8>, name: &NameData) {
     for value in name.fields {
         out.extend_from_slice(&value.to_le_bytes());
     }
+    for part in [&name.first, &name.last] {
+        debug_assert!(part.len() <= MAX_NAME_BYTES, "callers bound NameData parts");
+        out.extend_from_slice(&(part.len() as i32).to_le_bytes());
+        out.extend_from_slice(part.as_bytes());
+    }
+}
+
+fn put_name(out: &mut Vec<u8>, name: &NameData) -> Result<(), ChatError> {
     if name.first.len() > MAX_NAME_BYTES || name.last.len() > MAX_NAME_BYTES {
         return Err(ChatError::InvalidPacket);
     }
-    put_string(out, &name.first)?;
-    put_string(out, &name.last)
+    put_name_data(out, name);
+    Ok(())
 }
 
 fn read_header(reader: &mut Reader<'_>, family: u16, sub: u16) -> Result<(), ChatError> {

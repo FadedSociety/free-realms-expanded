@@ -491,6 +491,7 @@ fn start_server_with_content(temp: &TempDir, content: Option<PathBuf>) -> (Serve
         allow_lan: false,
         security_log: Some(temp.0.join("security.jsonl")),
         group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
+        guild_invite_ttl_ms: osfr_tools::guilds::DEFAULT_INVITE_WINDOW_MS,
     })
     .unwrap();
     (server, account_store)

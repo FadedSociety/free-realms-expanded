@@ -1,6 +1,6 @@
 use guilds::{
-    GuildError, GuildMemberName, GuildNoticeKind, GuildRank, GuildResultCode, GuildStore,
-    decode_request, error_message,
+    GuildError, GuildNoticeKind, GuildRank, GuildResultCode, GuildStore, decode_request,
+    error_message,
 };
 use osfr_tools::{guilds, social_chat};
 use social_chat::{
@@ -48,8 +48,8 @@ fn three_members() -> (GuildStore, u64) {
     (store, guild)
 }
 
-fn member(guid: u64) -> GuildMemberName {
-    GuildMemberName::new(format!("First{guid}"), "Last".to_string())
+fn member(guid: u64) -> NameData {
+    NameData::new(format!("First{guid}"), "Last")
 }
 
 fn request_header(sub: u16) -> Vec<u8> {

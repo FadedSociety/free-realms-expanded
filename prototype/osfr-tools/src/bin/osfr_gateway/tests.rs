@@ -34,6 +34,7 @@ fn w120_player_denial_is_logged_and_studio_requires_admin() {
         allow_lan: false,
         security_log: Some(log_path.clone()),
         group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
+        guild_invite_ttl_ms: osfr_tools::guilds::DEFAULT_INVITE_WINDOW_MS,
     };
     let mut server = Server::new(options).unwrap();
     let mut session = Session::new(
@@ -181,6 +182,7 @@ fn pose_only_saves_are_coalesced_and_flushed_by_tick() {
         allow_lan: false,
         security_log: None,
         group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
+        guild_invite_ttl_ms: osfr_tools::guilds::DEFAULT_INVITE_WINDOW_MS,
     };
     let mut server = Server::new(options).unwrap();
     let mut session = Session::new(
@@ -317,6 +319,7 @@ fn private_direct_pose_reaches_session_and_unlocks_reliable_rocket_use() {
         allow_lan: false,
         security_log: None,
         group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
+        guild_invite_ttl_ms: osfr_tools::guilds::DEFAULT_INVITE_WINDOW_MS,
     };
     let mut session = Session::new(
         SessionId(17),
@@ -890,6 +893,7 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
         allow_lan: false,
         security_log: None,
         group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
+        guild_invite_ttl_ms: osfr_tools::guilds::DEFAULT_INVITE_WINDOW_MS,
     };
     let new_session = |id: u64| {
         Session::new(

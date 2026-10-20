@@ -7,7 +7,7 @@
 //! Policy marks are (R): the module's reconstructed rules, not original server behaviour.
 
 use osfr_tools::{
-    guilds::{GuildCaller, GuildMemberName, GuildRank, GuildService, GuildStore},
+    guilds::{GuildCaller, GuildRank, GuildService, GuildStore},
     social_chat::{self, ChatChannel, ChatRequest, ChatSession, IgnoreLists, NameData},
 };
 use std::{
@@ -39,11 +39,11 @@ impl Drop for TempDir {
     }
 }
 
-fn name(guid: u64) -> GuildMemberName {
-    GuildMemberName::new(format!("Player{guid}"), "Tester".to_string())
+fn name(guid: u64) -> NameData {
+    NameData::new(format!("Player{guid}"), "Tester")
 }
 
-fn caller(character_guid: u64, name: &GuildMemberName) -> GuildCaller<'_> {
+fn caller(character_guid: u64, name: &NameData) -> GuildCaller<'_> {
     GuildCaller {
         character_guid,
         name,
@@ -179,7 +179,9 @@ struct FullData {
 }
 
 /// Reads 129/22 in the client's recovered field order (`00b1e730`, `00b1e160`, `00b1d2d0`,
-/// `00b1bf30`, `00b1bfc0`, `00b19350`; role default id is entry `+8` per `00b1a510`).
+/// `00b1bf30`, `00b1bfc0`, `00b19350`; role default id is entry `+8` per `00b1a510`). The
+/// member bool after `NameData` is the online flag: `00b1bfc0` stores it at member `+180`
+/// and `00b1b340` copies the 129/17 `+172` online flag into it.
 fn parse_full(bytes: &[u8]) -> FullData {
     let mut r = Reader::new(bytes);
     assert_eq!(r.u16(), 129);
@@ -199,11 +201,11 @@ fn parse_full(bytes: &[u8]) -> FullData {
         assert_eq!(key, (guid as u32) ^ ((guid >> 32) as u32), "member key");
         let rank = r.u32();
         let display = r.name_data();
-        let has_location = r.u8() != 0;
+        let online = r.u8() != 0;
         for _ in 0..4 {
             r.u32();
         }
-        members.push((guid, rank, display, has_location));
+        members.push((guid, rank, display, online));
     }
     let role_count = r.u32();
     assert_eq!(role_count, 4, "four default ranks");
@@ -240,9 +242,11 @@ fn status(bytes: &[u8]) -> (u64, u64, String, u32, bool, u32) {
     let guild = r.u64();
     let member = r.u64();
     let display = r.name_data();
-    let code = r.u32();
-    let online = r.u8() != 0;
+    // `00b1c840` reads role (+168), online (+172), status (+176); `00b1d7d0` switches on
+    // the status, so a status written first would be read as a rank.
     let rank = r.u32();
+    let online = r.u8() != 0;
+    let code = r.u32();
     for _ in 0..4 {
         r.u32();
     }
@@ -327,7 +331,8 @@ fn two_bots_create_invite_accept_and_chat() {
     assert_eq!(parsed.members[0].1, GuildRank::Leader as u32);
     assert_eq!(parsed.members[0].2, "Player101 Tester");
     assert_eq!(parsed.roles, vec![(1, 1), (2, 2), (3, 3), (4, 4)]);
-    assert!(parsed.members.iter().all(|member| !member.3));
+    // The creator is a connected session, so its 129/22 row is online (member bool +180).
+    assert!(parsed.members[0].3, "the founder row is online");
     assert!(created.messages.iter().any(|message| {
         sub(&message.bytes) == 32 && message.bytes[4] == 0 && message.recipient_guid == 101
     }));
@@ -390,7 +395,15 @@ fn two_bots_create_invite_accept_and_chat() {
         .iter()
         .find(|message| sub(&message.bytes) == 22)
         .expect("joiner roster");
-    assert_eq!(parse_full(&roster.bytes).members.len(), 2);
+    let parsed = parse_full(&roster.bytes);
+    assert_eq!(parsed.members.len(), 2);
+    // Both members are connected in this flow: the founder created the guild and the
+    // joiner accepted the invite.
+    assert!(
+        parsed.members.iter().all(|member| member.3),
+        "both roster rows are online: {:?}",
+        parsed.members
+    );
     // 129/27 tells the inviter that the invitee joined (`00b1d5b0`).
     let accepted_notice = accepted
         .messages
@@ -404,7 +417,6 @@ fn two_bots_create_invite_accept_and_chat() {
 
     // Guild chat: `chat_session` reads `guild_guid_for`; the existing channel router then
     // reaches exactly the members of that guild.
-    service.login(101, &a, true);
     let sessions = [(1, 101), (2, 202), (3, 303)].map(|(session_id, character_guid)| ChatSession {
         session_id,
         character_guid,
@@ -474,10 +486,12 @@ fn relog_roster_survives_a_gateway_restart() {
             .members
             .contains(&(101, 1, "Player101 Tester".into(), false))
     );
+    // The relogging member is marked online before the 129/22 roster is built, so its own
+    // member row is online (the pre-fix order wrote every row offline).
     assert!(
         parsed
             .members
-            .contains(&(202, 4, "Player202 Tester".into(), false))
+            .contains(&(202, 4, "Player202 Tester".into(), true))
     );
     assert!(login.messages.iter().any(|message| {
         sub(&message.bytes) == 32 && message.bytes[4] == 0 && message.recipient_guid == 202
@@ -740,4 +754,120 @@ fn an_expired_invite_does_not_block_a_new_one() {
     store.invite(1, guild, 202, false, false, 0, 100).unwrap();
     store.invite(1, guild, 202, false, false, 200, 100).unwrap();
     assert_eq!(store.guild_guid_for(202), None);
+}
+
+/// A leader who quits is removed (status 3) and the successor is promoted (status 4);
+/// the removed member is never encoded as demoted (status 5) to the client.
+#[test]
+fn leader_quit_encodes_leave_and_succession_never_a_demotion() {
+    let mut service = GuildService::new(60_000);
+    let a = name(101);
+    let b = name(202);
+    service.handle(&caller(101, &a), &resolve, &create("Lantern Guild"), 1_000);
+    let guild = service.store().guild_guid_for(101).unwrap();
+    service.handle(&caller(101, &a), &resolve, &invite(guild, 202, ""), 1_100);
+    service.handle(&caller(202, &b), &resolve, &one_guid(8, guild), 1_200);
+
+    let quit = service.handle(&caller(101, &a), &resolve, &one_guid(7, guild), 1_300);
+    let statuses: Vec<(u64, u32, bool, u32)> = quit
+        .messages
+        .iter()
+        .filter(|message| sub(&message.bytes) == 17)
+        .map(|message| {
+            let (_, _, _, code, online, rank) = status(&message.bytes);
+            (message.recipient_guid, code, online, rank)
+        })
+        .collect();
+    let leader = GuildRank::Leader as u32;
+    assert!(
+        statuses.contains(&(101, 3, false, leader)),
+        "the departing leader is told it left: {statuses:?}"
+    );
+    assert!(
+        statuses.contains(&(202, 4, true, leader)),
+        "the successor is promoted to Leader: {statuses:?}"
+    );
+    assert!(
+        statuses.contains(&(202, 3, false, leader)),
+        "the remaining member sees the leader leave: {statuses:?}"
+    );
+    assert!(
+        statuses.iter().all(|row| row.1 != 5),
+        "a removed member is never encoded as demoted: {statuses:?}"
+    );
+    assert_eq!(service.store().guild_guid_for(101), None);
+    assert_eq!(
+        service.store().guild(guild).unwrap().members[&202].rank,
+        GuildRank::Leader
+    );
+}
+
+/// A timed-out accept only changed runtime pending state: it writes no store and sends no
+/// roster (`handle_decoded` must distinguish "joined" from "timed out").
+#[test]
+fn a_timed_out_accept_changes_no_persisted_state() {
+    let temp = TempDir::new();
+    let path = temp.path().join("guilds.json");
+    let mut service = GuildService::new(100);
+    let a = name(101);
+    let b = name(202);
+    service.handle(&caller(101, &a), &resolve, &create("Lantern Guild"), 0);
+    let guild = service.store().guild_guid_for(101).unwrap();
+    service.handle(&caller(101, &a), &resolve, &invite(guild, 202, ""), 0);
+    service.save(&path).unwrap();
+    assert!(!service.is_dirty());
+    let before = std::fs::read(&path).unwrap();
+
+    let late = service.handle(&caller(202, &b), &resolve, &one_guid(8, guild), 1_000);
+    assert!(
+        late.messages
+            .iter()
+            .any(|message| sub(&message.bytes) == 28)
+    );
+    assert!(
+        late.messages
+            .iter()
+            .all(|message| sub(&message.bytes) != 22),
+        "a timed-out accept must not receive a guild roster"
+    );
+    assert!(!service.is_dirty(), "only runtime pending state changed");
+    assert_eq!(std::fs::read(&path).unwrap(), before);
+    assert_eq!(service.store().guild_guid_for(202), None);
+}
+
+/// The expired-invite sweep is documented runtime cleanup (review 19): a refused request is
+/// answered against the rows it found and changes no persisted state, even when this handled
+/// request also reclaims the stale runtime row.
+#[test]
+fn a_refused_request_changes_no_persisted_state_even_when_the_sweep_runs() {
+    let temp = TempDir::new();
+    let path = temp.path().join("guilds.json");
+    let mut service = GuildService::new(1_000);
+    let a = name(101);
+    let b = name(202);
+    service.handle(&caller(101, &a), &resolve, &create("Lantern Guild"), 0);
+    let guild = service.store().guild_guid_for(101).unwrap();
+    service.handle(&caller(101, &a), &resolve, &invite(guild, 202, ""), 0);
+    service.save(&path).unwrap();
+    assert!(!service.is_dirty());
+    let before = std::fs::read(&path).unwrap();
+
+    // A forged accept is refused and silent; the invite is far past its one-window grace,
+    // so the handled request also reclaims the stale runtime row (runtime-only cleanup).
+    let refused = service.handle(&caller(202, &b), &resolve, &one_guid(8, guild + 1), 10_000);
+    assert!(refused.messages.is_empty(), "a forged accept is silent");
+    assert!(
+        !service.is_dirty(),
+        "the refusal changed no persisted state"
+    );
+    assert_eq!(std::fs::read(&path).unwrap(), before);
+    assert_eq!(service.store().guild_guid_for(202), None);
+
+    // The handled request also reclaimed the stale runtime row: a later valid accept is
+    // silent instead of the one-window-grace timed-out notice.
+    let after_sweep = service.handle(&caller(202, &b), &resolve, &one_guid(8, guild), 10_001);
+    assert!(
+        after_sweep.messages.is_empty(),
+        "the stale runtime invite was reclaimed"
+    );
 }

@@ -10,9 +10,9 @@
 
 use super::*;
 use osfr_tools::guilds::{
-    GuildCaller, GuildMemberName, GuildMessage, GuildOutcome, GuildStore, can_create_message,
-    decode_request,
+    GuildCaller, GuildMessage, GuildOutcome, GuildStore, can_create_message, decode_request,
 };
+use osfr_tools::social_chat::NameData;
 
 /// T006 (R): one JSON guild file beside the character save, owned by the staged world.
 /// The store is shared copy-on-write: a world clone costs one refcount bump. Malformed
@@ -58,11 +58,9 @@ impl GuildWorld {
     }
 }
 
-fn member_name(identity: Option<&SocialIdentity>) -> GuildMemberName {
+fn member_name(identity: Option<&SocialIdentity>) -> NameData {
     identity
-        .map(|identity| {
-            GuildMemberName::new(identity.name.first.clone(), identity.name.last.clone())
-        })
+        .map(|identity| NameData::new(identity.name.first.clone(), identity.name.last.clone()))
         .unwrap_or_default()
 }
 

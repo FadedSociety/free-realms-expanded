@@ -5,7 +5,7 @@
 
 use super::t006_guilds::GuildWorld;
 use super::*;
-use osfr_tools::guilds::{GuildMemberName, GuildStore};
+use osfr_tools::guilds::GuildStore;
 use osfr_tools::players::PlayerPresentation;
 use osfr_tools::social_lists::SocialName;
 
@@ -46,6 +46,7 @@ fn options(scratch: &Path) -> Options {
         allow_lan: false,
         security_log: None,
         group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
+        guild_invite_ttl_ms: osfr_tools::guilds::DEFAULT_INVITE_WINDOW_MS,
     }
 }
 
@@ -139,7 +140,7 @@ fn seed_guild(path: &Path) -> u64 {
         .create_guild(
             GUIDS[0],
             "Lantern Guild",
-            &GuildMemberName::new(NAMES[0], ""),
+            &NameData::new(NAMES[0], ""),
             true,
         )
         .unwrap();
@@ -174,7 +175,7 @@ fn rig(name: &str, with_guild: bool) -> Rig {
     }
     let sessions = std::array::from_fn(|index| session(&options, index));
     let mut world = SharedWorld::new();
-    world.guilds = GuildWorld::load(&options.state, options.group_invite_ttl_ms).unwrap();
+    world.guilds = GuildWorld::load(&options.state, options.guild_invite_ttl_ms).unwrap();
     seed_world(&mut world, &sessions);
     Rig {
         sessions,
@@ -191,7 +192,7 @@ fn eligible_rig(name: &str) -> Rig {
     seed_eligible_character(&options);
     let sessions = std::array::from_fn(|index| session(&options, index));
     let mut world = SharedWorld::new();
-    world.guilds = GuildWorld::load(&options.state, options.group_invite_ttl_ms).unwrap();
+    world.guilds = GuildWorld::load(&options.state, options.guild_invite_ttl_ms).unwrap();
     seed_world(&mut world, &sessions);
     Rig {
         sessions,
@@ -296,6 +297,38 @@ fn has(deliveries: &[Delivery], index: usize, sub: u16) -> bool {
     deliveries
         .iter()
         .any(|delivery| delivery.recipient == recipient && family_sub(delivery).1 == sub)
+}
+
+#[test]
+fn create_then_invite_accept_reaches_the_online_founder() {
+    let mut rig = eligible_rig("founder-online");
+    log_in(&mut rig.sessions[0], "t006-founder");
+    // The real gateway path creates the guild; the creator is a connected session, so the
+    // store marks it online before any roster is built (129/22 member bool +180).
+    dispatch(&mut rig, 0, &create("Lantern Guild"), 1_000);
+    // The reference save carries template guid 1, so the committed dispatch adopts it for the
+    // session; the guild under test belongs to the seeded social identity. Production saves
+    // always carry the session's own guid; restore it for the rest of this fixture.
+    rig.sessions[0].character_guid = GUIDS[0];
+    let guild = rig
+        .world
+        .guilds
+        .store()
+        .guild_guid_for(GUIDS[0])
+        .expect("the founder owns the new guild");
+    assert!(
+        rig.world.guilds.store().is_online(GUIDS[0]),
+        "the founder is online"
+    );
+
+    let invited = route(&mut rig, 0, &invite(guild, 0, NAMES[1]));
+    assert!(has(&invited, 1, 24), "invitee pop-up");
+    let accepted = route(&mut rig, 1, &one_guid(8, guild));
+    assert!(has(&accepted, 0, 27), "founder accept notice");
+    // The founder now receives the directed MemberJoined status and the joiner its roster;
+    // before the online fix the broadcast filtered the founder out.
+    assert!(has(&accepted, 0, 17), "founder sees the join status");
+    assert!(has(&accepted, 1, 22), "joiner roster");
 }
 
 #[test]

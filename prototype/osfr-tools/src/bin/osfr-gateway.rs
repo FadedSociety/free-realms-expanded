@@ -37,16 +37,11 @@ use osfr_tools::world::{NpcVisibility, World, WorldPose};
 #[path = "osfr_gateway/delivery.rs"]
 mod delivery;
 use delivery::{chat_error_delivery, wrap_application};
+#[path = "osfr_gateway/paths.rs"]
+mod paths;
 #[path = "osfr_gateway/t006_guilds.rs"]
 mod t006_guilds;
-
-/// Studio savestates sit next to the character save.
-fn savestate_dir(state_path: &std::path::Path) -> PathBuf {
-    state_path
-        .parent()
-        .map(|p| p.join("savestates"))
-        .unwrap_or_else(|| PathBuf::from("savestates"))
-}
+use paths::{character_state_path, chat_settings_path, savestate_dir, social_path};
 
 /// Percent-decoding for Studio query strings and paths.
 fn studio_decode(text: &str) -> String {
@@ -304,6 +299,8 @@ pub struct Options {
     pub security_log: Option<PathBuf>,
     /// (R) Pending group invitations expire after this bounded monotonic duration.
     pub group_invite_ttl_ms: u64,
+    /// (R) Pending guild invitations expire after this bounded monotonic duration.
+    pub guild_invite_ttl_ms: u64,
 }
 
 impl Options {
@@ -311,7 +308,7 @@ impl Options {
         let mut args = env::args().skip(1);
         let bind: SocketAddr = args
             .next()
-            .ok_or("usage: osfr-gateway 127.0.0.1:PORT --reference DIR --state FILE [--content DIR] [--identity FILE] [--account-store FILE] [--seconds N] [--trace FILE] [--security-log FILE] [--group-invite-ttl-ms N] [--dev-tools]")?
+            .ok_or("usage: osfr-gateway 127.0.0.1:PORT --reference DIR --state FILE [--content DIR] [--identity FILE] [--account-store FILE] [--seconds N] [--trace FILE] [--security-log FILE] [--group-invite-ttl-ms N] [--guild-invite-ttl-ms N] [--dev-tools]")?
             .parse()?;
         let (mut reference, mut state, mut seconds, mut content, mut identity, mut account_store) =
             (None, None, 0, None, None, None);
@@ -326,6 +323,7 @@ impl Options {
         let mut stock_text = None;
         let mut security_log = None;
         let mut group_invite_ttl_ms = osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS;
+        let mut guild_invite_ttl_ms = osfr_tools::guilds::DEFAULT_INVITE_WINDOW_MS;
         while let Some(key) = args.next() {
             if key == "--dev-tools" {
                 dev_tools = true;
@@ -350,6 +348,7 @@ impl Options {
                 "--world" => world = Some(PathBuf::from(value)),
                 "--security-log" => security_log = Some(PathBuf::from(value)),
                 "--group-invite-ttl-ms" => group_invite_ttl_ms = value.parse()?,
+                "--guild-invite-ttl-ms" => guild_invite_ttl_ms = value.parse()?,
                 "--client-locale" => {
                     let dat = Path::new(&value).join("en_us_data.dat");
                     stock_text = Some(Arc::new(osfr_tools::world_text::stock_hashes(&dat)?));
@@ -362,6 +361,9 @@ impl Options {
                 "--trace" => {}
                 _ => return Err(format!("unknown option {key}").into()),
             }
+        }
+        if !(1..=osfr_tools::guilds::MAX_INVITE_WINDOW_MS).contains(&guild_invite_ttl_ms) {
+            return Err("--guild-invite-ttl-ms must be 1..=600000".into());
         }
         // Security Model L1/L5: loopback by default; a private-network bind only
         // with --allow-lan, in account-store mode, and never with dev tools.
@@ -399,6 +401,7 @@ impl Options {
             allow_lan,
             security_log,
             group_invite_ttl_ms,
+            guild_invite_ttl_ms,
         })
     }
 }
@@ -903,25 +906,6 @@ fn invalid_io(error: impl std::fmt::Display) -> io::Error {
 
 fn heading(rotation: [f32; 3]) -> f32 {
     rotation[0].atan2(rotation[2])
-}
-
-/// W173 (R): the chat settings file sits beside the social list, `<guid>.chat.json`.
-fn chat_settings_path(social: &Path) -> PathBuf {
-    social.with_extension("").with_extension("chat.json")
-}
-
-fn social_path(state_path: &Path) -> PathBuf {
-    // (R) Keep host-managed social data beside the character save.
-    state_path.with_extension("social.json")
-}
-
-fn character_state_path(configured: &Path, guid: u64) -> PathBuf {
-    // (R) Store account-selected character state under a local per-character filename.
-    configured
-        .parent()
-        .unwrap_or_else(|| Path::new("."))
-        .join("characters")
-        .join(format!("{guid}.json"))
 }
 
 fn load_gateway_from(
@@ -3389,7 +3373,7 @@ impl Server {
         world
             .social
             .set_group_invite_ttl(options.group_invite_ttl_ms)?;
-        world.guilds = t006_guilds::GuildWorld::load(&options.state, options.group_invite_ttl_ms)?;
+        world.guilds = t006_guilds::GuildWorld::load(&options.state, options.guild_invite_ttl_ms)?;
         if let Some(path) = &options.security_log {
             // Logging is best effort: an unusable file disables it, never the server.
             match SecurityLog::open(path) {
