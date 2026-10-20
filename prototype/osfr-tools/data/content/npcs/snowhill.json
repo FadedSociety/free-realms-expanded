@@ -4627,7 +4627,8 @@
       ],
       "roles": [
         "ambient",
-        "trainer"
+        "trainer",
+        "vendor"
       ],
       "enemy_kind": null,
       "location_evidence": [
@@ -4855,6 +4856,18 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) trainer classification follows the unchanged jobs.json trainer_npc_ids reference; the page may not give a trainer title"
+          },
+          {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md row 3: \"Visit Bruno Battlerock and purchase Thorny Fasteners\" (1315833944) and \"Purchase some Thorny Fasteners and Wooden Planks from Bruno Battlerock.\" (2238986354); the Snowhill NPC guide row lists his services: Thorny Fasteners, Wooden Planks and Singing Coal."
+          },
+          {
+            "kind": "video",
+            "evidence": "2fhn8kePbKQ/00612 and XPZ5uQEZSp4/00006 show Bruno's \"Crafting Supplies\" / \"Crafting Supplies & Recipes\" stall at the Snowhill forge."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T274: the vendor role authorizes the vendors.json stock mapping required by src/npc_interaction.rs; the client strings and the video stall establish that Bruno sells these components."
           }
         ],
         "enemy_kind": [

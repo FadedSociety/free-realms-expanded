@@ -51,23 +51,23 @@
     "t108_gender_pair_policy": "(R) Two identical wiki Sells entries for one exact default locale name map to one male and one female catalogue definition only when those are the only positive-priced candidates; no colour or item-family substitution."
   },
   "coverage": {
-    "vendor_keys_total": 192,
-    "vendors_with_item_ids": 98,
+    "vendor_keys_total": 193,
+    "vendors_with_item_ids": 99,
     "vendors_without_item_ids": 94,
     "wiki_npc_pages_with_sells_lists": 94,
     "unique_wiki_stock_names": 1133,
     "named_video_stock_claims_without_item_id": 1,
     "named_content_stock_claims": 5,
     "item_names_considered": 1139,
-    "items_resolved": 1105,
+    "items_resolved": 1108,
     "items_ambiguous": 20,
     "items_unmatched": 82,
     "unique_name_id_matches_missing_from_startup": 0,
     "no_exact_name_id_match": 81,
     "member_only_flags_recovered": 0,
-    "items_with_stores_price": 1103,
+    "items_with_stores_price": 1106,
     "mapped_items_without_stores_price": 2,
-    "vendors_with_runtime_item_ids": 96
+    "vendors_with_runtime_item_ids": 97
   },
   "vendors": [
     {
@@ -123,6 +123,138 @@
       ],
       "item_ids": [],
       "stock_completeness": "partial_evidence_reference"
+    },
+    {
+      "npc_id": 9000000034,
+      "npc_name": "Bruno Battlerock",
+      "npc_content_file": "snowhill.json",
+      "vendor_stock_description": "Crafting Supplies: Thorny Fasteners, Wooden Planks and Singing Coal (Blacksmith.md rows 3/4/5; video 2fhn8kePbKQ/00612 'Crafting Supplies'; client 3250596704, 798476908, 860037929).",
+      "stock_completeness": "all_named_evidence_items_mapped",
+      "item_ids": [
+        55,
+        56,
+        879
+      ],
+      "items": [
+        {
+          "item_id": 55,
+          "item_name": "Wooden Plank",
+          "source_stock_name": "Wooden Planks",
+          "item_name_id": 931,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price from the Legacy ClientItemDefinitions Cost; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "video",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "client_and_video",
+            "client_string_id": 3250596704,
+            "video": "2fhn8kePbKQ/00636",
+            "claim": "Smithy Merchandise buys Wooden Planks from Bruno Battlerock's stall; the video tracker shows the Wooden Planks goal complete after the counter step."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "c425fd7f936d6b8e40fef3e4b522d8a79675c88fc8e6f92c76b5f33fdbe58ddd",
+            "name_id": 931,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "Wooden Plank",
+            "mapping_policy": "(R) unique exact default locale display-name match; no fuzzy spelling or item-family substitution."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 55,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 56,
+          "item_name": "Thorny Fasteners",
+          "source_stock_name": "Thorny Fasteners",
+          "item_name_id": 932,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price from the Legacy ClientItemDefinitions Cost; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "video",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "client_and_video",
+            "client_string_id": 3250596704,
+            "video": "2fhn8kePbKQ/00636",
+            "claim": "Smithy Merchandise buys four Thorny Fasteners from Bruno Battlerock; the video tracker reads 'Fasteners - 1/4'."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "8e31fd0b67d960fd55b8072a8337984b0d8e72f697265d548420715aebbdd972",
+            "name_id": 932,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "{n}Thorny Fasteners{pl=\"Thorny Fasteners\"}",
+            "mapping_policy": "(R) unique exact default locale display-name match; no fuzzy spelling or item-family substitution."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 56,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true
+        },
+        {
+          "item_id": 879,
+          "item_name": "Singing Coal",
+          "source_stock_name": "Singing Coal",
+          "item_name_id": 878,
+          "purchase_price_coins": 12,
+          "member_price_coins": 10,
+          "sell_price_coins": 6,
+          "member_only": null,
+          "price_basis": "(R) stores.json reference price from the Legacy ClientItemDefinitions Cost; no captured retail NPC quote.",
+          "source_tags": [
+            "client",
+            "catalogue",
+            "stores"
+          ],
+          "stock_source": {
+            "kind": "client",
+            "client_string_ids": [
+              798476908,
+              860037929
+            ],
+            "claim": "Smelting text tells the player to buy Singing Coal from Bruno Battlerock; the guide also places Singing Coal in his stall."
+          },
+          "item_source": {
+            "kind": "catalogue_with_client_locale",
+            "path": "../lab/reports/item-catalogue-20261015/catalogue.json",
+            "catalogue_source": "legacy+client-if-present",
+            "catalogue_row_sha256": "e7de601a47d3b3495f3385bb4071453fde9dbaa5700f7f1425a801cebfe40c3d",
+            "name_id": 878,
+            "english_locale_path": "../lab/reports/locale-id-to-text.json",
+            "english_text": "Singing Coal",
+            "mapping_policy": "(R) unique exact default locale display-name match; no fuzzy spelling or item-family substitution."
+          },
+          "price_source": {
+            "kind": "stores.json",
+            "item_id": 879,
+            "scope": "(R) reference price, not captured NPC quote"
+          },
+          "runtime_eligible": true
+        }
+      ]
     },
     {
       "npc_id": 9000000027,

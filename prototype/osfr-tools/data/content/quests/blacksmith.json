@@ -96,13 +96,67 @@
     },
     {
       "id": 3020003,
+      "job": 16,
       "title_string_id": 90071,
       "giver_npc_id": 9000000206,
-      "prerequisite_quest_ids": [
-        3020002
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "zone_id": 0,
+          "position": [
+            357.5478,
+            48.41536,
+            321.7513
+          ],
+          "radius": 8.0,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md row 3: client 3250596704 'Speak to Bruno Battlerock to purchase Thorny Fasteners and Wooden Planks, then return to Smitty.'; sub-goals 1315833944, 3402659729 and 2238986354. Notes other columns place Bruno at the Snowhill forge supply stall."
+            },
+            {
+              "kind": "video",
+              "evidence": "2fhn8kePbKQ/00636 and /00642 show the tracker on Bruno with 'Fasteners - 1/4' and the Wooden Planks goal complete; /00612 shows the 'Crafting Supplies' title."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T274: the guide's literal purchase is represented by a visit to Bruno's stall because the 66/43 route sets the inventory and returns without raising an inventory quest event; radius 8.0 covers the stall counter."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000206,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md row 3: 'then return to Smitty' (client 3857116118); end text 90073."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T274: one ordered Talk to the giver 9000000206 completes the return step; objective id 2."
+            }
+          ]
+        }
       ],
-      "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "16": 20
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T274: the retained guide and video give no quest reward; five coins follows the existing small final-era fallback and 20 Blacksmith (profile 16) job XP is a small local rung."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -126,7 +180,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T274: objectives are one visit_position at Bruno Battlerock's stall and one talk_to_npc back to Smitty; no collect_item, because the 66/43 vendor route sets the inventory and returns without raising an inventory quest event (src/gameplay/npc.rs)."
         },
         {
           "kind": "reconstructed",
@@ -134,21 +188,25 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) source explicitly says after row 2; mapped that page label to the preceding batch content key"
+          "evidence": "(R) T274: 3020002 (Basics of Blacksmithing, the job unlock) stays disabled, so it is dropped as the prerequisite and this is the playtest entry order."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T274: reward is 5 coins and 20 Blacksmith (profile 16) job XP; the guide and video give no reward and no item is granted."
         },
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "video",
+          "evidence": "2fhn8kePbKQ/00630 offer panel; /00636, /00642 and /00648 quest tracker with the 'Fasteners - 1/4' counter and the Wooden Planks goal complete."
         }
       ],
       "description_string_id": 90072,
       "intro_text_string_id": 90070,
       "end_text_string_id": 90073,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3020004,
@@ -204,13 +262,63 @@
     },
     {
       "id": 3020005,
+      "job": 16,
       "title_string_id": 90735,
       "giver_npc_id": 9000000206,
       "prerequisite_quest_ids": [
-        3020004
+        3020003
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000220,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md row 5: 'Find out why Trixi at the Singing Crystal Mines in Snowhill canceled her rush order of pickaxes.' (2062556846); Trixi's answer (4265215633)."
+            },
+            {
+              "kind": "video",
+              "evidence": "wstXCsranVg/00142 and /00230 place Trixi in the Snowhill copper mine tunnel."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T274: one ordered Talk to Trixi 9000000220; objective id 1."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000206,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md row 5: 'Return to Smitty and let him know why Trixi canceled her order.' (4121257363); end text 90737."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T274: one ordered Talk back to the giver 9000000206; objective id 2."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "16": 20
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T274: the retained guide and video give no quest reward; five coins follows the existing small final-era fallback and 20 Blacksmith (profile 16) job XP is a small local rung."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -219,6 +327,10 @@
         {
           "kind": "wiki",
           "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md: Quest line > Band 0: entry (Sanctuary and Snowhill), row 5; name 'Blacksmith: Curious Cancelation (wiki: \"Curious Cancellation\")'; title id cell ucdt 271643501 / ugdt 1344051312; bare 3395901477. A pre-release copy \"NOT LIVE - Curious Cancelation\" (3828575163, 387494659) is also in the client."
+        },
+        {
+          "kind": "video",
+          "evidence": "wstXCsranVg/00142 and /00230 show Trixi as the green-marker NPC in the Snowhill copper mine tunnel that the guide names for this step."
         },
         {
           "kind": "reconstructed",
@@ -230,7 +342,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T274: two ordered talk_to_npc steps, Trixi 9000000220 then Smitty 9000000206."
         },
         {
           "kind": "reconstructed",
@@ -238,11 +350,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) source explicitly says after row 4; mapped that page label to the preceding batch content key"
+          "evidence": "(R) T274: prerequisite repointed from the disabled 3020004 (Hammer Training) to 3020003 so the first playable Blacksmith order leads into this quest; 3020004 stays disabled."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T274: reward is 5 coins and 20 Blacksmith (profile 16) job XP; the guide gives no reward and no item is granted."
         },
         {
           "kind": "reconstructed",
@@ -252,7 +364,7 @@
       "description_string_id": 90736,
       "intro_text_string_id": 90734,
       "end_text_string_id": 90737,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3020006,

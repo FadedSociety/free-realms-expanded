@@ -52,6 +52,9 @@
   "ride_price_policy": {"coins_per_sc": 20, "round_to_coins": 50, "min_coins": 2000, "max_coins": 30000, "member_discount_percent": 10, "note": "(R) W169: Station Cash is not sold here; rides cost coins at this rate. Edit a row to retune one ride, or coins_per_sc and rerun lab/runs/claude/W169/apply_ride_sources.py. Rows must stay within min_coins..max_coins."},
   "items": [
     {"item_id":2,"category_id":101,"tint_group_id":1,"purchase_price_coins":320,"member_discount_percent":10,"member_price_coins":288,"sell_price_coins":160,"no_sale":false,"source_tags":["L1","L2","L4","R2","R3","R1"]},
+    {"item_id":55,"category_id":16,"tint_group_id":null,"purchase_price_coins":12,"member_discount_percent":10,"member_price_coins":10,"sell_price_coins":6,"no_sale":false,"source_tags":["L2","L4","R2","R3","R1"]},
+    {"item_id":56,"category_id":16,"tint_group_id":null,"purchase_price_coins":12,"member_discount_percent":10,"member_price_coins":10,"sell_price_coins":6,"no_sale":false,"source_tags":["L2","L4","R2","R3","R1"]},
+    {"item_id":879,"category_id":16,"tint_group_id":null,"purchase_price_coins":12,"member_discount_percent":10,"member_price_coins":10,"sell_price_coins":6,"no_sale":false,"source_tags":["L2","L4","R2","R3","R1"]},
     {"item_id":3,"category_id":101,"tint_group_id":2,"purchase_price_coins":320,"member_discount_percent":10,"member_price_coins":288,"sell_price_coins":160,"no_sale":false,"source_tags":["L1","L2","L4","R2","R3","R1"]},
     {"item_id":4,"category_id":101,"tint_group_id":1,"purchase_price_coins":828,"member_discount_percent":10,"member_price_coins":745,"sell_price_coins":414,"no_sale":false,"source_tags":["L1","L2","L4","R2","R3","R1"]},
     {"item_id":5,"category_id":101,"tint_group_id":3,"purchase_price_coins":320,"member_discount_percent":10,"member_price_coins":288,"sell_price_coins":160,"no_sale":false,"source_tags":["L1","L2","L4","R2","R3","R1"]},
