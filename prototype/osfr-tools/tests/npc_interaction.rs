@@ -513,6 +513,55 @@ fn merchant_buy_66_43_is_parsed_only_for_an_open_vendor_session() {
     ));
 }
 
+/// A `vendors.json` mapping authorizes its own stock. The NPC `vendor` role only classifies
+/// the menu, so content regeneration that drops the role must not make the vendor record
+/// unloadable (the T274 review's failure mode).
+#[test]
+fn a_vendor_mapping_authorizes_stock_without_the_content_role() {
+    let root = std::env::temp_dir().join(format!(
+        "osfr-vendor-role-{}-{VENDOR_ID}",
+        std::process::id()
+    ));
+    let _ = std::fs::remove_dir_all(&root);
+    std::fs::create_dir_all(root.join("npcs")).expect("fixture NPC directory");
+    std::fs::write(
+        root.join("npcs/fixture.json"),
+        br#"{"schema_version":1,"records":[{"npc_id":9500000339,"name":"Fixture","zone_id":0,"position":[0.0,0.0,0.0],"roles":["ambient"],"vendor_stock":"synthetic"}]}"#,
+    )
+    .expect("fixture NPC writes");
+    std::fs::write(
+        root.join("vendors.json"),
+        br#"{"schema_version":1,"vendors":[{"npc_id":9500000339,"item_ids":[8]}]}"#,
+    )
+    .expect("fixture vendor writes");
+    std::fs::write(
+        root.join("stores.json"),
+        br#"{"schema_version":1,"items":[{"item_id":8,"purchase_price_coins":15,"sell_price_coins":7}]}"#,
+    )
+    .expect("fixture store writes");
+
+    let mut service = NpcInteraction::load(&root.join("npcs"), &root.join("stores.json"))
+        .expect("the explicit mapping authorizes stock without the content role");
+    let menu = service
+        .interact(VENDOR_ID, 0, [0.0; 3], None)
+        .expect("the role-less vendor opens its menu");
+    let shop = menu
+        .options
+        .iter()
+        .find(|option| option.action == NpcAction::Shop)
+        .expect("the mapping adds the Shop action");
+    let NpcSelection::Shop(window) = service
+        .select(&request_selection(VENDOR_ID, shop.id), 0, [0.0; 3], None)
+        .expect("the Shop choice opens the mapped stock")
+    else {
+        panic!("the Shop option selected a non-shop action");
+    };
+    assert_eq!(window.items.len(), 1);
+    assert_eq!(window.items[0].item_id, 8);
+    assert_eq!(window.items[0].purchase_price_coins, Some(15));
+    let _ = std::fs::remove_dir_all(&root);
+}
+
 #[test]
 fn dialogue_includes_goodbye_action_and_native_close_bytes() {
     let packet = encode_dialogue_26_3(&DialoguePacket26_3 {

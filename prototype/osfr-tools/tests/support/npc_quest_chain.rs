@@ -365,6 +365,22 @@ pub fn release_end_screen(
     end
 }
 
+/// The 49/13 reward bundle's leading end-screen words. `QuestEndPacket::ReadFields`
+/// (`00c7b990`) reads the actor at `6..14`, quest id at `14..18`, end text at `18..22`, the
+/// animation dword at `22..26`, then calls the reward bundle reader (`008e7930`): a bool at
+/// `26`, coins at `27..31`, and the stars total at `31..35` (the sum of the quest's job XP,
+/// not one profile's).
+pub fn end_screen_reward(end: &[u8]) -> (u32, u32) {
+    assert!(
+        end.len() >= 35,
+        "a 49/13 packet carries the reward bundle's coin and star words"
+    );
+    (
+        u32::from_le_bytes(end[27..31].try_into().unwrap()),
+        u32::from_le_bytes(end[31..35].try_into().unwrap()),
+    )
+}
+
 /// The ending profile is explicit: a quest's reward map names its own job, which
 /// need not be the profile the character has active at turn-in.
 pub fn finish_quest(
@@ -436,13 +452,15 @@ pub fn profile_xp(game: &Gameplay, profile: i32) -> u32 {
         .unwrap_or(0)
 }
 
+/// The serialized `GameplayState`, not the character-store save envelope. Use it to compare
+/// two in-memory sessions; a save-file claim needs the real store round trip.
 pub fn saved(game: &Gameplay) -> Vec<u8> {
     serde_json::to_vec(&game.state()).unwrap()
 }
 
 /// A Talk with nothing eligible must not offer, complete or mutate anything: the
 /// open 26/9 menu stays usable, the 26/6 choice releases no offer or end screen,
-/// and the save bytes stay equal.
+/// and the serialized state stays equal.
 pub fn assert_no_offer(
     game: &mut Gameplay,
     character: &CharacterState,
@@ -490,7 +508,7 @@ pub fn assert_no_offer(
     assert_eq!(
         saved(game),
         before,
-        "{label}: the refusal changed the save bytes"
+        "{label}: the refusal changed the serialized state"
     );
 }
 
@@ -511,5 +529,5 @@ pub fn assert_packet_changes_nothing(
             .any(|reply| has_family(reply, 49, 3, None) || has_family(reply, 49, 4, None)),
         "{label} completed or added a quest"
     );
-    assert_eq!(saved(game), before, "{label} changed the save bytes");
+    assert_eq!(saved(game), before, "{label} changed the serialized state");
 }

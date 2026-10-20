@@ -4641,8 +4641,8 @@
       ],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
-      "vendor_stock": null,
-      "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
+      "vendor_stock": "Crafting Supplies: Thorny Fasteners, Wooden Planks and Singing Coal (Blacksmith.md row 3; client 3250596704, 798476908, 860037929; video 2fhn8kePbKQ/00612).",
+      "vendor_stock_reason": null,
       "services": [
         "Thorny Fasteners, Wooden Planks (client 3250596704), Singing Coal (client 798476908, 860037929)."
       ],
@@ -4867,7 +4867,7 @@
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) T274: the vendor role authorizes the vendors.json stock mapping required by src/npc_interaction.rs; the client strings and the video stall establish that Bruno sells these components."
+            "evidence": "(R) T274: the vendor role classifies Bruno's stall; the explicit vendors.json item mapping authorizes the stock (src/npc_interaction.rs). The client strings and the video stall establish that he sells these components."
           }
         ],
         "enemy_kind": [
@@ -4926,18 +4926,18 @@
         ],
         "vendor_stock": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) The page provides no vendor stock for this NPC."
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Jobs/Blacksmith.md row 3 (client 1315833944, 2238986354) names Thorny Fasteners and Wooden Planks from Bruno; client 798476908 and 860037929 name Singing Coal from Bruno."
+          },
+          {
+            "kind": "video",
+            "evidence": "2fhn8kePbKQ/00612 shows Bruno's crafting supplies stall at the Snowhill forge."
           }
         ],
         "vendor_stock_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Singing Crystal Mines and the forge, row 47; source cell: [client][video]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Singing Crystal Mines and the forge, row 47; source cell: [client][video]"
+            "kind": "reconstructed",
+            "evidence": "(R) T274: no single source cell lists all three; the stock is the Blacksmith guide row plus the Snowhill NPC guide row and the video stall."
           }
         ],
         "services": [

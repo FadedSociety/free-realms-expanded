@@ -14,14 +14,14 @@
 //! - 26/6 dialogue response: reader `009f5890`; i32 row (301 is the quest row).
 //! - 49/1 offer: reader `00c7bb60`; 49/2 accept: constructor `00a86400`.
 //! - 49/13 end screen: `00c7bbd0`/`00c7b990` (actor 6..14, quest 14..18, end text 18..22,
-//!   reward bundle from 26); 49/14 end reply: constructor `00a864c0`.
+//!   reward bundle from 26; `008e7930` reads the coin word at 27..31 and the star total at
+//!   31..35); 49/14 end reply: constructor `00a864c0`.
 //! - 66/42 list: `00b48a10` -> `00b40a60` -> `00b3d5f0`; 66/43 buy: serializer `00b3ab20`;
 //!   66/44 result: reader `00b32430`, status dword at wire offset 48.
 //!
 //! The shared quest fixture and packet helpers live in `tests/support/npc_quest_chain.rs`; the
 //! vendor packet and result decoders live in `tests/common/gateway_vendor.rs`.
-#![allow(dead_code, unused_imports)]
-
+#[allow(dead_code, unused_imports)] // The shared vendor kit carries helpers this suite does not send.
 #[path = "common/gateway_vendor.rs"]
 mod gateway_vendor;
 #[path = "support/npc_quest_chain.rs"]
@@ -30,9 +30,10 @@ mod npc_quest_chain;
 use gateway_vendor::{count_definition, merchant_status, vendor_buy_packet};
 use npc_quest_chain::{
     CHARACTER, Fixture, accept, assert_no_offer, assert_packet_changes_nothing, character_at_for,
-    coins, content_dir, content_position, counts, finish_quest, has_family, interact, menu_option,
-    npc_interact, npc_select, offer, pending_offer, pending_turnin, profile_xp, quest_end_reply,
-    quest_reply, quest_status, read_json, release_end_screen, saved, select_job, send, talk_step,
+    coins, content_dir, content_position, counts, end_screen_reward, finish_quest, has_family,
+    interact, menu_option, npc_interact, npc_select, offer, pending_offer, pending_turnin,
+    profile_xp, quest_end_reply, quest_reply, quest_status, read_json, release_end_screen, saved,
+    select_job, send, talk_step,
 };
 use osfr_tools::{
     character_store::CharacterState,
@@ -153,18 +154,40 @@ fn result_status(outcome: &Outcome) -> u32 {
     )
 }
 
-/// A refusal must leave both the serialized save and the full typed `GameplayState` equal.
-fn snapshot(game: &Gameplay) -> (GameplayState, Vec<u8>) {
-    (game.state(), saved(game))
+/// A refused 66/43 must answer 66/44 false, report no change, and leave the full typed state
+/// equal. `!outcome.changed` is what keeps the gateway from writing a save for the refusal.
+fn assert_buy_refused(
+    game: &mut Gameplay,
+    target: &CharacterState,
+    transaction: u32,
+    item_id: i32,
+    quantity: u32,
+    now: u64,
+    label: &str,
+) {
+    let before = snapshot(game);
+    let refused = buy(game, target, transaction, item_id, quantity, now);
+    assert!(!refused.changed, "{label}: the refusal reported a change");
+    assert_eq!(
+        result_status(&refused),
+        0,
+        "{label}: the client was told the buy succeeded"
+    );
+    assert_unchanged(game, &before, label);
 }
 
-fn assert_unchanged(game: &Gameplay, before: &(GameplayState, Vec<u8>), label: &str) {
+/// A refusal must leave the full typed `GameplayState` equal. `saved` serializes the same
+/// state for cross-session comparisons; it is not the character-store envelope.
+fn snapshot(game: &Gameplay) -> GameplayState {
+    game.state()
+}
+
+fn assert_unchanged(game: &Gameplay, before: &GameplayState, label: &str) {
     assert_eq!(
         &game.state(),
-        &before.0,
+        before,
         "{label}: the full gameplay state changed"
     );
-    assert_eq!(&saved(game), &before.1, "{label}: the save bytes changed");
 }
 
 fn assert_no_offer_without_change(
@@ -207,9 +230,9 @@ fn finish_merchandise(game: &mut Gameplay, smitty: &CharacterState, now: &mut u6
         *now,
     );
     assert_eq!(
-        i32::from_le_bytes(end[31..35].try_into().unwrap()),
-        20,
-        "the end screen displays the configured Blacksmith job XP"
+        end_screen_reward(&end),
+        (5, 20),
+        "the end screen displays the configured 5 coins and 20 Blacksmith job-XP total"
     );
     *now += 10;
     finish_quest(game, smitty, MERCHANDISE, BLACKSMITH, 5, 20, *now);
@@ -331,7 +354,7 @@ fn the_supply_visit_and_the_vendor_purchase_pay_once() {
     );
     assert_eq!(count_definition(&game.state().inventory, WOODEN_PLANKS), 4);
 
-    // A replayed 49/14 pays nothing and changes no save byte.
+    // A replayed 49/14 pays nothing and changes no gameplay state.
     now += 10;
     assert_packet_refused_without_change(
         &mut game,
@@ -352,6 +375,18 @@ fn the_cancelation_talk_chain_pays_once() {
     let mut now = 3_000;
 
     accept_merchandise(&mut game, &smitty, &mut now);
+
+    // 3020005's prerequisite is 3020003: while 3020003 is only active, Smitty must not offer
+    // the later order. This throws away the earlier accept gate, so the offer check itself
+    // must refuse (a cleared prerequisite would fail here).
+    assert_no_offer_without_change(
+        &mut game,
+        &smitty,
+        SMITTY,
+        &mut now,
+        "3020005 before 3020003 completes",
+    );
+
     now += 10;
     visit_bruno(&mut game, &bruno, now);
     finish_merchandise(&mut game, &smitty, &mut now);
@@ -475,17 +510,32 @@ fn refusals_and_reconnect_change_nothing() {
     );
     assert_unchanged(&out_of_range, &before, "out-of-range 26/8");
 
-    // Insufficient coins: the 66/44 refusal is answered and nothing changes.
-    let mut poor = blacksmith_game(&fixture, CHARACTER + 4, 4);
+    // Insufficient coins: buying two costs 24 against a 20-coin wallet, so the 66/44 refusal
+    // answers and changes nothing. The same open shop then sells one for 12, proving the
+    // refusal did not consume the shop.
+    let mut poor = blacksmith_game(&fixture, CHARACTER + 4, 20);
     accept_merchandise(&mut poor, &smitty, &mut now);
     poor.on_location(&bruno, now).expect("location event");
     merchant_list(&mut poor, &bruno, now + 1);
-    let before = snapshot(&poor);
-    let refused = buy(&mut poor, &bruno, 91_010, THORNY_FASTENERS, 1, now + 2);
-    assert_eq!(result_status(&refused), 0);
-    assert_unchanged(&poor, &before, "insufficient coins");
+    assert_buy_refused(
+        &mut poor,
+        &bruno,
+        91_010,
+        THORNY_FASTENERS,
+        2,
+        now + 2,
+        "insufficient coins",
+    );
+    let bought = buy(&mut poor, &bruno, 91_015, THORNY_FASTENERS, 1, now + 3);
+    assert_eq!(result_status(&bought), 1, "the refusal closed the shop");
+    assert_eq!(coins(&poor), 20 - UNIT_PRICE);
+    assert_eq!(
+        count_definition(&poor.state().inventory, THORNY_FASTENERS),
+        1
+    );
 
-    // Full bag: a new stack would exceed the 100-stack capacity, so the same buy is refused.
+    // Full bag: 100 stacks refuse a new stack, but the open shop still merges a stack of the
+    // same item, proving the refusal did not consume it.
     let mut full_state = blacksmith_state(&fixture, CHARACTER + 5, 100);
     full_state.inventory.items.clear();
     for entry in &mut full_state.inventory.equipment {
@@ -494,7 +544,11 @@ fn refusals_and_reconnect_change_nothing() {
     for id in 100_000..100_100 {
         full_state.inventory.items.push(InventoryItem {
             id,
-            definition_id: 21_496,
+            definition_id: if id == 100_000 {
+                THORNY_FASTENERS
+            } else {
+                21_496
+            },
             tint: 0,
             count: 1,
             consumed_count: 0,
@@ -510,23 +564,63 @@ fn refusals_and_reconnect_change_nothing() {
     accept_merchandise(&mut full, &smitty, &mut now);
     full.on_location(&bruno, now).expect("location event");
     merchant_list(&mut full, &bruno, now + 1);
-    let before = snapshot(&full);
-    let refused = buy(&mut full, &bruno, 91_011, THORNY_FASTENERS, 1, now + 2);
-    assert_eq!(result_status(&refused), 0);
-    assert_unchanged(&full, &before, "full bag");
+    assert_buy_refused(
+        &mut full,
+        &bruno,
+        91_011,
+        WOODEN_PLANKS,
+        1,
+        now + 2,
+        "full bag",
+    );
+    let merged = buy(&mut full, &bruno, 91_016, THORNY_FASTENERS, 1, now + 3);
+    assert_eq!(result_status(&merged), 1, "the refusal closed the shop");
+    assert_eq!(
+        count_definition(&full.state().inventory, THORNY_FASTENERS),
+        2
+    );
 
-    // Unknown item and zero quantity are refused through the same open shop.
+    // Unknown item, zero quantity and an oversized quantity are refused through the same
+    // open shop; a valid buy afterwards proves the shop survived all three.
     let buyer = spot(CHARACTER + 6, BRUNO);
     let mut game = blacksmith_game(&fixture, CHARACTER + 6, 100);
     accept_merchandise(&mut game, &smitty, &mut now);
     game.on_location(&buyer, now).expect("location event");
     merchant_list(&mut game, &buyer, now + 1);
-    let before = snapshot(&game);
-    let unknown = buy(&mut game, &buyer, 91_012, i32::MAX, 1, now + 2);
-    assert_eq!(result_status(&unknown), 0);
-    let zero = buy(&mut game, &buyer, 91_013, THORNY_FASTENERS, 0, now + 3);
-    assert_eq!(result_status(&zero), 0);
-    assert_unchanged(&game, &before, "invalid buy");
+    assert_buy_refused(
+        &mut game,
+        &buyer,
+        91_012,
+        i32::MAX,
+        1,
+        now + 2,
+        "unknown item",
+    );
+    assert_buy_refused(
+        &mut game,
+        &buyer,
+        91_013,
+        THORNY_FASTENERS,
+        0,
+        now + 3,
+        "zero quantity",
+    );
+    assert_buy_refused(
+        &mut game,
+        &buyer,
+        91_017,
+        THORNY_FASTENERS,
+        u32::MAX,
+        now + 4,
+        "oversized quantity",
+    );
+    let valid = buy(&mut game, &buyer, 91_018, THORNY_FASTENERS, 1, now + 5);
+    assert_eq!(result_status(&valid), 1, "the refusal closed the shop");
+    assert_eq!(coins(&game), 100 - UNIT_PRICE);
+    assert_eq!(
+        count_definition(&game.state().inventory, THORNY_FASTENERS),
+        1
+    );
 
     // A mid-quest reconnect keeps the visit counter and the bought components, and the quest
     // still pays exactly once after the reload.
@@ -578,6 +672,22 @@ fn bruno_sells_exactly_the_three_recovered_components() {
     );
     let items = record["items"].as_array().expect("items are an array");
     assert_eq!(items.len(), 3, "no fourth component is invented");
+
+    // The NPC row must agree with the vendor record instead of claiming no stock (T274 MINOR 2).
+    let snowhill = read_json(&content.join("npcs/snowhill.json"));
+    let bruno = snowhill["records"]
+        .as_array()
+        .expect("NPC records are an array")
+        .iter()
+        .find(|npc| npc["npc_id"].as_u64() == Some(BRUNO))
+        .expect("Bruno is a positioned Snowhill NPC");
+    let stock = bruno["vendor_stock"]
+        .as_str()
+        .expect("Bruno's record carries the recovered stock, not null");
+    for name in ["Thorny Fasteners", "Wooden Planks", "Singing Coal"] {
+        assert!(stock.contains(name), "vendor_stock names {name}");
+    }
+    assert!(bruno["vendor_stock_reason"].is_null());
 
     let catalogue = Inventory::load(fixture.path(), None).expect("the runtime catalogue loads");
     let stores = read_json(&content.join("stores.json"));
@@ -646,6 +756,13 @@ fn bruno_sells_exactly_the_three_recovered_components() {
     let ids: BTreeSet<i32> = window.items.iter().map(|item| item.item_id).collect();
     assert_eq!(ids, [WOODEN_PLANKS, THORNY_FASTENERS, SINGING_COAL].into());
     assert_eq!(window.items.len(), 3, "no fourth item in 66/42");
+    assert!(
+        window
+            .stock_description
+            .as_deref()
+            .is_some_and(|text| text.contains("Thorny Fasteners")),
+        "the 66/42 window carries Bruno's recovered stock description"
+    );
     for item in window.items {
         assert_eq!(item.purchase_price_coins, Some(UNIT_PRICE));
     }
@@ -733,7 +850,7 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
     b.on_location(&bruno_b, now).expect("location event");
 
     // A's stale events fail for A only: a turn-in with no end screen, a stale accept and a
-    // malformed NPC request. A's full state and save are unchanged after every refusal.
+    // malformed NPC request. A's full state is unchanged after every refusal.
     let before = snapshot(&a);
     let stale_turnin = send(&mut a, &smitty_a, &quest_end_reply(MERCHANDISE), now + 1);
     assert!(!stale_turnin.changed);

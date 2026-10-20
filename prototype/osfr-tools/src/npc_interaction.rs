@@ -248,6 +248,8 @@ struct ActiveInteraction {
 struct NpcContent {
     npcs: BTreeMap<u64, NpcRecord>,
     prices: BTreeMap<i32, StorePrice>,
+    /// (R) The explicit `vendors.json` mapping authorizes an NPC's priced stock; the NPC
+    /// `vendor` role only classifies the menu (see `build_options`).
     vendor_items: BTreeMap<u64, BTreeSet<i32>>,
     /// (R) NPCs whose menu lists the kart race, and the label's locale id.
     race_gates: BTreeSet<u64>,
@@ -345,15 +347,15 @@ impl NpcInteraction {
         let mut vendor_items = BTreeMap::new();
         let mut total_vendor_items = 0usize;
         for vendor in vendor_file.vendors {
-            let npc = npcs
-                .get(&vendor.npc_id)
-                .ok_or_else(|| invalid("vendor stock references an unknown NPC"))?;
+            if !npcs.contains_key(&vendor.npc_id) {
+                return Err(invalid("vendor stock references an unknown NPC"));
+            }
             let item_count = vendor.item_ids.len();
             total_vendor_items = total_vendor_items.saturating_add(item_count);
-            // (R) This content role and explicit item list authorize which NPC may sell which
-            // priced items. The native client does not provide this server authorization rule.
-            if !has_role(npc, NpcRole::Vendor)
-                || total_vendor_items > MAX_VENDOR_ITEMS
+            // (R) The explicit vendors.json item list authorizes which priced items an NPC may
+            // sell. The `vendor` role only classifies the menu, so content regeneration that
+            // drops the role cannot make the vendor record unloadable.
+            if total_vendor_items > MAX_VENDOR_ITEMS
                 || vendor
                     .item_ids
                     .iter()
@@ -837,7 +839,9 @@ impl NpcInteraction {
                 ));
             }
         }
-        if has_role(npc, NpcRole::Vendor) {
+        // (R) A vendors.json mapping authorizes its own stock window; the content role keeps the
+        // menu for evidence-only vendors with no mapping (they open an empty window).
+        if has_role(npc, NpcRole::Vendor) || self.content.vendor_items.contains_key(&npc.npc_id) {
             options.push((NpcAction::Shop, SHOP_STRING_ID));
         }
         if self.content.race_gates.contains(&npc.npc_id) {
