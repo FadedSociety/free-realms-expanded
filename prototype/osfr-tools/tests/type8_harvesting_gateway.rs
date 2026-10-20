@@ -5,6 +5,8 @@
 //! file is written. Harvesting stays an unregistered opt-in candidate for Chef45.
 
 use osfr_tools::{
+    character_store::CharacterState,
+    encounter::EncounterEngine,
     game_store,
     gameplay::{Gameplay, GameplayState},
     gateway::{Gateway, GatewayOutcome},
@@ -516,6 +518,112 @@ fn wrong_or_locked_chef_profile_is_refused() {
         "an unlocked Chef is required even with dev tools on"
     );
     assert!(active_instance(&gateway).is_none());
+}
+
+#[test]
+fn developer_gather_refuses_when_harvesting_content_is_absent() {
+    let fixture = Fixture::new(&winning_spec());
+    fs::remove_file(fixture.directory.join(CONTENT_FILE)).unwrap();
+    let mut gateway = fixture.gateway(fixture.chef_state(), true);
+    let before = gateway.snapshot();
+    let outcome = say(&mut gateway, "realm harvest", 2_000);
+    assert_eq!(
+        chat_text(&outcome).trim_end(),
+        "Harvesting content is not loaded in this campaign."
+    );
+    assert!(active_instance(&gateway).is_none());
+    assert_eq!(gateway.snapshot(), before);
+}
+
+#[test]
+fn the_reachable_harvesting_strings_are_byte_identical() {
+    let fixture = Fixture::new(&winning_spec());
+
+    // Content absent.
+    let missing = Fixture::new(&winning_spec());
+    fs::remove_file(missing.directory.join(CONTENT_FILE)).unwrap();
+    let mut gateway = missing.gateway(missing.chef_state(), true);
+    assert_eq!(
+        chat_text(&say(&mut gateway, "realm harvest", 2_000)).trim_end(),
+        "Harvesting content is not loaded in this campaign."
+    );
+
+    // Finish-first: one live encounter.
+    let state = encounter_state(&fixture);
+    let mut gateway = gateway_in_encounter(&fixture, state);
+    assert_eq!(
+        chat_text(&say(&mut gateway, "realm harvest", 2_000)).trim_end(),
+        "Finish or exit the active activity before starting the harvesting test."
+    );
+
+    // The job is not unlocked.
+    let mut locked = fixture.chef_state();
+    locked.profiles.as_mut().unwrap().active = 1;
+    locked
+        .profiles
+        .as_mut()
+        .unwrap()
+        .unlocked
+        .remove(&CHEF_PROFILE_ID);
+    let mut gateway = fixture.gateway(locked, true);
+    assert_eq!(
+        chat_text(&say(&mut gateway, "realm harvest", 2_000)).trim_end(),
+        "The Chef job is not unlocked in this save."
+    );
+
+    // Unlocked but not the active job.
+    let mut wrong = fixture.chef_state();
+    wrong.profiles.as_mut().unwrap().active = 1;
+    let mut gateway = fixture.gateway(wrong, true);
+    assert_eq!(
+        chat_text(&say(&mut gateway, "realm harvest", 2_000)).trim_end(),
+        "Switch to the Chef job before starting the harvesting test."
+    );
+
+    // Started.
+    let mut gateway = fixture.gateway(fixture.chef_state(), true);
+    assert_eq!(
+        chat_text(&say(&mut gateway, "realm harvest", 2_000)).trim_end(),
+        "Harvesting test started; type realm exit to cancel."
+    );
+}
+
+/// One live dungeon encounter built from the fixture's own `encounters.json`.
+fn encounter_state(fixture: &Fixture) -> GameplayState {
+    let mut state = fixture.chef_state();
+    let mut encounter = EncounterEngine::load(&fixture.directory, None).unwrap();
+    encounter
+        .begin(
+            411,
+            CharacterState {
+                guid: 1,
+                zone_id: 0,
+                position: [9.0, 2.0, 3.0],
+                rotation: [0.0, 0.0, 1.0],
+            },
+            CHEF_PROFILE_ID,
+        )
+        .expect("fixture encounter begins");
+    state.encounter = Some(encounter.state().clone());
+    state
+}
+
+/// A dev-tools gateway whose character stands in the arena zone of the active encounter.
+fn gateway_in_encounter(fixture: &Fixture, state: GameplayState) -> Gateway {
+    let mut character = Gateway::reference_state(&fixture.reference).unwrap();
+    character.zone_id = 411;
+    character.position = [0.0, 0.0, 0.0];
+    let mut gateway = Gateway::load_gameplay(
+        &fixture.reference,
+        character,
+        &fixture.directory,
+        Some(state),
+    )
+    .unwrap();
+    gateway.set_dev_tools(true);
+    gateway.set_role(osfr_tools::account_store::AccountRole::Admin);
+    login(&mut gateway);
+    gateway
 }
 
 #[test]

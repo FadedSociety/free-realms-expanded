@@ -1310,3 +1310,47 @@ fn game_without_job(kind: ObjectiveKind) -> Gameplay {
     install(&mut game, kind, 1);
     game
 }
+
+#[test]
+fn a_failed_begin_leaves_no_clock_or_engine_state() {
+    let (mut game, scratch) = gathering_game(
+        mining::MINER_PROFILE_ID,
+        1,
+        definition(1, ObjectiveKind::GatherResource { resource_id: 2739 }, 1),
+    );
+    let mut state = game.state().mining.expect("synthetic mining state");
+    // An exhausted instance allocator passes every live guard, then `begin` refuses.
+    state.next_instance_id = i32::MAX;
+    game.mining = Some(
+        Type8Engine::load(
+            &scratch.0,
+            mining::CONTENT_FILE,
+            mining::MINING_GAME_ID,
+            mining::FIRST_MINING_INSTANCE,
+            Some(state),
+        )
+        .expect("the exhausted mining state loads"),
+    );
+
+    let before = game.state();
+    let mut out = Outcome::default();
+    assert!(
+        game.developer_gather(Gather::Mining, 1_000, &mut out)
+            .is_err(),
+        "an exhausted instance allocator must refuse the begin"
+    );
+    assert!(!out.changed, "a failed begin staged a change");
+    assert!(out.replies.is_empty(), "a failed begin replied");
+    assert_eq!(game.type8_tick_ms, None, "a failed begin stamped the clock");
+    assert!(
+        !game.mining.as_ref().unwrap().active(),
+        "a failed begin left a run live"
+    );
+    assert_eq!(game.state(), before);
+
+    // The absent-engine path refuses before touching the clock as well.
+    game.mining = None;
+    let mut out = Outcome::default();
+    assert!(game.begin_gather(Gather::Mining, 1_000, &mut out).is_err());
+    assert_eq!(game.type8_tick_ms, None);
+}

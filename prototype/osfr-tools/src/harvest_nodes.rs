@@ -116,7 +116,24 @@ impl Gather {
         }
     }
 
-    fn word(self) -> &'static str {
+    /// Lowercase noun for the developer-command sentences.
+    pub(crate) fn noun(self) -> &'static str {
+        match self {
+            Self::Mining => "mining",
+            Self::Harvesting => "harvesting",
+        }
+    }
+
+    /// Capitalised noun for the start of a sentence.
+    pub(crate) fn name(self) -> &'static str {
+        match self {
+            Self::Mining => "Mining",
+            Self::Harvesting => "Harvesting",
+        }
+    }
+
+    /// Capitalised job word used by the NPC refusal messages.
+    pub(crate) fn word(self) -> &'static str {
         match self {
             Self::Mining => "Miner",
             Self::Harvesting => "Chef",

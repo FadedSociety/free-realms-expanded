@@ -2471,8 +2471,9 @@ impl Gameplay {
     }
 
     /// W171 (R): the ordinary way into mining and harvesting. A click (26/8) on one of this
-    /// player's node actors starts the node's Type8 game on a staged copy, so a refusal changes
-    /// nothing. Anything that is not a node falls through to the NPC menu path.
+    /// player's node actors starts the node's Type8 game through [`Self::begin_gather`] on a
+    /// staged copy, so a refusal changes nothing. Anything that is not a node falls through to
+    /// the NPC menu path.
     fn handle_gathering_node(
         &mut self,
         inner: &[u8],
@@ -2519,10 +2520,8 @@ impl Gameplay {
             return Ok(Some(out));
         }
         let mut staged = self.clone();
-        staged.type8_tick_ms = Some(now_ms);
         staged.gathering_nodes.as_mut().unwrap().begin(target);
-        let result = staged.type8_mut(gather).unwrap().begin(gather.job())?;
-        staged.apply_type8(gather, result, &mut out)?;
+        staged.begin_gather(gather, now_ms, &mut out)?;
         *self = staged;
         Ok(Some(out))
     }
@@ -4170,124 +4169,58 @@ impl Gameplay {
         Ok(true)
     }
 
-    /// Developer-only `realm mine`: starts the reconstructed Mining18 board for
-    /// the accepted Miner job. The launcher must have enabled dev tools, the
-    /// Miner job must be unlocked and active, and no other live activity may
-    /// compete. Reward authority stays server-side in `apply_type8`.
-    fn developer_mining(&mut self, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
-        let Some(engine) = self.type8(Gather::Mining) else {
-            out.replies.push(chat::system(
-                "Mining content is not loaded in this campaign.",
-            ));
-            return Ok(());
-        };
-        if engine.active() {
-            out.replies.push(chat::system(
-                "A mining test is already running. Type realm exit to cancel it.",
-            ));
-            return Ok(());
-        }
-        if self.forging.as_ref().is_some_and(Forging::active)
-            || self.smelting.as_ref().is_some_and(Smelting::active)
-            || self.cooking.as_ref().is_some_and(Cooking::active)
-            || self.encounter.as_ref().is_some_and(EncounterEngine::active)
-        {
-            out.replies.push(chat::system(
-                "Finish or exit the active activity before starting the mining test.",
-            ));
-            return Ok(());
-        }
-        let (active, unlocked) = {
-            let profiles = self.profiles.as_ref().unwrap();
-            (
-                profiles.active(),
-                profiles
-                    .state()
-                    .unlocked
-                    .contains(&mining::MINER_PROFILE_ID),
-            )
-        };
-        if !unlocked {
-            out.replies
-                .push(chat::system("The Miner job is not unlocked in this save."));
-            return Ok(());
-        }
-        if active != mining::MINER_PROFILE_ID {
-            out.replies.push(chat::system(
-                "Switch to the Miner job before starting the mining test.",
-            ));
-            return Ok(());
-        }
-        let result = self
-            .type8_mut(Gather::Mining)
-            .unwrap()
-            .begin(mining::MINER_PROFILE_ID)?;
-        self.type8_tick_ms = Some(now_ms);
-        self.apply_type8(Gather::Mining, result, out)?;
-        out.replies.push(chat::system(
-            "Mining test started; type realm exit to cancel.",
-        ));
-        Ok(())
-    }
-
-    /// Developer-only `realm harvest`: starts the reconstructed Harvesting111
-    /// candidate for the accepted Chef job. Dev tools must be enabled, Chef
-    /// must be unlocked and active, and no other live activity may compete.
+    /// Developer-only `realm mine` / `realm harvest`: starts the reconstructed
+    /// Mining18 or Harvesting111 game for the accepted job. The caller has
+    /// already checked dev tools and role, and the movie gate owns any live
+    /// movie. An active encounter is the one busy state this path refuses.
     /// Reward authority stays server-side in `apply_type8`.
-    fn developer_harvesting(&mut self, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
-        let Some(engine) = self.type8(Gather::Harvesting) else {
-            out.replies.push(chat::system(
-                "Harvesting content is not loaded in this campaign.",
-            ));
-            return Ok(());
-        };
-        if engine.active() {
-            out.replies.push(chat::system(
-                "A harvesting test is already running. Type realm exit to cancel it.",
-            ));
+    fn developer_gather(
+        &mut self,
+        gather: Gather,
+        now_ms: u64,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        if self.type8(gather).is_none() {
+            out.replies.push(chat::system(&format!(
+                "{} content is not loaded in this campaign.",
+                gather.name()
+            )));
             return Ok(());
         }
-        if self.forging.as_ref().is_some_and(Forging::active)
-            || self.smelting.as_ref().is_some_and(Smelting::active)
-            || self.cooking.as_ref().is_some_and(Cooking::active)
-            || self.type8(Gather::Mining).is_some_and(Type8Engine::active)
-            || self.encounter.as_ref().is_some_and(EncounterEngine::active)
-        {
-            out.replies.push(chat::system(
-                "Finish or exit the active activity before starting the harvesting test.",
-            ));
+        if self.encounter.as_ref().is_some_and(EncounterEngine::active) {
+            out.replies.push(chat::system(&format!(
+                "Finish or exit the active activity before starting the {} test.",
+                gather.noun()
+            )));
             return Ok(());
         }
         let (active, unlocked) = {
             let profiles = self.profiles.as_ref().unwrap();
             (
                 profiles.active(),
-                profiles
-                    .state()
-                    .unlocked
-                    .contains(&harvesting::CHEF_PROFILE_ID),
+                profiles.state().unlocked.contains(&gather.job()),
             )
         };
         if !unlocked {
-            out.replies
-                .push(chat::system("The Chef job is not unlocked in this save."));
+            out.replies.push(chat::system(&format!(
+                "The {} job is not unlocked in this save.",
+                gather.word()
+            )));
             return Ok(());
         }
-        if active != harvesting::CHEF_PROFILE_ID {
-            out.replies.push(chat::system(
-                "Switch to the Chef job before starting the harvesting test.",
-            ));
+        if active != gather.job() {
+            out.replies.push(chat::system(&format!(
+                "Switch to the {} job before starting the {} test.",
+                gather.word(),
+                gather.noun()
+            )));
             return Ok(());
         }
-        let result = self
-            .type8_mut(Gather::Harvesting)
-            .unwrap()
-            .begin(harvesting::CHEF_PROFILE_ID)?;
-        self.type8_tick_ms = Some(now_ms);
-        self.apply_type8(Gather::Harvesting, result, out)?;
-        out.replies.push(chat::system(
-            "Harvesting test started; type realm exit to cancel.",
-        ));
+        self.begin_gather(gather, now_ms, out)?;
+        out.replies.push(chat::system(&format!(
+            "{} test started; type realm exit to cancel.",
+            gather.name()
+        )));
         Ok(())
     }
 
@@ -4400,6 +4333,18 @@ impl Gameplay {
                 self.apply_type8(Gather::Harvesting, result, out)
             }
         }
+    }
+
+    /// Begins one gather game on the caller's staged clone. The engine starts
+    /// first; only then is the shared clock stamped and the outcome applied. A
+    /// failed begin therefore leaves no clock or engine state behind.
+    fn begin_gather(&mut self, gather: Gather, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
+        let Some(engine) = self.type8_mut(gather) else {
+            return Err(invalid("gathering content is not loaded"));
+        };
+        let result = engine.begin(gather.job())?;
+        self.type8_tick_ms = Some(now_ms);
+        self.apply_type8(gather, result, out)
     }
 
     /// One due Type8 tick; the clock is stamped only after the tick and its
@@ -4520,7 +4465,7 @@ impl Gameplay {
                                 "Developer mining is disabled; start the gateway with --dev-tools to test it.",
                             ));
                         } else {
-                            self.developer_mining(now_ms, &mut out)?;
+                            self.developer_gather(Gather::Mining, now_ms, &mut out)?;
                         }
                     }
                     "harvest" => {
@@ -4529,7 +4474,7 @@ impl Gameplay {
                                 "Developer harvesting is disabled; start the gateway with --dev-tools to test it.",
                             ));
                         } else {
-                            self.developer_harvesting(now_ms, &mut out)?;
+                            self.developer_gather(Gather::Harvesting, now_ms, &mut out)?;
                         }
                     }
                     _ => {

@@ -6,6 +6,7 @@
 //! the synthetic W140 one, the node content is the repository's `data/content`.
 
 use osfr_tools::{
+    account_store::AccountRole,
     character_store::CharacterState,
     game_store,
     gameplay::{Gameplay, GameplayState},
@@ -247,6 +248,15 @@ impl Fixture {
         self.near(self.state(true, true))
     }
 
+    /// Dev tools on, so the `realm mine` / `realm harvest` command reaches the
+    /// shared developer gather path. The node route itself needs no dev tools.
+    fn dev_near(&self, state: GameplayState) -> Gateway {
+        let mut gateway = self.near(state);
+        gateway.set_dev_tools(true);
+        gateway.set_role(AccountRole::Admin);
+        gateway
+    }
+
     fn with_shipped_mining(self) -> Self {
         let source = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/mining.json");
         fs::copy(source, self.directory.join(mining::CONTENT_FILE)).unwrap();
@@ -377,6 +387,12 @@ fn gameplay_json(gateway: &Gateway) -> Value {
 
 fn active(gateway: &Gateway, game: Game) -> Option<i64> {
     gameplay_json(gateway)[game.json_key]["active"]["instance_id"].as_i64()
+}
+
+fn wall_ms(gateway: &Gateway, game: Game) -> u64 {
+    gameplay_json(gateway)[game.json_key]["active"]["wall_ms"]
+        .as_u64()
+        .unwrap()
 }
 
 fn count(gateway: &Gateway, definition: i32) -> u32 {
@@ -641,6 +657,19 @@ fn said(outcome: &GatewayOutcome, needle: &str) -> bool {
         .any(|p| String::from_utf8_lossy(p).contains(needle))
 }
 
+/// The exact `chat::system` lines in `outcome`, one per line.
+fn chat_text(outcome: &GatewayOutcome) -> String {
+    let mut text = String::new();
+    for packet in inners(outcome) {
+        if packet.starts_with(&[15, 0, 3, 0]) && packet.len() >= 8 {
+            let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
+            text.push_str(std::str::from_utf8(&packet[8..8 + length]).unwrap());
+            text.push('\n');
+        }
+    }
+    text
+}
+
 fn fill_inventory(state: &mut GameplayState) {
     let items = &mut state.inventory.items;
     let mut next = items.iter().map(|item| item.id).max().unwrap_or(0) + 1;
@@ -896,10 +925,153 @@ fn a_full_bag_refuses_the_start_instead_of_stranding_the_win() {
         fill_inventory(&mut state);
         let mut gateway = fixture.near(state);
         let before = gateway.snapshot();
+        let before_bytes = serde_json::to_vec(&before).unwrap();
         let out = click(&mut gateway, fixture.node.guid, 2_000);
-        assert!(said(&out, "bag is full"), "{}", game.node);
+        assert_eq!(
+            chat_text(&out).trim_end(),
+            "Your bag is full. Make room before gathering.",
+            "{}",
+            game.node
+        );
+        assert_eq!(gateway.snapshot(), before);
+        assert_eq!(
+            serde_json::to_vec(&gateway.snapshot()).unwrap(),
+            before_bytes,
+            "{}: the full-bag refusal changed the save bytes",
+            game.node
+        );
+        assert!(active(&gateway, game).is_none());
+    }
+}
+
+#[test]
+fn begin_gather_stamps_the_clock_only_after_begin() {
+    for game in GAMES {
+        let fixture = Fixture::new(game);
+        let mut gateway = fixture.ready();
+        let guid = fixture.node.guid;
+
+        tick(&mut gateway, 1_500);
+        click(&mut gateway, guid, 2_000);
+        assert!(active(&gateway, game).is_some(), "{}", game.node);
+        assert_eq!(
+            wall_ms(&gateway, game),
+            0,
+            "{}: a start must not tick the run",
+            game.node
+        );
+
+        // The 250 ms movie step is due only because begin_gather stamped the
+        // shared clock after the engine accepted the run.
+        tick(&mut gateway, 2_100);
+        assert_eq!(
+            wall_ms(&gateway, game),
+            0,
+            "{}: a not-due tick advanced the run",
+            game.node
+        );
+        tick(&mut gateway, 2_250);
+        assert_eq!(
+            wall_ms(&gateway, game),
+            250,
+            "{}: the due tick did not run",
+            game.node
+        );
+    }
+}
+
+#[test]
+fn unlocked_but_inactive_job_is_refused_on_both_paths() {
+    for game in GAMES {
+        let fixture = Fixture::new(game);
+        let guid = fixture.node.guid;
+        let (word, noun) = if game.json_key == "mining" {
+            ("Miner", "mining")
+        } else {
+            ("Chef", "harvesting")
+        };
+
+        // The node admission names the job.
+        let mut gateway = fixture.near(fixture.state(false, true));
+        let before = gateway.snapshot();
+        let node = click(&mut gateway, guid, 2_000);
+        assert_eq!(
+            chat_text(&node).trim_end(),
+            format!("Switch to the {word} job to gather that."),
+            "{}",
+            game.node
+        );
+        assert_eq!(gateway.snapshot(), before);
+
+        // The developer command names the same job and its own test.
+        let mut gateway = fixture.dev_near(fixture.state(false, true));
+        let before = gateway.snapshot();
+        let command = if game.json_key == "mining" {
+            "realm mine"
+        } else {
+            "realm harvest"
+        };
+        let dev = send(&mut gateway, &chat_inner(command), 2_000);
+        assert_eq!(
+            chat_text(&dev).trim_end(),
+            format!("Switch to the {word} job before starting the {noun} test."),
+            "{}",
+            game.node
+        );
         assert_eq!(gateway.snapshot(), before);
         assert!(active(&gateway, game).is_none());
+    }
+}
+
+#[test]
+fn a_refused_developer_gather_and_node_click_change_nothing() {
+    for game in GAMES {
+        let fixture = Fixture::new(game);
+        let guid = fixture.node.guid;
+        let command = if game.json_key == "mining" {
+            "realm mine"
+        } else {
+            "realm harvest"
+        };
+
+        for unlocked in [false, true] {
+            let mut gateway = fixture.dev_near(fixture.state(false, unlocked));
+            let before = gateway.snapshot();
+            let before_bytes = serde_json::to_vec(&before).unwrap();
+
+            // A node click refused by the node admission changes nothing, including
+            // the save bytes.
+            let refused = click(&mut gateway, guid, 2_000);
+            assert!(
+                !refused.gameplay_changed,
+                "{}: node refusal saved",
+                game.node
+            );
+            assert_eq!(gateway.snapshot(), before, "{}: node refusal", game.node);
+            assert_eq!(
+                serde_json::to_vec(&gateway.snapshot()).unwrap(),
+                before_bytes,
+                "{}: node refusal bytes",
+                game.node
+            );
+
+            // The developer command is refused by the same eligibility and also
+            // changes nothing.
+            let refused = send(&mut gateway, &chat_inner(command), 2_100);
+            assert!(
+                !refused.gameplay_changed,
+                "{}: command refusal saved",
+                game.node
+            );
+            assert_eq!(gateway.snapshot(), before, "{}: command refusal", game.node);
+            assert_eq!(
+                serde_json::to_vec(&gateway.snapshot()).unwrap(),
+                before_bytes,
+                "{}: command refusal bytes",
+                game.node
+            );
+            assert!(active(&gateway, game).is_none(), "{}", game.node);
+        }
     }
 }
 
