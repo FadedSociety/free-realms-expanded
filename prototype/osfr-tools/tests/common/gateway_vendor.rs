@@ -3,8 +3,9 @@
 //!
 //! Client-derived bodies: 26/8 constructor `008b6bc0` (u64 target + bool),
 //! 26/10 constructor `00a36f80` (u64 target + i32 choice), 66/43 serializer
-//! `00b3ab20`, 66/44 reader `00b32430` (status at wire offset 48), and the
-//! 165/5 sell body written by `00c75a70`/`00c76dd0` (Lua-facing `00c77030`).
+//! `00b3ab20`, 66/44 reader `00b32430` (status at wire offset 48), the 165/5
+//! sell body written by `00c75a70`/`00c76dd0` (Lua-facing `00c77030`), and the
+//! 165/12 buy-back request written by `00c759c0` (caller `00c76600`).
 //! The 7-byte tunnel prefix mirrors the captured client wrapper (`005`, subtype
 //! `1`, payload length).
 
@@ -86,5 +87,15 @@ pub fn sell_packet(merchant: u64, instance: i32, quantity: u32) -> Vec<u8> {
     packet.extend(merchant.to_le_bytes());
     packet.extend(instance.to_le_bytes());
     packet.extend(quantity.to_le_bytes());
+    packet
+}
+
+/// 165/12 body: the sale transaction id plus a context dword, written by
+/// `00c759c0` (the caller `00c76600` passes the record's dwords).
+#[allow(dead_code)] // Only the L011 save-failure test sends a buy-back request.
+pub fn buy_back_packet(transaction: u32, context: u32) -> Vec<u8> {
+    let mut packet = vec![165, 0, 12, 0];
+    packet.extend(transaction.to_le_bytes());
+    packet.extend(context.to_le_bytes());
     packet
 }

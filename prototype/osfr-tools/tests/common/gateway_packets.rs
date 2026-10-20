@@ -40,8 +40,9 @@ pub fn select(npc_id: u64, option: u32) -> Vec<u8> {
 }
 
 /// Synthetic ticket login: u16 count, then three length-prefixed strings, with
-/// `guid` after the ticket. The client compares that guid with the character it
-/// loaded (gateway `parse_message` login arm), so the caller supplies it.
+/// `guid` after the ticket. The gateway compares that guid with the loaded
+/// character (`src/gateway.rs` `parse_message` login arm), so the caller supplies
+/// it.
 pub fn login(guid: u64) -> Vec<u8> {
     let mut bytes = 1u16.to_le_bytes().to_vec();
     for (i, text) in ["synthetic-ticket", "1.910.1.530630", ""]

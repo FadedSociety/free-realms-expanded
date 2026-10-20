@@ -26,7 +26,8 @@ mod gateway_vendor;
 mod vendor_fixture;
 
 use gateway_vendor::{
-    count_definition, interact, login, merchant_status, select, sell_packet, vendor_buy_packet,
+    buy_back_packet, count_definition, interact, login, merchant_status, select, sell_packet,
+    vendor_buy_packet,
 };
 use vendor_fixture::{REPRESENTATIVE_ITEM, REPRESENTATIVE_VENDOR, SEEDED_ITEM, VendorFixture};
 
@@ -41,14 +42,6 @@ fn save_character(path: &Path, character: &CharacterState, gameplay: &GameplaySt
         },
     )
     .expect("fixture save writes");
-}
-
-/// 165/12 body (client 00c76600): the sale transaction id plus a context dword.
-fn buy_back(transaction: u32) -> Vec<u8> {
-    let mut packet = vec![165, 0, 12, 0];
-    packet.extend(transaction.to_le_bytes());
-    packet.extend(0u32.to_le_bytes());
-    packet
 }
 
 fn options(fixture: &VendorFixture, state: PathBuf) -> Options {
@@ -303,7 +296,7 @@ fn a_failed_vendor_save_changes_nothing_and_preserves_buy_back_state() {
     // The buy-back window is part of the same staged Coin Shop state: the sale record
     // survives with the same id and price, and the shop still serves its open session.
     scene
-        .send(&options, &buy_back(transaction), 1_500)
+        .send(&options, &buy_back_packet(transaction, 0), 1_500)
         .expect("the buy-back handles after the failed purchase");
     let after_buy_back = scene
         .snapshot()
@@ -498,10 +491,6 @@ fn a_failed_vendor_save_ends_only_that_session() {
         survivor_sockets.push(socket);
         survivor_keys.push(key);
     }
-    let survivor_client = &survivor_sockets[0];
-    let survivor_key = survivor_keys[0];
-    let survivor_login_guid = server.sessions[&survivor_key].gateway.state().guid;
-
     server
         .sessions
         .get_mut(&key)
@@ -566,53 +555,58 @@ fn a_failed_vendor_save_ends_only_that_session() {
         "the ended session left a world ghost"
     );
 
-    // Drain whatever the ending session's leave fanout queued to the survivor, then prove
-    // its next real datagram is still handled and answered.
+    // Drain whatever the ending session's leave fanout queued to each survivor, then prove
+    // every survivor's next real datagram is still handled and answered on its own socket.
     let mut buffer = [0; 65_535];
-    while survivor_client.recv_from(&mut buffer).is_ok() {}
-    let wire = {
-        let session = &server.sessions[&survivor_key];
-        let mut payload = 0u16.to_be_bytes().to_vec();
-        payload.extend(login(survivor_login_guid));
-        session
-            .codec
-            .encode(RELIABLE_DATA, &payload)
-            .expect("survivor login datagram encodes")
-    };
-    survivor_client
-        .send_to(&wire, server.local_addr().expect("server address"))
-        .expect("survivor datagram sends");
-    server.next_tick_ms = 0;
-    server.step().expect("the surviving sessions keep stepping");
-    assert!(
-        server.sessions[&survivor_key].gateway.is_logged_in(),
-        "the surviving session did not handle its next datagram"
-    );
-    let mut answered = false;
-    loop {
-        match survivor_client.recv_from(&mut buffer) {
-            Ok((length, _)) => {
-                let packet = server.sessions[&survivor_key]
-                    .codec
-                    .decode(&buffer[..length])
-                    .expect("the survivor's reply decodes");
-                answered |= matches!(packet.opcode, RELIABLE_DATA | RELIABLE_FRAGMENT);
+    for (survivor_client, survivor_key) in survivor_sockets.iter().zip(&survivor_keys) {
+        while survivor_client.recv_from(&mut buffer).is_ok() {}
+        let survivor_login_guid = server.sessions[survivor_key].gateway.state().guid;
+        let wire = {
+            let session = &server.sessions[survivor_key];
+            let mut payload = 0u16.to_be_bytes().to_vec();
+            payload.extend(login(survivor_login_guid));
+            session
+                .codec
+                .encode(RELIABLE_DATA, &payload)
+                .expect("survivor login datagram encodes")
+        };
+        survivor_client
+            .send_to(&wire, server.local_addr().expect("server address"))
+            .expect("survivor datagram sends");
+        server.next_tick_ms = 0;
+        server.step().expect("the surviving sessions keep stepping");
+        assert!(
+            server.sessions[survivor_key].gateway.is_logged_in(),
+            "survivor session {} did not handle its next datagram",
+            survivor_key.connection_id
+        );
+        let mut answered = false;
+        loop {
+            match survivor_client.recv_from(&mut buffer) {
+                Ok((length, _)) => {
+                    let packet = server.sessions[survivor_key]
+                        .codec
+                        .decode(&buffer[..length])
+                        .expect("the survivor's reply decodes");
+                    answered |= matches!(packet.opcode, RELIABLE_DATA | RELIABLE_FRAGMENT);
+                }
+                Err(error)
+                    if matches!(
+                        error.kind(),
+                        io::ErrorKind::WouldBlock | io::ErrorKind::TimedOut
+                    ) =>
+                {
+                    break;
+                }
+                Err(error) => panic!("survivor reply read fails: {error}"),
             }
-            Err(error)
-                if matches!(
-                    error.kind(),
-                    io::ErrorKind::WouldBlock | io::ErrorKind::TimedOut
-                ) =>
-            {
-                break;
-            }
-            Err(error) => panic!("survivor reply read fails: {error}"),
         }
+        assert!(
+            answered,
+            "survivor session {} did not answer its next datagram",
+            survivor_key.connection_id
+        );
     }
-    assert!(
-        answered,
-        "the surviving session did not answer its next datagram"
-    );
     assert_eq!(server.sessions.len(), 2);
 
     drop(server);

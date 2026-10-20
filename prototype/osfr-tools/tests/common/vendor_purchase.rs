@@ -21,7 +21,7 @@ use osfr_tools::{
     gateway::Gateway, npc_interaction::decode_merchant_list_66_42,
 };
 use std::path::PathBuf;
-use vendor_fixture::{REPRESENTATIVE_ITEM, REPRESENTATIVE_VENDOR, VendorFixture};
+use vendor_fixture::{REPRESENTATIVE_ITEM, REPRESENTATIVE_VENDOR, SEEDED_ITEM, VendorFixture};
 
 /// The integration suite's private build directory for the fixture pack.
 fn fixture_root() -> PathBuf {
@@ -39,6 +39,7 @@ fn connect_with(
     character: CharacterState,
     state: GameplayState,
 ) -> Gateway {
+    let guid = character.guid;
     let mut gateway = Gateway::load_gameplay(
         fixture.reference(),
         character,
@@ -48,12 +49,28 @@ fn connect_with(
     .expect("gateway loads the vendor content");
     gateway.set_dev_tools(false);
     gateway.set_role(AccountRole::Player);
-    for packet in [login(1), wrap(&[13, 0]), wrap(&[10, 0])] {
+    for packet in [login(guid), wrap(&[13, 0]), wrap(&[10, 0])] {
         gateway
             .handle_at(&packet, NOW)
             .expect("initialization message handles");
     }
     gateway
+}
+
+/// The reconnect helper logs in with the saved character's own guid. The gateway
+/// compares the ticket guid with the character it loaded, so the pre-fix `login(1)`
+/// is refused as "login selects another character".
+#[test]
+fn connect_with_logs_in_the_saved_character_guid() {
+    let fixture = VendorFixture::new(&fixture_root(), "f294-reconnect-guid");
+    let mut character = fixture.character();
+    character.guid = 7;
+    let gateway = connect_with(&fixture, character, fixture.state(1_000, false));
+    assert_eq!(gateway.state().guid, 7);
+    assert!(
+        gateway.is_logged_in(),
+        "the helper did not log in the saved character guid"
+    );
 }
 
 fn open_shop(fixture: &VendorFixture, gateway: &mut Gateway) -> Vec<Vec<u8>> {
@@ -123,7 +140,7 @@ pub fn representative_new_stock_buys_once_and_refuses_atomically() {
         count_definition(&before_inventory, REPRESENTATIVE_ITEM) + 1
     );
     assert_eq!(
-        count_definition(&after_inventory, 75_060),
+        count_definition(&after_inventory, SEEDED_ITEM),
         1,
         "the pre-login item survived the purchase"
     );
