@@ -16,13 +16,12 @@ pub const OPCODE: u16 = 164;
 /// Native application body length from reader `008e5ba0` / writer `009127f0`.
 pub const BODY_LEN: usize = 40;
 
-/// (R) Reject gross vertical impulse values while retaining ordinary jumps.
-/// The client's sender supplies its own velocity; no universal impulse was
-/// recovered from the client.
-pub const MAX_VERTICAL_SPEED: f32 = 10_000.0;
-/// (R) One relayed jump per client per 100 ms. Server broadcast policy, not a
-/// recovered client constant. `PlayerRegistry::allow_jump` enforces it.
-pub const MIN_INTERVAL_MS: u64 = 100;
+/// (R) Relay bound for the client's vertical impulse, 10x the 10 u/s opcode-125
+/// base speed. Sender `0092e670` supplies its own `+0x674` speed and the native
+/// bounce path caps velocity itself (`BounceVelocityCap`, `sub_CEB120`); no
+/// universal impulse was recovered, so finite input is clamped rather than
+/// refused (a refused body would end the session).
+pub const MAX_VERTICAL_SPEED: f32 = 100.0;
 
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct JumpUpdate {
@@ -35,7 +34,8 @@ pub struct JumpUpdate {
     pub state: u8,
     /// Preserved opaque client byte, like the opcode-125 trailer.
     pub unknown: u8,
-    /// Client vertical impulse; finite and within `MAX_VERTICAL_SPEED`; relayed unchanged.
+    /// Client vertical impulse; finite, clamped to `±MAX_VERTICAL_SPEED`, and
+    /// relayed as the clamped value.
     pub vertical_velocity: f32,
 }
 
@@ -84,9 +84,10 @@ pub fn decode(body: &[u8], guid: u64) -> io::Result<JumpUpdate> {
         *value = checked_float(body, 22 + index * 4, "invalid jump direction")?;
     }
     let vertical_velocity = f32::from_le_bytes(body[36..40].try_into().unwrap());
-    if !vertical_velocity.is_finite() || vertical_velocity.abs() > MAX_VERTICAL_SPEED {
-        return Err(invalid("invalid or excessive jump velocity"));
+    if !vertical_velocity.is_finite() {
+        return Err(invalid("non-finite jump velocity"));
     }
+    let vertical_velocity = vertical_velocity.clamp(-MAX_VERTICAL_SPEED, MAX_VERTICAL_SPEED);
     Ok(JumpUpdate {
         position,
         direction,
@@ -99,6 +100,8 @@ pub fn decode(body: &[u8], guid: u64) -> io::Result<JumpUpdate> {
 /// Build the observer body from the server-bound GUID and a validated pose.
 /// Callers pass `movement::validate`'s accepted state, never the raw body, so
 /// observers see the clamped/normalized pose and the opaque bytes are preserved.
+/// The gateway builds it once per request, after the last child, so a 164
+/// followed by a 125 in one bundle relays the final pose with the jump velocity.
 pub fn relay(guid: u64, movement: &MovementState, vertical_velocity: f32) -> Vec<u8> {
     let mut body = Vec::with_capacity(BODY_LEN);
     body.extend_from_slice(&OPCODE.to_le_bytes());
@@ -174,7 +177,18 @@ mod tests {
             assert!(decode(&nan, 1).is_err());
         }
         assert!(decode(&body(1, f32::INFINITY), 1).is_err());
-        assert!(decode(&body(1, MAX_VERTICAL_SPEED + 1.0), 1).is_err());
+        assert_eq!(
+            decode(&body(1, MAX_VERTICAL_SPEED + 1.0), 1)
+                .unwrap()
+                .vertical_velocity,
+            MAX_VERTICAL_SPEED
+        );
+        assert_eq!(
+            decode(&body(1, -MAX_VERTICAL_SPEED - 1.0), 1)
+                .unwrap()
+                .vertical_velocity,
+            -MAX_VERTICAL_SPEED
+        );
 
         let mut huge = body(1, 1.0);
         huge[10..14].copy_from_slice(&(MAX_POSITION_COMPONENT + 1.0).to_le_bytes());

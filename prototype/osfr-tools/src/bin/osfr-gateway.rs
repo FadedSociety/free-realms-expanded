@@ -1676,6 +1676,9 @@ impl Session {
         // T199: the notice is staged with the transaction, then fanned out only after
         // `commit_outcome` succeeds. Nothing is queued for a refused or failed transaction.
         let broadcast = outcome.broadcast.take();
+        // T008: the jump body is built from this request's final pose; fan it out
+        // only after the commit, like the notice above.
+        let jump = staged_gateway.take_jump_relay();
         let committed = self.commit_outcome(
             staged_gateway,
             previous,
@@ -1687,6 +1690,11 @@ impl Session {
         )?;
         if committed && let Some(text) = broadcast {
             for delivery in delivery::broadcast_deliveries(&text, world) {
+                queue_delivery(self, sessions, world, delivery)?;
+            }
+        }
+        if committed {
+            for delivery in jump_fanout(world, self.id, jump) {
                 queue_delivery(self, sessions, world, delivery)?;
             }
         }
@@ -1879,9 +1887,6 @@ impl Session {
                     bytes: message.bytes,
                 }));
             }
-            let jump = outcome.jump.take();
-            deliveries.extend(jump_fanout(&mut staged_world, self.id, jump, now_ms));
-
             if staged_world.joined.contains(&self.id) {
                 self.emote = staged_gateway.emote_context(now_ms);
                 match staged_gateway.ride_view() {

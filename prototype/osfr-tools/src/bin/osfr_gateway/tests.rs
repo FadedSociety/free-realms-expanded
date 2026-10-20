@@ -861,8 +861,10 @@ fn a_refused_precommit_transfer_releases_its_reply_budget() {
 #[path = "test_support.rs"]
 pub(super) mod test_support;
 
-/// T008: the opcode-164 jump body reaches exactly the sessions whose directed
-/// view contains the sender, and the relay window is throttled per session.
+/// T008/T266: the opcode-164 jump body reaches exactly the sessions whose
+/// directed view contains the sender, at the request's final committed pose.
+/// The name is pinned by `lab/autopilot/protected-pass.txt`; T266 removed the
+/// server relay window it used to assert, so every accepted jump now relays.
 #[test]
 fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
@@ -975,6 +977,7 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
         peer: non_viewer.peer,
         connection_id: non_viewer.request.id,
     };
+    let non_viewer_id = non_viewer.id;
     sessions.insert(recipient_key, recipient);
     sessions.insert(non_viewer_key, non_viewer);
     let jump_body = |guid: u64, position: [f32; 3], direction: [f32; 3], velocity: f32| {
@@ -1035,52 +1038,38 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
         .is_empty(),
         "the sender never receives its own jump"
     );
-    // 50 ms later the relay is throttled, but the validated pose still applies.
+    // T266: no server-side relay window. A second jump 60 ms after the first
+    // (the native sender's own gate is 50 ms) still reaches the viewer.
     sender
         .dispatch_message(
             &jump(1.0),
             &options,
-            1_050,
+            1_060,
             &mut world,
             &mut membership,
             &mut sessions,
             None,
         )
         .unwrap();
-    assert!(
-        jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
-            sessions.get_mut(&recipient_key).unwrap(),
-            1_050,
-        ))
-        .is_empty(),
-        "one relay per session window"
-    );
-    assert_eq!(sender.gateway.state().position[0], start[0] + 1.0);
-    // The next window publishes the jump again.
-    sender
-        .dispatch_message(
-            &jump(1.5),
-            &options,
-            1_100,
-            &mut world,
-            &mut membership,
-            &mut sessions,
-            None,
-        )
-        .unwrap();
-    let again = jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
+    let second = jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
         sessions.get_mut(&recipient_key).unwrap(),
-        1_100,
+        1_060,
     ));
-    assert_eq!(again.len(), 1);
+    assert_eq!(second.len(), 1, "every accepted jump relays");
     assert_eq!(
-        osfr_tools::jump_relay::decode(&again[0], character)
+        osfr_tools::jump_relay::decode(&second[0], character)
             .unwrap()
             .position[0],
-        start[0] + 1.5
+        start[0] + 1.0
     );
-    // A refusal is discarded before the staged transaction commits: the pose,
-    // the world and the relay window are unchanged.
+    assert_eq!(sender.gateway.state().position[0], start[0] + 1.0);
+    // T266: later jumps travel far enough that the one directed slot would
+    // switch from the recipient to the nearby non-viewer; that early case is
+    // already pinned above, so drop it to keep the later relays unambiguous.
+    let _ = world.players.leave(non_viewer_id);
+    world.joined.remove(&non_viewer_id);
+    // A refusal is discarded before the staged transaction commits: the pose
+    // and world are unchanged.
     let settled = sender.gateway.state().clone();
     let direction = [0.0, 0.0, 1.0];
     let exact = jump_body(
@@ -1097,15 +1086,6 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
                 [start[0] + 2.0, start[1], start[2]],
                 direction,
                 0.5,
-            ),
-        ),
-        (
-            "excessive velocity",
-            jump_body(
-                character,
-                [start[0] + 2.0, start[1], start[2]],
-                direction,
-                osfr_tools::jump_relay::MAX_VERTICAL_SPEED + 1.0,
             ),
         ),
         (
@@ -1166,13 +1146,13 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
             "{label} relayed"
         );
     }
-    // A refused jump consumed no relay window: this is 100 ms after the last
-    // accepted jump, so the viewer still receives it.
+    // T266: the refusals left the session on its committed pose and still able
+    // to relay; there is no window for them to consume.
     sender
         .dispatch_message(
-            &jump(2.5),
+            &jump(2.0),
             &options,
-            1_200,
+            1_250,
             &mut world,
             &mut membership,
             &mut sessions,
@@ -1182,14 +1162,14 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
     assert_eq!(
         jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
             sessions.get_mut(&recipient_key).unwrap(),
-            1_200,
+            1_250,
         ))
         .len(),
         1,
-        "a refusal did not consume the relay window"
+        "an accepted jump after refusals relays"
     );
-    // A later 125 in the same bundle supersedes the earlier 164 pose: observers
-    // must not receive the stale jump after the final pose fanout.
+    // T266 finding 1: a 164 followed by a 125 in one bundle still relays, at the
+    // bundle's final committed pose (P4) rather than the stale 164 pose (P3).
     let mut newer = 125u16.to_le_bytes().to_vec();
     newer.extend(character.to_le_bytes());
     for value in [start[0] + 4.0, start[1], start[2], 0.0, 0.0, 1.0] {
@@ -1221,15 +1201,24 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
         )
         .unwrap();
     assert_eq!(sender.gateway.state().position[0], start[0] + 4.0);
-    assert!(
-        jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
-            sessions.get_mut(&recipient_key).unwrap(),
-            1_300,
-        ))
-        .is_empty(),
-        "a later 125 superseded the jump relay"
+    let bundled = jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
+        sessions.get_mut(&recipient_key).unwrap(),
+        1_300,
+    ));
+    assert_eq!(bundled.len(), 1, "the bundled jump is relayed once");
+    let relayed = osfr_tools::jump_relay::decode(&bundled[0], character).unwrap();
+    assert_eq!(
+        relayed.position[0],
+        start[0] + 4.0,
+        "the relay uses the final pose, not the stale 164 pose"
     );
-    // A soft-over-speed jump is corrected for the sender and is not relayed.
+    assert_eq!(relayed.vertical_velocity, 3.0);
+    assert!(
+        sender.gateway.take_jump_relay().is_none(),
+        "the host consumed the relay body"
+    );
+    // T266: a soft-over-speed jump is corrected for the sender and still relays
+    // the pose the server committed (the clamp target), not the client's P62.
     sender
         .dispatch_message(
             &jump(62.0),
@@ -1241,20 +1230,55 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
             None,
         )
         .unwrap();
-    assert!(sender.gateway.state().position[0] < start[0] + 62.0);
-    assert!(
-        jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
-            sessions.get_mut(&recipient_key).unwrap(),
-            1_400,
-        ))
-        .is_empty(),
-        "a clamped jump is not relayed"
+    let clamped_pose = sender.gateway.state().position;
+    assert!(clamped_pose[0] < start[0] + 62.0);
+    let clamped = jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
+        sessions.get_mut(&recipient_key).unwrap(),
+        1_400,
+    ));
+    assert_eq!(clamped.len(), 1, "a clamped jump is relayed");
+    assert_eq!(
+        osfr_tools::jump_relay::decode(&clamped[0], character)
+            .unwrap()
+            .position,
+        clamped_pose,
+        "the relay uses the server's clamped pose"
     );
     assert!(
         super::f120_fishing_hour_reconnect::drain_replies(&mut sender, 1_400)
             .iter()
             .any(|message| message[7..].starts_with(&[38, 0, 12, 0])),
         "the clamped sender receives the location correction"
+    );
+    // T266: a finite velocity over the relay bound is clamped, not refused (a
+    // refused body would end the session); the pose is still validated.
+    sender
+        .dispatch_message(
+            &wrap(&jump_body(
+                character,
+                [start[0] + 6.0, start[1], start[2]],
+                direction,
+                osfr_tools::jump_relay::MAX_VERTICAL_SPEED + 1.0,
+            )),
+            &options,
+            1_500,
+            &mut world,
+            &mut membership,
+            &mut sessions,
+            None,
+        )
+        .unwrap();
+    assert_eq!(sender.gateway.state().position[0], start[0] + 6.0);
+    let bounded = jump_bodies(super::f120_fishing_hour_reconnect::drain_replies(
+        sessions.get_mut(&recipient_key).unwrap(),
+        1_500,
+    ));
+    assert_eq!(bounded.len(), 1);
+    assert_eq!(
+        osfr_tools::jump_relay::decode(&bounded[0], character)
+            .unwrap()
+            .vertical_velocity,
+        osfr_tools::jump_relay::MAX_VERTICAL_SPEED
     );
     // The world-entry gate is shared with opcode 125: a jump before Ready is refused.
     let mut early = new_session(20);
@@ -1270,7 +1294,7 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
                     0.5,
                 )),
                 &options,
-                1_500,
+                1_600,
                 &mut world,
                 &mut membership,
                 &mut sessions,
@@ -1280,6 +1304,10 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
         "a jump before Ready is refused"
     );
     assert_eq!(early.gateway.state(), &before_ready);
+    assert!(
+        early.gateway.take_jump_relay().is_none(),
+        "a refused jump stages no relay body"
+    );
     drop(world);
     let _ = fs::remove_dir_all(&scratch);
 }

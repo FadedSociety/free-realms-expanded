@@ -111,6 +111,8 @@ pub struct Gateway {
     movement_state: MovementState,
     expected_discontinuity: Option<ExpectedDiscontinuity>,
     last_movement_ms: Option<u64>,
+    /// T008: final-pose opcode-164 relay body; the host takes it once after commit.
+    jump_relay: Option<Vec<u8>>,
     trace_enabled: bool,
     // (R) Server-only authorization seam; no client parser sets an instance id.
     pending_transfer: Option<crate::players::ZoneInstance>,
@@ -130,8 +132,6 @@ pub struct GatewayOutcome {
     pub broadcast: Option<String>,
     /// Inner application payloads that passed the gateway parser, in request order.
     pub applications: Vec<Vec<u8>>,
-    /// Validated opcode-164 body for directed viewers (throttled there); a later child clears it.
-    pub jump: Option<Vec<u8>>,
     pub state_changed: bool,
     pub entered_world: bool,
     pub gameplay_changed: bool,
@@ -904,6 +904,7 @@ impl Gateway {
             movement_state,
             expected_discontinuity: None,
             last_movement_ms: None,
+            jump_relay: None,
             trace_enabled: false,
             pending_transfer: None,
         })
@@ -1091,6 +1092,10 @@ impl Gateway {
     /// The last accepted movement state and unknown byte, relayed to others.
     pub fn movement_bytes(&self) -> (u8, u8) {
         (self.movement_state.state, self.movement_state.unknown)
+    }
+
+    pub fn take_jump_relay(&mut self) -> Option<Vec<u8>> {
+        self.jump_relay.take()
     }
 
     pub fn enable_gameplay(
@@ -1434,6 +1439,7 @@ impl Gateway {
         let mut movement_state = self.movement_state;
         let mut expected_discontinuity = self.expected_discontinuity.clone();
         let mut last_movement_ms = self.last_movement_ms;
+        let mut impulse = None;
         let (mut logged_in, mut ready, mut loaded) = (self.logged_in, self.ready, self.loaded);
         let mut outcome = GatewayOutcome::default();
         // Count only the replies appended since the previous event; a bundle must not rescan
@@ -1581,16 +1587,12 @@ impl Gateway {
                             state.rotation = validated.state.direction;
                             movement_state = validated.state;
                             last_movement_ms = Some(now_ms);
-                            outcome.jump = None;
+                            impulse = jump.or(impulse);
                             if clamped {
                                 outcome.replies.push(wrapped(&dev_teleport::location_packet(
                                     state.position,
                                     state.rotation,
                                 )));
-                            } else if let Some(velocity) = jump {
-                                let pose = validated.state;
-                                outcome.jump =
-                                    Some(crate::jump_relay::relay(state.guid, &pose, velocity));
                             }
                         }
                     }
@@ -1809,6 +1811,7 @@ impl Gateway {
             }
         }
         budget.stage(&outcome.replies[counted_replies..])?;
+        self.jump_relay = impulse.map(|v| crate::jump_relay::relay(state.guid, &movement_state, v));
         self.state = state;
         self.gameplay = gameplay;
         self.movement_state = movement_state;

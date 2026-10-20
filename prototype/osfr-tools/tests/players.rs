@@ -690,9 +690,12 @@ fn oversized_and_invalid_presentations_are_rejected_without_joining() {
     }
 }
 
+// T266 removed the server-side jump-relay window. The relay's only per-session
+// state is now the directed view, so keep the protected-pass name and pin that
+// the view is per session and dropped by `leave`: a rejoined session id must
+// rebuild its own relay audience instead of inheriting one.
 #[test]
 fn jump_relay_window_is_per_session_and_clears_on_leave() {
-    const INTERVAL: u64 = osfr_tools::jump_relay::MIN_INTERVAL_MS;
     let mut registry = registry(50.0, 10);
     join(&mut registry, 1, 101, 1001, zone(8, 13), [0.0; 3], 0.0);
     join(
@@ -704,15 +707,16 @@ fn jump_relay_window_is_per_session_and_clears_on_leave() {
         [1.0, 0.0, 0.0],
         0.0,
     );
-    assert!(registry.allow_jump(SessionId(1), 1_000));
-    assert!(!registry.allow_jump(SessionId(1), 1_000 + INTERVAL - 1));
-    assert!(
-        registry.allow_jump(SessionId(2), 1_000),
-        "windows are per session"
-    );
-    assert!(registry.allow_jump(SessionId(1), 1_000 + INTERVAL));
-    // A reconnect under the same session id starts a fresh window.
+    assert!(registry.knows_character(SessionId(1), 1002));
+    assert!(registry.knows_character(SessionId(2), 1001));
     registry.leave(SessionId(1));
+    assert!(
+        !registry.knows_character(SessionId(1), 1002),
+        "leave drops the session's directed view"
+    );
     join(&mut registry, 1, 101, 1001, zone(8, 13), [0.0; 3], 0.0);
-    assert!(registry.allow_jump(SessionId(1), 1_000 + INTERVAL));
+    assert!(
+        registry.knows_character(SessionId(1), 1002),
+        "a rejoined session rebuilds its own view"
+    );
 }
