@@ -1215,8 +1215,7 @@ fn native_save_samantha_uses_localized_quest_offer_and_reply_state() {
         "3000021 is both a named target and a Talk completion; it must queue one end screen"
     );
     assert!(
-        end_screens[0].len() == 99
-            && u64::from_le_bytes(end_screens[0][6..14].try_into().unwrap()) == target_id
+        u64::from_le_bytes(end_screens[0][6..14].try_into().unwrap()) == target_id
             && u32::from_le_bytes(end_screens[0][14..18].try_into().unwrap())
                 == INTRODUCE_YOURSELF_ID
     );

@@ -46,11 +46,23 @@ fn content_root() -> std::path::PathBuf {
 fn eligibility() -> CharacterEligibility {
     CharacterEligibility {
         player_level: 20,
-        job_levels: BTreeMap::new(),
+        // T202: the Kart Driver entry quests are offered only to their job.
+        job_levels: BTreeMap::from([("kart_driver".into(), 20)]),
         member: false,
         nonmember_quest_limit: 30,
         member_quest_limit: 30,
     }
+}
+
+/// T202: the playable Kart Driver line is offered only while Kart Driver is active and
+/// unlocked, and the turn-in pays profile 48. A saved Kart Driver is that production state.
+fn kart_driver_profiles(state: &mut GameplayState) {
+    state.profiles = Some(ProfileState {
+        version: 1,
+        active: 48,
+        unlocked: BTreeSet::from([1, 43, 48]),
+        experience: BTreeMap::new(),
+    });
 }
 
 fn digest(bytes: &[u8]) -> String {
@@ -93,7 +105,8 @@ fn reward_state() -> RewardState {
         ProfileState {
             version: 1,
             active: 1,
-            unlocked: BTreeSet::new(),
+            // T202: the chapter rows pay Adventurer (1) and Kart Driver (48) job XP.
+            unlocked: BTreeSet::from([1, 48]),
             experience: BTreeMap::new(),
         },
         100_000,
@@ -607,6 +620,7 @@ fn mustang_racing_tutorial_offer_and_race_entry_use_npc_packets() {
     character.zone_id = 0;
     character.position = MUSTANG_POSITION;
     let mut gameplay = Gameplay::load(&route.0, None).unwrap().state();
+    kart_driver_profiles(&mut gameplay);
     gameplay.npc_quests = Some(seed_tutorial_prerequisites(&content, character.guid, false));
     let mut gateway = packet_gateway(&route.0, character, gameplay);
 
@@ -697,6 +711,7 @@ fn mustang_talk_completes_return_objective_and_pays_once_after_reconnect() {
     character.zone_id = 0;
     character.position = MUSTANG_POSITION;
     let mut gameplay = Gameplay::load(&route.0, None).unwrap().state();
+    kart_driver_profiles(&mut gameplay);
     gameplay.npc_quests = Some(seed_tutorial_prerequisites(&content, character.guid, true));
     let mut gateway = packet_gateway(&route.0, character, gameplay);
 

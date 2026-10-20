@@ -1557,11 +1557,17 @@
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "1": 15
+          },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202: Introduce Yourself is a one-talk referral. Adventurer.md says \"Quest completion gives coins, a new shirt, or even some experience\" (client 1250445224) and that \"Quests give small XP shares\", but the exact per-quest XP is unknown. 15 Adventurer (profile 1) job XP is the T202 (R) referral rung; the existing five-coin amount is unchanged."
             }
           ]
         }
@@ -1634,11 +1640,17 @@
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "1": 20
+          },
           "source": [
             {
               "kind": "wiki",
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md: Quest index, Introduce Yourself (Cobblestone version): 'Wiki: 5 coins'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202: Introduce Yourself (Cobblestone) is a one-talk referral. Adventurer.md gives only the five-coin wiki figure; the per-quest XP is unknown. 20 Adventurer (profile 1) job XP is the T202 (R) ladder value for this referral; the existing five-coin amount is unchanged."
             }
           ]
         }
@@ -1708,11 +1720,17 @@
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "1": 15
+          },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202: Introduce Yourself (Stillwater Crossing) is a one-talk referral. Adventurer.md gives no XP figure; 15 Adventurer (profile 1) job XP is the T202 (R) talk/referral rung and the existing five-coin amount is unchanged."
             }
           ]
         }
@@ -3846,11 +3864,17 @@
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "1": 30
+          },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202: Call the Crew! is a two-step ordered chapter referral (Shakey, then Ricky). Adventurer.md gives no XP figure; 30 Adventurer (profile 1) job XP is the T202 (R) chapter-finale rung and the existing five-coin amount is unchanged."
             }
           ]
         }
@@ -3901,11 +3925,17 @@
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "1": 25
+          },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202: Back for More is a one-talk follow-up. Adventurer.md gives no XP figure; 25 Adventurer (profile 1) job XP is the T202 (R) follow-up rung and the existing five-coin amount is unchanged."
             }
           ]
         }

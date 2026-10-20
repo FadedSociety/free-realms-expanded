@@ -3,6 +3,7 @@
   "records": [
     {
       "id": 3080001,
+      "job": 48,
       "title_string_id": 104106,
       "giver_npc_id": 9000000177,
       "prerequisite_quest_ids": [
@@ -74,11 +75,17 @@
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "48": 25
+          },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202: The Burden of Fame is a four-talk entry quest. Kart Driver.md records no quest XP or coin figure (the video set shows none), so 25 Kart Driver (profile 48) job XP is the T202 (R) collect/referral rung; the existing five-coin amount is unchanged."
             }
           ]
         }
@@ -119,6 +126,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W110 objective order retained. The three Frost Ridge targets now have legacy_data placements in data/content/npcs/snowhill.json (Chad 9500000735, Mustang Alli 9500000759, Burt 9500000731), so the direct-talk sequence is enabled. No pen item is transferred: the client text and video name the conversations, not an item grant."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T202: job 48 (Kart Driver) gate. The client intro 104105 names the Frost Ridge Speedway and says the player \"can even become a kart driver\"; the four-talk entry line is offered only while Kart Driver is active and unlocked, which also guarantees the job_xp profile is unlocked for the turn-in."
         }
       ],
       "description_string_id": 104107,
@@ -128,6 +139,7 @@
     },
     {
       "id": 3080002,
+      "job": 48,
       "title_string_id": 117323,
       "intro_text_string_id": 117327,
       "description_string_id": 117329,
@@ -177,11 +189,17 @@
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "48": 30
+          },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202: Racing Tutorial completes a race and returns to Mustang Alli. Kart Driver.md records no quest XP or coin figure; 30 Kart Driver (profile 48) job XP is the T202 (R) chapter-finale rung and the existing five-coin amount is unchanged."
             }
           ]
         }
@@ -230,6 +248,10 @@
         {
           "kind": "legacy-data",
           "evidence": "data/content/npcs/snowhill.json records Mustang Alli (9500000759) with placement=legacy_data at Frost Ridge and gives 3080002. data/content/kart_gates.json lists the same NPC so the race option is reachable at the quest giver; the return goal uses generic Talk."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T202: job 48 (Kart Driver) gate. The Racing Tutorial is Mustang Alli's driving lesson; it is offered only while Kart Driver is active and unlocked, which also guarantees the job_xp profile is unlocked for the turn-in."
         }
       ],
       "enabled": true

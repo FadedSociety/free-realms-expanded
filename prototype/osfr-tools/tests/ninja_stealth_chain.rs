@@ -2,10 +2,11 @@ use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState, Outcome},
     npc_interaction::NpcInteraction,
+    profiles::ProfileState,
     quest_engine::{QuestProgress, QuestState, QuestStatus},
 };
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, BTreeSet},
     path::{Path, PathBuf},
 };
 
@@ -92,6 +93,14 @@ impl Session {
         character.position = position;
 
         let mut state = Gameplay::load(&gameplay_content(), None).unwrap().state();
+        // T202: the Ninja entry line carries a job-2 offer gate; a Ninja save is the
+        // production state that earned it, and it keeps profile 2 unlocked for the XP grant.
+        state.profiles = Some(ProfileState {
+            version: 1,
+            active: 2,
+            unlocked: BTreeSet::from([1, 2, 43]),
+            experience: BTreeMap::new(),
+        });
         state.npc_quests = Some(completed_through_stolen_away(character.guid, stealth));
         let mut game = Gameplay::load(&gameplay_content(), Some(state)).unwrap();
         game.bind_npc_quest_catalogue(&content_root(), character.guid)

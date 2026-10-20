@@ -154,6 +154,7 @@
     },
     {
       "id": 3050004,
+      "job": 45,
       "title_string_id": 4420050,
       "giver_npc_id": 9000000019,
       "prerequisite_quest_ids": [],
@@ -203,11 +204,17 @@
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "45": 25
+          },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) W175: five-coin fallback for an unknown quest payout, matching the existing small final-era quest reward policy."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202: Cooking 101 is a multi-objective tutorial (reach the table, then first movement). Chef.md says \"Experience comes from Chef quests and from playing the harvesting and cooking minigames\" (wiki; client tip 4024725827) but gives no per-quest number. 25 Chef (profile 45) job XP is the T202 (R) multi-objective rung; the existing five-coin amount is unchanged."
             }
           ]
         }
@@ -248,6 +255,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T202: job 45 (Chef) gate. Auguste Frydaze is the Highroad Junction Chef trainer and the client title is \"Cooking 101\"; the tutorial is offered only while Chef is active and unlocked, which also guarantees the job_xp profile is unlocked for the turn-in."
         }
       ],
       "description_string_id": 4420051,
@@ -562,6 +573,7 @@
     },
     {
       "id": 3050011,
+      "job": 45,
       "title_string_id": 104134,
       "giver_npc_id": 9000000019,
       "prerequisite_quest_ids": [],
@@ -578,7 +590,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "45": 20
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202: Chef: Ranger Requisition is a one-talk referral and had no reward row. Chef.md says Chef quests give experience but gives no number. Zero coins and 20 Chef (profile 45) job XP make the line advance the job without inventing a coin payout."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -615,6 +641,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T202: job 45 (Chef) gate. Auguste Frydaze is the Highroad Junction Chef trainer and the client title is \"Chef: Ranger Requisition\"; the line is offered only while Chef is active and unlocked, which also guarantees the job_xp profile is unlocked for the turn-in."
         }
       ],
       "description_string_id": 104135,

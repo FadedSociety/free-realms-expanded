@@ -2277,6 +2277,11 @@ fn definition_from_content(
                 .ok_or_else(|| invalid("quest XP reward overflow"))?;
         }
     }
+    for profile in reward.job_xp.keys() {
+        if *profile <= 0 || !job_profile_ids.values().any(|id| id == profile) {
+            return Err(invalid("quest XP references an unknown job profile"));
+        }
+    }
     Ok(QuestDefinition {
         id: quest.id,
         title: quest
@@ -2318,7 +2323,8 @@ fn validate_definition(definition: &QuestDefinition) -> io::Result<()> {
             .reward
             .job_xp
             .values()
-            .any(|amount| *amount > i32::MAX as u32)
+            .try_fold(0u32, |total, amount| total.checked_add(*amount))
+            .is_none_or(|total| total > i32::MAX as u32)
         || definition
             .requirements
             .player_level

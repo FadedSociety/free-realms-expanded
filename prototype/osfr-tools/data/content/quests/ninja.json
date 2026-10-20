@@ -3,6 +3,7 @@
   "records": [
     {
       "id": 3110001,
+      "job": 2,
       "title_string_id": 20960,
       "giver_npc_id": 9000000223,
       "prerequisite_quest_ids": [],
@@ -19,7 +20,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 15
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202: Ninja: The Ninja Path is a one-talk referral and had no reward row. Ninja.md says \"Experience comes from Ninja quests, battles in the Wilds, and dungeons\" (wiki) but gives no per-quest number. Zero coins and 15 Ninja (profile 2) job XP make the line advance the job without inventing a coin payout."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -64,6 +79,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W110: DISABLED: existing enabled quest has unspawned giver/talk target(s) [9000000223]; objectives and rewards preserved."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T202: job 2 (Ninja) gate. The client title is \"Ninja: The Ninja Path\" and Ty is the Ninja trainer; the line is offered only while Ninja is active and unlocked, which also guarantees the job_xp profile is unlocked for the turn-in."
         }
       ],
       "description_string_id": 20961,
@@ -73,6 +92,7 @@
     },
     {
       "id": 3110002,
+      "job": 2,
       "title_string_id": 78925,
       "giver_npc_id": 9000000335,
       "prerequisite_quest_ids": [
@@ -96,7 +116,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [],
+          "job_xp": {
+            "2": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202: Ninja: Stolen Away is a single kill and had no reward row. Ninja.md gives no per-quest XP; zero coins and 25 Ninja (profile 2) job XP use the T202 (R) kill rung and do not invent a coin payout."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -133,6 +167,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T202: job 2 (Ninja) gate. The client title is \"Ninja: Stolen Away\" and Grosh continues Ty's line; it is offered only while Ninja is active and unlocked, which also guarantees the job_xp profile is unlocked for the turn-in."
         }
       ],
       "description_string_id": 78926,
@@ -192,6 +230,7 @@
     },
     {
       "id": 3110004,
+      "job": 2,
       "title_string_id": 78849,
       "giver_npc_id": 9000000223,
       "prerequisite_quest_ids": [
@@ -263,11 +302,17 @@
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "2": 20
+          },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T107: five coins is a small referral fallback consistent with W110 referral payouts; the exact E4 payout is unknown and the retired Amateur Ninja Blade is not granted."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202: Silence is Golden... and Deadly is a four-talk mentor chain. Ninja.md gives no per-quest XP; 20 Ninja (profile 2) job XP is the T202 (R) multi-step rung and the existing five-coin amount is unchanged."
             }
           ]
         }
@@ -308,6 +353,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T202: job 2 (Ninja) gate. The client title is \"Ninja: Silence is Golden... and Deadly\" and the mentor chain is Ninja training; it is offered only while Ninja is active and unlocked, which also guarantees the job_xp profile is unlocked for the turn-in."
         }
       ],
       "description_string_id": 78850,

@@ -212,6 +212,17 @@ impl Rig {
 
     /// `trim_npcs` keeps only the starting village's NPCs (see below).
     fn start_with(roles: &[AccountRole], broker: bool, trim_npcs: bool) -> Self {
+        Self::start_with_default_job(roles, broker, trim_npcs, None)
+    }
+
+    /// T202: a scenario whose content is offered only to one active job starts the
+    /// captured default profile state on that job instead of the Brawler default.
+    fn start_with_default_job(
+        roles: &[AccountRole],
+        broker: bool,
+        trim_npcs: bool,
+        default_job: Option<i32>,
+    ) -> Self {
         let lab = lab();
         let reference = lab.join("references/rust-gateway-reference");
         let bundle = lab.join("reports/round70-native-20261016T061000Z/content");
@@ -237,6 +248,17 @@ impl Rig {
             &content,
         );
         copy_dir(&bundle, &content);
+        if let Some(job) = default_job {
+            let path = content.join("profiles.json");
+            let mut profiles: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+            let state = profiles["default_state"].as_object_mut().unwrap();
+            state["active"] = json!(job);
+            let unlocked = state["unlocked"].as_array_mut().unwrap();
+            if !unlocked.contains(&json!(job)) {
+                unlocked.push(json!(job));
+            }
+            fs::write(&path, serde_json::to_vec(&profiles).unwrap()).unwrap();
+        }
         // The gateway builds a whole gameplay (24 MB of NPC JSON, parsed three
         // times) for every session, in a debug build: 2.5 to 8 s per bot depending
         // on load, past the bot's 5 s handshake window. No scenario needs more than
@@ -1288,7 +1310,7 @@ fn client_objective_breadcrumb_is_reachable_once_and_persists() {
     const TRAINER: u64 = 9_000_000_019;
     const TABLE: [f32; 3] = [-509.0114, -5.469004, 163.4705];
 
-    let rig = Rig::start_with(&[AccountRole::Builder], false, false);
+    let rig = Rig::start_with_default_job(&[AccountRole::Builder], false, false, Some(45));
     let guid = rig.accounts[0].guid;
     let claim = |id: u32| [&[45u8, 0, 7][..], &(id as i32).to_le_bytes()].concat();
     let quest = |save: &Value| save["gameplay"]["npc_quests"]["quests"][QUEST.to_string()].clone();
@@ -1422,8 +1444,8 @@ fn client_objective_breadcrumb_is_reachable_once_and_persists() {
         "the duplicate claim sent a second objective completion"
     );
 
-    // Turn in at the spawned Chef trainer. The five-coin data reward is the only
-    // reward, and it is paid once after the server sees the completed objective.
+    // Turn in at the spawned Chef trainer. The five-coin row and 25 Chef (profile 45)
+    // job XP are paid once after the server sees the completed objective.
     raw(&mut bot, &npc_packet(8, TRAINER, &[0]));
     raw(&mut bot, &npc_packet(10, TRAINER, &1i32.to_le_bytes()));
     raw(
