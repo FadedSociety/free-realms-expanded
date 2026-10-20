@@ -20,13 +20,16 @@ use osfr_tools::{
 use serde_json::{Value, json};
 use std::{
     fs,
-    path::{Path, PathBuf},
+    path::PathBuf,
     sync::atomic::{AtomicU64, Ordering},
 };
 
 #[path = "../src/bin/osfr_gateway/fishing_fixtures.rs"]
 #[allow(dead_code)]
 mod fishing_fixtures;
+
+#[path = "common/gateway_packets.rs"]
+mod gateway_packets;
 
 const HARVESTING_GAME_ID: i32 = 111;
 const LEFT: usize = 3;
@@ -63,19 +66,6 @@ fn reference_dir() -> PathBuf {
             PathBuf::from(env!("CARGO_MANIFEST_DIR"))
                 .join("../../../lab/references/rust-gateway-reference")
         })
-}
-
-fn copy_dir(source: &Path, destination: &Path) {
-    fs::create_dir_all(destination).unwrap();
-    for entry in fs::read_dir(source).unwrap() {
-        let entry = entry.unwrap();
-        let target = destination.join(entry.file_name());
-        if entry.file_type().unwrap().is_dir() {
-            copy_dir(&entry.path(), &target);
-        } else {
-            fs::copy(entry.path(), &target).unwrap();
-        }
-    }
 }
 
 fn empty_rows() -> [[i32; PLAYABLE]; PLAYABLE] {
@@ -196,7 +186,7 @@ impl Fixture {
             std::process::id(),
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
-        copy_dir(&base_content(), &directory);
+        fishing_fixtures::copy_tree(&base_content(), &directory);
         let fixture = Self {
             directory,
             reference: reference_dir(),
@@ -623,39 +613,36 @@ fn active_harvesting_blocks_other_games_and_unrelated_actions() {
     say(&mut gateway, "realm harvest", 2_000);
     let instance = active_instance(&gateway).unwrap() as i32;
 
-    let class_select = {
-        let mut b = vec![26, 0, 13, 0];
-        b.extend(2_i32.to_le_bytes());
-        b
-    };
-    let interact = {
-        let mut b = vec![26, 0, 8, 0];
-        b.extend(1_u64.to_le_bytes());
-        b.push(1);
-        b
-    };
-    let equip = {
-        let mut b = vec![36, 0, 10, 0];
-        b.extend(1_i32.to_le_bytes());
-        b.extend(0_i32.to_le_bytes());
-        b
-    };
-    for blocked in [class_select, interact, equip, vec![42, 0, 3, 0]] {
+    // The shared five-family builder is the shipped client's set, not a local
+    // list: a family the movie gate misses shows up as an unanswered request.
+    for blocked in gateway_packets::blocked_families(1) {
         let before = gateway.snapshot();
         let outcome = send(&mut gateway, &blocked, 2_100);
-        assert!(
-            chat_text(&outcome).contains("Close the harvesting game"),
+        assert_eq!(
+            chat_text(&outcome).trim_end(),
+            "Close the harvesting game before changing jobs, equipment or interacting.",
             "frame {blocked:?} must be blocked while harvesting is active"
         );
         assert_eq!(gateway.snapshot(), before);
     }
 
+    // Other realm text (not just a developer command) answers with the realm
+    // refusal and stages nothing.
+    let before = gateway.snapshot();
+    let outcome = say(&mut gateway, "realm status", 2_150);
+    assert_eq!(
+        chat_text(&outcome).trim_end(),
+        "Close the harvesting game before other opening actions."
+    );
+    assert_eq!(gateway.snapshot(), before);
+
     // Another game and a developer teleport stay blocked too.
     for command in ["realm mine", "realm goto mae farnum"] {
         let before = gateway.snapshot();
         let outcome = say(&mut gateway, command, 2_200);
-        assert!(
-            chat_text(&outcome).contains("Close the harvesting game"),
+        assert_eq!(
+            chat_text(&outcome).trim_end(),
+            "Close the harvesting game before other opening actions.",
             "{command} must be blocked while harvesting is active"
         );
         assert_eq!(gateway.snapshot(), before);

@@ -1,6 +1,6 @@
 //! The isolation boundary: one session's panic ends that session alone.
 use super::*;
-use fixtures::{bundle, wrap};
+use fixtures::{bundle, copy_tree, wrap};
 use std::cell::Cell;
 
 #[path = "fishing_fixtures.rs"]
@@ -75,18 +75,26 @@ fn a_failing_tick_save_ends_alone_and_the_server_keeps_running() {
 
 /// A gateway whose Harvesting run is live, started through the real dev command
 /// so the movie gate (not a test hook) produces the malformed-close error.
-/// `None` when the private W104 fixture is absent (a clean checkout or a cleaned
-/// lab build): the test skips instead of failing for an environment reason.
-fn movie_gateway(reference: &std::path::Path) -> Option<Gateway> {
-    let content =
-        PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab/build/w104/scratch/content");
-    if !content.join("harvesting.json").is_file() {
-        eprintln!(
-            "skipping: the private W104 harvesting fixture is missing at {}",
-            content.display()
-        );
-        return None;
-    }
+///
+/// The base content is the same opening reference the other default tests use;
+/// the harvesting board is the committed synthetic fixture in this module, so a
+/// clean lab build without the W104 scratch tree still runs the real UDP and
+/// `Server::step` proof instead of skipping it.
+fn movie_gateway(reference: &std::path::Path, scratch: &std::path::Path) -> Gateway {
+    let base = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab/references/opening-journal-text-v2/content");
+    assert!(
+        base.join("opening.json").is_file(),
+        "the isolation fixture needs the opening reference at {}",
+        base.display()
+    );
+    let content = scratch.join("movie-content");
+    copy_tree(&base, &content);
+    fs::write(
+        content.join("harvesting.json"),
+        include_str!("movie_harvesting.json"),
+    )
+    .unwrap();
     let mut state = Gameplay::load(&content, None).unwrap().state();
     let profiles = state.profiles.as_mut().unwrap();
     profiles.active = 45;
@@ -127,17 +135,14 @@ fn movie_gateway(reference: &std::path::Path) -> Option<Gateway> {
             .is_some_and(|harvesting| harvesting.active.is_some()),
         "the fixture must leave a live harvesting run"
     );
-    Some(gateway)
+    gateway
 }
 
 #[test]
 fn a_movie_error_ends_only_that_session_and_not_the_server() {
     let (mut server, keys, scratch) = super::t020_group_routing::server_rig("movie-error");
     let reference = server.options.reference.clone();
-    let Some(gateway) = movie_gateway(&reference) else {
-        let _ = fs::remove_dir_all(scratch);
-        return;
-    };
+    let gateway = movie_gateway(&reference, &scratch);
     // A real client socket at the session's peer address; the malformed close
     // arrives over the production reliable transport and `Server::step` path.
     let client = UdpSocket::bind("127.0.0.1:0").expect("client socket binds");
@@ -168,13 +173,26 @@ fn a_movie_error_ends_only_that_session_and_not_the_server() {
             .encode(RELIABLE_DATA, &payload)
             .expect("malformed close datagram encodes")
     };
+    // Keep the world tick out of the retry loop: the malformed close must end
+    // the session through the packet path, not through a later tick fault.
+    server.next_tick_ms = u64::MAX;
     client
         .send_to(&wire, server.local_addr().expect("server address"))
         .expect("malformed close datagram sends");
-    server
-        .step()
-        .expect("one handler error must not stop the server");
-
+    // UDP loopback delivery is asynchronous: step a bounded number of times
+    // instead of assuming the datagram is already queued.
+    let mut ended = false;
+    for _ in 0..50 {
+        server
+            .step()
+            .expect("one handler error must not stop the server");
+        if !server.sessions.contains_key(&key) {
+            ended = true;
+            break;
+        }
+        std::thread::sleep(std::time::Duration::from_millis(2));
+    }
+    assert!(ended, "the malformed close never reached its session");
     assert!(!server.sessions.contains_key(&key));
     assert!(
         !server.world.active_sessions.contains_key(&victim_guid),

@@ -757,6 +757,36 @@ fn movie_tick_reads_only_the_running_movies_clock() {
         "the mining tick drove harvesting"
     );
 
+    // Cooking/Smelting + Mining/Harvesting: the client-input engines have no
+    // clock, so the old five-block tick would reach the Type8 engine even
+    // though the gate answered the earlier movie. The gate's first match is
+    // now the tick's only match, so none of these four hand-made pairs advances
+    // anything. Production enforces one movie; only a hand-made save can hold
+    // two.
+    for input_only in [Engine::Cooking, Engine::Smelting] {
+        for gather in [Engine::Mining, Engine::Harvesting] {
+            let mut game = w104_game();
+            start(&mut game, input_only);
+            start(&mut game, gather);
+            let before = game.state();
+            game.tick(&character, NOW + 250).unwrap();
+            assert_eq!(
+                game.type8_tick_ms,
+                Some(NOW),
+                "{} + {} moved the Type8 clock",
+                input_only.noun(),
+                gather.noun()
+            );
+            assert_eq!(
+                game.state(),
+                before,
+                "{} + {} advanced the Type8 engine",
+                input_only.noun(),
+                gather.noun()
+            );
+        }
+    }
+
     // Missing clocks mean no tick, and the other movie's clock is not read:
     // harvesting must not use the forging clock.
     let mut game = w104_game();

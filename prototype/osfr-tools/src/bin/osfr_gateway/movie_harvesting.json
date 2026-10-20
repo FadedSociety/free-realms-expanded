@@ -1,0 +1,38 @@
+{
+  "schema_version": 1,
+  "game_id": 111,
+  "profile_id": 45,
+  "name_id": 100834,
+  "description_id": 94150,
+  "icon_id": 908,
+  "preload_file": "FarmingAssets.txt",
+  "launch_movie": "game_farming.gfx",
+  "spec": {
+    "width": 7,
+    "height": 8,
+    "shape": [
+      0, 0, 0, 0, 0, 0, 0,
+      0, 1, 1, 1, 1, 1, 1,
+      0, 1, 1, 1, 1, 1, 1,
+      0, 1, 1, 1, 1, 1, 1,
+      0, 1, 1, 1, 1, 1, 1,
+      0, 1, 1, 1, 1, 1, 1,
+      0, 1, 1, 1, 1, 1, 1,
+      0, 4, 4, 4, 4, 4, 4
+    ],
+    "selectable": [401],
+    "collectable": [],
+    "tiles": [{"value": 401, "category": 400, "icon_id": 1}],
+    "goals": [],
+    "outputs": [],
+    "duration_seconds": 180,
+    "seed": 111,
+    "wildcard_percent": 0,
+    "collectable_percent": 0,
+    "blocker_percent": 0,
+    "powerup_percent": 0,
+    "meter_id": 0,
+    "reconstructed_rules": true,
+    "rule_notice": "Synthetic isolation fixture; the original Harvesting111 level table is unrecovered."
+  }
+}
