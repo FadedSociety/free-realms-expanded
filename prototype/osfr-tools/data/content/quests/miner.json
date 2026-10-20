@@ -72,11 +72,62 @@
     },
     {
       "id": 3100002,
+      "job": 14,
       "title_string_id": 23217,
       "giver_npc_id": 9000000217,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "gather_resource",
+          "id": 1,
+          "resource_id": 2739,
+          "quantity": 1,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 0, row 1, practice-test text 1726071120; the live Snowhill copper-vein nodes beside Therin are the practice tools the record's description 23218 names."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T300: the objective listens to the lifted Copper Ore item definition 2739 that the ordinary W171 node path emits (Gameplay::apply_type8 -> QuestEvent::GatherResource, src/gameplay.rs), the same binding T241 pinned for 3000016; the one-time opening stage gather key 1003 never fires from a live regional node."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T300: quantity 1 is the recovered end-text instruction 'Mine one copper ore.' (23219); the shipped Mining18 board pays a multi-ore batch per win, so one win satisfies the goal."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000217,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "description 23218 '...Return to him if you can complete the minigame.' and end text 23219; the giver and turn-in speaker is Therin 9000000217 (Snowhill NPC row)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T300: the return-to-giver step is the ordered talk_to_npc objective; the same NPC is the quest giver and the turn-in speaker."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "14": 15
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T300: 5 coins use the W110/T202 small-referral fallback and 15 Miner (profile 14) job XP follows the T202/T241 first-quest rate. The guide's reward cell is unknown; no item is granted, so this quest creates no free, sellable or re-grantable gear."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -96,28 +147,28 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+          "evidence": "(R) T300: no prerequisite is a playtest entry. The trainer Mili Ironcall (9000000405) unlocks Miner profile 14 first; 3100001's giver 9000000001 is unresolved and 3100003's text/objective mismatch, so this record is the job's playable entry. Restore the retail order when 3100001/3100003 are repaired."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T300: enabled for the live Snowhill copper veins and the drawable Therin extra spawn; the objectives are the recovered 'Mine one copper ore.' (23219) gather and the return to Therin. The reward is the T202/T241 small-quest fallback (see the reward source)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T300: job gate 14 (Miner) at the schema's rank-1 default. The engine's job_levels only contains the saved active job, so the quest is offered only to a character who has learned Miner (Mili Ironcall's trainer menu) and selected it; a non-Miner is refused by the same gate."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T300: the client title block has no intro id at 23216, so intro_text_string_id stays absent (wire value 0); description 23218 and end text 23219 are the recovered ids. The record's own 23217/23218/23219 are stronger evidence than the guide's row 1 practice-test wording, which describes the training tools rather than one copper ore."
         }
       ],
       "description_string_id": 23218,
       "end_text_string_id": 23219,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3100003,

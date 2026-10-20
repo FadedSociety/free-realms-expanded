@@ -72161,6 +72161,45 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "spawn_guid": 9000000217,
+      "legacy_npc_id": 1201,
+      "content_key": 9000000217,
+      "model_id": 381,
+      "model_file_name": "dwarf_therin_m.adr",
+      "name": "Therin",
+      "name_string_id": 185,
+      "position": [
+        405.39592,
+        47.112,
+        347.076853
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1201 and Id=1202 both name Therin (NameId 185) with ModelId=46, ModelFileName=dwarf_m_therin.adr. ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt row 46 is the same dwarf_m_therin.adr entry."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat: jenkins_lookup2('Global.Text.185') = 943830538, and row 943830538 (ucdt) resolves to 'Therin'; the Snowhill content row 9000000217 stores that raw hash 943830538 as its name_string_id. The AddNpc name field is a Global.Text id (client formats 'Global.Text.%d' at 0x01804c14), so the spawn supplies 185; the raw hash would render a blank nameplate."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md row 43 (Singing Crystal Mines and the forge): Therin, the Miner guildmaster; notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 0, row 1 names Therin 9000000217 as the giver of 'So, You Want To Be A Miner?' (title 23217)."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Models.txt row 381 = dwarf_therin_m.adr; the client's own model table maps that shipped body. The extracted catalog.tsv ships dwarf_therin_m.adr (Assets_003.pack entry 799, pack_15/000799.adr) and Assets_manifest.txt lists 'dwarf_therin_m.adr.z', while neither the catalog nor the manifest contains the Legacy row 46 file dwarf_m_therin.adr. The live drawable Therin body is therefore id 381; the Legacy row's 46 would load a missing asset."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T300: reuses Snowhill NPC key 9000000217 as the runtime actor GUID and content key and the NPC row's POI position [405.39592, 47.112, 347.076853], so the ordinary 26/8 click addresses the same content identity the 3100002 giver and talk objective name. (R) Heading 0.0 is deterministic; no recovered heading or captured transform exists. (R) The 9000000000-range actor GUID is this project's content-key space, not a recovered server GUID."
+        }
+      ],
+      "position_w": null
     }
   ]
 }
