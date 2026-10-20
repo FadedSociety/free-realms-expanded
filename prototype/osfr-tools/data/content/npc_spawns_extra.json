@@ -33,6 +33,45 @@
       "position_w": null
     },
     {
+      "spawn_guid": 9000000330,
+      "legacy_npc_id": null,
+      "content_key": 9000000330,
+      "model_id": 415,
+      "model_file_name": "fairy_m_geoffrey.adr",
+      "name": "Geoffrey",
+      "name_string_id": 70318,
+      "position": [
+        -1414.895083,
+        -27.631,
+        357.169912
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md row 26 (Geoffrey, Royal Palace); notes/Build Guides/Content/Jobs/Adventurer.md Part E row E1 (video dialog header, giver of 'Chapter 1: The Missing Sisters', client title 90622)."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Models.txt row 415 = fairy_m_geoffrey.adr (the client model table mirror). ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json has no Geoffrey row, so legacy_npc_id stays null."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat: Global.Text.70318 resolves to 'Geoffrey'. The Sanctuary NPC row's name id 509620257 does not resolve as a Global.Text id, and the AddNpc name field is a Global.Text id (client formats 'Global.Text.%d' at 0x01804c14), so the extra spawn supplies 70318."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Assets_manifest.txt lists 'fairy_m_geoffrey.adr.z,1458658053,3139' (plus fairy_m_geoffrey_loc_stand.gr2.z, fairy_geoffrey.dds, fairy_geoffrey.dme). The extracted catalog.tsv carries only the sibling fairy_m_geoffrey.dma material row, so the shipped-client manifest is the asset evidence for the .adr model."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The spawn reuses Sanctuary NPC key 9000000330 as the runtime actor GUID and the NPC row's reconstructed Royal Palace position [-1414.895083, -27.631, 357.169912], so the ordinary 26/8 click addresses the same content identity. (R) Heading 0.0 is deterministic; no recovered heading or captured transform exists for the original placement. (R) The 9000000000-range actor GUID is this project's content-key space, not a recovered server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
       "spawn_guid": 100000001186,
       "legacy_npc_id": 1186,
       "model_id": 1062,

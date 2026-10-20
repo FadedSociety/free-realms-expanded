@@ -54,6 +54,23 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
         .filter_map(|line| line.split('\t').nth(2))
         .map(str::to_ascii_lowercase)
         .collect();
+    // The extracted pack catalogue is not complete for every model named by the
+    // client itself: 145 Models.txt `.adr` names are absent. The client's own
+    // Assets_manifest.txt is the shipped asset list (`.z` entries), so a model
+    // name is accepted when either source lists it. `catalog_names` stays the
+    // catalog-only set for the knocker `.dme` assertion below.
+    let manifest =
+        fs::read_to_string(lab_root.join("working/OSFR.Client/OSFR Client/Assets_manifest.txt"))
+            .unwrap();
+    let shipped_names: HashSet<String> = catalog_names
+        .iter()
+        .cloned()
+        .chain(manifest.lines().filter_map(|line| {
+            line.split(',')
+                .next()
+                .map(|name| name.trim_end_matches(".z").to_ascii_lowercase())
+        }))
+        .collect();
 
     let capture_doc = read_json(&lab_root.join("content/startup-snapshot/startup.json"));
     let captures: HashMap<u64, &Value> = capture_doc["world"]["npc_spawns"]
@@ -118,8 +135,8 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
         let owner = format!("Legacy spawn {}", row["spawn_guid"]);
         let model_file = row["model_file_name"].as_str().unwrap();
         assert!(
-            catalog_names.contains(&model_file.to_ascii_lowercase()),
-            "{owner}: model file {model_file:?} is absent from catalog.tsv"
+            shipped_names.contains(&model_file.to_ascii_lowercase()),
+            "{owner}: model file {model_file:?} is absent from catalog.tsv and Assets_manifest.txt"
         );
         if let Some(name_id) = row["name_string_id"].as_u64() {
             assert!(
@@ -203,7 +220,8 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
         regional_legacy >= 578,
         "regional NPCs dropped to {regional_legacy}"
     );
-    assert_eq!(extra_rows.len(), 3269);
+    // T257's appended rows plus T279's Geoffrey row inserted after Carlos.
+    assert_eq!(extra_rows.len(), 3270);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

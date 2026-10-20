@@ -64,6 +64,8 @@ const RICARDO: u64 = 9_000_000_178;
 const TY: u64 = 9_000_000_223;
 const GROSH: u64 = 9_000_000_335;
 const CLEETUS: u64 = 9_000_000_050;
+/// T279: the Royal Palace giver of "Chapter 1: The Missing Sisters".
+const GEOFFREY: u64 = 9_000_000_330;
 
 const INTRODUCE_YOURSELF: u32 = 3_000_020;
 const BURDEN_OF_FAME: u32 = 3_080_001;
@@ -999,7 +1001,7 @@ fn content_overflow_is_rejected_at_load() {
 fn configured_job_xp_and_job_gates_match_the_task_table() {
     let content = content_dir();
     // (file, quest id, giver, prerequisites, reward coins, job gate, profile, XP)
-    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 14] = [
+    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 15] = [
         (
             "adventurer.json",
             INTRODUCE_YOURSELF,
@@ -1134,16 +1136,31 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             MINER,
             15,
         ),
+        // T279: the second story beat. It is an independent playtest entry (no
+        // prerequisite and no job gate); its 25 XP pays the explicit Adventurer profile.
+        (
+            "adventurer.json",
+            3_000_029,
+            GEOFFREY,
+            &[],
+            5,
+            None,
+            ADVENTURER,
+            25,
+        ),
     ];
 
     let mut listed = BTreeSet::new();
-    // Both task decisions are accepted: T202 wrote the chapter job XP and gates, T241
-    // extended the same table with the two live Farnum starting records.
+    // The task decisions are accepted: T202 wrote the chapter job XP and gates, T241
+    // extended the same table with the two live Farnum starting records, and T279
+    // adds the independent Missing Sisters playtest entry.
     let has_decision = |source: &Value| {
         source.as_array().is_some_and(|tags| {
             tags.iter().any(|tag| {
                 tag["evidence"].as_str().is_some_and(|text| {
-                    text.starts_with("(R) T202:") || text.starts_with("(R) T241:")
+                    text.starts_with("(R) T202:")
+                        || text.starts_with("(R) T241:")
+                        || text.starts_with("(R) T279:")
                 })
             })
         })

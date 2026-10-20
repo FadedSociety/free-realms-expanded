@@ -2224,16 +2224,83 @@
       "title_string_id": 90622,
       "giver_npc_id": 9000000330,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "zone_id": 0,
+          "position": [
+            -1899.204,
+            -50.59,
+            307.902
+          ],
+          "radius": 8.0,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md Part E row E1 'Speak with the search party' and the client description 90623 'hills west of the Queensfields'."
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "data/content/field_enemies.json starting_farnum_wolves area W102-F1 centre [-1899.204, -50.59, 307.902] (three Hooligan Wolf 3156 actors)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T279: the search-party spot is expressed as an 8 m visit_position at the W102-F1 wolf-ground centre instead of inventing two unspawned sister actors or a dungeon instance. Position and radius are local playtest geometry, not a captured transform."
+            }
+          ]
+        },
+        {
+          "kind": "defeat",
+          "id": 2,
+          "model_id": 3156,
+          "count": 3,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md Part E row E1 goal 'Defeat the three wolves'."
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "data/content/field_enemies.json: three starting_farnum_wolves actors 131000102001-131000102003 have definition_id 3156, level 1, 100 HP/7 damage, 45 s respawn. (The 180 HP/25 damage rows are the separate level-5 mid_farnum_wolves camp, not this group.)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T279: the authored count is 3 because the guide and video say 'three wolves'; the three starter actors are the playtest target. No encounter or dungeon is claimed."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9000000330,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md Part E row E1 ends with the return to Geoffrey; the giver is NPC 9000000330 and its 49/13 end text 90624 returns the player to the Royal Palace."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T279: the final step is an ordinary talk_to_npc to the giver."
+            }
+          ]
+        }
+      ],
       "rewards": [
         {
           "coins": 5,
           "items": [],
-          "job_xp": {},
+          "job_xp": {
+            "1": 25
+          },
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred XP, membership bonus or random loot. Existing evidenced coin amounts are retained."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T279: the 25 Adventurer (profile 1) XP is a playtest payout in the existing local 25-XP step scale; the guide gives no reward amount, so XP is reconstructed. The reward map is explicit and pays profile 1 even when another job is active."
             }
           ]
         }
@@ -2277,13 +2344,29 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W110: DISABLED: Immediate Palace follow-up: Geoffrey does not spawn; Missing Sisters instance and exact sisters/encounter ids unresolved. Rest of Chapter 1 excluded from this starting-region slice."
+          "evidence": "(R) T279: ENABLED as the second playtest story beat after Local Hero. No prerequisite: the retail Local Hero -> Take a Number -> The Missing Sisters order is skipped because neither the palace gate nor Take a Number is playable, so this is an independent entry quest. Geoffrey's drawable spawn is data/content/npc_spawns_extra.json (model 415 fairy_m_geoffrey.adr, Global.Text 70318); the three-wolf step uses the live starting_farnum_wolves 3156 actors; the search-party spot is an 8 m visit_position at the W102-F1 centre; the two pixie sisters stay narrative text. This is not the Missing Sisters dungeon: no battle row, instance or sister actor is added."
+        },
+        {
+          "kind": "client",
+          "evidence": "T279 drawable-spawn evidence: ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt row 415 = fairy_m_geoffrey.adr; ../lab/working/OSFR.Client/OSFR Client/Assets_manifest.txt lists fairy_m_geoffrey.adr.z,1458658053,3139; Global.Text.70318 = 'Geoffrey' (locale-id-to-text.json), while the Sanctuary NPC row's 509620257 does not resolve. AddNpc's name field is a Global.Text id (formatted at 0x01804c14)."
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md Part E row E1 and the video title 'The Missing Sisters' / chat banner 'Chapter 1: The Missing Sisters'; the video goal is 'Defeat the three wolves' and its summary names the rescue from a pack of wolves."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T279: the visit_position uses the search-party spot at the W102-F1 wolf-ground centre [-1899.204, -50.59, 307.902] with an 8 m radius (the client description says 'hills west of the Queensfields'; the exact search-party transform is not recovered). The defeat target is 3 x definition 3156 from the live starting_farnum_wolves group; the authored field rows are 100 HP/7 damage at level 1 with a 45 s respawn. The 25 Adventurer XP is a playtest payout in the same 25-XP step scale as other local story quests; the guide gives no amount."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T279: no job field. The story is open to every active job for the playtest because the guide's video is an Adventurer and a job gate would hide the only follow-up from most characters. The reward profile is explicit: job_xp profile 1 (Adventurer) is paid even when another job is active."
         }
       ],
       "description_string_id": 90623,
       "intro_text_string_id": 90621,
       "end_text_string_id": 90624,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000030,
