@@ -709,7 +709,9 @@ pub struct QuestEngine {
 /// dwords. `ShowQuestEndScreen` (`00a95420`) receives the actor pair first, the quest id
 /// the "Thanks!" button sends back in 49/14 second, the NPC end-text locale id third, and
 /// an animation fourth. The client resolves the actor through its actor table (`00984960`),
-/// so this server's spawned actor GUID is the content NPC key used here.
+/// so `actor_id` must be the runtime actor GUID. A Talk event names the content NPC key;
+/// when that key is bound to a different extra-spawn actor, `gameplay/npc.rs` patches the
+/// held end screen with the clicked runtime GUID when 26/6 releases it.
 fn put_end_screen_ids(bytes: &mut Vec<u8>, quest_id: i32, actor_id: u64, end_text: u32) {
     bytes.extend(actor_id.to_le_bytes());
     put_i32(bytes, quest_id);

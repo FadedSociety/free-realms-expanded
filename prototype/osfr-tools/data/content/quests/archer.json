@@ -135,7 +135,22 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T194: objective ordinal 3 and target content key 9500000290 (Brugadug) are server bindings; the exact on-screen order of the three recruits is not recovered, so the array order is Bollylog, Hrugagu, Brugadug. The target is bound at runtime to the existing unnamed Legacy Greenwood archer actor standing in front of Lugabow (npc_spawns_extra.json content_key); the regional content row is unanchored scaffolding and does not spawn a duplicate."
+              "evidence": "(R) T194: objective ordinal 3 and target content key 9500000290 (Brugadug) are server bindings; the exact on-screen order of the three recruits is not recovered, so the array order is Bollylog, Hrugagu, Brugadug. The target is bound at runtime to the existing unnamed Legacy Greenwood archer actor standing in front of Lugabow (npc_spawns_extra.json content_key); the regional content row is unanchored scaffolding and does not spawn a duplicate. It is not the turn-in: the client's fourth step returns to Lugabow (locale 22083)."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "npc_id": 9000000387,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Archer.md: Quest line > Band 0 (Lugabow, Greenwood Camp), row 1; Lugabow's return line 2096652672 (Once you have talked to all three of my recruits and have decided if you wish to become an archer, come back and talk to me). Client locale ids 22077 / 22079 / 22081 are the three recruit steps (raw hashes 1507268342 / 3778780281 / 4154333971 in lab/reports/locale-id-map.json) and 22083 is the fourth row, Return to Lugabow."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T194 follow-up F217: objective ordinal 4 is the server binding for the client's Return to Lugabow step. The first record omitted this step, so the turn-in opened at the third recruit; the turn-in now opens at the giver."
             }
           ]
         }
@@ -174,7 +189,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T194: the three-recruit on-screen order is not recovered; the objective array order is Bollylog, Hrugagu, Brugadug. The runtime targets are existing Legacy Greenwood archer actors bound to the recruit content keys."
+          "evidence": "(R) T194: the three-recruit on-screen order is not recovered; the objective array order is Bollylog, Hrugagu, Brugadug. The runtime targets are existing Legacy Greenwood archer actors bound to the recruit content keys. The fourth objective returns to the giver (client locale 22083)."
         },
         {
           "kind": "reconstructed",
@@ -182,11 +197,16 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) intro/description ids from the client locale block around the title (T-1/T+1); the end text is the recovered debrief below"
+        },
+        {
+          "kind": "client",
+          "evidence": "Path end text locale 9701 is the guide row 1 debrief: raw hash 1391974141 resolves to 9701 in lab/reports/locale-id-map.json, and 9701 text matches the guide's debrief line. The job grant line 2967121729 resolves to intro 22074."
         }
       ],
       "description_string_id": 22076,
       "intro_text_string_id": 22074,
+      "end_text_string_id": 9701,
       "enabled": true
     },
     {

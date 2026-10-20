@@ -113,7 +113,7 @@ impl Gameplay {
                         // actor bound through a content_key, so patch the speaker here where
                         // the clicked runtime GUID is still known.
                         for packet in &mut held {
-                            set_dialog_camera_target(packet, runtime_guid);
+                            patch_npc_actor(packet, runtime_guid);
                         }
                         npc_event(
                             serde_json::json!({"event": "quest_end_from_choice", "quest_id": quest_id}),
@@ -129,7 +129,7 @@ impl Gameplay {
                         self.append_npc_quest_outcome(result, &mut out)?;
                     }
                     for packet in &mut out.replies {
-                        set_dialog_camera_target(packet, runtime_guid);
+                        patch_npc_actor(packet, runtime_guid);
                     }
                     npc_event(
                         serde_json::json!({"event": "quest_offer_from_choice", "quest_id": quest_id}),
@@ -554,7 +554,7 @@ impl Gameplay {
                     };
                     let mut dialogue = dialogue_packet_with(&context, quest_choice)
                         .map_err(|_| invalid("NPC dialogue could not be encoded"))?;
-                    set_dialog_camera_target(&mut dialogue, runtime_guid);
+                    patch_npc_actor(&mut dialogue, runtime_guid);
                     self.last_npc_dialogue =
                         Some((character.zone_id, runtime_guid, key, dialogue.clone()));
                     // A quest offer is shown alone, like the original: the 49/1 window
@@ -909,18 +909,23 @@ impl Gameplay {
     }
 }
 
-/// Point the client's dialog camera (`ControllerDialog`, switched in by
-/// `ReplacePointerAtECAndDispatch` `008d2ba0`) at the NPC, so it zooms in on them
-/// with the bubble to their left, as in the original. A zero target falls back to
-/// the player (native run 230409, Frida `dialog_camera` hooks):
-/// - 26/3 ShowDialog: dwords 2-3 of the leading four (`ShowDialogFromPacket`
-///   `009f5ae0` reads object +0x18/+0x1c).
-/// - 49/1 QuestInfo: the u64 after the reward bundle, i.e. the packet's last 14
+/// Point a server-built NPC packet at the runtime actor the client knows. This is one
+/// helper because all three packet families carry the same actor bytes but in different
+/// positions; each family is documented here:
+/// - 26/3 ShowDialog: the dialog camera target (`ControllerDialog`, switched in by
+///   `ReplacePointerAtECAndDispatch` `008d2ba0`) at dwords 2-3 of the leading four
+///   (`ShowDialogFromPacket` `009f5ae0` reads object +0x18/+0x1c), so it zooms in on
+///   the NPC with the bubble to their left. A zero target falls back to the player
+///   (native run 230409, Frida `dialog_camera` hooks).
+/// - 49/1 QuestInfo: the actor after the reward bundle, i.e. the packet's last 14
 ///   bytes start with it (dispatcher `00c7cea2` passes object +0xe0/+0xe4).
-/// - 49/13 QuestEnd: the turn-in speaker at offset 6. A quest Talk event names the
-///   content NPC key, which differs from the runtime actor for an extra-spawn NPC
-///   bound through a `content_key`; the held screen is patched when 26/6 releases it.
-pub(super) fn set_dialog_camera_target(packet: &mut [u8], npc_guid: u64) {
+/// - 49/13 QuestEnd: the turn-in speaker at offset 6, not the dialog camera. Its
+///   `ReadFields` (`00c7b990`) reads the 6-byte prefix, then this 8-byte actor, and
+///   `ShowQuestEndScreen` (`00a95420`) resolves it through the client actor table
+///   (`00984960`). A quest Talk event names the content NPC key, which differs from
+///   the runtime actor for an extra-spawn NPC bound through a `content_key`; the
+///   held screen is patched here when 26/6 releases it.
+pub(super) fn patch_npc_actor(packet: &mut [u8], npc_guid: u64) {
     let guid = npc_guid.to_le_bytes();
     if packet.starts_with(&[26, 0, 3, 0]) && packet.len() >= 20 {
         packet[12..20].copy_from_slice(&guid);
