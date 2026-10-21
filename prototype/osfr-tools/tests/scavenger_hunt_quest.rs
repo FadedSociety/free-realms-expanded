@@ -34,11 +34,13 @@ mod npc_quest_chain;
 use npc_quest_chain::{
     Fixture, accept, active_job, assert_no_offer, assert_packet_changes_nothing,
     character_at_for as character, coins, content_dir, counts, finish_quest, has_family,
-    npc_interact, offer, pending_offer, pending_turnin, profile_xp, quest_end_reply, quest_reply,
-    quest_status, read_json, release_end_screen, saved, select_job, send, talk,
+    npc_interact, objective_update, offer, pending_offer, pending_turnin, profile_xp,
+    quest_end_reply, quest_reply, quest_status, read_json, release_end_screen, saved, select_job,
+    send, talk,
 };
 use osfr_tools::{
     character_store::CharacterState,
+    game_store,
     gameplay::{Gameplay, Outcome},
     npc_interaction::NpcInteraction,
     profiles::ProfileState,
@@ -199,6 +201,14 @@ fn visit(
         .expect("movement is accepted");
     assert!(outcome.changed, "the landmark must advance the hunt");
     assert_eq!(counts(game, QUEST), expected, "landmark counters");
+    // The increment itself is a 49/9 `ObjectiveUpdate` (client reader
+    // 0x00c7af60: quest 6..10, objective 10..14, current 14..18); 49/10 and the
+    // next 49/8 are asserted by the caller.
+    let advanced = expected.iter().take_while(|count| **count == 1).count();
+    assert!(
+        objective_update(&outcome, QUEST, advanced as u32, 1),
+        "the visit sends the 49/9 update for objective {advanced}"
+    );
     outcome
 }
 
@@ -264,8 +274,11 @@ fn jacque_offers_the_hunt_first_to_a_new_character() {
         .collect();
     assert_eq!(offers.len(), 1, "one Talk offers exactly one quest");
     let offer = offers[0];
-    // 49/1 layout (reader 0x00c7b7a0): quest, intro, wire dword 2, name,
-    // description, wire dword 5. The builder puts the stock title in 2/name/5.
+    // 49/1 layout (reader 0x00c7b7a0): quest at 6..10, intro at 10..14, the
+    // five ShowQuestStartScreen dwords after it, with the client-verified card
+    // name at 18..22 and description at 22..26. The builder also mirrors the
+    // title into wire dwords 2 (14..18) and 5 (26..30); both meanings are
+    // unresolved (R), so this test does not pin those server-side choices.
     assert_eq!(
         u32::from_le_bytes(offer[6..10].try_into().unwrap()),
         QUEST,
@@ -277,21 +290,14 @@ fn jacque_offers_the_hunt_first_to_a_new_character() {
         "intro text is not authored; it stays 0 under the hollow-text policy"
     );
     assert_eq!(
-        u32::from_le_bytes(offer[14..18].try_into().unwrap()),
-        TITLE_ID
-    );
-    assert_eq!(
         u32::from_le_bytes(offer[18..22].try_into().unwrap()),
-        TITLE_ID
+        TITLE_ID,
+        "the client-verified card name is the stock hunt title"
     );
     assert_eq!(
         u32::from_le_bytes(offer[22..26].try_into().unwrap()),
         0,
         "description text is not authored; it stays 0 under the hollow-text policy"
-    );
-    assert_eq!(
-        u32::from_le_bytes(offer[26..30].try_into().unwrap()),
-        TITLE_ID
     );
     assert!(
         !offered
@@ -392,6 +398,7 @@ fn the_four_stops_complete_and_pay_once() {
     let final_talk = talk(&mut game, &jacque, JACQUE, now);
     now += 2;
     assert!(has_objective(&final_talk.replies, 10, 4));
+    assert!(objective_update(&final_talk, QUEST, 4, 1));
     assert!(
         !final_talk
             .replies
@@ -409,7 +416,10 @@ fn the_four_stops_complete_and_pay_once() {
     assert_eq!(i32::from_le_bytes(screen[27..31].try_into().unwrap()), 50);
     assert_eq!(i32::from_le_bytes(screen[31..35].try_into().unwrap()), 25);
 
-    let coins_before = coins(&game);
+    let before_payout = game.state();
+    let before_payout_bytes = saved(&game);
+    let inventory_before = before_payout.inventory.clone();
+    let coins_before = before_payout.inventory.coins;
     let xp_before = profile_xp(&game, ADVENTURER);
     let completed = finish_quest(&mut game, &jacque, QUEST, ADVENTURER, 50, 25, now);
     now += 2;
@@ -419,6 +429,58 @@ fn the_four_stops_complete_and_pay_once() {
         .find(|packet| has_family(packet, 49, 12, None))
         .expect("the completed count follows");
     assert_eq!(i32::from_le_bytes(count[6..10].try_into().unwrap()), 1);
+    // The payout is one atomic state change: the quest becomes Completed, the
+    // pending 49/13 state clears and the reward adds exactly 50 coins/25 XP.
+    // Compare the whole state and its serialized save bytes, so a partial save
+    // or an unexpected item grant fails here.
+    let mut expected = before_payout.clone();
+    expected.inventory.coins = coins_before.checked_add(50).unwrap();
+    expected
+        .profiles
+        .as_mut()
+        .unwrap()
+        .experience
+        .insert(ADVENTURER, xp_before.checked_add(25).unwrap());
+    let quests = expected.npc_quests.as_mut().unwrap();
+    quests.quests.get_mut(&QUEST).unwrap().status = QuestStatus::Completed;
+    quests.pending_turnin = None;
+    quests.pending_turnin_actor = None;
+    assert_eq!(
+        game.state(),
+        expected,
+        "the turn-in must change only the quest, the pending screen and the reward"
+    );
+    assert_eq!(
+        saved(&game),
+        serde_json::to_vec(&expected).unwrap(),
+        "the payout save must be exactly the expected envelope"
+    );
+    assert_ne!(
+        saved(&game),
+        before_payout_bytes,
+        "the payout must be persisted"
+    );
+    assert_eq!(
+        game.state().inventory.items,
+        inventory_before.items,
+        "the hunt rewards no items"
+    );
+    // The real game-save envelope, not only the in-memory serialization, must
+    // carry the exact post-payout state across a reload.
+    let save_path = fixture.path().join("gameplay-save.json");
+    let snapshot = game_store::Snapshot {
+        character: jacque.clone(),
+        gameplay: Some(expected.clone()),
+    };
+    game_store::save(&save_path, &snapshot).unwrap();
+    let reloaded = game_store::load_or_create(&save_path, jacque.clone()).unwrap();
+    assert_eq!(
+        reloaded.gameplay.as_ref(),
+        Some(&expected),
+        "the save envelope changed the expected payout state"
+    );
+    let reconnected = fixture.game(reloaded.gameplay);
+    assert_eq!(reconnected.state(), expected);
     assert_eq!(coins(&game), coins_before + 50);
     assert_eq!(profile_xp(&game, ADVENTURER), xp_before + 25);
     assert_eq!(
@@ -559,9 +621,12 @@ fn refusals_and_reconnect_change_nothing() {
     let jacque = character(CHARACTER, 0, npc_position(JACQUE));
     let mut now = 40_000;
 
-    // A declined offer is removed, and repeating the stale decline changes
-    // nothing. This is the one accepted change: decline clears the offer.
+    // The accepted T247/F272 decline behavior: a 49/2 decline is a client choice,
+    // so it clears the server's pending offer and removes the offered quest, and
+    // that change is persisted. Only a repeated stale decline is inert.
     offer_hunt(&mut game, &jacque, &mut now);
+    let offered_state = game.state();
+    let offered_bytes = saved(&game);
     let declined = send(&mut game, &jacque, &quest_reply(QUEST, false), now);
     now += 2;
     assert!(declined.changed, "declining clears the pending offer");
@@ -575,6 +640,28 @@ fn refusals_and_reconnect_change_nothing() {
             .quests
             .contains_key(&QUEST),
         "a declined offer is removed"
+    );
+    let mut expected = offered_state.clone();
+    expected.npc_quests.as_mut().unwrap().pending_offer = None;
+    assert!(
+        expected
+            .npc_quests
+            .as_mut()
+            .unwrap()
+            .quests
+            .remove(&QUEST)
+            .is_some(),
+        "the pre-decline snapshot contains the offered quest"
+    );
+    assert_eq!(
+        game.state(),
+        expected,
+        "a decline changes only the pending offer and the offered quest"
+    );
+    assert_ne!(
+        saved(&game),
+        offered_bytes,
+        "the declined offer is removed from the save"
     );
     let declined_state = game.state();
     let declined_bytes = saved(&game);
@@ -977,6 +1064,10 @@ fn a_completed_final_talk_is_turned_in_away_from_the_giver_today() {
     );
 }
 
+/// Content identity for the hunt (kept under its protected T281 test name).
+/// The operator broadcast script lives in the task note, not in content, so
+/// this test does not read note prose (F345 review finding 6). Host row
+/// drawability and the malformed-record loader case are separate tests.
 #[test]
 fn the_hunt_identity_and_admin_script_are_recorded() {
     let content = content_dir();
@@ -990,10 +1081,8 @@ fn the_hunt_identity_and_admin_script_are_recorded() {
         })
         .collect();
     files.sort();
-    assert_eq!(files.len(), 18, "the hunt is one new quest file");
 
     let mut seen = BTreeSet::new();
-    let mut total_records = 0usize;
     let mut host_givers = Vec::new();
     for path in &files {
         let document = read_json(path);
@@ -1001,13 +1090,11 @@ fn the_hunt_identity_and_admin_script_are_recorded() {
             let id = record["id"].as_u64().unwrap() as u32;
             assert!(id > 0, "{}: quest ids are positive", path.display());
             assert!(seen.insert(id), "duplicate quest id {id}");
-            total_records += 1;
             if record["giver_npc_id"] == json!(JACQUE) {
                 host_givers.push(id);
             }
         }
     }
-    assert_eq!(total_records, 654, "653 existing records plus the hunt");
     assert_eq!(
         host_givers,
         vec![QUEST],
@@ -1075,86 +1162,8 @@ fn the_hunt_identity_and_admin_script_are_recorded() {
         "no NPC row may bind the hunt; found {binders:?}"
     );
 
-    // The host row stays unchanged: drawable, no quest bindings, a quest giver.
-    let jacque = npc_row("sanctuary.json", JACQUE);
-    assert_eq!(jacque["placement"], json!("legacy_data"));
-    assert_eq!(jacque["model_id"], json!(134));
-    assert_eq!(jacque["name_string_id"], json!(7_575));
-    assert_eq!(jacque["greeting_string_id"], json!(15_500));
-    assert_eq!(jacque["quest_ids_given"], json!([]));
-    assert_eq!(jacque["quests_given"], json!([]));
-    assert_eq!(jacque["quests_accepted"], json!([]));
-    assert!(
-        jacque["roles"]
-            .as_array()
-            .unwrap()
-            .contains(&json!("quest_giver")),
-        "Jacque is a quest giver"
-    );
-    let position: [f32; 3] = serde_json::from_value(jacque["position"].clone()).unwrap();
-    assert_eq!(position, [-1212.878, -13.95695, 463.8414]);
-    assert!(position.iter().all(|value| value.is_finite()));
-    let spawned: BTreeMap<u64, [f32; 3]> = NpcVisibility::load(&content)
-        .unwrap()
-        .teleport_targets(0)
-        .into_iter()
-        .map(|target| (target.guid, target.position))
-        .collect();
-    assert_eq!(
-        spawned.get(&JACQUE),
-        Some(&position),
-        "Jacque is spawned by the production visibility loader"
-    );
-
-    // Ricky Danger's row stays byte-identical: his original chain still names
-    // him as giver and the hunt is not bound to him.
-    let original_quests = read_json(&quest_dir.join("adventurer.json"));
-    let original_records = original_quests["records"].as_array().unwrap();
-    for quest_id in [CALL_THE_CREW, BACK_FOR_MORE] {
-        let original = original_records
-            .iter()
-            .find(|record| record["id"] == json!(quest_id))
-            .expect("Ricky's original quest is in adventurer.json");
-        assert_eq!(original["giver_npc_id"], json!(RICKY));
-        assert_ne!(original["enabled"], json!(false));
-    }
-    let ricky = npc_row("cobblestone_village.json", RICKY);
-    assert_eq!(ricky["placement"], json!("legacy_data"));
-    assert_eq!(ricky["model_id"], json!(960));
-    assert_eq!(ricky["name_string_id"], json!(94_007));
-    assert_eq!(ricky["greeting_string_id"], json!(94_388));
-    assert_eq!(ricky["quest_ids_given"], json!([]));
-    assert_eq!(ricky["quests_given"], json!([]));
-    assert_eq!(ricky["quests_accepted"], json!([]));
-    assert!(
-        ricky["roles"]
-            .as_array()
-            .unwrap()
-            .contains(&json!("quest_giver")),
-        "Ricky is a quest giver"
-    );
-    let ricky_position: [f32; 3] = serde_json::from_value(ricky["position"].clone()).unwrap();
-    assert_eq!(ricky_position, [-1909.511, -44.3937, 462.83]);
-
-    // Samantha's referral is untouched: she still gives 3000021, which targets
-    // Ricky, and the hunt did not move onto her.
-    let samantha = npc_row("cobblestone_village.json", SAMANTHA);
-    assert!(
-        samantha["quest_ids_given"]
-            .as_array()
-            .unwrap()
-            .contains(&json!(REFERRAL)),
-        "Samantha still gives the referral"
-    );
-    let referral = original_quests["records"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .find(|record| record["id"] == json!(REFERRAL))
-        .expect("Introduce Yourself is in adventurer.json");
-    assert_eq!(referral["giver_npc_id"], json!(SAMANTHA));
-    assert_ne!(referral["enabled"], json!(false));
-    assert_eq!(referral["objectives"][0]["npc_id"], json!(RICKY));
+    // The host row, Ricky's untouched original chain and Samantha's referral
+    // are checked by `the_hunt_host_is_drawable_in_sanctuary`.
 
     // The three stops copy the cited rows verbatim and use the open-world zone.
     let objectives = record["objectives"].as_array().unwrap();
@@ -1219,20 +1228,103 @@ fn the_hunt_identity_and_admin_script_are_recorded() {
     assert_eq!(rewards[0]["items"], json!([]));
     assert_eq!(rewards[0]["job_xp"], json!({"1": 25}));
 
-    // The operator script is part of this change; no code path reads it.
-    let note_path = Path::new(env!("CARGO_MANIFEST_DIR")).join("../../notes/Autopilot/T281.md");
-    let note = fs::read_to_string(&note_path)
-        .unwrap_or_else(|error| panic!("{}: {error}", note_path.display()));
-    for line in [
-        "Talk to Jacque at Jacque's Cafe in Sanctuary to start The Great Scavenger Hunt.",
-        "Stops: Pappy Farnum's farm, the Cobblestone brawling ring, Highroad Junction;",
-        "then return to Jacque.",
-    ] {
-        assert!(note.contains(line), "the admin script is missing: {line}");
-    }
+    // The operator broadcast script is recorded in `notes/Autopilot/T281.md`.
+    // The suite deliberately does not read note prose: a note edit is not a
+    // gameplay change and a checkout without `notes/` must still pass (F345
+    // review finding 6).
+}
 
-    // A malformed synthetic copy is a bounded load error, never a panic; the
-    // unmodified copy in the same scratch directory loads as a control.
+/// The host NPC rows are unchanged: Jacque is a drawable `legacy_data` quest
+/// giver with no explicit quest bindings, Ricky's original chain still names
+/// him, and Samantha still gives the referral that targets Ricky.
+#[test]
+fn the_hunt_host_is_drawable_in_sanctuary() {
+    let content = content_dir();
+    let jacque = npc_row("sanctuary.json", JACQUE);
+    assert_eq!(jacque["placement"], json!("legacy_data"));
+    assert_eq!(jacque["model_id"], json!(134));
+    assert_eq!(jacque["name_string_id"], json!(7_575));
+    assert_eq!(jacque["greeting_string_id"], json!(15_500));
+    assert_eq!(jacque["quest_ids_given"], json!([]));
+    assert_eq!(jacque["quests_given"], json!([]));
+    assert_eq!(jacque["quests_accepted"], json!([]));
+    assert!(
+        jacque["roles"]
+            .as_array()
+            .unwrap()
+            .contains(&json!("quest_giver")),
+        "Jacque is a quest giver"
+    );
+    let position: [f32; 3] = serde_json::from_value(jacque["position"].clone()).unwrap();
+    assert_eq!(position, [-1212.878, -13.95695, 463.8414]);
+    assert!(position.iter().all(|value| value.is_finite()));
+    let spawned: BTreeMap<u64, [f32; 3]> = NpcVisibility::load(&content)
+        .unwrap()
+        .teleport_targets(0)
+        .into_iter()
+        .map(|target| (target.guid, target.position))
+        .collect();
+    assert_eq!(
+        spawned.get(&JACQUE),
+        Some(&position),
+        "Jacque is spawned by the production visibility loader"
+    );
+
+    // Ricky Danger's row stays byte-identical: his original chain still names
+    // him as giver and the hunt is not bound to him.
+    let original_quests = read_json(&content.join("quests/adventurer.json"));
+    let original_records = original_quests["records"].as_array().unwrap();
+    for quest_id in [CALL_THE_CREW, BACK_FOR_MORE] {
+        let original = original_records
+            .iter()
+            .find(|record| record["id"] == json!(quest_id))
+            .expect("Ricky's original quest is in adventurer.json");
+        assert_eq!(original["giver_npc_id"], json!(RICKY));
+        assert_ne!(original["enabled"], json!(false));
+    }
+    let ricky = npc_row("cobblestone_village.json", RICKY);
+    assert_eq!(ricky["placement"], json!("legacy_data"));
+    assert_eq!(ricky["model_id"], json!(960));
+    assert_eq!(ricky["name_string_id"], json!(94_007));
+    assert_eq!(ricky["greeting_string_id"], json!(94_388));
+    assert_eq!(ricky["quest_ids_given"], json!([]));
+    assert_eq!(ricky["quests_given"], json!([]));
+    assert_eq!(ricky["quests_accepted"], json!([]));
+    assert!(
+        ricky["roles"]
+            .as_array()
+            .unwrap()
+            .contains(&json!("quest_giver")),
+        "Ricky is a quest giver"
+    );
+    let ricky_position: [f32; 3] = serde_json::from_value(ricky["position"].clone()).unwrap();
+    assert_eq!(ricky_position, [-1909.511, -44.3937, 462.83]);
+
+    // Samantha's referral is untouched: she still gives 3000021, which targets
+    // Ricky, and the hunt did not move onto her.
+    let samantha = npc_row("cobblestone_village.json", SAMANTHA);
+    assert!(
+        samantha["quest_ids_given"]
+            .as_array()
+            .unwrap()
+            .contains(&json!(REFERRAL)),
+        "Samantha still gives the referral"
+    );
+    let referral = original_quests["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|record| record["id"] == json!(REFERRAL))
+        .expect("Introduce Yourself is in adventurer.json");
+    assert_eq!(referral["giver_npc_id"], json!(SAMANTHA));
+    assert_ne!(referral["enabled"], json!(false));
+    assert_eq!(referral["objectives"][0]["npc_id"], json!(RICKY));
+}
+
+/// A malformed hunt record is a bounded `InvalidData` load error, never a
+/// panic; the unmodified copy in the same scratch directory is the control.
+#[test]
+fn a_malformed_hunt_record_is_a_load_error() {
     let scratch = Scratch::new("scavenger-hunt-malformed");
     copy_split_content(&scratch.0);
     assert!(

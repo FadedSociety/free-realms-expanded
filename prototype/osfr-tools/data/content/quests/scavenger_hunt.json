@@ -120,7 +120,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T281 host choice: Jacque 9500000497 is a drawable legacy_data NPC at Jacque's Cafe in Pixiewood Hills, the southern entrance street of Sanctuary (notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md:15,51). At this tip he gives no quest: his row's quest_ids_given, quests_given and quests_accepted are empty, and no quest record names him giver_npc_id. He is the host and the final Talk target. This choice deliberately avoids the rejected Ricky Danger design (Call The Crew 3000059 and Back for More 3000060 name Ricky as giver, so an explicit first-offer binding would put the custom event ahead of an original chain); the NPC row's explicit quest_ids_given order is consulted before QuestEngine::quest_ids_for_giver, so original quests keep priority."
+          "evidence": "(R) T281 host choice: Jacque 9500000497 is a drawable legacy_data NPC at Jacque's Cafe in Pixiewood Hills, the southern entrance street of Sanctuary (notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md:15,51). At the parent tip he gave no quest: his row's quest_ids_given, quests_given and quests_accepted are empty, and no quest record named him giver_npc_id. The hunt is now his only giver record (tests/scavenger_hunt_quest.rs pins that). He is the host and the final Talk target. This choice deliberately avoids the rejected Ricky Danger design (Call The Crew 3000059 and Back for More 3000060 name Ricky as giver, so an explicit first-offer binding would put the custom event ahead of an original chain); the NPC row's explicit quest_ids_given order is consulted before QuestEngine::quest_ids_for_giver, so original quests keep priority."
         },
         {
           "kind": "reconstructed",
