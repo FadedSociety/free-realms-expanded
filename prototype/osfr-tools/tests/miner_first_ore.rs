@@ -1,4 +1,11 @@
-//! T300: the Miner's first playable quest, "So, You Want To Be A Miner?" (3100002).
+//! T300/T334: the Miner's first two playable records, "So, You Want To Be A Miner?"
+//! (3100002) and its follow-up "All I Got" (3100003).
+//!
+//! 3100003 is the Trixi gear referral: the record's own description 76088 ("Visit Trixi in
+//! the Singing Crystal Mines and find out if she has any better mining gear for you.") and
+//! its one Talk-to-Trixi objective are the authority; the guide's row-2 title match is
+//! reconstructed (R). Its job gate (14), prerequisite (3100002) and 5-coin / 15-Miner-XP
+//! reward mirror the first rung.
 //!
 //! Therin (9000000217), the guildmaster of the Singing Crystal Mines, is a POI anchor in the
 //! Snowhill content; the `npc_spawns_extra.json` row added here is the drawable actor. The
@@ -51,6 +58,7 @@ use npc_quest_chain::{
 };
 use osfr_tools::{
     character_store::CharacterState,
+    game_store,
     gameplay::Gameplay,
     inventory::MAX_ITEMS,
     mining,
@@ -62,13 +70,21 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
 const THERIN: u64 = 9_000_000_217;
-/// Trixi (9000000220) is a spawned Snowhill NPC who gives no live Miner quest: wrong NPC.
+/// Trixi (9000000220) is the Snowhill legacy_data regional row the 3100003 Talk targets.
 const TRIXI: u64 = 9_000_000_220;
+/// Smitty (9000000206) is a spawned Snowhill Blacksmith: a wrong Talk target for a Miner.
+const SMITTY: u64 = 9_000_000_206;
 const MINER_FIRST: u32 = 3_100_002;
-const DRAINED_RECORDS: [u32; 4] = [3_100_001, 3_100_003, 3_100_004, 3_100_005];
+/// T334: the second Miner chapter, the Trixi mining-gear referral.
+const ALL_I_GOT: u32 = 3_100_003;
+const DRAINED_RECORDS: [u32; 3] = [3_100_001, 3_100_004, 3_100_005];
 const TITLE: u32 = 23_217;
 const DESCRIPTION: u32 = 23_218;
 const END_TEXT: u32 = 23_219;
+const ALL_I_GOT_INTRO: u32 = 76_086;
+const ALL_I_GOT_TITLE: u32 = 76_087;
+const ALL_I_GOT_DESCRIPTION: u32 = 76_088;
+const ALL_I_GOT_END_TEXT: u32 = 76_089;
 const ADVENTURER: i32 = 1;
 const MINER: i32 = 14;
 const BRAWLER: i32 = 43;
@@ -77,6 +93,10 @@ const QUIT_FRAME_SUB: u8 = 6;
 
 fn therin_position() -> [f32; 3] {
     content_position("snowhill.json", THERIN)
+}
+
+fn trixi_position() -> [f32; 3] {
+    content_position("snowhill.json", TRIXI)
 }
 
 fn character_at(position: [f32; 3]) -> CharacterState {
@@ -100,17 +120,46 @@ fn count(game: &Gameplay, objective: usize) -> u32 {
     counts(game, MINER_FIRST)[objective]
 }
 
-/// The production per-session visibility batch, for one session at Therin's spawn. Each
-/// nearby session builds its own batch through `Gameplay::update_npc_visibility`.
-fn drawn_therin(fixture: &Fixture, character_id: u64) -> NpcSpawn {
+/// Complete 3100002 through the production offer, one live copper-vein Mining18 win, the
+/// held Therin end screen and the 49/14 payout. Returns the timestamp after the turn-in.
+fn complete_the_first_ore(game: &mut Gameplay, character: &CharacterState, now: u64) -> u64 {
+    offer(game, character, THERIN, MINER_FIRST, now);
+    accept(game, character, MINER_FIRST, now + 100);
+    let (guid, position) = copper_nodes()[0];
+    let mut at = now + 200;
+    assert!(
+        gather_copper(game, character, guid, position, &mut at).is_some(),
+        "the live copper vein starts a Mining18 round"
+    );
+    open_end_screen(game, character, THERIN, MINER_FIRST, END_TEXT, at + 100);
+    finish_quest(game, character, MINER_FIRST, MINER, 5, 15, at + 200);
+    at + 300
+}
+
+/// The real `game_store` save bytes, so a refusal is also proven inert at the persistence
+/// boundary. The envelope is deterministic: it carries no timestamp.
+fn save_envelope(fixture: &Fixture, game: &Gameplay, character: &CharacterState) -> Vec<u8> {
+    let path = fixture.path().join("refusal-save.json");
+    let snapshot = game_store::Snapshot {
+        character: character.clone(),
+        gameplay: Some(game.state()),
+    };
+    game_store::save(&path, &snapshot).expect("the save envelope writes");
+    std::fs::read(&path).expect("the save envelope reads")
+}
+
+/// The production per-session visibility batch, decoded with the client 35/2 reader, for one
+/// session standing at `at`. Each nearby session builds its own batch through
+/// `Gameplay::update_npc_visibility`.
+fn drawn_npc(fixture: &Fixture, character_id: u64, at: [f32; 3], actor_id: u64) -> NpcSpawn {
     let mut game = fixture.game_as(character_id, MINER, &[ADVENTURER, MINER]);
-    let at = character_at_for(character_id, 0, therin_position());
-    game.update_npc_visibility(&at)
+    let character = character_at_for(character_id, 0, at);
+    game.update_npc_visibility(&character)
         .expect("visibility batch builds")
         .iter()
         .filter_map(|packet| parse_add_npc(packet).ok())
-        .find(|npc| npc.actor_id == THERIN)
-        .expect("Therin is drawn for every nearby session")
+        .find(|npc| npc.actor_id == actor_id)
+        .unwrap_or_else(|| panic!("actor {actor_id} is drawn for every nearby session"))
 }
 
 fn row<'a>(records: &'a [Value], id: u64) -> &'a Value {
@@ -565,13 +614,24 @@ fn refusals_and_replay_change_nothing() {
         now + 300,
         "a replayed 49/14 after completion",
     );
+    // The completed 3100002 is not re-offered. Since T334 the same Talk offers the next
+    // Miner rung (3100003); a second Talk while that offer is open still changes nothing.
     let mut reoffer = now + 400;
+    let next = offer(&mut miner, &character, THERIN, ALL_I_GOT, reoffer);
+    assert_offer_ids(
+        &offer_packet(&next, ALL_I_GOT),
+        ALL_I_GOT,
+        ALL_I_GOT_INTRO,
+        ALL_I_GOT_TITLE,
+        ALL_I_GOT_DESCRIPTION,
+    );
+    reoffer += 100;
     assert_no_offer(
         &mut miner,
         &character,
         THERIN,
         &mut reoffer,
-        "a completed Miner quest",
+        "a second Talk while the follow-up is offered",
     );
 }
 
@@ -800,7 +860,7 @@ fn therin_is_drawable_and_the_quest_content_resolves() {
     let fixture = Fixture::new();
     let drawn: Vec<NpcSpawn> = [FIRST_VIEWER, SECOND_VIEWER]
         .into_iter()
-        .map(|viewer| drawn_therin(&fixture, viewer))
+        .map(|viewer| drawn_npc(&fixture, viewer, therin_position(), THERIN))
         .collect();
     for npc in &drawn {
         assert_eq!(npc.actor_id, THERIN);
@@ -857,12 +917,12 @@ fn therin_is_drawable_and_the_quest_content_resolves() {
         "the record carries its T300 decisions"
     );
 
-    // The records this slice must not open stay hollow with their recovered titles.
+    // The records T334 does not open stay disabled with their recovered titles. 3100003 is
+    // no longer one of them: T334 enables it with the Trixi objective and its reward.
     for (id, title) in [
-        (DRAINED_RECORDS[0], 139_748),
-        (DRAINED_RECORDS[1], 76_087),
-        (DRAINED_RECORDS[2], 76_209),
-        (DRAINED_RECORDS[3], 76_770),
+        (3_100_001_u32, 139_748_u32),
+        (3_100_004, 76_209),
+        (3_100_005, 76_770),
     ] {
         let record = row(&quests["records"].as_array().unwrap(), u64::from(id));
         assert_eq!(record["enabled"], json!(false), "quest {id} stays disabled");
@@ -964,8 +1024,9 @@ fn the_reward_is_paid_once_and_grants_no_free_item() {
     assert_eq!(coins(&game), 5);
     assert_eq!(profile_xp(&game, MINER), MINING_XP_PER_WIN + 15);
 
-    // A replayed turn-in and a later Talk cannot pay or re-grant anything.
-    let finished = saved(&game);
+    // A replayed turn-in and a later Talk cannot pay or re-grant anything. The later Talk
+    // offers the T334 follow-up (3100003), which proves the completed 3100002 is not
+    // re-offered; the offer itself pays nothing.
     let finished_ledger = item_ledger(&game);
     assert_packet_changes_nothing(
         &mut game,
@@ -975,6 +1036,15 @@ fn the_reward_is_paid_once_and_grants_no_free_item() {
         "a replayed 49/14",
     );
     let mut reoffer = now + 400;
+    let next = offer(&mut game, &character, THERIN, ALL_I_GOT, reoffer);
+    assert_offer_ids(
+        &offer_packet(&next, ALL_I_GOT),
+        ALL_I_GOT,
+        ALL_I_GOT_INTRO,
+        ALL_I_GOT_TITLE,
+        ALL_I_GOT_DESCRIPTION,
+    );
+    reoffer += 100;
     assert_no_offer(
         &mut game,
         &character,
@@ -982,8 +1052,628 @@ fn the_reward_is_paid_once_and_grants_no_free_item() {
         &mut reoffer,
         "the completed quest",
     );
+    assert_eq!(quest_status(&game, MINER_FIRST), QuestStatus::Completed);
     assert_eq!(coins(&game), 5);
     assert_eq!(profile_xp(&game, MINER), MINING_XP_PER_WIN + 15);
     assert_eq!(item_ledger(&game), finished_ledger);
+}
+
+// ---------------------------------------------------------------------------------------------
+// T334: "All I Got", the Trixi mining-gear referral (3100003).
+// ---------------------------------------------------------------------------------------------
+
+/// T334: after T300's practice test, the same Therin offers the record whose own client
+/// description 76088 sends the Miner to Trixi. The job and prerequisite gates are unchanged.
+#[test]
+fn all_i_got_is_offered_after_the_first_ore() {
+    let fixture = Fixture::new();
+    let character = character_at(therin_position());
+
+    // Complete 3100002 once in a donor session: it is 3100003's prerequisite.
+    let mut donor = fixture.game(MINER, &[ADVENTURER, MINER]);
+    let now = complete_the_first_ore(&mut donor, &character, 1_000);
+    let completed = donor.state();
+
+    // An active Miner who completed the practice test is offered the Trixi referral.
+    let mut miner = fixture.game_with_state(completed.clone());
+    let offered = offer(&mut miner, &character, THERIN, ALL_I_GOT, now);
+    assert_offer_ids(
+        &offer_packet(&offered, ALL_I_GOT),
+        ALL_I_GOT,
+        ALL_I_GOT_INTRO,
+        ALL_I_GOT_TITLE,
+        ALL_I_GOT_DESCRIPTION,
+    );
+    assert_eq!(quest_status(&miner, ALL_I_GOT), QuestStatus::Offered);
+
+    // A second Talk while the offer is open neither re-offers nor consumes the open menu.
+    let mut later = now + 100;
+    assert_no_offer(
+        &mut miner,
+        &character,
+        THERIN,
+        &mut later,
+        "a second Talk while 3100003 is offered",
+    );
+
+    // A fresh Miner without 3100002 is offered only the practice test, never 3100003.
+    let mut fresh = fixture.game(MINER, &[ADVENTURER, MINER]);
+    offer(&mut fresh, &character, THERIN, MINER_FIRST, now + 200);
+
+    // A completed practice test on a character without the Miner profile is refused.
+    let mut locked_state = completed.clone();
+    {
+        let profiles = locked_state
+            .profiles
+            .as_mut()
+            .expect("the fixture saves profiles");
+        profiles.active = ADVENTURER;
+        profiles.unlocked = [ADVENTURER].into_iter().collect();
+        profiles.experience.remove(&MINER);
+    }
+    let mut locked = fixture.game_with_state(locked_state);
+    let mut later = now + 300;
+    assert_no_offer(&mut locked, &character, THERIN, &mut later, "a non-Miner");
+
+    // An unlocked, ranked Miner who is not the active job is refused too: the engine's job
+    // levels are built from the saved active profile only.
+    let mut inactive_state = completed.clone();
+    {
+        let profiles = inactive_state
+            .profiles
+            .as_mut()
+            .expect("the fixture saves profiles");
+        profiles.active = ADVENTURER;
+        profiles.unlocked = [ADVENTURER, MINER].into_iter().collect();
+        profiles.experience.insert(MINER, 200);
+    }
+    let mut inactive = fixture.game_with_state(inactive_state);
+    let mut later = now + 400;
+    assert_no_offer(
+        &mut inactive,
+        &character,
+        THERIN,
+        &mut later,
+        "an unlocked-but-inactive Miner",
+    );
+}
+
+/// T334: the Talk to Trixi completes the one objective, opens the held 49/13 and the 49/14
+/// pays exactly 5 coins + 15 Miner XP with no item. Both replayed replies are inert.
+#[test]
+fn talking_to_trixi_completes_and_pays_once() {
+    let fixture = Fixture::new();
+    let mut game = fixture.game(MINER, &[ADVENTURER, MINER]);
+    let character = character_at(therin_position());
+    let now = complete_the_first_ore(&mut game, &character, 1_000);
+    offer(&mut game, &character, THERIN, ALL_I_GOT, now);
+    accept(&mut game, &character, ALL_I_GOT, now + 100);
+    assert_eq!(counts(&game, ALL_I_GOT), [0]);
+
+    let at_trixi = character_at(trixi_position());
+    let items_before = item_ledger(&game);
+    let coins_before = coins(&game);
+    let xp_before = profile_xp(&game, MINER);
+    let end = open_end_screen(
+        &mut game,
+        &at_trixi,
+        TRIXI,
+        ALL_I_GOT,
+        ALL_I_GOT_END_TEXT,
+        now + 200,
+    );
+    assert_eq!(end_screen_reward(&end), (5, 15), "49/13 reward bundle");
+    assert_eq!(counts(&game, ALL_I_GOT), [1], "the Talk completed the step");
+    assert_eq!(pending_turnin(&game), Some(ALL_I_GOT));
+    assert_eq!(coins(&game), coins_before, "the end screen pays nothing");
+
+    finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 15, now + 300);
+    assert_eq!(quest_status(&game, ALL_I_GOT), QuestStatus::Completed);
+    assert_eq!(coins(&game), coins_before + 5, "exactly 5 coins");
+    assert_eq!(
+        profile_xp(&game, MINER),
+        xp_before + 15,
+        "exactly 15 Miner XP"
+    );
+    assert_eq!(
+        item_ledger(&game),
+        items_before,
+        "the referral grants no item and consumes none"
+    );
+
+    // A replayed end reply and a replayed accept pay nothing.
+    assert_packet_changes_nothing(
+        &mut game,
+        &at_trixi,
+        &quest_end_reply(ALL_I_GOT),
+        now + 400,
+        "a replayed 49/14",
+    );
+    assert_packet_changes_nothing(
+        &mut game,
+        &at_trixi,
+        &quest_reply(ALL_I_GOT, true),
+        now + 500,
+        "a replayed 49/2",
+    );
+    assert_eq!(coins(&game), coins_before + 5);
+    assert_eq!(profile_xp(&game, MINER), xp_before + 15);
+}
+
+/// T334: the explicit `{"14": 15}` map pays profile 14 even when the active job changed
+/// between accept and turn-in.
+#[test]
+fn the_reward_goes_to_profile_14_after_a_job_switch() {
+    let fixture = Fixture::new();
+    let mut game = fixture.game(MINER, &[ADVENTURER, MINER, BRAWLER]);
+    let character = character_at(therin_position());
+    let now = complete_the_first_ore(&mut game, &character, 1_000);
+    offer(&mut game, &character, THERIN, ALL_I_GOT, now);
+    accept(&mut game, &character, ALL_I_GOT, now + 100);
+
+    // Switch away before the Trixi Talk: the reward map names Miner.
+    let switched = send(&mut game, &character, &select_job(BRAWLER), now + 200);
+    assert!(switched.changed, "the Brawler outfit is selectable");
+    assert_eq!(active_job(&game), BRAWLER);
+    let brawler_before = profile_xp(&game, BRAWLER);
+    let miner_before = profile_xp(&game, MINER);
+
+    let at_trixi = character_at(trixi_position());
+    let end = open_end_screen(
+        &mut game,
+        &at_trixi,
+        TRIXI,
+        ALL_I_GOT,
+        ALL_I_GOT_END_TEXT,
+        now + 300,
+    );
+    assert_eq!(end_screen_reward(&end), (5, 15));
+    finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 15, now + 400);
+    assert_eq!(
+        profile_xp(&game, MINER),
+        miner_before + 15,
+        "the quest pays profile 14"
+    );
+    assert_eq!(
+        profile_xp(&game, BRAWLER),
+        brawler_before,
+        "the active Brawler profile receives none of the quest XP"
+    );
+}
+
+/// T334: a wrong Talk target, an out-of-range click, forged replies, a wrong quest id and
+/// replays all leave the whole `GameplayState` and the real save bytes equal.
+#[test]
+fn refusals_wrong_target_and_replay_change_nothing() {
+    let fixture = Fixture::new();
+    let character = character_at(therin_position());
+    let mut game = fixture.game(MINER, &[ADVENTURER, MINER]);
+    let mut now = 1_000;
+
+    // Forged replies before 3100003 is offered change nothing.
+    assert_packet_changes_nothing(
+        &mut game,
+        &character,
+        &quest_reply(ALL_I_GOT, true),
+        now,
+        "a forged 49/2 before the offer",
+    );
+    assert_packet_changes_nothing(
+        &mut game,
+        &character,
+        &quest_end_reply(ALL_I_GOT),
+        now + 10,
+        "a forged 49/14 with no end screen",
+    );
+
+    now = complete_the_first_ore(&mut game, &character, now + 100);
+    offer(&mut game, &character, THERIN, ALL_I_GOT, now);
+    accept(&mut game, &character, ALL_I_GOT, now + 10);
+
+    // A wrong NPC (Smitty) neither advances the Trixi step nor offers anything to a Miner.
+    let at_smitty = character_at(content_position("snowhill.json", SMITTY));
+    let mut later = now + 100;
+    assert_no_offer(
+        &mut game,
+        &at_smitty,
+        SMITTY,
+        &mut later,
+        "a wrong Talk target (Smitty)",
+    );
+    assert_eq!(
+        counts(&game, ALL_I_GOT),
+        [0],
+        "Smitty advanced the Trixi step"
+    );
+
+    // Out-of-range 26/8 is an `Err` at the session boundary and changes nothing.
+    let far = character_at([10_000.0, 0.0, 10_000.0]);
+    let before = saved(&game);
+    let before_save = save_envelope(&fixture, &game, &character);
+    assert!(
+        game.handle_in_world(&npc_interact(TRIXI), &far, now + 200)
+            .is_err(),
+        "an out-of-range 26/8 is refused"
+    );
+    assert_eq!(saved(&game), before);
+    assert_eq!(save_envelope(&fixture, &game, &character), before_save);
+
+    // A replayed accept while the quest is already active is inert.
+    assert_packet_changes_nothing(
+        &mut game,
+        &character,
+        &quest_reply(ALL_I_GOT, true),
+        now + 300,
+        "a replayed 49/2",
+    );
+
+    // The Trixi Talk holds the end screen; a 49/14 for another quest cannot settle it.
+    let at_trixi = character_at(trixi_position());
+    open_end_screen(
+        &mut game,
+        &at_trixi,
+        TRIXI,
+        ALL_I_GOT,
+        ALL_I_GOT_END_TEXT,
+        now + 400,
+    );
+    let before = saved(&game);
+    let before_save = save_envelope(&fixture, &game, &character);
+    assert_packet_changes_nothing(
+        &mut game,
+        &at_trixi,
+        &quest_end_reply(MINER_FIRST),
+        now + 500,
+        "a 49/14 for another quest",
+    );
+    assert_eq!(
+        pending_turnin(&game),
+        Some(ALL_I_GOT),
+        "the wrong quest consumed the held end screen"
+    );
+    assert_eq!(saved(&game), before);
+    assert_eq!(save_envelope(&fixture, &game, &character), before_save);
+
+    finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 15, now + 600);
+    let finished = saved(&game);
+    let finished_save = save_envelope(&fixture, &game, &character);
+    assert_packet_changes_nothing(
+        &mut game,
+        &at_trixi,
+        &quest_end_reply(ALL_I_GOT),
+        now + 700,
+        "a replayed 49/14 after completion",
+    );
+    assert_packet_changes_nothing(
+        &mut game,
+        &at_trixi,
+        &quest_reply(ALL_I_GOT, true),
+        now + 800,
+        "a replayed 49/2 after completion",
+    );
     assert_eq!(saved(&game), finished);
+    assert_eq!(save_envelope(&fixture, &game, &character), finished_save);
+}
+
+/// T334: the accepted state, the Trixi step counter and the held end screen live in the
+/// character save and survive the production `game_store` round trip.
+#[test]
+fn progress_survives_a_reload() {
+    let fixture = Fixture::new();
+    let mut game = fixture.game(MINER, &[ADVENTURER, MINER]);
+    let character = character_at(therin_position());
+    let now = complete_the_first_ore(&mut game, &character, 1_000);
+    offer(&mut game, &character, THERIN, ALL_I_GOT, now);
+    accept(&mut game, &character, ALL_I_GOT, now + 100);
+
+    // Reload after the accept: the active state survives and nothing is paid.
+    let coins_before = coins(&game);
+    let xp_before = profile_xp(&game, MINER);
+    let mut game = fixture.save_and_reload(&game, &character);
+    assert_eq!(quest_status(&game, ALL_I_GOT), QuestStatus::Active);
+    assert_eq!(counts(&game, ALL_I_GOT), [0]);
+    assert_eq!(pending_turnin(&game), None);
+    assert_eq!(coins(&game), coins_before, "the reload paid nothing");
+    assert_eq!(profile_xp(&game, MINER), xp_before);
+
+    // The Trixi Talk, then a reload: the counter and the held screen survive, and the relog
+    // batch re-sends the 49/13 beside Trixi's AddNpc.
+    let at_trixi = character_at(trixi_position());
+    let end = open_end_screen(
+        &mut game,
+        &at_trixi,
+        TRIXI,
+        ALL_I_GOT,
+        ALL_I_GOT_END_TEXT,
+        now + 200,
+    );
+    assert_eq!(end_screen_reward(&end), (5, 15));
+    assert_eq!(counts(&game, ALL_I_GOT), [1]);
+    let mut game = fixture.save_and_reload(&game, &at_trixi);
+    assert_eq!(counts(&game, ALL_I_GOT), [1], "the Talk counter survives");
+    assert_eq!(
+        pending_turnin(&game),
+        Some(ALL_I_GOT),
+        "the held end screen survives"
+    );
+    let relog = game
+        .update_npc_visibility(&at_trixi)
+        .expect("the relog visibility batch builds");
+    assert!(
+        relog
+            .iter()
+            .any(|packet| has_family(packet, 49, 13, Some(ALL_I_GOT))),
+        "the relog batch re-sends the held end screen"
+    );
+
+    // The saved turn-in pays once; a later reload keeps the completed history.
+    finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 15, now + 300);
+    let mut game = fixture.save_and_reload(&game, &at_trixi);
+    assert_eq!(quest_status(&game, ALL_I_GOT), QuestStatus::Completed);
+    assert_eq!(coins(&game), coins_before + 5);
+    assert_eq!(profile_xp(&game, MINER), xp_before + 15);
+    assert_packet_changes_nothing(
+        &mut game,
+        &at_trixi,
+        &quest_end_reply(ALL_I_GOT),
+        now + 400,
+        "a 49/14 replayed after the reconnect",
+    );
+}
+
+/// T334: two Miners each own their offer, step counter and reward; one player's refusal
+/// changes neither the other session nor the server loop.
+#[test]
+fn two_miners_progress_independently_on_all_i_got() {
+    const FIRST: u64 = 300_031;
+    const SECOND: u64 = 300_032;
+    let fixture = Fixture::new();
+    let first = character_at_for(FIRST, 0, therin_position());
+    let second = character_at_for(SECOND, 0, therin_position());
+    let mut a = fixture.game_as(FIRST, MINER, &[ADVENTURER, MINER]);
+    let mut b = fixture.game_as(SECOND, MINER, &[ADVENTURER, MINER]);
+    let mut now = 1_000;
+    now = complete_the_first_ore(&mut a, &first, now);
+    now = complete_the_first_ore(&mut b, &second, now);
+
+    // A's offer is its own; B keeps a free menu. B's out-of-range click is a refusal that
+    // consumes neither A's pending offer nor B's state.
+    offer(&mut a, &first, THERIN, ALL_I_GOT, now);
+    assert_eq!(pending_offer(&a), Some(ALL_I_GOT));
+    assert_eq!(pending_offer(&b), None, "A's offer consumed B's menu");
+    let far = character_at_for(SECOND, 0, [10_000.0, 0.0, 10_000.0]);
+    let a_before = saved(&a);
+    let b_before = saved(&b);
+    assert!(
+        b.handle_in_world(&npc_interact(THERIN), &far, now + 100)
+            .is_err(),
+        "an out-of-range 26/8 is refused"
+    );
+    assert_eq!(
+        pending_offer(&a),
+        Some(ALL_I_GOT),
+        "B's refusal consumed A's pending offer"
+    );
+    assert_eq!(saved(&a), a_before);
+    assert_eq!(saved(&b), b_before, "B's refusal changed B's state");
+
+    offer(&mut b, &second, THERIN, ALL_I_GOT, now + 200);
+    accept(&mut a, &first, ALL_I_GOT, now + 300);
+    accept(&mut b, &second, ALL_I_GOT, now + 300);
+    assert_eq!(counts(&a, ALL_I_GOT), [0]);
+    assert_eq!(counts(&b, ALL_I_GOT), [0]);
+
+    // A's Trixi Talk and held end screen are its own; B's step counter stays at zero.
+    let at_trixi_a = character_at_for(FIRST, 0, trixi_position());
+    let at_trixi_b = character_at_for(SECOND, 0, trixi_position());
+    let end_a = open_end_screen(
+        &mut a,
+        &at_trixi_a,
+        TRIXI,
+        ALL_I_GOT,
+        ALL_I_GOT_END_TEXT,
+        now + 400,
+    );
+    assert_eq!(end_screen_reward(&end_a), (5, 15));
+    assert_eq!(counts(&a, ALL_I_GOT), [1]);
+    assert_eq!(counts(&b, ALL_I_GOT), [0], "A's Talk touched B's quest");
+    assert_eq!(pending_turnin(&a), Some(ALL_I_GOT));
+    assert_eq!(pending_turnin(&b), None);
+
+    // A's forged replay cannot touch B's progress while B is still at the Talk step.
+    finish_quest(&mut a, &at_trixi_a, ALL_I_GOT, MINER, 5, 15, now + 500);
+    let b_progress = saved(&b);
+    assert_packet_changes_nothing(
+        &mut a,
+        &at_trixi_a,
+        &quest_end_reply(ALL_I_GOT),
+        now + 600,
+        "A's replayed 49/14 while B is active",
+    );
+    assert_eq!(saved(&b), b_progress);
+
+    // B's own Trixi Talk pays its own reward.
+    let end_b = open_end_screen(
+        &mut b,
+        &at_trixi_b,
+        TRIXI,
+        ALL_I_GOT,
+        ALL_I_GOT_END_TEXT,
+        now + 700,
+    );
+    assert_eq!(end_screen_reward(&end_b), (5, 15));
+    finish_quest(&mut b, &at_trixi_b, ALL_I_GOT, MINER, 5, 15, now + 800);
+    assert_eq!(quest_status(&a, ALL_I_GOT), QuestStatus::Completed);
+    assert_eq!(quest_status(&b, ALL_I_GOT), QuestStatus::Completed);
+    // Each also finished T300's first Miner quest, so each wallet holds both 5-coin rungs.
+    assert_eq!(coins(&a), 10);
+    assert_eq!(coins(&b), 10);
+    assert_eq!(profile_xp(&a, MINER), MINING_XP_PER_WIN + 30);
+    assert_eq!(profile_xp(&b, MINER), MINING_XP_PER_WIN + 30);
+}
+
+/// T334: the record and both NPCs resolve through the production content parser and the
+/// client 35/2 AddNpc reader: Therin (extra spawn) offers, Trixi (legacy_data) is the target.
+#[test]
+fn the_record_and_both_npcs_resolve() {
+    let content = content_dir();
+    let quests = read_json(&content.join("quests/miner.json"));
+    let quest = row(&quests["records"].as_array().unwrap(), u64::from(ALL_I_GOT));
+    assert_eq!(quest["enabled"], json!(true));
+    assert_eq!(quest["job"], json!(MINER));
+    assert_eq!(quest["giver_npc_id"], json!(THERIN));
+    assert_eq!(quest["prerequisite_quest_ids"], json!([MINER_FIRST]));
+    assert_eq!(quest["title_string_id"], json!(ALL_I_GOT_TITLE));
+    assert_eq!(quest["description_string_id"], json!(ALL_I_GOT_DESCRIPTION));
+    assert_eq!(quest["intro_text_string_id"], json!(ALL_I_GOT_INTRO));
+    assert_eq!(quest["end_text_string_id"], json!(ALL_I_GOT_END_TEXT));
+    let objectives = quest["objectives"].as_array().unwrap();
+    assert_eq!(objectives.len(), 1, "one ordered Talk to Trixi");
+    assert_eq!(objectives[0]["kind"], json!("talk_to_npc"));
+    assert_eq!(objectives[0]["npc_id"], json!(TRIXI));
+    assert!(has_source(&objectives[0], "client"));
+    let rewards = quest["rewards"].as_array().unwrap();
+    assert_eq!(rewards.len(), 1);
+    assert_eq!(rewards[0]["coins"], json!(5));
+    assert_eq!(rewards[0]["items"], json!([]));
+    assert_eq!(rewards[0]["job_xp"], json!({"14": 15}));
+    assert!(has_source(&rewards[0], "reconstructed"));
+    assert!(has_source(quest, "reconstructed"));
+    assert!(
+        quest["source"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|tag| tag["evidence"]
+                .as_str()
+                .is_some_and(|text| text.starts_with("(R) T334:"))),
+        "the record carries its T334 decisions"
+    );
+    assert!(
+        !quest["source"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .any(|tag| tag["evidence"]
+                .as_str()
+                .is_some_and(|text| text.starts_with("(R) W110:"))),
+        "the stale W110 unspawned-giver tag is gone"
+    );
+    assert!(
+        quest["source"].as_array().unwrap().iter().any(|tag| {
+            tag["kind"].as_str() == Some("client")
+                && tag["evidence"]
+                    .as_str()
+                    .is_some_and(|text| text.contains("Visit Trixi in the Singing Crystal Mines"))
+        }),
+        "the client description 76088 names the Trixi visit"
+    );
+
+    let snowhill = read_json(&content.join("npcs/snowhill.json"));
+    let records = snowhill["records"].as_array().unwrap();
+    let trixi = row(records, TRIXI);
+    assert_eq!(trixi["name"], json!("Trixi"));
+    assert_eq!(trixi["placement"], json!("legacy_data"));
+    assert_eq!(trixi["model_id"], json!(35));
+    let position: [f64; 3] = serde_json::from_value(trixi["position"].clone()).unwrap();
+    assert!((position[0] - 478.2027).abs() < 0.001);
+    assert!((position[1] - 47.11174).abs() < 0.001);
+    assert!((position[2] - 237.3823).abs() < 0.001);
+
+    // Every quest Trixi gives is still disabled, so the Talk offers no second live quest.
+    for quest_id in trixi["quest_ids_given"].as_array().unwrap() {
+        let id = quest_id.as_u64().unwrap();
+        let file = if id == 3_020_006 {
+            "quests/blacksmith.json"
+        } else {
+            "quests/miner.json"
+        };
+        let document = read_json(&content.join(file));
+        let record = row(&document["records"].as_array().unwrap(), id);
+        assert_eq!(record["enabled"], json!(false), "quest {id} stays disabled");
+    }
+
+    // Both NPCs draw through the production 35/2 AddNpc parser for a nearby session. Therin
+    // is T300's extra spawn (Global.Text.185, model 381); Trixi is a legacy_data regional row.
+    const THERIN_VIEWER: u64 = 300_041;
+    const TRIXI_VIEWER: u64 = 300_042;
+    let fixture = Fixture::new();
+    let therin = drawn_npc(&fixture, THERIN_VIEWER, therin_position(), THERIN);
+    assert_eq!(therin.name_string_id, 185);
+    assert_eq!(therin.model_id, 381);
+    let drawn_trixi = drawn_npc(&fixture, TRIXI_VIEWER, trixi_position(), TRIXI);
+    assert_eq!(drawn_trixi.name_string_id, 3230);
+    assert_eq!(drawn_trixi.model_id, 35);
+    for axis in 0..3 {
+        assert!((drawn_trixi.position[axis] - position[axis] as f32).abs() < 0.01);
+    }
+}
+
+/// T334: a near-cap coin balance (the wire field is i32) refuses the 49/14 as a per-player
+/// application rejection: no coins, no XP, no item, no save change and no panic. Spending the
+/// overflow frees the same held end screen for a normal retry.
+#[test]
+fn a_near_cap_coin_balance_refuses_the_turn_in_without_paying_xp_or_item() {
+    let fixture = Fixture::new();
+    let mut game = fixture.game(MINER, &[ADVENTURER, MINER]);
+    let character = character_at(therin_position());
+    let now = complete_the_first_ore(&mut game, &character, 1_000);
+    offer(&mut game, &character, THERIN, ALL_I_GOT, now);
+    accept(&mut game, &character, ALL_I_GOT, now + 100);
+
+    let at_trixi = character_at(trixi_position());
+    open_end_screen(
+        &mut game,
+        &at_trixi,
+        TRIXI,
+        ALL_I_GOT,
+        ALL_I_GOT_END_TEXT,
+        now + 200,
+    );
+
+    // Seed the saved balance at the i32 wire cap with the end screen held.
+    let mut state = game.state();
+    state.inventory.coins = i32::MAX as u32;
+    let mut game = fixture.game_with_state(state);
+    assert_eq!(pending_turnin(&game), Some(ALL_I_GOT));
+    let xp_before = profile_xp(&game, MINER);
+    let items_before = item_ledger(&game);
+    let before = saved(&game);
+    let before_save = save_envelope(&fixture, &game, &character);
+
+    let error = game
+        .handle_in_world(&quest_end_reply(ALL_I_GOT), &at_trixi, now + 300)
+        .err()
+        .expect("a near-cap coin balance refuses the turn-in");
+    assert_eq!(
+        error.kind(),
+        std::io::ErrorKind::InvalidData,
+        "the refusal is a clean application error, not a panic"
+    );
+    assert_eq!(coins(&game), i32::MAX as u32, "the refused turn-in paid");
+    assert_eq!(
+        profile_xp(&game, MINER),
+        xp_before,
+        "the refused turn-in paid XP"
+    );
+    assert_eq!(
+        item_ledger(&game),
+        items_before,
+        "the refused turn-in granted an item"
+    );
+    assert_eq!(
+        pending_turnin(&game),
+        Some(ALL_I_GOT),
+        "the held end screen survives for a retry"
+    );
+    assert_eq!(quest_status(&game, ALL_I_GOT), QuestStatus::Active);
+    assert_eq!(saved(&game), before);
+    assert_eq!(save_envelope(&fixture, &game, &character), before_save);
+
+    // Spending the overflow lets the same held end screen pay once.
+    let mut state = game.state();
+    state.inventory.coins = 0;
+    let mut game = fixture.game_with_state(state);
+    finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 15, now + 400);
+    assert_eq!(coins(&game), 5);
 }

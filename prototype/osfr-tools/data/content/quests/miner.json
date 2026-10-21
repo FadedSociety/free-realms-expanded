@@ -172,6 +172,7 @@
     },
     {
       "id": 3100003,
+      "job": 14,
       "title_string_id": 76087,
       "giver_npc_id": 9000000217,
       "prerequisite_quest_ids": [
@@ -190,7 +191,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "14": 15
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T334: 5 coins and 15 Miner (profile 14) XP mirror T300's first Miner rung (3100002); the guide's reward cell is unknown. No item is granted, so this referral creates no free, sellable or re-grantable gear. The explicit {\"14\": 15} map pays profile 14 even if the active job changes before turn-in."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -210,7 +225,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T334: the record carries one ordered talk_to_npc objective to Trixi 9000000220; the earlier generic empty-objectives note was stale."
         },
         {
           "kind": "reconstructed",
@@ -221,8 +236,20 @@
           "evidence": "(R) source explicitly says after row 1; mapped that page label to the preceding batch content key"
         },
         {
+          "kind": "client",
+          "evidence": "The record's own description 76088 'Visit Trixi in the Singing Crystal Mines and find out if she has any better mining gear for you.' names the objective target Trixi 9000000220; intro 76086 and end text 76089 are the same client text block."
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T334: the guide's row 2 ('Miner: All I Got') is a weak match; its quoted strings fit first-ore mining, not this record's Trixi gear line. The record's own description 76088 and Trixi objective are the authority, so the title-to-guide-row link is reconstructed, not proven."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T334: job gate 14 (Miner) at the schema's rank-1 default. character_eligibility builds job_levels only from the saved active, unlocked profile, so a non-Miner and an unlocked-but-inactive Miner are both refused; prerequisite 3100002 is T300's practice test."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T334: the 5-coin / 15-Miner-XP reward is the T202/T241 small-quest fallback used by T300's 3100002; the guide leaves the reward cell unknown, and no item is granted."
         },
         {
           "kind": "reconstructed",
@@ -230,13 +257,17 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) W110: DISABLED: existing enabled quest has unspawned giver/talk target(s) [9000000217]; objectives and rewards preserved."
+          "evidence": "(R) T300: the giver Therin 9000000217 is drawable through the extra spawn row in npc_spawns_extra.json (spawn_guid/content_key 9000000217, model 381 dwarf_therin_m.adr, Global.Text.185); the old W110 unspawned-giver tag is stale."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T334: the talk target Trixi 9000000220 is a Snowhill legacy_data regional row (model 35, position [478.2027, 47.11174, 237.3823]); NpcVisibility::load draws it, so the 35/2 AddNpc and the 26/8 interaction resolve."
         }
       ],
       "description_string_id": 76088,
       "intro_text_string_id": 76086,
       "end_text_string_id": 76089,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3100004,

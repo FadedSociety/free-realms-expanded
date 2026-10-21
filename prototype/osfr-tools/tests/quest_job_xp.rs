@@ -1003,7 +1003,7 @@ fn content_overflow_is_rejected_at_load() {
 fn configured_job_xp_and_job_gates_match_the_task_table() {
     let content = content_dir();
     // (file, quest id, giver, prerequisites, reward coins, job gate, profile, XP)
-    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 17] = [
+    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 18] = [
         (
             "adventurer.json",
             INTRODUCE_YOURSELF,
@@ -1176,12 +1176,26 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             ADVENTURER,
             25,
         ),
+        // T334: the second Miner chapter, after T300's playable 3100002. 5 coins
+        // and 15 Miner XP mirror the first rung; the guide's reward cell is unknown
+        // and no item is granted.
+        (
+            "miner.json",
+            3_100_003,
+            9_000_000_217,
+            &[3_100_002],
+            5,
+            Some(MINER),
+            MINER,
+            15,
+        ),
     ];
 
     let mut listed = BTreeSet::new();
     // The task decisions are accepted: T202 wrote the chapter job XP and gates, T241
     // extended the same table with the two live Farnum starting records, T279 adds
-    // the independent Missing Sisters playtest entry, and T277 adds Local Hero.
+    // the independent Missing Sisters playtest entry, T277 adds Local Hero, and T334
+    // adds the second Miner chapter behind T300's practice test.
     // A later task's decision tag counts only for the record that task decided, so a
     // new quest cannot satisfy the table by carrying someone else's tag.
     let has_decision = |quest_id: u32, source: &Value| {
@@ -1190,6 +1204,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_000_024 => "(R) T277:",
             3_000_029 => "(R) T279:",
             3_000_032 => "(R) T330:",
+            3_100_003 => "(R) T334:",
             _ => "",
         };
         source.as_array().is_some_and(|tags| {
