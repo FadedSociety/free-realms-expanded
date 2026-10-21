@@ -1043,11 +1043,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1686; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2943 (ModelId=961, ModelFileName=human_f_caitlyn_gravefog.agr, NameId=116520)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.116793: \"Woah! Don't sneak up on people like that! You're here to fight the wraith? Let me teach you the brawler job first.\" (en_us_data.dat line 32325, JenkinsLookup2 hash 1220502472). Speaker proof: The region row quotes this line for Caitlyn teaching the Brawler job (\"Let me teach you the brawler job first\"), and the Brawler guide names her the Stillwater trainer. Guide row: notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md line 44; region row: notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md line 44."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": -0.369111,
       "model_id": 961,
-      "model_file_name": "human_f_caitlyn_gravefog.agr"
+      "model_file_name": "human_f_caitlyn_gravefog.agr",
+      "greeting_string_id": 116793
     },
     {
       "npc_id": 9000000041,
@@ -2660,11 +2671,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1693; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2950 (ModelId=964, ModelFileName=human_m_carlos_brazenfist.agr, NameId=388481)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.388502: \"You are standing before legendary bounty hunter, Fernando Flexsteel. No need to bow.\" (en_us_data.dat line 94453, JenkinsLookup2 hash 3566246703). Speaker proof: The Brawler guide quotes the line as Fernando's Contract: Hello Fernando offer, and the region row names him the Stillwater bounty hunter; it is also the quest's 49/1 intro. Guide row: notes/Build Guides/Content/Jobs/Brawler.md line 125; region row: notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md line 49. The content quest record data/content/quests/brawler.json quest 3030022 binds giver 9500000785 and intro 388502 (49/1 offer)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered. The quest 49/1 intro binding (data/content/quests/brawler.json quest 3030022) is itself reconstructed (T-1/T+1/T+2 locale backfill), so the speaker link is inferred from the quest's giver binding; no text is invented."
+          }
         ]
       },
       "heading": -2.799906,
       "model_id": 964,
-      "model_file_name": "human_m_carlos_brazenfist.agr"
+      "model_file_name": "human_m_carlos_brazenfist.agr",
+      "greeting_string_id": 388502
     },
     {
       "npc_id": 9500000786,
@@ -3701,11 +3723,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1725; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2982 (ModelId=971, ModelFileName=fairy_m_chef_01.agr, NameId=116522)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.116496: \"Robgoblins scattered my ingredients all over the place! Can you help me pick them up?\" (en_us_data.dat line 19001, JenkinsLookup2 hash 724072415). Speaker proof: The Chef guide names Gavin the giver of Harvest Hiccup! and the region row places him on the south road; the line is that quest's first-person 49/1 intro. Guide row: notes/Build Guides/Content/Jobs/Chef.md line 103; region row: notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md line 46. The content quest record data/content/quests/chef.json quest 3050017 binds giver 9000000096 and intro 116496 (49/1 offer)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered. The quest 49/1 intro binding (data/content/quests/chef.json quest 3050017) is itself reconstructed (T-1/T+1/T+2 locale backfill), so the speaker link is inferred from the quest's giver binding; no text is invented."
+          }
         ]
       },
       "heading": 1.243788,
       "model_id": 971,
-      "model_file_name": "fairy_m_chef_01.agr"
+      "model_file_name": "fairy_m_chef_01.agr",
+      "greeting_string_id": 116496
     },
     {
       "npc_id": 9500000787,
@@ -6079,11 +6112,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1691; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2948 (ModelId=957, ModelFileName=fairy_f_helena.agr, NameId=116519)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.116777: \"Need chef training? Things are pretty busy here at the Stillwater Inn, but I can take some time to teach the basics of cooking to someone with a real interest!\" (en_us_data.dat line 83418, JenkinsLookup2 hash 3160199473). Speaker proof: The region row quotes this line as Helena teaching the Chef job at the Stillwater Inn. Guide row: notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md line 45; region row: notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md line 45."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": -3.117493,
       "model_id": 957,
-      "model_file_name": "fairy_f_helena.agr"
+      "model_file_name": "fairy_f_helena.agr",
+      "greeting_string_id": 116777
     },
     {
       "npc_id": 9500000790,
@@ -10661,11 +10705,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1711; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2968 (ModelId=1589, ModelFileName=human_m_capn_sigmundr.agr, NameId=388950)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.408272: \"Pleasure to meet ya'. The name's Reed Stillwater. Are you lookin' to catch a few fish?\" (en_us_data.dat line 70112, JenkinsLookup2 hash 2663118808). Speaker proof: The Fisherman guide quotes this self-identifying line (\"The name's Reed Stillwater\") as his trainer greeting, and the region row names him the Stillwater fisherman trainer. Guide row: notes/Build Guides/Content/Jobs/Fisherman.md line 32; region row: notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md line 47."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": 2.828683,
       "model_id": 1589,
-      "model_file_name": "human_m_capn_sigmundr.agr"
+      "model_file_name": "human_m_capn_sigmundr.agr",
+      "greeting_string_id": 408272
     },
     {
       "npc_id": 9000000196,
@@ -11341,11 +11396,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:226; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1459 (ModelId=970, ModelFileName=human_m_seth_mcgrobie.agr, NameId=116525)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.116508: \"I didn't know the headstone was cursed, and now this ghost won't leave me alone!\" (en_us_data.dat line 51192, JenkinsLookup2 hash 1942927184). Speaker proof: The Brawler guide names Seth the giver of Stolen Merchandise, and the region row names him the Stillwater headstone seller; the line is that quest's first-person 49/1 intro. Guide row: notes/Build Guides/Content/Jobs/Brawler.md line 113; region row: notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md line 50. The content quest record data/content/quests/brawler.json quest 3030017 binds giver 9000000196 and intro 116508 (49/1 offer)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered. The quest 49/1 intro binding (data/content/quests/brawler.json quest 3030017) is itself reconstructed (T-1/T+1/T+2 locale backfill), so the speaker link is inferred from the quest's giver binding; no text is invented."
+          }
         ]
       },
       "heading": -2.974714,
       "model_id": 970,
-      "model_file_name": "human_m_seth_mcgrobie.agr"
+      "model_file_name": "human_m_seth_mcgrobie.agr",
+      "greeting_string_id": 116508
     },
     {
       "npc_id": 9500000795,

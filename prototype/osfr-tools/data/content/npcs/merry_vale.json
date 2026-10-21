@@ -1715,11 +1715,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3327; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4756 (ModelId=362, ModelFileName=fairy_f_freestyle_glitter_01.agr, NameId=427491)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.427481: \"*yawn* Who... who are you? Where is Rylan? I can feel him all around me.\" (en_us_data.dat line 337, JenkinsLookup2 hash 13348600). Speaker proof: The region row says she speaks once woken and quotes this line (\"Where is Rylan? I can feel him all around me\") for Sleeping Pixie. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 115; region row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 115."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": 2.798311,
       "model_id": 362,
-      "model_file_name": "fairy_f_freestyle_glitter_01.agr"
+      "model_file_name": "fairy_f_freestyle_glitter_01.agr",
+      "greeting_string_id": 427481
     },
     {
       "npc_id": 9000000030,
@@ -2220,11 +2231,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:944; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2192 (ModelId=382, ModelFileName=dwarf_miner_m.adr, NameId=40550)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.71067: \"Oh, I knew this day would come! Tumbolina wants her tools.\" (en_us_data.dat line 59014, JenkinsLookup2 hash 2242122283). Speaker proof: The Warrior guide attributes the line to Braldan in quest W8 (\"Braldan: ... she'll be so mad\"), and his region row names him the Merry Vale tool holder. Guide row: notes/Build Guides/Content/Jobs/Warrior.md line 94; region row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 46."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": 1.554309,
       "model_id": 382,
-      "model_file_name": "dwarf_miner_m.adr"
+      "model_file_name": "dwarf_miner_m.adr",
+      "greeting_string_id": 71067
     },
     {
       "npc_id": 9500000372,
@@ -4277,11 +4299,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:969; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2217 (ModelId=454, ModelFileName=sprite_basic_m.adr, NameId=41263)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.71783: \"He said you lack flavor! Well, I can teach you to make my Mystery Pot Roast.\" (en_us_data.dat line 5717, JenkinsLookup2 hash 217741357). Speaker proof: The Chef guide quotes the line as Jarvie's Mystery Pot Roast offer, and the region row names him the Merry Vale Chef trainer; it is also the quest's 49/1 intro. Guide row: notes/Build Guides/Content/Jobs/Chef.md line 118; region row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 41. The content quest record data/content/quests/chef.json quest 3050022 binds giver 9000000044 and intro 71783 (49/1 offer)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered. The quest 49/1 intro binding (data/content/quests/chef.json quest 3050022) is itself reconstructed (T-1/T+1/T+2 locale backfill), so the speaker link is inferred from the quest's giver binding; no text is invented."
+          }
         ]
       },
       "heading": -3.06478,
       "model_id": 454,
-      "model_file_name": "sprite_basic_m.adr"
+      "model_file_name": "sprite_basic_m.adr",
+      "greeting_string_id": 71783
     },
     {
       "npc_id": 9500000375,
@@ -7565,11 +7598,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1017; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2271 (ModelId=221, ModelFileName=chugawug_m_02.adr, NameId=70967)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.387043: \"I have to get Verna something for her birthday or she'll know that I forgot, but I can't miss the rest of this show!\" (en_us_data.dat line 54875, JenkinsLookup2 hash 2082414646). Speaker proof: The region row quotes the line as Dubawug's birthday-gift request for Verna. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 76; region row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 76."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": 0.870745,
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_string_id": 387043
     },
     {
       "npc_id": 9500000382,
@@ -16735,11 +16779,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:920; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2167 (ModelId=458, ModelFileName=sprite_basic_f.adr, NameId=41259)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.73922: \"I hope we get lots of visitors from the places I sent you to. Thanks for being the unofficial ambassador of Merry Vale!\" (en_us_data.dat line 29803, JenkinsLookup2 hash 1124293448). Speaker proof: The region row quotes the line as Luella's thanks after the ambassador chain. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 32; region row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 32."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": -2.22478,
       "model_id": 458,
-      "model_file_name": "sprite_basic_f.adr"
+      "model_file_name": "sprite_basic_f.adr",
+      "greeting_string_id": 73922
     },
     {
       "npc_id": 9500000401,
@@ -24075,11 +24130,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:971; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2219 (ModelId=458, ModelFileName=sprite_basic_f.adr, NameId=46432)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.387081: \"No need to buy a cooking pan, I just ordered one of Bordon Cloo's Quick Cookers.\" (en_us_data.dat line 56498, JenkinsLookup2 hash 2145785937). Speaker proof: The region row quotes the line as Plexi's cooking-pan hand-over in Dubawug's gift chain. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 90; region row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 90."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": 2.216961,
       "model_id": 458,
-      "model_file_name": "sprite_basic_f.adr"
+      "model_file_name": "sprite_basic_f.adr",
+      "greeting_string_id": 387081
     },
     {
       "npc_id": 9000000174,
@@ -24873,11 +24939,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1045; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2299 (ModelId=458, ModelFileName=sprite_basic_f.adr, NameId=47500)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.117035: \"I made the rule that all mail needs to go through me, but the workload is a little more than I bargained for!\" (en_us_data.dat line 51179, JenkinsLookup2 hash 1942512514). Speaker proof: The region row names Postmaster Vixie the Merry Vale Postman trainer, and the Postman guide's Missing Mail row names her the quest giver; the line is that quest's first-person 49/1 intro. Guide row: notes/Build Guides/Content/Jobs/Postman.md line 88; region row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 43. The content quest record data/content/quests/postman.json quest 3130012 binds giver 9000000174 and intro 117035 (49/1 offer)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered. The quest 49/1 intro binding (data/content/quests/postman.json quest 3130012) is itself reconstructed (T-1/T+1/T+2 locale backfill), so the speaker link is inferred from the quest's giver binding; no text is invented."
+          }
         ]
       },
       "heading": -1.995238,
       "model_id": 458,
-      "model_file_name": "sprite_basic_f.adr"
+      "model_file_name": "sprite_basic_f.adr",
+      "greeting_string_id": 117035
     },
     {
       "npc_id": 9500000418,
@@ -26094,11 +26171,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:947; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2195 (ModelId=9, ModelFileName=humanchild_m_tshirtwithbeltbig.adr, NameId=40416)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.41743: \"Before I can have fun, I have to get all my chores done, there's just so many!\" (en_us_data.dat line 79507, JenkinsLookup2 hash 3010630538). Speaker proof: The region row quotes the line as Ronnie's chores request. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 72; region row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 72."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": 1.82387,
       "model_id": 9,
-      "model_file_name": "humanchild_m_tshirtwithbeltbig.adr"
+      "model_file_name": "humanchild_m_tshirtwithbeltbig.adr",
+      "greeting_string_id": 41743
     },
     {
       "npc_id": 9500000421,
@@ -27787,11 +27875,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1012; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2266 (ModelId=4221, ModelFileName=human_m_shaggy_mysterychaser.agr, NameId=441919)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.441732: \"Zoinks! There really is a mystery that needs to be solved right here in Merry Vale!\" (en_us_data.dat line 90415, JenkinsLookup2 hash 3419032289). Speaker proof: The region quest table quotes the line as Shaggy's Merry Vale Mysteries offer, and his region row names him the amateur detective who starts the cave investigation. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 196; region row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 100."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": -0.458197,
       "model_id": 4221,
-      "model_file_name": "human_m_shaggy_mysterychaser.agr"
+      "model_file_name": "human_m_shaggy_mysterychaser.agr",
+      "greeting_string_id": 441732
     },
     {
       "npc_id": 9500000425,
@@ -29327,11 +29426,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1037; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2291 (ModelId=458, ModelFileName=sprite_basic_f.adr, NameId=70613)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.141684: \"Say, would you mind fetching me some mushroom soup from Chef Jarvie?\" (en_us_data.dat line 34188, JenkinsLookup2 hash 1290681492). Speaker proof: The Wizard guide quotes the line as Yvelle's Feeding the Storyteller request, and the region row names her the Merry Vale storyteller; it is also the quest's 49/1 intro. Guide row: notes/Build Guides/Content/Jobs/Wizard.md line 92; region row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 44. The content quest record data/content/quests/wizard.json quest 3160014 binds giver 9500000427 and intro 141684 (49/1 offer)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered. The quest 49/1 intro binding (data/content/quests/wizard.json quest 3160014) is itself reconstructed (T-1/T+1/T+2 locale backfill), so the speaker link is inferred from the quest's giver binding; no text is invented."
+          }
         ]
       },
       "heading": 2.084929,
       "model_id": 458,
-      "model_file_name": "sprite_basic_f.adr"
+      "model_file_name": "sprite_basic_f.adr",
+      "greeting_string_id": 141684
     },
     {
       "npc_id": 9500000428,
@@ -30770,11 +30880,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:952; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2200 (ModelId=357, ModelFileName=fairy_f_freestyle_02.agr, NameId=70891)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.71035: \"Why do you want to fight anyway? Things are so peaceful and happy here in Merry Vale!\" (en_us_data.dat line 62495, JenkinsLookup2 hash 2377109724). Speaker proof: The Warrior guide attributes the line to Tumbolina in quest W8 (\"Tumbolina: ... Ohh, look! A balloon!\"), and her region row names her the Merry Vale weapon repairer. Guide row: notes/Build Guides/Content/Jobs/Warrior.md line 94; region row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 45. The content quest record data/content/quests/warrior.json quest 3150008 binds giver 9000000222 and intro 71035 (49/1 offer)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered. The quest 49/1 intro binding (data/content/quests/warrior.json quest 3150008) is itself reconstructed (T-1/T+1/T+2 locale backfill), so the speaker link is inferred from the quest's giver binding; no text is invented."
+          }
         ]
       },
       "heading": -0.074611,
       "model_id": 357,
-      "model_file_name": "fairy_f_freestyle_02.agr"
+      "model_file_name": "fairy_f_freestyle_02.agr",
+      "greeting_string_id": 71035
     },
     {
       "npc_id": 9500000430,
