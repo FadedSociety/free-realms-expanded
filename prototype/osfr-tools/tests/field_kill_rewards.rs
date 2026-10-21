@@ -29,6 +29,9 @@ use std::{
 
 #[path = "support/packets.rs"]
 mod packets;
+#[allow(dead_code)] // Only the shared reply-text extractor is used here.
+#[path = "common/s6.rs"]
+mod s6;
 
 use packets::{carrier, count, packet};
 
@@ -594,13 +597,20 @@ fn an_overflowing_reward_refuses_one_player_without_stopping_the_field() {
     assert_eq!(a.state().inventory.coins, 2_000);
     assert_eq!(a.state().profiles.unwrap().experience.get(&43), Some(&2));
 
-    // B's one tick holds two rewards; the first is paid, the second refused.
+    // B's one tick holds two rewards; the first is paid, the second refused
+    // whole, including any prize item it carried.
     let b_out = b
         .tick_shared_effects(&mut field, &b_character, second_at + 50)
         .unwrap();
-    assert!(b_out.changed, "the representable reward is still paid");
+    assert!(b_out.changed, "the first reward is still paid");
     assert_eq!(count(&b_out.replies, 38, 19), 1);
     assert_eq!(count(&b_out.replies, 38, 14), 1);
+    assert!(
+        s6::chat_texts(&b_out.replies)
+            .iter()
+            .any(|text| text.contains("prize item was not granted")),
+        "the whole-reward refusal names the lost prize"
+    );
     let b_after = bank(&b);
     assert_eq!(b_after.0, b_coins + 1000);
     assert_eq!(b_after.1.get(&43), Some(&1));
@@ -659,12 +669,13 @@ fn an_overflowing_job_xp_refuses_the_whole_payout() {
         "the coins are not half-paid"
     );
     assert_eq!(count(&out.replies, 38, 14), 0, "the XP is not half-paid");
+    let text = s6::chat_texts(&out.replies).join("\n");
     assert!(
-        system_text(&out.replies).contains("at its limit"),
-        "the refusal is shown to the player"
+        text.contains("at its limit") && text.contains("prize item was not granted"),
+        "the whole-reward refusal names the lost prize: {text}"
     );
     let after = bank(&b);
-    assert_eq!(after.0, before.0, "the coins are not half-paid");
+    assert_eq!(after, before, "the refused payout changes nothing");
     assert_eq!(after.1.get(&35), Some(&b_xp), "the XP is not half-paid");
     assert_eq!(after.1.get(&43), None);
     assert_eq!(field.health(ENEMY), Some(0));
@@ -864,19 +875,6 @@ fn a_credit_survives_a_reconnect_and_expires_once() {
     assert_eq!(bank(&b), before);
 }
 
-/// System chat lines (`chat::system`) as text.
-fn system_text(replies: &[Vec<u8>]) -> String {
-    replies
-        .iter()
-        .filter(|packet| packet.starts_with(&[15, 0, 3, 0]))
-        .map(|packet| {
-            let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
-            String::from_utf8_lossy(&packet[8..8 + length]).into_owned()
-        })
-        .collect::<Vec<_>>()
-        .join("\n")
-}
-
 /// Start `battle` through the production dev route and load its arena the way
 /// the client does (a zone transfer, then Ready/Loaded -> `initialize_world`),
 /// which is what moves the encounter from Loading to Fighting.
@@ -905,8 +903,9 @@ fn start_battle(
 }
 
 /// F276: the representability gate also covers the one non-field encounter
-/// reward (a battle win). A player at the coin cap gets no half-payout, one
-/// explicit system line, and the battle still completes; another player is paid.
+/// reward (a battle win). A player at the coin cap gets no half-payout and no
+/// prize item, one explicit system line that names the lost prize, and the
+/// battle still completes; another player is paid.
 #[test]
 fn a_battle_reward_at_the_coin_cap_is_refused_with_feedback() {
     // Overworld battle 12310: 25 coins, one prize row and no combat-level
@@ -918,19 +917,16 @@ fn a_battle_reward_at_the_coin_cap_is_refused_with_feedback() {
     capped.set_dev_tools(true);
     capped.set_role(AccountRole::Admin);
     let arena = start_battle(&mut capped, &character, 12310, 100);
+    let before = bank(&capped);
     let items_before = capped.state().inventory.items.len();
     let won = capped
         .handle_in_world(&chat::local_request("realm win"), &arena, 400)
         .unwrap();
+    let text = s6::chat_texts(&won.replies).join("\n");
+    assert!(won.changed, "the battle still completes: {text}");
     assert!(
-        won.changed,
-        "the battle still completes: {}",
-        system_text(&won.replies)
-    );
-    let text = system_text(&won.replies);
-    assert!(
-        text.contains("at its limit"),
-        "the player is told the reward was refused: {text}"
+        text.contains("at its limit") && text.contains("prize item was not granted"),
+        "the player is told the reward and its prize were not granted: {text}"
     );
     let state = capped.state();
     assert_eq!(
@@ -941,8 +937,10 @@ fn a_battle_reward_at_the_coin_cap_is_refused_with_feedback() {
     assert_eq!(
         state.inventory.items.len(),
         items_before,
-        "the prize is not half-paid"
+        "the prize item is not half-paid"
     );
+    let after = bank(&capped);
+    assert_eq!(after, before, "the refused battle payout changes nothing");
     assert_eq!(
         state
             .encounter

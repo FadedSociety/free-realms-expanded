@@ -12,6 +12,7 @@
 //! `who` set in `credit_field_kill`: a future contributor-set change must
 //! change both together.
 use super::*;
+use std::io::Read;
 
 const FILE: &str = "field_kill_rewards.json";
 const MAX_BYTES: usize = 1024 * 1024;
@@ -98,7 +99,14 @@ impl FieldKillRewards {
             Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(Self::default()),
             Err(error) => return Err(error),
         }
-        Self::parse(&fs::read(path)?)
+        // Bound the read itself, not just the metadata: a file that grows (or a
+        // swapped symlink) between the check and the read cannot allocate past
+        // MAX_BYTES. `parse` refuses the one extra byte the `take` admits.
+        let mut bytes = Vec::new();
+        fs::File::open(path)?
+            .take(MAX_BYTES as u64 + 1)
+            .read_to_end(&mut bytes)?;
+        Self::parse(&bytes)
     }
 
     fn parse(bytes: &[u8]) -> io::Result<Self> {
@@ -404,6 +412,24 @@ mod tests {
     }
 
     #[test]
+    fn an_oversized_file_is_refused() {
+        let directory =
+            std::env::temp_dir().join(format!("osfr-field-rewards-size-{}", std::process::id()));
+        fs::create_dir_all(&directory).unwrap();
+        fs::write(directory.join(FILE), vec![b' '; MAX_BYTES + 1]).unwrap();
+        let error = FieldKillRewards::load(&directory).unwrap_err();
+        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+        assert!(error.to_string().contains("too large"));
+        // `parse` keeps the same bound for bytes handed in directly, including
+        // the one byte `take(MAX_BYTES + 1)` admits past the metadata limit.
+        assert!(
+            FieldKillRewards::parse(&vec![b' '; MAX_BYTES + 1]).is_err(),
+            "an oversized byte slice is refused"
+        );
+        let _ = fs::remove_dir_all(&directory);
+    }
+
+    #[test]
     fn a_missing_table_is_empty_and_the_shipped_content_matches_its_actors() {
         let missing =
             std::env::temp_dir().join(format!("osfr-field-rewards-missing-{}", std::process::id()));
@@ -431,8 +457,9 @@ mod tests {
                 "shipped field actor {definition_id} at level {level} has no reward row"
             );
         }
-        // The shipped levels 1/3/5/7/9/10 exercise every band; the level-5
-        // Hooligan Wolves stay on the definition override (2/5).
+        // The shipped levels 1/3/5/7/9/10/11/12/13/14 exercise every band,
+        // including the level-14 high Wilds shaman; the level-5/11/12 Hooligan
+        // Wolves stay on the definition override (2/5).
         for (definition_id, level, expected) in [
             (940102, 1, (2, 5)),
             (930050, 3, (4, 10)),

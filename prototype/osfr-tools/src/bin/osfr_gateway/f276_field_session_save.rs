@@ -10,7 +10,7 @@
 mod fixtures;
 use super::test_support::{self, Scratch};
 use super::*;
-use fixtures::{copy_tree, login, wrap};
+use fixtures::copy_tree;
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState},
@@ -126,86 +126,6 @@ impl Fixture {
     }
 }
 
-/// One session plus the containers a real `Server` owns (same shape as the L011
-/// save-failure regression); no listener and no bot process.
-struct Scene {
-    session: Session,
-    world: SharedWorld,
-    membership: World,
-    sessions: SessionMap,
-}
-
-impl Scene {
-    fn new(options: &Options, field: osfr_tools::encounter::SharedFieldState) -> Self {
-        let session = Session::new(
-            SessionId(41),
-            "127.0.0.1:34100".parse().unwrap(),
-            SessionRequest {
-                id: 41,
-                crc_length: 3,
-                buffer_size: 1400,
-            },
-            options,
-            CRC_SEED,
-            None,
-            None,
-        )
-        .expect("field session loads");
-        let mut membership = World::runtime();
-        membership.install_field_seed(0, field);
-        Self {
-            session,
-            world: SharedWorld::new(),
-            membership,
-            sessions: SessionMap::new(),
-        }
-    }
-
-    fn send(
-        &mut self,
-        options: &Options,
-        inner: &[u8],
-        now: u64,
-    ) -> Result<(), Box<dyn std::error::Error>> {
-        self.session.dispatch_message(
-            &wrap(inner),
-            options,
-            now,
-            &mut self.world,
-            &mut self.membership,
-            &mut self.sessions,
-            None,
-        )
-    }
-
-    fn enter(&mut self, options: &Options, now: u64) {
-        for (index, message) in [
-            login("f276-field-session"),
-            wrap(&13_u16.to_le_bytes()),
-            wrap(&10_u16.to_le_bytes()),
-        ]
-        .into_iter()
-        .enumerate()
-        {
-            self.session
-                .dispatch_message(
-                    &message,
-                    options,
-                    now + index as u64,
-                    &mut self.world,
-                    &mut self.membership,
-                    &mut self.sessions,
-                    None,
-                )
-                .expect("initialization message handles");
-        }
-    }
-
-    fn drain(&mut self, now: u64) -> Vec<Vec<u8>> {
-        super::f120_fishing_hour_reconnect::drain_replies(&mut self.session, now)
-    }
-}
-
 #[test]
 fn a_refused_field_replay_through_the_session_writes_no_save() {
     let fixture = Fixture::new();
@@ -231,8 +151,18 @@ fn a_refused_field_replay_through_the_session_writes_no_save() {
     let field = seed
         .take_shared_fields()
         .expect("the seed engine owns its field");
-    let mut scene = Scene::new(&options, field);
-    scene.enter(&options, 1_000);
+    let mut scene = test_support::Scene::new(&options, 41);
+    // The field must be on the membership before world entry, the order
+    // `Server::new` installs its seed in.
+    scene.membership.install_field_seed(0, field);
+    for (index, message) in [13_u16.to_le_bytes(), 10_u16.to_le_bytes()]
+        .into_iter()
+        .enumerate()
+    {
+        scene
+            .send(&options, &message, 1_000 + index as u64)
+            .expect("initialization message handles");
+    }
     // The shared-field view cache is server-owned; the session must know the
     // actor before its attack intent can name it (production fills this from
     // `Server::sync_field_views`).
@@ -270,7 +200,7 @@ fn a_refused_field_replay_through_the_session_writes_no_save() {
     // L011 does: the good save file is a component of the target path, so any
     // save attempt fails the dispatch instead of silently rewriting the file.
     let good_save = options.state.clone();
-    scene.session.state_path = good_save.join("blocked.json");
+    scene.break_next_save(&good_save);
     scene
         .send(&options, &attack(ACTOR), dead_at + 6_000)
         .expect("a refused replay does not attempt a save");
@@ -279,7 +209,7 @@ fn a_refused_field_replay_through_the_session_writes_no_save() {
         replies.is_empty(),
         "a refused replay replies with nothing: {replies:?}"
     );
-    scene.session.state_path = good_save.clone();
+    scene.repair_save(&good_save);
     assert_eq!(
         fs::read(&good_save).expect("the save is still readable"),
         saved,

@@ -101,7 +101,13 @@ fn f160_a_full_reliable_queue_refuses_only_its_own_view() {
     server.sessions.get_mut(&keys[0]).unwrap().sender = sender(32 * 1024 * 1024);
     server.tick_shared_fields(2_000);
     assert!(server.sessions[&keys[0]].known_npcs.is_empty());
-    // The whole event loop still runs with both sessions alive.
+    // The whole event loop still runs with both sessions alive. Refresh the
+    // idle budget first (as `isolation` does): a loaded host can stall this test
+    // for the 60 s session budget, and the idle timeout would then end a
+    // session instead of the event loop being exercised.
+    for session in server.sessions.values_mut() {
+        session.last_activity = std::time::Instant::now();
+    }
     server.step().unwrap();
     assert_eq!(server.sessions.len(), 3);
     let _ = fs::remove_dir_all(scratch);

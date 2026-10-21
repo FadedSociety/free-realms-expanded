@@ -186,9 +186,10 @@ fn a_movie_error_ends_only_that_session_and_not_the_server() {
         .send_to(&wire, server.local_addr().expect("server address"))
         .expect("malformed close datagram sends");
     // UDP loopback delivery is asynchronous: step a bounded number of times
-    // instead of assuming the datagram is already queued.
+    // instead of assuming the datagram is already queued. One second of
+    // two-millisecond steps tolerates a loaded host.
     let mut ended = false;
-    for _ in 0..50 {
+    for _ in 0..500 {
         server
             .step()
             .expect("one handler error must not stop the server");

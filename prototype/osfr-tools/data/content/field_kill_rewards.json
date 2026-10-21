@@ -13,7 +13,7 @@
         },
         {
           "kind": "wiki",
-          "evidence": "Free Realms wiki, Battles (final-era difficulty anchors 1/3/5/9/13) and the reviewed W102 Field Enemies note. The actor levels themselves are authored in field_enemies.json (shipped actors use levels 1, 3, 5, 7, 9 and 10, plus four quest-gated Hooligans that default to level 1); the wiki does not publish per-kill coin or XP values."
+          "evidence": "Free Realms wiki, Battles (final-era difficulty anchors 1/3/5/9/13) and the reviewed W102 Field Enemies note. The actor levels themselves are authored in field_enemies.json (shipped actors currently span levels 1, 3, 5, 7, 9, 10, 11, 12, 13 and 14, plus four quest-gated Hooligans that default to level 1); the wiki does not publish per-kill coin or XP values."
         }
       ]
     },
@@ -78,7 +78,7 @@
       "source": [
         {
           "kind": "reconstructed",
-          "evidence": "(R) Hooligan Wolf (definition 3156) stays on the starter 2 coins / 5 job XP rate at every level: the three level-1 W102-F1 starter wolves and the two level-5 MID-F1/MID-F2 wolves. Local policy so the kind cannot be retuned into a faucet by a level edit; the level-5 wolves therefore pay 2/5, not the level 5-8 band."
+          "evidence": "(R) Hooligan Wolf (definition 3156) stays on the starter 2 coins / 5 job XP rate at every level: three level-1 W102-F1 starter wolves, two level-5 MID-F1/MID-F2 wolves, and one level-11 and one level-12 high-band wolf. Local policy so the kind cannot be retuned into a faucet by a level edit; those wolves therefore pay 2/5, not their level band."
         },
         {
           "kind": "client",
