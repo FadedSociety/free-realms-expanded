@@ -34,6 +34,8 @@ pub const SEEDED_ITEM: i32 = 75_060;
 pub struct VendorFixture {
     content: PathBuf,
     reference: PathBuf,
+    /// The repo `data/content/stores.json` copy this fixture's pack was built from.
+    stores: PathBuf,
     zone: u32,
     position: [f32; 3],
     option: u32,
@@ -114,15 +116,13 @@ impl VendorFixture {
                 .id,
         )
         .expect("the shop option id fits the client field");
-        let price = store_price(
-            &data.join("stores.json"),
-            REPRESENTATIVE_ITEM,
-            "purchase_price_coins",
-        );
-        let sell_price = store_price(&data.join("stores.json"), SEEDED_ITEM, "sell_price_coins");
+        let stores = data.join("stores.json");
+        let price = store_price(&stores, REPRESENTATIVE_ITEM, "purchase_price_coins");
+        let sell_price = store_price(&stores, SEEDED_ITEM, "sell_price_coins");
         Self {
             content,
             reference,
+            stores,
             zone,
             position,
             option,
@@ -152,6 +152,11 @@ impl VendorFixture {
     /// The authoritative resale price of `SEEDED_ITEM` from `stores.json`.
     pub fn sell_price(&self) -> u32 {
         self.sell_price
+    }
+
+    /// The authoritative resale price of any stocked item from `stores.json`.
+    pub fn sell_price_of(&self, item: i32) -> u32 {
+        store_price(&self.stores, item, "sell_price_coins")
     }
 
     pub fn character(&self) -> CharacterState {

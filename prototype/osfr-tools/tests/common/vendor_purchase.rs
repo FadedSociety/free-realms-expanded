@@ -10,7 +10,7 @@
 //! ones. The directory is removed on drop.
 
 #[path = "vendor_fixture.rs"]
-mod vendor_fixture;
+pub mod vendor_fixture;
 
 use crate::gateway_vendor::{
     NOW, count_definition, inner_packets, interact, inventory_of, login, merchant_status, select,
@@ -21,10 +21,10 @@ use osfr_tools::{
     gateway::Gateway, npc_interaction::decode_merchant_list_66_42,
 };
 use std::path::PathBuf;
-use vendor_fixture::{REPRESENTATIVE_ITEM, REPRESENTATIVE_VENDOR, SEEDED_ITEM, VendorFixture};
+pub use vendor_fixture::{REPRESENTATIVE_ITEM, REPRESENTATIVE_VENDOR, SEEDED_ITEM, VendorFixture};
 
 /// The integration suite's private build directory for the fixture pack.
-fn fixture_root() -> PathBuf {
+pub fn fixture_root() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab/build/w178-vendor-gateway")
 }
 
@@ -34,7 +34,7 @@ fn connect(fixture: &VendorFixture, state: GameplayState) -> Gateway {
 
 /// Reconnect through the saved character half of the save envelope, not a fresh
 /// reference character.
-fn connect_with(
+pub fn connect_with(
     fixture: &VendorFixture,
     character: CharacterState,
     state: GameplayState,
