@@ -466,12 +466,12 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     assert_eq!(db.zones.len(), 17);
     assert_eq!(db.npcs.len(), expected_npc_count);
     assert_eq!(db.jobs.len(), 17);
-    assert_eq!(db.quests.len(), 654);
+    assert_eq!(db.quests.len(), 655);
     assert_eq!(resolved_reference_ids.len(), 295);
     assert_eq!(unresolved_ids.len(), 170);
     assert_eq!(
         resolved_giver_occurrences + unresolved_giver_occurrences,
-        654
+        655
     );
     println!(
         "NPC refs: {} resolved, {} unresolved; quest giver occurrences: {} resolved, {} unresolved; positions: {} known, {} unknown",

@@ -50,7 +50,8 @@ use serde_json::{Value, json};
 
 const CLEETUS: u64 = 9_000_000_050;
 /// A placed quest giver who gives neither live Farnum quest (wrong-NPC refusal).
-const ANNE: u64 = 9_500_000_266;
+/// Anne 9500000266 is no longer usable here: T360 gives her quest 3000061.
+const BO: u64 = 9_500_000_268;
 const ADVENTURER: i32 = 1;
 const MINER: i32 = 14;
 const BRAWLER: i32 = 43;
@@ -565,9 +566,9 @@ fn wrong_job_wrong_target_and_replay_change_nothing() {
     );
 
     // A wrong quest giver offers neither live quest and changes nothing.
-    let anne = character_at(content_position("farnum_farmstead.json", ANNE));
+    let bo = character_at(content_position("farnum_farmstead.json", BO));
     let mut now = 800;
-    assert_no_offer(&mut brawler, &anne, ANNE, &mut now, "a wrong quest giver");
+    assert_no_offer(&mut brawler, &bo, BO, &mut now, "a wrong quest giver");
 
     // An unknown target is a clean no-op on both request types.
     assert_packet_changes_nothing(

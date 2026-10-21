@@ -35,7 +35,9 @@
         "Farnum Farmstead: \"Anne, at Farnum Farmstead, believes that a pack of wolves has been stealing sheep.\" (421718439). The sheep pen is next to the Sheep Watch gate [video, see Overview]. Not seen in video."
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3000061
+      ],
       "quests_given_text": [
         "Investigate the Wolves (421718439, 25578785 \"Do you hear that howling? I think those wolves have been stealing our sheep.\", 976390251, 904559543, 1012648018; objective \"Defeat the Ravenous Wolves at Sheep Watch\" 466525651) and Wolves at the Door (\"A pack of wolves are attacking the sheep at Farnum Farmstead. Anne could use your help watching the sheep.\" 3738417521). Thanks: \"Thank you! Hopefully, the sheep can get some rest now.\" (1132992849). Dungeon: Sheep Watch. Reminder: \"Return to Anne!\" (359047159)."
       ],

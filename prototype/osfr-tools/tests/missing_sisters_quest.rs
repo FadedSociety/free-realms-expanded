@@ -45,8 +45,9 @@ use std::{
 
 const GEOFFREY: u64 = 9_000_000_330;
 const OTHER: u64 = CHARACTER + 1;
-/// A placed quest giver who gives neither live Farnum quest (wrong-NPC refusal).
-const ANNE: u64 = 9_500_000_266;
+/// A placed quest giver with no live quest, for the wrong-NPC refusal. Anne
+/// 9500000266 is no longer usable here: T360 gives her quest 3000061.
+const BO: u64 = 9_500_000_268;
 const QUEST: u32 = 3_000_029;
 const ADVENTURER: i32 = 1;
 const MINER: i32 = 14;
@@ -597,10 +598,10 @@ fn refusals_and_reconnect_change_nothing() {
     );
     let mut now = 1_000;
 
-    // Wrong NPC: Anne's menu offers no Missing Sisters quest and the save is equal.
-    let anne = character(CHARACTER, content_position("farnum_farmstead.json", ANNE));
+    // Wrong NPC: Bo's menu offers no Missing Sisters quest and the save is equal.
+    let bo = character(CHARACTER, content_position("farnum_farmstead.json", BO));
     let before = capture(&game);
-    assert_no_offer(&mut game, &anne, ANNE, &mut now, "a wrong quest giver");
+    assert_no_offer(&mut game, &bo, BO, &mut now, "a wrong quest giver");
     assert_unchanged(&game, &before, "a wrong quest giver");
 
     // Out-of-range 26/8 is refused with an error and no state change.
