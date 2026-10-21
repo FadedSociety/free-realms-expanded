@@ -268,7 +268,9 @@ fn quest_giver_talk_candidate_uses_quest_engine_eligibility() {
     else {
         panic!("talk option returns dialogue context")
     };
-    assert_eq!(dialogue.body_string_id, None);
+    // T378: Chloe now carries the recovered Ninja offer greeting; the synthetic
+    // quest still adds no menu option and keeps its title id.
+    assert_eq!(dialogue.body_string_id, Some(78_852));
     // Global.Text id of "Ninja: Strike from the Shadows" (was the raw locale
     // hash 2580872460, which the client would show blank).
     assert!(dialogue.quest_title_string_ids.contains(&78_853));

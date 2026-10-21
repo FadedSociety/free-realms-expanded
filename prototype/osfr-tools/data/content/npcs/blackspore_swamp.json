@@ -6246,11 +6246,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:324; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1557 (ModelId=661, ModelFileName=human_f_chloe.agr, NameId=45302)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378: en_us_data.dat Global.Text.78852, JenkinsLookup2 hash 1599642277, line 42353; First-person Ninja trainer offer ('Before you return to Lakeshore, you must demonstrate...'). The guide row quotes hash 1599642277 for Chloe. The line is the 49/1 intro of data/content/quests/ninja.json quest 3110005, whose giver_npc_id is 9000000047. notes/Build Guides/Content/Dungeons/Cracked Claw Caverns.md line 98. Quest record: data/content/quests/ninja.json quest 3110005."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T378: use this recovered speaker line as the fixed default Talk greeting. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
         ]
       },
       "heading": -0.873264,
       "model_id": 661,
-      "model_file_name": "human_f_chloe.agr"
+      "model_file_name": "human_f_chloe.agr",
+      "greeting_string_id": 78852
     },
     {
       "npc_id": 9500000013,
@@ -26992,8 +27003,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378: en_us_data.dat Global.Text.130793, JenkinsLookup2 hash 3927787240, line 103883; First-person Petra greeting ('Tevin? Wow, I haven't heard from him in years!...'). The guide row (Brawler: Prey on the Cray, giver Petra) quotes hash 3927787240. notes/Build Guides/Content/Jobs/Brawler.md line 123."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T378: use this recovered speaker line as the fixed default Talk greeting. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 130793
     },
     {
       "npc_id": 9500000057,
@@ -29725,11 +29747,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:319; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1552 (ModelId=312, ModelFileName=human_m_freestyle_03.agr, NameId=46099)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378: en_us_data.dat Global.Text.130856, JenkinsLookup2 hash 954454844, line 25260; first-person job-offer speech ('...delivering my job offer... Petra ... swamp to the west'). data/content/quests/brawler.json quest 3030009 has giver_npc_id 9000000446 and intro_text_string_id 130856; its description 130858 names Sabastian Cabet. notes/Build Guides/Content/Jobs/Brawler.md line 95 (C6 Brawler: Given to Guard) names Sabastian as the giver. (R) the T-1 intro slot is reconstructed; the guide giver row and the description are the independent check."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T378: use this recovered speaker line as the fixed default Talk greeting. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
         ]
       },
       "heading": -2.142488,
       "model_id": 312,
-      "model_file_name": "human_m_freestyle_03.agr"
+      "model_file_name": "human_m_freestyle_03.agr",
+      "greeting_string_id": 130856
     },
     {
       "npc_id": 9000000450,
@@ -32311,11 +32344,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:249; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1482 (ModelId=134, ModelFileName=floren.adr, NameId=77706)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378: en_us_data.dat Global.Text.77746, JenkinsLookup2 hash 3485775830, line 92308; First-person Quagmire Quarry offer ('I received a letter of complaint from Ramberry...'). The guide row (giver Silverray) quotes hash 3485775830. The line is the 49/1 intro of data/content/quests/miner.json quest 3100021, whose giver_npc_id is 9000000203. notes/Build Guides/Content/Jobs/Miner.md line 135. Quest record: data/content/quests/miner.json quest 3100021."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T378: use this recovered speaker line as the fixed default Talk greeting. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
         ]
       },
       "heading": -0.600796,
       "model_id": 134,
-      "model_file_name": "floren.adr"
+      "model_file_name": "floren.adr",
+      "greeting_string_id": 77746
     },
     {
       "npc_id": 9500000064,

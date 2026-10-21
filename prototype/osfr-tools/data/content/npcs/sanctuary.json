@@ -26759,8 +26759,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378: en_us_data.dat Global.Text.90621, JenkinsLookup2 hash 3236560243, line 85513; First-person Chapter 1 offer ('It seems that two pixie girls are missing...'). The guide row (Chapter 1: The Missing Sisters, Geoffrey) quotes hash 3236560243. The line is the 49/1 intro of data/content/quests/adventurer.json quest 3000029, whose giver_npc_id is 9000000330. notes/Build Guides/Content/Jobs/Adventurer.md line 124. Quest record: data/content/quests/adventurer.json quest 3000029."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T378: use this recovered speaker line as the fixed default Talk greeting. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 90621
     },
     {
       "npc_id": 9500000485,
@@ -28414,11 +28425,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2284; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3541 (ModelId=30, ModelFileName=fairy_m_old_01.adr, NameId=22987)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378: en_us_data.dat Global.Text.415317, JenkinsLookup2 hash 1498450452, line 39685; First-person greeting ('You must be here to help me recover my spectral spectacles...'). The guide row names Greyli Dustywings and his 'Spectral Spectacles' quest; notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md line 79 names Greyli's spectral spectacles. No split quest record models the Super Spooktacular event, so the speaker link is inferred from the self-referenced quest object (R). notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md line 45."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T378: use this recovered speaker line as the fixed default Talk greeting. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
         ]
       },
       "heading": -0.303523,
       "model_id": 30,
-      "model_file_name": "fairy_m_old_01.adr"
+      "model_file_name": "fairy_m_old_01.adr",
+      "greeting_string_id": 415317
     },
     {
       "npc_id": 9500000489,

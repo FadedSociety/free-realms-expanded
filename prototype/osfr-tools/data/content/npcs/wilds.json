@@ -37295,11 +37295,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1761; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3018 (ModelId=684, ModelFileName=dwarf_blackspore_miner_m.adr, NameId=20087)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378: en_us_data.dat Global.Text.94519, JenkinsLookup2 hash 2762924238, line 72786; First-person pit-crew reply ('Ricky crashed again!? Fine, I'll send the rest of the crew...'). The guide row (Call The Crew!) prefixes the same words with Shakey and quotes hash 2762924238. notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md line 112."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T378: use this recovered speaker line as the fixed default Talk greeting. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
         ]
       },
       "heading": 0.304947,
       "model_id": 684,
-      "model_file_name": "dwarf_blackspore_miner_m.adr"
+      "model_file_name": "dwarf_blackspore_miner_m.adr",
+      "greeting_string_id": 94519
     },
     {
       "npc_id": 9500000942,

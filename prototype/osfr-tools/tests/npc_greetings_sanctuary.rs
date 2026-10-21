@@ -229,6 +229,10 @@ const PRE_EXISTING: [(u64, u32); 11] = [
     (9500000541, 21602),
 ];
 
+/// T378 bindings recovered after T280. They are expected in `sanctuary.json`,
+/// not a T280 regression.
+const LATER_GREETINGS: [(u64, u32); 2] = [(9000000330, 90621), (9500000488, 415317)];
+
 /// A legacy-data Sanctuary trainer, merchant and non-quest greeter in the edited set.
 const TRAINER: u64 = 9000000097; // General Glowlight
 const MERCHANT: u64 = 9500000515; // Pucca De'Flor
@@ -597,6 +601,14 @@ fn every_edited_row_is_drawable_and_no_other_row_changed() {
     for record in &records {
         let npc_id = record["npc_id"].as_u64().expect("npc id");
         if edited.contains(&npc_id) {
+            continue;
+        }
+        if let Some((_, greeting)) = LATER_GREETINGS.iter().find(|(known, _)| *known == npc_id) {
+            assert_eq!(
+                record["greeting_string_id"].as_u64(),
+                Some(u64::from(*greeting)),
+                "NPC {npc_id}: later recovered binding changed"
+            );
             continue;
         }
         match existing.get(&npc_id) {

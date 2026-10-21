@@ -1741,11 +1741,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:221; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1454 (ModelId=459, ModelFileName=fairy_archdruid_f.adr, NameId=438740)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378: en_us_data.dat Global.Text.440465, JenkinsLookup2 hash 3546861059, line 93910; first-person Aiding our Allies offer (\"Gus Geargrinder sacrificed everything to save us from the Gloam...\"). notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md line 190 quotes hash 3546861059 with \"Camellia:\" as the speaker and names Aiding our Allies; this row's quests_given_text carries the same quest title hashes 858360248/675331539 and the \"Talk to Arch Druid Camellia\" intro 4138568321. The split content has no Aiding our Allies record (Shrouded Gloam event), so the speaker link is the guide quote (R)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T378: use this recovered speaker line as the fixed default Talk greeting. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
         ]
       },
       "heading": -2.847675,
       "model_id": 459,
-      "model_file_name": "fairy_archdruid_f.adr"
+      "model_file_name": "fairy_archdruid_f.adr",
+      "greeting_string_id": 440465
     },
     {
       "npc_id": 9500000651,

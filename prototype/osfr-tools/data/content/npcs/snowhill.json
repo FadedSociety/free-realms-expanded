@@ -5993,11 +5993,22 @@
             "kind": "reconstructed",
             "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378: en_us_data.dat Global.Text.139675, JenkinsLookup2 hash 2539856207, line 66905; First-person derby greeting ('Pen? Why would I need a pen? Wrecking karts is where the real fun is at, not pens!...'). The guide row (The Burden of Fame) quotes hash 2539856207 and names Burt 'Wrecking' Crewe. notes/Build Guides/Content/Jobs/Demolition Derby Driver.md line 166."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T378: use this recovered speaker line as the fixed default Talk greeting. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
         ]
       },
       "heading": -1.210766,
       "model_id": 829,
-      "model_file_name": "human_m_burt_crewe.agr"
+      "model_file_name": "human_m_burt_crewe.agr",
+      "greeting_string_id": 139675
     },
     {
       "npc_id": 9500000732,
@@ -29312,11 +29323,22 @@
             "kind": "reconstructed",
             "evidence": "(R) W117: bind the exact-name Legacy spawn to this existing regional key; preserve Legacy x/z and heading, snap y to the client-derived zone-0 terrain grid. Not a recovered retail spawn, collision proof or native appearance verification."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378: en_us_data.dat Global.Text.117327, JenkinsLookup2 hash 3470571122, line 91900; first-person Racing Tutorial offer ('Every driver should have his license...'). data/content/quests/kart_driver.json quest 3080002 has giver_npc_id 9500000759 and intro_text_string_id 117327. notes/Build Guides/Content/Jobs/Kart Driver.md line 50 (Racing Tutorial) names Mustang Alli as the giver. (R) the intro slot is reconstructed from the adjacent Racing Tutorial locale block; the guide giver row is the independent check."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T378: use this recovered speaker line as the fixed default Talk greeting. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
         ]
       },
       "heading": -1.987494,
       "model_id": 820,
-      "model_file_name": "fairy_f_mustang_alli.agr"
+      "model_file_name": "fairy_f_mustang_alli.agr",
+      "greeting_string_id": 117327
     },
     {
       "npc_id": 9500000760,
@@ -41691,8 +41713,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378: en_us_data.dat Global.Text.413741, JenkinsLookup2 hash 1726071120, line 45544; First-person Dwarven Mining Guild offer ('You want to be part of the Dwarven Mining Guild?...'). The guide row 'So, You Want To Be A Miner?' names Therin as the giver and quotes hash 1726071120. notes/Build Guides/Content/Jobs/Miner.md line 96."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T378: use this recovered speaker line as the fixed default Talk greeting. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 413741
     },
     {
       "npc_id": 9500000774,

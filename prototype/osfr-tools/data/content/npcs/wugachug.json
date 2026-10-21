@@ -12760,11 +12760,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:382; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1615 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=41250)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378: en_us_data.dat Global.Text.130231, JenkinsLookup2 hash 346429626, line 9230; First-person Wugachug postchug warning ('One of our chugs fell asleep on the job...'). The guide row (giver Postchug Runalug) quotes hash 346429626. The line is the 49/1 intro of data/content/quests/postman.json quest 3130023, whose giver_npc_id is 9000000172. notes/Build Guides/Content/Jobs/Postman.md line 109. Quest record: data/content/quests/postman.json quest 3130023."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T378: use this recovered speaker line as the fixed default Talk greeting. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
         ]
       },
       "heading": -2.996556,
       "model_id": 14,
-      "model_file_name": "chugawug_m_01.adr"
+      "model_file_name": "chugawug_m_01.adr",
+      "greeting_string_id": 130231
     },
     {
       "npc_id": 9500000994,

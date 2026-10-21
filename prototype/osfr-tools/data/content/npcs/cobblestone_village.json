@@ -1973,8 +1973,19 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378: en_us_data.dat Global.Text.9800, JenkinsLookup2 hash 2441571970, line 64292; The line names and identifies the speaker ('I'm Carlos Brazenfist', hash 2441571970); the Cobblestone NPC row quotes the same hash. notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md line 46."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T378: use this recovered speaker line as the fixed default Talk greeting. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
         ]
-      }
+      },
+      "greeting_string_id": 9800
     },
     {
       "npc_id": 9500000245,

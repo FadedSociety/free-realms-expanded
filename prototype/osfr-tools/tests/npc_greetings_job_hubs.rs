@@ -235,8 +235,9 @@ const TARGETS: [Target; 20] = [
     },
 ];
 
-/// The W126/T246 bindings that this slice must not touch.
-const EXISTING_GREETINGS: [(&str, u64, u32); 19] = [
+/// The W126/T246 bindings that this slice must not touch, plus the three T378
+/// Snowhill bindings recovered after this suite was written.
+const EXISTING_GREETINGS: [(&str, u64, u32); 22] = [
     ("cobblestone_village.json", 9000000021, 4420092),
     ("cobblestone_village.json", 9000000120, 94293),
     ("cobblestone_village.json", 9000000121, 94297),
@@ -253,6 +254,9 @@ const EXISTING_GREETINGS: [(&str, u64, u32); 19] = [
     ("seaside.json", 9500000639, 441037),
     ("snowhill.json", 9000000093, 430860),
     ("snowhill.json", 9000000158, 5696),
+    ("snowhill.json", 9000000217, 413741), // T378: Therin
+    ("snowhill.json", 9500000731, 139675), // T378: Burt 'Wrecking' Crewe
+    ("snowhill.json", 9500000759, 117327), // T378: Mustang Alli
     ("stillwater_crossing.json", 9500000786, 116463),
     ("sunstone_valley.json", 9500000824, 413082),
     ("merry_vale.json", 9500000430, 41268),

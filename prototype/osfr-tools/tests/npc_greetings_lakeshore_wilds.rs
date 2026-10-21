@@ -247,6 +247,10 @@ const EXISTING_GREETINGS: [(&str, u64, u32); 19] = [
     ("merry_vale.json", 9500000430, 41268),
 ];
 
+/// Bindings added after this suite was written (T378). They are expected in the
+/// two owned files, not a T298 regression.
+const LATER_GREETINGS: [(&str, u64, u32); 1] = [("wilds.json", 9500000941, 94519)];
+
 /// Sam Durango: a drawable Lakeshore trainer with no recovered speaker line.
 /// He stays blank, and a blank row must not inherit another row's body.
 const BLANK: u64 = 9500000364;
@@ -483,6 +487,17 @@ fn the_target_rows_are_spawned_and_non_target_rows_are_unchanged() {
             if targets.contains(&(file, npc_id)) {
                 continue;
             }
+            if let Some((_, _, greeting)) = LATER_GREETINGS
+                .iter()
+                .find(|(known_file, known_id, _)| *known_file == file && *known_id == npc_id)
+            {
+                assert_eq!(
+                    record["greeting_string_id"].as_u64(),
+                    Some(u64::from(*greeting)),
+                    "NPC {npc_id}: later recovered binding"
+                );
+                continue;
+            }
             assert!(
                 record["greeting_string_id"].as_u64().unwrap_or(0) == 0,
                 "NPC {npc_id}: non-target row gained a greeting"
@@ -508,12 +523,18 @@ fn the_existing_greetings_and_other_regions_are_unchanged() {
         );
     }
 
-    // Exactly the 19 target rows are greeted in the two owned files; no existing
-    // binding is overwritten and no duplicate speaker gains the same body.
-    let expected = NEW_GREETINGS
+    // Exactly the 19 target rows plus the later recovered bindings are greeted in
+    // the two owned files; no existing binding is overwritten and no duplicate
+    // speaker gains the same body.
+    let mut expected = NEW_GREETINGS
         .iter()
         .map(|(npc_id, _, greeting, _, _, _, _, _)| (*npc_id, *greeting))
         .collect::<BTreeSet<_>>();
+    expected.extend(
+        LATER_GREETINGS
+            .iter()
+            .map(|(_, npc_id, greeting)| (*npc_id, *greeting)),
+    );
     let mut found = BTreeSet::new();
     for file in ["lakeshore.json", "wilds.json"] {
         for record in read_json(&content_dir().join("npcs").join(file))["records"]
