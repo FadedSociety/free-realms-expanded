@@ -151,10 +151,7 @@ fn a_refused_field_replay_through_the_session_writes_no_save() {
     let field = seed
         .take_shared_fields()
         .expect("the seed engine owns its field");
-    let mut scene = test_support::Scene::new(&options, 41);
-    // The field must be on the membership before world entry, the order
-    // `Server::new` installs its seed in.
-    scene.membership.install_field_seed(0, field);
+    let mut scene = test_support::Scene::with_field(&options, 41, field);
     for (index, message) in [13_u16.to_le_bytes(), 10_u16.to_le_bytes()]
         .into_iter()
         .enumerate()

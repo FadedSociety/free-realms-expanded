@@ -5,12 +5,12 @@
 //! payout is applied. A pair the wallet or the active job cannot take (the wire
 //! coin field is `i32`, experience is `u32`) is therefore refused whole, logged
 //! and answered with one system line instead of faulting the shared-field tick
-//! for every other player. The refusal names the lost prize, so a capped player
-//! is not left guessing where the item went.
+//! for every other player. The refusal says the reward and any prize item it
+//! carried were not granted, so a capped player knows where the item went.
 use super::*;
 
 /// (R) Local copy: no recovered client locale row exists for this refusal.
-const REWARD_UNREPRESENTABLE: &str = "This reward was not applied, so its prize item was not granted: your coin balance or active job is at its limit.";
+const REWARD_UNREPRESENTABLE: &str = "This reward and any prize item it carried were not granted: your coin balance or active job is at its limit.";
 
 impl Gameplay {
     /// Apply one encounter reward. A reward that cannot be represented is

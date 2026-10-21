@@ -47,6 +47,10 @@ const WOLF: i32 = 3156;
 /// the kind's override (not the level 5-8 band) owns its payout.
 const MID_F1: u64 = 131_000_102_013;
 
+/// The one fixed refusal line for a reward the wallet or active job cannot
+/// take. `(R)` text: no recovered client locale row names it.
+const REWARD_REFUSED: &str = "This reward and any prize item it carried were not granted: your coin balance or active job is at its limit.";
+
 /// A field actor with no power-up table: only the kill reward path is used.
 fn actor(guid: u64, definition_id: i32, level: u32, position: [f32; 3], max_health: u32) -> Value {
     json!({
@@ -422,8 +426,8 @@ fn an_overflowing_reward_refuses_one_player_without_stopping_the_field() {
     assert!(
         s6::chat_texts(&b_out.replies)
             .iter()
-            .any(|text| text.contains("prize item was not granted")),
-        "the whole-reward refusal names the lost prize"
+            .any(|text| text == REWARD_REFUSED),
+        "the whole-reward refusal names the reward and any prize it carried"
     );
     let b_after = bank(&b);
     assert_eq!(b_after.0, b_coins + 1000);
@@ -484,9 +488,10 @@ fn an_overflowing_job_xp_refuses_the_whole_payout() {
     );
     assert_eq!(count(&out.replies, 38, 14), 0, "the XP is not half-paid");
     let text = s6::chat_texts(&out.replies).join("\n");
-    assert!(
-        text.contains("at its limit") && text.contains("prize item was not granted"),
-        "the whole-reward refusal names the lost prize: {text}"
+    assert_eq!(
+        text.as_str(),
+        REWARD_REFUSED,
+        "the whole-reward refusal is the fixed line"
     );
     let after = bank(&b);
     assert_eq!(after, before, "the refused payout changes nothing");
@@ -718,8 +723,9 @@ fn start_battle(
 
 /// F276: the representability gate also covers the one non-field encounter
 /// reward (a battle win). A player at the coin cap gets no half-payout and no
-/// prize item, one explicit system line that names the lost prize, and the
-/// battle still completes; another player is paid.
+/// prize item, one explicit system line saying the reward and any prize it
+/// carried were not granted, and the battle still completes; another player
+/// is paid.
 #[test]
 fn a_battle_reward_at_the_coin_cap_is_refused_with_feedback() {
     // Overworld battle 12310: 25 coins, one prize row and no combat-level
@@ -739,8 +745,8 @@ fn a_battle_reward_at_the_coin_cap_is_refused_with_feedback() {
     let text = s6::chat_texts(&won.replies).join("\n");
     assert!(won.changed, "the battle still completes: {text}");
     assert!(
-        text.contains("at its limit") && text.contains("prize item was not granted"),
-        "the player is told the reward and its prize were not granted: {text}"
+        text.contains(REWARD_REFUSED),
+        "the player is told the reward and any prize it carried were not granted: {text}"
     );
     let state = capped.state();
     assert_eq!(

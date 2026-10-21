@@ -121,14 +121,17 @@ impl FieldKillRewards {
             Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(Self::default()),
             Err(error) => return Err(error),
         }
-        // Bound the read itself, not just the metadata: a file that grows (or a
-        // swapped symlink) between the check and the read cannot allocate past
-        // MAX_BYTES. `parse` refuses the one extra byte the `take` admits.
+        // Bound the read itself too, not just the metadata.
+        Self::parse(&Self::read_bounded(fs::File::open(path)?)?)
+    }
+
+    /// Read at most one byte past `MAX_BYTES`, so a file that grows (or a
+    /// swapped symlink) between the metadata check and the read cannot be
+    /// allocated in full; `parse` refuses that one extra byte.
+    fn read_bounded(reader: impl Read) -> io::Result<Vec<u8>> {
         let mut bytes = Vec::new();
-        fs::File::open(path)?
-            .take(MAX_BYTES as u64 + 1)
-            .read_to_end(&mut bytes)?;
-        Self::parse(&bytes)
+        reader.take(MAX_BYTES as u64 + 1).read_to_end(&mut bytes)?;
+        Ok(bytes)
     }
 
     fn parse(bytes: &[u8]) -> io::Result<Self> {
@@ -450,13 +453,24 @@ mod tests {
         let error = FieldKillRewards::load(&directory).unwrap_err();
         assert_eq!(error.kind(), io::ErrorKind::InvalidData);
         assert!(error.to_string().contains("too large"));
-        // `parse` keeps the same bound for bytes handed in directly, including
-        // the one byte `take(MAX_BYTES + 1)` admits past the metadata limit.
-        assert!(
-            FieldKillRewards::parse(&vec![b' '; MAX_BYTES + 1]).is_err(),
-            "an oversized byte slice is refused"
-        );
         let _ = fs::remove_dir_all(&directory);
+    }
+
+    #[test]
+    fn the_bounded_read_stops_one_byte_past_the_limit() {
+        // The metadata precheck rejects an oversized file before this read
+        // runs, so drive the read itself: a much larger reader must still
+        // yield only the one byte `parse` needs to refuse it.
+        let over = FieldKillRewards::read_bounded(std::io::Cursor::new(vec![b' '; MAX_BYTES * 2]))
+            .unwrap();
+        assert_eq!(over.len(), MAX_BYTES + 1, "the read stops at the bound");
+        let error = FieldKillRewards::parse(&over).unwrap_err();
+        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+        assert!(error.to_string().contains("too large"));
+        // A reader exactly at the limit is read whole.
+        let at_limit =
+            FieldKillRewards::read_bounded(std::io::Cursor::new(vec![b' '; MAX_BYTES])).unwrap();
+        assert_eq!(at_limit.len(), MAX_BYTES);
     }
 
     #[test]
