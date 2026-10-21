@@ -26,6 +26,7 @@ mod shared;
 mod skills;
 use self::field::Wander;
 pub(crate) use self::field::level_refusal;
+use self::field_rewards::KillCredit;
 pub use self::shared::{SharedFieldAction, SharedFieldState};
 use self::skills::{SkillBuff, SkillDot, SkillEffects};
 
@@ -119,11 +120,6 @@ const PICKUP_GUID_BASE: u64 = 0x5057_5550_0000_0000;
 /// SFX_PowerUp_Pickup composite (ActorCompositeEffectDefinitions.xml 15509,
 /// Combat Power-ups note 1.1); played at the pickup when it is collected.
 const POWER_UP_PICKUP_EFFECT: i32 = 15509;
-/// (R) An unclaimed shared-kill drop lapses after this long (the claim happens
-/// on the participant's next shared tick, a fraction of a second away).
-const CREDIT_TTL_MS: u64 = 10_000;
-/// (R) At most this many unclaimed drops wait per player.
-const MAX_CREDITS: usize = 16;
 /// The client's own tutorial line, shown when a second stored kind is refused.
 const ONE_POWER_UP_TEXT: &str = "You can have one power up active at a time.";
 /// Local reconstructed objective award. The original encounter scoring table
@@ -789,23 +785,8 @@ pub struct EncounterEngine {
 struct KillLedger {
     /// enemy guid -> player guid -> time of that player's last damage.
     hits: BTreeMap<u64, BTreeMap<u64, u64>>,
-    /// player guid -> drops earned by a kill another player landed.
+    /// player guid -> credits (reward and kill event) earned by another's kill.
     credits: BTreeMap<u64, Vec<KillCredit>>,
-}
-
-/// A participant's unclaimed roll for one kill; the player's own engine rolls
-/// it, so every player has independent luck and their own pickups.
-#[derive(Clone)]
-struct KillCredit {
-    kill: (u64, u64),
-    /// Power-up drop table; `None` for a reward-only field kill and cleared by
-    /// `SharedFieldState::retain_casters` for a player who left the field.
-    table: Option<String>,
-    at: [f32; 3],
-    participants: usize,
-    /// The field reward earned by this kill, carried until the claim.
-    reward: Option<(u32, u32)>,
-    expires_ms: u64,
 }
 
 /// A pickup actor on the ground, owned by the player whose kill dropped it.
@@ -2179,6 +2160,7 @@ impl EncounterEngine {
                 self.credit_field_kill(
                     drop_table.as_deref(),
                     reward,
+                    definition,
                     guid,
                     killed_at,
                     now_ms,

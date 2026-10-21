@@ -1,9 +1,16 @@
-//! Field-kill coin and job-XP rewards: the bounded level-band table and the
-//! one payout each credited player receives for a server-authoritative kill.
+//! Field-kill rewards: the bounded level-band table, the one coin/job-XP payout
+//! and the one quest event each credited player receives for a
+//! server-authoritative kill.
 //!
 //! The table is separate from `field_enemies.json` so that actor rows keep
 //! their existing schema and limits; a missing table is an empty table for old
 //! test packages, while a malformed or out-of-bounds table refuses to load.
+//!
+//! A `KillCredit` carries the server-authored defeated actor definition (`0`
+//! names no quest target) together with the carried reward, and it is claimed
+//! on the participant's next shared tick. Reward and quest credit use the same
+//! `who` set in `credit_field_kill`: a future contributor-set change must
+//! change both together.
 use super::*;
 
 const FILE: &str = "field_kill_rewards.json";
@@ -12,6 +19,31 @@ const MAX_BANDS: usize = 20;
 const MAX_OVERRIDES: usize = 64;
 const MAX_REWARD: u32 = 1000;
 const MAX_LEVEL: u32 = 20;
+/// (R) An unclaimed shared-kill credit lapses after this long (the claim happens
+/// on the participant's next shared tick, a fraction of a second away).
+const CREDIT_TTL_MS: u64 = 10_000;
+/// (R) At most this many unclaimed credits wait per player.
+const MAX_CREDITS: usize = 16;
+
+/// A participant's unclaimed share of one kill: the carried T240 reward and the
+/// server-authored defeated definition. The claimant's own engine turns the
+/// definition into its own kill event, so every credited player advances their
+/// own quests exactly like the killer already does in `strike_damage`.
+#[derive(Clone)]
+pub(super) struct KillCredit {
+    kill: (u64, u64),
+    /// Power-up drop table; `None` for a reward-only field kill and cleared by
+    /// `SharedFieldState::retain_casters` for a player who left the field.
+    pub(super) table: Option<String>,
+    at: [f32; 3],
+    participants: usize,
+    /// The field reward earned by this kill, carried until the claim.
+    pub(super) reward: Option<(u32, u32)>,
+    /// The defeated actor's definition id, the claimant's own quest event.
+    /// `0` names no quest target.
+    definition: i32,
+    pub(super) expires_ms: u64,
+}
 
 /// (R) Per-kill coins and active-job XP, looked up by definition then level.
 #[derive(Debug, Default)]
@@ -153,13 +185,17 @@ fn validate_source(source: &[crate::content::SourceTag]) -> io::Result<()> {
 
 impl EncounterEngine {
     /// Pay one field kill: this engine's player at once, every other credited
-    /// participant on their next shared tick. The pair is carried with the
-    /// credit, so a later content reload can neither change nor drop it.
+    /// participant on their next shared tick. The pair and the defeated
+    /// definition are carried with the credit, so a later content reload can
+    /// neither change nor drop them. A positive `definition` still leaves a
+    /// credit when the kill has no drop table and no reward, so a zero-reward
+    /// quest target credits every participant, not only the killer.
     #[allow(clippy::too_many_arguments)]
     pub(super) fn credit_field_kill(
         &mut self,
         table: Option<&str>,
         reward: Option<(u32, u32)>,
+        definition: i32,
         enemy: u64,
         at: [f32; 3],
         now_ms: u64,
@@ -167,7 +203,7 @@ impl EncounterEngine {
         engaged: Option<u64>,
         out: &mut EncounterOutcome,
     ) {
-        if table.is_none() && reward.is_none() {
+        if table.is_none() && reward.is_none() && definition <= 0 {
             return;
         }
         let kill = (enemy, now_ms);
@@ -205,12 +241,14 @@ impl EncounterEngine {
                 at,
                 participants,
                 reward,
+                definition,
                 expires_ms: now_ms.saturating_add(CREDIT_TTL_MS),
             });
         }
     }
 
-    /// Pay the credits other players earned for this engine's player. A credit
+    /// Pay the credits other players earned for this engine's player: the
+    /// carried reward and, exactly once, the claimant's own kill event. A credit
     /// is removed when it is claimed or expires, so a second claim pays nothing.
     pub(super) fn claim_kill_credits(
         &mut self,
@@ -231,6 +269,12 @@ impl EncounterEngine {
                     );
                 }
                 pay_field_reward(credit.reward, out);
+                // The claimant's own server-authored defeat event. The killer
+                // is excluded from its own credits, so the T256 push in
+                // `strike_damage` remains the single event for the killer.
+                if credit.definition > 0 {
+                    out.defeated.push(credit.definition);
+                }
             }
         }
     }

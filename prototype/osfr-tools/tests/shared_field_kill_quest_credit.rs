@@ -1,4 +1,10 @@
-//! T256: a shared-field kill credits the killer's active kill quests.
+//! T256/T302: a shared-field kill credits every credited player's own quests.
+//!
+//! T256 gave the engine that lands the lethal hit its own `defeated` event.
+//! T302 carries the same server-authored definition on T240's kill credit, so
+//! every other credited participant (`who`: hitters inside the participation
+//! window, the engaged target and the killer) advances their own quests and
+//! opening defeat goals on their next shared tick, exactly once.
 //!
 //! The session fixture, its private content copy, the saved-state reload, the
 //! NPC menu/dialogue/turn-in packets and the 49/x objective assertions all come
@@ -22,9 +28,10 @@ mod npc_quest_chain;
 mod packets;
 
 use npc_quest_chain::{
-    Fixture, character_at_for, content_dir, content_position, counts, finish_quest, has_family,
-    npc_interact, npc_select, objective_activated_packet, objective_complete_packet,
-    objective_update_packet, quest_end_reply, quest_status, release_end_screen, send, talk,
+    Fixture, character_at_for, coins, content_dir, content_position, counts, finish_quest,
+    has_family, npc_interact, npc_select, objective_activated_packet, objective_complete_packet,
+    objective_update_packet, profile_xp, quest_end_reply, quest_status, release_end_screen, saved,
+    send, talk,
 };
 use osfr_tools::{
     character_store::CharacterState,
@@ -41,6 +48,8 @@ use std::{
 
 const A: u64 = 101;
 const B: u64 = 202;
+const C: u64 = 303;
+const D: u64 = 404;
 /// T241: "Fighting the Pack" is five wolf defeats, then a Talk to the giver.
 const QUEST: u32 = 3_000_009;
 const GIVER: u64 = 9_000_000_050;
@@ -58,6 +67,8 @@ const OPENING_STAGE: u32 = 910_007;
 const WOLF_GUID: u64 = 131_000_109_001;
 const WOLF_TWO: u64 = 131_000_109_002;
 const LEVEL_ONE: i32 = 930_108;
+/// `encounter::field_rewards::CREDIT_TTL_MS` (private to the engine).
+const CREDIT_TTL_MS: u64 = 10_000;
 /// The quest's end text (`end_text_string_id` in the quest record).
 const QUEST_END_TEXT: u32 = 4_420_076;
 
@@ -65,6 +76,18 @@ const QUEST_END_TEXT: u32 = 4_420_076;
 /// production `Gameplay::load` content path.
 fn wolf_fixture(enemies: &[Value]) -> Fixture {
     Fixture::for_character(A).with_field_enemies(enemies)
+}
+
+/// The same fixture without `field_kill_rewards.json`: the production loader
+/// reads a missing table as the empty table, so the T240 lookup returns no
+/// reward and the actor has no `power_up_table` either. That leaves both the
+/// drop table and the reward pair `None` while the definition stays positive,
+/// which is the zero-reward kill T302 must still credit.
+fn rewardless_fixture(enemies: &[Value]) -> Fixture {
+    let fixture = wolf_fixture(enemies);
+    fs::remove_file(fixture.path().join("field_kill_rewards.json"))
+        .expect("the synthetic reward table was copied");
+    fixture
 }
 
 /// Advance the saved opening save to stage 910007 "Fighting off the Pack":
@@ -274,12 +297,16 @@ fn a_shared_field_kill_credits_the_killer_quest_once() {
     }
     assert_eq!(counts(&game, QUEST), [5, 0]);
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Active);
+    // 49/10 body reader `0x00c7b070` (common header `0x00c7acd0`): quest id,
+    // objective id, progress float, one dword and a bool.
     assert!(
         fifth
             .replies
             .contains(&objective_complete_packet(QUEST, DEFEAT_OBJECTIVE, 0.5)),
         "the fifth kill produces the 49/10 Goal Complete packet"
     );
+    // 49/8 body reader `0x00c7aeb0` through dispatcher `0x00c7b570` (apply
+    // `0x00c7a910`): quest id, objective id, required count and a bool.
     assert!(
         fifth
             .replies
@@ -303,6 +330,10 @@ fn a_shared_field_kill_credits_the_killer_quest_once() {
 
 #[test]
 fn the_other_player_in_the_same_field_is_not_credited() {
+    // A player who is physically in the field but never hits or becomes the
+    // enemy's target is not in T240's `who` set, so A's kill leaves no credit
+    // for it. The contributor half of the same kill is covered by
+    // `a_contributors_own_quest_advances_once_from_a_shared_field_kill`.
     let fixture = wolf_fixture(&[
         wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 400),
         wolf(WOLF_TWO, WOLF, [-2.0, 0.0, 0.0], 100),
@@ -317,22 +348,13 @@ fn the_other_player_in_the_same_field_is_not_credited() {
     b.take_shared_fields();
     let known = BTreeSet::from([WOLF_GUID, WOLF_TWO]);
 
-    // B wounds the wolf (two hits of 100) and owns no lethal blow.
-    for now in [0, 700] {
-        let out = attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, now).unwrap();
-        assert!(
-            !out.replies
-                .iter()
-                .any(|packet| has_family(packet, 49, 3, None) || has_family(packet, 49, 9, None)),
-            "B's non-lethal hit must not add or advance the quest"
-        );
-    }
+    // A kills the 400 HP wolf alone; B is present but contributes nothing.
     let b_before = b.state();
-    for now in [1_400, 2_100, 2_800] {
+    for now in [0, 700, 1_400, 2_100] {
         attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, now).unwrap();
     }
     assert_eq!(field.health(WOLF_GUID), Some(0));
-    assert_eq!(counts(&a, QUEST), [1, 0], "only the killer is credited");
+    assert_eq!(counts(&a, QUEST), [1, 0], "the killer is credited");
     assert_eq!(counts(&b, QUEST), [0, 0], "the bystander's counter is 0");
     assert_eq!(
         opening_counts(&a),
@@ -344,24 +366,21 @@ fn the_other_player_in_the_same_field_is_not_credited() {
         [1, 1, 0],
         "A's defeat event is not applied to B's opening stage"
     );
+    assert_eq!(field.pending_kill_credits(B), 0, "B earned no credit");
     assert_eq!(
         b.state(),
         b_before,
         "A's kill changed nothing in B's saved gameplay state"
     );
 
-    // The shared tick that claims B's T240 reward must not deliver A's defeat
-    // event to B either.
-    let claimed = b
+    // The shared tick that pays B's T240 credit must not deliver A's defeat
+    // event to B either, because B has no credit at all.
+    let quiet = b
         .tick_shared_effects(&mut field, &b_character, 2_850)
         .unwrap();
-    assert_eq!(
-        counts(&b, QUEST),
-        [0, 0],
-        "the shared tick credits no bystander"
-    );
+    assert!(!quiet.changed);
     assert!(
-        !claimed
+        !quiet
             .replies
             .iter()
             .any(|packet| has_family(packet, 49, 3, None)
@@ -369,6 +388,8 @@ fn the_other_player_in_the_same_field_is_not_credited() {
                 || has_family(packet, 49, 10, None)),
         "A's defeat event is not fanned out to B"
     );
+    assert_eq!(counts(&b, QUEST), [0, 0]);
+    assert_eq!(opening_counts(&b), [1, 1, 0]);
 
     // B's own next kill credits B normally in the same field, opening included.
     let credit = attack(&mut b, &mut field, &b_character, &known, WOLF_TWO, 3_500).unwrap();
@@ -657,4 +678,646 @@ fn the_existing_field_and_arena_suites_stay_green() {
     );
     assert_eq!(u32::from_le_bytes(hit[28..32].try_into().unwrap()), 100);
     assert_eq!(u32::from_le_bytes(hit[46..50].try_into().unwrap()), 0);
+}
+
+/// A session with no bound NPC quest catalogue: the reachable form of a
+/// claimant whose own kill event cannot be applied. The opening save stays at
+/// its first stage, which has no defeat goal, so the claim changes nothing.
+fn unbound_player(fixture: &Fixture, guid: u64, position: [f32; 3]) -> Gameplay {
+    let mut state = Gameplay::load(fixture.path(), None).unwrap().state();
+    state.inventory.coins = 0;
+    {
+        let profiles = state.profiles.as_mut().unwrap();
+        profiles.active = BRAWLER;
+        profiles.unlocked.insert(BRAWLER);
+    }
+    let mut game = Gameplay::load(fixture.path(), Some(state)).unwrap();
+    game.initialize_world(&character_at_for(guid, 0, position), 0)
+        .unwrap();
+    game
+}
+
+#[test]
+fn a_contributors_own_quest_advances_once_from_a_shared_field_kill() {
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let a_at = [1.0, 0.0, 0.0];
+    let b_at = [-1.0, 0.0, 0.0];
+    let a_character = character_at_for(A, 0, a_at);
+    let b_character = character_at_for(B, 0, b_at);
+    let mut a = player(&fixture, A, a_at);
+    let mut b = player(&fixture, B, b_at);
+    let mut field = a.take_shared_fields().unwrap();
+    b.take_shared_fields();
+    let known = BTreeSet::from([WOLF_GUID]);
+
+    // B contributes one 100-damage hit; A lands the lethal 100-damage swing.
+    attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
+    attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 100).unwrap();
+    assert_eq!(field.health(WOLF_GUID), Some(0));
+    assert_eq!(counts(&a, QUEST), [1, 0], "the killer is credited at once");
+    assert_eq!(
+        counts(&b, QUEST),
+        [0, 0],
+        "the contributor waits for its tick"
+    );
+    assert_eq!(field.pending_kill_credits(B), 1);
+    assert_eq!(
+        field.pending_kill_credits(A),
+        0,
+        "the killer is never in its own credit list"
+    );
+
+    let claimed = b
+        .tick_shared_effects(&mut field, &b_character, 150)
+        .unwrap();
+    assert!(claimed.changed);
+    assert_eq!(
+        counts(&b, QUEST),
+        [1, 0],
+        "the credit advances B's own quest"
+    );
+    assert!(
+        claimed
+            .replies
+            .contains(&objective_update_packet(QUEST, DEFEAT_OBJECTIVE, 1, 0.1)),
+        "the contributor's own 49/9 reports 1/5 (client reader 0x00c7af60)"
+    );
+    let again = b
+        .tick_shared_effects(&mut field, &b_character, 200)
+        .unwrap();
+    assert!(!again.changed && again.replies.is_empty());
+    assert_eq!(
+        counts(&b, QUEST),
+        [1, 0],
+        "the credit is claimed exactly once"
+    );
+    assert_eq!(field.pending_kill_credits(B), 0);
+}
+
+#[test]
+fn the_credit_pays_the_contributor_reward_and_quest_event_once() {
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let a_at = [1.0, 0.0, 0.0];
+    let b_at = [-1.0, 0.0, 0.0];
+    let a_character = character_at_for(A, 0, a_at);
+    let b_character = character_at_for(B, 0, b_at);
+    let mut a = player(&fixture, A, a_at);
+    let mut b = player(&fixture, B, b_at);
+    let mut field = a.take_shared_fields().unwrap();
+    b.take_shared_fields();
+    let known = BTreeSet::from([WOLF_GUID]);
+
+    attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
+    attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 100).unwrap();
+    assert_eq!((coins(&b), profile_xp(&b, BRAWLER)), (0, 0));
+
+    let claimed = b
+        .tick_shared_effects(&mut field, &b_character, 150)
+        .unwrap();
+    assert_eq!(count(&claimed.replies, 38, 19), 1, "one coin balance reply");
+    assert_eq!(
+        packet(&claimed.replies, 38, 19),
+        [38u8, 0, 19, 0, 2, 0, 0, 0].as_slice(),
+        "the contributor is paid T240's 2 coins once (client ctor 0x0089e670)"
+    );
+    assert_eq!(
+        packet(&claimed.replies, 38, 14),
+        carrier(38, 14, &[BRAWLER, 1, 5, 0, 0, 0]).as_slice(),
+        "the contributor is paid 5 job XP once (client reader 0x008d86e0)"
+    );
+    assert_eq!(coins(&b), 2);
+    assert_eq!(profile_xp(&b, BRAWLER), 5);
+    assert_eq!(
+        counts(&b, QUEST),
+        [1, 0],
+        "the same credit advanced the quest once"
+    );
+
+    let again = b
+        .tick_shared_effects(&mut field, &b_character, 200)
+        .unwrap();
+    assert!(
+        !again.changed && again.replies.is_empty(),
+        "no second EncounterReward and no second kill event"
+    );
+    assert_eq!((coins(&b), profile_xp(&b, BRAWLER)), (2, 5));
+    assert_eq!(counts(&b, QUEST), [1, 0]);
+}
+
+#[test]
+fn an_expired_or_left_field_credit_advances_nothing() {
+    // Expiry: the contributor waits past CREDIT_TTL_MS.
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let a_at = [1.0, 0.0, 0.0];
+    let b_at = [-1.0, 0.0, 0.0];
+    let a_character = character_at_for(A, 0, a_at);
+    let b_character = character_at_for(B, 0, b_at);
+    let mut a = player(&fixture, A, a_at);
+    let mut b = player(&fixture, B, b_at);
+    let mut field = a.take_shared_fields().unwrap();
+    b.take_shared_fields();
+    let known = BTreeSet::from([WOLF_GUID]);
+    attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
+    attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 100).unwrap();
+    let before = saved(&b);
+    let expired = b
+        .tick_shared_effects(&mut field, &b_character, 100 + CREDIT_TTL_MS + 1)
+        .unwrap();
+    assert!(!expired.changed && expired.replies.is_empty());
+    assert_eq!(
+        saved(&b),
+        before,
+        "an expired credit changes neither state nor save bytes"
+    );
+    assert_eq!(counts(&b, QUEST), [0, 0]);
+    assert_eq!(opening_counts(&b), [1, 1, 0]);
+    assert_eq!(
+        field.pending_kill_credits(B),
+        0,
+        "the expired credit was consumed once"
+    );
+
+    // Leaving the field: a quest-only credit is dropped by the real prune.
+    let fixture = rewardless_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let mut a = player(&fixture, A, a_at);
+    let mut b = player(&fixture, B, b_at);
+    let mut field = a.take_shared_fields().unwrap();
+    b.take_shared_fields();
+    attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
+    attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 100).unwrap();
+    assert_eq!(field.pending_kill_credits(B), 1);
+    field.retain_casters(&BTreeSet::from([A]), 150);
+    assert_eq!(
+        field.pending_kill_credits(B),
+        0,
+        "a quest-only credit does not survive leaving the field"
+    );
+    let before = saved(&b);
+    let left = b
+        .tick_shared_effects(&mut field, &b_character, 200)
+        .unwrap();
+    assert!(!left.changed && left.replies.is_empty());
+    assert_eq!(saved(&b), before);
+    assert_eq!(counts(&b, QUEST), [0, 0]);
+    assert_eq!(opening_counts(&b), [1, 1, 0]);
+    assert_eq!((coins(&b), profile_xp(&b, BRAWLER)), (0, 0));
+}
+
+#[test]
+fn a_zero_reward_event_credits_a_contributor_quest() {
+    // The reward table is missing (the loader's empty table) and the actor has
+    // no `power_up_table`, so `credit_field_kill` sees no drop table and no
+    // reward while the definition stays positive. The old early return would
+    // leave B without a credit; T302 must still deliver the quest event.
+    let fixture = rewardless_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let a_at = [1.0, 0.0, 0.0];
+    let b_at = [-1.0, 0.0, 0.0];
+    let a_character = character_at_for(A, 0, a_at);
+    let b_character = character_at_for(B, 0, b_at);
+    let mut a = player(&fixture, A, a_at);
+    let mut b = player(&fixture, B, b_at);
+    let mut field = a.take_shared_fields().unwrap();
+    b.take_shared_fields();
+    let known = BTreeSet::from([WOLF_GUID]);
+
+    attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
+    let lethal = attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 100).unwrap();
+    assert_eq!(field.health(WOLF_GUID), Some(0));
+    assert_eq!(
+        count(&lethal.replies, 38, 19),
+        0,
+        "a missing reward table pays no coins"
+    );
+    assert_eq!(
+        field.pending_kill_credits(B),
+        1,
+        "the quest-bearing kill still credits B"
+    );
+
+    let claimed = b
+        .tick_shared_effects(&mut field, &b_character, 150)
+        .unwrap();
+    assert_eq!(
+        counts(&b, QUEST),
+        [1, 0],
+        "the zero-reward kill advances B's quest"
+    );
+    assert_eq!(opening_counts(&b), [1, 1, 1]);
+    assert_eq!(count(&claimed.replies, 38, 19), 0);
+    assert_eq!(count(&claimed.replies, 38, 14), 0);
+    assert_eq!((coins(&b), profile_xp(&b, BRAWLER)), (0, 0));
+}
+
+#[test]
+fn a_zero_or_invalid_definition_is_ignored_without_an_error() {
+    // 0 is accepted by the content loader but names no quest target. With no
+    // reward table either, the producer's early return still applies and no
+    // credit is queued; the kill itself stays server-authoritative.
+    let fixture = rewardless_fixture(&[wolf(WOLF_GUID, 0, [0.0, 0.0, 0.0], 200)]);
+    let a_at = [1.0, 0.0, 0.0];
+    let b_at = [-1.0, 0.0, 0.0];
+    let a_character = character_at_for(A, 0, a_at);
+    let b_character = character_at_for(B, 0, b_at);
+    let mut a = player(&fixture, A, a_at);
+    let mut b = player(&fixture, B, b_at);
+    let mut field = a.take_shared_fields().unwrap();
+    b.take_shared_fields();
+    let known = BTreeSet::from([WOLF_GUID]);
+
+    attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
+    let killed = attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 100)
+        .expect("a zero definition is skipped, not refused");
+    assert_eq!(field.health(WOLF_GUID), Some(0));
+    assert_eq!(field.pending_kill_credits(B), 0);
+    assert_eq!(counts(&a, QUEST), [0, 0], "zero is no quest target");
+    assert_eq!(count(&killed.replies, 49, 9), 0);
+    let before = saved(&b);
+    let quiet = b
+        .tick_shared_effects(&mut field, &b_character, 150)
+        .unwrap();
+    assert!(!quiet.changed && quiet.replies.is_empty());
+    assert_eq!(saved(&b), before);
+
+    // A negative definition cannot become a u32 and is refused at content
+    // load, before any kill can reach the credit path.
+    let bad = rewardless_fixture(&[wolf(WOLF_GUID, -1, [0.0, 0.0, 0.0], 200)]);
+    let error = Gameplay::load(bad.path(), None)
+        .err()
+        .expect("negative definitions are refused");
+    assert_eq!(error.kind(), std::io::ErrorKind::InvalidData);
+}
+
+#[test]
+fn a_full_credit_list_drops_the_oldest_and_other_players_continue() {
+    // 17 kills inside the 10 s TTL. B contributed to all of them, so its
+    // 16-entry list drops the oldest; the first kill is the only one that
+    // targets quest 3000009. C contributed only to that first kill and keeps
+    // its one credit, so the same kill still advances C.
+    let wolves: Vec<Value> = (0..17_u64)
+        .map(|index| {
+            let definition = if index == 0 { WOLF } else { LEVEL_ONE };
+            // The first wolf takes B's and C's hits before A's lethal swing.
+            let health = if index == 0 { 300 } else { 200 };
+            wolf(
+                WOLF_GUID + index,
+                definition,
+                [0.0, 0.0, index as f32 * 0.01],
+                health,
+            )
+        })
+        .collect();
+    let fixture = wolf_fixture(&wolves);
+    let a_at = [1.0, 0.0, 0.0];
+    let b_at = [-1.0, 0.0, 0.0];
+    let c_at = [0.0, 0.0, 1.0];
+    let a_character = character_at_for(A, 0, a_at);
+    let b_character = character_at_for(B, 0, b_at);
+    let c_character = character_at_for(C, 0, c_at);
+    let mut a = player(&fixture, A, a_at);
+    let mut b = player(&fixture, B, b_at);
+    let mut c = player(&fixture, C, c_at);
+    let mut field = a.take_shared_fields().unwrap();
+    b.take_shared_fields();
+    c.take_shared_fields();
+    let known: BTreeSet<u64> = (0..17_u64).map(|index| WOLF_GUID + index).collect();
+
+    // The 600 ms basic-swing clock bounds the kill rate; 17 kills fit inside
+    // the 10 s credit TTL.
+    for index in 0..17_u64 {
+        let hit_at = index * 600;
+        let kill_at = hit_at + 100;
+        attack(
+            &mut b,
+            &mut field,
+            &b_character,
+            &known,
+            WOLF_GUID + index,
+            hit_at,
+        )
+        .unwrap();
+        if index == 0 {
+            attack(&mut c, &mut field, &c_character, &known, WOLF_GUID, hit_at).unwrap();
+        }
+        let killed = attack(
+            &mut a,
+            &mut field,
+            &a_character,
+            &known,
+            WOLF_GUID + index,
+            kill_at,
+        )
+        .unwrap();
+        assert!(killed.changed, "kill {index} is server-authoritative");
+        assert_eq!(field.health(WOLF_GUID + index), Some(0), "kill {index}");
+    }
+    assert_eq!(
+        field.pending_kill_credits(B),
+        16,
+        "the cap keeps 16 and drops the oldest"
+    );
+    assert_eq!(field.pending_kill_credits(C), 1);
+    assert_eq!(counts(&b, QUEST), [0, 0]);
+    assert_eq!(counts(&c, QUEST), [0, 0]);
+
+    let claimed = b
+        .tick_shared_effects(&mut field, &b_character, 9_750)
+        .unwrap();
+    assert_eq!(
+        counts(&b, QUEST),
+        [0, 0],
+        "the dropped oldest credit was the only quest target"
+    );
+    assert_eq!(
+        opening_counts(&b),
+        [1, 1, 0],
+        "no surviving credit matches the opening goal"
+    );
+    assert_eq!(count(&claimed.replies, 49, 9), 0);
+    assert_eq!(field.pending_kill_credits(B), 0);
+
+    // A different participant's identical oldest credit was not dropped.
+    let c_credit = c
+        .tick_shared_effects(&mut field, &c_character, 9_800)
+        .unwrap();
+    assert_eq!(counts(&c, QUEST), [1, 0], "C still gets the kill's event");
+    assert_eq!(opening_counts(&c), [1, 1, 1]);
+    assert!(
+        c_credit
+            .replies
+            .contains(&objective_update_packet(QUEST, DEFEAT_OBJECTIVE, 1, 0.1))
+    );
+    assert_eq!(coins(&c), 2);
+    assert_eq!(profile_xp(&c, BRAWLER), 5);
+}
+
+#[test]
+fn a_group_member_who_never_hit_or_engaged_gets_no_credit() {
+    // D is a field member (same interest set, same shared tick) but never hit
+    // the wolf or became its target. T240's `who` is hitters inside the
+    // participation window, the engaged target and the killer; mere
+    // co-presence (or group-like membership) is not a contribution.
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let a_at = [1.0, 0.0, 0.0];
+    let b_at = [-1.0, 0.0, 0.0];
+    let d_at = [0.0, 0.0, 1.0];
+    let a_character = character_at_for(A, 0, a_at);
+    let b_character = character_at_for(B, 0, b_at);
+    let d_character = character_at_for(D, 0, d_at);
+    let mut a = player(&fixture, A, a_at);
+    let mut b = player(&fixture, B, b_at);
+    let mut d = player(&fixture, D, d_at);
+    let mut field = a.take_shared_fields().unwrap();
+    b.take_shared_fields();
+    d.take_shared_fields();
+    let known = BTreeSet::from([WOLF_GUID]);
+
+    attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
+    attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 100).unwrap();
+    assert_eq!(field.pending_kill_credits(B), 1);
+    assert_eq!(field.pending_kill_credits(D), 0);
+
+    let quiet = d
+        .tick_shared_effects(&mut field, &d_character, 150)
+        .unwrap();
+    assert!(!quiet.changed && quiet.replies.is_empty());
+    assert_eq!(counts(&d, QUEST), [0, 0]);
+    assert_eq!(opening_counts(&d), [1, 1, 0]);
+    assert_eq!((coins(&d), profile_xp(&d, BRAWLER)), (0, 0));
+}
+
+#[test]
+fn a_player_outside_the_field_instance_gets_no_credit() {
+    // The server computes each session's interest set (`known`); an outside
+    // player's set never contains this instance's actor, so the request finds
+    // no present enemy and records no contribution.
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let a_at = [1.0, 0.0, 0.0];
+    let b_at = [-1.0, 0.0, 0.0];
+    let d_at = [0.0, 0.0, 1.0];
+    let a_character = character_at_for(A, 0, a_at);
+    let b_character = character_at_for(B, 0, b_at);
+    let d_character = character_at_for(D, 0, d_at);
+    let mut a = player(&fixture, A, a_at);
+    let mut b = player(&fixture, B, b_at);
+    let mut d = player(&fixture, D, d_at);
+    let mut field = a.take_shared_fields().unwrap();
+    b.take_shared_fields();
+    d.take_shared_fields();
+    let known = BTreeSet::from([WOLF_GUID]);
+
+    let outside = attack(
+        &mut d,
+        &mut field,
+        &d_character,
+        &BTreeSet::new(),
+        WOLF_GUID,
+        0,
+    )
+    .unwrap();
+    assert!(!outside.changed && outside.replies.is_empty());
+    assert_eq!(field.health(WOLF_GUID), Some(200));
+
+    attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
+    attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 100).unwrap();
+    assert_eq!(field.pending_kill_credits(B), 1);
+    assert_eq!(field.pending_kill_credits(D), 0);
+    let quiet = d
+        .tick_shared_effects(&mut field, &d_character, 150)
+        .unwrap();
+    assert!(!quiet.changed && quiet.replies.is_empty());
+    assert_eq!(counts(&d, QUEST), [0, 0]);
+    assert_eq!(opening_counts(&d), [1, 1, 0]);
+}
+
+#[test]
+fn a_contributors_opening_defeat_goal_advances_once() {
+    let fixture = wolf_fixture(&[
+        wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200),
+        wolf(WOLF_TWO, LEVEL_ONE, [0.0, 0.0, 1.0], 200),
+    ]);
+    let a_at = [1.0, 0.0, 0.0];
+    let b_at = [-1.0, 0.0, 0.0];
+    let a_character = character_at_for(A, 0, a_at);
+    let b_character = character_at_for(B, 0, b_at);
+    let mut a = player(&fixture, A, a_at);
+    let mut b = player(&fixture, B, b_at);
+    let mut field = a.take_shared_fields().unwrap();
+    b.take_shared_fields();
+    let known = BTreeSet::from([WOLF_GUID, WOLF_TWO]);
+
+    // The matching definition 3156 advances B's opening stage goal once.
+    attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
+    attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 100).unwrap();
+    assert_eq!(opening_counts(&b), [1, 1, 0], "the claim is still pending");
+    b.tick_shared_effects(&mut field, &b_character, 150)
+        .unwrap();
+    assert_eq!(opening_counts(&b), [1, 1, 1]);
+    b.tick_shared_effects(&mut field, &b_character, 200)
+        .unwrap();
+    assert_eq!(opening_counts(&b), [1, 1, 1], "one event, not one per tick");
+
+    // A different definition is carried (it is positive) but matches neither
+    // the quest target nor the opening goal.
+    attack(&mut b, &mut field, &b_character, &known, WOLF_TWO, 700).unwrap();
+    attack(&mut a, &mut field, &a_character, &known, WOLF_TWO, 800).unwrap();
+    assert_eq!(field.pending_kill_credits(B), 1);
+    let other = b
+        .tick_shared_effects(&mut field, &b_character, 850)
+        .unwrap();
+    assert_eq!(counts(&b, QUEST), [1, 0]);
+    assert_eq!(opening_counts(&b), [1, 1, 1]);
+    assert_eq!(count(&other.replies, 49, 9), 0);
+    assert_eq!(field.pending_kill_credits(B), 0);
+}
+
+#[test]
+fn the_killer_and_two_contributors_each_advance_once() {
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 300)]);
+    let a_at = [1.0, 0.0, 0.0];
+    let b_at = [-1.0, 0.0, 0.0];
+    let c_at = [0.0, 0.0, 1.0];
+    let a_character = character_at_for(A, 0, a_at);
+    let b_character = character_at_for(B, 0, b_at);
+    let c_character = character_at_for(C, 0, c_at);
+    let mut a = player(&fixture, A, a_at);
+    let mut b = player(&fixture, B, b_at);
+    let mut c = player(&fixture, C, c_at);
+    let mut field = a.take_shared_fields().unwrap();
+    b.take_shared_fields();
+    c.take_shared_fields();
+    let known = BTreeSet::from([WOLF_GUID]);
+
+    // B and C each wound the wolf; A lands the lethal hit.
+    attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
+    attack(&mut c, &mut field, &c_character, &known, WOLF_GUID, 0).unwrap();
+    attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 0).unwrap();
+    assert_eq!(field.health(WOLF_GUID), Some(0));
+    assert_eq!(counts(&a, QUEST), [1, 0], "the killer advances at once");
+    assert_eq!(counts(&b, QUEST), [0, 0]);
+    assert_eq!(counts(&c, QUEST), [0, 0]);
+    assert_eq!(field.pending_kill_credits(A), 0);
+    assert_eq!(field.pending_kill_credits(B), 1);
+    assert_eq!(field.pending_kill_credits(C), 1);
+
+    b.tick_shared_effects(&mut field, &b_character, 50).unwrap();
+    c.tick_shared_effects(&mut field, &c_character, 60).unwrap();
+    assert_eq!(counts(&a, QUEST), [1, 0]);
+    assert_eq!(counts(&b, QUEST), [1, 0]);
+    assert_eq!(counts(&c, QUEST), [1, 0]);
+
+    // A second shared tick, and the killer's own tick, advance nothing.
+    for (game, character, now) in [
+        (&mut a, &a_character, 70),
+        (&mut b, &b_character, 80),
+        (&mut c, &c_character, 90),
+    ] {
+        let quiet = game
+            .tick_shared_effects(&mut field, character, now)
+            .unwrap();
+        assert!(!quiet.changed && quiet.replies.is_empty());
+    }
+    assert_eq!(counts(&a, QUEST), [1, 0]);
+    assert_eq!(counts(&b, QUEST), [1, 0]);
+    assert_eq!(counts(&c, QUEST), [1, 0]);
+}
+
+#[test]
+fn a_failing_quest_event_for_one_contributor_does_not_change_or_stop_the_other() {
+    // The kill-time event itself is validated (`KillActorKind` needs a positive
+    // id and count 1) and cannot fail. The reachable per-player refusal is a
+    // session with no bound NPC quest catalogue: B holds that absent engine and
+    // an opening stage with no defeat goal, so its claim consumes the credit and
+    // leaves its serialized state byte-identical. C's identical credit still
+    // pays, and C's tick is not stopped.
+    let fixture = rewardless_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 300)]);
+    let a_at = [1.0, 0.0, 0.0];
+    let b_at = [-1.0, 0.0, 0.0];
+    let c_at = [0.0, 0.0, 1.0];
+    let a_character = character_at_for(A, 0, a_at);
+    let b_character = character_at_for(B, 0, b_at);
+    let c_character = character_at_for(C, 0, c_at);
+    let mut a = player(&fixture, A, a_at);
+    let mut b = unbound_player(&fixture, B, b_at);
+    let mut c = player(&fixture, C, c_at);
+    let mut field = a.take_shared_fields().unwrap();
+    b.take_shared_fields();
+    c.take_shared_fields();
+    let known = BTreeSet::from([WOLF_GUID]);
+
+    attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
+    attack(&mut c, &mut field, &c_character, &known, WOLF_GUID, 0).unwrap();
+    attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 100).unwrap();
+    assert_eq!(field.pending_kill_credits(B), 1);
+    assert_eq!(field.pending_kill_credits(C), 1);
+
+    let before = saved(&b);
+    let refused = b
+        .tick_shared_effects(&mut field, &b_character, 150)
+        .expect("an absent quest engine is not an error");
+    assert!(!refused.changed && refused.replies.is_empty());
+    assert_eq!(saved(&b), before, "B's state and save bytes are unchanged");
+    assert_eq!(
+        field.pending_kill_credits(B),
+        0,
+        "the credit was consumed, not retried"
+    );
+
+    let paid = c
+        .tick_shared_effects(&mut field, &c_character, 160)
+        .unwrap();
+    assert_eq!(counts(&c, QUEST), [1, 0], "C's credit still pays");
+    assert!(
+        paid.replies
+            .contains(&objective_update_packet(QUEST, DEFEAT_OBJECTIVE, 1, 0.1))
+    );
+    assert_eq!(field.pending_kill_credits(C), 0);
+}
+
+#[test]
+fn a_reward_bearing_credit_advances_a_reconnected_contributor_once() {
+    // F276 keeps an unexpired reward-bearing credit in the world-owned ledger
+    // across a disconnect, so its owner still collects the earned pair. T302's
+    // defeat event rides that same credit; it is not saved, and the reconnect
+    // is the production load + `bind_npc_quest_catalogue`.
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let a_at = [1.0, 0.0, 0.0];
+    let b_at = [-1.0, 0.0, 0.0];
+    let a_character = character_at_for(A, 0, a_at);
+    let b_character = character_at_for(B, 0, b_at);
+    let mut a = player(&fixture, A, a_at);
+    let mut b = player(&fixture, B, b_at);
+    let mut field = a.take_shared_fields().unwrap();
+    b.take_shared_fields();
+    let known = BTreeSet::from([WOLF_GUID]);
+
+    attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
+    attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 100).unwrap();
+    let state = b.state();
+    drop(b);
+    field.retain_casters(&BTreeSet::from([A]), 150);
+    assert_eq!(
+        field.pending_kill_credits(B),
+        1,
+        "a reward-bearing credit survives the disconnect (F276)"
+    );
+
+    let mut b = fixture.game_as(B, Some(state));
+    b.initialize_world(&character_at_for(B, 0, b_at), 0)
+        .unwrap();
+    b.take_shared_fields();
+    assert_eq!(
+        counts(&b, QUEST),
+        [0, 0],
+        "the save alone carries no credit"
+    );
+    let claimed = b
+        .tick_shared_effects(&mut field, &b_character, 200)
+        .unwrap();
+    assert_eq!(counts(&b, QUEST), [1, 0], "the carried event advances once");
+    assert_eq!(
+        packet(&claimed.replies, 38, 19),
+        [38u8, 0, 19, 0, 2, 0, 0, 0].as_slice(),
+        "the carried reward is paid once too"
+    );
+    assert_eq!(field.pending_kill_credits(B), 0);
 }

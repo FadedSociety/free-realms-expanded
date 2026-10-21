@@ -120,7 +120,9 @@ impl SharedFieldState {
     ///
     /// (R) A kill credit already earned survives the player's absence until its
     /// TTL (F276: a reconnect must still collect it). The field-owned drop does
-    /// not: a player who left the field keeps only the coin/job-XP pair.
+    /// not: a player who left the field keeps only the coin/job-XP pair and the
+    /// server-authored defeat event. A quest-only credit has no such pair, so it
+    /// is dropped here rather than kept for a player who left.
     pub fn retain_casters(&mut self, ready: &BTreeSet<u64>, now_ms: u64) {
         self.dots
             .retain(|caster, dots| ready.contains(caster) && !dots.is_empty());

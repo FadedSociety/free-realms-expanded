@@ -102,7 +102,7 @@ const HIGH_SHAMAN_13_HOME: [f32; 3] = [-447.084, 3.03, 1128.348];
 const BIXIE_10: u64 = 131000102019;
 const BIXIE_10_HOME: [f32; 3] = [-664.762, 2.4, 299.608];
 const LEVEL_TWENTY_GUID: u64 = 131000110020;
-/// `encounter::CREDIT_TTL_MS`; the constant is private to the engine.
+/// `encounter::field_rewards::CREDIT_TTL_MS` (private to the engine).
 const CREDIT_TTL_MS: u64 = 10_000;
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 

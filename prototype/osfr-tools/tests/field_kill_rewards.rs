@@ -40,7 +40,7 @@ const NONCOMBAT: i32 = 45;
 /// T245's level-5 MID-F1 camp wolf. The shipped row keeps definition 3156, so
 /// the kind's override (not the level 5-8 band) owns its payout.
 const MID_F1: u64 = 131_000_102_013;
-/// `encounter::CREDIT_TTL_MS`; the constant is private to the engine.
+/// `encounter::field_rewards::CREDIT_TTL_MS` (private to the engine).
 const CREDIT_TTL_MS: u64 = 10_000;
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 
