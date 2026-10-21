@@ -66,6 +66,8 @@ struct VisibleNpc {
     spawn: NpcSpawn,
     name: Option<String>,
     position: [f32; 3],
+    /// (R) Content yaw the actor faces; `None` when the row carries no transform.
+    heading: Option<f32>,
 }
 
 #[derive(Clone, Default)]
@@ -149,7 +151,7 @@ struct ExtraNpc {
     #[serde(default)]
     position_w: Option<f32>,
     #[serde(default)]
-    heading: f32,
+    heading: Option<f32>,
     #[serde(default)]
     capture_match: Option<serde_json::Value>,
 }
@@ -284,8 +286,8 @@ impl NpcVisibility {
             // direction, so prefer the heading and fall back to the quaternion yaw.
             let heading = npc
                 .heading
-                .unwrap_or_else(|| npc.rotation.map(|q| 2.0 * q[1].atan2(q[3])).unwrap_or(0.0));
-            let rotation = facing(heading);
+                .or_else(|| npc.rotation.map(|q| 2.0 * q[1].atan2(q[3])));
+            let rotation = facing(heading.unwrap_or(0.0));
             let mut spawn = NpcSpawn {
                 actor_id: npc.npc_id,
                 name_string_id: npc.name_string_id.unwrap_or(0) as i32,
@@ -309,6 +311,7 @@ impl NpcVisibility {
                     spawn,
                     name: npc.name,
                     position,
+                    heading: heading.filter(|value| value.is_finite()),
                 });
         }
         if anchors.is_empty() {
@@ -351,7 +354,7 @@ impl NpcVisibility {
                 npc.position[2],
                 npc.position_w.unwrap_or(1.0),
             ];
-            spawn.rotation = facing(npc.heading);
+            spawn.rotation = facing(npc.heading.unwrap_or(0.0));
             // Server-only binding; client AddNpc reader 0x00921a10 reads the
             // ordinary name/model/transform fields already populated above.
             if let Some(content_key) = npc.content_key {
@@ -365,6 +368,7 @@ impl NpcVisibility {
                     spawn,
                     name: npc.name,
                     position: npc.position,
+                    heading: npc.heading.filter(|value| value.is_finite()),
                 });
         }
         let placements = content_dir.join("npc_placements.json");
@@ -407,6 +411,7 @@ impl NpcVisibility {
             spawn,
             name: placement.name.clone(),
             position: p,
+            heading: Some(placement.heading).filter(|value| value.is_finite()),
         });
         npcs.sort_by_key(|npc| npc.spawn.actor_id);
         self.placed.insert(placement.guid);
@@ -483,6 +488,8 @@ impl NpcVisibility {
             spawn,
             name: Some(name.to_string()),
             position,
+            // (R) Battle spawners carry no content yaw; keep the approach rule.
+            heading: None,
         });
         npcs.sort_by_key(|npc| npc.spawn.actor_id);
     }
@@ -529,6 +536,7 @@ impl NpcVisibility {
                     npc.name.as_deref(),
                     zone_id,
                     npc.position,
+                    npc.heading,
                 )
             })
             .collect()

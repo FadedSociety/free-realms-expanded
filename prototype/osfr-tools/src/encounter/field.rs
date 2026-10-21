@@ -242,6 +242,7 @@ impl EncounterEngine {
                 name: f.actor.name.clone(),
                 zone_id: self.content.world.zone_id,
                 position: f.state.position,
+                heading: None,
                 kind: "enemy".into(),
             })
             .chain(self.battles.iter().map(|b| crate::dev_teleport::Target {
@@ -249,6 +250,7 @@ impl EncounterEngine {
                 name: b.spawner.name.clone(),
                 zone_id: 0,
                 position: b.spawner.position,
+                heading: None,
                 kind: "battle".into(),
             }))
             .chain(self.dungeon().into_iter().flat_map(|d| {
@@ -263,6 +265,7 @@ impl EncounterEngine {
                         name: a.name.clone(),
                         zone_id: d.zone.zone_id,
                         position: s.position,
+                        heading: None,
                         kind: "enemy".into(),
                     })
             }))

@@ -9,9 +9,10 @@ use crate::{character_store::CharacterState, opening::OpeningActor};
 /// inside an actor's interaction radius and facing the actor. It does not parse
 /// collision geometry and does not claim a verified floor.
 pub const STANDOFF: f32 = 5.0; // 2.0 put the player on top of the NPC (clicks missed, run 165644)
-/// Arrival angles in degrees, relative to the character's current facing
-/// vector and tried in this order. The first sample that keeps the target at
-/// least [`MARGIN`] closer than every other loaded zone actor wins.
+/// Arrival angles in degrees, tried in this order. They are relative to the
+/// target's facing when it has a finite heading, otherwise to the character's
+/// current facing vector. The first sample that keeps the target at least
+/// [`MARGIN`] closer than every other loaded zone actor wins.
 const ANGLE_SAMPLES: [f32; 8] = [0.0, 45.0, -45.0, 90.0, -90.0, 135.0, -135.0, 180.0];
 /// Required clearance between the target and the next closest zone actor, in
 /// metres, measured horizontally.
@@ -27,6 +28,10 @@ pub struct Target {
     pub name: String,
     pub zone_id: u32,
     pub position: [f32; 3],
+    /// (R) Yaw the actor faces, radians, as AddNpc rotation `(sin h, 0, cos h, 0)`
+    /// (the client derives yaw with `atan2(X, Z)`, `0095dae0`). `None` keeps the
+    /// pre-heading arrival rule; a non-finite value is treated the same way.
+    pub heading: Option<f32>,
     pub kind: String,
 }
 
@@ -37,6 +42,7 @@ impl From<&OpeningActor> for Target {
             name: actor.name.clone(),
             zone_id: actor.zone_id,
             position: actor.position,
+            heading: Some(actor.heading),
             kind: actor.kind.clone(),
         }
     }
@@ -44,7 +50,13 @@ impl From<&OpeningActor> for Target {
 
 impl Target {
     /// (R) Keep nameless content targets addressable from the list by GUID.
-    pub fn content_npc(guid: u64, name: Option<&str>, zone_id: u32, position: [f32; 3]) -> Self {
+    pub fn content_npc(
+        guid: u64,
+        name: Option<&str>,
+        zone_id: u32,
+        position: [f32; 3],
+        heading: Option<f32>,
+    ) -> Self {
         Self {
             guid,
             name: name
@@ -53,6 +65,7 @@ impl Target {
                 .unwrap_or_else(|| format!("NPC {guid}")),
             zone_id,
             position,
+            heading,
             kind: "npc".into(),
         }
     }
@@ -259,12 +272,19 @@ fn describe(targets: &[&Target]) -> String {
 }
 
 /// Choose the arrival around the actor that keeps the target closest to the
-/// client's proximity prompt. Angle0 is the approach side, so the arrival is
-/// where the character came from and a repeated `goto` stays put; positive
-/// angles rotate counter-clockwise in the XZ plane. Only finite actors in the
-/// same zone are considered, and the target itself is skipped.
+/// client's proximity prompt. (R) Original NPCs face their customers, so the
+/// side an NPC faces is usually the open floor in front of its counter: a
+/// heading starts the samples on that side, and angle0 stays put on a repeated
+/// `goto`. An actor without a finite heading keeps the pre-heading rule: the
+/// approach side, where the character came from. Positive angles rotate
+/// counter-clockwise in the XZ plane. Only finite actors in the same zone are
+/// considered, and the target itself is skipped.
 fn standoff(actor: &Target, character: &CharacterState, actors: &[Target]) -> Relocation {
-    let base = approach_direction(actor, character);
+    let base = actor
+        .heading
+        .filter(|heading| heading.is_finite())
+        .map(f32::sin_cos)
+        .unwrap_or_else(|| approach_direction(actor, character));
     let others: Vec<[f32; 3]> = actors
         .iter()
         .filter(|other| {
@@ -359,6 +379,7 @@ mod tests {
             name: name.into(),
             zone_id,
             position,
+            heading: None,
             kind: "guide".into(),
         }
     }
@@ -605,6 +626,89 @@ mod tests {
         // The first passing sample after0/+45/-45 is +90, i.e. -Z here.
         assert!((relocation.position[0] - target.position[0]).abs() < 1e-3);
         assert!((relocation.position[2] - (target.position[2] - STANDOFF)).abs() < 1e-3);
+    }
+
+    #[test]
+    fn heading_arrival_is_in_front_of_the_actor_and_faces_it() {
+        // `(sin, cos)` of pi/2 is +X, the facing an actor's AddNpc rotation
+        // `[1, 0, 0, 0]` gives it.
+        let mut target = actor(10, "Roosey", 0, [-1842.0, -41.0, 411.0]);
+        target.heading = Some(std::f32::consts::FRAC_PI_2);
+        // The character stands on the other side (+Z), so the pre-heading rule
+        // would have arrived there instead of in front of the NPC.
+        let character = character(0, [-1842.0, -41.0, 511.0]);
+        let Some(Command::Relocate { relocation, .. }) =
+            handle("goto roosey", std::slice::from_ref(&target), &character)
+        else {
+            panic!("a headed actor must relocate");
+        };
+        assert!((relocation.position[0] - (target.position[0] + STANDOFF)).abs() < 1e-3);
+        assert!((relocation.position[2] - target.position[2]).abs() < 1e-3);
+        assert_eq!(relocation.position[1], target.position[1]);
+        // The player faces back at the actor.
+        assert!((relocation.rotation[0] + 1.0).abs() < 1e-6);
+        assert!(relocation.rotation[2].abs() < 1e-6);
+    }
+
+    #[test]
+    fn occupied_front_falls_back_to_the_next_sample() {
+        let mut target = actor(10, "Roosey", 0, [0.0, -41.0, 0.0]);
+        target.heading = Some(std::f32::consts::FRAC_PI_2); // +X
+        let occupied = actor(11, "Stall", 0, [STANDOFF, -41.0, 0.0]);
+        let character = character(0, [0.0, -41.0, 100.0]);
+        let Some(Command::Relocate { relocation, .. }) = handle(
+            "goto roosey",
+            &[target.clone(), occupied.clone()],
+            &character,
+        ) else {
+            panic!("a headed actor must relocate");
+        };
+        assert!(
+            horizontal(relocation.position, occupied.position) >= STANDOFF + MARGIN - 1e-3,
+            "the occupied front must be rejected: {relocation:?}"
+        );
+        // 0/+45/-45 all land too close to the stall; +90 from +X is +Z.
+        assert!((relocation.position[0] - target.position[0]).abs() < 1e-3);
+        assert!((relocation.position[2] - (target.position[2] + STANDOFF)).abs() < 1e-3);
+    }
+
+    #[test]
+    fn heading_less_or_non_finite_heading_keeps_the_approach_side() {
+        let target = actor(10, "Mae Farnum", 0, [100.0, -56.0, 200.0]);
+        let character = character(0, [-1000.0, -56.0, 305.0]);
+        let Some(Command::Relocate { relocation, .. }) =
+            handle("goto mae", std::slice::from_ref(&target), &character)
+        else {
+            panic!("Mae must relocate");
+        };
+        // The pre-heading result exactly: the character faces +X, so angle0 is
+        // -X and no sample rotation is applied.
+        assert_eq!(
+            relocation.position,
+            [
+                target.position[0] - STANDOFF,
+                target.position[1],
+                target.position[2]
+            ]
+        );
+        assert_eq!(relocation.rotation, [1.0, 0.0, 0.0]);
+        for heading in [f32::NAN, f32::INFINITY] {
+            let broken = Target {
+                heading: Some(heading),
+                ..target.clone()
+            };
+            let Some(Command::Relocate {
+                relocation: fallback,
+                ..
+            }) = handle("goto mae", &[broken], &character)
+            else {
+                panic!("a non-finite heading must fall back, not refuse");
+            };
+            assert_eq!(fallback.position, relocation.position, "{heading}");
+            assert_eq!(fallback.rotation, relocation.rotation, "{heading}");
+            assert!(fallback.position.iter().all(|value| value.is_finite()));
+            assert!(fallback.rotation.iter().all(|value| value.is_finite()));
+        }
     }
 
     /// Regression for the native Mae arrival: the Cooking Table sits about4m

@@ -163,6 +163,10 @@ fn chat_text(replies: &[Vec<u8>]) -> String {
 
 /// Logs in a character standing at the Queen, matching the live campaign save.
 fn fixture(dev_tools: bool) -> (Gateway, PathBuf, PathBuf) {
+    fixture_facing(dev_tools, [1.0, 0.0, 0.0])
+}
+
+fn fixture_facing(dev_tools: bool, rotation: [f32; 3]) -> (Gateway, PathBuf, PathBuf) {
     let (content, reference) = paths();
     assert!(content.join("opening.json").is_file());
     let queen = content_actor(&content, QUEEN_GUID);
@@ -170,13 +174,27 @@ fn fixture(dev_tools: bool) -> (Gateway, PathBuf, PathBuf) {
     let mut character = Gateway::reference_state(&reference).unwrap();
     character.zone_id = WORLD_ZONE;
     character.position = float3(&queen["position"]);
-    character.rotation = [1.0, 0.0, 0.0];
+    character.rotation = rotation;
     let state = Gameplay::load(&content, None).unwrap().state();
     let mut gateway = Gateway::load_gameplay(&reference, character, &content, Some(state)).unwrap();
     enter_world(&mut gateway);
     gateway.set_dev_tools(dev_tools);
     gateway.set_role(osfr_tools::account_store::AccountRole::Admin);
     (gateway, content, reference)
+}
+
+fn bundled_actor(file: &str, guid: u64) -> Value {
+    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("data/content/npcs")
+        .join(file);
+    let rows: Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+    rows["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["npc_id"].as_u64() == Some(guid))
+        .expect("bundled content NPC")
+        .clone()
 }
 
 #[test]
@@ -320,6 +338,47 @@ fn content_npcs_support_filtered_listing_name_and_guid_teleports_with_visibility
         "content GUID lookup: {}",
         chat_text(&remote.replies)
     );
+}
+
+/// (R) Original NPCs face their customers, so `realm goto` arrives on the side
+/// the NPC faces. In lead run `client-baseline-20261020T223209Z` Roosey's
+/// arrival fell under her raised deck and Bordon Cloo's behind his stall,
+/// because the arrival used the character's facing instead of the NPC's.
+#[test]
+fn content_npc_goto_arrives_on_the_side_the_npc_faces() {
+    for (file, guid, name) in [
+        ("cobblestone_village.json", 9_500_000_255_u64, "Roosey"),
+        ("sanctuary.json", 9_000_000_028_u64, "Bordon Cloo"),
+    ] {
+        let row = bundled_actor(file, guid);
+        let npc = float3(&row["position"]);
+        let heading = row["heading"].as_f64().expect("spawn heading") as f32;
+        let facing = [heading.sin(), 0.0, heading.cos()];
+        // The character faces where the NPC faces, so the pre-heading rule
+        // arrives behind the NPC: the same shape as the native failures.
+        let (mut gateway, _content, _reference) = fixture_facing(true, facing);
+        let outcome = say(&mut gateway, &format!("realm goto {guid}"));
+        let text = chat_text(&outcome.replies);
+        assert!(text.contains(name), "{name}: {text}");
+        let arrival = gateway.state().position;
+        let offset = [arrival[0] - npc[0], arrival[2] - npc[2]];
+        let distance = (offset[0].powi(2) + offset[1].powi(2)).sqrt();
+        assert!(
+            (distance - STANDOFF).abs() < 0.01,
+            "{name} arrived {distance}m away"
+        );
+        let front = offset[0] * facing[0] + offset[1] * facing[2];
+        assert!(
+            front > 0.0,
+            "{name}: arrival {arrival:?} is behind {facing:?}"
+        );
+        let rotation = gateway.state().rotation;
+        let back = [npc[0] - arrival[0], npc[2] - arrival[2]];
+        assert!(
+            rotation[0] * back[0] + rotation[2] * back[1] > 0.0,
+            "{name}: the player must face the actor"
+        );
+    }
 }
 
 #[test]
