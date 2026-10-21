@@ -4664,128 +4664,25 @@ impl Gameplay {
                         ));
                         return Ok(out);
                     }
-                    if matches!(
-                        actor.action,
-                        Some(crate::opening::OpeningTrigger::Craft { recipe_id: 2001 })
-                    ) && self.cooking.is_some()
-                    {
-                        if self.profiles.as_ref().unwrap().active() != 45 {
-                            out.replies
-                                .push(chat::system("Switch to Chef before cooking."));
-                        } else if !self.opening_craft_pending(2001) {
-                            out.replies.push(chat::system(
-                                "Accept the cooking objective and finish its earlier steps first.",
-                            ));
-                        } else if self
-                            .cooking
-                            .as_ref()
-                            .unwrap()
-                            .requirements()
-                            .iter()
-                            .any(|(id, n)| self.material_count(*id) < u64::from(*n))
-                        {
-                            out.replies.push(chat::system("StrongArm Stew requires 4 Bat Meat, 4 Gummyfruit, 4 Rainleaf and 4 Spice."));
-                        } else {
-                            let key = self.cooking.as_ref().unwrap().recipe_key().to_owned();
-                            let rank = self.recipe_rank(45);
-                            let learned = self.learned_recipe_for_key(&key);
-                            let available = self.available_ingredients();
-                            let result = self
-                                .cooking
-                                .as_mut()
-                                .unwrap()
-                                .begin_recipe(45, &key, rank, learned, &available)?;
-                            self.apply_craft(CraftingJob::Chef, result, character, &mut out)?;
-                        }
+                    let tutorial = match actor.action {
+                        Some(OpeningTrigger::Craft { recipe_id }) => match recipe_id {
+                            2001 if self.cooking.is_some() => Some(CraftingJob::Chef),
+                            2003 if self.forging.is_some() => Some(CraftingJob::Blacksmith),
+                            2002 if self.smelting.is_some() => Some(CraftingJob::Miner),
+                            _ => None,
+                        },
+                        _ => None,
+                    };
+                    if let Some(job) = tutorial {
+                        self.start_tutorial_craft(job, character, now_ms, &mut out)?;
                         return Ok(out);
                     }
-                    if matches!(
-                        actor.action,
-                        Some(crate::opening::OpeningTrigger::Craft { recipe_id: 2003 })
-                    ) && self.forging.is_some()
-                    {
-                        if self.profiles.as_ref().unwrap().active() != 16 {
-                            out.replies
-                                .push(chat::system("Switch to Blacksmith before forging."));
-                        } else if !self.opening_craft_pending(2003) {
-                            out.replies.push(chat::system(
-                                "Accept the forging objective and finish its earlier steps first.",
-                            ));
-                        } else if self
-                            .forging
-                            .as_ref()
-                            .unwrap()
-                            .requirements()
-                            .iter()
-                            .any(|(id, n)| self.material_count(*id) < u64::from(*n))
-                        {
-                            out.replies.push(chat::system("Forging requires 10 Copper Bars, 5 Turquoise, 5 Wooden Planks and 5 Thorny Fasteners."));
-                        } else {
-                            let key = self.forging.as_ref().unwrap().recipe_key().to_owned();
-                            let rank = self.recipe_rank(16);
-                            let learned = self.learned_recipe_for_key(&key);
-                            let available = self.available_ingredients();
-                            let result = self
-                                .forging
-                                .as_mut()
-                                .unwrap()
-                                .begin_recipe(16, &key, rank, learned, &available)?;
-                            self.forging_tick_ms = Some(now_ms);
-                            self.apply_craft(CraftingJob::Blacksmith, result, character, &mut out)?;
-                            out.replies.push(chat::system("Original Spunky Scrapper Hammer controls; board tuning, consumption and tint choice are reconstructed."));
-                        }
-                        return Ok(out);
-                    }
-                    if matches!(
-                        actor.action,
-                        Some(crate::opening::OpeningTrigger::Craft { recipe_id: 2002 })
-                    ) && self.smelting.is_some()
-                    {
-                        if self.profiles.as_ref().unwrap().active() != 14 {
-                            out.replies
-                                .push(chat::system("Switch to Miner before smelting."));
-                        } else if !self.opening_craft_pending(2002) {
-                            out.replies.push(chat::system(
-                                "Accept the smelting objective and finish its earlier steps first.",
-                            ));
-                        } else if !self
-                            .smelting
-                            .as_ref()
-                            .unwrap()
-                            .requirements()
-                            .iter()
-                            .all(|(id, n)| self.material_count(*id) >= u64::from(*n))
-                        {
-                            out.replies.push(chat::system("Smelting requires 5 Copper Ore and 3 Singing Coal. Mine the accepted nearby ore objective first."));
-                        } else {
-                            let key = self.smelting.as_ref().unwrap().recipe_key().to_owned();
-                            let rank = self.recipe_rank(14);
-                            let learned = self.learned_recipe_for_key(&key);
-                            let available = self.available_ingredients();
-                            let result = self
-                                .smelting
-                                .as_mut()
-                                .unwrap()
-                                .begin_recipe(14, &key, rank, learned, &available)?;
-                            self.apply_craft(CraftingJob::Miner, result, character, &mut out)?;
-                            out.replies.push(chat::system("Original four-stage smelting controls; phase tuning and this local recipe output are reconstructed."));
-                        }
-                        return Ok(out);
-                    }
-                    let gather_before = self.gather_count(1003);
-                    let resource_before = match actor.action {
-                        Some(crate::opening::OpeningTrigger::Gather { resource_id }) => {
+                    let gather_before = match actor.action {
+                        Some(OpeningTrigger::Gather { resource_id }) => {
                             Some((resource_id, self.gather_count(resource_id)))
                         }
                         _ => None,
                     };
-                    let chef_resource = match actor.action {
-                        Some(crate::opening::OpeningTrigger::Gather {
-                            resource_id: id @ (1001 | 1002),
-                        }) => Some(id),
-                        _ => None,
-                    };
-                    let chef_before = chef_resource.map(|id| self.gather_count(id));
                     let result = self.opening.as_mut().unwrap().on_interaction(guid)?;
                     let accepted = result.accepted;
                     self.apply_opening(result, &mut out)?;
@@ -4801,7 +4698,7 @@ impl Gameplay {
                             &mut out,
                         )?;
                     }
-                    if let Some((resource_id, before)) = resource_before {
+                    if let Some((resource_id, before)) = gather_before {
                         let quantity = self.gather_count(resource_id).saturating_sub(before);
                         if quantity > 0 {
                             self.npc_quest_event(
@@ -4812,25 +4709,8 @@ impl Gameplay {
                                 &mut out,
                             )?;
                         }
-                    }
-                    if self.smelting.is_some()
-                        && self.profiles.as_ref().unwrap().active() == 14
-                        && matches!(
-                            actor.action,
-                            Some(crate::opening::OpeningTrigger::Gather { resource_id: 1003 })
-                        )
-                        && self.gather_count(1003) > gather_before
-                    {
-                        // Temporary local drop, only on newly counted accepted
-                        // mining progress. This is not an original loot table.
-                        self.grant_reward(0, &[(2739, 1), (879, 1)], &mut out)?;
-                    }
-                    if self.cooking.is_some() && self.profiles.as_ref().unwrap().active() == 45 {
-                        if let (Some(resource), Some(before)) = (chef_resource, chef_before) {
-                            if self.gather_count(resource) > before {
-                                let definition = if resource == 1001 { 2884 } else { 2875 };
-                                self.grant_reward(0, &[(definition, 1)], &mut out)?;
-                            }
+                        if let Some(items) = self.local_gather_drop(resource_id, before) {
+                            self.grant_reward(0, items, &mut out)?;
                         }
                     }
                     self.opening_equipment_events(&mut out)?;
@@ -5005,6 +4885,116 @@ impl Gameplay {
         )?;
         self.apply_encounter(result, &mut out)?;
         Ok(out)
+    }
+
+    /// One opening craft start: job, pending objective, exact inputs, begin,
+    /// forging clock, applier and note. A refusal answers one chat line.
+    fn start_tutorial_craft(
+        &mut self,
+        job: CraftingJob,
+        character: &CharacterState,
+        now_ms: u64,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        struct Spec {
+            switch: &'static str,
+            pending: &'static str,
+            shortage: &'static str,
+            note: Option<&'static str>,
+        }
+        let spec = match job {
+            CraftingJob::Chef => Spec {
+                switch: "Switch to Chef before cooking.",
+                pending: "Accept the cooking objective and finish its earlier steps first.",
+                shortage: "StrongArm Stew requires 4 Bat Meat, 4 Gummyfruit, 4 Rainleaf and 4 Spice.",
+                note: None,
+            },
+            CraftingJob::Blacksmith => Spec {
+                switch: "Switch to Blacksmith before forging.",
+                pending: "Accept the forging objective and finish its earlier steps first.",
+                shortage: "Forging requires 10 Copper Bars, 5 Turquoise, 5 Wooden Planks and 5 Thorny Fasteners.",
+                note: Some(
+                    "Original Spunky Scrapper Hammer controls; board tuning, consumption and tint choice are reconstructed.",
+                ),
+            },
+            CraftingJob::Miner => Spec {
+                switch: "Switch to Miner before smelting.",
+                pending: "Accept the smelting objective and finish its earlier steps first.",
+                shortage: "Smelting requires 5 Copper Ore and 3 Singing Coal. Mine the accepted nearby ore objective first.",
+                note: Some(
+                    "Original four-stage smelting controls; phase tuning and this local recipe output are reconstructed.",
+                ),
+            },
+        };
+        let profile = job.profile_id();
+        if self.profiles.as_ref().unwrap().active() != profile {
+            out.replies.push(chat::system(spec.switch));
+            return Ok(());
+        }
+        if !self.opening_craft_pending(job.opening_recipe_id()) {
+            out.replies.push(chat::system(spec.pending));
+            return Ok(());
+        }
+        let missing = match job {
+            CraftingJob::Chef => self.cooking.as_ref().unwrap().requirements(),
+            CraftingJob::Blacksmith => self.forging.as_ref().unwrap().requirements(),
+            CraftingJob::Miner => self.smelting.as_ref().unwrap().requirements(),
+        }
+        .iter()
+        .any(|(id, n)| self.material_count(*id) < u64::from(*n));
+        if missing {
+            out.replies.push(chat::system(spec.shortage));
+            return Ok(());
+        }
+        let key = match job {
+            CraftingJob::Chef => self.cooking.as_ref().unwrap().recipe_key(),
+            CraftingJob::Blacksmith => self.forging.as_ref().unwrap().recipe_key(),
+            CraftingJob::Miner => self.smelting.as_ref().unwrap().recipe_key(),
+        }
+        .to_owned();
+        let rank = self.recipe_rank(profile);
+        let learned = self.learned_recipe_for_key(&key);
+        let available = self.available_ingredients();
+        let result = match job {
+            CraftingJob::Chef => self
+                .cooking
+                .as_mut()
+                .unwrap()
+                .begin_recipe(profile, &key, rank, learned, &available)?,
+            CraftingJob::Blacksmith => self
+                .forging
+                .as_mut()
+                .unwrap()
+                .begin_recipe(profile, &key, rank, learned, &available)?,
+            CraftingJob::Miner => self
+                .smelting
+                .as_mut()
+                .unwrap()
+                .begin_recipe(profile, &key, rank, learned, &available)?,
+        };
+        if job == CraftingJob::Blacksmith {
+            self.forging_tick_ms = Some(now_ms);
+        }
+        self.apply_craft(job, result, character, out)?;
+        if let Some(note) = spec.note {
+            out.replies.push(chat::system(note));
+        }
+        Ok(())
+    }
+
+    /// The two local opening gather drops: only on a raised count with the
+    /// matching service and active job. Not an original loot table.
+    fn local_gather_drop(&self, resource: u32, before: u32) -> Option<&'static [(i32, u32)]> {
+        if self.gather_count(resource) <= before {
+            return None;
+        }
+        let active = self.profiles.as_ref()?.active();
+        match resource {
+            1003 if self.smelting.is_some() && active == 14 => Some(&[(2739, 1), (879, 1)]),
+            1001 if self.cooking.is_some() && active == 45 => Some(&[(2884, 1)]),
+            1002 if self.cooking.is_some() && active == 45 => Some(&[(2875, 1)]),
+            _ => None,
+        }
     }
 
     fn opening_craft_pending(&self, recipe: u32) -> bool {

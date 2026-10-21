@@ -90,7 +90,9 @@ impl Gameplay {
         };
         let mut session = session.clone();
         let mut inventory = self.inventory.clone();
-        let result = session.service.handle(character.guid, inner, &mut inventory);
+        let result = session
+            .service
+            .handle(character.guid, inner, &mut inventory);
         let outcome = match result {
             Ok(outcome) => outcome,
             Err(error) => {
@@ -172,7 +174,12 @@ impl Gameplay {
     /// While inside, the lot is the player's scene (like a soccer arena), so the server's
     /// membership registry registers it and gives the visit its own instance.
     pub(super) fn house_zone(&self) -> Option<crate::encounter::ZoneTransition> {
-        let scene = self.housing.as_ref().filter(|s| s.in_house())?.scene.as_ref()?;
+        let scene = self
+            .housing
+            .as_ref()
+            .filter(|s| s.in_house())?
+            .scene
+            .as_ref()?;
         Some(crate::encounter::ZoneTransition {
             zone_id: u32::try_from(scene.id).ok()?,
             name: scene.scene.clone(),

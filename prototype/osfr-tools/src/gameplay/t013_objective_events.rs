@@ -4,7 +4,8 @@ use crate::quest_engine::{
     QuestRequirements,
 };
 use crate::rewards::{RewardDisplay, RewardGrant};
-use serde_json::json;
+use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
 use std::{
     fs,
     path::{Path, PathBuf},
@@ -1353,4 +1354,749 @@ fn a_failed_begin_leaves_no_clock_or_engine_state() {
     let mut out = Outcome::default();
     assert!(game.begin_gather(Gather::Mining, 1_000, &mut out).is_err());
     assert_eq!(game.type8_tick_ms, None);
+}
+
+#[derive(Clone, Copy)]
+enum TutorialStep {
+    Craft(u32),
+    Gather(u32),
+}
+
+impl TutorialStep {
+    fn matches(self, trigger: &OpeningTrigger) -> bool {
+        match (self, trigger) {
+            (Self::Craft(recipe), OpeningTrigger::Craft { recipe_id }) => *recipe_id == recipe,
+            (Self::Gather(resource), OpeningTrigger::Gather { resource_id }) => {
+                *resource_id == resource
+            }
+            _ => false,
+        }
+    }
+}
+
+struct TutorialCase {
+    game: Gameplay,
+    character: CharacterState,
+    actor: u64,
+    stage_id: u32,
+    objective_index: usize,
+}
+
+/// The opening state for the accepted/pending shape of `step`: earlier stages
+/// complete, earlier objectives counted, the step's own objective at zero.
+fn staged_state(
+    mut state: OpeningState,
+    step: TutorialStep,
+    accepted: bool,
+) -> (OpeningState, u32, usize) {
+    let engine = OpeningEngine::load(&reference(), Some(state.clone())).unwrap();
+    let (stage_id, objective_index) = engine
+        .stages()
+        .iter()
+        .find_map(|stage| {
+            stage
+                .objectives
+                .iter()
+                .position(|objective| step.matches(&objective.trigger))
+                .map(|index| (stage.id, index))
+        })
+        .expect("the reference owns the tutorial step");
+    for stage in engine.stages() {
+        let progress = state.stages.get_mut(&stage.id).unwrap();
+        if stage.id < stage_id {
+            progress.accepted = true;
+            progress.completed = true;
+            progress.rewarded = true;
+            progress.counts = stage
+                .objectives
+                .iter()
+                .map(|objective| objective.required)
+                .collect();
+        } else if stage.id == stage_id {
+            progress.accepted = accepted;
+            progress.completed = false;
+            progress.rewarded = false;
+            progress.counts = if accepted {
+                stage
+                    .objectives
+                    .iter()
+                    .enumerate()
+                    .map(|(index, objective)| {
+                        if index < objective_index {
+                            objective.required
+                        } else {
+                            0
+                        }
+                    })
+                    .collect()
+            } else {
+                vec![0; stage.objectives.len()]
+            };
+        }
+    }
+    (state, stage_id, objective_index)
+}
+
+/// Replace the active opening stage with the accepted/pending shape for `step`.
+fn restage(game: &mut Gameplay, step: TutorialStep, accepted: bool) {
+    let state = game.opening.as_ref().unwrap().state().clone();
+    let (state, _, _) = staged_state(state, step, accepted);
+    game.opening = Some(OpeningEngine::load(&reference(), Some(state)).unwrap());
+}
+
+/// One active opening stage for a tutorial step.
+fn tutorial_case(step: TutorialStep, profile: i32, accepted: bool) -> TutorialCase {
+    let base = Gameplay::load(&reference(), None).unwrap();
+    let actor = base
+        .opening
+        .as_ref()
+        .unwrap()
+        .actors()
+        .iter()
+        .find(|actor| {
+            actor
+                .action
+                .as_ref()
+                .is_some_and(|action| step.matches(action))
+        })
+        .expect("the reference owns the tutorial actor")
+        .clone();
+    let (mut state, stage_id, objective_index) = {
+        let mut state = base.state();
+        let (opening, stage_id, objective_index) =
+            staged_state(state.opening.take().unwrap(), step, accepted);
+        state.opening = Some(opening);
+        (state, stage_id, objective_index)
+    };
+    {
+        let profiles = state.profiles.as_mut().unwrap();
+        profiles.unlocked.insert(profile);
+        profiles.active = profile;
+    }
+    let mut game = Gameplay::load(&reference(), Some(state)).unwrap();
+    let character = CharacterState {
+        guid: 1,
+        zone_id: actor.zone_id,
+        position: actor.position,
+        rotation: [0., 0., 1.],
+    };
+    game.initialize_world(&character, 1_000).unwrap();
+    TutorialCase {
+        game,
+        character,
+        actor: actor.guid,
+        stage_id,
+        objective_index,
+    }
+}
+
+// Client 26/10 CommandPacketInteractRequest constructor 0x00a36f80 stores three
+// 32-bit caller words (the 8-byte target and the i32 selection).
+fn choose(guid: u64) -> Vec<u8> {
+    let mut packet = vec![26, 0, 10, 0];
+    packet.extend(guid.to_le_bytes());
+    packet.extend(1i32.to_le_bytes());
+    packet
+}
+
+fn chat_text(reply: &[u8]) -> Option<String> {
+    if !reply.starts_with(&[15, 0, 3, 0]) || reply.len() < 8 {
+        return None;
+    }
+    let length = u32::from_le_bytes(reply[4..8].try_into().ok()?) as usize;
+    std::str::from_utf8(reply.get(8..8 + length)?)
+        .ok()
+        .map(str::to_owned)
+}
+
+fn chat_texts(replies: &[Vec<u8>]) -> Vec<String> {
+    replies
+        .iter()
+        .filter_map(|reply| chat_text(reply))
+        .collect()
+}
+
+fn item_count(game: &Gameplay, definition: i32) -> u32 {
+    game.inventory
+        .state()
+        .items
+        .iter()
+        .filter(|item| item.definition_id == definition && item.rental.is_none())
+        .map(|item| item.count)
+        .sum()
+}
+
+fn opening_count(case: &TutorialCase) -> u32 {
+    case.game.opening.as_ref().unwrap().state().stages[&case.stage_id].counts[case.objective_index]
+}
+
+fn grant_requirements(game: &mut Gameplay, job: CraftingJob) {
+    let required = match job {
+        CraftingJob::Chef => game.cooking.as_ref().unwrap().requirements().to_vec(),
+        CraftingJob::Blacksmith => game.forging.as_ref().unwrap().requirements().to_vec(),
+        CraftingJob::Miner => game.smelting.as_ref().unwrap().requirements().to_vec(),
+    };
+    for (definition, count) in required {
+        game.inventory.grant(0, definition, count).unwrap();
+    }
+}
+
+fn snapshot(game: &Gameplay) -> (GameplayState, Vec<u8>) {
+    let state = game.state();
+    let bytes = serde_json::to_vec(&state).unwrap();
+    (state, bytes)
+}
+
+fn assert_refusal_changed_nothing(case: &TutorialCase, state: &GameplayState, save: &[u8]) {
+    assert_eq!(&case.game.state(), state);
+    assert_eq!(&serde_json::to_vec(&case.game.state()).unwrap(), save);
+    assert_eq!(case.game.forging_tick_ms, None);
+    assert_eq!(case.game.type8_tick_ms, None);
+    for active in [
+        case.game.forging.as_ref().unwrap().active(),
+        case.game.cooking.as_ref().unwrap().active(),
+        case.game.smelting.as_ref().unwrap().active(),
+    ] {
+        assert!(!active, "a refused tutorial start began a run");
+    }
+}
+
+fn assert_tutorial_refusals(
+    job: CraftingJob,
+    switch: &str,
+    pending: &str,
+    shortage: &str,
+    learned_error: &str,
+) {
+    let step = TutorialStep::Craft(job.opening_recipe_id());
+    let profile = job.profile_id();
+    let mut case = tutorial_case(step, profile, true);
+
+    case.game.profiles.as_mut().unwrap().unlock(1).unwrap();
+    case.game.profiles.as_mut().unwrap().activate(1).unwrap();
+    let (state, save) = snapshot(&case.game);
+    let out = case
+        .game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .unwrap();
+    assert_eq!(chat_texts(&out.replies), vec![switch.to_owned()]);
+    assert_refusal_changed_nothing(&case, &state, &save);
+
+    case.game
+        .profiles
+        .as_mut()
+        .unwrap()
+        .activate(profile)
+        .unwrap();
+    restage(&mut case.game, step, false);
+    let (state, save) = snapshot(&case.game);
+    let out = case
+        .game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .unwrap();
+    assert_eq!(chat_texts(&out.replies), vec![pending.to_owned()]);
+    assert_refusal_changed_nothing(&case, &state, &save);
+
+    restage(&mut case.game, step, true);
+    let (state, save) = snapshot(&case.game);
+    let out = case
+        .game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .unwrap();
+    assert_eq!(chat_texts(&out.replies), vec![shortage.to_owned()]);
+    assert_refusal_changed_nothing(&case, &state, &save);
+
+    // The service's own learned/rank/inputs guard is the existing `Err`; the
+    // opening arm has no learned chat line to duplicate.
+    grant_requirements(&mut case.game, job);
+    case.game.learned_recipes.clear();
+    let (state, save) = snapshot(&case.game);
+    let error = case
+        .game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .err()
+        .expect("the learned recipe must refuse");
+    assert_eq!(error.to_string(), learned_error);
+    assert_refusal_changed_nothing(&case, &state, &save);
+}
+
+#[test]
+fn start_tutorial_craft_refuses_wrong_job_pending_shortage_and_learned() {
+    assert_tutorial_refusals(
+        CraftingJob::Chef,
+        "Switch to Chef before cooking.",
+        "Accept the cooking objective and finish its earlier steps first.",
+        "StrongArm Stew requires 4 Bat Meat, 4 Gummyfruit, 4 Rainleaf and 4 Spice.",
+        "cooking recipe is locked or ingredients are missing",
+    );
+    assert_tutorial_refusals(
+        CraftingJob::Blacksmith,
+        "Switch to Blacksmith before forging.",
+        "Accept the forging objective and finish its earlier steps first.",
+        "Forging requires 10 Copper Bars, 5 Turquoise, 5 Wooden Planks and 5 Thorny Fasteners.",
+        "forging recipe is locked or ingredients are missing",
+    );
+    assert_tutorial_refusals(
+        CraftingJob::Miner,
+        "Switch to Miner before smelting.",
+        "Accept the smelting objective and finish its earlier steps first.",
+        "Smelting requires 5 Copper Ore and 3 Singing Coal. Mine the accepted nearby ore objective first.",
+        "smelting recipe is locked or ingredients are missing",
+    );
+}
+
+#[test]
+fn start_tutorial_craft_stamps_forging_only_after_begin() {
+    let mut case = tutorial_case(TutorialStep::Craft(2003), 16, true);
+    grant_requirements(&mut case.game, CraftingJob::Blacksmith);
+    let good = case.game.forging.as_ref().unwrap().state().clone();
+    let mut exhausted = good.clone();
+    exhausted.next_instance_id = i32::MAX;
+    case.game.forging = Some(Forging::load(&reference(), Some(exhausted)).unwrap());
+
+    let (state, save) = snapshot(&case.game);
+    let mut out = Outcome::default();
+    let error = case
+        .game
+        .start_tutorial_craft(CraftingJob::Blacksmith, &case.character, 1_000, &mut out)
+        .err()
+        .expect("an exhausted instance allocator must refuse the begin");
+    assert!(
+        error.to_string().contains("forging IDs exhausted"),
+        "{error}"
+    );
+    assert_eq!(
+        case.game.forging_tick_ms, None,
+        "a refused begin stamped the clock"
+    );
+    assert_eq!(case.game.state(), state);
+    assert_eq!(serde_json::to_vec(&case.game.state()).unwrap(), save);
+    assert!(!case.game.forging.as_ref().unwrap().active());
+
+    case.game.forging = Some(Forging::load(&reference(), Some(good)).unwrap());
+    let out = case
+        .game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .unwrap();
+    assert_eq!(
+        case.game.forging_tick_ms,
+        Some(1_000),
+        "the clock is stamped after a successful begin"
+    );
+    assert!(case.game.forging.as_ref().unwrap().active());
+    assert!(
+        out.replies
+            .first()
+            .is_some_and(|reply| reply.starts_with(&[39, 0, 16])),
+        "the recipe start packet must precede the note"
+    );
+    assert_eq!(
+        chat_texts(&out.replies),
+        vec![
+            "Original Spunky Scrapper Hammer controls; board tuning, consumption and tint choice are reconstructed."
+                .to_owned()
+        ]
+    );
+}
+
+#[test]
+fn start_tutorial_craft_never_starts_two_runs() {
+    let mut case = tutorial_case(TutorialStep::Craft(2003), 16, true);
+    grant_requirements(&mut case.game, CraftingJob::Blacksmith);
+    case.game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .unwrap();
+    assert!(case.game.forging.as_ref().unwrap().active());
+    let next = case.game.forging.as_ref().unwrap().state().next_instance_id;
+    let inventory = case.game.inventory.state().clone();
+    let (state, save) = snapshot(&case.game);
+
+    let out = case
+        .game
+        .handle_in_world(&choose(case.actor), &case.character, 1_001)
+        .unwrap();
+    assert_eq!(
+        chat_texts(&out.replies),
+        vec!["Close the forging game before changing jobs, equipment or interacting.".to_owned()]
+    );
+    assert_eq!(case.game.state(), state);
+    assert_eq!(serde_json::to_vec(&case.game.state()).unwrap(), save);
+    assert_eq!(case.game.inventory.state(), &inventory);
+    assert_eq!(
+        case.game.forging.as_ref().unwrap().state().next_instance_id,
+        next
+    );
+    assert!(!out.changed);
+}
+
+#[test]
+fn local_gather_drop_is_gated_on_service_job_and_new_count() {
+    // Chef leaf: one refusal, one wrong-job count, the positive drops, the
+    // completed-objective repeat and an out-of-range request in one session.
+    let mut case = tutorial_case(TutorialStep::Gather(1001), 45, true);
+    case.game.profiles.as_mut().unwrap().unlock(1).unwrap();
+    case.game.profiles.as_mut().unwrap().activate(1).unwrap();
+    case.game.initialize_world(&case.character, 1_000).unwrap();
+    let (state, save) = snapshot(&case.game);
+    let out = case
+        .game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .unwrap();
+    assert!(
+        chat_texts(&out.replies)
+            .first()
+            .is_some_and(|text| text.starts_with("Switch to Chef before using")),
+        "{:?}",
+        chat_texts(&out.replies)
+    );
+    assert_refusal_changed_nothing(&case, &state, &save);
+    assert_eq!(opening_count(&case), 0);
+
+    case.game.profiles.as_mut().unwrap().activate(45).unwrap();
+    case.game.initialize_world(&case.character, 1_000).unwrap();
+    case.game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .unwrap();
+    assert_eq!(item_count(&case.game, 2884), 1);
+    assert_eq!(opening_count(&case), 1);
+
+    case.game.profiles.as_mut().unwrap().activate(45).unwrap();
+    for round in 1..4 {
+        case.game
+            .handle_in_world(&choose(case.actor), &case.character, 1_000 + round)
+            .unwrap();
+    }
+    assert_eq!(opening_count(&case), 4);
+    assert_eq!(item_count(&case.game, 2884), 4);
+    let (state, save) = snapshot(&case.game);
+    case.game
+        .handle_in_world(&choose(case.actor), &case.character, 1_100)
+        .unwrap();
+    assert_refusal_changed_nothing(&case, &state, &save);
+    assert_eq!(item_count(&case.game, 2884), 4);
+
+    case.character.position = [case.character.position[0] + 100.0, 0.0, 0.0];
+    let (state, save) = snapshot(&case.game);
+    let out = case
+        .game
+        .handle_in_world(&choose(case.actor), &case.character, 1_100)
+        .unwrap();
+    assert_eq!(
+        chat_texts(&out.replies),
+        vec!["Move closer to interact.".to_owned()]
+    );
+    assert_refusal_changed_nothing(&case, &state, &save);
+
+    // The fruit and ore drops use the same service/job gate.
+    let mut case = tutorial_case(TutorialStep::Gather(1002), 45, true);
+    case.game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .unwrap();
+    assert_eq!(item_count(&case.game, 2875), 1);
+    assert_eq!(opening_count(&case), 1);
+    case.game.profiles.as_mut().unwrap().unlock(14).unwrap();
+    case.game.profiles.as_mut().unwrap().activate(14).unwrap();
+    let inventory = case.game.inventory.state().clone();
+    case.game
+        .handle_in_world(&choose(case.actor), &case.character, 1_001)
+        .unwrap();
+    assert_eq!(opening_count(&case), 2);
+    assert_eq!(
+        case.game.inventory.state(),
+        &inventory,
+        "a wrong active job paid the Chef drop"
+    );
+
+    let mut case = tutorial_case(TutorialStep::Gather(1003), 14, true);
+    let out = case
+        .game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .unwrap();
+    assert!(out.changed);
+    assert_eq!(item_count(&case.game, 2739), 1);
+    assert_eq!(item_count(&case.game, 879), 1);
+    assert_eq!(opening_count(&case), 1);
+    let inventory = case.game.inventory.state().clone();
+    case.game.profiles.as_mut().unwrap().unlock(45).unwrap();
+    case.game.profiles.as_mut().unwrap().activate(45).unwrap();
+    case.game
+        .handle_in_world(&choose(case.actor), &case.character, 1_001)
+        .unwrap();
+    assert_eq!(opening_count(&case), 2);
+    assert_eq!(
+        case.game.inventory.state(),
+        &inventory,
+        "a wrong active job paid the Miner drop"
+    );
+}
+
+/// The shared opening reference with stage 910004 unordered and its campaign
+/// bindings re-hashed, so a gather and a cosmetic objective can both count.
+fn unordered_cooking_reference() -> Scratch {
+    let scratch = Scratch::new("unordered-cooking");
+    copy_tree(&reference(), &scratch.0);
+    let opening_path = scratch.0.join("opening.json");
+    let mut opening: Value = serde_json::from_slice(&fs::read(&opening_path).unwrap()).unwrap();
+    let stage = opening["stages"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|stage| stage["id"].as_u64() == Some(910004))
+        .unwrap();
+    stage["ordered"] = false.into();
+    let bytes = serde_json::to_vec(&opening).unwrap();
+    fs::write(&opening_path, &bytes).unwrap();
+    let hash = format!("{:x}", Sha256::digest(&bytes));
+    for marker in ["cooking-campaign.json", "forging-campaign.json"] {
+        let path = scratch.0.join(marker);
+        let mut value: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+        value["opening_sha256"] = hash.clone().into();
+        fs::write(&path, serde_json::to_vec(&value).unwrap()).unwrap();
+    }
+    scratch
+}
+
+#[test]
+fn the_opening_event_order_is_unchanged() {
+    let scratch = unordered_cooking_reference();
+    let base = Gameplay::load(&scratch.0, None).unwrap();
+    let (stage, actor, gather_index, cosmetic_index, gather_text, equipment_text) = {
+        let opening = base.opening.as_ref().unwrap();
+        let stage = opening
+            .stages()
+            .iter()
+            .find(|stage| stage.id == 910004)
+            .unwrap();
+        let gather_index = stage
+            .objectives
+            .iter()
+            .position(|objective| {
+                matches!(
+                    &objective.trigger,
+                    OpeningTrigger::Gather { resource_id: 1001 }
+                )
+            })
+            .unwrap();
+        let cosmetic_index = stage
+            .objectives
+            .iter()
+            .position(|objective| {
+                matches!(
+                    &objective.trigger,
+                    OpeningTrigger::CosmeticEquipped {
+                        definition_id: 13597
+                    }
+                )
+            })
+            .unwrap();
+        let gather = &stage.objectives[gather_index];
+        let cosmetic = &stage.objectives[cosmetic_index];
+        let gather_text = format!("{}: 1/{}.", gather.description, gather.required);
+        let equipment_text = format!("{}: 1/{}.", cosmetic.description, cosmetic.required);
+        let actor = opening
+            .actors()
+            .iter()
+            .find(|actor| {
+                matches!(
+                    actor.action,
+                    Some(OpeningTrigger::Gather { resource_id: 1001 })
+                )
+            })
+            .unwrap()
+            .clone();
+        (
+            stage.clone(),
+            actor,
+            gather_index,
+            cosmetic_index,
+            gather_text,
+            equipment_text,
+        )
+    };
+    let mut state = base.state();
+    {
+        let opening = base.opening.as_ref().unwrap();
+        for earlier in opening.stages() {
+            let progress = state
+                .opening
+                .as_mut()
+                .unwrap()
+                .stages
+                .get_mut(&earlier.id)
+                .unwrap();
+            if earlier.id < stage.id {
+                progress.accepted = true;
+                progress.completed = true;
+                progress.rewarded = true;
+                progress.counts = earlier
+                    .objectives
+                    .iter()
+                    .map(|objective| objective.required)
+                    .collect();
+            }
+        }
+        let progress = state
+            .opening
+            .as_mut()
+            .unwrap()
+            .stages
+            .get_mut(&stage.id)
+            .unwrap();
+        progress.accepted = true;
+        progress.completed = false;
+        progress.rewarded = false;
+        progress.counts = stage
+            .objectives
+            .iter()
+            .enumerate()
+            .map(
+                |(index, objective)| {
+                    if index < 2 { objective.required } else { 0 }
+                },
+            )
+            .collect();
+    }
+    {
+        let profiles = state.profiles.as_mut().unwrap();
+        profiles.unlocked.insert(45);
+        profiles.active = 45;
+    }
+    let mut game = Gameplay::load(&scratch.0, Some(state)).unwrap();
+    let character = CharacterState {
+        guid: 1,
+        zone_id: actor.zone_id,
+        position: actor.position,
+        rotation: [0., 0., 1.],
+    };
+    game.initialize_world(&character, 1_000).unwrap();
+    game.inventory.grant(0, 13597, 1).unwrap();
+    game.inventory.equip_owned_definition(13597, 45).unwrap();
+    install(
+        &mut game,
+        ObjectiveKind::GatherResource { resource_id: 1001 },
+        2,
+    );
+    let ore_before = item_count(&game, 2884);
+
+    let out = game
+        .handle_in_world(&choose(actor.guid), &character, 1_000)
+        .unwrap();
+    let opening_index = out
+        .replies
+        .iter()
+        .position(|reply| chat_text(reply).as_deref() == Some(gather_text.as_str()))
+        .expect("the opening gather message");
+    let quest_index = out
+        .replies
+        .iter()
+        .position(|reply| reply.starts_with(&[49, 0, 9, 0]))
+        .expect("the GatherResource quest update");
+    let drop_index = out
+        .replies
+        .iter()
+        .position(|reply| reply.starts_with(&[38, 0, 2, 0]) || reply.starts_with(&[38, 0, 3, 0]))
+        .expect("the local drop packet");
+    let equipment_index = out
+        .replies
+        .iter()
+        .position(|reply| chat_text(reply).as_deref() == Some(equipment_text.as_str()))
+        .expect("the equipment event message");
+    assert!(
+        opening_index < quest_index,
+        "the opening event must precede the GatherResource event"
+    );
+    assert!(
+        quest_index < drop_index,
+        "the GatherResource event must precede the local drop"
+    );
+    assert!(
+        drop_index < equipment_index,
+        "the local drop must precede the equipment events"
+    );
+    assert_eq!(
+        game.opening.as_ref().unwrap().state().stages[&stage.id].counts[gather_index],
+        1
+    );
+    assert_eq!(
+        game.opening.as_ref().unwrap().state().stages[&stage.id].counts[cosmetic_index],
+        1
+    );
+    assert_eq!(item_count(&game, 2884), ore_before + 1);
+    assert_eq!(
+        game.npc_quests
+            .as_ref()
+            .unwrap()
+            .progress(1)
+            .unwrap()
+            .counts,
+        vec![1]
+    );
+}
+
+#[test]
+fn a_refused_opening_interaction_changes_nothing() {
+    let mut case = tutorial_case(TutorialStep::Craft(2001), 45, true);
+
+    case.game.profiles.as_mut().unwrap().unlock(1).unwrap();
+    case.game.profiles.as_mut().unwrap().activate(1).unwrap();
+    let (state, save) = snapshot(&case.game);
+    let out = case
+        .game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .unwrap();
+    assert!(!out.changed, "the wrong-job refusal staged a change");
+    assert_refusal_changed_nothing(&case, &state, &save);
+
+    case.game.profiles.as_mut().unwrap().activate(45).unwrap();
+    restage(&mut case.game, TutorialStep::Craft(2001), true);
+    let (state, save) = snapshot(&case.game);
+    let out = case
+        .game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .unwrap();
+    assert!(!out.changed, "the shortage refusal staged a change");
+    assert_refusal_changed_nothing(&case, &state, &save);
+
+    case.character.position = [1_000.0, 1_000.0, 1_000.0];
+    let (state, save) = snapshot(&case.game);
+    let out = case
+        .game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .unwrap();
+    assert_eq!(
+        chat_texts(&out.replies),
+        vec!["Move closer to interact.".to_owned()]
+    );
+    assert!(!out.changed, "the out-of-range refusal staged a change");
+    assert_refusal_changed_nothing(&case, &state, &save);
+}
+
+#[test]
+fn an_absent_service_falls_through_to_the_opening_event() {
+    let mut case = tutorial_case(TutorialStep::Craft(2001), 45, false);
+    case.game.cooking = None;
+    let (state, save) = snapshot(&case.game);
+    let out = case
+        .game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .unwrap();
+    assert!(!out.changed, "an unaccepted stage counted the craft event");
+    assert_eq!(case.game.state(), state);
+    assert_eq!(serde_json::to_vec(&case.game.state()).unwrap(), save);
+
+    restage(&mut case.game, TutorialStep::Craft(2001), true);
+    case.game.initialize_world(&case.character, 1_000).unwrap();
+    let out = case
+        .game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .unwrap();
+    assert!(out.changed, "the absent service must fall through");
+    assert_eq!(
+        opening_count(&case),
+        1,
+        "the opening craft event counts once"
+    );
+    assert!(case.game.cooking.is_none());
+    assert_eq!(case.game.forging_tick_ms, None);
+    assert_eq!(case.game.type8_tick_ms, None);
 }
