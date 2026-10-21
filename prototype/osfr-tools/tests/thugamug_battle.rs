@@ -1,4 +1,7 @@
 //! T282: Thugamug's bridge as a level-5 field battle (Thugamug and his two Hands).
+//! T330: "Chapter 1: Thugamug's Thievery" (quest 3000032) is played against that
+//! battle end to end. The T330 session harness and client-reader notes are in the
+//! section at the end of this file.
 //!
 //! Content-only slice. The battle is one new `field_battles.json` row and the
 //! existing route: activity-portal Play (167/1/2) or marker 26/8 -> 41/114
@@ -28,12 +31,15 @@ use osfr_tools::{
     account_store::AccountRole,
     activity_portal::{Catalogue, Kind, Refusal, Viewer},
     chat,
-    encounter::EncounterEngine,
+    encounter::{EncounterEngine, SharedFieldState},
     game_store,
     gameplay::GameplayState,
     gateway::{Gateway, GatewayOutcome},
     inventory::{Inventory, InventoryItem, InventoryState, MAX_ITEMS},
+    quest_engine::{CharacterEligibility, QuestEngine, QuestStatus},
+    startup_world,
     terrain::{HeightGrid, Terrain},
+    world,
 };
 use serde_json::{Value, json};
 use std::{
@@ -436,6 +442,13 @@ fn walk(gateway: &mut Gateway, guid: u64, to: [f32; 3], now_ms: &mut u64) {
 fn open_battle(gateway: &mut Gateway, spawner_guid: u64, row: &Value, now_ms: u64) -> Vec<u8> {
     let screen = send(gateway, &interact(spawner_guid), now_ms);
     let details = details(&screen).expect("clicking the marker opens 41/114");
+    assert_start_screen(details, row);
+    details.to_vec()
+}
+
+/// The 41/114 start screen fields, pinned byte-for-byte against the client
+/// reader chain 0x00aa3430 -> 0x00aa32d0 -> 0x00a29120 -> 0x009bdd70.
+fn assert_start_screen(details: &[u8], row: &Value) {
     assert_eq!(i32_at(details, 4), THUGAMUG as i32);
     assert!(i32_at(details, 8) > 0, "the start screen has an instance");
 
@@ -458,7 +471,6 @@ fn open_battle(gateway: &mut Gateway, spawner_guid: u64, row: &Value, now_ms: u6
         expected.as_slice(),
         "41/114 fields must agree byte-for-byte with the client reader"
     );
-    details.to_vec()
 }
 
 fn enter_battle(gateway: &mut Gateway, details: &[u8], row: &Value, now_ms: u64) -> Vec<u64> {
@@ -565,8 +577,23 @@ fn assert_payout(before: &Economy, after: &Economy, row: &Value) {
 }
 
 fn reopen(fixture: &Fixture, gateway: &Gateway, name: &str, now_ms: u64) -> Gateway {
+    reopen_with(fixture, gateway, name, now_ms, |_| {})
+}
+
+/// Save, optionally patch the decoded gameplay state, then load it through the
+/// same `game_store` envelope and `Gateway::load_gameplay` a reconnect uses.
+fn reopen_with(
+    fixture: &Fixture,
+    gateway: &Gateway,
+    name: &str,
+    now_ms: u64,
+    patch: impl FnOnce(&mut GameplayState),
+) -> Gateway {
     let path = fixture.save(gateway, name);
-    let saved = game_store::load_or_create(&path, gateway.state().clone()).unwrap();
+    let mut saved = game_store::load_or_create(&path, gateway.state().clone()).unwrap();
+    if let Some(gameplay) = saved.gameplay.as_mut() {
+        patch(gameplay);
+    }
     let mut restored = Gateway::load_gameplay(
         &fixture.reference,
         saved.character,
@@ -1500,4 +1527,1177 @@ fn a_second_player_can_run_its_own_instance() {
         first_paid,
         "the second player's win never pays the first"
     );
+}
+
+// ---------------------------------------------------------------------------
+// T330: "Chapter 1: Thugamug's Thievery" (quest 3000032) over battle 12340.
+//
+// The chapter record lives in `data/content/quests/adventurer.json`; the battle
+// is T282's `field_battles.json` row. These tests drive the production sessions:
+// the gateway's 26/8 -> 26/10 -> 26/6 -> 49/1 -> 49/2 offer/accept path, the
+// shared-field attack path for T279's wolves, the 41/108 Go and 36/10 arena
+// path, and the 49/13 -> 49/14 turn-in. A `QuestSession` also mirrors the one
+// server-owned side table the bare gateway does not carry: `commit_outcome`
+// (bin/osfr-gateway.rs) dispatches an accepted `shared_field` action through
+// `handle_shared_field` for actors in the session's known-NPC set.
+//
+// Client layouts used by these tests (IDA):
+// - 26/8 interact `0x008b6bc0`; 26/10 select `0x00a36f80`; 26/6 dialogue
+//   `0x009f5890`.
+// - 49/1 offer reader `0x00c7bb60` -> `0x00c7b7a0` (quest 6..10, intro 10..14,
+//   title 14..18 and 18..22, description 22..26).
+// - 49/2 reply `0x00a86400`; 49/3 quest add `0x00c7bd10`; 49/9 update
+//   `0x00c7af60` (quest 6..10, objective 10..14, current 14..18); 49/10
+//   complete `0x00c7b070`; 49/13 end reader `0x00c7b990` / writer `0x00c7bbd0`
+//   (actor 6..14, quest 14..18, end text 18..22, reward bundle at 26: coins
+//   27..31, displayed XP 31..35); 49/14 reply `0x00a864c0`.
+// - 41/108 Go `0x008b6e70`; 41/114 start screen `0x009bdd70`; 36/10 attacker
+//   `0x00a35150`; 35/2 AddNpc `0x00921a10`; 26/42 results Close `0x008a2eb0`.
+
+/// T279's playable Chapter 1 entry, the chapter's only prerequisite.
+const MISSING_SISTERS: u32 = 3_000_029;
+/// The chapter this task enables.
+const THIEVERY: u32 = 3_000_032;
+const INTRO_TEXT: u32 = 90_702;
+const END_TEXT: u32 = 90_705;
+const QUEST_COINS: u32 = 13;
+const QUEST_XP: u32 = 25;
+const MISSING_SISTERS_END_TEXT: u32 = 90_624;
+const MISSING_SISTERS_COINS: u32 = 5;
+const MISSING_SISTERS_XP: u32 = 25;
+const GEOFFREY: u64 = 9_000_000_330;
+/// A drawable `legacy_data` Sanctuary quest giver who offers no enabled quest.
+const HARRY: u64 = 9_500_000_493;
+const GEOFFREY_MODEL: i32 = 415;
+const GEOFFREY_NAME_ID: u32 = 70_318;
+const ADVENTURER: i32 = 1;
+const MINER: i32 = 14;
+/// The generic Talk option label and the quest row of the 26/6 dialogue.
+const TALK_LABEL: u32 = 3_300;
+const QUEST_CHOICE: i32 = 301;
+const WOLF_DEFINITION: i32 = 3_156;
+const WOLF_GROUP: &str = "starting_farnum_wolves";
+const WOLF_CENTRE: [f32; 3] = [-1899.204, -50.59, 307.902];
+
+fn content_dir() -> PathBuf {
+    manifest_dir().join("data/content")
+}
+
+fn npc_position(file: &str, npc_id: u64) -> [f32; 3] {
+    let document = read_json(&content_dir().join("npcs").join(file));
+    let row = document["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["npc_id"].as_u64() == Some(npc_id))
+        .unwrap_or_else(|| panic!("NPC {npc_id} is defined in {file}"));
+    position(&row["position"])
+}
+
+fn geoffrey_position() -> [f32; 3] {
+    npc_position("sanctuary.json", GEOFFREY)
+}
+
+/// The three live `starting_farnum_wolves` actors (definition 3156), in GUID order.
+fn starting_wolves() -> Vec<(u64, [f32; 3])> {
+    let document = read_json(&content_dir().join("field_enemies.json"));
+    let group = document["spawn_groups"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|group| group["id"] == WOLF_GROUP)
+        .expect("the starting_farnum_wolves group");
+    let members: BTreeSet<u64> = group["members"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|id| id.as_u64().unwrap())
+        .collect();
+    let mut wolves: Vec<(u64, [f32; 3])> = document["enemies"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|enemy| members.contains(&enemy["guid"].as_u64().unwrap()))
+        .map(|enemy| {
+            assert_eq!(
+                enemy["definition_id"].as_u64(),
+                Some(WOLF_DEFINITION as u64)
+            );
+            (u64_field(enemy, "guid"), position(&enemy["position"]))
+        })
+        .collect();
+    wolves.sort_by_key(|(guid, _)| *guid);
+    assert_eq!(
+        wolves.len(),
+        3,
+        "the group has exactly three starter wolves"
+    );
+    wolves
+}
+
+/// Every actor the server delivers through the shared field: field enemies and
+/// battle spawners. The server seeds a session's known-NPC set from this
+/// population, so a test that does not run the field delivery tick seeds it here.
+fn shared_guids() -> BTreeSet<u64> {
+    let field = read_json(&content_dir().join("field_enemies.json"));
+    field["enemies"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|enemy| u64_field(enemy, "guid"))
+        .chain(
+            battles()["battles"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|row| u64_field(&row["spawner"], "guid")),
+        )
+        .collect()
+}
+
+fn packet_family(packet: &[u8], family: u16, subtype: u16) -> bool {
+    packet.len() >= 4
+        && packet[..2] == family.to_le_bytes()
+        && packet[2..4] == subtype.to_le_bytes()
+}
+
+fn u32_at(packet: &[u8], offset: usize) -> u32 {
+    u32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap())
+}
+
+fn u64_at(packet: &[u8], offset: usize) -> u64 {
+    u64::from_le_bytes(packet[offset..offset + 8].try_into().unwrap())
+}
+
+fn replies(outcome: &GatewayOutcome) -> impl Iterator<Item = &[u8]> {
+    outcome.replies.iter().map(|packet| unframe(packet))
+}
+
+fn offered_quests(outcome: &GatewayOutcome) -> Vec<u32> {
+    replies(outcome)
+        .filter(|packet| packet_family(packet, 49, 1) && packet.len() >= 10)
+        .map(|packet| u32_at(packet, 6))
+        .collect()
+}
+
+fn menu_option(outcome: &GatewayOutcome, label: u32) -> Option<i32> {
+    let menu = replies(outcome).find(|packet| packet_family(packet, 26, 9))?;
+    let count = i32::from_le_bytes(menu[13..17].try_into().unwrap());
+    (0..count).find_map(|index| {
+        let offset = 17 + usize::try_from(index).unwrap() * 28;
+        let id = i32::from_le_bytes(menu[offset..offset + 4].try_into().unwrap());
+        (u32_at(menu, offset + 8) == label).then_some(id)
+    })
+}
+
+fn npc_select(target: u64, choice: i32) -> Vec<u8> {
+    [
+        vec![26, 0, 10, 0],
+        target.to_le_bytes().to_vec(),
+        choice.to_le_bytes().to_vec(),
+    ]
+    .concat()
+}
+
+fn dialogue_choice(row: i32) -> Vec<u8> {
+    [vec![26, 0, 6, 0], row.to_le_bytes().to_vec()].concat()
+}
+
+fn quest_reply(quest: u32, accept: bool) -> Vec<u8> {
+    [
+        vec![49, 0, 2, 0, 0, 0],
+        quest.to_le_bytes().to_vec(),
+        vec![u8::from(accept)],
+    ]
+    .concat()
+}
+
+fn quest_end_reply(quest: u32) -> Vec<u8> {
+    [vec![49, 0, 14, 0, 0, 0], quest.to_le_bytes().to_vec()].concat()
+}
+
+fn quest_counts(gateway: &Gateway, quest: u32) -> Vec<u32> {
+    gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .npc_quests
+        .unwrap()
+        .quests[&quest]
+        .counts
+        .clone()
+}
+
+fn quest_status(gateway: &Gateway, quest: u32) -> QuestStatus {
+    gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .npc_quests
+        .unwrap()
+        .quests[&quest]
+        .status
+        .clone()
+}
+
+fn pending_turnin(gateway: &Gateway) -> Option<u32> {
+    gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .npc_quests
+        .unwrap()
+        .pending_turnin
+}
+
+fn wallet(gateway: &Gateway) -> u32 {
+    gateway.snapshot().gameplay.unwrap().inventory.coins
+}
+
+fn profile_xp(gateway: &Gateway, profile: i32) -> u32 {
+    gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .profiles
+        .unwrap()
+        .experience
+        .get(&profile)
+        .copied()
+        .unwrap_or(0)
+}
+
+fn active_job(gateway: &Gateway) -> i32 {
+    gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .profiles
+        .unwrap()
+        .active
+}
+
+fn typed_state(gateway: &Gateway) -> GameplayState {
+    gateway.snapshot().gameplay.unwrap()
+}
+
+/// Rebuild the production engine over the session's saved quest state, so an
+/// offer gate can be asserted without starting a second session.
+fn engine_for(session: &QuestSession) -> QuestEngine {
+    let eligibility = CharacterEligibility {
+        player_level: 20,
+        job_levels: BTreeMap::from([("adventurer".into(), 20)]),
+        member: true,
+        nonmember_quest_limit: 30,
+        member_quest_limit: 30,
+    };
+    QuestEngine::from_split_content(
+        &content_dir(),
+        session.gateway.state().guid,
+        eligibility,
+        Some(
+            session
+                .gateway
+                .snapshot()
+                .gameplay
+                .unwrap()
+                .npc_quests
+                .unwrap(),
+        ),
+    )
+    .expect("the saved quest state rebuilds")
+}
+
+/// Track the 35/2 AddNpc / 35/3 removal stream the server turns into `known_npcs`.
+fn observe(known: &mut BTreeSet<u64>, outcome: &GatewayOutcome) {
+    for packet in replies(outcome) {
+        if packet_family(packet, 35, 2) {
+            let npc =
+                startup_world::parse_add_npc(packet).expect("the gateway emits a readable AddNpc");
+            known.insert(npc.actor_id);
+        } else if packet_family(packet, 35, 3) && packet.len() >= 14 {
+            known.remove(&u64_at(packet, 6));
+        }
+    }
+}
+
+/// One gateway session plus the server-side shared-field dispatch and known-NPC
+/// set `bin/osfr-gateway.rs` owns outside the gateway.
+struct QuestSession {
+    gateway: Gateway,
+    field: SharedFieldState,
+    known: BTreeSet<u64>,
+    now: u64,
+}
+
+impl Fixture {
+    /// A session whose shared field is taken before world entry, in the
+    /// server's `Session::new` order. `extra_jobs` seeds an otherwise-locked
+    /// profile set so a test can switch to a second job.
+    fn quest_session(&self, position: [f32; 3], guid: u64, extra_jobs: &[i32]) -> QuestSession {
+        let mut character = Gateway::reference_state(&self.reference).unwrap();
+        character.guid = guid;
+        character.zone_id = 0;
+        character.position = position;
+        character.rotation = [0.0, 0.0, 1.0];
+        let saved = (!extra_jobs.is_empty()).then(|| {
+            let seed =
+                Gateway::load_gameplay(&self.reference, character.clone(), &self.content, None)
+                    .unwrap();
+            let mut gameplay = seed.snapshot().gameplay.unwrap();
+            gameplay
+                .profiles
+                .as_mut()
+                .unwrap()
+                .unlocked
+                .extend(extra_jobs.iter().copied());
+            gameplay
+        });
+        let mut gateway =
+            Gateway::load_gameplay(&self.reference, character, &self.content, saved).unwrap();
+        gateway.set_dev_tools(true);
+        gateway.set_role(AccountRole::Admin);
+        let field = gateway
+            .take_shared_fields()
+            .expect("the bundled shared field content loads");
+        self.login(&mut gateway);
+        let mut known = shared_guids();
+        for packet in [&13_u16.to_le_bytes(), &10_u16.to_le_bytes()] {
+            let entry = send(&mut gateway, packet, 100);
+            observe(&mut known, &entry);
+        }
+        QuestSession {
+            gateway,
+            field,
+            known,
+            now: 300,
+        }
+    }
+}
+
+impl QuestSession {
+    fn send(&mut self, packet: &[u8]) -> GatewayOutcome {
+        self.now += 10;
+        self.send_at(packet, self.now)
+    }
+
+    /// The gateway request plus the host's post-commit shared-field dispatch
+    /// (`commit_outcome` -> `handle_shared_field`). A shared action for an
+    /// unknown actor is dropped, exactly as the host drops it.
+    fn send_at(&mut self, packet: &[u8], now: u64) -> GatewayOutcome {
+        let mut outcome = send(&mut self.gateway, packet, now);
+        observe(&mut self.known, &outcome);
+        if let Some(action) = outcome.shared_field.take() {
+            let target = action.target();
+            if target == self.gateway.state().guid || target == 0 || self.known.contains(&target) {
+                let field = &mut self.field;
+                let result = self
+                    .gateway
+                    .handle_shared_field(&action, field, &self.known, now)
+                    .expect("the shared field action succeeds");
+                outcome.state_changed |= result.changed;
+                outcome.gameplay_changed |= result.changed;
+                for reply in result.replies {
+                    outcome.replies.push(wrap(&reply));
+                }
+                observe(&mut self.known, &outcome);
+            }
+        }
+        outcome
+    }
+
+    /// The real 26/13 switch to the only combat job the fixture unlocks, then
+    /// the local `realm level 5` tuning command.
+    fn arm(&mut self) {
+        assert!(
+            self.send(&switch_job(BRAWLER)).state_changed,
+            "the Brawler outfit is selectable"
+        );
+        let levelled = self.send(&chat::local_request("realm level 5"));
+        assert!(levelled.state_changed, "the level command commits");
+        assert_eq!(level(&self.gateway, BRAWLER), REQUIRED_LEVEL);
+    }
+
+    fn talk(&mut self, target: u64) -> GatewayOutcome {
+        let menu = self.send(&interact(target));
+        let choice = menu_option(&menu, TALK_LABEL)
+            .unwrap_or_else(|| panic!("NPC {target} exposes a Talk option"));
+        self.send(&npc_select(target, choice))
+    }
+
+    fn offer(&mut self, target: u64, quest: u32) -> GatewayOutcome {
+        let dialogue = self.talk(target);
+        assert!(
+            replies(&dialogue).any(|packet| packet_family(packet, 26, 3)),
+            "Talk opens the 26/3 dialogue"
+        );
+        let offered = self.send(&dialogue_choice(QUEST_CHOICE));
+        assert_eq!(
+            offered_quests(&offered),
+            [quest],
+            "one Talk offers exactly quest {quest}"
+        );
+        offered
+    }
+
+    fn accept(&mut self, quest: u32) -> GatewayOutcome {
+        let accepted = self.send(&quest_reply(quest, true));
+        assert!(accepted.state_changed, "accepting quest {quest} commits");
+        assert!(
+            replies(&accepted)
+                .any(|packet| packet_family(packet, 49, 3) && u32_at(packet, 6) == quest),
+            "accepting quest {quest} sends QuestAdd"
+        );
+        assert!(
+            replies(&accepted)
+                .any(|packet| packet_family(packet, 49, 8) && u32_at(packet, 6) == quest),
+            "accepting quest {quest} activates its first objective"
+        );
+        assert_eq!(self.status(quest), QuestStatus::Active);
+        accepted
+    }
+
+    fn walk(&mut self, to: [f32; 3]) {
+        let guid = self.gateway.state().guid;
+        let from = self.gateway.state().position;
+        let distance = ((to[0] - from[0]).powi(2) + (to[2] - from[2]).powi(2)).sqrt();
+        let steps = (distance / 8.0).ceil().max(1.0) as usize;
+        for step in 1..=steps {
+            let amount = step as f32 / steps as f32;
+            let position = [0, 1, 2].map(|axis| from[axis] + (to[axis] - from[axis]) * amount);
+            self.now += 400;
+            let moved = self.send_at(&move_to(guid, position), self.now);
+            assert!(
+                !replies(&moved).any(|packet| packet_family(packet, 38, 12)),
+                "a walk step is never snapped back"
+            );
+            assert_eq!(self.gateway.state().position, position);
+        }
+    }
+
+    /// One basic attack on a shared-field actor, walking into reach first.
+    fn attack(&mut self, target: u64) {
+        for _ in 0..16 {
+            let position = self
+                .field
+                .position(target)
+                .unwrap_or_else(|| panic!("shared target {target} exists"));
+            self.walk([position[0] + 1.0, position[1], position[2]]);
+            self.now += 700;
+            let hit = self.send_at(&melee(target), self.now);
+            assert!(hit.state_changed, "the shared-field attack commits");
+            if self.field.health(target) == Some(0) {
+                return;
+            }
+        }
+        panic!("shared target {target} did not die");
+    }
+
+    /// T279's chapter through the real path: accept at Geoffrey, visit the
+    /// search-party spot, kill the three starter wolves, return and turn in.
+    fn accept_missing_sisters(&mut self) {
+        self.offer(GEOFFREY, MISSING_SISTERS);
+        self.accept(MISSING_SISTERS);
+        assert_eq!(self.counts(MISSING_SISTERS), [0, 0, 0]);
+    }
+
+    fn finish_missing_sisters(&mut self) {
+        assert_eq!(self.status(MISSING_SISTERS), QuestStatus::Active);
+        self.walk(WOLF_CENTRE);
+        assert_eq!(
+            self.counts(MISSING_SISTERS),
+            [1, 0, 0],
+            "the movement visit advances the search-party step"
+        );
+        for (guid, _) in starting_wolves() {
+            self.attack(guid);
+        }
+        assert_eq!(self.counts(MISSING_SISTERS), [1, 3, 0]);
+        self.walk(geoffrey_position());
+        let end = self.open_end_screen(MISSING_SISTERS, MISSING_SISTERS_END_TEXT);
+        assert_eq!(u32_at(&end, 27), MISSING_SISTERS_COINS);
+        assert_eq!(u32_at(&end, 31), MISSING_SISTERS_XP);
+        self.finish_quest(
+            MISSING_SISTERS,
+            ADVENTURER,
+            MISSING_SISTERS_COINS,
+            MISSING_SISTERS_XP,
+        );
+    }
+
+    fn complete_missing_sisters(&mut self) {
+        self.accept_missing_sisters();
+        self.finish_missing_sisters();
+    }
+
+    /// Talk to Geoffrey and release the held 49/13 with the 26/6 quest choice.
+    fn open_end_screen(&mut self, quest: u32, end_text: u32) -> Vec<u8> {
+        let dialogue = self.talk(GEOFFREY);
+        assert!(
+            replies(&dialogue).any(|packet| packet_family(packet, 26, 3)),
+            "Geoffrey opens the 26/3 dialogue"
+        );
+        let released = self.send(&dialogue_choice(QUEST_CHOICE));
+        let end = replies(&released)
+            .find(|packet| packet_family(packet, 49, 13) && u32_at(packet, 14) == quest)
+            .unwrap_or_else(|| panic!("quest {quest} releases its 49/13 end screen"))
+            .to_vec();
+        assert_eq!(end.len(), 99, "the empty-display reward bundle is 99 bytes");
+        assert_eq!(u64_at(&end, 6), GEOFFREY, "the end screen names the actor");
+        assert_eq!(u32_at(&end, 18), end_text, "49/13 carries the end text");
+        end
+    }
+
+    fn finish_quest(&mut self, quest: u32, profile: i32, coins: u32, xp: u32) {
+        let coins_before = self.coins();
+        let xp_before = self.xp(profile);
+        let completed = self.send(&quest_end_reply(quest));
+        assert!(completed.state_changed, "the turn-in settles");
+        assert!(
+            replies(&completed)
+                .any(|packet| packet_family(packet, 49, 4) && u32_at(packet, 6) == quest),
+            "quest {quest} completes"
+        );
+        assert_eq!(self.coins(), coins_before + coins);
+        assert_eq!(self.xp(profile), xp_before + xp);
+        assert_eq!(self.status(quest), QuestStatus::Completed);
+        assert_eq!(self.pending(), None);
+    }
+
+    fn open_battle(&mut self, row: &Value, marker: [f32; 3]) -> Vec<u8> {
+        self.walk(marker);
+        let screen = self.send(&interact(MARKER_GUID));
+        let details = replies(&screen)
+            .find(|packet| packet_family(packet, 41, 114))
+            .expect("clicking the bridge marker opens 41/114")
+            .to_vec();
+        assert_start_screen(&details, row);
+        details
+    }
+
+    fn enter_arena(&mut self, details: &[u8], row: &Value) -> Vec<u64> {
+        self.now += 100;
+        let guids = enter_battle(&mut self.gateway, details, row, self.now);
+        self.now += 200;
+        guids
+    }
+
+    fn fight(&mut self) {
+        fight_to_win(&mut self.gateway, &mut self.now);
+    }
+
+    /// 26/42 Close, then the ready/loaded handshake the client repeats for the
+    /// scene it returns to.
+    fn close_results(&mut self) -> GatewayOutcome {
+        self.now += 100;
+        let closed = send(&mut self.gateway, &[26, 0, 42, 0], self.now);
+        assert!(closed.began_zoning, "Close returns to the open world");
+        assert_eq!(self.gateway.state().zone_id, 0);
+        self.now += 100;
+        self.send(&13_u16.to_le_bytes());
+        self.now += 100;
+        let loaded = self.send(&10_u16.to_le_bytes());
+        assert!(loaded.entered_world, "the open world re-loads");
+        closed
+    }
+
+    /// Win the bridge battle through Go and the real attack path.
+    fn win_bridge_battle(&mut self, row: &Value) {
+        let marker = position(&row["spawner"]["position"]);
+        let details = self.open_battle(row, marker);
+        self.enter_arena(&details, row);
+        self.fight();
+        self.close_results();
+    }
+
+    fn counts(&self, quest: u32) -> Vec<u32> {
+        quest_counts(&self.gateway, quest)
+    }
+
+    fn status(&self, quest: u32) -> QuestStatus {
+        quest_status(&self.gateway, quest)
+    }
+
+    fn pending(&self) -> Option<u32> {
+        pending_turnin(&self.gateway)
+    }
+
+    fn coins(&self) -> u32 {
+        wallet(&self.gateway)
+    }
+
+    fn xp(&self, profile: i32) -> u32 {
+        profile_xp(&self.gateway, profile)
+    }
+
+    fn active_job(&self) -> i32 {
+        active_job(&self.gateway)
+    }
+
+    fn capture(&self) -> (GameplayState, Vec<u8>) {
+        (typed_state(&self.gateway), saved_bytes(&self.gateway))
+    }
+
+    fn assert_unchanged(&mut self, packet: &[u8], label: &str) {
+        let before = self.capture();
+        let outcome = self.send(packet);
+        assert!(!outcome.state_changed, "{label} changed the character");
+        assert!(
+            replies(&outcome).all(|reply| {
+                !(packet_family(reply, 49, 1)
+                    || packet_family(reply, 49, 3)
+                    || packet_family(reply, 49, 4)
+                    || packet_family(reply, 49, 13))
+            }),
+            "{label} offered, added, completed or ended a quest"
+        );
+        assert_eq!(
+            self.capture(),
+            before,
+            "{label} changed the typed state or the save bytes"
+        );
+    }
+}
+
+/// The chapter is offered at the drawable Geoffrey only after T279's `3000029`
+/// is Completed, and its 49/1 carries the reviewed text ids.
+#[test]
+fn geoffrey_offers_thugamugs_thievery_after_the_missing_sisters() {
+    let fixture = Fixture::new();
+    let mut session = fixture.quest_session(geoffrey_position(), 3_001, &[]);
+    session.arm();
+
+    // Before the prerequisite: the only 49/1 is T279's chapter. The disabled
+    // middle records 3000030/3000031 are never offered either.
+    let dialogue = session.talk(GEOFFREY);
+    assert!(replies(&dialogue).any(|packet| packet_family(packet, 26, 3)));
+    let first = session.send(&dialogue_choice(QUEST_CHOICE));
+    assert_eq!(offered_quests(&first), [MISSING_SISTERS]);
+
+    // Finish the prerequisite through the real wolf path, then the chapter appears.
+    session.accept(MISSING_SISTERS);
+    assert!(
+        !engine_for(&session).can_offer(THIEVERY, GEOFFREY),
+        "the unfinished prerequisite denies the chapter"
+    );
+    session.finish_missing_sisters();
+    assert_eq!(session.status(MISSING_SISTERS), QuestStatus::Completed);
+    assert!(
+        engine_for(&session).can_offer(THIEVERY, GEOFFREY),
+        "the completed prerequisite admits the chapter"
+    );
+
+    let offered = session.offer(GEOFFREY, THIEVERY);
+    let packet = replies(&offered)
+        .find(|packet| packet_family(packet, 49, 1) && u32_at(packet, 6) == THIEVERY)
+        .expect("the 49/1 offer");
+    assert_eq!(u32_at(packet, 10), INTRO_TEXT, "49/1 intro id");
+    assert_eq!(u32_at(packet, 14), TITLE, "49/1 title id");
+    assert_eq!(u32_at(packet, 18), TITLE, "49/1 title id (card)");
+    assert_eq!(u32_at(packet, 22), DESCRIPTION, "49/1 description id");
+
+    // A second adventurer without 3000029 gets T279's offer, never this chapter.
+    let mut fresh = fixture.quest_session(geoffrey_position(), 3_002, &[]);
+    let dialogue = fresh.talk(GEOFFREY);
+    assert!(replies(&dialogue).any(|packet| packet_family(packet, 26, 3)));
+    let offered = fresh.send(&dialogue_choice(QUEST_CHOICE));
+    assert_eq!(offered_quests(&offered), [MISSING_SISTERS]);
+    assert_eq!(fresh.status(MISSING_SISTERS), QuestStatus::Offered);
+}
+
+/// The chapter's dungeon step is the T282 bridge battle; the results Close leaves
+/// 1/1 on it and the Talk step open, and 49/14 pays 13 coins + 25 Adventurer XP once.
+#[test]
+fn winning_the_bridge_battle_completes_the_chapter_and_pays_once() {
+    let fixture = Fixture::new();
+    let file = battles();
+    let row = battle(&file, THUGAMUG);
+    let mut session = fixture.quest_session(geoffrey_position(), 3_003, &[]);
+    session.arm();
+    session.complete_missing_sisters();
+    session.offer(GEOFFREY, THIEVERY);
+    session.accept(THIEVERY);
+    assert_eq!(session.counts(THIEVERY), [0, 0]);
+
+    session.win_bridge_battle(row);
+
+    // T312 credits the dungeon step at the win; asserting after the results
+    // Close holds on both that code and the older close-time credit.
+    assert_eq!(
+        session.counts(THIEVERY),
+        [1, 0],
+        "the dungeon step is complete and the Talk step is open"
+    );
+    assert_eq!(session.status(THIEVERY), QuestStatus::Active);
+    assert_eq!(session.pending(), None);
+
+    session.walk(geoffrey_position());
+    let dialogue = session.talk(GEOFFREY);
+    assert!(
+        replies(&dialogue).any(|packet| packet_family(packet, 49, 9)
+            && u32_at(packet, 6) == THIEVERY
+            && u32_at(packet, 10) == 2
+            && u32_at(packet, 14) == 1),
+        "the Talk objective advances to 1/1"
+    );
+    let released = session.send(&dialogue_choice(QUEST_CHOICE));
+    let end = replies(&released)
+        .find(|packet| packet_family(packet, 49, 13) && u32_at(packet, 14) == THIEVERY)
+        .expect("the 49/13 end screen")
+        .to_vec();
+    assert_eq!(end.len(), 99);
+    assert_eq!(u64_at(&end, 6), GEOFFREY);
+    assert_eq!(u32_at(&end, 18), END_TEXT);
+    assert_eq!(u32_at(&end, 27), QUEST_COINS, "49/13 coin bundle");
+    assert_eq!(u32_at(&end, 31), QUEST_XP, "49/13 displayed XP bundle");
+    assert_eq!(session.counts(THIEVERY), [1, 1]);
+
+    // The end screen alone pays nothing.
+    let coins_before = session.coins();
+    let adventurer_before = session.xp(ADVENTURER);
+    let brawler_before = session.xp(BRAWLER);
+    session.finish_quest(THIEVERY, ADVENTURER, QUEST_COINS, QUEST_XP);
+    assert_eq!(session.coins(), coins_before + QUEST_COINS);
+    assert_eq!(session.xp(ADVENTURER), adventurer_before + QUEST_XP);
+    assert_eq!(session.xp(BRAWLER), brawler_before);
+    assert_eq!(session.status(THIEVERY), QuestStatus::Completed);
+    assert_eq!(session.counts(THIEVERY), [1, 1]);
+
+    // A replayed turn-in or accept pays nothing and changes no byte.
+    let finished = session.capture();
+    session.assert_unchanged(&quest_end_reply(THIEVERY), "a replayed 49/14");
+    session.assert_unchanged(&quest_reply(THIEVERY, true), "a replayed 49/2");
+    assert_eq!(session.capture(), finished);
+}
+
+/// The reward map is explicit: switching jobs after accepting still pays profile 1.
+#[test]
+fn the_reward_goes_to_profile_1_after_a_job_switch() {
+    let fixture = Fixture::new();
+    let file = battles();
+    let row = battle(&file, THUGAMUG);
+    let mut session = fixture.quest_session(geoffrey_position(), 3_004, &[MINER]);
+    session.arm();
+    session.complete_missing_sisters();
+    session.offer(GEOFFREY, THIEVERY);
+    session.accept(THIEVERY);
+    session.win_bridge_battle(row);
+
+    // The real 26/13 path switches to the other unlocked job after accepting.
+    session.walk(geoffrey_position());
+    let switched = session.send(&switch_job(MINER));
+    assert!(switched.state_changed, "the Miner outfit is selectable");
+    assert_eq!(session.active_job(), MINER);
+    let adventurer_before = session.xp(ADVENTURER);
+    let miner_before = session.xp(MINER);
+    let brawler_before = session.xp(BRAWLER);
+
+    let end = session.open_end_screen(THIEVERY, END_TEXT);
+    assert_eq!(u32_at(&end, 27), QUEST_COINS);
+    assert_eq!(u32_at(&end, 31), QUEST_XP);
+    session.finish_quest(THIEVERY, ADVENTURER, QUEST_COINS, QUEST_XP);
+
+    assert_eq!(
+        session.active_job(),
+        MINER,
+        "the turn-in must not switch jobs"
+    );
+    assert_eq!(session.xp(ADVENTURER), adventurer_before + QUEST_XP);
+    assert_eq!(
+        session.xp(MINER),
+        miner_before,
+        "the active job is not paid"
+    );
+    assert_eq!(session.xp(BRAWLER), brawler_before);
+}
+
+/// Premature, wrong-quest, forged and wrong-NPC requests change nothing; a coin
+/// balance that cannot hold the grant refuses the turn-in without paying XP or an
+/// item and without a server error.
+#[test]
+fn a_premature_wrong_or_forged_turn_in_changes_nothing() {
+    let fixture = Fixture::new();
+    let file = battles();
+    let row = battle(&file, THUGAMUG);
+    let mut session = fixture.quest_session(geoffrey_position(), 3_005, &[]);
+    session.arm();
+
+    // Before the chain: no pending screen exists for either quest.
+    session.assert_unchanged(&quest_end_reply(THIEVERY), "a 49/14 before the battle");
+    session.assert_unchanged(
+        &quest_end_reply(MISSING_SISTERS),
+        "a 49/14 for another quest",
+    );
+    session.assert_unchanged(&quest_reply(THIEVERY, true), "a 49/2 with no open offer");
+
+    // A wrong NPC: a drawable quest giver who offers no enabled quest. Its own
+    // menu is allowed; the chapter is not offered and the save stays equal.
+    session.walk(npc_position("sanctuary.json", HARRY));
+    let before = session.capture();
+    let menu = session.send(&interact(HARRY));
+    assert!(
+        replies(&menu).any(|packet| packet_family(packet, 26, 9)),
+        "the wrong NPC opens its own menu"
+    );
+    if let Some(choice) = menu_option(&menu, TALK_LABEL) {
+        let dialogue = session.send(&npc_select(HARRY, choice));
+        assert!(
+            replies(&dialogue).all(|packet| !packet_family(packet, 49, 1)),
+            "the wrong NPC offers no quest"
+        );
+    }
+    assert_eq!(
+        session.capture(),
+        before,
+        "a wrong NPC Talk changed the save"
+    );
+
+    // An out-of-range click on Geoffrey is refused by the NPC router.
+    session.assert_unchanged(&interact(GEOFFREY), "an out-of-range Geoffrey click");
+
+    // Run the chain once and open the end screen.
+    session.walk(geoffrey_position());
+    session.complete_missing_sisters();
+    session.offer(GEOFFREY, THIEVERY);
+    session.accept(THIEVERY);
+    session.win_bridge_battle(row);
+    session.walk(geoffrey_position());
+    session.open_end_screen(THIEVERY, END_TEXT);
+    assert_eq!(session.pending(), Some(THIEVERY));
+
+    // The coin balance cannot hold the 13-coin grant: the grant is refused for
+    // this player, nothing is paid, and the pending screen stays retryable.
+    let mut capped = reopen_with(
+        &fixture,
+        &session.gateway,
+        "near-cap.json",
+        session.now + 100,
+        |gameplay| gameplay.inventory.coins = i32::MAX as u32 - 5,
+    );
+    let before = (typed_state(&capped), saved_bytes(&capped));
+    let refused = send(&mut capped, &quest_end_reply(THIEVERY), session.now + 200);
+    assert!(!refused.state_changed, "the over-cap turn-in is a refusal");
+    assert!(
+        !replies(&refused).any(|packet| {
+            packet_family(packet, 49, 4)
+                || packet_family(packet, 49, 13)
+                || packet_family(packet, 38, 19)
+        }),
+        "a refused turn-in sends no completion, bundle or coin update"
+    );
+    assert_eq!(
+        (typed_state(&capped), saved_bytes(&capped)),
+        before,
+        "the refusal changed the typed state or the save bytes"
+    );
+    assert_eq!(wallet(&capped), i32::MAX as u32 - 5);
+    assert_eq!(pending_turnin(&capped), Some(THIEVERY));
+    assert_eq!(quest_status(&capped, THIEVERY), QuestStatus::Active);
+
+    // The same pending save with a normal wallet pays exactly once.
+    let mut paying = reopen(
+        &fixture,
+        &session.gateway,
+        "pending.json",
+        session.now + 300,
+    );
+    let coins_before = wallet(&paying);
+    let xp_before = profile_xp(&paying, ADVENTURER);
+    let paid = send(&mut paying, &quest_end_reply(THIEVERY), session.now + 400);
+    assert!(paid.state_changed);
+    assert_eq!(wallet(&paying), coins_before + QUEST_COINS);
+    assert_eq!(profile_xp(&paying, ADVENTURER), xp_before + QUEST_XP);
+    assert_eq!(quest_status(&paying, THIEVERY), QuestStatus::Completed);
+
+    // Replaying the old accept or turn-in after payment changes nothing.
+    let finished = (typed_state(&paying), saved_bytes(&paying));
+    for (packet, label) in [
+        (quest_end_reply(THIEVERY), "a replayed 49/14"),
+        (quest_reply(THIEVERY, true), "a replayed 49/2"),
+    ] {
+        let out = send(&mut paying, &packet, session.now + 500);
+        assert!(!out.state_changed, "{label} changed the character");
+        assert_eq!(
+            (typed_state(&paying), saved_bytes(&paying)),
+            finished,
+            "{label} changed the typed state or the save bytes"
+        );
+    }
+}
+
+/// The pending end screen, counters and completion live in the save; the reward
+/// is applied once by the `quest:<character>:<quest>` key at 49/14.
+#[test]
+fn progress_survives_a_reload_and_a_replay_pays_nothing() {
+    let fixture = Fixture::new();
+    let file = battles();
+    let row = battle(&file, THUGAMUG);
+    let mut session = fixture.quest_session(geoffrey_position(), 3_006, &[]);
+    session.arm();
+    session.complete_missing_sisters();
+    session.offer(GEOFFREY, THIEVERY);
+    session.accept(THIEVERY);
+    session.win_bridge_battle(row);
+    session.walk(geoffrey_position());
+    let end = session.open_end_screen(THIEVERY, END_TEXT);
+    assert_eq!(u32_at(&end, 27), QUEST_COINS);
+    assert_eq!(u32_at(&end, 31), QUEST_XP);
+    let coins_before = session.coins();
+    let xp_before = session.xp(ADVENTURER);
+    let counts_before = session.counts(THIEVERY);
+
+    // Reconnect with the end screen still pending: the saved quest state,
+    // counters and wallet survive unchanged.
+    let mut restored = reopen(
+        &fixture,
+        &session.gateway,
+        "pending.json",
+        session.now + 100,
+    );
+    assert_eq!(quest_status(&restored, THIEVERY), QuestStatus::Active);
+    assert_eq!(quest_counts(&restored, THIEVERY), counts_before);
+    assert_eq!(pending_turnin(&restored), Some(THIEVERY));
+    assert_eq!(wallet(&restored), coins_before);
+    assert_eq!(profile_xp(&restored, ADVENTURER), xp_before);
+
+    // The 49/14 settles the pending screen after the reconnect and pays once.
+    let paid = send(&mut restored, &quest_end_reply(THIEVERY), session.now + 200);
+    assert!(paid.state_changed);
+    assert_eq!(wallet(&restored), coins_before + QUEST_COINS);
+    assert_eq!(profile_xp(&restored, ADVENTURER), xp_before + QUEST_XP);
+    assert_eq!(quest_status(&restored, THIEVERY), QuestStatus::Completed);
+    assert_eq!(quest_counts(&restored, THIEVERY), counts_before);
+    assert_eq!(pending_turnin(&restored), None);
+    let finished = (typed_state(&restored), saved_bytes(&restored));
+
+    // Reload the completed save and replay both old replies: nothing changes.
+    let mut replayed = reopen(&fixture, &restored, "completed.json", session.now + 300);
+    assert_eq!(quest_status(&replayed, THIEVERY), QuestStatus::Completed);
+    assert_eq!(wallet(&replayed), wallet(&restored));
+    assert_eq!(
+        profile_xp(&replayed, ADVENTURER),
+        profile_xp(&restored, ADVENTURER)
+    );
+    let reloaded = (typed_state(&replayed), saved_bytes(&replayed));
+    for (packet, label) in [
+        (quest_end_reply(THIEVERY), "a post-relog 49/14"),
+        (quest_reply(THIEVERY, true), "a post-relog 49/2"),
+    ] {
+        let out = send(&mut replayed, &packet, session.now + 400);
+        assert!(!out.state_changed, "{label} changed the character");
+        assert_eq!(
+            (typed_state(&replayed), saved_bytes(&replayed)),
+            reloaded,
+            "{label} changed the typed state or the save bytes"
+        );
+    }
+    assert_eq!(
+        (typed_state(&restored), saved_bytes(&restored)),
+        finished,
+        "the second session's replay changed the paid save"
+    );
+}
+
+/// Two adventurers own their chapter state, battle instance and reward. One
+/// player's win or refusal never credits, pays or saves the other.
+#[test]
+fn two_adventurers_do_not_share_the_chapter() {
+    let fixture = Fixture::new();
+    let file = battles();
+    let row = battle(&file, THUGAMUG);
+    let at = geoffrey_position();
+    let mut a = fixture.quest_session(at, 3_007, &[]);
+    let mut b = fixture.quest_session(at, 3_008, &[]);
+    for session in [&mut a, &mut b] {
+        session.arm();
+        session.complete_missing_sisters();
+        session.offer(GEOFFREY, THIEVERY);
+        session.accept(THIEVERY);
+    }
+
+    // A runs its own arena. B's chapter, wallet and save never move.
+    let b_before_fight = b.capture();
+    a.win_bridge_battle(row);
+    assert_eq!(a.counts(THIEVERY), [1, 0]);
+    assert_eq!(b.capture(), b_before_fight, "A's battle changed B");
+    assert_eq!(b.counts(THIEVERY), [0, 0]);
+    assert_eq!(b.status(THIEVERY), QuestStatus::Active);
+
+    // A turns in; only A is paid.
+    let a_coins = a.coins();
+    let b_coins = b.coins();
+    a.walk(at);
+    a.open_end_screen(THIEVERY, END_TEXT);
+    a.finish_quest(THIEVERY, ADVENTURER, QUEST_COINS, QUEST_XP);
+    assert_eq!(a.coins(), a_coins + QUEST_COINS);
+    assert_eq!(a.status(THIEVERY), QuestStatus::Completed);
+    assert_eq!(b.coins(), b_coins, "A's turn-in paid B");
+    assert_eq!(b.status(THIEVERY), QuestStatus::Active);
+    assert_eq!(b.capture(), b_before_fight, "A's turn-in changed B's save");
+    let a_paid = a.capture();
+
+    // B's own battle and turn-in pay B exactly once; A stays untouched.
+    b.win_bridge_battle(row);
+    assert_eq!(b.counts(THIEVERY), [1, 0]);
+    assert_eq!(a.capture(), a_paid, "B's battle changed A's paid save");
+    let b_coins = b.coins();
+    b.walk(at);
+    b.open_end_screen(THIEVERY, END_TEXT);
+    b.finish_quest(THIEVERY, ADVENTURER, QUEST_COINS, QUEST_XP);
+    assert_eq!(b.coins(), b_coins + QUEST_COINS);
+    assert_eq!(b.status(THIEVERY), QuestStatus::Completed);
+    assert_eq!(a.capture(), a_paid, "B's turn-in changed A's paid save");
+
+    // A refused request for A (a replayed turn-in and a forged accept) is its own
+    // no-op; B's completed save stays byte-identical.
+    let b_paid = b.capture();
+    a.assert_unchanged(&quest_end_reply(THIEVERY), "A's replayed 49/14");
+    a.assert_unchanged(&quest_reply(THIEVERY, true), "A's forged 49/2");
+    assert_eq!(a.capture(), a_paid);
+    assert_eq!(b.capture(), b_paid, "A's refusals changed B's save");
+}
+
+/// The record, its text ids, Geoffrey's drawable spawn, the battle row and the
+/// reward profile all resolve to the ids the runtime offer and end screen used.
+#[test]
+fn the_chapter_text_giver_battle_and_reward_resolve() {
+    // The record: one prerequisite, two ordered steps and one reward row.
+    let adventurer = read_json(&content_dir().join("quests/adventurer.json"));
+    let record = adventurer["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|record| record["id"].as_u64() == Some(u64::from(THIEVERY)))
+        .expect("the 3000032 record");
+    assert_eq!(record["enabled"], true);
+    assert_eq!(record["title_string_id"], json!(TITLE));
+    assert_eq!(record["description_string_id"], json!(DESCRIPTION));
+    assert_eq!(record["intro_text_string_id"], json!(INTRO_TEXT));
+    assert_eq!(record["end_text_string_id"], json!(END_TEXT));
+    assert_eq!(record["giver_npc_id"], json!(GEOFFREY));
+    assert_eq!(record["prerequisite_quest_ids"], json!([MISSING_SISTERS]));
+    assert!(record.get("job").is_none(), "the chapter has no job gate");
+    let objectives = record["objectives"].as_array().unwrap();
+    assert_eq!(objectives.len(), 2);
+    assert_eq!(objectives[0]["kind"], json!("complete_dungeon"));
+    assert_eq!(objectives[0]["id"], json!(1));
+    assert_eq!(objectives[0]["encounter_id"], json!(THUGAMUG));
+    assert_eq!(objectives[1]["kind"], json!("talk_to_npc"));
+    assert_eq!(objectives[1]["id"], json!(2));
+    assert_eq!(objectives[1]["npc_id"], json!(GEOFFREY));
+    for objective in objectives {
+        assert!(
+            objective["source"]
+                .as_array()
+                .is_some_and(|source| !source.is_empty()),
+            "every objective carries provenance"
+        );
+    }
+    let rewards = record["rewards"].as_array().unwrap();
+    assert_eq!(rewards.len(), 1);
+    assert_eq!(rewards[0]["coins"], json!(QUEST_COINS));
+    assert_eq!(rewards[0]["items"], json!([]));
+    assert_eq!(rewards[0]["job_xp"], json!({"1": QUEST_XP}));
+    assert!(
+        record["source"].as_array().unwrap().iter().any(|tag| {
+            tag["kind"] == "reconstructed"
+                && tag["evidence"]
+                    .as_str()
+                    .is_some_and(|text| text.starts_with("(R) T330:"))
+        }),
+        "the record carries its (R) decision"
+    );
+
+    // The skipped middle records stay disabled and hollow.
+    for disabled in [3_000_030u32, 3_000_031] {
+        let row = adventurer["records"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|record| record["id"].as_u64() == Some(u64::from(disabled)))
+            .unwrap_or_else(|| panic!("the {disabled} record"));
+        assert_eq!(row["enabled"], false, "{disabled} must stay disabled");
+        assert_eq!(row["objectives"], json!([]));
+        assert_eq!(row["rewards"], json!([]));
+    }
+
+    // The engine resolves the same ids, and the 49/13 packet carries the bundle.
+    let engine =
+        QuestEngine::from_split_content(&content_dir(), 1, CharacterEligibility::default(), None)
+            .expect("the split catalogue loads");
+    assert!(engine.is_enabled(THIEVERY));
+    assert_eq!(engine.giver_npc_id(THIEVERY), Some(GEOFFREY));
+    assert_eq!(engine.title_string_id(THIEVERY), Some(TITLE));
+    assert_eq!(engine.description_string_id(THIEVERY), Some(DESCRIPTION));
+    assert_eq!(engine.intro_text_string_id(THIEVERY), Some(INTRO_TEXT));
+    assert_eq!(engine.end_text_string_id(THIEVERY), Some(END_TEXT));
+    let end = engine.quest_end_packet(THIEVERY, GEOFFREY).unwrap();
+    assert_eq!(end.len(), 99);
+    assert_eq!(u32_at(&end, 14), THIEVERY);
+    assert_eq!(u32_at(&end, 18), END_TEXT);
+    assert_eq!(u32_at(&end, 27), QUEST_COINS);
+    assert_eq!(u32_at(&end, 31), QUEST_XP);
+
+    // The reward profile is the Adventurer job that lists the chapter.
+    let jobs = read_json(&content_dir().join("jobs.json"));
+    let adventurer_job = jobs["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|job| job["profile_id"].as_i64() == Some(i64::from(ADVENTURER)))
+        .expect("the Adventurer job profile");
+    assert_eq!(adventurer_job["id"], json!("adventurer"));
+    assert!(
+        adventurer_job["quest_ids"]
+            .as_array()
+            .unwrap()
+            .contains(&json!(THIEVERY)),
+        "the Adventurer job lists the chapter"
+    );
+
+    // Geoffrey's drawable actor is the extra spawn with the same content key the
+    // quest names; the Sanctuary row alone is not a drawable placement.
+    let npc = read_json(&content_dir().join("npcs/sanctuary.json"));
+    let npc_row = npc["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["npc_id"].as_u64() == Some(GEOFFREY))
+        .expect("the Geoffrey NPC row");
+    assert_eq!(npc_row["placement"], json!("unanchored"));
+    let spawn = read_json(&content_dir().join("npc_spawns_extra.json"));
+    let spawn_row = spawn["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["spawn_guid"].as_u64() == Some(GEOFFREY))
+        .expect("Geoffrey's drawable extra spawn");
+    assert_eq!(spawn_row["content_key"], json!(GEOFFREY));
+    assert_eq!(spawn_row["model_id"], json!(GEOFFREY_MODEL));
+    assert_eq!(spawn_row["name_string_id"], json!(GEOFFREY_NAME_ID));
+    assert_eq!(
+        position(&spawn_row["position"]),
+        position(&npc_row["position"])
+    );
+    let mut visibility = world::NpcVisibility::load(&content_dir()).unwrap();
+    let drawn = visibility
+        .update(0, geoffrey_position())
+        .unwrap()
+        .iter()
+        .filter_map(|packet| startup_world::parse_add_npc(packet).ok())
+        .find(|npc| npc.actor_id == GEOFFREY)
+        .expect("Geoffrey's AddNpc for a nearby viewer");
+    assert_eq!(drawn.model_id, GEOFFREY_MODEL);
+    assert_eq!(drawn.name_string_id, GEOFFREY_NAME_ID as i32);
+
+    // The battle row the chapter credits: same title, description and goal,
+    // level 5, three enemies and the arena the runtime Go enters.
+    let file = battles();
+    let row = battle(&file, THUGAMUG);
+    assert_eq!(u32_field(row, "title_id"), TITLE);
+    assert_eq!(u32_field(row, "description_id"), DESCRIPTION);
+    assert_eq!(u32_field(row, "objective_id"), OBJECTIVE);
+    assert_eq!(u32_field(row, "required_combat_level"), REQUIRED_LEVEL);
+    assert_eq!(u32_field(&row["zone"], "zone_id"), 9600);
+    assert_eq!(row["enemies"].as_array().unwrap().len(), 3);
 }

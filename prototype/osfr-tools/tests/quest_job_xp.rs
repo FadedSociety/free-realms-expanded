@@ -1003,7 +1003,7 @@ fn content_overflow_is_rejected_at_load() {
 fn configured_job_xp_and_job_gates_match_the_task_table() {
     let content = content_dir();
     // (file, quest id, giver, prerequisites, reward coins, job gate, profile, XP)
-    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 16] = [
+    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 17] = [
         (
             "adventurer.json",
             INTRODUCE_YOURSELF,
@@ -1163,6 +1163,19 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             ADVENTURER,
             25,
         ),
+        // T330: the chapter after T279's playable 3000029. The disabled middle
+        // records are skipped, so its only prerequisite is the playable chapter;
+        // it keeps T277's 13-coin chapter rung and pays explicit profile 1.
+        (
+            "adventurer.json",
+            3_000_032,
+            GEOFFREY,
+            &[3_000_029],
+            13,
+            None,
+            ADVENTURER,
+            25,
+        ),
     ];
 
     let mut listed = BTreeSet::new();
@@ -1176,6 +1189,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_000_009 | 3_000_016 => "(R) T241:",
             3_000_024 => "(R) T277:",
             3_000_029 => "(R) T279:",
+            3_000_032 => "(R) T330:",
             _ => "",
         };
         source.as_array().is_some_and(|tags| {

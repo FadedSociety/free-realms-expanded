@@ -2523,10 +2523,59 @@
       "title_string_id": 90703,
       "giver_npc_id": 9000000330,
       "prerequisite_quest_ids": [
-        3000031
+        3000029
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "complete_dungeon",
+          "id": 1,
+          "encounter_id": 12340,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E4 goal 'Defeat Thugamug and his two Hands' (client 1298108787); the video tracker reads 'Defeat Thugamug' (db53WZqLX58/00048)."
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "data/content/field_battles.json row 12340 (T282): title 90703, description 90704, goal 90715, difficulty 3, required combat level 5, three enemies (Thugamug guid 100001234001 plus two Hands 100001234002-3) and arena zone 9600. The chapter's goal text is that battle's recovered objective text."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T330: the retail boss encounter 144 has no playable reconstruction; the authored T282 bridge battle 12340 is the chapter's dungeon step and one terminal win credits it."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000330,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md row E4: the video tracker reads 'Return to Geoffrey in the Royal Palace' (client 1212212727); the giver is NPC 9000000330 and its 49/13 end text 90705 returns the player to the Royal Palace."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T330: the final step is an ordinary talk_to_npc to the giver, the same shape as T279's 3000029 hand-in."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 13,
+          "items": [],
+          "job_xp": {
+            "1": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T330: the guide gives no amount; 13 coins reuse T277's Local Hero chapter rung and 25 Adventurer (profile 1) XP uses the local 25-XP step scale. No free item is granted, and the explicit map pays profile 1 even when another job is active."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2550,10 +2599,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -2562,17 +2607,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T330: ENABLED as the third playtest story beat after 3000029. The retail order E1 -> E2 -> E3 -> E4 skips the disabled/hollow 3000030 and 3000031 instead of enabling them, so the prerequisite points at the playable T279 record 3000029. All ids, text and the battle are existing content; this record adds no NPC, spawn, item, reward row, selector or save field."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T330: no job gate. The guide's video is an Adventurer, but T277/T279 keep the story open to every active job; the explicit reward map still pays Adventurer profile 1."
         }
       ],
       "description_string_id": 90704,
       "intro_text_string_id": 90702,
       "end_text_string_id": 90705,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000033,
