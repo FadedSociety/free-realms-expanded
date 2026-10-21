@@ -1,3 +1,6 @@
+#[path = "support/models.rs"]
+mod models;
+
 use serde_json::Value;
 use std::{
     collections::{HashMap, HashSet},
@@ -74,25 +77,7 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // The client's own model table is the authority on which `.adr` a model id draws:
     // a row whose file name is shipped but whose model_id points at another body must
     // fail here, not in the client.
-    let models_text =
-        fs::read_to_string(lab_root.join("working/OSFR.Client/OSFR Client/Resources/Models.txt"))
-            .unwrap();
-    let mut models: HashMap<u64, HashSet<String>> = HashMap::new();
-    for line in models_text.lines() {
-        if line.is_empty() || line.starts_with('#') {
-            continue;
-        }
-        let fields: Vec<_> = line.split('^').collect();
-        let Ok(id) = fields[0].parse::<u64>() else {
-            continue;
-        };
-        if let Some(name) = fields.get(1) {
-            models
-                .entry(id)
-                .or_default()
-                .insert(name.trim().to_ascii_lowercase());
-        }
-    }
+    let models = models::read_models();
 
     let capture_doc = read_json(&lab_root.join("content/startup-snapshot/startup.json"));
     let captures: HashMap<u64, &Value> = capture_doc["world"]["npc_spawns"]
@@ -162,9 +147,10 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
         );
         let model_id = row["model_id"].as_u64().unwrap();
         let model_file_key = model_file.trim().to_ascii_lowercase();
+        let model_key = i64::try_from(model_id).expect("model id fits a signed table id");
         assert!(
             models
-                .get(&model_id)
+                .get(&model_key)
                 .is_some_and(|names| names.contains(&model_file_key)),
             "{owner}: Models.txt does not map model {model_id} to {model_file:?}"
         );

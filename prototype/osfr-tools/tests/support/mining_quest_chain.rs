@@ -192,7 +192,8 @@ impl Fixture {
         self.game_with_state(state)
     }
 
-    /// The production save envelope, not a `GameplayState` proxy.
+    /// The production save envelope, not a `GameplayState` proxy. Reload under the same
+    /// character id the session used, not the fixture's default character.
     pub fn save_and_reload(&self, game: &Gameplay, character: &CharacterState) -> Gameplay {
         let path = self.path().join("character.json");
         let snapshot = game_store::Snapshot {
@@ -203,7 +204,7 @@ impl Fixture {
         let loaded =
             game_store::load_or_create(&path, character.clone()).expect("the envelope loads");
         assert_eq!(loaded.character, *character);
-        self.0.game_as(CHARACTER, loaded.gameplay)
+        self.0.game_as(character.guid, loaded.gameplay)
     }
 }
 
@@ -277,8 +278,9 @@ pub fn copper_ore(game: &Gameplay) -> u32 {
         .sum()
 }
 
-// Client 39/5 RequestStartGame writes subtype, current instance and two -1 words;
-// 39/14 SendMiniGameFlashPayload carries the movie's NUL-terminated text.
+// Client 39/5 RequestStartGame 0x009be7d0 -> writer 0x009bdc60, which builds the family
+// header as (subtype, current instance, -1, -1). 39/14 SendMiniGameFlashPayload 0x009be6b0
+// -> constructor 0x009b09d0 carries the movie's NUL-terminated text.
 pub fn type8_frame(sub: u8, instance: i32) -> Vec<u8> {
     let mut packet = vec![39, 0, sub];
     packet.extend(instance.to_le_bytes());

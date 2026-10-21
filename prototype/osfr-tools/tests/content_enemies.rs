@@ -1,3 +1,6 @@
+#[path = "support/models.rs"]
+mod models;
+
 use osfr_tools::enemies::EnemyEngine;
 use serde_json::Value;
 use std::{
@@ -60,21 +63,7 @@ fn enemy_definitions_load_and_model_assets_match_client_tables() {
         })
         .collect();
 
-    let mut models: HashMap<i64, HashSet<String>> = HashMap::new();
-    let model_text =
-        fs::read_to_string(lab.join("working/OSFR.Client/OSFR Client/Resources/Models.txt"))
-            .unwrap();
-    for line in model_text.lines() {
-        if line.is_empty() || line.starts_with('#') {
-            continue;
-        }
-        let fields: Vec<_> = line.split('^').collect();
-        let Ok(id) = fields[0].parse::<i64>() else {
-            continue;
-        };
-        assert!(fields.len() > 1, "Models.txt row for {id} has no filename");
-        models.entry(id).or_default().insert(fields[1].to_owned());
-    }
+    let models = models::read_models();
 
     let catalog = fs::read_to_string(lab.join("extracted/client-assets/catalog.tsv")).unwrap();
     let asset_names: HashSet<_> = catalog
@@ -114,7 +103,7 @@ fn enemy_definitions_load_and_model_assets_match_client_tables() {
         assert!(
             models
                 .get(&model_id)
-                .is_some_and(|names| names.contains(adr)),
+                .is_some_and(|names| names.contains(&adr.to_ascii_lowercase())),
             "Models.txt has no {model_id} -> {adr} mapping"
         );
         assert!(binding["models_txt"]["line"].as_u64().unwrap() > 0);

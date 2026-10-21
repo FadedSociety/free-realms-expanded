@@ -585,13 +585,14 @@ fn two_miners_progress_independently() {
     let mut a = fixture.game_as(FIRST, MINER, &[ADVENTURER, MINER, BRAWLER]);
     let mut b = fixture.game_as(SECOND, MINER, &[ADVENTURER, MINER, BRAWLER]);
 
-    // A's offer is its own; B keeps a free menu and its own offer. B's out-of-range click
-    // is a refusal that consumes neither A's pending offer nor B's own menu.
+    // A's offer is its own and B has no pending offer yet. B's out-of-range click is a
+    // refusal that consumes neither A's pending offer nor either session's state.
     offer(&mut a, &first, THERIN, MINER_FIRST, 1_000);
     assert_eq!(pending_offer(&a), Some(MINER_FIRST));
-    assert_eq!(pending_offer(&b), None, "A's offer consumed B's menu");
+    assert_eq!(pending_offer(&b), None, "A's offer created B's offer");
     let far = character_at_for(SECOND, 0, [10_000.0, 0.0, 10_000.0]);
-    let b_before = saved(&b);
+    let a_range_before = saved(&a);
+    let b_range_before = saved(&b);
     assert!(
         b.handle_in_world(&npc_interact(THERIN), &far, 1_005)
             .is_err(),
@@ -602,7 +603,8 @@ fn two_miners_progress_independently() {
         Some(MINER_FIRST),
         "B's refusal consumed A's pending offer"
     );
-    assert_eq!(saved(&b), b_before, "B's refusal changed B's state");
+    assert_eq!(saved(&a), a_range_before, "B's refusal changed A's state");
+    assert_eq!(saved(&b), b_range_before, "B's refusal changed B's state");
     offer(&mut b, &second, THERIN, MINER_FIRST, 1_010);
     accept(&mut a, &first, MINER_FIRST, 1_100);
     accept(&mut b, &second, MINER_FIRST, 1_100);
@@ -640,6 +642,20 @@ fn two_miners_progress_independently() {
     );
     assert_eq!(saved(&a), a_before);
     assert_eq!(saved(&b), b_pending_before);
+
+    // B's held turn-in survives a reconnect saved under B's own character id; the fixture
+    // default is a different character, so a reconnect bound to the wrong id would fail.
+    b = fixture.save_and_reload(&b, &second);
+    assert_eq!(
+        pending_turnin(&b),
+        Some(MINER_FIRST),
+        "B's held end screen survives the reconnect"
+    );
+    assert_eq!(
+        saved(&b),
+        b_pending_before,
+        "the reconnect changed B's save"
+    );
 
     finish_quest(&mut b, &second, MINER_FIRST, MINER, 5, 15, now + 200);
     let end_a = open_end_screen(&mut a, &first, THERIN, MINER_FIRST, END_TEXT, now + 300);
@@ -775,7 +791,10 @@ fn therin_is_drawable_and_the_quest_content_resolves() {
     assert_eq!(therin_npc["position"], therin_row["position"]);
 
     // The production per-session visibility batch draws the one shared actor for two
-    // independent nearby sessions.
+    // independent nearby sessions. Static NPCs are not server-broadcast: each session's
+    // gateway calls this same method for its own character (`gateway.rs` Event::Loaded and
+    // movement), so two Gameplay sessions are the production input. The osfr-gateway
+    // session loop and the shared-field NPC fanout are not exercised by this content test.
     const FIRST_VIEWER: u64 = 300_011;
     const SECOND_VIEWER: u64 = 300_012;
     let fixture = Fixture::new();
