@@ -2,21 +2,32 @@
 //!
 //! Test-only: the fixture is built under `CARGO_TARGET_TMPDIR` and removed on
 //! drop, so the shipped tree is never touched. The audit loads it through the
-//! production `QuestEngine::from_split_content` and `world::NpcVisibility::load`;
-//! this module only writes the minimal authored rows those loaders need.
+//! production `QuestEngine::from_split_content`, `world::NpcVisibility::load`,
+//! `Inventory::load`, `RecipeCatalog::load_runtime` and
+//! `activity_portal::Catalogue::load`; this module only writes the minimal
+//! authored rows those loaders need, one resolving row per graded kind.
+
+#[path = "../common/item_catalogue.rs"]
+mod item_catalogue;
 
 use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
 use std::{
     fs,
     path::{Path, PathBuf},
 };
 
 pub const FIXTURE_DEFECT: u32 = 9_100_002;
+pub const FIXTURE_QUEST: u32 = 9_100_001;
+pub const FIXTURE_ITEM: i32 = 9_100_100;
+pub const FIXTURE_RECIPE: u32 = 9_100_101;
+pub const FIXTURE_BATTLE: u32 = 9_100_200;
+/// The documented local opening drop key (`Gameplay::local_gather_drop`).
+pub const FIXTURE_GATHER_RESOURCE: u32 = 1_001;
 const FIXTURE_GIVER: u64 = 9_000_100_001;
 const FIXTURE_TARGET: u64 = 9_000_100_002;
 const FIXTURE_MISSING_GIVER: u64 = 9_000_100_099;
 const FIXTURE_MISSING_PREREQUISITE: u32 = 4_000_100_098;
-const FIXTURE_QUEST: u32 = 9_100_001;
 const FIXTURE_BLOCKER: u32 = 9_100_003;
 const FIXTURE_TITLE: u32 = 700_001;
 
@@ -101,8 +112,136 @@ fn fixture_visit_objective(position: [f64; 3], radius: f64) -> Value {
     }])
 }
 
+/// One resolving target per graded kind: the item catalogue, recipe book, chess
+/// constant, battle set and local gather-drop list this fixture writes.
+fn fixture_objectives() -> Value {
+    json!([
+        {
+            "kind": "talk_to_npc",
+            "id": 1,
+            "npc_id": FIXTURE_TARGET,
+            "source": fixture_source(),
+        },
+        {
+            "kind": "collect_item",
+            "id": 2,
+            "item_id": FIXTURE_ITEM,
+            "quantity": 1,
+            "source": fixture_source(),
+        },
+        {
+            "kind": "equip_item",
+            "id": 3,
+            "definition_id": FIXTURE_ITEM,
+            "source": fixture_source(),
+        },
+        {
+            "kind": "craft_recipe",
+            "id": 4,
+            "recipe_id": FIXTURE_RECIPE,
+            "quantity": 1,
+            "source": fixture_source(),
+        },
+        {
+            "kind": "finish_minigame",
+            "id": 5,
+            "minigame_id": osfr_tools::chess::GAME_ID as u32,
+            "count": 1,
+            "source": fixture_source(),
+        },
+        {
+            "kind": "complete_dungeon",
+            "id": 6,
+            "encounter_id": FIXTURE_BATTLE,
+            "source": fixture_source(),
+        },
+        {
+            "kind": "gather_resource",
+            "id": 7,
+            "resource_id": FIXTURE_GATHER_RESOURCE,
+            "quantity": 1,
+            "source": fixture_source(),
+        },
+    ])
+}
+
 fn fixture_reward() -> Value {
     json!([{"coins": 5, "items": [], "job_xp": {"4": 5}, "source": fixture_source()}])
+}
+
+/// The minimal valid merged inventory catalogue: no state rows, no inventory
+/// definitions, and one `item-catalogue.json` row for each target definition.
+fn fixture_inventory() -> Value {
+    let empty = format!("{:x}", Sha256::digest(0i32.to_le_bytes()));
+    let span = |kind: &str, offset: usize, profile_id: i32| {
+        json!({
+            "kind": kind,
+            "offset": offset,
+            "length": 4,
+            "profile_id": profile_id,
+            "sha256": empty.as_str(),
+        })
+    };
+    json!({
+        "schema_version": 1,
+        "player_guid": 1,
+        "default_state": {"coins": 0, "items": [], "equipment": []},
+        "profiles": [{"id": 1, "allowed_classes": [1], "slots": []}],
+        "spans": [
+            span("coins", 13, 0),
+            span("equipment", 17, 1),
+            span("items", 21, 0),
+        ],
+        "definitions": [],
+    })
+}
+
+fn fixture_recipe_book() -> Value {
+    let source = || json!({"kind": "reconstructed", "evidence": "(R) T358 scratch recipe"});
+    let mut fields = serde_json::Map::new();
+    for field in [
+        "key",
+        "name",
+        "recipe_id",
+        "job",
+        "job_profile_id",
+        "minigame_type_id",
+        "experience_points",
+        "output.definition_id",
+        "output.count",
+        "ingredients[0].definition_id",
+        "ingredients[0].count",
+    ] {
+        fields.insert(field.into(), source());
+    }
+    json!({
+        "schema_version": 1,
+        "records": [{
+            "key": "fixture.recipe",
+            "name": "Fixture Recipe",
+            "recipe_id": FIXTURE_RECIPE,
+            "job": "chef",
+            "job_profile_id": 45,
+            "minigame_type_id": 1,
+            "ingredients": [{"definition_id": FIXTURE_ITEM, "count": 1}],
+            "output": {"definition_id": FIXTURE_RECIPE, "count": 1},
+            "experience_points": 0,
+            "field_sources": fields,
+            "source": [source()],
+        }],
+    })
+}
+
+fn fixture_field_battles() -> Value {
+    json!({
+        "schema_version": 1,
+        "battles": [{
+            "id": FIXTURE_BATTLE,
+            "title_id": 1,
+            "description_id": 2,
+            "difficulty": 1,
+        }],
+    })
 }
 
 fn fixture_npc(npc_id: u64, name: &str, name_string_id: u32, model_id: u32, x: f64) -> Value {
@@ -136,7 +275,7 @@ pub fn fixture(name: &str, defect: Defect) -> Scratch {
         FIXTURE_QUEST,
         FIXTURE_TITLE,
         FIXTURE_GIVER,
-        fixture_talk_objective(),
+        fixture_objectives(),
         fixture_reward(),
         json!([]),
     )];
@@ -247,6 +386,16 @@ pub fn fixture(name: &str, defect: Defect) -> Scratch {
     );
     write_json(&root.join("npc_spawns_extra.json"), &json!({"records": []}));
     write_json(&root.join("jobs.json"), &jobs);
+    write_json(&root.join("inventory.json"), &fixture_inventory());
+    item_catalogue::write(
+        root,
+        &[
+            item_catalogue::sized_row(FIXTURE_ITEM as u32, 8),
+            item_catalogue::sized_row(FIXTURE_RECIPE, 8),
+        ],
+    );
+    write_json(&root.join("recipes.json"), &fixture_recipe_book());
+    write_json(&root.join("field_battles.json"), &fixture_field_battles());
     write_json(
         &root.join("quests/fixture.json"),
         &json!({"schema_version": 1, "records": quests}),
