@@ -6,7 +6,8 @@
 //! the ordinary Type8 mining round. Both are offered by Cleetus Farnum (9000000050) and
 //! turned in through the real 26/8 -> 26/10 -> 26/6 -> 49/13 -> 49/14 sequence. The
 //! shared fixture, packet builders and refusal/offer helpers come from
-//! `tests/support/npc_quest_chain.rs`.
+//! `tests/support/npc_quest_chain.rs`; the synthetic one-goal board and the node/win
+//! helpers come from `tests/support/mining_quest_chain.rs`, shared with T300.
 //!
 //! Client packet layouts used here (IDA native map):
 //! - 26/8 CommandPacketInteractRequest constructor `008b6bc0`: two u32 target words and a
@@ -27,27 +28,26 @@
 //!   packet constructor `008b3840`): u16 flag at 4..6, then the actor u64 at 6..14. The
 //!   hostile test reads it to prove the wolf died.
 
+#[path = "support/mining_quest_chain.rs"]
+mod mining_quest_chain;
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
 
+use mining_quest_chain::{
+    COPPER_ORE, Fixture, MINING_XP_PER_WIN, active_mining, assert_offer_ids, copper_nodes,
+    copper_ore, gather_copper, offer_packet, open_end_screen, signed_word, type8_frame,
+    type8_payload, word,
+};
 use npc_quest_chain::{
-    CHARACTER, Fixture as ChainFixture, accept, active_job, assert_no_offer,
-    assert_packet_changes_nothing, character_at_for, coins, content_dir, content_position, counts,
-    finish_quest, has_family, npc_interact, npc_select, offer, profile_xp,
-    quest_end_reply as npc_quest_end_reply, quest_reply as npc_quest_reply, quest_status,
-    read_json, release_end_screen, saved, select_job, send, talk,
+    CHARACTER, accept, active_job, assert_no_offer, assert_packet_changes_nothing,
+    character_at_for, coins, content_dir, content_position, counts, finish_quest, has_family,
+    npc_interact, npc_select, offer, profile_xp, quest_end_reply as npc_quest_end_reply,
+    quest_reply as npc_quest_reply, quest_status, read_json, saved, select_job, send,
 };
 use osfr_tools::{
-    character_store::CharacterState,
-    game_store,
-    gameplay::{Gameplay, Outcome},
-    harvest_nodes::GatheringNodes,
-    mining::{self, Type8BoardSpec, Type8Goal, Type8Kind, Type8Output},
-    profiles::ProfileState,
-    quest_engine::QuestStatus,
+    character_store::CharacterState, gameplay::Gameplay, mining, quest_engine::QuestStatus,
 };
 use serde_json::{Value, json};
-use std::{collections::BTreeMap, fs, path::Path};
 
 const CLEETUS: u64 = 9_000_000_050;
 /// A placed quest giver who gives neither live Farnum quest (wrong-NPC refusal).
@@ -63,8 +63,6 @@ const YOUR_FIRST_WEAPON: u32 = 3_000_008;
 const UNTOUCHED_RECORD: u32 = 3_000_020;
 const UNTOUCHED_TITLE: u32 = 94_247;
 const WOLF_DEFINITION: u32 = 3_156;
-/// (R) The live copper-vein node emits the mined item definition, Copper Ore 2739.
-const COPPER_ORE: u32 = 2_739;
 const FIGHTING_TITLE: u32 = 4_420_074;
 const FIGHTING_INTRO: u32 = 4_420_073;
 const FIGHTING_DESCRIPTION: u32 = 4_420_075;
@@ -74,135 +72,10 @@ const COPPER_INTRO: u32 = 5_100_482;
 const COPPER_DESCRIPTION: u32 = 5_100_484;
 const COPPER_END_TEXT: u32 = 5_100_485;
 const ATTACK_CHOICE: i32 = 103;
-const MINING_XP_PER_WIN: u32 = mining::lifecycle::RECONSTRUCTED_MINER_XP_PER_WIN;
 /// 39/6 Quit: leave the offered run without a payout.
 const QUIT_FRAME_SUB: u8 = 6;
-/// 26/42 closes the mining results window; the paid node hides on the next tick.
-const CLOSE_GAME: [u8; 4] = [26, 0, 42, 0];
 /// The authored `starting_farnum_wolves` group respawn timer.
 const WOLF_RESPAWN_MS: u64 = 46_000;
-
-/// One-goal Mining18 stand-in so a gather is exactly one Copper Ore. The board is the
-/// established synthetic W140/W171 fixture; node entry, payout and the quest event are the
-/// production path. Limitation: the shipped `mining.json` pays a multi-ore batch per win
-/// and needs six quota clusters in each of its two goals, so five separate single-ore
-/// gathers cannot be counted on it. This suite therefore proves the 2739 binding on a
-/// synthetic board; the shipped board's own 2739 output is pinned in
-/// `the_two_new_records_load_and_their_targets_exist`, and
-/// `gameplay::t013_objective_events` drives the same production apply path.
-fn synthetic_mining() -> Value {
-    const LEFT: usize = 3;
-    const TOP: usize = 3;
-    const PLAYABLE: usize = 8;
-    const BOTTOM: usize = TOP + PLAYABLE - 1;
-    let side = mining::SIDE;
-    let mut shape = vec![0_i32; side * side];
-    for dy in 0..PLAYABLE {
-        for dx in 0..PLAYABLE {
-            shape[(TOP + dy) * side + LEFT + dx] = 1;
-        }
-    }
-    shape[BOTTOM * side + LEFT] = -601;
-    for x in LEFT..LEFT + PLAYABLE {
-        shape[(TOP + PLAYABLE) * side + x] = 4;
-    }
-    json!({
-        "schema_version": 1,
-        "game_id": mining::MINING_GAME_ID,
-        "profile_id": mining::MINER_PROFILE_ID,
-        "name_id": 7910,
-        "description_id": 7911,
-        "icon_id": 909,
-        "spec": Type8BoardSpec {
-            width: side,
-            height: side,
-            shape,
-            selectable: vec![401, 402, 403, 404],
-            collectable: vec![601],
-            tiles: [401, 402, 403, 404]
-                .iter()
-                .map(|value| Type8Kind {
-                    value: *value,
-                    category: 400,
-                    icon_id: i32::from(*value) - 400,
-                })
-                .chain([Type8Kind {
-                    value: 601,
-                    category: 600,
-                    icon_id: 1301,
-                }])
-                .collect(),
-            goals: vec![Type8Goal {
-                index: 0,
-                value: 601,
-                quota: 1,
-                per_reward: 1,
-                icon_id: 1301,
-            }],
-            outputs: vec![Type8Output {
-                value: 601,
-                definition_id: COPPER_ORE as i32,
-                cluster_quantity: 1,
-            }],
-            duration_seconds: 180,
-            seed: 241,
-            wildcard_percent: 0,
-            collectable_percent: 0,
-            blocker_percent: 0,
-            powerup_percent: 0,
-            meter_id: 0,
-            reconstructed_rules: true,
-            rule_notice: "Synthetic T241 fixture; original Mining18 level tables unrecovered.".into(),
-        },
-    })
-}
-
-/// The canonical opening fixture with the synthetic one-goal mining board on top.
-struct Fixture(ChainFixture);
-
-impl Fixture {
-    fn new() -> Self {
-        let fixture = ChainFixture::new();
-        fs::write(
-            fixture.path().join(mining::CONTENT_FILE),
-            synthetic_mining().to_string(),
-        )
-        .expect("synthetic mining board writes");
-        Self(fixture)
-    }
-
-    fn path(&self) -> &Path {
-        self.0.path()
-    }
-
-    fn game(&self, active: i32, unlocked: &[i32]) -> Gameplay {
-        let mut state = Gameplay::load(self.path(), None)
-            .expect("opening reference loads")
-            .state();
-        state.profiles = Some(ProfileState {
-            version: 1,
-            active,
-            unlocked: unlocked.iter().copied().collect(),
-            experience: BTreeMap::new(),
-        });
-        self.0.game_as(CHARACTER, Some(state))
-    }
-
-    /// The production save envelope, not a `GameplayState` proxy: one JSON document
-    /// holding the character and the gameplay payload, written by `game_store`.
-    fn save_and_reload(&self, game: &Gameplay, character: &CharacterState) -> Gameplay {
-        let path = self.path().join("character.json");
-        let snapshot = game_store::Snapshot {
-            character: character.clone(),
-            gameplay: Some(game.state()),
-        };
-        game_store::save(&path, &snapshot).expect("the save envelope writes");
-        let loaded =
-            game_store::load_or_create(&path, character.clone()).expect("the envelope loads");
-        assert_eq!(loaded.character, *character);
-        self.0.game_as(CHARACTER, loaded.gameplay)
-    }
-}
 
 fn cleetus_position() -> [f32; 3] {
     content_position("farnum_farmstead.json", CLEETUS)
@@ -236,29 +109,6 @@ fn wolves() -> Vec<(u64, [f32; 3])> {
         .collect()
 }
 
-fn copper_nodes() -> Vec<(u64, [f32; 3])> {
-    let nodes = GatheringNodes::load(&content_dir())
-        .expect("node content loads")
-        .expect("node content exists");
-    let mut found: Vec<_> = nodes
-        .actors()
-        .filter(|actor| actor.name == "Copper Vein")
-        .map(|actor| (actor.guid, actor.position))
-        .collect();
-    found.sort_by_key(|(guid, _)| *guid);
-    found
-}
-
-fn copper_ore(game: &Gameplay) -> u32 {
-    game.state()
-        .inventory
-        .items
-        .iter()
-        .filter(|item| item.definition_id == COPPER_ORE as i32 && item.rental.is_none())
-        .map(|item| item.count)
-        .sum()
-}
-
 fn has_quest(game: &Gameplay, quest_id: u32) -> bool {
     game.state()
         .npc_quests
@@ -268,70 +118,6 @@ fn has_quest(game: &Gameplay, quest_id: u32) -> bool {
 
 fn count(game: &Gameplay, quest_id: u32, objective: usize) -> u32 {
     counts(game, quest_id)[objective]
-}
-
-/// A Talk holds the completed quest's 49/13, and the 26/6 dialogue choice releases it;
-/// sending 26/6 alone has nothing to release.
-fn open_end_screen(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    quest_id: u32,
-    end_text: u32,
-    now: u64,
-) -> Vec<u8> {
-    let dialogue = talk(game, character, CLEETUS, now);
-    assert!(
-        !dialogue
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 13, None)),
-        "the end screen opens only after the dialogue choice"
-    );
-    release_end_screen(game, character, quest_id, CLEETUS, end_text, now + 2)
-}
-
-fn word(packet: &[u8], offset: usize) -> u32 {
-    u32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap())
-}
-
-fn signed_word(packet: &[u8], offset: usize) -> i32 {
-    i32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap())
-}
-
-// Client 39/5 RequestStartGame `009be7d0` writes subtype, current instance and two -1 words;
-// 39/14 SendMiniGameFlashPayload carries the movie's NUL-terminated text.
-fn type8_frame(sub: u8, instance: i32) -> Vec<u8> {
-    let mut packet = vec![39, 0, sub];
-    packet.extend(instance.to_le_bytes());
-    packet.extend((-1_i32).to_le_bytes());
-    packet.extend((-1_i32).to_le_bytes());
-    packet
-}
-
-fn type8_payload(instance: i32, text: &str) -> Vec<u8> {
-    let mut packet = type8_frame(14, instance);
-    packet.extend(((text.len() + 1) as i32).to_le_bytes());
-    packet.extend(text.as_bytes());
-    packet.push(0);
-    packet
-}
-
-fn offer_packet(outcome: &Outcome, quest_id: u32) -> Vec<u8> {
-    outcome
-        .replies
-        .iter()
-        .find(|packet| has_family(packet, 49, 1, Some(quest_id)))
-        .cloned()
-        .expect("49/1 quest offer")
-}
-
-/// 49/1 quest at 6, intro at 10, title at 14/18, description at 22 (`00c7b7a0`).
-fn assert_offer_ids(packet: &[u8], quest_id: u32, intro: u32, title: u32, description: u32) {
-    assert_eq!(word(packet, 6), quest_id);
-    assert_eq!(word(packet, 10), intro, "49/1 intro id");
-    assert_eq!(word(packet, 14), title, "49/1 title id");
-    assert_eq!(word(packet, 18), title, "49/1 title id (card)");
-    assert_eq!(word(packet, 22), description, "49/1 description id");
 }
 
 /// (R) Accepted gap, lead-deferred: the 49/1 card's 69-byte ClientRewardBundle
@@ -408,60 +194,6 @@ fn respawn_wolves(game: &mut Gameplay, now: &mut u64) {
     let observer = character_at([10_000.0, 0.0, 10_000.0]);
     *now += WOLF_RESPAWN_MS;
     game.tick(&observer, *now).expect("field respawn tick");
-}
-
-fn active_mining(game: &Gameplay) -> Option<i32> {
-    game.state()
-        .mining
-        .as_ref()?
-        .active
-        .as_ref()
-        .map(|run| run.instance_id)
-}
-
-fn play_mining_round(game: &mut Gameplay, character: &CharacterState, instance: i32, base: u64) {
-    for (step, packet) in [
-        type8_frame(5, instance),
-        type8_payload(instance, "OnConnectMsg"),
-        type8_payload(instance, "OnStartGameMsg"),
-        type8_payload(instance, "OnStartLevelMsg"),
-    ]
-    .iter()
-    .enumerate()
-    {
-        send(game, character, packet, base + 100 * step as u64);
-    }
-    send(
-        game,
-        character,
-        &type8_payload(instance, "OnLevelEventMsg\t50\t3\t10"),
-        base + 600,
-    );
-    send(
-        game,
-        character,
-        &type8_payload(instance, "OnNextLevelMsg"),
-        base + 700,
-    );
-}
-
-/// One ordinary copper-vein gather: click the node, play the Mining18 round, close the
-/// results, and let the tick hide the paid node.
-fn gather_copper(game: &mut Gameplay, position: [f32; 3], guid: u64, now: &mut u64) -> bool {
-    let character = character_at(position);
-    *now += 100;
-    game.tick(&character, *now).expect("node tick");
-    send(game, &character, &npc_interact(guid), *now);
-    let Some(instance) = active_mining(game) else {
-        return false;
-    };
-    *now += 100;
-    play_mining_round(game, &character, instance, *now);
-    *now += 1_000;
-    send(game, &character, &CLOSE_GAME, *now);
-    *now += 100;
-    game.tick(&character, *now).expect("node sync tick");
-    true
 }
 
 #[test]
@@ -580,6 +312,7 @@ fn fighting_the_pack_counts_five_live_wolves_and_pays_once() {
     let end = open_end_screen(
         &mut game,
         &character,
+        CLEETUS,
         FIGHTING_THE_PACK,
         FIGHTING_END_TEXT,
         now + 100,
@@ -688,7 +421,7 @@ fn copper_collection_counts_five_gathers_from_the_node_path() {
 
     for (index, (guid, position)) in nodes.iter().copied().take(4).enumerate() {
         assert!(
-            gather_copper(&mut game, position, guid, &mut now),
+            gather_copper(&mut game, &character_at(position), guid, position, &mut now).is_some(),
             "node {index} started a round"
         );
         assert_eq!(count(&game, COPPER_COLLECTION, 0), index as u32 + 1);
@@ -700,12 +433,16 @@ fn copper_collection_counts_five_gathers_from_the_node_path() {
     let (first_guid, first_position) = nodes[0];
     now += 61_000;
     game.tick(&character, now).expect("node regrow tick");
-    assert!(gather_copper(
-        &mut game,
-        first_position,
-        first_guid,
-        &mut now
-    ));
+    assert!(
+        gather_copper(
+            &mut game,
+            &character_at(first_position),
+            first_guid,
+            first_position,
+            &mut now
+        )
+        .is_some()
+    );
     assert_eq!(count(&game, COPPER_COLLECTION, 0), 5);
     assert_eq!(copper_ore(&game), 5);
 
@@ -714,6 +451,7 @@ fn copper_collection_counts_five_gathers_from_the_node_path() {
     let end = open_end_screen(
         &mut game,
         &character,
+        CLEETUS,
         COPPER_COLLECTION,
         COPPER_END_TEXT,
         now + 100,
@@ -1042,6 +780,7 @@ fn a_mid_quest_reconnect_keeps_progress_and_pays_no_extra() {
     let end = open_end_screen(
         &mut game,
         &character,
+        CLEETUS,
         FIGHTING_THE_PACK,
         FIGHTING_END_TEXT,
         now + 100,

@@ -41062,7 +41062,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+              "evidence": "(R) T300 supersedes this NPC row note: the live objectives are in quests/miner.json record 3100002 (gather Copper Ore 2739 x1, then return to Therin 9000000217)"
             },
             {
               "kind": "reconstructed",
@@ -41074,7 +41074,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+              "evidence": "(R) T300 supersedes this NPC row note: the live reward is in quests/miner.json record 3100002 (5 coins, 15 Miner profile-14 XP, no items)"
             },
             {
               "kind": "client",
