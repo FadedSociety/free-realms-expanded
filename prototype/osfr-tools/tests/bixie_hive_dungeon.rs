@@ -10,8 +10,12 @@
 //! * 41/108 Go constructor `0x008b6e70`, sender `0x00938f00` (family 108 of
 //!   the encounter packet; the sender fills the encounter and instance).
 //! * 35/2 AddNpc body reader `0x00921a10`: u64 actor id, name id, model id,
-//!   transform and nameplate. The dispatcher `0x0092f460` case 2 is 35/2.
-//! * 35/3 removal dispatcher `0x0092f460` case 3 (constructor `0x008b3840`).
+//!   transform and nameplate.
+//! * The 35-family dispatcher at `0x0092f460` is not inside a carved IDA
+//!   function (`func`/`decompile` report "not inside a function" and `disasm`
+//!   shows only the family prologue). The case 2 = 35/2 and case 3 = 35/3
+//!   mapping is the lead-reviewed `notes/Design/Shared World.md` N1-N3
+//!   (removal constructor `0x008b3840`), not re-derived by this suite.
 //! * 32/7 AttackProcessed reader `0x00a2a910`, handler `0x00a2ba40`.
 //! * 41/114 start-screen reader chain `0x009bdd70` (called by `0x00a29120`);
 //!   the field order is [title, icon, description, difficulty, profile type,
@@ -27,7 +31,10 @@
 //! disc plus 24 ring points at 15 degree steps) is terrain-covered with a
 //! finite y; maximum sampled slope 0.00 degrees; nearest field-enemy home
 //! 27.17 m (Bixie Soldier `131000102009` at `[-651.667,2.4,231.947]`); nearest
-//! other battle marker 114.6 m (battle 12301); nearest spawned NPC 183.7 m.
+//! other battle marker 114.6 m (battle 12301). The nearest visible actor from
+//! `npc_spawns_extra.json` is the Bixie Queen prop `100000002913` at
+//! `[-635.7705,2.445,247.195]`, 34.57 m away; the nearest regional
+//! `legacy_data` NPC is 183.72 m (id `9000000019`). Both clear the 15 m gate.
 //! Water, object collision and a native walkable route remain unverified, as
 //! in battles 12301/12310/12350/12340.
 
@@ -38,11 +45,8 @@ use osfr_tools::{
     inventory::MAX_ITEMS,
     startup_world::{NpcSpawn, parse_add_npc},
 };
-use serde_json::{Value, json};
-use std::{
-    collections::{BTreeMap, BTreeSet},
-    fs,
-};
+use serde_json::json;
+use std::{collections::BTreeSet, fs};
 
 #[path = "common/field_battle_fixture.rs"]
 mod field_battle_fixture;
@@ -99,7 +103,6 @@ const REFUSAL_PRIZE: &str = "one of its rewards cannot be granted";
 const DETAILS_LEN: usize = 575;
 const DETAILS_ID: usize = 4;
 const DETAILS_INSTANCE: usize = 8;
-const DETAILS_FIELDS: usize = 47;
 const DETAILS_PRIZE_COUNT: usize = 271;
 const DETAILS_PRIZES: usize = 275;
 const DETAILS_ROSTER_COUNT: usize = 525;
@@ -184,263 +187,6 @@ fn published_row(replies: &[Vec<u8>]) -> PortalRow {
     rows.into_iter()
         .find(|row| row.id == BIXIE_HIVE)
         .expect("Bixie Hive is in the 167/1/1 list")
-}
-
-// ---------------------------------------------------------------------------
-// Economy, fight and reconnect helpers.
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, PartialEq)]
-struct Economy {
-    coins: u32,
-    prizes: BTreeMap<i32, u32>,
-    experience: BTreeMap<i32, u32>,
-}
-
-fn economy(gateway: &Gateway, prize_ids: &BTreeSet<i32>) -> Economy {
-    let state = gateway.snapshot().gameplay.unwrap();
-    Economy {
-        coins: state.inventory.coins,
-        prizes: prize_ids
-            .iter()
-            .map(|id| {
-                let count = state
-                    .inventory
-                    .items
-                    .iter()
-                    .filter(|item| item.definition_id == *id)
-                    .map(|item| item.count)
-                    .sum();
-                (*id, count)
-            })
-            .collect(),
-        experience: state.profiles.unwrap().experience,
-    }
-}
-
-fn coins(gateway: &Gateway) -> u32 {
-    gateway.snapshot().gameplay.unwrap().inventory.coins
-}
-
-fn active_profile(gateway: &Gateway) -> i32 {
-    gateway
-        .snapshot()
-        .gameplay
-        .unwrap()
-        .profiles
-        .unwrap()
-        .active
-}
-
-fn active_enemy(gateway: &Gateway) -> Option<(u64, [f32; 3], EncounterPhase)> {
-    let state = gateway.snapshot().gameplay?.encounter?;
-    let active = state.active?;
-    let enemy = active.enemies.iter().find(|enemy| enemy.health > 0)?;
-    Some((enemy.guid, enemy.position, active.phase))
-}
-
-fn open_battle(gateway: &mut Gateway, spawner_guid: u64, row: &Value, now_ms: u64) -> Vec<u8> {
-    let screen = send(gateway, &interact(spawner_guid), now_ms);
-    let details = details(&screen).expect("clicking the marker opens 41/114");
-    assert_eq!(i32_at(details, DETAILS_ID), BIXIE_HIVE as i32);
-    assert!(
-        i32_at(details, DETAILS_INSTANCE) > 0,
-        "the start screen has an instance"
-    );
-
-    // 41/114 reader chain 0x009bdd70: title, icon, description, difficulty,
-    // profile type, type.
-    let expected: Vec<u8> = [
-        i32_field(row, "title_id"),
-        i32_field(row, "icon_id"),
-        i32_field(row, "description_id"),
-        i32_field(row, "difficulty"),
-        2, // MiniGameInfo.ProfileType: combat
-        4, // MiniGameTypes.COMBAT_TYPE
-    ]
-    .into_iter()
-    .flat_map(i32::to_le_bytes)
-    .collect();
-    assert_eq!(
-        &details[DETAILS_FIELDS..DETAILS_FIELDS + 24],
-        expected.as_slice(),
-        "41/114 fields must agree byte-for-byte with the client reader"
-    );
-    details.to_vec()
-}
-
-fn enter_battle(gateway: &mut Gateway, details: &[u8], row: &Value, now_ms: u64) -> Vec<u64> {
-    let entered = send(gateway, &go(details), now_ms);
-    assert!(entered.began_zoning, "Go enters the arena");
-    assert_eq!(gateway.state().zone_id, ARENA_ZONE);
-
-    let enemy_guids: Vec<u64> = row["enemies"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .map(|enemy| u64_field(enemy, "guid"))
-        .collect();
-    let ready = arena_spawned(gateway, now_ms + 100);
-    for guid in &enemy_guids {
-        assert!(
-            ready
-                .replies
-                .iter()
-                .map(|packet| unframe(packet))
-                .any(|packet| packet.starts_with(&[35, 0, 2, 0])
-                    && packet[4..12] == guid.to_le_bytes()),
-            "arena enemy {guid} spawned"
-        );
-    }
-    assert!(
-        ready
-            .replies
-            .iter()
-            .map(|packet| unframe(packet))
-            .any(|packet| packet.starts_with(&[41, 0, 114, 0])),
-        "the running encounter refreshes through 41/114"
-    );
-    assert!(
-        ready
-            .replies
-            .iter()
-            .map(|packet| unframe(packet))
-            .any(|packet| packet
-                .windows(4)
-                .any(|field| field == OBJECTIVE.to_le_bytes())),
-        "the verified goal 16791 reaches the client"
-    );
-    let active = gateway
-        .snapshot()
-        .gameplay
-        .unwrap()
-        .encounter
-        .unwrap()
-        .active
-        .expect("the arena run is active");
-    assert_eq!(active.phase, EncounterPhase::Fighting);
-    assert_eq!(active.enemies.len(), enemy_guids.len());
-    for (actor, state) in row["enemies"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .zip(&active.enemies)
-    {
-        assert_eq!(state.guid, u64_field(actor, "guid"));
-        assert_eq!(state.position, position(&actor["position"]));
-        assert_eq!(state.health, u32_field(actor, "max_health"));
-    }
-    enemy_guids
-}
-
-/// Kill every arena actor through the ordinary 36/10 path. Returns every reply
-/// the fight produced so the caller can assert the results packets.
-fn fight_to_win(gateway: &mut Gateway, now_ms: &mut u64) -> Vec<Vec<u8>> {
-    let player_guid = gateway.state().guid;
-    let mut replies = Vec::new();
-    for _ in 0..200 {
-        let Some((guid, position, phase)) = active_enemy(gateway) else {
-            break;
-        };
-        if phase != EncounterPhase::Fighting {
-            break;
-        }
-        walk(
-            gateway,
-            player_guid,
-            [position[0] + 1.5, position[1], position[2]],
-            now_ms,
-        );
-        *now_ms += 700;
-        // 36/10 writer 0x00a342e0: bar 1, slot 0, target mode 0, target GUID.
-        let hit = send(gateway, &melee(guid), *now_ms);
-        replies.extend(hit.replies);
-        walk(gateway, player_guid, ARENA_ARRIVAL, now_ms);
-        *now_ms += 100;
-        let tick = gateway.tick_at(*now_ms).unwrap();
-        replies.extend(tick.replies);
-    }
-    let phase = gateway
-        .snapshot()
-        .gameplay
-        .unwrap()
-        .encounter
-        .unwrap()
-        .active
-        .map(|active| active.phase);
-    assert_eq!(
-        phase,
-        Some(EncounterPhase::Won),
-        "the five actors die through the real attack path"
-    );
-    replies
-}
-
-/// The result lifecycle produced by `present_results`: 39/18 (game over),
-/// 39/47 (scores) and 39/19 (results UI).
-fn results_lifecycle(replies: &[Vec<u8>]) -> Vec<u8> {
-    replies
-        .iter()
-        .map(|packet| unframe(packet))
-        .filter(|packet| packet.starts_with(&[39, 0]) && packet.len() >= 3)
-        .map(|packet| packet[2])
-        .filter(|sub| [18, 47, 19].contains(sub))
-        .collect()
-}
-
-fn won_flag(replies: &[Vec<u8>]) -> Option<u8> {
-    replies
-        .iter()
-        .map(|packet| unframe(packet))
-        .find(|packet| packet.len() >= 16 && packet.starts_with(&[39, 0, 18]))
-        .map(|packet| packet[15])
-}
-
-fn assert_payout(before: &Economy, after: &Economy, row: &Value, prize_ids: &BTreeSet<i32>) {
-    assert_eq!(after.coins, before.coins + u32_field(row, "reward_coins"));
-    // The active combat job is the only profile that gains the field-battle XP.
-    for (profile, experience) in &after.experience {
-        let prior = before.experience.get(profile).copied().unwrap_or(0);
-        let delta = experience - prior;
-        assert_eq!(
-            delta,
-            if *profile == BRAWLER {
-                BATTLE_JOB_XP
-            } else {
-                0
-            },
-            "profile {profile} gained {delta} XP"
-        );
-    }
-    let gains: Vec<(i32, u32)> = after
-        .prizes
-        .iter()
-        .filter_map(|(id, count)| {
-            let prior = before.prizes.get(id).copied().unwrap_or(0);
-            (count > &prior).then_some((*id, count - prior))
-        })
-        .collect();
-    assert_eq!(gains.len(), 1, "exactly one prize was granted");
-    assert!(prize_ids.contains(&gains[0].0));
-    assert_eq!(gains[0].1, 1);
-}
-
-/// The zone/position/rotation a results Close restores (the marker pose).
-fn assert_returned(gateway: &Gateway) {
-    assert_eq!(gateway.state().zone_id, 0);
-    assert_eq!(gateway.state().position, MARKER);
-    assert_eq!(gateway.state().rotation, [0.0, 0.0, 1.0]);
-    assert!(
-        gateway
-            .snapshot()
-            .gameplay
-            .unwrap()
-            .encounter
-            .unwrap()
-            .active
-            .is_none(),
-        "the finished run is cleared"
-    );
 }
 
 // ---------------------------------------------------------------------------
@@ -663,7 +409,8 @@ fn a_level_one_character_can_start() {
 /// bilinear zone-0 height rounded to 0.01, all 105 samples of the 5 m wander
 /// disc terrain-covered with a finite y, maximum slope at most 25 degrees, and
 /// the authored exclusions from every field-enemy home (the three Bixie
-/// actors), another battle marker and a spawned NPC.
+/// actors), another battle marker, the nearest regional NPC and the nearest
+/// `npc_spawns_extra.json` spawn.
 #[test]
 fn the_marker_is_terrain_safe_and_clear_of_the_bixie_camp() {
     let file = battles();
@@ -733,7 +480,15 @@ fn the_marker_is_terrain_safe_and_clear_of_the_bixie_camp() {
     let (npc, npc_id) = nearest_spawned_npc(marker);
     assert!(
         npc >= 15.0,
-        "nearest spawned NPC {npc_id} is {npc:.2} m away"
+        "nearest regional NPC {npc_id} is {npc:.2} m away"
+    );
+    // The second visible-actor source is npc_spawns_extra.json. The authored
+    // nearest is the Bixie Queen prop 100000002913 at 34.57 m; the regional
+    // scan above alone (183.72 m) would miss it.
+    let (extra, extra_id) = nearest_extra_spawn(marker);
+    assert!(
+        extra >= 15.0,
+        "nearest extra spawn {extra_id} is {extra:.2} m away"
     );
 
     // The samples recorded in the row's source and this header match the real
@@ -848,7 +603,7 @@ fn the_full_route_pays_sixty_eight_coins_and_one_prize() {
     let enemy_guids = enter_battle(&mut gateway, &screen, row, 1_000);
     assert_eq!(enemy_guids, ENEMY_GUIDS);
     let mut now = 2_000;
-    let replies = fight_to_win(&mut gateway, &mut now);
+    let replies = fight_to_win(&mut gateway, &mut now, row);
     assert_eq!(
         results_lifecycle(&replies),
         vec![18, 47, 19],
@@ -857,7 +612,7 @@ fn the_full_route_pays_sixty_eight_coins_and_one_prize() {
     assert_eq!(won_flag(&replies), Some(1), "the results report a win");
 
     let paid = economy(&gateway, &prizes);
-    assert_payout(&before, &paid, row, &prizes);
+    assert_payout(&before, &paid, row, &prizes, BATTLE_JOB_XP);
     assert_eq!(active_profile(&gateway), BRAWLER);
 
     // A replayed attack on the won fight pays nothing.
@@ -868,7 +623,7 @@ fn the_full_route_pays_sixty_eight_coins_and_one_prize() {
 
     let closed = send(&mut gateway, &[26, 0, 42, 0], now + 1_400);
     assert!(closed.began_zoning, "Close returns to the open world");
-    assert_returned(&gateway);
+    assert_returned(&gateway, MARKER);
     assert_eq!(
         economy(&gateway, &prizes),
         paid,
@@ -957,7 +712,12 @@ fn refusals_leave_everything_unchanged() {
     );
 
     // Out-of-range Go: the screen opens at the marker, the player walks 50 m
-    // away and Go is inert. Reopening the screen at the marker then works.
+    // away and Go is inert. This is an expiry, not a refusal: Go revalidates
+    // the marker distance (F176) and deliberately drops the session-only
+    // pending screen so the walked-away screen cannot start later. The pending
+    // battle is not saved, so the snapshot/save stay byte-equal either way;
+    // the drop is proved below by returning to the marker and replaying the
+    // old Go, which stays inert only because the pending screen is gone.
     let mut gateway = fixture.gateway(MARKER, 4002);
     assert!(send(&mut gateway, &switch_job(BRAWLER), 300).state_changed);
     let screen = open_battle(&mut gateway, MARKER_GUID, row, 500);
@@ -978,6 +738,12 @@ fn refusals_leave_everything_unchanged() {
         "an out-of-range Go changes no state"
     );
     walk(&mut gateway, player, MARKER, &mut now);
+    let replayed = send(&mut gateway, &go(&screen), now + 50);
+    assert!(
+        !replayed.began_zoning && !replayed.state_changed,
+        "the out-of-range Go dropped the pending screen"
+    );
+    assert_eq!(gateway.state().zone_id, 0, "the replay entered no arena");
     let screen = open_battle(&mut gateway, MARKER_GUID, row, now + 100);
     assert!(send(&mut gateway, &go(&screen), now + 200).began_zoning);
     assert_eq!(gateway.state().zone_id, ARENA_ZONE);
@@ -1293,10 +1059,10 @@ fn a_second_player_runs_its_own_instance_and_is_paid_once() {
     assert!(second_active.is_some());
 
     let mut first_now = 700;
-    let won = fight_to_win(&mut first, &mut first_now);
+    let won = fight_to_win(&mut first, &mut first_now, row);
     assert_eq!(results_lifecycle(&won), vec![18, 47, 19]);
     let first_paid = economy(&first, &prizes);
-    assert_payout(&first_before, &first_paid, row, &prizes);
+    assert_payout(&first_before, &first_paid, row, &prizes, BATTLE_JOB_XP);
     assert_eq!(
         economy(&second, &prizes),
         second_before,
@@ -1320,10 +1086,10 @@ fn a_second_player_runs_its_own_instance_and_is_paid_once() {
     );
 
     let mut second_now = 700;
-    let won = fight_to_win(&mut second, &mut second_now);
+    let won = fight_to_win(&mut second, &mut second_now, row);
     assert_eq!(results_lifecycle(&won), vec![18, 47, 19]);
     let second_paid = economy(&second, &prizes);
-    assert_payout(&second_before, &second_paid, row, &prizes);
+    assert_payout(&second_before, &second_paid, row, &prizes, BATTLE_JOB_XP);
     assert_eq!(
         economy(&first, &prizes),
         first_paid,
@@ -1348,7 +1114,7 @@ fn the_win_and_the_mid_fight_return_survive_a_reload() {
     let screen = open_battle(&mut gateway, MARKER_GUID, row, 500);
     enter_battle(&mut gateway, &screen, row, 600);
     let mut dropped = reopen(&fixture, &gateway, "bixie-mid-run.json", 2_000);
-    assert_returned(&dropped);
+    assert_returned(&dropped, MARKER);
     assert_eq!(economy(&dropped, &prizes), before);
     let screen = open_battle(&mut dropped, MARKER_GUID, row, 2_500);
     let restarted = send(&mut dropped, &go(&screen), 2_600);
@@ -1364,12 +1130,12 @@ fn the_win_and_the_mid_fight_return_survive_a_reload() {
     let screen = open_battle(&mut gateway, MARKER_GUID, row, 500);
     enter_battle(&mut gateway, &screen, row, 600);
     let mut now = 700;
-    let won = fight_to_win(&mut gateway, &mut now);
+    let won = fight_to_win(&mut gateway, &mut now, row);
     assert_eq!(results_lifecycle(&won), vec![18, 47, 19]);
     let paid = economy(&gateway, &prizes);
-    assert_payout(&before, &paid, row, &prizes);
+    assert_payout(&before, &paid, row, &prizes, BATTLE_JOB_XP);
     let mut dropped = reopen(&fixture, &gateway, "bixie-won-unclosed.json", now + 1_000);
-    assert_returned(&dropped);
+    assert_returned(&dropped, MARKER);
     assert_eq!(economy(&dropped, &prizes), paid);
     let before_replay = saved_bytes(&dropped);
     let replay = send(&mut dropped, &melee(ENEMY_GUIDS[0]), now + 1_100);
@@ -1560,10 +1326,10 @@ fn a_live_change_before_the_close_survives_the_payout() {
 
     enter_battle(&mut gateway, &screen, row, 700);
     let mut now = 800;
-    let won = fight_to_win(&mut gateway, &mut now);
+    let won = fight_to_win(&mut gateway, &mut now, row);
     assert_eq!(results_lifecycle(&won), vec![18, 47, 19]);
     let paid = economy(&gateway, &prizes);
-    assert_payout(&live, &paid, row, &prizes);
+    assert_payout(&live, &paid, row, &prizes, BATTLE_JOB_XP);
     assert_eq!(
         paid.coins,
         before.coins + 7 + REWARD_COINS,
@@ -1572,7 +1338,7 @@ fn a_live_change_before_the_close_survives_the_payout() {
 
     let closed = send(&mut gateway, &[26, 0, 42, 0], now + 700);
     assert!(closed.began_zoning);
-    assert_returned(&gateway);
+    assert_returned(&gateway, MARKER);
     assert_eq!(
         economy(&gateway, &prizes),
         paid,
@@ -1610,10 +1376,10 @@ fn a_failing_start_does_not_stop_the_other_session() {
     let screen = open_battle(&mut healthy, MARKER_GUID, row, 500);
     enter_battle(&mut healthy, &screen, row, 600);
     let mut now = 700;
-    let won = fight_to_win(&mut healthy, &mut now);
+    let won = fight_to_win(&mut healthy, &mut now, row);
     assert_eq!(results_lifecycle(&won), vec![18, 47, 19]);
     let healthy_paid = economy(&healthy, &prizes);
-    assert_payout(&healthy_before, &healthy_paid, row, &prizes);
+    assert_payout(&healthy_before, &healthy_paid, row, &prizes, BATTLE_JOB_XP);
     assert_eq!(
         (failing.snapshot(), saved_bytes(&failing)),
         failed_before,

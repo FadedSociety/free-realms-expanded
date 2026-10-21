@@ -95,188 +95,6 @@ impl Fixture {
 }
 
 // ---------------------------------------------------------------------------
-// Economy and fight helpers.
-// ---------------------------------------------------------------------------
-
-#[derive(Debug, PartialEq)]
-struct Economy {
-    coins: u32,
-    prizes: BTreeMap<i32, u32>,
-    experience: u32,
-}
-
-fn economy(gateway: &Gateway, prize_ids: &BTreeSet<i32>) -> Economy {
-    let state = gateway.snapshot().gameplay.unwrap();
-    Economy {
-        coins: state.inventory.coins,
-        prizes: prize_ids
-            .iter()
-            .map(|id| {
-                let count = state
-                    .inventory
-                    .items
-                    .iter()
-                    .filter(|item| item.definition_id == *id)
-                    .map(|item| item.count)
-                    .sum();
-                (*id, count)
-            })
-            .collect(),
-        experience: state
-            .profiles
-            .unwrap()
-            .experience
-            .get(&BRAWLER)
-            .copied()
-            .unwrap_or(0),
-    }
-}
-
-fn active_enemy(gateway: &Gateway) -> Option<(u64, [f32; 3], u32)> {
-    let state = gateway.snapshot().gameplay?.encounter?;
-    let active = state.active?;
-    let enemy = active.enemies.iter().find(|enemy| enemy.health > 0)?;
-    Some((enemy.guid, enemy.position, enemy.health))
-}
-
-fn open_battle(gateway: &mut Gateway, spawner_guid: u64, row: &Value, now_ms: u64) -> Vec<u8> {
-    let screen = send(gateway, &interact(spawner_guid), now_ms);
-    let details = details(&screen).expect("clicking the marker opens 41/114");
-    assert_start_screen(details, row);
-    details.to_vec()
-}
-
-/// The 41/114 start screen fields, pinned byte-for-byte against the client
-/// reader chain 0x00aa3430 -> 0x00aa32d0 -> 0x00a29120 -> 0x009bdd70.
-fn assert_start_screen(details: &[u8], row: &Value) {
-    assert_eq!(i32_at(details, 4), THUGAMUG as i32);
-    assert!(i32_at(details, 8) > 0, "the start screen has an instance");
-
-    // 41/114 reader chain 0x00aa3430 -> 0x00aa32d0 -> 0x00a29120 ->
-    // 0x009bdd70: title, icon, description, difficulty, profile type,
-    // MiniGameTypes.
-    let expected: Vec<u8> = [
-        i32_field(row, "title_id"),
-        i32_field(row, "icon_id"),
-        i32_field(row, "description_id"),
-        i32_field(row, "difficulty"),
-        2, // MiniGameInfo.ProfileType: combat
-        4, // MiniGameTypes.COMBAT_TYPE
-    ]
-    .into_iter()
-    .flat_map(i32::to_le_bytes)
-    .collect();
-    assert_eq!(
-        &details[47..71],
-        expected.as_slice(),
-        "41/114 fields must agree byte-for-byte with the client reader"
-    );
-}
-
-fn enter_battle(gateway: &mut Gateway, details: &[u8], row: &Value, now_ms: u64) -> Vec<u64> {
-    let entered = send(gateway, &go(details), now_ms);
-    assert!(entered.began_zoning, "Go enters the arena");
-    assert_eq!(gateway.state().zone_id, 9600);
-
-    let enemy_guids: Vec<u64> = row["enemies"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .map(|enemy| u64_field(enemy, "guid"))
-        .collect();
-    let ready = arena_spawned(gateway, now_ms + 100);
-    for guid in &enemy_guids {
-        assert!(
-            ready
-                .replies
-                .iter()
-                .map(|packet| unframe(packet))
-                .any(|packet| packet.starts_with(&[35, 0, 2, 0])
-                    && packet[4..12] == guid.to_le_bytes()),
-            "arena enemy {guid} spawned"
-        );
-    }
-    assert!(
-        ready
-            .replies
-            .iter()
-            .map(|packet| unframe(packet))
-            .any(|packet| packet
-                .windows(4)
-                .any(|field| field == i32_field(row, "objective_id").to_le_bytes())),
-        "the recovered goal reaches the client"
-    );
-    assert!(
-        active_enemy(gateway).is_some(),
-        "the arena starts with a fightable enemy"
-    );
-    enemy_guids
-}
-
-fn fight_to_win(gateway: &mut Gateway, now_ms: &mut u64) {
-    let player_guid = gateway.state().guid;
-    for _ in 0..200 {
-        let Some((guid, position, _)) = active_enemy(gateway) else {
-            break;
-        };
-        let phase = gateway
-            .snapshot()
-            .gameplay
-            .unwrap()
-            .encounter
-            .unwrap()
-            .active
-            .unwrap()
-            .phase;
-        if phase != osfr_tools::encounter::EncounterPhase::Fighting {
-            break;
-        }
-        walk(
-            gateway,
-            player_guid,
-            [position[0] + 1.5, position[1], position[2]],
-            now_ms,
-        );
-        *now_ms += 700;
-        // 36/10 writer 0x00a342e0: bar 1, slot 0, target mode 0, target GUID.
-        send(gateway, &melee(guid), *now_ms);
-        walk(gateway, player_guid, [136.0, -0.5, 155.0], now_ms);
-        *now_ms += 100;
-        gateway.tick_at(*now_ms).unwrap();
-    }
-    let phase = gateway
-        .snapshot()
-        .gameplay
-        .unwrap()
-        .encounter
-        .unwrap()
-        .active
-        .map(|active| active.phase);
-    assert_eq!(
-        phase,
-        Some(osfr_tools::encounter::EncounterPhase::Won),
-        "the three actors die through the real attack path"
-    );
-}
-
-fn assert_payout(before: &Economy, after: &Economy, row: &Value) {
-    let prizes = prize_ids(row);
-    assert_eq!(after.coins, before.coins + u32_field(row, "reward_coins"));
-    assert_eq!(after.experience, before.experience + BATTLE_JOB_XP);
-    let gains: Vec<(i32, u32)> = after
-        .prizes
-        .iter()
-        .filter_map(|(id, count)| {
-            let prior = before.prizes.get(id).copied().unwrap_or(0);
-            (count > &prior).then_some((*id, count - prior))
-        })
-        .collect();
-    assert_eq!(gains.len(), 1, "exactly one prize was granted");
-    assert!(prizes.contains(&gains[0].0));
-    assert_eq!(gains[0].1, 1);
-}
-
-// ---------------------------------------------------------------------------
 // Tests.
 // ---------------------------------------------------------------------------
 
@@ -570,10 +388,10 @@ fn a_level_five_character_can_start_and_win_it_once() {
     let screen = open_battle(&mut gateway, MARKER_GUID, row, 500);
     let enemy_guids = enter_battle(&mut gateway, &screen, row, 1_000);
     let mut now = 2_000;
-    fight_to_win(&mut gateway, &mut now);
+    fight_to_win(&mut gateway, &mut now, row);
 
     let paid = economy(&gateway, &prizes);
-    assert_payout(&before, &paid, row);
+    assert_payout(&before, &paid, row, &prizes, BATTLE_JOB_XP);
     let won = gateway.snapshot();
     let replay = send(&mut gateway, &melee(enemy_guids[0]), now + 700);
     assert!(!replay.state_changed, "a won fight cannot pay twice");
@@ -721,7 +539,7 @@ fn reconnect_and_duplicate_win_do_not_pay_twice() {
     let won = send(&mut gateway, &chat::local_request("realm win"), 2_000);
     assert!(won.state_changed);
     let paid = economy(&gateway, &prizes);
-    assert_payout(&before, &paid, row);
+    assert_payout(&before, &paid, row, &prizes, BATTLE_JOB_XP);
 
     // Replaying the win on the won run pays nothing before the close.
     let won_state = gateway.snapshot();
@@ -933,7 +751,7 @@ fn a_second_player_can_run_its_own_instance() {
     let won = send(&mut first, &chat::local_request("realm win"), now + 800);
     assert!(won.state_changed);
     let first_paid = economy(&first, &prizes);
-    assert_payout(&first_before, &first_paid, row);
+    assert_payout(&first_before, &first_paid, row, &prizes, BATTLE_JOB_XP);
     assert_eq!(
         economy(&second, &prizes),
         second_before,
@@ -959,7 +777,7 @@ fn a_second_player_can_run_its_own_instance() {
     let won = send(&mut second, &chat::local_request("realm win"), now + 1_000);
     assert!(won.state_changed);
     let second_paid = economy(&second, &prizes);
-    assert_payout(&second_before, &second_paid, row);
+    assert_payout(&second_before, &second_paid, row, &prizes, BATTLE_JOB_XP);
     assert_eq!(
         economy(&first, &prizes),
         first_paid,
@@ -1493,8 +1311,8 @@ impl QuestSession {
         guids
     }
 
-    fn fight(&mut self) {
-        fight_to_win(&mut self.gateway, &mut self.now);
+    fn fight(&mut self, row: &Value) {
+        fight_to_win(&mut self.gateway, &mut self.now, row);
     }
 
     /// 26/42 Close, then the ready/loaded handshake the client repeats for the
@@ -1517,7 +1335,7 @@ impl QuestSession {
         let marker = position(&row["spawner"]["position"]);
         let details = self.open_battle(row, marker);
         self.enter_arena(&details, row);
-        self.fight();
+        self.fight(row);
         self.close_results();
     }
 

@@ -5,9 +5,11 @@
 //! and `use field_battle_fixture::*;`. Test-only; production never builds this
 //! module. The bag helpers take the battle id because each suite fills the bag
 //! around its own prize pool.
+#![allow(dead_code)] // each include site uses a different subset of the helpers
 
 use osfr_tools::{
     account_store::AccountRole,
+    encounter::EncounterPhase,
     game_store,
     gameplay::GameplayState,
     gateway::{Gateway, GatewayOutcome},
@@ -15,6 +17,7 @@ use osfr_tools::{
 };
 use serde_json::Value;
 use std::{
+    collections::{BTreeMap, BTreeSet},
     fs,
     path::{Path, PathBuf},
     sync::{
@@ -394,6 +397,295 @@ pub fn reopen_with(
 }
 
 // ---------------------------------------------------------------------------
+// Route and economy helpers shared by the field-battle suites. The battle id,
+// arena, arrival and goal come from the row, so every suite that starts a
+// battle runs this one packet chain instead of a local copy.
+// ---------------------------------------------------------------------------
+
+#[derive(Debug, PartialEq)]
+pub struct Economy {
+    pub coins: u32,
+    pub prizes: BTreeMap<i32, u32>,
+    pub experience: BTreeMap<i32, u32>,
+    /// The active job at snapshot time: the only profile a field-battle win pays.
+    pub active: i32,
+}
+
+pub fn economy(gateway: &Gateway, prize_ids: &BTreeSet<i32>) -> Economy {
+    let state = gateway.snapshot().gameplay.unwrap();
+    let profiles = state.profiles.unwrap();
+    let active = profiles.active;
+    Economy {
+        coins: state.inventory.coins,
+        prizes: prize_ids
+            .iter()
+            .map(|id| {
+                let count = state
+                    .inventory
+                    .items
+                    .iter()
+                    .filter(|item| item.definition_id == *id)
+                    .map(|item| item.count)
+                    .sum();
+                (*id, count)
+            })
+            .collect(),
+        experience: profiles.experience,
+        active,
+    }
+}
+
+pub fn coins(gateway: &Gateway) -> u32 {
+    gateway.snapshot().gameplay.unwrap().inventory.coins
+}
+
+pub fn active_profile(gateway: &Gateway) -> i32 {
+    gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .profiles
+        .unwrap()
+        .active
+}
+
+/// The first living arena enemy: (GUID, position, health).
+pub fn active_enemy(gateway: &Gateway) -> Option<(u64, [f32; 3], u32)> {
+    let state = gateway.snapshot().gameplay?.encounter?;
+    let active = state.active?;
+    let enemy = active.enemies.iter().find(|enemy| enemy.health > 0)?;
+    Some((enemy.guid, enemy.position, enemy.health))
+}
+
+fn encounter_phase(gateway: &Gateway) -> Option<EncounterPhase> {
+    gateway
+        .snapshot()
+        .gameplay?
+        .encounter?
+        .active
+        .map(|active| active.phase)
+}
+
+/// The 41/114 start screen against the row, from the client reader chain
+/// 0x00aa3430 -> 0x00aa32d0 -> 0x00a29120 -> 0x009bdd70: the id, an allocated
+/// instance, then [title, icon, description, difficulty, profile type, type]
+/// at bytes 47..71.
+pub fn assert_start_screen(details: &[u8], row: &Value) {
+    assert_eq!(
+        i32_at(details, 4),
+        u32_field(row, "id") as i32,
+        "the 41/114 screen carries this battle's id"
+    );
+    assert!(i32_at(details, 8) > 0, "the start screen has an instance");
+    let expected: Vec<u8> = [
+        i32_field(row, "title_id"),
+        i32_field(row, "icon_id"),
+        i32_field(row, "description_id"),
+        i32_field(row, "difficulty"),
+        2, // MiniGameInfo.ProfileType: combat
+        4, // MiniGameTypes.COMBAT_TYPE
+    ]
+    .into_iter()
+    .flat_map(i32::to_le_bytes)
+    .collect();
+    assert_eq!(
+        &details[47..71],
+        expected.as_slice(),
+        "41/114 fields must agree byte-for-byte with the client reader"
+    );
+}
+
+/// Click the marker, then pin its 41/114 start screen against the row.
+pub fn open_battle(gateway: &mut Gateway, spawner_guid: u64, row: &Value, now_ms: u64) -> Vec<u8> {
+    let screen = send(gateway, &interact(spawner_guid), now_ms);
+    let details = details(&screen).expect("clicking the marker opens 41/114");
+    assert_start_screen(details, row);
+    details.to_vec()
+}
+
+/// Go, then assert every authored arena actor spawns with the row's state and
+/// the running encounter refreshes through 41/114.
+pub fn enter_battle(gateway: &mut Gateway, details: &[u8], row: &Value, now_ms: u64) -> Vec<u64> {
+    let entered = send(gateway, &go(details), now_ms);
+    assert!(entered.began_zoning, "Go enters the arena");
+    assert_eq!(gateway.state().zone_id, u32_field(&row["zone"], "zone_id"));
+
+    let enemy_guids: Vec<u64> = row["enemies"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|enemy| u64_field(enemy, "guid"))
+        .collect();
+    let ready = arena_spawned(gateway, now_ms + 100);
+    for guid in &enemy_guids {
+        assert!(
+            ready
+                .replies
+                .iter()
+                .map(|packet| unframe(packet))
+                .any(|packet| packet.starts_with(&[35, 0, 2, 0])
+                    && packet[4..12] == guid.to_le_bytes()),
+            "arena enemy {guid} spawned"
+        );
+    }
+    assert!(
+        ready
+            .replies
+            .iter()
+            .map(|packet| unframe(packet))
+            .any(|packet| packet.starts_with(&[41, 0, 114, 0])),
+        "the running encounter refreshes through 41/114"
+    );
+    let objective = u32_field(row, "objective_id");
+    assert!(
+        ready
+            .replies
+            .iter()
+            .map(|packet| unframe(packet))
+            .any(|packet| packet
+                .windows(4)
+                .any(|field| field == objective.to_le_bytes())),
+        "the row's goal {objective} reaches the client"
+    );
+    let active = gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .encounter
+        .unwrap()
+        .active
+        .expect("the arena run is active");
+    assert_eq!(active.phase, EncounterPhase::Fighting);
+    assert_eq!(active.enemies.len(), enemy_guids.len());
+    // The loader scales enemy health and damage by the difficulty factor (R),
+    // and only difficulty 1's factor is 1.0, so the authored health is
+    // observable exactly there; higher difficulties spawn at or above it.
+    let authored_health = u32_field(row, "difficulty") == 1;
+    for (actor, state) in row["enemies"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .zip(&active.enemies)
+    {
+        assert_eq!(state.guid, u64_field(actor, "guid"));
+        assert_eq!(state.position, position(&actor["position"]));
+        if authored_health {
+            assert_eq!(state.health, u32_field(actor, "max_health"));
+        } else {
+            assert!(
+                state.health >= u32_field(actor, "max_health"),
+                "actor {} spawned at {} health",
+                state.guid,
+                state.health
+            );
+        }
+    }
+    enemy_guids
+}
+
+/// Kill every arena actor through the ordinary 36/10 path. Returns every reply
+/// so the caller can assert the results packets.
+pub fn fight_to_win(gateway: &mut Gateway, now_ms: &mut u64, row: &Value) -> Vec<Vec<u8>> {
+    let player_guid = gateway.state().guid;
+    let arrival = position(&row["zone"]["position"]);
+    let mut replies = Vec::new();
+    for _ in 0..200 {
+        let Some((guid, at, _)) = active_enemy(gateway) else {
+            break;
+        };
+        if encounter_phase(gateway) != Some(EncounterPhase::Fighting) {
+            break;
+        }
+        walk(gateway, player_guid, [at[0] + 1.5, at[1], at[2]], now_ms);
+        *now_ms += 700;
+        // 36/10 writer 0x00a342e0: bar 1, slot 0, target mode 0, target GUID.
+        let hit = send(gateway, &melee(guid), *now_ms);
+        replies.extend(hit.replies);
+        walk(gateway, player_guid, arrival, now_ms);
+        *now_ms += 100;
+        let tick = gateway.tick_at(*now_ms).unwrap();
+        replies.extend(tick.replies);
+    }
+    assert_eq!(
+        encounter_phase(gateway),
+        Some(EncounterPhase::Won),
+        "the arena actors die through the real attack path"
+    );
+    replies
+}
+
+/// The result lifecycle produced by `present_results`: 39/18 (game over),
+/// 39/47 (scores) and 39/19 (results UI). 39/45 is the loot wheel and is not
+/// part of this assertion.
+pub fn results_lifecycle(replies: &[Vec<u8>]) -> Vec<u8> {
+    replies
+        .iter()
+        .map(|packet| unframe(packet))
+        .filter(|packet| packet.starts_with(&[39, 0]) && packet.len() >= 3)
+        .map(|packet| packet[2])
+        .filter(|sub| [18, 47, 19].contains(sub))
+        .collect()
+}
+
+pub fn won_flag(replies: &[Vec<u8>]) -> Option<u8> {
+    replies
+        .iter()
+        .map(|packet| unframe(packet))
+        .find(|packet| packet.len() >= 16 && packet.starts_with(&[39, 0, 18]))
+        .map(|packet| packet[15])
+}
+
+/// One win pays the row's coins, exactly one of the previewed prizes and the
+/// active job's XP; no other profile gains any.
+pub fn assert_payout(
+    before: &Economy,
+    after: &Economy,
+    row: &Value,
+    prize_ids: &BTreeSet<i32>,
+    job_xp: u32,
+) {
+    assert_eq!(after.coins, before.coins + u32_field(row, "reward_coins"));
+    for (profile, experience) in &after.experience {
+        let prior = before.experience.get(profile).copied().unwrap_or(0);
+        let delta = experience - prior;
+        assert_eq!(
+            delta,
+            if *profile == before.active { job_xp } else { 0 },
+            "profile {profile} gained {delta} XP"
+        );
+    }
+    let gains: Vec<(i32, u32)> = after
+        .prizes
+        .iter()
+        .filter_map(|(id, count)| {
+            let prior = before.prizes.get(id).copied().unwrap_or(0);
+            (count > &prior).then_some((*id, count - prior))
+        })
+        .collect();
+    assert_eq!(gains.len(), 1, "exactly one prize was granted");
+    assert!(prize_ids.contains(&gains[0].0));
+    assert_eq!(gains[0].1, 1);
+}
+
+/// The zone/position/rotation a results Close restores (the pre-entry marker).
+pub fn assert_returned(gateway: &Gateway, marker: [f32; 3]) {
+    assert_eq!(gateway.state().zone_id, 0);
+    assert_eq!(gateway.state().position, marker);
+    assert_eq!(gateway.state().rotation, [0.0, 0.0, 1.0]);
+    assert!(
+        gateway
+            .snapshot()
+            .gameplay
+            .unwrap()
+            .encounter
+            .unwrap()
+            .active
+            .is_none(),
+        "the finished run is cleared"
+    );
+}
+
+// ---------------------------------------------------------------------------
 // 167/1/1 reader: header, entry type, count, ten dwords, CanPlayerJoin, then
 // the variable-length tail (reader chain 0x00be79d0 -> 0x00be63e0).
 // ---------------------------------------------------------------------------
@@ -484,8 +776,10 @@ pub fn decode_list(packet: &[u8]) -> Vec<PortalRow> {
 // include that module directly so the rule has one owner.
 // ---------------------------------------------------------------------------
 
-/// `Some(distance)` to the nearest spawned regional NPC: only `legacy_data`
-/// rows are actors (`world.rs` skips POI/zone-centre scaffolding).
+/// The nearest **regional** spawned NPC: only `legacy_data` rows in
+/// `npcs/*.json` are actors there (`world.rs` skips POI/zone-centre
+/// scaffolding). `npc_spawns_extra.json` is the second visible-actor source
+/// that `nearest_extra_spawn` scans; a placement test must check both.
 pub fn nearest_spawned_npc(marker: [f32; 3]) -> (f32, u64) {
     let npc_dir = content_dir().join("npcs");
     let mut nearest = (f32::INFINITY, 0_u64);
@@ -508,6 +802,42 @@ pub fn nearest_spawned_npc(marker: [f32; 3]) -> (f32, u64) {
             if distance < nearest.0 {
                 nearest = (distance, record["npc_id"].as_u64().unwrap());
             }
+        }
+    }
+    nearest
+}
+
+/// The nearest visible actor from `npc_spawns_extra.json`, the second spawn
+/// source `world.rs` publishes. Rows filtered at load (a captured match, the
+/// missing knocker base model, a non-finite position or `content_key` 0) are
+/// filtered here too.
+pub fn nearest_extra_spawn(marker: [f32; 3]) -> (f32, u64) {
+    let extras = read_json(&content_dir().join("npc_spawns_extra.json"));
+    let mut nearest = (f32::INFINITY, 0_u64);
+    for record in extras["records"].as_array().unwrap() {
+        if !record["capture_match"].is_null()
+            || record["model_file_name"]
+                .as_str()
+                .is_some_and(|name| name.eq_ignore_ascii_case("knocker_m_boss.adr"))
+            || record["content_key"].as_u64() == Some(0)
+        {
+            continue;
+        }
+        let Some(point) = record["position"].as_array() else {
+            continue;
+        };
+        if point.len() < 3
+            || !point[..3]
+                .iter()
+                .all(|value| value.as_f64().is_some_and(f64::is_finite))
+        {
+            continue;
+        }
+        let distance = ((point[0].as_f64().unwrap() as f32 - marker[0]).powi(2)
+            + (point[2].as_f64().unwrap() as f32 - marker[2]).powi(2))
+        .sqrt();
+        if distance < nearest.0 {
+            nearest = (distance, record["spawn_guid"].as_u64().unwrap());
         }
     }
     nearest

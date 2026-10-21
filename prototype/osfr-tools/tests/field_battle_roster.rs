@@ -524,35 +524,24 @@ fn five_distinct_field_battles_load_with_the_existing_schema() {
     // roster without deleting that adjacent work; T252 appends the Brawling
     // Ring (12400) as the seventh row; T282 inserts Thugamug (12340) directly
     // after battle 96; T319 inserts Sheep Watch (12350) after Stone Heart;
-    // T354 inserts Bixie Hive (12370) directly after battle 96. Later content
-    // slices add their own rows, so the known order stays pinned as a
-    // subsequence instead of pinning the whole file.
-    let known = [
-        96,
-        12370,
-        12340,
-        12301,
-        12302,
-        STONE_HEART,
-        12350,
-        12310,
-        12311,
-        12400,
-    ];
-    for id in known {
-        assert_eq!(
-            ids.iter().filter(|candidate| **candidate == id).count(),
-            1,
-            "battle {id} disappeared or was duplicated"
-        );
-    }
-    let mut remaining = ids.iter().copied();
-    for id in known {
-        assert!(
-            remaining.by_ref().any(|candidate| candidate == id),
-            "battle {id} moved out of its pinned order"
-        );
-    }
+    // T354 inserts Bixie Hive (12370) directly after battle 96. This is the
+    // canonical exact repository-wide set: a new content slice updates this
+    // list, so an unintended or duplicate row cannot pass as a subsequence.
+    assert_eq!(
+        ids,
+        [
+            96,
+            12370,
+            12340,
+            12301,
+            12302,
+            STONE_HEART,
+            12350,
+            12310,
+            12311,
+            12400
+        ]
+    );
     assert_eq!(ids.iter().filter(|id| TASK_ROSTER.contains(id)).count(), 5);
 
     let mut guids = BTreeSet::new();
