@@ -1,4 +1,4 @@
-//! T314/F343/T358: structural reachability gate for the enabled split quest
+//! T314/F343/T358/F394: structural reachability gate for the enabled split quest
 //! catalogue.
 //!
 //! The shipped content tree is read through the production loaders:
@@ -12,27 +12,11 @@
 //! Resolved objective kinds: `talk_to_npc`, `interact_actor`, `reach_poi`,
 //! `defeat`, `collect_item`, `equip_item`, `craft_recipe`, `complete_dungeon`,
 //! `finish_minigame` and `gather_resource`. The last six additionally resolve
-//! their target id in the shipped tables loaded once from the same root:
-//!
-//! * `complete_dungeon`: `activity_portal::Catalogue` (the same
-//!   `field_battles.json` rows the encounter engine accepts) plus the raw
-//!   `encounters.json` `dungeons[].id` rows the encounter loader owns but
-//!   exposes no accessor for.
-//! * `finish_minigame`: `soccer_entry::Content`, `chess::GAME_ID`, the mining and
-//!   harvesting `Type8Engine` game ids, and the raw `kart_entry.json`
-//!   `race.speedway`, `derby_entry.json` `game_id` and `fishing_spots.json`
-//!   `spots[].game_id` fields those owning loaders do not expose.
-//! * `collect_item` / `equip_item`: `Inventory::definition_ids`, the merged
-//!   `inventory.json` + `item-catalogue.json` catalogue. `data/content` ships
-//!   no `inventory.json`, so the shipped item set is empty and an enabled item
-//!   target would fail loudly until a catalogue ships beside it; the shipped
-//!   enabled set has no item target today.
-//! * `craft_recipe`: `RecipeCatalog::load_runtime` and its stable `recipe_id`,
-//!   plus the three `CraftingJob::opening_recipe_id` fallbacks `apply_craft`
-//!   emits when the learned recipe row has no stable id.
-//! * `gather_resource`: mining/harvesting output definition ids from the same
-//!   `Type8Engine` content plus the local opening drops
-//!   (`Gameplay::local_gather_drop` match keys 1001/1002/1003).
+//! their target id in the id sets owned by `tests/support/quest_target_sets.rs`,
+//! which names the owning loader and every `FinishMinigame` emitter. A
+//! `finish_minigame` id the content defines but no server path can emit (derby
+//! 39 today) is refused with that reason instead of being certified, and
+//! `shipped_minigame_producers_are_pinned` fails if the accepted set drifts.
 //!
 //! `visit_position` geometry is rejected by `QuestEngine::from_split_content`
 //! (`valid_objective_kind`), the bound's only authority; the audit does not
@@ -44,7 +28,7 @@
 //!
 //! A quest is *reachable* when every prerequisite, directly or transitively,
 //! exists and is enabled. An enabled quest behind a disabled prerequisite is
-//! reported and excluded from the reward gate; it is not turned on here.
+//! reported and excluded from both gates; it is not turned on here.
 //!
 //! No new wire. A reachable quest's reward is proved through the production
 //! 49/13 encoder (`quest_end_packet`, reader `0x00c7b990`: actor u64, quest, end
@@ -53,32 +37,30 @@
 //! `0x00921a10`); the 26/8 click constructor `0x008b6bc0` resolves the same key
 //! through `NpcVisibility::content_key`. The graded targets add no packet: they
 //! are server-only ids. The 39/18 result reader wrapper `0x009b7ec0` (body
-//! `0x009b48b0`: shared header, `u8 won`, three dwords) and the 49/9 objective
-//! reader wrapper `0x00c7b5e0` (body `0x00c7af60`: counters, no target id) are
-//! the client side of that server-only identity.
+//! `0x009b48b0`: shared header via `0x009b2340`, `u8 won`, three dwords) and
+//! the 49/9 objective reader wrapper `0x00c7b5e0` (body `0x00c7af60`: counters,
+//! no target id) are the client side of that server-only identity.
 //!
-//! The shared `content_dir`/`read_json` helpers and the scratch fixture live in
-//! `tests/support/`.
+//! The shared `content_dir`/`read_json` helpers, the scratch fixture and the
+//! target-id sets each own their file in `tests/support/`.
 
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
 #[path = "support/quest_catalogue_fixture.rs"]
 mod quest_catalogue_fixture;
+#[path = "support/quest_target_sets.rs"]
+mod quest_target_sets;
 
 use npc_quest_chain::{content_dir, read_json};
 use osfr_tools::{
-    activity_portal, chess, harvesting,
-    inventory::Inventory,
-    mining::{self, Type8Engine},
     quest_engine::{CharacterEligibility, QuestEngine},
-    recipes::{CraftingJob, RecipeCatalog},
-    soccer_entry,
     world::NpcVisibility,
 };
 use quest_catalogue_fixture::{
-    Defect, FIXTURE_BATTLE, FIXTURE_DEFECT, FIXTURE_GATHER_RESOURCE, FIXTURE_ITEM, FIXTURE_QUEST,
-    FIXTURE_RECIPE, Scratch, fixture,
+    Defect, FIXTURE_BATTLE, FIXTURE_DEFECT, FIXTURE_GATHER_RESOURCE, FIXTURE_ITEM,
+    FIXTURE_MINIGAME, FIXTURE_QUEST, FIXTURE_RECIPE, Scratch, fixture,
 };
+use quest_target_sets::{Targets, as_u32};
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -91,12 +73,6 @@ const I32_MAX: u64 = i32::MAX as u64;
 const MAX_OBJECTIVE_COUNT: u64 = 1_000_000;
 /// `NpcVisibility::load` places every regional and extra-spawn actor here.
 const OPEN_WORLD_ZONE: u32 = 0;
-/// `src/gameplay.rs`'s private `HARVESTING_GAME_ID`: the one harvesting game the
-/// server loads, so the only harvesting id `finish_minigame` can receive.
-const HARVESTING_GAME_ID: u32 = 111;
-/// `Gameplay::local_gather_drop` match keys for the opening local drops. These
-/// are gather event resource keys, not item definition ids.
-const LOCAL_GATHER_RESOURCES: [u32; 3] = [1001, 1002, 1003];
 
 fn eligibility() -> CharacterEligibility {
     CharacterEligibility {
@@ -105,161 +81,6 @@ fn eligibility() -> CharacterEligibility {
         member: true,
         nonmember_quest_limit: 20,
         member_quest_limit: 20,
-    }
-}
-
-fn as_u32(value: &Value) -> Option<u32> {
-    value.as_u64().and_then(|value| u32::try_from(value).ok())
-}
-
-/// Target-id sets a graded objective must resolve in, loaded once from the same
-/// content root as the quest catalogue.
-#[derive(Debug, Default)]
-struct Targets {
-    /// `field_battles.json` battle ids plus `encounters.json` dungeon ids.
-    dungeons: BTreeSet<u32>,
-    /// Kart speedway, derby, soccer, chess, fishing, mining and harvesting ids.
-    minigames: BTreeSet<u32>,
-    /// The merged `inventory.json` + `item-catalogue.json` definitions.
-    items: BTreeSet<i32>,
-    /// The loaded recipe book's stable server ids.
-    recipes: BTreeSet<u32>,
-    /// Mining/harvesting output definitions plus the local opening drops.
-    gather: BTreeSet<u32>,
-}
-
-impl Targets {
-    fn load(root: &Path) -> io::Result<Self> {
-        let mut targets = Self {
-            gather: LOCAL_GATHER_RESOURCES.into_iter().collect(),
-            ..Self::default()
-        };
-
-        let battles = root.join("field_battles.json");
-        if battles.is_file() {
-            // The activity portal reads the same battle rows the encounter
-            // engine converts into dungeons, and exposes their ids.
-            targets.dungeons.extend(
-                activity_portal::Catalogue::load(&battles)?
-                    .activities()
-                    .iter()
-                    .map(|activity| activity.id),
-            );
-        }
-        let encounters = root.join("encounters.json");
-        if encounters.is_file() {
-            // `EncounterEngine::load` owns the dungeon table but exposes no id
-            // list; the raw `dungeons` array is the same authored rows it loads.
-            let document = read_json(&encounters);
-            targets.dungeons.extend(
-                document["dungeons"]
-                    .as_array()
-                    .into_iter()
-                    .flatten()
-                    .filter_map(|dungeon| as_u32(&dungeon["id"])),
-            );
-        }
-
-        // Chess is a server constant (`chess::GAME_ID`), not content-file data.
-        targets.minigames.insert(chess::GAME_ID as u32);
-        let kart = root.join("kart_entry.json");
-        if kart.is_file() {
-            // `KartGateway::load` owns the file; the kart service exposes no id
-            // accessor, so read the authored race identity directly.
-            let document = read_json(&kart);
-            targets
-                .minigames
-                .extend(as_u32(&document["race"]["speedway"]));
-        }
-        let derby = root.join("derby_entry.json");
-        if derby.is_file() {
-            // `DerbyGateway::load` owns the file; the game id is its identity.
-            let document = read_json(&derby);
-            targets.minigames.extend(as_u32(&document["game_id"]));
-        }
-        let soccer = root.join("soccer.json");
-        if soccer.is_file() {
-            targets.minigames.extend(
-                soccer_entry::Content::load(&soccer)?
-                    .games()
-                    .iter()
-                    .map(|game| game.id),
-            );
-        }
-        let spots = root.join("fishing_spots.json");
-        if spots.is_file() {
-            // `FishingSpots::load` owns the file; `FishingService` credits each
-            // spot's `game_id` to `finish_minigame`.
-            let document = read_json(&spots);
-            targets.minigames.extend(
-                document["spots"]
-                    .as_array()
-                    .into_iter()
-                    .flatten()
-                    .filter_map(|spot| as_u32(&spot["game_id"])),
-            );
-        }
-
-        let mining = root.join(mining::CONTENT_FILE);
-        if mining.is_file() {
-            let engine = Type8Engine::load(
-                root,
-                mining::CONTENT_FILE,
-                mining::MINING_GAME_ID,
-                mining::FIRST_MINING_INSTANCE,
-                None,
-            )?;
-            targets.minigames.insert(mining::MINING_GAME_ID as u32);
-            targets.gather.extend(
-                engine
-                    .spec()
-                    .outputs
-                    .iter()
-                    .filter_map(|output| u32::try_from(output.definition_id).ok()),
-            );
-        }
-        let harvest = root.join(harvesting::CONTENT_FILE);
-        if harvest.is_file() {
-            let engine = Type8Engine::load(
-                root,
-                harvesting::CONTENT_FILE,
-                HARVESTING_GAME_ID as i32,
-                harvesting::FIRST_INSTANCE_ID,
-                None,
-            )?;
-            targets.minigames.insert(HARVESTING_GAME_ID);
-            targets.gather.extend(
-                engine
-                    .spec()
-                    .outputs
-                    .iter()
-                    .filter_map(|output| u32::try_from(output.definition_id).ok()),
-            );
-        }
-
-        // `Gameplay::load` merges the optional catalogue under the same root;
-        // an absent `inventory.json` (as in `data/content`) means no item set,
-        // so a graded item target fails loudly instead of passing vacuously.
-        if root.join("inventory.json").is_file() {
-            targets
-                .items
-                .extend(Inventory::load(root, None)?.definition_ids());
-        }
-        targets.recipes.extend(
-            RecipeCatalog::load_runtime(root)?
-                .records
-                .iter()
-                .filter_map(|recipe| recipe.recipe_id),
-        );
-        // `Gameplay::apply_craft` falls back to the job's local opening recipe id
-        // when the learned recipe has no stable id, so those three server ids are
-        // valid `craft_recipe` events even though the recipe book does not row them.
-        targets.recipes.extend([
-            CraftingJob::Chef.opening_recipe_id(),
-            CraftingJob::Blacksmith.opening_recipe_id(),
-            CraftingJob::Miner.opening_recipe_id(),
-        ]);
-        Ok(targets)
     }
 }
 
@@ -460,14 +281,15 @@ impl Catalogue {
         violations
     }
 
-    /// Every enabled objective target this gate knows how to resolve: talk and
-    /// interact actors are in the production draw set; `reach_poi` ids are
-    /// positive; kill and item ids/counts are positive; and every target kind
-    /// with a shipped id table resolves in it. Visit geometry bounds are
+    /// Every reachable enabled objective target this gate knows how to resolve:
+    /// talk and interact actors are in the production draw set; `reach_poi` ids
+    /// are positive; kill and item ids/counts are positive; and every target
+    /// kind with a shipped id table resolves in it. Visit geometry bounds are
     /// enforced by `from_split_content` and deliberately not repeated here.
+    /// Unreachable enabled records are skipped, as the reachability rule says.
     fn target_violations(&self) -> Vec<String> {
         let mut violations = Vec::new();
-        for quest in self.enabled() {
+        for quest in self.reachable_enabled() {
             for (index, goal) in quest.objectives.iter().enumerate() {
                 let objective = goal["id"].as_u64().unwrap_or(0);
                 let owner = format!("quest {} objective {objective} (#{index})", quest.id);
@@ -541,8 +363,16 @@ impl Catalogue {
                     "finish_minigame" => {
                         let minigame = as_u32(&goal["minigame_id"]).unwrap_or(0);
                         if !self.targets.minigames.contains(&minigame) {
+                            // A shipped id no server path can emit is not an
+                            // unknown id: name the missing producer so the
+                            // content fix is an emitter, not a new row.
+                            let reason = if self.targets.unproduced_minigames.contains(&minigame) {
+                                "is a shipped minigame id with no server FinishMinigame emitter"
+                            } else {
+                                "is not a shipped minigame id"
+                            };
                             violations.push(format!(
-                                "{owner} (finish_minigame): minigame {minigame} is not a shipped minigame id"
+                                "{owner} (finish_minigame): minigame {minigame} {reason}"
                             ));
                         }
                     }
@@ -731,7 +561,7 @@ fn every_talk_target_and_visit_point_resolves() {
     let violations = catalogue.target_violations();
     assert!(
         violations.is_empty(),
-        "enabled quest targets that do not resolve:\n{}",
+        "reachable enabled quest targets that do not resolve:\n{}",
         violations.join("\n")
     );
     println!(
@@ -745,6 +575,10 @@ fn every_talk_target_and_visit_point_resolves() {
         catalogue.targets.items.len(),
         catalogue.targets.recipes.len(),
         catalogue.targets.gather.len()
+    );
+    println!(
+        "shipped minigame ids with no FinishMinigame emitter (a target on these cannot advance): {:?}",
+        catalogue.targets.unproduced_minigames
     );
 
     let reachable: BTreeSet<u32> = catalogue
@@ -774,6 +608,39 @@ fn every_talk_target_and_visit_point_resolves() {
         "enabled quests with resolvable targets: {} reachable, {} unreachable",
         reachable.len(),
         unreachable.len()
+    );
+}
+
+/// The accepted `finish_minigame` ids are the game ids one real server emitter
+/// can send (the producer table in `tests/support/quest_target_sets.rs`).
+/// Pinning the shipped set makes a lost or unmodelled producer fail here instead
+/// of silently certifying or rejecting a quest target. Derby 39 is the one
+/// shipped minigame game id with no emitter, so it must stay refused.
+#[test]
+fn shipped_minigame_producers_are_pinned() {
+    let catalogue = Catalogue::load(&content_dir()).expect("the shipped split catalogue loads");
+    assert_eq!(
+        catalogue
+            .targets
+            .minigames
+            .iter()
+            .copied()
+            .collect::<Vec<_>>(),
+        vec![
+            18, 20, 31, 42, 43, 44, 46, 66, 67, 77, 111, 134, 135, 136, 137, 139, 596, 597, 598,
+            599, 600, 601,
+        ],
+        "the finish_minigame producer set changed; update the producer table and this pin"
+    );
+    assert_eq!(
+        catalogue
+            .targets
+            .unproduced_minigames
+            .iter()
+            .copied()
+            .collect::<Vec<_>>(),
+        vec![39],
+        "derby 39 has no FinishMinigame emitter; accepting it would certify dead content"
     );
 }
 
@@ -883,6 +750,23 @@ fn a_malformed_enabled_row_is_rejected_or_reported() {
         catalogue.reward_violations()
     );
 
+    // A deliberately unshipped target on the unreachable dependant is not
+    // graded either: the reachability rule skips both gates for it.
+    patch_fixture_objective(
+        &blocked,
+        FIXTURE_DEFECT,
+        "finish_minigame",
+        "minigame_id",
+        9_999,
+    );
+    let catalogue = Catalogue::load(blocked.path()).expect("the patched unreachable quest loads");
+    assert!(catalogue.unreachable().contains_key(&FIXTURE_DEFECT));
+    assert!(
+        catalogue.target_violations().is_empty(),
+        "an unreachable enabled quest's targets must not be graded: {:?}",
+        catalogue.target_violations()
+    );
+
     // The production loader refuses an absent prerequisite; that rule is not
     // re-implemented by the audit.
     let missing_prerequisite = fixture("missing-prerequisite", Defect::MissingPrerequisite);
@@ -892,22 +776,22 @@ fn a_malformed_enabled_row_is_rejected_or_reported() {
     );
 }
 
-/// Rewrite one target field of the fixture's base quest in its scratch tree.
-fn patch_fixture_objective(scratch: &Scratch, kind: &str, field: &str, value: u64) {
+/// Rewrite one target field of one fixture quest in its scratch tree.
+fn patch_fixture_objective(scratch: &Scratch, quest: u32, kind: &str, field: &str, value: u64) {
     let path = scratch.path().join("quests/fixture.json");
     let mut document = read_json(&path);
-    let quest = document["records"]
+    let record = document["records"]
         .as_array_mut()
         .expect("fixture records")
         .iter_mut()
-        .find(|record| as_u32(&record["id"]) == Some(FIXTURE_QUEST))
-        .expect("the fixture base quest exists");
-    let goal = quest["objectives"]
+        .find(|record| as_u32(&record["id"]) == Some(quest))
+        .unwrap_or_else(|| panic!("the fixture quest {quest} exists"));
+    let goal = record["objectives"]
         .as_array_mut()
         .expect("fixture objectives")
         .iter_mut()
         .find(|goal| goal["kind"].as_str() == Some(kind))
-        .unwrap_or_else(|| panic!("the fixture has a {kind} objective"));
+        .unwrap_or_else(|| panic!("the fixture quest {quest} has a {kind} objective"));
     goal[field] = json!(value);
     fs::write(
         &path,
@@ -929,12 +813,7 @@ fn graded_target_kinds_fail_on_a_scratch_tree() {
         catalogue.target_violations()
     );
     assert!(catalogue.targets.dungeons.contains(&FIXTURE_BATTLE));
-    assert!(
-        catalogue
-            .targets
-            .minigames
-            .contains(&(chess::GAME_ID as u32))
-    );
+    assert!(catalogue.targets.minigames.contains(&FIXTURE_MINIGAME));
     assert!(catalogue.targets.items.contains(&FIXTURE_ITEM));
     assert!(catalogue.targets.recipes.contains(&FIXTURE_RECIPE));
     assert!(catalogue.targets.gather.contains(&FIXTURE_GATHER_RESOURCE));
@@ -942,7 +821,13 @@ fn graded_target_kinds_fail_on_a_scratch_tree() {
     // Canary A: a `complete_dungeon` encounter id no shipped battle or dungeon
     // owns. The quest stays reachable, so the reward gate cannot hide it.
     let dungeon = fixture("canary-dungeon", Defect::None);
-    patch_fixture_objective(&dungeon, "complete_dungeon", "encounter_id", 99_999);
+    patch_fixture_objective(
+        &dungeon,
+        FIXTURE_QUEST,
+        "complete_dungeon",
+        "encounter_id",
+        99_999,
+    );
     let catalogue = Catalogue::load(dungeon.path()).expect("the altered dungeon quest loads");
     assert!(
         catalogue
@@ -962,7 +847,13 @@ fn graded_target_kinds_fail_on_a_scratch_tree() {
 
     // Canary B: a `finish_minigame` id no shipped minigame owns.
     let minigame = fixture("canary-minigame", Defect::None);
-    patch_fixture_objective(&minigame, "finish_minigame", "minigame_id", 9_999);
+    patch_fixture_objective(
+        &minigame,
+        FIXTURE_QUEST,
+        "finish_minigame",
+        "minigame_id",
+        9_999,
+    );
     let catalogue = Catalogue::load(minigame.path()).expect("the altered minigame quest loads");
     let violations = catalogue.target_violations();
     assert_eq!(violations.len(), 1, "{violations:?}");
@@ -1010,7 +901,7 @@ fn graded_target_kinds_fail_on_a_scratch_tree() {
 
     // Canary D: a recipe key absent from the loaded recipe book.
     let recipe = fixture("canary-recipe", Defect::None);
-    patch_fixture_objective(&recipe, "craft_recipe", "recipe_id", 999_999);
+    patch_fixture_objective(&recipe, FIXTURE_QUEST, "craft_recipe", "recipe_id", 999_999);
     let catalogue = Catalogue::load(recipe.path()).expect("the altered recipe quest loads");
     let violations = catalogue.target_violations();
     assert_eq!(violations.len(), 1, "{violations:?}");
@@ -1022,7 +913,13 @@ fn graded_target_kinds_fail_on_a_scratch_tree() {
     // Canary E: a gather resource absent from the mining/harvesting outputs and
     // the documented local drops. Repeating the report proves deterministic order.
     let gather = fixture("canary-gather", Defect::None);
-    patch_fixture_objective(&gather, "gather_resource", "resource_id", 999_999);
+    patch_fixture_objective(
+        &gather,
+        FIXTURE_QUEST,
+        "gather_resource",
+        "resource_id",
+        999_999,
+    );
     let catalogue = Catalogue::load(gather.path()).expect("the altered gather quest loads");
     let violations = catalogue.target_violations();
     assert_eq!(violations.len(), 1, "{violations:?}");
@@ -1034,6 +931,32 @@ fn graded_target_kinds_fail_on_a_scratch_tree() {
         violations,
         catalogue.target_violations(),
         "the target report order must be deterministic"
+    );
+
+    // Canary F: a minigame id the content defines but no server path can emit.
+    // Derby 39 pays its completion but never calls `npc_minigame_win` or sends a
+    // 39/18, so certifying that target would hide dead content.
+    let derby = fixture("canary-derby", Defect::None);
+    let derby_path = derby.path().join("derby_entry.json");
+    fs::write(&derby_path, br#"{"schema_version":1,"game_id":39}"#)
+        .unwrap_or_else(|error| panic!("{}: {error}", derby_path.display()));
+    patch_fixture_objective(&derby, FIXTURE_QUEST, "finish_minigame", "minigame_id", 39);
+    let catalogue = Catalogue::load(derby.path()).expect("the derby-content quest loads");
+    assert!(
+        !catalogue.targets.minigames.contains(&39),
+        "derby 39 must not enter the producer set"
+    );
+    assert!(
+        catalogue.targets.unproduced_minigames.contains(&39),
+        "derby 39 must be reported as a shipped id with no producer"
+    );
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains("finish_minigame")
+            && violations[0].contains("39")
+            && violations[0].contains("no server FinishMinigame emitter"),
+        "canary F did not name the unproduced minigame: {violations:?}"
     );
 }
 

@@ -21,6 +21,8 @@ pub const FIXTURE_DEFECT: u32 = 9_100_002;
 pub const FIXTURE_QUEST: u32 = 9_100_001;
 pub const FIXTURE_ITEM: i32 = 9_100_100;
 pub const FIXTURE_RECIPE: u32 = 9_100_101;
+/// The recipe row's `minigame_id`: the game id a craft win sends as 39/18.
+pub const FIXTURE_MINIGAME: u32 = 9_100_102;
 pub const FIXTURE_BATTLE: u32 = 9_100_200;
 /// The documented local opening drop key (`Gameplay::local_gather_drop`).
 pub const FIXTURE_GATHER_RESOURCE: u32 = 1_001;
@@ -112,57 +114,58 @@ fn fixture_visit_objective(position: [f64; 3], radius: f64) -> Value {
     }])
 }
 
-/// One resolving target per graded kind: the item catalogue, recipe book, chess
-/// constant, battle set and local gather-drop list this fixture writes.
+/// One resolving target per graded kind: the item catalogue, recipe book, the
+/// recipe's `minigame_id`, battle set and local gather-drop list this fixture
+/// writes. The `finish_minigame` target is the recipe's game id so the craft
+/// producer is exercised through the production `RecipeCatalog` loader.
 fn fixture_objectives() -> Value {
-    json!([
-        {
-            "kind": "talk_to_npc",
-            "id": 1,
-            "npc_id": FIXTURE_TARGET,
-            "source": fixture_source(),
-        },
-        {
-            "kind": "collect_item",
-            "id": 2,
-            "item_id": FIXTURE_ITEM,
-            "quantity": 1,
-            "source": fixture_source(),
-        },
-        {
-            "kind": "equip_item",
-            "id": 3,
-            "definition_id": FIXTURE_ITEM,
-            "source": fixture_source(),
-        },
-        {
-            "kind": "craft_recipe",
-            "id": 4,
-            "recipe_id": FIXTURE_RECIPE,
-            "quantity": 1,
-            "source": fixture_source(),
-        },
-        {
-            "kind": "finish_minigame",
-            "id": 5,
-            "minigame_id": osfr_tools::chess::GAME_ID as u32,
-            "count": 1,
-            "source": fixture_source(),
-        },
-        {
-            "kind": "complete_dungeon",
-            "id": 6,
-            "encounter_id": FIXTURE_BATTLE,
-            "source": fixture_source(),
-        },
-        {
-            "kind": "gather_resource",
-            "id": 7,
-            "resource_id": FIXTURE_GATHER_RESOURCE,
-            "quantity": 1,
-            "source": fixture_source(),
-        },
-    ])
+    let mut objectives = fixture_talk_objective();
+    objectives
+        .as_array_mut()
+        .expect("the talk fixture is an objective array")
+        .extend([
+            json!({
+                "kind": "collect_item",
+                "id": 2,
+                "item_id": FIXTURE_ITEM,
+                "quantity": 1,
+                "source": fixture_source(),
+            }),
+            json!({
+                "kind": "equip_item",
+                "id": 3,
+                "definition_id": FIXTURE_ITEM,
+                "source": fixture_source(),
+            }),
+            json!({
+                "kind": "craft_recipe",
+                "id": 4,
+                "recipe_id": FIXTURE_RECIPE,
+                "quantity": 1,
+                "source": fixture_source(),
+            }),
+            json!({
+                "kind": "finish_minigame",
+                "id": 5,
+                "minigame_id": FIXTURE_MINIGAME,
+                "count": 1,
+                "source": fixture_source(),
+            }),
+            json!({
+                "kind": "complete_dungeon",
+                "id": 6,
+                "encounter_id": FIXTURE_BATTLE,
+                "source": fixture_source(),
+            }),
+            json!({
+                "kind": "gather_resource",
+                "id": 7,
+                "resource_id": FIXTURE_GATHER_RESOURCE,
+                "quantity": 1,
+                "source": fixture_source(),
+            }),
+        ]);
+    objectives
 }
 
 fn fixture_reward() -> Value {
@@ -206,6 +209,7 @@ fn fixture_recipe_book() -> Value {
         "job",
         "job_profile_id",
         "minigame_type_id",
+        "minigame_id",
         "experience_points",
         "output.definition_id",
         "output.count",
@@ -223,6 +227,7 @@ fn fixture_recipe_book() -> Value {
             "job": "chef",
             "job_profile_id": 45,
             "minigame_type_id": 1,
+            "minigame_id": FIXTURE_MINIGAME,
             "ingredients": [{"definition_id": FIXTURE_ITEM, "count": 1}],
             "output": {"definition_id": FIXTURE_RECIPE, "count": 1},
             "experience_points": 0,
@@ -319,11 +324,13 @@ pub fn fixture(name: &str, defect: Defect) -> Scratch {
         Defect::DisabledPrerequisite => {
             // The defect quest would fail the reward gate if it were graded, so
             // an empty reward proves the audit classified it unreachable instead.
+            // Its graded objectives let the target test patch one to an
+            // unshipped id and prove the unreachable record is skipped there too.
             quests.push(fixture_quest(
                 FIXTURE_DEFECT,
                 FIXTURE_TITLE,
                 FIXTURE_GIVER,
-                fixture_talk_objective(),
+                fixture_objectives(),
                 json!([]),
                 json!([FIXTURE_BLOCKER]),
             ));
