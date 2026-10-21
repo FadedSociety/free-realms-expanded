@@ -2035,11 +2035,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:554; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1794 (ModelId=401, ModelFileName=fairy_seaside_f_01.adr, NameId=45577)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.101729, JenkinsLookup2 hash 1666566655, en_us_data.dat line 44078. Speaker proof: first-person Beach Ball outfit request; the region-guide row quotes this line as Ashby Purrl's. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 78."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": -2.577284,
       "model_id": 401,
-      "model_file_name": "fairy_seaside_f_01.adr"
+      "model_file_name": "fairy_seaside_f_01.adr",
+      "greeting_string_id": 101729
     },
     {
       "npc_id": 9500000551,
@@ -6453,11 +6464,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:739; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1982 (ModelId=1457, ModelFileName=human_m_manager_landon.agr, NameId=406430)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.406431, JenkinsLookup2 hash 108726065, en_us_data.dat line 2823. Speaker proof: first-person Sandstorm Speedway welcome; notes/Build Guides/Content/Jobs/Kart Driver.md line 142 names Bill Riddly the Sandstorm's Grand Opening giver and records this line. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 113."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": -2.596121,
       "model_id": 1457,
-      "model_file_name": "human_m_manager_landon.agr"
+      "model_file_name": "human_m_manager_landon.agr",
+      "greeting_string_id": 406431
     },
     {
       "npc_id": 9500000560,
@@ -11388,11 +11410,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:521; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1759 (ModelId=401, ModelFileName=fairy_seaside_f_01.adr, NameId=103028)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.76268, JenkinsLookup2 hash 3385240829, en_us_data.dat line 89537. Speaker proof: first-person pearl-collection offer in the Cray Caves; the region-guide row quotes this line as Daria Purrl's. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 107."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": -0.211325,
       "model_id": 401,
-      "model_file_name": "fairy_seaside_f_01.adr"
+      "model_file_name": "fairy_seaside_f_01.adr",
+      "greeting_string_id": 76268
     },
     {
       "npc_id": 9500000572,
@@ -13487,11 +13520,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:653; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1895 (ModelId=774, ModelFileName=human_m_dr_callahan.agr, NameId=74790)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.387576, JenkinsLookup2 hash 4293886124, en_us_data.dat line 113302. Speaker proof: first-person Medic trainer quest offer; data/content/quests/medic.json quest 3090027 binds giver 9000000072 and intro_text_string_id 387576. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 51."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": 2.067681,
       "model_id": 774,
-      "model_file_name": "human_m_dr_callahan.agr"
+      "model_file_name": "human_m_dr_callahan.agr",
+      "greeting_string_id": 387576
     },
     {
       "npc_id": 9500000574,
@@ -18389,11 +18433,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:635; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1877 (ModelId=337, ModelFileName=human_m_courier_finneus.agr, NameId=117342)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.387934, JenkinsLookup2 hash 1553080327, en_us_data.dat line 41118. Speaker proof: first-person Postman trainer quest offer; data/content/quests/postman.json quest 3130017 binds giver 9000000080 and intro_text_string_id 387934. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 53."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": -1.50965,
       "model_id": 337,
-      "model_file_name": "human_m_courier_finneus.agr"
+      "model_file_name": "human_m_courier_finneus.agr",
+      "greeting_string_id": 387934
     },
     {
       "npc_id": 9500000582,
@@ -20400,11 +20455,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:587; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1827 (ModelId=4, ModelFileName=robgoblin_m_basic.adr, NameId=101707)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.400812, JenkinsLookup2 hash 1618656001, en_us_data.dat line 42849. Speaker proof: first-person Seaside Summer Splash secret-deck challenge; the region-guide row quotes this line as Grekel's. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 56."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": 0.430705,
       "model_id": 4,
-      "model_file_name": "robgoblin_m_basic.adr"
+      "model_file_name": "robgoblin_m_basic.adr",
+      "greeting_string_id": 400812
     },
     {
       "npc_id": 9500000587,
@@ -22418,11 +22484,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:595; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1836 (ModelId=641, ModelFileName=fairy_f_tcg_jammie_swiftsong.agr, NameId=74098)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.104270, JenkinsLookup2 hash 3098965505, en_us_data.dat line 81814. Speaker proof: first-person Card Duelist quest offer; data/content/quests/card_duelist.json quest 3040022 binds giver 9000000112 and intro_text_string_id 104270. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 55."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": 1.685854,
       "model_id": 641,
-      "model_file_name": "fairy_f_tcg_jammie_swiftsong.agr"
+      "model_file_name": "fairy_f_tcg_jammie_swiftsong.agr",
+      "greeting_string_id": 104270
     },
     {
       "npc_id": 9500000590,
@@ -23265,11 +23342,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:673; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1915 (ModelId=3, ModelFileName=jollyroger.adr, NameId=436629)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.427889, JenkinsLookup2 hash 2642857805, en_us_data.dat line 69548. Speaker proof: first-person Pirate's Plunder registration offer; the region-guide row names Jolly Roger the registering pirate teacher. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 61."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": 0.156203,
       "model_id": 3,
-      "model_file_name": "jollyroger.adr"
+      "model_file_name": "jollyroger.adr",
+      "greeting_string_id": 427889
     },
     {
       "npc_id": 9500000592,
@@ -26415,11 +26503,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:636; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1878 (ModelId=762, ModelFileName=fairy_m_gilly.adr, NameId=21294)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.5101019, JenkinsLookup2 hash 250427778, en_us_data.dat line 6572. Speaker proof: first-person Seaside welcome and Cray investigation offer; the region-guide row quotes this line as Mayor Gilly's. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 31."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": -2.61817,
       "model_id": 762,
-      "model_file_name": "fairy_m_gilly.adr"
+      "model_file_name": "fairy_m_gilly.adr",
+      "greeting_string_id": 5101019
     },
     {
       "npc_id": 9500000599,
@@ -38037,11 +38136,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:518; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1756 (ModelId=765, ModelFileName=fairy_m_seaspray.adr, NameId=21301)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.93409, JenkinsLookup2 hash 1382851082, en_us_data.dat line 36681. Speaker proof: first-person innkeeper line about the oldest building in Seaside; the region-guide row quotes this line as Seaspray's. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 32."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": -2.137807,
       "model_id": 765,
-      "model_file_name": "fairy_m_seaspray.adr"
+      "model_file_name": "fairy_m_seaspray.adr",
+      "greeting_string_id": 93409
     },
     {
       "npc_id": 9500000624,
@@ -39880,11 +39990,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:581; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1821 (ModelId=222, ModelFileName=chugawug_f_02.adr, NameId=101241)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.101261, JenkinsLookup2 hash 3493387114, en_us_data.dat line 92519. Speaker proof: first-person helmet request for her son Aziwug; the region-guide row quotes this line as Sockalug's. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 91."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": 0.589821,
       "model_id": 222,
-      "model_file_name": "chugawug_f_02.adr"
+      "model_file_name": "chugawug_f_02.adr",
+      "greeting_string_id": 101261
     },
     {
       "npc_id": 9500000628,
@@ -40784,11 +40905,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:643; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1885 (ModelId=766, ModelFileName=fairy_m_spritzy.adr, NameId=21292)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.93282, JenkinsLookup2 hash 2185228639, en_us_data.dat line 57559. Speaker proof: first-person new-visitor greeting that sends the player to the gazebo; the region-guide row quotes this line as Spritzy's. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 29."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": -0.686072,
       "model_id": 766,
-      "model_file_name": "fairy_m_spritzy.adr"
+      "model_file_name": "fairy_m_spritzy.adr",
+      "greeting_string_id": 93282
     },
     {
       "npc_id": 9500000630,

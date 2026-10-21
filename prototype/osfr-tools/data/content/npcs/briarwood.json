@@ -2344,11 +2344,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1302; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2559 (ModelId=438, ModelFileName=human_m_andrew.agr, NameId=17291)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.95156, JenkinsLookup2 hash 3961426188, en_us_data.dat line 104776. Speaker proof: first-person Brawler quest offer; data/content/quests/brawler.json quest 3030026 binds giver 9000000009 and intro_text_string_id 95156. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 48."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": 0.981863,
       "model_id": 438,
-      "model_file_name": "human_m_andrew.agr"
+      "model_file_name": "human_m_andrew.agr",
+      "greeting_string_id": 95156
     },
     {
       "npc_id": 9500000086,
@@ -3918,11 +3929,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1329; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2586 (ModelId=64, ModelFileName=chugawug_f_greenwood_soldier.adr, NameId=73994)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.72077, JenkinsLookup2 hash 596647416, en_us_data.dat line 15796. Speaker proof: first-person brazier request; the region-guide row names Babbina and the Stoke the Flames quest. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 60."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": 2.141618,
       "model_id": 64,
-      "model_file_name": "chugawug_f_greenwood_soldier.adr"
+      "model_file_name": "chugawug_f_greenwood_soldier.adr",
+      "greeting_string_id": 72077
     },
     {
       "npc_id": 9500000090,
@@ -5738,11 +5760,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1411; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2668 (ModelId=468, ModelFileName=fairy_druid_m.adr, NameId=390538)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.72220, JenkinsLookup2 hash 2622756725, en_us_data.dat line 69041. Speaker proof: first-person sapling-watering request; the region-guide row quotes this line as Blari's. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 100."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": -1.202353,
       "model_id": 468,
-      "model_file_name": "fairy_druid_m.adr"
+      "model_file_name": "fairy_druid_m.adr",
+      "greeting_string_id": 72220
     },
     {
       "npc_id": 9500000095,
@@ -8582,11 +8615,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3510; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=6452 (ModelId=409, ModelFileName=chugawug_captainchugug_m.adr, NameId=17794)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.93894, JenkinsLookup2 hash 2733008456, en_us_data.dat line 71999. Speaker proof: first-person Adventurer quest offer; data/content/quests/adventurer.json quest 3000044 binds giver 9000000268 and intro_text_string_id 93894. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 189."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": -2.229929,
       "model_id": 409,
-      "model_file_name": "chugawug_captainchugug_m.adr"
+      "model_file_name": "chugawug_captainchugug_m.adr",
+      "greeting_string_id": 93894
     },
     {
       "npc_id": 9500000100,
@@ -14021,11 +14065,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1381; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2638 (ModelId=14, ModelFileName=chugawug_m_01.adr, NameId=73486)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.72073, JenkinsLookup2 hash 582349080, en_us_data.dat line 15443. Speaker proof: first-person courting-stone request; the region-guide row lists this Corflugg errand. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 79."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": -2.212004,
       "model_id": 14,
-      "model_file_name": "chugawug_m_01.adr"
+      "model_file_name": "chugawug_m_01.adr",
+      "greeting_string_id": 72073
     },
     {
       "npc_id": 9500000112,
@@ -20968,11 +21023,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1482; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2739 (ModelId=221, ModelFileName=chugawug_m_02.adr, NameId=22283)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.74072, JenkinsLookup2 hash 1961466830, en_us_data.dat line 51685. Speaker proof: first-person Medic trainer quest offer; data/content/quests/medic.json quest 3090019 binds giver 9000000071 and intro_text_string_id 74072. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 70."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": 1.977838,
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_string_id": 74072
     },
     {
       "npc_id": 9000000074,
@@ -22055,11 +22121,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1549; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2806 (ModelId=221, ModelFileName=chugawug_m_02.adr, NameId=37569)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.412249, JenkinsLookup2 hash 1500179458, en_us_data.dat line 39754. Speaker proof: first-person Fisherman quest offer; data/content/quests/fisherman.json quest 3070027 binds giver 9000000308 and intro_text_string_id 412249. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 162."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": -0.04487,
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_string_id": 412249
     },
     {
       "npc_id": 9500000124,
@@ -23783,11 +23860,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1470; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2727 (ModelId=1568, ModelFileName=human_f_estherthebrain.adr, NameId=407093)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.407023, JenkinsLookup2 hash 2823732375, en_us_data.dat line 74435. Speaker proof: first-person Card Duelist quest offer; data/content/quests/card_duelist.json quest 3040033 binds giver 9000000082 and intro_text_string_id 407023. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 117."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": 3.121559,
       "model_id": 1568,
-      "model_file_name": "human_f_estherthebrain.adr"
+      "model_file_name": "human_f_estherthebrain.adr",
+      "greeting_string_id": 407023
     },
     {
       "npc_id": 9500000127,
@@ -26526,11 +26614,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1303; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2560 (ModelId=178, ModelFileName=changeling_f.adr, NameId=73516)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.139295, JenkinsLookup2 hash 3857115367, en_us_data.dat line 101958. Speaker proof: first-person lost-friends line; the region-guide row quotes this line as Freidi's. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 32."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": -2.755777,
       "model_id": 178,
-      "model_file_name": "changeling_f.adr"
+      "model_file_name": "changeling_f.adr",
+      "greeting_string_id": 139295
     },
     {
       "npc_id": 9500000134,
@@ -57802,11 +57901,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1551; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2808 (ModelId=71, ModelFileName=necrowartzombie_01.adr, NameId=435682)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.435562, JenkinsLookup2 hash 647951782, en_us_data.dat line 17166. Speaker proof: self-identifying first-person line ('my name is Reginald'); the region-guide row names Reginald the Vegetarian Shambler. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 101."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": 2.332662,
       "model_id": 71,
-      "model_file_name": "necrowartzombie_01.adr"
+      "model_file_name": "necrowartzombie_01.adr",
+      "greeting_string_id": 435562
     },
     {
       "npc_id": 9000000183,
@@ -62684,11 +62794,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1483; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2740 (ModelId=65, ModelFileName=chugawug_m_greenwood_soldier.adr, NameId=16814)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.78312, JenkinsLookup2 hash 2183725585, en_us_data.dat line 57531. Speaker proof: first-person Miner quest offer; data/content/quests/miner.json quest 3100028 binds giver 9000000470 and intro_text_string_id 78312. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 59."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": -0.300727,
       "model_id": 65,
-      "model_file_name": "chugawug_m_greenwood_soldier.adr"
+      "model_file_name": "chugawug_m_greenwood_soldier.adr",
+      "greeting_string_id": 78312
     },
     {
       "npc_id": 9500000216,
@@ -66557,11 +66678,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1328; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2585 (ModelId=421, ModelFileName=human_f_nurse_naia.agr, NameId=72683)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Global.Text.72039, JenkinsLookup2 hash 1265014476, en_us_data.dat line 33509. Speaker proof: first-person fellow-Medic request to treat the sick animals; the region-guide row quotes this line as Tara's. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 61."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
+          }
         ]
       },
       "heading": -0.957504,
       "model_id": 421,
-      "model_file_name": "human_f_nurse_naia.agr"
+      "model_file_name": "human_f_nurse_naia.agr",
+      "greeting_string_id": 72039
     },
     {
       "npc_id": 9500000224,
