@@ -142,7 +142,9 @@ pub struct RespawnWindow {
     pub instance_id: i32,
     /// Milliseconds; the native handler divides by 1000 for its label.
     pub timer_ms: u32,
-    /// Coins the "Revive here" button charges; `0` disables the paid path in the client guard.
+    /// Coins the "Revive here" button charges. The client greys the button while the wallet is
+    /// below this cost and enables it at or above (`showTwoButtons_lua`); cost `0` is therefore
+    /// *enabled*, not disabled, and no value hides the paid button.
     pub revive_cost: u32,
 }
 

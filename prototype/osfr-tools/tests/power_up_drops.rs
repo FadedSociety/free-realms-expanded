@@ -209,6 +209,28 @@ fn kill_spawns_a_pickup_actor_with_the_kind_model_at_the_kill() {
     );
 }
 
+/// T375: pickup actors carry no nameplate text. Client reader 0x00921a10 shows
+/// the literal `npc_name` when `name_string_id` is 0 (native text check
+/// 20261016T011257Z), so both stay empty; native run 20261021T044856Z showed
+/// "health_small"/"health_big" floating over the hearts. A stored kind's locale
+/// id (flame_wave 419611) is zeroed too.
+#[test]
+fn pickup_actors_carry_no_kind_names() {
+    for (table, kind) in [("boss", "health_big"), ("t_flame", "flame_wave")] {
+        let f = Fixture::new(&[Some(table)]);
+        let mut e = f.load();
+        let out = kill(&mut e, FIRST, 1_000);
+        let packet = out
+            .replies
+            .iter()
+            .find(|p| p.starts_with(&[35, 0, 2, 0]))
+            .expect("pickup AddNpc");
+        let spawn = osfr_tools::startup_world::parse_add_npc(packet).unwrap();
+        assert_eq!(spawn.name_string_id, 0, "{kind}: name id");
+        assert_eq!(spawn.npc_name, "", "{kind}: literal name");
+    }
+}
+
 #[test]
 fn kinds_use_their_own_models() {
     let f = Fixture::new(&[Some("t_flame"), Some("t_shield"), Some("t_energy")]);

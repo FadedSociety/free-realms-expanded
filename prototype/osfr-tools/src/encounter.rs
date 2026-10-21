@@ -97,10 +97,13 @@ const ENERGY_MAX: i32 = 100;
 /// Combat page (research piece 058). The client counts it down only when it
 /// does not show the two-button dialog, and then sends the free revive itself.
 const REVIVE_TIMER_MS: i32 = 10_000;
-/// (R) Price sent in 41/125. No payment policy exists, so it is unaffordable:
-/// the original window greys "Revive here" while wallet < cost (revive_window
-/// gfx `showTwoButtons_lua`, piece 037). Paid 41/122 is also refused below.
-const PAID_REVIVE_COST: i32 = i32::MAX;
+/// (R) Price sent in 41/125: the retail spot-revive price, 1,000 coins (the
+/// window's own default `setReviveCost_lua(1000)` in `UI/revive_window.gfx`;
+/// the wiki's Sunstone Valley page says 1,000). The client greys "Revive here"
+/// while the wallet is below this cost and enables it at or above
+/// (`showTwoButtons_lua`); it never hides the paid button, and cost 0 *enables*
+/// it, so 0 does not disable the paid path. Paid 41/122 is still refused below.
+const PAID_REVIVE_COST: i32 = 1_000;
 /// (R) Field enemies ignore a freshly revived or recovered player this long.
 const FIELD_GRACE_MS: u64 = 8_000;
 /// (R) Server fallback: an overworld knockout with no 41/122 by then is revived
@@ -210,6 +213,8 @@ struct Actor {
     guid: u64,
     definition_id: i32,
     model_id: i32,
+    /// Locale id for the client nameplate; 0 shows the literal `name`, so an
+    /// actor with no visible name leaves both empty (pickups below).
     name_id: i32,
     name: String,
     texture_alias: String,
@@ -2220,8 +2225,8 @@ impl EncounterEngine {
                 guid,
                 definition_id: 0,
                 model_id: kind.model_id as i32,
-                name_id: kind.name_id.unwrap_or(0) as i32,
-                name: kind_id.to_owned(),
+                name_id: 0,
+                name: String::new(),
                 texture_alias: String::new(),
                 position,
                 max_health: 1,

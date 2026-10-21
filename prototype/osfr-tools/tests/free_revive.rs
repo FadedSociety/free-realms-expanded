@@ -84,12 +84,17 @@ fn resume(paid: u8, encounter: i32, instance: i32) -> Vec<u8> {
 fn free() -> Vec<u8> {
     resume(0, 0, 0)
 }
+/// T375: the retail price the window offers. 0 is not a "disabled" sentinel:
+/// the client enables the paid button at or above the cost and greys it below
+/// (`revive_window.gfx` `showTwoButtons_lua`), so 1,000 keeps it greyed for a
+/// wallet under the wiki's 1,000-coin spot revive.
+const REVIVE_COST: i32 = 1_000;
 fn window() -> Vec<u8> {
     [
         vec![41, 0, 125, 0],
         vec![0; 8],
         10_000_i32.to_le_bytes().to_vec(),
-        i32::MAX.to_le_bytes().to_vec(),
+        REVIVE_COST.to_le_bytes().to_vec(),
     ]
     .concat()
 }
@@ -149,6 +154,32 @@ fn world_knockout_is_held_and_offers_the_window_once() {
     assert!(untouched(&e.attack(WOLF, [0.0; 3], 11, 0, 9_000).unwrap()));
     assert!(e.begin(411, location(), 11).is_err());
     assert_eq!(e.state(), &before);
+}
+
+#[test]
+fn the_window_carries_the_retail_paid_price() {
+    let f = Fixture::new();
+    let (_, out) = knocked_out(&f);
+    let offered = out
+        .replies
+        .iter()
+        .find(|p| p.starts_with(&[41, 0, 125, 0]))
+        .expect("41/125 offered");
+    assert_eq!(
+        offered.len(),
+        20,
+        "family header plus timer and cost (`008d6730`)"
+    );
+    assert_eq!(
+        i32::from_le_bytes(offered[12..16].try_into().unwrap()),
+        10_000,
+        "timer ms"
+    );
+    assert_eq!(
+        i32::from_le_bytes(offered[16..20].try_into().unwrap()),
+        REVIVE_COST,
+        "the chosen price, not a sentinel"
+    );
 }
 
 /// Lead (R): if the client never sends 41/122 (for example the window does
