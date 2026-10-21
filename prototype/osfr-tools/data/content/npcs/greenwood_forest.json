@@ -16690,9 +16690,18 @@
               "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 60; source cell: [client][wiki]"
             }
           ]
+        },
+        {
+          "quest_id": 3010003
+        },
+        {
+          "quest_id": 3010006
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3010003,
+        3010006
+      ],
       "quests_given_text": [
         "Full line on Archer: Path of the Archer (unlocks the job), Archer: Test of Agility, Archer: Taking Aim, Archer: Oath of Honor; entry quests \"Being a Better Archer\" and \"Aiming For Archery\" point to her. The wiki also lists the quest Thugawugs under her and names her in Lofty Letter (an Adventurer side quest); a letter to her from a guard named Trusty is in the client (3739059730, 2181619100) and is not tied to a title. Weapon-testing text: \"Help Lugabow with her weapons testing in the Greenwood Camp.\" (3032659489, title not found). Related: Miner: Arrowheads for Lugabow; blacksmith bow orders (2576706017)."
       ],

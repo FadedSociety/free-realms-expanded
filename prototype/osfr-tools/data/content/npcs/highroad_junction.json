@@ -908,11 +908,15 @@
               "evidence": "title_string_id corrected from raw locale hash 3343686488 to Global.Text id 104142 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3050004
         }
       ],
       "quest_ids_given": [
         3050011,
-        3050013
+        3050013,
+        3050004
       ],
       "quests_given_text": [
         "Chef: Highroad Cooking (unlocks the job: \"Are you here for the Assistant Chef job? ... I'll teach you how to cook Spiralmint Steak\" 331589818), Chef: Ranger Requisition, Chef: Perry's Pastures, Chef: Auguste's Rush Orders [inferred, see Chef H6]; Farmer's Market customer order Auguste Frydaze's Shopping List."
@@ -6579,8 +6583,14 @@
       "location_evidence": [
         "\"Merigold can be found in Highroad Junction.\" (1281773280); \"Find Merigold in Highroad Junction to begin your adventures in Sacred Grove!\" (260624254). Auguste is \"west of Merigold\" (540793855). [video: nameplate with an \"Active Quest!\" label and green marker, seen with Card Duelist level 15 players, zone banner not visible: Yk3SSD85Mho/00006, /00102, ZGsTWhCqcN0/00082]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3000020
+        }
+      ],
+      "quest_ids_given": [
+        3000020
+      ],
       "quests_given_text": [
         "Visit Merigold and Meet Merigold [inferred from title pairs 1553143299/1333151367 and 510375985/139862142; text \"Visit Merigold to get started in Free Realms!\" 3345147503, \"Welcome to Free Realms, visit Merigold to get started!\" 3866999428]. She points the player at Harold (\"Merigold has pointed you towards Harold, an animal control agent who's looking for some help with a recently escaped bear!\" 2362498448). Return objectives: \"Return to Merigold\" (2057457121, 3927401947); thank-you pointers from Harold's bear problem (3404995492, 23059866) and Auguste's party problem (3562100712, 2551974680); \"Hey, Merigold was looking for you. I think she has a few more quests!\" (1623587804); \"Merigold was looking for you while you were learning about racing. Raina thinks she has more quests for you\" (2622336658)."
       ],

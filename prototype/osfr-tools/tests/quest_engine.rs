@@ -829,6 +829,19 @@ fn split_regional_quest_catalogue_accepts_and_restores_an_npc_offer() {
             giver_relations.extend(ids.into_iter().map(|id| (id as u32, npc_id)));
         }
     }
+    let eligibility = CharacterEligibility {
+        player_level: 1,
+        job_levels: BTreeMap::new(),
+        member: false,
+        nonmember_quest_limit: 100,
+        member_quest_limit: 100,
+    };
+    let mut engine =
+        QuestEngine::from_split_content(&directory, CHARACTER, eligibility.clone(), None).unwrap();
+    // The catalogue's first row-bound, prerequisite-free quest may carry a job
+    // requirement this fixed eligibility cannot satisfy (T357 binds such rows).
+    // Select the first candidate the loader itself can offer, so the test still
+    // exercises one real NPC root offer instead of a denied one.
     let quest = quests
         .iter()
         .find(|quest| {
@@ -840,23 +853,15 @@ fn split_regional_quest_catalogue_accepts_and_restores_an_npc_offer() {
                     .as_array()
                     .is_some_and(Vec::is_empty)
                 && quest["id"].as_u64().is_some_and(|id| {
-                    quest["giver_npc_id"]
-                        .as_u64()
-                        .is_some_and(|giver| giver_relations.contains(&(id as u32, giver)))
+                    quest["giver_npc_id"].as_u64().is_some_and(|giver| {
+                        giver_relations.contains(&(id as u32, giver))
+                            && engine.can_offer(id as u32, giver)
+                    })
                 })
         })
         .expect("split NPC content has a root quest giver");
     let quest_id = quest["id"].as_u64().unwrap() as u32;
     let giver_npc_id = quest["giver_npc_id"].as_u64().unwrap();
-    let eligibility = CharacterEligibility {
-        player_level: 1,
-        job_levels: BTreeMap::new(),
-        member: false,
-        nonmember_quest_limit: 100,
-        member_quest_limit: 100,
-    };
-    let mut engine =
-        QuestEngine::from_split_content(&directory, CHARACTER, eligibility.clone(), None).unwrap();
     let offer = engine.offer(quest_id, giver_npc_id);
     assert!(offer.changed);
     let accepted = engine.accept(quest_id);

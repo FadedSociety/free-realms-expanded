@@ -15943,8 +15943,22 @@
       "location_evidence": [
         "\"Speak with Fizzlesticks at the Robgoblin camp near Lakeshore to learn how to become a Wizard\" (1250342927); \"north of Lakeshore\" (3122558389). [video: Active Quest marker only, 700 to 900 m away, zone not shown, CW9hNMMNV8w/00004, /00010, WHFQFeeB7aI/00010; quest title \"Being a Better Wizard\"]"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3160003
+        },
+        {
+          "quest_id": 3160004
+        },
+        {
+          "quest_id": 3160005
+        }
+      ],
+      "quest_ids_given": [
+        3160003,
+        3160004,
+        3160005
+      ],
       "quests_given_text": [
         "Wizard: How to be a Wizard, Wizard: I Can't Read This!, Sticky Spell Book, Wizard: Lightning Bolt!, Wizard: The First Rule of Being a Wizard..., Wizard: Market Wizards, Wizard: Student Profits, Wizard: Reach Level 5, Wizard: An Icy Mistake, Being a Better Wizard. The grenade-recovery and glasses errands (1226440549, 370084981) have no title match."
       ],

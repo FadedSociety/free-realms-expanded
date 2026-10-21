@@ -1195,10 +1195,18 @@
               "evidence": "title_string_id corrected from raw locale hash 576309282 to Global.Text id 4420058 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3000009
+        },
+        {
+          "quest_id": 3000016
         }
       ],
       "quest_ids_given": [
-        3000007
+        3000007,
+        3000009,
+        3000016
       ],
       "quests_given_text": [
         "Gear Up! (mine copper ore, smelt five bars, 576309282 / 3601884272), Your First Weapon (forge a Spunky Scrapper Hammer; wiki 16 coins), Fighting the Pack (hooligan wolves; wiki 18 coins), Cleetus' Copper Collection (\"Mine a large batch of Copper Ore for Cleetus Farnum\", 1319179983), Forging for Reinforcements (\"Forge another Spunky Scrapper Hammer for Cleetus Farnum.\", 1432811224). Reminder: \"Have you finished doing what Cleetus has asked you to do?\" (1727271980). See Blacksmith and Miner for the same quests from the job side."
