@@ -59,8 +59,9 @@ pub struct Trainer {
     pub job: String,
     /// Client locale id of the menu label ("Become a Miner").
     pub label_string_id: u32,
-    /// A recovered prerequisite: another job at this rank first (client text, e.g. the Ninja
-    /// trainer wants a level 20 Archer). The rank curve itself is the local (R) one.
+    /// A prerequisite: another job at this rank first. The recovered client text names level 20
+    /// (e.g. the Ninja board wants a level 20 Archer); the shipped row is the (R) rank-5
+    /// playtest reduction on the local rank curve.
     #[serde(default)]
     pub requires: Option<Requirement>,
     /// Evidence for the row; not read by the server.

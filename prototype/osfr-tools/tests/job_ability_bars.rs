@@ -14,6 +14,11 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "common/job_playtest.rs"]
+mod job_playtest;
+
+use job_playtest::bar_ids;
+
 static NEXT: AtomicU64 = AtomicU64::new(0);
 const JOBS: [i32; 7] = [1, 11, 32, 12, 2, 43, 35]; // Adventurer 1 has no combat bar.
 
@@ -132,34 +137,6 @@ fn roster() -> OpeningAbilities {
 
 fn level(profiles: &Profiles, id: i32) -> u32 {
     (1 + profiles.state().experience.get(&id).copied().unwrap_or(0) / 100).min(20)
-}
-
-/// Decode the native variable-length 36/5 toolbar into eight definition ids,
-/// with `None` for an empty slot. Index 0 is the basic attack.
-fn bar_ids(packets: &[Vec<u8>]) -> Vec<Option<i32>> {
-    let toolbar = packets.last().expect("toolbar");
-    assert!(toolbar.starts_with(&[36, 0, 5, 0]));
-    assert_eq!(i32::from_le_bytes(toolbar[8..12].try_into().unwrap()), 8);
-    let mut at = 12;
-    let mut ids = Vec::new();
-    for _ in 0..8 {
-        let kind = i32::from_le_bytes(toolbar[at..at + 4].try_into().unwrap());
-        match kind {
-            0 => {
-                ids.push(None);
-                at += 4;
-            }
-            3 => {
-                ids.push(Some(i32::from_le_bytes(
-                    toolbar[at + 4..at + 8].try_into().unwrap(),
-                )));
-                at += 41;
-            }
-            other => panic!("unexpected toolbar entry type {other}"),
-        }
-    }
-    assert_eq!(at, toolbar.len());
-    ids
 }
 
 #[test]

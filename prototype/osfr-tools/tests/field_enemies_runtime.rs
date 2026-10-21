@@ -10,6 +10,9 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "common/job_playtest.rs"]
+mod job_playtest;
+
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 const GUID: u64 = 100;
 struct Fixture(PathBuf);
@@ -66,13 +69,7 @@ fn at(e: &EncounterEngine) -> [f32; 3] {
         .position
 }
 fn hits_from(out: &EncounterOutcome, attacker: u64) -> Vec<u32> {
-    out.replies
-        .iter()
-        .filter(|p| {
-            p.starts_with(&[32, 0, 7, 0]) && p.get(4..12) == Some(attacker.to_le_bytes().as_slice())
-        })
-        .map(|p| u32::from_le_bytes(p[28..32].try_into().unwrap()))
-        .collect()
+    job_playtest::hits_from(&out.replies, attacker)
 }
 fn timed_effect(effects: Value) -> JobAbility {
     serde_json::from_value(json!({"slot":1,"definition_id":62001,"name_id":1,"icon_id":1,"min_level":1,"cooldown_ms":0,"damage_multiplier":0.0,"heal":0,"effects":effects})).unwrap()

@@ -7,7 +7,7 @@ use osfr_tools::{
     character_store::CharacterState,
     encounter::SharedFieldAction,
     game_store::{self, Snapshot},
-    gameplay::{Gameplay, GameplayState, Outcome},
+    gameplay::{Gameplay, GameplayState},
     gateway::{Gateway, GatewayOutcome},
     inventory::{InventoryItem, REQUIRED_PROFILE_SLOTS},
     item_bar::use_wire::{
@@ -26,6 +26,13 @@ use std::{
     fs,
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
+};
+
+#[path = "common/job_playtest.rs"]
+mod job_playtest;
+
+use job_playtest::{
+    bar_ids, hits_from, install_starter_outfits, install_starter_weapon_definitions,
 };
 
 const CRATE: &str = env!("CARGO_MANIFEST_DIR");
@@ -76,25 +83,23 @@ impl Content {
             dir.join("job_trainers.json"),
         )
         .unwrap();
-        // The pinned reference package predates the canonical six-job roster
-        // and two client weapon definitions; the production bundle carries
-        // both. Add only those proven rows so every combat job can be armed
-        // through the real starter gate.
-        fs::copy(
-            data().join("opening-abilities.json"),
-            dir.join("opening-abilities.json"),
-        )
-        .unwrap();
-        install_starter_weapon_definitions(&dir);
-        install_starter_outfits(&dir);
-        // The field reward table is read from the session content directory.
-        fs::copy(
-            data().join("field_kill_rewards.json"),
-            dir.join("field_kill_rewards.json"),
-        )
-        .unwrap();
         mining::write_content(&dir, mining::MINING_GAME_ID).unwrap();
         Self(dir)
+    }
+
+    /// The base fixture plus the production six-combat-job rows the T368 matrix
+    /// needs: the shipped `opening-abilities.json` and `field_kill_rewards.json`
+    /// (its definition-3156 override pays 5 active-job XP) and the captured T010
+    /// starter weapon definitions and outfits. Nothing is granted; the real
+    /// starter gate still decides ownership.
+    fn six_job() -> Self {
+        let content = Self::new();
+        for file in ["opening-abilities.json", "field_kill_rewards.json"] {
+            fs::copy(data().join(file), content.0.join(file)).unwrap();
+        }
+        install_starter_weapon_definitions(&content.0);
+        install_starter_outfits(&content.0);
+        content
     }
 
     /// Add one active collect goal. Its item is a trainer starter definition, so
@@ -188,73 +193,6 @@ impl Content {
         profiles["starter_items"][profile.to_string()] = serde_json::json!([definition]);
         fs::write(path, serde_json::to_vec(&profiles).unwrap()).unwrap();
     }
-}
-
-/// The pinned reference package predates the Wizard and Warrior starter
-/// weapons; the production `item-catalogue.json` carries both. These are the
-/// same captured client rows `tests/job_basic_attacks.rs` T010 installs, and
-/// only definitions are added: the starter grant still decides what is owned.
-fn install_starter_weapon_definitions(dir: &Path) {
-    let path = dir.join("inventory.json");
-    let mut inventory: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
-    let definitions = inventory["definitions"].as_array_mut().unwrap();
-    for row in [
-        serde_json::json!({
-            "id": 4914,
-            "slot": 7,
-            "class_id": 10,
-            "default_tint": 0,
-            "max_stack": -1,
-            "model": "wand_ar_ag_weapon_crude.adr",
-            "texture": "",
-            "tint_alias": "",
-            "effect": 0,
-            "wield_type": 10,
-            "serialized_hex": "32130000000000000000000000000000000000000000000000000000000000000a0000000000000007000000000000000000000000000000",
-            "sha256": "28b02e59bcf7c0fe6de8cfa2c429bcf5ebcbf3e1e20d1d9a6917599017ef5f14"
-        }),
-        serde_json::json!({
-            "id": 29963,
-            "slot": 7,
-            "class_id": 17,
-            "default_tint": 0,
-            "max_stack": -1,
-            "model": "club_ar_ag_weapon_cudgel.adr",
-            "texture": "",
-            "tint_alias": "",
-            "effect": 0,
-            "wield_type": 12,
-            "serialized_hex": "0b75000000000000000000000000000000000000000000000000000000000000110000000000000007000000000000000000000000000000",
-            "sha256": "dd8b3607d16fd953e370c2af82240ee38bb5a5f4f2aef8d42b1ddc0a51799e96"
-        }),
-    ] {
-        if !definitions
-            .iter()
-            .any(|definition| definition["id"] == row["id"])
-        {
-            definitions.push(row);
-        }
-    }
-    fs::write(path, serde_json::to_vec(&inventory).unwrap()).unwrap();
-}
-
-/// The production play package ships Ninja/Wizard/Warrior starter outfits; the
-/// pinned reference package predates them (T201). Add the captured Chest/Legs
-/// pieces T010 uses, so the real trainer/activation path can dress all six.
-fn install_starter_outfits(dir: &Path) {
-    let path = dir.join("profiles.json");
-    let mut profiles: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
-    let starter = profiles["starter_items"].as_object_mut().unwrap();
-    for (job, items) in [
-        (2, [19197, 19787]),
-        (12, [12060, 12709]),
-        (32, [46137, 46732]),
-    ] {
-        starter
-            .entry(job.to_string())
-            .or_insert_with(|| serde_json::json!(items));
-    }
-    fs::write(path, serde_json::to_vec(&profiles).unwrap()).unwrap();
 }
 
 impl Drop for Content {
@@ -1405,33 +1343,6 @@ fn xp(state: &GameplayState, profile: i32) -> u32 {
         .unwrap_or(0)
 }
 
-/// The native 36/5 toolbar: eight slots, `None` for an empty one. Index 0 is
-/// the basic attack; job slot N is index N.
-fn toolbar_ids(packets: &[Vec<u8>]) -> Vec<Option<i32>> {
-    let toolbar = packets.last().expect("toolbar");
-    assert!(toolbar.starts_with(&[36, 0, 5, 0]));
-    let mut at = 12;
-    let mut ids = Vec::new();
-    for _ in 0..8 {
-        let kind = i32::from_le_bytes(toolbar[at..at + 4].try_into().unwrap());
-        match kind {
-            0 => {
-                ids.push(None);
-                at += 4;
-            }
-            3 => {
-                ids.push(Some(i32::from_le_bytes(
-                    toolbar[at + 4..at + 8].try_into().unwrap(),
-                )));
-                at += 41;
-            }
-            other => panic!("unexpected toolbar entry type {other}"),
-        }
-    }
-    assert_eq!(at, toolbar.len());
-    ids
-}
-
 fn wolf_character(guid: u64, wolf: [f32; 3]) -> CharacterState {
     CharacterState {
         guid,
@@ -1449,17 +1360,6 @@ fn wolf_session(content: &Content, state: GameplayState, character: &CharacterSt
         .expect("the split quest catalogue binds");
     game.initialize_world(character, 0).expect("world init");
     game
-}
-
-fn hits(out: &Outcome, attacker: u64) -> Vec<u32> {
-    out.replies
-        .iter()
-        .filter(|packet| {
-            packet.starts_with(&[32, 0, 7, 0])
-                && packet.get(4..12) == Some(attacker.to_le_bytes().as_slice())
-        })
-        .map(|packet| u32::from_le_bytes(packet[28..32].try_into().unwrap()))
-        .collect()
 }
 
 /// The ordinary 36/10 basic, encoded and decoded with the production client
@@ -1493,7 +1393,7 @@ fn kill_wolf(game: &mut Gameplay, character: &CharacterState, wolf: u64) {
         let out = game
             .handle_shared_field(&action, &mut field, &known, character, now)
             .expect("the shared-field basic is accepted");
-        let damage = hits(&out, character.guid);
+        let damage = hits_from(&out.replies, character.guid);
         assert_eq!(damage.len(), 1, "one authoritative hit per 36/10 basic");
         assert!(damage[0] > 0, "the hit deals positive damage");
         let after = field.health(wolf).expect("the wolf stays in the field");
@@ -1513,7 +1413,7 @@ fn kill_wolf(game: &mut Gameplay, character: &CharacterState, wolf: u64) {
 
 #[test]
 fn all_six_combat_jobs_learn_activate_fight_and_gain_xp() {
-    let content = Content::new();
+    let content = Content::six_job();
     let npcs = npc_rows();
     let rows = trainers(&content);
     let abilities = shipped_abilities(&content);
@@ -1698,14 +1598,14 @@ fn level_five_bar(content: &Content) {
     let profiles = Profiles::load(&content.0, state.profiles.clone()).unwrap();
     assert_eq!(profiles.rank(32), 4);
     assert!(abilities.job_slot(32, 2, profiles.rank(32)).is_none());
-    let four = toolbar_ids(&abilities.activation(32, profiles.rank(32)).unwrap());
+    let four = bar_ids(&abilities.activation(32, profiles.rank(32)).unwrap());
     assert_eq!(four[2], None, "Warrior slot 2 stays empty below rank 5");
 
     let mut state = profiles.state().clone();
     state.experience.insert(32, 400);
     let profiles = Profiles::load(&content.0, Some(state)).unwrap();
     assert_eq!(profiles.rank(32), 5);
-    let five = toolbar_ids(&abilities.activation(32, profiles.rank(32)).unwrap());
+    let five = bar_ids(&abilities.activation(32, profiles.rank(32)).unwrap());
     assert_eq!(
         five[2],
         Some(WARRIOR_LEVEL_FIVE),

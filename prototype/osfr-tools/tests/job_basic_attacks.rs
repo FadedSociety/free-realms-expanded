@@ -20,6 +20,9 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "common/job_playtest.rs"]
+mod job_playtest;
+
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 
 const COMBAT_JOBS: [(i32, i32, i32); 6] = [
@@ -57,8 +60,8 @@ impl Fixture {
             path.join("opening-abilities.json"),
         )
         .unwrap();
-        patch_weapon_definitions(&path);
-        patch_starter_outfits(&path);
+        job_playtest::install_starter_weapon_definitions(&path);
+        job_playtest::install_starter_outfits(&path);
         patch_encounter(&path);
         Self(path)
     }
@@ -84,71 +87,6 @@ fn patch_encounter(path: &Path) {
     cave["enemies"][0]["max_health"] = serde_json::json!(300);
     cave["enemies"][0]["damage"] = serde_json::json!(0);
     fs::write(encounter_path, serde_json::to_vec(&encounters).unwrap()).unwrap();
-}
-
-/// The pinned early opening package predates the Wizard and Warrior weapons.
-/// Add only the two client-derived ids the fallback needs, with the same
-/// minimal serialized row shape already used by the other four weapons.
-fn patch_weapon_definitions(path: &Path) {
-    let inventory_path = path.join("inventory.json");
-    let mut inventory: Value = serde_json::from_slice(&fs::read(&inventory_path).unwrap()).unwrap();
-    let definitions = inventory["definitions"].as_array_mut().unwrap();
-    for row in [
-        serde_json::json!({
-            "id": 4914,
-            "slot": 7,
-            "class_id": 10,
-            "default_tint": 0,
-            "max_stack": -1,
-            "model": "wand_ar_ag_weapon_crude.adr",
-            "texture": "",
-            "tint_alias": "",
-            "effect": 0,
-            "wield_type": 10,
-            "serialized_hex": "32130000000000000000000000000000000000000000000000000000000000000a0000000000000007000000000000000000000000000000",
-            "sha256": "28b02e59bcf7c0fe6de8cfa2c429bcf5ebcbf3e1e20d1d9a6917599017ef5f14"
-        }),
-        serde_json::json!({
-            "id": 29963,
-            "slot": 7,
-            "class_id": 17,
-            "default_tint": 0,
-            "max_stack": -1,
-            "model": "club_ar_ag_weapon_cudgel.adr",
-            "texture": "",
-            "tint_alias": "",
-            "effect": 0,
-            "wield_type": 12,
-            "serialized_hex": "0b75000000000000000000000000000000000000000000000000000000000000110000000000000007000000000000000000000000000000",
-            "sha256": "dd8b3607d16fd953e370c2af82240ee38bb5a5f4f2aef8d42b1ddc0a51799e96"
-        }),
-    ] {
-        if !definitions
-            .iter()
-            .any(|definition| definition["id"] == row["id"])
-        {
-            definitions.push(row);
-        }
-    }
-    fs::write(inventory_path, serde_json::to_vec(&inventory).unwrap()).unwrap();
-}
-
-/// The pinned package has no starter lists for Ninja, Wizard or Warrior, so a
-/// job switch is refused before their weapons can be checked. Add the captured
-/// Chest and Legs pieces those profiles allow; the client's profile swap
-/// requires both (ProcessProfileSwap `00bfb620`).
-fn patch_starter_outfits(path: &Path) {
-    let profiles_path = path.join("profiles.json");
-    let mut profiles: Value = serde_json::from_slice(&fs::read(&profiles_path).unwrap()).unwrap();
-    let starter_items = profiles["starter_items"].as_object_mut().unwrap();
-    for (job, items) in [
-        (2, [19197, 19787]),
-        (12, [12060, 12709]),
-        (32, [46137, 46732]),
-    ] {
-        starter_items.insert(job.to_string(), serde_json::json!([items[0], items[1]]));
-    }
-    fs::write(profiles_path, serde_json::to_vec(&profiles).unwrap()).unwrap();
 }
 
 impl Drop for Fixture {
