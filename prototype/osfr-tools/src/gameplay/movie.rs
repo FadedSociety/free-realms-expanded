@@ -118,6 +118,7 @@ pub(super) fn start_forging(game: &mut super::Gameplay, now_ms: u64) {
 mod tests {
     use super::super::t013_objective_events::game;
     use super::super::*;
+    use super::Movie;
     use super::start_forging;
 
     /// The consolidated Forging tick through the production `Gameplay::tick`

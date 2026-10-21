@@ -13,6 +13,7 @@
 //! the four-byte 26/42 Results Close writer 0x0092f300; the chat request reader
 //! is 0x00b11600.
 
+use super::movie::Movie;
 use super::*;
 #[path = "../../tests/common/gateway_packets.rs"]
 mod gateway_packets;
