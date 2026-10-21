@@ -305,7 +305,7 @@ fn marketplace_handshake_replies_and_keeps_payment_sources_off() {
         inventory_with_coins(&directory, 100),
         usize::MAX,
     );
-    let initial = shop.marketplace_initial_packets();
+    let initial = shop.world_entry_packets();
     assert_eq!(initial[0], vec![66, 0, 24, 0, 1]);
     assert_eq!(initial[1], vec![66, 0, 33, 0, 0, 0]);
 

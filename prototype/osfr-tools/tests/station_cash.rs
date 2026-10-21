@@ -10,7 +10,8 @@ use osfr_tools::{
     inventory::{Inventory, InventoryState},
     station_cash::{self, Wallet},
 };
-use std::path::PathBuf;
+use serde_json::Value;
+use std::{collections::BTreeMap, path::PathBuf};
 
 /// A listed ride: item 76856 (the five-hundred-and-fifty Station Cash mount) is 549 SC of
 /// provenance, so the shipped 0.25 scale lists it at 137.
@@ -451,6 +452,120 @@ fn contains_u32(bytes: &[u8], value: u32) -> bool {
     bytes
         .windows(4)
         .any(|window| u32::from_le_bytes(window.try_into().unwrap()) == value)
+}
+
+/// T329: the world-entry packet set carries the shipped rides and their scaled SC prices. The
+/// 66/5 rows are walked exactly as `00b43170`/`00b41860` read them and compared with every
+/// `stores.json` row that has an `sc_price` and is not earn-only.
+#[test]
+fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
+    let shop = new_shop(Wallet::default(), usize::MAX);
+    let packets = shop.world_entry_packets();
+    assert_eq!(packets[0], vec![66, 0, 24, 0, 1], "66/24 handshake");
+    assert_eq!(packets[1], vec![66, 0, 33, 0, 0, 0], "66/33 sources off");
+    let store = packets
+        .iter()
+        .find(|packet| packet.starts_with(&[66, 0, 5, 0]))
+        .expect("66/5 store packet");
+    let config = shop.sc_catalogue().config();
+    let mut reader = Reader {
+        bytes: store,
+        at: 0,
+    };
+    assert_eq!(reader.u16(), 66);
+    assert_eq!(reader.u16(), 5);
+    assert_eq!(reader.u32(), 1, "inner type");
+    assert_eq!(reader.u32(), config.store_id);
+    assert_eq!(reader.u32(), config.store_id, "store id");
+    assert_eq!(reader.u32(), config.store_name_id, "store name id");
+    assert_eq!(
+        reader.u32(),
+        config.store_description_id,
+        "store description id"
+    );
+    reader.string();
+    reader.string();
+    let count = reader.u32() as usize;
+    let mut decoded = BTreeMap::new();
+    for _ in 0..count {
+        let key = reader.u32();
+        assert_eq!(reader.u32(), key, "bundle id");
+        reader.u32();
+        reader.u32();
+        reader.u32();
+        reader.string();
+        reader.string();
+        reader.u8();
+        reader.string();
+        assert_eq!(reader.u32(), config.currency_type);
+        let price = reader.u32();
+        reader.u32();
+        reader.u32();
+        reader.u32();
+        reader.u64();
+        reader.u64();
+        reader.u32();
+        reader.u8();
+        reader.u64();
+        reader.u64();
+        assert_eq!(reader.u32(), 1, "one entry");
+        assert_eq!(reader.u32(), 1, "quantity");
+        let item = reader.u32();
+        assert_eq!(reader.u32(), item, "marketing item id");
+        reader.string();
+        assert_eq!(reader.u32(), config.store_id);
+        assert_eq!(reader.u32(), config.category_group_id);
+        reader.u8();
+        for _ in 0..8 {
+            reader.u32();
+        }
+        reader.u8();
+        reader.u8();
+        reader.u8();
+        // `00b41860` continuation: u32, u32, u8, u32, u32, u32, u8, u8, u32, u32.
+        reader.u32();
+        reader.u32();
+        reader.u8();
+        reader.u32();
+        reader.u32();
+        reader.u32();
+        reader.u8();
+        reader.u8();
+        reader.u32();
+        reader.u32();
+        assert_eq!(item, key, "the bundle's game item is its map key");
+        decoded.insert(key, price);
+    }
+    assert_eq!(
+        reader.at,
+        store.len(),
+        "the store packet has trailing bytes"
+    );
+    assert_eq!(decoded.len(), 52, "the shipped listed ride count");
+
+    let stores: Value =
+        serde_json::from_slice(&std::fs::read(stores()).expect("stores.json reads"))
+            .expect("stores.json parses");
+    let scale = stores["station_cash"]["sc_price_scale"]
+        .as_f64()
+        .expect("scale");
+    let expected: BTreeMap<u32, u32> = stores["items"]
+        .as_array()
+        .expect("store rows")
+        .iter()
+        .filter(|row| row["earn_only"].as_bool() != Some(true))
+        .filter_map(|row| {
+            let price = row["sc_price"].as_u64()?;
+            Some((
+                u32::try_from(row["item_id"].as_i64()?).ok()?,
+                (price as f64 * scale).round() as u32,
+            ))
+        })
+        .collect();
+    assert_eq!(
+        decoded, expected,
+        "the store lists the shipped rides at their SC prices"
+    );
 }
 
 /// Walk a buffer exactly as the client's 66/5 reader does, refusing a short or trailing byte.

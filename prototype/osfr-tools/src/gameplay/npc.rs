@@ -1073,6 +1073,15 @@ impl Gameplay {
         ));
         Ok(())
     }
+
+    /// T329: the Marketplace handshake and store rows for the world-entry packet stream. Empty
+    /// when the package has Station Cash off, so a disabled package sends exactly what it sent
+    /// before T329.
+    pub(crate) fn world_entry_marketplace_packets(&self) -> Vec<Vec<u8>> {
+        self.npc_coin_shop
+            .as_ref()
+            .map_or_else(Vec::new, crate::coin_shop::CoinShop::world_entry_packets)
+    }
 }
 
 /// One `npc_select` telemetry row for the reason-less outcomes (shop, race, derby, fish

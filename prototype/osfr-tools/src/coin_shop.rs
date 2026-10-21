@@ -1032,18 +1032,17 @@ impl CoinShop {
         })
     }
 
-    /// Startup enables the Marketplace shell while disabling both payment sources (R).
-    pub fn marketplace_initial_packets(&self) -> Vec<Vec<u8>> {
-        vec![
-            vec![
-                66,
-                0,
-                24,
-                0,
-                u8::from(self.catalogue.marketplace.enabled_on_handshake),
-            ],
-            vec![66, 0, 33, 0, 0, 0],
-        ]
+    /// The Marketplace packets pushed with the world-entry stream: the 66/24 enable handshake,
+    /// the 66/33 payment-source flags and the store rows (66/7/6/9/5). The native store screen
+    /// never sends the 66/12 status request (`RequestServerStatus` is a Lua binding it does not
+    /// call), so the rows must be pushed for the client to list them. A package with Station
+    /// Cash off sends nothing, exactly as before T329.
+    pub fn world_entry_packets(&self) -> Vec<Vec<u8>> {
+        if self.sc_catalogue.config().enabled && self.catalogue.marketplace.enabled_on_handshake {
+            station_cash::catalogue_packets(&self.sc_catalogue)
+        } else {
+            Vec::new()
+        }
     }
 
     /// Answer gateway Marketplace requests. A Station Cash order debits the wallet and grants the
