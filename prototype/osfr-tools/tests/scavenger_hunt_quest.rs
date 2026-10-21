@@ -4,8 +4,9 @@
 //! -> `gameplay/npc.rs` -> `QuestEngine`), the real `Gameplay::on_location`
 //! movement path and the real accept/turn-in packets. They never call the quest
 //! engine's private helpers as a shortcut. The shared fixture and packet helpers
-//! live in `tests/support/npc_quest_chain.rs`; this file adds only the event
-//! content checks.
+//! live in `tests/support/npc_quest_chain.rs`; the hunt steps both this suite and
+//! the two-player suite drive live in `tests/support/scavenger_hunt.rs`; this
+//! file adds only the single-player and content-identity checks.
 //!
 //! Client evidence (2014 client, checked with `lab/autopilot/ida_query.py`):
 //! - 26/8 NPC interact constructor `008b6bc0`: two GUID dwords + one bool.
@@ -28,24 +29,23 @@
 //! ordinary 49/9/49/10 objective updates and the 49/8 activation, so there is no
 //! new wire shape to match.
 
-#[path = "support/npc_quest_chain.rs"]
-mod npc_quest_chain;
+#[path = "support/scavenger_hunt.rs"]
+mod scavenger_hunt;
 
-use npc_quest_chain::{
-    Fixture, accept, active_job, assert_no_offer, assert_packet_changes_nothing,
-    character_at_for as character, coins, content_dir, counts, finish_quest, has_family,
-    npc_interact, objective_update, offer, pending_offer, pending_turnin, profile_xp,
-    quest_end_reply, quest_reply, quest_status, read_json, release_end_screen, saved, select_job,
-    send, talk,
-};
 use osfr_tools::{
     character_store::CharacterState,
     game_store,
-    gameplay::{Gameplay, Outcome},
-    npc_interaction::NpcInteraction,
-    profiles::ProfileState,
+    gameplay::Gameplay,
     quest_engine::{CharacterEligibility, QuestEngine, QuestStatus},
     world::NpcVisibility,
+};
+use scavenger_hunt::{
+    ADVENTURER, BRAWLER, CARLOS, Fixture, JACQUE, MERIGOLD, PAPPY, QUEST, accept, accept_hunt,
+    active_job, assert_move_changes_nothing, assert_no_offer, character_at_for as character, coins,
+    content_dir, counts, finish_quest, fresh, has_family, has_objective, npc_position,
+    objective_update, offer, offer_hunt, pending_offer, pending_turnin, profile_xp,
+    quest_end_reply, quest_reply, quest_status, read_json, refused, refused_interaction,
+    release_end_screen, saved, select_job, send, talk, visit,
 };
 use serde_json::{Value, json};
 use std::{
@@ -57,7 +57,6 @@ use std::{
 
 const CHARACTER: u64 = 281_001;
 const OTHER_CHARACTER: u64 = 281_002;
-const QUEST: u32 = 3_000_200;
 /// Samantha's existing Cobblestone referral. It is unchanged; Ricky Danger is its
 /// Talk target, so a player carrying it resolves it at Ricky, not at the hunt host.
 const REFERRAL: u32 = 3_000_021;
@@ -67,23 +66,11 @@ const CALL_THE_CREW: u32 = 3_000_059;
 const BACK_FOR_MORE: u32 = 3_000_060;
 const SAMANTHA: u64 = 9_000_000_189;
 const RICKY: u64 = 9_500_000_254;
-/// Jacque 9500000497 is the event host and the return target. His `legacy_data`
-/// Sanctuary row at Jacque's Cafe (Pixiewood Hills, the southern entrance street)
-/// has empty `quest_ids_given`/`quests_given` and no quest record names him as
-/// giver, so the first Talk offers the hunt with no competing offer.
-const JACQUE: u64 = 9_500_000_497;
 /// The generic stock "Scavenger Hunt " label. The Greenwood Forest minigame title
 /// (429342) belongs to a different retail activity and is not reused.
 const TITLE_ID: u32 = 3_374;
-const HUNT_OBJECTIVE_BYTES: usize = 107;
-const PAPPY: u64 = 9_000_000_165;
-const CARLOS: u64 = 9_000_000_042;
-const MERIGOLD: u64 = 9_000_000_402;
 /// A positioned Cobblestone pet vendor with no quest binding; a non-target NPC.
 const GLORIA: u64 = 9_500_000_246;
-const ADVENTURER: i32 = 1;
-/// Used only by the reward-profile assertion; the hunt itself has no job gate.
-const BRAWLER: i32 = 43;
 static NEXT_FIXTURE: AtomicU64 = AtomicU64::new(0);
 
 fn eligibility() -> CharacterEligibility {
@@ -93,77 +80,6 @@ fn eligibility() -> CharacterEligibility {
         member_quest_limit: 100,
         ..CharacterEligibility::default()
     }
-}
-
-/// A fresh character with the Adventurer profile active, bound to the real
-/// bundled split quest content exactly as production binds it. The Brawler
-/// profile is unlocked so the turn-in test can switch the active job.
-fn fresh(fixture: &Fixture, character_id: u64) -> Gameplay {
-    let mut state = fixture.game_as(character_id, None).state();
-    state.profiles = Some(ProfileState {
-        version: 1,
-        active: ADVENTURER,
-        unlocked: BTreeSet::from([ADVENTURER, BRAWLER]),
-        experience: BTreeMap::new(),
-    });
-    fixture.game_as(character_id, Some(state))
-}
-
-fn npc_position(npc_id: u64) -> [f32; 3] {
-    let content = content_dir();
-    NpcInteraction::load(&content.join("npcs"), &content.join("stores.json"))
-        .expect("NPC content loads")
-        .location(npc_id)
-        .unwrap_or_else(|| panic!("NPC {npc_id} is a positioned content spawn"))
-        .1
-}
-
-fn has_objective(replies: &[Vec<u8>], subtype: u16, objective_id: u32) -> bool {
-    replies.iter().any(|packet| {
-        packet.len() >= 14
-            && packet[..6] == [49, 0, subtype as u8, 0, 0, 0]
-            && packet[6..10] == QUEST.to_le_bytes()
-            && packet[10..14] == objective_id.to_le_bytes()
-    })
-}
-
-/// Jacque has no competing quest offer, so one Talk offers the hunt directly
-/// through the production Talk/26/6 path.
-fn offer_hunt(game: &mut Gameplay, jacque: &CharacterState, now: &mut u64) -> Outcome {
-    let offered = offer(game, jacque, JACQUE, QUEST, *now);
-    *now += 4;
-    assert_eq!(pending_offer(game), Some(QUEST));
-    offered
-}
-
-fn accept_hunt(game: &mut Gameplay, jacque: &CharacterState, now: &mut u64) {
-    let accepted = accept(game, jacque, QUEST, *now);
-    *now += 2;
-    let add = accepted
-        .replies
-        .iter()
-        .find(|packet| has_family(packet, 49, 3, Some(QUEST)))
-        .expect("accept sends the 49/3 quest record");
-    // 49/3 packet: six-byte header, 103-byte fixed prefix and reward bundle,
-    // then the objective count at 109..113 and one 107-byte record each. Client
-    // reader chain 0x0093c840 (fixed prefix and count) -> 0x0092b050 (count and
-    // per-objective loop; it reads each record's leading id dword) -> 0x008fd770
-    // (the rest of the 107-byte record).
-    let objective_count = i32::from_le_bytes(add[109..113].try_into().unwrap());
-    assert_eq!(objective_count, 4, "the hunt has four objectives");
-    let ids: Vec<u32> = (0..usize::try_from(objective_count).unwrap())
-        .map(|index| {
-            let offset = 113 + index * HUNT_OBJECTIVE_BYTES;
-            u32::from_le_bytes(add[offset..offset + 4].try_into().unwrap())
-        })
-        .collect();
-    assert_eq!(ids, [1, 2, 3, 4], "the objectives are in hunt order");
-    assert!(
-        has_objective(&accepted.replies, 8, 1),
-        "accept activates the first ordered objective"
-    );
-    assert_eq!(counts(game, QUEST), [0, 0, 0, 0]);
-    assert_eq!(pending_offer(game), None);
 }
 
 /// One complete hunt through the final Talk and the held 49/13 end screen, so
@@ -184,79 +100,6 @@ fn open_hunt_end_screen(game: &mut Gameplay, jacque: &CharacterState, now: &mut 
     release_end_screen(game, jacque, QUEST, JACQUE, 0, *now);
     *now += 2;
     assert_eq!(pending_turnin(game), Some(QUEST));
-}
-
-fn visit(
-    game: &mut Gameplay,
-    guid: u64,
-    position: [f32; 3],
-    now: &mut u64,
-    expected: [u32; 4],
-) -> Outcome {
-    *now += 1;
-    // Runtime movement is the one open-world zone; npcs/*.json zone ids are
-    // content region labels (src/npc_interaction.rs check_range).
-    let outcome = game
-        .on_location(&character(guid, 0, position), *now)
-        .expect("movement is accepted");
-    assert!(outcome.changed, "the landmark must advance the hunt");
-    assert_eq!(counts(game, QUEST), expected, "landmark counters");
-    // The increment itself is a 49/9 `ObjectiveUpdate` (client reader
-    // 0x00c7af60: quest 6..10, objective 10..14, current 14..18); 49/10 and the
-    // next 49/8 are asserted by the caller.
-    let advanced = expected.iter().take_while(|count| **count == 1).count();
-    assert!(
-        objective_update(&outcome, QUEST, advanced as u32, 1),
-        "the visit sends the 49/9 update for objective {advanced}"
-    );
-    outcome
-}
-
-fn assert_move_changes_nothing(
-    game: &mut Gameplay,
-    guid: u64,
-    zone_id: u32,
-    position: [f32; 3],
-    now: u64,
-    label: &str,
-) {
-    let before_state = game.state();
-    let before_bytes = saved(game);
-    let at = character(guid, zone_id, position);
-    let outcome = game.on_location(&at, now).expect("movement is accepted");
-    assert!(!outcome.changed, "{label} changed gameplay");
-    assert_eq!(game.state(), before_state, "{label} changed the state");
-    assert_eq!(saved(game), before_bytes, "{label} changed the save bytes");
-}
-
-/// A refused packet changes neither the whole `GameplayState` nor its serialized
-/// save bytes. The shared helper owns the packet/reply checks; this wrapper adds
-/// the state snapshot the event's refusal gates require.
-fn refused(game: &mut Gameplay, speaker: &CharacterState, packet: &[u8], now: u64, label: &str) {
-    let before_state = game.state();
-    let before_bytes = saved(game);
-    assert_packet_changes_nothing(game, speaker, packet, now, label);
-    assert_eq!(game.state(), before_state, "{label} changed the state");
-    assert_eq!(saved(game), before_bytes, "{label} changed the save bytes");
-}
-
-/// An out-of-range 26/8 is refused before any menu, offer or save change.
-fn refused_interaction(
-    game: &mut Gameplay,
-    speaker: &CharacterState,
-    target: u64,
-    now: u64,
-    label: &str,
-) {
-    let before_state = game.state();
-    let before_bytes = saved(game);
-    assert!(
-        game.handle_in_world(&npc_interact(target), speaker, now)
-            .is_err(),
-        "{label} must be refused"
-    );
-    assert_eq!(game.state(), before_state, "{label} changed the state");
-    assert_eq!(saved(game), before_bytes, "{label} changed the save bytes");
 }
 
 #[test]
