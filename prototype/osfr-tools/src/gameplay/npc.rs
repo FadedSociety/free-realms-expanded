@@ -521,7 +521,11 @@ impl Gameplay {
                 character.position,
                 self.npc_quests.as_mut(),
             );
-            self.npc_interaction = Some(interaction);
+            // Refusals change nothing: a selection the service rejected must not commit the
+            // staged clone (it can carry menu/shop mutations made before the error).
+            if selected.is_ok() {
+                self.npc_interaction = Some(interaction);
+            }
             let mut out = Outcome::default();
             let mut consume_menu = false;
             match selected {

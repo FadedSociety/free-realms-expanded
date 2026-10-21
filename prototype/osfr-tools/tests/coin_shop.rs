@@ -67,8 +67,8 @@ fn buy_debits_exact_cost_and_retry_is_idempotent() {
     request.extend(0u64.to_le_bytes());
     request.extend(71001u32.to_le_bytes());
     request.extend(8i32.to_le_bytes());
-    request.extend(1u32.to_le_bytes());
-    request.extend(0u32.to_le_bytes());
+    request.extend(0i32.to_le_bytes()); // tint
+    request.extend(1u32.to_le_bytes()); // quantity (client writer 0x00c75ed0)
     let bought = shop.handle(&request).unwrap();
     assert_eq!(bought.result_code, coin_shop::RESULT_SUCCESS);
     assert!(bought.changed);

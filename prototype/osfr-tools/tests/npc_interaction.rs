@@ -64,13 +64,21 @@ fn count_definition(state: &InventoryState, definition_id: i32) -> u32 {
         .sum()
 }
 
-fn request_buy(merchant_id: u64) -> Vec<u8> {
+/// 165/4 client request: client writer `0x00c75ed0` (BuyItem `0x00c77230`) writes
+/// merchant u64, record id, definition, tint, then quantity as the last dword.
+fn request_buy(
+    merchant_id: u64,
+    transaction_id: u32,
+    definition_id: i32,
+    tint: i32,
+    quantity: u32,
+) -> Vec<u8> {
     let mut packet = vec![165, 0, 4, 0];
     packet.extend(merchant_id.to_le_bytes());
-    packet.extend(77001u32.to_le_bytes());
-    packet.extend(8i32.to_le_bytes());
-    packet.extend(1u32.to_le_bytes());
-    packet.extend(0u32.to_le_bytes());
+    packet.extend(transaction_id.to_le_bytes());
+    packet.extend(definition_id.to_le_bytes());
+    packet.extend(tint.to_le_bytes());
+    packet.extend(quantity.to_le_bytes());
     packet
 }
 
@@ -137,7 +145,12 @@ fn vendor_menu_shop_buy_sell_and_close_use_coin_shop_validation() {
     let mut shop = coin_shop(&directory);
     let original_count = count_definition(shop.inventory().state(), 8);
     let bought = service
-        .handle_coin_store(&mut shop, &request_buy(VENDOR_ID), zone, position)
+        .handle_coin_store(
+            &mut shop,
+            &request_buy(VENDOR_ID, 77001, 8, 0, 1),
+            zone,
+            position,
+        )
         .unwrap();
     assert_eq!(bought.result_code, coin_shop::RESULT_SUCCESS);
     assert_eq!(shop.inventory().state().coins, 85);
@@ -147,7 +160,12 @@ fn vendor_menu_shop_buy_sell_and_close_use_coin_shop_validation() {
     );
     let after_buy = shop.inventory().state().clone();
     let retry = service
-        .handle_coin_store(&mut shop, &request_buy(VENDOR_ID), zone, position)
+        .handle_coin_store(
+            &mut shop,
+            &request_buy(VENDOR_ID, 77001, 8, 0, 1),
+            zone,
+            position,
+        )
         .unwrap();
     assert!(!retry.changed);
     assert_eq!(shop.inventory().state(), &after_buy);
@@ -176,7 +194,12 @@ fn vendor_menu_shop_buy_sell_and_close_use_coin_shop_validation() {
 
     assert_eq!(service.close(VENDOR_ID).unwrap(), [66, 0, 46, 0]);
     assert!(matches!(
-        service.handle_coin_store(&mut shop, &request_buy(VENDOR_ID), zone, position),
+        service.handle_coin_store(
+            &mut shop,
+            &request_buy(VENDOR_ID, 77001, 8, 0, 1),
+            zone,
+            position
+        ),
         Err(NpcInteractionError::NoOpenShop)
     ));
 }
@@ -839,12 +862,28 @@ fn dialogue_close_26_4_consumes_only_that_menu() {
     );
     assert!(!closed.changed);
     assert_eq!(saved(&game), before, "a 26/4 close changed gameplay state");
+    let before_stale = saved(&game);
     assert!(
         game.handle_in_world(&npc_select(SAMANTHA, choice), &samantha, NOW + 2)
             .is_err(),
         "the closed menu still accepted its stale choice"
     );
-    let reopened = interact(&mut game, &samantha, SAMANTHA, NOW + 3);
+    assert_eq!(
+        saved(&game),
+        before_stale,
+        "a refused stale 26/10 changed gameplay state"
+    );
+    assert!(
+        game.handle_in_world(&npc_select(SAMANTHA, choice), &samantha, NOW + 3)
+            .is_err(),
+        "a refused stale choice must not reopen the closed menu"
+    );
+    assert_eq!(
+        saved(&game),
+        before_stale,
+        "a second refused stale 26/10 changed gameplay state"
+    );
+    let reopened = interact(&mut game, &samantha, SAMANTHA, NOW + 4);
     assert!(
         reopened
             .replies
@@ -855,8 +894,9 @@ fn dialogue_close_26_4_consumes_only_that_menu() {
 }
 
 /// 45/7 only moves an open client-reported goal of the character's own active quest
-/// (client sender `0x00cffba0` builds the 7-byte claim). The catalogue's only such goal is
-/// Cooking 101's second step, so the first (visit) step is marked done in the saved state.
+/// (client writer `0x00cff9f0`: u8 subtype + one dword; the UI wrapper is `0x00cffba0`).
+/// The catalogue's only such goal is Cooking 101's second step, so the first (visit) step is
+/// marked done in the saved state.
 #[test]
 fn client_reported_45_7_only_advances_an_open_goal() {
     let fixture = Fixture::new();
@@ -906,7 +946,8 @@ fn client_reported_45_7_only_advances_an_open_goal() {
 }
 
 /// 49/15 for an id the crosswalk does not list answers one chat line and changes nothing
-/// (the 47/12 and 47/13 requests share this family; `tests/quest_journal.rs` pins them).
+/// (client ctor `0x00a86580`, writer `0x00a91730`; the 47/12 and 47/13 requests share this
+/// family; `tests/quest_journal.rs` pins them).
 #[test]
 fn journal_49_15_unlisted_id_is_refused_with_one_line() {
     let fixture = Fixture::new();
@@ -967,7 +1008,8 @@ fn quest_accept_49_2_and_turn_in_49_14_still_route() {
 }
 
 /// 26/23 abandons through its own family and still replays the native 49/6
-/// (`CommandPacketQuestAbandon`, RTTI `0x01b6aa2c`).
+/// (`CommandPacketQuestAbandon`: ctor `0x00c09f60`, body writer `0x00c0a350`, sender
+/// `0x00c0a3d0`).
 #[test]
 fn abandon_26_23_still_replies_49_6() {
     let fixture = Fixture::new();
@@ -1032,10 +1074,30 @@ fn interact_and_select_26_8_26_10_still_route() {
     let missed = send(&mut game, &samantha, &npc_select(unknown, 1), NOW + 3);
     assert!(!missed.changed && missed.replies.is_empty());
     assert_eq!(saved(&game), before);
+    let before_malformed = saved(&game);
     assert!(
         game.handle_in_world(&[26, 0, 10, 0, 0, 0], &samantha, NOW + 4)
             .is_err(),
         "a malformed selection must stay that family's refusal"
+    );
+    assert_eq!(
+        saved(&game),
+        before_malformed,
+        "a malformed 26/10 changed gameplay state"
+    );
+    // The refused selection consumed nothing: the open menu still answers.
+    let again = send(
+        &mut game,
+        &samantha,
+        &npc_select(SAMANTHA, talk_choice),
+        NOW + 5,
+    );
+    assert!(
+        again
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
+        "a malformed 26/10 consumed the open menu"
     );
 }
 
@@ -1044,7 +1106,11 @@ fn interact_and_select_26_8_26_10_still_route() {
 #[test]
 fn vendor_165_4_and_66_43_still_route() {
     let fixture = Fixture::new();
-    let mut game = fixture.game(None);
+    // 100 coins covers the 15-coin price of item 8, so only the vendor's stock gate can
+    // refuse the buy below (a stock-check regression would succeed).
+    let mut state = fixture.game(None).state();
+    state.inventory.coins = 100;
+    let mut game = fixture.game(Some(state));
     let vendor = at_npc(SWAMP_VENDOR, "blackspore_swamp.json", SWAMP_ZONE);
     let menu = interact(&mut game, &vendor, SWAMP_VENDOR, NOW);
     let shop_choice = menu_option(&menu, SHOP_LABEL);
@@ -1063,12 +1129,7 @@ fn vendor_165_4_and_66_43_still_route() {
     );
     let before = saved(&game);
     // 165/4 for an item this vendor does not stock: the family refuses and nothing moves.
-    let mut buy = vec![165, 0, 4, 0];
-    buy.extend(SWAMP_VENDOR.to_le_bytes());
-    buy.extend(7u32.to_le_bytes());
-    buy.extend(8i32.to_le_bytes());
-    buy.extend(1u32.to_le_bytes());
-    buy.extend(0u32.to_le_bytes());
+    let buy = request_buy(SWAMP_VENDOR, 7, 8, 0, 1);
     assert!(
         game.handle_in_world(&buy, &vendor, NOW + 2).is_err(),
         "a non-stock 165/4 buy must be refused"

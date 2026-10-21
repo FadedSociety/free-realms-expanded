@@ -60,8 +60,8 @@ fn buy_packet(merchant: u64, transaction: u32, item: i32, quantity: u32) -> Vec<
     packet.extend(merchant.to_le_bytes());
     packet.extend(transaction.to_le_bytes());
     packet.extend(item.to_le_bytes());
-    packet.extend(quantity.to_le_bytes());
-    packet.extend(0u32.to_le_bytes());
+    packet.extend(0i32.to_le_bytes()); // tint
+    packet.extend(quantity.to_le_bytes()); // quantity (client writer 0x00c75ed0)
     packet
 }
 

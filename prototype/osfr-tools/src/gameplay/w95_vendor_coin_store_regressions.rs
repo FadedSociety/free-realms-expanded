@@ -103,8 +103,8 @@ fn coin_store_and_vendor_buys_preserve_live_inventory_and_saved_state() {
     request.extend(npc_id.to_le_bytes());
     request.extend(99001u32.to_le_bytes());
     request.extend(item_id.to_le_bytes());
-    request.extend(1u32.to_le_bytes());
-    request.extend(0u32.to_le_bytes());
+    request.extend(0i32.to_le_bytes()); // tint
+    request.extend(1u32.to_le_bytes()); // quantity (client writer 0x00c75ed0)
     let character = CharacterState {
         guid: 7,
         zone_id,

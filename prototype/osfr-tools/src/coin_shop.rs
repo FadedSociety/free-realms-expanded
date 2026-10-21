@@ -402,12 +402,13 @@ impl CoinShop {
     fn handle_coin_store(&mut self, inner: &[u8]) -> io::Result<CoinShopOutcome> {
         let opcode = read_u16(inner, 2)?;
         match opcode {
-            // (R) The first undocumented caller dword is used as the client idempotency key.
-            // The client writes two caller values, but their semantics are unresolved.
+            // Client writer 0x00c75ed0 (called by BuyItem 0x00c77230): header, merchant
+            // u64, record id (the idempotency key, R), definition, tint, quantity.
+            // Quantity is the last dword (offset 24).
             4 if inner.len() == 28 => self.buy_with_merchant(
                 read_u32(inner, 12)?,
                 read_i32(inner, 16)?,
-                read_u32(inner, 20)?,
+                read_u32(inner, 24)?,
                 read_u64(inner, 4)?,
             ),
             5 if inner.len() == 20 => self.sell_with_merchant(

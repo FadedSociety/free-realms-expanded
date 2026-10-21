@@ -2040,7 +2040,8 @@ fn t3_open_shop_rejects_hostile_buy_then_accepts_valid_follow_up() {
     }
     let mut buy = words(165, 4, &[]);
     buy.extend(NPC.to_le_bytes());
-    for field in [71001u32, 8, 1, 0] {
+    // Client writer 0x00c75ed0: record id, definition, tint, then quantity.
+    for field in [71001u32, 8, 0, 1] {
         buy.extend(field.to_le_bytes());
     }
     // Length corruption and an excessive count must not close/poison shared shop state.
@@ -2048,7 +2049,7 @@ fn t3_open_shop_rejects_hostile_buy_then_accepts_valid_follow_up() {
         unchanged(&mut gateway, &wrap(&buy[..cut]), "shop truncation");
     }
     let mut huge = buy.clone();
-    huge[20..24].fill(0xff);
+    huge[24..28].fill(0xff);
     unchanged(&mut gateway, &wrap(&huge), "shop u32::MAX quantity");
     buy[12..16].copy_from_slice(&71002u32.to_le_bytes()); // A fresh transaction after a valid refusal.
     let before = gateway.snapshot().gameplay.unwrap().inventory.coins;
