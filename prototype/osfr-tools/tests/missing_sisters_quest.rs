@@ -767,7 +767,7 @@ fn the_spawn_is_unique_and_the_quest_target_resolves() {
         .collect();
     assert_eq!(
         enabled,
-        vec![QUEST, 3_000_032],
+        vec![QUEST, 3_000_032, 3_000_033, 3_000_034],
         "only the enabled Chapter 1 rows are offered at Geoffrey"
     );
     let record = read_json(&content_dir().join("quests/adventurer.json"))["records"]

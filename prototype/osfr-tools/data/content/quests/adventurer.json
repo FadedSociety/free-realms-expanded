@@ -2630,8 +2630,63 @@
       "prerequisite_quest_ids": [
         3000032
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "zone_id": 0,
+          "position": [
+            -487.5454,
+            -75.8251,
+            2242.396
+          ],
+          "radius": 8.0,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E5 'Scout out Briarwood and return to Geoffrey with what you learn.' (client description 90727); title id cell ucdt 124479101 / ugdt 3805276719."
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "data/content/npcs/briarwood.json record npc_id 9500000209 (Sergeant Cargug): placement 'legacy_data', zone 'Briarwood' (zone_id 2), position [-487.5454, -75.8251, 2242.396], roles ['quest_giver'], model 'chugawug_m_sergeantcargug.adr'. world::NpcVisibility draws every positioned legacy_data row in the open-world zone 0 at this authored position."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T377: the scout target is the shipped Sergeant Cargug quest-hub row's own standing point copied verbatim; 8.0 m is the existing T279 authored visit radius. This is a standable NPC hub, not a poi_anchor/unanchored row and not a new coordinate."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000330,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md row E5 ends with the return to Geoffrey; the end text 90728 is his reply after the scout, and the giver is NPC 9000000330."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T377: the final step is an ordinary talk_to_npc to the giver, the same shape as T279/T330's hand-in."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 8,
+          "items": [],
+          "job_xp": {
+            "1": 20
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T377: the guide's E5 reward cell is unknown; this row uses the existing W110/T202 small-referral fallback: 8 coins and 20 Adventurer (profile 1) job XP, no item. The explicit job_xp map pays profile 1 even when another job is active."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2651,7 +2706,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T377: E5's goals are the shipped Sergeant Cargug row standing point (npcs/briarwood.json:9500000209) and the return Talk to Geoffrey; no coordinate, spawn or objective kind is invented. E2 (3000030) and E3 (3000031) remain disabled/hollow because their backfilled text describes gathering Ammi Lilies, and no Ammi Lily item or resource exists in the shipped content; this record chains from the playable E4 (3000032) instead and is a later slice."
         },
         {
           "kind": "reconstructed",
@@ -2663,17 +2718,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T377: the guide's E5 reward cell is unknown; the row uses the W110/T202 small-referral fallback: 8 coins and 20 Adventurer (profile 1) job XP, no item."
         },
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T377: ENABLED as the fourth playtest story beat after 3000032. All ids, text, targets and the reward are existing content or shipped rows; this record adds no NPC, spawn, item, battle, selector or save field."
         }
       ],
       "description_string_id": 90727,
       "intro_text_string_id": 90725,
       "end_text_string_id": 90728,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000034,
@@ -2682,8 +2741,57 @@
       "prerequisite_quest_ids": [
         3000033
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000650,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md: Quest line > Part E. Chapter 1 (22 quests), row E6: intro 90770 'the instructors in Shrouded Glade will have records of training her' and description 90772 'The druids of Shrouded Glade keep detailed records on those whom they train'; the guide marks E6's text match inferred (dagger)."
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "data/content/npcs/shrouded_glade.json record npc_id 9500000650 (Arch Druid Camellia): placement 'legacy_data', zone 'Shrouded Glade' (zone_id 12), position [103.6414, 69.12641, 1235.769], roles ['quest_giver'], model 'fairy_archdruid_f.adr'. world::NpcVisibility draws it in the open-world zone 0 at this authored position."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T377: the guide marks E6's client text inferred (dagger), so the objective link to Arch Druid Camellia is reconstructed from the druid-records lead-in. The shipped druid row is the talk target; no new NPC or spawn."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000330,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Adventurer.md row E6 returns to Geoffrey; the end text 90773 is his debrief, and the giver is NPC 9000000330."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T377: the final step is an ordinary talk_to_npc to the giver."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 8,
+          "items": [],
+          "job_xp": {
+            "1": 20
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T377: the guide's E6 reward cell is unknown; this row uses the existing W110/T202 small-referral fallback: 8 coins and 20 Adventurer (profile 1) job XP, no item. The explicit job_xp map pays profile 1 even when another job is active."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -2703,7 +2811,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T377: E6's target links are shipped rows: Arch Druid Camellia (npcs/shrouded_glade.json:9500000650) for the druid records and Geoffrey for the return. The guide marks the client text inferred (dagger), so the objective link is tagged on the objective itself."
         },
         {
           "kind": "reconstructed",
@@ -2715,17 +2823,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T377: the guide's E6 reward cell is unknown; the row uses the W110/T202 small-referral fallback: 8 coins and 20 Adventurer (profile 1) job XP, no item."
         },
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T377: ENABLED as the fifth playtest story beat after 3000033 (E5). All ids, text and targets are existing content or shipped rows; this record adds no NPC, spawn, item, battle, selector or save field."
         }
       ],
       "description_string_id": 90772,
       "intro_text_string_id": 90770,
       "end_text_string_id": 90773,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3000035,

@@ -995,7 +995,7 @@ fn content_overflow_is_rejected_at_load() {
 fn configured_job_xp_and_job_gates_match_the_task_table() {
     let content = content_dir();
     // (file, quest id, giver, prerequisites, reward coins, job gate, profile, XP)
-    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 21] = [
+    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 23] = [
         (
             "adventurer.json",
             INTRODUCE_YOURSELF,
@@ -1168,6 +1168,29 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             ADVENTURER,
             25,
         ),
+        // T377: the next two chapter records. The disabled E2/E3 are skipped, so E5
+        // chains from the playable E4 and E6 from E5. Both keep the small-referral
+        // fallback (8 coins, explicit Adventurer profile-1 XP, no item).
+        (
+            "adventurer.json",
+            3_000_033,
+            GEOFFREY,
+            &[3_000_032],
+            8,
+            None,
+            ADVENTURER,
+            20,
+        ),
+        (
+            "adventurer.json",
+            3_000_034,
+            GEOFFREY,
+            &[3_000_033],
+            8,
+            None,
+            ADVENTURER,
+            20,
+        ),
         // T252's two Cobblestone Brawler records; T331's C6 is the hand-off they lead to.
         // The table now covers every job-gated Brawler record in `brawler.json`, so the
         // final scan below can reject a new gate or XP row in that file.
@@ -1221,8 +1244,9 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
     // The task decisions are accepted: T202 wrote the chapter job XP and gates, T241
     // extended the same table with the two live Farnum starting records, T279 adds
     // the independent Missing Sisters playtest entry, T277 adds Local Hero, T252's two
-    // Cobblestone Brawler records and T331's hand-off are added with their own tags, and
-    // T334 adds the second Miner chapter behind T300's practice test.
+    // Cobblestone Brawler records and T331's hand-off are added with their own tags,
+    // T334 adds the second Miner chapter behind T300's practice test, and T377 adds
+    // the two chapter records after E4.
     // A later task's decision tag counts only for the record that task decided, so a
     // new quest cannot satisfy the table by carrying someone else's tag.
     let has_decision = |quest_id: u32, source: &Value| {
@@ -1231,6 +1255,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_000_024 => "(R) T277:",
             3_000_029 => "(R) T279:",
             3_000_032 => "(R) T330:",
+            3_000_033 | 3_000_034 => "(R) T377:",
             3_030_004 | 3_030_005 => "(R) T252:",
             3_030_009 => "(R) T331:",
             3_100_003 => "(R) T334:",

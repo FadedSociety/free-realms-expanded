@@ -16,7 +16,7 @@
 //! Talk. They are named in `UNBOUND_UNION_CONTROLS`; any other enabled quest
 //! without a row binding fails this gate.
 //!
-//! Counted on the T357 tree: 654 split quest records, 45 enabled, 42 of them
+//! Counted on the T377 tree: 655 split quest records, 48 enabled, 45 of them
 //! bound by a giver row, 3 union controls. The gate reads the counts, so a
 //! content change reports its new numbers instead of silently re-pinning them.
 //!
