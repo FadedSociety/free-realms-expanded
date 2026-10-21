@@ -158,6 +158,15 @@ mod unit {
     #[test]
     fn two_players_do_not_accelerate_motion_or_enemy_attack_clock() {
         let dir = fixture();
+        // A chaser (not the fixture's stationary default) so the far-player
+        // phase exercises the enemy's `moving` set as well as the marker's
+        // `wander` walk.
+        let path = dir.join("field_enemies.json");
+        let mut content: serde_json::Value =
+            serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+        content["enemies"][0]["aggro_range"] = json!(40);
+        content["enemies"][0]["behaviour"]["mode"] = json!("melee");
+        fs::write(&path, content.to_string()).unwrap();
         let mut a = load(&dir);
         let mut b = load(&dir);
         let mut field = a.take_shared_fields().unwrap();
@@ -191,6 +200,49 @@ mod unit {
                 "second observer must not advance the same world tick"
             );
         }
+        assert!(
+            field.attack_clock(E).is_some(),
+            "the enemy attack clock is swapped into the shared field"
+        );
+        // Far players let both the chaser and the battle marker walk: each
+        // writes one of the swapped collections, so a swap that missed them
+        // would leave the canonical state empty.
+        let far = [
+            a.field_participant(101, [10., 0., 0.], true),
+            b.field_participant(202, [-10., 0., 0.], true),
+        ];
+        for t in 11..=15 {
+            let now = t * 100;
+            let elapsed = field.due(now).unwrap();
+            let control_elapsed = control.due(now).unwrap();
+            let (_, hits) = a.shared_motion(&mut field, &far, now, elapsed).unwrap();
+            let (_, control_hits) = driver
+                .shared_motion(&mut control, &far[..1], now, control_elapsed)
+                .unwrap();
+            assert_eq!(hits, control_hits);
+            assert_eq!(field.position(E), control.position(E));
+            assert_eq!(field.position(super::M), control.position(super::M));
+            assert_eq!(field.attack_clock(E), control.attack_clock(E));
+            assert!(field.due(now).is_none());
+        }
+        assert_ne!(
+            field.position(super::M),
+            Some([0., 0., 0.]),
+            "the marker's walk is swapped into the shared field"
+        );
+        let initial = field.initialization(E).unwrap();
+        let animation = initial
+            .iter()
+            .find(|p| p.starts_with(&[35, 0, 8, 0]))
+            .expect("the late-join animation");
+        // 35/8 SetAnimation: guid then the animation id. Ctor 0x008b3ee0
+        // calls the family ctor 0089fbb0(8); dispatcher 0x0092f540 case 8
+        // calls it at 0x009315ce. Id 3 is the walking pose.
+        assert_eq!(
+            i32::from_le_bytes(animation[12..16].try_into().unwrap()),
+            3,
+            "the walk animation state is swapped into the shared field"
+        );
     }
     #[test]
     fn malformed_and_unknown_targets_do_not_mutate_or_consume_swing() {
@@ -208,6 +260,12 @@ mod unit {
             E.to_le_bytes().to_vec(),
         ]
         .concat();
+        let before = (
+            field.health(E),
+            field.position(E),
+            field.attack_clock(E),
+            field.pending_kill_credits(101),
+        );
         for end in 0..good.len() {
             assert!(!matches!(
                 a.shared_action(&good[..end], &character),
@@ -231,6 +289,16 @@ mod unit {
         assert!(
             a.shared_attack(&mut field, 101, E, [f32::NAN, 0., 0.], 2, 0)
                 .is_err()
+        );
+        assert_eq!(
+            (
+                field.health(E),
+                field.position(E),
+                field.attack_clock(E),
+                field.pending_kill_credits(101),
+            ),
+            before,
+            "a refused shared action changes nothing"
         );
         assert_eq!(field.health(E), Some(300));
         assert_eq!(

@@ -24,9 +24,8 @@ mod field_rewards;
 mod power_up_use;
 mod shared;
 mod skills;
-use self::field::Wander;
 pub(crate) use self::field::level_refusal;
-use self::field_rewards::KillCredit;
+use self::shared::FieldSim;
 pub use self::shared::{SharedFieldAction, SharedFieldState};
 use self::skills::{SkillBuff, SkillDot, SkillEffects};
 
@@ -536,26 +535,6 @@ struct FieldEnemy {
     reset_serial: u64,
 }
 
-impl FieldEnemy {
-    fn reset_motion(&mut self) {
-        self.motion = FieldMotion::Idle;
-        self.roam_goal = None;
-        self.pause_until = 0;
-        self.seed = self.actor.guid;
-        self.target = None;
-        self.reset_serial = self.reset_serial.wrapping_add(1);
-    }
-
-    /// (R) Per-actor deterministic random stream, same LCG as combat crits.
-    fn random(&mut self) -> f32 {
-        self.seed = self
-            .seed
-            .wrapping_mul(6_364_136_223_846_793_005)
-            .wrapping_add(1_442_695_040_888_963_407);
-        (self.seed >> 40) as f32 / 16_777_216.0
-    }
-}
-
 /// Overworld battle started from a spawner (red crossed swords): clicking it
 /// opens the minigame start screen (41/114 details, not launched); Go sends
 /// 41/108 and the player is zoned into the battle's arena. Titles, descriptions and goals are
@@ -700,8 +679,8 @@ pub struct EncounterEngine {
     state: EncounterState,
     last_attack: Option<u64>,
     last_tick: Option<u64>,
-    enemy_attacks: BTreeMap<u64, u64>,
-    moving: BTreeSet<u64>,
+    /// The whole field simulation; swapped with the shared field as one value.
+    field_sim: FieldSim,
     // Player energy for job abilities (session only; full on login) and its
     // next regeneration step, plus each ability slot's cooldown end.
     energy: i32,
@@ -722,8 +701,6 @@ pub struct EncounterEngine {
     skills: SkillEffects,
     player_profile: i32,
     job_level: u32,
-    // Overworld battle markers walking their loop, by battle id.
-    wander: BTreeMap<u32, Wander>,
     // Where a dropped saved battle started; the gateway moves the character
     // there on login (its saved location is still inside the arena).
     dropped_return: Option<CharacterState>,
@@ -735,7 +712,6 @@ pub struct EncounterEngine {
     // Remove presents the original results screen. Keep the finished server
     // encounter until the player closes it; the client's 39/7 is only an ack.
     results_presented: bool,
-    field: Vec<FieldEnemy>,
     // (R) Metadata only after World takes ownership. No local HP copy remains.
     shared_fields: Option<BTreeSet<u64>>,
     shared_sender: Option<u64>,
@@ -766,10 +742,6 @@ pub struct EncounterEngine {
     /// The single stored power-up (kind id in `power_ups.json`). Slice 3 shows
     /// it in the key-3 slot and takes it on use; nothing else reads it.
     held_power_up: Option<String>,
-    /// Who hit which shared-field enemy, and the drops other participants have
-    /// yet to claim. Owned by the shared field; swapped in with it (empty for a
-    /// solo engine).
-    ledger: KillLedger,
     /// (R) Coins and active-job XP for a field kill (`field_kill_rewards.json`).
     field_rewards: Arc<field_rewards::FieldKillRewards>,
     /// Zone the pickups were dropped in; a different zone clears them.
@@ -778,15 +750,6 @@ pub struct EncounterEngine {
     /// A begin-zoning reload (opcode 31) drops the ground pickups even into the
     /// same instance; the held power-up stays (player state).
     pickup_instance: Option<i32>,
-}
-
-/// (R) Shared-field kill bookkeeping for power-up drops (W158 slice 2b).
-#[derive(Clone, Default)]
-struct KillLedger {
-    /// enemy guid -> player guid -> time of that player's last damage.
-    hits: BTreeMap<u64, BTreeMap<u64, u64>>,
-    /// player guid -> credits (reward and kill event) earned by another's kill.
-    credits: BTreeMap<u64, Vec<KillCredit>>,
 }
 
 /// A pickup actor on the ground, owned by the player whose kill dropped it.
@@ -1101,11 +1064,9 @@ impl EncounterEngine {
             state,
             last_attack: None,
             last_tick: None,
-            enemy_attacks: BTreeMap::new(),
-            moving: BTreeSet::new(),
+            field_sim: FieldSim::default(),
             kiting: BTreeMap::new(),
             dropped_return,
-            wander: BTreeMap::new(),
             energy: ENERGY_MAX,
             energy_regen_at: 0,
             max_health: PLAYER_MAX,
@@ -1121,7 +1082,6 @@ impl EncounterEngine {
             job_level: 1,
             armed: false,
             results_presented: false,
-            field: Vec::new(),
             shared_fields: None,
             shared_sender: None,
             field_combat: false,
@@ -1137,7 +1097,6 @@ impl EncounterEngine {
             pickups: Vec::new(),
             next_pickup: 0,
             held_power_up: None,
-            ledger: KillLedger::default(),
             field_rewards: Arc::new(field_rewards::FieldKillRewards::load(directory)?),
             pickup_zone: None,
             pickup_instance: None,
@@ -1193,7 +1152,7 @@ impl EncounterEngine {
             .iter()
             .flat_map(|d| d.enemies.iter())
             .chain(self.content.world_enemies.iter())
-            .chain(self.field.iter().map(|f| &f.actor));
+            .chain(self.field_sim.enemies.iter().map(|f| &f.actor));
         let mut resolved = BTreeMap::new();
         for actor in actors {
             let behaviour =
@@ -1382,8 +1341,8 @@ impl EncounterEngine {
         self.results_presented = false;
         self.last_attack = None;
         self.last_tick = None;
-        self.enemy_attacks.clear();
-        self.moving.clear();
+        self.field_sim.attacks.clear();
+        self.field_sim.moving.clear();
         self.kiting.clear();
         // Zoning wipes the client's actors, so the pickups go with them. The
         // held power-up stays: it belongs to the player, not the zone.
@@ -1754,7 +1713,13 @@ impl EncounterEngine {
                             .state
                             .world_enemies
                             .iter()
-                            .chain(self.field.iter().filter(|f| f.present).map(|f| &f.state))
+                            .chain(
+                                self.field_sim
+                                    .enemies
+                                    .iter()
+                                    .filter(|f| f.present)
+                                    .map(|f| &f.state),
+                            )
                             .collect(),
                     };
                     let range = profile_stats(profile_id, slot).0;
@@ -1874,7 +1839,8 @@ impl EncounterEngine {
     fn enemy(&self, guid: u64) -> Option<(&Actor, &EnemyState)> {
         if self.shared_sender.is_some() {
             return self
-                .field
+                .field_sim
+                .enemies
                 .iter()
                 .find(|f| f.present && f.actor.guid == guid && f.motion != FieldMotion::Returning)
                 .map(|f| (&f.actor, &f.state));
@@ -1896,7 +1862,8 @@ impl EncounterEngine {
                 .zip(&self.state.world_enemies)
                 .find(|(a, _)| a.guid == guid && a.stages.contains(&self.state.world_stage))
                 .or_else(|| {
-                    self.field
+                    self.field_sim
+                        .enemies
                         .iter()
                         .find(|f| f.present && f.actor.guid == guid)
                         .map(|f| (&f.actor, &f.state))
@@ -1952,7 +1919,8 @@ impl EncounterEngine {
         // (R) Evading field actors cannot be damaged or re-aggroed by attacks
         // (including an old DoT); return-home healing must finish first.
         if self
-            .field
+            .field_sim
+            .enemies
             .iter()
             .any(|f| f.actor.guid == guid && f.motion == FieldMotion::Returning)
         {
@@ -1993,7 +1961,8 @@ impl EncounterEngine {
         let dealt = damage.min(health);
         let hp = health - dealt;
         if let (Some(sender), true) = (self.shared_sender, dealt > 0) {
-            self.ledger
+            self.field_sim
+                .kills
                 .hits
                 .entry(guid)
                 .or_default()
@@ -2009,15 +1978,16 @@ impl EncounterEngine {
             self.last_attack = Some(now_ms);
         }
         let field_index = if self.state.active.is_none() {
-            self.field
+            self.field_sim
+                .enemies
                 .iter()
                 .position(|f| f.present && f.actor.guid == guid)
         } else {
             None
         };
         if let Some(i) = field_index {
-            self.field[i].state.health = hp;
-            self.field[i].motion = FieldMotion::Chasing;
+            self.field_sim.enemies[i].state.health = hp;
+            self.field_sim.enemies[i].motion = FieldMotion::Chasing;
         } else {
             let states = if let Some(active) = &mut self.state.active {
                 &mut active.enemies
@@ -2072,9 +2042,9 @@ impl EncounterEngine {
             }
             self.kiting.remove(&guid);
             if let Some(i) = field_index {
-                self.moving.remove(&guid);
-                self.enemy_attacks.remove(&guid);
-                let f = &mut self.field[i];
+                self.field_sim.moving.remove(&guid);
+                self.field_sim.attacks.remove(&guid);
+                let f = &mut self.field_sim.enemies[i];
                 f.respawn_at = Some(now_ms.saturating_add(f.respawn_ms));
             } else if let Some(active) = &self.state.active {
                 let d = self.dungeon().unwrap();
@@ -2146,7 +2116,7 @@ impl EncounterEngine {
             }
         }
         if hp == 0 {
-            let hitters = self.ledger.hits.remove(&guid).unwrap_or_default();
+            let hitters = self.field_sim.kills.hits.remove(&guid).unwrap_or_default();
             // A won encounter is over: its zone is about to close, nothing to pick up.
             if self
                 .state
@@ -2156,7 +2126,7 @@ impl EncounterEngine {
             {
                 let reward =
                     field_index.and_then(|_| self.field_rewards.reward_for(definition, level));
-                let engaged = field_index.and_then(|i| self.field[i].target);
+                let engaged = field_index.and_then(|i| self.field_sim.enemies[i].target);
                 self.credit_field_kill(
                     drop_table.as_deref(),
                     reward,
@@ -2511,7 +2481,7 @@ impl EncounterEngine {
                         now_ms,
                         elapsed,
                         &mut self.kiting,
-                        &mut self.moving,
+                        &mut self.field_sim.moving,
                         &mut out,
                     );
                     continue;
@@ -2519,7 +2489,7 @@ impl EncounterEngine {
             }
             let delta = distance(position, s.position);
             if delta > b.chase_limit {
-                if self.moving.remove(&actor.guid) {
+                if self.field_sim.moving.remove(&actor.guid) {
                     out.replies.push(animation(actor.guid, 1, true));
                 }
                 continue;
@@ -2539,23 +2509,24 @@ impl EncounterEngine {
                 }
                 ground.snap(&mut s.position);
                 out.replies.push(movement(actor.guid, s.position, heading));
-                if self.moving.insert(actor.guid) {
+                if self.field_sim.moving.insert(actor.guid) {
                     out.replies.push(animation(actor.guid, 3, true));
                 }
                 out.changed = true;
             }
             if distance(position, s.position) <= b.reach {
-                if self.moving.remove(&actor.guid) {
+                if self.field_sim.moving.remove(&actor.guid) {
                     out.replies.push(animation(actor.guid, 1, true));
                 }
                 if self
-                    .enemy_attacks
+                    .field_sim
+                    .attacks
                     .get(&actor.guid)
                     .is_some_and(|last| now_ms.saturating_sub(*last) < b.attack_ms)
                 {
                     continue;
                 }
-                self.enemy_attacks.insert(actor.guid, now_ms);
+                self.field_sim.attacks.insert(actor.guid, now_ms);
                 out.replies.push(animation(actor.guid, 1001, false));
                 let attack_damage = (actor.damage as f32 * mitigation).round() as u32;
                 let damage =

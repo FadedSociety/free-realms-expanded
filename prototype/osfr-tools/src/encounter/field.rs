@@ -34,11 +34,32 @@ pub(crate) fn level_refusal(level: u32, required: u32) -> Option<u32> {
     (level < required).then_some(required)
 }
 
+impl FieldEnemy {
+    fn reset_motion(&mut self) {
+        self.motion = FieldMotion::Idle;
+        self.roam_goal = None;
+        self.pause_until = 0;
+        self.seed = self.actor.guid;
+        self.target = None;
+        self.reset_serial = self.reset_serial.wrapping_add(1);
+    }
+
+    /// (R) Per-actor deterministic random stream, same LCG as combat crits.
+    fn random(&mut self) -> f32 {
+        self.seed = self
+            .seed
+            .wrapping_mul(6_364_136_223_846_793_005)
+            .wrapping_add(1_442_695_040_888_963_407);
+        (self.seed >> 40) as f32 / 16_777_216.0
+    }
+}
+
 impl EncounterEngine {
     /// Authored field level, for client presentation by the owning gameplay
     /// route once its wire carrier is verified. Never infer it from HP.
     pub fn field_level(&self, guid: u64) -> Option<u32> {
-        self.field
+        self.field_sim
+            .enemies
             .iter()
             .find(|f| f.present && f.actor.guid == guid)
             .map(|f| f.actor.level)
@@ -216,7 +237,7 @@ impl EncounterEngine {
                 respawn_at: None,
             });
         }
-        self.field = field;
+        self.field_sim.enemies = field;
         self.rebuild_behaviours()
     }
 
@@ -225,7 +246,8 @@ impl EncounterEngine {
     /// whose enemies appear only once it is active.
     pub fn field_enemy_site(&self, definition_id: u32) -> Option<(u64, [f32; 3])> {
         let definition_id = i32::try_from(definition_id).ok()?;
-        self.field
+        self.field_sim
+            .enemies
             .iter()
             .filter(|f| f.actor.definition_id == definition_id)
             .min_by_key(|f| f.actor.guid)
@@ -234,7 +256,8 @@ impl EncounterEngine {
 
     /// Developer teleport targets for living field enemies (zone 0).
     pub fn field_teleport_targets(&self) -> Vec<crate::dev_teleport::Target> {
-        self.field
+        self.field_sim
+            .enemies
             .iter()
             .filter(|f| f.present && f.state.health > 0)
             .map(|f| crate::dev_teleport::Target {
@@ -289,7 +312,7 @@ impl EncounterEngine {
             .world_enemies
             .iter()
             .map(|a| a.guid)
-            .chain(self.field.iter().map(|f| f.actor.guid))
+            .chain(self.field_sim.enemies.iter().map(|f| f.actor.guid))
             .chain(self.content.dungeons.iter().flat_map(|d| {
                 d.enemies
                     .iter()
@@ -414,7 +437,7 @@ impl EncounterEngine {
             return Err(error);
         }
         self.pending_battle = None;
-        self.wander.clear();
+        self.field_sim.wander.clear();
         Ok(())
     }
 
@@ -428,7 +451,7 @@ impl EncounterEngine {
                 "finish or exit the encounter before reloading enemies",
             ));
         }
-        let previous = self.field.clone();
+        let previous = self.field_sim.enemies.clone();
         let mut packets = Vec::new();
         for f in &previous {
             if f.present && f.state.health > 0 {
@@ -436,13 +459,13 @@ impl EncounterEngine {
             }
         }
         if let Err(error) = self.load_field_enemies(path) {
-            self.field = previous;
+            self.field_sim.enemies = previous;
             self.rebuild_behaviours()?;
             return Err(error);
         }
         for f in &previous {
-            self.moving.remove(&f.actor.guid);
-            self.enemy_attacks.remove(&f.actor.guid);
+            self.field_sim.moving.remove(&f.actor.guid);
+            self.field_sim.attacks.remove(&f.actor.guid);
             self.skills.forget_target(f.actor.guid);
         }
         packets.extend(self.field_initialization());
@@ -527,7 +550,8 @@ impl EncounterEngine {
 
     /// The marker's current spot: where its walk has taken it, else home.
     fn marker_position(&self, battle: &FieldBattle) -> [f32; 3] {
-        self.wander
+        self.field_sim
+            .wander
             .get(&battle.id)
             .map_or(battle.spawner.position, |w| w.position)
     }
@@ -594,7 +618,10 @@ impl EncounterEngine {
     }
 
     pub fn is_field_enemy(&self, guid: u64) -> bool {
-        self.field.iter().any(|f| f.present && f.actor.guid == guid)
+        self.field_sim
+            .enemies
+            .iter()
+            .any(|f| f.present && f.actor.guid == guid)
     }
 
     /// Show or hide quest-gated field enemies for the player's active quests.
@@ -605,8 +632,8 @@ impl EncounterEngine {
             return out;
         }
         let mut shown = Vec::new();
-        for i in 0..self.field.len() {
-            let f = &mut self.field[i];
+        for i in 0..self.field_sim.enemies.len() {
+            let f = &mut self.field_sim.enemies[i];
             if f.quest_ids.is_empty() {
                 continue;
             }
@@ -620,37 +647,44 @@ impl EncounterEngine {
                 f.state = enemy_state(&f.actor);
                 f.respawn_at = None;
                 f.reset_motion();
-                self.enemy_attacks.remove(&f.actor.guid);
+                self.field_sim.attacks.remove(&f.actor.guid);
                 shown.push(i);
             } else {
                 if f.state.health > 0 {
                     out.replies.push(remove(f.actor.guid));
                 }
-                self.moving.remove(&f.actor.guid);
+                self.field_sim.moving.remove(&f.actor.guid);
             }
         }
         for i in &shown {
-            let f = &self.field[*i];
+            let f = &self.field_sim.enemies[*i];
             out.replies.push(self.spawn(&f.actor, f.state.position, 0));
             out.replies
                 .push(enemy_hp(f.actor.guid, f.state.health, f.actor.max_health));
         }
         if !shown.is_empty() {
-            let guids: Vec<u64> = shown.iter().map(|i| self.field[*i].actor.guid).collect();
+            let guids: Vec<u64> = shown
+                .iter()
+                .map(|i| self.field_sim.enemies[*i].actor.guid)
+                .collect();
             out.replies.push(relevance(&guids, false));
         }
         out
     }
 
     pub fn field_guids(&self) -> Vec<u64> {
-        self.field.iter().map(|f| f.actor.guid).collect()
+        self.field_sim
+            .enemies
+            .iter()
+            .map(|f| f.actor.guid)
+            .collect()
     }
 
     pub(super) fn field_initialization(&mut self) -> Vec<Vec<u8>> {
         self.field_combat = false;
         let mut packets = Vec::new();
         let mut alive = Vec::new();
-        for f in &self.field {
+        for f in &self.field_sim.enemies {
             if f.present && f.state.health > 0 {
                 packets.push(self.spawn(&f.actor, f.state.position, 0));
                 packets.push(enemy_hp(f.actor.guid, f.state.health, f.actor.max_health));
@@ -673,7 +707,7 @@ impl EncounterEngine {
         let ground = self.ground();
         for b in &self.battles {
             let home = b.spawner.position;
-            let w = self.wander.entry(b.id).or_insert(Wander {
+            let w = self.field_sim.wander.entry(b.id).or_insert(Wander {
                 position: home,
                 waypoint: 0,
                 pause_until: 0,
@@ -696,7 +730,7 @@ impl EncounterEngine {
             let guid = b.spawner.guid;
             if near < WANDER_NOTICE {
                 // It notices the player: stop and face them, so it can be clicked.
-                if self.moving.remove(&guid) {
+                if self.field_sim.moving.remove(&guid) {
                     let d = near.max(0.01);
                     let face = [
                         (player[0] - w.position[0]) / d,
@@ -731,7 +765,7 @@ impl EncounterEngine {
                     (goal[2] - home[2]) / WANDER_RADIUS,
                 ];
                 out.replies.push(movement(guid, w.position, heading));
-                if self.moving.remove(&guid) {
+                if self.field_sim.moving.remove(&guid) {
                     out.replies.push(animation(guid, 1, true));
                 }
                 continue;
@@ -746,7 +780,7 @@ impl EncounterEngine {
             }
             ground.snap(&mut w.position);
             out.replies.push(movement(guid, w.position, heading));
-            if self.moving.insert(guid) {
+            if self.field_sim.moving.insert(guid) {
                 out.replies.push(animation(guid, 2, true)); // loc_walk
             }
         }
@@ -770,7 +804,7 @@ impl EncounterEngine {
         let shared = participants.is_some();
         let mut engaged = false;
         let mut respawned = Vec::new();
-        for (i, f) in self.field.iter_mut().enumerate() {
+        for (i, f) in self.field_sim.enemies.iter_mut().enumerate() {
             let guid = f.actor.guid;
             if f.state.health == 0 {
                 if f.respawn_at.is_some_and(|at| now_ms >= at) {
@@ -891,7 +925,7 @@ impl EncounterEngine {
                     } else if let Some(next) = ground.field_position(next) {
                         f.state.position = next;
                         out.replies.push(movement(guid, next, heading));
-                        if self.moving.insert(guid) {
+                        if self.field_sim.moving.insert(guid) {
                             out.replies.push(animation(guid, 3, true));
                         }
                         out.changed = true;
@@ -901,13 +935,13 @@ impl EncounterEngine {
                         if f.motion == FieldMotion::Chasing {
                             f.motion = FieldMotion::Returning;
                         }
-                        if self.moving.remove(&guid) {
+                        if self.field_sim.moving.remove(&guid) {
                             out.replies.push(animation(guid, 1, true));
                         }
                     }
                 }
                 if f.motion != FieldMotion::Chasing && distance(f.state.position, goal) <= 0.001 {
-                    if self.moving.remove(&guid) {
+                    if self.field_sim.moving.remove(&guid) {
                         out.replies.push(animation(guid, 1, true));
                     }
                     if f.motion == FieldMotion::Returning {
@@ -917,7 +951,7 @@ impl EncounterEngine {
                                 .push(enemy_hp(guid, f.state.health, f.actor.max_health));
                             out.changed = true;
                         }
-                        self.enemy_attacks.remove(&guid);
+                        self.field_sim.attacks.remove(&guid);
                         self.skills.forget_target(guid);
                         f.motion = FieldMotion::Idle;
                         f.target = None;
@@ -933,17 +967,18 @@ impl EncounterEngine {
             }
             engaged = true;
             if distance(position, f.state.position) <= b.reach {
-                if self.moving.remove(&guid) {
+                if self.field_sim.moving.remove(&guid) {
                     out.replies.push(animation(guid, 1, true));
                 }
                 if self
-                    .enemy_attacks
+                    .field_sim
+                    .attacks
                     .get(&guid)
                     .is_some_and(|last| now_ms.saturating_sub(*last) < b.attack_ms)
                 {
                     continue;
                 }
-                self.enemy_attacks.insert(guid, now_ms);
+                self.field_sim.attacks.insert(guid, now_ms);
                 out.replies.push(animation(guid, 1001, false));
                 let victim = player.expect("a chasing actor has a valid target in reach");
                 let prior = if shared {
@@ -973,7 +1008,7 @@ impl EncounterEngine {
             }
         }
         for i in respawned {
-            let f = &self.field[i];
+            let f = &self.field_sim.enemies[i];
             if shared {
                 // (R) One observer diff emits AddNpc/full HP, never a second
                 // simulation spawn or HP correction for the same respawn.

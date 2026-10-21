@@ -1,5 +1,38 @@
 //! Shared field state: one overworld enemy simulation per instance, shared by every participant, and its engine entry points.
+use super::field::Wander;
+use super::field_rewards::KillCredit;
 use super::*;
+
+/// (R) The one field-simulation value. The engine and the world each own one
+/// `FieldSim`, and `with_shared_fields` swaps the whole value in and out for a
+/// single action. A future per-field collection belongs in here, never as a
+/// second engine field that has to be swapped separately.
+#[derive(Clone, Default)]
+pub(super) struct FieldSim {
+    /// Field enemies: health, presence, motion, roam/leash and respawn clocks.
+    pub(super) enemies: Vec<FieldEnemy>,
+    /// Battle markers walking their four-point loop, by battle id.
+    pub(super) wander: BTreeMap<u32, Wander>,
+    /// Enemy GUID to its last attack time. `tick_encounter` and `tick_field`
+    /// read and write it; `reset_session` clears it selectively on exit.
+    pub(super) attacks: BTreeMap<u64, u64>,
+    /// Enemy GUIDs whose walk animation is active. `tick_encounter`,
+    /// `tick_field` and `tick_wanderers_for` write it, late-join initialisation
+    /// reads it, and only `reset_session` clears it: never reset the whole
+    /// struct, or a cleared walk would desync observers.
+    pub(super) moving: BTreeSet<u64>,
+    /// Hit times and unclaimed credits for shared-field kills.
+    pub(super) kills: KillLedger,
+}
+
+/// (R) Shared-field kill bookkeeping for power-up drops (W158 slice 2b).
+#[derive(Clone, Default)]
+pub(super) struct KillLedger {
+    /// enemy guid -> player guid -> time of that player's last damage.
+    pub(super) hits: BTreeMap<u64, BTreeMap<u64, u64>>,
+    /// player guid -> credits (reward and kill event) earned by another's kill.
+    pub(super) credits: BTreeMap<u64, Vec<KillCredit>>,
+}
 
 /// (R) Parsed intents only. Session supplies identity, position and instance.
 #[derive(Clone, Debug)]
@@ -44,27 +77,27 @@ impl SharedFieldAction {
 /// World owns this outside cloneable session/social staging.
 #[derive(Clone)]
 pub struct SharedFieldState {
-    pub(super) enemies: Vec<FieldEnemy>,
-    pub(super) wander: BTreeMap<u32, Wander>,
-    pub(super) attacks: BTreeMap<u64, u64>,
-    pub(super) moving: BTreeSet<u64>,
+    /// The one simulation value: enemies, marker walks, attack clocks, walk
+    /// state and kill credits. A future field collection must live inside
+    /// `FieldSim`, not here or on the engine.
+    pub(super) field_sim: FieldSim,
     pub(super) dots: BTreeMap<u64, BTreeMap<(u64, i32), SkillDot>>,
     pub(super) stuns: BTreeMap<u64, u64>,
     pub(super) target_buffs: BTreeMap<(u64, i32), SkillBuff>,
     pub(super) last_tick: Option<u64>,
     pub(super) template: Arc<Content>,
     pub(super) battles: Arc<Vec<FieldBattle>>,
-    pub(super) kills: KillLedger,
 }
 
 impl SharedFieldState {
     pub fn enemies_targeting(&self, guid: u64) -> bool {
-        self.enemies.iter().any(|f| {
+        self.field_sim.enemies.iter().any(|f| {
             f.state.health > 0 && f.motion == FieldMotion::Chasing && f.target == Some(guid)
         })
     }
     pub(crate) fn restrict_to(&mut self, known: &BTreeSet<u64>) -> Vec<bool> {
-        self.enemies
+        self.field_sim
+            .enemies
             .iter_mut()
             .map(|f| {
                 let present = f.present;
@@ -74,24 +107,27 @@ impl SharedFieldState {
             .collect()
     }
     pub(crate) fn restore_presence(&mut self, previous: Vec<bool>) {
-        for (f, present) in self.enemies.iter_mut().zip(previous) {
+        for (f, present) in self.field_sim.enemies.iter_mut().zip(previous) {
             f.present = present;
         }
     }
     pub fn health(&self, guid: u64) -> Option<u32> {
-        self.enemies
+        self.field_sim
+            .enemies
             .iter()
             .find(|f| f.actor.guid == guid)
             .map(|f| f.state.health)
     }
     pub fn respawn_at(&self, guid: u64) -> Option<u64> {
-        self.enemies
+        self.field_sim
+            .enemies
             .iter()
             .find(|f| f.actor.guid == guid)?
             .respawn_at
     }
     pub fn position(&self, guid: u64) -> Option<[f32; 3]> {
-        self.enemies
+        self.field_sim
+            .enemies
             .iter()
             .find(|f| f.actor.guid == guid)
             .map(|f| f.state.position)
@@ -100,17 +136,19 @@ impl SharedFieldState {
                     .iter()
                     .find(|b| b.spawner.guid == guid)
                     .map(|b| {
-                        self.wander
+                        self.field_sim
+                            .wander
                             .get(&b.id)
                             .map_or(b.spawner.position, |w| w.position)
                     })
             })
     }
     pub fn attack_clock(&self, guid: u64) -> Option<u64> {
-        self.attacks.get(&guid).copied()
+        self.field_sim.attacks.get(&guid).copied()
     }
     pub fn target(&self, guid: u64) -> Option<u64> {
-        self.enemies
+        self.field_sim
+            .enemies
             .iter()
             .find(|f| f.actor.guid == guid)
             .and_then(|f| f.target)
@@ -127,7 +165,7 @@ impl SharedFieldState {
         self.dots
             .retain(|caster, dots| ready.contains(caster) && !dots.is_empty());
         // Players who left the field neither share future kills nor keep drops.
-        for (player, credits) in &mut self.kills.credits {
+        for (player, credits) in &mut self.field_sim.kills.credits {
             let present = ready.contains(player);
             credits.retain_mut(|credit| {
                 if now_ms >= credit.expires_ms {
@@ -142,16 +180,26 @@ impl SharedFieldState {
                     .is_some_and(|(coins, job_xp)| coins > 0 || job_xp > 0)
             });
         }
-        self.kills.credits.retain(|_, credits| !credits.is_empty());
-        for hitters in self.kills.hits.values_mut() {
+        self.field_sim
+            .kills
+            .credits
+            .retain(|_, credits| !credits.is_empty());
+        for hitters in self.field_sim.kills.hits.values_mut() {
             hitters.retain(|player, _| ready.contains(player));
         }
-        self.kills.hits.retain(|_, hitters| !hitters.is_empty());
+        self.field_sim
+            .kills
+            .hits
+            .retain(|_, hitters| !hitters.is_empty());
     }
 
     /// Pending kill credits for one player (tests and diagnostics).
     pub fn pending_kill_credits(&self, player: u64) -> usize {
-        self.kills.credits.get(&player).map_or(0, Vec::len)
+        self.field_sim
+            .kills
+            .credits
+            .get(&player)
+            .map_or(0, Vec::len)
     }
     pub fn due(&mut self, now_ms: u64) -> Option<u64> {
         let elapsed = self
@@ -165,7 +213,7 @@ impl SharedFieldState {
     }
     /// (R) Eligibility changes never reset health or corpse deadlines.
     pub fn set_active_quests(&mut self, active: &BTreeSet<u32>) {
-        for f in &mut self.enemies {
+        for f in &mut self.field_sim.enemies {
             let eligible =
                 f.quest_ids.is_empty() || f.quest_ids.iter().any(|id| active.contains(id));
             f.present = eligible || f.motion != FieldMotion::Idle && f.state.health > 0;
@@ -178,7 +226,8 @@ impl SharedFieldState {
     /// (R) Candidates for the common NPC budget. Dead rows are retained only
     /// for existing observers until their committed lethal HP delta is flushed.
     pub fn interest_candidates(&self, hold_deaths: bool) -> Vec<crate::world::NpcInterest> {
-        self.enemies
+        self.field_sim
+            .enemies
             .iter()
             .filter(|f| f.present && (f.state.health > 0 || hold_deaths))
             .map(|f| crate::world::NpcInterest {
@@ -195,6 +244,7 @@ impl SharedFieldState {
     }
     pub fn initialization(&self, guid: u64) -> io::Result<Vec<Vec<u8>>> {
         if let Some(f) = self
+            .field_sim
             .enemies
             .iter()
             .find(|f| f.actor.guid == guid && f.present && f.state.health > 0)
@@ -207,7 +257,7 @@ impl SharedFieldState {
                     guid,
                     if self.stuns.contains_key(&guid) {
                         1401
-                    } else if self.moving.contains(&guid) {
+                    } else if self.field_sim.moving.contains(&guid) {
                         3
                     } else {
                         1
@@ -250,24 +300,25 @@ impl EncounterEngine {
             return None;
         }
         self.shared_fields = Some(
-            self.field
+            self.field_sim
+                .enemies
                 .iter()
                 .map(|f| f.actor.guid)
                 .chain(self.battles.iter().map(|b| b.spawner.guid))
                 .collect(),
         );
         Some(SharedFieldState {
-            enemies: std::mem::take(&mut self.field),
-            wander: std::mem::take(&mut self.wander),
-            attacks: BTreeMap::new(),
-            moving: BTreeSet::new(),
+            field_sim: FieldSim {
+                enemies: std::mem::take(&mut self.field_sim.enemies),
+                wander: std::mem::take(&mut self.field_sim.wander),
+                ..FieldSim::default()
+            },
             dots: BTreeMap::new(),
             stuns: BTreeMap::new(),
             target_buffs: BTreeMap::new(),
             last_tick: None,
             template: self.content.clone(),
             battles: Arc::new(self.battles.clone()),
-            kills: KillLedger::default(),
         })
     }
 
@@ -361,16 +412,13 @@ impl EncounterEngine {
         action: impl FnOnce(&mut Self) -> io::Result<T>,
     ) -> io::Result<T> {
         let resets = runtime
+            .field_sim
             .enemies
             .iter()
             .map(|f| (f.actor.guid, f.reset_serial))
             .collect::<BTreeMap<_, _>>();
         let old_sender = self.shared_sender.replace(sender);
-        std::mem::swap(&mut self.field, &mut runtime.enemies);
-        std::mem::swap(&mut self.wander, &mut runtime.wander);
-        std::mem::swap(&mut self.enemy_attacks, &mut runtime.attacks);
-        std::mem::swap(&mut self.moving, &mut runtime.moving);
-        std::mem::swap(&mut self.ledger, &mut runtime.kills);
+        std::mem::swap(&mut self.field_sim, &mut runtime.field_sim);
         let personal_dots = std::mem::replace(
             &mut self.skills.dots,
             runtime.dots.remove(&sender).unwrap_or_default(),
@@ -390,14 +438,10 @@ impl EncounterEngine {
         runtime.stuns = std::mem::replace(&mut self.skills.stuns, personal_stuns);
         runtime.target_buffs =
             std::mem::replace(&mut self.skills.target_buffs, personal_target_buffs);
-        std::mem::swap(&mut self.field, &mut runtime.enemies);
-        std::mem::swap(&mut self.wander, &mut runtime.wander);
-        std::mem::swap(&mut self.enemy_attacks, &mut runtime.attacks);
-        std::mem::swap(&mut self.moving, &mut runtime.moving);
-        std::mem::swap(&mut self.ledger, &mut runtime.kills);
+        std::mem::swap(&mut self.field_sim, &mut runtime.field_sim);
         self.shared_sender = old_sender;
         // Evade/defeat invalidates every caster's effects on that incarnation.
-        for f in &runtime.enemies {
+        for f in &runtime.field_sim.enemies {
             if f.state.health == 0
                 || f.motion == FieldMotion::Returning
                 || resets.get(&f.actor.guid) != Some(&f.reset_serial)
@@ -483,5 +527,123 @@ impl EncounterEngine {
             engine.tick_wanderers_for(players, now_ms, elapsed, &mut out);
             Ok((out, hits))
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use sha2::{Digest, Sha256};
+
+    const TEST_ENEMY: u64 = 131000108001;
+    const TEST_BATTLE: u32 = 96;
+
+    /// A minimal content directory: `load` requires one dungeon, and the field
+    /// file supplies one enemy for `take_shared_fields` to move.
+    fn engine() -> (std::path::PathBuf, EncounterEngine) {
+        static SERIAL: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+        let dir = std::env::temp_dir().join(format!(
+            "osfr-field-sim-{}-{}",
+            std::process::id(),
+            SERIAL.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
+        ));
+        let _ = fs::remove_dir_all(&dir);
+        fs::create_dir_all(&dir).unwrap();
+        let mut template = vec![0_u8; 334];
+        template[..4].copy_from_slice(&[35, 0, 2, 0]);
+        template[133..137].copy_from_slice(&100_i32.to_le_bytes());
+        template[224] = 1;
+        fs::write(dir.join("npc.bin"), &template).unwrap();
+        let zone = serde_json::json!({"zone_id":0,"name":"0","sky":"","geometry_id":214,"position":[0,0,0],"rotation":[0,0,1],"tutorial":false});
+        let mut cave = zone.clone();
+        cave["zone_id"] = serde_json::json!(411);
+        let actor = serde_json::json!({"guid":300,"definition_id":930110,"model_id":3,"name_id":100,"name":"930110","texture_alias":"","position":[0,0,0],"max_health":300,"damage":0,"boss":false});
+        fs::write(
+            dir.join("encounters.json"),
+            serde_json::json!({
+                "schema_version": 1,
+                "template_file": "npc.bin",
+                "template_sha256": format!("{:x}", Sha256::digest(&template)),
+                "world": zone,
+                "world_enemies": [],
+                "dungeons": [{
+                    "id": 411,
+                    "title_id": 12,
+                    "description_id": 13,
+                    "objective_id": 14,
+                    "zone": cave,
+                    "guide": null,
+                    "enemies": [actor],
+                    "reward_coins": 0,
+                    "reward_items": []
+                }]
+            })
+            .to_string(),
+        )
+        .unwrap();
+        let enemy = serde_json::json!({"guid":TEST_ENEMY,"definition_id":930108,"model_id":3,"name_id":100,"name":"930108","texture_alias":"","position":[0,0,0],"max_health":300,"damage":7,"boss":false,"respawn_seconds":2,"aggro_range":8,"leash_radius":12,"behaviour":{"mode":"stationary","reach":2.5,"attack_ms":1000}});
+        fs::write(
+            dir.join("field_enemies.json"),
+            serde_json::json!({"schema_version": 1, "enemies": [enemy]}).to_string(),
+        )
+        .unwrap();
+        let mut engine = EncounterEngine::load(&dir, None).unwrap();
+        engine
+            .load_field_enemies(&dir.join("field_enemies.json"))
+            .unwrap();
+        (dir, engine)
+    }
+
+    #[test]
+    fn take_shared_fields_moves_only_enemies_and_walks() {
+        let (dir, mut engine) = engine();
+        engine.field_sim.attacks.insert(TEST_ENEMY, 11);
+        engine.field_sim.moving.insert(TEST_ENEMY);
+        engine
+            .field_sim
+            .kills
+            .hits
+            .entry(TEST_ENEMY)
+            .or_default()
+            .insert(101, 22);
+        engine.field_sim.wander.insert(
+            TEST_BATTLE,
+            Wander {
+                position: [1., 2., 3.],
+                waypoint: 2,
+                pause_until: 4,
+            },
+        );
+
+        let runtime = engine.take_shared_fields().unwrap();
+
+        assert_eq!(runtime.field_sim.enemies.len(), 1, "enemies transfer");
+        assert_eq!(runtime.field_sim.enemies[0].actor.guid, TEST_ENEMY);
+        assert_eq!(
+            runtime.field_sim.wander.get(&TEST_BATTLE).unwrap().position,
+            [1., 2., 3.],
+            "walks transfer"
+        );
+        assert!(runtime.field_sim.attacks.is_empty(), "attacks start empty");
+        assert!(runtime.field_sim.moving.is_empty(), "moving starts empty");
+        assert!(runtime.field_sim.kills.hits.is_empty(), "hits start empty");
+        assert!(
+            runtime.field_sim.kills.credits.is_empty(),
+            "credits start empty"
+        );
+        assert_eq!(runtime.pending_kill_credits(101), 0);
+        // Today's selective transfer: the engine keeps its own clocks and ledger.
+        assert_eq!(engine.field_sim.attacks.get(&TEST_ENEMY), Some(&11));
+        assert!(engine.field_sim.moving.contains(&TEST_ENEMY));
+        assert!(engine.field_sim.kills.hits.contains_key(&TEST_ENEMY));
+        assert!(
+            engine.field_sim.enemies.is_empty(),
+            "the live enemies moved out"
+        );
+        assert!(
+            engine.field_sim.wander.is_empty(),
+            "the live walks moved out"
+        );
+        let _ = fs::remove_dir_all(dir);
     }
 }

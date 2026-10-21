@@ -239,7 +239,7 @@ impl EncounterEngine {
         }
         pay_field_reward(reward, out);
         for player in who.into_iter().filter(|&p| p != killer) {
-            let waiting = self.ledger.credits.entry(player).or_default();
+            let waiting = self.field_sim.kills.credits.entry(player).or_default();
             if waiting.len() >= MAX_CREDITS {
                 waiting.remove(0);
             }
@@ -264,7 +264,13 @@ impl EncounterEngine {
         now_ms: u64,
         out: &mut EncounterOutcome,
     ) {
-        for credit in self.ledger.credits.remove(&player).unwrap_or_default() {
+        for credit in self
+            .field_sim
+            .kills
+            .credits
+            .remove(&player)
+            .unwrap_or_default()
+        {
             if now_ms < credit.expires_ms {
                 if let Some(table) = &credit.table {
                     self.drop_power_ups(

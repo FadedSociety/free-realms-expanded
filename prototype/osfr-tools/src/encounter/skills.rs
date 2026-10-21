@@ -334,7 +334,13 @@ impl EncounterEngine {
                 .state
                 .world_enemies
                 .iter()
-                .chain(self.field.iter().filter(|f| f.present).map(|f| &f.state))
+                .chain(
+                    self.field_sim
+                        .enemies
+                        .iter()
+                        .filter(|f| f.present)
+                        .map(|f| &f.state),
+                )
                 .collect(),
         };
         states
@@ -411,7 +417,7 @@ impl EncounterEngine {
                     .entry(guid)
                     .and_modify(|current| *current = (*current).max(until))
                     .or_insert(until);
-                self.moving.remove(&guid);
+                self.field_sim.moving.remove(&guid);
                 out.replies.push(animation(guid, 1, true));
                 out.replies.push(animation(guid, 1401, false)); // client com_stunned
             }
