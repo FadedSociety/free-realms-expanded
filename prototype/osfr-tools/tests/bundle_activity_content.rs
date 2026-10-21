@@ -6,6 +6,7 @@
 //! `encounters.json` hashes are also embedded in saved character state.
 
 use osfr_tools::{
+    derby_gateway::DerbyGateway,
     encounter::EncounterEngine,
     fishing_service::FishingSpots,
     harvest_nodes::GatheringNodes,
@@ -34,6 +35,8 @@ const FILES: &[&str] = &[
     "kart_entry.json",
     "kart_lobby.json",
     "kart_gates.json",
+    "derby_entry.json",
+    "derby_gates.json",
     "mining.json",
     "harvesting.json",
     "fishing_spots.json",
@@ -63,6 +66,14 @@ const FROZEN_SHA256: &[(&str, &str)] = &[
     (
         "kart_gates.json",
         "0ee62324a0d06234c229fb341d49051078ed03af15b1c3ac0cd32f575537012f",
+    ),
+    (
+        "derby_entry.json",
+        "eeb9a7734f5f915e1081270ec3340bfcf495248fc1d8d63f8d037cbeed251a57",
+    ),
+    (
+        "derby_gates.json",
+        "f9b8a7910dd29da6a415a0342e01a2e86429be4f970006f9fd66931d6ed892dd",
     ),
     (
         "mining.json",
@@ -149,6 +160,21 @@ fn bundled_activity_content_loads_without_lab() {
             9500000911,
             9500000630
         ][..]
+    );
+
+    let derby = DerbyGateway::load(directory, None)
+        .expect("derby content loads")
+        .expect("derby content is present");
+    assert_eq!(
+        derby.gate_npcs(),
+        &[9000000391u64, 9000000289, 9500000731, 9000000183][..]
+    );
+    assert_eq!(derby.menu_string_id(), 3053);
+    let package: Value =
+        serde_json::from_slice(&fs::read(directory.join("derby_entry.json")).unwrap()).unwrap();
+    assert!(
+        package["vehicle"]["definition"].as_array().unwrap().len() > 4,
+        "the bundle ships the recovered vehicle definition, not the synthetic fixture"
     );
 
     let lobby: LobbyNativeBody =

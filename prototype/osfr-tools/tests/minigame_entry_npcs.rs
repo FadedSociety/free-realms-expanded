@@ -446,24 +446,29 @@ fn shipped_derby_gates_load_and_every_gate_is_a_drawable_driver_at_its_arena() {
 }
 
 #[test]
-fn the_shipped_derby_stays_dormant_without_a_package() {
+fn the_shipped_package_offers_from_every_gate() {
     let content = data();
+    // The production loader is the check: the shipped package and the four gate ids are read
+    // together, so every driver's menu publishes the derby.
+    let shipped = DerbyGateway::load(&content, None)
+        .expect("the shipped package respects every loader bound")
+        .expect("the shipped derby package exists");
+    assert_eq!(shipped.gate_npcs(), &[MAD_JACK, CRASH, BURT, RIP][..]);
+    assert_eq!(shipped.menu_string_id(), 3053);
+    let mut interaction =
+        NpcInteraction::load(&content.join("npcs"), &content.join("stores.json")).unwrap();
     assert!(
-        !content.join("derby_entry.json").exists(),
-        "this package ships no derby content"
+        interaction
+            .set_derby_gates(shipped.gate_npcs(), shipped.menu_string_id())
+            .is_empty(),
+        "every shipped gate offers the derby exactly once"
     );
-    // The production world load is the check: an absent package leaves no derby state, whatever
-    // the gate list says.
+}
+
+#[test]
+fn a_kart_gate_list_is_dormant_without_race_content() {
+    // Existing dormant rule: the kart list is only published with race content.
     let fixture = Content::new();
-    assert!(
-        Gameplay::load(&fixture.0, None)
-            .unwrap()
-            .state()
-            .derby
-            .is_none(),
-        "no derby content means no derby state"
-    );
-    // Existing dormant rule: the list is only published with race content.
     let mut entry = read_json(&fixture.0.join("kart_entry.json"));
     entry["race"] = Value::Null;
     fs::write(

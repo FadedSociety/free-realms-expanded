@@ -75,6 +75,8 @@ ACTIVITY_CONTENT = (
     "kart_entry.json",  # kart_gateway.rs: race entry, vehicle and race service
     "kart_lobby.json",  # gameplay.rs: the 102/2 lobby body
     "kart_gates.json",  # kart_gateway.rs: (R) NPC menu gates and reward cooldown
+    "derby_entry.json",  # derby_gateway.rs: (R) derby vehicle, rules and completion reward
+    "derby_gates.json",  # derby_gateway.rs: (R) four arena driver menu gates
     "mining.json",  # mining.rs: Mining18 board
     "harvesting.json",  # harvesting.rs: Harvesting111 board
     "fishing_spots.json",  # fishing_service.rs: guide NPCs and fish items
@@ -89,6 +91,8 @@ ACTIVITY_MAX_BYTES = {
     "kart_entry.json": 512 * 1024,
     "kart_lobby.json": 256 * 1024,
     "kart_gates.json": 16 * 1024,
+    "derby_entry.json": 512 * 1024,
+    "derby_gates.json": 16 * 1024,
     "mining.json": 1024 * 1024,
     "harvesting.json": 1024 * 1024,
     "fishing_spots.json": 64 * 1024,
@@ -401,6 +405,39 @@ def _check_kart_gates(gates) -> list[int]:
     return npcs
 
 
+def _check_derby_content(entry, gates) -> list[int]:
+    """Check the core derby package shape; the Rust frozen test pins the full bytes."""
+    vehicle = entry.get("vehicle") if isinstance(entry, dict) else None
+    rules = entry.get("rules") if isinstance(entry, dict) else None
+    npcs = gates.get("npcs") if isinstance(gates, dict) else None
+    definition = vehicle.get("definition") if isinstance(vehicle, dict) else None
+    if (
+        not isinstance(entry, dict)
+        or entry.get("schema_version") != 1
+        or entry.get("game_id") != 39
+        or not isinstance(vehicle, dict)
+        or not isinstance(definition, list)
+        or len(definition) <= 4
+        or any(not _is_int(byte) or not 0 <= byte <= 255 for byte in definition)
+        or not isinstance(rules, dict)
+        or not _is_int(rules.get("max_drivers"))
+        or not 2 <= rules["max_drivers"] <= 8
+        or (rules.get("score_target") is None and rules.get("time_limit_ms") is None)
+        or not _is_u32(entry.get("completion_reward_coins", 0))
+        or entry.get("completion_reward_coins", 0) > 10_000
+        or not _is_u32(entry.get("completion_reward_xp", 0))
+        or entry.get("completion_reward_xp", 0) > 10_000
+        or not isinstance(gates, dict)
+        or gates.get("schema_version") != 1
+        or not isinstance(npcs, list)
+        or not 1 <= len(npcs) <= 16
+        or any(not _is_int(npc) or npc <= 0 for npc in npcs)
+        or len(set(npcs)) != len(npcs)
+    ):
+        raise ValueError("content/derby_entry.json or derby_gates.json is invalid")
+    return npcs
+
+
 def _is_shape_code(code: int) -> bool:
     """The shared engine's recovered `ServerGrid.buildMap` grammar.
 
@@ -697,6 +734,10 @@ def check_activity_content(bundle: Path) -> str:
     _check_lobby(read_json(content / "kart_lobby.json"))
 
     gates = _check_kart_gates(read_json(content / "kart_gates.json"))
+    derby_gates = _check_derby_content(
+        read_json(content / "derby_entry.json"),
+        read_json(content / "derby_gates.json"),
+    )
     _check_board("mining.json", read_json(content / "mining.json"), 18, 14)
     _check_board(
         "harvesting.json", read_json(content / "harvesting.json"), 111, 45,
@@ -725,7 +766,8 @@ def check_activity_content(bundle: Path) -> str:
 
     return (
         f"kart entry {sha256_file(content / 'kart_entry.json')[:12]} "
-        f"({len(gates)} gate NPCs, lobby 5 tables), mining 18, harvesting 111, "
+        f"({len(gates)} gate NPCs, lobby 5 tables), derby {len(derby_gates)} gates, "
+        f"mining 18, harvesting 111, "
         f"encounter {dungeons[0]['id']} + {len(world_enemies)} world enemies, "
         f"fishing {len(spots['spots'])} spots, nodes 2 tables"
     )
