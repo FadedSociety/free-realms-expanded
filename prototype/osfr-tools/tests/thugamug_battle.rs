@@ -813,13 +813,27 @@ fn the_pre_existing_battles_stay_unchanged() {
         .iter()
         .map(|row| row["id"].as_u64().unwrap() as u32)
         .collect();
-    // The insertion anchor is immediately after battle 96, not at the end.
+    // The insertion anchor is at the head of the file, after battle 96, not at
+    // the end. T354's Bixie Hive (12370) now occupies index 1, so assert the
+    // T282 row still precedes every other pre-existing battle rather than
+    // pinning its exact index.
     assert_eq!(ids[0], 96);
-    assert_eq!(ids[1], THUGAMUG);
-    // Later content slices add their own rows (T319 adds 12350), so this test
-    // requires every pre-existing row to survive in its exact relative order
-    // rather than re-pinning the whole file. The full shipped order (nine rows
-    // at T319) is pinned exactly by `tests/field_battle_roster.rs::
+    let thugamug_at = ids
+        .iter()
+        .position(|id| *id == THUGAMUG)
+        .expect("the Thugamug row survived");
+    let first_other = ids
+        .iter()
+        .position(|id| *id == 12301)
+        .expect("battle 12301 survived");
+    assert!(
+        thugamug_at > 0 && thugamug_at < first_other,
+        "Thugamug left its head anchor (index {thugamug_at}, 12301 at {first_other})"
+    );
+    // Later content slices add their own rows (T319 adds 12350, T354 adds
+    // 12370), so this test requires every pre-existing row to survive in its
+    // exact relative order rather than re-pinning the whole file. The known
+    // order is pinned by `tests/field_battle_roster.rs::
     // five_distinct_field_battles_load_with_the_existing_schema` and by
     // `sheep_watch_dungeon` test 7; a silent deletion or reorder fails here too.
     let existing: BTreeSet<u32> = pre_existing.iter().map(|row| row.0).collect();

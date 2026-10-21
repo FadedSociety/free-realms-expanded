@@ -1379,9 +1379,25 @@ fn the_existing_battles_and_content_are_unchanged() {
         .iter()
         .map(|row| row["id"].as_u64().unwrap() as u32)
         .collect();
-    assert_eq!(ids.len(), expected.len() + 1, "only one row was added");
-    assert_eq!(ids[4], 12303, "the insertion anchor is Stone Heart");
-    assert_eq!(ids[5], SHEEP_WATCH, "Sheep Watch sits after battle 12303");
+    // Later content slices add their own rows (T354 inserts Bixie Hive 12370
+    // directly after battle 96), so every pre-existing row must survive
+    // exactly once rather than pinning the whole file.
+    for (id, _, _, _, _) in expected {
+        assert_eq!(
+            ids.iter().filter(|candidate| **candidate == id).count(),
+            1,
+            "battle {id} disappeared or was duplicated"
+        );
+    }
+    let stone_heart = ids
+        .iter()
+        .position(|id| *id == 12303)
+        .expect("Stone Heart is still in the file");
+    assert_eq!(
+        ids[stone_heart + 1],
+        SHEEP_WATCH,
+        "Sheep Watch sits after battle 12303"
+    );
     assert!(!TASK_ROSTER.contains(&SHEEP_WATCH));
 
     // The canonical dungeon loader gate is

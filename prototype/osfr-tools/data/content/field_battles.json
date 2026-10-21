@@ -221,6 +221,184 @@
       ]
     },
     {
+      "id": 12370,
+      "title_id": 5702,
+      "description_id": 15336,
+      "objective_id": 16791,
+      "difficulty": 1,
+      "required_combat_level": 0,
+      "spawner": {
+        "guid": 100001237000,
+        "definition_id": 1237000,
+        "model_id": 220,
+        "name_id": 440711,
+        "name": "Bixie Soldier",
+        "texture_alias": "",
+        "position": [
+          -670.0,
+          2.4,
+          252.0
+        ],
+        "max_health": 1,
+        "damage": 0,
+        "boss": false
+      },
+      "enemies": [
+        {
+          "guid": 100001237001,
+          "definition_id": 1237001,
+          "model_id": 220,
+          "name_id": 38510,
+          "name": "Drone Fauzz",
+          "texture_alias": "",
+          "position": [
+            136.0,
+            -0.6,
+            175.0
+          ],
+          "max_health": 260,
+          "damage": 10,
+          "boss": true
+        },
+        {
+          "guid": 100001237002,
+          "definition_id": 1237002,
+          "model_id": 220,
+          "name_id": 440711,
+          "name": "Bixie Soldier",
+          "texture_alias": "",
+          "position": [
+            133.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 120,
+          "damage": 5,
+          "boss": false
+        },
+        {
+          "guid": 100001237003,
+          "definition_id": 1237003,
+          "model_id": 220,
+          "name_id": 440711,
+          "name": "Bixie Soldier",
+          "texture_alias": "",
+          "position": [
+            139.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 120,
+          "damage": 5,
+          "boss": false
+        },
+        {
+          "guid": 100001237004,
+          "definition_id": 1237004,
+          "model_id": 211,
+          "name_id": 440712,
+          "name": "Bixie Battlemage",
+          "texture_alias": "",
+          "position": [
+            134.0,
+            -0.6,
+            176.0
+          ],
+          "max_health": 90,
+          "damage": 7,
+          "boss": false
+        },
+        {
+          "guid": 100001237005,
+          "definition_id": 1237005,
+          "model_id": 211,
+          "name_id": 440712,
+          "name": "Bixie Battlemage",
+          "texture_alias": "",
+          "position": [
+            138.0,
+            -0.6,
+            176.0
+          ],
+          "max_health": 90,
+          "damage": 7,
+          "boss": false
+        }
+      ],
+      "reward_coins": 68,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Global.Text ids 5702 'Bixie Hive', 15336 'A group of bixies are revolting and have taken their own queen hostage. Enter the Bixie Hive and save her!', 16791 'Save the Queen from unruly Bixies.', 440711 'Bixie Soldier', 440712 'Bixie Battlemage' and 38510 'Drone Fauzz' (lab/reports/locale-id-to-text.json; the guide's 16784 is a panel description and is not the start-screen description). Resources/Models.txt line 212 maps model 211 to bixie_f_mage.adr and line 221 maps model 220 to bixie_m_warrior.adr. Resources/Images/Images.txt line 662 is icon_ui_combatstart_panelgraphic_bixiehive.dds (the battle's shipped start-panel graphic, sent as MiniGameInfo.IconId); line 11970 is the shared crossed-swords nameplate. The activity-portal rows publish each battle automatically."
+        },
+        {
+          "kind": "client",
+          "evidence": "data/content/enemies.json definitions 930052 Bixie Battlemage (model 211, name 440712) and 930053 Bixie Soldier (model 220, name 440711) prove the recovered model/name identity used by the roster. data/content/field_enemies.json rows 131000102007-009 (Bixie Soldier homes [-664.762,2.4,299.608], [-692.141,2.4,220.373] and [-651.667,2.4,231.947]) are the existing Queensfields field actors whose GUIDs and homes the marker must clear; the loader also enforces uniqueness against encounters.json actors."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Dungeons/Bixie Hive.md: difficulty 1, entrance by clicking the Queensfields door in Sanctuary, no combat-job level requirement, Drone Fauzz arrives after the waves, Bixie Soldiers and Bixie Battlemages, 68 coins on every job's prize wheel and '228 Stars or less'. The guide's Bixie Tunnel is a structure with no proven actor model; the recruited waves, Queen power-ups, bonus worker goal, coin drops, per-job wheel rows and 228-star payout are not modelled."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Content-only playable slice: local battle id 12370 and actor GUIDs 100001237000-100001237005, inserted after battle 96 without changing any other row. The visible Bixie Soldier spawner is the marker adaptation (the Bixie Tunnel structure has no proven actor model; T282/T319 made the same adaptation) and keeps the local, non-combat definition 1237000. Drone Fauzz has no recovered enemy definition, so the boss uses the Bixie Soldier body (model 220) with name 38510 and local definition 1237001 (R); the two Soldiers and two Battlemages use local definitions 1237002-005 (R) and the recovered model/name identities. The five-actor kill-all roster, 260 HP/10 damage boss, 120 HP/5 damage Soldiers and 90 HP/7 damage Battlemages are all before the existing difficulty-1 scaling (the loader's factor is 1 at difficulty 1; do not pre-scale twice). No wave summon, boss phase, Queen NPC, bonus goal, power-up table or per-kill coin drop is recovered or added; the existing 50 job XP and one-prize draw apply."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Placement: marker [-670.0,2.4,252.0], the bilinear zone-0 height 2.40 rounded to 0.01, on the Queensfields Bixie cluster side. lab/terrain/zone_0.hgt was sampled with the T103 bounded rule: all 105 samples of the 5 m wander disc (81 integer-offset points inside the disc plus 24 ring points at 15 degree steps) are terrain-covered with a finite y, maximum sampled slope 0.00 degrees (limit 25), nearest field-enemy home 27.17 m (Bixie Soldier 131000102009 at [-651.667,2.4,231.947]; limit 20), nearest other battle marker 114.6 m (battle 12301 at [-726,-7.1,152]; limit 20) and nearest spawned legacy_data NPC 183.7 m (limit 15). Water, object collision and a native walkable route remain unverified, as in battles 12301/12310/12350/12340."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Prize substitution: the four rows are copied from battle 12350 (Battle Item Mystery Pack 10482, Medium Energy Potion 3023, Medic's Power Shard of Vitality I 75354 and Small Health Potion 11002, with their catalogue name/icon ids) because the guide's per-job wheel rows have not been resolved to runtime item ids. The existing checked payout grants 68 coins plus one random prize once per win; no original Bixie Hive wheel, star payout or member bonus is recovered."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Arena reuse: the zone block is battle 12350's shared sg_random_encounter_clearing (zone 9600, arrival [136,-0.5,155], geometry 214, sky_wilds24.xml, zero rotation, tutorial false) because no original Bixie Hive scene or door transform was recovered; the guide's door is a Queensfields prop with no recovered transform."
+        }
+      ],
+      "nameplate_image_id": 11970,
+      "zone": {
+        "zone_id": 9600,
+        "name": "sg_random_encounter_clearing",
+        "sky": "sky_wilds24.xml",
+        "geometry_id": 214,
+        "position": [
+          136.0,
+          -0.5,
+          155.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tutorial": false
+      },
+      "icon_id": 662,
+      "prizes": [
+        {
+          "item_id": 10482,
+          "name_id": 6666,
+          "icon_id": 973
+        },
+        {
+          "item_id": 3023,
+          "name_id": 422907,
+          "icon_id": 544
+        },
+        {
+          "item_id": 75354,
+          "name_id": 131098,
+          "icon_id": 3721
+        },
+        {
+          "item_id": 11002,
+          "name_id": 422909,
+          "icon_id": 730
+        }
+      ]
+    },
+    {
       "id": 12340,
       "title_id": 90703,
       "description_id": 90704,
