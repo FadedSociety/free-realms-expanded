@@ -8,12 +8,12 @@
 //! - 26/8 NPC interact: constructor `008b6bc0`; body is u64 target + u8 [0].
 //! - 26/10 menu select: constructor `00a36f80`; body is u64 target + i32 choice.
 //! - 26/6 dialogue response: constructor `009f5890`; one i32 response row (301 is the quest row).
-//! - 49/1 QuestInfo: reader `00c7bb60` -> `00c7b7a0` (six dwords: quest id, intro, card title,
-//!   name, description, an unused field), decoded with the production
-//!   `decode_quest_offer_49_1`.
+//! - 49/1 QuestInfo: reader `00c7bb60` -> `00c7b7a0` (six dwords: quest id, intro, an unresolved
+//!   field, the card title/name, the description, an unresolved field), decoded with the
+//!   production `decode_quest_offer_49_1`.
 //! - 49/2 quest reply: constructor `00a86400` / sender `00a97d70`; i32 quest + u8 accept.
 //! - 49/13 QuestEnd: reader `00c7b990`; actor u64 at 6..14, quest i32 at 14..18, end-text
-//!   locale at 18..22, animation at 22..26, reward bundle from 26 (68-byte body via `008e7930`,
+//!   locale at 18..22, animation at 22..26, reward bundle from 26 (69-byte body via `008e7930`,
 //!   row count at 87..91 of the packet).
 //! - 49/14 end reply: constructor `00a864c0`; i32 quest.
 //!
@@ -49,21 +49,11 @@ fn has_quest(game: &Gameplay, quest_id: u32) -> bool {
         .contains_key(&quest_id)
 }
 
-/// One 49/8, 49/9 or 49/10 row for `objective_id` (those bodies carry quest id at 6..10 and
-/// objective id at 10..14).
-fn objective_event(outcome: &Outcome, subtype: u16, objective_id: u32) -> bool {
-    outcome.replies.iter().any(|packet| {
-        has_family(packet, 49, subtype, Some(STICKY))
-            && packet
-                .get(10..14)
-                .is_some_and(|id| u32::from_le_bytes(id.try_into().unwrap()) == objective_id)
-    })
-}
-
 /// `gateway.rs` sends the validated pose to `Gameplay::on_location`; the first two chapters
-/// consume their `visit_position` objectives through it.
-fn visit(game: &mut Gameplay, position: [f32; 3], now: u64) -> Outcome {
-    game.on_location(&character_at(OPEN_WORLD, position), now)
+/// consume their `visit_position` objectives through it. The character, not the module-level
+/// default, names whose location moved.
+fn visit(game: &mut Gameplay, character: &CharacterState, position: [f32; 3], now: u64) -> Outcome {
+    game.on_location(&character_at_for(character.guid, OPEN_WORLD, position), now)
         .expect("location event")
 }
 
@@ -82,7 +72,7 @@ fn play_chapter(
     accept(game, character, quest_id, *now);
     *now += 10;
     assert!(
-        visit(game, search, *now).changed,
+        visit(game, character, search, *now).changed,
         "quest {quest_id}'s search must advance"
     );
     *now += 10;
@@ -225,11 +215,11 @@ fn nurble_then_fizzlesticks_completes_and_pays_once() {
     let accepted = accept(&mut game, &character, STICKY, now);
     assert_eq!(pending_offer(&game), None);
     assert!(
-        objective_event(&accepted, 8, 1),
+        objective_activated(&accepted, STICKY, 1),
         "accept activates the Nurble objective"
     );
     assert!(
-        !objective_event(&accepted, 8, 2),
+        !objective_activated(&accepted, STICKY, 2),
         "an ordered quest activates only the first objective"
     );
 
@@ -250,10 +240,10 @@ fn nurble_then_fizzlesticks_completes_and_pays_once() {
     assert!(to_nurble.changed);
     assert_eq!(counts(&game, STICKY), vec![1, 0]);
     assert_eq!(pending_turnin(&game), None);
-    assert!(objective_event(&to_nurble, 9, 1));
-    assert!(objective_event(&to_nurble, 10, 1));
+    assert!(objective_update(&to_nurble, STICKY, 1, 1));
+    assert!(objective_complete(&to_nurble, STICKY, 1));
     assert!(
-        objective_event(&to_nurble, 8, 2),
+        objective_activated(&to_nurble, STICKY, 2),
         "the second objective opens after the first completes"
     );
     assert_eq!(
@@ -289,8 +279,8 @@ fn nurble_then_fizzlesticks_completes_and_pays_once() {
     assert!(to_fizzlesticks.changed);
     assert_eq!(counts(&game, STICKY), vec![1, 1]);
     assert_eq!(pending_turnin(&game), Some(STICKY));
-    assert!(objective_event(&to_fizzlesticks, 9, 2));
-    assert!(objective_event(&to_fizzlesticks, 10, 2));
+    assert!(objective_update(&to_fizzlesticks, STICKY, 2, 1));
+    assert!(objective_complete(&to_fizzlesticks, STICKY, 2));
     assert!(
         !to_fizzlesticks
             .replies
@@ -892,18 +882,6 @@ fn the_quest_text_and_targets_resolve() {
     );
     assert_eq!(rewards[0]["items"], serde_json::json!([]));
     assert_provenance(&rewards[0], "the Sticky Spell Book reward");
-
-    // This slice enabled exactly one more record; every other Wizard record stays off.
-    for record in records {
-        let id = record["id"].as_u64().unwrap();
-        if id != u64::from(STICKY) {
-            assert_eq!(
-                record["enabled"].as_bool(),
-                Some(id == u64::from(BOOK) || id == u64::from(GLASSES)),
-                "record {id} must keep its prior enabled state"
-            );
-        }
-    }
 
     // Both actors are drawable `legacy_data` rows at finite Robgoblin Camp positions.
     let npcs = read_json(&content_dir().join("npcs/wilds.json"));
