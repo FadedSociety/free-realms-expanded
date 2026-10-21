@@ -38,6 +38,10 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[allow(dead_code)] // only `copy_missing` is used here
+#[path = "common/content_copy.rs"]
+mod content_copy;
+
 const GUID: u64 = 42_059;
 const OTHER: u64 = 42_060;
 /// Shipped split quest "Introduce Yourself" (adventurer chapter).
@@ -64,8 +68,8 @@ impl Fixture {
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
         fs::create_dir_all(&dir).unwrap();
-        copy_missing(&opening_content(), &dir);
-        copy_missing(&content_dir(), &dir);
+        content_copy::copy_missing(&opening_content(), &dir);
+        content_copy::copy_missing(&content_dir(), &dir);
         // The opening inventory does not carry every optional farming reward
         // (the same rule as the field-combat fixtures); this suite exercises soccer.
         let _ = fs::remove_file(dir.join("harvesting.json"));
@@ -92,19 +96,6 @@ fn opening_content() -> PathBuf {
 
 fn content_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
-fn copy_missing(from: &Path, to: &Path) {
-    for row in fs::read_dir(from).unwrap() {
-        let path = row.unwrap().path();
-        let target = to.join(path.file_name().unwrap());
-        if path.is_dir() {
-            fs::create_dir_all(&target).unwrap();
-            copy_missing(&path, &target);
-        } else if !target.exists() {
-            fs::copy(path, target).unwrap();
-        }
-    }
 }
 
 /// The shipped rows 42/43/44 with the traced short match. Every physics and

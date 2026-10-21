@@ -20,6 +20,9 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "content_copy.rs"]
+mod content_copy;
+
 /// The engine's shared-kill credit window, linked so a value change cannot desync.
 pub const CREDIT_TTL_MS: u64 = osfr_tools::encounter::field_rewards::CREDIT_TTL_MS;
 /// A profile that is not a combat job.
@@ -40,8 +43,8 @@ impl RewardFixture {
             SERIAL.fetch_add(1, Ordering::Relaxed)
         ));
         fs::create_dir_all(&dir).unwrap();
-        copy_missing(&opening_content(), &dir);
-        copy_missing(
+        content_copy::copy_missing(&opening_content(), &dir);
+        content_copy::copy_missing(
             &Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content"),
             &dir,
         );
@@ -96,19 +99,6 @@ fn opening_content() -> PathBuf {
             PathBuf::from(env!("CARGO_MANIFEST_DIR"))
                 .join("../../../lab/references/opening-anvil-placement-v1/content")
         })
-}
-
-fn copy_missing(from: &Path, to: &Path) {
-    for row in fs::read_dir(from).unwrap() {
-        let path = row.unwrap().path();
-        let target = to.join(path.file_name().unwrap());
-        if path.is_dir() {
-            fs::create_dir_all(&target).unwrap();
-            copy_missing(&path, &target);
-        } else if !target.exists() {
-            fs::copy(path, target).unwrap();
-        }
-    }
 }
 
 pub fn source() -> Value {

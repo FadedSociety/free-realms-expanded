@@ -95,11 +95,21 @@ const EXISTING_GROUPS: [(&str, &str); 8] = [
     ("mid_queensfields_bixies", "61b65abc5a1bd9230dcc3814807268cc7303023e4065c2a0651124206633b488"),
 ];
 
-/// The four pre-T296 reward bands, unchanged.
-const EXISTING_BANDS: [(u32, u32, u32, u32); 4] =
-    [(1, 2, 2, 5), (3, 4, 4, 10), (5, 8, 7, 15), (9, 13, 12, 25)];
+/// The four pre-T296 reward bands in file order, pinned by the sha256 of each
+/// row's canonical `serde_json` encoding, so an edited value or provenance text
+/// fails, not only the four payout numbers.
+#[rustfmt::skip]
+const EXISTING_BANDS: [&str; 4] = [
+    "79b56a8735c90ab706eecf86cf7f3723e7d47168e4249bc2769c33f97814063f",
+    "931d59338da3721d075e1038637f4481007a0409e348dc21e1a852fe983e06f4",
+    "0f7a25c76e89c9807930c25013b6fef22255dc5e5b4a5d46e2d240d83666ad05",
+    "ef5ac778c5192dd5576853362fe9ea56e287c9473c8c46ad1a253a62441fa3b2",
+];
 /// The appended 14-20 band.
 const HIGH_BAND: (u32, u32, u32, u32) = (14, 20, 18, 35);
+/// The one pre-T296 definition override (Hooligan Wolf), pinned by the same
+/// canonical digest so its values and provenance cannot change unnoticed.
+const EXISTING_OVERRIDE: &str = "407b100e2645dbbbeb8b06e1faaebd849933c3c882bf6308bf2e9eba34d79a39";
 
 const HIGH_SHAMAN_13: u64 = 131000102023;
 const HIGH_SHAMAN_14: u64 = 131000102024;
@@ -496,24 +506,37 @@ fn the_existing_camps_and_rewards_are_unchanged() {
 
     let rewards = shipped_rewards();
     let bands = rewards["level_rewards"].as_array().unwrap();
-    let values = bands
-        .iter()
-        .map(|band| {
-            (
-                band["min_level"].as_u64().unwrap() as u32,
-                band["max_level"].as_u64().unwrap() as u32,
-                band["coins"].as_u64().unwrap() as u32,
-                band["job_xp"].as_u64().unwrap() as u32,
-            )
-        })
-        .collect::<Vec<_>>();
-    assert_eq!(values.len(), 5);
-    assert_eq!(&values[..4], EXISTING_BANDS.as_slice());
-    assert_eq!(values[4], HIGH_BAND);
+    assert_eq!(bands.len(), 5);
+    let high = &bands[4];
     assert_eq!(
-        rewards["definition_overrides"].as_array().unwrap().len(),
+        (
+            high["min_level"].as_u64().unwrap() as u32,
+            high["max_level"].as_u64().unwrap() as u32,
+            high["coins"].as_u64().unwrap() as u32,
+            high["job_xp"].as_u64().unwrap() as u32,
+        ),
+        HIGH_BAND
+    );
+    for (band, expected) in bands.iter().zip(EXISTING_BANDS) {
+        assert_eq!(
+            digest(band),
+            expected,
+            "pre-T296 reward band {}-{} changed: {band}",
+            band["min_level"],
+            band["max_level"]
+        );
+    }
+    let overrides = rewards["definition_overrides"].as_array().unwrap();
+    assert_eq!(
+        overrides.len(),
         1,
         "the wolf definition override is unchanged"
+    );
+    assert_eq!(
+        digest(&overrides[0]),
+        EXISTING_OVERRIDE,
+        "the 3156 definition override changed: {}",
+        overrides[0]
     );
 }
 
