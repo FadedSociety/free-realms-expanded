@@ -6,7 +6,6 @@ use osfr_tools::{
     npc_interaction::NpcInteraction,
     quest_engine::{CharacterEligibility, QuestDenial, QuestEngine, QuestProgress, QuestStatus},
     startup_world,
-    terrain::{HeightGrid, Terrain},
     world::NpcVisibility,
 };
 use serde_json::Value;
@@ -18,6 +17,12 @@ use std::{
 
 #[path = "common/gateway_reference.rs"]
 mod gateway_reference;
+#[path = "support/npc_quest_chain.rs"]
+mod npc_quest_chain;
+#[path = "support/terrain.rs"]
+mod terrain;
+
+use npc_quest_chain::{active_job, profile_xp, saved, seed_active_profile};
 
 const CHARACTER: u64 = 101;
 const SECOND_CHARACTER: u64 = 102;
@@ -133,38 +138,12 @@ fn field_hooligans() -> Vec<(u64, [f32; 3])> {
     enemies
 }
 
-fn saved(game: &Gameplay) -> Vec<u8> {
-    serde_json::to_vec(&game.state()).unwrap()
-}
-
-fn profile_xp(game: &Gameplay, profile: i32) -> u32 {
-    game.state()
-        .profiles
-        .as_ref()
-        .and_then(|state| state.experience.get(&profile).copied())
-        .unwrap_or(0)
-}
-
-fn active_job(game: &Gameplay) -> i32 {
-    game.state()
-        .profiles
-        .as_ref()
-        .expect("the fixture has profile content")
-        .active
-}
-
 /// The captured opening inventory carries only the Brawler outfit, so an ordinary 26/13 switch
-/// refuses every other job. Seed the saved active profile the way T202's `seeded` helper does
-/// when direct play cannot reach a job switch; the offer gate reads this production save.
+/// refuses every other job. Seed the saved active profile with the shared helper when direct
+/// play cannot reach a job switch; the offer gate reads this production save.
 fn with_active_job(game: &Gameplay, character_id: u64, profile: i32) -> Gameplay {
     let mut state = game.state();
-    let mut profiles = state
-        .profiles
-        .clone()
-        .expect("the fixture has profile content");
-    profiles.active = profile;
-    profiles.unlocked.insert(profile);
-    state.profiles = Some(profiles);
+    seed_active_profile(&mut state, profile, &[]);
     load_game_for(character_id, Some(state))
 }
 
@@ -203,37 +182,6 @@ fn complete_chapter_and_accept_c6(game: &mut Gameplay, character: &CharacterStat
     complete_chapter(game, character, now);
     let sabastian = npc_position("blackspore_swamp.json", SABASTIAN);
     accept_quest(game, character, SABASTIAN, sabastian, GIVEN_TO_GUARD, now);
-}
-
-// The T103/T282 5 m authoring sample: 81 one-metre disc points plus a 24-point 5 m ring.
-fn disc_points(x: f32, z: f32) -> Vec<(f32, f32)> {
-    let mut points = Vec::new();
-    for dx in -5..=5 {
-        for dz in -5..=5 {
-            let (dx, dz) = (dx as f32, dz as f32);
-            if dx * dx + dz * dz <= 25.0 {
-                points.push((x + dx, z + dz));
-            }
-        }
-    }
-    for angle in (0..360).step_by(15) {
-        let radians = (angle as f32).to_radians();
-        points.push((x + 5.0 * radians.cos(), z + 5.0 * radians.sin()));
-    }
-    points
-}
-
-fn slope_degrees(grid: &HeightGrid, x: f32, z: f32) -> Option<f32> {
-    let west = grid.height_at(x - 1.0, z)?;
-    let east = grid.height_at(x + 1.0, z)?;
-    let south = grid.height_at(x, z - 1.0)?;
-    let north = grid.height_at(x, z + 1.0)?;
-    Some(
-        ((east - west) / 2.0)
-            .hypot((north - south) / 2.0)
-            .atan()
-            .to_degrees(),
-    )
 }
 
 fn eligibility() -> CharacterEligibility {
@@ -1577,6 +1525,14 @@ fn delivering_the_offer_to_petra_completes_and_pays_once() {
     complete_chapter_and_accept_c6(&mut game, &character, &mut now);
     let at = at_petra(&character);
 
+    // A player standing on the drawn actor's spawn point -- not only on the authored content
+    // row `at_petra` uses -- can click her: 26/8 must pass the production 12 m reach
+    // (`npc_interaction::check_range`) and open her 26/9 menu. `interact_npc` panics otherwise.
+    let mut at_spawn = character.clone();
+    at_spawn.position = petra_spawn_position();
+    now += 100;
+    interact_npc(&mut game, &at_spawn, PETRA, now);
+
     let coins_before = game.state().inventory.coins;
     let inventory_before = game.state().inventory.clone();
     let xp_before = profile_xp(&game, BRAWLER);
@@ -2112,9 +2068,7 @@ fn the_spawn_and_content_are_reachable() {
     );
 
     // The spawn stands on ground and its full 5 m disc is standable (<= 25 degrees).
-    let terrain =
-        Terrain::load(&Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../lab/terrain"))
-            .expect("the shipped zone-0 terrain grid loads");
+    let terrain = terrain::load();
     let grid = terrain.grid(0).expect("zone 0 terrain is loaded");
     let ground = grid
         .height_at(spawn[0], spawn[2])
@@ -2125,7 +2079,7 @@ fn the_spawn_and_content_are_reachable() {
         spawn[1],
         spawn[1] - ground
     );
-    let disc = disc_points(spawn[0], spawn[2]);
+    let disc = terrain::disc_points(spawn[0], spawn[2]);
     assert_eq!(disc.len(), 105);
     let mut max_slope = 0.0_f32;
     for (x, z) in &disc {
@@ -2133,7 +2087,7 @@ fn the_spawn_and_content_are_reachable() {
             grid.height_at(*x, *z).is_some(),
             "disc sample ({x}, {z}) has no ground"
         );
-        let slope = slope_degrees(grid, *x, *z).expect("the 1 m slope footprint is covered");
+        let slope = terrain::slope_degrees(grid, *x, *z);
         max_slope = max_slope.max(slope);
     }
     for angle in (0..360).step_by(15) {

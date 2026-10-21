@@ -19,6 +19,7 @@ use osfr_tools::{
     character_store::CharacterState,
     encounter::{FieldParticipant, SharedFieldAction, SharedFieldState},
     gameplay::{Gameplay, GameplayState, Outcome},
+    gateway::Gateway,
     inventory::InventoryItem,
     npc_interaction::decode_quest_offer_49_1,
     quest_engine::QuestStatus,
@@ -568,7 +569,7 @@ pub fn pending_turnin(game: &Gameplay) -> Option<u32> {
 }
 
 pub fn active_job(game: &Gameplay) -> i32 {
-    game.state().profiles.as_ref().unwrap().active
+    state_active_job(&game.state())
 }
 
 pub fn coins(game: &Gameplay) -> u32 {
@@ -576,7 +577,15 @@ pub fn coins(game: &Gameplay) -> u32 {
 }
 
 pub fn profile_xp(game: &Gameplay, profile: i32) -> u32 {
-    game.state()
+    state_profile_xp(&game.state(), profile)
+}
+
+fn state_active_job(state: &GameplayState) -> i32 {
+    state.profiles.as_ref().unwrap().active
+}
+
+fn state_profile_xp(state: &GameplayState, profile: i32) -> u32 {
+    state
         .profiles
         .as_ref()
         .unwrap()
@@ -584,6 +593,42 @@ pub fn profile_xp(game: &Gameplay, profile: i32) -> u32 {
         .get(&profile)
         .copied()
         .unwrap_or(0)
+}
+
+/// The same two reads through the gateway session snapshot battle suites assert.
+pub fn gateway_active_job(gateway: &Gateway) -> i32 {
+    state_active_job(
+        gateway
+            .snapshot()
+            .gameplay
+            .as_ref()
+            .expect("the session has gameplay"),
+    )
+}
+
+pub fn gateway_profile_xp(gateway: &Gateway, profile: i32) -> u32 {
+    state_profile_xp(
+        gateway
+            .snapshot()
+            .gameplay
+            .as_ref()
+            .expect("the session has gameplay"),
+        profile,
+    )
+}
+
+/// Seed the saved active profile when direct play cannot reach a job switch (the captured
+/// opening inventory may lack that job's starter outfit). The quest gate reads this
+/// production save, not the caller's expectation. Jobs the caller lists stay unlocked; the
+/// caller's own fixture decides what was unlocked before.
+pub fn seed_active_profile(state: &mut GameplayState, active: i32, unlocked: &[i32]) {
+    let profiles = state
+        .profiles
+        .as_mut()
+        .expect("the fixture has profile content");
+    profiles.active = active;
+    profiles.unlocked.insert(active);
+    profiles.unlocked.extend(unlocked.iter().copied());
 }
 
 /// The serialized `GameplayState`, not the character-store save envelope. Use it to compare

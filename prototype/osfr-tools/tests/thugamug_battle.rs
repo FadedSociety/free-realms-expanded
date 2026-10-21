@@ -46,8 +46,13 @@ use std::{
 
 #[path = "common/field_battle_fixture.rs"]
 mod field_battle_fixture;
+#[path = "support/npc_quest_chain.rs"]
+mod npc_quest_chain;
+#[path = "support/terrain.rs"]
+mod terrain;
 
 use field_battle_fixture::*;
+use npc_quest_chain::{gateway_active_job as active_job, gateway_profile_xp as profile_xp};
 
 /// The new battle. 12340 was free on this base; the row is found by this id
 /// and test 1 also pins its published values.
@@ -475,7 +480,7 @@ fn the_marker_is_on_the_ground_and_clear() {
     let arrival = position(&zone["position"]);
     assert_eq!(arrival, [136.0, -0.5, 155.0]);
 
-    let terrain = terrain();
+    let terrain = terrain::load();
     let grid = terrain.grid(0).expect("zone 0 is loaded");
     let height = grid
         .height_at(marker[0], marker[2])
@@ -499,7 +504,7 @@ fn the_marker_is_on_the_ground_and_clear() {
             .unwrap_or_else(|| panic!("ring sample {angle} degrees has no ground"));
         assert!(sample.is_finite());
     }
-    let disc = disc_points(marker[0], marker[2]);
+    let disc = terrain::disc_points(marker[0], marker[2]);
     assert_eq!(disc.len(), 105);
     for (x, z) in &disc {
         assert!(
@@ -509,7 +514,7 @@ fn the_marker_is_on_the_ground_and_clear() {
     }
     let max_slope = disc
         .iter()
-        .map(|(x, z)| slope_degrees(grid, *x, *z))
+        .map(|(x, z)| terrain::slope_degrees(grid, *x, *z))
         .fold(0.0_f32, f32::max);
     assert!(
         max_slope <= 25.0,
@@ -518,9 +523,9 @@ fn the_marker_is_on_the_ground_and_clear() {
 
     // The bridge poi_anchor itself is why the marker moved: its disc is not
     // standable under the same rule.
-    let bridge_slope = disc_points(ORIGINAL_ANCHOR[0], ORIGINAL_ANCHOR[2])
+    let bridge_slope = terrain::disc_points(ORIGINAL_ANCHOR[0], ORIGINAL_ANCHOR[2])
         .iter()
-        .map(|(x, z)| slope_degrees(grid, *x, *z))
+        .map(|(x, z)| terrain::slope_degrees(grid, *x, *z))
         .fold(0.0_f32, f32::max);
     assert!(
         bridge_slope > 25.0,
@@ -1167,29 +1172,6 @@ fn pending_turnin(gateway: &Gateway) -> Option<u32> {
 
 fn wallet(gateway: &Gateway) -> u32 {
     gateway.snapshot().gameplay.unwrap().inventory.coins
-}
-
-fn profile_xp(gateway: &Gateway, profile: i32) -> u32 {
-    gateway
-        .snapshot()
-        .gameplay
-        .unwrap()
-        .profiles
-        .unwrap()
-        .experience
-        .get(&profile)
-        .copied()
-        .unwrap_or(0)
-}
-
-fn active_job(gateway: &Gateway) -> i32 {
-    gateway
-        .snapshot()
-        .gameplay
-        .unwrap()
-        .profiles
-        .unwrap()
-        .active
 }
 
 fn typed_state(gateway: &Gateway) -> GameplayState {

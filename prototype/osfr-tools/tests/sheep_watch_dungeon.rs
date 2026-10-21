@@ -56,6 +56,8 @@ use std::{
 
 #[path = "common/field_battle_fixture.rs"]
 mod field_battle_fixture;
+#[path = "support/terrain.rs"]
+mod terrain;
 
 use field_battle_fixture::*;
 
@@ -533,7 +535,7 @@ fn the_marker_is_drawable_and_the_portal_publishes_sheep_watch() {
     assert_eq!(position(&row["zone"]["position"]), ARENA_ARRIVAL);
 
     // The full 5 m wander disc is standable under the T103 authoring rule.
-    let terrain = terrain();
+    let terrain = terrain::load();
     let grid = terrain.grid(0).expect("zone 0 is loaded");
     let ground = grid
         .height_at(marker[0], marker[2])
@@ -554,7 +556,7 @@ fn the_marker_is_drawable_and_the_portal_publishes_sheep_watch() {
             .unwrap_or_else(|| panic!("ring sample {angle} degrees has no ground"));
         assert!(sample.is_finite());
     }
-    let disc = disc_points(marker[0], marker[2]);
+    let disc = terrain::disc_points(marker[0], marker[2]);
     assert_eq!(disc.len(), 105);
     for (x, z) in &disc {
         assert!(
@@ -564,7 +566,7 @@ fn the_marker_is_drawable_and_the_portal_publishes_sheep_watch() {
     }
     let max_slope = disc
         .iter()
-        .map(|(x, z)| slope_degrees(grid, *x, *z))
+        .map(|(x, z)| terrain::slope_degrees(grid, *x, *z))
         .fold(0.0_f32, f32::max);
     assert!(
         max_slope <= 25.0,

@@ -27,10 +27,11 @@
 mod npc_quest_chain;
 
 use npc_quest_chain::{
-    Fixture, accept, assert_no_offer, assert_packet_changes_nothing,
+    Fixture, accept, active_job, assert_no_offer, assert_packet_changes_nothing,
     character_at_for as character_in_zone, coins, content_dir, copy_tree, counts, finish_quest,
     interact, menu_option, npc_interact, npc_select, offer, pending_turnin, profile_xp,
-    quest_end_reply, quest_reply, quest_status, saved, select_job, send, talk, talk_step,
+    quest_end_reply, quest_reply, quest_status, saved, seed_active_profile, select_job, send, talk,
+    talk_step,
 };
 use osfr_tools::{
     character_store::CharacterState,
@@ -142,12 +143,7 @@ fn release_end_screen(
 /// exercised through the real trainer and job switch instead.
 fn seeded(fixture: &Fixture, active: i32, unlocked: &[i32]) -> Gameplay {
     let mut state = fixture.game(None).state();
-    state.profiles = Some(ProfileState {
-        version: 1,
-        active,
-        unlocked: unlocked.iter().copied().collect(),
-        experience: BTreeMap::new(),
-    });
+    seed_active_profile(&mut state, active, unlocked);
     fixture.game(Some(state))
 }
 
@@ -163,10 +159,6 @@ fn switch_job(game: &mut Gameplay, character: &CharacterState, profile: i32, now
             .collect::<Vec<_>>()
     );
     assert_eq!(active_job(game), profile);
-}
-
-fn active_job(game: &Gameplay) -> i32 {
-    game.state().profiles.as_ref().unwrap().active
 }
 
 fn introduce_yourself(game: &mut Gameplay, character: &CharacterState, now: &mut u64) {
@@ -1003,7 +995,7 @@ fn content_overflow_is_rejected_at_load() {
 fn configured_job_xp_and_job_gates_match_the_task_table() {
     let content = content_dir();
     // (file, quest id, giver, prerequisites, reward coins, job gate, profile, XP)
-    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 18] = [
+    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 21] = [
         (
             "adventurer.json",
             INTRODUCE_YOURSELF,
@@ -1176,6 +1168,40 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             ADVENTURER,
             25,
         ),
+        // T252's two Cobblestone Brawler records; T331's C6 is the hand-off they lead to.
+        // The table now covers every job-gated Brawler record in `brawler.json`, so the
+        // final scan below can reject a new gate or XP row in that file.
+        (
+            "brawler.json",
+            3_030_004,
+            9_000_000_042,
+            &[],
+            5,
+            Some(BRAWLER),
+            BRAWLER,
+            25,
+        ),
+        (
+            "brawler.json",
+            3_030_005,
+            9_000_000_042,
+            &[3_030_004],
+            5,
+            Some(BRAWLER),
+            BRAWLER,
+            25,
+        ),
+        // T331: C6 keeps the Brawler hand-off gate and the small-chapter 5-coin rung.
+        (
+            "brawler.json",
+            3_030_009,
+            9_000_000_446,
+            &[3_030_008],
+            5,
+            Some(BRAWLER),
+            BRAWLER,
+            25,
+        ),
         // T334: the second Miner chapter, after T300's playable 3100002. 5 coins
         // and 15 Miner XP mirror the first rung; the guide's reward cell is unknown
         // and no item is granted.
@@ -1194,8 +1220,9 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
     let mut listed = BTreeSet::new();
     // The task decisions are accepted: T202 wrote the chapter job XP and gates, T241
     // extended the same table with the two live Farnum starting records, T279 adds
-    // the independent Missing Sisters playtest entry, T277 adds Local Hero, and T334
-    // adds the second Miner chapter behind T300's practice test.
+    // the independent Missing Sisters playtest entry, T277 adds Local Hero, T252's two
+    // Cobblestone Brawler records and T331's hand-off are added with their own tags, and
+    // T334 adds the second Miner chapter behind T300's practice test.
     // A later task's decision tag counts only for the record that task decided, so a
     // new quest cannot satisfy the table by carrying someone else's tag.
     let has_decision = |quest_id: u32, source: &Value| {
@@ -1204,6 +1231,8 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_000_024 => "(R) T277:",
             3_000_029 => "(R) T279:",
             3_000_032 => "(R) T330:",
+            3_030_004 | 3_030_005 => "(R) T252:",
+            3_030_009 => "(R) T331:",
             3_100_003 => "(R) T334:",
             _ => "",
         };
@@ -1288,9 +1317,10 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
         );
     }
 
-    // Only the listed IDs gained XP or a job gate in these four files.
+    // Only the listed IDs gained XP or a job gate in these five files.
     for file in [
         "adventurer.json",
+        "brawler.json",
         "chef.json",
         "kart_driver.json",
         "ninja.json",

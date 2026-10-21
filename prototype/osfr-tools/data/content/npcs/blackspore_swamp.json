@@ -29248,7 +29248,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+              "evidence": "(R) T331: data/content/quests/brawler.json binds one ordered talk_to_npc objective targeting Petra 9000000428; this NPC row is provenance only"
             },
             {
               "kind": "reconstructed",
@@ -29260,7 +29260,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+              "evidence": "(R) T331: data/content/quests/brawler.json pays 5 coins and 25 Brawler (profile 43) XP with no items; the retail values remain unknown"
             },
             {
               "kind": "client",
@@ -29547,7 +29547,7 @@
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            "evidence": "(R) T331: data/content/quests/brawler.json binds one ordered talk_to_npc objective targeting Petra 9000000428; this NPC row is provenance only"
           },
           {
             "kind": "reconstructed",
@@ -29559,7 +29559,7 @@
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            "evidence": "(R) T331: data/content/quests/brawler.json pays 5 coins and 25 Brawler (profile 43) XP with no items; the retail values remain unknown"
           }
         ],
         "quest_ids_given": [
@@ -29581,7 +29581,7 @@
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            "evidence": "(R) T331: data/content/quests/brawler.json binds one ordered talk_to_npc objective targeting Petra 9000000428; this NPC row is provenance only"
           },
           {
             "kind": "reconstructed",
@@ -29593,7 +29593,7 @@
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            "evidence": "(R) T331: data/content/quests/brawler.json pays 5 coins and 25 Brawler (profile 43) XP with no items; the retail values remain unknown"
           }
         ],
         "quests_given_text": [

@@ -12,7 +12,6 @@ use osfr_tools::{
     gameplay::GameplayState,
     gateway::{Gateway, GatewayOutcome},
     inventory::{Inventory, InventoryItem, InventoryState},
-    terrain::{HeightGrid, Terrain},
 };
 use serde_json::Value;
 use std::{
@@ -481,42 +480,9 @@ pub fn decode_list(packet: &[u8]) -> Vec<PortalRow> {
 }
 
 // ---------------------------------------------------------------------------
-// Terrain helpers, mirroring the T103/T282 bounded authoring check.
+// The 5 m authoring sample lives in `tests/support/terrain.rs`; placement suites
+// include that module directly so the rule has one owner.
 // ---------------------------------------------------------------------------
-
-pub fn terrain() -> Terrain {
-    Terrain::load(&lab("terrain")).expect("the shipped zone-0/9600 terrain grids load")
-}
-
-pub fn disc_points(x: f32, z: f32) -> Vec<(f32, f32)> {
-    let mut points = Vec::new();
-    for dx in -5..=5 {
-        for dz in -5..=5 {
-            let (dx, dz) = (dx as f32, dz as f32);
-            if dx * dx + dz * dz <= 25.0 {
-                points.push((x + dx, z + dz));
-            }
-        }
-    }
-    for angle in (0..360).step_by(15) {
-        let radians = (angle as f32).to_radians();
-        points.push((x + 5.0 * radians.cos(), z + 5.0 * radians.sin()));
-    }
-    points
-}
-
-pub fn slope_degrees(grid: &HeightGrid, x: f32, z: f32) -> f32 {
-    let [west, east, south, north] = [
-        grid.height_at(x - 1.0, z),
-        grid.height_at(x + 1.0, z),
-        grid.height_at(x, z - 1.0),
-        grid.height_at(x, z + 1.0),
-    ]
-    .map(|height| height.expect("terrain around a sampled point is covered"));
-    let dx = (east - west) / 2.0;
-    let dz = (north - south) / 2.0;
-    dx.hypot(dz).atan().to_degrees()
-}
 
 /// `Some(distance)` to the nearest spawned regional NPC: only `legacy_data`
 /// rows are actors (`world.rs` skips POI/zone-centre scaffolding).
