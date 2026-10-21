@@ -3,8 +3,10 @@
 //! A `Player`-role account with developer tools off logs in through the real
 //! `Server` (SOE handshake, login 1, ready 13, loaded 10), moves with 125/1,
 //! speaks with 15/1, logs out cleanly, and relogs against a restarted server on
-//! the same state directory. The suite then proves that a malformed packet and
-//! an abrupt disconnect end only that session.
+//! the same state directory. A content-backed session proves the live role gate
+//! refuses `realm` input. The suite then proves that a malformed packet ends
+//! only that session and that an abandoned socket leaves the server and every
+//! other session running until the existing idle timeout.
 //!
 //! Test-only: no login, admission, session, transport, save-ordering, role or
 //! content code changes. The frames are the client's own shapes:
@@ -40,7 +42,6 @@ use osfr_tools::{
     account::{AccountFlags, SlotPolicy, create_character},
     account_store::{AccountRole, AccountStore},
     chat,
-    gameplay::Gameplay,
     identity::{NativeCreation, Resources},
     login,
     soe::{
@@ -487,15 +488,29 @@ fn contains_bytes(message: &[u8], needle: &[u8]) -> bool {
     needle.len() <= message.len() && message.windows(needle.len()).any(|window| window == needle)
 }
 
-/// The login-phase typed self-data packet (opcode 12) carrying the selected
-/// character's GUID at offset 21 (reference manifest `self_layout.guid_offset`,
-/// after the two u64 identity fields).
+/// The login-phase typed self-data packet (opcode 12). The client's self-data
+/// reader `0x00944fe0` (dispatched from `0x009471a0`) reads two `u64` identity
+/// fields and then the model `u32`, so the character GUID is the second `u64`
+/// at offset 21. The gateway validates that offset against the template and the
+/// reference manifest (`gateway.rs::derive_self_layout`); the built packet was
+/// native-accepted in `notes/Reviews/Native Startup Builders 215401.md`.
 fn self_packet(messages: &[Vec<u8>]) -> Option<&Vec<u8>> {
     messages.iter().find(|message| is_opcode(message, 12))
 }
 
-fn self_guid(message: &[u8]) -> Option<u64> {
-    Some(u64::from_le_bytes(message.get(21..29)?.try_into().ok()?))
+fn self_guid_offset(reference: &Reference) -> usize {
+    reference.manifest["self_layout"]["guid_offset"]
+        .as_u64()
+        .unwrap() as usize
+}
+
+fn self_guid(message: &[u8], offset: usize) -> Option<u64> {
+    Some(u64::from_le_bytes(
+        message
+            .get(offset..offset.checked_add(8)?)?
+            .try_into()
+            .ok()?,
+    ))
 }
 
 fn save_json(temp: &TempDir, guid: u64) -> Value {
@@ -513,7 +528,11 @@ fn a_normal_player_logs_in_enters_moves_chats_and_relogs() {
     let store_path = create_account_store(&temp.0);
     let store = AccountStore::load(&store_path).unwrap();
     let identity = store.character(2).unwrap().identity.clone();
+    let guid_offset = self_guid_offset(&reference);
     let pose = [4.0, 2.0, 3.0];
+    // The pose set inside the 5 s save coalesce window; only the logout save
+    // can persist it.
+    let logout_pose = [5.0, 2.0, 3.0];
     let direction = [0.0, 0.0, 1.0];
 
     // One normal player on the real server: login 1, ready 13, loaded 10.
@@ -522,7 +541,7 @@ fn a_normal_player_logs_in_enters_moves_chats_and_relogs() {
     login_messages.extend(settle(&mut server, &mut client));
     let self_data = self_packet(&login_messages).expect("login returns the 12 self-data packet");
     assert_eq!(
-        self_guid(self_data),
+        self_guid(self_data, guid_offset),
         Some(2),
         "the self-data record names the selected character"
     );
@@ -569,6 +588,21 @@ fn a_normal_player_logs_in_enters_moves_chats_and_relogs() {
     );
     assert_eq!(server.active_session_count(), 1);
 
+    // A second pose lands inside the 5 s save coalesce window, so the ordinary
+    // commit defers it; only the logout save can write it. Prove the file still
+    // holds the earlier pose before the disconnect.
+    let replies = client.send(&mut server, &position_request(2, logout_pose, direction));
+    assert!(
+        !replies.iter().any(|message| is_family(message, 38, 12)),
+        "the coalesced pose must not be refused"
+    );
+    assert_eq!(server.test_location(2).unwrap().0.position, logout_pose);
+    assert_eq!(
+        save_json(&temp, 2)["character"]["position"],
+        serde_json::json!(pose),
+        "the pose inside the coalesce window must still be deferred"
+    );
+
     // Clean logout: the real session save writes the last accepted pose.
     disconnect(&client, &mut server);
     assert_eq!(server.active_session_count(), 0);
@@ -577,7 +611,11 @@ fn a_normal_player_logs_in_enters_moves_chats_and_relogs() {
     let saved: Value = serde_json::from_slice(&after_logout).unwrap();
     assert_eq!(saved["character"]["guid"], serde_json::json!(2));
     assert_eq!(saved["character"]["zone_id"], serde_json::json!(0));
-    assert_eq!(saved["character"]["position"], serde_json::json!(pose));
+    assert_eq!(
+        saved["character"]["position"],
+        serde_json::json!(logout_pose),
+        "the logout path wrote the deferred pose"
+    );
     server.shutdown().unwrap();
     drop(server);
 
@@ -587,14 +625,41 @@ fn a_normal_player_logs_in_enters_moves_chats_and_relogs() {
     relogin.extend(settle(&mut server, &mut relogged));
     let self_data = self_packet(&relogin).expect("the relog returns the 12 self-data packet");
     assert_eq!(
-        self_guid(self_data),
+        self_guid(self_data, guid_offset),
         Some(2),
         "the same character comes back"
     );
-    let pose_bytes: Vec<u8> = pose.iter().flat_map(|value| value.to_le_bytes()).collect();
-    assert!(
-        contains_bytes(self_data, &pose_bytes),
-        "the self-data record carries the saved pose"
+    // The manifest `position_offset` describes the captured template, but
+    // `build_self_message` patches the appearance strings from the account
+    // store, so their serialized lengths move the transform offset; parse the
+    // emitted bytes with the production typed reader instead.
+    let parsed = osfr_tools::startup_selfdata::parse_self(self_data);
+    let position = parsed.transform.position.map(f32::from_bits);
+    let rotation = parsed.transform.rotation.map(f32::from_bits);
+    assert_eq!(
+        position,
+        [logout_pose[0], logout_pose[1], logout_pose[2], 1.0],
+        "the self-data record carries the saved position"
+    );
+    assert_eq!(
+        rotation,
+        [direction[0], direction[1], direction[2], 0.0],
+        "the self-data record carries the saved rotation"
+    );
+    let transform: Vec<u8> = logout_pose
+        .into_iter()
+        .chain([1.0])
+        .chain(direction)
+        .chain([0.0])
+        .flat_map(f32::to_le_bytes)
+        .collect();
+    assert_eq!(
+        self_data
+            .windows(transform.len())
+            .filter(|window| *window == transform.as_slice())
+            .count(),
+        1,
+        "the position/W=1 rotation/W=0 transform appears exactly once"
     );
     assert!(
         contains_bytes(self_data, identity.first_name.as_bytes())
@@ -607,7 +672,7 @@ fn a_normal_player_logs_in_enters_moves_chats_and_relogs() {
     assert!(ready);
     assert_eq!(restored.guid, 2);
     assert_eq!(restored.zone_id, 0);
-    assert_eq!(restored.position, pose);
+    assert_eq!(restored.position, logout_pose);
     assert_eq!(restored.rotation, direction);
     assert_eq!(
         server.active_session_count(),
@@ -662,22 +727,9 @@ fn the_smoke_uses_no_dev_commands_or_roles() {
         .account_role(owner)
         .expect("the account store records the account role");
     assert_eq!(role, AccountRole::Player, "a normal player account");
-    // The session policy is `Gameplay::may_run(command) = (dev_tools ||
-    // role_commands) && can_run_realm_command(role, key)` (src/gameplay.rs).
-    // Bind the stored Player role on the ordinary play content the first-hour
-    // suites use, mirroring the account-store gateway's flags (role commands
-    // trusted, developer tools off): neither representative developer command
-    // may run.
-    let fixture = npc_quest_chain::Fixture::new();
-    let mut game = Gameplay::load(fixture.path(), None).expect("the opening content loads");
-    game.set_role(role);
-    game.set_role_commands(true);
-    game.set_dev_tools(false);
-    assert!(!game.may_run("give"), "a Player may not run realm give");
-    assert!(
-        !game.may_run("coins 10"),
-        "a Player may not run realm coins"
-    );
+    // The session role gate itself is exercised through the real dispatch in
+    // `a_player_role_session_refuses_a_realm_command`; this test only proves
+    // the ordinary flow sends no developer text.
 
     let mut server = start_server(&temp, &reference, &store_path, false);
     let (mut client, _) = log_in(&mut server, 511, 2, &store_path);
@@ -755,6 +807,83 @@ fn the_smoke_uses_no_dev_commands_or_roles() {
     let identity = &store.character(2).unwrap().identity;
     assert!(!log.contains(&identity.first_name), "name reached the log");
     assert!(!log.contains("synthetic-ticket"), "ticket reached the log");
+    let peer = client.socket.local_addr().unwrap().to_string();
+    assert!(!log.contains(&peer), "peer address reached the log");
+}
+
+/// The live session, not a separately constructed `Gameplay`, must apply the
+/// account store's `Player` role: a `realm` developer command is refused on the
+/// real dispatch path and the refusal changes nothing.
+#[test]
+fn a_player_role_session_refuses_a_realm_command() {
+    let temp = TempDir::new();
+    let fixture = npc_quest_chain::Fixture::new();
+    let reference = Reference::new(VERSION, Some(fixture.path()));
+    let store_path = create_account_store(&temp.0);
+    let owner = AccountStore::load(&store_path)
+        .unwrap()
+        .character(2)
+        .unwrap()
+        .owner_account_id;
+    assert_eq!(
+        AccountStore::load(&store_path).unwrap().account_role(owner),
+        Some(AccountRole::Player)
+    );
+
+    let mut server_options = options(&temp, &reference, &store_path, false);
+    server_options.content = Some(fixture.path().to_owned());
+    let mut server = Server::new(server_options).unwrap();
+    let (mut client, _) = log_in(&mut server, 531, 2, &store_path);
+    settle(&mut server, &mut client);
+    let save_path = temp.0.join("characters/2.json");
+    let before = fs::read(&save_path).unwrap();
+    let before_pose = server.test_location(2).unwrap().0.position;
+
+    let replies = client.send(
+        &mut server,
+        &application(&chat::local_request("realm give 10")),
+    );
+    assert!(
+        replies
+            .iter()
+            .any(|message| is_family(message, 15, 3)
+                && contains_bytes(message, b"role does not allow")),
+        "the live Player session must refuse the developer command"
+    );
+    assert_eq!(
+        server.active_session_count(),
+        1,
+        "a refused developer command ended the session"
+    );
+    assert_eq!(
+        server.test_location(2).unwrap().0.position,
+        before_pose,
+        "a refused developer command moved the character"
+    );
+    assert_eq!(
+        fs::read(&save_path).unwrap(),
+        before,
+        "a refused developer command changed the save"
+    );
+
+    // The session still works after the refusal.
+    let replies = client.send(
+        &mut server,
+        &application(&chat::local_request("synthetic after refusal")),
+    );
+    assert!(
+        replies.iter().any(|message| is_family(message, 15, 1)
+            && contains_bytes(message, b"synthetic after refusal")),
+        "the session speaks after the refused developer command"
+    );
+
+    // The refusal is the existing server-owned audit event.
+    server.flush_security();
+    let log = fs::read_to_string(temp.0.join("security.jsonl")).unwrap_or_default();
+    assert!(log.contains("dev_command_denial"), "{log}");
+    assert!(!log.contains("synthetic after refusal"), "{log}");
+    server.shutdown().unwrap();
+    assert_eq!(server.active_session_count(), 0);
 }
 
 #[test]
@@ -763,6 +892,7 @@ fn a_bad_packet_or_abrupt_disconnect_ends_only_that_session() {
     let reference = Reference::new(VERSION, None);
     let store_path = create_account_store(&temp.0);
     let save_path = temp.0.join("characters/2.json");
+    let guid_offset = self_guid_offset(&reference);
     let start = [1.0, 2.0, 3.0];
     let direction = [0.0, 0.0, 1.0];
 
@@ -824,7 +954,10 @@ fn a_bad_packet_or_abrupt_disconnect_ends_only_that_session() {
     let (mut fresh, fresh_login) = log_in(&mut server, 522, 2, &store_path);
     settle(&mut server, &mut fresh);
     assert_eq!(
-        self_guid(self_packet(&fresh_login).expect("fresh login self data")),
+        self_guid(
+            self_packet(&fresh_login).expect("fresh login self data"),
+            guid_offset
+        ),
         Some(2)
     );
     assert!(
@@ -845,23 +978,63 @@ fn a_bad_packet_or_abrupt_disconnect_ends_only_that_session() {
     );
 
     // Separately, drop a session's socket mid-world while the other session
-    // stays live; the server keeps stepping, the vanished session is reaped by
-    // the existing idle timeout, and the live session and a new visitor still
-    // work.
+    // stays live; the server keeps stepping, the abandoned session stays until
+    // the existing idle timeout (so its character cannot be relogged), and the
+    // live session and a new visitor still work. Its last pose is deferred, so
+    // only an end-of-session save can write it.
     let (mut dropped, mut dropped_login) = log_in(&mut server, 523, 3, &store_path);
     let settled = settle_clients(&mut server, &mut [&mut fresh, &mut dropped]);
     dropped_login.extend(settled[1].clone());
     assert_eq!(
-        self_guid(self_packet(&dropped_login).expect("dropped login self data")),
+        self_guid(
+            self_packet(&dropped_login).expect("dropped login self data"),
+            guid_offset
+        ),
         Some(3)
+    );
+    let dropped_saved = [2.0, 2.0, 3.0];
+    let dropped_deferred = [3.0, 2.0, 3.0];
+    dropped.send(&mut server, &position_request(3, dropped_saved, direction));
+    dropped.send(
+        &mut server,
+        &position_request(3, dropped_deferred, direction),
+    );
+    assert_eq!(
+        save_json(&temp, 3)["character"]["position"],
+        serde_json::json!(dropped_saved),
+        "the last pose is inside the save coalesce window"
     );
     drop(dropped);
     for _ in 0..5 {
         server.step().unwrap();
     }
+    assert_eq!(
+        server.active_session_count(),
+        2,
+        "an abandoned socket stays until the existing idle timeout"
+    );
     assert!(
         server.test_location(2).is_some(),
         "dropping one socket must not end the live session"
+    );
+    // The abandoned session still owns character 3, so a relog is refused
+    // before it can read or write that character's save.
+    let before_refused_relog = fs::read(temp.0.join("characters/3.json")).unwrap();
+    let mut relog = Client::connect(&mut server, 525);
+    let refused = relog.send_unacknowledged(&mut server, &login(3, &store_path));
+    assert!(
+        !refused.iter().any(|message| is_opcode(message, 12)),
+        "a relog of an abandoned session received self data"
+    );
+    assert_eq!(
+        server.active_session_count(),
+        2,
+        "a relog of an abandoned session changed the session set"
+    );
+    assert_eq!(
+        fs::read(temp.0.join("characters/3.json")).unwrap(),
+        before_refused_relog,
+        "a refused relog changed the abandoned character's save"
     );
     let (mut visitor, mut visitor_login) = log_in(&mut server, 524, 1, &store_path);
     let settled = pump_clients(
@@ -871,7 +1044,10 @@ fn a_bad_packet_or_abrupt_disconnect_ends_only_that_session() {
     );
     visitor_login.extend(settled[1].clone());
     assert_eq!(
-        self_guid(self_packet(&visitor_login).expect("visitor login self data")),
+        self_guid(
+            self_packet(&visitor_login).expect("visitor login self data"),
+            guid_offset
+        ),
         Some(1)
     );
     assert!(
@@ -896,20 +1072,44 @@ fn a_bad_packet_or_abrupt_disconnect_ends_only_that_session() {
         "the live session still moves after the dropped socket"
     );
 
-    // Shutdown ends every session through the same save path: the abandoned
-    // session's save exists, and no session remains.
+    // Leave every live session with a pose inside the save coalesce window, so
+    // these poses can only reach the files through the shutdown save path.
+    let visitor_saved = [2.0, 2.0, 3.0];
+    let visitor_deferred = [3.0, 2.0, 3.0];
+    visitor.send(&mut server, &position_request(1, visitor_saved, direction));
+    visitor.send(
+        &mut server,
+        &position_request(1, visitor_deferred, direction),
+    );
+    let fresh_saved = [7.0, 2.0, 3.0];
+    let fresh_deferred = [8.0, 2.0, 3.0];
+    fresh.send(&mut server, &position_request(2, fresh_saved, direction));
+    fresh.send(&mut server, &position_request(2, fresh_deferred, direction));
+    for (guid, final_pose) in [
+        (1, visitor_deferred),
+        (2, fresh_deferred),
+        (3, dropped_deferred),
+    ] {
+        assert_ne!(
+            save_json(&temp, guid)["character"]["position"],
+            serde_json::json!(final_pose),
+            "character {guid}'s last pose must still be deferred before shutdown"
+        );
+    }
+
+    // Shutdown ends every session through the same save path and writes each
+    // session's final pose, including the abandoned one.
     server.shutdown().unwrap();
     assert_eq!(server.active_session_count(), 0);
-    assert_eq!(
-        save_json(&temp, 2)["character"]["guid"],
-        serde_json::json!(2)
-    );
-    assert_eq!(
-        save_json(&temp, 3)["character"]["guid"],
-        serde_json::json!(3)
-    );
-    assert_eq!(
-        save_json(&temp, 1)["character"]["guid"],
-        serde_json::json!(1)
-    );
+    for (guid, final_pose) in [
+        (1, visitor_deferred),
+        (2, fresh_deferred),
+        (3, dropped_deferred),
+    ] {
+        assert_eq!(
+            save_json(&temp, guid)["character"]["position"],
+            serde_json::json!(final_pose),
+            "the shutdown save wrote character {guid}'s final pose"
+        );
+    }
 }
