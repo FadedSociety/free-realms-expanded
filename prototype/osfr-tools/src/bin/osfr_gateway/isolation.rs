@@ -92,7 +92,7 @@ fn movie_gateway(reference: &std::path::Path, scratch: &std::path::Path) -> Gate
     copy_tree(&base, &content);
     fs::write(
         content.join("harvesting.json"),
-        include_str!("movie_harvesting.json"),
+        include_str!("../../../tests/fixtures/movie_harvesting.json"),
     )
     .unwrap();
     let mut state = Gameplay::load(&content, None).unwrap().state();
@@ -176,6 +176,12 @@ fn a_movie_error_ends_only_that_session_and_not_the_server() {
     // Keep the world tick out of the retry loop: the malformed close must end
     // the session through the packet path, not through a later tick fault.
     server.next_tick_ms = u64::MAX;
+    // Building the movie content above can outlast the 60 s idle budget on a
+    // loaded host. Refresh every session before the first step so the movie
+    // error alone ends the victim and the survivors stay for the final step.
+    for session in server.sessions.values_mut() {
+        session.last_activity = std::time::Instant::now();
+    }
     client
         .send_to(&wire, server.local_addr().expect("server address"))
         .expect("malformed close datagram sends");
@@ -199,14 +205,6 @@ fn a_movie_error_ends_only_that_session_and_not_the_server() {
         "no ghost left behind"
     );
     assert!(server.sessions.contains_key(&keys[1]) && server.sessions.contains_key(&keys[2]));
-    // Loading the movie content twice above can outlast the 60 s idle budget on
-    // a loaded host. The two survivors send nothing in this test, so refresh
-    // their liveness; the step below must keep them for the movie error alone.
-    for key in &keys[1..] {
-        if let Some(session) = server.sessions.get_mut(key) {
-            session.last_activity = std::time::Instant::now();
-        }
-    }
     server.next_tick_ms = 0;
     server.step().unwrap();
     assert_eq!(server.sessions.len(), 2);

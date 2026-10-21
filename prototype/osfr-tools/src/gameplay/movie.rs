@@ -94,10 +94,31 @@ pub(super) fn elapsed_if_due(clock: Option<u64>, now_ms: u64) -> Option<u32> {
     (elapsed >= MOVIE_TICK_MS).then(|| elapsed.min(u32::MAX as u64) as u32)
 }
 
+/// Test-only start of the Forging movie as the production start path leaves it:
+/// the engine run is live and the movie's own tick clock is stamped. Shared by
+/// the default tick test and the private movie matrix so the two cannot drift.
+#[cfg(test)]
+pub(super) fn start_forging(game: &mut super::Gameplay, now_ms: u64) {
+    let forging = game.forging.as_mut().unwrap();
+    let key = forging.recipe_key().to_owned();
+    let requirements = forging.requirements().to_vec();
+    forging
+        .begin_recipe(
+            crate::forging::profile_for_test(),
+            &key,
+            u8::MAX,
+            true,
+            &requirements,
+        )
+        .unwrap();
+    game.forging_tick_ms = Some(now_ms);
+}
+
 #[cfg(test)]
 mod tests {
     use super::super::t013_objective_events::game;
     use super::super::*;
+    use super::start_forging;
 
     /// The consolidated Forging tick through the production `Gameplay::tick`
     /// path. The private W104 matrix is ignored; this fixture is the shared
@@ -106,15 +127,7 @@ mod tests {
     #[test]
     fn forging_tick_advances_once_per_250ms_step() {
         let mut game = game();
-        let key = game.forging.as_ref().unwrap().recipe_key().to_owned();
-        let requirements = game.forging.as_ref().unwrap().requirements().to_vec();
-        // The forging service's private profile constant: Blacksmith 16.
-        game.forging
-            .as_mut()
-            .unwrap()
-            .begin_recipe(16, &key, u8::MAX, true, &requirements)
-            .unwrap();
-        game.forging_tick_ms = Some(1_000);
+        start_forging(&mut game, 1_000);
         let character = CharacterState {
             guid: 1,
             zone_id: 0,
@@ -143,5 +156,45 @@ mod tests {
             "the due tick did not stamp"
         );
         assert_eq!(wall(&game), before + 250, "the due tick did not advance");
+    }
+
+    /// Pins all five movies' three fixed refusals. The default gateway tests
+    /// start Harvesting only, so without this a typo in another movie's text
+    /// would leave the suite green. The exhaustive match also forces a new
+    /// movie variant to add its strings here.
+    #[test]
+    fn every_movie_owns_its_exact_static_refusals() {
+        for movie in Movie::ALL {
+            let (blocked, realm, leave) = match movie {
+                Movie::Forging => (
+                    "Close the forging game before changing jobs, equipment or interacting.",
+                    "Close the forging game before other opening actions.",
+                    "invalid forging leave request",
+                ),
+                Movie::Cooking => (
+                    "Close the cooking game before changing jobs, equipment or interacting.",
+                    "Close the cooking game before other opening actions.",
+                    "invalid cooking leave request",
+                ),
+                Movie::Smelting => (
+                    "Close the smelting game before changing jobs, equipment or interacting.",
+                    "Close the smelting game before other opening actions.",
+                    "invalid smelting leave request",
+                ),
+                Movie::Mining => (
+                    "Close the mining game before changing jobs, equipment or interacting.",
+                    "Close the mining game before other opening actions.",
+                    "invalid mining leave request",
+                ),
+                Movie::Harvesting => (
+                    "Close the harvesting game before changing jobs, equipment or interacting.",
+                    "Close the harvesting game before other opening actions.",
+                    "invalid harvesting leave request",
+                ),
+            };
+            assert_eq!(movie.blocked_message(), blocked);
+            assert_eq!(movie.realm_message(), realm);
+            assert_eq!(movie.leave_error(), leave);
+        }
     }
 }

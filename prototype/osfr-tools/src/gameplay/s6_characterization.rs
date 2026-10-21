@@ -386,8 +386,8 @@ fn real_regional_npc_reaches_the_npc_router_before_the_movie_gate() {
 }
 
 const UNKNOWN_ACTOR: u64 = u64::MAX - 1;
-/// The services' private profile constants: forging 16, cooking 45, smelting 14.
-const FORGING_PROFILE: i32 = 16;
+/// The services' private profile constants: cooking 45, smelting 14. Forging's
+/// start goes through `movie::start_forging`, which reads its own profile.
 const COOKING_PROFILE: i32 = 45;
 const SMELTING_PROFILE: i32 = 14;
 
@@ -462,16 +462,7 @@ fn test_character() -> CharacterState {
 /// engine run is live and the movie's own tick clock is stamped.
 fn start(game: &mut Gameplay, engine: Engine) {
     match engine {
-        Engine::Forging => {
-            let key = game.forging.as_ref().unwrap().recipe_key().to_owned();
-            let requirements = game.forging.as_ref().unwrap().requirements().to_vec();
-            game.forging
-                .as_mut()
-                .unwrap()
-                .begin_recipe(FORGING_PROFILE, &key, u8::MAX, true, &requirements)
-                .unwrap();
-            game.forging_tick_ms = Some(NOW);
-        }
+        Engine::Forging => super::super::movie::start_forging(game, NOW),
         Engine::Cooking => {
             let key = game.cooking.as_ref().unwrap().recipe_key().to_owned();
             let requirements = game.cooking.as_ref().unwrap().requirements().to_vec();

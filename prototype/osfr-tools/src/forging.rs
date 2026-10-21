@@ -24,6 +24,13 @@ const MAX_PAYLOAD: usize = 4096;
 const MAX_WALL_MS: u32 = 1_800_000;
 const COLLECTABLE: u16 = 606; // Mapping index6 is the original Hammer art.
 
+/// Test-only access to the Blacksmith profile id so fixtures start a run
+/// without restating the private constant.
+#[cfg(test)]
+pub(crate) const fn profile_for_test() -> i32 {
+    PROFILE
+}
+
 #[derive(Clone, Debug, Deserialize)]
 struct Content {
     schema_version: u32,

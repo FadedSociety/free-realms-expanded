@@ -261,13 +261,6 @@ impl Drop for Fixture {
     }
 }
 
-fn wrap(inner: &[u8]) -> Vec<u8> {
-    let mut b = vec![5, 0, 1];
-    b.extend((inner.len() as u32).to_le_bytes());
-    b.extend(inner);
-    b
-}
-
 /// Accepts both tunneled gateway replies and direct inner packets.
 fn inner(reply: &[u8]) -> &[u8] {
     if reply.starts_with(&[5, 0, 1]) && reply.len() >= 7 {
@@ -277,21 +270,6 @@ fn inner(reply: &[u8]) -> &[u8] {
         }
     }
     reply
-}
-
-fn chat_inner(text: &str) -> Vec<u8> {
-    let mut p = vec![15, 0, 1, 0, 0, 0];
-    p.extend(1u64.to_le_bytes());
-    p.extend(0u64.to_le_bytes());
-    for _ in 0..2 {
-        p.extend([0; 12]);
-        p.extend(0u32.to_le_bytes());
-        p.extend(0u32.to_le_bytes());
-    }
-    p.extend((text.len() as u32).to_le_bytes());
-    p.extend(text.as_bytes());
-    p.extend([0; 28]);
-    p
 }
 
 fn login(gateway: &mut Gateway) {
@@ -313,12 +291,12 @@ fn login(gateway: &mut Gateway) {
 
 fn send(gateway: &mut Gateway, packet: &[u8], now_ms: u64) -> GatewayOutcome {
     gateway
-        .handle_at(&wrap(packet), now_ms)
+        .handle_at(&fishing_fixtures::wrap(packet), now_ms)
         .expect("gateway frame")
 }
 
 fn say(gateway: &mut Gateway, text: &str, now_ms: u64) -> GatewayOutcome {
-    send(gateway, &chat_inner(text), now_ms)
+    send(gateway, &gateway_packets::chat(text), now_ms)
 }
 
 fn chat_text(outcome: &GatewayOutcome) -> String {
@@ -988,7 +966,10 @@ fn full_bag_rolls_back_the_win_and_retry_grants_after_space() {
     // gateway keeps the pre-frame snapshot (run still LevelComplete).
     let before = gateway.snapshot();
     let blocked = gateway
-        .handle_at(&wrap(&payload(instance, "OnNextLevelMsg")), 2_800)
+        .handle_at(
+            &fishing_fixtures::wrap(&payload(instance, "OnNextLevelMsg")),
+            2_800,
+        )
         .expect("a gameplay rejection must drop the application and keep the session");
     assert!(
         blocked.trace.iter().any(|event| {
