@@ -1340,14 +1340,16 @@ fn the_battle_and_quest_content_load_with_real_targets() {
                 .unwrap_or_default()
         );
     }
-    assert_eq!(
-        records
-            .iter()
-            .find(|record| record["id"].as_u64() == Some(3_030_009))
-            .unwrap()["enabled"],
-        false,
-        "T252 must not enable the later Blackspore record"
-    );
+    // T331 enabled C6 with its one Talk objective, Brawler gate and reward; T252's
+    // C1/C2 rows above are still the only other records this slice's pin covers.
+    let c6 = records
+        .iter()
+        .find(|record| record["id"].as_u64() == Some(3_030_009))
+        .unwrap();
+    assert_eq!(c6["enabled"], true, "T331 enables Given to Guard");
+    assert_eq!(c6["job"], BRAWLER);
+    assert_eq!(c6["objectives"].as_array().unwrap().len(), 1);
+    assert_eq!(c6["objectives"][0]["npc_id"].as_u64(), Some(9_000_000_428));
 }
 
 #[test]

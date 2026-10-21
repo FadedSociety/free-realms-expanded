@@ -72200,6 +72200,57 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "spawn_guid": 9000000428,
+      "legacy_npc_id": 1465,
+      "content_key": 9000000428,
+      "model_id": 356,
+      "model_file_name": "fairy_f_freestyle_01.agr",
+      "name": "Petra",
+      "name_string_id": 72450,
+      "position": [
+        -2138.724403,
+        -33.0,
+        1045.102653
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1465 (NameId=72450, Name=Petra, ModelId=356, ModelFileName=fairy_f_freestyle_01.agr). The other Legacy rows that carry NameId 72450 (Id 6312 and 6471) are human_f_gloam_agent.agr agents, not the Blackspore Brawler trainer."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 356 = fairy_f_freestyle_01.agr, and that body is shipped: lab/extracted/client-assets/catalog.tsv lists Assets_000.pack entry 728 (pack_12/000728.agr) and Assets_manifest.txt lists fairy_f_freestyle_01.agr.z."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat: Global.Text.72450 resolves to 'Petra'. lab/reports/locale-id-map.json maps the Blackspore row's raw name hash 565519828 to 72450. The AddNpc name field is a Global.Text id (client formats 'Global.Text.%d' at 0x01804c14), so the spawn supplies 72450; the raw hash would render a blank nameplate."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md row C6: Sabastian Cabet wants the player to deliver a job offer to Petra, a famous brawler west of Mire's Edge in Blackspore. notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md row 47 names Petra the veteran Brawler trainer and the receiver of Brawler: Given to Guard."
+        },
+        {
+          "kind": "client",
+          "evidence": "data/content/npcs/blackspore_swamp.json row 9000000428: the reconstructed regional Petra row (zone 1, quest_giver/trainer, position [-2141.724403,-32.948,1045.102653]); this spawn reuses her NPC key as the runtime actor GUID and content key, so the ordinary 26/8 click (reader 0x008b6bc0) addresses the same content identity the 3030009 talk objective names."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T331: drawable-spawn choice. Petra's regional row is unanchored/POI scaffolding and is never drawn; this extra row is the drawable body the 35/2 AddNpc reader (0x00921a10: u64 actor, i32 name id, i32 model id) and the 26/8 content_key map consume. Heading 0.0 is deterministic; no recovered heading or captured transform exists."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T331: position. The authored content-row point [-2141.724403,-32.948,1045.102653] sits 0.073 m above its sampled ground, but its full 5 m authoring disc reaches 42.30 degrees (25 degree rule), so the spawn uses the nearest sampled safe point 3.0 m east: [-2138.724403,-33.0,1045.102653], ground -33.0 (0.0 m delta), 105 disc samples covered, 24 ring samples finite, max disc slope 18.83 degrees. The content row keeps the authored point; this row records the 3.0 m horizontal / 0.052 m vertical delta."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The 9000000000-range actor GUID is this project's content-key space, not a recovered server GUID."
+        }
+      ],
+      "position_w": null
     }
   ]
 }

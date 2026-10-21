@@ -562,45 +562,76 @@
     },
     {
       "id": 3030009,
+      "job": 43,
       "title_string_id": 130857,
       "giver_npc_id": 9000000446,
       "prerequisite_quest_ids": [
         3030008
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000428,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C6; name 'Brawler: Given to Guard'; description 130858 'Sabastian Cabet wants you to deliver a job offer to Petra, a famous brawler located in Blackspore.' and the guide's objective text 'Petra is somewhere to the west of Mire's Edge in Blackspore. Find her and deliver Sabastian's job offer.' (298629165)."
+            },
+            {
+              "kind": "client",
+              "evidence": "data/content/npcs/blackspore_swamp.json: Petra 9000000428 is a positioned quest_giver/trainer row whose quests_given_text records that she receives the job offers of Brawler: Given to Guard and Brawler: Cemetery Security; lab/reports/locale-id-map.json maps her raw name hash 565519828 to Global.Text.72450 'Petra'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T331: objective ordinal 1 and target 9000000428 are server content bindings for the recovered C6 delivery; they are not recovered retail objective or target identifiers."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "43": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T331: the retail quest payout is unknown; five coins and 25 Brawler (profile 43) XP follow the T101/T252 small-chapter rung used by 3030004/3030005. No item is granted: the Brawler trainer already grants the starter outfit, so a second free grant would be a sellable duplicate."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C6; name 'Brawler: Given to Guard'; title id cell ucdt 2513078725 / ugdt 1114540062"
+          "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C6; name 'Brawler: Given to Guard'; title id cell ucdt 2513078725 / ugdt 1114540062 (Global.Text.130857); client description 130858 and intro 130856 repeat the guide's job-offer wording ('delivering my job offer', 'the swamp to the west'); end text 130859 is Petra's refusal-and-work reply."
         },
         {
           "kind": "wiki",
           "evidence": "notes/Build Guides/Content/Jobs/Brawler.md: Quest line > Starting line 1: Cobblestone Village (Carlos Brazenfist), row C6; name 'Brawler: Given to Guard'; title id cell ucdt 2513078725 / ugdt 1114540062"
         },
         {
-          "kind": "reconstructed",
-          "evidence": "(R) quest id 3030009 is a stable batch key; the guide does not provide a numeric server quest id"
+          "kind": "client",
+          "evidence": "data/content/npcs/blackspore_swamp.json: Sabastian Cabet 9000000446 is a legacy_data quest giver (model 312 human_m_freestyle_03.agr, locale name 46099) with quests_given row 3030009; Petra 9000000428 is the C6 talk target."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+          "evidence": "(R) T331: quest id 3030009 is the existing stable batch key; prerequisite 3030008 is the existing numeric binding for the recovered C5 to C6 order; ids 3030010+ belong to the Highroad and Stillwater starting lines and are untouched."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T331 job gate 43: rows 3030006-3030008 carry no job gate, but C6 is the Cobblestone line's Brawler hand-off (all three starting lines reach Petra). 43 is jobs.json 'brawler', and character_eligibility fills job_levels only from the saved active, unlocked profile, so a non-Brawler or an unlearned Brawler gets no offer."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+          "evidence": "(R) T331 enabled: Petra 9000000428 now has a drawable npc_spawns_extra row bound by content_key, so the 26/8 click reaches the real 26/10 Talk that completes this objective and the 49/13/49/14 turn-in."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) source explicitly says after row C5; mapped that page label to the preceding batch content key"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T331: the reward decision is recorded on rewards[0].source; the skipped retail reward values remain unknown."
         },
         {
           "kind": "reconstructed",
@@ -610,7 +641,7 @@
       "description_string_id": 130858,
       "intro_text_string_id": 130856,
       "end_text_string_id": 130859,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3030010,

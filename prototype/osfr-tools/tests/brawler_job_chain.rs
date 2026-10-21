@@ -3,8 +3,11 @@ use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState},
     gateway::Gateway,
+    npc_interaction::NpcInteraction,
     quest_engine::{CharacterEligibility, QuestDenial, QuestEngine, QuestProgress, QuestStatus},
     startup_world,
+    terrain::{HeightGrid, Terrain},
+    world::NpcVisibility,
 };
 use serde_json::Value;
 use std::{
@@ -17,15 +20,24 @@ use std::{
 mod gateway_reference;
 
 const CHARACTER: u64 = 101;
+const SECOND_CHARACTER: u64 = 102;
 const CLIENT_VERSION: &str = "1.910.1.530630";
 const CARLOS: u64 = 9_000_000_042;
 const JONES: u64 = 9_000_000_121;
 const SABASTIAN: u64 = 9_000_000_446;
+const PETRA: u64 = 9_000_000_428;
 const REFERRAL_TO_JONES: u32 = 3_030_006;
 const HOOLIGAN_FIGHT: u32 = 3_030_007;
 const SEARCH_BLACKSPORE: u32 = 3_030_008;
+const GIVEN_TO_GUARD: u32 = 3_030_009;
 const HOOLIGAN_DEFINITION: u32 = 930_050;
 const QUEST_REWARD_COINS: u32 = 5;
+const QUEST_REWARD_JOB_XP: u32 = 25;
+const BRAWLER: i32 = 43;
+const ADVENTURER: i32 = 1;
+const PETRA_MODEL: i32 = 356;
+const PETRA_NAME_STRING_ID: i32 = 72_450;
+const PETRA_LEGACY_NPC_ID: u64 = 1465;
 const ATTACK_CHOICE: i32 = 103;
 const QUEST_CHOICE: i32 = 301;
 
@@ -47,24 +59,40 @@ fn character_at(position: [f32; 3]) -> CharacterState {
     }
 }
 
-fn load_game(saved: Option<osfr_tools::gameplay::GameplayState>) -> Gameplay {
+fn load_game_for(
+    character_id: u64,
+    saved: Option<osfr_tools::gameplay::GameplayState>,
+) -> Gameplay {
     let mut game = Gameplay::load(&gameplay_dir(), saved).expect("gameplay content loads");
-    game.bind_npc_quest_catalogue(&content_dir(), CHARACTER)
+    game.bind_npc_quest_catalogue(&content_dir(), character_id)
         .expect("split quest content loads");
     game
 }
 
-fn fresh_game() -> (Gameplay, CharacterState) {
-    let mut game = load_game(None);
-    let character = character_at([0.0; 3]);
+fn load_game(saved: Option<osfr_tools::gameplay::GameplayState>) -> Gameplay {
+    load_game_for(CHARACTER, saved)
+}
+
+fn fresh_game_for(character_id: u64) -> (Gameplay, CharacterState) {
+    let mut game = load_game_for(character_id, None);
+    let character = CharacterState {
+        guid: character_id,
+        zone_id: 0,
+        position: [0.0; 3],
+        rotation: [1.0, 0.0, 0.0],
+    };
     let selected = game
-        .handle_in_world(&select_job(43), &character, 1)
+        .handle_in_world(&select_job(BRAWLER), &character, 1)
         .expect("Brawler job selection is valid");
     assert!(
         selected.changed,
         "Brawler selection must change the profile"
     );
     (game, character)
+}
+
+fn fresh_game() -> (Gameplay, CharacterState) {
+    fresh_game_for(CHARACTER)
 }
 
 fn npc_position(file: &str, npc_id: u64) -> [f32; 3] {
@@ -107,6 +135,105 @@ fn field_hooligans() -> Vec<(u64, [f32; 3])> {
 
 fn saved(game: &Gameplay) -> Vec<u8> {
     serde_json::to_vec(&game.state()).unwrap()
+}
+
+fn profile_xp(game: &Gameplay, profile: i32) -> u32 {
+    game.state()
+        .profiles
+        .as_ref()
+        .and_then(|state| state.experience.get(&profile).copied())
+        .unwrap_or(0)
+}
+
+fn active_job(game: &Gameplay) -> i32 {
+    game.state()
+        .profiles
+        .as_ref()
+        .expect("the fixture has profile content")
+        .active
+}
+
+/// The captured opening inventory carries only the Brawler outfit, so an ordinary 26/13 switch
+/// refuses every other job. Seed the saved active profile the way T202's `seeded` helper does
+/// when direct play cannot reach a job switch; the offer gate reads this production save.
+fn with_active_job(game: &Gameplay, character_id: u64, profile: i32) -> Gameplay {
+    let mut state = game.state();
+    let mut profiles = state
+        .profiles
+        .clone()
+        .expect("the fixture has profile content");
+    profiles.active = profile;
+    profiles.unlocked.insert(profile);
+    state.profiles = Some(profiles);
+    load_game_for(character_id, Some(state))
+}
+
+/// T331's drawable Petra row in `npc_spawns_extra.json` (spawn_guid/content_key 9000000428).
+fn petra_spawn_row() -> Value {
+    let document: Value =
+        serde_json::from_slice(&fs::read(content_dir().join("npc_spawns_extra.json")).unwrap())
+            .unwrap();
+    let rows: Vec<_> = document["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|row| row["spawn_guid"].as_u64() == Some(PETRA))
+        .cloned()
+        .collect();
+    assert_eq!(rows.len(), 1, "exactly one extra spawn carries Petra");
+    rows.into_iter().next().unwrap()
+}
+
+fn petra_spawn_position() -> [f32; 3] {
+    serde_json::from_value(petra_spawn_row()["position"].clone())
+        .expect("Petra's drawable spawn has a position")
+}
+
+/// Stand on Petra's authored content row, inside the 12 m NPC interaction radius of the drawable
+/// actor 3 m east of it (the row itself must not move; T331 rows the spawn delta in its source).
+fn at_petra(character: &CharacterState) -> CharacterState {
+    CharacterState {
+        position: npc_position("blackspore_swamp.json", PETRA),
+        ..character.clone()
+    }
+}
+
+/// Complete C3-C5 and accept C6 at Sabastian through the production menus.
+fn complete_chapter_and_accept_c6(game: &mut Gameplay, character: &CharacterState, now: &mut u64) {
+    complete_chapter(game, character, now);
+    let sabastian = npc_position("blackspore_swamp.json", SABASTIAN);
+    accept_quest(game, character, SABASTIAN, sabastian, GIVEN_TO_GUARD, now);
+}
+
+// The T103/T282 5 m authoring sample: 81 one-metre disc points plus a 24-point 5 m ring.
+fn disc_points(x: f32, z: f32) -> Vec<(f32, f32)> {
+    let mut points = Vec::new();
+    for dx in -5..=5 {
+        for dz in -5..=5 {
+            let (dx, dz) = (dx as f32, dz as f32);
+            if dx * dx + dz * dz <= 25.0 {
+                points.push((x + dx, z + dz));
+            }
+        }
+    }
+    for angle in (0..360).step_by(15) {
+        let radians = (angle as f32).to_radians();
+        points.push((x + 5.0 * radians.cos(), z + 5.0 * radians.sin()));
+    }
+    points
+}
+
+fn slope_degrees(grid: &HeightGrid, x: f32, z: f32) -> Option<f32> {
+    let west = grid.height_at(x - 1.0, z)?;
+    let east = grid.height_at(x + 1.0, z)?;
+    let south = grid.height_at(x, z - 1.0)?;
+    let north = grid.height_at(x, z + 1.0)?;
+    Some(
+        ((east - west) / 2.0)
+            .hypot((north - south) / 2.0)
+            .atan()
+            .to_degrees(),
+    )
 }
 
 fn eligibility() -> CharacterEligibility {
@@ -1079,14 +1206,25 @@ fn disabled_starting_quests_refuse_without_changing_state() {
     let before = engine.state().clone();
     // The still-hollow starting records refuse, and their provenance must not claim objectives
     // the server does not run (F135 review finding 4). T252 enabled C1/C2, so C1 now offers and
-    // C2 is gated on C1's completion instead.
-    for quest_id in [3_030_001, 3_030_002, 3_030_003, 3_030_009, 3_030_010] {
+    // C2 is gated on C1's completion instead. T331 enabled C6, so it left this list: without C5
+    // the engine refuses it on the prerequisite, and the wrong NPC is a wrong giver.
+    for quest_id in [3_030_001, 3_030_002, 3_030_003, 3_030_010] {
         let refused = engine.offer(quest_id, CARLOS);
         assert_eq!(refused.denial, Some(QuestDenial::Unavailable));
         assert!(!refused.changed);
         assert!(refused.outbound.is_empty());
         assert_eq!(engine.state(), &before);
     }
+    let early = engine.offer(GIVEN_TO_GUARD, SABASTIAN);
+    assert_eq!(early.denial, Some(QuestDenial::Prerequisite));
+    assert!(!early.changed);
+    assert!(early.outbound.is_empty());
+    assert_eq!(engine.state(), &before);
+    let wrong_giver = engine.offer(GIVEN_TO_GUARD, CARLOS);
+    assert_eq!(wrong_giver.denial, Some(QuestDenial::WrongGiver));
+    assert!(!wrong_giver.changed);
+    assert!(wrong_giver.outbound.is_empty());
+    assert_eq!(engine.state(), &before);
     let gated = engine.offer(3_030_005, CARLOS);
     assert_eq!(gated.denial, Some(QuestDenial::Prerequisite));
     assert!(!gated.changed);
@@ -1312,5 +1450,736 @@ fn offer_gates_and_save_reload_survive() {
         saved(&reloaded),
         before_menu,
         "an unofferable Carlos Talk changed the completed chapter"
+    );
+}
+
+/// T331: C6 is the Cobblestone line's Brawler hand-off. Only an active, unlocked Brawler that
+/// has finished C5 is offered it, and the offer is the ordinary 26/8 -> 26/10 -> 26/6 -> 49/1
+/// path at Sabastian.
+#[test]
+fn sabastian_offers_given_to_guard_after_honor_lost() {
+    let (mut game, character) = fresh_game();
+    let mut now = 20_000;
+    let sabastian = npc_position("blackspore_swamp.json", SABASTIAN);
+    let mut at = character.clone();
+    at.position = sabastian;
+
+    // A Brawler who has not completed C5 gets no offer: the prerequisite is real.
+    let before = saved(&game);
+    now += 100;
+    let _ = talk(&mut game, &at, SABASTIAN, now);
+    now += 100;
+    let early = choose_quest_row(&mut game, &at, now);
+    assert!(
+        !early
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 1, Some(GIVEN_TO_GUARD))),
+        "Given to Guard was offered before Bad Business completed"
+    );
+    assert_eq!(saved(&game), before, "the early Talk changed the save");
+
+    complete_chapter(&mut game, &character, &mut now);
+    at.position = sabastian;
+
+    // A non-Brawler is not offered the Brawler hand-off. The captured opening inventory has no
+    // Adventurer outfit, so the active profile is seeded in the save instead of a 26/13 switch.
+    let mut adventurer_game = with_active_job(&game, CHARACTER, ADVENTURER);
+    assert_eq!(active_job(&adventurer_game), ADVENTURER);
+    let before_adventurer = saved(&adventurer_game);
+    now += 100;
+    let _ = talk(&mut adventurer_game, &at, SABASTIAN, now);
+    now += 100;
+    let adventurer = choose_quest_row(&mut adventurer_game, &at, now);
+    assert!(
+        !adventurer
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 1, Some(GIVEN_TO_GUARD))),
+        "a non-Brawler was offered the Brawler hand-off"
+    );
+    assert_eq!(
+        saved(&adventurer_game),
+        before_adventurer,
+        "a non-Brawler changed the save"
+    );
+
+    // The active, unlocked Brawler gets it through the real menu, dialogue and reply path.
+    now += 100;
+    let menu = interact_npc(&mut game, &at, SABASTIAN, now);
+    assert!(
+        menu.starts_with(&[26, 0, 9, 0]),
+        "Sabastian did not open his 26/9 menu"
+    );
+    now += 100;
+    let dialogue = game
+        .handle_in_world(&npc_select(SABASTIAN, 1), &at, now)
+        .expect("Sabastian's Talk selection is valid");
+    assert!(
+        dialogue
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
+        "Sabastian's Talk did not open dialogue"
+    );
+    now += 100;
+    let offered = choose_quest_row(&mut game, &at, now);
+    assert!(
+        offered
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 1, Some(GIVEN_TO_GUARD))),
+        "Sabastian did not offer Given to Guard"
+    );
+
+    // A second Talk while the offer window is open changes nothing and reoffers nothing.
+    let before_second = saved(&game);
+    now += 100;
+    let _ = talk(&mut game, &at, SABASTIAN, now);
+    now += 100;
+    let again = choose_quest_row(&mut game, &at, now);
+    assert!(
+        !again
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 1, Some(GIVEN_TO_GUARD))),
+        "a second Talk reoffered the pending quest"
+    );
+    assert_eq!(
+        saved(&game),
+        before_second,
+        "a second Talk changed the pending offer"
+    );
+
+    now += 100;
+    let accepted = game
+        .handle_in_world(&quest_reply(GIVEN_TO_GUARD, true), &at, now)
+        .expect("the C6 accept is valid");
+    assert!(
+        accepted
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 3, None)),
+        "the C6 accept did not send QuestAdd"
+    );
+    assert_eq!(
+        game.state().npc_quests.unwrap().quests[&GIVEN_TO_GUARD].status,
+        QuestStatus::Active
+    );
+}
+
+/// T331: the C6 delivery is the real Petra actor: the Talk completes the only objective, the
+/// 49/13 names the drawn actor, and 49/14 pays exactly five coins and 25 Brawler XP once.
+#[test]
+fn delivering_the_offer_to_petra_completes_and_pays_once() {
+    let (mut game, character) = fresh_game();
+    let mut now = 22_000;
+    complete_chapter_and_accept_c6(&mut game, &character, &mut now);
+    let at = at_petra(&character);
+
+    let coins_before = game.state().inventory.coins;
+    let inventory_before = game.state().inventory.clone();
+    let xp_before = profile_xp(&game, BRAWLER);
+    // The 26/8 click resolves the drawable actor's content key before anything else, so a
+    // missing or unbound Petra spawn fails here (canary 1).
+    let end = open_end_screen(&mut game, &at, PETRA, GIVEN_TO_GUARD, &mut now);
+    let drawn = game
+        .update_npc_visibility(&at)
+        .expect("Petra visibility updates");
+    let petra = drawn
+        .iter()
+        .filter_map(|packet| startup_world::parse_add_npc(packet).ok())
+        .find(|npc| npc.actor_id == PETRA)
+        .expect("the drawn Petra actor must exist at her spawn");
+    assert_eq!(petra.model_id, PETRA_MODEL);
+    assert_eq!(petra.name_string_id, PETRA_NAME_STRING_ID);
+    assert_eq!(
+        u64::from_le_bytes(end[6..14].try_into().unwrap()),
+        PETRA,
+        "the delivered offer's end screen names the drawn Petra actor"
+    );
+    finish_turnin(&mut game, &at, GIVEN_TO_GUARD, &mut now);
+
+    let state = game.state();
+    assert_eq!(
+        state.inventory.coins,
+        coins_before + QUEST_REWARD_COINS,
+        "C6 must pay exactly five coins"
+    );
+    assert_eq!(
+        profile_xp(&game, BRAWLER),
+        xp_before + QUEST_REWARD_JOB_XP,
+        "C6 must pay 25 Brawler XP"
+    );
+    assert_eq!(
+        state.inventory.items, inventory_before.items,
+        "C6 must not grant an item"
+    );
+    assert_eq!(
+        state.inventory.equipment, inventory_before.equipment,
+        "C6 must not grant equipment"
+    );
+    let quests = state.npc_quests.as_ref().unwrap();
+    assert_eq!(
+        quests.quests[&GIVEN_TO_GUARD].status,
+        QuestStatus::Completed
+    );
+    assert_eq!(quests.pending_turnin, None);
+
+    // A replayed 49/14 and a replayed 49/2 pay nothing.
+    let paid = saved(&game);
+    now += 100;
+    assert_refusal_changes_nothing(
+        &mut game,
+        &at,
+        &quest_end_reply(GIVEN_TO_GUARD),
+        now,
+        "replayed C6 turn-in",
+    );
+    now += 100;
+    assert_refusal_changes_nothing(
+        &mut game,
+        &at,
+        &quest_reply(GIVEN_TO_GUARD, true),
+        now,
+        "replayed C6 accept",
+    );
+    assert_eq!(saved(&game), paid);
+    assert_eq!(
+        game.state().inventory.coins,
+        coins_before + QUEST_REWARD_COINS
+    );
+}
+
+/// T331 edge case 1: the explicit `{"43": 25}` map pays profile 43 even after a job switch.
+#[test]
+fn the_reward_goes_to_profile_43_after_a_job_switch() {
+    let (mut game, character) = fresh_game();
+    let mut now = 24_000;
+    complete_chapter_and_accept_c6(&mut game, &character, &mut now);
+    let at = at_petra(&character);
+
+    // A real 26/13 switch needs another job's outfit; the captured opening inventory only has
+    // the Brawler set, so the active profile changes through the saved state (T202's `seeded`).
+    game = with_active_job(&game, CHARACTER, ADVENTURER);
+    assert_eq!(active_job(&game), ADVENTURER);
+    let adventurer_xp = profile_xp(&game, ADVENTURER);
+    let brawler_xp = profile_xp(&game, BRAWLER);
+
+    let _ = open_end_screen(&mut game, &at, PETRA, GIVEN_TO_GUARD, &mut now);
+    finish_turnin(&mut game, &at, GIVEN_TO_GUARD, &mut now);
+
+    assert_eq!(
+        profile_xp(&game, BRAWLER),
+        brawler_xp + QUEST_REWARD_JOB_XP,
+        "profile 43 must receive the configured XP"
+    );
+    assert_eq!(
+        profile_xp(&game, ADVENTURER),
+        adventurer_xp,
+        "the active job must receive no XP"
+    );
+    assert_eq!(
+        active_job(&game),
+        ADVENTURER,
+        "the turn-in must not switch jobs"
+    );
+}
+
+/// T331 test 4: wrong target, forged replies, the near-cap wallet and a replay each leave the
+/// whole saved `GameplayState` equal; nothing pays or completes on a refusal.
+#[test]
+fn refusals_wrong_target_and_replay_change_nothing() {
+    let (mut game, character) = fresh_game();
+    let mut now = 26_000;
+    complete_chapter(&mut game, &character, &mut now);
+    let sabastian = npc_position("blackspore_swamp.json", SABASTIAN);
+    let carlos = npc_position("cobblestone_village.json", CARLOS);
+    let spawn = petra_spawn_position();
+    let mut at = character.clone();
+
+    // A forged accept before any offer changes nothing.
+    at.position = sabastian;
+    now += 100;
+    assert_refusal_changes_nothing(
+        &mut game,
+        &at,
+        &quest_reply(GIVEN_TO_GUARD, true),
+        now,
+        "forged C6 accept without an offer",
+    );
+
+    // Carlos is not C6's target: his Talk and dialogue row change nothing.
+    at.position = carlos;
+    let before_carlos = saved(&game);
+    now += 100;
+    let _ = talk(&mut game, &at, CARLOS, now);
+    now += 100;
+    let _ = choose_quest_row(&mut game, &at, now);
+    assert_eq!(
+        saved(&game),
+        before_carlos,
+        "a wrong-NPC Talk advanced the C6 delivery"
+    );
+
+    // An out-of-range 26/8 at Petra is refused before anything changes.
+    let far = CharacterState {
+        position: [spawn[0] + 400.0, spawn[1], spawn[2]],
+        ..character.clone()
+    };
+    now += 100;
+    let before_far = saved(&game);
+    assert!(
+        game.handle_in_world(&npc_interact(PETRA), &far, now)
+            .is_err(),
+        "a far interact must be refused"
+    );
+    assert_eq!(
+        saved(&game),
+        before_far,
+        "the far interact changed the save"
+    );
+
+    // The legitimate accept, then replies with no completed objective.
+    at.position = sabastian;
+    accept_quest(
+        &mut game,
+        &character,
+        SABASTIAN,
+        sabastian,
+        GIVEN_TO_GUARD,
+        &mut now,
+    );
+    now += 100;
+    assert_refusal_changes_nothing(
+        &mut game,
+        &at,
+        &quest_end_reply(GIVEN_TO_GUARD),
+        now,
+        "C6 turn-in with no end screen",
+    );
+    now += 100;
+    assert_refusal_changes_nothing(
+        &mut game,
+        &at,
+        &quest_end_reply(SEARCH_BLACKSPORE),
+        now,
+        "wrong quest turn-in",
+    );
+
+    // Complete the delivery at the drawable Petra actor and hold her end screen.
+    let petra_at = at_petra(&character);
+    let _ = game
+        .update_npc_visibility(&petra_at)
+        .expect("Petra visibility updates");
+    let _ = open_end_screen(&mut game, &petra_at, PETRA, GIVEN_TO_GUARD, &mut now);
+    let pending = saved(&game);
+    now += 100;
+    assert_refusal_changes_nothing(
+        &mut game,
+        &petra_at,
+        &quest_end_reply(SEARCH_BLACKSPORE),
+        now,
+        "wrong quest with the C6 screen open",
+    );
+    assert_eq!(
+        game.state().npc_quests.as_ref().unwrap().pending_turnin,
+        Some(GIVEN_TO_GUARD)
+    );
+    assert_eq!(saved(&game), pending);
+
+    // Near cap: the checked coin grant refuses for this player without paying anything.
+    let wallet = game.state().inventory.coins;
+    let mut capped = game.state();
+    capped.inventory.coins = i32::MAX as u32 - 2;
+    let mut capped = load_game(Some(capped));
+    let capped_before = saved(&capped);
+    let capped_xp = profile_xp(&capped, BRAWLER);
+    let capped_items = capped.state().inventory.items.clone();
+    now += 100;
+    let refused = capped.handle_in_world(&quest_end_reply(GIVEN_TO_GUARD), &petra_at, now);
+    assert!(
+        refused.is_err(),
+        "a near-cap wallet must refuse the turn-in, not panic"
+    );
+    assert_eq!(
+        saved(&capped),
+        capped_before,
+        "the near-cap refusal changed the save"
+    );
+    assert_eq!(
+        capped.state().npc_quests.as_ref().unwrap().pending_turnin,
+        Some(GIVEN_TO_GUARD),
+        "the near-cap refusal consumed the end screen"
+    );
+    assert_eq!(capped.state().inventory.coins, i32::MAX as u32 - 2);
+    assert_eq!(capped.state().inventory.items, capped_items);
+    assert_eq!(profile_xp(&capped, BRAWLER), capped_xp);
+
+    // The same save with the wallet restored pays exactly once.
+    let mut restored = capped.state();
+    restored.inventory.coins = wallet;
+    let mut game = load_game(Some(restored));
+    now += 100;
+    let paid = game
+        .handle_in_world(&quest_end_reply(GIVEN_TO_GUARD), &petra_at, now)
+        .expect("the restored wallet pays the turn-in");
+    assert!(paid.changed);
+    assert_eq!(game.state().inventory.coins, wallet + QUEST_REWARD_COINS);
+    assert_eq!(profile_xp(&game, BRAWLER), capped_xp + QUEST_REWARD_JOB_XP);
+    assert_eq!(
+        game.state().npc_quests.as_ref().unwrap().quests[&GIVEN_TO_GUARD].status,
+        QuestStatus::Completed
+    );
+    let paid = saved(&game);
+    for (packet, label) in [
+        (quest_end_reply(GIVEN_TO_GUARD), "replayed C6 turn-in"),
+        (quest_reply(GIVEN_TO_GUARD, true), "replayed C6 accept"),
+    ] {
+        now += 100;
+        assert_refusal_changes_nothing(&mut game, &petra_at, &packet, now, label);
+    }
+    assert_eq!(saved(&game), paid);
+}
+
+/// T331 edge case 2: the accepted state, the counter and the pending end screen are all in the
+/// character save; the grant key pays once across a reload.
+#[test]
+fn progress_survives_a_reload() {
+    let (mut game, character) = fresh_game();
+    let mut now = 30_000;
+    complete_chapter_and_accept_c6(&mut game, &character, &mut now);
+    let accepted = saved(&game);
+
+    // Reload after accept: the quest is active with its counter at zero and no offer pending.
+    game = load_game(Some(game.state()));
+    assert_eq!(saved(&game), accepted, "the accept save changed on load");
+    let accepted_state = game.state();
+    let quests = accepted_state.npc_quests.as_ref().unwrap();
+    assert_eq!(quests.quests[&GIVEN_TO_GUARD].status, QuestStatus::Active);
+    assert_eq!(quests.quests[&GIVEN_TO_GUARD].counts, vec![0]);
+    assert_eq!(quests.pending_turnin, None);
+
+    // Reload after the Petra Talk: the completed counter and the pending end screen persist.
+    let at = at_petra(&character);
+    let _ = open_end_screen(&mut game, &at, PETRA, GIVEN_TO_GUARD, &mut now);
+    let pending = saved(&game);
+    game = load_game(Some(game.state()));
+    assert_eq!(saved(&game), pending, "the pending save changed on load");
+    let pending_state = game.state();
+    let quests = pending_state.npc_quests.as_ref().unwrap();
+    assert_eq!(quests.quests[&GIVEN_TO_GUARD].counts, vec![1]);
+    assert_eq!(quests.pending_turnin, Some(GIVEN_TO_GUARD));
+
+    let coins_before = game.state().inventory.coins;
+    let xp_before = profile_xp(&game, BRAWLER);
+    finish_turnin(&mut game, &at, GIVEN_TO_GUARD, &mut now);
+    let paid = saved(&game);
+
+    // Reload after payment: Completed, the coins and the XP persist; a replay pays nothing.
+    game = load_game(Some(game.state()));
+    assert_eq!(saved(&game), paid, "the paid save changed on load");
+    let state = game.state();
+    assert_eq!(
+        state.npc_quests.as_ref().unwrap().quests[&GIVEN_TO_GUARD].status,
+        QuestStatus::Completed
+    );
+    assert_eq!(state.npc_quests.as_ref().unwrap().pending_turnin, None);
+    assert_eq!(state.inventory.coins, coins_before + QUEST_REWARD_COINS);
+    assert_eq!(profile_xp(&game, BRAWLER), xp_before + QUEST_REWARD_JOB_XP);
+    now += 100;
+    assert_refusal_changes_nothing(
+        &mut game,
+        &at,
+        &quest_end_reply(GIVEN_TO_GUARD),
+        now,
+        "replayed C6 turn-in after relog",
+    );
+    assert_eq!(saved(&game), paid);
+}
+
+/// T331 edge case 5: two Brawlers own their offer, counter and reward; one player's refusal
+/// changes neither the other player nor the first player's held end screen.
+#[test]
+fn two_brawlers_progress_independently() {
+    let (mut first, first_character) = fresh_game_for(CHARACTER);
+    let (mut second, second_character) = fresh_game_for(SECOND_CHARACTER);
+    let mut now = 34_000;
+    complete_chapter_and_accept_c6(&mut first, &first_character, &mut now);
+    complete_chapter_and_accept_c6(&mut second, &second_character, &mut now);
+    let first_at = at_petra(&first_character);
+    let second_at = at_petra(&second_character);
+
+    // The first player's Talk and held screen leave the second player untouched.
+    let second_before = saved(&second);
+    let _ = first
+        .update_npc_visibility(&first_at)
+        .expect("first Petra visibility updates");
+    let _ = open_end_screen(&mut first, &first_at, PETRA, GIVEN_TO_GUARD, &mut now);
+    assert_eq!(
+        saved(&second),
+        second_before,
+        "the first player's Talk changed the second player"
+    );
+
+    // A near-cap wallet refuses the first player's turn-in and changes nothing.
+    let first_wallet = first.state().inventory.coins;
+    let mut capped = first.state();
+    capped.inventory.coins = i32::MAX as u32 - 2;
+    first = load_game_for(CHARACTER, Some(capped));
+    let capped_before = saved(&first);
+    now += 100;
+    assert!(
+        first
+            .handle_in_world(&quest_end_reply(GIVEN_TO_GUARD), &first_at, now)
+            .is_err(),
+        "the near-cap wallet must refuse the first player's turn-in"
+    );
+    assert_eq!(saved(&first), capped_before);
+    assert_eq!(saved(&second), second_before);
+
+    // The second player turns in normally and is paid once.
+    let _ = second
+        .update_npc_visibility(&second_at)
+        .expect("second Petra visibility updates");
+    let _ = open_end_screen(&mut second, &second_at, PETRA, GIVEN_TO_GUARD, &mut now);
+    let second_coins = second.state().inventory.coins;
+    let second_xp = profile_xp(&second, BRAWLER);
+    finish_turnin(&mut second, &second_at, GIVEN_TO_GUARD, &mut now);
+    assert_eq!(
+        second.state().inventory.coins,
+        second_coins + QUEST_REWARD_COINS
+    );
+    assert_eq!(
+        profile_xp(&second, BRAWLER),
+        second_xp + QUEST_REWARD_JOB_XP
+    );
+    assert_eq!(
+        second.state().npc_quests.as_ref().unwrap().quests[&GIVEN_TO_GUARD].status,
+        QuestStatus::Completed
+    );
+    assert_eq!(
+        saved(&first),
+        capped_before,
+        "the second player's payment changed the first player"
+    );
+
+    // The first player's own save retries and pays once after the wallet is restored.
+    let mut restored = first.state();
+    restored.inventory.coins = first_wallet;
+    first = load_game_for(CHARACTER, Some(restored));
+    let first_xp = profile_xp(&first, BRAWLER);
+    now += 100;
+    let paid = first
+        .handle_in_world(&quest_end_reply(GIVEN_TO_GUARD), &first_at, now)
+        .expect("the first player's restored wallet pays");
+    assert!(paid.changed);
+    assert_eq!(
+        first.state().inventory.coins,
+        first_wallet + QUEST_REWARD_COINS
+    );
+    assert_eq!(profile_xp(&first, BRAWLER), first_xp + QUEST_REWARD_JOB_XP);
+    assert_eq!(
+        first.state().npc_quests.as_ref().unwrap().character_id,
+        CHARACTER
+    );
+    assert_eq!(
+        second.state().npc_quests.as_ref().unwrap().character_id,
+        SECOND_CHARACTER
+    );
+    // Each session still holds only its own paid quest.
+    let second_paid = saved(&second);
+    now += 100;
+    assert_refusal_changes_nothing(
+        &mut first,
+        &first_at,
+        &quest_end_reply(GIVEN_TO_GUARD),
+        now,
+        "the first player's replay",
+    );
+    assert_eq!(saved(&second), second_paid);
+}
+
+/// T331 test 7: one unique drawable Petra row reaches the production 35/2 path for two
+/// independent sessions, stands on standable ground, and resolves Sabastian, Petra and C6.
+#[test]
+fn the_spawn_and_content_are_reachable() {
+    let row = petra_spawn_row();
+    assert_eq!(row["content_key"].as_u64(), Some(PETRA));
+    assert_eq!(row["legacy_npc_id"].as_u64(), Some(PETRA_LEGACY_NPC_ID));
+    assert_eq!(row["model_id"].as_i64(), Some(i64::from(PETRA_MODEL)));
+    assert_eq!(
+        row["model_file_name"].as_str(),
+        Some("fairy_f_freestyle_01.agr")
+    );
+    assert_eq!(row["name"].as_str(), Some("Petra"));
+    assert_eq!(
+        row["name_string_id"].as_i64(),
+        Some(i64::from(PETRA_NAME_STRING_ID))
+    );
+    assert_eq!(row["heading"].as_f64(), Some(0.0));
+    assert!(row["capture_match"].is_null());
+    let spawn = petra_spawn_position();
+    assert!(spawn.iter().all(|axis| axis.is_finite()));
+
+    // Unique ids: no second row aliases Petra's actor id or content key.
+    let document: Value =
+        serde_json::from_slice(&fs::read(content_dir().join("npc_spawns_extra.json")).unwrap())
+            .unwrap();
+    let rows = document["records"].as_array().unwrap();
+    assert_eq!(
+        rows.iter()
+            .filter(|row| row["spawn_guid"].as_u64() == Some(PETRA))
+            .count(),
+        1,
+        "Petra's actor id is unique"
+    );
+    assert_eq!(
+        rows.iter()
+            .filter(|row| row["content_key"].as_u64() == Some(PETRA))
+            .count(),
+        1,
+        "Petra's content key is unique"
+    );
+
+    // The production draw set binds the actor to her content key, and two independent
+    // sessions receive the same 35/2 actor name/model/position.
+    let visibility = NpcVisibility::load(&content_dir()).expect("NPC visibility loads");
+    assert_eq!(visibility.content_key(PETRA), Some(PETRA));
+    let mut drawn = Vec::new();
+    for character_id in [CHARACTER, SECOND_CHARACTER] {
+        let mut game = load_game_for(character_id, None);
+        let character = CharacterState {
+            guid: character_id,
+            ..character_at(spawn)
+        };
+        let packets = game
+            .update_npc_visibility(&character)
+            .expect("NPC visibility updates");
+        let actor = packets
+            .iter()
+            .filter_map(|packet| startup_world::parse_add_npc(packet).ok())
+            .find(|npc| npc.actor_id == PETRA)
+            .unwrap_or_else(|| panic!("session {character_id} did not receive Petra's 35/2"));
+        assert_eq!(actor.model_id, PETRA_MODEL);
+        assert_eq!(actor.name_string_id, PETRA_NAME_STRING_ID);
+        for axis in 0..3 {
+            assert!(
+                (actor.position[axis] - spawn[axis]).abs() <= 0.001,
+                "session {character_id}: Petra's axis {axis} differs"
+            );
+        }
+        drawn.push((
+            actor.actor_id,
+            actor.model_id,
+            actor.name_string_id,
+            actor.position,
+        ));
+    }
+    assert_eq!(drawn[0], drawn[1], "both sessions must draw the same Petra");
+
+    // The authored content row is unchanged and reaches the drawable actor's click range.
+    let interaction = NpcInteraction::load(
+        &content_dir().join("npcs"),
+        &content_dir().join("stores.json"),
+    )
+    .expect("NPC interaction content loads");
+    let (petra_zone, petra_position) = interaction
+        .location(PETRA)
+        .expect("Petra is a positioned content NPC");
+    let (sabastian_zone, sabastian_position) = interaction
+        .location(SABASTIAN)
+        .expect("Sabastian is a positioned content NPC");
+    assert_eq!(petra_zone, 1);
+    assert_eq!(sabastian_zone, 1);
+    for (axis, expected) in [-2141.724403_f32, -32.948, 1045.102653].iter().enumerate() {
+        assert!(
+            (petra_position[axis] - expected).abs() <= 0.001,
+            "T331 must not move Petra's content row"
+        );
+    }
+    for (axis, expected) in [-1998.09_f32, -27.43718, 1156.538].iter().enumerate() {
+        assert!(
+            (sabastian_position[axis] - expected).abs() <= 0.001,
+            "T331 must not move Sabastian's content row"
+        );
+    }
+    let delta =
+        ((spawn[0] - petra_position[0]).powi(2) + (spawn[2] - petra_position[2]).powi(2)).sqrt();
+    assert!(
+        delta <= 5.0,
+        "the drawable spawn must stay inside the sampled 5 m authoring disc ({delta} m)"
+    );
+
+    // The spawn stands on ground and its full 5 m disc is standable (<= 25 degrees).
+    let terrain =
+        Terrain::load(&Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../lab/terrain"))
+            .expect("the shipped zone-0 terrain grid loads");
+    let grid = terrain.grid(0).expect("zone 0 terrain is loaded");
+    let ground = grid
+        .height_at(spawn[0], spawn[2])
+        .expect("the spawn is on the terrain grid");
+    assert!(
+        (spawn[1] - ground).abs() <= 0.1,
+        "spawn y {} is {:.4} m from the sampled ground {ground}",
+        spawn[1],
+        spawn[1] - ground
+    );
+    let disc = disc_points(spawn[0], spawn[2]);
+    assert_eq!(disc.len(), 105);
+    let mut max_slope = 0.0_f32;
+    for (x, z) in &disc {
+        assert!(
+            grid.height_at(*x, *z).is_some(),
+            "disc sample ({x}, {z}) has no ground"
+        );
+        let slope = slope_degrees(grid, *x, *z).expect("the 1 m slope footprint is covered");
+        max_slope = max_slope.max(slope);
+    }
+    for angle in (0..360).step_by(15) {
+        let radians = (angle as f32).to_radians();
+        let (x, z) = (
+            spawn[0] + 5.0 * radians.cos(),
+            spawn[2] + 5.0 * radians.sin(),
+        );
+        assert!(
+            grid.height_at(x, z).is_some(),
+            "ring sample {angle} degrees has no ground"
+        );
+    }
+    assert!(
+        max_slope <= 25.0,
+        "the 5 m authoring disc reaches {max_slope:.2} degrees"
+    );
+
+    // Sabastian, Petra and C6 resolve through the production quest catalogue.
+    let engine = QuestEngine::from_split_content(&content_dir(), CHARACTER, eligibility(), None)
+        .expect("the split quest catalogue loads");
+    assert!(engine.is_enabled(GIVEN_TO_GUARD));
+    assert_eq!(engine.giver_npc_id(GIVEN_TO_GUARD), Some(SABASTIAN));
+    assert_eq!(engine.title_string_id(GIVEN_TO_GUARD), Some(130_857));
+    assert!(
+        engine
+            .quest_ids_for_giver(SABASTIAN)
+            .any(|quest_id| quest_id == GIVEN_TO_GUARD),
+        "Sabastian's catalogue lists C6"
+    );
+    let end = engine
+        .quest_end_packet(GIVEN_TO_GUARD, PETRA)
+        .expect("C6 encodes its end screen");
+    assert_eq!(u64::from_le_bytes(end[6..14].try_into().unwrap()), PETRA);
+    assert_eq!(
+        u32::from_le_bytes(end[14..18].try_into().unwrap()),
+        GIVEN_TO_GUARD
+    );
+    assert_eq!(
+        i32::from_le_bytes(end[27..31].try_into().unwrap()),
+        i32::try_from(QUEST_REWARD_COINS).unwrap(),
+        "the end screen displays the five-coin reward"
+    );
+    assert_eq!(
+        i32::from_le_bytes(end[31..35].try_into().unwrap()),
+        i32::try_from(QUEST_REWARD_JOB_XP).unwrap(),
+        "the end screen displays the 25 Brawler XP reward"
     );
 }
