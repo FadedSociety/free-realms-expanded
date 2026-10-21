@@ -22,7 +22,7 @@ use std::{
     net::{SocketAddr, UdpSocket},
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
-    time::Duration,
+    time::{Duration, Instant},
 };
 
 #[path = "common/group_invite_wire.rs"]
@@ -285,6 +285,8 @@ struct Client {
     sender: ReliableSender,
     receiver: ReliableReceiver,
     clock_ms: u64,
+    /// Every message this client sent, for the no-dev-command audit.
+    sent: Vec<Vec<u8>>,
 }
 
 impl Client {
@@ -327,10 +329,12 @@ impl Client {
             receiver: ReliableReceiver::new(0, 1024, MAX_MESSAGE, 2 * 1024 * 1024).unwrap(),
             codec,
             clock_ms: 0,
+            sent: Vec::new(),
         }
     }
 
     fn send(&mut self, server: &mut Server, message: &[u8]) -> Vec<Vec<u8>> {
+        self.sent.push(message.to_vec());
         self.sender.queue_message(message).unwrap();
         self.clock_ms += 1;
         for wire in self.sender.poll(self.clock_ms).unwrap() {
@@ -342,6 +346,7 @@ impl Client {
 
     fn drain(&mut self, server: &mut Server) -> Vec<Vec<u8>> {
         let mut messages = Vec::new();
+        let mut pending_acks = 0;
         for _ in 0..512 {
             let mut buffer = [0; 65_535];
             let Ok((length, _)) = self.socket.recv_from(&mut buffer) else {
@@ -359,7 +364,15 @@ impl Client {
                     let ack = ack.packet();
                     let wire = self.codec.encode(ack.opcode, &ack.payload).unwrap();
                     self.socket.send_to(&wire, self.server).unwrap();
-                    server.step().unwrap();
+                    // A step after every ack pays the server's 10 ms socket
+                    // timeout per packet. Batch a window's worth so a content
+                    // login cannot keep a live session unacked past its 10 s
+                    // retry limit.
+                    pending_acks += 1;
+                    if pending_acks == 32 {
+                        server.step().unwrap();
+                        pending_acks = 0;
+                    }
                 }
             }
         }
@@ -1164,4 +1177,1328 @@ fn two_clients_share_world_routing_but_keep_their_sessions_and_saves() {
             .any(|message| is_family_byte_sub(message, 74, 3))
     );
     assert_eq!(server.active_session_count(), 1);
+}
+
+// ---------------------------------------------------------------------------
+// T335: the two-player playtest loop (visibility, group, chat, shared kill,
+// two saves). The field tests run on this same real `Server`/`Client` harness;
+// they add one scratch content tree built from the opening fixture plus the
+// repository content (the T301/T256 pattern) and one synthetic defeat quest,
+// so the quest id and reward values are test content, not retail values.
+//
+// Client evidence (2014 client, `lab/autopilot/ida_query.py`): AddPc
+// constructor `0x0091d000` (the vtable slot invoked from `0x0092feca`), 26/8
+// `0x008b6bc0`, 26/10 `0x00a36f80`, 26/6 `0x009f5890`, 36/10 writer
+// `0x00a342e0` / request path `0x00a35150`, 49/9 `0x00c7af60`, 49/10
+// `0x00c7b070`, 49/13 `0x00c7b990`. The family-40 shapes come from
+// `tests/common/group_invite_wire.rs` and `notes/Research/Friends and
+// Groups.md`; no new wire shape is introduced.
+// ---------------------------------------------------------------------------
+
+#[path = "support/npc_quest_chain.rs"]
+mod npc_quest_chain;
+
+use npc_quest_chain::{Fixture as ContentFixture, content_dir};
+
+const T335_GIVER: u64 = 9_700_000_335;
+const T335_QUEST: u32 = 3_999_990;
+const T335_WOLF_DEFINITION: i32 = 3_156;
+const T335_WOLF_ONE: u64 = 131_000_335_001;
+const T335_WOLF_TWO: u64 = 131_000_335_002;
+const T335_WOLF_THREE: u64 = 131_000_335_003;
+const T335_WOLF_FOUR: u64 = 131_000_335_004;
+const T335_BRAWLER: i32 = 43;
+const T335_ITEM: i32 = 8;
+const T335_QUEST_COINS: u32 = 10;
+const T335_QUEST_XP: u32 = 20;
+/// `data/content/field_kill_rewards.json` level 1-2 band.
+const T335_FIELD_COINS: i32 = 2;
+const T335_FIELD_XP: i32 = 5;
+const T335_TALK_LABEL: u32 = 3_300;
+const T335_QUEST_CHOICE: i32 = 301;
+const T335_TITLE: u32 = 9_700_351;
+const T335_END_TEXT: u32 = 9_700_352;
+/// The opening fixture's `encounters.json` world pose (zone 0), which
+/// `Gameplay::initial_character` gives every new session.
+const T335_START: [f32; 3] = [-1904.883, -39.7098, 412.6024];
+const T335_PATIENCE: Duration = Duration::from_secs(30);
+
+/// One private gameplay content tree: the opening fixture's profile,
+/// inventory and opening files, the repository's zone/job/field-reward files,
+/// then the synthetic T335 quest giver and four field wolves.
+struct PlaytestContent {
+    fixture: ContentFixture,
+}
+
+impl PlaytestContent {
+    fn new() -> Self {
+        let fixture = ContentFixture::for_character(2);
+        // Copy only the files this loop reads. The full T301 overlay's NPC,
+        // quest and pet tree costs ~20 s to load per content login, long
+        // enough for another live session to outlive its reliable retries.
+        for name in [
+            "zones.json",
+            "jobs.json",
+            "field_kill_rewards.json",
+            "npc_spawns_extra.json",
+        ] {
+            fs::copy(content_dir().join(name), fixture.path().join(name)).unwrap();
+        }
+        let _ = fs::create_dir_all(fixture.path().join("quests"));
+        let _ = fs::create_dir_all(fixture.path().join("npcs"));
+        write_json(
+            &fixture.path().join("stores.json"),
+            json!({"schema_version": 1, "marketplace": {
+                "enabled_on_handshake": false, "orders_enabled": false,
+                "payment_sources_enabled": false, "not_available_message": "disabled"
+            }, "items": []}),
+        );
+        write_json(
+            &fixture.path().join("vendors.json"),
+            json!({"schema_version": 1, "vendors": []}),
+        );
+        write_json(&fixture.path().join("field_enemies.json"), t335_wolves());
+        write_json(
+            &fixture.path().join("quests/t335.json"),
+            t335_quest_content(),
+        );
+        write_json(&fixture.path().join("npcs/t335.json"), t335_giver_content());
+        let jobs_path = fixture.path().join("jobs.json");
+        let mut jobs = npc_quest_chain::read_json(&jobs_path);
+        // The split loader requires every `job.quest_ids` entry to have a quest
+        // definition. Only this loop's synthetic quest is in the fixture, so
+        // clear the shipped references this test does not copy.
+        for job in jobs["records"]
+            .as_array_mut()
+            .expect("jobs.json records")
+            .iter_mut()
+        {
+            job["quest_ids"] = json!([]);
+        }
+        let brawler = jobs["records"]
+            .as_array_mut()
+            .expect("jobs.json records")
+            .iter_mut()
+            .find(|job| job["id"] == "brawler")
+            .expect("the Brawler job row");
+        brawler["quest_ids"] = json!([T335_QUEST]);
+        write_json(&jobs_path, jobs);
+        Self { fixture }
+    }
+
+    fn path(&self) -> &Path {
+        self.fixture.path()
+    }
+}
+
+fn write_json(path: &Path, value: serde_json::Value) {
+    fs::write(
+        path,
+        serde_json::to_vec(&value).expect("fixture JSON serializes"),
+    )
+    .unwrap_or_else(|error| panic!("fixture {} writes: {error}", path.display()));
+}
+
+fn t335_source() -> serde_json::Value {
+    json!([{
+        "kind": "reconstructed",
+        "evidence": "(R) T335 synthetic two-player acceptance content: test-only values, not recovered retail rewards."
+    }])
+}
+
+/// A stationary field wolf. Damage 0 and a long attack clock keep the two-
+/// player loop deterministic; ownership of the kill is what the test varies.
+fn t335_wolf(guid: u64, position: [f32; 3]) -> serde_json::Value {
+    json!({
+        "guid": guid,
+        "definition_id": T335_WOLF_DEFINITION,
+        "model_id": 3284,
+        "name_id": 5_100_200,
+        "name": "Synthetic T335 wolf",
+        "texture_alias": "",
+        "position": position,
+        "max_health": 200,
+        "damage": 0,
+        "boss": false,
+        "level": 1,
+        "respawn_seconds": 600,
+        "aggro_range": 8.0,
+        "leash_radius": 12.0,
+        "behaviour": {"mode": "stationary", "reach": 2.5, "attack_ms": 1_000_000},
+        "quest_ids": [],
+        "source": t335_source()
+    })
+}
+
+fn t335_wolves() -> serde_json::Value {
+    json!({
+        "schema_version": 1,
+        "enemies": [
+            t335_wolf(T335_WOLF_ONE, [T335_START[0], T335_START[1], T335_START[2] + 1.0]),
+            t335_wolf(T335_WOLF_TWO, [T335_START[0] + 1.0, T335_START[1], T335_START[2]]),
+            t335_wolf(T335_WOLF_THREE, [T335_START[0], T335_START[1], T335_START[2] - 1.0]),
+            t335_wolf(T335_WOLF_FOUR, [T335_START[0] - 1.0, T335_START[1], T335_START[2]]),
+        ]
+    })
+}
+
+/// One synthetic defeat quest: one wolf defeat, 10 coins, 20 Brawler job XP
+/// and one item 8, then a Talk to the giver for the turn-in.
+fn t335_quest_content() -> serde_json::Value {
+    json!({
+        "schema_version": 1,
+        "records": [{
+            "id": T335_QUEST,
+            "title_string_id": T335_TITLE,
+            "end_text_string_id": T335_END_TEXT,
+            "giver_npc_id": T335_GIVER,
+            "prerequisite_quest_ids": [],
+            "objectives": [{
+                "kind": "defeat",
+                "id": 1,
+                "model_id": T335_WOLF_DEFINITION,
+                "count": 1,
+                "source": t335_source()
+            }],
+            "rewards": [{
+                "coins": T335_QUEST_COINS,
+                "items": [{"definition_id": T335_ITEM, "count": 1, "source": t335_source()}],
+                "job_xp": {"43": T335_QUEST_XP},
+                "source": t335_source()
+            }],
+            "source": t335_source(),
+            "enabled": true
+        }]
+    })
+}
+
+/// A drawable regional giver: `legacy_data` plus a finite position is the
+/// production draw rule, and `npc_id` is the runtime actor id.
+fn t335_giver_content() -> serde_json::Value {
+    json!({
+        "schema_version": 1,
+        "records": [{
+            "npc_id": T335_GIVER,
+            "name": "Synthetic T335 giver",
+            "name_string_id": 19_685,
+            "zone_id": 0,
+            "position": [T335_START[0] + 2.0, T335_START[1], T335_START[2]],
+            "placement": "legacy_data",
+            "model_id": 958,
+            "roles": ["quest_giver"],
+            "quest_ids_given": [],
+            "quests_given": [],
+            "quests_accepted": [],
+            "source": t335_source()
+        }]
+    })
+}
+
+/// The captured reference's client version, which its manifest pins and the
+/// login request must repeat.
+fn field_version() -> String {
+    let reference = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab/references/rust-gateway-reference");
+    let manifest: serde_json::Value =
+        serde_json::from_slice(&fs::read(reference.join("manifest.json")).unwrap()).unwrap();
+    manifest["client_version"].as_str().unwrap().to_owned()
+}
+
+/// A content-backed two-session server: the captured reference, the account
+/// store fixture and the private content tree above.
+fn start_field_server(temp: &TempDir, content: &Path) -> (Server, PathBuf) {
+    // The captured reference's typed self-data carries the configured job
+    // rows the content-bound self message patches; the synthetic reference
+    // above cannot (it has no profile rows).
+    let reference = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab/references/rust-gateway-reference");
+    let account_store = create_account_store(&temp.0);
+    let server = Server::new(Options {
+        bind: "127.0.0.1:0".parse().unwrap(),
+        reference,
+        state: temp.0.join("gateway-state.json"),
+        content: Some(content.to_owned()),
+        identity: None,
+        account_store: Some(account_store.clone()),
+        gateway_ticket: "synthetic-ticket".into(),
+        handoff_key: b"synthetic-handoff-key".to_vec(),
+        seconds: 0,
+        dev_tools: true,
+        studio_port: 0,
+        client_logs: None,
+        terrain: None,
+        world: None,
+        stock_text: None,
+        allow_lan: false,
+        security_log: Some(temp.0.join("security.jsonl")),
+        group_invite_ttl_ms: osfr_tools::social_lists::DEFAULT_GROUP_INVITE_TTL_MS,
+        guild_invite_ttl_ms: osfr_tools::guilds::DEFAULT_INVITE_WINDOW_MS,
+    })
+    .unwrap();
+    (server, account_store)
+}
+
+/// Service every client and the server for `duration`, returning each
+/// client's drained messages. The server only ticks the shared field on its
+/// 20 Hz clock, so a test that waits must keep stepping.
+fn pump(server: &mut Server, clients: &mut [&mut Client], duration: Duration) -> Vec<Vec<Vec<u8>>> {
+    let mut out = vec![Vec::new(); clients.len()];
+    let deadline = Instant::now() + duration;
+    while Instant::now() < deadline {
+        server.step().unwrap();
+        for (index, client) in clients.iter_mut().enumerate() {
+            out[index].extend(client.drain(server));
+        }
+        std::thread::sleep(Duration::from_millis(1));
+    }
+    out
+}
+
+/// Pump until `done` observes the expected server state, or fail after
+/// `timeout`. The returned messages are per client, in `clients` order.
+fn wait_until(
+    server: &mut Server,
+    clients: &mut [&mut Client],
+    timeout: Duration,
+    mut done: impl FnMut(&Server) -> bool,
+) -> Vec<Vec<Vec<u8>>> {
+    let deadline = Instant::now() + timeout;
+    let mut out = vec![Vec::new(); clients.len()];
+    loop {
+        let batch = pump(server, clients, Duration::from_millis(10));
+        for (index, messages) in batch.into_iter().enumerate() {
+            out[index].extend(messages);
+        }
+        if done(server) {
+            return out;
+        }
+        assert!(Instant::now() < deadline, "T335 loop condition not reached");
+    }
+}
+
+/// Pump every client until the server's reliable queues are idle, so the
+/// next blocking content login cannot outlive another session's retries.
+fn settle(server: &mut Server, clients: &mut [&mut Client]) -> Vec<Vec<Vec<u8>>> {
+    wait_until(server, clients, T335_PATIENCE, |server| {
+        server.test_queues_idle()
+    })
+}
+
+fn knows(server: &Server, guid: u64, actor: u64) -> bool {
+    server.test_location(guid).is_some() && server.test_known_npcs(guid).contains(&actor)
+}
+
+/// The full application body after the 7-byte tunnel header.
+fn family_body(message: &[u8], family: u16, sub: u16) -> Option<&[u8]> {
+    (message.len() >= 11
+        && message[..3] == [5, 0, 1]
+        && u16::from_le_bytes(message[7..9].try_into().unwrap()) == family
+        && u16::from_le_bytes(message[9..11].try_into().unwrap()) == sub)
+        .then(|| &message[7..])
+}
+
+/// One tunneled gameplay request (outer 5).
+fn app(client: &mut Client, server: &mut Server, inner: &[u8]) -> Vec<Vec<u8>> {
+    client.send(server, &application(5, inner))
+}
+
+#[derive(Debug, PartialEq)]
+struct AddPc {
+    character_guid: u64,
+    first: String,
+    last: String,
+    model: i32,
+    active_profile: i32,
+}
+
+fn read_len_string(bytes: &[u8], at: &mut usize) -> Option<String> {
+    let length = i32::from_le_bytes(bytes.get(*at..*at + 4)?.try_into().ok()?);
+    let length = usize::try_from(length).ok()?;
+    *at += 4;
+    let text = std::str::from_utf8(bytes.get(*at..*at + length)?)
+        .ok()?
+        .to_owned();
+    *at += length;
+    Some(text)
+}
+
+/// Read 35/1 AddPc in the field order `players.rs::build_add_pc` writes and
+/// the client `0x0091d000` constructor initializes: header, guid, three name
+/// ids, first/last name, model, three bubble fields, pose, attachments, the
+/// appearance block, speed and flags, temporary model, guild, active profile.
+fn parse_add_pc(message: &[u8]) -> Option<AddPc> {
+    let body = family_body(message, 35, 1)?;
+    let character_guid = u64::from_le_bytes(body.get(4..12)?.try_into().ok()?);
+    let mut at = 12 + 12; // three name ids
+    let first = read_len_string(body, &mut at)?;
+    let last = read_len_string(body, &mut at)?;
+    let model = i32::from_le_bytes(body.get(at..at + 4)?.try_into().ok()?);
+    at += 4 + 12 + 16 + 16; // three bubble fields, position, rotation
+    let rows = u32::from_le_bytes(body.get(at..at + 4)?.try_into().ok()?);
+    at += 4;
+    for _ in 0..rows {
+        for _ in 0..3 {
+            read_len_string(body, &mut at)?;
+        }
+        at += 12;
+    }
+    read_len_string(body, &mut at)?; // head
+    read_len_string(body, &mut at)?; // hair
+    at += 4 + 4 + 4; // hair colour, eye colour, unknown3
+    read_len_string(body, &mut at)?; // skin tone
+    read_len_string(body, &mut at)?; // face paint
+    read_len_string(body, &mut at)?; // model customisation
+    at += 4 + 3 + 4 + 4; // speed, three flags, temporary model, guild
+    let active_profile = i32::from_le_bytes(body.get(at..at + 4)?.try_into().ok()?);
+    Some(AddPc {
+        character_guid,
+        first,
+        last,
+        model,
+        active_profile,
+    })
+}
+
+fn select_job(profile: i32) -> Vec<u8> {
+    let mut out = vec![26, 0, 13, 0];
+    out.extend(profile.to_le_bytes());
+    out
+}
+
+fn npc_interact(target: u64) -> Vec<u8> {
+    let mut out = vec![26, 0, 8, 0];
+    out.extend(target.to_le_bytes());
+    out.push(0);
+    out
+}
+
+fn menu_select(target: u64, choice: i32) -> Vec<u8> {
+    let mut out = vec![26, 0, 10, 0];
+    out.extend(target.to_le_bytes());
+    out.extend(choice.to_le_bytes());
+    out
+}
+
+fn dialogue_choice(row: i32) -> Vec<u8> {
+    let mut out = vec![26, 0, 6, 0];
+    out.extend(row.to_le_bytes());
+    out
+}
+
+fn quest_accept(quest: u32) -> Vec<u8> {
+    let mut out = vec![49, 0, 2, 0, 0, 0];
+    out.extend(quest.to_le_bytes());
+    out.push(1);
+    out
+}
+
+fn quest_turn_in(quest: u32) -> Vec<u8> {
+    let mut out = vec![49, 0, 14, 0, 0, 0];
+    out.extend(quest.to_le_bytes());
+    out
+}
+
+/// 36/10 `ClientRequestStartAbility`: bar, slot, target mode then the target
+/// guid (writer `0x00a342e0`; the same 24-byte body `shared_field_state` pins).
+fn field_attack(client: &mut Client, server: &mut Server, target: u64) -> Vec<Vec<u8>> {
+    let mut body = vec![10, 0];
+    for value in [1i32, 0, 0] {
+        body.extend(value.to_le_bytes());
+    }
+    body.extend(target.to_le_bytes());
+    client.send(server, &packet(36, &body))
+}
+
+/// The selected option id for `label` in the 26/9 interaction menu. 26/9
+/// reader `008b6bc0`'s menu: count at 13, 28-byte rows from 17, label at +8.
+fn menu_choice(messages: &[Vec<u8>], target: u64, label: u32) -> i32 {
+    let body = messages
+        .iter()
+        .find_map(|message| family_body(message, 26, 9))
+        .expect("26/8 returns the 26/9 interaction menu");
+    assert_eq!(
+        body.get(4..12),
+        Some(target.to_le_bytes().as_slice()),
+        "the menu names the clicked actor"
+    );
+    let count = i32::from_le_bytes(body.get(13..17).expect("menu count").try_into().unwrap());
+    assert!(count > 0, "the interaction menu has no options");
+    (0..count)
+        .find_map(|index| {
+            let offset = 17 + usize::try_from(index).unwrap() * 28;
+            let id = i32::from_le_bytes(body.get(offset..offset + 4)?.try_into().unwrap());
+            let string_id =
+                u32::from_le_bytes(body.get(offset + 8..offset + 12)?.try_into().unwrap());
+            (string_id == label).then_some(id)
+        })
+        .unwrap_or_else(|| panic!("menu label {label} is absent"))
+}
+
+fn save_json(temp: &TempDir, guid: u64) -> serde_json::Value {
+    serde_json::from_slice(
+        &fs::read(temp.0.join(format!("characters/{guid}.json")))
+            .expect("the character save exists"),
+    )
+    .expect("the character save is JSON")
+}
+
+fn saved_coins(temp: &TempDir, guid: u64) -> i32 {
+    i32::try_from(
+        save_json(temp, guid)["gameplay"]["inventory"]["coins"]
+            .as_i64()
+            .expect("the saved coin balance"),
+    )
+    .unwrap()
+}
+
+fn saved_job_xp(temp: &TempDir, guid: u64, profile: i32) -> i32 {
+    i32::try_from(
+        save_json(temp, guid)["gameplay"]["profiles"]["experience"][profile.to_string()]
+            .as_i64()
+            .unwrap_or(0),
+    )
+    .unwrap()
+}
+
+fn quest_counts(save: &serde_json::Value, quest: u32) -> Vec<u32> {
+    save["gameplay"]["npc_quests"]["quests"][quest.to_string()]["counts"]
+        .as_array()
+        .unwrap_or_else(|| panic!("quest {quest} counts are saved"))
+        .iter()
+        .map(|count| u32::try_from(count.as_u64().unwrap()).unwrap())
+        .collect()
+}
+
+fn coin_balance(messages: &[Vec<u8>]) -> Option<i32> {
+    messages.iter().find_map(|message| {
+        let body = family_body(message, 38, 19)?;
+        Some(i32::from_le_bytes(body.get(4..8)?.try_into().ok()?))
+    })
+}
+
+/// The job XP for `profile` in a 38/14 reward reply (reader `008d86e0`:
+/// profile, rank, progress, then three zero fields).
+fn job_xp(messages: &[Vec<u8>], profile: i32) -> Option<u32> {
+    messages.iter().find_map(|message| {
+        let body = family_body(message, 38, 14)?;
+        if i32::from_le_bytes(body.get(4..8)?.try_into().ok()?) != profile {
+            return None;
+        }
+        u32::try_from(i32::from_le_bytes(body.get(12..16)?.try_into().ok()?)).ok()
+    })
+}
+
+fn objective_update(messages: &[Vec<u8>], quest: u32, objective: u32, current: u32) -> bool {
+    messages.iter().any(|message| {
+        // 49/9 reader `0x00c7af60` runs through the quest base header
+        // `0x00c7acd0` (u16 family + i32 subtype), so the quest id is at 6.
+        let Some(body) = family_body(message, 49, 9) else {
+            return false;
+        };
+        u32::from_le_bytes(body.get(6..10).unwrap().try_into().unwrap()) == quest
+            && u32::from_le_bytes(body.get(10..14).unwrap().try_into().unwrap()) == objective
+            && u32::from_le_bytes(body.get(14..18).unwrap().try_into().unwrap()) == current
+    })
+}
+
+/// Switch one session to the Brawler job through the client's own 26/13
+/// request; the commit saves the new active profile before the reply lands.
+fn become_brawler(
+    client: &mut Client,
+    server: &mut Server,
+    temp: &TempDir,
+    guid: u64,
+) -> Vec<Vec<u8>> {
+    let replies = app(client, server, &select_job(T335_BRAWLER));
+    assert_eq!(
+        save_json(temp, guid)["gameplay"]["profiles"]["active"],
+        json!(T335_BRAWLER),
+        "the job switch commits its active profile"
+    );
+    replies
+}
+
+#[test]
+fn two_players_see_each_other_with_the_real_name_and_job() {
+    let temp = TempDir::new();
+    let content = PlaytestContent::new();
+    let (mut server, store_path) = start_field_server(&temp, content.path());
+    let store = AccountStore::load(&store_path).unwrap();
+    let identity = |guid: u64| {
+        let identity = &store.character(guid).unwrap().identity;
+        (
+            identity.first_name.clone(),
+            identity.last_name.clone(),
+            identity.model,
+        )
+    };
+    let (b_first, b_last, b_model) = identity(3);
+    let (a_first, a_last, a_model) = identity(2);
+
+    let version = field_version();
+    let (mut first, mut first_login) = log_in_version(&mut server, 401, 2, &store_path, &version);
+    let settled = settle(&mut server, &mut [&mut first]);
+    first_login.extend(settled[0].clone());
+    let (mut second, mut second_login) = log_in_version(&mut server, 402, 3, &store_path, &version);
+    let settled = settle(&mut server, &mut [&mut first, &mut second]);
+    first_login.extend(settled[0].clone());
+    second_login.extend(settled[1].clone());
+    assert!(
+        server.test_location(2).is_some_and(|row| row.2)
+            && server.test_location(3).is_some_and(|row| row.2),
+        "both sessions are ready in the world"
+    );
+
+    let other = |messages: &[Vec<u8>], guid: u64| -> Vec<AddPc> {
+        messages
+            .iter()
+            .filter_map(|message| parse_add_pc(message))
+            .filter(|add| add.character_guid == guid)
+            .collect()
+    };
+    let sees_b = other(&first_login, 3);
+    assert_eq!(sees_b.len(), 1, "one AddPc for the other player");
+    assert_eq!(sees_b[0].first, b_first);
+    assert_eq!(sees_b[0].last, b_last);
+    assert_eq!(sees_b[0].model, b_model);
+    // The public snapshot names the character's own saved active job.
+    let b_profile = save_json(&temp, 3)["gameplay"]["profiles"]["active"].clone();
+    assert_eq!(json!(sees_b[0].active_profile), b_profile);
+
+    let sees_a = other(&second_login, 2);
+    assert_eq!(sees_a.len(), 1, "one AddPc for the other player");
+    assert_eq!(sees_a[0].first, a_first);
+    assert_eq!(sees_a[0].last, a_last);
+    assert_eq!(sees_a[0].model, a_model);
+
+    // A switches job; the current viewer and a later joiner both get the new
+    // active profile. Skipping the presentation refresh leaves the late
+    // joiner with the pre-switch profile.
+    let mut switched = become_brawler(&mut first, &mut server, &temp, 2);
+    let settled = settle(&mut server, &mut [&mut first, &mut second]);
+    switched.extend(settled[0].clone());
+    first_login.extend(settled[0].clone());
+    second_login.extend(settled[1].clone());
+    assert!(
+        switched
+            .iter()
+            .chain(settled[1].iter())
+            .any(|message| family_body(message, 35, 7).is_some()),
+        "the current viewer receives the 35/7 job switch"
+    );
+    assert_eq!(
+        save_json(&temp, 2)["gameplay"]["profiles"]["active"],
+        json!(T335_BRAWLER)
+    );
+    let (mut late, mut late_login) = log_in_version(&mut server, 403, 1, &store_path, &version);
+    let settled = settle(&mut server, &mut [&mut first, &mut second, &mut late]);
+    first_login.extend(settled[0].clone());
+    second_login.extend(settled[1].clone());
+    late_login.extend(settled[2].clone());
+    let current = other(&late_login, 2);
+    assert_eq!(current.len(), 1, "the late joiner gets one current AddPc");
+    assert_eq!(current[0].active_profile, T335_BRAWLER);
+    assert_eq!(current[0].first, a_first);
+    assert_eq!(current[0].model, a_model);
+    let late_sees_b = other(&late_login, 3);
+    assert_eq!(late_sees_b.len(), 1, "the late joiner gets one AddPc for B");
+    assert_eq!(late_sees_b[0].first, b_first);
+    assert_eq!(late_sees_b[0].model, b_model);
+}
+
+#[test]
+fn a_shared_field_kill_pays_both_and_credits_the_killer_once() {
+    let temp = TempDir::new();
+    let content = PlaytestContent::new();
+    let (mut server, store_path) = start_field_server(&temp, content.path());
+    let version = field_version();
+    let (mut first, _) = log_in_version(&mut server, 411, 2, &store_path, &version);
+    settle(&mut server, &mut [&mut first]);
+    let (mut second, _) = log_in_version(&mut server, 412, 3, &store_path, &version);
+    settle(&mut server, &mut [&mut first, &mut second]);
+    {
+        let mut clients = [&mut first, &mut second];
+        wait_until(&mut server, &mut clients, T335_PATIENCE, |server| {
+            knows(server, 2, T335_WOLF_ONE) && knows(server, 3, T335_WOLF_ONE)
+        });
+    }
+    become_brawler(&mut first, &mut server, &temp, 2);
+    become_brawler(&mut second, &mut server, &temp, 3);
+    settle(&mut server, &mut [&mut first, &mut second]);
+
+    // A accepts the synthetic defeat quest through the ordinary NPC menu.
+    let menu = app(&mut first, &mut server, &npc_interact(T335_GIVER));
+    let choice = menu_choice(&menu, T335_GIVER, T335_TALK_LABEL);
+    app(&mut first, &mut server, &menu_select(T335_GIVER, choice));
+    let offer = app(&mut first, &mut server, &dialogue_choice(T335_QUEST_CHOICE));
+    assert!(
+        offer
+            .iter()
+            .any(|message| family_body(message, 49, 1).is_some()),
+        "the Talk offers the synthetic quest"
+    );
+    let accepted = app(&mut first, &mut server, &quest_accept(T335_QUEST));
+    assert!(
+        accepted
+            .iter()
+            .any(|message| family_body(message, 49, 3).is_some()),
+        "the accept adds the quest"
+    );
+
+    // B wounds the wolf; A lands the lethal hit. One shared death, two
+    // participants inside T240's window.
+    let (a_coins, b_coins) = (saved_coins(&temp, 2), saved_coins(&temp, 3));
+    let (a_xp, b_xp) = (
+        saved_job_xp(&temp, 2, T335_BRAWLER),
+        saved_job_xp(&temp, 3, T335_BRAWLER),
+    );
+    let mut b_replies = field_attack(&mut second, &mut server, T335_WOLF_ONE);
+    let mut a_replies = field_attack(&mut first, &mut server, T335_WOLF_ONE);
+    let claimed = {
+        let mut clients = [&mut first, &mut second];
+        wait_until(&mut server, &mut clients, T335_PATIENCE, |server| {
+            server.test_field_health(T335_WOLF_ONE) == Some(0)
+        })
+    };
+    a_replies.extend(claimed[0].clone());
+    b_replies.extend(claimed[1].clone());
+    for attempt in 0..80 {
+        if coin_balance(&b_replies).is_some() {
+            break;
+        }
+        assert!(attempt < 79, "the contributor's T240 payout did not arrive");
+        let more = {
+            let mut clients = [&mut first, &mut second];
+            pump(&mut server, &mut clients, Duration::from_millis(20))
+        };
+        a_replies.extend(more[0].clone());
+        b_replies.extend(more[1].clone());
+    }
+    assert_eq!(server.test_field_health(T335_WOLF_ONE), Some(0));
+    assert_eq!(coin_balance(&a_replies), Some(a_coins + T335_FIELD_COINS));
+    assert_eq!(
+        job_xp(&a_replies, T335_BRAWLER),
+        Some(u32::try_from(a_xp + T335_FIELD_XP).unwrap())
+    );
+    assert_eq!(coin_balance(&b_replies), Some(b_coins + T335_FIELD_COINS));
+    assert_eq!(
+        job_xp(&b_replies, T335_BRAWLER),
+        Some(u32::try_from(b_xp + T335_FIELD_XP).unwrap())
+    );
+    assert!(
+        objective_update(&a_replies, T335_QUEST, 1, 1),
+        "the killer's quest advances exactly one kill"
+    );
+    assert_eq!(quest_counts(&save_json(&temp, 2), T335_QUEST), [1]);
+    // T302 may credit the contributor's quest too; do not assert it either way.
+
+    // A replay on the corpse and a second kill attempt pay and credit nothing.
+    let replay_a = field_attack(&mut first, &mut server, T335_WOLF_ONE);
+    let replay_b = field_attack(&mut second, &mut server, T335_WOLF_ONE);
+    assert!(coin_balance(&replay_a).is_none());
+    assert!(coin_balance(&replay_b).is_none());
+    assert!(!objective_update(&replay_a, T335_QUEST, 1, 2));
+    assert_eq!(quest_counts(&save_json(&temp, 2), T335_QUEST), [1]);
+}
+
+// ---------------------------------------------------------------------------
+// T335: the remaining two-player loop tests.
+// ---------------------------------------------------------------------------
+
+fn seed_second_inventory(temp: &TempDir, content: &Path) {
+    // A distinct starting stack proves each character keeps its own items:
+    // A starts with no item 8 and B starts with one, and the quest grant adds
+    // one more to each (item 8 has `max_stack: 1`, so those are two stacks).
+    let mut state = osfr_tools::gameplay::Gameplay::load(content, None)
+        .expect("the fixture content loads")
+        .state();
+    state
+        .inventory
+        .items
+        .push(osfr_tools::inventory::InventoryItem {
+            definition_id: T335_ITEM,
+            tint: 0,
+            id: 900_001,
+            count: 1,
+            consumed_count: 0,
+            stored_count: 0,
+            last_cast_time: 0,
+            rental: None,
+            ability_count: 0,
+            activate_enabled: false,
+        });
+    state.inventory.next_instance_id = Some(900_002);
+    fs::create_dir_all(temp.0.join("characters")).unwrap();
+    osfr_tools::game_store::save(
+        &temp.0.join("characters/3.json"),
+        &osfr_tools::game_store::Snapshot {
+            character: CharacterState {
+                guid: 3,
+                zone_id: 0,
+                position: T335_START,
+                rotation: [0.0, 0.0, 1.0],
+            },
+            gameplay: Some(state),
+        },
+    )
+    .expect("the seeded second save writes");
+}
+
+fn saved_item_count(temp: &TempDir, guid: u64, definition: i32) -> u64 {
+    save_json(temp, guid)["gameplay"]["inventory"]["items"]
+        .as_array()
+        .expect("the saved inventory items")
+        .iter()
+        .filter(|item| item["definition_id"] == json!(definition))
+        .map(|item| item["count"].as_u64().unwrap_or(0))
+        .sum()
+}
+
+fn saved_item_ids(temp: &TempDir, guid: u64, definition: i32) -> Vec<i64> {
+    let mut ids: Vec<i64> = save_json(temp, guid)["gameplay"]["inventory"]["items"]
+        .as_array()
+        .expect("the saved inventory items")
+        .iter()
+        .filter(|item| item["definition_id"] == json!(definition))
+        .map(|item| item["id"].as_i64().unwrap())
+        .collect();
+    ids.sort_unstable();
+    ids
+}
+
+fn saved_quest_state(temp: &TempDir, guid: u64) -> serde_json::Value {
+    save_json(temp, guid)["gameplay"]["npc_quests"].clone()
+}
+
+fn has_text(messages: &[Vec<u8>], needle: &str) -> bool {
+    let needle = needle.as_bytes();
+    messages
+        .iter()
+        .any(|message| message.windows(needle.len()).any(|window| window == needle))
+}
+
+/// The group id snapshot's member GUIDs in roster order (40/8 reader
+/// `0093daf0` case 8 -> `0092aed0`: two i16, count, member rows).
+fn group_snapshot_guids(messages: &[Vec<u8>]) -> Vec<Vec<u64>> {
+    messages
+        .iter()
+        .filter_map(|message| {
+            let body = family_body(message, 40, 8)?;
+            let count = i32::from_le_bytes(body.get(8..12)?.try_into().ok()?);
+            let mut at = 12;
+            let mut guids = Vec::new();
+            for _ in 0..count {
+                guids.push(u64::from_le_bytes(body.get(at..at + 8)?.try_into().ok()?));
+                at += 8 + 12; // guid, three name fields
+                for _ in 0..2 {
+                    let length = i32::from_le_bytes(body.get(at..at + 4)?.try_into().ok()?);
+                    let length = usize::try_from(length).ok()?;
+                    at += 4 + length;
+                }
+                at += 7 * 4 + 2 + 4; // opaque fields, two flags, minigame type
+            }
+            Some(guids)
+        })
+        .collect()
+}
+
+fn group_result_code(messages: &[Vec<u8>], sub: u16) -> Option<u32> {
+    messages.iter().find_map(|message| {
+        let body = family_body(message, 40, sub)?;
+        Some(u32::from_le_bytes(body.get(4..8)?.try_into().ok()?))
+    })
+}
+
+fn accept_quest(client: &mut Client, server: &mut Server) -> Vec<Vec<u8>> {
+    let mut replies = app(client, server, &npc_interact(T335_GIVER));
+    let choice = menu_choice(&replies, T335_GIVER, T335_TALK_LABEL);
+    replies.extend(app(client, server, &menu_select(T335_GIVER, choice)));
+    let offer = app(client, server, &dialogue_choice(T335_QUEST_CHOICE));
+    assert!(
+        offer
+            .iter()
+            .any(|message| family_body(message, 49, 1).is_some()),
+        "the Talk offers the synthetic quest"
+    );
+    replies.extend(offer);
+    let accepted = app(client, server, &quest_accept(T335_QUEST));
+    assert!(
+        accepted
+            .iter()
+            .any(|message| family_body(message, 49, 3).is_some()),
+        "the accept adds the synthetic quest"
+    );
+    replies.extend(accepted);
+    replies
+}
+
+fn turn_in_quest(client: &mut Client, server: &mut Server) -> Vec<Vec<u8>> {
+    let mut replies = app(client, server, &npc_interact(T335_GIVER));
+    let choice = menu_choice(&replies, T335_GIVER, T335_TALK_LABEL);
+    replies.extend(app(client, server, &menu_select(T335_GIVER, choice)));
+    let end = app(client, server, &dialogue_choice(T335_QUEST_CHOICE));
+    assert!(
+        end.iter()
+            .any(|message| family_body(message, 49, 13).is_some()),
+        "the completed Talk holds the 49/13 end screen"
+    );
+    replies.extend(end);
+    let done = app(client, server, &quest_turn_in(T335_QUEST));
+    assert!(
+        done.iter()
+            .any(|message| family_body(message, 49, 4).is_some()),
+        "the 49/14 turn-in completes the quest"
+    );
+    replies.extend(done);
+    replies
+}
+
+/// Basic-attack `target` until the shared field reports it dead, waiting out
+/// the 700 ms swing clock between swings and servicing both clients.
+fn attack_until_dead(
+    server: &mut Server,
+    clients: &mut [&mut Client],
+    attacker: usize,
+    target: u64,
+) -> Vec<Vec<u8>> {
+    let mut replies = field_attack(clients[attacker], server, target);
+    let deadline = Instant::now() + Duration::from_secs(15);
+    while server.test_field_health(target) != Some(0) {
+        assert!(
+            Instant::now() < deadline,
+            "field target {target} did not die"
+        );
+        std::thread::sleep(Duration::from_millis(750));
+        let batch = pump(server, clients, Duration::from_millis(50));
+        replies.extend(batch[attacker].clone());
+        if server.test_field_health(target) == Some(0) {
+            break;
+        }
+        replies.extend(field_attack(clients[attacker], server, target));
+    }
+    replies
+}
+
+fn assert_no_dev_commands(clients: &[&Client]) {
+    for client in clients {
+        for message in &client.sent {
+            let lower = message.to_ascii_lowercase();
+            assert!(
+                !lower.windows(6).any(|window| window == b"realm "),
+                "the loop sent a `realm` developer command"
+            );
+            assert!(
+                !lower.windows(8).any(|window| window == b"teleport"),
+                "the loop sent a teleport developer command"
+            );
+        }
+    }
+}
+
+#[test]
+fn a_group_forms_and_party_chat_reaches_both() {
+    let temp = TempDir::new();
+    let (mut server, store_path) = start_server(&temp);
+    let store = AccountStore::load(&store_path).unwrap();
+    let b_name = {
+        let identity = &store.character(3).unwrap().identity;
+        (identity.first_name.clone(), identity.last_name.clone())
+    };
+    let (mut first, _) = log_in(&mut server, 431, 2, &store_path);
+    let (mut second, _) = log_in(&mut server, 432, 3, &store_path);
+
+    // The real 40/1 invite creates the leader row and reaches the target.
+    let invited = first.send(&mut server, &application(6, &group_invite()));
+    assert!(invited.iter().any(|message| is_family(message, 40, 8)));
+    assert_eq!(group_result_code(&invited, 2), Some(0));
+    let pending = second.drain(&mut server);
+    let invite_id = group_invite_wire::invite_generation(
+        pending
+            .iter()
+            .find(|message| is_family(message, 40, 1))
+            .expect("the target received the 40/1 invite"),
+    );
+
+    // The real 40/4 accept fans the notice, the member row and the roster to
+    // both members.
+    let mut b_side = second.send(&mut server, &application(6, &group_accept(invite_id)));
+    b_side.extend(second.drain(&mut server));
+    let a_side = first.drain(&mut server);
+    assert!(
+        group_snapshot_guids(&a_side).contains(&vec![2, 3]),
+        "A's snapshot names the leader and both members"
+    );
+    assert!(
+        group_snapshot_guids(&b_side).contains(&vec![2, 3]),
+        "B's snapshot names the leader and both members"
+    );
+    let mut both = pending;
+    both.extend(a_side);
+    both.extend(b_side);
+    assert!(both.iter().any(|message| is_family(message, 40, 4)));
+    assert!(both.iter().any(|message| is_family(message, 40, 9)));
+
+    // Party chat (channel 4) reaches both members and echoes to the sender.
+    let party = first.send(
+        &mut server,
+        &application(6, &chat_request(4, "synthetic party line", None)),
+    );
+    let mut party_seen = party;
+    party_seen.extend(second.drain(&mut server));
+    assert!(
+        has_text(&party_seen, "synthetic party line"),
+        "the party line does not reach both members"
+    );
+    // The server's (R) spam gate allows one line per 330 ms per session.
+    std::thread::sleep(Duration::from_millis(400));
+    // A local say in range reaches both.
+    let say = first.send(
+        &mut server,
+        &application(6, &chat_request(0, "synthetic local say", None)),
+    );
+    let mut say_seen = say;
+    say_seen.extend(second.drain(&mut server));
+    assert!(has_text(&say_seen, "synthetic local say"));
+    std::thread::sleep(Duration::from_millis(400));
+    // A tell from A reaches B by name.
+    let tell = first.send(
+        &mut server,
+        &application(
+            6,
+            &chat_request(1, "synthetic tell", Some((&b_name.0, &b_name.1))),
+        ),
+    );
+    let mut tell_seen = tell;
+    tell_seen.extend(second.drain(&mut server));
+    assert!(has_text(&tell_seen, "synthetic tell"));
+
+    // A refused duplicate invite and a stale accept leave the group and the
+    // pending invitation unchanged.
+    let repeated = first.send(&mut server, &application(6, &group_invite()));
+    // B is already in this group, so the service refuses the repeat as the
+    // client's already-grouped result (3) rather than a duplicate invite (6).
+    assert_eq!(group_result_code(&repeated, 2), Some(3));
+    assert!(
+        !second
+            .drain(&mut server)
+            .iter()
+            .any(|m| is_family(m, 40, 1)),
+        "a refused duplicate invite reached the target"
+    );
+    let stale = second.send(
+        &mut server,
+        &application(6, &group_accept(invite_id ^ 0x8000_0000)),
+    );
+    assert_eq!(group_result_code(&stale, 5), Some(3));
+    assert!(
+        !stale.iter().any(|message| {
+            is_family(message, 40, 4) || is_family(message, 40, 8) || is_family(message, 40, 9)
+        }),
+        "a stale accept changed the group"
+    );
+
+    // The party still works: one more line reaches both members.
+    std::thread::sleep(Duration::from_millis(400));
+    let still = first.send(
+        &mut server,
+        &application(6, &chat_request(4, "synthetic still grouped", None)),
+    );
+    let mut still_seen = still;
+    still_seen.extend(second.drain(&mut server));
+    assert!(has_text(&still_seen, "synthetic still grouped"));
+}
+
+#[test]
+fn each_character_keeps_its_own_coins_and_quest_after_relog() {
+    let temp = TempDir::new();
+    let content = PlaytestContent::new();
+    seed_second_inventory(&temp, content.path());
+    let (mut server, store_path) = start_field_server(&temp, content.path());
+    let version = field_version();
+    let (mut first, _) = log_in_version(&mut server, 441, 2, &store_path, &version);
+    settle(&mut server, &mut [&mut first]);
+    let (mut second, _) = log_in_version(&mut server, 442, 3, &store_path, &version);
+    settle(&mut server, &mut [&mut first, &mut second]);
+    {
+        let mut clients = [&mut first, &mut second];
+        wait_until(&mut server, &mut clients, T335_PATIENCE, |server| {
+            knows(server, 2, T335_WOLF_ONE)
+                && knows(server, 3, T335_WOLF_ONE)
+                && knows(server, 2, T335_WOLF_TWO)
+                && knows(server, 3, T335_WOLF_TWO)
+        });
+    }
+    become_brawler(&mut first, &mut server, &temp, 2);
+    become_brawler(&mut second, &mut server, &temp, 3);
+    settle(&mut server, &mut [&mut first, &mut second]);
+    accept_quest(&mut first, &mut server);
+    accept_quest(&mut second, &mut server);
+
+    // A kills wolf one alone; A wounds wolf two and B lands the lethal hit.
+    // A gets two T240 payouts (killer + contributor), B gets one.
+    attack_until_dead(
+        &mut server,
+        &mut [&mut first, &mut second],
+        0,
+        T335_WOLF_ONE,
+    );
+    // A's last swing at wolf one starts its 700 ms cooldown.
+    std::thread::sleep(Duration::from_millis(750));
+    let before_b = saved_coins(&temp, 3);
+    field_attack(&mut first, &mut server, T335_WOLF_TWO);
+    let b_kill = field_attack(&mut second, &mut server, T335_WOLF_TWO);
+    let mut b_claim = b_kill;
+    let deadline = Instant::now() + T335_PATIENCE;
+    while coin_balance(&b_claim).is_none() {
+        assert!(Instant::now() < deadline, "B's T240 payout did not arrive");
+        let batch = {
+            let mut clients = [&mut first, &mut second];
+            pump(&mut server, &mut clients, Duration::from_millis(20))
+        };
+        b_claim.extend(batch[1].clone());
+    }
+    assert_eq!(coin_balance(&b_claim), Some(before_b + T335_FIELD_COINS));
+    assert_eq!(server.test_field_health(T335_WOLF_TWO), Some(0));
+
+    // Both turn the synthetic quest in through the ordinary Talk path.
+    turn_in_quest(&mut first, &mut server);
+    turn_in_quest(&mut second, &mut server);
+    let a_quest_state = saved_quest_state(&temp, 2);
+    let b_quest_state = saved_quest_state(&temp, 3);
+    let (a_coins, b_coins) = (saved_coins(&temp, 2), saved_coins(&temp, 3));
+    let (a_xp, b_xp) = (
+        saved_job_xp(&temp, 2, T335_BRAWLER),
+        saved_job_xp(&temp, 3, T335_BRAWLER),
+    );
+    assert!(
+        a_coins > b_coins,
+        "A earned the killer and contributor payouts; B only the kill"
+    );
+    assert!(a_xp > b_xp, "A's job XP includes the contributor payout");
+    assert_eq!(saved_item_count(&temp, 2, T335_ITEM), 1);
+    assert_eq!(saved_item_count(&temp, 3, T335_ITEM), 2);
+    assert_eq!(
+        saved_item_ids(&temp, 2, T335_ITEM).len(),
+        1,
+        "A's quest item is one new stack"
+    );
+    let b_item_ids = saved_item_ids(&temp, 3, T335_ITEM);
+    assert_eq!(
+        b_item_ids.len(),
+        2,
+        "B keeps its seeded stack and the reward stack"
+    );
+    assert_eq!(b_item_ids[0], 900_001, "B keeps its own seeded stack");
+    assert!(
+        b_item_ids[1] > 900_001,
+        "the quest grant allocated a fresh id after the seeded stack"
+    );
+    assert_ne!(
+        saved_item_ids(&temp, 2, T335_ITEM)[0],
+        b_item_ids[1],
+        "the two characters' reward stacks must not alias"
+    );
+
+    // Save both characters through the real session save and reload them
+    // through the production gateway login path.
+    disconnect(&first, &mut server);
+    disconnect(&second, &mut server);
+    assert_eq!(server.active_session_count(), 0);
+    assert_eq!(saved_coins(&temp, 2), a_coins);
+    assert_eq!(saved_coins(&temp, 3), b_coins);
+    assert_eq!(saved_quest_state(&temp, 2), a_quest_state);
+    assert_eq!(saved_quest_state(&temp, 3), b_quest_state);
+    assert_eq!(save_json(&temp, 2)["character"]["guid"], json!(2));
+    assert_eq!(save_json(&temp, 3)["character"]["guid"], json!(3));
+
+    let (mut first, _) = log_in_version(&mut server, 443, 2, &store_path, &version);
+    settle(&mut server, &mut [&mut first]);
+    let (mut second, _) = log_in_version(&mut server, 444, 3, &store_path, &version);
+    settle(&mut server, &mut [&mut first, &mut second]);
+    {
+        let mut clients = [&mut first, &mut second];
+        wait_until(&mut server, &mut clients, T335_PATIENCE, |server| {
+            knows(server, 2, T335_WOLF_THREE) && knows(server, 3, T335_WOLF_FOUR)
+        });
+    }
+
+    // A replayed hit on the first kill's corpse pays and advances nothing.
+    let replay_a = field_attack(&mut first, &mut server, T335_WOLF_ONE);
+    let replay_b = field_attack(&mut second, &mut server, T335_WOLF_TWO);
+    assert!(coin_balance(&replay_a).is_none());
+    assert!(coin_balance(&replay_b).is_none());
+    assert!(!objective_update(&replay_a, T335_QUEST, 1, 2));
+    assert!(!objective_update(&replay_b, T335_QUEST, 1, 2));
+
+    // Fresh wolves after the relog pay on top of each character's own saved
+    // balance, which proves the loader restored each character's wallet and
+    // job XP independently.
+    let a_after = attack_until_dead(
+        &mut server,
+        &mut [&mut first, &mut second],
+        0,
+        T335_WOLF_THREE,
+    );
+    assert_eq!(coin_balance(&a_after), Some(a_coins + T335_FIELD_COINS));
+    assert_eq!(
+        job_xp(&a_after, T335_BRAWLER),
+        Some(u32::try_from(a_xp + T335_FIELD_XP).unwrap())
+    );
+    let b_after = attack_until_dead(
+        &mut server,
+        &mut [&mut first, &mut second],
+        1,
+        T335_WOLF_FOUR,
+    );
+    assert_eq!(coin_balance(&b_after), Some(b_coins + T335_FIELD_COINS));
+    assert_eq!(
+        job_xp(&b_after, T335_BRAWLER),
+        Some(u32::try_from(b_xp + T335_FIELD_XP).unwrap())
+    );
+    // The completed quest counters are the same as before the relog.
+    assert_eq!(saved_quest_state(&temp, 2), a_quest_state);
+    assert_eq!(saved_quest_state(&temp, 3), b_quest_state);
+    assert_eq!(saved_item_count(&temp, 2, T335_ITEM), 1);
+    assert_eq!(saved_item_count(&temp, 3, T335_ITEM), 2);
+}
+
+#[test]
+fn one_players_disconnect_or_bad_packet_does_not_stop_the_other() {
+    let temp = TempDir::new();
+    let content = PlaytestContent::new();
+    let (mut server, store_path) = start_field_server(&temp, content.path());
+    let version = field_version();
+    let (mut first, _) = log_in_version(&mut server, 451, 2, &store_path, &version);
+    settle(&mut server, &mut [&mut first]);
+    let (mut second, _) = log_in_version(&mut server, 452, 3, &store_path, &version);
+    settle(&mut server, &mut [&mut first, &mut second]);
+    {
+        let mut clients = [&mut first, &mut second];
+        wait_until(&mut server, &mut clients, T335_PATIENCE, |server| {
+            knows(server, 2, T335_WOLF_TWO) && knows(server, 3, T335_WOLF_TWO)
+        });
+    }
+    become_brawler(&mut second, &mut server, &temp, 3);
+    settle(&mut server, &mut [&mut first, &mut second]);
+    let before = saved_coins(&temp, 3);
+
+    // A hostile 36/10 with an unknown action kind is a malformed field
+    // request. The gateway's single-message refusal drops it for A alone
+    // (a bundled child would end A's session), and it changes nothing.
+    let a_coins = saved_coins(&temp, 2);
+    let a_quests = saved_quest_state(&temp, 2);
+    let mut bad = vec![10, 0];
+    for value in [1i32, 0, 2] {
+        bad.extend(value.to_le_bytes());
+    }
+    bad.extend(T335_WOLF_TWO.to_le_bytes());
+    let refused = first.send(&mut server, &packet(36, &bad));
+    assert!(
+        !refused
+            .iter()
+            .any(|message| family_body(message, 38, 19).is_some()
+                || family_body(message, 49, 9).is_some()),
+        "A's malformed field packet paid or advanced something"
+    );
+    assert_eq!(
+        server.active_session_count(),
+        2,
+        "a single malformed application packet must not end a session"
+    );
+    assert_eq!(saved_coins(&temp, 2), a_coins);
+    assert_eq!(saved_quest_state(&temp, 2), a_quests);
+
+    // A then disconnects mid-action: only A's session ends and its save is
+    // written; B keeps the shared field and the tick loop.
+    disconnect(&first, &mut server);
+    assert_eq!(
+        server.active_session_count(),
+        1,
+        "A's disconnect ended another session"
+    );
+
+    // B still moves, speaks and kills in the same tick loop.
+    let mut move_fields = 3u64.to_le_bytes().to_vec();
+    for value in [
+        T335_START[0],
+        T335_START[1] + 0.1,
+        T335_START[2],
+        0.0,
+        0.0,
+        1.0,
+    ] {
+        move_fields.extend_from_slice(&value.to_le_bytes());
+    }
+    move_fields.extend_from_slice(&[0, 0]);
+    second.send(&mut server, &packet(125, &move_fields));
+    assert_eq!(server.active_session_count(), 1);
+    let say = second.send(
+        &mut server,
+        &application(6, &chat_request(0, "synthetic survivor say", None)),
+    );
+    assert!(has_text(&say, "synthetic survivor say"));
+
+    let killed = attack_until_dead(&mut server, &mut [&mut second], 0, T335_WOLF_TWO);
+    assert_eq!(server.test_field_health(T335_WOLF_TWO), Some(0));
+    assert_eq!(coin_balance(&killed), Some(before + T335_FIELD_COINS));
+    server.step().unwrap();
+    assert_eq!(server.active_session_count(), 1);
+}
+
+#[test]
+fn the_social_loop_uses_no_dev_commands() {
+    let temp = TempDir::new();
+    let content = PlaytestContent::new();
+    let (mut server, store_path) = start_field_server(&temp, content.path());
+    let version = field_version();
+    let (mut first, _) = log_in_version(&mut server, 461, 2, &store_path, &version);
+    settle(&mut server, &mut [&mut first]);
+    let (mut second, _) = log_in_version(&mut server, 462, 3, &store_path, &version);
+    settle(&mut server, &mut [&mut first, &mut second]);
+    {
+        let mut clients = [&mut first, &mut second];
+        wait_until(&mut server, &mut clients, T335_PATIENCE, |server| {
+            knows(server, 2, T335_WOLF_ONE) && knows(server, 3, T335_WOLF_ONE)
+        });
+    }
+    become_brawler(&mut first, &mut server, &temp, 2);
+    settle(&mut server, &mut [&mut first, &mut second]);
+
+    // Group and party chat through the ordinary social requests.
+    let invited = first.send(&mut server, &application(6, &group_invite()));
+    assert_eq!(group_result_code(&invited, 2), Some(0));
+    let pending = second.drain(&mut server);
+    let invite_id = group_invite_wire::invite_generation(
+        pending
+            .iter()
+            .find(|message| is_family(message, 40, 1))
+            .expect("the target received the 40/1 invite"),
+    );
+    second.send(&mut server, &application(6, &group_accept(invite_id)));
+    let party = first.send(
+        &mut server,
+        &application(6, &chat_request(4, "synthetic loop line", None)),
+    );
+    let mut party_seen = party;
+    party_seen.extend(second.drain(&mut server));
+    assert!(has_text(&party_seen, "synthetic loop line"));
+
+    // One ordinary field kill.
+    let before = saved_coins(&temp, 2);
+    let killed = attack_until_dead(
+        &mut server,
+        &mut [&mut first, &mut second],
+        0,
+        T335_WOLF_ONE,
+    );
+    assert_eq!(coin_balance(&killed), Some(before + T335_FIELD_COINS));
+
+    // A relog on the real session save, then the loop has used only ordinary
+    // client requests: no `realm` or teleport command was sent.
+    disconnect(&first, &mut server);
+    assert_eq!(server.active_session_count(), 1);
+    let (mut relogged, _) = log_in_version(&mut server, 463, 2, &store_path, &version);
+    settle(&mut server, &mut [&mut second, &mut relogged]);
+    assert_eq!(server.active_session_count(), 2);
+    assert_no_dev_commands(&[&first, &second, &relogged]);
 }
