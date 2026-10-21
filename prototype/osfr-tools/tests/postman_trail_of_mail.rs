@@ -24,8 +24,8 @@ mod npc_quest_chain;
 
 use npc_quest_chain::{
     CHARACTER, Fixture, accept, assert_packet_changes_nothing, character_at_for, coins,
-    content_position, counts, end_screen_reward, finish_quest, offer, pending_turnin, profile_xp,
-    quest_end_reply, quest_status, release_end_screen, saved, talk, talk_step,
+    content_position, counts, end_screen_reward, finish_quest, has_family, offer, pending_turnin,
+    profile_xp, quest_end_reply, quest_status, saved, send, talk_step,
 };
 use osfr_tools::{character_store::CharacterState, gameplay::Gameplay, quest_engine::QuestStatus};
 
@@ -44,7 +44,8 @@ fn at(npc_id: u64, file: &str) -> CharacterState {
 }
 
 /// The opening fixture with Postman unlocked: its starter profile set is
-/// `[1, 43]`, and the reward's profile-4 XP must be grantable (T249's unlock rule).
+/// `[1, 43]` (pinned by [`a_locked_postman_profile_is_paid_nothing`]), and the
+/// reward's profile-4 XP must be grantable (T249's unlock rule).
 fn postman_game(fixture: &Fixture) -> Gameplay {
     let mut state = fixture.game(None).state();
     state
@@ -73,23 +74,51 @@ fn postmaster_lane_pays_trail_of_mail_once() {
     assert_eq!(pending_turnin(&game), Some(QUEST));
 
     // A reconnect between the final Talk and 49/14 must keep the pending
-    // turn-in; the same production bind reloads the saved state.
-    let mut game = fixture.reload(&game);
+    // turn-in through the serialized save state, not only the live clone.
+    let held = saved(&game);
+    let mut game = fixture.reload_serialized(&game);
+    assert_eq!(
+        saved(&game),
+        held,
+        "reload changed the saved pending turn-in"
+    );
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Active);
     assert_eq!(pending_turnin(&game), Some(QUEST));
 
-    // The held 49/13 packet is session memory; the production recovery is a
-    // fresh Talk at the actor that opened the screen, which re-sends it.
-    now += 10;
-    talk(&mut game, &target, TARGET, now);
-    now += 10;
-    let end = release_end_screen(&mut game, &target, QUEST, TARGET, END_TEXT, now);
+    // The production relog batch re-sends the held 49/13 after its speaker's
+    // 35/2 (`gateway.rs` -> `update_npc_visibility` ->
+    // `append_pending_turnin_screen`); `ShowQuestEndScreen` (`00a95420`)
+    // resolves the actor through the client table and never retries.
+    let packets = game
+        .update_npc_visibility(&target)
+        .expect("relog NPC visibility");
+    let spawn = packets.iter().position(|packet| {
+        osfr_tools::startup_world::parse_add_npc(packet).is_ok_and(|npc| npc.actor_id == TARGET)
+    });
+    let end = packets
+        .iter()
+        .position(|packet| has_family(packet, 49, 13, Some(QUEST)))
+        .expect("the held end screen is re-sent after relog");
+    assert!(
+        spawn.is_some_and(|spawn| spawn < end),
+        "the speaker's 35/2 must precede its 49/13"
+    );
     assert_eq!(
-        end.len(),
+        u64::from_le_bytes(packets[end][6..14].try_into().unwrap()),
+        TARGET,
+        "the re-sent end screen must name the runtime speaker"
+    );
+    assert_eq!(
+        u32::from_le_bytes(packets[end][18..22].try_into().unwrap()),
+        END_TEXT,
+        "the re-sent end screen must carry the quest's debrief text"
+    );
+    assert_eq!(
+        packets[end].len(),
         99,
         "the no-display-row reward bundle keeps the client-reader length"
     );
-    assert_eq!(end_screen_reward(&end), (REWARD_COINS, REWARD_XP));
+    assert_eq!(end_screen_reward(&packets[end]), (REWARD_COINS, REWARD_XP));
 
     now += 10;
     finish_quest(
@@ -117,12 +146,67 @@ fn postmaster_lane_pays_trail_of_mail_once() {
     );
     assert_eq!(coins(&game), REWARD_COINS);
     assert_eq!(profile_xp(&game, POSTMAN), REWARD_XP);
-    assert_eq!(saved(&game), finished);
 
-    // The completed ledger and the paid reward survive the same production bind
-    // a reconnect uses; the reward is not paid again on load.
-    let reloaded = fixture.reload(&game);
+    // The completed ledger and the paid reward survive the serialized reconnect;
+    // the reward is not paid again on load.
+    let reloaded = fixture.reload_serialized(&game);
+    assert_eq!(
+        saved(&reloaded),
+        finished,
+        "reload changed completed history"
+    );
     assert_eq!(quest_status(&reloaded, QUEST), QuestStatus::Completed);
     assert_eq!(coins(&reloaded), REWARD_COINS);
     assert_eq!(profile_xp(&reloaded, POSTMAN), REWARD_XP);
+}
+
+/// The reward names profile 4, so a character without Postman is refused at
+/// turn-in by the F249 reward gate (`QuestDenial::Job`): the end screen clears,
+/// nothing is paid, and the quest stays active for a later Talk. The content has
+/// no job gate on `3130032` (pre-existing T314 gap named in `notes/Autopilot/
+/// F365.md`); the first test unlocks Postman as its setup.
+#[test]
+fn a_locked_postman_profile_is_paid_nothing() {
+    let fixture = Fixture::new();
+    let mut game = fixture.game(None);
+    assert!(
+        !game
+            .state()
+            .profiles
+            .as_ref()
+            .expect("the opening fixture stores profiles")
+            .unlocked
+            .contains(&POSTMAN),
+        "the opening fixture starts without Postman"
+    );
+    let giver = at(GIVER, "shrouded_glade.json");
+    let target = at(TARGET, "wugachug.json");
+    let mut now = 2_000;
+
+    offer(&mut game, &giver, GIVER, QUEST, now);
+    now += 10;
+    accept(&mut game, &giver, QUEST, now);
+    now += 10;
+    talk_step(&mut game, &target, TARGET, now, "Postman: Trail of Mail");
+    assert_eq!(pending_turnin(&game), Some(QUEST));
+    let coins_before = coins(&game);
+
+    now += 10;
+    let settled = send(&mut game, &target, &quest_end_reply(QUEST), now);
+    assert!(
+        settled.changed,
+        "the locked-profile refusal still releases the end screen"
+    );
+    assert!(
+        !settled
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 4, Some(QUEST))),
+        "a locked profile must not report quest completion"
+    );
+    assert_eq!(pending_turnin(&game), None);
+    assert_eq!(coins(&game), coins_before);
+    assert_eq!(profile_xp(&game, POSTMAN), 0);
+    assert_eq!(quest_status(&game, QUEST), QuestStatus::Active);
+    assert_eq!(counts(&game, QUEST), [1]);
 }

@@ -8,10 +8,14 @@
 //! prerequisite ids, objective target fields, the authored title id and the
 //! authored NPC `quest_giver` role.
 //!
-//! Resolved objective kinds: `talk_to_npc`, `interact_actor`, `visit_position`,
-//! `reach_poi`, `defeat` and `collect_item`. Other kinds (`gather_resource`,
-//! `complete_dungeon`, `finish_minigame`, `client_reported`, `craft_recipe`,
-//! `equip_item`) are only bounded by the loader's field rules, not proved to
+//! Resolved objective kinds: `talk_to_npc`, `interact_actor`, `reach_poi`,
+//! `defeat` and `collect_item`. `visit_position` geometry is rejected by
+//! `QuestEngine::from_split_content` (`valid_objective_kind`), the bound's only
+//! authority; the audit does not re-check it and
+//! `visit_geometry_bounds_are_enforced` drives the production loader for it.
+//! The remaining kinds (`gather_resource`, `complete_dungeon`,
+//! `finish_minigame`, `client_reported`, `craft_recipe`, `equip_item`,
+//! `visit_position`) are only bounded by the loader's rules, not proved to
 //! exist; the target test prints them so the gap stays visible.
 //!
 //! A quest is *reachable* when every prerequisite, directly or transitively,
@@ -39,7 +43,7 @@ use osfr_tools::{
     world::NpcVisibility,
 };
 use quest_catalogue_fixture::{Defect, FIXTURE_DEFECT, fixture};
-use serde_json::{Value, json};
+use serde_json::Value;
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs, io,
@@ -64,31 +68,6 @@ fn eligibility() -> CharacterEligibility {
 
 fn as_u32(value: &Value) -> Option<u32> {
     value.as_u64().and_then(|value| u32::try_from(value).ok())
-}
-
-/// A finite xyz transform component.
-fn finite_position(value: &Value) -> bool {
-    value.as_array().is_some_and(|axis| {
-        axis.len() == 3
-            && axis
-                .iter()
-                .all(|value| value.as_f64().is_some_and(f64::is_finite))
-    })
-}
-
-/// The quest engine's `visit_position` bounds (`valid_objective_kind`).
-fn valid_visit_geometry(position: &Value, radius: &Value) -> bool {
-    finite_position(position)
-        && position.as_array().is_some_and(|axis| {
-            axis.iter().all(|value| {
-                value
-                    .as_f64()
-                    .is_some_and(|value| value.abs() <= 1_000_000.0)
-            })
-        })
-        && radius
-            .as_f64()
-            .is_some_and(|radius| radius.is_finite() && (0.1..=1000.0).contains(&radius))
 }
 
 /// One split quest record. Only fields the production loaders do not expose are
@@ -237,10 +216,9 @@ impl Catalogue {
     /// Objective kinds whose target this gate resolves. Everything else is only
     /// bounded by the split loader; the target test prints the gap.
     fn unchecked_objective_kinds(&self) -> BTreeSet<&str> {
-        const CHECKED: [&str; 6] = [
+        const CHECKED: [&str; 5] = [
             "talk_to_npc",
             "interact_actor",
-            "visit_position",
             "reach_poi",
             "defeat",
             "collect_item",
@@ -281,8 +259,9 @@ impl Catalogue {
     }
 
     /// Every enabled objective target this gate knows how to resolve: talk and
-    /// interact actors are in the production draw set; visit geometry is finite
-    /// and bounded; kill and item ids/counts are positive.
+    /// interact actors are in the production draw set; `reach_poi` ids are
+    /// positive; kill and item ids/counts are positive. Visit geometry bounds are
+    /// enforced by `from_split_content` and deliberately not repeated here.
     fn target_violations(&self) -> Vec<String> {
         let mut violations = Vec::new();
         for quest in self.enabled() {
@@ -296,23 +275,9 @@ impl Catalogue {
                     "interact_actor" => {
                         self.target_violation(&mut violations, &owner, goal["actor_guid"].as_u64());
                     }
-                    "visit_position" => {
-                        if !valid_visit_geometry(&goal["position"], &goal["radius"]) {
-                            violations.push(format!(
-                                "{owner}: visit geometry is not finite with a positive radius"
-                            ));
-                        }
-                    }
                     "reach_poi" => {
                         if goal["poi_id"].as_u64().unwrap_or(0) == 0 {
                             violations.push(format!("{owner}: reach_poi target is not positive"));
-                        }
-                        if goal.get("position").is_some()
-                            && !valid_visit_geometry(&goal["position"], &goal["radius"])
-                        {
-                            violations.push(format!(
-                                "{owner}: reach geometry is not finite with a positive radius"
-                            ));
                         }
                     }
                     "defeat" => {
@@ -664,35 +629,30 @@ fn a_malformed_enabled_row_is_rejected_or_reported() {
     );
 }
 
+/// `from_split_content` (`valid_objective_kind`) is the only authority for the
+/// visit bound; this drives that production loader instead of testing a copied
+/// helper, so a loosened or missing loader bound fails here.
 #[test]
 fn visit_geometry_bounds_are_enforced() {
-    assert!(valid_visit_geometry(&json!([0.0, 0.0, 0.0]), &json!(5.0)));
-    assert!(valid_visit_geometry(
-        &json!([1_000_000.0, -1_000_000.0, 0.0]),
-        &json!(1000.0)
-    ));
-    for position in [
-        json!([1_000_001.0, 0.0, 0.0]),
-        json!([null, 0.0, 0.0]),
-        json!([0.0, 0.0]),
-        json!([0.0, 0.0, "x"]),
+    let valid = fixture(
+        "visit-valid",
+        Defect::VisitGeometry {
+            position: [0.0, 0.0, 0.0],
+            radius: 5.0,
+        },
+    );
+    let catalogue = Catalogue::load(valid.path()).expect("valid visit geometry loads");
+    assert_eq!(catalogue.enabled().count(), 2);
+
+    for (name, position, radius) in [
+        ("visit-zero-radius", [0.0, 0.0, 0.0], 0.0),
+        ("visit-large-radius", [0.0, 0.0, 0.0], 1000.1),
+        ("visit-position-bound", [1_000_001.0, 0.0, 0.0], 5.0),
     ] {
+        let bad = fixture(name, Defect::VisitGeometry { position, radius });
         assert!(
-            !valid_visit_geometry(&position, &json!(5.0)),
-            "position {position} must be refused"
-        );
-    }
-    for radius in [
-        json!(0.0),
-        json!(-1.0),
-        json!(0.05),
-        json!(1000.1),
-        json!("5"),
-        json!(null),
-    ] {
-        assert!(
-            !valid_visit_geometry(&json!([0.0, 0.0, 0.0]), &radius),
-            "radius {radius} must be refused"
+            Catalogue::load(bad.path()).is_err(),
+            "{name}: from_split_content must reject out-of-range visit geometry"
         );
     }
 }

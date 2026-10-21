@@ -28,6 +28,12 @@ pub enum Defect {
     DisabledPrerequisite,
     MissingPrerequisite,
     WrappedTitle,
+    /// A `visit_position` objective with the given transform, so the production
+    /// split loader's geometry bound can be exercised directly.
+    VisitGeometry {
+        position: [f64; 3],
+        radius: f64,
+    },
 }
 
 pub struct Scratch(PathBuf);
@@ -80,6 +86,17 @@ fn fixture_talk_objective() -> Value {
         "kind": "talk_to_npc",
         "id": 1,
         "npc_id": FIXTURE_TARGET,
+        "source": fixture_source(),
+    }])
+}
+
+fn fixture_visit_objective(position: [f64; 3], radius: f64) -> Value {
+    json!([{
+        "kind": "visit_position",
+        "id": 1,
+        "zone_id": 1,
+        "position": position,
+        "radius": radius,
         "source": fixture_source(),
     }])
 }
@@ -191,6 +208,17 @@ pub fn fixture(name: &str, defect: Defect) -> Scratch {
                 fixture_talk_objective(),
                 fixture_reward(),
                 json!([FIXTURE_MISSING_PREREQUISITE]),
+            ));
+            quest_ids.push(FIXTURE_DEFECT);
+        }
+        Defect::VisitGeometry { position, radius } => {
+            quests.push(fixture_quest(
+                FIXTURE_DEFECT,
+                FIXTURE_TITLE,
+                FIXTURE_GIVER,
+                fixture_visit_objective(position, radius),
+                fixture_reward(),
+                json!([]),
             ));
             quest_ids.push(FIXTURE_DEFECT);
         }
