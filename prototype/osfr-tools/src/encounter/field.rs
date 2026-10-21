@@ -415,6 +415,18 @@ impl EncounterEngine {
             })
     }
 
+    /// Run a developer load against a clone and swap it in only when every
+    /// step succeeds. A reload is a rare developer action and the engine
+    /// already derives `Clone`; a refusal drops the clone, so content,
+    /// battles, resolved behaviours, the open start screen and the marker
+    /// walks all keep their old values.
+    fn staged<T>(&mut self, f: impl FnOnce(&mut Self) -> io::Result<T>) -> io::Result<T> {
+        let mut staged = self.clone();
+        let value = f(&mut staged)?;
+        *self = staged;
+        Ok(value)
+    }
+
     /// Developer hot reload of `field_battles.json` (outside encounters).
     pub fn reload_field_battles(&mut self, path: &Path) -> io::Result<()> {
         if self.shared_fields.is_some() {
@@ -425,20 +437,19 @@ impl EncounterEngine {
                 "finish or exit the encounter before reloading battles",
             ));
         }
-        let old: BTreeSet<u32> = self.battles.iter().map(|b| b.id).collect();
-        let content = Arc::make_mut(&mut self.content);
-        let saved = content.dungeons.clone();
-        content.dungeons.retain(|d| !old.contains(&d.id));
-        let battles = std::mem::take(&mut self.battles);
-        if let Err(error) = self.load_field_battles(path) {
-            Arc::make_mut(&mut self.content).dungeons = saved;
-            self.battles = battles;
-            self.rebuild_behaviours()?;
-            return Err(error);
-        }
-        self.pending_battle = None;
-        self.field_sim.wander.clear();
-        Ok(())
+        self.staged(|engine| {
+            let old: BTreeSet<u32> = engine.battles.iter().map(|b| b.id).collect();
+            // This file owns these dungeon rows: drop them before the read, or
+            // a battle that reuses its own spawner GUIDs collides with itself.
+            Arc::make_mut(&mut engine.content)
+                .dungeons
+                .retain(|d| !old.contains(&d.id));
+            engine.battles.clear();
+            engine.load_field_battles(path)?;
+            engine.pending_battle = None;
+            engine.field_sim.wander.clear();
+            Ok(())
+        })
     }
 
     /// Developer hot reload of `field_enemies.json`: despawn, reload, respawn.
@@ -451,23 +462,31 @@ impl EncounterEngine {
                 "finish or exit the encounter before reloading enemies",
             ));
         }
-        let previous = self.field_sim.enemies.clone();
-        let mut packets = Vec::new();
-        for f in &previous {
-            if f.present && f.state.health > 0 {
-                packets.push(remove(f.actor.guid));
+        // The old actors are despawned and their per-guid state forgotten only
+        // after the new file loads, so a refusal returns neither the packets
+        // nor the cleanup.
+        let previous: Vec<u64> = self
+            .field_sim
+            .enemies
+            .iter()
+            .map(|f| f.actor.guid)
+            .collect();
+        let mut packets: Vec<Vec<u8>> = self
+            .field_sim
+            .enemies
+            .iter()
+            .filter(|f| f.present && f.state.health > 0)
+            .map(|f| remove(f.actor.guid))
+            .collect();
+        self.staged(|engine| {
+            engine.load_field_enemies(path)?;
+            for guid in &previous {
+                engine.field_sim.moving.remove(guid);
+                engine.field_sim.attacks.remove(guid);
+                engine.skills.forget_target(*guid);
             }
-        }
-        if let Err(error) = self.load_field_enemies(path) {
-            self.field_sim.enemies = previous;
-            self.rebuild_behaviours()?;
-            return Err(error);
-        }
-        for f in &previous {
-            self.field_sim.moving.remove(&f.actor.guid);
-            self.field_sim.attacks.remove(&f.actor.guid);
-            self.skills.forget_target(f.actor.guid);
-        }
+            Ok(())
+        })?;
         packets.extend(self.field_initialization());
         Ok(packets)
     }
@@ -730,16 +749,11 @@ impl EncounterEngine {
             let guid = b.spawner.guid;
             if near < WANDER_NOTICE {
                 // It notices the player: stop and face them, so it can be clicked.
-                if self.field_sim.moving.remove(&guid) {
-                    let d = near.max(0.01);
-                    let face = [
-                        (player[0] - w.position[0]) / d,
-                        0.0,
-                        (player[2] - w.position[2]) / d,
-                    ];
+                if self.field_sim.moving.contains(&guid) {
+                    let face = heading(w.position, player).unwrap_or_default();
                     out.replies.push(movement(guid, w.position, face));
-                    out.replies.push(animation(guid, 1, true));
                 }
+                stand(guid, &mut self.field_sim.moving, out);
                 continue;
             }
             if now_ms < w.pause_until {
@@ -759,30 +773,26 @@ impl EncounterEngine {
                 w.position = goal;
                 w.waypoint = (w.waypoint + 1) % 4;
                 w.pause_until = now_ms.saturating_add(WANDER_PAUSE_MS);
-                let heading = [
+                // Waypoint exception: the arrival facing divides the goal
+                // offset by WANDER_RADIUS, not by the 3-D distance to it.
+                let face = [
                     (goal[0] - home[0]) / WANDER_RADIUS,
                     0.0,
                     (goal[2] - home[2]) / WANDER_RADIUS,
                 ];
-                out.replies.push(movement(guid, w.position, heading));
-                if self.field_sim.moving.remove(&guid) {
-                    out.replies.push(animation(guid, 1, true));
-                }
+                out.replies.push(movement(guid, w.position, face));
+                stand(guid, &mut self.field_sim.moving, out);
                 continue;
             }
-            let heading = [
-                (goal[0] - w.position[0]) / left,
-                0.0,
-                (goal[2] - w.position[2]) / left,
-            ];
+            let Some(face) = heading(w.position, goal) else {
+                continue;
+            };
             for (coord, to) in w.position.iter_mut().zip(goal) {
                 *coord += (to - *coord) / left * step;
             }
             ground.snap(&mut w.position);
-            out.replies.push(movement(guid, w.position, heading));
-            if self.field_sim.moving.insert(guid) {
-                out.replies.push(animation(guid, 2, true)); // loc_walk
-            }
+            out.replies.push(movement(guid, w.position, face));
+            walk(guid, 2, &mut self.field_sim.moving, out); // loc_walk
         }
     }
 
@@ -909,25 +919,19 @@ impl EncounterEngine {
                 };
                 let step = (speed * elapsed.min(250) as f32 / 1000.0).min((left - stop).max(0.0));
                 if left > 0.001 && step > 0.0 && b.mode != Mode::Stationary {
-                    let heading = [
-                        (goal[0] - f.state.position[0]) / left,
-                        0.0,
-                        (goal[2] - f.state.position[2]) / left,
-                    ];
-                    let mut next = f.state.position;
-                    for (coord, to) in next.iter_mut().zip(goal) {
-                        *coord += (to - *coord) / left * step;
-                    }
+                    let (next, grounded) = match advance(f.state.position, goal, step, &ground) {
+                        Ok(next) => (next, true),
+                        Err(next) => (next, false),
+                    };
                     // Check BEFORE moving. Never take even one step outside home leash.
                     if f.motion == FieldMotion::Chasing && horizontal_distance(next, home) > leash {
                         f.motion = FieldMotion::Returning;
                         f.roam_goal = None;
-                    } else if let Some(next) = ground.field_position(next) {
+                    } else if grounded {
+                        let face = heading(f.state.position, goal).unwrap_or_default();
                         f.state.position = next;
-                        out.replies.push(movement(guid, next, heading));
-                        if self.field_sim.moving.insert(guid) {
-                            out.replies.push(animation(guid, 3, true));
-                        }
+                        out.replies.push(movement(guid, next, face));
+                        walk(guid, 3, &mut self.field_sim.moving, out);
                         out.changed = true;
                     } else {
                         f.roam_goal = None;
@@ -935,15 +939,11 @@ impl EncounterEngine {
                         if f.motion == FieldMotion::Chasing {
                             f.motion = FieldMotion::Returning;
                         }
-                        if self.field_sim.moving.remove(&guid) {
-                            out.replies.push(animation(guid, 1, true));
-                        }
+                        stand(guid, &mut self.field_sim.moving, out);
                     }
                 }
                 if f.motion != FieldMotion::Chasing && distance(f.state.position, goal) <= 0.001 {
-                    if self.field_sim.moving.remove(&guid) {
-                        out.replies.push(animation(guid, 1, true));
-                    }
+                    stand(guid, &mut self.field_sim.moving, out);
                     if f.motion == FieldMotion::Returning {
                         if f.state.health != f.actor.max_health {
                             f.state.health = f.actor.max_health;
@@ -967,9 +967,7 @@ impl EncounterEngine {
             }
             engaged = true;
             if distance(position, f.state.position) <= b.reach {
-                if self.field_sim.moving.remove(&guid) {
-                    out.replies.push(animation(guid, 1, true));
-                }
+                stand(guid, &mut self.field_sim.moving, out);
                 if self
                     .field_sim
                     .attacks
@@ -1029,5 +1027,56 @@ impl EncounterEngine {
                 combat_flag(133, 0, 0, engaged),
             ]);
         }
+    }
+}
+
+/// Facing from `from` toward `to` exactly how the field AI has always sent it:
+/// the horizontal delta divided by the full 3-D distance. Movement is opcode
+/// 125 (`0x008e5940`); its direction is a horizontal vector that the client
+/// normalizes before `atan2(X, Z)` (`0x0095dae0`), so the y component is zero.
+/// `None` when the spots coincide, in which case the caller sends a zero
+/// facing (there is no direction to communicate). Documented exceptions kept
+/// inline: the waypoint-arrival heading in `tick_wanderers_for` (it divides
+/// the goal offset by `WANDER_RADIUS`) and `kite_turn`'s negated facing in
+/// `encounter.rs`.
+fn heading(from: [f32; 3], to: [f32; 3]) -> Option<[f32; 3]> {
+    let left = distance(from, to);
+    (left > 0.001).then(|| [(to[0] - from[0]) / left, 0.0, (to[2] - from[2]) / left])
+}
+
+/// The integrated next spot toward `goal`. `Ok` is snapped by `ground`; `Err`
+/// carries the same integrated spot when ground refuses it
+/// (`Ground::field_position`), so the caller can still apply its "home leash
+/// before moving" rule first, exactly as the old two-step check did. The bare
+/// `Ground::snap` walk in `tick_wanderers_for` stays inline because it never
+/// refuses a step.
+fn advance(
+    position: [f32; 3],
+    goal: [f32; 3],
+    step: f32,
+    ground: &Ground,
+) -> Result<[f32; 3], [f32; 3]> {
+    let left = distance(position, goal);
+    let mut next = position;
+    for (coord, to) in next.iter_mut().zip(goal) {
+        *coord += (to - *coord) / left * step;
+    }
+    ground.field_position(next).ok_or(next)
+}
+
+/// Stop the walk animation if this actor was walking: the `moving` set is the
+/// only record of the start/stop pairs, so one helper keeps them in step. The
+/// movement frame is pushed by the caller before this one.
+fn stand(guid: u64, moving: &mut BTreeSet<u64>, out: &mut EncounterOutcome) {
+    if moving.remove(&guid) {
+        out.replies.push(animation(guid, 1, true)); // loc_stand
+    }
+}
+
+/// Start the walk animation if this actor was standing. `id` is 2 (`loc_walk`)
+/// for a battle marker and 3 (`loc_run`) for a field actor.
+fn walk(guid: u64, id: i32, moving: &mut BTreeSet<u64>, out: &mut EncounterOutcome) {
+    if moving.insert(guid) {
+        out.replies.push(animation(guid, id, true));
     }
 }
