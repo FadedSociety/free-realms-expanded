@@ -8,6 +8,8 @@
 //! `encounter`, `activities` and `npc_visibility` -- and only after every
 //! requested loader succeeds; a refusal publishes neither state nor packets.
 //! A new `Gameplay` field is not reload content until it is added to that list.
+//! In particular `npc_interaction` is not reloaded: `NpcInteraction::load` runs only
+//! in `Gameplay::load`, so a vendor role or `vendors.json` mapping fix needs a restart.
 //!
 //! The regression `refused_reload_all_keeps_behaviour_and_shared_field_state`
 //! is in `gameplay/w64_regional_quest_tests.rs`: `lab/autopilot/protected-pass.txt`

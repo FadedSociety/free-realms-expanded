@@ -556,7 +556,7 @@ fn a_vendor_mapping_without_the_content_role_is_refused() {
         "unexpected refusal: {error}"
     );
 
-    // Positive control: the reviewed role+mapping rule still loads and sells.
+    // Positive control: the reviewed role+mapping rule still loads and opens the mapped stock.
     std::fs::write(root.join("npcs/fixture.json"), role_bearing).expect("fixture NPC writes");
     let mut service = NpcInteraction::load(&root.join("npcs"), &root.join("stores.json"))
         .expect("the role and the explicit mapping authorize stock");
