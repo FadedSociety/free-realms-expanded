@@ -274,6 +274,87 @@
           "evidence": "(R) Two always-on field shamans repeat two verified W102 centres; level band 13-14 and 150 s respawn are a local progression step above the level 9-10 mid shamans and reach the level-13 battle gate. Count, respawn and rates are local policy."
         }
       ]
+    },
+    {
+      "id": "elite_trolls",
+      "zone_id": 0,
+      "region": "Lakeshore / northeast Wilds",
+      "respawn_seconds": 180,
+      "aggro_range": 8.0,
+      "level_band": [
+        15,
+        16
+      ],
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "members": [
+        131000102031,
+        131000102032
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json starting_wilds_shamans, mid_wilds_shamans and high_wilds_shamans; rows 131000102010 (W102-T1) and 131000102012 (W102-T3) supply the reused centres; notes/Autopilot/T245.md and T296.md. The same 12 m leash, so no new ground is introduced."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Two elite Troll Bone Shamans (levels 15 and 16) in one group with a 180 s respawn; part of the six-actor/three-group T332 shape. Local progression above the level 13-14 high camps, reusing the shipped 930025 base definition. Count, respawn and rates are local policy, not a recovered 2014 spawn table."
+        }
+      ]
+    },
+    {
+      "id": "elite_bixies",
+      "zone_id": 0,
+      "region": "Sanctuary / Queensfields",
+      "respawn_seconds": 180,
+      "aggro_range": 8.0,
+      "level_band": [
+        17,
+        18
+      ],
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "members": [
+        131000102033,
+        131000102034
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json starting_queensfields_bixies and mid_queensfields_bixies; rows 131000102009 (W102-Q3) and 131000102007 (W102-Q1) supply the reused centres; notes/Autopilot/T245.md and T296.md. The same 12 m leash, so no new ground is introduced."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Two elite Bixie Soldiers (levels 17 and 18) in one group with a 180 s respawn; part of the six-actor/three-group T332 shape. Local progression above the level 13-14 high camps, reusing the shipped 930053 base definition. Count, respawn and rates are local policy, not a recovered 2014 spawn table."
+        }
+      ]
+    },
+    {
+      "id": "elite_hooligans",
+      "zone_id": 0,
+      "region": "Highroad outskirts",
+      "respawn_seconds": 180,
+      "aggro_range": 8.0,
+      "level_band": [
+        19,
+        20
+      ],
+      "leash_radius": 12.0,
+      "behaviour": "field_roamer",
+      "members": [
+        131000102035,
+        131000102036
+      ],
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json starting_highroad_hooligans and mid_highroad_hooligans; rows 131000102006 (W102-H3) and 131000102004 (W102-H1) supply the reused centres; notes/Autopilot/T245.md and T296.md. The same 12 m leash, so no new ground is introduced."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Two elite Hooligans (levels 19 and 20) in one group with a 180 s respawn; part of the six-actor/three-group T332 shape. Local progression above the level 13-14 high camps, reusing the shipped 930060 base definition. Count, respawn and rates are local policy, not a recovered 2014 spawn table."
+        }
+      ]
     }
   ],
   "enemies": [
@@ -1606,6 +1687,246 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102011 (W102-T2); level 14 in band 13-14 chosen as the local progression step above the level 9-10 mid shamans and at the level-13 battle gate; count, 150 s respawn and rates are local policy. HP/damage are the starting-band counterpart's level-one values (100/7); W105 scaling by level produces the live stats."
+        }
+      ]
+    },
+    {
+      "guid": 131000102031,
+      "definition_id": 930025,
+      "model_id": 168,
+      "name_id": 72269,
+      "name": "Troll Bone Shaman",
+      "texture_alias": "",
+      "position": [
+        -347.084,
+        0.61,
+        1068.348
+      ],
+      "max_health": 100,
+      "damage": 7,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 15,
+      "spawn_area": {
+        "id": "ELITE-T1",
+        "centre": [
+          -347.084,
+          0.61,
+          1068.348
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000003149,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json row 131000102017 (area MID-T1) for the shamans definition, model, name and level-one stats, and row 131000102010 (area W102-T1) for the verified centre and 12 m leash; notes/Autopilot/T245.md and T296.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Elite band actor at level 15 in band 15-16; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930025 Troll Bone Shaman base definition; count and rates are local policy. HP/damage are the base definition's level-one values (100/7); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+        }
+      ]
+    },
+    {
+      "guid": 131000102032,
+      "definition_id": 930025,
+      "model_id": 168,
+      "name_id": 72269,
+      "name": "Troll Bone Shaman",
+      "texture_alias": "",
+      "position": [
+        -447.084,
+        3.03,
+        1128.348
+      ],
+      "max_health": 100,
+      "damage": 7,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 16,
+      "spawn_area": {
+        "id": "ELITE-T2",
+        "centre": [
+          -447.084,
+          3.03,
+          1128.348
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000003149,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json row 131000102017 (area MID-T1) for the shamans definition, model, name and level-one stats, and row 131000102012 (area W102-T3) for the verified centre and 12 m leash; notes/Autopilot/T245.md and T296.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Elite band actor at level 16 in band 15-16; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930025 Troll Bone Shaman base definition; count and rates are local policy. HP/damage are the base definition's level-one values (100/7); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+        }
+      ]
+    },
+    {
+      "guid": 131000102033,
+      "definition_id": 930053,
+      "model_id": 220,
+      "name_id": 440711,
+      "name": "Bixie Soldier",
+      "texture_alias": "",
+      "position": [
+        -651.667,
+        2.4,
+        231.947
+      ],
+      "max_health": 180,
+      "damage": 15,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 17,
+      "spawn_area": {
+        "id": "ELITE-Q1",
+        "centre": [
+          -651.667,
+          2.4,
+          231.947
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000002933,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json row 131000102019 (area MID-Q1) for the bixies definition, model, name and level-one stats, and row 131000102009 (area W102-Q3) for the verified centre and 12 m leash; notes/Autopilot/T245.md and T296.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Elite band actor at level 17 in band 17-18; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930053 Bixie Soldier base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+        }
+      ]
+    },
+    {
+      "guid": 131000102034,
+      "definition_id": 930053,
+      "model_id": 220,
+      "name_id": 440711,
+      "name": "Bixie Soldier",
+      "texture_alias": "",
+      "position": [
+        -664.762,
+        2.4,
+        299.608
+      ],
+      "max_health": 180,
+      "damage": 15,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 18,
+      "spawn_area": {
+        "id": "ELITE-Q2",
+        "centre": [
+          -664.762,
+          2.4,
+          299.608
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000002920,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json row 131000102019 (area MID-Q1) for the bixies definition, model, name and level-one stats, and row 131000102007 (area W102-Q1) for the verified centre and 12 m leash; notes/Autopilot/T245.md and T296.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Elite band actor at level 18 in band 17-18; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930053 Bixie Soldier base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+        }
+      ]
+    },
+    {
+      "guid": 131000102035,
+      "definition_id": 930060,
+      "model_id": 203,
+      "name_id": 5100401,
+      "name": "Hooligan",
+      "texture_alias": "",
+      "position": [
+        -1789.626,
+        -30.24,
+        616.51
+      ],
+      "max_health": 180,
+      "damage": 15,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 19,
+      "spawn_area": {
+        "id": "ELITE-H1",
+        "centre": [
+          -1789.626,
+          -30.24,
+          616.51
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000004161,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json row 131000102015 (area MID-H1) for the hooligans definition, model, name and level-one stats, and row 131000102006 (area W102-H3) for the verified centre and 12 m leash; notes/Autopilot/T245.md and T296.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Elite band actor at level 19 in band 19-20; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930060 Hooligan base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+        }
+      ]
+    },
+    {
+      "guid": 131000102036,
+      "definition_id": 930060,
+      "model_id": 203,
+      "name_id": 5100401,
+      "name": "Hooligan",
+      "texture_alias": "",
+      "position": [
+        -1779.455,
+        -28.88,
+        562.833
+      ],
+      "max_health": 180,
+      "damage": 15,
+      "boss": false,
+      "power_up_table": "standard",
+      "quest_ids": [],
+      "level": 20,
+      "spawn_area": {
+        "id": "ELITE-H2",
+        "centre": [
+          -1779.455,
+          -28.88,
+          562.833
+        ],
+        "radius": 6.0,
+        "count": 1
+      },
+      "reference_spawn_guid": 100000004159,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "data/content/field_enemies.json row 131000102015 (area MID-H1) for the hooligans definition, model, name and level-one stats, and row 131000102004 (area W102-H1) for the verified centre and 12 m leash; notes/Autopilot/T245.md and T296.md."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Elite band actor at level 20 in band 19-20; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930060 Hooligan base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
         }
       ]
     }

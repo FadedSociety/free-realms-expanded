@@ -274,8 +274,16 @@ fn the_high_camps_use_verified_w102_centres_and_unique_guids() {
     let field = shipped_field();
     let enemies = field["enemies"].as_array().unwrap();
     let groups = field["spawn_groups"].as_array().unwrap();
-    assert_eq!(enemies.len(), EXISTING_ACTORS.len() + HIGH.len());
-    assert_eq!(groups.len(), EXISTING_GROUPS.len() + 2);
+    assert_eq!(
+        enemies.len(),
+        34,
+        "24 pre-T296 + 4 HIGH + 6 elite T332 actors"
+    );
+    assert_eq!(
+        groups.len(),
+        13,
+        "eight pre-T296 + two HIGH + three elite T332 groups"
+    );
 
     let mut guids = BTreeSet::new();
     let mut areas = BTreeSet::new();
@@ -293,8 +301,8 @@ fn the_high_camps_use_verified_w102_centres_and_unique_guids() {
             );
         }
     }
-    assert_eq!(areas.len(), 24, "24 actors carry a spawn area");
-    assert_eq!(guids.len(), 28);
+    assert_eq!(areas.len(), 30, "30 actors carry a spawn area");
+    assert_eq!(guids.len(), 34);
 
     for (index, (guid, level, area, reference_guid)) in HIGH.into_iter().enumerate() {
         let row = actor(&field, guid);
@@ -428,8 +436,16 @@ fn the_existing_camps_and_rewards_are_unchanged() {
     let field = shipped_field();
     let enemies = field["enemies"].as_array().unwrap();
     let groups = field["spawn_groups"].as_array().unwrap();
-    assert_eq!(enemies.len(), EXISTING_ACTORS.len() + HIGH.len());
-    assert_eq!(groups.len(), EXISTING_GROUPS.len() + 2);
+    assert_eq!(
+        enemies.len(),
+        34,
+        "24 pre-T296 + 4 HIGH + 6 elite T332 actors"
+    );
+    assert_eq!(
+        groups.len(),
+        13,
+        "eight pre-T296 + two HIGH + three elite T332 groups"
+    );
 
     // Full equality, not just identity and order: a changed position, level,
     // health, source or group policy fails and names the row.
@@ -449,10 +465,11 @@ fn the_existing_camps_and_rewards_are_unchanged() {
         enemies
             .iter()
             .skip(EXISTING_ACTORS.len())
+            .take(HIGH.len())
             .map(|row| row["guid"].as_u64().unwrap())
             .collect::<Vec<_>>(),
         HIGH.iter().map(|(guid, ..)| *guid).collect::<Vec<_>>(),
-        "the four HIGH actors are appended"
+        "the four HIGH actors remain the first appended actors"
     );
     for (row, (id, expected)) in groups
         .iter()
@@ -470,10 +487,11 @@ fn the_existing_camps_and_rewards_are_unchanged() {
         groups
             .iter()
             .skip(EXISTING_GROUPS.len())
+            .take(2)
             .map(|row| row["id"].as_str().unwrap())
             .collect::<Vec<_>>(),
         ["high_farnum_wolves", "high_wilds_shamans"],
-        "the two HIGH groups are appended"
+        "the two HIGH groups remain the first appended groups"
     );
 
     let rewards = shipped_rewards();
