@@ -72251,6 +72251,781 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "spawn_guid": 9500000746,
+      "legacy_npc_id": null,
+      "content_key": 9500000746,
+      "model_id": 4586,
+      "model_file_name": "fairy_m_merchant_wizard_asian_mantis.agr",
+      "name": "Fladnag",
+      "name_string_id": 5102517,
+      "position": [
+        57.361211,
+        30.987,
+        358.624822
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4586 = fairy_m_merchant_wizard_asian_mantis.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/snowhill.json row 9500000746 (Fladnag) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Job-gear and item merchants (wiki-era shops, 2013), row 106; source cell: [client name][video][wiki] The row's name hash 2505010157 resolves to Global.Text.5102517 ('Fladnag') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T372: this slice adds the 25 priced vendor spawns missing from the playtest package. (R) The position [57.361211, 30.987, 358.624822] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4586/fairy_m_merchant_wizard_asian_mantis.agr is a male pixie wizard merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000032,
+      "legacy_npc_id": null,
+      "content_key": 9500000032,
+      "model_id": 4556,
+      "model_file_name": "human_m_merchant_warrior_caucasian.agr",
+      "name": "Hannibal",
+      "name_string_id": 5102439,
+      "position": [
+        -2139.594143,
+        -32.948,
+        1048.33706
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4556 = human_m_merchant_warrior_caucasian.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/blackspore_swamp.json row 9500000032 (Hannibal) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part E. Merchants and vendors, row 87; source cell: [client name] [wiki Hannibal] The row's name hash 379969307 resolves to Global.Text.5102439 ('Hannibal') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [-2139.594143, -32.948, 1048.33706] is the NPC row's reconstructed unanchored placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4556/human_m_merchant_warrior_caucasian.agr is a male human warrior merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000067,
+      "legacy_npc_id": null,
+      "content_key": 9500000067,
+      "model_id": 4526,
+      "model_file_name": "human_f_merchant_ninja_asian.agr",
+      "name": "Striking Cheetah",
+      "name_string_id": 5102379,
+      "position": [
+        -2139.548038,
+        -32.948,
+        1032.814581
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4526 = human_f_merchant_ninja_asian.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/blackspore_swamp.json row 9500000067 (Striking Cheetah) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Blackspore Swamp.md#Part E. Merchants and vendors, row 97; source cell: [client name] [wiki Striking Cheetah] The row's name hash 3372596223 resolves to Global.Text.5102379 ('Striking Cheetah') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [-2139.548038, -32.948, 1032.814581] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4526/human_f_merchant_ninja_asian.agr is a female human ninja merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000115,
+      "legacy_npc_id": null,
+      "content_key": 9500000115,
+      "model_id": 4527,
+      "model_file_name": "human_f_merchant_ninja_caucasian.agr",
+      "name": "Crouching Tiger",
+      "name_string_id": 5102392,
+      "position": [
+        -534.169579,
+        -66.509,
+        2214.103722
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4527 = human_f_merchant_ninja_caucasian.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/briarwood.json row 9500000115 (Crouching Tiger) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Gear merchants (wiki-era shops, 2013), row 206; source cell: [client name][wiki] The row's name hash 985799469 resolves to Global.Text.5102392 ('Crouching Tiger') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [-534.169579, -66.509, 2214.103722] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4527/human_f_merchant_ninja_caucasian.agr is a female human ninja merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000691,
+      "legacy_npc_id": null,
+      "content_key": 9500000691,
+      "model_id": 4523,
+      "model_file_name": "human_m_merchant_ninja_asian.agr",
+      "name": "Hidden Dragon",
+      "name_string_id": 5102393,
+      "position": [
+        -5.779171,
+        41.038,
+        1118.52366
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4523 = human_m_merchant_ninja_asian.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/shrouded_glade.json row 9500000691 (Hidden Dragon) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part E. Gear merchants, row 110; source cell: [client name] [wiki Hidden Dragon, Merchants] The row's name hash 2477435321/1462735228 resolves to Global.Text.5102393 ('Hidden Dragon') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [-5.779171, 41.038, 1118.52366] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4523/human_m_merchant_ninja_asian.agr is a male human ninja merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000741,
+      "legacy_npc_id": null,
+      "content_key": 9500000741,
+      "model_id": 4499,
+      "model_file_name": "human_m_merchant_brawler_caucasian.agr",
+      "name": "Dempsy",
+      "name_string_id": 5102200,
+      "position": [
+        58.447775,
+        30.987,
+        362.571361
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4499 = human_m_merchant_brawler_caucasian.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/snowhill.json row 9500000741 (Dempsy) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Job-gear and item merchants (wiki-era shops, 2013), row 105; source cell: [client name][wiki] The row's name hash 2929861923 resolves to Global.Text.5102200 ('Dempsy') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [58.447775, 30.987, 362.571361] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4499/human_m_merchant_brawler_caucasian.agr is a male human brawler merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000771,
+      "legacy_npc_id": null,
+      "content_key": 9500000771,
+      "model_id": 4558,
+      "model_file_name": "human_f_merchant_warrior_asian.agr",
+      "name": "Sonja",
+      "name_string_id": 5102437,
+      "position": [
+        59.218049,
+        30.987,
+        358.721507
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4558 = human_f_merchant_warrior_asian.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/snowhill.json row 9500000771 (Sonja) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Job-gear and item merchants (wiki-era shops, 2013), row 109; source cell: [client name][wiki] The row's name hash 3998968048 resolves to Global.Text.5102437 ('Sonja') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [59.218049, 30.987, 358.721507] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4558/human_f_merchant_warrior_asian.agr is a female human warrior merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000772,
+      "legacy_npc_id": null,
+      "content_key": 9500000772,
+      "model_id": 4520,
+      "model_file_name": "fairy_f_merchant_medic_african_mayfly.agr",
+      "name": "Spratt",
+      "name_string_id": 5102292,
+      "position": [
+        48.595198,
+        30.987,
+        371.774098
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4520 = fairy_f_merchant_medic_african_mayfly.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/snowhill.json row 9500000772 (Spratt) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Job-gear and item merchants (wiki-era shops, 2013), row 110; source cell: [client name][wiki] The row's name hash 972154406 resolves to Global.Text.5102292 ('Spratt') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [48.595198, 30.987, 371.774098] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4520/fairy_f_merchant_medic_african_mayfly.agr is a female pixie medic merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000775,
+      "legacy_npc_id": null,
+      "content_key": 9500000775,
+      "model_id": 4475,
+      "model_file_name": "human_m_merchant_archer_african.agr",
+      "name": "Tommy",
+      "name_string_id": 5101985,
+      "position": [
+        42.671733,
+        30.987,
+        366.244185
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4475 = human_m_merchant_archer_african.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/snowhill.json row 9500000775 (Tommy) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Job-gear and item merchants (wiki-era shops, 2013), row 111; source cell: [client name][wiki] The row's name hash 613162474 resolves to Global.Text.5101985 ('Tommy') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [42.671733, 30.987, 366.244185] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4475/human_m_merchant_archer_african.agr is a male human archer merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000166,
+      "legacy_npc_id": null,
+      "content_key": 9500000166,
+      "model_id": 4476,
+      "model_file_name": "human_m_merchant_archer_asian.agr",
+      "name": "Locksley",
+      "name_string_id": 5101994,
+      "position": [
+        -535.244849,
+        -66.509,
+        2221.644487
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4476 = human_m_merchant_archer_asian.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/briarwood.json row 9500000166 (Locksley) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Gear merchants (wiki-era shops, 2013), row 203; source cell: [client name][wiki] The row's name hash 3938304913 resolves to Global.Text.5101994 ('Locksley') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [-535.244849, -66.509, 2221.644487] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4476/human_m_merchant_archer_asian.agr is a male human archer merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000339,
+      "legacy_npc_id": null,
+      "content_key": 9500000339,
+      "model_id": 4561,
+      "model_file_name": "fairy_m_merchant_warrior_asian_spark.agr",
+      "name": "Alexander",
+      "name_string_id": 5102438,
+      "position": [
+        84.921306,
+        42.0,
+        1017.636314
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4561 = fairy_m_merchant_warrior_asian_spark.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/lakeshore.json row 9500000339 (Alexander) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#Shops and gear merchants, row 75; source cell: [client name][wiki] The row's name hash 963588043/1784955247/4045445443 resolves to Global.Text.5102438 ('Alexander') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [84.921306, 42.0, 1017.636314] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4561/fairy_m_merchant_warrior_asian_spark.agr is a male pixie warrior merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000348,
+      "legacy_npc_id": null,
+      "content_key": 9500000348,
+      "model_id": 4487,
+      "model_file_name": "fairy_f_merchant_archer_african_decadent.agr",
+      "name": "Kimi",
+      "name_string_id": 5101986,
+      "position": [
+        86.129151,
+        42.0,
+        1024.083487
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4487 = fairy_f_merchant_archer_african_decadent.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/lakeshore.json row 9500000348 (Kimi) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#Shops and gear merchants, row 77; source cell: [client name][wiki] The row's name hash 4186158593/301897871 resolves to Global.Text.5101986 ('Kimi') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [86.129151, 42.0, 1024.083487] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4487/fairy_f_merchant_archer_african_decadent.agr is a female pixie archer merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000349,
+      "legacy_npc_id": null,
+      "content_key": 9500000349,
+      "model_id": 4508,
+      "model_file_name": "fairy_f_merchant_brawler_african_raven.agr",
+      "name": "Kristane",
+      "name_string_id": 5102201,
+      "position": [
+        88.341642,
+        42.0,
+        1014.919496
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4508 = fairy_f_merchant_brawler_african_raven.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/lakeshore.json row 9500000349 (Kristane) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#Shops and gear merchants, row 78; source cell: [client name][wiki] The row's name hash 98435331/4229495683 resolves to Global.Text.5102201 ('Kristane') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [88.341642, 42.0, 1014.919496] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4508/fairy_f_merchant_brawler_african_raven.agr is a female pixie brawler merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000742,
+      "legacy_npc_id": null,
+      "content_key": 9500000742,
+      "model_id": 4529,
+      "model_file_name": "fairy_m_merchant_ninja_asian_fire.agr",
+      "name": "Dizzy Toad",
+      "name_string_id": 5102377,
+      "position": [
+        46.524663,
+        30.987,
+        368.416367
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4529 = fairy_m_merchant_ninja_asian_fire.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/snowhill.json row 9500000742 (Dizzy Toad) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Job-gear and item merchants (wiki-era shops, 2013), row 116; source cell: [client name][wiki] The row's name hash 1820886519 resolves to Global.Text.5102377 ('Dizzy Toad') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [46.524663, 30.987, 368.416367] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4529/fairy_m_merchant_ninja_asian_fire.agr is a male pixie ninja merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000888,
+      "legacy_npc_id": null,
+      "content_key": 9500000888,
+      "model_id": 4522,
+      "model_file_name": "human_m_merchant_ninja_african.agr",
+      "name": "Coiled Viper",
+      "name_string_id": 5102378,
+      "position": [
+        -539.19148,
+        26.03942,
+        773.982013
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4522 = human_m_merchant_ninja_african.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/wilds.json row 9500000888 (Coiled Viper) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md#Part D. The Robgoblin Camp and the Robgoblin Treasure Trove (Northern Wilds), row 98; source cell: [client name][wiki] The row's name hash 665891918/1919228520 resolves to Global.Text.5102378 ('Coiled Viper') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [-539.19148, 26.03942, 773.982013] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4522/human_m_merchant_ninja_african.agr is a male human ninja merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000355,
+      "legacy_npc_id": null,
+      "content_key": 9500000355,
+      "model_id": 4496,
+      "model_file_name": "fairy_m_merchant_blacksmith_caucasian_fire.agr",
+      "name": "Masa",
+      "name_string_id": 5102119,
+      "position": [
+        -729.937593,
+        9.09,
+        949.356347
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4496 = fairy_m_merchant_blacksmith_caucasian_fire.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/lakeshore.json row 9500000355 (Masa) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#Shops and gear merchants, row 80; source cell: [client name][wiki] The row's name hash 2173663497/4257924776 resolves to Global.Text.5102119 ('Masa') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [-729.937593, 9.09, 949.356347] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4496/fairy_m_merchant_blacksmith_caucasian_fire.agr is a male pixie blacksmith merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000482,
+      "legacy_npc_id": null,
+      "content_key": 9500000482,
+      "model_id": 573,
+      "model_file_name": "fairy_f_freestyle_11.agr",
+      "name": "Florina",
+      "name_string_id": 45951,
+      "position": [
+        -1413.420038,
+        -27.631,
+        342.851581
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 573 = fairy_f_freestyle_11.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/sanctuary.json row 9500000482 (Florina) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part B. Merchants and shops, row 87; source cell: [client] [wiki] The row's name hash 1160566912 resolves to Global.Text.45951 ('Florina') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [-1413.420038, -27.631, 342.851581] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 573/fairy_f_freestyle_11.agr is a female pixie merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000676,
+      "legacy_npc_id": null,
+      "content_key": 9500000676,
+      "model_id": 4484,
+      "model_file_name": "human_f_merchant_archer_caucasian.agr",
+      "name": "Elinor",
+      "name_string_id": 5101996,
+      "position": [
+        7.040378,
+        41.038,
+        1118.045883
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4484 = human_f_merchant_archer_caucasian.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/shrouded_glade.json row 9500000676 (Elinor) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part E. Gear merchants, row 107; source cell: [client name] [wiki Elinor, Merchants] The row's name hash 264727886/832138912 resolves to Global.Text.5101996 ('Elinor') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [7.040378, 41.038, 1118.045883] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4484/human_f_merchant_archer_caucasian.agr is a female human archer merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000344,
+      "legacy_npc_id": null,
+      "content_key": 9500000344,
+      "model_id": 4598,
+      "model_file_name": "human_m_merchant_miner_cauasian.agr",
+      "name": "Grasberg",
+      "name_string_id": 5102559,
+      "position": [
+        93.742299,
+        42.0,
+        1018.957419
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4598 = human_m_merchant_miner_cauasian.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/lakeshore.json row 9500000344 (Grasberg) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#Shops and gear merchants, row 76; source cell: [client name][wiki] The row's name hash 3383046797/1241184910 resolves to Global.Text.5102559 ('Grasberg') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [93.742299, 42.0, 1018.957419] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4598/human_m_merchant_miner_cauasian.agr is a male human miner merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000543,
+      "legacy_npc_id": null,
+      "content_key": 9500000543,
+      "model_id": 4545,
+      "model_file_name": "human_f_merchant_postman_african.agr",
+      "name": "Wake",
+      "name_string_id": 5102400,
+      "position": [
+        -1422.405694,
+        -27.631,
+        342.832292
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4545 = human_f_merchant_postman_african.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/sanctuary.json row 9500000543 (Wake) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part B. Merchants and shops, row 91; source cell: [client name] [wiki] The row's name hash 1666351914 resolves to Global.Text.5102400 ('Wake') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [-1422.405694, -27.631, 342.832292] is the NPC row's reconstructed unanchored placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4545/human_f_merchant_postman_african.agr is a female human postman merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000354,
+      "legacy_npc_id": null,
+      "content_key": 9500000354,
+      "model_id": 4574,
+      "model_file_name": "human_f_merchant_chef_caucasian.agr",
+      "name": "Lorraine",
+      "name_string_id": 5102506,
+      "position": [
+        93.014407,
+        42.0,
+        1023.383347
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4574 = human_f_merchant_chef_caucasian.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/lakeshore.json row 9500000354 (Lorraine) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#Shops and gear merchants, row 79; source cell: [client name][wiki] The row's name hash 3624172822/1720767242 resolves to Global.Text.5102506 ('Lorraine') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [93.014407, 42.0, 1023.383347] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4574/human_f_merchant_chef_caucasian.agr is a female human chef merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000763,
+      "legacy_npc_id": null,
+      "content_key": 9500000763,
+      "model_id": 4549,
+      "model_file_name": "human_f_merchant_postman_caucasian.agr",
+      "name": "Reba",
+      "name_string_id": 5102420,
+      "position": [
+        45.355617,
+        30.987,
+        357.031637
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4549 = human_f_merchant_postman_caucasian.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/snowhill.json row 9500000763 (Reba) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Job-gear and item merchants (wiki-era shops, 2013), row 107; source cell: [client name][wiki] The row's name hash 2169332063 resolves to Global.Text.5102420 ('Reba') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [45.355617, 30.987, 357.031637] is the NPC row's reconstructed unanchored placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4549/human_f_merchant_postman_caucasian.agr is a female human postman merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000769,
+      "legacy_npc_id": null,
+      "content_key": 9500000769,
+      "model_id": 4577,
+      "model_file_name": "fairy_f_merchant_chef_african_decadent.agr",
+      "name": "Skye",
+      "name_string_id": 5102505,
+      "position": [
+        84.12376,
+        42.0,
+        1023.392761
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4577 = fairy_f_merchant_chef_african_decadent.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/snowhill.json row 9500000769 (Skye) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Job-gear and item merchants (wiki-era shops, 2013), row 108; source cell: [client name][wiki] The row's name hash 1550469976 resolves to Global.Text.5102505 ('Skye') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [84.12376, 42.0, 1023.392761] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4577/fairy_f_merchant_chef_african_decadent.agr is a female pixie chef merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000648,
+      "legacy_npc_id": null,
+      "content_key": 9500000648,
+      "model_id": 4585,
+      "model_file_name": "human_f_merchant_wizard_caucasian.agr",
+      "name": "Alusru",
+      "name_string_id": 5102523,
+      "position": [
+        0.206597,
+        41.038,
+        1118.531653
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4585 = human_f_merchant_wizard_caucasian.agr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/shrouded_glade.json row 9500000648 (Alusru) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part E. Gear merchants, row 113; source cell: [client name] [wiki Alusru, Merchants] The row's name hash 3454542571/2390135778 resolves to Global.Text.5102523 ('Alusru') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [0.206597, 41.038, 1118.531653] is the NPC row's reconstructed unanchored placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4585/human_f_merchant_wizard_caucasian.agr is a female human wizard merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000845,
+      "legacy_npc_id": null,
+      "content_key": 9500000845,
+      "model_id": 4,
+      "model_file_name": "robgoblin_m_basic.adr",
+      "name": "Razzle",
+      "name_string_id": 413068,
+      "position": [
+        908.835926,
+        2.463198,
+        2245.136441
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4 = robgoblin_m_basic.adr (the 2014 client's model table; ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt lists the same file as a legacy client model). The data/content/npcs/sunstone_valley.json row 9500000845 (Razzle) has no model_id/model_file_name, so the client body comes from the client model table, not from a recovered NPC binding."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part I. Pony Vale (through the Mystical Barrier), row 154; source cell: [client][wiki] The row's name hash 2605501257/1005573561 resolves to Global.Text.413068 ('Razzle') in lab/reports/locale-id-map.json; the AddNpc name field is the Global.Text id (client formats 'Global.Text.%d')."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) The position [908.835926, 2.463198, 2245.136441] is the NPC row's reconstructed unanchored placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4/robgoblin_m_basic.adr is a male robgoblin merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        }
+      ],
+      "position_w": null
     }
   ]
 }

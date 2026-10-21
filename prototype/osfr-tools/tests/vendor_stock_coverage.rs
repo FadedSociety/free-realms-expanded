@@ -6,8 +6,9 @@
 //! predates the later ride-vendor additions and does not match the checked catalogue.
 //!
 //! The six selected-hub NPC files contain 59 vendor-role records: 30 fully
-//! grantable `vendors.json` records (T275 made Bordon Cloo a vendor), one resolved
-//! record whose only named stock has no purchasable price, and 28 records with no
+//! grantable `vendors.json` records (T275 made Bordon Cloo a vendor; T372 spawns
+//! the ten stocked rows that had no runtime actor), one resolved record whose
+//! only named stock has no purchasable price, and 28 records with no
 //! item-level stock evidence.
 //! Every one is enumerated and either stocked or listed as an explicit,
 //! evidence-backed exception, so a new vendor or a newly empty window fails here
@@ -97,29 +98,21 @@ const SELECTED_HUB_VENDOR_RECORD_COUNT: usize = 31;
 const SELECTED_HUB_STOCKED_VENDOR_COUNT: usize = 30;
 const SELECTED_HUB_RESOLVED_EMPTY_VENDOR_COUNT: usize = 1;
 const SELECTED_HUB_UNRESOLVED_VENDOR_COUNT: usize = 28;
-/// Only data-backed `legacy_data` rows are sent by `NpcVisibility::load`; the
-/// other 29 vendor rows are POI-anchor/unanchored reconstruction scaffolding.
-/// Pin the stocked/unresolved split too, so a placement swap between the two
-/// groups cannot keep the total while hiding a reachable-stock regression.
-const SELECTED_HUB_SPAWNED_VENDOR_COUNT: usize = 30;
-const SELECTED_HUB_SPAWNED_STOCKED_VENDOR_COUNT: usize = 20;
+/// `NpcVisibility::load` sends every data-backed `legacy_data` row and every
+/// renderable `npc_spawns_extra` row. T372 added the ten stocked selected-hub
+/// vendor spawns, so the spawned set is 40 (30 stocked, 10 unstocked) and no
+/// stocked vendor is left unspawned. Pin the stocked/unresolved split too, so a
+/// placement swap between the two groups cannot keep the total while hiding a
+/// reachable-stock regression.
+const SELECTED_HUB_SPAWNED_VENDOR_COUNT: usize = 40;
+const SELECTED_HUB_SPAWNED_STOCKED_VENDOR_COUNT: usize = 30;
 const SELECTED_HUB_SPAWNED_UNSTOCKED_VENDOR_COUNT: usize = 10;
-/// Stocked `vendors.json` records whose NPC placement is not `legacy_data`, so
-/// the production visibility loader never spawns them. They remain unreachable
-/// and must not be counted toward the T108 completion target.
-const SELECTED_HUB_STOCKED_UNSPAWNED_VENDOR_COUNT: usize = 10;
-const SELECTED_HUB_STOCKED_UNSPAWNED_VENDOR_IDS: &[u64] = &[
-    9_500_000_032,
-    9_500_000_067,
-    9_500_000_339,
-    9_500_000_344,
-    9_500_000_348,
-    9_500_000_349,
-    9_500_000_354,
-    9_500_000_355,
-    9_500_000_482,
-    9_500_000_543,
-];
+/// Stocked `vendors.json` records whose NPC placement has neither a `legacy_data`
+/// row nor an `npc_spawns_extra` actor, so the production visibility loader never
+/// spawns them. T372 spawned the last ten; this stays zero so a regression that
+/// drops a spawn fails here.
+const SELECTED_HUB_STOCKED_UNSPAWNED_VENDOR_COUNT: usize = 0;
+const SELECTED_HUB_STOCKED_UNSPAWNED_VENDOR_IDS: &[u64] = &[];
 /// The brief's 20-additional-vendor target leaves 49 of the 59 selected-hub
 /// vendor rows fully grantable. Nothing sources that yet; the ignored target
 /// test below records the real requirement instead of treating the pre-T275
@@ -576,13 +569,14 @@ fn assert_exception(vendor: &VendorNpc, recorded: Option<&StockException>) {
     );
 }
 
-/// The production loader (`world::NpcVisibility::load`, `src/world.rs:280`)
-/// spawns only data-backed `legacy_data` rows; `reconstructed_spawn`, POI-anchor
-/// and unanchored rows are reconstruction scaffolding and stay off the wire.
-/// Pin both outcomes so a placement or anchor regression cannot silently drop a
-/// visible vendor, and confirm the 35/2 spawn list carries the content position.
+/// The production loader (`world::NpcVisibility::load`) spawns every data-backed
+/// `legacy_data` regional row and every renderable `npc_spawns_extra` row.
+/// Pin both outcomes so a placement or spawn regression cannot silently drop a
+/// visible vendor, and confirm the spawn list carries the content position.
 /// Also pin the stocked rows the loader cannot spawn: their stock is real but
-/// unreachable, so it must not count toward the T108 completion target.
+/// unreachable, so it must not count toward the T108 completion target. T372
+/// added extra spawns for all ten previously unspawned stocked selected-hub
+/// vendors, so this count is now zero.
 fn assert_selected_hub_vendor_spawns(
     content: &Path,
     vendors: &[VendorNpc],
@@ -595,29 +589,21 @@ fn assert_selected_hub_vendor_spawns(
         .into_iter()
         .map(|target| (target.guid, target.position))
         .collect();
-    let mut data_backed = 0usize;
-    let mut data_backed_stocked = 0usize;
-    let mut data_backed_unstocked = 0usize;
+    let mut spawned_count = 0usize;
+    let mut spawned_stocked = 0usize;
+    let mut spawned_unstocked = 0usize;
     let mut stocked_unspawned = BTreeSet::new();
     for vendor in vendors {
-        let spawned_placement = vendor.placement == "legacy_data";
-        if spawned_placement {
-            data_backed += 1;
+        if visibility.content_key(vendor.npc_id) == Some(vendor.npc_id) {
+            spawned_count += 1;
             if stocked_ids.contains(&vendor.npc_id) {
-                data_backed_stocked += 1;
+                spawned_stocked += 1;
             } else {
-                data_backed_unstocked += 1;
+                spawned_unstocked += 1;
             }
-            assert_eq!(
-                visibility.content_key(vendor.npc_id),
-                Some(vendor.npc_id),
-                "vendor NPC {} ({}) is data-backed but not spawned",
-                vendor.npc_id,
-                vendor.name
-            );
             let position = spawned.get(&vendor.npc_id).unwrap_or_else(|| {
                 panic!(
-                    "vendor NPC {} ({}) is missing from the 35/2 spawn list",
+                    "vendor NPC {} ({}) is content-keyed but missing from the spawn list",
                     vendor.npc_id, vendor.name
                 )
             });
@@ -629,30 +615,34 @@ fn assert_selected_hub_vendor_spawns(
                 );
             }
         } else {
+            assert_ne!(
+                vendor.placement, "legacy_data",
+                "vendor NPC {} ({}) is data-backed but has no spawned actor",
+                vendor.npc_id, vendor.name
+            );
             if stocked_ids.contains(&vendor.npc_id) {
                 stocked_unspawned.insert(vendor.npc_id);
             }
             assert_eq!(
                 visibility.content_key(vendor.npc_id),
                 None,
-                "vendor NPC {} ({}) has placement {} and must not be spawned",
+                "vendor NPC {} ({}) is not spawned but resolves to a content key",
                 vendor.npc_id,
-                vendor.name,
-                vendor.placement
+                vendor.name
             );
         }
     }
     assert_eq!(
-        data_backed, SELECTED_HUB_SPAWNED_VENDOR_COUNT,
-        "the selected-hub data-backed vendor spawn set changed"
+        spawned_count, SELECTED_HUB_SPAWNED_VENDOR_COUNT,
+        "the selected-hub spawned vendor set changed"
     );
     assert_eq!(
-        data_backed_stocked, SELECTED_HUB_SPAWNED_STOCKED_VENDOR_COUNT,
-        "the data-backed stocked-vendor spawn set changed"
+        spawned_stocked, SELECTED_HUB_SPAWNED_STOCKED_VENDOR_COUNT,
+        "the spawned stocked-vendor set changed"
     );
     assert_eq!(
-        data_backed_unstocked, SELECTED_HUB_SPAWNED_UNSTOCKED_VENDOR_COUNT,
-        "the data-backed non-stocked vendor spawn set changed"
+        spawned_unstocked, SELECTED_HUB_SPAWNED_UNSTOCKED_VENDOR_COUNT,
+        "the spawned non-stocked vendor set changed"
     );
     assert_eq!(
         stocked_unspawned.len(),
@@ -662,7 +652,7 @@ fn assert_selected_hub_vendor_spawns(
     assert_eq!(
         stocked_unspawned.iter().copied().collect::<Vec<_>>(),
         SELECTED_HUB_STOCKED_UNSPAWNED_VENDOR_IDS,
-        "a stocked vendor's placement changed; do not count an unreachable vendor as complete"
+        "a stocked vendor's spawn changed; do not count an unreachable vendor as complete"
     );
 }
 
@@ -674,17 +664,15 @@ fn assert_selected_hub_vendor_spawns(
 /// variant/composite claims), so the lead accepted this unmet target on
 /// 2026-10-19 instead of invented content. See `notes/Autopilot/F192.md`.
 #[test]
-#[ignore = "T108 target unmet: 20 of 39 spawned (30 of 49 records) selected-hub vendors are stocked"]
+#[ignore = "T108 target unmet: 30 of 39 spawned (30 of 49 records) selected-hub vendors are stocked"]
 fn at_least_twenty_more_selected_hub_vendors_are_fully_grantable() {
     let content = content_dir();
     let vendors = read_json(&content.join("vendors.json"));
     let stores = prices(&content);
     let inventory = Inventory::load(&inventory_content_dir(), None)
         .expect("the runtime inventory catalogue loads");
-    let placements: BTreeMap<u64, String> = selected_hub_vendors(&content)
-        .into_iter()
-        .map(|vendor| (vendor.npc_id, vendor.placement))
-        .collect();
+    let visibility = NpcVisibility::load(&content)
+        .expect("the production NPC visibility loader accepts the selected hubs");
     let selected: Vec<(u64, &Value)> = vendor_items(&vendors)
         .into_iter()
         .filter(|(_, vendor)| {
@@ -697,11 +685,7 @@ fn at_least_twenty_more_selected_hub_vendors_are_fully_grantable() {
     let fully_grantable_count = selected.len();
     let spawned_count = selected
         .iter()
-        .filter(|(npc_id, _)| {
-            placements
-                .get(npc_id)
-                .is_some_and(|placement| placement == "legacy_data")
-        })
+        .filter(|(npc_id, _)| visibility.content_key(*npc_id) == Some(*npc_id))
         .count();
     assert!(
         spawned_count >= T108_REQUIRED_SPAWNED_STOCKED_VENDOR_COUNT,
