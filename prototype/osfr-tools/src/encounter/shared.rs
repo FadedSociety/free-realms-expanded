@@ -157,10 +157,11 @@ impl SharedFieldState {
     /// account can retain an unbounded effect entry or a second ticking path.
     ///
     /// (R) A kill credit already earned survives the player's absence until its
-    /// TTL (F276: a reconnect must still collect it). The field-owned drop does
-    /// not: a player who left the field keeps only the coin/job-XP pair and the
-    /// server-authored defeat event. A quest-only credit has no such pair, so it
-    /// is dropped here rather than kept for a player who left.
+    /// TTL (F276: a reconnect must still collect the earned reward). The
+    /// field-owned drop and the quest event do not: a player who left the field
+    /// keeps only the coin/job-XP pair (`KillCredit::retain_after_leave`). A
+    /// quest-only credit has no such pair, so it is dropped here rather than
+    /// kept for a player who left.
     pub fn retain_casters(&mut self, ready: &BTreeSet<u64>, now_ms: u64) {
         self.dots
             .retain(|caster, dots| ready.contains(caster) && !dots.is_empty());
@@ -174,10 +175,7 @@ impl SharedFieldState {
                 if present {
                     return true;
                 }
-                credit.table = None;
-                credit
-                    .reward
-                    .is_some_and(|(coins, job_xp)| coins > 0 || job_xp > 0)
+                credit.retain_after_leave()
             });
         }
         self.field_sim

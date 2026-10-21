@@ -1,16 +1,22 @@
 //! Field-kill rewards: the bounded level-band table, the one coin/job-XP payout
-//! and the one quest event each credited player receives for a
-//! server-authoritative kill.
+//! and the one quest event each credited player present at the claim receives
+//! for a server-authoritative kill.
 //!
 //! The table is separate from `field_enemies.json` so that actor rows keep
 //! their existing schema and limits; a missing table is an empty table for old
 //! test packages, while a malformed or out-of-bounds table refuses to load.
 //!
+//! (R) The per-contributor quest event is a reconstructed policy: the client
+//! proves the 49/8, 49/9 and 49/10 objective packets (readers `0x00c7aeb0`,
+//! `0x00c7af60`, `0x00c7b070`), not who may receive them. Sources:
+//! `notes/Autopilot/T240.md`, `T256.md` and `T302.md`.
+//!
 //! A `KillCredit` carries the server-authored defeated actor definition (`0`
 //! names no quest target) together with the carried reward, and it is claimed
 //! on the participant's next shared tick. Reward and quest credit use the same
 //! `who` set in `credit_field_kill`: a future contributor-set change must
-//! change both together.
+//! change both together. A player who leaves the field keeps the reward pair
+//! for F276's reconnect but forfeits the event (`KillCredit::retain_after_leave`).
 use super::*;
 use std::io::Read;
 
@@ -22,14 +28,15 @@ const MAX_REWARD: u32 = 1000;
 const MAX_LEVEL: u32 = 20;
 /// (R) An unclaimed shared-kill credit lapses after this long (the claim happens
 /// on the participant's next shared tick, a fraction of a second away).
-const CREDIT_TTL_MS: u64 = 10_000;
+pub const CREDIT_TTL_MS: u64 = 10_000;
 /// (R) At most this many unclaimed credits wait per player.
 const MAX_CREDITS: usize = 16;
 
 /// A participant's unclaimed share of one kill: the carried T240 reward and the
 /// server-authored defeated definition. The claimant's own engine turns the
-/// definition into its own kill event, so every credited player advances their
-/// own quests exactly like the killer already does in `strike_damage`.
+/// definition into its own kill event, so every credited player still present
+/// at the claim advances their own quests exactly like the killer already does
+/// in `strike_damage` (leaving forfeits the event; see `retain_after_leave`).
 #[derive(Clone)]
 pub(super) struct KillCredit {
     kill: (u64, u64),
@@ -41,9 +48,24 @@ pub(super) struct KillCredit {
     /// The field reward earned by this kill, carried until the claim.
     pub(super) reward: Option<(u32, u32)>,
     /// The defeated actor's definition id, the claimant's own quest event.
-    /// `0` names no quest target.
+    /// `0` names no quest target and is also what `retain_after_leave` sets for
+    /// a player who left the field: the event is forfeited, the reward is not.
     definition: i32,
     pub(super) expires_ms: u64,
+}
+
+impl KillCredit {
+    /// (R) F276 keeps an earned reward pair for a departed player's reconnect,
+    /// but T302's quest event is not a saved entitlement: leaving the field
+    /// forfeits it. Clear the non-reward payloads here so the departure rule
+    /// lives on the type and a future credit payload has to decide it too.
+    /// Returns whether anything is left to claim.
+    pub(super) fn retain_after_leave(&mut self) -> bool {
+        self.table = None;
+        self.definition = 0;
+        self.reward
+            .is_some_and(|(coins, job_xp)| coins > 0 || job_xp > 0)
+    }
 }
 
 /// (R) Per-kill coins and active-job XP, looked up by definition then level.
@@ -258,6 +280,8 @@ impl EncounterEngine {
     /// Pay the credits other players earned for this engine's player: the
     /// carried reward and, exactly once, the claimant's own kill event. A credit
     /// is removed when it is claimed or expires, so a second claim pays nothing.
+    /// A departed player's credit has already cleared its event and table in
+    /// `KillCredit::retain_after_leave`; only the reward pair survives to here.
     pub(super) fn claim_kill_credits(
         &mut self,
         player: u64,

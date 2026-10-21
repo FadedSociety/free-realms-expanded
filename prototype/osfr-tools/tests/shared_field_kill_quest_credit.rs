@@ -4,7 +4,9 @@
 //! T302 carries the same server-authored definition on T240's kill credit, so
 //! every other credited participant (`who`: hitters inside the participation
 //! window, the engaged target and the killer) advances their own quests and
-//! opening defeat goals on their next shared tick, exactly once.
+//! opening defeat goals on their next shared tick, exactly once. A participant
+//! who leaves the field before the claim keeps T240's reward pair (F276's
+//! reconnect) but forfeits the quest event.
 //!
 //! The session fixture, its private content copy, the saved-state reload, the
 //! NPC menu/dialogue/turn-in packets and the 49/x objective assertions all come
@@ -35,7 +37,7 @@ use npc_quest_chain::{
 };
 use osfr_tools::{
     character_store::CharacterState,
-    encounter::{SharedFieldAction, SharedFieldState},
+    encounter::{SharedFieldAction, SharedFieldState, field_rewards::CREDIT_TTL_MS},
     gameplay::{Gameplay, GameplayState, Outcome},
     quest_engine::{CharacterEligibility, QuestEngine, QuestState, QuestStatus},
 };
@@ -67,8 +69,6 @@ const OPENING_STAGE: u32 = 910_007;
 const WOLF_GUID: u64 = 131_000_109_001;
 const WOLF_TWO: u64 = 131_000_109_002;
 const LEVEL_ONE: i32 = 930_108;
-/// `encounter::field_rewards::CREDIT_TTL_MS` (private to the engine).
-const CREDIT_TTL_MS: u64 = 10_000;
 /// The quest's end text (`end_text_string_id` in the quest record).
 const QUEST_END_TEXT: u32 = 4_420_076;
 
@@ -370,7 +370,7 @@ fn the_other_player_in_the_same_field_is_not_credited() {
     assert_eq!(
         b.state(),
         b_before,
-        "A's kill changed nothing in B's saved gameplay state"
+        "A's kill changed nothing in B's serialized gameplay state"
     );
 
     // The shared tick that pays B's T240 credit must not deliver A's defeat
@@ -726,6 +726,13 @@ fn a_contributors_own_quest_advances_once_from_a_shared_field_kill() {
         0,
         "the killer is never in its own credit list"
     );
+    // The real prune keeps a present contributor's credit, event included.
+    field.retain_casters(&BTreeSet::from([A, B]), 120);
+    assert_eq!(
+        field.pending_kill_credits(B),
+        1,
+        "a present contributor keeps the credit"
+    );
 
     let claimed = b
         .tick_shared_effects(&mut field, &b_character, 150)
@@ -752,6 +759,16 @@ fn a_contributors_own_quest_advances_once_from_a_shared_field_kill() {
         "the credit is claimed exactly once"
     );
     assert_eq!(field.pending_kill_credits(B), 0);
+
+    // The claimed progress is part of the saved character: a serialized reload
+    // through the production bind restores it, exactly as a reconnect does.
+    let reconnected = fixture.reload_serialized_as(B, &b);
+    assert_eq!(
+        counts(&reconnected, QUEST),
+        [1, 0],
+        "the claimed counter survives the save round trip"
+    );
+    assert_eq!(quest_status(&reconnected, QUEST), QuestStatus::Active);
 }
 
 #[test]
@@ -827,7 +844,7 @@ fn an_expired_or_left_field_credit_advances_nothing() {
     assert_eq!(
         saved(&b),
         before,
-        "an expired credit changes neither state nor save bytes"
+        "an expired credit changes neither the state nor its serialization"
     );
     assert_eq!(counts(&b, QUEST), [0, 0]);
     assert_eq!(opening_counts(&b), [1, 1, 0]);
@@ -1104,6 +1121,8 @@ fn a_player_outside_the_field_instance_gets_no_credit() {
     b.take_shared_fields();
     d.take_shared_fields();
     let known = BTreeSet::from([WOLF_GUID]);
+    let d_before = d.state();
+    let d_serialized = saved(&d);
 
     let outside = attack(
         &mut d,
@@ -1116,6 +1135,16 @@ fn a_player_outside_the_field_instance_gets_no_credit() {
     .unwrap();
     assert!(!outside.changed && outside.replies.is_empty());
     assert_eq!(field.health(WOLF_GUID), Some(200));
+    assert_eq!(
+        d.state(),
+        d_before,
+        "an outside-field request changed the player's full state"
+    );
+    assert_eq!(
+        saved(&d),
+        d_serialized,
+        "an outside-field request changed the serialized state"
+    );
 
     attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
     attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 100).unwrap();
@@ -1125,6 +1154,12 @@ fn a_player_outside_the_field_instance_gets_no_credit() {
         .tick_shared_effects(&mut field, &d_character, 150)
         .unwrap();
     assert!(!quiet.changed && quiet.replies.is_empty());
+    assert_eq!(
+        d.state(),
+        d_before,
+        "the shared tick changed the outside player's full state"
+    );
+    assert_eq!(saved(&d), d_serialized);
     assert_eq!(counts(&d, QUEST), [0, 0]);
     assert_eq!(opening_counts(&d), [1, 1, 0]);
 }
@@ -1223,12 +1258,11 @@ fn the_killer_and_two_contributors_each_advance_once() {
 
 #[test]
 fn a_failing_quest_event_for_one_contributor_does_not_change_or_stop_the_other() {
-    // The kill-time event itself is validated (`KillActorKind` needs a positive
-    // id and count 1) and cannot fail. The reachable per-player refusal is a
-    // session with no bound NPC quest catalogue: B holds that absent engine and
-    // an opening stage with no defeat goal, so its claim consumes the credit and
-    // leaves its serialized state byte-identical. C's identical credit still
-    // pays, and C's tick is not stopped.
+    // The event itself cannot fail (`KillActorKind` needs a positive id and
+    // count 1), so this is the reachable no-op, not a failing-event test (the
+    // protected-pass name is historical). B has no bound NPC quest catalogue and
+    // an opening stage with no defeat goal: its claim consumes the credit and
+    // changes nothing, while C's identical credit still pays.
     let fixture = rewardless_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 300)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
@@ -1250,12 +1284,14 @@ fn a_failing_quest_event_for_one_contributor_does_not_change_or_stop_the_other()
     assert_eq!(field.pending_kill_credits(B), 1);
     assert_eq!(field.pending_kill_credits(C), 1);
 
+    let before_state = b.state();
     let before = saved(&b);
-    let refused = b
+    let noop = b
         .tick_shared_effects(&mut field, &b_character, 150)
         .expect("an absent quest engine is not an error");
-    assert!(!refused.changed && refused.replies.is_empty());
-    assert_eq!(saved(&b), before, "B's state and save bytes are unchanged");
+    assert!(!noop.changed && noop.replies.is_empty());
+    assert_eq!(b.state(), before_state, "B's full state is unchanged");
+    assert_eq!(saved(&b), before, "B's serialized state is unchanged");
     assert_eq!(
         field.pending_kill_credits(B),
         0,
@@ -1277,8 +1313,10 @@ fn a_failing_quest_event_for_one_contributor_does_not_change_or_stop_the_other()
 fn a_reward_bearing_credit_advances_a_reconnected_contributor_once() {
     // F276 keeps an unexpired reward-bearing credit in the world-owned ledger
     // across a disconnect, so its owner still collects the earned pair. T302's
-    // defeat event rides that same credit; it is not saved, and the reconnect
-    // is the production load + `bind_npc_quest_catalogue`.
+    // defeat event is not a saved entitlement: the real `retain_casters` prune
+    // forfeits it for a departed player (the brief: leaving the field drops it)
+    // while the reward pair survives. The protected-pass name predates that
+    // split and is kept; this test now pins the reward-only reconnect.
     let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
@@ -1292,7 +1330,9 @@ fn a_reward_bearing_credit_advances_a_reconnected_contributor_once() {
 
     attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
     attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 100).unwrap();
-    let state = b.state();
+    // Reconnect through the serialized save (the production load + per-character
+    // bind), then drop the old session; the world ledger keeps the credit.
+    let mut reconnected = fixture.reload_serialized_as(B, &b);
     drop(b);
     field.retain_casters(&BTreeSet::from([A]), 150);
     assert_eq!(
@@ -1300,24 +1340,44 @@ fn a_reward_bearing_credit_advances_a_reconnected_contributor_once() {
         1,
         "a reward-bearing credit survives the disconnect (F276)"
     );
-
-    let mut b = fixture.game_as(B, Some(state));
-    b.initialize_world(&character_at_for(B, 0, b_at), 0)
-        .unwrap();
-    b.take_shared_fields();
     assert_eq!(
-        counts(&b, QUEST),
+        counts(&reconnected, QUEST),
         [0, 0],
-        "the save alone carries no credit"
+        "the serialized save carries no credit and no quest progress"
     );
-    let claimed = b
+    assert_eq!(opening_counts(&reconnected), [1, 1, 0]);
+
+    reconnected
+        .initialize_world(&character_at_for(B, 0, b_at), 0)
+        .unwrap();
+    reconnected.take_shared_fields();
+    let claimed = reconnected
         .tick_shared_effects(&mut field, &b_character, 200)
         .unwrap();
-    assert_eq!(counts(&b, QUEST), [1, 0], "the carried event advances once");
     assert_eq!(
         packet(&claimed.replies, 38, 19),
         [38u8, 0, 19, 0, 2, 0, 0, 0].as_slice(),
-        "the carried reward is paid once too"
+        "the carried reward is paid once (client ctor 0x0089e670)"
+    );
+    assert_eq!(
+        packet(&claimed.replies, 38, 14),
+        carrier(38, 14, &[BRAWLER, 1, 5, 0, 0, 0]).as_slice(),
+        "the carried job XP is paid once (client reader 0x008d86e0)"
+    );
+    assert_eq!(
+        counts(&reconnected, QUEST),
+        [0, 0],
+        "leaving the field forfeits the quest event"
+    );
+    assert_eq!(
+        opening_counts(&reconnected),
+        [1, 1, 0],
+        "leaving the field forfeits the opening defeat goal"
+    );
+    assert_eq!(
+        count(&claimed.replies, 49, 9),
+        0,
+        "no objective update for a departed player"
     );
     assert_eq!(field.pending_kill_credits(B), 0);
 }

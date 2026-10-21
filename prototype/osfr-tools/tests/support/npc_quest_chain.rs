@@ -183,9 +183,15 @@ impl Fixture {
 
     /// Reload through a JSON round trip, so decoding the saved state is exercised too.
     pub fn reload_serialized(&self, game: &Gameplay) -> Gameplay {
+        self.reload_serialized_as(self.character_id, game)
+    }
+
+    /// As [`Self::reload_serialized`], but bind the split quest catalogue for
+    /// `character_id`: a second session in the same fixture saves under its own id.
+    pub fn reload_serialized_as(&self, character_id: u64, game: &Gameplay) -> Gameplay {
         let bytes = serde_json::to_vec(&game.state()).unwrap();
         let state: GameplayState = serde_json::from_slice(&bytes).unwrap();
-        self.game(Some(state))
+        self.game_as(character_id, Some(state))
     }
 }
 

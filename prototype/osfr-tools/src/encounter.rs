@@ -20,7 +20,7 @@ use std::{
 };
 
 mod field;
-mod field_rewards;
+pub mod field_rewards;
 mod power_up_use;
 mod shared;
 mod skills;

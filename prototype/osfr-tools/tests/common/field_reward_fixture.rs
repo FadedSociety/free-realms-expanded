@@ -20,8 +20,8 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
-/// `encounter::CREDIT_TTL_MS`; the constant is private to the engine.
-pub const CREDIT_TTL_MS: u64 = 10_000;
+/// The engine's shared-kill credit window, linked so a value change cannot desync.
+pub const CREDIT_TTL_MS: u64 = osfr_tools::encounter::field_rewards::CREDIT_TTL_MS;
 /// A profile that is not a combat job.
 pub const NONCOMBAT: i32 = 45;
 
