@@ -36,7 +36,7 @@ pub struct RewardFixture {
 }
 
 impl RewardFixture {
-    pub fn new(actors: Vec<Value>) -> Self {
+    fn root() -> PathBuf {
         let dir = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!(
             "field-reward-{}-{}",
             std::process::id(),
@@ -44,6 +44,11 @@ impl RewardFixture {
         ));
         fs::create_dir_all(&dir).unwrap();
         content_copy::copy_missing(&opening_content(), &dir);
+        dir
+    }
+
+    pub fn new(actors: Vec<Value>) -> Self {
+        let dir = Self::root();
         content_copy::copy_missing(
             &Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content"),
             &dir,
@@ -51,6 +56,20 @@ impl RewardFixture {
         // The opening inventory does not carry every optional farming reward;
         // these suites exercise field combat only.
         let _ = fs::remove_file(dir.join("harvesting.json"));
+        let fixture = Self { dir };
+        fixture.write_field(&json!({"schema_version": 1, "enemies": actors}));
+        fixture
+    }
+
+    /// The opening fixture plus only the named bundled files. A loop that logs
+    /// in repeatedly cannot pay the full overlay's load cost per login, and it
+    /// needs the opening quest story out of its exact reward deltas.
+    pub fn minimal(actors: Vec<Value>, bundled: &[&str]) -> Self {
+        let dir = Self::root();
+        let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        for name in bundled {
+            fs::copy(content.join(name), dir.join(name)).unwrap();
+        }
         let fixture = Self { dir };
         fixture.write_field(&json!({"schema_version": 1, "enemies": actors}));
         fixture
