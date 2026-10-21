@@ -15,12 +15,21 @@
 //!
 //! The service path (`NpcInteraction::interact` -> `select`) is the same one
 //! `gameplay/npc.rs` uses; the dispatch path (`Gameplay::handle_in_world`)
-//! drives the real router and `dialogue_packet_with`.
+//! drives the real router and `dialogue_packet_with`. The packet builders, the
+//! locale line convention and the 26/3 body offset live in the shared
+//! `tests/common/npc_greetings.rs` harness.
 
+#[path = "common/npc_greetings.rs"]
+mod npc_greetings;
+
+use npc_greetings::{
+    GREETING_HEADER, MENU_HEADER, character_at, content_dir, gameplay_dir, gameplay_talk_body,
+    greeting_bindings, interact, lab_report, locale_id_to_text, locale_rows, npc_position,
+    npc_record, npc_records, read_json, select, service, service_talk_body,
+};
 use osfr_tools::{
-    character_store::CharacterState,
     gameplay::Gameplay,
-    npc_interaction::{NpcAction, NpcInteraction, NpcInteractionError, NpcSelection},
+    npc_interaction::{NpcAction, NpcInteractionError, NpcSelection},
     world::NpcVisibility,
     world_text::locale_hash,
 };
@@ -28,16 +37,15 @@ use serde_json::Value;
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs,
-    path::{Path, PathBuf},
+    path::Path,
 };
-
-const GREETING_HEADER: [u8; 4] = [26, 0, 3, 0];
-const MENU_HEADER: [u8; 4] = [26, 0, 9, 0];
 
 /// One edited row. `hash` is `JenkinsLookup2("Global.Text.<greeting>")`, the
 /// key the stock client locale stores on `dat_line`; `guide` is the repository
-/// notes path whose `guide_line` names the speaker. `quest` names the server
-/// quest record when the line is that quest's intro/offer speech.
+/// notes path whose `guide_line` names the speaker, and `guide_row` is that
+/// row's stable leading cells (the test finds it by content, so an unrelated
+/// note edit above it cannot break the test). `quest` names the server quest
+/// record when the line is that quest's intro/offer speech.
 struct Target {
     npc_id: u64,
     name: &'static str,
@@ -47,6 +55,7 @@ struct Target {
     dat_line: u32,
     guide: &'static str,
     guide_line: u32,
+    guide_row: &'static str,
     quest: Option<(&'static str, u32)>,
 }
 
@@ -60,6 +69,7 @@ const TARGETS: [Target; 7] = [
         dat_line: 34689,
         guide: "Build Guides/Content/NPCs/NPCs - Highroad Junction.md",
         guide_line: 118,
+        guide_row: "| Chef: Fireworks Frenzy! | Ranger Ricardo |",
         quest: Some(("chef.json", 3050012)),
     },
     Target {
@@ -71,6 +81,7 @@ const TARGETS: [Target; 7] = [
         dat_line: 37461,
         guide: "Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md",
         guide_line: 152,
+        guide_row: "| **Woolen Woes** | Hartley Harrison (by wording) |",
         quest: None,
     },
     Target {
@@ -82,6 +93,7 @@ const TARGETS: [Target; 7] = [
         dat_line: 97388,
         guide: "Build Guides/Content/Jobs/Card Duelist.md",
         guide_line: 113,
+        guide_row: "| 27 | **Card Duelist: Best of the Best!** | Maple Sugarleaf",
         quest: Some(("card_duelist.json", 3040028)),
     },
     Target {
@@ -93,6 +105,7 @@ const TARGETS: [Target; 7] = [
         dat_line: 50162,
         guide: "Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md",
         guide_line: 151,
+        guide_row: "| **Lost Sheep** (minigame name \"Lost Little Sheep\") | Bo |",
         quest: None,
     },
     Target {
@@ -104,6 +117,7 @@ const TARGETS: [Target; 7] = [
         dat_line: 100591,
         guide: "Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md",
         guide_line: 160,
+        guide_row: "| **Garden Defense** (Papa Salt's basic game) and **Finding a Garden Defense Table** | Papa Salt;",
         quest: None,
     },
     Target {
@@ -115,6 +129,7 @@ const TARGETS: [Target; 7] = [
         dat_line: 108808,
         guide: "Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md",
         guide_line: 165,
+        guide_row: "| **Tamara's harvest** (title not found) | Tamara |",
         quest: None,
     },
     Target {
@@ -126,6 +141,7 @@ const TARGETS: [Target; 7] = [
         dat_line: 40071,
         guide: "Build Guides/Content/Jobs/Adventurer.md",
         guide_line: 92,
+        guide_row: "| B4 | **Peep's Missing Bowl** (video reads \"Pozy's Missing Bowl\") | Uncle Irving",
         quest: Some(("adventurer.json", 3000018)),
     },
 ];
@@ -204,147 +220,6 @@ const OTHER_REGIONS: [(&str, u32, &str, u64); 15] = [
 const HIGHROAD_RECORDS: usize = 23;
 const FARNUM_RECORDS: usize = 24;
 
-fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
-/// Full server content used by the existing in-world router tests. It has no
-/// `npcs/` directory, so `Gameplay::load` takes the NPC rows from the bundled
-/// `data/content` (the same rows this test edits).
-fn gameplay_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/references/opening-anvil-placement-v1/content")
-}
-
-/// Stock 2014 client locale. `hash_to_ids` in `lab/reports/locale-id-map.json`
-/// was built from it; this test re-derives each key instead of trusting it.
-fn locale_path() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat")
-}
-
-/// A generated lab report used by the T246/T280 resolution method (outside the
-/// repository, like the client locale read above).
-fn lab_report(name: &str) -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/reports")
-        .join(name)
-}
-
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(
-        &fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
-    )
-    .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-}
-
-fn npc_records(file: &str) -> Vec<Value> {
-    let path = content_dir().join("npcs").join(file);
-    read_json(&path)["records"]
-        .as_array()
-        .unwrap_or_else(|| panic!("{}: records array", path.display()))
-        .clone()
-}
-
-fn npc_record(file: &str, npc_id: u64) -> Value {
-    npc_records(file)
-        .into_iter()
-        .find(|record| record["npc_id"].as_u64() == Some(npc_id))
-        .unwrap_or_else(|| panic!("{file}: NPC {npc_id}"))
-}
-
-fn npc_position(record: &Value, npc_id: u64) -> [f32; 3] {
-    let position = record["position"]
-        .as_array()
-        .unwrap_or_else(|| panic!("NPC {npc_id} has no position"));
-    assert_eq!(position.len(), 3, "NPC {npc_id} position shape");
-    [
-        position[0].as_f64().expect("x") as f32,
-        position[1].as_f64().expect("y") as f32,
-        position[2].as_f64().expect("z") as f32,
-    ]
-}
-
-fn service() -> NpcInteraction {
-    let data = content_dir();
-    NpcInteraction::load(&data.join("npcs"), &data.join("stores.json"))
-        .expect("NPC content loads through the real loader")
-}
-
-fn interact_request(npc_id: u64) -> Vec<u8> {
-    // 26/8 CommandPacketInteractRequest (constructor 0x008b6bc0).
-    let mut packet = vec![26, 0, 8, 0];
-    packet.extend(npc_id.to_le_bytes());
-    packet.push(0);
-    packet
-}
-
-fn select_request(npc_id: u64, choice: i32) -> Vec<u8> {
-    // 26/10 CommandPacketInteractionSelect (constructor 0x00a36f80).
-    let mut packet = vec![26, 0, 10, 0];
-    packet.extend(npc_id.to_le_bytes());
-    packet.extend(choice.to_le_bytes());
-    packet
-}
-
-/// Real Talk selection through the service the router calls.
-fn service_talk_body(service: &mut NpcInteraction, npc_id: u64) -> Option<u32> {
-    let (zone, position) = service
-        .location(npc_id)
-        .unwrap_or_else(|| panic!("NPC {npc_id} has a location"));
-    let menu = service
-        .interact(npc_id, zone, position, None)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} menu: {error:?}"));
-    let talk = menu
-        .options
-        .iter()
-        .find(|option| option.action == NpcAction::Talk)
-        .unwrap_or_else(|| panic!("NPC {npc_id} offers Talk"));
-    let selected = service
-        .select(&select_request(npc_id, talk.id), zone, position, None)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} Talk: {error:?}"));
-    match selected {
-        NpcSelection::Talk(context) => context.body_string_id,
-        _ => panic!("NPC {npc_id} Talk must return dialogue"),
-    }
-}
-
-fn character_at(position: [f32; 3]) -> CharacterState {
-    CharacterState {
-        guid: 101,
-        zone_id: 0,
-        position,
-        rotation: [1.0, 0.0, 0.0],
-    }
-}
-
-/// Real in-world Talk: 26/8 opens the menu, 26/10 selects Talk, and the 26/3
-/// reply is decoded from the production packet.
-fn gameplay_talk_body(game: &mut Gameplay, file: &str, npc_id: u64) -> u32 {
-    let character = character_at(npc_position(&npc_record(file, npc_id), npc_id));
-    let menu = game
-        .handle_in_world(&interact_request(npc_id), &character, 1_000)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} interact: {error}"));
-    assert!(
-        menu.replies
-            .iter()
-            .any(|packet| packet.starts_with(&MENU_HEADER)),
-        "NPC {npc_id} must answer 26/8 with a 26/9 menu"
-    );
-    let outcome = game
-        .handle_in_world(&select_request(npc_id, 1), &character, 1_100)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} Talk: {error}"));
-    let dialogue = outcome
-        .replies
-        .into_iter()
-        .find(|packet| packet.starts_with(&GREETING_HEADER))
-        .unwrap_or_else(|| panic!("NPC {npc_id} Talk must answer 26/3"));
-    // Body dword follows the four-byte family/subtype header; client reader
-    // 0x00a9ef10 stores it at object +16, and patch_npc_actor writes the runtime
-    // actor GUID only into bytes 12..20.
-    u32::from_le_bytes(dialogue[4..8].try_into().unwrap())
-}
-
 /// The loader spawns a row only when it is `legacy_data`, positioned with a
 /// finite transform, and carries a positive model and name.
 fn assert_drawable(record: &Value, npc_id: u64) {
@@ -388,48 +263,40 @@ fn drawable_rows() -> BTreeSet<(String, u64)> {
     rows
 }
 
-/// Physical stock-locale rows for the wanted key hashes: one-based line and text.
-fn locale_rows(wanted: &BTreeSet<u32>) -> BTreeMap<u32, (usize, String)> {
-    let path = locale_path();
-    let text =
-        fs::read_to_string(&path).unwrap_or_else(|error| panic!("{}: {error}", path.display()));
-    let mut rows = BTreeMap::new();
-    for (index, line) in text.lines().enumerate() {
-        let mut fields = line.splitn(3, '\t');
-        let (Some(key), Some(_table), Some(body)) = (fields.next(), fields.next(), fields.next())
-        else {
-            continue;
-        };
-        let Ok(hash) = key.trim_start_matches('\u{feff}').parse::<u32>() else {
-            continue;
-        };
-        if wanted.contains(&hash) {
-            rows.insert(hash, (index + 1, body.to_owned()));
-        }
-    }
-    rows
-}
-
-fn locale_id_to_text() -> BTreeMap<u64, String> {
-    read_json(&lab_report("locale-id-to-text.json"))
+/// The quest record a greeting is the intro/offer speech of.
+fn quest_record(file: &str, quest_id: u32) -> Value {
+    let path = content_dir().join("quests").join(file);
+    read_json(&path)["records"]
         .as_array()
-        .expect("locale-id-to-text rows")
+        .unwrap_or_else(|| panic!("{}: records array", path.display()))
         .iter()
-        .filter_map(|row| Some((row["id"].as_u64()?, row["text"].as_str()?.to_owned())))
-        .collect()
+        .find(|record| record["id"].as_u64() == Some(u64::from(quest_id)))
+        .unwrap_or_else(|| panic!("{}: quest {quest_id}", path.display()))
+        .clone()
 }
 
-/// The cited speaker-proof line in the repository notes.
-fn guide_line(guide: &str, line: u32) -> String {
+/// The cited speaker-proof row in the repository notes, found by its stable
+/// leading cells. The physical line is content evidence for provenance only, so
+/// an unrelated edit above the row cannot fail this test.
+fn guide_row(guide: &str, marker: &str) -> String {
     let path = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../notes")
         .join(guide);
     let text =
         fs::read_to_string(&path).unwrap_or_else(|error| panic!("{}: {error}", path.display()));
-    text.lines()
-        .nth(line as usize - 1)
-        .unwrap_or_else(|| panic!("{}: no line {line}", path.display()))
-        .to_owned()
+    let mut rows = text
+        .lines()
+        .filter(|line| line.starts_with('|') && line.contains(marker));
+    let row = rows
+        .next()
+        .unwrap_or_else(|| panic!("{}: no table row starts {marker:?}", path.display()))
+        .to_owned();
+    assert!(
+        rows.next().is_none(),
+        "{}: more than one table row starts {marker:?}",
+        path.display()
+    );
+    row
 }
 
 #[test]
@@ -530,6 +397,19 @@ fn every_edited_row_has_resolved_client_provenance() {
                 "NPC {}: client source must name its quest record",
                 target.npc_id
             );
+            let quest = quest_record(quest_file, quest_id);
+            assert_eq!(
+                quest["giver_npc_id"].as_u64(),
+                Some(target.npc_id),
+                "NPC {}: quest {quest_id} in {quest_file} must be giver-owned",
+                target.npc_id
+            );
+            assert_eq!(
+                quest["intro_text_string_id"].as_u64(),
+                Some(u64::from(target.greeting)),
+                "NPC {}: quest {quest_id} in {quest_file} must use the greeting as its intro",
+                target.npc_id
+            );
         }
         let reconstruction = reconstructed["evidence"].as_str().unwrap_or_default();
         assert!(
@@ -543,11 +423,10 @@ fn every_edited_row_has_resolved_client_provenance() {
             target.npc_id
         );
         assert!(
-            guide_line(target.guide, target.guide_line).contains(target.name),
-            "NPC {}: {} line {} must name {}",
+            guide_row(target.guide, target.guide_row).contains(target.name),
+            "NPC {}: {} row must name {}",
             target.npc_id,
             target.guide,
-            target.guide_line,
             target.name
         );
 
@@ -607,11 +486,18 @@ fn every_edited_row_has_resolved_client_provenance() {
             target.npc_id
         );
     }
-    let pre_existing: BTreeSet<u32> = T246_GREETINGS
+    let targets: BTreeSet<(String, u64)> = TARGETS
         .iter()
-        .chain(W126_GREETINGS.iter())
-        .map(|(_, _, greeting)| *greeting)
+        .map(|target| (target.file.to_owned(), target.npc_id))
         .collect();
+    // Every binding outside this slice, not only T246/W126: a later slice must
+    // not reuse one of these seven ids either.
+    let pre_existing: BTreeSet<u32> = greeting_bindings()
+        .into_iter()
+        .filter(|((file, npc_id), _)| !targets.contains(&(file.clone(), *npc_id)))
+        .map(|(_, greeting)| greeting)
+        .collect();
+    assert!(!pre_existing.is_empty(), "the NPC content has greetings");
     assert!(
         greeting_ids.is_disjoint(&pre_existing),
         "a new greeting reuses an existing binding"
@@ -620,15 +506,12 @@ fn every_edited_row_has_resolved_client_provenance() {
     // Every drawable row in the two files is a pre-existing greeted row, a row
     // bound here, or an unbound row listed in notes/Autopilot/T315.md.
     let drawable = drawable_rows();
-    let mut declared: BTreeSet<(String, u64)> = TARGETS
-        .iter()
-        .map(|target| (target.file.to_owned(), target.npc_id))
-        .chain(
-            UNBOUND
-                .iter()
-                .map(|(file, npc_id)| ((*file).to_owned(), *npc_id)),
-        )
-        .collect();
+    let mut declared: BTreeSet<(String, u64)> = targets;
+    declared.extend(
+        UNBOUND
+            .iter()
+            .map(|(file, npc_id)| ((*file).to_owned(), *npc_id)),
+    );
     for (file, npc_id, _) in T246_GREETINGS.iter().chain(W126_GREETINGS.iter()) {
         if *file == "farnum_farmstead.json" || *file == "highroad_junction.json" {
             assert!(
@@ -734,10 +617,10 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
         .expect("the blank NPC offers Talk")
         .id;
     assert!(matches!(
-        service.select(&select_request(blank, i32::MAX), zone, position, None),
+        service.select(&select(blank, i32::MAX as u32), zone, position, None),
         Err(NpcInteractionError::InvalidOption)
     ));
-    match service.select(&select_request(blank, talk), zone, position, None) {
+    match service.select(&select(blank, talk as u32), zone, position, None) {
         Ok(NpcSelection::Talk(context)) => assert_eq!(
             context.body_string_id, None,
             "the refused choice must not consume the menu or inject a body"
@@ -766,7 +649,7 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
         bound.npc_id,
     ));
     let menu = game
-        .handle_in_world(&interact_request(bound.npc_id), &character, 2_000)
+        .handle_in_world(&interact(bound.npc_id), &character, 2_000)
         .expect("bound NPC menu");
     assert!(
         menu.replies
@@ -774,12 +657,12 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
             .any(|packet| packet.starts_with(&MENU_HEADER))
     );
     assert!(
-        game.handle_in_world(&select_request(bound.npc_id, i32::MAX), &character, 2_100)
+        game.handle_in_world(&select(bound.npc_id, i32::MAX as u32), &character, 2_100)
             .is_err(),
         "an out-of-list choice is refused"
     );
     let after = game
-        .handle_in_world(&select_request(bound.npc_id, 1), &character, 2_200)
+        .handle_in_world(&select(bound.npc_id, 1), &character, 2_200)
         .expect("the menu must survive the refusal");
     let dialogue = after
         .replies
