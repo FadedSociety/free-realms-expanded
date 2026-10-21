@@ -12,15 +12,20 @@ mod item_catalogue;
 /// A clean temp directory; dropping it removes the directory and the saves in it.
 pub struct Scratch(PathBuf);
 
+/// Distinguishes directories created in the same clock tick: the protected-name alias of the
+/// transfer regression runs the same body twice, in parallel, under the same tag.
+static SEQUENCE: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
+
 impl Scratch {
     pub fn new(tag: &str) -> Self {
         let directory = std::env::temp_dir().join(format!(
-            "osfr-{tag}-{}-{}",
+            "osfr-{tag}-{}-{}-{}",
             std::process::id(),
             SystemTime::now()
                 .duration_since(UNIX_EPOCH)
                 .unwrap()
-                .as_nanos()
+                .as_nanos(),
+            SEQUENCE.fetch_add(1, std::sync::atomic::Ordering::Relaxed)
         ));
         let _ = fs::remove_dir_all(&directory);
         fs::create_dir_all(&directory).unwrap();

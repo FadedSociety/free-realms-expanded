@@ -758,16 +758,15 @@ fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
 
 /// F286 (F179 finding 4, the documented-accounting alternative): a begin-zoning child that refuses
 /// before its commit keeps its staged replies charged to the message's bundle budget until the
-/// dispatch ends; `dispatch_message` then releases the message budget (final assertion). The test
-/// name is the F264 one, kept because `lab/autopilot/protected-pass.txt` pins it. `BundleBudget`
-/// owns the rule: the ceiling bounds bytes staged for one message, not bytes the sender queues.
-/// `realm race` is a real zone transfer; deleting the save directory makes its precommit save fail,
-/// which is the `Err(_) if transfer` refusal path. The control bundle's last read fits by 528
-/// bytes; in the real bundle the same read is over by 371 because the refused transfer's 899
-/// staged bytes stayed charged. A refund (F264's `release`) would make the last read fit, so this
-/// test would fail. The control also establishes the live `World` membership; the refusal must
-/// leave that membership, the public instance and the save path unchanged (F322 review finding 1).
-/// The body's name says what it pins; the old F264 name is a thin alias below because
+/// dispatch ends; `dispatch_message` then releases the message budget (final assertion).
+/// `BundleBudget` owns the rule: the ceiling bounds bytes staged for one message, not bytes the
+/// sender queues. `realm race` is a real zone transfer; deleting the save directory makes its
+/// precommit save fail, which is the `Err(_) if transfer` refusal path. The control bundle's last
+/// read fits by 528 bytes; in the real bundle the same read is over by 371 because the refused
+/// transfer's 899 staged bytes stayed charged. A refund (F264's `release`) would make the last
+/// read fit, so this test would fail. The control also establishes the live `World` membership;
+/// the refusal must leave that membership, the public instance and the zone unchanged (F322 review
+/// finding 1). The body's name says what it pins; the old F264 name is a thin alias below because
 /// `lab/autopilot/protected-pass.txt` still selects it.
 #[test]
 fn a_refused_precommit_transfer_keeps_its_staged_bytes_until_dispatch_end() {
@@ -876,7 +875,11 @@ fn a_refused_precommit_transfer_keeps_its_staged_bytes_until_dispatch_end() {
     );
     let public_instance = server.membership.public_instance(0);
     // The transfer cannot commit: its precommit save has nowhere to write. Its staged bytes stay
-    // charged to the message, so the identical last read is now over the budget.
+    // charged to the message, so the identical last read is now over the budget. F344: this
+    // refusal is the save's own failure, so asserting that the save path stays absent says nothing
+    // about whether the refusal attempted a save (3cec461 review finding 1). The exact budget
+    // error below still catches a save on the refusal branch that propagates its failure; the
+    // persisted state is observed through the snapshot, zone and membership assertions.
     fs::remove_dir_all(scratch.path()).unwrap();
     let error = dispatch(&mut session, &mut server, &bundle(true))
         .expect_err("the refused transfer's staged replies must stay charged");
@@ -903,10 +906,6 @@ fn a_refused_precommit_transfer_keeps_its_staged_bytes_until_dispatch_end() {
         server.membership.public_instance(0),
         public_instance,
         "a refused precommit transfer changed the public instance"
-    );
-    assert!(
-        !scratch.state().exists(),
-        "a refused precommit transfer wrote a save"
     );
     assert_eq!(
         session.bundle_budget.used(),

@@ -21,13 +21,16 @@ use osfr_tools::{
     station_cash::{self, Wallet},
 };
 use serde_json::{Value, json};
-use sha2::{Digest, Sha256};
 use std::{
     collections::BTreeSet,
     fs,
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
 };
+
+#[path = "common/item_catalogue.rs"]
+#[allow(dead_code)]
+mod item_catalogue;
 
 const VENDOR_ID: u64 = 9_500_000_339;
 /// Default-state fixtures from `lab/references/rust-gameplay/inventory.json`.
@@ -40,31 +43,6 @@ const RESULT_OK: u32 = coin_shop::RESULT_SUCCESS;
 
 fn content_dir() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
-fn definition_row(id: i32) -> Value {
-    definition_row_sized(id, 8)
-}
-
-/// One synthetic row of exactly `size` wire bytes; `size` is bounded by the inventory decoder
-/// at 65,536 bytes.
-fn definition_row_sized(id: i32, size: usize) -> Value {
-    let mut bytes = id.to_le_bytes().to_vec();
-    bytes.resize(size.max(8), 0x5a);
-    json!({
-        "id": id,
-        "slot": 0,
-        "class_id": 1,
-        "default_tint": 0,
-        "max_stack": 10,
-        "model": "",
-        "texture": "",
-        "tint_alias": "",
-        "effect": 0,
-        "wield_type": 0,
-        "serialized_hex": bytes.iter().map(|byte| format!("{byte:02x}")).collect::<String>(),
-        "sha256": format!("{:x}", Sha256::digest(&bytes))
-    })
 }
 
 fn store_row(id: i32, buy: Option<u32>, sell: Option<u32>, no_sale: bool) -> Value {
@@ -339,7 +317,10 @@ impl Fixture {
 
     /// A fixture whose unowned catalogue carries `definitions` in addition to the one store row.
     fn with_definitions(mut definitions: Vec<Value>) -> Self {
-        definitions.push(definition_row(CATALOGUE_ONLY_DEFINITION));
+        definitions.push(item_catalogue::sized_row(
+            CATALOGUE_ONLY_DEFINITION as u32,
+            8,
+        ));
         let lab = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
         let source = std::env::var_os("OSFR_APP_FUZZ_CONTENT")
             .map(PathBuf::from)
@@ -407,13 +388,7 @@ impl Fixture {
                 "max_level":20,"members_only":false,"trainer_npc_ids":[],"quest_ids":[701],"abilities":[],"source":provenance
             }]}),
         );
-        write_json(
-            &content.join("item-catalogue.json"),
-            &json!({
-                "schema_version": 1,
-                "definitions": definitions
-            }),
-        );
+        item_catalogue::write(&content, &definitions);
         // Pick an equipped item from the state the gameplay loader actually produces.
         let loaded = Gameplay::load(&content, None).unwrap().state().inventory;
         let (equipped, equipped_definition) = loaded
@@ -1745,7 +1720,7 @@ fn large_definitions(count: usize, size: usize) -> (Vec<Value>, Vec<u32>) {
         .collect();
     let rows = ids
         .iter()
-        .map(|id| definition_row_sized(*id as i32, size))
+        .map(|id| item_catalogue::sized_row(*id, size))
         .collect();
     (rows, ids)
 }

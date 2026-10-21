@@ -12,6 +12,9 @@ use std::sync::atomic::{AtomicU64, Ordering};
 
 #[path = "common/content_copy.rs"]
 mod content_copy;
+#[path = "common/item_catalogue.rs"]
+#[allow(dead_code)]
+mod item_catalogue;
 
 fn hex(bytes: &str) -> Vec<u8> {
     bytes
@@ -58,12 +61,10 @@ impl CapturedProductContent {
             SERIAL.fetch_add(1, Ordering::Relaxed)
         ));
         content_copy::copy_tree(&reference_content(), &path);
-        let definition = definition_with_presentation(21_825, 38_663, 1_006, 0);
-        fs::write(
-            path.join("item-catalogue.json"),
-            serde_json::to_vec(&json!({"schema_version": 1, "definitions": [definition]})).unwrap(),
-        )
-        .unwrap();
+        item_catalogue::write(
+            &path,
+            &[definition_with_presentation(21_825, 38_663, 1_006, 0)],
+        );
         Self(path)
     }
 }
