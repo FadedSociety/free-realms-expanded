@@ -809,7 +809,7 @@
       "enemies": [
         {
           "guid": 100001235001,
-          "definition_id": 1235001,
+          "definition_id": 930050,
           "model_id": 3284,
           "name_id": 102128,
           "name": "Alpha Wolf",
@@ -825,7 +825,7 @@
         },
         {
           "guid": 100001235002,
-          "definition_id": 1235002,
+          "definition_id": 930050,
           "model_id": 3284,
           "name_id": 102128,
           "name": "Alpha Wolf",
@@ -841,7 +841,7 @@
         },
         {
           "guid": 100001235003,
-          "definition_id": 1235003,
+          "definition_id": 930071,
           "model_id": 3284,
           "name_id": 374,
           "name": "Wolf",
@@ -857,7 +857,7 @@
         },
         {
           "guid": 100001235004,
-          "definition_id": 1235004,
+          "definition_id": 930071,
           "model_id": 3284,
           "name_id": 374,
           "name": "Wolf",
@@ -873,7 +873,7 @@
         },
         {
           "guid": 100001235005,
-          "definition_id": 1235005,
+          "definition_id": 930071,
           "model_id": 3284,
           "name_id": 374,
           "name": "Wolf",
@@ -896,7 +896,7 @@
         },
         {
           "kind": "client",
-          "evidence": "Models.txt line 2470 maps 3284 to wolf_generic.adr (catalog.tsv line 10255: pack_03/000417.adr, 10690 bytes, CRC32 e6ad9ca1); data/content/enemies.json defines 930050 Alpha Wolf (model 3284, name 102128) and 930071 Wolf (model 3284, name 374). No sex-specific Alpha enemy definition or model binding is recovered (the client has Alpha Female/Male Wolf locale rows but no model binding), so both Alpha actors use the sole 930050 Alpha Wolf name/model; sex is represented only by the two boss roles (R)."
+          "evidence": "Models.txt line 2470 maps 3284 to wolf_generic.adr (catalog.tsv line 10255: pack_03/000417.adr, 10690 bytes, CRC32 e6ad9ca1); data/content/enemies.json defines 930050 Alpha Wolf (model 3284, name 102128) and 930071 Wolf (model 3284, name 374); every arena enemy carries that recovered definition id, so its defeat event names the enemy kind a quest goal is authored on. No sex-specific Alpha enemy definition or model binding is recovered (the client has Alpha Female/Male Wolf locale rows but no model binding), so both Alpha actors use the sole 930050 Alpha Wolf name/model; sex is represented only by the two boss roles (R)."
         },
         {
           "kind": "wiki",
@@ -904,7 +904,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Local battle id 12350, actor GUIDs 100001235000-100001235005 and definition ids 1235000-1235005. Five-enemy kill-all roster (not the retail waves): two Alpha Wolves 930050 boss true and three Wolves 930071 boss false; modest 160 HP/8 damage and 90 HP/5 damage before the existing difficulty-1 scaling; the existing 25-coin field-battle payout, one random draw from the existing four-item pool and the existing 50 job XP for guide-None battles. Marker adaptation: the visible Alpha Wolf model replaces a non-rendering gate (as T282 uses Thugamug). Arena: the 12311 block (zone 9600 sg_random_encounter_clearing, geometry 214, sky sky_wilds24.xml, arrival [136,-0.5,155]) with five positions [133,-0.6,173], [139,-0.6,173], [136,-0.6,175], [134,-0.6,176] and [138,-0.6,176]."
+          "evidence": "(R) Local battle id 12350 and actor GUIDs 100001235000-100001235005; the marker keeps the local actor definition 1235000 because it is a non-combat gate/marker adaptation, not an enemy kind. The five arena enemies carry the recovered kind ids from enemies.json (two Alpha Wolves 930050 boss true, three Wolves 930071 boss false), so each defeat event matches the kind an existing quest goal names. Five-enemy kill-all roster (not the retail waves); modest 160 HP/8 damage and 90 HP/5 damage before the existing difficulty-1 scaling; the existing 25-coin field-battle payout, one random draw from the existing four-item pool and the existing 50 job XP for guide-None battles. Marker adaptation: the visible Alpha Wolf model replaces a non-rendering gate (as T282 uses Thugamug). Arena: the 12311 block (zone 9600 sg_random_encounter_clearing, geometry 214, sky sky_wilds24.xml, arrival [136,-0.5,155]) with five positions [133,-0.6,173], [139,-0.6,173], [136,-0.6,175], [134,-0.6,176] and [138,-0.6,176]."
         },
         {
           "kind": "reconstructed",

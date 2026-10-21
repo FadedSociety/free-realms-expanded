@@ -32,25 +32,22 @@ use osfr_tools::{
     activity_portal::{Catalogue, Kind, Refusal, Viewer},
     chat,
     encounter::{EncounterEngine, SharedFieldState},
-    game_store,
     gameplay::GameplayState,
     gateway::{Gateway, GatewayOutcome},
-    inventory::{Inventory, InventoryItem, InventoryState, MAX_ITEMS},
+    inventory::{InventoryState, MAX_ITEMS},
     quest_engine::{CharacterEligibility, QuestEngine, QuestStatus},
-    startup_world,
-    terrain::{HeightGrid, Terrain},
-    world,
+    startup_world, world,
 };
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs,
-    path::{Path, PathBuf},
-    sync::{
-        OnceLock,
-        atomic::{AtomicU64, Ordering},
-    },
 };
+
+#[path = "common/field_battle_fixture.rs"]
+mod field_battle_fixture;
+
+use field_battle_fixture::*;
 
 /// The new battle. 12340 was free on this base; the row is found by this id
 /// and test 1 also pins its published values.
@@ -69,312 +66,27 @@ const NAME_THUGAMUG: i32 = 103031;
 const NAME_HENCHMAN: i32 = 103726;
 const MODEL: i32 = 199;
 const BRAWLER: i32 = 43;
-const RUNTIME_CONTENT: &str = "../../../lab/reports/round70-native-20261016T061000Z/content";
-const REFERENCE: &str = "../../../lab/references/rust-gateway-reference";
 const REFUSAL_PRIZE: &str = "one of its rewards cannot be granted";
 const BATTLE_JOB_XP: u32 = 50;
 
-static SERIAL: AtomicU64 = AtomicU64::new(0);
-static RUNTIME_INVENTORY: OnceLock<Inventory> = OnceLock::new();
-
 // ---------------------------------------------------------------------------
-// Content fixture and battle row helpers.
+// Fixture seam: the T282 start screen needs a level-5 combat job in the bag
+// seed, and the full bag is built around this battle's prize pool.
 // ---------------------------------------------------------------------------
-
-struct Fixture {
-    root: PathBuf,
-    reference: PathBuf,
-    content: PathBuf,
-    version: String,
-}
-
-impl Drop for Fixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.root);
-    }
-}
 
 impl Fixture {
-    fn new() -> Self {
-        let root = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!(
-            "thugamug-battle-{}-{}",
-            std::process::id(),
-            SERIAL.fetch_add(1, Ordering::Relaxed)
-        ));
-        fs::create_dir_all(&root).unwrap();
-        let reference = manifest_dir().join(REFERENCE);
-        let version = read_json(&reference.join("manifest.json"))["client_version"]
-            .as_str()
-            .unwrap()
-            .to_owned();
-        Self {
-            root,
-            reference,
-            content: manifest_dir().join(RUNTIME_CONTENT),
-            version,
-        }
-    }
-
-    fn login(&self, gateway: &mut Gateway) {
-        let mut login = 1_u16.to_le_bytes().to_vec();
-        for (index, value) in ["local-private-test", self.version.as_str(), ""]
-            .into_iter()
-            .enumerate()
-        {
-            login.extend((value.len() as u32).to_le_bytes());
-            login.extend(value.as_bytes());
-            if index == 0 {
-                login.extend(gateway.state().guid.to_le_bytes());
-            }
-        }
-        gateway.handle_at(&login, 0).unwrap();
-    }
-
-    /// A logged-in admin session at `position` with the bundled content loaded
-    /// through the production restore path.
-    fn gateway(&self, position: [f32; 3], guid: u64) -> Gateway {
-        let mut character = Gateway::reference_state(&self.reference).unwrap();
-        character.guid = guid;
-        character.zone_id = 0;
-        character.position = position;
-        character.rotation = [0.0, 0.0, 1.0];
-        let mut gateway =
-            Gateway::load_gameplay(&self.reference, character, &self.content, None).unwrap();
-        gateway.set_dev_tools(true);
-        gateway.set_role(AccountRole::Admin);
-        self.login(&mut gateway);
-        send(&mut gateway, &13_u16.to_le_bytes(), 100);
-        send(&mut gateway, &10_u16.to_le_bytes(), 200);
-        gateway
-    }
-
-    /// The seed session with a bag of exactly `capacity` stacks, restored
-    /// through the production `Gateway::load_gameplay` path (no test seam).
     fn gateway_with_bag(
         &self,
         position: [f32; 3],
         guid: u64,
         capacity: usize,
     ) -> (Gateway, InventoryState) {
-        let mut seed = self.gateway(position, guid);
-        assert!(send(&mut seed, &switch_job(BRAWLER), 300).state_changed);
-        send(&mut seed, &chat::local_request("realm level 5"), 350);
-        assert_eq!(level(&seed, BRAWLER), REQUIRED_LEVEL);
-
-        let mut snapshot = seed.snapshot();
-        let bag = full_bag(&snapshot.gameplay.as_ref().unwrap().inventory, capacity);
-        snapshot.gameplay.as_mut().unwrap().inventory = bag.clone();
-        let gameplay: GameplayState = snapshot.gameplay.unwrap();
-
-        let mut gateway = Gateway::load_gameplay(
-            &self.reference,
-            seed.state().clone(),
-            &self.content,
-            Some(gameplay),
-        )
-        .unwrap();
-        gateway.set_dev_tools(true);
-        gateway.set_role(AccountRole::Admin);
-        self.login(&mut gateway);
-        send(&mut gateway, &13_u16.to_le_bytes(), 400);
-        let loaded = send(&mut gateway, &10_u16.to_le_bytes(), 500);
-        assert!(loaded.entered_world);
-        assert_eq!(
-            gateway.snapshot().gameplay.unwrap().inventory,
-            bag,
-            "world entry restores the test bag unchanged"
-        );
-        (gateway, bag)
-    }
-
-    fn save(&self, gateway: &Gateway, name: &str) -> PathBuf {
-        let path = self.root.join(name);
-        game_store::save(&path, &gateway.snapshot()).unwrap();
-        path
-    }
-}
-
-fn manifest_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-}
-
-fn battle_path() -> PathBuf {
-    manifest_dir().join("data/content/field_battles.json")
-}
-
-fn lab(relative: &str) -> PathBuf {
-    manifest_dir().join("../../../lab").join(relative)
-}
-
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(&fs::read(path).unwrap()).unwrap()
-}
-
-fn battles() -> Value {
-    read_json(&battle_path())
-}
-
-fn battle<'a>(file: &'a Value, id: u32) -> &'a Value {
-    file["battles"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .find(|row| row["id"].as_u64() == Some(u64::from(id)))
-        .unwrap_or_else(|| panic!("battle {id} is missing"))
-}
-
-fn i32_field(value: &Value, field: &str) -> i32 {
-    value[field].as_i64().unwrap() as i32
-}
-
-fn u32_field(value: &Value, field: &str) -> u32 {
-    value[field].as_u64().unwrap() as u32
-}
-
-fn u64_field(value: &Value, field: &str) -> u64 {
-    value[field].as_u64().unwrap()
-}
-
-fn position(value: &Value) -> [f32; 3] {
-    let points = value.as_array().unwrap();
-    [
-        points[0].as_f64().unwrap() as f32,
-        points[1].as_f64().unwrap() as f32,
-        points[2].as_f64().unwrap() as f32,
-    ]
-}
-
-fn prize_ids(row: &Value) -> BTreeSet<i32> {
-    row["prizes"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .map(|prize| i32_field(prize, "item_id"))
-        .collect()
-}
-
-// ---------------------------------------------------------------------------
-// Packet helpers (shapes pinned by `field_battle_roster`).
-// ---------------------------------------------------------------------------
-
-fn wrap(inner: &[u8]) -> Vec<u8> {
-    let mut bytes = vec![5, 0, 1];
-    bytes.extend((inner.len() as u32).to_le_bytes());
-    bytes.extend(inner);
-    bytes
-}
-
-fn unframe(reply: &[u8]) -> &[u8] {
-    if reply.starts_with(&[5, 0, 1]) && reply.len() >= 7 {
-        let length = u32::from_le_bytes(reply[3..7].try_into().unwrap()) as usize;
-        if length == reply.len() - 7 {
-            return &reply[7..];
-        }
-    }
-    reply
-}
-
-fn send(gateway: &mut Gateway, inner: &[u8], now_ms: u64) -> GatewayOutcome {
-    gateway
-        .handle_at(&wrap(inner), now_ms)
-        .expect("gateway frame")
-}
-
-fn interact(guid: u64) -> Vec<u8> {
-    [vec![26, 0, 8, 0], guid.to_le_bytes().to_vec(), vec![0]].concat()
-}
-
-fn switch_job(profile: i32) -> Vec<u8> {
-    [vec![26, 0, 13, 0], profile.to_le_bytes().to_vec()].concat()
-}
-
-/// 41/108 Go; 0x008b6e70 accepts the encounter and instance from the start
-/// screen and 0x00938f00 writes them (the trailing session is zero).
-fn go(details: &[u8]) -> Vec<u8> {
-    let mut packet = vec![41, 0, 108, 0];
-    packet.extend(&details[4..12]);
-    packet.extend(0_u64.to_le_bytes());
-    packet
-}
-
-fn melee(guid: u64) -> Vec<u8> {
-    [
-        vec![36, 0, 10, 0],
-        1_i32.to_le_bytes().to_vec(),
-        0_i32.to_le_bytes().to_vec(),
-        0_i32.to_le_bytes().to_vec(),
-        guid.to_le_bytes().to_vec(),
-    ]
-    .concat()
-}
-
-fn move_to(guid: u64, position: [f32; 3]) -> Vec<u8> {
-    let mut packet = 125_u16.to_le_bytes().to_vec();
-    packet.extend(guid.to_le_bytes());
-    for value in position.into_iter().chain([0.0, 0.0, 1.0]) {
-        packet.extend(value.to_le_bytes());
-    }
-    packet.extend([0, 0]);
-    packet
-}
-
-fn portal_play(activity: u32) -> Vec<u8> {
-    let mut inner = vec![167, 0, 1, 2];
-    inner.extend(activity.to_le_bytes());
-    inner.extend(0u32.to_le_bytes());
-    inner
-}
-
-fn chat_text(outcome: &GatewayOutcome) -> String {
-    outcome
-        .replies
-        .iter()
-        .map(|packet| unframe(packet))
-        .filter(|packet| packet.starts_with(&[15, 0, 3, 0]) && packet.len() >= 8)
-        .map(|packet| {
-            let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
-            String::from_utf8_lossy(&packet[8..8 + length]).into_owned()
+        self.gateway_with_bag_seeded(position, guid, capacity, THUGAMUG, |seed| {
+            assert!(send(seed, &switch_job(BRAWLER), 300).state_changed);
+            send(seed, &chat::local_request("realm level 5"), 350);
+            assert_eq!(level(seed, BRAWLER), REQUIRED_LEVEL);
         })
-        .collect::<Vec<_>>()
-        .join("\n")
-}
-
-fn details(outcome: &GatewayOutcome) -> Option<&[u8]> {
-    outcome
-        .replies
-        .iter()
-        .map(|packet| unframe(packet))
-        .find(|packet| packet.starts_with(&[41, 0, 114, 0]))
-}
-
-fn arena_spawned(gateway: &mut Gateway, now_ms: u64) -> GatewayOutcome {
-    let mut outcome = send(gateway, &13_u16.to_le_bytes(), now_ms);
-    outcome.replies.extend(
-        send(gateway, &10_u16.to_le_bytes(), now_ms + 100)
-            .replies
-            .into_iter(),
-    );
-    outcome
-}
-
-fn i32_at(packet: &[u8], offset: usize) -> i32 {
-    i32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap())
-}
-
-fn level(gateway: &Gateway, profile: i32) -> u32 {
-    let state = gateway.snapshot().gameplay.unwrap();
-    1 + state
-        .profiles
-        .unwrap()
-        .experience
-        .get(&profile)
-        .copied()
-        .unwrap_or(0)
-        / 100
-}
-
-fn saved_bytes(gateway: &Gateway) -> Vec<u8> {
-    serde_json::to_vec(&gateway.snapshot()).unwrap()
+    }
 }
 
 // ---------------------------------------------------------------------------
@@ -420,23 +132,6 @@ fn active_enemy(gateway: &Gateway) -> Option<(u64, [f32; 3], u32)> {
     let active = state.active?;
     let enemy = active.enemies.iter().find(|enemy| enemy.health > 0)?;
     Some((enemy.guid, enemy.position, enemy.health))
-}
-
-fn walk(gateway: &mut Gateway, guid: u64, to: [f32; 3], now_ms: &mut u64) {
-    let from = gateway.state().position;
-    let distance = ((to[0] - from[0]).powi(2) + (to[2] - from[2]).powi(2)).sqrt();
-    let steps = (distance / 8.0).ceil().max(1.0) as usize;
-    for step in 1..=steps {
-        let amount = step as f32 / steps as f32;
-        let position = [0, 1, 2].map(|axis| from[axis] + (to[axis] - from[axis]) * amount);
-        *now_ms += 400;
-        let moved = send(gateway, &move_to(guid, position), *now_ms);
-        assert!(!moved.replies.iter().any(|reply| {
-            let packet = unframe(reply);
-            packet.starts_with(&[38, 0, 12, 0])
-        }));
-        assert_eq!(gateway.state().position, position);
-    }
 }
 
 fn open_battle(gateway: &mut Gateway, spawner_guid: u64, row: &Value, now_ms: u64) -> Vec<u8> {
@@ -574,298 +269,6 @@ fn assert_payout(before: &Economy, after: &Economy, row: &Value) {
     assert_eq!(gains.len(), 1, "exactly one prize was granted");
     assert!(prizes.contains(&gains[0].0));
     assert_eq!(gains[0].1, 1);
-}
-
-fn reopen(fixture: &Fixture, gateway: &Gateway, name: &str, now_ms: u64) -> Gateway {
-    reopen_with(fixture, gateway, name, now_ms, |_| {})
-}
-
-/// Save, optionally patch the decoded gameplay state, then load it through the
-/// same `game_store` envelope and `Gateway::load_gameplay` a reconnect uses.
-fn reopen_with(
-    fixture: &Fixture,
-    gateway: &Gateway,
-    name: &str,
-    now_ms: u64,
-    patch: impl FnOnce(&mut GameplayState),
-) -> Gateway {
-    let path = fixture.save(gateway, name);
-    let mut saved = game_store::load_or_create(&path, gateway.state().clone()).unwrap();
-    if let Some(gameplay) = saved.gameplay.as_mut() {
-        patch(gameplay);
-    }
-    let mut restored = Gateway::load_gameplay(
-        &fixture.reference,
-        saved.character,
-        &fixture.content,
-        saved.gameplay,
-    )
-    .unwrap();
-    restored.set_dev_tools(true);
-    restored.set_role(AccountRole::Admin);
-    fixture.login(&mut restored);
-    send(&mut restored, &13_u16.to_le_bytes(), now_ms);
-    send(&mut restored, &10_u16.to_le_bytes(), now_ms + 100);
-    restored
-}
-
-// ---------------------------------------------------------------------------
-// Bag fixture: real catalogue items, no prize definition, exact stack count.
-// ---------------------------------------------------------------------------
-
-fn runtime_inventory() -> &'static Inventory {
-    RUNTIME_INVENTORY.get_or_init(|| {
-        Inventory::load(&manifest_dir().join(RUNTIME_CONTENT), None)
-            .expect("the round70 runtime item catalogue loads")
-    })
-}
-
-/// A real uncapped catalogue row that is not one of this battle's prizes, so
-/// each filler stack stays separate and no granted prize merges into it.
-fn filler_definition() -> i32 {
-    static FILLER: OnceLock<i32> = OnceLock::new();
-    *FILLER.get_or_init(|| {
-        let prizes = prize_ids(battle(&battles(), THUGAMUG));
-        let inventory = runtime_inventory();
-        inventory
-            .definition_ids()
-            .find(|id| {
-                !prizes.contains(id)
-                    && inventory
-                        .trade_flags(*id)
-                        .is_some_and(|(_, max_stack)| max_stack.is_none())
-            })
-            .expect("the runtime catalogue has an uncapped filler item")
-    })
-}
-
-fn stack(id: i32, definition_id: i32, count: u32) -> InventoryItem {
-    InventoryItem {
-        definition_id,
-        tint: 0,
-        id,
-        count,
-        consumed_count: 0,
-        stored_count: 0,
-        last_cast_time: i64::from(i32::MAX),
-        rental: None,
-        ability_count: 0,
-        activate_enabled: false,
-    }
-}
-
-/// Replace the base bag's prize stacks (so each previewed prize needs a new
-/// stack) and pad to exactly `capacity` stacks. `capacity == MAX_ITEMS`
-/// therefore leaves no room for the four-row bundle; `MAX_ITEMS - 4` does.
-fn full_bag(base: &InventoryState, capacity: usize) -> InventoryState {
-    assert!(
-        base.items.len() <= capacity,
-        "the base bag ({} stacks) is larger than {capacity}",
-        base.items.len()
-    );
-    let prizes = prize_ids(battle(&battles(), THUGAMUG));
-    let mut state = base.clone();
-    let removed: BTreeSet<i32> = state
-        .items
-        .iter()
-        .filter(|item| prizes.contains(&item.definition_id))
-        .map(|item| item.id)
-        .collect();
-    state
-        .items
-        .retain(|item| !prizes.contains(&item.definition_id));
-    state
-        .equipment
-        .retain(|item| !removed.contains(&item.item_id));
-    let mut id = state.items.iter().map(|item| item.id).max().unwrap_or(0) + 1;
-    let filler = filler_definition();
-    while state.items.len() < capacity {
-        state.items.push(stack(id, filler, 1));
-        id += 1;
-    }
-    state.next_instance_id = Some(i64::from(id));
-    state
-}
-
-// ---------------------------------------------------------------------------
-// Terrain helpers, mirroring the T103 bounded authoring check.
-// ---------------------------------------------------------------------------
-
-fn terrain() -> Terrain {
-    Terrain::load(&lab("terrain")).expect("the shipped zone-0/9600 terrain grids load")
-}
-
-fn disc_points(x: f32, z: f32) -> Vec<(f32, f32)> {
-    let mut points = Vec::new();
-    for dx in -5..=5 {
-        for dz in -5..=5 {
-            let (dx, dz) = (dx as f32, dz as f32);
-            if dx * dx + dz * dz <= 25.0 {
-                points.push((x + dx, z + dz));
-            }
-        }
-    }
-    for angle in (0..360).step_by(15) {
-        let radians = (angle as f32).to_radians();
-        points.push((x + 5.0 * radians.cos(), z + 5.0 * radians.sin()));
-    }
-    points
-}
-
-fn slope_degrees(grid: &HeightGrid, x: f32, z: f32) -> f32 {
-    let [west, east, south, north] = [
-        grid.height_at(x - 1.0, z),
-        grid.height_at(x + 1.0, z),
-        grid.height_at(x, z - 1.0),
-        grid.height_at(x, z + 1.0),
-    ]
-    .map(|height| height.expect("terrain around a sampled point is covered"));
-    let dx = (east - west) / 2.0;
-    let dz = (north - south) / 2.0;
-    dx.hypot(dz).atan().to_degrees()
-}
-
-/// `Some(distance)` to the nearest spawned regional NPC: only `legacy_data`
-/// rows are actors (`world.rs` skips POI/zone-centre scaffolding).
-fn nearest_spawned_npc(marker: [f32; 3]) -> (f32, u64) {
-    let npc_dir = manifest_dir().join("data/content/npcs");
-    let mut nearest = (f32::INFINITY, 0_u64);
-    for entry in fs::read_dir(npc_dir).unwrap() {
-        let path = entry.unwrap().path();
-        if path.extension().and_then(|extension| extension.to_str()) != Some("json") {
-            continue;
-        }
-        let records = read_json(&path);
-        for record in records["records"].as_array().unwrap() {
-            if record["placement"] != "legacy_data" {
-                continue;
-            }
-            let Some(point) = record["position"].as_array() else {
-                continue;
-            };
-            let distance = ((point[0].as_f64().unwrap() as f32 - marker[0]).powi(2)
-                + (point[2].as_f64().unwrap() as f32 - marker[2]).powi(2))
-            .sqrt();
-            if distance < nearest.0 {
-                nearest = (distance, record["npc_id"].as_u64().unwrap());
-            }
-        }
-    }
-    nearest
-}
-
-fn nearest_field_enemy(marker: [f32; 3]) -> f32 {
-    let field = read_json(&manifest_dir().join("data/content/field_enemies.json"));
-    field["enemies"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .map(|enemy| {
-            let point = &enemy["position"];
-            ((point[0].as_f64().unwrap() as f32 - marker[0]).powi(2)
-                + (point[2].as_f64().unwrap() as f32 - marker[2]).powi(2))
-            .sqrt()
-        })
-        .fold(f32::INFINITY, f32::min)
-}
-
-fn nearest_other_battle_marker(marker: [f32; 3]) -> f32 {
-    battles()["battles"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .filter(|row| row["id"].as_u64() != Some(u64::from(THUGAMUG)))
-        .map(|row| {
-            let point = position(&row["spawner"]["position"]);
-            (point[0] - marker[0]).hypot(point[2] - marker[2])
-        })
-        .fold(f32::INFINITY, f32::min)
-}
-
-// ---------------------------------------------------------------------------
-// 167/1/1 reader: header, entry type, count, ten dwords, CanPlayerJoin, then
-// the variable-length tail (writer/reader chain 0x00be79d0 -> 0x00be63e0).
-// ---------------------------------------------------------------------------
-
-struct PortalRow {
-    id: u32,
-    title: u32,
-    description: u32,
-    difficulty: u32,
-    can_join: bool,
-}
-
-struct Cursor<'a> {
-    bytes: &'a [u8],
-    at: usize,
-}
-
-impl Cursor<'_> {
-    fn take(&mut self, length: usize) -> &[u8] {
-        assert!(
-            self.bytes.len() >= self.at + length,
-            "client stream ran out of bytes"
-        );
-        let slice = &self.bytes[self.at..self.at + length];
-        self.at += length;
-        slice
-    }
-
-    fn u32(&mut self) -> u32 {
-        u32::from_le_bytes(self.take(4).try_into().unwrap())
-    }
-
-    fn i32(&mut self) -> i32 {
-        i32::from_le_bytes(self.take(4).try_into().unwrap())
-    }
-}
-
-fn decode_list(packet: &[u8]) -> Vec<PortalRow> {
-    let mut cursor = Cursor {
-        bytes: packet,
-        at: 0,
-    };
-    assert_eq!(cursor.take(2), 167_u16.to_le_bytes());
-    assert_eq!(cursor.take(1), [1], "activity service");
-    assert_eq!(cursor.take(1), [1], "list sub-op");
-    let _entry = cursor.u32();
-    let count = cursor.i32();
-    assert!(count >= 0);
-    let mut rows = Vec::new();
-    for _ in 0..count {
-        let mut words = [0_u32; 10];
-        for word in &mut words {
-            *word = cursor.u32();
-        }
-        let can_join = cursor.take(1)[0] != 0;
-        let _preferred = cursor.u32();
-        let featured = cursor.u32();
-        assert_eq!(featured, 0, "no featured windows");
-        let _tutorial = cursor.u32();
-        let _members = cursor.take(1);
-        for _ in 0..2 {
-            let length = cursor.i32();
-            assert!(length >= 0);
-            cursor.take(length as usize);
-        }
-        let difficulty = cursor.u32();
-        let _unknown_0xc = cursor.u32();
-        let _unknown_0x68 = cursor.u32();
-        let _mystery_chest_icon = cursor.u32();
-        rows.push(PortalRow {
-            id: words[0],
-            title: words[5],
-            description: words[6],
-            difficulty,
-            can_join,
-        });
-    }
-    assert_eq!(
-        cursor.at,
-        packet.len(),
-        "trailing bytes make the client drop the list"
-    );
-    rows
 }
 
 // ---------------------------------------------------------------------------
@@ -1133,7 +536,7 @@ fn the_marker_is_on_the_ground_and_clear() {
     );
     let enemy = nearest_field_enemy(marker);
     assert!(enemy >= 25.0, "nearest field enemy is {enemy:.1} m away");
-    let other = nearest_other_battle_marker(marker);
+    let other = nearest_other_battle_marker(marker, THUGAMUG);
     assert!(other >= 25.0, "nearest battle marker is {other:.1} m away");
 
     let arena = terrain.grid(9600).expect("zone 9600 is loaded");
@@ -1408,13 +811,29 @@ fn the_pre_existing_battles_stay_unchanged() {
     // The insertion anchor is immediately after battle 96, not at the end.
     assert_eq!(ids[0], 96);
     assert_eq!(ids[1], THUGAMUG);
-    // Later content slices add their own rows (T319 adds 12350), so require
-    // every pre-existing row to survive rather than pinning the whole file.
+    // Later content slices add their own rows (T319 adds 12350), so this test
+    // requires every pre-existing row to survive in its exact relative order
+    // rather than re-pinning the whole file. The full shipped order (nine rows
+    // at T319) is pinned exactly by `tests/field_battle_roster.rs::
+    // five_distinct_field_battles_load_with_the_existing_schema` and by
+    // `sheep_watch_dungeon` test 7; a silent deletion or reorder fails here too.
     let existing: BTreeSet<u32> = pre_existing.iter().map(|row| row.0).collect();
     let actual: BTreeSet<u32> = ids.iter().copied().collect();
     assert!(
         existing.is_subset(&actual),
         "a pre-existing battle was removed"
+    );
+    let positions: Vec<usize> = pre_existing
+        .iter()
+        .map(|(id, ..)| {
+            ids.iter()
+                .position(|row| row == id)
+                .unwrap_or_else(|| panic!("battle {id} was removed"))
+        })
+        .collect();
+    assert!(
+        positions.windows(2).all(|pair| pair[0] < pair[1]),
+        "the T282-era battles were reordered: {positions:?}"
     );
     assert_eq!(
         actual.iter().filter(|id| **id == THUGAMUG).count(),
@@ -1578,10 +997,6 @@ const QUEST_CHOICE: i32 = 301;
 const WOLF_DEFINITION: i32 = 3_156;
 const WOLF_GROUP: &str = "starting_farnum_wolves";
 const WOLF_CENTRE: [f32; 3] = [-1899.204, -50.59, 307.902];
-
-fn content_dir() -> PathBuf {
-    manifest_dir().join("data/content")
-}
 
 fn npc_position(file: &str, npc_id: u64) -> [f32; 3] {
     let document = read_json(&content_dir().join("npcs").join(file));

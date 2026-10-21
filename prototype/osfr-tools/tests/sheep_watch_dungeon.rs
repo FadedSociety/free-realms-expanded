@@ -22,35 +22,42 @@
 //! * 167/1/1 list reader `0x00be79d0` -> `0x00be75c0` -> `0x00be6fa0` ->
 //!   `0x00be63e0`; the row layout is the one pinned by `activity_portal.rs`.
 //!
+//! Every arena enemy carries the recovered `enemies.json` kind: two Alpha
+//! Wolves `930050` and three Wolves `930071`. The production engine reports
+//! the actor's definition id in `EncounterOutcome::defeated`, so a quest goal
+//! authored on either kind is credited (tests 8 and 9). The marker keeps the
+//! local actor definition `1235000` because it is a non-combat gate adaptation,
+//! not an enemy kind.
+//!
 //! Placement evidence: the guide's Farnum Farmstead entrance and the video
 //! marker 19 m from Pappy. The marker uses the visible Alpha Wolf model (R),
 //! like T282's Thugamug marker, at a terrain-sampled point 19.00 m east of
-//! Pappy. Its 105-sample 5 m wander disc is terrain-covered and at most 19.96
-//! degrees; the nearest other spawned NPC is 17.38 m away (the 5 m disc stays
-//! outside the 12 m NPC interaction radius), and the nearest field enemy and
-//! other battle marker are over 200 m away. Water, object collision and a
-//! native walkable route remain unverified.
+//! Pappy, inside the brief's "within 25 m of Pappy" bound. Its 105-sample 5 m
+//! wander disc is terrain-covered and at most 19.96 degrees; the nearest other
+//! spawned NPC is 17.38 m away (the 5 m disc stays outside the 12 m NPC
+//! interaction radius), and the nearest field enemy and other battle marker are
+//! over 200 m away. Water, object collision and a native walkable route remain
+//! unverified.
 
 use osfr_tools::{
     account_store::AccountRole,
-    chat,
+    character_store::CharacterState,
     encounter::{EncounterEngine, EncounterPhase},
-    game_store,
-    gateway::{Gateway, GatewayOutcome},
-    inventory::{Inventory, InventoryItem, InventoryState, MAX_ITEMS},
+    gateway::Gateway,
+    inventory::{InventoryState, MAX_ITEMS},
+    quest_engine::{CharacterEligibility, QuestEngine, QuestProgress, QuestState, QuestStatus},
     startup_world::{NpcSpawn, parse_add_npc},
-    terrain::{HeightGrid, Terrain},
 };
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs,
-    path::{Path, PathBuf},
-    sync::{
-        OnceLock,
-        atomic::{AtomicU64, Ordering},
-    },
 };
+
+#[path = "common/field_battle_fixture.rs"]
+mod field_battle_fixture;
+
+use field_battle_fixture::*;
 
 /// The new row. 12350 is free on this base and sits after Stone Heart (12303).
 const SHEEP_WATCH: u32 = 12350;
@@ -72,6 +79,15 @@ const MARKER: [f32; 3] = [-2165.513, -32.96, 328.1112];
 const PAPPY: [f32; 3] = [-2184.513, -31.53728, 328.1112];
 const ALPHA_NAME: i32 = 102128;
 const WOLF_NAME: i32 = 374;
+/// The recovered `enemies.json` kinds: Alpha Wolf and Wolf.
+const ALPHA_KIND: i32 = 930050;
+const WOLF_KIND: i32 = 930071;
+/// Marker adaptation: a non-combat gate has no recovered enemy kind.
+const MARKER_DEFINITION: i32 = 1235000;
+/// The shipped `Brawler: Delinquent Dilemma` quest (3000007): defeat four
+/// actors whose definition is the recovered Alpha Wolf kind `930050`.
+const DELINQUENT_QUEST: u32 = 3030007;
+const DELINQUENT_GOAL: u32 = 1;
 const MODEL: i32 = 3284;
 const NAMEPLATE: i32 = 11970;
 const BRAWLER: i32 = 43;
@@ -81,103 +97,38 @@ const ARENA_ARRIVAL: [f32; 3] = [136.0, -0.5, 155.0];
 /// The designated five-battle roster from `field_battle_roster`; the new row
 /// is deliberately not part of it.
 const TASK_ROSTER: [u32; 5] = [96, 12301, 12302, 12310, 12311];
-const RUNTIME_CONTENT: &str = "../../../lab/reports/round70-native-20261016T061000Z/content";
-const REFERENCE: &str = "../../../lab/references/rust-gateway-reference";
 const REFUSAL_PRIZE: &str = "one of its rewards cannot be granted";
 
-static SERIAL: AtomicU64 = AtomicU64::new(0);
-static RUNTIME_INVENTORY: OnceLock<Inventory> = OnceLock::new();
-
 // ---------------------------------------------------------------------------
-// Production-shaped session fixture.
+// Local fixture seams: the full bag and the shipped defeat goal.
 // ---------------------------------------------------------------------------
-
-struct Fixture {
-    root: PathBuf,
-    reference: PathBuf,
-    content: PathBuf,
-    version: String,
-}
-
-impl Drop for Fixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.root);
-    }
-}
 
 impl Fixture {
-    fn new() -> Self {
-        let root = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!(
-            "sheep-watch-{}-{}",
-            std::process::id(),
-            SERIAL.fetch_add(1, Ordering::Relaxed)
-        ));
-        fs::create_dir_all(&root).unwrap();
-        let reference = manifest_dir().join(REFERENCE);
-        let version = read_json(&reference.join("manifest.json"))["client_version"]
-            .as_str()
-            .unwrap()
-            .to_owned();
-        Self {
-            root,
-            reference,
-            content: manifest_dir().join(RUNTIME_CONTENT),
-            version,
-        }
-    }
-
-    fn login(&self, gateway: &mut Gateway) -> GatewayOutcome {
-        let mut login = 1_u16.to_le_bytes().to_vec();
-        for (index, value) in ["local-private-test", self.version.as_str(), ""]
-            .into_iter()
-            .enumerate()
-        {
-            login.extend((value.len() as u32).to_le_bytes());
-            login.extend(value.as_bytes());
-            if index == 0 {
-                login.extend(gateway.state().guid.to_le_bytes());
-            }
-        }
-        gateway.handle_at(&login, 0).unwrap()
-    }
-
-    /// A logged-in session at `position`, including the 10/13 world-entry
-    /// replies (AddNpc visibility, portal list and the encounter state).
-    fn session(&self, position: [f32; 3], guid: u64) -> (Gateway, GatewayOutcome) {
-        let mut character = Gateway::reference_state(&self.reference).unwrap();
-        character.guid = guid;
-        character.zone_id = 0;
-        character.position = position;
-        character.rotation = [0.0, 0.0, 1.0];
-        let mut gateway =
-            Gateway::load_gameplay(&self.reference, character, &self.content, None).unwrap();
-        gateway.set_dev_tools(true);
-        gateway.set_role(AccountRole::Admin);
-        self.login(&mut gateway);
-        send(&mut gateway, &13_u16.to_le_bytes(), 100);
-        let loaded = send(&mut gateway, &10_u16.to_le_bytes(), 200);
-        (gateway, loaded)
-    }
-
-    fn gateway(&self, position: [f32; 3], guid: u64) -> Gateway {
-        self.session(position, guid).0
-    }
-
-    /// Restore a save built by the production `game_store` path. The seed has
-    /// already entered the world and is on a combat job.
+    /// Restore a save built by the production `game_store` path with a bag of
+    /// exactly `capacity` stacks. The seed has entered the world and is on a
+    /// level-1 combat job.
     fn gateway_with_bag(
         &self,
         position: [f32; 3],
         guid: u64,
         capacity: usize,
     ) -> (Gateway, InventoryState) {
+        self.gateway_with_bag_seeded(position, guid, capacity, SHEEP_WATCH, |seed| {
+            assert!(send(seed, &switch_job(BRAWLER), 300).state_changed);
+            assert_eq!(level(seed, BRAWLER), 1);
+        })
+    }
+
+    /// Restore a save whose NPC quest state carries the shipped Brawler
+    /// `Delinquent Dilemma` goal, through the same production bind a reconnect
+    /// uses. The seed is on the Brawler job at level 1.
+    fn gateway_with_quest(&self, position: [f32; 3], guid: u64, quests: QuestState) -> Gateway {
         let mut seed = self.gateway(position, guid);
         assert!(send(&mut seed, &switch_job(BRAWLER), 300).state_changed);
         assert_eq!(level(&seed, BRAWLER), 1);
 
         let mut snapshot = seed.snapshot();
-        let bag = full_bag(&snapshot.gameplay.as_ref().unwrap().inventory, capacity);
-        snapshot.gameplay.as_mut().unwrap().inventory = bag.clone();
+        snapshot.gameplay.as_mut().unwrap().npc_quests = Some(quests);
         let gameplay = snapshot.gameplay.unwrap();
         let mut gateway = Gateway::load_gameplay(
             &self.reference,
@@ -192,190 +143,25 @@ impl Fixture {
         send(&mut gateway, &13_u16.to_le_bytes(), 400);
         let loaded = send(&mut gateway, &10_u16.to_le_bytes(), 500);
         assert!(loaded.entered_world);
+        let restored = gateway
+            .snapshot()
+            .gameplay
+            .unwrap()
+            .npc_quests
+            .expect("the catalogue bind keeps the saved quest state");
         assert_eq!(
-            gateway.snapshot().gameplay.unwrap().inventory,
-            bag,
-            "world entry restores the test bag unchanged"
+            restored
+                .quests
+                .get(&DELINQUENT_QUEST)
+                .expect("the saved defeat goal survives the bind"),
+            &QuestProgress {
+                status: QuestStatus::Active,
+                counts: vec![0],
+            },
+            "world entry restores the test quest goal unchanged"
         );
-        (gateway, bag)
+        gateway
     }
-
-    fn save(&self, gateway: &Gateway, name: &str) -> PathBuf {
-        let path = self.root.join(name);
-        game_store::save(&path, &gateway.snapshot()).unwrap();
-        path
-    }
-}
-
-fn manifest_dir() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-}
-
-fn battle_path() -> PathBuf {
-    manifest_dir().join("data/content/field_battles.json")
-}
-
-fn content_dir() -> PathBuf {
-    manifest_dir().join("data/content")
-}
-
-fn lab(relative: &str) -> PathBuf {
-    manifest_dir().join("../../../lab").join(relative)
-}
-
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(&fs::read(path).unwrap()).unwrap()
-}
-
-fn battles() -> Value {
-    read_json(&battle_path())
-}
-
-fn battle<'a>(file: &'a Value, id: u32) -> &'a Value {
-    file["battles"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .find(|row| row["id"].as_u64() == Some(u64::from(id)))
-        .unwrap_or_else(|| panic!("battle {id} is missing"))
-}
-
-fn i32_field(value: &Value, field: &str) -> i32 {
-    value[field].as_i64().unwrap() as i32
-}
-
-fn u32_field(value: &Value, field: &str) -> u32 {
-    value[field].as_u64().unwrap() as u32
-}
-
-fn u64_field(value: &Value, field: &str) -> u64 {
-    value[field].as_u64().unwrap()
-}
-
-fn position(value: &Value) -> [f32; 3] {
-    let points = value.as_array().unwrap();
-    [
-        points[0].as_f64().unwrap() as f32,
-        points[1].as_f64().unwrap() as f32,
-        points[2].as_f64().unwrap() as f32,
-    ]
-}
-
-fn prize_ids(row: &Value) -> BTreeSet<i32> {
-    row["prizes"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .map(|prize| i32_field(prize, "item_id"))
-        .collect()
-}
-
-// ---------------------------------------------------------------------------
-// Packet helpers (shapes pinned by `field_battle_roster`).
-// ---------------------------------------------------------------------------
-
-fn wrap(inner: &[u8]) -> Vec<u8> {
-    let mut bytes = vec![5, 0, 1];
-    bytes.extend((inner.len() as u32).to_le_bytes());
-    bytes.extend(inner);
-    bytes
-}
-
-fn unframe(reply: &[u8]) -> &[u8] {
-    if reply.starts_with(&[5, 0, 1]) && reply.len() >= 7 {
-        let length = u32::from_le_bytes(reply[3..7].try_into().unwrap()) as usize;
-        if length == reply.len() - 7 {
-            return &reply[7..];
-        }
-    }
-    reply
-}
-
-fn send(gateway: &mut Gateway, inner: &[u8], now_ms: u64) -> GatewayOutcome {
-    gateway
-        .handle_at(&wrap(inner), now_ms)
-        .expect("gateway frame")
-}
-
-fn interact(guid: u64) -> Vec<u8> {
-    [vec![26, 0, 8, 0], guid.to_le_bytes().to_vec(), vec![0]].concat()
-}
-
-fn switch_job(profile: i32) -> Vec<u8> {
-    [vec![26, 0, 13, 0], profile.to_le_bytes().to_vec()].concat()
-}
-
-fn portal_play(activity: u32) -> Vec<u8> {
-    let mut inner = vec![167, 0, 1, 2];
-    inner.extend(activity.to_le_bytes());
-    inner.extend(0_u32.to_le_bytes());
-    inner
-}
-
-/// 41/108 Go; constructor `0x008b6e70` accepts the encounter and instance from
-/// the 41/114 screen. The trailing session is zero in native frames.
-fn go(details: &[u8]) -> Vec<u8> {
-    let mut packet = vec![41, 0, 108, 0];
-    packet.extend(&details[4..12]);
-    packet.extend(0_u64.to_le_bytes());
-    packet
-}
-
-fn melee(guid: u64) -> Vec<u8> {
-    [
-        vec![36, 0, 10, 0],
-        1_i32.to_le_bytes().to_vec(),
-        0_i32.to_le_bytes().to_vec(),
-        0_i32.to_le_bytes().to_vec(),
-        guid.to_le_bytes().to_vec(),
-    ]
-    .concat()
-}
-
-fn move_to(guid: u64, position: [f32; 3]) -> Vec<u8> {
-    let mut packet = 125_u16.to_le_bytes().to_vec();
-    packet.extend(guid.to_le_bytes());
-    for value in position.into_iter().chain([0.0, 0.0, 1.0]) {
-        packet.extend(value.to_le_bytes());
-    }
-    packet.extend([0, 0]);
-    packet
-}
-
-fn chat_text(outcome: &GatewayOutcome) -> String {
-    outcome
-        .replies
-        .iter()
-        .map(|packet| unframe(packet))
-        .filter(|packet| packet.starts_with(&[15, 0, 3, 0]) && packet.len() >= 8)
-        .map(|packet| {
-            let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
-            String::from_utf8_lossy(&packet[8..8 + length]).into_owned()
-        })
-        .collect::<Vec<_>>()
-        .join("\n")
-}
-
-fn details(outcome: &GatewayOutcome) -> Option<&[u8]> {
-    outcome
-        .replies
-        .iter()
-        .map(|packet| unframe(packet))
-        .find(|packet| packet.starts_with(&[41, 0, 114, 0]))
-}
-
-fn i32_at(packet: &[u8], offset: usize) -> i32 {
-    i32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap())
-}
-
-fn arena_spawned(gateway: &mut Gateway, now_ms: u64) -> GatewayOutcome {
-    let mut outcome = send(gateway, &13_u16.to_le_bytes(), now_ms);
-    outcome.replies.extend(
-        send(gateway, &10_u16.to_le_bytes(), now_ms + 100)
-            .replies
-            .into_iter(),
-    );
-    outcome
 }
 
 // ---------------------------------------------------------------------------
@@ -399,90 +185,8 @@ fn marker_spawn(packet: &[u8]) -> NpcSpawn {
 }
 
 // ---------------------------------------------------------------------------
-// 167/1/1 reader: header, entry type, count, ten dwords, CanPlayerJoin, then
-// the variable-length tail (reader chain 0x00be79d0 -> 0x00be63e0).
+// Published 167/1/1 activity list (shared row reader in the fixture module).
 // ---------------------------------------------------------------------------
-
-struct PortalRow {
-    id: u32,
-    title: u32,
-    description: u32,
-    difficulty: u32,
-    can_join: bool,
-}
-
-struct Cursor<'a> {
-    bytes: &'a [u8],
-    at: usize,
-}
-
-impl Cursor<'_> {
-    fn take(&mut self, length: usize) -> &[u8] {
-        assert!(
-            self.bytes.len() >= self.at + length,
-            "client stream ran out of bytes"
-        );
-        let slice = &self.bytes[self.at..self.at + length];
-        self.at += length;
-        slice
-    }
-
-    fn u32(&mut self) -> u32 {
-        u32::from_le_bytes(self.take(4).try_into().unwrap())
-    }
-
-    fn i32(&mut self) -> i32 {
-        i32::from_le_bytes(self.take(4).try_into().unwrap())
-    }
-}
-
-fn decode_list(packet: &[u8]) -> Vec<PortalRow> {
-    let mut cursor = Cursor {
-        bytes: packet,
-        at: 0,
-    };
-    assert_eq!(cursor.take(2), 167_u16.to_le_bytes());
-    assert_eq!(cursor.take(1), [1], "activity service");
-    assert_eq!(cursor.take(1), [1], "list sub-op");
-    let _entry = cursor.u32();
-    let count = cursor.i32();
-    assert!(count >= 0);
-    let mut rows = Vec::new();
-    for _ in 0..count {
-        let mut words = [0_u32; 10];
-        for word in &mut words {
-            *word = cursor.u32();
-        }
-        let can_join = cursor.take(1)[0] != 0;
-        let _preferred = cursor.u32();
-        let featured = cursor.u32();
-        assert_eq!(featured, 0, "no featured windows");
-        let _tutorial = cursor.u32();
-        let _members = cursor.take(1);
-        for _ in 0..2 {
-            let length = cursor.i32();
-            assert!(length >= 0);
-            cursor.take(length as usize);
-        }
-        let difficulty = cursor.u32();
-        let _unknown_0xc = cursor.u32();
-        let _unknown_0x68 = cursor.u32();
-        let _mystery_chest_icon = cursor.u32();
-        rows.push(PortalRow {
-            id: words[0],
-            title: words[5],
-            description: words[6],
-            difficulty,
-            can_join,
-        });
-    }
-    assert_eq!(
-        cursor.at,
-        packet.len(),
-        "trailing bytes make the client drop the list"
-    );
-    rows
-}
 
 fn published_list(replies: &[Vec<u8>]) -> Vec<PortalRow> {
     let packet = replies
@@ -491,18 +195,6 @@ fn published_list(replies: &[Vec<u8>]) -> Vec<PortalRow> {
         .find(|packet| packet.starts_with(&[167, 0, 1, 1]))
         .expect("a 167/1/1 activity list was sent");
     decode_list(packet)
-}
-
-fn level(gateway: &Gateway, profile: i32) -> u32 {
-    let state = gateway.snapshot().gameplay.unwrap();
-    1 + state
-        .profiles
-        .unwrap()
-        .experience
-        .get(&profile)
-        .copied()
-        .unwrap_or(0)
-        / 100
 }
 
 // ---------------------------------------------------------------------------
@@ -552,23 +244,6 @@ fn active_enemy(gateway: &Gateway) -> Option<(u64, [f32; 3], EncounterPhase)> {
     let active = state.active?;
     let enemy = active.enemies.iter().find(|enemy| enemy.health > 0)?;
     Some((enemy.guid, enemy.position, active.phase))
-}
-
-fn walk(gateway: &mut Gateway, guid: u64, to: [f32; 3], now_ms: &mut u64) {
-    let from = gateway.state().position;
-    let distance = ((to[0] - from[0]).powi(2) + (to[2] - from[2]).powi(2)).sqrt();
-    let steps = (distance / 8.0).ceil().max(1.0) as usize;
-    for step in 1..=steps {
-        let amount = step as f32 / steps as f32;
-        let position = [0, 1, 2].map(|axis| from[axis] + (to[axis] - from[axis]) * amount);
-        *now_ms += 400;
-        let moved = send(gateway, &move_to(guid, position), *now_ms);
-        assert!(!moved.replies.iter().any(|reply| {
-            let packet = unframe(reply);
-            packet.starts_with(&[38, 0, 12, 0])
-        }));
-        assert_eq!(gateway.state().position, position);
-    }
 }
 
 fn open_battle(gateway: &mut Gateway, spawner_guid: u64, row: &Value, now_ms: u64) -> Vec<u8> {
@@ -755,202 +430,68 @@ fn assert_payout(before: &Economy, after: &Economy, row: &Value, prize_ids: &BTr
     assert_eq!(gains[0].1, 1);
 }
 
-fn saved_bytes(gateway: &Gateway) -> Vec<u8> {
-    // The typed snapshot payload the save envelope writes; the full-bag
-    // refusal fixture is larger than game_store's 1 MiB document limit, so
-    // compare the payload directly (as T282 does).
-    serde_json::to_vec(&gateway.snapshot()).unwrap()
-}
+// ---------------------------------------------------------------------------
+// NPC quest state: the shipped defeat goal keyed to the Alpha Wolf kind.
+// ---------------------------------------------------------------------------
 
-fn reopen(fixture: &Fixture, gateway: &Gateway, name: &str, now_ms: u64) -> Gateway {
-    let path = fixture.save(gateway, name);
-    let saved = game_store::load_or_create(&path, gateway.state().clone()).unwrap();
-    let mut restored = Gateway::load_gameplay(
-        &fixture.reference,
-        saved.character,
-        &fixture.content,
-        saved.gameplay,
+/// The production catalogue's saved active progress for quest 3030007, whose
+/// only goal counts four defeats of definition `930050`. The state is the same
+/// `QuestState` a reconnect restores; the bind rebuilds the definitions.
+fn delinquent_quests(guid: u64) -> QuestState {
+    let engine = QuestEngine::from_split_content(
+        &content_dir(),
+        guid,
+        CharacterEligibility {
+            player_level: 20,
+            job_levels: BTreeMap::new(),
+            member: true,
+            nonmember_quest_limit: 30,
+            member_quest_limit: 30,
+        },
+        None,
     )
-    .unwrap();
-    restored.set_dev_tools(true);
-    restored.set_role(AccountRole::Admin);
-    fixture.login(&mut restored);
-    send(&mut restored, &13_u16.to_le_bytes(), now_ms);
-    send(&mut restored, &10_u16.to_le_bytes(), now_ms + 100);
-    restored
-}
-
-// ---------------------------------------------------------------------------
-// Full bag: real catalogue items, no prize definition, exact stack count.
-// ---------------------------------------------------------------------------
-
-fn runtime_inventory() -> &'static Inventory {
-    RUNTIME_INVENTORY.get_or_init(|| {
-        Inventory::load(&manifest_dir().join(RUNTIME_CONTENT), None)
-            .expect("the round70 runtime item catalogue loads")
-    })
-}
-
-/// A real uncapped catalogue row that is not one of this battle's prizes, so
-/// each filler stack stays separate and no granted prize merges into it.
-fn filler_definition() -> i32 {
-    static FILLER: OnceLock<i32> = OnceLock::new();
-    *FILLER.get_or_init(|| {
-        let prizes = prize_ids(battle(&battles(), SHEEP_WATCH));
-        let inventory = runtime_inventory();
-        inventory
-            .definition_ids()
-            .find(|id| {
-                !prizes.contains(id)
-                    && inventory
-                        .trade_flags(*id)
-                        .is_some_and(|(_, max_stack)| max_stack.is_none())
-            })
-            .expect("the runtime catalogue has an uncapped filler item")
-    })
-}
-
-fn stack(id: i32, definition_id: i32, count: u32) -> InventoryItem {
-    InventoryItem {
-        definition_id,
-        tint: 0,
-        id,
-        count,
-        consumed_count: 0,
-        stored_count: 0,
-        last_cast_time: i64::from(i32::MAX),
-        rental: None,
-        ability_count: 0,
-        activate_enabled: false,
-    }
-}
-
-/// Replace the base bag's prize stacks (so each previewed prize needs a new
-/// stack) and pad to exactly `capacity` stacks. `capacity == MAX_ITEMS`
-/// leaves no room for the four-row bundle; `MAX_ITEMS - 4` does.
-fn full_bag(base: &InventoryState, capacity: usize) -> InventoryState {
-    assert!(
-        base.items.len() <= capacity,
-        "the base bag ({} stacks) is larger than {capacity}",
-        base.items.len()
+    .expect("the split quest catalogue loads");
+    let mut state = engine.state().clone();
+    state.quests.insert(
+        DELINQUENT_QUEST,
+        QuestProgress {
+            status: QuestStatus::Active,
+            counts: vec![0],
+        },
     );
-    let prizes = prize_ids(battle(&battles(), SHEEP_WATCH));
-    let mut state = base.clone();
-    let removed: BTreeSet<i32> = state
-        .items
-        .iter()
-        .filter(|item| prizes.contains(&item.definition_id))
-        .map(|item| item.id)
-        .collect();
-    state
-        .items
-        .retain(|item| !prizes.contains(&item.definition_id));
-    state
-        .equipment
-        .retain(|item| !removed.contains(&item.item_id));
-    let mut id = state.items.iter().map(|item| item.id).max().unwrap_or(0) + 1;
-    let filler = filler_definition();
-    while state.items.len() < capacity {
-        state.items.push(stack(id, filler, 1));
-        id += 1;
-    }
-    state.next_instance_id = Some(i64::from(id));
     state
 }
 
-// ---------------------------------------------------------------------------
-// Terrain helpers, mirroring the T103/T282 bounded authoring check.
-// ---------------------------------------------------------------------------
-
-fn terrain() -> Terrain {
-    Terrain::load(&lab("terrain")).expect("the shipped zone-0/9600 terrain grids load")
-}
-
-fn disc_points(x: f32, z: f32) -> Vec<(f32, f32)> {
-    let mut points = Vec::new();
-    for dx in -5..=5 {
-        for dz in -5..=5 {
-            let (dx, dz) = (dx as f32, dz as f32);
-            if dx * dx + dz * dz <= 25.0 {
-                points.push((x + dx, z + dz));
-            }
-        }
-    }
-    for angle in (0..360).step_by(15) {
-        let radians = (angle as f32).to_radians();
-        points.push((x + 5.0 * radians.cos(), z + 5.0 * radians.sin()));
-    }
-    points
-}
-
-fn slope_degrees(grid: &HeightGrid, x: f32, z: f32) -> f32 {
-    let [west, east, south, north] = [
-        grid.height_at(x - 1.0, z),
-        grid.height_at(x + 1.0, z),
-        grid.height_at(x, z - 1.0),
-        grid.height_at(x, z + 1.0),
-    ]
-    .map(|height| height.expect("terrain around a sampled point is covered"));
-    let dx = (east - west) / 2.0;
-    let dz = (north - south) / 2.0;
-    dx.hypot(dz).atan().to_degrees()
-}
-
-/// `Some(distance)` to the nearest spawned regional NPC: only `legacy_data`
-/// rows are actors (`world.rs` skips POI/zone-centre scaffolding).
-fn nearest_spawned_npc(marker: [f32; 3]) -> (f32, u64) {
-    let npc_dir = content_dir().join("npcs");
-    let mut nearest = (f32::INFINITY, 0_u64);
-    for entry in fs::read_dir(npc_dir).unwrap() {
-        let path = entry.unwrap().path();
-        if path.extension().and_then(|extension| extension.to_str()) != Some("json") {
-            continue;
-        }
-        let records = read_json(&path);
-        for record in records["records"].as_array().unwrap() {
-            if record["placement"] != "legacy_data" {
-                continue;
-            }
-            let Some(point) = record["position"].as_array() else {
-                continue;
-            };
-            let distance = ((point[0].as_f64().unwrap() as f32 - marker[0]).powi(2)
-                + (point[2].as_f64().unwrap() as f32 - marker[2]).powi(2))
-            .sqrt();
-            if distance < nearest.0 {
-                nearest = (distance, record["npc_id"].as_u64().unwrap());
-            }
-        }
-    }
-    nearest
-}
-
-fn nearest_field_enemy(marker: [f32; 3]) -> f32 {
-    let field = read_json(&content_dir().join("field_enemies.json"));
-    field["enemies"]
-        .as_array()
+fn saved_quest_count(gateway: &Gateway, quest: u32) -> u32 {
+    gateway
+        .snapshot()
+        .gameplay
         .unwrap()
-        .iter()
-        .map(|enemy| {
-            let point = &enemy["position"];
-            ((point[0].as_f64().unwrap() as f32 - marker[0]).powi(2)
-                + (point[2].as_f64().unwrap() as f32 - marker[2]).powi(2))
-            .sqrt()
-        })
-        .fold(f32::INFINITY, f32::min)
+        .npc_quests
+        .unwrap()
+        .quests
+        .get(&quest)
+        .expect("the saved quest state carries the goal")
+        .counts[0]
 }
 
-fn nearest_other_battle_marker(marker: [f32; 3]) -> f32 {
-    battles()["battles"]
-        .as_array()
-        .unwrap()
+/// 49/9 ObjectiveUpdate readers: header, quest id, objective id, current count,
+/// progress float, notification bool and one unresolved dword. Body reader
+/// `0x00c7af60` (pinned by `tests/shared_field_kill_quest_credit.rs`).
+fn objective_updates(replies: &[Vec<u8>], quest: u32) -> Vec<u32> {
+    replies
         .iter()
-        .filter(|row| row["id"].as_u64() != Some(u64::from(SHEEP_WATCH)))
-        .map(|row| {
-            let point = position(&row["spawner"]["position"]);
-            (point[0] - marker[0]).hypot(point[2] - marker[2])
+        .map(|packet| unframe(packet))
+        .filter(|packet| packet.starts_with(&[49, 0, 9, 0]) && packet.len() >= 22)
+        .filter(|packet| u32::from_le_bytes(packet[6..10].try_into().unwrap()) == quest)
+        .map(|packet| {
+            assert_eq!(
+                u32::from_le_bytes(packet[10..14].try_into().unwrap()),
+                DELINQUENT_GOAL
+            );
+            u32::from_le_bytes(packet[14..18].try_into().unwrap())
         })
-        .fold(f32::INFINITY, f32::min)
+        .collect()
 }
 
 // ---------------------------------------------------------------------------
@@ -1038,7 +579,7 @@ fn the_marker_is_drawable_and_the_portal_publishes_sheep_watch() {
     );
     let enemy = nearest_field_enemy(marker);
     assert!(enemy >= 25.0, "nearest field enemy is {enemy:.1} m away");
-    let other = nearest_other_battle_marker(marker);
+    let other = nearest_other_battle_marker(marker, SHEEP_WATCH);
     assert!(other >= 25.0, "nearest battle marker is {other:.1} m away");
 
     // Two independent sessions each receive the same static marker.
@@ -1274,10 +815,11 @@ fn a_second_run_pays_again_once_and_only_once() {
     assert_eq!(economy(&gateway, &prizes), paid_twice);
 }
 
-/// 4. Forged Go, a wrong marker, out-of-range Go, a non-combat job, a
-/// knocked-out character and the full-bag preflight each change no typed
-/// state or save bytes and leave the session alive. Controls prove the same
-/// requests start under the qualifying condition.
+/// 4. Forged Go, a forged portal Play id, a wrong marker, out-of-range Go, an
+/// arbitrary 36/10 target, a non-combat job, a knocked-out character and the
+/// full-bag preflight each change no typed state or save bytes and leave the
+/// session alive. Controls prove the same requests start under the qualifying
+/// condition.
 #[test]
 fn refusals_change_nothing() {
     let fixture = Fixture::new();
@@ -1300,6 +842,21 @@ fn refusals_change_nothing() {
         (gateway.snapshot(), saved_bytes(&gateway)),
         before,
         "a forged Go changes no state"
+    );
+    // A forged 167/1/2 Play id: the catalogue does not publish it, so the
+    // request is one chat refusal and changes nothing.
+    let before = (gateway.snapshot(), saved_bytes(&gateway));
+    let unknown = send(&mut gateway, &portal_play(0x00ff_ffff), 430);
+    assert!(!unknown.began_zoning && !unknown.state_changed);
+    assert!(
+        chat_text(&unknown).contains("That activity is not available."),
+        "{}",
+        chat_text(&unknown)
+    );
+    assert_eq!(
+        (gateway.snapshot(), saved_bytes(&gateway)),
+        before,
+        "a forged portal Play id changes no state"
     );
     // The session still answers an ordinary refresh.
     assert!(
@@ -1345,6 +902,16 @@ fn refusals_change_nothing() {
     assert!(send(&mut gateway, &go(&screen), now + 200).began_zoning);
     assert_eq!(gateway.state().zone_id, ARENA_ZONE);
     arena_spawned(&mut gateway, now + 250);
+    // An arbitrary 36/10 target GUID is not an actor in this arena, so the
+    // attack is inert: no defeat, no reward and no arena mutation.
+    let before = (gateway.snapshot(), saved_bytes(&gateway));
+    let arbitrary = send(&mut gateway, &melee(0xdead_beef), now + 450);
+    assert!(!arbitrary.began_zoning && !arbitrary.state_changed);
+    assert_eq!(
+        (gateway.snapshot(), saved_bytes(&gateway)),
+        before,
+        "an arbitrary 36/10 target changes no state"
+    );
     let instance = i32_at(&screen, 8);
     let cancel = [
         vec![41, 0, 109, 0],
@@ -1352,7 +919,7 @@ fn refusals_change_nothing() {
         instance.to_le_bytes().to_vec(),
     ]
     .concat();
-    assert!(send(&mut gateway, &cancel, now + 300).began_zoning);
+    assert!(send(&mut gateway, &cancel, now + 500).began_zoning);
     assert_eq!(gateway.state().position, MARKER);
 
     // Non-combat job: the same Go is a chat refusal that reopens the screen.
@@ -1488,23 +1055,24 @@ fn a_disconnect_mid_run_drops_the_run_without_paying() {
         "the dropped run leaves no stuck busy state"
     );
 
-    // Won, unclosed variant: the payout is already applied; reloading must
-    // not pay again and a replayed win must be inert.
+    // Won, unclosed variant: a real 36/10 win applies the payout; reloading
+    // must not pay again and a replayed attack must be inert.
     let mut gateway = fixture.gateway(MARKER, 5002);
     assert!(send(&mut gateway, &switch_job(BRAWLER), 300).state_changed);
     let before = economy(&gateway, &prizes);
     let screen = open_battle(&mut gateway, MARKER_GUID, row, 500);
     enter_battle(&mut gateway, &screen, row, 600);
-    let won = send(&mut gateway, &chat::local_request("realm win"), 800);
-    assert!(won.state_changed);
+    let mut now = 700;
+    let won = fight_to_win(&mut gateway, &mut now);
+    assert_eq!(results_lifecycle(&won), vec![18, 47, 19]);
     let paid = economy(&gateway, &prizes);
     assert_payout(&before, &paid, row, &prizes);
-    let mut dropped = reopen(&fixture, &gateway, "won-unclosed.json", 2_000);
+    let mut dropped = reopen(&fixture, &gateway, "won-unclosed.json", now + 1_000);
     assert_eq!(economy(&dropped, &prizes), paid);
     assert_eq!(dropped.state().zone_id, 0);
     assert_eq!(dropped.state().position, MARKER);
     let before_replay = saved_bytes(&dropped);
-    let replay = send(&mut dropped, &chat::local_request("realm win"), 2_100);
+    let replay = send(&mut dropped, &melee(ENEMY_GUIDS[0]), now + 1_100);
     assert!(!replay.state_changed, "a reloaded win pays nothing");
     assert_eq!(saved_bytes(&dropped), before_replay);
     assert!(
@@ -1541,7 +1109,8 @@ fn a_disconnect_mid_run_drops_the_run_without_paying() {
         .active;
     assert!(second_active.is_some());
 
-    assert!(send(&mut first, &chat::local_request("realm win"), 800).state_changed);
+    let mut first_now = 700;
+    fight_to_win(&mut first, &mut first_now);
     let first_paid = economy(&first, &prizes);
     assert_payout(&first_before, &first_paid, row, &prizes);
     assert_eq!(
@@ -1560,7 +1129,7 @@ fn a_disconnect_mid_run_drops_the_run_without_paying() {
         second_active,
         "the second player's run is unchanged"
     );
-    let dropped = reopen(&fixture, &first, "first-dropped.json", 1_500);
+    let dropped = reopen(&fixture, &first, "first-dropped.json", first_now + 1_000);
     assert_eq!(economy(&dropped, &prizes), first_paid);
     assert_eq!(
         saved_bytes(&second),
@@ -1578,7 +1147,8 @@ fn a_disconnect_mid_run_drops_the_run_without_paying() {
         second_active,
         "the second player's run survives the first player's disconnect"
     );
-    assert!(send(&mut second, &chat::local_request("realm win"), 1_600).state_changed);
+    let mut second_now = 700;
+    fight_to_win(&mut second, &mut second_now);
     let second_paid = economy(&second, &prizes);
     assert_payout(&second_before, &second_paid, row, &prizes);
     assert_eq!(
@@ -1588,9 +1158,10 @@ fn a_disconnect_mid_run_drops_the_run_without_paying() {
     );
 }
 
-/// 6. Loader and reward bounds: unique ids/GUIDs, 1..=32 enemies, positive
-/// text ids, a bounded coin payout, one-prize-per-win rows and the zone-9600
-/// arena; synthetic duplicate rows/GUIDs are refused by the real loader.
+/// 6. Loader and reward bounds: unique ids/GUIDs, 1..=16 enemies (the loader's
+/// real cap, not the brief's 32), positive text ids, a bounded coin payout,
+/// one-prize-per-win rows and the zone-9600 arena; synthetic duplicate
+/// rows/GUIDs are refused by the real loader.
 #[test]
 fn the_row_is_inside_the_loader_and_reward_bounds() {
     let fixture = Fixture::new();
@@ -1621,7 +1192,9 @@ fn the_row_is_inside_the_loader_and_reward_bounds() {
         }
     }
     let enemies = row["enemies"].as_array().unwrap();
-    assert!((1..=32).contains(&enemies.len()));
+    // The loader refuses more than 16 enemies (`src/encounter/field.rs`), not
+    // the 32 the brief assumed; the real load below also proves the shipped five.
+    assert!((1..=16).contains(&enemies.len()));
     assert!(i32_field(row, "title_id") > 0);
     assert!(i32_field(row, "description_id") > 0);
     assert!(i32_field(row, "objective_id") > 0);
@@ -1684,7 +1257,8 @@ fn the_row_is_inside_the_loader_and_reward_bounds() {
 
 /// 7. Every battle that existed before this slice keeps its title, difficulty,
 /// required level, payout, actor GUIDs and positions; the new row is the only
-/// addition, after 12303, and the 75 dungeon records still load.
+/// addition, after 12303. The canonical dungeon-loader gate
+/// (`tests/content_dungeons.rs`) owns the 75-record `ContentDb` proof.
 #[test]
 fn the_existing_battles_and_content_are_unchanged() {
     let file = battles();
@@ -1808,18 +1382,10 @@ fn the_existing_battles_and_content_are_unchanged() {
     assert_eq!(ids[5], SHEEP_WATCH, "Sheep Watch sits after battle 12303");
     assert!(!TASK_ROSTER.contains(&SHEEP_WATCH));
 
-    let dungeon_dir = content_dir().join("dungeons");
-    let dungeon_files = fs::read_dir(dungeon_dir)
-        .unwrap()
-        .filter_map(Result::ok)
-        .filter(|entry| {
-            entry
-                .path()
-                .extension()
-                .is_some_and(|extension| extension == "json")
-        })
-        .count();
-    assert_eq!(dungeon_files, 75, "74 guide pages plus opening_cave.json");
+    // The canonical dungeon loader gate is
+    // `tests/content_dungeons.rs::every_dungeon_file_loads_and_validates`:
+    // it parses all 75 records through `ContentDb::load` and asserts the count.
+    // This content-only suite does not duplicate that loader proof.
     let sheep_watch = read_json(&content_dir().join("dungeons/sheep_watch.json"));
     assert_eq!(
         sheep_watch["records"][0]["record"]["name_string_id"],
@@ -1828,5 +1394,113 @@ fn the_existing_battles_and_content_are_unchanged() {
     assert_eq!(
         sheep_watch["records"][0]["dungeon_data"]["difficulty"]["value"],
         1
+    );
+}
+
+/// 8. Each arena enemy carries the recovered `enemies.json` kind, and the
+/// production engine (the real `load_field_battles` plus the same `strike` the
+/// 36/10 handler calls) reports that kind in `EncounterOutcome::defeated`: the
+/// input a quest bind matches a goal against. Test 9 proves the credit.
+#[test]
+fn the_arena_reports_the_recovered_enemy_kinds_on_every_defeat() {
+    let fixture = Fixture::new();
+    let file = battles();
+    let row = battle(&file, SHEEP_WATCH);
+    let expected = [ALPHA_KIND, ALPHA_KIND, WOLF_KIND, WOLF_KIND, WOLF_KIND];
+    let enemy_rows = row["enemies"].as_array().unwrap();
+
+    let definitions = read_json(&content_dir().join("enemies.json"));
+    let definitions = definitions["definitions"].as_array().unwrap();
+    let actual: Vec<i32> = enemy_rows
+        .iter()
+        .map(|enemy| i32_field(enemy, "definition_id"))
+        .collect();
+    assert_eq!(
+        actual, expected,
+        "the five arena actors must carry the recovered enemy kinds, not local ids"
+    );
+    for (enemy, kind) in enemy_rows.iter().zip(expected) {
+        let definition = definitions
+            .iter()
+            .find(|definition| i32_field(definition, "definition_id") == kind)
+            .unwrap_or_else(|| panic!("enemies.json has no definition {kind}"));
+        assert_eq!(i32_field(definition, "actor_kind_id"), kind);
+        assert_eq!(
+            i32_field(definition, "model_id"),
+            i32_field(enemy, "model_id"),
+            "kind {kind} model"
+        );
+        assert_eq!(
+            i32_field(definition, "name_string_id"),
+            i32_field(enemy, "name_id"),
+            "kind {kind} display name"
+        );
+    }
+    // The marker is the only actor without a recovered enemy kind.
+    assert_eq!(
+        i32_field(&row["spawner"], "definition_id"),
+        MARKER_DEFINITION
+    );
+
+    let mut engine = EncounterEngine::load(&fixture.content, None).unwrap();
+    engine
+        .load_field_battles(&battle_path())
+        .expect("the production loader accepts the row");
+    let location = CharacterState {
+        guid: 8001,
+        zone_id: 0,
+        position: MARKER,
+        rotation: [0.0, 0.0, 1.0],
+    };
+    engine.begin(SHEEP_WATCH, location, BRAWLER).unwrap();
+    engine.on_zone_ready(BRAWLER, 0).unwrap();
+    let mut defeated = Vec::new();
+    let mut now = 0;
+    for enemy in enemy_rows {
+        let guid = u64_field(enemy, "guid");
+        let at = position(&enemy["position"]);
+        let kills = defeated.len();
+        for _ in 0..8 {
+            now += 700;
+            let outcome = engine.attack(guid, at, BRAWLER, 0, now).unwrap();
+            defeated.extend(outcome.defeated);
+            if defeated.len() > kills {
+                break;
+            }
+        }
+    }
+    assert_eq!(
+        defeated, expected,
+        "every defeat event names the recovered enemy kind"
+    );
+}
+
+/// 9. The shipped `Brawler: Delinquent Dilemma` goal (quest 3000007) counts
+/// four defeats of the recovered Alpha Wolf kind `930050`. Through the real
+/// marker -> Go -> 36/10 route its two Sheep Watch Alphas advance 1/4 then
+/// 2/4, and the three Wolves (`930071`) do not touch that goal. With the local
+/// `1235001`-`1235005` ids the counter would stay at 0.
+#[test]
+fn an_arena_defeat_credits_a_goal_keyed_to_the_enemy_kind() {
+    let fixture = Fixture::new();
+    let file = battles();
+    let row = battle(&file, SHEEP_WATCH);
+    let mut gateway = fixture.gateway_with_quest(MARKER, 8101, delinquent_quests(8101));
+    assert_eq!(active_profile(&gateway), BRAWLER);
+    assert_eq!(saved_quest_count(&gateway, DELINQUENT_QUEST), 0);
+
+    let screen = open_battle(&mut gateway, MARKER_GUID, row, 700);
+    enter_battle(&mut gateway, &screen, row, 800);
+    let mut now = 900;
+    let replies = fight_to_win(&mut gateway, &mut now);
+    assert_eq!(results_lifecycle(&replies), vec![18, 47, 19]);
+
+    // Two Alpha Wolf defeats match the goal; the three Wolves are another
+    // kind, so the goal stops at 2/4.
+    assert_eq!(saved_quest_count(&gateway, DELINQUENT_QUEST), 2);
+    assert_eq!(
+        objective_updates(&replies, DELINQUENT_QUEST),
+        vec![1, 2],
+        "49/9 ObjectiveUpdate reports 1/4 then 2/4 (reader 0x00c7af60)"
     );
 }

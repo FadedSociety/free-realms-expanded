@@ -1,0 +1,654 @@
+//! Shared production-shaped fixture for the field-battle integration suites
+//! (T282 Thugamug, T319 Sheep Watch).
+//!
+//! Include with `#[path = "common/field_battle_fixture.rs"] mod field_battle_fixture;`
+//! and `use field_battle_fixture::*;`. Test-only; production never builds this
+//! module. The bag helpers take the battle id because each suite fills the bag
+//! around its own prize pool.
+
+use osfr_tools::{
+    account_store::AccountRole,
+    game_store,
+    gameplay::GameplayState,
+    gateway::{Gateway, GatewayOutcome},
+    inventory::{Inventory, InventoryItem, InventoryState},
+    terrain::{HeightGrid, Terrain},
+};
+use serde_json::Value;
+use std::{
+    fs,
+    path::{Path, PathBuf},
+    sync::{
+        OnceLock,
+        atomic::{AtomicU64, Ordering},
+    },
+};
+
+pub const RUNTIME_CONTENT: &str = "../../../lab/reports/round70-native-20261016T061000Z/content";
+pub const REFERENCE: &str = "../../../lab/references/rust-gateway-reference";
+
+static SERIAL: AtomicU64 = AtomicU64::new(0);
+static RUNTIME_INVENTORY: OnceLock<Inventory> = OnceLock::new();
+
+// ---------------------------------------------------------------------------
+// Production-shaped session fixture.
+// ---------------------------------------------------------------------------
+
+pub struct Fixture {
+    pub root: PathBuf,
+    pub reference: PathBuf,
+    pub content: PathBuf,
+    pub version: String,
+}
+
+impl Drop for Fixture {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.root);
+    }
+}
+
+impl Fixture {
+    pub fn new() -> Self {
+        let root = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!(
+            "field-battle-{}-{}",
+            std::process::id(),
+            SERIAL.fetch_add(1, Ordering::Relaxed)
+        ));
+        fs::create_dir_all(&root).unwrap();
+        let reference = manifest_dir().join(REFERENCE);
+        let version = read_json(&reference.join("manifest.json"))["client_version"]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        Self {
+            root,
+            reference,
+            content: manifest_dir().join(RUNTIME_CONTENT),
+            version,
+        }
+    }
+
+    pub fn login(&self, gateway: &mut Gateway) -> GatewayOutcome {
+        let mut login = 1_u16.to_le_bytes().to_vec();
+        for (index, value) in ["local-private-test", self.version.as_str(), ""]
+            .into_iter()
+            .enumerate()
+        {
+            login.extend((value.len() as u32).to_le_bytes());
+            login.extend(value.as_bytes());
+            if index == 0 {
+                login.extend(gateway.state().guid.to_le_bytes());
+            }
+        }
+        gateway.handle_at(&login, 0).unwrap()
+    }
+
+    /// A logged-in session at `position`, including the 10/13 world-entry
+    /// replies (AddNpc visibility, portal list and the encounter state).
+    pub fn session(&self, position: [f32; 3], guid: u64) -> (Gateway, GatewayOutcome) {
+        let mut character = Gateway::reference_state(&self.reference).unwrap();
+        character.guid = guid;
+        character.zone_id = 0;
+        character.position = position;
+        character.rotation = [0.0, 0.0, 1.0];
+        let mut gateway =
+            Gateway::load_gameplay(&self.reference, character, &self.content, None).unwrap();
+        gateway.set_dev_tools(true);
+        gateway.set_role(AccountRole::Admin);
+        self.login(&mut gateway);
+        send(&mut gateway, &13_u16.to_le_bytes(), 100);
+        let loaded = send(&mut gateway, &10_u16.to_le_bytes(), 200);
+        (gateway, loaded)
+    }
+
+    pub fn gateway(&self, position: [f32; 3], guid: u64) -> Gateway {
+        self.session(position, guid).0
+    }
+
+    /// Restore a save built by the production `game_store` path. `seed` runs on
+    /// the seed session before its gameplay state is snapshotted (job switch and
+    /// any level command); the restored world then holds the rebuilt bag.
+    pub fn gateway_with_bag_seeded(
+        &self,
+        position: [f32; 3],
+        guid: u64,
+        capacity: usize,
+        battle: u32,
+        seed: impl FnOnce(&mut Gateway),
+    ) -> (Gateway, InventoryState) {
+        let mut session = self.gateway(position, guid);
+        seed(&mut session);
+        let mut snapshot = session.snapshot();
+        let bag = full_bag(
+            &snapshot.gameplay.as_ref().unwrap().inventory,
+            capacity,
+            battle,
+        );
+        snapshot.gameplay.as_mut().unwrap().inventory = bag.clone();
+        let gameplay = snapshot.gameplay.unwrap();
+        let mut gateway = Gateway::load_gameplay(
+            &self.reference,
+            session.state().clone(),
+            &self.content,
+            Some(gameplay),
+        )
+        .unwrap();
+        gateway.set_dev_tools(true);
+        gateway.set_role(AccountRole::Admin);
+        self.login(&mut gateway);
+        send(&mut gateway, &13_u16.to_le_bytes(), 400);
+        let loaded = send(&mut gateway, &10_u16.to_le_bytes(), 500);
+        assert!(loaded.entered_world);
+        assert_eq!(
+            gateway.snapshot().gameplay.unwrap().inventory,
+            bag,
+            "world entry restores the test bag unchanged"
+        );
+        (gateway, bag)
+    }
+
+    pub fn save(&self, gateway: &Gateway, name: &str) -> PathBuf {
+        let path = self.root.join(name);
+        game_store::save(&path, &gateway.snapshot()).unwrap();
+        path
+    }
+}
+
+pub fn manifest_dir() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+}
+
+pub fn battle_path() -> PathBuf {
+    manifest_dir().join("data/content/field_battles.json")
+}
+
+pub fn content_dir() -> PathBuf {
+    manifest_dir().join("data/content")
+}
+
+pub fn lab(relative: &str) -> PathBuf {
+    manifest_dir().join("../../../lab").join(relative)
+}
+
+pub fn read_json(path: &Path) -> Value {
+    serde_json::from_slice(&fs::read(path).unwrap()).unwrap()
+}
+
+pub fn battles() -> Value {
+    read_json(&battle_path())
+}
+
+pub fn battle<'a>(file: &'a Value, id: u32) -> &'a Value {
+    file["battles"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["id"].as_u64() == Some(u64::from(id)))
+        .unwrap_or_else(|| panic!("battle {id} is missing"))
+}
+
+pub fn i32_field(value: &Value, field: &str) -> i32 {
+    value[field].as_i64().unwrap() as i32
+}
+
+pub fn u32_field(value: &Value, field: &str) -> u32 {
+    value[field].as_u64().unwrap() as u32
+}
+
+pub fn u64_field(value: &Value, field: &str) -> u64 {
+    value[field].as_u64().unwrap()
+}
+
+pub fn position(value: &Value) -> [f32; 3] {
+    let points = value.as_array().unwrap();
+    [
+        points[0].as_f64().unwrap() as f32,
+        points[1].as_f64().unwrap() as f32,
+        points[2].as_f64().unwrap() as f32,
+    ]
+}
+
+pub fn prize_ids(row: &Value) -> std::collections::BTreeSet<i32> {
+    row["prizes"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|prize| i32_field(prize, "item_id"))
+        .collect()
+}
+
+// ---------------------------------------------------------------------------
+// Packet helpers (shapes pinned by `field_battle_roster`).
+// ---------------------------------------------------------------------------
+
+pub fn wrap(inner: &[u8]) -> Vec<u8> {
+    let mut bytes = vec![5, 0, 1];
+    bytes.extend((inner.len() as u32).to_le_bytes());
+    bytes.extend(inner);
+    bytes
+}
+
+pub fn unframe(reply: &[u8]) -> &[u8] {
+    if reply.starts_with(&[5, 0, 1]) && reply.len() >= 7 {
+        let length = u32::from_le_bytes(reply[3..7].try_into().unwrap()) as usize;
+        if length == reply.len() - 7 {
+            return &reply[7..];
+        }
+    }
+    reply
+}
+
+pub fn send(gateway: &mut Gateway, inner: &[u8], now_ms: u64) -> GatewayOutcome {
+    gateway
+        .handle_at(&wrap(inner), now_ms)
+        .expect("gateway frame")
+}
+
+pub fn interact(guid: u64) -> Vec<u8> {
+    [vec![26, 0, 8, 0], guid.to_le_bytes().to_vec(), vec![0]].concat()
+}
+
+pub fn switch_job(profile: i32) -> Vec<u8> {
+    [vec![26, 0, 13, 0], profile.to_le_bytes().to_vec()].concat()
+}
+
+/// 41/108 Go; constructor `0x008b6e70` accepts the encounter and instance from
+/// the 41/114 screen. The trailing session is zero in native frames.
+pub fn go(details: &[u8]) -> Vec<u8> {
+    let mut packet = vec![41, 0, 108, 0];
+    packet.extend(&details[4..12]);
+    packet.extend(0_u64.to_le_bytes());
+    packet
+}
+
+pub fn melee(guid: u64) -> Vec<u8> {
+    [
+        vec![36, 0, 10, 0],
+        1_i32.to_le_bytes().to_vec(),
+        0_i32.to_le_bytes().to_vec(),
+        0_i32.to_le_bytes().to_vec(),
+        guid.to_le_bytes().to_vec(),
+    ]
+    .concat()
+}
+
+pub fn move_to(guid: u64, position: [f32; 3]) -> Vec<u8> {
+    let mut packet = 125_u16.to_le_bytes().to_vec();
+    packet.extend(guid.to_le_bytes());
+    for value in position.into_iter().chain([0.0, 0.0, 1.0]) {
+        packet.extend(value.to_le_bytes());
+    }
+    packet.extend([0, 0]);
+    packet
+}
+
+pub fn portal_play(activity: u32) -> Vec<u8> {
+    let mut inner = vec![167, 0, 1, 2];
+    inner.extend(activity.to_le_bytes());
+    inner.extend(0_u32.to_le_bytes());
+    inner
+}
+
+pub fn chat_text(outcome: &GatewayOutcome) -> String {
+    outcome
+        .replies
+        .iter()
+        .map(|packet| unframe(packet))
+        .filter(|packet| packet.starts_with(&[15, 0, 3, 0]) && packet.len() >= 8)
+        .map(|packet| {
+            let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
+            String::from_utf8_lossy(&packet[8..8 + length]).into_owned()
+        })
+        .collect::<Vec<_>>()
+        .join("\n")
+}
+
+pub fn details(outcome: &GatewayOutcome) -> Option<&[u8]> {
+    outcome
+        .replies
+        .iter()
+        .map(|packet| unframe(packet))
+        .find(|packet| packet.starts_with(&[41, 0, 114, 0]))
+}
+
+pub fn i32_at(packet: &[u8], offset: usize) -> i32 {
+    i32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap())
+}
+
+pub fn arena_spawned(gateway: &mut Gateway, now_ms: u64) -> GatewayOutcome {
+    let mut outcome = send(gateway, &13_u16.to_le_bytes(), now_ms);
+    outcome.replies.extend(
+        send(gateway, &10_u16.to_le_bytes(), now_ms + 100)
+            .replies
+            .into_iter(),
+    );
+    outcome
+}
+
+pub fn level(gateway: &Gateway, profile: i32) -> u32 {
+    let state = gateway.snapshot().gameplay.unwrap();
+    1 + state
+        .profiles
+        .unwrap()
+        .experience
+        .get(&profile)
+        .copied()
+        .unwrap_or(0)
+        / 100
+}
+
+pub fn saved_bytes(gateway: &Gateway) -> Vec<u8> {
+    // The typed snapshot payload the save envelope writes; the full-bag
+    // refusal fixture is larger than game_store's 1 MiB document limit, so
+    // compare the payload directly (as T282 does).
+    serde_json::to_vec(&gateway.snapshot()).unwrap()
+}
+
+pub fn walk(gateway: &mut Gateway, guid: u64, to: [f32; 3], now_ms: &mut u64) {
+    let from = gateway.state().position;
+    let distance = ((to[0] - from[0]).powi(2) + (to[2] - from[2]).powi(2)).sqrt();
+    let steps = (distance / 8.0).ceil().max(1.0) as usize;
+    for step in 1..=steps {
+        let amount = step as f32 / steps as f32;
+        let position = [0, 1, 2].map(|axis| from[axis] + (to[axis] - from[axis]) * amount);
+        *now_ms += 400;
+        let moved = send(gateway, &move_to(guid, position), *now_ms);
+        assert!(!moved.replies.iter().any(|reply| {
+            let packet = unframe(reply);
+            packet.starts_with(&[38, 0, 12, 0])
+        }));
+        assert_eq!(gateway.state().position, position);
+    }
+}
+
+pub fn reopen(fixture: &Fixture, gateway: &Gateway, name: &str, now_ms: u64) -> Gateway {
+    reopen_with(fixture, gateway, name, now_ms, |_| {})
+}
+
+/// Save, optionally patch the decoded gameplay state, then load it through the
+/// same `game_store` envelope and `Gateway::load_gameplay` a reconnect uses.
+pub fn reopen_with(
+    fixture: &Fixture,
+    gateway: &Gateway,
+    name: &str,
+    now_ms: u64,
+    patch: impl FnOnce(&mut GameplayState),
+) -> Gateway {
+    let path = fixture.save(gateway, name);
+    let mut saved = game_store::load_or_create(&path, gateway.state().clone()).unwrap();
+    if let Some(gameplay) = saved.gameplay.as_mut() {
+        patch(gameplay);
+    }
+    let mut restored = Gateway::load_gameplay(
+        &fixture.reference,
+        saved.character,
+        &fixture.content,
+        saved.gameplay,
+    )
+    .unwrap();
+    restored.set_dev_tools(true);
+    restored.set_role(AccountRole::Admin);
+    fixture.login(&mut restored);
+    send(&mut restored, &13_u16.to_le_bytes(), now_ms);
+    send(&mut restored, &10_u16.to_le_bytes(), now_ms + 100);
+    restored
+}
+
+// ---------------------------------------------------------------------------
+// 167/1/1 reader: header, entry type, count, ten dwords, CanPlayerJoin, then
+// the variable-length tail (reader chain 0x00be79d0 -> 0x00be63e0).
+// ---------------------------------------------------------------------------
+
+pub struct PortalRow {
+    pub id: u32,
+    pub title: u32,
+    pub description: u32,
+    pub difficulty: u32,
+    pub can_join: bool,
+}
+
+pub struct Cursor<'a> {
+    bytes: &'a [u8],
+    at: usize,
+}
+
+impl Cursor<'_> {
+    fn take(&mut self, length: usize) -> &[u8] {
+        assert!(
+            self.bytes.len() >= self.at + length,
+            "client stream ran out of bytes"
+        );
+        let slice = &self.bytes[self.at..self.at + length];
+        self.at += length;
+        slice
+    }
+
+    fn u32(&mut self) -> u32 {
+        u32::from_le_bytes(self.take(4).try_into().unwrap())
+    }
+
+    fn i32(&mut self) -> i32 {
+        i32::from_le_bytes(self.take(4).try_into().unwrap())
+    }
+}
+
+pub fn decode_list(packet: &[u8]) -> Vec<PortalRow> {
+    let mut cursor = Cursor {
+        bytes: packet,
+        at: 0,
+    };
+    assert_eq!(cursor.take(2), 167_u16.to_le_bytes());
+    assert_eq!(cursor.take(1), [1], "activity service");
+    assert_eq!(cursor.take(1), [1], "list sub-op");
+    let _entry = cursor.u32();
+    let count = cursor.i32();
+    assert!(count >= 0);
+    let mut rows = Vec::new();
+    for _ in 0..count {
+        let mut words = [0_u32; 10];
+        for word in &mut words {
+            *word = cursor.u32();
+        }
+        let can_join = cursor.take(1)[0] != 0;
+        let _preferred = cursor.u32();
+        let featured = cursor.u32();
+        assert_eq!(featured, 0, "no featured windows");
+        let _tutorial = cursor.u32();
+        let _members = cursor.take(1);
+        for _ in 0..2 {
+            let length = cursor.i32();
+            assert!(length >= 0);
+            cursor.take(length as usize);
+        }
+        let difficulty = cursor.u32();
+        let _unknown_0xc = cursor.u32();
+        let _unknown_0x68 = cursor.u32();
+        let _mystery_chest_icon = cursor.u32();
+        rows.push(PortalRow {
+            id: words[0],
+            title: words[5],
+            description: words[6],
+            difficulty,
+            can_join,
+        });
+    }
+    assert_eq!(
+        cursor.at,
+        packet.len(),
+        "trailing bytes make the client drop the list"
+    );
+    rows
+}
+
+// ---------------------------------------------------------------------------
+// Terrain helpers, mirroring the T103/T282 bounded authoring check.
+// ---------------------------------------------------------------------------
+
+pub fn terrain() -> Terrain {
+    Terrain::load(&lab("terrain")).expect("the shipped zone-0/9600 terrain grids load")
+}
+
+pub fn disc_points(x: f32, z: f32) -> Vec<(f32, f32)> {
+    let mut points = Vec::new();
+    for dx in -5..=5 {
+        for dz in -5..=5 {
+            let (dx, dz) = (dx as f32, dz as f32);
+            if dx * dx + dz * dz <= 25.0 {
+                points.push((x + dx, z + dz));
+            }
+        }
+    }
+    for angle in (0..360).step_by(15) {
+        let radians = (angle as f32).to_radians();
+        points.push((x + 5.0 * radians.cos(), z + 5.0 * radians.sin()));
+    }
+    points
+}
+
+pub fn slope_degrees(grid: &HeightGrid, x: f32, z: f32) -> f32 {
+    let [west, east, south, north] = [
+        grid.height_at(x - 1.0, z),
+        grid.height_at(x + 1.0, z),
+        grid.height_at(x, z - 1.0),
+        grid.height_at(x, z + 1.0),
+    ]
+    .map(|height| height.expect("terrain around a sampled point is covered"));
+    let dx = (east - west) / 2.0;
+    let dz = (north - south) / 2.0;
+    dx.hypot(dz).atan().to_degrees()
+}
+
+/// `Some(distance)` to the nearest spawned regional NPC: only `legacy_data`
+/// rows are actors (`world.rs` skips POI/zone-centre scaffolding).
+pub fn nearest_spawned_npc(marker: [f32; 3]) -> (f32, u64) {
+    let npc_dir = content_dir().join("npcs");
+    let mut nearest = (f32::INFINITY, 0_u64);
+    for entry in fs::read_dir(npc_dir).unwrap() {
+        let path = entry.unwrap().path();
+        if path.extension().and_then(|extension| extension.to_str()) != Some("json") {
+            continue;
+        }
+        let records = read_json(&path);
+        for record in records["records"].as_array().unwrap() {
+            if record["placement"] != "legacy_data" {
+                continue;
+            }
+            let Some(point) = record["position"].as_array() else {
+                continue;
+            };
+            let distance = ((point[0].as_f64().unwrap() as f32 - marker[0]).powi(2)
+                + (point[2].as_f64().unwrap() as f32 - marker[2]).powi(2))
+            .sqrt();
+            if distance < nearest.0 {
+                nearest = (distance, record["npc_id"].as_u64().unwrap());
+            }
+        }
+    }
+    nearest
+}
+
+pub fn nearest_field_enemy(marker: [f32; 3]) -> f32 {
+    let field = read_json(&content_dir().join("field_enemies.json"));
+    field["enemies"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|enemy| {
+            let point = &enemy["position"];
+            ((point[0].as_f64().unwrap() as f32 - marker[0]).powi(2)
+                + (point[2].as_f64().unwrap() as f32 - marker[2]).powi(2))
+            .sqrt()
+        })
+        .fold(f32::INFINITY, f32::min)
+}
+
+/// The nearest other battle marker, excluding `battle`'s own spawner.
+pub fn nearest_other_battle_marker(marker: [f32; 3], battle: u32) -> f32 {
+    battles()["battles"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|row| row["id"].as_u64() != Some(u64::from(battle)))
+        .map(|row| {
+            let point = position(&row["spawner"]["position"]);
+            (point[0] - marker[0]).hypot(point[2] - marker[2])
+        })
+        .fold(f32::INFINITY, f32::min)
+}
+
+// ---------------------------------------------------------------------------
+// Full bag: real catalogue items, no prize definition, exact stack count.
+// ---------------------------------------------------------------------------
+
+pub fn runtime_inventory() -> &'static Inventory {
+    RUNTIME_INVENTORY.get_or_init(|| {
+        Inventory::load(&manifest_dir().join(RUNTIME_CONTENT), None)
+            .expect("the round70 runtime item catalogue loads")
+    })
+}
+
+/// A real uncapped catalogue row that is not one of this battle's prizes, so
+/// each filler stack stays separate and no granted prize merges into it.
+pub fn filler_definition(battle_id: u32) -> i32 {
+    let file = battles();
+    let prizes = prize_ids(battle(&file, battle_id));
+    let inventory = runtime_inventory();
+    inventory
+        .definition_ids()
+        .find(|id| {
+            !prizes.contains(id)
+                && inventory
+                    .trade_flags(*id)
+                    .is_some_and(|(_, max_stack)| max_stack.is_none())
+        })
+        .expect("the runtime catalogue has an uncapped filler item")
+}
+
+pub fn stack(id: i32, definition_id: i32, count: u32) -> InventoryItem {
+    InventoryItem {
+        definition_id,
+        tint: 0,
+        id,
+        count,
+        consumed_count: 0,
+        stored_count: 0,
+        last_cast_time: i64::from(i32::MAX),
+        rental: None,
+        ability_count: 0,
+        activate_enabled: false,
+    }
+}
+
+/// Replace the base bag's prize stacks (so each previewed prize needs a new
+/// stack) and pad to exactly `capacity` stacks. `capacity == MAX_ITEMS`
+/// leaves no room for the bundle; `MAX_ITEMS - prizes` does.
+pub fn full_bag(base: &InventoryState, capacity: usize, battle_id: u32) -> InventoryState {
+    assert!(
+        base.items.len() <= capacity,
+        "the base bag ({} stacks) is larger than {capacity}",
+        base.items.len()
+    );
+    let file = battles();
+    let prizes = prize_ids(battle(&file, battle_id));
+    let mut state = base.clone();
+    let removed: std::collections::BTreeSet<i32> = state
+        .items
+        .iter()
+        .filter(|item| prizes.contains(&item.definition_id))
+        .map(|item| item.id)
+        .collect();
+    state
+        .items
+        .retain(|item| !prizes.contains(&item.definition_id));
+    state
+        .equipment
+        .retain(|item| !removed.contains(&item.item_id));
+    let mut id = state.items.iter().map(|item| item.id).max().unwrap_or(0) + 1;
+    let filler = filler_definition(battle_id);
+    while state.items.len() < capacity {
+        state.items.push(stack(id, filler, 1));
+        id += 1;
+    }
+    state.next_instance_id = Some(i64::from(id));
+    state
+}
