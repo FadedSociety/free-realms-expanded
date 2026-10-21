@@ -23,7 +23,8 @@
 //! one member. Quest ids, title/end-text locale ids and reward values are test content,
 //! not claimed retail values.
 //!
-//! Client readers/writers (2014 client, `lab/autopilot/ida_query.py`, this run):
+//! Client readers/writers (2014 client, `lab/autopilot/ida_query.py`; T301's citations
+//! were re-checked by the review, and F339 decompiled 35/5, 39/18, 39/14 and 45/7):
 //! - 26/8 `008b6bc0`: two GUID dwords + one bool (13-byte body).
 //! - 26/10 `00a36f80`: two GUID dwords + i32 choice (16-byte body).
 //! - 26/6 `009f5890`: i32 dialogue row; 301 releases the held quest screen.
@@ -36,27 +37,38 @@
 //! - Quest base reader `00c7acd0`: u16 family + i32 subtype (the six-byte body header).
 //! - 49/9 reader `00c7af60` and 49/10 reader `00c7b070`: quest, objective, current counter
 //!   at 6..10/10..14/14..18.
-//! - 36/10 `ClientRequestStartAbility`; writer `00a342e0` and action-bar request path
-//!   `00a35150` (bar, slot, target mode, target GUID). The 24-byte body this suite sends
-//!   is the same one `tests/shared_field_state.rs` pins.
+//! - 35/5 `PlayerUpdatePacketUpdateHitpoints` reader `008d6f10` (base header reader
+//!   `008d6830`): four-byte header, actor guid at 4..12, current hitpoints at 12..16.
+//! - 36/10 `ClientRequestStartAbility` writer `00a342e0` (action-bar path `00a35150`):
+//!   this suite passes the parsed `SharedFieldAction::Ability` that the production
+//!   `EncounterEngine::shared_action` parser derives from that body to
+//!   `Gameplay::handle_shared_field`; `tests/shared_field_state.rs` pins the 24-byte wire
+//!   body through the same parser.
 //! - 35/2 AddNpc body reader `00921a10`; the drawable-giver check parses it through the
 //!   production `startup_world::parse_add_npc`.
+//! - 39/18 `MiniGameGameOverPacket` body reader `009b7ec0` -> `009b48b0` (base record
+//!   `009b2340`): game id at 11..15, won byte at 15. 39/14 reader `009b89e0` carries the
+//!   same base record and the Flash payload; the suite only forges the parsed pattern.
+//! - 45/7 client completion `00cffba0` (serializer `00cff9f0`): i32 objective id. The
+//!   claim can match only a `client_reported` goal, which this quest does not have.
+//! - 50/1 reward bundle dispatcher `00b8a640` / reader `00b8a300`: a client-supplied
+//!   bundle is not a grant.
 
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
 
 use npc_quest_chain::{
-    CHARACTER, Fixture as ContentFixture, accept, active_job, character_at_for, coins, content_dir,
-    counts, end_screen_reward, finish_quest, has_family, offer, pending_offer, pending_turnin,
-    profile_xp, quest_end_reply, quest_reply, quest_status, read_json, release_end_screen, saved,
-    select_job, send, talk,
+    BAG_SLOTS, CHARACTER, Fixture as ContentFixture, QUEST_CHOICE, accept, active_job,
+    character_at_for, coins, content_dir, counts, dialogue_choice, end_screen_reward, enemy_hp,
+    fill_bag, finish_quest, has_family, npc_interact, npc_select, objective_complete,
+    objective_update, offer, pending_offer, pending_turnin, profile_xp, quest_end_reply,
+    quest_reply, quest_status, read_json, release_end_screen, saved, select_job, send, talk,
 };
 use osfr_tools::{
     character_store::CharacterState,
     encounter::{SharedFieldAction, SharedFieldState},
     game_store,
     gameplay::{Gameplay, GameplayState, Outcome},
-    inventory::InventoryItem,
     quest_engine::QuestStatus,
     startup_world,
 };
@@ -94,10 +106,6 @@ const FIELD_COINS: u32 = 2;
 const FIELD_XP: u32 = 5;
 const TITLE: u32 = 9_700_101;
 const END_TEXT: u32 = 9_700_102;
-/// (R) The pre-existing production turn-in floor in `gameplay/npc.rs`:
-/// `items.len().max(100)`. A new stack at or above that count is refused.
-const BAG_SLOTS: usize = 100;
-const FILLER_ITEM: i32 = 75_060;
 const GIVER_POSITION: [f32; 3] = [WOLF_CENTRE[0] + 6.0, WOLF_CENTRE[1], WOLF_CENTRE[2]];
 
 /// One private gameplay content tree: the opening fixture's profile/inventory/opening
@@ -345,37 +353,10 @@ fn start_quest(game: &mut Gameplay, at: &CharacterState, now: &mut u64) {
     assert_eq!(pending_offer(game), None);
 }
 
-// 49/9 QuestObjectiveUpdate reader 0x00c7af60: quest, objective, current counter.
-fn objective_update(replies: &[Vec<u8>], quest: u32, objective: u32, current: u32) -> bool {
-    replies.iter().any(|packet| {
-        has_family(packet, 49, 9, None)
-            && packet.len() >= 18
-            && u32::from_le_bytes(packet[6..10].try_into().unwrap()) == quest
-            && u32::from_le_bytes(packet[10..14].try_into().unwrap()) == objective
-            && u32::from_le_bytes(packet[14..18].try_into().unwrap()) == current
-    })
-}
-
-// 49/10 QuestObjectiveComplete reader 0x00c7b070: same prefix, quest + objective.
-fn objective_complete(replies: &[Vec<u8>], quest: u32, objective: u32) -> bool {
-    replies.iter().any(|packet| {
-        has_family(packet, 49, 10, None)
-            && packet.len() >= 14
-            && u32::from_le_bytes(packet[6..10].try_into().unwrap()) == quest
-            && u32::from_le_bytes(packet[10..14].try_into().unwrap()) == objective
-    })
-}
-
-fn enemy_hp(replies: &[Vec<u8>], guid: u64) -> Option<u32> {
-    replies.iter().find_map(|packet| {
-        (has_family(packet, 35, 5, None)
-            && packet.get(4..12) == Some(guid.to_le_bytes().as_slice()))
-        .then(|| u32::from_le_bytes(packet[12..16].try_into().unwrap()))
-    })
-}
-
-/// The ordinary 36/10 basic attack (`ClientRequestStartAbility`; writer `0x00a342e0`)
-/// through the production shared-field seam.
+/// The ordinary 36/10 basic attack: the parsed `ClientRequestStartAbility` action that
+/// `Session::commit_outcome` passes to the shared field after the production
+/// `EncounterEngine::shared_action` parser (writer `0x00a342e0`; the 24-byte wire body is
+/// pinned in `tests/shared_field_state.rs`).
 fn kill_wolf(
     game: &mut Gameplay,
     field: &mut SharedFieldState,
@@ -439,39 +420,61 @@ fn assert_refused(game: &mut Gameplay, at: &CharacterState, packet: &[u8], now: 
     );
 }
 
-/// Write the current state to a real game_store envelope and return its path and bytes;
-/// the caller compares the bytes after a refusal.
-fn save_bytes(
+/// The one field wolf: kill it through the ordinary basic attack, assert the single-kill
+/// objective count and leave the field available to observe. Test 7's zero-definition
+/// case is an accepted kill with no quest credit, so it drives `kill_wolf` directly.
+fn kill_field_wolf(
     fixture: &Fixture,
-    game: &Gameplay,
-    at: &CharacterState,
-    name: &str,
-) -> (PathBuf, Vec<u8>) {
-    let path = fixture.path().join(name);
-    fixture.write_save_to(&path, game, at);
-    let bytes = fs::read(&path).expect("the save envelope is readable");
-    (path, bytes)
+    game: &mut Gameplay,
+    now: &mut u64,
+) -> (SharedFieldState, Outcome) {
+    let wolf = fixture.wolf_character();
+    let mut field = game.take_shared_fields().expect("the shared field exists");
+    assert_eq!(
+        field.health(WOLF_GUID),
+        Some(WOLF_HP),
+        "the server's wolf starts at full health"
+    );
+    let killed = kill_wolf(game, &mut field, &wolf, *now);
+    *now += 700;
+    assert_eq!(counts(game, QUEST), [1], "one kill is one objective count");
+    (field, killed)
 }
 
-/// Fill the bag with real filler stacks. The production turn-in floor is
-/// `items.len().max(100)`, so a new reward stack cannot fit once the bag is at that size.
-fn fill_bag(state: &mut GameplayState) {
-    let base = 100_000;
-    for offset in 0..BAG_SLOTS {
-        state.inventory.items.push(InventoryItem {
-            definition_id: FILLER_ITEM,
-            tint: 0,
-            id: base + offset as i32,
-            count: 1,
-            consumed_count: 0,
-            stored_count: 0,
-            last_cast_time: 0,
-            rental: None,
-            ability_count: 0,
-            activate_enabled: false,
-        });
-    }
-    state.inventory.next_instance_id = Some(i64::from(base) + BAG_SLOTS as i64);
+/// Accept the quest and kill its one wolf.
+fn start_and_kill(
+    fixture: &Fixture,
+    game: &mut Gameplay,
+    at: &CharacterState,
+    now: &mut u64,
+) -> (SharedFieldState, Outcome) {
+    start_quest(game, at, now);
+    kill_field_wolf(fixture, game, now)
+}
+
+/// The completion Talk opens its dialogue, holds the 49/13 until the client's 26/6, and
+/// releases the end screen; the turn-in is then pending. Returns the 49/13 packet.
+fn open_end_screen(game: &mut Gameplay, at: &CharacterState, now: &mut u64) -> Vec<u8> {
+    let dialogue = talk(game, at, GIVER, *now);
+    *now += 10;
+    assert!(
+        dialogue
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
+        "the completion Talk opens its dialogue"
+    );
+    assert!(
+        !dialogue
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 13, None)),
+        "the 49/13 waits for the client's 26/6 dialogue choice"
+    );
+    assert_eq!(pending_turnin(game), Some(QUEST));
+    let screen = release_end_screen(game, at, QUEST, GIVER, END_TEXT, *now);
+    *now += 10;
+    screen
 }
 
 #[test]
@@ -496,13 +499,9 @@ fn a_new_character_accepts_a_quest_kills_a_field_enemy_turns_it_in_and_relogs_wi
     start_quest(&mut game, &at, &mut now);
 
     // One ordinary 36/10 basic attack against the server-spawned actor.
-    let wolf = fixture.wolf_character();
-    let mut field = game.take_shared_fields().expect("the shared field exists");
-    assert_eq!(field.health(WOLF_GUID), Some(WOLF_HP));
     let coins_before_kill = coins(&game);
     let xp_before_kill = profile_xp(&game, BRAWLER);
-    let killed = kill_wolf(&mut game, &mut field, &wolf, now);
-    now += 700;
+    let (field, killed) = kill_field_wolf(&fixture, &mut game, &mut now);
     assert!(killed.changed, "the kill must change gameplay");
     assert_eq!(
         field.health(WOLF_GUID),
@@ -514,13 +513,12 @@ fn a_new_character_accepts_a_quest_kills_a_field_enemy_turns_it_in_and_relogs_wi
         Some(0),
         "the killer sees the 35/5 zero-health update"
     );
-    assert_eq!(counts(&game, QUEST), [1], "one kill is one objective count");
     assert!(
-        objective_update(&killed.replies, QUEST, 1, 1),
+        objective_update(&killed, QUEST, 1, 1),
         "49/9 reports the defeat objective at 1/1"
     );
     assert!(
-        objective_complete(&killed.replies, QUEST, 1),
+        objective_complete(&killed, QUEST, 1),
         "49/10 completes the only objective"
     );
     assert_eq!(
@@ -550,25 +548,7 @@ fn a_new_character_accepts_a_quest_kills_a_field_enemy_turns_it_in_and_relogs_wi
     let items_before = count_definition(&game, REWARD_ITEM);
     now += 10;
 
-    let dialogue = talk(&mut game, &at, GIVER, now);
-    now += 10;
-    assert!(
-        dialogue
-            .replies
-            .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
-        "the completion Talk opens its dialogue"
-    );
-    assert!(
-        !dialogue
-            .replies
-            .iter()
-            .any(|packet| has_family(packet, 49, 13, None)),
-        "the 49/13 waits for the client's 26/6 dialogue choice"
-    );
-    assert_eq!(pending_turnin(&game), Some(QUEST));
-    let screen = release_end_screen(&mut game, &at, QUEST, GIVER, END_TEXT, now);
-    now += 10;
+    let screen = open_end_screen(&mut game, &at, &mut now);
     // 49/13 reader 0x00c7b990: actor 6..14, quest 14..18, end text 18..22, bundle at 26.
     assert_eq!(
         end_screen_reward(&screen),
@@ -600,9 +580,6 @@ fn a_new_character_accepts_a_quest_kills_a_field_enemy_turns_it_in_and_relogs_wi
     // A repeated 49/14 and a repeated 49/2 pay and change nothing.
     let paid_state = game.state();
     let paid_bytes = saved(&game);
-    let save_path = fixture.save_path();
-    fixture.write_save_to(&save_path, &game, &at);
-    let paid_save = fs::read(&save_path).expect("the paid save is readable");
     assert_refused(
         &mut game,
         &at,
@@ -619,11 +596,6 @@ fn a_new_character_accepts_a_quest_kills_a_field_enemy_turns_it_in_and_relogs_wi
     );
     assert_eq!(game.state(), paid_state);
     assert_eq!(saved(&game), paid_bytes);
-    assert_eq!(
-        fs::read(&save_path).expect("the save is readable"),
-        paid_save,
-        "a replayed packet rewrote the character save"
-    );
 
     // Save through the real envelope and reload through the real loader/bind.
     let mut game = fixture.save_and_reload(&game, &at);
@@ -662,7 +634,6 @@ fn a_forged_or_premature_turn_in_changes_nothing() {
     let at = fixture.giver_character();
     let mut now = 2_000;
     start_quest(&mut game, &at, &mut now);
-    let (seed_path, seed_save) = save_bytes(&fixture, &game, &at, "refusals.json");
 
     // 49/14 before the defeat objective.
     assert_refused(
@@ -683,22 +654,8 @@ fn a_forged_or_premature_turn_in_changes_nothing() {
     );
 
     // Kill, then open the server's pending end screen.
-    let wolf = fixture.wolf_character();
-    let mut field = game.take_shared_fields().expect("the shared field exists");
-    kill_wolf(&mut game, &mut field, &wolf, now + 3);
-    now += 800;
-    let dialogue = talk(&mut game, &at, GIVER, now);
-    now += 10;
-    assert!(
-        dialogue
-            .replies
-            .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
-        "the completion Talk opens its dialogue"
-    );
-    assert_eq!(pending_turnin(&game), Some(QUEST));
-    release_end_screen(&mut game, &at, QUEST, GIVER, END_TEXT, now);
-    now += 10;
+    kill_field_wolf(&fixture, &mut game, &mut now);
+    open_end_screen(&mut game, &at, &mut now);
 
     // A turn-in for another quest neither pays nor consumes the pending screen.
     assert_refused(
@@ -735,11 +692,6 @@ fn a_forged_or_premature_turn_in_changes_nothing() {
     assert_eq!(coins(&game), coins_before + QUEST_COINS);
     assert_eq!(profile_xp(&game, BRAWLER), xp_before + QUEST_XP);
     assert_eq!(pending_turnin(&game), None);
-    assert_eq!(
-        fs::read(&seed_path).expect("the seed save is readable"),
-        seed_save,
-        "a refusal wrote the character save"
-    );
 }
 
 #[test]
@@ -748,13 +700,7 @@ fn a_full_bag_refuses_the_item_reward_without_paying_coins_or_xp() {
     let mut game = fixture.game();
     let at = fixture.giver_character();
     let mut now = 3_000;
-    start_quest(&mut game, &at, &mut now);
-
-    let wolf = fixture.wolf_character();
-    let mut field = game.take_shared_fields().expect("the shared field exists");
-    kill_wolf(&mut game, &mut field, &wolf, now);
-    now += 700;
-    assert_eq!(counts(&game, QUEST), [1]);
+    start_and_kill(&fixture, &mut game, &at, &mut now);
 
     // Fill the bag through a saved-state reload, so only the turn-in sees it.
     let mut full = game.state();
@@ -762,29 +708,17 @@ fn a_full_bag_refuses_the_item_reward_without_paying_coins_or_xp() {
     let mut game = fixture.reload(full);
     assert_eq!(
         game.inventory_state().items.len(),
-        BAG_SLOTS + 7,
-        "fixture setup: the bag is at the production capacity floor"
+        BAG_SLOTS,
+        "fixture setup: the bag is at the 100-stack production floor"
     );
 
-    let dialogue = talk(&mut game, &at, GIVER, now);
-    now += 10;
-    assert!(
-        dialogue
-            .replies
-            .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
-        "the completion Talk opens its dialogue"
-    );
-    assert_eq!(pending_turnin(&game), Some(QUEST));
-    release_end_screen(&mut game, &at, QUEST, GIVER, END_TEXT, now);
-    now += 10;
+    open_end_screen(&mut game, &at, &mut now);
 
     let before_state = game.state();
     let before_bytes = saved(&game);
     let before_coins = coins(&game);
     let before_xp = profile_xp(&game, BRAWLER);
     let before_item = count_definition(&game, REWARD_ITEM);
-    let (save_path, before_save) = save_bytes(&fixture, &game, &at, "full-bag.json");
     let error = match game.handle_in_world(&quest_end_reply(QUEST), &at, now + 1) {
         Ok(_) => panic!("the full bag must refuse the reward"),
         Err(error) => error,
@@ -816,11 +750,6 @@ fn a_full_bag_refuses_the_item_reward_without_paying_coins_or_xp() {
         Some(QUEST),
         "the pending turn-in was consumed"
     );
-    assert_eq!(
-        fs::read(&save_path).expect("the save is readable"),
-        before_save,
-        "a full-bag refusal wrote the character save"
-    );
 }
 
 #[test]
@@ -835,21 +764,34 @@ fn a_client_reported_result_cannot_pay() {
     let archer_before = profile_xp(&game, ARCHER);
     let item_before = count_definition(&game, REWARD_ITEM);
 
-    // A forged "game won" lifecycle packet pair, a forged 45/7 goal claim naming the
-    // defeat objective, and a forged server-only reward bundle.
+    // A well-formed "game won" packet pair: the family-39 base header (instance 7,
+    // -1, game id 21 at 11..15), the won byte at 15 and three result dwords at 16..28,
+    // and the 39/14 Flash payload's length prefix plus NUL. A client cannot reach the
+    // production call, which inspects only the server-built settlement replies
+    // (`src/gameplay.rs` `apply_encounter`); an inbound 39/x is not a result. The 45/7
+    // claim names id 1; 45/7 may advance only a `client_reported` goal (W175), and this
+    // quest's only goal is the server-owned defeat, so it matches nothing.
     let mut won = vec![39, 0, 18, 0];
     won.extend([0u8; 12]);
+    won[3..7].copy_from_slice(&7_i32.to_le_bytes());
+    won[7..11].copy_from_slice(&(-1_i32).to_le_bytes());
+    won[11..15].copy_from_slice(&21_i32.to_le_bytes());
     won[15] = 1;
+    won.extend([0u8; 12]);
     let mut flash = vec![39, 0, 14, 0];
     flash.extend([0u8; 15]);
+    flash[3..7].copy_from_slice(&7_i32.to_le_bytes());
+    flash[7..11].copy_from_slice(&(-1_i32).to_le_bytes());
+    flash[11..15].copy_from_slice(&21_i32.to_le_bytes());
+    flash[15..19].copy_from_slice(&13_i32.to_le_bytes());
     flash.extend(b"OnGameWonMsg\0");
     let mut claim = vec![45, 0, 7];
     claim.extend(1_i32.to_le_bytes());
     let mut reward = vec![50, 0, 1, 0];
     reward.extend([0u8; 32]);
     for (packet, label) in [
-        (won.as_slice(), "forged 39/18 game won"),
-        (flash.as_slice(), "forged 39/14 win flash"),
+        (won.as_slice(), "well-formed 39/18 game won"),
+        (flash.as_slice(), "well-formed 39/14 win flash"),
         (claim.as_slice(), "forged 45/7 objective claim"),
         (reward.as_slice(), "forged 50/1 reward bundle"),
     ] {
@@ -868,11 +810,8 @@ fn a_client_reported_result_cannot_pay() {
     assert_eq!(quest_status(&game, QUEST), QuestStatus::Active);
 
     // The same quest still advances on the server's own defeat event.
-    let wolf = fixture.wolf_character();
-    let mut field = game.take_shared_fields().expect("the shared field exists");
-    let killed = kill_wolf(&mut game, &mut field, &wolf, now + 10);
-    assert_eq!(counts(&game, QUEST), [1]);
-    assert!(objective_update(&killed.replies, QUEST, 1, 1));
+    let (field, killed) = kill_field_wolf(&fixture, &mut game, &mut now);
+    assert!(objective_update(&killed, QUEST, 1, 1));
     assert_eq!(field.health(WOLF_GUID), Some(0));
 }
 
@@ -882,13 +821,7 @@ fn a_reconnect_mid_quest_keeps_progress_and_pays_once() {
     let mut game = fixture.game();
     let at = fixture.giver_character();
     let mut now = 5_000;
-    start_quest(&mut game, &at, &mut now);
-
-    let wolf = fixture.wolf_character();
-    let mut field = game.take_shared_fields().expect("the shared field exists");
-    kill_wolf(&mut game, &mut field, &wolf, now);
-    now += 700;
-    assert_eq!(counts(&game, QUEST), [1]);
+    start_and_kill(&fixture, &mut game, &at, &mut now);
 
     // Reload point 1: the objective survives, the turn-in is not open yet.
     let mut game = fixture.save_and_reload(&game, &at);
@@ -901,18 +834,7 @@ fn a_reconnect_mid_quest_keeps_progress_and_pays_once() {
     assert_eq!(pending_turnin(&game), None);
 
     // The completion Talk opens the pending end screen for the reconnect test.
-    let dialogue = talk(&mut game, &at, GIVER, now);
-    now += 10;
-    assert!(
-        dialogue
-            .replies
-            .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
-        "the completion Talk opens its dialogue"
-    );
-    assert_eq!(pending_turnin(&game), Some(QUEST));
-    release_end_screen(&mut game, &at, QUEST, GIVER, END_TEXT, now);
-    now += 10;
+    open_end_screen(&mut game, &at, &mut now);
 
     // Reload point 2: the pending turn-in exists only after the completion Talk, and the
     // relog visibility batch re-sends its 49/13 at the saved speaker.
@@ -965,7 +887,8 @@ fn the_first_hour_loop_uses_no_dev_commands_and_leaves_the_character_free() {
     let at = fixture.giver_character();
     let mut now = 6_000;
 
-    // The session has no developer ability and the suite sends no chat/dev packet.
+    // The session has no developer ability, and every packet shape this loop builds is a
+    // quest/NPC request: none is a 15/x chat request, so no `realm` command can be carried.
     for command in [
         "offer",
         "teleport",
@@ -980,26 +903,35 @@ fn the_first_hour_loop_uses_no_dev_commands_and_leaves_the_character_free() {
             "the first-hour character must not run the {command:?} developer command"
         );
     }
+    for packet in [
+        npc_interact(GIVER),
+        npc_select(GIVER, QUEST_CHOICE),
+        dialogue_choice(QUEST_CHOICE),
+        quest_reply(QUEST, true),
+        quest_end_reply(QUEST),
+        select_job(BRAWLER),
+    ] {
+        assert_not_chat(&packet);
+    }
 
-    start_quest(&mut game, &at, &mut now);
-    let wolf = fixture.wolf_character();
-    let mut field = game.take_shared_fields().expect("the shared field exists");
-    kill_wolf(&mut game, &mut field, &wolf, now);
-    now += 700;
-    assert_eq!(counts(&game, QUEST), [1]);
-    let dialogue = talk(&mut game, &at, GIVER, now);
-    now += 10;
+    let (_field, killed) = start_and_kill(&fixture, &mut game, &at, &mut now);
     assert!(
-        dialogue
+        !killed
             .replies
             .iter()
-            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
-        "the completion Talk opens its dialogue"
+            .any(|packet| packet.starts_with(&[15, 0])),
+        "the kill reply contains a chat/system line"
     );
-    release_end_screen(&mut game, &at, QUEST, GIVER, END_TEXT, now);
+    open_end_screen(&mut game, &at, &mut now);
+    let finished = finish_quest(&mut game, &at, QUEST, BRAWLER, QUEST_COINS, QUEST_XP, now);
     now += 10;
-    finish_quest(&mut game, &at, QUEST, BRAWLER, QUEST_COINS, QUEST_XP, now);
-    now += 10;
+    assert!(
+        !finished
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[15, 0])),
+        "the turn-in reply contains a chat/system line"
+    );
 
     // Every server-owned pending/control flag is clear and the character is in a valid
     // place, so the next quest can be accepted.
@@ -1009,11 +941,20 @@ fn the_first_hour_loop_uses_no_dev_commands_and_leaves_the_character_free() {
     assert!(!game.is_mounted(), "the character is still mounted");
     assert!(!game.is_soccer_active());
     assert!(!game.derby_active());
-    assert!(at.zone_id == 0);
-    assert!(at.position.iter().all(|value| value.is_finite()));
+    // Position is session state, not `GameplayState`; gameplay does not move it in this
+    // harness. Check the accepted zone-0 place and round-trip it through the real save
+    // envelope; the gateway's save commit is T258's seam.
+    let save_path = fixture.save_path();
+    fixture.write_save_to(&save_path, &game, &at);
+    let envelope =
+        game_store::load_or_create(&save_path, at.clone()).expect("the final save loads");
+    assert_eq!(
+        envelope.character, at,
+        "the save envelope keeps the session position"
+    );
     assert!(
-        game.supports_location(&at),
-        "the character's saved position is a valid zone-0 place"
+        game.supports_location(&envelope.character),
+        "the saved position is not a supported place"
     );
 
     // A busy character would be refused before the menu; a second quest is offered and
@@ -1035,9 +976,14 @@ fn the_loop_uses_only_server_owned_ids_and_authoritative_hits() {
     let clean = game.state();
 
     // A forged target GUID and an out-of-range attack hit nothing and credit nothing.
+    // Each is a whole-state refusal: `GameplayState` includes the encounter/combat halves,
+    // so any attack cost a refused action charged would show here; the field health and
+    // the later successful kill cover the shared field's own state.
     let wolf = fixture.wolf_character();
     let mut field = game.take_shared_fields().expect("the shared field exists");
     let known = BTreeSet::from([WOLF_GUID]);
+    let before_state = game.state();
+    let before_bytes = saved(&game);
     let forged = game
         .handle_shared_field(
             &SharedFieldAction::Ability {
@@ -1052,11 +998,24 @@ fn the_loop_uses_only_server_owned_ids_and_authoritative_hits() {
         .expect("a forged target is ignored, not an error");
     assert!(!forged.changed && forged.replies.is_empty());
     assert_eq!(field.health(WOLF_GUID), Some(WOLF_HP));
+    assert_eq!(
+        game.state(),
+        before_state,
+        "a forged target changed the gameplay state"
+    );
+    assert_eq!(
+        saved(&game),
+        before_bytes,
+        "a forged target changed the serialized save bytes"
+    );
+
     let far = character_at_for(
         CHARACTER,
         0,
         [WOLF_CENTRE[0] + 100.0, WOLF_CENTRE[1], WOLF_CENTRE[2]],
     );
+    let before_state = game.state();
+    let before_bytes = saved(&game);
     let out_of_range = game
         .handle_shared_field(
             &SharedFieldAction::Ability {
@@ -1071,6 +1030,16 @@ fn the_loop_uses_only_server_owned_ids_and_authoritative_hits() {
         .expect("an out-of-range attack is refused, not an error");
     assert!(!out_of_range.changed && out_of_range.replies.is_empty());
     assert_eq!(field.health(WOLF_GUID), Some(WOLF_HP));
+    assert_eq!(
+        game.state(),
+        before_state,
+        "an out-of-range attack changed the gameplay state"
+    );
+    assert_eq!(
+        saved(&game),
+        before_bytes,
+        "an out-of-range attack changed the serialized save bytes"
+    );
     assert_eq!(counts(&game, QUEST), [0]);
 
     // A client-supplied reward bundle is not a grant.
@@ -1078,13 +1047,19 @@ fn the_loop_uses_only_server_owned_ids_and_authoritative_hits() {
     reward.extend([0u8; 32]);
     assert_refused(&mut game, &at, &reward, now + 3, "client-supplied reward");
 
-    // Only the actor the server spawned is hittable; the defeat event credits it.
-    let killed = kill_wolf(&mut game, &mut field, &wolf, now + 4);
+    // Only the actor the server spawned is hittable; the defeat event credits it. This
+    // attack reuses the same field after the two refusals, so a refused attempt that had
+    // consumed the attack cooldown would refuse here and fail the objective assertion.
+    now += 4;
+    let killed = kill_wolf(&mut game, &mut field, &wolf, now);
     assert_eq!(field.health(WOLF_GUID), Some(0));
     assert_eq!(counts(&game, QUEST), [1]);
-    assert!(objective_update(&killed.replies, QUEST, 1, 1));
+    assert!(objective_update(&killed, QUEST, 1, 1));
 
-    // A zero definition is killed by the server but cannot advance a 3156 objective.
+    // A zero definition is an accepted kill, not a refusal: the server still processes
+    // the hit and may pay the ordinary field reward, but the actor kind is 0 so no 3156
+    // quest objective can match. This section claims only no quest credit and no
+    // 49/9/49/10, never state equality.
     write_json(
         &fixture.path().join("field_enemies.json"),
         wolf_content_with_definition(0),

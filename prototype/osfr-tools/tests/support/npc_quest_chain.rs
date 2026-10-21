@@ -13,12 +13,13 @@
 #[path = "../common/content_copy.rs"]
 mod content_copy;
 
-pub use content_copy::copy_tree;
+pub use content_copy::{copy_missing, copy_tree};
 
 use osfr_tools::{
     character_store::CharacterState,
     encounter::{FieldParticipant, SharedFieldAction, SharedFieldState},
     gameplay::{Gameplay, GameplayState, Outcome},
+    inventory::InventoryItem,
     npc_interaction::decode_quest_offer_49_1,
     quest_engine::QuestStatus,
 };
@@ -35,6 +36,11 @@ pub const CHARACTER: u64 = 194_017;
 pub const TALK_LABEL: u32 = 3_300;
 /// First response row of the quest dialogue (client 26/6).
 pub const QUEST_CHOICE: i32 = 301;
+/// (R) The production turn-in floor in `gameplay/npc.rs`: the reward
+/// `bag_capacity` is `items.len().max(100)`.
+pub const BAG_SLOTS: usize = 100;
+/// A real inventory definition used to fill the bag; only the stack count matters.
+pub const FILLER_ITEM: i32 = 75_060;
 
 static NEXT_FIXTURE: AtomicU64 = AtomicU64::new(0);
 
@@ -93,21 +99,9 @@ impl Fixture {
 
     /// Copy every repository content file this fixture does not already supply, so
     /// `Gameplay::load` reads NPCs, field actors and `jobs.json` from the fixture's own
-    /// tree. Opening/profile/inventory files keep winning (`copy_missing`), the same
-    /// overlay T256's field fixture uses; the caller may then patch the scratch copy.
+    /// tree. Opening/profile/inventory files keep winning (`copy_missing`), and the
+    /// caller may then patch the scratch copy.
     pub fn overlay_content(&self, source: &Path) {
-        fn copy_missing(from: &Path, to: &Path) {
-            for row in fs::read_dir(from).unwrap() {
-                let path = row.unwrap().path();
-                let target = to.join(path.file_name().unwrap());
-                if path.is_dir() {
-                    fs::create_dir_all(&target).unwrap();
-                    copy_missing(&path, &target);
-                } else if !target.exists() {
-                    fs::copy(path, target).unwrap();
-                }
-            }
-        }
         copy_missing(source, &self.path);
     }
 
@@ -214,6 +208,28 @@ pub fn character_at(zone_id: u32, position: [f32; 3]) -> CharacterState {
     character_at_for(CHARACTER, zone_id, position)
 }
 
+/// Fill the bag to the production capacity floor (exactly [`BAG_SLOTS`] stacks), so
+/// the next new stack is refused. Existing opening items count toward the total; the
+/// filler rows are real inventory instances.
+pub fn fill_bag(state: &mut GameplayState) {
+    let base = 100_000;
+    for offset in state.inventory.items.len()..BAG_SLOTS {
+        state.inventory.items.push(InventoryItem {
+            definition_id: FILLER_ITEM,
+            tint: 0,
+            id: base + offset as i32,
+            count: 1,
+            consumed_count: 0,
+            stored_count: 0,
+            last_cast_time: 0,
+            rental: None,
+            ability_count: 0,
+            activate_enabled: false,
+        });
+    }
+    state.inventory.next_instance_id = Some(i64::from(base) + BAG_SLOTS as i64);
+}
+
 pub fn content_position(file: &str, npc_id: u64) -> [f32; 3] {
     let document = read_json(&content_dir().join("npcs").join(file));
     let row = document["records"]
@@ -288,6 +304,18 @@ pub fn has_family(packet: &[u8], family: u16, subtype: u16, id: Option<u32>) -> 
     packet
         .get(offset..offset + 4)
         .is_some_and(|bytes| u32::from_le_bytes(bytes.try_into().unwrap()) == id)
+}
+
+/// 35/5 `PlayerUpdatePacketUpdateHitpoints` reader `0x008d6f10` (base header reader
+/// `0x008d6830`): after the four-byte header it reads the actor guid as two dwords
+/// (`4..12`), then three i32s; the first is the current hitpoints (`12..16`).
+pub fn enemy_hp(replies: &[Vec<u8>], guid: u64) -> Option<u32> {
+    replies.iter().find_map(|packet| {
+        (has_family(packet, 35, 5, None)
+            && packet.get(4..12) == Some(guid.to_le_bytes().as_slice())
+            && packet.len() >= 16)
+            .then(|| u32::from_le_bytes(packet[12..16].try_into().unwrap()))
+    })
 }
 
 /// Full 49/8 `ObjectiveActivated` packet: the 6-byte family/subtype header
