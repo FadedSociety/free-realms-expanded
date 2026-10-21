@@ -1147,7 +1147,13 @@ pub(super) fn quest_offer_packet_with(
         description_string_id: engine.description_string_id(quest_id).unwrap_or(0),
         field_5: title_id,
         members_only: false,
-        reward_bundle_body: vec![0; 69],
+        // The 49/1 card and the 49/13 end screen read the same ClientRewardBundle
+        // (`sub_8E7930`, client 0x008e7930; 49/1 reader 0x00c7b7a0): the quest's
+        // authored coins, summed job-XP stars and counted display rows. Display only;
+        // the 49/14 turn-in still pays.
+        reward_bundle_body: engine
+            .quest_reward_bundle(quest_id)
+            .map_err(|_| npc_interaction::NpcInteractionError::InvalidPacket)?,
         trailing_dwords: [0; 2],
         trailing_float_bits: 0,
         trailing_flags: [false; 2],
@@ -1239,5 +1245,78 @@ mod tests {
         assert_eq!(event["guid"], 9);
         assert_eq!(event["content_key"], 11);
         assert_eq!(event["item_count"], 4);
+    }
+
+    /// T318: a display row the client entry reader cannot instantiate makes the 49/1
+    /// builder refuse instead of sending a partial card. Content cannot author display
+    /// rows yet, so this synthetic engine is the only reachable construction of the
+    /// failure; the builder is pure, so a refusal changes nothing.
+    #[test]
+    fn a_malformed_reward_row_is_refused_by_the_offer_builder() {
+        use crate::{
+            quest_engine::{CharacterEligibility, QuestDefinition, QuestEngine, QuestRequirements},
+            rewards::{RewardBundleRow, RewardDisplay, RewardGrant},
+        };
+        use std::collections::BTreeMap;
+
+        let definition = |row_type: u32| QuestDefinition {
+            id: 7,
+            title: "Quest 7".into(),
+            description: String::new(),
+            giver_npc_id: 11,
+            turnin_npc_id: 11,
+            prerequisite_quest_ids: Vec::new(),
+            requirements: QuestRequirements::default(),
+            ordered: false,
+            objectives: Vec::new(),
+            reward: RewardGrant {
+                coins: 5,
+                items: Vec::new(),
+                job_xp: BTreeMap::new(),
+                display: RewardDisplay {
+                    source_guid: 11,
+                    player_guid: 3,
+                    reward_kind: 0,
+                    icon_id: 0,
+                    name_id: 0,
+                    rows: vec![RewardBundleRow {
+                        type_id: row_type,
+                        body: vec![0; 34],
+                    }],
+                },
+            },
+        };
+        let engine = |row_type| {
+            QuestEngine::new(
+                3,
+                vec![definition(row_type)],
+                CharacterEligibility::default(),
+                None,
+            )
+            .expect("display rows are not validated at engine construction")
+        };
+
+        let offered = quest_offer_packet_with(&engine(3), 7, None).expect("entry type 3 is read");
+        let decoded = crate::npc_interaction::decode_quest_offer_49_1(&offered)
+            .expect("the populated offer decodes");
+        let body = decoded.reward_bundle_body;
+        assert_eq!(
+            body.len(),
+            69 + 4 + 34,
+            "a populated reward appends its counted rows"
+        );
+        assert_eq!(
+            i32::from_le_bytes(body[61..65].try_into().unwrap()),
+            1,
+            "the client loops over exactly one row"
+        );
+        assert_eq!(u32::from_le_bytes(body[65..69].try_into().unwrap()), 3);
+        assert_eq!(&body[69..103], &[0; 34]);
+        assert_eq!(i32::from_le_bytes(body[103..107].try_into().unwrap()), 0);
+
+        assert_eq!(
+            quest_offer_packet_with(&engine(2), 7, None).unwrap_err(),
+            npc_interaction::NpcInteractionError::InvalidPacket
+        );
     }
 }

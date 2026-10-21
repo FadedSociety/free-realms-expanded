@@ -1208,6 +1208,22 @@ impl QuestEngine {
         Some(bytes)
     }
 
+    /// The 49/1/49/13 ClientRewardBundle body for this quest's authored reward.
+    ///
+    /// Both screens call the client bundle reader `sub_8E7930` (`0x008e7930`): the 49/1
+    /// reader `0x00c7b7a0` at packet offset 31 and the 49/13 reader `0x00c7b990` at
+    /// packet offset 26. They share `encode_quest_reward_bundle`, so the displayed coins,
+    /// summed job-XP stars and counted display rows cannot drift. The bundle is
+    /// display-only: sending it grants nothing.
+    pub fn quest_reward_bundle(&self, quest_id: u32) -> io::Result<Vec<u8>> {
+        let reward = &self
+            .definitions
+            .get(&quest_id)
+            .ok_or_else(|| invalid("unknown quest reward"))?
+            .reward;
+        encode_quest_reward_bundle(reward)
+    }
+
     /// Build the populated quest end screen from the saved definition (R field defaults).
     pub fn quest_end_packet(&self, quest_id: u32, actor_id: u64) -> io::Result<Vec<u8>> {
         let reward = &self

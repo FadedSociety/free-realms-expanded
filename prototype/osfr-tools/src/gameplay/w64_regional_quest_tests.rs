@@ -411,16 +411,40 @@ fn choose_quest_row() -> Vec<u8> {
 
 fn expected_quest_offer(_prefix: u16, intro_id: u32) -> Vec<u8> {
     // Native layout (run 142216): no u16 prefix; quest id + five dwords; 114 bytes.
+    // T318: byte 30 is the members-only bool and byte 31 starts the offered quest's
+    // authored ClientRewardBundle (49/1 reader 0x00c7b7a0 -> sub_8E7930 0x008e7930).
     let mut packet = vec![49, 0, 1, 0, 0, 0];
     packet.extend(INTRODUCE_YOURSELF_ID.to_le_bytes());
     for value in [intro_id, 94_247, 94_247, 94_248, 94_247] {
         packet.extend(value.to_le_bytes());
     }
     packet.push(0);
-    packet.extend([0; 69]);
+    packet.extend(expected_introduce_yourself_reward_bundle());
     packet.extend([0; 14]);
     assert_eq!(packet.len(), 114);
     packet
+}
+
+/// Quest 3000021's authored reward: 5 coins and 20 Adventurer (profile 1) XP, no
+/// display rows. The 69-byte base is the reader's success byte, nine dwords, the
+/// two 8-byte GUIDs, the icon and name words, the row count and a trailing dword
+/// (`sub_8E7930` 0x008e7930).
+fn expected_introduce_yourself_reward_bundle() -> Vec<u8> {
+    let mut body = vec![1];
+    for value in [5_i32, 20, 0, 0, 0, 0] {
+        body.extend(value.to_le_bytes());
+    }
+    body.extend(1.0_f32.to_le_bytes());
+    for value in [0_i32, 0] {
+        body.extend(value.to_le_bytes());
+    }
+    body.extend(SAMANTHA_ID.to_le_bytes());
+    body.extend(1_u64.to_le_bytes());
+    for value in [0_i32, 94_247, 0, 0] {
+        body.extend(value.to_le_bytes());
+    }
+    assert_eq!(body.len(), 69);
+    body
 }
 
 fn offer_test_game(dev_tools: bool) -> (Gameplay, CharacterState) {

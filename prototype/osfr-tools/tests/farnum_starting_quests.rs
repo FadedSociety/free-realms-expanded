@@ -18,9 +18,8 @@
 //! - 49/2 QuestReply constructor `00a86400`: u32 quest id and a u8 accept flag.
 //! - 49/1 QuestInfo reader `00c7b7a0`: six dwords end at offset 30, members-only at 30,
 //!   then the 69-byte reward bundle at 31 read by `008e7930`; quest at 6, intro at 10,
-//!   title at 14/18, description at 22. The offer still carries the zeroed placeholder
-//!   bundle: populating it is an S15/S16 `npc.rs` follow-up (accepted gap, see
-//!   `assert_offer_bundle_is_the_known_placeholder`).
+//!   title at 14/18, description at 22. T318: the bundle carries the quest's authored
+//!   reward through the same encoder the 49/13 screen uses (see `assert_offer_reward`).
 //! - 49/13 QuestEnd reader `00c7b990`: u64 actor, quest i32, end-text u32, a reserved u32,
 //!   then the 69-byte reward bundle (success, coins, XP stars) and a trailing float.
 //! - 49/14 QuestEndReply constructor `00a864c0`: one u32 quest id.
@@ -120,21 +119,35 @@ fn count(game: &Gameplay, quest_id: u32, objective: usize) -> u32 {
     counts(game, quest_id)[objective]
 }
 
-/// (R) Accepted gap, lead-deferred: the 49/1 card's 69-byte ClientRewardBundle
-/// (`00c7b7a0` -> `008e7930`, packet offset 31) is the pre-existing zeroed placeholder,
-/// so the client reads 0 coins/0 XP on the offer card. Populating it from the authored
-/// reward is an S15/S16 `src/gameplay/npc.rs` change and needs lead ownership
-/// (F267 review finding 4, alternative "amend the gate and note the gap"); the exact
-/// coins/XP are shown on the 49/13 screen and asserted by `assert_end_reward`.
-fn assert_offer_bundle_is_the_known_placeholder(packet: &[u8]) {
+/// T318: the 49/1 card carries the same authored `ClientRewardBundle` body the 49/13
+/// screen builds (`00c7b7a0` -> `008e7930`): success at packet 31, coins at 32, XP
+/// stars at 36; the trailing 14 bytes keep the clicked actor, float bits and bools.
+fn assert_offer_reward(packet: &[u8], expected_coins: u32, expected_xp: u32) {
     assert_eq!(
         packet.len(),
         114,
         "49/1 is 114 bytes with the 69-byte empty bundle"
     );
-    assert!(
-        packet[31..100].iter().all(|byte| *byte == 0),
-        "the 49/1 reward bundle is still the zeroed placeholder"
+    assert_eq!(packet[31], 1, "reward bundle success flag");
+    assert_eq!(
+        signed_word(packet, 32),
+        expected_coins as i32,
+        "49/1 displayed coins"
+    );
+    assert_eq!(
+        signed_word(packet, 36),
+        expected_xp as i32,
+        "49/1 displayed XP stars"
+    );
+    assert_eq!(
+        u64::from_le_bytes(packet[100..108].try_into().unwrap()),
+        CLEETUS,
+        "the offer names the clicked giver after the bundle"
+    );
+    assert_eq!(
+        &packet[108..],
+        &[0; 6],
+        "float bits and both bools are zero"
     );
 }
 
@@ -214,7 +227,7 @@ fn cleetus_offers_both_quests_to_the_right_job() {
         FIGHTING_TITLE,
         FIGHTING_DESCRIPTION,
     );
-    assert_offer_bundle_is_the_known_placeholder(&packet);
+    assert_offer_reward(&packet, 18, 25);
     assert_eq!(
         quest_status(&brawler, FIGHTING_THE_PACK),
         QuestStatus::Offered
@@ -229,7 +242,7 @@ fn cleetus_offers_both_quests_to_the_right_job() {
         COPPER_TITLE,
         COPPER_DESCRIPTION,
     );
-    assert_offer_bundle_is_the_known_placeholder(&packet);
+    assert_offer_reward(&packet, 5, 15);
     assert_eq!(
         quest_status(&miner, COPPER_COLLECTION),
         QuestStatus::Offered
