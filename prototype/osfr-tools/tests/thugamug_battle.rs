@@ -1381,16 +1381,18 @@ fn the_pre_existing_battles_stay_unchanged() {
     // The insertion anchor is immediately after battle 96, not at the end.
     assert_eq!(ids[0], 96);
     assert_eq!(ids[1], THUGAMUG);
-    assert_eq!(ids.len(), pre_existing.len() + 1);
+    // Later content slices add their own rows (T319 adds 12350), so require
+    // every pre-existing row to survive rather than pinning the whole file.
     let existing: BTreeSet<u32> = pre_existing.iter().map(|row| row.0).collect();
     let actual: BTreeSet<u32> = ids.iter().copied().collect();
+    assert!(
+        existing.is_subset(&actual),
+        "a pre-existing battle was removed"
+    );
     assert_eq!(
-        actual
-            .difference(&BTreeSet::from([THUGAMUG]))
-            .copied()
-            .collect::<BTreeSet<u32>>(),
-        existing,
-        "only the new row was added"
+        actual.iter().filter(|id| **id == THUGAMUG).count(),
+        1,
+        "the Thugamug row is present exactly once"
     );
     assert_eq!(
         file["battles"]

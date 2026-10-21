@@ -784,6 +784,180 @@
       ]
     },
     {
+      "id": 12350,
+      "title_id": 30404,
+      "description_id": 92659,
+      "objective_id": 388319,
+      "difficulty": 1,
+      "required_combat_level": 0,
+      "spawner": {
+        "guid": 100001235000,
+        "definition_id": 1235000,
+        "model_id": 3284,
+        "name_id": 102128,
+        "name": "Alpha Wolf",
+        "texture_alias": "",
+        "position": [
+          -2165.513,
+          -32.96,
+          328.1112
+        ],
+        "max_health": 1,
+        "damage": 0,
+        "boss": false
+      },
+      "enemies": [
+        {
+          "guid": 100001235001,
+          "definition_id": 1235001,
+          "model_id": 3284,
+          "name_id": 102128,
+          "name": "Alpha Wolf",
+          "texture_alias": "",
+          "position": [
+            133.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 160,
+          "damage": 8,
+          "boss": true
+        },
+        {
+          "guid": 100001235002,
+          "definition_id": 1235002,
+          "model_id": 3284,
+          "name_id": 102128,
+          "name": "Alpha Wolf",
+          "texture_alias": "",
+          "position": [
+            139.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 160,
+          "damage": 8,
+          "boss": true
+        },
+        {
+          "guid": 100001235003,
+          "definition_id": 1235003,
+          "model_id": 3284,
+          "name_id": 374,
+          "name": "Wolf",
+          "texture_alias": "",
+          "position": [
+            136.0,
+            -0.6,
+            175.0
+          ],
+          "max_health": 90,
+          "damage": 5,
+          "boss": false
+        },
+        {
+          "guid": 100001235004,
+          "definition_id": 1235004,
+          "model_id": 3284,
+          "name_id": 374,
+          "name": "Wolf",
+          "texture_alias": "",
+          "position": [
+            134.0,
+            -0.6,
+            176.0
+          ],
+          "max_health": 90,
+          "damage": 5,
+          "boss": false
+        },
+        {
+          "guid": 100001235005,
+          "definition_id": 1235005,
+          "model_id": 3284,
+          "name_id": 374,
+          "name": "Wolf",
+          "texture_alias": "",
+          "position": [
+            138.0,
+            -0.6,
+            176.0
+          ],
+          "max_health": 90,
+          "damage": 5,
+          "boss": false
+        }
+      ],
+      "reward_coins": 25,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Global.Text 30404 resolves 'Sheep Watch', 92659 'A pack of wolves is attacking the sheep at Farnum Farmstead. Save the sheep by defeating the wolves!', 388319 'Defeat the Ravenous Wolves at Sheep Watch', 102128 'Alpha Wolf' and 374 'Wolf' (lab/reports/locale-id-to-text.json array indexes 16233, 34274, 52534, 37854 and 373). The same texts and the difficulty-1 Farnum Farmstead entrance are in notes/Build Guides/Content/Dungeons/Sheep Watch.md; data/content/dungeons/sheep_watch.json records the Sheep Watch page without a numeric zone or objective id. The guide's raw title hash 1279835357 is not a Global.Text id and is not used."
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt line 2470 maps 3284 to wolf_generic.adr (catalog.tsv line 10255: pack_03/000417.adr, 10690 bytes, CRC32 e6ad9ca1); data/content/enemies.json defines 930050 Alpha Wolf (model 3284, name 102128) and 930071 Wolf (model 3284, name 374). No sex-specific Alpha enemy definition or model binding is recovered (the client has Alpha Female/Male Wolf locale rows but no model binding), so both Alpha actors use the sole 930050 Alpha Wolf name/model; sex is represented only by the two boss roles (R)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Dungeons/Sheep Watch.md: difficulty 1, no combat-job level requirement, the gate in the south-west Wilds at Farnum Farmstead, the main goal 'Defeat the Ravenous Wolves at Sheep Watch', Alpha Female and Alpha Male bosses and Ravenous Wolves; a video frame (3caQP-As968/00404) shows the red marker 19 m from Pappy Farnum. The retail waves, alpha howl/bite/teleport mechanics, sheep herding, bonus goal, boss count and 8/51-coin wheel are NOT modelled."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Local battle id 12350, actor GUIDs 100001235000-100001235005 and definition ids 1235000-1235005. Five-enemy kill-all roster (not the retail waves): two Alpha Wolves 930050 boss true and three Wolves 930071 boss false; modest 160 HP/8 damage and 90 HP/5 damage before the existing difficulty-1 scaling; the existing 25-coin field-battle payout, one random draw from the existing four-item pool and the existing 50 job XP for guide-None battles. Marker adaptation: the visible Alpha Wolf model replaces a non-rendering gate (as T282 uses Thugamug). Arena: the 12311 block (zone 9600 sg_random_encounter_clearing, geometry 214, sky sky_wilds24.xml, arrival [136,-0.5,155]) with five positions [133,-0.6,173], [139,-0.6,173], [136,-0.6,175], [134,-0.6,176] and [138,-0.6,176]."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Placement: marker [-2165.513,-32.96,328.1112], 19.00 m east of Pappy Farnum [-2184.513,-31.53728,328.1112] (the video marker is quoted as 19 m). The full 105-sample 5 m wander disc is terrain-covered; max sampled slope 19.96 degrees; all 24 ring samples are finite; y is the bilinear zone-0 height -32.9577 rounded to -32.96 (delta 0.0023 m). Nearest spawned NPC Riley 9500000276 is 17.38 m away, the nearest field enemy is 207.2 m away and the nearest other battle marker (12400) is 269.6 m away. Water, object collision and a native walkable route remain unverified."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Prize rows copied from battle 12311: Battle Item Mystery Pack 10482, Medium Energy Potion 3023, Medic's Power Shard of Vitality I 75354 and Small Health Potion 11002; T243's battle_prizes_available accepts all four against the shipped item catalogue. No original Sheep Watch wheel, star payout, coin-wheel slot or bonus-goal reward is recovered."
+        }
+      ],
+      "nameplate_image_id": 11970,
+      "zone": {
+        "zone_id": 9600,
+        "name": "sg_random_encounter_clearing",
+        "sky": "sky_wilds24.xml",
+        "geometry_id": 214,
+        "position": [
+          136.0,
+          -0.5,
+          155.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tutorial": false
+      },
+      "icon_id": -1,
+      "prizes": [
+        {
+          "item_id": 10482,
+          "name_id": 6666,
+          "icon_id": 973
+        },
+        {
+          "item_id": 3023,
+          "name_id": 422907,
+          "icon_id": 544
+        },
+        {
+          "item_id": 75354,
+          "name_id": 131098,
+          "icon_id": 3721
+        },
+        {
+          "item_id": 11002,
+          "name_id": 422909,
+          "icon_id": 730
+        }
+      ]
+    },
+    {
       "id": 12310,
       "title_id": 93274,
       "description_id": 116757,
