@@ -53,6 +53,7 @@ pub fn gameplay_dir() -> PathBuf {
 
 /// Stock 2014 client locale. `hash_to_ids` in `lab/reports/locale-id-map.json`
 /// was built from it; the suites re-derive each key instead of trusting it.
+#[allow(dead_code)] // Reached only through `locale_rows`; some include sites use neither.
 pub fn locale_path() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat")
@@ -165,6 +166,7 @@ pub fn gameplay_talk_body(game: &mut Gameplay, file: &str, npc_id: u64) -> u32 {
 
 /// Physical stock-locale rows for the wanted key hashes: one-based line and
 /// text, under the T246 `str::lines()` convention documented above.
+#[allow(dead_code)] // Include sites that cite no locale row use only the talk helpers.
 pub fn locale_rows(wanted: &BTreeSet<u32>) -> BTreeMap<u32, (usize, String)> {
     let path = locale_path();
     let text =
@@ -198,6 +200,7 @@ pub fn locale_id_to_text() -> BTreeMap<u64, String> {
 
 /// Every `(file, npc_id)` -> `greeting_string_id` binding in `npcs/*.json`, so
 /// a new slice can prove it does not reuse another row's greeting id.
+#[allow(dead_code)] // Only the provenance suites scan every binding.
 pub fn greeting_bindings() -> BTreeMap<(String, u64), u32> {
     let dir = content_dir().join("npcs");
     let mut files: Vec<PathBuf> = fs::read_dir(&dir)

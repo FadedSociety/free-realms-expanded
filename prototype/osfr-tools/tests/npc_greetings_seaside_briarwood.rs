@@ -15,12 +15,20 @@
 //!
 //! Locale ids, hashes, `en_us_data.dat` lines and speaker proofs are in
 //! `notes/Autopilot/T317.md`; every unbound drawable row is listed there with its reason.
-//! No production file changes: this is content plus this test.
+//! No production file changes: this is content plus this test. The packet builders, the
+//! locale row convention and the 26/3 body offset live in the shared
+//! `tests/common/npc_greetings.rs` harness.
 
+#[path = "common/npc_greetings.rs"]
+mod npc_greetings;
+
+use npc_greetings::{
+    content_dir, gameplay_dir, gameplay_talk_body, lab_report, locale_id_to_text, locale_rows,
+    npc_position, npc_record, npc_records, read_json, select, service, service_talk_body,
+};
 use osfr_tools::{
-    character_store::CharacterState,
     gameplay::Gameplay,
-    npc_interaction::{NpcAction, NpcInteraction, NpcInteractionError, NpcSelection},
+    npc_interaction::{NpcAction, NpcInteractionError, NpcSelection},
     world::NpcVisibility,
     world_text::locale_hash,
 };
@@ -28,11 +36,8 @@ use serde_json::Value;
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs,
-    path::{Path, PathBuf},
+    path::Path,
 };
-
-const GREETING_HEADER: [u8; 4] = [26, 0, 3, 0];
-const MENU_HEADER: [u8; 4] = [26, 0, 9, 0];
 
 const SEASIDE: &str = "seaside.json";
 const BRIARWOOD: &str = "briarwood.json";
@@ -343,77 +348,6 @@ const OTHER_REGIONS: [(&str, &str, u64); 15] = [
     ("wugachug.json", "Wugachug", 17),
 ];
 
-fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
-/// Full server content used by the existing in-world router tests. It has no `npcs/`
-/// directory, so `Gameplay::load` takes the NPC rows from the bundled `data/content`
-/// (the same rows this test edits).
-fn gameplay_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/references/opening-anvil-placement-v1/content")
-}
-
-/// Generated reports used by the T246/T280/T298 resolution method (outside the
-/// repository, like the stock client locale the test also reads).
-fn lab_report(name: &str) -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/reports")
-        .join(name)
-}
-
-/// The stock 2014 client locale. `hash_to_ids` was built from it; this test re-derives
-/// each key instead of trusting an export.
-fn locale_path() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat")
-}
-
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(
-        &fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
-    )
-    .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-}
-
-fn records(file: &str) -> Vec<Value> {
-    let path = content_dir().join("npcs").join(file);
-    read_json(&path)["records"]
-        .as_array()
-        .unwrap_or_else(|| panic!("{}: records array", path.display()))
-        .clone()
-}
-
-fn npc_record(file: &str, npc_id: u64) -> Value {
-    let path = content_dir().join("npcs").join(file);
-    read_json(&path)["records"]
-        .as_array()
-        .unwrap_or_else(|| panic!("{}: records array", path.display()))
-        .iter()
-        .find(|record| record["npc_id"].as_u64() == Some(npc_id))
-        .unwrap_or_else(|| panic!("{}: NPC {npc_id}", path.display()))
-        .clone()
-}
-
-fn position(record: &Value, npc_id: u64) -> [f32; 3] {
-    let position = record["position"]
-        .as_array()
-        .unwrap_or_else(|| panic!("NPC {npc_id}: position"));
-    assert_eq!(position.len(), 3, "NPC {npc_id}: position shape");
-    assert!(
-        position
-            .iter()
-            .all(|value| value.as_f64().is_some_and(f64::is_finite)),
-        "NPC {npc_id}: finite position"
-    );
-    [
-        position[0].as_f64().expect("x") as f32,
-        position[1].as_f64().expect("y") as f32,
-        position[2].as_f64().expect("z") as f32,
-    ]
-}
-
 /// The brief's drawability rule: a spawned `legacy_data` row with a finite position,
 /// positive model id, positive name id and a name. `NpcVisibility::load` spawns exactly
 /// these rows; `poi_anchor` and `unanchored` rows are not bindable.
@@ -445,109 +379,11 @@ fn assert_drawable(record: &Value, npc_id: u64) {
         record["name"].as_str().is_some_and(|name| !name.is_empty()),
         "NPC {npc_id}: name"
     );
-    let _ = position(record, npc_id);
-}
-
-fn service() -> NpcInteraction {
-    let data = content_dir();
-    NpcInteraction::load(&data.join("npcs"), &data.join("stores.json"))
-        .expect("NPC content loads through the real loader")
-}
-
-fn interact_request(npc_id: u64) -> Vec<u8> {
-    // 26/8 CommandPacketInteractRequest (constructor 0x008b6bc0).
-    let mut packet = vec![26, 0, 8, 0];
-    packet.extend(npc_id.to_le_bytes());
-    packet.push(0);
-    packet
-}
-
-fn select_request(npc_id: u64, choice: i32) -> Vec<u8> {
-    // 26/10 CommandPacketInteractionSelect (constructor 0x00a36f80).
-    let mut packet = vec![26, 0, 10, 0];
-    packet.extend(npc_id.to_le_bytes());
-    packet.extend(choice.to_le_bytes());
-    packet
-}
-
-/// Real Talk selection through the service the router calls.
-fn service_talk_body(service: &mut NpcInteraction, npc_id: u64) -> Option<u32> {
-    let (zone, position) = service
-        .location(npc_id)
-        .unwrap_or_else(|| panic!("NPC {npc_id} has a location"));
-    let menu = service
-        .interact(npc_id, zone, position, None)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} menu: {error:?}"));
-    let talk = menu
-        .options
-        .iter()
-        .find(|option| option.action == NpcAction::Talk)
-        .unwrap_or_else(|| panic!("NPC {npc_id} offers Talk"));
-    let selected = service
-        .select(&select_request(npc_id, talk.id), zone, position, None)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} Talk: {error:?}"));
-    match selected {
-        NpcSelection::Talk(context) => context.body_string_id,
-        _ => panic!("NPC {npc_id} Talk must return dialogue"),
-    }
-}
-
-fn character_at(position: [f32; 3]) -> CharacterState {
-    CharacterState {
-        guid: 101,
-        zone_id: 0,
-        position,
-        rotation: [1.0, 0.0, 0.0],
-    }
-}
-
-/// Real in-world Talk: 26/8 opens the menu, 26/10 selects Talk, and the 26/3 reply is
-/// decoded from the production packet.
-fn gameplay_talk_body(game: &mut Gameplay, file: &str, npc_id: u64) -> u32 {
-    let record = npc_record(file, npc_id);
-    let character = character_at(position(&record, npc_id));
-    let menu = game
-        .handle_in_world(&interact_request(npc_id), &character, 1_000)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} interact: {error}"));
+    let position = npc_position(record, npc_id);
     assert!(
-        menu.replies
-            .iter()
-            .any(|packet| packet.starts_with(&MENU_HEADER)),
-        "NPC {npc_id} must answer 26/8 with a 26/9 menu"
+        position.iter().all(|value| value.is_finite()),
+        "NPC {npc_id}: finite position"
     );
-    let outcome = game
-        .handle_in_world(&select_request(npc_id, 1), &character, 1_100)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} Talk: {error}"));
-    let dialogue = outcome
-        .replies
-        .into_iter()
-        .find(|packet| packet.starts_with(&GREETING_HEADER))
-        .unwrap_or_else(|| panic!("NPC {npc_id} Talk must answer 26/3"));
-    // Body dword follows the four-byte family/subtype header; patch_npc_actor writes
-    // the runtime actor GUID only into bytes 12..20.
-    u32::from_le_bytes(dialogue[4..8].try_into().unwrap())
-}
-
-/// Physical stock-locale rows for the wanted key hashes: line number (1-based) and text.
-fn locale_rows(wanted: &BTreeSet<u32>) -> BTreeMap<u32, (usize, String)> {
-    let path = locale_path();
-    let text =
-        fs::read_to_string(&path).unwrap_or_else(|error| panic!("{}: {error}", path.display()));
-    let mut rows = BTreeMap::new();
-    for (index, line) in text.lines().enumerate() {
-        let mut parts = line.splitn(3, '\t');
-        let (Some(key), Some(_kind), Some(body)) = (parts.next(), parts.next(), parts.next())
-        else {
-            continue;
-        };
-        let Ok(hash) = key.parse::<u32>() else {
-            continue;
-        };
-        if wanted.contains(&hash) {
-            rows.insert(hash, (index + 1, body.to_string()));
-        }
-    }
-    rows
 }
 
 /// The cited guide line. The client evidence pins its physical line; the speaker
@@ -649,12 +485,7 @@ fn every_edited_row_has_resolved_client_provenance() {
         NEW_GREETINGS.len()
     );
     let hash_to_ids = read_json(&lab_report("locale-id-map.json"))["hash_to_ids"].clone();
-    let id_to_text: BTreeMap<u64, String> = read_json(&lab_report("locale-id-to-text.json"))
-        .as_array()
-        .expect("locale-id-to-text rows")
-        .iter()
-        .filter_map(|row| Some((row["id"].as_u64()?, row["text"].as_str()?.to_string())))
-        .collect();
+    let id_to_text = locale_id_to_text();
     let wanted: BTreeSet<u32> = NEW_GREETINGS.iter().map(|row| row.hash).collect();
     let locale = locale_rows(&wanted);
     let mut greeting_ids = BTreeSet::new();
@@ -827,7 +658,7 @@ fn every_edited_row_has_resolved_client_provenance() {
         let record = npc_record(row.file, row.npc_id);
         assert_eq!(
             spawned.get(&row.npc_id),
-            Some(&position(&record, row.npc_id)),
+            Some(&npc_position(&record, row.npc_id)),
             "NPC {}: NpcVisibility must spawn the row at its content position",
             row.npc_id
         );
@@ -836,7 +667,7 @@ fn every_edited_row_has_resolved_client_provenance() {
     // Every unbound drawable row is listed with a reason, and no bound row is.
     let mut unbound = BTreeSet::new();
     for (file, _) in ROW_COUNTS {
-        for record in records(file) {
+        for record in npc_records(file) {
             let npc_id = record["npc_id"].as_u64().expect("npc id");
             let already_greeted = record["greeting_string_id"].as_u64().unwrap_or(0) > 0;
             if is_drawable(&record) && !already_greeted && !edited.contains(&npc_id) {
@@ -919,10 +750,10 @@ fn a_missing_greeting_falls_back_to_no_body() {
         .find(|option| option.action == NpcAction::Talk)
         .expect("the blank NPC offers Talk");
     assert!(matches!(
-        interaction.select(&select_request(BLANK, i32::MAX), zone, position, None),
+        interaction.select(&select(BLANK, i32::MAX as u32), zone, position, None),
         Err(NpcInteractionError::InvalidOption)
     ));
-    match interaction.select(&select_request(BLANK, talk.id), zone, position, None) {
+    match interaction.select(&select(BLANK, talk.id as u32), zone, position, None) {
         Ok(NpcSelection::Talk(context)) => assert_eq!(
             context.body_string_id, None,
             "the refused choice must not consume the menu or inject a body"
@@ -966,7 +797,7 @@ fn the_existing_greetings_and_other_regions_are_unchanged() {
 
     let edited: BTreeSet<u64> = NEW_GREETINGS.iter().map(|row| row.npc_id).collect();
     for (file, expected_rows) in ROW_COUNTS {
-        let rows = records(file);
+        let rows = npc_records(file);
         assert_eq!(rows.len(), expected_rows, "{file}: row count");
         for record in &rows {
             let npc_id = record["npc_id"].as_u64().expect("npc id");

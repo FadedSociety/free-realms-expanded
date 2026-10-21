@@ -11,11 +11,23 @@
 //! `tests/npc_interaction.rs::dialogue_26_3_synthetic_fixture_round_trips_exact_native_field_order`.
 //! Locale ids, JenkinsLookup2 hashes, physical `en_us_data.dat` lines and
 //! speaker proofs are in `notes/Autopilot/T299.md`.
+//!
+//! The packet builders, the talk helpers and the 26/3 body offset live in the
+//! shared `tests/common/npc_greetings.rs` harness. This suite keeps its own
+//! locale row index: T299's `dat_line` pins are the CRLF (`split("\r\n")`)
+//! physical lines, which differ from the harness `str::lines()` index after
+//! the locale's 38 lone-LF records (see the note's T356 section).
 
+#[path = "common/npc_greetings.rs"]
+mod npc_greetings;
+
+use npc_greetings::{
+    GREETING_HEADER, MENU_HEADER, character_at, content_dir, gameplay_dir, gameplay_talk_body,
+    interact, locale_path, npc_position, npc_record, read_json, select, service, service_talk_body,
+};
 use osfr_tools::{
-    character_store::CharacterState,
     gameplay::Gameplay,
-    npc_interaction::{NpcAction, NpcInteraction, NpcInteractionError, NpcSelection},
+    npc_interaction::{NpcAction, NpcInteractionError, NpcSelection},
     world::NpcVisibility,
     world_text::locale_hash,
 };
@@ -23,11 +35,7 @@ use serde_json::Value;
 use std::{
     collections::{BTreeSet, HashMap},
     fs,
-    path::{Path, PathBuf},
 };
-
-const GREETING_HEADER: [u8; 4] = [26, 0, 3, 0];
-const MENU_HEADER: [u8; 4] = [26, 0, 9, 0];
 
 /// One edited row. `hash` is `JenkinsLookup2("Global.Text.<greeting>")`, the
 /// key the stock client locale stores on `dat_line`; `guide_line` is the NPC
@@ -255,135 +263,6 @@ const BLANK_SNOWHILL: u64 = 9500000730;
 /// A legacy-data Greenwood Forest NPC with no recovered greeting.
 const BLANK_GREENWOOD: u64 = 9500000324;
 
-fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
-/// Full server content used by the existing in-world router tests. It has no
-/// `npcs/` or `npc_spawns_extra.json`, so `Gameplay::load` takes the NPC rows
-/// from the bundled `data/content` (the same rows this test edits).
-fn gameplay_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/references/opening-anvil-placement-v1/content")
-}
-
-/// The read-only stock client locale the server content cites.
-fn locale_path() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat")
-}
-
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(
-        &fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
-    )
-    .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-}
-
-fn npc_record(file: &str, npc_id: u64) -> Value {
-    let path = content_dir().join("npcs").join(file);
-    let document = read_json(&path);
-    document["records"]
-        .as_array()
-        .unwrap_or_else(|| panic!("{}: records array", path.display()))
-        .iter()
-        .find(|record| record["npc_id"].as_u64() == Some(npc_id))
-        .unwrap_or_else(|| panic!("{}: NPC {npc_id}", path.display()))
-        .clone()
-}
-
-fn npc_location(file: &str, npc_id: u64) -> [f32; 3] {
-    let record = npc_record(file, npc_id);
-    let position = record["position"]
-        .as_array()
-        .unwrap_or_else(|| panic!("NPC {npc_id} has no position"));
-    assert_eq!(position.len(), 3, "NPC {npc_id} position shape");
-    [
-        position[0].as_f64().expect("x") as f32,
-        position[1].as_f64().expect("y") as f32,
-        position[2].as_f64().expect("z") as f32,
-    ]
-}
-
-fn service() -> NpcInteraction {
-    let data = content_dir();
-    NpcInteraction::load(&data.join("npcs"), &data.join("stores.json"))
-        .expect("NPC content loads through the real loader")
-}
-
-fn interact_request(npc_id: u64) -> Vec<u8> {
-    // 26/8 CommandPacketInteractRequest (constructor 0x008b6bc0).
-    let mut packet = vec![26, 0, 8, 0];
-    packet.extend(npc_id.to_le_bytes());
-    packet.push(0);
-    packet
-}
-
-fn select_request(npc_id: u64, choice: i32) -> Vec<u8> {
-    // 26/10 CommandPacketInteractionSelect (constructor 0x00a36f80).
-    let mut packet = vec![26, 0, 10, 0];
-    packet.extend(npc_id.to_le_bytes());
-    packet.extend(choice.to_le_bytes());
-    packet
-}
-
-/// Real Talk selection through the service the router calls.
-fn service_talk_body(service: &mut NpcInteraction, npc_id: u64) -> Option<u32> {
-    let (zone, position) = service
-        .location(npc_id)
-        .unwrap_or_else(|| panic!("NPC {npc_id} has a location"));
-    let menu = service
-        .interact(npc_id, zone, position, None)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} menu: {error:?}"));
-    let talk = menu
-        .options
-        .iter()
-        .find(|option| option.action == NpcAction::Talk)
-        .unwrap_or_else(|| panic!("NPC {npc_id} offers Talk"));
-    let selected = service
-        .select(&select_request(npc_id, talk.id), zone, position, None)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} Talk: {error:?}"));
-    match selected {
-        NpcSelection::Talk(context) => context.body_string_id,
-        _ => panic!("NPC {npc_id} Talk must return dialogue"),
-    }
-}
-
-fn character_at(position: [f32; 3]) -> CharacterState {
-    CharacterState {
-        guid: 101,
-        zone_id: 0,
-        position,
-        rotation: [1.0, 0.0, 0.0],
-    }
-}
-
-/// Real in-world Talk: 26/8 opens the menu, 26/10 selects Talk, and the 26/3
-/// reply is decoded from the production packet.
-fn gameplay_talk_body(game: &mut Gameplay, file: &str, npc_id: u64) -> u32 {
-    let character = character_at(npc_location(file, npc_id));
-    let menu = game
-        .handle_in_world(&interact_request(npc_id), &character, 1_000)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} interact: {error}"));
-    assert!(
-        menu.replies
-            .iter()
-            .any(|packet| packet.starts_with(&MENU_HEADER)),
-        "NPC {npc_id} must answer 26/8 with a 26/9 menu"
-    );
-    let outcome = game
-        .handle_in_world(&select_request(npc_id, 1), &character, 1_100)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} Talk: {error}"));
-    let dialogue = outcome
-        .replies
-        .into_iter()
-        .find(|packet| packet.starts_with(&GREETING_HEADER))
-        .unwrap_or_else(|| panic!("NPC {npc_id} Talk must answer 26/3"));
-    // Body dword follows the four-byte family/subtype header; patch_npc_actor
-    // writes the runtime actor GUID only into bytes 12..20.
-    u32::from_le_bytes(dialogue[4..8].try_into().unwrap())
-}
-
 fn guide_name(file: &str) -> &'static str {
     match file {
         "snowhill.json" => "NPCs - Snowhill.md",
@@ -392,7 +271,10 @@ fn guide_name(file: &str) -> &'static str {
 }
 
 /// The stock client locale rows for the 20 target hashes, keyed by hash with
-/// the one-based physical line and the client text.
+/// the one-based physical line and the client text. T299 pinned `dat_line` with
+/// the CRLF (`split("\r\n")`) index; after the locale's lone-LF records every
+/// line differs from the harness `str::lines()` index, so this suite keeps its
+/// own lookup rather than `npc_greetings::locale_rows` (T356 note).
 fn locale_rows() -> HashMap<u32, (u32, String)> {
     let path = locale_path();
     let text =
@@ -487,14 +369,14 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
         .id;
     assert!(matches!(
         service.select(
-            &select_request(BLANK_SNOWHILL, i32::MAX),
+            &select(BLANK_SNOWHILL, i32::MAX as u32),
             zone,
             position,
             None
         ),
         Err(NpcInteractionError::InvalidOption)
     ));
-    match service.select(&select_request(BLANK_SNOWHILL, talk), zone, position, None) {
+    match service.select(&select(BLANK_SNOWHILL, talk as u32), zone, position, None) {
         Ok(NpcSelection::Talk(context)) => assert_eq!(
             context.body_string_id, None,
             "the refused choice must not consume the menu"
@@ -517,9 +399,10 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
 
     // Router refusal: an out-of-list 26/10 on Smitty's open dialogue is
     // rejected, and Talk straight afterwards still returns his recovered body.
-    let character = character_at(npc_location("snowhill.json", 9000000206));
+    let smitty = npc_record("snowhill.json", 9000000206);
+    let character = character_at(npc_position(&smitty, 9000000206));
     let menu = game
-        .handle_in_world(&interact_request(9000000206), &character, 2_000)
+        .handle_in_world(&interact(9000000206), &character, 2_000)
         .expect("Smitty menu");
     assert!(
         menu.replies
@@ -527,12 +410,12 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
             .any(|packet| packet.starts_with(&MENU_HEADER))
     );
     assert!(
-        game.handle_in_world(&select_request(9000000206, i32::MAX), &character, 2_100)
+        game.handle_in_world(&select(9000000206, i32::MAX as u32), &character, 2_100)
             .is_err(),
         "an out-of-list choice is refused"
     );
     let after = game
-        .handle_in_world(&select_request(9000000206, 1), &character, 2_200)
+        .handle_in_world(&select(9000000206, 1), &character, 2_200)
         .expect("Talk after the refusal");
     let dialogue = after
         .replies

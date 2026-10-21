@@ -12,23 +12,24 @@
 //!
 //! The service path (`NpcInteraction::interact` -> `select`) is the same one `gameplay/npc.rs`
 //! uses; the dispatch path (`Gameplay::handle_in_world`) drives the real router and
-//! `dialogue_packet_with`.
+//! `dialogue_packet_with`. The packet builders, the locale row convention and the 26/3 body
+//! offset live in the shared `tests/common/npc_greetings.rs` harness.
 
+#[path = "common/npc_greetings.rs"]
+mod npc_greetings;
+
+use npc_greetings::{
+    GREETING_HEADER, character_at, content_dir, gameplay_dir, gameplay_talk_body, interact,
+    lab_report, locale_id_to_text, locale_rows, npc_position, npc_record, npc_records, read_json,
+    select, service, service_talk_body,
+};
 use osfr_tools::{
-    character_store::CharacterState,
     gameplay::Gameplay,
-    npc_interaction::{NpcAction, NpcInteraction, NpcInteractionError, NpcSelection},
+    npc_interaction::{NpcAction, NpcInteractionError, NpcSelection},
     world::NpcVisibility,
 };
 use serde_json::Value;
-use std::{
-    collections::{BTreeMap, BTreeSet},
-    fs,
-    path::{Path, PathBuf},
-};
-
-const GREETING_HEADER: [u8; 4] = [26, 0, 3, 0];
-const MENU_HEADER: [u8; 4] = [26, 0, 9, 0];
+use std::collections::{BTreeMap, BTreeSet};
 
 const SANCTUARY_GUIDE: &str = "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md";
 const FARNUM_GUIDE: &str = "notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md";
@@ -235,63 +236,6 @@ const GREETER: u64 = 9500000438; // Anura, ambient
 /// An untouched legacy-data Sanctuary row with no recovered greeting.
 const BLANK: u64 = 9500000443; // Barin Battlerock
 
-fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
-/// Full server content used by the existing in-world router tests. It has no `npcs/` or
-/// `npc_spawns_extra.json`, so `Gameplay::load` takes the NPC rows from the bundled
-/// `data/content` (the same rows this test edits).
-fn gameplay_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/references/opening-anvil-placement-v1/content")
-}
-
-/// Stock 2014 client locale. `hash_to_ids` in `lab/reports/locale-id-map.json` was built from it;
-/// this test re-derives each key instead of trusting an export.
-fn locale_path() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat")
-}
-
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(
-        &fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
-    )
-    .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-}
-
-fn sanctuary_records() -> Vec<Value> {
-    let path = content_dir().join("npcs/sanctuary.json");
-    read_json(&path)["records"]
-        .as_array()
-        .unwrap_or_else(|| panic!("{}: records array", path.display()))
-        .clone()
-}
-
-fn npc_record(file: &str, npc_id: u64) -> Value {
-    let path = content_dir().join("npcs").join(file);
-    read_json(&path)["records"]
-        .as_array()
-        .unwrap_or_else(|| panic!("{}: records array", path.display()))
-        .iter()
-        .find(|record| record["npc_id"].as_u64() == Some(npc_id))
-        .unwrap_or_else(|| panic!("{}: NPC {npc_id}", path.display()))
-        .clone()
-}
-
-fn npc_position(record: &Value, npc_id: u64) -> [f32; 3] {
-    let position = record["position"]
-        .as_array()
-        .unwrap_or_else(|| panic!("NPC {npc_id} has no position"));
-    assert_eq!(position.len(), 3, "NPC {npc_id} position shape");
-    [
-        position[0].as_f64().expect("x") as f32,
-        position[1].as_f64().expect("y") as f32,
-        position[2].as_f64().expect("z") as f32,
-    ]
-}
-
 fn roles(record: &Value) -> BTreeSet<&str> {
     record["roles"]
         .as_array()
@@ -301,118 +245,9 @@ fn roles(record: &Value) -> BTreeSet<&str> {
         .collect()
 }
 
-fn service() -> NpcInteraction {
-    let data = content_dir();
-    NpcInteraction::load(&data.join("npcs"), &data.join("stores.json"))
-        .expect("NPC content loads through the real loader")
-}
-
-fn interact_request(npc_id: u64) -> Vec<u8> {
-    // 26/8 CommandPacketInteractRequest (constructor 0x008b6bc0).
-    let mut packet = vec![26, 0, 8, 0];
-    packet.extend(npc_id.to_le_bytes());
-    packet.push(0);
-    packet
-}
-
-fn select_request(npc_id: u64, choice: i32) -> Vec<u8> {
-    // 26/10 CommandPacketInteractionSelect (constructor 0x00a36f80).
-    let mut packet = vec![26, 0, 10, 0];
-    packet.extend(npc_id.to_le_bytes());
-    packet.extend(choice.to_le_bytes());
-    packet
-}
-
-/// Real 26/8 + 26/10 through the service the router calls; returns the 26/3 body id.
-fn service_talk_body(service: &mut NpcInteraction, npc_id: u64) -> Option<u32> {
-    let (zone, position) = service
-        .location(npc_id)
-        .unwrap_or_else(|| panic!("NPC {npc_id} has a location"));
-    let menu = service
-        .interact(npc_id, zone, position, None)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} menu: {error:?}"));
-    let talk = menu
-        .options
-        .iter()
-        .find(|option| option.action == NpcAction::Talk)
-        .unwrap_or_else(|| panic!("NPC {npc_id} offers Talk"));
-    let selected = service
-        .select(&select_request(npc_id, talk.id), zone, position, None)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} Talk: {error:?}"));
-    match selected {
-        NpcSelection::Talk(context) => context.body_string_id,
-        _ => panic!("NPC {npc_id} Talk must return dialogue"),
-    }
-}
-
-fn character_at(position: [f32; 3]) -> CharacterState {
-    CharacterState {
-        guid: 101,
-        zone_id: 0,
-        position,
-        rotation: [1.0, 0.0, 0.0],
-    }
-}
-
-/// Real in-world Talk: 26/8 opens the menu, 26/10 selects Talk, and the 26/3 reply is decoded
-/// from the production packet.
-fn gameplay_talk_body(game: &mut Gameplay, npc_id: u64, position: [f32; 3]) -> u32 {
-    let character = character_at(position);
-    let menu = game
-        .handle_in_world(&interact_request(npc_id), &character, 1_000)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} interact: {error}"));
-    assert!(
-        menu.replies
-            .iter()
-            .any(|packet| packet.starts_with(&MENU_HEADER)),
-        "NPC {npc_id} must answer 26/8 with a 26/9 menu"
-    );
-    let outcome = game
-        .handle_in_world(&select_request(npc_id, 1), &character, 1_100)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} Talk: {error}"));
-    let dialogue = outcome
-        .replies
-        .into_iter()
-        .find(|packet| packet.starts_with(&GREETING_HEADER))
-        .unwrap_or_else(|| panic!("NPC {npc_id} Talk must answer 26/3"));
-    // Body dword follows the four-byte family/subtype header; patch_npc_actor writes the runtime
-    // actor GUID only into bytes 12..20.
-    u32::from_le_bytes(dialogue[4..8].try_into().unwrap())
-}
-
-/// A generated lab report used by the T246/T280 resolution method (outside the repository, like the
-/// client locale `locale_path` reads).
-fn lab_report(name: &str) -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/reports")
-        .join(name)
-}
-
-/// Physical stock-locale rows for the wanted key hashes: line number (1-based) and text.
-fn locale_rows(wanted: &BTreeSet<u32>) -> BTreeMap<u32, (usize, String)> {
-    let path = locale_path();
-    let text =
-        fs::read_to_string(&path).unwrap_or_else(|error| panic!("{}: {error}", path.display()));
-    let mut rows = BTreeMap::new();
-    for (index, line) in text.lines().enumerate() {
-        let mut parts = line.splitn(3, '\t');
-        let (Some(key), Some(_kind), Some(body)) = (parts.next(), parts.next(), parts.next())
-        else {
-            continue;
-        };
-        let Ok(hash) = key.parse::<u32>() else {
-            continue;
-        };
-        if wanted.contains(&hash) {
-            rows.insert(hash, (index + 1, body.to_string()));
-        }
-    }
-    rows
-}
-
 #[test]
 fn the_new_rows_have_nonzero_greetings_and_real_sources() {
-    let records = sanctuary_records();
+    let records = npc_records("sanctuary.json");
     let by_id: BTreeMap<u64, &Value> = records
         .iter()
         .map(|record| (record["npc_id"].as_u64().expect("npc id"), record))
@@ -420,12 +255,7 @@ fn the_new_rows_have_nonzero_greetings_and_real_sources() {
     let wanted: BTreeSet<u32> = NEW_GREETINGS.iter().map(|row| row.hash).collect();
     let locale = locale_rows(&wanted);
     let hash_to_ids = read_json(&lab_report("locale-id-map.json"))["hash_to_ids"].clone();
-    let id_to_text: BTreeMap<u64, String> = read_json(&lab_report("locale-id-to-text.json"))
-        .as_array()
-        .expect("locale-id-to-text rows")
-        .iter()
-        .filter_map(|row| Some((row["id"].as_u64()?, row["text"].as_str()?.to_string())))
-        .collect();
+    let id_to_text = locale_id_to_text();
     let mut greeting_ids = BTreeSet::new();
     for row in &NEW_GREETINGS {
         assert!(
@@ -544,15 +374,10 @@ fn a_bound_npc_sends_its_greeting_in_26_3() {
     }
 
     // Dispatch path: gateway -> Gameplay -> gameplay/npc.rs -> dialogue_packet_with.
-    let records: BTreeMap<u64, Value> = sanctuary_records()
-        .into_iter()
-        .map(|record| (record["npc_id"].as_u64().expect("npc id"), record))
-        .collect();
     let mut game = Gameplay::load(&gameplay_dir(), None).expect("gameplay content loads");
     for row in &NEW_GREETINGS {
-        let position = npc_position(&records[&row.npc_id], row.npc_id);
         assert_eq!(
-            gameplay_talk_body(&mut game, row.npc_id, position),
+            gameplay_talk_body(&mut game, "sanctuary.json", row.npc_id),
             row.greeting,
             "NPC {}: 26/3 body dword",
             row.npc_id
@@ -611,10 +436,10 @@ fn a_refused_choice_leaves_the_menu_usable() {
     // Invalid choice id: refused, and the still-open menu must select Talk directly afterwards
     // with no second `interact` (the T246 review blocker).
     assert!(matches!(
-        service.select(&select_request(npc_id, i32::MAX), zone, position, None),
+        service.select(&select(npc_id, i32::MAX as u32), zone, position, None),
         Err(NpcInteractionError::InvalidOption)
     ));
-    match service.select(&select_request(npc_id, talk), zone, position, None) {
+    match service.select(&select(npc_id, talk as u32), zone, position, None) {
         Ok(NpcSelection::Talk(context)) => assert_eq!(
             context.body_string_id,
             Some(greeting),
@@ -628,10 +453,10 @@ fn a_refused_choice_leaves_the_menu_usable() {
         Err(NpcInteractionError::InvalidPacket)
     ));
     assert!(matches!(
-        service.select(&select_request(9_999_999_999, talk), zone, position, None),
+        service.select(&select(9_999_999_999, talk as u32), zone, position, None),
         Err(NpcInteractionError::UnknownNpc)
     ));
-    match service.select(&select_request(npc_id, talk), zone, position, None) {
+    match service.select(&select(npc_id, talk as u32), zone, position, None) {
         Ok(NpcSelection::Talk(context)) => assert_eq!(context.body_string_id, Some(greeting)),
         _ => panic!("refusals must change nothing"),
     }
@@ -639,15 +464,15 @@ fn a_refused_choice_leaves_the_menu_usable() {
     // The real dispatch path behaves the same: an invalid choice is an error, not a menu reset.
     let mut game = Gameplay::load(&gameplay_dir(), None).expect("gameplay content loads");
     let character = character_at(npc_position(&npc_record("sanctuary.json", npc_id), npc_id));
-    game.handle_in_world(&interact_request(npc_id), &character, 2_000)
+    game.handle_in_world(&interact(npc_id), &character, 2_000)
         .expect("in-world interact");
     assert!(
-        game.handle_in_world(&select_request(npc_id, i32::MAX), &character, 2_100)
+        game.handle_in_world(&select(npc_id, i32::MAX as u32), &character, 2_100)
             .is_err(),
         "an invalid 26/10 choice must be refused"
     );
     let outcome = game
-        .handle_in_world(&select_request(npc_id, 1), &character, 2_200)
+        .handle_in_world(&select(npc_id, 1), &character, 2_200)
         .expect("the menu must survive the refusal");
     assert_eq!(
         u32::from_le_bytes(
@@ -689,10 +514,10 @@ fn a_missing_or_zero_greeting_still_falls_back() {
         .expect("the blank NPC offers Talk")
         .id;
     assert!(matches!(
-        service.select(&select_request(BLANK, i32::MAX), zone, position, None),
+        service.select(&select(BLANK, i32::MAX as u32), zone, position, None),
         Err(NpcInteractionError::InvalidOption)
     ));
-    match service.select(&select_request(BLANK, talk), zone, position, None) {
+    match service.select(&select(BLANK, talk as u32), zone, position, None) {
         Ok(NpcSelection::Talk(context)) => assert_eq!(
             context.body_string_id, None,
             "a zero/missing greeting is absent, not a fabricated id"
@@ -701,13 +526,13 @@ fn a_missing_or_zero_greeting_still_falls_back() {
     }
 
     // The real router still encodes 26/3 with a zero body, and no bound body is a name id.
-    let records: BTreeMap<u64, Value> = sanctuary_records()
+    let records: BTreeMap<u64, Value> = npc_records("sanctuary.json")
         .into_iter()
         .map(|record| (record["npc_id"].as_u64().expect("npc id"), record))
         .collect();
     let mut game = Gameplay::load(&gameplay_dir(), None).expect("gameplay content loads");
     assert_eq!(
-        gameplay_talk_body(&mut game, BLANK, npc_position(&blank, BLANK)),
+        gameplay_talk_body(&mut game, "sanctuary.json", BLANK),
         0,
         "no invented locale id"
     );
@@ -729,7 +554,7 @@ fn every_edited_row_is_drawable_and_no_other_row_changed() {
         .into_iter()
         .map(|target| (target.guid, target.position))
         .collect();
-    let records = sanctuary_records();
+    let records = npc_records("sanctuary.json");
     let by_id: BTreeMap<u64, &Value> = records
         .iter()
         .map(|record| (record["npc_id"].as_u64().expect("npc id"), record))

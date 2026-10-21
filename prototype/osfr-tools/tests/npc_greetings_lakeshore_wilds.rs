@@ -10,22 +10,24 @@
 //! `tests/npc_interaction.rs::dialogue_26_3_synthetic_fixture_round_trips_exact_native_field_order`.
 //! Locale ids, hashes, dat lines and speaker proofs are in
 //! `notes/Research/NPC Greetings Lakeshore and Wilds.md`.
+//!
+//! The packet builders, the locale line convention and the 26/3 body offset
+//! live in the shared `tests/common/npc_greetings.rs` harness.
 
+#[path = "common/npc_greetings.rs"]
+mod npc_greetings;
+
+use npc_greetings::{
+    content_dir, gameplay_dir, gameplay_talk_body, npc_position, npc_record, read_json, select,
+    service, service_talk_body,
+};
 use osfr_tools::{
-    character_store::CharacterState,
     gameplay::Gameplay,
-    npc_interaction::{NpcAction, NpcInteraction, NpcInteractionError, NpcSelection},
+    npc_interaction::{NpcAction, NpcInteractionError, NpcSelection},
     world::NpcVisibility,
 };
 use serde_json::Value;
-use std::{
-    collections::BTreeSet,
-    fs,
-    path::{Path, PathBuf},
-};
-
-const GREETING_HEADER: [u8; 4] = [26, 0, 3, 0];
-const MENU_HEADER: [u8; 4] = [26, 0, 9, 0];
+use std::{collections::BTreeSet, fs};
 
 /// (npc id, content file, greeting id, locale hash, en_us_data.dat line,
 ///  proof guide, guide line, content quest (file, id) for the offer speech)
@@ -252,128 +254,6 @@ const BLANK: u64 = 9500000364;
 const LAKESHORE_RECORDS: usize = 39;
 const WILDS_RECORDS: usize = 118;
 
-fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
-/// Full server content used by the existing in-world router tests. It has no
-/// `npcs/` directory, so `Gameplay::load` takes the NPC rows from the bundled
-/// `data/content` (the same rows this test edits).
-fn gameplay_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/references/opening-anvil-placement-v1/content")
-}
-
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(
-        &fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
-    )
-    .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-}
-
-fn npc_record(file: &str, npc_id: u64) -> Value {
-    let path = content_dir().join("npcs").join(file);
-    let document = read_json(&path);
-    document["records"]
-        .as_array()
-        .unwrap_or_else(|| panic!("{}: records array", path.display()))
-        .iter()
-        .find(|record| record["npc_id"].as_u64() == Some(npc_id))
-        .unwrap_or_else(|| panic!("{}: NPC {npc_id}", path.display()))
-        .clone()
-}
-
-fn npc_location(file: &str, npc_id: u64) -> [f32; 3] {
-    let record = npc_record(file, npc_id);
-    let position = record["position"]
-        .as_array()
-        .unwrap_or_else(|| panic!("NPC {npc_id} has no position"));
-    assert_eq!(position.len(), 3, "NPC {npc_id} position shape");
-    [
-        position[0].as_f64().expect("x") as f32,
-        position[1].as_f64().expect("y") as f32,
-        position[2].as_f64().expect("z") as f32,
-    ]
-}
-
-fn service() -> NpcInteraction {
-    let data = content_dir();
-    NpcInteraction::load(&data.join("npcs"), &data.join("stores.json"))
-        .expect("NPC content loads through the real loader")
-}
-
-fn interact_request(npc_id: u64) -> Vec<u8> {
-    // 26/8 CommandPacketInteractRequest (constructor 0x008b6bc0).
-    let mut packet = vec![26, 0, 8, 0];
-    packet.extend(npc_id.to_le_bytes());
-    packet.push(0);
-    packet
-}
-
-fn select_request(npc_id: u64, choice: i32) -> Vec<u8> {
-    // 26/10 CommandPacketInteractionSelect (constructor 0x00a36f80).
-    let mut packet = vec![26, 0, 10, 0];
-    packet.extend(npc_id.to_le_bytes());
-    packet.extend(choice.to_le_bytes());
-    packet
-}
-
-fn service_talk_body(service: &mut NpcInteraction, npc_id: u64) -> Option<u32> {
-    let (zone, position) = service
-        .location(npc_id)
-        .unwrap_or_else(|| panic!("NPC {npc_id} has a location"));
-    let menu = service
-        .interact(npc_id, zone, position, None)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} menu: {error:?}"));
-    let talk = menu
-        .options
-        .iter()
-        .find(|option| option.action == NpcAction::Talk)
-        .unwrap_or_else(|| panic!("NPC {npc_id} offers Talk"));
-    let selected = service
-        .select(&select_request(npc_id, talk.id), zone, position, None)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} Talk: {error:?}"));
-    match selected {
-        NpcSelection::Talk(context) => context.body_string_id,
-        _ => panic!("NPC {npc_id} Talk must return dialogue"),
-    }
-}
-
-fn character_at(position: [f32; 3]) -> CharacterState {
-    CharacterState {
-        guid: 101,
-        zone_id: 0,
-        position,
-        rotation: [1.0, 0.0, 0.0],
-    }
-}
-
-/// Real in-world Talk: 26/8 opens the menu, 26/10 selects Talk, and the 26/3
-/// reply is decoded from the production packet.
-fn gameplay_talk_body(game: &mut Gameplay, file: &str, npc_id: u64) -> u32 {
-    let character = character_at(npc_location(file, npc_id));
-    let menu = game
-        .handle_in_world(&interact_request(npc_id), &character, 1_000)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} interact: {error}"));
-    assert!(
-        menu.replies
-            .iter()
-            .any(|packet| packet.starts_with(&MENU_HEADER)),
-        "NPC {npc_id} must answer 26/8 with a 26/9 menu"
-    );
-    let outcome = game
-        .handle_in_world(&select_request(npc_id, 1), &character, 1_100)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} Talk: {error}"));
-    let dialogue = outcome
-        .replies
-        .into_iter()
-        .find(|packet| packet.starts_with(&GREETING_HEADER))
-        .unwrap_or_else(|| panic!("NPC {npc_id} Talk must answer 26/3"));
-    // Body dword follows the four-byte family/subtype header; patch_npc_actor
-    // writes the runtime actor GUID only into bytes 12..20.
-    u32::from_le_bytes(dialogue[4..8].try_into().unwrap())
-}
-
 fn assert_drawable(record: &Value, npc_id: u64) {
     assert!(
         record["position"]
@@ -541,10 +421,10 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
         .find(|option| option.action == NpcAction::Talk)
         .expect("the blank NPC offers Talk");
     assert!(matches!(
-        service.select(&select_request(BLANK, i32::MAX), zone, position, None),
+        service.select(&select(BLANK, i32::MAX as u32), zone, position, None),
         Err(NpcInteractionError::InvalidOption)
     ));
-    match service.select(&select_request(BLANK, talk.id), zone, position, None) {
+    match service.select(&select(BLANK, talk.id as u32), zone, position, None) {
         Ok(NpcSelection::Talk(context)) => assert_eq!(
             context.body_string_id, None,
             "the refused choice must not consume the menu or inject a body"
@@ -570,7 +450,7 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
 fn the_target_rows_are_spawned_and_non_target_rows_are_unchanged() {
     let mut visibility = NpcVisibility::load(&content_dir()).expect("NPC visibility loads");
     for (npc_id, file, _, _, _, _, _, _) in NEW_GREETINGS {
-        let position = npc_location(file, npc_id);
+        let position = npc_position(&npc_record(file, npc_id), npc_id);
         // Clear the previous interest set, then look from this NPC's own feet so
         // it is the nearest candidate (distance 0).
         visibility.update(999, [0.0; 3]).unwrap();
