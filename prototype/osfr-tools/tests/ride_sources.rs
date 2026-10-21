@@ -104,6 +104,10 @@ fn every_ride_is_sold_by_a_vendor_inside_the_price_bounds() {
                 row["purchase_price_coins"].is_null(),
                 "ride item {id} still has a coin price"
             );
+            assert!(
+                row["member_price_coins"].is_null(),
+                "ride item {id} still has a member coin price"
+            );
             assert!(row["sell_price_coins"].is_null());
             assert_eq!(row["no_sale"], true);
         }

@@ -250,7 +250,6 @@ pub struct Gameplay {
     /// W162: a field enemy is chasing this player (from the last `receive_field_damage`). This is
     /// the "combat start" signal for rides; set by the shared field tick and never saved.
     field_engaged: bool,
-    trading: bool, // T230: trade busy, derived per request; session-only, never saved.
     /// W177: the saved pet roster and session-only active actor. The roster stays in the
     /// canonical save's top-level `pets` payload; only the actor is reset on reconnect.
     pets: crate::pets::PetService,
@@ -1153,11 +1152,14 @@ impl Gameplay {
             item_bar,
             mounts,
             field_engaged: false,
-            trading: false,
             pets: crate::pets::PetService::new(crate::pets::PetService::bundled_content()?)?,
             progression_extras,
             achievement_bindings,
-            housing: housing::HousingSession::load(directory, saved_housing.as_ref(), inventory.state())?,
+            housing: housing::HousingSession::load(
+                directory,
+                saved_housing.as_ref(),
+                inventory.state(),
+            )?,
             inventory,
             categories: ItemCategories::load(directory)?,
             quests: QuestEngine::load(directory, quests)?,
@@ -1692,7 +1694,10 @@ impl Gameplay {
         now_ms: u64,
     ) -> io::Result<Outcome> {
         if let Some(replies) = self.housing_loaded() {
-            return Ok(Outcome { replies, ..Outcome::default() });
+            return Ok(Outcome {
+                replies,
+                ..Outcome::default()
+            });
         }
         if let Some(soccer) = self.soccer.as_mut() {
             return Ok(Outcome {

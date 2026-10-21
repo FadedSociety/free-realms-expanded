@@ -247,6 +247,57 @@ fn marketplace_purchase_is_disabled_and_does_not_change_inventory() {
 }
 
 #[test]
+fn station_cash_row_with_a_member_coin_price_is_rejected() {
+    // The two currencies never meet in one row: a Station Cash row may not carry any coin price,
+    // including the member price the coin-shop `buy_once` would otherwise use.
+    let directory = std::env::temp_dir().join(format!("osfr-f324-{}", std::process::id()));
+    std::fs::create_dir_all(&directory).unwrap();
+    let row = |member_price_coins: Option<u32>| {
+        serde_json::json!({
+            "item_id": 14289,
+            "purchase_price_coins": null,
+            "member_discount_percent": null,
+            "member_price_coins": member_price_coins,
+            "sell_price_coins": null,
+            "no_sale": true,
+            "sc_price": 10
+        })
+    };
+    let catalogue = |items: serde_json::Value| {
+        serde_json::json!({
+            "schema_version": 1,
+            "marketplace": {
+                "enabled_on_handshake": false,
+                "orders_enabled": false,
+                "payment_sources_enabled": false,
+                "not_available_message": "disabled"
+            },
+            "items": items
+        })
+    };
+    let path = directory.join("stores.json");
+    std::fs::write(
+        &path,
+        serde_json::to_vec(&catalogue(serde_json::json!([row(Some(5))]))).unwrap(),
+    )
+    .unwrap();
+    assert!(
+        StoreCatalogue::load(&path).is_err(),
+        "an SC row with a member coin price must be rejected"
+    );
+    std::fs::write(
+        &path,
+        serde_json::to_vec(&catalogue(serde_json::json!([row(None)]))).unwrap(),
+    )
+    .unwrap();
+    assert!(
+        StoreCatalogue::load(&path).is_ok(),
+        "the same row without a coin price loads"
+    );
+    std::fs::remove_dir_all(&directory).unwrap();
+}
+
+#[test]
 fn marketplace_handshake_replies_and_keeps_payment_sources_off() {
     let directory = inventory_content();
     let mut shop = shop(

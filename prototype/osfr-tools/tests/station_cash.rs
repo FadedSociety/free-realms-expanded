@@ -142,6 +142,19 @@ fn order_packet_matches_the_client_writer() {
     truncated_extra.push(b'x');
     assert!(station_cash::decode_order(&truncated_extra, true).is_err());
 
+    // The client's order debug string (`0x01843730`) names the fields customerUserKey,
+    // recipientUserKey, orderTrackingId, customerLocaleString and couponCode in this order. The
+    // Lua `CreateNewOrder` binding (`sub_C039F0`) substitutes the local player for the self
+    // sentinel, and `sub_B376D0` writes the local player to customer and the requested player to
+    // recipient, so an ordinary self-order repeats the customer key. Only a different recipient
+    // is a gift.
+    let self_order = order_packet(3, 14, RIDE_ITEM as u32, STORE, 1, "42", "42", "", "0");
+    let decoded = station_cash::decode_order(&self_order, false).expect("self order parses");
+    assert!(!decoded.gift && !decoded.coupon);
+    let gift = order_packet(3, 15, RIDE_ITEM as u32, STORE, 1, "42", "43", "", "0");
+    let decoded = station_cash::decode_order(&gift, false).expect("gift order parses");
+    assert!(decoded.gift && !decoded.coupon);
+
     // Trailing bytes, a hostile string length and too many details are malformed, not orders.
     let mut trailing = buy(9);
     trailing.push(0);
@@ -277,11 +290,13 @@ fn refusals_change_nothing() {
         assert_eq!(snapshot(&shop), before, "{label}");
     }
 
-    // The shared busy table refuses the order before any state is staged.
+    // The shared busy table refuses the order before any state is staged. `handle_marketplace`
+    // takes that answer as an argument, so there is no second flag to keep in sync.
     let mut busy = new_shop(wallet(200), usize::MAX);
-    busy.set_busy(true);
     let before = snapshot(&busy);
-    let outcome = busy.handle(&buy(88)).expect("order parses");
+    let outcome = busy
+        .handle_marketplace(&buy(88), true)
+        .expect("order parses");
     assert_eq!(outcome.result_code, station_cash::ORDER_FAILURE);
     assert_eq!(snapshot(&busy), before);
 
@@ -372,7 +387,8 @@ fn wallet_survives_serde_and_restores_under_the_data_ceiling() {
 /// `piece_096`/`Inventory::trade_flags`). Ride rows are absent from the 302-row shipped
 /// `ItemDefinitions.txt` and from the captured client rows, so this is Legacy-sourced catalogue
 /// data, not a packet capture; T230 keeps the existing trade gate's refusal rather than
-/// overriding item data. The lead owns any decision to make goal B work.
+/// overriding item data. Goal B (tradeable SC rides) is explicitly deferred to the lead's economy
+/// decision (F324 review item 9), not silently claimed.
 #[test]
 fn bought_ride_catalogue_row_is_no_trade() {
     let mut shop = new_shop(wallet(200), usize::MAX);
@@ -405,11 +421,9 @@ fn catalogue_packets_carry_the_scaled_price_and_skip_earn_only() {
         .iter()
         .find(|packet| packet.starts_with(&[66, 0, 5, 0]))
         .expect("store packet");
-    // 66/5: inner type, store id, store definition. Find the listed bundle's price word by
-    // scanning the exact record built from the catalogue (the price is the eighth field of the
-    // bundle record after the two image strings).
-    assert!(contains_u32(store, RIDE_ITEM as u32));
-    assert!(contains_u32(store, RIDE_PRICE));
+    // The exact field positions (including the listed price) are asserted by
+    // `store_packet_matches_the_client_reader_field_for_field`; this test only checks the
+    // catalogue-level rules: the earn-only row is absent and every navigation packet is pushed.
     assert!(!contains_u32(store, EARN_ONLY_ITEM as u32));
     assert!(
         packets
@@ -480,9 +494,9 @@ impl<'a> Reader<'a> {
 
 /// T230: the 66/5 store packet is walked field by field in the exact order of the client readers
 /// `00b48700` -> `00b2dfd0` -> `00b45340` -> `00b2ea50` -> `00b43170` -> `00b41860` ->
-/// `00b3da50` -> `00b2ea50` -> `00b370d0` -> `00b2f390` -> `00b3fa00` -> `00b3da50`. The
-/// `00b3fa00` tail is the part a scan-for-a-u32 test cannot catch; a short record misaligns every
-/// following bundle, so the last byte must be consumed exactly.
+/// `00b3da50` -> `00b2ea50` -> `00b370d0` -> `00b2f390` -> `00b3fa00` -> `00b41860`'s ten-field
+/// continuation. The tail after `00b3fa00` is the part a scan-for-a-u32 test cannot catch; a short
+/// record misaligns every following bundle, so the last byte must be consumed exactly.
 #[test]
 fn store_packet_matches_the_client_reader_field_for_field() {
     let shop = new_shop(Wallet::default(), usize::MAX);
@@ -491,6 +505,12 @@ fn store_packet_matches_the_client_reader_field_for_field() {
         .iter()
         .find(|packet| packet.starts_with(&[66, 0, 5, 0]))
         .expect("66/5 store packet");
+    // Header (4) + inner type, store id and the store definition (two strings) + bundle count:
+    // 36 bytes. Every bundle is a u32 map key plus a 181-byte record (definition 106, `00b3fa00`
+    // tail 44, `00b41860` continuation 31). Assert the exact reader size as well as walking it, so
+    // a field added to or dropped from the writer cannot pass by ending where the test stops.
+    let listings = shop.sc_catalogue().listings();
+    assert_eq!(store.len(), 36 + listings.len() * 185, "66/5 packet size");
     let mut reader = Reader {
         bytes: store,
         at: 0,
@@ -510,11 +530,10 @@ fn store_packet_matches_the_client_reader_field_for_field() {
     );
     reader.string();
     reader.string();
-    let listings = shop.sc_catalogue().listings();
     assert_eq!(reader.u32() as usize, listings.len(), "bundle map count");
     for listing in listings {
         assert_eq!(reader.u32(), listing.bundle_id, "bundle map key");
-        // MarketingBundleDefinition.
+        // MarketingBundleDefinition (`00b3da50`).
         assert_eq!(reader.u32(), listing.bundle_id, "bundle id");
         assert_eq!(reader.u32(), listing.name_id, "name id");
         reader.u32();
@@ -534,13 +553,14 @@ fn store_packet_matches_the_client_reader_field_for_field() {
         reader.u8();
         reader.u64();
         reader.u64();
+        // Counted entry list (`00b370d0`).
         assert_eq!(reader.u32(), 1, "one entry");
         assert_eq!(reader.u32(), 1, "quantity");
         assert_eq!(reader.u32(), listing.item_id as u32, "game item id");
         assert_eq!(reader.u32(), listing.item_id as u32, "marketing item id");
         reader.string();
-        // StoreBundleDefinition: StoreId, CategoryGroupId, visible, then eight u32 and three
-        // bytes (`00b3fa00`).
+        // StoreBundleDefinition tail (`00b3fa00`): StoreId, CategoryGroupId, visible, then eight
+        // u32 and three bytes.
         assert_eq!(reader.u32(), config.store_id);
         assert_eq!(reader.u32(), config.category_group_id);
         reader.u8();
@@ -555,6 +575,17 @@ fn store_packet_matches_the_client_reader_field_for_field() {
         reader.u8();
         reader.u8();
         reader.u8();
+        // `00b41860` continuation: u32, u32, u8, u32, u32, u32, u8, u8, u32, u32 (31 bytes).
+        assert_eq!(reader.u32(), 0, "00b41860 field 1");
+        assert_eq!(reader.u32(), 0, "00b41860 field 2");
+        assert_eq!(reader.u8(), 0, "00b41860 field 3");
+        assert_eq!(reader.u32(), 0, "00b41860 field 4");
+        assert_eq!(reader.u32(), 0, "00b41860 field 5");
+        assert_eq!(reader.u32(), 0, "00b41860 field 6");
+        assert_eq!(reader.u8(), 0, "00b41860 field 7");
+        assert_eq!(reader.u8(), 0, "00b41860 field 8");
+        assert_eq!(reader.u32(), 0, "00b41860 field 9");
+        assert_eq!(reader.u32(), 0, "00b41860 field 10");
     }
     assert_eq!(
         reader.at,

@@ -21,9 +21,12 @@
 //! * The catalogue is the 66/5 full-store message: a u32 inner type 1, a u32 store id, then the
 //!   store (three u32 ids, two image strings and a keyed bundle map). The bundle record is read by
 //!   `00b48700` -> `00b2dfd0`/`00b45340`/`00b43170`/`00b41860`/`00b3da50`/`00b370d0`; the field
-//!   order below follows that reader. Its field *names* (price, currency type, limits) are
-//!   reconstructed from the community packet catalogue and the client's data-source column table
-//!   `00997840` and are labelled (R).
+//!   order below follows that reader. `00b43170` reads one map key then `00b41860` per entry;
+//!   `00b41860` calls `00b3fa00` and then reads ten more fields (u32, u32, u8, u32, u32, u32, u8,
+//!   u8, u32, u32), which are written as zeros (R). An earlier T230 writer stopped after the
+//!   `00b3fa00` tail and was 31 bytes short per bundle. The field *names* (price, currency type,
+//!   limits) are reconstructed from the community packet catalogue and the client's data-source
+//!   column table `00997840` and are labelled (R).
 //! * Category tree 66/7 (`00b48040`/`00b43090`), category groups 66/6 (`00b44d70`/`00b3ad20`) and
 //!   bundle groups 66/9 (`00b45560`/`00b3d770`/`00b36bb0`) make the store navigable; the store
 //!   screen sends 66/12 (server status), so the catalogue is pushed after the 66/13 status reply
@@ -254,6 +257,10 @@ impl Catalogue {
 }
 
 /// One successfully paid order, persisted with the wallet so a reconnect cannot pay it twice.
+///
+/// The client's tracking id comes from a process-global counter that starts at 1 each time the
+/// client runs (`00b28360`); a restarted client can legitimately reuse an id, so the replay key is
+/// the whole order (id, store, bundle, quantity, tint), never the id alone.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct OrderRecord {
@@ -408,7 +415,7 @@ pub fn decode_order(inner: &[u8], preview: bool) -> io::Result<OrderRequest> {
 /// Price and validate an order without changing anything; 66/2 reply.
 pub fn preview(catalogue: &Catalogue, wallet: &Wallet, order: &OrderRequest) -> OrderOutcome {
     let (result, total) = match price(catalogue, wallet, order) {
-        Ok((_, _, total)) => (ORDER_SUCCESS, total),
+        Ok((_, _, total, _)) => (ORDER_SUCCESS, total),
         Err(result) => (result, 0),
     };
     OrderOutcome {
@@ -430,12 +437,12 @@ pub fn place_order(
     if busy {
         return refusal(order, ORDER_FAILURE);
     }
-    let (listing, detail, total) = match price(catalogue, wallet, order) {
+    let (listing, detail, total, replay) = match price(catalogue, wallet, order) {
         Ok(priced) => priced,
         Err(result) => return refusal(order, result),
     };
     // A replay of a fully paid order returns its result without touching state.
-    if let Some(old_total) = wallet.replay(&detail, order.tracking_id) {
+    if let Some(old_total) = replay {
         return OrderOutcome {
             result_code: ORDER_SUCCESS,
             replies: vec![
@@ -485,7 +492,7 @@ fn price<'a>(
     catalogue: &'a Catalogue,
     wallet: &Wallet,
     order: &OrderRequest,
-) -> Result<(&'a Listing, OrderDetail, u32), u32> {
+) -> Result<(&'a Listing, OrderDetail, u32, Option<u32>), u32> {
     if order.gift || order.coupon || order.details.len() != 1 {
         return Err(ORDER_FAILURE);
     }
@@ -495,10 +502,11 @@ fn price<'a>(
     }
     let listing = catalogue.listing(detail.bundle_id).ok_or(ORDER_FAILURE)?;
     let total = listing.price;
-    if wallet.balance < total && wallet.replay(&detail, order.tracking_id).is_none() {
+    let replay = wallet.replay(&detail, order.tracking_id);
+    if wallet.balance < total && replay.is_none() {
         return Err(ORDER_INSUFFICIENT_SC);
     }
-    Ok((listing, detail, total))
+    Ok((listing, detail, total, replay))
 }
 
 fn refusal(order: &OrderRequest, result: u32) -> OrderOutcome {
@@ -680,6 +688,20 @@ fn bundle_record(bytes: &mut Vec<u8>, catalogue: &Catalogue, listing: &Listing, 
     bytes.push(0);
     bytes.push(0);
     bytes.push(0);
+    // Client reader `00b41860` continues after the `00b3fa00` tail with ten more fields:
+    // u32, u32, u8, u32, u32, u32, u8, u8, u32, u32 (31 bytes). Their meanings are not
+    // recovered, so every one is zero (R). A short record makes the client consume the next
+    // bundle's map key as these fields, misaligning every following entry.
+    put_u32(bytes, 0);
+    put_u32(bytes, 0);
+    bytes.push(0);
+    put_u32(bytes, 0);
+    put_u32(bytes, 0);
+    put_u32(bytes, 0);
+    bytes.push(0);
+    bytes.push(0);
+    put_u32(bytes, 0);
+    put_u32(bytes, 0);
 }
 
 fn header(opcode: u16) -> Vec<u8> {

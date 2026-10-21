@@ -159,6 +159,7 @@ impl StoreCatalogue {
                 || (item.earn_only && item.sc_price.is_none())
                 || (item.sc_price.is_some()
                     && (item.purchase_price_coins.is_some()
+                        || item.member_price_coins.is_some()
                         || item.sell_price_coins.is_some()
                         || !item.no_sale))
             {
@@ -226,8 +227,6 @@ pub struct CoinShop {
     sc_wallet: Wallet,
     /// T230: the validated ride catalogue, shared with every staged clone.
     sc_catalogue: Arc<station_cash::Catalogue>,
-    /// The shared busy table's answer for this request; never saved.
-    busy: bool,
     client_transactions: BTreeMap<u32, (u32, Vec<u8>)>,
     vendor_transactions: BTreeMap<u32, (u32, Vec<u8>)>,
     sales: VecDeque<SaleRecord>,
@@ -268,7 +267,6 @@ impl CoinShop {
             is_member: false,
             sc_wallet,
             sc_catalogue: Arc::new(sc_catalogue),
-            busy: false,
             client_transactions: BTreeMap::new(),
             vendor_transactions: BTreeMap::new(),
             sales: VecDeque::new(),
@@ -330,12 +328,6 @@ impl CoinShop {
 
     pub fn sc_catalogue(&self) -> &station_cash::Catalogue {
         &self.sc_catalogue
-    }
-
-    /// The shared busy table decides whether an order may start. Set per request by the hub;
-    /// a busy refusal changes nothing and is not persisted.
-    pub fn set_busy(&mut self, busy: bool) {
-        self.busy = busy;
     }
 
     /// Apply one 66/43 vendor buy using the store catalogue's server-side price.
@@ -400,7 +392,9 @@ impl CoinShop {
         }
         match read_u16(inner, 0)? {
             COIN_FAMILY => self.handle_coin_store(inner),
-            MARKETPLACE_FAMILY => self.handle_marketplace(inner),
+            // The hub passes the shared busy-table answer to `handle_marketplace`; a direct
+            // service call (tests, older callers) is not inside an activity.
+            MARKETPLACE_FAMILY => self.handle_marketplace(inner, false),
             _ => Err(invalid("not a store packet")),
         }
     }
@@ -1052,9 +1046,10 @@ impl CoinShop {
         ]
     }
 
-    /// Answer gateway Marketplace requests. A Station Cash order debits the wallet and grants
-    /// the ride in one staged commit; wallet funding, membership and paid orders stay off (R).
-    pub fn handle_marketplace(&mut self, inner: &[u8]) -> io::Result<CoinShopOutcome> {
+    /// Answer gateway Marketplace requests. A Station Cash order debits the wallet and grants the
+    /// ride in one staged commit; wallet funding, membership and paid orders stay off (R).
+    /// `busy` is the shared busy table's answer and only gates the order request.
+    pub fn handle_marketplace(&mut self, inner: &[u8], busy: bool) -> io::Result<CoinShopOutcome> {
         if inner.len() < 4 || inner.len() > MAX_PACKET_BYTES {
             return Err(invalid("invalid Marketplace packet length"));
         }
@@ -1096,7 +1091,7 @@ impl CoinShop {
                         &mut self.inventory,
                         &order,
                         self.bag_capacity,
-                        self.busy,
+                        busy,
                     );
                     changed = outcome.changed;
                     (outcome.result_code, outcome.replies)

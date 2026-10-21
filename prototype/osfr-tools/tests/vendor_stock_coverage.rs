@@ -77,18 +77,18 @@ const ADDED_STOCK: &[(u64, i32)] = &[
     (9_500_000_972, 75_983),
 ];
 
-/// T230 moved every ride row to the Station Cash Marketplace: 54 Seaside ride rows and 3
-/// Mysterious Merchant ride rows stopped being grantable coin stock. This tip measures 1,049
-/// after the move (1,103 before), so the fixed baseline stays 23 rows below the measured floor.
-const BASELINE_GRANTABLE_STOCK_ROWS: usize = 1_026;
+/// T230 moved the ride stock (54 Seaside and 3 Mysterious Merchant rows) to the Station Cash
+/// Marketplace and T275 added Bordon Cloo's 12 recovered cooking-supply rows. This tip recomputes
+/// 1,061 grantable rows, so with the T108 20-row addition the floor is exactly 1,061; the content's
+/// own coverage block declares `items_with_stores_price` 1,061. Any further stock loss fails here.
+const BASELINE_GRANTABLE_STOCK_ROWS: usize = 1_041;
 /// The brief's row floor. T108 added 22 rows; this only guards the row-level
 /// content, not the completion target (see the selected-hub test below).
 const REQUIRED_ADDITIONAL_ROWS: usize = 20;
-/// Reproduced from the pre-T108 vendor records: 96 of the 98 records were
-/// fully grantable. T230 deliberately emptied Delvin and the Mysterious
-/// Merchant, both of which were fully grantable, so the reproduced floor drops
-/// to 94; a later content change may raise it but must not lower it.
-const REPRODUCED_FULLY_GRANTABLE_VENDORS: usize = 94;
+/// Measured fully grantable vendor records. T230 emptied exactly Delvin and Cragara; T275's
+/// recovered Bordon Cloo stock brought the measured count to 96. It may be raised with a content
+/// change, never lowered silently.
+const REPRODUCED_FULLY_GRANTABLE_VENDORS: usize = 96;
 /// Every vendor-role record in the six selected-hub NPC files, split by the
 /// evidence available for its stock. The test asserts each count, so adding,
 /// removing or emptying a vendor needs a deliberate content change.
@@ -128,7 +128,6 @@ const SELECTED_HUB_STOCKED_UNSPAWNED_VENDOR_IDS: &[u64] = &[
 /// cannot make the target look complete.
 const T108_REQUIRED_STOCKED_VENDOR_COUNT: usize = 49;
 const T108_REQUIRED_SPAWNED_STOCKED_VENDOR_COUNT: usize = 39;
-const REPRESENTATIVE_VENDOR: u64 = 9_500_000_045;
 const REPRESENTATIVE_ITEM: i32 = 76_427;
 
 /// A vendor that cannot expose grantable stock yet. Every entry is a positioned
@@ -764,6 +763,35 @@ fn at_least_twenty_more_vendor_rows_are_fully_grantable() {
             vendor["npc_id"]
         );
     }
+
+    // T230 intentionally emptied exactly these two records: every row they listed was ride
+    // stock, now in the Station Cash Marketplace. Any other empty record is a silent stock loss
+    // and must be a deliberate content change.
+    let emptied: BTreeMap<u64, &str> = vendors["vendors"]
+        .as_array()
+        .expect("vendor records are an array")
+        .iter()
+        .filter(|vendor| {
+            vendor["items"]
+                .as_array()
+                .is_some_and(|items| items.is_empty())
+        })
+        .map(|vendor| {
+            (
+                vendor["npc_id"]
+                    .as_u64()
+                    .expect("vendor NPC ID is an integer"),
+                vendor["npc_name"]
+                    .as_str()
+                    .expect("vendor record has a name"),
+            )
+        })
+        .collect();
+    assert_eq!(
+        emptied,
+        BTreeMap::from([(9_500_000_569, "Cragara"), (9_500_000_572, "Delvin")]),
+        "only the two T230 ride vendors may be emptied"
+    );
 
     assert!(
         grantable_rows >= BASELINE_GRANTABLE_STOCK_ROWS + REQUIRED_ADDITIONAL_ROWS,

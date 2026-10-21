@@ -1633,7 +1633,7 @@ impl Session {
                 );
         }
         let previous = self.gateway.state().clone();
-        let mut staged_gateway = self.gateway.staged(&world.trades, self.character_guid);
+        let mut staged_gateway = self.gateway.clone();
         let mut outcome = match staged_gateway.handle_at(message, now_ms) {
             Ok(outcome) => outcome,
             Err(error) => {

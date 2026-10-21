@@ -665,8 +665,7 @@ impl Gameplay {
             if inner.get(2..4) == Some(&[3, 0]) {
                 shop.sync_inventory(self.inventory.clone());
             }
-            shop.set_busy(busy);
-            let outcome = shop.handle_marketplace(inner)?;
+            let outcome = shop.handle_marketplace(inner, busy)?;
             if outcome.changed {
                 self.inventory = shop.inventory().clone();
             }

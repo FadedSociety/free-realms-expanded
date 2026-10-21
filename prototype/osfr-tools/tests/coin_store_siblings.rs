@@ -1334,6 +1334,51 @@ fn contains_u32(bytes: &[u8], value: u32) -> bool {
         .any(|window| u32::from_le_bytes(window.try_into().unwrap()) == value)
 }
 
+/// T230: a fixture content package with no `station_cash` block (feature off) answers the
+/// wallet, preview, order and store-status rows with the disabled shapes and changes nothing.
+#[test]
+fn disabled_station_cash_policy_answers_every_marketplace_row_without_changes() {
+    let fixture = Fixture::new();
+    let mut gateway = fixture.connect(fixture.state());
+    let before = gateway.snapshot();
+    assert!(
+        gateway
+            .snapshot()
+            .gameplay
+            .as_ref()
+            .and_then(|gameplay| gameplay.sc_wallet.as_ref())
+            .is_none()
+    );
+
+    // 66/10 wallet: success status and a zero balance.
+    let wallet = send(&mut gateway, &marketplace(10));
+    assert_eq!(wallet.len(), 1);
+    assert_eq!(&wallet[0][..4], &[66, 0, 11, 0]);
+    assert_eq!(wallet_balance(&wallet), 0);
+
+    // 66/1 preview: result 0 (disabled) in all four dwords.
+    let packets = send(&mut gateway, &sc_preview(31, 8, 1));
+    assert_eq!(
+        packets,
+        vec![vec![
+            66, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+        ]]
+    );
+
+    // 66/3 order: result 0, no tracking id and the configured unavailable message.
+    let packets = send(&mut gateway, &sc_order(32, 8, 1));
+    assert_eq!(packets.len(), 1);
+    assert_eq!(&packets[0][..8], &[66, 0, 4, 0, 0, 0, 0, 0]);
+    let text_len = i32::from_le_bytes(packets[0][12..16].try_into().unwrap()) as usize;
+    assert_eq!(&packets[0][16..16 + text_len], b"disabled");
+
+    // 66/12 store status: the handshake flag is off, so no catalogue is pushed.
+    let packets = send(&mut gateway, &marketplace(12));
+    assert_eq!(packets, vec![vec![66, 0, 13, 0, 0]]);
+
+    assert_eq!(gateway.snapshot(), before);
+}
+
 /// T230: the real gateway path shows the wallet, debits exactly the listed price and grants the
 /// ride once; a replay and an insufficient order leave the snapshot untouched.
 #[test]
@@ -1390,38 +1435,6 @@ fn gateway_sc_wallet_and_ride_order_are_atomic_and_replay_once() {
     );
     assert!(!short.state_changed);
     assert_eq!(gateway.snapshot(), once);
-}
-
-/// T230: the shared busy table refuses the order while the trade service owns the character.
-#[test]
-fn gateway_sc_order_during_a_trade_is_refused_by_the_busy_table() {
-    let fixture = Fixture::new().with_sc();
-    let mut state = fixture.state();
-    state.sc_wallet = Some(Wallet {
-        balance: 150,
-        orders: Vec::new(),
-    });
-    let mut gateway = fixture.connect(state);
-    gateway.set_trading(true);
-    let before = gateway.snapshot();
-    let refused = gateway
-        .handle_at(&wrap(&sc_order(3, SC_RIDE_ITEM as u32, 1)), NOW)
-        .unwrap();
-    assert_eq!(
-        order_result(&inner_packets(&refused)),
-        station_cash::ORDER_FAILURE
-    );
-    assert!(!refused.state_changed);
-    assert_eq!(gateway.snapshot(), before);
-
-    gateway.set_trading(false);
-    let allowed = gateway
-        .handle_at(&wrap(&sc_order(4, SC_RIDE_ITEM as u32, 1)), NOW)
-        .unwrap();
-    assert_eq!(
-        order_result(&inner_packets(&allowed)),
-        station_cash::ORDER_SUCCESS
-    );
 }
 
 /// T230: opening the store (66/12) pushes the catalogue; the listed ride carries the scaled

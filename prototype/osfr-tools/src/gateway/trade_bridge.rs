@@ -1,29 +1,13 @@
-//! Trade bridges on a session gateway (T230).
+//! Trade bridges on a session gateway (W163/W172).
 //!
-//! The hub keeps only dispatch: the trade service's per-request busy answer is mirrored into the
-//! shared occupation table here, and the trade commit reads and adopts the session inventory
-//! through the same module.
+//! The hub keeps only dispatch; the W163 trade commit reads and adopts the session inventory
+//! through this module.
 
 use super::{Gateway, invalid};
 use crate::gameplay::Gameplay;
 use std::io;
 
 impl Gateway {
-    /// T230: clone this session gateway with the player's live trade state mirrored into the
-    /// shared occupation table. Derived per message by the server; never saved.
-    pub fn staged(&self, trades: &crate::trade::TradeService, guid: u64) -> Self {
-        let mut staged = self.clone();
-        staged.set_trading(trades.session_id_for(guid).is_some());
-        staged
-    }
-
-    /// Mirror the trade busy flag into gameplay (session-only; derived per message).
-    pub fn set_trading(&mut self, trading: bool) {
-        if let Some(gameplay) = self.gameplay.as_mut() {
-            gameplay.set_trading(trading);
-        }
-    }
-
     /// See `Gameplay::in_encounter` (W163 player trade).
     pub fn in_encounter(&self) -> bool {
         self.gameplay.as_ref().is_some_and(Gameplay::in_encounter)
