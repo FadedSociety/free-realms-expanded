@@ -4285,7 +4285,7 @@
           "source": [
             {
               "kind": "reconstructed",
-              "evidence": "(R) T360: the retail payout is unknown; 20 coins is the W110 small-referral fallback in the existing small final-era coin style. No item is granted (a free, sellable grant is avoided) and job_xp is empty so tests/quest_job_xp.rs's pinned configured-XP table is unchanged."
+              "evidence": "(R) T360: notes/Build Guides/Content/Dungeons/Sheep Watch.md gives no payout (checked 2026-10-21); the retail payout is unknown. 20 coins is the W110 small-referral fallback in the existing small final-era coin style. No item is granted (a free, sellable grant is avoided) and job_xp is empty so tests/quest_job_xp.rs's pinned configured-XP table is unchanged."
             }
           ]
         }
