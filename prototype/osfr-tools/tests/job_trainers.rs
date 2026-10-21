@@ -5,16 +5,24 @@
 use osfr_tools::{
     account_store::AccountRole,
     character_store::CharacterState,
-    gameplay::{Gameplay, GameplayState},
+    encounter::SharedFieldAction,
+    game_store::{self, Snapshot},
+    gameplay::{Gameplay, GameplayState, Outcome},
     gateway::{Gateway, GatewayOutcome},
     inventory::{InventoryItem, REQUIRED_PROFILE_SLOTS},
+    item_bar::use_wire::{
+        ActivateRequest, Target, decode_client_request_start_ability,
+        encode_client_request_start_ability,
+    },
     mining,
     npc_interaction::{NpcAction, NpcInteraction, NpcSelection},
+    opening_abilities::OpeningAbilities,
     profiles::{LearnDenied, ProfileState, Profiles, Trainer},
     quest_engine::{CharacterEligibility, QuestEngine, QuestState},
 };
 use serde_json::Value;
 use std::{
+    collections::BTreeSet,
     fs,
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
@@ -66,6 +74,23 @@ impl Content {
         fs::copy(
             data().join("job_trainers.json"),
             dir.join("job_trainers.json"),
+        )
+        .unwrap();
+        // The pinned reference package predates the canonical six-job roster
+        // and two client weapon definitions; the production bundle carries
+        // both. Add only those proven rows so every combat job can be armed
+        // through the real starter gate.
+        fs::copy(
+            data().join("opening-abilities.json"),
+            dir.join("opening-abilities.json"),
+        )
+        .unwrap();
+        install_starter_weapon_definitions(&dir);
+        install_starter_outfits(&dir);
+        // The field reward table is read from the session content directory.
+        fs::copy(
+            data().join("field_kill_rewards.json"),
+            dir.join("field_kill_rewards.json"),
         )
         .unwrap();
         mining::write_content(&dir, mining::MINING_GAME_ID).unwrap();
@@ -163,6 +188,73 @@ impl Content {
         profiles["starter_items"][profile.to_string()] = serde_json::json!([definition]);
         fs::write(path, serde_json::to_vec(&profiles).unwrap()).unwrap();
     }
+}
+
+/// The pinned reference package predates the Wizard and Warrior starter
+/// weapons; the production `item-catalogue.json` carries both. These are the
+/// same captured client rows `tests/job_basic_attacks.rs` T010 installs, and
+/// only definitions are added: the starter grant still decides what is owned.
+fn install_starter_weapon_definitions(dir: &Path) {
+    let path = dir.join("inventory.json");
+    let mut inventory: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    let definitions = inventory["definitions"].as_array_mut().unwrap();
+    for row in [
+        serde_json::json!({
+            "id": 4914,
+            "slot": 7,
+            "class_id": 10,
+            "default_tint": 0,
+            "max_stack": -1,
+            "model": "wand_ar_ag_weapon_crude.adr",
+            "texture": "",
+            "tint_alias": "",
+            "effect": 0,
+            "wield_type": 10,
+            "serialized_hex": "32130000000000000000000000000000000000000000000000000000000000000a0000000000000007000000000000000000000000000000",
+            "sha256": "28b02e59bcf7c0fe6de8cfa2c429bcf5ebcbf3e1e20d1d9a6917599017ef5f14"
+        }),
+        serde_json::json!({
+            "id": 29963,
+            "slot": 7,
+            "class_id": 17,
+            "default_tint": 0,
+            "max_stack": -1,
+            "model": "club_ar_ag_weapon_cudgel.adr",
+            "texture": "",
+            "tint_alias": "",
+            "effect": 0,
+            "wield_type": 12,
+            "serialized_hex": "0b75000000000000000000000000000000000000000000000000000000000000110000000000000007000000000000000000000000000000",
+            "sha256": "dd8b3607d16fd953e370c2af82240ee38bb5a5f4f2aef8d42b1ddc0a51799e96"
+        }),
+    ] {
+        if !definitions
+            .iter()
+            .any(|definition| definition["id"] == row["id"])
+        {
+            definitions.push(row);
+        }
+    }
+    fs::write(path, serde_json::to_vec(&inventory).unwrap()).unwrap();
+}
+
+/// The production play package ships Ninja/Wizard/Warrior starter outfits; the
+/// pinned reference package predates them (T201). Add the captured Chest/Legs
+/// pieces T010 uses, so the real trainer/activation path can dress all six.
+fn install_starter_outfits(dir: &Path) {
+    let path = dir.join("profiles.json");
+    let mut profiles: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    let starter = profiles["starter_items"].as_object_mut().unwrap();
+    for (job, items) in [
+        (2, [19197, 19787]),
+        (12, [12060, 12709]),
+        (32, [46137, 46732]),
+    ] {
+        starter
+            .entry(job.to_string())
+            .or_insert_with(|| serde_json::json!(items));
+    }
+    fs::write(path, serde_json::to_vec(&profiles).unwrap()).unwrap();
 }
 
 impl Drop for Content {
@@ -442,13 +534,13 @@ fn service_refusals_change_nothing() {
     let ninja = rows.iter().find(|t| t.profile == 2).unwrap();
     let miner = rows.iter().find(|t| t.profile == 14).unwrap();
 
-    // A prerequisite that is absent or below rank 20 grants nothing.
+    // A prerequisite that is absent or below rank 5 grants nothing.
     let mut profiles = Profiles::load(&content.0, None).unwrap();
     let before = profiles.state().clone();
     for (trainer, job) in [(wizard, "Medic"), (ninja, "Archer")] {
         let Err(LearnDenied::NeedsRank {
             job: named,
-            rank: 20,
+            rank: 5,
         }) = profiles.learn(trainer)
         else {
             panic!("{} needs rank", trainer.job);
@@ -458,10 +550,16 @@ fn service_refusals_change_nothing() {
     assert_eq!(profiles.state(), &before);
     let mut state = before.clone();
     state.unlocked.insert(35);
-    state.experience.insert(35, 1800);
+    state.experience.insert(35, 300);
     let mut profiles = Profiles::load(&content.0, Some(state.clone())).unwrap();
     assert!(profiles.learn(ninja).is_err());
     assert_eq!(profiles.state(), &state);
+
+    // The exact rank-5 boundary is accepted: 400 XP unlocks Ninja.
+    state.experience.insert(35, 400);
+    let mut profiles = Profiles::load(&content.0, Some(state)).unwrap();
+    assert_eq!(profiles.learn(ninja), Ok(()));
+    assert!(profiles.state().unlocked.contains(&2));
 
     // A row that lies about its job is refused without a panic or a change.
     let mut forged = miner.clone();
@@ -518,7 +616,7 @@ mod io_result {
     pub type R = std::io::Result<super::GatewayOutcome>;
 }
 
-fn login(gateway: &mut Gateway) {
+fn login_as(gateway: &mut Gateway, guid: u64) {
     let mut packet = 1u16.to_le_bytes().to_vec();
     for (index, value) in ["local-private-test", "1.910.1.530630", ""]
         .iter()
@@ -527,7 +625,7 @@ fn login(gateway: &mut Gateway) {
         packet.extend((value.len() as u32).to_le_bytes());
         packet.extend(value.as_bytes());
         if index == 0 {
-            packet.extend(1u64.to_le_bytes());
+            packet.extend(guid.to_le_bytes());
         }
     }
     gateway.handle_at(&packet, 0).unwrap();
@@ -633,10 +731,14 @@ fn equipped(gateway: &Gateway, job: i32) -> usize {
         .count()
 }
 
-fn switch(gateway: &mut Gateway, job: i32, now: u64) -> io_result::R {
+fn job_select(job: i32) -> Vec<u8> {
     let mut packet = vec![26, 0, 13, 0];
     packet.extend(job.to_le_bytes());
-    send(gateway, &packet, now)
+    packet
+}
+
+fn switch(gateway: &mut Gateway, job: i32, now: u64) -> io_result::R {
+    send(gateway, &job_select(job), now)
 }
 
 /// Attachment slot ids from a 38/21 body, read in the order the client does.
@@ -667,15 +769,20 @@ fn collect_count(gateway: &Gateway) -> u64 {
 }
 
 fn gateway_at(content: &Content, state: GameplayState, near: [f32; 3]) -> Gateway {
+    gateway_at_guid(content, state, near, 1)
+}
+
+fn gateway_at_guid(content: &Content, state: GameplayState, near: [f32; 3], guid: u64) -> Gateway {
     let reference = std::env::var_os("OSFR_GATEWAY_REFERENCE")
         .map(PathBuf::from)
         .unwrap_or_else(|| Path::new(CRATE).join("../../../lab/references/rust-gateway-reference"));
     let mut character: CharacterState = Gateway::reference_state(&reference).unwrap();
+    character.guid = guid;
     character.zone_id = 0;
     character.position = near;
     let mut gateway =
         Gateway::load_gameplay(&reference, character, &content.0, Some(state)).unwrap();
-    login(&mut gateway);
+    login_as(&mut gateway, guid);
     gateway
 }
 
@@ -947,7 +1054,7 @@ fn gateway_refusals_leave_the_save_untouched() {
     let choice = option_with_label(&menu, ninja.label_string_id).unwrap();
     let before = gameplay_json(&gateway);
     let refused = choose(&mut gateway, ninja.npc, choice, 2_100).unwrap();
-    assert!(said(&bodies(&refused), "level 20 Archer"));
+    assert!(said(&bodies(&refused), "level 5 Archer"));
     assert!(
         !refused.state_changed && !refused.gameplay_changed,
         "a prerequisite refusal must not mark the save changed"
@@ -955,7 +1062,7 @@ fn gateway_refusals_leave_the_save_untouched() {
     // The refused choice leaves the menu active, so the same option is still
     // understood instead of failing with NoInteraction.
     let again = choose(&mut gateway, ninja.npc, choice, 2_200).unwrap();
-    assert!(said(&bodies(&again), "level 20 Archer"));
+    assert!(said(&bodies(&again), "level 5 Archer"));
     assert!(!again.state_changed && !again.gameplay_changed);
     assert_eq!(gameplay_json(&gateway), before);
     assert!(!unlocked(&gateway).contains(&2));
@@ -1226,4 +1333,464 @@ fn two_talk_choices_in_one_bundle_both_reach_the_open_menu() {
         before,
         "Talk without a quest engine must not change the save"
     );
+}
+
+// ---- T368: the six-job playtest loop -------------------------------------------------------
+
+/// `field_kill_rewards.json`'s definition-3156 override: 5 active-job XP a kill.
+const FIELD_XP: u32 = 5;
+/// Warrior slot 2 (`Kick`, 62005) unlocks at rank 5 in `job_abilities.json`.
+const WARRIOR_LEVEL_FIVE: i32 = 62_005;
+
+/// The shipped level-1 `starting_farnum_wolves` actor the matrix fights. The
+/// field fixture `Gameplay::load` populates is the bundled `field_enemies.json`
+/// while the test content has no `npcs/` marker; this reads the same row.
+fn farnum_wolf() -> (u64, [f32; 3]) {
+    let field: Value =
+        serde_json::from_slice(&fs::read(data().join("field_enemies.json")).unwrap()).unwrap();
+    let group = field["spawn_groups"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|group| group["id"] == "starting_farnum_wolves")
+        .expect("the shipped starting_farnum_wolves group");
+    let guid = group["members"][0].as_u64().unwrap();
+    let actor = field["enemies"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|actor| actor["guid"].as_u64() == Some(guid))
+        .expect("the shipped starting wolf actor");
+    assert_eq!(actor["definition_id"], 3156);
+    assert_eq!(actor["level"], 1);
+    (
+        guid,
+        serde_json::from_value(actor["position"].clone()).unwrap(),
+    )
+}
+
+fn shipped_abilities(content: &Content) -> OpeningAbilities {
+    let mut abilities = OpeningAbilities::load(&content.0).unwrap();
+    abilities
+        .load_job_abilities(&data().join("job_abilities.json"))
+        .unwrap();
+    abilities
+}
+
+fn default_state(content: &Content) -> GameplayState {
+    let profiles = Profiles::load(&content.0, None).unwrap();
+    let mut state = Gameplay::load(&content.0, None).unwrap().state();
+    state.profiles = Some(profiles.state().clone());
+    state
+}
+
+/// Empty the job's weapon slot so the production `ensure_outfit` grant arms it
+/// from `opening-abilities.json`; the matrix then proves the real starter path.
+fn empty_weapon_slot(state: &mut GameplayState, job: i32) {
+    for equipment in &mut state.inventory.equipment {
+        if equipment.profile_id == job && equipment.slot == 7 {
+            equipment.item_id = 0;
+        }
+    }
+}
+
+fn xp(state: &GameplayState, profile: i32) -> u32 {
+    state
+        .profiles
+        .as_ref()
+        .unwrap()
+        .experience
+        .get(&profile)
+        .copied()
+        .unwrap_or(0)
+}
+
+/// The native 36/5 toolbar: eight slots, `None` for an empty one. Index 0 is
+/// the basic attack; job slot N is index N.
+fn toolbar_ids(packets: &[Vec<u8>]) -> Vec<Option<i32>> {
+    let toolbar = packets.last().expect("toolbar");
+    assert!(toolbar.starts_with(&[36, 0, 5, 0]));
+    let mut at = 12;
+    let mut ids = Vec::new();
+    for _ in 0..8 {
+        let kind = i32::from_le_bytes(toolbar[at..at + 4].try_into().unwrap());
+        match kind {
+            0 => {
+                ids.push(None);
+                at += 4;
+            }
+            3 => {
+                ids.push(Some(i32::from_le_bytes(
+                    toolbar[at + 4..at + 8].try_into().unwrap(),
+                )));
+                at += 41;
+            }
+            other => panic!("unexpected toolbar entry type {other}"),
+        }
+    }
+    assert_eq!(at, toolbar.len());
+    ids
+}
+
+fn wolf_character(guid: u64, wolf: [f32; 3]) -> CharacterState {
+    CharacterState {
+        guid,
+        zone_id: 0,
+        position: [wolf[0] + 1.0, wolf[1], wolf[2]],
+        rotation: [0.0, 0.0, 1.0],
+    }
+}
+
+/// A reconnect at the wolf: the saved progression through the production
+/// loader, catalogue bind and world init.
+fn wolf_session(content: &Content, state: GameplayState, character: &CharacterState) -> Gameplay {
+    let mut game = Gameplay::load(&content.0, Some(state)).expect("the saved gameplay loads");
+    game.bind_npc_quest_catalogue(&content.0, character.guid)
+        .expect("the split quest catalogue binds");
+    game.initialize_world(character, 0).expect("world init");
+    game
+}
+
+fn hits(out: &Outcome, attacker: u64) -> Vec<u32> {
+    out.replies
+        .iter()
+        .filter(|packet| {
+            packet.starts_with(&[32, 0, 7, 0])
+                && packet.get(4..12) == Some(attacker.to_le_bytes().as_slice())
+        })
+        .map(|packet| u32::from_le_bytes(packet[28..32].try_into().unwrap()))
+        .collect()
+}
+
+/// The ordinary 36/10 basic, encoded and decoded with the production client
+/// codec, against the server's field wolf until it dies. Every request must
+/// produce exactly one positive authoritative hit.
+fn kill_wolf(game: &mut Gameplay, character: &CharacterState, wolf: u64) {
+    let mut field = game.take_shared_fields().expect("the field enemies load");
+    let wolf_hp = field
+        .health(wolf)
+        .expect("the starting wolf is on the field");
+    let known = BTreeSet::from([wolf]);
+    // Writer `0x00a342e0`, action-bar path `0x00a35150`: bar 1, slot 0,
+    // target mode 0 (GUID). The client reader is the same recovered codec.
+    let request = encode_client_request_start_ability(1, 0, Target::Guid(wolf));
+    let decoded = decode_client_request_start_ability(&request).expect("the 36/10 body");
+    assert_eq!(
+        decoded,
+        ActivateRequest {
+            bar: 1,
+            slot: 0,
+            target: Target::Guid(wolf),
+        }
+    );
+    let action = SharedFieldAction::Ability {
+        slot: decoded.slot,
+        target: wolf,
+    };
+    let mut health = wolf_hp;
+    let mut now = 1_000;
+    for _ in 0..4 {
+        let out = game
+            .handle_shared_field(&action, &mut field, &known, character, now)
+            .expect("the shared-field basic is accepted");
+        let damage = hits(&out, character.guid);
+        assert_eq!(damage.len(), 1, "one authoritative hit per 36/10 basic");
+        assert!(damage[0] > 0, "the hit deals positive damage");
+        let after = field.health(wolf).expect("the wolf stays in the field");
+        assert!(after < health, "the authoritative health drops");
+        health = after;
+        now += 700;
+        if health == 0 {
+            break;
+        }
+    }
+    assert_eq!(
+        field.health(wolf),
+        Some(0),
+        "the basic attack kills the field actor"
+    );
+}
+
+#[test]
+fn all_six_combat_jobs_learn_activate_fight_and_gain_xp() {
+    let content = Content::new();
+    let npcs = npc_rows();
+    let rows = trainers(&content);
+    let abilities = shipped_abilities(&content);
+    let (wolf, wolf_at) = farnum_wolf();
+    let mut ninja_after_kill = None;
+
+    for profile in [2, 11, 12, 32, 35, 43] {
+        let trainer = rows.iter().find(|trainer| trainer.profile == profile);
+        let mut state = match trainer {
+            Some(trainer) => state_for(&content, trainer, trainer.requires.is_some()),
+            None => default_state(&content),
+        };
+        if let Some(trainer) = trainer
+            && let Some(need) = &trainer.requires
+        {
+            assert_eq!(need.rank, 5, "{} prerequisite rank", trainer.job);
+            let profiles =
+                Profiles::load(&content.0, Some(state.profiles.clone().unwrap())).unwrap();
+            assert_eq!(
+                profiles.rank(need.profile),
+                5,
+                "{} prerequisite",
+                trainer.job
+            );
+        }
+        empty_weapon_slot(&mut state, profile);
+        let near = trainer.map_or([0.0; 3], |trainer| {
+            let position = trainer_position(&npcs, trainer);
+            [position[0] + 2.0, position[1], position[2]]
+        });
+        let mut gateway = gateway_at(&content, state, near);
+        if let Some(trainer) = trainer {
+            assert!(!unlocked(&gateway).contains(&i64::from(profile)));
+            let menu = click(&mut gateway, trainer.npc, 2_000);
+            let choice = option_with_label(&menu, trainer.label_string_id)
+                .unwrap_or_else(|| panic!("{}: Learn option in the menu", trainer.job));
+            let learned = choose(&mut gateway, trainer.npc, choice, 2_100).unwrap();
+            assert!(
+                said(&bodies(&learned), "You learned the"),
+                "{}",
+                trainer.job
+            );
+            assert!(
+                unlocked(&gateway).contains(&i64::from(profile)),
+                "{}",
+                trainer.job
+            );
+        }
+        let switched = switch(&mut gateway, profile, 2_900).unwrap();
+        assert!(
+            bodies(&switched)
+                .iter()
+                .any(|body| body.starts_with(&[38, 0, 21, 0])),
+            "profile {profile}: job activation: {}",
+            String::from_utf8_lossy(&bodies(&switched).concat())
+        );
+        assert_eq!(
+            gameplay_json(&gateway)["profiles"]["active"],
+            Value::from(profile),
+            "profile {profile} selected"
+        );
+        assert!(
+            equipped(&gateway, profile) >= 1,
+            "profile {profile} is dressed"
+        );
+        assert!(
+            abilities.supports_basic(profile),
+            "profile {profile}: basic attack"
+        );
+
+        let snapshot = gateway.snapshot();
+        let character = wolf_character(snapshot.character.guid, wolf_at);
+        let mut game = wolf_session(&content, snapshot.gameplay.unwrap(), &character);
+        let before = game.state();
+        assert_eq!(
+            before.profiles.as_ref().unwrap().active,
+            profile,
+            "profile {profile}: reconnect keeps the active job"
+        );
+        assert!(
+            !game.may_run("level") && !game.may_run("give"),
+            "the matrix uses no developer command"
+        );
+        kill_wolf(&mut game, &character, wolf);
+        let paid = game.state();
+        assert_eq!(
+            xp(&paid, profile),
+            xp(&before, profile) + FIELD_XP,
+            "profile {profile}: field XP follows the active job"
+        );
+        for other in [2, 11, 12, 32, 35, 43]
+            .into_iter()
+            .filter(|other| *other != profile)
+        {
+            assert_eq!(
+                xp(&paid, other),
+                xp(&before, other),
+                "profile {other} must not be paid for profile {profile}'s kill"
+            );
+        }
+        if profile == 2 {
+            ninja_after_kill = Some(paid);
+        }
+    }
+
+    // The payout follows the ACTIVE job at claim time, not the job that
+    // unlocked or trained. The character save carries the unlock, active job
+    // and starter weapon, so the trainer is not required after a reconnect.
+    let paid_state = ninja_after_kill.expect("the Ninja case ran");
+    let character = wolf_character(1, wolf_at);
+    let save_path = content.0.join("t368-reconnect.json");
+    game_store::save(
+        &save_path,
+        &Snapshot {
+            character: character.clone(),
+            gameplay: Some(paid_state.clone()),
+        },
+    )
+    .unwrap();
+    let loaded = game_store::load_or_create(&save_path, character.clone()).unwrap();
+    let state = loaded.gameplay.expect("the save envelope carries gameplay");
+    let before = state.profiles.as_ref().unwrap().experience.clone();
+    assert_eq!(before.get(&2), Some(&FIELD_XP), "Ninja was paid");
+    assert_eq!(before.get(&35), Some(&400), "the prerequisite was not");
+    let mut game = wolf_session(&content, state, &character);
+    let reloaded = game.state();
+    assert_eq!(
+        reloaded.profiles.as_ref().unwrap().active,
+        2,
+        "the active job survives the save"
+    );
+    assert!(
+        reloaded.profiles.as_ref().unwrap().unlocked.contains(&2),
+        "the unlock survives the save"
+    );
+    assert!(
+        reloaded
+            .inventory
+            .equipment
+            .iter()
+            .any(|entry| entry.profile_id == 2 && entry.slot == 7 && entry.item_id != 0),
+        "the starter weapon survives the save"
+    );
+    // Switch to Archer and kill again: the XP follows the newly active job.
+    let switched = game
+        .handle_in_world(&job_select(35), &character, 10)
+        .unwrap();
+    assert!(
+        switched
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[38, 0, 21, 0])),
+        "the Archer switch activates"
+    );
+    assert_eq!(game.state().profiles.as_ref().unwrap().active, 35);
+    kill_wolf(&mut game, &character, wolf);
+    let paid = game.state();
+    assert_eq!(
+        xp(&paid, 35),
+        before.get(&35).copied().unwrap() + FIELD_XP,
+        "the second kill pays Archer"
+    );
+    assert_eq!(
+        xp(&paid, 2),
+        before.get(&2).copied().unwrap(),
+        "the previous active job is not paid again"
+    );
+    level_five_bar(&content);
+    two_sessions(&content);
+}
+
+/// The level-5 ability case of the matrix: the real 36/5 activation bar.
+fn level_five_bar(content: &Content) {
+    let abilities = shipped_abilities(content);
+    let mut state = default_state(content);
+    {
+        let profiles = state.profiles.as_mut().unwrap();
+        profiles.active = 32;
+        profiles.unlocked.insert(32);
+        profiles.experience.insert(32, 300);
+    }
+    let profiles = Profiles::load(&content.0, state.profiles.clone()).unwrap();
+    assert_eq!(profiles.rank(32), 4);
+    assert!(abilities.job_slot(32, 2, profiles.rank(32)).is_none());
+    let four = toolbar_ids(&abilities.activation(32, profiles.rank(32)).unwrap());
+    assert_eq!(four[2], None, "Warrior slot 2 stays empty below rank 5");
+
+    let mut state = profiles.state().clone();
+    state.experience.insert(32, 400);
+    let profiles = Profiles::load(&content.0, Some(state)).unwrap();
+    assert_eq!(profiles.rank(32), 5);
+    let five = toolbar_ids(&abilities.activation(32, profiles.rank(32)).unwrap());
+    assert_eq!(
+        five[2],
+        Some(WARRIOR_LEVEL_FIVE),
+        "Warrior Kick fills slot 2 at rank 5"
+    );
+}
+
+/// The two-session case of the matrix: per-character unlocks and an untouched
+/// pair of saves on a below-rank refusal.
+fn two_sessions(content: &Content) {
+    let npcs = npc_rows();
+    let ninja = trainers(content)
+        .into_iter()
+        .find(|trainer| trainer.profile == 2)
+        .unwrap();
+    let position = trainer_position(&npcs, &ninja);
+    let near = [position[0] + 2.0, position[1], position[2]];
+
+    // A: Archer rank 5 (400 XP), learns and activates Ninja.
+    let mut a = gateway_at(content, state_for(content, &ninja, true), near);
+    // B: Archer rank 4 (300 XP) on another character, already active Archer.
+    let mut b_state = state_for(content, &ninja, false);
+    {
+        let profiles = b_state.profiles.as_mut().unwrap();
+        profiles.unlocked.insert(35);
+        profiles.experience.insert(35, 300);
+        profiles.active = 35;
+    }
+    let mut b = gateway_at_guid(content, b_state, near, 2);
+    assert!(!unlocked(&b).contains(&2));
+
+    let menu = click(&mut a, ninja.npc, 2_000);
+    let choice = option_with_label(&menu, ninja.label_string_id).unwrap();
+    let learned = choose(&mut a, ninja.npc, choice, 2_100).unwrap();
+    assert!(said(&bodies(&learned), "You learned the"));
+    assert!(unlocked(&a).contains(&2));
+    assert!(
+        !unlocked(&b).contains(&2),
+        "one character's unlock must not unlock another"
+    );
+    let switched = switch(&mut a, 2, 2_900).unwrap();
+    assert!(
+        bodies(&switched)
+            .iter()
+            .any(|body| body.starts_with(&[38, 0, 21, 0]))
+    );
+    // The directed-visibility staging for the job/outfit change. The actual
+    // two-session delivery of 35/7 and 35/6 is pinned by
+    // `live_outfit_fanout_respects_directed_visibility_cap`
+    // (src/bin/osfr_gateway/tests.rs), which refuses the far session.
+    assert!(
+        switched
+            .nearby
+            .iter()
+            .any(|packet| packet.starts_with(&[35, 0, 7, 0])),
+        "the job switch stages its 35/7 outfit change for nearby players"
+    );
+    assert_eq!(
+        gameplay_json(&a)["profiles"]["active"],
+        Value::from(2),
+        "A is on Ninja"
+    );
+    assert_eq!(
+        gameplay_json(&b)["profiles"]["active"],
+        Value::from(35),
+        "B is on Archer"
+    );
+
+    // B's below-rank choice at the same trainer is refused and changes neither.
+    let menu = click(&mut b, ninja.npc, 3_000);
+    let choice = option_with_label(&menu, ninja.label_string_id).unwrap();
+    let before_a = gameplay_json(&a);
+    let before_b = gameplay_json(&b);
+    let refused = choose(&mut b, ninja.npc, choice, 3_100).unwrap();
+    assert!(said(&bodies(&refused), "level 5 Archer"));
+    assert!(!refused.state_changed && !refused.gameplay_changed);
+    // The menu stays usable and the same choice is still understood.
+    let again = choose(&mut b, ninja.npc, choice, 3_200).unwrap();
+    assert!(said(&bodies(&again), "level 5 Archer"));
+    assert!(!again.state_changed && !again.gameplay_changed);
+    assert_eq!(gameplay_json(&a), before_a, "B's refusal changed A");
+    assert_eq!(gameplay_json(&b), before_b, "B's refusal changed B");
+    assert!(!unlocked(&b).contains(&2));
+    let a_state = a.snapshot().gameplay.unwrap();
+    let b_state = b.snapshot().gameplay.unwrap();
+    assert_eq!(xp(&a_state, 35), 400);
+    assert_eq!(xp(&b_state, 35), 300);
 }

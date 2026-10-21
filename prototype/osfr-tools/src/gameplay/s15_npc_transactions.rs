@@ -37,7 +37,7 @@ const KART_OPTION: u32 = 3_052;
 const FISH_GATE: u64 = 9_000_000_181;
 /// `fishing_spots.json` menu label.
 const FISH_OPTION: u32 = 73_552;
-/// The Ninja trainer requires a level-20 Archer, so its Learn choice refuses.
+/// The Ninja trainer requires a level-5 Archer, so its Learn choice refuses.
 const NINJA_TRAINER: u64 = 9_000_000_223;
 const NINJA_OPTION: u32 = 412_437;
 /// The Miner trainer teaches an unlocked-on-success job with no prerequisite.
@@ -52,7 +52,7 @@ const CHARACTER_GUID: u64 = 0x1000_0000_0000_0001;
 const INTRODUCE_YOURSELF: u32 = 3_000_021;
 const SAMANTHA: u64 = 9_000_000_189;
 const BUSY_REFUSAL: &str = "Finish the active activity before interacting.";
-const LEARN_REFUSAL: &str = "level 20 Archer";
+const LEARN_REFUSAL: &str = "level 5 Archer";
 const FISH_REFUSAL: &str = "Fishing isn't open yet.";
 static NEXT: AtomicU64 = AtomicU64::new(0);
 

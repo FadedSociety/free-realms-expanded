@@ -65,9 +65,9 @@
       "requires": {
         "profile": 35,
         "job": "Archer",
-        "rank": 20
+        "rank": 5
       },
-      "source": "client: 412437/412438/442229/119069 (Ty in Lakeshore) and 5100368/5100390 (level 20 Archer); wiki: Ninja.md:41; reconstructed: Ty is spawned and the menu choice grants the job after the prerequisite"
+      "source": "client: 412437/412438/442229/119069 (Ty in Lakeshore) and 5100368/5100390 (level 20 Archer); wiki: Ninja.md:41; reconstructed: Ty is spawned and the menu choice grants the job after the prerequisite. (R) the recovered level-20 Archer gate is reduced to rank 5 for playtesting on the local 100-XP rank curve (T201-style), not the recovered retail level; this row is data, so restoring 20 needs no code"
     },
     {
       "npc": 9000000324,
@@ -77,9 +77,9 @@
       "requires": {
         "profile": 11,
         "job": "Medic",
-        "rank": 20
+        "rank": 5
       },
-      "source": "client: 412481/412482/442233/119076 (Fizzlesticks at Robgoblin Camp) and 5100378/5100392 (level 20 Medic); wiki: Wizard.md:46; reconstructed: Fizzlesticks is spawned and the menu choice grants the job after the prerequisite"
+      "source": "client: 412481/412482/442233/119076 (Fizzlesticks at Robgoblin Camp) and 5100378/5100392 (level 20 Medic); wiki: Wizard.md:46; reconstructed: Fizzlesticks is spawned and the menu choice grants the job after the prerequisite. (R) the recovered level-20 Medic gate is reduced to rank 5 for playtesting on the local 100-XP rank curve (T201-style), not the recovered retail level; this row is data, so restoring 20 needs no code"
     },
     {
       "npc": 9000000076,
