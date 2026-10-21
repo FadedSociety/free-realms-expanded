@@ -652,3 +652,31 @@ fn two_players_do_not_share_one_npc_menu() {
         "the other session's failed choice consumed the menu"
     );
 }
+
+/// S16: one router family owns one parser. An unlisted 66/x subtype belongs to none of
+/// them, so `handle_npc_packet` must answer `Ok(None)` — not an empty `Some` — and the rest
+/// of the request path still sees the packet. `handle_in_world` cannot tell those two
+/// apart, so this pin calls the router directly and then drives the real path for the same
+/// bytes.
+#[test]
+fn unlisted_66_x_falls_through_to_ok_none() {
+    let fixture = Fixture::full();
+    let mut game = fixture.game();
+    let character = character(&game, KART_GATE);
+    let packet = [66u8, 0, 7, 0];
+    assert!(
+        game.handle_npc_packet(&packet, &character, NOW)
+            .unwrap()
+            .is_none(),
+        "an unlisted 66/x subtype must fall through as Ok(None)"
+    );
+    let before = state_bytes(&game);
+    let out = game.handle_in_world(&packet, &character, NOW).unwrap();
+    assert!(!out.changed, "an unlisted 66/x changed gameplay");
+    assert!(
+        out.replies.is_empty(),
+        "an unlisted 66/x answered {:?}",
+        out.replies
+    );
+    assert_eq!(state_bytes(&game), before);
+}

@@ -741,3 +741,410 @@ fn named_target_npc_matches_active_quest_content_and_starts_turnin() {
         "one Talk must not queue a second 49/13"
     );
 }
+
+// ---------------------------------------------------------------------------------------------
+// S16: one NPC router family, one private method. Each request below is a real client packet
+// routed through `Gameplay::handle_in_world` (the production request path), which dispatches
+// to `gameplay/npc.rs::handle_npc_packet`.
+// ---------------------------------------------------------------------------------------------
+
+#[path = "support/npc_quest_chain.rs"]
+mod npc_quest_chain;
+
+use npc_quest_chain::{
+    CHARACTER, Fixture, QUEST_CHOICE, TALK_LABEL, accept, character_at_for, coins,
+    content_position, dialogue_choice, has_family, interact, menu_option, npc_interact, npc_select,
+    offer, pending_offer, pending_turnin, quest_end_reply, quest_status, saved, send, talk,
+};
+use osfr_tools::{
+    character_store::CharacterState,
+    chat,
+    quest_engine::{QuestProgress, QuestStatus},
+    quest_journal::BREADCRUMB_REFUSED,
+};
+
+/// The Cobblestone Village referral (`quests/adventurer.json`): giver Samantha, one Talk.
+const INTRODUCE_YOURSELF: u32 = 3_000_021;
+const SAMANTHA: u64 = 9_000_000_189;
+const RICKY_DANGER: u64 = 9_500_000_254;
+/// `npcs/cobblestone_village.json` places both NPCs in zone 3.
+const COBBLESTONE_ZONE: u32 = 3;
+/// A spawned (`legacy_data`) Blackspore vendor with shipped stock in `npcs/blackspore_swamp.json`
+/// (zone 1). Only data-backed placements are actors the router can resolve from a runtime GUID.
+const SWAMP_VENDOR: u64 = 9_500_000_007;
+const SWAMP_ZONE: u32 = 1;
+/// `npc_interaction::SHOP_STRING_ID`: the 26/9 label of the Shop choice.
+const SHOP_LABEL: u32 = 432_156;
+/// The shipped catalogue's one client-reported goal (Cooking 101's second step).
+const CLIENT_GOAL_QUEST: u32 = 3_050_004;
+const CLIENT_GOAL: u32 = 30_500_041;
+const NOW: u64 = 30_000;
+
+fn at_npc(npc: u64, file: &str, zone: u32) -> CharacterState {
+    character_at_for(CHARACTER, zone, content_position(file, npc))
+}
+
+/// The 26/6 dialogue row choice reaches its own family and opens the 49/1 quest offer
+/// (client reader `0x009f5890`: one i32 row).
+#[test]
+fn dialogue_26_6_choice_still_opens_the_quest_offer() {
+    let fixture = Fixture::new();
+    let mut game = fixture.game(None);
+    let samantha = at_npc(SAMANTHA, "cobblestone_village.json", COBBLESTONE_ZONE);
+    let dialogue = talk(&mut game, &samantha, SAMANTHA, NOW);
+    assert!(
+        dialogue
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
+        "the Talk must open the 26/3 dialogue"
+    );
+    let offered = send(
+        &mut game,
+        &samantha,
+        &dialogue_choice(QUEST_CHOICE),
+        NOW + 1,
+    );
+    assert_eq!(
+        offered
+            .replies
+            .iter()
+            .filter(|packet| has_family(packet, 49, 1, Some(INTRODUCE_YOURSELF)))
+            .count(),
+        1,
+        "the 26/6 quest row must open one 49/1 offer"
+    );
+    assert_eq!(
+        quest_status(&game, INTRODUCE_YOURSELF),
+        QuestStatus::Offered
+    );
+    assert_eq!(pending_offer(&game), Some(INTRODUCE_YOURSELF));
+}
+
+/// 26/4 closes the open dialogue and nothing else: it answers no packet, refuses the stale
+/// choice, and the NPC still opens a fresh menu afterwards (client handler `0x00aa0870`).
+#[test]
+fn dialogue_close_26_4_consumes_only_that_menu() {
+    let fixture = Fixture::new();
+    let mut game = fixture.game(None);
+    let samantha = at_npc(SAMANTHA, "cobblestone_village.json", COBBLESTONE_ZONE);
+    let menu = interact(&mut game, &samantha, SAMANTHA, NOW);
+    let choice = menu_option(&menu, TALK_LABEL);
+    let before = saved(&game);
+    let closed = send(&mut game, &samantha, &[26, 0, 4, 0], NOW + 1);
+    assert!(
+        closed.replies.is_empty(),
+        "26/4 answers nothing: {:?}",
+        closed.replies
+    );
+    assert!(!closed.changed);
+    assert_eq!(saved(&game), before, "a 26/4 close changed gameplay state");
+    assert!(
+        game.handle_in_world(&npc_select(SAMANTHA, choice), &samantha, NOW + 2)
+            .is_err(),
+        "the closed menu still accepted its stale choice"
+    );
+    let reopened = interact(&mut game, &samantha, SAMANTHA, NOW + 3);
+    assert!(
+        reopened
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[26, 0, 9, 0])),
+        "26/4 consumed more than the menu: the NPC no longer answers"
+    );
+}
+
+/// 45/7 only moves an open client-reported goal of the character's own active quest
+/// (client sender `0x00cffba0` builds the 7-byte claim). The catalogue's only such goal is
+/// Cooking 101's second step, so the first (visit) step is marked done in the saved state.
+#[test]
+fn client_reported_45_7_only_advances_an_open_goal() {
+    let fixture = Fixture::new();
+    let mut state = fixture.game(None).state();
+    state
+        .npc_quests
+        .as_mut()
+        .expect("the fixture binds the split catalogue")
+        .quests
+        .insert(
+            CLIENT_GOAL_QUEST,
+            QuestProgress {
+                status: QuestStatus::Active,
+                counts: vec![1, 0],
+            },
+        );
+    let mut game = fixture.game(Some(state));
+    let at = character_at_for(CHARACTER, 0, [0.0; 3]);
+    let before = saved(&game);
+    // A forged id changes nothing.
+    let mut forged = vec![45, 0, 7];
+    forged.extend(999u32.to_le_bytes());
+    let ignored = send(&mut game, &at, &forged, NOW);
+    assert!(!ignored.changed);
+    assert_eq!(saved(&game), before, "a forged 45/7 claim changed state");
+    // The open goal advances, reaches the client, and the unrelated goal does not move.
+    let mut claim = vec![45, 0, 7];
+    claim.extend(CLIENT_GOAL.to_le_bytes());
+    let advanced = send(&mut game, &at, &claim, NOW + 1);
+    assert!(advanced.changed, "the open client goal did not advance");
+    assert!(
+        advanced
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 10, Some(CLIENT_GOAL_QUEST))),
+        "the goal completion must reach the client: {:?}",
+        advanced.replies
+    );
+    let state = game.state();
+    let progress = &state.npc_quests.as_ref().unwrap().quests[&CLIENT_GOAL_QUEST];
+    assert_eq!(progress.counts, vec![1, 1]);
+    // A repeat changes nothing.
+    let after = saved(&game);
+    let repeat = send(&mut game, &at, &claim, NOW + 2);
+    assert!(!repeat.changed);
+    assert_eq!(saved(&game), after, "a replayed 45/7 claim changed state");
+}
+
+/// 49/15 for an id the crosswalk does not list answers one chat line and changes nothing
+/// (the 47/12 and 47/13 requests share this family; `tests/quest_journal.rs` pins them).
+#[test]
+fn journal_49_15_unlisted_id_is_refused_with_one_line() {
+    let fixture = Fixture::new();
+    let mut game = fixture.game(None);
+    let at = character_at_for(CHARACTER, 0, [0.0; 3]);
+    let before = saved(&game);
+    let mut request = vec![49, 0, 15, 0, 0, 0];
+    request.extend(999_999u32.to_le_bytes());
+    let refused = send(&mut game, &at, &request, NOW);
+    assert!(!refused.changed);
+    assert_eq!(refused.replies, vec![chat::system(BREADCRUMB_REFUSED)]);
+    assert_eq!(saved(&game), before, "an unlisted 49/15 id changed state");
+}
+
+/// 49/2 accepts and 49/14 turns in through their own families (captured accept of quest
+/// 3000021, run 143124; client constructors `0x00a86400` and `0x00a864c0`).
+#[test]
+fn quest_accept_49_2_and_turn_in_49_14_still_route() {
+    let fixture = Fixture::new();
+    let mut game = fixture.game(None);
+    let samantha = at_npc(SAMANTHA, "cobblestone_village.json", COBBLESTONE_ZONE);
+    offer(&mut game, &samantha, SAMANTHA, INTRODUCE_YOURSELF, NOW);
+    accept(&mut game, &samantha, INTRODUCE_YOURSELF, NOW + 2);
+    assert_eq!(quest_status(&game, INTRODUCE_YOURSELF), QuestStatus::Active);
+    let ricky = at_npc(RICKY_DANGER, "cobblestone_village.json", COBBLESTONE_ZONE);
+    let talked = talk(&mut game, &ricky, RICKY_DANGER, NOW + 3);
+    assert!(
+        talked.changed,
+        "the referral Talk did not complete the goal"
+    );
+    assert_eq!(pending_turnin(&game), Some(INTRODUCE_YOURSELF));
+    let coins_before = coins(&game);
+    let completed = send(
+        &mut game,
+        &ricky,
+        &quest_end_reply(INTRODUCE_YOURSELF),
+        NOW + 4,
+    );
+    assert!(completed.changed);
+    assert!(
+        completed
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 4, Some(INTRODUCE_YOURSELF))),
+        "the turn-in must send its 49/4 completion: {:?}",
+        completed.replies
+    );
+    assert_eq!(
+        quest_status(&game, INTRODUCE_YOURSELF),
+        QuestStatus::Completed
+    );
+    assert_eq!(pending_turnin(&game), None);
+    assert_eq!(
+        coins(&game),
+        coins_before + 5,
+        "the 49/14 turn-in must pay the content reward"
+    );
+}
+
+/// 26/23 abandons through its own family and still replays the native 49/6
+/// (`CommandPacketQuestAbandon`, RTTI `0x01b6aa2c`).
+#[test]
+fn abandon_26_23_still_replies_49_6() {
+    let fixture = Fixture::new();
+    let mut game = fixture.game(None);
+    let samantha = at_npc(SAMANTHA, "cobblestone_village.json", COBBLESTONE_ZONE);
+    offer(&mut game, &samantha, SAMANTHA, INTRODUCE_YOURSELF, NOW);
+    accept(&mut game, &samantha, INTRODUCE_YOURSELF, NOW + 2);
+    let mut request = vec![26, 0, 23, 0, 0, 0];
+    request.extend(INTRODUCE_YOURSELF.to_le_bytes());
+    let abandoned = send(&mut game, &samantha, &request, NOW + 3);
+    let mut expected = vec![49, 0, 6, 0, 0, 0];
+    expected.extend(INTRODUCE_YOURSELF.to_le_bytes());
+    assert_eq!(abandoned.replies, vec![expected]);
+    assert!(abandoned.changed);
+    assert_eq!(
+        quest_status(&game, INTRODUCE_YOURSELF),
+        QuestStatus::Abandoned
+    );
+    let before = saved(&game);
+    assert!(
+        game.handle_in_world(&[26, 0, 23, 0, 0, 0], &samantha, NOW + 4)
+            .is_err(),
+        "a truncated 26/23 must stay that family's refusal"
+    );
+    assert_eq!(saved(&game), before, "a truncated 26/23 changed state");
+}
+
+/// 26/8 opens the 26/9 menu and 26/10 selects from it (client constructors
+/// `0x008b6bc0` and `0x00a36f80`); an unknown target and a malformed selection keep their
+/// existing outcomes.
+#[test]
+fn interact_and_select_26_8_26_10_still_route() {
+    let fixture = Fixture::new();
+    let mut game = fixture.game(None);
+    let samantha = at_npc(SAMANTHA, "cobblestone_village.json", COBBLESTONE_ZONE);
+    let menu = interact(&mut game, &samantha, SAMANTHA, NOW);
+    let packet = menu
+        .replies
+        .iter()
+        .find(|packet| packet.starts_with(&[26, 0, 9, 0]))
+        .expect("26/8 reaches the 26/9 menu builder");
+    let count = i32::from_le_bytes(packet[13..17].try_into().unwrap());
+    assert!(count > 0, "the 26/9 menu has no options");
+    let talk_choice = menu_option(&menu, TALK_LABEL);
+    let dialogue = send(
+        &mut game,
+        &samantha,
+        &npc_select(SAMANTHA, talk_choice),
+        NOW + 1,
+    );
+    assert!(
+        dialogue
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[26, 0, 3, 0]))
+    );
+    // A target the content does not know belongs to no family: both fall through silently.
+    let unknown = u64::MAX;
+    let before = saved(&game);
+    let missed = send(&mut game, &samantha, &npc_interact(unknown), NOW + 2);
+    assert!(!missed.changed && missed.replies.is_empty());
+    let missed = send(&mut game, &samantha, &npc_select(unknown, 1), NOW + 3);
+    assert!(!missed.changed && missed.replies.is_empty());
+    assert_eq!(saved(&game), before);
+    assert!(
+        game.handle_in_world(&[26, 0, 10, 0, 0, 0], &samantha, NOW + 4)
+            .is_err(),
+        "a malformed selection must stay that family's refusal"
+    );
+}
+
+/// 165/4 and 66/43 keep their shop binding checks: both reach their own family, answer the
+/// client, and a refusal leaves the open shop and the inventory untouched.
+#[test]
+fn vendor_165_4_and_66_43_still_route() {
+    let fixture = Fixture::new();
+    let mut game = fixture.game(None);
+    let vendor = at_npc(SWAMP_VENDOR, "blackspore_swamp.json", SWAMP_ZONE);
+    let menu = interact(&mut game, &vendor, SWAMP_VENDOR, NOW);
+    let shop_choice = menu_option(&menu, SHOP_LABEL);
+    let opened = send(
+        &mut game,
+        &vendor,
+        &npc_select(SWAMP_VENDOR, shop_choice),
+        NOW + 1,
+    );
+    assert!(
+        opened
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[66, 0, 42, 0])),
+        "the Shop choice must open the 66/42 window"
+    );
+    let before = saved(&game);
+    // 165/4 for an item this vendor does not stock: the family refuses and nothing moves.
+    let mut buy = vec![165, 0, 4, 0];
+    buy.extend(SWAMP_VENDOR.to_le_bytes());
+    buy.extend(7u32.to_le_bytes());
+    buy.extend(8i32.to_le_bytes());
+    buy.extend(1u32.to_le_bytes());
+    buy.extend(0u32.to_le_bytes());
+    assert!(
+        game.handle_in_world(&buy, &vendor, NOW + 2).is_err(),
+        "a non-stock 165/4 buy must be refused"
+    );
+    assert_eq!(saved(&game), before, "a refused 165/4 buy changed state");
+    // 66/43 for the same item answers one 66/44 refusal (status dword at 48 = 0).
+    let buy = encode_merchant_buy_66_43(&MerchantBuyRequestV2 {
+        initial_dwords: [8, 0],
+        context_dwords: [0; 3],
+        context_bytes: Vec::new(),
+        trailing_dwords: [1, 0, 7],
+    })
+    .unwrap();
+    let refused = send(&mut game, &vendor, &buy, NOW + 3);
+    assert!(!refused.changed);
+    let status = refused
+        .replies
+        .last()
+        .expect("66/43 answers a 66/44 result");
+    assert_eq!(status.len(), 56, "the client reader needs the full record");
+    assert_eq!(&status[..4], &[66, 0, 44, 0]);
+    assert_ne!(
+        u32::from_le_bytes(status[48..52].try_into().unwrap()),
+        1,
+        "a refused buy must not report success"
+    );
+    assert_eq!(saved(&game), before, "a refused 66/43 buy changed state");
+    // A body that does not decode is answered by this family, not by the fall-through.
+    let malformed = send(&mut game, &vendor, &[66, 0, 43, 0], NOW + 4);
+    assert!(!malformed.changed);
+    assert!(
+        malformed
+            .replies
+            .last()
+            .is_some_and(|packet| packet.starts_with(&[66, 0, 44, 0]))
+    );
+    assert_eq!(saved(&game), before);
+}
+
+/// Menus are per session: another player's refused choice consumes nothing and changes
+/// neither player's saved state.
+#[test]
+fn a_two_session_refusal_does_not_change_the_other_players_state() {
+    let fixture = Fixture::new();
+    let mut first = fixture.game(None);
+    let mut second = fixture.game(None);
+    let samantha = at_npc(SAMANTHA, "cobblestone_village.json", COBBLESTONE_ZONE);
+    let menu = interact(&mut first, &samantha, SAMANTHA, NOW);
+    let choice = menu_option(&menu, TALK_LABEL);
+    let first_before = saved(&first);
+    let second_before = saved(&second);
+    // The second session never opened this menu: its choice is refused.
+    assert!(
+        second
+            .handle_in_world(&npc_select(SAMANTHA, choice), &samantha, NOW + 1)
+            .is_err(),
+        "a session without the menu must not read it"
+    );
+    assert_eq!(saved(&second), second_before);
+    assert_eq!(
+        saved(&first),
+        first_before,
+        "the other session's refusal changed this player's state"
+    );
+    // The first session's menu still answers.
+    let talked = send(
+        &mut first,
+        &samantha,
+        &npc_select(SAMANTHA, choice),
+        NOW + 2,
+    );
+    assert!(
+        talked
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[26, 0, 3, 0]))
+    );
+    assert_eq!(saved(&second), second_before);
+}

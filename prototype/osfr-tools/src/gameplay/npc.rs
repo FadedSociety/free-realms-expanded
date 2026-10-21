@@ -84,6 +84,46 @@ impl Gameplay {
         {
             return Ok(None);
         }
+        if let Some(out) = self.npc_dialogue_26_6(inner)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.npc_dialogue_close_26_4(inner)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.npc_client_objective_45_7(inner)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.npc_journal_49_15(inner)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.npc_quest_reply_49_2(inner)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.npc_quest_end_49_14(inner)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.npc_quest_abandon_26_23(inner)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.npc_interact_26_8(inner, character)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.npc_select_26_10(inner, character, now_ms)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.npc_store_165(inner, character)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.npc_merchant_66(inner)? {
+            return Ok(Some(out));
+        }
+        if let Some(out) = self.npc_merchant_buy_66_43(inner, character)? {
+            return Ok(Some(out));
+        }
+        Ok(None)
+    }
+
+    fn npc_dialogue_26_6(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
         if inner.starts_with(&[26, 0, 6, 0]) {
             let selected = npc_interaction::decode_dialogue_response_26_6(inner)
                 .map_err(|_| invalid("invalid dialogue response"))?;
@@ -133,6 +173,10 @@ impl Gameplay {
                 ..Outcome::default()
             }));
         }
+        Ok(None)
+    }
+
+    fn npc_dialogue_close_26_4(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
         if inner.starts_with(&[26, 0, 4, 0]) {
             if inner.len() != 4 {
                 return Err(invalid("invalid dialogue close request"));
@@ -143,8 +187,12 @@ impl Gameplay {
             }
             return Ok(Some(Outcome::default()));
         }
-        // 45/7: the client says a goal it judges itself is met (W175). Only an open goal of
-        // the character's own active quest can move; anything else changes nothing (R).
+        Ok(None)
+    }
+
+    /// 45/7: the client says a goal it judges itself is met (W175). Only an open goal of
+    /// the character's own active quest can move; anything else changes nothing (R).
+    fn npc_client_objective_45_7(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
         if let Some(client_id) = crate::quest_engine::decode_client_complete(inner)
             .map_err(|_| invalid("invalid client objective completion"))?
         {
@@ -159,6 +207,10 @@ impl Gameplay {
             }));
             return Ok(Some(out));
         }
+        Ok(None)
+    }
+
+    fn npc_journal_49_15(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
         if let Some(request) = crate::quest_journal::decode(inner)
             .map_err(|_| invalid("invalid quest journal request"))?
         {
@@ -201,6 +253,10 @@ impl Gameplay {
             }
             return Ok(Some(out));
         }
+        Ok(None)
+    }
+
+    fn npc_quest_reply_49_2(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
         if inner.starts_with(&[49, 0, 2, 0]) {
             let (quest_id, accept) = npc_interaction::decode_quest_reply_49_2(inner)
                 .map_err(|_| invalid("invalid quest accept/decline reply"))?;
@@ -235,6 +291,10 @@ impl Gameplay {
             out.replies.push(END_DIALOG_26_4.to_vec());
             return Ok(Some(out));
         }
+        Ok(None)
+    }
+
+    fn npc_quest_end_49_14(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
         if inner.starts_with(&[49, 0, 14, 0]) {
             let quest_id = npc_interaction::decode_quest_end_reply_49_14(inner)
                 .map_err(|_| invalid("invalid quest end reply"))?;
@@ -288,6 +348,10 @@ impl Gameplay {
             out.replies.push(END_DIALOG_26_4.to_vec());
             return Ok(Some(out));
         }
+        Ok(None)
+    }
+
+    fn npc_quest_abandon_26_23(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
         if inner.starts_with(&[26, 0, 23, 0, 0, 0]) {
             if inner.len() != 10 {
                 return Err(invalid("invalid quest abandon request"));
@@ -303,6 +367,14 @@ impl Gameplay {
             }
             return Ok(Some(out));
         }
+        Ok(None)
+    }
+
+    fn npc_interact_26_8(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+    ) -> io::Result<Option<Outcome>> {
         if inner.starts_with(&[26, 0, 8, 0]) {
             let request = npc_interaction::decode_npc_interact_26_8(inner)
                 .map_err(|_| invalid("invalid NPC interaction request"))?;
@@ -391,7 +463,15 @@ impl Gameplay {
             out.replies.push(packet);
             return Ok(Some(out));
         }
+        Ok(None)
+    }
 
+    fn npc_select_26_10(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Option<Outcome>> {
         if inner.starts_with(&[26, 0, 10, 0]) {
             if inner.len() != 16 {
                 return Err(invalid("invalid NPC menu selection"));
@@ -577,9 +657,16 @@ impl Gameplay {
             }
             return Ok(Some(out));
         }
+        Ok(None)
+    }
 
-        // 165/4 buy and 165/5 sell, plus the siblings (W172): 2 definitions, 8 list update,
-        // 12 buy-back, 14 gift (always refused).
+    /// 165/4 buy and 165/5 sell, plus the siblings (W172): 2 definitions, 8 list update,
+    /// 12 buy-back, 14 gift (always refused).
+    fn npc_store_165(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+    ) -> io::Result<Option<Outcome>> {
         if matches!(inner, [0xa5, 0, 2 | 4 | 5 | 8 | 12 | 14, 0, ..]) {
             if let Some(shop) = &mut self.npc_coin_shop {
                 let Some(interaction) = &mut self.npc_interaction else {
@@ -641,9 +728,12 @@ impl Gameplay {
                 }
             }
         }
+        Ok(None)
+    }
 
-        // Marketplace siblings (W172): wallet, status, SKU and code lists, account info, and the
-        // Station Cash order rows. The shop answers; a paid order is one staged commit.
+    /// Marketplace siblings (W172): wallet, status, SKU and code lists, account info, and the
+    /// Station Cash order rows. The shop answers; a paid order is one staged commit.
+    fn npc_merchant_66(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
         if matches!(
             inner,
             [
@@ -675,7 +765,14 @@ impl Gameplay {
                 ..Outcome::default()
             }));
         }
+        Ok(None)
+    }
 
+    fn npc_merchant_buy_66_43(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+    ) -> io::Result<Option<Outcome>> {
         if inner.starts_with(&[66, 0, 43, 0]) {
             let Ok(request) = npc_interaction::decode_merchant_buy_66_43(inner) else {
                 return Ok(Some(Outcome {
@@ -741,7 +838,6 @@ impl Gameplay {
                 ..Outcome::default()
             }));
         }
-
         Ok(None)
     }
 
