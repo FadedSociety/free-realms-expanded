@@ -420,11 +420,11 @@ impl EncounterEngine {
     /// already derives `Clone`; a refusal drops the clone, so content,
     /// battles, resolved behaviours, the open start screen and the marker
     /// walks all keep their old values.
-    fn staged<T>(&mut self, f: impl FnOnce(&mut Self) -> io::Result<T>) -> io::Result<T> {
+    fn staged(&mut self, f: impl FnOnce(&mut Self) -> io::Result<()>) -> io::Result<()> {
         let mut staged = self.clone();
-        let value = f(&mut staged)?;
+        f(&mut staged)?;
         *self = staged;
-        Ok(value)
+        Ok(())
     }
 
     /// Developer hot reload of `field_battles.json` (outside encounters).
@@ -750,7 +750,18 @@ impl EncounterEngine {
             if near < WANDER_NOTICE {
                 // It notices the player: stop and face them, so it can be clicked.
                 if self.field_sim.moving.contains(&guid) {
-                    let face = heading(w.position, player).unwrap_or_default();
+                    // Notice exception: this facing divides by the 3-D `near`
+                    // clamped at 1 cm, not by `heading`'s true distance. Below
+                    // 1 cm the direction is shorter than a unit vector; the
+                    // client normalizes it and ignores it under its 0.01
+                    // squared-length threshold (`0x0095dae0`), so these bytes
+                    // must not change.
+                    let d = near.max(0.01);
+                    let face = [
+                        (player[0] - w.position[0]) / d,
+                        0.0,
+                        (player[2] - w.position[2]) / d,
+                    ];
                     out.replies.push(movement(guid, w.position, face));
                 }
                 stand(guid, &mut self.field_sim.moving, out);
@@ -784,7 +795,7 @@ impl EncounterEngine {
                 stand(guid, &mut self.field_sim.moving, out);
                 continue;
             }
-            let Some(face) = heading(w.position, goal) else {
+            let Some(face) = heading(w.position, goal, left) else {
                 continue;
             };
             for (coord, to) in w.position.iter_mut().zip(goal) {
@@ -919,16 +930,17 @@ impl EncounterEngine {
                 };
                 let step = (speed * elapsed.min(250) as f32 / 1000.0).min((left - stop).max(0.0));
                 if left > 0.001 && step > 0.0 && b.mode != Mode::Stationary {
-                    let (next, grounded) = match advance(f.state.position, goal, step, &ground) {
-                        Ok(next) => (next, true),
-                        Err(next) => (next, false),
-                    };
+                    let (next, grounded) =
+                        match advance(f.state.position, goal, left, step, &ground) {
+                            Ok(next) => (next, true),
+                            Err(next) => (next, false),
+                        };
                     // Check BEFORE moving. Never take even one step outside home leash.
                     if f.motion == FieldMotion::Chasing && horizontal_distance(next, home) > leash {
                         f.motion = FieldMotion::Returning;
                         f.roam_goal = None;
                     } else if grounded {
-                        let face = heading(f.state.position, goal).unwrap_or_default();
+                        let face = heading(f.state.position, goal, left).unwrap_or_default();
                         f.state.position = next;
                         out.replies.push(movement(guid, next, face));
                         walk(guid, 3, &mut self.field_sim.moving, out);
@@ -1030,33 +1042,35 @@ impl EncounterEngine {
     }
 }
 
-/// Facing from `from` toward `to` exactly how the field AI has always sent it:
-/// the horizontal delta divided by the full 3-D distance. Movement is opcode
-/// 125 (`0x008e5940`); its direction is a horizontal vector that the client
-/// normalizes before `atan2(X, Z)` (`0x0095dae0`), so the y component is zero.
-/// `None` when the spots coincide, in which case the caller sends a zero
-/// facing (there is no direction to communicate). Documented exceptions kept
-/// inline: the waypoint-arrival heading in `tick_wanderers_for` (it divides
-/// the goal offset by `WANDER_RADIUS`) and `kite_turn`'s negated facing in
-/// `encounter.rs`.
-fn heading(from: [f32; 3], to: [f32; 3]) -> Option<[f32; 3]> {
-    let left = distance(from, to);
+/// Facing from `from` toward `to` for a walk or chase step: the horizontal
+/// delta divided by the full 3-D distance. `left` is the caller's
+/// `distance(from, to)`, so the hot path computes the square root once.
+/// Movement is opcode 125 (`0x008e5940`); its direction is a horizontal
+/// vector that the client normalizes before `atan2(X, Z)` (`0x0095dae0`), so
+/// the y component is zero. `None` when the spots coincide, in which case the
+/// caller sends a zero facing (there is no direction to communicate).
+/// Documented exceptions kept inline: the notice facing in
+/// `tick_wanderers_for` (divides by 3-D distance clamped at 1 cm) and the
+/// waypoint-arrival heading (divides the goal offset by `WANDER_RADIUS`);
+/// `kite_turn`'s negated facing in `encounter.rs` is separate.
+fn heading(from: [f32; 3], to: [f32; 3], left: f32) -> Option<[f32; 3]> {
     (left > 0.001).then(|| [(to[0] - from[0]) / left, 0.0, (to[2] - from[2]) / left])
 }
 
-/// The integrated next spot toward `goal`. `Ok` is snapped by `ground`; `Err`
-/// carries the same integrated spot when ground refuses it
-/// (`Ground::field_position`), so the caller can still apply its "home leash
-/// before moving" rule first, exactly as the old two-step check did. The bare
-/// `Ground::snap` walk in `tick_wanderers_for` stays inline because it never
-/// refuses a step.
+/// The integrated next spot toward `goal`. `left` is the caller's
+/// `distance(position, goal)` and the caller guards it above 1 mm; `Ok` is
+/// snapped by `ground`, and `Err` carries the same integrated spot when ground
+/// refuses it (`Ground::field_position`), so the caller can still apply its
+/// "home leash before moving" rule first, exactly as the old two-step check
+/// did. The bare `Ground::snap` walk in `tick_wanderers_for` stays inline
+/// because it never refuses a step.
 fn advance(
     position: [f32; 3],
     goal: [f32; 3],
+    left: f32,
     step: f32,
     ground: &Ground,
 ) -> Result<[f32; 3], [f32; 3]> {
-    let left = distance(position, goal);
     let mut next = position;
     for (coord, to) in next.iter_mut().zip(goal) {
         *coord += (to - *coord) / left * step;

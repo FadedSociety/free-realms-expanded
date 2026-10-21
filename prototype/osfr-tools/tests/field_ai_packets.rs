@@ -4,9 +4,10 @@
 //! deterministic ground grid, then asserts the complete reply sequence.
 //!
 //! Wire evidence: movement is the standalone opcode 125 read at `0x008e5940`
-//! (u16 family/subtype, u64 actor, 3 f32 position, 3 f32 direction, state,
-//! unknown); its direction is a horizontal vector the client normalizes before
-//! `atan2(X, Z)` (`0x0095dae0`). Animation is family 35/subtype 8 read at
+//! (u16 opcode 125, u64 actor, 3 f32 position, 3 f32 direction, state,
+//! unknown); there is no subtype after it, and its direction is a horizontal
+//! vector the client normalizes before `atan2(X, Z)` (`0x0095dae0`).
+//! Animation is family 35/subtype 8 read at
 //! `0x00908a50` -> `0x008e5dd0` (u64 actor, i32 animation, i32 unknown, flags
 //! byte; bit 0 assigns the base animation). Ids 1/2/3 are loc_stand/loc_walk/
 //! loc_run and 1001 is the melee attack clip.
@@ -235,6 +236,8 @@ fn frames(out: &EncounterOutcome) -> Vec<Frame> {
             let family = u16::from_le_bytes([packet[0], packet[1]]);
             let sub = u16::from_le_bytes([packet[2], packet[3]]);
             match family {
+                // Opcode 125 is standalone: packet[2..10] is the u64 actor, so
+                // `sub` above is the GUID's low half, not a subtype.
                 125 => {
                     assert_eq!(packet.len(), 36, "movement body");
                     Frame::Move {
@@ -742,6 +745,50 @@ fn wanderer_walks_then_faces_a_nearby_player() {
         .tick([position[0] + 3.0, position[1], position[2]], 1, 300)
         .unwrap();
     assert!(frames(&out).is_empty());
+}
+
+#[test]
+fn wanderer_notice_faces_with_the_old_clamped_divisor() {
+    let fixture = Fixture::new([50.0, 0.0, 50.0], behaviour());
+    let mut engine = fixture.load(None);
+    // Let the marker take one walking step, then put the player almost on top
+    // of it: 0.9 mm east and 1.2 mm up (1.5 mm 3-D). The notice facing divides
+    // the horizontal delta by near.max(0.01) = 1 cm, so it is 0.09 long: below
+    // the client's 0.010000001 squared-length threshold (0x0095dae0), which
+    // keeps its facing. A 3-D unit direction would be 0.6 (squared 0.36) and
+    // turn the marker.
+    let out = engine.tick([-200.0, 0.0, -150.0], 1, 100).unwrap();
+    let position = match frames(&out).first() {
+        Some(Frame::Move { position, .. }) => *position,
+        other => panic!("the marker must walk first: {other:?}"),
+    };
+    let player = [position[0] + 0.0009, position[1] + 0.0012, position[2]];
+    let out = engine.tick(player, 1, 200).unwrap();
+    let dx = player[0] - position[0];
+    let dy = player[1] - position[1];
+    let dz = player[2] - position[2];
+    let near = (dx * dx + dy * dy + dz * dz).sqrt();
+    let d = near.max(0.01);
+    assert_eq!(
+        frames(&out),
+        vec![
+            Frame::Move {
+                guid: SPAWNER_GUID,
+                position,
+                heading: [dx / d, 0.0, dz / d],
+            },
+            Frame::Anim {
+                guid: SPAWNER_GUID,
+                id: 1,
+                base: true,
+            },
+        ]
+    );
+    let face = [dx / d, 0.0, dz / d];
+    assert!(
+        face[0] * face[0] + face[2] * face[2] < 0.010000001,
+        "the client ignores this facing"
+    );
 }
 
 #[test]

@@ -16,6 +16,36 @@ static SERIAL: AtomicU64 = AtomicU64::new(0);
 
 const KEPT_BATTLE: u32 = 12310;
 const DROPPED_BATTLE: u32 = 96;
+const FIELD_GUID: u64 = 910_500_001;
+
+/// One plain zone-0 field actor: 10 m/s keeps each 100 ms step a whole metre,
+/// and the 12 m leash matches the shipped preset.
+fn enemy(position: [f32; 3]) -> Value {
+    json!({
+        "guid": FIELD_GUID,
+        "definition_id": 400,
+        "model_id": 3,
+        "name_id": 100,
+        "name": "Synthetic actor",
+        "texture_alias": "",
+        "position": position,
+        "max_health": 1000,
+        "damage": 7,
+        "boss": false,
+        "level": 1,
+        "zone_id": 0,
+        "respawn_seconds": 30,
+        "aggro_range": 8.0,
+        "leash_radius": 12.0,
+        "behaviour": {
+            "move_speed": 10.0,
+            "run_speed": 10.0,
+            "attack_ms": 1000,
+            "reach": 2.5,
+            "leash": 12.0
+        }
+    })
+}
 
 struct Fixture {
     dir: PathBuf,
@@ -335,5 +365,116 @@ fn a_reload_while_a_fight_is_active_is_refused() {
         engine.battle_spawners(),
         spawners,
         "a mid-fight reload refusal keeps every battle row"
+    );
+}
+
+/// The reply kinds this suite orders. Opcode 125 is standalone: bytes 2..10
+/// are the u64 actor, so it has no subtype.
+fn kind(packet: &[u8]) -> (u16, u16) {
+    let opcode = u16::from_le_bytes([packet[0], packet[1]]);
+    let subtype = if opcode == 125 {
+        0
+    } else {
+        u16::from_le_bytes([packet[2], packet[3]])
+    };
+    (opcode, subtype)
+}
+
+fn kinds(packets: &[Vec<u8>]) -> Vec<(u16, u16)> {
+    packets.iter().map(|packet| kind(packet)).collect()
+}
+
+fn u64_at(packet: &[u8], offset: usize) -> u64 {
+    u64::from_le_bytes(packet[offset..offset + 8].try_into().unwrap())
+}
+
+fn f32_at(packet: &[u8], offset: usize) -> f32 {
+    f32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap())
+}
+
+fn anim_id(packet: &[u8]) -> i32 {
+    i32::from_le_bytes(packet[12..16].try_into().unwrap())
+}
+
+#[test]
+fn a_refused_enemy_reload_keeps_the_walk_and_attack_state() {
+    let fixture = Fixture::new();
+    // No battle file: these pins order field-enemy frames only.
+    let mut engine = EncounterEngine::load(&fixture.dir, None).unwrap();
+    let path = fixture.write(
+        "field-enemies.json",
+        &json!({"schema_version": 1, "enemies": [enemy([0.0, 0.0, 0.0])]}),
+    );
+    engine.load_field_enemies(&path).unwrap();
+
+    // First tick: it swings once, starting the attack cooldown at 100 ms.
+    let first = engine.tick([1.0, 0.0, 0.0], 43, 100).unwrap();
+    assert!(kinds(&first.replies).contains(&(32, 7)));
+    let health = engine.state().player_health;
+    assert!(health < 1000);
+
+    // Second tick: a full 250 ms step starts the run animation.
+    let walk = engine.tick([7.0, 0.0, 0.0], 43, 350).unwrap();
+    assert_eq!(kinds(&walk.replies), vec![(125, 0), (35, 8)]);
+    assert_eq!(anim_id(&walk.replies[1]), 3);
+
+    // A malformed file is refused, and its per-GUID cleanup stays on the
+    // clone: the walk set and the attack cooldown are still the old ones.
+    let mut bad = enemy([0.0, 0.0, 0.0]);
+    bad["level"] = json!(21);
+    let bad = fixture.write(
+        "field-enemies-bad.json",
+        &json!({"schema_version": 1, "enemies": [bad]}),
+    );
+    let error = engine.reload_field_enemies(&bad).unwrap_err().to_string();
+    assert!(!error.is_empty());
+
+    // Still walking: this step moves without a second run animation.
+    let step = engine.tick([7.0, 0.0, 0.0], 43, 450).unwrap();
+    assert_eq!(kinds(&step.replies), vec![(125, 0)]);
+
+    // Still on the 100 ms cooldown: the stop step lands in reach but the
+    // player takes no hit. A cleared `attacks` map would swing here.
+    let stop = engine.tick([7.0, 0.0, 0.0], 43, 550).unwrap();
+    assert_eq!(kinds(&stop.replies), vec![(125, 0), (35, 8)]);
+    assert_eq!(anim_id(&stop.replies[1]), 1);
+    assert_eq!(engine.state().player_health, health);
+}
+
+#[test]
+fn a_successful_enemy_reload_despawns_before_it_respawns() {
+    let fixture = Fixture::new();
+    let mut engine = EncounterEngine::load(&fixture.dir, None).unwrap();
+    let before = fixture.write(
+        "field-enemies-before.json",
+        &json!({"schema_version": 1, "enemies": [enemy([0.0, 0.0, 0.0])]}),
+    );
+    engine.load_field_enemies(&before).unwrap();
+    let after = fixture.write(
+        "field-enemies.json",
+        &json!({"schema_version": 1, "enemies": [enemy([4.0, 0.0, 0.0])]}),
+    );
+
+    let packets = engine.reload_field_enemies(&after).unwrap();
+
+    assert_eq!(
+        kinds(&packets),
+        vec![(35, 3), (35, 2), (35, 5), (35, 12)],
+        "35/3 despawns come before the spawn, HP and relevance frames"
+    );
+    assert_eq!(
+        u64_at(&packets[0], 6),
+        FIELD_GUID,
+        "35/3 names the old actor"
+    );
+    assert_eq!(
+        u64_at(&packets[1], 4),
+        FIELD_GUID,
+        "35/2 names the new actor"
+    );
+    assert_eq!(
+        f32_at(&packets[1], 37),
+        4.0,
+        "the spawn uses the new file's position"
     );
 }
