@@ -29,6 +29,7 @@ pub const MAX_COUNT: usize = 4096;
 
 pub const SUB_PLACE: u16 = 2;
 pub const SUB_INSTANCE_DATA: u16 = 28;
+pub const SUB_INSTANCE_LIST: u16 = 39;
 pub const SUB_FIXTURE_UPDATE: u16 = 40;
 pub const SUB_FIXTURE_REMOVE: u16 = 41;
 pub const SUB_FIXTURE_ASSET: u16 = 42;
@@ -760,6 +761,50 @@ impl ZoneData {
             flag_b: reader.bool()?,
             unknown_word: reader.i32()?,
             instance: PlayerHousingInstanceInfo::decode(&mut reader)?,
+        };
+        reader.finish()?;
+        Ok(value)
+    }
+}
+
+/// S2C 127/39 instance list. Client reader `00abf210`: list reader `00aba800` (`u32` count, then
+/// `count` records read by `00aafe10`), then the `u64` owner guid the handler `00ac2a10` compares
+/// with the local character to choose "My Houses" or the visit picker.
+#[derive(Clone, Debug, PartialEq)]
+pub struct InstanceList {
+    pub records: Vec<PlayerHousingInstanceInfo>,
+    pub owner_guid: u64,
+}
+
+impl InstanceList {
+    pub fn encode(&self) -> io::Result<Vec<u8>> {
+        if self.records.len() > MAX_COUNT {
+            return Err(invalid("too many 127/39 instance records"));
+        }
+        let mut writer = Writer::new(SUB_INSTANCE_LIST);
+        writer.u32(self.records.len() as u32);
+        for record in &self.records {
+            record.encode(&mut writer)?;
+        }
+        writer.u64(self.owner_guid);
+        Ok(writer.finish())
+    }
+
+    pub fn decode(payload: &[u8]) -> io::Result<Self> {
+        let mut reader = Reader::new(payload);
+        if reader.subtype()? != SUB_INSTANCE_LIST {
+            return Err(invalid("not a 127/39 instance-list payload"));
+        }
+        let count = reader.u32()? as usize;
+        if count > MAX_COUNT {
+            return Err(invalid("too many 127/39 instance records"));
+        }
+        let records = (0..count)
+            .map(|_| PlayerHousingInstanceInfo::decode(&mut reader))
+            .collect::<io::Result<_>>()?;
+        let value = Self {
+            records,
+            owner_guid: reader.u64()?,
         };
         reader.finish()?;
         Ok(value)

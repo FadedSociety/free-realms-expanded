@@ -1241,7 +1241,7 @@ impl Gateway {
             character: self
                 .gameplay
                 .as_ref()
-                .and_then(|game| game.soccer_return(&self.state))
+                .and_then(|game| game.soccer_return(&self.state).or_else(|| game.house_return()))
                 .unwrap_or_else(|| self.state.clone()),
             gameplay: self.gameplay.as_ref().map(Gameplay::state),
         }
@@ -1374,6 +1374,9 @@ impl Gateway {
                 self.state = return_location;
             }
             if let Some(return_location) = game.abandon_soccer_for_reconnect(&self.state) {
+                self.state = return_location;
+            }
+            if let Some(return_location) = game.abandon_house_for_reconnect() {
                 self.state = return_location;
             }
             game.reset_session();

@@ -45,6 +45,7 @@ mod content_reload;
 mod derby_session;
 mod encounter_rewards;
 mod field_battle;
+mod housing;
 mod jobs;
 mod matchmaking_route;
 mod movie;
@@ -133,6 +134,8 @@ pub struct GameplayState {
     pub progression_extras: Option<crate::progression_extras::ProgressionExtrasState>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub sc_wallet: Option<crate::station_cash::Wallet>, // T230: save form; live value is in CoinShop.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub housing: Option<crate::housing_service::HousingServiceState>, // Lead housing slice 1.
 }
 
 /// Opt-in Harvesting candidate bound by this gateway integration: Farnum's
@@ -255,6 +258,8 @@ pub struct Gameplay {
     progression_extras: crate::progression_extras::ProgressionExtras,
     /// Data-driven achievement counters and exact title-name bindings.
     achievement_bindings: crate::progression_extras::AchievementBindings,
+    /// Player housing (`gameplay/housing.rs`); `None` when the content has no `houses.json`.
+    housing: Option<housing::HousingSession>,
 }
 
 #[derive(Default)]
@@ -614,6 +619,7 @@ impl Gameplay {
         let saved_derby = state.as_ref().and_then(|s| s.derby.clone());
         let saved_chess = state.as_ref().and_then(|s| s.chess);
         let saved_sc_wallet = state.as_ref().and_then(|s| s.sc_wallet.clone());
+        let saved_housing = state.as_ref().and_then(|s| s.housing.clone());
         if let Some(saved) = state.as_ref().and_then(|s| s.warpstones.as_ref()) {
             warp.restore(saved);
         }
@@ -1151,6 +1157,7 @@ impl Gameplay {
             pets: crate::pets::PetService::new(crate::pets::PetService::bundled_content()?)?,
             progression_extras,
             achievement_bindings,
+            housing: housing::HousingSession::load(directory, saved_housing.as_ref(), inventory.state())?,
             inventory,
             categories: ItemCategories::load(directory)?,
             quests: QuestEngine::load(directory, quests)?,
@@ -1376,6 +1383,7 @@ impl Gameplay {
                 .npc_coin_shop
                 .as_ref()
                 .and_then(crate::coin_shop::CoinShop::saved_wallet),
+            housing: self.housing.as_ref().and_then(|h| h.state()),
         }
     }
 
@@ -1640,6 +1648,9 @@ impl Gameplay {
     }
 
     pub fn current_zone(&self) -> Option<ZoneTransition> {
+        if let Some(zone) = self.house_zone() {
+            return Some(zone);
+        }
         if let Some(soccer) = self.soccer.as_ref() {
             // (R) A match owns its own arena scene; the public overworld zone
             // must not stand in for it, or other players share its instance.
@@ -1680,6 +1691,9 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Outcome> {
+        if let Some(replies) = self.housing_loaded() {
+            return Ok(Outcome { replies, ..Outcome::default() });
+        }
         if let Some(soccer) = self.soccer.as_mut() {
             return Ok(Outcome {
                 replies: soccer.loaded_replies(),
@@ -2226,6 +2240,9 @@ impl Gameplay {
                 replies: vec![chat::system("Finish the chess game before interacting.")],
                 ..Outcome::default()
             });
+        }
+        if let Some(out) = self.handle_housing(inner, character)? {
+            return Ok(out);
         }
         if let Some(out) = self.handle_mounts(inner, character, now_ms)? {
             return Ok(out);

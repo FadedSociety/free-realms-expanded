@@ -39,6 +39,8 @@ occupations!(
     FieldEngaged,
     // T230: a player trade or pending invite. Derived from the shared trade service per request.
     Trade,
+    // Lead housing slice 1: inside a house lot (a separate scene).
+    Housing,
 );
 
 /// What an occupation blocks while it is active.
@@ -72,6 +74,9 @@ impl Occupation {
             // A trade owns the client's item/coin interaction, so it closes every other gate it
             // can reach. Location reports stay ordinary: the client may still move while trading.
             Trade => (true, true, true, true, false),
+            // (R) A lot is its own scene: leave it before travelling, riding or starting an
+            // activity; pets may follow (the lot's pet autospawn flag); housing owns movement.
+            Housing => (true, true, true, false, true),
         };
         Gates {
             start,
@@ -108,6 +113,7 @@ impl Gameplay {
             Occupation::Kart => self.kart_entry.as_ref().is_some_and(|k| k.active()),
             Occupation::FieldEngaged => self.field_engaged,
             Occupation::Trade => self.trading,
+            Occupation::Housing => self.housing.as_ref().is_some_and(|h| h.in_house()),
         }
     }
 
@@ -125,7 +131,8 @@ mod tests {
     use super::Occupation::{self, *};
 
     /// Pins the table; changing a gate is a deliberate, tested edit. The start and warp rows
-    /// include kart and derby since the owner closed those gaps (2026-10-19).
+    /// include kart and derby since the owner closed those gaps (2026-10-19). Housing (lead,
+    /// 2026-10-20) closes start, warp and ride, keeps pets, and owns location.
     #[test]
     fn gates_reproduce_the_replaced_busy_lists() {
         let members = |gate: fn(super::Gates) -> bool| -> Vec<Occupation> {
@@ -139,19 +146,19 @@ mod tests {
             members(|g| g.start),
             [
                 Forging, Smelting, Cooking, Mining, Harvesting, Chess, Encounter, Derby, Fishing,
-                Soccer, Kart, Trade
+                Soccer, Kart, Trade, Housing
             ]
         );
         assert_eq!(
             members(|g| g.warp),
             [
                 Forging, Smelting, Cooking, Mining, Harvesting, Chess, Encounter, Derby, Fishing,
-                Soccer, Kart, Trade
+                Soccer, Kart, Trade, Housing
             ]
         );
         assert_eq!(
             members(|g| g.ride),
-            [Encounter, Derby, Soccer, Kart, FieldEngaged, Trade]
+            [Encounter, Derby, Soccer, Kart, FieldEngaged, Trade, Housing]
         );
         assert_eq!(
             members(|g| g.pets),
@@ -160,6 +167,6 @@ mod tests {
                 Soccer, Kart, Trade
             ]
         );
-        assert_eq!(members(|g| g.location), [Derby, Soccer, Kart]);
+        assert_eq!(members(|g| g.location), [Derby, Soccer, Kart, Housing]);
     }
 }

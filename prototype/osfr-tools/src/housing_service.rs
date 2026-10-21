@@ -36,7 +36,7 @@ use crate::housing::{
 use crate::housing_native::{
     CouplingDisplay, Customization, FixtureAsset, FixtureDefinition,
     FixtureInstance as WireFixtureInstance, FixtureInstanceInfo, FixtureItemList, FixtureRemove,
-    FixtureUpdate, HouseInfo, HousePermissionRecord, InstanceData,
+    FixtureUpdate, HouseInfo, HousePermissionRecord, InstanceData, InstanceList,
     PlaceFixture as WirePlaceFixture, PlacementDenied, PlayerHousingInstanceInfo, PositionUpdate,
     ZoneData,
 };
@@ -69,8 +69,12 @@ pub const OP_PICKUP_ALL: u16 = 4;
 pub const OP_SAVE: u16 = 5;
 pub const OP_SET_EDIT_MODE: u16 = 6;
 pub const OP_LEAVE: u16 = 10;
+/// `RequestPlayerHouses` (`00ac3f40`): `u64` owner guid, then a length-prefixed string.
+pub const OP_REQUEST_HOUSES: u16 = 14;
 pub const OP_ENTER: u16 = 19;
 pub const OP_PREVIEW: u16 = 20;
+/// `RequestGrant` (`00ac7af0`, latched once per client session): empty body.
+pub const OP_REQUEST_GRANT: u16 = 23;
 
 pub const REPLY_INSTANCE_DATA: u16 = 28;
 pub const REPLY_INSTANCE_LIST: u16 = 39;
@@ -354,6 +358,12 @@ pub enum Request {
     },
     SaveFixture,
     PreviewByItemDefinition,
+    /// 127/23: the client asks once per session whether it has a house to receive.
+    RequestGrant,
+    /// 127/14: list one player's houses (the trailing string is not used).
+    RequestHouses {
+        owner_guid: u64,
+    },
 }
 
 /// Decode a complete inner game packet: base opcode 127, inner opcode, then the recovered body.
@@ -366,6 +376,35 @@ pub fn decode_request(inner: &[u8]) -> Result<Request, RequestError> {
         return Err(RequestError::WrongBaseOpcode { found: base });
     }
     let opcode = u16::from_le_bytes([inner[2], inner[3]]);
+    if opcode == OP_REQUEST_GRANT {
+        return match inner.len() - HEADER_LEN {
+            0 => Ok(Request::RequestGrant),
+            count => Err(RequestError::TrailingBytes { count }),
+        };
+    }
+    if opcode == OP_REQUEST_HOUSES {
+        // u64 owner guid, then a u32-length string (bounded, otherwise unused).
+        let body = &inner[HEADER_LEN..];
+        if body.len() < 12 {
+            return Err(RequestError::Truncated);
+        }
+        let text_len = u32::from_le_bytes(body[8..12].try_into().unwrap()) as usize;
+        if text_len > 4096 {
+            return Err(RequestError::BodyRejected);
+        }
+        if body.len() != 12 + text_len {
+            return Err(if body.len() < 12 + text_len {
+                RequestError::Truncated
+            } else {
+                RequestError::TrailingBytes {
+                    count: body.len() - 12 - text_len,
+                }
+            });
+        }
+        return Ok(Request::RequestHouses {
+            owner_guid: u64::from_le_bytes(body[..8].try_into().unwrap()),
+        });
+    }
     if opcode == OP_PICKUP_ALL || opcode == OP_LEAVE {
         if inner.len() != HEADER_LEN {
             return Err(RequestError::TrailingBytes {
@@ -662,6 +701,7 @@ pub enum HousingReply {
     HouseInfo(HouseInfo),
     PositionUpdate(PositionUpdate),
     PlacementDenied(PlacementDenied),
+    InstanceList(InstanceList),
     Unrecovered { opcode: u16 },
 }
 
@@ -677,6 +717,7 @@ impl HousingReply {
             Self::HouseInfo(_) => REPLY_HOUSE_INFO,
             Self::PositionUpdate(_) => REPLY_POSITION,
             Self::PlacementDenied(_) => REPLY_PLACEMENT_DENIED,
+            Self::InstanceList(_) => REPLY_INSTANCE_LIST,
             Self::Unrecovered { opcode } => *opcode,
         }
     }
@@ -694,6 +735,7 @@ impl HousingReply {
             Self::HouseInfo(value) => value.encode(),
             Self::PositionUpdate(value) => value.encode(),
             Self::PlacementDenied(value) => value.encode(),
+            Self::InstanceList(value) => value.encode(),
             Self::Unrecovered { opcode } => Err(io::Error::new(
                 io::ErrorKind::Unsupported,
                 format!("housing reply {opcode} body is not recovered"),
@@ -924,7 +966,7 @@ pub struct HousingServiceState {
 }
 
 /// The housing service for one server process.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct HousingService {
     config: FixtureConfig,
     housing: Housing,
@@ -1191,6 +1233,8 @@ impl HousingService {
         match request {
             Request::Enter { house_guid } => self.enter(actor_guid, house_guid, stock),
             Request::Leave => self.leave(actor_guid),
+            Request::RequestGrant => self.request_grant(actor_guid),
+            Request::RequestHouses { owner_guid } => self.house_list(actor_guid, owner_guid),
             Request::Place {
                 selection_id,
                 transform,
@@ -1358,6 +1402,51 @@ impl HousingService {
             replies,
             changed: false,
         })
+    }
+
+    /// 127/23 (R): the first ask grants the starter lot (idempotent: a repeat grants nothing) and
+    /// answers with the owner's 127/39 list either way. 127/49 is not sent: no lot row carries
+    /// the house-type text it prints.
+    fn request_grant(&mut self, actor_guid: u64) -> Result<ServiceOutcome, ServiceError> {
+        let before = self.lots_of(actor_guid).len();
+        self.grant_starter_lot(actor_guid)?;
+        let mut outcome = self.house_list(actor_guid, actor_guid)?;
+        outcome.changed = self.lots_of(actor_guid).len() > before;
+        Ok(outcome)
+    }
+
+    /// 127/14 and the tail of 127/23: one owner's houses that `actor_guid` may visit (R: a
+    /// visitor sees only lots `can_visit` allows; the owner sees all of their own).
+    fn house_list(
+        &self,
+        actor_guid: u64,
+        owner_guid: u64,
+    ) -> Result<ServiceOutcome, ServiceError> {
+        let records = self
+            .lots_of(owner_guid)
+            .into_iter()
+            .filter(|lot| self.housing.can_visit(actor_guid, lot.lot_guid).is_ok())
+            .filter_map(|lot| {
+                let definition = self.house_definitions.get(&lot.property_id)?;
+                Some(self.instance_info(&lot, definition))
+            })
+            .collect();
+        Ok(ServiceOutcome {
+            zone_change: None,
+            replies: vec![HousingReply::InstanceList(InstanceList {
+                records,
+                owner_guid,
+            })],
+            changed: false,
+        })
+    }
+
+    fn lots_of(&self, owner_guid: u64) -> Vec<LotSnapshot> {
+        self.state()
+            .lots
+            .into_iter()
+            .filter(|lot| lot.owner_guid == owner_guid)
+            .collect()
     }
 
     fn leave(&mut self, actor_guid: u64) -> Result<ServiceOutcome, ServiceError> {
@@ -1609,29 +1698,38 @@ impl HousingService {
             flag_a: false,
             flag_b: false,
             unknown_word: 0,
-            instance: PlayerHousingInstanceInfo {
-                owner_guid: lot.owner_guid,
-                instance_guid: lot.lot_guid,
-                name_id: lot.name_id,
-                house_name: String::new(),
-                owner_name: String::new(),
-                icon_id: definition.icon_id,
-                fixture_count: lot.count.min(i32::MAX as u32) as i32,
-                furniture_score: 0,
-                last_visited: [0; 2],
-                is_locked: lot.locked,
-                is_members_only: false,
-                is_flora_allowed: RECONSTRUCTED_FLORA_ALLOWED,
-                description: String::new(),
-                keyword_list: String::new(),
-                unknown21: String::new(),
-                rating: 0.0,
-                votes: 0,
-                has_rating: false,
-                can_vote: false,
-                factory_plot_id: 0,
-                when_created: [0; 2],
-            },
+            instance: self.instance_info(lot, definition),
+        }
+    }
+
+    /// The `00aafe10` record shared by 127/45 and each 127/39 row.
+    fn instance_info(
+        &self,
+        lot: &LotSnapshot,
+        definition: &HousingLotDefinition,
+    ) -> PlayerHousingInstanceInfo {
+        PlayerHousingInstanceInfo {
+            owner_guid: lot.owner_guid,
+            instance_guid: lot.lot_guid,
+            name_id: lot.name_id,
+            house_name: String::new(),
+            owner_name: String::new(),
+            icon_id: definition.icon_id,
+            fixture_count: lot.count.min(i32::MAX as u32) as i32,
+            furniture_score: 0,
+            last_visited: [0; 2],
+            is_locked: lot.locked,
+            is_members_only: false,
+            is_flora_allowed: RECONSTRUCTED_FLORA_ALLOWED,
+            description: String::new(),
+            keyword_list: String::new(),
+            unknown21: String::new(),
+            rating: 0.0,
+            votes: 0,
+            has_rating: false,
+            can_vote: false,
+            factory_plot_id: 0,
+            when_created: [0; 2],
         }
     }
 
