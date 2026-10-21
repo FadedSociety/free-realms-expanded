@@ -720,3 +720,74 @@ fn a_derby_driver_offers_nothing_while_the_derby_package_is_absent() {
     let _ = gateway.handle_at(&wrap(&npc_select(MAD_JACK, 99)), NOW + 100);
     assert_eq!(save_bytes(&gateway), before);
 }
+
+/// T341 restores the coverage T313 retired: the shipped derby gate list without a playable
+/// `derby_entry.json` must stay dormant, not only at one driver. Dormancy is decided by the
+/// production loaders (no package means no route and no saved derby state), so a package-less
+/// content set must still ship the four gate ids and list none of them in the 26/9 menu.
+///
+/// The menu bytes are the client 26/9 reader shape (`0x00aa2360` -> `0x00a9dca0`; option id at
+/// `17 + n*28`, label at `+8`), the same shape the T221/T241 tests already parse.
+#[test]
+fn a_content_set_without_a_derby_package_keeps_the_derby_dormant() {
+    let content = Content::new();
+    assert!(
+        !content.0.join("derby_entry.json").exists(),
+        "the fixture ships the gate list, not the derby package"
+    );
+    let gates: DerbyGates =
+        serde_json::from_slice(&fs::read(content.0.join("derby_gates.json")).unwrap()).unwrap();
+    assert_eq!(
+        gates.npcs,
+        vec![MAD_JACK, CRASH, BURT, RIP],
+        "the dormant rule must be observed with the four shipped gate ids present"
+    );
+
+    // The production loaders are the dormancy decision: absent content leaves no route and no
+    // saved derby state, whatever the gate list says.
+    assert!(
+        DerbyGateway::load(&content.0, None)
+            .expect("the package-less content set loads")
+            .is_none(),
+        "a missing derby package must not create a derby route"
+    );
+    let state = Gameplay::load(&content.0, None)
+        .expect("the package-less content set loads")
+        .state();
+    assert!(
+        state.derby.is_none(),
+        "a missing derby package must leave no derby state in the save"
+    );
+
+    for driver in gates.npcs {
+        let mut gateway = gateway_at(&content, state.clone(), npc_position(driver));
+        let before = save_bytes(&gateway);
+        let menu = bodies(&click(&mut gateway, driver, NOW));
+        assert!(
+            menu.iter().any(|packet| packet.starts_with(&[26, 0, 9, 0])),
+            "driver {driver}: the ordinary menu still opens"
+        );
+        assert!(
+            menu_option(&menu, gates.menu_string_id).is_none(),
+            "driver {driver} lists the derby without a package"
+        );
+        // A forged choice is refused by the real gateway path and sends no derby record.
+        let refused = choose(&mut gateway, driver, 99, NOW + 100);
+        assert!(!refused.gameplay_changed, "driver {driver}");
+        assert!(
+            !bodies(&refused)
+                .iter()
+                .any(|packet| packet.first() == Some(&39)),
+            "driver {driver}: a dormant derby sends no 39/ offer"
+        );
+        assert_eq!(
+            save_bytes(&gateway),
+            before,
+            "driver {driver}: the dormant derby changes no save state"
+        );
+        assert!(
+            gateway.snapshot().gameplay.unwrap().derby.is_none(),
+            "driver {driver}: the save keeps no derby state"
+        );
+    }
+}
