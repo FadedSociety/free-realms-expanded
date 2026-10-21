@@ -22,13 +22,13 @@ use osfr_tools::{
     gameplay::Gameplay,
     npc_interaction::{NpcAction, NpcInteraction, NpcInteractionError, NpcSelection},
     world::NpcVisibility,
+    world_text::locale_hash,
 };
 use serde_json::Value;
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs,
     path::{Path, PathBuf},
-    process::Command,
 };
 
 const GREETING_HEADER: [u8; 4] = [26, 0, 3, 0];
@@ -38,10 +38,19 @@ const SEASIDE: &str = "seaside.json";
 const BRIARWOOD: &str = "briarwood.json";
 const SEASIDE_GUIDE: &str = "notes/Build Guides/Content/NPCs/NPCs - Seaside.md";
 const BRIARWOOD_GUIDE: &str = "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md";
+const MEDIC_GUIDE: &str = "notes/Build Guides/Content/Jobs/Medic.md";
+const POSTMAN_GUIDE: &str = "notes/Build Guides/Content/Jobs/Postman.md";
+const KART_GUIDE: &str = "notes/Build Guides/Content/Jobs/Kart Driver.md";
+const BRAWLER_GUIDE: &str = "notes/Build Guides/Content/Jobs/Brawler.md";
+const FISHERMAN_GUIDE: &str = "notes/Build Guides/Content/Jobs/Fisherman.md";
+const ADVENTURER_GUIDE: &str = "notes/Build Guides/Content/Jobs/Adventurer.md";
+const MINER_GUIDE: &str = "notes/Build Guides/Content/Jobs/Miner.md";
 
 /// One edited row: the content key, bound `Global.Text` id, its JenkinsLookup2 key hash,
-/// the physical stock-locale line, the guide row that proves the speaker, and the proof
-/// phrase the `client` source must carry.
+/// the physical stock-locale line, the guide row that proves the speaker (it must contain
+/// the hash, or the line must self-identify), and the proof phrase the `client` source
+/// must carry. `quest` is the server quest record whose 49/1 intro is this line, when the
+/// line is a quest intro; the test asserts both the giver and the intro binding.
 struct Greeting {
     npc_id: u64,
     file: &'static str,
@@ -50,18 +59,20 @@ struct Greeting {
     dat_line: u32,
     guide: &'static str,
     guide_line: u32,
+    quest: Option<(&'static str, u32)>,
     proof: &'static str,
 }
 
-const NEW_GREETINGS: [Greeting; 24] = [
+const NEW_GREETINGS: [Greeting; 22] = [
     Greeting {
         npc_id: 9000000072,
         file: SEASIDE,
         greeting: 387576,
         hash: 4293886124,
         dat_line: 113302,
-        guide: SEASIDE_GUIDE,
-        guide_line: 51,
+        guide: MEDIC_GUIDE,
+        guide_line: 114,
+        quest: Some(("medic.json", 3090027)),
         proof: "first-person Medic trainer quest offer",
     },
     Greeting {
@@ -70,19 +81,10 @@ const NEW_GREETINGS: [Greeting; 24] = [
         greeting: 387934,
         hash: 1553080327,
         dat_line: 41118,
-        guide: SEASIDE_GUIDE,
-        guide_line: 53,
+        guide: POSTMAN_GUIDE,
+        guide_line: 98,
+        quest: Some(("postman.json", 3130017)),
         proof: "first-person Postman trainer quest offer",
-    },
-    Greeting {
-        npc_id: 9000000112,
-        file: SEASIDE,
-        greeting: 104270,
-        hash: 3098965505,
-        dat_line: 81814,
-        guide: SEASIDE_GUIDE,
-        guide_line: 55,
-        proof: "first-person Card Duelist quest offer",
     },
     Greeting {
         npc_id: 9500000598,
@@ -92,6 +94,7 @@ const NEW_GREETINGS: [Greeting; 24] = [
         dat_line: 6572,
         guide: SEASIDE_GUIDE,
         guide_line: 31,
+        quest: None,
         proof: "first-person Seaside welcome",
     },
     Greeting {
@@ -102,6 +105,7 @@ const NEW_GREETINGS: [Greeting; 24] = [
         dat_line: 57559,
         guide: SEASIDE_GUIDE,
         guide_line: 29,
+        quest: None,
         proof: "first-person new-visitor greeting",
     },
     Greeting {
@@ -112,6 +116,7 @@ const NEW_GREETINGS: [Greeting; 24] = [
         dat_line: 36681,
         guide: SEASIDE_GUIDE,
         guide_line: 32,
+        quest: None,
         proof: "first-person innkeeper line",
     },
     Greeting {
@@ -122,6 +127,7 @@ const NEW_GREETINGS: [Greeting; 24] = [
         dat_line: 69548,
         guide: SEASIDE_GUIDE,
         guide_line: 61,
+        quest: None,
         proof: "first-person Pirate's Plunder registration offer",
     },
     Greeting {
@@ -132,6 +138,7 @@ const NEW_GREETINGS: [Greeting; 24] = [
         dat_line: 92519,
         guide: SEASIDE_GUIDE,
         guide_line: 91,
+        quest: None,
         proof: "first-person helmet request",
     },
     Greeting {
@@ -142,6 +149,7 @@ const NEW_GREETINGS: [Greeting; 24] = [
         dat_line: 89537,
         guide: SEASIDE_GUIDE,
         guide_line: 107,
+        quest: None,
         proof: "first-person pearl-collection offer",
     },
     Greeting {
@@ -152,6 +160,7 @@ const NEW_GREETINGS: [Greeting; 24] = [
         dat_line: 44078,
         guide: SEASIDE_GUIDE,
         guide_line: 78,
+        quest: None,
         proof: "first-person Beach Ball outfit request",
     },
     Greeting {
@@ -162,6 +171,7 @@ const NEW_GREETINGS: [Greeting; 24] = [
         dat_line: 42849,
         guide: SEASIDE_GUIDE,
         guide_line: 56,
+        quest: None,
         proof: "first-person Seaside Summer Splash secret-deck challenge",
     },
     Greeting {
@@ -170,19 +180,21 @@ const NEW_GREETINGS: [Greeting; 24] = [
         greeting: 406431,
         hash: 108726065,
         dat_line: 2823,
-        guide: SEASIDE_GUIDE,
-        guide_line: 113,
+        guide: KART_GUIDE,
+        guide_line: 142,
+        quest: None,
         proof: "first-person Sandstorm Speedway welcome",
     },
     Greeting {
         npc_id: 9000000009,
         file: BRIARWOOD,
-        greeting: 95156,
-        hash: 3961426188,
-        dat_line: 104776,
-        guide: BRIARWOOD_GUIDE,
-        guide_line: 48,
-        proof: "first-person Brawler quest offer",
+        greeting: 72532,
+        hash: 1975092436,
+        dat_line: 52030,
+        guide: BRAWLER_GUIDE,
+        guide_line: 133,
+        quest: None,
+        proof: "first-person wallet request quoted in the Brawler guide",
     },
     Greeting {
         npc_id: 9000000071,
@@ -190,19 +202,10 @@ const NEW_GREETINGS: [Greeting; 24] = [
         greeting: 74072,
         hash: 1961466830,
         dat_line: 51685,
-        guide: BRIARWOOD_GUIDE,
-        guide_line: 70,
+        guide: MEDIC_GUIDE,
+        guide_line: 101,
+        quest: Some(("medic.json", 3090019)),
         proof: "first-person Medic trainer quest offer",
-    },
-    Greeting {
-        npc_id: 9000000082,
-        file: BRIARWOOD,
-        greeting: 407023,
-        hash: 2823732375,
-        dat_line: 74435,
-        guide: BRIARWOOD_GUIDE,
-        guide_line: 117,
-        proof: "first-person Card Duelist quest offer",
     },
     Greeting {
         npc_id: 9000000308,
@@ -210,19 +213,21 @@ const NEW_GREETINGS: [Greeting; 24] = [
         greeting: 412249,
         hash: 1500179458,
         dat_line: 39754,
-        guide: BRIARWOOD_GUIDE,
-        guide_line: 162,
+        guide: FISHERMAN_GUIDE,
+        guide_line: 111,
+        quest: Some(("fisherman.json", 3070027)),
         proof: "first-person Fisherman quest offer",
     },
     Greeting {
         npc_id: 9000000268,
         file: BRIARWOOD,
-        greeting: 93894,
-        hash: 2733008456,
-        dat_line: 71999,
-        guide: BRIARWOOD_GUIDE,
-        guide_line: 189,
-        proof: "first-person Adventurer quest offer",
+        greeting: 93809,
+        hash: 202408898,
+        dat_line: 5344,
+        guide: ADVENTURER_GUIDE,
+        guide_line: 139,
+        quest: None,
+        proof: "first-person box hand-over line quoted in the Adventurer guide",
     },
     Greeting {
         npc_id: 9000000470,
@@ -230,8 +235,9 @@ const NEW_GREETINGS: [Greeting; 24] = [
         greeting: 78312,
         hash: 2183725585,
         dat_line: 57531,
-        guide: BRIARWOOD_GUIDE,
-        guide_line: 59,
+        guide: MINER_GUIDE,
+        guide_line: 147,
+        quest: Some(("miner.json", 3100028)),
         proof: "first-person Miner quest offer",
     },
     Greeting {
@@ -242,6 +248,7 @@ const NEW_GREETINGS: [Greeting; 24] = [
         dat_line: 33509,
         guide: BRIARWOOD_GUIDE,
         guide_line: 61,
+        quest: None,
         proof: "first-person fellow-Medic request",
     },
     Greeting {
@@ -252,6 +259,7 @@ const NEW_GREETINGS: [Greeting; 24] = [
         dat_line: 15796,
         guide: BRIARWOOD_GUIDE,
         guide_line: 60,
+        quest: None,
         proof: "first-person brazier request",
     },
     Greeting {
@@ -262,6 +270,7 @@ const NEW_GREETINGS: [Greeting; 24] = [
         dat_line: 69041,
         guide: BRIARWOOD_GUIDE,
         guide_line: 100,
+        quest: None,
         proof: "first-person sapling-watering request",
     },
     Greeting {
@@ -272,6 +281,7 @@ const NEW_GREETINGS: [Greeting; 24] = [
         dat_line: 15443,
         guide: BRIARWOOD_GUIDE,
         guide_line: 79,
+        quest: None,
         proof: "first-person courting-stone request",
     },
     Greeting {
@@ -282,6 +292,7 @@ const NEW_GREETINGS: [Greeting; 24] = [
         dat_line: 101958,
         guide: BRIARWOOD_GUIDE,
         guide_line: 32,
+        quest: None,
         proof: "first-person lost-friends line",
     },
     Greeting {
@@ -292,9 +303,14 @@ const NEW_GREETINGS: [Greeting; 24] = [
         dat_line: 17166,
         guide: BRIARWOOD_GUIDE,
         guide_line: 101,
+        quest: None,
         proof: "self-identifying first-person line",
     },
 ];
+
+/// The guide rows whose text proves the speaker without quoting the hash: the
+/// bound line itself self-identifies (Reginald: "my name is Reginald").
+const SELF_IDENTIFYING: [u64; 1] = [9500000206];
 
 /// The bindings already in the two files before T317 (W126): Burglz and Troy Ridewrangler.
 const PRE_EXISTING: [(u64, u32); 2] = [(9500000563, 441432), (9500000639, 441037)];
@@ -306,6 +322,27 @@ const ROW_COUNTS: [(&str, usize); 2] = [(SEASIDE, 108), (BRIARWOOD, 181)];
 /// third-person narration about him. A blank row must not inherit another row's body.
 const BLANK: u64 = 9500000548;
 
+/// Every NPC file this slice did not edit: region page name and region zone id.
+/// The explicit list (not a directory count) fails if a check is lost when a
+/// region is added, and it checks each file this slice must not have touched.
+const OTHER_REGIONS: [(&str, &str, u64); 15] = [
+    ("blackspore_swamp.json", "Blackspore Swamp", 1),
+    ("cobblestone_village.json", "Cobblestone Village", 3),
+    ("durango_zoo.json", "Durango Zoo", 4),
+    ("farnum_farmstead.json", "Farnum Farmstead", 5),
+    ("greenwood_forest.json", "Greenwood Forest", 6),
+    ("highroad_junction.json", "Highroad Junction", 7),
+    ("lakeshore.json", "Lakeshore", 8),
+    ("merry_vale.json", "Merry Vale", 9),
+    ("sanctuary.json", "Sanctuary", 10),
+    ("shrouded_glade.json", "Shrouded Glade", 12),
+    ("snowhill.json", "Snowhill", 13),
+    ("stillwater_crossing.json", "Stillwater Crossing", 14),
+    ("sunstone_valley.json", "Sunstone Valley", 15),
+    ("wilds.json", "Wilds", 16),
+    ("wugachug.json", "Wugachug", 17),
+];
+
 fn content_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
 }
@@ -316,10 +353,6 @@ fn content_dir() -> PathBuf {
 fn gameplay_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../../lab/references/opening-anvil-placement-v1/content")
-}
-
-fn repo_root() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
 }
 
 /// Generated reports used by the T246/T280/T298 resolution method (outside the
@@ -517,21 +550,64 @@ fn locale_rows(wanted: &BTreeSet<u32>) -> BTreeMap<u32, (usize, String)> {
     rows
 }
 
-/// HEAD bytes for a repository-relative path. The autopilot workspace is a git worktree,
-/// so this proves the diff did not touch a file the slice does not own.
-fn head_bytes(relative: &str) -> Vec<u8> {
-    let output = Command::new("git")
-        .arg("-C")
-        .arg(repo_root())
-        .args(["show", &format!("HEAD:{relative}")])
-        .output()
-        .unwrap_or_else(|error| panic!("git is required for the unchanged-files gate: {error}"));
-    assert!(
-        output.status.success(),
-        "git show HEAD:{relative} failed: {}",
-        String::from_utf8_lossy(&output.stderr)
-    );
-    output.stdout
+/// The cited guide line. The client evidence pins its physical line; the speaker
+/// check reads the same line, so a note-row edit that moves the proof fails here.
+fn guide_line(guide: &str, line: u32) -> String {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../..")
+        .join(guide);
+    let text =
+        fs::read_to_string(&path).unwrap_or_else(|error| panic!("{}: {error}", path.display()));
+    text.lines()
+        .nth(line as usize - 1)
+        .unwrap_or_else(|| panic!("{}: no line {line}", path.display()))
+        .to_string()
+}
+
+/// The server quest record a greeting is the 49/1 intro of.
+fn quest_record(file: &str, quest_id: u32) -> Value {
+    let path = content_dir().join("quests").join(file);
+    read_json(&path)["records"]
+        .as_array()
+        .unwrap_or_else(|| panic!("{}: records array", path.display()))
+        .iter()
+        .find(|record| record["id"].as_u64() == Some(u64::from(quest_id)))
+        .unwrap_or_else(|| panic!("{}: quest {quest_id}", path.display()))
+        .clone()
+}
+
+/// The speaker check: the cited guide line must name the NPC and either quote the
+/// bound hash or (for a self-identifying line) the locale text must say the name.
+/// Binding another speaker's valid locale line fails both.
+fn speaker_proof(row: &Greeting, name: &str, text: &str) -> Result<(), String> {
+    let line = guide_line(row.guide, row.guide_line);
+    if !line.contains(name) {
+        return Err(format!(
+            "{} line {} does not name {name}",
+            row.guide, row.guide_line
+        ));
+    }
+    if line.contains(&row.hash.to_string()) {
+        return Ok(());
+    }
+    if SELF_IDENTIFYING.contains(&row.npc_id)
+        && text
+            .to_lowercase()
+            .contains(&format!("my name is {}", name.to_lowercase()))
+    {
+        return Ok(());
+    }
+    Err(format!(
+        "{} line {} does not quote hash {} and the resolved text does not self-identify {name}",
+        row.guide, row.guide_line, row.hash
+    ))
+}
+
+fn locale_text(hash: u32) -> String {
+    locale_rows(&BTreeSet::from([hash]))
+        .remove(&hash)
+        .unwrap_or_else(|| panic!("hash {hash} is not a stock client locale key"))
+        .1
 }
 
 /// Every unbound drawable row must be listed with its reason in the note.
@@ -646,6 +722,29 @@ fn every_edited_row_has_resolved_client_provenance() {
             "NPC {}: a raw hash is not a locale id",
             row.npc_id
         );
+        if let Some((file, quest_id)) = row.quest {
+            // A quest intro is reconstructed T-1 text, so the test also pins the
+            // giver and intro binding and the job guide that quotes the same line.
+            assert!(
+                evidence.contains(&format!("data/content/quests/{file}"))
+                    && evidence.contains(&format!("quest {quest_id}")),
+                "NPC {}: client source must name its quest record",
+                row.npc_id
+            );
+            let quest = quest_record(file, quest_id);
+            assert_eq!(
+                quest["giver_npc_id"].as_u64(),
+                Some(row.npc_id),
+                "NPC {}: quest {quest_id} in {file} must be giver-owned",
+                row.npc_id
+            );
+            assert_eq!(
+                quest["intro_text_string_id"].as_u64(),
+                Some(u64::from(row.greeting)),
+                "NPC {}: quest {quest_id} in {file} must use the greeting as its intro",
+                row.npc_id
+            );
+        }
         let policy = sources[1]["evidence"].as_str().unwrap_or_default();
         assert!(
             policy.starts_with("(R)"),
@@ -659,6 +758,12 @@ fn every_edited_row_has_resolved_client_provenance() {
         );
 
         // Resolve three ways: hash_to_ids, the id-to-text report, and the physical line.
+        assert_eq!(
+            locale_hash(i32::try_from(row.greeting).expect("stock locale id fits i32")),
+            row.hash,
+            "NPC {}: greeting id must hash to the cited Global.Text key",
+            row.npc_id
+        );
         let bound = hash_to_ids
             .get(&row.hash.to_string())
             .and_then(Value::as_array)
@@ -704,6 +809,10 @@ fn every_edited_row_has_resolved_client_provenance() {
             "NPC {}: recovered locale text is empty",
             row.npc_id
         );
+        let name = record["name"].as_str().expect("NPC name");
+        if let Err(error) = speaker_proof(row, name, text) {
+            panic!("NPC {}: {error}", row.npc_id);
+        }
     }
 
     // Reachability: the production visibility loader spawns every edited row at its
@@ -779,7 +888,10 @@ fn seaside_and_briarwood_rows_send_their_greeting_in_26_3() {
 }
 
 #[test]
-fn a_zero_or_missing_greeting_falls_back_to_no_body() {
+fn a_missing_greeting_falls_back_to_no_body() {
+    // `dialogue_context` copies the Option, so a literal 0 would be Some(0) and
+    // render blank at the wire; the content never stores 0. The missing case is
+    // the one the router can distinguish, so this test is named for it.
     let mut interaction = service();
     let blank = npc_record(SEASIDE, BLANK);
     assert_drawable(&blank, BLANK);
@@ -830,14 +942,6 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
         0,
         "no invented locale id"
     );
-    let name_ids: BTreeSet<u64> = NEW_GREETINGS
-        .iter()
-        .map(|row| {
-            npc_record(row.file, row.npc_id)["name_string_id"]
-                .as_u64()
-                .expect("name id")
-        })
-        .collect();
     for row in &NEW_GREETINGS {
         assert_ne!(
             u64::from(row.greeting),
@@ -848,7 +952,6 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
             row.npc_id
         );
     }
-    assert_eq!(name_ids.len(), NEW_GREETINGS.len());
 }
 
 #[test]
@@ -894,45 +997,61 @@ fn the_existing_greetings_and_other_regions_are_unchanged() {
         }
     }
 
-    // The two edited files differ from HEAD only on the target rows, so every
-    // non-target row keeps its top-level values. (No-op once the diff is committed.)
-    for (file, _) in ROW_COUNTS {
-        let relative = format!("prototype/osfr-tools/data/content/npcs/{file}");
-        let base: Value = serde_json::from_slice(&head_bytes(&relative))
-            .unwrap_or_else(|error| panic!("{relative}: HEAD is not JSON: {error}"));
-        let base_records = base["records"].as_array().expect("HEAD records");
-        let current = records(file);
-        assert_eq!(base_records.len(), current.len(), "{file}: HEAD row count");
-        for (old, new) in base_records.iter().zip(&current) {
-            let npc_id = new["npc_id"].as_u64().expect("npc id");
-            if !edited.contains(&npc_id) {
-                assert_eq!(old, new, "NPC {npc_id}: non-target row changed");
-            }
-        }
-    }
-
-    // Every other region file is byte-identical to HEAD: the T246/T280/T298/T299 rows
-    // live there, so a change to any of them fails here.
-    let npc_dir = content_dir().join("npcs");
-    let mut others = 0usize;
-    for entry in fs::read_dir(&npc_dir).expect("npcs directory") {
-        let path = entry.expect("npc entry").path();
-        if path.extension().and_then(|extension| extension.to_str()) != Some("json") {
-            continue;
-        }
-        let file = path.file_name().unwrap().to_string_lossy();
-        if file == SEASIDE || file == BRIARWOOD {
-            continue;
-        }
-        let relative = format!("prototype/osfr-tools/data/content/npcs/{file}");
+    // Every other region file keeps its top-level identity and carries no T317
+    // evidence: the T246/T280/T298/T299/T315/T316 rows live there.
+    for (file, region_page, region_zone_id) in OTHER_REGIONS {
+        let document = read_json(&content_dir().join("npcs").join(file));
         assert_eq!(
-            fs::read(&path).expect("region file"),
-            head_bytes(&relative),
-            "{file}: another region's NPC file changed"
+            document["schema_version"].as_u64(),
+            Some(1),
+            "{file}: schema version"
         );
-        others += 1;
+        assert_eq!(
+            document["region_page"].as_str(),
+            Some(region_page),
+            "{file}: region page"
+        );
+        assert_eq!(
+            document["region_zone_id"].as_u64(),
+            Some(region_zone_id),
+            "{file}: region zone id"
+        );
+        assert!(
+            !document.to_string().contains("T317"),
+            "{file}: T317 edited a region file outside this slice"
+        );
     }
-    assert_eq!(others, 15, "expected fifteen untouched region files");
+}
+
+#[test]
+fn another_npcs_valid_locale_line_is_rejected() {
+    // The T317 blocker: Andrew was bound to Steelbloom's 95156, a valid line
+    // for a different speaker. Briarwood.md:48 names Andrew but does not quote
+    // the line, and the text is not Andrew's.
+    let wrong = Greeting {
+        npc_id: 9000000009,
+        file: BRIARWOOD,
+        greeting: 95156,
+        hash: 3961426188,
+        dat_line: 104776,
+        guide: BRIARWOOD_GUIDE,
+        guide_line: 48,
+        quest: None,
+        proof: "first-person Brawler quest offer",
+    };
+    let error = speaker_proof(&wrong, "Andrew", &locale_text(wrong.hash))
+        .expect_err("Steelbloom's line is not Andrew's");
+    assert!(error.contains("does not quote"), "{error}");
+
+    // The corrected binding is accepted: the Brawler guide quotes hash 1975092436.
+    let right = NEW_GREETINGS
+        .iter()
+        .find(|row| row.npc_id == 9000000009)
+        .expect("Andrew is bound");
+    assert_eq!(
+        speaker_proof(right, "Andrew", &locale_text(right.hash)),
+        Ok(())
+    );
 }
 
 #[test]

@@ -2348,7 +2348,7 @@
         "greeting_string_id": [
           {
             "kind": "client",
-            "evidence": "Global.Text.95156, JenkinsLookup2 hash 3961426188, en_us_data.dat line 104776. Speaker proof: first-person Brawler quest offer; data/content/quests/brawler.json quest 3030026 binds giver 9000000009 and intro_text_string_id 95156. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 48."
+            "evidence": "Global.Text.72532, JenkinsLookup2 hash 1975092436, en_us_data.dat line 52030. Speaker proof: first-person wallet request quoted in the Brawler guide; notes/Build Guides/Content/Jobs/Brawler.md line 133 quotes this line and names Andrew the Missing Wallet giver. Guide: notes/Build Guides/Content/Jobs/Brawler.md line 133."
           },
           {
             "kind": "reconstructed",
@@ -2359,7 +2359,7 @@
       "heading": 0.981863,
       "model_id": 438,
       "model_file_name": "human_m_andrew.agr",
-      "greeting_string_id": 95156
+      "greeting_string_id": 72532
     },
     {
       "npc_id": 9500000086,
@@ -8619,7 +8619,7 @@
         "greeting_string_id": [
           {
             "kind": "client",
-            "evidence": "Global.Text.93894, JenkinsLookup2 hash 2733008456, en_us_data.dat line 71999. Speaker proof: first-person Adventurer quest offer; data/content/quests/adventurer.json quest 3000044 binds giver 9000000268 and intro_text_string_id 93894. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 189."
+            "evidence": "Global.Text.93809, JenkinsLookup2 hash 202408898, en_us_data.dat line 5344. Speaker proof: first-person box hand-over line quoted in the Adventurer guide; notes/Build Guides/Content/Jobs/Adventurer.md line 139 quotes this line and names Captain Chugug the Empty Box giver. Guide: notes/Build Guides/Content/Jobs/Adventurer.md line 139."
           },
           {
             "kind": "reconstructed",
@@ -8630,7 +8630,7 @@
       "heading": -2.229929,
       "model_id": 409,
       "model_file_name": "chugawug_captainchugug_m.adr",
-      "greeting_string_id": 93894
+      "greeting_string_id": 93809
     },
     {
       "npc_id": 9500000100,
@@ -21027,7 +21027,7 @@
         "greeting_string_id": [
           {
             "kind": "client",
-            "evidence": "Global.Text.74072, JenkinsLookup2 hash 1961466830, en_us_data.dat line 51685. Speaker proof: first-person Medic trainer quest offer; data/content/quests/medic.json quest 3090019 binds giver 9000000071 and intro_text_string_id 74072. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 70."
+            "evidence": "Global.Text.74072, JenkinsLookup2 hash 1961466830, en_us_data.dat line 51685. Speaker proof: first-person Medic trainer quest offer; data/content/quests/medic.json quest 3090019 binds giver 9000000071 and intro_text_string_id 74072. Guide: notes/Build Guides/Content/Jobs/Medic.md line 101."
           },
           {
             "kind": "reconstructed",
@@ -22125,7 +22125,7 @@
         "greeting_string_id": [
           {
             "kind": "client",
-            "evidence": "Global.Text.412249, JenkinsLookup2 hash 1500179458, en_us_data.dat line 39754. Speaker proof: first-person Fisherman quest offer; data/content/quests/fisherman.json quest 3070027 binds giver 9000000308 and intro_text_string_id 412249. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 162."
+            "evidence": "Global.Text.412249, JenkinsLookup2 hash 1500179458, en_us_data.dat line 39754. Speaker proof: first-person Fisherman quest offer; data/content/quests/fisherman.json quest 3070027 binds giver 9000000308 and intro_text_string_id 412249. Guide: notes/Build Guides/Content/Jobs/Fisherman.md line 111."
           },
           {
             "kind": "reconstructed",
@@ -23860,22 +23860,11 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1470; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2727 (ModelId=1568, ModelFileName=human_f_estherthebrain.adr, NameId=407093)."
           }
-        ],
-        "greeting_string_id": [
-          {
-            "kind": "client",
-            "evidence": "Global.Text.407023, JenkinsLookup2 hash 2823732375, en_us_data.dat line 74435. Speaker proof: first-person Card Duelist quest offer; data/content/quests/card_duelist.json quest 3040033 binds giver 9000000082 and intro_text_string_id 407023. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 117."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
-          }
         ]
       },
       "heading": 3.121559,
       "model_id": 1568,
-      "model_file_name": "human_f_estherthebrain.adr",
-      "greeting_string_id": 407023
+      "model_file_name": "human_f_estherthebrain.adr"
     },
     {
       "npc_id": 9500000127,
@@ -62798,7 +62787,7 @@
         "greeting_string_id": [
           {
             "kind": "client",
-            "evidence": "Global.Text.78312, JenkinsLookup2 hash 2183725585, en_us_data.dat line 57531. Speaker proof: first-person Miner quest offer; data/content/quests/miner.json quest 3100028 binds giver 9000000470 and intro_text_string_id 78312. Guide: notes/Build Guides/Content/NPCs/NPCs - Briarwood.md line 59."
+            "evidence": "Global.Text.78312, JenkinsLookup2 hash 2183725585, en_us_data.dat line 57531. Speaker proof: first-person Miner quest offer; data/content/quests/miner.json quest 3100028 binds giver 9000000470 and intro_text_string_id 78312. Guide: notes/Build Guides/Content/Jobs/Miner.md line 147."
           },
           {
             "kind": "reconstructed",

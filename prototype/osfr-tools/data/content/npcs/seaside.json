@@ -6468,7 +6468,7 @@
         "greeting_string_id": [
           {
             "kind": "client",
-            "evidence": "Global.Text.406431, JenkinsLookup2 hash 108726065, en_us_data.dat line 2823. Speaker proof: first-person Sandstorm Speedway welcome; notes/Build Guides/Content/Jobs/Kart Driver.md line 142 names Bill Riddly the Sandstorm's Grand Opening giver and records this line. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 113."
+            "evidence": "Global.Text.406431, JenkinsLookup2 hash 108726065, en_us_data.dat line 2823. Speaker proof: first-person Sandstorm Speedway welcome; notes/Build Guides/Content/Jobs/Kart Driver.md line 142 names Bill Riddly the Sandstorm's Grand Opening giver and records this line. Guide: notes/Build Guides/Content/Jobs/Kart Driver.md line 142."
           },
           {
             "kind": "reconstructed",
@@ -13524,7 +13524,7 @@
         "greeting_string_id": [
           {
             "kind": "client",
-            "evidence": "Global.Text.387576, JenkinsLookup2 hash 4293886124, en_us_data.dat line 113302. Speaker proof: first-person Medic trainer quest offer; data/content/quests/medic.json quest 3090027 binds giver 9000000072 and intro_text_string_id 387576. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 51."
+            "evidence": "Global.Text.387576, JenkinsLookup2 hash 4293886124, en_us_data.dat line 113302. Speaker proof: first-person Medic trainer quest offer; data/content/quests/medic.json quest 3090027 binds giver 9000000072 and intro_text_string_id 387576. Guide: notes/Build Guides/Content/Jobs/Medic.md line 114."
           },
           {
             "kind": "reconstructed",
@@ -18437,7 +18437,7 @@
         "greeting_string_id": [
           {
             "kind": "client",
-            "evidence": "Global.Text.387934, JenkinsLookup2 hash 1553080327, en_us_data.dat line 41118. Speaker proof: first-person Postman trainer quest offer; data/content/quests/postman.json quest 3130017 binds giver 9000000080 and intro_text_string_id 387934. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 53."
+            "evidence": "Global.Text.387934, JenkinsLookup2 hash 1553080327, en_us_data.dat line 41118. Speaker proof: first-person Postman trainer quest offer; data/content/quests/postman.json quest 3130017 binds giver 9000000080 and intro_text_string_id 387934. Guide: notes/Build Guides/Content/Jobs/Postman.md line 98."
           },
           {
             "kind": "reconstructed",
@@ -22484,22 +22484,11 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:595; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1836 (ModelId=641, ModelFileName=fairy_f_tcg_jammie_swiftsong.agr, NameId=74098)."
           }
-        ],
-        "greeting_string_id": [
-          {
-            "kind": "client",
-            "evidence": "Global.Text.104270, JenkinsLookup2 hash 3098965505, en_us_data.dat line 81814. Speaker proof: first-person Card Duelist quest offer; data/content/quests/card_duelist.json quest 3040022 binds giver 9000000112 and intro_text_string_id 104270. Guide: notes/Build Guides/Content/NPCs/NPCs - Seaside.md line 55."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) T317 fixed default Talk greeting: the first 26/3 body is this row's greeting_string_id. The original server greeting/phase binding is not recovered; no client choice, no text invented, and no fallback to another row."
-          }
         ]
       },
       "heading": 1.685854,
       "model_id": 641,
-      "model_file_name": "fairy_f_tcg_jammie_swiftsong.agr",
-      "greeting_string_id": 104270
+      "model_file_name": "fairy_f_tcg_jammie_swiftsong.agr"
     },
     {
       "npc_id": 9500000590,
