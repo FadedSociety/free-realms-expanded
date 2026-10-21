@@ -524,7 +524,8 @@ fn five_distinct_field_battles_load_with_the_existing_schema() {
     // roster without deleting that adjacent work; T252 appends the Brawling
     // Ring (12400) as the seventh row; T282 inserts Thugamug (12340) directly
     // after battle 96; T319 inserts Sheep Watch (12350) after Stone Heart;
-    // T354 inserts Bixie Hive (12370) directly after battle 96. This is the
+    // T354 inserts Bixie Hive (12370) directly after battle 96; T353 appends
+    // the Bandit Hideout (12360) after the Brawling Ring. This is the
     // canonical exact repository-wide set: a new content slice updates this
     // list, so an unintended or duplicate row cannot pass as a subsequence.
     assert_eq!(
@@ -539,7 +540,8 @@ fn five_distinct_field_battles_load_with_the_existing_schema() {
             12350,
             12310,
             12311,
-            12400
+            12400,
+            12360
         ]
     );
     assert_eq!(ids.iter().filter(|id| TASK_ROSTER.contains(id)).count(), 5);

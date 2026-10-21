@@ -1519,6 +1519,180 @@
           "icon_id": 730
         }
       ]
+    },
+    {
+      "id": 12360,
+      "title_id": 30422,
+      "description_id": 6995,
+      "objective_id": 6997,
+      "difficulty": 4,
+      "required_combat_level": 9,
+      "spawner": {
+        "guid": 100001236000,
+        "definition_id": 1236000,
+        "model_id": 200,
+        "name_id": 7058,
+        "name": "Muggenstomp",
+        "texture_alias": "",
+        "position": [
+          -1903.0,
+          -34.75,
+          -660.0
+        ],
+        "max_health": 1,
+        "damage": 0,
+        "boss": false
+      },
+      "enemies": [
+        {
+          "guid": 100001236001,
+          "definition_id": 1236001,
+          "model_id": 200,
+          "name_id": 7058,
+          "name": "Muggenstomp",
+          "texture_alias": "",
+          "position": [
+            136.0,
+            -0.6,
+            175.0
+          ],
+          "max_health": 320,
+          "damage": 22,
+          "boss": true
+        },
+        {
+          "guid": 100001236002,
+          "definition_id": 1236002,
+          "model_id": 199,
+          "name_id": 139345,
+          "name": "Big Bandit",
+          "texture_alias": "",
+          "position": [
+            133.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 160,
+          "damage": 12,
+          "boss": false
+        },
+        {
+          "guid": 100001236003,
+          "definition_id": 1236003,
+          "model_id": 199,
+          "name_id": 139345,
+          "name": "Big Bandit",
+          "texture_alias": "",
+          "position": [
+            139.0,
+            -0.6,
+            173.0
+          ],
+          "max_health": 160,
+          "damage": 12,
+          "boss": false
+        },
+        {
+          "guid": 100001236004,
+          "definition_id": 1236004,
+          "model_id": 199,
+          "name_id": 139345,
+          "name": "Big Bandit",
+          "texture_alias": "",
+          "position": [
+            134.0,
+            -0.6,
+            176.0
+          ],
+          "max_health": 160,
+          "damage": 12,
+          "boss": false
+        },
+        {
+          "guid": 100001236005,
+          "definition_id": 1236005,
+          "model_id": 199,
+          "name_id": 139345,
+          "name": "Big Bandit",
+          "texture_alias": "",
+          "position": [
+            138.0,
+            -0.6,
+            176.0
+          ],
+          "max_health": 160,
+          "damage": 12,
+          "boss": false
+        }
+      ],
+      "reward_coins": 60,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Global.Text ids 30422 'Bandit Hideout!', 6995 'An unruly band of thugawugs are inside the Bandit Hideout! Defeat their leader, Muggenstomp, to end their greedy ways!', 6997 'Defeat Muggenstomp!', 7058 'Muggenstomp' and 139345 'Big Bandit' (lab/reports/locale-id-to-text.json). The guide's raw title hash 3310276457 is not a Global.Text id and is not used."
+        },
+        {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 200 (file line 201) maps model 200 to chugawug_f_bandit_01.adr and row 199 (file line 200) maps model 199 to chugawug_m_bandit_01.adr; Images.txt 4543 is icon_ui_combatstart_panelgraphic_trollsummonermadness.dds and 11970 is icon_minigame_combat_encounter_start_hard_free_64.dds. The guide calls Muggenstomp female, so the visible marker and boss use the female bandit body 200 (R). Arena sg_random_encounter_clearing, geometry 214 and sky sky_wilds24.xml are copied from battle 12350."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "notes/Build Guides/Content/Dungeons/Bandit Hideout.md: difficulty 4, level 9 combat job, entrance 'click the barrier near the Greenwood Camp', boss Muggenstomp, Big Bandits and the 60-coin slot on every wheel. The guide's per-job wheel rows, 209-coin members bonus, coin drops, stars, bonus clothing and bonus goal are not modelled."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Local battle id 12360, actor GUIDs 100001236000-005 and definition ids 1236000-005. Five-actor kill-all roster (not the retail waves): Muggenstomp boss and four Big Bandits; 320 HP / 22 damage for the boss and 160 HP / 12 damage per bandit are authored baselines before the existing difficulty-4 scaling (level 9 factor 3.063 -> 980/67 and 490/37), because the guide gives no health, damage or Big Bandit count. Marker adaptation: the visible Muggenstomp model replaces the guide's barrier prop, which has no proven actor model (as T282/T319); the spawner is the marker. The arena reuses zone 9600 sg_random_encounter_clearing, geometry 214, sky sky_wilds24.xml and arrival [136,-0.5,155], with the 12311 block's five positions."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Placement: no barrier transform is recovered. The marker [-1903.0,-34.75,-660.0] is on the Greenwood Camp approach south-east of Lugabow [-1915.146,-36.9307,-636.1354], 26.78 m away (Glugmort [-1943.932,-39.94606,-600.8123] is 71.96 m away and the Thugamug marker 339.18 m). y is the bilinear zone-0 height -34.75 (delta 0.0000 m). All 105 samples of the 5 m wander disc (81 grid + 24 ring) are terrain-covered with a finite y; the 24-sample ring and full disc reach at most 14.04 degrees of slope. The nearest field-enemy home is 946.62 m away and the nearest other battle marker 339.18 m. Water, object collision and a native walkable route remain unverified."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Prize rows copied from battle 12350: Battle Item Mystery Pack 10482, Medium Energy Potion 3023, Medic's Power Shard of Vitality I 75354 and Small Health Potion 11002, with their name and icon ids. The guide's Bandit Hideout wheel rows (for example Archer's Necklace of Bark Skin IV) are not resolved to runtime item ids, so this four-item substitution is reconstructed; one is awarded at random per win."
+        }
+      ],
+      "nameplate_image_id": 11970,
+      "zone": {
+        "zone_id": 9600,
+        "name": "sg_random_encounter_clearing",
+        "sky": "sky_wilds24.xml",
+        "geometry_id": 214,
+        "position": [
+          136.0,
+          -0.5,
+          155.0
+        ],
+        "rotation": [
+          0.0,
+          0.0,
+          0.0
+        ],
+        "tutorial": false
+      },
+      "icon_id": 4543,
+      "prizes": [
+        {
+          "item_id": 10482,
+          "name_id": 6666,
+          "icon_id": 973
+        },
+        {
+          "item_id": 3023,
+          "name_id": 422907,
+          "icon_id": 544
+        },
+        {
+          "item_id": 75354,
+          "name_id": 131098,
+          "icon_id": 3721
+        },
+        {
+          "item_id": 11002,
+          "name_id": 422909,
+          "icon_id": 730
+        }
+      ]
     }
   ]
 }
