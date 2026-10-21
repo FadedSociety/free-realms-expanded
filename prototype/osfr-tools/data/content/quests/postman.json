@@ -1642,7 +1642,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) ContentDb v1 has no free-text objective field; the talk_to_npc target 9000000172 was resolved by scripts/quest_talk_objectives.py from the client description, so objectives is no longer empty"
         },
         {
           "kind": "reconstructed",

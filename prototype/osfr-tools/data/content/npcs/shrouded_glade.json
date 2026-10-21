@@ -29147,7 +29147,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+              "evidence": "(R) ContentDb v1 has no free-text objective field; the talk_to_npc target 9000000172 was resolved by scripts/quest_talk_objectives.py from the client description, so objectives is no longer empty"
             },
             {
               "kind": "reconstructed",
@@ -29159,7 +29159,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+              "evidence": "(R) T314: the guide row 29 reward cell is unknown; the reward row carries the reconstructed 5 coins + 5 Postman (profile 4) XP placeholder, not an empty reward"
             },
             {
               "kind": "client",

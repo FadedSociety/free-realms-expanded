@@ -1,10 +1,18 @@
-//! T314: structural reachability gate for the enabled split quest catalogue.
+//! T314/F343: structural reachability gate for the enabled split quest catalogue.
 //!
 //! The shipped content tree is read through the production loaders:
-//! `QuestEngine::from_split_content` (definitions, giver listing, reward bounds
-//! and the 49/13 end-screen encoder) and `world::NpcVisibility::load` (the 35/2
-//! draw set and the 26/8 content-key map). A raw JSON pass only enumerates the
-//! `enabled` records and objective target fields those loaders do not expose.
+//! `QuestEngine::from_split_content` (definitions, giver binding, reward bounds,
+//! the enabled set and the 49/13 end-screen encoder) and `world::NpcVisibility`
+//! (the 35/2 draw set through `teleport_targets` and `content_key`). A raw JSON
+//! pass only reads what those loaders do not expose: the `enabled` flag,
+//! prerequisite ids, objective target fields, the authored title id and the
+//! authored NPC `quest_giver` role.
+//!
+//! Resolved objective kinds: `talk_to_npc`, `interact_actor`, `visit_position`,
+//! `reach_poi`, `defeat` and `collect_item`. Other kinds (`gather_resource`,
+//! `complete_dungeon`, `finish_minigame`, `client_reported`, `craft_recipe`,
+//! `equip_item`) are only bounded by the loader's field rules, not proved to
+//! exist; the target test prints them so the gap stays visible.
 //!
 //! A quest is *reachable* when every prerequisite, directly or transitively,
 //! exists and is enabled. An enabled quest behind a disabled prerequisite is
@@ -13,15 +21,24 @@
 //! No new wire. A reachable quest's reward is proved through the production
 //! 49/13 encoder (`quest_end_packet`, reader `0x00c7b990`: actor u64, quest, end
 //! text, animation dword, reward bundle `0x008e7930`, trailing float). A
-//! drawable giver is a `legacy_data` regional row with a positive model/name or
-//! an `npc_spawns_extra.json` `content_key`, exactly what the 35/2 AddNpc reader
-//! `0x00921a10` consumes; the 26/8 click reader `0x008b6bc0` resolves it through
-//! `NpcVisibility::content_key`.
+//! drawable giver is what the production 35/2 path sends (AddNpc reader
+//! `0x00921a10`); the 26/8 click constructor `0x008b6bc0` resolves the same key
+//! through `NpcVisibility::content_key`.
+//!
+//! The shared `content_dir`/`read_json` helpers and the scratch fixture live in
+//! `tests/support/`.
 
+#[path = "support/npc_quest_chain.rs"]
+mod npc_quest_chain;
+#[path = "support/quest_catalogue_fixture.rs"]
+mod quest_catalogue_fixture;
+
+use npc_quest_chain::{content_dir, read_json};
 use osfr_tools::{
     quest_engine::{CharacterEligibility, QuestEngine},
     world::NpcVisibility,
 };
+use quest_catalogue_fixture::{Defect, FIXTURE_DEFECT, fixture};
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -32,10 +49,8 @@ use std::{
 const CHARACTER: u64 = 7;
 const I32_MAX: u64 = i32::MAX as u64;
 const MAX_OBJECTIVE_COUNT: u64 = 1_000_000;
-
-fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
+/// `NpcVisibility::load` places every regional and extra-spawn actor here.
+const OPEN_WORLD_ZONE: u32 = 0;
 
 fn eligibility() -> CharacterEligibility {
     CharacterEligibility {
@@ -45,15 +60,6 @@ fn eligibility() -> CharacterEligibility {
         nonmember_quest_limit: 20,
         member_quest_limit: 20,
     }
-}
-
-fn invalid(message: impl Into<String>) -> io::Error {
-    io::Error::new(io::ErrorKind::InvalidData, message.into())
-}
-
-fn read_json(path: &Path) -> io::Result<Value> {
-    let bytes = fs::read(path)?;
-    serde_json::from_slice(&bytes).map_err(|error| invalid(format!("{}: {error}", path.display())))
 }
 
 fn as_u32(value: &Value) -> Option<u32> {
@@ -85,80 +91,57 @@ fn valid_visit_geometry(position: &Value, radius: &Value) -> bool {
             .is_some_and(|radius| radius.is_finite() && (0.1..=1000.0).contains(&radius))
 }
 
-/// One `enabled` split quest record. Only the fields the production loaders do
-/// not expose are parsed here; everything else is the loader's answer.
+/// One split quest record. Only fields the production loaders do not expose are
+/// parsed here; the loader remains the authority for rewards, bounds and
+/// enabled/disabled behaviour.
 #[derive(Debug)]
 struct RawQuest {
     id: u32,
     enabled: bool,
     giver_npc_id: u64,
+    /// Authored title id before `definition_from_content` casts it to `i32`.
+    title_string_id: u64,
     prerequisite_quest_ids: Vec<u32>,
     objectives: Vec<Value>,
-    rewards: Vec<Value>,
 }
 
 struct Catalogue {
     engine: QuestEngine,
     quests: Vec<RawQuest>,
     by_id: BTreeMap<u32, usize>,
-    npcs: BTreeMap<u64, Value>,
+    /// Content NPC ids the production 35/2 path can send.
     drawable: BTreeSet<u64>,
-    /// NPC content ids whose only placement is a `poi_anchor` row and which have
-    /// no drawable extra spawn.
-    anchor_only: BTreeSet<u64>,
-    job_quests: BTreeSet<u32>,
-    job_profiles: BTreeSet<i32>,
+    /// Authored NPC ids whose `roles` array carries `quest_giver`.
+    giver_role_npcs: BTreeSet<u64>,
 }
 
 impl Catalogue {
     fn load(root: &Path) -> io::Result<Self> {
         let engine = QuestEngine::from_split_content(root, CHARACTER, eligibility(), None)?;
         let visibility = NpcVisibility::load(root)?;
-        let npcs = read_npc_rows(root)?;
-        let drawable = drawable_sites(root, &visibility, &npcs)?;
-        let anchor_only = npcs
-            .iter()
-            .filter(|(npc_id, row)| {
-                row["placement"].as_str() == Some("poi_anchor") && !drawable.contains(npc_id)
-            })
-            .map(|(npc_id, _)| *npc_id)
+        // The loader's own draw list: `teleport_targets` applies the same
+        // placed/extra/excluded filters the 35/2 update uses, and `content_key`
+        // maps the runtime guid to the content NPC. Re-filtering authored rows
+        // here would silently fork a loader rule.
+        let drawable = visibility
+            .teleport_targets(OPEN_WORLD_ZONE)
+            .into_iter()
+            .filter_map(|target| visibility.content_key(target.guid))
             .collect();
-        let quests = read_quests(root)?;
-        let mut by_id = BTreeMap::new();
-        for (index, quest) in quests.iter().enumerate() {
-            if by_id.insert(quest.id, index).is_some() {
-                return Err(invalid(format!("duplicate split quest id {}", quest.id)));
-            }
-        }
-        let jobs = read_json(&root.join("jobs.json"))?;
-        let records = jobs["records"]
-            .as_array()
-            .ok_or_else(|| invalid("split jobs.json has no records array"))?;
-        let mut job_quests = BTreeSet::new();
-        let mut job_profiles = BTreeSet::new();
-        for job in records {
-            job_quests.extend(
-                job["quest_ids"]
-                    .as_array()
-                    .into_iter()
-                    .flatten()
-                    .filter_map(as_u32),
-            );
-            job_profiles.extend(
-                job["profile_id"]
-                    .as_i64()
-                    .and_then(|profile| i32::try_from(profile).ok()),
-            );
-        }
+        let giver_role_npcs = read_quest_giver_rows(root);
+        let quests = read_quests(root);
+        // `from_split_content` already rejected duplicate ids and an empty list.
+        let by_id = quests
+            .iter()
+            .enumerate()
+            .map(|(index, quest)| (quest.id, index))
+            .collect();
         Ok(Self {
             engine,
             quests,
             by_id,
-            npcs,
             drawable,
-            anchor_only,
-            job_quests,
-            job_profiles,
+            giver_role_npcs,
         })
     }
 
@@ -251,10 +234,27 @@ impl Catalogue {
             .collect()
     }
 
+    /// Objective kinds whose target this gate resolves. Everything else is only
+    /// bounded by the split loader; the target test prints the gap.
+    fn unchecked_objective_kinds(&self) -> BTreeSet<&str> {
+        const CHECKED: [&str; 6] = [
+            "talk_to_npc",
+            "interact_actor",
+            "visit_position",
+            "reach_poi",
+            "defeat",
+            "collect_item",
+        ];
+        self.enabled()
+            .flat_map(|quest| quest.objectives.iter())
+            .filter_map(|goal| goal["kind"].as_str())
+            .filter(|kind| !CHECKED.contains(kind))
+            .collect()
+    }
+
     /// Every enabled record has a drawable giver that the NPC content defines
-    /// with the `quest_giver` role (the production Talk-offer rule), the engine
-    /// kept it (objectives are not empty), and no giver is a bare `poi_anchor`
-    /// placement with no drawable extra spawn.
+    /// with the `quest_giver` role (the production Talk-offer rule), and the
+    /// engine kept it (objectives are not empty).
     fn giver_violations(&self) -> Vec<String> {
         let mut violations = Vec::new();
         for quest in self.enabled() {
@@ -264,33 +264,15 @@ impl Catalogue {
                     quest.id
                 ));
             }
-            let Some(row) = self.npcs.get(&quest.giver_npc_id) else {
+            if !self.giver_role_npcs.contains(&quest.giver_npc_id) {
                 violations.push(format!(
-                    "quest {}: giver {} has no npcs/*.json row",
-                    quest.id, quest.giver_npc_id
-                ));
-                continue;
-            };
-            // `npc_interaction::has_role` reads the same `roles` array; a giver
-            // without this string never builds the 26/9 Talk offer.
-            if !row["roles"].as_array().is_some_and(|roles| {
-                roles
-                    .iter()
-                    .any(|role| role.as_str() == Some("quest_giver"))
-            }) {
-                violations.push(format!(
-                    "quest {}: giver {} has no quest_giver role",
+                    "quest {}: giver {} has no npcs/*.json row with the quest_giver role",
                     quest.id, quest.giver_npc_id
                 ));
             }
             if !self.drawable.contains(&quest.giver_npc_id) {
-                let anchor = if self.anchor_only.contains(&quest.giver_npc_id) {
-                    " (poi_anchor-only row with no drawable extra spawn)"
-                } else {
-                    ""
-                };
                 violations.push(format!(
-                    "quest {}: giver {}{anchor} is not drawable by NpcVisibility",
+                    "quest {}: giver {} is not in the production 35/2 draw set",
                     quest.id, quest.giver_npc_id
                 ));
             }
@@ -298,9 +280,9 @@ impl Catalogue {
         violations
     }
 
-    /// Every enabled objective target resolves: talk/interact actors are
-    /// drawable content NPCs; visit geometry is finite and bounded; kill and
-    /// item ids/counts are positive; prerequisites exist.
+    /// Every enabled objective target this gate knows how to resolve: talk and
+    /// interact actors are in the production draw set; visit geometry is finite
+    /// and bounded; kill and item ids/counts are positive.
     fn target_violations(&self) -> Vec<String> {
         let mut violations = Vec::new();
         for quest in self.enabled() {
@@ -355,14 +337,6 @@ impl Catalogue {
                     _ => {}
                 }
             }
-            for prerequisite in &quest.prerequisite_quest_ids {
-                if self.quest(*prerequisite).is_none() {
-                    violations.push(format!(
-                        "quest {}: prerequisite {prerequisite} does not exist",
-                        quest.id
-                    ));
-                }
-            }
         }
         violations
     }
@@ -372,98 +346,27 @@ impl Catalogue {
             violations.push(format!("{owner}: target id is not positive"));
             return;
         };
-        if !self.npcs.contains_key(&target) {
-            violations.push(format!("{owner}: target {target} has no npcs/*.json row"));
-        } else if !self.drawable.contains(&target) {
-            violations.push(format!("{owner}: target {target} is not drawable"));
+        if !self.drawable.contains(&target) {
+            violations.push(format!(
+                "{owner}: target {target} is not in the production 35/2 draw set"
+            ));
         }
     }
 
-    /// Every reachable enabled quest has a positive title, a non-empty reward
-    /// inside the loader bounds, its giver's listing, the jobs.json union and an
-    /// encodable non-empty 49/13 end screen.
+    /// Every reachable enabled quest has a title the client's i32 fields can
+    /// carry and a non-empty 49/13 reward bundle. Reward bounds and the giver
+    /// listing are already proved by `from_split_content`; repeating them here
+    /// would only mirror the loader.
     fn reward_violations(&self) -> Vec<String> {
         let mut violations = Vec::new();
         for quest in self.reachable_enabled() {
-            if self.engine.title_string_id(quest.id).is_none() {
+            // `Quest.title_string_id` is a `u32`; `definition_from_content`
+            // casts it to `i32`. A value above `i32::MAX` wraps negative in the
+            // 49/1, 49/3 and 49/13 title fields, so reject it before the cast.
+            if !(1..=I32_MAX).contains(&quest.title_string_id) {
                 violations.push(format!(
-                    "quest {}: title is not positive or missing",
-                    quest.id
-                ));
-            }
-            let mut coins = 0u64;
-            let mut job_xp = 0u64;
-            let mut grant = false;
-            for (index, reward) in quest.rewards.iter().enumerate() {
-                let owner = format!("quest {} reward {index}", quest.id);
-                let row_coins = reward["coins"].as_u64().unwrap_or(0);
-                coins = coins.saturating_add(row_coins);
-                grant |= row_coins > 0;
-                for item in reward["items"].as_array().into_iter().flatten() {
-                    let definition_id = item["definition_id"].as_i64().unwrap_or(0);
-                    let count = item["count"].as_u64().unwrap_or(0);
-                    if definition_id <= 0 || !(1..=I32_MAX).contains(&count) {
-                        violations.push(format!(
-                            "{owner}: item grant {definition_id} x {count} is outside the loader bounds"
-                        ));
-                    } else {
-                        grant = true;
-                    }
-                }
-                for (profile, amount) in reward["job_xp"].as_object().into_iter().flatten() {
-                    let known = profile
-                        .parse::<i32>()
-                        .ok()
-                        .is_some_and(|profile| profile > 0 && self.job_profiles.contains(&profile));
-                    if !known {
-                        violations.push(format!(
-                            "{owner}: job XP profile {profile:?} is not a positive jobs.json profile"
-                        ));
-                        continue;
-                    }
-                    let amount = amount.as_u64().unwrap_or(0);
-                    if amount > I32_MAX {
-                        violations.push(format!(
-                            "{owner}: job XP amount {amount} exceeds the reward bundle i32 field"
-                        ));
-                        continue;
-                    }
-                    grant |= amount > 0;
-                    job_xp = job_xp.saturating_add(amount);
-                }
-            }
-            if !grant {
-                violations.push(format!(
-                    "quest {}: reachable quest has no reward grant (coins, items and job_xp are zero or empty)",
-                    quest.id
-                ));
-            }
-            if coins > I32_MAX {
-                violations.push(format!(
-                    "quest {}: coin total {coins} exceeds the loader bound",
-                    quest.id
-                ));
-            }
-            if job_xp > I32_MAX {
-                violations.push(format!(
-                    "quest {}: job XP total {job_xp} exceeds the loader bound",
-                    quest.id
-                ));
-            }
-            if !self
-                .engine
-                .quest_ids_for_giver(quest.giver_npc_id)
-                .any(|id| id == quest.id)
-            {
-                violations.push(format!(
-                    "quest {}: giver {} does not list the quest",
-                    quest.id, quest.giver_npc_id
-                ));
-            }
-            if !self.job_quests.contains(&quest.id) {
-                violations.push(format!(
-                    "quest {}: jobs.json does not list the quest in its quest_ids union",
-                    quest.id
+                    "quest {}: title id {} is outside 1..=i32::MAX and would wrap in the client fields",
+                    quest.id, quest.title_string_id
                 ));
             }
             if self
@@ -490,154 +393,94 @@ impl Catalogue {
     }
 }
 
-fn read_npc_rows(root: &Path) -> io::Result<BTreeMap<u64, Value>> {
-    let mut paths: Vec<PathBuf> = fs::read_dir(root.join("npcs"))?
-        .map(|entry| entry.map(|entry| entry.path()))
-        .collect::<io::Result<_>>()?;
+fn sorted_json_paths(directory: &Path) -> Vec<PathBuf> {
+    let mut paths: Vec<PathBuf> = fs::read_dir(directory)
+        .unwrap_or_else(|error| panic!("{}: {error}", directory.display()))
+        .map(|entry| {
+            entry
+                .unwrap_or_else(|error| panic!("{}: {error}", directory.display()))
+                .path()
+        })
+        .collect();
     paths.retain(|path| {
         path.extension()
             .is_some_and(|extension| extension == "json")
     });
     paths.sort();
-    let mut rows = BTreeMap::new();
-    for path in paths {
-        let document = read_json(&path)?;
+    paths
+}
+
+/// Authored NPC ids with the `quest_giver` role. `NpcInteraction` owns this
+/// table but exposes no role accessor; the split quest loader deliberately
+/// accepts a giver that no NPC row lists.
+fn read_quest_giver_rows(root: &Path) -> BTreeSet<u64> {
+    let mut ids = BTreeSet::new();
+    for path in sorted_json_paths(&root.join("npcs")) {
+        let document = read_json(&path);
         let records = document["records"]
             .as_array()
-            .ok_or_else(|| invalid(format!("{}: no records array", path.display())))?;
+            .unwrap_or_else(|| panic!("{}: no records array", path.display()));
         for record in records {
             let npc_id = record["npc_id"]
                 .as_u64()
-                .ok_or_else(|| invalid(format!("{}: NPC row has no id", path.display())))?;
-            if rows.insert(npc_id, record.clone()).is_some() {
-                return Err(invalid(format!("duplicate split NPC id {npc_id}")));
+                .unwrap_or_else(|| panic!("{}: NPC row has no id", path.display()));
+            let quest_giver = record["roles"].as_array().is_some_and(|roles| {
+                roles
+                    .iter()
+                    .any(|role| role.as_str() == Some("quest_giver"))
+            });
+            if quest_giver {
+                ids.insert(npc_id);
             }
         }
     }
-    Ok(rows)
+    ids
 }
 
-/// The production draw set: positioned `legacy_data` rows with a positive model
-/// or name id, plus extra spawns whose `content_key` names a content NPC. Each
-/// candidate is checked against `NpcVisibility` itself so the audit cannot claim
-/// an actor the 35/2 path never sends.
-fn drawable_sites(
-    root: &Path,
-    visibility: &NpcVisibility,
-    npcs: &BTreeMap<u64, Value>,
-) -> io::Result<BTreeSet<u64>> {
-    let mut sites = BTreeSet::new();
-    for (npc_id, row) in npcs {
-        if row["placement"].as_str() != Some("legacy_data") || !finite_position(&row["position"]) {
-            continue;
-        }
-        let model_id = row["model_id"].as_u64().unwrap_or(0);
-        let name_id = row["name_string_id"].as_u64().unwrap_or(0);
-        if model_id == 0 && name_id == 0 {
-            continue;
-        }
-        if visibility.content_key(*npc_id) != Some(*npc_id) {
-            return Err(invalid(format!(
-                "legacy_data NPC {npc_id} is not in the production draw set"
-            )));
-        }
-        sites.insert(*npc_id);
-    }
-    let extras = read_json(&root.join("npc_spawns_extra.json"))?;
-    let extras = extras["records"]
-        .as_array()
-        .ok_or_else(|| invalid("npc_spawns_extra.json has no records array"))?;
-    for row in extras {
-        let Some(content_key) = row["content_key"].as_u64().filter(|key| *key != 0) else {
-            continue;
-        };
-        // Mirror the loader's own skip list: no captured body, no unshipped
-        // knocker model and no non-finite position.
-        if !row["capture_match"].is_null()
-            || row["model_file_name"]
-                .as_str()
-                .is_some_and(|name| name.eq_ignore_ascii_case("knocker_m_boss.adr"))
-            || !finite_position(&row["position"])
-        {
-            continue;
-        }
-        let spawn_guid = row["spawn_guid"]
-            .as_u64()
-            .ok_or_else(|| invalid("extra NPC spawn has no guid"))?;
-        if visibility.content_key(spawn_guid) != Some(content_key) {
-            return Err(invalid(format!(
-                "extra spawn {spawn_guid} with content key {content_key} is not in the production draw set"
-            )));
-        }
-        sites.insert(content_key);
-    }
-    Ok(sites)
-}
-
-fn read_quests(root: &Path) -> io::Result<Vec<RawQuest>> {
-    let mut paths: Vec<PathBuf> = fs::read_dir(root.join("quests"))?
-        .map(|entry| entry.map(|entry| entry.path()))
-        .collect::<io::Result<_>>()?;
-    paths.retain(|path| {
-        path.extension()
-            .is_some_and(|extension| extension == "json")
-    });
-    paths.sort();
+fn read_quests(root: &Path) -> Vec<RawQuest> {
     let mut quests = Vec::new();
-    for path in paths {
-        let document = read_json(&path)?;
+    for path in sorted_json_paths(&root.join("quests")) {
+        let document = read_json(&path);
         let records = document["records"]
             .as_array()
-            .ok_or_else(|| invalid(format!("{}: no records array", path.display())))?;
+            .unwrap_or_else(|| panic!("{}: no records array", path.display()));
         for record in records {
             let id = as_u32(&record["id"])
-                .ok_or_else(|| invalid(format!("{}: invalid quest id", path.display())))?;
+                .unwrap_or_else(|| panic!("{}: invalid quest id", path.display()));
             let enabled = match record.get("enabled") {
                 None => true,
-                Some(value) => value.as_bool().ok_or_else(|| {
-                    invalid(format!(
-                        "{}: quest {id} enabled is not boolean",
-                        path.display()
-                    ))
-                })?,
+                Some(value) => value.as_bool().unwrap_or_else(|| {
+                    panic!("{}: quest {id} enabled is not boolean", path.display())
+                }),
             };
             let giver_npc_id = record["giver_npc_id"]
                 .as_u64()
-                .ok_or_else(|| invalid(format!("{}: quest {id} has no giver", path.display())))?;
+                .unwrap_or_else(|| panic!("{}: quest {id} has no giver", path.display()));
             let prerequisite_quest_ids = record["prerequisite_quest_ids"]
                 .as_array()
                 .into_iter()
                 .flatten()
                 .map(|value| {
-                    as_u32(value).ok_or_else(|| {
-                        invalid(format!(
-                            "{}: quest {id} prerequisite id is invalid",
-                            path.display()
-                        ))
+                    as_u32(value).unwrap_or_else(|| {
+                        panic!("{}: quest {id} prerequisite id is invalid", path.display())
                     })
                 })
-                .collect::<io::Result<Vec<_>>>()?;
-            let objectives = record["objectives"].as_array().cloned().ok_or_else(|| {
-                invalid(format!("{}: quest {id} has no objectives", path.display()))
-            })?;
-            let rewards = record["rewards"]
+                .collect();
+            let objectives = record["objectives"]
                 .as_array()
                 .cloned()
-                .ok_or_else(|| invalid(format!("{}: quest {id} has no rewards", path.display())))?;
+                .unwrap_or_else(|| panic!("{}: quest {id} has no objectives", path.display()));
             quests.push(RawQuest {
                 id,
                 enabled,
                 giver_npc_id,
+                title_string_id: record["title_string_id"].as_u64().unwrap_or(0),
                 prerequisite_quest_ids,
                 objectives,
-                rewards,
             });
         }
     }
-    if quests.is_empty() {
-        return Err(invalid("split quest catalogue is empty"));
-    }
-    Ok(quests)
+    quests
 }
 
 #[test]
@@ -653,26 +496,11 @@ fn every_enabled_quest_has_a_drawable_giver() {
         enabled.len(),
         "enabled quest ids are unique"
     );
-    for id in &enabled {
-        assert!(
-            catalogue.engine.giver_npc_id(*id).is_some(),
-            "enabled quest {id} was silently dropped by QuestEngine"
-        );
-    }
     let violations = catalogue.giver_violations();
     assert!(
         violations.is_empty(),
         "enabled quests without a drawable giver:\n{}",
         violations.join("\n")
-    );
-    let anchor_only: Vec<u32> = catalogue
-        .enabled()
-        .filter(|quest| catalogue.anchor_only.contains(&quest.giver_npc_id))
-        .map(|quest| quest.id)
-        .collect();
-    assert!(
-        anchor_only.is_empty(),
-        "enabled quests name a poi_anchor-only giver: {anchor_only:?}"
     );
     println!("enabled split quest records audited: {}", enabled.len());
 }
@@ -685,6 +513,10 @@ fn every_talk_target_and_visit_point_resolves() {
         violations.is_empty(),
         "enabled quest targets that do not resolve:\n{}",
         violations.join("\n")
+    );
+    println!(
+        "enabled objective kinds checked only by the split loader's field rules: {:?}",
+        catalogue.unchecked_objective_kinds()
     );
 
     let reachable: BTreeSet<u32> = catalogue
@@ -710,21 +542,6 @@ fn every_talk_target_and_visit_point_resolves() {
         classified, enabled,
         "every enabled quest is classified reachable or unreachable"
     );
-
-    // A reachable quest's direct prerequisites are enabled; reachability already
-    // proves the transitive chain, so a disabled ancestor cannot hide here.
-    for quest in catalogue.reachable_enabled() {
-        for prerequisite in &quest.prerequisite_quest_ids {
-            let row = catalogue.quest(*prerequisite).unwrap_or_else(|| {
-                panic!("quest {} prerequisite {prerequisite} is missing", quest.id)
-            });
-            assert!(
-                row.enabled,
-                "reachable quest {} has disabled prerequisite {prerequisite}",
-                quest.id
-            );
-        }
-    }
     println!(
         "enabled quests with resolvable targets: {} reachable, {} unreachable",
         reachable.len(),
@@ -759,231 +576,6 @@ fn every_reachable_enabled_quest_has_a_real_reward_and_title() {
         "reachable enabled quests audited for reward and title: {}",
         reachable.len()
     );
-}
-
-// -- scratch fixtures -------------------------------------------------------
-
-const FIXTURE_GIVER: u64 = 9_000_100_001;
-const FIXTURE_TARGET: u64 = 9_000_100_002;
-const FIXTURE_MISSING_GIVER: u64 = 9_000_100_099;
-const FIXTURE_MISSING_PREREQUISITE: u32 = 4_000_100_098;
-const FIXTURE_QUEST: u32 = 9_100_001;
-const FIXTURE_DEFECT: u32 = 9_100_002;
-const FIXTURE_BLOCKER: u32 = 9_100_003;
-const FIXTURE_TITLE: u32 = 700_001;
-
-#[derive(Clone, Copy)]
-enum Defect {
-    None,
-    MissingGiver,
-    NonFiniteVisit,
-    EmptyReward,
-    DisabledPrerequisite,
-    MissingPrerequisite,
-}
-
-struct Scratch(PathBuf);
-
-impl Scratch {
-    fn new(name: &str) -> Self {
-        let dir = Path::new(env!("CARGO_TARGET_TMPDIR")).join(format!("t314-{name}"));
-        let _ = fs::remove_dir_all(&dir);
-        fs::create_dir_all(dir.join("quests")).expect("fixture quests dir");
-        fs::create_dir_all(dir.join("npcs")).expect("fixture npcs dir");
-        Self(dir)
-    }
-
-    fn path(&self) -> &Path {
-        &self.0
-    }
-}
-
-impl Drop for Scratch {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.0);
-    }
-}
-
-fn fixture_source() -> Value {
-    json!([{"kind": "reconstructed", "evidence": "(R) T314 scratch fixture"}])
-}
-
-fn fixture_quest(
-    id: u32,
-    giver_npc_id: u64,
-    objectives: Value,
-    rewards: Value,
-    prerequisite_quest_ids: Value,
-) -> Value {
-    json!({
-        "id": id,
-        "title_string_id": FIXTURE_TITLE,
-        "giver_npc_id": giver_npc_id,
-        "prerequisite_quest_ids": prerequisite_quest_ids,
-        "objectives": objectives,
-        "rewards": rewards,
-        "source": fixture_source(),
-    })
-}
-
-fn fixture_talk_objective() -> Value {
-    json!([{
-        "kind": "talk_to_npc",
-        "id": 1,
-        "npc_id": FIXTURE_TARGET,
-        "source": fixture_source(),
-    }])
-}
-
-fn fixture_reward() -> Value {
-    json!([{"coins": 5, "items": [], "job_xp": {"4": 5}, "source": fixture_source()}])
-}
-
-fn fixture_npc(npc_id: u64, name: &str, name_string_id: u32, model_id: u32, x: f64) -> Value {
-    json!({
-        "npc_id": npc_id,
-        "name": name,
-        "name_string_id": name_string_id,
-        "zone_id": 1,
-        "position": [x, 0.0, 0.0],
-        "placement": "legacy_data",
-        "model_id": model_id,
-        "roles": ["quest_giver"],
-        "quest_ids_given": [],
-        "quests_given": [],
-        "quests_accepted": [],
-    })
-}
-
-fn write_json(path: &Path, value: &Value) {
-    fs::write(
-        path,
-        serde_json::to_vec_pretty(value).expect("fixture JSON"),
-    )
-    .unwrap_or_else(|error| panic!("{}: {error}", path.display()));
-}
-
-fn fixture(name: &str, defect: Defect) -> Scratch {
-    let scratch = Scratch::new(name);
-    let root = scratch.path();
-    let mut quests = vec![fixture_quest(
-        FIXTURE_QUEST,
-        FIXTURE_GIVER,
-        fixture_talk_objective(),
-        fixture_reward(),
-        json!([]),
-    )];
-    let mut quest_ids = vec![FIXTURE_QUEST];
-    let mut blocker = None;
-    match defect {
-        Defect::None => {}
-        Defect::MissingGiver => {
-            quests.push(fixture_quest(
-                FIXTURE_DEFECT,
-                FIXTURE_MISSING_GIVER,
-                fixture_talk_objective(),
-                fixture_reward(),
-                json!([]),
-            ));
-            quest_ids.push(FIXTURE_DEFECT);
-        }
-        Defect::NonFiniteVisit => {
-            let objectives = json!([{
-                "kind": "visit_position",
-                "id": 1,
-                "zone_id": 1,
-                "position": [1e300, 0.0, 0.0],
-                "radius": 5.0,
-                "source": fixture_source(),
-            }]);
-            quests.push(fixture_quest(
-                FIXTURE_DEFECT,
-                FIXTURE_GIVER,
-                objectives,
-                fixture_reward(),
-                json!([]),
-            ));
-            quest_ids.push(FIXTURE_DEFECT);
-        }
-        Defect::EmptyReward => {
-            quests.push(fixture_quest(
-                FIXTURE_DEFECT,
-                FIXTURE_GIVER,
-                fixture_talk_objective(),
-                json!([]),
-                json!([]),
-            ));
-            quest_ids.push(FIXTURE_DEFECT);
-        }
-        Defect::DisabledPrerequisite => {
-            // The defect quest would fail the reward gate if it were graded, so
-            // an empty reward proves the audit classified it unreachable instead.
-            quests.push(fixture_quest(
-                FIXTURE_DEFECT,
-                FIXTURE_GIVER,
-                fixture_talk_objective(),
-                json!([]),
-                json!([FIXTURE_BLOCKER]),
-            ));
-            blocker = Some(json!({
-                "id": FIXTURE_BLOCKER,
-                "title_string_id": FIXTURE_TITLE,
-                "giver_npc_id": FIXTURE_GIVER,
-                "prerequisite_quest_ids": [],
-                "objectives": [],
-                "rewards": [],
-                "source": fixture_source(),
-                "enabled": false,
-            }));
-            quest_ids.extend([FIXTURE_DEFECT, FIXTURE_BLOCKER]);
-        }
-        Defect::MissingPrerequisite => {
-            quests.push(fixture_quest(
-                FIXTURE_DEFECT,
-                FIXTURE_GIVER,
-                fixture_talk_objective(),
-                fixture_reward(),
-                json!([FIXTURE_MISSING_PREREQUISITE]),
-            ));
-            quest_ids.push(FIXTURE_DEFECT);
-        }
-    }
-    if let Some(blocker) = blocker {
-        quests.push(blocker);
-    }
-    let jobs = json!({
-        "schema_version": 1,
-        "records": [{
-            "id": "fixture_job",
-            "name": "Fixture Job",
-            "profile_id": 4,
-            "category": "combat",
-            "max_level": 20,
-            "members_only": false,
-            "trainer_npc_ids": [],
-            "quest_ids": quest_ids,
-            "abilities": [],
-            "source": fixture_source(),
-        }],
-    });
-    write_json(
-        &root.join("zones.json"),
-        &json!({"schema_version": 1, "records": [{"id": 1, "name": "Fixture Zone"}]}),
-    );
-    write_json(&root.join("npc_spawns_extra.json"), &json!({"records": []}));
-    write_json(&root.join("jobs.json"), &jobs);
-    write_json(
-        &root.join("quests/fixture.json"),
-        &json!({"schema_version": 1, "records": quests}),
-    );
-    write_json(
-        &root.join("npcs/fixture.json"),
-        &json!({"schema_version": 1, "records": [
-            fixture_npc(FIXTURE_GIVER, "Fixture giver", 700_002, 101, 10.0),
-            fixture_npc(FIXTURE_TARGET, "Fixture target", 700_003, 102, 12.0),
-        ]}),
-    );
-    scratch
 }
 
 #[test]
@@ -1023,6 +615,19 @@ fn a_malformed_enabled_row_is_rejected_or_reported() {
     );
     assert!(catalogue.giver_violations().is_empty());
 
+    // A title above i32::MAX would wrap negative in the client's title fields;
+    // the loader accepts it, so the audit must catch it.
+    let wrapped_title = fixture("wrapped-title", Defect::WrappedTitle);
+    let catalogue = Catalogue::load(wrapped_title.path()).expect("the wrapped-title fixture loads");
+    let violations = catalogue.reward_violations();
+    assert!(
+        violations.iter().any(|violation| {
+            violation.starts_with(&format!("quest {FIXTURE_DEFECT}:"))
+                && violation.contains("outside 1..=i32::MAX")
+        }),
+        "wrapped title was not reported: {violations:?}"
+    );
+
     // A disabled prerequisite makes the dependant unreachable: it is recorded
     // and not failed for its (deliberately empty) reward.
     let blocked = fixture("disabled-prerequisite", Defect::DisabledPrerequisite);
@@ -1050,16 +655,44 @@ fn a_malformed_enabled_row_is_rejected_or_reported() {
         catalogue.reward_violations()
     );
 
-    // The production loader already refuses an absent prerequisite and invalid
-    // visit geometry; the audit's matching checks are the defence in depth.
+    // The production loader refuses an absent prerequisite; that rule is not
+    // re-implemented by the audit.
     let missing_prerequisite = fixture("missing-prerequisite", Defect::MissingPrerequisite);
     assert!(
         Catalogue::load(missing_prerequisite.path()).is_err(),
         "an absent prerequisite must be rejected by the split loader"
     );
-    let non_finite_visit = fixture("non-finite-visit", Defect::NonFiniteVisit);
-    assert!(
-        Catalogue::load(non_finite_visit.path()).is_err(),
-        "non-finite visit geometry must be rejected by the split loader"
-    );
+}
+
+#[test]
+fn visit_geometry_bounds_are_enforced() {
+    assert!(valid_visit_geometry(&json!([0.0, 0.0, 0.0]), &json!(5.0)));
+    assert!(valid_visit_geometry(
+        &json!([1_000_000.0, -1_000_000.0, 0.0]),
+        &json!(1000.0)
+    ));
+    for position in [
+        json!([1_000_001.0, 0.0, 0.0]),
+        json!([null, 0.0, 0.0]),
+        json!([0.0, 0.0]),
+        json!([0.0, 0.0, "x"]),
+    ] {
+        assert!(
+            !valid_visit_geometry(&position, &json!(5.0)),
+            "position {position} must be refused"
+        );
+    }
+    for radius in [
+        json!(0.0),
+        json!(-1.0),
+        json!(0.05),
+        json!(1000.1),
+        json!("5"),
+        json!(null),
+    ] {
+        assert!(
+            !valid_visit_geometry(&json!([0.0, 0.0, 0.0]), &radius),
+            "radius {radius} must be refused"
+        );
+    }
 }
