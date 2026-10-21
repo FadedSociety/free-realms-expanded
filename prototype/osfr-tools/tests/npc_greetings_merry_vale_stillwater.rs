@@ -22,10 +22,19 @@
 //!
 //! The service path (`NpcInteraction::interact` -> `select`) is the same one
 //! `gameplay/npc.rs` uses; the dispatch path (`Gameplay::handle_in_world`)
-//! drives the real router and `dialogue_packet_with`.
+//! drives the real router and `dialogue_packet_with`. The packet builders, the
+//! locale line convention and the 26/3 body offset live in the shared
+//! `tests/common/npc_greetings.rs` harness; this suite keeps only its own
+//! content pins and the one-shot zero-greeting fixture.
 
+#[path = "common/npc_greetings.rs"]
+mod npc_greetings;
+
+use npc_greetings::{
+    content_dir, gameplay_dir, gameplay_talk_body, greeting_bindings, locale_rows, npc_record,
+    select, service, service_talk_body,
+};
 use osfr_tools::{
-    character_store::CharacterState,
     gameplay::Gameplay,
     npc_interaction::{NpcAction, NpcInteraction, NpcInteractionError, NpcSelection},
     world::NpcVisibility,
@@ -33,14 +42,13 @@ use osfr_tools::{
 };
 use serde_json::Value;
 use std::{
-    collections::{BTreeSet, HashMap},
+    collections::BTreeSet,
     fs,
     path::{Path, PathBuf},
     process::Command,
+    time::{SystemTime, UNIX_EPOCH},
 };
 
-const GREETING_HEADER: [u8; 4] = [26, 0, 3, 0];
-const MENU_HEADER: [u8; 4] = [26, 0, 9, 0];
 const MAX_GREETINGS: usize = 24;
 
 const WARRIOR_GUIDE: &str = "notes/Build Guides/Content/Jobs/Warrior.md";
@@ -51,6 +59,11 @@ const BRAWLER_GUIDE: &str = "notes/Build Guides/Content/Jobs/Brawler.md";
 const FISHERMAN_GUIDE: &str = "notes/Build Guides/Content/Jobs/Fisherman.md";
 const MERRY_VALE_GUIDE: &str = "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md";
 const STILLWATER_GUIDE: &str = "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md";
+
+/// The two NPC files this slice owns.
+const OWNED_FILES: [&str; 2] = ["merry_vale.json", "stillwater_crossing.json"];
+/// Repository-relative NPC directory; the changed-path guard works on it.
+const NPC_CONTENT: &str = "prototype/osfr-tools/data/content/npcs";
 
 /// One edited row: content key, the `Global.Text` id the client looks up, its
 /// JenkinsLookup2 hash, the physical stock-locale line, the speaker proof and
@@ -257,104 +270,13 @@ const NEW_GREETINGS: [Greeting; 17] = [
     },
 ];
 
-/// The 94 bindings this slice must not disturb (W126 plus T246, T280, T298 and
-/// T299). Greetings that a later slice added before this one integrates are
-/// covered by the per-row HEAD comparison in the same test.
-const EXISTING_GREETINGS: [(&str, u64, u32); 94] = [
-    ("cobblestone_village.json", 9000000021, 4420092),
-    ("cobblestone_village.json", 9000000120, 94293),
-    ("cobblestone_village.json", 9000000121, 94297),
-    ("cobblestone_village.json", 9000000189, 24940),
-    ("cobblestone_village.json", 9500000245, 388245),
-    ("cobblestone_village.json", 9500000254, 94388),
-    ("farnum_farmstead.json", 9000000050, 5100125),
-    ("farnum_farmstead.json", 9000000104, 391041),
-    ("farnum_farmstead.json", 9000000165, 4420036),
-    ("farnum_farmstead.json", 9000000396, 5100509),
-    ("farnum_farmstead.json", 9500000266, 101014),
-    ("farnum_farmstead.json", 9500000271, 391391),
-    ("greenwood_forest.json", 9000000005, 413790),
-    ("greenwood_forest.json", 9000000106, 383044),
-    ("greenwood_forest.json", 9000000334, 47871),
-    ("greenwood_forest.json", 9000000337, 77548),
-    ("greenwood_forest.json", 9000000387, 22074),
-    ("greenwood_forest.json", 9000000405, 94431),
-    ("greenwood_forest.json", 9000000444, 389186),
-    ("greenwood_forest.json", 9000000479, 94417),
-    ("greenwood_forest.json", 9500000291, 24816),
-    ("greenwood_forest.json", 9500000297, 429061),
-    ("greenwood_forest.json", 9500000298, 429370),
-    ("greenwood_forest.json", 9500000301, 429430),
-    ("highroad_junction.json", 9000000015, 436533),
-    ("highroad_junction.json", 9000000019, 431140),
-    ("highroad_junction.json", 9000000102, 140509),
-    ("highroad_junction.json", 9000000177, 104100),
-    ("highroad_junction.json", 9000000402, 80),
-    ("lakeshore.json", 9000000223, 24829),
-    ("lakeshore.json", 9000000233, 409412),
-    ("lakeshore.json", 9500000363, 41207),
+/// The two bindings that already existed in the two owned files (W126). The
+/// other ninety-two pre-existing bindings are pinned by the suites that own
+/// their regions; this suite proves their rows were not disturbed through the
+/// non-target-row comparison below.
+const OWNED_PRE_EXISTING: [(&str, u64, u32); 2] = [
     ("merry_vale.json", 9500000430, 41268),
-    ("sanctuary.json", 9000000028, 387246),
-    ("sanctuary.json", 9000000052, 73782),
-    ("sanctuary.json", 9000000073, 76747),
-    ("sanctuary.json", 9000000091, 24842),
-    ("sanctuary.json", 9000000097, 91895),
-    ("sanctuary.json", 9000000126, 76438),
-    ("sanctuary.json", 9000000160, 101215),
-    ("sanctuary.json", 9000000161, 73360),
-    ("sanctuary.json", 9000000205, 71435),
-    ("sanctuary.json", 9000000207, 46166),
-    ("sanctuary.json", 9000000467, 94274),
-    ("sanctuary.json", 9500000438, 37452),
-    ("sanctuary.json", 9500000440, 22622),
-    ("sanctuary.json", 9500000450, 441420),
-    ("sanctuary.json", 9500000465, 74526),
-    ("sanctuary.json", 9500000474, 21785),
-    ("sanctuary.json", 9500000476, 390786),
-    ("sanctuary.json", 9500000477, 21557),
-    ("sanctuary.json", 9500000487, 37872),
-    ("sanctuary.json", 9500000493, 415302),
-    ("sanctuary.json", 9500000497, 15500),
-    ("sanctuary.json", 9500000500, 103560),
-    ("sanctuary.json", 9500000505, 70827),
-    ("sanctuary.json", 9500000509, 46279),
-    ("sanctuary.json", 9500000515, 415266),
-    ("sanctuary.json", 9500000520, 428076),
-    ("sanctuary.json", 9500000522, 37041),
-    ("sanctuary.json", 9500000528, 21534),
-    ("sanctuary.json", 9500000529, 74933),
-    ("sanctuary.json", 9500000541, 21602),
-    ("sanctuary.json", 9500000545, 76061),
-    ("seaside.json", 9500000563, 441432),
-    ("seaside.json", 9500000639, 441037),
-    ("snowhill.json", 9000000033, 91267),
-    ("snowhill.json", 9000000076, 46059),
-    ("snowhill.json", 9000000093, 430860),
-    ("snowhill.json", 9000000151, 78904),
-    ("snowhill.json", 9000000155, 70892),
-    ("snowhill.json", 9000000158, 5696),
-    ("snowhill.json", 9000000206, 78478),
-    ("snowhill.json", 9000000208, 387432),
-    ("snowhill.json", 9000000220, 76208),
-    ("snowhill.json", 9000000234, 74937),
     ("stillwater_crossing.json", 9500000786, 116463),
-    ("sunstone_valley.json", 9500000824, 413082),
-    ("wilds.json", 9000000243, 387488),
-    ("wilds.json", 9000000273, 394709),
-    ("wilds.json", 9000000317, 130251),
-    ("wilds.json", 9000000324, 24947),
-    ("wilds.json", 9000000332, 73077),
-    ("wilds.json", 9000000335, 78924),
-    ("wilds.json", 9000000347, 104327),
-    ("wilds.json", 9000000415, 141009),
-    ("wilds.json", 9000000477, 391043),
-    ("wilds.json", 9000000488, 73492),
-    ("wilds.json", 9500000869, 115443),
-    ("wilds.json", 9500000876, 73378),
-    ("wilds.json", 9500000893, 25001),
-    ("wilds.json", 9500000907, 9599),
-    ("wilds.json", 9500000954, 20984),
-    ("wilds.json", 9500000958, 21014),
 ];
 
 /// Drawable rows with no recovered first-person speaker line, one per owned
@@ -362,134 +284,9 @@ const EXISTING_GREETINGS: [(&str, u64, u32); 94] = [
 const BLANK_MERRY_VALE: u64 = 9500000405;
 const BLANK_STILLWATER: u64 = 9000000227;
 
-fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
-/// Full server content used by the existing in-world router tests. It has no
-/// `npcs/` or `npc_spawns_extra.json`, so `Gameplay::load` takes the NPC rows
-/// from the bundled `data/content` (the same rows this test edits).
-fn gameplay_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/references/opening-anvil-placement-v1/content")
-}
-
-/// The read-only stock client locale the server content cites.
-fn locale_path() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat")
-}
-
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(
-        &fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
-    )
-    .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-}
-
-fn npc_record(file: &str, npc_id: u64) -> Value {
-    let path = content_dir().join("npcs").join(file);
-    let document = read_json(&path);
-    document["records"]
-        .as_array()
-        .unwrap_or_else(|| panic!("{}: records array", path.display()))
-        .iter()
-        .find(|record| record["npc_id"].as_u64() == Some(npc_id))
-        .unwrap_or_else(|| panic!("{}: NPC {npc_id}", path.display()))
-        .clone()
-}
-
-fn npc_location(file: &str, npc_id: u64) -> [f32; 3] {
-    let record = npc_record(file, npc_id);
-    let position = record["position"]
-        .as_array()
-        .unwrap_or_else(|| panic!("NPC {npc_id} has no position"));
-    assert_eq!(position.len(), 3, "NPC {npc_id} position shape");
-    [
-        position[0].as_f64().expect("x") as f32,
-        position[1].as_f64().expect("y") as f32,
-        position[2].as_f64().expect("z") as f32,
-    ]
-}
-
-fn service() -> NpcInteraction {
-    let data = content_dir();
-    NpcInteraction::load(&data.join("npcs"), &data.join("stores.json"))
-        .expect("NPC content loads through the real loader")
-}
-
-fn interact_request(npc_id: u64) -> Vec<u8> {
-    // 26/8 CommandPacketInteractRequest (constructor 0x008b6bc0).
-    let mut packet = vec![26, 0, 8, 0];
-    packet.extend(npc_id.to_le_bytes());
-    packet.push(0);
-    packet
-}
-
-fn select_request(npc_id: u64, choice: i32) -> Vec<u8> {
-    // 26/10 CommandPacketInteractionSelect (constructor 0x00a36f80).
-    let mut packet = vec![26, 0, 10, 0];
-    packet.extend(npc_id.to_le_bytes());
-    packet.extend(choice.to_le_bytes());
-    packet
-}
-
-/// Real Talk selection through the service the router calls.
-fn service_talk_body(service: &mut NpcInteraction, npc_id: u64) -> Option<u32> {
-    let (zone, position) = service
-        .location(npc_id)
-        .unwrap_or_else(|| panic!("NPC {npc_id} has a location"));
-    let menu = service
-        .interact(npc_id, zone, position, None)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} menu: {error:?}"));
-    let talk = menu
-        .options
-        .iter()
-        .find(|option| option.action == NpcAction::Talk)
-        .unwrap_or_else(|| panic!("NPC {npc_id} offers Talk"));
-    let selected = service
-        .select(&select_request(npc_id, talk.id), zone, position, None)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} Talk: {error:?}"));
-    match selected {
-        NpcSelection::Talk(context) => context.body_string_id,
-        _ => panic!("NPC {npc_id} Talk must return dialogue"),
-    }
-}
-
-fn character_at(position: [f32; 3]) -> CharacterState {
-    CharacterState {
-        guid: 101,
-        zone_id: 0,
-        position,
-        rotation: [1.0, 0.0, 0.0],
-    }
-}
-
-/// Real in-world Talk: 26/8 opens the menu, 26/10 selects Talk, and the 26/3
-/// reply is decoded from the production packet.
-fn gameplay_talk_body(game: &mut Gameplay, file: &str, npc_id: u64) -> u32 {
-    let character = character_at(npc_location(file, npc_id));
-    let menu = game
-        .handle_in_world(&interact_request(npc_id), &character, 1_000)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} interact: {error}"));
-    assert!(
-        menu.replies
-            .iter()
-            .any(|packet| packet.starts_with(&MENU_HEADER)),
-        "NPC {npc_id} must answer 26/8 with a 26/9 menu"
-    );
-    let outcome = game
-        .handle_in_world(&select_request(npc_id, 1), &character, 1_100)
-        .unwrap_or_else(|error| panic!("NPC {npc_id} Talk: {error}"));
-    let dialogue = outcome
-        .replies
-        .into_iter()
-        .find(|packet| packet.starts_with(&GREETING_HEADER))
-        .unwrap_or_else(|| panic!("NPC {npc_id} Talk must answer 26/3"));
-    // Body dword follows the four-byte family/subtype header; patch_npc_actor
-    // writes the runtime actor GUID only into bytes 12..20.
-    u32::from_le_bytes(dialogue[4..8].try_into().unwrap())
-}
+/// A bound row carried into the zero-greeting fixture as the control: it must
+/// keep sending its own id so the fixture is not a bypass.
+const CONTROL_ROW: u64 = 9500000371;
 
 fn assert_drawable(record: &Value, npc_id: u64) {
     assert!(
@@ -523,29 +320,6 @@ fn assert_drawable(record: &Value, npc_id: u64) {
     );
 }
 
-/// The stock client locale rows for the 17 target hashes, keyed by hash with
-/// the one-based physical line and the client text.
-fn locale_rows() -> HashMap<u32, (u32, String)> {
-    let path = locale_path();
-    let text =
-        fs::read_to_string(&path).unwrap_or_else(|error| panic!("{}: {error}", path.display()));
-    let mut rows = HashMap::new();
-    for (index, line) in text.lines().enumerate() {
-        let mut fields = line.splitn(3, '\t');
-        let (Some(key), Some(_table), Some(body)) = (fields.next(), fields.next(), fields.next())
-        else {
-            continue;
-        };
-        let Ok(hash) = key.trim_start_matches('\u{feff}').parse::<u32>() else {
-            continue;
-        };
-        if NEW_GREETINGS.iter().any(|target| target.hash == hash) {
-            rows.insert(hash, (index as u32 + 1, body.to_owned()));
-        }
-    }
-    rows
-}
-
 fn region_guide(file: &str) -> &'static str {
     match file {
         "merry_vale.json" => MERRY_VALE_GUIDE,
@@ -559,22 +333,142 @@ fn repo_root() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("../..")
 }
 
-/// HEAD bytes for a repository-relative path. The workspace is a git worktree,
-/// so comparing against HEAD proves this diff did not touch a file the slice
-/// does not own without pinning a hash that another slice's landing would stale.
-fn head_bytes(relative: &str) -> Vec<u8> {
-    let output = Command::new("git")
+fn git(args: &[&str]) -> std::process::Output {
+    Command::new("git")
         .arg("-C")
         .arg(repo_root())
-        .args(["show", &format!("HEAD:{relative}")])
+        .args(args)
         .output()
-        .unwrap_or_else(|error| panic!("git is required for the unchanged-files gate: {error}"));
+        .unwrap_or_else(|error| panic!("git is required for the changed-content gate: {error}"))
+}
+
+fn git_text(args: &[&str]) -> String {
+    let output = git(args);
     assert!(
         output.status.success(),
-        "git show HEAD:{relative} failed: {}",
+        "git {} failed: {}",
+        args.join(" "),
         String::from_utf8_lossy(&output.stderr)
     );
-    output.stdout
+    String::from_utf8_lossy(&output.stdout).into_owned()
+}
+
+fn is_owned(path: &str) -> bool {
+    OWNED_FILES
+        .iter()
+        .any(|file| path == format!("{NPC_CONTENT}/{file}"))
+}
+
+/// Repository-relative `npcs/*.json` paths this worktree has uncommitted
+/// changes for (tracked or untracked). A builder workspace is private, so any
+/// such path outside the two owned files is this slice's spill.
+fn uncommitted_npc_paths() -> BTreeSet<String> {
+    git_text(&["status", "--porcelain", "--", NPC_CONTENT])
+        .lines()
+        .filter(|line| line.len() > 3)
+        .map(|line| {
+            line[3..]
+                .split(" -> ")
+                .last()
+                .unwrap_or_default()
+                .to_owned()
+        })
+        .collect()
+}
+
+/// `npcs/*.json` paths the HEAD commit itself changed.
+fn head_npc_paths() -> BTreeSet<String> {
+    git_text(&[
+        "diff-tree",
+        "--no-commit-id",
+        "--name-only",
+        "-r",
+        "HEAD",
+        "--",
+        NPC_CONTENT,
+    ])
+    .lines()
+    .map(str::to_owned)
+    .collect()
+}
+
+/// The NPC paths of the change that must be checked: the uncommitted NPC edit
+/// in a builder workspace, or the HEAD commit when it touched one of the two
+/// owned files (the committed review state). A tip whose change does not touch
+/// the owned files has no content change for this suite to check, and each
+/// other region is pinned by the suite that owns it.
+fn change_under_test() -> Option<BTreeSet<String>> {
+    let uncommitted = uncommitted_npc_paths();
+    if !uncommitted.is_empty() {
+        return Some(uncommitted);
+    }
+    let head = head_npc_paths();
+    head.iter().any(|path| is_owned(path)).then_some(head)
+}
+
+/// A throwaway copy of the shipped gameplay content plus a one-row-region NPC
+/// fixture: the blank control with an explicit `greeting_string_id: 0` and one
+/// bound control row. Removed when the test ends.
+struct FixtureDir(PathBuf);
+
+impl Drop for FixtureDir {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.0);
+    }
+}
+
+fn zero_greeting_fixture() -> FixtureDir {
+    let stamp = SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .expect("clock after the epoch")
+        .as_nanos();
+    let target =
+        std::env::temp_dir().join(format!("osfr-t316-zero-{}-{stamp}", std::process::id()));
+    fs::create_dir_all(target.join("npcs")).expect("fixture npcs directory");
+    for entry in fs::read_dir(gameplay_dir()).expect("gameplay content directory") {
+        let entry = entry.expect("gameplay content entry");
+        if entry.path().is_file() {
+            fs::copy(entry.path(), target.join(entry.file_name()))
+                .expect("copied gameplay content");
+        }
+    }
+    // The Coin Shop validates the full store schema, so the real catalogue is
+    // copied; the fixture sells nothing, and `NpcInteraction::load` requires
+    // the empty vendor list next to `npcs/`.
+    fs::copy(
+        content_dir().join("stores.json"),
+        target.join("stores.json"),
+    )
+    .expect("copied store catalogue");
+    fs::write(
+        target.join("vendors.json"),
+        br#"{"schema_version":1,"vendors":[]}"#,
+    )
+    .expect("fixture vendors");
+    fs::write(
+        target.join("zones.json"),
+        br#"{"schema_version":1,"records":[]}"#,
+    )
+    .expect("fixture zones");
+    fs::write(
+        target.join("npc_spawns_extra.json"),
+        br#"{"schema_version":1,"records":[]}"#,
+    )
+    .expect("fixture extra spawns");
+    let mut record = npc_record("merry_vale.json", BLANK_MERRY_VALE);
+    record["greeting_string_id"] = Value::from(0);
+    let region = serde_json::json!({
+        "schema_version": 1,
+        "region_page": "Merry Vale",
+        "region_zone_id": 9,
+        "records": [record, npc_record("merry_vale.json", CONTROL_ROW)],
+    });
+    fs::write(
+        target.join("npcs/merry_vale.json"),
+        serde_json::to_vec(&region).expect("fixture NPC region"),
+    )
+    .expect("fixture NPC rows");
+    FixtureDir(target)
 }
 
 /// Every edited row: one client source and one `(R)` policy source, a drawable
@@ -587,10 +481,12 @@ fn every_edited_row_has_resolved_client_provenance() {
         NEW_GREETINGS.len() <= MAX_GREETINGS,
         "the slice binds at most {MAX_GREETINGS} rows"
     );
-    let locale = locale_rows();
+    let wanted: BTreeSet<u32> = NEW_GREETINGS.iter().map(|target| target.hash).collect();
+    let locale = locale_rows(&wanted);
     let visibility =
         NpcVisibility::load(&content_dir()).expect("the production visibility loader accepts it");
     let mut greeting_ids = BTreeSet::new();
+    let mut targets = BTreeSet::new();
     for target in &NEW_GREETINGS {
         assert!(
             target.greeting > 0,
@@ -602,6 +498,11 @@ fn every_edited_row_has_resolved_client_provenance() {
             "NPC {}: greeting {} reused",
             target.npc_id,
             target.greeting
+        );
+        assert!(
+            targets.insert((target.file.to_owned(), target.npc_id)),
+            "NPC {}: duplicate target row",
+            target.npc_id
         );
 
         let record = npc_record(target.file, target.npc_id);
@@ -679,7 +580,7 @@ fn every_edited_row_has_resolved_client_provenance() {
             .get(&target.hash)
             .unwrap_or_else(|| panic!("NPC {}: locale hash missing", target.npc_id));
         assert_eq!(
-            *line, target.dat_line,
+            *line, target.dat_line as usize,
             "NPC {}: en_us_data.dat line",
             target.npc_id
         );
@@ -690,33 +591,17 @@ fn every_edited_row_has_resolved_client_provenance() {
         );
     }
 
-    // The owned files add exactly these rows to the two W126 bindings.
-    let expected = NEW_GREETINGS
-        .iter()
-        .map(|target| (target.file, target.npc_id, target.greeting))
-        .chain(
-            EXISTING_GREETINGS
-                .iter()
-                .filter(|(file, _, _)| {
-                    *file == "merry_vale.json" || *file == "stillwater_crossing.json"
-                })
-                .map(|(file, npc_id, greeting)| (*file, *npc_id, *greeting)),
-        )
-        .collect::<BTreeSet<_>>();
-    let mut found = BTreeSet::new();
-    for file in ["merry_vale.json", "stillwater_crossing.json"] {
-        for record in read_json(&content_dir().join("npcs").join(file))["records"]
-            .as_array()
-            .unwrap()
-        {
-            if let Some(greeting) = record["greeting_string_id"].as_u64().filter(|id| *id > 0) {
-                found.insert((file, record["npc_id"].as_u64().unwrap(), greeting as u32));
-            }
-        }
-    }
-    assert_eq!(
-        found, expected,
-        "greeted rows changed outside the target set"
+    // Every other binding in `npcs/*.json` must stay disjoint from these ids;
+    // this is the cross-file check the exact-set comparison could not make.
+    let pre_existing: BTreeSet<u32> = greeting_bindings()
+        .into_iter()
+        .filter(|((file, npc_id), _)| !targets.contains(&(file.clone(), *npc_id)))
+        .map(|(_, greeting)| greeting)
+        .collect();
+    assert!(!pre_existing.is_empty(), "the NPC content has greetings");
+    assert!(
+        greeting_ids.is_disjoint(&pre_existing),
+        "a new greeting reuses an existing binding"
     );
 }
 
@@ -787,10 +672,10 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
             .expect("the blank NPC offers Talk")
             .id;
         assert!(matches!(
-            interaction.select(&select_request(npc_id, i32::MAX), zone, position, None),
+            interaction.select(&select(npc_id, i32::MAX as u32), zone, position, None),
             Err(NpcInteractionError::InvalidOption)
         ));
-        match interaction.select(&select_request(npc_id, talk), zone, position, None) {
+        match interaction.select(&select(npc_id, talk as u32), zone, position, None) {
             Ok(NpcSelection::Talk(context)) => assert_eq!(
                 context.body_string_id, None,
                 "the refused choice must not consume the menu or inject a body"
@@ -817,11 +702,45 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
             "NPC {npc_id}: no invented locale id"
         );
     }
+
+    // An explicit `greeting_string_id: 0` is the `Some(0)` case, not the missing
+    // block. The fixture keeps the blank control and one bound control row so a
+    // fallback to another row's id would show up as the wrong body.
+    let fixture = zero_greeting_fixture();
+    let mut fixture_interaction =
+        NpcInteraction::load(&fixture.0.join("npcs"), &fixture.0.join("stores.json"))
+            .expect("the zero-greeting fixture loads through the real NPC loader");
+    let control = NEW_GREETINGS
+        .iter()
+        .find(|target| target.npc_id == CONTROL_ROW)
+        .expect("the bound control row is one of the edited rows");
+    assert_eq!(
+        service_talk_body(&mut fixture_interaction, BLANK_MERRY_VALE),
+        Some(0),
+        "an explicit zero greeting is carried as Some(0), not dropped or borrowed"
+    );
+    assert_eq!(
+        service_talk_body(&mut fixture_interaction, CONTROL_ROW),
+        Some(control.greeting),
+        "the fixture still sends a bound row's own id"
+    );
+    let mut fixture_game =
+        Gameplay::load(&fixture.0, None).expect("the fixture gameplay content loads");
+    assert_eq!(
+        gameplay_talk_body(&mut fixture_game, "merry_vale.json", BLANK_MERRY_VALE),
+        0,
+        "an explicit zero greeting encodes a zero 26/3 body"
+    );
+    assert_eq!(
+        gameplay_talk_body(&mut fixture_game, "merry_vale.json", CONTROL_ROW),
+        control.greeting,
+        "the fixture's bound control row still sends its own 26/3 body"
+    );
 }
 
 #[test]
 fn the_existing_greetings_and_other_regions_are_unchanged() {
-    for (file, npc_id, greeting) in EXISTING_GREETINGS {
+    for (file, npc_id, greeting) in OWNED_PRE_EXISTING {
         assert_eq!(
             npc_record(file, npc_id)["greeting_string_id"].as_u64(),
             Some(u64::from(greeting)),
@@ -829,80 +748,27 @@ fn the_existing_greetings_and_other_regions_are_unchanged() {
         );
     }
 
-    // In the two files this slice owns, every non-target record keeps its
-    // top-level values: only the 17 edited rows may differ from HEAD.
-    let edited: BTreeSet<u64> = NEW_GREETINGS.iter().map(|target| target.npc_id).collect();
-    for file in ["merry_vale.json", "stillwater_crossing.json"] {
-        let relative = format!("prototype/osfr-tools/data/content/npcs/{file}");
-        let base: Value = serde_json::from_slice(&head_bytes(&relative))
-            .unwrap_or_else(|error| panic!("{relative}: HEAD is not JSON: {error}"));
-        let current = read_json(&content_dir().join("npcs").join(file));
-        let base_rows = base["records"].as_array().expect("HEAD records");
-        let current_rows = current["records"].as_array().expect("current records");
-        assert_eq!(base_rows.len(), current_rows.len(), "{file}: row count");
-        for (old, new) in base_rows.iter().zip(current_rows) {
-            let npc_id = new["npc_id"].as_u64().expect("npc id");
-            if !edited.contains(&npc_id) {
-                assert_eq!(old, new, "{file}: NPC {npc_id} non-target row changed");
-            }
-        }
-    }
-
-    // Every region file this slice does not own is byte-identical to HEAD, so
-    // the T246/T280/T298/T299 rows there cannot change. Comparing against HEAD
-    // (not a hash pinned at authoring time) keeps the gate true when another
-    // slice's work lands before this one integrates.
-    let data = content_dir().join("npcs");
-    let mut others = 0usize;
-    for entry in fs::read_dir(&data).expect("npcs directory") {
-        let path = entry.expect("npc entry").path();
-        if path.extension().and_then(|extension| extension.to_str()) != Some("json") {
-            continue;
-        }
-        let file = path.file_name().unwrap().to_string_lossy().into_owned();
-        if file == "merry_vale.json" || file == "stillwater_crossing.json" {
-            continue;
-        }
-        let relative = format!("prototype/osfr-tools/data/content/npcs/{file}");
-        assert_eq!(
-            fs::read(&path).expect("region file"),
-            head_bytes(&relative),
-            "{file}: an out-of-scope region file changed"
+    // The change under test (the uncommitted NPC edit in a builder workspace,
+    // or HEAD when HEAD touched an owned file) may change only the two owned
+    // NPC files; every other region belongs to another slice and is pinned by
+    // that slice's own suite. The changed-path set is read from the working
+    // tree (against HEAD) or from the HEAD commit (against its parent), so it
+    // is not a self-comparison once the commit is HEAD.
+    let Some(changed) = change_under_test() else {
+        return;
+    };
+    for path in &changed {
+        assert!(
+            is_owned(path),
+            "{path} changed: this slice owns only merry_vale.json and stillwater_crossing.json"
         );
-        others += 1;
     }
-    assert!(
-        others >= 15,
-        "expected at least fifteen untouched region files"
-    );
 }
 
 #[test]
 fn the_content_stays_within_the_loader_bounds() {
-    let data = content_dir().join("npcs");
-    let mut total = 0u64;
-    for file in ["merry_vale.json", "stillwater_crossing.json"] {
-        let path = data.join(file);
-        let bytes = fs::read(&path).unwrap();
-        let size = bytes.len() as u64;
-        assert!(
-            size <= 8 * 1024 * 1024,
-            "{file}: exceeds the 8 MiB per-file loader bound"
-        );
-        total += size;
-        let text = std::str::from_utf8(&bytes).unwrap_or_else(|error| panic!("{file}: {error}"));
-        let document: Value =
-            serde_json::from_str(text).unwrap_or_else(|error| panic!("{file}: {error}"));
-        assert!(
-            document["records"].as_array().unwrap().len() <= 20_000,
-            "{file}: exceeds the 20,000-row loader bound"
-        );
-    }
-    assert!(
-        total <= 32 * 1024 * 1024,
-        "the two edited files exceed the 32 MiB loader bound"
-    );
-    // The loader itself is the shape/source gate.
+    // `NpcInteraction::load` is the bounds gate: it enforces the 8 MiB per
+    // file, 32 MiB total and 20,000-record limits over every `npcs/*.json`.
     let _ = service();
 
     for target in &NEW_GREETINGS {

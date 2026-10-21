@@ -60,6 +60,7 @@ pub fn locale_path() -> PathBuf {
 
 /// A generated lab report used by the T246/T280 resolution method (outside the
 /// repository, like the client locale read above).
+#[allow(dead_code)] // Some include sites need only the locale rows.
 pub fn lab_report(name: &str) -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../../lab/reports")
@@ -185,6 +186,7 @@ pub fn locale_rows(wanted: &BTreeSet<u32>) -> BTreeMap<u32, (usize, String)> {
     rows
 }
 
+#[allow(dead_code)] // Some include sites need only `locale_rows`.
 pub fn locale_id_to_text() -> BTreeMap<u64, String> {
     read_json(&lab_report("locale-id-to-text.json"))
         .as_array()
