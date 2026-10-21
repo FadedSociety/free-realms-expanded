@@ -45,6 +45,7 @@ use osfr_tools::{
     encounter::{EncounterEngine, EncounterPhase},
     gateway::Gateway,
     inventory::{InventoryState, MAX_ITEMS},
+    npc_interaction::{QUEST_CHOICE_RESPONSE, decode_dialogue_26_3, decode_quest_offer_49_1},
     quest_engine::{CharacterEligibility, QuestEngine, QuestProgress, QuestState, QuestStatus},
     startup_world::{NpcSpawn, parse_add_npc},
 };
@@ -86,10 +87,17 @@ const ALPHA_KIND: i32 = 930050;
 const WOLF_KIND: i32 = 930071;
 /// Marker adaptation: a non-combat gate has no recovered enemy kind.
 const MARKER_DEFINITION: i32 = 1235000;
-/// The shipped `Brawler: Delinquent Dilemma` quest (3000007): defeat four
-/// actors whose definition is the recovered Alpha Wolf kind `930050`.
+/// The shipped `Brawler: Delinquent Dilemma` quest (`data/content/quests/brawler.json:405`):
+/// defeat four actors whose definition is the recovered Alpha Wolf kind `930050`.
 const DELINQUENT_QUEST: u32 = 3030007;
 const DELINQUENT_GOAL: u32 = 1;
+/// `Brawler: Building your Rep`, the completed prerequisite Delinquent Dilemma
+/// needs; its own earlier chain is the seeded reconnect seam, not this test.
+const DELINQUENT_PREREQUISITE: u32 = 3030006;
+/// Jones, the shipped Delinquent Dilemma giver in `npcs/cobblestone_village.json`.
+const JONES: u64 = 9_000_000_121;
+/// Generic rebuilt Talk option label (client 26/9 menu).
+const TALK_LABEL: u32 = 3_300;
 const MODEL: i32 = 3284;
 const NAMEPLATE: i32 = 11970;
 const BRAWLER: i32 = 43;
@@ -121,15 +129,17 @@ impl Fixture {
         })
     }
 
-    /// Restore a save whose NPC quest state carries the shipped Brawler
-    /// `Delinquent Dilemma` goal, through the same production bind a reconnect
-    /// uses. The seed is on the Brawler job at level 1.
+    /// Restore a save whose NPC quest state carries the given entries, through
+    /// the same production bind a reconnect uses. The seed is on the Brawler
+    /// job at level 1. Test 9 seeds only Delinquent Dilemma's completed
+    /// prerequisite; the target quest is then offered and accepted live.
     fn gateway_with_quest(&self, position: [f32; 3], guid: u64, quests: QuestState) -> Gateway {
         let mut seed = self.gateway(position, guid);
         assert!(send(&mut seed, &switch_job(BRAWLER), 300).state_changed);
         assert_eq!(level(&seed, BRAWLER), 1);
 
         let mut snapshot = seed.snapshot();
+        let seeded = quests.clone();
         snapshot.gameplay.as_mut().unwrap().npc_quests = Some(quests);
         let gameplay = snapshot.gameplay.unwrap();
         let mut gateway = Gateway::load_gameplay(
@@ -151,17 +161,13 @@ impl Fixture {
             .unwrap()
             .npc_quests
             .expect("the catalogue bind keeps the saved quest state");
-        assert_eq!(
-            restored
-                .quests
-                .get(&DELINQUENT_QUEST)
-                .expect("the saved defeat goal survives the bind"),
-            &QuestProgress {
-                status: QuestStatus::Active,
-                counts: vec![0],
-            },
-            "world entry restores the test quest goal unchanged"
-        );
+        for (quest, progress) in &seeded.quests {
+            assert_eq!(
+                restored.quests.get(quest),
+                Some(progress),
+                "world entry restores the seeded quest {quest} unchanged"
+            );
+        }
         gateway
     }
 }
@@ -203,10 +209,10 @@ fn published_list(replies: &[Vec<u8>]) -> Vec<PortalRow> {
 // NPC quest state: the shipped defeat goal keyed to the Alpha Wolf kind.
 // ---------------------------------------------------------------------------
 
-/// The production catalogue's saved active progress for quest 3030007, whose
-/// only goal counts four defeats of definition `930050`. The state is the same
-/// `QuestState` a reconnect restores; the bind rebuilds the definitions.
-fn delinquent_quests(guid: u64) -> QuestState {
+/// The saved state a reconnect restores after `Brawler: Building your Rep`
+/// completes. Only that prerequisite is seeded; test 9 offers and accepts
+/// Delinquent Dilemma through the real NPC route afterwards.
+fn delinquent_prerequisite(guid: u64) -> QuestState {
     let engine = QuestEngine::from_split_content(
         &content_dir(),
         guid,
@@ -222,26 +228,29 @@ fn delinquent_quests(guid: u64) -> QuestState {
     .expect("the split quest catalogue loads");
     let mut state = engine.state().clone();
     state.quests.insert(
-        DELINQUENT_QUEST,
+        DELINQUENT_PREREQUISITE,
         QuestProgress {
-            status: QuestStatus::Active,
-            counts: vec![0],
+            status: QuestStatus::Completed,
+            counts: vec![1],
         },
     );
     state
 }
 
+/// Jones's shipped content position (`npcs/cobblestone_village.json`).
+fn jones_position() -> [f32; 3] {
+    let npcs = read_json(&content_dir().join("npcs/cobblestone_village.json"));
+    let row = npcs["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["npc_id"].as_u64() == Some(JONES))
+        .expect("Jones is defined in cobblestone_village.json");
+    position(&row["position"])
+}
+
 fn saved_quest_count(gateway: &Gateway, quest: u32) -> u32 {
-    gateway
-        .snapshot()
-        .gameplay
-        .unwrap()
-        .npc_quests
-        .unwrap()
-        .quests
-        .get(&quest)
-        .expect("the saved quest state carries the goal")
-        .counts[0]
+    quest_counts(gateway, quest).first().copied().unwrap_or(0)
 }
 
 /// 49/9 ObjectiveUpdate readers: header, quest id, objective id, current count,
@@ -1260,23 +1269,91 @@ fn the_arena_reports_the_recovered_enemy_kinds_on_every_defeat() {
     );
 }
 
-/// 9. The shipped `Brawler: Delinquent Dilemma` goal (quest 3000007) counts
-/// four defeats of the recovered Alpha Wolf kind `930050`. Through the real
-/// marker -> Go -> 36/10 route its two Sheep Watch Alphas advance 1/4 then
-/// 2/4, and the three Wolves (`930071`) do not touch that goal. With the local
-/// `1235001`-`1235005` ids the counter would stay at 0.
+/// 9. The shipped `Brawler: Delinquent Dilemma` goal (`data/content/quests/brawler.json:405`,
+/// quest 3030007) counts four defeats of the recovered Alpha Wolf kind
+/// `930050`. Delinquent Dilemma is offered and accepted through the real
+/// NPC route (26/8 -> 26/10 Talk -> 26/6 row -> 49/1 -> 49/2); only its
+/// completed prerequisite is a reconnect-style save seam. After a
+/// `game_store` reconnect at the marker, the real marker -> Go -> 36/10 route
+/// advances its two Sheep Watch Alphas 1/4 then 2/4, and the three Wolves
+/// (`930071`) do not touch that goal. With the local `1235001`-`1235005` ids
+/// the counter would stay at 0.
 #[test]
 fn an_arena_defeat_credits_a_goal_keyed_to_the_enemy_kind() {
     let fixture = Fixture::new();
     let file = battles();
     let row = battle(&file, SHEEP_WATCH);
-    let mut gateway = fixture.gateway_with_quest(MARKER, 8101, delinquent_quests(8101));
+
+    // Seed only the previous chapter step, then acquire the target quest live.
+    let mut gateway =
+        fixture.gateway_with_quest(jones_position(), 8101, delinquent_prerequisite(8101));
     assert_eq!(active_profile(&gateway), BRAWLER);
+    assert_eq!(
+        quest_status(&gateway, DELINQUENT_PREREQUISITE),
+        QuestStatus::Completed
+    );
+    assert!(
+        !gateway
+            .snapshot()
+            .gameplay
+            .unwrap()
+            .npc_quests
+            .unwrap()
+            .quests
+            .contains_key(&DELINQUENT_QUEST)
+    );
+
+    let menu = send(&mut gateway, &interact(JONES), 700);
+    let choice = menu_option(&menu, TALK_LABEL).expect("Jones offers a Talk option");
+    let dialogue = send(&mut gateway, &npc_select(JONES, choice), 800);
+    let dialogue_packet = dialogue
+        .replies
+        .iter()
+        .map(|packet| unframe(packet))
+        .find(|packet| packet.starts_with(&[26, 0, 3, 0]))
+        .expect("Talk opens the 26/3 dialogue");
+    let decoded =
+        decode_dialogue_26_3(dialogue_packet).expect("the production 26/3 reader parses it");
+    assert!(
+        decoded
+            .choices
+            .iter()
+            .any(|row| row[0] == QUEST_CHOICE_RESPONSE as u32),
+        "the dialogue carries the Delinquent Dilemma quest row"
+    );
+    let offered = send(&mut gateway, &dialogue_choice(QUEST_CHOICE_RESPONSE), 900);
+    let offer_packet = offered
+        .replies
+        .iter()
+        .map(|packet| unframe(packet))
+        .find(|packet| packet.starts_with(&[49, 0, 1, 0]))
+        .expect("the quest row opens one 49/1 offer");
+    let offer =
+        decode_quest_offer_49_1(offer_packet).expect("the production 49/1 reader parses it");
+    assert_eq!(offer.quest_id, DELINQUENT_QUEST);
+    assert_eq!(
+        quest_status(&gateway, DELINQUENT_QUEST),
+        QuestStatus::Offered
+    );
+    send(&mut gateway, &quest_reply(DELINQUENT_QUEST, true), 1_000);
+    assert_eq!(
+        quest_status(&gateway, DELINQUENT_QUEST),
+        QuestStatus::Active
+    );
     assert_eq!(saved_quest_count(&gateway, DELINQUENT_QUEST), 0);
 
-    let screen = open_battle(&mut gateway, MARKER_GUID, row, 700);
-    enter_battle(&mut gateway, &screen, row, 800);
-    let mut now = 900;
+    // Reconnect through game_store at the marker; the accepted goal survives
+    // the catalogue bind.
+    let mut gateway = reopen_at(&fixture, &gateway, "accepted-quest.json", MARKER, 1_100);
+    assert_eq!(
+        quest_status(&gateway, DELINQUENT_QUEST),
+        QuestStatus::Active
+    );
+    assert_eq!(saved_quest_count(&gateway, DELINQUENT_QUEST), 0);
+
+    let screen = open_battle(&mut gateway, MARKER_GUID, row, 1_200);
+    enter_battle(&mut gateway, &screen, row, 1_300);
+    let mut now = 1_400;
     let replies = fight_to_win(&mut gateway, &mut now, row);
     assert_eq!(results_lifecycle(&replies), vec![18, 47, 19]);
 

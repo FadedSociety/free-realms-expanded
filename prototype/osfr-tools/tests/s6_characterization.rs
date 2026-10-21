@@ -22,7 +22,7 @@ mod s6;
 #[path = "common/smelting_movie.rs"]
 mod smelting_movie;
 
-use gateway_packets::{blocked_families, chat, login as login_request, select};
+use gateway_packets::{blocked_families, chat, login_with_version as login_request, select};
 use osfr_tools::{
     account_store::AccountRole,
     gateway::{Gateway, GatewayOutcome},
@@ -132,7 +132,13 @@ fn bundle(children: &[Vec<u8>]) -> Vec<u8> {
 }
 
 fn login(game: &mut Gateway) {
-    game.handle_at(&login_request(1), 0).unwrap();
+    let manifest: Value =
+        serde_json::from_slice(&fs::read(gateway_reference().join("manifest.json")).unwrap())
+            .unwrap();
+    let version = manifest["client_version"]
+        .as_str()
+        .expect("manifest client_version");
+    game.handle_at(&login_request(1, version), 0).unwrap();
     send(game, &13u16.to_le_bytes(), NOW);
     send(game, &10u16.to_le_bytes(), NOW);
 }

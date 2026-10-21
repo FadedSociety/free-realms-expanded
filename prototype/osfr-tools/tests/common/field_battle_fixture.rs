@@ -14,6 +14,7 @@ use osfr_tools::{
     gameplay::GameplayState,
     gateway::{Gateway, GatewayOutcome},
     inventory::{Inventory, InventoryItem, InventoryState},
+    quest_engine::QuestStatus,
 };
 use serde_json::Value;
 use std::{
@@ -25,6 +26,12 @@ use std::{
         atomic::{AtomicU64, Ordering},
     },
 };
+
+#[path = "gateway_packets.rs"]
+mod gateway_packets;
+
+#[allow(unused_imports)] // Each suite uses the subset its route needs.
+pub use gateway_packets::{dialogue_choice, interact, melee, quest_end_reply, quest_reply};
 
 pub const RUNTIME_CONTENT: &str = "../../../lab/reports/round70-native-20261016T061000Z/content";
 pub const REFERENCE: &str = "../../../lab/references/rust-gateway-reference";
@@ -71,17 +78,7 @@ impl Fixture {
     }
 
     pub fn login(&self, gateway: &mut Gateway) -> GatewayOutcome {
-        let mut login = 1_u16.to_le_bytes().to_vec();
-        for (index, value) in ["local-private-test", self.version.as_str(), ""]
-            .into_iter()
-            .enumerate()
-        {
-            login.extend((value.len() as u32).to_le_bytes());
-            login.extend(value.as_bytes());
-            if index == 0 {
-                login.extend(gateway.state().guid.to_le_bytes());
-            }
-        }
+        let login = gateway_packets::login_with_version(gateway.state().guid, &self.version);
         gateway.handle_at(&login, 0).unwrap()
     }
 
@@ -246,8 +243,9 @@ pub fn send(gateway: &mut Gateway, inner: &[u8], now_ms: u64) -> GatewayOutcome 
         .expect("gateway frame")
 }
 
-pub fn interact(guid: u64) -> Vec<u8> {
-    [vec![26, 0, 8, 0], guid.to_le_bytes().to_vec(), vec![0]].concat()
+/// 26/10 menu selection: the client constructor takes an i32 choice.
+pub fn npc_select(target: u64, choice: i32) -> Vec<u8> {
+    gateway_packets::select(target, choice as u32)
 }
 
 pub fn switch_job(profile: i32) -> Vec<u8> {
@@ -261,17 +259,6 @@ pub fn go(details: &[u8]) -> Vec<u8> {
     packet.extend(&details[4..12]);
     packet.extend(0_u64.to_le_bytes());
     packet
-}
-
-pub fn melee(guid: u64) -> Vec<u8> {
-    [
-        vec![36, 0, 10, 0],
-        1_i32.to_le_bytes().to_vec(),
-        0_i32.to_le_bytes().to_vec(),
-        0_i32.to_le_bytes().to_vec(),
-        guid.to_le_bytes().to_vec(),
-    ]
-    .concat()
 }
 
 pub fn move_to(guid: u64, position: [f32; 3]) -> Vec<u8> {
@@ -313,6 +300,22 @@ pub fn details(outcome: &GatewayOutcome) -> Option<&[u8]> {
         .find(|packet| packet.starts_with(&[41, 0, 114, 0]))
 }
 
+/// 26/9 interaction menu: find the option whose label string id is `label`.
+pub fn menu_option(outcome: &GatewayOutcome, label: u32) -> Option<i32> {
+    let menu = outcome
+        .replies
+        .iter()
+        .map(|packet| unframe(packet))
+        .find(|packet| packet.starts_with(&[26, 0, 9, 0]))?;
+    let count = i32::from_le_bytes(menu[13..17].try_into().unwrap());
+    (0..count).find_map(|index| {
+        let offset = 17 + usize::try_from(index).unwrap() * 28;
+        let id = i32::from_le_bytes(menu[offset..offset + 4].try_into().unwrap());
+        let string_id = u32::from_le_bytes(menu[offset + 8..offset + 12].try_into().unwrap());
+        (string_id == label).then_some(id)
+    })
+}
+
 pub fn i32_at(packet: &[u8], offset: usize) -> i32 {
     i32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap())
 }
@@ -344,6 +347,34 @@ pub fn saved_bytes(gateway: &Gateway) -> Vec<u8> {
     // refusal fixture is larger than game_store's 1 MiB document limit, so
     // compare the payload directly (as T282 does).
     serde_json::to_vec(&gateway.snapshot()).unwrap()
+}
+
+pub fn quest_counts(gateway: &Gateway, quest: u32) -> Vec<u32> {
+    gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .npc_quests
+        .unwrap()
+        .quests
+        .get(&quest)
+        .unwrap_or_else(|| panic!("quest {quest} is missing"))
+        .counts
+        .clone()
+}
+
+pub fn quest_status(gateway: &Gateway, quest: u32) -> QuestStatus {
+    gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .npc_quests
+        .unwrap()
+        .quests
+        .get(&quest)
+        .unwrap_or_else(|| panic!("quest {quest} is missing"))
+        .status
+        .clone()
 }
 
 pub fn walk(gateway: &mut Gateway, guid: u64, to: [f32; 3], now_ms: &mut u64) {
@@ -381,6 +412,25 @@ pub fn reopen_with(
     if let Some(gameplay) = saved.gameplay.as_mut() {
         patch(gameplay);
     }
+    restore(fixture, saved, now_ms)
+}
+
+/// The same reconnect, with a saved position, so a quest accepted at one NPC
+/// can be tested at the battle marker without walking across the zone.
+pub fn reopen_at(
+    fixture: &Fixture,
+    gateway: &Gateway,
+    name: &str,
+    position: [f32; 3],
+    now_ms: u64,
+) -> Gateway {
+    let path = fixture.save(gateway, name);
+    let mut saved = game_store::load_or_create(&path, gateway.state().clone()).unwrap();
+    saved.character.position = position;
+    restore(fixture, saved, now_ms)
+}
+
+fn restore(fixture: &Fixture, saved: game_store::Snapshot, now_ms: u64) -> Gateway {
     let mut restored = Gateway::load_gameplay(
         &fixture.reference,
         saved.character,

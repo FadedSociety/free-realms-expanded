@@ -932,66 +932,6 @@ fn offered_quests(outcome: &GatewayOutcome) -> Vec<u32> {
         .collect()
 }
 
-fn menu_option(outcome: &GatewayOutcome, label: u32) -> Option<i32> {
-    let menu = replies(outcome).find(|packet| packet_family(packet, 26, 9))?;
-    let count = i32::from_le_bytes(menu[13..17].try_into().unwrap());
-    (0..count).find_map(|index| {
-        let offset = 17 + usize::try_from(index).unwrap() * 28;
-        let id = i32::from_le_bytes(menu[offset..offset + 4].try_into().unwrap());
-        (u32_at(menu, offset + 8) == label).then_some(id)
-    })
-}
-
-fn npc_select(target: u64, choice: i32) -> Vec<u8> {
-    [
-        vec![26, 0, 10, 0],
-        target.to_le_bytes().to_vec(),
-        choice.to_le_bytes().to_vec(),
-    ]
-    .concat()
-}
-
-fn dialogue_choice(row: i32) -> Vec<u8> {
-    [vec![26, 0, 6, 0], row.to_le_bytes().to_vec()].concat()
-}
-
-fn quest_reply(quest: u32, accept: bool) -> Vec<u8> {
-    [
-        vec![49, 0, 2, 0, 0, 0],
-        quest.to_le_bytes().to_vec(),
-        vec![u8::from(accept)],
-    ]
-    .concat()
-}
-
-fn quest_end_reply(quest: u32) -> Vec<u8> {
-    [vec![49, 0, 14, 0, 0, 0], quest.to_le_bytes().to_vec()].concat()
-}
-
-fn quest_counts(gateway: &Gateway, quest: u32) -> Vec<u32> {
-    gateway
-        .snapshot()
-        .gameplay
-        .unwrap()
-        .npc_quests
-        .unwrap()
-        .quests[&quest]
-        .counts
-        .clone()
-}
-
-fn quest_status(gateway: &Gateway, quest: u32) -> QuestStatus {
-    gateway
-        .snapshot()
-        .gameplay
-        .unwrap()
-        .npc_quests
-        .unwrap()
-        .quests[&quest]
-        .status
-        .clone()
-}
-
 fn pending_turnin(gateway: &Gateway) -> Option<u32> {
     gateway
         .snapshot()
