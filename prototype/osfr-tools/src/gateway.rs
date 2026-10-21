@@ -548,10 +548,8 @@ fn application_handler(body: &[u8]) -> &'static str {
         (Some(108), Some(1 | 3 | 5)) => "claims",
         // W172: Coin Store siblings and the Marketplace shell are understood merchant
         // traffic even when a particular row is intentionally answered with nothing.
-        // T329: 66/29 is the store's close statistics report; 117/41 its session request.
-        (Some(66), Some(1 | 3 | 10 | 12 | 14 | 16 | 18 | 20 | 22 | 25 | 27 | 29 | 38 | 43))
+        (Some(66), Some(1 | 3 | 10 | 12 | 14 | 16 | 18 | 20 | 22 | 25 | 27 | 38 | 43))
         | (Some(165), Some(2 | 4 | 5 | 8 | 12 | 14)) => "merchant",
-        (Some(117), Some(41)) => "one_time_session",
         _ => "gameplay.handle_in_world",
     }
 }
@@ -1891,7 +1889,7 @@ impl Gateway {
             Kind::Login => 0..8,
             Kind::Ready => 8..46,
         };
-        let mut messages = range
+        range
             .filter(|index| {
                 !(gameplay.is_some_and(Gameplay::is_opening) && (10..=32).contains(index))
             })
@@ -1910,18 +1908,7 @@ impl Gateway {
                 };
                 Ok(message)
             })
-            .collect::<io::Result<Vec<_>>>()?;
-        // T329: the store screen never asks for the catalogue (no 66/12), so push it at entry.
-        if kind == Kind::Ready
-            && let Some(game) = gameplay
-        {
-            messages.extend(
-                game.world_entry_marketplace_packets()
-                    .iter()
-                    .map(|p| wrapped(p)),
-            );
-        }
-        Ok(messages)
+            .collect()
     }
 
     fn build_self_message(

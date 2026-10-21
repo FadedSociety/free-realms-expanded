@@ -1033,12 +1033,12 @@ impl CoinShop {
         })
     }
 
-    /// The Marketplace packets pushed with the world-entry stream: the 66/24 enable handshake,
-    /// the 66/33 payment-source flags and the store rows (66/7/6/9/5). The native store screen
-    /// never sends the 66/12 status request (`RequestServerStatus` is a Lua binding it does not
-    /// call), so the rows must be pushed for the client to list them. A package with Station
-    /// Cash off sends nothing, exactly as before T329.
-    pub fn world_entry_packets(&self) -> Vec<Vec<u8>> {
+    /// The Marketplace handshake (66/24, 66/33) and the store rows (66/7/6/9/5) when both the
+    /// Station Cash package and the Marketplace handshake are enabled; empty otherwise. The
+    /// native store screen asks for its wallet (66/10, `00b43bc0`/`RequestWalletInfo`) and never
+    /// for the 66/12 status, so the 66/10 reply carries this set; 66/12 answers a client that
+    /// does ask.
+    pub fn marketplace_packets(&self) -> Vec<Vec<u8>> {
         if self.sc_catalogue.config().enabled && self.catalogue.marketplace.enabled_on_handshake {
             station_cash::catalogue_packets(&self.sc_catalogue)
         } else {
@@ -1097,15 +1097,21 @@ impl CoinShop {
                     (outcome.result_code, outcome.replies)
                 }
             }
-            10 => (1, vec![station_cash::wallet_packet(self.sc_wallet.balance)]),
+            10 => {
+                let mut replies = vec![station_cash::wallet_packet(self.sc_wallet.balance)];
+                // The native store screen sends this wallet request when it opens
+                // (`00b43bc0`, Lua `RequestWalletInfo`) and never the 66/12 status
+                // request, so the reply carries the handshake and the catalogue; the
+                // client dispatches 66/x by subtype (`00b48a10`).
+                replies.extend(self.marketplace_packets());
+                (1, replies)
+            }
             12 => {
-                // The store screen asks for the server status when it opens. Answering with the
-                // catalogue here keeps the saved world entry untouched (R).
+                // Answered for a client that does ask for the server status; the shipped
+                // screen uses 66/10 instead.
                 let enabled = self.catalogue.marketplace.enabled_on_handshake;
                 let mut replies = vec![station_cash::bool_packet(13, enabled)];
-                if enabled && self.sc_catalogue.config().enabled {
-                    replies.extend(station_cash::catalogue_packets(&self.sc_catalogue));
-                }
+                replies.extend(self.marketplace_packets());
                 (1, replies)
             }
             14 => (1, vec![empty_product_list(15)]),

@@ -454,13 +454,14 @@ fn contains_u32(bytes: &[u8], value: u32) -> bool {
         .any(|window| u32::from_le_bytes(window.try_into().unwrap()) == value)
 }
 
-/// T329: the world-entry packet set carries the shipped rides and their scaled SC prices. The
-/// 66/5 rows are walked exactly as `00b43170`/`00b41860` read them and compared with every
-/// `stores.json` row that has an `sc_price` and is not earn-only.
+/// F387: the Marketplace reply set (now sent on the 66/10 wallet request) carries the shipped
+/// rides and their scaled SC prices. The pre-F387 name is kept because the integrator protects
+/// every passing test by name. The 66/5 rows are walked exactly as `00b43170`/`00b41860` read
+/// them and compared with every `stores.json` row that has an `sc_price` and is not earn-only.
 #[test]
 fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     let shop = new_shop(Wallet::default(), usize::MAX);
-    let packets = shop.world_entry_packets();
+    let packets = shop.marketplace_packets();
     assert_eq!(packets[0], vec![66, 0, 24, 0, 1], "66/24 handshake");
     assert_eq!(packets[1], vec![66, 0, 33, 0, 0, 0], "66/33 sources off");
     let store = packets

@@ -793,10 +793,10 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     for sub in [1, 3, 10, 12, 14, 18, 22, 27, 38] {
         result.push(("merchant", words(66, sub, &[])));
     }
-    // T329: the store screen's close statistics (66/29) and one-time commerce session request
-    // (117/41) are understood and silently discarded.
-    result.push(("merchant", words(66, 29, &[0; 16])));
-    result.push(("one_time_session", words(117, 41, &[])));
+    // F387: the store's close statistics (66/29) and one-time commerce session request
+    // (117/41) stay unknown traffic; the hostile corpus keeps exercising both.
+    result.push(("gameplay.handle_in_world", words(66, 29, &[0; 16])));
+    result.push(("gameplay.handle_in_world", words(117, 41, &[])));
     for sub in [16, 20, 25] {
         let mut locale = words(66, sub, &[5]);
         locale.extend(b"en_US");

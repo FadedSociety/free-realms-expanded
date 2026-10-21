@@ -509,8 +509,8 @@ impl Fixture {
         self.enter(state).0
     }
 
-    /// Enter the world and return the initialization (Ready) reply stream, the stage where
-    /// T329 pushes the Marketplace handshake and catalogue.
+    /// Enter the world and return the initialization (Ready) reply stream, so a test can pin
+    /// that world entry itself pushes no Marketplace packet.
     fn enter(&self, state: GameplayState) -> (Gateway, Vec<Vec<u8>>) {
         let mut character = Gateway::reference_state(&self.reference).unwrap();
         character.position = [0.; 3];
@@ -1209,8 +1209,9 @@ fn marketplace_replies_match_the_recovered_client_readers_byte_for_byte() {
             Some(&expected),
             "{label}: first reply"
         );
-        if label != "status 66/12" {
-            // The store-status answer also pushes the T230 catalogue after 66/13.
+        if !matches!(label, "wallet 66/10" | "status 66/12") {
+            // The wallet and store-status answers also push the catalogue after their reply;
+            // its bytes are asserted by the gateway and shipped-row tests.
             assert_eq!(outcome.replies, vec![expected], "{label}");
         }
     }
@@ -1248,7 +1249,7 @@ fn marketplace_payment_like_rows_stay_refused_or_free() {
     let wallet = counter.shop.handle(&marketplace(10)).unwrap();
     assert_eq!(&wallet.replies[0][9..17], &[0; 8]);
     assert_eq!(
-        counter.shop.world_entry_packets()[1],
+        counter.shop.marketplace_packets()[1],
         vec![66, 0, 33, 0, 0, 0]
     );
     // SKU lists (Station Cash and membership) are explicitly empty.
@@ -1385,15 +1386,27 @@ fn disabled_station_cash_policy_answers_every_marketplace_row_without_changes() 
     assert_eq!(gateway.snapshot(), before);
 }
 
-/// T329: the native store screen never sends 66/12, so the world-entry stream must carry the
-/// 66/24 handshake and the ride catalogue itself. `00b48700` is the 66/5 reader.
+/// F387: the real store screen asks for its wallet (66/10, native sender `00b43bc0`, Lua
+/// `RequestWalletInfo`) and never for the catalogue (66/12), so the wallet reply carries the
+/// 66/24 handshake and the ride catalogue. World entry itself pushes nothing; the lead owns
+/// that stream. `00b48700` is the 66/5 reader.
 #[test]
-fn world_entry_pushes_the_marketplace_handshake_and_the_ride_catalogue() {
+fn wallet_reply_carries_the_marketplace_handshake_and_the_ride_catalogue() {
     let fixture = Fixture::new().with_sc();
-    let (_gateway, ready) = fixture.enter(fixture.state());
-    let market: Vec<&Vec<u8>> = ready
+    let (mut gateway, ready) = fixture.enter(fixture.state());
+    assert!(
+        ready.iter().all(|packet| !packet.starts_with(&[66, 0])),
+        "world entry must not push the Marketplace"
+    );
+    let before = gateway.snapshot();
+    let outcome = deliver(&mut gateway, &marketplace(10));
+    let packets = inner_packets(&outcome);
+    assert_eq!(&packets[0][..4], &[66, 0, 11, 0], "the wallet reply leads");
+    assert_eq!(wallet_balance(&packets), 0);
+    let market: Vec<&Vec<u8>> = packets
         .iter()
         .filter(|packet| packet.starts_with(&[66, 0]))
+        .skip(1)
         .collect();
     let heads: Vec<&[u8]> = market.iter().map(|packet| &packet[..4]).collect();
     assert_eq!(
@@ -1406,7 +1419,7 @@ fn world_entry_pushes_the_marketplace_handshake_and_the_ride_catalogue() {
             &[66, 0, 9, 0],
             &[66, 0, 5, 0],
         ],
-        "the handshake and the four catalogue rows are pushed once, in order"
+        "the handshake and the four catalogue rows follow the wallet"
     );
     assert_eq!(market[0][4], 1, "the Marketplace is enabled");
     // The fixture lists one ride. The bundle record is the reader's 185 bytes, the map key is
@@ -1423,12 +1436,19 @@ fn world_entry_pushes_the_marketplace_handshake_and_the_ride_catalogue() {
         SC_RIDE_PRICE,
         "the listed SC price"
     );
+    assert!(!outcome.state_changed && !outcome.gameplay_changed);
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "the wallet reply changes nothing"
+    );
 }
 
-/// T329: a package without Station Cash keeps the pre-T329 world-entry stream: no Marketplace
-/// packet, even with the Marketplace handshake flag on, and 66/12 still answers 66/13 only.
+/// F387: a package without Station Cash keeps the pre-T329 replies: no Marketplace packet at
+/// world entry or in the wallet reply, even with the Marketplace handshake flag on, and 66/12
+/// still answers 66/13 only.
 #[test]
-fn world_entry_sends_no_marketplace_packet_when_station_cash_is_disabled() {
+fn wallet_reply_sends_no_marketplace_packet_when_station_cash_is_disabled() {
     let fixture = Fixture::new();
     let path = fixture.content.join("stores.json");
     let mut stores = read_json(&path);
@@ -1438,33 +1458,46 @@ fn world_entry_sends_no_marketplace_packet_when_station_cash_is_disabled() {
     assert!(!ready.is_empty(), "the world-entry stream is present");
     assert!(
         ready.iter().all(|packet| !packet.starts_with(&[66, 0])),
-        "a disabled package sends no Marketplace packet"
+        "world entry pushes no Marketplace packet"
     );
+    let packets = send(&mut gateway, &marketplace(10));
+    assert_eq!(
+        packets.len(),
+        1,
+        "the disabled wallet reply carries no catalogue"
+    );
+    assert_eq!(&packets[0][..4], &[66, 0, 11, 0]);
     let packets = send(&mut gateway, &marketplace(12));
     assert_eq!(packets, vec![vec![66, 0, 13, 0, 1]]);
 }
 
-/// T329: the store screen reports statistics when it closes (66/29,
-/// `PacketInGamePurchaseStoreClientStatistics` from `00b23fc0`) and asks for a one-time commerce
-/// session when it opens (117/41, family `OneTimeSessionRequestPacket` from `0089b510`). Neither
-/// has a server reply; both are known traffic, not "unknown application message".
+/// F387: 66/29 (the store's close statistics, `PacketInGamePurchaseStoreClientStatistics` from
+/// `00b23fc0`) and 117/41 (the one-time commerce session request, `0089b510`) stay unknown
+/// traffic. The gateway drops both before the shared application router, sends no reply and
+/// changes nothing; making them accepted traffic is a lead-owned routing decision.
 #[test]
-fn store_statistics_and_one_time_session_requests_are_accepted_silently() {
+fn store_statistics_and_one_time_session_requests_stay_unrouted_and_change_nothing() {
     let fixture = Fixture::new().with_sc();
     let mut gateway = traced(&fixture, fixture.state());
     let before = gateway.snapshot();
     let mut statistics = marketplace(29);
     statistics.extend([0u8; 65]); // the observed 69-byte close report
-    for (packet, handler) in [
-        (statistics, "merchant"),
-        (vec![117, 0, 41, 0, 0, 0], "one_time_session"),
-    ] {
+    for packet in [statistics, vec![117, 0, 41, 0, 0, 0]] {
         let outcome = deliver(&mut gateway, &packet);
         assert!(inner_packets(&outcome).is_empty(), "{packet:02x?}");
         assert!(!outcome.state_changed && !outcome.gameplay_changed);
+        assert!(
+            outcome.applications.is_empty(),
+            "unknown traffic must not reach the shared router: {packet:02x?}"
+        );
         let event = outcome.trace.last().expect("trace is enabled");
-        assert_eq!(event.handler, handler, "{packet:02x?}");
-        assert_eq!(event.outcome, "handled", "{packet:02x?}");
+        assert_eq!(event.handler, "gateway.application", "{packet:02x?}");
+        assert_eq!(event.outcome, "rejected", "{packet:02x?}");
+        assert_eq!(
+            event.reason.as_deref(),
+            Some("unknown application message"),
+            "{packet:02x?}"
+        );
     }
     assert_eq!(gateway.snapshot(), before);
 }
@@ -1582,7 +1615,14 @@ fn gateway_sc_balance_and_ride_survive_reload() {
     );
     assert_eq!(saved.sc_wallet.as_ref().unwrap().orders.len(), 1);
     let mut again = fixture.connect(saved);
-    assert_eq!(wallet_balance(&send(&mut again, &marketplace(10))), 50);
+    let after_reload = send(&mut again, &marketplace(10));
+    assert_eq!(wallet_balance(&after_reload), 50);
+    assert!(
+        after_reload
+            .iter()
+            .any(|packet| packet.starts_with(&[66, 0, 24, 0])),
+        "the catalogue is rebuilt after a reconnect"
+    );
     assert_eq!(
         count_definition(&inventory_of(&again), SC_RIDE_ITEM),
         bought_count
