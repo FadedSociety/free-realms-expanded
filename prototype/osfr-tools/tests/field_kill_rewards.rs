@@ -10,21 +10,25 @@
 //! proof, the battle-reward gate and the shipped level-band assertions. The
 //! real-session save guard lives in the gateway binary
 //! (`src/bin/osfr_gateway/f276_field_session_save.rs`), because only the
-//! binary writes the character save.
+//! binary writes the character save. The load root and the shared field helpers
+//! are `tests/common/field_reward_fixture.rs`, shared with the high-camp suite.
 use osfr_tools::{
     account_store::AccountRole,
     character_store::CharacterState,
     chat,
-    encounter::{EncounterPhase, SharedFieldAction, SharedFieldState},
+    encounter::{EncounterPhase, SharedFieldState},
     game_store::{self, Snapshot},
     gameplay::{Gameplay, Outcome},
 };
 use serde_json::{Value, json};
-use std::{
-    collections::{BTreeMap, BTreeSet},
-    fs,
-    path::{Path, PathBuf},
-    sync::atomic::{AtomicU64, Ordering},
+use std::{collections::BTreeSet, fs, path::PathBuf};
+
+#[path = "common/field_reward_fixture.rs"]
+mod field_reward_fixture;
+
+use field_reward_fixture::{
+    CREDIT_TTL_MS, NONCOMBAT, RewardFixture, attack, bank, character_at, kill, player,
+    shipped_field_actor, source,
 };
 
 #[path = "support/packets.rs"]
@@ -39,91 +43,9 @@ const ENEMY: u64 = 131000109001;
 const ENEMY_TWO: u64 = 131000109002;
 const LEVEL_ONE: i32 = 930108;
 const WOLF: i32 = 3156;
-const NONCOMBAT: i32 = 45;
 /// T245's level-5 MID-F1 camp wolf. The shipped row keeps definition 3156, so
 /// the kind's override (not the level 5-8 band) owns its payout.
 const MID_F1: u64 = 131_000_102_013;
-/// `encounter::field_rewards::CREDIT_TTL_MS` (private to the engine).
-const CREDIT_TTL_MS: u64 = 10_000;
-static SERIAL: AtomicU64 = AtomicU64::new(0);
-
-struct Fixture {
-    dir: PathBuf,
-}
-
-impl Fixture {
-    fn new(actors: Vec<Value>) -> Self {
-        let dir = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!(
-            "t240-{}-{}",
-            std::process::id(),
-            SERIAL.fetch_add(1, Ordering::Relaxed)
-        ));
-        fs::create_dir_all(&dir).unwrap();
-        copy_missing(&opening_content(), &dir);
-        copy_missing(
-            &PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content"),
-            &dir,
-        );
-        // The opening inventory does not carry every optional farming reward;
-        // this suite exercises field combat only.
-        let _ = fs::remove_file(dir.join("harvesting.json"));
-        let fixture = Self { dir };
-        fixture.write_field(&json!({"schema_version":1,"enemies":actors}));
-        fixture
-    }
-
-    fn write_field(&self, field: &Value) {
-        fs::write(
-            self.dir.join("field_enemies.json"),
-            serde_json::to_vec(field).unwrap(),
-        )
-        .unwrap();
-    }
-
-    fn write_rewards(&self, rewards: &Value) {
-        fs::write(
-            self.dir.join("field_kill_rewards.json"),
-            serde_json::to_vec(rewards).unwrap(),
-        )
-        .unwrap();
-    }
-
-    fn save_path(&self, character: &CharacterState) -> PathBuf {
-        self.dir.join(format!("character-{}.json", character.guid))
-    }
-}
-
-impl Drop for Fixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.dir);
-    }
-}
-
-fn opening_content() -> PathBuf {
-    std::env::var_os("OSFR_OPENING_REFERENCE")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| {
-            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-                .join("../../../lab/references/opening-anvil-placement-v1/content")
-        })
-}
-
-fn copy_missing(from: &Path, to: &Path) {
-    for row in fs::read_dir(from).unwrap() {
-        let path = row.unwrap().path();
-        let target = to.join(path.file_name().unwrap());
-        if path.is_dir() {
-            fs::create_dir_all(&target).unwrap();
-            copy_missing(&path, &target);
-        } else if !target.exists() {
-            fs::copy(path, target).unwrap();
-        }
-    }
-}
-
-fn source() -> Value {
-    json!([{"kind":"reconstructed","evidence":"(R) local test balance"}])
-}
 
 /// A field actor with no power-up table: only the kill reward path is used.
 fn actor(guid: u64, definition_id: i32, level: u32, position: [f32; 3], max_health: u32) -> Value {
@@ -158,83 +80,18 @@ fn levels(coins: u32, job_xp: u32) -> Value {
     })
 }
 
-fn character_at(guid: u64, position: [f32; 3]) -> CharacterState {
-    CharacterState {
-        guid,
-        zone_id: 0,
-        position,
-        rotation: [0.0, 0.0, 1.0],
-    }
-}
-
-fn player(
-    fixture: &Fixture,
-    guid: u64,
-    profile: i32,
-    position: [f32; 3],
-    coins: u32,
-    xp: Option<(i32, u32)>,
-) -> Gameplay {
-    let base = Gameplay::load(&fixture.dir, None).unwrap();
-    let mut state = base.state();
-    state.inventory.coins = coins;
-    {
-        let profiles = state.profiles.as_mut().unwrap();
-        profiles.unlocked.insert(profile);
-        profiles.active = profile;
-        profiles.unlocked.extend([35, 43, NONCOMBAT]);
-        if let Some((xp_profile, xp)) = xp {
-            profiles.experience.insert(xp_profile, xp);
-        }
-    }
-    let mut game = Gameplay::load(&fixture.dir, Some(state)).unwrap();
-    game.initialize_world(&character_at(guid, position), 0)
-        .unwrap();
-    game
-}
-
-/// The shipped field row with its shipped spawn group's policy applied inline,
-/// because this fixture carries no `spawn_groups`.
-fn shipped_field_actor(guid: u64) -> (Value, [f32; 3]) {
-    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/field_enemies.json");
-    let field: Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
-    let mut row = field["enemies"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .find(|row| row["guid"].as_u64() == Some(guid))
-        .unwrap_or_else(|| panic!("shipped field actor {guid}"))
-        .clone();
-    let group = field["spawn_groups"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .find(|group| group["members"].as_array().unwrap().contains(&json!(guid)))
-        .unwrap_or_else(|| panic!("shipped spawn group for {guid}"));
-    for key in [
-        "respawn_seconds",
-        "aggro_range",
-        "leash_radius",
-        "behaviour",
-    ] {
-        row[key] = group[key].clone();
-    }
-    let position = serde_json::from_value(row["position"].clone()).unwrap();
-    (row, position)
-}
-
 /// The production reconnect reads the character snapshot back through
 /// `game_store::load_or_create` and then loads the gameplay state.
-fn reconnect(fixture: &Fixture, character: &CharacterState) -> Gameplay {
+fn reconnect(fixture: &RewardFixture, character: &CharacterState) -> Gameplay {
     let snapshot =
         game_store::load_or_create(&fixture.save_path(character), character.clone()).unwrap();
-    let mut game = Gameplay::load(&fixture.dir, snapshot.gameplay).unwrap();
+    let mut game = Gameplay::load(fixture.dir(), snapshot.gameplay).unwrap();
     game.initialize_world(character, 0).unwrap();
     game.take_shared_fields();
     game
 }
 
-fn save(game: &Gameplay, fixture: &Fixture, character: &CharacterState) -> PathBuf {
+fn save(game: &Gameplay, fixture: &RewardFixture, character: &CharacterState) -> PathBuf {
     let path = fixture.save_path(character);
     game_store::save(
         &path,
@@ -245,44 +102,6 @@ fn save(game: &Gameplay, fixture: &Fixture, character: &CharacterState) -> PathB
     )
     .unwrap();
     path
-}
-
-fn attack(
-    game: &mut Gameplay,
-    field: &mut SharedFieldState,
-    character: &CharacterState,
-    known: &BTreeSet<u64>,
-    target: u64,
-    now_ms: u64,
-) -> std::io::Result<Outcome> {
-    game.handle_shared_field(
-        &SharedFieldAction::Select {
-            target,
-            choice: 103,
-        },
-        field,
-        known,
-        character,
-        now_ms,
-    )
-}
-
-fn kill(
-    game: &mut Gameplay,
-    field: &mut SharedFieldState,
-    character: &CharacterState,
-    known: &BTreeSet<u64>,
-    target: u64,
-    mut now_ms: u64,
-) -> (Outcome, u64) {
-    for _ in 0..10 {
-        let out = attack(game, field, character, known, target, now_ms).unwrap();
-        if field.health(target) == Some(0) {
-            return (out, now_ms);
-        }
-        now_ms += 700;
-    }
-    panic!("field enemy did not die");
 }
 
 fn switch_job(
@@ -296,11 +115,6 @@ fn switch_job(
     game.handle_in_world(&select, character, now_ms).unwrap()
 }
 
-fn bank(game: &Gameplay) -> (u32, BTreeMap<i32, u32>) {
-    let state = game.state();
-    (state.inventory.coins, state.profiles.unwrap().experience)
-}
-
 /// The observable runtime of one field actor; a refusal must not move any of it.
 fn field_view(field: &SharedFieldState, guid: u64) -> (Option<u32>, [f32; 3], Option<u64>) {
     (
@@ -312,7 +126,7 @@ fn field_view(field: &SharedFieldState, guid: u64) -> (Option<u32>, [f32; 3], Op
 
 #[test]
 fn a_solo_field_kill_pays_once_and_only_the_active_job() {
-    let fixture = Fixture::new(vec![actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 100)]);
+    let fixture = RewardFixture::new(vec![actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 100)]);
     let at = [1.0, 0.0, 0.0];
     let character = character_at(101, at);
     let mut game = player(&fixture, 101, 43, at, 0, None);
@@ -374,7 +188,7 @@ fn the_mid_level_farnum_camp_pays_the_kind_override_rate() {
     // band for this camp, so the payout stays 2 coins / 5 job XP.
     let (row, home) = shipped_field_actor(MID_F1);
     assert_eq!(row["level"], 5);
-    let fixture = Fixture::new(vec![row]);
+    let fixture = RewardFixture::new(vec![row]);
     let at = [home[0] + 1.0, home[1], home[2]];
     let character = character_at(101, at);
     let mut game = player(&fixture, 101, 43, at, 0, None);
@@ -402,7 +216,7 @@ fn the_mid_level_farnum_camp_pays_the_kind_override_rate() {
 #[test]
 fn a_shared_kill_pays_each_credited_player_once() {
     // Definition 3156's override pays 2/5 at level 3, where the band pays 4/10.
-    let fixture = Fixture::new(vec![actor(ENEMY, WOLF, 3, [0.0; 3], 500)]);
+    let fixture = RewardFixture::new(vec![actor(ENEMY, WOLF, 3, [0.0; 3], 500)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
     let c_at = [2.0, 0.0, 0.0];
@@ -479,7 +293,7 @@ fn a_shared_kill_pays_each_credited_player_once() {
 
 #[test]
 fn a_credit_expires_and_a_bad_row_changes_nothing() {
-    let fixture = Fixture::new(vec![actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 500)]);
+    let fixture = RewardFixture::new(vec![actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 500)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
     let a_character = character_at(101, a_at);
@@ -513,7 +327,7 @@ fn a_credit_expires_and_a_bad_row_changes_nothing() {
         "definition_overrides": []
     }));
     assert!(
-        Gameplay::load(&fixture.dir, None).is_err(),
+        Gameplay::load(fixture.dir(), None).is_err(),
         "overlapping bands must fail at load"
     );
     // Duplicate definition overrides are refused by the loader too.
@@ -526,7 +340,7 @@ fn a_credit_expires_and_a_bad_row_changes_nothing() {
         ]
     }));
     assert!(
-        Gameplay::load(&fixture.dir, None).is_err(),
+        Gameplay::load(fixture.dir(), None).is_err(),
         "duplicate overrides must fail at load"
     );
     // The shipped table still loads once the malformed file is gone.
@@ -538,13 +352,13 @@ fn a_credit_expires_and_a_bad_row_changes_nothing() {
     )
     .unwrap();
     fixture.write_rewards(&shipped);
-    assert!(Gameplay::load(&fixture.dir, None).is_ok());
+    assert!(Gameplay::load(fixture.dir(), None).is_ok());
 }
 
 #[test]
 fn an_overflowing_reward_refuses_one_player_without_stopping_the_field() {
     // The loader's per-row arithmetic limit: 1000 coins / 1000 job XP.
-    let fixture = Fixture::new(vec![
+    let fixture = RewardFixture::new(vec![
         actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 500),
         actor(ENEMY_TWO, LEVEL_ONE, 1, [10.0, 0.0, 0.0], 500),
     ]);
@@ -636,7 +450,7 @@ fn an_overflowing_reward_refuses_one_player_without_stopping_the_field() {
 
 #[test]
 fn an_overflowing_job_xp_refuses_the_whole_payout() {
-    let fixture = Fixture::new(vec![actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 500)]);
+    let fixture = RewardFixture::new(vec![actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 500)]);
     fixture.write_rewards(&levels(1, 1000));
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
@@ -688,7 +502,7 @@ fn an_overflowing_job_xp_refuses_the_whole_payout() {
 
 #[test]
 fn a_field_kill_credit_survives_an_unrelated_content_reload() {
-    let fixture = Fixture::new(vec![actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 500)]);
+    let fixture = RewardFixture::new(vec![actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 500)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
     let a_character = character_at(101, a_at);
@@ -770,7 +584,7 @@ fn a_field_kill_credit_survives_an_unrelated_content_reload() {
 
 #[test]
 fn a_credit_survives_a_reconnect_and_expires_once() {
-    let fixture = Fixture::new(vec![
+    let fixture = RewardFixture::new(vec![
         actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 500),
         actor(ENEMY_TWO, LEVEL_ONE, 1, [10.0, 0.0, 0.0], 500),
     ]);
@@ -910,7 +724,7 @@ fn start_battle(
 fn a_battle_reward_at_the_coin_cap_is_refused_with_feedback() {
     // Overworld battle 12310: 25 coins, one prize row and no combat-level
     // requirement, started through the production dev route.
-    let fixture = Fixture::new(vec![actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 500)]);
+    let fixture = RewardFixture::new(vec![actor(ENEMY, LEVEL_ONE, 1, [0.0; 3], 500)]);
     let at = [1.0, 0.0, 0.0];
     let character = character_at(101, at);
     let mut capped = player(&fixture, 101, 43, at, i32::MAX as u32, None);
