@@ -561,6 +561,7 @@ impl Gameplay {
         })();
         field.restore_presence(presence);
         self.apply_encounter(result?, &mut out)?;
+        self.sync_tracked_target(character, &mut out);
         Ok(out)
     }
     pub fn tick_shared_effects(
@@ -574,6 +575,7 @@ impl Gameplay {
             let result = engine.shared_effects(field, character.guid, now_ms)?;
             self.apply_encounter(result, &mut out)?;
         }
+        self.sync_tracked_target(character, &mut out);
         Ok(out)
     }
     pub fn tick_shared_motion(
@@ -1837,6 +1839,7 @@ impl Gameplay {
             let result = self.on_position(character.position, now_ms)?;
             out.changed |= result.changed;
             out.replies.extend(result.replies);
+            self.sync_tracked_target(character, &mut out);
             return Ok(out);
         }
         let before = self.opening.as_ref().unwrap().journal_entries();
@@ -1847,6 +1850,7 @@ impl Gameplay {
             .on_position(character.zone_id, character.position)?;
         self.apply_opening(result, &mut out)?;
         self.append_journal_updates(&before, &mut out)?;
+        self.sync_tracked_target(character, &mut out);
         Ok(out)
     }
 
@@ -1994,6 +1998,7 @@ impl Gameplay {
             self.apply_encounter(result, &mut out)?;
         }
         self.refresh_power_up_slot(held.as_deref(), &mut out)?;
+        self.sync_tracked_target(character, &mut out);
         Ok(out)
     }
 
@@ -2197,10 +2202,14 @@ impl Gameplay {
         };
         let enemy = |kind: u32| self.encounter.as_ref()?.field_enemy_site(kind);
         let poi = |id: u32| engine.poi_location(id);
+        let battle = |id: u32| self.encounter.as_ref()?.battle_marker(id);
+        let battle_enemy = |kind: u32| self.encounter.as_ref()?.battle_marker_for_enemy(kind);
         let places = crate::quest_journal::Places {
             npc: &npc,
             enemy: &enemy,
             poi: &poi,
+            battle: &battle,
+            battle_enemy: &battle_enemy,
         };
         let selected = engine.state().selected_quest_id;
         let open = selected.map_or_else(Vec::new, |id| engine.current_objectives(id));

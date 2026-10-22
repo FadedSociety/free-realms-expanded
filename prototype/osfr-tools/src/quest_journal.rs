@@ -276,6 +276,10 @@ pub struct Places<'a> {
     pub enemy: &'a dyn Fn(u32) -> Option<(u64, [f32; 3])>,
     /// Reach-POI id -> (zone, position).
     pub poi: &'a dyn Fn(u32) -> Option<(u32, [f32; 3])>,
+    /// Field battle id -> (spawner guid, position): the battle's zone-0 marker.
+    pub battle: &'a dyn Fn(u32) -> Option<(u64, [f32; 3])>,
+    /// Actor kind -> the marker of the lowest-id battle that fields that kind (R).
+    pub battle_enemy: &'a dyn Fn(u32) -> Option<(u64, [f32; 3])>,
 }
 
 /// The pin for one objective, or `None` when the content gives it no single known place
@@ -286,7 +290,14 @@ pub fn locate(quest_id: u32, objective: &QuestObjective, places: &Places) -> Opt
             (npc_id, OPEN_WORLD_ZONE, (places.npc)(npc_id)?)
         }
         ObjectiveKind::KillActorKind { actor_kind_id } => {
-            let (guid, position) = (places.enemy)(actor_kind_id)?;
+            // A field enemy of the kind wins; a kind that only fights inside a battle
+            // points at that battle's marker (R: the lowest battle id that fields it).
+            let (guid, position) =
+                (places.enemy)(actor_kind_id).or_else(|| (places.battle_enemy)(actor_kind_id))?;
+            (guid, OPEN_WORLD_ZONE, position)
+        }
+        ObjectiveKind::CompleteDungeon { encounter_id } => {
+            let (guid, position) = (places.battle)(encounter_id)?;
             (guid, OPEN_WORLD_ZONE, position)
         }
         ObjectiveKind::ReachPoi { poi_id } => {

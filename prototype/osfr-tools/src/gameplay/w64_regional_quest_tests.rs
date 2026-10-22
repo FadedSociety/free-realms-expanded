@@ -1071,19 +1071,44 @@ fn kill_objective_pins_its_field_enemy() {
 }
 
 #[test]
-fn an_objective_without_a_known_place_sends_no_pin() {
+fn a_battle_only_kill_objective_pins_its_battle_marker() {
     let (mut game, character) = offer_test_game(false);
     let engine = game.npc_quests.as_mut().unwrap();
-    // Kind 930096 has no field enemy, so the kill step has no known place.
+    // Kind 930096 has no field enemy; it fights only in battle 96, so the kill step
+    // points at that battle's marker (T427, R: the lowest battle id fielding the kind).
     assert!(engine.dev_mark_offered(3_110_002));
     assert!(engine.accept(3_110_002).changed);
     let out = game
         .handle_in_world(&select_packet(3_110_002), &character, 1_005)
         .unwrap();
+    let pins = tracked_pins(&out);
+    assert_eq!(pins.len(), 1);
+    assert_eq!(pins[0][16..24], 100_000_096_000u64.to_le_bytes());
+    for (axis, value) in [-440.0f32, 0.8, 1290.0].iter().enumerate() {
+        assert_eq!(pins[0][28 + 4 * axis..32 + 4 * axis], value.to_le_bytes());
+    }
+    assert_eq!(
+        pins[0][44..48],
+        0u32.to_le_bytes(),
+        "the marker is in zone 0"
+    );
+}
+
+#[test]
+fn an_objective_without_a_known_place_sends_no_pin() {
+    let (mut game, character) = offer_test_game(false);
+    let engine = game.npc_quests.as_mut().unwrap();
+    // A gather step has no single place (the quest is ordered, so its later Talk is
+    // not open yet).
+    assert!(engine.dev_mark_offered(3_000_016));
+    assert!(engine.accept(3_000_016).changed);
+    let out = game
+        .handle_in_world(&select_packet(3_000_016), &character, 1_005)
+        .unwrap();
     assert!(out.changed);
     assert!(tracked_pins(&out).is_empty());
     let again = game
-        .handle_in_world(&select_packet(3_110_002), &character, 1_006)
+        .handle_in_world(&select_packet(3_000_016), &character, 1_006)
         .unwrap();
     assert!(tracked_pins(&again).is_empty());
 }

@@ -1,5 +1,5 @@
 //! Field content loading, validation and staged reloads (`field_enemies.json`,
-//! `field_battles.json`).
+//! `field_battles.json`), and the quest pin's lookups over the loaded rows.
 use super::*;
 
 impl EncounterEngine {
@@ -179,9 +179,50 @@ impl EncounterEngine {
                 respawn_at: None,
             });
         }
+        Arc::make_mut(&mut self.content).field_sites = field
+            .iter()
+            .map(|f| (f.actor.definition_id, f.actor.guid, f.actor.position))
+            .collect();
         self.field_sim.enemies = field;
         self.paid_revive_cost = paid_revive_cost;
         self.rebuild_behaviours()
+    }
+
+    /// Guid and home position of the lowest-guid field enemy of this kind: where a kill
+    /// objective's "Take Me There" pin points (R). Present or not, so it works for a quest
+    /// whose enemies appear only once it is active, and read from the loaded rows, so it
+    /// still answers once the live enemies moved into the shared field (T427).
+    pub fn field_enemy_site(&self, definition_id: u32) -> Option<(u64, [f32; 3])> {
+        let definition_id = i32::try_from(definition_id).ok()?;
+        self.content
+            .field_sites
+            .iter()
+            .filter(|site| site.0 == definition_id)
+            .min_by_key(|site| site.1)
+            .map(|&(_, guid, home)| (guid, home))
+    }
+
+    /// Guid and position of field battle `id`'s spawner, its zone-0 marker: where a
+    /// dungeon objective's pin points. Cave dungeons have no marker.
+    pub fn battle_marker(&self, id: u32) -> Option<(u64, [f32; 3])> {
+        let battle = self.battles.iter().find(|b| b.id == id)?;
+        Some((battle.spawner.guid, battle.spawner.position))
+    }
+
+    /// The marker of the lowest-id battle whose spawner or roster is of this kind (R):
+    /// where a kill objective points when no field enemy of the kind exists.
+    pub fn battle_marker_for_enemy(&self, definition_id: u32) -> Option<(u64, [f32; 3])> {
+        let definition_id = i32::try_from(definition_id).ok()?;
+        let battle = self
+            .battles
+            .iter()
+            .filter(|b| {
+                std::iter::once(&b.spawner)
+                    .chain(&b.enemies)
+                    .any(|a| a.definition_id == definition_id)
+            })
+            .min_by_key(|b| b.id)?;
+        Some((battle.spawner.guid, battle.spawner.position))
     }
 
     /// Load overworld battles (`field_battles.json`); spawner and enemy GUIDs

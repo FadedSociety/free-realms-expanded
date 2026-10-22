@@ -428,6 +428,10 @@ struct Content {
     dungeons: Vec<Dungeon>,
     #[serde(skip)]
     template: Vec<u8>,
+    /// (definition, guid, home) per field enemy row: the quest pin's lookup, which must
+    /// outlive `take_shared_fields` moving the live rows into the shared field.
+    #[serde(skip)]
+    field_sites: Vec<(i32, u64, [f32; 3])>,
 }
 
 /// Overworld enemy that patrols outside the opening's story stages (e.g. the

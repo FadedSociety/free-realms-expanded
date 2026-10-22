@@ -70,19 +70,6 @@ impl EncounterEngine {
             .map(|f| f.actor.level)
     }
 
-    /// Guid and home position of the lowest-guid field enemy of this kind: where a kill
-    /// objective's "Take Me There" pin points (R). Present or not, so it works for a quest
-    /// whose enemies appear only once it is active.
-    pub fn field_enemy_site(&self, definition_id: u32) -> Option<(u64, [f32; 3])> {
-        let definition_id = i32::try_from(definition_id).ok()?;
-        self.field_sim
-            .enemies
-            .iter()
-            .filter(|f| f.actor.definition_id == definition_id)
-            .min_by_key(|f| f.actor.guid)
-            .map(|f| (f.actor.guid, f.actor.position))
-    }
-
     /// Developer teleport targets for living field enemies (zone 0).
     pub fn field_teleport_targets(&self) -> Vec<crate::dev_teleport::Target> {
         self.field_sim

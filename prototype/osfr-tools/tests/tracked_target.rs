@@ -7,6 +7,14 @@ const NPC: u64 = 9_500_000_254;
 const ENEMY_GUID: u64 = 100_000_004_154;
 const ENEMY_KIND: u32 = 930_050;
 const POI: u32 = 77;
+/// Sheep Watch (`field_battles.json` 12350): marker guid and position, as shipped.
+const BATTLE: u32 = 12_350;
+const MARKER_GUID: u64 = 100_001_235_000;
+const MARKER: [f32; 3] = [-2165.513, -32.96, 328.1112];
+/// Battle 96's own kind: it fights only inside that battle, never in the field.
+const BATTLE_KIND: u32 = 930_096;
+const BATTLE_96_GUID: u64 = 100_000_096_000;
+const BATTLE_96: [f32; 3] = [-440.0, 0.8, 1290.0];
 
 fn objective(id: u32, kind: ObjectiveKind) -> QuestObjective {
     QuestObjective {
@@ -17,15 +25,25 @@ fn objective(id: u32, kind: ObjectiveKind) -> QuestObjective {
     }
 }
 
-/// One NPC, one kind of field enemy and one POI exist; everything else is unknown.
+/// One NPC, one kind of field enemy, one POI and one battle exist; everything else is
+/// unknown. The field kind also fights in that battle (930050 is in 12350's roster), and
+/// one other kind fights only in battle 96.
 fn with_places<R>(f: impl FnOnce(&Places) -> R) -> R {
     let npc = |id: u64| (id == NPC).then_some([-1909.5, -44.4, 462.8]);
     let enemy = |kind: u32| (kind == ENEMY_KIND).then_some((ENEMY_GUID, [-1971.4, -34.5, 539.8]));
     let poi = |id: u32| (id == POI).then_some((5, [10.0, 2.0, -30.0]));
+    let battle = |id: u32| (id == BATTLE).then_some((MARKER_GUID, MARKER));
+    let battle_enemy = |kind: u32| match kind {
+        ENEMY_KIND => Some((MARKER_GUID, MARKER)),
+        BATTLE_KIND => Some((BATTLE_96_GUID, BATTLE_96)),
+        _ => None,
+    };
     f(&Places {
         npc: &npc,
         enemy: &enemy,
         poi: &poi,
+        battle: &battle,
+        battle_enemy: &battle_enemy,
     })
 }
 
@@ -113,6 +131,53 @@ fn reach_poi_and_visit_position_use_their_own_geometry() {
         }),
         Some(pin(4, 0, 6, [1.0, 2.0, 3.0]))
     );
+}
+
+#[test]
+fn dungeon_objectives_point_at_their_battle_marker() {
+    assert_eq!(
+        locate_kind(ObjectiveKind::CompleteDungeon {
+            encounter_id: BATTLE
+        }),
+        Some(pin(4, MARKER_GUID, 0, MARKER))
+    );
+}
+
+#[test]
+fn a_battle_only_kill_points_at_its_battle_marker() {
+    assert_eq!(
+        locate_kind(ObjectiveKind::KillActorKind {
+            actor_kind_id: BATTLE_KIND
+        }),
+        Some(pin(4, BATTLE_96_GUID, 0, BATTLE_96))
+    );
+}
+
+#[test]
+fn a_field_enemy_still_wins_over_a_battle_marker() {
+    // 930050 has both a field home and a battle; the field home is where it roams.
+    assert_eq!(
+        locate_kind(ObjectiveKind::KillActorKind {
+            actor_kind_id: ENEMY_KIND
+        }),
+        Some(pin(4, ENEMY_GUID, 0, [-1971.4, -34.5, 539.8]))
+    );
+}
+
+#[test]
+fn unknown_battles_and_battle_kinds_pin_nothing() {
+    for kind in [
+        ObjectiveKind::CompleteDungeon { encounter_id: 0 },
+        ObjectiveKind::CompleteDungeon {
+            encounter_id: BATTLE + 1,
+        },
+        ObjectiveKind::KillActorKind { actor_kind_id: 0 },
+        ObjectiveKind::KillActorKind {
+            actor_kind_id: BATTLE_KIND + 1,
+        },
+    ] {
+        assert_eq!(locate_kind(kind.clone()), None, "{kind:?}");
+    }
 }
 
 #[test]
