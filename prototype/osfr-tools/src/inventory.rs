@@ -29,8 +29,8 @@ pub const MAX_ITEMS: usize = 4096;
 const MAX_CONTENT: usize = 4 * 1024 * 1024;
 /// (R) Encounter content bounds a reward bundle by rows: dungeon `reward_items`
 /// at 16 (`src/encounter.rs:1011`) and field-battle `prizes` at 4
-/// (`src/encounter/field.rs:308`). `grant_bundle` commits no row cap of its own,
-/// so the preflight keeps the wider loader bound as the one deliberate limit.
+/// (`load_field_battles` in `src/encounter/field_content.rs`). `grant_bundle` commits no row
+/// cap of its own, so the preflight keeps the wider loader bound as the one deliberate limit.
 const MAX_REWARD_BUNDLE: usize = 16;
 // Reconstructed resource limits (R), separate from the player-owned item cap.
 const MAX_CATALOGUE_FILE: u64 = 128 * 1024 * 1024;

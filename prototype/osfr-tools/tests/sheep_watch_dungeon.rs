@@ -970,7 +970,7 @@ fn the_row_is_inside_the_loader_and_reward_bounds() {
         }
     }
     let enemies = row["enemies"].as_array().unwrap();
-    // The loader refuses more than 16 enemies (`src/encounter/field.rs`), not
+    // The loader refuses more than 16 enemies (`src/encounter/field_content.rs`), not
     // the 32 the brief assumed; the real load below also proves the shipped five.
     assert!((1..=16).contains(&enemies.len()));
     assert!(i32_field(row, "title_id") > 0);
