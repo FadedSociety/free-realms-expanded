@@ -1,14 +1,14 @@
 {
   "schema_version": 1,
-  "provenance": "Legacy Houses.json (AGPL-3.0 reference only; SHA256 854b2d3f009b916a928f66d57a42e2bf685dcc853e898d149580eefd26196d3c) supplies provisional spawn and six-float bounds. Scene choices are R matches from client IconId asset names to community-manifest hsg_emptylot names; no client property-to-scene map exists. No Legacy source code copied.",
-  "starter_property_id": 1,
+  "provenance": "Legacy Houses.json (AGPL-3.0 reference only; SHA256 854b2d3f009b916a928f66d57a42e2bf685dcc853e898d149580eefd26196d3c) supplies provisional spawn and six-float bounds. Scene choices are R matches from client IconId asset names to community-manifest hsg_emptylot names, plus property 25 (Wilds Condo) whose icon names the client-manifest scene hsg_hum_condo_w_lot; no client property-to-scene map exists. No Legacy source code copied.",
+  "starter_property_id": 25,
   "client_evidence": [
     "client: notes/Build Guides/Gameplay/Housing.md#Data-and-formats lists housing UI/placement resources; no client lot/zone/build-box table.",
     "client: working OSFR Client Resources/Images/Images.txt resolves each Legacy IconId to a named icon; the client does not link those icons to scenes.",
     "community-manifest: lab/references/osfr-asset-manifest/Assets_manifest.txt lists 24 hsg_emptylot scene names; it supplies no property association.",
     "R: scene candidates match the regional/product words in the client icon asset names; ambiguous or generic rows stay disabled.",
     "R: Legacy six-float bounds and spawn values remain provisional; scene transition type/sky/geometry defaults are placeholders pending scene/native evidence.",
-    "R: property 1 remains the temporary starter type until its client identity is verified; starter grant is one per character."
+    "R: property 25 (Wilds Condo, name_id 296) is the starter type: the wiki records it as every new player's starter from 2012-01-26 (notes/Research/Pieces/021 Property acquisition.md:107-108) and the client locale's decorating tutorial says 'your new Wilds Condo'; starter grant is one per character, and characters already holding property 1 also receive it once."
   ],
   "lots": [
     {
@@ -994,12 +994,23 @@
         0,
         0
       ],
-      "scene": null,
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=25;R:cap=9999;R:landmark-cap=0;R:scene-unavailable",
-      "enabled": false,
+      "scene": {
+        "name": "hsg_hum_condo_w_lot",
+        "zone_type": 2,
+        "sky": "sky_test.xml",
+        "tutorial": false,
+        "unknown": 1,
+        "zone_id": 25,
+        "update_radius": 0.0,
+        "geometry_id": 214,
+        "override_update_radius": true,
+        "wait_for_zone_ready": false
+      },
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=25;R:cap=9999;R:landmark-cap=0;R:client-manifest-scene:Assets_manifest.txt:72474 hsg_hum_condo_w_lot.gzne.z crc 274745638 (body Assets_004.pack entry 2685) named after icon 38460 icon_hsg_mkt_hsg_hum_condo_w_lot_64.dds;R:transition-defaults zone_type 2, sky_test.xml, geometry 214 (no GZNE reader)",
+      "enabled": true,
       "bounds_source": "legacy (R)",
-      "scene_source": null,
-      "disabled_reason": "condo-with-lot icon has no matching named community lot scene"
+      "scene_source": "client-manifest (R)",
+      "disabled_reason": null
     },
     {
       "property_id": 26,

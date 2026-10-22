@@ -12,7 +12,8 @@ from asset_delivery import AssetDelivery
 
 PROJECT = Path(__file__).resolve().parents[1]
 LAB = PROJECT.parent / "lab"
-# R: provisional property-to-scene joins from Housing Core.md, not a client table.
+# R: provisional property-to-scene joins from Housing Core.md, not a client table. Property 25's
+# scene is the one its client icon (icon_hsg_mkt_hsg_hum_condo_w_lot_64.dds) is named after.
 HOUSING_LOTS = [
     (1, "hsg_emptylot_blackspore_01"),
     (2, "hsg_emptylot_boat_01"),
@@ -32,6 +33,7 @@ HOUSING_LOTS = [
     (20, "hsg_emptylot_vale_steam_01"),
     (21, "hsg_emptylot_wugachug_01"),
     (22, "hsg_emptylot_blackspore_01"),
+    (25, "hsg_hum_condo_w_lot"),
     (29, "hsg_emptylot_snowhill_01"),
     (33, "hsg_emptylot_briarwood_01"),
     (34, "hsg_emptylot_wilds_halflot_01"),
@@ -187,9 +189,9 @@ def write_housing_report():
         extension = Path(key).suffix.lower() or "<none>"
         counts[extension] = counts.get(extension, 0) + 1
     lot_entries = sum(len(lot["missing_files"]) for lot in lots)
-    assert len(lots) == 21 and len({lot["scene"] for lot in lots}) == 17
-    assert len(unique_missing) == 1273, f"expected 1273 unique missing assets, got {len(unique_missing)}"
-    assert counts == {".gck2": 202, ".gcnk": 67, ".dds": 1004}, counts
+    assert len(lots) == 22 and len({lot["scene"] for lot in lots}) == 18
+    assert len(unique_missing) == 1350, f"expected 1350 unique missing assets, got {len(unique_missing)}"
+    assert counts == {".gck2": 202, ".gcnk": 67, ".dds": 1081}, counts
 
     report = {
         "schema_version": 1,

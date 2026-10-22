@@ -1,12 +1,15 @@
 //! Lead housing slice 1 through the real `Gameplay`: 127/23 grants the starter lot and lists it
 //! (127/39), 127/19 enters it (scene change now, house packets after the scene loads), saves and
-//! reconnects keep the world pose, 127/10 returns to it, and refusals change nothing. Raw inner
-//! packets as the client sends them; no player data.
+//! reconnects keep the world pose, 127/10 returns to it, and refusals change nothing. The starter
+//! is the Wilds Condo (property 25), and a character who already holds the old starter (property 1)
+//! gains it once. Raw inner packets as the client sends them; no player data.
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::Gameplay,
+    gateway::Gateway,
     housing_native::{InstanceList, PlayerHousingInstanceInfo, ZoneData},
     housing_service::HousingContent,
+    zone_transition,
 };
 use std::{
     fs,
@@ -18,6 +21,8 @@ const OWNER: u64 = 1;
 static NEXT: AtomicU64 = AtomicU64::new(0);
 const GRANT: [u8; 4] = [127, 0, 23, 0];
 const LEAVE: [u8; 4] = [127, 0, 10, 0];
+/// Locale name id of the Wilds Condo, the starter since 2012-01-26 (houses.json property 25).
+const WILDS_CONDO: i32 = 296;
 
 /// The opening reference content every gameplay route test loads (`OSFR_ACTIVITY_CONTENT`
 /// overrides it), optionally with the repository's `houses.json` copied in.
@@ -59,6 +64,19 @@ impl Content {
         )
         .unwrap();
         Self(dir)
+    }
+
+    /// The bundled lots with another starter: a save made before the Wilds Condo became it.
+    fn with_starter(property_id: i32) -> Self {
+        let content = Self::with_houses();
+        let mut houses = HousingContent::bundled().unwrap();
+        houses.starter_property_id = property_id;
+        fs::write(
+            content.0.join("houses.json"),
+            serde_json::to_vec(&houses).unwrap(),
+        )
+        .unwrap();
+        content
     }
 
     fn game(&self) -> Gameplay {
@@ -136,6 +154,34 @@ fn the_first_grant_gives_the_starter_lot_once_and_lists_it() {
     assert_eq!(only_list(&again.replies).records, vec![lot.clone()]);
     let listed = game.handle_in_world(&list_request(OWNER), &character(), 3_000).unwrap();
     assert_eq!(only_list(&listed.replies).records, vec![lot]);
+}
+
+#[test]
+fn a_new_character_is_granted_the_wilds_condo() {
+    let content = Content::with_houses();
+    let lot = granted(&mut content.game());
+    assert_eq!((lot.name_id, lot.icon_id), (WILDS_CONDO, 38460));
+}
+
+#[test]
+fn an_owner_of_lot_one_gains_the_condo_once_and_keeps_lot_one() {
+    let mut before = Content::with_starter(1).game();
+    let lot_one = granted(&mut before);
+    assert_ne!(lot_one.name_id, WILDS_CONDO);
+    let content = Content::with_houses();
+    let mut game = Gameplay::load(&content.0, Some(before.state())).unwrap();
+    let first = game.handle_in_world(&GRANT, &character(), 2_000).unwrap();
+    assert!(first.changed, "the condo is saved");
+    let lots = only_list(&first.replies).records;
+    assert_eq!(lots.len(), 2);
+    assert!(lots.contains(&lot_one), "lot 1 is kept unchanged");
+    assert!(lots.iter().any(|lot| lot.name_id == WILDS_CONDO));
+
+    let saved = game.state();
+    let again = game.handle_in_world(&GRANT, &character(), 3_000).unwrap();
+    assert!(!again.changed, "a second ask grants nothing");
+    assert_eq!(only_list(&again.replies).records, lots);
+    assert_eq!(game.state(), saved);
 }
 
 #[test]
@@ -315,10 +361,8 @@ fn login() -> Vec<u8> {
     bytes
 }
 
-#[test]
-fn the_gateway_sends_the_scene_change_then_the_house_after_the_load() {
-    use osfr_tools::gateway::Gateway;
-    let content = Content::with_houses();
+/// A gateway logged in and standing in the world, with the content's housing loaded.
+fn world_gateway(content: &Content) -> Gateway {
     let reference = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../../../lab/references/rust-gateway-reference");
     let character = Gateway::reference_state(&reference).unwrap();
@@ -329,14 +373,54 @@ fn the_gateway_sends_the_scene_change_then_the_house_after_the_load() {
     gateway.handle_at(&login(), 10_000).unwrap();
     gateway.handle_at(&wrap(&[13, 0]), 10_000).unwrap();
     gateway.handle_at(&wrap(&[10, 0]), 10_000).unwrap();
-    let listed = gateway.handle_at(&wrap(&GRANT), 11_000).unwrap();
-    let list = listed
+    gateway
+}
+
+/// 127/23 through the gateway, answered by the owner's 127/39 list.
+fn gateway_grant(gateway: &mut Gateway, now_ms: u64) -> InstanceList {
+    let listed = gateway.handle_at(&wrap(&GRANT), now_ms).unwrap();
+    listed
         .replies
         .iter()
         .filter_map(|r| r.get(7..))
         .find(|r| subtype(r) == Some(39))
         .map(|r| InstanceList::decode(&r[2..]).unwrap())
-        .expect("127/39 through the gateway");
+        .expect("127/39 through the gateway")
+}
+
+/// The opcode-31 scene change among a gateway's replies.
+fn op31(replies: &[Vec<u8>]) -> Option<zone_transition::ZoneTransition> {
+    replies.iter().find_map(|r| zone_transition::decode(r).ok())
+}
+
+#[test]
+fn the_wilds_condo_is_entered_by_op31_and_leave_returns_to_the_world_pose() {
+    let content = Content::with_houses();
+    let mut gateway = world_gateway(&content);
+    let world = gateway.state().clone();
+    let condo = gateway_grant(&mut gateway, 11_000).records[0].clone();
+    assert_eq!(condo.name_id, WILDS_CONDO);
+    let entered = gateway
+        .handle_at(&wrap(&enter(condo.instance_guid)), 12_000)
+        .unwrap();
+    let scene = op31(&entered.replies).expect("entering sends op31");
+    assert_eq!(
+        (scene.scene.as_str(), scene.id),
+        ("hsg_hum_condo_w_lot", 25)
+    );
+    gateway.handle_at(&wrap(&[13, 0]), 13_000).unwrap();
+    gateway.handle_at(&wrap(&[10, 0]), 13_000).unwrap();
+    let left = gateway.handle_at(&wrap(&LEAVE), 14_000).unwrap();
+    let back = op31(&left.replies).expect("leaving sends op31");
+    assert_eq!(&back.position[..3], &world.position);
+    assert_eq!(gateway.state(), &world, "back at the entry pose");
+}
+
+#[test]
+fn the_gateway_sends_the_scene_change_then_the_house_after_the_load() {
+    let content = Content::with_houses();
+    let mut gateway = world_gateway(&content);
+    let list = gateway_grant(&mut gateway, 11_000);
     let entered = gateway
         .handle_at(&wrap(&enter(list.records[0].instance_guid)), 12_000)
         .unwrap();

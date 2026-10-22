@@ -64,9 +64,14 @@ tagged with that reconstructed correction.
 
 ## Reconstructed policy (R) in this slice
 
-- Property id 1 is a temporary starter lot type; `grant_starter_lot` grants one per character and is
-  idempotent. Different characters may own the same property type. The client does not establish
-  that property id 1 is the retail starter.
+- Property id 25, the Wilds Condo (name id 296), is the starter lot type (L030, 2026-10-22);
+  `grant_starter_lot` grants one per character and is idempotent per (owner, property). The wiki
+  records it as every new player's starter from 2012-01-26
+  (`Research/Pieces/021 Property acquisition.md:107-108`) and the client locale's decorating
+  tutorial addresses "your new Wilds Condo"; the exe names no housing scene (IDA `strings` for
+  `condo` and `hsg_` find nothing), so the server chooses it. A character who already holds the old
+  starter (property 1) keeps it and gains the condo on its next 127/23. The 2012 rule named only
+  Apartment owners; giving it to every earlier owner is (R).
 - Visitor level 1, edit threshold 3, edit-mode enforcement, lock behavior, and all lot permission
   numbering are server policy. The Legacy packet model is only a reference for level 3.
 - `127/44`'s fixed local codec fields `unused = 10` and `is_flora_allowed = true` are retained as
@@ -253,7 +258,7 @@ them with properties.
 | 22 | `icon_hsg_mkt_blackspore_emptylot_64.dds` | `hsg_emptylot_blackspore_01` | enabled (R) |
 | 23 | `icon_hsg_mkt_generic_emptylot_64.dds` | — | disabled: generic icon has no unique region scene |
 | 24 | `icon_house_apartment_64.dds` | — | disabled: no matching named community lot scene |
-| 25 | `icon_hsg_mkt_hsg_hum_condo_w_lot_64.dds` | — | disabled: no matching named community lot scene |
+| 25 | `icon_hsg_mkt_hsg_hum_condo_w_lot_64.dds` | `hsg_hum_condo_w_lot` | enabled, starter (R, `client-manifest`: the icon is named after the scene; see below) |
 | 26 | `icon_house_deluxe_64.dds` | — | disabled: no region-specific community lot scene |
 | 27 | `icon_house_economy_64.dds` | — | disabled: no region-specific community lot scene |
 | 28 | `icon_house_viphouse_64.dds` | — | disabled: no region-specific community lot scene |
@@ -264,12 +269,21 @@ them with properties.
 | 33 | `icon_farming_briarwood_lot_01_64.dds` | `hsg_emptylot_briarwood_01` | enabled (R) |
 | 34 | `icon_farming_wilds_lot_64.dds` | `hsg_emptylot_wilds_halflot_01` | enabled (R, selected over rapids scene) |
 
-All enabled rows use `scene_source: "community-manifest (R)"` and
-`bounds_source: "legacy (R)"`; each retains its Legacy six-float box and spawn values. Property 1
-remains the temporary starter. Scene `zone_type`, sky, unknown value, geometry ID and other
+All enabled rows use `bounds_source: "legacy (R)"` and `scene_source: "community-manifest (R)"`,
+except property 25 (`client-manifest (R)`); each retains its Legacy six-float box and spawn values.
+Property 25 is the starter. Scene `zone_type`, sky, unknown value, geometry ID and other
 transition fields use the service test defaults (R); only the scene name was matched to a manifest
-entry. These defaults and the bounds have not passed native client acceptance. Ten rows without a
+entry. These defaults and the bounds have not passed native client acceptance. Nine rows without a
 plausible unique candidate remain disabled and carry a reason in JSON.
+
+Property 25's earlier search looked only at `hsg_emptylot_*` names. Its icon names the scene
+`hsg_hum_condo_w_lot`, which ships in the working client: `Assets_manifest.txt:72474`
+(`hsg_hum_condo_w_lot.gzne.z`, CRC 274745638) and `:146197` (`.map`), 183 manifest entries in all;
+the scene body is `Assets_004.pack` entry 2685 (`catalog.tsv:72023`, CRC `10604926`, the same
+value). The extracted body is `GZNE` version 3 and holds only terrain material names (`sg_dirt`,
+`sg_grass`, `bw_grass_darkvines` ...), no sky or geometry id, and the toolkit has no GZNE field
+reader, so its transition fields keep the defaults above (R). `hsg_hum_condo.gzne` (84 raw bytes) is
+a header-only stub and is not used.
 
 ### Asset delivery finding
 
@@ -330,4 +344,12 @@ catalog. The report groups 1,273 unique missing files across 21 provisional lots
 exact CRC-matching loose source under `lab/references`; saved pack-range fragments are not decoded.
 No files were downloaded. This is HTTP/source verification, not native-client acceptance, and the
 provisional lot-to-scene joins above remain R.
+
+L030 added property 25 (`hsg_hum_condo_w_lot`): 22 lots / 18 scenes, 1,350 unique missing files
+(1,624 per-lot entries): 202 `.gck2`, 67 `.gcnk`, 1,081 `.dds`. The condo's 183 entries are all
+CRC-present except 77 `.dds` (its `.gzne`, `.map`, `.txt`, 20 `.gck2`, 20 `.gcnk` and every
+`.adr`/`.cdt`/`.dma`/`.dme` are present); none of the 77 has a loose community source. The old
+starter (`hsg_emptylot_blackspore_01`) misses 9 `.gck2` and 52 `.dds`. The script ran with its
+report redirected to a scratch file; rewriting `lab/content/housing-assets/missing.json` is the
+lead's call. Whether the missing `.dds` show as untextured surfaces needs the native check.
 

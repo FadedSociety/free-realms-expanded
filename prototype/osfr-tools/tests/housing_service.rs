@@ -1189,7 +1189,7 @@ fn the_housing_snapshot_seam_is_path_free() {
 fn enabled_bundled_lots_have_scene_bounds_and_source_tags() {
     let content = HousingContent::bundled().unwrap();
     assert_eq!(content.lots.len(), 31);
-    assert_eq!(content.lots.iter().filter(|lot| lot.enabled).count(), 21);
+    assert_eq!(content.lots.iter().filter(|lot| lot.enabled).count(), 22);
     for lot in &content.lots {
         assert!(!lot.source_tag.is_empty());
         assert!(!lot.bounds_source.is_empty());
@@ -1200,7 +1200,12 @@ fn enabled_bundled_lots_have_scene_bounds_and_source_tags() {
                     .as_ref()
                     .is_some_and(|scene| !scene.name.is_empty())
             );
-            assert_eq!(lot.scene_source.as_deref(), Some("community-manifest (R)"));
+            // Only the Wilds Condo's scene is named by its icon in the client's own manifest.
+            let source = match lot.property_id {
+                25 => "client-manifest (R)",
+                _ => "community-manifest (R)",
+            };
+            assert_eq!(lot.scene_source.as_deref(), Some(source));
             assert_eq!(lot.bounds_source, "legacy (R)");
             assert!(lot.disabled_reason.is_none());
         } else {
@@ -1231,7 +1236,7 @@ fn bundled_enabled_starter_enters_its_scene_before_the_full_reply_sequence() {
         .unwrap();
     assert!(starter.enabled);
     let expected_scene = starter.scene.as_ref().unwrap().name.clone();
-    assert_eq!(expected_scene, "hsg_emptylot_blackspore_01");
+    assert_eq!(expected_scene, "hsg_hum_condo_w_lot");
     let mut service =
         HousingService::with_content(FixtureConfig::capture_defaults(), content).unwrap();
     let house_guid = service.grant_starter_lot(OWNER).unwrap();
@@ -1286,7 +1291,7 @@ fn starter_lot_grant_is_per_character_and_idempotent() {
     assert_ne!(guest_lot, owner_lot);
     let lots = service.state().lots;
     assert_eq!(lots.len(), 2);
-    assert!(lots.iter().all(|lot| lot.property_id == 1));
+    assert!(lots.iter().all(|lot| lot.property_id == 25));
 }
 
 #[test]
