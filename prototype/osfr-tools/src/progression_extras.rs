@@ -396,13 +396,29 @@ struct JobRow {
 
 // World collection wire messages use signed 16-bit family/subtype headers.
 
+/// 38/10 AddEntry body in client wire order: 7 x u32 then a bool (reader
+/// `008d8570`). `008c3fa0` copies it into the same 0x34-byte entry that the
+/// login entry reader `008dacc0` fills, which names each field against the
+/// captured login rows (0007-login.bin, entry 41 at byte 8941).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CollectionEntryUpdate {
+    /// Body +0 (reader +0x0C, entry +0x00): entry id, the login keyed-row key.
+    pub definition_id: u32,
+    /// Body +4 (IconData `008caaa0`, reader +0x14).
+    pub icon_id: u32,
+    /// Body +8 (IconData, reader +0x18).
+    pub icon_tint_id: u32,
+    /// Body +12 (reader +0x1C, entry +0x10): locale name id.
+    pub name_id: u32,
+    /// Body +16 (reader +0x20): the key case 10 looks the collection up by
+    /// (`0x00939e21` -> `00992bf0`, insert `009939a0`).
     pub collection_id: u32,
-    pub id_pair: [u32; 2],
-    /// Four entry fields are retained as wire values; their meanings are not
-    /// fully recovered. `collected=true` is reconstructed event policy (R).
-    pub fields: [u32; 4],
+    /// Body +20 (reader +0x24, entry +0x18): 1-based position.
+    pub index: u32,
+    /// Body +24 (reader +0x28, entry +0x1C): meaning unknown; 0 in all 1,815
+    /// captured login rows (R).
+    pub unknown: u32,
+    /// Body +28 (reader +0x2C, entry +0x20). `collected=true` is event policy (R).
     pub collected: bool,
 }
 
@@ -412,9 +428,9 @@ pub enum CollectionMessage {
     Start {
         record: Vec<u8>,
     },
-    /// The subtype-9 body was not recovered; callers must supply known bytes.
+    /// Drops the whole collection (reader `008e3ef0`; `0x00939db1` -> `009936b0`).
     Remove {
-        body: Vec<u8>,
+        collection_id: u32,
     },
     AddEntry(CollectionEntryUpdate),
     RemoveEntry {
@@ -433,11 +449,18 @@ impl CollectionMessage {
                 body.extend_from_slice(record);
                 (8, body)
             }
-            Self::Remove { body } => (9, body.clone()),
+            Self::Remove { collection_id } => (9, collection_id.to_le_bytes().to_vec()),
             Self::AddEntry(update) => {
                 let mut body = Vec::with_capacity(29);
-                put_u32(&mut body, update.collection_id);
-                for value in update.id_pair.into_iter().chain(update.fields) {
+                for value in [
+                    update.definition_id,
+                    update.icon_id,
+                    update.icon_tint_id,
+                    update.name_id,
+                    update.collection_id,
+                    update.index,
+                    update.unknown,
+                ] {
                     put_u32(&mut body, value);
                 }
                 body.push(u8::from(update.collected));
@@ -474,6 +497,7 @@ pub enum CollectionEventOrigin {
 pub struct CollectionEvent {
     pub entry_id: i32,
     pub origin: CollectionEventOrigin,
+    /// Checked against the entry and sent only when it is newly collected.
     pub wire_update: Option<CollectionEntryUpdate>,
 }
 
@@ -533,7 +557,9 @@ impl CollectionProgression {
 
         let mut collection_packets = Vec::new();
         if let Some(update) = event.wire_update {
-            if update.collection_id != u32::try_from(outcome.collection_id).unwrap_or(0)
+            // Wire ids are u32, ledger ids i32: widen so a negative id never matches.
+            if i64::from(update.definition_id) != i64::from(outcome.entry_id)
+                || i64::from(update.collection_id) != i64::from(outcome.collection_id)
                 || !update.collected
             {
                 return Err(invalid("collection wire update does not match event"));

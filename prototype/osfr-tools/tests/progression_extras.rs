@@ -188,10 +188,84 @@ fn item_grant() -> RewardGrant {
 
 fn update(collection_id: u32, entry_id: u32) -> CollectionEntryUpdate {
     CollectionEntryUpdate {
+        definition_id: entry_id,
+        icon_id: 0,
+        icon_tint_id: 0,
+        name_id: 0,
         collection_id,
-        id_pair: [0, entry_id],
-        fields: [1, entry_id, 0, 0],
+        index: 1,
+        unknown: 0,
         collected: true,
+    }
+}
+
+#[test]
+fn add_entry_body_matches_client_reader_8d8570() {
+    // Captured login row for entry 41 (0007-login.bin byte 8941), in AddEntry order.
+    let packet = CollectionMessage::AddEntry(CollectionEntryUpdate {
+        definition_id: 41,
+        icon_id: 2124,
+        icon_tint_id: 99,
+        name_id: 17056,
+        collection_id: 10,
+        index: 1,
+        unknown: 0,
+        collected: true,
+    })
+    .encode()
+    .unwrap();
+    let mut expected = vec![38, 0, 10, 0];
+    for value in [41u32, 2124, 99, 17056, 10, 1, 0] {
+        expected.extend(value.to_le_bytes());
+    }
+    expected.push(1);
+    assert_eq!(packet, expected);
+    // Case 10 looks the collection up by packet +0x20 (0x00939e21).
+    assert_eq!(packet[20..24], 10u32.to_le_bytes());
+}
+
+#[test]
+fn remove_body_is_one_collection_id() {
+    assert_eq!(
+        CollectionMessage::Remove { collection_id: 10 }
+            .encode()
+            .unwrap(),
+        [38, 0, 9, 0, 10, 0, 0, 0]
+    );
+}
+
+#[test]
+fn collect_refuses_wire_ids_that_do_not_name_the_entry() {
+    let fixture = InventoryFixture::new();
+    let rewards = fixture.state();
+    let mut catalogue = CollectionCatalogue::new();
+    for (id, entries) in [(11, vec![101, 102, -1]), (-1, vec![201])] {
+        catalogue
+            .insert(CollectionDefinition {
+                id,
+                category_id: 4,
+                entries,
+            })
+            .unwrap();
+    }
+    let mut progression = CollectionProgression::new(catalogue, CollectionLedger::new());
+    let before = progression.ledger_bytes().unwrap();
+    for (entry_id, wire) in [
+        (101, update(11, 102)),
+        (-1, update(11, u32::MAX)),
+        (201, update(0, 201)),
+    ] {
+        let refused = progression.collect(
+            CollectionEvent {
+                entry_id,
+                origin: CollectionEventOrigin::HarvestNode,
+                wire_update: Some(wire),
+            },
+            &coin_grant(5),
+            &rewards,
+        );
+        assert!(refused.is_err(), "entry {entry_id}");
+        assert_eq!(progression.ledger_bytes().unwrap(), before);
     }
 }
 
@@ -641,12 +715,6 @@ fn source_content_ids_are_unique_and_locale_backed() {
     );
 
     assert_eq!(promotional_packet(1, &[1, 2]).unwrap()[..4], [114, 0, 1, 0]);
-    assert!(
-        CollectionMessage::Remove { body: vec![0] }
-            .encode()
-            .unwrap()[..4]
-            == [38, 0, 9, 0]
-    );
     assert_eq!(
         CollectionMessage::Start { record: vec![1, 2] }
             .encode()
