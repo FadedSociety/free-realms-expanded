@@ -58,10 +58,11 @@ the fixture guid minting and the numeric bounds, all inherited from `housing.rs`
 These stay typed gaps, never invented values:
 
 1. **`127/2` selection id.** The first dword is bound to a real instance only through
-   `HousingService::offer`. A dword that happens to equal an inventory instance id places nothing
-   (test `a_selection_id_is_never_an_inventory_identity`). The `offer` binding itself is the
-   reconstruction allowed by the captured `127/1 -> 127/42` echo; the catalogue that owns the
-   selection id is still unrecovered.
+   `HousingService::offer`, which 127/1 calls (L031): the decorate bar sends the inventory item
+   guid, so 127/1 binds the owned single-unit item under its own id, and a new binding replaces
+   the actor's previous one. A 127/2 without its 127/1 places nothing (test
+   `a_127_2_without_its_127_1_places_nothing`). The id is (R) from the Lua and the `00c0b710`
+   binding until a native capture confirms it.
 2. **`127/5` `SaveFixture`.** `quad_a`/`quad_b` are four `u32` words each, the `FUN_00abd1d0`
    block is opaque and nothing identifies the fixture, so `handle` answers `SaveFixture` with
    `ServiceError::UnresolvedRequest { opcode: 5, missing: [...] }`. Movement is reachable only

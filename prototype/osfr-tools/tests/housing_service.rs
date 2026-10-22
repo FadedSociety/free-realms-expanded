@@ -224,6 +224,7 @@ fn test_housing_content() -> HousingContent {
         schema_version: 1,
         provenance: "synthetic test content".to_string(),
         starter_property_id: 5,
+        starter_fixture_item_id: None,
         client_evidence: vec!["synthetic test row".to_string()],
         lots: vec![lot_definition(property())],
     }
@@ -508,12 +509,11 @@ fn decode_request_keeps_the_selection_id_separate_from_the_transform() {
 }
 
 #[test]
-fn a_selection_id_is_never_an_inventory_identity() {
+fn a_127_2_without_its_127_1_places_nothing() {
     let mut service = service_with_lot();
     let mut stock = TestStock::new(vec![owned(INSTANCE, BLOCK_ITEM, 1)]);
     enter(&mut service, &mut stock);
-    // The client's dword happens to equal the real instance id; without a server-side binding it
-    // still cannot place anything.
+    // The dword is the real item id, but only 127/1 binds it: a 127/2 alone places nothing.
     let error = service
         .handle(
             OWNER,
@@ -865,12 +865,13 @@ fn fixture_asset_request_resolves_only_a_bound_owned_selection() {
     let mut service = service_with_lot();
     let mut stock = TestStock::new(vec![owned(INSTANCE, BLOCK_ITEM, 1)]);
     enter(&mut service, &mut stock);
+    // An unbound id is tried as the owned item guid; SELECTION names no owned item.
     assert_eq!(
         service
             .handle(OWNER, &place_request_frame(SELECTION), &mut stock)
             .unwrap_err(),
-        ServiceError::UnresolvedSelection {
-            selection_id: SELECTION
+        ServiceError::UnknownInstance {
+            instance_id: SELECTION
         }
     );
 
@@ -942,10 +943,7 @@ fn a_denied_request_encodes_the_recovered_53_body() {
         )
         .unwrap_err();
 
-    let denied = housing_service::ServiceOutcome::denied(&error);
-    assert!(!denied.changed);
-    assert_eq!(opcodes(&denied), vec![53]);
-    let body = denied.replies[0].encode_inner().unwrap();
+    let body = error.denial_reply().encode_inner().unwrap();
     assert_eq!(&body[..4], &[0x7f, 0x00, 0x35, 0x00]);
     let message = housing_native::PlacementDenied::decode(&body[2..]).unwrap();
     assert_eq!(message.message, error.denial_message());
@@ -1295,6 +1293,58 @@ fn starter_lot_grant_is_per_character_and_idempotent() {
 }
 
 #[test]
+fn the_starter_lot_and_its_fixture_commit_together() {
+    let mut service = HousingService::with_content(
+        FixtureConfig::capture_defaults(),
+        HousingContent::bundled().unwrap(),
+    )
+    .unwrap();
+    let grant = [BASE_OPCODE.to_le_bytes(), 23u16.to_le_bytes()].concat();
+    let mut stock = TestStock {
+        refuse_return: true,
+        ..TestStock::default()
+    };
+    let before = service.state();
+    assert!(matches!(
+        service.handle(OWNER, &grant, &mut stock),
+        Err(ServiceError::StockRejected { .. })
+    ));
+    assert_eq!(
+        service.state(),
+        before,
+        "a refused fixture drops the staged lot"
+    );
+    stock.refuse_return = false;
+    assert!(service.handle(OWNER, &grant, &mut stock).unwrap().changed);
+    assert_eq!(stock.instances.len(), 1);
+    assert_eq!(
+        (stock.instances[0].definition_id, stock.instances[0].tint_id),
+        (BLOCK_ITEM, 0)
+    );
+    assert!(!service.handle(OWNER, &grant, &mut stock).unwrap().changed);
+    assert_eq!(
+        stock.instances.len(),
+        1,
+        "a repeat ask grants no second unit"
+    );
+}
+
+#[test]
+fn a_starter_fixture_without_a_fixture_row_fails_at_load() {
+    let mut content = HousingContent::bundled().unwrap();
+    // The client's decorating tutorial item (ScriptsBase.lua PopulateItems): no fixture row yet.
+    content.starter_fixture_item_id = Some(70_429);
+    assert_eq!(
+        HousingService::with_content(FixtureConfig::capture_defaults(), content.clone()).err(),
+        Some(ServiceError::FixtureDefinitionUnknown {
+            definition_id: 70_429
+        })
+    );
+    content.starter_fixture_item_id = Some(0);
+    assert!(HousingContent::parse(&serde_json::to_vec(&content).unwrap()).is_err());
+}
+
+#[test]
 fn enter_sends_zoning_then_exact_45_28_44_and_item_list_bytes() {
     let mut service = service_with_lot();
     let mut stock = TestStock::default();
@@ -1507,7 +1557,7 @@ fn pickup_all_returns_every_owned_item_or_keeps_both_sides_unchanged() {
 }
 
 #[test]
-fn cap_and_unowned_selector_refusals_return_127_53_without_consuming_stock() {
+fn cap_and_unowned_selector_refusals_consume_no_stock() {
     let mut service = service_with_lot();
     let stock_items = (0..5)
         .map(|index| owned(INSTANCE + index, BLOCK_ITEM, 1))
@@ -1530,13 +1580,16 @@ fn cap_and_unowned_selector_refusals_return_127_53_without_consuming_stock() {
     let instance = INSTANCE + 4;
     service.offer(OWNER, selection, instance, &stock).unwrap();
     let denied = service
-        .handle_placement_for_client(
+        .handle(
             OWNER,
             &place_frame(selection, &block_transform(position(), ZERO_ROTATION, 1.0)),
             &mut stock,
         )
-        .unwrap();
-    assert_eq!(opcodes(&denied), vec![53]);
+        .unwrap_err();
+    assert_eq!(
+        denied,
+        ServiceError::Housing(HousingError::FixtureLimitReached)
+    );
     assert_eq!(service.lot(HOUSE).unwrap().count, 4);
     assert_eq!(stock.instances.len(), 1);
 
@@ -1544,13 +1597,18 @@ fn cap_and_unowned_selector_refusals_return_127_53_without_consuming_stock() {
     let mut unowned_stock = TestStock::new(vec![owned(INSTANCE, BLOCK_ITEM, 1)]);
     enter(&mut unowned_service, &mut unowned_stock);
     let denied = unowned_service
-        .handle_placement_for_client(
+        .handle(
             OWNER,
             &place_frame(SELECTION, &block_transform(position(), ZERO_ROTATION, 1.0)),
             &mut unowned_stock,
         )
-        .unwrap();
-    assert_eq!(opcodes(&denied), vec![53]);
+        .unwrap_err();
+    assert_eq!(
+        denied,
+        ServiceError::UnresolvedSelection {
+            selection_id: SELECTION
+        }
+    );
     assert_eq!(unowned_stock.instances.len(), 1);
 }
 
@@ -1578,13 +1636,18 @@ fn guest_can_visit_but_cannot_toggle_edit_or_place() {
         ServiceError::Housing(HousingError::NotPropertyOwner)
     );
     let denied = service
-        .handle_placement_for_client(
+        .handle(
             GUEST,
             &place_frame(SELECTION, &block_transform(position(), ZERO_ROTATION, 1.0)),
             &mut stock,
         )
-        .unwrap();
-    assert_eq!(opcodes(&denied), vec![53]);
+        .unwrap_err();
+    assert_eq!(
+        denied,
+        ServiceError::UnresolvedSelection {
+            selection_id: SELECTION
+        }
+    );
     assert_eq!(service.lot(HOUSE).unwrap().count, 0);
     assert_eq!(stock.instances.len(), 1);
 }

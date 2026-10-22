@@ -20,7 +20,8 @@
 //! * every decoder consumes its whole payload exactly — trailing bytes are an error, including
 //!   the unconfirmed bytes after the 127/53 string;
 //! * unknown positional fields keep their `unknownN` names; no meaning is invented. The 127/2
-//!   `first_dword` is the client selection id (`+0x40`), never an inventory identity.
+//!   `first_dword` is the client selection id (`+0x40`): the inventory item guid the decorate
+//!   bar passed to 127/1 (`housing_service` module note).
 
 use std::io;
 

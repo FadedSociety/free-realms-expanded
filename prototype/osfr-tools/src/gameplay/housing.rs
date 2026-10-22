@@ -8,7 +8,7 @@
 use super::*;
 use crate::housing_service::{
     FixtureConfig, HousingContent, HousingService, HousingServiceState, HousingZoneChange,
-    ServiceOutcome,
+    ServiceOutcome, decode_request,
 };
 
 /// Base opcode of the housing family, as the first two bytes of every inner packet.
@@ -76,7 +76,8 @@ fn encode_replies(outcome: &ServiceOutcome) -> io::Result<Vec<Vec<u8>>> {
 
 impl Gameplay {
     /// Family 127. Requests are staged on a copy of the session and the inventory, so a refusal
-    /// (shown as one chat line) changes nothing.
+    /// (one chat line, plus the client's 127/53 for a decorate request) changes nothing. What the
+    /// request did to the backpack reaches the client as ordinary inventory updates.
     pub(super) fn handle_housing(
         &mut self,
         inner: &[u8],
@@ -96,8 +97,13 @@ impl Gameplay {
         let outcome = match result {
             Ok(outcome) => outcome,
             Err(error) => {
+                let mut replies = vec![chat::system(&error.denial_message())];
+                // Client reader 00ab3030: one length-prefixed reason string.
+                if decode_request(inner).is_ok_and(|request| request.answers_with_denial()) {
+                    replies.push(error.denial_reply().encode_inner()?);
+                }
                 return Ok(Some(Outcome {
-                    replies: vec![chat::system(&error.denial_message())],
+                    replies,
                     ..Outcome::default()
                 }));
             }
@@ -146,8 +152,13 @@ impl Gameplay {
             }
             None => out.replies = encode_replies(&outcome)?,
         }
+        // 38/4 for a placed item, 38/2 for a returned or granted one. `adopt_state` commits the
+        // inventory only if it validates, before the session, so a failure here changes nothing.
+        if inventory.state() != self.inventory.state() {
+            out.replies
+                .extend(self.inventory.adopt_state(inventory.state().clone())?);
+        }
         self.housing = Some(session);
-        self.inventory = inventory;
         Ok(Some(out))
     }
 
@@ -163,12 +174,15 @@ impl Gameplay {
         self.housing.as_ref()?.return_to.clone()
     }
 
-    /// A reconnect leaves the house and resumes at the world pose.
+    /// A reconnect leaves the house and resumes at the world pose; the service forgets the visit,
+    /// so no edit mode or selection outlives it.
     pub fn abandon_house_for_reconnect(&mut self) -> Option<CharacterState> {
         let session = self.housing.as_mut()?;
         session.pending.clear();
         session.scene = None;
-        session.return_to.take()
+        let back = session.return_to.take()?;
+        session.service.end_visit(back.guid);
+        Some(back)
     }
 
     /// While inside, the lot is the player's scene (like a soccer arena), so the server's

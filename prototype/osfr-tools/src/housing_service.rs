@@ -6,8 +6,10 @@
 //! * housing is packet family 127; the client-to-server inner opcodes include 1
 //!   (`PlaceFixtureRequest`), 2 (`PlaceFixture`), 3 (`PickupFixture`), 5 (`SaveFixture`), 6
 //!   (`SetEditMode`), 19 (`EnterRequest`) and 20 (`PreviewByItemDefinitionIdRequest`);
-//! * the `127/2` first dword is the client's placement *selection id*: it is neither the item
-//!   definition nor an inventory instance identity, so a placement needs a server-side binding;
+//! * the `127/2` first dword is the client's placement *selection id*. The decorate bar passes the
+//!   inventory item guid (`ScriptsBase.lua` `PopulateItems` -> `ItemSelected` ->
+//!   `House.PlaceFixture`; binding `00c0b710` parses it and calls `00ac4200`), so 127/1 binds an
+//!   owned single-unit fixture item under its own id, and 127/2 only resolves a bound id;
 //! * client readers expose fixture and item definition ids in `127/40` records. This does not
 //!   establish how the original server authorized or paired them.
 //!
@@ -234,6 +236,10 @@ pub struct HousingContent {
     pub schema_version: u32,
     pub provenance: String,
     pub starter_property_id: i32,
+    /// (R) The item a new starter lot comes with, one unit, so it can be decorated. It must have
+    /// a fixture configuration row (checked at load). Absent: the lot comes empty.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub starter_fixture_item_id: Option<i32>,
     pub client_evidence: Vec<String>,
     pub lots: Vec<HousingLotDefinition>,
 }
@@ -285,6 +291,7 @@ impl HousingContent {
             || self.lots.is_empty()
             || self.lots.len() > MAX_STATE_LOTS
             || self.starter_property_id <= 0
+            || self.starter_fixture_item_id.is_some_and(|item| item <= 0)
         {
             return Err(ServiceError::HousingContentInvalid(
                 "invalid housing content header",
@@ -366,6 +373,21 @@ pub enum Request {
     RequestHouses {
         owner_guid: u64,
     },
+}
+
+impl Request {
+    /// The decorate requests (127/1, 2, 3, 4 and 6). A refusal of one is answered with the
+    /// client's own 127/53 reason; other housing refusals stay a chat line.
+    pub fn answers_with_denial(&self) -> bool {
+        matches!(
+            self,
+            Self::PlaceFixtureRequest { .. }
+                | Self::Place { .. }
+                | Self::Pickup { .. }
+                | Self::PickupAll
+                | Self::SetEditMode { .. }
+        )
+    }
 }
 
 /// Decode a complete inner game packet: base opcode 127, inner opcode, then the recovered body.
@@ -773,16 +795,6 @@ impl ServiceOutcome {
             changed: false,
         }
     }
-
-    /// The typed refusal outcome for a request the caller must answer: one recovered `127/53`
-    /// body with a bounded reason. Nothing changed, so the caller does not re-persist.
-    pub fn denied(error: &ServiceError) -> Self {
-        Self {
-            zone_change: None,
-            replies: vec![error.denial_reply()],
-            changed: false,
-        }
-    }
 }
 
 /// The fields the recovered `127/5` body still does not identify.
@@ -982,6 +994,7 @@ pub struct HousingService {
     selections: BTreeMap<(u64, u32), u32>,
     house_definitions: BTreeMap<i32, HousingLotDefinition>,
     starter_property_id: Option<i32>,
+    starter_fixture_item_id: Option<i32>,
 }
 
 impl HousingService {
@@ -994,6 +1007,7 @@ impl HousingService {
             selections: BTreeMap::new(),
             house_definitions: BTreeMap::new(),
             starter_property_id: None,
+            starter_fixture_item_id: None,
         }
     }
 
@@ -1004,11 +1018,22 @@ impl HousingService {
         config.validate()?;
         content.validate()?;
         let mut service = Self::new(config);
-        service.starter_property_id = Some(content.starter_property_id);
-        for definition in content.lots {
-            service.register_house_definition(definition)?;
-        }
+        service.adopt_content(content)?;
         Ok(service)
+    }
+
+    /// The starter choices and lot rows of `content`. A starter fixture without a configuration
+    /// row fails here, at load, rather than on a player's first 127/23.
+    fn adopt_content(&mut self, content: HousingContent) -> Result<(), ServiceError> {
+        if let Some(item) = content.starter_fixture_item_id {
+            self.config.row_for_item_definition(item)?;
+        }
+        self.starter_property_id = Some(content.starter_property_id);
+        self.starter_fixture_item_id = content.starter_fixture_item_id;
+        for definition in content.lots {
+            self.register_house_definition(definition)?;
+        }
+        Ok(())
     }
 
     pub fn register_house_definition(
@@ -1114,6 +1139,7 @@ impl HousingService {
             selections: BTreeMap::new(),
             house_definitions: BTreeMap::new(),
             starter_property_id: None,
+            starter_fixture_item_id: None,
         })
     }
 
@@ -1125,12 +1151,7 @@ impl HousingService {
     ) -> Result<Self, StateError> {
         content.validate().map_err(StateError::Config)?;
         let mut service = Self::from_state(config, state, inventory)?;
-        service.starter_property_id = Some(content.starter_property_id);
-        for definition in content.lots {
-            service
-                .register_house_definition(definition)
-                .map_err(StateError::Config)?;
-        }
+        service.adopt_content(content).map_err(StateError::Config)?;
         Ok(service)
     }
 
@@ -1235,7 +1256,7 @@ impl HousingService {
         match request {
             Request::Enter { house_guid } => self.enter(actor_guid, house_guid, stock),
             Request::Leave => self.leave(actor_guid),
-            Request::RequestGrant => self.request_grant(actor_guid),
+            Request::RequestGrant => self.request_grant(actor_guid, stock),
             Request::RequestHouses { owner_guid } => self.house_list(actor_guid, owner_guid),
             Request::Place {
                 selection_id,
@@ -1274,26 +1295,6 @@ impl HousingService {
                 opcode: OP_SAVE,
                 missing: SAVE_MISSING,
             }),
-        }
-    }
-
-    /// Gateway-facing placement path: authorization and unresolved selector failures become the
-    /// recovered `127/53` string reply. Decode errors remain explicit for the outer router.
-    pub fn handle_placement_for_client(
-        &mut self,
-        actor_guid: u64,
-        inner: &[u8],
-        stock: &mut dyn FurnitureStock,
-    ) -> Result<ServiceOutcome, ServiceError> {
-        if !matches!(
-            decode_request(inner).map_err(ServiceError::MalformedRequest)?,
-            Request::Place { .. }
-        ) {
-            return self.handle(actor_guid, inner, stock);
-        }
-        match self.handle(actor_guid, inner, stock) {
-            Ok(outcome) => Ok(outcome),
-            Err(error) => Ok(ServiceOutcome::denied(&error)),
         }
     }
 
@@ -1407,13 +1408,24 @@ impl HousingService {
     }
 
     /// 127/23 (R): the first ask grants the starter lot (idempotent: a repeat grants nothing) and
-    /// answers with the owner's 127/39 list either way. 127/49 is not sent: no lot row carries
-    /// the house-type text it prints.
-    fn request_grant(&mut self, actor_guid: u64) -> Result<ServiceOutcome, ServiceError> {
-        let before = self.lots_of(actor_guid).len();
-        self.grant_starter_lot(actor_guid)?;
-        let mut outcome = self.house_list(actor_guid, actor_guid)?;
-        outcome.changed = self.lots_of(actor_guid).len() > before;
+    /// answers with the owner's 127/39 list either way. A new lot comes with one unit of the
+    /// content's starter fixture; the lot and the unit commit together or not at all. 127/49 is
+    /// not sent: no lot row carries the house-type text it prints.
+    fn request_grant(
+        &mut self,
+        actor_guid: u64,
+        stock: &mut dyn FurnitureStock,
+    ) -> Result<ServiceOutcome, ServiceError> {
+        let mut staged = self.clone();
+        staged.grant_starter_lot(actor_guid)?;
+        let mut outcome = staged.house_list(actor_guid, actor_guid)?;
+        outcome.changed = staged.lots_of(actor_guid).len() > self.lots_of(actor_guid).len();
+        if let Some(item) = self.starter_fixture_item_id.filter(|_| outcome.changed) {
+            // Last, like placement: the inventory refuses atomically and the staged lot is dropped.
+            // Tint 0 (R), as a Coin Shop purchase of the same item gets (`coin_shop.rs` `grant`).
+            stock.return_instance(item, 0)?;
+        }
+        *self = staged;
         Ok(outcome)
     }
 
@@ -1451,13 +1463,19 @@ impl HousingService {
             .collect()
     }
 
-    fn leave(&mut self, actor_guid: u64) -> Result<ServiceOutcome, ServiceError> {
-        let house_guid = self
-            .entered
-            .remove(&actor_guid)
-            .ok_or(ServiceError::NotInHouse { actor_guid })?;
+    /// Forget the actor's visit: the entered lot, edit mode and selections. Leave uses it, and so
+    /// does a reconnect, which ends the visit without a 127/10.
+    pub fn end_visit(&mut self, actor_guid: u64) -> Option<u64> {
+        let house_guid = self.entered.remove(&actor_guid)?;
         self.edit_mode.remove(&actor_guid);
         self.selections.retain(|(owner, _), _| *owner != actor_guid);
+        Some(house_guid)
+    }
+
+    fn leave(&mut self, actor_guid: u64) -> Result<ServiceOutcome, ServiceError> {
+        let house_guid = self
+            .end_visit(actor_guid)
+            .ok_or(ServiceError::NotInHouse { actor_guid })?;
         Ok(ServiceOutcome {
             zone_change: Some(HousingZoneChange::ReturnToPreviousZone {
                 actor_guid,
@@ -1809,8 +1827,8 @@ impl HousingService {
     }
 
     /// The client 127/43 reader exposes fixture-info, definition and dword lists, but no selector
-    /// field. This projects current inventory instances into that shape (R); selectors still must
-    /// be bound explicitly by `offer` and are only resolved in the 127/1 -> 127/42 path.
+    /// field. This projects current inventory instances into that shape (R); a selector is bound
+    /// by `offer` in the 127/1 -> 127/42 path.
     fn fixture_item_list(
         &self,
         stock: &dyn FurnitureStock,
@@ -1844,16 +1862,25 @@ impl HousingService {
         })
     }
 
-    /// Resolve the first 127/1 selector through the explicitly registered owned-item binding.
-    /// The selection namespace itself is not recovered, so missing or stale bindings fail closed.
+    /// Resolve the 127/1 selector. The decorate bar sends the inventory item guid (module note),
+    /// so an unbound id is bound to itself through `offer`, which accepts only an owned
+    /// single-unit item with a fixture row on the actor's own editable lot. A stale binding is
+    /// re-checked below; anything else fails closed. A new binding replaces the actor's others:
+    /// the client holds one cursor item, and a place/pickup loop must not grow the map (pickup
+    /// returns the unit under a fresh id).
     fn fixture_asset(
-        &self,
+        &mut self,
         actor_guid: u64,
         selection_id: u32,
         stock: &dyn FurnitureStock,
     ) -> Result<ServiceOutcome, ServiceError> {
         self.house_of(actor_guid)?;
         self.require_edit_mode(actor_guid)?;
+        if !self.selections.contains_key(&(actor_guid, selection_id)) {
+            self.offer(actor_guid, selection_id, selection_id, stock)?;
+            self.selections
+                .retain(|&(owner, id), _| owner != actor_guid || id == selection_id);
+        }
         let instance_id = self
             .selections
             .get(&(actor_guid, selection_id))

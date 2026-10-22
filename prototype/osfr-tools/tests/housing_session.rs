@@ -2,12 +2,17 @@
 //! (127/39), 127/19 enters it (scene change now, house packets after the scene loads), saves and
 //! reconnects keep the world pose, 127/10 returns to it, and refusals change nothing. The starter
 //! is the Wilds Condo (property 25), and a character who already holds the old starter (property 1)
-//! gains it once. Raw inner packets as the client sends them; no player data.
+//! gains it once. Slice 2 decorates it: edit mode, 127/1 -> 127/42, place, pick up, pick up all,
+//! a relog, and every refusal answered by 127/53. Raw inner packets as the client sends them; no
+//! player data.
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::Gameplay,
     gateway::Gateway,
-    housing_native::{InstanceList, PlayerHousingInstanceInfo, ZoneData},
+    housing_native::{
+        FixtureAsset, FixtureItemList, FixtureRemove, FixtureUpdate, HouseInfo, InstanceList,
+        PlacementDenied, PlayerHousingInstanceInfo, ZoneData,
+    },
     housing_service::HousingContent,
     zone_transition,
 };
@@ -66,11 +71,13 @@ impl Content {
         Self(dir)
     }
 
-    /// The bundled lots with another starter: a save made before the Wilds Condo became it.
+    /// The bundled lots with another starter and no starter fixture: a save made before the Wilds
+    /// Condo became the starter.
     fn with_starter(property_id: i32) -> Self {
         let content = Self::with_houses();
         let mut houses = HousingContent::bundled().unwrap();
         houses.starter_property_id = property_id;
+        houses.starter_fixture_item_id = None;
         fs::write(
             content.0.join("houses.json"),
             serde_json::to_vec(&houses).unwrap(),
@@ -119,8 +126,8 @@ fn subtype(reply: &[u8]) -> Option<u16> {
 }
 
 fn only_list(replies: &[Vec<u8>]) -> InstanceList {
-    assert_eq!(replies.len(), 1, "one 127/39 reply");
-    InstanceList::decode(&replies[0][2..]).expect("a well-formed 127/39")
+    assert_eq!(housing(replies), [39], "one 127/39 reply");
+    InstanceList::decode(reply(replies, 39)).expect("a well-formed 127/39")
 }
 
 fn granted(game: &mut Gameplay) -> PlayerHousingInstanceInfo {
@@ -176,6 +183,10 @@ fn an_owner_of_lot_one_gains_the_condo_once_and_keeps_lot_one() {
     assert_eq!(lots.len(), 2);
     assert!(lots.contains(&lot_one), "lot 1 is kept unchanged");
     assert!(lots.iter().any(|lot| lot.name_id == WILDS_CONDO));
+    assert!(
+        matches!(blocks(&game)[..], [(_, 1)]),
+        "the condo comes with one block"
+    );
 
     let saved = game.state();
     let again = game.handle_in_world(&GRANT, &character(), 3_000).unwrap();
@@ -335,6 +346,345 @@ fn content_without_houses_leaves_family_127_alone() {
     assert!(out.replies.is_empty() && !out.changed && out.scene_zoning.is_none());
     assert_eq!(game.state(), before);
     assert!(game.state().housing.is_none());
+}
+
+// ---- Decorate (slice 2): 127/6 edit mode, 127/1 -> 127/42, 127/2 place, 127/3 and 127/4. ----
+
+/// houses.json `starter_fixture_item_id`: the one unit a new starter lot comes with.
+const BLOCK: i32 = 7466;
+/// Inside the Wilds Condo's build box (houses.json property 25).
+const ON_THE_LOT: [f32; 4] = [100.0, 0.0, -30.0, 1.0];
+const PICKUP_ALL: [u8; 4] = [127, 0, 4, 0];
+
+fn edit(on: bool) -> Vec<u8> {
+    vec![127, 0, 6, 0, u8::from(on)]
+}
+
+/// 127/1 as the client sends it: binding `00c0b710` calls `00ac4200(id, -1, -1)`, flag 0.
+fn ask(item: u32) -> Vec<u8> {
+    let mut inner = vec![127, 0, 1, 0];
+    inner.extend(item.to_le_bytes());
+    inner.extend((-1i32).to_le_bytes());
+    inner.extend((-1i32).to_le_bytes());
+    inner.push(0);
+    inner
+}
+
+/// 127/2 (writer `00abc9a0`): the selection, the position and rotation groups, then the scale.
+fn place(item: u32) -> Vec<u8> {
+    let mut inner = vec![127, 0, 2, 0];
+    inner.extend(item.to_le_bytes());
+    for value in ON_THE_LOT.into_iter().chain([0.0; 4]).chain([1.0]) {
+        inner.extend(value.to_le_bytes());
+    }
+    inner
+}
+
+fn pickup(fixture_guid: u64) -> Vec<u8> {
+    let mut inner = vec![127, 0, 3, 0];
+    inner.extend(fixture_guid.to_le_bytes());
+    inner
+}
+
+/// The housing subtypes of a reply set, in order (chat and inventory replies are not family 127).
+fn housing(replies: &[Vec<u8>]) -> Vec<u16> {
+    replies.iter().filter_map(|r| subtype(r)).collect()
+}
+
+/// The body of the 127 reply with this subtype, after the family prefix.
+fn reply(replies: &[Vec<u8>], wanted: u16) -> &[u8] {
+    let found = replies.iter().find(|r| subtype(r) == Some(wanted));
+    &found.unwrap_or_else(|| panic!("127/{wanted} in {replies:?}"))[2..]
+}
+
+/// The (item id, count) of every block in the saved backpack.
+fn blocks(game: &Gameplay) -> Vec<(i32, u32)> {
+    let state = game.state().inventory;
+    let items = state
+        .items
+        .iter()
+        .filter(|item| item.definition_id == BLOCK);
+    items.map(|item| (item.id, item.count)).collect()
+}
+
+/// Item ids the client is told about: 38/2 adds (payload: definition, tint, id) and 38/4 removals.
+fn backpack(replies: &[Vec<u8>], op: u8) -> Vec<i32> {
+    let at = if op == 2 { 16 } else { 4 };
+    let updates = replies.iter().filter(|r| r.starts_with(&[38, 0, op, 0]));
+    updates
+        .map(|r| i32::from_le_bytes(r[at..at + 4].try_into().unwrap()))
+        .collect()
+}
+
+/// Granted, entered, loaded and in edit mode: the lot and the item guid from the 127/43 list.
+fn decorating(game: &mut Gameplay) -> (u64, u32) {
+    let lot = granted(game);
+    game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000)
+        .unwrap();
+    let loaded = game.initialize_world(&character(), 3_000).unwrap();
+    let list = FixtureItemList::decode(reply(&loaded.replies, 43)).unwrap();
+    assert_eq!(list.items.len(), 1, "the starter block is listed");
+    assert_eq!(list.items[0].item_definition_id, BLOCK);
+    let on = game
+        .handle_in_world(&edit(true), &character(), 4_000)
+        .unwrap();
+    assert_eq!(housing(&on.replies), [44]);
+    assert!(
+        HouseInfo::decode(reply(&on.replies, 44))
+            .unwrap()
+            .in_edit_mode
+    );
+    let item = u32::try_from(list.items[0].fixture_guid).unwrap();
+    (lot.instance_guid, item)
+}
+
+/// 127/1 then 127/2 for one owned item: the placed fixture's guid.
+fn place_block(game: &mut Gameplay, item: u32) -> u64 {
+    let asked = game
+        .handle_in_world(&ask(item), &character(), 5_000)
+        .unwrap();
+    assert_eq!(housing(&asked.replies), [42]);
+    let asset = FixtureAsset::decode(reply(&asked.replies, 42)).unwrap();
+    assert_eq!(asset.selection_id, item, "127/42 echoes the 127/43 id");
+    let placed = game
+        .handle_in_world(&place(item), &character(), 6_000)
+        .unwrap();
+    assert!(placed.changed, "a placement is saved");
+    assert_eq!(housing(&placed.replies), [40, 44]);
+    assert_eq!(
+        backpack(&placed.replies, 4),
+        [item as i32],
+        "the client drops the item"
+    );
+    FixtureUpdate::decode(reply(&placed.replies, 40))
+        .unwrap()
+        .instance
+        .guid
+}
+
+/// A decorate refusal: a chat line plus the client's 127/53 (its reason is returned), and nothing
+/// changes.
+fn refused(game: &mut Gameplay, what: &str, inner: &[u8]) -> String {
+    let before = serde_json::to_vec(&game.state()).unwrap();
+    let out = game.handle_in_world(inner, &character(), 9_000).unwrap();
+    assert!(!out.changed, "{what}");
+    assert_eq!(housing(&out.replies), [53], "{what}");
+    let denied = PlacementDenied::decode(reply(&out.replies, 53)).unwrap();
+    assert!(!denied.message.is_empty(), "{what}");
+    let after = serde_json::to_vec(&game.state()).unwrap();
+    assert_eq!(after, before, "{what}: state and inventory stay byte-equal");
+    denied.message
+}
+
+#[test]
+fn a_new_lot_comes_with_one_block_and_a_repeat_ask_adds_none() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let first = game.handle_in_world(&GRANT, &character(), 1_000).unwrap();
+    let [(item, 1)] = blocks(&game)[..] else {
+        panic!("one single block: {:?}", blocks(&game))
+    };
+    assert_eq!(
+        backpack(&first.replies, 2),
+        [item],
+        "the client is sent the item"
+    );
+    let again = game.handle_in_world(&GRANT, &character(), 2_000).unwrap();
+    assert!(backpack(&again.replies, 2).is_empty());
+    assert_eq!(blocks(&game), [(item, 1)]);
+}
+
+#[test]
+fn edit_mode_on_then_off_flips_the_house_flag() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    decorating(&mut game);
+    let off = game
+        .handle_in_world(&edit(false), &character(), 5_000)
+        .unwrap();
+    assert_eq!(housing(&off.replies), [44]);
+    assert!(
+        !HouseInfo::decode(reply(&off.replies, 44))
+            .unwrap()
+            .in_edit_mode
+    );
+    assert!(!off.changed);
+}
+
+#[test]
+fn the_listed_block_is_asked_for_placed_and_leaves_the_backpack() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let (lot, item) = decorating(&mut game);
+    let fixture = place_block(&mut game, item);
+    assert!(blocks(&game).is_empty(), "the item left the inventory");
+    let lots = game.state().housing.unwrap().lots;
+    let placed = &lots.iter().find(|l| l.lot_guid == lot).unwrap().fixtures;
+    assert_eq!(placed.len(), 1);
+    assert_eq!(
+        (placed[0].fixture_guid, placed[0].item_instance_id),
+        (fixture, item)
+    );
+}
+
+#[test]
+fn pickup_returns_the_block_and_it_places_again() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let (_, item) = decorating(&mut game);
+    let fixture = place_block(&mut game, item);
+    let picked = game
+        .handle_in_world(&pickup(fixture), &character(), 7_000)
+        .unwrap();
+    assert!(picked.changed);
+    assert_eq!(housing(&picked.replies), [41, 44]);
+    let removed = FixtureRemove::decode(reply(&picked.replies, 41)).unwrap();
+    assert_eq!(removed.fixture_guid, fixture);
+    // The unit comes back as one single item (a fresh id), not a stack of two.
+    let [(back, 1)] = blocks(&game)[..] else {
+        panic!("one single block back: {:?}", blocks(&game))
+    };
+    assert_eq!(
+        backpack(&picked.replies, 2),
+        [back],
+        "the client is sent the item"
+    );
+    assert!(game.state().housing.unwrap().lots[0].fixtures.is_empty());
+    place_block(&mut game, u32::try_from(back).unwrap());
+}
+
+#[test]
+fn a_new_127_1_retires_the_previous_selection() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let (_, first) = decorating(&mut game);
+    let fixture = place_block(&mut game, first);
+    game.handle_in_world(&pickup(fixture), &character(), 7_000)
+        .unwrap();
+    let [(back, 1)] = blocks(&game)[..] else {
+        panic!("one single block back: {:?}", blocks(&game))
+    };
+    let back = u32::try_from(back).unwrap();
+    assert_ne!(back, first, "pickup returns the unit under a fresh id");
+    place_block(&mut game, back);
+    // Only the latest 127/1 stays bound, so a place/pickup loop cannot grow the bindings.
+    let reason = refused(&mut game, "127/2 with the retired id", &place(first));
+    assert_eq!(reason, "That fixture selection is no longer available.");
+}
+
+#[test]
+fn pickup_all_returns_every_placed_block() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let (_, item) = decorating(&mut game);
+    let fixture = place_block(&mut game, item);
+    let all = game
+        .handle_in_world(&PICKUP_ALL, &character(), 7_000)
+        .unwrap();
+    assert!(all.changed);
+    assert_eq!(housing(&all.replies), [41, 44]);
+    let removed = FixtureRemove::decode(reply(&all.replies, 41)).unwrap();
+    assert_eq!(removed.fixture_guid, fixture);
+    let [(back, 1)] = blocks(&game)[..] else {
+        panic!("one single block back: {:?}", blocks(&game))
+    };
+    assert_eq!(backpack(&all.replies, 2), [back]);
+    assert!(game.state().housing.unwrap().lots[0].fixtures.is_empty());
+}
+
+#[test]
+fn a_placed_block_survives_save_reload_and_reentry() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let (lot, item) = decorating(&mut game);
+    let fixture = place_block(&mut game, item);
+    let mut relogged = Gameplay::load(&content.0, Some(game.state())).unwrap();
+    relogged
+        .handle_in_world(&enter(lot), &character(), 8_000)
+        .unwrap();
+    let loaded = relogged.initialize_world(&character(), 9_000).unwrap();
+    assert_eq!(housing(&loaded.replies), [45, 28, 44, 43, 40]);
+    let update = FixtureUpdate::decode(reply(&loaded.replies, 40)).unwrap();
+    assert_eq!(
+        (update.instance.guid, update.instance.house_guid),
+        (fixture, lot)
+    );
+    assert_eq!(update.info.item_definition_id, BLOCK);
+    let list = FixtureItemList::decode(reply(&loaded.replies, 43)).unwrap();
+    assert!(
+        list.items.is_empty(),
+        "the placed block is not offered again"
+    );
+    assert!(blocks(&relogged).is_empty());
+}
+
+#[test]
+fn decorate_refusals_answer_127_53_and_change_nothing() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let lot = granted(&mut game);
+    let [(item, 1)] = blocks(&game)[..] else {
+        panic!("one single block")
+    };
+    let item = u32::try_from(item).unwrap();
+    for (what, inner) in [
+        ("127/1 not in a house", ask(item)),
+        ("127/2 not in a house", place(item)),
+        ("127/3 not in a house", pickup(1)),
+        ("127/4 not in a house", PICKUP_ALL.to_vec()),
+        ("127/6 not in a house", edit(true)),
+    ] {
+        refused(&mut game, what, &inner);
+    }
+
+    game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000)
+        .unwrap();
+    game.initialize_world(&character(), 3_000).unwrap();
+    for (what, inner) in [
+        ("127/1 not in edit mode", ask(item)),
+        ("127/2 not in edit mode", place(item)),
+        ("127/3 not in edit mode", pickup(1)),
+        ("127/4 not in edit mode", PICKUP_ALL.to_vec()),
+    ] {
+        refused(&mut game, what, &inner);
+    }
+
+    game.handle_in_world(&edit(true), &character(), 4_000)
+        .unwrap();
+    for (what, inner) in [
+        ("an unknown selection", ask(item + 1_000)),
+        ("a zero selection", ask(0)),
+        ("127/2 before its 127/1", place(item)),
+        ("an unknown fixture", pickup(1)),
+    ] {
+        refused(&mut game, what, &inner);
+    }
+
+    // A save whose block is a stack of two: the stack cannot back one fixture.
+    let mut stacked = game.state();
+    let block = stacked
+        .inventory
+        .items
+        .iter_mut()
+        .find(|i| i.definition_id == BLOCK);
+    block.unwrap().count = 2;
+    let mut game = Gameplay::load(&content.0, Some(stacked)).unwrap();
+    game.handle_in_world(&enter(lot.instance_guid), &character(), 5_000)
+        .unwrap();
+    game.handle_in_world(&edit(true), &character(), 6_000)
+        .unwrap();
+    refused(&mut game, "a stacked item", &ask(item));
+    refused(&mut game, "127/2 after a refused 127/1", &place(item));
+}
+
+#[test]
+fn a_reconnect_ends_the_edit_session() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let (_, item) = decorating(&mut game);
+    assert_eq!(game.abandon_house_for_reconnect(), Some(character()));
+    refused(&mut game, "127/1 after a reconnect", &ask(item));
+    refused(&mut game, "127/6 after a reconnect", &edit(true));
 }
 
 // ---- Gateway route: login, tunnel, gameplay and the scene change, as the client sees it. ----
