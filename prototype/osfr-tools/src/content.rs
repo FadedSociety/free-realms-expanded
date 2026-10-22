@@ -300,6 +300,12 @@ pub struct Quest {
     /// `gameplay/live_events.rs`). A closed event stays enabled.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
     pub live_event: bool,
+    /// T465: quests this one is mutually exclusive with. While any of them is
+    /// offered, active or completed, this one is neither offered nor accepted
+    /// (`QuestEngine::requirement_denial`); an abandon reopens it (R). The split
+    /// loader requires at most 16 distinct other quests, each listing this one back.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub excludes_quest_ids: Vec<u32>,
     pub objectives: Vec<ContentGoal>,
     pub rewards: Vec<RewardGrant>,
     pub source: Vec<SourceTag>,

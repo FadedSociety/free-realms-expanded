@@ -520,7 +520,8 @@ NON_ITEM_CONTEXT = re.compile(r"(enem|boss|spawner|guide|npc)", re.I)
 GLOBAL_TEXT_FIELDS = {"title_string_id", "description_string_id", "intro_text_string_id",
                       "end_text_string_id", "dialogue_string_id", "greeting_string_id",
                       "text_string_id"}
-QUEST_REF_KEYS = {"prerequisite_quest_ids", "quest_ids", "quest_ids_given", "quest_id"}
+QUEST_REF_KEYS = {"prerequisite_quest_ids", "excludes_quest_ids", "quest_ids", "quest_ids_given",
+                  "quest_id"}
 NPC_REF_KEYS = {"giver_npc_id"}
 GUID_KEYS = {"guid", "spawn_guid"}
 LIST_ID_KEYS = ("id", "npc_id", "key")

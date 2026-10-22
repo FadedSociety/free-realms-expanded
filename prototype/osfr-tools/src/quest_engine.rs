@@ -23,6 +23,8 @@ use std::{
 const MAX_OBJECTIVES: usize = 64;
 const MAX_QUESTS: usize = 1024;
 const MAX_COUNT: u32 = 1_000_000;
+/// Local bound on one quest's `excludes_quest_ids` (R; no recovered retail table).
+const MAX_EXCLUSIONS: usize = 16;
 /// Local bound on a registered UI event name (R; the native limit is not recovered).
 const MAX_UI_EVENT_BYTES: usize = 64;
 const MAX_SPLIT_CONTENT_BYTES: u64 = 8 * 1024 * 1024;
@@ -784,7 +786,7 @@ pub struct QuestEngine {
     state: QuestState,
     options: EngineOptions,
     /// Quest offered by the developer `realm offer` command; its accept skips
-    /// the prerequisite, level, job and membership checks. It belongs to the
+    /// the exclusion, prerequisite, level, job and membership checks. It belongs to the
     /// current `pending_offer` only: a successful accept, a decline or a later
     /// ordinary offer clears it, so it can never bypass a later offer's gates.
     dev_offer: Option<u32>,
@@ -793,6 +795,8 @@ pub struct QuestEngine {
     /// (`gameplay/live_events.rs`). A closed one is neither offered nor
     /// accepted, but it is not `disabled`: saves, progress and turn-ins keep it.
     live_events: BTreeMap<u32, bool>,
+    /// T465: split content `excludes_quest_ids`, validated symmetric at load.
+    exclusions: BTreeMap<u32, Vec<u32>>,
     location_quests: BTreeMap<u32, BTreeSet<u32>>,
     poi_locations: BTreeMap<u32, (u32, [f32; 3], f32)>,
 }
@@ -938,6 +942,24 @@ impl QuestEngine {
         if quest_ids.len() != quests.len() {
             return Err(invalid("duplicate split quest id"));
         }
+        // T465: explicit both ways; a missing or one-sided id has no listing back.
+        let exclusions: BTreeMap<u32, Vec<u32>> = quests
+            .iter()
+            .filter(|quest| !quest.excludes_quest_ids.is_empty())
+            .map(|quest| (quest.id, quest.excludes_quest_ids.clone()))
+            .collect();
+        for (id, excluded) in &exclusions {
+            if excluded.len() > MAX_EXCLUSIONS
+                || excluded.iter().collect::<BTreeSet<_>>().len() != excluded.len()
+                || excluded.iter().any(|other| {
+                    other == id || !exclusions.get(other).is_some_and(|back| back.contains(id))
+                })
+            {
+                return Err(invalid(
+                    "quest exclusions must name up to 16 distinct other quests that list it back",
+                ));
+            }
+        }
         let jobs: crate::content::VersionedFile<crate::content::Job> =
             read_split_file(&directory.join("jobs.json"), &mut total_bytes)?;
         if jobs.schema_version != crate::content::SCHEMA_VERSION {
@@ -1065,6 +1087,7 @@ impl QuestEngine {
             .filter(|quest| quest.live_event)
             .map(|quest| (quest.id, false))
             .collect();
+        engine.exclusions = exclusions;
         engine.index_location_quests();
         if let Some(id) = engine
             .state
@@ -1247,6 +1270,7 @@ impl QuestEngine {
             dev_offer: None,
             disabled,
             live_events: BTreeMap::new(),
+            exclusions: BTreeMap::new(),
             location_quests: BTreeMap::new(),
             poi_locations: BTreeMap::new(),
             state,
@@ -2242,7 +2266,23 @@ impl QuestEngine {
         }
     }
 
+    /// The gates `offer_denial` and `accept` share, after the quest's own status.
     fn requirement_denial(&self, definition: &QuestDefinition) -> Option<QuestDenial> {
+        // T465: an excluded quest that is offered, active or completed closes this
+        // one, checked before the prerequisite (Lxzxrus b84b467: two exclusive
+        // branches behind one prerequisite were both offered). Abandoned reopens (R).
+        if self.exclusions.get(&definition.id).is_some_and(|ids| {
+            ids.iter().any(|id| {
+                self.state.quests.get(id).is_some_and(|progress| {
+                    matches!(
+                        progress.status,
+                        QuestStatus::Offered | QuestStatus::Active | QuestStatus::Completed
+                    )
+                })
+            })
+        }) {
+            return Some(QuestDenial::Unavailable);
+        }
         if definition.prerequisite_quest_ids.iter().any(|id| {
             self.state
                 .quests

@@ -22,7 +22,8 @@
 //! The save a quest needs is one a player reaches by playing: its whole
 //! prerequisite chain completed and its job active at its `min_level` on the
 //! local 100-XP rank curve. Loading a save costs seconds (`NpcVisibility::load`
-//! dominates), so quests share one per (job, chain size): a quest inside
+//! dominates), so quests share one per (job, chain size), except that a
+//! mutually exclusive quest (T465) gets its own: a quest inside
 //! another's chain has a strictly smaller chain, so no shared save completes a
 //! quest it must offer. A disabled prerequisite can only be the historical
 //! completed entry `repair_counters` keeps; [`HISTORICAL_PREREQUISITE`] names the
@@ -257,13 +258,16 @@ impl Shipped {
     /// One save per (job, chain size) of `quests`; in each, walk to every giver
     /// of those quests and take every offer its menu makes. A live event (T418,
     /// the scavenger hunt) is offered only while an admin has it open, so every
-    /// walk runs with all of them open.
+    /// walk runs with all of them open. Taking one mutually exclusive quest
+    /// (T465) closes the others, so each of them gets a save of its own.
     fn walk_layers(&self, fixture: &Fixture, quests: &[u32]) -> Pass {
         let base = fixture.game(None).state();
         let live = fixture.open_live_events(self.engine.live_events().keys().copied());
-        let mut layers = BTreeMap::<(Option<i32>, usize), Vec<u32>>::new();
+        let mut layers = BTreeMap::<(Option<i32>, usize, Option<u32>), Vec<u32>>::new();
         for &quest in quests {
-            let key = (self.records[&quest].job, self.chain(quest).len());
+            let record = &self.records[&quest];
+            let exclusive = (!record.excludes_quest_ids.is_empty()).then_some(quest);
+            let key = (record.job, self.chain(quest).len(), exclusive);
             layers.entry(key).or_default().push(quest);
         }
         let mut pass = Pass::default();

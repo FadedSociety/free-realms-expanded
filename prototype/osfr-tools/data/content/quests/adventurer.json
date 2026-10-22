@@ -1567,6 +1567,10 @@
       "description_string_id": 104099,
       "giver_npc_id": 9000000402,
       "prerequisite_quest_ids": [],
+      "excludes_quest_ids": [
+        3000021,
+        3000022
+      ],
       "objectives": [
         {
           "kind": "talk_to_npc",
@@ -1644,6 +1648,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) W110: enabled: Merigold and Raina have legacy_data placements; one talk, five coins. Guide C1 gives no numerical level/job gate; none invented."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "T465 exclusion 3000020<->3000021: Lxzxrus-Free-Realms-Server @37ef175 and Sanctuary-main-20261019 @10f129e src/Resources/Quests.json, ids only: 2563 ExcludesQuestIds [2564] and 2564 [2563]; 2563 is 3000021 (GiverDialogueId 94246, ObjectiveDescriptionId 94248), 2564 is 3000020 (104097, 104099)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T465 exclusion 3000020<->3000022, transitive: neither source pairs Highroad with Stillwater."
         }
       ],
       "enabled": true
@@ -1655,6 +1667,10 @@
       "description_string_id": 94248,
       "giver_npc_id": 9000000189,
       "prerequisite_quest_ids": [],
+      "excludes_quest_ids": [
+        3000020,
+        3000022
+      ],
       "objectives": [
         {
           "kind": "talk_to_npc",
@@ -1732,6 +1748,14 @@
         {
           "kind": "client",
           "evidence": "(client) title string ID 4206471822 recovered from the guide title ID cell; Adventurer C2/C3 explicitly reuse C1 ID 4206471822."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "T465 exclusion 3000020<->3000021: Lxzxrus-Free-Realms-Server @37ef175 and Sanctuary-main-20261019 @10f129e src/Resources/Quests.json, ids only: 2563 ExcludesQuestIds [2564] and 2564 [2563]; 2563 is 3000021 (GiverDialogueId 94246, ObjectiveDescriptionId 94248), 2564 is 3000020 (104097, 104099)."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "T465 exclusion 3000021<->3000022: lab/references/freerealms-wiki/wikitext/8990-23969-57192e22bb75.wiki line 1, 'When you complete one, the other quest becomes unavailable for that player'; the page names the Cobblestone version (Samantha to Ricky Danger) and the Stillwater version (Valerie to Francis Panic)."
         }
       ]
     },
@@ -1740,6 +1764,10 @@
       "title_string_id": 94247,
       "giver_npc_id": 9000000227,
       "prerequisite_quest_ids": [],
+      "excludes_quest_ids": [
+        3000020,
+        3000021
+      ],
       "objectives": [
         {
           "kind": "talk_to_npc",
@@ -1817,6 +1845,14 @@
         {
           "kind": "client",
           "evidence": "description 116637 'Introduce yourself to Francis Panic in Stillwater Crossing.' = guide hash 3437900159 (Adventurer C3); the shared title 94247's block belongs to the Cobblestone version, so intro/end text stay empty"
+        },
+        {
+          "kind": "wiki",
+          "evidence": "T465 exclusion 3000021<->3000022: lab/references/freerealms-wiki/wikitext/8990-23969-57192e22bb75.wiki line 1, 'When you complete one, the other quest becomes unavailable for that player'; the page names the Cobblestone version (Samantha to Ricky Danger) and the Stillwater version (Valerie to Francis Panic)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T465 exclusion 3000020<->3000022, transitive: neither source pairs Highroad with Stillwater."
         }
       ],
       "description_string_id": 116637

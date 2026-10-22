@@ -1,6 +1,6 @@
 //! Raw split quest records: only the fields `QuestEngine::from_split_content`
-//! reads but does not expose (the `enabled` flag, prerequisite ids, the job and
-//! level gate, objective target fields and the authored title id). The loader
+//! reads but does not expose (the `enabled` flag, prerequisite and exclusion ids,
+//! the job and level gate, objective target fields and the authored title id). The loader
 //! stays the authority for rewards, bounds and the enabled/offer rules.
 //!
 //! Test-only. Include it next to `npc_quest_chain` (for `read_json`):
@@ -24,6 +24,8 @@ pub struct RawQuest {
     /// Authored title id before `definition_from_content` casts it to `i32`.
     pub title_string_id: u64,
     pub prerequisite_quest_ids: Vec<u32>,
+    /// T465 mutually exclusive quests; the loader already refused bad ids.
+    pub excludes_quest_ids: Vec<u32>,
     /// The `job` profile gate; `definition_from_content` applies `min_level` to
     /// that job's rank, or to the player level when there is no job.
     pub job: Option<i32>,
@@ -87,6 +89,12 @@ pub fn read_quests(root: &Path) -> Vec<RawQuest> {
                 giver_npc_id,
                 title_string_id: record["title_string_id"].as_u64().unwrap_or(0),
                 prerequisite_quest_ids,
+                excludes_quest_ids: record["excludes_quest_ids"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter_map(as_u32)
+                    .collect(),
                 job: record["job"]
                     .as_i64()
                     .and_then(|job| i32::try_from(job).ok()),
