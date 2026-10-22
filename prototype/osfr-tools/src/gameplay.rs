@@ -4161,61 +4161,6 @@ impl Gameplay {
         Ok(true)
     }
 
-    /// Developer-only `realm mine` / `realm harvest`: starts the reconstructed
-    /// Mining18 or Harvesting111 game for the accepted job. The caller has
-    /// already checked dev tools and role, and the movie gate owns any live
-    /// movie. An active encounter is the one busy state this path refuses.
-    /// Reward authority stays server-side in `apply_type8`.
-    fn developer_gather(
-        &mut self,
-        gather: Gather,
-        now_ms: u64,
-        out: &mut Outcome,
-    ) -> io::Result<()> {
-        if self.type8(gather).is_none() {
-            out.replies.push(chat::system(&format!(
-                "{} content is not loaded in this campaign.",
-                gather.name()
-            )));
-            return Ok(());
-        }
-        if self.encounter.as_ref().is_some_and(EncounterEngine::active) {
-            out.replies.push(chat::system(&format!(
-                "Finish or exit the active activity before starting the {} test.",
-                gather.noun()
-            )));
-            return Ok(());
-        }
-        let (active, unlocked) = {
-            let profiles = self.profiles.as_ref().unwrap();
-            (
-                profiles.active(),
-                profiles.state().unlocked.contains(&gather.job()),
-            )
-        };
-        if !unlocked {
-            out.replies.push(chat::system(&format!(
-                "The {} job is not unlocked in this save.",
-                gather.word()
-            )));
-            return Ok(());
-        }
-        if active != gather.job() {
-            out.replies.push(chat::system(&format!(
-                "Switch to the {} job before starting the {} test.",
-                gather.word(),
-                gather.noun()
-            )));
-            return Ok(());
-        }
-        self.begin_gather(gather, now_ms, out)?;
-        out.replies.push(chat::system(&format!(
-            "{} test started; type realm exit to cancel.",
-            gather.name()
-        )));
-        Ok(())
-    }
-
     /// States that must not be relocated out of. Crafting movies are refused
     /// by their own earlier gates; this covers live combat and knockout.
     fn relocation_block(&self) -> Option<String> {
@@ -4247,18 +4192,6 @@ impl Gameplay {
                 .updates(before, &self.opening.as_ref().unwrap().journal_entries())?,
         );
         Ok(())
-    }
-
-    /// Begins one gather game on the caller's staged clone. The engine starts
-    /// first; only then is the shared clock stamped and the outcome applied. A
-    /// failed begin therefore leaves no clock or engine state behind.
-    fn begin_gather(&mut self, gather: Gather, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
-        let Some(engine) = self.type8_mut(gather) else {
-            return Err(invalid("gathering content is not loaded"));
-        };
-        let result = engine.begin(gather.job())?;
-        self.type8_tick_ms = Some(now_ms);
-        self.apply_type8(gather, result, out)
     }
 
     fn handle_opening_inner(
