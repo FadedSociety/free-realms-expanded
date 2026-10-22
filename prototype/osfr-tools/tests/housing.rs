@@ -840,6 +840,7 @@ fn staged_inventory_stays_consistent_with_the_fixture_ledger() {
                 item_instance_id: 1,
                 fixture_definition_id: CHAIR,
                 transform: transform(400.0, 4.0, 410.0),
+                placed_by: 0,
             },
         })
         .expect("the server copies the client transform before committing");
@@ -909,13 +910,15 @@ fn typed_fixture_view_matches_the_recovered_serialization_order() {
         .map(String::as_str)
         .collect();
     keys.sort_unstable();
-    assert_eq!(keys.len(), 5);
+    // L045 adds the server-only `placed_by` (not part of the wire record).
+    assert_eq!(keys.len(), 6);
     for expected in [
         "fixture_guid",
         "house_guid",
         "item_instance_id",
         "fixture_definition_id",
         "transform",
+        "placed_by",
     ] {
         assert!(
             keys.contains(&expected),
@@ -1148,6 +1151,7 @@ fn save_fixture_placement_stamps_the_resolved_lot_identity() {
                 item_instance_id: 1,
                 fixture_definition_id: CHAIR,
                 transform: transform(400.0, 4.0, 410.0),
+                placed_by: OTHER,
             },
         })
         .expect("the owner may save a placement into the lot the command names");
@@ -1156,6 +1160,8 @@ fn save_fixture_placement_stamps_the_resolved_lot_identity() {
     let stored = housing.saved_fixtures(HOUSE).unwrap();
     assert_eq!(stored.fixtures.len(), 1);
     assert_eq!(stored.fixtures[0].house_guid, HOUSE);
+    // L045: the placer is the command's authorized actor, never the caller-supplied guid.
+    assert_eq!(stored.fixtures[0].placed_by, OWNER);
     housing
         .save_state(&fixture.save_path())
         .expect("a stamped placement saves and reloads");
@@ -1179,6 +1185,7 @@ fn save_fixture_placement_rejects_an_empty_instance() {
                     item_instance_id,
                     fixture_definition_id,
                     transform: transform(400.0, 4.0, 410.0),
+                    placed_by: 0,
                 },
             }),
             Err(HousingError::InvalidPlacement),

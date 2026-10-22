@@ -18,7 +18,8 @@ use housing_service::{
     HousingLotDefinition, HousingReply, HousingScene, HousingService, HousingServiceState,
     HousingZoneChange, OwnedInstance, REPLY_FIXTURE_REMOVE, REPLY_FIXTURE_UPDATE, REPLY_HOUSE_INFO,
     REPLY_INSTANCE_DATA, REPLY_PLACE_REQUEST, REPLY_POSITION, REPLY_ZONE_DATA, Request,
-    RequestError, ServiceError, StateError, StockOperation, WireTransform, decode_request,
+    RequestError, SERVICE_SCHEMA_VERSION, ServiceError, StateError, StockOperation, WireTransform,
+    decode_request,
 };
 use inventory::{Inventory, InventoryItem, InventoryState};
 use serde_json::json;
@@ -1142,7 +1143,7 @@ fn the_reconstructed_default_catalog_has_source_tagged_fixture_rows() {
     let mut empty_config = FixtureConfig::capture_defaults();
     empty_config.rows.clear();
     let empty_state = HousingServiceState {
-        schema_version: 1,
+        schema_version: SERVICE_SCHEMA_VERSION,
         lots: Vec::new(),
     };
     let empty_inventory = InventoryState {
@@ -1178,7 +1179,7 @@ fn the_housing_snapshot_seam_is_path_free() {
     place(&mut service, &mut stock);
     let state = service.state();
     let encoded = serde_json::to_value(&state).unwrap();
-    assert_eq!(encoded["schema_version"], 1);
+    assert_eq!(encoded["schema_version"], SERVICE_SCHEMA_VERSION);
     assert!(encoded.get("path").is_none());
     let round_trip: HousingServiceState = serde_json::from_value(encoded).unwrap();
     assert_eq!(round_trip, state);
@@ -1604,4 +1605,118 @@ fn housing_service_reload_keeps_lots_and_inventory_conservation() {
     )
     .unwrap();
     assert_eq!(restored.state(), state);
+}
+
+fn no_items() -> InventoryState {
+    InventoryState {
+        coins: 0,
+        items: Vec::new(),
+        equipment: Vec::new(),
+        next_instance_id: None,
+    }
+}
+
+/// L045 placed-by: each fixture records the character whose placement created it, a co-builder's
+/// pick-up returns the unit to the picker (R), and the record survives a save and reload.
+#[test]
+fn placed_by_records_each_placer_and_survives_a_reload() {
+    const GUEST_INSTANCE: u32 = INSTANCE + 1;
+    let mut service = service_with_lot();
+    service
+        .set_permission(OWNER, HOUSE, GUEST, PERMISSION_CAN_EDIT)
+        .unwrap();
+    let mut owner_stock = TestStock::new(vec![owned(INSTANCE, BLOCK_ITEM, 1)]);
+    enter(&mut service, &mut owner_stock);
+    place(&mut service, &mut owner_stock);
+    let owner_fixture = placed_guid(&service);
+
+    let mut guest_stock = TestStock::new(vec![owned(GUEST_INSTANCE, BLOCK_ITEM, 1)]);
+    service
+        .handle(GUEST, &enter_frame(HOUSE), &mut guest_stock)
+        .unwrap();
+    service
+        .handle(GUEST, &edit_frame(true), &mut guest_stock)
+        .unwrap();
+    service
+        .offer(GUEST, SELECTION, GUEST_INSTANCE, &guest_stock)
+        .unwrap();
+    service
+        .handle(
+            GUEST,
+            &place_frame(SELECTION, &block_transform(position(), ZERO_ROTATION, 1.0)),
+            &mut guest_stock,
+        )
+        .unwrap();
+    let placers = |service: &HousingService| -> Vec<(u32, u64)> {
+        let mut rows: Vec<_> = service
+            .lot(HOUSE)
+            .unwrap()
+            .fixtures
+            .iter()
+            .map(|fixture| (fixture.item_instance_id, fixture.placed_by))
+            .collect();
+        rows.sort();
+        rows
+    };
+    assert_eq!(
+        placers(&service),
+        vec![(INSTANCE, OWNER), (GUEST_INSTANCE, GUEST)],
+        "the server records the acting character, not the lot owner"
+    );
+
+    // (R) Pick-up returns the unit to the picker: the co-builder's backpack, never the owner's.
+    service
+        .handle(GUEST, &pickup_frame(owner_fixture), &mut guest_stock)
+        .unwrap();
+    assert!(owner_stock.instances.is_empty());
+    assert_eq!(guest_stock.instances.len(), 1);
+    assert_eq!(guest_stock.instances[0].definition_id, BLOCK_ITEM);
+    assert_eq!(placers(&service), vec![(GUEST_INSTANCE, GUEST)]);
+
+    let state = service.state();
+    let saved = serde_json::to_string(&state).unwrap();
+    assert!(saved.contains(&format!("\"placed_by\":{GUEST}")), "{saved}");
+    let decoded: HousingServiceState = serde_json::from_str(&saved).unwrap();
+    let restored =
+        HousingService::from_state(FixtureConfig::capture_defaults(), &decoded, &no_items())
+            .unwrap();
+    assert_eq!(restored.state(), state);
+    assert_eq!(placers(&restored), vec![(GUEST_INSTANCE, GUEST)]);
+}
+
+/// L045 migration: a schema-1 document (no `placed_by`) loads, attributes every fixture to the
+/// lot owner and is written back as the current schema. Unknown versions are refused whole.
+#[test]
+fn a_schema_one_document_migrates_placed_by_to_the_owner() {
+    let mut service = service_with_lot();
+    let mut stock = TestStock::new(vec![owned(INSTANCE, BLOCK_ITEM, 1)]);
+    enter(&mut service, &mut stock);
+    place(&mut service, &mut stock);
+    let current = service.state();
+    assert_eq!(current.schema_version, 2);
+
+    let mut old = serde_json::to_value(&current).unwrap();
+    old["schema_version"] = json!(1);
+    for fixture in old["lots"][0]["fixtures"].as_array_mut().unwrap() {
+        let fixture = fixture.as_object_mut().unwrap();
+        assert!(fixture.remove("placed_by").is_some());
+    }
+    let old: HousingServiceState = serde_json::from_value(old).unwrap();
+    let unrecorded = old.lots[0].fixtures[0].placed_by;
+    assert_eq!(unrecorded, 0, "schema 1 has no placer");
+    let migrated =
+        HousingService::from_state(FixtureConfig::capture_defaults(), &old, &no_items()).unwrap();
+    // Written back as schema 2, with the owner as the placer.
+    assert_eq!(migrated.state(), current);
+    assert_eq!(migrated.lot(HOUSE).unwrap().fixtures[0].placed_by, OWNER);
+
+    for found in [0, SERVICE_SCHEMA_VERSION + 1] {
+        let mut unknown = current.clone();
+        unknown.schema_version = found;
+        assert_eq!(
+            HousingService::from_state(FixtureConfig::capture_defaults(), &unknown, &no_items())
+                .unwrap_err(),
+            StateError::SchemaVersion { found }
+        );
+    }
 }

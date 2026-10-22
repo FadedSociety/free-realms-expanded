@@ -88,7 +88,9 @@ pub const REPLY_POSITION: u16 = 51;
 pub const REPLY_PLACEMENT_DENIED: u16 = 53;
 
 /// Schema version of the persisted service state. Bump it when `HousingServiceState` changes.
-pub const SERVICE_SCHEMA_VERSION: u32 = 1;
+/// 2 (L045) adds `SavedFixture::placed_by`; a schema-1 document still loads, its fixtures
+/// attributed to the lot owner on restore, and is written back as 2.
+pub const SERVICE_SCHEMA_VERSION: u32 = 2;
 /// RECONSTRUCTED bound on the lots one character snapshot may carry.
 pub const MAX_STATE_LOTS: usize = 64;
 /// RECONSTRUCTED bound on the placed fixtures one character snapshot may carry.
@@ -1066,7 +1068,7 @@ impl HousingService {
         inventory: &InventoryState,
     ) -> Result<Self, StateError> {
         config.validate().map_err(StateError::Config)?;
-        if state.schema_version != SERVICE_SCHEMA_VERSION {
+        if !(1..=SERVICE_SCHEMA_VERSION).contains(&state.schema_version) {
             return Err(StateError::SchemaVersion {
                 found: state.schema_version,
             });

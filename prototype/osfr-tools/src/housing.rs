@@ -125,9 +125,24 @@ pub struct SavedFixture {
     pub item_instance_id: u32,
     pub fixture_definition_id: i32,
     pub transform: FixtureTransform,
+    /// L045 (R): the character whose placement created this fixture. Set by the server from the
+    /// acting guid (`place_fixture`, `save_fixture_placement`), never from a packet, and not on the
+    /// wire (the client fixture reader 0x00ab6f40 has no such field). A move keeps it. `0` means
+    /// "not recorded" (documents from housing service schema 1); restore attributes it to the
+    /// lot owner, the only character who could place before co-builders (`attributed_to`).
+    #[serde(default)]
+    pub placed_by: u64,
 }
 
 impl SavedFixture {
+    /// The schema-1 migration rule: an unrecorded placer is the lot owner.
+    fn attributed_to(mut self, owner_guid: u64) -> Self {
+        if self.placed_by == 0 {
+            self.placed_by = owner_guid;
+        }
+        self
+    }
+
     pub fn house_guid(&self) -> u64 {
         self.house_guid
     }
@@ -153,6 +168,7 @@ impl From<FixturePlacement> for SavedFixture {
             item_instance_id: placement.item_instance_id,
             fixture_definition_id: placement.fixture_definition_id,
             transform: placement.transform,
+            placed_by: 0,
         }
     }
 }
@@ -757,7 +773,12 @@ impl Housing {
         lot.fixtures = snapshot
             .fixtures
             .into_iter()
-            .map(|fixture| (fixture.fixture_guid, fixture))
+            .map(|fixture| {
+                (
+                    fixture.fixture_guid,
+                    fixture.attributed_to(snapshot.owner_guid),
+                )
+            })
             .collect();
         lot.permissions = snapshot
             .permissions
@@ -930,7 +951,10 @@ impl Housing {
             definition_id: fixture_definition_id,
             tint_id: placed.transform.tint_id,
         });
-        let fixture = SavedFixture::from(placed.clone());
+        let fixture = SavedFixture {
+            placed_by: owner_guid,
+            ..SavedFixture::from(placed.clone())
+        };
         let lot = self
             .lots
             .get_mut(&house_guid)
@@ -1117,6 +1141,8 @@ impl Housing {
         // The lot was resolved from the command's house guid, so the stored fixture carries that
         // identity; a client-supplied house guid must not be able to persist an orphan fixture.
         placed.house_guid = command.house_guid;
+        // Likewise the placer is the authorized actor, never a caller-supplied guid.
+        placed.placed_by = command.owner_guid;
         let lot = self
             .lots
             .get_mut(&command.house_guid)
@@ -1283,7 +1309,10 @@ impl Housing {
                     .to_placement()
                     .map_err(|_| HousingError::CorruptSnapshot)?;
                 if fixtures
-                    .insert(fixture.fixture_guid, fixture.clone())
+                    .insert(
+                        fixture.fixture_guid,
+                        fixture.clone().attributed_to(snapshot.owner_guid),
+                    )
                     .is_some()
                 {
                     return Err(HousingError::CorruptSnapshot);

@@ -184,6 +184,47 @@ fn saves_and_reconnects_inside_a_house_keep_the_world_pose() {
     assert_eq!(only_list(&listed.replies).records, vec![lot]);
 }
 
+/// L045: a character save from before `placed_by` (housing schema 1, fixture with no placer)
+/// loads through the real `Gameplay`, the fixture is attributed to the lot owner, the next save
+/// is schema 2, and the placer survives another relog.
+#[test]
+fn an_old_schema_save_migrates_placed_by_and_keeps_it_across_relogs() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let lot = granted(&mut game);
+    let mut save = serde_json::to_value(game.state()).unwrap();
+    let housing = &mut save["housing"];
+    assert_eq!(housing["schema_version"], 2);
+    housing["schema_version"] = serde_json::json!(1);
+    let old_fixture = serde_json::json!({
+        "fixture_guid": 0x0f00_0000_0000_0042_u64,
+        "house_guid": lot.instance_guid,
+        "item_instance_id": 999_999,
+        "fixture_definition_id": 34,
+        "transform": {
+            "position": [0.0, 0.0, 0.0],
+            "rotation": [1.0, 0.0, 0.0, 0.0],
+            "tilt": [1.0, 0.0, 0.0, 0.0],
+            "scale": 1.0,
+            "tint_id": 0
+        }
+    });
+    housing["lots"][0]["fixtures"] = serde_json::json!([old_fixture]);
+    housing["lots"][0]["count"] = serde_json::json!(1);
+    let old = serde_json::from_value(save).unwrap();
+
+    let migrated = Gameplay::load(&content.0, Some(old)).unwrap().state();
+    let housing = migrated.housing.clone().expect("the lot survives");
+    // The next save is the current schema, and the old fixture belongs to the owner.
+    assert_eq!(housing.schema_version, 2);
+    assert_eq!(housing.lots[0].fixtures[0].placed_by, OWNER);
+
+    // placed_by survives a relog.
+    let again = Some(migrated.clone());
+    let relogged = Gameplay::load(&content.0, again).unwrap().state();
+    assert_eq!(relogged.housing, migrated.housing);
+}
+
 #[test]
 fn leaving_returns_to_the_world_pose() {
     let content = Content::with_houses();

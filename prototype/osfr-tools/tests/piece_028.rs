@@ -162,6 +162,7 @@ fn fixture(
         item_instance_id: instance_id,
         fixture_definition_id: definition_id,
         transform: transform(400.0, 4.0, 410.0, tint_id),
+        placed_by: 0,
     }
 }
 
