@@ -1,0 +1,1916 @@
+{
+  "schema_version": 1,
+  "pickup_range": 12.0,
+  "provenance": {
+    "generator": "scripts/build_collection_coins.py (python -I)",
+    "license": "AGPL data rows only, no code copied",
+    "coins": "npc_spawns_extra.json rows named 386170 (rare) or 4412 (elite); tier comes only from them",
+    "catalogue": "collection_catalogue.json; collection_id is always the entry's owner",
+    "lxzxrus_base": "lab/references/Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be src/Resources/CollectionNodeSpawns/1/*-exploration-coins-*.json",
+    "lxzxrus_fixes": "lab/references/Lxzxrus-Free-Realms-Server@65ec688f3e51249ca8a9c979b3938386748f7195 blackspore-exploration-coins-elite.json, briarwood-exploration-coins-rare.json (unmerged branch origin/collections/exploration-fixes; row 4493 left out)",
+    "sanctuary": "lab/references/Sanctuary-main-20261019@10f129e7f3e2094304d20ccee6e3f7136a5e889d src/Resources/CollectionCoins.json, Sunstone Valley only, its 311/312 swap undone (entry -8 into 311, +8 into 312)",
+    "pairing": "playtest: checked in game per the cited source; id-order: paired by id order, unchecked (R)",
+    "pickup_range": "(R) Sanctuary@10f129e src/Sanctuary.Game/Zones/BaseZone.cs:909 CollectionCoin InteractRange 12; not recovered from the client"
+  },
+  "records": [
+    {
+      "spawn_guid": 100000001946,
+      "legacy_npc_id": 1946,
+      "tier": "rare",
+      "collection_id": 267,
+      "entry_id": 1937,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/seaside-exploration-coins-rare.json Id=1946 CollectionEntryId=1937"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@301380a commit message: checked in game"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002090,
+      "legacy_npc_id": 2090,
+      "tier": "elite",
+      "collection_id": 289,
+      "entry_id": 2046,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/seaside-exploration-coins-elite.json Id=2090 CollectionEntryId=2046"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002091,
+      "legacy_npc_id": 2091,
+      "tier": "elite",
+      "collection_id": 289,
+      "entry_id": 2047,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/seaside-exploration-coins-elite.json Id=2091 CollectionEntryId=2047"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002092,
+      "legacy_npc_id": 2092,
+      "tier": "elite",
+      "collection_id": 289,
+      "entry_id": 2048,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/seaside-exploration-coins-elite.json Id=2092 CollectionEntryId=2048"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002093,
+      "legacy_npc_id": 2093,
+      "tier": "elite",
+      "collection_id": 289,
+      "entry_id": 2049,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/seaside-exploration-coins-elite.json Id=2093 CollectionEntryId=2049"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002094,
+      "legacy_npc_id": 2094,
+      "tier": "elite",
+      "collection_id": 289,
+      "entry_id": 2050,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/seaside-exploration-coins-elite.json Id=2094 CollectionEntryId=2050"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002095,
+      "legacy_npc_id": 2095,
+      "tier": "elite",
+      "collection_id": 289,
+      "entry_id": 2051,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/seaside-exploration-coins-elite.json Id=2095 CollectionEntryId=2051"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002096,
+      "legacy_npc_id": 2096,
+      "tier": "elite",
+      "collection_id": 289,
+      "entry_id": 2052,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/seaside-exploration-coins-elite.json Id=2096 CollectionEntryId=2052"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002097,
+      "legacy_npc_id": 2097,
+      "tier": "rare",
+      "collection_id": 267,
+      "entry_id": 1958,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/seaside-exploration-coins-rare.json Id=2097 CollectionEntryId=1958"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@301380a commit message: checked in game"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002098,
+      "legacy_npc_id": 2098,
+      "tier": "rare",
+      "collection_id": 267,
+      "entry_id": 1959,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/seaside-exploration-coins-rare.json Id=2098 CollectionEntryId=1959"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@301380a commit message: checked in game"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002099,
+      "legacy_npc_id": 2099,
+      "tier": "rare",
+      "collection_id": 267,
+      "entry_id": 1957,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/seaside-exploration-coins-rare.json Id=2099 CollectionEntryId=1957"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@301380a commit message: checked in game"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002101,
+      "legacy_npc_id": 2101,
+      "tier": "elite",
+      "collection_id": 289,
+      "entry_id": 2053,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/seaside-exploration-coins-elite.json Id=2101 CollectionEntryId=2053"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002102,
+      "legacy_npc_id": 2102,
+      "tier": "rare",
+      "collection_id": 267,
+      "entry_id": 1956,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/seaside-exploration-coins-rare.json Id=2102 CollectionEntryId=1956"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@301380a commit message: checked in game"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002103,
+      "legacy_npc_id": 2103,
+      "tier": "rare",
+      "collection_id": 270,
+      "entry_id": 1940,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/wugachug-exploration-coins-rare.json Id=2103 CollectionEntryId=1940"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002104,
+      "legacy_npc_id": 2104,
+      "tier": "rare",
+      "collection_id": 270,
+      "entry_id": 1968,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/wugachug-exploration-coins-rare.json Id=2104 CollectionEntryId=1968"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002105,
+      "legacy_npc_id": 2105,
+      "tier": "elite",
+      "collection_id": 285,
+      "entry_id": 2020,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/wugachug-exploration-coins-elite.json Id=2105 CollectionEntryId=2020"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002106,
+      "legacy_npc_id": 2106,
+      "tier": "rare",
+      "collection_id": 270,
+      "entry_id": 1969,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/wugachug-exploration-coins-rare.json Id=2106 CollectionEntryId=1969"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002107,
+      "legacy_npc_id": 2107,
+      "tier": "elite",
+      "collection_id": 285,
+      "entry_id": 2021,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/wugachug-exploration-coins-elite.json Id=2107 CollectionEntryId=2021"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002108,
+      "legacy_npc_id": 2108,
+      "tier": "elite",
+      "collection_id": 285,
+      "entry_id": 2022,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/wugachug-exploration-coins-elite.json Id=2108 CollectionEntryId=2022"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002109,
+      "legacy_npc_id": 2109,
+      "tier": "elite",
+      "collection_id": 285,
+      "entry_id": 2023,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/wugachug-exploration-coins-elite.json Id=2109 CollectionEntryId=2023"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002110,
+      "legacy_npc_id": 2110,
+      "tier": "elite",
+      "collection_id": 285,
+      "entry_id": 2024,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/wugachug-exploration-coins-elite.json Id=2110 CollectionEntryId=2024"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002111,
+      "legacy_npc_id": 2111,
+      "tier": "rare",
+      "collection_id": 268,
+      "entry_id": 1961,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-rare.json Id=2111 CollectionEntryId=1961"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e49e395 commit message: checked in game"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002112,
+      "legacy_npc_id": 2112,
+      "tier": "elite",
+      "collection_id": 288,
+      "entry_id": 2041,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-elite.json Id=2112 CollectionEntryId=2041"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002113,
+      "legacy_npc_id": 2113,
+      "tier": "rare",
+      "collection_id": 268,
+      "entry_id": 1960,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-rare.json Id=2113 CollectionEntryId=1960"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002114,
+      "legacy_npc_id": 2114,
+      "tier": "rare",
+      "collection_id": 268,
+      "entry_id": 1938,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-rare.json Id=2114 CollectionEntryId=1938"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e49e395 commit message: checked in game"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002115,
+      "legacy_npc_id": 2115,
+      "tier": "elite",
+      "collection_id": 288,
+      "entry_id": 2039,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-elite.json Id=2115 CollectionEntryId=2039"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002116,
+      "legacy_npc_id": 2116,
+      "tier": "elite",
+      "collection_id": 288,
+      "entry_id": 2040,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-elite.json Id=2116 CollectionEntryId=2040"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002117,
+      "legacy_npc_id": 2117,
+      "tier": "rare",
+      "collection_id": 268,
+      "entry_id": 1962,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-rare.json Id=2117 CollectionEntryId=1962"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002118,
+      "legacy_npc_id": 2118,
+      "tier": "elite",
+      "collection_id": 288,
+      "entry_id": 2043,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-elite.json Id=2118 CollectionEntryId=2043"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002119,
+      "legacy_npc_id": 2119,
+      "tier": "elite",
+      "collection_id": 288,
+      "entry_id": 2042,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-elite.json Id=2119 CollectionEntryId=2042"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002120,
+      "legacy_npc_id": 2120,
+      "tier": "elite",
+      "collection_id": 288,
+      "entry_id": 2044,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-elite.json Id=2120 CollectionEntryId=2044"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002121,
+      "legacy_npc_id": 2121,
+      "tier": "elite",
+      "collection_id": 288,
+      "entry_id": 2045,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-elite.json Id=2121 CollectionEntryId=2045"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002122,
+      "legacy_npc_id": 2122,
+      "tier": "rare",
+      "collection_id": 268,
+      "entry_id": 1963,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-rare.json Id=2122 CollectionEntryId=1963"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002123,
+      "legacy_npc_id": 2123,
+      "tier": "rare",
+      "collection_id": 272,
+      "entry_id": 1942,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/shrouded-glade-exploration-coins-rare.json Id=2123 CollectionEntryId=1942"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002125,
+      "legacy_npc_id": 2125,
+      "tier": "elite",
+      "collection_id": 286,
+      "entry_id": 2028,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/shrouded-glade-exploration-coins-elite.json Id=2125 CollectionEntryId=2028"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002126,
+      "legacy_npc_id": 2126,
+      "tier": "elite",
+      "collection_id": 286,
+      "entry_id": 2029,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/shrouded-glade-exploration-coins-elite.json Id=2126 CollectionEntryId=2029"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002127,
+      "legacy_npc_id": 2127,
+      "tier": "elite",
+      "collection_id": 286,
+      "entry_id": 2027,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/shrouded-glade-exploration-coins-elite.json Id=2127 CollectionEntryId=2027"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002128,
+      "legacy_npc_id": 2128,
+      "tier": "elite",
+      "collection_id": 286,
+      "entry_id": 2026,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/shrouded-glade-exploration-coins-elite.json Id=2128 CollectionEntryId=2026"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002129,
+      "legacy_npc_id": 2129,
+      "tier": "elite",
+      "collection_id": 286,
+      "entry_id": 2025,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/shrouded-glade-exploration-coins-elite.json Id=2129 CollectionEntryId=2025"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002130,
+      "legacy_npc_id": 2130,
+      "tier": "rare",
+      "collection_id": 272,
+      "entry_id": 1972,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/shrouded-glade-exploration-coins-rare.json Id=2130 CollectionEntryId=1972"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002131,
+      "legacy_npc_id": 2131,
+      "tier": "rare",
+      "collection_id": 272,
+      "entry_id": 1973,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/shrouded-glade-exploration-coins-rare.json Id=2131 CollectionEntryId=1973"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002302,
+      "legacy_npc_id": 2302,
+      "tier": "elite",
+      "collection_id": 290,
+      "entry_id": 2054,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/merry-vale-exploration-coins-elite.json Id=2302 CollectionEntryId=2054"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002303,
+      "legacy_npc_id": 2303,
+      "tier": "rare",
+      "collection_id": 271,
+      "entry_id": 1941,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/merry-vale-exploration-coins-rare.json Id=2303 CollectionEntryId=1941"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002304,
+      "legacy_npc_id": 2304,
+      "tier": "rare",
+      "collection_id": 271,
+      "entry_id": 1970,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/merry-vale-exploration-coins-rare.json Id=2304 CollectionEntryId=1970"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002305,
+      "legacy_npc_id": 2305,
+      "tier": "elite",
+      "collection_id": 290,
+      "entry_id": 2055,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/merry-vale-exploration-coins-elite.json Id=2305 CollectionEntryId=2055"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002306,
+      "legacy_npc_id": 2306,
+      "tier": "rare",
+      "collection_id": 271,
+      "entry_id": 1971,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/merry-vale-exploration-coins-rare.json Id=2306 CollectionEntryId=1971"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002307,
+      "legacy_npc_id": 2307,
+      "tier": "elite",
+      "collection_id": 290,
+      "entry_id": 2056,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/merry-vale-exploration-coins-elite.json Id=2307 CollectionEntryId=2056"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002308,
+      "legacy_npc_id": 2308,
+      "tier": "elite",
+      "collection_id": 290,
+      "entry_id": 2057,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/merry-vale-exploration-coins-elite.json Id=2308 CollectionEntryId=2057"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002309,
+      "legacy_npc_id": 2309,
+      "tier": "elite",
+      "collection_id": 290,
+      "entry_id": 2058,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/merry-vale-exploration-coins-elite.json Id=2309 CollectionEntryId=2058"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002473,
+      "legacy_npc_id": 2473,
+      "tier": "rare",
+      "collection_id": 266,
+      "entry_id": 1936,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=2473 CollectionEntryId=1936"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002474,
+      "legacy_npc_id": 2474,
+      "tier": "elite",
+      "collection_id": 291,
+      "entry_id": 2059,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-elite.json Id=2474 CollectionEntryId=2059"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002475,
+      "legacy_npc_id": 2475,
+      "tier": "elite",
+      "collection_id": 291,
+      "entry_id": 2060,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-elite.json Id=2475 CollectionEntryId=2060"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002476,
+      "legacy_npc_id": 2476,
+      "tier": "elite",
+      "collection_id": 291,
+      "entry_id": 2061,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-elite.json Id=2476 CollectionEntryId=2061"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002477,
+      "legacy_npc_id": 2477,
+      "tier": "elite",
+      "collection_id": 291,
+      "entry_id": 2062,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-elite.json Id=2477 CollectionEntryId=2062"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002478,
+      "legacy_npc_id": 2478,
+      "tier": "elite",
+      "collection_id": 291,
+      "entry_id": 2063,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-elite.json Id=2478 CollectionEntryId=2063"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002479,
+      "legacy_npc_id": 2479,
+      "tier": "elite",
+      "collection_id": 291,
+      "entry_id": 2064,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-elite.json Id=2479 CollectionEntryId=2064"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002480,
+      "legacy_npc_id": 2480,
+      "tier": "elite",
+      "collection_id": 291,
+      "entry_id": 2065,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-elite.json Id=2480 CollectionEntryId=2065"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002481,
+      "legacy_npc_id": 2481,
+      "tier": "rare",
+      "collection_id": 266,
+      "entry_id": 1951,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=2481 CollectionEntryId=1951"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002482,
+      "legacy_npc_id": 2482,
+      "tier": "rare",
+      "collection_id": 266,
+      "entry_id": 1952,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=2482 CollectionEntryId=1952"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002483,
+      "legacy_npc_id": 2483,
+      "tier": "rare",
+      "collection_id": 266,
+      "entry_id": 1953,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=2483 CollectionEntryId=1953"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000002484,
+      "legacy_npc_id": 2484,
+      "tier": "elite",
+      "collection_id": 291,
+      "entry_id": 2066,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-elite.json Id=2484 CollectionEntryId=2066"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004421,
+      "legacy_npc_id": 4421,
+      "tier": "rare",
+      "collection_id": 269,
+      "entry_id": 1966,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 src/Resources/CollectionNodeSpawns/1/briarwood-exploration-coins-rare.json Id=4421 CollectionEntryId=1966"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004422,
+      "legacy_npc_id": 4422,
+      "tier": "rare",
+      "collection_id": 269,
+      "entry_id": 1939,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 src/Resources/CollectionNodeSpawns/1/briarwood-exploration-coins-rare.json Id=4422 CollectionEntryId=1939"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004423,
+      "legacy_npc_id": 4423,
+      "tier": "rare",
+      "collection_id": 269,
+      "entry_id": 1965,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 src/Resources/CollectionNodeSpawns/1/briarwood-exploration-coins-rare.json Id=4423 CollectionEntryId=1965"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004424,
+      "legacy_npc_id": 4424,
+      "tier": "rare",
+      "collection_id": 269,
+      "entry_id": 1967,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 src/Resources/CollectionNodeSpawns/1/briarwood-exploration-coins-rare.json Id=4424 CollectionEntryId=1967"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004425,
+      "legacy_npc_id": 4425,
+      "tier": "rare",
+      "collection_id": 269,
+      "entry_id": 1964,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 src/Resources/CollectionNodeSpawns/1/briarwood-exploration-coins-rare.json Id=4425 CollectionEntryId=1964"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004426,
+      "legacy_npc_id": 4426,
+      "tier": "elite",
+      "collection_id": 287,
+      "entry_id": 2030,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/briarwood-exploration-coins-elite.json Id=4426 CollectionEntryId=2030"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004427,
+      "legacy_npc_id": 4427,
+      "tier": "elite",
+      "collection_id": 287,
+      "entry_id": 2031,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/briarwood-exploration-coins-elite.json Id=4427 CollectionEntryId=2031"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004428,
+      "legacy_npc_id": 4428,
+      "tier": "elite",
+      "collection_id": 287,
+      "entry_id": 2032,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/briarwood-exploration-coins-elite.json Id=4428 CollectionEntryId=2032"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004429,
+      "legacy_npc_id": 4429,
+      "tier": "elite",
+      "collection_id": 287,
+      "entry_id": 2033,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/briarwood-exploration-coins-elite.json Id=4429 CollectionEntryId=2033"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004430,
+      "legacy_npc_id": 4430,
+      "tier": "elite",
+      "collection_id": 287,
+      "entry_id": 2034,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/briarwood-exploration-coins-elite.json Id=4430 CollectionEntryId=2034"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004431,
+      "legacy_npc_id": 4431,
+      "tier": "elite",
+      "collection_id": 287,
+      "entry_id": 2035,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/briarwood-exploration-coins-elite.json Id=4431 CollectionEntryId=2035"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004432,
+      "legacy_npc_id": 4432,
+      "tier": "elite",
+      "collection_id": 287,
+      "entry_id": 2036,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/briarwood-exploration-coins-elite.json Id=4432 CollectionEntryId=2036"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004433,
+      "legacy_npc_id": 4433,
+      "tier": "elite",
+      "collection_id": 287,
+      "entry_id": 2037,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/briarwood-exploration-coins-elite.json Id=4433 CollectionEntryId=2037"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004434,
+      "legacy_npc_id": 4434,
+      "tier": "elite",
+      "collection_id": 284,
+      "entry_id": 2012,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/snowhill-exploration-coins-elite.json Id=4434 CollectionEntryId=2012"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004435,
+      "legacy_npc_id": 4435,
+      "tier": "elite",
+      "collection_id": 284,
+      "entry_id": 2013,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/snowhill-exploration-coins-elite.json Id=4435 CollectionEntryId=2013"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004436,
+      "legacy_npc_id": 4436,
+      "tier": "rare",
+      "collection_id": 265,
+      "entry_id": 1935,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/snowhill-exploration-coins-rare.json Id=4436 CollectionEntryId=1935"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004437,
+      "legacy_npc_id": 4437,
+      "tier": "elite",
+      "collection_id": 284,
+      "entry_id": 2014,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/snowhill-exploration-coins-elite.json Id=4437 CollectionEntryId=2014"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004438,
+      "legacy_npc_id": 4438,
+      "tier": "elite",
+      "collection_id": 284,
+      "entry_id": 2015,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/snowhill-exploration-coins-elite.json Id=4438 CollectionEntryId=2015"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004439,
+      "legacy_npc_id": 4439,
+      "tier": "rare",
+      "collection_id": 265,
+      "entry_id": 1947,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/snowhill-exploration-coins-rare.json Id=4439 CollectionEntryId=1947"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004440,
+      "legacy_npc_id": 4440,
+      "tier": "elite",
+      "collection_id": 284,
+      "entry_id": 2016,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/snowhill-exploration-coins-elite.json Id=4440 CollectionEntryId=2016"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004441,
+      "legacy_npc_id": 4441,
+      "tier": "elite",
+      "collection_id": 284,
+      "entry_id": 2017,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/snowhill-exploration-coins-elite.json Id=4441 CollectionEntryId=2017"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004442,
+      "legacy_npc_id": 4442,
+      "tier": "elite",
+      "collection_id": 284,
+      "entry_id": 2018,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/snowhill-exploration-coins-elite.json Id=4442 CollectionEntryId=2018"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004443,
+      "legacy_npc_id": 4443,
+      "tier": "rare",
+      "collection_id": 265,
+      "entry_id": 1948,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/snowhill-exploration-coins-rare.json Id=4443 CollectionEntryId=1948"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004444,
+      "legacy_npc_id": 4444,
+      "tier": "elite",
+      "collection_id": 284,
+      "entry_id": 2019,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/snowhill-exploration-coins-elite.json Id=4444 CollectionEntryId=2019"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004445,
+      "legacy_npc_id": 4445,
+      "tier": "rare",
+      "collection_id": 311,
+      "entry_id": 2188,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=4445 CollectionId=312 EntryId=2196 (tier swap undone)"
+        },
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sunstone-valley-exploration-coins-rare.json Id=4445 CollectionEntryId=90001 (cross-check)"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004446,
+      "legacy_npc_id": 4446,
+      "tier": "rare",
+      "collection_id": 311,
+      "entry_id": 2189,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=4446 CollectionId=312 EntryId=2197 (tier swap undone)"
+        },
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sunstone-valley-exploration-coins-rare.json Id=4446 CollectionEntryId=90002 (cross-check)"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004447,
+      "legacy_npc_id": 4447,
+      "tier": "elite",
+      "collection_id": 312,
+      "entry_id": 2196,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=4447 CollectionId=311 EntryId=2188 (tier swap undone)"
+        },
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sunstone-valley-exploration-coins-elite.json Id=4447 CollectionEntryId=90011 (cross-check)"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004448,
+      "legacy_npc_id": 4448,
+      "tier": "rare",
+      "collection_id": 311,
+      "entry_id": 2190,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=4448 CollectionId=312 EntryId=2198 (tier swap undone)"
+        },
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sunstone-valley-exploration-coins-rare.json Id=4448 CollectionEntryId=90003 (cross-check)"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004449,
+      "legacy_npc_id": 4449,
+      "tier": "elite",
+      "collection_id": 312,
+      "entry_id": 2197,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=4449 CollectionId=311 EntryId=2189 (tier swap undone)"
+        },
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sunstone-valley-exploration-coins-elite.json Id=4449 CollectionEntryId=90012 (cross-check)"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004450,
+      "legacy_npc_id": 4450,
+      "tier": "elite",
+      "collection_id": 312,
+      "entry_id": 2198,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=4450 CollectionId=311 EntryId=2190 (tier swap undone)"
+        },
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sunstone-valley-exploration-coins-elite.json Id=4450 CollectionEntryId=90013 (cross-check)"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004451,
+      "legacy_npc_id": 4451,
+      "tier": "rare",
+      "collection_id": 311,
+      "entry_id": 2191,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=4451 CollectionId=312 EntryId=2199 (tier swap undone)"
+        },
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sunstone-valley-exploration-coins-rare.json Id=4451 CollectionEntryId=90004 (cross-check)"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004452,
+      "legacy_npc_id": 4452,
+      "tier": "elite",
+      "collection_id": 312,
+      "entry_id": 2199,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=4452 CollectionId=311 EntryId=2191 (tier swap undone)"
+        },
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sunstone-valley-exploration-coins-elite.json Id=4452 CollectionEntryId=90014 (cross-check)"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004453,
+      "legacy_npc_id": 4453,
+      "tier": "rare",
+      "collection_id": 311,
+      "entry_id": 2192,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=4453 CollectionId=312 EntryId=2200 (tier swap undone)"
+        },
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sunstone-valley-exploration-coins-rare.json Id=4453 CollectionEntryId=90005 (cross-check)"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004454,
+      "legacy_npc_id": 4454,
+      "tier": "elite",
+      "collection_id": 312,
+      "entry_id": 2200,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=4454 CollectionId=311 EntryId=2192 (tier swap undone)"
+        },
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sunstone-valley-exploration-coins-elite.json Id=4454 CollectionEntryId=90015 (cross-check)"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004455,
+      "legacy_npc_id": 4455,
+      "tier": "elite",
+      "collection_id": 312,
+      "entry_id": 2201,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=4455 CollectionId=311 EntryId=2193 (tier swap undone)"
+        },
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sunstone-valley-exploration-coins-elite.json Id=4455 CollectionEntryId=90016 (cross-check)"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004461,
+      "legacy_npc_id": 4461,
+      "tier": "rare",
+      "collection_id": 311,
+      "entry_id": 2193,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=4461 CollectionId=312 EntryId=2201 (tier swap undone)"
+        },
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sunstone-valley-exploration-coins-rare.json Id=4461 CollectionEntryId=90006 (cross-check)"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004462,
+      "legacy_npc_id": 4462,
+      "tier": "elite",
+      "collection_id": 312,
+      "entry_id": 2202,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=4462 CollectionId=311 EntryId=2194 (tier swap undone)"
+        },
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sunstone-valley-exploration-coins-elite.json Id=4462 CollectionEntryId=90017 (cross-check)"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004463,
+      "legacy_npc_id": 4463,
+      "tier": "rare",
+      "collection_id": 311,
+      "entry_id": 2194,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=4463 CollectionId=312 EntryId=2202 (tier swap undone)"
+        },
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sunstone-valley-exploration-coins-rare.json Id=4463 CollectionEntryId=90007 (cross-check)"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004465,
+      "legacy_npc_id": 4465,
+      "tier": "rare",
+      "collection_id": 276,
+      "entry_id": 1946,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4465 CollectionEntryId=1946"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004467,
+      "legacy_npc_id": 4467,
+      "tier": "rare",
+      "collection_id": 276,
+      "entry_id": 1986,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4467 CollectionEntryId=1986"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004470,
+      "legacy_npc_id": 4470,
+      "tier": "rare",
+      "collection_id": 276,
+      "entry_id": 1987,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4470 CollectionEntryId=1987"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004471,
+      "legacy_npc_id": 4471,
+      "tier": "rare",
+      "collection_id": 276,
+      "entry_id": 1988,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4471 CollectionEntryId=1988"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004473,
+      "legacy_npc_id": 4473,
+      "tier": "rare",
+      "collection_id": 276,
+      "entry_id": 1989,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4473 CollectionEntryId=1989"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004474,
+      "legacy_npc_id": 4474,
+      "tier": "rare",
+      "collection_id": 274,
+      "entry_id": 1944,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4474 CollectionEntryId=1944"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004477,
+      "legacy_npc_id": 4477,
+      "tier": "rare",
+      "collection_id": 274,
+      "entry_id": 1978,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4477 CollectionEntryId=1978"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004478,
+      "legacy_npc_id": 4478,
+      "tier": "rare",
+      "collection_id": 274,
+      "entry_id": 1979,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4478 CollectionEntryId=1979"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004479,
+      "legacy_npc_id": 4479,
+      "tier": "rare",
+      "collection_id": 274,
+      "entry_id": 1980,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4479 CollectionEntryId=1980"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004480,
+      "legacy_npc_id": 4480,
+      "tier": "rare",
+      "collection_id": 274,
+      "entry_id": 1981,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4480 CollectionEntryId=1981"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004481,
+      "legacy_npc_id": 4481,
+      "tier": "rare",
+      "collection_id": 275,
+      "entry_id": 1945,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4481 CollectionEntryId=1945"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004482,
+      "legacy_npc_id": 4482,
+      "tier": "rare",
+      "collection_id": 275,
+      "entry_id": 1982,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4482 CollectionEntryId=1982"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004484,
+      "legacy_npc_id": 4484,
+      "tier": "rare",
+      "collection_id": 275,
+      "entry_id": 1983,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4484 CollectionEntryId=1983"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004485,
+      "legacy_npc_id": 4485,
+      "tier": "rare",
+      "collection_id": 275,
+      "entry_id": 1984,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4485 CollectionEntryId=1984"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004488,
+      "legacy_npc_id": 4488,
+      "tier": "rare",
+      "collection_id": 273,
+      "entry_id": 1943,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4488 CollectionEntryId=1943"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004489,
+      "legacy_npc_id": 4489,
+      "tier": "rare",
+      "collection_id": 273,
+      "entry_id": 1974,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4489 CollectionEntryId=1974"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004490,
+      "legacy_npc_id": 4490,
+      "tier": "rare",
+      "collection_id": 273,
+      "entry_id": 1975,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4490 CollectionEntryId=1975"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004491,
+      "legacy_npc_id": 4491,
+      "tier": "rare",
+      "collection_id": 273,
+      "entry_id": 1976,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4491 CollectionEntryId=1976"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000004492,
+      "legacy_npc_id": 4492,
+      "tier": "rare",
+      "collection_id": 273,
+      "entry_id": 1977,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4492 CollectionEntryId=1977"
+        }
+      ]
+    }
+  ],
+  "gaps": {
+    "entries_without_coin": [
+      {
+        "collection_id": 265,
+        "entry_id": 1949,
+        "reason": "no coin left for it: ../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=4438 CollectionId=265 EntryId=1949 pairs coin 4438 here; these rules bind it to 2015"
+      },
+      {
+        "collection_id": 265,
+        "entry_id": 1950,
+        "reason": "no coin in any source"
+      },
+      {
+        "collection_id": 266,
+        "entry_id": 1954,
+        "reason": "no coin in any source"
+      },
+      {
+        "collection_id": 266,
+        "entry_id": 1955,
+        "reason": "no coin in any source"
+      },
+      {
+        "collection_id": 275,
+        "entry_id": 1985,
+        "reason": "no coin in any source"
+      },
+      {
+        "collection_id": 288,
+        "entry_id": 2038,
+        "reason": "placed by coin-spawn-additions: ../lab/references/Lxzxrus-Free-Realms-Server@65ec688 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-elite.json Id=4493 CollectionEntryId=2038"
+      },
+      {
+        "collection_id": 311,
+        "entry_id": 2195,
+        "reason": "placed by coin-spawn-additions: ../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=36196 CollectionId=312 EntryId=2203 (tier swap undone)"
+      },
+      {
+        "collection_id": 312,
+        "entry_id": 2203,
+        "reason": "placed by coin-spawn-additions: ../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=36199 CollectionId=311 EntryId=2195 (tier swap undone)"
+      }
+    ],
+    "notes": [
+      {
+        "entry_id": 2039,
+        "spawn_guid": 100000002115,
+        "note": "coin 2115 cannot be reached on foot; it waits for a reachable spot (Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game')"
+      }
+    ]
+  }
+}

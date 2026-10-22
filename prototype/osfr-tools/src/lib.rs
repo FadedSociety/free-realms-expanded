@@ -11,6 +11,7 @@ pub mod chess;
 pub mod chess_service;
 pub mod coin_shop;
 pub mod collection_catalogue;
+pub mod collection_coins;
 pub mod combat;
 pub mod content;
 pub mod cooking;
