@@ -41,6 +41,7 @@
 //!   (it exposes no id list), read from the profile content root: the opening
 //!   content the session ranks jobs from, not the quest catalogue root.
 
+use super::quest_records::as_u32;
 use osfr_tools::{
     activity_portal, chess_service, harvesting,
     inventory::Inventory,
@@ -57,10 +58,6 @@ pub const HARVESTING_GAME_ID: u32 = 111;
 /// `Gameplay::local_gather_drop` match keys for the opening local drops. These
 /// are gather event resource keys, not item definition ids.
 pub const LOCAL_GATHER_RESOURCES: [u32; 3] = [1_001, 1_002, 1_003];
-
-pub fn as_u32(value: &Value) -> Option<u32> {
-    value.as_u64().and_then(|value| u32::try_from(value).ok())
-}
 
 /// Target-id sets a graded objective must resolve in, loaded once from the same
 /// content root as the quest catalogue.

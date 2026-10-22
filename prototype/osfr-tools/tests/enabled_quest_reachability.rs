@@ -44,13 +44,15 @@
 //! the 49/9 objective reader wrapper `0x00c7b5e0` (body `0x00c7af60`: counters,
 //! no target id) are the client side of that server-only identity.
 //!
-//! The shared `content_dir`/`read_json` helpers, the scratch fixture and the
-//! target-id sets each own their file in `tests/support/`.
+//! The shared `content_dir`/`read_json` helpers, the raw quest records, the
+//! scratch fixture and the target-id sets each own their file in `tests/support/`.
 
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
 #[path = "support/quest_catalogue_fixture.rs"]
 mod quest_catalogue_fixture;
+#[path = "support/quest_records.rs"]
+mod quest_records;
 #[path = "support/quest_target_sets.rs"]
 mod quest_target_sets;
 
@@ -63,12 +65,13 @@ use quest_catalogue_fixture::{
     Defect, FIXTURE_BATTLE, FIXTURE_DEFECT, FIXTURE_GATHER_RESOURCE, FIXTURE_ITEM,
     FIXTURE_MINIGAME, FIXTURE_QUEST, FIXTURE_RECIPE, Scratch, fixture,
 };
-use quest_target_sets::{Targets, as_u32};
+use quest_records::{RawQuest, as_u32, read_quests, sorted_json_paths};
+use quest_target_sets::Targets;
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs, io,
-    path::{Path, PathBuf},
+    path::Path,
 };
 
 const CHARACTER: u64 = 7;
@@ -85,20 +88,6 @@ fn eligibility() -> CharacterEligibility {
         nonmember_quest_limit: 20,
         member_quest_limit: 20,
     }
-}
-
-/// One split quest record. Only fields the production loaders do not expose are
-/// parsed here; the loader remains the authority for rewards, bounds and
-/// enabled/disabled behaviour.
-#[derive(Debug)]
-struct RawQuest {
-    id: u32,
-    enabled: bool,
-    giver_npc_id: u64,
-    /// Authored title id before `definition_from_content` casts it to `i32`.
-    title_string_id: u64,
-    prerequisite_quest_ids: Vec<u32>,
-    objectives: Vec<Value>,
 }
 
 struct Catalogue {
@@ -455,23 +444,6 @@ impl Catalogue {
     }
 }
 
-fn sorted_json_paths(directory: &Path) -> Vec<PathBuf> {
-    let mut paths: Vec<PathBuf> = fs::read_dir(directory)
-        .unwrap_or_else(|error| panic!("{}: {error}", directory.display()))
-        .map(|entry| {
-            entry
-                .unwrap_or_else(|error| panic!("{}: {error}", directory.display()))
-                .path()
-        })
-        .collect();
-    paths.retain(|path| {
-        path.extension()
-            .is_some_and(|extension| extension == "json")
-    });
-    paths.sort();
-    paths
-}
-
 /// Authored NPC ids with the `quest_giver` role. `NpcInteraction` owns this
 /// table but exposes no role accessor; the split quest loader deliberately
 /// accepts a giver that no NPC row lists.
@@ -497,52 +469,6 @@ fn read_quest_giver_rows(root: &Path) -> BTreeSet<u64> {
         }
     }
     ids
-}
-
-fn read_quests(root: &Path) -> Vec<RawQuest> {
-    let mut quests = Vec::new();
-    for path in sorted_json_paths(&root.join("quests")) {
-        let document = read_json(&path);
-        let records = document["records"]
-            .as_array()
-            .unwrap_or_else(|| panic!("{}: no records array", path.display()));
-        for record in records {
-            let id = as_u32(&record["id"])
-                .unwrap_or_else(|| panic!("{}: invalid quest id", path.display()));
-            let enabled = match record.get("enabled") {
-                None => true,
-                Some(value) => value.as_bool().unwrap_or_else(|| {
-                    panic!("{}: quest {id} enabled is not boolean", path.display())
-                }),
-            };
-            let giver_npc_id = record["giver_npc_id"]
-                .as_u64()
-                .unwrap_or_else(|| panic!("{}: quest {id} has no giver", path.display()));
-            let prerequisite_quest_ids = record["prerequisite_quest_ids"]
-                .as_array()
-                .into_iter()
-                .flatten()
-                .map(|value| {
-                    as_u32(value).unwrap_or_else(|| {
-                        panic!("{}: quest {id} prerequisite id is invalid", path.display())
-                    })
-                })
-                .collect();
-            let objectives = record["objectives"]
-                .as_array()
-                .cloned()
-                .unwrap_or_else(|| panic!("{}: quest {id} has no objectives", path.display()));
-            quests.push(RawQuest {
-                id,
-                enabled,
-                giver_npc_id,
-                title_string_id: record["title_string_id"].as_u64().unwrap_or(0),
-                prerequisite_quest_ids,
-                objectives,
-            });
-        }
-    }
-    quests
 }
 
 #[test]
