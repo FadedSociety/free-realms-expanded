@@ -1,4 +1,5 @@
-//! Synthetic bytes only; local HTTP peers exercise the real WinHTTP adapter.
+//! Synthetic bytes only, except the ignored client-overlay check; local HTTP
+//! peers exercise the real WinHTTP adapter.
 use osfr_launcher::patch::{self, PatchSource};
 use std::{
     fs,
@@ -568,4 +569,49 @@ fn partial_hard_link_and_manifest_aliases_fail_closed() {
         assert!(peer.run(&folder).is_err());
         assert_eq!(fs::read_dir(&folder.0).unwrap().count(), 0);
     }
+}
+/// L024 evidence: build the real overlay with `python -I scripts/bundle/client_overlay.py
+/// --out <dir>`, then run with OSFR_CLIENT_OVERLAY=<dir> and `-- --ignored`. W121 installs
+/// every overlay file into a fresh client copy byte for byte, replacing the client's own
+/// table, and a second check downloads nothing.
+#[test]
+#[ignore]
+fn client_overlay_lands_byte_identical() {
+    let overlay = PathBuf::from(
+        std::env::var("OSFR_CLIENT_OVERLAY").expect("OSFR_CLIENT_OVERLAY names a built overlay"),
+    );
+    let raw = fs::read(overlay.join("manifest.json")).unwrap();
+    let listed: serde_json::Value = serde_json::from_slice(&raw).unwrap();
+    let paths: Vec<&str> = listed["files"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|file| file["path"].as_str().unwrap())
+        .collect();
+    let peer = Peer::new(
+        paths
+            .iter()
+            .map(|path| (*path, fs::read(overlay.join(path)).unwrap()))
+            .collect(),
+        Some(raw),
+        PeerState::default(),
+    );
+    let client = std::env::temp_dir().join(format!("osfr-client-overlay-{}", std::process::id()));
+    fs::create_dir_all(client.join("Resources")).unwrap();
+    fs::write(
+        client.join("Resources/CharacterCreateCustomizationSkinTone.txt"),
+        b"the client's own table",
+    )
+    .unwrap();
+    let check = || patch::repair(&client, &peer.source(), &AtomicBool::new(false), |_| {});
+    assert_eq!(check().unwrap().files_downloaded, paths.len());
+    for path in &paths {
+        assert_eq!(
+            fs::read(client.join(path)).unwrap(),
+            fs::read(overlay.join(path)).unwrap(),
+            "{path}"
+        );
+    }
+    assert_eq!(check().unwrap().files_downloaded, 0);
+    fs::remove_dir_all(&client).unwrap();
 }

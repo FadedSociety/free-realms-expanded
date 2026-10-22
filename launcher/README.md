@@ -216,3 +216,49 @@ W131 adds the key-pair setup flow to Settings. `--test-join-flow --screenshot
 does not create a key, save a profile, or contact a server. The default window
 is 940 x 790 logical points. At 150% display scale, use `--window-size 853x533`
 for a 1280 x 800 physical capture.
+
+## Client overlay for the character creator (L024, distribution pending)
+
+A stock client's creator offers looks whose textures are missing or unproven
+(skin tones 7/8 and four extra faces), has no starting sets, and its dressing-room
+scene lacks nine terrain chunks. `scripts/bundle/client_overlay.py` lists the 22
+community files that fix this, each with its SHA-256 pin and the path the
+client opens; the native harness installs from that same list. A host builds it
+as a W121 patch folder:
+
+```powershell
+python -I scripts/bundle/client_overlay.py --out <new folder>
+```
+
+It writes nothing unless every cached source matches its pin, then prints the
+manifest pin to give friends with the patch URL. `client_overlay_lands_byte_identical`
+in `tests/patch.rs` (ignored; needs the lab cache) installs it through W121.
+
+**Provenance.** All 22 files were downloaded on 2026-10-08 from
+`https://opensourcefreerealms.com/client/<overlay path>`. Each is listed in that
+site's public `clientmanifest.xml` (SHA-256
+`9555ac7c5361d1734334df99f03f0f2149b35ee579098ffb709c0ec91fd78b42`), which the
+community [Launcher](https://github.com/Open-Source-Free-Realms/Launcher)
+(`e6a2674`) installs from; length and XXHash64 match that manifest. Per-file URL,
+size and hashes: `lab/references/asset-cache/cache-index.json` and
+`creator-public-tables.json`.
+
+| Overlay path | What it is |
+| --- | --- |
+| `Resources/CharacterCreate/CharacterCreateItemStartingSets.txt` | Community-populated table, 4 rows. The stock file has none, so creation fails (`startingSetId=-1`). |
+| `Resources/CharacterCreateCustomizationSkinTone.txt` | The original table minus the 8 rows that select skin 7/8. |
+| `Resources/CharacterCreateCustomizationFaceType.txt` | The original table minus 4 extra face rows. |
+| `custom/sg_dressing_room.gzne`, `custom/sg_dressing_room_{0,4,8}_{0,4,8}.gcnk` and `.gck2` (19 files) | Community-made creator scene. Not original assets: they do not match the original manifest rows. |
+
+**Licence: not stated.** The Launcher's AGPL-3.0 covers its code, not these
+files, and the three tables derive from the original client's own. Whether
+friends may receive them is the lead's decision. Until then `make_bundle.py`
+leaves the overlay out and no realm should serve it.
+
+**Client paths** (FreeRealms.exe). StartingSets: `./Resources/CharacterCreate/`
+(0x017e802c, set by 0x0071efb0) + the file name (0x017e8dc8, read by 0x00723e90).
+Customization tables: `Resources/` (0x017ed7d8, passed by 0x008ec05d to
+0x00982f10) + `CharacterCreateCustomization` + the category suffix (0x0097f570) +
+`.txt`; not `CharacterCreate/`, where the harness used to copy them. `custom/` is
+an ordinary folder the client's loose-file index scans (notes/Research/Native
+Character Selection Labels.md).

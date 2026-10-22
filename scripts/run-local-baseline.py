@@ -29,6 +29,8 @@ from journal_text_overlay import (validate_journal_text, apply_journal_text,
                                   validate_character_select_title, apply_character_select_title)
 from lua_probe_overlay import validate_lua_probe, apply_lua_probe
 from live_capture import LiveCapture
+sys.path.insert(1, str(Path(__file__).with_name("bundle")))
+from client_overlay import install as install_client_overlay
 
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--seconds", type=int, default=90)
@@ -78,31 +80,11 @@ if run_options.dev_tools and (lab / "world/text.json").is_file():
     subprocess.run([sys.executable, "-I", str(Path(__file__).with_name("build_world_locale.py")),
                     "--world", str(lab / "world"), "--locale", str(client / "locale")], check=True)
 lua_probe_overlay = apply_lua_probe(lua_probe, client, run, lab)
-custom_assets = lab / "references/asset-cache/client/custom"
-if run_options.native_login and custom_assets.is_dir():
-    shutil.copytree(custom_assets, client / "custom", dirs_exist_ok=True)
-elif run_options.native_login:
-    cache = lab / "references/asset-cache"
-    index = cache / "cache-index.json"
-    if index.is_file():
-        (client / "custom").mkdir(exist_ok=True)
-        for source in sorted(cache.glob("sg_dressing_room*")):
-            if source.is_file() and source.suffix in (".gzne", ".gcnk", ".gck2"):
-                shutil.copy2(source, client / "custom" / source.name)
 if run_options.native_login:
-    # Pinned community resources remove unsupported skin7/8 and extra faces.
-    # They affect future choices only; saved identities remain untouched.
-    cache = lab / "references/asset-cache"
-    creator_resources = (
-        ("CharacterCreateItemStartingSets.txt", "CharacterCreateItemStartingSets.txt", "89cc60e8979179e9af77aada3f3e8b64042757b249ee92745c361ce40b153c24"),
-        ("public-CharacterCreateCustomizationSkinTone.txt", "CharacterCreateCustomizationSkinTone.txt", "485d20174e96c53021d9644d3ba943f0a016fb0413d1be8fa8f728bea528dd9d"),
-        ("public-CharacterCreateCustomizationFaceType.txt", "CharacterCreateCustomizationFaceType.txt", "9d4d7acd63c7926ed3d4c03f99116e929061eef4ae25e1a2b6208c738f2c8525"),
-    )
-    for cached, target, expected_sha in creator_resources:
-        source = cache / cached
-        if hashlib.sha256(source.read_bytes()).hexdigest() != expected_sha:
-            raise RuntimeError(f"unverified community creator resource: {cached}")
-        shutil.copy2(source, client / "Resources/CharacterCreate" / target)
+    # The launcher's client overlay: pinned community creator tables that remove
+    # unsupported skin7/8 and extra faces, where the client opens them, plus the custom/
+    # dressing room. Future choices only; saved identities remain untouched.
+    install_client_overlay(client)
 if run_options.rust_reference:
     server.mkdir()
 else:
