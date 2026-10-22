@@ -11,197 +11,35 @@
 #[allow(dead_code)]
 #[path = "common/gateway_vendor.rs"]
 mod gateway_vendor;
+#[path = "common/roosey_shop.rs"]
+mod roosey_shop;
 #[path = "common/round70_content.rs"]
 mod round70_content;
 
-use gateway_vendor::{
-    NOW, count_definition, inner_packets, interact, inventory_of, login, select, send, wrap,
-};
-use osfr_tools::{
-    account_store::AccountRole,
-    character_store::CharacterState,
-    gameplay::{Gameplay, GameplayState},
-    gateway::Gateway,
-    inventory::Inventory,
-    npc_interaction::{NpcAction, NpcInteraction, decode_coin_merchant_list_165_10},
-};
-use serde_json::{Value, json};
-use std::{
-    collections::BTreeMap,
-    fs,
-    path::{Path, PathBuf},
-    sync::atomic::{AtomicU64, Ordering},
-};
+use gateway_vendor::{NOW, count_definition, inner_packets, inventory_of, wrap};
+use osfr_tools::{inventory::Inventory, npc_interaction::decode_coin_merchant_list_165_10};
+use roosey_shop::{Fixture, ROOSEY, data, read_json};
+use std::collections::BTreeMap;
 
-const ROOSEY: u64 = 9_500_000_255;
 const RING: i32 = 75_260;
 const RING_PRICE: u32 = 75;
 const STOCK: [i32; 6] = [75_030, 75_250, 75_260, 75_278, 75_294, 75_297];
 
-static NEXT: AtomicU64 = AtomicU64::new(0);
-
-fn data() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
-fn fixture_root() -> PathBuf {
-    PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("t362-roosey")
-}
-
-struct Fixture {
-    content: PathBuf,
-    reference: PathBuf,
-    option: u32,
-    position: [f32; 3],
-    prices: BTreeMap<i32, u32>,
-}
-
-impl Drop for Fixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.content);
-    }
-}
-
-impl Fixture {
-    fn new() -> Self {
-        let reference = round70_content::reference();
-        let content = round70_content::build(
-            &fixture_root(),
-            &format!("t362-{}", NEXT.fetch_add(1, Ordering::Relaxed)),
-            &[],
-        );
-        let data = data();
-        for file in ["stores.json", "zones.json"] {
-            fs::copy(data.join(file), content.join(file)).expect("fixture content file copies");
-        }
-        let vendors = read_json(&data.join("vendors.json"));
-        let vendor = vendors["vendors"]
-            .as_array()
-            .expect("vendor records are an array")
-            .iter()
-            .find(|vendor| vendor["npc_id"].as_u64() == Some(ROOSEY))
-            .expect("Roosey's vendor row exists")
-            .clone();
-        write_json(
-            &content.join("vendors.json"),
-            &json!({"schema_version": 1, "vendors": [vendor]}),
-        );
-        let npcs = read_json(&data.join("npcs/cobblestone_village.json"));
-        let npc = npcs["records"]
-            .as_array()
-            .expect("NPC records are an array")
-            .iter()
-            .find(|npc| npc["npc_id"].as_u64() == Some(ROOSEY))
-            .expect("Roosey's NPC record exists")
-            .clone();
-        write_json(
-            &content.join("npcs/roosey.json"),
-            &json!({"schema_version": 1, "records": [npc]}),
-        );
-        write_json(
-            &content.join("npc_spawns_extra.json"),
-            &json!({"schema_version": 1, "records": []}),
-        );
-
-        let mut service = NpcInteraction::load(&content.join("npcs"), &content.join("stores.json"))
-            .expect("fixture NPC content loads");
-        let (zone, position) = service.location(ROOSEY).expect("Roosey has a location");
-        let menu = service
-            .interact(ROOSEY, zone, position, None)
-            .expect("Roosey opens her menu");
-        let option = u32::try_from(
-            menu.options
-                .iter()
-                .find(|option| option.action == NpcAction::Shop)
-                .expect("Roosey exposes the Shop option")
-                .id,
-        )
-        .expect("the shop option id fits the wire field");
-        let stores = read_json(&data.join("stores.json"));
-        let prices = stores["items"]
-            .as_array()
-            .expect("store rows are an array")
-            .iter()
-            .filter_map(|row| {
-                Some((
-                    row["item_id"].as_i64()? as i32,
-                    row["purchase_price_coins"].as_u64()? as u32,
-                ))
-            })
-            .filter(|(id, _)| STOCK.contains(id))
-            .collect();
-        Self {
-            content,
-            reference,
-            option,
-            position,
-            prices,
-        }
-    }
-
-    fn character(&self) -> CharacterState {
-        let mut character =
-            Gateway::reference_state(&self.reference).expect("reference character loads");
-        character.zone_id = 0;
-        character.position = self.position;
-        character.rotation = [0.0; 3];
-        character
-    }
-
-    fn state(&self) -> GameplayState {
-        let mut state = Gameplay::load(&self.content, None)
-            .expect("fixture gameplay content loads")
-            .state();
-        state.inventory.items.clear();
-        for entry in &mut state.inventory.equipment {
-            entry.item_id = 0;
-        }
-        state.inventory.coins = 1_000;
-        state.inventory.next_instance_id = Some(1);
-        state
-    }
-
-    fn connect(&self, state: GameplayState) -> Gateway {
-        let mut gateway = Gateway::load_gameplay(
-            &self.reference,
-            self.character(),
-            &self.content,
-            Some(state),
-        )
-        .expect("gateway loads the Roosey content");
-        gateway.set_dev_tools(false);
-        gateway.set_role(AccountRole::Player);
-        let guid = gateway.state().guid;
-        for packet in [login(guid), wrap(&[13, 0]), wrap(&[10, 0])] {
-            gateway
-                .handle_at(&packet, NOW)
-                .expect("initialization message handles");
-        }
-        gateway
-    }
-}
-
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(&fs::read(path).expect("fixture JSON reads"))
-        .expect("fixture JSON parses")
-}
-
-fn write_json(path: &Path, value: &Value) {
-    fs::write(
-        path,
-        serde_json::to_vec(value).expect("fixture JSON serializes"),
-    )
-    .expect("fixture JSON writes");
-}
-
-/// The production path: 26/8 opens the menu and 26/10 selects the Shop option.
-fn open_shop(gateway: &mut Gateway, fixture: &Fixture) -> Vec<Vec<u8>> {
-    let menu = send(gateway, &interact(ROOSEY));
-    assert!(
-        menu.iter().any(|packet| packet.starts_with(&[26, 0, 9, 0])),
-        "26/8 must answer with the 26/9 menu"
-    );
-    send(gateway, &select(ROOSEY, fixture.option))
+/// Roosey's `stores.json` purchase prices.
+fn stock_prices() -> BTreeMap<i32, u32> {
+    let stores = read_json(&data().join("stores.json"));
+    stores["items"]
+        .as_array()
+        .expect("store rows are an array")
+        .iter()
+        .filter_map(|row| {
+            Some((
+                row["item_id"].as_i64()? as i32,
+                row["purchase_price_coins"].as_u64()? as u32,
+            ))
+        })
+        .filter(|(id, _)| STOCK.contains(id))
+        .collect()
 }
 
 /// The 35/37 batch the shop pushes, when any loaded definition price differs.
@@ -227,10 +65,11 @@ fn word(packet: &[u8], at: usize) -> u32 {
 
 #[test]
 fn roosey_coin_window_lists_her_stock_at_server_prices() {
-    let fixture = Fixture::new();
+    let fixture = Fixture::new(&[]);
+    let prices = stock_prices();
     let inventory = Inventory::load(&fixture.content, None).expect("fixture inventory loads");
     let mut gateway = fixture.connect(fixture.state());
-    let replies = open_shop(&mut gateway, &fixture);
+    let replies = fixture.open_shop(&mut gateway);
 
     let list = replies
         .iter()
@@ -282,7 +121,7 @@ fn roosey_coin_window_lists_her_stock_at_server_prices() {
     // pushed through the paired 35/37 batch.
     let mut updates = 0;
     for id in STOCK {
-        let price = fixture.prices[&id];
+        let price = prices[&id];
         let loaded = inventory
             .definition_coin_price(id)
             .expect("the definition carries a coin price");

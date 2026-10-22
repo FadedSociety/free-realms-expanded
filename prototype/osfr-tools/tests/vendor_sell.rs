@@ -40,7 +40,9 @@ const VENDOR_ID: u64 = 9_500_000_339;
 /// Default-state fixtures from `lab/references/rust-gameplay/inventory.json`.
 const SELLABLE_INSTANCE: i32 = 14; // definition 75060, sell price 375, not equipped
 const EQUIPPED_INSTANCE: i32 = 34; // definition 21683, sell price 5, equipped
-const UNCATALOGUED_INSTANCE: i32 = 4; // definition 19522, no store row
+/// Definition 60820: no store row, and its client definition sets NoSale, so neither the store
+/// nor the T434 Worth fallback buys it.
+const UNCATALOGUED_INSTANCE: i32 = 67;
 const NO_SALE_DEFINITION: i32 = 1180; // store row flagged no_sale
 const RESULT_OK: u32 = coin_shop::RESULT_SUCCESS;
 

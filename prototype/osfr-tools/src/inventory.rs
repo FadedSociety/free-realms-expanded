@@ -120,16 +120,12 @@ struct Requirement {
 }
 
 impl Requirement {
-    /// Skips the fixed 46-byte prefix and the two length-prefixed strings.
+    /// Reads the block after the model and texture strings.
     /// A row too short to carry the block (test stubs) has no restriction.
     fn from_wire(bytes: &[u8]) -> Self {
-        let mut at = 46;
-        for _ in 0..2 {
-            let Some(len) = read(bytes, at).ok().and_then(|n| usize::try_from(n).ok()) else {
-                return Self::default();
-            };
-            at = at.saturating_add(4).saturating_add(len);
-        }
+        let Some(at) = past_model_strings(bytes) else {
+            return Self::default();
+        };
         match (read(bytes, at), bytes.get(at + 12), read(bytes, at + 26)) {
             (Ok(gender), Some(members), Ok(min_rank)) => Self {
                 gender,
@@ -591,6 +587,17 @@ impl Inventory {
         Some((*definition.bytes.get(44)? != 0, max_stack))
     }
 
+    /// What the client's Sell tab reads from a definition (T434), as `(no_sale, resell_value)`:
+    /// NoSale is byte 45 (object `+0x35`) and ResellValue the dword `resell_value_offset` finds
+    /// (`+0xf0`). The tab lists an owned item only when NoSale is clear and ResellValue is
+    /// positive (`CanSellItem` `00cf08d0`), and shows ResellValue as its Worth (`00a6e5f0`
+    /// case 27). `None` when the row is too short to carry them.
+    pub fn sale_flags(&self, definition_id: i32) -> Option<(bool, i32)> {
+        let bytes = self.definition_record(definition_id)?;
+        let worth = read(bytes, resell_value_offset(bytes)?).ok()?;
+        Some((*bytes.get(45)? != 0, worth))
+    }
+
     pub fn presentation(&self, definition_id: i32) -> io::Result<ItemPresentation> {
         let definition = self
             .content
@@ -598,18 +605,9 @@ impl Inventory {
             .get(&definition_id)
             .ok_or_else(|| invalid("unknown item definition"))?;
         let bytes = &definition.bytes;
-        // Eleven words, two flags, model string, texture string, GenderUsage,
-        // then Type. String lengths count UTF-8 bytes, not characters.
-        let mut offset = 46usize;
-        for _ in 0..2 {
-            let length = usize::try_from(read(bytes, offset)?)
-                .map_err(|_| invalid("negative item string length"))?;
-            offset = offset
-                .checked_add(4)
-                .and_then(|n| n.checked_add(length))
-                .filter(|n| *n <= bytes.len())
-                .ok_or_else(|| invalid("truncated item definition string"))?;
-        }
+        // GenderUsage, then Type, follow the model and texture strings.
+        let offset =
+            past_model_strings(bytes).ok_or_else(|| invalid("truncated item definition string"))?;
         Ok(ItemPresentation {
             name_id: read(bytes, 4)?,
             description_id: read(bytes, 8)?,
@@ -1456,6 +1454,43 @@ fn read(bytes: &[u8], offset: usize) -> io::Result<i32> {
             .unwrap(),
     ))
 }
+
+/// The one walk over a serialized `ClientItemDefinition` row's variable-length strings, in
+/// `piece_096` `decode_items` order. Offset just past the length-prefixed string at `at`
+/// (lengths count UTF-8 bytes), or `None` when the row ends first.
+fn skip_text(bytes: &[u8], at: usize) -> Option<usize> {
+    let length = usize::try_from(read(bytes, at).ok()?).ok()?;
+    at.checked_add(4)?
+        .checked_add(length)
+        .filter(|end| *end <= bytes.len())
+}
+
+/// Past the model and texture strings, which follow the fixed prefix: eleven words, NoTrade
+/// (44) and NoSale (45).
+fn past_model_strings(bytes: &[u8]) -> Option<usize> {
+    skip_text(bytes, skip_text(bytes, 46)?)
+}
+
+/// Offset of ResellValue (T434). After the model strings come GenderUsage, Type, Category,
+/// MembersOnly, NonMinigame, seven effect words, SingleUse, MaxStack and IsTintable (48 bytes),
+/// the tint alias, ForceDisablePreview, then MemberDiscount, VipRankRequired, RaceSetId and
+/// ClientEquipReqSetId. The client agrees: `008e3760` ends with the alias (`008e2600` into
+/// `+0x58`), the flag (`+0x9d`) and those four dwords (`+0xa0`..`+0xac`), and its caller
+/// `00919e10` reads the next dword into `+0xf0`, the field `CanSellItem` (`00cf08d0`) tests.
+fn resell_value_offset(bytes: &[u8]) -> Option<usize> {
+    let alias = past_model_strings(bytes)?.checked_add(48)?;
+    let at = skip_text(bytes, alias)?.checked_add(17)?;
+    (at.checked_add(4)? <= bytes.len()).then_some(at)
+}
+
+/// Write `worth` as a serialized definition row's ResellValue (the Sell tab's Worth), leaving
+/// every other byte as it was. `None` when the row cannot carry it.
+pub fn set_resell_value(record: &mut [u8], worth: u32) -> Option<()> {
+    let at = resell_value_offset(record)?;
+    record[at..at + 4].copy_from_slice(&i32::try_from(worth).ok()?.to_le_bytes());
+    Some(())
+}
+
 fn write_text(bytes: &mut Vec<u8>, value: &str) {
     put(bytes, value.len() as i32);
     bytes.extend(value.as_bytes());

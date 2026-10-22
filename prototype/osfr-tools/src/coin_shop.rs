@@ -80,6 +80,10 @@ pub struct StoreCatalogue {
     station_cash: station_cash::Config,
     marketplace: MarketplaceConfig,
     items: Vec<StoreItem>,
+    /// F228/L040 free issuance (job starter outfits, the Condo starter kit), set by
+    /// `CoinShop::new`: every copy resells for 0 wherever the player got it (`sell_unit_price`).
+    #[serde(skip)]
+    free_items: BTreeSet<i32>,
 }
 
 fn default_buy_back_window() -> usize {
@@ -172,17 +176,6 @@ impl StoreCatalogue {
     fn item(&self, item_id: i32) -> Option<&StoreItem> {
         self.items.iter().find(|item| item.item_id == item_id)
     }
-
-    /// F228: a job starter outfit item is free issuance, so every copy resells for 0 wherever
-    /// the player got it. A row with no sell price stays unsellable (`None`); the purchase
-    /// price is unchanged.
-    fn zero_starter_sell_prices(&mut self, starter_items: &BTreeSet<i32>) {
-        for item in &mut self.items {
-            if starter_items.contains(&item.item_id) {
-                item.sell_price_coins = item.sell_price_coins.map(|_| 0);
-            }
-        }
-    }
 }
 
 /// Inner application messages and the state-change indicator. Persist state before sending replies.
@@ -233,12 +226,11 @@ impl CoinShop {
         // profiles: a second parse would also reject a package whose saved progression is valid
         // but whose unused `default_state` is not. Purchase prices are untouched.
         // L040: the Condo starter kit in this content's houses.json is free issuance too.
-        let mut free = profiles.map_or_else(Default::default, |p| p.all_starter_items());
-        free.extend(
+        catalogue.free_items = profiles.map_or_else(Default::default, |p| p.all_starter_items());
+        catalogue.free_items.extend(
             crate::housing_service::HousingContent::kit_items(inventory_content)
                 .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("{e:?}")))?,
         );
-        catalogue.zero_starter_sell_prices(&free);
         let sc_catalogue = station_cash::Catalogue::build(
             catalogue.station_cash.clone(),
             &inventory,
@@ -656,6 +648,41 @@ impl CoinShop {
         self.sell_with_merchant(item_instance_id, quantity, 0)
     }
 
+    /// T434: what 165/5 pays for one unit of `definition_id`, or `None` when the shop does not
+    /// buy it. The one sale price: a sale records it and buy-back refunds that record. In order:
+    /// a `stores.json` no_sale row is never bought; free issuance pays 0, with or without a row;
+    /// a `stores.json` sell price is authoritative; otherwise the client's own Worth, when its
+    /// Sell tab lists the item (NoSale clear, ResellValue > 0, `00cf08d0`), is paid (R). That
+    /// fallback covers the loot, gathered materials and potions `stores.json` never priced.
+    pub fn sell_unit_price(&self, definition_id: i32) -> Option<u32> {
+        let row = self.catalogue.item(definition_id);
+        if row.is_some_and(|row| row.no_sale) {
+            return None;
+        }
+        if self.catalogue.free_items.contains(&definition_id) {
+            return Some(0);
+        }
+        row.and_then(|row| row.sell_price_coins).or_else(|| {
+            let (no_sale, worth) = self.inventory.sale_flags(definition_id)?;
+            u32::try_from(worth)
+                .ok()
+                .filter(|worth| !no_sale && *worth > 0)
+        })
+    }
+
+    /// T434: the Worth a 35/37 update must carry so the client's Sell tab shows what 165/5 pays
+    /// for `definition_id`: the paid price where the definition's ResellValue differs, or 0 to
+    /// drop a listed item the shop pays nothing for off the tab (`00cf08d0`). `None` when the
+    /// client's definition already agrees. The client cache keeps the update for the session
+    /// (`00a3c290` overwrites by id), so it is sent on every shop open (R).
+    pub fn sell_worth_override(&self, definition_id: i32) -> Option<u32> {
+        let (no_sale, worth) = self.inventory.sale_flags(definition_id)?;
+        match self.sell_unit_price(definition_id) {
+            Some(paid) if paid > 0 => (i64::from(paid) != i64::from(worth)).then_some(paid),
+            _ => (!no_sale && worth > 0).then_some(0),
+        }
+    }
+
     fn sell_with_merchant(
         &mut self,
         item_instance_id: i32,
@@ -737,32 +764,15 @@ impl CoinShop {
                 merchant_id,
             ));
         }
-        let Some(item) = self.catalogue.item(owned.definition_id) else {
+        let Some(unit_price) = self.sell_unit_price(owned.definition_id) else {
+            // (R) An item the store has no row for is invalid; a row it refuses is unavailable.
+            let result = match self.catalogue.item(owned.definition_id) {
+                Some(_) => RESULT_SERVICE_UNAVAILABLE,
+                None => RESULT_INVALID_ITEM,
+            };
             return Ok(self.failure(
                 2,
-                RESULT_INVALID_ITEM,
-                transaction_id,
-                owned.definition_id,
-                quantity,
-                0,
-                merchant_id,
-            ));
-        };
-        if item.no_sale {
-            return Ok(self.failure(
-                2,
-                RESULT_SERVICE_UNAVAILABLE,
-                transaction_id,
-                owned.definition_id,
-                quantity,
-                0,
-                merchant_id,
-            ));
-        }
-        let Some(unit_price) = item.sell_price_coins else {
-            return Ok(self.failure(
-                2,
-                RESULT_SERVICE_UNAVAILABLE,
+                result,
                 transaction_id,
                 owned.definition_id,
                 quantity,

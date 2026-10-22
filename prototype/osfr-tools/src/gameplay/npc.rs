@@ -567,8 +567,9 @@ impl Gameplay {
                     // fills its stock rows. The row carries the display fields from the item
                     // definition; the displayed price is the definition's coin purchase price,
                     // so a stale definition is updated from stores.json first.
+                    let shop = self.npc_coin_shop.as_ref();
                     let (packets, rows) =
-                        coin_merchant_packets(&window, &self.inventory, now_ms)
+                        coin_merchant_packets(&window, &self.inventory, shop, now_ms)
                             .map_err(|_| invalid("NPC merchant list could not be encoded"))?;
                     out.replies.extend(packets);
                     npc_event(select_event(runtime_guid, Some(key), option_id, "shop"));
@@ -1223,12 +1224,18 @@ pub(super) fn dialogue_packet_with(
 /// price in the merchant row. A row the login catalogue did not carry is pushed so the window
 /// can render it; a cached row whose price differs from `stores.json` is replaced
 /// (`00a3c290` overwrites by id), keeping the server the price authority.
+///
+/// T434: the same batch carries the Sell tab's Worth. The tab lists each owned item at its
+/// definition's ResellValue (`00cf08d0`, `00a6e5f0` case 27), so an owned definition that shows
+/// something other than what 165/5 pays is pushed with `CoinShop::sell_worth_override`. One
+/// record per id carries both patches: the batch refuses two different rows for one id.
 fn coin_merchant_packets(
     window: &MerchantWindow,
     inventory: &Inventory,
+    shop: Option<&crate::coin_shop::CoinShop>,
     now_ms: u64,
 ) -> Result<(Vec<Vec<u8>>, usize), npc_interaction::NpcInteractionError> {
-    let mut definitions = Vec::new();
+    let mut definitions = BTreeMap::new();
     let mut entries = Vec::new();
     for item in &window.items {
         // The stock list is the buy list: a row without a purchase price cannot be bought.
@@ -1244,7 +1251,7 @@ fn coin_merchant_packets(
         let price_matches = inventory.definition_coin_price(item.item_id) == Some(price);
         if !inventory.definition_was_captured(item.item_id) || !price_matches {
             if let Some(record) = inventory.definition_record_with_coin_price(item.item_id, price) {
-                definitions.push(record);
+                definitions.insert(item.item_id, record);
             }
         }
         entries.push(npc_interaction::MerchantEntryV2 {
@@ -1263,9 +1270,30 @@ fn coin_merchant_packets(
             can_buy: true,
         });
     }
+    // ponytail: one batch bounded by the bag (MAX_ITEMS), like the login catalogue, and one
+    // linear `stores.json` lookup per owned definition; split the batch as
+    // `coin_shop::item_definitions` does, or index the store by id, if a bag outgrows them.
+    let owned: BTreeSet<i32> = inventory
+        .state()
+        .items
+        .iter()
+        .map(|item| item.definition_id)
+        .collect();
+    for id in owned {
+        let (Some(worth), Some(base)) = (
+            shop.and_then(|shop| shop.sell_worth_override(id)),
+            inventory.definition_record(id),
+        ) else {
+            continue;
+        };
+        let record = definitions.entry(id).or_insert_with(|| base.to_vec());
+        crate::inventory::set_resell_value(record, worth)
+            .ok_or(npc_interaction::NpcInteractionError::InvalidPacket)?;
+    }
     let rows = entries.len();
     let mut packets = Vec::new();
     if !definitions.is_empty() {
+        let definitions: Vec<_> = definitions.into_values().collect();
         packets.push(
             crate::inventory_v2_fixes::encode_definition_batch_v2(&definitions, &[])
                 .map_err(|_| npc_interaction::NpcInteractionError::InvalidPacket)?,
