@@ -1514,19 +1514,12 @@ impl Gateway {
                     let elapsed = last_movement_ms
                         .map(|last| Duration::from_millis(now_ms.saturating_sub(last)))
                         .unwrap_or(Duration::from_secs(1));
-                    // (R) Base speed and mount/buff modifiers are not server-owned
-                    // yet; 10 units/s with the validator's generous capture-tested
-                    // envelope preserves W53b reports while rejecting gross jumps.
                     let validated = movement::validate(
                         &movement_state,
                         update,
                         state.zone_id,
                         elapsed,
-                        SpeedModifiers {
-                            base_speed_per_second: 10.0,
-                            mount_multiplier: 1.0,
-                            buff_multiplier: 1.0,
-                        },
+                        SpeedModifiers::riding(gameplay.as_ref().and_then(Gameplay::mounted_speed)),
                         expected_discontinuity,
                     );
                     expected_discontinuity = validated.expected_discontinuity;

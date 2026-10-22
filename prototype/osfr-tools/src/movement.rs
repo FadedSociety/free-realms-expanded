@@ -82,6 +82,20 @@ pub struct SpeedModifiers {
 }
 
 impl SpeedModifiers {
+    /// (R) Base speed and buff modifiers are not server-owned yet; 10 units/s with the
+    /// validator's generous capture-tested envelope preserves W53b reports while rejecting gross
+    /// jumps. A boarded ride (`ride_speed`) scales the base by its speed over the base, held to
+    /// the validator's 1.0..=1.5 mount range, so a ride that stands still (the Lawn Chair, 0)
+    /// keeps the on-foot allowance.
+    pub fn riding(ride_speed: Option<f32>) -> Self {
+        const BASE: f32 = 10.0;
+        Self {
+            base_speed_per_second: BASE,
+            mount_multiplier: ride_speed.map_or(1.0, |speed| (speed / BASE).clamp(1.0, 1.5)),
+            buff_multiplier: 1.0,
+        }
+    }
+
     fn effective_speed(self, state: u8) -> Option<f64> {
         let base = f64::from(self.base_speed_per_second);
         let mount = f64::from(self.mount_multiplier);

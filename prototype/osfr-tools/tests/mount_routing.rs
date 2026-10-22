@@ -186,7 +186,8 @@ fn an_owned_ride_is_summoned_boarded_and_put_away() {
     // The client automounts: 168/1 names the actor it saw. The reply is shared.
     let boarded = handle(&mut service, &mount_request(actor), &owned, 10);
     assert_eq!(sub_opcodes(&boarded.shared), vec![(168, 2)]);
-    assert!(boarded.private.is_empty());
+    // T451: the rider's ride stats (38/7) go to the owner only.
+    assert_eq!(sub_opcodes(&boarded.private), vec![(38, 7)]);
     assert_eq!(&boarded.shared[0][3..11], &OWNER.to_le_bytes());
     assert_eq!(&boarded.shared[0][11..19], &actor.to_le_bytes());
     assert!(service.is_mounted());
@@ -196,7 +197,7 @@ fn an_owned_ride_is_summoned_boarded_and_put_away() {
     assert_eq!(sub_opcodes(&away.shared[..1]), vec![(168, 4)]);
     assert_eq!(&away.shared[1][..6], &[35, 0, 3, 0, 1, 0]);
     assert_eq!(&away.shared[1][6..14], &actor.to_le_bytes());
-    assert_eq!(sub_opcodes(&away.private), vec![(168, 5)]);
+    assert_eq!(sub_opcodes(&away.private), vec![(168, 5), (38, 7)]);
     assert!(!service.is_mounted());
     assert_eq!(service.view(OWNER), None);
     let again = handle(&mut service, &DISMOUNT_REQUEST, &owned, 30);

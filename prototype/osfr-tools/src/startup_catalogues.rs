@@ -85,13 +85,13 @@ pub struct EffectTag<'a> {
     pub definition_blob: &'a [u8],
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub enum StatValue {
     Integer(i32),
     Float(f32),
 }
 
-#[derive(Clone, Copy, Debug)]
+#[derive(Clone, Copy, Debug, PartialEq)]
 pub struct CharacterStat {
     pub id: i32,
     pub value: StatValue,

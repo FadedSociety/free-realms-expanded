@@ -1,5 +1,35 @@
 {
   "schema_version": 1,
+  "on_foot": {
+    "max_movement_speed": 8.0,
+    "source": [
+      {
+        "kind": "client",
+        "evidence": "Captured world entry lab/content/startup-snapshot/startup.json SHA256 da3a4ac1654522e212e7364fcf3870f5315e055a45b66f7ecdb116c904c0f276: character.stats id 2 (MaxMovementSpeed, client stat-name table 0x01af2010), kind 1 (float), value 8.0"
+      }
+    ]
+  },
+  "trained_glide": {
+    "stats": {
+      "glide_default_forward_speed": 8.0,
+      "glide_min_forward_speed": 2.0,
+      "glide_max_forward_speed": 18.0,
+      "glide_fall_time": 0.75,
+      "glide_fall_speed": 4.0,
+      "glide_accel": 4.0,
+      "glide_enabled": true
+    },
+    "source": [
+      {
+        "kind": "legacy",
+        "evidence": "Sanctuary main 10f129e (AGPL-3.0, values only, no code) src/Sanctuary.Gateway/Handlers/MountBasePacket/PacketMountSpawnHandler.cs:101-111, the block for an upgradable ride marked upgraded; the same values as src/restoration/piece_092.rs:526-537 (able_to_fly)"
+      },
+      {
+        "kind": "reconstructed",
+        "evidence": "Community server data; the original server's ride stat values were not recovered (R)"
+      }
+    ]
+  },
   "mount_types": [
     {
       "id": 0,
@@ -4373,6 +4403,16 @@
       "tint_id": 0,
       "tint_alias": "",
       "seat_count": 1,
+      "stats": {
+        "glide_default_forward_speed": 12.0,
+        "glide_min_forward_speed": 6.0,
+        "glide_max_forward_speed": 22.0,
+        "glide_fall_time": 0.75,
+        "glide_fall_speed": 3.0,
+        "glide_accel": 4.0,
+        "glide_enabled": true,
+        "jump_height": 5.0
+      },
       "source": [
         {
           "kind": "legacy",
@@ -4474,6 +4514,16 @@
           {
             "kind": "reconstructed",
             "evidence": "Not specified by client mount tables; default used for this service slice (R)"
+          }
+        ],
+        "stats": [
+          {
+            "kind": "legacy",
+            "evidence": "Sanctuary main 10f129e (AGPL-3.0, values only, no code) src/Resources/Mounts.json SHA256 9d7a76e92804b52d9f4a814b52fc16cf70421a4e59d5f12aba724d87246debc3, row 13459 Stats; the same values as src/restoration/piece_092.rs:513-525 (Fire Hawk)"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "Community server data; the original server's ride stat values were not recovered (R)"
           }
         ]
       }
@@ -6097,6 +6147,9 @@
       "tint_id": 0,
       "tint_alias": "dyetint",
       "seat_count": 1,
+      "stats": {
+        "jump_height": 2.5
+      },
       "source": [
         {
           "kind": "legacy",
@@ -6198,6 +6251,16 @@
           {
             "kind": "reconstructed",
             "evidence": "Not specified by client mount tables; default used for this service slice (R)"
+          }
+        ],
+        "stats": [
+          {
+            "kind": "legacy",
+            "evidence": "Sanctuary main 10f129e (AGPL-3.0, values only, no code) src/Resources/Mounts.json SHA256 9d7a76e92804b52d9f4a814b52fc16cf70421a4e59d5f12aba724d87246debc3, row 13567 Stats"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "Community server data; the original server's ride stat values were not recovered (R)"
           }
         ]
       }

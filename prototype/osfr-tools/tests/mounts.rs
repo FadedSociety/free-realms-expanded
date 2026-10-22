@@ -42,9 +42,12 @@ fn catalog() -> MountCatalog {
             tint_id: 0,
             tint_alias: "dyetint".to_owned(),
             seat_count: 1,
+            stats: Default::default(),
             source: source(),
             field_sources: Default::default(),
         }],
+        8.0,
+        Default::default(),
     )
     .unwrap()
 }

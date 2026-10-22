@@ -983,3 +983,14 @@ fn parse_zone_details(inner: &[u8]) -> Option<u32> {
         inner.get(offset..offset + 4)?.try_into().ok()?,
     ))
 }
+
+/// T451: a boarded ride scales the base by its speed over the base, held to the mount range.
+#[test]
+fn a_ride_scales_the_allowance_within_the_mount_range() {
+    let multiplier = |speed| SpeedModifiers::riding(speed).mount_multiplier;
+    assert_eq!(multiplier(None), 1.0);
+    assert_eq!(multiplier(Some(0.0)), 1.0, "a ride that stands still");
+    assert_eq!(multiplier(Some(12.5)), 1.25);
+    assert_eq!(multiplier(Some(64.0)), 1.5, "capped");
+    assert_eq!(SpeedModifiers::riding(None).base_speed_per_second, 10.0);
+}

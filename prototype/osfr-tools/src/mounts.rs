@@ -3,7 +3,11 @@
 //! Mount packets are synthetic inner messages based on the client readers in
 //! `notes/Build Guides/Gameplay/Mounts.md`; datagram byte order is unverified.
 
-use crate::{inventory::InventoryState, startup_world, world};
+use crate::{
+    inventory::InventoryState,
+    startup_catalogues::{self, CharacterStat, StatUpdate, StatValue},
+    startup_world, world,
+};
 use serde::Deserialize;
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -25,6 +29,15 @@ const SPAWN_DEBOUNCE_MS: u64 = 1_000;
 // rider is seated), and the AddPc tail feeds the same slot (`0095ad80`); FreeRealms-Legacy, which
 // this client accepts, sends 1 in all three places. Used for both so the two routes agree.
 const SEATED_QUEUE: i32 = 1;
+// (R) Sanity ceiling for ride, glide and on-foot speeds (units per second).
+const MAX_SPEED: f32 = 64.0;
+// Character stat ids index the client's stat-name table at `0x01af2008` (4 bytes per id):
+// 2 MaxMovementSpeed (`0x01af2010`); 59-63 GlideDefaultForwardSpeed, GlideMinForwardSpeed,
+// GlideMaxForwardSpeed, GlideFallTime, GlideFallSpeed (`0x01af20f4`-`0x01af2104`); 64 GlideEnabled
+// (`0x01af2108`); 67 GlideAccel (`0x01af2114`); 68 JumpHeight (`0x01af2118`).
+const MAX_MOVEMENT_SPEED: i32 = 2;
+const GLIDE_ENABLED: i32 = 64;
+const JUMP_HEIGHT: i32 = 68;
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
 #[serde(tag = "kind", content = "evidence", rename_all = "snake_case")]
@@ -61,15 +74,71 @@ pub struct MountDefinition {
     pub tint_id: i32,
     pub tint_alias: String,
     pub seat_count: u8,
+    /// Glide and jump stats the rider gets on boarding (`MountCatalog::boarded_stats`).
+    #[serde(default)]
+    pub stats: RideStats,
     pub source: Vec<MountSource>,
     #[serde(default)]
     pub field_sources: BTreeMap<String, Vec<MountSource>>,
+}
+
+/// A ride's movement stats for its rider, sent as character stats (38/7). A missing field is 0
+/// (off), which is what a ride without the stat sends.
+#[derive(Clone, Copy, Debug, Default, Deserialize, PartialEq)]
+#[serde(default, deny_unknown_fields)]
+pub struct RideStats {
+    pub glide_default_forward_speed: f32,
+    pub glide_min_forward_speed: f32,
+    pub glide_max_forward_speed: f32,
+    pub glide_fall_time: f32,
+    pub glide_fall_speed: f32,
+    pub glide_accel: f32,
+    pub glide_enabled: bool,
+    pub jump_height: f32,
+}
+
+impl RideStats {
+    /// (R) Sanity bounds: speeds and accel 0..=64, fall time 0..=10, jump 0..=32 (each range also
+    /// refuses NaN and infinities, which the client's stat reader rejects), and an enabled glide
+    /// keeps min <= default <= max.
+    fn valid(&self) -> bool {
+        [
+            self.glide_default_forward_speed,
+            self.glide_min_forward_speed,
+            self.glide_max_forward_speed,
+            self.glide_fall_speed,
+            self.glide_accel,
+        ]
+        .iter()
+        .all(|speed| (0.0..=MAX_SPEED).contains(speed))
+            && (0.0..=10.0).contains(&self.glide_fall_time)
+            && (0.0..=32.0).contains(&self.jump_height)
+            && (!self.glide_enabled
+                || (self.glide_min_forward_speed <= self.glide_default_forward_speed
+                    && self.glide_default_forward_speed <= self.glide_max_forward_speed))
+    }
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct OnFoot {
+    max_movement_speed: f32,
+    source: Vec<MountSource>,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct TrainedGlide {
+    stats: RideStats,
+    source: Vec<MountSource>,
 }
 
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct MountsDocument {
     schema_version: u32,
+    on_foot: OnFoot,
+    trained_glide: TrainedGlide,
     mount_types: Vec<MountType>,
     mounts: Vec<MountDefinition>,
 }
@@ -79,6 +148,8 @@ pub struct MountCatalog {
     types: BTreeMap<u32, MountType>,
     mounts: BTreeMap<i32, Arc<MountDefinition>>,
     item_to_mount: BTreeMap<i32, i32>,
+    on_foot_speed: f32,
+    trained_glide: RideStats,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -105,21 +176,35 @@ impl MountCatalog {
         }
         let bytes = fs::read(path)?;
         let document: MountsDocument = serde_json::from_slice(&bytes).map_err(invalid_data)?;
-        if document.schema_version != 1 {
+        if document.schema_version != 1
+            || !valid_sources(&document.on_foot.source)
+            || !valid_sources(&document.trained_glide.source)
+        {
             return Err(invalid_data("unsupported mount content schema"));
         }
-        Self::new(document.mount_types, document.mounts)
-            .map_err(|_| invalid_data("invalid mount content records"))
+        Self::new(
+            document.mount_types,
+            document.mounts,
+            document.on_foot.max_movement_speed,
+            document.trained_glide.stats,
+        )
+        .map_err(|_| invalid_data("invalid mount content records"))
     }
 
+    /// `on_foot_speed` is what a ride's end restores; `trained_glide` is the glide block of an
+    /// upgradable ride its owner trained.
     pub fn new(
         mount_types: Vec<MountType>,
         mounts: Vec<MountDefinition>,
+        on_foot_speed: f32,
+        trained_glide: RideStats,
     ) -> Result<Self, MountError> {
         if mount_types.is_empty()
             || mount_types.len() > 128
             || mounts.is_empty()
             || mounts.len() > 4096
+            || !(on_foot_speed > 0.0 && on_foot_speed <= MAX_SPEED)
+            || !trained_glide.valid()
         {
             return Err(MountError::InvalidCatalog);
         }
@@ -151,8 +236,8 @@ impl MountCatalog {
                 || mount.name.trim().is_empty()
                 || mount.name_string_id <= 0
                 || mount.image_set_id <= 0
-                || !mount.max_movement_speed.is_finite()
-                || mount.max_movement_speed < 0.0
+                || !(0.0..=MAX_SPEED).contains(&mount.max_movement_speed)
+                || !mount.stats.valid()
                 || !(1..=99).contains(&mount.seat_count)
                 || mount.tint_alias.len() > 4096
                 || !valid_sources(&mount.source)
@@ -179,7 +264,43 @@ impl MountCatalog {
             types,
             mounts: records,
             item_to_mount,
+            on_foot_speed,
+            trained_glide,
         })
+    }
+
+    /// The full 38/7 block a boarded ride sends its rider, always all nine stats so a replacement
+    /// ride never keeps an earlier ride's glide. The glide comes from the ride's own stats when
+    /// they enable it, else from `trained_glide` for a trained upgradable ride, else it is off.
+    fn boarded_stats(&self, mount: &MountDefinition) -> Vec<CharacterStat> {
+        let glide = if mount.stats.glide_enabled {
+            mount.stats
+        } else if mount.is_upgradable && trained(mount) {
+            self.trained_glide
+        } else {
+            RideStats::default()
+        };
+        vec![
+            float_stat(MAX_MOVEMENT_SPEED, mount.max_movement_speed),
+            float_stat(59, glide.glide_default_forward_speed),
+            float_stat(60, glide.glide_min_forward_speed),
+            float_stat(61, glide.glide_max_forward_speed),
+            float_stat(62, glide.glide_fall_time),
+            float_stat(63, glide.glide_fall_speed),
+            int_stat(GLIDE_ENABLED, glide.glide_enabled.into()),
+            float_stat(67, glide.glide_accel),
+            float_stat(JUMP_HEIGHT, mount.stats.jump_height),
+        ]
+    }
+
+    /// (R) What a ride's end restores: on-foot speed, glide off and no jump bonus. Both community
+    /// servers send exactly these three; the captured snapshot holds only the speed.
+    fn on_foot_stats(&self) -> Vec<CharacterStat> {
+        vec![
+            float_stat(MAX_MOVEMENT_SPEED, self.on_foot_speed),
+            int_stat(GLIDE_ENABLED, 0),
+            float_stat(JUMP_HEIGHT, 0.0),
+        ]
     }
 
     pub fn mount_types(&self) -> impl Iterator<Item = &MountType> {
@@ -281,6 +402,12 @@ pub enum MountEffectKind {
     },
     /// Synthetic inner application packet, before gateway tunnel wrapping.
     Packet(Vec<u8>),
+    /// The rider's character stats (38/7): the ride's block on boarding, the on-foot values when
+    /// a boarded ride ends. Owner only.
+    RiderStats {
+        rider_guid: u64,
+        stats: Vec<CharacterStat>,
+    },
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -291,11 +418,15 @@ pub struct MountEffect {
 }
 
 impl MountEffect {
-    /// Everything but the owner's roster list is public: nearby players need the ride actor, the
-    /// rider's attachment and its removal to draw the rider on the ride (client 00b06100 handles
-    /// 168/2 and 168/4 for any rider it knows, not only the local player).
+    /// Everything but the owner's roster list and stats is public: nearby players need the ride
+    /// actor, the rider's attachment and its removal to draw the rider on the ride (client
+    /// 00b06100 handles 168/2 and 168/4 for any rider it knows, not only the local player).
     pub fn nearby(&self) -> bool {
-        !matches!(&self.kind, MountEffectKind::Packet(bytes) if bytes.get(2) == Some(&LIST))
+        match &self.kind {
+            MountEffectKind::Packet(bytes) => bytes.get(2) != Some(&LIST),
+            MountEffectKind::RiderStats { .. } => false,
+            MountEffectKind::SpawnRide { .. } | MountEffectKind::DespawnRide { .. } => true,
+        }
     }
 }
 
@@ -339,6 +470,14 @@ impl MountService {
     /// (`social_chat::emote_context`).
     pub fn is_mounted(&self) -> bool {
         matches!(self.state, MountState::Mounted { .. })
+    }
+
+    /// The boarded ride's speed; `None` while on foot or beside a summoned ride.
+    pub fn mounted_speed(&self) -> Option<f32> {
+        let MountState::Mounted { ride, .. } = &self.state else {
+            return None;
+        };
+        Some(self.catalog.mount(ride.mount_id)?.max_movement_speed)
     }
 
     /// A new network session starts with no ride out (the actor does not survive a disconnect).
@@ -451,6 +590,7 @@ impl MountService {
             changed: true,
             ..MountOutcome::default()
         };
+        let was_mounted = self.is_mounted();
         // (R) Replace any prior summoned actor after the client spawn handshake.
         if let Some(old_ride) = self.state.active_ride().cloned() {
             if let MountState::Mounted { rider_guid, .. } = &self.state {
@@ -485,6 +625,11 @@ impl MountService {
                 max_movement_speed: mount.max_movement_speed,
             },
         });
+        if was_mounted {
+            outcome
+                .effects
+                .push(rider_stats(owner_guid, self.catalog.on_foot_stats()));
+        }
         Ok(outcome)
     }
 
@@ -557,10 +702,13 @@ impl MountService {
         };
         Ok(MountOutcome {
             changed: true,
-            effects: vec![packet(
-                recipients(owner_guid, observers),
-                encode_mount_response(rider_guid, ride.actor_guid, seat_index),
-            )],
+            effects: vec![
+                packet(
+                    recipients(owner_guid, observers),
+                    encode_mount_response(rider_guid, ride.actor_guid, seat_index),
+                ),
+                rider_stats(owner_guid, self.catalog.boarded_stats(mount)),
+            ],
             debounced: false,
         })
     }
@@ -578,6 +726,7 @@ impl MountService {
     ) -> MountOutcome {
         let all_recipients = recipients(owner_guid, observers);
         let mut effects = Vec::new();
+        let was_mounted = self.is_mounted();
         let ride = match std::mem::replace(&mut self.state, MountState::Empty) {
             // (R) Empty dismount requests are idempotent no-ops.
             MountState::Empty => return MountOutcome::default(),
@@ -599,6 +748,9 @@ impl MountService {
             },
         });
         effects.push(packet(vec![owner_guid], self.list_packet(inventory)));
+        if was_mounted {
+            effects.push(rider_stats(owner_guid, self.catalog.on_foot_stats()));
+        }
         MountOutcome {
             changed: true,
             effects,
@@ -864,6 +1016,13 @@ impl MountService {
                 MountEffectKind::DespawnRide { actor_guid } => {
                     target.push(remove_actor(*actor_guid))
                 }
+                MountEffectKind::RiderStats { rider_guid, stats } => target.extend(
+                    world::unframe_tunnel(&startup_catalogues::build_stat_update(StatUpdate {
+                        target_guid: *rider_guid,
+                        stats,
+                    }))
+                    .ok(),
+                ),
             }
         }
         wire
@@ -969,6 +1128,33 @@ fn packet(recipients: Vec<u64>, bytes: Vec<u8>) -> MountEffect {
     MountEffect {
         recipients,
         kind: MountEffectKind::Packet(bytes),
+    }
+}
+
+fn rider_stats(rider_guid: u64, stats: Vec<CharacterStat>) -> MountEffect {
+    MountEffect {
+        recipients: vec![rider_guid],
+        kind: MountEffectKind::RiderStats { rider_guid, stats },
+    }
+}
+
+/// Whether the owner trained this upgradable ride to glide. ponytail: the ride record's
+/// `is_upgraded` until glide training adds a per-owned-ride flag here.
+fn trained(mount: &MountDefinition) -> bool {
+    mount.is_upgraded
+}
+
+fn float_stat(id: i32, value: f32) -> CharacterStat {
+    CharacterStat {
+        id,
+        value: StatValue::Float(value),
+    }
+}
+
+fn int_stat(id: i32, value: i32) -> CharacterStat {
+    CharacterStat {
+        id,
+        value: StatValue::Integer(value),
     }
 }
 
