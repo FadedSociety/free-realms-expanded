@@ -10,6 +10,7 @@ pub mod chat;
 pub mod chess;
 pub mod chess_service;
 pub mod coin_shop;
+pub mod collection_catalogue;
 pub mod combat;
 pub mod content;
 pub mod cooking;

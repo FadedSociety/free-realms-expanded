@@ -24,9 +24,11 @@
 //! `Collected` and a reward bundle.
 //!
 //! RECONSTRUCTED here: the catalogue/ledger split, the durable document, every error and every
-//! bound. No first-party collection or entry identifier, node placement, radius, reward item or
-//! reward amount was recovered, so none is invented — [`CollectionDefinition::entries`] carries
-//! caller-supplied entry ids and nothing in this module grants an item or currency.
+//! bound. The captured collection and entry ids, entry item links and reward rows live in
+//! `data/content/collection_catalogue.json` (loader `collection_catalogue.rs`, T447), which builds
+//! this catalogue. No node placement or radius was recovered, so none is invented —
+//! [`CollectionDefinition::entries`] carries caller-supplied entry ids and nothing in this module
+//! grants an item or currency.
 
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeSet;

@@ -35,8 +35,9 @@
 //! Explicit gaps, do not imply these:
 //! * the proximity radius that activates an exploration entry is not recovered. `approach` takes the
 //!   range from the caller and validates it;
-//! * no collection reward value is recovered, only the reward-bundle entry kinds;
-//! * item definition ids for item collection entries live in work item 074, not here;
+//! * captured collection reward rows live in `data/content/collection_catalogue.json` (T447); this
+//!   module still grants none of them;
+//! * item definition ids for item collection entries live in that catalogue, not here;
 //! * the captured payload's unnamed fields keep their positions only; their meaning is unverified.
 
 use std::collections::BTreeMap;
