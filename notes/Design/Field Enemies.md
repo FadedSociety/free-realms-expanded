@@ -35,8 +35,8 @@ Every row has empty `quest_ids`, 8 m aggro, 2.5 m melee reach, radius 6 m, count
 | W102-T1 | Lakeshore / northeast Wilds / Troll Bone Shaman | 1 / 1–2 | `[-347.084,0.61,1068.348]` | 60 s | NPC 3149, Lua 1892; 112.07 m |
 | W102-T2 | Lakeshore / northeast Wilds / Troll Bone Shaman | 1 / 1–2 | `[-351.103,2.33,1048.674]` | 60 s | NPC 3150, Lua 1893; 116.82 m |
 | W102-T3 | Lakeshore / northeast Wilds / Troll Bone Shaman | 1 / 1–2 | `[-447.084,3.03,1128.348]` | 60 s | Additional actor (R), NPC 3149 as anchor; 116.28 m |
-| MID-F1 | Farnum outskirts / Hooligan Wolf | 5 / 5–6 | `[-2077,-48.70,425]` | 90 s | NPC 3156, Lua 1899; 39.8 m (T415) |
-| MID-F2 | Farnum outskirts / Hooligan Wolf | 5 / 5–6 | `[-2065,-47.17,425]` | 90 s | NPC 3156, Lua 1899; 48.0 m (T415) |
+| MID-F1 | Farnum outskirts / Hooligan Wolf | 5 / 5–6 | `[-2004,-37.50,490]` | 90 s | NPC 3157, Lua 1900; 97.3 m (F621) |
+| MID-F2 | Farnum outskirts / Hooligan Wolf | 5 / 5–6 | `[-2016,-39.50,490]` | 90 s | NPC 3157, Lua 1900; 85.8 m (F621) |
 | MID-H1 | Highroad outskirts / Hooligan | 7 / 7–8 | `[-2013,-37.60,609]` | 90 s | NPC 4667, Lua 3301; 39.6 m (T415) |
 | MID-H2 | Highroad outskirts / Hooligan | 7 / 7–8 | `[-2013,-35.75,597]` | 90 s | NPC 4667, Lua 3301; 48.7 m (T415) |
 | MID-T1 | Lakeshore / northeast Wilds / Troll Bone Shaman | 9 / 9–10 | `[-480,4.60,1110]` | 120 s | NPC 3149, Lua 1892; 153.9 m (T415) |
@@ -55,6 +55,8 @@ Every row has empty `quest_ids`, 8 m aggro, 2.5 m melee reach, radius 6 m, count
 | ELITE-H2 | Highroad outskirts / Hooligan | 20 / 19–20 | `[-1817,-43.45,188]` | 180 s | NPC 23623, Lua 4152; 40.4 m (T415) |
 
 **T415 (2026-10-22): the level 5-20 camps left the starter centres.** T245, T296 and T332 had put the MID/HIGH/ELITE rows on these W102 centres, so a level 1-4 player met level 7-20 hits (native: a level-5 player at W102-H1 took 46 and 141). The 18 rows above now sit on audited centres: the W102 checker's height, full-leash slope and NPC/town/path limits (every `npc_spawns_extra.json` record counts as an NPC anchor); at least leash + leash + aggro + 4 m from any actor whose band is more than two levels away; leash + aggro + 20 m from every difficulty 1-2 battle marker; leash + Flame Wave radius + 4 m from the power-up suite's clear point; and a walk of slopes up to 25 degrees to the region's W102 camp (R). Higher bands sit further from Sanctuary, Cobblestone and Farnum (R). The anchor is the nearest same-kind Legacy spawn. These rows keep their T245/T296/T332 stats, not the 100/7 W102 balance above. Per-centre checker output: `notes/Autopilot/T415.md`; `tests/field_camp_separation.rs` enforces the separation.
+
+**F621 (2026-10-22): MID-F left the opening wolf walk.** T415 had put MID-F1 7 m off the straight walk from Cleetus to the five stage-910007 wolves (`encounters.json` `world_enemies`) and 39.8 m from the first wolf, so a new Brawler on "Fighting off the Pack" could pull a level-5 wolf that looks like the pack. Both rows moved 81-98 m north-east, 72-84 m from the pack (table above). The separation test now also keeps every band above 4 at leash + aggro + 20 m from the straight walk between each opening stage's giver and its world enemy (givers from `tests/fixtures/quests/opening.json`). Checker output: `notes/Autopilot/F621.md`.
 
 The troll relocations are substantial: they are new clearing/approach placements in the same broader region, not claims of recovered transforms. Community positions beside steep raster breaks failed the full-leash terrain check. T3 is an extra actor (R), not a third recovered community spawn. Some positions were also separated to keep centres at least 20 m apart and avoid protected corridors.
 

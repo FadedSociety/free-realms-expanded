@@ -1139,9 +1139,9 @@
       "name": "Hooligan Wolf",
       "texture_alias": "",
       "position": [
-        -2077.0,
-        -48.7,
-        425.0
+        -2004.0,
+        -37.5,
+        490.0
       ],
       "max_health": 180,
       "damage": 25,
@@ -1152,14 +1152,14 @@
       "spawn_area": {
         "id": "MID-F1",
         "centre": [
-          -2077.0,
-          -48.7,
-          425.0
+          -2004.0,
+          -37.5,
+          490.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000003156,
+      "reference_spawn_guid": 100000003157,
       "source": [
         {
           "kind": "client",
@@ -1171,11 +1171,11 @@
         },
         {
           "kind": "legacy-data",
-          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1899, NPC row 3156, position [-2100.965, -45.98195, 456.7631]; the nearest same-kind Legacy spawn, 39.8 m from this centre. Position anchor only; no source code or combat rules reused."
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1900, NPC row 3157, position [-2097.339, -44.92286, 462.5679]; the nearest same-kind Legacy spawn, 97.3 m from this centre. Position anchor only; no source code or combat rules reused."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T415 audited centre 39.8 m from the nearest same-kind Legacy NPC row 3156 (FabledRealms.lua:1899), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102001 (W102-F1); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/25); W105 scaling by level produces the live stats."
+          "evidence": "(R) F621 re-audited centre 97.3 m from the nearest same-kind Legacy NPC row 3157 (FabledRealms.lua:1900), off the W102 starter centres and the opening walks to the stage wolves (field_camp_separation rules; checker output in notes/Autopilot/F621.md); 12 m leash as row 131000102001 (W102-F1); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/25); W105 scaling by level produces the live stats."
         }
       ]
     },
@@ -1187,9 +1187,9 @@
       "name": "Hooligan Wolf",
       "texture_alias": "",
       "position": [
-        -2065.0,
-        -47.17,
-        425.0
+        -2016.0,
+        -39.5,
+        490.0
       ],
       "max_health": 180,
       "damage": 25,
@@ -1200,14 +1200,14 @@
       "spawn_area": {
         "id": "MID-F2",
         "centre": [
-          -2065.0,
-          -47.17,
-          425.0
+          -2016.0,
+          -39.5,
+          490.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000003156,
+      "reference_spawn_guid": 100000003157,
       "source": [
         {
           "kind": "client",
@@ -1219,11 +1219,11 @@
         },
         {
           "kind": "legacy-data",
-          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1899, NPC row 3156, position [-2100.965, -45.98195, 456.7631]; the nearest same-kind Legacy spawn, 48.0 m from this centre. Position anchor only; no source code or combat rules reused."
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1900, NPC row 3157, position [-2097.339, -44.92286, 462.5679]; the nearest same-kind Legacy spawn, 85.8 m from this centre. Position anchor only; no source code or combat rules reused."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T415 audited centre 48.0 m from the nearest same-kind Legacy NPC row 3156 (FabledRealms.lua:1899), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102002 (W102-F2); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/25); W105 scaling by level produces the live stats."
+          "evidence": "(R) F621 re-audited centre 85.8 m from the nearest same-kind Legacy NPC row 3157 (FabledRealms.lua:1900), off the W102 starter centres and the opening walks to the stage wolves (field_camp_separation rules; checker output in notes/Autopilot/F621.md); 12 m leash as row 131000102002 (W102-F2); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/25); W105 scaling by level produces the live stats."
         }
       ]
     },

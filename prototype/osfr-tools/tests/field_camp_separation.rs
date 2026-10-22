@@ -4,8 +4,10 @@
 //! centres; aggro is distance-only and the client shows no level (the 35/2
 //! AddNpc reader `0x00921A10` has no level field), so a level-5 player at
 //! W102-H1 took 46 and 141 hits from the stacked MID-H1/ELITE-H2 Hooligans. T415
-//! moved those 18 rows to audited centres. These tests read the shipped content
-//! through the real loader and the real shared-field tick.
+//! moved those 18 rows to audited centres. F621 moved MID-F1/MID-F2 again: T415
+//! had put them 7 m off the walk from Cleetus to the opening stage-910007 wolves.
+//! These tests read the shipped content through the real loader and the real
+//! shared-field tick.
 //!
 //! Enemy hits are 32/7 AttackProcessed (client reader `0x00A2A910`): attacker
 //! u64 at 4..12, target u64 at 20..28, damage i32 at 28..32, remaining health
@@ -29,9 +31,10 @@ use field_reward_fixture::{RewardFixture, character_at, player_state};
 /// The 4 m chase hysteresis in the field tick (`encounter/field.rs`: a chasing
 /// actor keeps a target out to `aggro_range + 4`).
 const CHASE_MARGIN: f32 = 4.0;
-/// (R) Extra clearance between a higher band's aggro disc and a difficulty 1-2
-/// battle marker, so a low-level player walking up to the marker is not pulled.
-const MARKER_MARGIN: f32 = 20.0;
+/// (R) Extra clearance between a higher band's aggro disc and where a low-level
+/// player goes (a difficulty 1-2 battle marker, an opening stage enemy and the
+/// walk to it from its giver), so the player is not pulled on the way.
+const LOW_LEVEL_MARGIN: f32 = 20.0;
 /// The top of the starter bands (W102: 1-2 and 3-4).
 const STARTER_TOP: u32 = 4;
 const PLAYER: u64 = 101;
@@ -93,6 +96,75 @@ fn horizontal(a: [f32; 2], b: [f32; 2]) -> f32 {
     (a[0] - b[0]).hypot(a[1] - b[1])
 }
 
+/// Horizontal distance from `at` to the straight walk `from`..`to` (a point when
+/// they are equal).
+fn off_route(at: [f32; 2], from: [f32; 2], to: [f32; 2]) -> f32 {
+    let step = [to[0] - from[0], to[1] - from[1]];
+    let length = step[0] * step[0] + step[1] * step[1];
+    let along = (at[0] - from[0]) * step[0] + (at[1] - from[1]) * step[1];
+    let t = if length > 0.0 {
+        (along / length).clamp(0.0, 1.0)
+    } else {
+        0.0
+    };
+    horizontal(at, [from[0] + t * step[0], from[1] + t * step[1]])
+}
+
+/// Where a low-level player walks, as (label, from, to): each difficulty 1-2
+/// battle marker (a point), and the walk from each opening stage's giver to that
+/// stage's `encounters.json` world enemy. (R) The givers come from the repository
+/// fixture `tests/fixtures/quests/opening.json`, not shipped content: production's
+/// `opening.json` is in the private playtest package (round70: same givers and
+/// positions for all 17 stages). Drift between the two goes unnoticed here.
+fn low_level_routes() -> Vec<(String, [f32; 2], [f32; 2])> {
+    let xz = |at: &Value| {
+        [
+            at[0].as_f64().unwrap() as f32,
+            at[2].as_f64().unwrap() as f32,
+        ]
+    };
+    let battles = read(&content_dir().join("field_battles.json"));
+    let mut routes: Vec<_> = battles["battles"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|b| (1..=2).contains(&b["difficulty"].as_u64().unwrap()))
+        .map(|b| {
+            let at = xz(&b["spawner"]["position"]);
+            (format!("battle {}'s marker", b["id"]), at, at)
+        })
+        .collect();
+    let opening = read(
+        &std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("tests/fixtures/quests/opening.json"),
+    );
+    let find = |list: &str, key: &str, value: &Value| {
+        opening[list]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row[key] == *value)
+            .unwrap_or_else(|| panic!("opening {list} has no {key} {value}"))
+            .clone()
+    };
+    let encounters = read(&content_dir().join("encounters.json"));
+    for enemy in encounters["world_enemies"].as_array().unwrap() {
+        for stage in enemy["stages"].as_array().unwrap() {
+            let giver = find("actors", "guid", &find("stages", "id", stage)["giver_guid"]);
+            routes.push((
+                format!(
+                    "the walk from {} to stage {stage}'s {}",
+                    giver["name"].as_str().unwrap(),
+                    enemy["name"].as_str().unwrap()
+                ),
+                xz(&giver["position"]),
+                xz(&enemy["position"]),
+            ));
+        }
+    }
+    routes
+}
+
 /// Bands more than two levels apart.
 fn far(a: [u32; 2], b: [u32; 2]) -> bool {
     b[0] > a[1] + 2 || a[0] > b[1] + 2
@@ -122,37 +194,23 @@ fn no_field_camp_shares_ground_with_a_band_more_than_two_levels_away() {
     }
 }
 
+/// Also covers each opening giver -> `encounters.json` world-enemy walk (F621).
 #[test]
 fn low_difficulty_battle_markers_are_clear_of_higher_bands() {
     let engine = EngineFixture::shipped().load();
-    let battles = read(&content_dir().join("field_battles.json"));
-    let markers: Vec<(u64, [f32; 2])> = battles["battles"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .filter(|b| (1..=2).contains(&b["difficulty"].as_u64().unwrap()))
-        .map(|b| {
-            let at = &b["spawner"]["position"];
-            (
-                b["id"].as_u64().unwrap(),
-                [
-                    at[0].as_f64().unwrap() as f32,
-                    at[2].as_f64().unwrap() as f32,
-                ],
-            )
-        })
-        .collect();
+    let routes = low_level_routes();
+    let walks = routes.iter().filter(|(_, from, to)| from != to).count();
     assert!(
-        markers.len() >= 2,
-        "the shipped difficulty 1-2 markers load"
+        routes.len() - walks >= 2 && walks >= 5,
+        "the shipped difficulty 1-2 markers, the five stage-910007 wolves and their giver load"
     );
     for camp in camps(&engine).iter().filter(|c| c.band[0] > STARTER_TOP) {
-        for (battle, at) in &markers {
-            let need = camp.leash + camp.aggro + MARKER_MARGIN;
-            let apart = horizontal(camp.at, *at);
+        for (route, from, to) in &routes {
+            let need = camp.leash + camp.aggro + LOW_LEVEL_MARGIN;
+            let apart = off_route(camp.at, *from, *to);
             assert!(
                 apart >= need,
-                "{} (band {:?}) is {apart:.1} m from battle {battle}'s marker; it needs {need:.1} m",
+                "{} (band {:?}) is {apart:.1} m from {route}; it needs {need:.1} m",
                 camp.name,
                 camp.band
             );
@@ -200,6 +258,9 @@ fn a_level_three_player_at_each_starter_camp_is_hit_only_by_its_own_band() {
         let mut hits = 0;
         for tick in 1..=20_000 / TICK_MS {
             let now = tick * TICK_MS;
+            // The gateway's shared tick order: effects, motion, then damage.
+            game.tick_shared_effects(&mut field, &character, now)
+                .unwrap();
             let me = game.field_participant(&character).unwrap();
             assert!(me.mitigation > 0.0, "god mode is off");
             let (out, damage) = game

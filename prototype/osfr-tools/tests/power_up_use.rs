@@ -13,6 +13,10 @@ use osfr_tools::{
     gameplay::{Gameplay, Outcome},
     power_ups::{PowerUps, Slot},
 };
+#[path = "common/field_enemy_fixture.rs"]
+mod field_enemy_fixture;
+
+use field_enemy_fixture::shipped_row;
 use serde_json::{Value, json};
 use std::{
     collections::BTreeSet,
@@ -236,24 +240,6 @@ fn derby_content() -> DerbyGatewayContent {
         completion_reward_xp: 0,
         reward: None,
     }
-}
-
-/// A shipped field actor's authored level, or `None` for a GUID that is not one
-/// (the player). A row without `level` loads at level 1.
-fn shipped_level(guid: u64) -> Option<i64> {
-    shipped_row(guid).map(|row| row["level"].as_i64().unwrap_or(1))
-}
-
-/// A row of the bundled `field_enemies.json` the fixture copies.
-fn shipped_row(guid: u64) -> Option<Value> {
-    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/field_enemies.json");
-    let field: Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
-    field["enemies"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .find(|row| row["guid"].as_u64() == Some(guid))
-        .cloned()
 }
 
 fn who() -> CharacterState {
@@ -526,6 +512,8 @@ fn the_f1_pickup_point_hits_the_co_located_mid_camp_wolf() {
     // than two levels from the dead starter wolf; a cast at MID-F1's new home
     // hits it, leaves it alive and fabricates no drop.
     let fixture = Fixture::new();
+    // A shipped actor's authored level (1 when absent); `None` for the player.
+    let shipped_level = |guid| shipped_row(guid).map(|row| row["level"].as_i64().unwrap_or(1));
     let starter = shipped_level(TARGET).unwrap();
     let (mut game, location, _) = fresh_game(&fixture, 0);
     let kill = hold(&mut game, &location);
@@ -533,6 +521,10 @@ fn the_f1_pickup_point_hits_the_co_located_mid_camp_wolf() {
         .handle_in_world(&cast(2, 1), &at(TARGET_AT), kill + 1_000)
         .unwrap();
     assert_eq!(game.held_power_up(), None);
+    assert!(
+        !hit_targets(&at_f1).contains(&TARGET),
+        "the dead starter wolf is not hit again"
+    );
     for guid in hit_targets(&at_f1) {
         if let Some(level) = shipped_level(guid) {
             assert!(
@@ -554,10 +546,6 @@ fn the_f1_pickup_point_hits_the_co_located_mid_camp_wolf() {
     assert!(
         hits.contains(&MID_F1),
         "a cast at MID-F1's home hits it: {hits:?}"
-    );
-    assert!(
-        !hits.contains(&TARGET),
-        "the dead starter wolf is not hit again"
     );
     let health = enemy_health(&used, MID_F1).expect("the hit reports the wolf's health");
     assert!(

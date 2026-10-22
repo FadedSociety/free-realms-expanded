@@ -5,13 +5,16 @@
 #![allow(dead_code)] // each suite uses one field source and a subset of the helpers
 
 use osfr_tools::encounter::{EncounterEngine, EncounterOutcome};
-use serde_json::json;
+use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{
     collections::BTreeSet,
     fs,
     path::{Path, PathBuf},
-    sync::atomic::{AtomicU64, Ordering},
+    sync::{
+        LazyLock,
+        atomic::{AtomicU64, Ordering},
+    },
 };
 
 static SERIAL: AtomicU64 = AtomicU64::new(0);
@@ -115,6 +118,18 @@ pub fn content_dir() -> PathBuf {
 
 pub fn content_path() -> PathBuf {
     content_dir().join("field_enemies.json")
+}
+
+/// A row of the shipped `field_enemies.json` by GUID; the file is parsed once
+/// per test binary.
+pub fn shipped_row(guid: u64) -> Option<&'static Value> {
+    static FIELD: LazyLock<Value> =
+        LazyLock::new(|| serde_json::from_slice(&fs::read(content_path()).unwrap()).unwrap());
+    FIELD["enemies"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["guid"].as_u64() == Some(guid))
 }
 
 /// GUIDs in the 35/2 AddNpc packets a spawn emitted. The client body reader

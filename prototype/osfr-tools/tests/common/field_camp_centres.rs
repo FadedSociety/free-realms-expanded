@@ -4,8 +4,9 @@
 //! The 12 W102 starter centres passed `lab/reports/field-enemies-w102/check_placements.py`.
 //! T415 moved the 18 level 5-20 camps off them; each new centre passed that
 //! checker's `validate()` plus the separation, battle-marker and Flame Wave
-//! clearances (checker output per centre in `notes/Autopilot/T415.md`). A home
-//! that is not listed here has not been audited.
+//! clearances (checker output per centre in `notes/Autopilot/T415.md`; F621
+//! re-audited MID-F1/MID-F2 off the opening walks, `notes/Autopilot/F621.md`). A
+//! home that is not listed here has not been audited.
 #![allow(dead_code)] // each suite uses a subset
 
 use serde_json::Value;
@@ -25,8 +26,8 @@ pub const VERIFIED_CENTRES: [(&str, [f32; 3]); 30] = [
     ("W102-T1", [-347.084, 0.61, 1068.348]),
     ("W102-T2", [-351.103, 2.33, 1048.674]),
     ("W102-T3", [-447.084, 3.03, 1128.348]),
-    ("MID-F1", [-2077.0, -48.7, 425.0]),
-    ("MID-F2", [-2065.0, -47.17, 425.0]),
+    ("MID-F1", [-2004.0, -37.5, 490.0]),
+    ("MID-F2", [-2016.0, -39.5, 490.0]),
     ("MID-H1", [-2013.0, -37.6, 609.0]),
     ("MID-H2", [-2013.0, -35.75, 597.0]),
     ("MID-T1", [-480.0, 4.6, 1110.0]),
