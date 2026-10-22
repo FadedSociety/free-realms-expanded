@@ -75,6 +75,9 @@ fn job_batch_loads_and_npc_references_resolve_or_are_declared() {
                 record.remove("intro_text_string_id");
                 record.remove("description_string_id");
                 record.remove("end_text_string_id");
+                for goal in record["objectives"].as_array_mut().unwrap() {
+                    goal.as_object_mut().unwrap().remove("text_string_id");
+                }
             }
             record
         }));

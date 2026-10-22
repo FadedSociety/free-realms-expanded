@@ -351,6 +351,9 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
                 quest.remove("intro_text_string_id");
                 quest.remove("description_string_id");
                 quest.remove("end_text_string_id");
+                for goal in quest["objectives"].as_array_mut().unwrap() {
+                    goal.as_object_mut().unwrap().remove("text_string_id");
+                }
             }
             quest_records.push(quest);
         }

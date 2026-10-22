@@ -169,6 +169,7 @@
             163.4705
           ],
           "radius": 15.0,
+          "text_string_id": 430999,
           "source": [
             {
               "kind": "client",
@@ -177,6 +178,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) W175: POI 1811 'Cooking Table' is bound to this reachable trainer table for the first playable crosswalk; the original Cooking 101 geometry is not recovered."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 430999 'Interact with the Cooking Table': client goal line for the Cooking Table; the guide's 'Use the Cooking Table' is not a locale string."
             }
           ]
         },
@@ -188,6 +193,7 @@
             "type": "first_movement",
             "mouse": false
           },
+          "text_string_id": 424800,
           "source": [
             {
               "kind": "client",
@@ -196,6 +202,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) W175: client objective id 30500041 and the keyboard first-movement tutorial are local bindings, not recovered historical objective ids."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 424800 'Use arrow keys to move around.': client movement-tutorial line for the keyboard first-movement objective."
             }
           ]
         }
@@ -582,10 +592,15 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000178,
+          "text_string_id": 104135,
           "source": [
             {
               "kind": "client",
               "evidence": "description 104135 'Talk to Ranger Ricardo at the Ranger Station in Highroad Junction, near the road leading to Snowhill.'; target resolved by scripts/quest_talk_objectives.py"
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 104135 'Talk to Ranger Ricardo at the Ranger Station in Highroad Junction, near the road leading to Snowhill.': the id this objective's evidence cites as its step text."
             }
           ]
         }

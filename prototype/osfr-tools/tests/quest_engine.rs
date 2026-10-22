@@ -879,15 +879,117 @@ fn split_regional_quest_catalogue_accepts_and_restores_an_npc_offer() {
     );
 }
 
-#[test]
-fn split_quest_locale_ids_resolve_to_exported_rows() {
+fn exported_locale_ids() -> BTreeSet<u32> {
     let locale_path =
         Path::new(env!("CARGO_MANIFEST_DIR")).join("../../../lab/reports/locale-id-to-text.json");
     let locale: Vec<Value> = serde_json::from_slice(&fs::read(locale_path).unwrap()).unwrap();
-    let locale_ids: BTreeSet<u32> = locale
+    locale
         .iter()
         .filter_map(|row| row["id"].as_u64().and_then(|id| u32::try_from(id).ok()))
+        .collect()
+}
+
+/// T403 (lead native run 20261021T143012Z: the helper's only goal line read
+/// "<STRING 0 NOT FOUND>"). Each 49/3 objective is key, definition id, name and
+/// description locale ids (`008fd770`). The helper's goal line is the name
+/// (`00cf7fd0` column 0); the client rekeys objectives by definition id
+/// (`00baf380` -> `00bab950`) and 49/8 finds them by that key (`00c7a910`).
+#[test]
+fn enabled_split_quests_send_their_goal_text_and_live_keys() {
+    let locale_ids = exported_locale_ids();
+    let directory = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let mut engine =
+        QuestEngine::from_split_content(&directory, CHARACTER, eligibility(1024), None).unwrap();
+    let mut files: Vec<_> = fs::read_dir(split_quest_directory())
+        .unwrap()
+        .map(|entry| entry.unwrap().path())
+        .filter(|path| path.extension().is_some_and(|ext| ext == "json"))
         .collect();
+    files.sort();
+    let mut checked = 0;
+    for path in files {
+        let document: Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+        for quest in document["records"].as_array().unwrap() {
+            if quest["enabled"] == json!(false) {
+                continue;
+            }
+            let quest_id = quest["id"].as_u64().unwrap() as u32;
+            assert!(engine.dev_mark_offered(quest_id), "quest {quest_id} offers");
+            let accepted = engine.accept(quest_id);
+            assert!(accepted.changed, "quest {quest_id} accepts");
+            let record = engine.quest_add_packet(quest_id).unwrap();
+            let dword = |at: usize| u32::from_le_bytes(record[at..at + 4].try_into().unwrap());
+            let goals = quest["objectives"].as_array().unwrap();
+            assert_eq!(dword(109) as usize, goals.len());
+            let mut definition_ids = BTreeSet::new();
+            for (index, goal) in goals.iter().enumerate() {
+                let field = |n: usize| dword(113 + index * 107 + n * 4);
+                let id = goal["id"].as_u64().unwrap() as u32;
+                let text = goal["text_string_id"].as_u64().unwrap_or(0) as u32;
+                let owner = format!("quest {quest_id} objective {id}");
+                assert!(
+                    text != 0 && locale_ids.contains(&text),
+                    "{owner} text {text}"
+                );
+                assert_eq!([field(0), field(1)], [id, id], "{owner} key, definition id");
+                assert_eq!(
+                    [field(2), field(3)],
+                    [text, text],
+                    "{owner} name, description"
+                );
+                definition_ids.insert(field(1));
+            }
+            for message in &accepted.outbound[1..] {
+                let OutboundMessage::Quest(message) = message else {
+                    panic!("accept sends quest packets");
+                };
+                let activation = message.encode_exact().unwrap();
+                assert_eq!(&activation[..6], &[49, 0, 8, 0, 0, 0]);
+                let key = u32::from_le_bytes(activation[10..14].try_into().unwrap());
+                assert!(
+                    definition_ids.contains(&key),
+                    "quest {quest_id} 49/8 key {key}"
+                );
+            }
+            checked += 1;
+        }
+    }
+    assert!(checked > 0, "the catalogue has enabled quests");
+}
+
+/// A zero goal text id is the client's "<STRING 0 NOT FOUND>"; the loader refuses it.
+#[test]
+fn a_zero_goal_text_id_is_a_load_error() {
+    let source = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let scratch = std::env::temp_dir().join(format!("osfr-goal-text-{}", std::process::id()));
+    for folder in ["quests", "npcs"] {
+        fs::create_dir_all(scratch.join(folder)).unwrap();
+        for entry in fs::read_dir(source.join(folder)).unwrap() {
+            let path = entry.unwrap().path();
+            fs::copy(&path, scratch.join(folder).join(path.file_name().unwrap())).unwrap();
+        }
+    }
+    fs::copy(source.join("jobs.json"), scratch.join("jobs.json")).unwrap();
+    let load = || QuestEngine::from_split_content(&scratch, CHARACTER, eligibility(8), None);
+    assert!(load().is_ok(), "the control copy loads");
+    let path = scratch.join("quests/adventurer.json");
+    let mut document: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    let call_the_crew = document["records"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|quest| quest["id"] == json!(3_000_059))
+        .unwrap();
+    call_the_crew["objectives"][0]["text_string_id"] = json!(0);
+    fs::write(&path, serde_json::to_vec(&document).unwrap()).unwrap();
+    let error = load().err().expect("a zero goal text id must not load");
+    assert_eq!(error.kind(), std::io::ErrorKind::InvalidData);
+    fs::remove_dir_all(&scratch).unwrap();
+}
+
+#[test]
+fn split_quest_locale_ids_resolve_to_exported_rows() {
+    let locale_ids = exported_locale_ids();
     let mut files: Vec<_> = fs::read_dir(split_quest_directory())
         .unwrap()
         .map(|entry| entry.unwrap().path())

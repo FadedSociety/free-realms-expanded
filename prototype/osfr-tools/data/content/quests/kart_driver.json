@@ -14,6 +14,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9500000735,
+          "text_string_id": 115496,
           "source": [
             {
               "kind": "video",
@@ -22,6 +23,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 115496 'Talk to Chad Fastflutter': client goal line naming Chad Fastflutter, paired with 115497 about Raina's autographing pen (this quest's description 104107)."
             }
           ]
         },
@@ -29,6 +34,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9500000759,
+          "text_string_id": 115511,
           "source": [
             {
               "kind": "video",
@@ -37,6 +43,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 115511 'Talk to Mustang Alli to learn about racing': client goal line for Mustang Alli and racing (hash 2217784590, cited by 3080002); this quest's description says to learn about racing."
             }
           ]
         },
@@ -44,6 +54,7 @@
           "kind": "talk_to_npc",
           "id": 3,
           "npc_id": 9500000731,
+          "text_string_id": 115521,
           "source": [
             {
               "kind": "video",
@@ -52,6 +63,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 115521 'Talk to Burt 'Wrecking' Crewe to learn about demolition derby': client goal line for Burt 'Wrecking' Crewe and demolition derby, the same 1155xx series."
             }
           ]
         },
@@ -59,6 +74,7 @@
           "kind": "talk_to_npc",
           "id": 4,
           "npc_id": 9000000177,
+          "text_string_id": 115528,
           "source": [
             {
               "kind": "video",
@@ -67,6 +83,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 115528 'Return to Raina Rush in Highroad Junction': client return line to Raina Rush, the same 1155xx series."
             }
           ]
         }
@@ -154,6 +174,7 @@
           "id": 1,
           "minigame_id": 31,
           "count": 1,
+          "text_string_id": 139383,
           "source": [
             {
               "kind": "client",
@@ -166,6 +187,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) Bind completion to speedway 31, the stable race identity emitted by the current paid NPC-entry kart bridge. That is the normal Wildwood race in the play package, not a recovered retail tutorial minigame id; this substitutes the existing normal race for the unavailable Frost Ridge tutorial-specific game."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 139383 'Complete the racing tutorial': exact locale match for the guide goal 'Complete the racing tutorial' cited here."
             }
           ]
         },
@@ -173,6 +198,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9500000759,
+          "text_string_id": 139204,
           "source": [
             {
               "kind": "video",
@@ -181,6 +207,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) Objective id 2 and the Mustang Alli content key 9500000759 are the existing authored target; the guide does not provide a retail objective id."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 139204 'Return to Mustang Alli': exact locale match for the guide goal 'Return to Mustang Alli' cited here."
             }
           ]
         }

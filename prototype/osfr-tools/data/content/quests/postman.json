@@ -1600,10 +1600,15 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000172,
+          "text_string_id": 141830,
           "source": [
             {
               "kind": "client",
               "evidence": "description 141830 'Speak to Postchug Runalug about the recent attack on Wugachug.'; target resolved by scripts/quest_talk_objectives.py"
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 141830 'Speak to Postchug Runalug about the recent attack on Wugachug.': the id this objective's evidence cites as its step text."
             }
           ]
         }

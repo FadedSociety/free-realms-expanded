@@ -17,6 +17,7 @@
             328.1112
           ],
           "radius": 8.0,
+          "text_string_id": 35635,
           "source": [
             {
               "kind": "legacy-data",
@@ -25,6 +26,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T247: Pappy Farnum's farm is hunt stop 1 of 4. The 8.0 m search radius and the runtime zone 0 are local event-hunt policy, not recovered retail objective data; the NPC row's zone_id 5 is a content region label on the single open-world continent (src/npc_interaction.rs check_range)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 35635 'Pappy Farnum can be found at Farnum's Farmstead to the south of Sanctuary.': client line placing Pappy Farnum at Farnum's Farmstead; this local event has no retail goal text."
             }
           ]
         },
@@ -38,6 +43,7 @@
             414.835853
           ],
           "radius": 8.0,
+          "text_string_id": 139691,
           "source": [
             {
               "kind": "reconstructed",
@@ -46,6 +52,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T247: the Cobblestone Brawling Ring is hunt stop 2 of 4. The 8.0 m search radius and the runtime zone 0 are local event-hunt policy, not recovered retail objective data."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 139691 'Find Carlos Brazenfist in Cobblestone Village': client goal line for Carlos Brazenfist, whose row position this stop copies; local event."
             }
           ]
         },
@@ -59,6 +69,7 @@
             203.0213
           ],
           "radius": 8.0,
+          "text_string_id": 115463,
           "source": [
             {
               "kind": "legacy-data",
@@ -67,6 +78,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T247: Highroad Junction / Merigold is hunt stop 3 of 4. The 8.0 m search radius and the runtime zone 0 are local event-hunt policy, not recovered retail objective data."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 115463 'Find Merigold in Highroad Junction.': client goal line for Merigold, whose row position this stop copies; local event."
             }
           ]
         },
@@ -74,6 +89,7 @@
           "kind": "talk_to_npc",
           "id": 4,
           "npc_id": 9500000497,
+          "text_string_id": 18285,
           "source": [
             {
               "kind": "client",
@@ -82,6 +98,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T281: the final step returns to the event host Jacque. A Talk to the quest's giver or its named Talk target completes the final objective and opens the normal 49/13 end screen (src/quest_engine.rs on_event)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 18285 'Return to Jacque in Pixiewood': client return line to Jacque in Pixiewood, the event host; local event."
             }
           ]
         }

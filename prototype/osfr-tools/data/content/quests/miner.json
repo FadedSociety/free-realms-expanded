@@ -82,6 +82,7 @@
           "id": 1,
           "resource_id": 2739,
           "quantity": 1,
+          "text_string_id": 23219,
           "source": [
             {
               "kind": "client",
@@ -94,6 +95,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T300: quantity 1 is the recovered end-text instruction 'Mine one copper ore.' (23219); the shipped Mining18 board pays a multi-ore batch per win, so one win satisfies the goal."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 23219 'Mine one copper ore.': goal line in this quest's own locale block (title 23217), matching this step."
             }
           ]
         },
@@ -101,6 +106,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9000000217,
+          "text_string_id": 23221,
           "source": [
             {
               "kind": "client",
@@ -109,6 +115,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T300: the return-to-giver step is the ordered talk_to_npc objective; the same NPC is the quest giver and the turn-in speaker."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 23221 'Return one copper ore to Therin.': goal line in this quest's own locale block (title 23217), matching this step."
             }
           ]
         }
@@ -183,10 +193,15 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000220,
+          "text_string_id": 76088,
           "source": [
             {
               "kind": "client",
               "evidence": "description 76088 'Visit Trixi in the Singing Crystal Mines and find out if she has any better mining gear for you.'; target resolved by scripts/quest_talk_objectives.py"
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 76088 'Visit Trixi in the Singing Crystal Mines and find out if she has any better mining gear for you.': the id this objective's evidence cites as its step text."
             }
           ]
         }
@@ -282,6 +297,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000206,
+          "text_string_id": 41667,
           "source": [
             {
               "kind": "video",
@@ -294,6 +310,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T411: objective ids 1-3 and their order (Smitty, copper ore, Trixi) follow the video tracker's first goal and the client lines; the original objective ids are not recovered."
+            },
+            {
+              "kind": "video",
+              "evidence": "T403 goal text Global.Text 41667 'Speak with Smitty': the only exact locale match for the video tracker goal 'Speak with Smitty' cited here."
             }
           ]
         },
@@ -302,6 +322,7 @@
           "id": 2,
           "resource_id": 2739,
           "quantity": 6,
+          "text_string_id": 76520,
           "source": [
             {
               "kind": "client",
@@ -310,6 +331,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T411: Copper Ore is item definition 2739, the shipped Mining18 board's output (data/content/mining.json); quantity 6 is one shipped goal row (quota 6), so one ordinary copper-vein win completes it. The client and guide give no count. The ore stays with the player: the engine counts the mined ore and has no hand-in step, as in T300's 3100002."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 76520 'As a miner, mine more copper ore for Trixi.': client hash 410561729 = Global.Text 76520, cited here."
             }
           ]
         },
@@ -317,6 +342,7 @@
           "kind": "talk_to_npc",
           "id": 3,
           "npc_id": 9000000220,
+          "text_string_id": 76233,
           "source": [
             {
               "kind": "client",
@@ -325,6 +351,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T411: the return Talk at the giver Trixi opens the 49/13 end screen; the repaired gear is not modelled as an item."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 76233 'Return to Trixi in the Singing Crystal Mines': the return line among this quest's own goal lines after its title 76209 (76224 'Bring Smitty the Copper Ore you mined earlier.', 76227 'Give Smitty the copper bars'); the step's evidence cites no goal line."
             }
           ]
         }
@@ -1194,10 +1224,15 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000203,
+          "text_string_id": 77624,
           "source": [
             {
               "kind": "client",
               "evidence": "description 77624 'Visit Silverray at Quagmire Quarry in Blackspore.'; target resolved by scripts/quest_talk_objectives.py"
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 77624 'Visit Silverray at Quagmire Quarry in Blackspore.': the id this objective's evidence cites as its step text."
             }
           ]
         }

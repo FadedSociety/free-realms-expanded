@@ -742,6 +742,8 @@ pub struct QuestEngine {
     split_locale_fields: BTreeMap<u32, QuestLocaleFields>,
     /// (quest id, objective id) -> what the NPC says when that talk step is done.
     step_dialogue: BTreeMap<(u32, u32), u32>,
+    /// (quest id, objective id) -> goal line locale id (content `text_string_id`).
+    objective_text: BTreeMap<(u32, u32), u32>,
     job_profile_ids: BTreeMap<String, i32>,
     state: QuestState,
     options: EngineOptions,
@@ -792,6 +794,7 @@ impl QuestEngine {
         let mut total_bytes = 0u64;
         let mut quests = Vec::new();
         let mut split_locale_fields = BTreeMap::new();
+        let mut objective_text = BTreeMap::new();
         let mut disabled = BTreeSet::new();
         let mut runtime_goals = BTreeMap::new();
         let mut poi_locations = BTreeMap::new();
@@ -808,18 +811,25 @@ impl QuestEngine {
                 let enabled = enabled
                     .as_bool()
                     .ok_or_else(|| invalid("quest enabled must be boolean"))?;
-                let goals = object
+                let mut goals = object
                     .remove("objectives")
                     .ok_or_else(|| invalid("quest objectives missing"))?;
                 let goals = goals
-                    .as_array()
+                    .as_array_mut()
                     .ok_or_else(|| invalid("quest objectives must be a list"))?;
                 if goals.len() > MAX_OBJECTIVES {
                     return Err(invalid("too many quest objectives"));
                 }
                 let mut standard = Vec::new();
                 let mut extras = BTreeMap::new();
-                for (index, goal) in goals.iter().enumerate() {
+                let mut goal_text = Vec::new();
+                for (index, goal) in goals.iter_mut().enumerate() {
+                    let id = goal.get("id").and_then(Value::as_u64);
+                    // Stripped before the typed goal parse, like the quest-level locale ids.
+                    if let Some(text) = take_optional_locale_id(goal, "text_string_id")? {
+                        let id = id.and_then(|id| u32::try_from(id).ok());
+                        goal_text.push((id.ok_or_else(|| invalid("invalid objective id"))?, text));
+                    }
                     match goal.get("kind").and_then(Value::as_str) {
                         Some(
                             "gather_resource" | "craft_recipe" | "finish_minigame" | "equip_item"
@@ -861,6 +871,11 @@ impl QuestEngine {
                 if !enabled {
                     disabled.insert(quest.id);
                 }
+                objective_text.extend(
+                    goal_text
+                        .into_iter()
+                        .map(|(id, text)| ((quest.id, id), text)),
+                );
                 if !extras.is_empty() {
                     runtime_goals.insert(quest.id, extras);
                 }
@@ -1016,6 +1031,7 @@ impl QuestEngine {
         engine.job_profile_ids = job_profile_ids;
         engine.split_locale_fields = split_locale_fields;
         engine.step_dialogue = step_dialogue;
+        engine.objective_text = objective_text;
         Ok(engine)
     }
 
@@ -1181,6 +1197,7 @@ impl QuestEngine {
             definitions: indexed,
             split_locale_fields: BTreeMap::new(),
             step_dialogue: BTreeMap::new(),
+            objective_text: BTreeMap::new(),
             job_profile_ids: BTreeMap::new(),
             dev_offer: None,
             disabled,
@@ -1423,8 +1440,23 @@ impl QuestEngine {
         bytes.extend(0.0f32.to_le_bytes());
         bytes.extend([0; 69]);
         put_i32(&mut bytes, definition.objectives.len() as i32);
+        // (R) A goal without authored text shows the quest description, else its title.
+        let fallback_text = self
+            .description_string_id(quest_id)
+            .or(self.title_string_id(quest_id))
+            .unwrap_or(0);
         for (index, objective) in definition.objectives.iter().enumerate() {
-            for value in [objective.id, 0, 0, 0] {
+            let text = self
+                .objective_text
+                .get(&(quest_id, objective.id))
+                .copied()
+                .unwrap_or(fallback_text);
+            // Key, definition id, name and description locale ids (`008fd770`). The client
+            // rekeys objectives by definition id (`00baf380` -> `00bab950`) and 49/8/9/10 find
+            // them by it (`00c7a910`), so it is the objective id. The helper's goal line is
+            // the name (`00cf7fd0` column 0; id 0 prints "<STRING 0 NOT FOUND>"); description
+            // repeats it (R), as the opening journal's goal labels do.
+            for value in [objective.id, objective.id, text, text] {
                 put_i32(
                     &mut bytes,
                     value

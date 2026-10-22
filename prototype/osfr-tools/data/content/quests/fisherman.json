@@ -107,6 +107,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000181,
+          "text_string_id": 417056,
           "source": [
             {
               "kind": "client",
@@ -115,6 +116,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T244: objective id 1 is the local authored step; the guide gives no retail objective id, counter or ordered-step table. The accept is Reed's 26/10 menu; the next Talk to Reed completes the step."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 417056 'Learn all you need to know about fishing!': client hash 676088078 = Global.Text 417056, cited here."
             }
           ]
         }
@@ -187,6 +192,7 @@
           "id": 1,
           "minigame_id": 599,
           "count": 1,
+          "text_string_id": 408265,
           "source": [
             {
               "kind": "client",
@@ -199,6 +205,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T244: objective id 1, minigame_id 599 and count 1 are local authored policy; 599 is the spot's stable game id, not the framework type 21. Only the fishing service's server-emitted FinishMinigame event after a paid catch advances it."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 408265 'Head to Sacred Grove Shallows to catch your first fish!': goal line in this quest's own locale block (title 408259), matching this step."
             }
           ]
         },
@@ -206,6 +216,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9000000181,
+          "text_string_id": 409334,
           "source": [
             {
               "kind": "client",
@@ -214,6 +225,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T244: objective id 2 returns the player to Reed. The guide's E4 text names the catch, not a retail return row; the Talk binding is local authored policy."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 409334 'Return to Reed Stillwater': client goal line naming Reed Stillwater; this quest's block has no return line."
             }
           ]
         }

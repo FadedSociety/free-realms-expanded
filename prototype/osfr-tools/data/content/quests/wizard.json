@@ -65,6 +65,7 @@
             778.1584
           ],
           "radius": 5.0,
+          "text_string_id": 20862,
           "source": [
             {
               "kind": "client",
@@ -73,6 +74,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T242: the thieving Robgoblin Adept is not a resolved field actor and no spell-book item definition is proven, so the search is a server-verified camp position rather than a fabricated kill target (model_id) or item id (collect_item). The point is the ground under the drawable Robgoblin Camp NPC Squee (9500000949, legacy_data, Wilds), which is proven standable camp ground; the client's 'northwest' bearing is not resolvable in this server's world axes, so no compass claim is made. Radius 5 m keeps the point outside the 12 m NPC talk ring, so accepting at Fizzlesticks cannot complete it without moving."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 20862 'Search the wilds near the Robgoblin Camp for the thieving Robgoblin Adept!': the id this objective's evidence cites as its step text."
             }
           ]
         },
@@ -80,6 +85,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9000000324,
+          "text_string_id": 22226,
           "source": [
             {
               "kind": "client",
@@ -88,6 +94,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T242: objective ordinal 2 is the server binding for the client's hand-in step. The giver is also the turn-in NPC; no separate turn-in row is recovered."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 22226 'Return to Fizzlesticks': client return line to Fizzlesticks from the 22xxx Band 1 wizard series."
             }
           ]
         }
@@ -161,6 +171,7 @@
             781.8755
           ],
           "radius": 5.0,
+          "text_string_id": 103129,
           "source": [
             {
               "kind": "client",
@@ -169,6 +180,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T242: the camp junkpile is Nurble the junkmaster's ground spot (9000000415, legacy_data, Wilds), the drawable camp NPC the client text points at; \"Fizzlesticks' Reading Glasses\" has no proven item definition, so this is visit_position rather than collect_item. Radius 5 m keeps the point 8 m outside the 12 m Fizzlesticks talk ring even after the book hand-in."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 103129 'Find Fizzlesticks' glasses in the Robgoblin Camp.': the id this objective's evidence cites as its step text."
             }
           ]
         },
@@ -176,6 +191,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9000000324,
+          "text_string_id": 38878,
           "source": [
             {
               "kind": "client",
@@ -184,6 +200,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T242: objective ordinal 2 is the server binding for the client's hand-in step at the giver."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 38878 'Take the glasses back to Fizzlesticks in the Robgoblin Camp.': the id this objective's evidence cites as its step text."
             }
           ]
         }
@@ -251,6 +271,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000415,
+          "text_string_id": 22211,
           "source": [
             {
               "kind": "client",
@@ -259,6 +280,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T303: objective ordinal 1 is the server binding for the client's first delivery step (take the book to Nurble). The spell book is narrative, not a proven inventory item, so this is talk_to_npc rather than collect_item and no item is granted or consumed."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 22211 'Give the spell book to Nurble': client hash 1281056681 = Global.Text 22211, cited here."
             }
           ]
         },
@@ -266,6 +291,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9000000324,
+          "text_string_id": 22227,
           "source": [
             {
               "kind": "client",
@@ -274,6 +300,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T303: objective ordinal 2 is the server binding for the client's return step at the giver. The split loader keeps objectives ordered, so this Talk cannot complete before the Nurble Talk. turnin_npc_id defaults to the giver; no NPC quests_accepted row points at Nurble."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 22227 'Return the spell book to Fizzlesticks at the Robgoblin Camp.': client hash 3878582851 = Global.Text 22227, cited here."
             }
           ]
         }

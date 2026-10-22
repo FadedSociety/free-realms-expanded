@@ -164,6 +164,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000042,
+          "text_string_id": 47308,
           "source": [
             {
               "kind": "client",
@@ -172,6 +173,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T252: objective ordinal 1 and target 9000000042 are server content bindings for the recovered Carlos talk step, not recovered retail objective identifiers."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 47308 'Talk to Carlos Brazenfist': client hash 1274467248 = Global.Text 47308, cited here."
             }
           ]
         },
@@ -179,6 +184,7 @@
           "kind": "complete_dungeon",
           "id": 2,
           "encounter_id": 12400,
+          "text_string_id": 94586,
           "source": [
             {
               "kind": "client",
@@ -187,6 +193,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T252: objective ordinal 2 and encounter 12400 are server content bindings (the field_battles row). The battle's own 41/114 start screen is the gate step, so no separate gate objective is authored: the server observes the authoritative won run, not the click."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 94586 'Defeat Mongo in the brawling ring': client hash 1844179881 = Global.Text 94586, cited here."
             }
           ]
         }
@@ -250,6 +260,7 @@
           "kind": "complete_dungeon",
           "id": 1,
           "encounter_id": 12400,
+          "text_string_id": 94586,
           "source": [
             {
               "kind": "client",
@@ -258,6 +269,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T252: objective ordinal 1 and encounter 12400 are server content bindings for the repeatable battle row; the fight is repeatable under the existing field-battle policy and the quest advances once."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 94586 'Defeat Mongo in the brawling ring': the Mongo battle goal 94586 of the same field battle 12400 (cited by 3030004)."
             }
           ]
         },
@@ -265,6 +280,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9000000042,
+          "text_string_id": 47312,
           "source": [
             {
               "kind": "client",
@@ -273,6 +289,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T252: objective ordinal 2 and target 9000000042 are server content bindings for the recovered Carlos hand-in."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 47312 'Now that you've beaten Mongo, return to Carlos and get your reward.': client hash 2203155873 = Global.Text 47312, Carlos's hand-in step cited on objective 1 of this quest."
             }
           ]
         }
@@ -329,6 +349,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000121,
+          "text_string_id": 94296,
           "source": [
             {
               "kind": "client",
@@ -337,6 +358,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T101: objective ordinal 1 and target 9000000121 are server content bindings for the recovered Jones referral; they are not recovered retail objective or target identifiers."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 94296 'Find Jones at his makeshift camp, along the road leading east out of Cobblestone Village towards Blackspore.': the id this objective's evidence cites as its step text."
             }
           ]
         }
@@ -414,6 +439,7 @@
           "id": 1,
           "model_id": 930050,
           "count": 4,
+          "text_string_id": 94304,
           "source": [
             {
               "kind": "client",
@@ -422,6 +448,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T101: count 4 and kill target 930050 are reconstructed playtest bindings; the four quest-gated Hooligan spawn rows in field_enemies.json carry quest_ids [3030007]. Original artifact drops are not modelled."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 94304 'Defeat the Hooligan Delinquents south of Jones to recover the artifacts they stole from him.': client hash 3825361510 = Global.Text 94304, cited here."
             }
           ]
         }
@@ -493,6 +523,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000446,
+          "text_string_id": 103355,
           "source": [
             {
               "kind": "client",
@@ -501,6 +532,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T101: one Talk completes the referral; objective id 1 and target 9000000446 are server bindings, not recovered retail quest or target identifiers."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 103355 'Find Sabastian Cabet somewhere in Blackspore. The entrance to Blackspore is a large cave directly east of Cobblestone Village.': the id this objective's evidence cites as its step text."
             }
           ]
         }
@@ -573,6 +608,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000428,
+          "text_string_id": 130882,
           "source": [
             {
               "kind": "client",
@@ -585,6 +621,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T331: objective ordinal 1 and target 9000000428 are server content bindings for the recovered C6 delivery; they are not recovered retail objective or target identifiers."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 130882 'Petra is somewhere to the west of Mire's Edge in Blackspore. Find her and deliver Sabastian's job offer.': client hash 298629165 = Global.Text 130882, the guide objective text cited here."
             }
           ]
         }

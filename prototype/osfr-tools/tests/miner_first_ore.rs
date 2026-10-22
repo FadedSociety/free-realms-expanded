@@ -2077,7 +2077,10 @@ fn the_objective_is_produced_by_the_shipped_mining_board() {
         .iter()
         .map(|objective| {
             let mut bare = objective.clone();
-            bare.as_object_mut().unwrap().remove("source");
+            let fields = bare.as_object_mut().unwrap();
+            fields.remove("source");
+            // Goal text (T403) is display content, checked by tests/quest_engine.rs.
+            fields.remove("text_string_id");
             bare
         })
         .collect();

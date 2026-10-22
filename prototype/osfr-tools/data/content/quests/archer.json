@@ -98,6 +98,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9500000289,
+          "text_string_id": 22077,
           "source": [
             {
               "kind": "client",
@@ -106,6 +107,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T194: objective ordinal 1 and target content key 9500000289 (Bollylog) are server bindings; the exact on-screen order of the three recruits is not recovered, so the array order is Bollylog, Hrugagu, Brugadug. The target is bound at runtime to the existing unnamed Legacy Greenwood archer actor standing in front of Lugabow (npc_spawns_extra.json content_key); the regional content row is unanchored scaffolding and does not spawn a duplicate."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 22077 'Talk to the first recruit': client hash 1507268342 = Global.Text 22077, the first recruit step this objective cites."
             }
           ]
         },
@@ -113,6 +118,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9500000309,
+          "text_string_id": 22079,
           "source": [
             {
               "kind": "client",
@@ -121,6 +127,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T194: objective ordinal 2 and target content key 9500000309 (Hrugagu) are server bindings; the exact on-screen order of the three recruits is not recovered, so the array order is Bollylog, Hrugagu, Brugadug. The target is bound at runtime to the existing unnamed Legacy Greenwood archer actor standing in front of Lugabow (npc_spawns_extra.json content_key); the regional content row is unanchored scaffolding and does not spawn a duplicate."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 22079 'Talk to the second recruit': client hash 3778780281 = Global.Text 22079, the second recruit step this objective cites."
             }
           ]
         },
@@ -128,6 +138,7 @@
           "kind": "talk_to_npc",
           "id": 3,
           "npc_id": 9500000290,
+          "text_string_id": 22081,
           "source": [
             {
               "kind": "client",
@@ -136,6 +147,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T194: objective ordinal 3 and target content key 9500000290 (Brugadug) are server bindings; the exact on-screen order of the three recruits is not recovered, so the array order is Bollylog, Hrugagu, Brugadug. The target is bound at runtime to the existing unnamed Legacy Greenwood archer actor standing in front of Lugabow (npc_spawns_extra.json content_key); the regional content row is unanchored scaffolding and does not spawn a duplicate. It is not the turn-in: the client's fourth step returns to Lugabow (locale 22083)."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 22081 'Talk to the third recruit': client hash 4154333971 = Global.Text 22081, the third recruit step this objective cites."
             }
           ]
         },
@@ -143,6 +158,7 @@
           "kind": "talk_to_npc",
           "id": 4,
           "npc_id": 9000000387,
+          "text_string_id": 22083,
           "source": [
             {
               "kind": "client",
@@ -151,6 +167,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T194 follow-up F217: objective ordinal 4 is the server binding for the client's Return to Lugabow step. The first record omitted this step, so the turn-in opened at the third recruit; the turn-in now opens at the giver."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 22083 'Return to Lugabow': the return step after the three recruit steps 22077/22079/22081 in the same block."
             }
           ]
         }
@@ -325,6 +345,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000106,
+          "text_string_id": 77037,
           "source": [
             {
               "kind": "client",
@@ -333,6 +354,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T194: the stump geometry is not in content, so the carve-the-stump step is skipped and recorded here; the only objective is the recovered report-to-Hilforn talk step (Hilforn 9000000106). Guide text ids 824954949 and 1299662855 carry the skipped stump instruction; no visit_position geometry is invented."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 77037 'Carve your name into the tree stump near the lake in the northern end of Greenwood Forest, then report to Hilforn.': client hash 824954949 = Global.Text 77037 (the quest description), cited here; it names the skipped carve step as well as the report to Hilforn."
             }
           ]
         }

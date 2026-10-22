@@ -12,10 +12,15 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000335,
+          "text_string_id": 93206,
           "source": [
             {
               "kind": "video",
               "evidence": "Owner Field Notes 2026-10-15: helper 'Ask around Forest Troll Village for information' (locale 93206); the quest is handed in to Grosh"
+            },
+            {
+              "kind": "video",
+              "evidence": "T403 goal text Global.Text 93206 'Ask around Forest Troll Village for information': Global.Text 93206, the helper line the owner's field notes record for this quest (cited here)."
             }
           ]
         }
@@ -104,6 +109,7 @@
           "id": 1,
           "model_id": 930096,
           "count": 1,
+          "text_string_id": 115023,
           "source": [
             {
               "kind": "video",
@@ -112,6 +118,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) kill id 930096 = Troll Summoner in data/content/field_battles.json battle 96; handed in to the giver Grosh"
+            },
+            {
+              "kind": "video",
+              "evidence": "T403 goal text Global.Text 115023 'Defeat the Troll Summoner': Global.Text 115023, the journal goal the owner's field notes record for this quest (cited here)."
             }
           ]
         }
@@ -241,6 +251,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9500000561,
+          "text_string_id": 90423,
           "source": [
             {
               "kind": "client",
@@ -249,6 +260,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) the E4 mentor stop is bound to the spawned Seaside NPC key 9500000561 named Brendan"
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 90423 'Speak to Brendan in Seaside to learn secrets of stealth.': client hash 573579885 = Global.Text 90423, cited here."
             }
           ]
         },
@@ -256,6 +271,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9500000697,
+          "text_string_id": 90412,
           "source": [
             {
               "kind": "client",
@@ -264,6 +280,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) the E4 mentor stop is bound to the spawned Shrouded Glade NPC key 9500000697 named Kosha"
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 90412 'Speak to Kosha in Shrouded Glade to learn secrets of stealth.': client hash 1664864679 = Global.Text 90412, cited here."
             }
           ]
         },
@@ -271,6 +291,7 @@
           "kind": "talk_to_npc",
           "id": 3,
           "npc_id": 9000000047,
+          "text_string_id": 90450,
           "source": [
             {
               "kind": "client",
@@ -283,6 +304,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) the E4 continuation stop is bound to the spawned Blackspore Swamp NPC key 9000000047 named Chloe"
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 90450 'Return to Chloe in Blackspore': client hash 1346410582 = Global.Text 90450, cited here."
             }
           ]
         },
@@ -290,10 +315,15 @@
           "kind": "talk_to_npc",
           "id": 4,
           "npc_id": 9000000223,
+          "text_string_id": 90402,
           "source": [
             {
               "kind": "reconstructed",
               "evidence": "(R) T107 authors the return to giver Ty as the final ordered talk step so the existing quest engine opens the normal turn-in at Ty after the three mentor visits; the E4 client text does not expose a separate turn-in stop."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 90402 'Return to Ty in Lakeshore': client return line to Ty in Lakeshore from the same 904xx goal series as steps 1-3."
             }
           ]
         }

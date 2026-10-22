@@ -689,6 +689,7 @@
           "id": 1,
           "model_id": 3156,
           "count": 5,
+          "text_string_id": 5100203,
           "source": [
             {
               "kind": "client",
@@ -697,6 +698,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 5100203 'Defeat Hooligan Wolves': goal line beside 'Hooligan Wolf' 5100200 and the Cleetus return 5100209 in one block; the reconstructed opening stage with this title (tests/fixtures/quests/opening.json 910007) names its wolf goal 5100203."
             }
           ]
         },
@@ -704,6 +709,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9000000050,
+          "text_string_id": 5100209,
           "source": [
             {
               "kind": "client",
@@ -712,6 +718,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 5100209 'Return to Cleetus Farnum': Cleetus return line in the same 5100200-5100209 block as the wolf goal."
             }
           ]
         }
@@ -1222,6 +1232,7 @@
           "id": 1,
           "resource_id": 2739,
           "quantity": 5,
+          "text_string_id": 5100492,
           "source": [
             {
               "kind": "client",
@@ -1234,6 +1245,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T241: the live Snowhill copper-vein node path counts the mined item definition (Copper Ore 2739, gameplay.rs:5398; mining.json output), not the one-time opening gather key 1003; quantity five is playtest tuning for the batch."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 5100492 'Mine Copper Ore': goal line in the second block of this title (5100490 'Cleetus' Copper Collection', 5100491 same description)."
             }
           ]
         },
@@ -1241,6 +1256,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9000000050,
+          "text_string_id": 5100494,
           "source": [
             {
               "kind": "client",
@@ -1249,6 +1265,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 5100494 'Return to Cleetus': return line in the same 5100490 block."
             }
           ]
         }
@@ -1552,6 +1572,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000177,
+          "text_string_id": 104099,
           "source": [
             {
               "kind": "client",
@@ -1560,6 +1581,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) W110: objective ordinal, numeric content-key binding and ordered server event policy; not a recovered retail objective table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 104099 'Introduce yourself to Raina Rush in Highroad Junction.': the quest description, the same single-talk referral shape whose 3000021/3000022 evidence cites the description as the objective text."
             }
           ]
         }
@@ -1635,6 +1660,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9500000254,
+          "text_string_id": 94248,
           "source": [
             {
               "kind": "client",
@@ -1643,6 +1669,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) one Talk completes this referral; target uses existing NPC content key; objective id 1, matching and completion binding by scripts/quest_audit.py; not recovered retail quest/target identifiers or reward policy"
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 94248 'Introduce yourself to Ricky Danger in Cobblestone Village.': the id this objective's evidence cites as its step text."
             }
           ]
         }
@@ -1715,6 +1745,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9500000786,
+          "text_string_id": 116637,
           "source": [
             {
               "kind": "client",
@@ -1723,6 +1754,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) one Talk completes this referral; target uses existing NPC content key; objective id 1, matching and completion binding by scripts/quest_audit.py; not recovered retail quest/target identifiers or reward policy"
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 116637 'Introduce yourself to Francis Panic in Stillwater Crossing.': the id this objective's evidence cites as its step text."
             }
           ]
         }
@@ -1858,6 +1893,7 @@
           "id": 1,
           "model_id": 930050,
           "count": 5,
+          "text_string_id": 389193,
           "source": [
             {
               "kind": "client",
@@ -1866,6 +1902,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T277: the live level-3 field Hooligan definition 930050 (data/content/field_enemies.json, starting_highroad_hooligans) is the only counted kill kind; neither the guide's exact thugawug variant nor the video's ten-kill Hooligan Bullies is proven to be 930050. Five kills is the playtest count for the three live actors plus one 60 s respawn cycle; the per-kill 6/3 coin popups are the field enemies' own T240 payout, not this quest's."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 389193 'Defeat the Thugawug Thug': goal line in this quest's own locale block (title 389187), matching this step."
             }
           ]
         },
@@ -1873,6 +1913,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9000000444,
+          "text_string_id": 389199,
           "source": [
             {
               "kind": "client",
@@ -1881,6 +1922,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T277: the final Talk to the Courier is the hand-in; the guide gives no stolen-message item definition, so no item is invented or required."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 389199 'Talk to the Royal Courier': exact locale match for the guide objective cell 'Talk to the Royal Courier' this objective cites."
             }
           ]
         }
@@ -2277,6 +2322,7 @@
             307.902
           ],
           "radius": 8.0,
+          "text_string_id": 393135,
           "source": [
             {
               "kind": "client",
@@ -2289,6 +2335,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T279: the search-party spot is expressed as an 8 m visit_position at the W102-F1 wolf-ground centre instead of inventing two unspawned sister actors or a dungeon instance. Position and radius are local playtest geometry, not a captured transform."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 393135 'Speak with the search party': exact locale match for the guide row E1 text 'Speak with the search party' this objective cites."
             }
           ]
         },
@@ -2297,6 +2347,7 @@
           "id": 2,
           "model_id": 3156,
           "count": 3,
+          "text_string_id": 90630,
           "source": [
             {
               "kind": "client",
@@ -2309,6 +2360,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T279: the authored count is 3 because the guide and video say 'three wolves'; the three starter actors are the playtest target. No encounter or dungeon is claimed."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 90630 'The sisters are in trouble! Defeat the wolves': goal line in this quest's own locale block (title 90622), matching this step; the guide's 'Defeat the three wolves' is not a locale string."
             }
           ]
         },
@@ -2316,6 +2371,7 @@
           "kind": "talk_to_npc",
           "id": 3,
           "npc_id": 9000000330,
+          "text_string_id": 90636,
           "source": [
             {
               "kind": "client",
@@ -2324,6 +2380,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T279: the final step is an ordinary talk_to_npc to the giver."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 90636 'Return to Geoffrey in the Royal Palace': goal line in this quest's own locale block (title 90622), matching this step (also client 1212212727, cited by 3000032)."
             }
           ]
         }
@@ -2530,6 +2590,7 @@
           "kind": "complete_dungeon",
           "id": 1,
           "encounter_id": 12340,
+          "text_string_id": 90715,
           "source": [
             {
               "kind": "client",
@@ -2542,6 +2603,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T330: the retail boss encounter 144 has no playable reconstruction; the authored T282 bridge battle 12340 is the chapter's dungeon step and one terminal win credits it."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 90715 'Defeat Thugamug and his two Hands': client hash 1298108787 = Global.Text 90715, cited here and by field_battles row 12340."
             }
           ]
         },
@@ -2549,6 +2614,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9000000330,
+          "text_string_id": 90636,
           "source": [
             {
               "kind": "client",
@@ -2557,6 +2623,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T330: the final step is an ordinary talk_to_npc to the giver, the same shape as T279's 3000029 hand-in."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 90636 'Return to Geoffrey in the Royal Palace': client hash 1212212727 = Global.Text 90636, cited here."
             }
           ]
         }
@@ -2641,6 +2711,7 @@
             2242.396
           ],
           "radius": 8.0,
+          "text_string_id": 90727,
           "source": [
             {
               "kind": "client",
@@ -2653,6 +2724,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T377: the scout target is the shipped Sergeant Cargug quest-hub row's own standing point copied verbatim; 8.0 m is the existing T279 authored visit radius. This is a standable NPC hub, not a poi_anchor/unanchored row and not a new coordinate."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 90727 'Scout out Briarwood and return to Geoffrey with what you learn.': the quest description cited by this objective (the guide row E5 text); the 90726 block has no separate scout goal line."
             }
           ]
         },
@@ -2660,6 +2735,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9000000330,
+          "text_string_id": 90636,
           "source": [
             {
               "kind": "client",
@@ -2668,6 +2744,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T377: the final step is an ordinary talk_to_npc to the giver, the same shape as T279/T330's hand-in."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 90636 'Return to Geoffrey in the Royal Palace': Geoffrey's Royal Palace return line, cited by 3000032 (client 1212212727) in the same chapter."
             }
           ]
         }
@@ -2746,6 +2826,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9500000650,
+          "text_string_id": 438284,
           "source": [
             {
               "kind": "client",
@@ -2758,6 +2839,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T377: the guide marks E6's client text inferred (dagger), so the objective link to Arch Druid Camellia is reconstructed from the druid-records lead-in. The shipped druid row is the talk target; no new NPC or spawn."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 438284 'Speak to Arch Druid Camellia': the client goal line naming the bound target Arch Druid Camellia; this quest's block goal 90778 names Arestol, whom the server does not bind."
             }
           ]
         },
@@ -2765,6 +2850,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9000000330,
+          "text_string_id": 90636,
           "source": [
             {
               "kind": "client",
@@ -2773,6 +2859,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T377: the final step is an ordinary talk_to_npc to the giver."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 90636 'Return to Geoffrey in the Royal Palace': Geoffrey's Royal Palace return line, cited by 3000032 (client 1212212727) in the same chapter."
             }
           ]
         }
@@ -4138,10 +4228,15 @@
           "id": 1,
           "npc_id": 9500000941,
           "dialogue_string_id": 94258,
+          "text_string_id": 100080,
           "source": [
             {
               "kind": "client",
               "evidence": "'Convince Shakey at the Wildwood Speedway to send the rest of Ricky's pit crew.' (1842066294); Shakey's reply locale 94258 'Tell Ricky I'll come fix his car'"
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 100080 'Convince Shakey at the Wildwood Speedway to send the rest of Ricky's pit crew.': client hash 1842066294 = Global.Text 100080, cited here."
             }
           ]
         },
@@ -4149,10 +4244,15 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9500000254,
+          "text_string_id": 384143,
           "source": [
             {
               "kind": "client",
               "evidence": "'Let Ricky know that Shakey and his pit crew are on the way to help him out.' (1347845427, 3304545061)"
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 384143 'Let Ricky know that Shakey and his pit crew are on the way to help him out.': client hash 1347845427 = Global.Text 384143, cited here with the quoted text (the other cited hash 3304545061 is the variant 94512)."
             }
           ]
         }
@@ -4210,10 +4310,15 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000189,
+          "text_string_id": 94264,
           "source": [
             {
               "kind": "client",
               "evidence": "locale 94264 'Find out what Samantha in Cobblestone Village wanted to talk to you about.'"
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 94264 'Find out what Samantha in Cobblestone Village wanted to talk to you about.': the id this objective's evidence cites as its step text."
             }
           ]
         }
@@ -4261,6 +4366,7 @@
           "kind": "complete_dungeon",
           "id": 1,
           "encounter_id": 12350,
+          "text_string_id": 388319,
           "source": [
             {
               "kind": "client",
@@ -4273,6 +4379,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T360: objective 1 credits the authoritative terminal win of battle 12350 through the existing complete_dungeon event (T312 win_completed -> QuestEvent::CompleteDungeon). No Talk objective is authored: the win completes the only step, so a later Talk to the giver opens the ordinary 49/13 end screen, the same dungeon-step shape as 3030004."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 388319 'Defeat the Ravenous Wolves at Sheep Watch': the id this objective's evidence cites as its step text (field_battles row 12350 objective_id)."
             }
           ]
         }

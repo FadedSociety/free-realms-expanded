@@ -515,7 +515,8 @@ NON_ITEM_CONTEXT = re.compile(r"(enem|boss|spawner|guide|npc)", re.I)
 # Consumers known to display these via Global.Text.<id> (npc_interaction.rs quest_dialogue_choice,
 # quest_engine name_id, ShowDialog body), so a raw hash there renders blank.
 GLOBAL_TEXT_FIELDS = {"title_string_id", "description_string_id", "intro_text_string_id",
-                      "end_text_string_id", "dialogue_string_id", "greeting_string_id"}
+                      "end_text_string_id", "dialogue_string_id", "greeting_string_id",
+                      "text_string_id"}
 QUEST_REF_KEYS = {"prerequisite_quest_ids", "quest_ids", "quest_ids_given", "quest_id"}
 NPC_REF_KEYS = {"giver_npc_id"}
 GUID_KEYS = {"guid", "spawn_guid"}
@@ -1344,6 +1345,10 @@ class Checker:
                     error(field + ".trigger", trigger, "invalid client objective trigger")
             if not isinstance(goal.get("source"), list) or not goal["source"]:
                 error(field + ".source", goal.get("source"), "quest objective requires provenance")
+            # T403: the 49/3 objective name is the helper's goal line; 0 shows "<STRING 0 NOT FOUND>".
+            if enabled and not identity(goal.get("text_string_id")):
+                error(field + ".text_string_id", goal.get("text_string_id"),
+                      "an enabled quest objective needs its goal text locale id")
 
     def collect_ids(self, files):
         quest_owner, npc_owner = {}, {}

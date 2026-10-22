@@ -12,6 +12,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000161,
+          "text_string_id": 23055,
           "source": [
             {
               "kind": "client",
@@ -20,6 +21,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T197: the retail quest is Nurse Naia's three-question exam (guide Overview questions 1223254944, 2136427033, 2523135785; pass/fail lines 836266468, 3993954191, 1302975110, 437707728). ContentDb v1 has no exam or multiple-choice objective and the correct answers are not in the recovered locale, so the local step is the guide's take-the-test talk to Naia. No answer state, reward-by-score or second interaction is invented."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 23055 'Talk to Nurse Naia when you are ready to take the test.': client hash 2928150053 = Global.Text 23055, the talk step cited here."
             }
           ]
         }
@@ -143,6 +148,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9500000488,
+          "text_string_id": 22993,
           "source": [
             {
               "kind": "client",
@@ -151,6 +157,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T197: 3090002 (Operation: Revival, Bixie Hive) is unavailable and stays disabled, so this chapter follows the completed exam as the task requires. The single talk is the whole local step; the client completion line 1171210927 is neutral."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 22993 'As a medic, talk to Greyli Dustywings': client hash 1387828253 = Global.Text 22993, the talk step cited here."
             }
           ]
         }
@@ -243,6 +253,7 @@
             70.83138
           ],
           "radius": 8.0,
+          "text_string_id": 76397,
           "source": [
             {
               "kind": "client",
@@ -255,6 +266,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T278: harvesting is Chef-only on this server (harvesting.json binds CHEF_PROFILE_ID 45 and gameplay.rs apply_type8 refuses a non-Chef completion), so a Medic cannot perform the literal gather. The trip is expressed as a server-side visit_position at Sunflower's drawable farm ground; no item is granted or fabricated and no gather_resource objective is used."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 76397 'Collect the fruits and vegetables Doctor Gordon has requested.': client hash 1158596127 = Global.Text 76397, the gather step cited here."
             }
           ]
         },
@@ -262,6 +277,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9000000161,
+          "text_string_id": 23014,
           "source": [
             {
               "kind": "client",
@@ -270,6 +286,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T278: the client has Nurse Naia make the vitamins after the hand-off, so the second local step is the recovered Naia talk; no item is handed in or consumed."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 23014 'Return the fruits and vegetables to Nurse Naia and talk to her.': client hash 1428816954 = Global.Text 23014, cited here."
             }
           ]
         }
@@ -349,6 +369,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9500000488,
+          "text_string_id": 23024,
           "source": [
             {
               "kind": "client",
@@ -361,6 +382,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T197: with a single final talk objective the engine opens the 49/13 end screen at the named talk target (Greyli) rather than at the giver, because quest_engine::on_event treats a completed Talk objective as a turn-in actor; the 49/14 then pays the quest. This is the same recovered rule the T194 Archer Oath chain uses at Hilforn."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 23024 'As a medic, talk to Greyli Dustywings and let him know when he should take his vitamins': client hash 812984915 = Global.Text 23024, cited here."
             }
           ]
         }
@@ -448,6 +473,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000073,
+          "text_string_id": 387477,
           "source": [
             {
               "kind": "client",
@@ -456,6 +482,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T278: the classic level gate is the authored min_level 5 offer gate; ContentDb v1 has no level-up event objective, so the one local step is the recovered report back to Gordon."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 387477 'Reach Level 5 as a medic, and return to Doctor Gordon.': client hash 3170726822 = Global.Text 387477, cited here."
             }
           ]
         }

@@ -12,6 +12,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000076,
+          "text_string_id": 22483,
           "source": [
             {
               "kind": "client",
@@ -20,6 +21,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T257: ContentDb v1 has no free-text objective field, so the guide's battle-cry step is the server's single talk_to_npc objective at Dewey. The accept is the menu and Dewey hears the cry on the next Talk; no extra dialogue or item state is invented."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 22483 'Show Drill Sergeant Dewey your battle cry': client hash 288078259 = Global.Text 22483, cited here."
             }
           ]
         }
@@ -199,6 +204,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000208,
+          "text_string_id": 22582,
           "source": [
             {
               "kind": "client",
@@ -207,6 +213,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T257: ContentDb v1 has no free-text objective field, so the guide's report-to-Steele step is the server's single talk_to_npc objective at Steele. No practice-dummy or sword-test minigame state is invented."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 22582 'Report to Steele': client hash 2641381951 = Global.Text 22582, cited here."
             }
           ]
         }
@@ -286,6 +296,7 @@
           "id": 1,
           "profile_id": 32,
           "level": 5,
+          "text_string_id": 387437,
           "source": [
             {
               "kind": "client",
@@ -294,6 +305,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T361: the client text names the job and level; the server side is one authoritative job_level objective. It completes from the server's own Profiles::rank curve, never from a Talk or a client claim, and no packet field is added."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 387437 'Reach level 5 as a warrior, then return to Steele.': client hash 248116931 = Global.Text 387437, cited here (the cited journal line 2755651467 is the shared level-gate label 117836 'Achieve Level 5 as a Warrior'), the same pick as Medic's level gate 387477."
             }
           ]
         }

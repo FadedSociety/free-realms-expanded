@@ -111,6 +111,7 @@
             321.7513
           ],
           "radius": 8.0,
+          "text_string_id": 90123,
           "source": [
             {
               "kind": "client",
@@ -123,6 +124,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T274: the guide's literal purchase is represented by a visit to Bruno's stall because the 66/43 route sets the inventory and returns without raising an inventory quest event; radius 8.0 covers the stall counter."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 90123 'Speak to Bruno Battlerock to purchase Thorny Fasteners and Wooden Planks, then return to Smitty.': exact locale match for the quoted step text cited here (its cited hash 3250596704 resolves to 91135, a different line; 90123's hash is 3857116118)."
             }
           ]
         },
@@ -130,6 +135,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9000000206,
+          "text_string_id": 90134,
           "source": [
             {
               "kind": "client",
@@ -138,6 +144,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T274: one ordered Talk to the giver 9000000206 completes the return step; objective id 2."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403 goal text Global.Text 90134 'Return to Smitty': goal line in this quest's own locale block (title 90071), matching this step (second title copy 90122 'Smithy Merchandise')."
             }
           ]
         }
@@ -273,6 +283,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000220,
+          "text_string_id": 90756,
           "source": [
             {
               "kind": "client",
@@ -285,6 +296,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T274: one ordered Talk to Trixi 9000000220; objective id 1."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 90756 'Find out why Trixi at the Singing Crystal Mines in Snowhill canceled her rush order of pickaxes.': client hash 2062556846 = Global.Text 90756, cited here."
             }
           ]
         },
@@ -292,6 +307,7 @@
           "kind": "talk_to_npc",
           "id": 2,
           "npc_id": 9000000206,
+          "text_string_id": 35805,
           "source": [
             {
               "kind": "client",
@@ -300,6 +316,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) T274: one ordered Talk back to the giver 9000000206; objective id 2."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 35805 'Return to Smitty and let him know why Trixi canceled her order.': client hash 4121257363 = Global.Text 35805, cited here."
             }
           ]
         }
@@ -786,6 +806,7 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000405,
+          "text_string_id": 94419,
           "source": [
             {
               "kind": "client",
@@ -794,6 +815,10 @@
             {
               "kind": "reconstructed",
               "evidence": "(R) one Talk completes this referral; target uses existing NPC content key; objective id 1, matching and completion binding by scripts/quest_audit.py; not recovered retail quest/target identifiers or reward policy"
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 94419 'Speak with Mili Ironcall, the camp's director.': the id this objective's evidence cites as its step text."
             }
           ]
         }
