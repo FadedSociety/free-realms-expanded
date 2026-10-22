@@ -593,8 +593,10 @@ fn chat_scope_derives_zone_and_position_from_the_live_registry() {
     a.send_message(&bot::wrap(&chat(ChatChannel::Say, NEAR_SAY)), "15/1")
         .unwrap();
     let mut near = Default::default();
+    // Wait for both copies: the sender and listener are independent sockets, so waiting only for
+    // one makes the exact-count assertion on the other depend on the 500 ms grace.
     settle(&mut a, &mut b, &mut near, |m| {
-        chat_count(&m[1], NEAR_SAY) >= 1
+        chat_count(&m[0], NEAR_SAY) >= 1 && chat_count(&m[1], NEAR_SAY) >= 1
     });
     assert_eq!(chat_count(&near[0], NEAR_SAY), 1, "near say echo");
     assert_eq!(chat_count(&near[1], NEAR_SAY), 1, "near say listener");
@@ -655,7 +657,7 @@ fn chat_scope_derives_zone_and_position_from_the_live_registry() {
         .unwrap();
     let mut rejoined = Default::default();
     settle(&mut a, &mut b, &mut rejoined, |m| {
-        chat_count(&m[1], REJOINED_SAY) >= 1
+        chat_count(&m[0], REJOINED_SAY) >= 1 && chat_count(&m[1], REJOINED_SAY) >= 1
     });
     assert_eq!(chat_count(&rejoined[0], REJOINED_SAY), 1, "rejoined echo");
     assert_eq!(

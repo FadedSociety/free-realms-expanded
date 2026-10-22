@@ -10,51 +10,25 @@
 //! ones. The directory is removed on drop.
 
 #[path = "vendor_fixture.rs"]
-pub mod vendor_fixture;
+mod vendor_fixture;
 
 use crate::gateway_vendor::{
-    NOW, count_definition, inner_packets, interact, inventory_of, login, merchant_status, select,
-    sell_packet, send, vendor_buy_packet, wrap,
+    NOW, connect_with, count_definition, fixture_root, inner_packets, interact, inventory_of,
+    merchant_status, select, sell_packet, send, vendor_buy_packet, wrap,
 };
 use osfr_tools::{
-    account_store::AccountRole, character_store::CharacterState, gameplay::GameplayState,
-    gateway::Gateway, npc_interaction::decode_merchant_list_66_42,
+    character_store::CharacterState, gameplay::GameplayState, gateway::Gateway,
+    npc_interaction::decode_merchant_list_66_42,
 };
-use std::path::PathBuf;
-pub use vendor_fixture::{REPRESENTATIVE_ITEM, REPRESENTATIVE_VENDOR, SEEDED_ITEM, VendorFixture};
-
-/// The integration suite's private build directory for the fixture pack.
-pub fn fixture_root() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab/build/w178-vendor-gateway")
-}
+use vendor_fixture::{REPRESENTATIVE_ITEM, REPRESENTATIVE_VENDOR, SEEDED_ITEM, VendorFixture};
 
 fn connect(fixture: &VendorFixture, state: GameplayState) -> Gateway {
-    connect_with(fixture, fixture.character(), state)
-}
-
-/// Reconnect through the saved character half of the save envelope, not a fresh
-/// reference character.
-pub fn connect_with(
-    fixture: &VendorFixture,
-    character: CharacterState,
-    state: GameplayState,
-) -> Gateway {
-    let guid = character.guid;
-    let mut gateway = Gateway::load_gameplay(
+    connect_with(
         fixture.reference(),
-        character,
+        fixture.character(),
         fixture.content(),
-        Some(state),
+        state,
     )
-    .expect("gateway loads the vendor content");
-    gateway.set_dev_tools(false);
-    gateway.set_role(AccountRole::Player);
-    for packet in [login(guid), wrap(&[13, 0]), wrap(&[10, 0])] {
-        gateway
-            .handle_at(&packet, NOW)
-            .expect("initialization message handles");
-    }
-    gateway
 }
 
 /// The reconnect helper logs in with the saved character's own guid. The gateway
@@ -65,7 +39,12 @@ fn connect_with_logs_in_the_saved_character_guid() {
     let fixture = VendorFixture::new(&fixture_root(), "f294-reconnect-guid");
     let mut character = fixture.character();
     character.guid = 7;
-    let gateway = connect_with(&fixture, character, fixture.state(1_000, false));
+    let gateway = connect_with(
+        fixture.reference(),
+        character,
+        fixture.content(),
+        fixture.state(1_000, false),
+    );
     assert_eq!(gateway.state().guid, 7);
     assert!(
         gateway.is_logged_in(),
@@ -164,7 +143,12 @@ pub fn representative_new_stock_buys_once_and_refuses_atomically() {
         .expect("gameplay state serializes"),
     )
     .expect("gameplay state parses");
-    let mut reconnected = connect_with(&fixture, saved_character.clone(), saved);
+    let mut reconnected = connect_with(
+        fixture.reference(),
+        saved_character.clone(),
+        fixture.content(),
+        saved,
+    );
     let reconnect_snapshot = reconnected.snapshot();
     assert_eq!(
         reconnect_snapshot.character, saved_character,

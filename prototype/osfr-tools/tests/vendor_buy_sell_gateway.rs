@@ -23,22 +23,27 @@
 
 #[path = "common/gateway_vendor.rs"]
 mod gateway_vendor;
-// The shared purchase module carries helpers and a test this suite reuses rather than copies;
-// the few functions it does not call stay unused here.
+#[path = "common/vendor_fixture.rs"]
+mod vendor_fixture;
+// Keep the shared module's canonical test running in this target: the integration suite treats
+// a test that disappears from a target as a regression. This suite itself uses only the shared
+// helpers above (the module's representative buy/refusal proof still runs in
+// `vendor_stock_coverage`).
 #[path = "common/vendor_purchase.rs"]
 #[allow(dead_code)]
 mod vendor_purchase;
 
 use gateway_vendor::{
-    NOW, count_definition, interact, inventory_of, merchant_status, select, sell_packet, send,
-    vendor_buy_packet, wrap,
+    NOW, completions, connect_with, count_definition, fixture_root, inner_packets, interact,
+    inventory_of, merchant_status, select, sell_packet, send, vendor_buy_packet, wrap,
 };
 use osfr_tools::{
     account_store::AccountRole,
+    character_store::CharacterState,
     coin_shop,
     game_store::{self, Snapshot},
     gameplay::GameplayState,
-    gateway::Gateway,
+    gateway::{Gateway, GatewayOutcome},
     inventory::InventoryState,
     npc_interaction::{
         MerchantBuyRequestV2, decode_merchant_list_66_42, encode_merchant_buy_66_43,
@@ -46,15 +51,16 @@ use osfr_tools::{
     world::NpcVisibility,
 };
 use std::{fs, path::PathBuf};
-use vendor_purchase::{
-    REPRESENTATIVE_ITEM, REPRESENTATIVE_VENDOR, SEEDED_ITEM, VendorFixture, connect_with,
-    fixture_root,
-};
+use vendor_fixture::{REPRESENTATIVE_ITEM, REPRESENTATIVE_VENDOR, SEEDED_ITEM, VendorFixture};
 
 const RESULT_SUCCESS: u32 = coin_shop::RESULT_SUCCESS;
 
+fn reconnect(fixture: &VendorFixture, character: CharacterState, state: GameplayState) -> Gateway {
+    connect_with(fixture.reference(), character, fixture.content(), state)
+}
+
 fn connect(fixture: &VendorFixture, state: GameplayState) -> Gateway {
-    connect_with(fixture, fixture.character(), state)
+    reconnect(fixture, fixture.character(), state)
 }
 
 /// Open the representative vendor's 66/42 window and return the list body.
@@ -69,50 +75,6 @@ fn open_shop(fixture: &VendorFixture, gateway: &mut Gateway) -> Vec<u8> {
 
 fn buy(gateway: &mut Gateway, transaction: u32, item: i32, quantity: u32) -> Vec<Vec<u8>> {
     send(gateway, &vendor_buy_packet(transaction, item, quantity))
-}
-
-/// 165/6 record sizes and order from `0x00c74ef0` -> `0x00c71f30`: header, result, leading
-/// item, then kind, u64 merchant, transaction, u64 timestamp, item pair, quantity, unit price
-/// and remaining.
-#[derive(Debug, PartialEq)]
-struct SellCompletion {
-    result: u32,
-    kind: u32,
-    merchant: u64,
-    transaction: u32,
-    definition: i32,
-    quantity: u32,
-    price: u32,
-    remaining: u32,
-}
-
-fn sell_completion(packet: &[u8]) -> SellCompletion {
-    assert_eq!(
-        packet.len(),
-        56,
-        "165/6 must match the 0x00c74ef0/0x00c71f30 reader size"
-    );
-    assert_eq!(&packet[..4], &[165, 0, 6, 0]);
-    let u32_at = |at: usize| u32::from_le_bytes(packet[at..at + 4].try_into().unwrap());
-    let u64_at = |at: usize| u64::from_le_bytes(packet[at..at + 8].try_into().unwrap());
-    SellCompletion {
-        result: u32_at(4),
-        kind: u32_at(12),
-        merchant: u64_at(16),
-        transaction: u32_at(24),
-        definition: u32_at(36) as i32,
-        quantity: u32_at(44),
-        price: u32_at(48),
-        remaining: u32_at(52),
-    }
-}
-
-fn completions(replies: &[Vec<u8>]) -> Vec<SellCompletion> {
-    replies
-        .iter()
-        .filter(|packet| packet.starts_with(&[165, 0, 6, 0]))
-        .map(|packet| sell_completion(packet))
-        .collect()
 }
 
 fn buy_status(replies: &[Vec<u8>]) -> u32 {
@@ -134,29 +96,68 @@ fn bought_instance(state: &InventoryState) -> (i32, u32) {
     first
 }
 
+fn assert_unique_instance_ids(label: &str, state: &InventoryState) {
+    let mut ids: Vec<i32> = state.items.iter().map(|item| item.id).collect();
+    ids.sort_unstable();
+    let total = ids.len();
+    ids.dedup();
+    assert_eq!(
+        ids.len(),
+        total,
+        "{label}: inventory instance ids are not unique"
+    );
+}
+
+/// Save files go into the private build output, never `%TEMP%`: no other local user can
+/// pre-create the path and each file is removed as soon as it is read back.
 fn save_path(label: &str) -> PathBuf {
-    std::env::temp_dir().join(format!("osfr-t374-{}-{label}.json", std::process::id()))
+    let directory = PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join("vendor-buy-sell-gateway");
+    fs::create_dir_all(&directory).expect("the test save directory creates");
+    directory.join(format!("{label}.json"))
 }
 
 /// Serialize the whole gateway snapshot through the real save envelope and return its bytes.
 fn saved_bytes(label: &str, snapshot: &Snapshot) -> Vec<u8> {
     let path = save_path(label);
     game_store::save(&path, snapshot).expect("the canonical game save writes");
-    fs::read(&path).expect("the canonical game save reads")
+    let bytes = fs::read(&path).expect("the canonical game save reads");
+    let _ = fs::remove_file(&path);
+    bytes
 }
 
 fn read_save(label: &str, snapshot: &Snapshot) -> Snapshot {
     let path = save_path(label);
     game_store::save(&path, snapshot).expect("the canonical game save writes");
-    game_store::load_or_create(&path, snapshot.character.clone()).expect("the canonical save loads")
+    let loaded = game_store::load_or_create(&path, snapshot.character.clone())
+        .expect("the canonical save loads");
+    let _ = fs::remove_file(&path);
+    loaded
 }
 
-/// A refused buy answers exactly one 66/44 status 0 and changes neither the snapshot nor the
-/// save bytes.
+/// Send one request through the real gateway and keep both the inner replies and the
+/// outcome, so a refusal can assert that it requested no save at all.
+fn handled(gateway: &mut Gateway, packet: &[u8]) -> (Vec<Vec<u8>>, GatewayOutcome) {
+    let outcome = gateway
+        .handle_at(&wrap(packet), NOW)
+        .expect("gateway handles the request");
+    let replies = inner_packets(&outcome);
+    (replies, outcome)
+}
+
+/// A refused buy answers exactly one 66/44 status 0, requests no save and changes neither the
+/// snapshot nor the save bytes.
 fn refused_buy(gateway: &mut Gateway, label: &str, packet: &[u8]) {
     let before = gateway.snapshot();
     let before_save = saved_bytes(&format!("{label}-before"), &before);
-    let replies = send(gateway, packet);
+    let (replies, outcome) = handled(gateway, packet);
+    assert!(
+        !outcome.gameplay_changed,
+        "{label}: a refused buy requested a save"
+    );
+    assert!(
+        !outcome.state_changed,
+        "{label}: a refused buy changed the character state"
+    );
     assert_eq!(
         replies.len(),
         1,
@@ -175,11 +176,20 @@ fn refused_buy(gateway: &mut Gateway, label: &str, packet: &[u8]) {
     );
 }
 
-/// A refused sell answers one 165/6 with the production result code and changes nothing.
+/// A refused sell answers one 165/6 with the production result code, requests no save and
+/// changes nothing.
 fn refused_sell(gateway: &mut Gateway, label: &str, packet: &[u8], code: u32) {
     let before = gateway.snapshot();
     let before_save = saved_bytes(&format!("{label}-before"), &before);
-    let replies = send(gateway, packet);
+    let (replies, outcome) = handled(gateway, packet);
+    assert!(
+        !outcome.gameplay_changed,
+        "{label}: a refused sell requested a save"
+    );
+    assert!(
+        !outcome.state_changed,
+        "{label}: a refused sell changed the character state"
+    );
     let done = completions(&replies);
     assert_eq!(done.len(), 1, "{label}: exactly one 165/6 completion");
     assert_eq!(done[0].result, code, "{label}: result code");
@@ -195,6 +205,39 @@ fn refused_sell(gateway: &mut Gateway, label: &str, packet: &[u8], code: u32) {
         before_save,
         "{label}: the refused sell changed the save bytes"
     );
+}
+
+/// Byte-level pins for the request bodies this suite sends, derived from the client writers:
+/// 26/8 `008b6bc0` (u64 target + bool), 26/10 `00a36f80` (u64 target + i32 choice), and 165/5
+/// `00c75a70` with `00c76dd0`'s field order (u64 merchant, item instance, quantity). The 66/43
+/// body is pinned by `vendor_stock_coverage::vendor_buy_wire_matches_the_client_reader_layout`.
+#[test]
+fn request_bodies_match_the_client_writers() {
+    let interact_body = interact(REPRESENTATIVE_VENDOR);
+    assert_eq!(interact_body.len(), 13, "26/8 is a target and one bool");
+    assert_eq!(&interact_body[..4], &[26, 0, 8, 0]);
+    assert_eq!(&interact_body[4..12], &REPRESENTATIVE_VENDOR.to_le_bytes());
+    assert_eq!(interact_body[12], 0);
+
+    let select_body = select(REPRESENTATIVE_VENDOR, 7);
+    assert_eq!(
+        select_body.len(),
+        16,
+        "26/10 is a target and one i32 choice"
+    );
+    assert_eq!(&select_body[..4], &[26, 0, 10, 0]);
+    assert_eq!(&select_body[4..12], &REPRESENTATIVE_VENDOR.to_le_bytes());
+    assert_eq!(&select_body[12..16], &7u32.to_le_bytes());
+
+    let merchant = 0x0102_0304_0506_0708u64;
+    let instance = 0x090A_0B0Ci32;
+    let quantity = 0x0D0E_0F10u32;
+    let sell_body = sell_packet(merchant, instance, quantity);
+    assert_eq!(sell_body.len(), 20, "165/5 is a merchant and two dwords");
+    assert_eq!(&sell_body[..4], &[165, 0, 5, 0]);
+    assert_eq!(&sell_body[4..12], &merchant.to_le_bytes());
+    assert_eq!(&sell_body[12..16], &instance.to_le_bytes());
+    assert_eq!(&sell_body[16..20], &quantity.to_le_bytes());
 }
 
 #[test]
@@ -253,15 +296,7 @@ fn a_player_buys_a_stock_item_and_the_save_holds_the_new_wallet() {
     let (instance, count) = bought_instance(&after_inventory);
     assert_eq!(count, 1);
     assert_ne!(instance, 1, "the purchase aliased the seeded instance");
-    let mut ids: Vec<i32> = after_inventory.items.iter().map(|item| item.id).collect();
-    ids.sort_unstable();
-    let mut unique = ids.clone();
-    unique.dedup();
-    assert_eq!(
-        unique.len(),
-        ids.len(),
-        "inventory instance ids are not unique"
-    );
+    assert_unique_instance_ids("buy", &after_inventory);
 
     // The authored stock is not decremented by a purchase: reopening the window lists the same
     // vendor state (there is no per-row stock counter in the production path).
@@ -308,7 +343,7 @@ fn the_purchase_survives_a_real_relog() {
     assert_eq!(saved_inventory.coins, 1_000);
     assert_eq!(count_definition(&saved_inventory, REPRESENTATIVE_ITEM), 1);
 
-    let mut relogged = connect_with(
+    let mut relogged = reconnect(
         &fixture,
         loaded.character.clone(),
         loaded.gameplay.clone().expect("the save carries gameplay"),
@@ -388,6 +423,12 @@ fn the_same_item_can_be_sold_once_through_165_5() {
     assert_eq!(done[0].kind, 2);
     assert_eq!(done[0].merchant, 0, "the native sell names the open shop");
     assert_eq!(done[0].definition, REPRESENTATIVE_ITEM);
+    // The buy-back ledger entry the client reads: a successful one-unit sale leaves one unit
+    // available (`00c71f30`'s last record dword, `this+13`).
+    assert_eq!(
+        done[0].remaining, 1,
+        "the sale did not leave a buy-back entry for the sold unit"
+    );
     assert_eq!((done[0].quantity, done[0].price), (1, resale));
     assert_ne!(
         done[0].transaction, 0,
@@ -571,12 +612,31 @@ fn buy_and_sell_refusals_change_nothing() {
         price + 1_000 + fixture.sell_price()
     );
 
+    // Near the coin cap the sale credit cannot be added: the production gate refuses it whole,
+    // keeps the item and requests no save (the wire coin field is i32).
+    let cap = i32::MAX as u32;
+    let resale = fixture.sell_price();
+    let mut capped = connect(&fixture, fixture.state(cap - resale + 1, false));
+    open_shop(&fixture, &mut capped);
+    refused_sell(
+        &mut capped,
+        "coin-cap",
+        &sell_packet(0, 1, 1),
+        coin_shop::RESULT_SERVICE_UNAVAILABLE,
+    );
+    assert_eq!(inventory_of(&capped).coins, cap - resale + 1);
+    assert_eq!(
+        count_definition(&inventory_of(&capped), SEEDED_ITEM),
+        1,
+        "the refused coin-cap sale consumed the item"
+    );
+
     // Out of range: the entry path is gated before a shop exists. A single (non-bundled) request
     // whose gameplay handler refuses is dropped by the gateway with no reply, and it must change
     // nothing.
     let mut far = fixture.character();
     far.position = [1_000.0, 0.0, 0.0];
-    let mut far_gateway = connect_with(&fixture, far, fixture.state(price + 1_000, false));
+    let mut far_gateway = reconnect(&fixture, far, fixture.state(price + 1_000, false));
     let far_before = far_gateway.snapshot();
     let refused = far_gateway
         .handle_at(&wrap(&interact(REPRESENTATIVE_VENDOR)), NOW)
@@ -604,10 +664,12 @@ fn the_round_trip_uses_no_dev_commands() {
     let fixture = VendorFixture::new(&fixture_root(), "t374-ordinary");
     let price = fixture.price();
     let mut gateway = connect(&fixture, fixture.state(price + 1_000, false));
+    // The shared `connect_with` helper sets no role: this is the production default a loaded
+    // session gets, so the round trip really runs as an ordinary player.
     assert_eq!(
         gateway.role(),
         AccountRole::Player,
-        "the round trip must run as an ordinary player"
+        "a production session starts with a non-player role"
     );
 
     struct Flow<'a> {
@@ -677,7 +739,11 @@ fn the_round_trip_uses_no_dev_commands() {
             "the ordinary flow did not answer {expected:?}"
         );
     }
-    assert_eq!(flow.gateway.role(), AccountRole::Player);
+    assert_eq!(
+        flow.gateway.role(),
+        AccountRole::Player,
+        "the ordinary round trip changed the session role"
+    );
 
     // The vendor is spawned from the fixture content by the same visibility loader the world
     // entry uses; no admin spawn or realm command is needed.
@@ -744,8 +810,20 @@ fn a_client_supplied_price_field_cannot_change_the_server_price() {
 fn two_players_at_the_same_vendor_keep_independent_wallets_and_shops() {
     let fixture = VendorFixture::new(&fixture_root(), "t374-two");
     let price = fixture.price();
+    let first_character = fixture.character();
+    let mut second_character = first_character.clone();
+    second_character.guid = first_character.guid + 1;
     let mut first = connect(&fixture, fixture.state(price + 1_000, false));
-    let mut second = connect(&fixture, fixture.state(price + 1_000, false));
+    let mut second = reconnect(
+        &fixture,
+        second_character,
+        fixture.state(price + 1_000, false),
+    );
+    assert_ne!(
+        first.state().guid,
+        second.state().guid,
+        "the two gateways are the same character"
+    );
     let first_list = decode_merchant_list_66_42(&open_shop(&fixture, &mut first))
         .expect("first shop matches the client reader");
     let second_list = decode_merchant_list_66_42(&open_shop(&fixture, &mut second))
@@ -785,8 +863,10 @@ fn two_players_at_the_same_vendor_keep_independent_wallets_and_shops() {
     );
     let (first_instance, _) = bought_instance(&inventory_of(&first));
     let (second_instance, _) = bought_instance(&inventory_of(&second));
-    // Instance ids are per-character namespaces; each purchase still allocated its own new id
-    // in its own bag (never the seeded instance 1).
+    // Instance ids are per-character namespaces; each purchase still allocated a fresh id in its
+    // own bag (never the seeded instance 1) and never introduced a duplicate there.
     assert_ne!(first_instance, 1);
     assert_ne!(second_instance, 1);
+    assert_unique_instance_ids("first", &inventory_of(&first));
+    assert_unique_instance_ids("second", &inventory_of(&second));
 }

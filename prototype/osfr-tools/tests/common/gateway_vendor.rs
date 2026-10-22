@@ -1,5 +1,5 @@
 //! Shared gateway packet plumbing for the vendor suites (`vendor_sell`,
-//! `vendor_stock_coverage`).
+//! `vendor_stock_coverage`, `vendor_buy_sell_gateway`).
 //!
 //! Client-derived bodies: 26/8 constructor `008b6bc0` (u64 target + bool),
 //! 26/10 constructor `00a36f80` (u64 target + i32 choice), 66/43 serializer
@@ -8,6 +8,9 @@
 //! 165/12 buy-back request written by `00c759c0` (caller `00c76600`).
 //! The 7-byte tunnel prefix mirrors the captured client wrapper (`005`, subtype
 //! `1`, payload length).
+//!
+//! The 165/6 completion parser lives here too, so a layout correction lands in
+//! one place.
 
 #[path = "gateway_packets.rs"]
 mod gateway_packets;
@@ -16,10 +19,13 @@ mod gateway_packets;
 pub use gateway_packets::{interact, login, select};
 
 use osfr_tools::{
+    character_store::CharacterState,
+    gameplay::GameplayState,
     gateway::{Gateway, GatewayOutcome},
     inventory::InventoryState,
     npc_interaction::{MerchantBuyRequestV2, encode_merchant_buy_66_43},
 };
+use std::path::{Path, PathBuf};
 
 pub const NOW: u64 = 10_000;
 
@@ -44,6 +50,36 @@ pub fn send(gateway: &mut Gateway, packet: &[u8]) -> Vec<Vec<u8>> {
             .handle_at(&wrap(packet), NOW)
             .expect("gateway handles the request"),
     )
+}
+
+/// The integration suite's private build directory for the representative
+/// vendor's content pack.
+#[allow(dead_code)] // Only the suites that build that fixture call it.
+pub fn fixture_root() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab/build/w178-vendor-gateway")
+}
+
+/// Reconnect through the saved character half of the save envelope, not a fresh
+/// reference character. It deliberately sets no role: `Gateway::load_gameplay`
+/// mints the production default, so an assertion on `role()` is not the helper's
+/// own setup.
+#[allow(dead_code)] // Only the suites that reconnect through the fixture call it.
+pub fn connect_with(
+    reference: &Path,
+    character: CharacterState,
+    content: &Path,
+    state: GameplayState,
+) -> Gateway {
+    let guid = character.guid;
+    let mut gateway = Gateway::load_gameplay(reference, character, content, Some(state))
+        .expect("gateway loads the vendor content");
+    gateway.set_dev_tools(false);
+    for packet in [login(guid), wrap(&[13, 0]), wrap(&[10, 0])] {
+        gateway
+            .handle_at(&packet, NOW)
+            .expect("initialization message handles");
+    }
+    gateway
 }
 
 pub fn inventory_of(gateway: &Gateway) -> InventoryState {
@@ -100,4 +136,52 @@ pub fn buy_back_packet(transaction: u32, context: u32) -> Vec<u8> {
     packet.extend(transaction.to_le_bytes());
     packet.extend(context.to_le_bytes());
     packet
+}
+
+/// The 165/6 record as `00c74ef0`/`00c71f30` read it: header, result, leading item,
+/// then kind, u64 merchant, transaction, u64 timestamp, item pair, quantity, unit
+/// price and remaining. `remaining` (`this+13`, the last wire dword) is the buy-back
+/// quantity a successful sale leaves.
+#[allow(dead_code)] // Only the suites that read a 165/6 completion use this parser.
+#[derive(Debug, PartialEq)]
+pub struct SellCompletion {
+    pub result: u32,
+    pub kind: u32,
+    pub merchant: u64,
+    pub transaction: u32,
+    pub definition: i32,
+    pub quantity: u32,
+    pub price: u32,
+    pub remaining: u32,
+}
+
+#[allow(dead_code)]
+pub fn sell_completion(packet: &[u8]) -> SellCompletion {
+    assert_eq!(
+        packet.len(),
+        56,
+        "165/6 must match the 0x00c74ef0/0x00c71f30 reader size"
+    );
+    assert_eq!(&packet[..4], &[165, 0, 6, 0]);
+    let u32_at = |at: usize| u32::from_le_bytes(packet[at..at + 4].try_into().unwrap());
+    let u64_at = |at: usize| u64::from_le_bytes(packet[at..at + 8].try_into().unwrap());
+    SellCompletion {
+        result: u32_at(4),
+        kind: u32_at(12),
+        merchant: u64_at(16),
+        transaction: u32_at(24),
+        definition: u32_at(36) as i32,
+        quantity: u32_at(44),
+        price: u32_at(48),
+        remaining: u32_at(52),
+    }
+}
+
+#[allow(dead_code)]
+pub fn completions(replies: &[Vec<u8>]) -> Vec<SellCompletion> {
+    replies
+        .iter()
+        .filter(|packet| packet.starts_with(&[165, 0, 6, 0]))
+        .map(|packet| sell_completion(packet))
+        .collect()
 }
