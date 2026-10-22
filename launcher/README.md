@@ -21,7 +21,9 @@ send a private key. Return to **Realms** and choose the saved account beside
 PLAY.
 
 The trusted server identity comes from the host, never from a network response.
-Login uses the local secure tunnel at `127.0.0.1:20043`; the host must enroll the
+Login goes to the realm's AUTH2 broker: by default the game address's IP at port
+20043, and only a loopback or private/VPN address (`default_broker` in
+`src/main.rs`, `broker_ip_allowed` in `src/auth.rs`). The host must enroll the
 public key for the supplied account handle. A refused login explains that the
 host may still need to add the key. The broker intentionally returns one
 generic refusal for unknown, disabled, wrong-key and locked accounts.
@@ -124,7 +126,7 @@ Physical controller navigation, actual client launch, release packaging and
 second-PC acceptance remain unverified. See `notes/Design/Rust Launcher.md` for
 root-cause logs, provenance, security review and the remaining full-launcher gates.
 
-## Evidence (2026-10-21)
+## Evidence (2026-10-22)
 
 Native runs are under `lab/runs/`. Every client run cited here used the
 `run-local-baseline.py` harness, not this launcher.
@@ -135,14 +137,15 @@ Native runs are under `lab/runs/`. Every client run cited here used the
 | Key creation and AUTH2 broker login against a real `osfr-login` | Proven by tests only | `tests/auth.rs` `real_broker_enrol_generated_key_and_receive_token`; pin canary `wrong_pin_sends_no_proof_canary` |
 | Pinned patch download, resume and repair | Proven by loopback tests only; no real patch host | `tests/patch.rs`; `lab/reports/rust-launcher-w121/README.md` |
 | Launcher starts `FreeRealms.exe` | Pending (lead native run, L024) | — |
-| The client needs a `manifest.crc` asset server | Proven natively (harness) | `client-baseline-20261008T015537Z` exited with code 27 after four failed `manifest.crc` requests; `client-baseline-20261021T193008Z` got 7 of 339 asset requests answered 200 (`manifest.crc`, fence, lamp and sconce models). `offline_urls` (`src/lib.rs`) points every URL at `127.0.0.1:9`, `IndirectServerAddress` included (`src/tests.rs:117`), so a client this launcher starts is expected to exit with code 27 (R) until L024's asset responder or a profile asset URL lands |
+| The client needs a `manifest.crc` asset server | Proven natively (harness) | `client-baseline-20261008T015537Z` exited with code 27 after four failed `manifest.crc` requests; `client-baseline-20261021T193008Z` got 7 of 339 asset requests answered 200 (`manifest.crc`, fence, lamp and sconce models). Since T442 the launcher's loopback responder serves `manifest.crc` and indirect assets: `IndirectServerAddress` points at it (`assets::Responder`, `src/lib.rs`; `src/tests.rs:121-122`), and only the client's other URLs still go to `127.0.0.1:9` (`offline_urls`). Not yet run natively (L024) |
 | Dev-mode login, Character Select, world entry | Proven natively (harness) | `client-baseline-20261020T173403Z`, `client-baseline-20261020T204059Z` |
 | Account-store login: legacy save migrated into the store, then world entry | Proven natively (harness) | `client-baseline-20261014T023623Z` (`notes/Reviews/Native Login Accounts 023623.md`) |
 | Role-checked `realm` commands without `--dev-tools` on an account-store gateway (admin `realm god` ran, player refused) | Proven natively (harness, dev-mode login) | `client-baseline-20261021T193008Z` |
-| Gateway HMAC handoff | Not proven for the real client (pending L024) | In `client-baseline-20261021T193008Z` only `osfr-bot` (guid 2) presented an HMAC ticket, which it signs itself. The real client (account 1 / character 1) still enters with the public fixed ticket: login issues it for that pair (`prototype/osfr-tools/src/login.rs:414-418`) and the gateway accepts it (`prototype/osfr-tools/src/bin/osfr-gateway.rs:1114-1116`). Security Model S02/L3 |
+| Gateway HMAC handoff | Proven natively (harness, dev-mode login) | L023 removed the public fixed ticket on account-store servers: login gives every account, 1/1 included, an HMAC binding ticket (`prototype/osfr-tools/src/login.rs:457-459`), and the gateway refuses any other ticket and logs `auth_failure` (`prototype/osfr-tools/src/bin/osfr-gateway.rs:1133-1139`). In `client-baseline-20261022T005637Z` the real client (1/1) entered on it through an account-store gateway. Tickets are still reusable and never expire (Security Model S02/L3) |
 | Key-pair login of the real client (broker token redeemed by the client) | Not run | The harness runs login in loopback dev mode; key-pair native verification belongs with this launcher (`lab/autopilot/native-notes/2026-10-20.md`, harness repairs) |
 | Character creation on a fresh key-pair account | Not run | `notes/Reviews/Native Login Accounts 023623.md` (Open) |
-| Physical controller, release package, fresh second PC, VPN broker | Not run | — |
+| VPN broker | Proven with `osfr-bot` only | L053 ran gateway, login and broker on the host's Tailscale address and passed the bot from the host and from Windows Sandbox (through the host's NAT, not Tailscale) (`lab/autopilot/native-notes/2026-10-22.md`, `lab/runs/lan-test-20261022T041757Z`). A second PC and the real client are still not run |
+| Physical controller, release package, fresh second PC | Not run | — |
 
 ## W98 skin evidence (2026-10-16)
 
@@ -237,22 +240,27 @@ does not create a key, save a profile, or contact a server. The default window
 is 940 x 790 logical points. At 150% display scale, use `--window-size 853x533`
 for a 1280 x 800 physical capture.
 
-## Client overlay for the character creator (L024, distribution pending)
+## Client overlay for the character creator (L024, private realms only)
 
 A stock client's creator offers looks whose textures are missing or unproven
 (skin tones 7/8 and four extra faces), has no starting sets, and its dressing-room
 scene lacks nine terrain chunks. `scripts/bundle/client_overlay.py` lists the 22
 community files that fix this, each with its SHA-256 pin and the path the
-client opens; the native harness installs from that same list. A host builds it
-as a W121 patch folder:
+client opens; the native harness installs from that same list. `make_bundle.py`
+builds it into the playtest bundle's `client-overlay/` folder, a W121 patch
+folder; the host serves only that folder at the patch URL. On its own:
 
 ```powershell
 python -I scripts/bundle/client_overlay.py --out <new folder>
 ```
 
-It writes nothing unless every cached source matches its pin, then prints the
-manifest pin to give friends with the patch URL. `client_overlay_lands_byte_identical`
-in `tests/patch.rs` (ignored; needs the lab cache) installs it through W121.
+Both refuse unless every cached source matches its pin (no overlay folder, and
+no bundle), then print the manifest pin to give friends with the patch URL. The
+bundle also puts the two pinned customization tables in its `login-resources/`,
+so `osfr-login` refuses the looks they hide (its `listening` line shows
+`"creator_allow_list":true`).
+`client_overlay_lands_byte_identical` in `tests/patch.rs` (ignored; needs the lab
+cache) installs it through W121.
 
 **Provenance.** All 22 files were downloaded on 2026-10-08 from
 `https://opensourcefreerealms.com/client/<overlay path>`. Each is listed in that
@@ -271,9 +279,13 @@ size and hashes: `lab/references/asset-cache/cache-index.json` and
 | `custom/sg_dressing_room.gzne`, `custom/sg_dressing_room_{0,4,8}_{0,4,8}.gcnk` and `.gck2` (19 files) | Community-made creator scene. Not original assets: they do not match the original manifest rows. |
 
 **Licence: not stated.** The Launcher's AGPL-3.0 covers its code, not these
-files, and the three tables derive from the original client's own. Whether
-friends may receive them is the lead's decision. Until then `make_bundle.py`
-leaves the overlay out and no realm should serve it.
+files, and the three tables derive from the original client's own. Lead
+decision (2026-10-22): private realms (friends over a VPN, the Playtest Host
+Runbook setup) may serve the overlay. These are the same files every
+community-launcher user downloads publicly from opensourcefreerealms.com, so
+pinned redistribution to invited friends follows the owner's direction to use
+community renditions of original content. A public release still waits until
+the licence is clear.
 
 **Client paths** (FreeRealms.exe). StartingSets: `./Resources/CharacterCreate/`
 (0x017e802c, set by 0x0071efb0) + the file name (0x017e8dc8, read by 0x00723e90).

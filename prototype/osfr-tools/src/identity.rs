@@ -336,8 +336,9 @@ impl Resources {
             return Err(invalid("missing native creation resources"));
         }
         // A tree holding any allow-list input must hold all of them, pinned: every
-        // client tree does (a stock one needs the overlay installed). Trees with none
-        // (synthetic fixtures, bundle login-resources) create unfiltered.
+        // client tree does (a stock one needs the overlay installed), and so does the
+        // bundle's login-resources (T575). Trees with none (synthetic fixtures) create
+        // unfiltered.
         let mut pinned = directory.join(ITEM_MAPPINGS).try_exists()?;
         for (name, _) in PINNED_CREATOR_TABLES {
             pinned |= directory.join(name).try_exists()?;
@@ -353,6 +354,11 @@ impl Resources {
             items,
             pinned_looks,
         })
+    }
+
+    /// Whether creation refuses the looks the pinned creator tables hide.
+    pub fn filters_looks(&self) -> bool {
+        self.pinned_looks.is_some()
     }
 
     pub fn resolve(&self, creation: NativeCreation) -> io::Result<CharacterIdentity> {

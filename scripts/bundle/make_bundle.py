@@ -40,6 +40,7 @@ from bundle_common import (  # noqa: E402
     verify_manifest,
 )
 from item_content import check_item_content  # noqa: E402
+import client_overlay  # noqa: E402
 
 
 def copy_file(source: Path, source_root: Path, target: Path) -> None:
@@ -231,6 +232,23 @@ def copy_fixed_inputs(target: Path) -> tuple[int, int, int]:
     return len(LOGIN_RESOURCE_FILES), len(LOCALE_FILES), len(terrain_files)
 
 
+def copy_client_overlay(target: Path) -> str:
+    """Build client-overlay/, the W121 patch folder a private realm serves; return its pin.
+
+    Private realms only (lead, 2026-10-22; launcher/README.md "Licence"). The two
+    customization tables also go to the login-resources root, where osfr-login checks
+    their pins and refuses the looks they hide (identity.rs PINNED_CREATOR_TABLES).
+    """
+    overlay = target / "client-overlay"
+    client_overlay.build(overlay)  # writes nothing unless every cached file matches its pin
+    for name in (
+        "CharacterCreateCustomizationSkinTone.txt",
+        "CharacterCreateCustomizationFaceType.txt",
+    ):
+        shutil.copyfile(overlay / "Resources" / name, target / "login-resources" / name)
+    return sha256_file(overlay / "manifest.json")
+
+
 def copy_startup_snapshot(target: Path) -> int:
     copy_file(STARTUP_SNAPSHOT, STARTUP_SNAPSHOT.parent, target / "startup" / "startup.json")
     return 1
@@ -262,15 +280,25 @@ Private local bundle, manifest version {MANIFEST_VERSION}. Source Git revision: 
 This folder contains current repository gameplay content, the frozen round70
 activity content now tracked in the repository, the verified gateway startup
 reference, journal locale files,
-the typed startup snapshot, character-creation resource tables, and terrain
-grids. It contains no player identity or save, no populated account store, and
-no private account key.
+the typed startup snapshot, character-creation resource tables, the client's
+character-creator overlay, and terrain grids. It contains no player identity or
+save, no populated account store, and no private account key.
 
 `server/accounts.json` is a fresh empty schema-3 store. `server/server-id.bin`
 is a new 32-byte public server identifier. The gateway handoff key and every
 player's Ed25519 private key must be created or kept outside this bundle.
 `client-locale/` is the private journal-text overlay. `login-resources/` contains
-only the character creator tables required by `osfr-login`.
+only the character creator tables required by `osfr-login`, including the two
+pinned creator tables that make it refuse the looks they hide.
+
+## Client overlay
+
+`client-overlay/` is a W121 patch folder: the 22 pinned community files a stock
+client needs for its character creator (`scripts/bundle/client_overlay.py`) and
+their own `manifest.json`. Serve only this folder at the private patch URL, never
+the whole bundle. The pin friends enter in the launcher is the SHA-256 of
+`client-overlay/manifest.json`: the builder prints it, and this bundle's
+`manifest.json` records it. Give it to friends out of band.
 
 ## Build and local run
 
@@ -353,9 +381,11 @@ manifest's own pin.
 Do not publish this folder. It contains client-derived packet templates,
 localized client text, client resource tables, terrain, and activity data that
 includes Legacy-derived material. Keep the bundle in `lab/bundles/` until the
-project's content and licensing review explicitly approves distribution. Do
-not add user account stores, character identities, player saves, handoff keys,
-client private keys, or signing keys.
+project's content and licensing review explicitly approves distribution. The
+one exception is `client-overlay/`: a private realm may serve it to invited
+friends over its VPN (lead decision, 2026-10-22). A public release still waits
+until the overlay's licence is clear. Do not add user account stores, character
+identities, player saves, handoff keys, client private keys, or signing keys.
 """
 
 
@@ -392,6 +422,7 @@ def main() -> int:
         generated = add_generated_content(target)
         reference_files = copy_reference(target)
         login_files, locale_files, terrain_files = copy_fixed_inputs(target)
+        overlay_pin = copy_client_overlay(target)
         startup_files = copy_startup_snapshot(target)
 
         reference_manifest = read_json(target / "reference" / "manifest.json")
@@ -435,6 +466,10 @@ def main() -> int:
             f"generated={generated or 'none'}; present={present or 'none'}; "
             "absent optional="
             f"{[n for n in OPTIONAL_REPOSITORY_CONTENT if n not in present] or 'none'}"
+        )
+        print(
+            f"Client overlay: client-overlay/ ({len(client_overlay.OVERLAY)} pinned files); "
+            f"patch-manifest SHA-256 pin: {overlay_pin}"
         )
         print(f"Frozen activity content: PASS ({activity})")
         print(f"Item content: PASS ({item_content})")

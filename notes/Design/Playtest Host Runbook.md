@@ -96,10 +96,10 @@ Share this SHA-256 fingerprint separately so friends can compare it out of band.
 11. Record the patch-manifest pin.
 
 ```powershell
-Get-FileHash -LiteralPath (Join-Path $bundle 'manifest.json') -Algorithm SHA256 | Select-Object -ExpandProperty Hash
+Get-FileHash -LiteralPath (Join-Path $bundle 'client-overlay\manifest.json') -Algorithm SHA256 | Select-Object -ExpandProperty Hash
 ```
 
-The bundle is not a patch server. The host still needs a VPN-only patch URL that serves the intended client overlay, plus this trusted manifest pin. Do not serve the whole bundle directory: it contains server-side reference data.
+The builder prints the same pin. The bundle is not a patch server. Serve only its `client-overlay` folder (the pinned character-creator overlay, private realms only) at a VPN-only patch URL, with this pin. Do not serve the whole bundle directory: it contains server-side reference data.
 
 12. Create the owner's account key with the launcher when W131 is available.
 
@@ -252,7 +252,7 @@ The gateway prints a listening event with dev_tools false. Login prints listenin
 Get-Content -LiteralPath (Join-Path $runtime 'security.jsonl') -Tail 20
 ```
 
-The log batches admission refusals, action-budget refusals, and developer-command denials. It has no names, chat, IP addresses, or tokens. It rotates at 1 MiB and keeps one .previous file. Login authentication failures are not currently written to this gateway log. An empty file does not prove a login succeeded.
+The log batches admission refusals, action-budget refusals, and developer-command denials. It has no names, chat, IP addresses, or tokens. It rotates at 1 MiB and keeps one .previous file. Since L023 the gateway also writes an `auth_failure` row (batched with a count) for every refused binding ticket. osfr-login itself logs no authentication failures, broker or UDP, so an empty file does not prove a login succeeded.
 
 3. Run a broker-login stress preflight before friends arrive.
 
@@ -352,7 +352,7 @@ Do not invite players while any item stays unchecked.
 - Account-store create, add-key, set-role, and list passed against a disposable store.
 - Login and gateway started in account-store mode on loopback with --allow-lan, --security-log, --studio-port 0, and no --dev-tools. The gateway reported dev_tools false.
 - The local source supports private-network binds with --allow-lan. No second-PC session was tested.
-- VPN bind, 2026-10-22 (L053, `lab/runs/lan-test-20261022T041757Z`): gateway, login and AUTH2 broker started on this PC's Tailscale address (100.64.x.x) with the commands above, and `osfr-bot --broker-profile ... --allow-lan` passed broker auth, UDP login, handoff and world entry against them from the same PC. The run found two bugs, now fixed: login refused any non-loopback `--gateway`, so the login command above could not start; and the bot bound loopback, so it could not send to a VPN address. A Windows Sandbox client did not reach the servers, because no Windows Firewall allow rule existed for the release binaries. Allow UDP 20041/20042 and TCP 20043 before a remote client joins.
+- VPN bind, 2026-10-22 (L053, `lab/runs/lan-test-20261022T041757Z`): gateway, login and AUTH2 broker started on this PC's Tailscale address (100.64.x.x) with the commands above, and `osfr-bot --broker-profile ... --allow-lan` passed broker auth, UDP login, handoff and world entry against them from the same PC. The run found two bugs, now fixed: login refused any non-loopback `--gateway`, so the login command above could not start; and the bot bound loopback, so it could not send to a VPN address. The first Windows Sandbox launch did not reach the servers, because no Windows Firewall allow rule existed for the release binaries. After three narrow allow rules were added, the 05:11Z launch passed the same bot from inside the Sandbox, through the host's NAT rather than Tailscale (`lab/autopilot/native-notes/2026-10-22.md`). Allow UDP 20041/20042 and TCP 20043 before a remote client joins.
 - client-baseline-20261022T005637Z: the real client (1/1) entered on the HMAC handoff (L023), through an account-store gateway with login in loopback dev mode. The launcher's key-pair (AUTH2) login has not run with the real client, and no two-real-client VPN run is recorded.
 - Launcher key creation failed in this managed workspace because its owner-only profile directory could not be accessed. W131's friend UI, a clean installation package, and fresh-PC login remain unverified.
 - No private patch host or patch URL exists in this runbook's evidence.
@@ -373,7 +373,7 @@ Do not invite players while any item stays unchecked.
 | Fixed ticket refused, HMAC tickets reusable (L023) | `prototype/osfr-tools/src/login.rs` character selection (`gateway_binding_ticket` for every account, 1/1 included); `src/bin/osfr-gateway.rs` `select_character_from_login` (refuses any other ticket, logs `auth_failure`); test `tests/playtest_gateway_smoke.rs` `the_fixed_ticket_is_refused_and_1_1_enters_with_its_binding_ticket`; [[Security Model]] S02/L3; native run `lab/runs/client-baseline-20261022T005637Z` (gateway `--account-store`, login dev mode) |
 | Diagnostics gated on --dev-tools | `src/gameplay.rs` realm dispatch (`mine`, `harvest`), `developer_npx_off`, quest `offer`, kart `realm race` and the 102 lobby reply |
 | Private bind, `--allow-lan`, dev-tools restriction, and Studio bind | [[Security Model]]; `prototype/osfr-tools/src/bin/osfr-gateway.rs` |
-| Security-log event types, rotation, and lack of auth-failure events | `prototype/osfr-tools/src/security_log.rs`, login/gateway call sites; scratch startup in `lab/reports/host-runbook-w132/service-startup.log` |
+| Security-log event types, rotation, gateway `auth_failure` rows, and no login-side auth-failure events | `prototype/osfr-tools/src/security_log.rs`, login/gateway call sites (`src/bin/osfr-gateway.rs` `select_character_from_login` records `AuthFailure` since L023; osfr-login has no security log); scratch startup in `lab/reports/host-runbook-w132/service-startup.log` |
 | Save paths, session expiry, and shutdown persistence | [[Build Ledger]]; `prototype/osfr-tools/src/gameplay.rs`, `prototype/osfr-tools/src/bin/osfr-gateway.rs` |
 | Stress flags, fixed report path, and latest ten-minute result | `scripts/stress/run.py`; [[Build Plan]] and [[Current Progress]]; help output in `lab/reports/host-runbook-w132/stress-help.log` |
 

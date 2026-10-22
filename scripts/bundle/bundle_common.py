@@ -122,6 +122,10 @@ LOGIN_RESOURCE_FILES = (
     "CharacterCreate/FacePaintMappings.txt",
     "CharacterCreate/SkinToneMappings.txt",
     "CharacterCreate/ItemDefinitions.txt",
+    # With the overlay's two pinned tables (make_bundle.copy_client_overlay), this turns
+    # on osfr-login's creator allow-list (identity.rs). Read from ./Resources/CharacterCreate/
+    # by 0x00723860 (name 0x017e8d64), which 0x00724d80 calls with StartingSets' folder.
+    "CharacterCreate/CharacterCreateItemMappings.txt",
 )
 LOCALE_FILES = ("en_us_data.dat", "en_us_data.dir")
 
@@ -823,8 +827,11 @@ def protected_source_files():
                 if not path.is_file() or path.is_symlink():
                     continue
                 name = path.name.lower()
-                if name == "client-login-key.bin" or path.suffix.lower() in private_suffixes or any(
-                    token in name for token in sensitive_tokens
+                # A run's client tree holds the creator tables (CharacterCreate*.txt, stock
+                # or overlay-pinned) the bundle ships too: public client data, not saves.
+                creator_table = name.startswith("charactercreate") and name.endswith(".txt")
+                if name == "client-login-key.bin" or path.suffix.lower() in private_suffixes or (
+                    not creator_table and any(token in name for token in sensitive_tokens)
                 ):
                     yield path
     for path in (

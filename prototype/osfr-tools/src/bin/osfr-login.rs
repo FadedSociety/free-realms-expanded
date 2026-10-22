@@ -796,6 +796,9 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         AccountStore::load(&options.account_store)?;
     }
     options.service()?;
+    // T575: the startup line says whether creation refuses the looks the pinned
+    // creator tables hide (identity.rs); a bundle's login-resources turns it on.
+    let creator_allow_list = Resources::load(&options.resources)?.filters_looks();
     let trace = options
         .trace_file
         .as_deref()
@@ -811,7 +814,8 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     println!(
         "{}",
         json!({"event":"listening","address":socket.local_addr()?.to_string(),
-        "protocol":"LoginUdp_6","identity":options.identity})
+        "protocol":"LoginUdp_6","identity":options.identity,
+        "creator_allow_list":creator_allow_list})
     );
     if let Some(broker) = &broker {
         println!(

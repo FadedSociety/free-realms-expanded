@@ -34,8 +34,13 @@ source commit in the bundle README. It does not modify the active play package.
   so it is a private packet template rather than a player save. This boundary
   is recorded in `notes/Research/Startup Integration.md` and implemented by
   `startup_snapshot.rs` / `gateway.rs`.
-- `login-resources/`: the seven character-creation tables from the extracted
-  client `Resources` tree. `client-locale/`: the two English locale files from
+- `login-resources/`: the eight character-creation tables from the extracted
+  client `Resources` tree, plus the overlay's two pinned customization tables at
+  its root, which turn on osfr-login's creator allow-list (T444, T575).
+- `client-overlay/`: the 22 pinned community creator files
+  (`scripts/bundle/client_overlay.py`) and their W121 `manifest.json`, the patch
+  folder a private realm serves (lead decision 2026-10-22; not for public release).
+  The build fails if any cached file misses its pin. `client-locale/`: the two English locale files from
   `lab/references/opening-native-lobby-20261009T163603Z/locale`. These are private
   client data, not newly recovered behavior.
 - `terrain/`: `zone_*.hgt` grids from `lab/terrain`.
