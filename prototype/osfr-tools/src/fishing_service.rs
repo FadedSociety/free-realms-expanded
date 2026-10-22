@@ -119,6 +119,9 @@ struct Tracked {
     area_key: String,
     fisherman_level: u32,
     anchor: Vec4,
+    /// The 138/3 zone block: the spot's scene values ([`Scene::zone_words`]) for `enter`, the
+    /// bundled `fishing.json` words for `begin`.
+    zone_words: [f32; 5],
     /// Zone of the spot; `None` for sessions started by `begin` (no zone supervision).
     zone: Option<u32>,
     /// Per-grade payout rows for this round (R, `fishing_spots.json`); `None` for `begin`,
@@ -257,6 +260,7 @@ impl FishingService {
             area_key,
             fisherman_level,
             anchor,
+            CONTENT.registration.zone_words,
             None,
             None,
             None,
@@ -272,6 +276,7 @@ impl FishingService {
         area_key: &str,
         fisherman_level: u32,
         anchor: Vec4,
+        zone_words: [f32; 5],
         zone: Option<u32>,
         payout: Option<PayoutTable>,
         cap: Option<CatchCap>,
@@ -307,6 +312,7 @@ impl FishingService {
                 area_key: area_key.to_owned(),
                 fisherman_level,
                 anchor,
+                zone_words,
                 zone,
                 payout,
                 cap,
@@ -586,6 +592,7 @@ impl FishingService {
                 &spot.area,
                 fisherman_level,
                 anchor,
+                spot.scene.zone_words(),
                 Some(zone),
                 Some(spots.payout.clone()),
                 Some(spots.catch_cap.clone()),
@@ -1089,7 +1096,7 @@ fn registration_reply(tracked: &Tracked) -> Result<Vec<u8>, Error> {
         }
     }
     push_string(&mut out, &CONTENT.registration.underwater_sky);
-    for (index, value) in CONTENT.registration.zone_words.iter().enumerate() {
+    for (index, value) in tracked.zone_words.iter().enumerate() {
         if index == 3 {
             out.extend((*value as u32).to_le_bytes());
         } else {
@@ -1421,7 +1428,7 @@ impl EntryDenied {
 }
 
 /// The optional `fishing_spots.json`: which guide NPCs offer a fishing trip (R), the area and
-/// client MiniGameData row each one stands for, the locale line of the menu option, the
+/// client MiniGameData row and scene each one stands for, the locale line of the menu option, the
 /// per-grade payout table and the optional catch cap (R), and the inventory item behind every
 /// fish size. Absent file = nobody offers fishing. The file is operator content: bounded,
 /// regular-file only, strict.
@@ -1526,9 +1533,65 @@ struct Spot {
     name_id: i32,
     description_id: i32,
     icon_id: i32,
+    scene: Scene,
     /// Provenance only: why this NPC stands for this area.
     #[allow(dead_code)]
     source: String,
+}
+
+/// The fishing hole's own client scene. The client draws underwater fish at fixed coordinates
+/// of the current scene (`0x00b640e0`: X = processor +0x140 + |aim - +0x240| x +0x13C, Z = 485),
+/// and the 138/3 handler copies the zone block to processor +0xFC (`0x00b6cf19`), so +0x13C and
+/// +0x140 are UnderwaterRunScale and UnderwaterRunOffset. Each scene's Underwater_Bed sits near
+/// Z 485, so the round must send its own scene's bed X.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+struct Scene {
+    /// Client zone name, e.g. `bw_fishing_medpond`.
+    name: String,
+    /// Zone (activity) id paired with the spot's MiniGameData row.
+    zone_id: u32,
+    spawn_position: [f32; 3],
+    spawn_rotation: [f32; 4],
+    /// Water surface height, for the spawn bound and fishing-hole-zoning. Not a zone word:
+    /// BobberGroundCheckMinY (word 4) is a Y offset from the bobber ([`Scene::zone_words`]).
+    water_y: f32,
+    /// (R) X of the scene's Underwater_Bed area, sent as zone word 1 (UnderwaterRunOffset). A
+    /// reconstruction: `bbe_FishingZoneConfig.txt` is lost. With RunScale 1 and word 4 at 0 the
+    /// fish X runs from bed X to bed X + (cast distance - BobberMinDistanceFromPlayer).
+    underwater_bed_x: f32,
+    /// Provenance only: the scene's .gzne and Areas.xml are in our extracted client catalogue.
+    #[allow(dead_code)]
+    client_scene_cached: bool,
+    source: String,
+}
+
+impl Scene {
+    /// (R) Sanity bounds: every number finite, the bed X inside 0..=200 (the five client beds
+    /// read 55..=74), and the spawn at most half a metre under the water (one bank spawn sits
+    /// 4 cm below it).
+    fn valid(&self) -> bool {
+        self.spawn_position
+            .iter()
+            .chain(&self.spawn_rotation)
+            .chain([&self.water_y, &self.underwater_bed_x])
+            .all(|value| value.is_finite())
+            && (0.0..=200.0).contains(&self.underwater_bed_x)
+            && self.spawn_position[1] >= self.water_y - 0.5
+            && self.zone_id != 0
+            && !self.name.is_empty()
+            && !self.source.is_empty()
+    }
+
+    /// The 138/3 zone block (`0x00b67240`) for this scene: `fishing.json`'s words with this
+    /// scene's bed X as word 1. Word 4 is not the water height: processor +0x250 (`0x00b6cfaa`)
+    /// is added to the aim Y for the cast point (`0x00b6ca39`) and reaches bobber +0xE4
+    /// (`0x00b6d337`, `0x00ccff06`), the ground ray's Y offset from the bobber (`0x00cd3e89`).
+    fn zone_words(&self) -> [f32; 5] {
+        let mut words = CONTENT.registration.zone_words;
+        words[1] = self.underwater_bed_x;
+        words
+    }
 }
 
 impl FishingSpots {
@@ -1555,7 +1618,7 @@ impl FishingSpots {
             return Err(invalid("fishing spots exceed 64 KiB"));
         }
         let spots: Self = serde_json::from_slice(bytes).map_err(invalid)?;
-        let mut seen = BTreeSet::new();
+        let (mut seen, mut zones) = (BTreeSet::new(), BTreeSet::new());
         if spots.schema_version != 1
             || spots.menu_string_id == 0
             || !spots.payout.valid()
@@ -1569,6 +1632,8 @@ impl FishingSpots {
                     && s.name_id >= 0
                     && s.description_id >= 0
                     && s.icon_id >= 0
+                    && s.scene.valid()
+                    && zones.insert(s.scene.zone_id)
             })
             || !spots.items.iter().all(|(key, sizes)| {
                 species(key).is_some()
@@ -1630,6 +1695,7 @@ struct Registration {
     player_words: [f32; 16],
     underwater_sky: String,
     /// The 138/3 zone block (`0x00b67240`). Word 3 (TensionMeterAmplifier) goes out as a u32.
+    /// A spot's scene replaces word 1 ([`Scene::zone_words`]).
     zone_words: [f32; 5],
     integer_values: Vec<u32>,
     source: String,

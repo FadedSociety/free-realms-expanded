@@ -250,7 +250,12 @@ impl Round {
     /// Offer and start a round with the current `spots`. Also reuses the same service, so a
     /// session-scoped cap can be observed across trips.
     fn start(&mut self) {
-        let offer = self.enter(REED, false).unwrap();
+        self.start_at(REED);
+    }
+
+    /// Offer and start a round at `npc`'s spot; returns the registration's change.
+    fn start_at(&mut self, npc: u64) -> Change {
+        let offer = self.enter(npc, false).unwrap();
         assert_eq!(ids(&offer.replies), vec![(39, 16), (41, 107)]);
         let instance = self.service.instance_id(PLAYER).unwrap();
         let go = self.send(&lifecycle(5, instance), T0).unwrap().unwrap();
@@ -262,6 +267,7 @@ impl Round {
         );
         let registered = self.send(&register(), T0).unwrap().unwrap();
         assert_eq!(ids(&registered.replies)[0], (138, 3));
+        registered
     }
 
     /// Cast, wait out the bite and hook, reel. Returns the reel's change.
@@ -436,6 +442,64 @@ fn malformed_spots_files_are_refused() {
             edited(|j| j["spots"][0]["name_id"] = json!(-1)),
         ),
         (
+            "spot without a scene",
+            edited(|j| {
+                j["spots"][0].as_object_mut().unwrap().remove("scene");
+            }),
+        ),
+        (
+            "scene without a water height",
+            edited(|j| {
+                j["spots"][0]["scene"]
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("water_y");
+            }),
+        ),
+        (
+            "unknown scene field",
+            edited(|j| j["spots"][0]["scene"]["extra"] = json!(1)),
+        ),
+        (
+            "duplicate zone id",
+            edited(|j| {
+                j["spots"][1]["scene"]["zone_id"] = j["spots"][0]["scene"]["zone_id"].clone()
+            }),
+        ),
+        (
+            "zone id 0",
+            edited(|j| j["spots"][0]["scene"]["zone_id"] = json!(0)),
+        ),
+        (
+            "empty scene name",
+            edited(|j| j["spots"][0]["scene"]["name"] = json!("")),
+        ),
+        (
+            "scene without provenance",
+            edited(|j| j["spots"][0]["scene"]["source"] = json!("")),
+        ),
+        (
+            "bed past 200",
+            edited(|j| j["spots"][0]["scene"]["underwater_bed_x"] = json!(200.5)),
+        ),
+        (
+            "negative bed",
+            edited(|j| j["spots"][0]["scene"]["underwater_bed_x"] = json!(-0.5)),
+        ),
+        (
+            "infinite water (-1e39 overflows f32; the spawn bound alone would pass it)",
+            edited(|j| j["spots"][0]["scene"]["water_y"] = json!(-1e39)),
+        ),
+        (
+            "spawn more than half a metre under its water",
+            edited(|j| {
+                let spawn_y = j["spots"][0]["scene"]["spawn_position"][1]
+                    .as_f64()
+                    .unwrap();
+                j["spots"][0]["scene"]["water_y"] = json!(spawn_y + 0.51);
+            }),
+        ),
+        (
             "unknown species",
             edited(|j| j["items"]["unicorn"] = json!([1, 1, 1, 1])),
         ),
@@ -542,6 +606,106 @@ fn every_guide_opens_its_own_area() {
         games.insert(game);
     }
     assert_eq!(games.len(), 6);
+}
+
+// ---- each hole's own scene (T513) ---------------------------------------------------------
+
+/// The six holes: guide, scene, zone id, spawn, water Y, underwater bed X, scene in our client
+/// catalogue. Bed X and water come from each scene's Areas.xml (sg_fishing_medpond: (R)).
+#[rustfmt::skip]
+const SCENES: [(u64, &str, u32, [f32; 3], f32, f32, bool); 6] = [
+    (9_000_000_377, "bw_fishing_medpond", 560, [200.0, 0.0, 200.0], -2.0, 74.0, false),
+    (9_000_000_339, "bw_fishing_stream", 561, [226.38, -2.04, 227.88], -2.0, 58.0, true),
+    (SELVI, "sg_fishing_stream", 562, [441.42, -60.31, 475.08], -66.0, 58.0, true),
+    (REED, "sg_fishing_medpond", 563, [435.05676, -64.46508, 370.70682], -64.46508, 68.0, false),
+    (9_000_000_024, "sh_fishing_medpond", 564, [202.42, 5.74, 290.33], 0.0, 55.0, true),
+    (9_500_000_736, "sh_fishing_stream", 565, [538.99, 30.28, 578.01], 23.0, 69.0, false),
+];
+
+#[test]
+fn the_shipped_spots_carry_the_six_hole_scenes() {
+    let json: Value = serde_json::from_str(SPOTS_JSON).unwrap();
+    let rows = json["spots"].as_array().unwrap();
+    assert_eq!(rows.len(), SCENES.len());
+    let floats = |value: &Value| -> Vec<f32> {
+        value
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|n| n.as_f64().unwrap() as f32)
+            .collect()
+    };
+    for (npc, name, zone, spawn, water, bed, cached) in SCENES {
+        let row = rows.iter().find(|row| row["npc"] == json!(npc)).unwrap();
+        let scene = &row["scene"];
+        assert_eq!(scene["name"], json!(name));
+        assert_eq!(scene["zone_id"], json!(zone));
+        assert_eq!(floats(&scene["spawn_position"]), spawn, "{name}");
+        assert_eq!(
+            floats(&scene["spawn_rotation"]),
+            [0.0, 0.0, 0.0, 1.0],
+            "{name} (R)"
+        );
+        assert_eq!(scene["water_y"].as_f64().unwrap() as f32, water, "{name}");
+        assert_eq!(
+            scene["underwater_bed_x"].as_f64().unwrap() as f32,
+            bed,
+            "{name}"
+        );
+        assert_eq!(scene["client_scene_cached"], json!(cached), "{name}");
+        assert!(!scene["source"].as_str().unwrap().is_empty(), "{name}");
+        assert!(spawn[1] >= water - 0.5, "{name}: spawn above its water");
+    }
+}
+
+/// The zone block of a 138/3, read as `0x00b67240` reads it after the 4-byte header and the 16
+/// player words (`0x00b65880`): an i32-length string (UnderwaterSkyFile, zone +0x30), f32 +0x40
+/// RunScale, f32 +0x44 RunOffset, f32 +0x48 ReelDuration, u32 +0x4c TensionMeterAmplifier, f32
+/// +0x20 BobberGroundCheckMinY.
+fn zone_block(packet: &[u8]) -> (String, [f32; 3], u32, f32) {
+    let body = &packet[4 + 16 * 4..];
+    let length = i32::from_le_bytes(body[..4].try_into().unwrap()) as usize;
+    let sky = String::from_utf8(body[4..4 + length].to_vec()).unwrap();
+    let word =
+        |index: usize| -> [u8; 4] { body[4 + length + 4 * index..][..4].try_into().unwrap() };
+    (
+        sky,
+        [0, 1, 2].map(|index| f32::from_le_bytes(word(index))),
+        u32::from_le_bytes(word(3)),
+        f32::from_le_bytes(word(4)),
+    )
+}
+
+#[test]
+fn each_hole_registers_with_its_own_bed_x() {
+    let content: Value = serde_json::from_str(FishingService::content_json()).unwrap();
+    let defaults = &content["registration"]["zone_words"];
+    let default = |index: usize| defaults[index].as_f64().unwrap() as f32;
+    for (npc, name, _, _, _, bed, _) in SCENES {
+        let mut round = Round::new(false);
+        let registered = round.start_at(npc);
+        let (sky, words, amplifier, ground_y) = zone_block(&registered.replies[0]);
+        assert_eq!(sky, "", "{name}: UnderwaterSkyFile stays empty");
+        assert_eq!(words[0], default(0), "{name}: RunScale from fishing.json");
+        assert_eq!(words[1], bed, "{name}: RunOffset is the scene's bed X");
+        assert_eq!(
+            words[2],
+            default(2),
+            "{name}: ReelDuration from fishing.json"
+        );
+        assert_eq!(
+            amplifier as f32,
+            default(3),
+            "{name}: TensionMeterAmplifier"
+        );
+        // The client adds word 4 to the bobber's own Y for its ground ray (`0x00cd3e89`), so the
+        // scene's water height must not go here.
+        assert_eq!(
+            ground_y,
+            default(4),
+            "{name}: BobberGroundCheckMinY from fishing.json"
+        );
+    }
 }
 
 #[test]

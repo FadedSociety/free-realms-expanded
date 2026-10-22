@@ -40,6 +40,25 @@
       "name_id": 408591,
       "description_id": 5235,
       "icon_id": 9870,
+      "scene": {
+        "name": "sg_fishing_medpond",
+        "zone_id": 563,
+        "spawn_position": [
+          435.05676,
+          -64.46508,
+          370.70682
+        ],
+        "spawn_rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "water_y": -64.46508,
+        "underwater_bed_x": 68,
+        "client_scene_cached": false,
+        "source": "Spawn, water height and bed X: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/sg_fishing_medpond.json (spawn read in game upstream, R). R: bed X 68 has no client source here; sg_fishing_medpondAreas.xml and sg_fishing_medpond.gzne are not in our client catalogue. R: the water height equals that file's spawn height. Zone 563 pairs with MiniGameData 599 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1)."
+      },
       "source": "Reed Stillwater (Stillwater Crossing). Client text 408571: 'When you're ready to head out, just use the boat behind me' and 'Interact with the boat behind Reed Stillwater to enter Sacred Grove Shallows'. The boat object is not a routed interaction, so the guide's menu stands in for it (R)."
     },
     {
@@ -49,6 +68,25 @@
       "name_id": 93710,
       "description_id": 5235,
       "icon_id": 9870,
+      "scene": {
+        "name": "sg_fishing_stream",
+        "zone_id": 562,
+        "spawn_position": [
+          441.42,
+          -60.31,
+          475.08
+        ],
+        "spawn_rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "water_y": -66,
+        "underwater_bed_x": 58,
+        "client_scene_cached": true,
+        "source": "Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/sg_fishing_stream.json, read in game on 2026-10-19 (R). Bed X and water: our sg_fishing_streamAreas.xml (pack_09/001475), UnderWater_Bed id 4117 at (58, -1, 483) and Water id 3917 with its child spheres at y -66. Zone 562 pairs with MiniGameData 598 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1)."
+      },
       "source": "Selvi Slowreel (Lakeshore docks). Client text: 'Selvi Slowreel on the docks in Lakeshore can show you the way to Rainbow Lake' (3685316205); guide line 408566 'Rainbow Lake ... Are you ready to head out?'."
     },
     {
@@ -58,6 +96,25 @@
       "name_id": 408604,
       "description_id": 5235,
       "icon_id": 9870,
+      "scene": {
+        "name": "bw_fishing_medpond",
+        "zone_id": 560,
+        "spawn_position": [
+          200,
+          0,
+          200
+        ],
+        "spawn_rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "water_y": -2,
+        "underwater_bed_x": 74,
+        "client_scene_cached": false,
+        "source": "R: the spawn is the upstream PR #31 placeholder, kept because it lands on the bank (Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/bw_fishing_medpond.json). Bed X and water: our bw_fishing_medpondAreas.xml (pack_18/003763), UnderWater_Bed id 4116 at (74, -2, 482) and Water id 3905 with its child spheres at y -2. bw_fishing_medpond.gzne is not in our client catalogue. Zone 560 pairs with MiniGameData 596 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1)."
+      },
       "source": "Lila Darklure (Briarwood, beside a boat). Client text 'Only Lila Darklure knows the way' (1194232508); guide line 408605 'Darklit Lagoon ... Are you ready to head out?'."
     },
     {
@@ -67,6 +124,25 @@
       "name_id": 408599,
       "description_id": 5235,
       "icon_id": 9870,
+      "scene": {
+        "name": "bw_fishing_stream",
+        "zone_id": 561,
+        "spawn_position": [
+          226.38,
+          -2.04,
+          227.88
+        ],
+        "spawn_rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "water_y": -2,
+        "underwater_bed_x": 58,
+        "client_scene_cached": true,
+        "source": "Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/bw_fishing_stream.json, read in game on 2026-10-19 (R); it sits 4 cm below the water. Bed X and water: our bw_fishing_streamAreas.xml (pack_14/003861), Underwater_Bed id 4118 at (58, -2, 484) and Water id 3908 with its child spheres at y -2. Zone 561 pairs with MiniGameData 597 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1)."
+      },
       "source": "Gunther (Briarwood). R: the Bayou guide line 408596 has no named speaker; Gunther is the Fisherman quest giver at Brambleback's Bayou."
     },
     {
@@ -76,6 +152,25 @@
       "name_id": 408622,
       "description_id": 5235,
       "icon_id": 9870,
+      "scene": {
+        "name": "sh_fishing_medpond",
+        "zone_id": 564,
+        "spawn_position": [
+          202.42,
+          5.74,
+          290.33
+        ],
+        "spawn_rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "water_y": 0,
+        "underwater_bed_x": 55,
+        "client_scene_cached": true,
+        "source": "Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/sh_fishing_medpond.json, read in game on 2026-10-19 (R). Bed X and water: our sh_fishing_medpondAreas.xml (pack_14/003874), Underwater_Bed id 4119 at (55, 0, 486) and Water id 3932 with its child spheres at y 0. Zone 564 pairs with MiniGameData 600 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1)."
+      },
       "source": "Big J (Snowhill). Client text 379035497: 'Head to the Wintery Basin for further instructions' (Big J's ice fishing crew). R: the Wintery Basin guide line has no named speaker."
     },
     {
@@ -85,6 +180,25 @@
       "name_id": 408640,
       "description_id": 5235,
       "icon_id": 9870,
+      "scene": {
+        "name": "sh_fishing_stream",
+        "zone_id": 565,
+        "spawn_position": [
+          538.99,
+          30.28,
+          578.01
+        ],
+        "spawn_rotation": [
+          0,
+          0,
+          0,
+          1
+        ],
+        "water_y": 23,
+        "underwater_bed_x": 69,
+        "client_scene_cached": false,
+        "source": "Spawn: Lxzxrus-Free-Realms-Server origin/fishing/lure-and-spawns@75f7d95 src/Resources/Zones/sh_fishing_stream.json, read in game on 2026-10-19 (R). Bed X and water: our sh_fishing_streamAreas.xml (pack_18/003769), Underwater_Bed id 4120 at (69, -1, 484); the water is 23 from the child Water spheres (3945-3956), where the parent sphere 3944 says 27. sh_fishing_stream.gzne is not in our client catalogue. Zone 565 pairs with MiniGameData 601 (the 'Unknown' field of ClientActivityDefinitions in Lxzxrus-Free-Realms-Server 75f7d95, AGPL data only). R: rotation (0, 0, 0, 1)."
+      },
       "source": "Chip Numbwing (Snowhill). Client text 216811999 / 4011916228: 'Chip Numbwing can show you the way' to Lenore's cabin at Frostbitten Banks; guide line 408641 'Frostbitten Banks ... Are you ready to head out?'."
     }
   ],
