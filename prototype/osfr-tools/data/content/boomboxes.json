@@ -1,0 +1,637 @@
+{
+  "schema_version": 1,
+  "boomboxes": [
+    {
+      "item_id": 878,
+      "model_id": 1936,
+      "kind": "synchronized",
+      "dance_sequence": [3531, 3532, 3533, 3534],
+      "clip_ms": {
+        "1": [4834, 4434, 6667, 10667],
+        "2": [4834, 4434, 6667, 10667],
+        "60": [4834, 2967, 6667, 11000],
+        "61": [4834, 4434, 6667, 10667]
+      },
+      "blend_ms": 600,
+      "song_effect_ids": [],
+      "standing_animation_id": 0,
+      "priority": 0,
+      "transform_model_id": 0,
+      "transform_reapply_ms": 0,
+      "duration_ms": 180000,
+      "range_m": 15,
+      "spawn_offset_m": 2,
+      "recast_ms": 180000,
+      "texture_alias": "boombox-xmas-M",
+      "tint_alias": "dyetint",
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/Consumables.json:3 (Jingle Bell Boombox): dances, sync, blend, clip lengths, song effects, standing dance, priority, transform"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/FreeRealms-Legacy@9e08202 src/Resources/ClientItemDefinitions.json:18764 'Jingle Bell Boombox': Class 171, ModelName mkt_boombox_xmas_01.adr, TextureAlias boombox-xmas-M, TintAlias dyetint"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:1910 1936^mkt_boombox_xmas_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
+        }
+      ]
+    },
+    {
+      "item_id": 1180,
+      "model_id": 1973,
+      "kind": "transform",
+      "dance_sequence": [3541],
+      "clip_ms": {
+        "1941": [12667]
+      },
+      "blend_ms": 600,
+      "song_effect_ids": [],
+      "standing_animation_id": 0,
+      "priority": 100,
+      "transform_model_id": 1941,
+      "transform_reapply_ms": 2000,
+      "duration_ms": 180000,
+      "range_m": 15,
+      "spawn_offset_m": 2,
+      "recast_ms": 180000,
+      "texture_alias": "boombox-realmsroll-M",
+      "tint_alias": "dyetint",
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/Consumables.json:4 (Realms Roll Boombox): dances, sync, blend, clip lengths, song effects, standing dance, priority, transform"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/FreeRealms-Legacy@9e08202 src/Resources/ClientItemDefinitions.json:24000 'Realms Roll Boombox': Class 171, ModelName mkt_boombox_realmsroll_01.adr, TextureAlias boombox-realmsroll-M, TintAlias dyetint; the captured definition the runtime loads first (W84 baseline inventory.json) has class 171 and model '', texture ''"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:1947 1973^mkt_boombox_realmsroll_01.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:1915 1941^human_m_realmsroll.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
+        }
+      ]
+    },
+    {
+      "item_id": 1913,
+      "model_id": 1979,
+      "kind": "independent",
+      "dance_sequence": [3550],
+      "clip_ms": {},
+      "blend_ms": 600,
+      "song_effect_ids": [16448, 16449, 16450, 16451, 16452, 16453],
+      "standing_animation_id": 3550,
+      "priority": 0,
+      "transform_model_id": 0,
+      "transform_reapply_ms": 0,
+      "duration_ms": 180000,
+      "range_m": 15,
+      "spawn_offset_m": 2,
+      "recast_ms": 180000,
+      "texture_alias": "boombox-rainbow-M",
+      "tint_alias": "dyetint",
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/Consumables.json:5 (Rainbow Randomizer Boombox): dances, sync, blend, clip lengths, song effects, standing dance, priority, transform"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/FreeRealms-Legacy@9e08202 src/Resources/ClientItemDefinitions.json:36246 'Rainbow Randomizer Boombox': Class 171, ModelName mkt_boombox_rainbow_01.adr, TextureAlias boombox-rainbow-M, TintAlias dyetint; the captured definition the runtime loads first (W84 baseline inventory.json) has class 171 and model '', texture ''"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:1953 1979^mkt_boombox_rainbow_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
+        }
+      ]
+    },
+    {
+      "item_id": 8185,
+      "model_id": 2217,
+      "kind": "synchronized",
+      "dance_sequence": [3551],
+      "clip_ms": {
+        "1": [17567],
+        "2": [17567],
+        "60": [17567],
+        "61": [17567]
+      },
+      "blend_ms": 600,
+      "song_effect_ids": [],
+      "standing_animation_id": 0,
+      "priority": 0,
+      "transform_model_id": 0,
+      "transform_reapply_ms": 0,
+      "duration_ms": 180000,
+      "range_m": 15,
+      "spawn_offset_m": 2,
+      "recast_ms": 180000,
+      "texture_alias": "boombox-totem-M",
+      "tint_alias": "dyetint",
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/Consumables.json:6 (Totem Boombox): dances, sync, blend, clip lengths, song effects, standing dance, priority, transform"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/FreeRealms-Legacy@9e08202 src/Resources/ClientItemDefinitions.json:155967 'Totem Boombox': Class 171, ModelName mkt_boombox_totem.adr, TextureAlias boombox-totem-M, TintAlias dyetint; the captured definition the runtime loads first (W84 baseline inventory.json) has class 171 and model '', texture ''"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:2189 2217^mkt_boombox_totem.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
+        }
+      ]
+    },
+    {
+      "item_id": 35759,
+      "model_id": 4012,
+      "kind": "synchronized",
+      "dance_sequence": [3568004, 3569004, 3570004, 3571004],
+      "clip_ms": {
+        "1": [5000, 4967, 4967, 4967],
+        "2": [5000, 4967, 4967, 4967],
+        "60": [5000, 4967, 4967, 4967],
+        "61": [5000, 4967, 4967, 4967]
+      },
+      "blend_ms": 600,
+      "song_effect_ids": [],
+      "standing_animation_id": 0,
+      "priority": 0,
+      "transform_model_id": 0,
+      "transform_reapply_ms": 0,
+      "duration_ms": 180000,
+      "range_m": 15,
+      "spawn_offset_m": 2,
+      "recast_ms": 180000,
+      "texture_alias": "boombox-dwarftech-M",
+      "tint_alias": "dyetint",
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/Consumables.json:7 (Clockwork Boombox): dances, sync, blend, clip lengths, song effects, standing dance, priority, transform"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/FreeRealms-Legacy@9e08202 src/Resources/ClientItemDefinitions.json:817059 'Clockwork Boombox': Class 171, ModelName mkt_boombox_dwarftech_01.adr, TextureAlias boombox-dwarftech-M, TintAlias dyetint; the captured definition the runtime loads first (W84 baseline inventory.json) has class 9 and model '', texture ''"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:3194 4012^mkt_boombox_dwarftech_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
+        }
+      ]
+    },
+    {
+      "item_id": 48244,
+      "model_id": 185,
+      "kind": "independent",
+      "dance_sequence": [3201, 3211, 3212, 3213, 3214],
+      "clip_ms": {},
+      "blend_ms": 600,
+      "song_effect_ids": [],
+      "standing_animation_id": 3200,
+      "priority": 0,
+      "transform_model_id": 0,
+      "transform_reapply_ms": 0,
+      "duration_ms": 180000,
+      "range_m": 15,
+      "spawn_offset_m": 2,
+      "recast_ms": 180000,
+      "texture_alias": "",
+      "tint_alias": "dyetint",
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/Consumables.json:8 (Boombox XVD-S): dances, sync, blend, clip lengths, song effects, standing dance, priority, transform"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/FreeRealms-Legacy@9e08202 src/Resources/ClientItemDefinitions.json:991144 'Boombox XVD-S': Class 171, ModelName none, TextureAlias none, TintAlias dyetint; the captured definition the runtime loads first (W84 baseline inventory.json) has class 171 and model '', texture ''"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:186 185^sh_primitive_radio_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the client item names no model file; Sanctuary's 185 sh_primitive_radio_01.adr is kept"
+        }
+      ]
+    },
+    {
+      "item_id": 56774,
+      "model_id": 1661,
+      "kind": "synchronized",
+      "dance_sequence": [3501],
+      "clip_ms": {
+        "1": [5801],
+        "2": [5801],
+        "60": [5801],
+        "61": [5801]
+      },
+      "blend_ms": 600,
+      "song_effect_ids": [],
+      "standing_animation_id": 0,
+      "priority": 0,
+      "transform_model_id": 0,
+      "transform_reapply_ms": 0,
+      "duration_ms": 180000,
+      "range_m": 15,
+      "spawn_offset_m": 2,
+      "recast_ms": 180000,
+      "texture_alias": "boombox-ghettoblaster-M",
+      "tint_alias": "dyetint",
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/Consumables.json:9 (Hip-Hop Boombox): dances, sync, blend, clip lengths, song effects, standing dance, priority, transform"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/FreeRealms-Legacy@9e08202 src/Resources/ClientItemDefinitions.json:1075047 'Hip-Hop Boombox': Class 171, ModelName mkt_boombox_ghettoblaster_01.adr, TextureAlias boombox-ghettoblaster-M, TintAlias dyetint"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:1635 1661^mkt_boombox_ghettoblaster_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
+        }
+      ]
+    },
+    {
+      "item_id": 69825,
+      "model_id": 4428,
+      "kind": "synchronized",
+      "dance_sequence": [3511, 3512, 3513, 3514],
+      "clip_ms": {
+        "1": [6067, 6100, 6100, 6100],
+        "2": [6067, 6100, 6100, 6100],
+        "60": [6067, 6100, 6100, 6100],
+        "61": [6067, 6100, 6100, 6100]
+      },
+      "blend_ms": 600,
+      "song_effect_ids": [],
+      "standing_animation_id": 0,
+      "priority": 0,
+      "transform_model_id": 0,
+      "transform_reapply_ms": 0,
+      "duration_ms": 180000,
+      "range_m": 15,
+      "spawn_offset_m": 2,
+      "recast_ms": 180000,
+      "texture_alias": "boombox-realmshake-M",
+      "tint_alias": "dyetint",
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/Consumables.json:10 (Chiller Boombox): dances, sync, blend, clip lengths, song effects, standing dance, priority, transform"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/FreeRealms-Legacy@9e08202 src/Resources/ClientItemDefinitions.json:1193009 'Chiller Boombox': Class 171, ModelName mkt_boombox_realmshake_01.adr, TextureAlias boombox-realmshake-M, TintAlias dyetint"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:3410 4428^mkt_boombox_realmshake_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) model conflict until the lead checks it natively: the client item's model mkt_boombox_realmshake_01.adr is 4428 (used); Sanctuary uses 1062 bw_boombox_01.adr"
+        }
+      ]
+    },
+    {
+      "item_id": 76927,
+      "model_id": 1062,
+      "kind": "synchronized",
+      "dance_sequence": [3568010, 3569010, 3570010, 3571010],
+      "clip_ms": {
+        "1": [3901, 3867, 3867, 3934],
+        "2": [3901, 3867, 3867, 3967],
+        "60": [3901, 3867, 3867, 3934],
+        "61": [3901, 3867, 3867, 3934]
+      },
+      "blend_ms": 600,
+      "song_effect_ids": [],
+      "standing_animation_id": 0,
+      "priority": 0,
+      "transform_model_id": 0,
+      "transform_reapply_ms": 0,
+      "duration_ms": 180000,
+      "range_m": 15,
+      "spawn_offset_m": 2,
+      "recast_ms": 180000,
+      "texture_alias": "boombox-bw-M",
+      "tint_alias": "dyetint",
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/Consumables.json:11 (Pop-Dance Boombox): dances, sync, blend, clip lengths, song effects, standing dance, priority, transform"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/FreeRealms-Legacy@9e08202 src/Resources/ClientItemDefinitions.json:1242299 'Pop-Dance Boombox': Class 171, ModelName bw_boombox_01.adr, TextureAlias boombox-bw-M, TintAlias dyetint"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:1063 1062^bw_boombox_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) model conflict until the lead checks it natively: the client item's model bw_boombox_01.adr is 1062 (used); Sanctuary uses 4076 mkt_boombox_kpop_01.adr ('K-Pop Boombox' in Models.txt)"
+        }
+      ]
+    },
+    {
+      "item_id": 76928,
+      "model_id": 2201,
+      "kind": "synchronized",
+      "dance_sequence": [3568006, 3569006, 3570006, 3571006],
+      "clip_ms": {
+        "1": [6401, 6401, 6401, 6367],
+        "2": [6401, 6401, 6401, 6367],
+        "60": [6401, 6401, 6401, 6367],
+        "61": [6401, 6401, 6401, 6367]
+      },
+      "blend_ms": 600,
+      "song_effect_ids": [],
+      "standing_animation_id": 0,
+      "priority": 0,
+      "transform_model_id": 0,
+      "transform_reapply_ms": 0,
+      "duration_ms": 180000,
+      "range_m": 15,
+      "spawn_offset_m": 2,
+      "recast_ms": 180000,
+      "texture_alias": "boombox-tiki-M",
+      "tint_alias": "dyetint",
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/Consumables.json:12 (Tiki Boombox): dances, sync, blend, clip lengths, song effects, standing dance, priority, transform"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/FreeRealms-Legacy@9e08202 src/Resources/ClientItemDefinitions.json:1242322 'Tiki Boombox': Class 171, ModelName mkt_boombox_tiki_01.adr, TextureAlias boombox-tiki-M, TintAlias dyetint"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:2173 2201^mkt_boombox_tiki_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
+        }
+      ]
+    },
+    {
+      "item_id": 76930,
+      "model_id": 4096,
+      "kind": "synchronized",
+      "dance_sequence": [3568001, 3569001, 3570001, 3571001],
+      "clip_ms": {
+        "1": [5000, 4967, 4967, 4500],
+        "2": [5000, 4967, 4967, 4534],
+        "60": [5000, 4967, 4967, 4500],
+        "61": [5000, 4967, 4967, 4534]
+      },
+      "blend_ms": 600,
+      "song_effect_ids": [],
+      "standing_animation_id": 0,
+      "priority": 0,
+      "transform_model_id": 0,
+      "transform_reapply_ms": 0,
+      "duration_ms": 180000,
+      "range_m": 15,
+      "spawn_offset_m": 2,
+      "recast_ms": 180000,
+      "texture_alias": "boombox-bigband-M",
+      "tint_alias": "dyetint",
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/Consumables.json:13 (Big Band Boombox): dances, sync, blend, clip lengths, song effects, standing dance, priority, transform"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/FreeRealms-Legacy@9e08202 src/Resources/ClientItemDefinitions.json:1242345 'Big Band Boombox': Class 171, ModelName mkt_boombox_bigband_01.adr, TextureAlias boombox-bigband-M, TintAlias dyetint"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:3278 4096^mkt_boombox_bigband_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
+        }
+      ]
+    },
+    {
+      "item_id": 76933,
+      "model_id": 4099,
+      "kind": "synchronized",
+      "dance_sequence": [3568008, 3569008, 3570008, 3571008],
+      "clip_ms": {
+        "1": [5000, 4934, 5000, 4901],
+        "2": [5000, 4934, 5000, 4901],
+        "60": [5000, 4934, 5000, 4901],
+        "61": [5000, 4967, 4967, 4934]
+      },
+      "blend_ms": 600,
+      "song_effect_ids": [],
+      "standing_animation_id": 0,
+      "priority": 0,
+      "transform_model_id": 0,
+      "transform_reapply_ms": 0,
+      "duration_ms": 180000,
+      "range_m": 15,
+      "spawn_offset_m": 2,
+      "recast_ms": 180000,
+      "texture_alias": "boombox-western-M",
+      "tint_alias": "dyetint",
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/Consumables.json:14 (Hootenanny Boombox): dances, sync, blend, clip lengths, song effects, standing dance, priority, transform"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/FreeRealms-Legacy@9e08202 src/Resources/ClientItemDefinitions.json:1242368 'Hootenanny Boombox': Class 171, ModelName mkt_boombox_western_01.adr, TextureAlias boombox-western-M, TintAlias dyetint"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:3281 4099^mkt_boombox_western_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
+        }
+      ]
+    },
+    {
+      "item_id": 76934,
+      "model_id": 4100,
+      "kind": "synchronized",
+      "dance_sequence": [3568009, 3569009, 3570009, 3571009],
+      "clip_ms": {
+        "1": [5000, 4967, 4967, 4967],
+        "2": [5000, 4967, 4967, 4967],
+        "60": [5000, 4967, 4967, 4967],
+        "61": [5000, 4967, 4967, 4967]
+      },
+      "blend_ms": 600,
+      "song_effect_ids": [],
+      "standing_animation_id": 0,
+      "priority": 0,
+      "transform_model_id": 0,
+      "transform_reapply_ms": 0,
+      "duration_ms": 180000,
+      "range_m": 15,
+      "spawn_offset_m": 2,
+      "recast_ms": 180000,
+      "texture_alias": "",
+      "tint_alias": "dyetint",
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/Consumables.json:17 (Xylophone): dances, sync, blend, clip lengths, song effects, standing dance, priority, transform"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/FreeRealms-Legacy@9e08202 src/Resources/ClientItemDefinitions.json:1242391 'Xylophone': Class 171, ModelName none, TextureAlias none, TintAlias dyetint"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:3282 4100^mkt_boombox_xylophone_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the client item names no model file; Sanctuary's 4100 mkt_boombox_xylophone_01.adr is kept"
+        }
+      ]
+    },
+    {
+      "item_id": 76935,
+      "model_id": 4428,
+      "kind": "independent",
+      "dance_sequence": [3570],
+      "clip_ms": {},
+      "blend_ms": 600,
+      "song_effect_ids": [],
+      "standing_animation_id": 3570,
+      "priority": 0,
+      "transform_model_id": 0,
+      "transform_reapply_ms": 0,
+      "duration_ms": 180000,
+      "range_m": 15,
+      "spawn_offset_m": 2,
+      "recast_ms": 180000,
+      "texture_alias": "boombox-realmshake-M",
+      "tint_alias": "dyetint",
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/Consumables.json:15 (Realmshake Boombox): dances, sync, blend, clip lengths, song effects, standing dance, priority, transform"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/FreeRealms-Legacy@9e08202 src/Resources/ClientItemDefinitions.json:1242411 'Realmshake Boombox': Class 171, ModelName mkt_boombox_realmshake_01.adr, TextureAlias boombox-realmshake-M, TintAlias dyetint"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:3410 4428^mkt_boombox_realmshake_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
+        }
+      ]
+    },
+    {
+      "item_id": 77329,
+      "model_id": 2059,
+      "kind": "synchronized",
+      "dance_sequence": [3521, 3522, 3523, 3524, 3525],
+      "clip_ms": {
+        "1": [5867, 5867, 5867, 5867, 5867],
+        "2": [5867, 5867, 5867, 5867, 5867],
+        "60": [5867, 5867, 5867, 5867, 5867],
+        "61": [5867, 5867, 5867, 5867, 5867]
+      },
+      "blend_ms": 600,
+      "song_effect_ids": [],
+      "standing_animation_id": 0,
+      "priority": 0,
+      "transform_model_id": 0,
+      "transform_reapply_ms": 0,
+      "duration_ms": 180000,
+      "range_m": 15,
+      "spawn_offset_m": 2,
+      "recast_ms": 180000,
+      "texture_alias": "boombox-valentines-M",
+      "tint_alias": "dyetint",
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/Consumables.json:16 (Lovelectric Boombox): dances, sync, blend, clip lengths, song effects, standing dance, priority, transform"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/FreeRealms-Legacy@9e08202 src/Resources/ClientItemDefinitions.json:1249618 'Lovelectric Boombox': Class 171, ModelName mkt_boombox_valentines_01.adr, TextureAlias boombox-valentines-M, TintAlias dyetint"
+        },
+        {
+          "kind": "client",
+          "evidence": "Models.txt:2033 2059^mkt_boombox_valentines_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
+        }
+      ]
+    }
+  ]
+}

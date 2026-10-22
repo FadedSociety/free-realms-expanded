@@ -596,6 +596,8 @@ class Checker:
         # Job ability animations may use a wield animation GROUP (e.g. 1099),
         # not an AnimationSlot. Validate those against the client's job table.
         self.ability_animation_groups = set()
+        # A boombox's standing dance is an AnimationGroup (3200, 3550, 3570), not a slot (T459).
+        self.animation_groups = set()
         self.models = None
         if client.is_dir():
             loc = client / "locale" / "en_us_data.dat"
@@ -622,6 +624,10 @@ class Checker:
             if anim.is_file():
                 self.anims = load_animation_slots(anim)
                 self.tables["animations"] = {"path": str(anim), "rows": len(self.anims)}
+            groups = client / "Resources" / "AnimationGroups.xml"
+            if groups.is_file():
+                self.animation_groups = {int(i) for i in re.findall(
+                    r'<AnimationGroup\b[^>]*\bid="(\d+)"', groups.read_text(encoding="utf-8", errors="replace"))}
             wield = client / "Resources" / "WieldTypeAnimationMappings.txt"
             if wield.is_file():
                 for line in wield.read_text().splitlines():
@@ -845,7 +851,8 @@ class Checker:
                      "item id in no item definition table (runtime inventory.json, generated catalogue, content, Legacy)")
 
     def check_anim(self, sev, file, path, field, value):
-        if file == "job_abilities.json" and value in self.ability_animation_groups:
+        if (file == "job_abilities.json" and value in self.ability_animation_groups) or \
+                (file == "boomboxes.json" and value in self.animation_groups):
             self.stats["animation"] += 1
             return
         if self.anims is None or not isinstance(value, int) or isinstance(value, bool) or value <= 0:

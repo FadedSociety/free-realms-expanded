@@ -613,13 +613,10 @@ impl Gameplay {
         let saved_chess = state.as_ref().and_then(|s| s.chess);
         let saved_sc_wallet = state.as_ref().and_then(|s| s.sc_wallet.clone());
         let saved_housing = state.as_ref().and_then(|s| s.housing.clone());
+        let saved_item_bar = state.as_ref().and_then(|s| s.item_bar.clone());
         if let Some(saved) = state.as_ref().and_then(|s| s.warpstones.as_ref()) {
             warp.restore(saved);
         }
-        let item_bar = crate::item_bar::ItemBar::load(
-            directory,
-            state.as_ref().and_then(|s| s.item_bar.clone()),
-        )?;
         let progression_extras = crate::progression_extras::ProgressionExtras::load(
             state.as_ref().and_then(|s| s.progression_extras.clone()),
         )?;
@@ -882,6 +879,8 @@ impl Gameplay {
         } else {
             bundled_npc_content.as_path()
         };
+        let boomboxes = Arc::new(crate::boombox::Catalogue::load(npc_content)?);
+        let item_bar = crate::item_bar::ItemBar::load(directory, boomboxes, saved_item_bar)?;
         // W162: the ride catalogue ships with the bundled content; a set without it has no rides.
         let mounts = if npc_content.join("mounts.json").is_file() {
             Some(crate::mounts::MountService::new(

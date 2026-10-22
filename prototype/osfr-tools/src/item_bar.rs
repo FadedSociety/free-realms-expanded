@@ -19,8 +19,9 @@
 //!
 //! # Reconstructed policy (R)
 //!
-//! * Only the seven recovered consumable rows may sit on the bar; only the Small Health Potion rows
-//!   (2173, 11002) are usable. Other bar items show disabled and a use is refused.
+//! * Only the seven recovered consumable rows and the boomboxes in [`boombox::Catalogue`] (owned
+//!   outright, not rented) may sit on the bar; only the Small Health Potion rows (2173, 11002) are
+//!   usable. Other bar items show disabled and a use is refused.
 //! * Heal: the cached wiki gives 2% instantly plus 11% per second for 3 seconds; the effect is
 //!   applied at once as 35% of maximum health. Cooldown 10 s per item definition, shared by every
 //!   slot and by 42/15. Both are tunable in `consumables.json` (see [`Effects`]).
@@ -29,7 +30,7 @@
 //! * Cooldowns and the pending 42/16 confirmation live in memory only; a relog resets them.
 //! * 42/15 only works for the instance the last 42/16 confirmed, once.
 
-use crate::{abilities, chat, inventory::Inventory};
+use crate::{abilities, boombox, chat, inventory::Inventory};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::BTreeMap,
@@ -154,6 +155,8 @@ pub struct ItemBar {
     bar: bar_wire::ActionBarState,
     #[serde(skip)]
     effects: Arc<Effects>,
+    #[serde(skip)]
+    boomboxes: Arc<boombox::Catalogue>,
     /// Last accepted use per item definition, in the caller's millisecond clock.
     #[serde(skip)]
     last_used: BTreeMap<i32, u64>,
@@ -161,8 +164,9 @@ pub struct ItemBar {
     pending: Option<i32>,
 }
 
-/// Read-only view of the inventory for the bar. Only recovered consumables can back a slot.
-struct View<'a>(&'a Inventory);
+/// Read-only view of the inventory for the bar. Only recovered consumables and catalogued
+/// boomboxes can back a slot.
+struct View<'a>(&'a Inventory, &'a boombox::Catalogue);
 
 impl ActionBarItems for View<'_> {
     fn owned_action(&self, item_instance_id: i32) -> Option<OwnedAction> {
@@ -172,7 +176,12 @@ impl ActionBarItems for View<'_> {
             .items
             .iter()
             .find(|i| i.id == item_instance_id)?;
-        use_wire::consumable(item.definition_id)?;
+        // A rental is never usable here (see `usable`), so a rented box can't take a slot (R).
+        let listed = use_wire::consumable(item.definition_id).is_some()
+            || (item.rental.is_none() && self.1.get(item.definition_id).is_some());
+        if !listed {
+            return None;
+        }
         let shown = self.0.presentation(item.definition_id).ok()?;
         Some(OwnedAction {
             item_instance_id,
@@ -204,11 +213,17 @@ impl Refusal {
 }
 
 impl ItemBar {
-    /// Restore a saved bar (validated) with the effect table from the content directory.
-    pub fn load(directory: &Path, saved: Option<Self>) -> io::Result<Self> {
+    /// Restore a saved bar (validated) with the effect table from the content directory and the
+    /// shared boombox catalogue.
+    pub fn load(
+        directory: &Path,
+        boomboxes: Arc<boombox::Catalogue>,
+        saved: Option<Self>,
+    ) -> io::Result<Self> {
         let mut bar = saved.unwrap_or_default();
         bar.bar.validate()?;
         bar.effects = Arc::new(Effects::load(directory)?);
+        bar.boomboxes = boomboxes;
         Ok(bar)
     }
 
@@ -282,7 +297,7 @@ impl ItemBar {
     /// 38/25 for all four slots: bound slots with quantity and recast, the rest empty. Stale
     /// bindings (stack gone) are dropped first.
     pub fn refresh(&mut self, inventory: &Inventory, now_ms: u64) -> io::Result<Vec<Vec<u8>>> {
-        self.bar.reconcile(&View(inventory));
+        self.bar.reconcile(&View(inventory, &self.boomboxes));
         (0..bar_wire::ITEM_BAR_SLOTS)
             .map(|slot| {
                 let update = self
@@ -307,7 +322,7 @@ impl ItemBar {
                 slot,
                 item_instance_id: instance,
             },
-            &View(inventory),
+            &View(inventory, &self.boomboxes),
         )?;
         let mut replies = Vec::new();
         if let Some(why) = outcome.rejection {
@@ -485,7 +500,7 @@ impl ItemBar {
         inventory: &Inventory,
         now_ms: u64,
     ) -> Option<io::Result<Vec<u8>>> {
-        let action = View(inventory).owned_action(binding.item_instance_id)?;
+        let action = View(inventory, &self.boomboxes).owned_action(binding.item_instance_id)?;
         let mut slot = ActionBarSlot::for_owned_action(&action);
         match self.effects.get(action.definition_id) {
             Some(effect) => {

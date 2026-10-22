@@ -4,6 +4,7 @@ pub mod abilities;
 pub mod account;
 pub mod account_store;
 pub mod activity_portal;
+pub mod boombox;
 pub mod bundle_budget;
 pub mod character_store;
 pub mod chat;

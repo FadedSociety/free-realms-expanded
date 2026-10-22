@@ -141,7 +141,7 @@ impl Fixture {
         Inventory::load(&self.path, None).unwrap()
     }
     fn bar(&self) -> ItemBar {
-        ItemBar::load(&self.path, None).unwrap()
+        ItemBar::load(&self.path, Default::default(), None).unwrap()
     }
 }
 impl Drop for Fixture {
@@ -570,8 +570,12 @@ fn the_bar_persists_and_runtime_state_does_not() {
     run(&mut bar, &mut inventory, &assign(3, 14), &ALIVE, 0).unwrap();
     run(&mut bar, &mut inventory, &cast(0), &ALIVE, 0).unwrap();
     let saved = serde_json::to_string(&bar).unwrap();
-    let mut loaded =
-        ItemBar::load(&fixture.path, Some(serde_json::from_str(&saved).unwrap())).unwrap();
+    let mut loaded = ItemBar::load(
+        &fixture.path,
+        Default::default(),
+        Some(serde_json::from_str(&saved).unwrap()),
+    )
+    .unwrap();
     assert_eq!(bound(&loaded), [(0, 10), (3, 14)]);
     // The recast is not saved: a relog can use again at once.
     assert_eq!(
@@ -595,7 +599,7 @@ fn a_tampered_saved_bar_is_refused_at_load() {
     let fixture = Fixture::new();
     let good = json!({"bar":{"version":1,"bindings":[{"slot":0,"item_instance_id":10,"definition_id":2173}]}});
     let loaded: ItemBar = serde_json::from_value(good.clone()).unwrap();
-    assert!(ItemBar::load(&fixture.path, Some(loaded)).is_ok()); // canary
+    assert!(ItemBar::load(&fixture.path, Default::default(), Some(loaded)).is_ok()); // canary
     for (why, value) in [
         (
             "slot out of range",
@@ -620,7 +624,10 @@ fn a_tampered_saved_bar_is_refused_at_load() {
         ),
     ] {
         let loaded: ItemBar = serde_json::from_value(value).unwrap();
-        assert!(ItemBar::load(&fixture.path, Some(loaded)).is_err(), "{why}");
+        assert!(
+            ItemBar::load(&fixture.path, Default::default(), Some(loaded)).is_err(),
+            "{why}"
+        );
     }
     let mut unknown = good;
     unknown["extra"] = json!(1);
@@ -632,7 +639,7 @@ fn the_effect_table_is_tunable_from_data_within_sanity_bounds() {
     let fixture = Fixture::new();
     let write = |value: serde_json::Value| {
         fs::write(fixture.path.join("consumables.json"), value.to_string()).unwrap();
-        ItemBar::load(&fixture.path, None)
+        ItemBar::load(&fixture.path, Default::default(), None)
     };
     let row = |definition, heal, cooldown| json!({"definition":definition,"heal_percent":heal,"cooldown_ms":cooldown});
     // Absent file: the built-in Small Health Potion rows.
