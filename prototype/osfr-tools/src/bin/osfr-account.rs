@@ -14,6 +14,7 @@ const USAGE: &str = "osfr-account <command> --store <accounts.json>
   add-key    --account-id <id> --public-key <64 hex characters>
   remove-key --account-id <id> --public-key <64 hex characters>
   set-role   --account-id <id> --role <player|builder|admin>
+  member     --account-id <id> | --handle <handle>, --state <on|off>
   list
 Host-only; stop login first. Never supply a private key.";
 
@@ -53,6 +54,8 @@ fn run(mut args: impl Iterator<Item = String>) -> Result<(), Box<dyn Error>> {
         "create" => &["--store", "--handle", "--public-key"],
         "add-key" | "remove-key" => &["--store", "--account-id", "--public-key"],
         "set-role" => &["--store", "--account-id", "--role"],
+        // L057: one of --account-id or --handle (the arm refuses both).
+        "member" => &["--store", "--account-id", "--handle", "--state"],
         "list" => &["--store"],
         _ => return Err(USAGE.into()),
     };
@@ -63,7 +66,7 @@ fn run(mut args: impl Iterator<Item = String>) -> Result<(), Box<dyn Error>> {
         }
         options.insert(flag, args.next().ok_or("missing option value")?);
     }
-    if options.len() != expected.len() {
+    if options.len() != expected.len() - usize::from(command == "member") {
         return Err("missing required option".into());
     }
     let get = |name: &str| {
@@ -92,6 +95,14 @@ fn run(mut args: impl Iterator<Item = String>) -> Result<(), Box<dyn Error>> {
         .get("--role")
         .map(|role| AccountRole::parse(role).ok_or("invalid role"))
         .transpose()?;
+    let state = options
+        .get("--state")
+        .map(|state| match state.as_str() {
+            "on" => Ok(true),
+            "off" => Ok(false),
+            _ => Err("state must be on or off"),
+        })
+        .transpose()?;
     if let Some(parent) = path.parent().filter(|p| !p.as_os_str().is_empty()) {
         std::fs::create_dir_all(parent)?;
     }
@@ -112,7 +123,7 @@ fn run(mut args: impl Iterator<Item = String>) -> Result<(), Box<dyn Error>> {
             }
             let id = store.create_account(
                 hash.ok_or("handle required")?,
-                AccountFlags::default(),
+                AccountFlags::NEW_ACCOUNT,
                 SlotPolicy { max_characters: 6 },
             )?;
             store.add_public_key(id, &key.ok_or("public key required")?)?;
@@ -135,6 +146,22 @@ fn run(mut args: impl Iterator<Item = String>) -> Result<(), Box<dyn Error>> {
             store.set_account_role_offline(id, role.ok_or("role required")?)?;
             store.save(&path)?;
             println!("updated account {id}");
+        }
+        "member" => {
+            let id = match (id, hash) {
+                (Some(id), None) => id,
+                (None, Some(hash)) => store
+                    .account_id_by_login_hash(&hash)
+                    .ok_or("target account does not exist")?,
+                _ => return Err(USAGE.into()),
+            };
+            let state = state.ok_or("state required")?;
+            store.set_membership_offline(id, state)?;
+            store.save(&path)?;
+            println!(
+                "account {id} membership {}",
+                if state { "on" } else { "off" }
+            );
         }
         "list" => {
             for id in store.account_ids() {

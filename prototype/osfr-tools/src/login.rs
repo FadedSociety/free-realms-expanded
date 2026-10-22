@@ -203,9 +203,9 @@ impl LoginService {
     fn authenticate_account(&mut self, login_name: &str) -> io::Result<u64> {
         let login_name_hash: [u8; 32] = Sha256::digest(login_name.as_bytes()).into();
         let flags = AccountFlags {
-            membership: false,
             underage: self.config.underage,
             open_chat: self.config.open_chat,
+            ..AccountFlags::NEW_ACCOUNT
         };
         let slots = SlotPolicy {
             max_characters: self.config.max_characters,

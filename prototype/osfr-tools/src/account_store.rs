@@ -289,6 +289,16 @@ impl AccountStore {
         Ok(())
     }
 
+    /// (R) L057 local operator command only (`osfr-account member`); never route it from a
+    /// packet. The offline CLI holds AccountStoreLock; host filesystem ACLs are authority.
+    pub fn set_membership_offline(&mut self, account_id: u64, member: bool) -> io::Result<()> {
+        let account = self.data.accounts.get_mut(&account_id).ok_or_else(|| {
+            io::Error::new(io::ErrorKind::NotFound, "target account does not exist")
+        })?;
+        account.flags.membership = member;
+        Ok(())
+    }
+
     pub fn account_id_by_login_hash(&self, login_name_hash: &[u8; 32]) -> Option<u64> {
         self.data
             .accounts

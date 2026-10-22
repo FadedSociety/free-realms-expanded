@@ -184,11 +184,21 @@ fn login_gateway_address_follows_the_lan_rule() {
         }
         let result = command.output().unwrap();
         let stderr = String::from_utf8_lossy(&result.stderr);
-        assert_eq!(stderr.contains("loopback gateway, or a private-network one"), refused, "{gateway}: {stderr}");
+        assert_eq!(
+            stderr.contains("loopback gateway, or a private-network one"),
+            refused,
+            "{gateway}: {stderr}"
+        );
     }
     // With --allow-lan a private gateway passes this gate (the run then stops on missing resources).
     let result = Command::new(env!("CARGO_BIN_EXE_osfr-login"))
-        .args(["--bind", "127.0.0.1:0", "--gateway", "100.64.0.1:20041", "--allow-lan"])
+        .args([
+            "--bind",
+            "127.0.0.1:0",
+            "--gateway",
+            "100.64.0.1:20041",
+            "--allow-lan",
+        ])
         .output()
         .unwrap();
     assert!(!String::from_utf8_lossy(&result.stderr).contains("loopback gateway"));
@@ -567,7 +577,11 @@ fn tokens_route_to_distinct_native_accounts_replay_fails_and_peers_stay_live() {
 fn loopback_dev_login_without_account_store_still_works() {
     let server = Server::start(false);
     let mut client = NativeClient::connect(server.udp);
-    assert_eq!(client.login(b"local-session"), accepted(6));
+    // L057: the account this login creates is a member (IsMember byte 6, payload member byte 11).
+    let mut member = accepted(6);
+    member[6] = 1;
+    member[11] = 1;
+    assert_eq!(client.login(b"local-session"), member);
     assert_eq!(client.request(&[11])[0], 12);
 }
 

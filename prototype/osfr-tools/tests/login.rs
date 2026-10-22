@@ -245,9 +245,10 @@ fn native_creation_selection_reconnect_and_name_check_preserve_identity() {
     let t = Temp::new();
     let mut service = service(&t);
     assert!(service.handle(&[11]).is_err());
+    // L057: the account login creates here (no store yet) is a member.
     assert_eq!(
         service.handle(&login_request()).unwrap().replies[0],
-        login_reply_with_max_characters(false, 6)
+        login_reply_with_max_characters(true, 6)
     );
     assert_eq!(
         service.handle(&[11]).unwrap().replies[0],
@@ -297,7 +298,8 @@ fn native_creation_selection_reconnect_and_name_check_preserve_identity() {
     assert!(selected.selected);
     // L023: 1/1 gets its HMAC binding ticket, never the public fixed ticket.
     let store = AccountStore::load(&t.0.join("accounts.json")).unwrap();
-    let ticket = login::gateway_binding_ticket(b"synthetic-handoff-key", store.account(1).unwrap(), 1);
+    let ticket =
+        login::gateway_binding_ticket(b"synthetic-handoff-key", store.account(1).unwrap(), 1);
     assert_eq!(
         selected.replies[0],
         login::character_login_reply(1, 1, 1, "127.0.0.1:20260", &ticket)
@@ -463,6 +465,86 @@ fn login_reply_carries_account_membership_in_the_byte_the_client_reads() {
     assert_eq!(fs::read(t.0.join("accounts.json")).unwrap(), saved);
 }
 
+fn osfr_account(args: &[&str]) -> std::process::Output {
+    std::process::Command::new(env!("CARGO_BIN_EXE_osfr-account"))
+        .args(args)
+        .output()
+        .unwrap()
+}
+
+/// L057: both account-creating paths (`osfr-account create`, and login for a name the store
+/// lacks) make members, and `osfr-account member` changes exactly one account; the next login
+/// reply carries the new IsMember byte. Refusals leave the store bytes unchanged.
+#[test]
+fn new_accounts_are_members_and_the_operator_sets_one_accounts_membership() {
+    let t = Temp::new();
+    let path = t.0.join("accounts.json");
+    let store = path.to_str().unwrap();
+    let key: String = ed25519_dalek::SigningKey::from_bytes(&[7; 32])
+        .verifying_key()
+        .to_bytes()
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect();
+    let created = osfr_account(&[
+        "create",
+        "--store",
+        store,
+        "--handle",
+        "synthetic-session",
+        "--public-key",
+        &key,
+    ]);
+    assert!(created.status.success());
+    let login = |name: &str| {
+        service_as(&t, name)
+            .handle(&login_request_as(name))
+            .unwrap()
+    };
+    let first = login("synthetic-session");
+    assert_eq!(first.replies[0], login_reply_with_max_characters(true, 6));
+    assert_eq!(client_account_info(&first.replies[0]), (true, 3, false));
+    let second = login("synthetic-other");
+    assert_eq!(client_account_info(&second.replies[0]), (true, 3, false));
+
+    let member = |rest: &[&str]| osfr_account(&[&["member", "--store", store][..], rest].concat());
+    let off = member(&["--handle", "synthetic-session", "--state", "off"]);
+    assert!(off.status.success());
+    assert_eq!(off.stdout, b"account 1 membership off\n");
+    let first = login("synthetic-session");
+    assert_eq!(first.replies[0], login_reply_with_max_characters(false, 6));
+    assert_eq!(client_account_info(&first.replies[0]), (false, 1, false));
+    let other = AccountStore::load(&path).unwrap();
+    assert!(other.account(2).unwrap().flags.membership);
+
+    let saved = fs::read(&path).unwrap();
+    for refused in [
+        &["--account-id", "3", "--state", "on"][..],
+        &["--handle", "synthetic-unknown", "--state", "on"],
+        &["--account-id", "1", "--state", "yes"],
+        &["--account-id", "1", "--handle", "synthetic-session"],
+        &[
+            "--account-id",
+            "1",
+            "--handle",
+            "synthetic-other",
+            "--state",
+            "on",
+        ],
+    ] {
+        assert!(!member(refused).status.success(), "{refused:?}");
+        assert_eq!(fs::read(&path).unwrap(), saved, "{refused:?}");
+    }
+
+    assert!(
+        member(&["--account-id", "1", "--state", "on"])
+            .status
+            .success()
+    );
+    let first = login("synthetic-session");
+    assert_eq!(client_account_info(&first.replies[0]), (true, 3, false));
+}
+
 #[test]
 fn current_character_save_and_identity_migrate_without_rewriting_sources() {
     let t = Temp::new();
@@ -495,6 +577,7 @@ fn current_character_save_and_identity_migrate_without_rewriting_sources() {
         store.account(1).unwrap().character_guids,
         [original_state.guid]
     );
+    assert!(store.account(1).unwrap().flags.membership, "L057");
     assert_eq!(
         store.character(original_state.guid).unwrap().world_state,
         Some(original_state)

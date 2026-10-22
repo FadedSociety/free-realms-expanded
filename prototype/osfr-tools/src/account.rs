@@ -24,6 +24,18 @@ pub struct AccountFlags {
     pub open_chat: bool,
 }
 
+impl AccountFlags {
+    /// (R) L057 lead decision (2026-10-22, free revival with no paid tier; the owner may override it
+    /// here): every account-creating path starts from this, so new accounts are members. The
+    /// client offers "Add a Character" only to members (OnLoginAuthReply 0x009542d0 sets
+    /// MaxCharacters = 1 + 2 * IsMember). Stored accounts keep the flags they were saved with.
+    pub const NEW_ACCOUNT: Self = Self {
+        membership: true,
+        underage: false,
+        open_chat: false,
+    };
+}
+
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct SlotPolicy {
