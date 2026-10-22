@@ -98,6 +98,7 @@ pub mod startup_snapshot;
 pub mod startup_world;
 pub mod station_cash;
 pub mod studio;
+pub mod style_cards;
 pub mod terrain;
 pub mod trace;
 pub mod trade;
