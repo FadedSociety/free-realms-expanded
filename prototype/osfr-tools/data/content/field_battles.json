@@ -1633,7 +1633,7 @@
         },
         {
           "kind": "client",
-          "evidence": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 200 (file line 201) maps model 200 to chugawug_f_bandit_01.adr and row 199 (file line 200) maps model 199 to chugawug_m_bandit_01.adr; Images.txt 4543 is icon_ui_combatstart_panelgraphic_trollsummonermadness.dds and 11970 is icon_minigame_combat_encounter_start_hard_free_64.dds. The guide calls Muggenstomp female, so the visible marker and boss use the female bandit body 200 (R). Arena sg_random_encounter_clearing, geometry 214 and sky sky_wilds24.xml are copied from battle 12350."
+          "evidence": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 200 (file line 201) maps model 200 to chugawug_f_bandit_01.adr and row 199 (file line 200) maps model 199 to chugawug_m_bandit_01.adr; Images.txt line 660 is icon_ui_combatstart_panelgraphic_bandithideout.dds, this battle's own start-panel graphic (the 660-683 panel block that also gives Bixie Hive 662), and 11970 is icon_minigame_combat_encounter_start_hard_free_64.dds. The guide calls Muggenstomp female, so the visible marker and boss use the female bandit body 200 (R). Arena sg_random_encounter_clearing, geometry 214 and sky sky_wilds24.xml are copied from battle 12350."
         },
         {
           "kind": "wiki",
@@ -1641,11 +1641,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Local battle id 12360, actor GUIDs 100001236000-005 and definition ids 1236000-005. Five-actor kill-all roster (not the retail waves): Muggenstomp boss and four Big Bandits; 320 HP / 22 damage for the boss and 160 HP / 12 damage per bandit are authored baselines before the existing difficulty-4 scaling (level 9 factor 3.063 -> 980/67 and 490/37), because the guide gives no health, damage or Big Bandit count. Marker adaptation: the visible Muggenstomp model replaces the guide's barrier prop, which has no proven actor model (as T282/T319); the spawner is the marker. The arena reuses zone 9600 sg_random_encounter_clearing, geometry 214, sky sky_wilds24.xml and arrival [136,-0.5,155], with the 12311 block's five positions."
+          "evidence": "(R) Local battle id 12360, actor GUIDs 100001236000-005 and definition ids 1236000-005. Five-actor kill-all roster (not the retail waves): Muggenstomp boss and four Big Bandits; 320 HP / 22 damage for the boss and 160 HP / 12 damage per bandit are authored baselines before the existing difficulty-4 scaling (level 9 factor 3.063 -> 980/67 and 490/37), because the guide gives no health or damage. The guide gives five Big Bandits (bonus counter 0/5); four is the kill-all adaptation (R). Marker adaptation: the visible Muggenstomp model replaces the guide's barrier prop, which has no proven actor model (as T282/T319); the spawner is the marker. The arena reuses zone 9600 sg_random_encounter_clearing, geometry 214, sky sky_wilds24.xml and arrival [136,-0.5,155], with the 12311 block's five positions."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Placement: no barrier transform is recovered. The marker [-1903.0,-34.75,-660.0] is on the Greenwood Camp approach south-east of Lugabow [-1915.146,-36.9307,-636.1354], 26.78 m away (Glugmort [-1943.932,-39.94606,-600.8123] is 71.96 m away and the Thugamug marker 339.18 m). y is the bilinear zone-0 height -34.75 (delta 0.0000 m). All 105 samples of the 5 m wander disc (81 grid + 24 ring) are terrain-covered with a finite y; the 24-sample ring and full disc reach at most 14.04 degrees of slope. The nearest field-enemy home is 946.62 m away and the nearest other battle marker 339.18 m. Water, object collision and a native walkable route remain unverified."
+          "evidence": "(R) Placement: no barrier transform is recovered. The marker [-1903.0,-34.75,-660.0] is on the Greenwood Camp approach south-east of Lugabow [-1915.146,-36.9307,-636.1354], the nearest regional legacy_data NPC, 26.78 m away; the nearest visible npc_spawns_extra.json actor is Bandit Patrolman 100000004341 [-1877.934,-29.25417,-654.0696], 25.76 m away (Glugmort [-1943.932,-39.94606,-600.8123] is 71.96 m away and the Thugamug marker 339.18 m). y is the bilinear zone-0 height -34.75 (delta 0.0000 m). All 105 samples of the 5 m wander disc (81 grid + 24 ring) are terrain-covered with a finite y; the 24-sample ring and full disc reach at most 14.04 degrees of slope. The nearest field-enemy home is 946.62 m away and the nearest other battle marker 339.18 m. Water, object collision and a native walkable route remain unverified."
         },
         {
           "kind": "reconstructed",
@@ -1670,7 +1670,7 @@
         ],
         "tutorial": false
       },
-      "icon_id": 4543,
+      "icon_id": 660,
       "prizes": [
         {
           "item_id": 10482,
