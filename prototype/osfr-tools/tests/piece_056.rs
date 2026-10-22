@@ -33,6 +33,7 @@
 #[allow(dead_code)]
 mod piece_056;
 
+use osfr_tools::startup_catalogues::{self, EffectTag};
 use piece_056::{
     ADD_COMPOSITE_EFFECT_LEN, ADD_EFFECT_TAG_LEN, ActiveEffect, CHARACTER_STATE_LEN,
     CLIENT_UPDATE_OPCODE, CLIENT_UPDATE_SUB_ADD_EFFECT_TAG, CLIENT_UPDATE_SUB_REMOVE_EFFECT_TAG,
@@ -81,8 +82,9 @@ fn recovered_packet_ids_and_sizes() {
     assert_eq!(PLAYER_UPDATE_SUB_REMOVE_COMPOSITE_EFFECT, 42);
     assert_eq!(PLAYER_UPDATE_SUB_UPDATE_CHARACTER_STATE, 20);
 
-    // 4-byte header + TagId + the 85-byte ClientEffectTag (72-byte EffectTag + 4 extra fields).
-    assert_eq!(ADD_EFFECT_TAG_LEN, 4 + 4 + 85);
+    // 4-byte header + TagId + i32 blob length + the 85-byte ClientEffectTag (72-byte EffectTag +
+    // 4 extra fields); client reader 0x008d8870 -> 0x008bfc00.
+    assert_eq!(ADD_EFFECT_TAG_LEN, 4 + 4 + 4 + 85);
     assert_eq!(REMOVE_EFFECT_TAG_LEN, 4 + 4);
     assert_eq!(ADD_COMPOSITE_EFFECT_LEN, 4 + 8 + 4 + 4 + 8 + 8);
     assert_eq!(REMOVE_COMPOSITE_EFFECT_LEN, 4 + 8 + 4);
@@ -124,7 +126,38 @@ fn captured_profile_row_matches_the_recovered_self_payload_shape() {
     assert_eq!(bytes.len(), 4 + 4 + 85);
     assert_eq!(&bytes[..4], &1_i32.to_le_bytes());
     assert_eq!(&bytes[4..8], &2_i32.to_le_bytes());
-    assert_eq!(&bytes[8..], &encode_add_effect_tag(2, &row)[8..]);
+    assert_eq!(&bytes[8..], &encode_add_effect_tag(2, &row)[12..]);
+}
+
+/// The two 38/16 packets of the verified gateway startup reference
+/// (`lab/bundles/playtest-20261016T115811Z/reference/0036-ready.bin`, `0037-ready.bin`, after the
+/// 7-byte tunnel prefix). Tag 4 is also the literal the supplied server's `UpdateStats.cs` sends.
+const CAPTURED_ADD_EFFECT_TAGS: [&str; 2] = [
+    "260010000200000055000000\
+     02000000ef0100000200000000000000000000000000c842100e00000091ca73956acc524b0000000000000000\
+     000000000000000000000000000000000000000000000000000101a61c000000ae1000000c010000",
+    "260010000400000055000000\
+     04000000350b000008000000000000000000000000000000100e00000091ca73956acc524b0000000000000000\
+     01000000a20f000000000000000000000000000000000000000001272d00000054b80600db070000",
+];
+
+#[test]
+fn captured_startup_tags_match_the_codec_and_the_startup_writer() {
+    for hex in CAPTURED_ADD_EFFECT_TAGS {
+        let packet: Vec<u8> = (0..hex.len())
+            .step_by(2)
+            .map(|at| u8::from_str_radix(&hex[at..at + 2], 16).unwrap())
+            .collect();
+        let (tag_id, tag) = decode_add_effect_tag(&packet).expect("captured row");
+        // Both retail rows carry their tag id as the instance id.
+        assert_eq!(tag.unknown_1, tag_id);
+        assert_eq!(encode_add_effect_tag(tag_id, &tag), packet);
+        let startup = startup_catalogues::build_effect_tag(EffectTag {
+            id: tag_id,
+            definition_blob: &packet[12..],
+        });
+        assert_eq!(&startup[7..], &packet[..]);
+    }
 }
 
 #[test]
@@ -267,6 +300,9 @@ fn the_same_definition_and_source_refresh_one_row() {
     assert_eq!(second.tag_id, first.tag_id);
     assert!(second.refreshed);
     assert_eq!(ledger.len(), 1);
+    // The refresh resends the same instance id, so it replaces its own icon.
+    let (_, tag) = decode_add_effect_tag(&second.packets[0]).expect("refreshed row");
+    assert_eq!(tag.unknown_1, first.tag_id);
     let effect = ledger.get(second.tag_id).expect("active");
     assert_eq!(effect.remaining_seconds(10_000), 60);
 }
@@ -285,6 +321,11 @@ fn a_different_source_stacks_an_independent_row() {
 
     assert_ne!(second.tag_id, first.tag_id);
     assert_eq!(ledger.len(), 2);
+    // Each row carries its own tag id as the client's instance id, so the buff bar draws two icons.
+    for applied in [&first, &second] {
+        let (tag_id, tag) = decode_add_effect_tag(&applied.packets[0]).expect("buff row");
+        assert_eq!((tag_id, tag.unknown_1), (applied.tag_id, applied.tag_id));
+    }
     let removed = ledger.remove(first.tag_id).expect("remove first");
     assert_eq!(&removed[0][4..8], &first.tag_id.to_le_bytes());
     assert_eq!(ledger.len(), 1);
@@ -300,11 +341,13 @@ fn restart_restores_live_rows_and_drops_elapsed_ones() {
     ledger
         .apply(coin_boost_request(), 0, &ImmunitySet::none())
         .expect("coin boost");
-    let rows = ledger.profile_rows(600_000);
+    let mut rows = ledger.profile_rows(600_000);
     assert_eq!(rows.len(), 1);
     assert_eq!(rows[0].0, 1);
     assert_eq!(rows[0].1.duration_seconds(), 3000);
     assert_eq!(rows[0].1.icon_id(), 7334);
+    // A row saved before the instance id was written still resends with its tag id.
+    rows[0].1.unknown_1 = 0;
 
     let (restored, packets) = StatusLedger::restore(&rows, 0, 600).expect("restore");
     assert_eq!(restored.len(), 1);
@@ -313,7 +356,7 @@ fn restart_restores_live_rows_and_drops_elapsed_ones() {
     assert_eq!(restored.get(1).unwrap().remaining_seconds(0), 2400);
     assert_eq!(packets.len(), 1);
     let (tag_id, tag) = decode_add_effect_tag(&packets[0]).expect("resend");
-    assert_eq!(tag_id, 1);
+    assert_eq!((tag_id, tag.unknown_1), (1, 1));
     assert_eq!(tag.duration_seconds(), 2400);
 
     let (gone, none) = StatusLedger::restore(&rows, 0, 3000).expect("fully elapsed");
@@ -360,6 +403,15 @@ fn malformed_and_invalid_requests_are_rejected() {
         Err(StatusError::BadLength {
             expected: ADD_EFFECT_TAG_LEN,
             got: ADD_EFFECT_TAG_LEN - 1,
+        })
+    );
+    let mut short_blob = good.clone();
+    short_blob[8] = 84;
+    assert_eq!(
+        decode_add_effect_tag(&short_blob),
+        Err(StatusError::BadLength {
+            expected: 85,
+            got: 84
         })
     );
     let mut wrong = good;

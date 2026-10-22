@@ -776,9 +776,18 @@ fn super_shield_blocks_damage_for_its_window_then_expires() {
     let use_at = kill + 1_000;
     let used = game.handle_in_world(&cast(2, 1), &moved, use_at).unwrap();
     assert_eq!(game.held_power_up(), None);
-    assert!(
-        used.replies.iter().any(|p| p.starts_with(&[38, 0, 16, 0])),
-        "the HUD receives the shield's effect tag"
+    let tag = used
+        .replies
+        .iter()
+        .find(|p| p.starts_with(&[38, 0, 16, 0]))
+        .expect("the HUD receives the shield's effect tag");
+    // Tag id, blob length 85 (reader 0x008d8870 -> 0x008bfc00), then the instance id the buff
+    // bar keys its icon by (reader 0x008e93e0 -> +8).
+    let id = fixture.slot("super_shield").definition_id.to_le_bytes();
+    let blob = 85_i32.to_le_bytes();
+    assert_eq!(
+        (&tag[4..8], &tag[8..12], &tag[12..16]),
+        (&id[..], &blob[..], &id[..])
     );
     let healthy = player_health(&game);
     // Within the 5 s window the enemy still swings but deals no damage.

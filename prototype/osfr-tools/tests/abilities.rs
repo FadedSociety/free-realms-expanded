@@ -116,7 +116,9 @@ fn push_i32(bytes: &mut Vec<u8>, value: i32) {
 fn expected_apply_effect(tag_id: i32, seconds: i32) -> Vec<u8> {
     let mut bytes = packet(38, 16, &[]);
     push_i32(&mut bytes, tag_id);
-    for value in [0, tag_id, 0, 0, 0, 0, seconds] {
+    push_i32(&mut bytes, 85); // blob length, client reader 0x008d8870 -> 0x008bfc00
+    // Instance id (client reader 0x008e93e0 -> +8, buff-bar column 0) equals the tag id.
+    for value in [tag_id, tag_id, 0, 0, 0, 0, seconds] {
         push_i32(&mut bytes, value);
     }
     bytes.push(0);

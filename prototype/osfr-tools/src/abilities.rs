@@ -923,11 +923,11 @@ pub(crate) fn build_effect_tag(
     icon_id: i32,
     name_id: i32,
 ) -> Vec<u8> {
-    // Client family-38 dispatcher `009392c0`, sub 16 reader `008d8870` reads id plus tag blob.
-    // The existing effect codec writes the 85-byte 38/16 row. Unknown tag members stay zero (R).
+    // Client family-38 dispatcher `009392c0`, sub 16 reader `008d8870` reads the tag id, then an
+    // i32 length and the 85-byte tag blob (`008bfc00`). Unknown tag members stay zero (R).
     let duration_seconds = duration_ms.saturating_add(999) / 1000; // (R) round up for client display
     let tag = effect_packets::EffectTagPayload {
-        unknown_1: 0,
+        unknown_1: tag_id, // the client's instance id; one buff-bar icon per tag
         unknown_2: tag_id, // (R) carries the authored effect-definition id
         unknown_3: 0,
         unknown_4: 0,

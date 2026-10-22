@@ -51,12 +51,14 @@
 //! ## GAPS (explicit)
 //!
 //! * The meanings of `unknown_9`, `unknown_10`/`unknown_11`, `unknown_15`/`unknown_16` and the
-//!   remaining members are unrecovered; only duration, icon, name and composite effect are pinned.
+//!   remaining members are unrecovered; only instance id (`unknown_1`), duration, icon, name and
+//!   composite effect are pinned.
 //! * `EffectTagCompositeEffectsEnable` (35/43) has a known id and no recovered body.
 //! * No server-side effect application, stacking, immunity or cleanse logic was recovered: the
 //!   supplied server only ships one hard-coded demonstration tag on login.
-//! * A 97-byte hex literal in the supplied server's `UpdateStats.cs` is preserved but does not line
-//!   up with the 93-byte `AddEffectTag` layout; it is unused here.
+//! * The 97-byte hex literal in the supplied server's `UpdateStats.cs` is a whole 38/16 packet:
+//!   header, tag id 4, blob length 85, the 85-byte row. It is the same row as the verified startup
+//!   reference `0037-ready.bin`, and `tests/piece_056.rs` decodes both captured startup rows.
 
 use std::collections::BTreeMap;
 
@@ -74,7 +76,8 @@ pub const PLAYER_UPDATE_SUB_EFFECT_TAG_COMPOSITE_EFFECTS_ENABLE: u16 = 43;
 pub const EFFECT_TAG_LEN: usize = 72;
 /// `ClientEffectTag` adds IconId, a bool, NameId and one more int.
 pub const CLIENT_EFFECT_TAG_LEN: usize = EFFECT_TAG_LEN + 13;
-pub const ADD_EFFECT_TAG_LEN: usize = 4 + 4 + CLIENT_EFFECT_TAG_LEN;
+/// Header, tag id, i32 blob length, then the blob (client reader `0x008d8870`).
+pub const ADD_EFFECT_TAG_LEN: usize = 4 + 4 + 4 + CLIENT_EFFECT_TAG_LEN;
 pub const REMOVE_EFFECT_TAG_LEN: usize = 4 + 4;
 pub const ADD_COMPOSITE_EFFECT_LEN: usize = 4 + 8 + 4 + 4 + 8 + 8;
 pub const REMOVE_COMPOSITE_EFFECT_LEN: usize = 4 + 8 + 4;
@@ -241,6 +244,11 @@ impl ImmunitySet {
 /// roles are `duration_seconds`, `icon_id`, `name_id` and `composite_effect_id`.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct EffectTagPayload {
+    /// The client's instance id: reader `0x008e93e0` stores it at record +8, and the
+    /// `PlayerEffectTags` getter `0x00c8e720` returns +8 as column 0, which `BuffsUpdated` keys
+    /// one buff icon by and `CancelBuff` sends back. Writers set it to the row's tag id: both
+    /// captured startup rows have it (tag 2 -> 2, tag 4 -> 4; tag 4's `unknown_3` is 8, so it is
+    /// not that field).
     pub unknown_1: i32,
     pub unknown_2: i32,
     pub unknown_3: i32,
@@ -332,12 +340,12 @@ pub struct EffectRequest {
 }
 
 impl EffectRequest {
-    /// A neutral `ClientEffectTag`: only the four recovered roles carry caller data, every other
-    /// member is zero because its meaning is unrecovered. `unknown_2` is used to carry the
-    /// definition id so a persisted row can be matched again after a restart.
-    fn to_payload(&self) -> EffectTagPayload {
+    /// A neutral `ClientEffectTag`: only the four recovered roles and the instance id carry caller
+    /// data, every other member is zero because its meaning is unrecovered. `unknown_2` is used to
+    /// carry the definition id so a persisted row can be matched again after a restart.
+    fn to_payload(&self, tag_id: i32) -> EffectTagPayload {
         EffectTagPayload {
-            unknown_1: 0,
+            unknown_1: tag_id,
             unknown_2: self.definition_id,
             unknown_3: 0,
             unknown_4: 0,
@@ -482,7 +490,7 @@ impl StatusLedger {
         let refreshed = refreshed_on.is_some();
         let tag_id = refreshed_on.unwrap_or_else(|| self.allocate());
 
-        let tag = request.to_payload();
+        let tag = request.to_payload(tag_id);
         let expires_at_ms =
             now_ms.saturating_add(u64::try_from(request.duration_seconds).unwrap_or(0) * 1000);
         self.active.insert(
@@ -565,7 +573,10 @@ impl StatusLedger {
             if remaining <= 0 {
                 continue;
             }
-            let tag = tag.with_duration_seconds(remaining);
+            let tag = EffectTagPayload {
+                unknown_1: *tag_id,
+                ..tag.with_duration_seconds(remaining)
+            };
             let effect = ActiveEffect {
                 tag_id: *tag_id,
                 kind: StatusKind::Status,
@@ -654,6 +665,9 @@ pub fn encode_add_effect_tag(tag_id: i32, tag: &EffectTagPayload) -> Vec<u8> {
     let mut bytes = Vec::with_capacity(ADD_EFFECT_TAG_LEN);
     bytes.extend(client_header(CLIENT_UPDATE_SUB_ADD_EFFECT_TAG));
     push_i32(&mut bytes, tag_id);
+    // Reader 0x008d8870 -> 0x008bfc00 reads an i32 length, then that many blob bytes. The parse
+    // is strict (case 16 at 0x0093a5fd passes 0 to 0x008f8ef0): any trailing byte drops the row.
+    push_i32(&mut bytes, CLIENT_EFFECT_TAG_LEN as i32);
     push_payload(&mut bytes, tag);
     bytes
 }
@@ -665,7 +679,14 @@ pub fn decode_add_effect_tag(bytes: &[u8]) -> Result<(i32, EffectTagPayload), St
         ADD_EFFECT_TAG_LEN,
     )?;
     let tag_id = read_i32(bytes, 4)?;
-    Ok((tag_id, read_payload(bytes, 8)?))
+    let blob_len = read_i32(bytes, 8)?;
+    if blob_len != CLIENT_EFFECT_TAG_LEN as i32 {
+        return Err(StatusError::BadLength {
+            expected: CLIENT_EFFECT_TAG_LEN,
+            got: usize::try_from(blob_len).unwrap_or(0),
+        });
+    }
+    Ok((tag_id, read_payload(bytes, 12)?))
 }
 
 pub fn encode_remove_effect_tag(tag_id: i32) -> Vec<u8> {
