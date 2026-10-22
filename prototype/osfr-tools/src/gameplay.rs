@@ -41,6 +41,8 @@ use std::{
     time::{SystemTime, UNIX_EPOCH},
 };
 
+mod admin_move;
+pub use admin_move::{AdminMove, MoveTarget};
 mod content_reload;
 mod crafting;
 mod derby_session;
@@ -284,6 +286,8 @@ pub struct Outcome {
     /// T199: a `realm broadcast` notice set by `realm broadcast <text>`. Session-only:
     /// the gateway fans it out once after a successful commit and never saves it.
     pub broadcast: Option<String>,
+    /// L043: an admin `realm move` the host runs once after a successful commit, like `broadcast`.
+    pub admin_move: Option<AdminMove>,
 }
 
 impl Outcome {
@@ -302,6 +306,7 @@ impl Outcome {
             group_heal,
             nearby,
             broadcast,
+            admin_move,
         } = other;
         self.dev_command_denied |= dev_command_denied;
         self.shared_field = shared_field.or(self.shared_field.take());
@@ -313,6 +318,7 @@ impl Outcome {
         self.group_heal = group_heal.or(self.group_heal.take());
         self.nearby.extend(nearby);
         self.broadcast = broadcast.or(self.broadcast.take());
+        self.admin_move = admin_move.or(self.admin_move.take());
     }
 }
 
@@ -2202,6 +2208,9 @@ impl Gameplay {
         now_ms: u64,
     ) -> io::Result<Outcome> {
         if let Some(out) = self.command_refusal(inner, character.guid)? {
+            return Ok(out);
+        }
+        if let Some(out) = self.admin_move_request(inner, character.guid)? {
             return Ok(out);
         }
         if let Some(out) = self.handle_progression_extras(inner)? {

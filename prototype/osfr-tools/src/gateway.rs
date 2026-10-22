@@ -29,6 +29,7 @@ use std::io::{self, Read};
 use std::path::{Component, Path};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
+mod admin_move;
 mod trade_bridge;
 
 const MAX_MESSAGE: usize = 1_048_576;
@@ -132,6 +133,8 @@ pub struct GatewayOutcome {
     /// T199: `realm broadcast` text gameplay staged for one post-commit fanout to every
     /// online chat session. Session-only: dropped when the transaction is refused or fails.
     pub broadcast: Option<String>,
+    /// L043: an admin `realm move` the host runs once after a successful commit, like `broadcast`.
+    pub admin_move: Option<crate::gameplay::AdminMove>,
     /// Inner application payloads that passed the gateway parser, in request order.
     pub applications: Vec<Vec<u8>>,
     pub state_changed: bool,
@@ -1705,6 +1708,7 @@ impl Gateway {
                         // T199: a later non-broadcast child in the same bundle must not
                         // clear an earlier notice; two broadcasts keep the last.
                         outcome.broadcast = result.broadcast.or(outcome.broadcast.take());
+                        outcome.admin_move = result.admin_move.or(outcome.admin_move.take());
                         outcome.nearby.extend(result.nearby);
                         outcome.dev_command_denials += usize::from(result.dev_command_denied);
                         outcome.applications.push(inner.clone());

@@ -148,16 +148,34 @@ impl SecurityLog {
             return Ok(());
         };
         let (action, reason) = event.kind.action_reason();
-        let timestamp_ms = SystemTime::now()
-            .duration_since(UNIX_EPOCH)
-            .unwrap_or_default()
-            .as_millis()
-            .min(u64::MAX as u128) as u64;
-        let mut line = serde_json::to_vec(&serde_json::json!({
-            "timestamp_ms": timestamp_ms, "kind": event.kind,
+        let count = slot.count;
+        self.append(serde_json::json!({
+            "timestamp_ms": timestamp_ms(), "kind": event.kind,
             "account_id": event.account_id, "session_id": event.session_id,
-            "action": action, "outcome": "refused", "reason": reason, "count": slot.count,
+            "action": action, "outcome": "refused", "reason": reason, "count": count,
         }))?;
+        let slot = &mut self.pending[index];
+        slot.count = 0;
+        slot.event = None;
+        slot.last_write = Some(now);
+        Ok(())
+    }
+
+    /// L043: one row per admin character move, written at once (never batched or merged like
+    /// refusals). Numbers only: the row has no field for a name or chat text.
+    pub fn record_admin_move(&mut self, row: AdminMoveRow) -> io::Result<()> {
+        let pose = |(zone_id, position): (u32, [f32; 3])| serde_json::json!({"zone_id": zone_id, "position": position});
+        self.append(serde_json::json!({
+            "timestamp_ms": timestamp_ms(), "kind": "admin_move",
+            "account_id": row.account_id, "session_id": row.session_id,
+            "action": "move_character", "outcome": "applied", "target_guid": row.target_guid,
+            "online": row.online, "from": pose(row.from), "to": pose(row.to),
+        }))
+    }
+
+    /// Append one JSON row, rotating to `.previous` first when the row would pass the cap.
+    fn append(&mut self, row: serde_json::Value) -> io::Result<()> {
+        let mut line = serde_json::to_vec(&row)?;
         line.push(b'\n');
         if line.len() as u64 > self.max_bytes {
             return Err(io::Error::new(
@@ -184,13 +202,28 @@ impl SecurityLog {
                 .open(&self.path)?;
         }
         file.write_all(&line)?;
-        file.flush()?;
-        let slot = &mut self.pending[index];
-        slot.count = 0;
-        slot.event = None;
-        slot.last_write = Some(now);
-        Ok(())
+        file.flush()
     }
+}
+
+/// L043: an applied admin move. Server-owned numbers: the acting account and session, the
+/// moved character's GUID, whether it was online, and its zone and position before and after.
+#[derive(Clone, Copy, Debug)]
+pub struct AdminMoveRow {
+    pub account_id: u64,
+    pub session_id: u64,
+    pub target_guid: u64,
+    pub online: bool,
+    pub from: (u32, [f32; 3]),
+    pub to: (u32, [f32; 3]),
+}
+
+fn timestamp_ms() -> u64 {
+    SystemTime::now()
+        .duration_since(UNIX_EPOCH)
+        .unwrap_or_default()
+        .as_millis()
+        .min(u64::MAX as u128) as u64
 }
 
 #[cfg(test)]
@@ -355,6 +388,55 @@ mod tests {
         log.record_at(event(EventKind::AuthFailure), now + Duration::from_secs(1))
             .unwrap();
         assert_eq!(rows(&scratch.path())[0]["count"], 3);
+    }
+
+    /// L043: every admin move is its own row at once, even two in the same instant, and the
+    /// row carries numbers only.
+    #[test]
+    fn admin_moves_are_written_at_once_with_numbers_only() {
+        let scratch = Scratch::new();
+        let mut log = SecurityLog::open(scratch.path()).unwrap();
+        let row = AdminMoveRow {
+            account_id: 7,
+            session_id: 11,
+            target_guid: 42,
+            online: false,
+            from: (0, [1.0, 2.0, 3.0]),
+            to: (0, [-1904.5, -39.25, 413.5]),
+        };
+        log.record_admin_move(row).unwrap();
+        log.record_admin_move(AdminMoveRow {
+            online: true,
+            ..row
+        })
+        .unwrap();
+        let rows = rows(&scratch.path());
+        assert_eq!(rows.len(), 2, "admin moves are never batched");
+        assert_eq!(rows[0]["kind"], "admin_move");
+        assert_eq!(rows[0]["outcome"], "applied");
+        assert_eq!(rows[0]["account_id"], 7);
+        assert_eq!(rows[0]["target_guid"], 42);
+        assert_eq!(
+            rows[0]["to"]["position"],
+            serde_json::json!([-1904.5, -39.25, 413.5])
+        );
+        assert_eq!(rows[1]["online"], true);
+        let keys: Vec<_> = rows[0].as_object().unwrap().keys().cloned().collect();
+        assert_eq!(
+            keys,
+            [
+                "account_id",
+                "action",
+                "from",
+                "kind",
+                "online",
+                "outcome",
+                "session_id",
+                "target_guid",
+                "timestamp_ms",
+                "to"
+            ]
+        );
     }
 
     #[test]

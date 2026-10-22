@@ -301,6 +301,21 @@ impl AccountStore {
         self.data.characters.get(&guid)
     }
 
+    /// L043 (`realm move`, admin only): the one character whose displayed name equals `name`,
+    /// ignoring case. `None` when no character or several match, so a name never picks one of two.
+    pub fn character_by_display_name(&self, name: &str) -> Option<u64> {
+        let name = name.to_lowercase();
+        let mut found = self
+            .data
+            .characters
+            .iter()
+            .filter(|(_, record)| record.identity.display_name().to_lowercase() == name);
+        match (found.next(), found.next()) {
+            (Some((guid, _)), None) => Some(*guid),
+            _ => None,
+        }
+    }
+
     pub(crate) fn character_name_taken(&self, first: &str, last: &str) -> bool {
         // (R) Global uniqueness across displayed and pending names, compared by `name_key`.
         let (first, last) = (name_key(first), name_key(last));

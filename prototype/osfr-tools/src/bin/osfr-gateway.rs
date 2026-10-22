@@ -34,6 +34,8 @@ use osfr_tools::studio;
 use osfr_tools::trade::{TradeMessage, TradeService, TradeSettlement};
 use osfr_tools::world::{NpcVisibility, World, WorldPose};
 
+#[path = "osfr_gateway/admin_move.rs"]
+mod admin_move;
 #[path = "osfr_gateway/delivery.rs"]
 mod delivery;
 use delivery::{chat_error_delivery, wrap_application};
@@ -1130,10 +1132,7 @@ impl Session {
         // before Ready/Loaded. Reject duplicates before reading or writing a
         // save; a snapshot loaded here could otherwise outlive its active owner
         // and overwrite later progress on disconnect or shutdown.
-        if sessions.values().any(|session| {
-            session.selected_character
-                && (session.account_guid == account.id || session.character_guid == guid)
-        }) {
+        if owning_session(sessions, account.id, guid).is_some() {
             return Err("account or character already has a selected session".into());
         }
         let mut identity = record.identity.clone();
@@ -1668,6 +1667,7 @@ impl Session {
         // T199: the notice is staged with the transaction, then fanned out only after
         // `commit_outcome` succeeds. Nothing is queued for a refused or failed transaction.
         let broadcast = outcome.broadcast.take();
+        let admin_move = outcome.admin_move.take();
         // T008: the jump body is built from this request's final pose; fan it out
         // only after the commit, like the notice above.
         let jump = staged_gateway.take_jump_relay();
@@ -1682,6 +1682,9 @@ impl Session {
         )?;
         if committed {
             delivery::post_commit(self, sessions, world, broadcast, jump)?;
+            if let Some(request) = admin_move {
+                admin_move::run(self, options, sessions, world, membership, now_ms, request)?;
+            }
         }
         Ok(())
     }
@@ -2757,6 +2760,17 @@ fn rider_event(frame: &[u8]) -> Option<(u64, bool)> {
         )),
         _ => None,
     }
+}
+
+/// The selected session that owns `account` or `character`. Login refuses a second selection
+/// while one exists, and an admin move (L043) takes the same rule before it touches a save.
+fn owning_session(sessions: &SessionMap, account: u64, character: u64) -> Option<SessionKey> {
+    sessions
+        .iter()
+        .find(|(_, s)| {
+            s.selected_character && (s.account_guid == account || s.character_guid == character)
+        })
+        .map(|(key, _)| *key)
 }
 
 fn login_character_binding(message: &[u8]) -> io::Result<Option<(u64, String)>> {

@@ -100,6 +100,39 @@ pub fn save(path: &Path, snapshot: &Snapshot) -> io::Result<()> {
     write_document(path, &document)
 }
 
+/// L043: rewrite only the saved character's position and rotation (`rotation` `None` keeps it),
+/// for an admin moving a character no session owns. The save must exist and be in `zone_id`;
+/// nothing is created. Gameplay and the pet roster are carried through unchanged into the
+/// one atomic `save`. Returns the character before and after; a refusal or failure leaves the
+/// file untouched.
+pub fn replace_pose(
+    path: &Path,
+    zone_id: u32,
+    position: [f32; 3],
+    rotation: Option<[f32; 3]>,
+) -> io::Result<(CharacterState, CharacterState)> {
+    let document = read_document(path)?;
+    if document.character.zone_id != zone_id {
+        return Err(io::Error::new(
+            io::ErrorKind::InvalidInput,
+            "the saved character is in another zone",
+        ));
+    }
+    let before = document.character;
+    let after = CharacterState {
+        position,
+        rotation: rotation.unwrap_or(before.rotation),
+        ..before.clone()
+    };
+    let snapshot = Snapshot {
+        character: after.clone(),
+        gameplay: document.gameplay,
+        pets: document.pets,
+    };
+    save(path, &snapshot)?;
+    Ok((before, after))
+}
+
 /// Load housing state from the same canonical save envelope. The caller supplies its own state
 /// type so this module stays independent of the not-yet-routed housing service.
 pub fn load_housing_state<T: DeserializeOwned>(path: &Path) -> io::Result<Option<T>> {

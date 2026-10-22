@@ -129,3 +129,61 @@ fn one_save_writes_character_and_roster_and_none_keeps_the_disk_roster() {
     fs::remove_file(path).unwrap();
     fs::remove_dir(dir).unwrap();
 }
+
+/// L043: an admin moving an offline character rewrites only its position and rotation; a save
+/// in another zone or a missing save is refused and left exactly as it was.
+#[test]
+fn replace_pose_changes_only_the_pose_and_refusals_change_nothing() {
+    let dir = std::env::temp_dir().join(format!("osfr-game-store-pose-{}", std::process::id()));
+    fs::create_dir(&dir).unwrap();
+    let path = dir.join("state.json");
+    load_or_create(&path, initial()).unwrap();
+    save_housing_state(&path, &serde_json::json!({"rooms": [1, 2]})).unwrap();
+    let with_pets = Snapshot {
+        character: initial(),
+        gameplay: None,
+        pets: Some(serde_json::json!({"roster": [7]})),
+    };
+    save(&path, &with_pets).unwrap();
+    let before: serde_json::Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    let (from, to) = osfr_tools::game_store::replace_pose(
+        &path,
+        0,
+        [-1904.46, -39.29, 413.316],
+        Some([0.0, 0.0, -1.0]),
+    )
+    .unwrap();
+    assert_eq!(from, initial());
+    assert_eq!(to.position, [-1904.46, -39.29, 413.316]);
+    let mut after: serde_json::Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    assert_eq!(
+        after["character"]["rotation"],
+        serde_json::json!([0.0, 0.0, -1.0])
+    );
+    let mut expected = before.clone();
+    for document in [&mut after, &mut expected] {
+        let character = document["character"].as_object_mut().unwrap();
+        character.remove("position");
+        character.remove("rotation");
+    }
+    assert_eq!(after, expected, "only the pose may change");
+    // `None` keeps the saved facing.
+    let (_, kept) = osfr_tools::game_store::replace_pose(&path, 0, [1.0, 1.0, 1.0], None).unwrap();
+    assert_eq!(kept.rotation, [0.0, 0.0, -1.0]);
+
+    let saved = fs::read(&path).unwrap();
+    let elsewhere = osfr_tools::game_store::replace_pose(&path, 411, [0.0; 3], None).unwrap_err();
+    assert_eq!(elsewhere.kind(), std::io::ErrorKind::InvalidInput);
+    let far = osfr_tools::game_store::replace_pose(&path, 0, [2_000_000.0, 0.0, 0.0], None);
+    assert!(far.is_err());
+    assert_eq!(
+        fs::read(&path).unwrap(),
+        saved,
+        "a refusal rewrote the save"
+    );
+    let missing = dir.join("never-entered.json");
+    let absent = osfr_tools::game_store::replace_pose(&missing, 0, [0.0; 3], None).unwrap_err();
+    assert_eq!(absent.kind(), std::io::ErrorKind::NotFound);
+    assert!(!missing.exists(), "a move must never create a save");
+    fs::remove_dir_all(dir).unwrap();
+}

@@ -1770,3 +1770,9 @@ mod f276_field_session_save;
 #[cfg(test)]
 #[path = "l039_login_pose.rs"]
 mod l039_login_pose;
+
+/// L043 (lead): admin `realm move` of an online, loading or offline character, through a real
+/// `Server` in account-store mode.
+#[cfg(test)]
+#[path = "l043_admin_move.rs"]
+mod l043_admin_move;

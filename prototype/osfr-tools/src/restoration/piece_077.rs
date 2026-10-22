@@ -1331,16 +1331,42 @@ fn arrive_at_destination(
 /// Arrival point: the stored height, raised to the server's terrain plus a
 /// small lift when the terrain is higher; facing kept unless one is known.
 fn arrival(
-    mut position: [f32; 3],
+    position: [f32; 3],
     facing: Option<[f32; 3]>,
     ctx: &TravelContext,
     world: &WarpWorld,
 ) -> WarpRelocation {
+    WarpRelocation {
+        position: lifted(position, world),
+        rotation: facing.unwrap_or(ctx.rotation),
+    }
+}
+
+fn lifted(mut position: [f32; 3], world: &WarpWorld) -> [f32; 3] {
     if let Some(ground) = (world.ground)(position[0], position[2]).filter(|g| g.is_finite()) {
         position[1] = position[1].max(ground + ARRIVAL_LIFT_M);
     }
-    WarpRelocation {
-        position,
-        rotation: facing.unwrap_or(ctx.rotation),
+    position
+}
+
+impl WarpRegistry {
+    /// L043 (`realm move`, admin only): the warpstone named `name` (ASCII case-insensitive),
+    /// attuned or not, and its arrival by the 90/122 rule above. The facing is `None` where
+    /// that rule keeps the moved character's own.
+    pub fn named_arrival(
+        &self,
+        name: &str,
+        world: &WarpWorld,
+    ) -> Option<([f32; 3], Option<[f32; 3]>)> {
+        let destination = self
+            .destinations
+            .iter()
+            .find(|d| d.is_warpstone && d.name.eq_ignore_ascii_case(name))?;
+        let [x, y, z, _] = destination.position;
+        let [fx, fy, fz, _] = destination.rotation;
+        Some((
+            lifted([x, y, z], world),
+            destination.facing_known.then_some([fx, fy, fz]),
+        ))
     }
 }

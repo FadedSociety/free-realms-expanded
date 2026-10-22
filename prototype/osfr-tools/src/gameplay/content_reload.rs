@@ -153,6 +153,11 @@ mod tests {
             }),
             nearby: vec![vec![4]],
             broadcast: Some("staged notice".into()),
+            admin_move: Some(AdminMove {
+                target: MoveTarget::Guid(9),
+                position: [4.0, 5.0, 6.0],
+                rotation: None,
+            }),
         }
     }
 
@@ -181,13 +186,14 @@ mod tests {
         );
         assert_eq!(live.nearby, vec![vec![2], vec![4]]);
         assert_eq!(live.broadcast.as_deref(), Some("staged notice"));
+        assert_eq!(live.admin_move.as_ref().unwrap().position, [4.0, 5.0, 6.0]);
         // Nothing staged never wipes the live state.
         live.absorb(Outcome::default());
         assert!(live.dev_command_denied && live.changed);
         assert!(live.shared_field.is_some() && live.zoning.is_some());
         assert!(
-            live.broadcast.is_some(),
-            "an empty outcome wiped the notice"
+            live.broadcast.is_some() && live.admin_move.is_some(),
+            "an empty outcome wiped the notice or the move"
         );
         assert_eq!(live.replies, vec![vec![1], vec![3]]);
     }

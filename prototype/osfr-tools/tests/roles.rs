@@ -64,6 +64,7 @@ fn roles_allow_only_the_documented_commands() {
         "sim",
         "role",
         "broadcast",
+        "move",
         "heal",
         "fightlog",
         "harvest",
