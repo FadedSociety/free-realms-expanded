@@ -149,8 +149,22 @@ fn built_startup_sequence_matches_the_captured_character_byte_for_byte() {
     for (index, message) in actual.iter().enumerate() {
         let phase = if index < 8 { "login" } else { "ready" };
         let expected = fs::read(reference.join(format!("{index:04}-{phase}.bin"))).unwrap();
+        let expected = fresh_character(index, expected);
         assert_eq!(message, &expected, "startup message index {index:02}");
     }
+}
+
+/// T448: a fresh login sends none of the captured player's collected entries, so the
+/// expected self-data (startup index 7) is the capture with every collected byte cleared.
+fn fresh_character(index: usize, captured: Vec<u8>) -> Vec<u8> {
+    if index != 7 {
+        return captured;
+    }
+    let mut data = typed_selfdata::parse_self(&captured);
+    for row in data.collections.iter_mut().flat_map(|c| &mut c.keyed_rows) {
+        row.payload[28] = 0;
+    }
+    typed_selfdata::build_self(&data)
 }
 
 #[test]
@@ -538,13 +552,17 @@ fn actual_original_client_capture_when_explicitly_configured() {
     // Initial 46 templates + seven time replies; legacy area-of-interest reply
     // 104 is beyond this one-character gateway slice.
     assert_eq!(replies.len(), 53);
-    for (reply, original) in replies[..46].iter().zip(
-        analysis["directions"]["server-to-client"]["messages"]
-            .as_array()
-            .unwrap(),
-    ) {
+    for (index, (reply, original)) in replies[..46]
+        .iter()
+        .zip(
+            analysis["directions"]["server-to-client"]["messages"]
+                .as_array()
+                .unwrap(),
+        )
+        .enumerate()
+    {
         let expected = fs::read(capture.join(original["path"].as_str().unwrap())).unwrap();
-        assert_eq!(reply, &expected);
+        assert_eq!(reply, &fresh_character(index, expected));
     }
 }
 

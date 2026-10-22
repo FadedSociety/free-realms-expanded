@@ -9,6 +9,7 @@
 use crate::{
     inventory::Inventory,
     rewards::{self, RewardBundleRow, RewardGrant, RewardState},
+    startup_selfdata::CollectionRecord,
 };
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -585,6 +586,24 @@ impl CollectionProgression {
             reward_state: next_rewards,
             reward_packets,
         })
+    }
+}
+
+/// Set the login self-data collected flags from the character's own ledger.
+///
+/// Client `008fb360` reads each keyed row as a u32 map key and then `008dacc0`, which
+/// reads seven dwords and stores the final bool at entry+0x20, so `payload[28]` is
+/// that bool. The `CollectionDataSource` field getter (`00c326c0`, default case at
+/// `00c32836`) returns entry+0x20 for columns 9.. (`EntryCollected1..8` at 9..16 in
+/// `ScriptsBase.lua:3057-3064`). Community decode of the 29 bytes: DefinitionId,
+/// Index, CollectionId, NameId, IconId, IconTintId, Unknown, Collected, with the
+/// entry id as the key (R). Rows are never dropped or reordered: the data source's
+/// column count is 9 plus the longest entry list (`00c31f00` via `00992cd0`), so
+/// without an 8-entry collection `EntryCollected8` (column 16) is out of range.
+pub fn apply_collected_flags(rows: &mut [CollectionRecord], ledger: &CollectionLedger) {
+    for row in rows.iter_mut().flat_map(|record| &mut record.keyed_rows) {
+        let collected = i32::try_from(row.key).is_ok_and(|key| ledger.is_collected(key));
+        row.payload[28] = u8::from(collected);
     }
 }
 
@@ -1401,6 +1420,11 @@ pub struct ProgressionExtrasState {
     achievements: AchievementState,
     #[serde(default)]
     pending_claims: Vec<PendingClaimState>,
+    /// Collected entry ids and completed collection ids (T448). Older saves have
+    /// none and load empty; the login self-data flags come from it through
+    /// [`apply_collected_flags`]. `load` bounds both sets.
+    #[serde(default)]
+    pub collections: CollectionLedger,
 }
 
 #[derive(Clone, Default)]
@@ -1419,6 +1443,7 @@ pub struct ProgressionExtras {
     titles: TitleState,
     claims: ClaimWindow,
     achievements: AchievementState,
+    collections: CollectionLedger,
 }
 
 impl ProgressionExtras {
@@ -1437,10 +1462,17 @@ impl ProgressionExtras {
         {
             return Err(invalid("invalid achievement state"));
         }
+        // Unknown ids are kept (content may come back); only the size is refused.
+        if saved.collections.collected_count() > collection_ledger::MAX_LEDGER_ENTRIES
+            || saved.collections.completed_count() > collection_ledger::MAX_LEDGER_ENTRIES
+        {
+            return Err(invalid("invalid collection ledger"));
+        }
         Ok(Self {
             titles: saved.titles,
             claims: ClaimWindow::from_saved(saved.claimed_ids, saved.pending_claims)?,
             achievements: saved.achievements,
+            collections: saved.collections,
         })
     }
 
@@ -1450,6 +1482,7 @@ impl ProgressionExtras {
             claimed_ids: self.claims.claimed_ids().clone(),
             achievements: self.achievements.clone(),
             pending_claims: self.claims.pending_state(),
+            collections: self.collections.clone(),
         }
     }
 
@@ -1458,6 +1491,11 @@ impl ProgressionExtras {
             && self.claims.claimed_ids().is_empty()
             && self.claims.pending_count() == 0
             && self.achievements == AchievementState::default()
+            && self.collections == CollectionLedger::default()
+    }
+
+    pub fn collections(&self) -> &CollectionLedger {
+        &self.collections
     }
 
     pub fn titles(&self) -> &TitleState {

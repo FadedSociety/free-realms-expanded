@@ -1939,14 +1939,17 @@ impl Gateway {
             data.name.last.clone_from(&identity.last_name);
             data.gender = identity.gender as u32;
         }
+        let mut collections = crate::progression_extras::CollectionLedger::default();
         if let Some(game) = gameplay {
             let current = game.state();
             data.inventory = current.inventory;
             data.quests = current.quests;
+            collections = current.progression_extras.unwrap_or_default().collections;
             if let Some(profiles) = current.profiles {
                 self.apply_profile_state(&mut data, &profiles)?;
             }
         }
+        crate::progression_extras::apply_collected_flags(&mut data.collections, &collections);
         // (R) Action-bar assignments have no field in the current saved
         // GameplayState, so preserve the captured typed rows until that state exists.
         // The module-owned opaque post-effect tail remains untouched.

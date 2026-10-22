@@ -232,8 +232,10 @@ pub struct CollectionProgress {
     pub complete: bool,
 }
 
-/// RECONSTRUCTED: the per-character collection ledger.
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+/// RECONSTRUCTED: the per-character collection ledger. Saved inside the character's
+/// `ProgressionExtrasState`; both sets are persisted, so a missing one loads empty.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(default, deny_unknown_fields)]
 pub struct CollectionLedger {
     collected: BTreeSet<i32>,
     completed: BTreeSet<i32>,
