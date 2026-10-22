@@ -3,6 +3,24 @@
 //! filters shared-field packets per recipient.
 use super::*;
 
+/// Queue one delivery: on the current session, or on the recipient's own session when it is
+/// still connected (a recipient that left is skipped).
+pub(super) fn queue_delivery(
+    current: &mut Session,
+    sessions: &mut SessionMap,
+    world: &SharedWorld,
+    delivery: Delivery,
+) -> Result<(), Box<dyn std::error::Error>> {
+    if delivery.recipient == current.id {
+        current.sender.queue_message(&delivery.bytes)?;
+    } else if let Some(key) = world.session_keys.get(&delivery.recipient) {
+        if let Some(session) = sessions.get_mut(key) {
+            session.sender.queue_message(&delivery.bytes)?;
+        }
+    }
+    Ok(())
+}
+
 /// Wrap one inner application packet in the 5/1 tunnel.
 pub(super) fn wrap_application(inner: &[u8]) -> Vec<u8> {
     let mut out = vec![5, 0, 1];

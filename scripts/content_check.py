@@ -31,6 +31,7 @@ import json
 import re
 import sys
 import time
+import xml.etree.ElementTree as ET
 from datetime import datetime, timezone
 from pathlib import Path
 
@@ -45,6 +46,7 @@ INVENTORY = ROOT / "lab" / "reports" / "kart-weapons-probe-v20-20261010" / "cont
 DEFAULT_ITEM_CATALOGUE = ROOT / "lab" / "reports" / "round70-native-20261016T061000Z" / "content" / "item-catalogue.json"
 STARTER_ITEMS_FIXTURE = Path(__file__).resolve().parent / "fixtures" / "starter_items.json"
 LEGACY_RESOURCES = ROOT / "lab" / "references" / "FreeRealms-Legacy" / "src" / "Resources"
+CLIENT_AREAS_XML = ROOT / "lab" / "extracted" / "named" / "Assets_000" / "Assets_000" / "FabledRealmsAreas.xml"
 
 MAX_PER_GROUP = 25        # findings kept per (severity, file, field, problem code)
 PREVIEW_CHARS = 160
@@ -922,9 +924,32 @@ class Checker:
                 and num(p.get("max_alive_per_instance"), 1, 32, True)):
             bad("pickup", p, "pickup needs ttl_ms 5000..120000, radius 0.5..5, max_alive_per_instance 1..32")
 
+    def check_client_areas(self, rel, data):
+        """T457: every area id is an AreaDefinition the client ships with AreaEnabled="0"."""
+        if not CLIENT_AREAS_XML.is_file():
+            self.notes.append(f"{CLIENT_AREAS_XML} missing; client area ids not checked")
+            return
+        root = ET.fromstring("<r>" + CLIENT_AREAS_XML.read_text(encoding="utf-8") + "</r>")
+        disabled = {int(d.get("id")) for d in root.iter("AreaDefinition") if d.get("AreaEnabled") == "0"}
+        data = data if isinstance(data, dict) else {}
+        switchable = data.get("switchable") if isinstance(data.get("switchable"), dict) else {}
+        lists = [("switchable.area_ids", switchable.get("area_ids"))]
+        lists += [(f"always_on[{i}].area_id", [row.get("area_id")])
+                  for i, row in enumerate(data.get("always_on") or []) if isinstance(row, dict)]
+        lists += [(f"seasons[{i}].area_ids", row.get("area_ids"))
+                  for i, row in enumerate(data.get("seasons") or []) if isinstance(row, dict)]
+        for path, ids in lists:
+            for area_id in ids if isinstance(ids, list) else [ids]:
+                self.stats["client_area"] += 1
+                if area_id not in disabled:
+                    self.add("error", "client_area_unknown", rel, path, "area_id", area_id,
+                             'not an AreaDefinition with AreaEnabled="0" in FabledRealmsAreas.xml')
+
     def check_file(self, rel: str, data):
         if rel == "power_ups.json":
             self.check_power_ups(rel, data)
+        if rel == "client_areas.json":
+            self.check_client_areas(rel, data)
         if rel == "job_abilities.json" and isinstance(data, dict):
             # Every skill must opt into its job level. Omission must never
             # silently turn a later skill into a level-one unlock.

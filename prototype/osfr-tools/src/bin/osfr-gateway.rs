@@ -39,8 +39,11 @@ mod admin_move;
 #[path = "osfr_gateway/delivery.rs"]
 mod delivery;
 use delivery::{
-    chat_error_delivery, field_packet, field_packets_for, field_recipient_matches, wrap_application,
+    chat_error_delivery, field_packet, field_packets_for, field_recipient_matches, queue_delivery,
+    wrap_application,
 };
+#[path = "osfr_gateway/client_area_routing.rs"]
+mod client_area_routing;
 #[path = "osfr_gateway/moderation.rs"]
 mod moderation;
 #[path = "osfr_gateway/paths.rs"]
@@ -502,6 +505,8 @@ struct SharedWorld {
     /// W173: each joined character's channel switches and bubble colour (26/32, 26/33, 26/18).
     chat_settings: social_chat::ChatSettingsBook,
     guilds: t006_guilds::GuildWorld,
+    /// T457: opcode-89 client areas (always-on, seasons, event toggles); never saved.
+    client_areas: osfr_tools::client_areas::ClientAreas,
     security: Arc<Mutex<Security>>,
 }
 
@@ -587,6 +592,7 @@ impl SharedWorld {
             chat_history: ChatHistory::default(),
             chat_settings: social_chat::ChatSettingsBook::default(),
             guilds: Default::default(),
+            client_areas: Default::default(),
             security: Arc::default(),
         }
     }
@@ -1756,6 +1762,7 @@ impl Session {
         outcome.gameplay_changed |= ended.gameplay_changed;
         outcome.replies.extend(ended.replies);
         outcome.nearby.extend(ended.nearby);
+        client_area_routing::world_ready(&mut outcome, &staged_gateway, world);
         self.bundle_budget.stage(&outcome.replies)?;
         let current = staged_gateway.state().clone();
         let transfer = outcome.began_zoning || previous.zone_id != current.zone_id;
@@ -2750,22 +2757,6 @@ fn persist_social_changes(before: &SharedWorld, after: &SharedWorld) -> io::Resu
     Ok(())
 }
 
-fn queue_delivery(
-    current: &mut Session,
-    sessions: &mut SessionMap,
-    world: &SharedWorld,
-    delivery: Delivery,
-) -> Result<(), Box<dyn std::error::Error>> {
-    if delivery.recipient == current.id {
-        current.sender.queue_message(&delivery.bytes)?;
-    } else if let Some(key) = world.session_keys.get(&delivery.recipient) {
-        if let Some(session) = sessions.get_mut(key) {
-            session.sender.queue_message(&delivery.bytes)?;
-        }
-    }
-    Ok(())
-}
-
 /// The character and whether it was added (true) or removed (false), for the registry's AddPc
 /// (35/1) and RemovePlayer (35/3) tunnel frames; `None` for every other delivery.
 fn rider_event(frame: &[u8]) -> Option<(u64, bool)> {
@@ -3397,6 +3388,7 @@ impl Server {
             .social
             .set_group_invite_ttl(options.group_invite_ttl_ms)?;
         world.guilds = t006_guilds::GuildWorld::load(&options.state, options.guild_invite_ttl_ms)?;
+        world.client_areas = client_area_routing::load(&options)?;
         if let Some(path) = &options.security_log {
             // Logging is best effort: an unusable file disables it, never the server.
             match SecurityLog::open(path) {
@@ -3810,6 +3802,8 @@ impl Server {
         if tick_due {
             self.next_tick_ms = now_ms.saturating_add(50);
             self.tick_shared_fields(now_ms);
+            let unix_ms = osfr_tools::client_areas::unix_now_ms();
+            client_area_routing::season_tick(&mut self.world, &mut self.sessions, unix_ms);
         }
         let keys = self.sessions.keys().copied().collect::<Vec<_>>();
         for key in keys {
