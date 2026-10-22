@@ -854,6 +854,26 @@ impl Inventory {
         })
     }
 
+    /// Take `amount` coins for a server-priced service; a wallet below it is an
+    /// error and changes nothing. Answers with the 38/19 balance.
+    pub fn spend_coins(&mut self, amount: u32) -> io::Result<InventoryOutcome> {
+        let coins = self
+            .state
+            .coins
+            .checked_sub(amount)
+            .ok_or_else(|| invalid("not enough coins"))?;
+        if amount == 0 {
+            return Ok(InventoryOutcome::default());
+        }
+        self.state.coins = coins;
+        let mut reply = header(38, 19);
+        put(&mut reply, coins as i32);
+        Ok(InventoryOutcome {
+            replies: vec![reply],
+            changed: true,
+        })
+    }
+
     /// Replace the whole state with `after`, a settled trade's validated state (W163, lead),
     /// and return the client updates that turn the current view into it: removed stacks
     /// (38/4), new stacks with their definitions (38/2), changed counts (item update) and the

@@ -48,6 +48,7 @@ mod encounter_rewards;
 mod field_battle;
 mod housing;
 mod jobs;
+mod knockout;
 mod matchmaking_route;
 mod movie;
 mod npc;
@@ -581,21 +582,6 @@ impl Gameplay {
             .ok_or_else(|| invalid("shared motion requires encounter context"))?
             .shared_motion(field, players, now_ms, elapsed)
     }
-    pub fn receive_field_damage(
-        &mut self,
-        damage: u32,
-        now_ms: u64,
-        engaged: bool,
-    ) -> io::Result<Outcome> {
-        let mut out = Outcome::default();
-        self.field_engaged = engaged;
-        if let Some(engine) = &mut self.encounter {
-            let result = engine.receive_field_damage(damage, now_ms, engaged);
-            self.apply_encounter(result, &mut out)?;
-        }
-        Ok(out)
-    }
-
     /// How many ground pickups this session still holds (tests and diagnostics).
     pub fn pickup_count(&self) -> usize {
         self.encounter
@@ -4762,6 +4748,10 @@ impl Gameplay {
         // Go on a battle start screen (41/108): the owning module runs the
         // prize gate and keeps the screen open on a refusal.
         if inner.starts_with(&[41, 0, 108, 0]) && self.handle_battle_go(character, &mut out)? {
+            return Ok(out);
+        }
+        // A paid revive (41/122) charges the wallet with the revive (`knockout.rs`).
+        if self.handle_paid_revive(inner, now_ms, &mut out)? {
             return Ok(out);
         }
         let result = self.encounter.as_mut().unwrap().handle(

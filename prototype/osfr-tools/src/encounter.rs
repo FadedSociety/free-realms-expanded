@@ -22,9 +22,11 @@ use std::{
 mod field;
 pub mod field_rewards;
 mod power_up_use;
+mod revive;
 mod shared;
 mod skills;
 pub(crate) use self::field::level_refusal;
+use self::revive::{AUTO_REVIVE_MS, respawn_hide};
 use self::shared::FieldSim;
 pub use self::shared::{SharedFieldAction, SharedFieldState};
 use self::skills::{SkillBuff, SkillDot, SkillEffects};
@@ -93,23 +95,6 @@ fn difficulty_level(difficulty: i32) -> u32 {
 /// Energy for job abilities (R): the HUD shows 100/100; regeneration of
 /// 2 per 0.5 s follows the community reference's 4 per second.
 const ENERGY_MAX: i32 = 100;
-/// (R) Overworld knockout window, in ms: the ten-second recovery of the wiki
-/// Combat page (research piece 058). The client counts it down only when it
-/// does not show the two-button dialog, and then sends the free revive itself.
-const REVIVE_TIMER_MS: i32 = 10_000;
-/// (R) Price sent in 41/125: the retail spot-revive price, 1,000 coins (the
-/// window's own default `setReviveCost_lua(1000)` in `UI/revive_window.gfx`;
-/// the wiki's Sunstone Valley page says 1,000). The client greys "Revive here"
-/// while the wallet is below this cost and enables it at or above
-/// (`showTwoButtons_lua`); it never hides the paid button, and cost 0 *enables*
-/// it, so 0 does not disable the paid path. Paid 41/122 is still refused below.
-const PAID_REVIVE_COST: i32 = 1_000;
-/// (R) Field enemies ignore a freshly revived or recovered player this long.
-const FIELD_GRACE_MS: u64 = 8_000;
-/// (R) Server fallback: an overworld knockout with no 41/122 by then is revived
-/// at the safe location anyway, so a client that never shows the window (its
-/// 41/125 field order is inferred, not captured) cannot leave a player down.
-const AUTO_REVIVE_MS: u64 = 15_000;
 const BATTLE_JOB_XP: u32 = 50;
 /// Job type of combat jobs in the profile definitions (field 3).
 const COMBAT_PROFILE_TYPE: i32 = 2;
@@ -516,6 +501,9 @@ enum FieldMotion {
 #[serde(deny_unknown_fields)]
 struct FieldContent {
     schema_version: u32,
+    /// (R) Knockout "Revive here" price (`revive.rs`); absent: the retail 1,000.
+    #[serde(default)]
+    paid_revive: Option<revive::PaidRevive>,
     enemies: Vec<FieldActor>,
     #[serde(default)]
     spawn_groups: Vec<FieldSpawnGroup>,
@@ -726,6 +714,8 @@ pub struct EncounterEngine {
     field_grace_until: u64,
     /// When the current overworld knockout was first seen by `tick` (session-only).
     knocked_out_at: Option<u64>,
+    /// Coins a paid revive costs (`field_enemies.json` `paid_revive`).
+    paid_revive_cost: u32,
     battles: Vec<FieldBattle>,
     /// Start screen shown for (battle id, instance id); Go (41/108) starts it.
     /// Session-local: cleared by a successful `begin`, by a close/leave
@@ -891,7 +881,7 @@ impl EncounterEngine {
                 .push(player_hp(self.state.player_health, self.max_health));
             if self.state.player_health == 0 {
                 // (R) Hold the knockout; 41/122 chooses the way back up.
-                out.replies.push(respawn_window());
+                out.replies.push(self.respawn_window());
             }
         }
         if self.field_combat != engaged && !self.world_stage_fighting() {
@@ -1092,6 +1082,7 @@ impl EncounterEngine {
             field_combat: false,
             field_grace_until: 0,
             knocked_out_at: None,
+            paid_revive_cost: revive::RETAIL_REVIVE_COST,
             battles: Vec::new(),
             pending_battle: None,
             terrain: None,
@@ -1479,7 +1470,7 @@ impl EncounterEngine {
             replies.extend(self.field_initialization());
             if self.state.player_health == 0 {
                 // (R) A knocked-out player whose scene reloads gets the window back.
-                replies.push(respawn_window());
+                replies.push(self.respawn_window());
             }
             return Ok(EncounterOutcome {
                 replies,
@@ -1753,62 +1744,6 @@ impl EncounterEngine {
                 self.attack(guid, position, profile_id, slot, now_ms)
             }
             _ => Ok(EncounterOutcome::default()),
-        }
-    }
-
-    /// 41/122 ParticipantResume: header, then a bool, 1 for the paid revive
-    /// (`0093be30`, Lua `OnPaidRevive`) and 0 for the free one (`0093bd80`,
-    /// `RevivePlayer`, and the safe-location button). Only the session's own
-    /// knocked-out state is revived; the client sends no place or price (R).
-    fn resume(&mut self, inner: &[u8], now_ms: u64) -> io::Result<EncounterOutcome> {
-        if inner.len() != 13 || inner[12] > 1 {
-            return Err(invalid("malformed encounter resume"));
-        }
-        if self.state.player_health != 0 {
-            return Ok(EncounterOutcome::default());
-        }
-        let in_world = self.state.active.is_none();
-        if inner[12] == 1 {
-            // (R) No payment policy yet. The window hid itself on the click,
-            // so show it again or the knocked-out player has no buttons.
-            return Ok(EncounterOutcome {
-                replies: if in_world {
-                    vec![respawn_window()]
-                } else {
-                    Vec::new()
-                },
-                feedback: Some("Paying to revive is not available. Choose the free revive.".into()),
-                ..Default::default()
-            });
-        }
-        if let Some(a) = &self.state.active {
-            // A lost instance revives through its existing exit (return
-            // location, full health). A header naming another instance is a
-            // replay from an earlier one.
-            let encounter = i32::from_le_bytes(inner[4..8].try_into().unwrap());
-            let instance = i32::from_le_bytes(inner[8..12].try_into().unwrap());
-            if a.phase == EncounterPhase::Lost
-                && (encounter == 0 || encounter == a.encounter_id as i32)
-                && (instance == 0 || instance == a.instance_id)
-            {
-                return self.exit();
-            }
-            return Ok(EncounterOutcome::default());
-        }
-        Ok(self.revive_at_safe_location(now_ms))
-    }
-
-    /// (R) Safe location: the world checkpoint the opening already uses.
-    fn revive_at_safe_location(&mut self, now_ms: u64) -> EncounterOutcome {
-        self.state.player_health = self.max_health;
-        self.field_grace_until = now_ms.saturating_add(FIELD_GRACE_MS);
-        self.knocked_out_at = None;
-        EncounterOutcome {
-            changed: true,
-            zoning: Some(self.content.world.clone()),
-            replies: vec![player_hp(self.max_health, self.max_health), respawn_hide()],
-            feedback: Some("You revive at the safe location.".into()),
-            ..Default::default()
         }
     }
 
@@ -2603,7 +2538,7 @@ impl EncounterEngine {
                 } else {
                     // (R) Overworld knockout: stay down and show the recovered
                     // respawn window; 41/122 (`resume`) revives the player.
-                    out.replies.push(respawn_window());
+                    out.replies.push(self.respawn_window());
                     out.feedback = Some("Knocked out.".into());
                 }
             }
@@ -2982,21 +2917,6 @@ fn encounter_state(id: u32, instance: i32, state: i32) -> Vec<u8> {
     let mut b = encounter_header(106, id, instance);
     b.extend(state.to_le_bytes());
     b
-}
-/// 41/125 EncounterShowRespawnWindowPacket: dispatcher `0090d830`, ctor
-/// `008a33b0`, reader `008d6730`. Family header (ids zero: the overworld has no
-/// instance) then two i32 handed to `DisplayRespawnWindow` `00904300`, which
-/// takes (timer ms, revive cost). The field order is inferred from that
-/// handler, not captured.
-fn respawn_window() -> Vec<u8> {
-    let mut b = encounter_header(125, 0, 0);
-    b.extend(REVIVE_TIMER_MS.to_le_bytes());
-    b.extend(PAID_REVIVE_COST.to_le_bytes());
-    b
-}
-/// 41/126: the dispatcher runs `RespawnWindow:Hide` (family header only).
-fn respawn_hide() -> Vec<u8> {
-    encounter_header(126, 0, 0)
 }
 fn combat_flag(sub: u16, id: u32, instance: i32, on: bool) -> Vec<u8> {
     let mut b = encounter_header(sub, id, instance);

@@ -203,7 +203,7 @@ impl FieldKillRewards {
 }
 
 /// Every row carries provenance, and a reconstructed row starts with `(R)`.
-fn validate_source(source: &[crate::content::SourceTag]) -> io::Result<()> {
+pub(super) fn validate_source(source: &[crate::content::SourceTag]) -> io::Result<()> {
     if source.is_empty() {
         return Err(invalid("field kill reward row needs provenance"));
     }

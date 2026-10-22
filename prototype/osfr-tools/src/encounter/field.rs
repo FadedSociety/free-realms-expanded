@@ -80,6 +80,10 @@ impl EncounterEngine {
         {
             return Err(invalid("unsupported field enemy content"));
         }
+        let paid_revive_cost = content
+            .paid_revive
+            .as_ref()
+            .map_or(Ok(revive::RETAIL_REVIVE_COST), revive::PaidRevive::cost)?;
         let FieldContent {
             mut enemies,
             spawn_groups,
@@ -238,6 +242,7 @@ impl EncounterEngine {
             });
         }
         self.field_sim.enemies = field;
+        self.paid_revive_cost = paid_revive_cost;
         self.rebuild_behaviours()
     }
 

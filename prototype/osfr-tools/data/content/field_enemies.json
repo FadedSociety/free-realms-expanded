@@ -1,5 +1,22 @@
 {
   "schema_version": 1,
+  "paid_revive": {
+    "cost": 1000,
+    "source": [
+      {
+        "kind": "client",
+        "evidence": "UI/revive_window.gfx frame_1/DoAction.as (piece-037 export): setReviveCost_lua(1000) is the window default and showTwoButtons_lua greys the paid button while m_coinWallet < m_reviveCost; ScriptsBase.lua RespawnWindow:DisplayRespawn offers 'Revive here: %1 coins' only in the overworld; the paid click sends 41/122 with its bool set (0x0093be30)."
+      },
+      {
+        "kind": "wiki",
+        "evidence": "Free Realms wiki, Sunstone Valley (revision 50424): revive in a safezone, or spend 1,000 coins to revive on the spot of defeat."
+      },
+      {
+        "kind": "reconstructed",
+        "evidence": "(R) No 41/125 capture exists, so the server price is not recovered; 1,000 follows the window default and the wiki. The server charges it once and revives in place at full health with the free revive's grace (T402)."
+      }
+    ]
+  },
   "spawn_groups": [
     {
       "id": "starting_farnum_wolves",
