@@ -271,13 +271,79 @@
     },
     {
       "id": 3100004,
+      "job": 14,
       "title_string_id": 76209,
       "giver_npc_id": 9000000220,
       "prerequisite_quest_ids": [
         3100003
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000206,
+          "source": [
+            {
+              "kind": "video",
+              "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 1: Singing Crystal Mines (level 1 to 5), row 3: the Rush Order tracker's first goal reads 'Speak with Smitty' (ct2JrtOiO4g/00080, /00038, /00088, /00742)"
+            },
+            {
+              "kind": "client",
+              "evidence": "intro 76208 'While you were mining copper ore, I dropped off a shipment of broken mining gear to Smitty, our resident smith. Bring him the copper you mined and he should be able to patch up the gear.'"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T411: objective ids 1-3 and their order (Smitty, copper ore, Trixi) follow the video tracker's first goal and the client lines; the original objective ids are not recovered."
+            }
+          ]
+        },
+        {
+          "kind": "gather_resource",
+          "id": 2,
+          "resource_id": 2739,
+          "quantity": 6,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "'As a miner, mine more copper ore for Trixi.' (410561729); Smitty: 'If I had more copper ore, I could perhaps rush Trixi's order ... If you could mine the ore, then I could finish her order within the day.' (1812347357)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T411: Copper Ore is item definition 2739, the shipped Mining18 board's output (data/content/mining.json); quantity 6 is one shipped goal row (quota 6), so one ordinary copper-vein win completes it. The client and guide give no count. The ore stays with the player: the engine counts the mined ore and has no hand-in step, as in T300's 3100002."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9000000220,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "description 76210 'Deliver the copper ore to Smitty in Snowhill and bring back the repaired mining gear to Trixi.'; Smitty: 'Nice work. Go ahead and take this repaired gear to Trixi.' (1579575518)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T411: the return Talk at the giver Trixi opens the 49/13 end screen; the repaired gear is not modelled as an item."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "14": 20
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T411: 5 coins and 20 Miner (profile 14) XP follow the T202/T300 small follow-up rate, one step above 3100003's 15; the guide's reward cell is unknown. No item is granted, so the chapter creates no free, sellable or re-grantable gear. The explicit {\"14\": 20} map pays profile 14 even if the active job changes before turn-in."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -301,10 +367,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -313,17 +375,33 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "The record's own text: intro 76208 sends the Miner to Smitty with the copper, description 76210 'Deliver the copper ore to Smitty in Snowhill and bring back the repaired mining gear to Trixi.', end text 76211 'Fantastic! That went quicker than expected. Looks like we can provide some better gear to our miners again!'"
+        },
+        {
+          "kind": "video",
+          "evidence": "notes/Build Guides/Content/Jobs/Miner.md: Quest line > Band 1: Singing Crystal Mines (level 1 to 5), row 3: the tracker reads 'Miner: Rush Order' with the goal 'Speak with Smitty' (ct2JrtOiO4g/00080) and the description 'As a miner, work with Smitty in Snowhill to repair some broken miner gear.' (ct2JrtOiO4g/00310; client 4261914076)"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T411: job gate 14 (Miner) at the schema's rank-1 default, as 3100002/3100003; the client lines say 'As a miner'. character_eligibility builds job_levels only from the saved active, unlocked profile, so a non-Miner and an unlocked-but-inactive Miner are not offered it. The guide's video player held the quest as a level-20 Archer (ct2JrtOiO4g/00080); holding it after a job switch is allowed here, only the offer is gated."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T411: the record uses the talk + mine + return core the live W171 copper veins and the Mining18 board can complete. The smelting/coal variant (Smitty: buy Singing Coal from Bruno Battlerock and smelt copper bars, 860037929, 798476908, 2958167957, 3229505996, 14300103) and a separate delivery Talk back at Smitty are deferred to a later rung."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T411: Smitty 9000000206 (model 48, Global.Text.3061, position [352.0034, 48.08104, 316.9705]) and the giver Trixi 9000000220 (model 35) are Snowhill legacy_data regional rows; NpcVisibility::load draws both, so the 35/2 AddNpc and the 26/8 interactions resolve."
         }
       ],
       "description_string_id": 76210,
       "intro_text_string_id": 76208,
       "end_text_string_id": 76211,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3100005,

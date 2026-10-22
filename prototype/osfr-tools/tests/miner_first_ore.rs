@@ -1,11 +1,17 @@
-//! T300/T334: the Miner's first two playable records, "So, You Want To Be A Miner?"
-//! (3100002) and its follow-up "All I Got" (3100003).
+//! T300/T334/T411: the Miner's first three playable records, "So, You Want To Be A Miner?"
+//! (3100002), its follow-up "All I Got" (3100003) and "Rush Order" (3100004).
 //!
 //! 3100003 is the Trixi gear referral: the record's own description 76088 ("Visit Trixi in
 //! the Singing Crystal Mines and find out if she has any better mining gear for you.") and
 //! its one Talk-to-Trixi objective are the authority; the guide's row-2 title match is
 //! reconstructed (R). Its job gate (14), prerequisite (3100002) and 5-coin / 15-Miner-XP
 //! reward mirror the first rung.
+//!
+//! 3100004 is Trixi's "Rush Order": Talk to Smitty (the video tracker's first goal "Speak
+//! with Smitty"), mine six Copper Ore at a live copper vein, then return to Trixi
+//! (description 76210). Quantity 6 (one shipped Mining18 goal row), the 5-coin / 20-Miner-XP
+//! reward and the deferred smelting/coal step are (R). This suite's synthetic board pays one
+//! ore per win, so the Rush Order tests patch only their private fixture copy to pay six.
 //!
 //! Therin (9000000217), the guildmaster of the Singing Crystal Mines, is a POI anchor in the
 //! Snowhill content; the `npc_spawns_extra.json` row added here is the drawable actor. The
@@ -49,12 +55,15 @@ mod npc_quest_chain;
 use mining_quest_chain::{
     COPPER_ORE, Fixture, MINING_XP_PER_WIN, active_mining, assert_offer_ids, copper_nodes,
     copper_ore, fill_bag, gather_copper, offer_packet, open_end_screen, type8_frame, type8_payload,
+    word,
 };
 use npc_quest_chain::{
     CHARACTER, accept, active_job, assert_no_offer, assert_packet_changes_nothing,
     character_at_for, coins, content_dir, content_position, counts, end_screen_reward,
-    finish_quest, has_family, npc_interact, npc_select, offer, pending_offer, pending_turnin,
+    finish_quest, has_family, npc_interact, npc_select, objective_activated,
+    objective_activated_packet, objective_complete, offer, pending_offer, pending_turnin,
     profile_xp, quest_end_reply, quest_reply, quest_status, read_json, saved, select_job, send,
+    talk,
 };
 use osfr_tools::{
     character_store::CharacterState,
@@ -70,14 +79,24 @@ use serde_json::{Value, json};
 use std::collections::BTreeMap;
 
 const THERIN: u64 = 9_000_000_217;
-/// Trixi (9000000220) is the Snowhill legacy_data regional row the 3100003 Talk targets.
+/// Trixi (9000000220) is the Snowhill legacy_data regional row the 3100003 Talk targets and
+/// the giver of 3100004.
 const TRIXI: u64 = 9_000_000_220;
-/// Smitty (9000000206) is a spawned Snowhill Blacksmith: a wrong Talk target for a Miner.
+/// Smitty (9000000206), the Snowhill Blacksmith trainer (legacy_data row): a wrong Talk
+/// target for 3100003 and the first Talk of 3100004.
 const SMITTY: u64 = 9_000_000_206;
 const MINER_FIRST: u32 = 3_100_002;
 /// T334: the second Miner chapter, the Trixi mining-gear referral.
 const ALL_I_GOT: u32 = 3_100_003;
-const DRAINED_RECORDS: [u32; 3] = [3_100_001, 3_100_004, 3_100_005];
+/// T411: the third Miner chapter, Smitty's rush order of mining gear for Trixi.
+const RUSH_ORDER: u32 = 3_100_004;
+const RUSH_ORDER_INTRO: u32 = 76_208;
+const RUSH_ORDER_TITLE: u32 = 76_209;
+const RUSH_ORDER_DESCRIPTION: u32 = 76_210;
+const RUSH_ORDER_END_TEXT: u32 = 76_211;
+/// (R) T411: Rush Order counts six Copper Ore, one shipped Mining18 goal row.
+const RUSH_ORE: u32 = 6;
+const DRAINED_RECORDS: [u32; 2] = [3_100_001, 3_100_005];
 const TITLE: u32 = 23_217;
 const DESCRIPTION: u32 = 23_218;
 const END_TEXT: u32 = 23_219;
@@ -97,6 +116,21 @@ fn therin_position() -> [f32; 3] {
 
 fn trixi_position() -> [f32; 3] {
     content_position("snowhill.json", TRIXI)
+}
+
+fn smitty_position() -> [f32; 3] {
+    content_position("snowhill.json", SMITTY)
+}
+
+/// T411: the shared synthetic board pays one Copper Ore per win; Rush Order counts six, the
+/// batch one shipped Mining18 goal row pays. Only this fixture's private board copy changes.
+fn six_ore_fixture() -> Fixture {
+    let fixture = Fixture::new();
+    let path = fixture.path().join(mining::CONTENT_FILE);
+    let mut board = read_json(&path);
+    board["spec"]["outputs"][0]["cluster_quantity"] = json!(RUSH_ORE);
+    std::fs::write(&path, board.to_string()).expect("the six-ore board writes");
+    fixture
 }
 
 fn character_at(position: [f32; 3]) -> CharacterState {
@@ -134,6 +168,44 @@ fn complete_the_first_ore(game: &mut Gameplay, character: &CharacterState, now: 
     open_end_screen(game, character, THERIN, MINER_FIRST, END_TEXT, at + 100);
     finish_quest(game, character, MINER_FIRST, MINER, 5, 15, at + 200);
     at + 300
+}
+
+/// T411: complete 3100002 and then 3100003 (Therin offer, Trixi Talk, 49/14) through the
+/// production paths. Returns the timestamp after the 3100003 turn-in.
+fn complete_all_i_got(game: &mut Gameplay, character: &CharacterState, now: u64) -> u64 {
+    let now = complete_the_first_ore(game, character, now);
+    offer(game, character, THERIN, ALL_I_GOT, now);
+    accept(game, character, ALL_I_GOT, now + 100);
+    let at_trixi = character_at_for(character.guid, 0, trixi_position());
+    open_end_screen(
+        game,
+        &at_trixi,
+        TRIXI,
+        ALL_I_GOT,
+        ALL_I_GOT_END_TEXT,
+        now + 200,
+    );
+    finish_quest(game, &at_trixi, ALL_I_GOT, MINER, 5, 15, now + 300);
+    now + 400
+}
+
+/// T411: a refused request leaves the serialized `GameplayState` and the real save bytes
+/// equal, and adds or completes no quest.
+fn assert_inert(
+    fixture: &Fixture,
+    game: &mut Gameplay,
+    character: &CharacterState,
+    packet: &[u8],
+    now: u64,
+    label: &str,
+) {
+    let before = save_envelope(fixture, game, character);
+    assert_packet_changes_nothing(game, character, packet, now, label);
+    assert_eq!(
+        save_envelope(fixture, game, character),
+        before,
+        "{label} changed the save"
+    );
 }
 
 /// The real `game_store` save bytes, so a refusal is also proven inert at the persistence
@@ -537,7 +609,7 @@ fn refusals_and_replay_change_nothing() {
         );
     }
 
-    // A wrong NPC (Trixi, a spawned Snowhill NPC with no live Miner quest) offers nothing.
+    // A wrong NPC (Trixi, whose Rush Order waits on 3100003) offers nothing.
     let trixi = character_at(content_position("snowhill.json", TRIXI));
     let mut now = 400;
     assert_no_offer(&mut miner, &trixi, TRIXI, &mut now, "a wrong NPC");
@@ -917,15 +989,19 @@ fn therin_is_drawable_and_the_quest_content_resolves() {
         "the record carries its T300 decisions"
     );
 
-    // The records T334 does not open stay disabled with their recovered titles. 3100003 is
-    // no longer one of them: T334 enables it with the Trixi objective and its reward.
-    for (id, title) in [
-        (3_100_001_u32, 139_748_u32),
-        (3_100_004, 76_209),
-        (3_100_005, 76_770),
+    // The neighbouring records keep their recovered titles. T334 enabled 3100003 and T411
+    // enables 3100004 ("Rush Order"); 3100001 and 3100005 ("Gem Appraisal") stay disabled.
+    for (id, title, enabled) in [
+        (3_100_001_u32, 139_748_u32, false),
+        (RUSH_ORDER, RUSH_ORDER_TITLE, true),
+        (3_100_005, 76_770, false),
     ] {
         let record = row(&quests["records"].as_array().unwrap(), u64::from(id));
-        assert_eq!(record["enabled"], json!(false), "quest {id} stays disabled");
+        assert_eq!(
+            record["enabled"],
+            json!(enabled),
+            "quest {id} enabled state"
+        );
         assert_eq!(record["title_string_id"], json!(title));
     }
 
@@ -1580,7 +1656,8 @@ fn the_record_and_both_npcs_resolve() {
     assert!((position[1] - 47.11174).abs() < 0.001);
     assert!((position[2] - 237.3823).abs() < 0.001);
 
-    // Every quest Trixi gives is still disabled, so the Talk offers no second live quest.
+    // Trixi's only live quest is T411's Rush Order, which waits on 3100003 itself, so the
+    // Talk that completes 3100003 offers no second quest. The others stay disabled.
     for quest_id in trixi["quest_ids_given"].as_array().unwrap() {
         let id = quest_id.as_u64().unwrap();
         let file = if id == 3_020_006 {
@@ -1590,7 +1667,11 @@ fn the_record_and_both_npcs_resolve() {
         };
         let document = read_json(&content.join(file));
         let record = row(&document["records"].as_array().unwrap(), id);
-        assert_eq!(record["enabled"], json!(false), "quest {id} stays disabled");
+        assert_eq!(
+            record["enabled"],
+            json!(id == u64::from(RUSH_ORDER)),
+            "quest {id} enabled state"
+        );
     }
 
     // Both NPCs draw through the production 35/2 AddNpc parser for a nearby session. Therin
@@ -1676,4 +1757,540 @@ fn a_near_cap_coin_balance_refuses_the_turn_in_without_paying_xp_or_item() {
     let mut game = fixture.game_with_state(state);
     finish_quest(&mut game, &at_trixi, ALL_I_GOT, MINER, 5, 15, now + 400);
     assert_eq!(coins(&game), 5);
+}
+
+// ---------------------------------------------------------------------------------------------
+// T411: "Rush Order" (3100004): Smitty, six Copper Ore, back to Trixi.
+// ---------------------------------------------------------------------------------------------
+
+/// T411: Trixi offers Rush Order only after 3100003. The 49/3 lists its three ordered
+/// objectives (count then one 107-byte record each: `0092b050` -> `008fd770`) and the 49/8
+/// (`00c7aeb0`: quest, objective, required) activates only the Smitty Talk.
+#[test]
+fn rush_order_is_offered_after_all_i_got() {
+    let fixture = six_ore_fixture();
+    let character = character_at(therin_position());
+    let at_trixi = character_at(trixi_position());
+    let mut game = fixture.game(MINER, &[ADVENTURER, MINER]);
+
+    let mut now = 500;
+    assert_no_offer(
+        &mut game,
+        &at_trixi,
+        TRIXI,
+        &mut now,
+        "Trixi before All I Got",
+    );
+
+    let now = complete_all_i_got(&mut game, &character, 1_000);
+    let offered = offer(&mut game, &at_trixi, TRIXI, RUSH_ORDER, now);
+    assert_offer_ids(
+        &offer_packet(&offered, RUSH_ORDER),
+        RUSH_ORDER,
+        RUSH_ORDER_INTRO,
+        RUSH_ORDER_TITLE,
+        RUSH_ORDER_DESCRIPTION,
+    );
+
+    let accepted = accept(&mut game, &at_trixi, RUSH_ORDER, now + 100);
+    let add = accepted
+        .replies
+        .iter()
+        .find(|packet| has_family(packet, 49, 3, Some(RUSH_ORDER)))
+        .expect("accept sends the 49/3 quest record");
+    assert_eq!(word(add, 109), 3, "the 49/3 carries three objectives");
+    let ids: Vec<u32> = (0..3).map(|index| word(add, 113 + index * 107)).collect();
+    assert_eq!(ids, [1, 2, 3], "Smitty, copper ore, Trixi, in order");
+    assert!(
+        accepted
+            .replies
+            .contains(&objective_activated_packet(RUSH_ORDER, 1, 1)),
+        "accept activates the Smitty Talk"
+    );
+    assert!(
+        !objective_activated(&accepted, RUSH_ORDER, 2)
+            && !objective_activated(&accepted, RUSH_ORDER, 3),
+        "the later steps wait for the Smitty Talk"
+    );
+    assert_eq!(counts(&game, RUSH_ORDER), [0, 0, 0]);
+}
+
+/// T411: Smitty Talk, one six-ore copper-vein win, Trixi Talk; the 49/14 pays exactly 5 coins
+/// + 20 profile-14 XP once from the live state (after a job switch), grants no item, and the
+/// counters, coins and XP survive `game_store` reloads.
+#[test]
+fn smitty_then_copper_then_trixi_pays_once() {
+    let fixture = six_ore_fixture();
+    let mut game = fixture.game(MINER, &[ADVENTURER, MINER, BRAWLER]);
+    let character = character_at(therin_position());
+    let at_trixi = character_at(trixi_position());
+    let at_smitty = character_at(smitty_position());
+    let now = complete_all_i_got(&mut game, &character, 1_000);
+    offer(&mut game, &at_trixi, TRIXI, RUSH_ORDER, now);
+    accept(&mut game, &at_trixi, RUSH_ORDER, now + 100);
+    let coins_before = coins(&game);
+    let xp_at_accept = profile_xp(&game, MINER);
+
+    // Goal 1: the Smitty Talk completes and activates the six-ore gather.
+    let smitty = talk(&mut game, &at_smitty, SMITTY, now + 200);
+    assert!(smitty.changed, "the Smitty Talk advanced the quest");
+    assert!(objective_complete(&smitty, RUSH_ORDER, 1));
+    assert!(
+        smitty
+            .replies
+            .contains(&objective_activated_packet(RUSH_ORDER, 2, RUSH_ORE)),
+        "the gather step opens with its count of six"
+    );
+    assert!(
+        !smitty
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 13, None)),
+        "Smitty is not the turn-in"
+    );
+    let mut game = fixture.save_and_reload(&game, &at_smitty);
+    assert_eq!(
+        counts(&game, RUSH_ORDER),
+        [1, 0, 0],
+        "the Talk counter survives"
+    );
+
+    // Goal 2: one ordinary copper-vein win pays the six ore the objective counts.
+    let ore_before = copper_ore(&game);
+    let (guid, position) = copper_nodes()[1];
+    let mut at = now + 300;
+    assert!(gather_copper(&mut game, &character, guid, position, &mut at).is_some());
+    assert_eq!(copper_ore(&game), ore_before + RUSH_ORE);
+    assert_eq!(counts(&game, RUSH_ORDER), [1, RUSH_ORE, 0]);
+    let xp_after_mining = profile_xp(&game, MINER);
+    assert_eq!(xp_after_mining, xp_at_accept + MINING_XP_PER_WIN);
+    let mut game = fixture.save_and_reload(&game, &character);
+    assert_eq!(
+        counts(&game, RUSH_ORDER),
+        [1, RUSH_ORE, 0],
+        "the gather survives"
+    );
+    assert_eq!(pending_turnin(&game), None);
+    assert_eq!(
+        coins(&game),
+        coins_before,
+        "nothing is paid before the turn-in"
+    );
+
+    // Switch away before the turn-in: the reward map names profile 14.
+    let switched = send(&mut game, &character, &select_job(BRAWLER), at + 100);
+    assert!(switched.changed, "the Brawler outfit is selectable");
+    let brawler_before = profile_xp(&game, BRAWLER);
+    let items_before = item_ledger(&game);
+
+    // Goal 3: the Trixi Talk holds the 49/13; the 49/14 pays once.
+    let end = open_end_screen(
+        &mut game,
+        &at_trixi,
+        TRIXI,
+        RUSH_ORDER,
+        RUSH_ORDER_END_TEXT,
+        at + 200,
+    );
+    assert_eq!(end_screen_reward(&end), (5, 20), "49/13 reward bundle");
+    assert_eq!(counts(&game, RUSH_ORDER), [1, RUSH_ORE, 1]);
+    assert_eq!(coins(&game), coins_before, "the end screen pays nothing");
+    finish_quest(&mut game, &at_trixi, RUSH_ORDER, MINER, 5, 20, at + 300);
+    assert_eq!(profile_xp(&game, MINER), xp_after_mining + 20);
+    assert_eq!(profile_xp(&game, BRAWLER), brawler_before);
+    assert_eq!(
+        item_ledger(&game),
+        items_before,
+        "the quest grants no item and consumes none"
+    );
+
+    // A reload keeps the paid result; replays pay nothing and Trixi offers nothing more.
+    let mut game = fixture.save_and_reload(&game, &at_trixi);
+    assert_eq!(quest_status(&game, RUSH_ORDER), QuestStatus::Completed);
+    assert_eq!(coins(&game), coins_before + 5);
+    assert_eq!(profile_xp(&game, MINER), xp_after_mining + 20);
+    assert_inert(
+        &fixture,
+        &mut game,
+        &at_trixi,
+        &quest_end_reply(RUSH_ORDER),
+        at + 400,
+        "a replayed 49/14",
+    );
+    assert_inert(
+        &fixture,
+        &mut game,
+        &at_trixi,
+        &quest_reply(RUSH_ORDER, true),
+        at + 500,
+        "a replayed 49/2",
+    );
+    let mut later = at + 600;
+    assert_no_offer(
+        &mut game,
+        &at_trixi,
+        TRIXI,
+        &mut later,
+        "Trixi after Rush Order",
+    );
+}
+
+/// T411: an inactive Miner, an out-of-order or wrong NPC, a click 30 m outside the (R) 12 m
+/// interaction radius, forged 26/8 / 49/2 / 49/14, a turn-in before the gather and a full bag
+/// at the node leave the whole `GameplayState` (and, under the save cap, the save bytes) equal.
+#[test]
+fn a_non_miner_wrong_npc_or_forged_request_changes_nothing() {
+    let fixture = six_ore_fixture();
+    let character = character_at(therin_position());
+    let at_trixi = character_at(trixi_position());
+    let at_smitty = character_at(smitty_position());
+    let mut donor = fixture.game(MINER, &[ADVENTURER, MINER]);
+    let now = complete_all_i_got(&mut donor, &character, 1_000);
+    let completed = donor.state();
+
+    let mut state = completed.clone();
+    state
+        .profiles
+        .as_mut()
+        .expect("the fixture saves profiles")
+        .active = ADVENTURER;
+    let mut adventurer = fixture.game_with_state(state);
+    let mut later = now;
+    assert_no_offer(
+        &mut adventurer,
+        &at_trixi,
+        TRIXI,
+        &mut later,
+        "an active Adventurer with Miner unlocked",
+    );
+
+    let mut game = fixture.game_with_state(completed);
+    for (packet, label) in [
+        (
+            quest_reply(RUSH_ORDER, true),
+            "a forged 49/2 before the offer",
+        ),
+        (
+            quest_end_reply(RUSH_ORDER),
+            "a forged 49/14 with no end screen",
+        ),
+        (npc_interact(u64::MAX), "a forged 26/8 at an unknown actor"),
+    ] {
+        assert_inert(&fixture, &mut game, &at_trixi, &packet, now + 10, label);
+    }
+    offer(&mut game, &at_trixi, TRIXI, RUSH_ORDER, now + 100);
+    accept(&mut game, &at_trixi, RUSH_ORDER, now + 200);
+
+    let mut later = now + 300;
+    assert_no_offer(
+        &mut game,
+        &at_trixi,
+        TRIXI,
+        &mut later,
+        "Trixi before the Smitty step",
+    );
+    assert_no_offer(&mut game, &character, THERIN, &mut later, "Therin");
+    let [x, y, z] = smitty_position();
+    let outside = character_at([x + 42.0, y, z]);
+    let before = save_envelope(&fixture, &game, &character);
+    assert!(
+        game.handle_in_world(&npc_interact(SMITTY), &outside, later + 10)
+            .is_err(),
+        "a 26/8 30 m outside the interaction radius is refused"
+    );
+    assert_eq!(save_envelope(&fixture, &game, &character), before);
+    assert_eq!(counts(&game, RUSH_ORDER), [0, 0, 0]);
+
+    // After the Smitty step, a turn-in before the copper ore holds no end screen.
+    talk(&mut game, &at_smitty, SMITTY, later + 100);
+    assert_eq!(counts(&game, RUSH_ORDER), [1, 0, 0]);
+    let mut later = later + 200;
+    assert_no_offer(
+        &mut game,
+        &at_trixi,
+        TRIXI,
+        &mut later,
+        "Trixi before the copper ore",
+    );
+    assert_inert(
+        &fixture,
+        &mut game,
+        &at_trixi,
+        &quest_end_reply(RUSH_ORDER),
+        later + 10,
+        "a 49/14 before the copper ore",
+    );
+
+    // A full bag with no Copper Ore stack to merge into refuses the node before the run.
+    let mut state = game.state();
+    state
+        .inventory
+        .items
+        .retain(|item| item.definition_id != COPPER_ORE as i32);
+    fill_bag(&mut state.inventory);
+    let mut full = fixture.game_with_state(state);
+    let (guid, position) = copper_nodes()[1];
+    let at_node = character_at(position);
+    full.tick(&at_node, later + 100).expect("node tick");
+    // A 4,096-stack bag exceeds the save envelope's 1 MiB cap, so compare the state (T300).
+    let before = saved(&full);
+    let refused = send(&mut full, &at_node, &npc_interact(guid), later + 101);
+    assert!(
+        !refused.changed,
+        "a full bag refuses the node before the run"
+    );
+    assert!(
+        !refused
+            .replies
+            .iter()
+            .any(|packet| has_family(packet, 49, 9, None)),
+        "the refused node sends no objective progress"
+    );
+    assert!(active_mining(&full).is_none(), "no mining run started");
+    assert_eq!(counts(&full, RUSH_ORDER), [1, 0, 0]);
+    assert_eq!(saved(&full), before, "the refused node changed the state");
+}
+
+/// T411: the record's content; the shipped Mining18 board produces its gather target (T358's
+/// rule) and one shipped win pays at least the six it counts; Smitty and Trixi draw through
+/// the production 35/2 reader with resolved names and shipped models.
+#[test]
+fn the_objective_is_produced_by_the_shipped_mining_board() {
+    let content = content_dir();
+    let quests = read_json(&content.join("quests/miner.json"));
+    let records = quests["records"].as_array().unwrap();
+    let quest = row(records, u64::from(RUSH_ORDER));
+    assert_eq!(quest["enabled"], json!(true));
+    assert_eq!(quest["job"], json!(MINER));
+    assert_eq!(quest["giver_npc_id"], json!(TRIXI));
+    assert_eq!(quest["prerequisite_quest_ids"], json!([ALL_I_GOT]));
+    assert_eq!(quest["intro_text_string_id"], json!(RUSH_ORDER_INTRO));
+    assert_eq!(quest["title_string_id"], json!(RUSH_ORDER_TITLE));
+    assert_eq!(
+        quest["description_string_id"],
+        json!(RUSH_ORDER_DESCRIPTION)
+    );
+    assert_eq!(quest["end_text_string_id"], json!(RUSH_ORDER_END_TEXT));
+    let objectives = quest["objectives"].as_array().unwrap();
+    let bare: Vec<Value> = objectives
+        .iter()
+        .map(|objective| {
+            let mut bare = objective.clone();
+            bare.as_object_mut().unwrap().remove("source");
+            bare
+        })
+        .collect();
+    assert_eq!(
+        bare,
+        [
+            json!({"kind": "talk_to_npc", "id": 1, "npc_id": SMITTY}),
+            json!({"kind": "gather_resource", "id": 2, "resource_id": COPPER_ORE, "quantity": RUSH_ORE}),
+            json!({"kind": "talk_to_npc", "id": 3, "npc_id": TRIXI}),
+        ]
+    );
+    for objective in objectives {
+        assert!(has_source(objective, "client") || has_source(objective, "video"));
+        assert!(has_source(objective, "reconstructed"));
+    }
+    let rewards = quest["rewards"].as_array().unwrap();
+    assert_eq!(rewards.len(), 1);
+    assert_eq!(rewards[0]["coins"], json!(5));
+    assert_eq!(rewards[0]["items"], json!([]));
+    assert_eq!(rewards[0]["job_xp"], json!({"14": 20}));
+    assert!(has_source(&rewards[0], "reconstructed"));
+    let evidence: Vec<&str> = quest["source"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|tag| tag["evidence"].as_str())
+        .collect();
+    assert!(evidence.iter().any(|text| text.starts_with("(R) T411:")));
+    assert!(
+        !evidence
+            .iter()
+            .any(|text| text.contains("objectives is empty") || text.contains("rewards left empty")),
+        "the stale empty-record tags are gone"
+    );
+
+    // Gem Appraisal stays disabled; 3100020 stays unreachable behind disabled 3100019.
+    assert_eq!(row(records, 3_100_005)["enabled"], json!(false));
+    assert_eq!(
+        row(records, 3_100_020)["prerequisite_quest_ids"],
+        json!([3_100_019])
+    );
+    assert_eq!(row(records, 3_100_019)["enabled"], json!(false));
+
+    // The production loader reads the shipped board; `reward_transaction` (src/mining.rs)
+    // pays collected / per_reward * cluster_quantity per output row, so a won board pays
+    // each Copper Ore row's full quota.
+    let board = mining::Type8Engine::load(
+        &content,
+        mining::CONTENT_FILE,
+        mining::MINING_GAME_ID,
+        mining::FIRST_MINING_INSTANCE,
+        None,
+    )
+    .expect("the shipped Mining18 board loads");
+    let spec = board.spec();
+    let per_win: u32 = spec
+        .outputs
+        .iter()
+        .filter(|output| output.definition_id == COPPER_ORE as i32)
+        .map(|output| {
+            let goal = spec
+                .goals
+                .iter()
+                .find(|goal| goal.value == output.value)
+                .expect("every output has its goal");
+            goal.quota / goal.per_reward * output.cluster_quantity
+        })
+        .sum();
+    assert!(
+        per_win >= RUSH_ORE,
+        "one shipped win pays {per_win} Copper Ore, fewer than Rush Order counts"
+    );
+
+    let fixture = Fixture::new();
+    let smitty = drawn_npc(&fixture, 300_061, smitty_position(), SMITTY);
+    assert_eq!((smitty.name_string_id, smitty.model_id), (3061, 48));
+    let trixi = drawn_npc(&fixture, 300_062, trixi_position(), TRIXI);
+    assert_eq!((trixi.name_string_id, trixi.model_id), (3230, 35));
+}
+
+/// T411: two Miners own their Rush Order counters, end screen and reward; one player's Talk,
+/// gather, refusal or forged reply never moves the other's.
+#[test]
+fn two_miners_progress_independently_on_rush_order() {
+    const FIRST: u64 = 300_071;
+    const SECOND: u64 = 300_072;
+    let fixture = six_ore_fixture();
+    let at = |guid, position| character_at_for(guid, 0, position);
+    let mut a = fixture.game_as(FIRST, MINER, &[ADVENTURER, MINER]);
+    let mut b = fixture.game_as(SECOND, MINER, &[ADVENTURER, MINER]);
+    let mut now = complete_all_i_got(&mut a, &at(FIRST, therin_position()), 1_000);
+    now = complete_all_i_got(&mut b, &at(SECOND, therin_position()), now);
+    for (game, guid) in [(&mut a, FIRST), (&mut b, SECOND)] {
+        offer(game, &at(guid, trixi_position()), TRIXI, RUSH_ORDER, now);
+        accept(game, &at(guid, trixi_position()), RUSH_ORDER, now + 100);
+    }
+
+    let (guid, position) = copper_nodes()[1];
+    let mut ms = now + 200;
+    talk(&mut a, &at(FIRST, smitty_position()), SMITTY, ms);
+    assert!(gather_copper(&mut a, &at(FIRST, position), guid, position, &mut ms).is_some());
+    assert_eq!(counts(&a, RUSH_ORDER), [1, RUSH_ORE, 0]);
+    assert_eq!(counts(&b, RUSH_ORDER), [0, 0, 0], "A's progress moved B");
+
+    let a_before = saved(&a);
+    let b_before = saved(&b);
+    let [x, y, z] = smitty_position();
+    assert!(
+        b.handle_in_world(&npc_interact(SMITTY), &at(SECOND, [x + 42.0, y, z]), ms)
+            .is_err(),
+        "B's out-of-range click is refused"
+    );
+    assert_packet_changes_nothing(
+        &mut b,
+        &at(SECOND, trixi_position()),
+        &quest_end_reply(RUSH_ORDER),
+        ms + 10,
+        "B's forged 49/14",
+    );
+    assert_eq!(saved(&a), a_before);
+    assert_eq!(saved(&b), b_before);
+
+    let end = open_end_screen(
+        &mut a,
+        &at(FIRST, trixi_position()),
+        TRIXI,
+        RUSH_ORDER,
+        RUSH_ORDER_END_TEXT,
+        ms + 100,
+    );
+    assert_eq!(end_screen_reward(&end), (5, 20));
+    assert_eq!(pending_turnin(&b), None, "A's end screen opened B's");
+    finish_quest(
+        &mut a,
+        &at(FIRST, trixi_position()),
+        RUSH_ORDER,
+        MINER,
+        5,
+        20,
+        ms + 200,
+    );
+    assert_eq!(counts(&b, RUSH_ORDER), [0, 0, 0]);
+
+    talk(&mut b, &at(SECOND, smitty_position()), SMITTY, ms + 300);
+    ms += 400;
+    assert!(gather_copper(&mut b, &at(SECOND, position), guid, position, &mut ms).is_some());
+    open_end_screen(
+        &mut b,
+        &at(SECOND, trixi_position()),
+        TRIXI,
+        RUSH_ORDER,
+        RUSH_ORDER_END_TEXT,
+        ms + 100,
+    );
+    finish_quest(
+        &mut b,
+        &at(SECOND, trixi_position()),
+        RUSH_ORDER,
+        MINER,
+        5,
+        20,
+        ms + 200,
+    );
+
+    // Each wallet holds its three 5-coin rungs; each Miner profile two wins plus 15/15/20.
+    for game in [&a, &b] {
+        assert_eq!(quest_status(game, RUSH_ORDER), QuestStatus::Completed);
+        assert_eq!(coins(game), 15);
+        assert_eq!(profile_xp(game, MINER), 2 * MINING_XP_PER_WIN + 50);
+    }
+}
+
+/// T411: the chapter runs on the production quest, menu and node packets the shared helpers
+/// build (26/8, 26/10, 26/6, 49/2, 49/14, 39/x, 26/42): no realm chat command is sent, no
+/// reply teleports the player (38/12), and the character ends free with nothing open.
+#[test]
+fn the_chapter_uses_no_dev_commands() {
+    let fixture = six_ore_fixture();
+    let character = character_at(therin_position());
+    let at_trixi = character_at(trixi_position());
+    let mut game = fixture.game(MINER, &[ADVENTURER, MINER]);
+    let now = complete_all_i_got(&mut game, &character, 1_000);
+    let mut replies = offer(&mut game, &at_trixi, TRIXI, RUSH_ORDER, now).replies;
+    replies.extend(accept(&mut game, &at_trixi, RUSH_ORDER, now + 100).replies);
+    let at_smitty = character_at(smitty_position());
+    replies.extend(talk(&mut game, &at_smitty, SMITTY, now + 200).replies);
+    let (guid, position) = copper_nodes()[1];
+    let mut at = now + 300;
+    assert!(gather_copper(&mut game, &character, guid, position, &mut at).is_some());
+    replies.push(open_end_screen(
+        &mut game,
+        &at_trixi,
+        TRIXI,
+        RUSH_ORDER,
+        RUSH_ORDER_END_TEXT,
+        at + 100,
+    ));
+    replies.extend(finish_quest(&mut game, &at_trixi, RUSH_ORDER, MINER, 5, 20, at + 200).replies);
+    assert!(
+        !replies
+            .iter()
+            .any(|packet| packet.starts_with(&[38, 0, 12, 0])),
+        "the chapter must not teleport the player"
+    );
+    assert_eq!(quest_status(&game, RUSH_ORDER), QuestStatus::Completed);
+    assert_eq!(pending_offer(&game), None);
+    assert_eq!(pending_turnin(&game), None);
+    assert!(active_mining(&game).is_none(), "no mining run is left open");
+    // The NPC router's shared busy gate closes menus while an activity runs; Therin's opens.
+    let menu = send(&mut game, &character, &npc_interact(THERIN), at + 300);
+    assert!(
+        menu.replies
+            .iter()
+            .any(|packet| packet.starts_with(&[26, 0, 9, 0])),
+        "the character ends free: Therin's menu opens"
+    );
 }
