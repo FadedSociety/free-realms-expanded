@@ -302,13 +302,12 @@ impl AccountStore {
     }
 
     pub(crate) fn character_name_taken(&self, first: &str, last: &str) -> bool {
-        // (R) Use case-insensitive global uniqueness across displayed and pending names.
-        let first = first.to_lowercase();
-        let last = last.to_lowercase();
+        // (R) Global uniqueness across displayed and pending names, compared by `name_key`.
+        let (first, last) = (name_key(first), name_key(last));
         self.data.characters.values().any(|character| {
-            name_keys(&character.identity)
-                .iter()
-                .any(|(known_first, known_last)| known_first == &first && known_last == &last)
+            name_pairs(&character.identity).any(|(known_first, known_last)| {
+                name_key(known_first) == first && name_key(known_last) == last
+            })
         })
     }
 
@@ -329,10 +328,7 @@ impl AccountStore {
         if account.character_guids.len() >= account.slots.max_characters as usize {
             return Err(invalid_data("account character slots are full"));
         }
-        if name_keys(&identity)
-            .iter()
-            .any(|(first, last)| self.character_name_taken(first, last))
-        {
+        if name_pairs(&identity).any(|(first, last)| self.character_name_taken(first, last)) {
             return Err(invalid_data("character name is already assigned"));
         }
         let guid = self.data.next_character_guid;
@@ -380,9 +376,7 @@ impl AccountStore {
             .get(&account_id)
             .ok_or_else(|| invalid_data("unknown account"))?;
         if account.slots.max_characters == 0
-            || name_keys(&identity)
-                .iter()
-                .any(|(first, last)| self.character_name_taken(first, last))
+            || name_pairs(&identity).any(|(first, last)| self.character_name_taken(first, last))
         {
             return Err(invalid_data("legacy character cannot be adopted"));
         }
@@ -593,7 +587,16 @@ impl AccountStore {
     }
 }
 
+/// Load and save duplicate check: lowercase only, not `name_key`, so saves whose names already
+/// fold together keep loading and saving.
 fn name_keys(identity: &CharacterIdentity) -> BTreeSet<(String, String)> {
+    name_pairs(identity)
+        .map(|(first, last)| (first.to_lowercase(), last.to_lowercase()))
+        .collect()
+}
+
+/// The displayed and pending (temporary) name pairs a character holds.
+fn name_pairs(identity: &CharacterIdentity) -> impl Iterator<Item = (&str, &str)> {
     [
         (&identity.first_name, &identity.last_name),
         (
@@ -603,9 +606,70 @@ fn name_keys(identity: &CharacterIdentity) -> BTreeSet<(String, String)> {
     ]
     .into_iter()
     .filter(|(first, last)| !first.is_empty() && !last.is_empty())
-    .map(|(first, last)| (first.to_lowercase(), last.to_lowercase()))
-    .collect()
+    .map(|(first, last)| (first.as_str(), last.as_str()))
 }
+
+/// Uniqueness key of one name part: Latin letters fold to their base, the rest lowercase, so
+/// 'Éva', 'EVA' and 'Eva' are one name. Folding comes before lowercasing because 'İ' lowercases
+/// to 'i' plus a combining dot. Saves keep the typed spelling; only comparisons use the key.
+fn name_key(part: &str) -> String {
+    let mut key = String::with_capacity(part.len());
+    for c in part.chars() {
+        match LATIN_FOLDS
+            .iter()
+            .find(|(_, letters)| !c.is_ascii() && letters.contains(c))
+        {
+            Some((base, _)) => key.push_str(base),
+            None => key.extend(c.to_lowercase()),
+        }
+    }
+    key
+}
+
+/// (R) Base letters for U+00C0..=U+024F, the range `account::new_name_part` allows: every base
+/// letter or ligature with a mark, stroke, hook, bar or tail, plus the look-alikes ð, þ, ß, ĸ, ı,
+/// ȷ, ŉ, ŋ and African Ɖ. Letters with no base reading (schwa, ezh, yogh, wynn, open, turned and
+/// reversed forms, clicks, tone letters, glottal stops) only lowercase.
+const LATIN_FOLDS: [(&str, &str); 38] = [
+    ("'n", "ŉ"),
+    ("a", "ÀÁÂÃÄÅàáâãäåĀāĂăĄąǍǎǞǟǠǡǺǻȀȁȂȃȦȧȺ"),
+    ("ae", "ÆæǢǣǼǽ"),
+    ("b", "ƀƁƂƃɃ"),
+    ("c", "ÇçĆćĈĉĊċČčƇƈȻȼ"),
+    ("d", "ÐðĎďĐđƉƊƋƌȡ"),
+    ("db", "ȸ"),
+    ("dz", "ǄǅǆǱǲǳ"),
+    ("e", "ÈÉÊËèéêëĒēĔĕĖėĘęĚěȄȅȆȇȨȩɆɇ"),
+    ("f", "Ƒƒ"),
+    ("g", "ĜĝĞğĠġĢģƓǤǥǦǧǴǵ"),
+    ("h", "ĤĥĦħȞȟ"),
+    ("hv", "ƕǶ"),
+    ("i", "ÌÍÎÏìíîïĨĩĪīĬĭĮįİıƗǏǐȈȉȊȋ"),
+    ("ij", "Ĳĳ"),
+    ("j", "ĴĵǰȷɈɉ"),
+    ("k", "ĶķĸƘƙǨǩ"),
+    ("l", "ĹĺĻļĽľĿŀŁłƚȴȽ"),
+    ("lj", "Ǉǈǉ"),
+    ("n", "ÑñŃńŅņŇňŊŋƝƞǸǹȠȵ"),
+    ("nj", "Ǌǋǌ"),
+    ("o", "ÒÓÔÕÖØòóôõöøŌōŎŏŐőƟƠơǑǒǪǫǬǭǾǿȌȍȎȏȪȫȬȭȮȯȰȱ"),
+    ("oe", "Œœ"),
+    ("oi", "Ƣƣ"),
+    ("ou", "Ȣȣ"),
+    ("p", "Ƥƥ"),
+    ("q", "Ɋɋ"),
+    ("qp", "ȹ"),
+    ("r", "ŔŕŖŗŘřȐȑȒȓɌɍ"),
+    ("s", "ŚśŜŝŞşŠšſȘșȿ"),
+    ("ss", "ß"),
+    ("t", "ŢţŤťŦŧƫƬƭƮȚțȶȾ"),
+    ("th", "Þþ"),
+    ("u", "ÙÚÛÜùúûüŨũŪūŬŭŮůŰűŲųƯưǓǔǕǖǗǘǙǚǛǜȔȕȖȗɄ"),
+    ("v", "Ʋ"),
+    ("w", "Ŵŵ"),
+    ("y", "ÝýÿŶŷŸƳƴȲȳɎɏ"),
+    ("z", "ŹźŻżŽžƵƶȤȥɀ"),
+];
 
 fn read_legacy_state(path: &Path) -> io::Result<CharacterState> {
     let file = File::open(path)?;

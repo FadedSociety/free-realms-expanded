@@ -175,21 +175,30 @@ fn valid_client_name(first: &str, last: &str) -> bool {
         && (2..=14).contains(&last_len)
         && first_len + last_len <= 15
         && identity::valid_name(first, last)
-        && latin_name(first)
-        && latin_name(last)
+        && new_name_part(first)
+        && new_name_part(last)
 }
 
-/// New names use Latin letters only: ASCII plus Latin-1 Supplement and Latin Extended-A/B letters
+/// A first or last name of a new character (and of its temporary pair).
+///
+/// Latin letters only: ASCII plus Latin-1 Supplement and Latin Extended-A/B letters
 /// (U+00C0..=U+024F without × and ÷), with the space, hyphen and apostrophe `valid_name` allows.
 /// Other scripts render invisibly in the client (OSFR found this for Chinese) and allow look-alike
-/// names (Cyrillic "а" for Latin "a"). Saved characters keep loading under `valid_name`. (R): the
-/// original server's character set is unknown.
-fn latin_name(name: &str) -> bool {
-    name.chars().all(|c| {
-        c.is_ascii_alphabetic()
-            || matches!(c, ' ' | '-' | '\'')
-            || (('\u{00C0}'..='\u{024F}').contains(&c) && !matches!(c, '\u{00D7}' | '\u{00F7}'))
-    })
+/// names (Cyrillic "а" for Latin "a").
+///
+/// Letters joined by single separators: no part starts or ends with a space, hyphen or apostrophe
+/// or has two in a row, so '--', '-ab', 'a--b' and 'a  b' are refused. With the 2-character
+/// minimum this also means at least 2 letters.
+///
+/// Saved characters keep loading under `valid_name`. (R): the original server's rules are unknown.
+fn new_name_part(name: &str) -> bool {
+    name.split([' ', '-', '\''])
+        .all(|letters| !letters.is_empty())
+        && name.chars().all(|c| {
+            c.is_ascii_alphabetic()
+                || matches!(c, ' ' | '-' | '\'')
+                || (('\u{00C0}'..='\u{024F}').contains(&c) && !matches!(c, '\u{00D7}' | '\u{00F7}'))
+        })
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -267,7 +276,7 @@ fn check_name_status(store: &AccountStore, first: &str, last: &str) -> NameCheck
         NameCheckStatus::LastTooLong
     } else if first_len + last_len > 15 {
         NameCheckStatus::TotalLengthInvalid
-    } else if !identity::valid_name(first, last) || !latin_name(first) || !latin_name(last) {
+    } else if !identity::valid_name(first, last) || !new_name_part(first) || !new_name_part(last) {
         NameCheckStatus::Invalid
     } else if store.character_name_taken(first, last) {
         NameCheckStatus::Taken

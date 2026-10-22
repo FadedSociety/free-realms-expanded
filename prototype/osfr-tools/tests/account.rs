@@ -278,20 +278,34 @@ fn name_check_and_create_return_client_status_codes() {
     // Latin letters with accents are allowed (OSFR parity); other scripts, look-alikes, combining
     // marks, Latin-range symbols and C1 controls are refused for new names.
     for (first, last) in [("José", "Núñez"), ("Zoë", "Ångström"), ("Łukasz", "Dvořák")] {
-        assert_eq!(check_name(&store, 1, first, last).status, NameCheckStatus::Available, "{first} {last}");
+        assert_eq!(
+            check_name(&store, 1, first, last).status,
+            NameCheckStatus::Available,
+            "{first} {last}"
+        );
     }
     for (first, last) in [
-        ("Jоse", "Record"),        // Cyrillic о
-        ("名前", "Record"),          // CJK renders invisibly in the client
+        ("Jоse", "Record"),         // Cyrillic о
+        ("名前", "Record"),         // CJK renders invisibly in the client
         ("Jose\u{0301}", "Record"), // combining acute instead of é
         ("Jo×e", "Record"),         // U+00D7 sits inside the Latin range
         ("Jo\u{0085}e", "Record"),  // C1 control
         ("Jo\u{00A0}e", "Record"),  // no-break space
     ] {
-        assert_eq!(check_name(&store, 1, first, last).status, NameCheckStatus::Invalid, "{first:?}");
+        assert_eq!(
+            check_name(&store, 1, first, last).status,
+            NameCheckStatus::Invalid,
+            "{first:?}"
+        );
     }
     assert_eq!(
-        create_character(&mut store, account_id, creation("Jоse", "Record"), &resources).status,
+        create_character(
+            &mut store,
+            account_id,
+            creation("Jоse", "Record"),
+            &resources
+        )
+        .status,
         CharacterCreateStatus::InvalidName
     );
     assert_eq!(NameCheckStatus::Profane.client_code(), 3);
@@ -498,4 +512,153 @@ fn migration_adopts_a_legacy_character_save_without_rewriting_it() {
             .character_guids,
         [900_000_001, 900_000_002]
     );
+}
+
+#[test]
+fn every_new_name_part_is_letters_joined_by_single_separators() {
+    let temp = TempDir::new();
+    let resources = resources(&temp.0.join("creator"));
+    let mut store = AccountStore::new();
+    let account_id = account(&mut store, 7, 4);
+    for (first, last) in [
+        ("Éva", "O'Vale"),
+        ("Zoë", "Núñez"),
+        ("Łukasz", "Dvořák"),
+        ("Ana-Lu", "De Vale"),
+    ] {
+        assert_eq!(
+            check_name(&store, 1, first, last).status,
+            NameCheckStatus::Available,
+            "{first} {last}"
+        );
+    }
+    for part in ["--", "'-", "-ab", "ab-", "a--b", "a  b", "a -b", "a'-b"] {
+        for (first, last) in [(part, "Record"), ("Eva", part)] {
+            assert_eq!(
+                check_name(&store, 1, first, last).status,
+                NameCheckStatus::Invalid,
+                "{first:?} {last:?}"
+            );
+        }
+    }
+    // Refusals change nothing, for the displayed and the temporary pair alike.
+    let before = store.clone();
+    for refused in [creation("-ab", "TempA"), creation("SampleA", "a--b")] {
+        assert_eq!(
+            create_character(&mut store, account_id, refused, &resources).status,
+            CharacterCreateStatus::InvalidName
+        );
+    }
+    assert_eq!(store, before);
+}
+
+#[test]
+fn accented_and_cased_look_alikes_of_a_saved_name_are_taken() {
+    let temp = TempDir::new();
+    let resources = resources(&temp.0.join("creator"));
+    let mut store = AccountStore::new();
+    let account_id = account(&mut store, 8, 12);
+    let saved = [
+        "Eva", "Kyle", "Lukasz", "Dorde", "Soren", "Weiss", "Aesa", "Oella", "Thora", "Ilka",
+    ];
+    for first in saved {
+        let created = create_character(&mut store, account_id, creation(first, ""), &resources);
+        assert_eq!(created.status, CharacterCreateStatus::Created, "{first}");
+    }
+    let accented = NativeCreation {
+        last_name: "Núñez".into(),
+        ..creation("Zoë", "")
+    };
+    let created = create_character(&mut store, account_id, accented, &resources);
+    assert_eq!(created.status, CharacterCreateStatus::Created);
+
+    for (first, last) in [
+        ("Éva", "Record"),
+        ("EVA", "RECORD"),
+        ("Kýle", "Record"),
+        ("Łukasz", "Record"),
+        ("Đorđe", "Record"),
+        ("Søren", "Record"),
+        ("Weiß", "Record"),
+        ("Æsa", "Record"),
+        ("Œlla", "Record"),
+        ("Þora", "Record"),
+        ("İlka", "Record"),
+        ("ılka", "Record"),
+        ("Zoe", "Nunez"),
+        ("ZOE", "NÚÑEZ"),
+    ] {
+        assert_eq!(
+            check_name(&store, 1, first, last).status,
+            NameCheckStatus::Taken,
+            "{first} {last}"
+        );
+    }
+    assert_eq!(
+        check_name(&store, 1, "Evan", "Record").status,
+        NameCheckStatus::Available
+    );
+
+    let before = store.clone();
+    assert_eq!(
+        create_character(&mut store, account_id, creation("Éva", ""), &resources).status,
+        CharacterCreateStatus::NameTaken
+    );
+    let temporary_look_alike = NativeCreation {
+        temporary_last_name: "Record".into(),
+        ..creation("Fresh", "Évà")
+    };
+    assert_eq!(
+        create_character(&mut store, account_id, temporary_look_alike, &resources).status,
+        CharacterCreateStatus::TemporaryNameTaken
+    );
+    assert_eq!(store, before);
+}
+
+#[test]
+fn saves_with_now_refused_or_colliding_names_still_load_and_play() {
+    let temp = TempDir::new();
+    let resources = resources(&temp.0.join("creator"));
+    let mut store = AccountStore::new();
+    let account_id = account(&mut store, 9, 4);
+    let guids = ["Eva", "Evb", "Evc"].map(|first| {
+        create_character(&mut store, account_id, creation(first, ""), &resources).guid
+    });
+    let path = temp.0.join("accounts.json");
+    store.save(&path).unwrap();
+    // Names an older server accepted: one folds onto 'Eva', one has no letters.
+    let older = fs::read_to_string(&path)
+        .unwrap()
+        .replace("\"Evb\"", "\"Éva\"")
+        .replace("\"Evc\"", "\"--\"");
+    fs::write(&path, older).unwrap();
+
+    let legacy = AccountStore::load(&path).unwrap();
+    assert_eq!(
+        legacy.character(guids[1]).unwrap().identity.first_name,
+        "Éva"
+    );
+    assert_eq!(
+        legacy.character(guids[2]).unwrap().identity.first_name,
+        "--"
+    );
+    assert_eq!(character_list(&legacy, account_id, 1).characters.len(), 3);
+    for guid in guids {
+        let mut session = AuthenticatedSession::new(account_id);
+        let selected = select_and_bind_session(
+            &legacy,
+            &mut session,
+            guid,
+            1,
+            "127.0.0.1:20260",
+            "synthetic-ticket",
+        );
+        assert_eq!(selected.status, CharacterLoginStatus::Success);
+    }
+    assert_eq!(
+        check_name(&legacy, 1, "EVA", "Record").status,
+        NameCheckStatus::Taken
+    );
+    legacy.save(&path).unwrap();
+    assert_eq!(AccountStore::load(&path).unwrap(), legacy);
 }
