@@ -216,8 +216,9 @@ impl FishingService {
 
     /// Start the shared TYPE 21 encounter. `game_id` and `encounter_id` are
     /// supplied by the trusted area/portal integration; their native pairing
-    /// is unresolved (R). The returned 39/16 offer must be sent before client
-    /// start handling. Call `mark_started` after the encounter is ready.
+    /// is unresolved (R). The returned 39/16 offer and its 41/107 ready must be
+    /// sent before client start handling. Call `mark_started` after the
+    /// client's 39/5 is answered (41/2, 39/17).
     pub fn begin(
         &mut self,
         guid: u64,
@@ -521,9 +522,9 @@ impl FishingService {
     }
 
     /// Ordinary entry (W160): admit the player at a listed guide and offer the round. Staged:
-    /// a refusal changes nothing, and the 39/16 offer in the returned [`Change`] is the only
-    /// effect of success. `busy` is true while another activity runs; range and "this exact
-    /// option was offered" are already proven by the NPC menu service.
+    /// a refusal changes nothing, and the 39/16 offer and its 41/107 ready in the returned
+    /// [`Change`] are the only effect of success. `busy` is true while another activity runs;
+    /// range and "this exact option was offered" are already proven by the NPC menu service.
     #[allow(clippy::too_many_arguments)]
     pub fn enter(
         &mut self,

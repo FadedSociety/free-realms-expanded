@@ -251,10 +251,10 @@ impl Round {
     /// session-scoped cap can be observed across trips.
     fn start(&mut self) {
         let offer = self.enter(REED, false).unwrap();
-        assert_eq!(ids(&offer.replies), vec![(39, 16)]);
+        assert_eq!(ids(&offer.replies), vec![(39, 16), (41, 107)]);
         let instance = self.service.instance_id(PLAYER).unwrap();
         let go = self.send(&lifecycle(5, instance), T0).unwrap().unwrap();
-        assert_eq!(ids(&go.replies), vec![(41, 2), (35, 20)]);
+        assert_eq!(ids(&go.replies), vec![(41, 2), (39, 17), (35, 20)]);
         assert_eq!(
             status_flags(&go.replies),
             vec![0x40_0001],
@@ -503,8 +503,8 @@ fn only_listed_guides_admit_and_a_refusal_changes_nothing() {
     let offer = round.enter(REED, false).unwrap();
     assert_eq!(
         ids(&offer.replies),
-        vec![(39, 16)],
-        "the offer is the only effect"
+        vec![(39, 16), (41, 107)],
+        "the offer and its ready are the only effect"
     );
     assert!(offer.changed && !offer.paid);
     assert_eq!(round.service.len(), 1);
@@ -1059,7 +1059,7 @@ fn reconnect_releases_the_round_and_keeps_what_was_already_paid() {
     assert_eq!(round.fisherman_xp(), 10);
     // After the reconnect a new trip starts from scratch.
     let offer = round.enter(REED, false).unwrap();
-    assert_eq!(ids(&offer.replies), vec![(39, 16)]);
+    assert_eq!(ids(&offer.replies), vec![(39, 16), (41, 107)]);
     assert!(
         round
             .service
@@ -1263,9 +1263,9 @@ mod gateway_route {
         // The character may already hold items that share an id with a fish: count the change.
         let base = fish_items(&g);
 
-        // 5. The client's Go: 41/2 and the fishing flag.
+        // 5. The client's Go: 41/2, the 39/17 start and the fishing flag.
         let go = send_at(&mut g, &lifecycle(5, instance), NOW);
-        assert_eq!(ids(&go), vec![(41, 2), (35, 20)]);
+        assert_eq!(ids(&go), vec![(41, 2), (39, 17), (35, 20)]);
         assert_eq!(status_flags(&go), vec![0x40_0001]);
 
         // 6. Register, cast, bite, hook, reel: one catch, paid once.

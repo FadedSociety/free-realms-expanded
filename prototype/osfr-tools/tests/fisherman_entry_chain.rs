@@ -491,8 +491,9 @@ fn start_round(rig: &mut Rig) -> i32 {
     let (_, instance) = enter_fishing(rig);
     let go = rig.send(&lifecycle(5, instance));
     assert!(
-        find(&go.replies, &[41, 0, 2]).is_some(),
-        "39/5 starts the encounter (41/2), not an empty run"
+        find(&go.replies, &[39, 0, 17]).is_some(),
+        "39/5 starts the round (39/17), not an empty run: {:?}",
+        go.replies
     );
     let registered = rig.send(&register(ACTOR));
     assert!(

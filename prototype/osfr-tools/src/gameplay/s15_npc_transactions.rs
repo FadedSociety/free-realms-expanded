@@ -528,6 +528,122 @@ fn an_admitted_fish_entry_starts_with_end_dialog_and_opens_the_round() {
     );
 }
 
+/// T393: Go fish! answers 26/4, the 39/16 offer and its 41/107 ready, in order. The ready
+/// (`00aa36c0` case 0x6b -> `009b0cc0` setReady) turns the start screen's "Loading..." into
+/// Go. The client's Go (39/5, `009be7d0`) gets 41/2, the 39/17 that starts the 39/16 state
+/// (`009b9550`, fishing HUD) and the fishing flag; the round then registers and casts.
+#[test]
+fn go_fish_sends_offer_then_ready_and_go_starts_the_round() {
+    let fixture = Fixture::full();
+    let mut game = fixture.game();
+    let character = character(&game, FISH_GATE);
+    let choice = open_menu(&mut game, &character, FISH_GATE, FISH_OPTION);
+    let entered = game
+        .handle_in_world(&select(FISH_GATE, choice as u32), &character, NOW + 1)
+        .unwrap();
+    let heads: Vec<_> = entered.replies.iter().map(|p| p[..3].to_vec()).collect();
+    assert_eq!(
+        heads,
+        vec![vec![26, 0, 4], vec![39, 0, 16], vec![41, 0, 107]]
+    );
+    let offer = &entered.replies[1];
+    let instance = i32::from_le_bytes(offer[3..7].try_into().unwrap());
+    let game_id = i32::from_le_bytes(offer[11..15].try_into().unwrap());
+    // (R) ordinary entry uses the spot's game id as its encounter id (`FishingService::enter`).
+    let mut ready = vec![41, 0, 107, 0];
+    ready.extend(game_id.to_le_bytes());
+    ready.extend(instance.to_le_bytes());
+    assert_eq!(entered.replies[2], ready, "the bare header naming this run");
+
+    let mut go = vec![39, 0, 5];
+    let mut start = vec![39, 0, 17];
+    for (go_word, start_word) in [(instance, instance), (-1, -1), (-1, game_id)] {
+        go.extend(go_word.to_le_bytes());
+        start.extend(start_word.to_le_bytes());
+    }
+    let started = game.handle_in_world(&go, &character, NOW + 2).unwrap();
+    let mut flag = vec![35, 0, 20, 0];
+    flag.extend(CHARACTER_GUID.to_le_bytes());
+    flag.extend(0x40_0001_u32.to_le_bytes());
+    assert_eq!(started.replies.len(), 3, "{:?}", started.replies);
+    assert!(started.replies[0].starts_with(&[41, 0, 2, 0]));
+    assert_eq!(started.replies[1], start);
+    assert_eq!(started.replies[2], flag);
+
+    // The existing round runs: registration, then a cast 10 m from the spot (138/6 -> 138/8).
+    let handle = [0x44_u8, 0x33, 0x22, 0x11, 0x88, 0x77, 0x66, 0x55];
+    let mut register = vec![138, 0, 2, 0];
+    register.extend(handle);
+    register.push(0);
+    let registered = game
+        .handle_in_world(&register, &character, NOW + 3)
+        .unwrap();
+    assert!(registered.replies[0].starts_with(&[138, 0, 3, 0]));
+    let mut cast = vec![138, 0, 6, 0];
+    cast.extend(handle);
+    let [x, y, z] = character.position;
+    for coordinate in [x + 10.0, y, z, 1.0] {
+        cast.extend(coordinate.to_le_bytes());
+    }
+    cast.push(0);
+    let cast = game.handle_in_world(&cast, &character, NOW + 4).unwrap();
+    assert!(
+        cast.replies[0].starts_with(&[138, 0, 8, 0]),
+        "{:?}",
+        cast.replies
+    );
+}
+
+/// T393: a refused Go fish! (busy, or chosen from out of range) sends none of the start
+/// sequence, opens no round and changes nothing.
+#[test]
+fn a_refused_go_fish_sends_no_offer_or_ready() {
+    let fixture = Fixture::full();
+    let starts = |replies: &[Vec<u8>]| {
+        replies
+            .iter()
+            .any(|p| p.starts_with(&[39, 0, 16]) || p.starts_with(&[41, 0, 107]))
+    };
+    let mut game = fixture.game();
+    let character = character(&game, FISH_GATE);
+    let choice = open_menu(&mut game, &character, FISH_GATE, FISH_OPTION);
+    start_mining(&mut game, &character);
+    let before = state_bytes(&game);
+    let busy = game
+        .handle_in_world(&select(FISH_GATE, choice as u32), &character, NOW + 2)
+        .unwrap();
+    assert!(
+        !busy.changed && !starts(&busy.replies),
+        "{:?}",
+        busy.replies
+    );
+    assert!(game.fishing.is_empty());
+    assert_eq!(state_bytes(&game), before, "busy");
+
+    let mut game = fixture.game();
+    let choice = open_menu(&mut game, &character, FISH_GATE, FISH_OPTION);
+    let far = CharacterState {
+        position: [
+            character.position[0] + 100.0,
+            character.position[1],
+            character.position[2],
+        ],
+        ..character
+    };
+    let before = state_bytes(&game);
+    assert!(
+        game.handle_in_world(&select(FISH_GATE, choice as u32), &far, NOW + 1)
+            .is_err()
+    );
+    assert!(game.fishing.is_empty());
+    assert_eq!(state_bytes(&game), before, "too far");
+    // The refusal consumed nothing: back in range the same choice opens the round.
+    let entered = game
+        .handle_in_world(&select(FISH_GATE, choice as u32), &character, NOW + 2)
+        .unwrap();
+    assert!(starts(&entered.replies));
+}
+
 #[test]
 fn a_positive_26_23_abandon_keeps_its_current_packet() {
     let fixture = Fixture::full();

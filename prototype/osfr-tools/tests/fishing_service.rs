@@ -171,14 +171,14 @@ fn running() -> (InventoryFixture, FishingService) {
             fixture.reward_state(),
         )
         .unwrap();
-    assert_eq!(packet_ids(&offer), vec![(39, 16)]);
+    assert_eq!(packet_ids(&offer), vec![(39, 16), (41, 107)]);
     let instance = service.instance_id(PLAYER).unwrap();
     let mut start = vec![39, 0, 5];
     start.extend(instance.to_le_bytes());
     start.extend((-1i32).to_le_bytes());
     start.extend((-1i32).to_le_bytes());
     let starting = service.handle_minigame_lifecycle(PLAYER, &start).unwrap();
-    assert_eq!(packet_ids(&starting), vec![(41, 2)]);
+    assert_eq!(packet_ids(&starting), vec![(41, 2), (39, 17)]);
     assert!(service.mark_started(PLAYER));
     assert_eq!(
         service.run_state(PLAYER),

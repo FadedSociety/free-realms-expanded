@@ -263,7 +263,15 @@ impl MinigameRuns {
         let next = id
             .checked_add(1)
             .ok_or_else(|| invalid("minigame instance counter exhausted"))?;
-        let packet = info_packet(id, &spec)?;
+        let mut replies = vec![info_packet(id, &spec)?];
+        // An encounter run (fishing 21, soccer 12) has no preload list, so the client's own ready
+        // step (manager state 3 in `009bf5e0`, which `009beb70` reaches only for types 1, 2, 17,
+        // 22 or through a preload) never runs and the start screen stays on "Loading...". 41/107
+        // is the server's ready: dispatcher `00aa36c0` case 0x6b calls `009b0cc0`
+        // (`HandlerMiniGameStart:setReady`, the Go button), as kart's `loaded` sends it.
+        if let RunMode::Encounter { encounter_id, .. } = spec.mode {
+            replies.push(encounter_packet(107, encounter_id, id));
+        }
         self.next_instance_id = next;
         self.current = Some(Run {
             instance_id: id,
@@ -277,7 +285,7 @@ impl MinigameRuns {
             accepted: true,
             changed: true,
             state: Some(RunState::Offered),
-            replies: vec![packet],
+            replies,
             ..Default::default()
         })
     }
@@ -609,14 +617,16 @@ impl MinigameRuns {
             RunMode::Encounter {
                 encounter_id,
                 player_guid,
-            } => vec![encounter_started_packet(
-                *encounter_id,
-                run.instance_id,
-                *player_guid,
-            )],
+            } => vec![
+                encounter_started_packet(*encounter_id, run.instance_id, *player_guid),
+                // The 39/16 join never flags its state as an encounter (`009bfdb0` passes 0
+                // to `009beb70`), so 41/2's `009b9500` skips it. 39/17 (`009b9550`) is what
+                // starts it and shows the game HUD (`009b6aa0`). (R) 41/2 stays as before: on
+                // such a state it only sets client byte +0x780 (`008a9200`) and a loader flag
+                // (`008a8a30`).
+                start_ack_packet(run.instance_id, run.spec.game_id),
+            ],
         };
-        // Keep the sequence as discrete packets; no generic 39/17 is sent for
-        // an encounter per the reviewed framework guide.
         self.current.as_mut().unwrap().state = RunState::Starting;
         Ok(RunOutcome {
             accepted: true,
@@ -707,11 +717,18 @@ fn flash_launch_packet(movie: &str) -> Vec<u8> {
 
 /// Encounter started packet 41/2; client dispatcher `00aa36c0`, body reader `00a9f760`.
 fn encounter_started_packet(encounter_id: i32, instance_id: i32, player_guid: u64) -> Vec<u8> {
-    let mut bytes = [FAMILY_ENCOUNTER.to_le_bytes(), 2_u16.to_le_bytes()].concat();
-    bytes.extend(encounter_id.to_le_bytes());
-    bytes.extend(instance_id.to_le_bytes());
+    let mut bytes = encounter_packet(2, encounter_id, instance_id);
     bytes.extend(player_guid.to_le_bytes());
     bytes.push(0);
+    bytes
+}
+
+/// Encounter header `u16 41 | u16 sub | i32 encounter | i32 instance` (reader `008d6690`); alone
+/// it is the whole 41/107 body (`00a9f990`).
+fn encounter_packet(sub: u16, encounter_id: i32, instance_id: i32) -> Vec<u8> {
+    let mut bytes = [FAMILY_ENCOUNTER.to_le_bytes(), sub.to_le_bytes()].concat();
+    bytes.extend(encounter_id.to_le_bytes());
+    bytes.extend(instance_id.to_le_bytes());
     bytes
 }
 

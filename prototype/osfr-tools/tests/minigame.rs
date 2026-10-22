@@ -444,13 +444,25 @@ fn encounter_start_and_close_use_encounter_family_packets() {
         },
     );
     encounter.flags = [1; 5];
-    runs.offer(encounter).unwrap();
+    let offered = runs.offer(encounter).unwrap();
+    // 39/16 then the 41/107 ready (`00a9f990`: the bare encounter header) that turns the
+    // start screen's "Loading..." into Go.
+    assert_eq!(offered.replies.len(), 2);
+    assert_eq!(offered.replies[0][..3], [39, 0, 16]);
+    assert_eq!(
+        offered.replies[1],
+        vec![41, 0, 107, 0, 77, 0, 0, 0, 127, 0, 0, 0]
+    );
     let started = runs.handle_client(&request(5, 127)).unwrap();
+    // 41/2 as before, then the 39/17 that starts a 39/16-created state (`009b9550`).
     assert_eq!(
         started.replies,
-        vec![vec![
-            41, 0, 2, 0, 77, 0, 0, 0, 127, 0, 0, 0, 8, 7, 6, 5, 4, 3, 2, 1, 0
-        ]]
+        vec![
+            vec![
+                41, 0, 2, 0, 77, 0, 0, 0, 127, 0, 0, 0, 8, 7, 6, 5, 4, 3, 2, 1, 0
+            ],
+            vec![39, 0, 17, 127, 0, 0, 0, 255, 255, 255, 255, 4, 0, 0, 0],
+        ]
     );
     runs.started(127);
     let loss = TestActivity {
