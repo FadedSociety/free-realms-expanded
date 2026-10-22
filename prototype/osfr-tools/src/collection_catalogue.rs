@@ -100,14 +100,22 @@ pub struct Reward {
     pub quest_add: Vec<i32>,
 }
 
+/// A kind-1 row: `+0x24` is the item (`Item=%d`, `0103b4a0`) and `+0x10` its display name
+/// (`RewardEntryDataSource` column 1, `00c33430`).
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]
 #[serde(deny_unknown_fields)]
 pub struct RewardItem {
-    pub item_definition_id: i32,
+    /// The item granted, which must have a definition: the captured `+0x24` id, else (R) the
+    /// single Legacy item named by `+0x10` (T630), else `None` (no item, the rest of the reward
+    /// stands).
+    pub item_definition_id: Option<i32>,
     pub count: u32,
     /// Lxzxrus `RewardItemIdsGirls`, only where it lists one.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub female_item_definition_id: Option<i32>,
+    /// The captured `+0x24` id, kept only when it has no definition and so is not granted.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub captured_item_definition_id: Option<i32>,
 }
 
 #[derive(Clone, Debug, Deserialize, Serialize, PartialEq)]

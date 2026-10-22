@@ -5,6 +5,7 @@ use osfr_tools::collection_catalogue::{
     CatalogueFile, Collection, CollectionCatalogueContent, Entry, FILE_NAME, Gaps, ItemLink,
     ItemLinkNote, Reward, RewardItem, RewardToken, RewardXp, SCHEMA_VERSION,
 };
+use osfr_tools::inventory::Inventory;
 use osfr_tools::startup_selfdata::{CollectionRecord, parse_self};
 use serde::{Deserialize, de::DeserializeOwned};
 use serde_json::{Value, json};
@@ -162,13 +163,14 @@ fn exploration_sets_carry_their_captured_rows() {
     assert_eq!(
         set_265.reward.items,
         [RewardItem {
-            item_definition_id: 18040,
+            item_definition_id: Some(18040),
             count: 1,
             female_item_definition_id: Some(16529),
+            captured_item_definition_id: None,
         }]
     );
     let set_284 = &content.collection(284).unwrap().reward;
-    assert_eq!(set_284.items[0].item_definition_id, 70341);
+    assert_eq!(set_284.items[0].item_definition_id, Some(70341));
     assert_eq!(
         set_284.tokens,
         [RewardToken {
@@ -195,6 +197,54 @@ fn entry_for_item_answers_only_unique_links() {
     assert_eq!(linking_2868, 2, "2868 is linked by two entries");
     assert_eq!(content.entry_for_item(2868), None);
     assert_eq!(content.entry_for_item(-1), None);
+}
+
+/// T630: every item the catalogue binds (entry links, reward items, female variants) has a
+/// definition in the runtime item catalogue, so the playtest bundle's item gate passes.
+#[test]
+fn every_bound_item_has_a_runtime_definition() {
+    let runtime = Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab/reports/round70-native-20261016T061000Z/content");
+    let inventory = Inventory::load(&runtime, None).expect("the round70 item catalogue loads");
+    let content = committed();
+    let undefined: BTreeSet<i32> = content
+        .collections()
+        .iter()
+        .flat_map(|c| {
+            let entries = c.entries.iter().map(|e| e.item_definition_id);
+            let rewards = c
+                .reward
+                .items
+                .iter()
+                .flat_map(|item| [item.item_definition_id, item.female_item_definition_id]);
+            entries.chain(rewards).flatten()
+        })
+        .filter(|&id| !inventory.has_definition(id))
+        .collect();
+    assert!(undefined.is_empty(), "bound but undefined: {undefined:?}");
+
+    // The three captured ids no definition source has: the "Skeletal T-Rex" row (NameId 19042)
+    // grants 79446, ride 13575's item; the "Sunstone Street Lamp" and "Skullz Tent" rows grant
+    // no item, and their collections and tokens stand.
+    let reward = |id: i32| content.collection(id).unwrap().reward.clone();
+    let item = |granted, captured| RewardItem {
+        item_definition_id: granted,
+        count: 1,
+        female_item_definition_id: None,
+        captured_item_definition_id: Some(captured),
+    };
+    assert_eq!(reward(313).items, [item(Some(79446), 12410)]);
+    assert_eq!(reward(313).coins, 12);
+    for (id, captured, token) in [(311, 38817, 654), (312, 38816, 655)] {
+        assert_eq!(reward(id).items, [item(None, captured)]);
+        assert_eq!(
+            reward(id).tokens,
+            [RewardToken {
+                token_id: token,
+                count: 1
+            }]
+        );
+    }
 }
 
 #[test]
@@ -327,11 +377,13 @@ fn join_input<T: DeserializeOwned>(
 
 /// One captured record. Entry payload in stream order (`008dacc0`): DefinitionId, Index,
 /// CollectionId, NameId, the icon pair (`008caaa0`), an unknown dword, Collected (not kept).
-/// Reward rows' common dwords (`0103c460`): icon pair, +0x10, +0x20 (count/amount), +0x24 (the
-/// item, profile or token id), +0x28.
+/// Reward rows' common dwords (`0103c460`): icon pair, +0x10 (display NameId, `00c33430`
+/// column 1), +0x20 (count/amount), +0x24 (the item, profile or token id), +0x28.
+/// `reward_item(item, name)` is the item a kind-1 row grants.
 fn collection(
     record: &CollectionRecord,
     link: &impl Fn(i32, i32) -> Link,
+    reward_item: &impl Fn(i32, i32) -> Option<i32>,
     female: &BTreeMap<(i32, i32), i32>,
 ) -> Collection {
     let [
@@ -380,15 +432,20 @@ fn collection(
         ..Reward::default()
     };
     for row in &record.reward.entries {
-        let [_, _, _, count, target, zero] = dwords(&row.common_fields);
+        let [_, _, name, count, target, zero] = dwords(&row.common_fields);
         assert_eq!(zero, 0, "collection {id} reward row");
         let tail = || int(dwords::<1>(&row.kind_fields)[0]);
         match row.kind {
-            1 => reward.items.push(RewardItem {
-                item_definition_id: int(target),
-                count,
-                female_item_definition_id: female.get(&(int(id), int(target))).copied(),
-            }),
+            1 => {
+                let granted = reward_item(int(target), int(name));
+                reward.items.push(RewardItem {
+                    item_definition_id: granted,
+                    count,
+                    female_item_definition_id: female.get(&(int(id), int(target))).copied(),
+                    captured_item_definition_id: (granted != Some(int(target)))
+                        .then_some(int(target)),
+                })
+            }
             3 => reward.xp.push(RewardXp {
                 profile_id: int(target),
                 amount: count,
@@ -492,10 +549,22 @@ fn generate(packet: &[u8], references: &Path) -> String {
             _ => (None, None, Some(ItemLinkNote::NoItem)),
         }
     };
+    // T630 (R): a captured reward item Legacy does not define cannot be granted; the row's own
+    // display name picks the single Legacy item with that NameId (12410 "Skeletal T-Rex" ->
+    // 79446), and with none the row grants no item (38816, 38817).
+    let reward_item = |item: i32, name_id: i32| {
+        if legacy_ids.contains(&item) {
+            return Some(item);
+        }
+        match by_name.get(&name_id).map(Vec::as_slice) {
+            Some([only]) => Some(*only),
+            _ => None,
+        }
+    };
     let collections: Vec<Collection> = parse_self(packet)
         .collections
         .iter()
-        .map(|record| collection(record, &link, &female))
+        .map(|record| collection(record, &link, &reward_item, &female))
         .collect();
 
     let reward_items = || collections.iter().flat_map(|c| &c.reward.items);
@@ -508,7 +577,7 @@ fn generate(packet: &[u8], references: &Path) -> String {
     let reward_items_missing_from_legacy = reward_items()
         .flat_map(|item| {
             [
-                Some(item.item_definition_id),
+                item.captured_item_definition_id.or(item.item_definition_id),
                 item.female_item_definition_id,
             ]
         })

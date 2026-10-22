@@ -23516,8 +23516,9 @@
         "coins": 0,
         "items": [
           {
-            "item_definition_id": 38817,
-            "count": 1
+            "item_definition_id": null,
+            "count": 1,
+            "captured_item_definition_id": 38817
           }
         ],
         "xp": [],
@@ -23625,8 +23626,9 @@
         "coins": 0,
         "items": [
           {
-            "item_definition_id": 38816,
-            "count": 1
+            "item_definition_id": null,
+            "count": 1,
+            "captured_item_definition_id": 38816
           }
         ],
         "xp": [],
@@ -23684,8 +23686,9 @@
         "coins": 12,
         "items": [
           {
-            "item_definition_id": 12410,
-            "count": 1
+            "item_definition_id": 79446,
+            "count": 1,
+            "captured_item_definition_id": 12410
           }
         ],
         "xp": [],
