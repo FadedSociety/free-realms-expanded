@@ -28,10 +28,10 @@ use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState},
     quest_engine::{CharacterEligibility, QuestEngine, QuestState},
-    soccer::{self, SoccerPacket},
     soccer_match::MatchPhase,
 };
 use serde_json::{Value, json};
+use soccer_play::*;
 use std::{
     fs,
     path::{Path, PathBuf},
@@ -41,6 +41,8 @@ use std::{
 #[allow(dead_code)] // only `copy_missing` is used here
 #[path = "common/content_copy.rs"]
 mod content_copy;
+#[path = "support/soccer_play.rs"]
+mod soccer_play;
 
 const GUID: u64 = 42_059;
 const OTHER: u64 = 42_060;
@@ -238,21 +240,6 @@ fn player(fixture: &Fixture, guid: u64) -> Gameplay {
     player_with(fixture, guid, Some(active_quests(&fixture.dir, guid)))
 }
 
-fn play(activity: u32) -> Vec<u8> {
-    let mut inner = vec![167, 0, 1, 2];
-    inner.extend(activity.to_le_bytes());
-    inner.extend(0u32.to_le_bytes());
-    inner
-}
-
-fn lifecycle(sub: u8, instance: i32) -> Vec<u8> {
-    let mut packet = vec![39, 0, sub];
-    for value in [instance, -1, -1] {
-        packet.extend(value.to_le_bytes());
-    }
-    packet
-}
-
 /// A client's own `39/14` result claim: the exact shape the server writes for
 /// `OnGameWonMsg`, but sent client-to-server.
 fn client_won_payload(instance: i32) -> Vec<u8> {
@@ -264,97 +251,6 @@ fn client_won_payload(instance: i32) -> Vec<u8> {
     packet.extend((text.len() as i32).to_le_bytes());
     packet.extend_from_slice(text);
     packet
-}
-
-fn offer_instance(replies: &[Vec<u8>]) -> i32 {
-    let offer = replies
-        .iter()
-        .find(|reply| reply.starts_with(&[39, 0, 16]))
-        .expect("39/16 soccer offer");
-    i32::from_le_bytes(offer[3..7].try_into().unwrap())
-}
-
-fn position(player: u64, position: [f32; 3]) -> Vec<u8> {
-    soccer::encode_inner(&SoccerPacket::UpdatePlayerPos {
-        player,
-        position,
-        tail: [0; 45],
-    })
-}
-
-fn shot(player: u64) -> Vec<u8> {
-    soccer::encode_inner(&SoccerPacket::UpdatePlayerState {
-        player,
-        state: 17,
-        aux: 255,
-        state_counter: 1,
-        vectors: [[0.0, 0.0, 1.0, 1.0], [0.0; 4], [0.0; 4]],
-    })
-}
-
-fn client_goal() -> Vec<u8> {
-    soccer::encode_inner(&SoccerPacket::GoalMade { fields: [0, 1, 1] })
-}
-
-/// Portal Play through Loaded and the start request. Returns the run instance.
-fn enter_match(game: &mut Gameplay, character: &CharacterState, activity: u32, at: u64) -> i32 {
-    let played = game
-        .handle_in_world(&play(activity), character, at)
-        .unwrap();
-    assert!(played.scene_zoning.is_some(), "Play zones into sg_soccer");
-    let loaded = game.initialize_world(character, at + 100).unwrap();
-    let instance = offer_instance(&loaded.replies);
-    let started = game
-        .handle_in_world(&lifecycle(5, instance), character, at + 200)
-        .unwrap();
-    assert!(
-        started
-            .replies
-            .iter()
-            .any(|reply| reply.starts_with(&[41, 0, 2, 0])),
-        "shared encounter start"
-    );
-    instance
-}
-
-/// The server-scored goal a real client produces: report the pose, let the
-/// server step, then send the sub-14 charged shot.
-fn shoot(game: &mut Gameplay, character: &CharacterState, at: u64) {
-    game.handle_in_world(&position(character.guid, [0.0, 0.0, 0.0]), character, at)
-        .unwrap();
-    game.tick(character, at + 150).unwrap();
-    game.handle_in_world(&shot(character.guid), character, at + 150)
-        .unwrap();
-}
-
-/// Step the authoritative clock until full time settles the match. Returns the
-/// settling tick's replies and the tick time.
-fn tick_to_full_time(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    mut now: u64,
-) -> (Vec<Vec<u8>>, u64) {
-    for _ in 0..160 {
-        now += 250;
-        let out = game.tick(character, now).unwrap();
-        if index(&out.replies, &[39, 0, 18]).is_some() {
-            return (out.replies, now);
-        }
-    }
-    panic!("the soccer clock reached full time");
-}
-
-/// One full match: Play, start, server goal, full time. Returns the settling
-/// tick's replies and its time.
-fn win_match(
-    game: &mut Gameplay,
-    character: &CharacterState,
-    activity: u32,
-    at: u64,
-) -> (Vec<Vec<u8>>, u64) {
-    enter_match(game, character, activity, at);
-    shoot(game, character, at + 200);
-    tick_to_full_time(game, character, at + 350)
 }
 
 fn index(packets: &[Vec<u8>], prefix: &[u8]) -> Option<usize> {

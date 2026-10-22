@@ -13,7 +13,6 @@ use osfr_tools::{
     gateway::{Gateway, GatewayOutcome},
     progression_extras,
     rewards::{ItemGrant, RewardDisplay, RewardGrant},
-    soccer::{self, SoccerPacket},
     soccer_service::FIRST_INSTANCE_ID,
     world::{World, WorldPose},
 };
@@ -24,6 +23,10 @@ use std::{
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
 };
+
+#[path = "support/soccer_play.rs"]
+mod soccer_play;
+use soccer_play::{client_goal, lifecycle, offer_instance, play, position, shot};
 
 const GUID: u64 = 0x0000_0010_0080_06b2;
 const SOCCER_ACTIVITY: u32 = 43;
@@ -155,29 +158,6 @@ fn soccer_content_with_reward(job_xp: u32) -> Vec<u8> {
     .unwrap()
 }
 
-fn play(activity: u32) -> Vec<u8> {
-    let mut inner = vec![167, 0, 1, 2];
-    inner.extend(activity.to_le_bytes());
-    inner.extend(0u32.to_le_bytes());
-    inner
-}
-
-fn lifecycle(sub: u8, instance: i32) -> Vec<u8> {
-    let mut packet = vec![39, 0, sub];
-    for value in [instance, -1, -1] {
-        packet.extend(value.to_le_bytes());
-    }
-    packet
-}
-
-fn offer_instance(replies: &[Vec<u8>]) -> i32 {
-    let offer = replies
-        .iter()
-        .find(|reply| reply.starts_with(&[39, 0, 16]))
-        .expect("39/16 soccer offer");
-    i32::from_le_bytes(offer[3..7].try_into().unwrap())
-}
-
 fn portal_rows(list: &[u8]) -> Vec<(u32, u32, String, u8)> {
     assert_eq!(&list[..4], &[167, 0, 1, 1]);
     let count = u32::from_le_bytes(list[8..12].try_into().unwrap()) as usize;
@@ -203,28 +183,6 @@ fn portal_rows(list: &[u8]) -> Vec<(u32, u32, String, u8)> {
     }
     assert_eq!(offset, list.len(), "portal list has no trailing bytes");
     rows
-}
-
-fn position(inner_player: u64, position: [f32; 3]) -> Vec<u8> {
-    soccer::encode_inner(&SoccerPacket::UpdatePlayerPos {
-        player: inner_player,
-        position,
-        tail: [0; 45],
-    })
-}
-
-fn shot(inner_player: u64) -> Vec<u8> {
-    soccer::encode_inner(&SoccerPacket::UpdatePlayerState {
-        player: inner_player,
-        state: 17,
-        aux: 255,
-        state_counter: 1,
-        vectors: [[0.0, 0.0, 1.0, 1.0], [0.0; 4], [0.0; 4]],
-    })
-}
-
-fn client_goal() -> Vec<u8> {
-    soccer::encode_inner(&SoccerPacket::GoalMade { fields: [0, 1, 1] })
 }
 
 #[test]

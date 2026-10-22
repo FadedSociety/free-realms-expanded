@@ -99,6 +99,13 @@
       "job": "Postman",
       "label_string_id": 412445,
       "source": "client: 412445 'Become a Postman' (menu label); 412446/442230/384165/384171 name Felipe in Sanctuary; 46247 'Flitter can teach you how to become a postman.', 46248/73595 (speak with Flitter in Sanctuary) and Flitter's own greeting 24842 ('If you'd like to work as a Postman'). guide: notes/Build Guides/Content/Jobs/Postman.md:24,33-34,262 (How to unlock, Trainers, Conflicts 2). wiki: Postman (Felipe unlocks the job). reconstructed: (R) Felipe is only a poi_anchor in the Sanctuary content, so Flitter, the spawned Sanctuary postmaster (legacy_data, model 411), is the reachable menu trainer; the menu choice grants the job without the original Become a Postman / Can You Deliver? quests"
+    },
+    {
+      "npc": 9000000140,
+      "profile": 52,
+      "job": "Soccer Star",
+      "label_string_id": 412463,
+      "source": "client: 412463 'Become a Soccer Star' (menu label), 412464 'Learn how to be a soccer star by finding Manager Landon in Snowhill.', 1388210539/1821460636 (speak to Manager Landon at the soccer field near Perry's Pasture). guide: notes/Build Guides/Content/Jobs/Soccer Star.md Overview 'How to unlock' and Trainers (Manager Landon is the only trainer that starts the job). reconstructed: (R) Landon is a poi_anchor in the Snowhill content, so data/content/npc_spawns_extra.json holds his drawable spawn (T409); the menu choice unlocks the job and grants the play package's starter outfit once, without activating it."
     }
   ]
 }

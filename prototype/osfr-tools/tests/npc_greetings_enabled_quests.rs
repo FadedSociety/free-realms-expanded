@@ -279,7 +279,11 @@ const BINDINGS: [Binding; 13] = [
 /// Enabled quest givers and talk targets whose client text has no recoverable
 /// first-person line of their own. Each stays unbound; the test fails a new
 /// unbound id that is not listed here.
-const BLANK_WITH_REASON: [(u64, &str); 8] = [
+const BLANK_WITH_REASON: [(u64, &str); 9] = [
+    (
+        9000000140,
+        "Manager Landon (T409): his client lines are third person (402947, 402841, 416471, 402687); the first-person substitute plea 418984 is the Snowy Scrimmage offer intro, whose speaker the Soccer Star guide leaves unnamed (1591815111), so no uncontested greeting of his own is recovered.",
+    ),
     (
         9000000173,
         "Postmaster Lane: the split Trail of Mail intro 141828 is quoted by the Postman guide under Enve LeStamp's earlier Sasparilla row, so the speaker is contested; no uncontested first-person line exists.",

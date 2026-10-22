@@ -73172,6 +73172,37 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "spawn_guid": 9000000140,
+      "legacy_npc_id": null,
+      "content_key": 9000000140,
+      "model_id": 1457,
+      "model_file_name": "human_m_manager_landon.agr",
+      "name": "Manager Landon",
+      "name_string_id": 401744,
+      "position": [
+        -70.714,
+        11.04,
+        226.4
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "data/content/npcs/snowhill.json npc 9000000140 (Manager Landon, roles quest_giver/trainer, Snowhill zone 13); the position is that row's, verbatim. ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=1982 and Id=2351 use ModelId=1457 / ModelFileName=human_m_manager_landon.agr; both rows name other characters, so only the asset name supplies the model and legacy_npc_id stays null."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 1457 = human_m_manager_landon.agr; Assets_manifest.txt lists human_m_manager_landon.agr.z. The regional name hash 2754079242 (ucdt) maps to Global.Text 401744 in lab/reports/locale-id-map.json, and 401744 resolves to 'Manager Landon' in lab/reports/locale-id-to-text.json; the AddNpc name field is a Global.Text id (client formats 'Global.Text.%d' at 0x01804c14)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T409: the position is the regional row's reconstructed Perry's Pasture POI 20 XZ offset, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 1457 is chosen by its asset name; Landon's own retail spawn row is unrecovered. (R) spawn_guid/content_key reuse NPC key 9000000140 as the runtime actor GUID so the ordinary 26/8 click resolves the regional row (trainer menu and quests)."
+        }
+      ],
+      "position_w": null
     }
   ]
 }

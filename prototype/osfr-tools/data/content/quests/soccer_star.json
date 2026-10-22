@@ -137,15 +137,56 @@
     },
     {
       "id": 3140004,
+      "job": 52,
       "title_string_id": 407408,
-      "giver_npc_id": 9000000003,
+      "giver_npc_id": 9000000140,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "minigame_id": 43,
+          "count": 1,
+          "text_string_id": 441183,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Quest line > Arc 1 - Joining the Sidekicks (Snowhill and the Northern Wilds), row 1: objective 'Win a Snowhill Soccer minigame' (2216136620; the same text is Global.Text 441183) and 'Help the Sidekicks out! Play a game against the Snowhill Snowspurs with them.' (3355830634). Client locale 37945 'Snowhill Soccer' is the name_id of MiniGameData row 43 in data/content/soccer.json."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 441183 'Win a Snowhill Soccer minigame': exact locale match for the guide goal 2216136620 (lab/reports/locale-id-map.json hash_to_ids['2216136620'] = [441183]), sent as the 49/3 goal name and description."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T409: objective id 1 and count 1 are local; the guide names one Snowhill Soccer win. Only a server-settled win of game 43 emits FinishMinigame { 43 } (Gameplay::tick_world -> npc_minigame_win, T259); a loss, a quit or another field does not."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 10,
+          "items": [],
+          "job_xp": {
+            "52": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T409: the guide records no Snowy Scrimmage reward ('Rewards are largely unknown'; no quest-complete frame). 10 coins and 25 Soccer Star (profile 52) XP are the T244 job-entry rung on the T202 small bonus ladder (25 for a single follow-up objective); no item is granted."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Quest line > Arc 1 - Joining the Sidekicks (Snowhill and the Northern Wilds), row 1; name 'Soccer Star: Snowy Scrimmage'; title id cell 3969225798 ucdt; 3053227271 ugdt"
+        },
+        {
+          "kind": "client",
+          "evidence": "lab/reports/locale-id-to-text.json: 407408 'Soccer Star: Snowy Scrimmage' (title; ucdt 3969225798 maps to 407408 in lab/reports/locale-id-map.json), 418984 'Oh no! One of the players just suffered a terrible injury! ... are you interested in playing soccer' (intro; guide 1591815111), 402583 'Emergency! The Sidekicks need someone to replace their center player ...' (description; guide 3332971439), 402584 'Lookin' good on the field! ... go meet your teammates and your coach... formally.' (end text), 37945 'Snowhill Soccer' (the field)."
         },
         {
           "kind": "reconstructed",
@@ -157,10 +198,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -169,10 +206,25 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T409: giver is Manager Landon (9000000140). The guide's speaker for the substitute line is unnamed (1591815111) and 2487084498 says 'Manager Landon is allowing an emergency substitution'; Landon is the Snowhill Soccer Field trainer and the giver of the next record 3140005."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T409: job 52 (Soccer Star) gate. The trainer row in job_trainers.json is the entry; this first story quest is offered only while Soccer Star is active and unlocked, which also guarantees the job_xp profile exists at turn-in."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T409: end text 402584 is the completion line of the client's older 'Snowy Scrimmage' locale block (intro 402581, title 402582, description 402583, end 402584; the T-1/T+1/T+2 rule of scripts/quest_text_backfill.py). It leads into 3140005 'Meeting The Team'. No 'Soccer Star:'-prefixed completion string exists."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T409: only 3140004 is enabled; the entry titles 3140001-3140003 and the later story records stay disabled."
         }
       ],
-      "enabled": false
+      "description_string_id": 402583,
+      "intro_text_string_id": 418984,
+      "end_text_string_id": 402584,
+      "enabled": true
     },
     {
       "id": 3140005,

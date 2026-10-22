@@ -23657,6 +23657,22 @@
       ],
       "quests_given": [
         {
+          "quest_id": 3140004,
+          "title": "Soccer Star: Snowy Scrimmage",
+          "title_string_id": 407408,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Soccer Star.md: Quest line > Arc 1 - Joining the Sidekicks (Snowhill and the Northern Wilds), row 1; name 'Soccer Star: Snowy Scrimmage'; title id cell 3969225798 ucdt (Global.Text 407408); 'Manager Landon is allowing an emergency substitution - that's you' (2487084498)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T409: Landon gives 3140004; the substitute speaker is unnamed in the client text"
+            }
+          ]
+        },
+        {
           "quest_id": 3140005,
           "title": "Soccer Star: Meeting The Team",
           "title_string_id": 402574,
@@ -23698,6 +23714,7 @@
         }
       ],
       "quest_ids_given": [
+        3140004,
         3140005
       ],
       "quests_given_text": [
