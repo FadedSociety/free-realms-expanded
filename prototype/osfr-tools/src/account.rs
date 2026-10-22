@@ -179,16 +179,23 @@ fn nonempty_pair<'a>(first: &'a str, last: &'a str) -> Option<(&'a str, &'a str)
     (!first.is_empty() && !last.is_empty()).then_some((first, last))
 }
 
+/// Longest first and last name of a new character, in characters, and no combined cap.
+/// (R): the original server's limits are unknown; these admit every length the picker offers.
+///
+/// - Picker: "first prefix+suffix" from `Resources/CharacterCreate/CharacterCreateNames.txt`
+///   (path string 0x0180b684). characterNameScreen.gfx `updateNameHeader` joins the three wheels;
+///   `HandleInput` (arrows, Random) reaches every row with no length filter. Longest rows: first
+///   11 (`Alexzandria`, `Christopher`), prefix 8 (`Imperial`), suffix 8 (`slippers`): last 16.
+/// - Typed: check-name codes 9/10 (client switch 0x00710e20) show locale 432097/432096, "The
+///   Custom name ... must be less than 15 characters", so 14. The movie's own min/max
+///   (native `GetCharacterNameLengthMinMax` 0x00c1ba00, Lua fallback 1..10) is China-only.
+/// - Combined: code 5 shows locale 432109, "... must contain at least 15 characters", which the
+///   picker's own 9-letter "Ari Oxarm" breaks; no client number caps the total, so 5 is unproduced.
+const MAX_FIRST_NAME_CHARS: usize = 14;
+const MAX_LAST_NAME_CHARS: usize = 16;
+
 fn valid_client_name(first: &str, last: &str) -> bool {
-    // (R) Client UI thresholds are enforced locally; original server checks are unknown.
-    let first_len = first.chars().count();
-    let last_len = last.chars().count();
-    (2..=14).contains(&first_len)
-        && (2..=14).contains(&last_len)
-        && first_len + last_len <= 15
-        && identity::valid_name(first, last)
-        && new_name_part(first)
-        && new_name_part(last)
+    name_shape_status(first, last) == NameCheckStatus::Available
 }
 
 /// A first or last name of a new character (and of its temporary pair).
@@ -218,6 +225,7 @@ pub enum NameCheckStatus {
     Available,
     Taken,
     Profane,
+    /// Client code 5. Never produced: see `MAX_FIRST_NAME_CHARS` for why there is no combined cap.
     TotalLengthInvalid,
     ServerFailure,
     FirstTooShort,
@@ -276,22 +284,28 @@ pub fn check_name(store: &AccountStore, server_id: i32, first: &str, last: &str)
 }
 
 fn check_name_status(store: &AccountStore, first: &str, last: &str) -> NameCheckStatus {
+    match name_shape_status(first, last) {
+        NameCheckStatus::Available if store.character_name_taken(first, last) => {
+            NameCheckStatus::Taken
+        }
+        status => status,
+    }
+}
+
+/// Length and letter rules for a new name, shared by create and check-name.
+fn name_shape_status(first: &str, last: &str) -> NameCheckStatus {
     let first_len = first.chars().count();
     let last_len = last.chars().count();
     if first_len < 2 {
         NameCheckStatus::FirstTooShort
     } else if last_len < 2 {
         NameCheckStatus::LastTooShort
-    } else if first_len > 14 {
+    } else if first_len > MAX_FIRST_NAME_CHARS {
         NameCheckStatus::FirstTooLong
-    } else if last_len > 14 {
+    } else if last_len > MAX_LAST_NAME_CHARS {
         NameCheckStatus::LastTooLong
-    } else if first_len + last_len > 15 {
-        NameCheckStatus::TotalLengthInvalid
     } else if !identity::valid_name(first, last) || !new_name_part(first) || !new_name_part(last) {
         NameCheckStatus::Invalid
-    } else if store.character_name_taken(first, last) {
-        NameCheckStatus::Taken
     } else {
         NameCheckStatus::Available
     }

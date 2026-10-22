@@ -264,12 +264,8 @@ fn name_check_and_create_return_client_status_codes() {
         NameCheckStatus::FirstTooLong
     );
     assert_eq!(
-        check_name(&store, 1, "SampleA", "VeryLongLastName").status,
+        check_name(&store, 1, "SampleA", "VeryLongerLastName").status,
         NameCheckStatus::LastTooLong
-    );
-    assert_eq!(
-        check_name(&store, 1, "LongNamePart", "LastPart").status,
-        NameCheckStatus::TotalLengthInvalid
     );
     assert_eq!(
         check_name(&store, 1, "Bad!", "Record").status,
@@ -309,6 +305,7 @@ fn name_check_and_create_return_client_status_codes() {
         CharacterCreateStatus::InvalidName
     );
     assert_eq!(NameCheckStatus::Profane.client_code(), 3);
+    assert_eq!(NameCheckStatus::TotalLengthInvalid.client_code(), 5);
     assert_eq!(NameCheckStatus::ServerFailure.client_code(), 6);
     assert_eq!(
         create_character(
@@ -546,6 +543,103 @@ fn every_new_name_part_is_letters_joined_by_single_separators() {
     for refused in [creation("-ab", "TempA"), creation("SampleA", "a--b")] {
         assert_eq!(
             create_character(&mut store, account_id, refused, &resources).status,
+            CharacterCreateStatus::InvalidName
+        );
+    }
+    assert_eq!(store, before);
+}
+
+// L058: the creator's picker joins a first name and a last-name prefix and suffix from the client's
+// CharacterCreateNames.txt (longest rows 11, 8 and 8) and sends the pick as the temporary pair
+// (client 0x0070cfa0). A native run was refused "Jessica Grittycandle" by a 15-letter total cap.
+#[test]
+fn the_longest_names_the_creator_picker_offers_pass_check_name_and_create() {
+    let temp = TempDir::new();
+    let resources = resources(&temp.0.join("creator"));
+    let mut store = AccountStore::new();
+    let account_id = account(&mut store, 9, 8);
+    let picks = [
+        ("Christopher", "Imperialslippers"), // longest first + longest last: 27
+        ("Alexzandria", "Majesticcauldron"),
+        ("Jessica", "Grittycandle"),
+        ("Ari", "Oxarm"), // shortest: 9
+    ];
+    for (first, last) in picks {
+        assert_eq!(
+            check_name(&store, 1, first, last).status,
+            NameCheckStatus::Available,
+            "{first} {last}"
+        );
+        let picked = NativeCreation {
+            first_name: String::new(),
+            last_name: String::new(),
+            temporary_first_name: first.into(),
+            temporary_last_name: last.into(),
+            ..creation("", "")
+        };
+        let created = create_character(&mut store, account_id, picked, &resources);
+        assert_eq!(created.status, CharacterCreateStatus::Created, "{first}");
+        assert_eq!(
+            check_name(&store, 1, first, last).status,
+            NameCheckStatus::Taken
+        );
+    }
+    // A typed (displayed) pair of the same lengths is created too.
+    let typed = NativeCreation {
+        last_name: "Sapphirefeathers".into(),
+        ..creation("Christophera", "TempTyped")
+    };
+    let created = create_character(&mut store, account_id, typed, &resources);
+    assert_eq!(created.status, CharacterCreateStatus::Created);
+}
+
+#[test]
+fn a_name_part_over_the_limit_is_refused_and_changes_nothing() {
+    let temp = TempDir::new();
+    let resources = resources(&temp.0.join("creator"));
+    let mut store = AccountStore::new();
+    let account_id = account(&mut store, 10, 8);
+    let (first_14, first_15) = ("Christopherann", "Christopheranne");
+    let (last_16, last_17) = ("Imperialslippers", "Imperialslipperss");
+    assert_eq!(
+        check_name(&store, 1, first_14, last_16).status,
+        NameCheckStatus::Available
+    );
+    assert_eq!(
+        check_name(&store, 1, first_15, "Record").status,
+        NameCheckStatus::FirstTooLong
+    );
+    assert_eq!(
+        check_name(&store, 1, "Jessica", last_17).status,
+        NameCheckStatus::LastTooLong
+    );
+    // Characters, not bytes: 16 two-byte letters are a valid last name, 17 are not.
+    let (accented_16, accented_17) = ("é".repeat(16), "é".repeat(17));
+    assert_eq!(
+        check_name(&store, 1, "Jessica", &accented_16).status,
+        NameCheckStatus::Available
+    );
+    assert_eq!(
+        check_name(&store, 1, "Jessica", &accented_17).status,
+        NameCheckStatus::LastTooLong
+    );
+
+    let before = store.clone();
+    let refused = [
+        creation(first_15, "TempA"),
+        NativeCreation {
+            last_name: last_17.into(),
+            ..creation("Jessica", "TempB")
+        },
+        creation("SampleC", first_15),
+        NativeCreation {
+            temporary_last_name: last_17.into(),
+            ..creation("SampleD", "TempD")
+        },
+    ];
+    for over in refused {
+        assert_eq!(
+            create_character(&mut store, account_id, over, &resources).status,
             CharacterCreateStatus::InvalidName
         );
     }

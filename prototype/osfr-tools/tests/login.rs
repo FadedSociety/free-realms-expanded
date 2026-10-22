@@ -606,6 +606,33 @@ fn account_name_check_and_create_share_global_uniqueness() {
     );
 }
 
+// L058: the creator's picker sends its pick (up to 11 + 16 letters) as the temporary pair
+// (client 0x0070cfa0); a native run was refused "Jessica Grittycandle" with check-name code 5.
+#[test]
+fn picker_names_pass_check_name_and_create_through_the_login_service() {
+    let t = Temp::new();
+    let mut service = service(&t);
+    service.handle(&login_request()).unwrap();
+    for (first, last) in [
+        ("Jessica", "Grittycandle"),
+        ("Christopher", "Imperialslippers"),
+    ] {
+        let checked = service.handle(&name_check_request(first, last)).unwrap();
+        assert_eq!(name_check_status(&checked.replies[0]), 1, "{first} {last}");
+        let mut picked = creation_named("", "");
+        picked.temporary_first_name = first.into();
+        picked.temporary_last_name = last.into();
+        let mut request = vec![5];
+        request.extend(1i32.to_le_bytes());
+        payload(&mut request, &picked.encode());
+        assert!(service.handle(&request).unwrap().created, "{first} {last}");
+    }
+    let too_long = service
+        .handle(&name_check_request("Jessica", "Imperialslipperss"))
+        .unwrap();
+    assert_eq!(name_check_status(&too_long.replies[0]), 10); // Last_Name_Long_PS3
+}
+
 // L055: osfr-login gives every peer its own LoginService on one store file (on the unauthenticated
 // loopback path all of them log in as the one local session), and each caches the store at login.
 fn delete_request(guid: u64) -> Vec<u8> {
