@@ -37,6 +37,9 @@
 //!   emits when the learned recipe has no stable id.
 //! * `gather`: mining/harvesting output definition ids plus the local opening
 //!   drops (`Gameplay::local_gather_drop` match keys).
+//! * `profiles`: the `profiles.json` `profiles[].id` rows `Profiles::load` owns
+//!   (it exposes no id list), read from the profile content root: the opening
+//!   content the session ranks jobs from, not the quest catalogue root.
 
 use osfr_tools::{
     activity_portal, chess_service, harvesting,
@@ -76,12 +79,18 @@ pub struct Targets {
     pub recipes: BTreeSet<u32>,
     /// Mining/harvesting output definitions plus the local opening drops.
     pub gather: BTreeSet<u32>,
+    /// Profiles the loaded profile content declares; a `job_level` rank is only
+    /// real for one of them.
+    pub profiles: BTreeSet<u32>,
 }
 
 impl Targets {
-    pub fn load(root: &Path) -> io::Result<Self> {
+    pub fn load(root: &Path, profile_root: &Path) -> io::Result<Self> {
         let mut targets = Self {
             gather: LOCAL_GATHER_RESOURCES.into_iter().collect(),
+            profiles: read_ids(profile_root, "profiles.json", |document| {
+                array_ids(document, "profiles", "id")
+            }),
             ..Self::default()
         };
 

@@ -14,10 +14,9 @@
 //! `finish_minigame`, `gather_resource` and `job_level`. The item, recipe,
 //! dungeon, minigame and gather kinds additionally resolve their target ids in
 //! the id sets owned by `tests/support/quest_target_sets.rs`, which names the
-//! owning loader and every `FinishMinigame` emitter. A `job_level` target is
-//! proved through the production profile loader (`Profiles::load`): the profile
-//! must exist in the loaded profile content and its 100-XP rank at the objective
-//! level must be that level (1..=20). A
+//! owning loader and every `FinishMinigame` emitter. A `job_level` profile must
+//! be declared by the loaded profile content (`Targets::profiles`); its level
+//! bound (1..=20) and its jobs.json profile are the split loader's. A
 //! `finish_minigame` id the content defines but no server path can emit (derby
 //! 39 today) is refused with that reason instead of being certified, and
 //! `shipped_minigame_producers_are_pinned` fails if the accepted set drifts.
@@ -57,7 +56,6 @@ mod quest_target_sets;
 
 use npc_quest_chain::{content_dir, read_json, reference_content};
 use osfr_tools::{
-    profiles::{ProfileState, Profiles},
     quest_engine::{CharacterEligibility, QuestEngine},
     world::NpcVisibility,
 };
@@ -129,7 +127,7 @@ impl Catalogue {
             .filter_map(|target| visibility.content_key(target.guid))
             .collect();
         let giver_role_npcs = read_quest_giver_rows(root);
-        let targets = Targets::load(root)?;
+        let targets = Targets::load(root, &reference_content())?;
         let quests = read_quests(root);
         // `from_split_content` already rejected duplicate ids and an empty list.
         let by_id = quests
@@ -391,7 +389,12 @@ impl Catalogue {
                         }
                     }
                     "job_level" => {
-                        self.job_level_violation(&mut violations, &owner, goal);
+                        let profile = as_u32(&goal["profile_id"]).unwrap_or(0);
+                        if !self.targets.profiles.contains(&profile) {
+                            violations.push(format!(
+                                "{owner} (job_level): profile {profile} is not declared by the loaded profile content"
+                            ));
+                        }
                     }
                     _ => {}
                 }
@@ -409,43 +412,6 @@ impl Catalogue {
             violations.push(format!(
                 "{owner}: target {target} is not in the production 35/2 draw set"
             ));
-        }
-    }
-
-    /// T361: a job-level target is proved through the production profile loader.
-    /// The explicit profile state also proves the profile exists: `Profiles::load`
-    /// rejects an unlocked id the loaded profile content does not declare.
-    fn job_level_violation(&self, violations: &mut Vec<String>, owner: &str, goal: &Value) {
-        let profile = goal["profile_id"]
-            .as_i64()
-            .and_then(|id| i32::try_from(id).ok());
-        let level = goal["level"]
-            .as_u64()
-            .and_then(|level| u8::try_from(level).ok());
-        let (Some(profile), Some(level)) = (profile, level) else {
-            violations.push(format!("{owner}: job_level needs a profile id and a level"));
-            return;
-        };
-        if profile <= 0 || !(1..=20).contains(&level) {
-            violations.push(format!(
-                "{owner}: job_level profile must be positive and level 1..=20"
-            ));
-            return;
-        }
-        let state = ProfileState {
-            version: 1,
-            active: profile,
-            unlocked: BTreeSet::from([profile]),
-            experience: BTreeMap::from([(profile, u32::from(level - 1) * 100)]),
-        };
-        match Profiles::load(&reference_content(), Some(state)) {
-            Ok(profiles) if profiles.rank(profile) == u32::from(level) => {}
-            Ok(_) => violations.push(format!(
-                "{owner}: job_level rank {level} is not on the production profile curve"
-            )),
-            Err(error) => violations.push(format!(
-                "{owner}: job_level profile {profile} is absent from the loaded profile content: {error}"
-            )),
         }
     }
 
@@ -1004,6 +970,72 @@ fn graded_target_kinds_fail_on_a_scratch_tree() {
             && violations[0].contains("no server FinishMinigame emitter"),
         "canary F did not name the unproduced minigame: {violations:?}"
     );
+
+    // Canary G: a `job_level` profile the split loader accepts (jobs.json names it)
+    // but the loaded profile content does not declare, so no rank can reach it. The
+    // control is the fixture job's own profile 4, which the profile content declares.
+    let ranked = fixture("job-level-ranked", Defect::None);
+    open_with_job_level(&ranked, 4);
+    let catalogue = Catalogue::load(ranked.path()).expect("the ranked job-level quest loads");
+    assert!(catalogue.targets.profiles.contains(&4));
+    assert!(
+        catalogue.target_violations().is_empty(),
+        "{:?}",
+        catalogue.target_violations()
+    );
+    let unranked = fixture("canary-job-level", Defect::None);
+    open_with_job_level(&unranked, 99);
+    let catalogue = Catalogue::load(unranked.path()).expect("a jobs.json profile loads");
+    assert!(!catalogue.targets.profiles.contains(&99));
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains(&format!("quest {FIXTURE_QUEST} objective 8 (#0)"))
+            && violations[0].contains("job_level")
+            && violations[0].contains("99"),
+        "canary G did not name the undeclared job-level profile: {violations:?}"
+    );
+}
+
+/// Open the fixture quest with a `job_level` goal on `profile` (the first step, as the
+/// split loader requires) and give that profile a jobs.json row, so the loader accepts
+/// it and only the profile content can refuse it.
+fn open_with_job_level(scratch: &Scratch, profile: u32) {
+    let path = scratch.path().join("quests/fixture.json");
+    let mut document = read_json(&path);
+    document["records"]
+        .as_array_mut()
+        .expect("fixture records")
+        .iter_mut()
+        .find(|record| as_u32(&record["id"]) == Some(FIXTURE_QUEST))
+        .expect("the fixture quest exists")["objectives"]
+        .as_array_mut()
+        .expect("fixture objectives")
+        .insert(
+            0,
+            json!({
+                "kind": "job_level",
+                "id": 8,
+                "profile_id": profile,
+                "level": 5,
+                "source": [{"kind": "reconstructed", "evidence": "(R) F576 scratch job_level goal"}],
+            }),
+        );
+    fs::write(&path, serde_json::to_vec_pretty(&document).unwrap()).unwrap();
+    let jobs_path = scratch.path().join("jobs.json");
+    let mut jobs = read_json(&jobs_path);
+    let rows = jobs["records"].as_array_mut().expect("fixture jobs");
+    if !rows
+        .iter()
+        .any(|row| as_u32(&row["profile_id"]) == Some(profile))
+    {
+        let mut row = rows[0].clone();
+        row["id"] = json!(format!("fixture_job_{profile}"));
+        row["profile_id"] = json!(profile);
+        row["quest_ids"] = json!([]);
+        rows.push(row);
+    }
+    fs::write(&jobs_path, serde_json::to_vec_pretty(&jobs).unwrap()).unwrap();
 }
 
 /// `from_split_content` (`valid_objective_kind`) is the only authority for the

@@ -88,7 +88,7 @@ fn definition_many(
     }
 }
 
-fn install(game: &mut Gameplay, kind: ObjectiveKind, required: u32) {
+pub(super) fn install(game: &mut Gameplay, kind: ObjectiveKind, required: u32) {
     install_many(game, definition(1, kind, required));
 }
 
@@ -1303,6 +1303,51 @@ fn scene_entry_advances_area_and_reach_without_opening_content() {
             .unwrap()
             .counts,
         vec![1, 1]
+    );
+}
+
+/// F576: every accepted movement packet reaches `apply_opening`, so the job-level sync
+/// must run there only when the opening paid a reward. The rank is planted without a
+/// notification, as a path that never notified would leave it: a plain footstep must not
+/// scan for (and so credit) it, while the discovery reward that crosses the rank must.
+#[test]
+fn a_footstep_never_scans_job_level_goals_but_an_opening_reward_does() {
+    let mut game = game();
+    let profile = game.profiles.as_ref().unwrap().active();
+    let goal = ObjectiveKind::JobLevel {
+        profile_id: profile,
+        level: 2,
+    };
+    install(&mut game, goal, 1);
+    let mut character = CharacterState {
+        guid: 1,
+        zone_id: 0,
+        position: [0.; 3],
+        rotation: [0., 0., 1.],
+    };
+    let completes = |out: &Outcome| {
+        out.replies
+            .iter()
+            .any(|packet| packet.starts_with(&[49, 0, 10, 0, 0, 0]))
+    };
+
+    game.profiles.as_mut().unwrap().set_experience(100);
+    let step = game.on_location(&character, 1_000).unwrap();
+    count(&game, 0);
+    assert!(
+        !completes(&step),
+        "a footstep with no opening reward scanned the quests"
+    );
+
+    // The reference opening's Briarwood Caverns discovery pays the active job 25 XP.
+    game.profiles.as_mut().unwrap().set_experience(75);
+    character.position = [-1_897.0, -39.7, 412.6];
+    let found = game.on_location(&character, 2_000).unwrap();
+    assert_eq!(game.job_level(profile), 2, "75 + 25 XP is rank 2");
+    count(&game, 1);
+    assert!(
+        completes(&found),
+        "the rank-crossing reward completes the goal at once"
     );
 }
 

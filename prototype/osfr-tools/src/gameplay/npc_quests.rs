@@ -144,12 +144,23 @@ impl Gameplay {
         }
     }
 
+    /// F576: a payout replaced or raised the character's profiles (an opening reward or
+    /// unlock, a minigame payout, a claim). Refresh the quest gates and credit any
+    /// job-level goal the new rank meets. Callers run it only when profiles changed,
+    /// never per tick or per movement packet.
+    pub(super) fn npc_quest_profiles_changed(&mut self, out: &mut Outcome) -> io::Result<()> {
+        self.refresh_npc_quest_eligibility(current_unix_seconds());
+        self.sync_job_level_objectives(out)
+    }
+
     /// Emit one authoritative `QuestEvent::JobLevel` for every open job-level goal
     /// the character's current rank satisfies. Active quests only; the caller runs
     /// it where the rank can have changed (an XP award, the developer level, an
-    /// accept, a turn-in, a reward settlement or a catalogue bind), never on a
-    /// steady tick or an unrelated packet. Idempotent: a satisfied goal is no
-    /// longer open, so a repeat emits nothing and changes nothing.
+    /// accept, a turn-in, a payout through `npc_quest_profiles_changed` or a
+    /// catalogue bind), never on a steady tick or an unrelated packet: a movement
+    /// packet reaches it only when the opening paid a reward or unlocked a job.
+    /// Idempotent: a satisfied goal is no longer open, so a repeat emits nothing
+    /// and changes nothing.
     pub(super) fn sync_job_level_objectives(&mut self, out: &mut Outcome) -> io::Result<()> {
         let Some(engine) = &self.npc_quests else {
             return Ok(());

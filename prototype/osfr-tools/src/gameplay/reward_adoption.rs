@@ -2,10 +2,11 @@
 //! builders live in `t013_objective_events`; importing them keeps one fishing request path.
 
 use super::t013_objective_events::{
-    FISHING_T0, fishing_cast, fishing_reel, fishing_register, game,
+    FISHING_T0, fishing_cast, fishing_reel, fishing_register, game, install,
 };
 use super::*;
 use crate::fishing_service::{FISHERMAN_PROFILE, FishingSpots};
+use crate::quest_engine::ObjectiveKind;
 use serde_json::json;
 
 const SPOTS_JSON: &str = include_str!("../../data/content/fishing_spots.json");
@@ -137,5 +138,39 @@ fn fishing_catch_without_profile_content_changes_no_reward_state() {
         ),
         before,
         "a refused catch adopts neither inventory nor profile state"
+    );
+}
+
+/// F576: a minigame payout replaces the profiles through `adopt_reward_state`. A catch
+/// whose Fisherman XP crosses a job-level goal's rank credits it in the same outcome,
+/// not at a later accept, turn-in or reload.
+#[test]
+fn a_fishing_payout_that_crosses_a_job_level_goal_credits_it_at_once() {
+    let mut game = game();
+    begin(&mut game);
+    let mut state = game.profiles.as_ref().unwrap().state().clone();
+    state.experience.insert(FISHERMAN_PROFILE, 90);
+    let directory = game.profile_content_directory.clone().unwrap();
+    game.profiles = Some(Profiles::load(&directory, Some(state)).unwrap());
+    let goal = ObjectiveKind::JobLevel {
+        profile_id: FISHERMAN_PROFILE,
+        level: 2,
+    };
+    install(&mut game, goal, 1);
+
+    let outcome = catch(&mut game, FISHING_T0 + 10_000).expect("paid catch");
+    assert_eq!(
+        game.job_level(FISHERMAN_PROFILE),
+        2,
+        "the 10-XP catch reaches rank 2"
+    );
+    let quests = game.npc_quests.as_ref().unwrap();
+    assert_eq!(quests.progress(1).unwrap().counts, vec![1]);
+    assert!(
+        outcome
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[49, 0, 10, 0, 0, 0])),
+        "the payout outcome carries the 49/10 completion"
     );
 }

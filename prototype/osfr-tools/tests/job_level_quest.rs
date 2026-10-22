@@ -1046,25 +1046,43 @@ fn job_level_goal(profile_id: i32, level: u8) -> Value {
     }])
 }
 
-fn load_goal(goal: Value) -> bool {
+fn load(goal: Value) -> std::io::Result<QuestEngine> {
     let scratch = synthetic_content(goal);
-    let engine = match QuestEngine::from_split_content(
+    QuestEngine::from_split_content(
         scratch.0.as_path(),
         1,
-        osfr_tools::quest_engine::CharacterEligibility::default(),
+        CharacterEligibility::default(),
         None,
-    ) {
-        Ok(engine) => engine,
-        Err(_) => return false,
-    };
-    engine.is_enabled(SYNTHETIC_QUEST)
+    )
 }
 
+fn talk_goal(id: u32) -> Value {
+    json!({
+        "kind": "talk_to_npc",
+        "id": id,
+        "npc_id": SYNTHETIC_GIVER,
+        "source": [{
+            "kind": "reconstructed",
+            "evidence": "(R) F576 synthetic ordered step"
+        }]
+    })
+}
+
+/// A malformed record must refuse the whole load, not quietly disable the quest.
 #[test]
 fn a_malformed_job_level_goal_is_a_load_error() {
+    let clean = load(job_level_goal(WARRIOR, 5)).expect("the clean goal loads");
     assert!(
-        load_goal(job_level_goal(WARRIOR, 5)),
-        "the clean goal loads"
+        clean.is_enabled(SYNTHETIC_QUEST),
+        "the clean goal is enabled"
+    );
+    // F576: a job-level goal may open an ordered quest, so the refusal below is about
+    // its position, not about mixing kinds.
+    let mut first = job_level_goal(WARRIOR, 5);
+    first.as_array_mut().unwrap().push(talk_goal(2));
+    assert!(
+        load(first).is_ok(),
+        "a job-level goal as the first ordered step loads"
     );
 
     for (label, goal) in [
@@ -1089,7 +1107,22 @@ fn a_malformed_job_level_goal_is_a_load_error() {
                 "source": []
             }]),
         ),
+        (
+            // F576: nothing re-checks a job-level goal when an earlier ordered step
+            // completes, so a later job-level step could never be credited.
+            "a job-level goal after an earlier ordered step",
+            json!([talk_goal(1), {
+                "kind": "job_level",
+                "id": 2,
+                "profile_id": WARRIOR,
+                "level": 5,
+                "source": [{
+                    "kind": "reconstructed",
+                    "evidence": "(R) F576 synthetic later job_level step"
+                }]
+            }]),
+        ),
     ] {
-        assert!(!load_goal(goal), "{label} must be a load error");
+        assert!(load(goal).is_err(), "{label} must refuse the whole load");
     }
 }

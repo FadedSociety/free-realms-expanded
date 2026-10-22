@@ -2468,6 +2468,14 @@ fn validate_definition(definition: &QuestDefinition) -> io::Result<()> {
                 || objective.description.len() > 4096
                 || !valid_objective_kind(&objective.kind)
         })
+        // F576: a job-level goal is checked at accept and on a rank change, never when an
+        // earlier ordered step completes, so in an ordered quest it may only be the first step.
+        || (definition.ordered
+            && definition
+                .objectives
+                .iter()
+                .skip(1)
+                .any(|objective| matches!(objective.kind, ObjectiveKind::JobLevel { .. })))
     {
         return Err(invalid("invalid quest objective definition"));
     }
@@ -2828,7 +2836,8 @@ impl QuestEngine {
 
     /// The open job-level goals of the character's active quests. `current_objectives`
     /// already limits an ordered quest to its first unfinished step, so a later goal
-    /// cannot be credited early.
+    /// cannot be credited early; `validate_definition` refuses a job-level goal that is
+    /// not an ordered quest's first step, so none waits behind an earlier one.
     pub fn open_job_level_objectives(&self) -> Vec<(i32, u8)> {
         self.state
             .quests

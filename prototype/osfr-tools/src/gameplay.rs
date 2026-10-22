@@ -1951,7 +1951,6 @@ impl Gameplay {
             replies.extend(claim.replies);
             // The save decision is the type's: a clock-only racing tick writes nothing.
             let changed = before.changed_for_save(kart.state());
-            staged.refresh_npc_quest_eligibility(current_unix_seconds());
             let mut out = Outcome {
                 replies,
                 changed,
@@ -1962,7 +1961,7 @@ impl Gameplay {
                     crate::quest_engine::QuestEvent::FinishMinigame { minigame_id },
                     &mut out,
                 )?;
-                staged.sync_job_level_objectives(&mut out)?;
+                staged.npc_quest_profiles_changed(&mut out)?;
             }
             *self = staged;
             return Ok(out);
@@ -2453,6 +2452,7 @@ impl Gameplay {
             self.inventory = next.inventory;
             if let Some(profiles) = next_profiles {
                 self.profiles = Some(profiles);
+                self.npc_quest_profiles_changed(&mut out)?;
             }
             self.npc_inventory_events(&before, &mut out)?;
         } else {
@@ -2574,6 +2574,7 @@ impl Gameplay {
                 .as_deref()
                 .ok_or_else(|| invalid("minigame XP needs profile content"))?;
             self.profiles = Some(Profiles::load(directory, Some(next.profiles))?);
+            self.npc_quest_profiles_changed(out)?;
         }
         self.inventory = next.inventory;
         out.changed = true;
@@ -2696,13 +2697,12 @@ impl Gameplay {
                 out.replies.extend(claim.replies);
             }
             out.changed = before.changed_for_save(kart.state());
-            self.refresh_npc_quest_eligibility(current_unix_seconds());
             if let Some(minigame_id) = minigame_id {
                 self.npc_quest_event(
                     crate::quest_engine::QuestEvent::FinishMinigame { minigame_id },
                     &mut out,
                 )?;
-                self.sync_job_level_objectives(&mut out)?;
+                self.npc_quest_profiles_changed(&mut out)?;
             }
             return Ok(out);
         }
@@ -2915,8 +2915,7 @@ impl Gameplay {
                     out.replies.extend(self.ability_activation_for(profile)?);
                 }
                 self.sync_player_level(out);
-                self.refresh_npc_quest_eligibility(current_unix_seconds());
-                self.sync_job_level_objectives(out)?;
+                self.npc_quest_profiles_changed(out)?;
                 say(out, format!("Job {profile} is now level {level}."));
             }
             ["heal"] => {
@@ -4829,8 +4828,10 @@ impl Gameplay {
             if self.profiles.as_mut().unwrap().unlock(id)? {
                 out.changed = true;
                 self.give_starter_outfit(id, false, out)?;
+                self.npc_quest_profiles_changed(out)?;
             }
         }
+        // F576: only an unlock or a reward changes profiles; a plain footstep scans nothing.
         for reward in result.rewards {
             self.grant_reward(reward.coins, &reward.items, out)?;
             let profiles = self.profiles.as_mut().unwrap();
@@ -4842,9 +4843,8 @@ impl Gameplay {
                 .unwrap_or(0);
             out.changed |= profiles.add_experience(25)?;
             out.replies.extend(profiles.experience_packets(previous_xp));
+            self.npc_quest_profiles_changed(out)?;
         }
-        self.refresh_npc_quest_eligibility(current_unix_seconds());
-        self.sync_job_level_objectives(out)?;
         Ok(())
     }
 
