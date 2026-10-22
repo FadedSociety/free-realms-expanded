@@ -116,19 +116,18 @@ fn application(inner: &[u8]) -> Vec<u8> {
 }
 
 /// The real login request: opcode 1, binding ticket, character GUID, client
-/// version, empty fourth string. Character 1 keeps the synthetic dev ticket,
-/// which is the gateway's own fixture path.
+/// version, empty fourth string. Every character, 1/1 included, carries its
+/// HMAC binding ticket (L023).
 fn login(guid: u64, account_store_path: &Path) -> Vec<u8> {
     let store = AccountStore::load(account_store_path).unwrap();
     let record = store.character(guid).unwrap();
     let account = store.account(record.owner_account_id).unwrap();
-    let ticket = if account.id == 1 && guid == 1 {
-        "synthetic-ticket".to_owned()
-    } else {
-        login::gateway_binding_ticket(HANDOFF_KEY, account, guid)
-    };
+    login_with_ticket(guid, &login::gateway_binding_ticket(HANDOFF_KEY, account, guid))
+}
+
+fn login_with_ticket(guid: u64, ticket: &str) -> Vec<u8> {
     let mut out = 1u16.to_le_bytes().to_vec();
-    put_string(&mut out, &ticket);
+    put_string(&mut out, ticket);
     out.extend_from_slice(&guid.to_le_bytes());
     put_string(&mut out, VERSION);
     put_string(&mut out, "");
@@ -884,6 +883,38 @@ fn a_player_role_session_refuses_a_realm_command() {
     assert!(!log.contains("synthetic after refusal"), "{log}");
     server.shutdown().unwrap();
     assert_eq!(server.active_session_count(), 0);
+}
+
+/// L023 (Security Model L3): an account-store gateway refuses the public fixed
+/// ticket, even for the host's account 1 / guid 1, logs the refusal without
+/// ticket bytes, and still lets 1/1 in with its HMAC binding ticket.
+#[test]
+fn the_fixed_ticket_is_refused_and_1_1_enters_with_its_binding_ticket() {
+    let temp = TempDir::new();
+    let reference = Reference::new(VERSION, None);
+    let store_path = create_account_store(&temp.0);
+    let guid_offset = self_guid_offset(&reference);
+    let mut server = start_server(&temp, &reference, &store_path, false);
+
+    for (connection_id, ticket) in [(531, "synthetic-ticket"), (532, login::DEFAULT_GATEWAY_TICKET)] {
+        let mut fixed = Client::connect(&mut server, connection_id);
+        fixed.send_unacknowledged(&mut server, &login_with_ticket(1, ticket));
+        assert_eq!(server.active_session_count(), 0, "fixed ticket {ticket} opened a session");
+        server.step().unwrap();
+    }
+    server.flush_security();
+    let log = fs::read_to_string(temp.0.join("security.jsonl")).unwrap_or_default();
+    assert!(log.contains("auth_failure"), "{log}");
+    assert!(!log.contains("synthetic-ticket") && !log.contains(login::DEFAULT_GATEWAY_TICKET), "{log}");
+
+    let (mut client, messages) = log_in(&mut server, 533, 1, &store_path);
+    settle(&mut server, &mut client);
+    assert_eq!(server.active_session_count(), 1);
+    assert_eq!(
+        self_guid(self_packet(&messages).expect("1/1 self data"), guid_offset),
+        Some(1)
+    );
+    server.shutdown().unwrap();
 }
 
 #[test]

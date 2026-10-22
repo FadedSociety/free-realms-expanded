@@ -411,11 +411,9 @@ impl LoginService {
                     let account = store
                         .account(account_id)
                         .ok_or_else(|| invalid("authenticated account is unavailable"))?;
-                    let ticket = if account_id == 1 && guid == 1 {
-                        self.config.gateway_ticket.clone()
-                    } else {
-                        gateway_binding_ticket(&self.config.handoff_key, account, guid)
-                    };
+                    // L023: every account, the host's 1/1 included, gets an HMAC binding ticket;
+                    // the public fixed ticket would let anyone who reaches the gateway in as 1/1.
+                    let ticket = gateway_binding_ticket(&self.config.handoff_key, account, guid);
                     self.authenticated_session = Some(authenticated);
                     outcome.selected = true;
                     outcome.selected_binding = Some(CharacterBinding {

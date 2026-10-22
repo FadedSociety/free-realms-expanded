@@ -83,11 +83,7 @@ fn login_version(guid: u64, account_store_path: &Path, version: &str) -> Vec<u8>
     let store = AccountStore::load(account_store_path).unwrap();
     let record = store.character(guid).unwrap();
     let account = store.account(record.owner_account_id).unwrap();
-    let ticket = if account.id == 1 && guid == 1 {
-        "synthetic-ticket".to_owned()
-    } else {
-        login::gateway_binding_ticket(b"synthetic-handoff-key", account, guid)
-    };
+    let ticket = login::gateway_binding_ticket(b"synthetic-handoff-key", account, guid);
     let mut out = 1u16.to_le_bytes().to_vec();
     put_string(&mut out, &ticket);
     out.extend_from_slice(&guid.to_le_bytes());

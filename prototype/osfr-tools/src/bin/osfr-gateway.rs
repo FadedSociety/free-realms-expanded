@@ -1097,6 +1097,7 @@ impl Session {
         options: &Options,
         message: &[u8],
         sessions: &SessionMap,
+        security: &Mutex<Security>,
     ) -> Result<(), Box<dyn std::error::Error>> {
         if self.selected_character || options.account_store.is_none() {
             return Ok(());
@@ -1111,10 +1112,11 @@ impl Session {
         let account = store
             .account(record.owner_account_id)
             .ok_or("character account is missing")?;
-        let legacy_ticket = account.id == 1 && guid == 1 && ticket == options.gateway_ticket;
-        if !legacy_ticket
-            && !login::verify_gateway_binding_ticket(&options.handoff_key, account, guid, &ticket)
-        {
+        // L023: with an account store only the HMAC binding ticket enters, for 1/1 too (the fixed
+        // ticket is public). The refusal is logged without ticket bytes.
+        if !login::verify_gateway_binding_ticket(&options.handoff_key, account, guid, &ticket) {
+            let mut security = security.lock().unwrap_or_else(|e| e.into_inner());
+            security.record(EventKind::AuthFailure, Some(account.id), Some(self.id.0));
             return Err("gateway character binding ticket is invalid".into());
         }
         // (R) First selected session owns the account and character, including
@@ -1550,7 +1552,7 @@ impl Session {
             }
             return Err("account character selection is required before gateway use".into());
         }
-        if let Err(error) = self.select_character_from_login(options, message, sessions) {
+        if let Err(error) = self.select_character_from_login(options, message, sessions, &world.security) {
             if let Some(trace) = &self.trace {
                 trace_gateway_rejected(
                     trace,

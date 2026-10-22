@@ -287,7 +287,13 @@ fn native_creation_selection_reconnect_and_name_check_preserve_identity() {
     payload(&mut select, &client);
     let selected = service.handle(&select).unwrap();
     assert!(selected.selected);
-    assert_eq!(selected.replies[0], vector("character_login"));
+    // L023: 1/1 gets its HMAC binding ticket, never the public fixed ticket.
+    let store = AccountStore::load(&t.0.join("accounts.json")).unwrap();
+    let ticket = login::gateway_binding_ticket(b"synthetic-handoff-key", store.account(1).unwrap(), 1);
+    assert_eq!(
+        selected.replies[0],
+        login::character_login_reply(1, 1, 1, "127.0.0.1:20260", &ticket)
+    );
     select[1..9].copy_from_slice(&2u64.to_le_bytes());
     assert!(!service.handle(&select).unwrap().selected);
     assert_eq!(
@@ -328,11 +334,7 @@ fn account_login_creates_lists_selects_and_deletes_two_characters() {
             })
         );
         let account = store.account(1).unwrap();
-        let ticket = if guid == 1 {
-            "synthetic-ticket".to_owned()
-        } else {
-            login::gateway_binding_ticket(b"synthetic-handoff-key", account, guid)
-        };
+        let ticket = login::gateway_binding_ticket(b"synthetic-handoff-key", account, guid);
         assert_eq!(
             selected.replies[0],
             login::character_login_reply(guid, 1, 1, "127.0.0.1:20260", &ticket,)
