@@ -371,22 +371,30 @@ pub fn objective_complete_packet(quest_id: u32, objective_id: u32, progress: f32
     packet
 }
 
+/// The selected option id for `label` in one 26/9 interaction menu body.
+/// Dispatcher `0x00aa2360` -> `0x00aa2220` -> `0x00aa1600` (guid at 4, flag
+/// at 12) -> list reader `0x00aa04d0` (count at 13) -> row reader `0x00a9dca0`
+/// (seven dwords, 28-byte rows from 17; label at +8). `multiplayer.rs` shares it.
+pub fn menu_option_bytes(packet: &[u8], label: u32) -> i32 {
+    let count = i32::from_le_bytes(packet[13..17].try_into().unwrap());
+    assert!(count > 0, "the interaction menu has no options");
+    (0..count)
+        .find_map(|index| {
+            let offset = 17 + usize::try_from(index).unwrap() * 28;
+            let id = i32::from_le_bytes(packet[offset..offset + 4].try_into().unwrap());
+            let string_id = u32::from_le_bytes(packet[offset + 8..offset + 12].try_into().unwrap());
+            (string_id == label).then_some(id)
+        })
+        .unwrap_or_else(|| panic!("menu label {label} is absent"))
+}
+
 pub fn menu_option(outcome: &Outcome, label: u32) -> i32 {
     let menu = outcome
         .replies
         .iter()
         .find(|packet| packet.starts_with(&[26, 0, 9, 0]))
         .expect("26/8 returns the 26/9 interaction menu");
-    let count = i32::from_le_bytes(menu[13..17].try_into().unwrap());
-    assert!(count > 0, "the interaction menu has no options");
-    (0..count)
-        .find_map(|index| {
-            let offset = 17 + usize::try_from(index).unwrap() * 28;
-            let id = i32::from_le_bytes(menu[offset..offset + 4].try_into().unwrap());
-            let string_id = u32::from_le_bytes(menu[offset + 8..offset + 12].try_into().unwrap());
-            (string_id == label).then_some(id)
-        })
-        .unwrap_or_else(|| panic!("menu label {label} is absent"))
+    menu_option_bytes(menu, label)
 }
 
 pub fn interact(game: &mut Gameplay, character: &CharacterState, target: u64, now: u64) -> Outcome {

@@ -1257,7 +1257,7 @@ const T335_WOLF_THREE: u64 = 131_000_335_003;
 const T335_WOLF_FOUR: u64 = 131_000_335_004;
 const T335_BRAWLER: i32 = 43;
 const T335_ITEM: i32 = 8;
-const T335_QUEST_COINS: u32 = 10;
+const T335_QUEST_COINS: i32 = 10;
 const T335_QUEST_XP: u32 = 20;
 /// `data/content/field_kill_rewards.json` level 1-2 band.
 const T335_FIELD_COINS: i32 = 2;
@@ -1629,9 +1629,9 @@ fn field_attack(client: &mut Client, server: &mut Server, target: u64) -> Vec<Ve
     client.send(server, &packet(36, &body))
 }
 
-/// The selected option id for `label` in the 26/9 interaction menu. Dispatcher
-/// `0x00aa2360` -> list reader `0x00aa2220`/`0x00aa04d0` -> row reader
-/// `0x00a9dca0` (seven dwords; label at +8): count at 13, 28-byte rows from 17.
+/// The selected option id for `label` in the 26/9 interaction menu, proving the
+/// menu names the clicked actor. The row walk is the shared
+/// `npc_quest_chain::menu_option_bytes`, which cites the client readers.
 fn menu_choice(messages: &[Vec<u8>], target: u64, label: u32) -> i32 {
     let body = messages
         .iter()
@@ -1642,17 +1642,7 @@ fn menu_choice(messages: &[Vec<u8>], target: u64, label: u32) -> i32 {
         Some(target.to_le_bytes().as_slice()),
         "the menu names the clicked actor"
     );
-    let count = i32::from_le_bytes(body.get(13..17).expect("menu count").try_into().unwrap());
-    assert!(count > 0, "the interaction menu has no options");
-    (0..count)
-        .find_map(|index| {
-            let offset = 17 + usize::try_from(index).unwrap() * 28;
-            let id = i32::from_le_bytes(body.get(offset..offset + 4)?.try_into().unwrap());
-            let string_id =
-                u32::from_le_bytes(body.get(offset + 8..offset + 12)?.try_into().unwrap());
-            (string_id == label).then_some(id)
-        })
-        .unwrap_or_else(|| panic!("menu label {label} is absent"))
+    npc_quest_chain::menu_option_bytes(body, label)
 }
 
 fn save_json(temp: &TempDir, guid: u64) -> serde_json::Value {
@@ -1720,9 +1710,12 @@ fn job_updates(messages: &[Vec<u8>], profile: i32) -> Vec<(i32, i32)> {
         .collect()
 }
 
-/// The (rank, progress) pair a 38/14 must carry for a saved total.
+/// The (rank, progress) pair a 38/14 must carry for a saved total: the same
+/// reconstructed 100-XP curve and rank-20 cap as `Profiles::rank`
+/// (`src/profiles.rs:228`) and `rewards::experience_packets` (`src/rewards.rs:177`).
 fn expected_job_update(total: i32) -> (i32, i32) {
-    (1 + total / 100, total % 100)
+    let rank = (1 + total / 100).min(20);
+    (rank, if rank == 20 { 0 } else { total % 100 })
 }
 
 fn objective_update(messages: &[Vec<u8>], quest: u32, objective: u32, current: u32) -> bool {
@@ -1858,7 +1851,9 @@ fn two_players_see_each_other_with_the_real_name_and_job() {
     assert_eq!(json!(late_sees_b[0].active_profile), b_profile);
 
     // A fourth session 10 km away is outside the 100 m interest radius: it
-    // receives neither player's AddPc and the pair receives none for it.
+    // receives neither player's AddPc and the pair receives none for it. The
+    // far login is asserted ready first, so a refused session cannot make the
+    // "no AddPc" checks below pass vacuously; B's inbox is inspected too.
     seed_far_character(&temp, content.path(), 4);
     let (mut far, mut far_login) =
         log_in_version_batched(&mut server, 404, 4, &store_path, &version);
@@ -1870,6 +1865,24 @@ fn two_players_see_each_other_with_the_real_name_and_job() {
     second_login.extend(settled[1].clone());
     late_login.extend(settled[2].clone());
     far_login.extend(settled[3].clone());
+    assert_eq!(
+        server.active_session_count(),
+        4,
+        "the far session did not log in"
+    );
+    let (_, _, far_ready, far_instance) = server
+        .test_location(4)
+        .expect("the far session is in the world");
+    assert!(far_ready, "the far session never became ready in the world");
+    // The pair's own instance, so distance alone keeps the AddPc rows apart.
+    assert!(
+        far_instance.contains(&2) && far_instance.contains(&3),
+        "the far session is not in the pair's instance"
+    );
+    assert!(
+        far_login.iter().any(|message| is_opcode(message, 12)),
+        "the far session received no world-entry self data"
+    );
     assert!(
         other(&far_login, 2).is_empty(),
         "an out-of-range player received A's AddPc"
@@ -1881,6 +1894,10 @@ fn two_players_see_each_other_with_the_real_name_and_job() {
     assert!(
         other(&first_login, 4).is_empty(),
         "A received an out-of-range player's AddPc"
+    );
+    assert!(
+        other(&second_login, 4).is_empty(),
+        "B received an out-of-range player's AddPc"
     );
     assert!(
         other(&late_login, 4).is_empty(),
@@ -2430,6 +2447,7 @@ fn each_character_keeps_its_own_coins_and_quest_after_relog() {
 
     // A kills wolf one alone; A wounds wolf two and B lands the lethal hit.
     // A gets two T240 payouts (killer + contributor), B gets one.
+    let (a_start, b_start) = (saved_coins(&temp, 2), saved_coins(&temp, 3));
     attack_until_dead(
         &mut server,
         &mut [&mut first, &mut second],
@@ -2455,6 +2473,13 @@ fn each_character_keeps_its_own_coins_and_quest_after_relog() {
         };
         b_claim.extend(batch[1].clone());
     }
+    let settled = settle(&mut server, &mut [&mut first, &mut second]);
+    b_claim.extend(settled[1].clone());
+    assert_eq!(
+        saved_coins(&temp, 3),
+        before_b + T335_FIELD_COINS,
+        "B's saved balance changed exactly once for the shared kill"
+    );
     assert_eq!(
         coin_balances(&b_claim),
         vec![before_b + T335_FIELD_COINS],
@@ -2481,9 +2506,15 @@ fn each_character_keeps_its_own_coins_and_quest_after_relog() {
         saved_job_xp(&temp, 2, T335_BRAWLER),
         saved_job_xp(&temp, 3, T335_MEDIC),
     );
-    assert!(
-        a_coins > b_coins,
-        "A earned the killer and contributor payouts; B only the kill"
+    assert_eq!(
+        a_coins,
+        a_start + 2 * T335_FIELD_COINS + T335_QUEST_COINS,
+        "A's saved balance is its own kill, its shared-kill contribution and the quest"
+    );
+    assert_eq!(
+        b_coins,
+        b_start + T335_FIELD_COINS + T335_QUEST_COINS,
+        "B's saved balance is the shared kill and the quest"
     );
     assert!(
         b_xp > 0,
@@ -2547,14 +2578,21 @@ fn each_character_keeps_its_own_coins_and_quest_after_relog() {
     // Fresh wolves after the relog pay on top of each character's own saved
     // balance, which proves the loader restored each character's wallet and
     // job XP independently.
-    let a_after = attack_until_dead(
+    let mut a_after = attack_until_dead(
         &mut server,
         &mut [&mut first, &mut second],
         0,
         T335_WOLF_THREE,
     );
+    let settled = settle(&mut server, &mut [&mut first, &mut second]);
+    a_after.extend(settled[0].clone());
     let a_xp_after = saved_job_xp(&temp, 2, T335_BRAWLER);
     assert_eq!(a_xp_after, a_xp + T335_FIELD_XP);
+    assert_eq!(
+        saved_coins(&temp, 2),
+        a_coins + T335_FIELD_COINS,
+        "A's saved balance changed exactly once after the relog"
+    );
     assert_eq!(
         coin_balances(&a_after),
         vec![a_coins + T335_FIELD_COINS],
@@ -2568,14 +2606,21 @@ fn each_character_keeps_its_own_coins_and_quest_after_relog() {
         job_updates(&a_after, T335_MEDIC).is_empty(),
         "A's payout must not use the contributor's job"
     );
-    let b_after = attack_until_dead(
+    let mut b_after = attack_until_dead(
         &mut server,
         &mut [&mut first, &mut second],
         1,
         T335_WOLF_FOUR,
     );
+    let settled = settle(&mut server, &mut [&mut first, &mut second]);
+    b_after.extend(settled[1].clone());
     let b_xp_after = saved_job_xp(&temp, 3, T335_MEDIC);
     assert_eq!(b_xp_after, b_xp + T335_FIELD_XP);
+    assert_eq!(
+        saved_coins(&temp, 3),
+        b_coins + T335_FIELD_COINS,
+        "B's saved balance changed exactly once after the relog"
+    );
     assert_eq!(
         coin_balances(&b_after),
         vec![b_coins + T335_FIELD_COINS],
@@ -2616,6 +2661,9 @@ fn one_players_disconnect_or_bad_packet_does_not_stop_the_other() {
     become_brawler(&mut second, &mut server, &temp, 3);
     settle(&mut server, &mut [&mut first, &mut second]);
     let before = saved_coins(&temp, 3);
+    let before_quests = saved_quest_state(&temp, 3);
+    // Drain B's inbox now, so the post-refusal check sees only new replies.
+    second.drain(&mut server);
 
     // A hostile 36/10 with an unknown action kind is a malformed field
     // request. The gateway's single-message refusal drops it for A alone
@@ -2637,6 +2685,14 @@ fn one_players_disconnect_or_bad_packet_does_not_stop_the_other() {
                 || family_body(message, 49, 9).is_some()),
         "A's malformed field packet paid or advanced something"
     );
+    let delivered = second.drain(&mut server);
+    assert!(
+        !delivered
+            .iter()
+            .any(|message| family_body(message, 38, 19).is_some()
+                || family_body(message, 49, 9).is_some()),
+        "B received a payout or objective update from A's malformed field packet"
+    );
     assert_eq!(
         server.active_session_count(),
         2,
@@ -2644,6 +2700,12 @@ fn one_players_disconnect_or_bad_packet_does_not_stop_the_other() {
     );
     assert_eq!(saved_coins(&temp, 2), a_coins);
     assert_eq!(saved_quest_state(&temp, 2), a_quests);
+    assert_eq!(saved_coins(&temp, 3), before, "the refusal paid B");
+    assert_eq!(
+        saved_quest_state(&temp, 3),
+        before_quests,
+        "the refusal advanced B's quest"
+    );
     assert_eq!(
         server.test_field_health(T335_WOLF_TWO),
         field_before,
