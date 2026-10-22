@@ -175,7 +175,9 @@ impl LoginService {
     pub fn new(resources: Resources, config: LoginConfig) -> io::Result<Self> {
         identity::load(&config.identity_file)?;
         let address: std::net::SocketAddr = config.gateway_address.parse().map_err(invalid)?;
-        if !address.ip().is_loopback()
+        // L053: loopback, or a private-network/VPN gateway (Security Model decision 2); never public.
+        // The osfr-login binary admits a private one only with --allow-lan.
+        if !crate::net_policy::allowed(address.ip(), true)
             || config.local_session.is_empty()
             || config.local_session.len() > 1024
             || !config.gateway_ticket.is_ascii()

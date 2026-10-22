@@ -256,10 +256,13 @@ impl Bot {
     }
 
     fn connect_protocol(config: BotConfig, key: Option<&[u8]>) -> Result<Self, String> {
-        let socket = UdpSocket::bind(if config.gateway.is_ipv6() {
-            "[::1]:0"
-        } else {
-            "127.0.0.1:0"
+        // L053: Windows will not send from a loopback socket to a LAN/VPN gateway, so bind the
+        // unspecified address for one; a loopback gateway keeps the loopback-only bind.
+        let socket = UdpSocket::bind(match (config.gateway.is_ipv6(), config.gateway.ip().is_loopback()) {
+            (true, true) => "[::1]:0",
+            (false, true) => "127.0.0.1:0",
+            (true, false) => "[::]:0",
+            (false, false) => "0.0.0.0:0",
         })
         .map_err(|e| format!("bind: {e}"))?;
         socket
@@ -771,12 +774,17 @@ fn broker_handoff(
     path: &Path,
     selected: Option<u64>,
     connection_id: u32,
+    allow_lan: bool,
 ) -> Result<(SocketAddr, u64, String), String> {
     let profile: BrokerProfile =
         serde_json::from_slice(&read_bounded(path, 4096)?).map_err(|_| "invalid broker profile")?;
     login_handle_hash(&profile.handle).map_err(|_| "invalid account handle")?;
-    if !profile.broker.ip().is_loopback() || !profile.login.ip().is_loopback() {
-        return Err("broker/native login requires loopback or an encrypted tunnel".into());
+    // L053: loopback, or with --allow-lan a private-network or VPN address: the launcher's rule
+    // (net_policy::allowed), so the bot can stand in for a second PC on a LAN or tailnet.
+    if !osfr_tools::net_policy::allowed(profile.broker.ip(), allow_lan)
+        || !osfr_tools::net_policy::allowed(profile.login.ip(), allow_lan)
+    {
+        return Err("broker/native login requires loopback, or a private-network address with --allow-lan".into());
     }
     let base = path.parent().unwrap_or(Path::new("."));
     let pin = read_bounded(&base.join(profile.server_id_file), 32)?;
@@ -921,8 +929,8 @@ fn broker_handoff(
         let address: SocketAddr = login_string(&mut input, 128)?
             .parse()
             .map_err(|_| "invalid gateway address")?;
-        if !address.ip().is_loopback() {
-            return Err("gateway handoff requires loopback or an encrypted tunnel".into());
+        if !osfr_tools::net_policy::allowed(address.ip(), allow_lan) {
+            return Err("gateway handoff requires loopback, or a private-network address with --allow-lan".into());
         }
         let ticket = login_string(&mut input, 128)?.to_owned();
         let key = login_string(&mut input, 128)?;
@@ -951,6 +959,7 @@ const USAGE: &str = "usage: osfr-bot --gateway 127.0.0.1:PORT [--script FILE] [-
   [--guid N] [--ticket T] [--version V] [--reference DIR]
   [--account-store FILE --handoff-key-file FILE [--account N | --guid N]]
   [--broker-profile FILE] (instead of direct gateway credentials; --guid selects a listed character)
+  [--allow-lan] (the broker profile and its gateway may use a private-network or VPN address)
   [--name NAME] [--connection-id N] [--expect-timeout MS] [--quiet]";
 
 fn config_from_args() -> Result<(BotConfig, Vec<Step>), String> {
@@ -962,9 +971,14 @@ fn config_from_args() -> Result<(BotConfig, Vec<Step>), String> {
     let (mut name, mut connection_id, mut expect_timeout_ms, mut quiet) = (None, None, 5000, false);
     let mut steps = Vec::new();
     let mut broker_profile = None::<PathBuf>;
+    let mut allow_lan = false;
     while let Some(key) = args.next() {
         if key == "--quiet" {
             quiet = true;
+            continue;
+        }
+        if key == "--allow-lan" {
+            allow_lan = true;
             continue;
         }
         if key == "--help" || key == "-h" {
@@ -1016,7 +1030,12 @@ fn config_from_args() -> Result<(BotConfig, Vec<Step>), String> {
                 "--broker-profile cannot be combined with direct gateway credentials".into(),
             );
         }
-        let handoff = broker_handoff(&profile, guid, connection_id.unwrap_or(std::process::id()))?;
+        let handoff = broker_handoff(
+            &profile,
+            guid,
+            connection_id.unwrap_or(std::process::id()),
+            allow_lan,
+        )?;
         gateway = Some(handoff.0);
         guid = Some(handoff.1);
         ticket = Some(handoff.2);

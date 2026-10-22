@@ -167,6 +167,33 @@ impl Server {
     }
 }
 
+/// L053: login sends every client the gateway address, so it takes loopback, or a private/VPN
+/// address only with --allow-lan, and never a public one (the LAN/VPN preflight found login refusing
+/// every non-loopback gateway, which blocked the runbook's VPN host setup).
+#[test]
+fn login_gateway_address_follows_the_lan_rule() {
+    for (gateway, allow_lan, refused) in [
+        ("8.8.8.8:20041", true, true),
+        ("100.64.0.1:20041", false, true),
+        ("192.168.1.10:20041", false, true),
+    ] {
+        let mut command = Command::new(env!("CARGO_BIN_EXE_osfr-login"));
+        command.args(["--bind", "127.0.0.1:0", "--gateway", gateway]);
+        if allow_lan {
+            command.arg("--allow-lan");
+        }
+        let result = command.output().unwrap();
+        let stderr = String::from_utf8_lossy(&result.stderr);
+        assert_eq!(stderr.contains("loopback gateway, or a private-network one"), refused, "{gateway}: {stderr}");
+    }
+    // With --allow-lan a private gateway passes this gate (the run then stops on missing resources).
+    let result = Command::new(env!("CARGO_BIN_EXE_osfr-login"))
+        .args(["--bind", "127.0.0.1:0", "--gateway", "100.64.0.1:20041", "--allow-lan"])
+        .output()
+        .unwrap();
+    assert!(!String::from_utf8_lossy(&result.stderr).contains("loopback gateway"));
+}
+
 #[test]
 fn broker_refuses_public_wildcard_and_private_without_allow_lan() {
     for (address, allow_lan) in [

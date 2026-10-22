@@ -258,6 +258,41 @@ fn create_account_store(root: &Path) -> PathBuf {
     path
 }
 
+/// L053: a broker profile on a private-network or VPN (100.64/10) address is refused unless
+/// `--allow-lan` opts in, the launcher's rule; with the flag the address gate passes and the run
+/// fails later for its own reasons (this profile has no login key), never at the gate.
+#[test]
+fn private_broker_profile_needs_allow_lan() {
+    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab/reports/broker-login-w130")
+        .join(format!("allow-lan-{}", std::process::id()));
+    fs::create_dir_all(&root).unwrap();
+    let _secrets = SecretCleanup(root.clone());
+    fs::write(root.join("key.ed25519"), [7; 32]).unwrap();
+    fs::write(root.join("server.id"), [9; 32]).unwrap();
+    let profile_path = root.join("profile.json");
+    let run = |broker: &str, lan: bool| {
+        let profile = json!({"handle":"acct_002", "key_file":"key.ed25519", "server_id_file":"server.id",
+            "broker":broker, "login":"10.255.255.1:20042", "login_key_file":"login.key"});
+        fs::write(&profile_path, serde_json::to_vec(&profile).unwrap()).unwrap();
+        let mut command = Command::new(env!("CARGO_BIN_EXE_osfr-bot"));
+        command.arg("--broker-profile").arg(&profile_path).args(["--guid", "2", "--version", VERSION]);
+        if lan {
+            command.arg("--allow-lan");
+        }
+        let output = command.output().unwrap();
+        assert!(!output.status.success());
+        String::from_utf8_lossy(&output.stderr).into_owned()
+    };
+    let refused = run("10.255.255.1:20043", false);
+    assert!(refused.contains("private-network address with --allow-lan"), "{refused}");
+    let opted_in = run("100.64.8.1:20043", true);
+    assert!(!opted_in.contains("private-network address"), "{opted_in}");
+    // A public address stays refused even with the flag.
+    let public = run("8.8.8.8:20043", true);
+    assert!(public.contains("private-network address with --allow-lan"), "{public}");
+}
+
 #[test]
 fn broker_bot_reaches_world_and_wrong_key_sends_no_udp() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))

@@ -99,6 +99,13 @@ impl Options {
         if !osfr_tools::net_policy::allowed(bind.ip(), allow_lan) {
             return Err("login binds loopback, or a private-network IP with --allow-lan".into());
         }
+        // L053: every client is sent the gateway address; loopback, or a private/VPN one with --allow-lan.
+        if let Some(gateway) = &gateway {
+            let ip = gateway.parse::<SocketAddr>().map_err(|_| "invalid --gateway address")?.ip();
+            if !osfr_tools::net_policy::allowed(ip, allow_lan) {
+                return Err("login hands players to a loopback gateway, or a private-network one with --allow-lan".into());
+            }
+        }
         let authenticated = account_store.is_some();
         // Security Model decision 2 (2026-10-16): the broker may listen on the
         // VPN address under the same rule as the UDP binds; public stays closed.

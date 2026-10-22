@@ -328,7 +328,8 @@ Do not invite players while any item stays unchecked.
 - Bundle build, manifest/security check, bot login, and persisted-walk smoke test passed on loopback in the W132 scratch bundle.
 - Account-store create, add-key, set-role, and list passed against a disposable store.
 - Login and gateway started in account-store mode on loopback with --allow-lan, --security-log, --studio-port 0, and no --dev-tools. The gateway reported dev_tools false.
-- The local source supports private-network binds with --allow-lan. No VPN bind or second-PC session was tested.
+- The local source supports private-network binds with --allow-lan. No second-PC session was tested.
+- VPN bind, 2026-10-22 (L053, `lab/runs/lan-test-20261022T041757Z`): gateway, login and AUTH2 broker started on this PC's Tailscale address (100.64.x.x) with the commands above, and `osfr-bot --broker-profile ... --allow-lan` passed broker auth, UDP login, handoff and world entry against them from the same PC. The run found two bugs, now fixed: login refused any non-loopback `--gateway`, so the login command above could not start; and the bot bound loopback, so it could not send to a VPN address. A Windows Sandbox client did not reach the servers, because no Windows Firewall allow rule existed for the release binaries. Allow UDP 20041/20042 and TCP 20043 before a remote client joins.
 - The account-store login flow has not passed native-client acceptance. No two-real-client VPN run is recorded.
 - Launcher key creation failed in this managed workspace because its owner-only profile directory could not be accessed. W131's friend UI, a clean installation package, and fresh-PC login remain unverified.
 - The AUTH2 broker binds a private address with --allow-lan (tested on a LAN address). Login from a friend's PC over the VPN is not verified.
