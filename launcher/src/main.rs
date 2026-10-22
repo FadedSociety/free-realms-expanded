@@ -8,6 +8,7 @@ use controller::{Controller, Navigation};
 use eframe::egui::{self, Color32, RichText, Vec2};
 use osfr_launcher::{
     LaunchPlan, LaunchSettings, LocalLoginStub, LoginProvider, SessionToken,
+    assets::Responder,
     auth::{self, AuthError},
     patch::{self, PatchSource, Progress},
 };
@@ -381,8 +382,9 @@ pub(crate) struct Launcher {
     controller_on: bool,
     controller: Option<Controller>,
     controller_status: String,
-    pending: Option<mpsc::Receiver<Result<Child, String>>>,
-    child: Option<Child>,
+    pending: Option<mpsc::Receiver<Result<(Child, Responder), String>>>,
+    /// The asset responder lives exactly as long as the client it serves.
+    child: Option<(Child, Responder)>,
     message: String,
     screenshot: Option<PathBuf>,
     screenshot_requested: bool,
@@ -1191,7 +1193,7 @@ impl eframe::App for Launcher {
                     match result {
                         Ok(child) => {
                             self.child = Some(child);
-                            self.message = "Client started. Backups are in its .friend-launcher-backups folder.".into();
+                            self.message = "Client started. Keep the launcher open while you play. Backups are in its .friend-launcher-backups folder.".into();
                         }
                         Err(error) => self.message = error,
                     }
@@ -1204,16 +1206,14 @@ impl eframe::App for Launcher {
                 Err(mpsc::TryRecvError::Empty) => (),
             }
         }
-        if let Some(child) = self.child.as_mut() {
+        if let Some((child, _)) = self.child.as_mut() {
             match child.try_wait() {
                 Ok(Some(_)) => {
                     self.child = None;
                     self.message = "The client has closed.".into();
                 }
-                Err(_) => {
-                    self.child = None;
-                    self.message = "Could not read client status.".into();
-                }
+                // Keep the client and its responder: it may still be running.
+                Err(_) => self.message = "Could not read client status.".into(),
                 Ok(None) => (),
             }
         }

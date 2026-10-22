@@ -1,5 +1,6 @@
 //! Local client preparation and per-server key-pair authentication.
 
+pub mod assets;
 pub mod auth;
 pub mod patch;
 
@@ -409,6 +410,7 @@ pub struct LaunchPlan {
     changes: Vec<Change>,
     arguments: Vec<String>,
     backup: PathBuf,
+    assets: assets::Responder,
 }
 
 impl LaunchPlan {
@@ -436,11 +438,16 @@ impl LaunchPlan {
         for name in LOCALE {
             regular(&root, &format!("locale/{name}"))?;
         }
-        let baseline = offline_urls(&replace_setting(
-            &text(&root, "ClientConfig.ini")?,
-            "Server",
-            endpoint,
-        )?);
+        let assets = assets::Responder::start(&root)?;
+        let baseline = replace_setting(
+            &offline_urls(&replace_setting(
+                &text(&root, "ClientConfig.ini")?,
+                "Server",
+                endpoint,
+            )?),
+            "IndirectServerAddress",
+            &assets.url,
+        )?;
         let mut options = text(&root, "UserOptions.ini")?;
         for (key, value) in [
             ("WindowedWidth", settings.width.to_string()),
@@ -504,6 +511,7 @@ impl LaunchPlan {
             changes,
             arguments,
             backup,
+            assets,
         })
     }
 
@@ -585,7 +593,8 @@ impl LaunchPlan {
     }
 
     /// Explicitly called only from Play. Tests and screenshot mode never call it.
-    pub fn launch(&self) -> Result<Child> {
+    /// Keep the returned responder as long as the client runs: it serves its assets.
+    pub fn launch(self) -> Result<(Child, assets::Responder)> {
         #[cfg(not(windows))]
         {
             Err("Launching Free Realms requires Windows.".into())
@@ -596,7 +605,7 @@ impl LaunchPlan {
             let executable = regular(&self.root, "FreeRealms.exe")?;
             Command::new(executable).args(&self.arguments).current_dir(&self.root)
                 .creation_flags(0x08000000) // CREATE_NO_WINDOW; no shell/batch execution.
-                .spawn().map_err(|_| "Could not start the supplied client. Prepared files and backups were preserved.".into())
+                .spawn().map(|child| (child, self.assets)).map_err(|_| "Could not start the supplied client. Prepared files and backups were preserved.".into())
         }
     }
 }

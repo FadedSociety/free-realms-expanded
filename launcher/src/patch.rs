@@ -68,7 +68,7 @@ fn valid_hash(hash: &str) -> bool {
     hash.len() == 64 && hash.bytes().all(|b| b.is_ascii_hexdigit())
 }
 
-fn valid_path(path: &str) -> bool {
+pub(crate) fn valid_path(path: &str) -> bool {
     // (R) Portable ASCII filenames, no ADS, device aliases, hidden launcher
     // state or reserved partial names. Slash alone separates components.
     !path.is_empty()

@@ -40,6 +40,17 @@ profile. These commands run before UI startup and return their output directly.
 The controller option controls this launcher window. It does not inject game
 input or start the existing in-game Python bridge. Settings are session-only.
 
+PLAY also runs an asset responder on `127.0.0.1` for as long as the client
+runs, so keep the launcher open while you play. Without one the client exits
+with code 27 when `manifest.crc` fails (`notes/Research/Client Runtime
+Dependencies.md`). Like the native harness, it answers `/manifest.crc` with the
+CRC-32 and size of the client's own `Assets_manifest.txt`, so the client keeps
+that local manifest, and answers `/<digits>/<name>` with the file of exactly
+that name in the client's `indirect-assets/` folder, byte for byte: a `.z` file
+must already be the A1B2C3D4 envelope the client inflates. A realm's patch
+manifest fills that folder. Every other request, including `..`, separators,
+`%` escapes, absolute paths and links (hard links too), gets 404.
+
 From this directory on Windows, using the project's private toolchain:
 
 ```powershell
