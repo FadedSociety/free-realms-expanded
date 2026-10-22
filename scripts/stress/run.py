@@ -28,6 +28,19 @@ from pathlib import Path
 BOT_LAST_NAME = "Test"
 CLIENT_VERSION = "1.910.1.530630"
 MAX_EXPECT_MS = 15000
+# A bundle's inputs at the paths its README launch lines use (make_bundle.py `readme`);
+# tests/test_stress_bundle.py pins the match. The identity, saves and keys stay in the run
+# folder, as the README keeps them in its runtime folder.
+BUNDLE_LAUNCH = {
+    "--reference": "reference",
+    "--content": "content",
+    "--terrain": "terrain",
+    "--client-locale": "client-locale",
+    "--resources": "login-resources",
+    "--server-id-file": "server/server-id.bin",
+    "OSFR_GATEWAY_STARTUP_SNAPSHOT": "startup/startup.json",
+}
+SCENARIO_FILES = ("item-catalogue.json", "field_enemies.json", "stores.json")
 
 
 def login_summary(run_dir: Path) -> dict:
@@ -218,15 +231,15 @@ def build_bins(root: Path, build_dir: Path, run_dir: Path, commit: str, working_
     return build_dir / "release" / ("osfr-gateway" + suffix)
 
 
-def copy_runtime_content(base_content: Path, root: Path, run_dir: Path) -> Path:
+def copy_runtime_content(base_content: Path, overlay: Path | None, run_dir: Path) -> Path:
     content = run_dir / "content"
     if not base_content.is_dir():
-        raise RuntimeError(f"HEAD content directory missing: {base_content}")
+        raise RuntimeError(f"content directory missing: {base_content}")
     shutil.copytree(base_content, content)
-    bundle = root.parent / "lab" / "reports" / "round70-native-20261016T061000Z" / "content"
-    if not bundle.is_dir():
-        raise RuntimeError(f"required content bundle not found: {bundle}")
-    shutil.copytree(bundle, content, dirs_exist_ok=True)
+    if overlay is not None:
+        if not overlay.is_dir():
+            raise RuntimeError(f"required content bundle not found: {overlay}")
+        shutil.copytree(overlay, content, dirs_exist_ok=True)
 
     # (R) Scratch-only wallet seed lets each test character buy one low-cost item.
     # Keep the local span digest aligned; no modified value is presented as recovered.
@@ -245,6 +258,9 @@ def copy_runtime_content(base_content: Path, root: Path, run_dir: Path) -> Path:
 
 
 def scenario_from_content(content: Path) -> dict:
+    missing = [name for name in SCENARIO_FILES if not (content / name).is_file()]
+    if missing:
+        raise RuntimeError(f"{content} lacks {', '.join(missing)}; the stress scenario needs the item catalogue, field enemies and stores")
     npc_rows = []
     for path in sorted((content / "npcs").glob("*.json")):
         npc_rows.extend(load_json(path).get("records", []))
@@ -295,18 +311,28 @@ def scenario_from_content(content: Path) -> dict:
     _, price, vendor_id, item_id, vendor_npc = min(vendor_choices)
     if start_position is None:
         start_position = quest_npc["position"]
-    enemies_doc = load_json(content / "field_enemies.json").get("enemies", [])
-    combat_quest_id = 3030007
-    enemies = [
-        enemy for enemy in enemies_doc
-        if combat_quest_id in enemy.get("quest_ids", []) and len(enemy.get("position", [])) == 3
+    # Always-on rows only: a quest-gated field enemy exists only while its quest is active
+    # (encounter/field.rs, encounter/shared.rs), so bots that lack the quest hit nothing.
+    always_on = [
+        enemy for enemy in load_json(content / "field_enemies.json").get("enemies", [])
+        if not enemy.get("quest_ids") and len(enemy.get("position", [])) == 3
     ]
-    if not enemies:
-        raise RuntimeError("quest 3030007 has no field-enemy rows in scratch content")
-    enemies.sort(key=lambda row: int(row["guid"]))
+    if not always_on:
+        raise RuntimeError(f"{content / 'field_enemies.json'} has no always-on enemy (empty quest_ids and a 3-element position); quest-gated rows exist only while their quest is active")
+    # (R) Authored damage and health are level-one baselines that the server scales up by level
+    # at load (encounter/field.rs), so level ranks ahead of damage. The nearest 8 to the start
+    # (non-boss first; of stacked rows the lower level, then the lower damage), then non-boss,
+    # lowest level and lowest damage first, so the round-robin hands out the weakest first.
+    def rank(row, *keys):
+        return (bool(row.get("boss")), *keys, int(row["guid"]))
+    def strength(row):
+        return int(row.get("level", 1)), int(row.get("damage", 0))
+    def distance(row):
+        return math.dist(start_position, row["position"])
+    enemies = sorted(always_on, key=lambda row: rank(row, distance(row), *strength(row)))[:8]
+    enemies.sort(key=lambda row: rank(row, *strength(row), distance(row)))
     return {
         "quest_id": int(quest["id"]),
-        "combat_quest_id": combat_quest_id,
         "quest_npc_id": int(quest_npc["npc_id"]),
         "quest_npc_position": [float(x) for x in quest_npc["position"]],
         "start_position": [float(x) for x in start_position],
@@ -314,7 +340,7 @@ def scenario_from_content(content: Path) -> dict:
         "vendor_position": [float(x) for x in vendor_npc["position"]],
         "item_id": item_id,
         "item_price": price,
-        "enemies": [{"guid": int(row["guid"]), "position": [float(x) for x in row["position"]]} for row in enemies[:8]],
+        "enemies": [{"guid": int(row["guid"]), "position": [float(x) for x in row["position"]], "level": strength(row)[0], "damage": strength(row)[1], "boss": bool(row.get("boss")), "quest_ids": row.get("quest_ids", [])} for row in enemies],
         "npc_count": len(npcs),
     }
 
@@ -463,12 +489,12 @@ def wait_ready(process: ProcessLogs, path: Path, tokens: tuple[str, ...], timeou
     raise TimeoutError(f"{process.name} did not emit ready markers {tokens}")
 
 
-def gateway_args(bind_port: int, reference: Path, content: Path, state: Path, store: Path, handoff: Path, run_dir: Path, trace_name: str | None = None) -> list[str]:
+def gateway_args(bind_port: int, reference: Path, content: Path, state: Path, store: Path, handoff: Path, run_dir: Path, trace_name: str | None = None, extra: list[str] | None = None) -> list[str]:
     return [
         f"127.0.0.1:{bind_port}", "--reference", str(reference), "--state", str(state),
         "--content", str(content), "--account-store", str(store), "--handoff-key-file", str(handoff),
         "--studio-port", "0", "--security-log", str(run_dir / "security.jsonl"),
-    ] + (["--trace", str(run_dir / trace_name)] if trace_name else [])
+    ] + (["--trace", str(run_dir / trace_name)] if trace_name else []) + (extra or [])
 
 
 def write_raw(lines: list[str], packet: bytes) -> None:
@@ -494,6 +520,7 @@ def make_bot_script(index: int, record: dict, records: list[dict], scenario: dic
     current = start_position[:]
     partner = records[(index + 1) % len(records)]
     tell_target = records[(index - 1) % len(records)]
+    enemy = scenario["enemies"][index % len(scenario["enemies"])]
     cycle = 0
 
     def ping() -> None:
@@ -510,7 +537,6 @@ def make_bot_script(index: int, record: dict, records: list[dict], scenario: dic
         write_raw(lines, quest_dialogue_response())
         write_raw(lines, quest_reply(scenario["quest_id"], True))
 
-        enemy = scenario["enemies"][index % len(scenario["enemies"])]
         current = move_steps(current, enemy["position"], lines, rng)
         lines.extend([f"ability 0 {enemy['guid']}", "wait 800"])
         current = move_steps(current, scenario["vendor_position"], lines, rng)
@@ -526,11 +552,10 @@ def make_bot_script(index: int, record: dict, records: list[dict], scenario: dic
     # ends normally so the next session tests persisted state after reconnect.
     estimated = sum(0.08 for line in lines if not line.startswith("wait ")) + sum(int(line.split()[1]) / 1000 for line in lines if line.startswith("wait "))
     while estimated < seconds - 22:
-        targets = [scenario["quest_npc_position"], scenario["vendor_position"], scenario["enemies"][rng.randrange(len(scenario["enemies"]))]["position"]]
+        targets = [scenario["quest_npc_position"], scenario["vendor_position"], enemy["position"]]
         target = targets[(cycle + index + rng.randrange(len(targets))) % len(targets)]
         current = move_steps(current, target, lines, rng)
-        if target in [enemy["position"] for enemy in scenario["enemies"]]:
-            enemy = min(scenario["enemies"], key=lambda item: math.dist(item["position"], target))
+        if target is enemy["position"]:
             lines.extend([f"ability 0 {enemy['guid']}", f"wait {rng.randint(350, 900)}"])
         ping()
         if cycle % 3 == 0:
@@ -752,9 +777,9 @@ class ProcessSampler:
 RUN_START = 0.0
 
 
-def sample_save_load(gateway_exe: Path, bin_dir: Path, records: list[dict], verify_port: int, store: Path, handoff: Path, reference: Path, content: Path, state_path: Path, run_dir: Path, trace: bool = False) -> tuple[ProcessLogs, list[dict]]:
+def sample_save_load(gateway_exe: Path, bin_dir: Path, records: list[dict], verify_port: int, store: Path, handoff: Path, reference: Path, content: Path, state_path: Path, run_dir: Path, trace: bool = False, extra: list[str] | None = None) -> tuple[ProcessLogs, list[dict]]:
     name = "gateway-verify"
-    process = ProcessLogs(name, gateway_exe, gateway_args(verify_port, reference, content, state_path, store, handoff, run_dir, "gateway-verify.trace.jsonl" if trace else None), run_dir, run_dir)
+    process = ProcessLogs(name, gateway_exe, gateway_args(verify_port, reference, content, state_path, store, handoff, run_dir, "gateway-verify.trace.jsonl" if trace else None, extra), run_dir, run_dir)
     wait_ready(process, run_dir, ('"event":"listening"',))
     results = []
     for record in records:
@@ -853,6 +878,44 @@ def latency_samples(run_dir: Path) -> list[float]:
     return samples
 
 
+def knockout_summary(run_dir: Path) -> dict:
+    """Knockouts are explained, not protocol errors: field enemies hit back (T398, T402).
+
+    The bot already logs every received message as `<- family/sub`: 41/125 shows the respawn
+    window (encounter/revive.rs `respawn_window`: sent on a field knockout, and again when a
+    downed character's scene loads), 41/126 hides it on revival, and 36/1 is an ability refusal
+    (abilities.rs `build_failure`). A downed bot's basic attack is silent (encounter.rs `attack`).
+    """
+    summary = {"knockouts": 0, "revives": 0, "refusals_while_down": 0, "other_refusals": 0}
+    for path in sorted((run_dir / "bots").glob("bot-*.stdout.log")):
+        down = False
+        for line in read_lines(path):
+            if "<- 41/125 " in line:
+                summary["knockouts"] += 1
+                down = True
+            elif "<- 41/126 " in line:
+                summary["revives"] += 1
+                down = False
+            elif "<- 36/1 " in line:
+                summary["refusals_while_down" if down else "other_refusals"] += 1
+    # A downed character that reloads is still a reload (its `loaded` comes from the exit code).
+    summary["reloaded_down"] = sum(any("<- 41/125 " in line for line in read_lines(path))
+        for path in (run_dir / "bots").glob("save-load-*.log"))
+    return summary
+
+
+def tick_stats(run_dir: Path) -> list[dict]:
+    """The gateway's per-window `tick_stats` events (osfr_gateway/tick_stats.rs)."""
+    rows = []
+    for line in read_lines(run_dir / "gateway.stdout.log"):
+        if '"event":"tick_stats"' in line:
+            try:
+                rows.append(json.loads(line))
+            except json.JSONDecodeError:
+                continue
+    return rows
+
+
 def percentile(values: list[float], pct: float) -> float | None:
     if not values:
         return None
@@ -873,9 +936,15 @@ def save_summary(run_dir: Path, records: list[dict], scenario: dict, phase_saves
         phases = phase_saves.get(str(record["guid"]), [])
         counts = [entry.get("item_count") for entry in phases if entry.get("item_count") is not None]
         purchase_observed = any(count >= 1 for count in counts) or state.get("item_count", 0) >= 1
-        item_persisted = purchase_observed and len(counts) >= 2 and all(count == counts[0] for count in counts[1:]) and counts[0] >= 1
+        # A reconnect needs two phase samples to compare; one sample measures nothing.
+        if not purchase_observed:
+            persistence = "not purchased"
+        elif len(counts) < 2:
+            persistence = "unmeasured"
+        else:
+            persistence = "persisted" if all(count == counts[0] for count in counts[1:]) and counts[0] >= 1 else "lost"
         coins_ok = isinstance(state.get("coins"), int) and state["coins"] >= 0
-        results.append({"guid": record["guid"], "exists": source.is_file(), "coins": state.get("coins"), "coins_nonnegative": coins_ok, "purchased_item_count": state.get("item_count"), "purchase_observed": purchase_observed, "purchase_persisted_across_reconnect": item_persisted, "phase_samples": phases})
+        results.append({"guid": record["guid"], "exists": source.is_file(), "coins": state.get("coins"), "coins_nonnegative": coins_ok, "purchased_item_count": state.get("item_count"), "purchase_observed": purchase_observed, "purchase_persistence": persistence, "phase_samples": phases})
     for path in (run_dir / "state").rglob("*.json"):
         if path.is_file():
             relative = path.relative_to(run_dir / "state")
@@ -902,6 +971,9 @@ def report(run_dir: Path, metadata: dict, gateway_exit: int | None, login_exit: 
     duplicate_refusals = sum(event["event"] == "duplicate_session_refusal" for event in timeline_events)
     immediate_refusals = sum(event["event"] == "immediate_reconnect_probe" and event.get("refused") for event in timeline_events)
     observed_purchases = [row for row in saves if row.get("purchase_observed")]
+    persistence = {state: sum(row["purchase_persistence"] == state for row in saves) for state in ("persisted", "lost", "unmeasured")}
+    knockouts = knockout_summary(run_dir)
+    windows = tick_stats(run_dir)
     rss_by_component: dict[str, list[float]] = {}
     for row in perf_rows:
         try:
@@ -916,7 +988,9 @@ def report(run_dir: Path, metadata: dict, gateway_exit: int | None, login_exit: 
         f"Working-tree overlay: {metadata.get('working_tree', False)}; packet tracing: {metadata.get('trace', True)}.  ",
         f"Requested: {metadata['bots']} bots for {metadata['duration_seconds']} seconds; elapsed {metadata.get('elapsed_seconds', 0):.1f} seconds  ",
         f"Bot handshake/expect timeout: {metadata.get('expect_timeout_ms', MAX_EXPECT_MS)} ms; initial join stagger: 0 to {metadata.get('startup_stagger_max_seconds', 8)} seconds  ",
-        f"Scenario: zone 0; quest {scenario.get('quest_id')}; combat targets from quest {scenario.get('combat_quest_id')}; vendor {scenario.get('vendor_id')}; item {scenario.get('item_id')} at {scenario.get('item_price')} coins; {len(scenario.get('enemies', []))} matching field-enemy rows",
+        f"Content: {('bundle `' + metadata['bundle'] + '`') if metadata.get('bundle') else 'HEAD data/content plus the round70 overlay'}  ",
+        *([f"Bundle revision: `{metadata.get('bundle_revision')}`; the binaries are built from `git archive HEAD`, so they {'match' if metadata.get('bundle_revision') == metadata['commit'] else 'DIFFER from'} the bundle's source  "] if metadata.get("bundle") else []),
+        f"Scenario: zone 0; quest {scenario.get('quest_id')}; combat targets: {len(scenario.get('enemies', []))} always-on field enemies (no quest gate) nearest the start, round-robin per bot; vendor {scenario.get('vendor_id')}; item {scenario.get('item_id')} at {scenario.get('item_price')} coins",
         "",
         "## Summary",
         "",
@@ -929,7 +1003,8 @@ def report(run_dir: Path, metadata: dict, gateway_exit: int | None, login_exit: 
         f"- Service crash events: {len(crash_events)}; panic markers: {panic_count}.",
         f"- Unique ping round trips: {len(latency)}; p50 `{percentile(latency, .50)}` s, p95 `{percentile(latency, .95)}` s, p99 `{percentile(latency, .99)}` s.",
         f"- End saves present: {sum(row['exists'] for row in saves)}/{len(saves)}; gateway-loader reconnects: {sum(row['loaded'] for row in save_load)}/{len(save_load)}.",
-        f"- Nonnegative coin checks: {sum(row['coins_nonnegative'] for row in saves)}/{len(saves)}; scripted item purchases observed: {len(observed_purchases)}/{len(saves)}; purchase persistence checks passed: {sum(row['purchase_persisted_across_reconnect'] for row in observed_purchases)}/{len(observed_purchases)}.",
+        f"- Nonnegative coin checks: {sum(row['coins_nonnegative'] for row in saves)}/{len(saves)}; scripted item purchases observed: {len(observed_purchases)}/{len(saves)}; purchase persistence: persisted {persistence['persisted']}, lost {persistence['lost']}, unmeasured {persistence['unmeasured']} (fewer than two phase samples; a run under 60 s has one phase).",
+        f"- Knockouts (explained, not protocol errors; T398 enemy damage, T402 paid revive): {knockouts['knockouts']} respawn-window notices, {knockouts['revives']} revivals, {knockouts['refusals_while_down']} ability refusals while down; other ability refusals: {knockouts['other_refusals']}; knocked-out characters reloaded: at least {knockouts['reloaded_down']} (counted as reloaded; a lower bound, since the save-load bot quits 200 ms in and can leave before the re-sent window arrives). After 15 s down the character auto-revives at the safe location while its bot walks on from where it was, so any movement refusals that follow land in `security.jsonl` and `refusals-and-errors.log`, not here.",
         "",
         "## Timeline",
         "",
@@ -955,6 +1030,16 @@ def report(run_dir: Path, metadata: dict, gateway_exit: int | None, login_exit: 
         lines.append("Security log entries are preserved in `security.jsonl`; they record rejected packet/admission summaries only.")
     else:
         lines.append("`security.jsonl` was empty; no security-log refusal event was recorded.")
+    lines.extend(["", "## Gateway tick time", ""])
+    if windows:
+        lines.append(f"One row per `tick_stats` window of {windows[0].get('window_s')} s; microseconds. A step includes its socket wait (up to 10 ms when idle); a tick is the 20 Hz simulation, session ticks and flush of that step.")
+        lines.extend(["", "| Window | Sessions | Steps | Step p50 | Step p99 | Step max | Ticks | Tick p50 | Tick p99 | Tick max |", "|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|"])
+        for number, row in enumerate(windows, 1):
+            lines.append(f"| {number} | {row.get('sessions')} | {row.get('steps')} | {row.get('step_p50_us')} | {row.get('step_p99_us')} | {row.get('step_max_us')} | {row.get('ticks')} | {row.get('tick_p50_us')} | {row.get('tick_p99_us')} | {row.get('tick_max_us')} |")
+        worst = lambda key: max(row.get(key, 0) for row in windows)
+        lines.extend(["", f"Worst window: step p99 `{worst('step_p99_us')}` us, step max `{worst('step_max_us')}` us; tick p99 `{worst('tick_p99_us')}` us, tick max `{worst('tick_max_us')}` us."])
+    else:
+        lines.append("No `tick_stats` event: the gateway ran with `--tick-stats-seconds 0` or stopped before its first window closed.")
     lines.extend(["", "## Process resource samples", ""])
     if rss_by_component:
         lines.append("| Process | Samples | First RSS MiB | Last RSS MiB | Min RSS MiB | Max RSS MiB |")
@@ -968,7 +1053,7 @@ def report(run_dir: Path, metadata: dict, gateway_exit: int | None, login_exit: 
     lines.extend(["", "## Save integrity", ""])
     for row in saves:
         phase_counts = [entry.get("item_count") for entry in row.get("phase_samples", [])]
-        lines.append(f"- GUID {row['guid']}: save={'present' if row['exists'] else 'missing'}, coins={row['coins']}, coins_nonnegative={row['coins_nonnegative']}, item_count={row['purchased_item_count']}, phase item counts={phase_counts}, purchase_observed={row.get('purchase_observed', False)}, reconnect_purchase_persisted={row['purchase_persisted_across_reconnect']}.")
+        lines.append(f"- GUID {row['guid']}: save={'present' if row['exists'] else 'missing'}, coins={row['coins']}, coins_nonnegative={row['coins_nonnegative']}, item_count={row['purchased_item_count']}, phase item counts={phase_counts}, purchase_observed={row.get('purchase_observed', False)}, reconnect_purchase={row['purchase_persistence']}.")
     lines.append("")
     for row in save_load:
         if not row["loaded"]:
@@ -985,10 +1070,12 @@ def report(run_dir: Path, metadata: dict, gateway_exit: int | None, login_exit: 
         findings.append(("P1", "Saved state rejected on reload", "Reconnect the listed GUID using `bots/save-load-<guid>.txt` against the preserved run state."))
     if any(not row["coins_nonnegative"] for row in saves):
         findings.append(("P1", "Coin save invariant failed", "Inspect `state/characters/<guid>.json` and the shop transaction in gateway trace."))
-    if observed_purchases and any(not row["purchase_persisted_across_reconnect"] for row in observed_purchases):
+    if persistence["lost"]:
         findings.append(("P1", "Purchased item did not persist across reconnect", "Compare the purchase packet in the bot session log with the phase snapshots and end save for the same GUID."))
     elif not observed_purchases:
         findings.append(("P2", "Purchase persistence gate not exercised", "No scripted item purchase appears in the phase or end saves; resolve the bot transport/action failures before drawing a save-persistence conclusion."))
+    elif persistence["unmeasured"]:
+        findings.append(("P2", "Purchase persistence unmeasured", f"{persistence['unmeasured']} GUIDs have fewer than two phase samples (a run under 60 s has one phase, or a session failed); rerun for 60 s or longer before claiming the gate."))
     if checksum_mismatches:
         findings.append(("P1", "Gateway rejected bot transport packets with SOE checksum mismatches", f"{len(checksum_mismatches)} rejected packets are indexed in `refusals-and-errors.log`; inspect the matching trace rows and bot session logs."))
     if bot_errors:
@@ -1020,10 +1107,22 @@ def report(run_dir: Path, metadata: dict, gateway_exit: int | None, login_exit: 
         "- Bot actions and multiplayer helper patterns: `prototype/osfr-tools/tests/multiplayer.rs`, `tests/bot_smoke.rs`.",
         "- NPC 26/8 request provenance comment points to `lab/runs/client-baseline-20261009T103605Z/analysis/application-0066.bin`; reconstructed interaction option meanings are documented in `src/npc_interaction.rs`.",
         "- Quest packet provenance is in `src/npc_interaction.rs` and the native quest reply capture references in `tests/npc_interaction.rs`; quest acceptance policy remains reconstructed.",
-        "- Zone-0 Hooligan quest/enemy association: `notes/Design/Field Enemies.md` and scratch `content/field_enemies.json`; content tags distinguish client/legacy/reconstructed fields.",
-        "- Runtime content started from the same `git archive HEAD` used for the build, then received the preserved `lab/reports/round70-native-20261016T061000Z/content` overlay. Only the scratch copy's starting-wallet coins were adjusted to 5,000 (R).",
+        "- Always-on zone-0 field enemies (empty `quest_ids`): `notes/Design/Field Enemies.md` and scratch `content/field_enemies.json`; content tags distinguish client/legacy/reconstructed fields.",
+        (f"- Runtime content, reference, terrain, client locale, login resources, server id and startup snapshot came from bundle `{metadata['bundle']}`, as its README launches them." if metadata.get("bundle")
+            else "- Runtime content started from the same `git archive HEAD` used for the build, then received the preserved `lab/reports/round70-native-20261016T061000Z/content` overlay.")
+        + " Only the scratch copy's starting-wallet coins were adjusted to 5,000 (R).",
     ])
     return "\n".join(lines) + "\n"
+
+
+def run_failed(service_crashed: bool, broker_login: bool, timeline_events: list[dict], authentication: dict, save_load: list[dict], saves: list[dict]) -> bool:
+    """Broker mode exits 0 only when every gate passed, purchases and coins included."""
+    return bool(service_crashed or (broker_login and (
+        any(event["event"] == "bot_error" for event in timeline_events)
+        or authentication["broker_refusals"] or authentication["login_failures"]
+        or any(not row["loaded"] for row in save_load)
+        or any(row["purchase_persistence"] != "persisted" or not row["coins_nonnegative"] for row in saves)
+    )))
 
 
 def main() -> int:
@@ -1034,11 +1133,20 @@ def main() -> int:
     parser.add_argument("--trace", action="store_true", help="opt in to synchronous per-packet tracing (affects latency)")
     parser.add_argument("--broker-login", action="store_true", help="AUTH2, native login and character-select handoff for every bot")
     parser.add_argument("--working-tree", action="store_true", help="freeze current crate sources over the HEAD snapshot")
+    parser.add_argument("--bundle", type=Path, help="run from this playtest bundle (make_bundle.py) instead of HEAD content plus the round70 overlay")
+    parser.add_argument("--scenario-only", action="store_true", help="print the scenario chosen from --bundle as JSON and exit")
+    parser.add_argument("--tick-stats-seconds", type=int, default=60, help="gateway tick_stats window (0 = off, else 5-600)")
     args = parser.parse_args()
     if not 1 <= args.bots <= 10:
         parser.error("--bots must be between 1 and 10")
     if args.duration_seconds < 1:
         parser.error("--duration-seconds must be positive")
+    bundle = args.bundle.resolve(strict=True) if args.bundle else None
+    if args.scenario_only:
+        if bundle is None:
+            parser.error("--scenario-only needs --bundle")
+        print(json.dumps(scenario_from_content(bundle / BUNDLE_LAUNCH["--content"]), indent=2))
+        return 0
 
     # Broker mode must exercise the owned uncommitted bot implementation.
     args.working_tree = args.working_tree or args.broker_login
@@ -1069,7 +1177,10 @@ def main() -> int:
         raise RuntimeError("git rev-parse HEAD failed")
     commit = commit_result.stdout.strip()
     (run_dir / "build.commit.txt").write_text(commit + "\n", encoding="ascii")
-    metadata = {"commit": commit, "bots": args.bots, "duration_seconds": args.duration_seconds, "expect_timeout_ms": MAX_EXPECT_MS, "startup_stagger_max_seconds": 8, "trace": args.trace, "working_tree": args.working_tree, "broker_login": args.broker_login}
+    metadata = {"commit": commit, "bots": args.bots, "duration_seconds": args.duration_seconds, "expect_timeout_ms": MAX_EXPECT_MS, "startup_stagger_max_seconds": 8, "trace": args.trace, "working_tree": args.working_tree, "broker_login": args.broker_login, "bundle": str(bundle) if bundle else None}
+    if bundle:  # make_bundle.py `readme` records the source revision the bundle was built from
+        revision = re.search(r"Source Git revision: `([0-9a-f]{40})`", (bundle / "README.md").read_text(encoding="utf-8"))
+        metadata["bundle_revision"] = revision.group(1) if revision else "unknown"
     login_process = gateway_process = None
     records = []
     bot_registry: dict[int, subprocess.Popen] = {}
@@ -1089,22 +1200,30 @@ def main() -> int:
         bin_dir = build_dir / "release"
         account_exe = bin_dir / ("osfr-account.exe" if os.name == "nt" else "osfr-account")
         login_exe = bin_dir / ("osfr-login.exe" if os.name == "nt" else "osfr-login")
-        head_content = build_dir / "head-src" / "prototype" / "osfr-tools" / "data" / "content"
-        content = copy_runtime_content(head_content, root, run_dir)
+        if bundle:
+            content = copy_runtime_content(bundle / BUNDLE_LAUNCH["--content"], None, run_dir)
+            reference, resources, server_id = (bundle / BUNDLE_LAUNCH[flag] for flag in ("--reference", "--resources", "--server-id-file"))
+            bundle_args = [part for flag in ("--terrain", "--client-locale") for part in (flag, str(bundle / BUNDLE_LAUNCH[flag]))]
+            # Process-wide on purpose: the save-load verify gateway (sample_save_load) needs it too,
+            # or it falls back to <reference>/../../content/startup-snapshot (gateway.rs).
+            os.environ["OSFR_GATEWAY_STARTUP_SNAPSHOT"] = str(bundle / BUNDLE_LAUNCH["OSFR_GATEWAY_STARTUP_SNAPSHOT"])
+        else:
+            head_content = build_dir / "head-src" / "prototype" / "osfr-tools" / "data" / "content"
+            content = copy_runtime_content(head_content, lab / "reports" / "round70-native-20261016T061000Z" / "content", run_dir)
+            write_login_resources(run_dir)
+            reference, resources, server_id = lab / "references" / "rust-gateway-reference", run_dir / "login-resources", run_dir / "server.id"
+            server_id.write_bytes(os.urandom(32))
+            bundle_args = []
         scenario = scenario_from_content(content)
         metadata["scenario"] = scenario
         store, records = create_accounts(account_exe, run_dir, scenario, args.bots, args.broker_login)
         metadata["account_count"] = len(records)
-        write_login_resources(run_dir)
-        reference = lab / "references" / "rust-gateway-reference"
         if not (reference / "manifest.json").is_file():
             raise RuntimeError(f"validated local gateway reference is missing: {reference}")
         handoff = run_dir / "handoff.key"
         login_key = run_dir / "login.key"
-        server_id = run_dir / "server.id"
         handoff.write_bytes(os.urandom(32))
         login_key.write_bytes(os.urandom(16))
-        server_id.write_bytes(os.urandom(32))
         state_path = run_dir / "state" / "gateway.json"
         login_port, auth_port, gateway_port = free_port("udp"), free_port("tcp"), free_port("udp")
         if args.broker_login:
@@ -1116,13 +1235,13 @@ def main() -> int:
                 record["broker_profile"] = profile
         login_process = ProcessLogs("login", login_exe, [
             "--bind", f"127.0.0.1:{login_port}", "--auth-bind", f"127.0.0.1:{auth_port}",
-            "--server-id-file", str(server_id), "--resources", str(run_dir / "login-resources"),
+            "--server-id-file", str(server_id), "--resources", str(resources),
             "--identity", str(run_dir / "identity.json"), "--state", str(run_dir / "login-state.json"),
             "--account-store", str(store), "--key-file", str(login_key), "--handoff-key-file", str(handoff),
             "--gateway", f"127.0.0.1:{gateway_port}",
         ] + (["--trace", str(run_dir / "login.trace.jsonl")] if args.trace else []), root, run_dir)
         wait_ready(login_process, run_dir, ('"event":"listening"', '"event":"auth_listening"'))
-        gateway_process = ProcessLogs("gateway", gateway_exe, gateway_args(gateway_port, reference, content, state_path, store, handoff, run_dir, "gateway.trace.jsonl" if args.trace else None), root, run_dir)
+        gateway_process = ProcessLogs("gateway", gateway_exe, gateway_args(gateway_port, reference, content, state_path, store, handoff, run_dir, "gateway.trace.jsonl" if args.trace else None, bundle_args + ["--tick-stats-seconds", str(args.tick_stats_seconds)]), root, run_dir)
         wait_ready(gateway_process, run_dir, ('"event":"listening"',))
         timeline("services_ready", {"login_port": login_port, "auth_port": auth_port, "gateway_port": gateway_port})
 
@@ -1186,7 +1305,7 @@ def main() -> int:
                 gateway_process.process.wait(timeout=5)
         gateway_process.close_logs()
         if not service_crashed:
-            gateway_process, save_load = sample_save_load(gateway_exe, bin_dir, records, gateway_port if args.broker_login else free_port("udp"), store, handoff, reference, content, state_path, run_dir, args.trace)
+            gateway_process, save_load = sample_save_load(gateway_exe, bin_dir, records, gateway_port if args.broker_login else free_port("udp"), store, handoff, reference, content, state_path, run_dir, args.trace, bundle_args)
             if gateway_process.process.poll() is None:
                 gateway_process.process.terminate()
                 try:
@@ -1226,13 +1345,12 @@ def main() -> int:
             "latency_p99_s": percentile(latency_samples(run_dir), .99),
             "latency_samples": len(latency_samples(run_dir)), "save_load": f"{sum(row['loaded'] for row in save_load)}/{len(save_load)}",
             "coins_nonnegative": f"{sum(row['coins_nonnegative'] for row in save_rows)}/{len(save_rows)}",
-            "purchase_persisted": f"{sum(row['purchase_persisted_across_reconnect'] for row in save_rows)}/{len(save_rows)}",
+            "purchase_persisted": f"{sum(row['purchase_persistence'] == 'persisted' for row in save_rows)}/{len(save_rows)}",
+            "purchase_unmeasured": sum(row["purchase_persistence"] == "unmeasured" for row in save_rows),
+            "knockouts": knockout_summary(run_dir)["knockouts"],
+            "tick_worst_p99_us": max((row.get("tick_p99_us", 0) for row in tick_stats(run_dir)), default=None),
         }, indent=2))
-        return 1 if service_crashed or (args.broker_login and (
-            any(event["event"] == "bot_error" for event in timeline_events)
-            or authentication["broker_refusals"] or authentication["login_failures"]
-            or any(not row["loaded"] for row in save_load)
-        )) else 0
+        return 1 if run_failed(service_crashed, args.broker_login, timeline_events, authentication, save_load, save_rows) else 0
     except Exception as exc:
         timeline("runner_error", {"error": f"{type(exc).__name__}: {exc}"})
         capture_error_events(run_dir)

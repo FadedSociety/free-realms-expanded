@@ -38,11 +38,15 @@ use osfr_tools::world::{NpcVisibility, World, WorldPose};
 mod admin_move;
 #[path = "osfr_gateway/delivery.rs"]
 mod delivery;
-use delivery::{chat_error_delivery, wrap_application};
+use delivery::{
+    chat_error_delivery, field_packet, field_packets_for, field_recipient_matches, wrap_application,
+};
 #[path = "osfr_gateway/paths.rs"]
 mod paths;
 #[path = "osfr_gateway/t006_guilds.rs"]
 mod t006_guilds;
+#[path = "osfr_gateway/tick_stats.rs"]
+mod tick_stats;
 use paths::{character_state_path, chat_settings_path, savestate_dir, social_path};
 
 /// Percent-decoding for Studio query strings and paths.
@@ -310,7 +314,7 @@ impl Options {
         let mut args = env::args().skip(1);
         let bind: SocketAddr = args
             .next()
-            .ok_or("usage: osfr-gateway 127.0.0.1:PORT --reference DIR --state FILE [--content DIR] [--identity FILE] [--account-store FILE] [--seconds N] [--trace FILE] [--security-log FILE] [--group-invite-ttl-ms N] [--guild-invite-ttl-ms N] [--dev-tools]")?
+            .ok_or("usage: osfr-gateway 127.0.0.1:PORT --reference DIR --state FILE [--content DIR] [--identity FILE] [--account-store FILE] [--seconds N] [--trace FILE] [--tick-stats-seconds N] [--security-log FILE] [--group-invite-ttl-ms N] [--guild-invite-ttl-ms N] [--dev-tools]")?
             .parse()?;
         let (mut reference, mut state, mut seconds, mut content, mut identity, mut account_store) =
             (None, None, 0, None, None, None);
@@ -360,7 +364,7 @@ impl Options {
                         &value,
                     ))?))
                 }
-                "--trace" => {}
+                "--trace" | "--tick-stats-seconds" => {} // read in `run`
                 _ => return Err(format!("unknown option {key}").into()),
             }
         }
@@ -2978,6 +2982,7 @@ pub struct Server {
     start: Instant,
     generation: u32,
     trace: Option<trace::Trace>,
+    tick_stats: tick_stats::TickStats,
     studio: Option<TcpListener>,
     // Studio asset browser: index files loaded on first search.
     studio_assets: BTreeMap<String, Vec<serde_json::Value>>,
@@ -3404,6 +3409,7 @@ impl Server {
             start: Instant::now(),
             generation: SystemTime::now().duration_since(UNIX_EPOCH)?.subsec_nanos(),
             trace: None,
+            tick_stats: tick_stats::TickStats::new(Duration::ZERO),
             studio,
             studio_assets: BTreeMap::new(),
             faulted_fields: BTreeSet::new(),
@@ -3675,6 +3681,7 @@ impl Server {
     }
 
     pub fn step(&mut self) -> Result<(), Box<dyn std::error::Error>> {
+        let step_started = Instant::now();
         // One event loop serializes all shared world mutations; session state stays per entry.
         let now_ms = self.start.elapsed().as_millis() as u64;
         self.membership.collect_empty_instances(now_ms);
@@ -3784,6 +3791,7 @@ impl Server {
         let now_ms = self.start.elapsed().as_millis() as u64;
         // (R) 20 Hz simulation; ACK/retry flushing still runs every step.
         let tick_due = now_ms >= self.next_tick_ms;
+        let tick_started = tick_due.then(Instant::now);
         if tick_due {
             self.next_tick_ms = now_ms.saturating_add(50);
             self.tick_shared_fields(now_ms);
@@ -3822,6 +3830,8 @@ impl Server {
                 self.sessions.insert(key, current);
             }
         }
+        self.tick_stats
+            .record(step_started, tick_started, self.sessions.len());
         Ok(())
     }
 
@@ -4492,9 +4502,11 @@ fn contain<T>(
 
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let trace_path = trace_path_from_args();
+    let tick_window = tick_stats::TickStats::window_from_args(env::args().skip(1))?;
     let options = Options::parse()?;
     let mut server = Server::new(options)?;
     server.trace = trace_path.as_deref().map(trace::Trace::open).transpose()?;
+    server.tick_stats = tick_stats::TickStats::new(tick_window);
     event(
         json!({"event":"listening","address":server.local_addr()?.to_string(),"reference":server.options.reference,"dev_tools":server.options.dev_tools}),
     );
@@ -4550,79 +4562,6 @@ mod f160_field_views;
 #[cfg(test)]
 #[path = "osfr_gateway/dormant_fields.rs"]
 mod dormant_fields;
-
-fn field_packet(packet: &[u8]) -> bool {
-    packet.starts_with(&[125, 0])
-        || packet.get(..4).is_some_and(|h| {
-            matches!(
-                h,
-                [35, 0, 5, 0] | [35, 0, 8, 0] | [35, 0, 16, 0] | [32, 0, 7, 0]
-            )
-        })
-}
-fn field_packets_for(
-    recipient: &Session,
-    membership: &World,
-    players: &PlayerRegistry,
-    instance: i32,
-    packets: &[Vec<u8>],
-    known_npcs: &BTreeSet<u64>,
-) -> Vec<Delivery> {
-    if !field_recipient_matches(
-        recipient.gateway.is_world_loaded(),
-        membership
-            .player_location(recipient.character_guid)
-            .map(|l| (l.instance_id, l.ready)),
-        instance,
-    ) {
-        return Vec::new();
-    }
-    let known = |guid| {
-        guid == recipient.character_guid
-            || known_npcs.contains(&guid)
-            || players.knows_character(recipient.id, guid)
-    };
-    packets
-        .iter()
-        .filter(|packet| {
-            let offset = if packet.starts_with(&[125, 0]) { 2 } else { 4 };
-            let Some(guid) = packet
-                .get(offset..offset + 8)
-                .and_then(|b| b.try_into().ok())
-                .map(u64::from_le_bytes)
-            else {
-                return false;
-            };
-            if !known(guid) {
-                return false;
-            }
-            if packet.starts_with(&[32, 0, 7, 0]) {
-                let Some(target) = packet
-                    .get(20..28)
-                    .and_then(|b| b.try_into().ok())
-                    .map(u64::from_le_bytes)
-                else {
-                    return false;
-                };
-                return known(target);
-            }
-            true
-        })
-        .map(|packet| Delivery {
-            recipient: recipient.id,
-            bytes: wrap_application(packet),
-        })
-        .collect()
-}
-// (R) A server-owned membership, never the attacker's directed PC view,
-// determines which ready instance may observe a field event.
-fn field_recipient_matches(loaded: bool, location: Option<(i32, bool)>, instance: i32) -> bool {
-    #[cfg(test)]
-    if std::env::var_os("OSFR_W127_CROSS_INSTANCE_CANARY").is_some() {
-        return loaded; // Deliberate test-only broadcast mutation.
-    }
-    loaded && location.is_some_and(|(id, ready)| id == instance && ready)
-}
 
 /// W173: the chat channel switches and bubble colour (26/32, 26/33, 26/18) through
 /// `Session::route_application` with three sessions and no sockets.

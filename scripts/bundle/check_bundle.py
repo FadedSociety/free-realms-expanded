@@ -291,11 +291,20 @@ def stop(process: subprocess.Popen | None, log_stream) -> None:
         log_stream.close()
 
 
+BINARIES = ("osfr-login", "osfr-gateway", "osfr-bot")
+
+
+def existing_binaries(directory: Path) -> dict[str, Path]:
+    """The smoke check's binaries in `directory`; an incomplete set is refused."""
+    result = {name: directory / f"{name}.exe" for name in BINARIES}
+    missing = [name for name, path in result.items() if not path.is_file()]
+    if missing:
+        raise FileNotFoundError(f"{directory} lacks: {', '.join(missing)}")
+    return result
+
+
 def binaries(runtime: Path) -> dict[str, Path]:
     crate = PROJECT / "prototype" / "osfr-tools"
-    target = runtime / "cargo-target" / "release"
-    names = ("osfr-login", "osfr-gateway", "osfr-bot")
-    result = {name: target / f"{name}.exe" for name in names}
     command = [
         "powershell.exe",
         "-NoProfile",
@@ -309,18 +318,15 @@ def binaries(runtime: Path) -> dict[str, Path]:
         str(runtime / "cargo-target"),
         "--manifest-path",
         str(crate / "Cargo.toml"),
-        *sum((["--bin", name] for name in names), []),
+        *sum((["--bin", name] for name in BINARIES), []),
     ]
     subprocess.run(command, cwd=PROJECT, check=True, timeout=600)
-    missing = [name for name, path in result.items() if not path.is_file()]
-    if missing:
-        raise FileNotFoundError(f"cargo.ps1 did not produce: {', '.join(missing)}")
-    return result
+    return existing_binaries(runtime / "cargo-target" / "release")
 
 
-def run_smoke(bundle: Path, reference_manifest: dict) -> None:
+def run_smoke(bundle: Path, reference_manifest: dict, exe: dict[str, Path] | None = None) -> None:
     with scratch_directory() as runtime:
-        exe = binaries(runtime)
+        exe = exe or binaries(runtime)
         gateway_port = free_udp_port()
         login_port = free_udp_port()
         while login_port == gateway_port:
@@ -505,7 +511,11 @@ def main() -> int:
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--bundle", type=Path, help="bundle directory (default: newest playtest bundle)")
     parser.add_argument("--verify-only", action="store_true", help="verify manifest and source exclusions; do not start services")
+    parser.add_argument("--bin-dir", type=Path, help="reuse this release build (osfr-login, osfr-gateway, osfr-bot) instead of building one")
     args = parser.parse_args()
+    exe = existing_binaries(args.bin_dir.resolve(strict=True)) if args.bin_dir else None
+    if exe:
+        print(f"Binaries: PASS (reusing {', '.join(BINARIES)} from {args.bin_dir})")
     bundle = (args.bundle or latest_bundle()).resolve(strict=True)
     manifest, file_count = verify_manifest(bundle)
     protected_count, _ = scan_bundle_sources(bundle, manifest)
@@ -520,7 +530,7 @@ def main() -> int:
     if args.verify_only:
         return 0
     reference_manifest = read_json(bundle / "reference" / "manifest.json")
-    run_smoke(bundle, reference_manifest)
+    run_smoke(bundle, reference_manifest, exe)
     print("Bundle check: PASS")
     return 0
 

@@ -1,5 +1,6 @@
 //! Application-delivery framing for the gateway: one place that wraps an inner packet in
-//! the 5/1 tunnel the client decodes, builds a chat refusal, or fans a server notice out.
+//! the 5/1 tunnel the client decodes, builds a chat refusal, fans a server notice out, or
+//! filters shared-field packets per recipient.
 use super::*;
 
 /// Wrap one inner application packet in the 5/1 tunnel.
@@ -123,4 +124,86 @@ pub(super) fn broadcast_deliveries(text: &str, world: &SharedWorld) -> Vec<Deliv
             bytes: bytes.clone(),
         })
         .collect()
+}
+
+/// The inner packets that travel the shared-field fan-out, filtered by `field_packets_for`.
+pub(super) fn field_packet(packet: &[u8]) -> bool {
+    packet.starts_with(&[125, 0])
+        || packet.get(..4).is_some_and(|h| {
+            matches!(
+                h,
+                [35, 0, 5, 0] | [35, 0, 8, 0] | [35, 0, 16, 0] | [32, 0, 7, 0]
+            )
+        })
+}
+
+/// The field packets `recipient` may see: only in its own ready instance, and only about
+/// characters or NPCs it already knows.
+pub(super) fn field_packets_for(
+    recipient: &Session,
+    membership: &World,
+    players: &PlayerRegistry,
+    instance: i32,
+    packets: &[Vec<u8>],
+    known_npcs: &BTreeSet<u64>,
+) -> Vec<Delivery> {
+    if !field_recipient_matches(
+        recipient.gateway.is_world_loaded(),
+        membership
+            .player_location(recipient.character_guid)
+            .map(|l| (l.instance_id, l.ready)),
+        instance,
+    ) {
+        return Vec::new();
+    }
+    let known = |guid| {
+        guid == recipient.character_guid
+            || known_npcs.contains(&guid)
+            || players.knows_character(recipient.id, guid)
+    };
+    packets
+        .iter()
+        .filter(|packet| {
+            let offset = if packet.starts_with(&[125, 0]) { 2 } else { 4 };
+            let Some(guid) = packet
+                .get(offset..offset + 8)
+                .and_then(|b| b.try_into().ok())
+                .map(u64::from_le_bytes)
+            else {
+                return false;
+            };
+            if !known(guid) {
+                return false;
+            }
+            if packet.starts_with(&[32, 0, 7, 0]) {
+                let Some(target) = packet
+                    .get(20..28)
+                    .and_then(|b| b.try_into().ok())
+                    .map(u64::from_le_bytes)
+                else {
+                    return false;
+                };
+                return known(target);
+            }
+            true
+        })
+        .map(|packet| Delivery {
+            recipient: recipient.id,
+            bytes: wrap_application(packet),
+        })
+        .collect()
+}
+
+// (R) A server-owned membership, never the attacker's directed PC view,
+// determines which ready instance may observe a field event.
+pub(super) fn field_recipient_matches(
+    loaded: bool,
+    location: Option<(i32, bool)>,
+    instance: i32,
+) -> bool {
+    #[cfg(test)]
+    if std::env::var_os("OSFR_W127_CROSS_INSTANCE_CANARY").is_some() {
+        return loaded; // Deliberate test-only broadcast mutation.
+    }
+    loaded && location.is_some_and(|(id, ready)| id == instance && ready)
 }
