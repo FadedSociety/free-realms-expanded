@@ -575,7 +575,13 @@ impl QuestMessage {
             }
             Self::QuestComplete { quest_id } => Some(id_packet49(4, *quest_id)?),
             Self::CompletedQuestCount { count } => Some(id_packet49(12, *count)?),
-            Self::QuestAbandoned { quest_id } => Some(id_packet49(6, *quest_id)?),
+            Self::QuestAbandoned { quest_id } => {
+                // Reader `0x00c7ae40` (via `0x00c7b500`, exact length): header, u32 id, bool.
+                // Without the bool the client drops the packet and keeps the quest listed.
+                let mut bytes = id_packet49(6, *quest_id)?;
+                bytes.push(0); // (R) 0 = show the abandon chat line (`0x00c7cd40` case 6).
+                Some(bytes)
+            }
             Self::QuestLimit { member } => Some(vec![47, 0, 15, if *member { 1 } else { 2 }]),
             Self::QuestInfo { .. } | Self::QuestAdd { .. } | Self::QuestEnd { .. } => None,
         }

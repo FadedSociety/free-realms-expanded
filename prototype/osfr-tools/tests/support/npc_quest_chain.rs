@@ -281,6 +281,14 @@ pub fn quest_end_reply(quest_id: u32) -> Vec<u8> {
     packet
 }
 
+/// 26/23 abandon, the client's 8-byte body: writer `0x00c0a350` (preamble `0x0090ac70`
+/// writes u16 26 + u16 23, then the u32 quest id).
+pub fn quest_abandon(quest_id: u32) -> Vec<u8> {
+    let mut packet = vec![26, 0, 23, 0];
+    packet.extend(quest_id.to_le_bytes());
+    packet
+}
+
 pub fn select_job(profile: i32) -> Vec<u8> {
     let mut packet = vec![26, 0, 13, 0];
     packet.extend(profile.to_le_bytes());

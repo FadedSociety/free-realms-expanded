@@ -30,8 +30,8 @@ use npc_quest_chain::{
     Fixture, accept, active_job, assert_no_offer, assert_packet_changes_nothing,
     character_at_for as character_in_zone, coins, content_dir, copy_tree, counts, finish_quest,
     interact, menu_option, npc_interact, npc_select, offer, pending_turnin, profile_xp,
-    quest_end_reply, quest_reply, quest_status, saved, seed_active_profile, select_job, send, talk,
-    talk_step,
+    quest_abandon, quest_end_reply, quest_reply, quest_status, saved, seed_active_profile,
+    select_job, send, talk, talk_step,
 };
 use osfr_tools::{
     character_store::CharacterState,
@@ -559,10 +559,8 @@ fn locked_profile_turnin_is_refused_cleanly() {
     );
 
     // Not wedged: the quest can now be abandoned, which the pending screen blocked.
-    let mut abandon = vec![26, 0, 23, 0, 0, 0];
-    abandon.extend(RANGER_REQUISITION.to_le_bytes());
     now += 10;
-    let abandoned = send(&mut game, &ricardo, &abandon, now);
+    let abandoned = send(&mut game, &ricardo, &quest_abandon(RANGER_REQUISITION), now);
     assert!(abandoned.changed, "abandon must succeed after the refusal");
     assert_eq!(
         quest_status(&game, RANGER_REQUISITION),

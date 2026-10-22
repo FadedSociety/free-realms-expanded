@@ -661,18 +661,14 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     for sub in [4, 6, 8, 10, 23] {
         let packet = match sub {
             4 => words(26, sub, &[]),
-            6 => words(26, sub, &[u32::MAX]),
+            // 23: abandon writer `0x00c0a350`, u32 quest id after the 4-byte header.
+            6 | 23 => words(26, sub, &[u32::MAX]),
             8 => {
                 let mut p = words(26, sub, &[u32::MAX; 2]);
                 p.push(0);
                 p
             }
-            10 => words(26, sub, &[u32::MAX; 3]),
-            _ => {
-                let mut p = vec![26, 0, 23, 0, 0, 0];
-                p.extend(u32::MAX.to_le_bytes());
-                p
-            }
+            _ => words(26, sub, &[u32::MAX; 3]),
         };
         result.push(("npc_interaction", packet));
     }

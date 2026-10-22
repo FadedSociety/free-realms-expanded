@@ -644,9 +644,9 @@ fn a_refused_go_fish_sends_no_offer_or_ready() {
     assert!(starts(&entered.replies));
 }
 
-#[test]
-fn a_positive_26_23_abandon_keeps_its_current_packet() {
-    let fixture = Fixture::full();
+/// Introduce Yourself accepted, plus its 26/23 abandon. Client writer `0x00c0a350`: u16 26,
+/// u16 23, u32 quest id (8 bytes).
+fn accepted_quest_and_abandon(fixture: &Fixture) -> (Gameplay, Vec<u8>) {
     let mut game = fixture.game();
     let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
     game.bind_npc_quest_catalogue(&content, CHARACTER_GUID)
@@ -654,18 +654,26 @@ fn a_positive_26_23_abandon_keeps_its_current_packet() {
     let engine = game.npc_quests.as_mut().unwrap();
     assert!(engine.offer(INTRODUCE_YOURSELF, SAMANTHA).changed);
     assert!(engine.accept(INTRODUCE_YOURSELF).changed);
+    let mut packet = vec![26, 0, 23, 0];
+    packet.extend(INTRODUCE_YOURSELF.to_le_bytes());
+    (game, packet)
+}
+
+#[test]
+fn a_positive_26_23_abandon_keeps_its_current_packet() {
+    let fixture = Fixture::full();
+    let (mut game, packet) = accepted_quest_and_abandon(&fixture);
     let character = CharacterState {
         guid: CHARACTER_GUID,
         zone_id: 0,
         position: [0.0; 3],
         rotation: [0.0, 0.0, 1.0],
     };
-    let mut packet = vec![26, 0, 23, 0, 0, 0];
-    packet.extend(INTRODUCE_YOURSELF.to_le_bytes());
     let abandoned = game.handle_in_world(&packet, &character, NOW).unwrap();
     assert!(abandoned.changed);
     let mut expected = vec![49, 0, 6, 0, 0, 0];
     expected.extend(INTRODUCE_YOURSELF.to_le_bytes());
+    expected.push(0); // 49/6 reader `0x00c7ae40`: trailing bool.
     assert_eq!(abandoned.replies, vec![expected]);
     assert_eq!(
         game.npc_quests
@@ -676,6 +684,19 @@ fn a_positive_26_23_abandon_keeps_its_current_packet() {
             .status,
         crate::quest_engine::QuestStatus::Abandoned
     );
+}
+
+/// T408 adds no busy gate: with a live Mining run the real 26/23 still abandons (as the old
+/// router order did) and the run stays live.
+#[test]
+fn a_live_activity_neither_blocks_nor_is_ended_by_an_abandon() {
+    let fixture = Fixture::full();
+    let (mut game, packet) = accepted_quest_and_abandon(&fixture);
+    let character = character(&game, KART_GATE);
+    start_mining(&mut game, &character);
+    let abandoned = game.handle_in_world(&packet, &character, NOW + 1).unwrap();
+    assert!(abandoned.changed, "{:?}", abandoned.replies);
+    assert!(game.mining.as_ref().is_some_and(Type8Engine::active));
 }
 
 #[test]

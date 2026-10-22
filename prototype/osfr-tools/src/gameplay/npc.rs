@@ -363,12 +363,14 @@ impl Gameplay {
         Ok(None)
     }
 
+    /// Client body is 8 bytes: writer `0x00c0a350` runs the preamble `0x0090ac70` (u16 family
+    /// 26, u16 subtype 23) and then appends the u32 quest id from `this+0x10` (ctor `0x00c09f60`).
     fn npc_quest_abandon_26_23(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
-        if inner.starts_with(&[26, 0, 23, 0, 0, 0]) {
-            if inner.len() != 10 {
+        if inner.starts_with(&[26, 0, 23, 0]) {
+            if inner.len() != 8 {
                 return Err(invalid("invalid quest abandon request"));
             }
-            let quest_id = u32::from_le_bytes(inner[6..10].try_into().unwrap());
+            let quest_id = u32::from_le_bytes(inner[4..8].try_into().unwrap());
             let mut out = Outcome::default();
             let result = self
                 .npc_quests

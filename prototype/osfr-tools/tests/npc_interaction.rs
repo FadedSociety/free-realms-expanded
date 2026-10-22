@@ -779,11 +779,13 @@ mod npc_quest_chain;
 use npc_quest_chain::{
     CHARACTER, Fixture, QUEST_CHOICE, TALK_LABEL, accept, character_at_for, coins,
     content_position, dialogue_choice, has_family, interact, menu_option, npc_interact, npc_select,
-    offer, pending_offer, pending_turnin, quest_end_reply, quest_status, saved, send, talk,
+    offer, pending_offer, pending_turnin, quest_abandon, quest_end_reply, quest_status, saved,
+    send, talk,
 };
 use osfr_tools::{
     character_store::CharacterState,
-    chat,
+    chat, game_store,
+    gameplay::Gameplay,
     quest_engine::{QuestProgress, QuestStatus},
     quest_journal::BREADCRUMB_REFUSED,
 };
@@ -1009,34 +1011,163 @@ fn quest_accept_49_2_and_turn_in_49_14_still_route() {
     );
 }
 
-/// 26/23 abandons through its own family and still replays the native 49/6
-/// (`CommandPacketQuestAbandon`: ctor `0x00c09f60`, body writer `0x00c0a350`, sender
-/// `0x00c0a3d0`).
-#[test]
-fn abandon_26_23_still_replies_49_6() {
-    let fixture = Fixture::new();
-    let mut game = fixture.game(None);
-    let samantha = at_npc(SAMANTHA, "cobblestone_village.json", COBBLESTONE_ZONE);
+/// The real save envelope: `game_store::save` -> `load_or_create` -> the login bind. The
+/// snapshot comes from `load_or_create`, not a struct literal, so new envelope fields keep it.
+fn store_reload(fixture: &Fixture, game: &Gameplay, at: &CharacterState) -> Gameplay {
+    let path = fixture.path().join("abandon-save.json");
+    let mut snapshot = game_store::load_or_create(&path, at.clone()).unwrap();
+    snapshot.gameplay = Some(game.state());
+    game_store::save(&path, &snapshot).unwrap();
+    fixture.game(
+        game_store::load_or_create(&path, at.clone())
+            .unwrap()
+            .gameplay,
+    )
+}
+
+/// `guid` has accepted Introduce Yourself and stands at its giver.
+fn active_quest(fixture: &Fixture, guid: u64) -> (Gameplay, CharacterState) {
+    let mut game = fixture.game_as(guid, None);
+    let position = content_position("cobblestone_village.json", SAMANTHA);
+    let samantha = character_at_for(guid, COBBLESTONE_ZONE, position);
     offer(&mut game, &samantha, SAMANTHA, INTRODUCE_YOURSELF, NOW);
     accept(&mut game, &samantha, INTRODUCE_YOURSELF, NOW + 2);
-    let mut request = vec![26, 0, 23, 0, 0, 0];
-    request.extend(INTRODUCE_YOURSELF.to_le_bytes());
+    (game, samantha)
+}
+
+/// The 49/6 `QuestAbandoned` reply: client reader `0x00c7ae40` (exact length via
+/// `0x00c7b500`) reads u16 49 + u32 6, the u32 id, then a bool.
+fn abandoned_reply(quest_id: u32) -> Vec<u8> {
+    [&[49u8, 0, 6, 0, 0, 0][..], &quest_id.to_le_bytes(), &[0]].concat()
+}
+
+/// 26/23 is the client's 8-byte body (`CommandPacketQuestAbandon`: ctor `0x00c09f60` stores
+/// 26/23 via `0x008a2820` and the id at `this+0x10`; writer `0x00c0a350` runs the preamble
+/// `0x0090ac70`, u16 26 + u16 23, then appends the u32 id; sender `0x00c0a3d0`, Lua
+/// `Quest_AbandonQuest` `0x00c0a500`). It replays the native 49/6 and the save keeps it.
+#[test]
+fn a_real_client_eight_byte_abandon_is_decoded_and_removes_the_quest() {
+    let fixture = Fixture::new();
+    let (mut game, samantha) = active_quest(&fixture, CHARACTER);
+    // Introduce Yourself is 3_000_021 = 0x002dc6d5.
+    let request = [26, 0, 23, 0, 0xd5, 0xc6, 0x2d, 0x00];
+    assert_eq!(quest_abandon(INTRODUCE_YOURSELF), request);
     let abandoned = send(&mut game, &samantha, &request, NOW + 3);
-    let mut expected = vec![49, 0, 6, 0, 0, 0];
-    expected.extend(INTRODUCE_YOURSELF.to_le_bytes());
-    assert_eq!(abandoned.replies, vec![expected]);
+    assert_eq!(abandoned.replies, vec![abandoned_reply(INTRODUCE_YOURSELF)]);
     assert!(abandoned.changed);
     assert_eq!(
         quest_status(&game, INTRODUCE_YOURSELF),
         QuestStatus::Abandoned
     );
-    let before = saved(&game);
-    assert!(
-        game.handle_in_world(&[26, 0, 23, 0, 0, 0], &samantha, NOW + 4)
-            .is_err(),
-        "a truncated 26/23 must stay that family's refusal"
+    let reloaded = store_reload(&fixture, &game, &samantha);
+    assert_eq!(
+        quest_status(&reloaded, INTRODUCE_YOURSELF),
+        QuestStatus::Abandoned,
+        "the saved character must keep the abandon"
     );
-    assert_eq!(saved(&game), before, "a truncated 26/23 changed state");
+}
+
+/// The old 10-byte shape was a test fixture, not a client shape: it and every other length
+/// of family 26/23 are refused before anything changes, and the open NPC menu survives.
+#[test]
+fn the_old_ten_byte_abandon_and_other_lengths_are_refused_without_mutation() {
+    let fixture = Fixture::new();
+    let (mut game, samantha) = active_quest(&fixture, CHARACTER);
+    let menu = interact(&mut game, &samantha, SAMANTHA, NOW + 3);
+    let choice = menu_option(&menu, TALK_LABEL);
+    let before = saved(&game);
+    let real = quest_abandon(INTRODUCE_YOURSELF);
+    let old = [
+        &[26u8, 0, 23, 0, 0, 0][..],
+        &INTRODUCE_YOURSELF.to_le_bytes(),
+    ]
+    .concat();
+    for packet in [
+        old,
+        real[..6].to_vec(),
+        real[..7].to_vec(),
+        [&real[..], &[0]].concat(),
+    ] {
+        assert!(
+            game.handle_in_world(&packet, &samantha, NOW + 4).is_err(),
+            "{packet:?} must be refused"
+        );
+        assert_eq!(saved(&game), before, "{packet:?} changed state");
+    }
+    assert_eq!(quest_status(&game, INTRODUCE_YOURSELF), QuestStatus::Active);
+    let talked = send(&mut game, &samantha, &npc_select(SAMANTHA, choice), NOW + 5);
+    assert!(
+        talked
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
+        "a refused 26/23 consumed the open NPC menu"
+    );
+}
+
+/// The request carries only a quest id; the engine reads the sender's own quests. A forged,
+/// completed or other character's id answers nothing and changes neither save, and each
+/// player's real abandon touches only their own quest.
+#[test]
+fn an_unknown_completed_or_other_characters_quest_is_refused_without_mutation() {
+    let fixture = Fixture::new();
+    let (mut other, other_at) = active_quest(&fixture, CHARACTER + 1);
+    let other_before = saved(&other);
+    let (mut game, samantha) = active_quest(&fixture, CHARACTER);
+    let ricky = at_npc(RICKY_DANGER, "cobblestone_village.json", COBBLESTONE_ZONE);
+    let talked = talk(&mut game, &ricky, RICKY_DANGER, NOW + 3);
+    assert!(
+        talked.changed,
+        "the referral Talk did not complete the goal"
+    );
+    send(
+        &mut game,
+        &ricky,
+        &quest_end_reply(INTRODUCE_YOURSELF),
+        NOW + 5,
+    );
+    assert_eq!(
+        quest_status(&game, INTRODUCE_YOURSELF),
+        QuestStatus::Completed
+    );
+    for id in [INTRODUCE_YOURSELF, 0, u32::MAX, CLIENT_GOAL_QUEST] {
+        let before = saved(&game);
+        let refused = send(&mut game, &samantha, &quest_abandon(id), NOW + 6);
+        assert!(refused.replies.is_empty(), "{id}: {:?}", refused.replies);
+        assert!(!refused.changed, "{id} changed gameplay");
+        assert_eq!(saved(&game), before, "{id} changed the save");
+    }
+    assert_eq!(saved(&other), other_before, "the other player changed");
+    let before = saved(&game);
+    let abandoned = send(
+        &mut other,
+        &other_at,
+        &quest_abandon(INTRODUCE_YOURSELF),
+        NOW + 7,
+    );
+    assert_eq!(abandoned.replies, vec![abandoned_reply(INTRODUCE_YOURSELF)]);
+    assert_eq!(
+        quest_status(&other, INTRODUCE_YOURSELF),
+        QuestStatus::Abandoned
+    );
+    assert_eq!(saved(&game), before, "one abandon touched the other player");
+}
+
+/// A replayed 26/23, before or after a save round trip, sends no second 49/6.
+#[test]
+fn a_replayed_abandon_changes_nothing() {
+    let fixture = Fixture::new();
+    let (mut game, samantha) = active_quest(&fixture, CHARACTER);
+    let request = quest_abandon(INTRODUCE_YOURSELF);
+    assert!(send(&mut game, &samantha, &request, NOW + 3).changed);
+    let mut reloaded = store_reload(&fixture, &game, &samantha);
+    for game in [&mut game, &mut reloaded] {
+        let before = saved(game);
+        let replay = send(game, &samantha, &request, NOW + 4);
+        assert!(replay.replies.is_empty(), "{:?}", replay.replies);
+        assert!(!replay.changed);
+        assert_eq!(saved(game), before);
+    }
 }
 
 /// 26/8 opens the 26/9 menu and 26/10 selects from it (client constructors
