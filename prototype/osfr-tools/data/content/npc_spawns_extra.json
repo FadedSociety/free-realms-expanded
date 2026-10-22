@@ -73203,6 +73203,66 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "spawn_guid": 100000033356,
+      "legacy_npc_id": 33356,
+      "model_id": 104,
+      "model_file_name": "sh_table_battlepets_01.adr",
+      "name": null,
+      "name_string_id": null,
+      "position": [
+        -1285.0726,
+        -14.354,
+        352.8
+      ],
+      "heading": 0.0708599995,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3586; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33356 (ModelId=104, ModelFileName=sh_table_battlepets_01.adr, NameId=20704 'Card Table', HideNamePlate=true; Npcs.json line 24683); commit 10f129e, spawn added in e3deee7. Spawned beside Poe Tatters (Id=33355). Name left null like the five Legacy card tables: the extras schema has no hide-nameplate flag, so a name id would draw the nameplate Sanctuary hides."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 104 = sh_table_battlepets_01.adr 'Snowhill Battlepets Card Table' (line 105); lab/reports/locale-id-to-text.json Global.Text 20704 = 'Card Table'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) spawn_guid and legacy_npc_id are Sanctuary-main's spawnNpcWithGuid guid and Npcs.json Id, not FreeRealms-Legacy ids."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033631,
+      "legacy_npc_id": 33631,
+      "model_id": 104,
+      "model_file_name": "sh_table_battlepets_01.adr",
+      "name": null,
+      "name_string_id": null,
+      "position": [
+        195.83235,
+        23.162956,
+        349.84732
+      ],
+      "heading": -2.7494719,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3850; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33631 (ModelId=104, ModelFileName=sh_table_battlepets_01.adr, NameId=20704 'Card Table', HideNamePlate=true; Npcs.json line 29990); commit 10f129e, spawn added in e3deee7. Spawned beside Garrison Gold (Id=33633). Name left null like the five Legacy card tables: the extras schema has no hide-nameplate flag, so a name id would draw the nameplate Sanctuary hides."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 104 = sh_table_battlepets_01.adr 'Snowhill Battlepets Card Table' (line 105); lab/reports/locale-id-to-text.json Global.Text 20704 = 'Card Table'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) spawn_guid and legacy_npc_id are Sanctuary-main's spawnNpcWithGuid guid and Npcs.json Id, not FreeRealms-Legacy ids. Sanctuary does not state where this spawn came from (e3deee7: area traced from the world map)."
+        }
+      ],
+      "position_w": null
     }
   ]
 }

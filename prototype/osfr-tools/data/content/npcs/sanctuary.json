@@ -42618,11 +42618,11 @@
       ],
       "name": "Poe Tatters",
       "name_reason": null,
-      "name_string_id": 4287171865,
+      "name_string_id": 38111,
       "name_string_ids": [
         {
-          "table": "unspecified",
-          "id": 4287171865
+          "table": "client_locale",
+          "id": 38111
         }
       ],
       "name_string_id_reason": null,
@@ -42975,29 +42975,23 @@
       ],
       "services_reason": null,
       "position": [
-        -1409.893701,
-        -27.631,
-        350.524419
+        -1282.9117,
+        -14.34194,
+        353.48657
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.9016198145155808,
+        -0.9997563277942896,
         0.0,
-        0.43252943260879895
+        0.022074533636684417
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 5,
-          "poi_name": "Sanctuary",
-          "match_score": 9
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 5 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Sanctuary-main built-content spawn coordinates copied from ../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3585; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33355; same position and heading as ../lab/references/Sanctuary-main-20261019/src/Resources/PointOfInterests.json POI 110.",
       "source": [
         {
           "kind": "client",
@@ -43010,6 +43004,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3585; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33355 (ModelId=648, ModelFileName=human_m_tcg_poe_tatters.agr, NameId=38111; Npcs.json line 24657); commit 10f129e, spawn added in e3deee7"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/Sanctuary-main-20261019/src/Resources/PointOfInterests.json Id=110 (line 1415) 'Comment: Poe Tatters', NameId=38111: same position and heading as the spawn; commit 10f129e, spawn added in e3deee7"
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 648 = human_m_tcg_poe_tatters.agr (line 649); the client's model table maps this id to this body."
+        },
+        {
+          "kind": "client",
+          "evidence": "lab/reports/locale-id-to-text.json Global.Text 38111 = 'Poe Tatters'; the row's former raw name hash 4287171865 maps to 38111 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
         }
       ],
       "field_sources": {
@@ -43077,22 +43087,22 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 53; source cell: [client] [wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3585; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33355 (ModelId=648, ModelFileName=human_m_tcg_poe_tatters.agr, NameId=38111; Npcs.json line 24657); commit 10f129e, spawn added in e3deee7"
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 53; source cell: [client] [wiki]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 38111 = 'Poe Tatters'; the row's former raw name hash 4287171865 maps to 38111 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 53; source cell: [client] [wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3585; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33355 (ModelId=648, ModelFileName=human_m_tcg_poe_tatters.agr, NameId=38111; Npcs.json line 24657); commit 10f129e, spawn added in e3deee7"
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 53; source cell: [client] [wiki]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 38111 = 'Poe Tatters'; the row's former raw name hash 4287171865 maps to 38111 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_id_reason": [
@@ -43491,67 +43501,100 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=5 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=5 NameId=3499 matches native name_string_id."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3585; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33355 (ModelId=648, ModelFileName=human_m_tcg_poe_tatters.agr, NameId=38111; Npcs.json line 24657); commit 10f129e, spawn added in e3deee7"
           },
           {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Resources/PointOfInterests.json Id=110 (line 1415) 'Comment: Poe Tatters', NameId=38111: same position and heading as the spawn; commit 10f129e, spawn added in e3deee7"
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3585; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33355 (ModelId=648, ModelFileName=human_m_tcg_poe_tatters.agr, NameId=38111; Npcs.json line 24657); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "position_w": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3585; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33355 (ModelId=648, ModelFileName=human_m_tcg_poe_tatters.agr, NameId=38111; Npcs.json line 24657); commit 10f129e, spawn added in e3deee7. The spawn has XYZ only."
           }
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=5 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=5 NameId=3499 matches native name_string_id."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3585; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33355 (ModelId=648, ModelFileName=human_m_tcg_poe_tatters.agr, NameId=38111; Npcs.json line 24657); commit 10f129e, spawn added in e3deee7"
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) Y-axis yaw quaternion [0, sin(h/2), 0, cos(h/2)] of the spawn heading; the raw heading is retained separately."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3585; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33355 (ModelId=648, ModelFileName=human_m_tcg_poe_tatters.agr, NameId=38111; Npcs.json line 24657); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3585; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33355 (ModelId=648, ModelFileName=human_m_tcg_poe_tatters.agr, NameId=38111; Npcs.json line 24657); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "placement_confidence": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) medium measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) high: one Sanctuary spawn that equals its POI 110 position and heading, with model and name ids the client tables confirm; not a native capture."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3585; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33355 (ModelId=648, ModelFileName=human_m_tcg_poe_tatters.agr, NameId=38111; Npcs.json line 24657); commit 10f129e, spawn added in e3deee7. No competing regional row or spawn candidate."
           }
         ],
         "capture_match": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+            "kind": "legacy-data",
+            "evidence": "No identity-matched AddNpc capture was assigned to this regional row."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3585; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33355 (ModelId=648, ModelFileName=human_m_tcg_poe_tatters.agr, NameId=38111; Npcs.json line 24657); commit 10f129e, spawn added in e3deee7"
+          },
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Resources/PointOfInterests.json Id=110 (line 1415) 'Comment: Poe Tatters', NameId=38111: same position and heading as the spawn; commit 10f129e, spawn added in e3deee7"
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3585; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33355 (ModelId=648, ModelFileName=human_m_tcg_poe_tatters.agr, NameId=38111; Npcs.json line 24657); commit 10f129e, spawn added in e3deee7"
+          },
+          {
+            "kind": "client",
+            "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 648 = human_m_tcg_poe_tatters.agr (line 649); the client's model table maps this id to this body."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3585; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33355 (ModelId=648, ModelFileName=human_m_tcg_poe_tatters.agr, NameId=38111; Npcs.json line 24657); commit 10f129e, spawn added in e3deee7"
+          },
+          {
+            "kind": "client",
+            "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 648 = human_m_tcg_poe_tatters.agr (line 649); the client's model table maps this id to this body."
           }
         ]
-      }
+      },
+      "heading": -3.09744,
+      "model_id": 648,
+      "model_file_name": "human_m_tcg_poe_tatters.agr"
     },
     {
       "npc_id": 9500000513,
@@ -51196,11 +51239,11 @@
       ],
       "name": "Sam Potts",
       "name_reason": null,
-      "name_string_id": 1159662914,
+      "name_string_id": 74093,
       "name_string_ids": [
         {
-          "table": "unspecified",
-          "id": 1159662914
+          "table": "client_locale",
+          "id": 74093
         }
       ],
       "name_string_id_reason": null,
@@ -51422,29 +51465,23 @@
       ],
       "services_reason": null,
       "position": [
-        -1415.294358,
-        -27.631,
-        346.486496
+        -1290.0687,
+        -14.91131,
+        291.80383
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.9016198145155808,
+        0.5163600334911569,
         0.0,
-        0.43252943260879895
+        0.8563715991396559
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 5,
-          "poi_name": "Sanctuary",
-          "match_score": 9
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 5 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Sanctuary-main built-content spawn coordinates copied from ../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3570; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33340; same position and heading as ../lab/references/Sanctuary-main-20261019/src/Resources/PointOfInterests.json POI 104.",
       "source": [
         {
           "kind": "client",
@@ -51461,6 +51498,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3570; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33340 (ModelId=646, ModelFileName=human_f_tcg_sam_potts.agr, NameId=74093; Npcs.json line 24392); commit 10f129e, spawn added in e3deee7"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/Sanctuary-main-20261019/src/Resources/PointOfInterests.json Id=104 (line 1387) 'Comment: Sam Potts', NameId=74093: same position and heading as the spawn; commit 10f129e, spawn added in e3deee7"
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 646 = human_f_tcg_sam_potts.agr (line 647); the client's model table maps this id to this body."
+        },
+        {
+          "kind": "client",
+          "evidence": "lab/reports/locale-id-to-text.json Global.Text 74093 = 'Sam Potts'; the row's former raw name hash 1159662914 maps to 74093 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
         }
       ],
       "field_sources": {
@@ -51548,30 +51601,22 @@
         ],
         "name_string_id": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3570; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33340 (ModelId=646, ModelFileName=human_f_tcg_sam_potts.agr, NameId=74093; Npcs.json line 24392); commit 10f129e, spawn added in e3deee7"
+          },
+          {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 52; source cell: [client] [video `Agau4t-9A58/00030`: title partly hidden, \"Card Duelist Trainer?\" low confidence] [wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 52; source cell: [client] [video `Agau4t-9A58/00030`: title partly hidden, \"Card Duelist Trainer?\" low confidence] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 52; source cell: [client] [video `Agau4t-9A58/00030`: title partly hidden, \"Card Duelist Trainer?\" low confidence] [wiki]"
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 74093 = 'Sam Potts'; the row's former raw name hash 1159662914 maps to 74093 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3570; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33340 (ModelId=646, ModelFileName=human_f_tcg_sam_potts.agr, NameId=74093; Npcs.json line 24392); commit 10f129e, spawn added in e3deee7"
+          },
+          {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 52; source cell: [client] [video `Agau4t-9A58/00030`: title partly hidden, \"Card Duelist Trainer?\" low confidence] [wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 52; source cell: [client] [video `Agau4t-9A58/00030`: title partly hidden, \"Card Duelist Trainer?\" low confidence] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 52; source cell: [client] [video `Agau4t-9A58/00030`: title partly hidden, \"Card Duelist Trainer?\" low confidence] [wiki]"
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 74093 = 'Sam Potts'; the row's former raw name hash 1159662914 maps to 74093 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_id_reason": [
@@ -51954,67 +51999,100 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=5 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=5 NameId=3499 matches native name_string_id."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3570; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33340 (ModelId=646, ModelFileName=human_f_tcg_sam_potts.agr, NameId=74093; Npcs.json line 24392); commit 10f129e, spawn added in e3deee7"
           },
           {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Resources/PointOfInterests.json Id=104 (line 1387) 'Comment: Sam Potts', NameId=74093: same position and heading as the spawn; commit 10f129e, spawn added in e3deee7"
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3570; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33340 (ModelId=646, ModelFileName=human_f_tcg_sam_potts.agr, NameId=74093; Npcs.json line 24392); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "position_w": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3570; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33340 (ModelId=646, ModelFileName=human_f_tcg_sam_potts.agr, NameId=74093; Npcs.json line 24392); commit 10f129e, spawn added in e3deee7. The spawn has XYZ only."
           }
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=5 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=5 NameId=3499 matches native name_string_id."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3570; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33340 (ModelId=646, ModelFileName=human_f_tcg_sam_potts.agr, NameId=74093; Npcs.json line 24392); commit 10f129e, spawn added in e3deee7"
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) Y-axis yaw quaternion [0, sin(h/2), 0, cos(h/2)] of the spawn heading; the raw heading is retained separately."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3570; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33340 (ModelId=646, ModelFileName=human_f_tcg_sam_potts.agr, NameId=74093; Npcs.json line 24392); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3570; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33340 (ModelId=646, ModelFileName=human_f_tcg_sam_potts.agr, NameId=74093; Npcs.json line 24392); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "placement_confidence": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) medium measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) high: one Sanctuary spawn that equals its POI 104 position and heading, with model and name ids the client tables confirm; not a native capture."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3570; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33340 (ModelId=646, ModelFileName=human_f_tcg_sam_potts.agr, NameId=74093; Npcs.json line 24392); commit 10f129e, spawn added in e3deee7. No competing regional row or spawn candidate."
           }
         ],
         "capture_match": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+            "kind": "legacy-data",
+            "evidence": "No identity-matched AddNpc capture was assigned to this regional row."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3570; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33340 (ModelId=646, ModelFileName=human_f_tcg_sam_potts.agr, NameId=74093; Npcs.json line 24392); commit 10f129e, spawn added in e3deee7"
+          },
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Resources/PointOfInterests.json Id=104 (line 1387) 'Comment: Sam Potts', NameId=74093: same position and heading as the spawn; commit 10f129e, spawn added in e3deee7"
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3570; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33340 (ModelId=646, ModelFileName=human_f_tcg_sam_potts.agr, NameId=74093; Npcs.json line 24392); commit 10f129e, spawn added in e3deee7"
+          },
+          {
+            "kind": "client",
+            "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 646 = human_f_tcg_sam_potts.agr (line 647); the client's model table maps this id to this body."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3570; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33340 (ModelId=646, ModelFileName=human_f_tcg_sam_potts.agr, NameId=74093; Npcs.json line 24392); commit 10f129e, spawn added in e3deee7"
+          },
+          {
+            "kind": "client",
+            "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 646 = human_f_tcg_sam_potts.agr (line 647); the client's model table maps this id to this body."
           }
         ]
-      }
+      },
+      "heading": 1.08519005,
+      "model_id": 646,
+      "model_file_name": "human_f_tcg_sam_potts.agr"
     },
     {
       "npc_id": 9500000530,

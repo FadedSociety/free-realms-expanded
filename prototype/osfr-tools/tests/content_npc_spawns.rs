@@ -239,9 +239,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     );
     // T257's appended rows, T279's Geoffrey row inserted after Carlos, T300's
     // appended Therin row, T331's appended Petra row, T372's appended 25
-    // priced-vendor spawns, T385's appended 4 fishing-guide spawns, and T409's
-    // appended Manager Landon.
-    assert_eq!(extra_rows.len(), 3302);
+    // priced-vendor spawns, T385's appended 4 fishing-guide spawns, T409's
+    // appended Manager Landon, and T467's two Sanctuary card tables.
+    assert_eq!(extra_rows.len(), 3304);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

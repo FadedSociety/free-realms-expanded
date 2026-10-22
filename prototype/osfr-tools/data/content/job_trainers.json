@@ -106,6 +106,13 @@
       "job": "Soccer Star",
       "label_string_id": 412463,
       "source": "client: 412463 'Become a Soccer Star' (menu label), 412464 'Learn how to be a soccer star by finding Manager Landon in Snowhill.', 1388210539/1821460636 (speak to Manager Landon at the soccer field near Perry's Pasture). guide: notes/Build Guides/Content/Jobs/Soccer Star.md Overview 'How to unlock' and Trainers (Manager Landon is the only trainer that starts the job). reconstructed: (R) Landon is a poi_anchor in the Snowhill content, so data/content/npc_spawns_extra.json holds his drawable spawn (T409); the menu choice unlocks the job and grants the play package's starter outfit once, without activating it."
+    },
+    {
+      "npc": 9000000187,
+      "profile": 120,
+      "job": "Card Duelist",
+      "label_string_id": 392269,
+      "source": "client: 392269 'Become a Card Duelist' (menu label, hash 2010917501); 392273 'Find Sam Potts at Sanctuary to become a Card Duelist.' (hash 1454484288) and 383099 'To become a Card Duelist, you need to find Sam Potts.' (hash 1943395019). guide: notes/Build Guides/Content/Jobs/Card Duelist.md:22,31-34 (Sam Potts is the trainer every referral names; no client line makes Poe, Bry or Garrison one). Sanctuary-main@10f129e src/Resources/Profiles.json Id 120 Hint 384207 ('find Sam Potts in Sanctuary'), DefaultItems [] (no starter outfit). reconstructed: (R) the menu choice grants the job directly, as for every other trainer row; Sam is drawn at her Sanctuary spawn (T467)"
     }
   ]
 }

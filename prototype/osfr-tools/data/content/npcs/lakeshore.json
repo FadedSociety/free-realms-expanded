@@ -1568,18 +1568,14 @@
       ],
       "name": "Bry",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 38107,
       "name_string_ids": [
         {
-          "table": "ucdt",
-          "id": 677847228
-        },
-        {
-          "table": "ugdt",
-          "id": 3296116542
+          "table": "client_locale",
+          "id": 38107
         }
       ],
-      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "name_string_id_reason": "Global.Text 38107 from the Sanctuary NameId; the guide's raw hashes (ucdt 677847228 and ugdt 3296116542) are replaced.",
       "zone": "Lakeshore",
       "zone_id": 8,
       "zone_reason": null,
@@ -1753,34 +1749,23 @@
       ],
       "services_reason": null,
       "position": [
-        -1413.386,
-        -27.631,
-        351.567
+        -742.321,
+        1.05391,
+        844.33936
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.9016198145155808,
+        -0.7557738092936707,
         0.0,
-        0.43252943260879895
+        0.6548327642885123
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 5,
-          "poi_name": "Sanctuary",
-          "match_score": 9
-        },
-        {
-          "poi_id": 9,
-          "poi_name": "Lakeshore",
-          "match_score": 9
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 5 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Sanctuary-main built-content spawn coordinates copied from ../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3762; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33540. (R) Sanctuary does not state this spawn's origin (e3deee7: area traced from the world map).",
       "source": [
         {
           "kind": "client",
@@ -1793,6 +1778,22 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3762; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33540 (ModelId=643, ModelFileName=fairy_f_tcg_bry.agr, NameId=38107; Npcs.json line 28045); commit 10f129e, spawn added in e3deee7"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) Sanctuary does not state where this spawn came from; commit e3deee7 says its Sanctuary area was traced from the world map. No client capture or POI confirms this position."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 643 = fairy_f_tcg_bry.agr (line 644); the client's model table maps this id to this body."
+        },
+        {
+          "kind": "client",
+          "evidence": "lab/reports/locale-id-to-text.json Global.Text 38107 = 'Bry'; the row's former raw name hash 677847228 maps to 38107 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
         }
       ],
       "field_sources": {
@@ -1860,32 +1861,32 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 38; source cell: [client][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3762; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33540 (ModelId=643, ModelFileName=fairy_f_tcg_bry.agr, NameId=38107; Npcs.json line 28045); commit 10f129e, spawn added in e3deee7"
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 38; source cell: [client][wiki]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 38107 = 'Bry'; the row's former raw name hash 677847228 maps to 38107 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 38; source cell: [client][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3762; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33540 (ModelId=643, ModelFileName=fairy_f_tcg_bry.agr, NameId=38107; Npcs.json line 28045); commit 10f129e, spawn added in e3deee7"
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 38; source cell: [client][wiki]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 38107 = 'Bry'; the row's former raw name hash 677847228 maps to 38107 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 38; source cell: [client][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3762; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33540 (ModelId=643, ModelFileName=fairy_f_tcg_bry.agr, NameId=38107; Npcs.json line 28045); commit 10f129e, spawn added in e3deee7"
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Lakeshore.md#The fishing village, docks and lanes, row 38; source cell: [client][wiki]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 38107 = 'Bry'; the row's former raw name hash 677847228 maps to 38107 in lab/reports/locale-id-map.json (hash_to_ids). AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "zone": [
@@ -2186,67 +2187,100 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=5 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=5 NameId=3499 matches native name_string_id."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3762; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33540 (ModelId=643, ModelFileName=fairy_f_tcg_bry.agr, NameId=38107; Npcs.json line 28045); commit 10f129e, spawn added in e3deee7"
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "evidence": "(R) Sanctuary does not state where this spawn came from; commit e3deee7 says its Sanctuary area was traced from the world map. No client capture or POI confirms this position."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3762; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33540 (ModelId=643, ModelFileName=fairy_f_tcg_bry.agr, NameId=38107; Npcs.json line 28045); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "position_w": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3762; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33540 (ModelId=643, ModelFileName=fairy_f_tcg_bry.agr, NameId=38107; Npcs.json line 28045); commit 10f129e, spawn added in e3deee7. The spawn has XYZ only."
           }
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=5 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=5 NameId=3499 matches native name_string_id."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3762; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33540 (ModelId=643, ModelFileName=fairy_f_tcg_bry.agr, NameId=38107; Npcs.json line 28045); commit 10f129e, spawn added in e3deee7"
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) Y-axis yaw quaternion [0, sin(h/2), 0, cos(h/2)] of the spawn heading; the raw heading is retained separately."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3762; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33540 (ModelId=643, ModelFileName=fairy_f_tcg_bry.agr, NameId=38107; Npcs.json line 28045); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3762; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33540 (ModelId=643, ModelFileName=fairy_f_tcg_bry.agr, NameId=38107; Npcs.json line 28045); commit 10f129e, spawn added in e3deee7"
           }
         ],
         "placement_confidence": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) medium: one unambiguous Sanctuary spawn with model and name ids the client tables confirm, but no stated origin for its position; not a native capture."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3762; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33540 (ModelId=643, ModelFileName=fairy_f_tcg_bry.agr, NameId=38107; Npcs.json line 28045); commit 10f129e, spawn added in e3deee7. No competing regional row or spawn candidate."
           }
         ],
         "capture_match": [
           {
+            "kind": "legacy-data",
+            "evidence": "No identity-matched AddNpc capture was assigned to this regional row."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3762; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33540 (ModelId=643, ModelFileName=fairy_f_tcg_bry.agr, NameId=38107; Npcs.json line 28045); commit 10f129e, spawn added in e3deee7"
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+            "evidence": "(R) Sanctuary does not state where this spawn came from; commit e3deee7 says its Sanctuary area was traced from the world map. No client capture or POI confirms this position."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3762; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33540 (ModelId=643, ModelFileName=fairy_f_tcg_bry.agr, NameId=38107; Npcs.json line 28045); commit 10f129e, spawn added in e3deee7"
+          },
+          {
+            "kind": "client",
+            "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 643 = fairy_f_tcg_bry.agr (line 644); the client's model table maps this id to this body."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3762; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33540 (ModelId=643, ModelFileName=fairy_f_tcg_bry.agr, NameId=38107; Npcs.json line 28045); commit 10f129e, spawn added in e3deee7"
+          },
+          {
+            "kind": "client",
+            "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 643 = fairy_f_tcg_bry.agr (line 644); the client's model table maps this id to this body."
           }
         ]
-      }
+      },
+      "heading": -1.71367001,
+      "model_id": 643,
+      "model_file_name": "fairy_f_tcg_bry.agr"
     },
     {
       "npc_id": 9000000043,
