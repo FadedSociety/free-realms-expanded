@@ -10,7 +10,7 @@
 //!
 //! The stock rows are shipped content. The tests drive the production path:
 //! `NpcVisibility`/`Gameplay::load` -> 26/8 (`008b6bc0`) -> 26/10
-//! (`00a36f80`) -> 66/42 -> 66/43 (`00b3ab20`) -> 66/44 (`00b32430`), plus
+//! (`00a36f80`) -> 165/10 -> 66/43 (`00b3ab20`) -> 66/44 (`00b32430`), plus
 //! 165/5 (`00c75a70`) -> 165/6 and 165/12 buy-back. The item ids are the ones
 //! the Chef recipes in `data/content/recipes.json` already bind; duplicate
 //! catalogue printings are excluded by that binding.
@@ -30,7 +30,7 @@ use osfr_tools::{
     gateway::Gateway,
     inventory::{InventoryItem, InventoryState},
     npc_interaction::{
-        MerchantBuyRequestV2, NpcAction, NpcInteraction, decode_merchant_list_66_42,
+        MerchantBuyRequestV2, NpcAction, NpcInteraction, decode_coin_merchant_list_165_10,
         encode_merchant_buy_66_43,
     },
     world::NpcVisibility,
@@ -266,29 +266,23 @@ fn open_shop(gateway: &mut Gateway) -> Vec<Vec<u8>> {
     assert!(
         replies
             .iter()
-            .any(|packet| packet.starts_with(&[66, 0, 42, 0])),
-        "26/10 must open Bordon's 66/42 shop"
+            .any(|packet| packet.starts_with(&[165, 0, 10, 0])),
+        "26/10 must open Bordon's 165/10 coin merchant list"
     );
     replies
 }
 
-fn shop_entries(replies: &[Vec<u8>]) -> Vec<(i32, u32, u32)> {
+fn shop_entries(replies: &[Vec<u8>]) -> Vec<i32> {
     let packet = replies
         .iter()
-        .find(|packet| packet.starts_with(&[66, 0, 42, 0]))
-        .expect("the 66/42 window is present");
-    let decoded = decode_merchant_list_66_42(packet).expect("66/42 matches the client reader");
-    let mut rows: Vec<(i32, u32, u32)> = decoded
-        .group
+        .find(|packet| packet.starts_with(&[165, 0, 10, 0]))
+        .expect("the 165/10 window is present");
+    let decoded =
+        decode_coin_merchant_list_165_10(packet).expect("165/10 matches the client reader");
+    let mut rows: Vec<i32> = decoded
         .entries
         .iter()
-        .map(|entry| {
-            (
-                entry.first_six_dwords[0] as i32,
-                entry.first_six_dwords[1],
-                entry.first_six_dwords[2],
-            )
-        })
+        .map(|entry| entry.item_id as i32)
         .collect();
     rows.sort_unstable();
     rows
@@ -438,12 +432,9 @@ fn buying_each_ingredient_grants_one_stack_and_debits_twelve_coins() {
     let mut gateway = player(200, &[]);
     let before = inventory_of(&gateway);
     let entries = shop_entries(&open_shop(&mut gateway));
-    let mut expected: Vec<(i32, u32, u32)> = INGREDIENTS
-        .iter()
-        .map(|(_, id)| (*id, PRICE, SELL_PRICE))
-        .collect();
+    let mut expected: Vec<i32> = INGREDIENTS.iter().map(|(_, id)| *id).collect();
     expected.sort_unstable();
-    assert_eq!(entries, expected, "66/42 lists exactly the twelve rows");
+    assert_eq!(entries, expected, "165/10 lists exactly the twelve rows");
 
     let mut coins = before.coins;
     for (index, (name, item_id)) in INGREDIENTS.iter().enumerate() {
@@ -739,7 +730,7 @@ fn the_vendor_is_keyed_to_the_drawable_bordon() {
         assert!((spawned.position[axis] - position[axis]).abs() < 1e-3);
     }
 
-    // Real in-range 26/8 -> 26/10 opens the 66/42 window and 66/43 buys.
+    // Real in-range 26/8 -> 26/10 opens the 165/10 coin window and 66/43 buys.
     let mut gateway = player(100, &[]);
     let menu = send(&mut gateway, &interact(BORDON));
     assert!(menu.iter().any(|packet| packet.starts_with(&[26, 0, 9, 0])));
@@ -773,7 +764,7 @@ fn the_vendor_is_keyed_to_the_drawable_bordon() {
     assert!(
         inner_packets(&outcome)
             .iter()
-            .all(|packet| !packet.starts_with(&[66, 0, 42, 0])),
+            .all(|packet| !packet.starts_with(&[165, 0, 10, 0])),
         "a non-Bordon target opened a shop"
     );
     assert_eq!(other.snapshot(), before);

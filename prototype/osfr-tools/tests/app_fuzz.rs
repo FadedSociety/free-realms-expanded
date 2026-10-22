@@ -2034,7 +2034,7 @@ fn t3_open_shop_rejects_hostile_buy_then_accepts_valid_follow_up() {
         opened
             .replies
             .iter()
-            .any(|p| p[7..].starts_with(&[66, 0, 42, 0])),
+            .any(|p| p[7..].starts_with(&[165, 0, 10, 0])),
         "fixture shop did not open"
     );
     for (label, input) in hostile(&npc(10, Some(u32::MAX))) {
@@ -2046,7 +2046,7 @@ fn t3_open_shop_rejects_hostile_buy_then_accepts_valid_follow_up() {
     }
     let mut buy = words(165, 4, &[]);
     buy.extend(NPC.to_le_bytes());
-    // Client writer 0x00c75ed0: record id, definition, tint, then quantity.
+    // Client writer 0x00c75ed0: merchant-record context, definition, tint, then quantity.
     for field in [71001u32, 8, 0, 1] {
         buy.extend(field.to_le_bytes());
     }
@@ -2057,7 +2057,7 @@ fn t3_open_shop_rejects_hostile_buy_then_accepts_valid_follow_up() {
     let mut huge = buy.clone();
     huge[24..28].fill(0xff);
     unchanged(&mut gateway, &wrap(&huge), "shop u32::MAX quantity");
-    buy[12..16].copy_from_slice(&71002u32.to_le_bytes()); // A fresh transaction after a valid refusal.
+    buy[12..16].copy_from_slice(&71002u32.to_le_bytes()); // A valid buy after the refusals.
     let before = gateway.snapshot().gameplay.unwrap().inventory.coins;
     let out = gateway.handle_at(&wrap(&buy), NOW).unwrap();
     bounded(&out);
@@ -2066,7 +2066,16 @@ fn t3_open_shop_rejects_hostile_buy_then_accepts_valid_follow_up() {
         before - 15,
         "shared shop state poisoned"
     );
-    unchanged(&mut gateway, &wrap(&buy), "replayed buy transaction");
+    // 165/4 has no per-request id: the context is the 165/10 record scalar, the same for every
+    // buy from one open shop (`00cf10d0`). A repeated request is a second purchase at the
+    // server price, never a free grant.
+    let out = gateway.handle_at(&wrap(&buy), NOW).unwrap();
+    bounded(&out);
+    assert_eq!(
+        gateway.snapshot().gameplay.unwrap().inventory.coins,
+        before - 30,
+        "a repeated buy must pay the server price again"
+    );
 }
 
 #[test]

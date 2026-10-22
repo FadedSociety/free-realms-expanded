@@ -65,11 +65,6 @@ impl HousingSession {
         self.return_to.is_some()
     }
 
-    /// The starter kit's items: free issuance, so a merchant pays 0 for them.
-    pub(super) fn kit_items(&self) -> Vec<i32> {
-        self.service.kit_items()
-    }
-
     /// L046: the lot for a paid Marketplace deed. Staged on a copy and committed only once its
     /// replies encode and `commit` is set (a preview only asks), so `None` (no enabled lot for
     /// the deed, already owned) changes nothing.

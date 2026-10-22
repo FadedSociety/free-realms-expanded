@@ -1682,14 +1682,6 @@ impl HousingService {
         Ok(ids)
     }
 
-    /// The starter kit's items (free issuance, see `StarterKit::items`).
-    pub fn kit_items(&self) -> Vec<i32> {
-        self.starter_kit
-            .iter()
-            .flat_map(StarterKit::items)
-            .collect()
-    }
-
     /// 127/14 and the tail of 127/23: one owner's houses that `actor_guid` may visit (R: a
     /// visitor sees only lots `can_visit` allows; the owner sees all of their own).
     fn house_list(&self, actor_guid: u64, owner_guid: u64) -> Result<ServiceOutcome, ServiceError> {

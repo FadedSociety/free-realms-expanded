@@ -68,7 +68,7 @@ impl Scene {
         assert!(
             replies
                 .iter()
-                .any(|packet| packet[7..].starts_with(&[66, 0, 42, 0])),
+                .any(|packet| packet[7..].starts_with(&[165, 0, 10, 0])),
             "the real vendor did not open its shop: {replies:?}"
         );
     }
@@ -367,7 +367,7 @@ fn a_failed_vendor_save_ends_only_that_session() {
     assert!(
         opened
             .iter()
-            .any(|packet| packet[7..].starts_with(&[66, 0, 42, 0])),
+            .any(|packet| packet[7..].starts_with(&[165, 0, 10, 0])),
         "the vendor shop did not open on the real gateway"
     );
     server.world.session_keys.insert(victim.id, key);

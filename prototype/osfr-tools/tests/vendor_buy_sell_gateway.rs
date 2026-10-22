@@ -6,8 +6,10 @@
 //! Wire bodies are the shipped client's, re-checked in IDA:
 //! - 26/8 interact constructor `0x008b6bc0` (u64 target + bool);
 //! - 26/10 select constructor `0x00a36f80` (u64 target + i32 choice);
-//! - 66/42 list: dispatcher `0x00b48a10` case 0x2a -> `0x00b40a60` -> `0x00b3d5f0`; the row
-//!   reader `0x00b29cd0` reads six dwords, a bool, three dwords and a bool;
+//! - 165/10 coin merchant list: handler `0x00c78fb0` (header `0x00c71d90`, the shared record
+//!   `0x00b33020` and row `0x00b29cd0` readers) raises `HandlerMerchant:Show("CoinStore")`
+//!   (`0x00c78c10`); the row's displayed coin price is the item definition `+0x24`
+//!   (`0x00cff140` case 27), not a row field;
 //! - 66/43 buy serializer `0x00b3ab20`; its request constructor is `0x00b43310`;
 //! - 66/44 result reader `0x00b32430`; `0x00b48a10` tests field `+0x58` (wire offset 48)
 //!   against 1;
@@ -46,7 +48,7 @@ use osfr_tools::{
     gateway::{Gateway, GatewayOutcome},
     inventory::InventoryState,
     npc_interaction::{
-        MerchantBuyRequestV2, decode_merchant_list_66_42, encode_merchant_buy_66_43,
+        MerchantBuyRequestV2, decode_coin_merchant_list_165_10, encode_merchant_buy_66_43,
     },
     world::NpcVisibility,
 };
@@ -63,14 +65,14 @@ fn connect(fixture: &VendorFixture, state: GameplayState) -> Gateway {
     reconnect(fixture, fixture.character(), state)
 }
 
-/// Open the representative vendor's 66/42 window and return the list body.
+/// Open the representative vendor's 165/10 coin window and return the merchant record.
 fn open_shop(fixture: &VendorFixture, gateway: &mut Gateway) -> Vec<u8> {
     send(gateway, &interact(REPRESENTATIVE_VENDOR));
     let replies = send(gateway, &select(REPRESENTATIVE_VENDOR, fixture.option()));
     replies
         .into_iter()
-        .find(|packet| packet.starts_with(&[66, 0, 42, 0]))
-        .expect("the representative vendor opens its 66/42 shop")
+        .find(|packet| packet.starts_with(&[165, 0, 10, 0]))
+        .expect("the representative vendor opens its 165/10 coin shop")
 }
 
 fn buy(gateway: &mut Gateway, transaction: u32, item: i32, quantity: u32) -> Vec<Vec<u8>> {
@@ -246,20 +248,17 @@ fn a_player_buys_a_stock_item_and_the_save_holds_the_new_wallet() {
     let price = fixture.price();
     let mut gateway = connect(&fixture, fixture.state(price + 1_000, false));
 
-    let list = decode_merchant_list_66_42(&open_shop(&fixture, &mut gateway))
-        .expect("the 66/42 window matches the client row reader");
+    let list = decode_coin_merchant_list_165_10(&open_shop(&fixture, &mut gateway))
+        .expect("the 165/10 window matches the shared client row reader");
     let entry = list
-        .group
         .entries
         .iter()
-        .find(|entry| entry.first_six_dwords[0] == REPRESENTATIVE_ITEM as u32)
+        .find(|entry| entry.item_id == REPRESENTATIVE_ITEM as u32)
         .expect("the representative stock row is in the window");
-    // (R) Local convention for the opaque row: dword 1 is the purchase price; the server value
-    // from stores.json, never a client field, decides the debit.
-    assert_eq!(
-        entry.first_six_dwords[1], price,
-        "the window does not quote the stores.json price"
-    );
+    // The window shows the item definition's coin purchase price (client column `00cff140`
+    // case 27); the row itself carries no price. The server value from stores.json, never a
+    // client field, decides the debit asserted below.
+    assert!(entry.can_buy, "the representative row is not buyable");
 
     let before = gateway.snapshot();
     let before_inventory = inventory_of(&gateway);
@@ -300,8 +299,8 @@ fn a_player_buys_a_stock_item_and_the_save_holds_the_new_wallet() {
 
     // The authored stock is not decremented by a purchase: reopening the window lists the same
     // vendor state (there is no per-row stock counter in the production path).
-    let relisted = decode_merchant_list_66_42(&open_shop(&fixture, &mut gateway))
-        .expect("the reopened 66/42 window matches the client reader");
+    let relisted = decode_coin_merchant_list_165_10(&open_shop(&fixture, &mut gateway))
+        .expect("the reopened 165/10 window matches the client reader");
     assert_eq!(relisted, list, "the vendor stock changed after a purchase");
 
     // The canonical save holds the same wallet and bag.
@@ -494,14 +493,13 @@ fn the_same_item_can_be_sold_once_through_165_5() {
     );
 
     // The vendor's authored stock is unaffected by either sale.
-    let relisted = decode_merchant_list_66_42(&open_shop(&fixture, &mut gateway))
-        .expect("the reopened 66/42 window matches the client reader");
+    let relisted = decode_coin_merchant_list_165_10(&open_shop(&fixture, &mut gateway))
+        .expect("the reopened 165/10 window matches the client reader");
     assert!(
         relisted
-            .group
             .entries
             .iter()
-            .any(|entry| entry.first_six_dwords[0] == REPRESENTATIVE_ITEM as u32),
+            .any(|entry| entry.item_id == REPRESENTATIVE_ITEM as u32),
         "a sale removed the vendor's authored stock row"
     );
 }
@@ -694,8 +692,8 @@ fn the_round_trip_uses_no_dev_commands() {
     let shop = flow.request(select(REPRESENTATIVE_VENDOR, fixture.option()));
     assert!(
         shop.iter()
-            .any(|packet| packet.starts_with(&[66, 0, 42, 0])),
-        "the ordinary interaction did not open the shop"
+            .any(|packet| packet.starts_with(&[165, 0, 10, 0])),
+        "the ordinary interaction did not open the coin shop"
     );
     assert_eq!(
         buy_status(&flow.request(vendor_buy_packet(501, REPRESENTATIVE_ITEM, 1))),
@@ -731,7 +729,7 @@ fn the_round_trip_uses_no_dev_commands() {
         flow.replies.iter().all(|packet| packet[0] != 15),
         "a chat/dev reply entered the ordinary round trip"
     );
-    for expected in [[66u8, 0, 42, 0], [66, 0, 44, 0], [165, 0, 6, 0]] {
+    for expected in [[165u8, 0, 10, 0], [66, 0, 44, 0], [165, 0, 6, 0]] {
         assert!(
             flow.replies
                 .iter()
@@ -824,9 +822,9 @@ fn two_players_at_the_same_vendor_keep_independent_wallets_and_shops() {
         second.state().guid,
         "the two gateways are the same character"
     );
-    let first_list = decode_merchant_list_66_42(&open_shop(&fixture, &mut first))
+    let first_list = decode_coin_merchant_list_165_10(&open_shop(&fixture, &mut first))
         .expect("first shop matches the client reader");
-    let second_list = decode_merchant_list_66_42(&open_shop(&fixture, &mut second))
+    let second_list = decode_coin_merchant_list_165_10(&open_shop(&fixture, &mut second))
         .expect("second shop matches the client reader");
     assert_eq!(
         first_list, second_list,

@@ -1,6 +1,7 @@
 use osfr_tools::{
     coin_shop::{self, CoinShop, StoreCatalogue},
     inventory::{Inventory, InventoryState},
+    soe::{self, Packet, RELIABLE_DATA, ReliableReceiver},
     station_cash,
 };
 use std::path::{Path, PathBuf};
@@ -53,6 +54,11 @@ fn merchant_status(result: &coin_shop::CoinShopOutcome) -> u32 {
     u32::from_le_bytes(packet[48..52].try_into().unwrap())
 }
 
+/// T362 kept this id and changed the body. The native 165/4 writer (`00c75ed0`) has no
+/// per-request id: its context dword is the 165/10 record scalar (`00cf10d0`), the same for every
+/// buy from one open shop, so the shop keeps no replay cache. A retry is a retransmitted reliable
+/// packet, which the gateway's SOE receiver drops before the shop sees it. The client's next
+/// 165/4 (a new sequence) is the player buying again, and each buy pays the server price.
 #[test]
 fn buy_debits_exact_cost_and_retry_is_idempotent() {
     let directory = inventory_content();
@@ -69,20 +75,26 @@ fn buy_debits_exact_cost_and_retry_is_idempotent() {
     request.extend(8i32.to_le_bytes());
     request.extend(0i32.to_le_bytes()); // tint
     request.extend(1u32.to_le_bytes()); // quantity (client writer 0x00c75ed0)
-    let bought = shop.handle(&request).unwrap();
-    assert_eq!(bought.result_code, coin_shop::RESULT_SUCCESS);
-    assert!(bought.changed);
-    assert_eq!(shop.inventory().state().coins, 85);
-    assert_eq!(
-        count_definition(shop.inventory().state(), 8),
-        original_count + 1
-    );
-    let once = shop.inventory().state().clone();
-
-    let retry = shop.handle(&request).unwrap();
-    assert_eq!(retry.result_code, coin_shop::RESULT_SUCCESS);
-    assert!(!retry.changed);
-    assert_eq!(shop.inventory().state(), &once);
+    // The gateway's session receiver limits (`osfr-gateway.rs`).
+    let mut receiver =
+        ReliableReceiver::new(0, 1024, soe::MAX_LOGICAL_MESSAGE, 2 * 1024 * 1024).unwrap();
+    // The first send, its retransmission, then the player's second buy.
+    for (sequence, bought) in [(0u16, 1u32), (0, 1), (1, 2)] {
+        let packet = Packet {
+            opcode: RELIABLE_DATA,
+            payload: [&sequence.to_be_bytes()[..], &request].concat(),
+        };
+        for message in receiver.receive(&packet).unwrap().messages {
+            let result = shop.handle(&message).unwrap();
+            assert_eq!(result.result_code, coin_shop::RESULT_SUCCESS);
+            assert!(result.changed);
+        }
+        assert_eq!(shop.inventory().state().coins, 100 - 15 * bought);
+        assert_eq!(
+            count_definition(shop.inventory().state(), 8),
+            original_count + bought
+        );
+    }
 }
 
 #[test]

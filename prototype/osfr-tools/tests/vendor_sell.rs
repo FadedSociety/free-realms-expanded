@@ -20,7 +20,8 @@ use osfr_tools::{
     gateway::Gateway,
     inventory::{Inventory, InventoryItem, InventoryState},
     npc_interaction::{
-        NpcAction, NpcInteraction, NpcInteractionError, NpcSelection, decode_merchant_list_66_42,
+        NpcAction, NpcInteraction, NpcInteractionError, NpcSelection,
+        decode_coin_merchant_list_165_10,
     },
 };
 use serde_json::{Value, json};
@@ -710,7 +711,7 @@ impl Fixture {
         let opened = gateway.handle_at(&wrap(&select(NPC, 2)), NOW).unwrap();
         let inner = inner_packets(&opened);
         assert!(
-            inner.iter().any(|p| p.starts_with(&[66, 0, 42, 0])),
+            inner.iter().any(|p| p.starts_with(&[165, 0, 10, 0])),
             "the shop did not open"
         );
         (gateway, inner)
@@ -728,11 +729,11 @@ fn gateway_shop_list_is_the_client_readable_66_42() {
     let (_, inner) = fixture.at_open_shop();
     let list = inner
         .iter()
-        .find(|p| p.starts_with(&[66, 0, 42, 0]))
+        .find(|p| p.starts_with(&[165, 0, 10, 0]))
         .unwrap();
-    let decoded = decode_merchant_list_66_42(list).expect("client layout");
-    assert_eq!(decoded.group.entries.len(), 1);
-    assert_eq!(decoded.group.entries[0].first_six_dwords[0], 8);
+    let decoded = decode_coin_merchant_list_165_10(list).expect("client layout");
+    assert_eq!(decoded.entries.len(), 1);
+    assert_eq!(decoded.entries[0].item_id, 8);
 }
 
 #[test]

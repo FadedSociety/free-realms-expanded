@@ -7,7 +7,8 @@
 //! (u64 target + bool); 26/9 chain `0x00aa2360 -> 0x00aa2220 -> 0x00aa1600 ->
 //! 0x00aa04d0` (option reader `0x00a9dca0` reads seven dwords; the 32-byte
 //! object keeps one unused dword); 26/10 constructor `0x00a36f80` (u64 target +
-//! i32 choice). 66/42 is the existing merchant window decoder.
+//! i32 choice). The Shop choice answers with the 165/10 coin merchant list
+//! (`00c78fb0`), not the 66/42 Station Cash window.
 //!
 //! The position is the NPC row's reconstructed POI/zone-centre placement; the
 //! model is a same-race/gender/job client body chosen from the 2014
@@ -25,7 +26,7 @@ use osfr_tools::{
     game_store::{self, Snapshot},
     gameplay::{Gameplay, GameplayState},
     gateway::Gateway,
-    npc_interaction::{NpcAction, NpcInteraction, NpcSelection, decode_merchant_list_66_42},
+    npc_interaction::{NpcAction, NpcInteraction, NpcSelection, decode_coin_merchant_list_165_10},
     world::NpcVisibility,
 };
 use serde_json::Value;
@@ -67,7 +68,7 @@ const T372_SPAWNS: &[u64] = &[
     9_500_000_845,
 ];
 
-/// The brief's representative subset; each row opens its real 66/42 window.
+/// The brief's representative subset; each row opens its real 165/10 coin window.
 const REPRESENTATIVE: &[u64] = &[
     9_500_000_482,
     9_500_000_746,
@@ -304,8 +305,8 @@ fn menu_packet<'a>(replies: &'a [Vec<u8>]) -> &'a [u8] {
 fn merchant_packet<'a>(replies: &'a [Vec<u8>]) -> &'a [u8] {
     replies
         .iter()
-        .find(|packet| packet.starts_with(&[66, 0, 42, 0]))
-        .expect("66/42 merchant window")
+        .find(|packet| packet.starts_with(&[165, 0, 10, 0]))
+        .expect("165/10 coin merchant window")
 }
 
 /// The 26/9 option ids are seven little-endian dwords per choice after the
@@ -338,18 +339,21 @@ fn shop_choice(content: &Path, npc_id: u64) -> i32 {
         .id
 }
 
+/// The stock ids in the 165/10 record. A row is only listed when the server has both a store
+/// price and an item definition for it, and the window shows the definition's coin price; the
+/// price is therefore not repeated in the row.
 fn shop_items(packet: &[u8]) -> BTreeSet<i32> {
-    let list = decode_merchant_list_66_42(packet).expect("66/42 matches the client reader");
-    list.group
+    let group = decode_coin_merchant_list_165_10(packet).expect("165/10 matches the client reader");
+    group
         .entries
         .iter()
         .map(|entry| {
             assert!(
-                entry.first_six_dwords[1] > 0,
-                "shop entry {} has no positive price",
-                entry.first_six_dwords[0]
+                entry.can_buy && entry.name_id != 0,
+                "shop entry {} cannot render a buyable name",
+                entry.item_id
             );
-            i32::try_from(entry.first_six_dwords[0]).expect("shop item id fits i32")
+            i32::try_from(entry.item_id).expect("shop item id fits i32")
         })
         .collect()
 }
@@ -549,7 +553,7 @@ fn representative_vendors_open_the_real_shop_menu() {
         let items = shop_items(merchant_packet(&window));
         assert_eq!(
             items, vendor.item_ids,
-            "vendor {npc_id} 66/42 window does not list its priced stock"
+            "vendor {npc_id} 165/10 window does not list its priced stock"
         );
     }
 }

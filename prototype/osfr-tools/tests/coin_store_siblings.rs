@@ -530,7 +530,7 @@ impl Fixture {
             .unwrap();
         let inner = inner_packets(&opened);
         assert!(
-            inner.iter().any(|p| p.starts_with(&[66, 0, 42, 0])),
+            inner.iter().any(|p| p.starts_with(&[165, 0, 10, 0])),
             "the shop did not open"
         );
         (gateway, inner)
@@ -1985,7 +1985,7 @@ fn a_refused_bundle_leaves_the_npc_menu_closed() {
         !outcome
             .replies
             .iter()
-            .any(|reply| reply[7..].starts_with(&[66, 0, 42, 0])),
+            .any(|reply| reply[7..].starts_with(&[165, 0, 10, 0])),
         "a refused bundle must not leave the NPC menu open"
     );
     assert_eq!(gateway.snapshot(), before);
@@ -2000,7 +2000,7 @@ fn a_refused_bundle_leaves_the_npc_menu_closed() {
     assert!(
         inner_packets(&opened)
             .iter()
-            .any(|packet| packet.starts_with(&[66, 0, 42, 0])),
+            .any(|packet| packet.starts_with(&[165, 0, 10, 0])),
         "the fixture must still be able to open the shop"
     );
 }

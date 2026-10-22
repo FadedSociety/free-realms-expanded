@@ -1,9 +1,9 @@
 //! Coin Shop purchases and the Station Cash Marketplace handshake.
 //!
 //! Client packet readers establish the family/opcode headers and transaction result fields.
-//! Numeric result-code meanings, buy idempotency's caller field, resale pricing, buy-back window,
-//! merchant authorization and Marketplace defaults are reconstructed policy (R). No persistence
-//! or packet transport is performed here; callers save the returned state before sending replies.
+//! Numeric result-code meanings, resale pricing, buy-back window, merchant authorization and
+//! Marketplace defaults are reconstructed policy (R). No persistence or packet transport is
+//! performed here; callers save the returned state before sending replies.
 //!
 //! Sibling requests (W172). Recovered from the client: 165/2 is `i32 count` then `count x u32`
 //! item ids (sender `00c76b10`, writers `00c75580`/`00c75620`) and is answered by 165/3, which the
@@ -173,28 +173,15 @@ impl StoreCatalogue {
         self.items.iter().find(|item| item.item_id == item_id)
     }
 
-    /// F228: a job starter outfit item is free issuance, so its sell price is 0. A row with
-    /// no sell price stays unsellable (`None`); the purchase price is unchanged.
+    /// F228: a job starter outfit item is free issuance, so every copy resells for 0 wherever
+    /// the player got it. A row with no sell price stays unsellable (`None`); the purchase
+    /// price is unchanged.
     fn zero_starter_sell_prices(&mut self, starter_items: &BTreeSet<i32>) {
         for item in &mut self.items {
-            item.sell_price_coins =
-                starter_sell_price(item.item_id, item.sell_price_coins, starter_items);
+            if starter_items.contains(&item.item_id) {
+                item.sell_price_coins = item.sell_price_coins.map(|_| 0);
+            }
         }
-    }
-}
-
-/// F228: a job starter outfit item is free issuance, so every copy resells for 0 wherever the
-/// player got it. The Coin Shop catalogue and the 66/42 merchant window both apply this one
-/// rule. A row with no sell price stays unsellable (`None`).
-pub fn starter_sell_price(
-    item_id: i32,
-    sell_price: Option<u32>,
-    starter_items: &BTreeSet<i32>,
-) -> Option<u32> {
-    if starter_items.contains(&item_id) {
-        sell_price.map(|_| 0)
-    } else {
-        sell_price
     }
 }
 
@@ -227,7 +214,6 @@ pub struct CoinShop {
     sc_wallet: Wallet,
     /// T230: the validated ride catalogue, shared with every staged clone.
     sc_catalogue: Arc<station_cash::Catalogue>,
-    client_transactions: BTreeMap<u32, (u32, Vec<u8>)>,
     vendor_transactions: BTreeMap<u32, (u32, Vec<u8>)>,
     sales: VecDeque<SaleRecord>,
     next_transaction_id: u32,
@@ -271,7 +257,6 @@ impl CoinShop {
             is_member: false,
             sc_wallet,
             sc_catalogue: Arc::new(sc_catalogue),
-            client_transactions: BTreeMap::new(),
             vendor_transactions: BTreeMap::new(),
             sales: VecDeque::new(),
             next_transaction_id: 1,
@@ -407,10 +392,12 @@ impl CoinShop {
     fn handle_coin_store(&mut self, inner: &[u8]) -> io::Result<CoinShopOutcome> {
         let opcode = read_u16(inner, 2)?;
         match opcode {
-            // Client writer 0x00c75ed0 (called by BuyItem 0x00c77230): header, merchant
-            // u64, record id (the idempotency key, R), definition, tint, quantity.
-            // Quantity is the last dword (offset 24).
-            4 if inner.len() == 28 => self.buy_with_merchant(
+            // Client writer 0x00c75ed0 (BuyItem 0x00c77230, called by 0x00c77db0): header,
+            // merchant u64, the 165/10 record scalar as the context (`00cf10d0`), definition id,
+            // tint, quantity (offset 24). The context is the same for every buy from one open
+            // shop and nothing else is per request, so a repeated 165/4 is a second purchase;
+            // transport retransmits are already dropped by the SOE layer.
+            4 if inner.len() == 28 => self.buy_once(
                 read_u32(inner, 12)?,
                 read_i32(inner, 16)?,
                 read_u32(inner, 24)?,
@@ -442,47 +429,7 @@ impl CoinShop {
         item_id: i32,
         quantity: u32,
     ) -> io::Result<CoinShopOutcome> {
-        self.buy_with_merchant(client_transaction_id, item_id, quantity, 0)
-    }
-
-    fn buy_with_merchant(
-        &mut self,
-        client_transaction_id: u32,
-        item_id: i32,
-        quantity: u32,
-        merchant_id: u64,
-    ) -> io::Result<CoinShopOutcome> {
-        if let Some((result_code, completion)) =
-            self.client_transactions.get(&client_transaction_id)
-        {
-            return Ok(CoinShopOutcome {
-                result_code: *result_code,
-                transaction_id: client_transaction_id,
-                replies: vec![completion.clone()],
-                changed: false,
-            });
-        }
-        if self.client_transactions.len() >= MAX_CLIENT_TRANSACTIONS {
-            return Ok(self.failure(
-                1,
-                RESULT_SERVICE_UNAVAILABLE,
-                client_transaction_id,
-                item_id,
-                quantity,
-                0,
-                0,
-            ));
-        }
-
-        let outcome = self.buy_once(client_transaction_id, item_id, quantity, merchant_id)?;
-        let completion = outcome
-            .replies
-            .last()
-            .cloned()
-            .expect("buy outcome always carries a transaction response");
-        self.client_transactions
-            .insert(client_transaction_id, (outcome.result_code, completion));
-        Ok(outcome)
+        self.buy_once(client_transaction_id, item_id, quantity, 0)
     }
 
     fn buy_once(

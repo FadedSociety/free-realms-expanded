@@ -18,7 +18,7 @@ use crate::gateway_vendor::{
 };
 use osfr_tools::{
     character_store::CharacterState, gameplay::GameplayState, gateway::Gateway,
-    npc_interaction::decode_merchant_list_66_42,
+    npc_interaction::decode_coin_merchant_list_165_10,
 };
 use vendor_fixture::{REPRESENTATIVE_ITEM, REPRESENTATIVE_VENDOR, SEEDED_ITEM, VendorFixture};
 
@@ -58,8 +58,8 @@ fn open_shop(fixture: &VendorFixture, gateway: &mut Gateway) -> Vec<Vec<u8>> {
     assert!(
         replies
             .iter()
-            .any(|packet| packet.starts_with(&[66, 0, 42, 0])),
-        "the gateway did not open the representative shop"
+            .any(|packet| packet.starts_with(&[165, 0, 10, 0])),
+        "the gateway did not open the representative coin shop"
     );
     replies
 }
@@ -71,21 +71,16 @@ pub fn representative_new_stock_buys_once_and_refuses_atomically() {
     let opened = open_shop(&fixture, &mut gateway);
     let list = opened
         .iter()
-        .find(|packet| packet.starts_with(&[66, 0, 42, 0]))
+        .find(|packet| packet.starts_with(&[165, 0, 10, 0]))
         .expect("shop list is present");
-    // 66/42 is decoded exactly as the client reads it: dispatcher `00b48a10`
-    // -> `00b40a60` -> `00b3d5f0` (header + nested record). Group reader
-    // `00b33020` reads one scalar, two dword pairs and a final scalar (six
-    // dwords), then `00b2e620` reads the entry count and rows via `00b29cd0`.
-    let list = decode_merchant_list_66_42(list).expect("shop list matches the client reader");
-    let entry = list
-        .group
-        .entries
+    // 165/10 is decoded exactly as the client reads it (`00c78fb0` -> the shared record
+    // reader `00b33020` and row reader `00b29cd0`). The displayed price is the item
+    // definition's coin purchase price, so it is not repeated in the row.
+    let list = decode_coin_merchant_list_165_10(list).expect("shop list matches the client reader");
+    list.entries
         .iter()
-        .find(|entry| entry.first_six_dwords[0] == REPRESENTATIVE_ITEM as u32)
+        .find(|entry| entry.item_id == REPRESENTATIVE_ITEM as u32)
         .expect("the gateway shop does not expose the new item");
-    // (R) Local convention for the opaque row: dword 1 is the purchase price.
-    assert_eq!(entry.first_six_dwords[1], price);
 
     let before = gateway.snapshot();
     let bought = gateway

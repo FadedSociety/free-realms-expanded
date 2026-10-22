@@ -42,6 +42,7 @@ const COIN_STORE_FAMILY: u16 = 165;
 const COIN_STORE_BUY: u16 = 4;
 const COIN_STORE_SELL: u16 = 5;
 const COIN_STORE_BUY_BACK: u16 = 12;
+const COIN_STORE_MERCHANT_LIST: u16 = 10;
 const TALK_STRING_ID: u32 = 3300;
 // Supplied locale-id-to-text export: locale row 8075 is exactly "Goodbye".
 const GOODBYE_STRING_ID: u32 = 8075;
@@ -102,7 +103,6 @@ pub struct InteractionMenu {
 pub struct MerchantItem {
     pub item_id: i32,
     pub purchase_price_coins: Option<u32>,
-    pub sell_price_coins: Option<u32>,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -112,21 +112,6 @@ pub struct MerchantWindow {
     pub stock_description: Option<String>,
     /// (R) Region stock has prose names but no item IDs; only explicit mapped IDs are listed.
     pub items: Vec<MerchantItem>,
-}
-
-impl MerchantWindow {
-    /// F228: a starter outfit item is free issuance, so the window advertises the same 0 the
-    /// Coin Shop pays rather than the raw reference row. A row with no sell price stays
-    /// unsellable (`None`).
-    pub fn zero_starter_sell_prices(&mut self, starter_items: &BTreeSet<i32>) {
-        for item in &mut self.items {
-            item.sell_price_coins = osfr_tools::coin_shop::starter_sell_price(
-                item.item_id,
-                item.sell_price_coins,
-                starter_items,
-            );
-        }
-    }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -913,7 +898,6 @@ impl NpcInteraction {
                 Some(MerchantItem {
                     item_id: price.item_id,
                     purchase_price_coins: price.purchase_price_coins,
-                    sell_price_coins: price.sell_price_coins,
                 })
             })
             .collect();
@@ -1297,39 +1281,60 @@ pub fn decode_quest_offer_49_1(packet: &[u8]) -> Result<QuestOfferPacket49_1, Np
     })
 }
 
-/// Opaque merchant row fields in native wire order (`00b29cd0`).
+/// One merchant-list row as the client reads it (`00b29cd0`, 38 bytes on the wire).
+///
+/// The wire order is fixed. The 165/10 coin merchant record uses every field; the 66/42
+/// Station Cash record uses `item_id` as the store bundle id and `quantity_available` as that
+/// bundle's available count. `field_7` and `first_item_id` are not read by the recovered coin
+/// column getter (`00cff140`); the SC data source names the latter `FirstItemId` (R).
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct MerchantEntryV2 {
-    pub first_six_dwords: [u32; 6],
-    pub flag_after_six: bool,
-    pub final_three_dwords: [u32; 3],
-    pub final_flag: bool,
+    /// Wire dword 1: item definition id (resolved through the client definition cache).
+    pub item_id: u32,
+    /// Wire dword 2: image-set (icon) id.
+    pub icon_id: u32,
+    /// Wire dword 3: tint value.
+    pub tint_value: u32,
+    /// Wire dword 4: name locale id.
+    pub name_id: u32,
+    /// Wire dword 5: description locale id.
+    pub description_id: u32,
+    /// Wire dword 6: quantity available (column 34). The server sends 0 for unlimited stock;
+    /// how the client shows 0 was not captured (R).
+    pub quantity_available: u32,
+    /// Wire boolean 1: members-only row.
+    pub members_only: bool,
+    /// Wire dword 7: unread by the coin column getter. (R) meaning unresolved.
+    pub field_7: u32,
+    /// Wire dword 8: the SC store's `FirstItemId` position; 0 for a coin row. (R)
+    pub first_item_id: u32,
+    /// Wire dword 9: available tint group id (column 29).
+    pub available_tint_group_id: u32,
+    /// Wire boolean 2: the client may buy this row (column 31).
+    pub can_buy: bool,
 }
 
-/// The nested merchant record: six dwords (`00b33020`) and the counted entries (`00b2e620`).
-/// `fields[6]` is not on the wire (see `MerchantListV2`).
+/// The nested merchant record: six wire dwords (`00b33020`) and the counted entries
+/// (`00b2e620`).
+///
+/// `fields[0]` is the record scalar the client copies into a 165/4 buy as `merchant_unknown`
+/// (`00cf10d0`); `fields[3]`/`fields[4]` are the merchant GUID low/high the client sends with
+/// 165/4 buys and 165/5 sells (`00cf16c0`); `fields[1]`, `fields[2]` and `fields[5]` are not
+/// read by the recovered path. `fields[6]` is not on the wire and must stay zero.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct MerchantGroupV2 {
     pub fields: [u32; 7],
     pub entries: Vec<MerchantEntryV2>,
 }
 
-/// 66/42 body as the client reads it (`00b48a10` case 0x2a -> `00b40a60` -> `00b3d5f0`).
+/// 66/42 Station Cash merchant list (`00b48a10` case 42 -> `00b40a60` -> `00b3d5f0`).
 ///
-/// Recovered (W148): the reader re-reads the 4-byte message header (the signed-16 pair at
-/// `00b2dd60`), so nothing but the header precedes `initial_dword`; the nested record
-/// (`00b3aa30` -> `00b33020`) is exactly six dwords (a scalar, two dword pairs, a scalar) before
-/// the entry count read by `00b2e620`. Earlier versions wrote an extra i16 pair and a seventh
-/// record dword, which shifts every later field and leaves unread bytes, so the client rejects
-/// the whole list. The record's second pair (`fields[3]`, `fields[4]`) is the merchant GUID the
-/// client keeps at manager +0x3e8f0 and copies into every 66/43 request (`00b43310`).
-///
-/// `initial_i16s` and `group.fields[6]` are not on the wire and must be zero; they remain only
-/// until `gameplay.rs::merchant_packet` stops filling the old shape.
+/// The client passes `initial_dword` to `NpcMerchantV2:Show` as `timeLeft` and opens the
+/// window in its Station Cash mode; -1 hides the timer. Coin vendors do not use this message
+/// (see [`encode_coin_merchant_list_165_10`]): a 66/42 row is a store bundle id and count, not
+/// a coin item.
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct MerchantListV2 {
-    pub initial_i16s: [i16; 2],
-    /// One scalar precedes the single nested merchant record in `00b3d5f0`.
     pub initial_dword: u32,
     pub group: MerchantGroupV2,
 }
@@ -1337,24 +1342,13 @@ pub struct MerchantListV2 {
 pub fn encode_merchant_list_66_42(
     message: &MerchantListV2,
 ) -> Result<Vec<u8>, NpcInteractionError> {
-    if message.group.entries.len() > MAX_VENDOR_ITEMS
-        || message.initial_i16s != [0; 2]
-        || message.group.fields[6] != 0
-    {
+    if message.group.entries.len() > MAX_VENDOR_ITEMS || message.group.fields[6] != 0 {
         return Err(NpcInteractionError::InvalidPacket);
     }
     let mut packet = Vec::new();
-    packet.extend([66, 0, MERCHANT_LIST as u8, 0]);
+    packet.extend([MERCHANT_FAMILY as u8, 0, MERCHANT_LIST as u8, 0]);
     put_words(&mut packet, &[message.initial_dword]);
-    let [f0, f1, f2, f3, f4, f5, _] = message.group.fields;
-    put_words(&mut packet, &[f0, f1, f2, f3, f4, f5]);
-    put_words(&mut packet, &[message.group.entries.len() as u32]);
-    for entry in &message.group.entries {
-        put_words(&mut packet, &entry.first_six_dwords);
-        packet.push(u8::from(entry.flag_after_six));
-        put_words(&mut packet, &entry.final_three_dwords);
-        packet.push(u8::from(entry.final_flag));
-    }
+    write_merchant_group(&mut packet, &message.group);
     if packet.len() > MAX_WIRE_PACKET_BYTES {
         return Err(NpcInteractionError::InvalidPacket);
     }
@@ -1364,12 +1358,94 @@ pub fn encode_merchant_list_66_42(
 pub fn decode_merchant_list_66_42(packet: &[u8]) -> Result<MerchantListV2, NpcInteractionError> {
     if packet.len() < 36
         || packet.len() > MAX_WIRE_PACKET_BYTES
-        || packet[..4] != [66, 0, MERCHANT_LIST as u8, 0]
+        || packet[..4] != [MERCHANT_FAMILY as u8, 0, MERCHANT_LIST as u8, 0]
     {
         return Err(NpcInteractionError::InvalidPacket);
     }
     let mut cursor = WireCursor::new(&packet[4..]);
     let initial_dword = cursor.u32()?;
+    let group = read_merchant_group(&mut cursor)?;
+    Ok(MerchantListV2 {
+        initial_dword,
+        group,
+    })
+}
+
+/// 165/10 coin merchant list (`00c78fb0`): the record's rows fill the client's
+/// `MerchantSellInventoryDataSource` and the handler raises `HandlerMerchant:Show("CoinStore")`
+/// (`00c78c10`). The window displays those rows with coin prices; there is no time-left field
+/// and no Station Cash header. The row layout is the shared `00b33020`/`00b29cd0` reader.
+pub fn encode_coin_merchant_list_165_10(
+    group: &MerchantGroupV2,
+) -> Result<Vec<u8>, NpcInteractionError> {
+    if group.entries.len() > MAX_VENDOR_ITEMS || group.fields[6] != 0 {
+        return Err(NpcInteractionError::InvalidPacket);
+    }
+    let mut packet = Vec::new();
+    packet.extend([
+        COIN_STORE_FAMILY as u8,
+        0,
+        COIN_STORE_MERCHANT_LIST as u8,
+        0,
+    ]);
+    write_merchant_group(&mut packet, group);
+    if packet.len() > MAX_WIRE_PACKET_BYTES {
+        return Err(NpcInteractionError::InvalidPacket);
+    }
+    Ok(packet)
+}
+
+pub fn decode_coin_merchant_list_165_10(
+    packet: &[u8],
+) -> Result<MerchantGroupV2, NpcInteractionError> {
+    if packet.len() < 32
+        || packet.len() > MAX_WIRE_PACKET_BYTES
+        || packet[..4]
+            != [
+                COIN_STORE_FAMILY as u8,
+                0,
+                COIN_STORE_MERCHANT_LIST as u8,
+                0,
+            ]
+    {
+        return Err(NpcInteractionError::InvalidPacket);
+    }
+    let mut cursor = WireCursor::new(&packet[4..]);
+    read_merchant_group(&mut cursor)
+}
+
+fn write_merchant_group(out: &mut Vec<u8>, group: &MerchantGroupV2) {
+    let [f0, f1, f2, f3, f4, f5, _] = group.fields;
+    put_words(out, &[f0, f1, f2, f3, f4, f5]);
+    put_words(out, &[group.entries.len() as u32]);
+    for entry in &group.entries {
+        put_words(
+            out,
+            &[
+                entry.item_id,
+                entry.icon_id,
+                entry.tint_value,
+                entry.name_id,
+                entry.description_id,
+                entry.quantity_available,
+            ],
+        );
+        out.push(u8::from(entry.members_only));
+        put_words(
+            out,
+            &[
+                entry.field_7,
+                entry.first_item_id,
+                entry.available_tint_group_id,
+            ],
+        );
+        out.push(u8::from(entry.can_buy));
+    }
+}
+
+fn read_merchant_group(
+    cursor: &mut WireCursor<'_>,
+) -> Result<MerchantGroupV2, NpcInteractionError> {
     let [f0, f1, f2, f3, f4, f5] = cursor.words::<6>()?;
     let entry_count = cursor.u32()? as usize;
     if entry_count > MAX_VENDOR_ITEMS || entry_count > cursor.remaining() / 38 {
@@ -1378,20 +1454,23 @@ pub fn decode_merchant_list_66_42(packet: &[u8]) -> Result<MerchantListV2, NpcIn
     let mut entries = Vec::with_capacity(entry_count);
     for _ in 0..entry_count {
         entries.push(MerchantEntryV2 {
-            first_six_dwords: cursor.words::<6>()?,
-            flag_after_six: cursor.boolean()?,
-            final_three_dwords: cursor.words::<3>()?,
-            final_flag: cursor.boolean()?,
+            item_id: cursor.u32()?,
+            icon_id: cursor.u32()?,
+            tint_value: cursor.u32()?,
+            name_id: cursor.u32()?,
+            description_id: cursor.u32()?,
+            quantity_available: cursor.u32()?,
+            members_only: cursor.boolean()?,
+            field_7: cursor.u32()?,
+            first_item_id: cursor.u32()?,
+            available_tint_group_id: cursor.u32()?,
+            can_buy: cursor.boolean()?,
         });
     }
     cursor.finish()?;
-    Ok(MerchantListV2 {
-        initial_i16s: [0; 2],
-        initial_dword,
-        group: MerchantGroupV2 {
-            fields: [f0, f1, f2, f3, f4, f5, 0],
-            entries,
-        },
+    Ok(MerchantGroupV2 {
+        fields: [f0, f1, f2, f3, f4, f5, 0],
+        entries,
     })
 }
 
@@ -1450,7 +1529,7 @@ pub fn decode_merchant_buy_66_43(
     })
 }
 
-fn put_words<const N: usize>(out: &mut Vec<u8>, values: &[u32; N]) {
+fn put_words(out: &mut Vec<u8>, values: &[u32]) {
     for value in values {
         out.extend(value.to_le_bytes());
     }
@@ -1497,7 +1576,7 @@ impl<'a> WireCursor<'a> {
         self.bytes.len() - self.offset
     }
 
-    fn finish(self) -> Result<(), NpcInteractionError> {
+    fn finish(&self) -> Result<(), NpcInteractionError> {
         if self.offset == self.bytes.len() {
             Ok(())
         } else {

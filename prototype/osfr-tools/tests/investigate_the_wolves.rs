@@ -418,7 +418,7 @@ fn open_end_screen(game: &mut Gameplay, at: &CharacterState, now: &mut u64) -> V
     end
 }
 
-/// Open a vendor's real 66/42 window through 26/8 -> 26/10 and return the list.
+/// Open a vendor's real 165/10 coin window through 26/8 -> 26/10 and return the list.
 fn open_shop(game: &mut Gameplay, at: &CharacterState, vendor: u64, now: u64) -> Vec<u8> {
     let menu = interact(game, at, vendor, now);
     let choice = menu_option(&menu, SHOP_LABEL);
@@ -426,9 +426,9 @@ fn open_shop(game: &mut Gameplay, at: &CharacterState, vendor: u64, now: u64) ->
     opened
         .replies
         .iter()
-        .find(|packet| packet.starts_with(&[66, 0, 42, 0]))
+        .find(|packet| packet.starts_with(&[165, 0, 10, 0]))
         .cloned()
-        .expect("the Shop choice sends the 66/42 list")
+        .expect("the Shop choice sends the 165/10 coin merchant list")
 }
 
 // ---------------------------------------------------------------------------
@@ -1002,7 +1002,7 @@ fn a_live_change_before_the_turn_in_survives() {
 /// catalogue price and adds a new stack of the item (the opening bag has none),
 /// then 49/14 adds only its own 20 coins on the live wallet and bag, never
 /// restoring the accept-time snapshot. The item and price come from
-/// `vendors.json`/`stores.json`, the same content the 66/42/66/43 route reads.
+/// `vendors.json`/`stores.json`, the same content the 165/10/66/43 route reads.
 /// This is the real merchant transaction; `a_live_change_before_the_turn_in_survives`
 /// keeps the developer-seam grant as the complementary case.
 #[test]
@@ -1031,7 +1031,7 @@ fn a_vendor_purchase_before_the_turn_in_survives() {
 
     at.position = content_position("farnum_farmstead.json", VELA);
     let list = open_shop(&mut game, &at, VELA, now);
-    assert!(!list.is_empty(), "Vela sends a 66/42 list");
+    assert!(!list.is_empty(), "Vela sends a 165/10 coin list");
     now += 10;
     let coins_before = coins(&game);
     let items_before = item_count(&game, item);

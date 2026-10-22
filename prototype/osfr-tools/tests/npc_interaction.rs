@@ -1,11 +1,11 @@
 use osfr_tools::npc_interaction::{
     DialoguePacket26_3, MerchantBuyRequestV2, MerchantEntryV2, MerchantGroupV2, MerchantListV2,
     NpcAction, NpcInteraction, NpcInteractionError, NpcSelection, QuestOfferPacket49_1,
-    decode_dialogue_26_3, decode_dialogue_response_26_6, decode_merchant_list_66_42,
-    decode_npc_interact_26_8, decode_quest_end_reply_49_14, decode_quest_offer_49_1,
-    decode_quest_reply_49_2, encode_dialogue_26_3, encode_dialogue_close_26_4,
-    encode_merchant_buy_66_43, encode_merchant_list_66_42, encode_quest_offer_49_1,
-    goodbye_dialogue_choice,
+    decode_coin_merchant_list_165_10, decode_dialogue_26_3, decode_dialogue_response_26_6,
+    decode_merchant_list_66_42, decode_npc_interact_26_8, decode_quest_end_reply_49_14,
+    decode_quest_offer_49_1, decode_quest_reply_49_2, encode_coin_merchant_list_165_10,
+    encode_dialogue_26_3, encode_dialogue_close_26_4, encode_merchant_buy_66_43,
+    encode_merchant_list_66_42, encode_quest_offer_49_1, goodbye_dialogue_choice,
 };
 use osfr_tools::{
     coin_shop::{self, CoinShop, StoreCatalogue},
@@ -158,8 +158,9 @@ fn vendor_menu_shop_buy_sell_and_close_use_coin_shop_validation() {
         count_definition(shop.inventory().state(), 8),
         original_count + 1
     );
-    let after_buy = shop.inventory().state().clone();
-    let retry = service
+    // The same 165/4 again is a second purchase: the native writer (`00c75ed0`) has no
+    // per-request id, and its context dword repeats for every buy from one open shop.
+    let again = service
         .handle_coin_store(
             &mut shop,
             &request_buy(VENDOR_ID, 77001, 8, 0, 1),
@@ -167,8 +168,12 @@ fn vendor_menu_shop_buy_sell_and_close_use_coin_shop_validation() {
             position,
         )
         .unwrap();
-    assert!(!retry.changed);
-    assert_eq!(shop.inventory().state(), &after_buy);
+    assert!(again.changed);
+    assert_eq!(shop.inventory().state().coins, 70);
+    assert_eq!(
+        count_definition(shop.inventory().state(), 8),
+        original_count + 2
+    );
 
     let instance_id = shop
         .inventory()
@@ -186,10 +191,10 @@ fn vendor_menu_shop_buy_sell_and_close_use_coin_shop_validation() {
         .handle_coin_store(&mut shop, &sell, zone, position)
         .unwrap();
     assert_eq!(sold.result_code, coin_shop::RESULT_SUCCESS);
-    assert_eq!(shop.inventory().state().coins, 92);
+    assert_eq!(shop.inventory().state().coins, 77);
     assert_eq!(
         count_definition(shop.inventory().state(), 8),
-        original_count
+        original_count + 1
     );
 
     assert_eq!(service.close(VENDOR_ID).unwrap(), [66, 0, 46, 0]);
@@ -474,32 +479,40 @@ fn dialogue_uses_a_greeting_locale_id_instead_of_the_npc_name() {
     assert_eq!(context.body_string_id, Some(80));
 }
 
+fn sample_merchant_group() -> MerchantGroupV2 {
+    MerchantGroupV2 {
+        fields: [1, 2, 3, 4, 5, 6, 0],
+        entries: vec![MerchantEntryV2 {
+            item_id: 8,
+            icon_id: 9,
+            tint_value: 10,
+            name_id: 11,
+            description_id: 12,
+            quantity_available: 13,
+            members_only: true,
+            field_7: 14,
+            first_item_id: 15,
+            available_tint_group_id: 16,
+            can_buy: false,
+        }],
+    }
+}
+
 #[test]
 fn merchant_list_66_42_matches_the_client_reader_layout() {
-    // Client reader (`00b3d5f0`): the header, one dword, a six-dword record (`00b33020`), the
-    // entry count (`00b2e620`), then 38-byte rows. Synthetic values, no captured frame exists.
+    // Client reader (`00b3d5f0`): the header, the time-left dword, a six-dword record
+    // (`00b33020`), the entry count (`00b2e620`), then 38-byte rows. Synthetic values, no
+    // captured frame exists.
     let message = MerchantListV2 {
-        initial_i16s: [0, 0],
         initial_dword: 99,
-        group: MerchantGroupV2 {
-            fields: [1, 2, 3, 4, 5, 6, 0],
-            entries: vec![MerchantEntryV2 {
-                first_six_dwords: [8, 9, 10, 11, 12, 13],
-                flag_after_six: true,
-                final_three_dwords: [14, 15, 16],
-                final_flag: false,
-            }],
-        },
+        group: sample_merchant_group(),
     };
     let encoded = encode_merchant_list_66_42(&message).unwrap();
     assert_eq!(&encoded[..8], &[66, 0, 42, 0, 99, 0, 0, 0]);
     assert_eq!(encoded.len(), 4 + 4 + 24 + 4 + 38);
-    assert_eq!(&encoded[32..36], &1u32.to_le_bytes());
+    assert_eq!(&encoded[36..40], &8u32.to_le_bytes());
     assert_eq!(decode_merchant_list_66_42(&encoded).unwrap(), message);
-    // Off-wire legacy fields cannot be smuggled in, and the old 8-byte-longer shape is refused.
-    let mut legacy = message.clone();
-    legacy.initial_i16s = [1, 0];
-    assert!(encode_merchant_list_66_42(&legacy).is_err());
+    // The off-wire seventh record dword is refused; the old 8-byte-longer shape is refused.
     let mut legacy = message.clone();
     legacy.group.fields[6] = 1;
     assert!(encode_merchant_list_66_42(&legacy).is_err());
@@ -507,6 +520,41 @@ fn merchant_list_66_42_matches_the_client_reader_layout() {
     extended.splice(4..4, [0u8; 4]);
     assert!(decode_merchant_list_66_42(&extended).is_err());
     assert!(decode_merchant_list_66_42(&encoded[..encoded.len() - 1]).is_err());
+}
+
+#[test]
+fn coin_merchant_list_165_10_matches_the_same_row_reader_layout() {
+    // `00c78fb0` reads the 4-byte header, then the same six-dword record and 38-byte rows
+    // (`00b33020`/`00b2e620`). It has no time-left dword and no Station Cash field.
+    let group = sample_merchant_group();
+    let encoded = encode_coin_merchant_list_165_10(&group).unwrap();
+    assert_eq!(&encoded[..4], &[165, 0, 10, 0]);
+    assert_eq!(encoded.len(), 4 + 24 + 4 + 38);
+    assert_eq!(&encoded[4..8], &1u32.to_le_bytes()); // record scalar
+    assert_eq!(&encoded[16..20], &4u32.to_le_bytes()); // merchant GUID low
+    assert_eq!(&encoded[20..24], &5u32.to_le_bytes()); // merchant GUID high
+    assert_eq!(&encoded[28..32], &1u32.to_le_bytes()); // entry count
+    assert_eq!(&encoded[32..36], &8u32.to_le_bytes()); // item id
+    assert_eq!(&encoded[36..40], &9u32.to_le_bytes()); // icon
+    assert_eq!(&encoded[40..44], &10u32.to_le_bytes()); // tint
+    assert_eq!(&encoded[44..48], &11u32.to_le_bytes()); // name
+    assert_eq!(&encoded[48..52], &12u32.to_le_bytes()); // description
+    assert_eq!(&encoded[52..56], &13u32.to_le_bytes()); // quantity
+    assert_eq!(encoded[56], 1); // members only
+    assert_eq!(&encoded[57..61], &14u32.to_le_bytes()); // field 7
+    assert_eq!(&encoded[61..65], &15u32.to_le_bytes()); // first item id
+    assert_eq!(&encoded[65..69], &16u32.to_le_bytes()); // available tint group
+    assert_eq!(encoded[69], 0); // can buy
+    assert_eq!(decode_coin_merchant_list_165_10(&encoded).unwrap(), group);
+    assert!(decode_coin_merchant_list_165_10(&encoded[..encoded.len() - 1]).is_err());
+    // The two families are not interchangeable.
+    assert!(decode_merchant_list_66_42(&encoded).is_err());
+    let other = encode_merchant_list_66_42(&MerchantListV2 {
+        initial_dword: 0,
+        group: group.clone(),
+    })
+    .unwrap();
+    assert!(decode_coin_merchant_list_165_10(&other).is_err());
 }
 
 #[test]
@@ -1257,8 +1305,8 @@ fn vendor_165_4_and_66_43_still_route() {
         opened
             .replies
             .iter()
-            .any(|packet| packet.starts_with(&[66, 0, 42, 0])),
-        "the Shop choice must open the 66/42 window"
+            .any(|packet| packet.starts_with(&[165, 0, 10, 0])),
+        "the Shop choice must open the 165/10 coin merchant window"
     );
     let before = saved(&game);
     // 165/4 for an item this vendor does not stock: the family refuses and nothing moves.

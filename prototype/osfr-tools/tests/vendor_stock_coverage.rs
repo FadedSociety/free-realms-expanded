@@ -323,12 +323,10 @@ fn exception(npc_id: u64) -> Option<&'static StockException> {
         .find(|exception| exception.npc_id == npc_id)
 }
 
-/// Open one vendor's 66/42 window through the production interaction service.
+/// Open one vendor's coin stock through the production interaction service.
 /// The 26/10 body is the u64 NPC GUID plus the i32 choice (client constructor
-/// `00a36f80`); the reply is the 66/42 list. Dispatcher `00b48a10` selects
-/// `00b40a60`; `00b3d5f0` reads the header and nested record, `00b33020` reads
-/// one scalar, two dword pairs and a final scalar (six dwords), and `00b2e620`
-/// then reads the entry count and rows through `00b29cd0`.
+/// `00a36f80`); the gameplay caller then sends it as the 165/10 coin merchant list
+/// (`00c78fb0`) whose rows use the shared `00b33020`/`00b29cd0` reader.
 fn open_shop(interaction: &mut NpcInteraction, npc_id: u64) -> MerchantWindow {
     let (zone, position) = interaction
         .location(npc_id)

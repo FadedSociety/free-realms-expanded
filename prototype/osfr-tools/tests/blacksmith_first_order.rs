@@ -5,7 +5,7 @@
 //! stock is in `data/content/vendors.json` / `stores.json`. These tests drive the production
 //! in-world router (`Gameplay::handle_in_world` -> `gameplay/npc.rs` -> `QuestEngine`), the
 //! production position event (`Gameplay::on_location`, called by `gateway.rs` after movement
-//! validation), and the real 66/42 -> 66/43 -> 66/44 vendor route. They do not call
+//! validation), and the real 165/10 -> 66/43 -> 66/44 vendor route. They do not call
 //! `QuestOutcome` or `CoinShop::buy_vendor` directly.
 //!
 //! Client evidence used here:
@@ -16,7 +16,7 @@
 //! - 49/13 end screen: `00c7bbd0`/`00c7b990` (actor 6..14, quest 14..18, end text 18..22,
 //!   reward bundle from 26; `008e7930` reads the coin word at 27..31 and the star total at
 //!   31..35); 49/14 end reply: constructor `00a864c0`.
-//! - 66/42 list: `00b48a10` -> `00b40a60` -> `00b3d5f0`; 66/43 buy: serializer `00b3ab20`;
+//! - 165/10 coin list: `00c78fb0` (shared row reader `00b29cd0`); 66/43 buy: serializer `00b3ab20`;
 //!   66/44 result: reader `00b32430`, status dword at wire offset 48.
 //!
 //! The shared quest fixture and packet helpers live in `tests/support/npc_quest_chain.rs`; the
@@ -39,7 +39,7 @@ use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, GameplayState, Outcome},
     inventory::{Inventory, InventoryItem},
-    npc_interaction::{NpcAction, NpcInteraction, NpcSelection, decode_merchant_list_66_42},
+    npc_interaction::{NpcAction, NpcInteraction, NpcSelection, decode_coin_merchant_list_165_10},
     profiles::ProfileState,
     quest_engine::QuestStatus,
 };
@@ -104,7 +104,7 @@ fn visit_bruno(game: &mut Gameplay, bruno: &CharacterState, now: u64) -> Outcome
     game.on_location(bruno, now).expect("location event")
 }
 
-/// Read the real 66/42 list the client opens from the 26/10 Shop choice.
+/// Read the real 165/10 coin merchant list the client opens from the 26/10 Shop choice.
 fn merchant_list(game: &mut Gameplay, target: &CharacterState, now: u64) -> Vec<u8> {
     let menu = interact(game, target, BRUNO, now);
     let choice = menu_option(&menu, SHOP_LABEL);
@@ -112,20 +112,19 @@ fn merchant_list(game: &mut Gameplay, target: &CharacterState, now: u64) -> Vec<
     let list = opened
         .replies
         .iter()
-        .find(|packet| packet.starts_with(&[66, 0, 42, 0]))
-        .expect("the Shop choice sends the 66/42 list")
+        .find(|packet| packet.starts_with(&[165, 0, 10, 0]))
+        .expect("the Shop choice sends the 165/10 coin merchant list")
         .clone();
-    assert_eq!(&list[..4], &[66, 0, 42, 0]);
+    assert_eq!(&list[..4], &[165, 0, 10, 0]);
     list
 }
 
 fn merchant_ids(list: &[u8]) -> Vec<i32> {
-    decode_merchant_list_66_42(list)
-        .expect("66/42 matches the client reader layout")
-        .group
+    decode_coin_merchant_list_165_10(list)
+        .expect("165/10 matches the shared client row reader")
         .entries
         .iter()
-        .map(|entry| entry.first_six_dwords[0] as i32)
+        .map(|entry| entry.item_id as i32)
         .collect()
 }
 
@@ -309,7 +308,7 @@ fn the_supply_visit_and_the_vendor_purchase_pay_once() {
     assert!(visited.changed, "the supply visit must advance 3020003");
     assert_eq!(counts(&game, MERCHANDISE), [1, 0]);
 
-    // The Shop choice opens the client-readable 66/42 component list.
+    // The Shop choice opens the client-readable 165/10 coin component list.
     now += 10;
     let list = merchant_list(&mut game, &bruno, now);
 
@@ -331,7 +330,7 @@ fn the_supply_visit_and_the_vendor_purchase_pay_once() {
     assert_eq!(
         merchant_ids(&list),
         vec![WOODEN_PLANKS, THORNY_FASTENERS, SINGING_COAL],
-        "the 66/42 list is exactly Bruno's three recovered components"
+        "the 165/10 list is exactly Bruno's three recovered components"
     );
 
     // A locked profile is refused by the reward path; the XP belongs to profile 16 even when
@@ -732,7 +731,7 @@ fn bruno_sells_exactly_the_three_recovered_components() {
         assert_eq!(item["price_source"]["kind"], "stores.json");
     }
 
-    // The same three ids are the client-readable 66/42 component shop, opened through the
+    // The same three ids are the client-readable coin component shop, opened through the
     // production interaction service.
     let mut interaction = NpcInteraction::load(&content.join("npcs"), &content.join("stores.json"))
         .expect("the production NPC loader accepts Bruno");
@@ -755,13 +754,13 @@ fn bruno_sells_exactly_the_three_recovered_components() {
     };
     let ids: BTreeSet<i32> = window.items.iter().map(|item| item.item_id).collect();
     assert_eq!(ids, [WOODEN_PLANKS, THORNY_FASTENERS, SINGING_COAL].into());
-    assert_eq!(window.items.len(), 3, "no fourth item in 66/42");
+    assert_eq!(window.items.len(), 3, "no fourth item in the coin window");
     assert!(
         window
             .stock_description
             .as_deref()
             .is_some_and(|text| text.contains("Thorny Fasteners")),
-        "the 66/42 window carries Bruno's recovered stock description"
+        "the coin window carries Bruno's recovered stock description"
     );
     for item in window.items {
         assert_eq!(item.purchase_price_coins, Some(UNIT_PRICE));

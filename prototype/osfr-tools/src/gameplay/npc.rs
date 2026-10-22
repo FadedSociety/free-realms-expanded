@@ -559,21 +559,19 @@ impl Gameplay {
                         &mut out,
                     )?;
                 }
-                Ok(NpcSelection::Shop(mut window)) => {
-                    // F228: the 66/42 window advertises the same resale price the Coin Shop
-                    // pays; a job starter item or (L040) a Condo starter-kit item is free
-                    // issuance, so show 0, not the raw row.
-                    let profiles = self.profiles.as_ref();
-                    let mut free =
-                        profiles.map_or_else(Default::default, Profiles::all_starter_items);
-                    free.extend(self.housing.iter().flat_map(|housing| housing.kit_items()));
-                    window.zero_starter_sell_prices(&free);
-                    out.replies.push(
-                        merchant_packet(&window)
-                            .map_err(|_| invalid("NPC merchant list could not be encoded"))?,
-                    );
+                Ok(NpcSelection::Shop(window)) => {
+                    // The coin vendor's stock is 165/10, not the 66/42 Station Cash list: 66/42
+                    // opens the client's Station Cash window and its rows are store bundle ids.
+                    // 165/10 raises HandlerMerchant:Show("CoinStore") with the coin window and
+                    // fills its stock rows. The row carries the display fields from the item
+                    // definition; the displayed price is the definition's coin purchase price,
+                    // so a stale definition is updated from stores.json first.
+                    let (packets, rows) =
+                        coin_merchant_packets(&window, &self.inventory, now_ms)
+                            .map_err(|_| invalid("NPC merchant list could not be encoded"))?;
+                    out.replies.extend(packets);
                     npc_event(select_event(runtime_guid, Some(key), option_id, "shop"));
-                    npc_event(shop_open_event(runtime_guid, key, window.items.len()));
+                    npc_event(shop_open_event(runtime_guid, key, rows));
                 }
                 Ok(NpcSelection::Race) => {
                     consume_menu = true;
@@ -1216,38 +1214,71 @@ pub(super) fn dialogue_packet_with(
     })
 }
 
-pub(super) fn merchant_packet(
+/// Build the coin merchant window: the 35/37 definition updates the client needs, then the
+/// 165/10 merchant list. Returns the packets and the row count for the shop-open event.
+///
+/// The client's `MerchantSellInventoryDataSource` resolves every row through its item definition
+/// cache and displays the definition's coin purchase price (`+0x24`, serialized dword 7), not a
+/// price in the merchant row. A row the login catalogue did not carry is pushed so the window
+/// can render it; a cached row whose price differs from `stores.json` is replaced
+/// (`00a3c290` overwrites by id), keeping the server the price authority.
+fn coin_merchant_packets(
     window: &MerchantWindow,
-) -> Result<Vec<u8>, npc_interaction::NpcInteractionError> {
-    let entries = window
-        .items
-        .iter()
-        .map(|item| npc_interaction::MerchantEntryV2 {
-            // (R) IDs and reference prices are carried in opaque fields by local convention.
-            first_six_dwords: [
-                item.item_id as u32,
-                item.purchase_price_coins.unwrap_or(0),
-                item.sell_price_coins.unwrap_or(0),
-                0,
-                0,
-                0,
-            ],
-            flag_after_six: false,
-            final_three_dwords: [0; 3],
-            final_flag: false,
-        })
-        .collect();
+    inventory: &Inventory,
+    now_ms: u64,
+) -> Result<(Vec<Vec<u8>>, usize), npc_interaction::NpcInteractionError> {
+    let mut definitions = Vec::new();
+    let mut entries = Vec::new();
+    for item in &window.items {
+        // The stock list is the buy list: a row without a purchase price cannot be bought.
+        let Some(price) = item.purchase_price_coins else {
+            continue;
+        };
+        if !inventory.has_definition(item.item_id) {
+            continue;
+        }
+        let presentation = inventory
+            .presentation(item.item_id)
+            .map_err(|_| npc_interaction::NpcInteractionError::InvalidPacket)?;
+        let price_matches = inventory.definition_coin_price(item.item_id) == Some(price);
+        if !inventory.definition_was_captured(item.item_id) || !price_matches {
+            if let Some(record) = inventory.definition_record_with_coin_price(item.item_id, price) {
+                definitions.push(record);
+            }
+        }
+        entries.push(npc_interaction::MerchantEntryV2 {
+            item_id: item.item_id as u32,
+            icon_id: u32::try_from(presentation.icon_id).unwrap_or(0),
+            tint_value: u32::try_from(presentation.icon_tint).unwrap_or(0),
+            name_id: u32::try_from(presentation.name_id).unwrap_or(0),
+            description_id: u32::try_from(presentation.description_id).unwrap_or(0),
+            // Unlimited server stock; the client's display of 0 is unverified (R).
+            quantity_available: 0,
+            // Membership and the available tint set live in the definition, not this row.
+            members_only: false,
+            field_7: 0,
+            first_item_id: 0,
+            available_tint_group_id: 0,
+            can_buy: true,
+        });
+    }
+    let rows = entries.len();
+    let mut packets = Vec::new();
+    if !definitions.is_empty() {
+        packets.push(
+            crate::inventory_v2_fixes::encode_definition_batch_v2(&definitions, &[])
+                .map_err(|_| npc_interaction::NpcInteractionError::InvalidPacket)?,
+        );
+    }
     let npc = window.npc_id;
-    // (R) 66/42 layout is recovered, while all semantic values remain opaque. The stable content
-    // key identifies the merchant in this reconstructed listing.
-    npc_interaction::encode_merchant_list_66_42(&npc_interaction::MerchantListV2 {
-        initial_i16s: [0; 2],
-        initial_dword: npc as u32,
-        group: npc_interaction::MerchantGroupV2 {
-            fields: [npc as u32, (npc >> 32) as u32, 0, 0, 0, 0, 0],
+    packets.push(npc_interaction::encode_coin_merchant_list_165_10(
+        &npc_interaction::MerchantGroupV2 {
+            // [record scalar, pair 1, merchant GUID low/high, scalar 2, unused].
+            fields: [now_ms as u32, 0, 0, npc as u32, (npc >> 32) as u32, 0, 0],
             entries,
         },
-    })
+    )?);
+    Ok((packets, rows))
 }
 
 pub(super) fn quest_offer_packet(

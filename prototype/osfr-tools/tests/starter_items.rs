@@ -24,6 +24,7 @@ use osfr_tools::{
     gameplay::{Gameplay, GameplayState},
     gateway::Gateway,
     inventory::InventoryState,
+    npc_interaction::decode_coin_merchant_list_165_10,
 };
 use serde_json::{Value, json};
 use std::{
@@ -199,7 +200,7 @@ fn unequip_weapon(gateway: &mut Gateway) {
 }
 
 /// Interact with the synthetic vendor and choose its Shop option (Talk is option 1). Returns the
-/// 66/42 window as sent, so a test can read the advertised prices.
+/// 165/10 coin merchant list as sent.
 fn open_shop(gateway: &mut Gateway) -> Vec<Vec<u8>> {
     let menu = request(gateway, &interact(VENDOR));
     assert!(
@@ -210,27 +211,24 @@ fn open_shop(gateway: &mut Gateway) -> Vec<Vec<u8>> {
     assert!(
         opened
             .iter()
-            .any(|packet| packet.starts_with(&[66, 0, 42, 0])),
-        "the vendor opened no shop window"
+            .any(|packet| packet.starts_with(&[165, 0, 10, 0])),
+        "the vendor opened no coin shop window"
     );
     opened
 }
 
-/// The 66/42 rows `00b29cd0`/`00b2e620` read: item id, purchase price and sell price in the
-/// first three entry dwords (semantic values are (R)).
-fn merchant_rows(replies: &[Vec<u8>]) -> Vec<(i32, u32, u32)> {
+/// The stock rows `00c78fb0` installs through the shared `00b33020`/`00b29cd0` reader.
+/// The displayed price is the item definition's coin purchase price, not a row field.
+fn merchant_rows(replies: &[Vec<u8>]) -> Vec<i32> {
     let packet = replies
         .iter()
-        .find(|packet| packet.starts_with(&[66, 0, 42, 0]))
+        .find(|packet| packet.starts_with(&[165, 0, 10, 0]))
         .expect("the shop window reply");
-    let word = |at: usize| u32::from_le_bytes(packet[at..at + 4].try_into().unwrap());
-    let count = word(32) as usize;
-    assert_eq!(packet.len(), 36 + count * 38, "66/42 must match its reader");
-    (0..count)
-        .map(|index| {
-            let at = 36 + index * 38;
-            (word(at) as i32, word(at + 4), word(at + 8))
-        })
+    decode_coin_merchant_list_165_10(packet)
+        .expect("165/10 matches the shared client row reader")
+        .entries
+        .iter()
+        .map(|entry| entry.item_id as i32)
         .collect()
 }
 
@@ -366,17 +364,17 @@ fn a_regranted_starter_weapon_sells_for_zero_and_a_normal_item_keeps_its_price()
     );
 
     let shop_window = open_shop(&mut gateway);
-    // F228: the 66/42 window advertises the same resale price the sale pays. The fixture keeps
-    // the raw 375 in its synthetic stores.json, so only the shared starter rule can make this 0.
+    // Both vendor rows are in the coin stock list. F228 (a starter copy pays 0) is a sale rule,
+    // asserted by the sell requests below.
     let rows = merchant_rows(&shop_window);
     assert_eq!(rows.len(), 2, "both vendor items are listed: {rows:?}");
     assert!(
-        rows.contains(&(STARTER_BOW, 10, 0)),
-        "the starter row must advertise 0, not {STARTER_SELL_PRICE}: {rows:?}"
+        rows.contains(&STARTER_BOW),
+        "the starter row must be listed: {rows:?}"
     );
     assert!(
-        rows.contains(&(NORMAL_ITEM, 15, NORMAL_SELL_PRICE)),
-        "a non-starter keeps its advertised price: {rows:?}"
+        rows.contains(&NORMAL_ITEM),
+        "a non-starter must be listed: {rows:?}"
     );
     // The equipped weapon is refused, and the refusal changes nothing (the shop stays open in
     // the canary below). A starter item is only sellable once it is off the body.
@@ -467,9 +465,9 @@ fn a_saved_package_loads_with_an_invalid_unused_default_state() {
     assert!(loaded.state().profiles.is_some());
 }
 
-/// L040: the Wilds Condo's starter kit (houses.json `starter_kit`) is free issuance too. The 66/42
-/// window advertises 0 for both kit items, and the Chicken the 127/23 grant put in the bag sells
-/// for 0, although the synthetic store keeps their reference resale prices (500 and 2).
+/// L040: the Wilds Condo's starter kit (houses.json `starter_kit`) is free issuance too. The coin
+/// window lists the Chicken (its rows carry no resale price), and the Chicken the 127/23 grant put
+/// in the bag sells for 0, although the synthetic store keeps its reference resale price (500).
 #[test]
 fn the_condo_starter_kit_resells_for_zero() {
     const CHICKEN: i32 = 70_429;
@@ -502,12 +500,11 @@ fn the_condo_starter_kit_resells_for_zero() {
     let chicken = instance_of(&inventory_of(&gateway), CHICKEN);
 
     let rows = merchant_rows(&open_shop(&mut gateway));
-    assert!(rows.contains(&(CHICKEN, 1_000, 0)), "{rows:?}");
-    assert!(rows.contains(&(KIT_BLOCK, 5, 0)), "{rows:?}");
-    assert!(
-        rows.contains(&(NORMAL_ITEM, 15, NORMAL_SELL_PRICE)),
-        "{rows:?}"
-    );
+    // The prepared item catalogue has no definition for the kit block, and the client draws a
+    // row only through its definition (`00cff140`), so the coin window leaves that row out.
+    for item in [CHICKEN, NORMAL_ITEM] {
+        assert!(rows.contains(&item), "{item} is not listed: {rows:?}");
+    }
     let coins = inventory_of(&gateway).coins;
     let sold = one_completion(&send(&mut gateway, &sell_packet(0, chicken, 1)));
     assert_eq!((sold.result, sold.definition), (RESULT_OK, CHICKEN));

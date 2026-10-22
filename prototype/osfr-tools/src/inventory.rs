@@ -96,10 +96,16 @@ pub struct InventoryOutcome {
 #[derive(Clone, Copy, Debug)]
 pub struct ItemPresentation {
     pub name_id: i32,
+    pub description_id: i32,
     pub icon_id: i32,
     pub icon_tint: i32,
     pub item_type: i32,
 }
+
+/// Wire offset of the coin purchase price in a serialized item definition: the client reads
+/// the seventh dword after the id into object `+0x24` (`008e3760`; Items and Inventory guide
+/// step 6) and the merchant stock list displays it (`00cff140` case 27).
+const DEFINITION_COIN_PRICE: std::ops::Range<usize> = 28..32;
 
 /// Equip restrictions read from a definition's wire row. Recovered layout:
 /// gender usage `+0x68`, members-only `+0x74`, minimum profile rank `+0x84`
@@ -548,6 +554,30 @@ impl Inventory {
             .map(|definition| definition.bytes.as_slice())
     }
 
+    /// The definition's coin purchase price, which the merchant stock list displays. `None`
+    /// when the record is too short or the stored price is negative.
+    pub fn definition_coin_price(&self, definition_id: i32) -> Option<u32> {
+        let bytes = self.definition_record(definition_id)?;
+        let stored = i32::from_le_bytes(bytes.get(DEFINITION_COIN_PRICE)?.try_into().ok()?);
+        u32::try_from(stored).ok()
+    }
+
+    /// The same serialized row with its coin purchase price replaced, so a merchant can
+    /// advertise the server's `stores.json` quote in a 35/37 definition update. `None` when
+    /// the record cannot carry the field.
+    pub fn definition_record_with_coin_price(
+        &self,
+        definition_id: i32,
+        price: u32,
+    ) -> Option<Vec<u8>> {
+        let mut record = self.definition_record(definition_id)?.to_vec();
+        let price = i32::try_from(price).ok()?;
+        record
+            .get_mut(DEFINITION_COIN_PRICE)?
+            .copy_from_slice(&price.to_le_bytes());
+        Some(record)
+    }
+
     /// What a trade needs from a definition (W163), as `(no_trade, max_stack)`. NO_TRADE is the
     /// byte after the eleven leading words of the serialized row (`piece_096`
     /// `ItemDefinition.no_trade`, inside the 46-byte prefix `Requirement::from_wire` skips) and
@@ -582,6 +612,7 @@ impl Inventory {
         }
         Ok(ItemPresentation {
             name_id: read(bytes, 4)?,
+            description_id: read(bytes, 8)?,
             icon_id: read(bytes, 12)?,
             icon_tint: read(bytes, 16)?,
             item_type: read(bytes, offset + 4)?,
