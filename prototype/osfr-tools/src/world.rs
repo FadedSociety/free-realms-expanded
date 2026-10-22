@@ -518,6 +518,17 @@ impl NpcVisibility {
     /// Model of a visible content actor, for content-defined fixtures such as
     /// crafting stations. Excluded actors have none.
     pub fn model_of(&self, actor_id: u64) -> Option<u32> {
+        self.shown(actor_id)
+            .and_then(|npc| u32::try_from(npc.spawn.model_id).ok())
+    }
+
+    /// Where a content actor stands, for click reach checks. Excluded and removed actors have
+    /// no position.
+    pub fn actor_position(&self, actor_id: u64) -> Option<[f32; 3]> {
+        self.shown(actor_id).map(|npc| npc.position)
+    }
+
+    fn shown(&self, actor_id: u64) -> Option<&VisibleNpc> {
         if self.excluded.contains(&actor_id) {
             return None;
         }
@@ -525,7 +536,6 @@ impl NpcVisibility {
             .values()
             .flatten()
             .find(|npc| npc.spawn.actor_id == actor_id)
-            .and_then(|npc| u32::try_from(npc.spawn.model_id).ok())
     }
 
     pub fn exclude_actor_guids(&mut self, actor_guids: impl IntoIterator<Item = u64>) {

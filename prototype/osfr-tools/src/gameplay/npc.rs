@@ -30,6 +30,26 @@ impl Gameplay {
         Ok(packets)
     }
 
+    /// (R) Common NPC budget, computed without mutating staged Gameplay clones.
+    pub fn npc_visibility_revision(&self) -> u64 {
+        self.npc_visibility.as_ref().map_or(0, |v| v.revision())
+    }
+
+    pub fn shared_npc_view(
+        &self,
+        character: &CharacterState,
+        fields: &[crate::world::NpcInterest],
+        known: &BTreeSet<u64>,
+    ) -> io::Result<(BTreeSet<u64>, Vec<Vec<u8>>)> {
+        let (visible, mut packets) = self
+            .npc_visibility
+            .as_ref()
+            .unwrap_or(&crate::world::NpcVisibility::default())
+            .shared_view(character.zone_id, character.position, fields, known)?;
+        self.append_shared_pending_end_screen(&mut packets);
+        Ok((visible, packets))
+    }
+
     /// Canonical runtime-GUID -> content-key map for a client interaction target; opening-scene
     /// actors are excluded because the opening trigger path drives them, not the NPC router.
     pub(super) fn content_npc_key(&self, runtime_guid: u64) -> Option<u64> {

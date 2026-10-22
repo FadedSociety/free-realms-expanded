@@ -489,6 +489,7 @@ impl CollectionMessage {
 /// One of the gameplay sources that can supply a newly collected entry (R).
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum CollectionEventOrigin {
+    ExplorationCoin,
     HarvestNode,
     QuestReward,
     CollectionBundleEntry,
@@ -568,15 +569,17 @@ impl CollectionProgression {
             collection_packets.push(CollectionMessage::AddEntry(update).encode()?);
         }
 
-        let (next_rewards, reward_packets) = if outcome.completion.is_some() {
-            apply_award(
-                reward_state,
-                completion_reward,
-                &format!("collection:{}", outcome.collection_id),
-            )?
-        } else {
-            (reward_state.clone(), Vec::new())
-        };
+        // An empty grant pays nothing, so it sends no empty reward toast either.
+        let (next_rewards, reward_packets) =
+            if outcome.completion.is_some() && !grant_is_empty(completion_reward) {
+                apply_award(
+                    reward_state,
+                    completion_reward,
+                    &format!("collection:{}", outcome.collection_id),
+                )?
+            } else {
+                (reward_state.clone(), Vec::new())
+            };
         // R: update progress before its single completion reward. Caller saves
         // the ledger and RewardState in the same character transaction.
         self.ledger = staged;
@@ -781,7 +784,7 @@ fn grant_is_empty(grant: &RewardGrant) -> bool {
         && grant.display.rows.is_empty()
 }
 
-fn empty_grant() -> RewardGrant {
+pub(crate) fn empty_grant() -> RewardGrant {
     RewardGrant {
         coins: 0,
         items: Vec::new(),
@@ -1496,6 +1499,22 @@ impl ProgressionExtras {
 
     pub fn collections(&self) -> &CollectionLedger {
         &self.collections
+    }
+
+    /// Record one server-verified collection event on the saved ledger through
+    /// [`CollectionProgression::collect`]. The ledger changes only when it returns `Ok`.
+    pub fn collect(
+        &mut self,
+        catalogue: &CollectionCatalogue,
+        event: CollectionEvent,
+        completion_reward: &RewardGrant,
+        reward_state: &RewardState,
+    ) -> io::Result<CollectionTransition> {
+        let mut progression =
+            CollectionProgression::new(catalogue.clone(), self.collections.clone());
+        let transition = progression.collect(event, completion_reward, reward_state)?;
+        self.collections = progression.ledger;
+        Ok(transition)
     }
 
     pub fn titles(&self) -> &TitleState {

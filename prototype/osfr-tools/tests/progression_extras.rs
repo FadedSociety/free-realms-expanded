@@ -356,6 +356,35 @@ fn collection_completes_and_grants_once_across_gameplay_sources() {
 }
 
 #[test]
+fn completing_with_an_empty_grant_sends_no_reward_toast() {
+    let fixture = InventoryFixture::new();
+    let mut catalogue = CollectionCatalogue::new();
+    catalogue
+        .insert(CollectionDefinition {
+            id: 11,
+            category_id: 4,
+            entries: vec![101],
+        })
+        .unwrap();
+    let mut progression = CollectionProgression::new(catalogue, CollectionLedger::new());
+    let done = progression
+        .collect(
+            CollectionEvent {
+                entry_id: 101,
+                origin: CollectionEventOrigin::ExplorationCoin,
+                wire_update: Some(update(11, 101)),
+            },
+            &coin_grant(0),
+            &fixture.state(),
+        )
+        .unwrap();
+    assert!(done.outcome.completion.is_some());
+    assert_eq!(done.collection_packets.len(), 1);
+    assert!(done.reward_packets.is_empty());
+    assert!(done.reward_state.applied_grant_keys.is_empty());
+}
+
+#[test]
 fn achievement_threshold_awards_once_and_emits_150_messages() {
     let fixture = InventoryFixture::new();
     let rewards = fixture.state();

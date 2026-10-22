@@ -43,6 +43,7 @@ use std::{
 
 mod admin_move;
 pub use admin_move::{AdminMove, MoveTarget};
+mod collection_pickup;
 mod content_reload;
 mod crafting;
 mod derby_session;
@@ -266,6 +267,8 @@ pub struct Gameplay {
     progression_extras: crate::progression_extras::ProgressionExtras,
     /// Data-driven achievement counters and exact title-name bindings.
     achievement_bindings: crate::progression_extras::AchievementBindings,
+    /// T450 exploration coins and their catalogue; `None` unless both files exist.
+    collections: Option<Arc<collection_pickup::CollectionWorld>>,
     /// Player housing (`gameplay/housing.rs`); `None` when the content has no `houses.json`.
     housing: Option<housing::HousingSession>,
     /// L046: the saved lots, kept unchanged while housing is dormant so a save never drops them.
@@ -428,24 +431,6 @@ impl Gameplay {
         Some(runtime)
     }
 
-    /// (R) Common NPC budget, computed without mutating staged Gameplay clones.
-    pub fn npc_visibility_revision(&self) -> u64 {
-        self.npc_visibility.as_ref().map_or(0, |v| v.revision())
-    }
-    pub fn shared_npc_view(
-        &self,
-        character: &CharacterState,
-        fields: &[crate::world::NpcInterest],
-        known: &BTreeSet<u64>,
-    ) -> io::Result<(BTreeSet<u64>, Vec<Vec<u8>>)> {
-        let (visible, mut packets) = self
-            .npc_visibility
-            .as_ref()
-            .unwrap_or(&crate::world::NpcVisibility::default())
-            .shared_view(character.zone_id, character.position, fields, known)?;
-        self.append_shared_pending_end_screen(&mut packets);
-        Ok((visible, packets))
-    }
     pub fn bind_run_instance(&mut self, instance: i32, scene_reload: bool) -> io::Result<bool> {
         self.encounter
             .as_mut()
@@ -899,6 +884,8 @@ impl Gameplay {
         } else {
             None
         };
+        let collections =
+            collection_pickup::load(npc_content, &progression_extras, &mut npc_visibility)?;
         // Overworld enemies replace their passive Legacy copies (same GUIDs).
         let mut encounter = encounter;
         if let Some(engine) = encounter.as_mut() {
@@ -1159,6 +1146,7 @@ impl Gameplay {
             pets: crate::pets::PetService::new(crate::pets::PetService::bundled_content()?)?,
             progression_extras,
             achievement_bindings,
+            collections,
             housing,
             dormant_housing,
             inventory,
@@ -2247,6 +2235,9 @@ impl Gameplay {
             return Ok(outcome);
         }
         if let Some(outcome) = self.handle_gathering_node(inner, character, now_ms)? {
+            return Ok(outcome);
+        }
+        if let Some(outcome) = self.handle_collection_coin(inner, character)? {
             return Ok(outcome);
         }
         let inventory_before = self.inventory.state().clone();

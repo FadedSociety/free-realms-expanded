@@ -179,6 +179,12 @@ impl Rig {
     /// nothing here acknowledges those sends: wait out the sender's 250 ms retry interval
     /// (`Session::new`) so `drain` takes them back as resends and acknowledges them.
     fn step(&mut self) {
+        // `send` enters at `dispatch_message`, past the packet path that refreshes
+        // `last_activity`, so a loaded host (debug world loads, a parallel suite) could idle
+        // out a live session after 60 s. Refresh first, as `isolation` and `f160_field_views` do.
+        for session in self.server.sessions.values_mut() {
+            session.last_activity = Instant::now();
+        }
         self.server.step().unwrap();
         std::thread::sleep(Duration::from_millis(300));
         for key in self.server.sessions.keys().copied().collect::<Vec<_>>() {

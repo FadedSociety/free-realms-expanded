@@ -34,6 +34,8 @@ use std::{
 const NOW: u64 = 10_000;
 const OUTPUT_LIMIT: usize = 1_048_576; // (R) T3 per-call oracle, includes forwarded bytes.
 const NPC: u64 = 700;
+/// T450: exploration coin 1946, placed out of the fixture player's reach.
+const COIN: u64 = 100_000_001_946;
 const QUEST: u32 = 701;
 const CHEST: i32 = 910_190;
 const LOOT: i32 = 910_191;
@@ -206,8 +208,13 @@ impl Fixture {
         );
         write_json(
             &content.join("npc_spawns_extra.json"),
-            &json!({"schema_version":1,"records":[]}),
+            &json!({"schema_version":1,"records":[{"spawn_guid":COIN,"model_id":816,
+                "name_string_id":386170,"position":[-507.1435,-27.20111,-1201.367]}]}),
         );
+        let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        for file in ["collection_catalogue.json", "collection_coins.json"] {
+            fs::copy(shipped.join(file), content.join(file)).unwrap();
+        }
         write_json(
             &content.join("zones.json"),
             &json!({"schema_version":1,"records":[{"id":0,"name":"Synthetic zone"}]}),
@@ -672,6 +679,10 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
         };
         result.push(("npc_interaction", packet));
     }
+    let mut coin = words(26, 8, &[]);
+    coin.extend(COIN.to_le_bytes());
+    coin.push(0);
+    result.push(("npc_interaction", coin));
     for sub in [14, 15, 17, 21, 30] {
         result.push(("social_router", words(26, sub, &[u32::MAX; 5])));
     }
