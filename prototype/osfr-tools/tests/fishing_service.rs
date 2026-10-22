@@ -301,12 +301,43 @@ fn a_cast_spawns_the_bobber_model_and_the_fish_the_bite_names() {
 }
 
 #[test]
+fn registration_sends_the_client_compiled_player_defaults() {
+    let (_fixture, mut service) = running();
+    let registered = service.handle(&register_request(), PLAYER, T0).unwrap();
+    let body = &registered.replies[0][4..];
+    // Reader 0x00b65880 fills +0x20, +0x5c, +0x60, +0x64, +0x68, +0x6c, +0x58, +0x78, +0x7c,
+    // +0x98, +0x9c, +0xa0, +0xa4, +0x4c, +0x50, +0x48; 0x0107b6d0 writes these defaults there.
+    let words: Vec<u32> = body[..64]
+        .chunks(4)
+        .map(|word| u32::from_le_bytes(word.try_into().unwrap()))
+        .collect();
+    let expected: Vec<u32> = [0.5f32, 3.0, 20.0, 0.2, 5.0, 0.5]
+        .map(f32::to_bits)
+        .into_iter()
+        .chain([u32::MAX])
+        .chain([1.0f32, 2.0, 6.0, 0.445, 1.85, 0.2, 10.0, 5.0, 12.0].map(f32::to_bits))
+        .collect();
+    assert_eq!(words, expected);
+    assert_eq!(
+        body[24..28],
+        [0xff; 4],
+        "BobberSplashCompositeEffectId is -1"
+    );
+}
+
+#[test]
 fn a_refused_cast_sends_nothing_and_changes_nothing() {
     let (fixture, mut service) = running();
     route(&mut service, &fixture, &register_request(), T0).unwrap();
     let mut twin = service.clone();
-    let far = fishing_packets::cast_at(ACTOR, [0.0, 0.0, 0.0], 500.0);
-    assert!(route(&mut service, &fixture, &far, T0 + 10).is_err());
+    // MinCastDistance 3 m and MaxCastDistance 20 m (client defaults, player words 1 and 2).
+    for distance in [2.5, 20.5, 500.0] {
+        let cast = fishing_packets::cast_at(ACTOR, [0.0, 0.0, 0.0], distance);
+        assert!(
+            route(&mut service, &fixture, &cast, T0 + 10).is_err(),
+            "{distance} m"
+        );
+    }
     assert_eq!(service.phase(PLAYER), Some(Phase::Idle));
     // The refused service answers the next good cast exactly like its untouched twin, so the
     // attempt and the cast sequence (the fish id) were not consumed.

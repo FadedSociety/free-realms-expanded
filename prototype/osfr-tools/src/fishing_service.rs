@@ -58,8 +58,8 @@ const STATUS_FISHING: u32 = 0x40_0001;
 const STATUS_NORMAL: u32 = 1;
 /// The Fisherman job's profile id (`jobs.json`). Catches pay its XP when the job is unlocked.
 pub const FISHERMAN_PROFILE: i32 = 137;
-/// (R) How far from the spot a fisherman may wander before the round ends. The cast reach is at
-/// most 35 m (`MaxCastDistance`), so this is 15 m past the longest cast.
+/// (R) How far from the spot a fisherman may wander before the round ends. Independent of the
+/// cast reach (`MaxCastDistance`, player word 2 in `fishing.json`).
 const LEASH_M: f32 = 50.0;
 const SPOTS_FILE: &str = "fishing_spots.json";
 const MAX_SPOTS_FILE: usize = 64 * 1024;
@@ -89,6 +89,10 @@ static CONTENT: LazyLock<Content> = LazyLock::new(|| {
     assert!(
         content.models.valid(),
         "fishing.json models: ids must be positive and motion within 0..=100"
+    );
+    assert!(
+        content.registration.valid(),
+        "fishing.json registration: player word 6 and zone word 3 must be whole numbers"
     );
     content
 });
@@ -198,7 +202,8 @@ impl FishingService {
             && CONTENT.timing.nibble_ms > 0
             && CONTENT.timing.reel_window_ms > 0
             && CONTENT.timing.source.contains("R:")
-            && CONTENT.registration.source.contains("R:")
+            && CONTENT.registration.source.contains("client")
+            && CONTENT.registration.valid()
             && CONTENT.models.valid()
             && CONTENT.sizes.len() == 4
             && CONTENT.sizes.iter().enumerate().all(|(i, size)| {
@@ -1077,7 +1082,8 @@ fn registration_reply(tracked: &Tracked) -> Result<Vec<u8>, Error> {
     let mut out = packet(Sub::RegisterPlayerResponse, Vec::new());
     for (index, value) in CONTENT.registration.player_words.iter().enumerate() {
         if index == 6 {
-            out.extend((*value as u32).to_le_bytes());
+            // BobberSplashCompositeEffectId: the client default is -1, so it goes out as FF FF FF FF.
+            out.extend((*value as i32).to_le_bytes());
         } else {
             out.extend(value.to_le_bytes());
         }
@@ -1619,11 +1625,23 @@ struct Timing {
 
 #[derive(Deserialize)]
 struct Registration {
+    /// The 138/3 player block in client reader order (`0x00b65880`). Word 6
+    /// (BobberSplashCompositeEffectId) goes out as an i32, the rest as f32 (`registration_reply`).
     player_words: [f32; 16],
     underwater_sky: String,
+    /// The 138/3 zone block (`0x00b67240`). Word 3 (TensionMeterAmplifier) goes out as a u32.
     zone_words: [f32; 5],
     integer_values: Vec<u32>,
     source: String,
+}
+
+impl Registration {
+    /// The integer words must be whole and in range, so `registration_reply`'s casts are exact.
+    /// The round trip also refuses NaN and infinities.
+    fn valid(&self) -> bool {
+        let (splash, amplifier) = (self.player_words[6], self.zone_words[3]);
+        splash as i32 as f32 == splash && amplifier as u32 as f32 == amplifier
+    }
 }
 
 /// Client model ids and fish motion for 138/8 and 138/18; provenance in `fishing.json`.
@@ -1712,5 +1730,23 @@ mod tests {
         json["models"]["fish_by_grade"][2] = 1672.into();
         json["models"]["fish_motion_tail"] = 100.5.into();
         assert!(!valid(&json));
+    }
+
+    #[test]
+    fn registration_refuses_fractional_integer_words() {
+        let mut json: serde_json::Value = serde_json::from_str(CONTENT_JSON).unwrap();
+        let valid = |json: &serde_json::Value| {
+            serde_json::from_value::<Registration>(json["registration"].clone())
+                .unwrap()
+                .valid()
+        };
+        assert!(valid(&json));
+        json["registration"]["player_words"][6] = 0.5.into();
+        assert!(!valid(&json));
+        json["registration"]["player_words"][6] = (-1.0).into();
+        json["registration"]["zone_words"][3] = 1.5.into();
+        assert!(!valid(&json));
+        json["registration"]["zone_words"][3] = (-1.0).into();
+        assert!(!valid(&json), "zone word 3 is a u32");
     }
 }

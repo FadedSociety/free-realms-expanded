@@ -14,22 +14,22 @@
   },
   "registration": {
     "player_words": [
+      0.5,
       3.0,
+      20.0,
+      0.2,
+      5.0,
+      0.5,
+      -1.0,
+      1.0,
       2.0,
-      35.0,
-      1.0,
-      15.0,
-      3.0,
-      0.0,
-      100.0,
-      1.0,
-      12.0,
-      0.65,
-      0.0,
-      1.0,
-      30.0,
-      12.0,
-      5.0
+      6.0,
+      0.445,
+      1.85,
+      0.2,
+      10.0,
+      5.0,
+      12.0
     ],
     "underwater_sky": "",
     "zone_words": [
@@ -40,7 +40,7 @@
       0.0
     ],
     "integer_values": [],
-    "source": "R: values project into recovered sub-3 fields; originals are unavailable."
+    "source": "client compiled defaults at 0x0107b6d0 (wire order reader 0x00b65880); the shipped bbe_FishingPlayerConfig.txt is lost, so these are fallbacks, not proven live tuning"
   },
   "models": {
     "bobber": 1063,
