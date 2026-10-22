@@ -742,7 +742,13 @@ pub fn assert_returned(gateway: &Gateway, marker: [f32; 3]) {
 
 pub struct PortalRow {
     pub id: u32,
+    /// `+0x10`: the client files the row under `Activities.Category<category>`.
+    pub category: u32,
+    /// `+0x14` ImageSetId, the strip icon.
+    pub icon: u32,
     pub title: u32,
+    /// `+0x28` NameId, the name the battle finder strip shows.
+    pub name: u32,
     pub description: u32,
     pub difficulty: u32,
     pub can_join: bool,
@@ -807,7 +813,10 @@ pub fn decode_list(packet: &[u8]) -> Vec<PortalRow> {
         let _mystery_chest_icon = cursor.u32();
         rows.push(PortalRow {
             id: words[0],
+            category: words[2],
+            icon: words[3],
             title: words[5],
+            name: words[7],
             description: words[6],
             difficulty,
             can_join,

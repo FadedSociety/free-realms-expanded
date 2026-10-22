@@ -13,6 +13,10 @@ use osfr_tools::{
 };
 use std::path::PathBuf;
 
+#[path = "common/field_battle_fixture.rs"]
+mod field_battle_fixture;
+use field_battle_fixture::{battles, decode_list};
+
 const LAKESHORE: [f32; 3] = [-733.952, 9.09, 945.973];
 const BATTLE: u32 = 96;
 /// Brawler, the combat job the opening gives every player.
@@ -110,6 +114,48 @@ fn world_entry_and_refresh_publish_the_same_populated_list() {
     switch_to_combat(&mut game);
     let after = game.handle_in_world(&REFRESH, &character(), 1_500).unwrap();
     assert_eq!(first_can_join(lists(&after)[0]), 1);
+}
+
+/// T399: Games > Battles opens the finder on `Activities.Category10` (client
+/// `ActivityCategories.txt` row 10, "Battles"), and the client files each row under its
+/// Category dword (`00cea720`). Every shipped battle must land there with its name and
+/// icon, and a combat job gets PLAY! for every battle without a level floor.
+#[test]
+fn world_entry_lists_every_battle_under_battles() {
+    const BATTLES_CATEGORY: u32 = 10;
+    let mut game = game();
+    let entry = game.initialize_world(&character(), 500).unwrap();
+    let rows = decode_list(lists(&entry)[0]);
+    switch_to_combat(&mut game);
+    let refreshed =
+        decode_list(lists(&game.handle_in_world(&REFRESH, &character(), 1_000).unwrap())[0]);
+    let file = battles();
+    let shipped = file["battles"].as_array().unwrap();
+    assert!(!shipped.is_empty());
+    for battle in shipped {
+        let id = battle["id"].as_u64().unwrap() as u32;
+        let field = |name: &str| battle[name].as_i64().unwrap_or(0);
+        let mut listed = rows.iter().filter(|row| row.id == id);
+        let row = listed
+            .next()
+            .unwrap_or_else(|| panic!("battle {id} is listed"));
+        assert!(listed.next().is_none(), "battle {id} is listed once");
+        assert_eq!(
+            row.category, BATTLES_CATEGORY,
+            "battle {id} is under Battles"
+        );
+        assert_eq!(i64::from(row.name), field("title_id"), "battle {id} name");
+        assert_eq!(
+            i64::from(row.icon),
+            field("icon_id").max(0),
+            "battle {id} icon"
+        );
+        assert!(!row.can_join, "battle {id}: no PLAY! before a combat job");
+        let after = refreshed.iter().find(|row| row.id == id).unwrap();
+        if field("required_combat_level") == 0 {
+            assert!(after.can_join, "battle {id}: PLAY! for a combat job");
+        }
+    }
 }
 
 #[test]

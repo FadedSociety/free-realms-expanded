@@ -123,17 +123,18 @@ fn list_matches_the_client_reader_for_every_row() {
     let list = decode_list(&catalogue.list_packet(FIGHTER));
     assert_eq!(list.key, 1, "entry type 1 = world tunnel");
     assert_eq!(list.rows.len(), 2);
-    // Id, AppSystemId, Category, ImageSetId, Position, Name, Desc, NameId, DescId, EntryType
+    // Id, AppSystemId, Category, ImageSetId, Position, Name, Desc, NameId, DescId, EntryType.
+    // Category 10 is the client's "Battles" row (`ActivityCategories.txt`); 18 is Micro-Games.
     assert_eq!(
         list.rows[0][..10],
-        [96, 0, 18, 4_596, 1, 42_096, 43_096, 42_096, 43_096, 1]
+        [96, 0, 10, 4_596, 1, 42_096, 43_096, 42_096, 43_096, 1]
     );
     assert_eq!(list.rows[1][0], 12302);
     assert_eq!(list.rows[1][4], 2, "positions follow list order");
     // +0x34, +0x38, Difficulty, +0xc, +0x68, MysteryChestIcon
     assert_eq!(list.rows[0][10..], [0, 0, 2, 0, 0, 0]);
-    assert_eq!(list.strings[0].0, "hacknslash_detail.dds");
-    assert_eq!(list.strings[0].1, "hacknslash_detail.dds");
+    assert_eq!(list.strings[0].0, "bandit_hideout_detail.dds");
+    assert_eq!(list.strings[0].1, "bandit_hideout_detail.dds");
     assert!(
         list.flags
             .iter()

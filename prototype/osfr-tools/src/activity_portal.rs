@@ -27,20 +27,26 @@
 //!   or missing bytes. Field-to-column mapping is from `ClientActivityDatasource::GetCell`
 //!   (`00cfc180`, jump table `00cfc434`) and the Lua `Activities_col`.
 //! * `Ui.RequestToJoinActivity(id, 0)` (portal Play button) is the only Lua entry to `00be7d80`.
+//! * Category decides where a row shows (T399). After every list the client files each row under
+//!   the datasource `"Activities.Category%d"` of its Category dword (`00cea720`, format `00cfc0b0`
+//!   at `00cea896`). The Games window lists the `ActivityCategories.txt` rows (loader `00be58f0`)
+//!   and opens the finder on `Activities.Category<row ID>`, adding every row of it (Lua
+//!   `BrowserV2:PopulateGames`, `MinigameDetail:Populate`). Row 10 is "Battles" (name 31018), row
+//!   18 is "Micro-Games" (31026), row 22 is "Soccer" (31030).
 //!
 //! # Reconstructed policy (R)
 //!
 //! * Only activities backed by a running battle or a configured native soccer match are published:
-//!   one row per `field_battles.json` battle (category 18) and one per `soccer.json` game (category
-//!   22, art `Soccer_Briarwood.dds`; both values are the client `ActivityCategories.txt` row 22),
-//!   entry type 1. Every other activity (races, mining, card game ...) is simply not listed, so the
-//!   client cannot ask for it.
+//!   one row per `field_battles.json` battle (category 10, Battles) and one per `soccer.json` game
+//!   (category 22, art `Soccer_Briarwood.dds`; both values are the client `ActivityCategories.txt`
+//!   row 22), entry type 1. Every other activity (races, mining, card game ...) is simply not
+//!   listed, so the client cannot ask for it.
 //! * `CanPlayerJoin` is per player: battle rows require a combat job at the configured level;
 //!   chess is open, and soccer uses its own configured level floor without a job gate. A
 //!   refused Play says why in chat (the 147/2 join-error body is not recovered). The owning
 //!   activity, never the portal request, awards.
 //! * The preferred/featured/tutorial/AppSystem/chest fields and the two unknown dwords are 0.
-//!   Image names come from each row's client category (`hacknslash_detail.dds` for combat and
+//!   Image names come from each row's client category (`bandit_hideout_detail.dds` for battles and
 //!   `Soccer_Briarwood.dds` for soccer).
 
 use serde::Deserialize;
@@ -57,12 +63,14 @@ const SUB_LIST: u8 = 1;
 const SUB_PLAY: u8 = 2;
 const SUB_REFRESH: u8 = 4;
 const ENTRY_WORLD_TUNNEL: u32 = 1;
-const COMBAT_CATEGORY: u32 = 18;
+/// "Battles", row 10 of the client `Resources/ActivityCategories.txt` (T399; was 18, Micro-Games).
+const COMBAT_CATEGORY: u32 = 10;
 /// Recovered soccer category row 22 in the client `Resources/ActivityCategories.txt`.
 pub const SOCCER_CATEGORY: u32 = 22;
 /// Recovered category-22 art name in the same client table.
 pub const SOCCER_ART: &str = "Soccer_Briarwood.dds";
-const ART: &str = "hacknslash_detail.dds";
+/// Category-10 art in the same client table.
+const ART: &str = "bandit_hideout_detail.dds";
 /// (R) The type-6 row in `MiniGameTypeData.txt` carries CATEGORY_ID 0; the
 /// portal categories table has no board-game row, so chess rows use it as-is.
 const CHESS_CATEGORY: u32 = 0;
