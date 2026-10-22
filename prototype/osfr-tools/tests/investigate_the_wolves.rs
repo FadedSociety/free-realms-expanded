@@ -102,8 +102,6 @@ const MARKER_GUID: u64 = 100_001_235_000;
 const ARENA_ZONE: u32 = 9_600;
 const ARENA_ARRIVAL: [f32; 3] = [136.0, -0.5, 155.0];
 const VELA: u64 = 9_500_000_281;
-const VENDOR_ITEM: i32 = 75_691;
-const VENDOR_PRICE: u32 = 75;
 /// `npc_interaction::SHOP_STRING_ID`: the 26/9 Shop option label.
 const SHOP_LABEL: u32 = 432_156;
 
@@ -149,6 +147,39 @@ fn marker_guid(row: &Value) -> u64 {
 
 fn battle_coins(row: &Value) -> u32 {
     row["reward_coins"].as_u64().expect("the battle payout") as u32
+}
+
+/// The cheapest item the vendor stocks and the catalogue price the 66/43 route
+/// charges: `vendors.json` authorizes the stock, `stores.json` prices it.
+fn vendor_item(npc_id: u64) -> (i32, u32) {
+    let vendors = read_json(&content_dir().join("vendors.json"));
+    let stock = vendors["vendors"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["npc_id"].as_u64() == Some(npc_id))
+        .expect("the vendor's stock row")["item_ids"]
+        .as_array()
+        .unwrap();
+    let stores = read_json(&content_dir().join("stores.json"));
+    let prices: BTreeMap<i64, u64> = stores["items"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|row| {
+            Some((
+                row["item_id"].as_i64()?,
+                row["purchase_price_coins"].as_u64()?,
+            ))
+        })
+        .collect();
+    stock
+        .iter()
+        .filter_map(|id| id.as_i64())
+        .filter_map(|id| prices.get(&id).map(|price| (id, *price)))
+        .min_by_key(|(_, price)| *price)
+        .map(|(id, price)| (id as i32, price as u32))
+        .expect("the vendor stocks a priced item")
 }
 
 fn profiles(active: i32, unlocked: &[i32]) -> ProfileState {
@@ -559,7 +590,8 @@ fn a_cancel_credits_nothing() {
 
 /// A lost run (the arena roster knocks the player out) leaves the quest Active
 /// at 0/1 and pays nothing. The client's free 41/122 revive (constructor
-/// `0x0093bd80`; header words plus the trailing bool) then restores full health,
+/// `0x0093bd80`; header words plus the trailing bool) then restores full health
+/// (the 38/1 reply's current equals its maximum and the arena-entry value),
 /// clears the lost instance and returns the marker's return pose; the return
 /// Talk neither offers nor turns in anything.
 #[test]
@@ -576,11 +608,18 @@ fn a_loss_credits_nothing_and_the_free_revive_restores_the_player() {
     now += 10;
     let instance = enter_arena(&mut game, &mut at, &details, &mut now);
     let coins_before = coins(&game);
+    let health_before = game
+        .state()
+        .encounter
+        .as_ref()
+        .map(|state| state.player_health)
+        .expect("the arena encounter state exists");
+    assert!(health_before > 0, "the player enters the arena standing");
 
-    // Stand on the first Alpha Wolf and run the production 20 Hz tick until the
-    // roster's melee knocks the player out. The arena damage and the loss are
-    // server-driven; no client packet reports either.
-    at.position = [133.0, -0.6, 173.0];
+    // Stand on the first roster enemy's authored spawn and run the production
+    // 20 Hz tick until its melee knocks the player out. The arena damage and the
+    // loss are server-driven; no client packet reports either.
+    at.position = position(&row["enemies"][0]["position"]);
     let mut knock_out = None;
     for _ in 0..60 {
         now += 1_000;
@@ -622,6 +661,36 @@ fn a_loss_credits_nothing_and_the_free_revive_restores_the_player() {
     revive.push(0);
     let restored = send(&mut game, &at, &revive, now);
     now += 10;
+    // 38/1 Hitpoints: two u16 header words, current health, maximum health
+    // (constructor `0x0089d2b0` -> `sub_89D180(1)`; the 38/x dispatch arm
+    // `0x0093938f` reads the body through `0x008f8890` -> `0x008d8210`, which
+    // refuses trailing bytes, and stores the first dword as the current health
+    // at client+0x484). A lost instance exits through the shared 41/109 exit,
+    // which restores full health.
+    let healed = restored
+        .replies
+        .iter()
+        .find(|packet| packet.starts_with(&[38, 0, 1, 0]))
+        .expect("the free revive sends 38/1 player health");
+    assert_eq!(healed.len(), 12, "38/1 is the header and two dwords");
+    assert_eq!(
+        u32_at(healed, 4),
+        health_before,
+        "the revive restores the arena-entry health"
+    );
+    assert_eq!(
+        u32_at(healed, 8),
+        health_before,
+        "the revived health is the maximum"
+    );
+    assert_eq!(
+        game.state()
+            .encounter
+            .as_ref()
+            .map(|state| state.player_health),
+        Some(health_before),
+        "the saved encounter health is full again"
+    );
     let zone = restored
         .zoning
         .expect("the free revive leaves the lost instance");
@@ -929,9 +998,11 @@ fn a_live_change_before_the_turn_in_survives() {
 }
 
 /// A live vendor purchase commits between the win and the turn-in and survives
-/// the 49/14 payout: Vela's real 26/8 -> 26/10 Shop -> 66/43 buy debits 75
-/// coins and adds a unit of the owned stack, then 49/14 adds only its own 20
-/// coins on the live wallet and bag, never restoring the accept-time snapshot.
+/// the 49/14 payout: Vela's real 26/8 -> 26/10 Shop -> 66/43 buy debits the
+/// catalogue price and adds a new stack of the item (the opening bag has none),
+/// then 49/14 adds only its own 20 coins on the live wallet and bag, never
+/// restoring the accept-time snapshot. The item and price come from
+/// `vendors.json`/`stores.json`, the same content the 66/42/66/43 route reads.
 /// This is the real merchant transaction; `a_live_change_before_the_turn_in_survives`
 /// keeps the developer-seam grant as the complementary case.
 #[test]
@@ -940,6 +1011,7 @@ fn a_vendor_purchase_before_the_turn_in_survives() {
     let row = battle_row();
     let (mut game, mut at) = player(&fixture, profiles(ADVENTURER, &[ADVENTURER, BRAWLER]));
     let mut now = 1_000;
+    let (item, price) = vendor_item(VELA);
 
     accept_at_anne(&mut game, &at, &mut now);
     win_sheep_watch(&mut game, &mut at, &row, &mut now);
@@ -948,7 +1020,12 @@ fn a_vendor_purchase_before_the_turn_in_survives() {
 
     // Fund the purchase through the developer seam (the fixture opens with an
     // empty wallet); the buy itself is the real merchant route.
-    let funded = send(&mut game, &at, &chat::local_request("realm coins 900"), now);
+    let funded = send(
+        &mut game,
+        &at,
+        &chat::local_request(&format!("realm coins {}", price + 100)),
+        now,
+    );
     assert!(funded.changed, "the funding grant commits");
     now += 10;
 
@@ -957,15 +1034,14 @@ fn a_vendor_purchase_before_the_turn_in_survives() {
     assert!(!list.is_empty(), "Vela sends a 66/42 list");
     now += 10;
     let coins_before = coins(&game);
-    let items_before = item_count(&game, VENDOR_ITEM);
+    let items_before = item_count(&game, item);
+    assert_eq!(
+        items_before, 0,
+        "the opening bag has no stack of the bought item"
+    );
     // The shared vendor kit carries the 66/43 serializer `0x00b3ab20` and the
     // 66/44 status reader `0x00b32430` (status at wire offset 48).
-    let bought = send(
-        &mut game,
-        &at,
-        &vendor_buy_packet(7_001, VENDOR_ITEM, 1),
-        now,
-    );
+    let bought = send(&mut game, &at, &vendor_buy_packet(7_001, item, 1), now);
     now += 10;
     assert!(bought.changed, "the vendor buy commits");
     assert_eq!(
@@ -980,11 +1056,11 @@ fn a_vendor_purchase_before_the_turn_in_survives() {
     );
     assert_eq!(
         coins(&game),
-        coins_before - VENDOR_PRICE,
+        coins_before - price,
         "the buy debits the catalogue price"
     );
     assert_eq!(
-        item_count(&game, VENDOR_ITEM),
+        item_count(&game, item),
         items_before + 1,
         "the buy adds the item"
     );
@@ -995,11 +1071,11 @@ fn a_vendor_purchase_before_the_turn_in_survives() {
     finish_quest(&mut game, &at, QUEST, ADVENTURER, COINS, 0, now);
     assert_eq!(
         coins(&game),
-        coins_before - VENDOR_PRICE + COINS,
+        coins_before - price + COINS,
         "49/14 paid on the accept-time wallet instead of the live one"
     );
     assert_eq!(
-        item_count(&game, VENDOR_ITEM),
+        item_count(&game, item),
         items_before + 1,
         "49/14 restored the accept-time inventory over the live purchase"
     );
@@ -1162,16 +1238,21 @@ fn the_quest_record_text_giver_and_battle_resolve() {
     assert_eq!(rewards[0]["coins"], COINS);
     assert_eq!(rewards[0]["items"], serde_json::json!([]));
     assert_eq!(rewards[0]["job_xp"], serde_json::json!({}));
-    // The reward row itself cites the checked guide and records that it gives
-    // no payout, so an auditor does not have to infer it from the outer source.
+    // The reward row itself cites the checked guide and separates its dungeon
+    // rewards from a quest payout, so an auditor does not have to infer it from
+    // the outer source.
     let reward_evidence = rewards[0]["source"][0]["evidence"].as_str().unwrap();
     assert!(
         reward_evidence.contains("Dungeons/Sheep Watch.md"),
         "the reward source cites the Sheep Watch guide"
     );
     assert!(
-        reward_evidence.contains("gives no payout"),
-        "the reward source records that the guide gives no payout"
+        reward_evidence.contains("no quest payout"),
+        "the reward source records that the guide has no quest payout"
+    );
+    assert!(
+        reward_evidence.contains("prize-wheel"),
+        "the reward source records the guide's dungeon rewards"
     );
     for (index, tag) in record["source"].as_array().unwrap().iter().enumerate() {
         assert!(

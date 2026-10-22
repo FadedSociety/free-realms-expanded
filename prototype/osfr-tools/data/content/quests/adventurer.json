@@ -4285,7 +4285,7 @@
           "source": [
             {
               "kind": "reconstructed",
-              "evidence": "(R) T360: notes/Build Guides/Content/Dungeons/Sheep Watch.md gives no payout (checked 2026-10-21); the retail payout is unknown. 20 coins is the W110 small-referral fallback in the existing small final-era coin style. No item is granted (a free, sellable grant is avoided) and job_xp is empty so tests/quest_job_xp.rs's pinned configured-XP table is unchanged."
+              "evidence": "(R) T360: notes/Build Guides/Content/Dungeons/Sheep Watch.md has no quest payout; its Rewards table lists only the dungeon's own rewards (122 Stars, an 8-coin prize-wheel slot, a 51-coin members bonus, wheel clothing, achievements and a reward text with no amount; checked 2026-10-21). The retail quest payout is unknown. 20 coins is the W110 small-referral fallback in the existing small final-era coin style. No item is granted (a free, sellable grant is avoided) and job_xp is empty so tests/quest_job_xp.rs's pinned configured-XP table is unchanged."
             }
           ]
         }
@@ -4301,7 +4301,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T360: no numeric server quest id is recovered; 3000061 is a stable batch key appended after 3000060. prerequisite_quest_ids is empty because the guide names no predecessor for this regional referral. The guide's row supplies no payout, so the reward decision is recorded on rewards[0].source."
+          "evidence": "(R) T360: no numeric server quest id is recovered; 3000061 is a stable batch key appended after 3000060. prerequisite_quest_ids is empty because the guide names no predecessor for this regional referral. The guide's Rewards table lists only the dungeon's own rewards (Stars, prize-wheel and members coins), no quest payout, so the reward decision is recorded on rewards[0].source."
         }
       ],
       "enabled": true
