@@ -1765,3 +1765,8 @@ mod quest_reward_save_failure;
 #[cfg(test)]
 #[path = "f276_field_session_save.rs"]
 mod f276_field_session_save;
+
+/// L039: a save off the map or deep under the terrain enters at the nearest warpstone.
+#[cfg(test)]
+#[path = "l039_login_pose.rs"]
+mod l039_login_pose;

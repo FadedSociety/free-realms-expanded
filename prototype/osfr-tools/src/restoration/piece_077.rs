@@ -846,6 +846,12 @@ pub struct WarpRules {
     pub stuck_cooldown_ms: u64,
     /// A character this far under the terrain counts as fallen out of the world.
     pub below_world_m: f32,
+    /// L039 (R): a saved pose this far under the terrain is moved at world
+    /// entry. The grid keeps the highest surface, and zone 0's mines and crypts
+    /// lie up to 188 m under it (103 spawns in `npc_spawns_extra.json` are over
+    /// 50 m under; deepest: 100000002757 at -904, -91, 2478), so the default
+    /// stays clear of every known interior.
+    pub login_below_world_m: f32,
 }
 
 impl Default for WarpRules {
@@ -855,6 +861,7 @@ impl Default for WarpRules {
             cooldown_ms: 5_000,
             stuck_cooldown_ms: 300_000,
             below_world_m: 3.0,
+            login_below_world_m: 250.0,
         }
     }
 }
@@ -870,6 +877,9 @@ impl WarpRules {
         if !(0.5..=100.0).contains(&self.below_world_m) {
             return Err("below-world margin must be 0.5-100 m");
         }
+        if !(3.0..=500.0).contains(&self.login_below_world_m) {
+            return Err("login below-world margin must be 3-500 m");
+        }
         Ok(self)
     }
 }
@@ -877,6 +887,12 @@ impl WarpRules {
 /// (R) Arrival is lifted this far above the terrain; the client grounds a
 /// character from above, never from below. Same value as `realm goto`.
 const ARRIVAL_LIFT_M: f32 = 0.5;
+
+/// (R) L039: no terrain under the pose but terrain this far away on both sides
+/// along x or along z means a hole in the grid (a runtime object stands in it),
+/// not the edge of the map. In `lab/terrain/zone_0.hgt` the 18 small holes are
+/// at most 32 m across and every edge void or missing chunk is 252 m or more.
+const HOLE_PROBE_M: f32 = 40.0;
 
 /// Why the character may not teleport right now. The caller derives it from
 /// live state it owns (encounters, crafting/minigame movies, knockout).
@@ -1188,20 +1204,58 @@ impl WarpRegistry {
         if !fallen {
             self.check_cooldown(self.last_stuck_ms, self.rules.stuck_cooldown_ms, now_ms)?;
         }
-        let distance = |d: &WarpDestination| {
-            (d.position[0] - ctx.position[0]).powi(2) + (d.position[2] - ctx.position[2]).powi(2)
-        };
-        let nearest = *self
-            .destinations
-            .iter()
-            .filter(|d| d.is_warpstone)
-            .min_by(|a, b| distance(a).total_cmp(&distance(b)))
+        let nearest = self
+            .nearest_warpstone(ctx.position)
             .ok_or(WarpRejection::TargetUnavailable)?;
         if !fallen {
             self.last_stuck_ms = Some(now_ms);
         }
         self.last_travel_ms = Some(now_ms);
         Ok(relocate(arrive_at_destination(&nearest, ctx, world)))
+    }
+
+    /// The warpstone nearest to `position` in the plane (R): the `122` target.
+    fn nearest_warpstone(&self, position: [f32; 3]) -> Option<WarpDestination> {
+        let distance = |d: &WarpDestination| {
+            (d.position[0] - position[0]).powi(2) + (d.position[2] - position[2]).powi(2)
+        };
+        self.destinations
+            .iter()
+            .filter(|d| d.is_warpstone)
+            .min_by(|a, b| distance(a).total_cmp(&distance(b)))
+            .copied()
+    }
+
+    /// L039 (R): at world entry, an open-world pose more than
+    /// `login_below_world_m` under the terrain, or with no terrain under it and
+    /// not inside a hole (off the map), goes to the nearest warpstone exactly as
+    /// a `122` does. `ground` is the zone's loaded terrain: the caller skips the
+    /// check when none is loaded. Blockers and cooldowns do not apply, since
+    /// the character is not in the world yet, and nothing here changes state.
+    /// A recovered pose passes, so recovery is idempotent.
+    pub fn recover_login_pose(
+        &self,
+        ctx: &TravelContext,
+        ground: &dyn Fn(f32, f32) -> Option<f32>,
+    ) -> Option<(WarpRelocation, &'static str)> {
+        if ctx.zone_id != OPEN_WORLD_ZONE {
+            return None;
+        }
+        let [x, y, z] = ctx.position;
+        let hit = |dx: f32, dz: f32| ground(x + dx, z + dz).is_some();
+        let d = HOLE_PROBE_M;
+        let in_hole = (hit(d, 0.0) && hit(-d, 0.0)) || (hit(0.0, d) && hit(0.0, -d));
+        let reason = match ground(x, z) {
+            Some(height) if y < height - self.rules.login_below_world_m => "below_world",
+            None if !in_hole => "off_map",
+            _ => return None,
+        };
+        let world = WarpWorld {
+            ground,
+            friend: &|_| None,
+        };
+        let nearest = self.nearest_warpstone(ctx.position)?;
+        Some((arrive_at_destination(&nearest, ctx, &world), reason))
     }
 
     /// `58`: go to an online friend in the same open world (R). The request

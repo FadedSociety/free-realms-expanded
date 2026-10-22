@@ -952,6 +952,12 @@ fn load_gateway_from(
     // `realm` commands run by role without --dev-tools (Studio stays off).
     gateway.set_role_commands(options.account_store.is_some());
     gateway.set_terrain(options.terrain.clone());
+    // L039: every save load passes here; a recovered pose is saved at once (atomic replace).
+    if let Some((from, reason)) = gateway.recover_login_pose() {
+        save(state_path, &gateway.snapshot())?;
+        let (guid, to) = (gateway.state().guid, gateway.state().position);
+        event(json!({"event":"pose_recovered","guid":guid,"reason":reason,"from":from,"to":to}));
+    }
     gateway.set_world_dir(options.world.clone())?;
     gateway.set_stock_text(options.stock_text.clone());
     // (R) Without an account store the gateway can only bind loopback (checked

@@ -702,3 +702,165 @@ fn curated_rows_equal_the_captured_original_57() {
         assert_eq!(&row, original, "hub {}", row.id);
     }
 }
+
+/// L039: flat synthetic ground at -40 m around Cobblestone Village (warpstone 7)
+/// with two 20 m strip holes, x -1960..-1940 and z 420..440, the size of zone
+/// 0's holes under runtime objects (the pattern of the `terrain.rs` tests).
+fn cobblestone_ground() -> osfr_tools::terrain::HeightGrid {
+    let mut grid =
+        osfr_tools::terrain::HeightGrid::new([-2000.0, 300.0], [-1800.0, 500.0], 2.0).unwrap();
+    let p = |x: f32, z: f32| [x, -40.0, z];
+    for (west, east) in [(-2000.0, -1960.0), (-1940.0, -1800.0)] {
+        for (south, north) in [(300.0, 420.0), (440.0, 500.0)] {
+            grid.add_triangle([p(west, south), p(east, south), p(east, north)]);
+            grid.add_triangle([p(west, south), p(east, north), p(west, north)]);
+        }
+    }
+    grid
+}
+
+const COBBLESTONE_POSITION: [f32; 3] = [-1904.46, -39.79, 413.316];
+
+fn recover(
+    registry: &WarpRegistry,
+    zone_id: u32,
+    position: [f32; 3],
+) -> Option<([f32; 3], &'static str)> {
+    let grid = cobblestone_ground();
+    let mut ctx = ctx_at(position);
+    ctx.zone_id = zone_id;
+    let (to, reason) = registry.recover_login_pose(&ctx, &|x, z| grid.height_at(x, z))?;
+    assert_eq!(
+        to.rotation, ctx.rotation,
+        "Cobblestone keeps the saved facing"
+    );
+    Some((to.position, reason))
+}
+
+fn tuned_to_50_m() -> WarpRegistry {
+    let mut registry = WarpRegistry::curated();
+    registry
+        .set_rules(WarpRules {
+            login_below_world_m: 50.0,
+            ..WarpRules::default()
+        })
+        .unwrap();
+    registry
+}
+
+#[test]
+fn login_pose_off_the_map_or_deep_under_it_moves_to_the_nearest_warpstone() {
+    // Cobblestone's row, raised to the terrain plus the 0.5 m arrival lift.
+    let ground = cobblestone_ground()
+        .height_at(COBBLESTONE_POSITION[0], COBBLESTONE_POSITION[2])
+        .unwrap();
+    assert!((ground + 40.0).abs() < 0.01);
+    let arrival = [
+        COBBLESTONE_POSITION[0],
+        ground + 0.5,
+        COBBLESTONE_POSITION[2],
+    ];
+    let registry = WarpRegistry::curated();
+    let off_map = [-2600.0, 0.0, 400.0];
+    assert_eq!(
+        recover(&registry, OPEN_WORLD_ZONE, off_map),
+        Some((arrival, "off_map"))
+    );
+    // 20 m past the terrain edge: ground 40 m east, none west, so not a hole.
+    assert_eq!(
+        recover(&registry, OPEN_WORLD_ZONE, [-2020.0, 0.0, 400.0]),
+        Some((arrival, "off_map"))
+    );
+    assert_eq!(
+        recover(&registry, OPEN_WORLD_ZONE, [-1900.0, -300.0, 400.0]),
+        Some((arrival, "below_world"))
+    );
+    // Tuned to 50 m, a pose 60 m under moves too.
+    assert_eq!(
+        recover(&tuned_to_50_m(), OPEN_WORLD_ZONE, [-1900.0, -100.0, 400.0]),
+        Some((arrival, "below_world"))
+    );
+    // Idempotent: a recovered pose passes, whatever the tuning.
+    assert_eq!(recover(&registry, OPEN_WORLD_ZONE, arrival), None);
+    assert_eq!(recover(&tuned_to_50_m(), OPEN_WORLD_ZONE, arrival), None);
+    // The same pose the 122 rescue picks: one nearest-warpstone choice.
+    let mut rescue = WarpRegistry::curated();
+    let grid = cobblestone_ground();
+    let world = WarpWorld {
+        ground: &|x, z| grid.height_at(x, z),
+        friend: &|_| None,
+    };
+    let reply = rescue
+        .handle(&inner(122, &[]), &ctx_at(off_map), 0, &world)
+        .unwrap();
+    assert_eq!(reply.relocation.unwrap().position, arrival);
+}
+
+#[test]
+fn login_pose_on_the_ground_in_caves_holes_and_other_zones_stays() {
+    for (name, zone, position) in [
+        ("on the ground", OPEN_WORLD_ZONE, [-1900.0, -40.0, 400.0]),
+        (
+            "10 m under: a cave",
+            OPEN_WORLD_ZONE,
+            [-1900.0, -50.0, 400.0],
+        ),
+        (
+            "in a hole with ground east and west",
+            OPEN_WORLD_ZONE,
+            [-1950.0, -40.0, 400.0],
+        ),
+        (
+            "in a hole with ground north and south",
+            OPEN_WORLD_ZONE,
+            [-1850.0, -40.0, 430.0],
+        ),
+        (
+            "deep under a field battle scene",
+            9600,
+            [-1900.0, -900.0, 400.0],
+        ),
+        ("off the map in another zone", 411, [-2600.0, 0.0, 400.0]),
+    ] {
+        assert_eq!(
+            recover(&WarpRegistry::curated(), zone, position),
+            None,
+            "{name}"
+        );
+        assert_eq!(recover(&tuned_to_50_m(), zone, position), None, "{name}");
+    }
+    // A mine 190 m under the grid (zone 0 has interiors 188 m under) stays by default.
+    assert_eq!(
+        recover(
+            &WarpRegistry::curated(),
+            OPEN_WORLD_ZONE,
+            [-1900.0, -230.0, 400.0]
+        ),
+        None
+    );
+}
+
+#[test]
+fn login_below_world_margin_is_bounded_and_a_refused_rule_changes_nothing() {
+    let mut registry = WarpRegistry::curated();
+    for bad in [2.0, 600.0, -50.0, f32::NAN, f32::INFINITY] {
+        let rules = WarpRules {
+            login_below_world_m: bad,
+            ..WarpRules::default()
+        };
+        assert!(registry.set_rules(rules).is_err(), "{bad}");
+    }
+    // Still the 250 m default: 230 m under stays, 300 m under moves.
+    assert_eq!(
+        recover(&registry, OPEN_WORLD_ZONE, [-1900.0, -270.0, 400.0]),
+        None
+    );
+    assert!(recover(&registry, OPEN_WORLD_ZONE, [-1900.0, -300.0, 400.0]).is_some());
+    for good in [3.0, 500.0] {
+        let rules = WarpRules {
+            login_below_world_m: good,
+            ..WarpRules::default()
+        };
+        assert!(registry.set_rules(rules).is_ok(), "{good}");
+    }
+}

@@ -1207,6 +1207,17 @@ impl Gateway {
         self.terrain = terrain;
     }
 
+    /// L039: before login only (no pose sent yet), an open-world pose off the map or deep under
+    /// the terrain moves to the nearest warpstone. Returns the old position and why, to save and log.
+    pub fn recover_login_pose(&mut self) -> Option<([f32; 3], &'static str)> {
+        if self.logged_in {
+            return None;
+        }
+        let (to, reason) = self.gameplay.as_ref()?.recover_login_pose(&self.state)?;
+        self.movement_state = MovementState::new(to.zone_id, to.position, to.rotation);
+        Some((std::mem::replace(&mut self.state, to).position, reason))
+    }
+
     /// Enable the developer-only chat commands such as `realm goto`. Off by
     /// default so an ordinary local session cannot relocate by accident.
     pub fn set_dev_tools(&mut self, enabled: bool) {

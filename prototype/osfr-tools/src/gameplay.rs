@@ -3260,6 +3260,17 @@ impl Gameplay {
         }
     }
 
+    /// L039: `c` at the nearest warpstone when its saved pose is off the map or deep under the
+    /// terrain (`WarpRegistry::recover_login_pose`); `None` when no terrain is loaded for the zone.
+    pub fn recover_login_pose(&self, c: &CharacterState) -> Option<(CharacterState, &'static str)> {
+        let grid = self.terrain.as_ref()?.grid(c.zone_id)?;
+        let (ctx, ground) = (self.warp_context(c), |x, z| grid.height_at(x, z));
+        let (to, reason) = self.warp.recover_login_pose(&ctx, &ground)?;
+        let mut moved = c.clone();
+        (moved.position, moved.rotation) = (to.position, to.rotation);
+        Some((moved, reason))
+    }
+
     /// (R) Warpstones never interrupt a fight, a knockout or a running
     /// crafting/gathering movie; those states own the character.
     fn warp_blocker(&self) -> Option<piece_077::Blocker> {
