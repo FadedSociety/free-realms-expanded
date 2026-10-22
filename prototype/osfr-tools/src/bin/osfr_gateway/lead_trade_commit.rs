@@ -138,6 +138,14 @@ fn an_interrupted_trade_is_finished_from_its_journal_at_start() {
     let mut b = party(&dir, 6, 202);
     with_coins(&mut a, 15);
     with_coins(&mut b, 15);
+    // S17: A owns a pet, so its entry carries the roster; B's entry has none, which is the
+    // pre-S17 journal shape and must still parse.
+    let content = osfr_tools::pets::PetService::bundled_content().unwrap();
+    let definition = content.definition(1_000_015).unwrap();
+    let mut pets = osfr_tools::pets::PetService::new(content).unwrap();
+    pets.adopt_vendor_grant(1, &definition, 0).unwrap();
+    let roster = pets.document_value().unwrap();
+    a.gateway.adopt_pets(Some(roster.clone())).unwrap();
     // The crash happened after the journal and before either save.
     let journal: Vec<TradeJournalEntry> = [&a, &b]
         .iter()
@@ -146,6 +154,8 @@ fn an_interrupted_trade_is_finished_from_its_journal_at_start() {
             snapshot: party.gateway.snapshot(),
         })
         .collect();
+    let written = serde_json::to_value(&journal).unwrap();
+    assert!(written[1]["snapshot"].get("pets").is_none());
     fs::write(
         dir.path()
             .join(format!("trade-7-1.{TRADE_JOURNAL_EXTENSION}")),
@@ -157,6 +167,9 @@ fn an_interrupted_trade_is_finished_from_its_journal_at_start() {
     assert_eq!(recover_trade_journals(dir.path()).unwrap(), 1);
     assert_eq!(saved_coins(&a.state_path), 15);
     assert_eq!(saved_coins(&b.state_path), 15);
+    let saved: serde_json::Value =
+        serde_json::from_slice(&fs::read(&a.state_path).unwrap()).unwrap();
+    assert_eq!(saved["pets"], roster, "the journal carried the roster");
     assert!(
         leftovers(dir.path()).is_empty(),
         "{:?}",

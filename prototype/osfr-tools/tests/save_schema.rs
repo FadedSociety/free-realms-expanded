@@ -1,6 +1,7 @@
 use osfr_tools::{
     character_store::{self, CharacterState},
     game_store,
+    pets::PetService,
 };
 use serde_json::Value;
 use std::{
@@ -252,7 +253,9 @@ fn schema_five_migrates_pet_roster_and_preserves_housing_and_counters() {
         "pets": [],
         "vendor_grants": {},
     });
-    game_store::save_pets_state(&file.path, &roster).unwrap();
+    let mut loaded = game_store::load_or_create(&file.path, character()).unwrap();
+    loaded.pets = Some(roster.clone());
+    game_store::save(&file.path, &loaded).unwrap();
     let migrated: Value = serde_json::from_slice(&fs::read(&file.path).unwrap()).unwrap();
     assert_eq!(
         migrated["schema_version"],
@@ -262,12 +265,11 @@ fn schema_five_migrates_pet_roster_and_preserves_housing_and_counters() {
     assert_eq!(migrated["housing"], housing);
     assert_eq!(migrated["pets"], roster);
     assert_eq!(instance_counters(&migrated), counters);
-    assert_eq!(
-        game_store::load_pets_state::<Value>(&file.path).unwrap(),
-        Some(roster)
-    );
+    let mut loaded = game_store::load_or_create(&file.path, character()).unwrap();
+    assert_eq!(loaded.pets, Some(roster));
 
-    let loaded = game_store::load_or_create(&file.path, character()).unwrap();
+    // `None` (an empty live roster) keeps the roster already on disk.
+    loaded.pets = None;
     game_store::save(&file.path, &loaded).unwrap();
     let rewritten: Value = serde_json::from_slice(&fs::read(&file.path).unwrap()).unwrap();
     assert_eq!(
@@ -277,4 +279,25 @@ fn schema_five_migrates_pet_roster_and_preserves_housing_and_counters() {
     assert_eq!(rewritten["pets"]["next_pet_id"], 2);
     assert_eq!(rewritten["housing"], housing);
     assert_eq!(instance_counters(&rewritten), counters);
+}
+
+/// S17: a save in the shape the pre-S17 `save_with_pets` wrote (fc39966 built the same
+/// `Document` with the roster from `serde_json::to_value`) loads with the same roster, and
+/// re-saving the loaded snapshot rewrites the same bytes.
+#[test]
+fn a_pre_s17_pet_save_loads_the_same_roster_and_resaves_identically() {
+    let file = SaveFile::new();
+    let fixture = include_bytes!("fixtures/save_schema/pets-save-with-pets.json");
+    fs::write(&file.path, fixture).unwrap();
+    let loaded = game_store::load_or_create(&file.path, character()).unwrap();
+    let pets =
+        PetService::from_document(PetService::bundled_content().unwrap(), loaded.pets.clone())
+            .unwrap();
+    let pet = pets.pet(1).unwrap();
+    assert_eq!((pet.species_id, pet.name.as_str()), (1_000_015, "Ace"));
+    assert!(pet.learned_tricks.contains(&1));
+    assert_eq!(pet.favorite_tricks[0], Some(1));
+    assert_eq!(pets.document_value(), loaded.pets);
+    game_store::save(&file.path, &loaded).unwrap();
+    assert_eq!(fs::read(&file.path).unwrap(), fixture);
 }

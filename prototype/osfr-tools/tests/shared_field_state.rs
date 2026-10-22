@@ -951,6 +951,7 @@ fn create_content(root: &Path) -> PathBuf {
             &osfr_tools::game_store::Snapshot {
                 character,
                 gameplay: Some(game.state()),
+                pets: None,
             },
         )
         .unwrap();

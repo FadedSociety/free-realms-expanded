@@ -102,6 +102,7 @@ fn save(game: &Gameplay, fixture: &RewardFixture, character: &CharacterState) ->
         &Snapshot {
             character: character.clone(),
             gameplay: Some(game.state()),
+            pets: None,
         },
     )
     .unwrap();

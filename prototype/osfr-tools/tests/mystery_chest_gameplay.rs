@@ -91,6 +91,7 @@ fn private_confirmation_atomic_grant_replay_and_disk_restore() {
     let snap = game_store::Snapshot {
         character: ch.clone(),
         gameplay: Some(after.clone()),
+        pets: None,
     };
     game_store::save(&save, &snap).unwrap();
     let restored = game_store::load_or_create(&save, ch.clone()).unwrap();

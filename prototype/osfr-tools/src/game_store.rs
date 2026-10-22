@@ -1,5 +1,6 @@
 //! Version-seven character, gameplay, housing, pet and recipe snapshots, committed together.
 //! Older envelopes migrate without changing character, gameplay or instance-counter state.
+//! The pet roster rides in `Snapshot` (S17), so one `replace_bytes` carries it with the rest.
 use crate::character_store::{CharacterState, replace_bytes};
 use crate::gameplay::GameplayState;
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
@@ -23,6 +24,12 @@ pub struct Snapshot {
     pub character: CharacterState,
     #[serde(default)]
     pub gameplay: Option<GameplayState>,
+    /// The saved pet roster (`pets::PetRoster`), written in the same atomic replace as the
+    /// character and gameplay, so an adoption's spent item and its new pet land together or not
+    /// at all. `None` keeps the roster already on disk (an empty live roster sends `None`); a
+    /// future feature that can shrink a roster (release, trade away) must send `Some`.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub pets: Option<Value>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -52,6 +59,7 @@ pub fn load_or_create(path: &Path, initial: CharacterState) -> io::Result<Snapsh
             let initial = Snapshot {
                 character: initial,
                 gameplay: None,
+                pets: None,
             };
             save(path, &initial)?;
             return Ok(initial);
@@ -61,26 +69,17 @@ pub fn load_or_create(path: &Path, initial: CharacterState) -> io::Result<Snapsh
     Ok(Snapshot {
         character: document.character,
         gameplay: document.gameplay,
+        pets: document.pets,
     })
 }
 
+/// Write the whole character document in one atomic replace. Housing is read back from disk
+/// (it still saves read-modify-write), and so is the roster when `snapshot.pets` is `None`.
 pub fn save(path: &Path, snapshot: &Snapshot) -> io::Result<()> {
-    save_document(path, snapshot, None)
-}
-
-/// Write the character snapshot and the pet roster in one atomic replace. A pet change that also
-/// changes the character (adoption consumes an item) must never land as two writes: a crash
-/// between them would keep the item without the pet, or the pet without spending the item.
-pub fn save_with_pets<T: Serialize>(path: &Path, snapshot: &Snapshot, pets: &T) -> io::Result<()> {
-    let pets = serde_json::to_value(pets).map_err(invalid)?;
-    save_document(path, snapshot, Some(pets))
-}
-
-fn save_document(path: &Path, snapshot: &Snapshot, new_pets: Option<Value>) -> io::Result<()> {
     snapshot.character.validate()?;
     let (housing, pets) = match read_document(path) {
-        Ok(document) => (document.housing, new_pets.or(document.pets)),
-        Err(error) if error.kind() == io::ErrorKind::NotFound => (None, new_pets),
+        Ok(document) => (document.housing, snapshot.pets.clone().or(document.pets)),
+        Err(error) if error.kind() == io::ErrorKind::NotFound => (None, snapshot.pets.clone()),
         Err(error) => return Err(error),
     };
     let document = Document {
@@ -121,30 +120,6 @@ pub fn save_housing_state<T: Serialize>(path: &Path, housing: &T) -> io::Result<
         PET_SCHEMA_VERSION
     } else {
         BASE_SCHEMA_VERSION
-    });
-    document.version = None;
-    write_document(path, &document)
-}
-
-/// Load pet roster state from the canonical save envelope without coupling the envelope to its
-/// service type.
-pub fn load_pets_state<T: DeserializeOwned>(path: &Path) -> io::Result<Option<T>> {
-    read_document(path)?
-        .pets
-        .map(serde_json::from_value)
-        .transpose()
-        .map_err(invalid)
-}
-
-/// Atomically replace only the pet roster while preserving character, gameplay, counters, and
-/// the optional housing payload.
-pub fn save_pets_state<T: Serialize>(path: &Path, pets: &T) -> io::Result<()> {
-    let mut document = read_document(path)?;
-    document.pets = Some(serde_json::to_value(pets).map_err(invalid)?);
-    document.schema_version = Some(if document.gameplay.is_some() {
-        GAMEPLAY_SCHEMA_VERSION
-    } else {
-        PET_SCHEMA_VERSION
     });
     document.version = None;
     write_document(path, &document)

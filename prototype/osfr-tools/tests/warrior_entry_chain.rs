@@ -999,6 +999,7 @@ fn progress_survives_a_reload() {
     let hold = game_store::Snapshot {
         character: character.clone(),
         gameplay: Some(game.state()),
+        pets: None,
     };
     game_store::save(&path, &hold).unwrap();
     let loaded = game_store::load_or_create(&path, character.clone()).unwrap();
@@ -1040,6 +1041,7 @@ fn progress_survives_a_reload() {
     let done = game_store::Snapshot {
         character: character.clone(),
         gameplay: Some(game.state()),
+        pets: None,
     };
     game_store::save(&path, &done).unwrap();
     let loaded = game_store::load_or_create(&path, character.clone()).unwrap();

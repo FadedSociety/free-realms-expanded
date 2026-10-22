@@ -828,6 +828,7 @@ fn progress_survives_a_reconnect() {
     let snapshot = game_store::Snapshot {
         character: saved_character.clone(),
         gameplay: Some(game.state()),
+        pets: None,
     };
     game_store::save(&path, &snapshot).expect("the save envelope writes");
     let loaded = game_store::load_or_create(&path, saved_character.clone())
@@ -875,6 +876,7 @@ fn progress_survives_a_reconnect() {
     let snapshot = game_store::Snapshot {
         character: saved_character.clone(),
         gameplay: Some(game.state()),
+        pets: None,
     };
     game_store::save(&path, &snapshot).expect("the completed save writes");
     let loaded = game_store::load_or_create(&path, saved_character.clone())

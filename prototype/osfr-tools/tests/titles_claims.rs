@@ -901,7 +901,7 @@ fn settlement_capacity_failure_defers_the_award_without_failing_the_transaction(
     let saved = gateway.snapshot();
 
     let path = fixture.content.join("deferred-award-save.json");
-    gateway.save_with_pet_roster(&path).unwrap();
+    game_store::save(&path, &gateway.snapshot()).unwrap();
     let reloaded = game_store::load_or_create(&path, saved.character.clone()).unwrap();
     let mut fresh = fixture.gateway(reloaded.gameplay.clone());
     let titles = fresh

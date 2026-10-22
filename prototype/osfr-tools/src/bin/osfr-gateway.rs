@@ -924,6 +924,7 @@ fn load_gateway_from(
     if snapshot.character.guid != initial.guid {
         return Err("character save belongs to another character".into());
     }
+    let pets = snapshot.pets.take(); // S17: before the partial moves below.
     let gateway = if let Some(content) = &options.content {
         if content.join("opening.json").is_file()
             && snapshot
@@ -945,7 +946,7 @@ fn load_gateway_from(
         Gateway::load(&options.reference, snapshot.character)?
     };
     let mut gateway = gateway;
-    gateway.load_pet_roster(state_path)?;
+    gateway.adopt_pets(pets)?;
     gateway.take_shared_fields();
     gateway.set_dev_tools(options.dev_tools);
     // Decision 1: account-store roles are server-owned, so builder/admin
@@ -1734,7 +1735,6 @@ impl Session {
         let ended = staged_gateway.settle_pets(zoned, now_ms)?;
         outcome.state_changed |= ended.state_changed;
         outcome.gameplay_changed |= ended.gameplay_changed;
-        outcome.pets_changed |= ended.pets_changed;
         outcome.replies.extend(ended.replies);
         outcome.nearby.extend(ended.nearby);
         self.bundle_budget.stage(&outcome.replies)?;
@@ -1926,14 +1926,9 @@ impl Session {
                     .position_saved_ms
                     .is_some_and(|saved| now_ms < saved.saturating_add(POSITION_SAVE_MS));
             if outcome.state_changed && !deferred {
-                // Lead (persistence): a pet change saves character and roster in ONE atomic
-                // write. Two writes could crash between them and keep a consumed adoption item
-                // without its pet, or the pet without spending the item.
-                if outcome.pets_changed {
-                    staged_gateway.save_with_pet_roster(&self.state_path)?;
-                } else {
-                    save(&self.state_path, &staged_gateway.snapshot())?;
-                }
+                // S17: the snapshot carries the pet roster, so an adoption's spent item and its
+                // new pet land in this ONE atomic write or not at all.
+                save(&self.state_path, &staged_gateway.snapshot())?;
             }
             persist_social_changes(world, &staged_world)?;
             staged_world

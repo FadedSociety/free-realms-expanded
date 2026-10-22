@@ -502,6 +502,7 @@ fn the_queensfields_visit_and_naia_talk_pay_once() {
     let snapshot = game_store::Snapshot {
         character: naia.clone(),
         gameplay: Some(game.state()),
+        pets: None,
     };
     game_store::save(&save_path, &snapshot).unwrap();
     let loaded = game_store::load_or_create(&save_path, naia.clone()).unwrap();
@@ -773,6 +774,7 @@ fn refusals_and_reconnect_change_nothing() {
     let snapshot = game_store::Snapshot {
         character: naia.clone(),
         gameplay: Some(mid_state.clone()),
+        pets: None,
     };
     game_store::save(&save_path, &snapshot).unwrap();
     let loaded = game_store::load_or_create(&save_path, naia.clone()).unwrap();

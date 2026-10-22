@@ -2087,6 +2087,7 @@ fn seed_second_character(temp: &TempDir, content: &Path, active: i32, seeded_ite
                 rotation: [0.0, 0.0, 1.0],
             },
             gameplay: Some(state),
+            pets: None,
         },
     )
     .expect("the seeded second save writes");
@@ -2108,6 +2109,7 @@ fn seed_far_character(temp: &TempDir, content: &Path, guid: u64) {
                 rotation: [0.0, 0.0, 1.0],
             },
             gameplay: Some(state),
+            pets: None,
         },
     )
     .expect("the far character save writes");

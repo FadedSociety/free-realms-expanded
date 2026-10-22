@@ -33,6 +33,15 @@ fn service() -> PetService {
     PetService::new(PetService::bundled_content().unwrap()).unwrap()
 }
 
+fn owner() -> CharacterState {
+    CharacterState {
+        guid: OWNER,
+        zone_id: 0,
+        position: [0.0; 3],
+        rotation: [0.0, 0.0, 1.0],
+    }
+}
+
 fn reference() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../../../lab/references/rust-opening-cooking-original-assets")
@@ -306,7 +315,7 @@ fn each_adoption_item_adopts_a_new_pet_even_when_the_species_is_owned() {
             )
             .unwrap()
             .unwrap();
-        assert!(wire.pets_changed);
+        assert!(wire.changed);
         assert_eq!(service.active_pet_id(), Some(pet));
         assert_eq!(certificates(&inventory), 2 - pet);
     }
@@ -325,7 +334,7 @@ fn each_adoption_item_adopts_a_new_pet_even_when_the_species_is_owned() {
         .unwrap()
         .unwrap();
     assert!(refused.notice.is_some());
-    assert!(!refused.pets_changed);
+    assert!(!refused.changed);
     assert_eq!(service.roster_snapshot(), roster);
     assert_eq!(service.active_pet_id(), Some(2));
 }
@@ -353,7 +362,6 @@ fn an_owned_adoption_item_can_create_and_summon_a_roster_pet() {
         .unwrap()
         .unwrap();
     assert!(wire.changed);
-    assert!(wire.pets_changed);
     // Actor creation precedes the roster (whose trailing active pair activates
     // the pet) and the explicit activation.
     let actor_at = wire
@@ -550,22 +558,17 @@ impl Drop for SaveFile {
 #[test]
 fn roster_reload_preserves_ownership_and_the_client_list_reports_no_active_actor() {
     let file = SaveFile::new();
+    let mut service = service();
+    let pet_id = owned_pet(&mut service);
     game_store::save(
         &file.path,
         &game_store::Snapshot {
-            character: CharacterState {
-                guid: OWNER,
-                zone_id: 0,
-                position: [0.0; 3],
-                rotation: [0.0, 0.0, 1.0],
-            },
+            character: owner(),
             gameplay: None,
+            pets: service.document_value(),
         },
     )
     .unwrap();
-    let mut service = service();
-    let pet_id = owned_pet(&mut service);
-    service.save_to(&file.path).unwrap();
     service
         .handle(
             &summon(pet_id),
@@ -576,8 +579,9 @@ fn roster_reload_preserves_ownership_and_the_client_list_reports_no_active_actor
         )
         .unwrap();
 
+    let saved = game_store::load_or_create(&file.path, owner()).unwrap();
     let reloaded =
-        PetService::load_from(PetService::bundled_content().unwrap(), &file.path).unwrap();
+        PetService::from_document(PetService::bundled_content().unwrap(), saved.pets).unwrap();
     assert_eq!(reloaded.pet(pet_id).unwrap().id, pet_id);
     assert_eq!(reloaded.active_pet_id(), None);
     let list = reloaded.list_packet();
@@ -743,21 +747,19 @@ fn switching_pets_removes_the_old_actor_then_creates_and_activates_the_new_one()
 #[test]
 fn an_item_record_with_a_wrong_tint_refuses_without_consuming_or_saving() {
     let file = SaveFile::new();
-    game_store::save(
-        &file.path,
-        &game_store::Snapshot {
-            character: CharacterState {
-                guid: OWNER,
-                zone_id: 0,
-                position: [0.0; 3],
-                rotation: [0.0, 0.0, 1.0],
-            },
-            gameplay: None,
-        },
-    )
-    .unwrap();
     let mut service = service();
-    service.save_to(&file.path).unwrap();
+    let save = |service: &PetService| {
+        game_store::save(
+            &file.path,
+            &game_store::Snapshot {
+                character: owner(),
+                gameplay: None,
+                pets: service.document_value(),
+            },
+        )
+        .unwrap()
+    };
+    save(&service);
     let saved_before = fs::read(&file.path).unwrap();
     let mut inventory = inventory_handle(70352);
     let inventory_before = inventory.state().clone();
@@ -778,14 +780,14 @@ fn an_item_record_with_a_wrong_tint_refuses_without_consuming_or_saving() {
         .unwrap()
         .expect("refusal is a private roster refresh");
     assert!(wire.notice.is_some());
-    assert!(!wire.changed && !wire.pets_changed);
+    assert!(!wire.changed);
     assert!(wire.shared.is_empty());
     assert_eq!(inventory.state(), &inventory_before);
     assert_eq!(service.roster_snapshot(), roster_before);
     assert_eq!(service.active_pet_id(), None);
     assert!(service.pet(1).is_none());
     assert_eq!(fs::read(&file.path).unwrap(), saved_before);
-    service.save_to(&file.path).unwrap();
+    save(&service);
     assert_eq!(fs::read(&file.path).unwrap(), saved_before);
 }
 

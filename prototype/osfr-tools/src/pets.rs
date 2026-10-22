@@ -5,7 +5,6 @@
 //! because no original pet datagram was recovered.
 
 use crate::{
-    game_store,
     inventory::{Inventory, InventoryState},
     startup_world, world,
 };
@@ -13,7 +12,6 @@ use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet},
     io,
-    path::Path,
     sync::Arc,
 };
 
@@ -488,8 +486,6 @@ pub struct PetTransition {
     pub broadcasts: Vec<PetPresenceEvent>,
     /// The roster or active-pet state differs from the state before this transition.
     pub changed: bool,
-    /// The saved pet roster differs from the state before this transition.
-    pub pets_changed: bool,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -617,7 +613,6 @@ pub struct PetWire {
     pub shared: Vec<Vec<u8>>,
     pub notice: Option<&'static str>,
     pub changed: bool,
-    pub pets_changed: bool,
 }
 
 #[derive(Clone, Copy)]
@@ -653,18 +648,6 @@ impl PetService {
         })
     }
 
-    pub fn load_from(content: PetContent, path: &Path) -> io::Result<Self> {
-        content.validate()?;
-        let roster = game_store::load_pets_state(path)?.unwrap_or_default();
-        validate_roster(&content, &roster)?;
-        Ok(Self {
-            content: Arc::new(content),
-            roster,
-            active: None,
-            ui_mode: 0,
-        })
-    }
-
     pub fn from_saved(content: PetContent, roster: Option<PetRoster>) -> io::Result<Self> {
         content.validate()?;
         let roster = roster.unwrap_or_default();
@@ -677,20 +660,26 @@ impl PetService {
         })
     }
 
+    /// S17: rebuild from the character document's `pets` value (`game_store::Snapshot::pets`).
+    /// The roster is validated against the content before any session uses it.
+    pub fn from_document(content: PetContent, pets: Option<serde_json::Value>) -> io::Result<Self> {
+        let roster = pets
+            .map(serde_json::from_value)
+            .transpose()
+            .map_err(|_| invalid("unreadable pet roster snapshot"))?;
+        Self::from_saved(content, roster)
+    }
+
     /// The persisted roster without the session-only active actor.
     pub fn roster_snapshot(&self) -> Option<PetRoster> {
         (!self.roster.pets.is_empty()).then(|| self.roster.clone())
     }
 
-    pub fn save_to(&self, path: &Path) -> io::Result<()> {
-        validate_roster(&self.content, &self.roster)?;
-        game_store::save_pets_state(path, &self.roster)
-    }
-
-    /// Persist the roster together with the character snapshot in one atomic write.
-    pub fn save_with(&self, path: &Path, snapshot: &game_store::Snapshot) -> io::Result<()> {
-        validate_roster(&self.content, &self.roster)?;
-        game_store::save_with_pets(path, snapshot, &self.roster)
+    /// S17: the roster as `game_store::Snapshot::pets` stores it. `None` while the roster is
+    /// empty, which keeps the on-disk value; nothing removes a pet yet (see that field).
+    pub fn document_value(&self) -> Option<serde_json::Value> {
+        self.roster_snapshot()
+            .map(|roster| serde_json::to_value(roster).expect("a pet roster always serializes"))
     }
 
     pub fn pet(&self, pet_id: u32) -> Option<&Pet> {
@@ -940,7 +929,6 @@ impl PetService {
             owner_message: pet_active_packet(pet_id, actor_guid),
             broadcasts,
             changed: true,
-            pets_changed: true,
         })
     }
 
@@ -950,7 +938,6 @@ impl PetService {
                 owner_message: pet_active_packet(0, 0),
                 broadcasts: Vec::new(),
                 changed: false,
-                pets_changed: false,
             });
         }
         self.advance_time(now)?;
@@ -965,7 +952,6 @@ impl PetService {
             owner_message: pet_active_packet(0, 0),
             broadcasts,
             changed: true,
-            pets_changed: true,
         })
     }
 
@@ -1067,7 +1053,6 @@ impl PetService {
                         next.list_packet(),
                     ],
                     changed: true,
-                    pets_changed: true,
                     ..PetWire::default()
                 };
                 *self = next;
@@ -1154,7 +1139,6 @@ impl PetService {
     pub fn wire(&self, transition: PetTransition) -> PetWire {
         let mut wire = PetWire {
             changed: transition.changed,
-            pets_changed: transition.pets_changed,
             ..PetWire::default()
         };
         for event in transition.broadcasts {
@@ -1212,7 +1196,6 @@ impl PetService {
                 target,
             }],
             changed: false,
-            pets_changed: false,
         })
     }
 

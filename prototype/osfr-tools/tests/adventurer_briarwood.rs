@@ -195,6 +195,7 @@ fn save_and_reload(
         &Snapshot {
             character: at.clone(),
             gameplay: Some(game.state()),
+            pets: None,
         },
     )
     .expect("the character save writes");

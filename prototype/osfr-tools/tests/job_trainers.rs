@@ -1530,6 +1530,7 @@ fn all_six_combat_jobs_learn_activate_fight_and_gain_xp() {
         &Snapshot {
             character: character.clone(),
             gameplay: Some(paid_state.clone()),
+            pets: None,
         },
     )
     .unwrap();

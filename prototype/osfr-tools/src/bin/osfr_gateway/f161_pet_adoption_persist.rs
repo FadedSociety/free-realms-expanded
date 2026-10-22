@@ -156,6 +156,74 @@ fn a_spent_certificate_and_its_pet_survive_a_restart_together() {
     );
 }
 
+/// S17 (17c): the roster rides in the one character document. The adoption's file inventory and
+/// roster equal the live session's, a refused pet request writes nothing (not even a deferred
+/// pose), and the later pose flush keeps the roster.
+#[test]
+fn the_roster_rides_in_every_document_save_and_a_refusal_writes_nothing() {
+    if !bin_test_target("f161") {
+        return;
+    }
+    let scratch = Scratch::new("f161-document");
+    let state = scratch.state();
+    let options = test_support::options(state.clone());
+    let mut scene = world_loaded(&options, 631);
+    grant_certificate(&mut scene.session);
+    let movement = pose(&scene.session);
+    scene
+        .send(&options, &movement, 10_000)
+        .expect("the pose commits");
+
+    let adopt = pet_wire::summon_by_item(ADOPTION_ITEM as u32, 0);
+    scene
+        .send(&options, &adopt, 11_000)
+        .expect("adoption commits");
+    let adopted = document(&state);
+    let live = serde_json::to_value(scene.snapshot()).unwrap();
+    assert!(!carries_certificate(&adopted, ADOPTION_ITEM));
+    assert_eq!(
+        adopted["gameplay"]["inventory"],
+        live["gameplay"]["inventory"]
+    );
+    assert_eq!(adopted["pets"], live["pets"]);
+    assert_eq!(adopted["pets"]["pets"].as_array().map(Vec::len), Some(1));
+
+    // A pose inside POSITION_SAVE_MS is deferred; a refused pet request must not write it.
+    let movement = pose(&scene.session);
+    scene
+        .send(&options, &movement, 12_000)
+        .expect("the pose is accepted");
+    let bytes = fs::read(&state).unwrap();
+    assert_eq!(
+        document(&state)["character"],
+        adopted["character"],
+        "the pose is deferred"
+    );
+    scene
+        .send(&options, &adopt, 12_500)
+        .expect("a spent certificate is refused with a reply, not an error");
+    assert_eq!(
+        fs::read(&state).unwrap(),
+        bytes,
+        "a refused pet request wrote the document"
+    );
+    assert_eq!(
+        serde_json::to_value(scene.snapshot()).unwrap()["pets"],
+        adopted["pets"]
+    );
+
+    scene.tick(&options, 17_000);
+    let flushed = document(&state);
+    assert_ne!(
+        flushed["character"]["position"], adopted["character"]["position"],
+        "the tick flushed the deferred pose"
+    );
+    assert_eq!(
+        flushed["pets"], adopted["pets"],
+        "the pose flush kept the roster"
+    );
+}
+
 /// A concurrent Windows reader without `FILE_SHARE_DELETE` makes the atomic rename fail after the
 /// document was read and built. On Unix a read-only directory, not a file handle, decides the
 /// rename, so the injection has no equivalent.
@@ -212,12 +280,10 @@ fn a_refused_adoption_save_leaves_the_document_and_the_live_session_unchanged() 
         live_before,
         "live gameplay is unchanged by a refused commit"
     );
-    // The live roster is still empty, read back through the production combined save.
-    let probe = scratch.path().join("live-roster.json");
-    scene.session.gateway.save_with_pet_roster(&probe).unwrap();
+    // The live roster is still empty: the document value every save would write is `None`.
     assert_eq!(
-        document(&probe)["pets"]["pets"].as_array().unwrap().len(),
-        0,
+        scene.snapshot().pets,
+        None,
         "a refused commit leaves no live roster entry"
     );
 

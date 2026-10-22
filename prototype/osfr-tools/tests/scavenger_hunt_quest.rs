@@ -314,6 +314,7 @@ fn the_four_stops_complete_and_pay_once() {
     let snapshot = game_store::Snapshot {
         character: jacque.clone(),
         gameplay: Some(expected.clone()),
+        pets: None,
     };
     game_store::save(&save_path, &snapshot).unwrap();
     let reloaded = game_store::load_or_create(&save_path, jacque.clone()).unwrap();

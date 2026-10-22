@@ -267,7 +267,6 @@ fn assert_gateway_refusal(out: &GatewayOutcome) {
         "a refusal staged a shared field action"
     );
     assert!(out.group_heal.is_none(), "a refusal staged a group heal");
-    assert!(!out.pets_changed, "a refusal marked the pet roster changed");
     assert!(!out.began_zoning, "a refusal began zoning");
     assert!(!out.state_changed, "a refusal changed the character");
     assert!(!out.gameplay_changed, "a refusal changed gameplay state");

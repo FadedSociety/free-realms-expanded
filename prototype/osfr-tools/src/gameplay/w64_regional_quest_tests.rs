@@ -314,7 +314,6 @@ fn denied_accept_after_a_request_handler_job_switch_changes_nothing_and_requests
     assert!(refused.relocation.is_none());
     assert!(refused.zoning.is_none());
     assert!(refused.scene_zoning.is_none());
-    assert!(!refused.pets_changed);
     assert_eq!(game.npc_quests.as_ref().unwrap().state(), &before);
     assert!(
         !refused

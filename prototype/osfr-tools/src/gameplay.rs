@@ -284,9 +284,6 @@ pub struct Outcome {
     /// T199: a `realm broadcast` notice set by `realm broadcast <text>`. Session-only:
     /// the gateway fans it out once after a successful commit and never saves it.
     pub broadcast: Option<String>,
-    /// W177: the saved top-level pet roster changed and must be written through its own
-    /// `game_store` seam after the normal character snapshot commits.
-    pub pets_changed: bool,
 }
 
 impl Outcome {
@@ -305,7 +302,6 @@ impl Outcome {
             group_heal,
             nearby,
             broadcast,
-            pets_changed,
         } = other;
         self.dev_command_denied |= dev_command_denied;
         self.shared_field = shared_field.or(self.shared_field.take());
@@ -317,7 +313,6 @@ impl Outcome {
         self.group_heal = group_heal.or(self.group_heal.take());
         self.nearby.extend(nearby);
         self.broadcast = broadcast.or(self.broadcast.take());
-        self.pets_changed |= pets_changed;
     }
 }
 
@@ -2069,28 +2064,16 @@ impl Gameplay {
         Self::ride_outcome(mounts.wire(&ended, pose))
     }
 
-    /// W177: the persisted pet roster is loaded from the character save before world entry.
-    pub fn load_pet_roster(&mut self, path: &Path) -> io::Result<()> {
-        self.pets =
-            crate::pets::PetService::load_from(crate::pets::PetService::bundled_content()?, path)?;
+    /// S17: the saved roster comes from the character document (`Snapshot::pets`) before
+    /// world entry; `pets_document` hands it back for every save of that document.
+    pub fn adopt_pets(&mut self, pets: Option<serde_json::Value>) -> io::Result<()> {
+        let content = crate::pets::PetService::bundled_content()?;
+        self.pets = crate::pets::PetService::from_document(content, pets)?;
         Ok(())
     }
 
-    /// Persist the pet roster through the existing top-level envelope seam. This
-    /// must run after the ordinary gameplay snapshot so a committed request
-    /// cannot silently lose its name or need changes.
-    pub fn save_pet_roster(&self, path: &Path) -> io::Result<()> {
-        self.pets.save_to(path)
-    }
-
-    /// Persist the character snapshot and the pet roster in one atomic write (adoption consumes
-    /// an item and adds a pet; both must land or neither).
-    pub fn save_with_pet_roster(
-        &self,
-        path: &Path,
-        snapshot: &crate::game_store::Snapshot,
-    ) -> io::Result<()> {
-        self.pets.save_with(path, snapshot)
+    pub fn pets_document(&self) -> Option<serde_json::Value> {
+        self.pets.document_value()
     }
 
     /// W177: the active pet as other players need it for AddNpc replay.
@@ -2101,7 +2084,6 @@ impl Gameplay {
     fn pet_outcome(wire: crate::pets::PetWire) -> Outcome {
         let mut out = Outcome::default();
         out.changed = wire.changed;
-        out.pets_changed = wire.pets_changed;
         if let Some(notice) = wire.notice {
             out.replies.push(chat::system(notice));
         }
@@ -2111,7 +2093,7 @@ impl Gameplay {
     }
 
     /// W177: summon, dismiss and UI mode (family 53). Ownership comes only from the saved
-    /// roster loaded by `load_pet_roster`; the actor GUID is derived from the authenticated
+    /// roster loaded by `adopt_pets`; the actor GUID is derived from the authenticated
     /// character, never from request bytes.
     fn handle_pets(
         &mut self,

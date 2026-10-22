@@ -141,8 +141,6 @@ pub struct GatewayOutcome {
     pub began_zoning: bool,
     /// W158: a big heart was picked up; the server heals the rest of the group.
     pub group_heal: Option<crate::encounter::GroupHeal>,
-    /// W177: the saved top-level pet roster must be written after the normal snapshot.
-    pub pets_changed: bool,
     /// Populated only when the owning local server explicitly enables tracing.
     pub trace: Vec<GatewayTraceEvent>,
 }
@@ -1258,6 +1256,8 @@ impl Gateway {
                 })
                 .unwrap_or_else(|| self.state.clone()),
             gameplay: self.gameplay.as_ref().map(Gameplay::state),
+            // S17: the roster rides in the same document write as the character and inventory.
+            pets: self.gameplay.as_ref().and_then(Gameplay::pets_document),
         }
     }
 
@@ -1329,22 +1329,13 @@ impl Gateway {
         self.gameplay.as_ref()?.ride_view(self.state.guid)
     }
 
-    /// W177: load the top-level saved pet roster before world entry.
-    pub fn load_pet_roster(&mut self, path: &Path) -> io::Result<()> {
+    /// S17: adopt the roster read from the character document (`Snapshot::pets`) before world
+    /// entry. Without gameplay it stays on disk untouched (`snapshot` then sends `None`).
+    pub fn adopt_pets(&mut self, pets: Option<serde_json::Value>) -> io::Result<()> {
         if let Some(game) = self.gameplay.as_mut() {
-            game.load_pet_roster(path)?;
+            game.adopt_pets(pets)?;
         }
         Ok(())
-    }
-
-    /// Persist the character snapshot and, when gameplay owns pets, the pet roster in one atomic
-    /// write after a committed pet change.
-    pub fn save_with_pet_roster(&self, path: &Path) -> io::Result<()> {
-        let snapshot = self.snapshot();
-        match self.gameplay.as_ref() {
-            Some(game) => game.save_with_pet_roster(path, &snapshot),
-            None => crate::game_store::save(path, &snapshot),
-        }
     }
 
     /// W177: the active pet for AddNpc fanout and late viewers.
@@ -1359,7 +1350,6 @@ impl Gateway {
             let ended = game.settle_pets(zoned, now_ms)?;
             outcome.state_changed = ended.changed;
             outcome.gameplay_changed = ended.changed;
-            outcome.pets_changed = ended.pets_changed;
             outcome.replies = ended.replies.iter().map(|r| wrapped(r)).collect();
             outcome.nearby = ended.nearby;
         }
@@ -1725,7 +1715,6 @@ impl Gateway {
                         gameplay = Some(staged_game);
                         outcome.state_changed |= result.changed;
                         outcome.gameplay_changed |= result.changed;
-                        outcome.pets_changed |= result.pets_changed;
                         if let Some(relocation) = result.relocation {
                             // A developer teleport stays in the current zone.
                             // Stage the position before the packet is built so

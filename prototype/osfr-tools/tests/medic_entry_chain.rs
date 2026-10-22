@@ -720,6 +720,7 @@ fn relog_preserves_completed_history() {
     let snapshot = game_store::Snapshot {
         character: character.clone(),
         gameplay: Some(held.clone()),
+        pets: None,
     };
     game_store::save(&save_path, &snapshot).unwrap();
     let loaded = game_store::load_or_create(&save_path, character).unwrap();
@@ -790,6 +791,7 @@ fn relog_preserves_completed_history() {
     let snapshot = game_store::Snapshot {
         character: naia.clone(),
         gameplay: Some(expected.clone()),
+        pets: None,
     };
     game_store::save(&save_path, &snapshot).unwrap();
     let loaded = game_store::load_or_create(&save_path, naia.clone()).unwrap();

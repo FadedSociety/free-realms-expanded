@@ -2,7 +2,7 @@ use osfr_tools::{
     character_store::CharacterState,
     game_store::{
         BASE_SCHEMA_VERSION, MAX_SNAPSHOT_BYTES, PET_SCHEMA_VERSION, Snapshot, load_or_create,
-        save, save_housing_state, save_pets_state, save_with_pets,
+        save, save_housing_state,
     },
 };
 use std::fs;
@@ -32,7 +32,8 @@ fn version_one_migrates_without_changing_coordinates_and_corruption_is_preserved
         loaded,
         Snapshot {
             character: initial(),
-            gameplay: None
+            gameplay: None,
+            pets: None,
         }
     );
     assert_eq!(fs::read(&path).unwrap(), before); // Loading is not an implicit write.
@@ -56,8 +57,12 @@ fn pet_state_uses_the_current_schema_constant() {
     let dir = std::env::temp_dir().join(format!("osfr-game-store-pets-{}", std::process::id()));
     fs::create_dir(&dir).unwrap();
     let path = dir.join("state.json");
-    load_or_create(&path, initial()).unwrap();
-    save_pets_state(&path, &serde_json::json!({"roster": []})).unwrap();
+    let with_pets = Snapshot {
+        character: initial(),
+        gameplay: None,
+        pets: Some(serde_json::json!({"roster": []})),
+    };
+    save(&path, &with_pets).unwrap();
 
     let saved: serde_json::Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
     assert_eq!(saved["schema_version"], PET_SCHEMA_VERSION);
@@ -66,12 +71,13 @@ fn pet_state_uses_the_current_schema_constant() {
     fs::remove_dir(dir).unwrap();
 }
 
-/// Lead (persistence): a pet change that also changes the character (adoption consumes an item)
-/// is written as one atomic document, keeps housing, and a refused write changes nothing. The
-/// production adoption path (session commit, restart, refused replacement) is pinned by the
-/// gateway binary's `f161_pet_adoption_persist` tests; this one covers the envelope itself.
+/// Lead (persistence), S17: a pet change that also changes the character (adoption consumes an
+/// item) is written as one atomic document, keeps housing, a `None` roster keeps the one on disk,
+/// and a refused write changes nothing. The production adoption path (session commit, restart,
+/// refused replacement) is pinned by the gateway binary's `f161_pet_adoption_persist` tests;
+/// this one covers the envelope itself.
 #[test]
-fn save_with_pets_writes_character_and_roster_in_one_document() {
+fn one_save_writes_character_and_roster_and_none_keeps_the_disk_roster() {
     let dir =
         std::env::temp_dir().join(format!("osfr-game-store-with-pets-{}", std::process::id()));
     fs::create_dir(&dir).unwrap();
@@ -79,15 +85,16 @@ fn save_with_pets_writes_character_and_roster_in_one_document() {
     load_or_create(&path, initial()).unwrap();
     save_housing_state(&path, &serde_json::json!({"rooms": 1})).unwrap();
 
+    let roster = serde_json::json!({"roster": [{"id": 7}]});
     let moved = Snapshot {
         character: CharacterState {
             position: [9.0, 9.0, 9.0],
             ..initial()
         },
         gameplay: None,
+        pets: Some(roster.clone()),
     };
-    let roster = serde_json::json!({"roster": [{"id": 7}]});
-    save_with_pets(&path, &moved, &roster).unwrap();
+    save(&path, &moved).unwrap();
     let saved: serde_json::Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
     assert_eq!(
         saved["character"]["position"],
@@ -97,7 +104,11 @@ fn save_with_pets_writes_character_and_roster_in_one_document() {
     assert_eq!(saved["housing"], serde_json::json!({"rooms": 1}));
     assert_eq!(saved["schema_version"], PET_SCHEMA_VERSION);
 
-    // A later plain save keeps the roster written above.
+    // A later save without a roster (`None`, as an empty live roster sends) keeps it on disk.
+    let moved = Snapshot {
+        pets: None,
+        ..moved
+    };
     save(&path, &moved).unwrap();
     let saved: serde_json::Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
     assert_eq!(saved["pets"], roster);
@@ -110,8 +121,9 @@ fn save_with_pets_writes_character_and_roster_in_one_document() {
             ..initial()
         },
         gameplay: None,
+        pets: Some(serde_json::json!({"roster": []})),
     };
-    assert!(save_with_pets(&path, &invalid, &serde_json::json!({"roster": []})).is_err());
+    assert!(save(&path, &invalid).is_err());
     assert_eq!(fs::read(&path).unwrap(), before);
 
     fs::remove_file(path).unwrap();

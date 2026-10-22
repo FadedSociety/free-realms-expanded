@@ -132,6 +132,7 @@ fn save_reload(fixture: &Fixture, game: &Gameplay, character: &CharacterState) -
     let snapshot = game_store::Snapshot {
         character: character.clone(),
         gameplay: Some(game.state()),
+        pets: None,
     };
     game_store::save(&path, &snapshot).expect("game_store saves the character");
     let loaded = game_store::load_or_create(&path, character.clone()).expect("game_store loads");

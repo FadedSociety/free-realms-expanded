@@ -199,6 +199,7 @@ impl Fixture {
         let snapshot = game_store::Snapshot {
             character: character.clone(),
             gameplay: Some(game.state()),
+            pets: None,
         };
         game_store::save(&path, &snapshot).expect("the save envelope writes");
         let loaded =

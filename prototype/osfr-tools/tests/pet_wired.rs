@@ -1,6 +1,6 @@
 //! W177 patch proof: the saved pet roster and active actor through `Gameplay` and `Gateway`.
 //! Drop this in as `tests/pet_wired.rs` after `apply_shared_patch.py`; it does not compile before
-//! (`Gameplay::load_pet_roster`, `handle_pets`, `settle_pets`, `Gateway::pet_view`).
+//! (`Gameplay::adopt_pets`, `handle_pets`, `settle_pets`, `Gateway::pet_view`).
 use osfr_tools::{
     character_store::CharacterState,
     game_store,
@@ -47,19 +47,11 @@ impl Save {
             std::env::temp_dir().join(format!("osfr-pet-wired-{}-{sequence}", std::process::id()));
         fs::create_dir(&directory).unwrap();
         let path = directory.join("save.json");
-        game_store::save(
-            &path,
-            &game_store::Snapshot {
-                character: who(),
-                gameplay: None,
-            },
-        )
-        .unwrap();
         let content = PetService::bundled_content().unwrap();
         let mut pets = PetService::new(content.clone()).unwrap();
         let definition = content.definition(PET_SPECIES).unwrap();
         pets.adopt_vendor_grant(1, &definition, 0).unwrap();
-        pets.save_to(&path).unwrap();
+        save_roster(&path, pets.document_value());
         Self { directory, path }
     }
 }
@@ -71,9 +63,23 @@ impl Drop for Save {
     }
 }
 
+/// The production document write: `Snapshot::pets` rides in the one `game_store::save`.
+fn save_roster(path: &Path, pets: Option<serde_json::Value>) {
+    let snapshot = game_store::Snapshot {
+        character: who(),
+        gameplay: None,
+        pets,
+    };
+    game_store::save(path, &snapshot).unwrap();
+}
+
+fn saved_roster(path: &Path) -> Option<serde_json::Value> {
+    game_store::load_or_create(path, who()).unwrap().pets
+}
+
 fn game(path: &Path) -> Gameplay {
     let mut game = Gameplay::load(&reference(), None).unwrap();
-    game.load_pet_roster(path).unwrap();
+    game.adopt_pets(saved_roster(path)).unwrap();
     game.initialize_world(&who(), 0).unwrap();
     game
 }
@@ -161,7 +167,7 @@ fn foreign_pet_and_unowned_item_requests_leave_gameplay_unchanged() {
     let before = game.state();
 
     let foreign = game.handle_in_world(&summon(999), &who(), NOW).unwrap();
-    assert!(!foreign.pets_changed);
+    assert!(!foreign.changed);
     assert!(has(&foreign.replies, 53, 5), "roster refresh");
     assert!(
         foreign
@@ -182,7 +188,7 @@ fn foreign_pet_and_unowned_item_requests_leave_gameplay_unchanged() {
     let refused = game
         .handle_in_world(&foreign_item, &who(), NOW + 1)
         .unwrap();
-    assert!(!refused.pets_changed);
+    assert!(!refused.changed);
     assert!(
         refused
             .replies
@@ -209,7 +215,7 @@ fn zoning_dismisses_without_persisting_the_actor_and_reload_keeps_roster() {
 
     game.reset_session();
     let mut reloaded = Gameplay::load(&reference(), None).unwrap();
-    reloaded.load_pet_roster(&save.path).unwrap();
+    reloaded.adopt_pets(saved_roster(&save.path)).unwrap();
     let list = reloaded.initialize_world(&who(), NOW + 2).unwrap();
     assert!(has(&list.replies, 53, 5));
     assert!(reloaded.pet_view(1).is_none());
@@ -224,14 +230,13 @@ fn an_accepted_name_is_written_to_the_top_level_pet_payload() {
         .handle_in_world(&name_request("Admiral Ace"), &who(), NOW + 1)
         .unwrap();
     assert!(renamed.changed);
-    assert!(renamed.pets_changed);
-    game.save_pet_roster(&save.path).unwrap();
+    save_roster(&save.path, game.pets_document());
     let document: serde_json::Value =
         serde_json::from_slice(&fs::read(&save.path).unwrap()).unwrap();
     assert_eq!(document["pets"]["pets"][0]["name"], "Admiral Ace");
 
     let mut reloaded = Gameplay::load(&reference(), None).unwrap();
-    reloaded.load_pet_roster(&save.path).unwrap();
+    reloaded.adopt_pets(saved_roster(&save.path)).unwrap();
     assert!(has(
         &reloaded.initialize_world(&who(), NOW + 2).unwrap().replies,
         53,
@@ -246,7 +251,7 @@ fn the_gateway_exposes_the_saved_pet_roster_and_clears_the_actor_on_zoning() {
     let reference = lab().join("references/rust-gateway-reference");
     let state = Gameplay::load(&content, None).unwrap().state();
     let mut gateway = Gateway::load_gameplay(&reference, who(), &content, Some(state)).unwrap();
-    gateway.load_pet_roster(&save.path).unwrap();
+    gateway.adopt_pets(saved_roster(&save.path)).unwrap();
     gateway.handle_at(&login(), NOW).unwrap();
     gateway.handle_at(&wrap(&[13, 0]), NOW + 1).unwrap();
     gateway.handle_at(&wrap(&[10, 0]), NOW + 2).unwrap();

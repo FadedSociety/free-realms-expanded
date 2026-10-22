@@ -143,6 +143,7 @@ fn a_refused_field_replay_through_the_session_writes_no_save() {
         &osfr_tools::game_store::Snapshot {
             character: character.clone(),
             gameplay: Some(gameplay.clone()),
+            pets: None,
         },
     )
     .unwrap();

@@ -1,0 +1,67 @@
+{
+  "schema_version": 6,
+  "character": {
+    "guid": 123,
+    "zone_id": 7,
+    "position": [
+      1.0,
+      2.0,
+      3.0
+    ],
+    "rotation": [
+      0.0,
+      0.0,
+      1.0
+    ]
+  },
+  "gameplay": null,
+  "pets": {
+    "next_pet_id": 2,
+    "pets": [
+      {
+        "adoption_item_definition_id": 70352,
+        "equipment": {
+          "chest": null,
+          "collar": null,
+          "feet": null,
+          "head": null,
+          "toy": null,
+          "utilities": [
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+          ]
+        },
+        "favorite_tricks": [
+          1,
+          null,
+          null,
+          null
+        ],
+        "id": 1,
+        "learned_tricks": [
+          1
+        ],
+        "model": "dragon_m_basic.adr",
+        "name": "Ace",
+        "needs": {
+          "food": 100.0,
+          "groom": 100.0,
+          "mood": 100.0,
+          "play": 100.0
+        },
+        "species_id": 1000015,
+        "updated_at": 1234
+      }
+    ],
+    "vendor_grants": {
+      "9": 1
+    },
+    "version": 1
+  }
+}

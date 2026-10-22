@@ -68,7 +68,6 @@ fn assert_empty(out: &Outcome) {
     assert!(out.relocation.is_none());
     assert!(out.group_heal.is_none());
     assert!(out.nearby.is_empty());
-    assert!(!out.pets_changed);
 }
 
 fn send(tutorial: &mut Tutorial, inner: &[u8], now: u64) -> io::Result<Outcome> {

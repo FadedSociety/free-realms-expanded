@@ -220,6 +220,7 @@ pub fn save_character(path: &Path, character: &CharacterState, gameplay: &Gamepl
         &Snapshot {
             character: character.clone(),
             gameplay: Some(gameplay.clone()),
+            pets: None,
         },
     )
     .expect("fixture save writes");

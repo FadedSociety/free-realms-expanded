@@ -113,6 +113,7 @@ fn reload_via_store(
     let snapshot = game_store::Snapshot {
         character: at.clone(),
         gameplay: Some(game.state()),
+        pets: None,
     };
     game_store::save(path, &snapshot).expect("the character save commits");
     let loaded = game_store::load_or_create(path, at.clone()).expect("the character save loads");

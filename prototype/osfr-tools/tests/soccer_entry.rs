@@ -679,9 +679,9 @@ fn tick_reward_crossing_a_rank_awards_its_title_without_reconnect() {
 
     // The tick marks the character changed, so the gateway saves the staged
     // state; prove the title and the active selection survive the same
-    // `save_with_pet_roster` path the session uses and a real reload.
+    // `game_store::save(&path, &snapshot)` path the session uses and a real reload.
     let path = fixture.0.join("tick-title-save.json");
-    gateway.save_with_pet_roster(&path).unwrap();
+    game_store::save(&path, &gateway.snapshot()).unwrap();
     let reloaded = game_store::load_or_create(&path, snapshot.character.clone()).unwrap();
     let saved = &reloaded
         .gameplay
@@ -955,7 +955,7 @@ fn a_mid_match_save_reloads_back_into_the_world() {
     gateway_send(&mut gateway, &lifecycle(5, instance), loaded_at + 100);
 
     let path = fixture.0.join("mid-match-save.json");
-    gateway.save_with_pet_roster(&path).unwrap();
+    game_store::save(&path, &gateway.snapshot()).unwrap();
     let saved = game_store::load_or_create(&path, fixture.character()).unwrap();
     let reloaded = Gateway::load_gameplay(
         &reference_dir(),

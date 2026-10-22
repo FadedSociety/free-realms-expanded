@@ -384,12 +384,13 @@ fn trick_list_favourite_and_roster_reload_persist() {
         &game_store::Snapshot {
             character: character(),
             gameplay: None,
+            pets: service.document_value(),
         },
     )
     .unwrap();
-    service.save_to(&file.path).unwrap();
+    let saved = game_store::load_or_create(&file.path, character()).unwrap();
     let reloaded =
-        PetService::load_from(PetService::bundled_content().unwrap(), &file.path).unwrap();
+        PetService::from_document(PetService::bundled_content().unwrap(), saved.pets).unwrap();
     let pet = reloaded.pet(pet_id).unwrap();
     assert!(pet.learned_tricks.contains(&1));
     assert_eq!(pet.favorite_tricks[0], Some(1));

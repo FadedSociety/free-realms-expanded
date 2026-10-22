@@ -463,6 +463,7 @@ fn progress_survives_a_reconnect() {
         &game_store::Snapshot {
             character: character.clone(),
             gameplay: Some(held.clone()),
+            pets: None,
         },
     )
     .expect("the character document saves");
@@ -505,6 +506,7 @@ fn progress_survives_a_reconnect() {
         &game_store::Snapshot {
             character: character.clone(),
             gameplay: Some(expected.clone()),
+            pets: None,
         },
     )
     .expect("the finished character document saves");

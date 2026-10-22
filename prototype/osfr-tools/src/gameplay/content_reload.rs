@@ -153,7 +153,6 @@ mod tests {
             }),
             nearby: vec![vec![4]],
             broadcast: Some("staged notice".into()),
-            pets_changed: true,
         }
     }
 
@@ -182,10 +181,9 @@ mod tests {
         );
         assert_eq!(live.nearby, vec![vec![2], vec![4]]);
         assert_eq!(live.broadcast.as_deref(), Some("staged notice"));
-        assert!(live.pets_changed);
         // Nothing staged never wipes the live state.
         live.absorb(Outcome::default());
-        assert!(live.dev_command_denied && live.changed && live.pets_changed);
+        assert!(live.dev_command_denied && live.changed);
         assert!(live.shared_field.is_some() && live.zoning.is_some());
         assert!(
             live.broadcast.is_some(),

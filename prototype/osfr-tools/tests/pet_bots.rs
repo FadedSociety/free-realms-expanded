@@ -505,7 +505,10 @@ fn seed_pet(rig: &Rig, account: usize) -> u32 {
     let definition = content.definition(CHAR_SPECIES).unwrap();
     let mut pets = PetService::new(content).unwrap();
     let pet_id = pets.adopt_vendor_grant(1, &definition, 0).unwrap();
-    pets.save_to(&rig.save_path(account)).unwrap();
+    let path = rig.save_path(account);
+    let mut save: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    save["pets"] = pets.document_value().unwrap();
+    fs::write(&path, serde_json::to_vec(&save).unwrap()).unwrap();
     pet_id
 }
 
