@@ -8,9 +8,9 @@
 //! startup row, never from the sender.
 //!
 //! RECONSTRUCTED (R): the server-side refusal policy (mounted, moving into a
-//! `freezeMovement` slot, unrecovered/foreign/mismatched animation) and the
-//! 500 ms "moving" window. Dance (3200) stays unavailable until its slot is
-//! recovered.
+//! `freezeMovement` slot, foreign/mismatched animation) and the 500 ms
+//! "moving" window. Dance (3200) is the client's `emo_dance` animation group
+//! (`AnimationGroups.xml:874`) and follows the same rules as every emote.
 //!
 //! Canaries: `canary_*` tests fail if the policy stops distinguishing rows.
 
@@ -87,31 +87,27 @@ fn plain_phrases_are_never_restricted() {
 }
 
 #[test]
-fn every_recovered_emote_is_accepted_standing_except_unrecovered_dance() {
+fn every_recovered_emote_is_accepted_standing() {
     let catalog = recovered_catalog();
-    let mut accepted = 0;
-    let mut refused = Vec::new();
-    for row in EMOTE_ACTIONS {
-        match catalog.authorize_emote(row.quick_chat_id as i32, standing()) {
-            Ok(()) => accepted += 1,
-            Err(error) => refused.push((row.quick_chat_id, error)),
-        }
-    }
-    assert_eq!(accepted, EMOTE_ACTIONS.len() - 1);
-    assert_eq!(
-        refused,
-        [(
-            184,
-            ChatError::EmoteRefused(EmoteRejection::UnrecoveredAnimation { animation_id: 3200 })
-        )]
-    );
+    let refused: Vec<_> = EMOTE_ACTIONS
+        .iter()
+        .filter_map(|row| {
+            let id = row.quick_chat_id as i32;
+            catalog
+                .authorize_emote(id, standing())
+                .err()
+                .map(|e| (id, e))
+        })
+        .collect();
+    assert_eq!(refused, []);
     assert_eq!(phrase("dance"), 184);
+    assert_eq!(catalog.authorize_emote(184, standing()), Ok(()));
 }
 
 #[test]
 fn mounted_actors_cannot_emote_but_can_still_use_plain_chat() {
     let catalog = recovered_catalog();
-    for row in EMOTE_ACTIONS.iter().filter(|row| row.animation_id != 3200) {
+    for row in EMOTE_ACTIONS.iter() {
         assert_eq!(
             catalog.authorize_emote(row.quick_chat_id as i32, mounted()),
             Err(ChatError::EmoteRefused(EmoteRejection::Mounted)),
@@ -154,7 +150,7 @@ fn a_catalog_row_cannot_supply_arbitrary_animation_data() {
     let catalog = QuickChatCatalog::from_rows([
         (5, 99_999),   // outside the Emotes slot block
         (6, -3306),    // negative id
-        (7, 3200),     // unrecovered slot on a non-emote row
+        (184, 3899),   // Dance phrase, an id with neither slot nor group
         (cheer, 3317), // recovered phrase, another emote's animation
         (8, 3999),     // just past the block
         (9, 3000),     // just before the block
@@ -172,8 +168,8 @@ fn a_catalog_row_cannot_supply_arbitrary_animation_data() {
         ChatError::EmoteRefused(EmoteRejection::ForeignAnimation { .. })
     ));
     assert_eq!(
-        refused(7),
-        ChatError::EmoteRefused(EmoteRejection::UnrecoveredAnimation { animation_id: 3200 })
+        refused(184),
+        ChatError::EmoteRefused(EmoteRejection::AnimationMismatch { animation_id: 3899 })
     );
     assert_eq!(
         refused(cheer),
@@ -366,13 +362,13 @@ fn ignored_sender_does_not_reach_an_ignoring_player_with_an_emote() {
 }
 
 /// Canary: the gateway's old catalog (`from_ids`, built before this change)
-/// treats every row as plain, so Dance and mounted emotes slip through. If the
-/// policy ever stops reading the animation column this pair of asserts fails.
+/// treats every row as plain, so mounted emotes, Dance included, slip through.
+/// If the policy ever stops reading the animation column these asserts fail.
 #[test]
 fn canary_catalog_without_animation_data_accepts_what_the_real_one_refuses() {
     let blind = QuickChatCatalog::from_ids([184, phrase("cheer")]);
     assert_eq!(blind.authorize_emote(184, mounted()), Ok(()));
     let real = recovered_catalog();
-    assert!(real.authorize_emote(184, standing()).is_err());
+    assert!(real.authorize_emote(184, mounted()).is_err());
     assert!(real.authorize_emote(phrase("cheer"), mounted()).is_err());
 }

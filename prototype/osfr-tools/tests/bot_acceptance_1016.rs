@@ -1008,10 +1008,10 @@ fn is_quick_chat(message: &[u8], phrase: i32) -> bool {
     message.starts_with(&[67, 0, 3, 0]) && message.get(4..8) == Some(&phrase.to_le_bytes()[..])
 }
 
-/// W139: a quick-chat emote reaches a second player; Dance (184, no recovered
-/// animation slot) is dropped silently.
+/// W139: a quick-chat emote reaches a second player. L038: so does Dance (184),
+/// whose animation 3200 is the client's `emo_dance` group.
 #[test]
-fn emote_reaches_a_second_bot_and_dance_does_not() {
+fn emote_and_dance_reach_a_second_bot() {
     let _serial = serial();
     const WAVE: i32 = 135;
     const DANCE: i32 = 184;
@@ -1028,15 +1028,8 @@ fn emote_reaches_a_second_bot_and_dance_does_not() {
         .expect("emote 135 not delivered to the second bot");
 
     raw(&mut a, &quick_chat(DANCE, "FixtureA"));
-    assert!(
-        b.wait_for(QUIET, |m| is_quick_chat(m, DANCE)).is_err(),
-        "Dance (184) was delivered"
-    );
-
-    // Canary: the channel still works after the refusal.
-    raw(&mut a, &quick_chat(WAVE, "FixtureA"));
-    b.wait_for(T, |m| is_quick_chat(m, WAVE))
-        .expect("emote 135 lost after Dance");
+    b.wait_for(T, |m| is_quick_chat(m, DANCE))
+        .expect("Dance (184) not delivered to the second bot");
     disconnect(a);
     disconnect(b);
 }

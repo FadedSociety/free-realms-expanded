@@ -17,6 +17,9 @@
 //! * `client/Resources/AnimationTypes.xml`: the `Emotes` slot block, including
 //!   `emo_no` = 3317, `emo_dance_basic` = 3201 and `hideSlotType` /
 //!   `freezeMovement` / `disableBoneMasking` / `priority` attributes.
+//! * `client/Resources/AnimationGroups.xml:874`: animation id 3200 (the `Dance`
+//!   phrase) is the `emo_dance` group of slots 3201 and 3211-3214; the client
+//!   resolves a group id to one member slot at play time (`0x007829a0`).
 //! * `client/Resources/AnimationTransitionRules.xml`: `Any -> Emote` plays once
 //!   (`numLoops="1"`, easeIn/easeOut 0.4) and `Emote -> Fidgets` returns.
 //! * Locale export text for the menu and phrase strings.
@@ -24,9 +27,7 @@
 //! RECONSTRUCTED, labelled at each call site: the request-validation policy
 //! (mounted/moving rejection) built on the recovered button/motion data.
 //!
-//! NOT CLAIMED: animation id 3200 (the `Dance` phrase) has no `AnimationSlot`
-//! row, so it stays an explicit gap instead of a guessed motion; no native
-//! client run is claimed here.
+//! NOT CLAIMED: no native client run is claimed here.
 // The module is not registered in `src/lib.rs` (lead-owned). Including the exact
 // source file keeps this target compiling against the real artifact. Integration
 // step for the lead: register the module and drop this `#[path]` include.
@@ -38,9 +39,9 @@ use piece_093::{
     DEAD_EMOTE_BINDINGS, DISABLE_BONE_MASKING_ANIMATIONS, EMOTE_ACTIONS, EMOTE_ANIMATIONS,
     EMOTE_CATEGORIES, EMOTE_COMMANDS, EMOTE_MENU_ROOT, EMOTE_TRANSITION, EmoteCategory,
     EmoteContext, EmoteRejection, FREEZE_MOVEMENT_ANIMATIONS, HIDE_SLOT_TYPE_EXCEPTIONS,
-    PRIORITY_ONE_ANIMATIONS, TOP_LEVEL_PARENT, UNRECOVERED_ANIMATION_IDS, emote_action,
-    emote_animation_name, emote_command_id, emote_restrictions, emote_visible_in_menu,
-    validate_emote,
+    PRIORITY_ONE_ANIMATIONS, TOP_LEVEL_PARENT, emote_action, emote_animation_name,
+    emote_command_id, emote_restrictions, emote_visible_in_menu, validate_emote,
+    validate_emote_phrase,
 };
 
 #[test]
@@ -111,25 +112,23 @@ fn emote_menu_categories_match_the_recovered_locale_ids() {
 }
 
 #[test]
-fn animation_names_cover_every_referenced_id_except_the_recorded_gap() {
-    // 73 actions reference 72 distinct animation ids; 3200 (the `Dance` phrase)
-    // has no AnimationSlot row, so 71 ids carry a recovered slot name.
-    assert_eq!(EMOTE_ANIMATIONS.len(), 71);
+fn animation_names_cover_every_referenced_id() {
+    // 73 actions reference 72 distinct animation ids: 71 AnimationSlot rows
+    // plus the `emo_dance` AnimationGroup (3200) played by the `Dance` phrase.
+    assert_eq!(EMOTE_ANIMATIONS.len(), 72);
     assert_eq!(emote_animation_name(3301), Some("emo_angry"));
     assert_eq!(emote_animation_name(3317), Some("emo_no"));
     assert_eq!(emote_animation_name(3201), Some("emo_dance_basic"));
     assert_eq!(emote_animation_name(3369), Some("emo_scare"));
     assert_eq!(emote_animation_name(3001), Some("emo_outfit_all"));
     assert_eq!(emote_animation_name(3101), Some("emo_talk_basic"));
-    // The `Dance` phrase points at 3200, which has no AnimationSlot row.
-    assert_eq!(UNRECOVERED_ANIMATION_IDS, [3200]);
+    // The `Dance` phrase points at the group, AnimationGroups.xml:874.
     assert_eq!(emote_action(184).unwrap().animation_id, 3200);
-    assert_eq!(emote_animation_name(3200), None);
-    // Every action resolves to a named slot or to the recorded gap; nothing else.
+    assert_eq!(emote_animation_name(3200), Some("emo_dance"));
+    // Every action resolves to a named slot or group; nothing else.
     for action in EMOTE_ACTIONS {
         assert!(
-            emote_animation_name(action.animation_id).is_some()
-                || UNRECOVERED_ANIMATION_IDS.contains(&action.animation_id),
+            emote_animation_name(action.animation_id).is_some(),
             "action {} points at unexplained animation {}",
             action.quick_chat_id,
             action.animation_id
@@ -151,18 +150,25 @@ fn restriction_flags_come_from_the_animation_block() {
     assert!(emote_restrictions(3001).freeze_movement);
     assert!(!emote_restrictions(3333).freeze_movement);
     // Every emote slot hides the wielded item except the recorded exceptions.
-    assert_eq!(HIDE_SLOT_TYPE_EXCEPTIONS, [3001, 3200]);
+    assert_eq!(HIDE_SLOT_TYPE_EXCEPTIONS, [3001]);
     assert!(emote_restrictions(3317).hide_slot_type);
     assert!(!emote_restrictions(3001).hide_slot_type);
-    assert!(!emote_restrictions(3200).hide_slot_type);
     assert_eq!(DISABLE_BONE_MASKING_ANIMATIONS, [3329]);
     assert!(emote_restrictions(3329).disable_bone_masking);
     assert_eq!(
         PRIORITY_ONE_ANIMATIONS,
-        [3001, 3101, 3201, 3211, 3212, 3213, 3214]
+        [3001, 3101, 3200, 3201, 3211, 3212, 3213, 3214]
     );
     assert!(emote_restrictions(3201).priority_one);
     assert!(!emote_restrictions(3317).priority_one);
+    // The `emo_dance` group (AnimationGroups.xml:874-879) plays one of its member
+    // slots, so its flags are theirs (AnimationTypes.xml:1156-1160: priority 1,
+    // hideSlotType 1, no freeze or bone-masking flag).
+    let dance = emote_restrictions(3200);
+    assert!(dance.hide_slot_type && dance.priority_one);
+    for member in [3201, 3211, 3212, 3213, 3214] {
+        assert_eq!(emote_restrictions(member), dance, "member slot {member}");
+    }
     // `Any -> Emote` runs the clip once and blends 0.4s in/out.
     assert_eq!(EMOTE_TRANSITION.num_loops, 1);
     assert_eq!(EMOTE_TRANSITION.ease_in, 0.4);
@@ -234,12 +240,39 @@ fn validation_accepts_recovered_emotes_and_rejects_restricted_requests() {
         Err(EmoteRejection::Moving { animation_id: 3001 })
     );
 
+    // Dance plays the `emo_dance` group standing and is blocked mounted like
+    // every other emote.
     assert_eq!(
-        validate_emote("dance", standing).unwrap_err(),
-        EmoteRejection::UnrecoveredAnimation { animation_id: 3200 }
+        validate_emote("dance", standing).unwrap().animation_id,
+        3200
+    );
+    assert_eq!(
+        validate_emote("dance", mounted),
+        Err(EmoteRejection::Mounted)
     );
     assert_eq!(
         validate_emote("nope", standing),
         Err(EmoteRejection::UnknownCommand)
     );
+}
+
+/// L038 edge: naming the `emo_dance` group opens no fallback. An id with
+/// neither a slot nor a group (AnimationTypes.xml and AnimationGroups.xml have
+/// no id 3899) has no name, cannot ride the Dance phrase, and is refused
+/// outside the Emotes block.
+#[test]
+fn an_animation_id_with_neither_a_slot_nor_a_group_is_still_refused() {
+    let standing = EmoteContext::standing();
+    assert_eq!(emote_animation_name(3899), None);
+    assert_eq!(
+        validate_emote_phrase(184, 3899, standing),
+        Err(EmoteRejection::AnimationMismatch { animation_id: 3899 })
+    );
+    assert_eq!(
+        validate_emote_phrase(7, 99_999, standing),
+        Err(EmoteRejection::ForeignAnimation {
+            animation_id: 99_999
+        })
+    );
+    assert_eq!(validate_emote_phrase(184, 3200, standing), Ok(()));
 }

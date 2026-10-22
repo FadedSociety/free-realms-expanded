@@ -538,7 +538,7 @@ fn quick_chat_catalog_carries_animation_ids_and_emote_context_follows_movement()
     };
     let reference = Reference::new(VERSION, None);
     let mut snapshot = StartupSnapshot::empty();
-    snapshot.world.quick_chat = vec![row(11, 0), row(12, 3306), row(13, 3200)];
+    snapshot.world.quick_chat = vec![row(11, 0), row(12, 3306), row(13, 99_999), row(14, 3200)];
     let mut gateway =
         Gateway::load_with_startup_snapshot(&reference.directory, initial_state(), snapshot)
             .unwrap();
@@ -546,7 +546,8 @@ fn quick_chat_catalog_carries_animation_ids_and_emote_context_follows_movement()
     let standing = osfr_tools::social_chat::piece_093::EmoteContext::standing();
     assert!(catalog.authorize_emote(11, standing).is_ok());
     assert!(catalog.authorize_emote(12, standing).is_ok());
-    assert!(catalog.authorize_emote(13, standing).is_err()); // Dance 3200 stays unavailable
+    assert!(catalog.authorize_emote(13, standing).is_err()); // outside the Emotes block
+    assert!(catalog.authorize_emote(14, standing).is_ok()); // Dance, the emo_dance group
 
     gateway.handle(&login(1, VERSION, "ticket")).unwrap();
     gateway.handle(&packet(13, &[])).unwrap();

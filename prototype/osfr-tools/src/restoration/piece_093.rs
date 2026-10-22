@@ -18,6 +18,12 @@
 //! * `client/Resources/AnimationTypes.xml` `Emotes` block: the animation slot
 //!   names behind those ids and their `hideSlotType` / `freezeMovement` /
 //!   `disableBoneMasking` / `priority` attributes.
+//! * `client/Resources/AnimationGroups.xml:874`: animation id 3200, played by
+//!   the `Dance` phrase (quick-chat id 184), is the `emo_dance` group of slots
+//!   3201 and 3211-3214 (weight 1.0 each). The client loads the groups
+//!   (`0x007a9db0`) and resolves a group id to one weighted member slot
+//!   (`0x007829a0`) when the quick-chat receiver (`0x00b966e0`) plays the
+//!   phrase's animation through `0x0096c780`.
 //! * `client/Resources/AnimationTransitionRules.xml`: `Any -> Emote` plays once
 //!   (`numLoops="1"`, easeIn/easeOut 0.4), `Emote -> Fidgets` hands back.
 //! * `ChatLog:enableEmotesButton` is called with 0 while a mount data row exists
@@ -27,11 +33,6 @@
 //! [`validate_emote`] mirrors the recovered client button/motion data on the
 //! server side. It is a policy this restoration owns, not a first-party server
 //! rule.
-//!
-//! GAP: animation id 3200, played by the `Dance` phrase (quick-chat id 184,
-//! display locale 60), has no `AnimationSlot` row in `AnimationTypes.xml` and no
-//! `CodeAnimationMappings.txt` row. It is reported as unrecovered and rejected
-//! instead of inventing a motion.
 
 /// Menu root row id of the Emotes panel (`BaseClient.QuickChatData` row 13).
 pub const EMOTE_MENU_ROOT: u32 = 13;
@@ -703,9 +704,8 @@ pub const EMOTE_ACTIONS: [EmoteActionRow; 73] = [
 ];
 
 /// `AnimationTypes.xml` slot names for the animation ids the quick-chat table
-/// references. Id 3200 has no slot row and is listed in
-/// [`UNRECOVERED_ANIMATION_IDS`].
-pub const EMOTE_ANIMATIONS: [(u32, &str); 71] = [
+/// references, plus the one `AnimationGroups.xml` group it references (3200).
+pub const EMOTE_ANIMATIONS: [(u32, &str); 72] = [
     (3001, "emo_outfit_all"),
     (3002, "emo_outfit_head"),
     (3003, "emo_outfit_shoulders"),
@@ -714,6 +714,8 @@ pub const EMOTE_ANIMATIONS: [(u32, &str); 71] = [
     (3006, "emo_outfit_legs"),
     (3007, "emo_outfit_feet"),
     (3101, "emo_talk_basic"),
+    // AnimationGroups.xml:874 group, no slot row: plays one of 3201, 3211-3214.
+    (3200, "emo_dance"),
     (3201, "emo_dance_basic"),
     (3211, "emo_dance_01"),
     (3212, "emo_dance_02"),
@@ -779,10 +781,6 @@ pub const EMOTE_ANIMATIONS: [(u32, &str); 71] = [
     (3369, "emo_scare"),
 ];
 
-/// Animation ids referenced by the quick-chat table that have no recovered
-/// `AnimationSlot` name. `Dance` (id 184) points at 3200.
-pub const UNRECOVERED_ANIMATION_IDS: [u32; 1] = [3200];
-
 /// Slots with `freezeMovement="1"`: the client holds the actor still while the
 /// clip plays. `emo_spraycan` (3351) is in the Emotes block but no quick-chat
 /// row reaches it yet.
@@ -791,12 +789,14 @@ pub const FREEZE_MOVEMENT_ANIMATIONS: [u32; 2] = [3001, 3351];
 /// Slots with `disableBoneMasking="1"`.
 pub const DISABLE_BONE_MASKING_ANIMATIONS: [u32; 1] = [3329];
 
-/// Slots with `priority="1"` inside the Emotes block.
-pub const PRIORITY_ONE_ANIMATIONS: [u32; 7] = [3001, 3101, 3201, 3211, 3212, 3213, 3214];
+/// Slots with `priority="1"` inside the Emotes block. Group 3200 follows its
+/// member slots, which all carry it (`AnimationTypes.xml:1156-1160`).
+pub const PRIORITY_ONE_ANIMATIONS: [u32; 8] = [3001, 3101, 3200, 3201, 3211, 3212, 3213, 3214];
 
 /// Every named emote slot carries `hideSlotType="1"` (the wielded item is
-/// hidden for the clip) except these recovered exceptions.
-pub const HIDE_SLOT_TYPE_EXCEPTIONS: [u32; 2] = [3001, 3200];
+/// hidden for the clip) except these recovered exceptions. Group 3200 hides
+/// because every member slot does.
+pub const HIDE_SLOT_TYPE_EXCEPTIONS: [u32; 1] = [3001];
 
 /// Recovered `Any -> Emote` transition rule.
 pub struct EmoteTransition {
@@ -842,8 +842,7 @@ pub fn emote_action(quick_chat_id: u32) -> Option<EmoteActionRow> {
         .copied()
 }
 
-/// Recovered animation slot name, or `None` when the id is unknown or belongs
-/// to the documented gap ([`UNRECOVERED_ANIMATION_IDS`]).
+/// Recovered animation slot or group name, or `None` when the id is unknown.
 pub fn emote_animation_name(animation_id: u32) -> Option<&'static str> {
     EMOTE_ANIMATIONS
         .iter()
@@ -900,8 +899,6 @@ impl EmoteContext {
 pub enum EmoteRejection {
     /// No `EmoteHandler` binding for the command.
     UnknownCommand,
-    /// The row points at an animation id with no recovered slot (id 3200).
-    UnrecoveredAnimation { animation_id: u32 },
     /// The animation id is outside the recovered `Emotes` slot block.
     ForeignAnimation { animation_id: u32 },
     /// The quick-chat row's animation differs from the recovered row for that id.
@@ -939,9 +936,6 @@ pub fn validate_emote_phrase(
     animation_id: u32,
     context: EmoteContext,
 ) -> Result<(), EmoteRejection> {
-    if UNRECOVERED_ANIMATION_IDS.contains(&animation_id) {
-        return Err(EmoteRejection::UnrecoveredAnimation { animation_id });
-    }
     if !EMOTE_ANIMATION_BLOCK.contains(&animation_id) {
         return Err(EmoteRejection::ForeignAnimation { animation_id });
     }

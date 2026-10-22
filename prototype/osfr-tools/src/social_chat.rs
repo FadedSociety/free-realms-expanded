@@ -456,8 +456,8 @@ impl QuickChatCatalog {
 
     /// (R) Apply the recovered emote restrictions (`piece_093`) to one phrase.
     /// Plain phrases always pass; an animated row must be a recovered emote
-    /// animation (3200 `Dance` stays unavailable) and the actor state must allow
-    /// it. Refusals are silent at the gateway, like the client's disabled button.
+    /// animation and the actor state must allow it. Refusals are silent at the
+    /// gateway, like the client's disabled button.
     pub fn authorize_emote(&self, phrase_id: i32, context: EmoteContext) -> Result<(), ChatError> {
         let animation = *self
             .0
