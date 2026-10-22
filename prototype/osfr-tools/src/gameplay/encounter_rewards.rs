@@ -12,6 +12,10 @@ use super::*;
 /// (R) Local copy: no recovered client locale row exists for this refusal.
 const REWARD_UNREPRESENTABLE: &str = "This reward and any prize item it carried were not granted: your coin balance or active job is at its limit.";
 
+/// (R) The same refusal for a finished derby's flat completion payout (`derby_session.rs`). No
+/// recovered client locale row names it either, so it uses one bounded local line.
+pub(super) const DERBY_PAYOUT_REFUSED: &str = "Your demolition derby completion reward was not granted: your coin balance or Demo Derby Driver progress is at its limit.";
+
 impl Gameplay {
     /// Apply one encounter reward. A reward that cannot be represented is
     /// refused whole for this player and leaves the rest of the outcome alone;

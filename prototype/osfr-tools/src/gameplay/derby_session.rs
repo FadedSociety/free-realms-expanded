@@ -193,8 +193,14 @@ impl Gameplay {
     /// score or a client-supplied result. `DerbyGateway::take_completion` records the match
     /// instance in the ledger as it hands it over, so a repeated record or a reconnect cannot pay
     /// the same match twice. The grant is staged with `rewards::apply_grant` over
-    /// `reward_snapshot()` and adopted by `adopt_reward_state` (the shared minigame reward path),
-    /// so any refusal leaves coins, XP and the ledger untouched.
+    /// `reward_snapshot()` and adopted by `adopt_reward_state` (the shared minigame reward path).
+    ///
+    /// The same once-per-instance handover emits the quest event: a finished derby is a
+    /// server-observed `FinishMinigame` credit for the package's game id (`DerbyGateway::game_id`,
+    /// the MiniGameData row the 39/16 offer names) whether the flat payout fits, is refused or is
+    /// tuned to zero. A payout the wallet or job progress cannot represent is a player-local
+    /// refusal: one system line, the consumed ledger and the quest credit stay committed, and the
+    /// session keeps running (never an `io::Error` that ends it).
     fn pay_derby_completion(
         &mut self,
         character: &CharacterState,
@@ -203,17 +209,31 @@ impl Gameplay {
         let Some(instance) = self.derby.as_mut().and_then(DerbyGateway::take_completion) else {
             return Ok(());
         };
-        let grant = self
-            .derby
-            .as_ref()
-            .unwrap()
-            .completion_grant(character.guid);
+        // The ledger row is taken: persist it with the quest credit, whatever the payout does.
+        out.changed = true;
+        let derby = self.derby.as_ref().unwrap();
+        let (minigame_id, grant) = (derby.game_id(), derby.completion_grant(character.guid));
+        self.npc_quest_event(
+            crate::quest_engine::QuestEvent::FinishMinigame { minigame_id },
+            out,
+        )?;
+        let Some(grant) = grant else {
+            return Ok(());
+        };
         let rewards = self.reward_snapshot();
         let key = format!("derby-completion-{instance}");
-        let (next, replies) = crate::rewards::apply_grant(&rewards, &grant, &key)
-            .map_err(|error| invalid(format!("derby completion payout: {error}")))?;
-        out.replies.extend(replies);
-        self.adopt_reward_state(next, out)
+        match crate::rewards::apply_grant(&rewards, &grant, &key) {
+            Ok((next, replies)) => {
+                out.replies.extend(replies);
+                self.adopt_reward_state(next, out)
+            }
+            Err(error) => {
+                eprintln!("derby completion payout for instance {instance} refused: {error}");
+                out.replies
+                    .push(chat::system(super::encounter_rewards::DERBY_PAYOUT_REFUSED));
+                Ok(())
+            }
+        }
     }
 
     fn cancel_derby(&mut self, inner: &[u8], character: &CharacterState) -> io::Result<Outcome> {

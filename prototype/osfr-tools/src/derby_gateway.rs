@@ -60,7 +60,8 @@ pub struct DerbyGatewayContent {
     #[serde(default)]
     pub pickups: Vec<DerbyPickup>,
     /// (R) Flat coins for finishing a match, paid once per match instance. A package with zero
-    /// coins and zero XP pays nothing, so an operator file without these keys still loads.
+    /// coins and zero XP pays nothing, so an operator file without these keys still loads; its
+    /// finished matches still enter the ledger and still credit `finish_minigame`.
     #[serde(default)]
     pub completion_reward_coins: u32,
     /// (R) Demo Derby Driver XP for the same completion; 0 pays no XP.
@@ -95,7 +96,8 @@ pub struct DerbyGatewayState {
     pub previous_job: Option<i32>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub last_paid_unix: Option<u64>,
-    /// Paid match instances, oldest first, at most the newest `MAX_PAID_MATCHES`. The save belongs
+    /// Finished (paid and credited) match instances, oldest first, at most the newest
+    /// `MAX_PAID_MATCHES`; a zero-reward package records its finishes too. The save belongs
     /// to one character, so (this ledger, instance id) is the (character, match) key and another
     /// character's identical instance id is a different match. `next_instance` resumes above the
     /// newest row, so a pruned id is never reissued to a character that was paid for it.
@@ -441,14 +443,11 @@ impl DerbyGateway {
         Ok(accepted)
     }
 
-    /// Take the finished match this session may be paid for: the live match is showing its results
-    /// and the ledger has no row for its instance. Taking records the instance, so the same match
-    /// never yields a second claim. `None` when the package grants nothing or the match is not
-    /// finished.
+    /// Take the finished match this session may be paid and credited for: the live match is
+    /// showing its results and the ledger has no row for its instance. Taking records the
+    /// instance, so the same match never yields a second claim. `None` when the match is not
+    /// finished or was already taken; the reward amount plays no part (see `completion_grant`).
     pub fn take_completion(&mut self) -> Option<i32> {
-        if self.content.completion_reward_coins == 0 && self.content.completion_reward_xp == 0 {
-            return None;
-        }
         let instance = self
             .service
             .as_ref()
@@ -466,13 +465,15 @@ impl DerbyGateway {
 
     /// The one flat completion grant this package pays. It never carries items and never derives
     /// from a contact report, a score or a match duration; `display` is the ordinary reward toast.
-    /// (R) The amounts are content, not recovered retail values.
-    pub fn completion_grant(&self, guid: u64) -> RewardGrant {
+    /// (R) The amounts are content, not recovered retail values. `None` for a 0 coin / 0 XP
+    /// package, which pays nothing and sends no toast.
+    pub fn completion_grant(&self, guid: u64) -> Option<RewardGrant> {
         let job_xp = match self.content.completion_reward_xp {
+            0 if self.content.completion_reward_coins == 0 => return None,
             0 => BTreeMap::new(),
             xp => BTreeMap::from([(DEMO_DERBY_DRIVER_PROFILE, xp)]),
         };
-        RewardGrant {
+        Some(RewardGrant {
             coins: self.content.completion_reward_coins,
             items: Vec::new(),
             job_xp,
@@ -484,10 +485,17 @@ impl DerbyGateway {
                 name_id: 0,
                 rows: Vec::new(),
             },
-        }
+        })
     }
 
-    /// The ledger to persist; `None` keeps a save with no paid match byte-identical.
+    /// The package's own MiniGameData row (`derby_entry.json` `game_id`, client row 39 "Wildwood
+    /// Demo Derby" in the shipped file): the game id the 39/16 offer names and the id a finished
+    /// match credits to `finish_minigame`. `validate_content` keeps it positive.
+    pub fn game_id(&self) -> u32 {
+        self.content.game_id as u32
+    }
+
+    /// The ledger to persist; `None` keeps a save with no finished match byte-identical.
     pub fn saved_state(&self) -> Option<DerbyGatewayState> {
         (!self.paid_matches.is_empty()).then(|| DerbyGatewayState {
             previous_job: None,

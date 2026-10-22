@@ -6,8 +6,11 @@
 //! 009eeba0, 009eec60 and 009eeeb0. No OSFR packet capture is used here.
 //!
 //! All game rules in DerbyRules, NPC fill/keys, combat, pickup selection, timers, result
-//! ordering and generic minigame defaults are reconstructed policy (R). F164 withholds rewards:
-//! every collision is a client `34/16` report, so there is no server-verified outcome to pay from.
+//! ordering and generic minigame defaults are reconstructed policy (R). Every collision is a client
+//! `34/16` report the service bounds (pose age, radius, cooldown, impact) before scoring, so the
+//! score is not independently verified. The gateway pays its flat completion reward and credits
+//! `finish_minigame` once per match at the Results phase (T219/T369), reached by the score target
+//! or the time limit.
 //! Unknown reader fields remain raw words/bytes. Native launch and gateway routing are external
 //! integration responsibilities.
 

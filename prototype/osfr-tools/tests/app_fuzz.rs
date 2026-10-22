@@ -1227,18 +1227,32 @@ fn active_derby_hostile_records_cancel_and_tick_transitions_are_bounded() {
     assert!(!gateway.gameplay().unwrap().derby_active());
 }
 
-/// T219 gate 4: a completion payout that cannot be applied (this wallet is already at the wire
-/// maximum) is a refusal. The application is dropped, the match stays running, the wallet and the
-/// ledger are unchanged, and the session keeps serving this player; no other player is involved.
+/// T369 gate 4: a completion payout that cannot be applied (this wallet is already at the wire
+/// maximum) is a player-local refusal, never an error that ends the session. The finished match
+/// stays committed (results phase, consumed ledger, quest credit), the wallet and XP are
+/// unchanged, one bounded server line replaces the reward bundle, and the session keeps serving
+/// this player; no other player is involved. The T219 test id is kept (protected-pass): the
+/// player-visible wallet/XP outcome still changes nothing; the committed finish is the deliberate
+/// T369 exception.
 #[test]
 fn a_refused_derby_completion_payout_changes_nothing() {
     let fixture = Fixture::new();
-    let (mut gateway, npc, _) = fixture.active_derby_with(fixture.gateway_with_max_coins());
+    let (mut gateway, npc, instance) = fixture.active_derby_with(fixture.gateway_with_max_coins());
     let guid = gateway.state().guid;
     gateway
         .handle_at(&wrap(&derby_pose(guid, [0.0, 0.0, 0.0])), 3_900)
         .unwrap();
     let before = gateway.snapshot();
+    let before_game = before.gameplay.as_ref().unwrap();
+    let before_coins = before_game.inventory.coins;
+    let before_xp = before_game
+        .profiles
+        .as_ref()
+        .unwrap()
+        .experience
+        .get(&osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)
+        .copied()
+        .unwrap_or(0);
     let hit = encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
         reporter: ParticipantKey(guid),
         other: npc,
@@ -1247,23 +1261,50 @@ fn a_refused_derby_completion_payout_changes_nothing() {
     .unwrap();
     let refused = gateway.handle_at(&wrap(&hit), 4_000).unwrap();
     bounded(&refused);
+    let replies: Vec<_> = refused
+        .replies
+        .iter()
+        .filter_map(|packet| unwrap_reply(packet))
+        .collect();
     assert!(
-        !refused
-            .replies
-            .iter()
-            .filter_map(|packet| unwrap_reply(packet))
-            .any(|packet| packet.starts_with(&[50, 0, 1])),
+        !replies.iter().any(|packet| packet.starts_with(&[50, 0, 1])),
         "a refused payout sends no reward bundle"
     );
     assert_eq!(
-        gateway.snapshot(),
-        before,
-        "a refused payout changes nothing"
+        replies
+            .iter()
+            .filter(|packet| packet.starts_with(&[15, 0, 3, 0]))
+            .count(),
+        1,
+        "the refusal answers one bounded server line"
+    );
+    let after = gateway.snapshot();
+    let after_game = after.gameplay.as_ref().unwrap();
+    assert_eq!(
+        after_game.inventory.coins, before_coins,
+        "the refused payout paid coins"
+    );
+    assert_eq!(
+        after_game
+            .profiles
+            .as_ref()
+            .unwrap()
+            .experience
+            .get(&osfr_tools::derby_gateway::DEMO_DERBY_DRIVER_PROFILE)
+            .copied()
+            .unwrap_or(0),
+        before_xp,
+        "the refused payout paid XP"
+    );
+    assert_eq!(
+        after_game.derby.as_ref().unwrap().paid_matches,
+        vec![instance],
+        "the finished match ledger stays consumed"
     );
     assert_eq!(
         gateway.gameplay().unwrap().derby_phase(),
-        Some(osfr_tools::derby::DerbyPhase::Running),
-        "the refused results transition is rolled back, not half applied"
+        Some(osfr_tools::derby::DerbyPhase::Results),
+        "the server-observed finish stays committed, not rolled back"
     );
     follow_up(&mut gateway);
 }

@@ -96,8 +96,9 @@ struct Binding {
 }
 
 /// Every row this slice binds. The greeting is always the clicked row's own
-/// `greeting_string_id`; no row borrows a neighbour's line.
-const BINDINGS: [Binding; 13] = [
+/// `greeting_string_id`; no row borrows a neighbour's line. T369 added Crash
+/// Davis and Dalton Narrowbrow when it enabled the derby chapter's two quests.
+const BINDINGS: [Binding; 15] = [
     Binding {
         npc_id: 9000000042,
         name: "Carlos Brazenfist",
@@ -162,6 +163,32 @@ const BINDINGS: [Binding; 13] = [
         guide_row: "| 1 | So, You Want To Be A Miner?",
         proof: Proof::GuideQuote,
         quest: None,
+    },
+    Binding {
+        npc_id: 9000000289,
+        name: "Crash Davis",
+        file: "wilds.json",
+        greeting: 393376,
+        hash: 2000949526,
+        dat_line: 52695,
+        guide: DERBY_GUIDE,
+        guide_line: 71,
+        guide_row: "| 2 | **Demo Derby: License to Drive** |",
+        proof: Proof::GuideQuote,
+        quest: Some(("demo_derby_driver.json", 3060005)),
+    },
+    Binding {
+        npc_id: 9000000295,
+        name: "Dalton Narrowbrow",
+        file: "wilds.json",
+        greeting: 395495,
+        hash: 3058718898,
+        dat_line: 80791,
+        guide: DERBY_GUIDE,
+        guide_line: 70,
+        guide_row: "| 1 | **Demo Derby: Rules of the Road** |",
+        proof: Proof::GuideQuote,
+        quest: Some(("demo_derby_driver.json", 3060004)),
     },
     Binding {
         npc_id: 9000000330,

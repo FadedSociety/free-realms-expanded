@@ -18,17 +18,16 @@
 //!   | harvesting win (`Gameplay::apply_type8` -> `npc_minigame_win`) | 111 | `Gameplay`'s `HARVESTING_GAME_ID` |
 //!   | paid fishing catch (`Gameplay::handle_fishing`) | spot game id | `fishing_spots.json` `spots[].game_id` |
 //!   | kart claim (`Gameplay::handle_kart_entry`/tick) | 31 | `kart_entry.json` `race.speedway` |
+//!   | finished derby (`Gameplay::pay_derby_completion`) | package game id | `derby_entry.json` `game_id` |
 //!
 //!   Chess sends the row id as the 39/18 game id through its `RunSpec`. A craft
 //!   win sends the selected recipe's `minigame_id`; a recipe without one falls
 //!   back to the job content's game id (cooking 46, smelting 77, forging 139,
 //!   each a private `const GAME` the content must match), and the shipped
-//!   `recipes.json` rows carry all three ids.
-//! * derby: `derby_entry.json` `game_id` (39) is a shipped minigame id, but no
-//!   server path emits `FinishMinigame` for it
-//!   (`Gameplay::pay_derby_completion` never calls `npc_minigame_win`, and the
-//!   derby sends no 39/18 or `OnGameWonMsg` 39/14), so it is reported in
-//!   [`Targets::unproduced_minigames`] instead of being accepted.
+//!   `recipes.json` rows carry all three ids. A finished derby credits the
+//!   package's MiniGameData row (`DerbyGateway::game_id`, 39 "Wildwood Demo
+//!   Derby"), never its type id 11, which is MiniGameData row 11 (the Trading
+//!   Card Game).
 //! * `items`: `Inventory::load`'s merged `inventory.json` +
 //!   `item-catalogue.json` definitions. An absent catalogue is an empty set, so
 //!   a graded item target fails loudly instead of passing vacuously.
@@ -67,9 +66,6 @@ pub struct Targets {
     pub dungeons: BTreeSet<u32>,
     /// The ids a server path can emit as a `FinishMinigame` event.
     pub minigames: BTreeSet<u32>,
-    /// Shipped minigame ids no server path can emit; a target on one can never
-    /// advance and is refused with the reason instead of the unknown-id message.
-    pub unproduced_minigames: BTreeSet<u32>,
     /// The merged `inventory.json` + `item-catalogue.json` definitions.
     pub items: BTreeSet<i32>,
     /// The loaded recipe book's stable server ids.
@@ -207,15 +203,13 @@ impl Targets {
                 .filter_map(|recipe| recipe.minigame_id),
         );
 
-        // Derby is the one shipped minigame content row with no producer: its
-        // completion pays but sends no result packet the quest glue reads.
-        targets.unproduced_minigames.extend(
-            read_ids(root, "derby_entry.json", |document| {
+        // `DerbyGateway::load` owns the file; a finished match credits its
+        // `game_id` whatever the flat payout.
+        targets
+            .minigames
+            .extend(read_ids(root, "derby_entry.json", |document| {
                 as_u32(&document["game_id"]).into_iter().collect()
-            })
-            .into_iter()
-            .filter(|id| !targets.minigames.contains(id)),
-        );
+            }));
         Ok(targets)
     }
 }

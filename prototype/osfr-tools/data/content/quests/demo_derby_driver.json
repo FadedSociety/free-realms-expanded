@@ -134,9 +134,53 @@
       "id": 3060004,
       "title_string_id": 403450,
       "giver_npc_id": 9000000295,
+      "job": 49,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000295,
+          "text_string_id": 394062,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 1: Thunder Falls and Crash Davis (training, karts, Crash for Coin), row 1; client 2920218524 'Speak to Dalton Narrowbrow' and 883115591 'Check in with the derby commissioner outside of Thunder Falls to learn about the rules of the arena.'"
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "data/content/npcs/wilds.json records Dalton Narrowbrow (9000000295) with placement=legacy_data in the Wilds at quest_ids_given [3060004], so the Talk target is a spawned server actor, not an unplaced name."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110/T369: the objective ordinal 1, the numeric Talk target binding and the ordered server event policy are local authored keys; the guide recovers no objective id table for this quest."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 394062 'Speak to Dalton Narrowbrow' (hash 2920218524): exact locale match for the guide goal cited here."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "49": 10
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred membership bonus, random loot or item is granted."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202/T369: Rules of the Road is a one-talk first step. Demolition Derby Driver.md records no quest XP or coin figure, so 10 Demo Derby Driver (profile 49) job XP is the T202 first-step rung; the existing five-coin amount is unchanged."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -152,7 +196,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T369: the one objective is the guide's single 'check in with the commissioner' step (client 883115591/2920218524). The guide records no objective id, so objective id 1 and the Talk event binding are local authored keys."
         },
         {
           "kind": "reconstructed",
@@ -160,22 +204,97 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+          "evidence": "(R) no numeric predecessor was mapped; the guide places Rules of the Road early in the chain, so prerequisite_quest_ids stays empty. T369: this is the chapter's first playable step."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "data/content/npcs/wilds.json Dalton Narrowbrow (9000000295) is placement=legacy_data with quest_ids_given [3060004]; data/content/jobs.json demo_derby_driver quest_ids already lists 3060004. No NPC or jobs.json edit is needed."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T369: reward 5 coins / 10 profile-49 job XP with no items, following the T202 first-step rung; content bounds and the existing checked-arithmetic reward path still decide a refused grant."
         }
       ],
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3060005,
       "title_string_id": 403451,
       "giver_npc_id": 9000000289,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "job": 49,
+      "prerequisite_quest_ids": [
+        3060004
+      ],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "minigame_id": 39,
+          "count": 1,
+          "text_string_id": 394068,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 1: Thunder Falls and Crash Davis (training, karts, Crash for Coin), row 2; client 2000949526 'First things first, you'll need to pass your driving test.' and 920450951 'You need to pass your driver's test before you can get in the arena.'"
+            },
+            {
+              "kind": "client",
+              "evidence": "Resources/MiniGameData.txt row 39 '39^11^37938' is TYPE 11 named 37938 'Wildwood Demo Derby' (hash 2918776355); it is derby_entry.json game_id 39, the game id the 39/16 offer names, and the id pay_derby_completion credits to finish_minigame (DerbyGateway::game_id). Row 11 '11^3^4745' is TYPE 3 'FR Trading Card Game' (hash 1299081784), so the type id 11 is not a finish_minigame id. Row 605 '605^11^393296' is a dedicated TYPE-11 'License to Drive' row (hash 3091894649; description 394460 'Pass your behind the wheel test by coming in 1st place at Thunder Falls.')."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T369: the license test is one finished match of the package the server runs (row 39). Row 605 names this test but no server package runs it, and its 'coming in 1st place' condition and the client's 'chat with the pros' step (2000949526, 889892562, 2089990312) are not modelled; a finish, not a win, credits."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403/T369 goal text Global.Text 394068 'Compete in the derby' (hash 3252524785): the location-neutral finish goal of the 3940xx derby goal series that holds 394062 'Speak to Dalton Narrowbrow'; the guide cites no goal line for this step, and 394067 'Compete in a Thunder Falls derby' names an arena the server package (row 39, Wildwood) is not."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000289,
+          "text_string_id": 394063,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 1: Thunder Falls and Crash Davis (training, karts, Crash for Coin), row 2; giver Crash Davis; client 889892562 'Crash Davis has informed you that you'll need to pass a test before you can crash around in the arena.'"
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "data/content/npcs/wilds.json records Crash Davis (9000000289) with placement=legacy_data in the Wilds at quest_ids_given [3060005, 3060006, 3060012, 3060013, 3060044], and derby_gates.json lists him as an arena gate, so the return Talk target is a spawned server actor."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110/T369: objective ordinal 2 and the return-to-giver binding are local authored keys; the guide recovers no objective id table."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T403/T369 goal text Global.Text 394063 'Speak to Crash Davis' (hash 3629848388): the Crash Davis Talk goal of the same 3940xx derby goal series as 394062; the guide cites no goal line for the return step. 93090 'Return to Crash Davis' belongs to the DemoDriver L2 'Respect Mah Authoritah' series (93086-93089), not this chapter."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 20,
+          "items": [],
+          "job_xp": {
+            "49": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: small final-era coin amount for an unknown quest payout; no inferred membership bonus, random loot or item is granted."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202/T369: License to Drive finishes a derby and returns to Crash Davis. Demolition Derby Driver.md records no quest XP or coin figure, so 20 coins and 25 Demo Derby Driver (profile 49) job XP are the T202 chapter step; the flat 25 coin / 10 profile-49 XP match completion (T313) is unchanged and paid separately."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -191,7 +310,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T369: two ordered objectives (finish the derby, then return to Crash Davis) follow the guide's driving-test text; objective ids and the minigame/talk event bindings are local authored keys."
         },
         {
           "kind": "reconstructed",
@@ -199,14 +318,22 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+          "evidence": "(R) T369: prerequisite [3060004] follows the guide's Series 1 ordering (Rules of the Road, then License to Drive); no retail prerequisite table was recovered."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "data/content/npcs/wilds.json Crash Davis (9000000289) is placement=legacy_data with quest_ids_given [3060005, ...]; data/content/jobs.json demo_derby_driver quest_ids already lists 3060005 and trainer Mad Jack (9000000391) teaches profile 49, so no NPC or jobs.json edit is needed. The active play package lab/bundles/playtest-20261016T115811Z/content/profiles.json ships the recovered profile-49 starter row [14481, 616, 623, 13998] (lab/reports/job-outfits-20261015/starter_items.json), so the job can be learned from Mad Jack and selected outside a match, which the job: 49 offer gate needs."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T313/T369: the finished derby is credited at the server's Results transition in src/gameplay/derby_session.rs (the once-per-instance take_completion ledger), whatever the flat payout. The shipped package has no time limit, so Results comes from its 22-point score target, scored from client 34/16 contact reports the server bounds; no 39/18 claim, reconnect or replay credits. Cancelling, quitting, a lobby timeout or an unfinished match pays and credits nothing."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T369: reward 20 coins / 25 profile-49 job XP with no items, the T202 chapter-step rung; content bounds and the existing checked-arithmetic reward path still decide a refused grant."
         }
       ],
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3060006,

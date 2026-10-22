@@ -11806,11 +11806,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1786; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3043 (ModelId=830, ModelFileName=human_m_crash_davis.agr, NameId=419307)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378/T369: en_us_data.dat Global.Text.393376, JenkinsLookup2 hash 2000949526, line 52695; the License to Drive offer in the giver's own voice ('First things first, you'll need to pass your driving test. ... You can talk to a few of the pros around the track...'). notes/Build Guides/Content/Jobs/Demolition Derby Driver.md line 71 (Series 1 row 2, Demo Derby: License to Drive) names Crash Davis as the giver and quotes hash 2000949526; the quest description Global.Text.393336 (hash 889892562) says 'Crash Davis has informed you that you'll need to pass a test', so the speaker is Crash. data/content/quests/demo_derby_driver.json quest 3060005 is his enabled record."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T369: use this recovered speaker line as the fixed default Talk greeting. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
         ]
       },
       "heading": -2.105225,
       "model_id": 830,
-      "model_file_name": "human_m_crash_davis.agr"
+      "model_file_name": "human_m_crash_davis.agr",
+      "greeting_string_id": 393376
     },
     {
       "npc_id": 9500000890,
@@ -12604,11 +12615,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1787; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3044 (ModelId=780, ModelFileName=human_sanctuary_m.adr, NameId=394246)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378/T369: en_us_data.dat Global.Text.395495, JenkinsLookup2 hash 3058718898, line 80791; the commissioner's ruling ('Well then, it looks like you're in violation of quite a few derby codes. That'll be a hefty fine. ...'). notes/Build Guides/Content/Jobs/Demolition Derby Driver.md line 70 (Series 1 row 1, Demo Derby: Rules of the Road) names Dalton Narrowbrow and quotes hash 3058718898 as his line. Corroboration: Global.Text.394284 (hash 2390464450) says Dalton is the derby commissioner who 'will need to ask you a few questions', and this line closes the questions at Global.Text.395491/395493 (title and registration, performance check, sponsor). data/content/quests/demo_derby_driver.json quest 3060004 is his enabled record."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T369: use this recovered speaker line as the fixed default Talk greeting. The guide marks the speaker with a dagger (inferred); the commissioner reading rests on the corroboration above. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
         ]
       },
       "heading": -2.849658,
       "model_id": 780,
-      "model_file_name": "human_sanctuary_m.adr"
+      "model_file_name": "human_sanctuary_m.adr",
+      "greeting_string_id": 395495
     },
     {
       "npc_id": 9500000891,

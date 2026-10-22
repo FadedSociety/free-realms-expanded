@@ -17,9 +17,9 @@
 //! owning loader and every `FinishMinigame` emitter. A `job_level` profile must
 //! be declared by the loaded profile content (`Targets::profiles`); its level
 //! bound (1..=20) and its jobs.json profile are the split loader's. A
-//! `finish_minigame` id the content defines but no server path can emit (derby
-//! 39 today) is refused with that reason instead of being certified, and
-//! `shipped_minigame_producers_are_pinned` fails if the accepted set drifts.
+//! `finish_minigame` id no server path emits is refused instead of being
+//! certified, and `shipped_minigame_producers_are_pinned` fails if the accepted
+//! set drifts.
 //!
 //! `visit_position` geometry is rejected by `QuestEngine::from_split_content`
 //! (`valid_objective_kind`), the bound's only authority; the audit does not
@@ -356,16 +356,8 @@ impl Catalogue {
                     "finish_minigame" => {
                         let minigame = as_u32(&goal["minigame_id"]).unwrap_or(0);
                         if !self.targets.minigames.contains(&minigame) {
-                            // A shipped id no server path can emit is not an
-                            // unknown id: name the missing producer so the
-                            // content fix is an emitter, not a new row.
-                            let reason = if self.targets.unproduced_minigames.contains(&minigame) {
-                                "is a shipped minigame id with no server FinishMinigame emitter"
-                            } else {
-                                "is not a shipped minigame id"
-                            };
                             violations.push(format!(
-                                "{owner} (finish_minigame): minigame {minigame} {reason}"
+                                "{owner} (finish_minigame): minigame {minigame} is not a shipped minigame id"
                             ));
                         }
                     }
@@ -514,10 +506,6 @@ fn every_talk_target_and_visit_point_resolves() {
         catalogue.targets.recipes.len(),
         catalogue.targets.gather.len()
     );
-    println!(
-        "shipped minigame ids with no FinishMinigame emitter (a target on these cannot advance): {:?}",
-        catalogue.targets.unproduced_minigames
-    );
 
     let reachable: BTreeSet<u32> = catalogue
         .reachable_enabled()
@@ -552,8 +540,9 @@ fn every_talk_target_and_visit_point_resolves() {
 /// The accepted `finish_minigame` ids are the game ids one real server emitter
 /// can send (the producer table in `tests/support/quest_target_sets.rs`).
 /// Pinning the shipped set makes a lost or unmodelled producer fail here instead
-/// of silently certifying or rejecting a quest target. Derby 39 is the one
-/// shipped minigame game id with no emitter, so it must stay refused.
+/// of silently certifying or rejecting a quest target. Derby 39 is the shipped
+/// package's MiniGameData row ("Wildwood Demo Derby") that a finished match
+/// credits; 11 (its type id, MiniGameData row 11 the Trading Card Game) is not.
 #[test]
 fn shipped_minigame_producers_are_pinned() {
     let catalogue = Catalogue::load(&content_dir()).expect("the shipped split catalogue loads");
@@ -565,20 +554,10 @@ fn shipped_minigame_producers_are_pinned() {
             .copied()
             .collect::<Vec<_>>(),
         vec![
-            18, 20, 31, 42, 43, 44, 46, 66, 67, 77, 111, 134, 135, 136, 137, 139, 596, 597, 598,
-            599, 600, 601,
+            18, 20, 31, 39, 42, 43, 44, 46, 66, 67, 77, 111, 134, 135, 136, 137, 139, 596, 597,
+            598, 599, 600, 601,
         ],
         "the finish_minigame producer set changed; update the producer table and this pin"
-    );
-    assert_eq!(
-        catalogue
-            .targets
-            .unproduced_minigames
-            .iter()
-            .copied()
-            .collect::<Vec<_>>(),
-        vec![39],
-        "derby 39 has no FinishMinigame emitter; accepting it would certify dead content"
     );
 }
 
@@ -871,30 +850,22 @@ fn graded_target_kinds_fail_on_a_scratch_tree() {
         "the target report order must be deterministic"
     );
 
-    // Canary F: a minigame id the content defines but no server path can emit.
-    // Derby 39 pays its completion but never calls `npc_minigame_win` or sends a
-    // 39/18, so certifying that target would hide dead content.
+    // Canary F: a finished derby credits the package's `game_id`, not the
+    // derby type id 11 (MiniGameData row 11 is the Trading Card Game).
     let derby = fixture("canary-derby", Defect::None);
     let derby_path = derby.path().join("derby_entry.json");
     fs::write(&derby_path, br#"{"schema_version":1,"game_id":39}"#)
         .unwrap_or_else(|error| panic!("{}: {error}", derby_path.display()));
     patch_fixture_objective(&derby, FIXTURE_QUEST, "finish_minigame", "minigame_id", 39);
     let catalogue = Catalogue::load(derby.path()).expect("the derby-content quest loads");
-    assert!(
-        !catalogue.targets.minigames.contains(&39),
-        "derby 39 must not enter the producer set"
-    );
-    assert!(
-        catalogue.targets.unproduced_minigames.contains(&39),
-        "derby 39 must be reported as a shipped id with no producer"
-    );
+    assert_eq!(catalogue.target_violations(), Vec::<String>::new());
+    patch_fixture_objective(&derby, FIXTURE_QUEST, "finish_minigame", "minigame_id", 11);
+    let catalogue = Catalogue::load(derby.path()).expect("the derby-type quest loads");
     let violations = catalogue.target_violations();
     assert_eq!(violations.len(), 1, "{violations:?}");
     assert!(
-        violations[0].contains("finish_minigame")
-            && violations[0].contains("39")
-            && violations[0].contains("no server FinishMinigame emitter"),
-        "canary F did not name the unproduced minigame: {violations:?}"
+        violations[0].contains("finish_minigame") && violations[0].contains("minigame 11 "),
+        "canary F accepted the derby type id as a game id: {violations:?}"
     );
 
     // Canary G: a `job_level` profile the split loader accepts (jobs.json names it)
