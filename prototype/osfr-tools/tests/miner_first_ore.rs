@@ -1723,15 +1723,11 @@ fn a_near_cap_coin_balance_refuses_the_turn_in_without_paying_xp_or_item() {
     let before = saved(&game);
     let before_save = save_envelope(&fixture, &game, &character);
 
-    let error = game
+    // T382: the refusal is a per-player denial, not a session-ending error or a panic.
+    let refused = game
         .handle_in_world(&quest_end_reply(ALL_I_GOT), &at_trixi, now + 300)
-        .err()
-        .expect("a near-cap coin balance refuses the turn-in");
-    assert_eq!(
-        error.kind(),
-        std::io::ErrorKind::InvalidData,
-        "the refusal is a clean application error, not a panic"
-    );
+        .expect("a near-cap coin balance is a refusal, not an error");
+    assert!(!refused.changed, "the near-cap refusal is not a change");
     assert_eq!(coins(&game), i32::MAX as u32, "the refused turn-in paid");
     assert_eq!(
         profile_xp(&game, MINER),

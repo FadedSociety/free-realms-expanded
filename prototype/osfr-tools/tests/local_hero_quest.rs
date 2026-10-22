@@ -674,9 +674,11 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
     state.inventory.coins = i32::MAX as u32;
     let mut capped = fixture.game_as(A, Some(state));
     let before = saved(&capped);
-    let refused = capped.handle_in_world(&quest_end_reply(QUEST), &a_character, now_c);
+    let refused = capped
+        .handle_in_world(&quest_end_reply(QUEST), &a_character, now_c)
+        .expect("a coin grant past i32::MAX is a refusal, not an error (T382)");
     assert!(
-        refused.is_err(),
+        !refused.changed,
         "a coin grant past i32::MAX is refused for that player"
     );
     assert_eq!(

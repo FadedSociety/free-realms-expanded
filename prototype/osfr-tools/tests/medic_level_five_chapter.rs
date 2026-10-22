@@ -1110,11 +1110,11 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
     });
     let before_state = first.state();
     let before_bytes = saved(&first);
-    let failed = first.handle_in_world(&quest_end_reply(PILLS), &first_naia, now + 1);
-    assert!(
-        failed.is_err(),
-        "a near-cap wallet must refuse the turn-in, not panic"
-    );
+    // T382: a per-player denial, not a session-ending error or a panic.
+    let failed = first
+        .handle_in_world(&quest_end_reply(PILLS), &first_naia, now + 1)
+        .expect("a near-cap wallet is a refusal, not an error");
+    assert!(!failed.changed, "a near-cap wallet must refuse the turn-in");
     assert_eq!(
         first.state(),
         before_state,
@@ -1140,10 +1140,12 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
     });
     let before_state = first.state();
     let before_bytes = saved(&first);
-    let failed = first.handle_in_world(&quest_end_reply(PILLS), &first_naia, now + 2);
+    let failed = first
+        .handle_in_world(&quest_end_reply(PILLS), &first_naia, now + 2)
+        .expect("a near-cap profile is a refusal, not an error");
     assert!(
-        failed.is_err(),
-        "a near-cap profile must refuse the turn-in, not panic"
+        !failed.changed,
+        "a near-cap profile must refuse the turn-in"
     );
     assert_eq!(
         first.state(),

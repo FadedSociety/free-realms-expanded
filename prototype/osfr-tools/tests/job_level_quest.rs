@@ -640,9 +640,12 @@ fn a_near_cap_wallet_refuses_the_turn_in_atomically() {
 
     let before = saved(&game);
     let wallet = coins(&game);
-    let refused = game.handle_in_world(&quest_end_reply(W5), &steele, now + 20);
+    // T382: a per-player denial, not a session-ending error.
+    let refused = game
+        .handle_in_world(&quest_end_reply(W5), &steele, now + 20)
+        .expect("a near-cap wallet is a refusal, not an error");
     assert!(
-        refused.is_err(),
+        !refused.changed,
         "a 15-coin payout over the wire coin cap is refused"
     );
     assert_eq!(saved(&game), before, "the refused payout changed the save");

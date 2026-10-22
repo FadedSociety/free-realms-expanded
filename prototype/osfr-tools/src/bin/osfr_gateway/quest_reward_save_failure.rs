@@ -1055,9 +1055,20 @@ fn a_full_bag_refuses_the_turn_in_and_changes_nothing() {
         .send(&options, &quest_end_reply(CONTROL_QUEST), now)
         .expect("a full bag is a refusal, not a save failure");
     let refused_replies = scene.drain(now);
-    assert!(
-        refused_replies.is_empty(),
-        "a full-bag refusal must be silent, not a client-visible reply: {refused_replies:?}"
+    // T382: the refusal speaks one line telling the player to make room; nothing else changes.
+    let refusal = osfr_tools::chat::system(
+        osfr_tools::quest_engine::QuestDenial::NeedSpace
+            .message()
+            .expect("the bag denial has a line"),
+    );
+    assert_eq!(
+        refused_replies
+            .iter()
+            .filter(|packet| inner(packet).starts_with(&[15, 0]))
+            .map(|packet| inner(packet))
+            .collect::<Vec<_>>(),
+        [refusal.as_slice()],
+        "a full-bag refusal is one client-visible line: {refused_replies:?}"
     );
 
     // The reward never became a quest completion, coin, item, XP or save change.

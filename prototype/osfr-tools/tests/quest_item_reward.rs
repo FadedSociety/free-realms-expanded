@@ -334,10 +334,9 @@ fn turn_in(game: &mut Gameplay, character_id: u64, now: u64) -> Outcome {
     paid
 }
 
-/// A refused 49/14 pays nothing and keeps the pending end screen for a retry. Today a
-/// grant failure is an `Err` the gateway drops without installing the staged game
-/// (`Gateway::handle_at`); T382 may turn it into a player-local `Ok` refusal, which
-/// this accepts too as long as it changes nothing.
+/// A refused 49/14 pays nothing and keeps the pending end screen for a retry. A grant
+/// failure is a player-local `Ok` refusal (T382); a malformed body is still an `Err` the
+/// gateway drops without installing the staged game (`Gateway::handle_at`).
 fn assert_turn_in_refused(
     game: &mut Gameplay,
     character_id: u64,

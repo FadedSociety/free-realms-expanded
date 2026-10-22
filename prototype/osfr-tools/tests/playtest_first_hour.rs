@@ -69,7 +69,7 @@ use osfr_tools::{
     encounter::{SharedFieldAction, SharedFieldState},
     game_store,
     gameplay::{Gameplay, GameplayState, Outcome},
-    quest_engine::QuestStatus,
+    quest_engine::{QuestDenial, QuestStatus},
     startup_world,
 };
 use serde_json::{Value, json};
@@ -720,13 +720,15 @@ fn a_full_bag_refuses_the_item_reward_without_paying_coins_or_xp() {
     let before_coins = coins(&game);
     let before_xp = profile_xp(&game, BRAWLER);
     let before_item = count_definition(&game, REWARD_ITEM);
-    let error = match game.handle_in_world(&quest_end_reply(QUEST), &at, now + 1) {
-        Ok(_) => panic!("the full bag must refuse the reward"),
-        Err(error) => error,
-    };
-    assert!(
-        error.to_string().contains("bag capacity"),
-        "the refusal is the production bag check: {error}"
+    // T382: the full bag is a chat refusal for this player, not a session-ending error.
+    let refused = game
+        .handle_in_world(&quest_end_reply(QUEST), &at, now + 1)
+        .expect("a full bag is a refusal, not an error");
+    assert!(!refused.changed, "a full-bag refusal is not a change");
+    assert_eq!(
+        system_lines(&refused.replies),
+        [QuestDenial::NeedSpace.message().unwrap()],
+        "the refusal is the production bag check's one line"
     );
     assert_eq!(
         game.state(),
@@ -751,6 +753,18 @@ fn a_full_bag_refuses_the_item_reward_without_paying_coins_or_xp() {
         Some(QUEST),
         "the pending turn-in was consumed"
     );
+}
+
+/// The text of each 15/3 system line (`chat::system`), in reply order.
+fn system_lines(replies: &[Vec<u8>]) -> Vec<String> {
+    replies
+        .iter()
+        .filter(|packet| packet.starts_with(&[15, 0, 3, 0]))
+        .map(|packet| {
+            let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
+            String::from_utf8_lossy(&packet[8..8 + length]).into_owned()
+        })
+        .collect()
 }
 
 #[test]

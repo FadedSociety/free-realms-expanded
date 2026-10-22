@@ -839,9 +839,11 @@ fn an_over_cap_reward_is_refused_for_that_player_only() {
     a = fixture.game_as(CHARACTER, Some(state));
     let before_state = a.state();
     let before_bytes = saved(&a);
+    // T382: a per-player denial, not a session-ending error.
     assert!(
-        a.handle_in_world(&quest_end_reply(QUEST), &a_jacque, a_now)
-            .is_err(),
+        !a.handle_in_world(&quest_end_reply(QUEST), &a_jacque, a_now)
+            .expect("an over-cap coin grant is a refusal, not an error")
+            .changed,
         "an over-cap coin grant is refused for A"
     );
     assert_eq!(
@@ -867,8 +869,9 @@ fn an_over_cap_reward_is_refused_for_that_player_only() {
     let before_state = a.state();
     let before_bytes = saved(&a);
     assert!(
-        a.handle_in_world(&quest_end_reply(QUEST), &a_jacque, a_now + 1)
-            .is_err(),
+        !a.handle_in_world(&quest_end_reply(QUEST), &a_jacque, a_now + 1)
+            .expect("the over-cap retry is a refusal, not an error")
+            .changed,
         "the over-cap retry is refused for A"
     );
     assert_eq!(a.state(), before_state);

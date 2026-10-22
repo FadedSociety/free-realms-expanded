@@ -242,6 +242,16 @@ impl Gameplay {
                 crate::quest_engine::OutboundMessage::Reward(packet) => out.replies.push(packet),
             }
         }
+        // At most one reward-denial line (T382). `quest.messages` stays unspoken: the client
+        // writes its own progress and completion text from 49/9 (0x00a931b0) and 49/4
+        // (0x00a928b0), and split titles are only `Quest <id>` placeholders.
+        if let Some(line) = quest
+            .denial
+            .as_ref()
+            .and_then(crate::quest_engine::QuestDenial::message)
+        {
+            out.replies.push(chat::system(line));
+        }
         Ok(())
     }
 

@@ -1753,10 +1753,13 @@ fn refusals_wrong_target_and_replay_change_nothing() {
     let capped_xp = profile_xp(&capped, BRAWLER);
     let capped_items = capped.state().inventory.items.clone();
     now += 100;
-    let refused = capped.handle_in_world(&quest_end_reply(GIVEN_TO_GUARD), &petra_at, now);
+    // T382: a per-player denial, not a session-ending error or a panic.
+    let refused = capped
+        .handle_in_world(&quest_end_reply(GIVEN_TO_GUARD), &petra_at, now)
+        .expect("a near-cap wallet is a refusal, not an error");
     assert!(
-        refused.is_err(),
-        "a near-cap wallet must refuse the turn-in, not panic"
+        !refused.changed,
+        "a near-cap wallet must refuse the turn-in"
     );
     assert_eq!(
         saved(&capped),
@@ -1886,9 +1889,10 @@ fn two_brawlers_progress_independently() {
     let capped_before = saved(&first);
     now += 100;
     assert!(
-        first
+        !first
             .handle_in_world(&quest_end_reply(GIVEN_TO_GUARD), &first_at, now)
-            .is_err(),
+            .expect("a near-cap wallet is a refusal, not an error")
+            .changed,
         "the near-cap wallet must refuse the first player's turn-in"
     );
     assert_eq!(saved(&first), capped_before);

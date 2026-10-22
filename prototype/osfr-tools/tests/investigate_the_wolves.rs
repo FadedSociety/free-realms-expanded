@@ -1103,9 +1103,10 @@ fn an_over_cap_turn_in_is_refused_and_stays_pending() {
     let before_state = capped.state();
     let before_bytes = saved(&capped);
     assert!(
-        capped
+        !capped
             .handle_in_world(&quest_end_reply(QUEST), &at, now)
-            .is_err(),
+            .expect("an over-cap coin grant is a refusal, not an error (T382)")
+            .changed,
         "an over-cap coin grant is refused for this player"
     );
     assert_eq!(

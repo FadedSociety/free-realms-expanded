@@ -74,7 +74,7 @@ fn apply_award(
     key: &str,
 ) -> io::Result<(RewardState, Vec<Vec<u8>>)> {
     validate_reward_rows(&grant.display.rows)?;
-    rewards::apply_grant(state, grant, key)
+    Ok(rewards::apply_grant(state, grant, key)?)
 }
 
 // Content readers. Unknown client ids and server bindings are optional by design.

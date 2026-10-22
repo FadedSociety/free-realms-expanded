@@ -6,9 +6,12 @@
 //! policies (R). The caller persists the returned inventory, profile state, and keys together with
 //! its save snapshot.
 
-use crate::{inventory::Inventory, profiles::ProfileState};
+use crate::{
+    inventory::{Inventory, MAX_ITEMS},
+    profiles::ProfileState,
+};
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeSet, io};
+use std::{collections::BTreeSet, fmt, io};
 
 const MAX_GRANT_KEY_BYTES: usize = 256;
 const REWARD_FAMILY: u16 = 50;
@@ -78,10 +81,54 @@ impl RewardState {
     }
 }
 
+/// Why [`apply_grant`] refused a grant. The variant is the classification: a caller matches it
+/// (a quest turn-in turns it into a per-player denial), never the message text (T382).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum GrantFailure {
+    /// The bag has no room for the granted stacks.
+    BagFull,
+    /// The grant pays XP to a profile the character has not unlocked.
+    LockedProfile,
+    /// A reward item definition is not in the loaded catalogue.
+    UnknownItem,
+    /// The inventory cannot grant a known reward row: an invalid id or count, more than one stack
+    /// holds, or (a server fault) an exhausted item-id counter or an unencodable item.
+    BadItem,
+    /// A coin or XP amount, or the resulting balance, does not fit its wire field.
+    WireRange,
+    /// The idempotency key is empty, oversized or padded.
+    InvalidKey,
+    /// The display bundle has an unsupported, truncated or oversized row.
+    Shape,
+}
+
+impl fmt::Display for GrantFailure {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.write_str(match self {
+            Self::BagFull => "reward exceeds configured bag capacity",
+            Self::LockedProfile => "reward XP references a locked profile",
+            Self::UnknownItem => "unknown reward item definition",
+            Self::BadItem => "invalid reward item",
+            Self::WireRange => "reward coins or XP exceed the wire field",
+            Self::InvalidKey => "invalid reward grant key",
+            Self::Shape => "unsupported or truncated reward bundle entry",
+        })
+    }
+}
+
+impl std::error::Error for GrantFailure {}
+
+/// `?` callers keep the `InvalidData` error and wording they had before the type existed.
+impl From<GrantFailure> for io::Error {
+    fn from(failure: GrantFailure) -> Self {
+        io::Error::new(io::ErrorKind::InvalidData, failure)
+    }
+}
+
 /// The first non-zero `job_xp` entry the profile snapshot has not unlocked. `apply_grant`
-/// refuses such a grant; `QuestEngine::finish_turnin` pre-checks the same rule so a save written
-/// before a quest gained its job XP becomes a clean refusal instead of an error (R).
-pub(crate) fn locked_job_profile(grant: &RewardGrant, profiles: &ProfileState) -> Option<i32> {
+/// refuses such a grant as [`GrantFailure::LockedProfile`], which `QuestEngine::finish_turnin`
+/// turns into a clean refusal for a save written before a quest gained its job XP (R).
+fn locked_job_profile(grant: &RewardGrant, profiles: &ProfileState) -> Option<i32> {
     grant.job_xp.iter().find_map(|(&profile_id, &amount)| {
         (amount > 0 && (profile_id <= 0 || !profiles.unlocked.contains(&profile_id)))
             .then_some(profile_id)
@@ -89,45 +136,51 @@ pub(crate) fn locked_job_profile(grant: &RewardGrant, profiles: &ProfileState) -
 }
 
 /// Apply one grant to a clone and return its ordered inner packets. The input is never mutated;
-/// persistence and send-after-save ordering remain the caller's responsibility.
+/// persistence and send-after-save ordering remain the caller's responsibility. A refusal is a
+/// typed [`GrantFailure`].
 pub fn apply_grant(
     state: &RewardState,
     grant: &RewardGrant,
     grant_key: &str,
-) -> io::Result<(RewardState, Vec<Vec<u8>>)> {
+) -> Result<(RewardState, Vec<Vec<u8>>), GrantFailure> {
     if grant_key.is_empty()
         || grant_key.len() > MAX_GRANT_KEY_BYTES
         || grant_key.trim() != grant_key
     {
-        return Err(invalid("invalid reward grant key"));
+        return Err(GrantFailure::InvalidKey);
     }
     if state.applied_grant_keys.contains(grant_key) {
         return Ok((state.clone(), Vec::new()));
     }
     if state.inventory.state().items.len() > state.bag_capacity {
-        return Err(invalid("inventory exceeds configured bag capacity"));
+        return Err(GrantFailure::BagFull);
     }
     // Granting only to unlocked jobs is server authorization policy (R).
     if locked_job_profile(grant, &state.profiles).is_some() {
-        return Err(invalid("reward XP references a locked profile"));
+        return Err(GrantFailure::LockedProfile);
     }
 
-    let total_xp = grant.job_xp.values().try_fold(0u32, |total, amount| {
-        total
-            .checked_add(*amount)
-            .ok_or_else(|| invalid("reward XP display total overflow"))
-    })?;
-    let coins = i32::try_from(grant.coins).map_err(|_| invalid("coin award exceeds wire field"))?;
-    let stars = i32::try_from(total_xp).map_err(|_| invalid("XP display exceeds wire field"))?;
-    let row_count = i32::try_from(grant.display.rows.len())
-        .map_err(|_| invalid("reward bundle has too many rows"))?;
+    let total_xp = grant
+        .job_xp
+        .values()
+        .try_fold(0u32, |total, amount| total.checked_add(*amount))
+        .ok_or(GrantFailure::WireRange)?;
+    let coins = i32::try_from(grant.coins).map_err(|_| GrantFailure::WireRange)?;
+    let stars = i32::try_from(total_xp).map_err(|_| GrantFailure::WireRange)?;
+    let row_count = i32::try_from(grant.display.rows.len()).map_err(|_| GrantFailure::Shape)?;
 
     let mut next = state.clone();
     let mut outgoing = Vec::new();
 
     // The guide requires grant messages before the presentation bundle. Their relative order is
     // reconstructed policy (R); rank notification precedes 38/14 per the existing profile writer.
-    outgoing.extend(next.inventory.grant_coins(grant.coins)?.replies);
+    // `grant_coins` refuses only a balance past the i32 wire cap.
+    outgoing.extend(
+        next.inventory
+            .grant_coins(grant.coins)
+            .map_err(|_| GrantFailure::WireRange)?
+            .replies,
+    );
     for (&profile_id, &amount) in &grant.job_xp {
         if amount == 0 {
             continue;
@@ -140,25 +193,39 @@ pub fn apply_grant(
             .unwrap_or(0);
         let updated = previous
             .checked_add(amount)
-            .ok_or_else(|| invalid("profile experience overflow"))?;
+            .ok_or(GrantFailure::WireRange)?;
         next.profiles.experience.insert(profile_id, updated);
         outgoing.extend(experience_packets(profile_id, previous, updated));
     }
     for item in &grant.items {
         if item.definition_id <= 0 || item.count == 0 {
-            return Err(invalid("invalid reward item"));
+            return Err(GrantFailure::BadItem);
         }
         if !next.inventory.has_definition(item.definition_id) {
-            return Err(invalid("unknown reward item definition"));
+            return Err(GrantFailure::UnknownItem);
         }
+        // Bag room is the `bag_capacity` check below. Past the row checks above, `grant` refuses
+        // an over-stack row, its item-id counter or encoding (`BadItem`), or a new stack at its
+        // `MAX_ITEMS` ceiling, which making room fixes (`BagFull`).
         outgoing.extend(
             next.inventory
-                .grant(0, item.definition_id, item.count)?
+                .grant(0, item.definition_id, item.count)
+                .map_err(|_| {
+                    if next.inventory.state().items.len() >= MAX_ITEMS
+                        && next
+                            .inventory
+                            .accepts_reward(item.definition_id, item.count)
+                    {
+                        GrantFailure::BagFull
+                    } else {
+                        GrantFailure::BadItem
+                    }
+                })?
                 .replies,
         );
     }
     if next.inventory.state().items.len() > next.bag_capacity {
-        return Err(invalid("reward exceeds configured bag capacity"));
+        return Err(GrantFailure::BagFull);
     }
 
     // Reward bundle fields and entry ids follow the body consumed by client reader 008e7930.
@@ -201,20 +268,21 @@ fn encode_display_bundle(
     stars: i32,
     row_count: i32,
     display: &RewardDisplay,
-) -> io::Result<Vec<u8>> {
+) -> Result<Vec<u8>, GrantFailure> {
     for row in &display.rows {
         if !supported_entry(row.type_id) || row.body.len() < BASE_ENTRY_BODY_MIN_BYTES {
-            return Err(invalid("unsupported or truncated reward bundle entry"));
+            return Err(GrantFailure::Shape);
         }
     }
 
     // Success=1 and zero unresolved fields/multiplier are server defaults (R).
-    let capacity = display.rows.iter().try_fold(72usize, |total, row| {
-        total
-            .checked_add(4)
-            .and_then(|size| size.checked_add(row.body.len()))
-            .ok_or_else(|| invalid("reward bundle size overflow"))
-    })?;
+    let capacity = display
+        .rows
+        .iter()
+        .try_fold(72usize, |total, row| {
+            total.checked_add(4)?.checked_add(row.body.len())
+        })
+        .ok_or(GrantFailure::Shape)?;
     let mut bytes = Vec::with_capacity(capacity);
     bytes.extend(REWARD_FAMILY.to_le_bytes());
     bytes.push(REWARD_BUNDLE_SUBTYPE);
@@ -243,8 +311,4 @@ fn supported_entry(type_id: u32) -> bool {
         type_id,
         1 | 3 | 6 | 7 | 8 | 10 | 11 | 12 | 13 | 14 | 15 | 17 | 18 | 19 | 20 | 22 | 23
     )
-}
-
-fn invalid(message: &'static str) -> io::Error {
-    io::Error::new(io::ErrorKind::InvalidData, message)
 }

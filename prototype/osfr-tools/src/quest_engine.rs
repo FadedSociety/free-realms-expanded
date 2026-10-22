@@ -7,7 +7,9 @@
 use crate::{
     content::{ContentDb, ContentGoal},
     opening::{OpeningEngine, OpeningTrigger},
-    rewards::{self, ItemGrant, RewardBundleRow, RewardDisplay, RewardGrant, RewardState},
+    rewards::{
+        self, GrantFailure, ItemGrant, RewardBundleRow, RewardDisplay, RewardGrant, RewardState,
+    },
     startup_messages, startup_world,
 };
 use serde::{Deserialize, Serialize, de::DeserializeOwned};
@@ -413,6 +415,10 @@ pub struct QuestState {
     pub character_id: u64,
     pub quests: BTreeMap<u32, QuestProgress>,
     pub pending_offer: Option<u32>,
+    /// The completed quest whose 49/13 end screen waits for the client's 49/14. Only a paid
+    /// turn-in, the locked-profile denial (F249), the quest's own 26/23 abandon or the load-time
+    /// save repair of that quest clears it; any other refused reward keeps it so the player can
+    /// retry (T382).
     pub pending_turnin: Option<u32>,
     /// Content NPC key that opened `pending_turnin`; it may be a Talk objective target
     /// rather than the formal `turnin_npc_id`. Missing on older saves: the definition's
@@ -455,6 +461,30 @@ pub enum QuestDenial {
     Incomplete,
     WrongTurnin,
     NoPendingTurnin,
+    /// The bag cannot hold the reward; the end screen stays for a retry (T382).
+    NeedSpace,
+    /// A content or server fault in the reward row; the end screen stays and 26/23 abandon is
+    /// the player's exit (T382).
+    RewardData,
+    /// A coin or XP amount would pass its wire field; the end screen stays (T382).
+    RewardLimit,
+}
+
+impl QuestDenial {
+    /// The one chat line a reward denial speaks (R wording). The other denials stay silent, as
+    /// they were before T382.
+    pub fn message(&self) -> Option<&'static str> {
+        match self {
+            Self::NeedSpace => Some("Your bag is full. Make room and turn the quest in again."),
+            Self::RewardData => {
+                Some("This quest's reward cannot be paid. You can abandon it from your journal.")
+            }
+            Self::RewardLimit => {
+                Some("You cannot receive this reward right now. Turn the quest in again later.")
+            }
+            _ => None,
+        }
+    }
 }
 
 /// Semantic quest message. `encode_exact` only returns bytes where the body is
@@ -2094,26 +2124,14 @@ impl QuestEngine {
             .definitions
             .get(&quest_id)
             .ok_or_else(|| invalid("pending quest definition disappeared"))?;
-        // (R) The job gate is an offer gate, so a save written before this reward row
-        // gained its job XP can hold an active quest whose reward names a profile the
-        // character has not unlocked. Refuse without a grant, but release the pending
-        // end screen: a hard error here would leave `pending_turnin` set forever and
-        // block both a retry after unlocking the job and `abandon` (F249 review). The
-        // unlock rule itself lives in `rewards::locked_job_profile`.
-        if rewards::locked_job_profile(&definition.reward, &reward_state.profiles).is_some() {
-            self.state.clear_pending_turnin();
-            return Ok((
-                QuestOutcome {
-                    changed: true,
-                    denial: Some(QuestDenial::Job),
-                    ..QuestOutcome::default()
-                },
-                reward_state.clone(),
-            ));
-        }
         let grant_key = format!("quest:{}:{}", self.character_id, quest_id);
         let (next_reward_state, reward_packets) =
-            rewards::apply_grant(reward_state, &definition.reward, &grant_key)?;
+            match rewards::apply_grant(reward_state, &definition.reward, &grant_key) {
+                Ok(granted) => granted,
+                Err(failure) => {
+                    return Ok((self.refuse_turnin(quest_id, failure), reward_state.clone()));
+                }
+            };
         self.state.clear_pending_turnin();
         self.state
             .quests
@@ -2165,11 +2183,43 @@ impl QuestEngine {
         Ok((outcome, next_reward_state))
     }
 
-    /// 26/0x17 command result: remove active quest without any grant.
+    /// A refused grant pays nothing and completes nothing; it is a per-player denial, never a
+    /// session-ending error (T382). Only the locked profile releases the end screen; every other
+    /// refusal keeps `pending_turnin` for a retry or a 26/23 abandon.
+    fn refuse_turnin(&mut self, quest_id: u32, failure: GrantFailure) -> QuestOutcome {
+        let denial = match failure {
+            // (R) The job gate is an offer gate, so a save written before this reward row gained
+            // its job XP can hold an active quest whose reward names a profile the character has
+            // not unlocked. Release the screen so the player can unlock the job and retry, or
+            // abandon (F249 review).
+            GrantFailure::LockedProfile => {
+                self.state.clear_pending_turnin();
+                return QuestOutcome {
+                    changed: true,
+                    denial: Some(QuestDenial::Job),
+                    ..QuestOutcome::default()
+                };
+            }
+            GrantFailure::BagFull => QuestDenial::NeedSpace,
+            // Always the player's wallet or XP: `validate_definition` refuses a reward row past
+            // the wire field when the engine loads.
+            GrantFailure::WireRange => QuestDenial::RewardLimit,
+            GrantFailure::UnknownItem
+            | GrantFailure::BadItem
+            | GrantFailure::Shape
+            | GrantFailure::InvalidKey => {
+                // Not the player's fault: one bounded line for the operator, like
+                // `quest_save_repair` (fixed text, a u32 id and the class; no identity or chat).
+                eprintln!("quest_turnin_reward_refused quest={quest_id} reason={failure:?}");
+                QuestDenial::RewardData
+            }
+        };
+        denied(denial)
+    }
+
+    /// 26/0x17 command result: remove active quest without any grant. A pending end screen for
+    /// this quest goes with it, so a reward that cannot be paid never traps the quest (T382).
     pub fn abandon(&mut self, quest_id: u32) -> QuestOutcome {
-        if self.state.pending_turnin == Some(quest_id) {
-            return denied(QuestDenial::Unavailable);
-        }
         let Some(progress) = self.state.quests.get_mut(&quest_id) else {
             return denied(QuestDenial::Unavailable);
         };
@@ -2177,6 +2227,9 @@ impl QuestEngine {
             return denied(QuestDenial::Unavailable);
         }
         progress.status = QuestStatus::Abandoned;
+        if self.state.pending_turnin == Some(quest_id) {
+            self.state.clear_pending_turnin();
+        }
         if self.state.selected_quest_id == Some(quest_id) {
             self.state.selected_quest_id = None;
         }
