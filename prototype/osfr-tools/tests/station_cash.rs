@@ -193,11 +193,11 @@ fn order_debits_exact_price_and_grants_once() {
     // No coin path ran.
     assert_eq!(shop.inventory().state().coins, before.0.coins);
     assert_eq!(shop.sc_wallet().orders.len(), 1);
-    // 66/4 full layout: result, tracking id, order-id string, discount, total.
+    // 66/4 full layout (`00b2ded0`, T453): tracking id, result, order-id string, discount, total.
     let reply = outcome.replies.last().expect("order response");
     assert_eq!(&reply[..4], &[66, 0, 4, 0]);
-    assert_eq!(u32::from_le_bytes(reply[4..8].try_into().unwrap()), 1);
-    assert_eq!(u32::from_le_bytes(reply[8..12].try_into().unwrap()), 71);
+    assert_eq!(u32::from_le_bytes(reply[4..8].try_into().unwrap()), 71);
+    assert_eq!(u32::from_le_bytes(reply[8..12].try_into().unwrap()), 1);
     assert_eq!(i32::from_le_bytes(reply[12..16].try_into().unwrap()), 2);
     assert_eq!(&reply[16..18], b"71");
     assert_eq!(u32::from_le_bytes(reply[18..22].try_into().unwrap()), 0);
@@ -222,7 +222,7 @@ fn order_debits_exact_price_and_grants_once() {
         replay
             .replies
             .iter()
-            .any(|reply| reply.starts_with(&[66, 0, 4, 0, 1, 0, 0, 0]))
+            .any(|reply| reply.starts_with(&[66, 0, 4, 0, 71, 0, 0, 0, 1, 0, 0, 0]))
     );
     assert_eq!(snapshot(&shop), once);
 }
@@ -318,8 +318,8 @@ fn preview_prices_without_changing_state() {
     assert_eq!(outcome.result_code, station_cash::ORDER_SUCCESS);
     let reply = outcome.replies.first().expect("preview reply");
     assert_eq!(&reply[..4], &[66, 0, 2, 0]);
-    assert_eq!(u32::from_le_bytes(reply[4..8].try_into().unwrap()), 1);
-    assert_eq!(u32::from_le_bytes(reply[8..12].try_into().unwrap()), 91);
+    assert_eq!(u32::from_le_bytes(reply[4..8].try_into().unwrap()), 91);
+    assert_eq!(u32::from_le_bytes(reply[8..12].try_into().unwrap()), 1);
     assert_eq!(u32::from_le_bytes(reply[12..16].try_into().unwrap()), 0);
     assert_eq!(
         u32::from_le_bytes(reply[16..20].try_into().unwrap()),
@@ -336,6 +336,124 @@ fn preview_prices_without_changing_state() {
     let outcome = poor.handle(&packet).expect("preview parses");
     assert_eq!(outcome.result_code, station_cash::ORDER_INSUFFICIENT_SC);
     assert_eq!(snapshot(&poor), before);
+}
+
+/// 66/4 exactly as the client reads it: `00b2dd60` (u16 family, u16 opcode), then `00b2ded0`
+/// (tracking id to obj+0x18, result to obj+0x1C, i32-length order-id string, discount, total).
+/// `00b3b6d0` drops the reply if any byte is left over.
+fn client_order_response(reply: &[u8]) -> (u32, u32, String, u32, u32) {
+    let mut reader = Reader {
+        bytes: reply,
+        at: 0,
+    };
+    assert_eq!((reader.u16(), reader.u16()), (66, 4), "66/4 header");
+    let tracking = reader.u32();
+    let result = reader.u32();
+    let order_id = String::from_utf8(reader.string().to_vec()).expect("order id text");
+    let response = (tracking, result, order_id, reader.u32(), reader.u32());
+    assert_eq!(reader.at, reply.len(), "66/4 trailing bytes");
+    response
+}
+
+/// `00b3b6d0`: the pending order (manager+0x3E8E8, tracking id at +0x44) completes only when the
+/// reply carries its tracking id, and succeeds only when the result is 1.
+fn client_outcome(pending: u32, reply: &[u8]) -> (bool, bool) {
+    let (tracking, result, ..) = client_order_response(reply);
+    (tracking == pending, result == station_cash::ORDER_SUCCESS)
+}
+
+/// 66/2 exactly as `00b2dd60` + `00b2de20` read it: four u32 into obj+0x18..+0x24, nothing after.
+fn client_preview_response(reply: &[u8]) -> (u32, u32, u32, u32) {
+    let mut reader = Reader {
+        bytes: reply,
+        at: 0,
+    };
+    assert_eq!((reader.u16(), reader.u16()), (66, 2), "66/2 header");
+    let response = (reader.u32(), reader.u32(), reader.u32(), reader.u32());
+    assert_eq!(reader.at, reply.len(), "66/2 trailing bytes");
+    response
+}
+
+/// T453: the client's tracking ids restart at 1 every run (`00b28360`). With the result written
+/// first, the first order worked by coincidence and the second read as tracking 1, result 2.
+#[test]
+fn order_response_tracking_id_precedes_result() {
+    let mut shop = new_shop(wallet(1000), usize::MAX);
+    let other = *shop
+        .sc_catalogue()
+        .listings()
+        .iter()
+        // L046: a deed needs housing, which `CoinShop::handle` does not have.
+        .find(|listing| {
+            !listing.deed
+                && listing.bundle_id != RIDE_ITEM as u32
+                && listing.price <= 1000 - RIDE_PRICE
+        })
+        .expect("a second affordable listed ride");
+
+    // (a) Two different rides in one client run, tracking 1 then 2: both complete and succeed.
+    let first = shop.handle(&buy(1)).expect("order parses");
+    let reply = first.replies.last().expect("order response");
+    assert_eq!(
+        client_order_response(reply),
+        (1, 1, "1".to_string(), 0, RIDE_PRICE)
+    );
+    assert_eq!(client_outcome(1, reply), (true, true));
+    let second_packet = order_packet(3, 2, other.bundle_id, STORE, 1, "", "", "", "0");
+    let second = shop.handle(&second_packet).expect("order parses");
+    let reply = second.replies.last().expect("order response");
+    assert_eq!(
+        client_order_response(reply),
+        (2, 1, "2".to_string(), 0, other.price)
+    );
+    assert_eq!(client_outcome(2, reply), (true, true));
+    assert_eq!(shop.sc_wallet().balance, 1000 - RIDE_PRICE - other.price);
+
+    // (c) A replay of tracking 2 echoes it and changes nothing.
+    let paid = snapshot(&shop);
+    let replay = shop.handle(&second_packet).expect("replay parses");
+    assert!(!replay.changed);
+    let reply = replay.replies.last().expect("order response");
+    assert_eq!(
+        client_order_response(reply),
+        (2, 1, "2".to_string(), 0, other.price)
+    );
+    assert_eq!(snapshot(&shop), paid);
+
+    // (d) An unknown bundle (item 8 has no Station Cash row) with tracking 3: order failure.
+    let unknown = shop
+        .handle(&order_packet(3, 3, 8, STORE, 1, "", "", "", "0"))
+        .expect("order parses");
+    let reply = unknown.replies.last().expect("order response");
+    assert_eq!(client_order_response(reply), (3, 2, "3".to_string(), 0, 0));
+    assert_eq!(client_outcome(3, reply), (true, false));
+    assert_eq!(snapshot(&shop), paid);
+
+    // (b) Too little Station Cash, tracking 1: balance-not-enough, never success.
+    let mut poor = new_shop(wallet(RIDE_PRICE - 1), usize::MAX);
+    let before = snapshot(&poor);
+    let short = poor.handle(&buy(1)).expect("order parses");
+    let reply = short.replies.last().expect("order response");
+    assert_eq!(client_order_response(reply), (1, 5, "1".to_string(), 0, 0));
+    assert_eq!(client_outcome(1, reply), (true, false));
+    assert_eq!(snapshot(&poor), before);
+}
+
+/// T453: 66/2 carries the tracking id first too (`00b3b450` reads the result at obj+0x1C).
+#[test]
+fn preview_response_tracking_id_precedes_result() {
+    let mut preview = order_packet(1, 9, RIDE_ITEM as u32, STORE, 1, "", "", "", "0");
+    put_string(&mut preview, "");
+    for (balance, expected) in [(200, (9, 1, 0, RIDE_PRICE)), (100, (9, 5, 0, 0))] {
+        let mut shop = new_shop(wallet(balance), usize::MAX);
+        let outcome = shop.handle(&preview).expect("preview parses");
+        assert_eq!(outcome.replies.len(), 1, "balance {balance}");
+        assert_eq!(
+            client_preview_response(&outcome.replies[0]),
+            expected,
+            "balance {balance}"
+        );
+    }
 }
 
 #[test]
@@ -635,7 +753,7 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     );
 }
 
-/// Walk a buffer exactly as the client's 66/5 reader does, refusing a short or trailing byte.
+/// Walk a buffer exactly as the client's 66/x readers do, refusing a short or trailing byte.
 struct Reader<'a> {
     bytes: &'a [u8],
     at: usize,

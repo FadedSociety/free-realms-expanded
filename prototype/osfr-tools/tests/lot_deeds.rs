@@ -97,6 +97,7 @@ fn request(opcode: u8, tracking: u32, bundle: i32) -> Vec<u8> {
     bytes
 }
 
+/// 66/4 (`order_packet`, T453): tracking id, result, order id string, discount, total.
 fn order_result(replies: &[Vec<u8>]) -> (u32, u32) {
     let reply = replies
         .iter()
@@ -104,17 +105,17 @@ fn order_result(replies: &[Vec<u8>]) -> (u32, u32) {
         .expect("a 66/4 order reply");
     let word = |at: usize| u32::from_le_bytes(reply[at..at + 4].try_into().unwrap());
     let id_length = word(12) as usize;
-    (word(4), word(16 + id_length + 4))
+    (word(8), word(16 + id_length + 4))
 }
 
-/// 66/2 (`preview_packet`): result, tracking id, a zero word, total.
+/// 66/2 (`preview_packet`, T453): tracking id, result, a zero word, total.
 fn preview_result(replies: &[Vec<u8>]) -> (u32, u32) {
     let reply = replies
         .iter()
         .find(|reply| reply.starts_with(&[66, 0, 2, 0]))
         .expect("a 66/2 preview reply");
     let word = |at: usize| u32::from_le_bytes(reply[at..at + 4].try_into().unwrap());
-    (word(4), word(16))
+    (word(8), word(16))
 }
 
 fn subtypes(replies: &[Vec<u8>]) -> Vec<(u8, u8)> {

@@ -1027,7 +1027,12 @@ impl CoinShop {
         let (result_code, replies) = match opcode {
             1 => {
                 if !self.sc_catalogue.config().enabled {
-                    (MARKETPLACE_RESULT_DISABLED, vec![preview_disabled_packet()])
+                    // T453: echo the request's tracking id; a body that does not decode gets 0.
+                    let tracking_id = station_cash::decode_order(inner, true)
+                        .map_or(0, |order| order.tracking_id);
+                    let reply =
+                        station_cash::preview_packet(tracking_id, MARKETPLACE_RESULT_DISABLED, 0);
+                    (MARKETPLACE_RESULT_DISABLED, vec![reply])
                 } else {
                     let order = station_cash::decode_order(inner, true)?;
                     transaction_id = order.tracking_id;
@@ -1042,12 +1047,15 @@ impl CoinShop {
             }
             3 => {
                 if !self.sc_catalogue.config().enabled {
-                    (
+                    let tracking_id = station_cash::decode_order(inner, false)
+                        .map_or(0, |order| order.tracking_id);
+                    let reply = station_cash::order_packet(
+                        tracking_id,
                         MARKETPLACE_RESULT_DISABLED,
-                        vec![order_disabled_packet(
-                            &self.catalogue.marketplace.not_available_message,
-                        )],
-                    )
+                        &self.catalogue.marketplace.not_available_message,
+                        0,
+                    );
+                    (MARKETPLACE_RESULT_DISABLED, vec![reply])
                 } else {
                     let order = station_cash::decode_order(inner, false)?;
                     transaction_id = order.tracking_id;
@@ -1242,25 +1250,6 @@ fn marketplace_request_is_well_formed(opcode: u16, inner: &[u8]) -> bool {
         (16 | 20 | 25, None) => false,
         _ => inner.len() <= MAX_MARKETPLACE_REQUEST,
     }
-}
-
-fn preview_disabled_packet() -> Vec<u8> {
-    let mut bytes = header(MARKETPLACE_FAMILY, 2);
-    for _ in 0..4 {
-        put_u32(&mut bytes, MARKETPLACE_RESULT_DISABLED);
-    }
-    bytes
-}
-
-fn order_disabled_packet(message: &str) -> Vec<u8> {
-    // Reader 00b2ded0 consumes two dwords, a length-prefixed string, then two dwords.
-    let mut bytes = header(MARKETPLACE_FAMILY, 4);
-    put_u32(&mut bytes, MARKETPLACE_RESULT_DISABLED);
-    put_u32(&mut bytes, 0);
-    put_text(&mut bytes, message);
-    put_u32(&mut bytes, 0);
-    put_u32(&mut bytes, 0);
-    bytes
 }
 
 /// 66/44 response. Native reader `00b32430` consumes seven dwords, an empty

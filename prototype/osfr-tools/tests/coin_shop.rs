@@ -248,8 +248,10 @@ fn marketplace_purchase_is_disabled_and_does_not_change_inventory() {
     let response = result.replies.first().expect("client receives failure");
     assert_eq!(u16::from_le_bytes(response[0..2].try_into().unwrap()), 66);
     assert_eq!(u16::from_le_bytes(response[2..4].try_into().unwrap()), 4);
+    // 66/4 (`00b2ded0`, T453): the echoed tracking id 1, then the result.
+    assert_eq!(u32::from_le_bytes(response[4..8].try_into().unwrap()), 1);
     assert_eq!(
-        u32::from_le_bytes(response[4..8].try_into().unwrap()),
+        u32::from_le_bytes(response[8..12].try_into().unwrap()),
         station_cash::ORDER_FAILURE
     );
 

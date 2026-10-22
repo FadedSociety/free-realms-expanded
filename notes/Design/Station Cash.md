@@ -1,7 +1,7 @@
 ---
 type: design
 section: Design
-updated: 2026-10-20
+updated: 2026-10-22
 ---
 
 # Station Cash
@@ -15,7 +15,8 @@ text are recorded.
 
 Re-verified 2026-10-20 with the read-only IDA tool in this worktree: `00b3a6e0` reads the 66/11
 status and `00b2b450` the record (bool, balance, `u32`, string, string, bool); `00b3b6d0` /
-`00b2ded0` read result, tracking id, string, discount, total and `00cc5470` maps 1 to success,
+`00b2ded0` read tracking id, result, string, discount, total (corrected by T453, 2026-10-22; the
+2026-10-20 reading had result and tracking id swapped) and `00cc5470` maps 1 to success,
 2/4/6/7 to order failure and 5 to balance not enough; `00b3da50` / `00b3fa00` / `00b41860` confirm
 the 66/5 bundle record and its ten-field continuation; `00b3fd70` / `00b3b080` / `00b33400`,
 `00b3ad20`, and `00b3d770` / `00b36bb0` / `00b2a090` confirm the navigation field order. The
@@ -108,22 +109,29 @@ by `scripts/content_check.py`).
     non-empty, different recipient as a gift and refuses it.
 - **66/1 preview** is the same order followed by one extra string. The server tolerates its
   absence (R) and still rejects any bytes after it. **66/2 preview response** is read by
-  `00b3b450`/`00b2de20`: four u32, the first compared with 1 (result), then order id, discount
-  and total.
-- **66/4 place-order response** is read by `00b3b6d0`/`00b2ded0`: `u32 result` (1 is success),
-  `u32 order-tracking id`, length-prefixed order-id string, `u32` discount, `u32` total. The
+  `00b3b450`/`00b2de20` (object at frame -0x784, `00b3b4b2`): four u32 and no string, stored at
+  obj+0x18 (tracking id, unused by the handler), +0x1C (result, compared with 1), +0x20
+  (discount) and +0x24 (total), which go to Lua `OnOrderPreviewResponse`.
+- **66/4 place-order response** is read by `00b3b6d0`/`00b2ded0`: `u32 order-tracking id`
+  (obj+0x18), `u32 result` (obj+0x1C, 1 is success), length-prefixed order-id string, `u32`
+  discount (+0x4C), `u32` total (+0x50); `00b3b6d0` drops a reply with bytes left over. The
   client's `OnOrderResponse` receives success, order id, discount and total; a failure raises
   `PurchaseFailed` and an alert. The result-to-error map `00cc5470` confirms 2 (and 4/6/7) as
-  order failure, 5 as balance not enough and 1 as success; the server uses 2 and 5.
-- The community reference writes the tracking id before the result. The client compares the
-  first dword with 1 in `00b3b6d0`, so **result first**; the client wins. (IDA contradiction
-  with the community reference recorded here.)
+  order failure, 5 as balance not enough, 8 as invalid coupon, 1 as success and anything else
+  (the disabled reply's 0) as request unavailable; the server uses 2 and 5.
+- The pending order is settled (success: `MerchantPurchased` and
+  `NotificationHandler:ItemReceived`; failure: `PurchaseFailed` and an alert; then the pending
+  order is released) only when obj+0x18 equals its tracking id (manager+0x3E8E8, field +0x44).
+  The client's tracking ids restart at 1 every run (`00b28360`), so every reply echoes the
+  request's tracking id, refusals and the disabled reply included (T453). The community
+  reference writes the same order (tracking id, result, ...); it agrees with the client.
 
 ### What the client shows after a successful order
 
-- `00b3b6d0` raises `OnOrderResponse` with the success flag, tracking id, discount and total, and
-  the generic path records the response on the pending order. The granted item arrives through
-  the normal inventory update packets; `NotificationHandler:ItemReceived` runs for the item.
+- `00b3b6d0` raises `OnOrderResponse` with the success flag, the order-id string, discount and
+  total, and the generic path records the response on the pending order. The granted item
+  arrives through the normal inventory update packets; `NotificationHandler:ItemReceived` runs
+  for the item.
 - The order handler does **not** request the wallet again. The wallet line updates when the
   server sends 66/11 (`OnWalletInfo`). T230 therefore pushes a fresh 66/11 immediately after a
   successful order so the client displays the debited balance. This push is (R).

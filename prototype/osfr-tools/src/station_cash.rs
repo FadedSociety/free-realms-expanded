@@ -15,9 +15,12 @@
 //!   store-bundle id, a u32 store id, a u32 quantity, a tint string and a second string
 //!   (`00b3af80`, shared with the preview request). Preview 66/1 is the same order followed by one
 //!   extra string.
-//! * Place-order response 66/4 is read by `00b3b6d0`/`00b2ded0`: a u32 result (1 is success), a
-//!   u32 order-tracking id, a length-prefixed order id string, then two u32s (discount and total).
-//! * Preview response 66/2 is read by `00b3b450`/`00b2de20`: four u32s, the first compared with 1.
+//! * Place-order response 66/4 is read by `00b3b6d0`/`00b2ded0` (T453): a u32 order-tracking id
+//!   (obj+0x18), a u32 result (obj+0x1C, 1 is success), a length-prefixed order id string, then
+//!   two u32s (discount and total). The order completes only when the tracking id equals the
+//!   pending order's (`00b3b6d0`, manager+0x3E8E8 -> +0x44), so every reply echoes it.
+//! * Preview response 66/2 is read by `00b3b450`/`00b2de20`: four u32s, the tracking id (obj+0x18,
+//!   unused by the handler), the result (obj+0x1C, 1 is success), discount and total.
 //! * The catalogue is the 66/5 full-store message: a u32 inner type 1, a u32 store id, then the
 //!   store (three u32 ids, two image strings and a keyed bundle map). The bundle record is read by
 //!   `00b48700` -> `00b2dfd0`/`00b45340`/`00b43170`/`00b41860`/`00b3da50`/`00b370d0`; the field
@@ -66,9 +69,9 @@ const OP_ENABLE_PAYMENT_SOURCES: u16 = 33;
 
 /// Marketplace result 1 is success in the client reader `00b3b6d0`.
 pub const ORDER_SUCCESS: u32 = 1;
-/// The client maps this to `marketplace_error_order_failure` (R).
+/// `00cc5470` maps this to `marketplace_error_order_failure` (using it for every refusal is R).
 pub const ORDER_FAILURE: u32 = 2;
-/// The client maps this to `marketplace_error_balance_not_enough` (R).
+/// `00cc5470` maps this to `marketplace_error_balance_not_enough`.
 pub const ORDER_INSUFFICIENT_SC: u32 = 5;
 
 /// A client order is tiny: six small strings, one detail and the preview's extra string.
@@ -450,7 +453,7 @@ pub fn preview(
     };
     OrderOutcome {
         result_code: result,
-        replies: vec![preview_packet(result, order.tracking_id, total)],
+        replies: vec![preview_packet(order.tracking_id, result, total)],
         changed: false,
     }
 }
@@ -479,7 +482,12 @@ pub fn place_order(
             result_code: ORDER_SUCCESS,
             replies: vec![
                 wallet_packet(wallet.balance),
-                order_packet(ORDER_SUCCESS, order.tracking_id, old_total),
+                order_packet(
+                    order.tracking_id,
+                    ORDER_SUCCESS,
+                    &order.tracking_id.to_string(),
+                    old_total,
+                ),
             ],
             changed: false,
         };
@@ -521,7 +529,12 @@ pub fn place_order(
     }
     let mut replies = vec![wallet_packet(balance)];
     replies.extend(granted);
-    replies.push(order_packet(ORDER_SUCCESS, order.tracking_id, total));
+    replies.push(order_packet(
+        order.tracking_id,
+        ORDER_SUCCESS,
+        &order.tracking_id.to_string(),
+        total,
+    ));
     OrderOutcome {
         result_code: ORDER_SUCCESS,
         replies,
@@ -553,7 +566,12 @@ fn price<'a>(
 fn refusal(order: &OrderRequest, result: u32) -> OrderOutcome {
     OrderOutcome {
         result_code: result,
-        replies: vec![order_packet(result, order.tracking_id, 0)],
+        replies: vec![order_packet(
+            order.tracking_id,
+            result,
+            &order.tracking_id.to_string(),
+            0,
+        )],
         changed: false,
     }
 }
@@ -571,22 +589,26 @@ pub fn wallet_packet(balance: u32) -> Vec<u8> {
     bytes
 }
 
-/// 66/2. Reader `00b3b450` treats the first dword 1 as success.
-fn preview_packet(result: u32, tracking_id: u32, total: u32) -> Vec<u8> {
+/// 66/2 (T453). Reader `00b2de20` stores tracking id, result, discount and total at
+/// obj+0x18..+0x24; handler `00b3b450` treats the second dword (obj+0x1C) 1 as success.
+pub(crate) fn preview_packet(tracking_id: u32, result: u32, total: u32) -> Vec<u8> {
     let mut bytes = header(OP_PREVIEW_RESPONSE);
-    put_u32(&mut bytes, result);
     put_u32(&mut bytes, tracking_id);
+    put_u32(&mut bytes, result);
     put_u32(&mut bytes, 0);
     put_u32(&mut bytes, total);
     bytes
 }
 
-/// 66/4. Reader `00b3b6d0` treats the first dword 1 as success and `00b2ded0` reads the rest.
-fn order_packet(result: u32, tracking_id: u32, total: u32) -> Vec<u8> {
+/// 66/4 (T453). Reader `00b2ded0` stores the tracking id at obj+0x18 and the result at obj+0x1C,
+/// then the order id string, discount (+0x4C) and total (+0x50). Handler `00b3b6d0` treats the
+/// second dword 1 as success and completes the pending order only when the first matches it.
+/// The order id is the tracking id in decimal (R) and the disabled reply's message.
+pub(crate) fn order_packet(tracking_id: u32, result: u32, order_id: &str, total: u32) -> Vec<u8> {
     let mut bytes = header(OP_ORDER_RESPONSE);
-    put_u32(&mut bytes, result);
     put_u32(&mut bytes, tracking_id);
-    put_string(&mut bytes, &tracking_id.to_string());
+    put_u32(&mut bytes, result);
+    put_string(&mut bytes, order_id);
     put_u32(&mut bytes, 0);
     put_u32(&mut bytes, total);
     bytes

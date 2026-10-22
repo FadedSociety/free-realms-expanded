@@ -657,11 +657,12 @@ fn sc_preview(tracking: u32, bundle: u32, quantity: u32) -> Vec<u8> {
     bytes
 }
 
+/// The 66/4 result: the second dword after the header (`00b2ded0` obj+0x1C, T453).
 fn order_result(packets: &[Vec<u8>]) -> u32 {
     packets
         .iter()
         .find(|packet| packet.starts_with(&[66, 0, 4, 0]))
-        .map(|packet| u32::from_le_bytes(packet[4..8].try_into().unwrap()))
+        .map(|packet| u32::from_le_bytes(packet[8..12].try_into().unwrap()))
         .expect("order response exists")
 }
 
@@ -1237,6 +1238,10 @@ fn marketplace_payment_like_rows_stay_refused_or_free() {
     assert_eq!(order.replies[0][..4], [66, 0, 4, 0]);
     assert_eq!(
         u32::from_le_bytes(order.replies[0][4..8].try_into().unwrap()),
+        22
+    );
+    assert_eq!(
+        u32::from_le_bytes(order.replies[0][8..12].try_into().unwrap()),
         station_cash::ORDER_FAILURE
     );
     assert!(!order.changed);
@@ -1357,21 +1362,28 @@ fn disabled_station_cash_policy_answers_every_marketplace_row_without_changes() 
     assert_eq!(&wallet[0][..4], &[66, 0, 11, 0]);
     assert_eq!(wallet_balance(&wallet), 0);
 
-    // 66/1 preview: result 0 (disabled) in all four dwords.
-    let packets = send(&mut gateway, &sc_preview(31, 8, 1));
-    assert_eq!(
-        packets,
+    // T453: both disabled replies echo the request's tracking id before result 0 (`00b2de20`,
+    // `00b2ded0`); a body that does not decode still gets the disabled reply, with tracking 0.
+    // 66/1 preview: tracking id, result 0, discount 0, total 0.
+    let disabled_preview = |tracking: u8| {
         vec![vec![
-            66, 0, 2, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0
+            66, 0, 2, 0, tracking, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0,
         ]]
-    );
+    };
+    let packets = send(&mut gateway, &sc_preview(31, 8, 1));
+    assert_eq!(packets, disabled_preview(31));
+    assert_eq!(send(&mut gateway, &marketplace(1)), disabled_preview(0));
 
-    // 66/3 order: result 0, no tracking id and the configured unavailable message.
+    // 66/3 order: tracking id, result 0, the configured unavailable message, discount, total.
+    let disabled_order = |tracking: u8| {
+        let mut bytes = vec![66, 0, 4, 0, tracking, 0, 0, 0, 0, 0, 0, 0, 8, 0, 0, 0];
+        bytes.extend_from_slice(b"disabled");
+        bytes.extend([0; 8]);
+        vec![bytes]
+    };
     let packets = send(&mut gateway, &sc_order(32, 8, 1));
-    assert_eq!(packets.len(), 1);
-    assert_eq!(&packets[0][..8], &[66, 0, 4, 0, 0, 0, 0, 0]);
-    let text_len = i32::from_le_bytes(packets[0][12..16].try_into().unwrap()) as usize;
-    assert_eq!(&packets[0][16..16 + text_len], b"disabled");
+    assert_eq!(packets, disabled_order(32));
+    assert_eq!(send(&mut gateway, &marketplace(3)), disabled_order(0));
 
     // 66/12 store status: the handshake flag is off, so no catalogue is pushed.
     let packets = send(&mut gateway, &marketplace(12));
