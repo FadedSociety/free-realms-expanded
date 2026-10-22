@@ -1497,7 +1497,7 @@ fn enter_sends_zoning_then_exact_45_28_44_and_item_list_bytes() {
     );
 
     let mut expected_45 = vec![127, 0, 45, 0, 0, 0];
-    expected_45.extend_from_slice(&0i32.to_le_bytes());
+    expected_45.extend_from_slice(&10i32.to_le_bytes()); // head size in tenths (00ab07a0 default)
     expected_45.extend_from_slice(&OWNER.to_le_bytes());
     expected_45.extend_from_slice(&HOUSE.to_le_bytes());
     expected_45.extend_from_slice(&6_514i32.to_le_bytes());
@@ -1509,11 +1509,11 @@ fn enter_sends_zoning_then_exact_45_28_44_and_item_list_bytes() {
     expected_45.extend_from_slice(&[0, 0, 1]);
     append_text(&mut expected_45, "");
     append_text(&mut expected_45, "");
-    append_text(&mut expected_45, "");
     append_float(&mut expected_45, 0.0);
     expected_45.extend_from_slice(&0i32.to_le_bytes());
     expected_45.extend_from_slice(&[0, 0]);
     expected_45.extend_from_slice(&0i32.to_le_bytes());
+    append_text(&mut expected_45, ""); // directory snapshot, after factory_plot_id
     expected_45.extend_from_slice(&[0u8; 8]);
     assert_eq!(outcome.replies[0].encode_inner().unwrap(), expected_45);
 

@@ -238,6 +238,10 @@ fn entering_changes_scene_and_the_house_packets_wait_for_the_load() {
     );
     let zone = ZoneData::decode(&loaded.replies[0][2..]).unwrap();
     assert_eq!(zone.instance, lot);
+    assert_eq!(
+        zone.head_size_tenths, 10,
+        "a zero head size hides the player's head"
+    );
     let again = game.initialize_world(&character(), 4_000).unwrap();
     assert!(again.replies.is_empty(), "a second load inside the house resends nothing");
 }

@@ -651,8 +651,12 @@ impl HouseInfo {
     }
 }
 
-/// Client `FUN_00aafe10` record embedded in 127/45. Field order is recovered; values other than
-/// the owner/lot identifiers and counts supplied by the service remain reconstructed (R).
+/// Client `FUN_00aafe10` record embedded in 127/45 and each 127/39 row. Wire order (client reader
+/// `00aafe10`, when_created through `008cb4c0`): owner u64, instance u64, name_id i32, house_name
+/// str, owner_name str, icon i32, fixture_count i32, last_visited 8 bytes, furniture_score i32,
+/// 3 bools, description str, keyword_list str, rating f32, votes i32, has_rating bool, can_vote
+/// bool, factory_plot_id i32, directory_snapshot str, when_created 8 bytes. Values other than the
+/// owner/lot identifiers and counts supplied by the service remain reconstructed (R).
 #[derive(Clone, Debug, PartialEq)]
 pub struct PlayerHousingInstanceInfo {
     pub owner_guid: u64,
@@ -669,12 +673,14 @@ pub struct PlayerHousingInstanceInfo {
     pub is_flora_allowed: bool,
     pub description: String,
     pub keyword_list: String,
-    pub unknown21: String,
     pub rating: f32,
     pub votes: i32,
     pub has_rating: bool,
     pub can_vote: bool,
     pub factory_plot_id: i32,
+    /// The string `00aafe10` reads after factory_plot_id. Its meaning (a directory snapshot) is
+    /// community evidence only (R).
+    pub directory_snapshot: String,
     pub when_created: [u32; 2],
 }
 
@@ -695,12 +701,12 @@ impl PlayerHousingInstanceInfo {
         writer.bool(self.is_flora_allowed);
         writer.string(&self.description)?;
         writer.string(&self.keyword_list)?;
-        writer.string(&self.unknown21)?;
         writer.f32(self.rating)?;
         writer.i32(self.votes);
         writer.bool(self.has_rating);
         writer.bool(self.can_vote);
         writer.i32(self.factory_plot_id);
+        writer.string(&self.directory_snapshot)?;
         writer.u32(self.when_created[0]);
         writer.u32(self.when_created[1]);
         Ok(())
@@ -722,24 +728,28 @@ impl PlayerHousingInstanceInfo {
             is_flora_allowed: reader.bool()?,
             description: reader.string()?,
             keyword_list: reader.string()?,
-            unknown21: reader.string()?,
             rating: reader.f32()?,
             votes: reader.i32()?,
             has_rating: reader.bool()?,
             can_vote: reader.bool()?,
             factory_plot_id: reader.i32()?,
+            directory_snapshot: reader.string()?,
             when_created: [reader.u32()?, reader.u32()?],
         })
     }
 }
 
-/// S2C 127/45. The two flags and word are parsed at `00ab6c80`; their meanings/default values are
-/// not recovered and remain caller-supplied reconstructed policy (R).
+/// S2C 127/45. Client reader `00ab6c80`: bool +12, bool +13, i32 +16, then the `00aafe10` record.
+/// Handler `00ac36c0` passes +12 to `Housing:SetIsInInstance` as its second argument (`00ab94b0`),
+/// which the Lua preview handler names `isPreview` (R); +13's meaning is not recovered (R).
 #[derive(Clone, Debug, PartialEq)]
 pub struct ZoneData {
     pub flag_a: bool,
     pub flag_b: bool,
-    pub unknown_word: i32,
+    /// Head scale in tenths: `00ac36c0` hands it to `00ab96e0`, which runs Lua
+    /// `CuteMode:SetSizeInstant(word * 0.1)`, so 0 hides the head. The constructor `00ab07a0`
+    /// defaults it to 10.
+    pub head_size_tenths: i32,
     pub instance: PlayerHousingInstanceInfo,
 }
 
@@ -748,7 +758,7 @@ impl ZoneData {
         let mut writer = Writer::new(SUB_ZONE_DATA);
         writer.bool(self.flag_a);
         writer.bool(self.flag_b);
-        writer.i32(self.unknown_word);
+        writer.i32(self.head_size_tenths);
         self.instance.encode(&mut writer)?;
         Ok(writer.finish())
     }
@@ -761,7 +771,7 @@ impl ZoneData {
         let value = Self {
             flag_a: reader.bool()?,
             flag_b: reader.bool()?,
-            unknown_word: reader.i32()?,
+            head_size_tenths: reader.i32()?,
             instance: PlayerHousingInstanceInfo::decode(&mut reader)?,
         };
         reader.finish()?;

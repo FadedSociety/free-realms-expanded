@@ -241,59 +241,98 @@ fn house_info_round_trip_and_bool_policy() {
     }
 }
 
+/// A `00aafe10` record with distinct values, a non-empty snapshot and a non-zero factory plot.
+fn instance_record() -> PlayerHousingInstanceInfo {
+    PlayerHousingInstanceInfo {
+        owner_guid: 1,
+        instance_guid: 2,
+        name_id: 3,
+        house_name: String::new(),
+        owner_name: String::new(),
+        icon_id: 101,
+        fixture_count: 102,
+        furniture_score: 103,
+        last_visited: [104, 105],
+        is_locked: false,
+        is_members_only: true,
+        is_flora_allowed: false,
+        description: String::new(),
+        keyword_list: String::new(),
+        rating: 1.25,
+        votes: 106,
+        has_rating: true,
+        can_vote: false,
+        factory_plot_id: 107,
+        directory_snapshot: "seaside_lot".into(),
+        when_created: [108, 109],
+    }
+}
+
+/// `instance_record()` in client reader `00aafe10` order: the snapshot follows factory_plot_id.
+fn instance_record_bytes() -> Vec<u8> {
+    let mut bytes = Vec::new();
+    bytes.extend_from_slice(&1u64.to_le_bytes());
+    bytes.extend_from_slice(&2u64.to_le_bytes());
+    bytes.extend_from_slice(&3i32.to_le_bytes());
+    bytes.extend_from_slice(&[0; 8]); // house and owner names
+    bytes.extend_from_slice(&101i32.to_le_bytes());
+    bytes.extend_from_slice(&102i32.to_le_bytes());
+    bytes.extend_from_slice(&104u32.to_le_bytes());
+    bytes.extend_from_slice(&105u32.to_le_bytes());
+    bytes.extend_from_slice(&103i32.to_le_bytes());
+    bytes.extend_from_slice(&[0, 1, 0]);
+    bytes.extend_from_slice(&[0; 8]); // description and keyword list
+    bytes.extend_from_slice(&1.25f32.to_le_bytes());
+    bytes.extend_from_slice(&106i32.to_le_bytes());
+    bytes.extend_from_slice(&[1, 0]);
+    bytes.extend_from_slice(&107i32.to_le_bytes());
+    bytes.extend_from_slice(&11i32.to_le_bytes());
+    bytes.extend_from_slice(b"seaside_lot");
+    bytes.extend_from_slice(&108u32.to_le_bytes());
+    bytes.extend_from_slice(&109u32.to_le_bytes());
+    bytes
+}
+
 #[test]
 fn zone_data_follows_native_pair_between_the_second_and_third_words() {
     let value = ZoneData {
         flag_a: false,
         flag_b: true,
-        unknown_word: 100,
-        instance: PlayerHousingInstanceInfo {
-            owner_guid: 1,
-            instance_guid: 2,
-            name_id: 3,
-            house_name: String::new(),
-            owner_name: String::new(),
-            icon_id: 101,
-            fixture_count: 102,
-            furniture_score: 103,
-            last_visited: [104, 105],
-            is_locked: false,
-            is_members_only: true,
-            is_flora_allowed: false,
-            description: String::new(),
-            keyword_list: String::new(),
-            unknown21: String::new(),
-            rating: 1.25,
-            votes: 106,
-            has_rating: true,
-            can_vote: false,
-            factory_plot_id: 107,
-            when_created: [108, 109],
-        },
+        head_size_tenths: 10,
+        instance: instance_record(),
     };
     let mut expected = vec![45, 0, 0, 1];
-    expected.extend_from_slice(&100i32.to_le_bytes());
-    expected.extend_from_slice(&1u64.to_le_bytes());
-    expected.extend_from_slice(&2u64.to_le_bytes());
-    expected.extend_from_slice(&3i32.to_le_bytes());
-    expected.extend_from_slice(&[0; 8]); // two empty strings
-    expected.extend_from_slice(&101i32.to_le_bytes());
-    expected.extend_from_slice(&102i32.to_le_bytes());
-    expected.extend_from_slice(&104u32.to_le_bytes());
-    expected.extend_from_slice(&105u32.to_le_bytes());
-    expected.extend_from_slice(&103i32.to_le_bytes());
-    expected.extend_from_slice(&[0, 1, 0]);
-    expected.extend_from_slice(&[0; 12]); // three empty strings
-    expected.extend_from_slice(&1.25f32.to_le_bytes());
-    expected.extend_from_slice(&106i32.to_le_bytes());
-    expected.extend_from_slice(&[1, 0]);
-    expected.extend_from_slice(&107i32.to_le_bytes());
-    expected.extend_from_slice(&108u32.to_le_bytes());
-    expected.extend_from_slice(&109u32.to_le_bytes());
+    expected.extend_from_slice(&10i32.to_le_bytes());
+    expected.extend(instance_record_bytes());
 
     let payload = value.encode().unwrap();
     assert_eq!(payload, expected);
+    let snapshot = payload
+        .windows(11)
+        .position(|w| w == b"seaside_lot")
+        .unwrap();
+    assert_eq!(
+        payload[snapshot - 8..snapshot - 4],
+        107i32.to_le_bytes(),
+        "the snapshot's length prefix follows factory_plot_id"
+    );
     assert_eq!(ZoneData::decode(&payload).unwrap(), value);
+}
+
+#[test]
+fn instance_list_rows_carry_the_snapshot_after_factory_plot_id() {
+    let list = InstanceList {
+        records: vec![instance_record()],
+        owner_guid: 1,
+    };
+    let mut expected = vec![39, 0];
+    expected.extend_from_slice(&1u32.to_le_bytes());
+    expected.extend(instance_record_bytes());
+    expected.extend_from_slice(&1u64.to_le_bytes());
+
+    let payload = list.encode().unwrap();
+    assert_eq!(payload, expected);
+    assert_eq!(InstanceList::decode(&payload).unwrap(), list);
 }
 
 #[test]
@@ -435,7 +474,7 @@ fn every_subtype_uses_the_same_explicit_family_boundary() {
         HousingPacket::ZoneData(ZoneData {
             flag_a: false,
             flag_b: true,
-            unknown_word: 0,
+            head_size_tenths: 0,
             instance: PlayerHousingInstanceInfo {
                 owner_guid: 2,
                 instance_guid: 3,
@@ -451,12 +490,12 @@ fn every_subtype_uses_the_same_explicit_family_boundary() {
                 is_flora_allowed: true,
                 description: String::new(),
                 keyword_list: String::new(),
-                unknown21: String::new(),
                 rating: 0.0,
                 votes: 0,
                 has_rating: false,
                 can_vote: false,
                 factory_plot_id: 0,
+                directory_snapshot: String::new(),
                 when_created: [0, 0],
             },
         }),

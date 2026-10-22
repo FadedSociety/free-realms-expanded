@@ -111,6 +111,10 @@ pub const MAX_STARTER_KIT_FIXTURES: usize = 16;
 const RECONSTRUCTED_HOUSE_UNUSED: i32 = 10;
 /// (R) Default flora policy; the retail server value is not recovered.
 const RECONSTRUCTED_FLORA_ALLOWED: bool = true;
+/// 127/45 head scale in tenths: the client's own constructor default (`00ab07a0`), read at
+/// `00ab6c80` and applied through `CuteMode:SetSizeInstant` (`00ac36c0` -> `00ab96e0`); 0 hides
+/// the head. A future tunable should stay within about 1..60 (`CuteMode:Inflate` reaches 5.2).
+const HOUSE_HEAD_SIZE_TENTHS: i32 = 10;
 /// (R) Identity tilt because the client `127/2` body has no separate tilt field.
 const IDENTITY_TILT: [f32; 4] = [1.0, 0.0, 0.0, 0.0];
 
@@ -1960,13 +1964,14 @@ impl HousingService {
     }
 
     /// Build the 127/45 record in the client reader's field order. Identity/count values come
-    /// from the owned lot; display strings, ratings, timestamps and the leading flags/word are R
-    /// defaults because no server capture or retail value table supplies them.
+    /// from the owned lot and the head size is the client default; display strings, ratings,
+    /// timestamps and the leading flags are R defaults because no server capture or retail value
+    /// table supplies them.
     fn zone_data(&self, lot: &LotSnapshot, definition: &HousingLotDefinition) -> ZoneData {
         ZoneData {
             flag_a: false,
             flag_b: false,
-            unknown_word: 0,
+            head_size_tenths: HOUSE_HEAD_SIZE_TENTHS,
             instance: self.instance_info(lot, definition),
         }
     }
@@ -1992,12 +1997,12 @@ impl HousingService {
             is_flora_allowed: RECONSTRUCTED_FLORA_ALLOWED,
             description: String::new(),
             keyword_list: String::new(),
-            unknown21: String::new(),
             rating: 0.0,
             votes: 0,
             has_rating: false,
             can_vote: false,
             factory_plot_id: 0,
+            directory_snapshot: String::new(),
             when_created: [0; 2],
         }
     }
