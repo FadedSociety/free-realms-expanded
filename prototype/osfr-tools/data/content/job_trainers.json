@@ -92,6 +92,13 @@
         "rank": 5
       },
       "source": "client: 412471 'Become a Warrior' (menu label), 412472/119075 (find and speak with Drill Sergeant Dewey in Snowhill) and 5100388 job-board text 'Requires: Level 20 Brawler'. guide: notes/Build Guides/Content/Jobs/Warrior.md:30-32,44 (Unlocking, prerequisite, trainers); notes/Build Guides/Content/NPCs/NPCs - Snowhill.md:35. wiki: Warrior.md:44 (Drill Sergeant Dewey starts the line). reconstructed: (R) the recovered level-20 Brawler gate is reduced to rank 5 for playtesting on the local 100-XP rank curve; this row is data, so restoring 20 needs no code. (R) Dewey is a poi_anchor in the Snowhill content, so data/content/npc_spawns_extra.json now holds his drawable spawn."
+    },
+    {
+      "npc": 9000000091,
+      "profile": 4,
+      "job": "Postman",
+      "label_string_id": 412445,
+      "source": "client: 412445 'Become a Postman' (menu label); 412446/442230/384165/384171 name Felipe in Sanctuary; 46247 'Flitter can teach you how to become a postman.', 46248/73595 (speak with Flitter in Sanctuary) and Flitter's own greeting 24842 ('If you'd like to work as a Postman'). guide: notes/Build Guides/Content/Jobs/Postman.md:24,33-34,262 (How to unlock, Trainers, Conflicts 2). wiki: Postman (Felipe unlocks the job). reconstructed: (R) Felipe is only a poi_anchor in the Sanctuary content, so Flitter, the spawned Sanctuary postmaster (legacy_data, model 411), is the reachable menu trainer; the menu choice grants the job without the original Become a Postman / Can You Deliver? quests"
     }
   ]
 }

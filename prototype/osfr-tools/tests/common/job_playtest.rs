@@ -58,19 +58,22 @@ pub fn install_starter_weapon_definitions(dir: &Path) {
     fs::write(path, serde_json::to_vec(&inventory).unwrap()).unwrap();
 }
 
-/// The production play package ships Ninja/Wizard/Warrior starter outfits; the
-/// pinned reference packages predate them (T201). Add the captured Chest/Legs
-/// pieces T010 uses when the reference has no list, so the real
-/// trainer/activation path can dress all six.
+/// The production play package ships Ninja/Wizard/Warrior/Postman starter
+/// outfits; the pinned reference packages predate them (T201). Add the captured
+/// Chest/Legs pieces T010 uses, and the play package's whole Postman list
+/// (`notes/Research/Job Starter Outfits.md`, T407), when the reference has no
+/// list, so the real trainer/activation path can dress those jobs.
 pub fn install_starter_outfits(dir: &Path) {
     let path = dir.join("profiles.json");
     let mut profiles: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
     let starter = profiles["starter_items"].as_object_mut().unwrap();
-    for (job, items) in [
-        (2, [19197, 19787]),
-        (12, [12060, 12709]),
-        (32, [46137, 46732]),
-    ] {
+    let outfits: [(i32, &[i32]); 4] = [
+        (2, &[19197, 19787]),
+        (4, &[13137, 12827, 13197, 13317, 12957]),
+        (12, &[12060, 12709]),
+        (32, &[46137, 46732]),
+    ];
+    for (job, items) in outfits {
         starter
             .entry(job.to_string())
             .or_insert_with(|| serde_json::json!(items));
