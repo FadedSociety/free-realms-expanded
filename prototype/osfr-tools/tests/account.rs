@@ -275,6 +275,25 @@ fn name_check_and_create_return_client_status_codes() {
         check_name(&store, 1, "Bad!", "Record").status,
         NameCheckStatus::Invalid
     );
+    // Latin letters with accents are allowed (OSFR parity); other scripts, look-alikes, combining
+    // marks, Latin-range symbols and C1 controls are refused for new names.
+    for (first, last) in [("José", "Núñez"), ("Zoë", "Ångström"), ("Łukasz", "Dvořák")] {
+        assert_eq!(check_name(&store, 1, first, last).status, NameCheckStatus::Available, "{first} {last}");
+    }
+    for (first, last) in [
+        ("Jоse", "Record"),        // Cyrillic о
+        ("名前", "Record"),          // CJK renders invisibly in the client
+        ("Jose\u{0301}", "Record"), // combining acute instead of é
+        ("Jo×e", "Record"),         // U+00D7 sits inside the Latin range
+        ("Jo\u{0085}e", "Record"),  // C1 control
+        ("Jo\u{00A0}e", "Record"),  // no-break space
+    ] {
+        assert_eq!(check_name(&store, 1, first, last).status, NameCheckStatus::Invalid, "{first:?}");
+    }
+    assert_eq!(
+        create_character(&mut store, account_id, creation("Jоse", "Record"), &resources).status,
+        CharacterCreateStatus::InvalidName
+    );
     assert_eq!(NameCheckStatus::Profane.client_code(), 3);
     assert_eq!(NameCheckStatus::ServerFailure.client_code(), 6);
     assert_eq!(

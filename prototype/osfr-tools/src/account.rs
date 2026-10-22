@@ -175,6 +175,21 @@ fn valid_client_name(first: &str, last: &str) -> bool {
         && (2..=14).contains(&last_len)
         && first_len + last_len <= 15
         && identity::valid_name(first, last)
+        && latin_name(first)
+        && latin_name(last)
+}
+
+/// New names use Latin letters only: ASCII plus Latin-1 Supplement and Latin Extended-A/B letters
+/// (U+00C0..=U+024F without × and ÷), with the space, hyphen and apostrophe `valid_name` allows.
+/// Other scripts render invisibly in the client (OSFR found this for Chinese) and allow look-alike
+/// names (Cyrillic "а" for Latin "a"). Saved characters keep loading under `valid_name`. (R): the
+/// original server's character set is unknown.
+fn latin_name(name: &str) -> bool {
+    name.chars().all(|c| {
+        c.is_ascii_alphabetic()
+            || matches!(c, ' ' | '-' | '\'')
+            || (('\u{00C0}'..='\u{024F}').contains(&c) && !matches!(c, '\u{00D7}' | '\u{00F7}'))
+    })
 }
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
@@ -252,7 +267,7 @@ fn check_name_status(store: &AccountStore, first: &str, last: &str) -> NameCheck
         NameCheckStatus::LastTooLong
     } else if first_len + last_len > 15 {
         NameCheckStatus::TotalLengthInvalid
-    } else if !identity::valid_name(first, last) {
+    } else if !identity::valid_name(first, last) || !latin_name(first) || !latin_name(last) {
         NameCheckStatus::Invalid
     } else if store.character_name_taken(first, last) {
         NameCheckStatus::Taken
