@@ -65,7 +65,8 @@ impl Tier {
 #[derive(Clone, Copy, Debug, Deserialize, PartialEq, Eq)]
 #[serde(rename_all = "kebab-case")]
 pub enum Pairing {
-    /// Checked in game, per the row's `playtest` source.
+    /// A community playtester checked it against the basis the row's `playtest` source names
+    /// (wiki, videos or guides; not 2014 evidence).
     Playtest,
     /// (R) Paired by id order, never checked.
     IdOrder,

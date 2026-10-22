@@ -11,7 +11,8 @@ recognises fields by name:
   items      (item_id, reward/prize items)   -> runtime inventory.json, generated catalogue,
                                                 data/content item definitions, Legacy ClientItemDefinitions.json
   animations (*animation* ints)              -> Resources/AnimationTypes.xml AnimationSlot ids
-  guids      (guid, spawn_guid)              -> duplicates across all actors
+  guids      (guid, spawn_guid)              -> duplicates across all actors; collection_coins.json only
+                                                references them, so each must name a defined actor
   list ids   (id, npc_id, key)               -> duplicates within a list / across quest files
   quest/npc refs (prerequisite_quest_ids, quest_ids, giver_npc_id) -> authored quests/npcs
 
@@ -575,6 +576,7 @@ class Checker:
         self.text_cache = {}
         self.text_previews = {}
         self.guid_seen = collections.defaultdict(list)
+        self.guid_refs = []          # (severity, file, path, field, value): guids that name an actor
         self.quest_ids = set()
         self.npc_ids = set()
         self.quest_refs = []         # (file, path, field, value, severity)
@@ -1169,6 +1171,8 @@ class Checker:
                 self.actor_kinds.add(x)
             elif "animation" in lk:
                 self.check_anim(sev, rel, p, k, x)
+            elif lk in GUID_KEYS and rel == "collection_coins.json":  # T449: names a spawn row, defines no actor
+                self.guid_refs.append((sev, rel, p, k, x))
             elif lk in GUID_KEYS:
                 record = path.split(".")[0]
                 signature = re.sub(r"\[\d+\]", "[]", path)
@@ -1405,6 +1409,9 @@ class Checker:
                     self.add("error", "duplicate_guid", o[0], o[3], o[3].rsplit(".", 1)[-1], guid,
                              f"guid also used by a different actor at {first[0]} {first[3]}")
                 kept.append(o)
+        for sev, rel, p, k, v in self.guid_refs:
+            if v not in self.guid_seen:
+                self.add(sev, "guid_ref_unknown", rel, p, k, v, "guid names no actor defined in content")
         # Point raw-hash findings at a Global.Text id with identical text, when content uses one.
         by_text = {}
         for (value, _), (mode, t) in self.text_cache.items():

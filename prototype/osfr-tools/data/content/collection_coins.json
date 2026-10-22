@@ -9,7 +9,7 @@
     "lxzxrus_base": "lab/references/Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be src/Resources/CollectionNodeSpawns/1/*-exploration-coins-*.json",
     "lxzxrus_fixes": "lab/references/Lxzxrus-Free-Realms-Server@65ec688f3e51249ca8a9c979b3938386748f7195 blackspore-exploration-coins-elite.json, briarwood-exploration-coins-rare.json (unmerged branch origin/collections/exploration-fixes; row 4493 left out)",
     "sanctuary": "lab/references/Sanctuary-main-20261019@10f129e7f3e2094304d20ccee6e3f7136a5e889d src/Resources/CollectionCoins.json, Sunstone Valley only, its 311/312 swap undone (entry -8 into 311, +8 into 312)",
-    "pairing": "playtest: checked in game per the cited source; id-order: paired by id order, unchecked (R)",
+    "pairing": "playtest: a community playtester checked it against the basis its source names (not 2014 evidence); id-order: paired by id order, unchecked (R)",
     "pickup_range": "(R) Sanctuary@10f129e src/Sanctuary.Game/Zones/BaseZone.cs:909 CollectionCoin InteractRange 12; not recovered from the client"
   },
   "records": [
@@ -27,7 +27,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@301380a commit message: checked in game"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@301380a commit message: playtester matched each coin to the wiki's directions"
         }
       ]
     },
@@ -143,7 +143,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@301380a commit message: checked in game"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@301380a commit message: playtester matched each coin to the wiki's directions"
         }
       ]
     },
@@ -161,7 +161,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@301380a commit message: checked in game"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@301380a commit message: playtester matched each coin to the wiki's directions"
         }
       ]
     },
@@ -179,7 +179,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@301380a commit message: checked in game"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@301380a commit message: playtester matched each coin to the wiki's directions"
         }
       ]
     },
@@ -211,7 +211,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@301380a commit message: checked in game"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@301380a commit message: playtester matched each coin to the wiki's directions"
         }
       ]
     },
@@ -341,7 +341,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e49e395 commit message: checked in game"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e49e395 commit message: playtester swapped 2111 and 2114 back, as the original game's guides show"
         }
       ]
     },
@@ -359,7 +359,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -391,7 +391,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e49e395 commit message: checked in game"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e49e395 commit message: playtester swapped 2111 and 2114 back, as the original game's guides show"
         }
       ]
     },
@@ -409,7 +409,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -427,7 +427,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -459,7 +459,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -477,7 +477,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -495,7 +495,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -513,7 +513,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -545,7 +545,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: playtester says the Rare coins were right (no basis named)"
         }
       ]
     },
@@ -563,7 +563,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: playtester checked each coin against the original game's videos"
         }
       ]
     },
@@ -581,7 +581,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: playtester checked each coin against the original game's videos"
         }
       ]
     },
@@ -599,7 +599,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: playtester checked each coin against the original game's videos"
         }
       ]
     },
@@ -617,7 +617,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: playtester checked each coin against the original game's videos"
         }
       ]
     },
@@ -635,7 +635,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: playtester checked each coin against the original game's videos"
         }
       ]
     },
@@ -653,7 +653,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: playtester says the Rare coins were right (no basis named)"
         }
       ]
     },
@@ -671,7 +671,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: checked in game"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@e1dbdae commit message: playtester says the Rare coins were right (no basis named)"
         }
       ]
     },
@@ -969,7 +969,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -987,7 +987,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -1005,7 +1005,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -1023,7 +1023,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -1041,7 +1041,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -1059,7 +1059,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -1077,7 +1077,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -1095,7 +1095,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -1113,7 +1113,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -1131,7 +1131,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -1149,7 +1149,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -1167,7 +1167,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },
@@ -1185,7 +1185,7 @@
         },
         {
           "kind": "playtest",
-          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game'"
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
         }
       ]
     },

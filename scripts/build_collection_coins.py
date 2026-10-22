@@ -12,9 +12,7 @@ Correcting a pair is a one-row edit here or in the output; tests pin only canari
 import json
 from pathlib import Path
 import subprocess
-import sys
 
-sys.dont_write_bytecode = True
 PROJECT = Path(__file__).resolve().parents[1]
 CONTENT = PROJECT / "prototype/osfr-tools/data/content"
 REFS = PROJECT.parent / "lab/references"
@@ -23,7 +21,7 @@ SANCTUARY, SANCTUARY_REV = "Sanctuary-main-20261019", "10f129e"
 SANCTUARY_COINS = "src/Resources/CollectionCoins.json"
 NODES = "src/Resources/CollectionNodeSpawns/1/"
 FIX_DOC = "docs/research/exploration-collections.md 'Checked in game'"
-MESSAGE = "commit message: checked in game"
+FIX_CHECK = f"{FIX_DOC}: playtester named each coin's place from the original game's guides and videos"
 # Our row's name_string_id: client locale 386170 "Rare Exploration Coin", 4412 "Elite Exploration Coin".
 TIERS = {386170: "rare", 4412: "elite"}
 # Locale names: 265-276 "<place> Rare Exploration", 284-291 "<place> Elite Exploration",
@@ -32,15 +30,21 @@ EXPLORATION = {c: "rare" for c in [*range(265, 277), 311]} | {c: "elite" for c i
 # Sanctuary puts Rare-named Sunstone coins in 312 and Elite-named in 311; entries sit 8 apart.
 SANCTUARY_UNSWAP = {311: 8, 312: -8}
 FIXED_FILES = ("blackspore-exploration-coins-elite.json", "briarwood-exploration-coins-rare.json")
-# Coins checked in game: base file -> (commit, where it says so, only these Ids or None for all).
+# Coins a community playtester checked: base file -> (commit, what it says the check was against,
+# only these Ids or None for all). Community evidence, not 2014 evidence.
 PLAYTEST = {
-    "seaside-exploration-coins-rare.json": ("301380a", MESSAGE, None),
-    "shrouded-glade-exploration-coins-rare.json": ("e1dbdae", MESSAGE, None),
-    "shrouded-glade-exploration-coins-elite.json": ("e1dbdae", MESSAGE, None),
-    "blackspore-exploration-coins-rare.json": ("e49e395", MESSAGE, {2111, 2114}),
-    "briarwood-exploration-coins-rare.json": (LXZ_FIX, FIX_DOC, None),
-    "briarwood-exploration-coins-elite.json": (LXZ_FIX, FIX_DOC, None),
-    "blackspore-exploration-coins-elite.json": (LXZ_FIX, FIX_DOC, None),
+    "seaside-exploration-coins-rare.json":
+        ("301380a", "commit message: playtester matched each coin to the wiki's directions", None),
+    "shrouded-glade-exploration-coins-rare.json":
+        ("e1dbdae", "commit message: playtester says the Rare coins were right (no basis named)", None),
+    "shrouded-glade-exploration-coins-elite.json":
+        ("e1dbdae", "commit message: playtester checked each coin against the original game's videos", None),
+    "blackspore-exploration-coins-rare.json":
+        ("e49e395", "commit message: playtester swapped 2111 and 2114 back, as the original game's guides show",
+         {2111, 2114}),
+    "briarwood-exploration-coins-rare.json": (LXZ_FIX, FIX_CHECK, None),
+    "briarwood-exploration-coins-elite.json": (LXZ_FIX, FIX_CHECK, None),
+    "blackspore-exploration-coins-elite.json": (LXZ_FIX, FIX_CHECK, None),
 }
 NOTES = {2039: f"cannot be reached on foot; it waits for a reachable spot ({LXZ}@{LXZ_FIX} {FIX_DOC})"}
 
@@ -157,7 +161,8 @@ def main():
                              " (unmerged branch origin/collections/exploration-fixes; row 4493 left out)",
             "sanctuary": f"lab/references/{SANCTUARY}@{full(SANCTUARY, SANCTUARY_REV)} {SANCTUARY_COINS},"
                          " Sunstone Valley only, its 311/312 swap undone (entry -8 into 311, +8 into 312)",
-            "pairing": "playtest: checked in game per the cited source; id-order: paired by id order, unchecked (R)",
+            "pairing": "playtest: a community playtester checked it against the basis its source names (not 2014"
+                       " evidence); id-order: paired by id order, unchecked (R)",
             "pickup_range": f"(R) Sanctuary@{SANCTUARY_REV} src/Sanctuary.Game/Zones/BaseZone.cs:909"
                             " CollectionCoin InteractRange 12; not recovered from the client",
         },
