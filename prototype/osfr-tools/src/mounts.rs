@@ -311,6 +311,10 @@ pub struct MountService {
     catalog: Arc<MountCatalog>,
     state: MountState,
     last_spawn_ms: Option<u64>,
+    /// Session-only: the owned ride ids (ascending, as `owned_mounts` lists them) and the active
+    /// ride GUID of the last roster (168/5) sent. `list_packet` records it, `roster_sync` compares
+    /// with it, `reset` clears it; `None` until world entry sends the first roster.
+    last_sent: Option<(Vec<i32>, Option<u64>)>,
 }
 
 impl MountService {
@@ -319,6 +323,7 @@ impl MountService {
             catalog: Arc::new(catalog),
             state: MountState::Empty,
             last_spawn_ms: None,
+            last_sent: None,
         }
     }
 
@@ -340,10 +345,71 @@ impl MountService {
     pub fn reset(&mut self) {
         self.state = MountState::Empty;
         self.last_spawn_ms = None;
+        self.last_sent = None;
     }
 
-    pub fn list_packet(&self, inventory: &InventoryState) -> Vec<u8> {
-        encode_mount_list(&self.catalog, inventory, self.state.active_ride())
+    /// The owner's roster (168/5). Every roster sent goes through here, so it also records what
+    /// the client now holds (`last_sent`).
+    pub fn list_packet(&mut self, inventory: &InventoryState) -> Vec<u8> {
+        let mounts = self.catalog.owned_mounts(inventory);
+        let active = self.state.active_ride();
+        let ids = mounts.iter().map(|mount| mount.id).collect();
+        self.last_sent = Some((ids, active.map(|ride| ride.actor_guid)));
+        encode_mount_list(&mounts, active)
+    }
+
+    /// The roster again when the owned rides or the active ride changed since the last one sent;
+    /// `None` when nothing changed or before world entry sent the first. It runs after every
+    /// message and tick, so it allocates nothing unless it sends: every owned ride item must map
+    /// to a remembered ride, and every remembered ride must still be owned.
+    pub fn roster_sync(&mut self, inventory: &InventoryState) -> Option<Vec<u8>> {
+        let (ids, guid) = self.last_sent.as_ref()?;
+        let unchanged = *guid == self.state.active_ride().map(|ride| ride.actor_guid)
+            && inventory
+                .items
+                .iter()
+                .filter(|item| item.count > 0)
+                .filter_map(|item| self.catalog.item_to_mount.get(&item.definition_id))
+                .all(|id| ids.binary_search(id).is_ok())
+            && ids.iter().all(|id| {
+                self.catalog
+                    .mount(*id)
+                    .is_some_and(|mount| is_owned(mount, inventory))
+            });
+        (!unchanged).then(|| self.list_packet(inventory))
+    }
+
+    /// Runs after every message and tick (`Gameplay::settle_mounts`). The ride is put away when
+    /// `end` holds (zoning, a fight or minigame, a knockout) or its item is gone; otherwise the
+    /// roster is resent when ownership changed. A put-away carries the roster itself, so one
+    /// change sends one 168/5.
+    pub fn settle(
+        &mut self,
+        owner_guid: u64,
+        inventory: &InventoryState,
+        end: bool,
+    ) -> MountOutcome {
+        let mut outcome = if end || self.ride_lost(inventory) {
+            self.dismount_request(owner_guid, inventory, &[])
+        } else {
+            MountOutcome::default()
+        };
+        let roster = self.roster_sync(inventory);
+        outcome
+            .effects
+            .extend(roster.map(|list| packet(vec![owner_guid], list)));
+        outcome
+    }
+
+    /// (R) Losing the ride item (trade, sale, drop) ends the ride: no candidate item of the active
+    /// ride's mount is owned any more. Another owned candidate (Scaled Dragon 7960 and 76856)
+    /// keeps it out.
+    fn ride_lost(&self, inventory: &InventoryState) -> bool {
+        self.state.active_ride().is_some_and(|ride| {
+            self.catalog
+                .mount(ride.mount_id)
+                .is_none_or(|mount| !is_owned(mount, inventory))
+        })
     }
 
     pub fn spawn(
@@ -365,9 +431,9 @@ impl MountService {
         }
         let mount = self
             .catalog
-            .mount(mount_id)
+            .mount_arc(mount_id)
             .ok_or(MountError::UnknownMount)?;
-        if !is_owned(mount, inventory) {
+        if !is_owned(&mount, inventory) {
             return Err(MountError::NotOwned);
         }
         if self
@@ -849,12 +915,9 @@ fn is_owned(mount: &MountDefinition, inventory: &InventoryState) -> bool {
     })
 }
 
-fn encode_mount_list(
-    catalog: &MountCatalog,
-    inventory: &InventoryState,
-    active: Option<&ActiveRide>,
-) -> Vec<u8> {
-    let mounts = catalog.owned_mounts(inventory);
+/// Client reader: 00b06100 case 5 -> 00b05e00 -> 00b05830 (i32 count) -> 008e74c0 per record;
+/// 00b05600 then replaces the BaseClient mount store and refreshes the UI.
+fn encode_mount_list(mounts: &[&MountDefinition], active: Option<&ActiveRide>) -> Vec<u8> {
     let mut out = header(LIST);
     put_i32(&mut out, mounts.len() as i32);
     for mount in mounts {

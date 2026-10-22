@@ -66,6 +66,7 @@ mod power_up_use;
 mod profile_outfit;
 /// Progress-driven achievement observation over authoritative gameplay state.
 mod progression;
+mod rides;
 use self::npc::{dialogue_packet, quest_offer_packet_with};
 
 #[derive(Clone)]
@@ -1714,7 +1715,7 @@ impl Gameplay {
             self.append_warp_definitions(character, &mut out);
             self.append_activity_list(&mut out);
             self.append_item_bar(now_ms, &mut out)?;
-            out.replies.push(self.pets.list_packet());
+            self.push_rosters(&mut out);
             self.sync_client_objectives(&mut out);
             self.sync_achievement_progress(&mut out, None)?;
             return Ok(out);
@@ -1803,7 +1804,7 @@ impl Gameplay {
         self.append_activity_list(&mut out);
         self.append_item_bar(now_ms, &mut out)?;
         out.replies.push(self.recipe_replace_all_packet()?);
-        out.replies.push(self.pets.list_packet());
+        self.push_rosters(&mut out);
         self.sync_client_objectives(&mut out);
         self.sync_achievement_progress(&mut out, None)?;
         Ok(out)
@@ -2055,18 +2056,16 @@ impl Gameplay {
         Ok(mounts.handle(inner, &context)?.map(Self::ride_outcome))
     }
 
-    /// W162 (R): a ride ends when the player zones, a fight or kart race
-    /// starts, or the player is knocked out. The gateway calls this after every handled message
-    /// and tick, once the new state is known.
+    /// W162 (R): a ride ends when the player zones, a fight or kart race starts, the player is
+    /// knocked out or the ride item is gone; T424: the roster (168/5) follows every ownership
+    /// change. The gateway calls this after every handled message, shared-field action and tick.
     pub fn settle_mounts(&mut self, character: &CharacterState, zoned: bool) -> Outcome {
         let restrictions = self.ride_restrictions();
         let Some(mounts) = self.mounts.as_mut() else {
             return Outcome::default();
         };
-        if !(zoned || restrictions.in_minigame || restrictions.knocked_out) {
-            return Outcome::default();
-        }
-        let ended = mounts.dismount_request(character.guid, self.inventory.state(), &[]);
+        let end = zoned || restrictions.in_minigame || restrictions.knocked_out;
+        let ended = mounts.settle(character.guid, self.inventory.state(), end);
         let pose = crate::mounts::RidePose {
             position: character.position,
             heading: 0.0,

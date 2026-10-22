@@ -242,6 +242,9 @@ pub struct PostQuestRecords {
     /// (R) Captured signed marker and u64 value before pre-action rows.
     pub pet_source_marker: i32,
     pub pet_source_value: u64,
+    /// Misnamed: these are the owned-ride records, read by `008e74c0` like the rows of a 168/5
+    /// (`00b05830`). They are still the captured rows; world entry replaces the client's list
+    /// with a live 168/5 (`gameplay/rides.rs`). Rebuilding this section is open (T424).
     pub pre_action_records: Vec<PreActionRecord>,
 }
 

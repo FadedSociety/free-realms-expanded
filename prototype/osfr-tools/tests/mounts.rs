@@ -143,7 +143,7 @@ fn client_table_and_mount_data_load_with_provenance() {
 
 #[test]
 fn list_is_derived_from_owned_inventory_items() {
-    let service = MountService::new(catalog());
+    let mut service = MountService::new(catalog());
     let owned = inventory(&[ITEM_DEFINITION]);
     assert_eq!(service.catalog().owned_mounts(&owned).len(), 1);
     assert_eq!(service.list_packet(&owned), expected_mount_list(0));
