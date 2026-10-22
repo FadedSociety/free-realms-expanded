@@ -238,9 +238,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
         "regional NPCs dropped to {regional_legacy}"
     );
     // T257's appended rows, T279's Geoffrey row inserted after Carlos, T300's
-    // appended Therin row, T331's appended Petra row, and T372's appended 25
-    // priced-vendor spawns.
-    assert_eq!(extra_rows.len(), 3297);
+    // appended Therin row, T331's appended Petra row, T372's appended 25
+    // priced-vendor spawns, and T385's appended 4 fishing-guide spawns.
+    assert_eq!(extra_rows.len(), 3301);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

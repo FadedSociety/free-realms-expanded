@@ -73028,6 +73028,150 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "spawn_guid": 9000000194,
+      "legacy_npc_id": null,
+      "content_key": 9000000194,
+      "model_id": 1593,
+      "model_file_name": "fairy_m_selvi_slowreel.agr",
+      "name": "Selvi Slowreel",
+      "name_string_id": 37339,
+      "position": [
+        -737.152319,
+        9.09,
+        945.406909
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "data/content/npcs/lakeshore.json row 9000000194 (Selvi Slowreel, Lakeshore zone 8, poi_anchor POI 9) supplies the name and position; data/content/fishing_spots.json names this NPC the Rainbow Lake guide (area rainbow_lake, game 598). ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt row 1593 = fairy_m_selvi_slowreel.agr (the client model table mirror); the Legacy Npcs.json has no Selvi row, so legacy_npc_id stays null."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 1593 = fairy_m_selvi_slowreel.agr (gender 1, male): Selvi's own body, not a substitute. Shipped: lab/extracted/client-assets/catalog.tsv Assets_000.pack entry 787 (pack_12/000787.agr) and Assets_manifest.txt 'fairy_m_selvi_slowreel.agr.z'. The NPC row's location evidence already cites the client asset name 'fairy_m_selvi_slowreel' (2909359773)."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat: Global.Text.37339 resolves to 'Selvi Slowreel'; lab/reports/locale-id-map.json maps the row's ucdt hash 491270171 to 37339 (the row's second hash, ugdt 4106949866, has no mapping). The 35/2 AddNpc name field (reader 0x00921a10: u64 actor, i32 name id, i32 model id) is a Global.Text id (client formats 'Global.Text.%d' at 0x01804c14), so the spawn supplies 37339; the raw hash would render a blank nameplate."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T385: drawable guide for the Rainbow Lake trip. The position [-737.152319, 9.09, 945.406909] is the NPC row's reconstructed poi_anchor placement (POI 9 plus a deterministic XZ offset), not a captured transform; the zone-0 terrain grid puts the ground 0.21 m above it. (R) Heading 0.0: the row's quaternion is the POI arrival heading, not a recovered NPC facing. (R) spawn_guid/content_key reuse the 9000000000-range NPC content key as the runtime actor GUID, so the ordinary 26/8 click addresses the fishing_spots.json guide key; it is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000339,
+      "legacy_npc_id": null,
+      "content_key": 9000000339,
+      "model_id": 221,
+      "model_file_name": "chugawug_m_02.adr",
+      "name": "Gunther",
+      "name_string_id": 409300,
+      "position": [
+        -535.0814,
+        -74.24706,
+        2025.3947
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "data/content/npcs/briarwood.json row 9000000339 (Gunther, Briarwood zone 2, poi_anchor POI 129 Brambleback's Bayou) supplies the name and position; data/content/fishing_spots.json names this NPC the Brambleback's Bayou guide (area bramblebacks_bayou, game 597). ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt row 221 = chugawug_m_02.adr ('Generic Male Chugawug'); neither Legacy table names Gunther, so legacy_npc_id stays null."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 221 = chugawug_m_02.adr (race 7 chugawug, gender 1, 'Generic Male Chugawug'). Shipped: lab/extracted/client-assets/catalog.tsv Assets_008.pack entry 6002 (pack_20/006002.adr), with chugawug_m_02_lod0.dme and chugawug_m_02.dma."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat: Global.Text.409300 resolves to 'Gunther'; lab/reports/locale-id-map.json maps the row's ucdt hash 3082272307 to 409300. The 35/2 AddNpc name field (reader 0x00921a10: u64 actor, i32 name id, i32 model id) is a Global.Text id (client formats 'Global.Text.%d' at 0x01804c14), so the spawn supplies 409300; the raw hash would render a blank nameplate."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T385: drawable guide for the Brambleback's Bayou trip. The position [-535.0814, -74.24706, 2025.3947] is the NPC row's reconstructed poi_anchor placement (POI 129 plus a deterministic XZ offset), not a captured transform; the zone-0 terrain grid puts the ground 2.06 m below it on a 30 degree slope. (R) Model 221 is a generic body, not Gunther's identity: no client model, Legacy row or wiki page names Gunther, and his race is unrecovered (the client only says he feeds the chugawug soldiers, 410463). The chugawug body is the lead's T385 choice; a Gunther-specific asset was searched for in Models.txt, catalog.tsv and Assets_manifest.txt and none exists. (R) Heading 0.0: the row's quaternion is the POI arrival heading, not a recovered NPC facing. (R) spawn_guid/content_key reuse the 9000000000-range NPC content key as the runtime actor GUID, so the ordinary 26/8 click addresses the fishing_spots.json guide key; it is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000024,
+      "legacy_npc_id": null,
+      "content_key": 9000000024,
+      "model_id": 1587,
+      "model_file_name": "fairy_m_fisherman_03.agr",
+      "name": "Big J",
+      "name_string_id": 6375,
+      "position": [
+        51.623921,
+        30.987,
+        360.501988
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "data/content/npcs/snowhill.json row 9000000024 (Big J, Snowhill zone 13, unanchored zone-centre placement from POI 3) supplies the name and position; data/content/fishing_spots.json names this NPC the Wintery Basin guide (area wintery_basin, game 600). ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt row 1587 = fairy_m_fisherman_03.agr; neither Legacy table names Big J, so legacy_npc_id stays null."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 1587 = fairy_m_fisherman_03.agr (race 2 fairy/pixie, gender 1), one of the client's generic fisherman bodies in the fishing NPC block 1583-1595. Shipped: lab/extracted/client-assets/catalog.tsv Assets_006.pack entry 582 (pack_18/000582.agr) and Assets_manifest.txt 'fairy_m_fisherman_03.agr.z'."
+        },
+        {
+          "kind": "wiki",
+          "evidence": "lab/references/freerealms-wiki/wiki.sqlite page 303 'Big J': 'pixie NPC located in Snowhill', infobox Gender Male, Race Pixie. No client text states his race."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat: Global.Text.6375 resolves to 'Big J'; lab/reports/locale-id-map.json maps the row's ucdt hash 3579792565 to 6375. The 35/2 AddNpc name field (reader 0x00921a10: u64 actor, i32 name id, i32 model id) is a Global.Text id (client formats 'Global.Text.%d' at 0x01804c14), so the spawn supplies 6375; the raw hash would render a blank nameplate."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T385: drawable guide for the Wintery Basin trip. The position [51.623921, 30.987, 360.501988] is the NPC row's reconstructed unanchored zone-centre placement, not a captured transform; the zone-0 terrain grid puts the ground 0.68 m below it. (R) Model 1587 is a generic pixie male fisherman body chosen for the wiki's race/gender and his bait-shop and ice-fishing-crew role; no Big J asset exists in Models.txt, catalog.tsv or Assets_manifest.txt. The T385 brief's human body (1590) was not used because the wiki names him a pixie. (R) Heading 0.0: no recovered NPC facing. (R) spawn_guid/content_key reuse the 9000000000-range NPC content key as the runtime actor GUID, so the ordinary 26/8 click addresses the fishing_spots.json guide key; it is not a captured server GUID."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000736,
+      "legacy_npc_id": null,
+      "content_key": 9500000736,
+      "model_id": 1585,
+      "model_file_name": "fairy_m_chip_numbwing.agr",
+      "name": "Chip Numbwing",
+      "name_string_id": 408638,
+      "position": [
+        125.76855,
+        25.90476,
+        399.674573
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "data/content/npcs/snowhill.json row 9500000736 (Chip Numbwing, Snowhill zone 13, poi_anchor POI 131 Frostbitten Banks) supplies the name and position; data/content/fishing_spots.json names this NPC the Frostbitten Banks guide (area frostbitten_banks, game 601). ../lab/references/FreeRealms-Legacy/src/Resources/Models.txt row 1585 = fairy_m_chip_numbwing.agr (the client model table mirror); the Legacy Npcs.json has no Chip row, so legacy_npc_id stays null."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 1585 = fairy_m_chip_numbwing.agr (race 2 fairy/pixie, gender 1): Chip's own body, not a substitute. Shipped: lab/extracted/client-assets/catalog.tsv Assets_005.pack entry 532 (pack_17/000532.agr) and Assets_manifest.txt 'fairy_m_chip_numbwing.agr.z'."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/locale/en_us_data.dat: Global.Text.408638 resolves to 'Chip Numbwing'; lab/reports/locale-id-map.json maps the row's ucdt hash 3410365534 to 408638. The 35/2 AddNpc name field (reader 0x00921a10: u64 actor, i32 name id, i32 model id) is a Global.Text id (client formats 'Global.Text.%d' at 0x01804c14), so the spawn supplies 408638; the raw hash would render a blank nameplate."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T385: drawable guide for the Frostbitten Banks trip. The position [125.76855, 25.90476, 399.674573] is the NPC row's reconstructed poi_anchor placement (POI 131 plus a deterministic XZ offset), not a captured transform; the zone-0 terrain grid (terrain only, no structures) puts the ground 3.41 m below it. (R) Heading 0.0: the row's quaternion is the POI arrival heading, not a recovered NPC facing. (R) spawn_guid/content_key reuse the 9000000000-range NPC content key as the runtime actor GUID, so the ordinary 26/8 click addresses the fishing_spots.json guide key; it is not a captured server GUID."
+        }
+      ],
+      "position_w": null
     }
   ]
 }

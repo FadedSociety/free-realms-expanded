@@ -45,7 +45,9 @@ mod fishing_packets;
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
 
-use fishing_packets::{cast_at, handle_bytes, lifecycle, reel, register, request};
+use fishing_packets::{
+    add_fish_definitions, cast_at, fish_item_ids, handle_bytes, lifecycle, reel, register, request,
+};
 use npc_quest_chain::*;
 use osfr_tools::{
     character_store::CharacterState,
@@ -55,7 +57,6 @@ use osfr_tools::{
     quest_engine::{QuestProgress, QuestStatus},
 };
 use serde_json::{Value, json};
-use sha2::{Digest, Sha256};
 use std::{
     collections::BTreeSet,
     fs, io,
@@ -81,18 +82,6 @@ const ACTOR: Handle = Handle {
 const FISH_T0: u64 = 1_000_000;
 
 // ---- content lookups ----------------------------------------------------------------------
-
-fn fish_item_ids() -> BTreeSet<i32> {
-    let value = read_json(&content_dir().join("fishing_spots.json"));
-    value["items"]
-        .as_object()
-        .unwrap()
-        .values()
-        .flat_map(|sizes| sizes.as_array().unwrap().iter())
-        .map(|id| id.as_i64().unwrap() as i32)
-        .filter(|id| *id > 0)
-        .collect()
-}
 
 /// Reed's trainer row in `job_trainers.json` (profile 137): the production label the
 /// test selects, never a hand-copied string id.
@@ -122,14 +111,6 @@ fn newman_position() -> [f32; 3] {
     content_position("stillwater_crossing.json", NEWMAN)
 }
 
-fn digest(bytes: &[u8]) -> String {
-    format!("{:x}", Sha256::digest(bytes))
-}
-
-fn hex(bytes: &[u8]) -> String {
-    bytes.iter().map(|byte| format!("{byte:02x}")).collect()
-}
-
 /// The active play package named by the F270 review. Only its `profiles.json` is used:
 /// the reviewed opening fixture supplies the inventory, opening and campaign content.
 fn active_play_profiles() -> PathBuf {
@@ -148,41 +129,6 @@ fn use_active_starter_tables(fixture: &Fixture) {
         "the active package dresses Fisherman (137)"
     );
     fs::copy(&source, fixture.path().join("profiles.json")).unwrap();
-}
-
-/// Widen the fixture inventory with a stub definition for every fish item the real
-/// spot file binds, so a catch can be stored. The spot file itself is shipped content.
-fn add_fish_definitions(directory: &Path) {
-    let path = directory.join("inventory.json");
-    let mut inventory: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
-    let known: BTreeSet<i32> = inventory["definitions"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .filter_map(|row| row["id"].as_i64().map(|id| id as i32))
-        .collect();
-    let definitions = inventory["definitions"].as_array_mut().unwrap();
-    for id in fish_item_ids() {
-        if known.contains(&id) {
-            continue;
-        }
-        let bytes = [id.to_le_bytes(), 8i32.to_le_bytes()].concat();
-        definitions.push(json!({
-            "id": id,
-            "slot": 3,
-            "class_id": 1,
-            "default_tint": 5,
-            "max_stack": 10,
-            "model": "fixture.adr",
-            "texture": "fixture",
-            "tint_alias": "fixture",
-            "effect": 0,
-            "wield_type": 0,
-            "serialized_hex": hex(&bytes),
-            "sha256": digest(&bytes)
-        }));
-    }
-    fs::write(&path, serde_json::to_vec(&inventory).unwrap()).unwrap();
 }
 
 // ---- forged / server-shaped completion frames ---------------------------------------------
