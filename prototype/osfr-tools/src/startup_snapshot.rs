@@ -312,7 +312,7 @@ impl StartupSnapshot {
             3 => self.build_zone(self.login.zone.zone_id, None),
             4 => catalogues::build_client_game_settings(),
             5 => self.build_item_definitions()?,
-            6 => catalogues::build_unidentified_193_2(),
+            6 => catalogues::build_announcement_data(),
             7 => {
                 return Err(invalid(
                     "startup message 07 remains on the self-data patch path",

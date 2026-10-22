@@ -68,6 +68,7 @@ mod profile_outfit;
 /// Progress-driven achievement observation over authoritative gameplay state.
 mod progression;
 mod rides;
+mod startup_health;
 use self::npc::{dialogue_packet, quest_offer_packet_with};
 
 #[derive(Clone)]
@@ -243,6 +244,8 @@ pub struct Gameplay {
     tracked_pin: crate::quest_journal::Tracker,
     /// Regional quest state is sent once per network session, not after every zone load.
     npc_quests_synced: bool,
+    /// The encounter holds the job's max health (`startup_health.rs`); not saved.
+    health_synced: bool,
     game_rules: GameRuleSet,
     profile_content_directory: Option<PathBuf>,
     recipe_catalog: crate::recipes::RecipeCatalog,
@@ -1141,6 +1144,7 @@ impl Gameplay {
             client_objectives: Default::default(),
             tracked_pin: crate::quest_journal::Tracker::default(),
             npc_quests_synced: false,
+            health_synced: false,
             game_rules: GameRuleSet::default(),
             profile_content_directory: directory
                 .join("profiles.json")
@@ -4986,23 +4990,6 @@ impl Gameplay {
         self.profiles
             .as_ref()
             .map_or(1, |profiles| profiles.rank(profile))
-    }
-
-    /// Max health and weapon damage follow the active combat job's level
-    /// (final-era scaling in the encounter engine); other jobs stay at the
-    /// level-1 baseline.
-    fn sync_player_level(&mut self, out: &mut Outcome) {
-        let Some(profile) = self.profiles.as_ref().map(Profiles::active) else {
-            return;
-        };
-        let combat = self
-            .abilities
-            .as_ref()
-            .is_some_and(|a| a.supports_basic(profile));
-        let level = if combat { self.job_level(profile) } else { 1 };
-        if let Some(encounter) = self.encounter.as_mut() {
-            out.replies.extend(encounter.set_player_job(profile, level));
-        }
     }
 
     /// Experience for the active job; a level that unlocks a job ability

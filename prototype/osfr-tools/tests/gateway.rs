@@ -149,7 +149,13 @@ fn built_startup_sequence_matches_the_captured_character_byte_for_byte() {
     for (index, message) in actual.iter().enumerate() {
         let phase = if index < 8 { "login" } else { "ready" };
         let expected = fs::read(reference.join(format!("{index:04}-{phase}.bin"))).unwrap();
-        let expected = fresh_character(index, expected);
+        let mut expected = fresh_character(index, expected);
+        if index == 6 {
+            // T437 (R): the announcement row's action is 'closeWindow', not the captured 'Exit'.
+            let action = &b"\x0b\x00\x00\x00closeWindow"[..];
+            expected = [&expected[..38], action, &expected[46..]].concat();
+            expected[3..7].copy_from_slice(&71u32.to_le_bytes());
+        }
         assert_eq!(message, &expected, "startup message index {index:02}");
     }
 }

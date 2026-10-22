@@ -189,10 +189,14 @@ fn mapped_catalogue_and_status_messages_reproduce_the_private_capture() {
         startup_catalogues::build_client_game_settings(),
         captured(reference, 4, "login")
     );
-    assert_eq!(
-        startup_catalogues::build_unidentified_193_2(),
-        captured(reference, 6, "login")
-    );
+    // T437 (R): the row's action is 'closeWindow' where the capture says 'Exit'; nothing else moves.
+    let announcement = captured(reference, 6, "login");
+    assert_eq!(&announcement[38..46], b"\x04\x00\x00\x00Exit");
+    let action = &b"\x0b\x00\x00\x00closeWindow"[..];
+    let mut expected = [&announcement[..38], action, &announcement[46..]].concat();
+    let length = expected.len() as u32 - 7;
+    expected[3..7].copy_from_slice(&length.to_le_bytes());
+    assert_eq!(startup_catalogues::build_announcement_data(), expected);
     assert_eq!(
         startup_catalogues::build_opcode_14_marker(),
         captured(reference, 42, "ready")

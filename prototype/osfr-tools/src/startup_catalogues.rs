@@ -9,14 +9,10 @@ const GAME_SETTINGS_UNKNOWN_DWORD_2: u32 = 268;
 const GAME_SETTINGS_UNKNOWN_FLAG: u8 = 1;
 const GAME_SETTINGS_UNKNOWN_FLOAT_BITS: u32 = 0x3f80_0000;
 
-// (R) Opcode 193's native dispatcher route is known, but this captured inner
-// layout has not been matched to its announcement-family reader.
-const UNIDENTIFIED_193_2_CAPTURE_REST: [u8; 62] = [
-    0x02, 0x01, 0x00, 0x00, 0x00, 0x8b, 0x00, 0x00, 0x00, 0x01, 0x00, 0x00, 0x00, 0x78, 0xba, 0x00,
-    0x00, 0xa3, 0xde, 0x4d, 0x00, 0x00, 0x00, 0x00, 0x00, 0x77, 0x07, 0x00, 0x00, 0x04, 0x00, 0x00,
-    0x00, 0x45, 0x78, 0x69, 0x74, 0x05, 0x00, 0x00, 0x00, 0x50, 0x61, 0x72, 0x61, 0x6d, 0x00, 0x00,
-    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
-];
+/// Typed startup writers (work item 096); only the announcement row is used here.
+#[path = "restoration/piece_096.rs"]
+#[allow(dead_code)]
+mod piece_096;
 
 // (R) These two encounter dwords are not interpreted by the recovered client
 // reader; both retain their captured values.
@@ -244,12 +240,25 @@ pub fn build_client_game_settings() -> Vec<u8> {
     tunnel(&inner)
 }
 
-/// Opaque captured opcode 193 packet, retained until its announcement reader
-/// is correlated with the 193/2 capture (`009471a0`, case 0xc1; `00a40aa0`).
-pub fn build_unidentified_193_2() -> Vec<u8> {
-    let mut inner = 193u16.to_le_bytes().to_vec();
-    inner.extend_from_slice(&UNIDENTIFIED_193_2_CAPTURE_REST);
-    tunnel(&inner)
+/// Opcode 193 AnnouncementData, revision 2 (`009471a0` case 0xc1; `00a40aa0` -> `00a40070`; row
+/// reader `00a3f350`: six u32, two strings, three u32, one string). One What's New row with the
+/// captured values, except its action (the welcome splash's `LuaCall`).
+pub fn build_announcement_data() -> Vec<u8> {
+    use piece_096::{AnnouncementData, AnnouncementRow, InitMessage};
+    InitMessage::AnnouncementData(AnnouncementData {
+        revision: 2,
+        rows: vec![AnnouncementRow {
+            numbers: [139, 1, 47_736, 5_103_267, 0, 1911],
+            // (R) The capture's 'Exit' has no case in WelcomeHandler:OnUserEvent (ScriptsBase.lua
+            // 14477-14602), so Thanks! did nothing; 'closeWindow' hides the splash (14479). The
+            // SWF handing the row's action to OnUserEvent is inferred, not traced.
+            action: "closeWindow".into(),
+            parameter: "Param".into(),
+            tail: [0; 3],
+            extra: String::new(),
+        }],
+    })
+    .encode()
 }
 
 /// Empty opcode 14 marker. Client dispatcher case 0xe writes `NetInfo.log` and

@@ -31,6 +31,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 mod admin_move;
 mod staff;
+mod startup_stream;
 mod trade_bridge;
 
 const MAX_MESSAGE: usize = 1_048_576;
@@ -101,6 +102,8 @@ pub struct Gateway {
     logged_in: bool,
     ready: bool,
     loaded: bool,
+    /// The welcome splash went out this login; reloads skip it (see `startup_for`).
+    welcomed: bool,
     gameplay: Option<Gameplay>,
     identity: Option<CharacterIdentity>,
     /// Developer-only chat commands; off unless the launcher opts in.
@@ -897,6 +900,7 @@ impl Gateway {
             logged_in: false,
             ready: false,
             loaded: false,
+            welcomed: false,
             gameplay,
             identity: None,
             dev_tools: false,
@@ -1393,6 +1397,7 @@ impl Gateway {
         self.logged_in = false;
         self.ready = false;
         self.loaded = false;
+        self.welcomed = false;
         if let Some(game) = self.gameplay.as_mut() {
             if let Some(return_location) = game.abandon_kart_for_reconnect() {
                 self.state = return_location;
@@ -1443,6 +1448,7 @@ impl Gateway {
         let mut last_movement_ms = self.last_movement_ms;
         let mut impulse = None;
         let (mut logged_in, mut ready, mut loaded) = (self.logged_in, self.ready, self.loaded);
+        let mut welcomed = self.welcomed;
         let mut outcome = GatewayOutcome::default();
         // Count only the replies appended since the previous event; a bundle must not rescan
         // every earlier batch on each child (F179 item 19).
@@ -1458,6 +1464,7 @@ impl Gateway {
                             Kind::Login,
                             &state,
                             gameplay.as_ref(),
+                            welcomed,
                         )?);
                         logged_in = true;
                     }
@@ -1479,7 +1486,9 @@ impl Gateway {
                                 Kind::Ready,
                                 &state,
                                 gameplay.as_ref(),
+                                welcomed,
                             )?);
+                            welcomed = true;
                         }
                         ready = true;
                     }
@@ -1806,6 +1815,7 @@ impl Gateway {
         self.logged_in = logged_in;
         self.ready = ready;
         self.loaded = loaded;
+        self.welcomed = welcomed;
         outcome.trace = trace.unwrap_or_default();
         Ok(outcome)
     }
@@ -1879,39 +1889,6 @@ impl Gateway {
         }
         self.gameplay = Some(gameplay);
         Ok(outcome)
-    }
-
-    fn startup_for(
-        &self,
-        kind: Kind,
-        state: &CharacterState,
-        gameplay: Option<&Gameplay>,
-    ) -> io::Result<Vec<Vec<u8>>> {
-        let snapshot = &self.startup_snapshot;
-        let range = match kind {
-            Kind::Login => 0..8,
-            Kind::Ready => 8..46,
-        };
-        range
-            .filter(|index| {
-                !(gameplay.is_some_and(Gameplay::is_opening) && (10..=32).contains(index))
-            })
-            .map(|index| {
-                let message = match index {
-                    3 => {
-                        let zone = gameplay.and_then(Gameplay::current_zone);
-                        snapshot.build_zone(state.zone_id, zone.as_ref())
-                    }
-                    5 => match gameplay.and_then(Gameplay::definitions_packet) {
-                        Some(inner) => wrapped(&inner),
-                        None => snapshot.build_packet(index, state.guid)?,
-                    },
-                    7 => self.build_self_message(state, gameplay)?,
-                    _ => snapshot.build_packet(index, state.guid)?,
-                };
-                Ok(message)
-            })
-            .collect()
     }
 
     fn build_self_message(
