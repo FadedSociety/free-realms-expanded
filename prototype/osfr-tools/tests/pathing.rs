@@ -244,10 +244,89 @@ fn missing_terrain_gets_the_clients_failure_reply() {
     assert_eq!(reply, expected.concat());
 }
 
+/// T404: Take Me There (`009ce560` writes kind 2). Its reply reader `009cead0` takes the
+/// same count and nodes as kind 1's; the kind routes the reply there.
+#[test]
+fn take_me_there_gets_the_breadcrumb_path_under_its_own_kind() {
+    let terrain = terrain();
+    let (from, to) = ([10.0, 1.0, 10.0, 1.0], [110.0, 1.0, 10.0, 1.0]);
+    let answer = |kind: u32| {
+        let packet = request(kind, from, to);
+        decode(
+            &ask(&mut Pathing::default(), &terrain, &packet, 0)
+                .unwrap()
+                .unwrap(),
+        )
+    };
+    let (breadcrumb, take_me_there) = (answer(1), answer(2));
+    assert_eq!((take_me_there.kind, take_me_there.aux), (2, 7));
+    assert_eq!(take_me_there.points.len(), 21);
+    assert_eq!(take_me_there.points, breadcrumb.points);
+    // Five metres from the objective (the native run's second click): the client's own
+    // two points, byte for byte.
+    let near = [15.0, 1.5, 10.0, 1.0];
+    let reply = ask(
+        &mut Pathing::default(),
+        &terrain,
+        &request(2, from, near),
+        0,
+    );
+    let mut expected = vec![98, 0, 2];
+    expected.extend([2u32, 7].iter().flat_map(|w| w.to_le_bytes()));
+    expected.extend(2i32.to_le_bytes());
+    expected.extend(from.iter().chain(&near).flat_map(|v| v.to_le_bytes()));
+    assert_eq!(reply, Some(Ok(expected)));
+}
+
+#[test]
+fn take_me_there_is_refused_and_rate_capped_like_the_breadcrumb() {
+    let terrain = terrain();
+    let from = [10.0, 1.0, 10.0, 1.0];
+    let refused = [
+        (request(2, from, [311.0, 1.0, 10.0, 1.0]), Refusal::TooFar),
+        (
+            request(2, from, [f32::NAN, 1.0, 10.0, 1.0]),
+            Refusal::NotFinite,
+        ),
+        (
+            request(2, from, [10.0, 1.0, 150.0, 1.0]),
+            Refusal::OutOfZone,
+        ),
+        (
+            request(2, [400.0, 1.0, 10.0, 1.0], [410.0, 1.0, 10.0, 1.0]),
+            Refusal::OutOfZone,
+        ),
+    ];
+    // Refusals send nothing and spend none of the budget the two kinds share.
+    let mut path = Pathing::default();
+    for (packet, why) in &refused {
+        for _ in 0..10 {
+            assert_eq!(
+                ask(&mut path, &terrain, packet, 0),
+                Some(Err(*why)),
+                "{why:?}"
+            );
+        }
+    }
+    let take_me_there = request(2, from, [60.0, 1.0, 10.0, 1.0]);
+    for i in 0..MAX_PER_SECOND {
+        let packet = if i % 2 == 0 {
+            walk(60.0)
+        } else {
+            take_me_there.clone()
+        };
+        assert!(ask(&mut path, &terrain, &packet, 0).unwrap().is_ok(), "{i}");
+    }
+    assert_eq!(
+        ask(&mut path, &terrain, &take_me_there, 999),
+        Some(Err(Refusal::TooFast))
+    );
+}
+
 #[test]
 fn other_packets_and_other_kinds_are_not_ours() {
     let (terrain, mut path) = (terrain(), Pathing::default());
-    for kind in [0, 2, 3, 4, u32::MAX] {
+    for kind in [0, 3, 4, u32::MAX] {
         let packet = request(kind, [10.0, 1.0, 10.0, 1.0], [60.0, 1.0, 10.0, 1.0]);
         assert_eq!(ask(&mut path, &terrain, &packet, 0), None, "kind {kind}");
     }

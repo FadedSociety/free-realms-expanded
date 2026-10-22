@@ -817,12 +817,14 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
         }
         result.push(("movie", p));
     }
-    // 98/1 path request (W164): handle, kind 1, aux, two vec4, tail; then the family's
-    // unknown subtype.
+    // 98/1 path request (W164): handle, kind 1, aux, two vec4, tail; the same as Take Me
+    // There (kind 2, T404); then the family's unknown subtype.
     let mut path = vec![98, 0, 1];
     path.extend(0u64.to_le_bytes());
     path.extend(1u32.to_le_bytes());
     path.extend([0; 4 + 32 + 4]);
+    result.push(("pathing", path.clone()));
+    path[11] = 2;
     result.push(("pathing", path));
     result.push(("pathing", vec![98, 0, 0xff, 0xff]));
     // W173: channel switch on/off by name, and the bubble colour (three i32 and a u64).

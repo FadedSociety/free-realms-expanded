@@ -604,8 +604,23 @@ fn path_requests_are_capped_per_second_and_refusals_are_silent() {
     let far = path_request(start.position, [start.position[0] + 400.0, 0.0, 0.0]);
     assert!(ask(&mut game, &far, 9_000).replies.is_empty());
     assert!(ask(&mut game, &valid[..20], 9_000).replies.is_empty());
-    // The POI teleport request (kind 2) is not this module's.
-    let mut poi = valid.clone();
-    poi[11] = 2;
-    assert!(path_replies(&ask(&mut game, &poi, 9_000)).is_empty());
+}
+
+/// T404: the quest panel's Take Me There (kind 2, `009ce560`) gets the breadcrumb's path,
+/// under its own kind so the client hands it to `009cead0`.
+#[test]
+fn take_me_there_is_answered_like_the_breadcrumb() {
+    let content = content_directory();
+    let mut game = Gameplay::load(&content, None).unwrap();
+    game.set_terrain(Some(flat_terrain("take-me-there", 42.0)));
+    let start = character();
+    let goal = [start.position[0] + 90.0, 42.0, start.position[2]];
+    let mut packet = path_request(start.position, goal);
+    let breadcrumb = game.handle_in_world(&packet, &start, 1_000).unwrap();
+    packet[11] = 2;
+    let take_me_there = game.handle_in_world(&packet, &start, 1_000).unwrap();
+    let (one, two) = (path_replies(&breadcrumb), path_replies(&take_me_there));
+    assert_eq!((one.len(), two.len()), (1, 1));
+    assert_eq!(&two[0][3..7], &2u32.to_le_bytes());
+    assert_eq!(two[0][7..], one[0][7..]);
 }
