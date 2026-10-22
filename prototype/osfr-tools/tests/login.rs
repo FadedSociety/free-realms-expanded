@@ -38,11 +38,11 @@ fn expected_character_list(identity: &CharacterIdentity) -> Vec<u8> {
     // native character select accepted (run 023623); see `selection_reply`.
     login::selection_reply(Some(identity))
 }
-fn login_reply_with_max_characters(max_characters: i32) -> Vec<u8> {
+fn login_reply_with_max_characters(member: bool, max_characters: i32) -> Vec<u8> {
     let mut out = vec![2, 1];
     out.extend(1i32.to_le_bytes());
-    out.push(0);
-    let mut account = vec![0];
+    out.push(u8::from(member));
+    let mut account = vec![u8::from(member)];
     account.extend(max_characters.to_le_bytes());
     account.push(0);
     payload(&mut out, &account);
@@ -247,7 +247,7 @@ fn native_creation_selection_reconnect_and_name_check_preserve_identity() {
     assert!(service.handle(&[11]).is_err());
     assert_eq!(
         service.handle(&login_request()).unwrap().replies[0],
-        login_reply_with_max_characters(6)
+        login_reply_with_max_characters(false, 6)
     );
     assert_eq!(
         service.handle(&[11]).unwrap().replies[0],
@@ -415,6 +415,52 @@ fn account_login_rejects_a_character_owned_by_another_account() {
         i32::from_le_bytes(selected.replies[0][13..17].try_into().unwrap()),
         6
     );
+}
+
+/// The (IsMember, MaxCharacters, IsAdmin) the client stores from a login reply:
+/// reader 0x00fa40e0 takes IsMember from byte 6 and the payload (0x00953790) from
+/// byte 7; OnLoginAuthReply 0x009542d0 then replaces the member flag with byte 6
+/// and MaxCharacters with 1 + 2 * IsMember (0x00954375-0x00954398) before
+/// ClientAccountManager::OnAccountInfo 0x00719330 copies them. Admin is payload byte 16.
+fn client_account_info(reply: &[u8]) -> (bool, i32, bool) {
+    let member = reply[6] != 0;
+    (member, 1 + 2 * i32::from(member), reply[16] != 0)
+}
+
+#[test]
+fn login_reply_carries_account_membership_in_the_byte_the_client_reads() {
+    let t = Temp::new();
+    let mut store = AccountStore::new();
+    for (name, membership) in [("synthetic-session", true), ("synthetic-other", false)] {
+        let flags = AccountFlags {
+            membership,
+            ..AccountFlags::default()
+        };
+        let slots = SlotPolicy { max_characters: 6 };
+        store
+            .create_account(Sha256::digest(name).into(), flags, slots)
+            .unwrap();
+    }
+    store.save(&t.0.join("accounts.json")).unwrap();
+    let saved = fs::read(t.0.join("accounts.json")).unwrap();
+
+    let member = &service(&t).handle(&login_request()).unwrap().replies[0];
+    assert_eq!(member, &login_reply_with_max_characters(true, 6));
+    assert_eq!(client_account_info(member), (true, 3, false));
+
+    let other = service_as(&t, "synthetic-other")
+        .handle(&login_request_as("synthetic-other"))
+        .unwrap();
+    assert_eq!(other.replies[0], login_reply_with_max_characters(false, 6));
+    assert_eq!(client_account_info(&other.replies[0]), (false, 1, false));
+
+    // A refused login carries no account fields (no membership oracle).
+    let refused = service(&t)
+        .handle(&login_request_as("synthetic-other"))
+        .unwrap();
+    assert_eq!(refused.replies[0][1], 0);
+    assert_eq!(client_account_info(&refused.replies[0]), (false, 1, false));
+    assert_eq!(fs::read(t.0.join("accounts.json")).unwrap(), saved);
 }
 
 #[test]

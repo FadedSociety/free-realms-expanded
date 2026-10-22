@@ -629,7 +629,10 @@ fn login_reply_for_account(success: bool, membership: bool, max_characters: u32)
 fn login_reply_fields(success: bool, membership: bool, max_characters: i32) -> Vec<u8> {
     let mut out = vec![2, u8::from(success)];
     out.extend((if success { 1i32 } else { 0i32 }).to_le_bytes());
-    out.push(0);
+    // IsMember (client reader 0x00fa40e0). OnLoginAuthReply 0x009542d0 copies it over the
+    // payload's member flag and sets MaxCharacters = 1 + 2 * IsMember (0x00954375-0x00954398);
+    // the payload's maximum never reaches the client. Failed logins pass `false`.
+    out.push(u8::from(membership));
     // The callback values use account state. (R) No admin account flag is stored locally.
     let rules = GameRuleSet::new(
         MembershipState::new(membership, None),
