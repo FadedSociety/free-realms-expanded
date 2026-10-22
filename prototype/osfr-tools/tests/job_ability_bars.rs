@@ -162,15 +162,12 @@ fn switching_jobs_keeps_each_jobs_level_and_unlocked_bar() {
         .map(|id| (*id, abilities.activation(*id, levels[id]).unwrap()))
         .collect();
 
-    // Brawler at 5 has Leg Sweep (slot 3) and Rock Toss (slot 4); Pummel (10)
-    // and Enrage (15) stay empty in their existing positions.
+    // T421: Brawler at 5 has Leg Sweep (row 1) and Rock Toss (row 2) with no
+    // blank button before them; Pummel opens row 3 at 10, and rows 4-7, which
+    // the client never draws, stay empty.
     let brawler = bar_ids(&canonical[&43]);
-    assert_eq!(brawler[0], Some(4895));
-    assert_eq!(brawler[1], None);
-    assert_eq!(brawler[2], None);
-    assert!(brawler[3].is_some());
-    assert!(brawler[4].is_some());
-    assert!(brawler[5..].iter().all(Option::is_none));
+    assert_eq!(&brawler[..4], &[Some(4895), Some(62018), Some(62024), None]);
+    assert!(brawler[4..].iter().all(Option::is_none));
 
     // Switching through every combat job and the non-combat Adventurer returns
     // exactly the same job bar each time; experience and levels stay intact.

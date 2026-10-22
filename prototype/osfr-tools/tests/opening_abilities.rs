@@ -89,8 +89,10 @@ fn shipped_roster() -> OpeningAbilities {
     load_jobs(&fixture, &jobs).unwrap()
 }
 
-// (slot, client name id, unlock level). The name ids come from the client
-// locale, not from job_abilities.json, so a swapped skill fails here.
+// (row, client name id, unlock level) of every skill the bar can show; a
+// later skill on a row replaces the earlier one. The name ids come from the
+// client locale, not from job_abilities.json, so a swapped skill fails here.
+// Ninja's Shadow Minion (24516) is unavailable and is never shown.
 const COMBAT_LADDERS: [(i32, &[(i32, i32, u32)]); 6] = [
     (
         11,
@@ -98,34 +100,31 @@ const COMBAT_LADDERS: [(i32, &[(i32, i32, u32)]); 6] = [
             (1, 442456, 1),
             (2, 3784, 1),
             (3, 3810, 5),
-            (4, 24061, 10),
-            (5, 3800, 15),
+            (3, 24061, 10),
+            (1, 3800, 15),
         ],
     ),
     (
         32,
-        &[(1, 24540, 1), (2, 4908, 5), (3, 24694, 10), (4, 24706, 15)],
+        &[(1, 24540, 1), (2, 4908, 5), (3, 24694, 10), (2, 24706, 15)],
     ),
     (
         12,
-        &[(1, 17071, 1), (2, 35492, 5), (3, 23679, 10), (4, 38016, 15)],
+        &[(1, 17071, 1), (2, 35492, 5), (3, 23679, 10), (3, 38016, 15)],
     ),
-    (
-        2,
-        &[(1, 3085, 1), (2, 3086, 5), (3, 24516, 10), (4, 3855, 15)],
-    ),
+    (2, &[(1, 3085, 1), (2, 3086, 5), (3, 3855, 15)]),
     (
         43,
-        &[(1, 24097, 10), (2, 21374, 15), (3, 24133, 1), (4, 15916, 5)],
+        &[(1, 24133, 1), (2, 15916, 5), (3, 24097, 10), (3, 21374, 15)],
     ),
     (
         35,
         &[
-            (1, 4830, 5),
-            (2, 24364, 1),
-            (3, 20015, 15),
-            (4, 24397, 10),
-            (5, 24398, 20),
+            (1, 24364, 1),
+            (2, 4830, 5),
+            (3, 24397, 10),
+            (2, 20015, 15),
+            (3, 24398, 20),
         ],
     ),
 ];
@@ -136,29 +135,27 @@ fn every_job_bar_has_exactly_the_unlocked_ladder_at_every_level() {
     for (profile, ladder) in COMBAT_LADDERS {
         for level in 1..=20 {
             let bar = abilities.job_bar(profile, level);
+            // The client draws the basic and three job rows (ScriptsBase.lua:5215):
+            // rows 4-7 stay empty, filled rows leave no blank button before a
+            // skill, and an unavailable skill is never shown.
+            assert!(bar[3..].iter().all(Option::is_none), "profile {profile}");
+            assert!(
+                bar.windows(2)
+                    .all(|pair| pair[0].is_some() || pair[1].is_none()),
+                "profile {profile}, level {level}: blank button before a skill"
+            );
+            assert!(bar.iter().flatten().all(|ability| !ability.unavailable));
             for slot in 1..=7 {
-                let expected = ladder.iter().find(|(s, _, _)| *s == slot);
-                match (bar[slot as usize - 1], expected) {
-                    (Some(ability), Some((_, name, minimum))) => {
-                        assert_eq!(ability.slot, slot, "profile {profile}, level {level}");
-                        assert_eq!(ability.name_id, *name, "profile {profile}, level {level}");
-                        assert!(
-                            level >= *minimum,
-                            "profile {profile}, slot {slot} showed early at level {level}"
-                        );
-                    }
-                    (None, Some((_, _, minimum))) => assert!(
-                        level < *minimum,
-                        "profile {profile}, slot {slot} missing at level {level}"
-                    ),
-                    (Some(ability), None) => {
-                        panic!(
-                            "profile {profile}, unexpected slot {} at level {level}",
-                            ability.slot
-                        )
-                    }
-                    (None, None) => {}
-                }
+                let expected = ladder
+                    .iter()
+                    .filter(|(row, _, minimum)| *row == slot && *minimum <= level)
+                    .max_by_key(|(_, _, minimum)| *minimum)
+                    .map(|(_, name, _)| *name);
+                assert_eq!(
+                    bar[slot as usize - 1].map(|ability| ability.name_id),
+                    expected,
+                    "profile {profile}, level {level}, row {slot}"
+                );
             }
 
             // The wire bar must match the model: one basic, seven job slots,
@@ -210,24 +207,24 @@ fn every_job_bar_has_exactly_the_unlocked_ladder_at_every_level() {
     }
 }
 
-// Independent expected levels: changing a content lock alone must fail this test.
+// Independent expected (row, level): changing a content lock alone must fail
+// this test. Each skill takes its row at its own level, replacing any earlier one.
 #[test]
 fn shipped_job_roster_unlocks_each_skill_at_its_declared_ladder() {
     let abilities = shipped_roster();
     for (profile, expected) in [
-        (11, vec![(1, 1), (2, 1), (3, 5), (4, 10), (5, 15)]),
-        (32, vec![(1, 1), (2, 5), (3, 10), (4, 15)]),
-        (12, vec![(1, 1), (2, 5), (3, 10), (4, 15)]),
-        (2, vec![(1, 1), (2, 5), (3, 10), (4, 15)]),
-        (43, vec![(1, 10), (2, 15), (3, 1), (4, 5)]), // W125: 2009 Brawler guide
-        (35, vec![(1, 5), (2, 1), (3, 15), (4, 10), (5, 20)]), // W125: 2009 Archer guide
+        (11, vec![(1, 1), (2, 1), (3, 5), (3, 10), (1, 15)]),
+        (32, vec![(1, 1), (2, 5), (3, 10), (2, 15)]),
+        (12, vec![(1, 1), (2, 5), (3, 10), (3, 15)]),
+        (2, vec![(1, 1), (2, 5), (3, 15)]), // Shadow Minion (row 3, 10) is unavailable
+        (43, vec![(1, 1), (2, 5), (3, 10), (3, 15)]), // W125: 2009 Brawler guide levels
+        (35, vec![(1, 1), (2, 5), (3, 10), (2, 15), (3, 20)]), // W125: 2009 Archer guide levels
     ] {
         for (slot, minimum) in expected {
             let ability = abilities.job_slot(profile, slot, minimum).unwrap();
             assert_eq!(ability.min_level, minimum, "profile {profile}, slot {slot}");
             let id = ability.definition_id;
-            assert!(abilities.job_slot(profile, slot, minimum - 1).is_none());
-            for level in [minimum - 1, minimum, 20] {
+            for level in [minimum - 1, minimum] {
                 let packets = abilities.activation(profile, level).unwrap();
                 let defined = packets.iter().any(|p| {
                     p.starts_with(&[36, 0, 13, 0])
@@ -243,7 +240,9 @@ fn shipped_job_roster_unlocks_each_skill_at_its_declared_ladder() {
                 for index in 0..8 {
                     let kind = i32::from_le_bytes(bar[at..at + 4].try_into().unwrap());
                     if index == slot {
-                        assert_eq!(kind == 3, level >= minimum);
+                        let shown = kind == 3
+                            && i32::from_le_bytes(bar[at + 4..at + 8].try_into().unwrap()) == id;
+                        assert_eq!(shown, level >= minimum, "profile {profile}, row {slot}");
                     }
                     at += if kind == 3 { 41 } else { 4 };
                 }
@@ -259,9 +258,10 @@ fn full_roster_preserves_campaigns_with_only_some_basic_attacks() {
     let jobs: Value =
         serde_json::from_str(include_str!("../data/content/job_abilities.json")).unwrap();
     let abilities = load_jobs(&fixture, &jobs).unwrap();
-    assert!(abilities.job_slot(43, 3, 1).is_some()); // Leg Sweep, the level-1 Brawler skill (W125)
-    assert!(abilities.job_slot(43, 4, 4).is_none()); // Rock Toss is a level-5 skill
-    assert!(abilities.job_slot(43, 4, 5).is_some());
+    let name = |row, level| abilities.job_slot(43, row, level).map(|a| a.name_id);
+    assert_eq!(name(1, 1), Some(24133)); // Leg Sweep, the level-1 Brawler skill (W125)
+    assert_eq!(name(2, 4), None); // Rock Toss is a level-5 skill
+    assert_eq!(name(2, 5), Some(15916));
     assert!(abilities.job_slot(32, 1, 20).is_none());
     let bar = abilities.activation(32, 20).unwrap();
     assert_eq!(bar.len(), 1);
@@ -305,15 +305,16 @@ impl Drop for Fixture {
 
 // (R) Synthetic levels exercise the shared gate for every combat profile;
 // these are not historical unlock claims for Ninja, Brawler or Archer.
+// (row, level): rows 1-3 open at 1, 5 and 10; row 1 upgrades at 15.
 fn job_fixture(profile: i32) -> (Fixture, Value) {
     let mut fixture = Fixture::new();
     fixture.content["basics"][0]["profile_id"] = json!(profile);
     fixture.write();
-    let slots: Vec<_> = [1, 5, 10, 15]
+    let slots: Vec<_> = [(1, 1), (2, 5), (3, 10), (1, 15)]
         .into_iter()
         .enumerate()
-        .map(|(index, level)| {
-            json!({"slot": index + 1, "definition_id": 2000 + index,
+        .map(|(index, (slot, level))| {
+            json!({"slot": slot, "definition_id": 2000 + index,
                 "name_id": 3000 + index, "icon_id": 4000 + index,
                 "heal": 1, "cooldown_ms": 1000, "min_level": level})
         })
@@ -347,46 +348,48 @@ fn assert_job_levels(profile: i32) {
     let (fixture, jobs) = job_fixture(profile);
     let abilities = load_jobs(&fixture, &jobs).unwrap();
     for level in 0..=20 {
+        // Basic, then rows 1-3; row 1 switches to its upgrade at 15 and rows
+        // 4-7 never fill.
+        let open = |minimum, id| if level >= minimum { id } else { 0 };
+        let row_one = if level >= 15 { 2003 } else { open(1, 2000) };
+        let expected = [1234, row_one, open(5, 2001), open(10, 2002), 0, 0, 0, 0];
         let packets = abilities.activation(profile, level).unwrap();
         let definitions: Vec<_> = packets[..packets.len() - 1]
             .iter()
             .map(|packet| i32::from_le_bytes(packet[4..8].try_into().unwrap()))
             .collect();
+        let shown: Vec<_> = expected.into_iter().filter(|id| *id != 0).collect();
+        assert_eq!(definitions, shown, "profile {profile}, level {level}");
         // Independently walk the native variable-length slot encoding, including
         // empty slots, so a gate on definitions alone cannot pass this test.
         let toolbar = packets.last().unwrap();
         let mut offset = 12;
-        for slot in 0..8 {
+        for (slot, id) in expected.into_iter().enumerate() {
             let kind = i32::from_le_bytes(toolbar[offset..offset + 4].try_into().unwrap());
-            let unlocked = slot == 0 || (slot <= 4 && level >= [1, 5, 10, 15][slot - 1]);
-            assert_eq!(
-                kind,
-                if unlocked { 3 } else { 0 },
-                "profile {profile}, level {level}, slot {slot}"
-            );
+            let what = format!("profile {profile}, level {level}, slot {slot}");
+            assert_eq!(kind, if id == 0 { 0 } else { 3 }, "{what}");
+            if kind == 3 {
+                let at = offset + 4..offset + 8;
+                assert_eq!(i32::from_le_bytes(toolbar[at].try_into().unwrap()), id);
+            }
             offset += if kind == 3 { 41 } else { 4 };
-        }
-        assert_eq!(offset, toolbar.len());
-        for (index, minimum) in [1, 5, 10, 15].into_iter().enumerate() {
-            let unlocked = level >= minimum;
-            assert_eq!(definitions.contains(&(2000 + index as i32)), unlocked);
-            assert_eq!(
-                abilities
-                    .job_slot(profile, index as i32 + 1, level)
-                    .is_some(),
-                unlocked
-            );
-            assert!(
-                abilities
-                    .job_slot(profile + 1000, index as i32 + 1, 20)
-                    .is_none()
-            );
-            if minimum > 1 {
-                assert!(abilities.unlocks_between(profile, minimum - 1, minimum));
+            if slot > 0 {
+                let cast = abilities.job_slot(profile, slot as i32, level);
+                assert_eq!(cast.map_or(0, |a| a.definition_id), id, "{what}");
+                assert!(
+                    abilities
+                        .job_slot(profile + 1000, slot as i32, 20)
+                        .is_none()
+                );
             }
         }
+        assert_eq!(offset, toolbar.len());
+    }
+    for minimum in [1, 5, 10, 15] {
+        assert!(abilities.unlocks_between(profile, minimum - 1, minimum));
     }
     assert!(!abilities.unlocks_between(profile, 1, 4));
+    assert!(!abilities.unlocks_between(profile, 10, 14));
     assert!(!abilities.unlocks_between(profile, 15, 20));
 }
 
@@ -413,6 +416,48 @@ fn brawler_level_boundaries() {
 #[test]
 fn archer_level_boundaries() {
     assert_job_levels(35);
+}
+
+/// T421: a row past the client's fourth button, or a second skill for the same
+/// (row, level), is refused, and the refused file leaves the loaded bar alone.
+#[test]
+fn job_rows_past_the_fourth_button_or_doubled_are_refused() {
+    let (fixture, jobs) = job_fixture(11);
+    let mut abilities = load_jobs(&fixture, &jobs).unwrap();
+    let before = abilities.activation(11, 20).unwrap();
+    let path = fixture.path.join("job_abilities.json");
+    // Row 1's level-15 upgrade on a fifth button, on no button, and on the
+    // level-1 unlock of its own row.
+    for (field, value) in [("slot", 4), ("slot", 0), ("min_level", 1)] {
+        let mut bad = jobs.clone();
+        bad["jobs"][0]["slots"][3][field] = json!(value);
+        fs::write(&path, serde_json::to_vec(&bad).unwrap()).unwrap();
+        assert!(
+            abilities.load_job_abilities(&path).is_err(),
+            "{field} {value}"
+        );
+        assert_eq!(
+            abilities.activation(11, 20).unwrap(),
+            before,
+            "{field} {value}"
+        );
+    }
+}
+
+/// An unavailable skill is never placed: the row keeps the skill below it, or
+/// stays empty, and reaching its level unlocks nothing new.
+#[test]
+fn unavailable_skills_leave_their_row_to_the_skill_below() {
+    let (fixture, mut jobs) = job_fixture(11);
+    jobs["jobs"][0]["slots"][2]["unavailable"] = json!(true);
+    jobs["jobs"][0]["slots"][3]["unavailable"] = json!(true);
+    let abilities = load_jobs(&fixture, &jobs).unwrap();
+    let bar = abilities
+        .job_bar(11, 20)
+        .map(|row| row.map(|a| a.definition_id));
+    assert_eq!(bar, [Some(2000), Some(2001), None, None, None, None, None]);
+    assert!(!abilities.unlocks_between(11, 9, 10));
+    assert!(!abilities.unlocks_between(11, 14, 15));
 }
 
 #[test]

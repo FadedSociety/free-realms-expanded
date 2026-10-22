@@ -121,7 +121,7 @@
           "weapon_class": 27
         },
         {
-          "slot": 4,
+          "slot": 3,
           "definition_id": 62002,
           "min_level": 10,
           "name_id": 24061,
@@ -149,7 +149,7 @@
           "source": {
             "tag": "client + guide + reconstructed (R)",
             "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
-            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "slot": "(R) T421: the client draws four ability buttons (ScriptsBase.lua:5215 setButtonData ignores id >= 4; native populate 0x008ee3d0), so job rows are 1..3, filled left to right by unlock level, and a later skill upgrades its row; original row order unrecovered",
             "min_level": "notes\\Build Guides\\Content\\Jobs\\Medic.md:150,164,201,222",
             "name_id": "Client locale Global.Text.24061; Jenkins lookup2 775534621",
             "description_id": "Client locale Global.Text.24062; (R) wording-based rank binding; old rank numbers are not runtime balance",
@@ -168,7 +168,7 @@
           "weapon_class": 27
         },
         {
-          "slot": 5,
+          "slot": 1,
           "definition_id": 62003,
           "min_level": 15,
           "name_id": 3800,
@@ -193,7 +193,7 @@
           "source": {
             "tag": "client + guide + reconstructed (R)",
             "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
-            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "slot": "(R) T421: the client draws four ability buttons (ScriptsBase.lua:5215 setButtonData ignores id >= 4; native populate 0x008ee3d0), so job rows are 1..3, filled left to right by unlock level, and a later skill upgrades its row; original row order unrecovered",
             "min_level": "notes\\Build Guides\\Content\\Jobs\\Medic.md:151,153,164,222",
             "name_id": "Client locale Global.Text.3800; Jenkins lookup2 1066134485",
             "description_id": "Client locale Global.Text.3815; (R) wording-based rank binding; old rank numbers are not runtime balance",
@@ -348,7 +348,7 @@
           "weapon_class": 17
         },
         {
-          "slot": 4,
+          "slot": 2,
           "definition_id": 62007,
           "min_level": 15,
           "name_id": 24706,
@@ -377,7 +377,7 @@
           "source": {
             "tag": "client + guide + reconstructed (R)",
             "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
-            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "slot": "(R) T421: the client draws four ability buttons (ScriptsBase.lua:5215 setButtonData ignores id >= 4; native populate 0x008ee3d0), so job rows are 1..3, filled left to right by unlock level, and a later skill upgrades its row; original row order unrecovered",
             "min_level": "notes\\Build Guides\\Content\\Jobs\\Warrior.md:147,149,162,225",
             "name_id": "Client locale Global.Text.24706; Jenkins lookup2 3798615259",
             "description_id": "Client locale Global.Text.24708; (R) wording-based rank binding; old rank numbers are not runtime balance",
@@ -549,7 +549,7 @@
           "weapon_class": 10
         },
         {
-          "slot": 4,
+          "slot": 3,
           "definition_id": 62011,
           "min_level": 15,
           "name_id": 38016,
@@ -572,7 +572,7 @@
           "source": {
             "tag": "client + guide + reconstructed (R)",
             "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
-            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "slot": "(R) T421: the client draws four ability buttons (ScriptsBase.lua:5215 setButtonData ignores id >= 4; native populate 0x008ee3d0), so job rows are 1..3, filled left to right by unlock level, and a later skill upgrades its row; original row order unrecovered",
             "min_level": "notes\\Build Guides\\Content\\Jobs\\Wizard.md:151,164,229,240",
             "name_id": "Client locale Global.Text.38016; Jenkins lookup2 2190134503",
             "description_id": "Client locale Global.Text.38017; (R) wording-based rank binding; old rank numbers are not runtime balance",
@@ -722,7 +722,7 @@
           "weapon_class": 6
         },
         {
-          "slot": 4,
+          "slot": 3,
           "definition_id": 62015,
           "min_level": 15,
           "name_id": 3855,
@@ -750,7 +750,7 @@
           "source": {
             "tag": "client + guide + reconstructed (R)",
             "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
-            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "slot": "(R) T421: the client draws four ability buttons (ScriptsBase.lua:5215 setButtonData ignores id >= 4; native populate 0x008ee3d0), so job rows are 1..3, filled left to right by unlock level, and a later skill upgrades its row; original row order unrecovered",
             "min_level": "(R) W101 ladder; unknown original unlock",
             "name_id": "Client locale Global.Text.3855; Jenkins lookup2 4190623537",
             "description_id": "Client locale Global.Text.24507; (R) wording-based rank binding; old rank numbers are not runtime balance",
@@ -774,7 +774,7 @@
       "profile_id": 43,
       "slots": [
         {
-          "slot": 1,
+          "slot": 3,
           "definition_id": 62016,
           "min_level": 10,
           "name_id": 24097,
@@ -792,7 +792,7 @@
           "source": {
             "tag": "client + guide + reconstructed (R)",
             "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
-            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "slot": "(R) T421: the client draws four ability buttons (ScriptsBase.lua:5215 setButtonData ignores id >= 4; native populate 0x008ee3d0), so job rows are 1..3, filled left to right by unlock level, and a later skill upgrades its row; original row order unrecovered",
             "min_level": "W125: Pamela Blalock, Brushing Up on the Brawler, MMORPG.com, 2009-07-29, skills/unlock paragraph; https://www.mmorpg.com/class-overviews/brushing-up-on-the-brawler-2000117137; 2009 ranked-job unlock, not recovered from client tables; (R) applying this historical level to the current hybrid skill content",
             "name_id": "Client locale Global.Text.24097; Jenkins lookup2 3570676904",
             "description_id": "Client locale Global.Text.24096; (R) wording-based rank binding; old rank numbers are not runtime balance",
@@ -810,7 +810,7 @@
           "weapon_class": 71
         },
         {
-          "slot": 2,
+          "slot": 3,
           "definition_id": 62017,
           "min_level": 15,
           "name_id": 21374,
@@ -838,7 +838,7 @@
           "source": {
             "tag": "client + guide + reconstructed (R)",
             "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
-            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "slot": "(R) T421: the client draws four ability buttons (ScriptsBase.lua:5215 setButtonData ignores id >= 4; native populate 0x008ee3d0), so job rows are 1..3, filled left to right by unlock level, and a later skill upgrades its row; original row order unrecovered",
             "min_level": "W125: Pamela Blalock, Brushing Up on the Brawler, MMORPG.com, 2009-07-29, skills/unlock paragraph; https://www.mmorpg.com/class-overviews/brushing-up-on-the-brawler-2000117137; 2009 ranked-job unlock, not recovered from client tables; (R) applying this historical level to the current hybrid skill content",
             "name_id": "Client locale Global.Text.21374; Jenkins lookup2 3723673953",
             "description_id": "Client locale Global.Text.24131; (R) wording-based rank binding; old rank numbers are not runtime balance",
@@ -856,7 +856,7 @@
           "weapon_class": 71
         },
         {
-          "slot": 3,
+          "slot": 1,
           "definition_id": 62018,
           "min_level": 1,
           "name_id": 24133,
@@ -885,7 +885,7 @@
           "source": {
             "tag": "client + guide + reconstructed (R)",
             "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
-            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "slot": "(R) T421: the client draws four ability buttons (ScriptsBase.lua:5215 setButtonData ignores id >= 4; native populate 0x008ee3d0), so job rows are 1..3, filled left to right by unlock level, and a later skill upgrades its row; original row order unrecovered",
             "min_level": "W125: Pamela Blalock, Brushing Up on the Brawler, MMORPG.com, 2009-07-29, skills/unlock paragraph; https://www.mmorpg.com/class-overviews/brushing-up-on-the-brawler-2000117137; 2009 ranked-job unlock, not recovered from client tables; (R) applying this historical level to the current hybrid skill content",
             "name_id": "Client locale Global.Text.24133; Jenkins lookup2 3884242169",
             "description_id": "Client locale Global.Text.24134; (R) wording-based rank binding; old rank numbers are not runtime balance",
@@ -903,7 +903,7 @@
           "weapon_class": 71
         },
         {
-          "slot": 4,
+          "slot": 2,
           "definition_id": 62024,
           "min_level": 5,
           "name_id": 15916,
@@ -926,7 +926,7 @@
           "source": {
             "tag": "client + guide + reconstructed (R)",
             "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
-            "slot": "(R) T011: Brawler slot 4, appended after the preserved W125 slots; original toolbar order is unrecovered",
+            "slot": "(R) T421: the client draws four ability buttons (ScriptsBase.lua:5215 setButtonData ignores id >= 4; native populate 0x008ee3d0), so job rows are 1..3, filled left to right by unlock level, and a later skill upgrades its row; original row order unrecovered",
             "min_level": "W125/B2009: Pamela Blalock, Brushing Up on the Brawler, MMORPG.com, 2009-07-29, skills/unlock paragraph; https://www.mmorpg.com/class-overviews/brushing-up-on-the-brawler-2000117137; Rock Toss 5; (R) applying this historical level to the current hybrid skill content",
             "name_id": "Client locale Global.Text.15916; Jenkins lookup2 1570714033",
             "description_id": "Client locale Global.Text.3255; Jenkins lookup2 4248561680; 'Hurls a small rock at an opponent doing damage and briefly stunning them.'",
@@ -949,7 +949,7 @@
       "profile_id": 35,
       "slots": [
         {
-          "slot": 1,
+          "slot": 2,
           "definition_id": 62019,
           "min_level": 5,
           "name_id": 4830,
@@ -974,7 +974,7 @@
           "source": {
             "tag": "client + guide + reconstructed (R)",
             "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
-            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "slot": "(R) T421: the client draws four ability buttons (ScriptsBase.lua:5215 setButtonData ignores id >= 4; native populate 0x008ee3d0), so job rows are 1..3, filled left to right by unlock level, and a later skill upgrades its row; original row order unrecovered",
             "min_level": "W125: Pamela Blalock, Getting to Know The Archer, MMORPG.com, 2009-07-07, skills/unlock paragraph; https://www.mmorpg.com/class-overviews/getting-to-know-the-archer-2000117060; 2009 ranked-job unlock, not recovered from client tables; (R) applying this historical level to the current hybrid skill content",
             "name_id": "Client locale Global.Text.4830; Jenkins lookup2 2315245172",
             "description_id": "Client locale Global.Text.6158; (R) wording-based rank binding; old rank numbers are not runtime balance",
@@ -992,7 +992,7 @@
           "weapon_class": 18
         },
         {
-          "slot": 2,
+          "slot": 1,
           "definition_id": 62020,
           "min_level": 1,
           "name_id": 24364,
@@ -1017,7 +1017,7 @@
           "source": {
             "tag": "client + guide + reconstructed (R)",
             "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
-            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "slot": "(R) T421: the client draws four ability buttons (ScriptsBase.lua:5215 setButtonData ignores id >= 4; native populate 0x008ee3d0), so job rows are 1..3, filled left to right by unlock level, and a later skill upgrades its row; original row order unrecovered",
             "min_level": "W125: Pamela Blalock, Getting to Know The Archer, MMORPG.com, 2009-07-07, skills/unlock paragraph; https://www.mmorpg.com/class-overviews/getting-to-know-the-archer-2000117060; 2009 ranked-job unlock, not recovered from client tables; (R) applying this historical level to the current hybrid skill content",
             "name_id": "Client locale Global.Text.24364; Jenkins lookup2 656147727",
             "description_id": "Client locale Global.Text.24365; (R) wording-based rank binding; old rank numbers are not runtime balance",
@@ -1035,7 +1035,7 @@
           "weapon_class": 18
         },
         {
-          "slot": 3,
+          "slot": 2,
           "definition_id": 62021,
           "min_level": 15,
           "name_id": 20015,
@@ -1053,7 +1053,7 @@
           "source": {
             "tag": "client + guide + reconstructed (R)",
             "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
-            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "slot": "(R) T421: the client draws four ability buttons (ScriptsBase.lua:5215 setButtonData ignores id >= 4; native populate 0x008ee3d0), so job rows are 1..3, filled left to right by unlock level, and a later skill upgrades its row; original row order unrecovered",
             "min_level": "W125: Pamela Blalock, Getting to Know The Archer, MMORPG.com, 2009-07-07, skills/unlock paragraph; https://www.mmorpg.com/class-overviews/getting-to-know-the-archer-2000117060; 2009 ranked-job unlock, not recovered from client tables; (R) applying this historical level to the current hybrid skill content",
             "name_id": "Client locale Global.Text.20015; Jenkins lookup2 2042026306",
             "description_id": "Client locale Global.Text.24325; (R) wording-based rank binding; old rank numbers are not runtime balance",
@@ -1071,7 +1071,7 @@
           "weapon_class": 18
         },
         {
-          "slot": 4,
+          "slot": 3,
           "definition_id": 62022,
           "min_level": 10,
           "name_id": 24397,
@@ -1100,7 +1100,7 @@
           "source": {
             "tag": "client + guide + reconstructed (R)",
             "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
-            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "slot": "(R) T421: the client draws four ability buttons (ScriptsBase.lua:5215 setButtonData ignores id >= 4; native populate 0x008ee3d0), so job rows are 1..3, filled left to right by unlock level, and a later skill upgrades its row; original row order unrecovered",
             "min_level": "W125: Pamela Blalock, Getting to Know The Archer, MMORPG.com, 2009-07-07, skills/unlock paragraph; https://www.mmorpg.com/class-overviews/getting-to-know-the-archer-2000117060; 2009 ranked-job unlock, not recovered from client tables; (R) applying this historical level to the current hybrid skill content",
             "name_id": "Client locale Global.Text.24397; Jenkins lookup2 1326375153",
             "description_id": "Client locale Global.Text.38242; (R) wording-based rank binding; old rank numbers are not runtime balance",
@@ -1118,7 +1118,7 @@
           "weapon_class": 18
         },
         {
-          "slot": 5,
+          "slot": 3,
           "definition_id": 62023,
           "min_level": 20,
           "name_id": 24398,
@@ -1146,7 +1146,7 @@
           "source": {
             "tag": "client + guide + reconstructed (R)",
             "definition_id": "(R) local server-sent identity; native ctor 00a2d320 supplies sub-opcode 0xd, no retail identity claimed",
-            "slot": "(R) guide/W99 order; Medic Triage weapon slot preserved",
+            "slot": "(R) T421: the client draws four ability buttons (ScriptsBase.lua:5215 setButtonData ignores id >= 4; native populate 0x008ee3d0), so job rows are 1..3, filled left to right by unlock level, and a later skill upgrades its row; original row order unrecovered",
             "min_level": "(R) W101 ladder; unknown original unlock",
             "name_id": "Client locale Global.Text.24398; Jenkins lookup2 2517867575",
             "description_id": "Client locale Global.Text.24399; (R) wording-based rank binding; old rank numbers are not runtime balance",

@@ -1,4 +1,7 @@
-use osfr_tools::{encounter::EncounterEngine, opening_abilities::JobAbility};
+use osfr_tools::{
+    encounter::EncounterEngine,
+    opening_abilities::{JobAbility, OpeningAbilities},
+};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{
@@ -356,17 +359,14 @@ fn reset_session_clears_skill_effects() {
 }
 
 fn job_wins(profile: i32) {
-    let content: Value =
-        serde_json::from_str(include_str!("../data/content/job_abilities.json")).unwrap();
-    let row = content["jobs"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .find(|r| r["profile_id"] == profile)
+    let content = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let mut abilities = OpeningAbilities::load(&content).unwrap();
+    abilities
+        .load_job_abilities(&content.join("job_abilities.json"))
         .unwrap();
-    let skills: Vec<JobAbility> = serde_json::from_value(row["slots"].clone()).unwrap();
     // (R) Same-level field packs use the existing HP curve, three enemies,
-    // no god mode, no basic attack; repeat at every ladder level.
+    // no god mode, no basic attack; repeat at every ladder level with only
+    // the skills the bar shows there (T421: an upgrade replaces its row).
     for level in [1_u32, 5, 10, 15, 20] {
         let scale = 1.75_f32.powf((level - 1) as f32 / 4.0);
         let f = Fixture::new((240.0 * scale) as u32, (12.0 * scale) as u32);
@@ -374,7 +374,7 @@ fn job_wins(profile: i32) {
         let mut defeated = 0;
         let mut casts = 0;
         for t in (0..120000).step_by(700) {
-            for a in skills.iter().filter(|a| a.min_level <= level) {
+            for a in abilities.job_bar(profile, level).into_iter().flatten() {
                 let out = e.job_ability(a, 0, [0.0; 3], profile, t).unwrap();
                 defeated += out.defeated.len();
                 casts += usize::from(!hit_damages(&out).is_empty());

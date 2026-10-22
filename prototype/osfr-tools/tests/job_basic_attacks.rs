@@ -300,6 +300,78 @@ fn clothed_warrior_without_a_weapon_gets_the_starter_cudgel() {
     assert_eq!(equipped_weapon(&fixture, &game, 32, 17), 29963);
 }
 
+/// T421: through the real 36/10 bar 1 request, every available skill casts on
+/// its row from its own unlock level, and rows 4-7 (no client button,
+/// ScriptsBase.lua:5215) are refused without a state change.
+#[test]
+fn each_job_row_casts_its_skill_from_its_unlock_level() {
+    let jobs: Value =
+        serde_json::from_str(include_str!("../data/content/job_abilities.json")).unwrap();
+    let fixture = Fixture::new();
+    for (job, _, _) in COMBAT_JOBS {
+        let (mut game, mut location, _) = fresh_game(&fixture, job);
+        let (position, target, _) = start_cave(&mut game, &location);
+        location.zone_id = 411;
+        location.position = position;
+        game.initialize_world(&location, 300).unwrap();
+        let cast =
+            |row: i32| [command(36, 10, &[1, row, 0]), target.to_le_bytes().to_vec()].concat();
+        let skills = &jobs["jobs"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["profile_id"] == job)
+            .unwrap()["slots"];
+        for skill in skills.as_array().unwrap() {
+            let row = skill["slot"].as_i64().unwrap() as i32;
+            let what = format!("job {job}, skill {}, row {row}", skill["definition_id"]);
+            assert!(
+                (1..=3).contains(&row),
+                "{what}: the client has three job buttons"
+            );
+            if skill["unavailable"] == true {
+                continue;
+            }
+            let mut leveled = game.clone();
+            let level = format!("realm level {}", skill["min_level"]);
+            leveled
+                .handle_in_world(&chat::local_request(&level), &location, 400)
+                .unwrap();
+            let out = leveled
+                .handle_in_world(&cast(row), &location, 1_000)
+                .unwrap();
+            assert!(
+                !out.replies.iter().any(|p| p.starts_with(&[36, 0, 1, 0])),
+                "{what}: refused"
+            );
+            assert!(
+                out.replies.iter().any(|p| p.starts_with(&[35, 0, 8, 0])),
+                "{what}: no cast"
+            );
+            // 35/16 carries the cast skill's composite effect after two GUIDs
+            // (encounter.rs `composite_effect`), so a row-mate cannot pass.
+            if let Some(effect) = skill["effect_id"].as_i64().filter(|id| *id > 0) {
+                assert!(
+                    out.replies.iter().any(|p| p.starts_with(&[35, 0, 16, 0])
+                        && p[20..24] == (effect as i32).to_le_bytes()),
+                    "{what}: another skill fired"
+                );
+            }
+        }
+        game.handle_in_world(&chat::local_request("realm level 20"), &location, 400)
+            .unwrap();
+        for row in 4..=7 {
+            let before = game.state();
+            let out = game.handle_in_world(&cast(row), &location, 1_000).unwrap();
+            assert!(
+                out.replies.iter().any(|p| p.starts_with(&[36, 0, 1, 0])),
+                "job {job}, row {row} has no button"
+            );
+            assert_eq!(game.state(), before, "job {job}, row {row} changed state");
+        }
+    }
+}
+
 #[test]
 fn unequipped_basic_is_refused_without_combat_change() {
     let fixture = Fixture::new();

@@ -36,12 +36,19 @@ struct Content {
     basics: Vec<Basic>,
 }
 
-/// A job ability beyond the basic attack, on toolbar slot 1.. (keys 2..).
+/// The client draws four ability buttons: the basic attack and three job rows.
+/// `GraphicActionBar.setButtonData` ignores `id >= 4` (ScriptsBase.lua:5215) and
+/// `resetButtons` clears 0..3; native populate `0x008ee3d0` hands it every row.
+const JOB_ROWS: i32 = 3;
+
+/// A job ability beyond the basic attack, on toolbar row 1..=JOB_ROWS (keys 2-4).
 /// Names, icons and heal amounts are client/wiki facts; damage, energy and
 /// cooldowns are reconstructed (R). See data/content/job_abilities.json.
 #[derive(Clone, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct JobAbility {
+    /// Toolbar row. Several abilities may share a row with different
+    /// `min_level`s: the row shows the highest unlocked one (`job_bar`).
     pub slot: i32,
     pub definition_id: i32,
     pub name_id: i32,
@@ -58,7 +65,8 @@ pub struct JobAbility {
     pub range: f32,
     #[serde(default)]
     pub effects: Vec<crate::abilities::JobEffect>,
-    /// A documented skill whose mechanic is not implemented; casting fails closed.
+    /// A documented skill whose mechanic is not implemented: never placed on
+    /// the bar, and casting fails closed.
     #[serde(default)]
     pub unavailable: bool,
     /// Strike multiplier of the job's basic attack damage; 0 = no strike.
@@ -85,7 +93,7 @@ pub struct JobAbility {
 
 impl JobAbility {
     pub fn valid(&self) -> bool {
-        (1..=7).contains(&self.slot)
+        (1..=JOB_ROWS).contains(&self.slot)
             && self.definition_id > 0
             && self.name_id > 0
             && self.description_id >= 0
@@ -213,7 +221,8 @@ impl OpeningAbilities {
     }
 
     /// Load the full roster independently of a campaign's basic-attack subset.
-    /// Slots run 1, 2, ...; a job needs a loaded basic before activation/casting.
+    /// Rows are 1..=JOB_ROWS, one ability per (row, min_level); a job needs a
+    /// loaded basic before activation/casting.
     pub fn load_job_abilities(&mut self, path: &Path) -> io::Result<()> {
         // (R) Operator-authored file with per-field provenance (24 skills was ~66 KB
         // after W125); 1 MiB stays bounded with room for every job's roster.
@@ -239,12 +248,13 @@ impl OpeningAbilities {
                         .and_then(|b| b.weapon_class)
                 });
             }
+            // Unique (row, min_level) also bounds a job to 3 x 20 abilities.
+            let mut placed = std::collections::BTreeSet::new();
             let valid = row.profile_id > 0
                 && !row.slots.is_empty()
-                && row.slots.len() <= 7
-                && row.slots.iter().enumerate().all(|(i, a)| {
-                    a.slot == i as i32 + 1
-                        && a.valid()
+                && row.slots.iter().all(|a| {
+                    a.valid()
+                        && placed.insert((a.slot, a.min_level))
                         && ids.insert(a.definition_id)
                         && !self
                             .basics
@@ -259,16 +269,19 @@ impl OpeningAbilities {
         Ok(())
     }
 
-    /// One entry per toolbar slot 1..=7 for the job at `level`. A locked or
-    /// absent ability leaves its slot empty instead of shifting later skills;
-    /// the client's variable-length toolbar encoding expects that position.
+    /// One entry per toolbar row 1..=7 for the job at `level`; only rows
+    /// 1..=JOB_ROWS are ever filled, so rows 4-7 go out empty. Each row shows
+    /// its highest unlocked, available ability, so a later skill upgrades the
+    /// row in place and a locked row stays empty instead of shifting others.
     pub fn job_bar(&self, profile_id: i32, level: u32) -> [Option<&JobAbility>; 7] {
-        let mut bar = [None; 7];
-        if let Some(slots) = self.jobs.get(&profile_id) {
-            for ability in slots {
-                if ability.min_level <= level {
-                    bar[(ability.slot - 1) as usize] = Some(ability);
-                }
+        let mut bar: [Option<&JobAbility>; 7] = [None; 7];
+        for ability in self.jobs.get(&profile_id).into_iter().flatten() {
+            let row = &mut bar[(ability.slot - 1) as usize];
+            if ability.min_level <= level
+                && !ability.unavailable
+                && row.is_none_or(|shown| shown.min_level < ability.min_level)
+            {
+                *row = Some(ability);
             }
         }
         bar
@@ -308,7 +321,7 @@ impl OpeningAbilities {
         self.jobs.get(&profile_id).is_some_and(|slots| {
             slots
                 .iter()
-                .any(|a| a.min_level > previous && a.min_level <= level)
+                .any(|a| !a.unavailable && a.min_level > previous && a.min_level <= level)
         })
     }
 
