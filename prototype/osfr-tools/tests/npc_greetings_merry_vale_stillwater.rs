@@ -406,11 +406,12 @@ fn change_under_test() -> Option<BTreeSet<String>> {
     head.iter().any(|path| is_owned(path)).then_some(head)
 }
 
-/// True when `path` differs from HEAD only by greeting bindings: the same
-/// records in the same order, each unchanged apart from `greeting_string_id`
-/// and its `field_sources` entry, and the same top-level metadata. A builder
-/// workspace may carry another greeting slice's uncommitted binding; that is
-/// that slice's change, not this suite's spill.
+/// True when `path` differs from HEAD only by greeting bindings and appended
+/// rows: the HEAD records in the same order, each unchanged apart from
+/// `greeting_string_id` and its `field_sources` entry, then any new rows, and
+/// the same top-level metadata. A builder workspace may carry another slice's
+/// uncommitted binding or appended row (T379's repair guys); that is that
+/// slice's change, pinned by its own suite, not this suite's spill.
 fn is_greeting_only_change(path: &str) -> bool {
     let output = git(&["show", &format!("HEAD:{path}")]);
     if !output.status.success() {
@@ -430,7 +431,7 @@ fn is_greeting_only_change(path: &str) -> bool {
     else {
         return false;
     };
-    if old_records.len() != new_records.len() {
+    if new_records.len() < old_records.len() {
         return false;
     }
     let mut old_document = old.clone();

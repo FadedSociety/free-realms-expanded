@@ -9074,6 +9074,253 @@
           }
         ]
       }
+    },
+    {
+      "npc_id": 9000002048,
+      "reference_ids": [],
+      "name": "Racer Repair Guy",
+      "name_string_id": null,
+      "name_string_ids": [],
+      "zone": "Cobblestone Village",
+      "zone_id": 3,
+      "roles": [
+        "ambient"
+      ],
+      "quests_given": [],
+      "quests_accepted": [],
+      "vendor_stock": null,
+      "services": [
+        "Dialogue only"
+      ],
+      "position": [
+        -1915.755,
+        -45.05808,
+        458.5376
+      ],
+      "rotation": [
+        0.0,
+        0.34620226825804223,
+        0.0,
+        0.9381598954618485
+      ],
+      "placement": "unanchored",
+      "placement_source": "reconstructed_unanchored_default",
+      "placement_confidence": "high",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "T379: exact position copied from npc_spawns_extra.json spawn_guid 100000002048; the extra row is the one drawable actor. Client GCNK object sg_broken_racecar_01 (lab/reports/world-objects-20261015.json) stands at (-1915.6288, -45.02709, 460.72006), 2.2 m from the actor; Ricky Danger 9500000254 is 7.6 m away and client locale 94360 places his crashed race car next to the Brawling Ring in Cobblestone Village. The native note calls this Sanctuary's kart pad, but the client transform and the Cobblestone rows place it in Cobblestone Village; see notes/Autopilot/T379.md.",
+      "heading": 0.70704,
+      "model_id": 968,
+      "model_file_name": "human_m_racer_repair_guy.agr",
+      "greeting_string_id": 401156,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "en_us_data.dat Global.Text.401156, JenkinsLookup2 hash 769285313 (0x2dda5cc1), line 20259: 'Just trying to fix up this kart here.' It is the repair man's first reply in the client conversation 401155-401172 that runs beside the 'Car Repair Guy' name id 94010. The line is client locale text, not player chat. See notes/Autopilot/T379.md."
+        },
+        {
+          "kind": "client",
+          "evidence": "Client GCNK object sg_broken_racecar_01 (lab/reports/world-objects-20261015.json) stands at (-1915.6288, -45.02709, 460.72006), 2.2 m from the actor; Ricky Danger 9500000254 is 7.6 m away and client locale 94360 places his crashed race car next to the Brawling Ring in Cobblestone Village. The native note calls this Sanctuary's kart pad, but the client transform and the Cobblestone rows place it in Cobblestone Village; see notes/Autopilot/T379.md."
+        },
+        {
+          "kind": "client",
+          "evidence": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 968 = human_m_racer_repair_guy.agr; Assets_manifest.txt ships human_m_racer_repair_guy.agr.z and catalog.tsv lists pack_13/000563.agr."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:804; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2048 (ModelId=968, ModelFileName=human_m_racer_repair_guy.agr, NameId=None)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T379: content_key 9000002048 binds the existing extra actor 100000002048 (Legacy Npc 2048) to this content row. The actor, model, transform and null nameplate are unchanged; the extra row remains the one drawable actor. The 9000000000-range id is this project's content-key space, not a recovered server GUID."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T379: 'Racer Repair Guy' is the server-side menu label, not the client nameplate; the extra spawn keeps name_string_id null. The adjacent recovered name id 94010 'Car Repair Guy' is evidence for what the actor is, deliberately not bound here."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T379: placement is unanchored so the regional loader draws no second actor; the position and heading are copied verbatim from the extra spawn's Legacy transform. The placement-test vocabulary accepts only reconstructed_zone_center or reconstructed_unanchored_default for an unanchored row, so the latter is used as the no-spawn class label; the transform itself is recovered, not reconstructed."
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:804; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2048 (ModelId=968, ModelFileName=human_m_racer_repair_guy.agr, NameId=None)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: content_key 9000002048 binds the existing extra actor 100000002048 (Legacy Npc 2048) to this content row. The actor, model, transform and null nameplate are unchanged; the extra row remains the one drawable actor. The 9000000000-range id is this project's content-key space, not a recovered server GUID."
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: no reference alias; this is a scenery greeting binding."
+          }
+        ],
+        "name": [
+          {
+            "kind": "client",
+            "evidence": "Client locale id 94010 = 'Car Repair Guy' is the adjacent repair-man name id."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: 'Racer Repair Guy' is the server-side menu label, not the client nameplate; the extra spawn keeps name_string_id null. The adjacent recovered name id 94010 'Car Repair Guy' is evidence for what the actor is, deliberately not bound here."
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: no client name-string id is bound. The extra spawn's name_string_id is null and the overhead nameplate is unchanged."
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: no client name-string id is bound. The extra spawn's name_string_id is null and the overhead nameplate is unchanged."
+          }
+        ],
+        "zone": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: zone follows the regional guide notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md line 22 (Ricky Danger's crashed car next to the Brawling Ring) and line 40 (Ricky Danger); zone_id is a content-package key."
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: stable content-package zone key from data/content/zones.json, not a recovered server zone id."
+          }
+        ],
+        "roles": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: ambient scenery role; it opens Talk only and adds no vendor, trainer, quest or kart gate."
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: no quest ids; the repair guy only greets."
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: no quest hand-ins."
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: no vendor stock; scenery only."
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: Talk only. No kart gate, no menu role, no reward."
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:804; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2048 (ModelId=968, ModelFileName=human_m_racer_repair_guy.agr, NameId=None)."
+          },
+          {
+            "kind": "client",
+            "evidence": "Client GCNK object sg_broken_racecar_01 (lab/reports/world-objects-20261015.json) stands at (-1915.6288, -45.02709, 460.72006), 2.2 m from the actor; Ricky Danger 9500000254 is 7.6 m away and client locale 94360 places his crashed race car next to the Brawling Ring in Cobblestone Village. The native note calls this Sanctuary's kart pad, but the client transform and the Cobblestone rows place it in Cobblestone Village; see notes/Autopilot/T379.md."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:804; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2048 (ModelId=968, ModelFileName=human_m_racer_repair_guy.agr, NameId=None)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Existing Y-axis yaw-quaternion conversion from the raw heading; heading is retained separately."
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: placement is unanchored so the regional loader draws no second actor; the position and heading are copied verbatim from the extra spawn's Legacy transform. The placement-test vocabulary accepts only reconstructed_zone_center or reconstructed_unanchored_default for an unanchored row, so the latter is used as the no-spawn class label; the transform itself is recovered, not reconstructed."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: placement is unanchored so the regional loader draws no second actor; the position and heading are copied verbatim from the extra spawn's Legacy transform. The placement-test vocabulary accepts only reconstructed_zone_center or reconstructed_unanchored_default for an unanchored row, so the latter is used as the no-spawn class label; the transform itself is recovered, not reconstructed."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: high confidence in the copied Legacy transform; the unanchored class only means this row adds no spawn."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: none; the binding copies the extra row's exact transform."
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: null; no startup AddNpc capture matches this scenery actor."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:804; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2048 (ModelId=968, ModelFileName=human_m_racer_repair_guy.agr, NameId=None)."
+          },
+          {
+            "kind": "client",
+            "evidence": "Client GCNK object sg_broken_racecar_01 (lab/reports/world-objects-20261015.json) stands at (-1915.6288, -45.02709, 460.72006), 2.2 m from the actor; Ricky Danger 9500000254 is 7.6 m away and client locale 94360 places his crashed race car next to the Brawling Ring in Cobblestone Village. The native note calls this Sanctuary's kart pad, but the client transform and the Cobblestone rows place it in Cobblestone Village; see notes/Autopilot/T379.md."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:804; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2048 (ModelId=968, ModelFileName=human_m_racer_repair_guy.agr, NameId=None)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:804; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2048 (ModelId=968, ModelFileName=human_m_racer_repair_guy.agr, NameId=None)."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 968 = human_m_racer_repair_guy.agr; Assets_manifest.txt ships human_m_racer_repair_guy.agr.z and catalog.tsv lists pack_13/000563.agr."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:804; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2048 (ModelId=968, ModelFileName=human_m_racer_repair_guy.agr, NameId=None)."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 968 = human_m_racer_repair_guy.agr; Assets_manifest.txt ships human_m_racer_repair_guy.agr.z and catalog.tsv lists pack_13/000563.agr."
+          }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "en_us_data.dat Global.Text.401156, JenkinsLookup2 hash 769285313 (0x2dda5cc1), line 20259: 'Just trying to fix up this kart here.' It is the repair man's first reply in the client conversation 401155-401172 that runs beside the 'Car Repair Guy' name id 94010. The line is client locale text, not player chat. See notes/Autopilot/T379.md."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T379: use the recovered repair-man line as the fixed Talk greeting; the original server greeting binding is not recovered and no text is invented."
+          }
+        ]
+      }
     }
   ]
 }

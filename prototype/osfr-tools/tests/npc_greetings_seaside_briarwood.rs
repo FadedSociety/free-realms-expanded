@@ -320,8 +320,13 @@ const SELF_IDENTIFYING: [u64; 1] = [9500000206];
 /// The bindings already in the two files before T317 (W126): Burglz and Troy Ridewrangler.
 const PRE_EXISTING: [(u64, u32); 2] = [(9500000563, 441432), (9500000639, 441037)];
 
-/// Row counts: this slice edits rows, it never adds or removes one.
-const ROW_COUNTS: [(&str, usize); 2] = [(SEASIDE, 108), (BRIARWOOD, 181)];
+/// T379 (another slice) appended one binding-only repair-guy row to seaside.json;
+/// its own suite pins that row's greeting and transform.
+const APPENDED_BY_OTHER_SLICES: [u64; 1] = [9000001989];
+
+/// Row counts: this slice edits rows, it never adds or removes one. T379
+/// appended one binding-only row to seaside.json.
+const ROW_COUNTS: [(&str, usize); 2] = [(SEASIDE, 109), (BRIARWOOD, 181)];
 
 /// Alonzo: a drawable Seaside quest giver left blank because the guide only carries
 /// third-person narration about him. A blank row must not inherit another row's body.
@@ -801,7 +806,7 @@ fn the_existing_greetings_and_other_regions_are_unchanged() {
         assert_eq!(rows.len(), expected_rows, "{file}: row count");
         for record in &rows {
             let npc_id = record["npc_id"].as_u64().expect("npc id");
-            if edited.contains(&npc_id) {
+            if edited.contains(&npc_id) || APPENDED_BY_OTHER_SLICES.contains(&npc_id) {
                 continue;
             }
             match PRE_EXISTING.iter().find(|(id, _)| *id == npc_id) {

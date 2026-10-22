@@ -11074,6 +11074,7 @@
     {
       "spawn_guid": 100000001989,
       "legacy_npc_id": 1989,
+      "content_key": 9000001989,
       "model_id": 968,
       "model_file_name": "human_m_racer_repair_guy.agr",
       "name": null,
@@ -11998,6 +11999,7 @@
     {
       "spawn_guid": 100000002048,
       "legacy_npc_id": 2048,
+      "content_key": 9000002048,
       "model_id": 968,
       "model_file_name": "human_m_racer_repair_guy.agr",
       "name": null,

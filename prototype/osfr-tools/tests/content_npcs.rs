@@ -455,7 +455,8 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
             &adapter_source,
         ));
     }
-    assert_eq!(content_npcs.len(), 1199);
+    // T379 appended two unanchored repair-guy binding rows.
+    assert_eq!(content_npcs.len(), 1201);
     let expected_npc_count = loader_npcs.len();
     write_json(
         &scratch.join("npcs.json"),

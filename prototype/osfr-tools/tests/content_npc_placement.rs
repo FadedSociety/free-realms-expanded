@@ -211,6 +211,7 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
         }
     }
 
-    assert_eq!(npc_count, 1_199);
+    // T379 appended two unanchored repair-guy binding rows.
+    assert_eq!(npc_count, 1_201);
     println!("NPC placement sources: {counts:?}");
 }
