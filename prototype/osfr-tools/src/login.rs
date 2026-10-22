@@ -267,6 +267,22 @@ impl LoginService {
         Ok((store, account_id))
     }
 
+    /// L055: create and delete save the whole store, so they start from the file, never the copy
+    /// cached at login: another session on the same file (every unauthenticated loopback peer
+    /// shares one) may have saved since. Re-runs the account lookup here; the caller's
+    /// create/delete re-run slot, name and ownership checks on this copy. osfr-login handles one
+    /// request at a time, so nothing in the process saves between this load and the caller's save.
+    fn reload_account_store(&mut self) -> io::Result<()> {
+        let (_, account_id) = self.store_and_account()?;
+        let store = AccountStore::load(&self.config.account_store_file)?;
+        let login_name_hash: [u8; 32] = Sha256::digest(self.config.local_session.as_bytes()).into();
+        if store.account_id_by_login_hash(&login_name_hash) != Some(account_id) {
+            return Err(invalid("authenticated account is unavailable"));
+        }
+        self.account_store = Some(store);
+        Ok(())
+    }
+
     fn character_list_reply(&self, server_id: i32) -> io::Result<Vec<u8>> {
         let (store, account_id) = self.store_and_account()?;
         let reply = account::character_list(store, account_id, server_id);
@@ -339,6 +355,7 @@ impl LoginService {
                 let data = r.payload(4096)?;
                 r.end()?;
                 let creation = NativeCreation::decode(data)?;
+                self.reload_account_store()?;
                 let (store, account_id) = self.store_and_account()?;
                 if !matches!(server, 0 | 1) {
                     outcome.creation_rejection = Some("unsupported local server".into());
@@ -456,6 +473,7 @@ impl LoginService {
             9 => {
                 let guid = r.u64()?;
                 r.end()?;
+                self.reload_account_store()?;
                 let (store, account_id) = self.store_and_account()?;
                 let mut staged = store.clone();
                 let reply = account::delete_character(&mut staged, account_id, guid);

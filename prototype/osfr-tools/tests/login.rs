@@ -145,11 +145,15 @@ fn resources(t: &Temp) -> Resources {
     Resources::load(&t.0).unwrap()
 }
 fn service(t: &Temp) -> LoginService {
+    service_as(t, "synthetic-session")
+}
+fn service_as(t: &Temp, local_session: &str) -> LoginService {
     service_with_paths(
         t,
         t.0.join("identity.json"),
         t.0.join("state.json"),
         t.0.join("accounts.json"),
+        local_session,
     )
 }
 fn service_with_paths(
@@ -157,6 +161,7 @@ fn service_with_paths(
     identity_file: PathBuf,
     legacy_save_file: PathBuf,
     account_store_file: PathBuf,
+    local_session: &str,
 ) -> LoginService {
     LoginService::new(
         resources(t),
@@ -165,7 +170,7 @@ fn service_with_paths(
             legacy_save_file,
             account_store_file,
             gateway_address: "127.0.0.1:20260".into(),
-            local_session: "synthetic-session".into(),
+            local_session: local_session.into(),
             gateway_ticket: "synthetic-ticket".into(),
             handoff_key: b"synthetic-handoff-key".to_vec(),
             max_characters: 6,
@@ -176,8 +181,11 @@ fn service_with_paths(
     .unwrap()
 }
 fn login_request() -> Vec<u8> {
+    login_request_as("synthetic-session")
+}
+fn login_request_as(local_session: &str) -> Vec<u8> {
     let mut out = vec![1];
-    string(&mut out, "synthetic-session");
+    string(&mut out, local_session);
     string(&mut out, "synthetic-machine");
     out
 }
@@ -429,6 +437,7 @@ fn current_character_save_and_identity_migrate_without_rewriting_sources() {
         identity_path.clone(),
         save_path.clone(),
         t.0.join("accounts.json"),
+        "synthetic-session",
     );
     service.handle(&login_request()).unwrap();
     assert_eq!(
@@ -465,6 +474,105 @@ fn account_name_check_and_create_share_global_uniqueness() {
     assert_eq!(
         i32::from_le_bytes(duplicate.replies[0][1..5].try_into().unwrap()),
         4
+    );
+}
+
+// L055: osfr-login gives every peer its own LoginService on one store file (on the unauthenticated
+// loopback path all of them log in as the one local session), and each caches the store at login.
+fn delete_request(guid: u64) -> Vec<u8> {
+    let mut out = vec![9];
+    out.extend(guid.to_le_bytes());
+    out
+}
+
+fn delete_status(reply: &[u8]) -> i32 {
+    assert_eq!(reply[0], 10);
+    i32::from_le_bytes(reply[9..13].try_into().unwrap())
+}
+
+#[test]
+fn two_sessions_on_one_store_both_keep_the_characters_they_create() {
+    let t = Temp::new();
+    let (mut a, mut b) = (service(&t), service(&t));
+    a.handle(&login_request()).unwrap();
+    b.handle(&login_request()).unwrap();
+    let created = a.handle(&create_request("Testa", "One")).unwrap();
+    assert_eq!(created.replies[0], login::create_reply(1, 1));
+    // B logged in before A saved: its create still sees guid 1 taken.
+    let created = b.handle(&create_request("Testb", "Two")).unwrap();
+    assert_eq!(created.replies[0], login::create_reply(1, 2));
+    let store = AccountStore::load(&t.0.join("accounts.json")).unwrap();
+    assert_eq!(store.account(1).unwrap().character_guids, [1, 2]);
+    assert_eq!(store.character(1).unwrap().identity.first_name, "Testa");
+    assert_eq!(store.character(2).unwrap().identity.first_name, "Testb");
+    // Account 1's guid 1 is mirrored to identity.json; it still holds A's character.
+    let mirrored = identity::load(&t.0.join("identity.json")).unwrap().unwrap();
+    assert_eq!(mirrored.first_name, "Testa");
+}
+
+#[test]
+fn a_name_another_session_created_is_refused_and_nothing_is_written() {
+    let t = Temp::new();
+    let (mut a, mut b) = (service(&t), service(&t));
+    a.handle(&login_request()).unwrap();
+    b.handle(&login_request()).unwrap();
+    assert!(a.handle(&create_request("Testn", "Same")).unwrap().created);
+    let store_before = fs::read(t.0.join("accounts.json")).unwrap();
+    let identity_before = fs::read(t.0.join("identity.json")).unwrap();
+    let refused = b.handle(&create_request("Testn", "Same")).unwrap();
+    assert!(!refused.created);
+    assert_eq!(refused.replies[0], login::create_reply(4, 0)); // NameTaken
+    assert_eq!(fs::read(t.0.join("accounts.json")).unwrap(), store_before);
+    assert_eq!(
+        fs::read(t.0.join("identity.json")).unwrap(),
+        identity_before
+    );
+}
+
+#[test]
+fn delete_checks_ownership_on_the_file_and_keeps_characters_saved_since() {
+    let t = Temp::new();
+    let mut a = service(&t);
+    let mut b = service_as(&t, "synthetic-other");
+    a.handle(&login_request()).unwrap(); // account 1
+    b.handle(&login_request_as("synthetic-other")).unwrap(); // account 2
+    let created = b.handle(&create_request("Testb", "Two")).unwrap();
+    assert_eq!(created.replies[0], login::create_reply(1, 1));
+    let created = a.handle(&create_request("Testa", "One")).unwrap();
+    assert_eq!(created.replies[0], login::create_reply(1, 2));
+    let before = fs::read(t.0.join("accounts.json")).unwrap();
+    // B does not own guid 2: refused, nothing written.
+    let refused = b.handle(&delete_request(2)).unwrap();
+    assert_eq!(delete_status(&refused.replies[0]), 2);
+    assert_eq!(fs::read(t.0.join("accounts.json")).unwrap(), before);
+    // B deletes its own character without dropping the one A saved after B's last write.
+    let deleted = b.handle(&delete_request(1)).unwrap();
+    assert_eq!(delete_status(&deleted.replies[0]), 1);
+    let store = AccountStore::load(&t.0.join("accounts.json")).unwrap();
+    assert!(store.character(1).is_none());
+    assert_eq!(store.account(1).unwrap().character_guids, [2]);
+    assert!(store.account(2).unwrap().character_guids.is_empty());
+}
+
+#[test]
+fn create_and_delete_refuse_when_the_file_maps_the_account_to_another_login() {
+    let t = Temp::new();
+    let mut a = service(&t);
+    a.handle(&login_request()).unwrap(); // account 1 for this login
+    // The store is replaced (an operator restore, say): account 1 now belongs to another login.
+    fs::remove_file(t.0.join("accounts.json")).unwrap();
+    let mut other = service_as(&t, "synthetic-other");
+    other.handle(&login_request_as("synthetic-other")).unwrap();
+    let created = other.handle(&create_request("Testb", "Two")).unwrap();
+    assert!(created.created);
+    let store_before = fs::read(t.0.join("accounts.json")).unwrap();
+    let identity_before = fs::read(t.0.join("identity.json")).unwrap();
+    assert!(a.handle(&create_request("Testa", "One")).is_err());
+    assert!(a.handle(&delete_request(1)).is_err());
+    assert_eq!(fs::read(t.0.join("accounts.json")).unwrap(), store_before);
+    assert_eq!(
+        fs::read(t.0.join("identity.json")).unwrap(),
+        identity_before
     );
 }
 
