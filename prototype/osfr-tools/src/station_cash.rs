@@ -41,6 +41,9 @@
 //! is the data-configured `order_history`; a packet older than that window is outside this slice's
 //! proof. Rides marked `earn_only` are never listed and can never be ordered here.
 //!
+//! L046 (R): a listed lot deed (item Type 16) is paid like a ride but delivers the lot itself
+//! through the caller's [`LotGrant`]; the deed item is never granted.
+//!
 //! This module grants no Station Cash: slice 2 adds the earned source. Nothing here creates coins.
 
 use crate::inventory::Inventory;
@@ -169,14 +172,29 @@ pub fn require_wallet_owner(wallet: &Option<Wallet>, shop_present: bool) -> io::
     }
 }
 
-/// One row the Marketplace lists: a store bundle equal to one ride item.
+/// L046 (R): `ClientItemDefinition.Type` of a property deed. Every lot deed recorded in
+/// `houses.json` has Type 16 in the item catalogue (the word `Inventory::presentation` reads after
+/// the two strings); the client has no deed handling of its own (no `deed` string, none in
+/// ScriptsBase.lua).
+pub const DEED_ITEM_TYPE: i32 = 16;
+
+/// One row the Marketplace lists: a store bundle equal to one ride item, or to one lot deed.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Listing {
     pub bundle_id: u32,
     pub item_id: i32,
     pub name_id: u32,
     pub price: u32,
+    /// L046: the item is a lot deed. An order for it grants the lot through the caller's
+    /// [`LotGrant`] and never puts the deed in the inventory.
+    pub deed: bool,
 }
+
+/// L046: the caller's lot grant for a paid deed. It receives the deed's item id (always from the
+/// server-side listing, never from the client) and `commit`. It returns the lot's replies, or
+/// `None` with nothing changed (no lot for the deed, the owner already has it, or no housing).
+/// With `commit` false it only answers whether the grant would succeed and changes nothing.
+pub type LotGrant<'a> = &'a mut dyn FnMut(i32, bool) -> Option<Vec<Vec<u8>>>;
 
 /// The validated Station Cash catalogue built from `stores.json` rows and the live item catalogue.
 #[derive(Clone, Debug)]
@@ -213,6 +231,7 @@ impl Catalogue {
                 item_id,
                 name_id: u32::try_from(presentation.name_id).unwrap_or(0),
                 price: config.scaled_price(sc_price)?,
+                deed: presentation.item_type == DEED_ITEM_TYPE,
             };
             if reward_only {
                 earn_only.push(listing);
@@ -412,9 +431,20 @@ pub fn decode_order(inner: &[u8], preview: bool) -> io::Result<OrderRequest> {
     })
 }
 
-/// Price and validate an order without changing anything; 66/2 reply.
-pub fn preview(catalogue: &Catalogue, wallet: &Wallet, order: &OrderRequest) -> OrderOutcome {
+/// Price and validate an order without changing anything; 66/2 reply. A new deed order also asks
+/// `grant_lot` without committing, so a lot the order would refuse is refused here too.
+pub fn preview(
+    catalogue: &Catalogue,
+    wallet: &Wallet,
+    order: &OrderRequest,
+    grant_lot: LotGrant,
+) -> OrderOutcome {
     let (result, total) = match price(catalogue, wallet, order) {
+        Ok((listing, _, _, None))
+            if listing.deed && grant_lot(listing.item_id, false).is_none() =>
+        {
+            (ORDER_FAILURE, 0)
+        }
         Ok((_, _, total, _)) => (ORDER_SUCCESS, total),
         Err(result) => (result, 0),
     };
@@ -425,7 +455,8 @@ pub fn preview(catalogue: &Catalogue, wallet: &Wallet, order: &OrderRequest) -> 
     }
 }
 
-/// Debit Station Cash and grant the ride in one staged commit; 66/4 reply.
+/// Debit Station Cash and grant the ride (or, for a deed, the lot) in one staged commit; 66/4
+/// reply. The grant is the last step that can fail; the debit after it cannot.
 pub fn place_order(
     catalogue: &Catalogue,
     wallet: &mut Wallet,
@@ -433,6 +464,7 @@ pub fn place_order(
     order: &OrderRequest,
     bag_capacity: usize,
     busy: bool,
+    grant_lot: LotGrant,
 ) -> OrderOutcome {
     if busy {
         return refusal(order, ORDER_FAILURE);
@@ -455,16 +487,25 @@ pub fn place_order(
     if wallet.balance < total {
         return refusal(order, ORDER_INSUFFICIENT_SC);
     }
-    let mut staged = inventory.clone();
-    let granted = match staged.grant_with_tint(0, listing.item_id, 1, detail.tint) {
-        Ok(granted) => granted,
-        Err(_) => return refusal(order, ORDER_FAILURE),
+    let granted = if listing.deed {
+        // L046: a deed never enters the inventory; no lot for it means no sale.
+        match grant_lot(listing.item_id, true) {
+            Some(replies) => replies,
+            None => return refusal(order, ORDER_FAILURE),
+        }
+    } else {
+        let mut staged = inventory.clone();
+        let granted = match staged.grant_with_tint(0, listing.item_id, 1, detail.tint) {
+            Ok(granted) => granted,
+            Err(_) => return refusal(order, ORDER_FAILURE),
+        };
+        if staged.state().items.len() > bag_capacity {
+            return refusal(order, ORDER_FAILURE);
+        }
+        *inventory = staged;
+        granted.replies
     };
-    if staged.state().items.len() > bag_capacity {
-        return refusal(order, ORDER_FAILURE);
-    }
     let balance = wallet.balance - total;
-    *inventory = staged;
     wallet.balance = balance;
     wallet.orders.push(OrderRecord {
         tracking_id: order.tracking_id,
@@ -479,7 +520,7 @@ pub fn place_order(
         wallet.orders.drain(..drop);
     }
     let mut replies = vec![wallet_packet(balance)];
-    replies.extend(granted.replies);
+    replies.extend(granted);
     replies.push(order_packet(ORDER_SUCCESS, order.tracking_id, total));
     OrderOutcome {
         result_code: ORDER_SUCCESS,

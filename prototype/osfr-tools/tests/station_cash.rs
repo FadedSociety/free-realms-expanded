@@ -296,7 +296,7 @@ fn refusals_change_nothing() {
     let mut busy = new_shop(wallet(200), usize::MAX);
     let before = snapshot(&busy);
     let outcome = busy
-        .handle_marketplace(&buy(88), true)
+        .handle_marketplace(&buy(88), true, &mut |_, _| None)
         .expect("order parses");
     assert_eq!(outcome.result_code, station_cash::ORDER_FAILURE);
     assert_eq!(snapshot(&busy), before);
@@ -399,6 +399,7 @@ fn bought_ride_catalogue_row_is_no_trade() {
         .listings()
         .iter()
         .chain(shop.sc_catalogue().earn_only())
+        .filter(|listing| !listing.deed) // L046: lot deeds are listed too; they grant a lot.
         .map(|listing| listing.item_id)
         .collect();
     assert_eq!(items.len(), 54, "every ride has a catalogue row");
@@ -546,7 +547,8 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         store.len(),
         "the store packet has trailing bytes"
     );
-    assert_eq!(decoded.len(), 52, "the shipped listed ride count");
+    // 52 rides plus the 9 lot deeds L046 lists.
+    assert_eq!(decoded.len(), 61, "the shipped listed ride and deed count");
 
     // 66/7 (`00b48040`/`00b43090`): counted category nodes, then the sorted byte.
     let tree = packets

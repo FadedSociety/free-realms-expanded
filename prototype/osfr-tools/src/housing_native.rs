@@ -37,6 +37,7 @@ pub const SUB_FIXTURE_ASSET: u16 = 42;
 pub const SUB_FIXTURE_ITEM_LIST: u16 = 43;
 pub const SUB_HOUSE_INFO: u16 = 44;
 pub const SUB_ZONE_DATA: u16 = 45;
+pub const SUB_NOTIFY_HOUSE_ADDED: u16 = 49;
 pub const SUB_POSITION: u16 = 51;
 pub const SUB_PLACEMENT_DENIED: u16 = 53;
 
@@ -1170,6 +1171,26 @@ impl PlacementDenied {
         };
         reader.finish()?;
         Ok(denied)
+    }
+}
+
+/// S2C 127/49 `HousingPacketNotifyHouseAdded` (L046). Dispatcher `00aca5d0` case 0x31 calls
+/// `00ab91b0`, whose reader `00ab2f50` takes a `u32` then two `u64`s after the subtype and drops
+/// the packet unless every byte is consumed. The handler looks the `u32` up as a locale string id
+/// (falling back to "house") and prints "You have received a new %s."; it never reads the two
+/// `u64`s, so they are zero (R).
+#[derive(Clone, Debug, PartialEq)]
+pub struct NotifyHouseAdded {
+    pub name_id: i32,
+}
+
+impl NotifyHouseAdded {
+    pub fn encode(&self) -> io::Result<Vec<u8>> {
+        let mut writer = Writer::new(SUB_NOTIFY_HOUSE_ADDED);
+        writer.i32(self.name_id);
+        writer.u64(0);
+        writer.u64(0);
+        Ok(writer.finish())
     }
 }
 

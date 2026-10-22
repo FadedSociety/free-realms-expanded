@@ -83,7 +83,14 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 17567,
+        "store_bundle_ids": [
+          4666
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_blackspore_01.json ItemDefinitionId 17567; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:115; FreeRealms-Legacy@9e08202 StoreBundles.json Id 4666 entry MarketingItemId 17567; item-catalogue Type 16, NameId 6514 = name_id"
+      }
     },
     {
       "property_id": 2,
@@ -130,7 +137,12 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 79149,
+        "store_bundle_ids": [],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_boat_01.json ItemDefinitionId 79149; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:116; item-catalogue Type 16, NameId 5103265 = name_id; no original bundle (member gift); the zone file bundle 900202 is Lxzxrus-invented"
+      }
     },
     {
       "property_id": 3,
@@ -177,7 +189,14 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 17192,
+        "store_bundle_ids": [
+          4701
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_bog_shore_01.json ItemDefinitionId 17192; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:117; FreeRealms-Legacy@9e08202 StoreBundles.json Id 4701 entry MarketingItemId 17192; item-catalogue Type 16, NameId 69974 = name_id"
+      }
     },
     {
       "property_id": 4,
@@ -224,7 +243,14 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 17193,
+        "store_bundle_ids": [
+          4846
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_briarfalls_01.json ItemDefinitionId 17193; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:118; FreeRealms-Legacy@9e08202 StoreBundles.json Id 4846 entry MarketingItemId 17193; item-catalogue Type 16, NameId 69975 = name_id"
+      }
     },
     {
       "property_id": 5,
@@ -271,7 +297,14 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 7485,
+        "store_bundle_ids": [
+          4295
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_briarwood_01.json ItemDefinitionId 7485; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:119; FreeRealms-Legacy@9e08202 StoreBundles.json Id 4295 entry MarketingItemId 7485; item-catalogue Type 16, NameId 5184 = name_id"
+      }
     },
     {
       "property_id": 6,
@@ -318,7 +351,14 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 17189,
+        "store_bundle_ids": [
+          4978
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_bw_towers_01.json ItemDefinitionId 17189; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:120; FreeRealms-Legacy@9e08202 StoreBundles.json Id 4978 entry MarketingItemId 17189; item-catalogue Type 16, NameId 69971 = name_id"
+      }
     },
     {
       "property_id": 7,
@@ -401,7 +441,12 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 10338,
+        "store_bundle_ids": [],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_gl_staircase_01.json ItemDefinitionId 10338; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:122; item-catalogue Type 16, NameId 69965 = name_id; no original bundle sells this deed; the zone file bundle 900208 is Lxzxrus-invented"
+      }
     },
     {
       "property_id": 9,
@@ -448,7 +493,14 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 17182,
+        "store_bundle_ids": [
+          4633
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_gl_valley_01.json ItemDefinitionId 17182; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:123; FreeRealms-Legacy@9e08202 StoreBundles.json Id 4633 entry MarketingItemId 17182; item-catalogue Type 16, NameId 69964 = name_id"
+      }
     },
     {
       "property_id": 10,
@@ -495,7 +547,14 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 10386,
+        "store_bundle_ids": [
+          4596
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_island_01.json ItemDefinitionId 10386; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:124; FreeRealms-Legacy@9e08202 StoreBundles.json Id 4596 entry MarketingItemId 10386; item-catalogue Type 16, NameId 8322 = name_id"
+      }
     },
     {
       "property_id": 14,
@@ -542,7 +601,14 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 10384,
+        "store_bundle_ids": [
+          4536
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_seaside_cliffs_01.json ItemDefinitionId 10384; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:125; FreeRealms-Legacy@9e08202 StoreBundles.json Id 4536 entry MarketingItemId 10384; item-catalogue Type 16, NameId 8320 = name_id"
+      }
     },
     {
       "property_id": 15,
@@ -589,7 +655,12 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 17195,
+        "store_bundle_ids": [],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_sh_batcave_01.json ItemDefinitionId 17195; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:126; item-catalogue Type 16, NameId 69977 = name_id; no original bundle (loot card); the zone file bundle 900215 is Lxzxrus-invented"
+      }
     },
     {
       "property_id": 16,
@@ -636,7 +707,14 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 17191,
+        "store_bundle_ids": [
+          4786
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_sh_crystalmines_01.json ItemDefinitionId 17191; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:127; FreeRealms-Legacy@9e08202 StoreBundles.json Id 4786 entry MarketingItemId 17191; item-catalogue Type 16, NameId 69973 = name_id"
+      }
     },
     {
       "property_id": 17,
@@ -683,7 +761,14 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 17183,
+        "store_bundle_ids": [
+          4715
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_shrouded_gloam_01.json ItemDefinitionId 17183; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:128; FreeRealms-Legacy@9e08202 StoreBundles.json Id 4715 entry MarketingItemId 17183; item-catalogue Type 16, NameId 17432 = name_id; data defect: Legacy StoreBundles 4715 is named Shrouded Stairs Lot (NameId 69965) but its entry is this Gloam deed"
+      }
     },
     {
       "property_id": 18,
@@ -777,7 +862,14 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 7486,
+        "store_bundle_ids": [
+          4296
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_snowhill_01.json ItemDefinitionId 7486; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:130; FreeRealms-Legacy@9e08202 StoreBundles.json Id 4296 entry MarketingItemId 7486; item-catalogue Type 16, NameId 5185 = name_id"
+      }
     },
     {
       "property_id": 20,
@@ -824,7 +916,14 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 17194,
+        "store_bundle_ids": [
+          4885
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_vale_steam_01.json ItemDefinitionId 17194; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:131; FreeRealms-Legacy@9e08202 StoreBundles.json Id 4885 entry MarketingItemId 17194; item-catalogue Type 16, NameId 69976 = name_id"
+      }
     },
     {
       "property_id": 21,
@@ -871,7 +970,14 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 17185,
+        "store_bundle_ids": [
+          4634
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_wugachug_01.json ItemDefinitionId 17185; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:132; FreeRealms-Legacy@9e08202 StoreBundles.json Id 4634 entry MarketingItemId 17185; item-catalogue Type 16, NameId 69967 = name_id; deed 10999 carries the same NameId and no bundle; 17185 is the one bundle 4634 sells"
+      }
     },
     {
       "property_id": 22,
@@ -918,7 +1024,12 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 11110,
+        "store_bundle_ids": [],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_hum_blackspore_01.json ItemDefinitionId 11110; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:133; item-catalogue Type 16, NameId 69966 = name_id; no original bundle sells this deed: Legacy StoreBundles 4709 and 50038 carry this lot name (NameId 69966) but their entry is the Condo deed 17184; Lxzxrus@37ef175 rewrote 4709 to 11110"
+      }
     },
     {
       "property_id": 23,
@@ -990,7 +1101,12 @@
       "enabled": false,
       "bounds_source": "legacy (R)",
       "scene_source": null,
-      "disabled_reason": "apartment icon has no matching named community lot scene"
+      "disabled_reason": "apartment icon has no matching named community lot scene",
+      "deed": {
+        "item_id": 10337,
+        "store_bundle_ids": [],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_hum_condo.json ItemDefinitionId 10337; Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:135; item-catalogue Type 16, NameId 420151 = name_id; no original bundle; the zone file bundle 900224 is Lxzxrus-invented"
+      }
     },
     {
       "property_id": 25,
@@ -1037,7 +1153,15 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "client-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 17184,
+        "store_bundle_ids": [
+          4709,
+          50038
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:136; FreeRealms-Legacy@9e08202 StoreBundles.json Id 4709, Id 50038 entry MarketingItemId 17184; item-catalogue Type 16, NameId 296 = name_id; data defect: Legacy StoreBundles 4709 and 50038 are named Blackspore Swamp House (NameId 69966) but their entry is this Condo deed"
+      }
     },
     {
       "property_id": 26,
@@ -1073,7 +1197,15 @@
       "enabled": false,
       "bounds_source": "legacy (R)",
       "scene_source": null,
-      "disabled_reason": "deluxe-house icon has no region-specific community lot scene"
+      "disabled_reason": "deluxe-house icon has no region-specific community lot scene",
+      "deed": {
+        "item_id": 2214,
+        "store_bundle_ids": [
+          3438,
+          50048
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:137; FreeRealms-Legacy@9e08202 StoreBundles.json Id 3438, Id 50048 entry MarketingItemId 2214; item-catalogue Type 16, NameId 6290 = name_id"
+      }
     },
     {
       "property_id": 27,
@@ -1109,7 +1241,14 @@
       "enabled": false,
       "bounds_source": "legacy (R)",
       "scene_source": null,
-      "disabled_reason": "economy-house icon has no region-specific community lot scene"
+      "disabled_reason": "economy-house icon has no region-specific community lot scene",
+      "deed": {
+        "item_id": 2213,
+        "store_bundle_ids": [
+          3437
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:138; FreeRealms-Legacy@9e08202 StoreBundles.json Id 3437 entry MarketingItemId 2213; item-catalogue Type 16, NameId 6289 = name_id"
+      }
     },
     {
       "property_id": 28,
@@ -1145,7 +1284,14 @@
       "enabled": false,
       "bounds_source": "legacy (R)",
       "scene_source": null,
-      "disabled_reason": "VIP-house icon has no region-specific community lot scene"
+      "disabled_reason": "VIP-house icon has no region-specific community lot scene",
+      "deed": {
+        "item_id": 11140,
+        "store_bundle_ids": [
+          4855
+        ],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:139; FreeRealms-Legacy@9e08202 StoreBundles.json Id 4855 entry MarketingItemId 11140; item-catalogue Type 16, NameId 6775 = name_id"
+      }
     },
     {
       "property_id": 29,
@@ -1228,7 +1374,12 @@
       "enabled": false,
       "bounds_source": "legacy (R)",
       "scene_source": null,
-      "disabled_reason": "Rumbledome icon has no matching community lot scene"
+      "disabled_reason": "Rumbledome icon has no matching community lot scene",
+      "deed": {
+        "item_id": 15955,
+        "store_bundle_ids": [],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:141; item-catalogue Type 16, NameId 442333 = name_id; no original bundle (loot card)"
+      }
     },
     {
       "property_id": 31,
@@ -1347,7 +1498,12 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 2215,
+        "store_bundle_ids": [],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:144; item-catalogue Type 16, NameId 435461 = name_id; no original bundle"
+      }
     },
     {
       "property_id": 34,
@@ -1394,7 +1550,12 @@
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
-      "disabled_reason": null
+      "disabled_reason": null,
+      "deed": {
+        "item_id": 11435,
+        "store_bundle_ids": [],
+        "source": "Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:145; item-catalogue Type 16, NameId 5409 = name_id; no original bundle"
+      }
     }
   ]
 }

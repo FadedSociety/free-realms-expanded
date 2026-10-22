@@ -177,7 +177,14 @@ fn buying_each_ride_with_coins_grants_it() {
     wallet.balance = 1_000_000;
     let mut shop = shop_with(wallet, usize::MAX);
     let store = shop.sc_catalogue().config().store_id;
-    let listings: Vec<_> = shop.sc_catalogue().listings().to_vec();
+    // L046: lot deeds share the listing; they grant a lot, never an item (tests/lot_deeds.rs).
+    let listings: Vec<_> = shop
+        .sc_catalogue()
+        .listings()
+        .iter()
+        .filter(|listing| !listing.deed)
+        .copied()
+        .collect();
     assert!(!listings.is_empty());
     let mut expected = 1_000_000u32;
     for (index, listing) in listings.iter().enumerate() {

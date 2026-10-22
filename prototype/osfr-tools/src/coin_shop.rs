@@ -396,9 +396,10 @@ impl CoinShop {
         }
         match read_u16(inner, 0)? {
             COIN_FAMILY => self.handle_coin_store(inner),
-            // The hub passes the shared busy-table answer to `handle_marketplace`; a direct
-            // service call (tests, older callers) is not inside an activity.
-            MARKETPLACE_FAMILY => self.handle_marketplace(inner, false),
+            // The hub passes the shared busy-table answer and the session's lot grant to
+            // `handle_marketplace`; a direct service call (tests, older callers) is not inside an
+            // activity and has no housing, so a deed order is refused (L046).
+            MARKETPLACE_FAMILY => self.handle_marketplace(inner, false, &mut |_, _| None),
             _ => Err(invalid("not a store packet")),
         }
     }
@@ -1056,8 +1057,14 @@ impl CoinShop {
 
     /// Answer gateway Marketplace requests. A Station Cash order debits the wallet and grants the
     /// ride in one staged commit; wallet funding, membership and paid orders stay off (R).
-    /// `busy` is the shared busy table's answer and only gates the order request.
-    pub fn handle_marketplace(&mut self, inner: &[u8], busy: bool) -> io::Result<CoinShopOutcome> {
+    /// `busy` is the shared busy table's answer and only gates the order request. `grant_lot`
+    /// delivers a paid lot deed, and a preview asks it without committing (L046).
+    pub fn handle_marketplace(
+        &mut self,
+        inner: &[u8],
+        busy: bool,
+        grant_lot: station_cash::LotGrant,
+    ) -> io::Result<CoinShopOutcome> {
         if inner.len() < 4 || inner.len() > MAX_PACKET_BYTES {
             return Err(invalid("invalid Marketplace packet length"));
         }
@@ -1077,8 +1084,12 @@ impl CoinShop {
                 } else {
                     let order = station_cash::decode_order(inner, true)?;
                     transaction_id = order.tracking_id;
-                    let outcome =
-                        station_cash::preview(&self.sc_catalogue, &self.sc_wallet, &order);
+                    let outcome = station_cash::preview(
+                        &self.sc_catalogue,
+                        &self.sc_wallet,
+                        &order,
+                        grant_lot,
+                    );
                     (outcome.result_code, outcome.replies)
                 }
             }
@@ -1100,6 +1111,7 @@ impl CoinShop {
                         &order,
                         self.bag_capacity,
                         busy,
+                        grant_lot,
                     );
                     changed = outcome.changed;
                     (outcome.result_code, outcome.replies)

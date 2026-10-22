@@ -199,6 +199,7 @@ fn lot_definition(property: PropertyDefinition) -> HousingLotDefinition {
         scene_source: Some("test fixture only".to_string()),
         bounds_source: "test fixture only".to_string(),
         disabled_reason: None,
+        deed: None,
         source_tag: "test fixture only".to_string(),
         enabled: true,
     }

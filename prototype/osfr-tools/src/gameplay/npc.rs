@@ -117,7 +117,7 @@ impl Gameplay {
         if let Some(out) = self.npc_store_165(inner, character)? {
             return Ok(Some(out));
         }
-        if let Some(out) = self.npc_merchant_66(inner)? {
+        if let Some(out) = self.npc_merchant_66(inner, character)? {
             return Ok(Some(out));
         }
         if let Some(out) = self.npc_merchant_buy_66_43(inner, character)? {
@@ -752,7 +752,11 @@ impl Gameplay {
 
     /// Marketplace siblings (W172): wallet, status, SKU and code lists, account info, and the
     /// Station Cash order rows. The shop answers; a paid order is one staged commit.
-    fn npc_merchant_66(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
+    fn npc_merchant_66(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+    ) -> io::Result<Option<Outcome>> {
         if matches!(
             inner,
             [
@@ -774,7 +778,12 @@ impl Gameplay {
             if inner.get(2..4) == Some(&[3, 0]) {
                 shop.sync_inventory(self.inventory.clone());
             }
-            let outcome = shop.handle_marketplace(inner, busy)?;
+            // L046: a paid deed grants this character's lot in the housing session; the order
+            // debits only after that grant commits, and both land in the one gameplay save.
+            let housing = &mut self.housing;
+            let outcome = shop.handle_marketplace(inner, busy, &mut |deed, commit| {
+                housing.as_mut()?.grant_deed(character.guid, deed, commit)
+            })?;
             if outcome.changed {
                 self.inventory = shop.inventory().clone();
             }

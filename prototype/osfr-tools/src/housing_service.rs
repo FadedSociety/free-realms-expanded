@@ -38,7 +38,7 @@ use crate::housing::{
 use crate::housing_native::{
     CouplingDisplay, Customization, FixtureAsset, FixtureDefinition,
     FixtureInstance as WireFixtureInstance, FixtureInstanceInfo, FixtureItemList, FixtureRemove,
-    FixtureUpdate, HouseInfo, HousePermissionRecord, InstanceData, InstanceList,
+    FixtureUpdate, HouseInfo, HousePermissionRecord, InstanceData, InstanceList, NotifyHouseAdded,
     PlaceFixture as WirePlaceFixture, PlacementDenied, PlayerHousingInstanceInfo, PositionUpdate,
     ZoneData,
 };
@@ -88,6 +88,7 @@ pub const REPLY_PLACE_REQUEST: u16 = 42;
 pub const REPLY_ITEM_LIST: u16 = 43;
 pub const REPLY_HOUSE_INFO: u16 = 44;
 pub const REPLY_ZONE_DATA: u16 = 45;
+pub const REPLY_NOTIFY_HOUSE_ADDED: u16 = 49;
 pub const REPLY_POSITION: u16 = 51;
 pub const REPLY_PLACEMENT_DENIED: u16 = 53;
 
@@ -162,6 +163,22 @@ pub struct HousingLotDefinition {
     pub disabled_reason: Option<String>,
     pub source_tag: String,
     pub enabled: bool,
+    /// L046: the deed whose Marketplace purchase grants this lot; `None` when no deed is
+    /// recorded. A deed names at most one lot (`HousingContent::validate`).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub deed: Option<LotDeed>,
+}
+
+/// L046: the property deed (a Type 16 `ClientItemDefinition`) that sells one lot, with its source.
+/// `store_bundle_ids` are the original Marketplace bundles whose entry is this deed, kept as
+/// provenance: the revival lists a deed under its own item id, like every ride (R).
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct LotDeed {
+    pub item_id: i32,
+    #[serde(default)]
+    pub store_bundle_ids: Vec<u32>,
+    pub source: String,
 }
 
 impl HousingLotDefinition {
@@ -208,6 +225,11 @@ impl HousingLotDefinition {
                         .disabled_reason
                         .as_ref()
                         .map_or(true, |reason| reason.trim().is_empty())))
+            || self.deed.as_ref().is_some_and(|deed| {
+                deed.item_id <= 0
+                    || deed.source.trim().is_empty()
+                    || deed.store_bundle_ids.contains(&0)
+            })
         {
             return Err(ServiceError::HousingContentInvalid(
                 "invalid or untagged lot row",
@@ -333,11 +355,22 @@ impl HousingContent {
             ));
         }
         let mut ids = BTreeSet::new();
+        let mut deeds = BTreeSet::new();
         for lot in &self.lots {
             lot.validate()?;
             if !ids.insert(lot.property_id) {
                 return Err(ServiceError::HousingContentInvalid(
                     "duplicate lot property id",
+                ));
+            }
+            // L046: a purchase must resolve to exactly one lot.
+            if lot
+                .deed
+                .as_ref()
+                .is_some_and(|deed| !deeds.insert(deed.item_id))
+            {
+                return Err(ServiceError::HousingContentInvalid(
+                    "one deed names two lots",
                 ));
             }
         }
@@ -827,6 +860,7 @@ pub enum HousingReply {
     PositionUpdate(PositionUpdate),
     PlacementDenied(PlacementDenied),
     InstanceList(InstanceList),
+    NotifyHouseAdded(NotifyHouseAdded),
     Unrecovered { opcode: u16 },
 }
 
@@ -843,6 +877,7 @@ impl HousingReply {
             Self::PositionUpdate(_) => REPLY_POSITION,
             Self::PlacementDenied(_) => REPLY_PLACEMENT_DENIED,
             Self::InstanceList(_) => REPLY_INSTANCE_LIST,
+            Self::NotifyHouseAdded(_) => REPLY_NOTIFY_HOUSE_ADDED,
             Self::Unrecovered { opcode } => *opcode,
         }
     }
@@ -861,6 +896,7 @@ impl HousingReply {
             Self::PositionUpdate(value) => value.encode(),
             Self::PlacementDenied(value) => value.encode(),
             Self::InstanceList(value) => value.encode(),
+            Self::NotifyHouseAdded(value) => value.encode(),
             Self::Unrecovered { opcode } => Err(io::Error::new(
                 io::ErrorKind::Unsupported,
                 format!("housing reply {opcode} body is not recovered"),
@@ -1198,6 +1234,58 @@ impl HousingService {
         Ok(lot_guid)
     }
 
+    /// L046 (R): a paid Marketplace deed grants the one enabled lot that names it. An owner who
+    /// already has that lot is refused, so a repeated purchase is never charged. Replies: 127/49
+    /// ("You have received a new %s.") with the lot's name, then the owner's 127/39 list. A deed
+    /// with no enabled lot is the lookup refusal `InvalidProperty`, not a content error.
+    ///
+    /// The starter lot's deed is that refusal too: the starter is free and its kit (L040) rides
+    /// only its 127/23 grant, so a deed must never hand it out kitless or for Station Cash.
+    ///
+    /// Not atomic on its own: an error after `grant_property` leaves the lot granted. Callers
+    /// stage it on a clone (`HousingSession::grant_deed`, the only production caller).
+    pub fn grant_deed(
+        &mut self,
+        owner_guid: u64,
+        deed_item_id: i32,
+    ) -> Result<ServiceOutcome, ServiceError> {
+        let definition = self
+            .house_definitions
+            .values()
+            .find(|lot| {
+                lot.enabled
+                    && Some(lot.property_id) != self.starter_property_id
+                    && lot
+                        .deed
+                        .as_ref()
+                        .is_some_and(|deed| deed.item_id == deed_item_id)
+            })
+            .cloned()
+            .ok_or(HousingError::InvalidProperty)?;
+        if self
+            .lots_of(owner_guid)
+            .iter()
+            .any(|lot| lot.property_id == definition.property_id)
+        {
+            return Err(HousingError::PropertyAlreadyOwned.into());
+        }
+        let lot_guid = self.housing.lot_guid(owner_guid, definition.property_id)?;
+        self.housing.grant_property(PropertyGrant {
+            owner_guid,
+            property: definition.property(),
+            lot_guid,
+        })?;
+        let mut outcome = self.house_list(owner_guid, owner_guid)?;
+        outcome.replies.insert(
+            0,
+            HousingReply::NotifyHouseAdded(NotifyHouseAdded {
+                name_id: definition.name_id,
+            }),
+        );
+        outcome.changed = true;
+        Ok(outcome)
+    }
+
     /// Restore one character's persisted state. Bounded, whole-document validation: the schema
     /// version, both size caps, the housing state machine's own checks, cross-lot instance
     /// duplication and the inventory half of the conservation invariant.
@@ -1524,7 +1612,7 @@ impl HousingService {
     /// 127/23 (R): the first ask grants the starter lot (idempotent: a repeat grants nothing) and
     /// answers with the owner's 127/39 list either way. A new lot comes with the content's
     /// starter kit: the lot, its standing fixtures and the unit in the bag commit together or not
-    /// at all. 127/49 is not sent: no lot row carries the house-type text it prints.
+    /// at all. 127/49 is not sent here; a purchased lot sends it (L046 `grant_deed`).
     fn request_grant(
         &mut self,
         actor_guid: u64,
@@ -1604,11 +1692,7 @@ impl HousingService {
 
     /// 127/14 and the tail of 127/23: one owner's houses that `actor_guid` may visit (R: a
     /// visitor sees only lots `can_visit` allows; the owner sees all of their own).
-    fn house_list(
-        &self,
-        actor_guid: u64,
-        owner_guid: u64,
-    ) -> Result<ServiceOutcome, ServiceError> {
+    fn house_list(&self, actor_guid: u64, owner_guid: u64) -> Result<ServiceOutcome, ServiceError> {
         let records = self
             .lots_of(owner_guid)
             .into_iter()

@@ -69,6 +69,23 @@ impl HousingSession {
     pub(super) fn kit_items(&self) -> Vec<i32> {
         self.service.kit_items()
     }
+
+    /// L046: the lot for a paid Marketplace deed. Staged on a copy and committed only once its
+    /// replies encode and `commit` is set (a preview only asks), so `None` (no enabled lot for
+    /// the deed, already owned) changes nothing.
+    pub(super) fn grant_deed(
+        &mut self,
+        owner: u64,
+        deed: i32,
+        commit: bool,
+    ) -> Option<Vec<Vec<u8>>> {
+        let mut service = self.service.clone();
+        let replies = encode_replies(&service.grant_deed(owner, deed).ok()?).ok()?;
+        if commit {
+            self.service = service;
+        }
+        Some(replies)
+    }
 }
 
 fn encode_replies(outcome: &ServiceOutcome) -> io::Result<Vec<Vec<u8>>> {

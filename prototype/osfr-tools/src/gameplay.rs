@@ -262,6 +262,8 @@ pub struct Gameplay {
     achievement_bindings: crate::progression_extras::AchievementBindings,
     /// Player housing (`gameplay/housing.rs`); `None` when the content has no `houses.json`.
     housing: Option<housing::HousingSession>,
+    /// L046: the saved lots, kept unchanged while housing is dormant so a save never drops them.
+    dormant_housing: Option<crate::housing_service::HousingServiceState>,
 }
 
 #[derive(Default)]
@@ -1114,6 +1116,9 @@ impl Gameplay {
                 );
             }
         }
+        let housing =
+            housing::HousingSession::load(directory, saved_housing.as_ref(), inventory.state())?;
+        let dormant_housing = saved_housing.filter(|_| housing.is_none());
         Ok(Self {
             mystery_chests,
             pending_chest: None,
@@ -1145,11 +1150,8 @@ impl Gameplay {
             pets: crate::pets::PetService::new(crate::pets::PetService::bundled_content()?)?,
             progression_extras,
             achievement_bindings,
-            housing: housing::HousingSession::load(
-                directory,
-                saved_housing.as_ref(),
-                inventory.state(),
-            )?,
+            housing,
+            dormant_housing,
             inventory,
             categories: ItemCategories::load(directory)?,
             quests: QuestEngine::load(directory, quests)?,
@@ -1375,7 +1377,10 @@ impl Gameplay {
                 .npc_coin_shop
                 .as_ref()
                 .and_then(crate::coin_shop::CoinShop::saved_wallet),
-            housing: self.housing.as_ref().and_then(|h| h.state()),
+            housing: self
+                .housing
+                .as_ref()
+                .map_or_else(|| self.dormant_housing.clone(), |h| h.state()),
         }
     }
 
