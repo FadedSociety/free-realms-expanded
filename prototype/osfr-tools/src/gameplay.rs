@@ -2669,10 +2669,14 @@ impl Gameplay {
             }
             return self.begin_kart_race(character);
         }
+        // T392: the client's mid-race quit (41/109) is answered with 41/121, then the same exit.
+        let quit = self.kart_entry.as_ref().unwrap().quit_reply(inner)?;
         let exit = command.is_some_and(|c| c.trim().eq_ignore_ascii_case("realm exit"))
             || inner == [26, 0, 42, 0]
+            || quit.is_some()
             || self.kart_entry.as_ref().unwrap().accepts_close(inner)?;
         if exit {
+            out.replies.extend(quit);
             let previous_job = self.kart_entry.as_ref().unwrap().previous_job();
             let return_location = self.kart_entry.as_mut().unwrap().exit().unwrap();
             if let Some(job) = previous_job {
@@ -2681,34 +2685,7 @@ impl Gameplay {
             // Captured return frame44446 clears racing bit10 (0x401 ->1).
             out.replies
                 .push(crate::kart_gateway::player_status(return_location.guid, 1));
-            let world = self
-                .encounter
-                .as_ref()
-                .ok_or_else(|| invalid("kart return requires world content"))?
-                .world();
-            out.scene_zoning = Some(crate::zone_transition::ZoneTransition {
-                envelope_flag: 1,
-                scene: world.name.clone(),
-                type_id: 2,
-                position: [
-                    return_location.position[0],
-                    return_location.position[1],
-                    return_location.position[2],
-                    1.,
-                ],
-                rotation: [
-                    return_location.rotation[0],
-                    return_location.rotation[1],
-                    return_location.rotation[2],
-                    1.,
-                ],
-                sky: world.sky.clone(),
-                id: return_location.zone_id as i32,
-                geometry_id: world.geometry_id,
-                override_update_radius: true,
-                unknown: 1,
-                ..Default::default()
-            });
+            out.scene_zoning = Some(self.world_zoning(&return_location)?);
             out.changed = true;
             return Ok(out);
         }

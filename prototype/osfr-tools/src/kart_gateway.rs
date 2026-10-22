@@ -459,6 +459,35 @@ impl KartGateway {
             .as_ref()
             .is_some_and(|a| word(inner, 3) == a.context.encounter_id && inner[7..15] == [255; 8]))
     }
+    /// ORIGINAL mid-race quit (T392). The title-bar Exit runs `Ui.QuitMiniGame`
+    /// (`00939100`): the race's MiniGameState is in progress (`+0x61`, set by the
+    /// 41/114 path `009beb70`), so it sends EncounterParticipantRequestExit 41/109
+    /// (ctor `008a31a0`): a zero word, then the 41/107 instance it stored at
+    /// `client+0xc10` (dispatcher `00aa36c0` case 0x6b). The retail racing capture
+    /// sent exactly that mid-lap (frame 42898) and the server answered 41/121
+    /// EncounterParticipantTerminateEncounter: header + flag byte 0 (frame 42925;
+    /// case 0x79 -> `00938fe0` raises `MiniGameHandler:EncounterCancelled`, then
+    /// `008d2730` drops the client state). Returns that answer when the quit names
+    /// this race; the caller then runs the ordinary exit (no payout).
+    pub fn quit_reply(&self, inner: &[u8]) -> io::Result<Option<Vec<u8>>> {
+        if !inner.starts_with(&[41, 0, 109, 0]) {
+            return Ok(None);
+        }
+        if inner.len() != 12 {
+            return Err(invalid("invalid kart quit width"));
+        }
+        let Some(a) = &self.state.active else {
+            return Ok(None);
+        };
+        if word(inner, 4) != 0 || word(inner, 8) != a.context.instance_id {
+            return Ok(None);
+        }
+        let mut reply = vec![41, 0, 121, 0];
+        reply.extend(a.context.encounter_id.to_le_bytes());
+        reply.extend(a.context.instance_id.to_le_bytes());
+        reply.push(0);
+        Ok(Some(reply))
+    }
     pub fn scene(&self) -> Option<&zone_transition::ZoneTransition> {
         self.state.active.as_ref().map(|a| &a.context.scene)
     }

@@ -205,14 +205,15 @@ impl Gameplay {
         })
     }
 
-    fn world_zoning(
+    /// The op31 frame back to the saved world pose (house and kart race returns).
+    pub(super) fn world_zoning(
         &self,
         back: &CharacterState,
     ) -> io::Result<crate::zone_transition::ZoneTransition> {
         let world = self
             .encounter
             .as_ref()
-            .ok_or_else(|| invalid("house return requires world content"))?
+            .ok_or_else(|| invalid("world return requires world content"))?
             .world();
         Ok(crate::zone_transition::ZoneTransition {
             envelope_flag: 1,

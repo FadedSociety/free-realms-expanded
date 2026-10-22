@@ -1344,6 +1344,113 @@ fn a_timed_out_race_still_reports_the_abort_for_saving() {
     assert_eq!(game.state().profiles.unwrap().active, prior_job);
 }
 
+// ---- T392: the client's mid-race quit ----------------------------------------------------------
+
+/// `Ui.QuitMiniGame` (`00939100`) mid-race: 41/109 with a zero word, then the instance the
+/// client stored from 41/107. Retail capture frame 42898: `29006d00 00000000 f0030000`.
+fn quit(instance: u32) -> Vec<u8> {
+    let mut b = vec![41, 0, 109, 0, 0, 0, 0, 0];
+    b.extend(instance.to_le_bytes());
+    b
+}
+
+/// The race start sends what the client's Exit needs (41/107 names the instance the quit
+/// carries; GameState 8 runs `Countdown:Show`, which shows `MinigameTitleBar` and its Exit), and
+/// the quit it sends ends the race unpaid, answered with 41/121 first, in the prior job, back at
+/// the world pose. Foreign, malformed and replayed quits change nothing.
+#[test]
+fn the_client_quit_mid_race_ends_it_unpaid_in_the_prior_job_and_a_replay_changes_nothing() {
+    let fixture = GameplayFixture::new();
+    let character = character();
+    let mut game = fixture.load(None);
+    game.set_dev_tools(true);
+    game.set_role(osfr_tools::account_store::AccountRole::Admin);
+    let before_race = game.state();
+    let entered = game
+        .handle_in_world(&chat_request("realm race"), &character, T0)
+        .unwrap();
+    assert!(entered.changed);
+    let active = game.state().kart_entry.unwrap().active.unwrap();
+    let (instance, encounter) = (active.context.instance_id, active.context.encounter_id);
+    game.handle_in_world(&register(PLAYER), &character, T0 + 100)
+        .unwrap();
+    let mut zone_ready = vec![41, 0, 107, 0];
+    zone_ready.extend(encounter.to_le_bytes());
+    zone_ready.extend(instance.to_le_bytes());
+    let loaded = game.initialize_world(&character, T0 + 150).unwrap();
+    assert!(loaded.replies.contains(&zone_ready));
+    game.handle_in_world(&go(encounter, instance, PLAYER), &character, T0 + 200)
+        .unwrap();
+    let green = T0 + 6_200;
+    let started = game.tick(&character, green).unwrap();
+    assert!(started.replies.contains(&vec![33, 0, 1, 0, 8, 0, 0, 0]));
+    assert_eq!(race_phase(&game), RacePhase::Racing);
+    // One lap of two, like the capture's racer, then quit.
+    for gate in 1..=4u64 {
+        game.handle_in_world(
+            &gate_hit(PLAYER, gate as f32),
+            &character,
+            green + gate * 1_000,
+        )
+        .unwrap();
+    }
+    let now = green + 5_000;
+
+    let racing = game.state();
+    let mut not_zero = quit(instance);
+    not_zero[4] = 1;
+    for foreign in [quit(instance + 1), not_zero] {
+        let out = game.handle_in_world(&foreign, &character, now).unwrap();
+        assert!(out.replies.is_empty() && !out.changed && out.scene_zoning.is_none());
+        assert_eq!(game.state(), racing);
+    }
+    assert!(
+        game.handle_in_world(&quit(instance)[..11], &character, now)
+            .is_err()
+    );
+    assert_eq!(game.state(), racing);
+
+    let out = game
+        .handle_in_world(&quit(instance), &character, now)
+        .unwrap();
+    // Capture frame 42925: `29007900 3e000e00 f0030000 00` (encounter, instance, flag 0).
+    let mut terminate = vec![41, 0, 121, 0];
+    terminate.extend(encounter.to_le_bytes());
+    terminate.extend(instance.to_le_bytes());
+    terminate.push(0);
+    assert_eq!(out.replies.first(), Some(&terminate));
+    assert!(out.changed, "the quit must be saved");
+    let scene = out.scene_zoning.expect("the racer returns to the world");
+    assert_eq!(
+        (scene.scene.as_str(), scene.id, &scene.position[..3]),
+        ("SyntheticWorld", 0, &character.position[..])
+    );
+    let after = game.state();
+    let entry = after.kart_entry.clone().unwrap();
+    assert!(entry.active.is_none());
+    assert_eq!(entry.race.unwrap().phase, RacePhase::Aborted);
+    assert_eq!(
+        after.inventory, before_race.inventory,
+        "a quit pays nothing"
+    );
+    assert_eq!(
+        after.profiles, before_race.profiles,
+        "the prior job is back"
+    );
+
+    // The capture's client follows 41/121 with 39/7, a second 41/109 and 26/42: all inert now.
+    for replay in [quit(instance), close(encounter), vec![26, 0, 42, 0]] {
+        if let Ok(out) = game.handle_in_world(&replay, &character, now + 100) {
+            assert!(!out.changed && out.scene_zoning.is_none());
+        }
+        assert_eq!(game.state(), after);
+    }
+    // A reload keeps the finished quit: no race, the prior job.
+    let reloaded = fixture.load(Some(after.clone()));
+    assert!(reloaded.state().kart_entry.unwrap().active.is_none());
+    assert_eq!(reloaded.state().profiles, after.profiles);
+}
+
 // ---- private gateway proof (needs a playtest bundle; fails until the shared patch lands) ----
 
 mod gateway_route {
