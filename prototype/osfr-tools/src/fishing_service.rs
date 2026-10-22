@@ -2,7 +2,7 @@
 //!
 //! Recovered layouts: fishing sub 2/5/6/7/15 client requests; sub 1 update,
 //! sub 3 registration, sub 4 fish list, sub 8 bobber, sub 10 fish state,
-//! sub 11 school, sub 12 despawn and sub 14 result. Sources are the readers
+//! sub 11 school, sub 12 despawn, sub 14 result and sub 18 fish run. Sources are the readers
 //! and writers named in `notes/Build Guides/Gameplay/Fishing.md`, notably
 //! `00b6a400`, `00b6a380`, `00b6a460`, `00b6a4d0`, `00b65880`, `00b67240`,
 //! `00b673b0`, `00b66a00`, `00b66a80`, `00b69130`, `00b68810` and `00b66be0`.
@@ -29,7 +29,9 @@
 //! fishing processor on and off.
 
 use crate::{
-    fishing::{self, ClientRequest, Error, Handle, Outcome, Phase, ResultBody, Sub, Vec4},
+    fishing::{
+        self, ClientRequest, Error, FishRun, Handle, Outcome, Phase, ResultBody, RunFish, Sub, Vec4,
+    },
     inventory::Inventory,
     minigame::{MinigameRuns, RunMode, RunSpec, RunState},
     profiles::ProfileState,
@@ -82,7 +84,13 @@ const CATCH_CAP_NOTICE: &str = "The fishing reward limit has been reached, so th
 const MAX_FISH_STACKS: usize = 160;
 
 static CONTENT: LazyLock<Content> = LazyLock::new(|| {
-    serde_json::from_str(CONTENT_JSON).expect("bundled fishing content must parse")
+    let content: Content =
+        serde_json::from_str(CONTENT_JSON).expect("bundled fishing content must parse");
+    assert!(
+        content.models.valid(),
+        "fishing.json models: ids must be positive and motion within 0..=100"
+    );
+    content
 });
 
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -191,6 +199,7 @@ impl FishingService {
             && CONTENT.timing.reel_window_ms > 0
             && CONTENT.timing.source.contains("R:")
             && CONTENT.registration.source.contains("R:")
+            && CONTENT.models.valid()
             && CONTENT.sizes.len() == 4
             && CONTENT.sizes.iter().enumerate().all(|(i, size)| {
                 size.grade == i as u8 + 1 && !size.name.is_empty() && !size.source.is_empty()
@@ -769,14 +778,16 @@ impl FishingService {
                 if tracked.attempt.is_some() {
                     return Err(Error::OutOfOrder);
                 }
+                // Select before any mutation, so a refused cast changes nothing.
+                let sequence = tracked.cast_sequence.wrapping_add(1).max(1);
+                let selected = select_species(tracked, sequence)?;
                 tracked.session.request(&request)?;
-                tracked.cast_sequence = tracked.cast_sequence.wrapping_add(1).max(1);
-                let selected = select_species(tracked, tracked.cast_sequence)?;
+                tracked.cast_sequence = sequence;
                 let now = now_ms;
                 let bite_at = now.saturating_add(CONTENT.timing.bite_delay_ms);
                 let hook_at = bite_at.saturating_add(CONTENT.timing.nibble_ms);
                 let expires_at = hook_at.saturating_add(CONTENT.timing.reel_window_ms);
-                let fish_key = ((guid as u32).rotate_left(9) ^ tracked.cast_sequence).max(1);
+                let fish_key = ((guid as u32).rotate_left(9) ^ sequence).max(1);
                 tracked.attempt = Some(Attempt {
                     stage: AttemptStage::Casting,
                     cast_at_ms: now,
@@ -786,7 +797,8 @@ impl FishingService {
                     fish_key,
                     species_key: selected.key.clone(),
                 });
-                change.replies.push(bobber_reply(actor, fish_key, target));
+                change.replies.push(bobber_reply(actor, target));
+                change.replies.push(fish_run_reply(fish_key, selected));
                 change.changed = true;
             }
             ClientRequest::ReelIn { flag, .. } => {
@@ -1158,9 +1170,11 @@ fn school_reply(school_id: u32, anchor: Vec4, position: [f32; 3]) -> Vec<u8> {
     packet(Sub::SpawnSchool, body)
 }
 
-fn bobber_reply(actor: Handle, fish_key: u32, target: Vec4) -> Vec<u8> {
+fn bobber_reply(actor: Handle, target: Vec4) -> Vec<u8> {
     let mut body = actor.encode().to_vec();
-    body.extend(fish_key.to_le_bytes());
+    // The client keeps this u32 as the player's bobber model (+0xd8); `0x00ccfdb0` looks a
+    // positive one up without a null check.
+    body.extend(CONTENT.models.bobber.to_le_bytes());
     body.extend(target.encode());
     body.extend(
         Vec4 {
@@ -1172,6 +1186,37 @@ fn bobber_reply(actor: Handle, fish_key: u32, target: Vec4) -> Vec<u8> {
         .encode(),
     );
     packet(Sub::SpawnBobber, body)
+}
+
+/// 138/18 for one attempt: its fish alone, as the head record (138/7 needs one). Caster only:
+/// case 18 has no handle. (R) The model follows the species' likeliest size (ties to the
+/// smaller); the catch card keeps the size `settle_catch` rolls.
+///
+/// (R) `on_hook` = 1: the client starts the fish at the hook in state 6 (`0x00cd3a70`, +0x10),
+/// and state 4 sends 138/7 past its +0xd9 gate (`0x00b6cbd5`). With 0 the fish starts away from
+/// the hook (`0x00b6d5d4`) and the lure is drawn there, but our hook 138/10 sets +0xd9
+/// (`0x00b6de7c`) and that gate then blocks the reel. Side effect: every escape (138/10 0,0)
+/// shows 'Item Lost', not 'Fish Escaped' (`0x00b6df48`).
+fn fish_run_reply(fish_key: u32, fish: &Species) -> Vec<u8> {
+    let models = &CONTENT.models;
+    let grade = (1..=4)
+        .rev()
+        .max_by_key(|grade| fish.size_weights[grade - 1])
+        .unwrap_or(1);
+    fishing::encode_spawn_fish_run(&FishRun {
+        flag: true, // R
+        model: models.run_header,
+        texture: Vec::new(), // R
+        fish: vec![RunFish {
+            id: fish_key,
+            model: models.fish_by_grade[grade - 1],
+            size_grade: grade as u32,
+            on_hook: true,
+            motion: models.fish_motion,
+            motion_tail: models.fish_motion_tail,
+            ..RunFish::default()
+        }],
+    })
 }
 
 fn update_fish(actor: Handle, fish_key: u32, first: bool, second: bool) -> Vec<u8> {
@@ -1555,6 +1600,7 @@ struct Content {
     source_tags: BTreeMap<String, String>,
     timing: Timing,
     registration: Registration,
+    models: Models,
     sizes: Vec<Size>,
     areas: Vec<Area>,
     species: Vec<Species>,
@@ -1578,6 +1624,32 @@ struct Registration {
     zone_words: [f32; 5],
     integer_values: Vec<u32>,
     source: String,
+}
+
+/// Client model ids and fish motion for 138/8 and 138/18; provenance in `fishing.json`.
+#[derive(Deserialize)]
+struct Models {
+    bobber: i32,
+    run_header: i32,
+    fish_by_grade: [i32; 4],
+    fish_motion: [f32; 10],
+    fish_motion_tail: f32,
+}
+
+impl Models {
+    /// The client looks every id up unchecked, so each must be positive; motion is a sanity
+    /// bound (R), which also refuses NaN and infinities.
+    fn valid(&self) -> bool {
+        [self.bobber, self.run_header]
+            .iter()
+            .chain(&self.fish_by_grade)
+            .all(|id| *id > 0)
+            && self
+                .fish_motion
+                .iter()
+                .chain([&self.fish_motion_tail])
+                .all(|value| (0.0..=100.0).contains(value))
+    }
 }
 
 #[derive(Deserialize)]
@@ -1620,4 +1692,25 @@ struct Lure {
     bonus_percent: u32,
     fish: Vec<String>,
     source: String,
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn model_bounds_refuse_a_zero_id_and_wild_motion() {
+        let mut json: serde_json::Value = serde_json::from_str(CONTENT_JSON).unwrap();
+        let valid = |json: &serde_json::Value| {
+            serde_json::from_value::<Models>(json["models"].clone())
+                .unwrap()
+                .valid()
+        };
+        assert!(valid(&json));
+        json["models"]["fish_by_grade"][2] = 0.into();
+        assert!(!valid(&json));
+        json["models"]["fish_by_grade"][2] = 1672.into();
+        json["models"]["fish_motion_tail"] = 100.5.into();
+        assert!(!valid(&json));
+    }
 }

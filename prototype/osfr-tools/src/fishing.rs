@@ -438,6 +438,116 @@ fn read_blob(body: &[u8], offset: usize) -> Result<(Vec<u8>, usize), Error> {
     ))
 }
 
+fn put_blob(out: &mut Vec<u8>, value: &[u8]) {
+    out.extend((value.len() as u32).to_le_bytes());
+    out.extend(value);
+}
+
+/// Server-to-client `SpawnFishRun` (sub 18). Case 18 (`0x00b6d3ab`) has no handle and acts on
+/// the local player's fishing entry, so it goes to the caster only. It parses through
+/// `0x00b6aed0` (called at `0x00b6d3cb`), which refuses a body the reader `0x00b6a2b0` does not
+/// consume exactly; that reader takes the fields below in order.
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct FishRun {
+    /// +0x0c.
+    pub flag: bool,
+    /// +0x10: the lure drawn at the hook when the head record's `on_hook` is 0 (`loc_B6D9F9`);
+    /// looked up unchecked at `0x00b6da36`, so it must be a real model.
+    pub model: i32,
+    /// +0x14: texture alias string.
+    pub texture: Vec<u8>,
+    /// +0x24: `0x00b694e0` reads an i32 count, then `0x00b67550` per fish.
+    pub fish: Vec<RunFish>,
+}
+
+/// One underwater fish (`0x00b67550`). Its model is looked up unchecked (`0x00b6d4a7`); only
+/// the head record may be `on_hook`, a later one with the byte set is skipped (`0x00b6d4c4`).
+#[derive(Debug, Clone, PartialEq, Default)]
+pub struct RunFish {
+    /// +0x00: the key sub 10 names.
+    pub id: u32,
+    /// +0x04.
+    pub model: i32,
+    /// +0x08 and +0x18: two strings, tint then texture alias (names R).
+    pub tint: Vec<u8>,
+    pub texture: Vec<u8>,
+    /// +0x28: size grade 1..=4.
+    pub size_grade: u32,
+    /// +0x2c: not read by case 18.
+    pub at_2c: u32,
+    /// +0x30: this record is the thing on the hook (name R). Case 18 places it at the bobber
+    /// (`0x00b6d4fe`; others scatter at `0x00b6d5d4`), ties the line to its `hinge_2` bone and
+    /// makes no lure (`0x00b6d81f`..`0x00b6d8e7`). `0x00cd3a70` copies it to the fish's +0x10 and,
+    /// when set, starts the fish in state 6 with +0xdb = 1. State 4 then sends 138/7 without its
+    /// +0xd9 (hooked) gate (`0x00b6cbd5`), and a 138/10 escape shows 'bbe_fishing_item_lost'
+    /// instead of 'bbe_fishing_fish_escaped' (`0x00b6df48`).
+    pub on_hook: bool,
+    /// +0x34..=+0x58, copied onto the fish at `0x00b6d749`.
+    pub motion: [f32; 10],
+    /// +0x5c, read by `0x008d53b0`.
+    pub motion_tail: f32,
+}
+
+pub fn encode_spawn_fish_run(run: &FishRun) -> Vec<u8> {
+    let mut out = frame(Sub::SpawnFishRun, &[]);
+    out.push(u8::from(run.flag));
+    out.extend(run.model.to_le_bytes());
+    put_blob(&mut out, &run.texture);
+    out.extend((run.fish.len() as u32).to_le_bytes());
+    for fish in &run.fish {
+        out.extend(fish.id.to_le_bytes());
+        out.extend(fish.model.to_le_bytes());
+        put_blob(&mut out, &fish.tint);
+        put_blob(&mut out, &fish.texture);
+        out.extend(fish.size_grade.to_le_bytes());
+        out.extend(fish.at_2c.to_le_bytes());
+        out.push(u8::from(fish.on_hook));
+        for value in fish.motion.iter().chain([&fish.motion_tail]) {
+            out.extend(value.to_le_bytes());
+        }
+    }
+    out
+}
+
+impl FishRun {
+    fn decode(body: &[u8]) -> Result<Self, Error> {
+        let flag = *body.first().ok_or(Error::Truncated)? != 0;
+        let model = u32::read(body, 1)? as i32;
+        let (texture, at) = read_blob(body, 5)?;
+        // `0x00b694e0` loops `j < count` on an i32, so a negative count reads no records.
+        let count = u32::read(body, at)? as i32;
+        let mut at = at + 4;
+        let mut fish = Vec::new();
+        for _ in 0..count.max(0) {
+            let (tint, next) = read_blob(body, at + 8)?;
+            let (texture, next) = read_blob(body, next)?;
+            let mut motion = [0.0; 10];
+            for (index, value) in motion.iter_mut().enumerate() {
+                *value = f32::read(body, next + 9 + 4 * index)?;
+            }
+            fish.push(RunFish {
+                id: u32::read(body, at)?,
+                model: u32::read(body, at + 4)? as i32,
+                tint,
+                texture,
+                size_grade: u32::read(body, next)?,
+                at_2c: u32::read(body, next + 4)?,
+                on_hook: *body.get(next + 8).ok_or(Error::Truncated)? != 0,
+                motion,
+                motion_tail: f32::read(body, next + 49)?,
+            });
+            at = next + 53;
+        }
+        exact(body, at)?;
+        Ok(Self {
+            flag,
+            model,
+            texture,
+            fish,
+        })
+    }
+}
+
 /// Server-to-client packets whose native reader was located, plus an opaque
 /// fallback for the sub-opcodes that were not recovered.
 #[derive(Debug, Clone, PartialEq)]
@@ -484,6 +594,10 @@ pub enum ServerPacket {
     /// Sub 14 (`FUN_00b66be0`).
     Result {
         body: ResultBody,
+    },
+    /// Sub 18 (`0x00b6a2b0`).
+    SpawnFishRun {
+        run: FishRun,
     },
     Opaque {
         sub: Sub,
@@ -553,6 +667,9 @@ impl ServerPacket {
             Sub::Result => Self::Result {
                 body: ResultBody::decode(body)?,
             },
+            Sub::SpawnFishRun => Self::SpawnFishRun {
+                run: FishRun::decode(body)?,
+            },
             _ => Self::Opaque {
                 sub,
                 body: body.to_vec(),
@@ -570,6 +687,7 @@ impl ServerPacket {
             Self::DespawnSchool { .. } => Sub::DespawnSchool,
             Self::UpdateSchool { .. } => Sub::UpdateSchool,
             Self::Result { .. } => Sub::Result,
+            Self::SpawnFishRun { .. } => Sub::SpawnFishRun,
             Self::Opaque { sub, .. } => *sub,
         }
     }

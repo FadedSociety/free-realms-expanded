@@ -42,6 +42,36 @@
     "integer_values": [],
     "source": "R: values project into recovered sub-3 fields; originals are unavailable."
   },
+  "models": {
+    "bobber": 1063,
+    "run_header": 1673,
+    "fish_by_grade": [
+      1670,
+      1671,
+      1672,
+      1672
+    ],
+    "fish_motion": [
+      1.5,
+      2.0,
+      2.0,
+      1.0,
+      1.0,
+      3.0,
+      1.0,
+      0.5,
+      3.0,
+      1.0
+    ],
+    "fish_motion_tail": 3.0,
+    "source_tags": {
+      "bobber": "client compiled FishingPlayerConfig default 0x0107b6d0 sets BobberModelId (+0x54) to 0x427; client Models.txt 1063 fishing_bobber_bbe.adr. Sent in 138/8; 0x00ccfdb0 looks it up unchecked",
+      "run_header": "R: 138/18 header model, the lure drawn at the hook and read unchecked at 0x00b6da36 when the head record +0x30 (on_hook) is 0, so unused while we send 1; client Models.txt 1673 sg_fishing_lure_bbe.adr; the lure choice is a hint from Lxzxrus 75f7d95 FishingSession.cs HookLureModelId",
+      "fish_by_grade": "R: client Models.txt 1670 fishing_thin_fish_bbe, 1671 fishing_medium_fish_bbe, 1672 fishing_fat_fish_bbe, for size grades 1-4; the grade pairing is not recovered",
+      "fish_motion": "R: 138/18 record floats +0x34..+0x58 (reader 0x00b67550, copied to the fish at 0x00b6d749); values are a hint from Lxzxrus 37ef175 docs/research/fishing/FISHING_RE_NOTES.md:240-245 ('lively'); integers freeze the fish",
+      "fish_motion_tail": "R: 138/18 record float +0x5c (read by 0x008d53b0); same hint"
+    }
+  },
   "sizes": [
     {
       "grade": 1,

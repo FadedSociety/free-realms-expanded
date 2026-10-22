@@ -1,5 +1,5 @@
 use osfr_tools::fishing::{
-    self, ClientRequest, Error, Handle, Outcome, Phase, ServerPacket, Sub, Vec4, OPCODE,
+    self, ClientRequest, Error, Handle, OPCODE, Outcome, Phase, ServerPacket, Sub, Vec4,
 };
 
 fn handle() -> Handle {
@@ -174,9 +174,71 @@ fn server_layouts_decode_from_native_field_order() {
 
     // Undocumented bodies stay opaque instead of being guessed.
     assert!(matches!(
-        ServerPacket::decode_known(Sub::SpawnFishRun, &[1, 2, 3]).unwrap(),
+        ServerPacket::decode_known(Sub::SpawnSchool, &[1, 2, 3]).unwrap(),
         ServerPacket::Opaque { .. }
     ));
+}
+
+#[test]
+fn spawn_fish_run_matches_the_client_reader_byte_for_byte() {
+    // Reader chain: 0x00b6a2b0 header, 0x00b694e0 count, 0x00b67550 per fish, 0x008d53b0 tail.
+    let motion = [1.5f32, 2.0, 2.0, 1.0, 1.0, 3.0, 1.0, 0.5, 3.0, 1.0];
+    let run = fishing::FishRun {
+        flag: true,
+        model: 1673,
+        texture: Vec::new(),
+        fish: vec![fishing::RunFish {
+            id: 0x0102_0304,
+            model: 1671,
+            size_grade: 2,
+            on_hook: true,
+            motion,
+            motion_tail: 3.0,
+            ..Default::default()
+        }],
+    };
+    let mut expected = vec![0x8a, 0, 18, 0];
+    expected.push(1); // u8 flag (+0x0c)
+    expected.extend(1673i32.to_le_bytes()); // header model (+0x10)
+    expected.extend(0i32.to_le_bytes()); // empty texture string (+0x14)
+    expected.extend(1i32.to_le_bytes()); // record count
+    assert_eq!(expected.len(), 17);
+    expected.extend(0x0102_0304u32.to_le_bytes()); // fish id (+0x00)
+    expected.extend(1671i32.to_le_bytes()); // model (+0x04)
+    expected.extend(0i32.to_le_bytes()); // empty string (+0x08)
+    expected.extend(0i32.to_le_bytes()); // empty string (+0x18)
+    expected.extend(2i32.to_le_bytes()); // size grade (+0x28)
+    expected.extend(0i32.to_le_bytes()); // +0x2c
+    expected.push(1); // on_hook (+0x30)
+    for value in motion.iter().chain([&3.0f32]) {
+        expected.extend(value.to_le_bytes()); // +0x34..=+0x5c
+    }
+    assert_eq!(expected.len(), 17 + 69);
+
+    assert_eq!(fishing::encode_spawn_fish_run(&run), expected);
+    let body = &expected[4..];
+    assert_eq!(
+        ServerPacket::decode_known(Sub::SpawnFishRun, body).unwrap(),
+        ServerPacket::SpawnFishRun { run }
+    );
+    // 0x00b6aed0 refuses a body the reader does not consume exactly.
+    let mut trailing = body.to_vec();
+    trailing.push(0);
+    assert!(matches!(
+        ServerPacket::decode_known(Sub::SpawnFishRun, &trailing),
+        Err(Error::TrailingBytes)
+    ));
+    assert!(matches!(
+        ServerPacket::decode_known(Sub::SpawnFishRun, &body[..body.len() - 1]),
+        Err(Error::Truncated)
+    ));
+    // 0x00b694e0 loops `j < count` on an i32: a negative count is an empty list, not a refusal.
+    let mut negative = body[..9].to_vec();
+    negative.extend((-1i32).to_le_bytes());
+    match ServerPacket::decode_known(Sub::SpawnFishRun, &negative).unwrap() {
+        ServerPacket::SpawnFishRun { run } => assert!(run.fish.is_empty()),
+        packet => panic!("expected a fish run, got {packet:?}"),
+    }
 }
 
 #[test]

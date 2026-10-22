@@ -1283,7 +1283,7 @@ mod gateway_route {
         }
         body.push(0);
         let cast = send_at(&mut g, &request(6, &body), NOW + 10);
-        assert_eq!(ids(&cast), vec![(138, 8)]);
+        assert_eq!(ids(&cast), vec![(138, 8), (138, 18)]);
         let bite = tick(&mut g, NOW + 1_600);
         assert!(
             ids(&bite).contains(&(138, 10)),

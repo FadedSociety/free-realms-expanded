@@ -376,7 +376,6 @@ fn decode_known_enforces_the_decoder_body_bound() {
         Sub::RegisterPlayerResponse,
         Sub::SpawnSchool,
         Sub::SpecialResponse,
-        Sub::SpawnFishRun,
     ] {
         match ServerPacket::decode_known(sub, &[1, 2, 3]).unwrap() {
             ServerPacket::Opaque { sub: got, body } => {

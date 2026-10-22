@@ -1,5 +1,5 @@
 use osfr_tools::{
-    fishing::{Handle, Phase, ServerPacket, Sub, Vec4},
+    fishing::{Error, FishRun, Handle, Phase, ServerPacket, Sub, Vec4},
     fishing_service::{Change, FishingService},
     inventory::Inventory,
     profiles::ProfileState,
@@ -197,7 +197,7 @@ fn registration_cast_bite_reel_catch_has_exact_messages_and_one_item() {
     );
 
     let cast = service.handle(&cast_request(), PLAYER, T0 + 10).unwrap();
-    assert_eq!(packet_ids(&cast), vec![(138, 8)]);
+    assert_eq!(packet_ids(&cast), vec![(138, 8), (138, 18)]);
     let bite = service.tick(PLAYER, T0 + 1510).unwrap();
     assert_eq!(packet_ids(&bite), vec![(138, 10)]);
     assert_eq!(service.phase(PLAYER), Some(Phase::Hook));
@@ -234,6 +234,85 @@ fn registration_cast_bite_reel_catch_has_exact_messages_and_one_item() {
             },
             QuestEvent::FinishMinigame { minigame_id: 595 }
         ]
+    );
+}
+
+/// The production path: `FishingService::route` with the player's live inventory and profiles.
+fn route(
+    service: &mut FishingService,
+    fixture: &InventoryFixture,
+    packet: &[u8],
+    now: u64,
+) -> Result<Change, Error> {
+    let live = fixture.reward_state();
+    service
+        .route(PLAYER, packet, now, &live.inventory, &live.profiles)
+        .map(|change| change.expect("a fishing packet"))
+}
+
+fn fish_run(change: &Change) -> FishRun {
+    match ServerPacket::decode_known(Sub::SpawnFishRun, &change.replies[1][4..]).unwrap() {
+        ServerPacket::SpawnFishRun { run } => run,
+        packet => panic!("expected a fish run, got {packet:?}"),
+    }
+}
+
+#[test]
+fn a_cast_spawns_the_bobber_model_and_the_fish_the_bite_names() {
+    let (fixture, mut service) = running();
+    route(&mut service, &fixture, &register_request(), T0).unwrap();
+    let cast = route(&mut service, &fixture, &cast_request(), T0 + 10).unwrap();
+    assert_eq!(packet_ids(&cast), vec![(138, 8), (138, 18)]);
+    match ServerPacket::decode_known(Sub::SpawnBobber, &cast.replies[0][4..]).unwrap() {
+        ServerPacket::SpawnBobber { code, .. } => assert_eq!(
+            code, 1063,
+            "the bobber model (client 0x0107b6d0 +0x54); 0x00ccfdb0 looks it up unchecked"
+        ),
+        packet => panic!("expected a bobber, got {packet:?}"),
+    }
+    let run = fish_run(&cast);
+    assert_eq!(run.fish.len(), 1, "one fish per attempt");
+    let fish = &run.fish[0];
+    assert!(
+        fish.on_hook,
+        "the record starts on the hook, so state 4 sends 138/7 past the +0xd9 gate (0x00b6cbd5)"
+    );
+    assert!((1..=4).contains(&fish.size_grade));
+    assert!(
+        run.model > 0 && fish.model > 0,
+        "the client looks both up unchecked"
+    );
+
+    let bite = service
+        .supervise(PLAYER, 0, [0.0; 3], T0 + 1_510)
+        .unwrap()
+        .unwrap();
+    match ServerPacket::decode_known(Sub::UpdateBobber, &bite.replies[0][4..]).unwrap() {
+        ServerPacket::UpdateBobber { code, .. } => assert_eq!(code, fish.id),
+        packet => panic!("expected a bite, got {packet:?}"),
+    }
+
+    // After an escape the next cast gets a fresh run for its own fish.
+    let escaped = route(&mut service, &fixture, &reel_request(), T0 + 1_520).unwrap();
+    assert_eq!(packet_ids(&escaped), vec![(138, 10), (138, 14)]);
+    let again = route(&mut service, &fixture, &cast_request(), T0 + 2_000).unwrap();
+    assert_eq!(packet_ids(&again), vec![(138, 8), (138, 18)]);
+    assert_ne!(fish_run(&again).fish[0].id, fish.id);
+}
+
+#[test]
+fn a_refused_cast_sends_nothing_and_changes_nothing() {
+    let (fixture, mut service) = running();
+    route(&mut service, &fixture, &register_request(), T0).unwrap();
+    let mut twin = service.clone();
+    let far = fishing_packets::cast_at(ACTOR, [0.0, 0.0, 0.0], 500.0);
+    assert!(route(&mut service, &fixture, &far, T0 + 10).is_err());
+    assert_eq!(service.phase(PLAYER), Some(Phase::Idle));
+    // The refused service answers the next good cast exactly like its untouched twin, so the
+    // attempt and the cast sequence (the fish id) were not consumed.
+    assert_eq!(
+        route(&mut service, &fixture, &cast_request(), T0 + 20).unwrap(),
+        route(&mut twin, &fixture, &cast_request(), T0 + 20).unwrap()
     );
 }
 
