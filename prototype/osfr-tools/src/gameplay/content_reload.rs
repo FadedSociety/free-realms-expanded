@@ -34,7 +34,13 @@ impl Gameplay {
         Ok(done)
     }
 
-    fn reload_content_in_place(&mut self, what: &str, out: &mut Outcome) -> io::Result<String> {
+    /// Loads in place with no rollback: only `reload_content` runs it on live
+    /// state. `pub(super)` so the protected regression can read what a refusal drops.
+    pub(super) fn reload_content_in_place(
+        &mut self,
+        what: &str,
+        out: &mut Outcome,
+    ) -> io::Result<String> {
         let dir = self.content_dir.clone();
         let mut done = Vec::new();
         let all = what == "all";
@@ -191,6 +197,8 @@ mod tests {
         live.absorb(Outcome::default());
         assert!(live.dev_command_denied && live.changed);
         assert!(live.shared_field.is_some() && live.zoning.is_some());
+        assert!(live.scene_zoning.is_some() && live.relocation.is_some());
+        assert!(live.group_heal.is_some());
         assert!(
             live.broadcast.is_some() && live.admin_move.is_some(),
             "an empty outcome wiped the notice or the move"

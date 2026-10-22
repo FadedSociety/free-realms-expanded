@@ -1999,7 +1999,12 @@ fn refused_reload_all_keeps_behaviour_and_shared_field_state() {
     let mut game = Gameplay::load(&reference, None).unwrap();
     game.set_dev_tools(true);
     game.set_role(crate::account_store::AccountRole::Admin);
-    let profile = game.profiles.as_ref().unwrap().active();
+    // A combat job: a noncombat job's bar is eight empty slots whatever the
+    // file says, so its packets could not show a staged load.
+    let profile = 11;
+    let profiles = game.profiles.as_mut().unwrap();
+    profiles.unlock(profile).unwrap();
+    profiles.activate(profile).unwrap();
     let level = game.job_level(profile);
     let before_abilities = game
         .abilities
@@ -2007,21 +2012,12 @@ fn refused_reload_all_keeps_behaviour_and_shared_field_state() {
         .unwrap()
         .job_bar(profile, level)
         .map(|slot| slot.map(|ability| ability.definition_id));
-    let before_activation = game
-        .abilities
-        .as_ref()
-        .unwrap()
-        .activation(profile, level)
-        .unwrap();
-    let shared = game.take_shared_fields().expect("shipped field enemies");
-    let actors = |shared: &crate::encounter::SharedFieldState| {
-        shared
-            .interest_candidates(false)
-            .into_iter()
-            .map(|npc| (npc.guid, npc.position, npc.engaged))
-            .collect::<Vec<_>>()
-    };
-    let before_actors = actors(&shared);
+    let before_activation = game.ability_activation_for(profile).unwrap();
+    // The world owns the field from here, so the enemies step refuses. The
+    // detached runtime is out of the reload's reach (`&mut self` only); the
+    // shared-field state it can reach is the engine's guid list and the
+    // behaviour table the shared enemies tick with (`field.rs` `behaviour_of`).
+    game.take_shared_fields().expect("shipped field enemies");
     let before_guid_order = game
         .encounter
         .as_ref()
@@ -2073,6 +2069,28 @@ fn refused_reload_all_keeps_behaviour_and_shared_field_state() {
     .unwrap();
     game.content_dir = dir.to_path_buf();
 
+    // The staging step on a clone: the abilities and behaviour loads run
+    // before the enemies step refuses, so the refusal below has real staged
+    // packets and a staged behaviour to drop.
+    let mut staged = game.clone();
+    let mut staged_out = Outcome::default();
+    assert!(
+        staged
+            .reload_content_in_place("all", &mut staged_out)
+            .is_err()
+    );
+    assert_eq!(
+        staged_out.replies,
+        staged.ability_activation_for(profile).unwrap(),
+        "the staged outcome carries the authored bar's activation packets"
+    );
+    assert_ne!(staged_out.replies, before_activation);
+    assert_ne!(
+        staged.encounter.as_ref().unwrap().behaviour(GROUPED_WOLF),
+        Some(&before_behaviour),
+        "the behaviour load ran before the refusal"
+    );
+
     let mut queued = Outcome::default();
     queued.replies.push(vec![0xde, 0xad]);
     let queued_before = queued.replies.clone();
@@ -2100,7 +2118,6 @@ fn refused_reload_all_keeps_behaviour_and_shared_field_state() {
         )]
     );
     assert!(!refused.changed);
-    assert_eq!(actors(&shared), before_actors);
     assert_eq!(
         game.encounter
             .as_ref()
@@ -2123,11 +2140,7 @@ fn refused_reload_all_keeps_behaviour_and_shared_field_state() {
         "a refused reload must not publish the staged job abilities"
     );
     assert_eq!(
-        game.abilities
-            .as_ref()
-            .unwrap()
-            .activation(profile, level)
-            .unwrap(),
+        game.ability_activation_for(profile).unwrap(),
         before_activation,
         "the live hotbar packets are unchanged"
     );
