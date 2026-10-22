@@ -626,6 +626,24 @@ impl Inventory {
             .expect("visible owned definitions are present in the startup catalogue")
     }
 
+    /// `profile`'s weapon (slot 7) definition's client wield type, 0 when the slot is empty or
+    /// the item or definition is missing. Same join as `abilities::equipped_weapon_matches`;
+    /// never reads `EquippedItem.category` as a class. Negative content values clamp to 0.
+    pub fn equipped_wield_type(&self, profile: i32) -> i32 {
+        self.state
+            .equipment
+            .iter()
+            .find(|e| e.profile_id == profile && e.slot == 7)
+            .and_then(|e| {
+                self.state
+                    .items
+                    .iter()
+                    .find(|i| i.id == e.item_id && i.count > 0)
+            })
+            .and_then(|item| self.content.definitions.get(&item.definition_id))
+            .map_or(0, |definition| definition.wield_type.max(0))
+    }
+
     /// Native CharacterAttachmentData list for a complete class outfit.
     pub fn profile_attachments(&self, profile_id: i32) -> io::Result<Vec<u8>> {
         let visible = self.client_visible_state();

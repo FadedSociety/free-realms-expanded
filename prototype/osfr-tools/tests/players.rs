@@ -661,6 +661,9 @@ fn oversized_and_invalid_presentations_are_rejected_without_joining() {
     let mut negative_speed = PlayerPresentation::default();
     negative_speed.character_guid = 1001;
     negative_speed.max_movement_speed = -1.0;
+    let mut negative_wield = PlayerPresentation::default();
+    negative_wield.character_guid = 1001;
+    negative_wield.wield_type = -1;
     let mut mismatched_character = PlayerPresentation::default();
     mismatched_character.character_guid = 1002;
 
@@ -670,6 +673,7 @@ fn oversized_and_invalid_presentations_are_rejected_without_joining() {
         invalid_attachment_text,
         non_finite_speed,
         negative_speed,
+        negative_wield,
         mismatched_character,
     ] {
         let mut registry = registry(20.0, 10);

@@ -1565,6 +1565,7 @@ struct AddPc {
     last: String,
     model: i32,
     active_profile: i32,
+    wield_type: i32,
 }
 
 fn read_len_string(bytes: &[u8], at: &mut usize) -> Option<String> {
@@ -1582,7 +1583,8 @@ fn read_len_string(bytes: &[u8], at: &mut usize) -> Option<String> {
 /// `0x008d6830`; guid +16, names via `0x008e7290`, model +160, active profile
 /// +364): header, guid, three name ids, first/last name, model, three bubble
 /// fields, pose, attachments, the appearance block, speed and flags, temporary
-/// model, guild, active profile. `players.rs::build_add_pc` writes that order.
+/// model, guild, active profile, titles, effects, the mount block and the wield
+/// type (+420, `0x0091aee4`). `players.rs::build_add_pc` writes that order.
 /// (R) The parser assumes the guild and effect rows are empty, as the current
 /// writer emits them.
 fn parse_add_pc(message: &[u8]) -> Option<AddPc> {
@@ -1609,12 +1611,15 @@ fn parse_add_pc(message: &[u8]) -> Option<AddPc> {
     read_len_string(body, &mut at)?; // model customisation
     at += 4 + 3 + 4 + 4; // speed, three flags, temporary model, guild
     let active_profile = i32::from_le_bytes(body.get(at..at + 4)?.try_into().ok()?);
+    at += 4 + 16 + 4 + 20; // profile, four title dwords, effect count, mount block
+    let wield_type = i32::from_le_bytes(body.get(at..at + 4)?.try_into().ok()?);
     Some(AddPc {
         character_guid,
         first,
         last,
         model,
         active_profile,
+        wield_type,
     })
 }
 
@@ -2825,4 +2830,280 @@ fn the_social_loop_uses_no_dev_commands() {
     settle(&mut server, &mut [&mut second, &mut relogged]);
     assert_eq!(server.active_session_count(), 2);
     assert_no_dev_commands(&[&first, &second, &relogged]);
+}
+
+// ---------------------------------------------------------------------------
+// T405: the AddPc wield type. Spawn hands AddPc +0x1a4 (reader `0x0091aee4`)
+// to the actor's wield setter `0x009582c0` (`0x009300f6`), the same setter the
+// live 35/6 trailing dword reaches (`0x009315a9`). A late joiner must get the
+// active job's equipped weapon value, never the old 0.
+// ---------------------------------------------------------------------------
+
+/// The opening fixture's `inventory.json` wield types: the Brawler hammer 75030
+/// its saved Brawler weapon slot holds, and the Medic starter weapon 4622.
+const BRAWLER_WIELD: i32 = 13;
+const MEDIC_WIELD: i32 = 14;
+
+/// Every AddPc about `guid` in `messages`, in arrival order.
+fn add_pcs(messages: &[Vec<u8>], guid: u64) -> Vec<AddPc> {
+    messages
+        .iter()
+        .filter_map(|message| parse_add_pc(message))
+        .filter(|add| add.character_guid == guid)
+        .collect()
+}
+
+/// The trailing wield dword of every 35/6 about `guid` (reader `0x0090a1f0`,
+/// packet +0x1ec), in arrival order.
+fn equip_change_wields(messages: &[Vec<u8>], guid: u64) -> Vec<i32> {
+    messages
+        .iter()
+        .filter_map(|message| family_body(message, 35, 6))
+        .filter(|body| body.get(4..12) == Some(guid.to_le_bytes().as_slice()))
+        .map(|body| i32::from_le_bytes(body[body.len() - 4..].try_into().unwrap()))
+        .collect()
+}
+
+/// The item id saved in `guid`'s `profile` equipment `slot`.
+fn saved_equipped(temp: &TempDir, guid: u64, profile: i32, slot: i32) -> i32 {
+    save_json(temp, guid)["gameplay"]["inventory"]["equipment"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|entry| entry["profile_id"] == json!(profile) && entry["slot"] == json!(slot))
+        .and_then(|entry| entry["item_id"].as_i64())
+        .map(|id| i32::try_from(id).unwrap())
+        .expect("the saved equipment row")
+}
+
+/// 42/3 equip by item id: item, profile, slot.
+fn equip(item: i32, profile: i32, slot: i32) -> Vec<u8> {
+    [
+        [42, 0, 3, 0],
+        item.to_le_bytes(),
+        profile.to_le_bytes(),
+        slot.to_le_bytes(),
+    ]
+    .concat()
+}
+
+/// A (guid 2) logs in and becomes a Brawler; then B (guid 3) logs in beside A.
+/// Returns both clients and B's login messages.
+fn brawler_and_viewer(
+    server: &mut Server,
+    temp: &TempDir,
+    store: &Path,
+) -> (Client, Client, Vec<Vec<u8>>) {
+    let version = field_version();
+    let (mut a, _) = log_in_version_batched(server, 4051, 2, store, &version);
+    settle(server, &mut [&mut a]);
+    become_brawler(&mut a, server, temp, 2);
+    settle(server, &mut [&mut a]);
+    let (mut b, mut b_login) = log_in_version_batched(server, 4052, 3, store, &version);
+    b_login.extend(settle(server, &mut [&mut a, &mut b]).swap_remove(1));
+    (a, b, b_login)
+}
+
+#[test]
+fn a_late_joiner_sees_the_equipped_weapon_wield_type() {
+    let temp = TempDir::new();
+    let content = PlaytestContent::new();
+    let (mut server, store) = start_field_server(&temp, content.path());
+    let (_a, _b, b_login) = brawler_and_viewer(&mut server, &temp, &store);
+    let seen = add_pcs(&b_login, 2);
+    assert_eq!(seen.len(), 1, "one AddPc for the armed player");
+    assert_eq!(seen[0].active_profile, T335_BRAWLER);
+    assert_eq!(
+        seen[0].wield_type, BRAWLER_WIELD,
+        "the late joiner saw the Brawler unarmed"
+    );
+    assert!(
+        equip_change_wields(&b_login, 2).is_empty(),
+        "the late joiner needed a 35/6 correction"
+    );
+}
+
+#[test]
+fn the_live_equip_path_and_initial_addpc_agree() {
+    let temp = TempDir::new();
+    let content = PlaytestContent::new();
+    let (mut server, store) = start_field_server(&temp, content.path());
+    let (mut a, mut b, _) = brawler_and_viewer(&mut server, &temp, &store);
+    let hammer = saved_equipped(&temp, 2, T335_BRAWLER, 7);
+    let unequip = [
+        [42, 0, 2, 0],
+        7i32.to_le_bytes(),
+        T335_BRAWLER.to_le_bytes(),
+    ]
+    .concat();
+    app(&mut a, &mut server, &unequip);
+    app(&mut a, &mut server, &equip(hammer, T335_BRAWLER, 7));
+    let viewed = settle(&mut server, &mut [&mut a, &mut b]).swap_remove(1);
+    let live = equip_change_wields(&viewed, 2);
+    assert_eq!(live, [0, BRAWLER_WIELD], "B's live 35/6 unequip then equip");
+
+    let (mut c, mut c_login) =
+        log_in_version_batched(&mut server, 4053, 1, &store, &field_version());
+    c_login.extend(settle(&mut server, &mut [&mut a, &mut b, &mut c]).swap_remove(2));
+    let seen = add_pcs(&c_login, 2);
+    assert_eq!(seen.len(), 1);
+    assert_eq!(
+        seen[0].wield_type, live[1],
+        "the AddPc disagrees with the live 35/6"
+    );
+}
+
+#[test]
+fn an_inactive_jobs_weapon_does_not_change_the_public_wield_type() {
+    let temp = TempDir::new();
+    let content = PlaytestContent::new();
+    let (mut server, store) = start_field_server(&temp, content.path());
+    let version = field_version();
+    let (mut a, _) = log_in_version_batched(&mut server, 4054, 2, &store, &version);
+    settle(&mut server, &mut [&mut a]);
+    let active = save_json(&temp, 2)["gameplay"]["profiles"]["active"].clone();
+    assert_ne!(active, json!(T335_BRAWLER));
+    assert_ne!(
+        saved_equipped(&temp, 2, T335_BRAWLER, 7),
+        0,
+        "the inactive Brawler holds its hammer"
+    );
+    let (mut b, mut b_login) = log_in_version_batched(&mut server, 4055, 3, &store, &version);
+    b_login.extend(settle(&mut server, &mut [&mut a, &mut b]).swap_remove(1));
+    let seen = add_pcs(&b_login, 2);
+    assert_eq!(seen.len(), 1);
+    assert_eq!(json!(seen[0].active_profile), active);
+    assert_eq!(seen[0].wield_type, 0, "an inactive job's weapon leaked");
+}
+
+#[test]
+fn the_wield_type_survives_save_and_relog() {
+    let temp = TempDir::new();
+    let content = PlaytestContent::new();
+    let (mut server, store) = start_field_server(&temp, content.path());
+    let (a, mut b, _) = brawler_and_viewer(&mut server, &temp, &store);
+    disconnect(&a, &mut server);
+    settle(&mut server, &mut [&mut b]);
+    assert!(
+        !save_json(&temp, 2).to_string().contains("wield"),
+        "the wield type is derived, never persisted"
+    );
+    let (mut a, _) = log_in_version_batched(&mut server, 4056, 2, &store, &field_version());
+    let viewed = settle(&mut server, &mut [&mut a, &mut b]).swap_remove(1);
+    let seen = add_pcs(&viewed, 2);
+    assert_eq!(seen.len(), 1, "B meets the relogged Brawler once");
+    assert_eq!(seen[0].wield_type, BRAWLER_WIELD);
+}
+
+#[test]
+fn a_refused_equip_does_not_change_the_public_wield_type() {
+    let temp = TempDir::new();
+    let content = PlaytestContent::new();
+    let (mut server, store) = start_field_server(&temp, content.path());
+    let (mut a, mut b, b_login) = brawler_and_viewer(&mut server, &temp, &store);
+    let raw_add_pc = |messages: &[Vec<u8>]| -> Vec<Vec<u8>> {
+        messages
+            .iter()
+            .filter(|message| parse_add_pc(message).is_some_and(|add| add.character_guid == 2))
+            .cloned()
+            .collect()
+    };
+    let before = raw_add_pc(&b_login);
+    assert_eq!(before.len(), 1);
+    let saved = save_json(&temp, 2);
+    let shirt = saved_equipped(&temp, 2, T335_BRAWLER, 3);
+    assert_ne!(shirt, 0);
+    // An unowned item, then an owned shirt, into the weapon slot.
+    app(&mut a, &mut server, &equip(999_999, T335_BRAWLER, 7));
+    app(&mut a, &mut server, &equip(shirt, T335_BRAWLER, 7));
+    let viewed = settle(&mut server, &mut [&mut a, &mut b]).swap_remove(1);
+    assert!(equip_change_wields(&viewed, 2).is_empty());
+    assert_eq!(server.active_session_count(), 2);
+    assert_eq!(
+        save_json(&temp, 2),
+        saved,
+        "a refused equip changed the save"
+    );
+
+    let (mut c, mut c_login) =
+        log_in_version_batched(&mut server, 4057, 1, &store, &field_version());
+    c_login.extend(settle(&mut server, &mut [&mut a, &mut b, &mut c]).swap_remove(2));
+    assert_eq!(raw_add_pc(&c_login), before, "the next AddPc changed");
+}
+
+#[test]
+fn two_players_keep_their_own_wield_type() {
+    let temp = TempDir::new();
+    let content = PlaytestContent::new();
+    seed_second_character(&temp, content.path(), T335_MEDIC, false);
+    let (mut server, store) = start_field_server(&temp, content.path());
+    let (mut a, mut b, _) = brawler_and_viewer(&mut server, &temp, &store);
+    become_job(&mut b, &mut server, &temp, 3, T335_MEDIC);
+    settle(&mut server, &mut [&mut a, &mut b]);
+    let (mut c, mut c_login) =
+        log_in_version_batched(&mut server, 4058, 1, &store, &field_version());
+    c_login.extend(settle(&mut server, &mut [&mut a, &mut b, &mut c]).swap_remove(2));
+    let wields = |guid| {
+        add_pcs(&c_login, guid)
+            .iter()
+            .map(|add| add.wield_type)
+            .collect::<Vec<_>>()
+    };
+    assert_eq!(wields(2), [BRAWLER_WIELD]);
+    assert_eq!(wields(3), [MEDIC_WIELD]);
+}
+
+/// The accessor behind AddPc fails to 0: an empty weapon slot, a default-state
+/// weapon whose definition the catalogue lacks (the load keeps that link, R),
+/// and a negative content value. Inventory owns the lookup, so its content is
+/// what this edits.
+#[test]
+fn no_weapon_unknown_definition_and_negative_values_are_zero() {
+    use osfr_tools::inventory::Inventory;
+    let fixture = RewardFixture::minimal(Vec::new(), &[]);
+    let path = fixture.dir().join("inventory.json");
+    let mut catalogue: serde_json::Value =
+        serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    let load = |catalogue: &serde_json::Value| {
+        fs::write(&path, serde_json::to_vec(catalogue).unwrap()).unwrap();
+        Inventory::load(fixture.dir(), None).unwrap()
+    };
+    let initial = load(&catalogue);
+    assert_eq!(initial.equipped_wield_type(T335_BRAWLER), BRAWLER_WIELD);
+    assert_eq!(
+        initial.equipped_wield_type(T335_MEDIC),
+        0,
+        "an empty weapon slot"
+    );
+    assert_eq!(initial.equipped_wield_type(-1), 0, "an unknown profile");
+
+    for row in catalogue["definitions"].as_array_mut().unwrap() {
+        if row["id"] == json!(75_030) {
+            row["wield_type"] = json!(-3);
+        }
+    }
+    assert_eq!(load(&catalogue).equipped_wield_type(T335_BRAWLER), 0);
+
+    // The default state's Brawler weapon is item 4235 (definition 13658).
+    catalogue["initial_state"] = serde_json::Value::Null;
+    catalogue["definitions"]
+        .as_array_mut()
+        .unwrap()
+        .retain(|row| row["id"] != json!(13_658));
+    let defaults = load(&catalogue);
+    assert_eq!(
+        defaults
+            .state()
+            .equipment
+            .iter()
+            .find(|entry| entry.profile_id == T335_BRAWLER && entry.slot == 7)
+            .map(|entry| entry.item_id),
+        Some(4235)
+    );
+    assert_eq!(defaults.equipped_wield_type(T335_BRAWLER), 0);
+    assert_eq!(
+        defaults.equipped_wield_type(2),
+        9,
+        "a known weapon still reads"
+    );
 }

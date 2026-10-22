@@ -64,6 +64,9 @@ pub struct PlayerPresentation {
     pub referee: bool,
     pub active_profile: i32,
     pub attachments_wire: Vec<u8>,
+    /// The active job's slot-7 weapon definition's wield type (`Inventory::equipped_wield_type`),
+    /// 0 without a weapon; `validate` refuses negatives. Late joiners get it through
+    /// `set_presentation`; current viewers get the live 35/6.
     pub wield_type: i32,
 }
 
@@ -660,6 +663,7 @@ impl PlayerPresentation {
         if self.character_guid != character_guid
             || !self.max_movement_speed.is_finite()
             || self.max_movement_speed < 0.0
+            || self.wield_type < 0
         {
             return Err(RegistryError::InvalidPresentation);
         }

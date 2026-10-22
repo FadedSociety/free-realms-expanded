@@ -1024,8 +1024,7 @@ impl Gateway {
 
     /// The public look other players get in AddPc (Build Plan 1.3), from the
     /// same identity, profile and inventory inputs as `build_self_message`.
-    /// (R) Name ids stay zero (literal-name mode); speed and wield type keep
-    /// the players.rs defaults until those are server-owned.
+    /// (R) Name ids stay zero (literal-name mode); speed keeps the players.rs default.
     /// See `Gameplay::public_look` (W143 Inspect).
     pub fn public_look(&self) -> Option<crate::player_radial::PublicLook> {
         self.gameplay.as_ref()?.public_look()
@@ -1059,6 +1058,7 @@ impl Gateway {
         look.active_profile = profile;
         if let Some(game) = &self.gameplay {
             look.attachments_wire = game.profile_attachments(profile)?;
+            look.wield_type = game.public_wield_type(profile);
         }
         Ok(look)
     }

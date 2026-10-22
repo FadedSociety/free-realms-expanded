@@ -36,4 +36,10 @@ impl Gameplay {
         out.nearby.push(self.profile_switch_packet(guid, &after));
         Ok(())
     }
+
+    /// AddPc wield type for `profile` (reader `0x0091aee4`; spawn calls the actor's wield setter
+    /// `0x009582c0` at `0x009300f6`, as 35/6 does at `0x009315a9`).
+    pub fn public_wield_type(&self, profile: i32) -> i32 {
+        self.inventory.equipped_wield_type(profile)
+    }
 }
