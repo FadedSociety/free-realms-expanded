@@ -583,3 +583,62 @@ fn moderation_audit_has_ids_only() {
         json!(UNTIL_LIFTED)
     );
 }
+
+/// L048: the [underage, member, referee] bytes of each AddPc (35/1) for `guid`. Client reader
+/// 0091ad4a-0091ada2: they follow the f32 speed and sit 72 fixed bytes before the end.
+fn add_pc_flags(messages: &[Vec<u8>], guid: u64) -> Vec<[u8; 3]> {
+    let mut head = vec![35, 0, 1, 0];
+    head.extend(guid.to_le_bytes());
+    let mut flags = Vec::new();
+    for message in messages {
+        for at in (4..message.len()).filter(|at| message[*at..].starts_with(&head)) {
+            let end = at + u32::from_le_bytes(message[at - 4..at].try_into().unwrap()) as usize;
+            assert_eq!(
+                message[end - 79..end - 75],
+                10f32.to_le_bytes(),
+                "speed anchor"
+            );
+            flags.push(message[end - 75..end - 72].try_into().unwrap());
+        }
+    }
+    flags
+}
+
+/// L048: other players see the referee flag for moderators and admins only (AddPc 0091ada2 sets
+/// actor +0x140 bit 0x20 through 008dc9a0; OnReceiveSay 009013a2 and OnReceiveWhisper 00b11e35
+/// pass it to the chat log as `isRef`). It is fixed at login, so a role change shows at the next
+/// login, which a kick forces.
+#[test]
+fn addpc_referee_flag_is_the_login_role() {
+    let files = Files::new("referee");
+    let mut rig = Rig::new(&files);
+    let pip = rig.join(PIP).unwrap();
+    let ada = rig.join(ADA).unwrap();
+    for index in [MO, BEA, QUILL] {
+        rig.join(index).unwrap();
+    }
+    let seen = rig.drain(pip);
+    for (index, referee) in [(ADA, 1), (MO, 1), (BEA, 0), (QUILL, 0)] {
+        assert_eq!(
+            add_pc_flags(&seen, guid(index)),
+            [[0, 0, referee]],
+            "{index}"
+        );
+    }
+    // Demote the moderator and promote the builder while both stay online: nothing is re-sent.
+    for text in ["realm role 2 player", "realm role 5 moderator"] {
+        assert!(said(&rig.command(ada, text), "Account role saved."));
+    }
+    let seen = rig.drain(pip);
+    assert!(add_pc_flags(&seen, guid(MO)).is_empty() && add_pc_flags(&seen, guid(BEA)).is_empty());
+    for (index, name, referee) in [(MO, "Mo Moderator", 0), (BEA, "Bea Builder", 1)] {
+        let kick = format!("realm kick {name}");
+        assert!(said(&rig.command(ada, &kick), "Player kicked."));
+        rig.step();
+        rig.join(index).unwrap();
+        assert_eq!(
+            add_pc_flags(&rig.drain(pip), guid(index)),
+            [[0, 0, referee]]
+        );
+    }
+}

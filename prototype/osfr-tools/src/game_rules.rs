@@ -299,15 +299,12 @@ pub fn encode_membership_activation(kind: i16, is_member: bool) -> Vec<u8> {
     tunnel(&inner)
 }
 
-/// Encode opcode 0xbd's opaque i16 and two raw boolean fields. Their client
-/// storage offsets are known, but their meanings are not.
-pub fn encode_membership_service_flags(kind: i16, flag_a: bool, flag_b: bool) -> Vec<u8> {
-    let mut inner = Vec::with_capacity(6);
-    inner.extend_from_slice(&189u16.to_le_bytes());
-    inner.extend_from_slice(&kind.to_le_bytes());
-    inner.push(u8::from(flag_a));
-    inner.push(u8::from(flag_b));
-    tunnel(&inner)
+/// Encode PacketMembershipSubscriptionInfo (opcode 189). Client reader 008d6600 reads the i16
+/// opcode, then two bool bytes; 008f7300 refuses unread trailing bytes. Dispatch 00949a01
+/// stores them at ClientPcData +0x468 and +0x469. `Ui.IsPlayerLifetimeMember` (00c199e0)
+/// reads +0x468; nothing in the client reads +0x469, which OSFR names IsReferee (R).
+pub fn encode_membership_subscription_info(lifetime_member: bool, referee: bool) -> Vec<u8> {
+    tunnel(&[189, 0, u8::from(lifetime_member), u8::from(referee)])
 }
 
 fn tunnel(inner: &[u8]) -> Vec<u8> {

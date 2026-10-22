@@ -174,3 +174,18 @@ fn a_fishing_payout_that_crosses_a_job_level_goal_credits_it_at_once() {
         "the payout outcome carries the 49/10 completion"
     );
 }
+
+/// L059 (the L052 replay's one conflict): a minigame payout reloads the saved progression
+/// through `Profiles::adopt`, so the session's staff jobs (never saved) survive it.
+#[test]
+fn a_fishing_payout_keeps_the_sessions_staff_jobs() {
+    let mut game = game();
+    begin(&mut game);
+    game.set_staff_jobs(true);
+    catch(&mut game, FISHING_T0 + 10_000).expect("paid catch");
+    assert_eq!(
+        game.staff_job_rows().len(),
+        2,
+        "both staff jobs stay granted"
+    );
+}

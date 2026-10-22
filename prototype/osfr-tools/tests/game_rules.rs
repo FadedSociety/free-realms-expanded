@@ -1,7 +1,7 @@
 use osfr_tools::game_rules::{
     AccountChatFlags, GameAction, GameRuleSet, IntegerEncoding, MemberFeature, MembershipState,
     QuestLimits, RulePolicy, TradeAllowedFlag, encode_membership_activation,
-    encode_membership_service_flags, encode_trade_allowed_flag_entries,
+    encode_membership_subscription_info, encode_trade_allowed_flag_entries,
 };
 use osfr_tools::startup_selfdata::{build_self, parse_self};
 use std::{fs, path::Path};
@@ -190,10 +190,18 @@ fn membership_wire_messages_match_native_reader_layouts() {
         encode_membership_activation(0x1234, false),
         [5, 0, 1, 8, 0, 0, 0, 100, 0, 0x34, 0x12, 0, 0, 0, 0]
     );
-    assert_eq!(
-        encode_membership_service_flags(0x1234, true, false),
-        [5, 0, 1, 6, 0, 0, 0, 189, 0, 0x34, 0x12, 1, 0]
-    );
+}
+
+/// L048: client reader 008d6600 reads the i16 opcode, a bool for +0x468 and a bool for +0x469,
+/// and 008f7300 refuses any unread byte, so the inner payload is exactly [189, 0, l, r].
+#[test]
+fn membership_subscription_info_matches_the_native_reader() {
+    for (l, r) in [(0, 0), (1, 0), (0, 1), (1, 1)] {
+        assert_eq!(
+            encode_membership_subscription_info(l == 1, r == 1),
+            [5, 0, 1, 4, 0, 0, 0, 189, 0, l, r]
+        );
+    }
 }
 
 #[test]

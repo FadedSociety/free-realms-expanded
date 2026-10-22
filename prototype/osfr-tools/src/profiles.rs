@@ -1,14 +1,138 @@
 //! Native class selection backed by verified private profile payloads.
 //! Unlock timing and the small opening XP curve are reconstructed local rules.
 use crate::inventory::Inventory;
+use crate::startup_selfdata::{JobProfile, ProfileAbility};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs, io,
     path::Path,
-    sync::Arc,
+    sync::{Arc, LazyLock},
 };
+
+/// L052: the staff jobs, Referee (58) and Enforcer (20), with provenance per row in
+/// `data/content/staff_jobs.json`. A file that does not load leaves no staff jobs (fails
+/// closed, never panics); `bundled_staff_jobs_load` keeps the shipped file usable.
+static STAFF_JOBS: LazyLock<Vec<StaffJob>> = LazyLock::new(|| {
+    serde_json::from_str::<StaffJobFile>(include_str!("../data/content/staff_jobs.json"))
+        .ok()
+        .filter(StaffJobFile::is_valid)
+        .map(|file| file.jobs)
+        .unwrap_or_default()
+});
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct StaffJobFile {
+    schema_version: u32,
+    jobs: Vec<StaffJob>,
+}
+
+impl StaffJobFile {
+    fn is_valid(&self) -> bool {
+        let ids: BTreeSet<_> = self.jobs.iter().map(|job| job.id).collect();
+        self.schema_version == 1
+            && ids.len() == self.jobs.len()
+            && self.jobs.len() <= 4
+            && self.jobs.iter().all(|job| {
+                job.id > 0
+                    && job.item_classes.len() <= 64
+                    && (1..=16).contains(&job.default_items.len())
+                    && job.default_items.iter().all(|item| *item > 0)
+                    && !job.source.trim().is_empty()
+            })
+    }
+}
+
+/// One staff job's fields of the client's `ClientPcProfile` record (reader `0x00911d60`).
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct StaffJob {
+    id: i32,
+    name_id: i32,
+    description_id: i32,
+    #[serde(rename = "type")]
+    kind: i32,
+    icon: i32,
+    ability_bg_image_set: i32,
+    badge_image_set: i32,
+    button_image_set: i32,
+    members_only: bool,
+    /// Item class -> its unknown value, written in key order like every captured record.
+    item_classes: BTreeMap<i32, i32>,
+    /// The outfit the job is worn in, as attachments only: never granted as owned items.
+    default_items: Vec<i32>,
+    /// Evidence for the row; only checked to be present.
+    source: String,
+}
+
+fn dwords(values: &[i32]) -> impl Iterator<Item = u8> + '_ {
+    values.iter().flat_map(|value| value.to_le_bytes())
+}
+
+impl StaffJob {
+    /// The record up to its equipment list, in the layout of the 16 captured records: eight
+    /// header dwords, the members-only byte, (R) a zero tenth dword (a per-job index in the
+    /// captures; OSFR sends 0), the class map (key, class, unknown), (R) the five unnamed
+    /// fields (byte, two dwords, byte, dword) as zero like OSFR, then rank 20 (OSFR grants staff
+    /// jobs at level 20), percent, stars available, stars earned and an unknown dword, all 0.
+    fn prefix(&self) -> Vec<u8> {
+        let mut bytes: Vec<u8> = dwords(&[
+            self.id,
+            self.name_id,
+            self.description_id,
+            self.kind,
+            self.icon,
+            self.ability_bg_image_set,
+            self.badge_image_set,
+            self.button_image_set,
+        ])
+        .collect();
+        bytes.push(u8::from(self.members_only));
+        bytes.extend(dwords(&[0, self.item_classes.len() as i32]));
+        for (class, unknown) in &self.item_classes {
+            bytes.extend(dwords(&[*class, *class, *unknown]));
+        }
+        bytes.extend([0; 1 + 4 + 4 + 1 + 4]);
+        bytes.extend(dwords(&[20, 0, 0, 0, 0]));
+        bytes
+    }
+
+    /// The whole record: no equipment rows, then the tail every captured non-combat record
+    /// carries (a zero dword, eight empty ability rows, the zero sentinel).
+    fn record(&self) -> Vec<u8> {
+        let mut bytes = self.prefix();
+        bytes.extend(dwords(&[0, 0, 8, 0, 0, 0, 0, 0, 0, 0, 0, 0]));
+        bytes
+    }
+
+    /// The same record as a typed self-data row (opcode 12), with no equipment rows.
+    fn row(&self) -> JobProfile {
+        let empty = ProfileAbility {
+            kind: 0,
+            kind_fields: Vec::new(),
+            common_fields: None,
+            common_flag: None,
+        };
+        JobProfile {
+            map_key: self.id as u32,
+            opaque_before_equipment_without_key: self.prefix()[4..].to_vec(),
+            after_equipment_value: 0,
+            abilities: vec![empty; 8],
+            trailing_records: Vec::new(),
+        }
+    }
+}
+
+/// L052: this session's staff jobs. None of it is in `ProfileState`, so no save holds it.
+#[derive(Clone, Copy, Debug, Default)]
+struct StaffSession {
+    /// Fixed at login from the account role (`Gateway::bind_account_role`).
+    granted: bool,
+    /// A staff job worn over the active job: what the client shows, nothing else.
+    worn: Option<i32>,
+}
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -45,6 +169,7 @@ struct Content {
 pub struct Profiles {
     content: Arc<Content>,
     state: ProfileState,
+    staff: StaffSession,
 }
 
 /// W176: one job a trainer NPC teaches (`job_trainers.json`). The job, trainer pointer and
@@ -167,6 +292,9 @@ impl Profiles {
                 return Err(invalid("profile proof or bounds differ"));
             }
         }
+        if STAFF_JOBS.iter().any(|job| ids.contains(&job.id)) {
+            return Err(invalid("a staff job id is also a player job"));
+        }
         let mut state = state.unwrap_or_else(|| content.default_state.clone());
         if let Some(job) = retired_job.filter(|job| *job > 0 && !ids.contains(job))
             && state.unlocked.remove(&job)
@@ -187,7 +315,22 @@ impl Profiles {
         Ok(Self {
             content: Arc::new(content),
             state,
+            staff: StaffSession::default(),
         })
+    }
+
+    /// Load a reward's progression snapshot, keeping `current`'s staff jobs (granted and
+    /// worn): they belong to the session, and no snapshot carries them (L052).
+    pub fn adopt(
+        current: &Option<Self>,
+        directory: &Path,
+        state: ProfileState,
+    ) -> io::Result<Self> {
+        let mut next = Self::load(directory, Some(state))?;
+        if let Some(current) = current {
+            next.staff = current.staff;
+        }
+        Ok(next)
     }
 
     pub fn state(&self) -> &ProfileState {
@@ -196,6 +339,60 @@ impl Profiles {
     pub fn active(&self) -> i32 {
         self.state.active
     }
+
+    /// L052: grant this session the staff jobs (moderators and admins, decided at login).
+    pub fn set_staff_jobs(&mut self, granted: bool) {
+        self.staff = StaffSession {
+            granted,
+            worn: None,
+        };
+    }
+
+    fn staff_job(&self, id: i32) -> Option<&'static StaffJob> {
+        let job = STAFF_JOBS.iter().find(|job| job.id == id);
+        job.filter(|_| self.staff.granted)
+    }
+
+    /// Whether `id` is a staff job this session was granted.
+    pub fn is_staff_job(&self, id: i32) -> bool {
+        self.staff_job(id).is_some()
+    }
+
+    /// The staff jobs' self-data rows (none unless granted). Their rank stays 20.
+    pub fn staff_rows(&self) -> Vec<JobProfile> {
+        if !self.staff.granted {
+            return Vec::new();
+        }
+        STAFF_JOBS.iter().map(StaffJob::row).collect()
+    }
+
+    /// The job the client shows: a worn staff job, else the active job. Everything else (XP,
+    /// quests, trainers, abilities, saves) reads `active`, so a staff job never reaches it.
+    pub fn shown(&self) -> i32 {
+        self.staff.worn.unwrap_or(self.state.active)
+    }
+
+    /// L052: wear granted staff job `id` over the active job and return its 38/21. An error
+    /// (not granted, or an outfit the catalogue cannot dress) changes nothing.
+    pub fn wear_staff_job(&mut self, id: i32, inventory: &Inventory) -> io::Result<Vec<u8>> {
+        if !self.is_staff_job(id) {
+            return Err(invalid("not a staff job of this session"));
+        }
+        let activation = self.activation(id, inventory)?;
+        self.staff.worn = Some(id);
+        Ok(activation)
+    }
+
+    /// The attachment list `id` is shown in: a staff job's outfit, else the job's worn items.
+    pub fn attachments(&self, id: i32, inventory: &Inventory) -> io::Result<Vec<u8>> {
+        match self.staff_job(id) {
+            Some(job) => inventory
+                .outfit_attachments(&job.default_items)
+                .ok_or_else(|| invalid("staff job outfit is unavailable")),
+            None => inventory.profile_attachments(id),
+        }
+    }
+
     pub fn starter_items(&self, profile: i32) -> &[i32] {
         self.content
             .starter_items
@@ -408,11 +605,13 @@ impl Profiles {
 
     /// Change the active job after validating it is unlocked. The 38/21 activation is a
     /// separate [`Self::activation`] call so a caller can repair the outfit first.
+    /// Every real job change also takes a worn staff job off (L052).
     pub fn activate(&mut self, id: i32) -> io::Result<()> {
         if !self.state.unlocked.contains(&id) {
             return Err(invalid("that class has not been unlocked"));
         }
         self.state.active = id;
+        self.staff.worn = None;
         Ok(())
     }
 
@@ -425,26 +624,45 @@ impl Profiles {
     }
 
     pub fn activation(&self, id: i32, inventory: &Inventory) -> io::Result<Vec<u8>> {
-        let profile = self
-            .content
-            .profiles
-            .iter()
-            .find(|p| p.id == id)
-            .ok_or_else(|| invalid("unknown active class"))?;
-        let mut payload = decode(&profile.serialized_hex)?;
-        payload[profile.rank_offset..profile.rank_offset + 12]
-            .copy_from_slice(&self.progression_bytes(id));
-        payload.splice(
-            profile.equipment_offset..profile.equipment_offset + profile.equipment_length,
-            inventory.profile_equipment(id),
-        );
+        let payload = match self.staff_job(id) {
+            Some(job) => job.record(),
+            None => {
+                let profile = self
+                    .content
+                    .profiles
+                    .iter()
+                    .find(|p| p.id == id)
+                    .ok_or_else(|| invalid("unknown active class"))?;
+                let mut payload = decode(&profile.serialized_hex)?;
+                payload[profile.rank_offset..profile.rank_offset + 12]
+                    .copy_from_slice(&self.progression_bytes(id));
+                payload.splice(
+                    profile.equipment_offset..profile.equipment_offset + profile.equipment_length,
+                    inventory.profile_equipment(id),
+                );
+                payload
+            }
+        };
         let mut packet = vec![38, 0, 21, 0];
         packet.extend((payload.len() as u32).to_le_bytes());
         packet.extend(payload);
-        packet.extend(inventory.profile_attachments(id)?);
+        packet.extend(self.attachments(id, inventory)?);
         packet.extend(3001i32.to_le_bytes());
         packet.extend(4005i32.to_le_bytes());
         packet.extend(0i32.to_le_bytes());
         Ok(packet)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn bundled_staff_jobs_load() {
+        let ids: Vec<i32> = super::STAFF_JOBS.iter().map(|job| job.id).collect();
+        assert_eq!(
+            ids,
+            [58, 20],
+            "data/content/staff_jobs.json must stay valid"
+        );
     }
 }

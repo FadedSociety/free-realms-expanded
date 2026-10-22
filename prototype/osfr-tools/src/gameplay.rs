@@ -1225,9 +1225,9 @@ impl Gameplay {
         self.terrain.as_ref()?.height_at(zone, x, z)
     }
 
-    /// The active job profile, when profiles are loaded (other players' AddPc).
+    /// The job others see in AddPc, when profiles are loaded: a worn staff job or the active job.
     pub fn active_profile(&self) -> Option<i32> {
-        self.profiles.as_ref().map(|p| p.state().active)
+        self.profiles.as_ref().map(Profiles::shown)
     }
 
     /// (R) Client locale: any unlocked job at rank 15 or higher may create a guild.
@@ -1316,11 +1316,6 @@ impl Gameplay {
             state.items.len().max(100),
         )
         .ok()
-    }
-
-    /// One profile's outfit as the native attachment list (count + rows).
-    pub fn profile_attachments(&self, profile_id: i32) -> io::Result<Vec<u8>> {
-        self.inventory.profile_attachments(profile_id)
     }
 
     /// T027: whether an equip names an inactive job (whose 35/6 must not reach
@@ -1758,7 +1753,7 @@ impl Gameplay {
         self.type8_tick_ms = None;
         self.forging_tick_ms = None;
         out.replies.push(self.categories.initialization());
-        let profile = self.profiles.as_ref().unwrap().active();
+        let profile = self.profiles.as_ref().unwrap().shown();
         out.replies.push(
             self.profiles
                 .as_ref()
@@ -2375,7 +2370,7 @@ impl Gameplay {
                     .profile_content_directory
                     .as_deref()
                     .ok_or_else(|| invalid("claim XP needs profile content"))?;
-                Some(Profiles::load(directory, Some(next.profiles))?)
+                Some(Profiles::adopt(&self.profiles, directory, next.profiles)?)
             } else {
                 None
             };
@@ -2505,7 +2500,7 @@ impl Gameplay {
                 .profile_content_directory
                 .as_deref()
                 .ok_or_else(|| invalid("minigame XP needs profile content"))?;
-            self.profiles = Some(Profiles::load(directory, Some(next.profiles))?);
+            self.profiles = Some(Profiles::adopt(&self.profiles, directory, next.profiles)?);
             self.npc_quest_profiles_changed(out)?;
         }
         self.inventory = next.inventory;
@@ -4222,9 +4217,8 @@ impl Gameplay {
                 return Err(invalid("invalid class selection request"));
             }
             let id = i32::from_le_bytes(inner[4..8].try_into().unwrap());
-            let outfit_before = self
-                .inventory
-                .profile_attachments(self.profiles.as_ref().unwrap().active())?;
+            let outfit_before =
+                self.profile_attachments(self.profiles.as_ref().unwrap().shown())?;
             if let Some(changed) = self.stage_job_selection(id, &mut out)? {
                 out.replies.extend(self.ability_activation_for(id)?);
                 self.sync_player_level(&mut out);
@@ -5116,7 +5110,7 @@ impl Gameplay {
         out.replies.push(self.categories.initialization());
         if let Some(profiles) = &self.profiles {
             out.replies
-                .push(profiles.activation(profiles.active(), &self.inventory)?);
+                .push(profiles.activation(profiles.shown(), &self.inventory)?);
         }
         out.replies.extend(self.combat.initialization(position));
         let quest = self.quests.initialization()?;
@@ -5210,7 +5204,7 @@ impl Gameplay {
             let Some(active) = self.active_profile() else {
                 return Ok(out);
             };
-            let outfit_before = self.inventory.profile_attachments(active)?;
+            let outfit_before = self.profile_attachments(active)?;
             if let Some(changed) = self.stage_job_selection(id, &mut out)? {
                 self.announce_profile_outfit(guid, &outfit_before, changed, &mut out)?;
             }

@@ -29,7 +29,7 @@ impl Gameplay {
         let Some(profiles) = &self.profiles else {
             return Ok(());
         };
-        let after = self.inventory.profile_attachments(profiles.active())?;
+        let after = self.profile_attachments(profiles.shown())?;
         if !switched && after == before {
             return Ok(());
         }

@@ -704,6 +704,26 @@ impl Inventory {
         Ok(bytes)
     }
 
+    /// L052: an outfit worn without owned items (a staff job's default items), each piece in
+    /// its definition's slot and default tint. None when a definition is unknown or the outfit
+    /// lacks a slot `ProcessProfileSwap` requires, so the client never gets a group it rejects.
+    pub fn outfit_attachments(&self, definitions: &[i32]) -> Option<Vec<u8>> {
+        let mut rows = Vec::new();
+        let mut slots = BTreeSet::new();
+        for id in definitions {
+            let definition = self.content.definitions.get(id)?;
+            write_attachment(&mut rows, definition, 0, definition.slot);
+            slots.insert(definition.slot);
+        }
+        if !BTreeSet::from(REQUIRED_PROFILE_SLOTS).is_subset(&slots) {
+            return None;
+        }
+        // Staff data holds at most 16 pieces (`StaffJobFile::is_valid`).
+        let mut bytes = (definitions.len() as i32).to_le_bytes().to_vec();
+        bytes.extend(rows);
+        Some(bytes)
+    }
+
     /// Whether this profile has every slot `ProcessProfileSwap` requires.
     /// Uses the same visible equipment rows that `profile_attachments` sends.
     pub fn has_required_profile_slots(&self, profile_id: i32) -> bool {

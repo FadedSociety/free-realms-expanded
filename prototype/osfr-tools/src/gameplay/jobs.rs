@@ -150,6 +150,9 @@ impl Gameplay {
         let Some(profiles) = &self.profiles else {
             return Ok(None);
         };
+        if profiles.is_staff_job(id) {
+            return Ok(self.wear_staff_job(id, out));
+        }
         if !profiles.state().unlocked.contains(&id) {
             out.replies.push(chat::system(
                 "Cannot switch classes: that class has not been unlocked",
@@ -158,7 +161,7 @@ impl Gameplay {
         }
         let mut staged = self.clone();
         let mut selection = Outcome::default();
-        let changed = staged.profiles.as_ref().unwrap().active() != id;
+        let changed = staged.profiles.as_ref().unwrap().shown() != id;
         if let Err(error) = staged.profiles.as_mut().unwrap().activate(id) {
             out.replies
                 .push(chat::system(&format!("Cannot switch classes: {error}")));
@@ -184,6 +187,47 @@ impl Gameplay {
         out.replies.extend(selection.replies);
         out.nearby.extend(selection.nearby);
         Ok(Some(changed))
+    }
+
+    /// L052 (R): wear a granted staff job over the real one. The client shows it (this 38/21,
+    /// the callers' 35/7 to neighbours, AddPc for later viewers) while the active job, its XP,
+    /// quests, inventory and save stay untouched. A refusal is one chat line, nothing else.
+    fn wear_staff_job(&mut self, id: i32, out: &mut Outcome) -> Option<bool> {
+        let profiles = self.profiles.as_mut()?;
+        let changed = profiles.shown() != id;
+        let Ok(activation) = profiles.wear_staff_job(id, &self.inventory) else {
+            out.replies.push(chat::system(
+                "Cannot switch classes: that job's outfit is unavailable.",
+            ));
+            return None;
+        };
+        out.replies.push(activation);
+        out.changed |= changed;
+        Some(changed)
+    }
+
+    /// One profile's outfit as the native attachment list (count + rows); a staff job's outfit.
+    pub fn profile_attachments(&self, profile_id: i32) -> io::Result<Vec<u8>> {
+        match &self.profiles {
+            Some(profiles) => profiles.attachments(profile_id, &self.inventory),
+            None => self.inventory.profile_attachments(profile_id),
+        }
+    }
+
+    /// L052: grant (moderators and admins) or withhold this session's staff jobs; the gateway
+    /// decides once at login from the account role.
+    pub fn set_staff_jobs(&mut self, granted: bool) {
+        if let Some(profiles) = self.profiles.as_mut() {
+            profiles.set_staff_jobs(granted);
+        }
+    }
+
+    /// The staff jobs' rows for the self data (opcode 12); none for a player.
+    pub fn staff_job_rows(&self) -> Vec<crate::startup_selfdata::JobProfile> {
+        self.profiles
+            .as_ref()
+            .map(Profiles::staff_rows)
+            .unwrap_or_default()
     }
 
     /// W176 (R): teach the job the chosen trainer offers. The caller stages `self`, so a refusal

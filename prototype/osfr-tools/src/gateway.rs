@@ -110,6 +110,9 @@ pub struct Gateway {
     world_dir: Option<std::path::PathBuf>,
     stock_text: Option<std::sync::Arc<std::collections::HashSet<u32>>>,
     role: crate::account_store::AccountRole,
+    /// L048: the AddPc referee flag, fixed at login (`bind_account_role`); display only. L052:
+    /// the same decision grants the session's staff jobs (`Gameplay::set_staff_jobs`).
+    referee: bool,
     // (R) Bound only by the host after verifying the character's owner and ticket.
     role_account: Option<(std::path::PathBuf, u64)>,
     /// L042: this account's mute and ban, read with the role by `refresh_role`.
@@ -902,6 +905,7 @@ impl Gateway {
             world_dir: None,
             stock_text: None,
             role: crate::account_store::AccountRole::Player,
+            referee: false,
             role_account: None,
             sanctions: Default::default(),
             movement_state,
@@ -1037,6 +1041,7 @@ impl Gateway {
         let mut look = PlayerPresentation {
             character_guid: self.state.guid,
             member,
+            referee: self.referee,
             ..PlayerPresentation::default()
         };
         if let Some(identity) = &self.identity {
@@ -1114,6 +1119,13 @@ impl Gateway {
     pub fn bind_account_role(&mut self, path: &Path, account_id: u64) {
         self.role_account = Some((path.to_owned(), account_id));
         self.refresh_role();
+        // (R) OSFR policy: moderators and admins show as referees; a change shows at next login.
+        use crate::account_store::AccountRole::{Admin, Moderator};
+        self.referee = matches!(self.role, Moderator | Admin);
+        // L052 (R): the staff jobs (Referee, Enforcer) follow the same login decision.
+        if let Some(game) = self.gameplay.as_mut() {
+            game.set_staff_jobs(self.referee);
+        }
     }
 
     /// (R) Re-read on use so online demotion takes effect in every session.
@@ -1939,6 +1951,7 @@ impl Gateway {
             if let Some(profiles) = current.profiles {
                 self.apply_profile_state(&mut data, &profiles)?;
             }
+            data.jobs.profiles.extend(game.staff_job_rows());
         }
         crate::progression_extras::apply_collected_flags(&mut data.collections, &collections);
         // (R) Action-bar assignments have no field in the current saved

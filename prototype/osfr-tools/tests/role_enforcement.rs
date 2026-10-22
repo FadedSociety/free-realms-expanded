@@ -61,7 +61,11 @@ fn verified_owner_roles_persist_and_online_demotion_is_immediate() {
         .handle(&wrap(&chat::local_request("realm god")))
         .unwrap();
     assert_eq!(denied.dev_command_denials, 1);
+    // L048: AddPc shows a moderator or admin as a referee; the flag is fixed at login.
+    let referee = |gateway: &Gateway| gateway.player_presentation(false).unwrap().referee;
+    assert!(!referee(&gateway));
     gateway.bind_account_role(&path, 2);
+    assert!(referee(&gateway));
     let send = |gateway: &mut Gateway, text: &str| {
         gateway.handle(&wrap(&chat::local_request(text))).unwrap()
     };
@@ -100,6 +104,10 @@ fn verified_owner_roles_persist_and_online_demotion_is_immediate() {
             .any(|p| String::from_utf8_lossy(p).contains("Account role saved"))
     );
     assert_eq!(gateway.role(), AccountRole::Player);
+    // Authority drops at once; the referee display waits for the next login.
+    assert!(referee(&gateway));
+    gateway.bind_account_role(&path, 2);
+    assert!(!referee(&gateway));
     assert_eq!(send(&mut gateway, "realm god").dev_command_denials, 1);
     assert_eq!(
         send(&mut gateway, "realm role 2 admin").dev_command_denials,

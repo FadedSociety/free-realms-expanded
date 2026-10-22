@@ -341,9 +341,10 @@ impl Gameplay {
                         .profile_content_directory
                         .as_deref()
                         .ok_or_else(|| invalid("quest XP needs profile content"))?;
-                    Some(Profiles::load(
+                    Some(Profiles::adopt(
+                        &self.profiles,
                         directory,
-                        Some(next_state.profiles.clone()),
+                        next_state.profiles.clone(),
                     )?)
                 }
             } else if next_state.profiles != profile_state {
