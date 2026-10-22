@@ -1,7 +1,8 @@
 //! T296: the level 11-14 high field camps and the 14-20 kill-reward band.
 //!
-//! Content slice. The two new camps repeat four W102 terrain-checked centres,
-//! the existing `field_roamer` preset and the shipped wolf/shaman definitions.
+//! Content slice. The two new camps sit on audited centres (T415 moved them off
+//! the W102 starter centres; `common/field_camp_centres.rs`), the existing
+//! `field_roamer` preset and the shipped wolf/shaman definitions.
 //! The reward band is one appended row in `field_kill_rewards.json`. No
 //! production behaviour, packet or schema changed. The load root and the shared
 //! reward helpers are `tests/common/field_reward_fixture.rs`, shared with the
@@ -24,11 +25,14 @@ use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{collections::BTreeSet, fs};
 
+#[path = "common/field_camp_centres.rs"]
+mod field_camp_centres;
 #[path = "common/field_enemy_fixture.rs"]
 mod field_enemy_fixture;
 #[path = "common/field_reward_fixture.rs"]
 mod field_reward_fixture;
 
+use field_camp_centres::{placement_masked, verified_centre};
 use field_enemy_fixture::{Fixture as EngineFixture, content_dir, content_path, spawned};
 use field_reward_fixture::{
     CREDIT_TTL_MS, RewardFixture, attack_one, bank, character_at, kill_one, player, player_state,
@@ -41,8 +45,9 @@ mod packets;
 use packets::{carrier, count, packet};
 
 /// The four new actors in file order: GUID, authored level, spawn area and the
-/// pre-T296 W102 row they reuse. Position, copied fields and provenance are
-/// compared to that row, not to a copied constant.
+/// pre-T296 W102 row they reuse. Copied fields and provenance are compared to
+/// that row, not to a copied constant; T415 moved the position to an audited
+/// centre.
 const HIGH: [(u64, u32, &str, u64); 4] = [
     (131000102021, 11, "HIGH-F3", 131000102003),
     (131000102022, 12, "HIGH-F2", 131000102002),
@@ -54,6 +59,8 @@ const HIGH: [(u64, u32, &str, u64); 4] = [
 /// MID-level. Each entry is the GUID and the sha256 of the row's canonical
 /// `serde_json` encoding, so an edited, added or removed field fails, not only
 /// identity and order. A mismatch names the row; `git diff` names the field.
+/// The 8 MID rows are hashed with their placement masked (`placement_masked`):
+/// T415 moved them, and the masked values are the pre-T415 rows' digests.
 #[rustfmt::skip]
 const EXISTING_ACTORS: [(u64, &str); 24] = [
     (100000004154, "f0fcf5f580fa03f2a45868be58f288559a15a9fbdc54e72989dbe68ceed725d9"),
@@ -72,14 +79,14 @@ const EXISTING_ACTORS: [(u64, &str); 24] = [
     (131000102010, "7b6000ac2cb55616bae0e24c9a65e2dd99cc5acabf6d553085111224bb0eeb24"),
     (131000102011, "147f051194673438471741f7aca493a31fb317b5fdea589af1ecce4009400bab"),
     (131000102012, "a1cd884e4e9a53d4ea36d808b8799bef2c3f22129d62c1ce6b818dd6f00c9236"),
-    (131000102013, "e7cf657b503cfa490fb97c6c52ce966e3729a9a76929f9210abe70318a1ff862"),
-    (131000102014, "e0c3bbc1d761888e7e1ab04cfa07836ac4abcd44e7d9f00838fd0b9099752990"),
-    (131000102015, "44fb113b225d98e4840062a383cf60a5ad39f56321615a3aa0364802338e284b"),
-    (131000102016, "bbc2e2744a273565f0659608eb9e37fe09656cf155c63b09fcc51292f6691b4c"),
-    (131000102017, "6c2bc222c7df2b3e877da8ab0af468acb161fea11e642787d9c9b5b1a446636d"),
-    (131000102018, "d9dbd1c1840b0546475b8b707f8ddfa24bbaf279b12bd94f16500c68de55179f"),
-    (131000102019, "77d98e3b3c27fbdba3f273fdc63db5b23e65de5cd852dd10381b1687127b6faa"),
-    (131000102020, "2daeaa0f927c8380885a99cf74ba1664ba2f9139eca77f207a2314960c0eadb8"),
+    (131000102013, "b91bce6fc1170f499be4257c86b6e866c0cf03de301cb81f58237f60f051a6a1"),
+    (131000102014, "3a9145a8f336274ea9674a6c15e92e240e70a0885f66de29d8e241851c2883fb"),
+    (131000102015, "618656411055f6c59e00379290ad5d215903e1be12ba177bb3de91170c054fb4"),
+    (131000102016, "eaa0c43e0c6e28f84c9918ef47820c771e81f93853807b107866d09d756045f3"),
+    (131000102017, "925a94ac887c3e94feb7e5e8e856806d365a489802563ae00ea1539359490fea"),
+    (131000102018, "c76d2bf2c45b2da6ee8ebc4644be054c397f505a734c477c669c08aa4574ec5f"),
+    (131000102019, "2fab27c957a63ed49a490a2d62fed9e9b3102aadfdd03e02927b739fd5fb53bb"),
+    (131000102020, "da2762a99d74d4c8724f0c8d24558f5e5e1dee68359daf847ccd84697af3f9b0"),
 ];
 
 /// The eight pre-T296 spawn groups in file order, pinned the same way.
@@ -113,11 +120,31 @@ const EXISTING_OVERRIDE: &str = "407b100e2645dbbbeb8b06e1faaebd849933c3c882bf630
 
 const HIGH_SHAMAN_13: u64 = 131000102023;
 const HIGH_SHAMAN_14: u64 = 131000102024;
-const HIGH_SHAMAN_14_HOME: [f32; 3] = [-351.103, 2.33, 1048.674];
-const HIGH_SHAMAN_13_HOME: [f32; 3] = [-447.084, 3.03, 1128.348];
+const HIGH_SHAMAN_14_HOME: [f32; 3] = verified_centre("HIGH-T2");
+const HIGH_SHAMAN_13_HOME: [f32; 3] = verified_centre("HIGH-T3");
 const BIXIE_10: u64 = 131000102019;
-const BIXIE_10_HOME: [f32; 3] = [-664.762, 2.4, 299.608];
+const BIXIE_10_HOME: [f32; 3] = verified_centre("MID-Q1");
 const LEVEL_TWENTY_GUID: u64 = 131000110020;
+/// Same-kind spawns a moved camp may name as `reference_spawn_guid`:
+/// FreeRealms-Legacy 9e08202 `src/Scripts/Zone/FabledRealms.lua` rows (positions
+/// only, no code). Hooligan Wolf 3156-3158 (lines 1899-1901) and 4164-4166
+/// (2830-2832), the unnamed `wolf_generic` 2529 (1272); Troll Bone Shaman 3149
+/// and 3150 (1892, 1893).
+const LEGACY_SAME_KIND: [(&str, &[u64]); 2] = [
+    (
+        "Hooligan Wolf",
+        &[
+            100000002529,
+            100000003156,
+            100000003157,
+            100000003158,
+            100000004164,
+            100000004165,
+            100000004166,
+        ],
+    ),
+    ("Troll Bone Shaman", &[100000003149, 100000003150]),
+];
 
 fn shipped_field() -> Value {
     serde_json::from_slice(&fs::read(content_path()).unwrap()).unwrap()
@@ -319,15 +346,16 @@ fn the_high_camps_use_verified_w102_centres_and_unique_guids() {
         let reference = actor(&field, reference_guid);
         let w102 = format!("W102-{}", area.strip_prefix("HIGH-").unwrap());
         assert_eq!(row["spawn_area"]["id"], area);
+        // T415 moved the camp off the W102 row's centre onto its audited centre.
         assert_eq!(
             position(&row["position"]).map(f32::to_bits),
-            position(&reference["position"]).map(f32::to_bits),
-            "{area} must stay byte-identical to the {w102} row's position"
+            verified_centre(area).map(f32::to_bits),
+            "{area} must stay on its verified centre"
         );
         assert_eq!(
             position(&row["spawn_area"]["centre"]).map(f32::to_bits),
-            position(&reference["position"]).map(f32::to_bits),
-            "{area} must keep its centre on the {w102} row"
+            verified_centre(area).map(f32::to_bits),
+            "{area} centre must equal its position"
         );
         assert_eq!(
             row["spawn_area"]["radius"], reference["spawn_area"]["radius"],
@@ -340,9 +368,14 @@ fn the_high_camps_use_verified_w102_centres_and_unique_guids() {
         assert_eq!(row["level"], level);
         assert_eq!(row["quest_ids"], json!([]), "{guid} must be always-on");
         assert_eq!(row["boss"], false);
-        assert_eq!(
-            row["reference_spawn_guid"], reference["reference_spawn_guid"],
-            "{area} names the same community spawn as the {w102} row"
+        let (_, same_kind) = LEGACY_SAME_KIND
+            .iter()
+            .find(|(name, _)| row["name"] == *name)
+            .unwrap_or_else(|| panic!("{area} has no Legacy kind"));
+        assert!(
+            same_kind.contains(&row["reference_spawn_guid"].as_u64().unwrap()),
+            "{area} must name a same-kind Legacy spawn, not {}",
+            row["reference_spawn_guid"]
         );
 
         // Every field the row claims to copy comes from the named W102 row, so a
@@ -466,7 +499,7 @@ fn the_existing_camps_and_rewards_are_unchanged() {
     {
         assert_eq!(row["guid"].as_u64(), Some(guid));
         assert_eq!(
-            digest(row),
+            digest(&placement_masked(row)),
             expected,
             "pre-T296 field actor {guid} changed: {row}"
         );

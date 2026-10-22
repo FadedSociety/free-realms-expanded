@@ -28,11 +28,11 @@ static SERIAL: AtomicU64 = AtomicU64::new(0);
 /// (no quest gate).
 const TARGET: u64 = 131_000_102_001;
 const TARGET_AT: [f32; 3] = [-1899.204, -50.59, 307.902];
-/// A clear point 40 m east of the F1 camp. T245 appends a level-5 wolf on the
-/// same F1 centre, so the Flame Wave is cast here where nothing is in range.
+/// A clear point 40 m east of the F1 camp where nothing is in Flame Wave range;
+/// T415 keeps every moved camp at least leash + radius + 4 m from it.
 const CLEAR_AT: [f32; 3] = [-1859.204, -50.59, 307.902];
-/// T245's level-5 MID-F1 wolf: the same centre as `TARGET`, so a cast at the
-/// authored F1 pickup point has a live target.
+/// T245's level-5 MID-F1 wolf. T415 moved it off the F1 centre; its home is
+/// read from the shipped file.
 const MID_F1: u64 = 131_000_102_013;
 /// A second always-present Hooligan, where the player walks after the pickup;
 /// its own position is inside the Flame Wave radius.
@@ -236,6 +236,24 @@ fn derby_content() -> DerbyGatewayContent {
         completion_reward_xp: 0,
         reward: None,
     }
+}
+
+/// A shipped field actor's authored level, or `None` for a GUID that is not one
+/// (the player). A row without `level` loads at level 1.
+fn shipped_level(guid: u64) -> Option<i64> {
+    shipped_row(guid).map(|row| row["level"].as_i64().unwrap_or(1))
+}
+
+/// A row of the bundled `field_enemies.json` the fixture copies.
+fn shipped_row(guid: u64) -> Option<Value> {
+    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/field_enemies.json");
+    let field: Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+    field["enemies"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["guid"].as_u64() == Some(guid))
+        .cloned()
 }
 
 fn who() -> CharacterState {
@@ -488,8 +506,8 @@ fn a_held_power_up_uses_its_own_key_once_and_restores_the_job_bar() {
     );
 
     // The client's key request (bar 1, slot 2) consumes the kind and restores
-    // the authored job row. The T245 mid-level camp shares the F1 centre, so
-    // this cast happens at a clear point with no target in the Flame Wave radius.
+    // the authored job row. This cast happens at a clear point with no target
+    // in the Flame Wave radius.
     let use_at = kill + 1_000;
     let used = game
         .handle_in_world(&cast(2, 1), &at(CLEAR_AT), use_at)
@@ -503,23 +521,39 @@ fn a_held_power_up_uses_its_own_key_once_and_restores_the_job_bar() {
 
 #[test]
 fn the_f1_pickup_point_hits_the_co_located_mid_camp_wolf() {
-    // The authored scenario: the pickup is taken at F1, where T245's level-5
-    // MID-F1 wolf now stands beside the dead starter wolf. A level-1 Flame Wave
+    // T415 re-scope: the pickup is still taken at F1, but T245's level-5 MID-F1
+    // wolf no longer stands there. A cast at the F1 centre reaches no actor more
+    // than two levels from the dead starter wolf; a cast at MID-F1's new home
     // hits it, leaves it alive and fabricates no drop.
     let fixture = Fixture::new();
+    let starter = shipped_level(TARGET).unwrap();
     let (mut game, location, _) = fresh_game(&fixture, 0);
-    let kill = kill_target(&mut game, &location, 1_000);
-    game.tick(&location, kill + 200).unwrap();
-    assert_eq!(game.held_power_up(), Some("flame_wave"));
-
-    let used = game
+    let kill = hold(&mut game, &location);
+    let at_f1 = game
         .handle_in_world(&cast(2, 1), &at(TARGET_AT), kill + 1_000)
+        .unwrap();
+    assert_eq!(game.held_power_up(), None);
+    for guid in hit_targets(&at_f1) {
+        if let Some(level) = shipped_level(guid) {
+            assert!(
+                (level - starter).abs() <= 2,
+                "the F1 cast hit {guid} at level {level}, beside the level-{starter} starter camp"
+            );
+        }
+    }
+
+    let (mut game, location, _) = fresh_game(&fixture, 0);
+    let kill = hold(&mut game, &location);
+    let home: [f32; 3] =
+        serde_json::from_value(shipped_row(MID_F1).unwrap()["position"].clone()).unwrap();
+    let used = game
+        .handle_in_world(&cast(2, 1), &at(home), kill + 1_000)
         .unwrap();
     assert_eq!(game.held_power_up(), None);
     let hits = hit_targets(&used);
     assert!(
         hits.contains(&MID_F1),
-        "the F1 cast hits the co-located MID-F1 wolf: {hits:?}"
+        "a cast at MID-F1's home hits it: {hits:?}"
     );
     assert!(
         !hits.contains(&TARGET),

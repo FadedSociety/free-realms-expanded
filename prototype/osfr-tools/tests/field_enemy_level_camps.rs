@@ -1,6 +1,7 @@
 //! T245: level 5-10 free-roaming camps appended to the shipped field population.
 //!
-//! Content-only slice. The four new camps reuse the existing W102 centres, the
+//! Content-only slice. The four new camps sit on audited centres (T415 moved them
+//! off the W102 starter centres; `common/field_camp_centres.rs`), the
 //! existing `field_roamer` behaviour, the existing `enemies.json` definitions and
 //! the existing field loader/runtime; no production module changes.
 //!
@@ -15,9 +16,12 @@ use std::{
     fs,
 };
 
+#[path = "common/field_camp_centres.rs"]
+mod field_camp_centres;
 #[path = "common/field_enemy_fixture.rs"]
 mod field_enemy_fixture;
 
+use field_camp_centres::{VERIFIED_CENTRES, verified_centre};
 use field_enemy_fixture::{Fixture, content_path, spawned};
 
 /// The four mid-level camps in file order: group id, the two new member GUIDs,
@@ -51,24 +55,6 @@ const CAMPS: [(&str, [u64; 2], [u32; 2], u32, u32); 4] = [
         10,
         120,
     ),
-];
-
-/// The 12 pre-change W102 centres, in actor order. A new camp may only repeat
-/// one of these terrain-checked discs; moving one back onto new ground must fail
-/// here and go through the W102 terrain audit first.
-const W102_CENTRES: [(&str, [f32; 3]); 12] = [
-    ("W102-F1", [-1899.204, -50.59, 307.902]),
-    ("W102-F2", [-1887.867, -51.14, 291.159]),
-    ("W102-F3", [-1962.89, -46.92, 284.723]),
-    ("W102-H1", [-1779.455, -28.88, 562.833]),
-    ("W102-H2", [-1792.921, -29.33, 579.55]),
-    ("W102-H3", [-1789.626, -30.24, 616.51]),
-    ("W102-Q1", [-664.762, 2.4, 299.608]),
-    ("W102-Q2", [-692.141, 2.4, 220.373]),
-    ("W102-Q3", [-651.667, 2.4, 231.947]),
-    ("W102-T1", [-347.084, 0.61, 1068.348]),
-    ("W102-T2", [-351.103, 2.33, 1048.674]),
-    ("W102-T3", [-447.084, 3.03, 1128.348]),
 ];
 
 const STARTER_LEVELS: [u32; 12] = [1, 1, 1, 3, 3, 3, 1, 1, 1, 1, 1, 1];
@@ -353,6 +339,8 @@ fn four_mid_level_camps_load_with_valid_bands_and_ids() {
 
 #[test]
 fn every_new_home_is_a_verified_w102_centre() {
+    // T415 moved these camps off the W102 starter centres: each home is now its
+    // own audited centre (the W102 checker plus the T415 separation rules).
     let engine = Fixture::shipped().load();
     let field = field();
     let mut used = BTreeSet::new();
@@ -361,18 +349,17 @@ fn every_new_home_is_a_verified_w102_centre() {
         for guid in members {
             let row = actor(&field, guid);
             let area = row["spawn_area"]["id"].as_str().unwrap();
-            let base_area = format!("W102-{}", &area[4..]);
-            let (_, centre) = W102_CENTRES
-                .iter()
-                .find(|(name, _)| *name == base_area)
-                .unwrap_or_else(|| panic!("{area} is not a W102 area"));
-            assert!(used.insert(base_area), "{area} reuses a W102 centre twice");
+            let centre = verified_centre(area);
+            assert!(
+                used.insert(centre.map(f32::to_bits)),
+                "{area} reuses a verified centre"
+            );
             assert_eq!(
                 position(&row["position"]),
-                *centre,
-                "{area} position must stay on its verified W102 centre"
+                centre,
+                "{area} position must stay on its verified centre"
             );
-            assert_eq!(position(&row["spawn_area"]["centre"]), *centre);
+            assert_eq!(position(&row["spawn_area"]["centre"]), centre);
             assert_eq!(row["spawn_area"]["radius"], 6.0);
             assert_eq!(row["spawn_area"]["count"], 1);
             assert_eq!(
@@ -385,7 +372,7 @@ fn every_new_home_is_a_verified_w102_centre() {
     assert_eq!(
         used.len(),
         8,
-        "the eight new camps sit on eight W102 centres"
+        "the eight new camps sit on eight verified centres"
     );
 }
 
@@ -456,7 +443,7 @@ fn the_existing_starter_and_quest_populations_are_unchanged() {
     for (index, guid) in STARTER_GUIDS.into_iter().enumerate() {
         let row = actor(&field, guid);
         let (definition, model, name_id, name, health, damage) = STARTER_STATS[index];
-        let (area, centre) = &W102_CENTRES[index];
+        let (area, centre) = &VERIFIED_CENTRES[index];
         assert_eq!(row["quest_ids"], json!([]));
         assert_eq!(row["level"], STARTER_LEVELS[index]);
         assert_eq!(row["definition_id"], definition);

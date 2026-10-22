@@ -1,7 +1,8 @@
 //! T332: the level 15-20 elite field camps and the shipped 14-20 reward band.
 //!
-//! Content slice. The three new camps repeat six W102 terrain-checked centres,
-//! the existing `field_roamer` preset and the shipped troll/bixie/hooligan
+//! Content slice. The three new camps sit on six audited centres (T415 moved
+//! them off the W102 starter centres; `common/field_camp_centres.rs`), the
+//! existing `field_roamer` preset and the shipped troll/bixie/hooligan
 //! definitions; the reward band is the existing `field_kill_rewards.json`
 //! 14-20 row. No production behaviour, packet or schema changed. The load root
 //! and the reward helpers are `tests/common/field_reward_fixture.rs`, shared
@@ -24,11 +25,14 @@ use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{collections::BTreeSet, fs, path::Path};
 
+#[path = "common/field_camp_centres.rs"]
+mod field_camp_centres;
 #[path = "common/field_enemy_fixture.rs"]
 mod field_enemy_fixture;
 #[path = "common/field_reward_fixture.rs"]
 mod field_reward_fixture;
 
+use field_camp_centres::{placement_masked, verified_centre};
 use field_enemy_fixture::{Fixture as EngineFixture, content_dir, content_path, spawned};
 use field_reward_fixture::{
     RewardFixture, attack_one, bank, character_at, kill_one, player, shipped_field_actor, source,
@@ -39,8 +43,8 @@ mod packets;
 
 use packets::{carrier, count, packet};
 
-/// The six elite actors in file order: GUID, authored level, area, the
-/// byte-identical W102 centre, the W102 area, the reused MID-camp row and the
+/// The six elite actors in file order: GUID, authored level, area, its audited
+/// centre (T415), the W102 area and row whose leash it reuses, and the
 /// loader-consumed definition/model/name/stats.
 #[derive(Clone, Copy)]
 struct Elite {
@@ -63,7 +67,7 @@ const ELITE: [Elite; 6] = [
         guid: 131000102031,
         level: 15,
         area: "ELITE-T1",
-        centre: [-347.084, 0.61, 1068.348],
+        centre: verified_centre("ELITE-T1"),
         w102: "W102-T1",
         w102_row: 131000102010,
         definition: 930025,
@@ -77,7 +81,7 @@ const ELITE: [Elite; 6] = [
         guid: 131000102032,
         level: 16,
         area: "ELITE-T2",
-        centre: [-447.084, 3.03, 1128.348],
+        centre: verified_centre("ELITE-T2"),
         w102: "W102-T3",
         w102_row: 131000102012,
         definition: 930025,
@@ -91,7 +95,7 @@ const ELITE: [Elite; 6] = [
         guid: 131000102033,
         level: 17,
         area: "ELITE-Q1",
-        centre: [-651.667, 2.4, 231.947],
+        centre: verified_centre("ELITE-Q1"),
         w102: "W102-Q3",
         w102_row: 131000102009,
         definition: 930053,
@@ -105,7 +109,7 @@ const ELITE: [Elite; 6] = [
         guid: 131000102034,
         level: 18,
         area: "ELITE-Q2",
-        centre: [-664.762, 2.4, 299.608],
+        centre: verified_centre("ELITE-Q2"),
         w102: "W102-Q1",
         w102_row: 131000102007,
         definition: 930053,
@@ -119,7 +123,7 @@ const ELITE: [Elite; 6] = [
         guid: 131000102035,
         level: 19,
         area: "ELITE-H1",
-        centre: [-1789.626, -30.24, 616.51],
+        centre: verified_centre("ELITE-H1"),
         w102: "W102-H3",
         w102_row: 131000102006,
         definition: 930060,
@@ -133,7 +137,7 @@ const ELITE: [Elite; 6] = [
         guid: 131000102036,
         level: 20,
         area: "ELITE-H2",
-        centre: [-1779.455, -28.88, 562.833],
+        centre: verified_centre("ELITE-H2"),
         w102: "W102-H1",
         w102_row: 131000102004,
         definition: 930060,
@@ -173,23 +177,6 @@ const CAMPS: [Camp; 3] = [
         members: [131000102035, 131000102036],
         region: "Highroad outskirts",
     },
-];
-
-/// The 12 W102 terrain-checked centres. The elite camps may only repeat one of
-/// these; a moved position has to pass the W102 terrain audit first.
-const W102_CENTRES: [(&str, [f32; 3]); 12] = [
-    ("W102-F1", [-1899.204, -50.59, 307.902]),
-    ("W102-F2", [-1887.867, -51.14, 291.159]),
-    ("W102-F3", [-1962.89, -46.92, 284.723]),
-    ("W102-H1", [-1779.455, -28.88, 562.833]),
-    ("W102-H2", [-1792.921, -29.33, 579.55]),
-    ("W102-H3", [-1789.626, -30.24, 616.51]),
-    ("W102-Q1", [-664.762, 2.4, 299.608]),
-    ("W102-Q2", [-692.141, 2.4, 220.373]),
-    ("W102-Q3", [-651.667, 2.4, 231.947]),
-    ("W102-T1", [-347.084, 0.61, 1068.348]),
-    ("W102-T2", [-351.103, 2.33, 1048.674]),
-    ("W102-T3", [-447.084, 3.03, 1128.348]),
 ];
 
 /// The 28 pre-T332 actors and 10 groups in file order. The elite rows must be
@@ -240,16 +227,18 @@ const EXISTING_GROUPS: [&str; 10] = [
 
 /// (R) Pinned deep-equal digest of the 28 actor rows and 10 group rows before
 /// this slice appended to them. Any changed, reordered or reformatted prefix
-/// field (including evidence text) changes this digest.
+/// field (including evidence text) changes this digest, except the placement
+/// of the 12 MID/HIGH rows T415 moved (`placement_masked`); the value is the
+/// pre-T415 prefix's masked digest.
 const EXISTING_PREFIX_SHA256: &str =
-    "6461f566c2e95d46f0b9221f80f75bb6fe26137d94b3a86f2c1a29d3fea50d7e";
+    "c74c3eeaa182c49402d29ccee9336c652d1a482e1fc62e66fec531d28697c9cc";
 
 /// The existing level-10 and level-14 controls used to prove the actor level,
 /// not the player level, selects the reward band.
 const HIGH_SHAMAN_14: u64 = 131000102024;
-const HIGH_SHAMAN_14_HOME: [f32; 3] = [-351.103, 2.33, 1048.674];
+const HIGH_SHAMAN_14_HOME: [f32; 3] = verified_centre("HIGH-T2");
 const MID_BIXIE_10: u64 = 131000102020;
-const MID_BIXIE_10_HOME: [f32; 3] = [-692.141, 2.4, 220.373];
+const MID_BIXIE_10_HOME: [f32; 3] = verified_centre("MID-Q2");
 const LEVEL_TWENTY_ACTOR: u64 = 131000110020;
 const LEVEL_TWENTY_WOLF: u64 = 131000110156;
 /// The elite camp's shared 180 s respawn.
@@ -388,10 +377,12 @@ fn items(game: &Gameplay) -> Vec<(i32, u32)> {
         .collect()
 }
 
-/// The canonical deep-equal digest of the 28 old actors and 10 old groups.
+/// The canonical deep-equal digest of the 28 old actors (placement masked) and
+/// 10 old groups.
 fn existing_prefix_digest(field: &Value) -> String {
+    let enemies = &field["enemies"].as_array().unwrap()[..EXISTING_ACTORS.len()];
     let prefix = json!({
-        "enemies": &field["enemies"].as_array().unwrap()[..EXISTING_ACTORS.len()],
+        "enemies": enemies.iter().map(placement_masked).collect::<Vec<_>>(),
         "spawn_groups": &field["spawn_groups"].as_array().unwrap()[..EXISTING_GROUPS.len()],
     });
     format!("{:x}", Sha256::digest(serde_json::to_vec(&prefix).unwrap()))
@@ -514,38 +505,36 @@ fn six_elite_camps_load_with_levels_fifteen_to_twenty() {
 
 #[test]
 fn every_elite_home_is_a_verified_w102_centre() {
+    // T415 moved the elite camps off the W102 starter centres: each home is
+    // its own audited centre (the W102 checker plus the T415 separation rules).
     let engine = EngineFixture::shipped().load();
     let field = shipped_field();
     let mut used = BTreeSet::new();
     for elite in ELITE {
         let row = actor(&field, elite.guid);
-        let (_, centre) = W102_CENTRES
-            .iter()
-            .find(|(name, _)| *name == elite.w102)
-            .unwrap_or_else(|| panic!("{} is not a W102 area", elite.w102));
+        let centre = verified_centre(elite.area);
         assert_eq!(
             bits(position(&row["position"])),
-            bits(*centre),
-            "{} must stay byte-identical to {}",
-            elite.area,
-            elite.w102
+            bits(centre),
+            "{} must stay on its verified centre",
+            elite.area
         );
         assert_eq!(
             bits(position(&row["spawn_area"]["centre"])),
-            bits(*centre),
+            bits(centre),
             "{} centre must equal its position",
             elite.area
         );
         assert_eq!(row["spawn_area"]["radius"], 6.0);
         assert_eq!(row["spawn_area"]["count"], 1);
         assert!(
-            used.insert(elite.w102),
-            "{} reuses a W102 centre twice",
-            elite.w102
+            used.insert(bits(centre)),
+            "{} reuses a verified centre",
+            elite.area
         );
         assert_eq!(engine.behaviour(elite.guid).unwrap().leash, 12.0);
     }
-    assert_eq!(used.len(), 6, "six distinct verified W102 centres");
+    assert_eq!(used.len(), 6, "six distinct verified centres");
 }
 
 #[test]

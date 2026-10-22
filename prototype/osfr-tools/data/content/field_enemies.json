@@ -1139,9 +1139,9 @@
       "name": "Hooligan Wolf",
       "texture_alias": "",
       "position": [
-        -1899.204,
-        -50.59,
-        307.902
+        -2077.0,
+        -48.7,
+        425.0
       ],
       "max_health": 180,
       "damage": 25,
@@ -1152,14 +1152,14 @@
       "spawn_area": {
         "id": "MID-F1",
         "centre": [
-          -1899.204,
-          -50.59,
-          307.902
+          -2077.0,
+          -48.7,
+          425.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000004164,
+      "reference_spawn_guid": 100000003156,
       "source": [
         {
           "kind": "client",
@@ -1167,15 +1167,15 @@
         },
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102001 (area W102-F1): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md:85,129. Regional enemy context; dungeon presence does not prove an always-on field population."
+          "evidence": "data/content/field_enemies.json row 131000102001 (area W102-F1): reuses this row's 12 m leash and resource identity; T415 moved the camp off its centre. notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md:85,129. Regional enemy context; dungeon presence does not prove an always-on field population."
         },
         {
           "kind": "legacy-data",
-          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2830, NPC row 4164, position [-1923.204, -49.37827, 295.9019]. Position/count anchor only; no source code or combat rules reused."
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1899, NPC row 3156, position [-2100.965, -45.98195, 456.7631]; the nearest same-kind Legacy spawn, 39.8 m from this centre. Position anchor only; no source code or combat rules reused."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102001 (W102-F1); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/25); W105 scaling by level produces the live stats."
+          "evidence": "(R) T415 audited centre 39.8 m from the nearest same-kind Legacy NPC row 3156 (FabledRealms.lua:1899), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102001 (W102-F1); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/25); W105 scaling by level produces the live stats."
         }
       ]
     },
@@ -1187,9 +1187,9 @@
       "name": "Hooligan Wolf",
       "texture_alias": "",
       "position": [
-        -1887.867,
-        -51.14,
-        291.159
+        -2065.0,
+        -47.17,
+        425.0
       ],
       "max_health": 180,
       "damage": 25,
@@ -1200,14 +1200,14 @@
       "spawn_area": {
         "id": "MID-F2",
         "centre": [
-          -1887.867,
-          -51.14,
-          291.159
+          -2065.0,
+          -47.17,
+          425.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000004165,
+      "reference_spawn_guid": 100000003156,
       "source": [
         {
           "kind": "client",
@@ -1215,15 +1215,15 @@
         },
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102002 (area W102-F2): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md:85,129. Regional enemy context; dungeon presence does not prove an always-on field population."
+          "evidence": "data/content/field_enemies.json row 131000102002 (area W102-F2): reuses this row's 12 m leash and resource identity; T415 moved the camp off its centre. notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md:85,129. Regional enemy context; dungeon presence does not prove an always-on field population."
         },
         {
           "kind": "legacy-data",
-          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2831, NPC row 4165, position [-1923.867, -48.80265, 299.1591]. Position/count anchor only; no source code or combat rules reused."
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1899, NPC row 3156, position [-2100.965, -45.98195, 456.7631]; the nearest same-kind Legacy spawn, 48.0 m from this centre. Position anchor only; no source code or combat rules reused."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102002 (W102-F2); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/25); W105 scaling by level produces the live stats."
+          "evidence": "(R) T415 audited centre 48.0 m from the nearest same-kind Legacy NPC row 3156 (FabledRealms.lua:1899), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102002 (W102-F2); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/25); W105 scaling by level produces the live stats."
         }
       ]
     },
@@ -1235,9 +1235,9 @@
       "name": "Hooligan",
       "texture_alias": "",
       "position": [
-        -1779.455,
-        -28.88,
-        562.833
+        -2013.0,
+        -37.6,
+        609.0
       ],
       "max_health": 180,
       "damage": 15,
@@ -1248,14 +1248,14 @@
       "spawn_area": {
         "id": "MID-H1",
         "centre": [
-          -1779.455,
-          -28.88,
-          562.833
+          -2013.0,
+          -37.6,
+          609.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000004159,
+      "reference_spawn_guid": 100000004667,
       "source": [
         {
           "kind": "client",
@@ -1263,15 +1263,15 @@
         },
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102004 (area W102-H1): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/Dungeons/Highroad Hijinx.md:19,48. Regional enemy context; dungeon presence does not prove an always-on field population."
+          "evidence": "data/content/field_enemies.json row 131000102004 (area W102-H1): reuses this row's 12 m leash and resource identity; T415 moved the camp off its centre. notes/Build Guides/Content/Dungeons/Highroad Hijinx.md:19,48. Regional enemy context; dungeon presence does not prove an always-on field population."
         },
         {
           "kind": "legacy-data",
-          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2825, NPC row 4159, position [-1779.455, -28.78084, 562.8329]. Position/count anchor only; no source code or combat rules reused."
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:3301, NPC row 4667, position [-2041.375, -33.63479, 636.6123]; the nearest same-kind Legacy spawn, 39.6 m from this centre. Position anchor only; no source code or combat rules reused."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102004 (W102-H1); level 7 in band 7-8 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
+          "evidence": "(R) T415 audited centre 39.6 m from the nearest same-kind Legacy NPC row 4667 (FabledRealms.lua:3301), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102004 (W102-H1); level 7 in band 7-8 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
         }
       ]
     },
@@ -1283,9 +1283,9 @@
       "name": "Hooligan",
       "texture_alias": "",
       "position": [
-        -1792.921,
-        -29.33,
-        579.55
+        -2013.0,
+        -35.75,
+        597.0
       ],
       "max_health": 180,
       "damage": 15,
@@ -1296,14 +1296,14 @@
       "spawn_area": {
         "id": "MID-H2",
         "centre": [
-          -1792.921,
-          -29.33,
-          579.55
+          -2013.0,
+          -35.75,
+          597.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000004160,
+      "reference_spawn_guid": 100000004667,
       "source": [
         {
           "kind": "client",
@@ -1311,15 +1311,15 @@
         },
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102005 (area W102-H2): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/Dungeons/Highroad Hijinx.md:19,48. Regional enemy context; dungeon presence does not prove an always-on field population."
+          "evidence": "data/content/field_enemies.json row 131000102005 (area W102-H2): reuses this row's 12 m leash and resource identity; T415 moved the camp off its centre. notes/Build Guides/Content/Dungeons/Highroad Hijinx.md:19,48. Regional enemy context; dungeon presence does not prove an always-on field population."
         },
         {
           "kind": "legacy-data",
-          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2826, NPC row 4160, position [-1792.921, -29.21154, 571.5501]. Position/count anchor only; no source code or combat rules reused."
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:3301, NPC row 4667, position [-2041.375, -33.63479, 636.6123]; the nearest same-kind Legacy spawn, 48.7 m from this centre. Position anchor only; no source code or combat rules reused."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102005 (W102-H2); level 7 in band 7-8 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
+          "evidence": "(R) T415 audited centre 48.7 m from the nearest same-kind Legacy NPC row 4667 (FabledRealms.lua:3301), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102005 (W102-H2); level 7 in band 7-8 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
         }
       ]
     },
@@ -1331,9 +1331,9 @@
       "name": "Troll Bone Shaman",
       "texture_alias": "",
       "position": [
-        -347.084,
-        0.61,
-        1068.348
+        -480.0,
+        4.6,
+        1110.0
       ],
       "max_health": 100,
       "damage": 7,
@@ -1344,9 +1344,9 @@
       "spawn_area": {
         "id": "MID-T1",
         "centre": [
-          -347.084,
-          0.61,
-          1068.348
+          -480.0,
+          4.6,
+          1110.0
         ],
         "radius": 6.0,
         "count": 1
@@ -1359,15 +1359,15 @@
         },
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102010 (area W102-T1): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/Dungeons/Treasure of the Bone Shaman.md:19,27,43; Content/NPCs/NPCs - Wilds.md:111. Regional enemy context; dungeon presence does not prove an always-on field population."
+          "evidence": "data/content/field_enemies.json row 131000102010 (area W102-T1): reuses this row's 12 m leash and resource identity; T415 moved the camp off its centre. notes/Build Guides/Content/Dungeons/Treasure of the Bone Shaman.md:19,27,43; Content/NPCs/NPCs - Wilds.md:111. Regional enemy context; dungeon presence does not prove an always-on field population."
         },
         {
           "kind": "legacy-data",
-          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1892, NPC row 3149, position [-343.084, 1.436595, 1180.348]. Position/count anchor only; no source code or combat rules reused."
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1892, NPC row 3149, position [-343.084, 1.436595, 1180.348]; the nearest same-kind Legacy spawn, 153.9 m from this centre. Position anchor only; no source code or combat rules reused."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102010 (W102-T1); level 9 in band 9-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (100/7); W105 scaling by level produces the live stats."
+          "evidence": "(R) T415 audited centre 153.9 m from the nearest same-kind Legacy NPC row 3149 (FabledRealms.lua:1892), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102010 (W102-T1); level 9 in band 9-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (100/7); W105 scaling by level produces the live stats."
         }
       ]
     },
@@ -1379,9 +1379,9 @@
       "name": "Troll Bone Shaman",
       "texture_alias": "",
       "position": [
-        -351.103,
-        2.33,
-        1048.674
+        -489.0,
+        6.9,
+        1118.0
       ],
       "max_health": 100,
       "damage": 7,
@@ -1392,14 +1392,14 @@
       "spawn_area": {
         "id": "MID-T2",
         "centre": [
-          -351.103,
-          2.33,
-          1048.674
+          -489.0,
+          6.9,
+          1118.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000003150,
+      "reference_spawn_guid": 100000003149,
       "source": [
         {
           "kind": "client",
@@ -1407,15 +1407,15 @@
         },
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102011 (area W102-T2): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/Dungeons/Treasure of the Bone Shaman.md:19,27,43; Content/NPCs/NPCs - Wilds.md:111. Regional enemy context; dungeon presence does not prove an always-on field population."
+          "evidence": "data/content/field_enemies.json row 131000102011 (area W102-T2): reuses this row's 12 m leash and resource identity; T415 moved the camp off its centre. notes/Build Guides/Content/Dungeons/Treasure of the Bone Shaman.md:19,27,43; Content/NPCs/NPCs - Wilds.md:111. Regional enemy context; dungeon presence does not prove an always-on field population."
         },
         {
           "kind": "legacy-data",
-          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1893, NPC row 3150, position [-259.1032, 0.5111136, 1120.674]. Position/count anchor only; no source code or combat rules reused."
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1892, NPC row 3149, position [-343.084, 1.436595, 1180.348]; the nearest same-kind Legacy spawn, 158.7 m from this centre. Position anchor only; no source code or combat rules reused."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102011 (W102-T2); level 9 in band 9-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (100/7); W105 scaling by level produces the live stats."
+          "evidence": "(R) T415 audited centre 158.7 m from the nearest same-kind Legacy NPC row 3149 (FabledRealms.lua:1892), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102011 (W102-T2); level 9 in band 9-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (100/7); W105 scaling by level produces the live stats."
         }
       ]
     },
@@ -1427,9 +1427,9 @@
       "name": "Bixie Soldier",
       "texture_alias": "",
       "position": [
-        -664.762,
-        2.4,
-        299.608
+        -608.0,
+        -2.2,
+        172.0
       ],
       "max_health": 180,
       "damage": 15,
@@ -1440,14 +1440,14 @@
       "spawn_area": {
         "id": "MID-Q1",
         "centre": [
-          -664.762,
-          2.4,
-          299.608
+          -608.0,
+          -2.2,
+          172.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000002920,
+      "reference_spawn_guid": 100000002930,
       "source": [
         {
           "kind": "client",
@@ -1455,15 +1455,15 @@
         },
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102007 (area W102-Q1): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md:40,123; Content/Dungeons/Bixie Hive.md:18,26,48. Regional enemy context; dungeon presence does not prove an always-on field population."
+          "evidence": "data/content/field_enemies.json row 131000102007 (area W102-Q1): reuses this row's 12 m leash and resource identity; T415 moved the camp off its centre. notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md:40,123; Content/Dungeons/Bixie Hive.md:18,26,48. Regional enemy context; dungeon presence does not prove an always-on field population."
         },
         {
           "kind": "legacy-data",
-          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1663, NPC row 2920, position [-672.7616, 2.510802, 299.6082]. Position/count anchor only; no source code or combat rules reused."
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1673, NPC row 2930, position [-645.3138, 2.448046, 221.9843]; the nearest same-kind Legacy spawn, 62.4 m from this centre. Position anchor only; no source code or combat rules reused."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102007 (W102-Q1); level 10 in band 10-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
+          "evidence": "(R) T415 audited centre 62.4 m from the nearest same-kind Legacy NPC row 2930 (FabledRealms.lua:1673), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102007 (W102-Q1); level 10 in band 10-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
         }
       ]
     },
@@ -1475,9 +1475,9 @@
       "name": "Bixie Soldier",
       "texture_alias": "",
       "position": [
-        -692.141,
-        2.4,
-        220.373
+        -608.0,
+        -2.1,
+        160.0
       ],
       "max_health": 180,
       "damage": 15,
@@ -1488,14 +1488,14 @@
       "spawn_area": {
         "id": "MID-Q2",
         "centre": [
-          -692.141,
-          2.4,
-          220.373
+          -608.0,
+          -2.1,
+          160.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000002932,
+      "reference_spawn_guid": 100000002930,
       "source": [
         {
           "kind": "client",
@@ -1503,15 +1503,15 @@
         },
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102008 (area W102-Q2): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md:40,123; Content/Dungeons/Bixie Hive.md:18,26,48. Regional enemy context; dungeon presence does not prove an always-on field population."
+          "evidence": "data/content/field_enemies.json row 131000102008 (area W102-Q2): reuses this row's 12 m leash and resource identity; T415 moved the camp off its centre. notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md:40,123; Content/Dungeons/Bixie Hive.md:18,26,48. Regional enemy context; dungeon presence does not prove an always-on field population."
         },
         {
           "kind": "legacy-data",
-          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1675, NPC row 2932, position [-696.1415, 2.447089, 216.3727]. Position/count anchor only; no source code or combat rules reused."
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1673, NPC row 2930, position [-645.3138, 2.448046, 221.9843]; the nearest same-kind Legacy spawn, 72.3 m from this centre. Position anchor only; no source code or combat rules reused."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102008 (W102-Q2); level 10 in band 10-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
+          "evidence": "(R) T415 audited centre 72.3 m from the nearest same-kind Legacy NPC row 2930 (FabledRealms.lua:1673), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102008 (W102-Q2); level 10 in band 10-10 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/15); W105 scaling by level produces the live stats."
         }
       ]
     },
@@ -1523,9 +1523,9 @@
       "name": "Hooligan Wolf",
       "texture_alias": "",
       "position": [
-        -1962.89,
-        -46.92,
-        284.723
+        -2136.0,
+        -40.2,
+        516.0
       ],
       "max_health": 100,
       "damage": 7,
@@ -1536,14 +1536,14 @@
       "spawn_area": {
         "id": "HIGH-F3",
         "centre": [
-          -1962.89,
-          -46.92,
-          284.723
+          -2136.0,
+          -40.2,
+          516.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000004166,
+      "reference_spawn_guid": 100000003158,
       "source": [
         {
           "kind": "client",
@@ -1551,15 +1551,15 @@
         },
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102003 (area W102-F3): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md:85,129. Regional enemy context; dungeon presence does not prove an always-on field population."
+          "evidence": "data/content/field_enemies.json row 131000102003 (area W102-F3): reuses this row's 12 m leash and resource identity; T415 moved the camp off its centre. notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md:85,129. Regional enemy context; dungeon presence does not prove an always-on field population."
         },
         {
           "kind": "legacy-data",
-          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2832, NPC row 4166, position [-1926.89, -50.08986, 292.7234]. Position/count anchor only; no source code or combat rules reused."
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1901, NPC row 3158, position [-2102.018, -45.02852, 460.4505]; the nearest same-kind Legacy spawn, 65.1 m from this centre. Position anchor only; no source code or combat rules reused."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102003 (W102-F3); level 11 in band 11-12 chosen as the next local progression step above the level 5-10 mid camps and below the level-13 battle gate; count, 120 s respawn and rates are local policy. HP/damage are the starting-band counterpart's level-one values (100/7); W105 scaling by level produces the live stats."
+          "evidence": "(R) T415 audited centre 65.1 m from the nearest same-kind Legacy NPC row 3158 (FabledRealms.lua:1901), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102003 (W102-F3); level 11 in band 11-12 chosen as the next local progression step above the level 5-10 mid camps and below the level-13 battle gate; count, 120 s respawn and rates are local policy. HP/damage are the starting-band counterpart's level-one values (100/7); W105 scaling by level produces the live stats."
         }
       ]
     },
@@ -1571,9 +1571,9 @@
       "name": "Hooligan Wolf",
       "texture_alias": "",
       "position": [
-        -1887.867,
-        -51.14,
-        291.159
+        -2148.0,
+        -37.8,
+        516.0
       ],
       "max_health": 100,
       "damage": 7,
@@ -1584,14 +1584,14 @@
       "spawn_area": {
         "id": "HIGH-F2",
         "centre": [
-          -1887.867,
-          -51.14,
-          291.159
+          -2148.0,
+          -37.8,
+          516.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000004165,
+      "reference_spawn_guid": 100000003158,
       "source": [
         {
           "kind": "client",
@@ -1599,15 +1599,15 @@
         },
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102002 (area W102-F2): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md:85,129. Regional enemy context; dungeon presence does not prove an always-on field population."
+          "evidence": "data/content/field_enemies.json row 131000102002 (area W102-F2): reuses this row's 12 m leash and resource identity; T415 moved the camp off its centre. notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md:85,129. Regional enemy context; dungeon presence does not prove an always-on field population."
         },
         {
           "kind": "legacy-data",
-          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:2831, NPC row 4165, position [-1923.867, -48.80265, 299.1591]. Position/count anchor only; no source code or combat rules reused."
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1901, NPC row 3158, position [-2102.018, -45.02852, 460.4505]; the nearest same-kind Legacy spawn, 72.1 m from this centre. Position anchor only; no source code or combat rules reused."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102002 (W102-F2); level 12 in band 11-12 chosen as the next local progression step above the level 5-10 mid camps and below the level-13 battle gate; count, 120 s respawn and rates are local policy. HP/damage are the starting-band counterpart's level-one values (100/7); W105 scaling by level produces the live stats."
+          "evidence": "(R) T415 audited centre 72.1 m from the nearest same-kind Legacy NPC row 3158 (FabledRealms.lua:1901), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102002 (W102-F2); level 12 in band 11-12 chosen as the next local progression step above the level 5-10 mid camps and below the level-13 battle gate; count, 120 s respawn and rates are local policy. HP/damage are the starting-band counterpart's level-one values (100/7); W105 scaling by level produces the live stats."
         }
       ]
     },
@@ -1619,9 +1619,9 @@
       "name": "Troll Bone Shaman",
       "texture_alias": "",
       "position": [
-        -447.084,
-        3.03,
-        1128.348
+        -512.0,
+        6.1,
+        1214.0
       ],
       "max_health": 100,
       "damage": 7,
@@ -1632,9 +1632,9 @@
       "spawn_area": {
         "id": "HIGH-T3",
         "centre": [
-          -447.084,
-          3.03,
-          1128.348
+          -512.0,
+          6.1,
+          1214.0
         ],
         "radius": 6.0,
         "count": 1
@@ -1647,15 +1647,15 @@
         },
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102012 (area W102-T3): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/Dungeons/Treasure of the Bone Shaman.md:19,27,43; Content/NPCs/NPCs - Wilds.md:111. Regional enemy context; dungeon presence does not prove an always-on field population."
+          "evidence": "data/content/field_enemies.json row 131000102012 (area W102-T3): reuses this row's 12 m leash and resource identity; T415 moved the camp off its centre. notes/Build Guides/Content/Dungeons/Treasure of the Bone Shaman.md:19,27,43; Content/NPCs/NPCs - Wilds.md:111. Regional enemy context; dungeon presence does not prove an always-on field population."
         },
         {
           "kind": "legacy-data",
-          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1892, NPC row 3149, position [-343.084, 1.436595, 1180.348]. Position/count anchor only; no source code or combat rules reused."
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1892, NPC row 3149, position [-343.084, 1.436595, 1180.348]; the nearest same-kind Legacy spawn, 172.2 m from this centre. Position anchor only; no source code or combat rules reused."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102012 (W102-T3); level 13 in band 13-14 chosen as the local progression step above the level 9-10 mid shamans and at the level-13 battle gate; count, 150 s respawn and rates are local policy. HP/damage are the starting-band counterpart's level-one values (100/7); W105 scaling by level produces the live stats."
+          "evidence": "(R) T415 audited centre 172.2 m from the nearest same-kind Legacy NPC row 3149 (FabledRealms.lua:1892), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102012 (W102-T3); level 13 in band 13-14 chosen as the local progression step above the level 9-10 mid shamans and at the level-13 battle gate; count, 150 s respawn and rates are local policy. HP/damage are the starting-band counterpart's level-one values (100/7); W105 scaling by level produces the live stats."
         }
       ]
     },
@@ -1667,9 +1667,9 @@
       "name": "Troll Bone Shaman",
       "texture_alias": "",
       "position": [
-        -351.103,
-        2.33,
-        1048.674
+        -512.0,
+        5.5,
+        1226.0
       ],
       "max_health": 100,
       "damage": 7,
@@ -1680,14 +1680,14 @@
       "spawn_area": {
         "id": "HIGH-T2",
         "centre": [
-          -351.103,
-          2.33,
-          1048.674
+          -512.0,
+          5.5,
+          1226.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000003150,
+      "reference_spawn_guid": 100000003149,
       "source": [
         {
           "kind": "client",
@@ -1695,15 +1695,15 @@
         },
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102011 (area W102-T2): reuses this row's verified W102 centre, 12 m leash and resource identity. notes/Build Guides/Content/Dungeons/Treasure of the Bone Shaman.md:19,27,43; Content/NPCs/NPCs - Wilds.md:111. Regional enemy context; dungeon presence does not prove an always-on field population."
+          "evidence": "data/content/field_enemies.json row 131000102011 (area W102-T2): reuses this row's 12 m leash and resource identity; T415 moved the camp off its centre. notes/Build Guides/Content/Dungeons/Treasure of the Bone Shaman.md:19,27,43; Content/NPCs/NPCs - Wilds.md:111. Regional enemy context; dungeon presence does not prove an always-on field population."
         },
         {
           "kind": "legacy-data",
-          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1893, NPC row 3150, position [-259.1032, 0.5111136, 1120.674]. Position/count anchor only; no source code or combat rules reused."
+          "evidence": "FreeRealms-Legacy 9e082025391177d5a33ee18c714ddd06b457a695 src/Scripts/Zone/FabledRealms.lua:1892, NPC row 3149, position [-343.084, 1.436595, 1180.348]; the nearest same-kind Legacy spawn, 175.0 m from this centre. Position anchor only; no source code or combat rules reused."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Same verified W102 centre and 12 m leash as row 131000102011 (W102-T2); level 14 in band 13-14 chosen as the local progression step above the level 9-10 mid shamans and at the level-13 battle gate; count, 150 s respawn and rates are local policy. HP/damage are the starting-band counterpart's level-one values (100/7); W105 scaling by level produces the live stats."
+          "evidence": "(R) T415 audited centre 175.0 m from the nearest same-kind Legacy NPC row 3149 (FabledRealms.lua:1892), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md); 12 m leash as row 131000102011 (W102-T2); level 14 in band 13-14 chosen as the local progression step above the level 9-10 mid shamans and at the level-13 battle gate; count, 150 s respawn and rates are local policy. HP/damage are the starting-band counterpart's level-one values (100/7); W105 scaling by level produces the live stats."
         }
       ]
     },
@@ -1715,9 +1715,9 @@
       "name": "Troll Bone Shaman",
       "texture_alias": "",
       "position": [
-        -347.084,
-        0.61,
-        1068.348
+        -408.0,
+        0.1,
+        1362.0
       ],
       "max_health": 100,
       "damage": 7,
@@ -1728,9 +1728,9 @@
       "spawn_area": {
         "id": "ELITE-T1",
         "centre": [
-          -347.084,
-          0.61,
-          1068.348
+          -408.0,
+          0.1,
+          1362.0
         ],
         "radius": 6.0,
         "count": 1
@@ -1739,11 +1739,11 @@
       "source": [
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102017 (area MID-T1) for the shamans definition, model, name and level-one stats, and row 131000102010 (area W102-T1) for the verified centre and 12 m leash; notes/Autopilot/T245.md and T296.md."
+          "evidence": "data/content/field_enemies.json row 131000102017 (area MID-T1) for the shamans definition, model, name and level-one stats, and row 131000102010 (area W102-T1) for the 12 m leash (T415 moved the camp off its centre); notes/Autopilot/T245.md and T296.md."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Elite band actor at level 15 in band 15-16; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930025 Troll Bone Shaman base definition; count and rates are local policy. HP/damage are the base definition's level-one values (100/7); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+          "evidence": "(R) T415 audited centre 192.9 m from the nearest same-kind Legacy NPC row 3149 (FabledRealms.lua:1892), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md). Elite band actor at level 15 in band 15-16; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930025 Troll Bone Shaman base definition; count and rates are local policy. HP/damage are the base definition's level-one values (100/7); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
         }
       ]
     },
@@ -1755,9 +1755,9 @@
       "name": "Troll Bone Shaman",
       "texture_alias": "",
       "position": [
-        -447.084,
-        3.03,
-        1128.348
+        -420.0,
+        0.0,
+        1362.0
       ],
       "max_health": 100,
       "damage": 7,
@@ -1768,9 +1768,9 @@
       "spawn_area": {
         "id": "ELITE-T2",
         "centre": [
-          -447.084,
-          3.03,
-          1128.348
+          -420.0,
+          0.0,
+          1362.0
         ],
         "radius": 6.0,
         "count": 1
@@ -1779,11 +1779,11 @@
       "source": [
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102017 (area MID-T1) for the shamans definition, model, name and level-one stats, and row 131000102012 (area W102-T3) for the verified centre and 12 m leash; notes/Autopilot/T245.md and T296.md."
+          "evidence": "data/content/field_enemies.json row 131000102017 (area MID-T1) for the shamans definition, model, name and level-one stats, and row 131000102012 (area W102-T3) for the 12 m leash (T415 moved the camp off its centre); notes/Autopilot/T245.md and T296.md."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Elite band actor at level 16 in band 15-16; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930025 Troll Bone Shaman base definition; count and rates are local policy. HP/damage are the base definition's level-one values (100/7); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+          "evidence": "(R) T415 audited centre 197.3 m from the nearest same-kind Legacy NPC row 3149 (FabledRealms.lua:1892), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md). Elite band actor at level 16 in band 15-16; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930025 Troll Bone Shaman base definition; count and rates are local policy. HP/damage are the base definition's level-one values (100/7); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
         }
       ]
     },
@@ -1795,9 +1795,9 @@
       "name": "Bixie Soldier",
       "texture_alias": "",
       "position": [
-        -651.667,
-        2.4,
-        231.947
+        -572.0,
+        16.3,
+        320.0
       ],
       "max_health": 180,
       "damage": 15,
@@ -1808,22 +1808,22 @@
       "spawn_area": {
         "id": "ELITE-Q1",
         "centre": [
-          -651.667,
-          2.4,
-          231.947
+          -572.0,
+          16.3,
+          320.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000002933,
+      "reference_spawn_guid": 100000002915,
       "source": [
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102019 (area MID-Q1) for the bixies definition, model, name and level-one stats, and row 131000102009 (area W102-Q3) for the verified centre and 12 m leash; notes/Autopilot/T245.md and T296.md."
+          "evidence": "data/content/field_enemies.json row 131000102019 (area MID-Q1) for the bixies definition, model, name and level-one stats, and row 131000102009 (area W102-Q3) for the 12 m leash (T415 moved the camp off its centre); notes/Autopilot/T245.md and T296.md."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Elite band actor at level 17 in band 17-18; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930053 Bixie Soldier base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+          "evidence": "(R) T415 audited centre 79.7 m from the nearest same-kind Legacy NPC row 2915 (FabledRealms.lua:1658), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md). Elite band actor at level 17 in band 17-18; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930053 Bixie Soldier base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
         }
       ]
     },
@@ -1835,9 +1835,9 @@
       "name": "Bixie Soldier",
       "texture_alias": "",
       "position": [
-        -664.762,
-        2.4,
-        299.608
+        -560.0,
+        16.6,
+        320.0
       ],
       "max_health": 180,
       "damage": 15,
@@ -1848,22 +1848,22 @@
       "spawn_area": {
         "id": "ELITE-Q2",
         "centre": [
-          -664.762,
-          2.4,
-          299.608
+          -560.0,
+          16.6,
+          320.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000002920,
+      "reference_spawn_guid": 100000002915,
       "source": [
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102019 (area MID-Q1) for the bixies definition, model, name and level-one stats, and row 131000102007 (area W102-Q1) for the verified centre and 12 m leash; notes/Autopilot/T245.md and T296.md."
+          "evidence": "data/content/field_enemies.json row 131000102019 (area MID-Q1) for the bixies definition, model, name and level-one stats, and row 131000102007 (area W102-Q1) for the 12 m leash (T415 moved the camp off its centre); notes/Autopilot/T245.md and T296.md."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Elite band actor at level 18 in band 17-18; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930053 Bixie Soldier base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+          "evidence": "(R) T415 audited centre 89.3 m from the nearest same-kind Legacy NPC row 2915 (FabledRealms.lua:1658), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md). Elite band actor at level 18 in band 17-18; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930053 Bixie Soldier base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
         }
       ]
     },
@@ -1875,9 +1875,9 @@
       "name": "Hooligan",
       "texture_alias": "",
       "position": [
-        -1789.626,
-        -30.24,
-        616.51
+        -1817.0,
+        -44.45,
+        176.0
       ],
       "max_health": 180,
       "damage": 15,
@@ -1888,22 +1888,22 @@
       "spawn_area": {
         "id": "ELITE-H1",
         "centre": [
-          -1789.626,
-          -30.24,
-          616.51
+          -1817.0,
+          -44.45,
+          176.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000004161,
+      "reference_spawn_guid": 100000023623,
       "source": [
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102015 (area MID-H1) for the hooligans definition, model, name and level-one stats, and row 131000102006 (area W102-H3) for the verified centre and 12 m leash; notes/Autopilot/T245.md and T296.md."
+          "evidence": "data/content/field_enemies.json row 131000102015 (area MID-H1) for the hooligans definition, model, name and level-one stats, and row 131000102006 (area W102-H3) for the 12 m leash (T415 moved the camp off its centre); notes/Autopilot/T245.md and T296.md."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Elite band actor at level 19 in band 19-20; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930060 Hooligan base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+          "evidence": "(R) T415 audited centre 39.8 m from the nearest same-kind Legacy NPC row 23623 (FabledRealms.lua:4152), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md). Elite band actor at level 19 in band 19-20; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930060 Hooligan base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
         }
       ]
     },
@@ -1915,9 +1915,9 @@
       "name": "Hooligan",
       "texture_alias": "",
       "position": [
-        -1779.455,
-        -28.88,
-        562.833
+        -1817.0,
+        -43.45,
+        188.0
       ],
       "max_health": 180,
       "damage": 15,
@@ -1928,22 +1928,22 @@
       "spawn_area": {
         "id": "ELITE-H2",
         "centre": [
-          -1779.455,
-          -28.88,
-          562.833
+          -1817.0,
+          -43.45,
+          188.0
         ],
         "radius": 6.0,
         "count": 1
       },
-      "reference_spawn_guid": 100000004159,
+      "reference_spawn_guid": 100000023623,
       "source": [
         {
           "kind": "reference",
-          "evidence": "data/content/field_enemies.json row 131000102015 (area MID-H1) for the hooligans definition, model, name and level-one stats, and row 131000102004 (area W102-H1) for the verified centre and 12 m leash; notes/Autopilot/T245.md and T296.md."
+          "evidence": "data/content/field_enemies.json row 131000102015 (area MID-H1) for the hooligans definition, model, name and level-one stats, and row 131000102004 (area W102-H1) for the 12 m leash (T415 moved the camp off its centre); notes/Autopilot/T245.md and T296.md."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) Elite band actor at level 20 in band 19-20; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930060 Hooligan base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
+          "evidence": "(R) T415 audited centre 40.4 m from the nearest same-kind Legacy NPC row 23623 (FabledRealms.lua:4152), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md). Elite band actor at level 20 in band 19-20; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930060 Hooligan base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
         }
       ]
     }
