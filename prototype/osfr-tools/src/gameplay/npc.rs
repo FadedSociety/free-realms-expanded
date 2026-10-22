@@ -553,10 +553,13 @@ impl Gameplay {
                 }
                 Ok(NpcSelection::Shop(mut window)) => {
                     // F228: the 66/42 window advertises the same resale price the Coin Shop
-                    // pays; a job starter item is free issuance, so show 0, not the raw row.
-                    if let Some(profiles) = &self.profiles {
-                        window.zero_starter_sell_prices(&profiles.all_starter_items());
-                    }
+                    // pays; a job starter item or (L040) a Condo starter-kit item is free
+                    // issuance, so show 0, not the raw row.
+                    let profiles = self.profiles.as_ref();
+                    let mut free =
+                        profiles.map_or_else(Default::default, Profiles::all_starter_items);
+                    free.extend(self.housing.iter().flat_map(|housing| housing.kit_items()));
+                    window.zero_starter_sell_prices(&free);
                     out.replies.push(
                         merchant_packet(&window)
                             .map_err(|_| invalid("NPC merchant list could not be encoded"))?,

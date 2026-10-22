@@ -2,7 +2,7 @@
 //! player got that copy. The regression drives the real gateway path: learn a job from its
 //! trainer, unequip and sell the starter weapon, reselect the job (which re-grants it) and sell
 //! again, then buy the same item from a merchant and sell that copy. A non-starter item still
-//! pays its catalogued price.
+//! pays its catalogued price, and (L040) the Wilds Condo starter kit resells for 0 as well.
 //!
 //! Client facts: 165/5 names no price (sender `00c76dd0`/`00c75a70` write the merchant, item
 //! instance and quantity only), and 165/6 carries the server's unit price (`00c71f30` reads
@@ -465,4 +465,56 @@ fn a_saved_package_loads_with_an_invalid_unused_default_state() {
     let loaded = Gameplay::load(&fixture.content, Some(saved))
         .expect("a valid saved progression must load even when default_state is unused");
     assert!(loaded.state().profiles.is_some());
+}
+
+/// L040: the Wilds Condo's starter kit (houses.json `starter_kit`) is free issuance too. The 66/42
+/// window advertises 0 for both kit items, and the Chicken the 127/23 grant put in the bag sells
+/// for 0, although the synthetic store keeps their reference resale prices (500 and 2).
+#[test]
+fn the_condo_starter_kit_resells_for_zero() {
+    const CHICKEN: i32 = 70_429;
+    const KIT_BLOCK: i32 = 32_647;
+    let fixture = Fixture::new();
+    fs::copy(
+        content_dir().join("houses.json"),
+        fixture.content.join("houses.json"),
+    )
+    .unwrap();
+    write_json(
+        &fixture.content.join("vendors.json"),
+        &json!({"schema_version":1,"vendors":[
+            {"npc_id":VENDOR,"item_ids":[CHICKEN, KIT_BLOCK, NORMAL_ITEM]}
+        ]}),
+    );
+    write_json(
+        &fixture.content.join("stores.json"),
+        &json!({"schema_version":1,"marketplace":{
+        "enabled_on_handshake":false,"orders_enabled":false,
+        "payment_sources_enabled":false,"not_available_message":"disabled"},
+        "items":[
+            store_row(CHICKEN, 1_000, 500),
+            store_row(KIT_BLOCK, 5, 2),
+            store_row(NORMAL_ITEM, 15, NORMAL_SELL_PRICE)
+        ]}),
+    );
+    let mut gateway = fixture.connect();
+    request(&mut gateway, &[127, 0, 23, 0]);
+    let chicken = instance_of(&inventory_of(&gateway), CHICKEN);
+
+    let rows = merchant_rows(&open_shop(&mut gateway));
+    assert!(rows.contains(&(CHICKEN, 1_000, 0)), "{rows:?}");
+    assert!(rows.contains(&(KIT_BLOCK, 5, 0)), "{rows:?}");
+    assert!(
+        rows.contains(&(NORMAL_ITEM, 15, NORMAL_SELL_PRICE)),
+        "{rows:?}"
+    );
+    let coins = inventory_of(&gateway).coins;
+    let sold = one_completion(&send(&mut gateway, &sell_packet(0, chicken, 1)));
+    assert_eq!((sold.result, sold.definition), (RESULT_OK, CHICKEN));
+    assert_eq!(
+        sold.price, 0,
+        "the free Chicken must not pay its store price"
+    );
+    assert_eq!(inventory_of(&gateway).coins, coins);
+    assert_eq!(count_definition(&inventory_of(&gateway), CHICKEN), 0);
 }

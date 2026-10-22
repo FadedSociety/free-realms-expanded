@@ -64,6 +64,11 @@ impl HousingSession {
     pub(super) fn in_house(&self) -> bool {
         self.return_to.is_some()
     }
+
+    /// The starter kit's items: free issuance, so a merchant pays 0 for them.
+    pub(super) fn kit_items(&self) -> Vec<i32> {
+        self.service.kit_items()
+    }
 }
 
 fn encode_replies(outcome: &ServiceOutcome) -> io::Result<Vec<Vec<u8>>> {

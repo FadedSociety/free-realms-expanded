@@ -3,20 +3,27 @@
 //! reconnects keep the world pose, 127/10 returns to it, and refusals change nothing. The starter
 //! is the Wilds Condo (property 25), and a character who already holds the old starter (property 1)
 //! gains it once. Slice 2 decorates it: edit mode, 127/1 -> 127/42, place, pick up, pick up all,
-//! a relog, and every refusal answered by 127/53. Raw inner packets as the client sends them; no
-//! player data.
+//! a relog, and every refusal answered by 127/53. A new Condo comes with its starter kit (L040):
+//! a Chicken in the bag and Basic Square Blocks already standing. Raw inner packets as the client
+//! sends them; no player data.
+#[path = "common/item_catalogue.rs"]
+mod item_catalogue;
+
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::Gameplay,
     gateway::Gateway,
+    housing::{FixtureTransform, SavedFixture},
     housing_native::{
         FixtureAsset, FixtureItemList, FixtureRemove, FixtureUpdate, HouseInfo, InstanceList,
         PlacementDenied, PlayerHousingInstanceInfo, ZoneData,
     },
     housing_service::HousingContent,
+    inventory::{InventoryItem, MAX_ITEMS},
     zone_transition,
 };
 use std::{
+    collections::BTreeSet,
     fs,
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
@@ -68,16 +75,19 @@ impl Content {
             dir.join("houses.json"),
         )
         .unwrap();
+        // The captured catalogue has no Basic Square Block, so a picked-up kit block needs this
+        // synthetic definition row to enter the bag.
+        item_catalogue::write(&dir, &[item_catalogue::sized_row(KIT_BLOCK as u32, 64)]);
         Self(dir)
     }
 
-    /// The bundled lots with another starter and no starter fixture: a save made before the Wilds
+    /// The bundled lots with another starter and no starter kit: a save made before the Wilds
     /// Condo became the starter.
     fn with_starter(property_id: i32) -> Self {
         let content = Self::with_houses();
         let mut houses = HousingContent::bundled().unwrap();
         houses.starter_property_id = property_id;
-        houses.starter_fixture_item_id = None;
+        houses.starter_kit = None;
         fs::write(
             content.0.join("houses.json"),
             serde_json::to_vec(&houses).unwrap(),
@@ -184,9 +194,15 @@ fn an_owner_of_lot_one_gains_the_condo_once_and_keeps_lot_one() {
     assert!(lots.contains(&lot_one), "lot 1 is kept unchanged");
     assert!(lots.iter().any(|lot| lot.name_id == WILDS_CONDO));
     assert!(
-        matches!(blocks(&game)[..], [(_, 1)]),
-        "the condo comes with one block"
+        matches!(owned(&game, CHICKEN)[..], [(_, 1)]),
+        "the condo comes with one Chicken"
     );
+    let held = game.state().housing.unwrap().lots;
+    let furnished: Vec<_> = held
+        .iter()
+        .map(|l| (l.property_id, l.fixtures.len()))
+        .collect();
+    assert!(furnished.contains(&(25, KIT_BLOCKS)) && furnished.contains(&(1, 0)));
 
     let saved = game.state();
     let again = game.handle_in_world(&GRANT, &character(), 3_000).unwrap();
@@ -214,10 +230,11 @@ fn entering_changes_scene_and_the_house_packets_wait_for_the_load() {
 
     let loaded = game.initialize_world(&character(), 3_000).unwrap();
     let order: Vec<_> = loaded.replies.iter().map(|r| subtype(r)).collect();
+    let mut expected = vec![Some(45), Some(28), Some(44), Some(43)];
+    expected.extend([Some(40); KIT_BLOCKS]);
     assert_eq!(
-        order,
-        [Some(45), Some(28), Some(44), Some(43)],
-        "zone data, then the house record before any 127/4x"
+        order, expected,
+        "zone data, then the house record before any 127/4x, then the standing kit"
     );
     let zone = ZoneData::decode(&loaded.replies[0][2..]).unwrap();
     assert_eq!(zone.instance, lot);
@@ -350,8 +367,11 @@ fn content_without_houses_leaves_family_127_alone() {
 
 // ---- Decorate (slice 2): 127/6 edit mode, 127/1 -> 127/42, 127/2 place, 127/3 and 127/4. ----
 
-/// houses.json `starter_fixture_item_id`: the one unit a new starter lot comes with.
-const BLOCK: i32 = 7466;
+/// houses.json `starter_kit` (L040): a new Condo puts one Chicken in the bag and stands four
+/// Basic Square Blocks in the lot.
+const CHICKEN: i32 = 70_429;
+const KIT_BLOCK: i32 = 32_647;
+const KIT_BLOCKS: usize = 4;
 /// Inside the Wilds Condo's build box (houses.json property 25).
 const ON_THE_LOT: [f32; 4] = [100.0, 0.0, -30.0, 1.0];
 const PICKUP_ALL: [u8; 4] = [127, 0, 4, 0];
@@ -397,14 +417,29 @@ fn reply(replies: &[Vec<u8>], wanted: u16) -> &[u8] {
     &found.unwrap_or_else(|| panic!("127/{wanted} in {replies:?}"))[2..]
 }
 
-/// The (item id, count) of every block in the saved backpack.
-fn blocks(game: &Gameplay) -> Vec<(i32, u32)> {
+/// The (item id, count) of every row of `definition` in the saved backpack.
+fn owned(game: &Gameplay, definition: i32) -> Vec<(i32, u32)> {
     let state = game.state().inventory;
     let items = state
         .items
         .iter()
-        .filter(|item| item.definition_id == BLOCK);
+        .filter(|item| item.definition_id == definition);
     items.map(|item| (item.id, item.count)).collect()
+}
+
+/// The saved fixtures of the one lot this character holds.
+fn standing(game: &Gameplay) -> Vec<SavedFixture> {
+    let lots = game.state().housing.unwrap().lots;
+    assert_eq!(lots.len(), 1, "one lot");
+    lots[0].fixtures.clone()
+}
+
+/// The 127/40 records among `replies`.
+fn updates(replies: &[Vec<u8>]) -> Vec<FixtureUpdate> {
+    let records = replies.iter().filter(|r| subtype(r) == Some(40));
+    records
+        .map(|r| FixtureUpdate::decode(&r[2..]).unwrap())
+        .collect()
 }
 
 /// Item ids the client is told about: 38/2 adds (payload: definition, tint, id) and 38/4 removals.
@@ -423,8 +458,8 @@ fn decorating(game: &mut Gameplay) -> (u64, u32) {
         .unwrap();
     let loaded = game.initialize_world(&character(), 3_000).unwrap();
     let list = FixtureItemList::decode(reply(&loaded.replies, 43)).unwrap();
-    assert_eq!(list.items.len(), 1, "the starter block is listed");
-    assert_eq!(list.items[0].item_definition_id, BLOCK);
+    assert_eq!(list.items.len(), 1, "the starter Chicken is listed");
+    assert_eq!(list.items[0].item_definition_id, CHICKEN);
     let on = game
         .handle_in_world(&edit(true), &character(), 4_000)
         .unwrap();
@@ -439,7 +474,7 @@ fn decorating(game: &mut Gameplay) -> (u64, u32) {
 }
 
 /// 127/1 then 127/2 for one owned item: the placed fixture's guid.
-fn place_block(game: &mut Gameplay, item: u32) -> u64 {
+fn place_item(game: &mut Gameplay, item: u32) -> u64 {
     let asked = game
         .handle_in_world(&ask(item), &character(), 5_000)
         .unwrap();
@@ -477,21 +512,169 @@ fn refused(game: &mut Gameplay, what: &str, inner: &[u8]) -> String {
 }
 
 #[test]
-fn a_new_lot_comes_with_one_block_and_a_repeat_ask_adds_none() {
+fn a_new_condo_comes_with_a_chicken_and_standing_blocks_once() {
     let content = Content::with_houses();
     let mut game = content.game();
     let first = game.handle_in_world(&GRANT, &character(), 1_000).unwrap();
-    let [(item, 1)] = blocks(&game)[..] else {
-        panic!("one single block: {:?}", blocks(&game))
+    let [(chicken, 1)] = owned(&game, CHICKEN)[..] else {
+        panic!("one single Chicken: {:?}", owned(&game, CHICKEN))
     };
     assert_eq!(
         backpack(&first.replies, 2),
-        [item],
-        "the client is sent the item"
+        [chicken],
+        "the client is sent the Chicken"
     );
+    let kit = HousingContent::bundled().unwrap().starter_kit.unwrap();
+    let blocks = standing(&game);
+    assert_eq!(blocks.len(), KIT_BLOCKS);
+    for at in &kit.placed_positions {
+        assert!(blocks.iter().any(|b| b.transform.position == *at), "{at:?}");
+    }
+    assert!(blocks.iter().all(|b| b.fixture_definition_id == KIT_BLOCK));
+    // Each block has its own item id: never in the bag, and the bag's counter moved past it.
+    let ids: BTreeSet<i64> = blocks
+        .iter()
+        .map(|b| i64::from(b.item_instance_id))
+        .collect();
+    let bag = game.state().inventory;
+    assert_eq!(ids.len(), KIT_BLOCKS);
+    assert!(
+        bag.items
+            .iter()
+            .all(|item| !ids.contains(&i64::from(item.id)))
+    );
+    assert!(bag.next_instance_id > ids.last().copied());
+
+    let saved = game.state();
     let again = game.handle_in_world(&GRANT, &character(), 2_000).unwrap();
-    assert!(backpack(&again.replies, 2).is_empty());
-    assert_eq!(blocks(&game), [(item, 1)]);
+    assert!(!again.changed && backpack(&again.replies, 2).is_empty());
+    assert_eq!(game.state(), saved, "a repeat ask grants no second kit");
+}
+
+#[test]
+fn a_standing_block_picks_up_as_one_block_and_the_save_reloads() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    decorating(&mut game);
+    let block = standing(&game)[0].fixture_guid;
+    let picked = game
+        .handle_in_world(&pickup(block), &character(), 7_000)
+        .unwrap();
+    assert!(picked.changed);
+    assert_eq!(housing(&picked.replies), [41, 44]);
+    let [(back, 1)] = owned(&game, KIT_BLOCK)[..] else {
+        panic!("one block back: {:?}", owned(&game, KIT_BLOCK))
+    };
+    assert_eq!(backpack(&picked.replies, 2), [back]);
+    assert_eq!(standing(&game).len(), KIT_BLOCKS - 1);
+    // The reload re-runs conservation: no id is both in the bag and on the lot.
+    let relogged = Gameplay::load(&content.0, Some(game.state())).unwrap();
+    assert_eq!(owned(&relogged, KIT_BLOCK), [(back, 1)]);
+    assert_eq!(standing(&relogged), standing(&game));
+}
+
+/// One single unit of `definition_id` under item id `id`, as a save holds it.
+fn single(id: i32, definition_id: i32) -> InventoryItem {
+    InventoryItem {
+        definition_id,
+        tint: 0,
+        id,
+        count: 1,
+        consumed_count: 0,
+        stored_count: 0,
+        last_cast_time: i64::from(i32::MAX),
+        rental: None,
+        ability_count: 0,
+        activate_enabled: false,
+    }
+}
+
+#[test]
+fn the_kit_chicken_arrives_unstacked_beside_one_already_owned() {
+    let content = Content::with_houses();
+    let mut state = content.game().state();
+    let id = state
+        .inventory
+        .items
+        .iter()
+        .map(|i| i.id)
+        .max()
+        .unwrap_or(0)
+        + 1;
+    state.inventory.items.push(single(id, CHICKEN));
+    let mut game = Gameplay::load(&content.0, Some(state)).unwrap();
+    granted(&mut game);
+    let chickens = owned(&game, CHICKEN);
+    assert_eq!(chickens.len(), 2, "{chickens:?}");
+    assert!(
+        chickens.iter().all(|&(_, count)| count == 1),
+        "each can be placed: {chickens:?}"
+    );
+}
+
+#[test]
+fn a_full_bag_refuses_the_whole_grant_and_a_retry_gets_the_kit() {
+    let content = Content::with_houses();
+    let mut state = content.game().state();
+    let mut id = state.inventory.items.iter().map(|i| i.id).max().unwrap();
+    while state.inventory.items.len() < MAX_ITEMS {
+        id += 1;
+        // Any catalogued item fills a row: 7466 is the captured Blue Square Block.
+        state.inventory.items.push(single(id, 7_466));
+    }
+    let mut game = Gameplay::load(&content.0, Some(state)).unwrap();
+    let before = serde_json::to_vec(&game.state()).unwrap();
+    let out = game.handle_in_world(&GRANT, &character(), 1_000).unwrap();
+    assert!(
+        !out.changed && housing(&out.replies).is_empty(),
+        "no house list"
+    );
+    let text = String::from_utf8_lossy(&out.replies.concat()).into_owned();
+    assert!(text.contains("The inventory could not apply that change."));
+    let after = serde_json::to_vec(&game.state()).unwrap();
+    assert_eq!(after, before, "nothing changes");
+
+    let mut state = game.state();
+    state.inventory.items.pop();
+    let mut game = Gameplay::load(&content.0, Some(state)).unwrap();
+    granted(&mut game);
+    assert!(matches!(owned(&game, CHICKEN)[..], [(_, 1)]));
+    assert_eq!(standing(&game).len(), KIT_BLOCKS);
+}
+
+#[test]
+fn kit_ids_skip_an_id_a_lot_already_holds() {
+    // A pre-condo save with no id counter whose lot-1 fixture holds the id just above the bag's
+    // highest row (that item left the bag when it was placed).
+    let mut before = Content::with_starter(1).game();
+    granted(&mut before);
+    let mut state = before.state();
+    assert_eq!(state.inventory.next_instance_id, None);
+    let held = state.inventory.items.iter().map(|i| i.id).max().unwrap() as u32 + 1;
+    let lot = &mut state.housing.as_mut().unwrap().lots[0];
+    let area = lot.build_areas[0];
+    lot.fixtures.push(SavedFixture {
+        fixture_guid: 0x00a0_0000_0000_0001,
+        house_guid: lot.lot_guid,
+        item_instance_id: held,
+        fixture_definition_id: 34,
+        transform: FixtureTransform {
+            position: [area[0], area[1], area[2]],
+            ..FixtureTransform::default()
+        },
+        placed_by: lot.owner_guid, // L045's field (rebase onto 770b791): the owner placed it.
+    });
+    lot.count = 1;
+    let content = Content::with_houses();
+    let mut game = Gameplay::load(&content.0, Some(state)).unwrap();
+    let out = game.handle_in_world(&GRANT, &character(), 2_000).unwrap();
+    assert!(out.changed);
+    let [(chicken, 1)] = owned(&game, CHICKEN)[..] else {
+        panic!("one Chicken: {:?}", owned(&game, CHICKEN))
+    };
+    assert_ne!(chicken as u32, held);
+    // The save reloads: the conservation check finds no id both in the bag and on a lot.
+    Gameplay::load(&content.0, Some(game.state())).expect("conservation holds");
 }
 
 #[test]
@@ -512,27 +695,27 @@ fn edit_mode_on_then_off_flips_the_house_flag() {
 }
 
 #[test]
-fn the_listed_block_is_asked_for_placed_and_leaves_the_backpack() {
-    let content = Content::with_houses();
-    let mut game = content.game();
-    let (lot, item) = decorating(&mut game);
-    let fixture = place_block(&mut game, item);
-    assert!(blocks(&game).is_empty(), "the item left the inventory");
-    let lots = game.state().housing.unwrap().lots;
-    let placed = &lots.iter().find(|l| l.lot_guid == lot).unwrap().fixtures;
-    assert_eq!(placed.len(), 1);
-    assert_eq!(
-        (placed[0].fixture_guid, placed[0].item_instance_id),
-        (fixture, item)
-    );
-}
-
-#[test]
-fn pickup_returns_the_block_and_it_places_again() {
+fn the_listed_chicken_is_asked_for_placed_and_leaves_the_backpack() {
     let content = Content::with_houses();
     let mut game = content.game();
     let (_, item) = decorating(&mut game);
-    let fixture = place_block(&mut game, item);
+    let fixture = place_item(&mut game, item);
+    assert!(
+        owned(&game, CHICKEN).is_empty(),
+        "the item left the inventory"
+    );
+    let placed = standing(&game);
+    assert_eq!(placed.len(), KIT_BLOCKS + 1);
+    let chicken = placed.iter().find(|f| f.fixture_guid == fixture).unwrap();
+    assert_eq!(chicken.item_instance_id, item);
+}
+
+#[test]
+fn pickup_returns_the_chicken_and_it_places_again() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let (_, item) = decorating(&mut game);
+    let fixture = place_item(&mut game, item);
     let picked = game
         .handle_in_world(&pickup(fixture), &character(), 7_000)
         .unwrap();
@@ -541,16 +724,16 @@ fn pickup_returns_the_block_and_it_places_again() {
     let removed = FixtureRemove::decode(reply(&picked.replies, 41)).unwrap();
     assert_eq!(removed.fixture_guid, fixture);
     // The unit comes back as one single item (a fresh id), not a stack of two.
-    let [(back, 1)] = blocks(&game)[..] else {
-        panic!("one single block back: {:?}", blocks(&game))
+    let [(back, 1)] = owned(&game, CHICKEN)[..] else {
+        panic!("one single Chicken back: {:?}", owned(&game, CHICKEN))
     };
     assert_eq!(
         backpack(&picked.replies, 2),
         [back],
         "the client is sent the item"
     );
-    assert!(game.state().housing.unwrap().lots[0].fixtures.is_empty());
-    place_block(&mut game, u32::try_from(back).unwrap());
+    assert_eq!(standing(&game).len(), KIT_BLOCKS, "only the kit stands");
+    place_item(&mut game, u32::try_from(back).unwrap());
 }
 
 #[test]
@@ -558,64 +741,77 @@ fn a_new_127_1_retires_the_previous_selection() {
     let content = Content::with_houses();
     let mut game = content.game();
     let (_, first) = decorating(&mut game);
-    let fixture = place_block(&mut game, first);
+    let fixture = place_item(&mut game, first);
     game.handle_in_world(&pickup(fixture), &character(), 7_000)
         .unwrap();
-    let [(back, 1)] = blocks(&game)[..] else {
-        panic!("one single block back: {:?}", blocks(&game))
+    let [(back, 1)] = owned(&game, CHICKEN)[..] else {
+        panic!("one single Chicken back: {:?}", owned(&game, CHICKEN))
     };
     let back = u32::try_from(back).unwrap();
     assert_ne!(back, first, "pickup returns the unit under a fresh id");
-    place_block(&mut game, back);
+    place_item(&mut game, back);
     // Only the latest 127/1 stays bound, so a place/pickup loop cannot grow the bindings.
     let reason = refused(&mut game, "127/2 with the retired id", &place(first));
     assert_eq!(reason, "That fixture selection is no longer available.");
 }
 
 #[test]
-fn pickup_all_returns_every_placed_block() {
+fn pickup_all_returns_every_standing_fixture() {
     let content = Content::with_houses();
     let mut game = content.game();
     let (_, item) = decorating(&mut game);
-    let fixture = place_block(&mut game, item);
+    let fixture = place_item(&mut game, item);
     let all = game
         .handle_in_world(&PICKUP_ALL, &character(), 7_000)
         .unwrap();
     assert!(all.changed);
-    assert_eq!(housing(&all.replies), [41, 44]);
-    let removed = FixtureRemove::decode(reply(&all.replies, 41)).unwrap();
-    assert_eq!(removed.fixture_guid, fixture);
-    let [(back, 1)] = blocks(&game)[..] else {
-        panic!("one single block back: {:?}", blocks(&game))
+    let mut expected = vec![41; KIT_BLOCKS + 1];
+    expected.push(44);
+    assert_eq!(housing(&all.replies), expected);
+    let removed = all.replies.iter().filter(|r| subtype(r) == Some(41));
+    let mut removed = removed.map(|r| FixtureRemove::decode(&r[2..]).unwrap().fixture_guid);
+    assert!(removed.any(|guid| guid == fixture));
+    let [(back, 1)] = owned(&game, CHICKEN)[..] else {
+        panic!("one single Chicken back: {:?}", owned(&game, CHICKEN))
     };
-    assert_eq!(backpack(&all.replies, 2), [back]);
-    assert!(game.state().housing.unwrap().lots[0].fixtures.is_empty());
+    assert!(backpack(&all.replies, 2).contains(&back));
+    // The blocks come back too (as one stack: the L031 return rule merges equal units).
+    let blocks: u32 = owned(&game, KIT_BLOCK).iter().map(|&(_, n)| n).sum();
+    assert_eq!(blocks, KIT_BLOCKS as u32);
+    assert!(standing(&game).is_empty());
 }
 
 #[test]
-fn a_placed_block_survives_save_reload_and_reentry() {
+fn a_placed_chicken_and_the_kit_survive_save_reload_and_reentry() {
     let content = Content::with_houses();
     let mut game = content.game();
     let (lot, item) = decorating(&mut game);
-    let fixture = place_block(&mut game, item);
+    let fixture = place_item(&mut game, item);
     let mut relogged = Gameplay::load(&content.0, Some(game.state())).unwrap();
+    assert_eq!(standing(&relogged), standing(&game));
     relogged
         .handle_in_world(&enter(lot), &character(), 8_000)
         .unwrap();
     let loaded = relogged.initialize_world(&character(), 9_000).unwrap();
-    assert_eq!(housing(&loaded.replies), [45, 28, 44, 43, 40]);
-    let update = FixtureUpdate::decode(reply(&loaded.replies, 40)).unwrap();
+    let mut expected = vec![45, 28, 44, 43];
+    expected.extend([40; KIT_BLOCKS + 1]);
+    assert_eq!(housing(&loaded.replies), expected);
+    let updates = updates(&loaded.replies);
+    let chicken = updates.iter().find(|u| u.instance.guid == fixture).unwrap();
     assert_eq!(
-        (update.instance.guid, update.instance.house_guid),
-        (fixture, lot)
+        (chicken.instance.house_guid, chicken.info.item_definition_id),
+        (lot, CHICKEN)
     );
-    assert_eq!(update.info.item_definition_id, BLOCK);
+    let blocks = updates
+        .iter()
+        .filter(|u| u.info.item_definition_id == KIT_BLOCK);
+    assert_eq!(blocks.count(), KIT_BLOCKS);
     let list = FixtureItemList::decode(reply(&loaded.replies, 43)).unwrap();
     assert!(
         list.items.is_empty(),
-        "the placed block is not offered again"
+        "the placed Chicken is not offered again"
     );
-    assert!(blocks(&relogged).is_empty());
+    assert!(owned(&relogged, CHICKEN).is_empty());
 }
 
 #[test]
@@ -623,8 +819,8 @@ fn decorate_refusals_answer_127_53_and_change_nothing() {
     let content = Content::with_houses();
     let mut game = content.game();
     let lot = granted(&mut game);
-    let [(item, 1)] = blocks(&game)[..] else {
-        panic!("one single block")
+    let [(item, 1)] = owned(&game, CHICKEN)[..] else {
+        panic!("one single Chicken")
     };
     let item = u32::try_from(item).unwrap();
     for (what, inner) in [
@@ -660,14 +856,14 @@ fn decorate_refusals_answer_127_53_and_change_nothing() {
         refused(&mut game, what, &inner);
     }
 
-    // A save whose block is a stack of two: the stack cannot back one fixture.
+    // A save whose Chicken is a stack of two: the stack cannot back one fixture.
     let mut stacked = game.state();
-    let block = stacked
+    let chicken = stacked
         .inventory
         .items
         .iter_mut()
-        .find(|i| i.definition_id == BLOCK);
-    block.unwrap().count = 2;
+        .find(|i| i.definition_id == CHICKEN);
+    chicken.unwrap().count = 2;
     let mut game = Gameplay::load(&content.0, Some(stacked)).unwrap();
     game.handle_in_world(&enter(lot.instance_guid), &character(), 5_000)
         .unwrap();
@@ -800,5 +996,7 @@ fn the_gateway_sends_the_scene_change_then_the_house_after_the_load() {
         .iter()
         .filter_map(|r| r.get(7..).and_then(subtype))
         .collect();
-    assert_eq!(house, [45, 28, 44, 43], "the house follows the lot load");
+    let mut expected = vec![45, 28, 44, 43];
+    expected.extend([40; KIT_BLOCKS]);
+    assert_eq!(house, expected, "the house follows the lot load");
 }

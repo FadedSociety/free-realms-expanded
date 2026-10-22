@@ -217,7 +217,7 @@ pub struct PropertyDefinition {
 }
 
 impl PropertyDefinition {
-    fn contains(&self, position: [f32; 3]) -> bool {
+    pub(crate) fn contains(&self, position: [f32; 3]) -> bool {
         self.build_areas.iter().any(|area| {
             position[0] >= area[0]
                 && position[0] <= area[3]

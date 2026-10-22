@@ -224,7 +224,7 @@ fn test_housing_content() -> HousingContent {
         schema_version: 1,
         provenance: "synthetic test content".to_string(),
         starter_property_id: 5,
-        starter_fixture_item_id: None,
+        starter_kit: None,
         client_evidence: vec!["synthetic test row".to_string()],
         lots: vec![lot_definition(property())],
     }
@@ -317,6 +317,28 @@ impl FurnitureStock for TestStock {
             staged.return_instance(definition_id, tint_id)?;
         }
         *self = staged;
+        Ok(())
+    }
+
+    fn first_free_instance_id(&self) -> Result<u32, ServiceError> {
+        Ok(self
+            .instances
+            .iter()
+            .map(|e| e.instance_id)
+            .max()
+            .unwrap_or(0)
+            + 1)
+    }
+
+    /// Only the unit is recorded; this stand-in keeps no counter for the standing fixtures' ids.
+    fn grant_kit(&mut self, item_id: i32, ids: &[u32]) -> Result<(), ServiceError> {
+        if self.refuse_return {
+            return Err(ServiceError::StockRejected {
+                operation: StockOperation::Return,
+                instance_id: 0,
+            });
+        }
+        self.instances.push(owned(ids[0], item_id, 1));
         Ok(())
     }
 }
@@ -1262,6 +1284,8 @@ fn bundled_disabled_lots_refuse_entry_with_a_reason() {
     for property_id in disabled_ids {
         let mut disabled_content = content.clone();
         disabled_content.starter_property_id = property_id;
+        // The kit's positions are the Wilds Condo's; another starter type stands its own.
+        disabled_content.starter_kit = None;
         let mut service =
             HousingService::with_content(FixtureConfig::capture_defaults(), disabled_content)
                 .unwrap();
@@ -1292,8 +1316,12 @@ fn starter_lot_grant_is_per_character_and_idempotent() {
     assert!(lots.iter().all(|lot| lot.property_id == 25));
 }
 
+/// houses.json `starter_kit` (L040): the Chicken for the bag and the block standing in the lot.
+const KIT_CHICKEN: i32 = 70_429;
+const KIT_BLOCK: i32 = 32_647;
+
 #[test]
-fn the_starter_lot_and_its_fixture_commit_together() {
+fn the_starter_lot_and_its_kit_commit_together() {
     let mut service = HousingService::with_content(
         FixtureConfig::capture_defaults(),
         HousingContent::bundled().unwrap(),
@@ -1312,14 +1340,22 @@ fn the_starter_lot_and_its_fixture_commit_together() {
     assert_eq!(
         service.state(),
         before,
-        "a refused fixture drops the staged lot"
+        "a refused kit drops the staged lot"
     );
     stock.refuse_return = false;
     assert!(service.handle(OWNER, &grant, &mut stock).unwrap().changed);
-    assert_eq!(stock.instances.len(), 1);
-    assert_eq!(
-        (stock.instances[0].definition_id, stock.instances[0].tint_id),
-        (BLOCK_ITEM, 0)
+    assert_eq!(stock.instances, [owned(1, KIT_CHICKEN, 1)]);
+    let standing = service.state().lots[0].fixtures.clone();
+    let ids: Vec<_> = standing.iter().map(|f| f.item_instance_id).collect();
+    assert_eq!(ids.len(), 4);
+    assert!(
+        ids.iter().all(|&id| id > 1),
+        "no fixture shares the unit's id"
+    );
+    assert!(
+        standing
+            .iter()
+            .all(|f| f.fixture_definition_id == KIT_BLOCK)
     );
     assert!(!service.handle(OWNER, &grant, &mut stock).unwrap().changed);
     assert_eq!(
@@ -1327,21 +1363,72 @@ fn the_starter_lot_and_its_fixture_commit_together() {
         1,
         "a repeat ask grants no second unit"
     );
+    assert_eq!(service.state().lots[0].fixtures, standing);
 }
 
 #[test]
-fn a_starter_fixture_without_a_fixture_row_fails_at_load() {
-    let mut content = HousingContent::bundled().unwrap();
-    // The client's decorating tutorial item (ScriptsBase.lua PopulateItems): no fixture row yet.
-    content.starter_fixture_item_id = Some(70_429);
+fn the_inventory_hands_out_each_kit_id_once() {
+    let content = Content::new(
+        vec![item(INSTANCE as i32, BLOCK_ITEM, 1)],
+        &[BLOCK_ITEM, KIT_CHICKEN],
+    );
+    let mut inventory = content.inventory();
+    let first = inventory.first_free_instance_id().unwrap();
+    assert_eq!(first, INSTANCE + 1);
+    let before = inventory.state().clone();
+    for (what, ids) in [
+        ("an id a row holds", vec![INSTANCE]),
+        ("a repeated id", vec![first, first]),
+        ("ids out of order", vec![first + 1, first]),
+        ("no id", Vec::new()),
+    ] {
+        assert!(inventory.grant_kit(KIT_CHICKEN, &ids).is_err(), "{what}");
+        assert_eq!(inventory.state(), &before, "{what}: the bag is unchanged");
+    }
+    inventory
+        .grant_kit(KIT_CHICKEN, &[first, first + 1, first + 2])
+        .unwrap();
+    assert_eq!(units(&inventory, KIT_CHICKEN), 1);
+    assert_eq!(inventory.first_free_instance_id().unwrap(), first + 3);
+    let granted = inventory.state().clone();
+    assert!(
+        inventory.grant_kit(KIT_CHICKEN, &[first + 1]).is_err(),
+        "an id already handed to a standing fixture"
+    );
+    assert_eq!(inventory.state(), &granted);
+}
+
+#[test]
+fn a_starter_kit_that_cannot_stand_fails_at_load() {
+    let bundled = HousingContent::bundled().unwrap();
+    let mut config = FixtureConfig::capture_defaults();
+    config
+        .rows
+        .retain(|row| row.item_definition_id != KIT_CHICKEN);
     assert_eq!(
-        HousingService::with_content(FixtureConfig::capture_defaults(), content.clone()).err(),
+        HousingService::with_content(config, bundled.clone()).err(),
         Some(ServiceError::FixtureDefinitionUnknown {
-            definition_id: 70_429
+            definition_id: KIT_CHICKEN
         })
     );
-    content.starter_fixture_item_id = Some(0);
-    assert!(HousingContent::parse(&serde_json::to_vec(&content).unwrap()).is_err());
+    let refused = |edit: fn(&mut housing_service::StarterKit)| {
+        let mut content = bundled.clone();
+        edit(content.starter_kit.as_mut().unwrap());
+        HousingContent::parse(&serde_json::to_vec(&content).unwrap()).is_err()
+    };
+    assert!(
+        refused(|kit| kit.placed_positions[0][0] = 87.0),
+        "outside the build area"
+    );
+    assert!(
+        refused(|kit| kit.placed_positions = vec![[92.0, 0.0, -30.0]; 17]),
+        "over 16"
+    );
+    assert!(refused(|kit| kit.item_id = 0), "a zero item id");
+    assert!(
+        !refused(|kit| kit.placed_positions.clear()),
+        "a kit may stand nothing"
+    );
 }
 
 #[test]

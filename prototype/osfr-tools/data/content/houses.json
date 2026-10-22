@@ -2,7 +2,32 @@
   "schema_version": 1,
   "provenance": "Legacy Houses.json (AGPL-3.0 reference only; SHA256 854b2d3f009b916a928f66d57a42e2bf685dcc853e898d149580eefd26196d3c) supplies provisional spawn and six-float bounds. Scene choices are R matches from client IconId asset names to community-manifest hsg_emptylot names, plus property 25 (Wilds Condo) whose icon names the client-manifest scene hsg_hum_condo_w_lot; no client property-to-scene map exists. No Legacy source code copied.",
   "starter_property_id": 25,
-  "starter_fixture_item_id": 7466,
+  "starter_kit": {
+    "item_id": 70429,
+    "placed_item_id": 32647,
+    "placed_positions": [
+      [
+        92,
+        -0.87,
+        -33.9
+      ],
+      [
+        92,
+        -0.87,
+        -31.9
+      ],
+      [
+        92,
+        -0.87,
+        -29.9
+      ],
+      [
+        92,
+        -0.87,
+        -27.9
+      ]
+    ]
+  },
   "client_evidence": [
     "client: notes/Build Guides/Gameplay/Housing.md#Data-and-formats lists housing UI/placement resources; no client lot/zone/build-box table.",
     "client: working OSFR Client Resources/Images/Images.txt resolves each Legacy IconId to a named icon; the client does not link those icons to scenes.",
@@ -10,7 +35,7 @@
     "R: scene candidates match the regional/product words in the client icon asset names; ambiguous or generic rows stay disabled.",
     "R: Legacy six-float bounds and spawn values remain provisional; scene transition type/sky/geometry defaults are placeholders pending scene/native evidence.",
     "R: property 25 (Wilds Condo, name_id 296) is the starter type: the wiki records it as every new player's starter from 2012-01-26 (notes/Research/Pieces/021 Property acquisition.md:107-108) and the client locale's decorating tutorial says 'your new Wilds Condo'; starter grant is one per character, and characters already holding property 1 also receive it once.",
-    "R: starter_fixture_item_id 7466 (inventory.json model hsg_block_01.adr, max_stack -1, tint 0 in the captured inventory; stores.json no_sale, no sell price) is the one unit a new starter lot comes with, so it can be decorated (locale tutorial: 'moving some of the blocks it came with'); the client's own decorating tutorial lists item 70429 (chicken.adr) first (ScriptsBase.lua Housing PopulateItems), which has no fixture configuration row yet."
+    "R: starter_kit (L040): a new Wilds Condo comes with one Chicken 70429 in the bag, its own unstacked row (the client decorating tutorial lists ItemID 70429 first while TutorialArrow:TutorialActive(), ScriptsBase.lua:33599-33606; client Models.txt 535 chicken.adr) and four Basic Square Blocks 32647 standing in the lot (locale objective 'Redecorate your Wilds Condo by moving some of the blocks it came with'; Legacy ClientItemDefinitions.json 32647 hsg_block_01.adr, client Models.txt 1926). Granting the Chicken, the block item (not the captured 7466) and the count and positions (2 m apart, 6 m in front of the spawn at spawn height) are reconstructed; both items resell for 0 (free issuance)."
   ],
   "lots": [
     {

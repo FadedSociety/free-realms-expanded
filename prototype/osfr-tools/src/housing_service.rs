@@ -42,7 +42,9 @@ use crate::housing_native::{
     PlaceFixture as WirePlaceFixture, PlacementDenied, PlayerHousingInstanceInfo, PositionUpdate,
     ZoneData,
 };
-use crate::inventory::{Inventory, InventoryItem, InventoryState};
+use crate::inventory::{
+    Inventory, InventoryItem, InventoryState, instance_ids::allocate_from_snapshot,
+};
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -101,6 +103,8 @@ pub const MAX_STATE_FIXTURES: usize = 4_096;
 const MAX_HOUSING_CONTENT_BYTES: usize = 1024 * 1024;
 /// RECONSTRUCTED bound on one fixture-configuration table.
 const MAX_CONFIG_ROWS: usize = 4_096;
+/// RECONSTRUCTED sanity bound on the fixtures a starter kit stands in a new lot (L040).
+pub const MAX_STARTER_KIT_FIXTURES: usize = 16;
 
 /// (R) Placeholder for the `127/44` field whose retail server value is not recovered.
 const RECONSTRUCTED_HOUSE_UNUSED: i32 = 10;
@@ -236,17 +240,49 @@ pub struct HousingContent {
     pub schema_version: u32,
     pub provenance: String,
     pub starter_property_id: i32,
-    /// (R) The item a new starter lot comes with, one unit, so it can be decorated. It must have
-    /// a fixture configuration row (checked at load). Absent: the lot comes empty.
+    /// (R) What a new starter lot comes with. Absent: the lot comes empty.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub starter_fixture_item_id: Option<i32>,
+    pub starter_kit: Option<StarterKit>,
     pub client_evidence: Vec<String>,
     pub lots: Vec<HousingLotDefinition>,
+}
+
+/// (R) The starter lot's kit (L040): one unit for the bag, and fixtures already standing in the
+/// lot (tint 0, identity rotation, scale 1). Both items need a fixture configuration row (checked
+/// at load), so the unit can be placed and a standing fixture picked up.
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct StarterKit {
+    /// Granted as its own single-unit row, never merged into a stack, so it can be placed.
+    pub item_id: i32,
+    /// The item each standing fixture stands for; a pickup returns one unit of it.
+    pub placed_item_id: i32,
+    /// Where they stand: inside the starter lot's build area, at most `MAX_STARTER_KIT_FIXTURES`.
+    pub placed_positions: Vec<[f32; 3]>,
+}
+
+impl StarterKit {
+    /// Free issuance (the owner, 2026-10-20: starter items sell back for 0 coins), so every copy of
+    /// these items resells for 0, as F228 does for job starter outfits.
+    pub fn items(&self) -> [i32; 2] {
+        [self.item_id, self.placed_item_id]
+    }
 }
 
 impl HousingContent {
     pub fn bundled() -> Result<Self, ServiceError> {
         Self::parse(include_bytes!("../data/content/houses.json"))
+    }
+
+    /// The starter kit's `items` from `directory/houses.json`; none without that file.
+    pub fn kit_items(directory: &Path) -> Result<Vec<i32>, ServiceError> {
+        let path = directory.join("houses.json");
+        if !path.is_file() {
+            return Ok(Vec::new());
+        }
+        Ok(Self::load(&path)?
+            .starter_kit
+            .map_or(Vec::new(), |kit| kit.items().to_vec()))
     }
 
     pub fn load(path: &Path) -> Result<Self, ServiceError> {
@@ -291,14 +327,12 @@ impl HousingContent {
             || self.lots.is_empty()
             || self.lots.len() > MAX_STATE_LOTS
             || self.starter_property_id <= 0
-            || self.starter_fixture_item_id.is_some_and(|item| item <= 0)
         {
             return Err(ServiceError::HousingContentInvalid(
                 "invalid housing content header",
             ));
         }
         let mut ids = BTreeSet::new();
-        let mut starter = false;
         for lot in &self.lots {
             lot.validate()?;
             if !ids.insert(lot.property_id) {
@@ -306,12 +340,25 @@ impl HousingContent {
                     "duplicate lot property id",
                 ));
             }
-            starter |= lot.property_id == self.starter_property_id;
         }
-        if !starter {
-            return Err(ServiceError::HousingContentInvalid(
+        let starter = self
+            .lots
+            .iter()
+            .find(|lot| lot.property_id == self.starter_property_id)
+            .ok_or(ServiceError::HousingContentInvalid(
                 "starter property id has no lot row",
-            ));
+            ))?
+            .property();
+        // A kit that could not stand in the starter lot fails here, at load, not on a player's
+        // first 127/23. `contains` is the placement's own build-area test (false for NaN).
+        if self.starter_kit.as_ref().is_some_and(|kit| {
+            kit.item_id <= 0
+                || kit.placed_item_id <= 0
+                || kit.placed_positions.len() > MAX_STARTER_KIT_FIXTURES
+                || kit.placed_positions.len() as u32 > starter.max_fixtures
+                || !kit.placed_positions.iter().all(|&at| starter.contains(at))
+        }) {
+            return Err(ServiceError::HousingContentInvalid("invalid starter kit"));
         }
         Ok(())
     }
@@ -540,6 +587,14 @@ pub trait FurnitureStock {
     fn return_instance(&mut self, definition_id: i32, tint_id: i32) -> Result<(), ServiceError>;
     /// Apply all returns atomically. Implementations stage their own clone before committing.
     fn return_instances(&mut self, items: &[(i32, i32)]) -> Result<(), ServiceError>;
+    /// Read-only: the instance id the next grant would hand out. It and every id above it are
+    /// held by no row and were handed out by no earlier grant.
+    fn first_free_instance_id(&self) -> Result<u32, ServiceError>;
+    /// The starter kit (L040), atomically: `ids` (strictly ascending, from
+    /// `first_free_instance_id` up) are handed out. The first becomes one unit of `item_id` at
+    /// tint 0, its own row and never merged into a stack, so it can be placed; the rest stand in
+    /// the new lot, so no row is added for them and the counter moves past them.
+    fn grant_kit(&mut self, item_id: i32, ids: &[u32]) -> Result<(), ServiceError>;
 }
 
 impl FurnitureStock for Inventory {
@@ -580,6 +635,52 @@ impl FurnitureStock for Inventory {
         }
         *self = staged;
         Ok(())
+    }
+
+    fn first_free_instance_id(&self) -> Result<u32, ServiceError> {
+        let live: Vec<i32> = self.state().items.iter().map(|item| item.id).collect();
+        let (id, _) = allocate_from_snapshot(self.state().next_instance_id, &live)
+            .map_err(|_| kit_refused())?;
+        u32::try_from(id).map_err(|_| kit_refused())
+    }
+
+    fn grant_kit(&mut self, item_id: i32, ids: &[u32]) -> Result<(), ServiceError> {
+        // Distinct and at or above the counter: no id is in the bag, was handed out before, or
+        // is shared by the unit and a standing fixture (which would fail the save's conservation
+        // check on the next load).
+        let first = FurnitureStock::first_free_instance_id(self)?;
+        let (Some(&unit), Some(&last)) = (ids.first(), ids.last()) else {
+            return Err(kit_refused());
+        };
+        if unit < first || ids.windows(2).any(|pair| pair[0] >= pair[1]) {
+            return Err(kit_refused());
+        }
+        let mut state = self.state().clone();
+        state.next_instance_id = Some(i64::from(last) + 1);
+        state.items.push(InventoryItem {
+            definition_id: item_id,
+            tint: 0,
+            id: i32::try_from(unit).map_err(|_| kit_refused())?,
+            count: 1,
+            consumed_count: 0,
+            stored_count: 0,
+            last_cast_time: i64::from(i32::MAX),
+            rental: None,
+            ability_count: 0,
+            activate_enabled: false,
+        });
+        // Commits only if the whole bag validates: a known definition, at most MAX_ITEMS rows (a
+        // full bag refuses), and the counter above every row and within the i32 id range.
+        self.adopt_state(state).map_err(|_| kit_refused())?;
+        Ok(())
+    }
+}
+
+/// The bag refused the kit; nothing was committed.
+fn kit_refused() -> ServiceError {
+    ServiceError::StockRejected {
+        operation: StockOperation::Return,
+        instance_id: 0,
     }
 }
 
@@ -832,8 +933,9 @@ pub struct FixtureConfig {
 }
 
 impl FixtureConfig {
-    /// Historical reconstructed fixture rows used as test defaults. The current client guide does
-    /// not validate these tuples; flags, category, Lua calls, actions and effects remain unknown.
+    /// Historical reconstructed fixture rows used as test defaults, plus the two starter-kit rows
+    /// (L040) until the item-derived table lands. The current client guide does not validate
+    /// these tuples; flags, category, Lua calls, actions and effects remain unknown.
     pub fn capture_defaults() -> Self {
         let row = |fixture_definition_id: i32, item_definition_id: i32, model_id: i32| {
             FixtureConfigRow {
@@ -849,6 +951,16 @@ impl FixtureConfig {
                 ),
             }
         };
+        // Not captured: the fixture id is the item id (the item-table convention) and the model
+        // is the client's own Models.txt row for the item's ModelName.
+        let kit = |item_definition_id: i32, model_id: i32, model: &str| FixtureConfigRow {
+            provenance: format!(
+                "R:L040 starter kit; legacy-data:FreeRealms-Legacy@9e08202 \
+                 ClientItemDefinitions.json Id={item_definition_id} ModelName {model}; client \
+                 Models.txt id {model_id}; fixture definition id = item id"
+            ),
+            ..row(item_definition_id, item_definition_id, model_id)
+        };
         Self {
             schema_version: 1,
             provenance: "R: unverified packet-derived fixture rows; the retail server-side \
@@ -862,6 +974,8 @@ impl FixtureConfig {
                 row(68, 16_039, 3_002),
                 row(1_074, 18_110, 3_058),
                 row(69, 16_040, 3_003),
+                kit(70_429, 535, "chicken.adr"),
+                kit(32_647, 1_926, "hsg_block_01.adr"),
             ],
         }
     }
@@ -994,7 +1108,7 @@ pub struct HousingService {
     selections: BTreeMap<(u64, u32), u32>,
     house_definitions: BTreeMap<i32, HousingLotDefinition>,
     starter_property_id: Option<i32>,
-    starter_fixture_item_id: Option<i32>,
+    starter_kit: Option<StarterKit>,
 }
 
 impl HousingService {
@@ -1007,7 +1121,7 @@ impl HousingService {
             selections: BTreeMap::new(),
             house_definitions: BTreeMap::new(),
             starter_property_id: None,
-            starter_fixture_item_id: None,
+            starter_kit: None,
         }
     }
 
@@ -1022,14 +1136,14 @@ impl HousingService {
         Ok(service)
     }
 
-    /// The starter choices and lot rows of `content`. A starter fixture without a configuration
-    /// row fails here, at load, rather than on a player's first 127/23.
+    /// The starter choices and lot rows of `content`. A kit item without a configuration row
+    /// fails here, at load, rather than on a player's first 127/23.
     fn adopt_content(&mut self, content: HousingContent) -> Result<(), ServiceError> {
-        if let Some(item) = content.starter_fixture_item_id {
+        for item in content.starter_kit.iter().flat_map(StarterKit::items) {
             self.config.row_for_item_definition(item)?;
         }
         self.starter_property_id = Some(content.starter_property_id);
-        self.starter_fixture_item_id = content.starter_fixture_item_id;
+        self.starter_kit = content.starter_kit;
         for definition in content.lots {
             self.register_house_definition(definition)?;
         }
@@ -1139,7 +1253,7 @@ impl HousingService {
             selections: BTreeMap::new(),
             house_definitions: BTreeMap::new(),
             starter_property_id: None,
-            starter_fixture_item_id: None,
+            starter_kit: None,
         })
     }
 
@@ -1408,25 +1522,84 @@ impl HousingService {
     }
 
     /// 127/23 (R): the first ask grants the starter lot (idempotent: a repeat grants nothing) and
-    /// answers with the owner's 127/39 list either way. A new lot comes with one unit of the
-    /// content's starter fixture; the lot and the unit commit together or not at all. 127/49 is
-    /// not sent: no lot row carries the house-type text it prints.
+    /// answers with the owner's 127/39 list either way. A new lot comes with the content's
+    /// starter kit: the lot, its standing fixtures and the unit in the bag commit together or not
+    /// at all. 127/49 is not sent: no lot row carries the house-type text it prints.
     fn request_grant(
         &mut self,
         actor_guid: u64,
         stock: &mut dyn FurnitureStock,
     ) -> Result<ServiceOutcome, ServiceError> {
         let mut staged = self.clone();
-        staged.grant_starter_lot(actor_guid)?;
+        let lot_guid = staged.grant_starter_lot(actor_guid)?;
+        let granted = staged.lots_of(actor_guid).len() > self.lots_of(actor_guid).len();
+        let kit = self.starter_kit.as_ref().filter(|_| granted);
+        let ids = match kit {
+            Some(kit) => staged.stand_kit(actor_guid, lot_guid, kit, stock)?,
+            None => Vec::new(),
+        };
         let mut outcome = staged.house_list(actor_guid, actor_guid)?;
-        outcome.changed = staged.lots_of(actor_guid).len() > self.lots_of(actor_guid).len();
-        if let Some(item) = self.starter_fixture_item_id.filter(|_| outcome.changed) {
-            // Last, like placement: the inventory refuses atomically and the staged lot is dropped.
-            // Tint 0 (R), as a Coin Shop purchase of the same item gets (`coin_shop.rs` `grant`).
-            stock.return_instance(item, 0)?;
+        outcome.changed = granted;
+        if let Some(kit) = kit {
+            // Last, like placement: the bag refuses atomically and the staged lot is dropped.
+            stock.grant_kit(kit.item_id, &ids)?;
         }
         *self = staged;
         Ok(outcome)
+    }
+
+    /// Stand the kit's fixtures in the new lot (on this staged clone) and return the ids for
+    /// `grant_kit`: the bag unit's, then one per fixture. They start at the bag's first free id
+    /// and above every id this character's lots hold, because a save without a counter floors
+    /// the bag's next id on its own rows only.
+    fn stand_kit(
+        &mut self,
+        owner_guid: u64,
+        lot_guid: u64,
+        kit: &StarterKit,
+        stock: &dyn FurnitureStock,
+    ) -> Result<Vec<u32>, ServiceError> {
+        let lots = self.state().lots;
+        let held = lots.iter().flat_map(|lot| &lot.fixtures);
+        let held = held
+            .map(|fixture| fixture.item_instance_id)
+            .max()
+            .unwrap_or(0);
+        let first = stock.first_free_instance_id()?.max(held.saturating_add(1));
+        let ids = (0..=kit.placed_positions.len())
+            .map(|offset| first.checked_add(u32::try_from(offset).ok()?))
+            .collect::<Option<Vec<u32>>>()
+            .ok_or_else(kit_refused)?;
+        let fixture_definition_id = self
+            .config
+            .row_for_item_definition(kit.placed_item_id)?
+            .fixture_definition_id;
+        // The placements below draw on exactly these ids; an id the seed refused fails them.
+        let mut ledger = FixtureItemLedger::default();
+        ledger.seed(fixture_definition_id, 0, ids[1..].iter().copied());
+        for (&id, &position) in ids[1..].iter().zip(&kit.placed_positions) {
+            let transform = FixtureTransform {
+                position,
+                ..FixtureTransform::default()
+            };
+            self.housing.place_fixture(
+                owner_guid,
+                lot_guid,
+                fixture_definition_id,
+                id,
+                transform,
+                &mut ledger,
+            )?;
+        }
+        Ok(ids)
+    }
+
+    /// The starter kit's items (free issuance, see `StarterKit::items`).
+    pub fn kit_items(&self) -> Vec<i32> {
+        self.starter_kit
+            .iter()
+            .flat_map(StarterKit::items)
+            .collect()
     }
 
     /// 127/14 and the tail of 127/23: one owner's houses that `actor_guid` may visit (R: a

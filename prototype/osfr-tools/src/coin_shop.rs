@@ -246,9 +246,13 @@ impl CoinShop {
         // so the store pays 0 for it however the player got a copy. Reuse the session's loaded
         // profiles: a second parse would also reject a package whose saved progression is valid
         // but whose unused `default_state` is not. Purchase prices are untouched.
-        if let Some(profiles) = profiles {
-            catalogue.zero_starter_sell_prices(&profiles.all_starter_items());
-        }
+        // L040: the Condo starter kit in this content's houses.json is free issuance too.
+        let mut free = profiles.map_or_else(Default::default, |p| p.all_starter_items());
+        free.extend(
+            crate::housing_service::HousingContent::kit_items(inventory_content)
+                .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("{e:?}")))?,
+        );
+        catalogue.zero_starter_sell_prices(&free);
         let sc_catalogue = station_cash::Catalogue::build(
             catalogue.station_cash.clone(),
             &inventory,
