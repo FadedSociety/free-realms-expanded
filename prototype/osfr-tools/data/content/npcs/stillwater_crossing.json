@@ -7888,11 +7888,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1713; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2970 (ModelId=356, ModelFileName=fairy_f_freestyle_01.agr, NameId=116843)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "(R) speaker inferred: Client locale Global.Text.395718: \"You need a sponsor, huh? I'm looking to replace a member of the Paws 'n Claws Crashing Crew. <BR><BR>But I've never heard of you before... Seems a bit risky! If you can <font color='#D9781A'>prove yourself worthy</font> of wearing our name, then I might be willing to sponsor you.\" (en_us_data.dat line 4925, JenkinsLookup2 hash 186107631). Inferred from the sponsor offer: the region row calls Kanan the sponsor of the Paws 'n Claws crashing crew and cites this exact hash as the candidate offer text whose speaker is not named; she is the only Paws 'n Claws sponsor. Guide row: notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md line 56."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented. The speaker link is inferred; see the client source."
+          }
         ]
       },
       "heading": 1.562224,
       "model_id": 356,
-      "model_file_name": "fairy_f_freestyle_01.agr"
+      "model_file_name": "fairy_f_freestyle_01.agr",
+      "greeting_string_id": 395718
     },
     {
       "npc_id": 9500000791,

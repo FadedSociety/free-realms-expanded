@@ -31,8 +31,8 @@
 mod npc_greetings;
 
 use npc_greetings::{
-    content_dir, gameplay_dir, gameplay_talk_body, greeting_bindings, locale_rows, npc_record,
-    select, service, service_talk_body,
+    assert_drawable, content_dir, gameplay_dir, gameplay_talk_body, greeting_bindings, locale_rows,
+    npc_record, select, service, service_talk_body,
 };
 use osfr_tools::{
     gameplay::Gameplay,
@@ -280,45 +280,14 @@ const OWNED_PRE_EXISTING: [(&str, u64, u32); 2] = [
 ];
 
 /// Drawable rows with no recovered first-person speaker line, one per owned
-/// file. They stay blank and must not inherit another row's body.
-const BLANK_MERRY_VALE: u64 = 9500000405;
+/// file. They stay blank and must not inherit another row's body. T381 bound
+/// Mayor McFairy (9500000405), so the Merry Vale control moved to Madison.
+const BLANK_MERRY_VALE: u64 = 9500000404;
 const BLANK_STILLWATER: u64 = 9000000227;
 
 /// A bound row carried into the zero-greeting fixture as the control: it must
 /// keep sending its own id so the fixture is not a bypass.
 const CONTROL_ROW: u64 = 9500000371;
-
-fn assert_drawable(record: &Value, npc_id: u64) {
-    assert!(
-        record["position"].as_array().is_some_and(|position| {
-            position.len() == 3 && position.iter().all(Value::is_number)
-        }),
-        "NPC {npc_id}: finite 3D position"
-    );
-    assert!(
-        record["name"].as_str().is_some_and(|name| !name.is_empty()),
-        "NPC {npc_id}: name"
-    );
-    assert!(
-        record["roles"]
-            .as_array()
-            .is_some_and(|roles| !roles.is_empty()),
-        "NPC {npc_id}: roles"
-    );
-    assert_eq!(
-        record["placement"].as_str(),
-        Some("legacy_data"),
-        "NPC {npc_id}: must stay a spawned placement"
-    );
-    assert!(
-        record["model_id"].as_u64().is_some_and(|id| id > 0),
-        "NPC {npc_id}: model id (NpcVisibility spawns model_id.unwrap_or(0))"
-    );
-    assert!(
-        record["name_string_id"].as_u64().is_some_and(|id| id > 0),
-        "NPC {npc_id}: name string id"
-    );
-}
 
 fn region_guide(file: &str) -> &'static str {
     match file {

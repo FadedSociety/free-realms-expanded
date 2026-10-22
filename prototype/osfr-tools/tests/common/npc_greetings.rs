@@ -102,6 +102,32 @@ pub fn npc_position(record: &Value, npc_id: u64) -> [f32; 3] {
     ]
 }
 
+/// The production drawability rule (`NpcVisibility::load`): only a
+/// `legacy_data` row with a finite 3D position, a name, roles, a positive model
+/// and a positive name string id becomes a visible actor. Blank/greeting audits
+/// use this predicate so a row that is not drawable is never counted.
+#[allow(dead_code)] // Only the Merry Vale/Stillwater suites audit drawability.
+pub fn drawable(record: &Value) -> bool {
+    record["position"]
+        .as_array()
+        .is_some_and(|position| position.len() == 3 && position.iter().all(Value::is_number))
+        && record["name"].as_str().is_some_and(|name| !name.is_empty())
+        && record["roles"]
+            .as_array()
+            .is_some_and(|roles| !roles.is_empty())
+        && record["placement"].as_str() == Some("legacy_data")
+        && record["model_id"].as_u64().is_some_and(|id| id > 0)
+        && record["name_string_id"].as_u64().is_some_and(|id| id > 0)
+}
+
+#[allow(dead_code)] // Only the Merry Vale/Stillwater suites audit drawability.
+pub fn assert_drawable(record: &Value, npc_id: u64) {
+    assert!(
+        drawable(record),
+        "NPC {npc_id}: a drawable legacy_data row needs a finite position, name, roles, model_id and name_string_id"
+    );
+}
+
 pub fn service() -> NpcInteraction {
     let data = content_dir();
     NpcInteraction::load(&data.join("npcs"), &data.join("stores.json"))

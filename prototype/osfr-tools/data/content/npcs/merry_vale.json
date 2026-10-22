@@ -436,11 +436,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:963; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2211 (ModelId=493, ModelFileName=human_f_aida.agr, NameId=40553)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.115532: \"My little sister, Lynzi, keeps letting her balloons loose because she says they need to fly free. <BR><BR>Can you please go and <font color='#D9781A'>collect</font> the escaped <font color='#D9781A'>balloons</font> from around Merry Vale?\" (en_us_data.dat line 66723, JenkinsLookup2 hash 2532711647). Speaker proof: the line names her little sister Lynzi and the escaped balloons; the region row calls Aida Humblehoop \"Older sister of Lynzi\" and quotes the same balloon chase. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 70."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": 1.64378,
       "model_id": 493,
-      "model_file_name": "human_f_aida.agr"
+      "model_file_name": "human_f_aida.agr",
+      "greeting_string_id": 115532
     },
     {
       "npc_id": 9500000369,
@@ -858,11 +869,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1008; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2262 (ModelId=454, ModelFileName=sprite_basic_m.adr, NameId=70940)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "(R) speaker inferred: Client locale Global.Text.70932: \"She wants a sunflower then, does she? Fortunately, I have a few that I picked this morning already on hand!\" (en_us_data.dat line 66687, JenkinsLookup2 hash 2531687873). Inferred from the sunflower errand: the region row says Alvie hands over a sunflower as a prop for Yvelle's story (1124291008, 1362981900, 3295769524), and this is the hand-over reply in Alvie's locale block. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 80."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented. The speaker link is inferred; see the client source."
+          }
         ]
       },
       "heading": 0.43887,
       "model_id": 454,
-      "model_file_name": "sprite_basic_m.adr"
+      "model_file_name": "sprite_basic_m.adr",
+      "greeting_string_id": 70932
     },
     {
       "npc_id": 9500000370,
@@ -9386,11 +9408,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:928; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2175 (ModelId=454, ModelFileName=sprite_basic_m.adr, NameId=41229)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.70762: \"A sweet bun, oh ho, yes, I believe I can supply that. This is Yvelle's favorite. I am sure she'll tell a good story with one of these in her stomach!\" (en_us_data.dat line 34252, JenkinsLookup2 hash 1293215637). Speaker proof: the region row cites this exact hash (1293215637) as the sweet bun Fenwink sells for Yvelle's story. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 33."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": -0.327871,
       "model_id": 454,
-      "model_file_name": "sprite_basic_m.adr"
+      "model_file_name": "sprite_basic_m.adr",
+      "greeting_string_id": 70762
     },
     {
       "npc_id": 9500000386,
@@ -13341,11 +13374,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1041; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2295 (ModelId=458, ModelFileName=sprite_basic_f.adr, NameId=41557)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "(R) speaker inferred: Client locale Global.Text.2885: \"So this man once asked me, why do you care so much about this stinkin sunflower?\" (en_us_data.dat line 58327, JenkinsLookup2 hash 2216243585). Inferred from the audition scene: 2884 says \"Okay then, let's start with you Joelle. Show us what you've got!\" and 2888 answers \"Alright, not bad, Joelle!\", so 2885-2887 are Joelle's audition speech. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 57."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented. The speaker link is inferred; see the client source."
+          }
         ]
       },
       "heading": 1.003749,
       "model_id": 458,
-      "model_file_name": "sprite_basic_f.adr"
+      "model_file_name": "sprite_basic_f.adr",
+      "greeting_string_id": 2885
     },
     {
       "npc_id": 9500000395,
@@ -13780,11 +13824,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1034; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2288 (ModelId=454, ModelFileName=sprite_basic_m.adr, NameId=41236)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.46673: \"A work of art is a living thing, ever flawed and evolving! To that effect, I have completely rewritten the second act of our show!<BR><BR>Would you please <font color='#D9781A'>deliver the new scripts</font> to my players?\" (en_us_data.dat line 86747, JenkinsLookup2 hash 3285115298). Speaker proof: the line is the director's script-rewrite offer; the region row names Joona the director who keeps rewriting the script, and the objective \"Deliver Joona's new scripts to some of his performers around Merry Vale.\" (3902203195) matches. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 56."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": 2.863336,
       "model_id": 454,
-      "model_file_name": "sprite_basic_m.adr"
+      "model_file_name": "sprite_basic_m.adr",
+      "greeting_string_id": 46673
     },
     {
       "npc_id": 9500000396,
@@ -14213,11 +14268,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1042; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2296 (ModelId=499, ModelFileName=human_f_aster.agr, NameId=427282)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.427168: \"Oh, how loved I am! I got another forget-me-not today.<BR><BR>Everyone knows the more forget-me-nots you receive, the more special you are, and no one's as special as <font size='22'>me</font>!<BR><BR>I bet my biggest gift that you can't <font color='#D9781A'>get</font> as many <font color='#D9781A'>forget-me-nots</font>.\" (en_us_data.dat line 61367, JenkinsLookup2 hash 2333594798). Speaker proof: the line is the forget-me-not boast; the region row names Joyce as the NPC certain she gets more forget-me-nots than anyone (2611687715), and the objective \"Let Joyce know you've managed to get more forget-me-nots than her!\" (3889686517) matches. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 119."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": -1.08094,
       "model_id": 499,
-      "model_file_name": "human_f_aster.agr"
+      "model_file_name": "human_f_aster.agr",
+      "greeting_string_id": 427168
     },
     {
       "npc_id": 9500000397,
@@ -14966,11 +15032,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1028; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2282 (ModelId=458, ModelFileName=sprite_basic_f.adr, NameId=41257)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "(R) speaker inferred: Client locale Global.Text.2898: \"The day star is gone, we're down here alone, but we found a way to survive. The rainbow of life, it provides.\" (en_us_data.dat line 29544, JenkinsLookup2 hash 1115395599). Inferred from the audition scene: 2897 says \"Let's see what you brought, Krissa!\" and 2905 answers \"That's marvelous, Krissa!\", so 2898-2899 and 2904 are Krissa's audition speech. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 58."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented. The speaker link is inferred; see the client source."
+          }
         ]
       },
       "heading": 3.032539,
       "model_id": 458,
-      "model_file_name": "sprite_basic_f.adr"
+      "model_file_name": "sprite_basic_f.adr",
+      "greeting_string_id": 2898
     },
     {
       "npc_id": 9500000399,
@@ -18901,11 +18978,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:929; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2177 (ModelId=454, ModelFileName=sprite_basic_m.adr, NameId=41231)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "(R) speaker inferred: Client locale Global.Text.71075: \"Welcome to Merry Vale! Our home is open to anyone whose found their way here. As you can probably tell, many people end up finding they have no desire whatsoever to leave, and we think that's great! The more the merrier!<BR><BR>Check out what we have to eat! <font color='#D9781A'>Visit Fenwink</font>. And then see how exceptional our entertainers are by checking in with <font color='#D9781A'>Tyra</font>. I am sure you will just love it here!\" (en_us_data.dat line 46160, JenkinsLookup2 hash 1748567956). Inferred from the welcome tour: the region row says Mayor McFairy hands out the list of people to visit; his follow-up 72846 says \"Speak to them about the list I gave you and come back to me\", and this speech names Fenwink and Tyra exactly as the tour list does. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 31."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented. The speaker link is inferred; see the client source."
+          }
         ]
       },
       "heading": -2.073892,
       "model_id": 454,
-      "model_file_name": "sprite_basic_m.adr"
+      "model_file_name": "sprite_basic_m.adr",
+      "greeting_string_id": 71075
     },
     {
       "npc_id": 9500000406,
@@ -21010,11 +21098,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1047; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2301 (ModelId=214, ModelFileName=chugawug_m_greenwood_archer_01.adr, NameId=46207)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.46252: \"Wow, look at this place! It's so... flowery! What's that you say? Blorple sent you? <BR><BR>Oops! I guess I wandered a bit far from my patrol. Thanks for finding me! <BR>\" (en_us_data.dat line 57859, JenkinsLookup2 hash 2197412592). Speaker proof: the line is the lost guard's rescue reply and names Blorple, who sends the player to find Mugwopp (Misplaced Mugwopp 1862904283; \"Find Mugwopp in Merry Vale for Blorple\" 4011159409). Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 91."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": 2.183333,
       "model_id": 214,
-      "model_file_name": "chugawug_m_greenwood_archer_01.adr"
+      "model_file_name": "chugawug_m_greenwood_archer_01.adr",
+      "greeting_string_id": 46252
     },
     {
       "npc_id": 9500000411,
@@ -21352,11 +21451,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:965; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2213 (ModelId=454, ModelFileName=sprite_basic_m.adr, NameId=41287)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "(R) speaker inferred: Client locale Global.Text.117186: \"I won a seashell necklace?! Wow, it's beautiful, but... it's also broken. What a bummer. Do you think you could take this one back to Enaine in Seaside, and maybe get a new one?\" (en_us_data.dat line 39507, JenkinsLookup2 hash 1492140926). Inferred from the contest winner: 117181 announces \"And the winner is... Myrea!\", 117177 is \"Find Myrea in Merry Vale\", and this is the winner's prize reply. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 86."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented. The speaker link is inferred; see the client source."
+          }
         ]
       },
       "heading": 0.873086,
       "model_id": 454,
-      "model_file_name": "sprite_basic_m.adr"
+      "model_file_name": "sprite_basic_m.adr",
+      "greeting_string_id": 117186
     },
     {
       "npc_id": 9500000412,
@@ -22733,11 +22843,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1011; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2265 (ModelId=458, ModelFileName=sprite_basic_f.adr, NameId=385624)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "(R) speaker inferred: Client locale Global.Text.385493: \"Welcome to Merry Vale!!! Would you like some cotton candy? Here, take some extra to share!<BR><BR>I bet some of the <font color='#d9781a'>unhappy visitors</font> could use a pick-me-up. Even our own <font color='#d9781a'>mayor</font> can't get enough of this! I bet they all would love some cotton candy!<BR><BR>Circle around town, and <font color='#d9781a'>share your cotton candy</font>!\" (en_us_data.dat line 105481, JenkinsLookup2 hash 3989348772). Inferred from the cotton-candy role and the id block: the row's own name_string_id 385624 (Nymmi) was allocated in the same 2013 locale block as this offer (385494 title \"A Very Merry Welcome\", 385495 objective, 385629 giver follow-up \"Be sure to share that cotton candy! Talk to the mayor if you hand it all out.\"), while the other cotton-candy holders carry older name ids (Alvie 70940, Fenwink 41229, Luella 41259, Tumbolina 70891); the region row also gives Nymmi the cotton-candy hand-in (267457919, \"Get some cotton candy from Nymmi\", 386184). Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 81."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented. The speaker link is inferred; see the client source."
+          }
         ]
       },
       "heading": 0.73295,
       "model_id": 458,
-      "model_file_name": "sprite_basic_f.adr"
+      "model_file_name": "sprite_basic_f.adr",
+      "greeting_string_id": 385493
     },
     {
       "npc_id": 9500000415,
@@ -25366,11 +25487,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:974; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2222 (ModelId=4, ModelFileName=robgoblin_m_basic.adr, NameId=40488)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.71363: \"Wouldn't it be funny to switch the sunflower seed pies the fairies have cooling down around town with smelly sock pies? Then, when someone takes a bite, HAHAHA... Straight into old sock! No sunflower seed for you!<BR><BR>Well, whaddaya think? You want to help me out with this great prank? <font color='#D9781A'>Gather sunflower seed pies from around town</font> and bring them back to me. I will then swap them for the smelly sock pies later on.\" (en_us_data.dat line 46622, JenkinsLookup2 hash 1766237798). Speaker proof: the prank is Ratsplat's sunflower-seed-pie swap (region row and objectives 3257964355, 2818026809); the line is the prank offer. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 73."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": -1.372991,
       "model_id": 4,
-      "model_file_name": "robgoblin_m_basic.adr"
+      "model_file_name": "robgoblin_m_basic.adr",
+      "greeting_string_id": 71363
     },
     {
       "npc_id": 9500000419,
@@ -25738,11 +25870,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1026; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2280 (ModelId=221, ModelFileName=chugawug_m_02.adr, NameId=40378)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.46570: \"Finally, the shipment has arrived! I was wonderin' when it was going to get here. I suppose you should return to Postchug Runalug and tell him his shipment got here safely, but you should come back to Merry Vale! We sure do have a lot of fun here. Well, here's payment for the sasparilla. See you around!\" (en_us_data.dat line 87359, JenkinsLookup2 hash 3306096356). Speaker proof: the line accepts the late sasparilla shipment and sends the player back to Postchug Runalug, matching Delivery for Rimpadun (region row; 3306096356, 2689905545). Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 74."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": -2.154549,
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_string_id": 46570
     },
     {
       "npc_id": 9500000420,
@@ -26526,11 +26669,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:937; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2185 (ModelId=571, ModelFileName=fairy_f_freestyle_09.agr, NameId=117030)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "(R) speaker inferred: Client locale Global.Text.117031: \"Oh, this a beautiful bouquet, but I'm afraid I can't accept it. All mail needs to be checked in with <font color='#D9781A'>Postmaster Vixie</font> before it can be delivered.\" (en_us_data.dat line 10075, JenkinsLookup2 hash 379954746). Inferred from the bouquet delivery: \"Deliver flowers to Rosalie in Merry Vale.\" (4057808012) and \"Talk to Rosalie\" (3814275294) precede the line, which answers the bouquet delivery. Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 87."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented. The speaker link is inferred; see the client source."
+          }
         ]
       },
       "heading": -1.9294,
       "model_id": 571,
-      "model_file_name": "fairy_f_freestyle_09.agr"
+      "model_file_name": "fairy_f_freestyle_09.agr",
+      "greeting_string_id": 117031
     },
     {
       "npc_id": 9500000422,
@@ -31757,11 +31911,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:972; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2220 (ModelId=222, ModelFileName=chugawug_f_02.adr, NameId=387029)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.387033: \"I've been picking flower petals all day trying to determine whether my beloved Dubawug still cares for me! I used to be the apple of his eye.<BR><BR>I'd be surprised if he even remembered today was my birthday. Could you <font color='#d9781a'>find Dubawug</font> and see if he remembers?\" (en_us_data.dat line 76401, JenkinsLookup2 hash 2896366823). Speaker proof: the line names her husband Dubawug and her birthday; the region row names Verna Dubawug's wife and the birthday chain (3049505363, 2896366823). Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 75."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": 0.541673,
       "model_id": 222,
-      "model_file_name": "chugawug_f_02.adr"
+      "model_file_name": "chugawug_f_02.adr",
+      "greeting_string_id": 387033
     },
     {
       "npc_id": 9500000432,
@@ -32238,11 +32403,22 @@
             "kind": "legacy-data",
             "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3021; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4355 (ModelId=221, ModelFileName=chugawug_m_02.adr, NameId=40344)."
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "Client locale Global.Text.74198: \"There's just something not right about Merry Vale. My sister and some other children have gone missing.<BR><BR><font color='#D9781A'>Ask the family members of the missing children</font> if they have any suspicions.\" (en_us_data.dat line 38978, JenkinsLookup2 hash 1472403084). Speaker proof: the region row cites this exact hash (1472403084) under Wugunbump's Suspicious Serenity offer, and the quest text 74200 (1729137906) says \"Wugunbump thinks that something strange is going on around Merry Vale. In addition to his sister, a few other children have also gone missing.\" Guide row: notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md line 77."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) fixed default Talk greeting: the recovered speaker line above is shown on every Talk because the original server greeting/phase table was not recovered; no text is invented."
+          }
         ]
       },
       "heading": -2.486199,
       "model_id": 221,
-      "model_file_name": "chugawug_m_02.adr"
+      "model_file_name": "chugawug_m_02.adr",
+      "greeting_string_id": 74198
     },
     {
       "npc_id": 9500000433,
