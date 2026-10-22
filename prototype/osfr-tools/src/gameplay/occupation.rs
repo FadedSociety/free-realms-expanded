@@ -113,6 +113,11 @@ impl Gameplay {
             .copied()
             .any(|occupation| gate(occupation.gates()) && self.is_occupied(occupation))
     }
+
+    /// True while a crafting, gathering or battle activity is running.
+    pub(super) fn activity_busy(&self) -> bool {
+        self.blocks(|gates| gates.start)
+    }
 }
 
 #[cfg(test)]

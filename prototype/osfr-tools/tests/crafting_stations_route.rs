@@ -2,7 +2,8 @@
 //!
 //! The three positions below come from `npc_spawns_extra.json`. None is one of
 //! the tutorial craft actors, so this test proves the world actors themselves
-//! are registered rather than only the opening scene.
+//! are registered rather than only the opening scene. T400: interacting with a
+//! station (26/8) opens its recipe window (26/25).
 
 #[path = "common/cooking_movie.rs"]
 mod cooking_movie;
@@ -20,7 +21,7 @@ use osfr_tools::{
     gateway::{Gateway, GatewayOutcome},
     inventory::InventoryItem,
     recipes::CraftingJob,
-    smelting,
+    smelting, startup_world,
 };
 use serde_json::Value;
 use std::{
@@ -46,6 +47,10 @@ struct Case {
     profile: i32,
     recipe: i32,
     station: [f32; 3],
+    /// The station's world spawn (`npc_spawns_extra.json`).
+    station_guid: u64,
+    /// The job's recipe filter column (Chef 10, Miner 9, Blacksmith 12 (R)).
+    filter: u8,
     inputs: &'static [(i32, u32)],
     output: i32,
     output_quantity: u32,
@@ -57,6 +62,8 @@ const CASES: [Case; 3] = [
         profile: 45,
         recipe: 70,
         station: WORLD_COOKING_TABLE,
+        station_guid: 100_000_002_417,
+        filter: 10,
         inputs: &[(2862, 4), (2875, 4), (2884, 4), (2900, 4)],
         output: 35,
         output_quantity: 1,
@@ -66,6 +73,8 @@ const CASES: [Case; 3] = [
         profile: 14,
         recipe: COPPER_RECIPE,
         station: WORLD_FORGE,
+        station_guid: 100_000_004_582,
+        filter: 9,
         inputs: &[(2739, 5), (879, 3)],
         output: 21785,
         output_quantity: 5,
@@ -75,6 +84,8 @@ const CASES: [Case; 3] = [
         profile: 16,
         recipe: 11,
         station: WORLD_ANVIL,
+        station_guid: 100_000_003_600,
+        filter: 12,
         inputs: &[(21785, 10), (2752, 5), (55, 5), (56, 5)],
         output: 30280,
         output_quantity: 1,
@@ -476,5 +487,144 @@ fn a_wrong_job_recipe_request_changes_nothing() {
     assert!(
         chat.iter().any(|text| text.contains("Switch to Chef")),
         "{chat:?}"
+    );
+}
+
+/// Client 26/8 (`008b6bc0`): actor GUID and a zero flag.
+fn interact(gateway: &mut Gateway, guid: u64) -> GatewayOutcome {
+    let mut packet = vec![26, 0, 8, 0];
+    packet.extend(guid.to_le_bytes());
+    packet.push(0);
+    send(gateway, &packet, 2_000)
+}
+
+/// Every 26/25 recipe-window command in a reply.
+fn windows(outcome: &GatewayOutcome) -> Vec<Vec<u8>> {
+    outcome
+        .replies
+        .iter()
+        .map(|packet| inner(packet))
+        .filter(|packet| packet.starts_with(&[26, 0, 25, 0]))
+        .map(<[u8]>::to_vec)
+        .collect()
+}
+
+/// The 26/25 bytes `00aa0920` reads: header, the filter, then a zero.
+fn window(filter: u8) -> Vec<u8> {
+    vec![26, 0, 25, 0, filter, 0, 0, 0, 0, 0, 0, 0]
+}
+
+/// Reload the saved gateway after `edit`, logging in again.
+fn reload(
+    gateway: &Gateway,
+    content: &std::path::Path,
+    reference: &std::path::Path,
+    edit: impl FnOnce(&mut game_store::Snapshot),
+) -> (Gateway, Vec<GatewayOutcome>) {
+    let mut saved = gateway.snapshot();
+    edit(&mut saved);
+    let mut gateway =
+        Gateway::load_gameplay(reference, saved.character, content, saved.gameplay).unwrap();
+    let sent = login(&mut gateway);
+    (gateway, sent)
+}
+
+#[test]
+fn a_world_station_spawn_offers_the_x_prompt_at_the_station_radius() {
+    let case = &CASES[0];
+    let (gateway, content, reference) = gateway_at(case, case.station);
+    let (_gateway, sent) = reload(&gateway, &content, &reference, |_| {});
+    let packet = sent
+        .iter()
+        .flat_map(|outcome| &outcome.replies)
+        .map(|packet| inner(packet))
+        .find(|packet| {
+            packet.starts_with(&[35, 0, 2, 0]) && packet[4..12] == case.station_guid.to_le_bytes()
+        })
+        .expect("the world Cooking Table spawns near the player");
+    let spawn = startup_world::parse_add_npc(packet).unwrap();
+    assert_eq!((spawn.model_id, spawn.name_string_id), (419, 2061));
+    // AddNpc reader 00921a10 with an empty name: the interactable flag at byte
+    // 224 and, at 237, the prompt reach dispatch 0092f997 stores at
+    // actor+0x1818 (a zero falls back to the session's 7 m, run 133027).
+    assert_eq!(packet.len(), 334);
+    assert_eq!(packet[224], 1);
+    assert_eq!(packet[237..241], 12.0f32.to_le_bytes());
+    assert_eq!(spawn.unknown_float_51, 12.0);
+}
+
+#[test]
+fn interacting_with_each_world_station_opens_its_recipe_window() {
+    for case in CASES {
+        let (mut gateway, _content, _reference) = gateway_at(&case, case.station);
+        let before = gateway.snapshot();
+        let outcome = interact(&mut gateway, case.station_guid);
+        assert_eq!(windows(&outcome), [window(case.filter)], "{}", case.recipe);
+        assert!(!outcome.state_changed && !outcome.gameplay_changed);
+        assert_eq!(
+            gateway.snapshot(),
+            before,
+            "opening the window changes nothing"
+        );
+    }
+}
+
+#[test]
+fn a_station_of_another_job_or_out_of_reach_answers_the_refusal_line() {
+    let case = &CASES[0];
+    let (gateway, content, reference) = gateway_at(case, case.station);
+    let (mut miner, _) = reload(&gateway, &content, &reference, |saved| {
+        let profiles = saved.gameplay.as_mut().unwrap().profiles.as_mut().unwrap();
+        profiles.active = CraftingJob::Miner.profile_id();
+        profiles.unlocked.insert(profiles.active);
+    });
+    let (mut away, _) = reload(&gateway, &content, &reference, |saved| {
+        saved.character.position[0] += 100.0;
+    });
+    for (gateway, line) in [
+        (&mut miner, "Switch to Chef to make that recipe."),
+        (&mut away, "Move closer to a cooking station."),
+    ] {
+        let before = gateway.snapshot();
+        let outcome = interact(gateway, case.station_guid);
+        assert!(windows(&outcome).is_empty(), "{line}");
+        assert_eq!(s6::chat_texts(&outcome.replies), [line]);
+        assert!(!outcome.state_changed && !outcome.gameplay_changed);
+        assert_eq!(gateway.snapshot(), before, "a refusal changes nothing");
+    }
+}
+
+#[test]
+fn the_farm_cooking_table_keeps_its_tutorial_menu_until_the_tutorial_craft_is_done() {
+    // The opening actor and the world spawn of the same Legacy table (2537) share
+    // the farm position; run 133027 delivered both to the client.
+    const FARM_TABLE: [f32; 3] = [-2109.244, -56.61908, 210.265];
+    const OPENING_TABLE: u64 = 5_715_144_128_442_925_070;
+    const WORLD_TABLE: u64 = 100_000_002_537;
+    let case = &CASES[0];
+    let (mut done, content, reference) = gateway_at(case, FARM_TABLE);
+    for guid in [OPENING_TABLE, WORLD_TABLE] {
+        assert_eq!(windows(&interact(&mut done, guid)), [window(10)], "{guid}");
+    }
+    // Cooking 101 (910004) accepted with only its craft objective left; the
+    // stages after it are not started yet (content order is by id).
+    let (mut pending, _) = reload(&done, &content, &reference, |saved| {
+        let opening = saved.gameplay.as_mut().unwrap().opening.as_mut().unwrap();
+        for (id, stage) in opening.stages.range_mut(910004..) {
+            stage.accepted = *id == 910004;
+            stage.completed = false;
+            stage.rewarded = false;
+            stage.counts.iter_mut().for_each(|count| *count = 0);
+        }
+        opening.stages.get_mut(&910004).unwrap().counts = vec![1, 1, 1, 4, 4, 0];
+    });
+    let outcome = interact(&mut pending, OPENING_TABLE);
+    assert!(windows(&outcome).is_empty());
+    assert!(
+        outcome
+            .replies
+            .iter()
+            .any(|packet| inner(packet).starts_with(&[26, 0, 9, 0])),
+        "the pending tutorial craft keeps the opening menu"
     );
 }

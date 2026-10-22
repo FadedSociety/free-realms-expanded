@@ -1,4 +1,5 @@
-//! Recipe-book start (client request 26/24) at a real crafting station.
+//! Recipe-book start (client request 26/24) at a real crafting station, and the
+//! recipe window a station interaction opens (server command 26/25, [`open_window`]).
 //!
 //! Recovered client facts: the recipe window calls `Ui.RecipeStart(recipe)`
 //! (`ScriptsBase.lua:29430,29543,43142`), native `RequestRecipeStart 00c23970`
@@ -151,9 +152,20 @@ fn invalid(message: impl Into<String>) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, message.into())
 }
 
-/// (R) The opening world's craft actors, whose objective ids 2001/2002/2003 are
-/// the stove, furnace and anvil. `load_world_station_rules` adds the ordinary
-/// world actors placed with the same client models.
+/// (R) The job of an opening craft actor: objective ids 2001/2002/2003 are the
+/// stove, furnace and anvil.
+pub fn opening_job(recipe_id: u32) -> Option<CraftingJob> {
+    [
+        CraftingJob::Chef,
+        CraftingJob::Blacksmith,
+        CraftingJob::Miner,
+    ]
+    .into_iter()
+    .find(|job| job.opening_recipe_id() == recipe_id)
+}
+
+/// The opening world's craft actors. `load_world_station_rules` adds the
+/// ordinary world actors placed with the same client models.
 pub fn stations(actors: &[OpeningActor]) -> Vec<Station> {
     actors
         .iter()
@@ -161,13 +173,7 @@ pub fn stations(actors: &[OpeningActor]) -> Vec<Station> {
             let Some(OpeningTrigger::Craft { recipe_id }) = &actor.action else {
                 return None;
             };
-            let job = [
-                CraftingJob::Chef,
-                CraftingJob::Blacksmith,
-                CraftingJob::Miner,
-            ]
-            .into_iter()
-            .find(|job| job.opening_recipe_id() == *recipe_id)?;
+            let job = opening_job(*recipe_id)?;
             Some(Station {
                 job,
                 zone_id: actor.zone_id,
@@ -273,6 +279,36 @@ pub fn near_any(stations: &[Station], job: CraftingJob, zone_id: u32, position: 
                 .sum::<f32>()
                 <= station.radius.powi(2)
     })
+}
+
+/// The answer to client 26/8 on a station actor of `job`: the recipe window, or
+/// the refusal line a 26/24 start there would give (wrong job, then no station
+/// in reach). (R) The original station-interaction policy was not recovered.
+///
+/// The window is server command 26/25 `CommandPacketShowRecipeWindow` (ctor
+/// `00a987a0`, sub 0x19): family-26 dispatcher jump table `00aa2620` case 25
+/// calls `00aa0920`, whose reader `00a9d110` takes the header and two i32 and
+/// refuses unread bytes, so the body is exactly `26,0, 25,0, filter, 0`. A
+/// non-zero filter lists the learned rows whose `RecipeData+0x24` (the filter
+/// column, reader `0090a720`) equals it (`00c8cd70`), then Lua
+/// `RecipeHandler:Show` opens the window.
+pub fn open_window(
+    job: CraftingJob,
+    active_profile: i32,
+    zone_id: u32,
+    position: [f32; 3],
+    stations: &[Station],
+) -> Vec<u8> {
+    if job.profile_id() != active_profile {
+        return Refusal::WrongJob(job).feedback();
+    }
+    if !near_any(stations, job, zone_id, position) {
+        return Refusal::NoStation(job).feedback();
+    }
+    let mut packet = vec![26, 0, 25, 0];
+    packet.extend(job.recipe_filter().to_le_bytes());
+    packet.extend(0u32.to_le_bytes());
+    packet
 }
 
 fn has_ingredients(required: &[(i32, u32)], available: &[(i32, u32)]) -> bool {

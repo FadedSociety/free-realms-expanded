@@ -105,6 +105,9 @@ impl Gameplay {
         if let Some(out) = self.npc_quest_abandon_26_23(inner)? {
             return Ok(Some(out));
         }
+        if let Some(out) = self.station_interaction_26_8(inner, character)? {
+            return Ok(Some(out));
+        }
         if let Some(out) = self.npc_interact_26_8(inner, character)? {
             return Ok(Some(out));
         }

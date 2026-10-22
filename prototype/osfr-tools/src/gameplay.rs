@@ -1115,6 +1115,9 @@ impl Gameplay {
             bundled_npc_content.as_path()
         };
         let world_station_rules = crate::recipe_book::load_world_station_rules(station_content)?;
+        if let Some(visibility) = npc_visibility.as_mut() {
+            visibility.set_station_reach(&world_station_rules);
+        }
         if let (Some(profiles), Some(interaction)) = (&profiles, &mut npc_interaction) {
             let trainers = profiles.load_trainers(directory)?;
             let unknown = interaction.set_job_trainers(trainers);
@@ -2547,11 +2550,6 @@ impl Gameplay {
         staged.begin_gather(gather, now_ms, &mut out)?;
         *self = staged;
         Ok(Some(out))
-    }
-
-    /// True while a crafting, gathering or battle activity is running.
-    fn activity_busy(&self) -> bool {
-        self.blocks(|gates| gates.start)
     }
 
     /// Profile state for a reward transaction; a default one without class content.

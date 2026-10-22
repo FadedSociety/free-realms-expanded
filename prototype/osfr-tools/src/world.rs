@@ -84,6 +84,8 @@ pub struct NpcVisibility {
     placed: BTreeSet<u64>,
     shared: bool,
     revision: u64,
+    /// Station model -> client prompt reach; see [`Self::set_station_reach`].
+    station_reach: Arc<BTreeMap<u32, f32>>,
 }
 
 /// (R) One candidate in the common passive/hostile NPC budget. Engaged actors
@@ -403,6 +405,7 @@ impl NpcVisibility {
         // AddNpc's literal name; whether the nameplate shows it without a
         // locale id is the World Builder native text check.
         spawn.npc_name = placement.name.clone().unwrap_or_default();
+        apply_reach(&self.station_reach, &mut spawn);
         let npcs = Arc::make_mut(&mut self.by_zone)
             .entry(OPEN_WORLD_ZONE)
             .or_default();
@@ -492,6 +495,37 @@ impl NpcVisibility {
             heading: None,
         });
         npcs.sort_by_key(|npc| npc.spawn.actor_id);
+    }
+
+    /// (R) Station models (`crafting_stations.json`) carry the station radius as
+    /// their client prompt reach: AddNpc float `unknown_float_51` (reader
+    /// `00921a10`), which dispatch `0092f997` stores at actor+0x1818 through
+    /// `008b3320`, falling back to the session's 7 m when it is not positive. The
+    /// X prompt (`00baf6e0`) then matches the server's station reach, as the
+    /// opening actors already do. Later placements of these models get it too.
+    pub fn set_station_reach(&mut self, rules: &[crate::recipe_book::WorldStationRule]) {
+        self.station_reach = Arc::new(
+            rules
+                .iter()
+                .map(|rule| (rule.model_id, rule.interact_range))
+                .collect(),
+        );
+        for npc in Arc::make_mut(&mut self.by_zone).values_mut().flatten() {
+            apply_reach(&self.station_reach, &mut npc.spawn);
+        }
+    }
+
+    /// Model of a visible content actor, for content-defined fixtures such as
+    /// crafting stations. Excluded actors have none.
+    pub fn model_of(&self, actor_id: u64) -> Option<u32> {
+        if self.excluded.contains(&actor_id) {
+            return None;
+        }
+        self.by_zone
+            .values()
+            .flatten()
+            .find(|npc| npc.spawn.actor_id == actor_id)
+            .and_then(|npc| u32::try_from(npc.spawn.model_id).ok())
     }
 
     pub fn exclude_actor_guids(&mut self, actor_guids: impl IntoIterator<Item = u64>) {
@@ -628,6 +662,15 @@ pub(crate) fn content_spawn_template() -> NpcSpawn {
 /// pairs a heading with a non-staged rotation).
 fn facing(heading: f32) -> [f32; 4] {
     [heading.sin(), 0.0, heading.cos(), 0.0]
+}
+
+fn apply_reach(reach: &BTreeMap<u32, f32>, spawn: &mut NpcSpawn) {
+    if let Some(range) = u32::try_from(spawn.model_id)
+        .ok()
+        .and_then(|model| reach.get(&model))
+    {
+        spawn.unknown_float_51 = *range;
+    }
 }
 
 fn distance_squared(left: [f32; 3], right: [f32; 3]) -> f64 {

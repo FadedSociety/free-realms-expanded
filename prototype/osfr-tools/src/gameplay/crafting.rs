@@ -230,6 +230,58 @@ impl Gameplay {
         })
     }
 
+    /// Client 26/8 on a crafting station opens the recipe window for its job, or
+    /// answers the 26/24 wrong-job / no-station line (`recipe_book::open_window`).
+    /// Read-only, so a refusal changes nothing. Other targets and busy players
+    /// fall through to the NPC, opening and movie paths.
+    pub(super) fn station_interaction_26_8(
+        &self,
+        inner: &[u8],
+        character: &CharacterState,
+    ) -> io::Result<Option<Outcome>> {
+        if !inner.starts_with(&[26, 0, 8, 0]) {
+            return Ok(None);
+        }
+        let target = npc_interaction::decode_npc_interact_26_8(inner)
+            .map_err(|_| invalid("invalid NPC interaction request"))?
+            .target;
+        let (Some(job), Some(profiles)) = (self.station_job(target), self.profiles.as_ref()) else {
+            return Ok(None);
+        };
+        if self.activity_busy() {
+            return Ok(None);
+        }
+        Ok(Some(Outcome {
+            replies: vec![crate::recipe_book::open_window(
+                job,
+                profiles.active(),
+                character.zone_id,
+                character.position,
+                &self.crafting_stations(),
+            )],
+            ..Outcome::default()
+        }))
+    }
+
+    /// (R) The job of a station actor: a world model `crafting_stations.json`
+    /// binds, or an opening craft actor once its tutorial craft is not pending
+    /// (until then its menu starts the tutorial).
+    fn station_job(&self, guid: u64) -> Option<CraftingJob> {
+        let opening = self.opening.as_ref();
+        if let Some(actor) = opening.and_then(|o| o.actors().iter().find(|a| a.guid == guid)) {
+            let Some(OpeningTrigger::Craft { recipe_id }) = actor.action else {
+                return None;
+            };
+            return crate::recipe_book::opening_job(recipe_id)
+                .filter(|_| !self.opening_craft_pending(recipe_id));
+        }
+        let model = self.npc_visibility.as_ref()?.model_of(guid)?;
+        self.world_station_rules
+            .iter()
+            .find(|rule| rule.model_id == model)
+            .map(|rule| rule.job)
+    }
+
     pub(super) fn near_craft_station(&self, character: &CharacterState, job: CraftingJob) -> bool {
         crate::recipe_book::near_any(
             &self.crafting_stations(),
