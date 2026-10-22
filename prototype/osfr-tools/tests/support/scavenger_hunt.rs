@@ -34,7 +34,10 @@ use osfr_tools::{
     npc_interaction::NpcInteraction,
     profiles::ProfileState,
 };
-use std::collections::{BTreeMap, BTreeSet};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    path::Path,
+};
 
 /// The fixed admin event quest (T247), hosted by Jacque since T281.
 pub const QUEST: u32 = 3_000_200;
@@ -54,10 +57,25 @@ pub const BRAWLER: i32 = 43;
 /// The three ordered stops in hunt order.
 pub const STOPS: [u64; 3] = [PAPPY, CARLOS, MERIGOLD];
 
-/// A fresh character with the Adventurer profile active, bound to the real
-/// bundled split quest content exactly as production binds it. The Brawler
-/// profile is unlocked so the turn-in tests can switch the active job.
+/// `events.json` with the hunt open, as `realm event open 3000200` writes it
+/// (T418; `tests/live_events.rs` drives the command itself).
+pub const HUNT_OPEN: &str = r#"{"schema_version":1,"open":[3000200]}"#;
+
+/// A fresh character with the hunt open in the fixture's own live folder. The
+/// hunt is a live event (T418), so the suites written before it start with the
+/// admin's open already done. Sessions rebuilt later with `Fixture::reload` or
+/// `game_as` have no live folder, so the hunt is closed for them; they only
+/// continue a hunt already accepted, which a closed event keeps.
 pub fn fresh(fixture: &Fixture, character_id: u64) -> Gameplay {
+    let live = fixture.open_live_events([QUEST]);
+    fresh_in(fixture, character_id, &live)
+}
+
+/// A fresh character with the Adventurer profile active, bound to the real
+/// bundled split quest content exactly as production binds it, whose live world
+/// (`--world`) is `live`. The Brawler profile is unlocked so the turn-in tests
+/// can switch the active job.
+pub fn fresh_in(fixture: &Fixture, character_id: u64, live: &Path) -> Gameplay {
     let mut state = fixture.game_as(character_id, None).state();
     state.profiles = Some(ProfileState {
         version: 1,
@@ -65,7 +83,10 @@ pub fn fresh(fixture: &Fixture, character_id: u64) -> Gameplay {
         unlocked: BTreeSet::from([ADVENTURER, BRAWLER]),
         experience: BTreeMap::new(),
     });
-    fixture.game_as(character_id, Some(state))
+    let mut game = fixture.game_as(character_id, Some(state));
+    game.set_world_dir(Some(live.to_path_buf()))
+        .expect("the live world folder opens");
+    game
 }
 
 pub fn npc_position(npc_id: u64) -> [f32; 3] {

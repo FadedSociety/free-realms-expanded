@@ -134,6 +134,20 @@ impl Fixture {
         &self.path
     }
 
+    /// T418: this fixture's private live folder (the `--world` layer) with the
+    /// live events `ids` open, as an admin's `realm event open` leaves
+    /// `events.json`. A session reads it only after `set_world_dir`; without one
+    /// its live folder is its NPC content directory, usually the bundled
+    /// `data/content` every test shares.
+    pub fn open_live_events(&self, ids: impl IntoIterator<Item = u32>) -> PathBuf {
+        let live = self.path.join("live");
+        fs::create_dir_all(&live).unwrap();
+        let open: Vec<u32> = ids.into_iter().collect();
+        let text = serde_json::json!({"schema_version": 1, "open": open}).to_string();
+        fs::write(live.join("events.json"), text).unwrap();
+        live
+    }
+
     /// Replace the shared field population with `enemies`. The reference opening
     /// content has no `field_enemies.json`, so this also makes the private copy
     /// the session's NPC content root (the spawn catalogue, store and vendor

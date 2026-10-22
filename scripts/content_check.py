@@ -1216,6 +1216,10 @@ class Checker:
         enabled = quest.get("enabled", True)
         if not isinstance(enabled, bool):
             error("enabled", enabled, "quest enabled must be boolean")
+        # T418: offered only while an admin has the event open (realm event open).
+        live_event = quest.get("live_event", False)
+        if not isinstance(live_event, bool):
+            error("live_event", live_event, "quest live_event must be boolean")
         # W114 requirement fields: optional, independent, never inferred.
         if not hasattr(self, "job_profiles"):
             try:

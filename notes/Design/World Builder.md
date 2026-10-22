@@ -60,6 +60,8 @@ An event bundles NPCs, quests, a start, an end and a winner limit. **Scavenger h
 
 The event ends after N winners or at its end time. The NPC can stay or vanish.
 
+**Built so far (T418):** a quest marked `live_event` in content (the hunt, 3000200) is offered only while an admin has it open. The admin commands are `realm event open <id>`, `realm event close <id>` and `realm event list`. They keep `<live_dir>/events.json`, and every session sees a change within about a second. They do not announce anything: the operator sends the announcement with `realm broadcast` (script in `notes/Autopilot/T281.md`). There is no `realm event start` yet, and no start or end time, winner limit or per-event NPC placement.
+
 ## Order of work
 
 1. Native text check, one session: an NPC with a literal `npc_name`; an NPC and a quest using overlay text ids. *(needs the game window)*

@@ -149,9 +149,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) T247/F272: the split loader requires the quest catalogue to equal the union of every jobs.json quest_ids list (src/quest_engine.rs from_split_content), so the Adventurer job lists 3000200. This is a loader structural invariant, not a job gate: the record has no job field, is not Adventurer content, and the giver offer comes only from giver_npc_id through QuestEngine::quest_ids_for_giver. No NPC row was edited; tests/scavenger_hunt_quest.rs pins the loader rejection of a standalone quest."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T418: live_event keeps the hunt closed until an admin runs realm event open 3000200 (src/gameplay/live_events.rs); realm event close stops new offers while an accepted hunt still finishes and pays. This replaces T281's always-offered policy (World Builder realm event, Build Plan 3.3)."
         }
       ],
-      "enabled": true
+      "enabled": true,
+      "live_event": true
     }
   ]
 }

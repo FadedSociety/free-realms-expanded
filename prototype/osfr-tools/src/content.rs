@@ -296,6 +296,10 @@ pub struct Quest {
     /// W104 publication flag: hollow quests are `false` and never offered.
     #[serde(default = "enabled_by_default")]
     pub enabled: bool,
+    /// T418: offered only while an admin has the event open (`realm event open`,
+    /// `gameplay/live_events.rs`). A closed event stays enabled.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub live_event: bool,
     pub objectives: Vec<ContentGoal>,
     pub rewards: Vec<RewardGrant>,
     pub source: Vec<SourceTag>,

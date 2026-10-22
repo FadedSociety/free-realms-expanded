@@ -277,22 +277,28 @@ impl Gameplay {
             } else {
                 engine.decline(quest_id)
             };
+            // T418: an accept of a closed live event withdraws the offer
+            // (changed, with a denial); it is not an accept.
+            let accepted = accept && result.changed && result.denial.is_none();
             npc_event(serde_json::json!({
                 "event": "quest_reply",
                 "quest_id": quest_id,
                 "accepted": accept,
-                "outcome": if result.changed {
-                    if accept { "accepted" } else { "declined" }
-                } else {
+                "outcome": if !result.changed {
                     "rejected"
+                } else if result.denial.is_some() {
+                    "withdrawn"
+                } else if accept {
+                    "accepted"
+                } else {
+                    "declined"
                 }
             }));
-            let changed = result.changed;
             let mut out = Outcome::default();
             self.append_npc_quest_outcome(result, &mut out)?;
             // T361: an accept can complete a job-level goal the character already
-            // meets. A refused accept has changed == false and changes nothing.
-            if accept && changed {
+            // meets. A refused or withdrawn accept starts no quest.
+            if accepted {
                 self.sync_job_level_objectives(&mut out)?;
             }
             // End the NPC dialog so the client leaves dialog camera and restores

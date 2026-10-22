@@ -759,6 +759,10 @@ pub struct QuestEngine {
     /// ordinary offer clears it, so it can never bypass a later offer's gates.
     dev_offer: Option<u32>,
     disabled: BTreeSet<u32>,
+    /// T418: `live_event` quests and whether an admin has them open
+    /// (`gameplay/live_events.rs`). A closed one is neither offered nor
+    /// accepted, but it is not `disabled`: saves, progress and turn-ins keep it.
+    live_events: BTreeMap<u32, bool>,
     location_quests: BTreeMap<u32, BTreeSet<u32>>,
     poi_locations: BTreeMap<u32, (u32, [f32; 3], f32)>,
 }
@@ -1026,6 +1030,11 @@ impl QuestEngine {
         let mut engine =
             Self::new_with_disabled(character_id, definitions, eligibility, state, disabled)?;
         engine.poi_locations = poi_locations;
+        engine.live_events = quests
+            .iter()
+            .filter(|quest| quest.live_event)
+            .map(|quest| (quest.id, false))
+            .collect();
         engine.index_location_quests();
         if let Some(id) = engine
             .state
@@ -1207,6 +1216,7 @@ impl QuestEngine {
             job_profile_ids: BTreeMap::new(),
             dev_offer: None,
             disabled,
+            live_events: BTreeMap::new(),
             location_quests: BTreeMap::new(),
             poi_locations: BTreeMap::new(),
             state,
@@ -1688,13 +1698,38 @@ impl QuestEngine {
                 .is_some_and(|d| !d.objectives.is_empty())
     }
 
+    /// T418: every `live_event` quest and whether it is open.
+    pub fn live_events(&self) -> &BTreeMap<u32, bool> {
+        &self.live_events
+    }
+
+    /// T418: open exactly the live events in `open` (the live world's
+    /// `events.json`). Returns the ids that are not live events; they are ignored.
+    pub fn set_open_events(&mut self, open: &BTreeSet<u32>) -> Vec<u32> {
+        for (id, is_open) in &mut self.live_events {
+            *is_open = open.contains(id);
+        }
+        open.iter()
+            .copied()
+            .filter(|id| !self.live_events.contains_key(id))
+            .collect()
+    }
+
+    fn event_closed(&self, quest_id: u32) -> bool {
+        self.live_events.get(&quest_id) == Some(&false)
+    }
+
     fn offer_denial(&self, quest_id: u32, giver_npc_id: u64) -> Option<QuestDenial> {
         let Some(definition) = self.definitions.get(&quest_id) else {
             return Some(QuestDenial::Unavailable);
         };
         // (R) Incomplete content stays available to editors and saved state,
         // but cannot be offered, even when `enabled` is accidentally true.
-        if definition.objectives.is_empty() || self.disabled.contains(&quest_id) {
+        // T418: neither is a live event an admin has not opened.
+        if definition.objectives.is_empty()
+            || self.disabled.contains(&quest_id)
+            || self.event_closed(quest_id)
+        {
             return Some(QuestDenial::Unavailable);
         }
         if definition.giver_npc_id != giver_npc_id {
@@ -1737,8 +1772,17 @@ impl QuestEngine {
         if self.state.pending_offer != Some(quest_id) || !self.is_enabled(quest_id) {
             return denied(QuestDenial::Unavailable);
         }
-        let definition = &self.definitions[&quest_id];
         let developer_offer = self.dev_offer == Some(quest_id);
+        // T418: an offer shown before the admin closed the event is not accepted.
+        // The client forgets its offer once it sends this accept (0x00a97d70
+        // sets the offer id to -1), so the refusal withdraws the offer like a
+        // decline; a kept pending offer would block every later offer.
+        if self.event_closed(quest_id) && !developer_offer {
+            let mut outcome = self.decline(quest_id);
+            outcome.denial = Some(QuestDenial::Unavailable);
+            return outcome;
+        }
+        let definition = &self.definitions[&quest_id];
         if let Some(denial) = self
             .requirement_denial(definition)
             .filter(|_| !developer_offer)

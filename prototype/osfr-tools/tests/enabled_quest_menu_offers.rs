@@ -255,9 +255,12 @@ impl Shipped {
     }
 
     /// One save per (job, chain size) of `quests`; in each, walk to every giver
-    /// of those quests and take every offer its menu makes.
+    /// of those quests and take every offer its menu makes. A live event (T418,
+    /// the scavenger hunt) is offered only while an admin has it open, so every
+    /// walk runs with all of them open.
     fn walk_layers(&self, fixture: &Fixture, quests: &[u32]) -> Pass {
         let base = fixture.game(None).state();
+        let live = fixture.open_live_events(self.engine.live_events().keys().copied());
         let mut layers = BTreeMap::<(Option<i32>, usize), Vec<u32>>::new();
         for &quest in quests {
             let key = (self.records[&quest].job, self.chain(quest).len());
@@ -273,7 +276,9 @@ impl Shipped {
                 givers.entry(giver).or_default().push(quest);
             }
             let start = character_at_for(CHARACTER, 0, [0.0; 3]);
-            let mut client = Client::new(fixture.game(Some(state)), start);
+            let mut game = fixture.game(Some(state));
+            game.set_world_dir(Some(live.clone())).unwrap();
+            let mut client = Client::new(game, start);
             for (giver, targets) in givers {
                 let Some((at, actor)) = self.giver(CHARACTER, giver) else {
                     pass.unplaced.extend(targets);

@@ -51,6 +51,7 @@ mod field_battle;
 mod housing;
 mod jobs;
 mod knockout;
+mod live_events;
 mod matchmaking_route;
 mod movie;
 mod npc;
@@ -219,6 +220,7 @@ pub struct Gameplay {
     pending_chest: Option<i32>,
     npc_visibility: Option<crate::world::NpcVisibility>,
     placement_watch: placement_watch::PlacementWatch, // live stat; never saved
+    event_watch: placement_watch::PlacementWatch,     // T418 events.json; never saved
     npc_interaction: Option<NpcInteraction>,
     /// Last NPC Talk packet, retained only for the opt-in offer experiment.
     last_npc_dialogue: Option<(u32, u64, u64, Vec<u8>)>,
@@ -1125,6 +1127,7 @@ impl Gameplay {
             pending_chest: None,
             npc_visibility,
             placement_watch: placement_watch::PlacementWatch::default(),
+            event_watch: placement_watch::PlacementWatch::default(),
             npc_interaction,
             last_npc_dialogue: None,
             pending_quest_choice: None,
@@ -1884,6 +1887,7 @@ impl Gameplay {
         let mut out = self.tick_world(character, now_ms)?;
         self.tick_gathering_nodes(now_ms, &mut out)?;
         self.tick_live_placements(now_ms, &mut out); // world visibility only, never saved
+        self.tick_live_events(now_ms); // quest offer gate only, never saved
         out.replies.splice(0..0, fishing);
         self.settle_achievement_counters(&counters_before, &mut out)?;
         Ok(out)
@@ -2883,6 +2887,7 @@ impl Gameplay {
                 };
                 say(out, text);
             }
+            ["event", rest @ ..] => say(out, self.realm_event(rest)?),
             ["reload", rest @ ..] => {
                 let what = rest.first().copied().unwrap_or("all");
                 let text = match self.reload_content(what, out) {
@@ -3738,21 +3743,8 @@ impl Gameplay {
             visibility.replace_placements(&records)?;
         }
         self.placement_watch.observe(&self.placements_path());
+        self.load_live_events();
         Ok(())
-    }
-
-    fn placements_path(&self) -> PathBuf {
-        self.live_dir().join("npc_placements.json")
-    }
-
-    /// A missing table is empty; a malformed, oversized or non-regular one is
-    /// refused, so no command overwrites rows it could not read.
-    fn load_placements(&self) -> io::Result<Vec<crate::world::Placement>> {
-        match crate::world::read_placements(&self.placements_path()) {
-            Ok(records) => Ok(records),
-            Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(Vec::new()),
-            Err(error) => Err(error),
-        }
     }
 
     fn save_placements(&self, mut records: Vec<crate::world::Placement>) -> io::Result<()> {

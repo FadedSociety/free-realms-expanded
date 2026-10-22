@@ -57,7 +57,7 @@ impl PlacementWatch {
 
     /// True when the one-second budget allows the next stat. The tick checks
     /// this before building the file path, so an idle tick allocates nothing.
-    fn due(&self, now_ms: u64) -> bool {
+    pub(super) fn due(&self, now_ms: u64) -> bool {
         now_ms >= self.next_check_ms
     }
 
@@ -70,6 +70,17 @@ impl PlacementWatch {
         path: &Path,
         now_ms: u64,
     ) -> io::Result<Option<Vec<crate::world::Placement>>> {
+        self.poll_with(path, now_ms, crate::world::read_placements)
+    }
+
+    /// `poll` for any live-world file read by `read`; a missing file is
+    /// `T::default()`. T418's `events.json` (`live_events.rs`) shares it.
+    pub(super) fn poll_with<T: Default>(
+        &mut self,
+        path: &Path,
+        now_ms: u64,
+        read: fn(&Path) -> io::Result<T>,
+    ) -> io::Result<Option<T>> {
         if !self.due(now_ms) {
             return Ok(None);
         }
@@ -81,7 +92,7 @@ impl PlacementWatch {
                     return Ok(None);
                 }
                 self.stamp = Stamp::Absent;
-                return Ok(Some(Vec::new()));
+                return Ok(Some(T::default()));
             }
             Err(error) => return Err(error),
         };
@@ -92,7 +103,7 @@ impl PlacementWatch {
         if self.stamp == Stamp::Modified(modified) || self.stamp == Stamp::Rejected(modified) {
             return Ok(None);
         }
-        match crate::world::read_placements(path) {
+        match read(path) {
             Ok(records) => {
                 self.stamp = Stamp::Modified(modified);
                 Ok(Some(records))
@@ -106,6 +117,20 @@ impl PlacementWatch {
 }
 
 impl Gameplay {
+    pub(super) fn placements_path(&self) -> PathBuf {
+        self.live_dir().join("npc_placements.json")
+    }
+
+    /// A missing table is empty; a malformed, oversized or non-regular one is
+    /// refused, so no command overwrites rows it could not read.
+    pub(super) fn load_placements(&self) -> io::Result<Vec<crate::world::Placement>> {
+        match crate::world::read_placements(&self.placements_path()) {
+            Ok(records) => Ok(records),
+            Err(error) if error.kind() == io::ErrorKind::NotFound => Ok(Vec::new()),
+            Err(error) => Err(error),
+        }
+    }
+
     /// Apply the acting session's saved table with the canonical swap, so a
     /// same-GUID model/name/position edit is not mistaken for an unchanged row.
     /// The file is already saved; the stamp is recorded only after the view

@@ -41,6 +41,7 @@ impl Gameplay {
         )?;
         self.npc_quests = Some(engine);
         self.saved_npc_quests = None;
+        self.load_live_events(); // T418: before any Talk, not on the first tick
         self.register_breadcrumb_crosswalk(crosswalk);
         self.refresh_npc_quest_eligibility(current_unix_seconds());
         // Bind is the load-time level-change notification. The login packet sync

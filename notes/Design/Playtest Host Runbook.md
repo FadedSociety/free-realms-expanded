@@ -176,7 +176,7 @@ For example, these are the two game endpoints:
 
 The offline osfr-account set-role command gives the owner the admin account role. It does not turn on developer tools.
 
-The shared gateway refuses --dev-tools on a non-loopback bind. Studio stays off with --studio-port 0. Admin and builder `realm` commands still work there: with an account store, the gateway checks each command against the account's role and needs no --dev-tools (Security Model decision 1, `264db2a`; native evidence below). Builders get building commands only. Diagnostics and experiments (for example `realm mine`, `harvest`, `npx off`, `offer`, `race` and the kart lobby catalogue) still need --dev-tools, so they are off on the shared gateway. Do not start a second gateway against the same saves; separate processes do not share session ownership. The scavenger hunt is ordinary quest content (3000200 in `data/content/quests/scavenger_hunt.json`), announced with the admin-only `realm broadcast` (see Night-blocking gaps).
+The shared gateway refuses --dev-tools on a non-loopback bind. Studio stays off with --studio-port 0. Admin and builder `realm` commands still work there: with an account store, the gateway checks each command against the account's role and needs no --dev-tools (Security Model decision 1, `264db2a`; native evidence below). Builders get building commands only. Diagnostics and experiments (for example `realm mine`, `harvest`, `npx off`, `offer`, `race` and the kart lobby catalogue) still need --dev-tools, so they are off on the shared gateway. Do not start a second gateway against the same saves; separate processes do not share session ownership. The scavenger hunt (3000200 in `data/content/quests/scavenger_hunt.json`) is a live event since T418: Jacque offers it only after the admin-only `realm event open 3000200` and stops after `realm event close 3000200` (`realm event list` shows the state, kept in the `--world` folder's `events.json`), and the admin-only `realm broadcast` announces it (see Night-blocking gaps).
 
 ## 2. Each friend
 
@@ -323,7 +323,7 @@ Do not invite players while any item stays unchecked.
 - There is no verified VPN-only patch host or patch URL.
 - The real client has not logged in through the launcher's key-pair (AUTH2) path, and two-client visibility/gameplay over VPN is untested.
 - Gateway tickets are HMAC-bound for every account since L023 (the public fixed ticket is refused), but they are reusable and never expire: a ticket stays valid until the handoff key changes (Security Model S02/L3; the one-use, expiring part is open). The lead decides whether this blocks the night.
-- The scavenger hunt and the admin's `realm broadcast` have not run natively (Build Plan 3.3).
+- The scavenger hunt, `realm event open`/`close` and the admin's `realm broadcast` have not run natively (Build Plan 3.3).
 - The broker-login 60-minute stress gate is open; the launcher key command also failed under this workspace's profile-folder ACL.
 
 ## Evidence and open gates
