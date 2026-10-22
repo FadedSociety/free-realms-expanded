@@ -169,15 +169,26 @@ def main():
                    (line.split("^") for line in classes.read_text().splitlines() if line and not line.startswith("#"))}
     resource = lab / "working/OSFR.Client/OSFR Client/Resources/CharacterCreate/ItemDefinitions.txt"
     rows = [line.split("^") for line in resource.read_text().splitlines() if line and not line.startswith("#")]
+    # FEET/LEGS/CHEST_ITEM_ID of every creator clothing set (all races and genders).
+    clothing = {int(item) for line in resource.with_name("CharacterCreateItemClothingSets.txt").read_text().splitlines()
+                if line and not line.startswith("#") for item in line.split("^")[4:7]}
     existing = {d["id"] for d in inv["definitions"]}
     creator_added = 0
+    reconstructed_class = []
     for row in rows:
         if int(row[0]) in existing:
             continue
         value = lambda n: int(row[n] or 0)
+        item_class = value(9)
+        if item_class == 0 and value(0) in clothing:
+            # (R) Human female sets 30-35 ship ITEM_CLASS 0 here. This creator table is the client's only item
+            # table (LoadItemDefinitions 00724b80, via LoadAllDefinitionFiles 00724d80); the full catalogue is
+            # server-sent. Class 1 is what every other creator outfit has, and profile 1 accepts it.
+            item_class = 1
+            reconstructed_class.append(value(0))
         definition = {"Id": value(0), "NameId": value(2), "DescriptionId": value(3),
                       "IconData": {"Id": value(4), "TintId": value(19)}, "Tint": 0, "Unknown5": 0,
-                      "Cost": value(8), "Class": value(9), "ProfileOverride": value(11), "Slot": value(12),
+                      "Cost": value(8), "Class": item_class, "ProfileOverride": value(11), "Slot": value(12),
                       "NoTrade": bool(value(14)), "NoSale": bool(value(32)), "ModelName": row[16],
                       "TextureAlias": row[18], "GenderUsage": value(17), "Type": value(1),
                       "CategoryId": value(20), "MembersOnly": bool(value(22)), "NonMiniGame": bool(value(23)),
@@ -225,6 +236,14 @@ def main():
                 raise ValueError(f"starter {definition_id} has {len(matches)} equipment slots")
             starter_audit.append({"profile_id": int(profile_id), "definition_id": definition_id,
                                   "slot": slot, "class_id": definition["class_id"]})
+    # World entry equips the chosen outfit on profile 1 (Gameplay::apply_identity); inventory.rs `equip`
+    # refuses a slot or class profile 1 lacks and the session ends. Every set must pass that check.
+    profile_one = next(p for p in inv["profiles"] if p["id"] == 1)
+    unequippable = sorted(i for i in clothing if i not in by_definition
+                          or by_definition[i]["slot"] not in profile_one["slots"]
+                          or by_definition[i]["class_id"] not in profile_one["allowed_classes"])
+    if unequippable:
+        raise ValueError(f"creator clothing {unequippable} cannot be equipped on profile 1")
     for definition_id in result["starter_items"]["43"]:
         definition = by_definition[definition_id]
         item_id = len(fresh["items"]) + 1
@@ -239,7 +258,8 @@ def main():
         target["category"] = definition["slot"]
     inv["initial_state"] = fresh
     inv["provenance"]["creator_definitions"] = {"file_sha256": hashlib.sha256(resource.read_bytes()).hexdigest(),
-                                               "added": creator_added, "mapping": "Named CSV fields to verified item serializer. Unprovided resale/stat/ability values are zero; original catalog retained for existing IDs."}
+                                               "added": creator_added, "mapping": "Named CSV fields to verified item serializer. Unprovided resale/stat/ability values are zero; original catalog retained for existing IDs.",
+                                               "reconstructed_class_1": reconstructed_class}
     starter_provenance = {"repository": "https://github.com/raisingkaines/FreeRealms-Legacy",
                           "revision": "9e082025391177d5a33ee18c714ddd06b457a695", "license": "AGPL-3.0",
                           "definitions_sha256": hashlib.sha256(legacy_items_path.read_bytes()).hexdigest(),
