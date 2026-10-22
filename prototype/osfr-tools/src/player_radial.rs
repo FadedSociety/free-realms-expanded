@@ -55,6 +55,8 @@ pub const DEFAULT_REACH_M: f32 = 40.0;
 const MAX_NAME_BYTES: usize = 64; // (R)
 const MAX_PROFILES: usize = 64; // (R)
 const MAX_SLOT: i32 = 17; // `00ad83b0` accepts slots 1..=17 only.
+/// Stat entries in 149/1: the Inspect window reads up to index 37 (CoinBoost).
+const INSPECT_STATS: i32 = 38;
 const MAX_RECORD_BYTES: usize = 64 * 1024; // (R)
 const MAX_PAYLOAD_BYTES: usize = 512 * 1024; // (R)
 
@@ -400,7 +402,16 @@ fn start_inspect_packet(guid: u64, look: &PublicLook) -> Result<Vec<u8>, RadialE
     put_i32(&mut payload, levels);
     put_i32(&mut payload, 0); // collections (R: private)
     put_i32(&mut payload, 0); // quests (R: private)
-    put_i32(&mut payload, 0); // stats: none (R)
+    // Stats list (`00ad7f40`, entries `008e7640`: id, type 0 = int, value). The window reads
+    // entries 1, 5, 7, 17, 37 by position with no bounds check (`00cc0760` cases 12-16 via
+    // `00ad7700`); an empty list left the array null and crashed the client (T401).
+    // (R) id = position, values 0 (private, like coins).
+    put_i32(&mut payload, INSPECT_STATS);
+    for id in 0..INSPECT_STATS {
+        for value in [id, 0, 0] {
+            put_i32(&mut payload, value);
+        }
+    }
     put_i32(&mut payload, 0); // trailing string, empty
     if payload.len() > MAX_PAYLOAD_BYTES {
         return Err(RadialError::BadLook("payload too large"));

@@ -109,7 +109,11 @@ struct Payload {
     profiles: Vec<(i32, i32)>,
     active: i32,
     items: Vec<(i32, i32, i32, Vec<u8>)>,
+    /// Achievement count and points (`00940e60`), then the eight scalars.
     tail: Vec<i32>,
+    /// (id, type, value) in list order (`00ad7f40`, entries `008e7640`).
+    stats: Vec<(i32, i32, i32)>,
+    text: Vec<u8>,
 }
 
 fn parse_inspect(packet: &[u8]) -> (u64, bool, Payload) {
@@ -142,7 +146,26 @@ fn parse_inspect(packet: &[u8]) -> (u64, bool, Payload) {
         items.push((slot, def, tint, body[at..at + record_len].to_vec()));
         at += record_len;
     }
-    let tail = (0..12).map(|_| i32_at(&mut at)).collect();
+    let tail: Vec<i32> = (0..10).map(|_| i32_at(&mut at)).collect();
+    assert_eq!(tail[0], 0, "achievement records are not decoded here");
+    // `00ad7f40` refuses a negative count or one larger than the bytes left.
+    let n = i32_at(&mut at);
+    assert!(n >= 0 && n as usize <= body.len() - at, "stat count {n}");
+    let stats = (0..n)
+        .map(|_| {
+            let (id, kind) = (i32_at(&mut at), i32_at(&mut at));
+            // `008e7640`: a value follows only for type 0 (int) and 1 (float).
+            let value = if kind == 0 || kind == 1 {
+                i32_at(&mut at)
+            } else {
+                0
+            };
+            (id, kind, value)
+        })
+        .collect();
+    let n = i32_at(&mut at) as usize; // `008e2470`
+    let text = body[at..at + n].to_vec();
+    at += n;
     assert_eq!(at, body.len(), "payload fully consumed");
     (
         guid,
@@ -152,6 +175,8 @@ fn parse_inspect(packet: &[u8]) -> (u64, bool, Payload) {
             active,
             items,
             tail,
+            stats,
+            text,
         },
     )
 }
@@ -317,13 +342,46 @@ fn inspect_choice_sends_the_public_look_only() {
     assert_eq!((p.items[0].0, p.items[0].1, p.items[0].2), (2, 1234, 77));
     assert_eq!(p.items[0].3, record(1234, 10));
     assert_eq!(p.items[1].3, record(55, 0));
-    // vip rank f32, icon, vip title, active title, coins, levels, collections,
-    // quests, stats, string, plus the two leading achievement words.
-    assert_eq!(p.tail, [0, 0, 0, 0, 0, 0, 0, 2, 0, 0, 0, 0]);
+    // achievement count and points, vip rank f32, icon, vip title, active title, coins,
+    // levels, collections, quests.
+    assert_eq!(p.tail, [0, 0, 0, 0, 0, 0, 0, 2, 0, 0]);
+    assert!(p.text.is_empty());
     // Canary: nothing private exists to leak; a scan for the marker finds nothing.
     assert!(!out[0].windows(4).any(|w| w == CANARY.to_le_bytes()));
     assert_eq!(radial.inspecting(), Some(OTHER));
     assert_eq!(radial.menu_target(), None, "menu is one-shot");
+}
+
+/// T401: the Inspect window reads MaxHealth, MaxMana, Defense, StarBoost and CoinBoost as stat
+/// entries 1, 5, 7, 17 and 37 by position with no bounds check (`00cc0760` cases 12-16 via
+/// `00ad7700`); a shorter list made the client read a null array and crash.
+#[test]
+fn inspect_carries_every_stat_the_window_reads() {
+    let registry = world();
+    let empty = PublicLook {
+        profiles: Vec::new(),
+        active_profile: 0,
+        items: Vec::new(),
+    };
+    for target_look in [look(), empty] {
+        let mut radial = PlayerRadial::default();
+        open_menu(&mut radial, &registry);
+        let out = radial
+            .choose(
+                &registry,
+                viewer(),
+                &choice(OTHER, INSPECT_ENTRY_ID),
+                |_| Some(target_look.clone()),
+            )
+            .unwrap()
+            .unwrap();
+        let (_, _, p) = parse_inspect(&out[0]);
+        assert!(p.stats.len() > 37, "{} stat entries", p.stats.len());
+        for (index, &(id, kind, value)) in p.stats.iter().enumerate() {
+            // (R) id = position, int type, value private.
+            assert_eq!((id, kind, value), (index as i32, 0, 0));
+        }
+    }
 }
 
 #[test]
