@@ -118,11 +118,31 @@ diagnostics and panic/error output. Its parent must exist and the file must be
 unused. It does not log launch arguments, tokens or form contents. Omit the
 variable for normal operation.
 
-**Current evidence (W86b, 2026-10-16):** offline build and 12 tests pass. Home and
+**W86b evidence (2026-10-16):** offline build and 12 tests pass. Home and
 Settings each saved a 1410 x 1185 PNG through their own running-window capture.
 Physical controller navigation, actual client launch, release packaging and
 second-PC acceptance remain unverified. See `notes/Design/Rust Launcher.md` for
 root-cause logs, provenance, security review and the remaining full-launcher gates.
+
+## Evidence (2026-10-21)
+
+Native runs are under `lab/runs/`. Every client run cited here used the
+`run-local-baseline.py` harness, not this launcher.
+
+| What | State | Evidence |
+|---|---|---|
+| Launcher window, Settings and join screen draw | Proven (window captures) | `lab/reports/rust-launcher-20261016/`, `lab/reports/rust-launcher-w131/` |
+| Key creation and AUTH2 broker login against a real `osfr-login` | Proven by tests only | `tests/auth.rs` `real_broker_enrol_generated_key_and_receive_token`; pin canary `wrong_pin_sends_no_proof_canary` |
+| Pinned patch download, resume and repair | Proven by loopback tests only; no real patch host | `tests/patch.rs`; `lab/reports/rust-launcher-w121/README.md` |
+| Launcher starts `FreeRealms.exe` | Pending (lead native run, L024) | — |
+| The client needs a `manifest.crc` asset server | Proven natively (harness) | `client-baseline-20261008T015537Z` exited with code 27 after four failed `manifest.crc` requests; `client-baseline-20261021T193008Z` got 7 of 339 asset requests answered 200 (`manifest.crc`, fence, lamp and sconce models). `offline_urls` (`src/lib.rs`) points every URL at `127.0.0.1:9`, `IndirectServerAddress` included (`src/tests.rs:117`), so a client this launcher starts is expected to exit with code 27 (R) until L024's asset responder or a profile asset URL lands |
+| Dev-mode login, Character Select, world entry | Proven natively (harness) | `client-baseline-20261020T173403Z`, `client-baseline-20261020T204059Z` |
+| Account-store login: legacy save migrated into the store, then world entry | Proven natively (harness) | `client-baseline-20261014T023623Z` (`notes/Reviews/Native Login Accounts 023623.md`) |
+| Role-checked `realm` commands without `--dev-tools` on an account-store gateway (admin `realm god` ran, player refused) | Proven natively (harness, dev-mode login) | `client-baseline-20261021T193008Z` |
+| Gateway HMAC handoff | Not proven for the real client (pending L024) | In `client-baseline-20261021T193008Z` only `osfr-bot` (guid 2) presented an HMAC ticket, which it signs itself. The real client (account 1 / character 1) still enters with the public fixed ticket: login issues it for that pair (`prototype/osfr-tools/src/login.rs:414-418`) and the gateway accepts it (`prototype/osfr-tools/src/bin/osfr-gateway.rs:1114-1116`). Security Model S02/L3 |
+| Key-pair login of the real client (broker token redeemed by the client) | Not run | The harness runs login in loopback dev mode; key-pair native verification belongs with this launcher (`lab/autopilot/native-notes/2026-10-20.md`, harness repairs) |
+| Character creation on a fresh key-pair account | Not run | `notes/Reviews/Native Login Accounts 023623.md` (Open) |
+| Physical controller, release package, fresh second PC, VPN broker | Not run | — |
 
 ## W98 skin evidence (2026-10-16)
 

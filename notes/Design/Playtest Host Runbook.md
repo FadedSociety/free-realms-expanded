@@ -118,13 +118,13 @@ $publicKey = Read-Host '64-character public key'
 & $accountExe set-role --store (Join-Path $runtime 'accounts.json') --account-id 1 --role admin
 ```
 
-The first account in a fresh store is ID 1. Account roles are server policy (R). W120's in-game command syntax is `realm role <account-id> <player|builder|admin>`; it is admin-only and requires developer tools. For example:
+The first account in a fresh store is ID 1. Account roles are server policy (R). W120's in-game command syntax is `realm role <account-id> <player|builder|admin>`; it is admin-only. For example:
 
 ```text
 realm role 1 admin
 ```
 
-This command is for a local developer session only. It is not available on the shared VPN gateway: that process must refuse developer tools, and the project has no host-only remote console yet. Use the offline `osfr-account set-role` command above for the playtest account.
+On the shared gateway an admin may send it without developer tools (decision 1), but login holds the account-store lock while it runs, so the gateway answers "account store is busy or unavailable" (code: `osfr-login.rs` `run`, `Gateway::change_account_role`; not run natively). Use the offline `osfr-account set-role` command above for the playtest account.
 
 15. Set the VPN address and server binaries.
 
@@ -142,8 +142,10 @@ Replace the address placeholder with the private VPN address. Keep the legacy cl
 
 ```powershell
 $env:OSFR_GATEWAY_STARTUP_SNAPSHOT = Join-Path $bundle 'startup\startup.json'
-& $gatewayExe ($vpn + ':20041') --reference (Join-Path $bundle 'reference') --state (Join-Path $runtime 'character.json') --content (Join-Path $bundle 'content') --terrain (Join-Path $bundle 'terrain') --client-locale (Join-Path $bundle 'client-locale') --account-store (Join-Path $runtime 'accounts.json') --handoff-key-file (Join-Path $runtime 'handoff.key') --security-log (Join-Path $runtime 'security.jsonl') --studio-port 0 --allow-lan --seconds 14400
+& $gatewayExe ($vpn + ':20041') --reference (Join-Path $bundle 'reference') --state (Join-Path $runtime 'character.json') --content (Join-Path $bundle 'content') --world (Join-Path $runtime 'world') --terrain (Join-Path $bundle 'terrain') --client-locale (Join-Path $bundle 'client-locale') --account-store (Join-Path $runtime 'accounts.json') --handoff-key-file (Join-Path $runtime 'handoff.key') --security-log (Join-Path $runtime 'security.jsonl') --studio-port 0 --allow-lan --seconds 14400
 ```
+
+`--world` keeps World Builder saves (placed NPCs, marks, authored text) in the runtime. The gateway creates the folder when the first character enters the world; without the flag, these saves go into the bundle's content folder (`Gameplay::live_dir`). Players see new authored text only after `scripts/build_world_locale.py` rebuilds their client locale from this folder and they restart the client.
 
 Leave this terminal open. The 14,400-second limit is a planned four-hour clean shutdown. The command was checked with a two-second limit on loopback. VPN binding and a four-hour run were not exercised. Do not add --dev-tools.
 
@@ -174,7 +176,7 @@ For example, these are the two game endpoints:
 
 The offline osfr-account set-role command gives the owner the admin account role. It does not turn on developer tools.
 
-The shared gateway refuses --dev-tools on a non-loopback bind. Studio stays off with --studio-port 0. There is no supported host-only developer console for this remote server yet. Do not start a second gateway against the same saves; separate processes do not share session ownership. Live scavenger-hunt commands are blocked until a host-only control path is implemented and reviewed.
+The shared gateway refuses --dev-tools on a non-loopback bind. Studio stays off with --studio-port 0. Admin and builder `realm` commands still work there: with an account store, the gateway checks each command against the account's role and needs no --dev-tools (Security Model decision 1, `264db2a`), but the role is bound to whoever enters as the host's character, and the gateway still lets any peer do that with the public fixed ticket (see Night-blocking gaps). Native run client-baseline-20261021T193008Z, a loopback account-store gateway without --dev-tools, proved the role check: the admin's `realm god` ran, and a player account's `realm give`, `goto`, `here` and `god` got the role refusal. Builders get building commands only. Diagnostics and experiments (for example `realm mine`, `harvest`, `npx off`, `offer`, `race` and the kart lobby catalogue) still need --dev-tools, so they are off on the shared gateway. Do not start a second gateway against the same saves; separate processes do not share session ownership. The scavenger hunt is ordinary quest content (3000200 in `data/content/quests/scavenger_hunt.json`), announced with the admin-only `realm broadcast`; neither has run natively yet (Build Plan 3.3).
 
 ## 2. Each friend
 
@@ -254,7 +256,7 @@ The gateway has a clean shutdown path when --seconds expires. Ctrl+C with active
 
 7. Restart with the same bundle and runtime.
 
-Use the same server-id.bin, accounts.json, handoff.key, character directory, and gateway state path. Never copy the empty accounts.json over the active store.
+Use the same server-id.bin, accounts.json, handoff.key, character directory, world folder (`--world`), and gateway state path. Never copy the empty accounts.json over the active store.
 
 ### Launcher login errors
 
@@ -290,7 +292,7 @@ $backup = Join-Path $backupRoot ('playtest-' + [DateTime]::UtcNow.ToString('yyyy
 Copy-Item -LiteralPath $runtime -Destination $backup -Recurse
 ```
 
-This includes character saves, social data, the account store, and the handoff key. Keep the backup on a host-only encrypted volume. Do not upload it with bug reports.
+This includes character saves, social data, World Builder saves, the account store, and the handoff key. Keep the backup on a host-only encrypted volume. Do not upload it with bug reports.
 
 4. Save one Markdown file per bug.
 
@@ -304,7 +306,7 @@ Use lab/reports/playtest-night-YYYYMMDD/bugs/bug-NNN.md. Include UTC time, bundl
 - [ ] Host-only legacy client protocol key is configured and readable.
 - [ ] Host account is admin before login starts.
 - [ ] VPN and firewall expose only UDP 20041 and 20042 to VPN peers.
-- [ ] Gateway starts with account-store mode, --allow-lan, --security-log, --studio-port 0, and no --dev-tools.
+- [ ] Gateway starts with account-store mode, --world in the runtime, --allow-lan, --security-log, --studio-port 0, and no --dev-tools.
 - [ ] Login and its AUTH2 broker start on the VPN address with --allow-lan.
 - [ ] W131 launcher install/join flow works on a clean second PC.
 - [ ] Private patch URL and trusted manifest pin work without exposing the server bundle.
@@ -320,7 +322,8 @@ Do not invite players while any item stays unchecked.
 - The W131 install/join screen, key creation, and VPN broker login have not passed a clean-PC test.
 - There is no verified VPN-only patch host or patch URL.
 - Account-store login has no native-client acceptance, and two-client visibility/gameplay over VPN is untested.
-- Developer tools cannot be made host-only on the shared gateway yet.
+- An account-store gateway still accepts the public fixed ticket for account 1 / character 1 (`osfr-gateway.rs:1114-1116`, `login.rs:414-418`; Security Model S02/L3), which is the host admin here (step 14; a fresh store's first character is guid 1). Any VPN peer can send it and enter as the host's admin character while the host is offline. Do not invite players until it is refused.
+- The scavenger hunt and the admin's `realm broadcast` have not run natively (Build Plan 3.3).
 - The broker-login 60-minute stress gate is open; the launcher key command also failed under this workspace's profile-folder ACL.
 
 ## Evidence and open gates
@@ -331,10 +334,11 @@ Do not invite players while any item stays unchecked.
 - The local source supports private-network binds with --allow-lan. No second-PC session was tested.
 - VPN bind, 2026-10-22 (L053, `lab/runs/lan-test-20261022T041757Z`): gateway, login and AUTH2 broker started on this PC's Tailscale address (100.64.x.x) with the commands above, and `osfr-bot --broker-profile ... --allow-lan` passed broker auth, UDP login, handoff and world entry against them from the same PC. The run found two bugs, now fixed: login refused any non-loopback `--gateway`, so the login command above could not start; and the bot bound loopback, so it could not send to a VPN address. A Windows Sandbox client did not reach the servers, because no Windows Firewall allow rule existed for the release binaries. Allow UDP 20041/20042 and TCP 20043 before a remote client joins.
 - The account-store login flow has not passed native-client acceptance. No two-real-client VPN run is recorded.
+- No native run has bound the real client with an HMAC ticket: it is account 1 / character 1, so it takes the fixed ticket. In client-baseline-20261021T193008Z only the bot (guid 2) used HMAC, with a ticket it signs itself.
 - Launcher key creation failed in this managed workspace because its owner-only profile directory could not be accessed. W131's friend UI, a clean installation package, and fresh-PC login remain unverified.
 - The AUTH2 broker binds a private address with --allow-lan (tested on a LAN address). Login from a friend's PC over the VPN is not verified.
 - No private patch host or patch URL exists in this runbook's evidence.
-- The gateway rejects --dev-tools for non-loopback binds. There is no supported host-only remote developer console; live scavenger-hunt administration remains blocked.
+- The gateway rejects --dev-tools for non-loopback binds. Role-checked `realm` commands need no --dev-tools with an account store: native run client-baseline-20261021T193008Z (loopback, no --dev-tools) ran the admin's `realm god` and refused a player account's commands. The scavenger hunt and `realm broadcast` have not run natively.
 - The stress harness's broker-login command was not run because it writes outside W132's owned report path. The full 60-minute broker-login gate remains open.
 
 ## Source notes
@@ -346,6 +350,10 @@ Do not invite players while any item stays unchecked.
 | Launcher join intent and displayed login errors | [[../Research/Launcher Login Client]]; `launcher/README.md`, `launcher/src/auth.rs`; W131 remains coming and its brief was not present in checked-in notes |
 | `osfr-account` command syntax | `prototype/osfr-tools/src/bin/osfr-account.rs`; scratch CLI output in `lab/reports/host-runbook-w132/account-cli.log` |
 | Role command and admin check | W120 / [[Build Plan]]; gateway command routing. Role assignment policy (R) |
+| Role commands without --dev-tools | Decision 1 (`264db2a`): `Gameplay::may_run`, `account_store::can_run_realm_command`; native run `lab/runs/client-baseline-20261021T193008Z` (lead native notes, 19:30Z) |
+| `--world` live-world folder | `prototype/osfr-tools/src/bin/osfr-gateway.rs` option parsing; `Gameplay::set_world_dir` and `live_dir` in `src/gameplay.rs`; [[World Builder]]; locale rebuild in `scripts/build_world_locale.py` (docstring) |
+| Fixed ticket for account 1 / character 1 | `prototype/osfr-tools/src/login.rs:414-418`; `src/bin/osfr-gateway.rs:315-316` (default ticket), `:1114-1116` (accepted); [[Security Model]] S02/L3; bundle `server/accounts.json` (`next_account_id` 1, `next_character_guid` 1); bot ticket `src/bin/osfr-bot.rs:1060` |
+| Diagnostics gated on --dev-tools | `src/gameplay.rs` realm dispatch (`mine`, `harvest`), `developer_npx_off`, quest `offer`, kart `realm race` and the 102 lobby reply |
 | Private bind, `--allow-lan`, dev-tools restriction, and Studio bind | [[Security Model]]; `prototype/osfr-tools/src/bin/osfr-gateway.rs` |
 | Security-log event types, rotation, and lack of auth-failure events | `prototype/osfr-tools/src/security_log.rs`, login/gateway call sites; scratch startup in `lab/reports/host-runbook-w132/service-startup.log` |
 | Save paths, session expiry, and shutdown persistence | [[Build Ledger]]; `prototype/osfr-tools/src/gameplay.rs`, `prototype/osfr-tools/src/bin/osfr-gateway.rs` |
