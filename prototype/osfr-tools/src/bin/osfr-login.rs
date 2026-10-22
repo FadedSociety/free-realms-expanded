@@ -767,10 +767,11 @@ impl Session {
             return Err(io::Error::other("invalid credentials"));
         }
         // ponytail: reuse all native character handlers unchanged. Reload their
-        // cached store before each request under the process-wide writer lock,
-        // so interleaved peers cannot overwrite one another. This also reloads
-        // resource tables; replace with the lead's shared-store API if measured
-        // login load warrants it. No packet can choose this synthetic identity.
+        // cached store before each request. L042: only the handlers that save take
+        // the store writer lock (login.rs), so read spam cannot stall staff writes.
+        // This also reloads resource tables; replace with the lead's shared-store
+        // API if measured login load warrants it. No packet can choose this
+        // synthetic identity.
         self.service = options.service_for(handle)?;
         let authenticated = self.service.handle(&handle_login_request(handle))?;
         if bytes.first() == Some(&1) {
@@ -789,14 +790,11 @@ impl Drop for Session {
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let options = Options::parse()?;
     // (R) Account-store mode never creates/migrates a store from network input.
-    // Cooperates with osfr-account's offline writer; keep guard for server life.
-    let _lock = if options.authenticated {
-        let lock = AccountStoreLock::acquire(&options.account_store)?;
+    // L042: startup only validates the store and refuses a stale lock; each save locks it.
+    if options.authenticated {
+        let _check = AccountStoreLock::acquire(&options.account_store)?;
         AccountStore::load(&options.account_store)?;
-        Some(lock)
-    } else {
-        None
-    };
+    }
     options.service()?;
     let trace = options
         .trace_file

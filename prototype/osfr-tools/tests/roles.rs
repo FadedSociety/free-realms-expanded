@@ -198,6 +198,55 @@ fn role_names_are_exact_and_closed() {
     assert_eq!(AccountRole::parse("player"), Some(AccountRole::Player));
     assert_eq!(AccountRole::parse("builder"), Some(AccountRole::Builder));
     assert_eq!(AccountRole::parse("admin"), Some(AccountRole::Admin));
+    assert_eq!(
+        AccountRole::parse("moderator"),
+        Some(AccountRole::Moderator)
+    );
     assert_eq!(AccountRole::parse("Admin"), None);
     assert_eq!(AccountRole::parse("owner"), None);
+}
+
+#[test]
+fn moderators_run_only_the_moderation_commands() {
+    for command in ["mute", "unmute", "kick", "ban", "unban"] {
+        assert!(can_run_realm_command(AccountRole::Moderator, command));
+        assert!(can_run_realm_command(AccountRole::Admin, command));
+        assert!(!can_run_realm_command(AccountRole::Builder, command));
+        assert!(!can_run_realm_command(AccountRole::Player, command));
+    }
+    for command in [
+        "role",
+        "god",
+        "place",
+        "broadcast",
+        "reload all",
+        "future_command",
+    ] {
+        assert!(
+            !can_run_realm_command(AccountRole::Moderator, command),
+            "{command}"
+        );
+    }
+}
+
+/// (R) L042: Admin > Moderator > Builder = Player, strictly; equals never moderate each other.
+#[test]
+fn moderation_hierarchy_is_strict() {
+    use AccountRole::{Admin, Builder, Moderator, Player};
+    let outranked = [
+        (Admin, Moderator),
+        (Admin, Builder),
+        (Admin, Player),
+        (Moderator, Builder),
+        (Moderator, Player),
+    ];
+    for actor in [Player, Builder, Moderator, Admin] {
+        for target in [Player, Builder, Moderator, Admin] {
+            assert_eq!(
+                actor.outranks(target),
+                outranked.contains(&(actor, target)),
+                "{actor:?} over {target:?}"
+            );
+        }
+    }
 }

@@ -51,6 +51,8 @@ $env:CARGO_TARGET_DIR = $target
 .\scripts\cargo.ps1 build --locked --offline --release --manifest-path .\prototype\osfr-tools\Cargo.toml --bin osfr-account --bin osfr-login --bin osfr-gateway
 ```
 
+Run all three from this one build. A store written by this build can hold the moderator role and mutes or bans (L042), and an older login, gateway or osfr-account refuses to load it.
+
 6. Create a new runtime directory.
 
 ```powershell
@@ -118,13 +120,13 @@ $publicKey = Read-Host '64-character public key'
 & $accountExe set-role --store (Join-Path $runtime 'accounts.json') --account-id 1 --role admin
 ```
 
-The first account in a fresh store is ID 1. Account roles are server policy (R). W120's in-game command syntax is `realm role <account-id> <player|builder|admin>`; it is admin-only. For example:
+The first account in a fresh store is ID 1. Account roles are server policy (R). W120's in-game command syntax is `realm role <account-id> <player|builder|moderator|admin>`; it is admin-only. For example:
 
 ```text
 realm role 1 admin
 ```
 
-On the shared gateway an admin may send it without developer tools (decision 1), but login holds the account-store lock while it runs, so the gateway answers "account store is busy or unavailable" (code: `osfr-login.rs` `run`, `Gateway::change_account_role`; not run natively). Use the offline `osfr-account set-role` command above for the playtest account.
+On the shared gateway an admin may send it without developer tools (decision 1), and it lands while login runs: login takes the account-store lock only for a write (code: `login.rs` create and delete, `Gateway::change_account_role`; not run natively). Use the offline `osfr-account set-role` command above for the host account.
 
 15. Set the VPN address and server binaries.
 
@@ -178,6 +180,24 @@ The offline osfr-account set-role command gives the owner the admin account role
 
 The shared gateway refuses --dev-tools on a non-loopback bind. Studio stays off with --studio-port 0. Admin and builder `realm` commands still work there: with an account store, the gateway checks each command against the account's role and needs no --dev-tools (Security Model decision 1, `264db2a`; native evidence below). Builders get building commands only. Diagnostics and experiments (for example `realm mine`, `harvest`, `npx off`, `offer`, `race` and the kart lobby catalogue) still need --dev-tools, so they are off on the shared gateway. Do not start a second gateway against the same saves; separate processes do not share session ownership. The scavenger hunt (3000200 in `data/content/quests/scavenger_hunt.json`) is a live event since T418: Jacque offers it only after the admin-only `realm event open 3000200` and stops after `realm event close 3000200` (`realm event list` shows the state, kept in the `--world` folder's `events.json`), and the admin-only `realm broadcast` announces it (see Night-blocking gaps).
 
+### Moderation (L042)
+
+An admin or moderator account types these in game chat while login and the gateway run:
+
+```text
+realm mute <First Last> [minutes]
+realm unmute <First Last>
+realm kick <First Last>
+realm ban <First Last> [minutes]
+realm unban <First Last>
+```
+
+No minutes means until lifted; the most is one year (`data/content/moderation.json`). Moderators act only on players and builders, admins also on moderators, and nobody on their own account (R). A mute refuses the player's chat and guild message-of-the-day edits; a ban ends their session and refuses login until it lapses or is lifted; a kick ends the session only, and the player may log in again at once. Each action writes one row with account IDs only to the security log. Give a friend the moderator role with `realm role <account-id> moderator` or `osfr-account set-role --role moderator`.
+
+The name is matched by its words, ignoring case and where the space falls between first and last name. New characters cannot take a name whose words match an existing one, and look-alike characters on one account count as that one account. Only an older store can hold two accounts whose names read alike; such a name answers "no single character has that name".
+
+Login takes the account-store writer lock only for a write: a character create or delete, or a first login that creates or migrates an account. Login, the character list, the name check and character select read the store without it. A moderation or `realm role` command that still finds the store busy after a 50 ms wait answers "account store is busy or unavailable" and changes nothing; send it again. If that keeps happening, or a server prints "account store lock ... is held; request refused" or "account store lock ... could not be removed", look for a stale `accounts.json.lock` left by a crashed process and delete it once no writer is running.
+
 ## 2. Each friend
 
 1. Install the client and launcher build designated for this playtest. Do not send the private playtest bundle.
@@ -186,7 +206,7 @@ The W131 installer and friend join flow are coming. The intended screen is Setti
 
 2. Find the friend's existing account ID.
 
-Login must be stopped because it holds the account-store writer lock. Use the account ID from this list and the public key sent over the trusted channel.
+Login and the gateway may keep running: every writer takes the account-store lock for one change only. Use the account ID from this list and the public key sent over the trusted channel.
 
 ```powershell
 & $accountExe list --store (Join-Path $runtime 'accounts.json')
@@ -194,7 +214,7 @@ Login must be stopped because it holds the account-store writer lock. Use the ac
 
 3. Add the friend's public key to that account.
 
-Login must stay stopped while the account store is edited. The gateway may remain running.
+If osfr-account reports the store busy, run it again.
 
 ```powershell
 $accountId = Read-Host 'Existing friend account ID'

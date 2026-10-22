@@ -5,6 +5,7 @@ use crate::{
     account::{Account, AccountFlags, CharacterRecord, SlotPolicy},
     character_store::{self, CharacterState},
     login_auth::validate_public_key,
+    moderation::Sanctions,
 };
 use osfr_tools::identity::{self, CharacterIdentity};
 use serde::{Deserialize, Serialize};
@@ -30,6 +31,8 @@ pub const MAX_PUBLIC_KEYS: usize = 4;
 pub enum AccountRole {
     Player,
     Builder,
+    /// L042: mute, unmute, kick, ban and unban only.
+    Moderator,
     Admin,
 }
 
@@ -39,9 +42,21 @@ impl AccountRole {
         match value {
             "player" => Some(Self::Player),
             "builder" => Some(Self::Builder),
+            "moderator" => Some(Self::Moderator),
             "admin" => Some(Self::Admin),
             _ => None,
         }
+    }
+
+    /// (R) Moderation hierarchy: Admin > Moderator > Builder = Player. Staff act only on a
+    /// strictly lower role, so equals (and admins) cannot moderate each other.
+    pub fn outranks(self, target: Self) -> bool {
+        let rank = |role| match role {
+            Self::Player | Self::Builder => 0,
+            Self::Moderator => 1,
+            Self::Admin => 2,
+        };
+        rank(self) > rank(target)
     }
 }
 
@@ -72,6 +87,8 @@ pub fn can_run_realm_command(role: AccountRole, command: &str) -> bool {
                 | "reload power_ups"
                 | "reload placements"
         ),
+        // (R) L042: moderators get the moderation commands and nothing else.
+        AccountRole::Moderator => matches!(command, "mute" | "unmute" | "kick" | "ban" | "unban"),
         AccountRole::Player => false,
     }
 }
@@ -92,6 +109,10 @@ struct StoreData {
     /// Kept outside Account to preserve its recovered pre-game record shape.
     #[serde(default)]
     public_keys: BTreeMap<u64, Vec<[u8; 32]>>,
+    /// L042 mutes and bans by account ID (unix seconds); absent means none. Older files load
+    /// without it; an older binary refuses a file that has it (deny_unknown_fields).
+    #[serde(default, skip_serializing_if = "BTreeMap::is_empty")]
+    sanctions: BTreeMap<u64, Sanctions>,
 }
 
 #[derive(Serialize, Deserialize)]
@@ -116,20 +137,49 @@ pub struct AccountStore {
     data: StoreData,
 }
 
-/// (R) Cooperative single-writer lock for the login owner and offline CLI.
-/// All writers must acquire this same lock before loading the store. A stale
-/// lock is an operator recovery decision, never removed on age/PID alone.
+/// (R) Cooperative single-writer lock for login, the gateway's staff writes and the offline CLI.
+/// Every writer acquires it before loading the store and holds it across one load-modify-save
+/// only (L042: login per request, not for its life). A stale lock is an operator recovery
+/// decision, never removed on age/PID alone.
 pub struct AccountStoreLock(PathBuf);
+
+/// (R) How long a writer waits out another writer's load-modify-save before reporting busy.
+const LOCK_WAIT: std::time::Duration = std::time::Duration::from_millis(500);
+
+/// (R) The gateway's staff writes (`realm role` and moderation) run on the world loop that
+/// every player shares, so they wait far less: a stale lock costs that loop 50 ms per command.
+pub const STAFF_LOCK_WAIT: std::time::Duration = std::time::Duration::from_millis(50);
 
 impl AccountStoreLock {
     pub fn acquire(store_path: &Path) -> io::Result<Self> {
+        Self::acquire_within(store_path, LOCK_WAIT)
+    }
+
+    /// `acquire`, giving up with `AlreadyExists` once `wait` has passed. Giving up prints one
+    /// stderr line (the host's sign of a stale lock left by a killed writer).
+    pub fn acquire_within(store_path: &Path, wait: std::time::Duration) -> io::Result<Self> {
         let mut name = store_path.as_os_str().to_os_string();
         name.push(".lock");
         let path = PathBuf::from(name);
-        let mut file = OpenOptions::new()
-            .write(true)
-            .create_new(true)
-            .open(&path)?;
+        let deadline = std::time::Instant::now() + wait;
+        let mut file = loop {
+            match OpenOptions::new().write(true).create_new(true).open(&path) {
+                Err(error)
+                    if error.kind() == io::ErrorKind::AlreadyExists
+                        && std::time::Instant::now() < deadline =>
+                {
+                    std::thread::sleep(std::time::Duration::from_millis(10));
+                }
+                Err(error) if error.kind() == io::ErrorKind::AlreadyExists => {
+                    eprintln!(
+                        "account store lock {} is held; request refused",
+                        path.display()
+                    );
+                    return Err(error);
+                }
+                opened => break opened?,
+            }
+        };
         let guard = Self(path);
         writeln!(file, "pid={}", std::process::id())?;
         file.sync_all()?;
@@ -138,8 +188,15 @@ impl AccountStoreLock {
 }
 
 impl Drop for AccountStoreLock {
+    /// A lock left behind refuses every later writer, so a failed removal is reported on the
+    /// request that leaves it (stderr; the guard has no security log in reach).
     fn drop(&mut self) {
-        let _ = std::fs::remove_file(&self.0);
+        if let Err(error) = std::fs::remove_file(&self.0) {
+            eprintln!(
+                "account store lock {} could not be removed: {error}",
+                self.0.display()
+            );
+        }
     }
 }
 
@@ -153,6 +210,7 @@ impl AccountStore {
                 characters: BTreeMap::new(),
                 roles: BTreeMap::new(),
                 public_keys: BTreeMap::new(),
+                sanctions: BTreeMap::new(),
             },
         }
     }
@@ -202,6 +260,37 @@ impl AccountStore {
 
     pub fn account_role(&self, id: u64) -> Option<AccountRole> {
         self.data.roles.get(&id).copied()
+    }
+
+    pub fn sanctions(&self, id: u64) -> Sanctions {
+        self.data.sanctions.get(&id).copied().unwrap_or_default()
+    }
+
+    /// Callers pass an existing account (validated on save); no sanction removes the row.
+    pub(crate) fn set_sanctions(&mut self, id: u64, sanctions: Sanctions) {
+        if sanctions == Sanctions::default() {
+            self.data.sanctions.remove(&id);
+        } else {
+            self.data.sanctions.insert(id, sanctions);
+        }
+    }
+
+    /// The account that owns every character whose displayed name has these words (compared
+    /// by `name_words`); none when no character matches or the matches have different owners.
+    /// Sanctions are per account, so one account's look-alike characters stay one target.
+    pub(crate) fn account_by_display_name(&self, words: &[String]) -> Option<u64> {
+        let wanted = name_words(words.iter().map(String::as_str));
+        let mut owners = self
+            .data
+            .characters
+            .values()
+            .filter(|character| {
+                let identity = &character.identity;
+                name_words([identity.first_name.as_str(), identity.last_name.as_str()]) == wanted
+            })
+            .map(|character| character.owner_account_id);
+        let owner = owners.next()?;
+        owners.all(|other| other == owner).then_some(owner)
     }
 
     pub fn account_ids(&self) -> impl Iterator<Item = u64> + '_ {
@@ -327,13 +416,26 @@ impl AccountStore {
     }
 
     pub(crate) fn character_name_taken(&self, first: &str, last: &str) -> bool {
-        // (R) Global uniqueness across displayed and pending names, compared by `name_key`.
-        let (first, last) = (name_key(first), name_key(last));
-        self.data.characters.values().any(|character| {
-            name_pairs(&character.identity).any(|(known_first, known_last)| {
-                name_key(known_first) == first && name_key(known_last) == last
+        // (R) Global uniqueness across displayed and pending names by their folded words, as
+        // `realm` moderation reads a name: 'Al Bo' 'Cy' takes 'Al' 'Bo Cy' (L042) and 'Éva' takes
+        // 'Eva' (L049). Every stored pair counts, one with an empty part included, because the
+        // resolver reads those too. `validate` stays pair-based, so older stores keep loading.
+        let wanted = name_words([first, last]);
+        !wanted.is_empty()
+            && self.data.characters.values().any(|character| {
+                let (identity, creation) = (&character.identity, &character.identity.creation);
+                [
+                    (&identity.first_name, &identity.last_name),
+                    (
+                        &creation.temporary_first_name,
+                        &creation.temporary_last_name,
+                    ),
+                ]
+                .into_iter()
+                .any(|(known_first, known_last)| {
+                    name_words([known_first.as_str(), known_last.as_str()]) == wanted
+                })
             })
-        })
     }
 
     pub(crate) fn insert_character(
@@ -547,6 +649,14 @@ impl AccountStore {
         {
             return Err(invalid_data("public key records do not match accounts"));
         }
+        if self
+            .data
+            .sanctions
+            .keys()
+            .any(|id| !self.data.accounts.contains_key(id))
+        {
+            return Err(invalid_data("sanction records do not match accounts"));
+        }
         let mut all_keys = BTreeSet::new();
         for keys in self.data.public_keys.values() {
             if keys.len() > MAX_PUBLIC_KEYS
@@ -695,6 +805,18 @@ const LATIN_FOLDS: [(&str, &str); 38] = [
     ("y", "ÝýÿŶŷŸƳƴȲȳɎɏ"),
     ("z", "ŹźŻżŽžƵƶȤȥɀ"),
 ];
+
+/// A name as its whitespace-separated words, each folded by `name_key`, however the spaces fall
+/// between and inside the parts: what `realm` moderation commands match and new names must keep
+/// unique. `name_key` folds one character at a time and never yields whitespace, so folding each
+/// word equals folding each part.
+fn name_words<'a>(parts: impl IntoIterator<Item = &'a str>) -> Vec<String> {
+    parts
+        .into_iter()
+        .flat_map(str::split_whitespace)
+        .map(name_key)
+        .collect()
+}
 
 fn read_legacy_state(path: &Path) -> io::Result<CharacterState> {
     let file = File::open(path)?;
@@ -845,5 +967,44 @@ mod tests {
         );
         drop(guard);
         drop(AccountStoreLock::acquire(&path).unwrap());
+        // L042: a writer waits out another writer's short load-modify-save.
+        let guard = AccountStoreLock::acquire(&path).unwrap();
+        let holder = std::thread::spawn(move || {
+            std::thread::sleep(std::time::Duration::from_millis(100));
+            drop(guard);
+        });
+        drop(AccountStoreLock::acquire(&path).unwrap());
+        holder.join().unwrap();
+    }
+
+    /// L042: a writer refused by a held lock, and a lock its guard fails to remove (which refuses
+    /// every later writer), are reported on stderr. They run in a child copy of this test binary,
+    /// whose stderr is read here.
+    #[test]
+    fn a_held_or_unremovable_lock_is_reported() {
+        const CHILD: &str = "OSFR_L042_LOCK_LEAK_CHILD";
+        if let Some(path) = std::env::var_os(CHILD) {
+            let guard = AccountStoreLock::acquire(Path::new(&path)).unwrap();
+            let busy = AccountStoreLock::acquire_within(Path::new(&path), Default::default());
+            assert!(busy.is_err());
+            // Another hand removed the lock file, so the guard's own removal fails.
+            std::fs::remove_file(&guard.0).unwrap();
+            drop(guard);
+            return;
+        }
+        let path = std::env::temp_dir().join(format!("osfr-l042-leak-{}.json", std::process::id()));
+        let output = std::process::Command::new(std::env::current_exe().unwrap())
+            .args([
+                "--exact",
+                "account_store::tests::a_held_or_unremovable_lock_is_reported",
+            ])
+            .arg("--nocapture")
+            .env(CHILD, &path)
+            .output()
+            .unwrap();
+        assert!(output.status.success());
+        let stderr = String::from_utf8_lossy(&output.stderr);
+        assert!(stderr.contains("is held; request refused"), "{stderr}");
+        assert!(stderr.contains("could not be removed"), "{stderr}");
     }
 }

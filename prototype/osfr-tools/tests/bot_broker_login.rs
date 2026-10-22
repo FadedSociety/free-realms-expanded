@@ -298,6 +298,8 @@ fn broker_bot_reaches_world_and_wrong_key_sends_no_udp() {
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
         .join("../../../lab/reports/broker-login-w130")
         .join(format!("integration-{}", std::process::id()));
+    // A reused process id must not inherit an older run's files, such as a stale store lock.
+    let _ = fs::remove_dir_all(&root);
     fs::create_dir_all(&root).unwrap();
     let _secrets = SecretCleanup(root.clone());
     let reference = create_reference(&root);

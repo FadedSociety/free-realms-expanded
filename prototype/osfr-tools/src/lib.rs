@@ -54,6 +54,7 @@ pub mod login_auth;
 pub mod matchmaking;
 pub mod minigame;
 pub mod mining;
+pub mod moderation;
 pub mod mounts;
 pub mod movement;
 pub mod mystery_chest;

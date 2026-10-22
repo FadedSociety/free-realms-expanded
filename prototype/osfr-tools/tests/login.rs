@@ -1,6 +1,6 @@
 use osfr_tools::{
     account::{self, AccountFlags, SlotPolicy},
-    account_store::AccountStore,
+    account_store::{AccountStore, AccountStoreLock},
     character_store::CharacterState,
     identity::{self, Attachment, CharacterIdentity, NativeCreation, Resources},
     login::{self, LoginConfig, LoginService, Rc4},
@@ -368,6 +368,60 @@ fn account_login_creates_lists_selects_and_deletes_two_characters() {
 }
 
 #[test]
+fn ban_blocks_login_until_expiry() {
+    use osfr_tools::{
+        account_store::AccountRole,
+        moderation::{self, Command},
+    };
+    let t = Temp::new();
+    let path = t.0.join("accounts.json");
+    let mut first = service(&t);
+    first.handle(&login_request()).unwrap();
+    first.handle(&create_request("Testa", "One")).unwrap();
+    // L042: a moderator account of its own; the login account stays a player.
+    let mut store = AccountStore::load(&path).unwrap();
+    let moderator = store
+        .create_account(
+            [7; 32],
+            AccountFlags::default(),
+            SlotPolicy { max_characters: 1 },
+        )
+        .unwrap();
+    store
+        .set_account_role_offline(moderator, AccountRole::Moderator)
+        .unwrap();
+    store.save(&path).unwrap();
+    let run = |text: &str, now: u64| {
+        moderation::run(&path, moderator, &Command::parse(text).unwrap(), now).unwrap()
+    };
+    run("ban testa one 30", moderation::unix_now());
+    // The banned account gets the ordinary failed login and no character requests.
+    let mut banned = service(&t);
+    assert_eq!(
+        banned.handle(&login_request()).unwrap().replies,
+        [login::login_reply(false)]
+    );
+    assert!(banned.handle(&[11]).is_err());
+    assert!(banned.handle(&select_request(1)).is_err());
+    // Thirty minutes from a clock two hours behind: already over, so login works again.
+    run("unban testa one", moderation::unix_now());
+    run("ban testa one 30", moderation::unix_now() - 7_200);
+    assert!(
+        AccountStore::load(&path)
+            .unwrap()
+            .sanctions(1)
+            .banned_until
+            .is_some()
+    );
+    let mut expired = service(&t);
+    assert_eq!(
+        expired.handle(&login_request()).unwrap().replies,
+        [login_reply_with_max_characters(true, 6)]
+    );
+    assert!(expired.handle(&select_request(1)).unwrap().selected);
+}
+
+#[test]
 fn account_login_rejects_a_character_owned_by_another_account() {
     let t = Temp::new();
     let mut store = AccountStore::new();
@@ -730,6 +784,93 @@ fn create_and_delete_refuse_when_the_file_maps_the_account_to_another_login() {
         fs::read(t.0.join("identity.json")).unwrap(),
         identity_before
     );
+}
+
+/// L042: moderation finds a player by the words of their name, so a new name whose words match
+/// a taken one, however the spaces fall between its parts, is taken too; else a player could
+/// hide behind a look-alike on a spare slot.
+#[test]
+fn split_variants_of_a_taken_name_are_taken() {
+    let t = Temp::new();
+    let mut service = service(&t);
+    service.handle(&login_request()).unwrap();
+    let status = |service: &mut LoginService, packet: Vec<u8>| {
+        let reply = &service.handle(&packet).unwrap().replies[0];
+        i32::from_le_bytes(reply[1..5].try_into().unwrap())
+    };
+    assert_eq!(status(&mut service, create_request("Al Bo", "Cy")), 1);
+    for (first, last) in [("Al", "Bo Cy"), ("al", "BO cy")] {
+        let checked = service.handle(&name_check_request(first, last)).unwrap();
+        assert_eq!(name_check_status(&checked.replies[0]), 2, "{first} {last}");
+        let created = status(&mut service, create_request(first, last));
+        assert_eq!(created, 4, "{first} {last}");
+    }
+    // L049 refuses a doubled space as a separator run: invalid (7), before the name check.
+    assert_eq!(status(&mut service, create_request("Al  Bo", "Cy")), 7);
+    // The pending (temporary) pair follows the same rule.
+    let mut creation = creation_named("Dee", "Eff");
+    creation.temporary_first_name = "Al".into();
+    creation.temporary_last_name = "Bo Cy".into();
+    let mut packet = vec![5];
+    packet.extend(1i32.to_le_bytes());
+    payload(&mut packet, &creation.encode());
+    assert_eq!(status(&mut service, packet), 5);
+    let store = AccountStore::load(&t.0.join("accounts.json")).unwrap();
+    let characters: usize = store
+        .account_ids()
+        .map(|id| store.account(id).unwrap().character_guids.len())
+        .sum();
+    assert_eq!(characters, 1);
+}
+
+/// L042: only a save holds the store writer lock. While another writer holds it (a staff command,
+/// osfr-account or a stale lock), login, the character list and the name check still answer, so a
+/// client spamming them cannot keep a staff write waiting. Create, delete and a first login that
+/// adds an account wait the lock out, are refused and write nothing, and work once it is free.
+#[test]
+fn only_saves_wait_for_the_store_lock() {
+    let t = Temp::new();
+    let path = t.0.join("accounts.json");
+    let held = AccountStoreLock::acquire(&path).unwrap();
+    assert!(service(&t).handle(&login_request()).is_err());
+    assert!(!path.exists());
+    drop(held);
+    let mut a = service(&t);
+    a.handle(&login_request()).unwrap();
+    assert!(a.handle(&create_request("Testa", "One")).unwrap().created);
+
+    let held = AccountStoreLock::acquire(&path).unwrap();
+    let (store_before, identity_before) = (
+        fs::read(&path).unwrap(),
+        fs::read(t.0.join("identity.json")).unwrap(),
+    );
+    let mut b = service(&t);
+    assert_eq!(
+        b.handle(&login_request()).unwrap().replies,
+        [login_reply_with_max_characters(true, 6)]
+    );
+    assert_eq!(b.handle(&[11]).unwrap().replies[0][0], 12);
+    let checked = b.handle(&name_check_request("testa", "one")).unwrap();
+    assert_eq!(name_check_status(&checked.replies[0]), 2);
+    let mut other = service_as(&t, "synthetic-other");
+    assert!(other.handle(&login_request_as("synthetic-other")).is_err());
+    assert!(b.handle(&create_request("Testb", "Two")).is_err());
+    assert!(b.handle(&delete_request(1)).is_err());
+    assert_eq!(fs::read(&path).unwrap(), store_before);
+    assert_eq!(
+        fs::read(t.0.join("identity.json")).unwrap(),
+        identity_before
+    );
+    drop(held);
+
+    assert!(b.handle(&create_request("Testb", "Two")).unwrap().created);
+    let deleted = b.handle(&delete_request(1)).unwrap();
+    assert_eq!(delete_status(&deleted.replies[0]), 1);
+    assert!(other.handle(&login_request_as("synthetic-other")).is_ok());
+    let store = AccountStore::load(&path).unwrap();
+    assert_eq!(store.account(1).unwrap().character_guids, [2]);
+    assert!(store.account(2).is_some());
+    assert!(!t.0.join("accounts.json.lock").exists());
 }
 
 #[test]

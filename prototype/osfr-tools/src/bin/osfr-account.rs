@@ -1,5 +1,5 @@
-//! (R) Host-only account provisioning. Stop login before use until the lead
-//! integrates AccountStoreLock into its single authoritative store owner.
+//! (R) Host-only account provisioning. Login and the gateway may keep running: every writer,
+//! login's saves included, takes AccountStoreLock around one load-modify-save (L042).
 //! Public keys are 64 hex characters; private keys are never accepted here.
 
 use osfr_tools::{
@@ -13,10 +13,10 @@ const USAGE: &str = "osfr-account <command> --store <accounts.json>
   create     --handle <3-32 ASCII bytes> --public-key <64 hex characters>
   add-key    --account-id <id> --public-key <64 hex characters>
   remove-key --account-id <id> --public-key <64 hex characters>
-  set-role   --account-id <id> --role <player|builder|admin>
+  set-role   --account-id <id> --role <player|builder|moderator|admin>
   member     --account-id <id> | --handle <handle>, --state <on|off>
   list
-Host-only; stop login first. Never supply a private key.";
+Host-only; login may keep running. Never supply a private key.";
 
 fn main() {
     if let Err(error) = run(std::env::args().skip(1)) {

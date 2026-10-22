@@ -756,3 +756,54 @@ fn saves_with_now_refused_or_colliding_names_still_load_and_play() {
     legacy.save(&path).unwrap();
     assert_eq!(AccountStore::load(&path).unwrap(), legacy);
 }
+
+/// L042 on L049: a `realm` moderation command finds a name by the same folded words that keep
+/// names unique, so plain, cased and accented spellings all reach the one account, and a new
+/// name cannot take the words of an older name whose last part is empty.
+#[test]
+fn moderation_and_uniqueness_share_the_folded_words() {
+    use osfr_tools::{
+        account_store::AccountRole,
+        moderation::{self, Command},
+    };
+    let temp = TempDir::new();
+    let resources = resources(&temp.0.join("creator"));
+    let mut store = AccountStore::new();
+    let player = account(&mut store, 1, 2);
+    let moderator = account(&mut store, 2, 1);
+    store
+        .set_account_role_offline(moderator, AccountRole::Moderator)
+        .unwrap();
+    let accented = NativeCreation {
+        last_name: "Núñez".into(),
+        ..creation("İlka", "")
+    };
+    let created = create_character(&mut store, player, accented, &resources);
+    assert_eq!(created.status, CharacterCreateStatus::Created);
+    let created = create_character(&mut store, player, creation("Alda", ""), &resources);
+    assert_eq!(created.status, CharacterCreateStatus::Created);
+    let path = temp.0.join("accounts.json");
+    store.save(&path).unwrap();
+    // An older server stored 'Alda Bryn' with an empty last name (`valid_name` allows it).
+    let older = fs::read_to_string(&path)
+        .unwrap()
+        .replace("\"Alda\"", "\"Alda Bryn\"")
+        .replace("\"Record\"", "\"\"");
+    fs::write(&path, older).unwrap();
+    let legacy = AccountStore::load(&path).unwrap();
+    assert_eq!(
+        check_name(&legacy, 1, "Alda", "Bryn").status,
+        NameCheckStatus::Taken
+    );
+    for name in [
+        "ilka nunez",
+        "ILKA NUNEZ",
+        "İlka Núñez",
+        "İLKA NÚÑEZ",
+        "alda bryn",
+    ] {
+        let command = Command::parse(&format!("kick {name}")).unwrap();
+        let applied = moderation::run(&path, moderator, &command, moderation::unix_now());
+        assert_eq!(applied.map(|a| a.target_account_id), Ok(player), "{name}");
+    }
+}

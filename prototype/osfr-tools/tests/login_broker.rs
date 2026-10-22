@@ -47,6 +47,8 @@ impl Server {
             std::process::id(),
             NEXT.fetch_add(1, Ordering::Relaxed)
         ));
+        // A reused process id must not inherit an older run's files, such as a stale store lock.
+        let _ = fs::remove_dir_all(&directory);
         fs::create_dir_all(directory.join("CharacterCreate")).unwrap();
         let mut model = vec!["0"; 17];
         model[0] = "1";
@@ -288,9 +290,12 @@ fn private_broker_bind_admits_private_peers_and_keeps_failure_limits() {
 }
 impl Drop for Server {
     fn drop(&mut self) {
+        // Whether login had already exited (for example its `--seconds` limit) when a test failed.
+        let exited = self.child.try_wait();
         let _ = self.child.kill();
         let _ = self.child.wait();
         if std::thread::panicking() {
+            eprintln!("test server exit before kill: {exited:?}");
             let mut errors = String::new();
             self.child
                 .stderr
@@ -403,24 +408,50 @@ impl NativeClient {
         request.extend(71u32.to_be_bytes());
         request.extend(512u32.to_be_bytes());
         request.extend(b"LoginUdp_6\0");
-        socket.send(&request).unwrap();
+        // Resend the exact request each second until answered, as the client does: one lost
+        // datagram under machine load must not cost the whole 30 s wait (L042 review).
+        socket
+            .set_read_timeout(Some(Duration::from_secs(1)))
+            .unwrap();
+        let deadline = Instant::now() + PATIENCE;
         let mut bytes = [0; 512];
-        let n = socket.recv(&mut bytes).unwrap();
+        let n = loop {
+            socket.send(&request).unwrap();
+            match socket.recv(&mut bytes) {
+                Ok(n) => break n,
+                Err(error) if Instant::now() < deadline => {
+                    assert!(matches!(
+                        error.kind(),
+                        std::io::ErrorKind::TimedOut | std::io::ErrorKind::WouldBlock
+                    ));
+                }
+                Err(error) => panic!("no SessionResponse within {PATIENCE:?}: {error}"),
+            }
+        };
         assert_eq!(n, 21);
         let response = bytes[..n].to_vec();
         socket.send(&request).unwrap();
         let n = socket.recv(&mut bytes).unwrap();
         assert_eq!(&bytes[..n], response);
-        // A different request from the occupied peer must not reset RC4/state.
+        // A different request from the occupied peer must not reset RC4/state: nothing but
+        // late copies of the first response arrives.
         request[6..10].copy_from_slice(&72u32.to_be_bytes());
         socket
             .set_read_timeout(Some(Duration::from_millis(100)))
             .unwrap();
         socket.send(&request).unwrap();
-        assert!(matches!(
-            socket.recv(&mut [0; 512]).unwrap_err().kind(),
-            std::io::ErrorKind::TimedOut | std::io::ErrorKind::WouldBlock
-        ));
+        loop {
+            match socket.recv(&mut bytes) {
+                Ok(n) => assert_eq!(&bytes[..n], response),
+                Err(error) => {
+                    assert!(matches!(
+                        error.kind(),
+                        std::io::ErrorKind::TimedOut | std::io::ErrorKind::WouldBlock
+                    ));
+                    break;
+                }
+            }
+        }
         socket.set_read_timeout(Some(PATIENCE)).unwrap();
         let seed = u32::from_be_bytes(bytes[6..10].try_into().unwrap());
         let codec = Codec::new(seed, bytes[10], false, login::MAX_LOGIN_MESSAGE + 1).unwrap();
@@ -564,13 +595,88 @@ fn tokens_route_to_distinct_native_accounts_replay_fails_and_peers_stay_live() {
         fs::read(server.directory.join("accounts.json")).unwrap(),
         original
     );
-    assert!(server.directory.join("accounts.json.lock").is_file());
-    assert!(
+    // L042: login locks the store per request only, so between requests other writers may.
+    assert!(!server.directory.join("accounts.json.lock").exists());
+    drop(
         osfr_tools::account_store::AccountStoreLock::acquire(
-            &server.directory.join("accounts.json")
+            &server.directory.join("accounts.json"),
         )
-        .is_err()
+        .unwrap(),
     );
+}
+
+/// L042 blocker: in the runbook topology login runs on the gateway's store. A moderation write
+/// (`moderation::run`, which the gateway's `realm ban` calls) lands while login runs, the
+/// banned account then gets the ordinary failed login, and an unban lets it log in again.
+#[test]
+fn ban_and_unban_apply_while_login_runs() {
+    use osfr_tools::{
+        account_store::AccountStoreLock,
+        moderation::{self, Command},
+    };
+    let server = Server::start(true);
+    let path = server.directory.join("accounts.json");
+    let mut before = NativeClient::connect(server.udp);
+    assert_eq!(before.login(&token(&server, HANDLE, 7)), accepted(2));
+    {
+        // An offline writer (osfr-account's lock) names acct_001's character and makes the
+        // keyless acct_003 a moderator while login keeps running.
+        let _lock = AccountStoreLock::acquire(&path).unwrap();
+        let mut document: serde_json::Value =
+            serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+        let mut fixture: serde_json::Value =
+            serde_json::from_str(include_str!("fixtures/account/legacy-identity-v1.json")).unwrap();
+        fixture["character"]["first_name"] = "Banna".into();
+        fixture["character"]["last_name"] = "Target".into();
+        document["store"]["characters"]["1"] = serde_json::json!({"guid": 1,
+            "owner_account_id": 1, "identity": fixture["character"], "world_state": null});
+        document["store"]["accounts"]["1"]["character_guids"] = serde_json::json!([1]);
+        document["store"]["next_character_guid"] = 2.into();
+        document["store"]["roles"]["3"] = "moderator".into();
+        let staged = server.directory.join("staged.json");
+        fs::write(&staged, serde_json::to_vec(&document).unwrap()).unwrap();
+        AccountStore::load(&staged).unwrap().save(&path).unwrap();
+    }
+    let run = |text: &str| {
+        moderation::run(
+            &path,
+            3,
+            &Command::parse(text).unwrap(),
+            moderation::unix_now(),
+        )
+    };
+    assert_eq!(run("ban banna target").unwrap().target_account_id, 1);
+    let mut banned = NativeClient::connect(server.udp);
+    assert_eq!(
+        banned.login(&token(&server, HANDLE, 7)),
+        login::login_reply(false)
+    );
+    assert_eq!(run("unban banna target").unwrap().target_account_id, 1);
+    let mut lifted = NativeClient::connect(server.udp);
+    assert_eq!(lifted.login(&token(&server, HANDLE, 7)), accepted(2));
+    assert_eq!(lifted.request(&[11])[0], 12);
+    let store = AccountStore::load(&path).unwrap();
+    assert_eq!(store.sanctions(1), Default::default());
+    assert!(!server.directory.join("accounts.json.lock").exists());
+}
+
+/// L042 (third review): osfr-login holds the store writer lock for no request of its own; only
+/// a save takes it (`login.rs`). With the lock held (a staff write, or a stale lock), the
+/// key-pair login and the character list still answer, so a client spamming reads cannot make a
+/// staff write answer busy.
+#[test]
+fn a_held_store_lock_does_not_stop_login_or_the_character_list() {
+    let server = Server::start(true);
+    let path = server.directory.join("accounts.json");
+    let held = osfr_tools::account_store::AccountStoreLock::acquire(&path).unwrap();
+    let before = fs::read(&path).unwrap();
+    let mut client = NativeClient::connect(server.udp);
+    assert_eq!(client.login(&token(&server, HANDLE, 7)), accepted(2));
+    for _ in 0..3 {
+        assert_eq!(client.request(&[11])[0], 12);
+    }
+    assert_eq!(fs::read(&path).unwrap(), before);
+    drop(held);
 }
 
 #[test]

@@ -1,0 +1,5 @@
+{
+  "schema_version": 1,
+  "source": "reconstructed (R): L042 brief; OSFR #138 (4f028dc) takes any number of minutes, this server caps a timed mute or ban at one year",
+  "max_minutes": 525600
+}

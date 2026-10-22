@@ -7,6 +7,7 @@
 //! Call `flush` on a host timer/shutdown to drain buffered counts. Logs inherit
 //! the host directory's ACL; deployment must restrict it to service/admin users.
 
+use crate::moderation::Applied;
 use serde::{Deserialize, Serialize};
 use std::fs::{self, OpenOptions};
 use std::io::{self, Write};
@@ -24,24 +25,19 @@ pub enum EventKind {
     AuthFailure,
     BudgetRefusal,
     DevCommandDenial,
+    /// L042: one unbatched row per applied staff action (`record_moderation`).
+    ModerationAction,
 }
 
 impl EventKind {
-    fn index(self) -> usize {
+    /// Batched refusal kinds: (slot, action, reason). Moderation rows are never batched.
+    fn refusal(self) -> Option<(usize, &'static str, &'static str)> {
         match self {
-            Self::AdmissionRefusal => 0,
-            Self::AuthFailure => 1,
-            Self::BudgetRefusal => 2,
-            Self::DevCommandDenial => 3,
-        }
-    }
-
-    fn action_reason(self) -> (&'static str, &'static str) {
-        match self {
-            Self::AdmissionRefusal => ("admission", "admission_policy"),
-            Self::AuthFailure => ("authentication", "invalid_credentials"),
-            Self::BudgetRefusal => ("social_action", "action_budget"),
-            Self::DevCommandDenial => ("dev_command", "authorization"),
+            Self::AdmissionRefusal => Some((0, "admission", "admission_policy")),
+            Self::AuthFailure => Some((1, "authentication", "invalid_credentials")),
+            Self::BudgetRefusal => Some((2, "social_action", "action_budget")),
+            Self::DevCommandDenial => Some((3, "dev_command", "authorization")),
+            Self::ModerationAction => None,
         }
     }
 }
@@ -108,7 +104,13 @@ impl SecurityLog {
     }
 
     fn record_at(&mut self, event: SecurityEvent, now: Instant) -> io::Result<()> {
-        let slot = &mut self.pending[event.kind.index()];
+        let Some((index, ..)) = event.kind.refusal() else {
+            return Err(io::Error::new(
+                io::ErrorKind::InvalidInput,
+                "moderation rows use record_moderation",
+            ));
+        };
+        let slot = &mut self.pending[index];
         if slot.count == 0 {
             slot.event = Some(event);
         } else if let Some(pending) = &mut slot.event {
@@ -127,7 +129,7 @@ impl SecurityLog {
             // Throttle failed I/O attempts too: an unwritable log must not cause
             // an open/rotation attempt (or host error notice) for every packet.
             slot.last_write = Some(now);
-            self.write_pending(event.kind.index(), now)?;
+            self.write_pending(index, now)?;
         }
         Ok(())
     }
@@ -147,7 +149,9 @@ impl SecurityLog {
         let Some(event) = slot.event.filter(|_| slot.count > 0) else {
             return Ok(());
         };
-        let (action, reason) = event.kind.action_reason();
+        let Some((_, action, reason)) = event.kind.refusal() else {
+            return Ok(());
+        };
         let count = slot.count;
         self.append(serde_json::json!({
             "timestamp_ms": timestamp_ms(), "kind": event.kind,
@@ -173,7 +177,19 @@ impl SecurityLog {
         }))
     }
 
-    /// Append one JSON row, rotating to `.previous` first when the row would pass the cap.
+    /// L042: one row per applied moderation action, written at once and never batched, so
+    /// every action keeps its own actor. Server-owned account ids, the closed action name and
+    /// the minutes only; never names, chat or the command text.
+    pub fn record_moderation(&mut self, actor_account_id: u64, applied: Applied) -> io::Result<()> {
+        self.append(serde_json::json!({
+            "timestamp_ms": timestamp_ms(), "kind": EventKind::ModerationAction,
+            "account_id": actor_account_id, "target_account_id": applied.target_account_id,
+            "action": applied.action, "minutes": applied.minutes, "outcome": "applied",
+        }))
+    }
+
+    /// The one write path for every row (refusal batches, admin moves, moderation): append one
+    /// JSON row, rotating to `.previous` first when the row would pass the cap.
     fn append(&mut self, row: serde_json::Value) -> io::Result<()> {
         let mut line = serde_json::to_vec(&row)?;
         line.push(b'\n');
@@ -437,6 +453,68 @@ mod tests {
                 "to"
             ]
         );
+    }
+
+    /// L042R2: refusal batches, admin moves and moderation rows share the one capped, rotating
+    /// `append`, and a moderation kind is never taken as a batched refusal.
+    #[test]
+    fn every_row_kind_shares_the_capped_rotation() {
+        let scratch = Scratch::new();
+        let mut log = SecurityLog::open(scratch.path()).unwrap();
+        log.max_bytes = 600;
+        assert!(log.record(event(EventKind::ModerationAction)).is_err());
+        assert!(fs::read(scratch.path()).unwrap().is_empty());
+        let applied = Applied {
+            action: crate::moderation::Action::Ban,
+            target_account_id: 9,
+            minutes: Some(60),
+        };
+        let moved = AdminMoveRow {
+            account_id: 7,
+            session_id: 11,
+            target_guid: 42,
+            online: true,
+            from: (0, [1.0, 2.0, 3.0]),
+            to: (0, [4.0, 5.0, 6.0]),
+        };
+        let now = Instant::now();
+        for n in 0..12 {
+            match n % 3 {
+                0 => log.record_moderation(7, applied).unwrap(),
+                1 => log.record_admin_move(moved).unwrap(),
+                _ => log
+                    .record_at(event(EventKind::AuthFailure), now + Duration::from_secs(n))
+                    .unwrap(),
+            }
+            assert!(fs::metadata(scratch.path()).unwrap().len() <= 600);
+            assert!(!log.previous.exists() || fs::metadata(&log.previous).unwrap().len() <= 600);
+        }
+        assert_eq!(fs::read_dir(&scratch.0).unwrap().count(), 2);
+        let mut all = rows(&log.previous);
+        all.extend(rows(&scratch.path()));
+        for kind in ["moderation_action", "admin_move", "auth_failure"] {
+            assert!(all.iter().any(|row| row["kind"] == kind), "{kind}");
+        }
+        let row = all
+            .iter()
+            .find(|row| row["kind"] == "moderation_action")
+            .unwrap();
+        let keys: Vec<_> = row.as_object().unwrap().keys().cloned().collect();
+        assert_eq!(
+            keys,
+            [
+                "account_id",
+                "action",
+                "kind",
+                "minutes",
+                "outcome",
+                "target_account_id",
+                "timestamp_ms"
+            ]
+        );
+        assert_eq!(row["account_id"], 7);
+        assert_eq!(row["target_account_id"], 9);
+        assert_eq!(row["action"], "ban");
     }
 
     #[test]

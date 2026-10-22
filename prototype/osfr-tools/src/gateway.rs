@@ -30,6 +30,7 @@ use std::path::{Component, Path};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 mod admin_move;
+mod staff;
 mod trade_bridge;
 
 const MAX_MESSAGE: usize = 1_048_576;
@@ -111,6 +112,8 @@ pub struct Gateway {
     role: crate::account_store::AccountRole,
     // (R) Bound only by the host after verifying the character's owner and ticket.
     role_account: Option<(std::path::PathBuf, u64)>,
+    /// L042: this account's mute and ban, read with the role by `refresh_role`.
+    sanctions: crate::moderation::Sanctions,
     movement_state: MovementState,
     expected_discontinuity: Option<ExpectedDiscontinuity>,
     last_movement_ms: Option<u64>,
@@ -135,6 +138,8 @@ pub struct GatewayOutcome {
     pub broadcast: Option<String>,
     /// L043: an admin `realm move` the host runs once after a successful commit, like `broadcast`.
     pub admin_move: Option<crate::gameplay::AdminMove>,
+    /// L042: role-gated moderation commands; the host runs them after the commit.
+    pub moderation: Vec<crate::moderation::Command>,
     /// Inner application payloads that passed the gateway parser, in request order.
     pub applications: Vec<Vec<u8>>,
     pub state_changed: bool,
@@ -898,6 +903,7 @@ impl Gateway {
             stock_text: None,
             role: crate::account_store::AccountRole::Player,
             role_account: None,
+            sanctions: Default::default(),
             movement_state,
             expected_discontinuity: None,
             last_movement_ms: None,
@@ -1114,8 +1120,11 @@ impl Gateway {
     /// An unreadable store, missing account or missing role fails closed.
     pub fn refresh_role(&mut self) {
         if let Some((path, id)) = &self.role_account {
-            let role = crate::account_store::AccountStore::load(path)
-                .ok()
+            let store = crate::account_store::AccountStore::load(path).ok();
+            // L042: a mute applies from the next message; an unreadable store mutes (R).
+            let sanctions = store.as_ref().map(|store| store.sanctions(*id));
+            self.sanctions = sanctions.unwrap_or(crate::moderation::Sanctions::FAIL_CLOSED);
+            let role = store
                 .and_then(|store| store.account_role(*id))
                 .unwrap_or(crate::account_store::AccountRole::Player);
             self.set_role(role);
@@ -1146,22 +1155,22 @@ impl Gateway {
     }
 
     fn change_account_role(&mut self, command: &str) -> &'static str {
-        use crate::account_store::{AccountRole, AccountStore, AccountStoreLock};
+        use crate::account_store::{AccountRole, AccountStore, AccountStoreLock, STAFF_LOCK_WAIT};
         let words: Vec<_> = command.split_whitespace().collect();
         let ["role", id, role] = words.as_slice() else {
-            return "Usage: realm role <account-id> <player|builder|admin>";
+            return "Usage: realm role <account-id> <player|builder|moderator|admin>";
         };
         let (Some(target), Some(role)) = (
             id.parse::<u64>().ok().filter(|id| *id > 0),
             AccountRole::parse(role),
         ) else {
-            return "Usage: realm role <account-id> <player|builder|admin>";
+            return "Usage: realm role <account-id> <player|builder|moderator|admin>";
         };
         let Some((path, actor)) = &self.role_account else {
             return "Cannot do that: a verified account binding is required.";
         };
         // (R) Cooperate with login/CLI writers; never overwrite a newer key or role.
-        let Ok(_lock) = AccountStoreLock::acquire(path) else {
+        let Ok(_lock) = AccountStoreLock::acquire_within(path, STAFF_LOCK_WAIT) else {
             return "Cannot do that: account store is busy or unavailable.";
         };
         let result = AccountStore::load(path).and_then(|mut store| {
@@ -1643,24 +1652,13 @@ impl Gateway {
                             continue;
                         }
                         let mut staged_game = game.clone();
-                        if let Some(text) = crate::chat::request(&inner, state.guid).ok().flatten()
+                        // `realm role` and the L042 moderation words (gateway/staff.rs).
+                        if crate::chat::request(&inner, state.guid)
+                            .ok()
+                            .flatten()
+                            .is_some_and(|text| self.staff_command(game, &text, &mut outcome))
                         {
-                            let lower = text.trim().to_ascii_lowercase();
-                            if let Some(command) = lower
-                                .strip_prefix("realm ")
-                                .filter(|c| c.split_whitespace().next() == Some("role"))
-                            {
-                                let allowed = game.may_run("role");
-                                let reply = if allowed {
-                                    self.change_account_role(command)
-                                } else {
-                                    outcome.dev_command_denials += 1;
-                                    "Cannot do that: developer command requires --dev-tools and an authorized account role."
-                                };
-                                game.set_role(self.role);
-                                outcome.replies.push(wrapped(&crate::chat::system(reply)));
-                                continue;
-                            }
+                            continue;
                         }
                         let result = match staged_game.handle_in_world(&inner, &state, now_ms) {
                             Ok(result) => result,

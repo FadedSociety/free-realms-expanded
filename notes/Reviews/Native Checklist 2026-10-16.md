@@ -130,7 +130,7 @@ Take a screenshot at each **Expect** point. Name them `<section>-<step>.png` in 
 
 ### 0.5 Commands used in this note
 
-`realm` commands need `--dev-tools` on a local run, and a native-login run uses an account store, so the account role also counts. In the round70 `accounts.json` account 1 (Capo) is `admin` and account 2 (Buddy Botsworth) is `player`, so Capo can run everything. A new account (for a second client) starts as `player`: set it with `osfr-account set-role` (offline, login stopped) or it cannot run `realm`. On an account-store server without `--dev-tools` only builders and admins get `goto`, `here`, `place` and `reload`.
+`realm` commands need `--dev-tools` on a local run, and a native-login run uses an account store, so the account role also counts. In the round70 `accounts.json` account 1 (Capo) is `admin` and account 2 (Buddy Botsworth) is `player`, so Capo can run everything. A new account (for a second client) starts as `player`: set it with `osfr-account set-role` (offline; since L042 login may keep running) or it cannot run `realm`. On an account-store server without `--dev-tools` only builders and admins get `goto`, `here`, `place` and `reload`.
 
 | Command | Use |
 |---|---|

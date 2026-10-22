@@ -1778,3 +1778,71 @@ fn a_handshake_is_answered_quickly_even_with_full_content() {
         "the slowest SessionResponse took {slowest:?}; the bot gives up after 5 s"
     );
 }
+
+// ------------------------------------------------------------- L042 moderation
+
+/// L042 gates 1-3 over real sockets (real-client runs stay with the lead's native lane). Login
+/// and the gateway share one account store, as the Playtest Host Runbook starts them, so the
+/// moderator's writes must land while login runs: the review blocker was that login held the
+/// store lock for its whole life. A mute refuses the player's chat; a ban ends the live session
+/// and refuses the broker re-login; both lapse after their minute.
+#[test]
+fn moderator_mute_and_ban_land_while_login_runs_and_lapse() {
+    let _serial = serial();
+    let rig = Rig::start(&[AccountRole::Moderator, AccountRole::Player], true);
+    let mut moderator = rig.connect(0, "l042mod");
+    // Gate 1: the mute lands while login runs, and the player's chat is refused.
+    ask(
+        &mut moderator,
+        "realm mute FixtureB Record 1",
+        "Player muted.",
+    );
+    let muted = rig.cli(
+        1,
+        &[
+            "chat l042 muted line",
+            "expect-text cannot chat right now",
+            "quit",
+        ],
+    );
+    assert!(muted.status.success(), "{}", text_of(&muted));
+    // Gate 3: the ban ends the player's live session and refuses the broker re-login.
+    let player = rig.connect(1, "l042player");
+    ask(
+        &mut moderator,
+        "realm ban FixtureB Record 1",
+        "Player banned.",
+    );
+    rig.wait_log(&mut moderator, "the ban's session end", |event| {
+        event["event"] == "session_ended" && event["reason"] == "moderation"
+    });
+    disconnect(player);
+    let refused = rig.cli(1, &["quit"]);
+    assert!(
+        !refused.status.success() && text_of(&refused).contains("native login refused"),
+        "{}",
+        text_of(&refused)
+    );
+    let audit = fs::read_to_string(rig.root.join("security.jsonl")).unwrap();
+    assert_eq!(audit.matches("moderation_action").count(), 2, "{audit}");
+    disconnect(moderator);
+    // Gate 2 and the end of gate 3: once both lapse, the player logs in and chats again.
+    let store = AccountStore::load(&rig.root.join("accounts.json")).unwrap();
+    let sanctions = store.sanctions(rig.accounts[1].id);
+    let until = sanctions.muted_until.max(sanctions.banned_until).unwrap();
+    let now = osfr_tools::moderation::unix_now();
+    assert!(
+        until <= now + 60,
+        "a one-minute sanction runs past a minute"
+    );
+    std::thread::sleep(Duration::from_secs(until.saturating_sub(now) + 1));
+    let lapsed = rig.cli(
+        1,
+        &[
+            "chat l042 after expiry",
+            "expect-text l042 after expiry",
+            "quit",
+        ],
+    );
+    assert!(lapsed.status.success(), "{}", text_of(&lapsed));
+}

@@ -41,6 +41,8 @@ mod delivery;
 use delivery::{
     chat_error_delivery, field_packet, field_packets_for, field_recipient_matches, wrap_application,
 };
+#[path = "osfr_gateway/moderation.rs"]
+mod moderation;
 #[path = "osfr_gateway/paths.rs"]
 mod paths;
 #[path = "osfr_gateway/t006_guilds.rs"]
@@ -465,6 +467,8 @@ struct Session {
     received: u64,
     trace: Option<trace::Trace>,
     bundle_budget: BundleBudget,
+    /// L042: a moderator's kick or ban; `Server::step` ends the session through `end_session`.
+    kicked: bool,
 }
 
 #[derive(Clone, Debug)]
@@ -1102,6 +1106,7 @@ impl Session {
             received: 0,
             trace,
             bundle_budget: BundleBudget::outside(),
+            kicked: false,
         })
     }
 
@@ -1132,6 +1137,8 @@ impl Session {
             security.record(EventKind::AuthFailure, Some(account.id), Some(self.id.0));
             return Err("gateway character binding ticket is invalid".into());
         }
+        // L042: checked after the ticket, so an unverified peer learns nothing about bans.
+        moderation::refuse_banned(&store, account.id)?;
         // (R) First selected session owns the account and character, including
         // before Ready/Loaded. Reject duplicates before reading or writing a
         // save; a snapshot loaded here could otherwise outlive its active owner
@@ -1520,6 +1527,9 @@ impl Session {
         sessions: &mut SessionMap,
         transport: Option<(u16, Option<u16>, &'static str, bool)>,
     ) -> Result<(), Box<dyn std::error::Error>> {
+        if self.kicked {
+            return Ok(()); // L042: dropped unread until `step` ends the session.
+        }
         // One reply budget for the whole client message: `commit_outcome` charges the replies it
         // is about to queue, which covers both the combat split and the shared-field/ride/pet
         // replies `handle_at` did not count (F179).
@@ -1672,6 +1682,7 @@ impl Session {
         // `commit_outcome` succeeds. Nothing is queued for a refused or failed transaction.
         let broadcast = outcome.broadcast.take();
         let admin_move = outcome.admin_move.take();
+        let staged = std::mem::take(&mut outcome.moderation);
         // T008: the jump body is built from this request's final pose; fan it out
         // only after the commit, like the notice above.
         let jump = staged_gateway.take_jump_relay();
@@ -1689,6 +1700,7 @@ impl Session {
             if let Some(request) = admin_move {
                 admin_move::run(self, options, sessions, world, membership, now_ms, request)?;
             }
+            moderation::run_staged(self, sessions, world, options, staged)?;
         }
         Ok(())
     }
@@ -2133,6 +2145,9 @@ impl Session {
         // no shared-world delivery is composed here.
         if matches!(inner, [108, 0, 1 | 3 | 5, 0, ..]) || matches!(inner, [152, 0, 4 | 5, 0, ..]) {
             return Vec::new();
+        }
+        if let Some(refusal) = moderation::muted_chat(self, inner) {
+            return refusal;
         }
         if inner.starts_with(&[129, 0]) {
             return self.route_guild(inner, world, now_ms);
@@ -3826,6 +3841,8 @@ impl Server {
                 self.end_session(key, current, "login_deadline");
             } else if current.last_activity.elapsed() > Duration::from_secs(60) {
                 self.end_session(key, current, "idle_timeout");
+            } else if current.kicked {
+                self.end_session(key, current, "moderation");
             } else {
                 self.sessions.insert(key, current);
             }

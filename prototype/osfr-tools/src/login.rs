@@ -6,7 +6,7 @@ use crate::{
         self, AccountFlags, AuthenticatedSession, CharacterCreateStatus, CharacterLoginStatus,
         SlotPolicy,
     },
-    account_store::AccountStore,
+    account_store::{AccountStore, AccountStoreLock},
     character_store::CharacterState,
     game_rules::{GameRuleSet, MembershipState, RulePolicy},
     identity::{
@@ -202,6 +202,28 @@ impl LoginService {
 
     fn authenticate_account(&mut self, login_name: &str) -> io::Result<u64> {
         let login_name_hash: [u8; 32] = Sha256::digest(login_name.as_bytes()).into();
+        // L042: a login whose account the file already holds only reads it, without the writer
+        // lock; every broker login is one, since osfr-login checks the account first.
+        let (store, account_id) = match AccountStore::load(&self.config.account_store_file) {
+            Ok(store) => match store.account_id_by_login_hash(&login_name_hash) {
+                Some(id) => (store, id),
+                None => self.add_account(login_name_hash)?,
+            },
+            Err(error) if error.kind() == io::ErrorKind::NotFound => {
+                self.add_account(login_name_hash)?
+            }
+            Err(error) => return Err(error),
+        };
+        self.account_store = Some(store);
+        self.account_id = Some(account_id);
+        self.authenticated_session = Some(AuthenticatedSession::new(account_id));
+        Ok(account_id)
+    }
+
+    /// Create or migrate the store, or add this login's account, under the store writer lock
+    /// (L042), re-reading the file under it.
+    fn add_account(&self, login_name_hash: [u8; 32]) -> io::Result<(AccountStore, u64)> {
+        let _lock = AccountStoreLock::acquire(&self.config.account_store_file)?;
         let flags = AccountFlags {
             underage: self.config.underage,
             open_chat: self.config.open_chat,
@@ -250,10 +272,7 @@ impl LoginService {
                 id
             }
         };
-        self.account_store = Some(store);
-        self.account_id = Some(account_id);
-        self.authenticated_session = Some(AuthenticatedSession::new(account_id));
-        Ok(account_id)
+        Ok((store, account_id))
     }
 
     fn store_and_account(&self) -> io::Result<(&AccountStore, u64)> {
@@ -270,8 +289,9 @@ impl LoginService {
     /// L055: create and delete save the whole store, so they start from the file, never the copy
     /// cached at login: another session on the same file (every unauthenticated loopback peer
     /// shares one) may have saved since. Re-runs the account lookup here; the caller's
-    /// create/delete re-run slot, name and ownership checks on this copy. osfr-login handles one
-    /// request at a time, so nothing in the process saves between this load and the caller's save.
+    /// create/delete re-run slot, name and ownership checks on this copy. The caller holds the
+    /// store writer lock (L042) from before this load until after its save, so no other writer
+    /// (a staff command, osfr-account) saves in between.
     fn reload_account_store(&mut self) -> io::Result<()> {
         let (_, account_id) = self.store_and_account()?;
         let store = AccountStore::load(&self.config.account_store_file)?;
@@ -329,6 +349,13 @@ impl LoginService {
                 if self.logged_in {
                     self.authenticate_account(&login_name)?;
                     let (store, account_id) = self.store_and_account()?;
+                    // L042: a banned account gets the ordinary failed login until expiry.
+                    self.logged_in = !store
+                        .sanctions(account_id)
+                        .banned(crate::moderation::unix_now());
+                }
+                if self.logged_in {
+                    let (store, account_id) = self.store_and_account()?;
                     let account = store
                         .account(account_id)
                         .ok_or_else(|| invalid("authenticated account is unavailable"))?;
@@ -355,6 +382,7 @@ impl LoginService {
                 let data = r.payload(4096)?;
                 r.end()?;
                 let creation = NativeCreation::decode(data)?;
+                let _lock = AccountStoreLock::acquire(&self.config.account_store_file)?;
                 self.reload_account_store()?;
                 let (store, account_id) = self.store_and_account()?;
                 if !matches!(server, 0 | 1) {
@@ -473,6 +501,7 @@ impl LoginService {
             9 => {
                 let guid = r.u64()?;
                 r.end()?;
+                let _lock = AccountStoreLock::acquire(&self.config.account_store_file)?;
                 self.reload_account_store()?;
                 let (store, account_id) = self.store_and_account()?;
                 let mut staged = store.clone();
