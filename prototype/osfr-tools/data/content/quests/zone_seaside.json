@@ -1,0 +1,422 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3000320,
+      "title_string_id": 93283,
+      "intro_text_string_id": 93282,
+      "description_string_id": 93284,
+      "end_text_string_id": 93335,
+      "giver_npc_id": 9500000629,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "zone_id": 0,
+          "position": [
+            -690.38,
+            2.3,
+            -1060.25
+          ],
+          "radius": 15.0,
+          "text_string_id": 93294,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3020 goal 1: NameId 93294; Type 1 ReachPosition [-690.38, 2.3, -1060.25] ReachRadius 15, hand-placed by the fork (R); runtime zone 0 is the open-world continent"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000629,
+          "dialogue_string_id": 93316,
+          "text_string_id": 93310,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3020 goal 2: NameId 93310; TargetGuid 100000001885 = definition 1885 (Spritzy, NameId 21292, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:612), bound to npcs/seaside.json 9500000629 at the same spawn; its Dialogue array has no DialogueId, so dialogue_string_id is the first entry's TextId 93316 (R); talk-dialogue-chains adds the rest later"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9500000567,
+          "text_string_id": 101743,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3020 goal 3: NameId 101743; TargetGuid 100000001748 = definition 1748 (Cole, NameId 93337, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:487), bound to npcs/seaside.json 9500000567 at the same spawn; the last goal at the turn-in NPC: its DialogueId 93335 is the quest's end_text_string_id"
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {
+            "1": 20
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3020: RewardCoins 30, RewardItems []. Its RewardExperience 80 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 20 goes to profile 1 (Adventurer) on the T202 ladder (three goals)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3020 'Welcome to Seaside' (quest data last changed in 1c36ad7): TitleId 93283, DescriptionId 93284, GiverDialogueId 93282, GiverGuid 100000001885 (Spritzy), TargetGuid 100000001748 (Cole), PrerequisiteQuestId 0. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 93283 'Welcome to Seaside' (title), 93284 (description), 93282 (intro) and 93335 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T466: minted id 3000320 = 3000300 + (fork QuestId 3020 - 3000); XP rung 20 (three goals); coin value 30 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000321,
+      "title_string_id": 93399,
+      "intro_text_string_id": 93398,
+      "description_string_id": 140222,
+      "end_text_string_id": 93401,
+      "giver_npc_id": 9500000567,
+      "prerequisite_quest_ids": [
+        3000320
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000623,
+          "dialogue_string_id": 93409,
+          "text_string_id": 93405,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3021 goal 1: NameId 93405; TargetGuid 100000001756 = definition 1756 (Seaspray, NameId 21301, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:495), bound to npcs/seaside.json 9500000623 at the same spawn"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000567,
+          "text_string_id": 93407,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3021 goal 2: NameId 93407; TargetGuid 100000001748 = definition 1748 (Cole, NameId 93337, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:487), bound to npcs/seaside.json 9500000567 at the same spawn; the last goal at the turn-in NPC: its DialogueId 93401 is the quest's end_text_string_id"
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {
+            "1": 20
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3021: RewardCoins 30, RewardItems []. Its RewardExperience 80 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 20 goes to profile 1 (Adventurer) on the T202 ladder (two goals)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3021 'The Oldest Building' (quest data last changed in 1c36ad7): TitleId 93399, DescriptionId 140222, GiverDialogueId 93398, GiverGuid 100000001748 (Cole), TargetGuid 100000001748 (Cole), PrerequisiteQuestId 3020. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 93399 'The Oldest Building' (title), 140222 (description), 93398 (intro) and 93401 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T466: minted id 3000321 = 3000300 + (fork QuestId 3021 - 3000); XP rung 20 (two goals); coin value 30 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000322,
+      "title_string_id": 93420,
+      "intro_text_string_id": 93419,
+      "description_string_id": 93421,
+      "end_text_string_id": 93422,
+      "giver_npc_id": 9500000567,
+      "prerequisite_quest_ids": [
+        3000321
+      ],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "zone_id": 0,
+          "position": [
+            -379.92,
+            -6.58,
+            -1168.87
+          ],
+          "radius": 10.0,
+          "text_string_id": 93425,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3022 goal 1: NameId 93425; Type 1 ReachPosition [-379.92, -6.58, -1168.87] ReachRadius 10, hand-placed by the fork (R); runtime zone 0 is the open-world continent"
+            }
+          ]
+        },
+        {
+          "kind": "visit_position",
+          "id": 2,
+          "zone_id": 0,
+          "position": [
+            -426.24,
+            -18.72,
+            -1223.69
+          ],
+          "radius": 20.0,
+          "text_string_id": 93427,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3022 goal 2: NameId 93427; Type 1 ReachPosition [-426.24, -18.72, -1223.69] ReachRadius 20, hand-placed by the fork (R); runtime zone 0 is the open-world continent"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9000000070,
+          "text_string_id": 93429,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3022 goal 3: NameId 93429; TargetGuid 100000004265 = definition 4265 (Diggy, NameId 21302, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:2748), bound to npcs/seaside.json 9000000070 at the same spawn; the fork gives this goal no DialogueId or Dialogue"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "npc_id": 9500000567,
+          "text_string_id": 93407,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3022 goal 4: NameId 93407; TargetGuid 100000001748 = definition 1748 (Cole, NameId 93337, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:487), bound to npcs/seaside.json 9500000567 at the same spawn; the last goal at the turn-in NPC: its DialogueId 93422 is the quest's end_text_string_id"
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {
+            "1": 30
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3022: RewardCoins 30, RewardItems []. Its RewardExperience 80 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 30 goes to profile 1 (Adventurer) on the T202 ladder (four goals)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3022 'Touring Seaside' (quest data last changed in 1c36ad7): TitleId 93420, DescriptionId 93421, GiverDialogueId 93419, GiverGuid 100000001748 (Cole), TargetGuid 100000001748 (Cole), PrerequisiteQuestId 3021. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 93420 'Touring Seaside' (title), 93421 (description), 93419 (intro) and 93422 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T466: minted id 3000322 = 3000300 + (fork QuestId 3022 - 3000); XP rung 30 (four goals); coin value 30 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000323,
+      "title_string_id": 93447,
+      "intro_text_string_id": 93449,
+      "description_string_id": 93454,
+      "end_text_string_id": 93451,
+      "giver_npc_id": 9500000567,
+      "prerequisite_quest_ids": [
+        3000322
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000562,
+          "dialogue_string_id": 93464,
+          "text_string_id": 93454,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3023 goal 1: NameId 93454; TargetGuid 100000001749 = definition 1749 (Brenna, NameId 93463, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:488), bound to npcs/seaside.json 9500000562 at the same spawn; its Dialogue array has no DialogueId, so dialogue_string_id is the first entry's TextId 93464 (R); talk-dialogue-chains adds the rest later; the fork marks this goal CompleteAfterDialogue (her two quiz questions 93466 and 93474), so this slice credits the Talk alone (R)"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000567,
+          "text_string_id": 93457,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3023 goal 2: NameId 93457; TargetGuid 100000001748 = definition 1748 (Cole, NameId 93337, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:487), bound to npcs/seaside.json 9500000567 at the same spawn; the last goal at the turn-in NPC: its DialogueId 93451 is the quest's end_text_string_id"
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {
+            "1": 30
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3023: RewardCoins 30, RewardItems []. Its RewardExperience 80 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 30 goes to profile 1 (Adventurer) on the T202 ladder (the last quest of the four-quest Seaside Tour)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3023 'Testing the Tour' (quest data last changed in 1c36ad7): TitleId 93447, DescriptionId 93454, GiverDialogueId 93449, GiverGuid 100000001748 (Cole), TargetGuid 100000001748 (Cole), PrerequisiteQuestId 3022. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 93447 'Testing the Tour' (title), 93454 (description), 93449 (intro) and 93451 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T466: minted id 3000323 = 3000300 + (fork QuestId 3023 - 3000); XP rung 30 (the last quest of the four-quest Seaside Tour); coin value 30 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000360,
+      "title_string_id": 101400,
+      "intro_text_string_id": 101408,
+      "description_string_id": 101410,
+      "end_text_string_id": 101411,
+      "giver_npc_id": 9500000645,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000633,
+          "dialogue_string_id": 101412,
+          "text_string_id": 101402,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3060 goal 1: NameId 101402; TargetGuid 100000001777 = definition 1777 (Tazinna, NameId 45815, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:514), bound to npcs/seaside.json 9500000633 at the same spawn; its Dialogue array has no DialogueId, so dialogue_string_id is the first entry's TextId 101412 (R); talk-dialogue-chains adds the rest later"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000580,
+          "dialogue_string_id": 101414,
+          "text_string_id": 101404,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3060 goal 2: NameId 101404; TargetGuid 100000001758 = definition 1758 (Emuzz, NameId 45586, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:497), bound to npcs/seaside.json 9500000580 at the same spawn; its Dialogue array has no DialogueId, so dialogue_string_id is the first entry's TextId 101414 (R); talk-dialogue-chains adds the rest later"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9500000645,
+          "text_string_id": 101406,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3060 goal 3: NameId 101406; TargetGuid 100000001964 = definition 1964 (Yancy Gilbert, NameId 45562, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:686), bound to npcs/seaside.json 9500000645 at the same spawn; the last goal at the turn-in NPC: its DialogueId 101411 is the quest's end_text_string_id"
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {
+            "1": 20
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3060: RewardCoins 30, RewardItems []. Its RewardExperience 80 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 20 goes to profile 1 (Adventurer) on the T202 ladder (three goals)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3060 'Feminine Touch' (quest data last changed in 1c36ad7): TitleId 101400, DescriptionId 101410, GiverDialogueId 101408, GiverGuid 100000001964 (Yancy Gilbert), TargetGuid 100000001964 (Yancy Gilbert), PrerequisiteQuestId 0. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 101400 'Feminine Touch' (title), 101410 (description), 101408 (intro) and 101411 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T466: minted id 3000360 = 3000300 + (fork QuestId 3060 - 3000); XP rung 20 (three goals); coin value 30 is the fork's RewardCoins."
+        }
+      ]
+    }
+  ]
+}

@@ -98,7 +98,7 @@ struct Binding {
 /// Every row this slice binds. The greeting is always the clicked row's own
 /// `greeting_string_id`; no row borrows a neighbour's line. T369 added Crash
 /// Davis and Dalton Narrowbrow when it enabled the derby chapter's two quests.
-const BINDINGS: [Binding; 15] = [
+const BINDINGS: &[Binding] = &[
     Binding {
         npc_id: 9000000042,
         name: "Carlos Brazenfist",
@@ -306,7 +306,11 @@ const BINDINGS: [Binding; 15] = [
 /// Enabled quest givers and talk targets whose client text has no recoverable
 /// first-person line of their own. Each stays unbound; the test fails a new
 /// unbound id that is not listed here.
-const BLANK_WITH_REASON: [(u64, &str); 9] = [
+const BLANK_WITH_REASON: &[(u64, &str)] = &[
+    (
+        9000000070,
+        "Diggy (T466 Touring Seaside talk target): NPCs - Seaside.md:45 quotes only third-person cooking objectives and other speakers' referrals (428610, 21340, 384277, 100280); locale 93435 ('finest seafood') has no speaker in any guide row, and 93429 is the quest-step goal text, so no first-person line of his own is proven.",
+    ),
     (
         9000000140,
         "Manager Landon (T409): his client lines are third person (402947, 402841, 416471, 402687); the first-person substitute plea 418984 is the Snowy Scrimmage offer intro, whose speaker the Soccer Star guide leaves unnamed (1591815111), so no uncontested greeting of his own is recovered.",
@@ -334,6 +338,26 @@ const BLANK_WITH_REASON: [(u64, &str); 9] = [
     (
         9500000561,
         "Brendan: only the objective string 573579885 and third-person lotion references; no recovered first-person speech.",
+    ),
+    (
+        9500000562,
+        "Brenna (T466 Testing the Tour talk target): NPCs - Seaside.md:28 quotes only Cole's referrals to her (383202, 103055) and objectives (140239, 93454); her first-person quiz lines 93464, 93466 and 93474 are the quest-step dialogue of 3000323 goal 1, not a greeting.",
+    ),
+    (
+        9500000567,
+        "Cole (T466 giver of 3000321-3000323, turn-in of 3000320): NPCs - Seaside.md:27 quotes only lines about him (93369, 93334, 93324, 93424, 116733); his first-person lines are the tour intros 93398, 93419, 93449 and end texts 93335, 93401, 93422, 93451. A QuestOffer proof could bind an intro, but tests/npc_greetings_seaside_briarwood.rs and notes/Autopilot/T317.md pin his Seaside row unbound.",
+    ),
+    (
+        9500000580,
+        "Emuzz (T466 Feminine Touch talk target): NPCs - Seaside.md:104 quotes only another speaker's survey and flyer objectives (101404, 95036, 139578); her first-person reply 101414 is the quest-step dialogue of 3000360 goal 2, not a greeting.",
+    ),
+    (
+        9500000633,
+        "Tazinna (T466 Feminine Touch talk target): NPCs - Seaside.md:105 quotes only third-person survey lines (101402, 139578); her first-person reply 101412 is the quest-step dialogue of 3000360 goal 1, not a greeting.",
+    ),
+    (
+        9500000645,
+        "Yancy Gilbert (T466 giver of 3000360): NPCs - Seaside.md:106 quotes only third-person novel and flyer objectives (101401, 101410, 100067) and the player's line 101415; his first-person lines are the Feminine Touch intro 101408 and end text 101411. A QuestOffer proof could bind 101408, but tests/npc_greetings_seaside_briarwood.rs and notes/Autopilot/T317.md pin his Seaside row unbound.",
     ),
     (
         9500000697,
@@ -753,7 +777,7 @@ fn every_enabled_quest_giver_and_talk_target_is_bound_or_explained() {
     }
 
     // No stale blank entries and no silently dropped target.
-    for (npc_id, _) in BLANK_WITH_REASON {
+    for &(npc_id, _) in BLANK_WITH_REASON {
         assert!(
             targets.contains(&npc_id),
             "NPC {npc_id} is in BLANK_WITH_REASON but is not an enabled quest giver/talk target"
@@ -811,7 +835,7 @@ fn each_bound_greeting_is_the_npcs_own_first_person_line() {
     let mut greeting_ids = BTreeSet::new();
     let mut edited = BTreeSet::new();
 
-    for binding in &BINDINGS {
+    for binding in BINDINGS {
         assert!(
             binding.greeting > 0,
             "NPC {}: zero greeting",
@@ -1014,7 +1038,7 @@ fn each_bound_greeting_is_the_npcs_own_first_person_line() {
 fn clicking_a_bound_quest_npc_returns_its_greeting_body() {
     // Service path: the context the router copies into the 26/3 body.
     let mut interaction = service();
-    for binding in &BINDINGS {
+    for binding in BINDINGS {
         assert_eq!(
             service_talk_body(&mut interaction, binding.npc_id),
             Some(binding.greeting),
@@ -1025,7 +1049,7 @@ fn clicking_a_bound_quest_npc_returns_its_greeting_body() {
 
     // Dispatch path: gateway -> Gameplay -> gameplay/npc.rs -> dialogue_packet_with.
     let mut game = Gameplay::load(&gameplay_dir(), None).expect("gameplay content loads");
-    for binding in &BINDINGS {
+    for binding in BINDINGS {
         let (dialogue, menu_packet, runtime_guid) = in_world_talk(
             &mut game,
             binding.file,

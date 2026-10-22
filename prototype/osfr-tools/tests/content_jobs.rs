@@ -82,7 +82,8 @@ fn job_batch_loads_and_npc_references_resolve_or_are_declared() {
             record
         }));
     }
-    assert_eq!(fs::read_dir(root.join("quests")).unwrap().count(), 18);
+    // T466 added quests/zone_seaside.json, the first zone-quests slice.
+    assert_eq!(fs::read_dir(root.join("quests")).unwrap().count(), 19);
 
     let mut referenced_npcs = HashSet::new();
     for job in jobs["records"].as_array().unwrap() {
