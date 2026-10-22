@@ -135,7 +135,7 @@ fn client_table_and_mount_data_load_with_provenance() {
     let catalog = MountCatalog::load(data).unwrap();
     assert_eq!(catalog.mount_types().count(), 30); // 29 types plus empty id 0.
     assert_eq!(catalog.mount_types().filter(|row| row.id > 0).count(), 29);
-    assert_eq!(catalog.mounts().count(), 54);
+    assert_eq!(catalog.mounts().count(), 89); // T452: 54 seeded plus 35 OSFR-parity rides.
     assert!(catalog.mounts().all(|mount| !mount.source.is_empty()));
     assert!(
         catalog

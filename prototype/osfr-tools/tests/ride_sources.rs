@@ -3,16 +3,17 @@
 //! The two test names below are historical and deliberately retained for the protected-pass
 //! list: before T230 the rides were sold by Delvin and the Mysterious Merchant for coins. T230
 //! removed that stock and lists the rides for Station Cash instead. `Chrome Drake` and
-//! `Polar Bear` carry `earn_only` and must never be listed (slice 2 rewards).
+//! `Polar Bear` carry `earn_only` and must never be listed (slice 2 rewards); T452 added six more
+//! earn-only rides (loot-card, TCG-questline and collection rewards in the original).
 
 use osfr_tools::{
     coin_shop::{CoinShop, StoreCatalogue},
     inventory::Inventory,
-    mounts::MountCatalog,
+    mounts::{MountCatalog, MountSource},
     station_cash::{self, Wallet},
 };
 use serde_json::Value;
-use std::{fs, path::PathBuf};
+use std::{collections::BTreeSet, fs, path::PathBuf};
 
 fn content() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content")
@@ -164,8 +165,109 @@ fn every_ride_is_sold_by_a_vendor_inside_the_price_bounds() {
             assert_eq!(listing.price as u64, scaled, "{} price", ride.name);
         }
     }
-    assert_eq!(rides, 54, "the ride catalogue changed");
-    assert_eq!(shop.sc_catalogue().earn_only().len(), 2);
+    // T452 added 35 OSFR-parity rides (6 of them earn-only) to the 54 seeded ones.
+    assert_eq!(rides, 89, "the ride catalogue changed");
+    assert_eq!(shop.sc_catalogue().earn_only().len(), 8);
+}
+
+/// T452: the rides Sanctuary-main 10f129e `Mounts.json` ships and the seed lacked. The Futuristic
+/// Bicycle (13464) waits for T429: its item 79417 is the only tradeable ride definition.
+const OSFR_PARITY_RIDES: [i32; 35] = [
+    12638, 520, 13562, 13563, 13590, 13591, 13592, 13566, 13578, 895, 13580, 13565, 8765, 13570,
+    12636, 13569, 13573, 13575, 13582, 13593, 13588, 13585, 13586, 13577, 13579, 13572, 13571,
+    13564, 681, 699, 13584, 13463, 13574, 13581, 926,
+];
+
+/// T452: each added ride's one item is a client ride definition that presents the ride's own name
+/// and icon (definition bytes 4..8 and 12..16). Item type 19 is a ride: the client's item-record
+/// action switch on the definition's type (+0x6c; `00a1ec00`, switch at `00a1edf0`) collects case
+/// 19 at `00a1eec0` and spawns it through SpawnMountByItemDefinitionId (`00b06db0`).
+#[test]
+fn osfr_parity_rides_match_their_item_definitions() {
+    let catalog = MountCatalog::load(content().join("mounts.json")).expect("mounts load");
+    let inventory = Inventory::load(&inventory_content(), None).expect("item content loads");
+    for id in OSFR_PARITY_RIDES {
+        let ride = catalog
+            .mount(id)
+            .unwrap_or_else(|| panic!("ride {id} is not catalogued"));
+        let [item] = ride.item_definition_id_candidates[..] else {
+            panic!("{} must have exactly one item", ride.name);
+        };
+        let presentation = inventory
+            .presentation(item)
+            .unwrap_or_else(|error| panic!("{} item {item}: {error}", ride.name));
+        assert_eq!(
+            presentation.name_id, ride.name_string_id,
+            "{} name",
+            ride.name
+        );
+        assert_eq!(
+            presentation.icon_id, ride.image_set_id,
+            "{} icon",
+            ride.name
+        );
+        assert_eq!(presentation.item_type, 19, "{} item type", ride.name);
+    }
+}
+
+/// T452 review: the item catalogue's `legacy+client-if-present` rows are FreeRealms-Legacy
+/// `ClientItemDefinitions.json` data (none of these items is in the client overlay), so evidence
+/// citing an added ride's catalogue row is `legacy` unless the row is a captured
+/// `inventory-baseline` definition. Which source sets a ride's tint is open, so every added
+/// ride's tint alias evidence carries (R).
+#[test]
+fn osfr_parity_ride_evidence_names_its_real_source() {
+    #[derive(serde::Deserialize)]
+    struct Row {
+        id: i32,
+        #[serde(default)]
+        source: String,
+    }
+    #[derive(serde::Deserialize)]
+    struct ItemCatalogue {
+        definitions: Vec<Row>,
+    }
+    fn evidence(source: &MountSource) -> &str {
+        match source {
+            MountSource::Client(text)
+            | MountSource::Legacy(text)
+            | MountSource::Wiki(text)
+            | MountSource::Reconstructed(text) => text,
+        }
+    }
+    let bytes = fs::read(inventory_content().join("item-catalogue.json")).expect("catalogue reads");
+    let items: ItemCatalogue = serde_json::from_slice(&bytes).expect("catalogue parses");
+    let captured: BTreeSet<i32> = items
+        .definitions
+        .iter()
+        .filter(|row| row.source == "inventory-baseline")
+        .map(|row| row.id)
+        .collect();
+    let catalog = MountCatalog::load(content().join("mounts.json")).expect("mounts load");
+    for id in OSFR_PARITY_RIDES {
+        let ride = catalog.mount(id).expect("ride catalogued");
+        let item = ride.item_definition_id_candidates[0];
+        let row = format!("item-catalogue.json row {item}");
+        let cited: Vec<_> = (ride.source.iter())
+            .chain(ride.field_sources.values().flatten())
+            .filter(|source| evidence(source).contains(&row))
+            .collect();
+        assert!(!cited.is_empty(), "{} cites its item row", ride.name);
+        for source in cited {
+            let right = if captured.contains(&item) {
+                matches!(source, MountSource::Client(_))
+            } else {
+                matches!(source, MountSource::Legacy(_))
+            };
+            assert!(right, "{} item {item}: {source:?}", ride.name);
+        }
+        let tint = &ride.field_sources["tint_alias"];
+        assert!(
+            !tint.is_empty() && tint.iter().all(|source| evidence(source).contains("(R)")),
+            "{} tint alias evidence needs (R)",
+            ride.name
+        );
+    }
 }
 
 #[test]

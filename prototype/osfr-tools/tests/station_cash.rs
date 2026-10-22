@@ -520,7 +520,8 @@ fn bought_ride_catalogue_row_is_no_trade() {
         .filter(|listing| !listing.deed) // L046: lot deeds are listed too; they grant a lot.
         .map(|listing| listing.item_id)
         .collect();
-    assert_eq!(items.len(), 54, "every ride has a catalogue row");
+    // T452: 54 seeded plus 35 OSFR-parity rides.
+    assert_eq!(items.len(), 89, "every ride has a catalogue row");
     for item in items {
         let (no_trade, _) = shop
             .inventory()
@@ -665,8 +666,9 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         store.len(),
         "the store packet has trailing bytes"
     );
-    // 52 rides plus the 9 lot deeds L046 lists.
-    assert_eq!(decoded.len(), 61, "the shipped listed ride and deed count");
+    // 52 rides plus the 9 lot deeds L046 lists, plus T452's 29 listed OSFR-parity rides (6 more
+    // are earn-only).
+    assert_eq!(decoded.len(), 90, "the shipped listed ride and deed count");
 
     // 66/7 (`00b48040`/`00b43090`): counted category nodes, then the sorted byte.
     let tree = packets
