@@ -1265,11 +1265,9 @@ fn marketplace_payment_like_rows_stay_refused_or_free() {
 fn unrecovered_marketplace_rows_and_malformed_requests_change_nothing() {
     let mut counter = Counter::new(100, |_| {});
     let before = counter.state();
-    // Bundle content (27) and item requirements (38): no catalogue, no reply, no state.
-    for sub in [27, 38] {
-        let outcome = counter.shop.handle(&marketplace(sub)).unwrap();
-        assert!(outcome.replies.is_empty() && !outcome.changed, "66/{sub}");
-    }
+    // Bundle content (27): no reply, no state.
+    let outcome = counter.shop.handle(&marketplace(27)).unwrap();
+    assert!(outcome.replies.is_empty() && !outcome.changed, "66/27");
     let mut long = marketplace(14);
     long.resize(65, 0);
     let bad_locales = [
@@ -1287,6 +1285,7 @@ fn unrecovered_marketplace_rows_and_malformed_requests_change_nothing() {
     let bare_with_tail = [
         [marketplace(10), vec![0]].concat(),
         [marketplace(18), vec![0]].concat(),
+        [marketplace(38), vec![0]].concat(),
     ];
     for packet in bad_locales.into_iter().chain(bare_with_tail).chain([long]) {
         assert!(
@@ -1469,6 +1468,31 @@ fn wallet_reply_sends_no_marketplace_packet_when_station_cash_is_disabled() {
     assert_eq!(&packets[0][..4], &[66, 0, 11, 0]);
     let packets = send(&mut gateway, &marketplace(12));
     assert_eq!(packets, vec![vec![66, 0, 13, 0, 1]]);
+    // T380: the store screen's 66/38 still gets no reply.
+    assert!(send(&mut gateway, &marketplace(38)).is_empty());
+}
+
+/// T380: the store screen sends the bare 66/38 when it opens (Lua `Opening`, `00c047a0` ->
+/// `00c03920`). Its reply 66/39 is read by `00b3e490`: a counted list (`00b32d00`) of a u32
+/// bundle id and a purchase byte (`00b2b590`). After a clean read the client refreshes
+/// StoreItemRoot (`0099a790`), and only that refresh fills the bundle list once its commerce
+/// processor is ready (`0099aa60`). The list is empty: no bundle changes and nothing is saved.
+#[test]
+fn store_screen_opening_gets_the_item_requirements_reply() {
+    let fixture = Fixture::new().with_sc();
+    let mut gateway = traced(&fixture, fixture.state());
+    let before = gateway.snapshot();
+    let outcome = deliver(&mut gateway, &marketplace(38));
+    assert_eq!(
+        inner_packets(&outcome),
+        vec![vec![66, 0, 39, 0, 0, 0, 0, 0]]
+    );
+    assert_eq!(outcome.trace.last().unwrap().handler, "merchant");
+    assert!(!outcome.state_changed && !outcome.gameplay_changed);
+    let refused = deliver(&mut gateway, &[marketplace(38), vec![0]].concat());
+    assert!(refused.replies.is_empty());
+    assert_eq!(refused.trace.last().unwrap().outcome, "rejected");
+    assert_eq!(gateway.snapshot(), before);
 }
 
 /// F387: 66/29 (the store's close statistics, `PacketInGamePurchaseStoreClientStatistics` from

@@ -1039,11 +1039,15 @@ impl CoinShop {
     /// for the 66/12 status, so the 66/10 reply carries this set; 66/12 answers a client that
     /// does ask.
     pub fn marketplace_packets(&self) -> Vec<Vec<u8>> {
-        if self.sc_catalogue.config().enabled && self.catalogue.marketplace.enabled_on_handshake {
+        if self.marketplace_enabled() {
             station_cash::catalogue_packets(&self.sc_catalogue)
         } else {
             Vec::new()
         }
+    }
+
+    fn marketplace_enabled(&self) -> bool {
+        self.sc_catalogue.config().enabled && self.catalogue.marketplace.enabled_on_handshake
     }
 
     /// Answer gateway Marketplace requests. A Station Cash order debits the wallet and grants the
@@ -1122,8 +1126,13 @@ impl CoinShop {
             20 => (1, vec![empty_list_with_text(21)]),
             22 => (1, vec![empty_list_with_text(23)]),
             25 => (1, vec![account_info_packet()]),
-            // Bundle content (27) and item requirements (38): the store carries one-bundle
-            // definitions, so neither request has a row to ask about; refused with no reply.
+            // T380: 66/38 is the store screen's `Opening` request (`00c047a0`). Its 66/39 reply
+            // (`00b3e490`) refreshes StoreItemRoot, and that refresh is what fills the bundle
+            // list: StoreItems only copies the store once the commerce processor is ready
+            // (`0099aa60`), one client tick after a 66/5 arrives (`00b335f0`). An empty list
+            // keeps every bundle as 66/5 sent it.
+            38 if self.marketplace_enabled() => (1, vec![counted_empty(MARKETPLACE_FAMILY, 39)]),
+            // Bundle content (27), and 66/38 with the Marketplace off: no reply.
             27 | 38 => return Ok(CoinShopOutcome::default()),
             // NpcMerchantV2 buy reply: every result other than 1 is a client-visible refusal.
             43 => (
@@ -1254,15 +1263,15 @@ fn empty_list_with_text(opcode: u16) -> Vec<u8> {
     bytes
 }
 
-/// Observed client requests (62 native traces): 66/10 and 66/18 are the bare header; 66/16, 20
-/// and 25 add an `i32` length and that many locale bytes (`en_US`). Rows with no observed sender
-/// are only length-bounded (R).
+/// Observed client requests (62 native traces): 66/10, 66/18 and 66/38 (`00c03920` builds only
+/// the header) are the bare header; 66/16, 20 and 25 add an `i32` length and that many locale
+/// bytes (`en_US`). Rows with no observed sender are only length-bounded (R).
 fn marketplace_request_is_well_formed(opcode: u16, inner: &[u8]) -> bool {
     match (opcode, inner.get(4..8)) {
         // The order body is parsed strictly by `station_cash::decode_order`; 4 KiB bounds the
         // six small strings, one detail and the preview's extra string before allocation.
         (1 | 3, _) => inner.len() <= station_cash::MAX_ORDER_PACKET,
-        (10 | 18, _) => inner.len() == 4,
+        (10 | 18 | 38, _) => inner.len() == 4,
         (16 | 20 | 25, Some(length)) => {
             let length = i32::from_le_bytes(length.try_into().unwrap());
             usize::try_from(length).is_ok_and(|n| n <= 32 && inner.len() == 8 + n)

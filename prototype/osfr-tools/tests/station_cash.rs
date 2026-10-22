@@ -458,6 +458,10 @@ fn contains_u32(bytes: &[u8], value: u32) -> bool {
 /// rides and their scaled SC prices. The pre-F387 name is kept because the integrator protects
 /// every passing test by name. The 66/5 rows are walked exactly as `00b43170`/`00b41860` read
 /// them and compared with every `stores.json` row that has an `sc_price` and is not earn-only.
+/// T380: the rows are then listed per category the way the client's StoreItems filter does
+/// (`0099f150`): a bundle's category group (+204) must be a 66/6 group, and one of that group's
+/// categories must be the selected one or below it in the 66/7 tree (`0099d7e0`). The selected
+/// category is the client's own Rides id, 139.
 #[test]
 fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     let shop = new_shop(Wallet::default(), usize::MAX);
@@ -515,7 +519,7 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         assert_eq!(reader.u32(), item, "marketing item id");
         reader.string();
         assert_eq!(reader.u32(), config.store_id);
-        assert_eq!(reader.u32(), config.category_group_id);
+        let group = reader.u32();
         reader.u8();
         for _ in 0..8 {
             reader.u32();
@@ -535,7 +539,7 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         reader.u32();
         reader.u32();
         assert_eq!(item, key, "the bundle's game item is its map key");
-        decoded.insert(key, price);
+        decoded.insert(key, (price, group));
     }
     assert_eq!(
         reader.at,
@@ -543,6 +547,66 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         "the store packet has trailing bytes"
     );
     assert_eq!(decoded.len(), 52, "the shipped listed ride count");
+
+    // 66/7 (`00b48040`/`00b43090`): counted category nodes, then the sorted byte.
+    let tree = packets
+        .iter()
+        .find(|packet| packet.starts_with(&[66, 0, 7, 0]))
+        .expect("66/7 category tree");
+    let mut reader = Reader { bytes: tree, at: 4 };
+    let mut parents = BTreeMap::new();
+    let mut names = BTreeMap::new();
+    for _ in 0..reader.u32() {
+        reader.u32();
+        let id = reader.u32();
+        names.insert(id, reader.u32());
+        reader.string();
+        reader.string();
+        parents.insert(id, reader.u32());
+        reader.u32();
+        reader.u32();
+    }
+    reader.u8();
+    assert_eq!(reader.at, tree.len(), "66/7 trailing bytes");
+    // 66/6 (`00b44d70`/`00b3ad20`): group key, group id, counted category ids.
+    let groups = packets
+        .iter()
+        .find(|packet| packet.starts_with(&[66, 0, 6, 0]))
+        .expect("66/6 category groups");
+    let mut reader = Reader {
+        bytes: groups,
+        at: 4,
+    };
+    let mut categories_of = BTreeMap::new();
+    for _ in 0..reader.u32() {
+        let key = reader.u32();
+        reader.u32();
+        let ids: Vec<u32> = (0..reader.u32()).map(|_| reader.u32()).collect();
+        categories_of.insert(key, ids);
+    }
+    assert_eq!(reader.at, groups.len(), "66/6 trailing bytes");
+    // Lua `MarketplaceCategoryIds.RIDES`, the mount screen's buy-more-rides link and the Rides
+    // portal tile (`ClientStorePortalCategories.txt`, name 27547) all open category 139.
+    const RIDES: u32 = 139;
+    assert_eq!(names.get(&RIDES), Some(&27_547), "the Rides category node");
+    let under_rides = |mut category: u32| loop {
+        if category == RIDES {
+            return true;
+        }
+        match parents.get(&category) {
+            Some(&parent) if parent != 0 => category = parent,
+            _ => return false,
+        }
+    };
+    let listed: BTreeMap<u32, u32> = decoded
+        .iter()
+        .filter(|(_, (_, group))| {
+            categories_of
+                .get(group)
+                .is_some_and(|ids| ids.iter().any(|id| under_rides(*id)))
+        })
+        .map(|(key, (price, _))| (*key, *price))
+        .collect();
 
     let stores: Value =
         serde_json::from_slice(&std::fs::read(stores()).expect("stores.json reads"))
@@ -564,8 +628,8 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         })
         .collect();
     assert_eq!(
-        decoded, expected,
-        "the store lists the shipped rides at their SC prices"
+        listed, expected,
+        "Rides lists exactly the shipped non-earn-only rides at their SC prices"
     );
 }
 
