@@ -26,8 +26,9 @@
 //!
 //! BOUNDARIES: this module is recovery metadata plus pure lookups. It does not read the client,
 //! does not send or accept a create request, does not reject a choice in production and does not
-//! change any supplied resource. Server-side login validation remains the lead's integration
-//! step, and the China head exclusion is community-table evidence, not a proven missing asset.
+//! change any supplied resource. Server-side login validation derives the same sets from the
+//! pinned creator tables (identity.rs, T444; tests/creator_allow_list.rs), and the China head
+//! exclusion is community-table evidence, not a proven missing asset.
 //!
 //! This file is a `#[path]` include so it compiles and exercises the real module before the lead
 //! registers `pub mod piece_049;` under `src/restoration/` and `src/lib.rs`.

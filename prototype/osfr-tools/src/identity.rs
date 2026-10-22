@@ -2,7 +2,12 @@
 //! against pinned Sanctuary and the supplied ClientPcData serializer; no account
 //! service, moderation system or original progression is implied.
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeMap, fs, io, path::Path};
+use sha2::{Digest, Sha256};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fs, io,
+    path::Path,
+};
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -12,7 +17,8 @@ pub struct NativeCreation {
     pub temporary_first_name: String,
     pub temporary_last_name: String,
     /// Model, head, hair, customization, face, skin; six clothing definitions;
-    /// six clothing tints; eye tint, hair tint, location, in native wire order.
+    /// six clothing tints; eye tint, hair tint, location, in native wire order
+    /// (client writer 0x00954bd0, filled at 0x007186a4..0x007187a9).
     pub choices: [i32; 21],
 }
 
@@ -203,10 +209,70 @@ pub struct Resources {
     models: BTreeMap<i32, i32>,
     mappings: [BTreeMap<i32, String>; 5],
     items: BTreeMap<i32, (Attachment, i32)>,
+    /// Skin tone and head ids the pinned creator tables offer; `None` only for a
+    /// tree with none of the allow-list inputs (see `Resources::load`).
+    pinned_looks: Option<[BTreeSet<i32>; 2]>,
+}
+
+/// Community creator tables of the client overlay (`OVERLAY` in
+/// scripts/bundle/client_overlay.py), which the native harness installs and the
+/// launcher ships (L024). Same paths and pins; tests/creator_allow_list.rs builds
+/// its tree through that overlay, so re-pinning one side alone fails the test.
+/// They drop the rows that select skin tone 7/8 and the four China heads. The
+/// client reads them from Resources/ itself: 0x008ec05d passes "Resources/" to
+/// 0x00982f10, which opens "%s%s.txt" (0x009830c9) with the name from 0x0097f570.
+/// Order is skin tone, then face type: `resolve` reads them as `[skins, heads]`.
+const PINNED_CREATOR_TABLES: [(&str, &str); 2] = [
+    (
+        "CharacterCreateCustomizationSkinTone.txt",
+        "485d20174e96c53021d9644d3ba943f0a016fb0413d1be8fa8f728bea528dd9d",
+    ),
+    (
+        "CharacterCreateCustomizationFaceType.txt",
+        "9d4d7acd63c7926ed3d4c03f99116e929061eef4ae25e1a2b6208c738f2c8525",
+    ),
+];
+
+const ITEM_MAPPINGS: &str = "CharacterCreate/CharacterCreateItemMappings.txt";
+
+/// Each pinned row's ITEM_ID goes through the item mappings (ITEM_ID column 5,
+/// row parser 0x007255e0) to an item definition whose PARAM2 (column 25, stored at
+/// +0x218 by 0x0072e050) is the skin tone or head id: ChangeItem 0x0071f030 cases 1
+/// and 9 look it up in SkinToneMappings/HeadMappings, and 0x0071875b/0x00718796
+/// copy it into creation choices 1 and 5 for the writer 0x00954bd0.
+fn pinned_looks(directory: &Path, param2: &BTreeMap<i32, i32>) -> io::Result<[BTreeSet<i32>; 2]> {
+    let mut definitions = BTreeMap::new();
+    for row in rows(&directory.join(ITEM_MAPPINGS))? {
+        if row.len() >= 6 {
+            if let (Ok(id), Ok(definition)) = (row[0].parse::<i32>(), row[5].parse::<i32>()) {
+                definitions.insert(id, definition);
+            }
+        }
+    }
+    let mut looks: [BTreeSet<i32>; 2] = Default::default();
+    for ((name, sha256), allowed) in PINNED_CREATOR_TABLES.iter().zip(&mut looks) {
+        let bytes = fs::read(directory.join(name))?;
+        if format!("{:x}", Sha256::digest(&bytes)) != *sha256 {
+            return Err(invalid("creator table does not match its pin"));
+        }
+        for row in parse_rows(bytes)? {
+            let id = row
+                .get(3)
+                .and_then(|item| item.parse::<i32>().ok())
+                .and_then(|item| definitions.get(&item))
+                .and_then(|definition| param2.get(definition))
+                .ok_or_else(|| invalid("pinned creator row does not resolve"))?;
+            allowed.insert(*id);
+        }
+    }
+    Ok(looks)
 }
 
 fn rows(path: &Path) -> io::Result<Vec<Vec<String>>> {
-    let bytes = fs::read(path)?;
+    parse_rows(fs::read(path)?)
+}
+
+fn parse_rows(bytes: Vec<u8>) -> io::Result<Vec<Vec<String>>> {
     if bytes.len() > 32 * 1024 * 1024 {
         return Err(invalid("creation resource exceeds local bound"));
     }
@@ -248,6 +314,7 @@ impl Resources {
             }
         }
         let mut items = BTreeMap::new();
+        let mut param2 = BTreeMap::new();
         for row in rows(&directory.join("CharacterCreate/ItemDefinitions.txt"))? {
             if row.len() < 42 {
                 continue;
@@ -262,15 +329,29 @@ impl Resources {
                 composite_effect_id: int(36)?,
                 slot: int(12)?,
             };
+            param2.insert(a.definition, int(25)?);
             items.insert(a.definition, (a, int(17)?));
         }
         if models.is_empty() || mappings.iter().any(BTreeMap::is_empty) || items.is_empty() {
             return Err(invalid("missing native creation resources"));
         }
+        // A tree holding any allow-list input must hold all of them, pinned: every
+        // client tree does (a stock one needs the overlay installed). Trees with none
+        // (synthetic fixtures, bundle login-resources) create unfiltered.
+        let mut pinned = directory.join(ITEM_MAPPINGS).try_exists()?;
+        for (name, _) in PINNED_CREATOR_TABLES {
+            pinned |= directory.join(name).try_exists()?;
+        }
+        let pinned_looks = if pinned {
+            Some(pinned_looks(directory, &param2)?)
+        } else {
+            None
+        };
         Ok(Self {
             models,
             mappings,
             items,
+            pinned_looks,
         })
     }
 
@@ -280,6 +361,11 @@ impl Resources {
             .models
             .get(&c[0])
             .ok_or_else(|| invalid("invalid player model"))?;
+        if let Some([skins, heads]) = &self.pinned_looks
+            && (!skins.contains(&c[5]) || !heads.contains(&c[1]))
+        {
+            return Err(invalid("look hidden by the pinned creator tables"));
+        }
         let mapping = |index: usize, id: i32| {
             self.mappings[index]
                 .get(&id)

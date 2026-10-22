@@ -30,11 +30,13 @@
 //!   rows resolve to the `FRC` hair family 78037-78066, which no creator row offers.
 //!
 //! BOUNDARIES: this module is recovery metadata plus pure lookups. It grants nothing, sends
-//! nothing and rejects nothing in production. Wiring the exclusion into creator/login
-//! validation is the lead's integration step. The China head exclusion carries community-table
-//! evidence only; the skins 7/8 exclusion additionally carries absent-asset and native-failure
-//! evidence. `HeadMappings.txt` id 4 has no creator row in either table and stays an explicit
-//! gap rather than being accepted or rejected here.
+//! nothing and rejects nothing in production. Login creation enforces the same sets in
+//! `identity::Resources::resolve` (T444), derived from the pinned creator tables rather than
+//! from these constants; `tests/creator_allow_list.rs` asserts the two agree, and head 4 is
+//! refused there because no pinned row reaches it. The China head exclusion carries
+//! community-table evidence only; the skins 7/8 exclusion additionally carries absent-asset and
+//! native-failure evidence. `HeadMappings.txt` id 4 has no creator row in either table and stays
+//! an explicit gap in this module's lookups rather than being accepted or rejected here.
 
 /// One creator character type and the PC model it binds to.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]

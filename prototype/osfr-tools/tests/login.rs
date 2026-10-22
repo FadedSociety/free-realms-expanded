@@ -663,6 +663,8 @@ fn private_self_patch_equals_supplied_compiled_serializer() {
 }
 
 #[test]
+// OSFR_CREATOR_RESOURCES is a client Resources/ with the creator overlay installed
+// (scripts/bundle/client_overlay.py): a stock tree fails the pinned-table check.
 #[ignore = "requires private native creator capture, resource tables and login key"]
 fn private_actual_native_creation_resolves_against_supplied_resources() {
     use osfr_tools::{
