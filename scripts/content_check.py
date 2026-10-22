@@ -1278,7 +1278,7 @@ class Checker:
             "craft_recipe": ("recipe_id", "quantity"), "finish_minigame": ("minigame_id", "count"),
             "equip_item": ("definition_id", None), "visit_position": ("zone_id", None),
             "interact_actor": ("actor_guid", None), "complete_dungeon": ("encounter_id", None),
-            "client_reported": ("client_id", None),
+            "client_reported": ("client_id", None), "job_level": ("profile_id", None),
         }
         seen = set()
         for index, goal in enumerate(goals):
@@ -1303,10 +1303,17 @@ class Checker:
                 valid_target = type(target) is int and 1 <= target <= 0xffffffffffffffff
             elif key in ("item_id", "definition_id", "client_id"):
                 valid_target = type(target) is int and 1 <= target <= 0x7fffffff
+            elif key == "profile_id":
+                valid_target = (type(target) is int and 1 <= target <= 0x7fffffff
+                                and target in self.job_profiles)
             if not valid_target:
                 error(field + "." + key, target, "invalid quest objective target")
             if count and not positive(goal.get(count)):
                 error(field + "." + count, goal.get(count), "objective count must be 1..1000000")
+            if goal["kind"] == "job_level":
+                level = goal.get("level")
+                if not (type(level) is int and 1 <= level <= 20):
+                    error(field + ".level", level, "job_level level must be 1..=20")
             if goal["kind"] in ("visit_position", "reach_poi"):
                 position, radius, zone = goal.get("position"), goal.get("radius"), goal.get("zone_id")
                 if not (type(zone) is int and 0 <= zone <= 0xffffffff

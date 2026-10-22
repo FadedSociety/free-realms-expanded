@@ -11,9 +11,13 @@
 //!
 //! Resolved objective kinds: `talk_to_npc`, `interact_actor`, `reach_poi`,
 //! `defeat`, `collect_item`, `equip_item`, `craft_recipe`, `complete_dungeon`,
-//! `finish_minigame` and `gather_resource`. The last six additionally resolve
-//! their target id in the id sets owned by `tests/support/quest_target_sets.rs`,
-//! which names the owning loader and every `FinishMinigame` emitter. A
+//! `finish_minigame`, `gather_resource` and `job_level`. The item, recipe,
+//! dungeon, minigame and gather kinds additionally resolve their target ids in
+//! the id sets owned by `tests/support/quest_target_sets.rs`, which names the
+//! owning loader and every `FinishMinigame` emitter. A `job_level` target is
+//! proved through the production profile loader (`Profiles::load`): the profile
+//! must exist in the loaded profile content and its 100-XP rank at the objective
+//! level must be that level (1..=20). A
 //! `finish_minigame` id the content defines but no server path can emit (derby
 //! 39 today) is refused with that reason instead of being certified, and
 //! `shipped_minigame_producers_are_pinned` fails if the accepted set drifts.
@@ -51,8 +55,9 @@ mod quest_catalogue_fixture;
 #[path = "support/quest_target_sets.rs"]
 mod quest_target_sets;
 
-use npc_quest_chain::{content_dir, read_json};
+use npc_quest_chain::{content_dir, read_json, reference_content};
 use osfr_tools::{
+    profiles::{ProfileState, Profiles},
     quest_engine::{CharacterEligibility, QuestEngine},
     world::NpcVisibility,
 };
@@ -234,7 +239,7 @@ impl Catalogue {
     /// Objective kinds whose target this gate resolves. Everything else is only
     /// bounded by the split loader; the target test prints the gap.
     fn unchecked_objective_kinds(&self) -> BTreeSet<&str> {
-        const CHECKED: [&str; 10] = [
+        const CHECKED: [&str; 11] = [
             "talk_to_npc",
             "interact_actor",
             "reach_poi",
@@ -245,6 +250,7 @@ impl Catalogue {
             "complete_dungeon",
             "finish_minigame",
             "gather_resource",
+            "job_level",
         ];
         self.enabled()
             .flat_map(|quest| quest.objectives.iter())
@@ -384,6 +390,9 @@ impl Catalogue {
                             ));
                         }
                     }
+                    "job_level" => {
+                        self.job_level_violation(&mut violations, &owner, goal);
+                    }
                     _ => {}
                 }
             }
@@ -400,6 +409,43 @@ impl Catalogue {
             violations.push(format!(
                 "{owner}: target {target} is not in the production 35/2 draw set"
             ));
+        }
+    }
+
+    /// T361: a job-level target is proved through the production profile loader.
+    /// The explicit profile state also proves the profile exists: `Profiles::load`
+    /// rejects an unlocked id the loaded profile content does not declare.
+    fn job_level_violation(&self, violations: &mut Vec<String>, owner: &str, goal: &Value) {
+        let profile = goal["profile_id"]
+            .as_i64()
+            .and_then(|id| i32::try_from(id).ok());
+        let level = goal["level"]
+            .as_u64()
+            .and_then(|level| u8::try_from(level).ok());
+        let (Some(profile), Some(level)) = (profile, level) else {
+            violations.push(format!("{owner}: job_level needs a profile id and a level"));
+            return;
+        };
+        if profile <= 0 || !(1..=20).contains(&level) {
+            violations.push(format!(
+                "{owner}: job_level profile must be positive and level 1..=20"
+            ));
+            return;
+        }
+        let state = ProfileState {
+            version: 1,
+            active: profile,
+            unlocked: BTreeSet::from([profile]),
+            experience: BTreeMap::from([(profile, u32::from(level - 1) * 100)]),
+        };
+        match Profiles::load(&reference_content(), Some(state)) {
+            Ok(profiles) if profiles.rank(profile) == u32::from(level) => {}
+            Ok(_) => violations.push(format!(
+                "{owner}: job_level rank {level} is not on the production profile curve"
+            )),
+            Err(error) => violations.push(format!(
+                "{owner}: job_level profile {profile} is absent from the loaded profile content: {error}"
+            )),
         }
     }
 

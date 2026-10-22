@@ -43,6 +43,17 @@ impl Gameplay {
         self.saved_npc_quests = None;
         self.register_breadcrumb_crosswalk(crosswalk);
         self.refresh_npc_quest_eligibility(current_unix_seconds());
+        // Bind is the load-time level-change notification. The login packet sync
+        // (`append_npc_quest_login_sync`) rebuilds the 49/3 + completion frames from
+        // this committed state, so dropping the staging outcome here loses nothing.
+        // The sync also re-arms session-only client-objective registrations
+        // (45/6, 45/10, 45/11), whose packets would be dropped with it; keep the
+        // session's view of them and let the login/`handle_in_world` sync send them.
+        let client_objectives = std::mem::take(&mut self.client_objectives);
+        let mut sync = Outcome::default();
+        let synced = self.sync_job_level_objectives(&mut sync);
+        self.client_objectives = client_objectives;
+        synced?;
         Ok(())
     }
 
@@ -131,6 +142,40 @@ impl Gameplay {
         if let Some(engine) = &mut self.npc_quests {
             engine.set_eligibility(eligibility);
         }
+    }
+
+    /// Emit one authoritative `QuestEvent::JobLevel` for every open job-level goal
+    /// the character's current rank satisfies. Active quests only; the caller runs
+    /// it where the rank can have changed (an XP award, the developer level, an
+    /// accept, a turn-in, a reward settlement or a catalogue bind), never on a
+    /// steady tick or an unrelated packet. Idempotent: a satisfied goal is no
+    /// longer open, so a repeat emits nothing and changes nothing.
+    pub(super) fn sync_job_level_objectives(&mut self, out: &mut Outcome) -> io::Result<()> {
+        let Some(engine) = &self.npc_quests else {
+            return Ok(());
+        };
+        let goals = engine.open_job_level_objectives();
+        if goals.is_empty() {
+            return Ok(());
+        }
+        let Some(profiles) = &self.profiles else {
+            return Ok(());
+        };
+        let satisfied: Vec<_> = goals
+            .into_iter()
+            .filter_map(|(profile_id, level)| {
+                // (R) Same 100-XP rank curve as the quest gate and `job_level`.
+                let rank = profiles.rank(profile_id) as u8;
+                (rank >= level).then_some((profile_id, rank))
+            })
+            .collect();
+        for (profile_id, level) in satisfied {
+            self.npc_quest_event(
+                crate::quest_engine::QuestEvent::JobLevel { profile_id, level },
+                out,
+            )?;
+        }
+        Ok(())
     }
 
     pub(super) fn append_npc_quest_outcome(

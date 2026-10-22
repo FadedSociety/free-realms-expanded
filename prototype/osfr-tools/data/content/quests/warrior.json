@@ -274,11 +274,43 @@
     },
     {
       "id": 3150005,
+      "job": 32,
       "title_string_id": 387433,
       "giver_npc_id": 9000000208,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3150004
+      ],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 32,
+          "level": 5,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Warrior.md: Quest line > Band 1: level 1 to 5, row W5; client text 248116931 'Reach level 5 as a warrior, then return to Steele.'; wait text 1524930698; journal 2755651467 'Achieve Level 5 as a Warrior'; the level-5 ability is Spinning Blade (row 5 of the ability table). The target is the Warrior job (profile 32)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T361: the client text names the job and level; the server side is one authoritative job_level objective. It completes from the server's own Profiles::rank curve, never from a Talk or a client claim, and no packet field is added."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T361: W5's guide reward cell is unknown; 15 coins are this task's reconstructed gate-quest payout, paid once by the 49/14 turn-in. The client text 'Reach level 5 as a warrior, then return to Steele.' (248116931) and Warrior guide row W5 are the reward evidence. No item and no job XP are granted, so the pinned quest_job_xp table is untouched."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -298,29 +330,37 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+          "evidence": "(R) T361: W5 becomes one job_level objective at profile 32 and level 5, using the client text 'Reach level 5 as a warrior, then return to Steele.' (248116931) and journal 2755651467. The objective kind is a local server binding; the client only shows the existing objective counters."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T361: the preceding Band 1 chapter step is 3150004 'Warrior: One With Your Weapon' (row W4), so W5 is offered after it. W2 and W3 remain unbuilt, disabled records."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T361: job gate 32 keeps W5 Warrior-only, matching the guide's W5 row and the Spinning Blade unlock; the gate also guarantees the reward profile is unlocked. data/content/jobs.json already lists 3150005 in the Warrior union."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T361: the reward is a coins-only 15-coin gate payout; the guide's reward cell is unknown. No item and no job XP are granted, so the pinned quest_job_xp table is unchanged. The 15 and the row are (R)."
         },
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T361: enabled now that job_level exists and Steele 9000000208 is drawable through npc_spawns_extra.json. The server enforces the level target; a Talk objective cannot."
         }
       ],
       "description_string_id": 387434,
       "intro_text_string_id": 387432,
       "end_text_string_id": 387435,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3150006,

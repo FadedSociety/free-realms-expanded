@@ -49,7 +49,7 @@ pub fn content_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
 }
 
-fn reference_content() -> PathBuf {
+pub fn reference_content() -> PathBuf {
     std::env::var_os("OSFR_NPC_QUEST_CHAIN_CONTENT")
         .map(PathBuf::from)
         .unwrap_or_else(|| {

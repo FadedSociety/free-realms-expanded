@@ -313,6 +313,12 @@ pub enum ObjectiveKind {
     SelectJob {
         profile_id: i32,
     },
+    /// A job-rank gate (Warrior W5). The event must name the same profile and
+    /// carry at least `level`; the goal completes once and never regresses (R).
+    JobLevel {
+        profile_id: i32,
+        level: u8,
+    },
     EquipItem {
         definition_id: i32,
     },
@@ -601,22 +607,66 @@ pub enum OutboundMessage {
 
 #[derive(Clone, Debug, PartialEq)]
 pub enum QuestEvent {
-    TalkToNpc { npc_id: u64 },
-    KillActorKind { actor_kind_id: u32, count: u32 },
-    CollectItem { item_id: i32, quantity: u32 },
-    EnterArea { area_id: u32 },
-    ReachPoi { poi_id: u32 },
-    FinishMinigame { minigame_id: u32 },
-    UseItem { item_id: i32, quantity: u32 },
-    InteractNpc { npc_id: u64 },
-    GatherResource { resource_id: u32, quantity: u32 },
-    CraftRecipe { recipe_id: u32, quantity: u32 },
-    SelectJob { profile_id: i32 },
-    EquipItem { definition_id: i32 },
-    CompleteDungeon { encounter_id: u32 },
-    UseAbility { ability_id: i32 },
-    VisitPosition { zone_id: u32, position: [f32; 3] },
-    ClientReported { client_id: u32 },
+    TalkToNpc {
+        npc_id: u64,
+    },
+    KillActorKind {
+        actor_kind_id: u32,
+        count: u32,
+    },
+    CollectItem {
+        item_id: i32,
+        quantity: u32,
+    },
+    EnterArea {
+        area_id: u32,
+    },
+    ReachPoi {
+        poi_id: u32,
+    },
+    FinishMinigame {
+        minigame_id: u32,
+    },
+    UseItem {
+        item_id: i32,
+        quantity: u32,
+    },
+    InteractNpc {
+        npc_id: u64,
+    },
+    /// An authoritative job rank after a level change. The match is profile-exact
+    /// and completes when this rank is at least the objective level (R).
+    JobLevel {
+        profile_id: i32,
+        level: u8,
+    },
+    GatherResource {
+        resource_id: u32,
+        quantity: u32,
+    },
+    CraftRecipe {
+        recipe_id: u32,
+        quantity: u32,
+    },
+    SelectJob {
+        profile_id: i32,
+    },
+    EquipItem {
+        definition_id: i32,
+    },
+    CompleteDungeon {
+        encounter_id: u32,
+    },
+    UseAbility {
+        ability_id: i32,
+    },
+    VisitPosition {
+        zone_id: u32,
+        position: [f32; 3],
+    },
+    ClientReported {
+        client_id: u32,
+    },
 }
 
 impl From<OpeningTrigger> for ObjectiveKind {
@@ -2129,6 +2179,22 @@ fn definition_from_content(
                     ));
                 }
             }
+            ContentGoal::JobLevel {
+                profile_id,
+                level,
+                source,
+                ..
+            } => {
+                if *profile_id <= 0
+                    || !job_profile_ids.values().any(|known| known == profile_id)
+                    || !(1..=20).contains(level)
+                    || source.is_empty()
+                {
+                    return Err(invalid(
+                        "job_level objective requires a known positive profile, level 1..=20 and provenance",
+                    ));
+                }
+            }
             _ => {}
         }
     }
@@ -2275,6 +2341,20 @@ fn definition_from_content(
                 description: format!("Objective {}", id),
                 kind: ObjectiveKind::CompleteDungeon {
                     encounter_id: *encounter_id,
+                },
+            },
+            ContentGoal::JobLevel {
+                id,
+                profile_id,
+                level,
+                ..
+            } => QuestObjective {
+                id: *id,
+                required: 1,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::JobLevel {
+                    profile_id: *profile_id,
+                    level: *level,
                 },
             },
         })
@@ -2529,6 +2609,9 @@ fn valid_objective_kind(kind: &ObjectiveKind) -> bool {
         ObjectiveKind::GatherResource { resource_id } => *resource_id != 0,
         ObjectiveKind::CraftRecipe { recipe_id } => *recipe_id != 0,
         ObjectiveKind::SelectJob { profile_id } => *profile_id > 0,
+        ObjectiveKind::JobLevel { profile_id, level } => {
+            *profile_id > 0 && (1..=20).contains(level)
+        }
         ObjectiveKind::EquipItem { definition_id } => *definition_id > 0,
         ObjectiveKind::CompleteDungeon { encounter_id } => *encounter_id != 0,
         ObjectiveKind::UseAbility { ability_id } => *ability_id > 0,
@@ -2593,6 +2676,7 @@ fn validate_event(event: &QuestEvent) -> io::Result<()> {
         | QuestEvent::UseAbility {
             ability_id: profile_id,
         } => *profile_id > 0,
+        QuestEvent::JobLevel { profile_id, level } => *profile_id > 0 && (1..=20).contains(level),
         QuestEvent::EquipItem { definition_id } => *definition_id > 0,
         QuestEvent::CompleteDungeon { encounter_id } => *encounter_id != 0,
         QuestEvent::ClientReported { client_id } => (1..=i32::MAX as u32).contains(client_id),
@@ -2695,6 +2779,16 @@ fn event_matches(kind: &ObjectiveKind, event: &QuestEvent) -> u32 {
             ObjectiveKind::ClientReported { client_id: a, .. },
             QuestEvent::ClientReported { client_id: b },
         ) if a == b => 1,
+        (
+            ObjectiveKind::JobLevel {
+                profile_id: a,
+                level: objective_level,
+            },
+            QuestEvent::JobLevel {
+                profile_id: b,
+                level: event_level,
+            },
+        ) if a == b && event_level >= objective_level => 1,
         _ => 0,
     }
 }
@@ -2727,6 +2821,21 @@ impl QuestEngine {
             .flat_map(|quest_id| self.current_objectives(*quest_id))
             .filter_map(|objective| match &objective.kind {
                 ObjectiveKind::ClientReported { client_id, trigger } => Some((*client_id, trigger)),
+                _ => None,
+            })
+            .collect()
+    }
+
+    /// The open job-level goals of the character's active quests. `current_objectives`
+    /// already limits an ordered quest to its first unfinished step, so a later goal
+    /// cannot be credited early.
+    pub fn open_job_level_objectives(&self) -> Vec<(i32, u8)> {
+        self.state
+            .quests
+            .keys()
+            .flat_map(|quest_id| self.current_objectives(*quest_id))
+            .filter_map(|objective| match &objective.kind {
+                ObjectiveKind::JobLevel { profile_id, level } => Some((*profile_id, *level)),
                 _ => None,
             })
             .collect()

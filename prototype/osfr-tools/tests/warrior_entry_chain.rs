@@ -1,6 +1,7 @@
 //! T257: the first playable Warrior chapter, "Becoming a Warrior" (3150001) and
 //! "Warrior: One With Your Weapon" (3150004), plus the drawable Morninglory and
-//! Steele spawns that make the chapter reachable.
+//! Steele spawns that make the chapter reachable. T361 enables the level gate
+//! "Warrior: Achieve Level 5" (3150005), so this file also pins its record shape.
 //!
 //! The chapter is content-only; these tests drive the production in-world router
 //! (`Gameplay::handle_in_world` -> `gameplay/npc.rs` -> `QuestEngine`), the same path
@@ -820,7 +821,7 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
         );
     }
 
-    // ---- record table: exactly W1 and W4 are enabled, the rest stay hollow --
+    // ---- record table: W1, W4 and the W5 level gate are enabled; the rest stay hollow --
     let document = read_json(&content_dir().join("quests/warrior.json"));
     let records = document["records"].as_array().unwrap();
     let ids: Vec<u64> = records
@@ -841,9 +842,12 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
             .iter()
             .map(|row| row["id"].as_u64().unwrap())
             .collect::<Vec<_>>(),
-        vec![u64::from(W1), u64::from(W4)]
+        vec![u64::from(W1), u64::from(W4), u64::from(W5)]
     );
     for record in &enabled {
+        if record["id"].as_u64() == Some(u64::from(W5)) {
+            continue; // the level gate has its own shape below
+        }
         assert_eq!(record["job"].as_i64(), Some(i64::from(WARRIOR)));
         assert!(
             record["source"]
@@ -920,11 +924,27 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
     assert_eq!(w4["objectives"][0]["npc_id"].as_u64(), Some(STEELE));
     assert!(w4.get("end_text_string_id").is_none());
 
+    let w5 = records
+        .iter()
+        .find(|row| row["id"].as_u64() == Some(u64::from(W5)))
+        .unwrap();
+    assert_eq!(w5["enabled"].as_bool(), Some(true));
+    assert_eq!(w5["job"].as_i64(), Some(i64::from(WARRIOR)));
+    assert_eq!(w5["objectives"][0]["kind"], "job_level");
+    assert_eq!(
+        w5["objectives"][0]["profile_id"].as_i64(),
+        Some(i64::from(WARRIOR))
+    );
+    assert_eq!(w5["objectives"][0]["level"].as_u64(), Some(5));
+    assert_eq!(w5["rewards"][0]["coins"].as_u64(), Some(15));
+    assert_eq!(w5["rewards"][0]["items"], serde_json::json!([]));
+    assert_eq!(w5["rewards"][0]["job_xp"], serde_json::json!({}));
+
     // Every other Warrior record stays disabled and hollow, with the fields the
     // generated content already carried.
     for record in records {
         let id = record["id"].as_u64().unwrap();
-        if id == u64::from(W1) || id == u64::from(W4) {
+        if id == u64::from(W1) || id == u64::from(W4) || id == u64::from(W5) {
             continue;
         }
         assert_eq!(record["enabled"].as_bool(), Some(false), "quest {id}");
@@ -934,7 +954,7 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
     for (id, title, giver, prerequisites) in [
         (W2, 77_223_u64, 9_000_000_302_u64, vec![u64::from(W1)]),
         (W3, 70_893, 9_000_000_302, vec![u64::from(W2)]),
-        (W5, 387_433, 9_000_000_208, vec![]),
+        (W5, 387_433, 9_000_000_208, vec![u64::from(W4)]),
     ] {
         let record = records
             .iter()

@@ -284,8 +284,14 @@ impl Gameplay {
                     "rejected"
                 }
             }));
+            let changed = result.changed;
             let mut out = Outcome::default();
             self.append_npc_quest_outcome(result, &mut out)?;
+            // T361: an accept can complete a job-level goal the character already
+            // meets. A refused accept has changed == false and changes nothing.
+            if accept && changed {
+                self.sync_job_level_objectives(&mut out)?;
+            }
             // End the NPC dialog so the client leaves dialog camera and restores
             // the HUD (native run 200411 stayed in dialog view after accepting).
             out.replies.push(END_DIALOG_26_4.to_vec());
@@ -345,6 +351,9 @@ impl Gameplay {
             self.refresh_npc_quest_eligibility(current_unix_seconds());
             let mut out = Outcome::default();
             self.append_npc_quest_outcome(quest, &mut out)?;
+            // T361: a quest's own job XP can raise the level that another active
+            // job-level goal watches, so the turn-in notifies like every level path.
+            self.sync_job_level_objectives(&mut out)?;
             out.replies.push(END_DIALOG_26_4.to_vec());
             return Ok(Some(out));
         }

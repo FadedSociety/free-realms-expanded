@@ -198,6 +198,14 @@ pub enum ContentGoal {
         zone_id: u32,
         source: Vec<SourceTag>,
     },
+    /// (R) The character's job rank reaches `level`: one authoritative server fact
+    /// from the `Profiles::rank` 100-XP curve. `profile_id` is a jobs.json profile id.
+    JobLevel {
+        id: u32,
+        profile_id: i32,
+        level: u8,
+        source: Vec<SourceTag>,
+    },
     // W104 runtime kinds; same fields as quest_engine::RuntimeGoal.
     GatherResource {
         id: u32,
@@ -259,6 +267,7 @@ impl ContentGoal {
             | Self::CollectItem { id, .. }
             | Self::ReachPoi { id, .. }
             | Self::VisitZone { id, .. }
+            | Self::JobLevel { id, .. }
             | Self::GatherResource { id, .. }
             | Self::CraftRecipe { id, .. }
             | Self::FinishMinigame { id, .. }
@@ -752,7 +761,7 @@ impl ContentDb {
                 )?;
             }
             for goal in &row.objectives {
-                validate_goal(&owner, goal, &zones, &npcs, &pois, &items)?;
+                validate_goal(&owner, goal, &zones, &npcs, &pois, &items, &job_profiles)?;
             }
             for reward in &row.rewards {
                 validate_reward(&owner, reward, &items, &job_profiles)?;
@@ -801,7 +810,15 @@ impl ContentDb {
                     encounter.goals.iter().map(|goal| goal.id().to_string()),
                 )?;
                 for goal in &encounter.goals {
-                    validate_goal(&encounter_owner, goal, &zones, &npcs, &pois, &items)?;
+                    validate_goal(
+                        &encounter_owner,
+                        goal,
+                        &zones,
+                        &npcs,
+                        &pois,
+                        &items,
+                        &job_profiles,
+                    )?;
                 }
                 for reward in &encounter.rewards {
                     validate_reward(&encounter_owner, reward, &items, &job_profiles)?;
@@ -836,6 +853,7 @@ fn check_goal_sources(owner: &str, goal: &ContentGoal) -> Result<(), ContentErro
         | ContentGoal::CollectItem { id, source, .. }
         | ContentGoal::ReachPoi { id, source, .. }
         | ContentGoal::VisitZone { id, source, .. }
+        | ContentGoal::JobLevel { id, source, .. }
         | ContentGoal::GatherResource { id, source, .. }
         | ContentGoal::CraftRecipe { id, source, .. }
         | ContentGoal::FinishMinigame { id, source, .. }
@@ -879,6 +897,7 @@ fn validate_goal(
     npcs: &HashSet<String>,
     pois: &HashSet<String>,
     items: &HashSet<String>,
+    job_profiles: &HashSet<String>,
 ) -> Result<(), ContentError> {
     match goal {
         ContentGoal::Defeat { .. } => Ok(()),
@@ -906,6 +925,23 @@ fn validate_goal(
             zone_id,
             zones.contains(&zone_id.to_string()),
         ),
+        ContentGoal::JobLevel {
+            profile_id, level, ..
+        } => {
+            reference(
+                owner,
+                "goal.profile_id",
+                profile_id,
+                *profile_id > 0 && job_profiles.contains(&profile_id.to_string()),
+            )?;
+            if !(1..=20).contains(level) {
+                return Err(ContentError::InvalidRecord {
+                    record: owner.to_owned(),
+                    detail: "goal.level must be 1..=20".to_owned(),
+                });
+            }
+            Ok(())
+        }
         ContentGoal::EquipItem { definition_id, .. } => reference(
             owner,
             "goal.definition_id",

@@ -1967,6 +1967,7 @@ impl Gameplay {
                     crate::quest_engine::QuestEvent::FinishMinigame { minigame_id },
                     &mut out,
                 )?;
+                staged.sync_job_level_objectives(&mut out)?;
             }
             *self = staged;
             return Ok(out);
@@ -2744,6 +2745,7 @@ impl Gameplay {
                     crate::quest_engine::QuestEvent::FinishMinigame { minigame_id },
                     &mut out,
                 )?;
+                self.sync_job_level_objectives(&mut out)?;
             }
             return Ok(out);
         }
@@ -2957,6 +2959,7 @@ impl Gameplay {
                 }
                 self.sync_player_level(out);
                 self.refresh_npc_quest_eligibility(current_unix_seconds());
+                self.sync_job_level_objectives(out)?;
                 say(out, format!("Job {profile} is now level {level}."));
             }
             ["heal"] => {
@@ -4869,6 +4872,7 @@ impl Gameplay {
             out.replies.extend(profiles.experience_packets(previous_xp));
         }
         self.refresh_npc_quest_eligibility(current_unix_seconds());
+        self.sync_job_level_objectives(out)?;
         Ok(())
     }
 
@@ -5207,6 +5211,8 @@ impl Gameplay {
         }
         if after != before {
             self.sync_player_level(out);
+            // T361: only a rank change can satisfy an open job-level goal.
+            self.sync_job_level_objectives(out)?;
         }
         Ok(())
     }
