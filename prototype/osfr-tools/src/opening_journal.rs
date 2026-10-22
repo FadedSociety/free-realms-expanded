@@ -244,8 +244,7 @@ impl OpeningJournal {
         message: &[u8],
         entries: &[OpeningJournalEntry],
     ) -> io::Result<Vec<u8>> {
-        validate_entries(entries)?;
-        self.validate_presentation(entries)?;
+        let journal = self.journal(entries)?;
         if message.len() < 13
             || message.len() > MAX_BYTES
             || message[..3] != [5, 0, 1]
@@ -267,6 +266,26 @@ impl OpeningJournal {
                 "native self journal differs from unique verified reference span",
             ));
         }
+        let mut result = Vec::with_capacity(message.len() - self.original.len() + journal.len());
+        result.extend_from_slice(&message[..self.offset]);
+        result.extend(journal);
+        result.extend_from_slice(&message[end..]);
+        if result.len() > MAX_BYTES {
+            return Err(invalid("opening journal self packet exceeds size limit"));
+        }
+        let tunnel_length = (result.len() - 7) as u32;
+        let self_length = (result.len() - 13) as u32;
+        result[3..7].copy_from_slice(&tunnel_length.to_le_bytes());
+        result[9..13].copy_from_slice(&self_length.to_le_bytes());
+        Ok(result)
+    }
+
+    /// The self-data journal span (`00940c60`) holding only these entries: the accepted,
+    /// unrewarded quests, the rewarded count, the first of them selected (or -1) and the
+    /// captured quest limits.
+    pub fn journal(&self, entries: &[OpeningJournalEntry]) -> io::Result<Vec<u8>> {
+        validate_entries(entries)?;
+        self.validate_presentation(entries)?;
         let active: Vec<_> = entries.iter().filter(|entry| visible(entry)).collect();
         let mut journal = Vec::new();
         integer(&mut journal, active.len() as i32);
@@ -280,18 +299,7 @@ impl OpeningJournal {
         );
         journal.push(0); // Selection-policy flag: no inherited research selection.
         journal.extend(self.root_unknown);
-        let mut result = Vec::with_capacity(message.len() - self.original.len() + journal.len());
-        result.extend_from_slice(&message[..self.offset]);
-        result.extend(journal);
-        result.extend_from_slice(&message[end..]);
-        if result.len() > MAX_BYTES {
-            return Err(invalid("opening journal self packet exceeds size limit"));
-        }
-        let tunnel_length = (result.len() - 7) as u32;
-        let self_length = (result.len() - 13) as u32;
-        result[3..7].copy_from_slice(&tunnel_length.to_le_bytes());
-        result[9..13].copy_from_slice(&self_length.to_le_bytes());
-        Ok(result)
+        Ok(journal)
     }
 
     /// Return INNER native packets; the gateway adds the normal tunnel wrapper.

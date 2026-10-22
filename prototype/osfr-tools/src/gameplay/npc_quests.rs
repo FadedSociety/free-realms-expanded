@@ -391,4 +391,31 @@ impl Gameplay {
         self.npc_quests_synced = true;
         Ok(())
     }
+
+    /// The login self-data quest journal (`00940c60`): this character's own quests, never
+    /// the captured character's. Opening content owns it when loaded (its accepted,
+    /// unrewarded stages); otherwise the captured records of the local quests the character
+    /// holds (1617, with its bound counter); with no gameplay, none. Split quests stay out:
+    /// `append_npc_quest_login_sync` adds them with 49/3, and the client inserts without a
+    /// duplicate check (`009225d0` -> `008e9330`), so listing them here would show them twice.
+    pub fn write_self_quests(
+        game: Option<&Self>,
+        data: &mut crate::startup_selfdata::SelfData,
+    ) -> io::Result<()> {
+        use crate::startup_selfdata::{replace_quest_journal, retain_quests};
+        let Some(game) = game else {
+            retain_quests(data, |_| false, 0);
+            return Ok(());
+        };
+        data.quests = game.quests.state().clone();
+        if let (Some(journal), Some(opening)) = (&game.journal, &game.opening) {
+            replace_quest_journal(data, &journal.journal(&opening.journal_entries())?);
+            return Ok(());
+        }
+        let quests = &game.quests.state().quests;
+        let completed = quests.values().filter(|quest| quest.rewarded).count() as i32;
+        let own = |id| quests.get(&id).is_some_and(|q| q.accepted && !q.rewarded);
+        retain_quests(data, own, completed);
+        Ok(())
+    }
 }

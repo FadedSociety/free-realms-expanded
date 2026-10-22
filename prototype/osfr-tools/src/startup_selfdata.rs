@@ -39,7 +39,9 @@ pub struct SelfData {
     pub inventory: inventory::InventoryState,
     pub gender: u32,
     /// Native quest-list structure with unnamed fixed fields retained as bytes.
-    /// Bound counters are overlaid from `quests` using `quest_bindings`.
+    /// Bound counters are overlaid from `quests` using `quest_bindings`. The captured
+    /// first list is the original character's; every login replaces it with the
+    /// character's own (`Gameplay::write_self_quests`, T623).
     pub quest_records: QuestRecords,
     pub quests: quests::QuestState,
     /// (R) Bindings imported from the gateway's local quest content. Offsets
@@ -212,6 +214,13 @@ pub struct QuestFirstRecord {
     pub objectives: Vec<QuestObjectiveRecord>,
     /// (R) Fixed six-byte record tail.
     pub tail: [u8; 6],
+}
+
+impl QuestFirstRecord {
+    /// The record's first dword, the quest id (`0093c840`, runtime `+0`).
+    pub fn quest_id(&self) -> u32 {
+        u32::from_le_bytes(self.prefix[..4].try_into().unwrap())
+    }
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -706,7 +715,9 @@ fn parse_collection_rows(cursor: &mut Cursor<'_>) -> Vec<CollectionRecord> {
     records
 }
 
-fn parse_quest_records(cursor: &mut Cursor<'_>) -> QuestRecords {
+/// `00940c60` (quest manager, player `+0x1add0`): the quest list, then the 17-byte tail
+/// (completed count, selected quest, auto-switch byte, two quest limits).
+fn parse_quest_journal(cursor: &mut Cursor<'_>) -> (Vec<QuestFirstRecord>, [u8; 17]) {
     let first_count = cursor.count(113);
     let first = (0..first_count)
         .map(|_| QuestFirstRecord {
@@ -716,7 +727,11 @@ fn parse_quest_records(cursor: &mut Cursor<'_>) -> QuestRecords {
             tail: cursor.take(6).try_into().unwrap(),
         })
         .collect();
-    let first_tail = cursor.take(17).try_into().unwrap();
+    (first, cursor.take(17).try_into().unwrap())
+}
+
+fn parse_quest_records(cursor: &mut Cursor<'_>) -> QuestRecords {
+    let (first, first_tail) = parse_quest_journal(cursor);
 
     let second_count = cursor.count(127);
     let second = (0..second_count)
@@ -1013,6 +1028,39 @@ fn overlay_quest_state(
         let value = i32::try_from(*value).expect("quest progress exceeds native i32 field");
         target.copy_from_slice(&value.to_le_bytes());
     }
+}
+
+/// Keep only the quest records `own` accepts, so a character never inherits the captured
+/// character's journal. Bound counters are written in first: the bindings index the captured
+/// span, so they are spent here. The tail's completed count and selection described the
+/// captured character: they become `completed`, the first kept quest (or -1) and auto-switch
+/// off, as the opening journal writes them (R); the two limits after them stay.
+pub fn retain_quests(data: &mut SelfData, own: impl Fn(u32) -> bool, completed: i32) {
+    let mut wire = Vec::new();
+    write_quest_records(&mut wire, &data.quest_records);
+    overlay_quest_state(&mut wire, &data.quests, &data.quest_bindings);
+    data.quest_bindings.clear();
+    let (mut first, mut tail) = parse_quest_journal(&mut Cursor::new(&wire));
+    first.retain(|record| own(record.quest_id()));
+    let selected = first.first().map_or(-1, |record| record.quest_id() as i32);
+    tail[..4].copy_from_slice(&completed.to_le_bytes());
+    tail[4..8].copy_from_slice(&selected.to_le_bytes());
+    tail[8] = 0;
+    data.quest_records.first = first;
+    data.quest_records.first_tail = tail;
+}
+
+/// Replace the quest list and its tail with a server-built `00940c60` span. The captured
+/// bindings point into the replaced span, so they are dropped.
+pub fn replace_quest_journal(data: &mut SelfData, span: &[u8]) {
+    let mut cursor = Cursor::new(span);
+    (data.quest_records.first, data.quest_records.first_tail) = parse_quest_journal(&mut cursor);
+    assert_eq!(
+        cursor.remaining(),
+        0,
+        "quest journal span has trailing bytes"
+    );
+    data.quest_bindings.clear();
 }
 
 /// Parse opcode 12 using the quest binding recovered by the existing local

@@ -156,6 +156,7 @@ fn built_startup_sequence_matches_the_captured_character_byte_for_byte() {
 
 /// T448: a fresh login sends none of the captured player's collected entries, so the
 /// expected self-data (startup index 7) is the capture with every collected byte cleared.
+/// T623: nor its quests: an empty list, nothing completed, nothing selected (-1).
 fn fresh_character(index: usize, captured: Vec<u8>) -> Vec<u8> {
     if index != 7 {
         return captured;
@@ -164,7 +165,14 @@ fn fresh_character(index: usize, captured: Vec<u8>) -> Vec<u8> {
     for row in data.collections.iter_mut().flat_map(|c| &mut c.keyed_rows) {
         row.payload[28] = 0;
     }
+    no_quests(&mut data);
     typed_selfdata::build_self(&data)
+}
+
+fn no_quests(data: &mut typed_selfdata::SelfData) {
+    data.quest_bindings.clear(); // they index the captured list
+    data.quest_records.first.clear();
+    data.quest_records.first_tail[..9].copy_from_slice(&[0, 0, 0, 0, 255, 255, 255, 255, 0]);
 }
 
 #[test]
@@ -190,6 +198,7 @@ fn typed_startup_builder_serializes_session_position_and_preserves_tail() {
         } else if index == 7 {
             let original = fs::read(reference.directory.join(format!("{index:04}.bin"))).unwrap();
             let mut data = typed_selfdata::parse_self_with_quest_bindings(&original, &[]);
+            no_quests(&mut data);
             data.identity.guid = state.guid;
             for component in 0..3 {
                 data.transform.position[component] = state.position[component].to_bits();
