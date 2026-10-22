@@ -60,16 +60,18 @@ fn jump(guid: u64, xyz: [f32; 3], velocity: f32) -> Vec<u8> {
     packet(164, &fields)
 }
 
+/// Client Group writer: SendCoalesce `0x010e6910` prefixes each child with PutVariableValue
+/// `0x010dae40` (one byte below 254, `FF hi lo` below 65535, else `FF FF FF` + u32).
 fn bundle(messages: &[Vec<u8>]) -> Vec<u8> {
     let mut bytes = vec![0, 25];
     for message in messages {
-        if message.len() < 255 {
+        if message.len() < 254 {
             bytes.push(message.len() as u8);
-        } else if message.len() <= 65_535 && message.len() != 255 {
+        } else if message.len() < 65_535 {
             bytes.push(255);
             bytes.extend_from_slice(&(message.len() as u16).to_be_bytes());
         } else {
-            bytes.extend_from_slice(&[255, 0, 255]);
+            bytes.extend_from_slice(&[255, 255, 255]);
             bytes.extend_from_slice(&(message.len() as u32).to_be_bytes());
         }
         bytes.extend_from_slice(message);
@@ -386,7 +388,7 @@ fn real_bundle_prefix_variants_and_tunnel_lengths_are_bounded() {
         packet(13, &[]),
         packet(10, &[]),
     ];
-    // Both extended lengths used by SOE application bundles, including 255.
+    // Two-byte-form children of 255 (`FF 00 FF`) and 300 bytes.
     messages.push(wrapped(6, &vec![0; 248]));
     messages.push(wrapped(6, &vec![0; 293]));
     let outcome = gateway.handle(&bundle(&messages)).unwrap();
@@ -407,6 +409,35 @@ fn real_bundle_prefix_variants_and_tunnel_lengths_are_bounded() {
     let mut bad_size = packet(200, &[]);
     bad_size[3..7].copy_from_slice(&1u32.to_le_bytes());
     assert!(gateway.handle(&bad_size).is_err());
+}
+
+#[test]
+fn group_child_lengths_follow_the_client_variable_length() {
+    // Client reader GetVariableValue 0x010daea0 (Group case 25 at 0x010e46d9): `FF hi lo`, and
+    // only `FF FF FF` selects a u32, so a 255-byte child is `FF 00 FF`, not an escape.
+    let gateway = Reference::new(VERSION, None).gateway();
+    let short = packet(13, &[]);
+    for (prefix, size) in [
+        (vec![255, 0, 255], 255),
+        (vec![255, 0, 254], 254),
+        (vec![255, 1, 44], 300),
+        (vec![255, 255, 255, 0, 1, 17, 112], 70_000),
+    ] {
+        let child = wrapped(6, &vec![7; size - 7]);
+        let group = [vec![0, 25], prefix, child.clone(), vec![9], short.clone()].concat();
+        let children = gateway.ordered_messages(&group).unwrap();
+        assert_eq!(children, vec![child, short.clone()], "{size}-byte child");
+    }
+    for bad in [
+        vec![0, 25, 255],
+        vec![0, 25, 255, 0],
+        vec![0, 25, 255, 255, 255],
+        vec![0, 25, 255, 255, 255, 0, 1, 17],
+        [vec![0, 25, 255, 255, 255, 0, 1, 17, 112, 9], short.clone()].concat(),
+        [vec![0, 25, 255, 0, 255], wrapped(6, &[7; 247])].concat(),
+    ] {
+        assert!(gateway.ordered_messages(&bad).is_err(), "{bad:?}");
+    }
 }
 
 #[test]

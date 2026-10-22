@@ -103,13 +103,9 @@ pub fn ciphertext_messages(bytes: &[u8]) -> io::Result<Vec<&[u8]>> {
         if out.len() >= 64 {
             return Err(invalid("too many login group children"));
         }
-        let mut n = usize::from(r.u8()?);
-        if n == 255 {
-            n = u16::from_be_bytes(r.take(2)?.try_into().unwrap()) as usize;
-            if n == 255 {
-                n = u32::from_be_bytes(r.take(4)?.try_into().unwrap()) as usize;
-            }
-        }
+        let (n, prefix) = crate::soe::variable_length(&bytes[2 + r.offset..])
+            .ok_or_else(|| invalid("truncated login group child length"))?;
+        r.take(prefix)?;
         if n == 0 || n > MAX_LOGIN_MESSAGE + 1 {
             return Err(invalid("invalid login group child length"));
         }

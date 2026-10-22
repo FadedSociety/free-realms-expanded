@@ -591,6 +591,33 @@ fn rc4_stream_zero_escape_and_group_framing() {
     assert!(login::ciphertext_messages(&[0, 25, 2, 0, 25]).is_err());
 }
 
+#[test]
+fn group_child_lengths_follow_the_client_variable_length() {
+    // Client reader GetVariableValue 0x010daea0: `FF hi lo`, and only `FF FF FF` selects a u32.
+    let short = [2u8; 6];
+    for (prefix, size) in [
+        (vec![255, 0, 255], 255),
+        (vec![255, 0, 254], 254),
+        (vec![255, 1, 44], 300),
+        (vec![255, 255, 255, 0, 0, 1, 44], 300),
+    ] {
+        let child = vec![1u8; size];
+        let group = [vec![0, 25], prefix, child.clone(), vec![6], short.to_vec()].concat();
+        let children = login::ciphertext_messages(&group).unwrap();
+        assert_eq!(children, vec![&child[..], &short[..]], "{size}-byte child");
+    }
+    for bad in [
+        vec![0, 25, 255],
+        vec![0, 25, 255, 0],
+        vec![0, 25, 255, 255, 255],
+        vec![0, 25, 255, 255, 255, 0, 1, 17],
+        vec![0, 25, 255, 255, 255, 0, 1, 17, 112, 1, 1],
+        [vec![0, 25, 255, 0, 255], vec![1; 254]].concat(),
+    ] {
+        assert!(login::ciphertext_messages(&bad).is_err(), "{bad:?}");
+    }
+}
+
 fn self_packet() -> Vec<u8> {
     let mut out = vec![5, 0, 1, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0];
     out.extend(99i64.to_le_bytes());

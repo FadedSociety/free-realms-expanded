@@ -663,13 +663,9 @@ fn application_messages(bytes: &[u8]) -> io::Result<Vec<&[u8]>> {
         if messages.len() >= MAX_BUNDLE_CHILDREN {
             return Err(invalid("too many bundled application messages"));
         }
-        let mut size = reader.u8()? as usize;
-        if size == 255 {
-            size = u16::from_be_bytes(reader.take(2)?.try_into().unwrap()) as usize;
-            if size == 255 {
-                size = u32::from_be_bytes(reader.take(4)?.try_into().unwrap()) as usize;
-            }
-        }
+        let (size, prefix) = crate::soe::variable_length(&reader.bytes[reader.offset..])
+            .ok_or_else(|| invalid("truncated bundled message length"))?;
+        reader.take(prefix)?;
         if !(2..=MAX_MESSAGE).contains(&size) {
             return Err(invalid("invalid bundled message length"));
         }

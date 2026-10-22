@@ -263,6 +263,19 @@ pub fn seeded_crc32(seed: u32, packet: &[u8]) -> u32 {
     !crc
 }
 
+/// A Group (0x19) child's length prefix, as the client reads it (GetVariableValue `0x010daea0`;
+/// writer PutVariableValue `0x010dae40`): one byte below `FF`, else `FF hi lo` big-endian, and
+/// only `FF FF FF` selects a big-endian u32. Returns (value, prefix bytes); None if truncated.
+pub fn variable_length(bytes: &[u8]) -> Option<(usize, usize)> {
+    match *bytes {
+        [0xff, 0xff, 0xff, a, b, c, d, ..] => Some((u32::from_be_bytes([a, b, c, d]) as usize, 7)),
+        [0xff, 0xff, 0xff, ..] => None,
+        [0xff, hi, lo, ..] => Some((usize::from(u16::from_be_bytes([hi, lo])), 3)),
+        [first, ..] if first != 0xff => Some((usize::from(first), 1)),
+        _ => None,
+    }
+}
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub struct Ack {
     /// 17 acknowledges one buffered packet; 21 acknowledges the contiguous run.

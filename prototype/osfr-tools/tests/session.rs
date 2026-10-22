@@ -41,6 +41,22 @@ fn cooked_multi_packet_children_have_no_individual_crc_headers() {
 }
 
 #[test]
+fn multi_child_length_stays_one_byte_at_255() {
+    // Pin: client Multi (opcode 3) reads ONE length byte, dispatcher 0x010e3dd0 case 3 at
+    // 0x010e4294 (`movzx ecx, byte ptr [eax]`). Only Group (0x19) uses the `FF hi lo` form.
+    let codec = Codec::new(123, 3, true, 1024).unwrap();
+    let body = [vec![255, 0, 21], vec![9; 253]].concat();
+    let decoded = decode_controls(&codec, &codec.encode(3, &body).unwrap()).unwrap();
+    assert_eq!(
+        decoded,
+        vec![Packet {
+            opcode: 21,
+            payload: vec![9; 253]
+        }]
+    );
+}
+
+#[test]
 fn clock_reflection_preserves_peer_fields_and_supplies_server_counts() {
     let packet = Packet {
         opcode: 7,

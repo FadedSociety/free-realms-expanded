@@ -1544,6 +1544,14 @@ fn t3_gateway_login_tunnel_and_bundle_lengths_are_atomic() {
     }
     for input in [
         vec![0, 25, 255, 0, 255, 255, 255, 255, 255],
+        // Group lengths (client GetVariableValue 0x010daea0): `FF 00 FF` short of its body,
+        // `FF FF FF` + u32 70,000 with no body, and every truncated prefix.
+        [vec![0, 25, 255, 0, 255], vec![0; 254]].concat(),
+        vec![0, 25, 255, 255, 255, 0, 1, 17, 112, 0, 0],
+        vec![0, 25, 255],
+        vec![0, 25, 255, 0],
+        vec![0, 25, 255, 255, 255],
+        vec![0, 25, 255, 255, 255, 0, 1, 17],
         vec![0, 25, 2, 0, 25],
         vec![0; 1_048_577],
     ] {

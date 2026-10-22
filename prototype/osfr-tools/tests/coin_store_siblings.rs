@@ -249,16 +249,11 @@ fn wrap(inner: &[u8]) -> Vec<u8> {
 fn bundle(messages: &[Vec<u8>]) -> Vec<u8> {
     let mut bytes = vec![0, 25];
     for message in messages {
-        assert!(message.len() <= u16::MAX as usize);
-        // The client's length escape: 0xff then a 16-bit big-endian length, and a 16-bit
-        // length of 255 means the 32-bit length follows.
+        assert!(message.len() < u16::MAX as usize);
+        // The client's two-byte length form: 0xff then a 16-bit big-endian length; only
+        // `FF FF FF` selects a 32-bit length (GetVariableValue 0x010daea0).
         bytes.push(255);
-        if message.len() == 255 {
-            bytes.extend(255u16.to_be_bytes());
-            bytes.extend(255u32.to_be_bytes());
-        } else {
-            bytes.extend((message.len() as u16).to_be_bytes());
-        }
+        bytes.extend((message.len() as u16).to_be_bytes());
         bytes.extend(message);
     }
     bytes
