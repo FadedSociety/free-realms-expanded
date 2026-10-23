@@ -280,14 +280,22 @@ fn buying_each_ride_with_coins_grants_it() {
     let mut shop = shop_with(wallet, usize::MAX);
     let store = shop.sc_catalogue().config().store_id;
     // L046: lot deeds share the listing; they grant a lot, never an item (tests/lot_deeds.rs).
+    // T634: so do the wiki-priced items that are no ride (tests/station_cash.rs).
     let listings: Vec<_> = shop
         .sc_catalogue()
         .listings()
         .iter()
-        .filter(|listing| !listing.deed)
+        .filter(|listing| {
+            !listing.deed
+                && catalog.mounts().any(|ride| {
+                    ride.item_definition_id_candidates
+                        .contains(&listing.item_id)
+                })
+        })
         .copied()
         .collect();
-    assert!(!listings.is_empty());
+    // Every ride but the 8 earn-only ones is listed.
+    assert_eq!(listings.len(), 81);
     let mut expected = 1_000_000u32;
     for (index, listing) in listings.iter().enumerate() {
         let ride = catalog

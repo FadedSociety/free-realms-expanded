@@ -512,13 +512,25 @@ fn wallet_survives_serde_and_restores_under_the_data_ceiling() {
 fn bought_ride_catalogue_row_is_no_trade() {
     let mut shop = new_shop(wallet(200), usize::MAX);
     assert!(shop.handle(&buy(61)).expect("order parses").changed);
+    // Rides are the rows whose provenance names a ride. L046 lot deeds and the T634 wiki-priced
+    // items are listed too; deeds grant a lot and the wiki items are tradeable.
+    let stores: Value =
+        serde_json::from_slice(&std::fs::read(stores()).expect("stores.json reads"))
+            .expect("stores.json parses");
+    let ride_rows: Vec<i64> = stores["items"]
+        .as_array()
+        .expect("store rows")
+        .iter()
+        .filter(|row| !row["price_provenance"]["ride_id"].is_null())
+        .filter_map(|row| row["item_id"].as_i64())
+        .collect();
     let items: Vec<i32> = shop
         .sc_catalogue()
         .listings()
         .iter()
         .chain(shop.sc_catalogue().earn_only())
-        .filter(|listing| !listing.deed) // L046: lot deeds are listed too; they grant a lot.
         .map(|listing| listing.item_id)
+        .filter(|item| ride_rows.contains(&i64::from(*item)))
         .collect();
     // T452: 54 seeded plus 35 OSFR-parity rides.
     assert_eq!(items.len(), 89, "every ride has a catalogue row");
@@ -531,6 +543,97 @@ fn bought_ride_catalogue_row_is_no_trade() {
             no_trade,
             "ride item {item} is tradeable in the item catalogue"
         );
+    }
+}
+
+/// T634: Dog Ears (a head accessory, three tints) is a wiki Marketplace item at 49 Station Cash
+/// (page revision 36898); its store rows had no price. Castaway Hat spans two item classes under
+/// one name (16031 is the class 1 one), so its wiki price cannot be assigned and its row stays
+/// unpriced. Turtle is a wiki Coin Shop pet at 10000 coins (revision 49986), 9000 for a member;
+/// the Legacy reference gave it no Cost.
+const DOG_EARS: [i32; 3] = [22_927, 900_046, 900_047];
+const DOG_EARS_WIKI_SC: f64 = 49.0;
+const AMBIGUOUS_HAT: i32 = 16_031;
+const TURTLE: i32 = 70_430;
+
+#[test]
+fn a_wiki_priced_clothing_item_lists_at_a_quarter_and_buying_it_grants_it() {
+    let mut shop = new_shop(wallet(200), usize::MAX);
+    let scale = shop.sc_catalogue().config().sc_price_scale;
+    assert_eq!(
+        scale, 0.25,
+        "the owner: the Marketplace sells at 1/4 of the live price"
+    );
+    let price = (DOG_EARS_WIKI_SC * scale).round() as u32;
+    for item in DOG_EARS {
+        let listing = shop
+            .sc_catalogue()
+            .listing(item as u32)
+            .unwrap_or_else(|| panic!("Dog Ears tint {item} is not listed"));
+        assert!(!listing.deed, "a head accessory is not a lot deed");
+        assert_eq!(
+            listing.price, price,
+            "tint {item} lists at 1/4 of the wiki price"
+        );
+    }
+    let before = snapshot(&shop);
+    let order = order_packet(3, 101, DOG_EARS[0] as u32, STORE, 1, "", "", "", "0");
+    let outcome = shop.handle(&order).expect("order parses");
+    assert_eq!(outcome.result_code, station_cash::ORDER_SUCCESS);
+    assert!(outcome.changed);
+    assert_eq!(shop.sc_wallet().balance, 200 - price);
+    assert_eq!(
+        count_definition(shop.inventory().state(), DOG_EARS[0]),
+        count_definition(&before.0, DOG_EARS[0]) + 1
+    );
+    assert_eq!(
+        shop.inventory().state().coins,
+        before.0.coins,
+        "no coin path ran"
+    );
+}
+
+#[test]
+fn an_ambiguous_wiki_name_stays_unpriced() {
+    let mut shop = new_shop(wallet(200), usize::MAX);
+    assert!(shop.sc_catalogue().listing(AMBIGUOUS_HAT as u32).is_none());
+    let before = snapshot(&shop);
+    let order = order_packet(3, 102, AMBIGUOUS_HAT as u32, STORE, 1, "", "", "", "0");
+    let outcome = shop.handle(&order).expect("order parses");
+    assert_eq!(outcome.result_code, station_cash::ORDER_FAILURE);
+    assert!(!outcome.changed);
+    assert_eq!(snapshot(&shop), before);
+}
+
+#[test]
+fn a_coin_shop_item_without_a_price_sells_at_the_wiki_price() {
+    let directory = inventory_content();
+    let mut state = Inventory::load(&directory, None)
+        .expect("item content loads")
+        .state()
+        .clone();
+    state.coins = 20_000;
+    for (member, price) in [(false, 10_000), (true, 9_000)] {
+        let inventory = Inventory::load(&directory, Some(state.clone())).expect("coins are valid");
+        let catalogue = StoreCatalogue::load(&stores()).expect("store catalogue loads");
+        let mut shop = CoinShop::new(
+            &directory,
+            inventory,
+            catalogue,
+            usize::MAX,
+            None,
+            wallet(0),
+        )
+        .expect("shop loads");
+        shop.set_member_status(member);
+        let outcome = shop.buy(1, TURTLE, 1).expect("buy parses");
+        assert_eq!(outcome.result_code, osfr_tools::coin_shop::RESULT_SUCCESS);
+        assert_eq!(
+            shop.inventory().state().coins,
+            20_000 - price,
+            "member {member}"
+        );
+        assert_eq!(count_definition(shop.inventory().state(), TURTLE), 1);
     }
 }
 
@@ -667,8 +770,12 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         "the store packet has trailing bytes"
     );
     // 52 rides plus the 9 lot deeds L046 lists, plus T452's 29 listed OSFR-parity rides (6 more
-    // are earn-only).
-    assert_eq!(decoded.len(), 90, "the shipped listed ride and deed count");
+    // are earn-only), plus the 55 items T634 priced from the wiki.
+    assert_eq!(
+        decoded.len(),
+        145,
+        "the shipped listed ride, deed and wiki item count"
+    );
 
     // 66/7 (`00b48040`/`00b43090`): counted category nodes, then the sorted byte.
     let tree = packets
