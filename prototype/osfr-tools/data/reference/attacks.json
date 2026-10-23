@@ -1,0 +1,4954 @@
+{
+ "schema_version": 1,
+ "tier_base": {
+  "1": 889,
+  "2": 1554,
+  "3": 2716,
+  "4": 4750,
+  "5": 8302
+ },
+ "job_basic": {
+  "Archer": {
+   "profile_id": 35,
+   "attack": "Barrage",
+   "damage_x": 0.314,
+   "weapons_leading_with_it": 52
+  },
+  "Brawler": {
+   "profile_id": 43,
+   "attack": "Glancing Blow",
+   "damage_x": 0.286,
+   "weapons_leading_with_it": 46
+  },
+  "Medic": {
+   "profile_id": 11,
+   "attack": "Incision",
+   "damage_x": 0.314,
+   "weapons_leading_with_it": 55
+  },
+  "Ninja": {
+   "profile_id": 2,
+   "attack": "Flame Flash",
+   "damage_x": 0.286,
+   "weapons_leading_with_it": 58
+  },
+  "Warrior": {
+   "profile_id": 32,
+   "attack": "Sweeping Slash",
+   "damage_x": 0.314,
+   "weapons_leading_with_it": 53
+  },
+  "Wizard": {
+   "profile_id": 12,
+   "attack": "Zap",
+   "damage_x": 0.314,
+   "weapons_leading_with_it": 51
+  }
+ },
+ "attacks": [
+  {
+   "name": "Dragonstrike",
+   "name_locale_ids": [
+    419930,
+    442457
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 58,
+   "damage_x": {
+    "median": 1.286,
+    "min": 1.286,
+    "max": 1.286,
+    "n": 53
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Flame Flash",
+   "name_locale_ids": [
+    419883
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front",
+    "stun"
+   ],
+   "weapon_count": 58,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.314,
+    "n": 53
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Incision",
+   "name_locale_ids": [
+    420174
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 55,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.18,
+    "max": 0.314,
+    "n": 51
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Triage",
+   "name_locale_ids": [
+    420186,
+    442456
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "around",
+    "heal"
+   ],
+   "weapon_count": 55,
+   "damage_x": {
+    "median": 1.0,
+    "min": 0.572,
+    "max": 1.0,
+    "n": 51
+   },
+   "heal_x": {
+    "median": 0.286,
+    "min": 0.163,
+    "max": 0.286,
+    "n": 51
+   },
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Spinning Attack",
+   "name_locale_ids": [
+    410557
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "around",
+    "multi_hit"
+   ],
+   "weapon_count": 53,
+   "damage_x": {
+    "median": 0.57,
+    "min": 0.527,
+    "max": 0.57,
+    "n": 49
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Sweeping Slash",
+   "name_locale_ids": [
+    420252
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 53,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.314,
+    "max": 0.314,
+    "n": 49
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Barrage",
+   "name_locale_ids": [
+    420256
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 52,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.18,
+    "max": 0.314,
+    "n": 47
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Lightning Blast",
+   "name_locale_ids": [
+    40191
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 52,
+   "damage_x": {
+    "median": 1.286,
+    "min": 0.421,
+    "max": 1.414,
+    "n": 47
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Volley",
+   "name_locale_ids": [
+    420258,
+    442454
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "around",
+    "multi_hit"
+   ],
+   "weapon_count": 52,
+   "damage_x": {
+    "median": 0.57,
+    "min": 0.326,
+    "max": 0.57,
+    "n": 47
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Zap",
+   "name_locale_ids": [
+    17071
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 51,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.103,
+    "max": 0.314,
+    "n": 47
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Leg Sweep",
+   "name_locale_ids": [
+    24133,
+    442455,
+    5101083
+   ],
+   "jobs": [
+    "Brawler",
+    "Warrior"
+   ],
+   "tags": [
+    "around",
+    "knockdown"
+   ],
+   "weapon_count": 48,
+   "damage_x": {
+    "median": 1.0,
+    "min": 0.994,
+    "max": 1.0,
+    "n": 44
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Glancing Blow",
+   "name_locale_ids": [
+    420172
+   ],
+   "jobs": [
+    "Brawler",
+    "Warrior"
+   ],
+   "tags": [
+    "front",
+    "knockdown"
+   ],
+   "weapon_count": 47,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 43
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Heart Breaker",
+   "name_locale_ids": [
+    427021
+   ],
+   "jobs": [
+    "Archer",
+    "Brawler",
+    "Medic",
+    "Ninja",
+    "Warrior",
+    "Wizard"
+   ],
+   "tags": [],
+   "weapon_count": 6,
+   "damage_x": {
+    "median": 0.792,
+    "min": 0.792,
+    "max": 0.792,
+    "n": 6
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Party Crasher",
+   "name_locale_ids": [
+    45406
+   ],
+   "jobs": [
+    "Archer",
+    "Brawler",
+    "Medic",
+    "Ninja",
+    "Warrior",
+    "Wizard"
+   ],
+   "tags": [
+    "around",
+    "front",
+    "stun"
+   ],
+   "weapon_count": 6,
+   "damage_x": {
+    "median": 1.018,
+    "min": 1.018,
+    "max": 1.018,
+    "n": 6
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "1000 Storms",
+   "name_locale_ids": [
+    420317
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "around",
+    "summon"
+   ],
+   "weapon_count": 5,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Blizzard Blast",
+   "name_locale_ids": [
+    420386
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "freeze"
+   ],
+   "weapon_count": 5,
+   "damage_x": {
+    "median": 0.72,
+    "min": 0.719,
+    "max": 0.72,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Burn",
+   "name_locale_ids": [
+    7999
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "bonus_damage",
+    "front"
+   ],
+   "weapon_count": 5,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Candy Hurricane",
+   "name_locale_ids": [
+    426408
+   ],
+   "jobs": [
+    "Archer",
+    "Medic",
+    "Ninja",
+    "Warrior",
+    "Wizard"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 5,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Chill",
+   "name_locale_ids": [
+    420539
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "freeze",
+    "front"
+   ],
+   "weapon_count": 5,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Cleave",
+   "name_locale_ids": [
+    420527
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 5,
+   "damage_x": {
+    "median": 1.286,
+    "min": 1.286,
+    "max": 1.286,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Fierce Edge",
+   "name_locale_ids": [
+    420521
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 5,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.314,
+    "max": 0.314,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Firestorm",
+   "name_locale_ids": [
+    420995
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 5,
+   "damage_x": {
+    "median": 0.57,
+    "min": 0.569,
+    "max": 0.57,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Ice Nova",
+   "name_locale_ids": [
+    23679
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "freeze",
+    "front",
+    "summon"
+   ],
+   "weapon_count": 5,
+   "damage_x": {
+    "median": 0.792,
+    "min": 0.72,
+    "max": 0.792,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Icy Arrow",
+   "name_locale_ids": [
+    420384
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "freeze",
+    "front"
+   ],
+   "weapon_count": 5,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Injure",
+   "name_locale_ids": [
+    420394
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 5,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Lightning Strike",
+   "name_locale_ids": [
+    20217
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 5,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.314,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Ready to Rumble",
+   "name_locale_ids": [
+    420391
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "around",
+    "buff"
+   ],
+   "weapon_count": 5,
+   "damage_x": {
+    "median": 0.72,
+    "min": 0.719,
+    "max": 0.72,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Target Vitals",
+   "name_locale_ids": [
+    3810
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "defense_down",
+    "front"
+   ],
+   "weapon_count": 5,
+   "damage_x": {
+    "median": 0.72,
+    "min": 0.719,
+    "max": 0.72,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Wallop",
+   "name_locale_ids": [
+    420389
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 5,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.314,
+    "max": 0.314,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Assist",
+   "name_locale_ids": [
+    420612
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "defense_down",
+    "front"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Bruise",
+   "name_locale_ids": [
+    421040
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Charged Shot",
+   "name_locale_ids": [
+    420567
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Cinder Slash",
+   "name_locale_ids": [
+    421045
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.286,
+    "max": 0.314,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Dual Strike",
+   "name_locale_ids": [
+    421059
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 0.143,
+    "min": 0.143,
+    "max": 0.143,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Explosive Shot",
+   "name_locale_ids": [
+    420584
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Flame Wave",
+   "name_locale_ids": [
+    421047
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front",
+    "summon"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 1.286,
+    "min": 1.286,
+    "max": 1.286,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Immunize",
+   "name_locale_ids": [
+    421043
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "around",
+    "buff"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 0.72,
+    "min": 0.719,
+    "max": 0.72,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Multi-Shot",
+   "name_locale_ids": [
+    421006
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front",
+    "multi_hit"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 0.143,
+    "min": 0.143,
+    "max": 0.143,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Nurse!",
+   "name_locale_ids": [
+    420627
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "summon"
+   ],
+   "weapon_count": 4,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Pound",
+   "name_locale_ids": [
+    420598
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.314,
+    "max": 0.314,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Power Shot",
+   "name_locale_ids": [
+    421184,
+    438135
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front",
+    "stun"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Power Slash",
+   "name_locale_ids": [
+    420987
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Pummel",
+   "name_locale_ids": [
+    24097
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "front",
+    "multi_hit"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 0.424,
+    "min": 0.424,
+    "max": 0.424,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Quake",
+   "name_locale_ids": [
+    24694
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Roundhouse Kick",
+   "name_locale_ids": [
+    421038
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Shuriken Storm",
+   "name_locale_ids": [
+    420984
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Smack",
+   "name_locale_ids": [
+    421036
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "around",
+    "knockdown"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Splash",
+   "name_locale_ids": [
+    421067
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "front",
+    "knockdown"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Splitting Arrow",
+   "name_locale_ids": [
+    421008
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Tsunami",
+   "name_locale_ids": [
+    421073
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "front",
+    "summon"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 1.286,
+    "min": 1.286,
+    "max": 1.414,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Twisted Edge",
+   "name_locale_ids": [
+    420638
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 0.346,
+    "min": 0.345,
+    "max": 0.346,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Warcry",
+   "name_locale_ids": [
+    421063
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "around",
+    "buff",
+    "heal"
+   ],
+   "weapon_count": 4,
+   "damage_x": {
+    "median": 0.72,
+    "min": 0.719,
+    "max": 0.72,
+    "n": 4
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Ashen Strike",
+   "name_locale_ids": [
+    421251
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 0.345,
+    "min": 0.314,
+    "max": 0.346,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Axe Throw",
+   "name_locale_ids": [
+    421253
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Blast",
+   "name_locale_ids": [
+    421258
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.314,
+    "max": 0.314,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Chain Lightning",
+   "name_locale_ids": [
+    421257
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 1.286,
+    "min": 1.286,
+    "max": 1.414,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Clear!",
+   "name_locale_ids": [
+    421247
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "around",
+    "stun"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Dark Assault",
+   "name_locale_ids": [
+    421250
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front",
+    "multi_hit"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 0.157,
+    "min": 0.143,
+    "max": 0.157,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Energy Vortex",
+   "name_locale_ids": [
+    421256
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 1.414,
+    "min": 1.414,
+    "max": 1.414,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Feral Spirit",
+   "name_locale_ids": [
+    438138
+   ],
+   "jobs": [],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 3,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Flaming Arrow",
+   "name_locale_ids": [
+    421244
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 1.286,
+    "min": 1.286,
+    "max": 1.286,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Flaming Uppercut",
+   "name_locale_ids": [
+    421249
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Gale Axe",
+   "name_locale_ids": [
+    421254
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "around",
+    "bonus_damage"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Kick Dirt",
+   "name_locale_ids": [
+    422816
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 0.72,
+    "min": 0.72,
+    "max": 0.72,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Power Rain",
+   "name_locale_ids": [
+    438137
+   ],
+   "jobs": [],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 3,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Power Smash",
+   "name_locale_ids": [
+    437177
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 0.571,
+    "min": 0.571,
+    "max": 0.571,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Reckless Strike",
+   "name_locale_ids": [
+    421255
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Shadow Army",
+   "name_locale_ids": [
+    421248
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "summon"
+   ],
+   "weapon_count": 3,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Shock",
+   "name_locale_ids": [
+    421259
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "front",
+    "stun"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Shock Paddles",
+   "name_locale_ids": [
+    3800
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "around",
+    "stun"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Smoldering Shot",
+   "name_locale_ids": [
+    421245
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.314,
+    "max": 0.314,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Stunning Shot",
+   "name_locale_ids": [
+    24397
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front",
+    "stun"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 0.72,
+    "min": 0.72,
+    "max": 0.72,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Sucker Punch",
+   "name_locale_ids": [
+    410416
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 0.72,
+    "min": 0.72,
+    "max": 0.72,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Vitamins",
+   "name_locale_ids": [
+    24061
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "buff"
+   ],
+   "weapon_count": 3,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Whack",
+   "name_locale_ids": [
+    421241
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "around",
+    "knockdown"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Whirlwind",
+   "name_locale_ids": [
+    421252
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "around",
+    "knockdown"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Wild Swing",
+   "name_locale_ids": [
+    38633
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Wound",
+   "name_locale_ids": [
+    421246
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 3,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 3
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Arcane Chain",
+   "name_locale_ids": [
+    421282
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 1.414,
+    "min": 1.286,
+    "max": 1.414,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Blood Cell",
+   "name_locale_ids": [
+    421277
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 0.72,
+    "min": 0.72,
+    "max": 0.72,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Bonk",
+   "name_locale_ids": [],
+   "jobs": [
+    "Brawler",
+    "Medic"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 0.628,
+    "min": 0.628,
+    "max": 0.629,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Crush",
+   "name_locale_ids": [
+    141485
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Crushing Blow",
+   "name_locale_ids": [
+    421269
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "around",
+    "defense_down"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Electric Arrow",
+   "name_locale_ids": [
+    421260
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "bonus_damage",
+    "front"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Feral Swipe",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 2,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Fiery Slice",
+   "name_locale_ids": [
+    421266
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "bonus_damage",
+    "front"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.314,
+    "max": 0.314,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Flame Breath",
+   "name_locale_ids": [
+    421278
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 1.286,
+    "min": 1.286,
+    "max": 1.286,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Freeze",
+   "name_locale_ids": [
+    104321
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "around",
+    "freeze"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Frenzy",
+   "name_locale_ids": [
+    421281
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 0.283,
+    "min": 0.283,
+    "max": 0.283,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Hammer Toss",
+   "name_locale_ids": [
+    421275
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Lightning Call",
+   "name_locale_ids": [
+    421272
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Mystic Rush",
+   "name_locale_ids": [
+    421267
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front",
+    "multi_hit"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 0.157,
+    "min": 0.157,
+    "max": 0.157,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Mystical Blade",
+   "name_locale_ids": [
+    421279
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "buff"
+   ],
+   "weapon_count": 2,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Protective Barrier",
+   "name_locale_ids": [
+    421283
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "around",
+    "buff"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 0.28,
+    "min": 0.28,
+    "max": 0.28,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Reckless",
+   "name_locale_ids": [
+    5101085
+   ],
+   "jobs": [
+    "Brawler",
+    "Warrior"
+   ],
+   "tags": [
+    "buff"
+   ],
+   "weapon_count": 2,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Reflex Test",
+   "name_locale_ids": [
+    421276
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "around",
+    "bonus_damage"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 1.286,
+    "min": 1.286,
+    "max": 1.286,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Scorch",
+   "name_locale_ids": [],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "bonus_damage",
+    "front"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Sedate",
+   "name_locale_ids": [
+    421265
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Slam",
+   "name_locale_ids": [
+    73160
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Smash",
+   "name_locale_ids": [
+    40430
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Sniper Shot",
+   "name_locale_ids": [
+    20015,
+    5101079
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 1.414,
+    "min": 1.414,
+    "max": 1.414,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Sonic Arrow",
+   "name_locale_ids": [],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front",
+    "knockdown"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Sonic Boom",
+   "name_locale_ids": [],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front",
+    "knockdown"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Traumatize",
+   "name_locale_ids": [
+    421264
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 2,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 2
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Angro Chop",
+   "name_locale_ids": [
+    428955
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Anniversary Arrow",
+   "name_locale_ids": [
+    428375
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front",
+    "stun"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Annual Checkup",
+   "name_locale_ids": [
+    428379
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "front",
+    "stun"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Anti-Snowman Snowball",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Antibodies",
+   "name_locale_ids": [
+    421300
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 1.286,
+    "min": 1.286,
+    "max": 1.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Artifact Whipcrack",
+   "name_locale_ids": [
+    5102723
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Bash",
+   "name_locale_ids": [
+    421286
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "front",
+    "stun"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Birthday Bash",
+   "name_locale_ids": [
+    428377
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "front",
+    "stun"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Blade-arang",
+   "name_locale_ids": [
+    5101896
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 1.1,
+    "min": 1.099,
+    "max": 1.1,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Boom",
+   "name_locale_ids": [
+    421294
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "around",
+    "knockdown"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Brilliant Smash",
+   "name_locale_ids": [],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Burning Slash",
+   "name_locale_ids": [
+    439521
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.157,
+    "min": 0.157,
+    "max": 0.157,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Cake Cutter",
+   "name_locale_ids": [
+    428383
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "front",
+    "stun"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Card Rain",
+   "name_locale_ids": [
+    436619
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Cauterize",
+   "name_locale_ids": [
+    421289
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "defense_down",
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.143,
+    "min": 0.143,
+    "max": 0.143,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Celestial Spin",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Chaos Explosion",
+   "name_locale_ids": [
+    421306
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.308,
+    "min": 0.308,
+    "max": 0.308,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Chaotic Flux",
+   "name_locale_ids": [
+    428952
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Charm",
+   "name_locale_ids": [
+    427016
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Commanding Shout",
+   "name_locale_ids": [
+    24706
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "around",
+    "buff"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Concussive Blast",
+   "name_locale_ids": [
+    439523
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "around",
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.214,
+    "min": 0.214,
+    "max": 0.214,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Cover Fire",
+   "name_locale_ids": [],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Deck the Halls",
+   "name_locale_ids": [],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Detonate",
+   "name_locale_ids": [],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Dizzying Blow",
+   "name_locale_ids": [
+    421292
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "around",
+    "stun"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Egg Toss",
+   "name_locale_ids": [
+    5100885
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Electric Punch",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Elemental Overload",
+   "name_locale_ids": [],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Elemental Slice",
+   "name_locale_ids": [],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Ember Arrow",
+   "name_locale_ids": [
+    421285
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "bonus_damage",
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Ember Strike",
+   "name_locale_ids": [
+    428921
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Emerald Slash",
+   "name_locale_ids": [],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Energy Slash",
+   "name_locale_ids": [
+    5102649
+   ],
+   "jobs": [],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Energy Storm",
+   "name_locale_ids": [
+    5102651
+   ],
+   "jobs": [],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Enrage",
+   "name_locale_ids": [
+    21374
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "buff"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Explosive Smash",
+   "name_locale_ids": [],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Fan of Blades",
+   "name_locale_ids": [
+    421303
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.72,
+    "min": 0.72,
+    "max": 0.72,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Feather Spin",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Feral Blast",
+   "name_locale_ids": [
+    438136
+   ],
+   "jobs": [],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Firebomb",
+   "name_locale_ids": [
+    421297
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.28,
+    "min": 0.28,
+    "max": 0.28,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Flail",
+   "name_locale_ids": [],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Flare",
+   "name_locale_ids": [],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "around",
+    "bonus_damage"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Freezing Strike",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Frost Snap",
+   "name_locale_ids": [
+    5101105
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "around",
+    "freeze"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.22,
+    "min": 0.22,
+    "max": 0.22,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Fungal Rain",
+   "name_locale_ids": [
+    436977
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Fungal Spray",
+   "name_locale_ids": [
+    436337
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Gleam Explosion",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Gleam Smash",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Gloam Fire",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "around",
+    "summon"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Gloam Smash",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Golden Robgoblin",
+   "name_locale_ids": [
+    5102722
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Heart Attack",
+   "name_locale_ids": [
+    426972
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Heartbreak",
+   "name_locale_ids": [
+    421288
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Heat Wave",
+   "name_locale_ids": [],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Hidden Strike",
+   "name_locale_ids": [
+    421291
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.314,
+    "max": 0.314,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Holiday Fever",
+   "name_locale_ids": [
+    426400
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "front",
+    "heal"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Ice Storm",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Ignite",
+   "name_locale_ids": [
+    428917
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Into the Fray",
+   "name_locale_ids": [],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "buff"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Jingle Spells",
+   "name_locale_ids": [
+    426406
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Kaleidoscope",
+   "name_locale_ids": [],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Knockout",
+   "name_locale_ids": [
+    421299
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 1.286,
+    "min": 1.286,
+    "max": 1.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Laser Surgery",
+   "name_locale_ids": [
+    421301
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 1.286,
+    "min": 1.286,
+    "max": 1.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Lightbulb Critter",
+   "name_locale_ids": [
+    4419425
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Love Struck",
+   "name_locale_ids": [
+    427013
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Magic Snowball",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Magical Missile",
+   "name_locale_ids": [
+    428950
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Magma Shot",
+   "name_locale_ids": [],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Mass Transfigure",
+   "name_locale_ids": [],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.792,
+    "min": 0.792,
+    "max": 0.792,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Mega Growth Rain",
+   "name_locale_ids": [
+    436971
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Mega Growth Spray",
+   "name_locale_ids": [
+    436233
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Megabonk!",
+   "name_locale_ids": [
+    5102396
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Missile-Toe",
+   "name_locale_ids": [
+    426395
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Moon Slice",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Mystical Drain",
+   "name_locale_ids": [
+    421302
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 1.0,
+    "min": 1.0,
+    "max": 1.0,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Noxious Cloud",
+   "name_locale_ids": [],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Orbital Strike",
+   "name_locale_ids": [],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Overdrive",
+   "name_locale_ids": [],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Party Tricks",
+   "name_locale_ids": [
+    428385
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "front",
+    "stun"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Perfect Shot",
+   "name_locale_ids": [
+    439518
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Poisoned Blades",
+   "name_locale_ids": [],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "bonus_damage"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Power Drive",
+   "name_locale_ids": [
+    5102644
+   ],
+   "jobs": [],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Precise Shot",
+   "name_locale_ids": [],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Precise Strikes",
+   "name_locale_ids": [
+    429134
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Prismatic Slash",
+   "name_locale_ids": [],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Pulse",
+   "name_locale_ids": [
+    428942
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Purge",
+   "name_locale_ids": [
+    428944
+   ],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Radiation Slash",
+   "name_locale_ids": [],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Radioactive Aura",
+   "name_locale_ids": [],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Rainbow Cutter",
+   "name_locale_ids": [],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Rainbow Slash",
+   "name_locale_ids": [],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Rampage",
+   "name_locale_ids": [
+    421293
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.143,
+    "min": 0.143,
+    "max": 0.143,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Regal Strike",
+   "name_locale_ids": [
+    5102645
+   ],
+   "jobs": [],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Revitalizing Slice",
+   "name_locale_ids": [
+    439520
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Ricochet",
+   "name_locale_ids": [],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 1.286,
+    "min": 1.286,
+    "max": 1.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Ringing Smash",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Royal Power",
+   "name_locale_ids": [
+    5102647
+   ],
+   "jobs": [],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Secret Admirer",
+   "name_locale_ids": [
+    427010
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.314,
+    "max": 0.314,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Shadowslash",
+   "name_locale_ids": [
+    421290
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.314,
+    "max": 0.314,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Shifting Sands",
+   "name_locale_ids": [
+    5101898
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.314,
+    "max": 0.314,
+    "n": 5
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Shot to the Heart",
+   "name_locale_ids": [
+    426959
+   ],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Snow Globe-ification",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Snow Storm",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Spider Rain",
+   "name_locale_ids": [
+    436975
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Spider Spray",
+   "name_locale_ids": [
+    436326
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Spread Cheer",
+   "name_locale_ids": [
+    4419423
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Stalking Stuffer",
+   "name_locale_ids": [
+    426402
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Starshower",
+   "name_locale_ids": [],
+   "jobs": [
+    "Wizard"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Strong Layup",
+   "name_locale_ids": [
+    5102642
+   ],
+   "jobs": [],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Supernova",
+   "name_locale_ids": [],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Surprise!",
+   "name_locale_ids": [
+    101144
+   ],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front",
+    "stun"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.314,
+    "max": 0.314,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Thump",
+   "name_locale_ids": [
+    421287
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Thunderclap",
+   "name_locale_ids": [
+    421305
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.72,
+    "min": 0.72,
+    "max": 0.72,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Thunderstorm",
+   "name_locale_ids": [],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Thwack",
+   "name_locale_ids": [
+    5100457
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.242,
+    "min": 0.242,
+    "max": 0.242,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Tidal Slash",
+   "name_locale_ids": [],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Tiger Claw",
+   "name_locale_ids": [],
+   "jobs": [
+    "Ninja"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Tolling Bell",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Tough Love",
+   "name_locale_ids": [
+    426968
+   ],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Tribal Influence",
+   "name_locale_ids": [
+    442430
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Tribal Mastery",
+   "name_locale_ids": [
+    442431
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Turbo Smash",
+   "name_locale_ids": [],
+   "jobs": [
+    "Brawler"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Twilight Strike",
+   "name_locale_ids": [],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Two-Handed Chop",
+   "name_locale_ids": [
+    5102452
+   ],
+   "jobs": [
+    "Brawler",
+    "Warrior"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.314,
+    "min": 0.314,
+    "max": 0.314,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Vampiric Wrath",
+   "name_locale_ids": [],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "around",
+    "heal"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Vanquish",
+   "name_locale_ids": [
+    6751
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Vita-booster",
+   "name_locale_ids": [],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "around",
+    "buff"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Vital Strike",
+   "name_locale_ids": [
+    429140
+   ],
+   "jobs": [
+    "Medic"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Volcanic Rain",
+   "name_locale_ids": [],
+   "jobs": [
+    "Archer"
+   ],
+   "tags": [
+    "around"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Whirlwind Strike",
+   "name_locale_ids": [
+    5101095
+   ],
+   "jobs": [
+    "Brawler",
+    "Warrior"
+   ],
+   "tags": [
+    "around",
+    "multi_hit"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.157,
+    "min": 0.157,
+    "max": 0.157,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Winged Slice",
+   "name_locale_ids": [],
+   "jobs": [],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Withering Rain",
+   "name_locale_ids": [
+    436973
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Withering Spray",
+   "name_locale_ids": [
+    436235
+   ],
+   "jobs": [],
+   "tags": [],
+   "weapon_count": 1,
+   "damage_x": null,
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  },
+  {
+   "name": "Wrathful Strike",
+   "name_locale_ids": [
+    439522
+   ],
+   "jobs": [
+    "Warrior"
+   ],
+   "tags": [
+    "front"
+   ],
+   "weapon_count": 1,
+   "damage_x": {
+    "median": 0.286,
+    "min": 0.286,
+    "max": 0.286,
+    "n": 1
+   },
+   "heal_x": null,
+   "source": [
+    "wiki"
+   ]
+  }
+ ],
+ "rejected": [
+  {
+   "name": "Delivers a quick smash, damaging all opponents in front of y",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": "Launches several arrows at once, damaging all opponents in f",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": ": A fierce swipe of the Sword of Omens will damage nearby op",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": ": Blasts opponents with lightning, damaging all opponents in",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": "Blasts opponents with lightning, damaging all opponents in f",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": ": Chops with furious swings, damaging all nearby opponents.\n",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": "Chops with furious swings, damaging all nearby opponents.\n:D",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": ": Delivers a quick smash, damaging all opponents in front of",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": "Delivers a quick smash, damaging all opponents in front of y",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": "Illusion: Random Card Critter",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": ": Launches several arrows at once, damaging all opponents in",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": "Launches several arrows at once, damaging all opponents in f",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": ": Slash at opponents in front of you with the might of a dra",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": ": Spreads holiday cheer with the power of your fists! Damage",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": ": Strikes in a flash of blinding fury. Damages all opponents",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": "Strikes in a flash of blinding fury. Damages all opponents i",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": "Strikes in a flash of blinding fury. Damages all opponents i",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": ": Strikes with practiced precision, damaging all opponents i",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": "Strikes with practiced precision, damaging all opponents in ",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": ": Wildly swings at anything within range. Damages all nearby",
+   "reason": "a tooltip description was parsed as the attack name"
+  },
+  {
+   "name": ": Wildly swings at anything within range. Damages all nearby",
+   "reason": "a tooltip description was parsed as the attack name"
+  }
+ ]
+}
