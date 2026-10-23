@@ -1,4 +1,4 @@
-"""T634: fill stores.json Station Cash and coin prices from the wiki catalogue; run with python -I.
+"""T634/T638: fill stores.json Station Cash and coin prices from the wiki catalogue; run with python -I.
 
 Chain: wiki article name -> client locale text id(s) (lab/reports/locale-id-to-text.json) -> item
 definitions whose NameId is one of those ids (the item catalogue the server loads) -> the
@@ -12,6 +12,9 @@ stores.json rows of those items. Rules, all from the T634 brief:
   row that already has a coin price is never also given a Station Cash price (the store loader
   refuses a row in both currencies).
 * An item two articles price differently is skipped.
+* T638: a row with a Legacy coin price moves to Station Cash (coin prices cleared, no_sale) when its
+  article is in SC Marketplace and not in Coin Shop and no coin vendor stocks the item
+  (vendors.json item_ids). Such a row carries the T638 tag; rerunning reproduces it.
 
 The edit is textual: every item row is one compact JSON line, so only the changed lines differ.
 It asserts when an input drifts and is idempotent: rows it priced carry the T634 tag and are
@@ -29,6 +32,7 @@ sys.dont_write_bytecode = True
 PROJECT = Path(__file__).resolve().parents[1]
 LAB = Path("%USERPROFILE%/Documents/Projects/CartoonMMO/lab")
 STORES = PROJECT / "prototype/osfr-tools/data/content/stores.json"
+VENDORS = PROJECT / "prototype/osfr-tools/data/content/vendors.json"
 INPUTS = {
     "wiki": (LAB / "references/freerealms-wiki/harvest/lists/catalog.json",
              "ae2d8945f2c6cc0d6a00266f5ab9a468b75de4860e8af976ff27a3d7613e4fed"),
@@ -38,12 +42,16 @@ INPUTS = {
               "76394d874a5b1a89f8ff8778ca89675324eedfddeab8b23496e3d71dc35577e5"),
 }
 TAG = "T634"
+MOVE_TAG = "T638"
 LEGEND = ("(R) T634: price from the fandom wiki catalogue (Marketplace or Coin Shop article, "
           "regular price), matched to the item by name through the client locale; see "
           "price_provenance. Never overrides a Legacy or client coin price.")
+LEGEND_MOVE = ("(R) T638: the wiki lists the item only in the SC Marketplace (not the Coin Shop) and no coin "
+               "vendor stocks it, so the Legacy coin Cost is cleared and the row sells for Station Cash; "
+               "see price_provenance.legacy_coin_price.")
 WIKI_URL = "https://freerealms.fandom.com/wiki/"
 # Expected result of one run on the pinned inputs (the drift assertion).
-EXPECTED = {"sc_rows": 55, "coin_rows": 1}
+EXPECTED = {"sc_rows": 55, "coin_rows": 1, "move_rows": 663}
 
 
 def load_inputs():
@@ -96,8 +104,20 @@ def regular_price(prices):
     return None
 
 
-def plan(data, rows):
-    """Returns (edits, report). edits maps item id -> ('sc'|'coin', price, article)."""
+def vendor_stock():
+    return {i for vendor in json.loads(VENDORS.read_bytes())["vendors"] for i in vendor["item_ids"]}
+
+
+def moves(row, categories, stock):
+    """T638: a Legacy coin-priced row of a Station-Cash-only article that no coin vendor stocks."""
+    if MOVE_TAG in row["source_tags"]:
+        return True
+    return (row["purchase_price_coins"] is not None and "Coin Shop" not in categories
+            and row["item_id"] not in stock)
+
+
+def plan(data, rows, stock=frozenset()):
+    """Returns (edits, report). edits maps item id -> ('sc'|'coin'|'move', price, article)."""
     find = groups(data)
     by_id = {row["item_id"]: row for row in rows}
     report = collections.defaultdict(list)
@@ -123,12 +143,18 @@ def plan(data, rows):
             else:
                 members = [by_id[i] for i, _ in definitions if i in by_id]
                 free = [r for r in members if is_free(r) or TAG in r["source_tags"]]
+                moving = [r for r in members if kind == "sc" and moves(r, categories, stock)]
+                if kind == "sc" and any(r["purchase_price_coins"] is not None and r not in moving
+                                        for r in members):
+                    report["sc:kept_" + ("dual" if "Coin Shop" in categories else "vendor")].append(name)
                 if not members:
                     outcome = "no_store_row"
-                elif free:
+                elif free or moving:
                     outcome = "applied"
                     for row in free:
                         proposals[row["item_id"]][(kind, price)] = article
+                    for row in moving:
+                        proposals[row["item_id"]][("move", price)] = article
                 elif any("sc_price" in r for r in members):
                     outcome = "already_sc_priced"
                 else:
@@ -149,13 +175,32 @@ def is_free(row):
 
 
 def apply(row, kind, price, article):
-    assert row["price_provenance"] if "price_provenance" in row and TAG in row["source_tags"] \
-        else "price_provenance" not in row, "refusing to replace another price's provenance"
-    row["source_tags"] = [t for t in row["source_tags"] if t != TAG] + [TAG]
+    tag = MOVE_TAG if kind == "move" else TAG
+    assert "price_provenance" not in row or {TAG, MOVE_TAG} & set(row["source_tags"]), \
+        "refusing to replace another price's provenance"
+    row["source_tags"] = [t for t in row["source_tags"] if t != tag] + [tag]
     wiki = {"wiki_name": article["name"], "wiki_url": article["url"],
             "wiki_rev_id": article["rev_id"]}
     assert article["url"] == WIKI_URL + article["url"].rsplit("/", 1)[1]
-    if kind == "sc":
+    if kind == "move":
+        coins = row["purchase_price_coins"]
+        if coins is None:  # rerun over a moved row: the cleared price is kept in the provenance
+            coins = row["price_provenance"]["legacy_coin_price"]
+        row.update(purchase_price_coins=None, member_price_coins=None, sell_price_coins=None,
+                   no_sale=True)
+        row["price_provenance"] = {
+            "kind": "reconstructed",
+            "basis": f"(R) T638: {price} Station Cash, the regular price on the fandom wiki page "
+                     f"{article['name']} (revision {article['rev_id']}), which is in the SC "
+                     f"Marketplace and not the Coin Shop; no coin vendor stocks the item, so the "
+                     f"Legacy coin Cost of {coins} is cleared. A second listed price is the sale "
+                     f"price and is not used. Listed at round(sc_price * "
+                     f"station_cash.sc_price_scale) SC.",
+            "sc_price": price, "sc_basis": "W", "wiki_prices": article["station_cash"],
+            "legacy_coin_price": coins, **wiki}
+        row["sc_price"] = price
+        row["earn_only"] = False
+    elif kind == "sc":
         assert row["no_sale"] and row["purchase_price_coins"] is None
         row["price_provenance"] = {
             "kind": "reconstructed",
@@ -189,10 +234,11 @@ def write(lines, start, rows, edits):
             changed[start + index] = f"    {dump(row)}{comma}"
     for number, text in changed.items():
         lines[number] = text
-    legend = next(i for i, line in enumerate(lines) if line.startswith('    "R452":'))
-    if not any(line.startswith(f'    "{TAG}":') for line in lines[:start]):
-        lines[legend] += ","
-        lines.insert(legend + 1, f"    {json.dumps(TAG)}: {json.dumps(LEGEND)}")
+    for tag, text, after in ((TAG, LEGEND, "R452"), (MOVE_TAG, LEGEND_MOVE, TAG)):
+        if not any(line.startswith(f'    "{tag}":') for line in lines[:start]):
+            legend = next(i for i, line in enumerate(lines) if line.startswith(f'    "{after}":'))
+            lines[legend] += ","
+            lines.insert(legend + 1, f"    {json.dumps(tag)}: {json.dumps(text)}")
     return "\n".join(lines)
 
 
@@ -203,9 +249,10 @@ def main():
     args = parser.parse_args()
     data = load_inputs()
     lines, start, rows = read_stores()
-    edits, report = plan(data, rows)
+    edits, report = plan(data, rows, vendor_stock())
     counts = collections.Counter(kind for kind, _, _ in edits.values())
-    assert counts == {"sc": EXPECTED["sc_rows"], "coin": EXPECTED["coin_rows"]}, counts
+    assert counts == {"sc": EXPECTED["sc_rows"], "coin": EXPECTED["coin_rows"],
+                      "move": EXPECTED["move_rows"]}, counts
     text = write(lines, start, rows, edits)
     summary = {key: len(value) for key, value in sorted(report.items())}
     print(json.dumps({"rows_priced": dict(counts), "articles": summary}, indent=1))
@@ -217,7 +264,7 @@ def main():
         STORES.write_bytes(text.encode("utf-8"))
     # The result must still be valid JSON and every edited row carries its tag.
     final = json.loads(text.encode("utf-8"))
-    assert sum(TAG in r["source_tags"] for r in final["items"]) == len(edits)
+    assert sum(bool({TAG, MOVE_TAG} & set(r["source_tags"])) for r in final["items"]) == len(edits)
 
 
 if __name__ == "__main__":

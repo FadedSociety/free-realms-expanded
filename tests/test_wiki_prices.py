@@ -1,4 +1,4 @@
-"""T634: the wiki price matcher (scripts/build_wiki_prices.py) on small synthetic inputs.
+"""T634/T638: the wiki price matcher (scripts/build_wiki_prices.py) on small synthetic inputs.
 
 Run from the project root: python -I tests/test_wiki_prices.py
 """
@@ -57,11 +57,11 @@ def rows():
 
 class WikiPrices(unittest.TestCase):
     def test_plan(self):
-        edits, report = prices.plan(DATA, rows())
+        edits, report = prices.plan(DATA, rows(), stock={41})
         # Tint variants (same name and class) take one price; the regular price is the first.
         self.assertEqual({i: edits[i][:2] for i in (20, 21, 22)}, {i: ("sc", 49) for i in (20, 21, 22)})
         self.assertEqual(edits[30][:2], ("coin", 10000))
-        # A row with a coin price keeps it; its free sibling is priced.
+        # A coin-priced row a vendor stocks keeps it (T638); its free sibling is priced.
         self.assertEqual(edits[40][:2], ("sc", 20))
         self.assertNotIn(41, edits)
         # Two classes under one name, a sale price listed first and an unknown name stay unpriced.
@@ -71,7 +71,7 @@ class WikiPrices(unittest.TestCase):
         self.assertEqual(report["sc:unmatched"], ["Unknown"])
 
     def test_apply_is_idempotent_and_keeps_the_other_prices(self):
-        edits, _ = prices.plan(DATA, rows())
+        edits, _ = prices.plan(DATA, rows(), stock={41})
         once = rows()
         for item in once:
             if item["item_id"] in edits:
@@ -83,12 +83,63 @@ class WikiPrices(unittest.TestCase):
         self.assertEqual((pet["purchase_price_coins"], pet["member_price_coins"]), (10000, 9000))
         self.assertEqual(once[7]["purchase_price_coins"], 300)
         # Planning again over the edited rows reproduces the same edits.
-        again, _ = prices.plan(DATA, once)
+        again, _ = prices.plan(DATA, once, stock={41})
         self.assertEqual(set(again), set(edits))
         twice = [dict(item) for item in once]
         for item in twice:
             if item["item_id"] in again:
                 prices.apply(item, *again[item["item_id"]])
+        self.assertEqual(twice, once)
+
+
+class StationCashOnly(unittest.TestCase):
+    """T638: a Legacy coin-priced row moves to Station Cash only on the three-part evidence."""
+    DATA = {
+        "locale": [{"id": 1, "text": "Tail"}, {"id": 2, "text": "Cloak"}, {"id": 3, "text": "Ring"},
+                   {"id": 4, "text": "Hat"}],
+        "items": {"definitions": [definition(60, 1, 1), definition(61, 1, 1), definition(70, 2, 1),
+                                  definition(80, 3, 1), definition(90, 4, 1),
+                                  definition(91, 4, 173)]},
+        "wiki": [article("Tail", categories=["SC Marketplace"], station_cash=[49, 44]),
+                 article("Cloak", categories=["SC Marketplace"], station_cash=[20]),
+                 article("Ring", categories=["SC Marketplace", "Coin Shop"], station_cash=[30],
+                         coins=[300]),
+                 article("Hat", categories=["SC Marketplace"], station_cash=[10])],
+    }
+
+    def rows(self):
+        return [row(60, coins=270, no_sale=False), row(61, coins=270), row(70, coins=100),
+                row(80, coins=300), row(90, coins=50), row(91, coins=50)]
+
+    def test_plan(self):
+        edits, report = prices.plan(self.DATA, self.rows(), stock={70})
+        # Both tints of the Station Cash only item move at the first listed price.
+        self.assertEqual({i: edits[i][:2] for i in (60, 61)}, {60: ("move", 49), 61: ("move", 49)})
+        # A vendor-stocked item, a dual-category item and an ambiguous name keep their coin price.
+        self.assertEqual(set(edits), {60, 61})
+        self.assertEqual(report["sc:kept_vendor"], ["Cloak"])
+        self.assertEqual(report["sc:kept_dual"], ["Ring"])
+        self.assertEqual(report["sc:ambiguous"], ["Hat"])
+
+    def test_apply_clears_every_coin_price_and_reruns_identically(self):
+        edits, _ = prices.plan(self.DATA, self.rows(), stock={70})
+        once = self.rows()
+        once[0]["member_price_coins"], once[1]["sell_price_coins"] = 243, 135
+        for item in once[:2]:
+            prices.apply(item, *edits[item["item_id"]])
+        for item in once[:2]:
+            self.assertEqual((item["purchase_price_coins"], item["member_price_coins"],
+                              item["sell_price_coins"], item["no_sale"], item["sc_price"],
+                              item["earn_only"]), (None, None, None, True, 49, False))
+            self.assertEqual(item["price_provenance"]["legacy_coin_price"], 270)
+            self.assertEqual(item["source_tags"], ["L1", prices.MOVE_TAG])
+        self.assertEqual(once[2]["purchase_price_coins"], 100)
+        # Planning and applying again over the moved rows reproduces them.
+        again, _ = prices.plan(self.DATA, once, stock={70})
+        self.assertEqual(set(again), {60, 61})
+        twice = [dict(item) for item in once]
+        for item in twice[:2]:
+            prices.apply(item, *again[item["item_id"]])
         self.assertEqual(twice, once)
 
 

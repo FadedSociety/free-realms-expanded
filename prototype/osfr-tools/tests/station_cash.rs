@@ -637,6 +637,113 @@ fn a_coin_shop_item_without_a_price_sells_at_the_wiki_price() {
     }
 }
 
+/// T638: Dog Tail (three tints) is 49 Station Cash on the wiki (revision 36899, SC Marketplace and
+/// not the Coin Shop) and no coin vendor stocks it; Legacy and the client definition give it a coin
+/// Cost of 270 (client reader `008e3760`). It lists at 1/4 of the wiki price and no longer sells
+/// for coins.
+const DOG_TAIL: [i32; 3] = [79_511, 79_512, 79_513];
+
+#[test]
+fn a_station_cash_only_item_lists_at_a_quarter_and_no_longer_sells_for_coins() {
+    let directory = inventory_content();
+    let mut state = Inventory::load(&directory, None)
+        .expect("item content loads")
+        .state()
+        .clone();
+    state.coins = 20_000;
+    let inventory = Inventory::load(&directory, Some(state)).expect("coins are valid");
+    let catalogue = StoreCatalogue::load(&stores()).expect("store catalogue loads");
+    let mut shop = CoinShop::new(
+        &directory,
+        inventory,
+        catalogue,
+        usize::MAX,
+        None,
+        wallet(200),
+    )
+    .expect("shop loads");
+    let price = (49.0 * shop.sc_catalogue().config().sc_price_scale).round() as u32;
+    assert_eq!(price, 12, "1/4 of the wiki price");
+    for item in DOG_TAIL {
+        let listing = shop.sc_catalogue().listing(item as u32).expect("listed");
+        assert_eq!(listing.price, price, "tint {item}");
+    }
+    // The coin path is gone: a coin purchase is refused and changes nothing.
+    let before = snapshot(&shop);
+    let refused = shop.buy(1, DOG_TAIL[0], 1).expect("buy parses");
+    assert_eq!(
+        refused.result_code,
+        osfr_tools::coin_shop::RESULT_SERVICE_UNAVAILABLE
+    );
+    assert!(!refused.changed);
+    assert_eq!(snapshot(&shop), before);
+    // The Station Cash order grants it and moves no coins.
+    let order = order_packet(3, 103, DOG_TAIL[0] as u32, STORE, 1, "", "", "", "0");
+    let outcome = shop.handle(&order).expect("order parses");
+    assert_eq!(outcome.result_code, station_cash::ORDER_SUCCESS);
+    assert_eq!(shop.sc_wallet().balance, 200 - price);
+    assert_eq!(
+        count_definition(shop.inventory().state(), DOG_TAIL[0]),
+        count_definition(&before.0, DOG_TAIL[0]) + 1
+    );
+    assert_eq!(shop.inventory().state().coins, 20_000);
+}
+
+/// T638: every row the move touched (tag T638) is a Station Cash row with no coin price, keeps the
+/// Legacy price in its provenance, and is in no coin vendor's stock; every item a coin vendor
+/// stocks keeps its coin price and is not a Station Cash listing.
+#[test]
+fn moved_rows_are_station_cash_only_and_vendor_stock_keeps_coins() {
+    let read = |file: &str| -> Value {
+        let path = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("data/content")
+            .join(file);
+        serde_json::from_slice(&std::fs::read(path).expect("content reads")).expect("parses")
+    };
+    let stores = read("stores.json");
+    let stock: std::collections::BTreeSet<i64> = read("vendors.json")["vendors"]
+        .as_array()
+        .expect("vendors")
+        .iter()
+        .flat_map(|vendor| vendor["item_ids"].as_array().expect("stock").clone())
+        .filter_map(|id| id.as_i64())
+        .collect();
+    let mut moved = 0;
+    for row in stores["items"].as_array().expect("rows") {
+        let id = row["item_id"].as_i64().expect("id");
+        if stock.contains(&id) {
+            assert!(
+                row["sc_price"].is_null() && !row["purchase_price_coins"].is_null(),
+                "vendor-stocked item {id} lost its coin price"
+            );
+        }
+        if row["source_tags"]
+            .as_array()
+            .expect("tags")
+            .iter()
+            .any(|tag| tag == "T638")
+        {
+            moved += 1;
+            assert!(!stock.contains(&id), "{id} is in vendor stock");
+            assert!(
+                row["purchase_price_coins"].is_null(),
+                "{id} still sells for coins"
+            );
+            assert!(row["member_price_coins"].is_null() && row["sell_price_coins"].is_null());
+            assert_eq!(row["no_sale"], true);
+            assert!(row["sc_price"].as_u64().expect("sc price") > 0, "{id}");
+            assert!(
+                row["price_provenance"]["legacy_coin_price"]
+                    .as_u64()
+                    .expect("kept")
+                    > 0,
+                "{id} lost the Legacy price record"
+            );
+        }
+    }
+    assert_eq!(moved, 663, "the Station Cash only items moved from coins");
+}
+
 #[test]
 fn catalogue_packets_carry_the_scaled_price_and_skip_earn_only() {
     let shop = new_shop(Wallet::default(), usize::MAX);
@@ -770,11 +877,16 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         "the store packet has trailing bytes"
     );
     // 52 rides plus the 9 lot deeds L046 lists, plus T452's 29 listed OSFR-parity rides (6 more
-    // are earn-only), plus the 55 items T634 priced from the wiki.
+    // are earn-only), plus the 55 items T634 priced from the wiki, plus the 663 Station Cash only
+    // items T638 moved from their Legacy coin price.
     assert_eq!(
         decoded.len(),
-        145,
+        808,
         "the shipped listed ride, deed and wiki item count"
+    );
+    assert!(
+        store.len() < osfr_tools::soe::MAX_LOGICAL_MESSAGE / 2,
+        "the store packet must stay well inside one logical message"
     );
 
     // 66/7 (`00b48040`/`00b43090`): counted category nodes, then the sorted byte.
