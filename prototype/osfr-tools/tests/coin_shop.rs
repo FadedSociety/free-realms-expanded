@@ -1,9 +1,13 @@
+#[path = "common/resale.rs"]
+mod resale;
+
 use osfr_tools::{
     coin_shop::{self, CoinShop, StoreCatalogue},
     inventory::{Inventory, InventoryState},
     soe::{self, Packet, RELIABLE_DATA, ReliableReceiver},
     station_cash,
 };
+use resale::resale;
 use std::path::{Path, PathBuf};
 
 fn inventory_content() -> PathBuf {
@@ -190,7 +194,7 @@ fn sell_then_buy_back_restores_item_and_coin_balance() {
     sell_request.extend(1u32.to_le_bytes());
     let sold = shop.handle(&sell_request).unwrap();
     assert_eq!(sold.result_code, coin_shop::RESULT_SUCCESS);
-    assert_eq!(shop.inventory().state().coins, 107);
+    assert_eq!(shop.inventory().state().coins, 100 + resale(8));
     assert_eq!(count_definition(shop.inventory().state(), 8), 0);
 
     let mut buy_back_request = vec![165, 0, 12, 0];

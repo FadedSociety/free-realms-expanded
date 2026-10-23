@@ -1,3 +1,6 @@
+#[path = "common/resale.rs"]
+mod resale;
+
 use osfr_tools::npc_interaction::{
     DialoguePacket26_3, MerchantBuyRequestV2, MerchantEntryV2, MerchantGroupV2, MerchantListV2,
     NpcAction, NpcInteraction, NpcInteractionError, NpcSelection, QuestOfferPacket49_1,
@@ -16,6 +19,7 @@ use osfr_tools::{
     },
     rewards::{RewardDisplay, RewardGrant},
 };
+use resale::resale;
 use std::{
     collections::BTreeMap,
     path::{Path, PathBuf},
@@ -191,7 +195,7 @@ fn vendor_menu_shop_buy_sell_and_close_use_coin_shop_validation() {
         .handle_coin_store(&mut shop, &sell, zone, position)
         .unwrap();
     assert_eq!(sold.result_code, coin_shop::RESULT_SUCCESS);
-    assert_eq!(shop.inventory().state().coins, 77);
+    assert_eq!(shop.inventory().state().coins, 70 + resale(8));
     assert_eq!(
         count_definition(shop.inventory().state(), 8),
         original_count + 1

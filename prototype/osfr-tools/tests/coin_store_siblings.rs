@@ -20,6 +20,7 @@ use osfr_tools::{
     npc_interaction::{NpcAction, NpcInteraction, NpcInteractionError, NpcSelection},
     station_cash::{self, Wallet},
 };
+use resale::resale;
 use serde_json::{Value, json};
 use std::{
     collections::BTreeSet,
@@ -31,10 +32,12 @@ use std::{
 #[path = "common/item_catalogue.rs"]
 #[allow(dead_code)]
 mod item_catalogue;
+#[path = "common/resale.rs"]
+mod resale;
 
 const VENDOR_ID: u64 = 9_500_000_339;
 /// Default-state fixtures from `lab/references/rust-gameplay/inventory.json`.
-const SELLABLE_INSTANCE: i32 = 14; // definition 75060, sell price 375, not equipped
+const SELLABLE_INSTANCE: i32 = 14; // definition 75060 (bought for 750), not equipped
 const EQUIPPED_INSTANCE: i32 = 34; // definition 21683, sell price 5, equipped
 const UNCATALOGUED_INSTANCE: i32 = 4; // definition 19522, no store row
 const NO_SALE_DEFINITION: i32 = 1180; // store row flagged no_sale
@@ -748,7 +751,7 @@ fn sell_then_buy_back_once_restores_the_stack_and_the_exact_coins() {
     assert!(sold.changed);
     let id = completions(&sold.replies)[0].transaction;
     let after_sale = counter.state();
-    assert_eq!(after_sale.coins, 100 + 375);
+    assert_eq!(after_sale.coins, 100 + resale(75060));
     assert_eq!(count_definition(&after_sale, 75060), stack_before - 1);
 
     let back = counter.send(&buy_back_packet(id, 0)).unwrap();
@@ -795,13 +798,13 @@ fn partial_buy_back_consumes_only_the_requested_quantity() {
 
     let sold = counter.send(&sell_packet(0, STACK, 10)).unwrap();
     let id = completions(&sold.replies)[0].transaction;
-    assert_eq!(counter.state().coins, 10 * 375);
+    assert_eq!(counter.state().coins, 10 * resale(75060));
     assert_eq!(count_definition(&counter.state(), 75060), original - 10);
 
     let partial = counter.send(&buy_back_packet(id, 3)).unwrap();
     assert!(partial.changed);
     assert_eq!(buy_backs(&partial.replies), vec![(id, RESULT_OK, 3)]);
-    assert_eq!(counter.state().coins, 7 * 375);
+    assert_eq!(counter.state().coins, 7 * resale(75060));
     assert_eq!(count_definition(&counter.state(), 75060), original - 7);
 
     // Eight exceeds the seven left on the sale. Nothing changes, including its remainder.
@@ -842,7 +845,8 @@ fn an_unaffordable_buy_back_keeps_the_sale_available() {
         counter.shop.sync_inventory(inventory);
     };
 
-    set_coins(&mut counter, 374);
+    let unit = resale(75060);
+    set_coins(&mut counter, unit - 1);
     let before = counter.state();
     let short = counter.send(&buy_back_packet(id, 0)).unwrap();
     assert!(!short.changed);
@@ -852,7 +856,7 @@ fn an_unaffordable_buy_back_keeps_the_sale_available() {
     );
     assert_eq!(counter.state(), before);
 
-    set_coins(&mut counter, 375);
+    set_coins(&mut counter, unit);
     let paid = counter.send(&buy_back_packet(id, 0)).unwrap();
     assert_eq!(buy_backs(&paid.replies), vec![(id, RESULT_OK, 0)]);
     assert_eq!(counter.state().coins, 0);
@@ -884,7 +888,7 @@ fn only_the_ten_most_recent_sales_can_be_bought_back() {
         })
         .collect();
     let paid = counter.state().coins;
-    assert_eq!(paid, 11 * 375);
+    assert_eq!(paid, 11 * resale(75060));
 
     // The oldest sale fell out of the window: refused, nothing charged.
     let evicted = counter.send(&buy_back_packet(ids[0], 0)).unwrap();
@@ -899,7 +903,7 @@ fn only_the_ten_most_recent_sales_can_be_bought_back() {
         let back = counter.send(&buy_back_packet(id, 0)).unwrap();
         assert_eq!(buy_backs(&back.replies), vec![(id, RESULT_OK, 0)]);
     }
-    assert_eq!(counter.state().coins, paid - 2 * 375);
+    assert_eq!(counter.state().coins, paid - 2 * resale(75060));
 }
 
 #[test]

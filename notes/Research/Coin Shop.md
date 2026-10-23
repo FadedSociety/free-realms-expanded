@@ -30,8 +30,28 @@ The checked-in catalogue was built from reference data only. No FreeRealms-Legac
 - `CoinStoreItems.json` has 17,198 rows with item id, category, and tint group. SHA-256: `a952fe176611a75d2f084e27d4fea328d5d0898eea72efb2f9d57b8fda389388`.
 - `ClientItemDefinitions.json` matches all 17,198 ids. Its `Cost` field exists for 16,932; 266 entries have no price. Its `MemberDiscount` is 10 for all listed items, and 2,217 entries explicitly set `NoSale`. SHA-256: `40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025`.
 - `Stores.json` has one Marketplace store. All 1,267 `StoreBundles.json` rows have `CurrencyType: 1`; they are not Coin Shop prices and were not mapped as coins. Hashes: `e4588fb75bbe9ec4f83312f8333591c46b0fe4b59eb01b6c05a71f928959ef0d` and `4f6dc81e97ca65d6571a27c07993c2b9b07d4612b14850656882b6c1b8b2771f`.
-- `data/content/stores.json` keeps 17,198 rows. Tags `L1` through `L4` identify the source data fields. `R1` marks unknown or defaulted values; `R2` marks member-price arithmetic; `R3` marks the resale rule. `Cost` is used as the starting regular coin price because these rows belong to `CoinStoreItems`; this mapping has not been checked against a real client transaction.
-- Member price is calculated as `Cost * (100 - MemberDiscount) / 100`, integer floor (R). The source percentage is also retained on each row. Sell price is half of `Cost`, integer floor (R). Rows with no `Cost` remain unpriced and cannot be bought or sold. Missing `NoSale` is treated as false (R). The source map and each row's tag list are in `stores.json`.
+- `data/content/stores.json` keeps 17,198 rows. Tags `L1` through `L4` identify the source data fields. `R1` marks unknown or defaulted values; `R2` marks member-price arithmetic; `R3` marked the original Cost/2 resale rule and now survives only on the unpriced rows and one T634 row with no sell price; `T633` marks the resale rule below. `Cost` is used as the starting regular coin price because these rows belong to `CoinStoreItems`; this mapping has not been checked against a real client transaction.
+- Member price is calculated as `Cost * (100 - MemberDiscount) / 100`, integer floor (R). The source percentage is also retained on each row. Sell price is `max(1, Cost // 10)` (T633, below; it was half of `Cost` before). Rows with no `Cost` remain unpriced and cannot be bought or sold. Missing `NoSale` is treated as false (R). The source map and each row's tag list are in `stores.json`.
+
+## Sell-back rule (T633)
+
+`sell_price_coins` is `max(1, purchase_price_coins // 10)` for the 14,829 rows that were still on the Cost/2
+reconstruction. The shipped client has no retail resale value to cite: the item catalogue's `ResellValue`
+is a reconstructed 0 for most definitions and neither Legacy nor the client's `ItemDefinitions.txt` carries
+the field, so the rule is wiki-evidenced content data (R), kept in `stores.json` so it stays tunable.
+
+- **Wiki tooltips** (`lab/references/freerealms-wiki/harvest/lists/tooltips.json`): for the 396 store-priced
+  items with a matching tooltip (426 pairs, matched by client name id), the tooltip resell value equals
+  `purchase // 10` in 341 pairs (80%) and `purchase // 2` in none. The 85 other pairs are other price eras
+  (Bokken costs 225, tooltip 58); they are listed in `notes/Autopilot/T633.md`.
+- **Community server data** (`lab/references/OpenSourceFreeRealms/ofrserver/Customize/ClientItemDefinitions.json`,
+  the same data `scripts/pieces/piece_084.py` measures): `ResellValue == max(1, Cost // 10)` for 1,229 of 1,230
+  priced rows (the exception is item 56757). This is where the floor of 1 comes from: a 5-coin item resells for
+  1, and a 10-coin item for 1 (tooltip pairs agree: 9 of 9). Rows whose captured price era differs from our
+  `Cost` do not follow it (Sanctuary's definitions: 439 of 667 follow it).
+- `scripts/build_sell_prices.py` applies the rule (idempotent, `python -I`) and mirrors it into `vendors.json`.
+  Untouched on purpose: `no_sale` rows, unpriced rows, the F228 free-issuance zeros and any row that is not on
+  the Cost/2 rule. A row whose result would exceed its cheapest buy price keeps its old value.
 
 ## Rust behavior and reconstructed policy
 

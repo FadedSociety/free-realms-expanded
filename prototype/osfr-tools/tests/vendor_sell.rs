@@ -8,6 +8,8 @@
 
 #[path = "common/gateway_vendor.rs"]
 mod gateway_vendor;
+#[path = "common/resale.rs"]
+mod resale;
 
 use gateway_vendor::{
     NOW, count_definition, inner_packets, interact, inventory_of, login, merchant_status, select,
@@ -24,6 +26,7 @@ use osfr_tools::{
         decode_coin_merchant_list_165_10,
     },
 };
+use resale::resale;
 use serde_json::{Value, json};
 use std::{
     collections::BTreeSet,
@@ -38,7 +41,7 @@ use std::{
 
 const VENDOR_ID: u64 = 9_500_000_339;
 /// Default-state fixtures from `lab/references/rust-gameplay/inventory.json`.
-const SELLABLE_INSTANCE: i32 = 14; // definition 75060, sell price 375, not equipped
+const SELLABLE_INSTANCE: i32 = 14; // definition 75060 (bought for 750), not equipped
 const EQUIPPED_INSTANCE: i32 = 34; // definition 21683, sell price 5, equipped
 /// Definition 60820: no store row, and its client definition sets NoSale, so neither the store
 /// nor the T434 Worth fallback buys it.
@@ -262,7 +265,7 @@ fn native_sell_changes_exactly_one_stack_and_the_coin_balance() {
     assert!(sold.changed);
     assert_eq!(sold.result_code, RESULT_OK);
     let after_sell = counter.state();
-    assert_eq!(after_sell.coins, after_buy.coins + 7);
+    assert_eq!(after_sell.coins, after_buy.coins + resale(8));
     assert_eq!(
         count_definition(&after_sell, 8),
         count_definition(&after_buy, 8) - 1
@@ -277,7 +280,7 @@ fn native_sell_changes_exactly_one_stack_and_the_coin_balance() {
     assert_eq!(completion.definition, 8);
     assert_eq!(
         (completion.quantity, completion.price, completion.remaining),
-        (1, 7, 1)
+        (1, resale(8), 1)
     );
     // 38/19 coin balance carries the new total.
     let balance = sold
@@ -299,7 +302,7 @@ fn sale_completion_id_drives_buy_back() {
     let sold = counter.send(&sell_packet(0, SELLABLE_INSTANCE, 1)).unwrap();
     let completion = parse_completion(sold.replies.last().unwrap());
     assert_eq!(completion.result, RESULT_OK);
-    assert_eq!(completion.price, 375);
+    assert_eq!(completion.price, resale(75060));
     // The history row id the client sends back is the record's id field.
     let mut buy_back = vec![165, 0, 12, 0];
     buy_back.extend(completion.transaction.to_le_bytes());
@@ -479,13 +482,14 @@ fn every_item_refusal_leaves_state_untouched_with_a_canary_that_still_sells() {
         .unwrap();
     assert_eq!(stack.count, 2);
     assert!(stack.count >= stack.consumed_count + stack.stored_count);
-    assert_eq!(counter.state().coins, 100 + 375);
+    assert_eq!(counter.state().coins, 100 + resale(75060));
 }
 
 #[test]
 fn coin_cap_blocks_a_sale_without_taking_the_item() {
     let cap = i32::MAX as u32;
-    let mut counter = Counter::new(cap - 374, |_| {});
+    let paid = resale(75060);
+    let mut counter = Counter::new(cap - (paid - 1), |_| {});
     counter.open();
     counter.refused(
         "over the cap",
@@ -493,7 +497,7 @@ fn coin_cap_blocks_a_sale_without_taking_the_item() {
         coin_shop::RESULT_SERVICE_UNAVAILABLE,
     );
     // Exactly reaching the cap is fine.
-    let mut counter = Counter::new(cap - 375, |_| {});
+    let mut counter = Counter::new(cap - paid, |_| {});
     counter.open();
     let sold = counter.send(&sell_packet(0, SELLABLE_INSTANCE, 1)).unwrap();
     assert_eq!(sold.result_code, RESULT_OK);
@@ -508,11 +512,11 @@ fn replay_and_reload_cannot_pay_twice() {
     let sold = counter.send(&packet).unwrap();
     assert_eq!(sold.result_code, RESULT_OK);
     let after = counter.state();
-    assert_eq!(after.coins, 375);
+    assert_eq!(after.coins, resale(75060));
     assert!(after.items.iter().all(|item| item.id != SELLABLE_INSTANCE));
     // The identical packet again finds no such item.
     counter.refused("replay", &packet, coin_shop::RESULT_INVALID_ITEM);
-    assert_eq!(counter.state().coins, 375);
+    assert_eq!(counter.state().coins, resale(75060));
 
     // Save and reload: the state round-trips and a replay against it still pays nothing.
     let saved = serde_json::to_vec(&after).unwrap();

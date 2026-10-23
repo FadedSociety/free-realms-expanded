@@ -17,6 +17,8 @@
 
 #[path = "common/gateway_vendor.rs"]
 mod gateway_vendor;
+#[path = "common/resale.rs"]
+mod resale;
 
 use gateway_vendor::{
     NOW, count_definition, inner_packets, interact, inventory_of, login, merchant_status, select,
@@ -35,6 +37,7 @@ use osfr_tools::{
     },
     world::NpcVisibility,
 };
+use resale::resale;
 use serde_json::Value;
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -44,7 +47,6 @@ use std::{
 const BORDON: u64 = 9_000_000_028;
 const BORDON_NAME: &str = "Bordon Cloo";
 const PRICE: u32 = 12;
-const SELL_PRICE: u32 = 6;
 /// A pre-existing sellable item used to free a bag slot or top up coins.
 const SEED_DEFINITION: i32 = 75_060;
 
@@ -413,7 +415,11 @@ fn bordon_sells_only_the_resolved_recovered_ingredients() {
             "{name}: 12-coin price"
         );
         assert_eq!(store["member_price_coins"], 10, "{name}: member price");
-        assert_eq!(store["sell_price_coins"], SELL_PRICE, "{name}: resale");
+        assert_eq!(
+            store["sell_price_coins"],
+            resale(*expected_id),
+            "{name}: resale"
+        );
         assert_eq!(store["no_sale"], false, "{name}: sellable policy");
         assert_eq!(
             item["purchase_price_coins"], store["purchase_price_coins"],
@@ -607,14 +613,15 @@ fn selling_an_ingredient_back_uses_the_store_price_and_is_once() {
     assert_eq!(bought.coins, 100 - PRICE);
     let (instance, _) = stack_of(&bought, INGREDIENTS[0].1).expect("the bought stack");
 
-    // 165/5 names no merchant (null session GUID); 165/6 pays the store row.
+    // 165/5 names no merchant (null session GUID); 165/6 pays the store row (a tenth, T633).
+    let sell_price = resale(INGREDIENTS[0].1);
     let sold = send(&mut gateway, &sell_packet(0, instance, 1));
     let (result, transaction, price, remaining) = sell_completion(&sold);
     assert_eq!(result, coin_shop::RESULT_SUCCESS, "sale accepted");
-    assert_eq!(price, SELL_PRICE, "resale price is the store row");
+    assert_eq!(price, sell_price, "resale price is the store row");
     assert_eq!(remaining, 1, "one copy can be bought back");
     let after_sale = inventory_of(&gateway);
-    assert_eq!(after_sale.coins, bought.coins + SELL_PRICE);
+    assert_eq!(after_sale.coins, bought.coins + sell_price);
     assert_eq!(stack_of(&after_sale, INGREDIENTS[0].1), None);
 
     // The same sell again fails and pays nothing.
@@ -641,7 +648,7 @@ fn selling_an_ingredient_back_uses_the_store_price_and_is_once() {
         coin_shop::RESULT_SUCCESS
     );
     let after_back = inventory_of(&gateway);
-    assert_eq!(after_back.coins, after_sale.coins - SELL_PRICE);
+    assert_eq!(after_back.coins, after_sale.coins - sell_price);
     assert_eq!(count_definition(&after_back, INGREDIENTS[0].1), 1);
     let before_second = gateway.snapshot();
     let again = send(&mut gateway, &buy_back);

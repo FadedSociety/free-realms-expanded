@@ -17,6 +17,8 @@ mod gateway_vendor;
 #[allow(dead_code)]
 #[path = "../src/restoration/piece_096.rs"]
 mod piece_096;
+#[path = "common/resale.rs"]
+mod resale;
 #[allow(dead_code)]
 #[path = "common/roosey_shop.rs"]
 mod roosey_shop;
@@ -36,13 +38,14 @@ use osfr_tools::{
     station_cash::Wallet,
 };
 use piece_096::{InitMessage, ItemDefinition, TypedWriter, decode_payload};
+use resale::resale;
 use roosey_shop::{Fixture, data, read_json};
 use std::collections::{BTreeMap, BTreeSet};
 
-/// `stores.json` sells it for 37; its definition shows 7.
-const RING: i32 = 75_260;
-/// `stores.json` buys it for 750 and sells it for 375; its generated row shows 0, so the tab
-/// hides it.
+/// `stores.json` pays Cost / 10 (T633) for it; its definition shows a different Worth (3).
+const RING: i32 = 75_732;
+/// `stores.json` buys it for 750 and pays Cost / 10 for it; its generated row shows 0, so the
+/// tab hides it.
 const NECKLACE: i32 = 75_250;
 /// A job starter Roosey stocks: it pays 0, its definition shows 7 and her price patch applies.
 const MALLET: i32 = 75_030;
@@ -154,13 +157,19 @@ fn shop_open_shows_each_owned_item_at_what_165_5_pays() {
     client.extend(pushed.clone());
 
     // The shipped content still disagrees with the server price (sanity, not a pin).
-    assert_eq!(listed(&login[&RING]), Some(7));
+    let (ring_paid, necklace_paid) = (resale(RING), resale(NECKLACE));
+    assert!(listed(&login[&RING]).is_some_and(|worth| worth != ring_paid));
     assert_eq!(listed(&login[&NECKLACE]), None);
     assert_eq!(listed(&login[&MALLET]), Some(7));
     assert_eq!(listed(&login[&STARTER]), Some(75));
 
     // (a) and (e): the pushed rows show what 165/5 pays, and change nothing else.
-    for (id, worth) in [(RING, 37), (NECKLACE, 375), (MALLET, 0), (STARTER, 0)] {
+    for (id, worth) in [
+        (RING, ring_paid as i32),
+        (NECKLACE, necklace_paid as i32),
+        (MALLET, 0),
+        (STARTER, 0),
+    ] {
         assert_eq!(client[&id].resell_value, worth, "item {id} shows {worth}");
     }
     for id in [RING, NECKLACE, STARTER] {
@@ -197,9 +206,33 @@ fn shop_open_shows_each_owned_item_at_what_165_5_pays() {
     }
     assert_eq!(
         inventory_of(&gateway).coins,
-        10_000 - 750 + 37 + 375 + 1,
+        10_000 - 750 + ring_paid + necklace_paid + 1,
         "ring, necklace and one ore paid; the starters paid 0"
     );
+}
+
+/// T633: a weapon, a clothing item and a consumable each pay a tenth of their buy price (the live
+/// wiki tooltips: 85, 118 and 50 for 850, 1182 and 500), not the old Cost / 2.
+#[test]
+fn weapon_clothing_and_consumable_sell_for_a_tenth_of_their_price() {
+    const WAND: i32 = 75_154;
+    const CLOAK: i32 = 43;
+    const BANDAGE: i32 = 3_998;
+    let fixture = Fixture::new(&["profiles.json"]);
+    let mut state = fixture.state();
+    give(&mut state, &[(WAND, 1), (CLOAK, 1), (BANDAGE, 1)]);
+    let mut gateway = fixture.connect(state);
+    fixture.open_shop(&mut gateway);
+
+    for (instance, definition) in (900_001..).zip([WAND, CLOAK, BANDAGE]) {
+        let (coins, rule) = (inventory_of(&gateway).coins, resale(definition));
+        assert!(rule > 1, "item {definition} is a priced row");
+        let done = completions(&send(&mut gateway, &sell_packet(0, instance, 1)));
+        assert_eq!(done.len(), 1, "one 165/6 per sell");
+        assert_eq!(done[0].result, RESULT_SUCCESS, "item {definition} sells");
+        assert_eq!(done[0].price, rule, "item {definition} pays a tenth");
+        assert_eq!(inventory_of(&gateway).coins, coins + rule);
+    }
 }
 
 #[test]
