@@ -526,10 +526,9 @@ fn replay_run(directory: &Path, manifest: Manifest) -> ReplayStats {
     let policy = test_policy();
     let mut previous_capture_time = None;
 
-    for meta in manifest.frames {
-        if meta.service != "gateway" || !matches!(meta.opcode, 1 | 2 | 9 | 13 | 21) {
-            continue;
-        }
+    let frames: Vec<_> = manifest.frames.into_iter().filter(is_replayed).collect();
+    let datagrams = read_datagrams(directory, &frames);
+    for (meta, read) in frames.into_iter().zip(datagrams) {
         assert!(meta.time.is_finite(), "non-finite capture timestamp");
         if let Some(previous) = previous_capture_time {
             assert!(
@@ -540,8 +539,7 @@ fn replay_run(directory: &Path, manifest: Manifest) -> ReplayStats {
             );
         }
         previous_capture_time = Some(meta.time);
-        let path = directory.join(&meta.path);
-        let bytes = fs::read(&path).unwrap_or_else(|_| {
+        let bytes = read.unwrap_or_else(|_| {
             panic!(
                 "missing captured gateway datagram in {}",
                 directory.display()
@@ -834,6 +832,33 @@ fn replay_run(directory: &Path, manifest: Manifest) -> ReplayStats {
         }
     }
     stats
+}
+
+fn is_replayed(meta: &FrameMeta) -> bool {
+    meta.service == "gateway" && matches!(meta.opcode, 1 | 2 | 9 | 13 | 21)
+}
+
+/// Each capture is one small file and a Windows open costs milliseconds (virus scanning), so
+/// a run of thousands of datagrams took seconds read one by one. The reads only wait on the
+/// disk, so they go out side by side; the replay itself still walks the frames in order.
+fn read_datagrams(directory: &Path, frames: &[FrameMeta]) -> Vec<std::io::Result<Vec<u8>>> {
+    let chunk = frames.len().div_ceil(32).max(1);
+    std::thread::scope(|scope| {
+        let readers: Vec<_> = frames
+            .chunks(chunk)
+            .map(|part| {
+                scope.spawn(move || {
+                    part.iter()
+                        .map(|meta| fs::read(directory.join(&meta.path)))
+                        .collect::<Vec<_>>()
+                })
+            })
+            .collect();
+        readers
+            .into_iter()
+            .flat_map(|reader| reader.join().unwrap())
+            .collect()
+    })
 }
 
 fn read_run_manifest(directory: &Path) -> Manifest {
