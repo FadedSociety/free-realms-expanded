@@ -4,7 +4,7 @@
 //! `notes/Build Guides/Gameplay/Mounts.md`; datagram byte order is unverified.
 
 use crate::{
-    inventory::InventoryState,
+    inventory::{Inventory, InventoryItem, InventoryState, ItemLook},
     startup_catalogues::{self, CharacterStat, StatUpdate, StatValue},
     startup_world, world,
 };
@@ -343,6 +343,54 @@ impl MountCatalog {
             })
             .collect()
     }
+
+    /// T482: one roster row per owned ride item, ascending by instance id: an inventory instance
+    /// with `count > 0` and a positive id (the id is what the client sends back) whose item maps
+    /// to a ride.
+    fn owned_rides<'a>(
+        &'a self,
+        inventory: &'a InventoryState,
+    ) -> Vec<(&'a InventoryItem, &'a MountDefinition)> {
+        let mut rows: Vec<_> = inventory
+            .items
+            .iter()
+            .filter(|item| item.count > 0 && item.id > 0)
+            .filter_map(|item| Some((item, self.mount_for_item(item.definition_id)?)))
+            .collect();
+        rows.sort_by_key(|(item, _)| item.id);
+        rows
+    }
+
+    /// Whether this inventory row is a roster row: owned, positively numbered, and a ride item.
+    fn is_ride_row(&self, item: &InventoryItem) -> bool {
+        item.count > 0 && item.id > 0 && self.item_to_mount.contains_key(&item.definition_id)
+    }
+
+    /// The owned ride instance with this row id; `None` for an unknown, unowned, zero-count,
+    /// non-positive or non-ride id.
+    fn owned_instance<'a>(
+        &self,
+        inventory: &'a InventoryState,
+        instance_id: i32,
+    ) -> Option<&'a InventoryItem> {
+        let is_row = |item: &&InventoryItem| item.id == instance_id && self.is_ride_row(item);
+        inventory.items.iter().find(is_row)
+    }
+
+    /// The owned ride instance with the lowest id whose item definition passes `item_matches`.
+    fn lowest_instance<'a>(
+        &self,
+        inventory: &'a InventoryState,
+        item_matches: impl Fn(i32) -> bool,
+    ) -> Option<&'a InventoryItem> {
+        let wanted =
+            |item: &&InventoryItem| self.is_ride_row(item) && item_matches(item.definition_id);
+        inventory
+            .items
+            .iter()
+            .filter(wanted)
+            .min_by_key(|item| item.id)
+    }
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -364,6 +412,8 @@ impl RideRestrictions {
 #[derive(Clone, Debug, PartialEq)]
 pub struct ActiveRide {
     pub mount_id: i32,
+    /// T482: the inventory instance (roster row id) this ride was summoned from.
+    pub instance_id: i32,
     pub actor_guid: u64,
 }
 
@@ -442,10 +492,21 @@ pub struct MountService {
     catalog: Arc<MountCatalog>,
     state: MountState,
     last_spawn_ms: Option<u64>,
-    /// Session-only: the owned ride ids (ascending, as `owned_mounts` lists them) and the active
-    /// ride GUID of the last roster (168/5) sent. `list_packet` records it, `roster_sync` compares
-    /// with it, `reset` clears it; `None` until world entry sends the first roster.
-    last_sent: Option<(Vec<i32>, Option<u64>)>,
+    /// Session-only: what the last roster (168/5) sent. `list_packet` records it, `roster_sync`
+    /// compares with it, `reset` clears it; `None` until world entry sends the first roster.
+    last_sent: Option<SentRoster>,
+    /// T482: the catalogue look of every ride item, for each row's tint alias.
+    looks: BTreeMap<i32, ItemLook>,
+}
+
+/// T482: every field of the last roster that comes from live state. A row's name and image set
+/// come from the ride and its alias from the item's catalogue row, both fixed by the item
+/// definition, so a row changes only through these.
+#[derive(Clone, Debug)]
+struct SentRoster {
+    /// (instance id, item definition, tint) per row, ascending: the order of `owned_rides`.
+    rows: Vec<(i32, i32, i32)>,
+    active_guid: Option<u64>,
 }
 
 impl MountService {
@@ -455,7 +516,18 @@ impl MountService {
             state: MountState::Empty,
             last_spawn_ms: None,
             last_sent: None,
+            looks: BTreeMap::new(),
         }
+    }
+
+    /// The service for the ride catalogue at `path`, with the look of every ride item read from
+    /// the loaded item catalogue (`Inventory::look`).
+    pub fn load(path: &Path, inventory: &Inventory) -> io::Result<Self> {
+        let mut service = Self::new(MountCatalog::load(path)?);
+        service.looks = (service.catalog.item_to_mount.keys())
+            .filter_map(|id| Some((*id, inventory.look(*id)?)))
+            .collect();
+        Ok(service)
     }
 
     pub fn state(&self) -> &MountState {
@@ -490,31 +562,39 @@ impl MountService {
     /// The owner's roster (168/5). Every roster sent goes through here, so it also records what
     /// the client now holds (`last_sent`).
     pub fn list_packet(&mut self, inventory: &InventoryState) -> Vec<u8> {
-        let mounts = self.catalog.owned_mounts(inventory);
+        let rows = self.catalog.owned_rides(inventory);
         let active = self.state.active_ride();
-        let ids = mounts.iter().map(|mount| mount.id).collect();
-        self.last_sent = Some((ids, active.map(|ride| ride.actor_guid)));
-        encode_mount_list(&mounts, active)
+        self.last_sent = Some(SentRoster {
+            rows: rows
+                .iter()
+                .map(|(item, _)| (item.id, item.definition_id, item.tint))
+                .collect(),
+            active_guid: active.map(|ride| ride.actor_guid),
+        });
+        encode_mount_list(&rows, active, &self.looks)
     }
 
-    /// The roster again when the owned rides or the active ride changed since the last one sent;
-    /// `None` when nothing changed or before world entry sent the first. It runs after every
-    /// message and tick, so it allocates nothing unless it sends: every owned ride item must map
-    /// to a remembered ride, and every remembered ride must still be owned.
+    /// The roster again when an owned ride item, its tint or the active ride changed since the
+    /// last one sent; `None` when nothing changed or before world entry sent the first. It runs
+    /// after every message and tick, so it allocates nothing unless it sends: every live ride row
+    /// must be a remembered one (the remembered rows are sorted and instance ids are unique) and
+    /// the counts must match, so no remembered row is gone.
     pub fn roster_sync(&mut self, inventory: &InventoryState) -> Option<Vec<u8>> {
-        let (ids, guid) = self.last_sent.as_ref()?;
-        let unchanged = *guid == self.state.active_ride().map(|ride| ride.actor_guid)
-            && inventory
-                .items
-                .iter()
-                .filter(|item| item.count > 0)
-                .filter_map(|item| self.catalog.item_to_mount.get(&item.definition_id))
-                .all(|id| ids.binary_search(id).is_ok())
-            && ids.iter().all(|id| {
-                self.catalog
-                    .mount(*id)
-                    .is_some_and(|mount| is_owned(mount, inventory))
-            });
+        let sent = self.last_sent.as_ref()?;
+        let mut live = 0;
+        let mut all_sent = true;
+        for item in inventory
+            .items
+            .iter()
+            .filter(|i| self.catalog.is_ride_row(i))
+        {
+            live += 1;
+            let row = (item.id, item.definition_id, item.tint);
+            all_sent &= sent.rows.binary_search(&row).is_ok();
+        }
+        let unchanged = all_sent
+            && live == sent.rows.len()
+            && sent.active_guid == self.state.active_ride().map(|ride| ride.actor_guid);
         (!unchanged).then(|| self.list_packet(inventory))
     }
 
@@ -540,17 +620,38 @@ impl MountService {
         outcome
     }
 
-    /// (R) Losing the ride item (trade, sale, drop) ends the ride: no candidate item of the active
-    /// ride's mount is owned any more. Another owned candidate (Scaled Dragon 7960 and 76856)
-    /// keeps it out.
+    /// (R) Losing the ride item (trade, sale, drop) ends the ride: the instance it was summoned
+    /// from (T482: that row, not any item of the same ride) is no longer owned.
     fn ride_lost(&self, inventory: &InventoryState) -> bool {
-        self.state.active_ride().is_some_and(|ride| {
-            self.catalog
-                .mount(ride.mount_id)
-                .is_none_or(|mount| !is_owned(mount, inventory))
-        })
+        self.state
+            .active_ride()
+            .is_some_and(|ride| !self.owns(ride, inventory))
     }
 
+    /// Whether the ride's own instance is still owned and still maps to the ride.
+    fn owns(&self, ride: &ActiveRide, inventory: &InventoryState) -> bool {
+        self.catalog
+            .owned_instance(inventory, ride.instance_id)
+            .and_then(|item| self.catalog.item_to_mount.get(&item.definition_id))
+            == Some(&ride.mount_id)
+    }
+
+    /// (R) A ride actor must have its own nonzero world GUID, and riding must be allowed.
+    fn spawn_guard(
+        owner_guid: u64,
+        actor_guid: u64,
+        restrictions: RideRestrictions,
+    ) -> Result<(), MountError> {
+        if owner_guid == 0 || actor_guid == 0 || actor_guid == owner_guid {
+            return Err(MountError::InvalidGuid);
+        }
+        if !restrictions.allows() {
+            return Err(MountError::Restricted);
+        }
+        Ok(())
+    }
+
+    /// Summon a ride by definition: its owned instance with the lowest id (T482).
     pub fn spawn(
         &mut self,
         owner_guid: u64,
@@ -561,20 +662,86 @@ impl MountService {
         now_ms: u64,
         observers: &[u64],
     ) -> Result<MountOutcome, MountError> {
-        // (R) A ride actor must have its own nonzero world GUID.
-        if owner_guid == 0 || actor_guid == 0 || actor_guid == owner_guid {
-            return Err(MountError::InvalidGuid);
-        }
-        if !restrictions.allows() {
-            return Err(MountError::Restricted);
-        }
+        Self::spawn_guard(owner_guid, actor_guid, restrictions)?;
         let mount = self
             .catalog
-            .mount_arc(mount_id)
+            .mount(mount_id)
             .ok_or(MountError::UnknownMount)?;
-        if !is_owned(&mount, inventory) {
-            return Err(MountError::NotOwned);
-        }
+        let candidates = &mount.item_definition_id_candidates;
+        let instance = (self.catalog)
+            .lowest_instance(inventory, |item| candidates.contains(&item))
+            .ok_or(MountError::NotOwned)?
+            .id;
+        self.spawn_instance(
+            owner_guid, inventory, instance, actor_guid, now_ms, observers,
+        )
+    }
+
+    /// Summon the ride a roster row (168/6) names: that exact owned instance. An id that is
+    /// unknown, not owned, zero-count, not positive or not a ride is refused (T482).
+    pub fn spawn_row(
+        &mut self,
+        owner_guid: u64,
+        inventory: &InventoryState,
+        instance_id: i32,
+        actor_guid: u64,
+        restrictions: RideRestrictions,
+        now_ms: u64,
+        observers: &[u64],
+    ) -> Result<MountOutcome, MountError> {
+        Self::spawn_guard(owner_guid, actor_guid, restrictions)?;
+        self.spawn_instance(
+            owner_guid,
+            inventory,
+            instance_id,
+            actor_guid,
+            now_ms,
+            observers,
+        )
+    }
+
+    /// 168/8: the owned instance of that item with the lowest id (T482).
+    pub fn spawn_by_item_definition(
+        &mut self,
+        owner_guid: u64,
+        inventory: &InventoryState,
+        item_definition_id: i32,
+        actor_guid: u64,
+        restrictions: RideRestrictions,
+        now_ms: u64,
+        observers: &[u64],
+    ) -> Result<MountOutcome, MountError> {
+        (self.catalog)
+            .mount_for_item(item_definition_id)
+            .ok_or(MountError::UnknownMountItem)?;
+        Self::spawn_guard(owner_guid, actor_guid, restrictions)?;
+        let instance = (self.catalog)
+            .lowest_instance(inventory, |item| item == item_definition_id)
+            .ok_or(MountError::NotOwned)?
+            .id;
+        self.spawn_instance(
+            owner_guid, inventory, instance, actor_guid, now_ms, observers,
+        )
+    }
+
+    /// The summon itself, after the guards passed and the instance was chosen.
+    fn spawn_instance(
+        &mut self,
+        owner_guid: u64,
+        inventory: &InventoryState,
+        instance_id: i32,
+        actor_guid: u64,
+        now_ms: u64,
+        observers: &[u64],
+    ) -> Result<MountOutcome, MountError> {
+        let item = (self.catalog)
+            .owned_instance(inventory, instance_id)
+            .ok_or(MountError::NotOwned)?;
+        let mount = (self.catalog)
+            .mount_for_item(item.definition_id)
+            .and_then(|mount| self.catalog.mount_arc(mount.id))
+            .ok_or(MountError::UnknownMount)?;
+        let mount_id = mount.id;
         if self
             .last_spawn_ms
             .is_some_and(|last| now_ms.saturating_sub(last) < SPAWN_DEBOUNCE_MS)
@@ -608,6 +775,7 @@ impl MountService {
         }
         self.state = MountState::Spawned(ActiveRide {
             mount_id,
+            instance_id,
             actor_guid,
         });
         self.last_spawn_ms = Some(now_ms);
@@ -631,32 +799,6 @@ impl MountService {
                 .push(rider_stats(owner_guid, self.catalog.on_foot_stats()));
         }
         Ok(outcome)
-    }
-
-    pub fn spawn_by_item_definition(
-        &mut self,
-        owner_guid: u64,
-        inventory: &InventoryState,
-        item_definition_id: i32,
-        actor_guid: u64,
-        restrictions: RideRestrictions,
-        now_ms: u64,
-        observers: &[u64],
-    ) -> Result<MountOutcome, MountError> {
-        let mount_id = self
-            .catalog
-            .mount_for_item(item_definition_id)
-            .map(|mount| mount.id)
-            .ok_or(MountError::UnknownMountItem)?;
-        self.spawn(
-            owner_guid,
-            inventory,
-            mount_id,
-            actor_guid,
-            restrictions,
-            now_ms,
-            observers,
-        )
     }
 
     pub fn mount(
@@ -689,7 +831,7 @@ impl MountService {
             .catalog
             .mount(ride.mount_id)
             .ok_or(MountError::UnknownMount)?;
-        if !is_owned(mount, inventory) {
+        if !self.owns(&ride, inventory) {
             return Err(MountError::NotOwned);
         }
         if seat_index >= u32::from(mount.seat_count) {
@@ -781,7 +923,9 @@ impl MountService {
 /// 168/1 `PacketMountRequest` (`008b3730`: target GUID plus further fields), 168/3
 /// `PacketDismountRequest` (`009aa410`, no fields), 168/6 spawn (`00b038c0`, one i32 ride id,
 /// writer `00b05a80`) and 168/8 spawn by item (`00b03970`, i32 item definition and a flag byte
-/// that is always 1, writer `00b05ae0`).
+/// that is always 1, writer `00b05ae0`). T482: the 168/6 id is a roster row id, an inventory
+/// instance id (the client echoes the id of the row it clicked, `00bff6f0` "Lua Spawn and
+/// automount: id %d"), so `Spawn::mount_id` names that instance, not a ride.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MountRequest {
     Mount { target: u64 },
@@ -953,7 +1097,7 @@ impl MountService {
         let owner = ctx.guid;
         let actor = Self::ride_guid(owner);
         let result = match request {
-            MountRequest::Spawn { mount_id } => self.spawn(
+            MountRequest::Spawn { mount_id } => self.spawn_row(
                 owner,
                 ctx.inventory,
                 mount_id,
@@ -1065,33 +1209,36 @@ fn remove_actor(guid: u64) -> Vec<u8> {
     out
 }
 
-fn is_owned(mount: &MountDefinition, inventory: &InventoryState) -> bool {
-    inventory.items.iter().any(|item| {
-        item.count > 0
-            && mount
-                .item_definition_id_candidates
-                .contains(&item.definition_id)
-    })
-}
-
 /// Client reader: 00b06100 case 5 -> 00b05e00 -> 00b05830 (i32 count) -> 008e74c0 per record;
 /// 00b05600 then replaces the BaseClient mount store and refreshes the UI.
-fn encode_mount_list(mounts: &[&MountDefinition], active: Option<&ActiveRide>) -> Vec<u8> {
+///
+/// T482: one record per owned ride item. The id is the inventory instance id, which the client
+/// sends back in 168/6 (`00b038c0`); the tint is the instance's own (0 when undyed, as the
+/// captured rows show); the alias is the item's catalogue alias, else the ride's.
+fn encode_mount_list(
+    rows: &[(&InventoryItem, &MountDefinition)],
+    active: Option<&ActiveRide>,
+    looks: &BTreeMap<i32, ItemLook>,
+) -> Vec<u8> {
     let mut out = header(LIST);
-    put_i32(&mut out, mounts.len() as i32);
-    for mount in mounts {
-        put_i32(&mut out, mount.id);
+    put_i32(&mut out, rows.len() as i32);
+    for (item, mount) in rows {
+        put_i32(&mut out, item.id);
         put_i32(&mut out, mount.name_string_id);
         put_i32(&mut out, mount.image_set_id);
         put_u64(
             &mut out,
             active
-                .filter(|ride| ride.mount_id == mount.id)
+                .filter(|ride| ride.instance_id == item.id)
                 .map_or(0, |ride| ride.actor_guid),
         );
         out.push(u8::from(mount.members_only));
-        put_i32(&mut out, mount.tint_id);
-        put_string(&mut out, &mount.tint_alias);
+        put_i32(&mut out, item.tint);
+        let alias = looks.get(&item.definition_id);
+        put_string(
+            &mut out,
+            alias.map_or(&mount.tint_alias, |look| &look.tint_alias),
+        );
         out.push(u8::from(mount.is_upgradable));
         out.push(u8::from(mount.is_upgraded));
     }

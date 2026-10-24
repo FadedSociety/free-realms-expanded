@@ -22,7 +22,9 @@ use osfr_tools::{
 };
 use std::path::PathBuf;
 
-const RIDE: i32 = 993; // Wolf, bundled `mounts.json`
+/// T482: 168/6 names a roster row, an inventory instance: the first ride item `game_with` grants
+/// (the gateway test grants 900_001 itself).
+const ROW: i32 = 900_001;
 const RIDE_ITEM: i32 = 14289; // its item definition, present in the captured catalogue
 const NOW: u64 = 10_000;
 
@@ -45,7 +47,7 @@ fn ride_guid() -> u64 {
 }
 
 fn spawn() -> Vec<u8> {
-    [vec![168, 0, 6], RIDE.to_le_bytes().to_vec()].concat()
+    [vec![168, 0, 6], ROW.to_le_bytes().to_vec()].concat()
 }
 fn board() -> Vec<u8> {
     [
@@ -60,14 +62,8 @@ const PUT_AWAY: [u8; 3] = [168, 0, 3];
 /// A game that owns `items` (as stacks of one); returns it with world entry done.
 fn game_with(items: &[i32]) -> Gameplay {
     let mut state = Gameplay::load(&reference(), None).unwrap().state();
-    let mut id = state
-        .inventory
-        .items
-        .iter()
-        .map(|i| i.id)
-        .max()
-        .unwrap_or(0)
-        + 1000;
+    let mut id = ROW - 1;
+    assert!(state.inventory.items.iter().all(|i| i.id < ROW));
     for definition_id in items {
         id += 1;
         state.inventory.items.push(InventoryItem {
@@ -348,14 +344,9 @@ fn rider_at(position: [f32; 3], job: i32, items: &[(i32, u32)]) -> Gateway {
     let profiles = state.profiles.as_mut().unwrap();
     profiles.unlocked.insert(job);
     profiles.active = job;
-    let mut id = state
-        .inventory
-        .items
-        .iter()
-        .map(|i| i.id)
-        .max()
-        .unwrap_or(0)
-        + 1000;
+    // The ride item is granted first, so it is row `ROW`.
+    let mut id = ROW - 1;
+    assert!(state.inventory.items.iter().all(|i| i.id < ROW));
     for (definition_id, count) in [(RIDE_ITEM, 1)].iter().chain(items) {
         id += 1;
         state.inventory.items.push(InventoryItem {

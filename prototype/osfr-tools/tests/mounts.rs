@@ -1,9 +1,9 @@
 use osfr_tools::{inventory, mounts};
 
-use inventory::{InventoryItem, InventoryState};
+use inventory::{Inventory, InventoryItem, InventoryState};
 use mounts::{
     ActiveRide, MountCatalog, MountDefinition, MountEffectKind, MountError, MountService,
-    MountSource, MountState, MountType, RideRestrictions,
+    MountSource, MountState, MountType, RideContext, RidePose, RideRestrictions,
 };
 use std::path::PathBuf;
 
@@ -98,7 +98,8 @@ fn packet_effects(outcome: &mounts::MountOutcome) -> Vec<(Vec<u64>, Vec<u8>)> {
 
 fn expected_mount_list(actor_guid: u64) -> Vec<u8> {
     let mut bytes = vec![0xa8, 0x00, 0x05, 1, 0, 0, 0];
-    bytes.extend_from_slice(&MOUNT_ID.to_le_bytes());
+    // T482: the row id is the inventory instance id (the fixture's first item), not the ride id.
+    bytes.extend_from_slice(&1_i32.to_le_bytes());
     bytes.extend_from_slice(&10_i32.to_le_bytes());
     bytes.extend_from_slice(&11_i32.to_le_bytes());
     bytes.extend_from_slice(&actor_guid.to_le_bytes());
@@ -343,7 +344,8 @@ fn item_definition_spawn_uses_the_catalog_crosswalk() {
         service.state(),
         MountState::Spawned(ActiveRide {
             mount_id: MOUNT_ID,
-            actor_guid: MOUNT_ACTOR
+            actor_guid: MOUNT_ACTOR,
+            ..
         })
     ));
     assert_eq!(
@@ -427,4 +429,185 @@ fn restrictions_reject_spawn_in_minigame_ability_or_blocked_zone() {
             Err(MountError::Restricted)
         );
     }
+}
+
+// ---------------------------------------------------------------- T482: one row per owned ride
+
+/// Lava Tiger (ride 12688) has two items in the captured reference catalogue with different looks:
+/// 17240 (alias `blizzard`) and 76906 (alias `dyetint`).
+const LAVA_TIGER: i32 = 12688;
+const BLIZZARD_ITEM: i32 = 17240;
+const DYETINT_ITEM: i32 = 76906;
+
+/// The real ride catalogue with the item looks of the reference item catalogue.
+fn lava_service() -> MountService {
+    let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+    let reference = manifest.join("../../../lab/references/rust-opening-cooking-original-assets");
+    let items = Inventory::load(&reference, None).unwrap();
+    MountService::load(&manifest.join("data/content/mounts.json"), &items).unwrap()
+}
+
+/// One 168/5 record as the client reads it: (row id, guid, tint, alias).
+fn rows(list: &[u8]) -> Vec<(i32, u64, i32, String)> {
+    let word = |at: usize| i32::from_le_bytes(list[at..at + 4].try_into().unwrap());
+    let mut at = 7;
+    let mut out = Vec::new();
+    for _ in 0..word(3) {
+        let guid = u64::from_le_bytes(list[at + 12..at + 20].try_into().unwrap());
+        let alias_len = word(at + 25) as usize;
+        let alias = String::from_utf8(list[at + 29..at + 29 + alias_len].to_vec()).unwrap();
+        out.push((word(at), guid, word(at + 21), alias));
+        at += 29 + alias_len + 2;
+    }
+    assert_eq!(at, list.len(), "no trailing bytes");
+    out
+}
+
+fn request(row: i32) -> Vec<u8> {
+    [vec![168, 0, 6], row.to_le_bytes().to_vec()].concat()
+}
+
+fn context(inventory: &InventoryState, now_ms: u64) -> RideContext<'_> {
+    RideContext {
+        guid: OWNER,
+        inventory,
+        restrictions: restrictions(),
+        pose: RidePose {
+            position: [0.0; 3],
+            heading: 0.0,
+        },
+        now_ms,
+    }
+}
+
+#[test]
+fn each_owned_ride_item_is_its_own_row() {
+    let mut service = lava_service();
+    let mut owned = inventory(&[BLIZZARD_ITEM, DYETINT_ITEM, 1, BLIZZARD_ITEM]);
+    owned.items[3].count = 0; // an emptied instance is not a row; the non-ride item 1 is not either
+    assert_eq!(
+        rows(&service.list_packet(&owned)),
+        [
+            (1, 0, 0, "blizzard".to_owned()),
+            (2, 0, 0, "dyetint".to_owned())
+        ]
+    );
+    // A dyed instance lists its own tint; the other row keeps 0.
+    owned.items[1].tint = 249;
+    assert_eq!(
+        rows(&service.list_packet(&owned))[1],
+        (2, 0, 249, "dyetint".to_owned())
+    );
+    // Duplicates of one item are separate rows too, ordered by instance id.
+    let twins = inventory(&[BLIZZARD_ITEM, BLIZZARD_ITEM]);
+    let list = service.list_packet(&twins);
+    let ids: Vec<i32> = rows(&list).iter().map(|row| row.0).collect();
+    assert_eq!(ids, [1, 2]);
+    // The ride's name and image set still come from the ride definition.
+    let ride = service.catalog().mount(LAVA_TIGER).unwrap();
+    assert_eq!(&list[11..15], &ride.name_string_id.to_le_bytes());
+    assert_eq!(&list[15..19], &ride.image_set_id.to_le_bytes());
+}
+
+#[test]
+fn a_changed_tint_resends_the_roster() {
+    let mut service = lava_service();
+    let mut owned = inventory(&[BLIZZARD_ITEM, DYETINT_ITEM]);
+    assert_eq!(service.roster_sync(&owned), None, "before world entry");
+    service.list_packet(&owned);
+    assert_eq!(service.roster_sync(&owned), None, "nothing changed");
+    owned.items[0].tint = 249; // the ride set is the same; only a tint moved
+    let resent = service
+        .roster_sync(&owned)
+        .expect("a dye resends the roster");
+    assert_eq!(rows(&resent)[0].2, 249);
+    assert_eq!(service.roster_sync(&owned), None, "sent once");
+}
+
+#[test]
+fn spawning_a_row_summons_that_instance() {
+    let mut service = lava_service();
+    let owned = inventory(&[BLIZZARD_ITEM, DYETINT_ITEM]);
+    let wire = service
+        .handle(&request(2), &context(&owned, 0))
+        .unwrap()
+        .unwrap();
+    assert_eq!(wire.notice, None);
+    assert!(matches!(
+        service.state(),
+        MountState::Spawned(ActiveRide {
+            mount_id: LAVA_TIGER,
+            instance_id: 2,
+            ..
+        })
+    ));
+    let actor = MountService::ride_guid(OWNER);
+    let sent = rows(&wire.private[0]);
+    assert_eq!(
+        sent.iter().map(|row| (row.0, row.1)).collect::<Vec<_>>(),
+        [(1, 0), (2, actor)],
+        "only the summoned row carries the guid"
+    );
+    // Boarding rechecks that instance: its sibling does not stand in for it.
+    let mut only_sibling = inventory(&[]);
+    only_sibling.items.push(owned.items[0].clone());
+    assert_eq!(
+        service.mount(OWNER, OWNER, &only_sibling, actor, 0, restrictions(), &[]),
+        Err(MountError::NotOwned)
+    );
+    assert!(
+        service
+            .mount(OWNER, OWNER, &owned, actor, 0, restrictions(), &[])
+            .is_ok()
+    );
+}
+
+#[test]
+fn a_stale_row_is_refused_without_change() {
+    let mut owned = inventory(&[BLIZZARD_ITEM, DYETINT_ITEM, 1]);
+    owned.items[1].count = 0;
+    let mut service = lava_service();
+    service
+        .handle(&request(1), &context(&owned, 0))
+        .unwrap()
+        .unwrap();
+    let before = service.state().clone();
+    // A zero-count instance, an unknown id, zero, a negative id, a non-ride item and a ride id.
+    for row in [2, 99, 0, -1, 3, LAVA_TIGER] {
+        let wire = service
+            .handle(&request(row), &context(&owned, 5_000))
+            .unwrap()
+            .unwrap();
+        assert!(wire.notice.is_some(), "row {row}");
+        assert!(wire.shared.is_empty(), "row {row}");
+        // The refresh is the roster as it stands: the one owned row, still the active ride.
+        let roster = rows(&wire.private[0]);
+        assert_eq!(roster.len(), 1, "row {row}");
+        assert_eq!(roster[0].1, MountService::ride_guid(OWNER), "row {row}");
+        assert_eq!(service.state(), &before, "row {row}");
+    }
+}
+
+#[test]
+fn spawn_by_item_picks_the_lowest_owned_instance() {
+    let mut service = lava_service();
+    let mut owned = inventory(&[BLIZZARD_ITEM, DYETINT_ITEM, BLIZZARD_ITEM]);
+    owned.items.reverse(); // listed as instance 3, 2, 1: the lowest id is not the first listed
+    let item = [
+        vec![168, 0, 8],
+        BLIZZARD_ITEM.to_le_bytes().to_vec(),
+        vec![1],
+    ]
+    .concat();
+    service.handle(&item, &context(&owned, 0)).unwrap().unwrap();
+    assert!(matches!(
+        service.state(),
+        MountState::Spawned(ActiveRide { instance_id: 1, .. })
+    ));
+    // An item that is not owned is refused and changes nothing.
+    let mut service = lava_service();
+    let other = inventory(&[DYETINT_ITEM]);
+    let wire = service.handle(&item, &context(&other, 0)).unwrap().unwrap();
+    assert!(wire.notice.is_some());
+    assert_eq!(service.state(), &MountState::Empty);
 }

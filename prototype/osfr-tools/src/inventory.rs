@@ -323,6 +323,14 @@ struct Content {
     initial_state: Option<InventoryState>,
 }
 
+/// An item's catalogue look (`Inventory::look`).
+#[derive(Clone, Debug, PartialEq)]
+pub struct ItemLook {
+    pub texture: String,
+    pub tint_alias: String,
+    pub default_tint: i32,
+}
+
 #[derive(Clone)]
 pub struct Inventory {
     content: Arc<Content>,
@@ -499,6 +507,17 @@ impl Inventory {
     /// content bindings that must not reference unknown reward definitions.
     pub fn has_definition(&self, definition_id: i32) -> bool {
         self.content.definitions.contains_key(&definition_id)
+    }
+
+    /// How the catalogue draws this item (the fields `write_attachment` sends); `None` when the
+    /// loaded catalogue does not define it.
+    pub fn look(&self, definition_id: i32) -> Option<ItemLook> {
+        let definition = self.content.definitions.get(&definition_id)?;
+        Some(ItemLook {
+            texture: definition.texture.clone(),
+            tint_alias: definition.tint_alias.clone(),
+            default_tint: definition.default_tint,
+        })
     }
 
     /// Every item definition id the loaded catalogue defines, ascending. A

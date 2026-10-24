@@ -141,23 +141,21 @@ fn item(definition_id: i32, id: i32) -> InventoryItem {
     }
 }
 
+/// T482: a roster row is an inventory instance (168/6 names it), so the fixtures number each ride
+/// item by its ride: `spawn(WOLF)` names the row of the Wolf item.
+fn ride_of(item_id: i32) -> i32 {
+    let catalog = MountCatalog::load(mounts_json()).unwrap();
+    catalog.mount_for_item(item_id).unwrap().id
+}
+
 /// A game that owns `items`, with world entry done (as `tests/mount_wired.rs::game_with`).
 fn game_with(items: &[i32]) -> Gameplay {
     let reference = lab().join("references/rust-opening-cooking-original-assets");
     let mut state = Gameplay::load(&reference, None).unwrap().state();
-    let next = state
-        .inventory
-        .items
-        .iter()
-        .map(|i| i.id)
-        .max()
-        .unwrap_or(0)
-        + 1000;
-    for (n, definition_id) in items.iter().enumerate() {
-        state
-            .inventory
-            .items
-            .push(item(*definition_id, next + n as i32));
+    for definition_id in items {
+        let row = ride_of(*definition_id);
+        assert!(state.inventory.items.iter().all(|i| i.id != row));
+        state.inventory.items.push(item(*definition_id, row));
     }
     let mut game = Gameplay::load(&reference, Some(state)).unwrap();
     game.initialize_world(&who(), 0).unwrap();
@@ -390,19 +388,6 @@ fn wolf_row(document: &mut Value) -> &mut Value {
         .unwrap()
 }
 
-fn inventory(definitions: &[i32]) -> InventoryState {
-    InventoryState {
-        coins: 0,
-        items: definitions
-            .iter()
-            .enumerate()
-            .map(|(n, definition_id)| item(*definition_id, n as i32 + 1))
-            .collect(),
-        equipment: Vec::new(),
-        next_instance_id: None,
-    }
-}
-
 fn request(
     service: &mut MountService,
     inner: &[u8],
@@ -431,7 +416,12 @@ fn request(
 
 /// Summon and board `mount` through `MountService::handle`; the boarding's 38/7 updates.
 fn board_with(service: &mut MountService, mount: i32, item_id: i32) -> Vec<Update> {
-    let owned = inventory(&[item_id]);
+    let owned = InventoryState {
+        coins: 0,
+        items: vec![item(item_id, mount)],
+        equipment: Vec::new(),
+        next_instance_id: None,
+    };
     request(service, &spawn(mount), &owned, NOW);
     request(service, &board(ride_guid()), &owned, NOW + 10)
 }
@@ -584,7 +574,7 @@ fn one_second_dash(mount: Option<(i32, i32)>) -> f32 {
     character.position = [0.0; 3];
     let mut state = Gameplay::load(&content, None).unwrap().state();
     if let Some((_, item_id)) = mount {
-        state.inventory.items.push(item(item_id, 900_001));
+        state.inventory.items.push(item(item_id, ride_of(item_id)));
     }
     let mut gateway = Gateway::load_gameplay(&reference, character, &content, Some(state)).unwrap();
     gateway.set_dev_tools(false);

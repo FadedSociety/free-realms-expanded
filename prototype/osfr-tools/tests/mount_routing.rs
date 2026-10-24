@@ -25,6 +25,8 @@ const OTHER: u64 = 8;
 /// Skeletal Dragon (mount 715) and the one item definition that grants it in `mounts.json`.
 const DRAGON: i32 = 715;
 const DRAGON_ITEM: i32 = 10530;
+/// T482: 168/6 names a roster row, an inventory instance; the fixture's first item is instance 1.
+const ROW: i32 = 1;
 
 fn catalog() -> MountCatalog {
     MountCatalog::load(PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/mounts.json"))
@@ -168,7 +170,7 @@ fn an_owned_ride_is_summoned_boarded_and_put_away() {
     let actor = MountService::ride_guid(OWNER);
     assert_ne!(actor, OWNER);
 
-    let spawned = handle(&mut service, &spawn_request(DRAGON), &owned, 0);
+    let spawned = handle(&mut service, &spawn_request(ROW), &owned, 0);
     // The owner's roster entry carries the ride actor's GUID before the actor appears.
     assert_eq!(sub_opcodes(&spawned.private), vec![(168, 5)]);
     assert!(
@@ -214,7 +216,7 @@ fn a_ride_the_player_does_not_own_is_refused() {
     let mut service = MountService::new(catalog());
     // Another item and no item: neither grants the Skeletal Dragon.
     for inv in [inventory(&[]), inventory(&[1, 2, 3])] {
-        let refused = handle(&mut service, &spawn_request(DRAGON), &inv, 0);
+        let refused = handle(&mut service, &spawn_request(ROW), &inv, 0);
         assert!(refused.shared.is_empty());
         assert_eq!(refused.notice, Some("You do not own that ride."));
         // The owner still gets a roster refresh so the client UI resets.
@@ -245,7 +247,7 @@ fn a_ride_the_player_does_not_own_is_refused() {
         .is_empty()
     );
     // A hostile 168/1 naming some other actor boards nothing.
-    handle(&mut service, &spawn_request(DRAGON), &owned, 0);
+    handle(&mut service, &spawn_request(ROW), &owned, 0);
     let wrong = handle(&mut service, &mount_request(OTHER), &owned, 10);
     assert!(wrong.shared.is_empty() && wrong.notice.is_some());
     assert!(!service.is_mounted());
@@ -266,7 +268,7 @@ fn restrictions_block_summoning_and_boarding() {
     ] {
         let mut service = MountService::new(catalog());
         let wire = service
-            .handle(&spawn_request(DRAGON), &ctx(&owned, blocked, 0))
+            .handle(&spawn_request(ROW), &ctx(&owned, blocked, 0))
             .unwrap()
             .unwrap();
         assert!(wire.shared.is_empty());
@@ -284,7 +286,7 @@ fn every_server_trigger_dismounts_and_removes_the_ride() {
     for trigger in ["zoning", "combat", "knockout", "minigame"] {
         for mounted in [true, false] {
             let mut service = MountService::new(catalog());
-            handle(&mut service, &spawn_request(DRAGON), &owned, 0);
+            handle(&mut service, &spawn_request(ROW), &owned, 0);
             if mounted {
                 handle(&mut service, &mount_request(actor), &owned, 10);
             }
@@ -316,7 +318,7 @@ fn every_server_trigger_dismounts_and_removes_the_ride() {
         ..open()
     };
     let wire = service
-        .handle(&spawn_request(DRAGON), &ctx(&owned, down, 5_000))
+        .handle(&spawn_request(ROW), &ctx(&owned, down, 5_000))
         .unwrap()
         .unwrap();
     assert!(wire.shared.is_empty());
@@ -347,7 +349,7 @@ fn a_second_player_in_range_sees_the_ride_and_its_removal() {
 
     // The gateway delivers `shared` to the owner's neighbours; B sees it, the distant player not.
     let mut service = MountService::new(catalog());
-    let spawned = handle(&mut service, &spawn_request(DRAGON), &owned, 0);
+    let spawned = handle(&mut service, &spawn_request(ROW), &owned, 0);
     let boarded = handle(
         &mut service,
         &mount_request(MountService::ride_guid(OWNER)),
@@ -371,7 +373,7 @@ fn a_second_player_in_range_sees_the_ride_and_its_removal() {
     assert_eq!(scene[1], boarded.shared[0]);
     // A ride that is summoned but not boarded has no attachment to replay.
     let mut idle = MountService::new(catalog());
-    handle(&mut idle, &spawn_request(DRAGON), &owned, 0);
+    handle(&mut idle, &spawn_request(ROW), &owned, 0);
     assert_eq!(idle.view(OWNER).unwrap().packets(pose()).len(), 1);
 
     // Putting the ride away removes it for everyone in range.
@@ -400,7 +402,7 @@ fn a_seated_rider_carries_the_mount_tail_and_the_ride_copies_its_moves() {
     let update = position_update(OWNER);
 
     // Summoned, not boarded: no seat to carry, and the ride stays where it stands.
-    handle(&mut service, &spawn_request(DRAGON), &owned, 0);
+    handle(&mut service, &spawn_request(ROW), &owned, 0);
     let idle = service.view(OWNER).unwrap();
     assert_eq!(idle.tail(), MountTail::NONE);
     assert_eq!(idle.follow(&update), None);
@@ -458,7 +460,7 @@ fn a_mounted_rider_cannot_emote() {
         catalog_rows.authorize_emote(phrase, emote_context(service.is_mounted(), None, 1_000))
     };
     assert!(can_emote(&service).is_ok());
-    handle(&mut service, &spawn_request(DRAGON), &owned, 0);
+    handle(&mut service, &spawn_request(ROW), &owned, 0);
     assert!(
         can_emote(&service).is_ok(),
         "summoned but not yet on the ride"
@@ -494,7 +496,7 @@ fn every_catalogued_ride_builds_a_valid_actor() {
         let item = mount.item_definition_id_candidates[0];
         let owned = inventory(&[item]);
         let mut service = MountService::new(catalog.clone());
-        let wire = handle(&mut service, &spawn_request(mount.id), &owned, 0);
+        let wire = handle(&mut service, &spawn_request(ROW), &owned, 0);
         assert!(wire.notice.is_none(), "{}", mount.name);
         assert_eq!(wire.shared.len(), 1, "{}", mount.name);
         assert_eq!(&wire.shared[0][..4], &[35, 0, 2, 0], "{}", mount.name);

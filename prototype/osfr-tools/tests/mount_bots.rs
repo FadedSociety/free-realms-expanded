@@ -563,7 +563,8 @@ fn is_quick_chat(message: &[u8], phrase: i32) -> bool {
 // ------------------------------------------------------------------ W162 scenario
 
 /// Wolf (mount 993) and the item definition that grants it; 14289 exists in the captured catalogue.
-const WOLF: i32 = 993;
+/// T482: 168/6 names a roster row, an inventory instance: A's seeded Wolf item.
+const WOLF_ROW: i32 = 900_001;
 const WOLF_ITEM: i64 = 14289;
 const WAVE: i32 = 135;
 
@@ -617,7 +618,7 @@ fn riders_are_seen_by_neighbours_and_late_arrivals_and_a_mounted_emote_is_droppe
     // The first login writes the save; give player A the wolf ride item while
     // logged out. The wait proves the gateway wrote and released the character.
     logout(&rig, rig.connect(0, "mountA0"), "the first login");
-    seed_items(&rig, 0, &[(900_001, WOLF_ITEM)]);
+    seed_items(&rig, 0, &[(WOLF_ROW.into(), WOLF_ITEM)]);
 
     let (ga, gb) = (rig.accounts[0].guid, rig.accounts[1].guid);
     let ride = ride_of(ga);
@@ -629,7 +630,7 @@ fn riders_are_seen_by_neighbours_and_late_arrivals_and_a_mounted_emote_is_droppe
     sees(&mut b, ga, "B: A is in the field");
 
     // B owns no ride: refused with a notice, and A never sees a ride for B.
-    raw(&mut b, &spawn_request(WOLF));
+    raw(&mut b, &spawn_request(WOLF_ROW));
     b.wait_for(T, |m| {
         system_text(m).is_some_and(|t| t.contains("do not own"))
     })
@@ -641,7 +642,7 @@ fn riders_are_seen_by_neighbours_and_late_arrivals_and_a_mounted_emote_is_droppe
     );
 
     // A summons: the roster (private) then the ride actor; B, in range, sees the actor too.
-    raw(&mut a, &spawn_request(WOLF));
+    raw(&mut a, &spawn_request(WOLF_ROW));
     a.wait_for(T, |m| m.starts_with(&[168, 0, 5]))
         .unwrap_or_else(|e| panic!("no roster ({e}); got {}", tail(&a)));
     a.wait_for(T, |m| is_ride_actor(m, ride))
@@ -687,7 +688,7 @@ fn riders_are_seen_by_neighbours_and_late_arrivals_and_a_mounted_emote_is_droppe
     // re-summon inside its 1 s debounce, measured from the first spawn it
     // processed (before the actor reached us), so wait that window out.
     wait_past(first_spawn + SPAWN_DEBOUNCE + Duration::from_millis(250));
-    raw(&mut a, &spawn_request(WOLF));
+    raw(&mut a, &spawn_request(WOLF_ROW));
     b.wait_for(T, |m| is_ride_actor(m, ride))
         .expect("B: second ride actor");
     disconnect(a);
@@ -717,7 +718,7 @@ fn the_ride_moves_with_its_rider_and_a_late_arrival_gets_the_native_mount_tail()
     let _serial = serial();
     let rig = Rig::start(&[AccountRole::Player; 3], false);
     logout(&rig, rig.connect(0, "followA0"), "the first login");
-    seed_items(&rig, 0, &[(900_001, WOLF_ITEM)]);
+    seed_items(&rig, 0, &[(WOLF_ROW.into(), WOLF_ITEM)]);
 
     let ga = rig.accounts[0].guid;
     let gb = rig.accounts[1].guid;
@@ -729,7 +730,7 @@ fn the_ride_moves_with_its_rider_and_a_late_arrival_gets_the_native_mount_tail()
     sees(&mut b, ga, "B: A is in the field");
 
     // Summoned but not boarded: the ride stands where it appeared, so B gets A's move only.
-    raw(&mut a, &spawn_request(WOLF));
+    raw(&mut a, &spawn_request(WOLF_ROW));
     b.wait_for(T, |m| is_ride_actor(m, ride))
         .expect("B: ride actor");
     walk(&mut a, ga, start, &[0.5]);

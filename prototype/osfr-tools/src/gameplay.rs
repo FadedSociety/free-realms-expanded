@@ -882,9 +882,8 @@ impl Gameplay {
         let item_bar = crate::item_bar::ItemBar::load(directory, boomboxes, saved_item_bar)?;
         // W162: the ride catalogue ships with the bundled content; a set without it has no rides.
         let mounts = if npc_content.join("mounts.json").is_file() {
-            Some(crate::mounts::MountService::new(
-                crate::mounts::MountCatalog::load(npc_content.join("mounts.json"))?,
-            ))
+            let path = npc_content.join("mounts.json");
+            Some(crate::mounts::MountService::load(&path, &inventory)?)
         } else {
             None
         };

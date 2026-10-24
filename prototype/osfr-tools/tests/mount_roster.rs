@@ -15,12 +15,9 @@ use osfr_tools::{
 };
 use std::path::PathBuf;
 
-// Rides of the bundled `mounts.json` whose items the captured reference catalogue defines.
-const WOLF: i32 = 993;
+// Ride items the captured reference catalogue defines (Lava Tiger has two captured items).
 const WOLF_ITEM: i32 = 14289;
-const BAT: i32 = 992;
 const BAT_ITEM: i32 = 14288;
-const LAVA_TIGER: i32 = 12688; // two captured candidate items
 const LAVA_TIGER_ITEMS: [i32; 2] = [17240, 76906];
 const NOW: u64 = 10_000;
 const PUT_AWAY: [u8; 3] = [168, 0, 3];
@@ -95,8 +92,17 @@ fn tick(game: &mut Gameplay, at: u64) -> Outcome {
 fn give(item: i32) -> Vec<u8> {
     chat::local_request(&format!("realm give {item}"))
 }
-fn spawn(mount: i32) -> Vec<u8> {
-    [vec![168, 0, 6], mount.to_le_bytes().to_vec()].concat()
+/// T482: 168/6 names a roster row, which is an inventory instance: the lowest id the game gave
+/// this item.
+fn row(game: &Gameplay, item: i32) -> i32 {
+    let rows = game.inventory_state().items.iter();
+    rows.filter(|i| i.definition_id == item)
+        .map(|i| i.id)
+        .min()
+        .unwrap()
+}
+fn spawn(row: i32) -> Vec<u8> {
+    [vec![168, 0, 6], row.to_le_bytes().to_vec()].concat()
 }
 fn board() -> Vec<u8> {
     [
@@ -172,7 +178,7 @@ fn world_entry_sends_the_owned_ride_roster() {
     let mut game = game_with(&[WOLF_ITEM]);
     let entry = enter(&mut game);
     let wolf = Row {
-        id: WOLF,
+        id: row(&game, WOLF_ITEM),
         name: 374,
         image: 6873,
         guid: 0,
@@ -198,14 +204,16 @@ fn grants_send_the_roster_once_and_nothing_else_does() {
     let other_item = game.state().inventory.items[0].definition_id;
     enter(&mut game);
     let given = message(&mut game, &give(WOLF_ITEM), NOW);
-    assert_eq!(rides(&given), vec![vec![(WOLF, 0)]], "realm give");
-    // A second Wolf item, a non-ride grant and an idle tick change no ride.
+    let wolf = row(&game, WOLF_ITEM);
+    assert_eq!(rides(&given), vec![vec![(wolf, 0)]], "realm give");
+    // A second Wolf item (it stacks into the same instance, so no new row), a non-ride grant and
+    // an idle tick change no ride.
     assert!(rosters(&message(&mut game, &give(WOLF_ITEM), NOW + 10)).is_empty());
     assert!(rosters(&message(&mut game, &give(other_item), NOW + 20)).is_empty());
     assert!(rosters(&tick(&mut game, NOW + 30)).is_empty());
     // A later summon sends its own roster, with the actor, and the sync adds no duplicate.
-    let summoned = message(&mut game, &spawn(WOLF), NOW + 40);
-    assert_eq!(rides(&summoned), vec![vec![(WOLF, actor())]]);
+    let summoned = message(&mut game, &spawn(wolf), NOW + 40);
+    assert_eq!(rides(&summoned), vec![vec![(wolf, actor())]]);
     assert!(rosters(&tick(&mut game, NOW + 50)).is_empty());
 }
 
@@ -218,28 +226,34 @@ fn summon_put_away_and_refusal_rosters_leave_nothing_for_the_sync() {
     let mut game = game_with(&[]);
     enter(&mut game);
     game.handle_in_world(&give(WOLF_ITEM), &who(), NOW).unwrap();
-    let out = message(&mut game, &spawn(WOLF), NOW + 10);
-    assert_eq!(rides(&out), vec![vec![(WOLF, actor())]], "summon");
+    let wolf = row(&game, WOLF_ITEM);
+    let out = message(&mut game, &spawn(wolf), NOW + 10);
+    assert_eq!(rides(&out), vec![vec![(wolf, actor())]], "summon");
 
     // Put away, after a second ride arrived.
     let mut game = game_with(&[WOLF_ITEM]);
     enter(&mut game);
-    message(&mut game, &spawn(WOLF), NOW);
+    let wolf = row(&game, WOLF_ITEM);
+    message(&mut game, &spawn(wolf), NOW);
     game.handle_in_world(&give(BAT_ITEM), &who(), NOW + 10)
         .unwrap();
+    let bat = row(&game, BAT_ITEM);
     let out = message(&mut game, &PUT_AWAY, NOW + 20);
-    assert_eq!(rides(&out), vec![vec![(BAT, 0), (WOLF, 0)]], "put away");
+    let mut both = vec![(bat, 0), (wolf, 0)];
+    both.sort();
+    assert_eq!(rides(&out), vec![both], "put away");
 
     // Refused summon of a ride not owned.
     let mut game = game_with(&[]);
     enter(&mut game);
     game.handle_in_world(&give(WOLF_ITEM), &who(), NOW).unwrap();
-    let out = message(&mut game, &spawn(BAT), NOW + 10);
+    let wolf = row(&game, WOLF_ITEM);
+    let out = message(&mut game, &spawn(wolf + 1_000_000), NOW + 10);
     assert!(
         out.replies.iter().any(|r| r.starts_with(&[15, 0, 3, 0])),
         "notice"
     );
-    assert_eq!(rides(&out), vec![vec![(WOLF, 0)]], "refusal");
+    assert_eq!(rides(&out), vec![vec![(wolf, 0)]], "refusal");
 }
 
 #[test]
@@ -250,14 +264,15 @@ fn a_new_session_sends_the_roster_again_at_world_entry_and_nothing_before() {
         "before entry"
     );
     enter(&mut game);
-    message(&mut game, &spawn(WOLF), NOW);
+    let wolf = row(&game, WOLF_ITEM);
+    message(&mut game, &spawn(wolf), NOW);
     game.reset_session();
     // The ride did not survive the disconnect; nothing is sent until the new world entry.
     assert!(
         rosters(&game.settle_mounts(&who(), false)).is_empty(),
         "after reset"
     );
-    assert_eq!(rides(&enter(&mut game)), vec![vec![(WOLF, 0)]]);
+    assert_eq!(rides(&enter(&mut game)), vec![vec![(wolf, 0)]]);
 }
 
 #[test]
@@ -265,7 +280,9 @@ fn losing_the_ride_item_puts_the_ride_away() {
     for mounted in [false, true] {
         let mut game = game_with(&[WOLF_ITEM, BAT_ITEM]);
         enter(&mut game);
-        message(&mut game, &spawn(WOLF), NOW);
+        let bat = row(&game, BAT_ITEM);
+        let wolf = row(&game, WOLF_ITEM);
+        message(&mut game, &spawn(wolf), NOW);
         if mounted {
             message(&mut game, &board(), NOW + 10);
             assert!(game.is_mounted());
@@ -281,35 +298,39 @@ fn losing_the_ride_item_puts_the_ride_away() {
             "mounted: {mounted}"
         );
         // Owner: exactly one roster, the remaining ride and no active guid.
-        assert_eq!(rides(&out), vec![vec![(BAT, 0)]], "mounted: {mounted}");
+        assert_eq!(rides(&out), vec![vec![(bat, 0)]], "mounted: {mounted}");
         assert!(!game.is_mounted() && game.ride_view(1).is_none());
         let after = tick(&mut game, NOW + 200);
         assert!(rosters(&after).is_empty() && !after.nearby.iter().any(|r| removes_ride(r)));
     }
 
-    // Another owned candidate item of the same ride keeps it out: nothing is sent.
+    // T482: a ride is one item instance. Another owned item of the same ride is another row: losing
+    // it leaves the ride out (the roster loses that row and nothing else is sent), and losing the
+    // summoned item puts the ride away.
     for mounted in [false, true] {
         let mut game = game_with(&LAVA_TIGER_ITEMS);
         enter(&mut game);
-        message(&mut game, &spawn(LAVA_TIGER), NOW);
+        let summoned = row(&game, LAVA_TIGER_ITEMS[0]);
+        message(&mut game, &spawn(summoned), NOW);
         if mounted {
             message(&mut game, &board(), NOW + 10);
         }
-        trade_away(&mut game, LAVA_TIGER_ITEMS[0]);
+        trade_away(&mut game, LAVA_TIGER_ITEMS[1]);
         let out = tick(&mut game, NOW + 100);
-        let ride_packets = |packets: &[Vec<u8>]| {
-            packets
-                .iter()
-                .any(|r| r.starts_with(&[168, 0]) || removes_ride(r))
-        };
-        assert!(!ride_packets(&out.replies) && !ride_packets(&out.nearby));
+        assert_eq!(rides(&out), vec![vec![(summoned, actor())]]);
+        assert!(out.nearby.is_empty());
         assert_eq!(game.is_mounted(), mounted);
         assert!(game.ride_view(1).is_some());
+        trade_away(&mut game, LAVA_TIGER_ITEMS[0]);
+        let out = tick(&mut game, NOW + 200);
+        assert_eq!(out.nearby.iter().filter(|r| removes_ride(r)).count(), 1);
+        assert!(!game.is_mounted() && game.ride_view(1).is_none());
     }
 }
 
 /// The brief's own example, at the service level: the captured reference catalogue lacks these two
-/// Scaled Dragon items, so `Gameplay` cannot hold them in a test.
+/// Scaled Dragon items, so `Gameplay` cannot hold them in a test. T482: the ride is the instance
+/// it was summoned from (row 2, item 76856); the other item (row 1) is only another row.
 #[test]
 fn a_scaled_dragon_stays_out_while_another_of_its_items_is_owned() {
     let catalog = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/mounts.json");
@@ -328,14 +349,16 @@ fn a_scaled_dragon_stays_out_while_another_of_its_items_is_owned() {
     };
     let both = owned(&[7960, 76856]);
     service.list_packet(&both); // world entry
-    let summoned = service.spawn(1, &both, 12672, actor(), free, NOW, &[]);
+    let summoned = service.spawn_row(1, &both, 2, actor(), free, NOW, &[]);
     assert!(summoned.unwrap().changed);
-    assert!(
-        service
-            .settle(1, &owned(&[76856]), false)
-            .effects
-            .is_empty()
-    );
+    let kept = InventoryState {
+        items: stacks(2, &[76856]).collect(),
+        ..owned(&[])
+    };
+    // The roster loses row 1 for the owner only; the ride stays out.
+    let lost_sibling = service.settle(1, &kept, false);
+    assert_eq!(lost_sibling.effects.len(), 1);
+    assert!(!lost_sibling.effects[0].nearby());
     assert!(service.state().active_ride().is_some());
     // The last one gone: put away, with one roster.
     let ended = service.settle(1, &owned(&[]), false);
