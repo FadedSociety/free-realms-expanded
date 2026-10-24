@@ -78,6 +78,7 @@ pub mod profiles;
 pub mod progression_extras;
 pub mod quest_engine;
 pub mod quest_journal;
+pub mod quest_markers;
 pub mod quests;
 pub mod recipe_book;
 pub mod recipes;
