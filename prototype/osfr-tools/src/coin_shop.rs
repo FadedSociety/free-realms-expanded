@@ -84,6 +84,11 @@ pub struct StoreCatalogue {
     /// `CoinShop::new`: every copy resells for 0 wherever the player got it (`sell_unit_price`).
     #[serde(skip)]
     free_items: BTreeSet<i32>,
+    /// T484: the ride catalogue beside `stores.json` (`mounts.json`, the one the Rides roster
+    /// uses); a listing it knows is a ride, the only single-copy listing. Absent (a content set
+    /// without rides, or a fixture directory) means no listing is a ride.
+    #[serde(skip)]
+    rides: Option<Arc<crate::mounts::MountCatalog>>,
 }
 
 fn default_buy_back_window() -> usize {
@@ -127,9 +132,13 @@ impl StoreCatalogue {
         if bytes.len() > MAX_CATALOGUE_BYTES {
             return Err(invalid("store catalogue exceeds 16 MiB"));
         }
-        let catalogue: Self = serde_json::from_slice(&bytes)
+        let mut catalogue: Self = serde_json::from_slice(&bytes)
             .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
         catalogue.station_cash.validate()?;
+        let mounts = path.with_file_name("mounts.json");
+        if mounts.is_file() {
+            catalogue.rides = Some(Arc::new(crate::mounts::MountCatalog::load(mounts)?));
+        }
         if catalogue.schema_version != 1
             || catalogue.items.len() > 100_000
             || !(1..=MAX_BUY_BACK_WINDOW).contains(&catalogue.buy_back_window)
@@ -236,6 +245,12 @@ impl CoinShop {
         let sc_catalogue = station_cash::Catalogue::build(
             catalogue.station_cash.clone(),
             &inventory,
+            |item_id| {
+                catalogue
+                    .rides
+                    .as_ref()
+                    .is_some_and(|rides| rides.mount_for_item(item_id).is_some())
+            },
             catalogue.items.iter().filter_map(|item| {
                 item.sc_price
                     .map(|price| (item.item_id, price, item.earn_only))

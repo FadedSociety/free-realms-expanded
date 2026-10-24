@@ -525,13 +525,17 @@ pub struct Listing {
     /// L046: the item is a lot deed. An order for it grants the lot through the caller's
     /// [`LotGrant`] and never puts the deed in the inventory.
     pub deed: bool,
+    /// The item is a ride (`MountCatalog::mount_for_item` knows it, the rule the Rides roster
+    /// uses). Only a ride is single-copy: every other listing sells again and again (T484 review).
+    pub ride: bool,
 }
 
 impl Listing {
-    /// The player already holds this listing. A deed never enters the bag (its owner check is the
-    /// lot grant), so it is never "owned" here.
+    /// The player already holds this ride, so a second order is refused and 66/39 marks it
+    /// view-only. A deed is not a ride (it never enters the bag; its owner check is the lot
+    /// grant), and a stackable listing such as a bag or a flair shard is never "owned".
     pub fn owned_by(&self, inventory: &InventoryState) -> bool {
-        !self.deed && owns_item(inventory, self.item_id)
+        self.ride && owns_item(inventory, self.item_id)
     }
 }
 
@@ -554,6 +558,7 @@ impl Catalogue {
     pub fn build(
         config: Config,
         inventory: &Inventory,
+        is_ride: impl Fn(i32) -> bool,
         rows: impl IntoIterator<Item = (i32, u32, bool)>,
     ) -> io::Result<Self> {
         config.validate()?;
@@ -577,6 +582,7 @@ impl Catalogue {
                 name_id: u32::try_from(presentation.name_id).unwrap_or(0),
                 price: config.scaled_price(sc_price)?,
                 deed: presentation.item_type == DEED_ITEM_TYPE,
+                ride: is_ride(item_id),
             };
             if reward_only {
                 earn_only.push(listing);
@@ -912,18 +918,19 @@ pub fn place_order(
     }
 }
 
-/// Whether the player holds the item: any instance of that definition with a positive count, in
-/// any tint (R; a colour variant is its own item id, see `notes/Autopilot/T484.md`). The one
-/// "already owned" rule for the Marketplace order path and its 66/39 flags.
+/// Whether the player owns the item: an instance of that exact item id (R; a colour variant is
+/// its own item id, so another tint is a separate purchase, see `notes/Autopilot/T484.md`) with a
+/// positive count. A rental, expired or not, is not owned (R). The one "already owned" rule for
+/// the Marketplace order path, its 66/39 flags and the earn-only ride award.
 pub fn owns_item(inventory: &InventoryState, item_id: i32) -> bool {
     inventory
         .items
         .iter()
-        .any(|item| item.definition_id == item_id && item.count > 0)
+        .any(|item| item.definition_id == item_id && item.count > 0 && item.rental.is_none())
 }
 
 /// Checks run in this order: the listing, the replay (a paid duplicate still answers success),
-/// ownership (a second copy would stack or duplicate the ride and waste the SC), the balance.
+/// ownership of a ride (a second copy would stack or duplicate it and waste the SC), the balance.
 fn price<'a>(
     catalogue: &'a Catalogue,
     wallet: &Wallet,
@@ -1005,8 +1012,9 @@ pub(crate) fn order_packet(tracking_id: u32, result: u32, order_id: &str, total:
 /// 66/39 (T484). Reader `00b3e490` takes a counted list (`00b32d00`: i32 count, then per entry a
 /// u32 bundle id and a u8 flag, `00b2b590`) and stores `flag == 0` in each found bundle's byte
 /// +242, the `IsViewOnly` column (`009a56d0` case 27). So flag 0 marks an owned ride view-only
-/// and flag 1 leaves it purchasable. Every listing is named, so a ride the player no longer owns
-/// is purchasable again at the next 66/38; the order path (`price`) stays the authority.
+/// and flag 1 leaves a listing purchasable (every non-ride listing, always). Every listing is
+/// named, so a ride the player no longer owns is purchasable again at the next 66/38; the order
+/// path (`price`) stays the authority.
 pub fn requirements_packet(catalogue: &Catalogue, inventory: &InventoryState) -> Vec<u8> {
     let mut bytes = header(OP_ITEM_REQUIREMENTS);
     put_i32(&mut bytes, catalogue.listings.len() as i32);

@@ -1,5 +1,6 @@
-//! T484: the Marketplace refuses a Station Cash order for a ride the player already owns, and its
-//! 66/39 reply marks owned rides view-only.
+//! T484 (and F656): the Marketplace refuses a Station Cash order for a ride the player already
+//! owns, and its 66/39 reply marks owned rides view-only. Only rides are single-copy: every other
+//! listing sells as often as the player pays. A rental is not owned.
 //!
 //! 66/39 is read by `00b3e490`: a header, a counted list (`00b32d00`, i32 count) of a u32 bundle
 //! id and a u8 flag (`00b2b590`), and for every bundle found it stores `flag == 0` at bundle+242,
@@ -15,6 +16,8 @@ use std::path::PathBuf;
 
 const AIR_T_REX: i32 = 11_317; // max_stack 1: a second grant creates a second item
 const SKELETAL_DRAGON: i32 = 10_530; // max_stack -1: a second grant raises the count
+const CANDY_BAG: i32 = 17_744; // a stackable non-ride listing (Station Cash 49)
+const FLAIR_SHARD: i32 = 10_330; // another one
 const STORE: u32 = 1;
 const REFUSED: u32 = station_cash::ORDER_FAILURE;
 
@@ -158,7 +161,6 @@ fn a_player_owning_nothing_sees_every_listing_purchasable() {
         listed,
         "every listing, in catalogue order"
     );
-    assert!(list.len() > 40, "the shipped Rides list is large");
     assert!(list.iter().all(|(_, flag)| *flag == 1));
     for ride in [AIR_T_REX, SKELETAL_DRAGON] {
         assert!(list.iter().any(|(id, _)| *id == ride as u32), "{ride}");
@@ -273,4 +275,126 @@ fn a_deed_item_in_the_bag_never_marks_its_listing_owned() {
         .item_id;
     give_outside_the_shop(&mut shop, deed);
     assert!(flags(&mut shop).iter().all(|(_, flag)| *flag == 1));
+}
+
+fn listing(shop: &CoinShop, item_id: i32) -> station_cash::Listing {
+    *shop
+        .sc_catalogue()
+        .listings()
+        .iter()
+        .find(|listing| listing.item_id == item_id)
+        .expect("the shipped catalogue lists it")
+}
+
+/// The same bag, with every instance of `item_id` turned into a rental.
+fn rent_in_place(shop: &mut CoinShop, item_id: i32) {
+    let mut state = shop.inventory().state().clone();
+    for item in state
+        .items
+        .iter_mut()
+        .filter(|i| i.definition_id == item_id)
+    {
+        item.rental = Some(osfr_tools::inventory::RentalState {
+            expiration: 1,
+            upsells: 0,
+            bundle_id: 0,
+        });
+    }
+    let inventory = Inventory::load(&inventory_content(), Some(state)).expect("bag loads");
+    shop.sync_inventory(inventory);
+}
+
+/// F656: the flag is the ride rule, not "any listing the player holds". The 66/39 flags exactly
+/// the owned rides of the real listings, however many other listings the player holds.
+#[test]
+fn only_rides_are_single_copy_and_the_flags_match_the_listings() {
+    let mut shop = shop(1_000);
+    assert!(listing(&shop, AIR_T_REX).ride && listing(&shop, SKELETAL_DRAGON).ride);
+    for stackable in [CANDY_BAG, FLAIR_SHARD] {
+        assert!(!listing(&shop, stackable).ride, "{stackable} is no ride");
+        give_outside_the_shop(&mut shop, stackable);
+    }
+    give_outside_the_shop(&mut shop, AIR_T_REX);
+    let list = flags(&mut shop);
+    let owned_rides: Vec<u32> = shop
+        .sc_catalogue()
+        .listings()
+        .iter()
+        .filter(|l| l.ride && station_cash::owns_item(shop.inventory().state(), l.item_id))
+        .map(|l| l.bundle_id)
+        .collect();
+    assert_eq!(owned_rides, [AIR_T_REX as u32]);
+    let flagged: Vec<u32> = list
+        .iter()
+        .filter(|(_, flag)| *flag == 0)
+        .map(|(id, _)| *id)
+        .collect();
+    assert_eq!(
+        flagged, owned_rides,
+        "holding bags and shards flags nothing"
+    );
+}
+
+/// F656: a stackable non-ride listing is bought twice, and is never refused or flagged.
+#[test]
+fn a_stackable_non_ride_listing_sells_twice() {
+    let mut shop = shop(1_000);
+    for (tracking, expected) in [(1, 1), (2, 2)] {
+        let bought = shop.handle(&buy(tracking, CANDY_BAG)).unwrap();
+        assert_eq!(
+            order_result(&bought.replies),
+            (tracking, station_cash::ORDER_SUCCESS)
+        );
+        assert!(bought.changed);
+        assert_eq!(count(&shop, CANDY_BAG), expected);
+        assert!(
+            requirements_in(&bought.replies)
+                .unwrap()
+                .iter()
+                .all(|(_, flag)| *flag == 1),
+            "nothing is flagged owned"
+        );
+    }
+    let preview = shop.handle(&order(1, 3, CANDY_BAG)).unwrap();
+    assert_eq!(
+        preview_result(&preview.replies),
+        station_cash::ORDER_SUCCESS
+    );
+    assert!(flags(&mut shop).iter().all(|(_, flag)| *flag == 1));
+}
+
+/// F656: a rented ride is not owned. It is not flagged, the permanent one can be bought, and
+/// only then is the ride refused and flagged.
+#[test]
+fn a_rented_ride_does_not_block_buying_the_permanent_one() {
+    let mut shop = shop(1_000);
+    give_outside_the_shop(&mut shop, AIR_T_REX);
+    rent_in_place(&mut shop, AIR_T_REX);
+    assert!(!station_cash::owns_item(
+        shop.inventory().state(),
+        AIR_T_REX
+    ));
+    assert!(flags(&mut shop).iter().all(|(_, flag)| *flag == 1));
+    let preview = shop.handle(&order(1, 1, AIR_T_REX)).unwrap();
+    assert_eq!(
+        preview_result(&preview.replies),
+        station_cash::ORDER_SUCCESS
+    );
+
+    let bought = shop.handle(&buy(2, AIR_T_REX)).unwrap();
+    assert_eq!(
+        order_result(&bought.replies),
+        (2, station_cash::ORDER_SUCCESS)
+    );
+    assert_eq!(
+        count(&shop, AIR_T_REX),
+        2,
+        "the rental stays beside the new one"
+    );
+    assert!(flags(&mut shop).contains(&(AIR_T_REX as u32, 0)));
+
+    let once = snapshot(&shop);
+    let again = shop.handle(&buy(3, AIR_T_REX)).unwrap();
+    assert_eq!(order_result(&again.replies), (3, REFUSED));
+    assert_eq!(snapshot(&shop), once, "a refusal changes nothing");
 }

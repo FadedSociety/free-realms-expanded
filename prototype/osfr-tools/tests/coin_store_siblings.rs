@@ -465,6 +465,16 @@ impl Fixture {
             stores["items"].as_array_mut().unwrap().push(row);
         }
         write_json(&path, &stores);
+        // F656: only a ride is single-copy, and `StoreCatalogue::load` finds the rides in the
+        // `mounts.json` beside `stores.json`: the shipped one, cut down to the listed ride.
+        let mut mounts =
+            read_json(&PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/mounts.json"));
+        mounts["mounts"]
+            .as_array_mut()
+            .unwrap()
+            .retain(|mount| mount["item_definition_id_candidates"] == json!([SC_RIDE_ITEM]));
+        assert_eq!(mounts["mounts"].as_array().unwrap().len(), 1);
+        write_json(&self.content.join("mounts.json"), &mounts);
         self
     }
 
