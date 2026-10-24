@@ -91,9 +91,35 @@ pub fn system(message: &str) -> Vec<u8> {
     packet
 }
 
+/// 15/4 ChatPacketFromStringId, 43 bytes, client reader 0x00b0f680 (header 0x00b0f550 reads the
+/// two u16): speaker u64, string id i32, three bool bytes, colour i32, two u64, elapsed i32. The
+/// dispatcher (0x00b14350) tests the first bool at 0x00b14db5: zero is the `WorldSay` path
+/// (0x009012b0), nonzero an emote (0x00b0e190), so a speech line must send it clear. The second
+/// bool is `OnReceiveSay`'s chat-logged argument (R, set); the third, when set, also prints the
+/// line with the speaker's name (left clear). Colour and the two u64 stay 0 (R).
+pub fn string_say(speaker: u64, string_id: i32) -> Vec<u8> {
+    let mut packet = vec![15, 0, 4, 0];
+    packet.extend(speaker.to_le_bytes());
+    packet.extend(string_id.to_le_bytes());
+    packet.extend([0, 1, 0]);
+    packet.extend([0; 4 + 8 + 8 + 4]);
+    packet
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
+    /// Golden bytes against the reader's layout; the first flag decides say versus emote.
+    #[test]
+    fn string_say_follows_the_reader_layout() {
+        let packet = string_say(0x0102_0304_0506_0708, 432_431);
+        let mut expected = vec![15, 0, 4, 0, 8, 7, 6, 5, 4, 3, 2, 1];
+        expected.extend(432_431_i32.to_le_bytes());
+        expected.extend([0, 1, 0]);
+        expected.extend([0; 24]);
+        assert_eq!((packet.len(), &packet), (43, &expected));
+        assert_eq!(packet[16], 0, "a != 0 would route to the emote reader");
+    }
     fn example() -> Vec<u8> {
         let mut p = vec![15, 0, 1, 0, 0, 0];
         p.extend(1u64.to_le_bytes());

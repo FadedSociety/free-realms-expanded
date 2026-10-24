@@ -302,7 +302,7 @@ impl Roll {
 /// daily coin cap limits what that is worth), and drops are not an economy
 /// secret. The seed comes from the OS in production, so a new game is not
 /// predictable before its first replies.
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct Rng(u64);
 
 impl Rng {

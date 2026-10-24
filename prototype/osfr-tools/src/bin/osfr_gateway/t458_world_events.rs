@@ -580,3 +580,51 @@ fn t458_server_step_runs_the_world_event_tick() {
         "every session is still connected"
     );
 }
+
+/// T460: `say`, `broadcast` and `area` reach the viewers through the production tick. The near
+/// viewer (5 m) hears the 15/4 line, both viewers get the zone-wide 15/3 and the area packet, and
+/// `realm event stop` switches the area off for both.
+#[test]
+fn t460_say_broadcast_and_area_reach_the_viewers_through_the_tick() {
+    let line = "Let the Dance-off begin!";
+    let talk = json!({"events": [{"key": "talk",
+        "actors": show()["events"][0]["actors"].clone(),
+        "timeline": [
+            {"at_ms": 0, "op": {"spawn": {"actor": "star"}}},
+            {"at_ms": 100, "op": {"say": {"actor": "star", "string_id": 432_431}}},
+            {"at_ms": 200, "op": {"broadcast": {"text": line, "locale_id": 432_431}}},
+            {"at_ms": 300, "op": {"area": {"area_id": 4299, "on": true}}}]}]});
+    let Some(mut rig) = Rig::new("t460-ops", Some(talk)) else {
+        return;
+    };
+    let areas = rig._scratch.path().join("areas");
+    fs::create_dir_all(&areas).unwrap();
+    let switchable = json!({"schema_version": 1,
+        "switchable": {"area_ids": [4299], "source": "T460 test"}});
+    fs::write(areas.join("client_areas.json"), switchable.to_string()).unwrap();
+    rig.server.world.client_areas = osfr_tools::client_areas::ClientAreas::load(&areas).unwrap();
+    let area = |on: bool| bytes(&[&[89, 0], &4299_i32.to_le_bytes(), &[u8::from(on)], &[0; 4]]);
+    let broadcast = osfr_tools::chat::system(line);
+
+    rig.realm("event start talk", T0);
+    let [near, far] = rig.tick(T0);
+    let guid = spawned(&near[0]);
+    assert_eq!((near.len(), far.len()), (1, 0));
+    let [near, far] = rig.tick(T0 + 100);
+    assert_eq!(near, [osfr_tools::chat::string_say(guid, 432_431)]);
+    assert!(far.is_empty(), "the far viewer never saw the speaker");
+    assert_eq!(
+        rig.tick(T0 + 200),
+        [vec![broadcast.clone()], vec![broadcast]]
+    );
+    assert_eq!(rig.tick(T0 + 300), [vec![area(true)], vec![area(true)]]);
+    // The admin stands in the open world too: it heard the zone-wide line, then its own reply.
+    assert_eq!(
+        rig.realm("event stop talk", T0 + 400),
+        [line, "World event talk stopped."]
+    );
+    assert_eq!(
+        rig.tick(T0 + 400),
+        [vec![removal(guid, 0), area(false)], vec![area(false)]]
+    );
+}

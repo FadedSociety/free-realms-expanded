@@ -58,7 +58,12 @@ fn start(admin: &Session, world: &mut SharedWorld, now_ms: u64, key: &str) -> St
 /// actors again later (`WorldEvents::refused`). Only that session is affected (worker rule 17).
 pub(super) fn tick(world: &mut SharedWorld, sessions: &mut SessionMap, now_ms: u64) {
     let mut refused: BTreeMap<SessionId, Vec<Vec<u8>>> = BTreeMap::new();
-    for (recipient, packet) in world.world_events.tick(now_ms, &world.players) {
+    let unix_ms = osfr_tools::client_areas::unix_now_ms();
+    let areas = &mut world.client_areas;
+    for (recipient, packet) in world
+        .world_events
+        .tick(now_ms, unix_ms, &world.players, areas)
+    {
         if let Some(undelivered) = refused.get_mut(&recipient) {
             undelivered.push(packet);
             continue;

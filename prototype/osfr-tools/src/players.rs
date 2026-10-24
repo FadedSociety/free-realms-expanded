@@ -225,6 +225,14 @@ impl PlayerRegistry {
         self.nearby(zone, position)
     }
 
+    /// Every session in `zone`, whatever its distance (a zone-wide announcement; a scan, so for
+    /// rare events only).
+    pub fn sessions_in(&self, zone: ZoneInstance) -> impl Iterator<Item = &PlayerSession> {
+        self.sessions
+            .values()
+            .filter(move |session| session.zone == zone)
+    }
+
     /// A PC reference is safe only after this viewer's directed AddPc.
     pub fn knows_character(&self, viewer: SessionId, character: u64) -> bool {
         self.character_owners.get(&character).is_some_and(|owner| {
