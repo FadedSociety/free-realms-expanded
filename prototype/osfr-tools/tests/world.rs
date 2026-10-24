@@ -361,7 +361,7 @@ fn npc_visibility_loads_content_caps_the_view_and_respects_startup_exclusions() 
             (npc["spawn_guid"].as_u64().unwrap(), position)
         })
         .collect();
-    assert_eq!(unrenderable.len(), 3);
+    assert_eq!(unrenderable.len(), 1); // T468 retired 10170 and 17596.
     for (guid, position) in unrenderable {
         let nearby = visibility.update(zone_id, position).unwrap();
         assert!(!nearby.iter().any(|packet| {

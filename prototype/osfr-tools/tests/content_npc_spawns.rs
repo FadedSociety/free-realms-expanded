@@ -1,6 +1,7 @@
 #[path = "support/models.rs"]
 mod models;
 
+use osfr_tools::{startup_world, world};
 use serde_json::Value;
 use std::{
     collections::{HashMap, HashSet},
@@ -233,7 +234,8 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
         .iter()
         .filter(|row| row["model_file_name"] == "knocker_m_boss.adr")
         .collect();
-    assert_eq!(broken_model_rows.len(), 3);
+    // T468 retired 10170 and 17596; 25841 is still in the world.
+    assert_eq!(broken_model_rows.len(), 1);
     assert!(!catalog_names.contains("knocker_m_boss.dme"));
 
     // Placing a guessed NPC with evidence moves it between these two counts (W117 moved 4);
@@ -248,12 +250,83 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // appended Therin row, T331's appended Petra row, T372's appended 25
     // priced-vendor spawns, T385's appended 4 fishing-guide spawns, T409's
     // appended Manager Landon, T467's two Sanctuary card tables, and T479's 3
-    // exploration coins.
-    assert_eq!(extra_rows.len(), 3307);
+    // exploration coins (3,307). T468 moved the 632 Legacy rows Lxzxrus 9c5ef6b
+    // pruned as misplaced to npc_spawns_retired.json.
+    assert_eq!(extra_rows.len(), 2675);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",
         extra_rows.len(),
         captured_actors.len()
     );
+}
+
+/// T468: the 632 Legacy rows Lxzxrus 9c5ef6b removed as out-of-bounds or misplaced
+/// live in `npc_spawns_retired.json`, which `world.rs` never reads. Its `exempt`
+/// forges (crafting_stations.json model 1733) stay in the world.
+#[test]
+fn retired_legacy_spawns_stay_out_of_the_world() {
+    let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let retired = read_json(&content.join("npc_spawns_retired.json"));
+    let extra = read_json(&content.join("npc_spawns_extra.json"));
+    let live_guids: HashSet<u64> = extra["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|row| row["spawn_guid"].as_u64().unwrap())
+        .collect();
+    let live_legacy_ids: HashSet<u64> = extra["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter_map(|row| row["legacy_npc_id"].as_u64())
+        .collect();
+
+    let rows = retired["records"].as_array().unwrap();
+    assert_eq!(rows.len(), 632);
+    let mut retired_guids = HashSet::new();
+    for row in rows {
+        let guid = row["spawn_guid"].as_u64().unwrap();
+        let legacy_id = row["legacy_npc_id"].as_u64().unwrap();
+        assert_eq!(row["retired"]["kind"], "reference", "retired spawn {guid}");
+        assert!(
+            row["retired"]["evidence"]
+                .as_str()
+                .is_some_and(|evidence| evidence.contains("9c5ef6b")),
+            "retired spawn {guid}: evidence must name Lxzxrus 9c5ef6b"
+        );
+        assert!(
+            !live_guids.contains(&guid),
+            "retired spawn {guid} is back in npc_spawns_extra.json"
+        );
+        assert!(
+            !live_legacy_ids.contains(&legacy_id),
+            "retired Legacy id {legacy_id} is back in npc_spawns_extra.json"
+        );
+        assert!(retired_guids.insert(guid), "retired spawn {guid} repeats");
+    }
+    let exempt = retired["exempt"]["spawn_guids"].as_array().unwrap();
+    assert_eq!(exempt.len(), 3);
+    for guid in exempt {
+        let guid = guid.as_u64().unwrap();
+        assert!(
+            live_guids.contains(&guid),
+            "exempt forge {guid} left npc_spawns_extra.json"
+        );
+    }
+
+    // Legacy 1215, inside the west-edge stacks: nothing retired is drawn there.
+    let mut visibility = world::NpcVisibility::load(&content).unwrap();
+    for packet in visibility
+        .update(0, [-2538.731, 0.04500806, -425.8167])
+        .unwrap()
+    {
+        if packet.starts_with(&[35, 0, 2, 0]) {
+            let guid = startup_world::parse_add_npc(&packet).unwrap().actor_id;
+            assert!(
+                !retired_guids.contains(&guid),
+                "retired spawn {guid} is drawn"
+            );
+        }
+    }
 }
