@@ -62,6 +62,11 @@ impl Drop for Service {
 /// Spawn `command`, tee its stdout/stderr into `log`, and return once it prints
 /// the JSON event `event` (carrying `address`) together with that event line.
 fn spawn(mut command: Command, event: &str, log: &Path) -> (Service, Value) {
+    // The bots are strict about timing (a 5 s handshake window) and the server under test
+    // builds a whole session per handshake, so on a machine busy with builds and other test
+    // binaries the services must not queue behind them (T628; as `bot_acceptance_1016`).
+    #[cfg(windows)]
+    std::os::windows::process::CommandExt::creation_flags(&mut command, 0x0000_8000); // ABOVE_NORMAL_PRIORITY_CLASS
     let mut child = Service(
         command
             .stdout(Stdio::piped())
@@ -389,6 +394,22 @@ impl Rig {
         }
     }
 
+    /// Client-initiated session ends the gateway has logged. `end_session` writes the
+    /// character save before printing its event, so a seed written after this count
+    /// increases is the logged-out state, not the login's.
+    fn client_disconnects(&self) -> usize {
+        fs::read_to_string(self.root.join("gateway.out.log"))
+            .map(|text| {
+                text.lines()
+                    .filter_map(|line| serde_json::from_str::<Value>(line).ok())
+                    .filter(|value| {
+                        value["event"] == "session_ended" && value["reason"] == "client_disconnect"
+                    })
+                    .count()
+            })
+            .unwrap_or(0)
+    }
+
     fn ticket(&self, account: usize) -> String {
         let store = AccountStore::load(&self.root.join("accounts.json")).unwrap();
         let a = &self.accounts[account];
@@ -476,6 +497,27 @@ fn disconnect(mut bot: bot::Bot) {
     bot.disconnect();
 }
 
+/// Disconnect `bot` and wait until the gateway has written its logout save (T628: a fixed
+/// sleep let a loaded gateway overwrite a seed with the late logout save). The SOE disconnect
+/// is an unreliable datagram, so it is resent while waiting; a repeated disconnect for an
+/// absent session is ignored.
+fn logout(rig: &Rig, mut bot: bot::Bot, what: &str) {
+    let before = rig.client_disconnects();
+    bot.disconnect();
+    let deadline = Instant::now() + T;
+    let mut resent = Instant::now();
+    while rig.client_disconnects() <= before {
+        if Instant::now() >= deadline {
+            panic!("{what}: the gateway never logged the logout");
+        }
+        if resent.elapsed() >= Duration::from_secs(1) {
+            bot.disconnect();
+            resent = Instant::now();
+        }
+        std::thread::sleep(Duration::from_millis(50));
+    }
+}
+
 /// Add owned items to a character's save while it is logged out, the way a
 /// purchase or a drop would have (the starter inventory is ten items).
 fn seed_items(rig: &Rig, account: usize, items: &[(i64, i64)]) {
@@ -553,8 +595,7 @@ fn a_saved_pet_is_summoned_seen_by_two_players_and_dismissed() {
     let rig = Rig::start(&[AccountRole::Player; 3], false);
 
     // The first login writes the save; seed a pet and its item while A is logged out.
-    disconnect(rig.connect(0, "petA0"));
-    std::thread::sleep(Duration::from_millis(1500));
+    logout(&rig, rig.connect(0, "petA0"), "the first login's logout");
     let pet_id = seed_pet(&rig, 0);
 
     let ga = rig.accounts[0].guid;

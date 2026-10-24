@@ -1,4 +1,5 @@
 //! The isolation boundary: one session's panic ends that session alone.
+use super::tests::test_support;
 use super::*;
 use fixtures::{bundle, copy_tree, wrap};
 use std::cell::Cell;
@@ -24,7 +25,7 @@ fn a_panicking_session_ends_alone_and_the_server_keeps_running() {
     PANIC_IN_TICK.set(Some(victim_id));
     server.next_tick_ms = 0;
 
-    let stepped = server.step();
+    let stepped = test_support::step(&mut server);
     PANIC_IN_TICK.set(None);
     stepped.unwrap();
 
@@ -35,7 +36,7 @@ fn a_panicking_session_ends_alone_and_the_server_keeps_running() {
     );
     assert!(server.sessions.contains_key(&keys[1]) && server.sessions.contains_key(&keys[2]));
     server.next_tick_ms = 0;
-    server.step().unwrap();
+    test_support::step(&mut server).unwrap();
     assert_eq!(server.sessions.len(), 2);
     let _ = fs::remove_dir_all(scratch);
 }
@@ -59,7 +60,7 @@ fn a_failing_tick_save_ends_alone_and_the_server_keeps_running() {
     victim.position_saved_ms = None;
     server.next_tick_ms = 0;
 
-    server.step().unwrap();
+    test_support::step(&mut server).unwrap();
 
     assert!(!server.sessions.contains_key(&keys[0]));
     assert!(
@@ -68,7 +69,7 @@ fn a_failing_tick_save_ends_alone_and_the_server_keeps_running() {
     );
     assert!(server.sessions.contains_key(&keys[1]) && server.sessions.contains_key(&keys[2]));
     server.next_tick_ms = 0;
-    server.step().unwrap();
+    test_support::step(&mut server).unwrap();
     assert_eq!(server.sessions.len(), 2);
     let _ = fs::remove_dir_all(scratch);
 }
@@ -176,12 +177,6 @@ fn a_movie_error_ends_only_that_session_and_not_the_server() {
     // Keep the world tick out of the retry loop: the malformed close must end
     // the session through the packet path, not through a later tick fault.
     server.next_tick_ms = u64::MAX;
-    // Building the movie content above can outlast the 60 s idle budget on a
-    // loaded host. Refresh every session before the first step so the movie
-    // error alone ends the victim and the survivors stay for the final step.
-    for session in server.sessions.values_mut() {
-        session.last_activity = std::time::Instant::now();
-    }
     client
         .send_to(&wire, server.local_addr().expect("server address"))
         .expect("malformed close datagram sends");
@@ -190,9 +185,7 @@ fn a_movie_error_ends_only_that_session_and_not_the_server() {
     // two-millisecond steps tolerates a loaded host.
     let mut ended = false;
     for _ in 0..500 {
-        server
-            .step()
-            .expect("one handler error must not stop the server");
+        test_support::step(&mut server).expect("one handler error must not stop the server");
         if !server.sessions.contains_key(&key) {
             ended = true;
             break;
@@ -207,7 +200,7 @@ fn a_movie_error_ends_only_that_session_and_not_the_server() {
     );
     assert!(server.sessions.contains_key(&keys[1]) && server.sessions.contains_key(&keys[2]));
     server.next_tick_ms = 0;
-    server.step().unwrap();
+    test_support::step(&mut server).unwrap();
     assert_eq!(server.sessions.len(), 2);
     let _ = fs::remove_dir_all(scratch);
 }

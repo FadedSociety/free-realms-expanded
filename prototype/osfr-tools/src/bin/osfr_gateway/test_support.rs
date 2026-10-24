@@ -183,6 +183,19 @@ pub fn options(state: PathBuf) -> Options {
     }
 }
 
+/// `Server::step` for a rig whose sessions have no client behind them. A real client keeps
+/// the 60 s idle budget alive with its datagrams and KeepAlives; a rig's `dispatch_message`
+/// calls and its test body do not, so a loaded host that stalls a test past the budget would
+/// end every session as `idle_timeout` and look like a moderation, isolation or routing
+/// failure (T628). Refresh the budget first, as a live client would; every other close path
+/// (kick, error, panic) still runs unchanged.
+pub fn step(server: &mut Server) -> Result<(), Box<dyn std::error::Error>> {
+    for session in server.sessions.values_mut() {
+        session.last_activity = Instant::now();
+    }
+    server.step()
+}
+
 /// A session before its login, with the fixture's own port and datagram size.
 fn session(options: &Options, id: u32, port: u32, buffer_size: usize) -> Session {
     Session::new(

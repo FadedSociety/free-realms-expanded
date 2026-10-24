@@ -429,9 +429,7 @@ fn a_failed_vendor_save_ends_only_that_session() {
     client
         .send_to(&wire, server.local_addr().expect("server address"))
         .expect("buy datagram sends");
-    server
-        .step()
-        .expect("one failed session must not stop the server");
+    super::test_support::step(&mut server).expect("one failed session must not stop the server");
 
     assert!(
         !server.sessions.contains_key(&key),
@@ -491,7 +489,7 @@ fn a_failed_vendor_save_ends_only_that_session() {
             .send_to(&wire, server.local_addr().expect("server address"))
             .expect("survivor datagram sends");
         server.next_tick_ms = 0;
-        server.step().expect("the surviving sessions keep stepping");
+        super::test_support::step(&mut server).expect("the surviving sessions keep stepping");
         assert!(
             server.sessions[survivor_key].gateway.is_logged_in(),
             "survivor session {} did not handle its next datagram",

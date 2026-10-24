@@ -227,7 +227,7 @@ mod tests {
         EMITTED.with(|e| e.borrow_mut().clear());
         let step = |server: &mut super::super::Server| {
             server.next_tick_ms = 0;
-            server.step().unwrap();
+            super::super::tests::test_support::step(server).unwrap();
         };
         for _ in 0..3 {
             step(&mut server);

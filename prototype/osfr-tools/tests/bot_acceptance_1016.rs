@@ -523,14 +523,24 @@ impl Rig {
             .unwrap_or(0)
     }
 
-    fn wait_log_outcomes(&self, what: &str, event: &str, outcome: &str, at_least: usize) {
+    /// Pumps the live `bot` while waiting (as `wait_log` does): a bot that only sleeps never
+    /// retransmits, so one lost or late datagram would stall the very request being waited
+    /// for until the deadline (T628).
+    fn wait_log_outcomes(
+        &self,
+        bot: &mut bot::Bot,
+        what: &str,
+        event: &str,
+        outcome: &str,
+        at_least: usize,
+    ) {
         let deadline = Instant::now() + T;
         while self.log_outcomes(event, outcome) < at_least {
             assert!(
                 Instant::now() < deadline,
                 "{what}: no gateway event/outcome"
             );
-            std::thread::sleep(Duration::from_millis(50));
+            bot.pump(Duration::from_millis(50)).unwrap();
         }
     }
 
@@ -1330,6 +1340,7 @@ fn client_objective_breadcrumb_is_reachable_once_and_persists() {
     let from = bot.received.len();
     raw(&mut bot, &claim(CLIENT_ID));
     rig.wait_log_outcomes(
+        &mut bot,
         "the inactive client objective",
         "client_objective",
         "ignored",
@@ -1392,6 +1403,7 @@ fn client_objective_breadcrumb_is_reachable_once_and_persists() {
     let from = bot.received.len();
     raw(&mut bot, &claim(CLIENT_ID + 1));
     rig.wait_log_outcomes(
+        &mut bot,
         "the forged client objective",
         "client_objective",
         "ignored",
@@ -1422,13 +1434,17 @@ fn client_objective_breadcrumb_is_reachable_once_and_persists() {
     // A duplicate is handled and inert.
     let ignored = rig.log_outcomes("client_objective", "ignored");
     let from = bot.received.len();
+    // The request is lost once, as on a loaded host: the wait must retransmit it (T628).
+    bot.drop_next_matching(&claim(CLIENT_ID));
     raw(&mut bot, &claim(CLIENT_ID));
     rig.wait_log_outcomes(
+        &mut bot,
         "the duplicate client objective",
         "client_objective",
         "ignored",
         ignored + 1,
     );
+    assert!(bot.dropped_datagram(), "the duplicate claim was never lost");
     barrier(&mut bot);
     assert_eq!(
         rig.save(0)["gameplay"],
@@ -1477,6 +1493,7 @@ fn client_objective_breadcrumb_is_reachable_once_and_persists() {
     let from = again.received.len();
     raw(&mut again, &claim(CLIENT_ID));
     rig.wait_log_outcomes(
+        &mut again,
         "the replayed client objective after relog",
         "client_objective",
         "ignored",

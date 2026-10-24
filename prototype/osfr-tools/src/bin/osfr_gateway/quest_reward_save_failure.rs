@@ -773,9 +773,7 @@ fn a_failed_save_ends_only_that_session() {
     client
         .send_to(&wire, server.local_addr().expect("server address"))
         .expect("turn-in datagram sends");
-    server
-        .step()
-        .expect("one failed session must not stop the server");
+    super::test_support::step(&mut server).expect("one failed session must not stop the server");
 
     assert!(
         !server.sessions.contains_key(&a_key),
@@ -873,7 +871,7 @@ fn a_failed_save_ends_only_that_session() {
         while socket.recv_from(&mut buffer).is_ok() {}
     }
     server.next_tick_ms = 0;
-    server.step().expect("the surviving sessions keep stepping");
+    super::test_support::step(&mut server).expect("the surviving sessions keep stepping");
     assert_eq!(server.sessions.len(), 2);
 
     drop(server);

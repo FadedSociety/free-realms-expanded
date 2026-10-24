@@ -69,6 +69,11 @@ impl Drop for Service {
 /// Spawn `command`, tee its stdout/stderr into `log`, and return once it prints
 /// the JSON event `event` (carrying `address`) together with that event line.
 fn spawn(mut command: Command, event: &str, log: &Path) -> (Service, Value) {
+    // The bots are strict about timing (a 5 s handshake window) and the server under test
+    // builds a whole session per handshake, so on a machine busy with builds and other test
+    // binaries the services must not queue behind them (T628; as `bot_acceptance_1016`).
+    #[cfg(windows)]
+    std::os::windows::process::CommandExt::creation_flags(&mut command, 0x0000_8000); // ABOVE_NORMAL_PRIORITY_CLASS
     let mut child = Service(
         command
             .stdout(Stdio::piped())

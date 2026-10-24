@@ -175,17 +175,13 @@ impl Rig {
         }
     }
 
-    /// `Server::step`, the production close path. It ticks and flushes every session, and
-    /// nothing here acknowledges those sends: wait out the sender's 250 ms retry interval
-    /// (`Session::new`) so `drain` takes them back as resends and acknowledges them.
+    /// `Server::step`, the production close path, with the idle budget kept alive
+    /// (`test_support::step`: `send` enters at `dispatch_message`, past the packet path that
+    /// refreshes it). It ticks and flushes every session, and nothing here acknowledges those
+    /// sends: wait out the sender's 250 ms retry interval (`Session::new`) so `drain` takes
+    /// them back as resends and acknowledges them.
     fn step(&mut self) {
-        // `send` enters at `dispatch_message`, past the packet path that refreshes
-        // `last_activity`, so a loaded host (debug world loads, a parallel suite) could idle
-        // out a live session after 60 s. Refresh first, as `isolation` and `f160_field_views` do.
-        for session in self.server.sessions.values_mut() {
-            session.last_activity = Instant::now();
-        }
-        self.server.step().unwrap();
+        test_support::step(&mut self.server).unwrap();
         std::thread::sleep(Duration::from_millis(300));
         for key in self.server.sessions.keys().copied().collect::<Vec<_>>() {
             self.drain(key);
@@ -284,6 +280,32 @@ impl Rig {
             .get(&key)
             .is_some_and(|session| !session.kicked)
     }
+}
+
+/// T628: the rig's sessions have no client to refresh their 60 s idle budget, so a host loaded
+/// enough to stall a test past it ended them as `idle_timeout` between two steps and the
+/// next `send` found no live session. The budget is backdated here instead of waited out.
+#[test]
+fn a_stall_past_the_idle_budget_ends_no_rig_session() {
+    let files = Files::new("stall");
+    let mut rig = Rig::new(&files);
+    let keys = [MO, PIP].map(|index| rig.join(index).unwrap());
+    let stall = |rig: &mut Rig| {
+        let stalled = Instant::now() - Duration::from_secs(61);
+        for session in rig.server.sessions.values_mut() {
+            session.last_activity = stalled;
+        }
+    };
+    stall(&mut rig);
+    rig.step();
+    assert!(keys.iter().all(|key| rig.live(*key)));
+    // The cause, not just the cure: the bare production step does idle them out.
+    stall(&mut rig);
+    rig.server.step().unwrap();
+    assert!(
+        keys.iter()
+            .all(|key| !rig.server.sessions.contains_key(key))
+    );
 }
 
 #[test]
