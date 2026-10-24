@@ -416,6 +416,8 @@ impl EncounterEngine {
                     .entry(guid)
                     .and_modify(|current| *current = (*current).max(until))
                     .or_insert(until);
+                // The stunned enemy is an arena's or the field's; the GUID sets are disjoint.
+                self.arena.moving.remove(&guid);
                 self.field_sim.moving.remove(&guid);
                 out.replies.push(animation(guid, 1, true));
                 out.replies.push(animation(guid, 1401, false)); // client com_stunned

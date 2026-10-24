@@ -19,6 +19,7 @@ use std::{
     sync::Arc,
 };
 
+mod arena;
 mod combat_scale;
 mod field;
 pub mod field_rewards;
@@ -26,6 +27,7 @@ mod power_up_use;
 mod revive;
 mod shared;
 mod skills;
+use self::arena::{ArenaSim, ArenaTick};
 use self::combat_scale::CombatScale;
 pub(crate) use self::field::level_refusal;
 use self::revive::{AUTO_REVIVE_MS, respawn_hide};
@@ -681,8 +683,8 @@ pub struct EncounterEngine {
     // Where a dropped saved battle started; the gateway moves the character
     // there on login (its saved location is still inside the arena).
     dropped_return: Option<CharacterState>,
-    // Skittish actors fighting alone: running or resting, until a time.
-    kiting: BTreeMap<u64, Kite>,
+    /// One run's enemy clocks and walks; swapped as one value (`with_arena`).
+    arena: ArenaSim,
     // Readiness is local to the connection. Rejoining never resumes attacks
     // while the client is still loading its scene and models.
     armed: bool,
@@ -1051,7 +1053,7 @@ impl EncounterEngine {
             last_attack: None,
             last_tick: None,
             field_sim: FieldSim::default(),
-            kiting: BTreeMap::new(),
+            arena: ArenaSim::default(),
             dropped_return,
             energy: ENERGY_MAX,
             energy_regen_at: 0,
@@ -1330,7 +1332,7 @@ impl EncounterEngine {
         self.last_tick = None;
         self.field_sim.attacks.clear();
         self.field_sim.moving.clear();
-        self.kiting.clear();
+        self.arena = ArenaSim::default();
         // Zoning wipes the client's actors, so the pickups go with them. The
         // held power-up stays: it belongs to the player, not the zone.
         self.pickups.clear();
@@ -1971,7 +1973,7 @@ impl EncounterEngine {
             if definition > 0 {
                 out.defeated.push(definition);
             }
-            self.kiting.remove(&guid);
+            self.arena.kiting.remove(&guid);
             if let Some(i) = field_index {
                 self.field_sim.moving.remove(&guid);
                 self.field_sim.attacks.remove(&guid);
@@ -2377,105 +2379,19 @@ impl EncounterEngine {
         out.changed = energy.changed;
         out.rewards.append(&mut energy.rewards);
         out.defeated.append(&mut energy.defeated);
-        let mut total_damage = 0_u32;
         out.replies.append(&mut energy.replies);
-        // Summoned minions still standing: the summoner fights alongside them.
-        let backup = actors.iter().any(|a| {
-            a.summon_below_percent.is_some()
-                && states
-                    .iter()
-                    .any(|s| s.guid == a.guid && s.health > 0 && !s.dormant)
-        });
-        for actor in actors {
-            let s = states.iter_mut().find(|s| s.guid == actor.guid).unwrap();
-            if s.health == 0 || s.dormant {
-                continue;
-            }
-            if self.skills.stunned(actor.guid, now_ms) {
-                continue;
-            }
-            let b = self
-                .behaviour_of
-                .get(&actor.guid)
-                .cloned()
-                .unwrap_or_default();
-            if b.mode == Mode::Skittish {
-                if backup {
-                    self.kiting.remove(&actor.guid);
-                } else {
-                    kite_turn(
-                        &actor,
-                        s,
-                        position,
-                        &ground,
-                        &b,
-                        now_ms,
-                        elapsed,
-                        &mut self.kiting,
-                        &mut self.field_sim.moving,
-                        &mut out,
-                    );
-                    continue;
-                }
-            }
-            let delta = distance(position, s.position);
-            if delta > b.chase_limit {
-                if self.field_sim.moving.remove(&actor.guid) {
-                    out.replies.push(animation(actor.guid, 1, true));
-                }
-                continue;
-            }
-            if delta > b.reach && b.mode != Mode::Stationary {
-                let heading = [
-                    (position[0] - s.position[0]) / delta,
-                    0.0,
-                    (position[2] - s.position[2]) / delta,
-                ];
-                // Stop inside reach so f32 rounding at world coordinates cannot
-                // strand a pursuer just outside the attack threshold.
-                let step =
-                    (b.move_speed * elapsed.min(250) as f32 / 1000.0).min(delta - (b.reach - 0.1));
-                for (coord, to) in s.position.iter_mut().zip(position) {
-                    *coord += (to - *coord) / delta * step;
-                }
-                ground.snap(&mut s.position);
-                out.replies.push(movement(actor.guid, s.position, heading));
-                if self.field_sim.moving.insert(actor.guid) {
-                    out.replies.push(animation(actor.guid, 3, true));
-                }
-                out.changed = true;
-            }
-            if distance(position, s.position) <= b.reach {
-                if self.field_sim.moving.remove(&actor.guid) {
-                    out.replies.push(animation(actor.guid, 1, true));
-                }
-                if self
-                    .field_sim
-                    .attacks
-                    .get(&actor.guid)
-                    .is_some_and(|last| now_ms.saturating_sub(*last) < b.attack_ms)
-                {
-                    continue;
-                }
-                self.field_sim.attacks.insert(actor.guid, now_ms);
-                out.replies.push(animation(actor.guid, 1001, false));
-                let attack_damage = (actor.damage as f32 * mitigation).round() as u32;
-                let damage =
-                    attack_damage.min(self.state.player_health.saturating_sub(total_damage));
-                out.replies.push(attack_processed(
-                    actor.guid,
-                    1,
-                    damage,
-                    self.state
-                        .player_health
-                        .saturating_sub(total_damage)
-                        .saturating_sub(damage),
-                    self.max_health,
-                    false,
-                ));
-                total_damage = total_damage.saturating_add(attack_damage);
-            }
-        }
+        let tick = ArenaTick {
+            position,
+            ground: &ground,
+            behaviours: &self.behaviour_of,
+            skills: &self.skills,
+            mitigation,
+            player_health: self.state.player_health,
+            max_health: self.max_health,
+            now_ms,
+            elapsed,
+        };
+        let mut total_damage = self.arena.tick_enemies(actors, states, &tick, &mut out);
         if !self.active() && self.shared_fields.is_none() {
             self.tick_field(
                 position,
@@ -2805,86 +2721,6 @@ pub struct FightEvent {
     pub amount: i64,
 }
 const FIGHT_LOG_CAP: usize = 600;
-
-#[derive(Clone, Copy, Debug)]
-enum Kite {
-    Run(u64),
-    Rest(u64),
-}
-
-/// One tick of a skittish actor fighting alone: run from the player, then
-/// rest (no attacks), then run again.
-#[allow(clippy::too_many_arguments)]
-fn kite_turn(
-    actor: &Actor,
-    s: &mut EnemyState,
-    player: [f32; 3],
-    ground: &Ground,
-    b: &Behaviour,
-    now_ms: u64,
-    elapsed: u64,
-    kiting: &mut BTreeMap<u64, Kite>,
-    moving: &mut BTreeSet<u64>,
-    out: &mut EncounterOutcome,
-) {
-    let delta = distance(player, s.position).max(0.01);
-    let away = [
-        (s.position[0] - player[0]) / delta,
-        0.0,
-        (s.position[2] - player[2]) / delta,
-    ];
-    let phase = *kiting
-        .entry(actor.guid)
-        .or_insert(Kite::Run(now_ms.saturating_add(b.run_ms)));
-    match phase {
-        Kite::Rest(until) if now_ms < until => {}
-        Kite::Rest(_) => {
-            kiting.insert(actor.guid, Kite::Run(now_ms.saturating_add(b.run_ms)));
-        }
-        Kite::Run(until) if now_ms >= until => {
-            kiting.insert(actor.guid, Kite::Rest(now_ms.saturating_add(b.rest_ms)));
-            moving.remove(&actor.guid);
-            // Turn to face the player and catch its breath.
-            out.replies
-                .push(movement(actor.guid, s.position, [-away[0], 0.0, -away[2]]));
-            out.replies.push(animation(actor.guid, 1, true));
-            out.replies
-                .push(animation(actor.guid, b.rest_animation, false));
-            out.changed = true;
-        }
-        Kite::Run(until) if delta > b.run_from => {
-            kiting.insert(actor.guid, Kite::Run(until.saturating_add(elapsed)));
-            if moving.remove(&actor.guid) {
-                out.replies
-                    .push(movement(actor.guid, s.position, [-away[0], 0.0, -away[2]]));
-                out.replies.push(animation(actor.guid, 1, true));
-                out.changed = true;
-            }
-        }
-        Kite::Run(_) => {
-            let step = b.run_speed * elapsed.min(250) as f32 / 1000.0;
-            // Straight away, or along the leash edge (either tangent) when cornered.
-            let directions = [away, [away[2], 0.0, -away[0]], [-away[2], 0.0, away[0]]];
-            let next = directions.iter().find_map(|d| {
-                let next = ground.snapped([
-                    s.position[0] + d[0] * step,
-                    player[1],
-                    s.position[2] + d[2] * step,
-                ]);
-                let flat = [next[0], actor.position[1], next[2]];
-                (distance(flat, actor.position) <= b.leash).then_some((next, *d))
-            });
-            if let Some((next, heading)) = next {
-                s.position = next;
-                out.replies.push(movement(actor.guid, s.position, heading));
-                if moving.insert(actor.guid) {
-                    out.replies.push(animation(actor.guid, 3, true));
-                }
-                out.changed = true;
-            }
-        }
-    }
-}
 
 fn header(op: u16, sub: u16) -> Vec<u8> {
     [op.to_le_bytes(), sub.to_le_bytes()].concat()

@@ -529,16 +529,16 @@ impl EncounterEngine {
 }
 
 #[cfg(test)]
-mod tests {
+pub(super) mod tests {
     use super::*;
     use sha2::{Digest, Sha256};
 
-    const TEST_ENEMY: u64 = 131000108001;
+    pub(in crate::encounter) const TEST_ENEMY: u64 = 131000108001;
     const TEST_BATTLE: u32 = 96;
 
     /// A minimal content directory: `load` requires one dungeon, and the field
     /// file supplies one enemy for `take_shared_fields` to move.
-    fn engine() -> (std::path::PathBuf, EncounterEngine) {
+    pub(in crate::encounter) fn engine() -> (std::path::PathBuf, EncounterEngine) {
         static SERIAL: std::sync::atomic::AtomicU64 = std::sync::atomic::AtomicU64::new(0);
         let dir = std::env::temp_dir().join(format!(
             "osfr-field-sim-{}-{}",

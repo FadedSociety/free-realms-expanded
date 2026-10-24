@@ -73,6 +73,8 @@ fn production_melee_reach_is_still_the_reviewed_three_units() {
     // reviewed melee reach is widened, if the ranged kits are folded into it, or
     // if the far-hit and repeat gates disappear.
     let encounter = normalized(include_str!("../src/encounter.rs"));
+    // The enemy contact rule moved into the arena simulation (T439).
+    let arena = normalized(include_str!("../src/encounter/arena.rs"));
     // Reach is code; damage per job moved to `combat_scale.json` (T639), so only
     // the reach rows are pinned here: melee 3.0 for every job but the two ranged kits.
     let scale = normalized(include_str!("../src/encounter/combat_scale.rs"));
@@ -91,7 +93,7 @@ fn production_melee_reach_is_still_the_reviewed_three_units() {
     // Enemy reach is tunable data (behaviours.json, the owner 2026-10-15: "change
     // reach on the fly"); only the code default keeps the reviewed 2.5 m.
     assert!(
-        encounter.contains("distance(position, s.position) <= b.reach")
+        arena.contains("distance(position, s.position) <= b.reach")
             && encounter.contains("reach: 2.5,"),
         "the reconstructed enemy contact rule changed"
     );
