@@ -106,12 +106,7 @@ struct Rig {
 impl Rig {
     /// `None` when the private lab fixtures are absent.
     fn new(tag: &str, events: Option<serde_json::Value>) -> Option<Self> {
-        let lab = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
-        if !lab
-            .join("reports/round59-native-20261015T124443Z/content")
-            .is_dir()
-            || !test_support::bin_test_target(tag)
-        {
+        if !test_support::lab_content().is_dir() || !test_support::bin_test_target(tag) {
             eprintln!("skip {tag}: the private lab fixtures are absent");
             return None;
         }
@@ -453,6 +448,23 @@ fn t458_no_events_configured_sends_nothing() {
     assert_eq!(rig.server.world.world_events, Default::default());
 }
 
+/// A reliable sender that holds at most `max_queued_bytes` of unacknowledged wire bytes.
+fn queue_limit(max_queued_bytes: usize) -> ReliableSender {
+    let codec = Codec::new(CRC_SEED, 3, true, MAX_MESSAGE).unwrap();
+    let config = SenderConfig {
+        datagram_limit: 1400,
+        window: 32,
+        max_message: MAX_MESSAGE,
+        max_queued_bytes,
+        retry_ms: 250,
+        max_retries: 40,
+    };
+    ReliableSender::new(codec, config).unwrap()
+}
+
+/// The first run's actor: serial 1, index 0 (`world_events::GUID_TAG`).
+const GUID: u64 = 0x4556_4e54_0000_0100;
+
 /// A full reliable queue refuses only that viewer: the tick returns, the other viewer is served,
 /// and once the queue drains a later tick shows the refused viewer the actor.
 #[test]
@@ -461,20 +473,8 @@ fn t458_a_refusing_queue_only_affects_its_own_session() {
         return;
     };
     rig.walk(1, [2010.0, 0.0, 2000.0]);
-    let full = |max_queued_bytes| {
-        let codec = Codec::new(CRC_SEED, 3, true, MAX_MESSAGE).unwrap();
-        let config = SenderConfig {
-            datagram_limit: 1400,
-            window: 32,
-            max_message: MAX_MESSAGE,
-            max_queued_bytes,
-            retry_ms: 250,
-            max_retries: 40,
-        };
-        ReliableSender::new(codec, config).unwrap()
-    };
     let refused = rig.viewers[0];
-    rig.server.sessions.get_mut(&refused).unwrap().sender = full(1);
+    rig.server.sessions.get_mut(&refused).unwrap().sender = queue_limit(1);
     rig.realm("event start show", T0);
     let [near, other] = rig.tick(T0);
     assert!(near.is_empty(), "the full queue took nothing");
@@ -484,7 +484,7 @@ fn t458_a_refusing_queue_only_affects_its_own_session() {
         "the other viewer got the AddNpc and the poof"
     );
     let guid = spawned(&other[0]);
-    rig.server.sessions.get_mut(&refused).unwrap().sender = full(32 * 1024 * 1024);
+    rig.server.sessions.get_mut(&refused).unwrap().sender = queue_limit(32 * 1024 * 1024);
     let [near, other] = rig.tick(T0 + 1_100);
     assert_eq!(
         other,
@@ -493,13 +493,66 @@ fn t458_a_refusing_queue_only_affects_its_own_session() {
     );
     assert_eq!(
         near.len(),
-        2,
-        "shown again: AddNpc and the current base animation"
+        3,
+        "the removal it is owed, then AddNpc and the current base animation"
     );
+    assert_eq!(near[0], removal(guid, 0));
     assert_eq!(
-        (spawned(&near[0]), &near[1]),
+        (spawned(&near[1]), &near[2]),
         (guid, &animation(guid, BASE, true))
     );
+}
+
+/// Finding 3: once a session refuses a packet, the packets behind it are not tried. A queue that
+/// takes the small spawn poof but not the AddNpc must not get the poof for an actor it never
+/// saw; it is later shown the actor once, behind a removal.
+#[test]
+fn t458_a_refused_packet_skips_the_rest_of_that_sessions_tick() {
+    let Some(mut rig) = Rig::new("t458-skip", Some(show())) else {
+        return;
+    };
+    let mut probe = queue_limit(100);
+    assert!(
+        probe
+            .queue_message(&wrap_application(&play_effect(GUID, POOF)))
+            .is_ok(),
+        "the poof alone fits the small queue"
+    );
+    let near_key = rig.viewers[0];
+    rig.server.sessions.get_mut(&near_key).unwrap().sender = queue_limit(100);
+    rig.realm("event start show", T0);
+    let [near, far] = rig.tick(T0);
+    assert!(
+        near.is_empty() && far.is_empty(),
+        "the AddNpc was refused, so the poof behind it was not sent"
+    );
+    rig.server.sessions.get_mut(&near_key).unwrap().sender = queue_limit(32 * 1024 * 1024);
+    let [near, _] = rig.tick(T0 + 1_100);
+    assert_eq!(near.len(), 3, "removal, AddNpc, base animation");
+    assert_eq!(near[0], removal(GUID, 0));
+    assert_eq!(spawned(&near[1]), GUID);
+    assert_eq!(near[2], animation(GUID, BASE, true));
+}
+
+/// Finding 3: a removal a session refused is not lost; the actor does not stay on its client.
+#[test]
+fn t458_a_refused_removal_is_sent_when_the_queue_has_room() {
+    let Some(mut rig) = Rig::new("t458-ghost", Some(show())) else {
+        return;
+    };
+    rig.realm("event start show", T0);
+    let [near, _] = rig.tick(T0);
+    assert_eq!(spawned(&near[0]), GUID);
+    rig.realm("event stop show", T0 + 500);
+    let near_key = rig.viewers[0];
+    rig.server.sessions.get_mut(&near_key).unwrap().sender = queue_limit(1);
+    let [near, _] = rig.tick(T0 + 500);
+    assert!(near.is_empty(), "the removal was refused");
+    rig.server.sessions.get_mut(&near_key).unwrap().sender = queue_limit(32 * 1024 * 1024);
+    let [near, far] = rig.tick(T0 + 600);
+    assert_eq!(near, [removal(GUID, POOF)], "owed, with its poof");
+    assert!(far.is_empty());
+    assert_eq!(rig.tick(T0 + 700), [Vec::<Vec<u8>>::new(), Vec::new()]);
 }
 
 /// The production tick is wired into `Server::step`: one step after a start runs the spawn.

@@ -27,11 +27,17 @@ use crate::players::{PlayerRegistry, SessionId, ZoneInstance};
 use crate::startup_world::{NpcSpawn, build_add_npc};
 use serde::Deserialize;
 use std::collections::{BTreeMap, BTreeSet};
-use std::{io, path::Path, sync::Arc};
+use std::{
+    io::{self, Read},
+    path::Path,
+    sync::Arc,
+};
 
 pub const FILE: &str = "world_events.json";
 /// 'EVNT' in the high half; the run serial (bits 8..32) and the actor index fill the low half,
 /// beside the other actor tags (mounts.rs, pets.rs, encounter.rs, harvest_nodes.rs, housing.rs).
+/// The 35/3 header: the runner sends nothing else from 35/3 but a removal.
+const REMOVAL_HEAD: [u8; 4] = [35, 0, 3, 0];
 const GUID_TAG: u64 = 0x4556_4e54_0000_0000;
 const SERIALS: u32 = 0xff_ffff;
 // (R) Sanity bounds for hand-written content, not tuning values.
@@ -40,6 +46,8 @@ const MAX_ACTORS: usize = 32;
 const MAX_STEPS: usize = 512;
 const MAX_AT_MS: u64 = 2 * 60 * 60 * 1000;
 const MAX_NAME_BYTES: usize = 64;
+/// The bound the sibling content loaders use (`abilities.rs`, `power_ups.rs`).
+const MAX_JSON_BYTES: u64 = 1_048_576;
 
 type Out = Vec<(SessionId, Vec<u8>)>;
 
@@ -191,10 +199,18 @@ fn valid_key(key: &str) -> bool {
 
 /// Every event in `<dir>/world_events.json`, validated; a missing file is no events.
 pub fn load(dir: &Path) -> io::Result<Vec<WorldEvent>> {
-    let bytes = match std::fs::read(dir.join(FILE)) {
+    let mut file = match std::fs::File::open(dir.join(FILE)) {
         Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(Vec::new()),
-        bytes => bytes?,
+        file => file?,
     };
+    // Checked before reading: the load runs on the server thread inside an admin's commit.
+    if file.metadata()?.len() > MAX_JSON_BYTES {
+        return Err(invalid(format!(
+            "{FILE} is larger than {MAX_JSON_BYTES} bytes"
+        )));
+    }
+    let mut bytes = Vec::new();
+    file.read_to_end(&mut bytes)?;
     let file: EventsFile = serde_json::from_slice(&bytes).map_err(invalid)?;
     if file.events.len() > MAX_EVENTS {
         return Err(invalid("at most 32 world events"));
@@ -286,7 +302,7 @@ fn compile(row: EventRow) -> io::Result<WorldEvent> {
 #[derive(Clone, Debug, Default, PartialEq)]
 pub struct WorldEvents {
     runs: BTreeMap<String, Run>,
-    /// Removals `stop` queued for the next tick.
+    /// Removals for the next tick, sent first: `stop`'s, and the ones a session refused.
     pending: Out,
     serial: u32,
     tag: i32,
@@ -390,10 +406,33 @@ impl WorldEvents {
         out
     }
 
-    /// Forget a session whose delivery was refused: a later tick shows it every live actor again.
-    pub fn forget(&mut self, session: SessionId) {
-        for shown in self.runs.values_mut().flat_map(|run| &mut run.actors) {
-            shown.seen_by.remove(&session);
+    /// A session refused `undelivered`, its packets of one tick from the first refusal on, in
+    /// order. The client must end up with no actor the runs no longer have, so:
+    /// * a removal it missed stays owed: the next tick sends it again, first;
+    /// * every actor it was shown is removed before a later tick shows it again, because the
+    ///   client may hold the actor already (a refused base animation after an accepted AddNpc).
+    ///   A 35/3 for a guid the client lacks is a no-op (its handler skips a missed lookup at
+    ///   `0x00930808`), so removing an actor whose AddNpc was refused is harmless.
+    pub fn refused(&mut self, session: SessionId, undelivered: Vec<Vec<u8>>) {
+        let mut owed: Vec<_> = undelivered
+            .into_iter()
+            .filter(|packet| packet.starts_with(&REMOVAL_HEAD))
+            .collect();
+        for run in self.runs.values_mut() {
+            for index in 0..run.actors.len() {
+                if run.actors[index].seen_by.remove(&session) {
+                    owed.push(encode_remove_gracefully(run.guid(index), 0));
+                }
+            }
+        }
+        for packet in owed {
+            if !self
+                .pending
+                .iter()
+                .any(|(to, held)| *to == session && *held == packet)
+            {
+                self.pending.push((session, packet));
+            }
         }
     }
 }
@@ -524,7 +563,10 @@ mod tests {
     }
 
     fn load_json(name: &str, file: &serde_json::Value) -> io::Result<Vec<WorldEvent>> {
-        let dir = std::env::temp_dir().join(format!("osfr-t458-{}-{name}", std::process::id()));
+        // One directory per test thread: tests run in parallel and share the helper names.
+        let thread = format!("{:?}", std::thread::current().id()).replace(['(', ')'], "");
+        let dir =
+            std::env::temp_dir().join(format!("osfr-t458-{}-{thread}-{name}", std::process::id()));
         std::fs::create_dir_all(&dir).unwrap();
         std::fs::write(dir.join(FILE), file.to_string()).unwrap();
         let events = load(&dir);
@@ -695,6 +737,99 @@ mod tests {
             GUID_TAG | 2 << 8,
             "the wrap skipped the live serial"
         );
+    }
+
+    const GUID: u64 = GUID_TAG | 1 << 8;
+
+    fn kinds(out: &Out) -> Vec<&[u8]> {
+        out.iter().map(|(_, packet)| &packet[..4]).collect()
+    }
+
+    /// Finding 3: a session that took the AddNpc but refused the base animation is forgotten;
+    /// it must get the removal first, never a second AddNpc for a guid it still holds.
+    #[test]
+    fn a_forgotten_session_is_removed_before_it_is_shown_again() {
+        let event = one(json!([
+            {"at_ms": 0, "op": {"spawn": {"actor": "a"}}},
+            {"at_ms": 10, "op": {"base_anim": {"actor": "a", "id": 7}}}
+        ]));
+        let players = registry_with(1, [1.0, 0.0, 0.0]);
+        let mut events = WorldEvents::default();
+        assert!(events.start(event, WORLD, 0));
+        assert_eq!(kinds(&events.tick(0, &players)), [[35, 0, 2, 0]]);
+        let animated = events.tick(10, &players);
+        assert_eq!(kinds(&animated), [[35, 0, 8, 0]]);
+        events.refused(SessionId(1), vec![animated[0].1.clone()]);
+        let again = events.tick(20, &players);
+        assert_eq!(
+            kinds(&again),
+            [[35, 0, 3, 0], [35, 0, 2, 0], [35, 0, 8, 0]],
+            "the removal, then the AddNpc and the animation"
+        );
+        assert_eq!(again[0].1, encode_remove_gracefully(GUID, 0));
+        assert_eq!(&again[1].1[4..12], &GUID.to_le_bytes());
+        assert!(
+            events.tick(30, &players).is_empty(),
+            "shown once, then quiet"
+        );
+    }
+
+    /// Finding 3: a removal a session refused (a `remove` step, a `stop`, or the walk-out
+    /// removal) is sent again until it is accepted, once per tick however often it is refused.
+    #[test]
+    fn a_refused_removal_stays_owed_until_it_is_delivered() {
+        let event = one(json!([
+            {"at_ms": 0, "op": {"spawn": {"actor": "a"}}},
+            {"at_ms": 10, "op": {"remove": {"actor": "a", "effect_id": 5}}}
+        ]));
+        let players = registry_with(1, [1.0, 0.0, 0.0]);
+        let mut events = WorldEvents::default();
+        assert!(events.start(event, WORLD, 0));
+        events.tick(0, &players);
+        let removal = encode_remove_gracefully(GUID, 5);
+        let sent = events.tick(10, &players);
+        assert_eq!(sent, [(SessionId(1), removal.clone())]);
+        // The run is over, yet the refused removal comes back, once, however often refused.
+        events.refused(SessionId(1), sent.iter().map(|(_, p)| p.clone()).collect());
+        events.refused(SessionId(1), vec![removal.clone()]);
+        assert_eq!(events.tick(20, &players), [(SessionId(1), removal.clone())]);
+        events.refused(SessionId(1), vec![removal.clone()]);
+        assert_eq!(events.tick(30, &players), [(SessionId(1), removal)]);
+        assert!(
+            events.tick(40, &players).is_empty(),
+            "delivered, so no longer owed"
+        );
+    }
+
+    /// The same for `stop`: a refused removal is owed even though the run is gone.
+    #[test]
+    fn a_refused_stop_removal_is_not_lost() {
+        let event = one(json!([{"at_ms": 0, "op": {"spawn": {"actor": "a"}}}]));
+        let players = registry_with(1, [1.0, 0.0, 0.0]);
+        let mut events = WorldEvents::default();
+        assert!(events.start(event, WORLD, 0));
+        events.tick(0, &players);
+        assert!(events.stop("show"));
+        let sent = events.tick(10, &players);
+        assert_eq!(sent, [(SessionId(1), encode_remove_gracefully(GUID, 0))]);
+        events.refused(SessionId(1), vec![sent[0].1.clone()]);
+        assert_eq!(events.tick(20, &players), sent);
+        assert!(events.tick(30, &players).is_empty());
+    }
+
+    /// The bound is checked on the file's size before it is read, and the error names the file.
+    #[test]
+    fn an_oversized_file_is_refused_by_name_before_it_is_read() {
+        let dir = std::env::temp_dir().join(format!("osfr-t458-{}-big", std::process::id()));
+        std::fs::create_dir_all(&dir).unwrap();
+        let padded = |extra: u64| format!(r#"{{"events": []}}{}"#, " ".repeat((extra) as usize));
+        let pad = MAX_JSON_BYTES - 14; // `{"events": []}` is 14 bytes
+        std::fs::write(dir.join(FILE), padded(pad)).unwrap();
+        assert!(load(&dir).unwrap().is_empty(), "exactly the bound loads");
+        std::fs::write(dir.join(FILE), padded(pad + 1)).unwrap();
+        let error = load(&dir).unwrap_err().to_string();
+        let _ = std::fs::remove_dir_all(&dir);
+        assert!(error.contains(FILE) && error.contains("larger"), "{error}");
     }
 
     /// With no events configured a tick sends nothing and allocates nothing.

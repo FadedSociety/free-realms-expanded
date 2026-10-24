@@ -52,10 +52,17 @@ fn start(admin: &Session, world: &mut SharedWorld, now_ms: u64, key: &str) -> St
     }
 }
 
-/// One world-event tick. A refused delivery is logged and only that session is affected: the
-/// runner forgets it, so a later tick shows it every live actor again (worker rule 17).
+/// One world-event tick. Once a session's queue refuses a packet it gets none of its later
+/// packets this tick (a small op behind a refused AddNpc would name a guid the client never
+/// saw) and one log line; the runner owes it the removals it missed and shows it the live
+/// actors again later (`WorldEvents::refused`). Only that session is affected (worker rule 17).
 pub(super) fn tick(world: &mut SharedWorld, sessions: &mut SessionMap, now_ms: u64) {
+    let mut refused: BTreeMap<SessionId, Vec<Vec<u8>>> = BTreeMap::new();
     for (recipient, packet) in world.world_events.tick(now_ms, &world.players) {
+        if let Some(undelivered) = refused.get_mut(&recipient) {
+            undelivered.push(packet);
+            continue;
+        }
         let key = world.session_keys.get(&recipient);
         let Some(session) = key.and_then(|key| sessions.get_mut(key)) else {
             continue;
@@ -63,7 +70,10 @@ pub(super) fn tick(world: &mut SharedWorld, sessions: &mut SessionMap, now_ms: u
         if let Err(error) = session.queue_shared_message(&wrap_application(&packet)) {
             event(json!({"event":"world_event_delivery_refused",
                 "character":session.character_guid,"reason":error.to_string()}));
-            world.world_events.forget(recipient);
+            refused.insert(recipient, vec![packet]);
         }
+    }
+    for (session, undelivered) in refused {
+        world.world_events.refused(session, undelivered);
     }
 }

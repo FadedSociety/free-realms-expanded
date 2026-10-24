@@ -100,15 +100,13 @@ impl Gameplay {
     /// for the host, which answers once the admin's transaction commits (`crate::world_events`);
     /// every other verb answers with one line here.
     pub(super) fn realm_event(&mut self, args: &[&str], out: &mut Outcome) -> io::Result<()> {
-        out.world_event = match args {
-            ["start", key] => Some(WorldEventCommand::Start(key.to_string())),
-            ["stop", key] => Some(WorldEventCommand::Stop(key.to_string())),
-            _ => {
-                out.replies
-                    .push(chat::system(&self.live_event_command(args)?));
-                None
-            }
-        };
+        match args {
+            ["start", key] => out.world_event = Some(WorldEventCommand::Start(key.to_string())),
+            ["stop", key] => out.world_event = Some(WorldEventCommand::Stop(key.to_string())),
+            _ => out
+                .replies
+                .push(chat::system(&self.live_event_command(args)?)),
+        }
         Ok(())
     }
 
@@ -245,6 +243,28 @@ mod tests {
         fs::create_dir(&path).unwrap();
         assert!(read_events(&path).is_err(), "a directory is refused");
         let _ = fs::remove_dir_all(&dir);
+    }
+
+    /// Only a start or stop touches `Outcome::world_event`; the other verbs leave a staged
+    /// command alone.
+    #[test]
+    fn only_a_start_or_stop_stages_the_world_event() {
+        let content = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../lab/references/rust-opening-cooking-original-assets");
+        let mut game = Gameplay::load(&content, None).unwrap();
+        let staged = Some(WorldEventCommand::Stop("kept".into()));
+        let mut out = Outcome {
+            world_event: staged.clone(),
+            ..Outcome::default()
+        };
+        game.realm_event(&["list"], &mut out).unwrap();
+        assert_eq!(out.world_event, staged, "event list leaves it staged");
+        assert_eq!(out.replies.len(), 1, "and still answers");
+        game.realm_event(&["start", "show"], &mut out).unwrap();
+        assert_eq!(
+            out.world_event,
+            Some(WorldEventCommand::Start("show".into()))
+        );
     }
 
     /// The tick logs a refused file when the poll errors; the watch's

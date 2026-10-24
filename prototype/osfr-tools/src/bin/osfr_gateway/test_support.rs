@@ -47,6 +47,17 @@ impl Drop for Scratch {
     }
 }
 
+/// The prepared round59 content: `OSFR_APP_FUZZ_CONTENT` when set, else the lab report. Tests
+/// that skip without the private fixtures check this directory.
+pub fn lab_content() -> PathBuf {
+    std::env::var_os("OSFR_APP_FUZZ_CONTENT")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| {
+            PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+                .join("../../../lab/reports/round59-native-20261015T124443Z/content")
+        })
+}
+
 /// The prepared round59 content plus one synthetic vendor NPC and its one-row store, in the
 /// scratch directory. `npc_spawns_extra.json` and `npcs/` keep the content local so the bundled
 /// `data/content` catalogue cannot leak into a test; the caller may add its own catalogue files.
@@ -54,10 +65,7 @@ pub fn vendor_content(scratch: &Scratch) -> PathBuf {
     let content = scratch.path().join("content");
     fs::create_dir_all(content.join("npcs")).unwrap();
     fs::create_dir_all(content.join("quests")).unwrap();
-    let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
-    let source = std::env::var_os("OSFR_APP_FUZZ_CONTENT")
-        .map(PathBuf::from)
-        .unwrap_or_else(|| root.join("reports/round59-native-20261015T124443Z/content"));
+    let source = lab_content();
     for entry in fs::read_dir(&source).unwrap() {
         let path = entry.unwrap().path();
         if path.is_file() {
