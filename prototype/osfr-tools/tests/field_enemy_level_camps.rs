@@ -96,7 +96,7 @@ const STARTER_STATS: [(u64, i64, i64, &str, u64, u64); 12] = [
 /// The four quest-gated Hooligans, in file order: GUID, position, model, name
 /// id, name, max health, damage. All four use definition 930050 and gate on
 /// quest 3030007.
-const QUEST_HOOLIGANS: [(u64, [f32; 3], i64, i64, &str, u64, u64); 4] = [
+const QUEST_HOOLIGANS: [(u64, [f32; 3], i64, i64, &str, u64); 4] = [
     (
         100000004154,
         [-1971.408, -34.51335, 539.8358],
@@ -104,7 +104,6 @@ const QUEST_HOOLIGANS: [(u64, [f32; 3], i64, i64, &str, u64, u64); 4] = [
         5100401,
         "Hooligan",
         220,
-        8,
     ),
     (
         100000004155,
@@ -113,7 +112,6 @@ const QUEST_HOOLIGANS: [(u64, [f32; 3], i64, i64, &str, u64, u64); 4] = [
         5100401,
         "Hooligan",
         220,
-        8,
     ),
     (
         5064655448674664449,
@@ -122,7 +120,6 @@ const QUEST_HOOLIGANS: [(u64, [f32; 3], i64, i64, &str, u64, u64); 4] = [
         5100401,
         "Hooligan",
         220,
-        8,
     ),
     (
         5064655448674664450,
@@ -131,7 +128,6 @@ const QUEST_HOOLIGANS: [(u64, [f32; 3], i64, i64, &str, u64, u64); 4] = [
         5100401,
         "Hooligan",
         220,
-        8,
     ),
 ];
 const QUEST_ID: u64 = 3_030_007;
@@ -473,7 +469,9 @@ fn the_existing_starter_and_quest_populations_are_unchanged() {
             grouped.insert(member.as_u64().unwrap());
         }
     }
-    for (index, (guid, centre, model, name_id, name, health, damage)) in
+    // Damage is tunable balance (T398 retuned it against the final-era budget, which
+    // `field_enemy_budget` bounds), so it is not pinned here.
+    for (index, (guid, centre, model, name_id, name, health)) in
         QUEST_HOOLIGANS.into_iter().enumerate()
     {
         let row = actor(&field, guid);
@@ -483,7 +481,6 @@ fn the_existing_starter_and_quest_populations_are_unchanged() {
         assert_eq!(row["name_id"], name_id);
         assert_eq!(row["name"], name);
         assert_eq!(row["max_health"], health);
-        assert_eq!(row["damage"], damage);
         assert_eq!(row["texture_alias"], "");
         assert_eq!(row["power_up_table"], "standard");
         assert_eq!(

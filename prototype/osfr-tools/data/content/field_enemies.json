@@ -388,7 +388,7 @@
         539.8358
       ],
       "max_health": 220,
-      "damage": 8,
+      "damage": 6,
       "boss": false,
       "power_up_table": "standard",
       "respawn_seconds": 30,
@@ -407,7 +407,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) health 220, damage 8, respawn 30 s and aggro 10 m are local balance (20 damage from four at once knocked a player out in ~12 s, run 001154); the opening's Hooligan Wolves use 180/25"
+          "evidence": "(R) health 220, damage 6, respawn 30 s and aggro 10 m are local balance (20 damage from four at once knocked a player out in ~12 s, run 001154); the opening's Hooligan Wolves use 180/25; T398 (R): damage 8 -> 6 so the four together need over 30 s to knock out a level-1 Wizard on the final-era health curve (27 s at 8)"
         },
         {
           "kind": "legacy-data",
@@ -432,7 +432,7 @@
         544.2426
       ],
       "max_health": 220,
-      "damage": 8,
+      "damage": 6,
       "boss": false,
       "power_up_table": "standard",
       "respawn_seconds": 30,
@@ -451,7 +451,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) health 220, damage 8, respawn 30 s and aggro 10 m are local balance (20 damage from four at once knocked a player out in ~12 s, run 001154); the opening's Hooligan Wolves use 180/25"
+          "evidence": "(R) health 220, damage 6, respawn 30 s and aggro 10 m are local balance (20 damage from four at once knocked a player out in ~12 s, run 001154); the opening's Hooligan Wolves use 180/25; T398 (R): damage 8 -> 6 so the four together need over 30 s to knock out a level-1 Wizard on the final-era health curve (27 s at 8)"
         },
         {
           "kind": "legacy-data",
@@ -476,7 +476,7 @@
         548.0
       ],
       "max_health": 220,
-      "damage": 8,
+      "damage": 6,
       "boss": false,
       "power_up_table": "standard",
       "respawn_seconds": 30,
@@ -495,7 +495,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) health 220, damage 8, respawn 30 s and aggro 10 m are local balance (20 damage from four at once knocked a player out in ~12 s, run 001154); the opening's Hooligan Wolves use 180/25"
+          "evidence": "(R) health 220, damage 6, respawn 30 s and aggro 10 m are local balance (20 damage from four at once knocked a player out in ~12 s, run 001154); the opening's Hooligan Wolves use 180/25; T398 (R): damage 8 -> 6 so the four together need over 30 s to knock out a level-1 Wizard on the final-era health curve (27 s at 8)"
         },
         {
           "kind": "reconstructed",
@@ -520,7 +520,7 @@
         535.0
       ],
       "max_health": 220,
-      "damage": 8,
+      "damage": 6,
       "boss": false,
       "power_up_table": "standard",
       "respawn_seconds": 30,
@@ -539,7 +539,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) health 220, damage 8, respawn 30 s and aggro 10 m are local balance (20 damage from four at once knocked a player out in ~12 s, run 001154); the opening's Hooligan Wolves use 180/25"
+          "evidence": "(R) health 220, damage 6, respawn 30 s and aggro 10 m are local balance (20 damage from four at once knocked a player out in ~12 s, run 001154); the opening's Hooligan Wolves use 180/25; T398 (R): damage 8 -> 6 so the four together need over 30 s to knock out a level-1 Wizard on the final-era health curve (27 s at 8)"
         },
         {
           "kind": "reconstructed",
@@ -1144,7 +1144,7 @@
         490.0
       ],
       "max_health": 180,
-      "damage": 25,
+      "damage": 8,
       "boss": false,
       "power_up_table": "standard",
       "quest_ids": [],
@@ -1175,7 +1175,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) F621 re-audited centre 97.3 m from the nearest same-kind Legacy NPC row 3157 (FabledRealms.lua:1900), off the W102 starter centres and the opening walks to the stage wolves (field_camp_separation rules; checker output in notes/Autopilot/F621.md); 12 m leash as row 131000102001 (W102-F1); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/25); W105 scaling by level produces the live stats."
+          "evidence": "(R) F621 re-audited centre 97.3 m from the nearest same-kind Legacy NPC row 3157 (FabledRealms.lua:1900), off the W102 starter centres and the opening walks to the stage wolves (field_camp_separation rules; checker output in notes/Autopilot/F621.md); 12 m leash as row 131000102001 (W102-F1); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/8); W105 scaling by level produces the live stats. T398 (R): damage 25 -> 8, the Hooligan row's value, so a level-5 camp keeps the starter band's knockout time on the final-era health curve (it was 17 s for the pair against a level-5 Wizard)."
         }
       ]
     },
@@ -1192,7 +1192,7 @@
         490.0
       ],
       "max_health": 180,
-      "damage": 25,
+      "damage": 8,
       "boss": false,
       "power_up_table": "standard",
       "quest_ids": [],
@@ -1223,7 +1223,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) F621 re-audited centre 85.8 m from the nearest same-kind Legacy NPC row 3157 (FabledRealms.lua:1900), off the W102 starter centres and the opening walks to the stage wolves (field_camp_separation rules; checker output in notes/Autopilot/F621.md); 12 m leash as row 131000102002 (W102-F2); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/25); W105 scaling by level produces the live stats."
+          "evidence": "(R) F621 re-audited centre 85.8 m from the nearest same-kind Legacy NPC row 3157 (FabledRealms.lua:1900), off the W102 starter centres and the opening walks to the stage wolves (field_camp_separation rules; checker output in notes/Autopilot/F621.md); 12 m leash as row 131000102002 (W102-F2); level 5 in band 5-6 chosen as a local progression step between the 1-4 starter band and the difficulty-2/3 battle gates; count, respawn and rates are local policy. HP/damage are the enemies.json definition's level-1 values (180/8); W105 scaling by level produces the live stats. T398 (R): damage 25 -> 8, the Hooligan row's value, so a level-5 camp keeps the starter band's knockout time on the final-era health curve (it was 17 s for the pair against a level-5 Wizard)."
         }
       ]
     },

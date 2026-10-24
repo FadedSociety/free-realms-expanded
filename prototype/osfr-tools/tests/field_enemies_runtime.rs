@@ -5,6 +5,7 @@ use osfr_tools::{
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{
+    collections::BTreeSet,
     fs,
     path::PathBuf,
     sync::atomic::{AtomicU64, Ordering},
@@ -317,6 +318,36 @@ fn levels_scale_hp_damage_and_respawn() {
     let out = high.tick([100.0; 3], 11, 4000).unwrap();
     assert_eq!(hp(&out), Some((health, health)));
     assert_eq!(at(&high), [0.0; 3]);
+}
+
+/// T398: a field enemy's hit is its row's `damage` through the data scale, not a hidden
+/// constant: editing the row (or its level) moves the hit to the data-derived value.
+#[test]
+fn a_field_enemy_hit_follows_its_row_damage_and_level() {
+    let hit = |level: u32, damage: u32| {
+        let f = Fixture::new(level, 0.0);
+        f.edit("damage", json!(damage));
+        let mut e = f.load();
+        e.on_zone_ready(11, 0).unwrap();
+        let hits = hits_from(&e.tick([0.0; 3], 11, 100).unwrap(), GUID);
+        assert_eq!(hits.len(), 1, "one swing");
+        hits[0]
+    };
+    let mut seen = BTreeSet::new();
+    for (level, damage) in [(1, 7), (1, 40), (5, 7), (5, 40), (8, 40)] {
+        let got = hit(level, damage);
+        assert_eq!(
+            got,
+            combat_scale::enemy_hit(damage, level),
+            "{damage} at {level}"
+        );
+        seen.insert(got);
+    }
+    assert_eq!(
+        seen.len(),
+        5,
+        "every row or level change moves the hit: {seen:?}"
+    );
 }
 
 #[test]
