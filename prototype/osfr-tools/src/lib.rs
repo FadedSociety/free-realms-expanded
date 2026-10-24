@@ -15,6 +15,7 @@ pub mod coin_shop;
 pub mod collection_catalogue;
 pub mod collection_coins;
 pub mod combat;
+pub mod consumable_effects;
 pub mod content;
 pub mod cooking;
 pub mod derby;
