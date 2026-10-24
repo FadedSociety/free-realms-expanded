@@ -7,12 +7,30 @@
     "coins": "npc_spawns_extra.json rows named 386170 (rare) or 4412 (elite); tier comes only from them",
     "catalogue": "collection_catalogue.json; collection_id is always the entry's owner",
     "lxzxrus_base": "lab/references/Lxzxrus-Free-Realms-Server@37ef17587d43e9b33bfb10e5484518f61a82c6be src/Resources/CollectionNodeSpawns/1/*-exploration-coins-*.json",
-    "lxzxrus_fixes": "lab/references/Lxzxrus-Free-Realms-Server@65ec688f3e51249ca8a9c979b3938386748f7195 blackspore-exploration-coins-elite.json, briarwood-exploration-coins-rare.json (unmerged branch origin/collections/exploration-fixes; row 4493 left out)",
+    "lxzxrus_fixes": "lab/references/Lxzxrus-Free-Realms-Server@65ec688f3e51249ca8a9c979b3938386748f7195 blackspore-exploration-coins-elite.json, briarwood-exploration-coins-rare.json (unmerged branch origin/collections/exploration-fixes; row 4493 is our spawn 9700004493)",
     "sanctuary": "lab/references/Sanctuary-main-20261019@10f129e7f3e2094304d20ccee6e3f7136a5e889d src/Resources/CollectionCoins.json, Sunstone Valley only, its 311/312 swap undone (entry -8 into 311, +8 into 312)",
     "pairing": "playtest: a community playtester checked it against the basis its source names (not 2014 evidence); id-order: paired by id order, unchecked (R)",
     "pickup_range": "(R) Sanctuary@10f129e src/Sanctuary.Game/Zones/BaseZone.cs:909 CollectionCoin InteractRange 12; not recovered from the client"
   },
   "records": [
+    {
+      "spawn_guid": 9700004493,
+      "legacy_npc_id": null,
+      "tier": "elite",
+      "collection_id": 288,
+      "entry_id": 2038,
+      "pairing": "playtest",
+      "source": [
+        {
+          "kind": "lxzxrus",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-elite.json Id=4493 CollectionEntryId=2038"
+        },
+        {
+          "kind": "playtest",
+          "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@65ec688 docs/research/exploration-collections.md 'Checked in game': playtester named each coin's place from the original game's guides and videos"
+        }
+      ]
+    },
     {
       "spawn_guid": 100000001946,
       "legacy_npc_id": 1946,
@@ -1860,6 +1878,34 @@
           "evidence": "../lab/references/Lxzxrus-Free-Realms-Server@37ef175 src/Resources/CollectionNodeSpawns/1/sanctuary-exploration-coins-rare.json Id=4492 CollectionEntryId=1977"
         }
       ]
+    },
+    {
+      "spawn_guid": 100000036196,
+      "legacy_npc_id": 36196,
+      "tier": "rare",
+      "collection_id": 311,
+      "entry_id": 2195,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=36196 CollectionId=312 EntryId=2203 (tier swap undone)"
+        }
+      ]
+    },
+    {
+      "spawn_guid": 100000036199,
+      "legacy_npc_id": 36199,
+      "tier": "elite",
+      "collection_id": 312,
+      "entry_id": 2203,
+      "pairing": "id-order",
+      "source": [
+        {
+          "kind": "sanctuary",
+          "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=36199 CollectionId=311 EntryId=2195 (tier swap undone)"
+        }
+      ]
     }
   ],
   "gaps": {
@@ -1888,21 +1934,6 @@
         "collection_id": 275,
         "entry_id": 1985,
         "reason": "no coin in any source"
-      },
-      {
-        "collection_id": 288,
-        "entry_id": 2038,
-        "reason": "placed by coin-spawn-additions: ../lab/references/Lxzxrus-Free-Realms-Server@65ec688 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-elite.json Id=4493 CollectionEntryId=2038"
-      },
-      {
-        "collection_id": 311,
-        "entry_id": 2195,
-        "reason": "placed by coin-spawn-additions: ../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=36196 CollectionId=312 EntryId=2203 (tier swap undone)"
-      },
-      {
-        "collection_id": 312,
-        "entry_id": 2203,
-        "reason": "placed by coin-spawn-additions: ../lab/references/Sanctuary-main-20261019@10f129e src/Resources/CollectionCoins.json NpcDefinitionId=36199 CollectionId=311 EntryId=2195 (tier swap undone)"
       }
     ],
     "notes": [

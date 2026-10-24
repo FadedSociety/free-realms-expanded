@@ -309,3 +309,29 @@ fn completing_a_set_records_completion_once() {
     let replay = click(&mut game, guid, &at(position));
     assert!(replay.replies.is_empty() && !replay.changed);
 }
+
+/// T479's coins, each standing on its own spot, record their entry through the same route.
+#[test]
+fn the_three_added_coins_record_their_entries() {
+    let spawns = json(&bundled().join("npc_spawns_extra.json"));
+    for (guid, entry) in [
+        (9_700_004_493_u64, 2038), // Oberyn's Broken Home (Blackspore Elite)
+        (100_000_036_196, 2195),   // Sunstone Valley Rare
+        (100_000_036_199, 2203),   // Sunstone Valley Elite
+    ] {
+        let row = spawns["records"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["spawn_guid"] == guid)
+            .expect("coin spawn row");
+        let position = [0, 1, 2].map(|i| row["position"][i].as_f64().unwrap() as f32);
+        let fixture = Fixture::new();
+        let mut game = fixture.load(None);
+        let who = at(position);
+        assert!(added(&game.update_npc_visibility(&who).unwrap(), guid));
+        let out = click(&mut game, guid, &who);
+        assert!(out.changed, "{guid}");
+        assert!(ledger_holds(&game, entry), "{guid} records {entry}");
+    }
+}

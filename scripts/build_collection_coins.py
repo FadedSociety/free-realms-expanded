@@ -5,7 +5,7 @@ collection catalogue and pinned read-only reference commits (AGPL data rows only
 Pairing rules, in order:
 1. Lxzxrus base files, Id -> CollectionEntryId (Sunstone Valley excepted: invented ids there).
 2. Lxzxrus 65ec688 playtest re-pairs (unmerged branch), for coins we place.
-3. Sunstone Valley from Sanctuary, with its 311/312 tier swap undone.
+3. Sunstone Valley from Sanctuary, with its 311/312 tier swap undone; it alone places the 8th coins.
 collection_id is always the catalogue owner of the entry; tier always comes from our row's name.
 Correcting a pair is a one-row edit here or in the output; tests pin only canaries and totals.
 """
@@ -24,6 +24,9 @@ FIX_DOC = "docs/research/exploration-collections.md 'Checked in game'"
 FIX_CHECK = f"{FIX_DOC}: playtester named each coin's place from the original game's guides and videos"
 # Our row's name_string_id: client locale 386170 "Rare Exploration Coin", 4412 "Elite Exploration Coin".
 TIERS = {386170: "rare", 4412: "elite"}
+# Coin rows with a null legacy_npc_id, keyed by the Lxzxrus spawn Id that places them (T479).
+# Legacy Npc 4493 is a bear cub (our 100000004493), so Oberyn's coin has no Legacy id.
+LXZ_ONLY = {9700004493: 4493}
 # Locale names: 265-276 "<place> Rare Exploration", 284-291 "<place> Elite Exploration",
 # 311 = 3795 "Sunstone Valley Rare Exploration", 312 = 3797 "Sunstone Valley Elite Exploration".
 EXPLORATION = {c: "rare" for c in [*range(265, 277), 311]} | {c: "elite" for c in [*range(284, 292), 312]}
@@ -64,7 +67,8 @@ def cite(repo, rev, path, **fields):
 
 def main():
     spawns = json.loads((CONTENT / "npc_spawns_extra.json").read_text(encoding="utf-8"))["records"]
-    coins = {r["legacy_npc_id"]: r for r in spawns if r.get("name_string_id") in TIERS}
+    coins = {r["legacy_npc_id"] or LXZ_ONLY[r["spawn_guid"]]: r
+             for r in spawns if r.get("name_string_id") in TIERS}
     catalogue = json.loads((CONTENT / "collection_catalogue.json").read_text(encoding="utf-8"))
     owner = {e["id"]: c["id"] for c in catalogue["collections"] for e in c["entries"]}
 
@@ -73,13 +77,13 @@ def main():
     files = [p for p in git(LXZ, "ls-tree", "--name-only", LXZ_BASE, NODES).split()
              if p.endswith(("-exploration-coins-rare.json", "-exploration-coins-elite.json"))]
     assert len(files) == 18, files
-    base_ids = {}
+    file_ids = {}  # source file -> every coin Id it holds, at either Lxzxrus commit
     sunstone = {}  # coin id -> Lxzxrus own entry id and its evidence, a cross-check only
     for path in files:
         name = path.rsplit("/", 1)[1]
         for row in rows(LXZ, LXZ_BASE, path):
             coin, entry = row["Id"], row["CollectionEntryId"]
-            base_ids.setdefault(name, []).append(coin)
+            file_ids.setdefault(name, set()).add(coin)
             evidence = cite(LXZ, LXZ_BASE, path, Id=coin, CollectionEntryId=entry)
             if name.startswith("sunstone-valley-"):
                 sunstone[coin] = (entry, evidence)
@@ -91,7 +95,8 @@ def main():
             coin, entry = row["Id"], row["CollectionEntryId"]
             evidence = cite(LXZ, LXZ_FIX, NODES + name, Id=coin, CollectionEntryId=entry)
             claims.append((entry, coin, evidence))
-            if coin in coins:  # 4493 is not placed yet; coin-spawn-additions places it
+            file_ids[name].add(coin)  # 65ec688 adds 4493, Oberyn's coin
+            if coin in coins:
                 bound[coin] = [entry, [{"kind": "lxzxrus", "evidence": evidence}]]
     for row in rows(SANCTUARY, SANCTUARY_REV, SANCTUARY_COINS):
         coin, collection = row["NpcDefinitionId"], row["CollectionId"]
@@ -107,12 +112,14 @@ def main():
             assert entry == own - (90001 - 2188 if own < 90011 else 90011 - 2196), (coin, entry, own)
             bound[coin] = [entry, [{"kind": "sanctuary", "evidence": evidence},
                                    {"kind": "lxzxrus", "evidence": f"{cross_check} (cross-check)"}]]
+        elif collection in SANCTUARY_UNSWAP and coin in coins:  # e3deee7's 8th Sunstone coins: no Lxzxrus row
+            bound[coin] = [entry, [{"kind": "sanctuary", "evidence": evidence}]]
     assert not sunstone, f"Sunstone coins Sanctuary does not pair: {sorted(sunstone)}"
     assert bound.keys() == coins.keys(), bound.keys() ^ coins.keys()
 
     playtest = {}
     for name, (rev, where, only) in PLAYTEST.items():
-        for coin in base_ids[name]:
+        for coin in file_ids[name]:
             if only is None or coin in only:
                 playtest[coin] = f"../lab/references/{LXZ}@{rev} {where}"
 
@@ -122,7 +129,7 @@ def main():
         assert EXPLORATION.get(owner.get(entry)) == tier, (coin, entry, tier)
         if coin in playtest:
             source.append({"kind": "playtest", "evidence": playtest[coin]})
-        records.append({"spawn_guid": row["spawn_guid"], "legacy_npc_id": coin, "tier": tier,
+        records.append({"spawn_guid": row["spawn_guid"], "legacy_npc_id": row["legacy_npc_id"], "tier": tier,
                         "collection_id": owner[entry], "entry_id": entry,
                         "pairing": "playtest" if coin in playtest else "id-order", "source": source})
     records.sort(key=lambda r: r["spawn_guid"])
@@ -132,7 +139,7 @@ def main():
     def reason(entry):
         unplaced = [e for c_entry, coin, e in claims if c_entry == entry and coin not in coins]
         if unplaced:
-            return f"placed by coin-spawn-additions: {unplaced[0]}"
+            return f"a source places a coin we do not: {unplaced[0]}"
         taken = [(coin, e) for c_entry, coin, e in claims if c_entry == entry]
         if taken:
             coin, evidence = taken[0]
@@ -158,7 +165,7 @@ def main():
             "catalogue": "collection_catalogue.json; collection_id is always the entry's owner",
             "lxzxrus_base": f"lab/references/{LXZ}@{full(LXZ, LXZ_BASE)} {NODES}*-exploration-coins-*.json",
             "lxzxrus_fixes": f"lab/references/{LXZ}@{full(LXZ, LXZ_FIX)} {', '.join(FIXED_FILES)}"
-                             " (unmerged branch origin/collections/exploration-fixes; row 4493 left out)",
+                             " (unmerged branch origin/collections/exploration-fixes; row 4493 is our spawn 9700004493)",
             "sanctuary": f"lab/references/{SANCTUARY}@{full(SANCTUARY, SANCTUARY_REV)} {SANCTUARY_COINS},"
                          " Sunstone Valley only, its 311/312 swap undone (entry -8 into 311, +8 into 312)",
             "pairing": "playtest: a community playtester checked it against the basis its source names (not 2014"

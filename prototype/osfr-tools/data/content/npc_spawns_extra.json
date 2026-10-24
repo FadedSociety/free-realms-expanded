@@ -73263,6 +73263,96 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "spawn_guid": 9700004493,
+      "legacy_npc_id": null,
+      "model_id": 947,
+      "model_file_name": "env_icon_blackspore.adr",
+      "name": "Elite Exploration Coin",
+      "name_string_id": 4412,
+      "position": [
+        -2202.31,
+        -21.77,
+        1079.31
+      ],
+      "heading": 0.0,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Models.txt row 947 = env_icon_blackspore.adr; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Elite coin rows such as Id=2112 use ModelId=947 and NameId=4412. They supply the model and name only; legacy_npc_id stays null because Legacy Npc 4493 is a bear cub (our spawn 100000004493)."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 947 = env_icon_blackspore.adr; Assets_manifest.txt lists env_icon_blackspore.adr.z. Global.Text 4412 = 'Elite Exploration Coin' (lab/reports/locale-id-to-text.json); the 35/2 AddNpc reader 0x00921a10 reads u64 actor, i32 name id, i32 model id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T479: ../lab/references/Lxzxrus-Free-Realms-Server@65ec688f3e51249ca8a9c979b3938386748f7195 src/Resources/CollectionNodeSpawns/1/blackspore-exploration-coins-elite.json Id=4493 (CollectionEntryId=2038, Global.Text 408090 \"Oberyn's Broken Home\") supplies the position, a community playtester's in-game position report (docs/research/exploration-collections.md 'Checked in game'), not a 2014 transform. (R) Heading 0.0 is that row's value; the report records none. (R) spawn_guid 9700004493 is ours: the 97000xxxxx range is unused, and 100000004493 is the bear cub."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000036196,
+      "legacy_npc_id": 36196,
+      "model_id": 4057,
+      "model_file_name": "env_icon_sunstone_valley.adr",
+      "name": "Rare Exploration Coin",
+      "name_string_id": 386170,
+      "position": [
+        621.99664,
+        -0.877558,
+        2395.128
+      ],
+      "heading": -2.04773691,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Models.txt row 4057 = env_icon_sunstone_valley.adr, the model of Legacy's 14 Sunstone Valley coins (../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4445-4455 and 4461-4463). Legacy has no Id=36196 row; it supplies the model only, and legacy_npc_id is Sanctuary's Npcs.json Id, which shares Legacy's id space."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4057 = env_icon_sunstone_valley.adr; Assets_manifest.txt lists env_icon_sunstone_valley.adr.z. Global.Text 386170 = 'Rare Exploration Coin' (lab/reports/locale-id-to-text.json); the 35/2 AddNpc reader 0x00921a10 reads u64 actor, i32 name id, i32 model id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T479: ../lab/references/Sanctuary-main-20261019@10f129e7f3e2094304d20ccee6e3f7136a5e889d src/Scripts/Zone/FabledRealms.lua:4250 spawnNpcWithGuid(36196, 100000036196, ...) supplies the guid, position and heading, and src/Resources/Npcs.json Id=36196 (NameId=386170, ModelId=4057) the definition; both added in e3deee7, the 8th coin of its Sunstone Valley set. Community placement, not a captured 2014 transform."
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000036199,
+      "legacy_npc_id": 36199,
+      "model_id": 4057,
+      "model_file_name": "env_icon_sunstone_valley.adr",
+      "name": "Elite Exploration Coin",
+      "name_string_id": 4412,
+      "position": [
+        721.102,
+        84.58193,
+        2219.0725
+      ],
+      "heading": -2.966465,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Resources/Models.txt row 4057 = env_icon_sunstone_valley.adr, the model of Legacy's 14 Sunstone Valley coins (../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4445-4455 and 4461-4463). Legacy has no Id=36199 row; it supplies the model only, and legacy_npc_id is Sanctuary's Npcs.json Id, which shares Legacy's id space."
+        },
+        {
+          "kind": "client",
+          "evidence": "../lab/working/OSFR.Client/OSFR Client/Resources/Models.txt row 4057 = env_icon_sunstone_valley.adr; Assets_manifest.txt lists env_icon_sunstone_valley.adr.z. Global.Text 4412 = 'Elite Exploration Coin' (lab/reports/locale-id-to-text.json); the 35/2 AddNpc reader 0x00921a10 reads u64 actor, i32 name id, i32 model id."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T479: ../lab/references/Sanctuary-main-20261019@10f129e7f3e2094304d20ccee6e3f7136a5e889d src/Scripts/Zone/FabledRealms.lua:4253 spawnNpcWithGuid(36199, 100000036199, ...) supplies the guid, position and heading, and src/Resources/Npcs.json Id=36199 (NameId=4412, ModelId=4057) the definition; both added in e3deee7, the 8th coin of its Sunstone Valley set. Community placement, not a captured 2014 transform."
+        }
+      ],
+      "position_w": null
     }
   ]
 }

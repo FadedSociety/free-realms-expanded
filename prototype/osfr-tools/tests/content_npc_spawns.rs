@@ -87,6 +87,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
         .map(|row| (row["actor_id"].as_u64().unwrap(), row))
         .collect();
 
+    // world.rs spawns legacy_data regional rows as actor `npc_id` and extra rows as actor
+    // `spawn_guid`, so each id may name one spawn only (T479).
+    let mut actors = HashSet::new();
     let mut regional_legacy = 0;
     let mut regional_reconstructed = 0;
     for entry in fs::read_dir(content_root.join("npcs")).unwrap() {
@@ -100,6 +103,8 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
             let source = row["placement_source"].as_str().unwrap();
             if source == "legacy_data_spawn" {
                 regional_legacy += 1;
+                let actor = row["npc_id"].as_u64().unwrap();
+                assert!(actors.insert(actor), "{owner}: actor {actor} spawned twice");
                 assert_eq!(row["placement"], "legacy_data", "{owner}");
                 assert!(
                     has_source(row, "legacy-data"),
@@ -140,6 +145,8 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     let mut captured_actors = HashSet::new();
     for row in extra_rows {
         let owner = format!("Legacy spawn {}", row["spawn_guid"]);
+        let actor = row["spawn_guid"].as_u64().unwrap();
+        assert!(actors.insert(actor), "{owner}: actor {actor} spawned twice");
         let model_file = row["model_file_name"].as_str().unwrap();
         assert!(
             shipped_names.contains(&model_file.to_ascii_lowercase()),
@@ -240,8 +247,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // T257's appended rows, T279's Geoffrey row inserted after Carlos, T300's
     // appended Therin row, T331's appended Petra row, T372's appended 25
     // priced-vendor spawns, T385's appended 4 fishing-guide spawns, T409's
-    // appended Manager Landon, and T467's two Sanctuary card tables.
-    assert_eq!(extra_rows.len(), 3304);
+    // appended Manager Landon, T467's two Sanctuary card tables, and T479's 3
+    // exploration coins.
+    assert_eq!(extra_rows.len(), 3307);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

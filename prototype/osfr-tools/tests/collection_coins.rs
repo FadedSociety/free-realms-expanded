@@ -1,10 +1,11 @@
 //! T449: gates on the committed coin -> collection entry map. Only the canaries and the totals
-//! are pinned; the 83 id-order pairs stay tunable one row at a time.
+//! are pinned; the 85 id-order pairs stay tunable one row at a time.
 
 use osfr_tools::collection_catalogue::CollectionCatalogueContent;
 use osfr_tools::collection_coins::{
     CoinsFile, CollectionCoins, FILE_NAME, Pairing, SCHEMA_VERSION, Tier,
 };
+use osfr_tools::{startup_world::parse_add_npc, world::NpcVisibility};
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -57,7 +58,7 @@ fn refusal(name: &str, edit: impl FnOnce(&mut Value)) -> String {
 #[test]
 fn every_placed_coin_is_bound_once_with_its_own_tier() {
     let coins = committed();
-    assert_eq!(coins.iter().count(), 118);
+    assert_eq!(coins.iter().count(), 121);
     let spawns: Value = serde_json::from_str(
         &fs::read_to_string(content_dir().join("npc_spawns_extra.json")).unwrap(),
     )
@@ -100,7 +101,7 @@ fn every_placed_coin_is_bound_once_with_its_own_tier() {
         .iter()
         .filter(|(_, coin)| coin.pairing == Pairing::Playtest)
         .count();
-    assert_eq!(playtest, 35);
+    assert_eq!(playtest, 36);
     // Tunable (R): a sanity bound only, so retuning the reach stays a one-value data edit.
     assert!((1.0..=50.0).contains(&coins.pickup_range()));
 }
@@ -108,16 +109,21 @@ fn every_placed_coin_is_bound_once_with_its_own_tier() {
 #[test]
 fn canary_pairs_hold() {
     let coins = committed();
-    for (legacy, collection, entry, pairing) in [
-        (1946, 267, 1937, Pairing::Playtest),
-        (2097, 267, 1958, Pairing::Playtest), // re-paired in Lxzxrus 301380a
-        (2112, 288, 2041, Pairing::Playtest), // Lxzxrus 65ec688 override
-        (4421, 269, 1966, Pairing::Playtest), // Lxzxrus 65ec688 override
-        (4438, 284, 2015, Pairing::IdOrder),  // stays Elite; Sanctuary e3deee7 renamed it
-        (4445, 311, 2188, Pairing::IdOrder),  // Rare-named Sunstone: Sanctuary's swap undone
-        (4447, 312, 2196, Pairing::IdOrder),  // Elite-named Sunstone
+    for (guid, legacy, collection, entry, pairing) in [
+        (100_000_001_946, Some(1946), 267, 1937, Pairing::Playtest),
+        (100_000_002_097, Some(2097), 267, 1958, Pairing::Playtest), // re-paired in Lxzxrus 301380a
+        (100_000_002_112, Some(2112), 288, 2041, Pairing::Playtest), // Lxzxrus 65ec688 override
+        (100_000_004_421, Some(4421), 269, 1966, Pairing::Playtest), // Lxzxrus 65ec688 override
+        (100_000_004_438, Some(4438), 284, 2015, Pairing::IdOrder), // stays Elite; e3deee7 renamed it
+        (100_000_004_445, Some(4445), 311, 2188, Pairing::IdOrder), // Rare-named Sunstone: swap undone
+        (100_000_004_447, Some(4447), 312, 2196, Pairing::IdOrder), // Elite-named Sunstone
+        // T479: Oberyn's coin (Lxzxrus 65ec688 row 4493, no Legacy id) and Sanctuary e3deee7's
+        // 8th Sunstone pair, its swap undone.
+        (9_700_004_493, None, 288, 2038, Pairing::Playtest),
+        (100_000_036_196, Some(36196), 311, 2195, Pairing::IdOrder),
+        (100_000_036_199, Some(36199), 312, 2203, Pairing::IdOrder),
     ] {
-        let coin = coins.by_guid(100_000_000_000 + legacy).expect("coin");
+        let coin = coins.by_guid(guid).expect("coin");
         assert_eq!(
             (
                 coin.legacy_npc_id,
@@ -125,8 +131,47 @@ fn canary_pairs_hold() {
                 coin.entry_id,
                 coin.pairing
             ),
-            (Some(legacy as u32), collection, entry, pairing)
+            (legacy, collection, entry, pairing)
         );
+    }
+}
+
+/// T479's coins reach a player standing on them as one 35/2 AddNpc (client reader 0x00921a10)
+/// carrying their row's model, name and position, through the production loader.
+#[test]
+fn added_coins_are_drawn_at_their_spots() {
+    let spawns: Value = serde_json::from_str(
+        &fs::read_to_string(content_dir().join("npc_spawns_extra.json")).unwrap(),
+    )
+    .unwrap();
+    for guid in [9_700_004_493_u64, 100_000_036_196, 100_000_036_199] {
+        let row = spawns["records"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|row| row["spawn_guid"] == guid)
+            .expect("spawn row");
+        let at = [0, 1, 2].map(|axis| row["position"][axis].as_f64().unwrap() as f32);
+        let mut visibility = NpcVisibility::load(&content_dir()).unwrap();
+        let packets = visibility.update(0, at).unwrap();
+        let drawn: Vec<_> = packets
+            .iter()
+            .filter(|packet| packet.starts_with(&[35, 0, 2, 0]))
+            .map(|packet| parse_add_npc(packet).unwrap())
+            .filter(|npc| npc.actor_id == guid)
+            .collect();
+        let [npc] = drawn.as_slice() else {
+            panic!("{guid}: {} AddNpc packets", drawn.len())
+        };
+        assert_eq!(
+            (i64::from(npc.model_id), i64::from(npc.name_string_id)),
+            (
+                row["model_id"].as_i64().unwrap(),
+                row["name_string_id"].as_i64().unwrap()
+            ),
+            "{guid}"
+        );
+        assert_eq!(npc.position[..3], at, "{guid}");
     }
 }
 
@@ -152,10 +197,9 @@ fn gaps_are_every_unbound_exploration_entry() {
         .collect();
     assert_eq!(gaps, unbound);
     let ids: Vec<i32> = gaps.iter().map(|&(_, entry)| entry).collect();
-    assert_eq!(ids, [1949, 1950, 1954, 1955, 1985, 2038, 2195, 2203]);
+    assert_eq!(ids, [1949, 1950, 1954, 1955, 1985]);
     for gap in &file.gaps.entries_without_coin {
         let expected = match gap.entry_id {
-            2038 | 2195 | 2203 => "placed by coin-spawn-additions: ",
             1949 => "no coin left for it: ", // Sanctuary pairs Elite coin 4438 here as Rare
             _ => "no coin in any source",
         };
