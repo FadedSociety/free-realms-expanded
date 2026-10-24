@@ -216,20 +216,24 @@ fn earn_table_refuses_out_of_bounds_and_active_seasonal_rows() {
 #[test]
 fn first_activity_of_the_day_pays_the_bonus_once() {
     let table = shipped();
+    let chess_win = EarnSource::ChessGame {
+        won_or_drew: true,
+        plies: 0,
+    };
     let (chess, kart, bonus) = (
-        table.amount(EarnSource::ChessGame),
+        table.amount(chess_win),
         table.amount(EarnSource::KartRace),
         table.daily_first_activity,
     );
     let mut wallet = Wallet::default();
-    let first = table.earned(&mut wallet, EarnSource::ChessGame, DAY, None);
+    let first = table.earned(&mut wallet, chess_win, DAY, None);
     assert_eq!(
         first.sc,
         chess + bonus,
         "the first completion adds the daily bonus"
     );
     assert_eq!(wallet.last_activity_day, Some(DAY));
-    let second = table.earned(&mut wallet, EarnSource::ChessGame, DAY, None);
+    let second = table.earned(&mut wallet, chess_win, DAY, None);
     assert_eq!(second.sc, chess, "the same day pays the base amount only");
     let next_day = table.earned(&mut wallet, EarnSource::KartRace, DAY + 1, None);
     assert_eq!(
@@ -303,24 +307,169 @@ fn first_clear_ride_is_settled_once_and_an_owned_ride_pays_its_marketplace_value
         "the award is consumed even when paid in Station Cash"
     );
 
+    // A full bag pays the clear only and does not settle the ride, so a later clear grants it.
     let mut full = Wallet {
         last_activity_day: Some(DAY),
         ..Wallet::default()
     };
+    let no_room = RideOffer {
+        room: false,
+        ..offer
+    };
+    let paid = table.earned(&mut full, hardest, DAY, Some(no_room));
+    assert_eq!(paid.ride, None);
+    assert_eq!(paid.sc, clear, "a full bag pays the clear only");
+    assert!(paid.bag_full, "the player is told to make room");
+    assert!(full.earned_rides.is_empty(), "the ride stays unsettled");
+    let again = table.earned(&mut full, hardest, DAY, Some(no_room));
+    assert!(again.bag_full && again.ride.is_none() && full.earned_rides.is_empty());
+    let freed = table.earned(&mut full, hardest, DAY, Some(offer));
+    assert_eq!(freed.ride, Some(CHROME_DRAKE), "room later grants the ride");
+    assert_eq!(freed.sc, clear);
+    assert!(!freed.bag_full);
+    assert_eq!(full.earned_rides, vec![CHROME_DRAKE as u32]);
+    let after = table.earned(&mut full, hardest, DAY, Some(offer));
+    assert_eq!(after.ride, None, "the ride is granted once");
+
+    // An owned ride keeps the SC-equivalent rule even with a full bag.
+    let mut owned_full = Wallet {
+        last_activity_day: Some(DAY),
+        ..Wallet::default()
+    };
     let paid = table.earned(
-        &mut full,
+        &mut owned_full,
         hardest,
         DAY,
         Some(RideOffer {
-            room: false,
-            ..offer
+            owned: true,
+            ..no_room
         }),
     );
-    assert_eq!(paid.ride, None);
+    assert_eq!(paid.sc, clear + 125);
+    assert!(!paid.bag_full);
+    assert_eq!(owned_full.earned_rides, vec![CHROME_DRAKE as u32]);
+}
+
+fn chess(won_or_drew: bool, plies: u32) -> EarnSource {
+    EarnSource::ChessGame { won_or_drew, plies }
+}
+
+/// Chess pays only a game that reached a result through play (R): a win, a draw, or a loss after
+/// `chess_min_plies`. An instant resign pays nothing, not even the daily bonus.
+#[test]
+fn chess_pays_only_a_game_that_reached_a_result_through_play() {
+    let mut table = shipped();
+    table.chess_min_plies = 30;
+    let (game, bonus) = (table.chess_game, table.daily_first_activity);
+    assert!(game > 0 && bonus > 0, "the shipped table pays chess");
+
+    let mut wallet = Wallet::default();
+    let resigned = table.earned(&mut wallet, chess(false, 0), DAY, None);
     assert_eq!(
-        paid.sc,
-        clear + 125,
-        "a full bag cannot lose the clear reward"
+        resigned,
+        Default::default(),
+        "an instant resign pays nothing"
+    );
+    assert_eq!(
+        wallet,
+        Wallet::default(),
+        "and does not start the daily bonus"
+    );
+    let early = table.earned(&mut wallet, chess(false, 29), DAY, None);
+    assert_eq!(early.sc, 0, "a loss one ply short pays nothing");
+    assert_eq!(wallet.last_activity_day, None);
+
+    let lost = table.earned(&mut wallet, chess(false, 30), DAY, None);
+    assert_eq!(lost.sc, game + bonus, "a loss at min_plies pays");
+    let mut fresh = Wallet::default();
+    let won = table.earned(&mut fresh, chess(true, 0), DAY, None);
+    assert_eq!(won.sc, game + bonus, "a win pays at any length");
+    let mut fresh = Wallet::default();
+    let drawn = table.earned(&mut fresh, chess(true, 1), DAY, None);
+    assert_eq!(drawn.sc, game + bonus, "a draw pays at any length");
+}
+
+/// `chess_min_plies` is data: retuning it changes the outcome, and the loader bounds it.
+#[test]
+fn retuning_chess_min_plies_in_data_changes_the_outcome() {
+    let paid = |min: u32| {
+        let mut table = shipped();
+        table.chess_min_plies = min;
+        table
+            .earned(&mut Wallet::default(), chess(false, 10), DAY, None)
+            .sc
+    };
+    assert_eq!(paid(11), 0, "a stricter minimum refuses the same game");
+    assert!(paid(10) > 0, "the same game pays at its own length");
+    assert!(paid(0) > 0, "0 pays every settled game");
+
+    let directory = scratch("chess-min-plies");
+    let mut value: serde_json::Value =
+        serde_json::from_slice(&fs::read(table_path()).unwrap()).unwrap();
+    let load = |name: &str, value: &serde_json::Value| {
+        fs::write(directory.join(name), serde_json::to_vec(value).unwrap()).unwrap();
+        EarnTable::load(&directory.join(name))
+    };
+    value["chess_min_plies"] = json!(400);
+    assert_eq!(
+        load("max.json", &value).unwrap().unwrap().chess_min_plies,
+        400
+    );
+    value["chess_min_plies"] = json!(401);
+    assert!(load("over.json", &value).is_err(), "above the sane bound");
+    value.as_object_mut().unwrap().remove("chess_min_plies");
+    assert_eq!(
+        load("default.json", &value)
+            .unwrap()
+            .unwrap()
+            .chess_min_plies,
+        20,
+        "an omitted value keeps the (R) default"
+    );
+    let _ = fs::remove_dir_all(&directory);
+}
+
+/// With every amount tuned to 0 and only the ride flag set, the payout is the ride alone: the
+/// applier sends the item event but no empty 50/1 reward bundle.
+#[test]
+fn a_zeroed_table_with_a_ride_sends_no_empty_reward_bundle() {
+    let mut table = shipped();
+    let first = table.first_clear_ride.expect("a first-clear ride ships");
+    table.hardest_dungeon_clear = 0;
+    table.daily_first_activity = 0;
+    let offer = RideOffer {
+        item_id: first.item_id,
+        sc_equivalent: 0,
+        owned: false,
+        room: true,
+    };
+    let mut wallet = Wallet::default();
+    let earned = table.earned(
+        &mut wallet,
+        EarnSource::DungeonClear {
+            id: first.dungeon_id,
+        },
+        DAY,
+        Some(offer),
+    );
+    assert_eq!((earned.sc, earned.ride), (0, Some(first.item_id)));
+
+    let state = RewardState::new(fb::runtime_inventory().clone(), profiles(), 100)
+        .with_wallet(wallet, 1_000);
+    let (next, replies) = apply_grant(&state, &earned.grant(), "sc-zeroed").unwrap();
+    assert_eq!(
+        next.inventory
+            .state()
+            .items
+            .iter()
+            .filter(|item| item.definition_id == first.item_id)
+            .count(),
+        1,
+        "the ride is granted"
+    );
+    assert!(
+        !replies.is_empty() && !replies.iter().any(|p| p.starts_with(&[50, 0, 1])),
+        "an item event, and no empty reward bundle: {replies:?}"
     );
 }
 
@@ -441,13 +590,18 @@ fn hardest_session(fixture: &fb::Fixture, guid: u64) -> Gateway {
 /// Open, enter and win the first-clear dungeon through the production route (26/8 marker, 41/108
 /// Go, 36/10 attacks and the world tick). Returns the time after the win.
 fn win_hardest(gateway: &mut Gateway, now_ms: u64) -> u64 {
+    win_hardest_replies(gateway, now_ms).0
+}
+
+/// [`win_hardest`] plus every reply the fight produced.
+fn win_hardest_replies(gateway: &mut Gateway, now_ms: u64) -> (u64, Vec<Vec<u8>>) {
     let file = fb::battles();
     let row = fb::battle(&file, first_clear().0);
     let screen = fb::open_battle(gateway, fb::u64_field(&row["spawner"], "guid"), row, now_ms);
     fb::enter_battle(gateway, &screen, row, now_ms + 500);
     let mut now = now_ms + 1_000;
-    fb::fight_to_win(gateway, &mut now, row);
-    now
+    let replies = fb::fight_to_win(gateway, &mut now, row);
+    (now, replies)
 }
 
 fn saved_wallet(gateway: &Gateway) -> Option<Wallet> {
@@ -602,4 +756,78 @@ fn an_owned_ride_pays_its_marketplace_value_and_leaving_early_pays_nothing() {
     );
     assert_eq!(rides_owned(&gateway, ride), 1, "no second copy");
     assert_eq!(paid.earned_rides, vec![ride as u32]);
+}
+
+const MAKE_ROOM: &str = "Make room in your bag";
+
+/// Every system chat line in a set of gateway replies.
+fn said(replies: &[Vec<u8>]) -> String {
+    replies
+        .iter()
+        .map(|packet| fb::unframe(packet))
+        .filter(|packet| packet.starts_with(&[15, 0, 3, 0]) && packet.len() >= 8)
+        .map(|packet| {
+            let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
+            String::from_utf8_lossy(&packet[8..8 + length]).into_owned()
+        })
+        .collect::<Vec<_>>()
+        .join(
+            "
+",
+        )
+}
+
+/// A first clear whose payout finds the bag full pays the clear only: the ride is not granted and
+/// not settled, the player is told to make room, and a later clear with room grants it once.
+#[test]
+fn a_full_bag_defers_the_first_clear_ride_until_a_later_clear_has_room() {
+    let (dungeon, ride) = first_clear();
+    let table = shipped();
+    let clear = table.amount(EarnSource::DungeonClear { id: dungeon });
+    let fixture = fb::Fixture::new();
+    let seed = hardest_session(&fixture, 2_003);
+    // 99 stacks: the win's prize takes the 100th, so no stack is free when the clear pays.
+    let mut gateway = fb::reopen_with(&fixture, &seed, "full.json", 400, |state| {
+        state.inventory = fb::full_bag(&state.inventory, 99, dungeon);
+    });
+    assert_eq!(
+        gateway.snapshot().gameplay.unwrap().inventory.items.len(),
+        99
+    );
+
+    let (now, replies) = win_hardest_replies(&mut gateway, 500);
+    let first = saved_wallet(&gateway).expect("the win pays the clear");
+    assert_eq!(first.balance, clear + table.daily_first_activity);
+    assert!(
+        first.earned_rides.is_empty(),
+        "a full bag does not settle the ride"
+    );
+    assert_eq!(rides_owned(&gateway, ride), 0, "and does not grant it");
+    assert!(
+        said(&replies).contains(MAKE_ROOM),
+        "the player is told to make room"
+    );
+
+    // Back in the open world, free three stacks and clear again.
+    assert!(fb::send(&mut gateway, &[26, 0, 42, 0], now + 700).began_zoning);
+    fb::arena_spawned(&mut gateway, now + 800);
+    let mut gateway = fb::reopen_with(&fixture, &gateway, "freed.json", now + 900, |state| {
+        let keep = state.inventory.items.len() - 3;
+        state.inventory.items.truncate(keep);
+    });
+    let (now, replies) = win_hardest_replies(&mut gateway, now + 1_000);
+    let second = saved_wallet(&gateway).expect("the second win pays");
+    assert_eq!(
+        second.balance,
+        first.balance + clear,
+        "the clear pays again"
+    );
+    assert_eq!(second.earned_rides, vec![ride as u32]);
+    assert_eq!(rides_owned(&gateway, ride), 1, "room grants the ride");
+    assert!(!said(&replies).contains(MAKE_ROOM));
+
+    assert!(fb::send(&mut gateway, &[26, 0, 42, 0], now + 700).began_zoning);
+    fb::arena_spawned(&mut gateway, now + 800);
+    win_hardest(&mut gateway, now + 1_000);
+    assert_eq!(rides_owned(&gateway, ride), 1, "granted once");
 }

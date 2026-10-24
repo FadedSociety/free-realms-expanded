@@ -594,6 +594,11 @@ impl Position {
         }
     }
 
+    /// Half-moves played since the start position (`history` holds the start key plus one per move).
+    pub fn plies(&self) -> u32 {
+        u32::try_from(self.history.len().saturating_sub(1)).unwrap_or(u32::MAX)
+    }
+
     pub fn is_stalemate(&self) -> bool {
         self.legal_moves().is_empty() && !self.in_check(self.side_to_move())
     }

@@ -102,6 +102,7 @@ impl Gameplay {
         }
         // The first clear of the table's hardest dungeon grants its earn-only ride (R). The ride
         // must be in the validated catalogue; a content set without it pays the clear in SC only.
+        // A full bag defers the ride (nothing recorded) and tells the player.
         let ride = table.first_clear_ride.and_then(|first| {
             if !matches!(source, EarnSource::DungeonClear { id } if id == first.dungeon_id) {
                 return None;
@@ -126,6 +127,11 @@ impl Gameplay {
         let mut wallet = shop.sc_wallet().clone();
         let day = station_cash::activity_day(current_unix_seconds());
         let earned = table.earned(&mut wallet, source, day, offer);
+        if earned.bag_full {
+            out.replies.push(chat::system(
+                "Make room in your bag to earn the ride from this dungeon: clear it again.",
+            ));
+        }
         if earned.sc == 0 && earned.ride.is_none() {
             return Ok(());
         }

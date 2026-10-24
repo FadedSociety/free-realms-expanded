@@ -3353,9 +3353,9 @@ impl Gameplay {
             self.adopt_reward_state(next, out)?;
         }
         out.replies.extend(change.reward_packets);
-        if change.completed {
-            // T229: a settled game pays once, win or loss; `settle` accepts once.
-            self.pay_earned_station_cash(EarnSource::ChessGame, out)?;
+        if let Some(game) = change.completed {
+            // T229: a settled game pays once (`settle` accepts once) if the earn table counts it.
+            self.pay_earned_station_cash(game, out)?;
         }
         // Only the lifecycle result (39/18) advances quests. A checkmate movie
         // message alone is not a payout: the client still has to acknowledge it.

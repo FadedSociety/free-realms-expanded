@@ -94,6 +94,8 @@ const MAX_ORDER_HISTORY: usize = 4096;
 pub const MAX_EARN_SC: u32 = 10_000;
 const MAX_EARN_OVERRIDES: usize = 512;
 const MAX_EARN_RIDES: usize = 64;
+/// (R) Sanity bound for `chess_min_plies` (not a game-length limit).
+const MAX_CHESS_MIN_PLIES: u32 = 400;
 const MAX_EARN_FILE_BYTES: u64 = 65_536;
 /// (R) The Station Cash "day" is the UTC day, like the chess ledger.
 const ACTIVITY_DAY_SECONDS: u64 = 86_400;
@@ -184,16 +186,25 @@ pub enum EarnSource {
     KartRace,
     DerbyMatch,
     SoccerMatch,
-    ChessGame,
-    Quest { id: u32 },
-    DungeonClear { id: u32 },
+    /// A settled chess game. It pays only if it reached a result through play (R): a win or a
+    /// draw, or a loss after `EarnTable::chess_min_plies` plies, so an instant resign pays nothing.
+    ChessGame {
+        won_or_drew: bool,
+        plies: u32,
+    },
+    Quest {
+        id: u32,
+    },
+    DungeonClear {
+        id: u32,
+    },
 }
 
 /// A first-clear ride resolved against the live inventory and the Marketplace price.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct RideOffer {
     pub item_id: i32,
-    /// The Marketplace Station Cash value paid when the ride is already owned or cannot be stored.
+    /// The Marketplace Station Cash value paid when the ride is already owned.
     pub sc_equivalent: u32,
     pub owned: bool,
     pub room: bool,
@@ -205,12 +216,15 @@ pub struct Earned {
     pub sc: u32,
     /// The first-clear ride item to grant, when this completion wins it.
     pub ride: Option<i32>,
+    /// The first-clear ride is still unearned but the bag has no room; the caller tells the
+    /// player to make room, and a later clear grants it.
+    pub bag_full: bool,
 }
 
 impl Earned {
     /// The one atomic reward for this completion: the Station Cash kind plus the first-clear ride
-    /// item, for the single reward applier (`rewards::apply_grant`). The display stays empty; a
-    /// Station Cash-only grant has no reward bundle (client reader `008e7930` has no SC field).
+    /// item, for the single reward applier (`rewards::apply_grant`). The display stays empty; the
+    /// applier sends no reward bundle for it (client reader `008e7930` has no SC field).
     pub fn grant(self) -> crate::rewards::RewardGrant {
         crate::rewards::RewardGrant {
             coins: 0,
@@ -238,7 +252,8 @@ impl Earned {
 }
 
 /// The first clear of one dungeon grants one earn-only ride (R). It is granted once per character
-/// save; an owned ride (or a full bag) pays its Marketplace value instead.
+/// save; an owned ride pays its Marketplace value instead, and a full bag defers it to a later
+/// clear.
 #[derive(Clone, Copy, Debug, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct FirstClearRide {
@@ -272,6 +287,10 @@ pub struct EarnTable {
     pub derby_match: u32,
     pub soccer_match: u32,
     pub chess_game: u32,
+    /// (R) A lost chess game pays only after this many plies (half-moves); wins and draws always
+    /// pay. Live-tunable; 0 pays every settled game. Sane bound 0..=400.
+    #[serde(default = "default_chess_min_plies")]
+    pub chess_min_plies: u32,
     /// One won combat run (the opening cave or any field battle), paid at the win transition;
     /// `hardest_dungeon_clear` replaces it for `hardest_dungeons`.
     pub dungeon_clear: u32,
@@ -290,6 +309,10 @@ pub struct EarnTable {
     /// Dormant event rides; every row must be disabled until a seasonal event trigger exists.
     pub seasonal_rides: Vec<SeasonalRide>,
     pub source: Vec<SourceTag>,
+}
+
+fn default_chess_min_plies() -> u32 {
+    20
 }
 
 impl EarnTable {
@@ -331,6 +354,7 @@ impl EarnTable {
             || self.dungeon_overrides.len() > MAX_EARN_OVERRIDES
             || self.quest_overrides.len() > MAX_EARN_OVERRIDES
             || self.seasonal_rides.len() > MAX_EARN_RIDES
+            || self.chess_min_plies > MAX_CHESS_MIN_PLIES
         {
             return Err(invalid("Station Cash reward value outside bounds"));
         }
@@ -383,7 +407,7 @@ impl EarnTable {
             EarnSource::KartRace => self.kart_race,
             EarnSource::DerbyMatch => self.derby_match,
             EarnSource::SoccerMatch => self.soccer_match,
-            EarnSource::ChessGame => self.chess_game,
+            EarnSource::ChessGame { .. } => self.chess_game,
             EarnSource::Quest { id } => self
                 .quest_overrides
                 .get(&id)
@@ -401,11 +425,23 @@ impl EarnTable {
         }
     }
 
+    /// Whether the completion counts at all (R): only a chess game that reached a result through
+    /// play does. A refused completion pays nothing, not even the daily bonus.
+    fn counts(&self, source: EarnSource) -> bool {
+        match source {
+            EarnSource::ChessGame { won_or_drew, plies } => {
+                won_or_drew || plies >= self.chess_min_plies
+            }
+            _ => true,
+        }
+    }
+
     /// Decide one completion against the staged wallet. `day` is the character's server day; the
     /// first completion of a day adds the bonus once. The first-clear ride is recorded in the
     /// wallet in the same staged transaction, so a failed grant records nothing. The once-only
     /// proof is `earned_rides`, never current ownership: rides trade (T429), and trading the ride
-    /// away must not re-arm the award.
+    /// away must not re-arm the award. A ride the bag cannot hold is not recorded, so a later
+    /// clear with room still grants it.
     pub fn earned(
         &self,
         wallet: &mut Wallet,
@@ -413,12 +449,18 @@ impl EarnTable {
         day: u64,
         ride: Option<RideOffer>,
     ) -> Earned {
+        if !self.counts(source) {
+            return Earned::default();
+        }
         let mut sc = self.amount(source);
         if wallet.last_activity_day != Some(day) {
             wallet.last_activity_day = Some(day);
             sc = sc.saturating_add(self.daily_first_activity);
         }
-        let mut earned = Earned { sc, ride: None };
+        let mut earned = Earned {
+            sc,
+            ..Earned::default()
+        };
         let ride = ride.filter(|offer| {
             self.first_clear_ride.is_some_and(|first| {
                 offer.item_id == first.item_id
@@ -428,15 +470,19 @@ impl EarnTable {
         if let Some(offer) = ride {
             let item = u32::try_from(offer.item_id).unwrap_or(0);
             if item != 0 && !wallet.earned_rides.contains(&item) {
-                wallet.earned_rides.push(item);
-                if wallet.earned_rides.len() > MAX_EARN_RIDES {
-                    let drop = wallet.earned_rides.len() - MAX_EARN_RIDES;
-                    wallet.earned_rides.drain(..drop);
-                }
-                if offer.owned || !offer.room {
-                    earned.sc = earned.sc.saturating_add(offer.sc_equivalent);
+                if !offer.owned && !offer.room {
+                    earned.bag_full = true;
                 } else {
-                    earned.ride = Some(offer.item_id);
+                    wallet.earned_rides.push(item);
+                    if wallet.earned_rides.len() > MAX_EARN_RIDES {
+                        let drop = wallet.earned_rides.len() - MAX_EARN_RIDES;
+                        wallet.earned_rides.drain(..drop);
+                    }
+                    if offer.owned {
+                        earned.sc = earned.sc.saturating_add(offer.sc_equivalent);
+                    } else {
+                        earned.ride = Some(offer.item_id);
+                    }
                 }
             }
         }

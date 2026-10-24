@@ -593,7 +593,10 @@ fn a_single_player_win_pays_once_after_acknowledgement_and_closes_cleanly() {
         .expect("the settled game writes the Station Cash wallet");
     assert_eq!(
         wallet.balance,
-        sc_earn::first_of_day(EarnSource::ChessGame),
+        sc_earn::first_of_day(EarnSource::ChessGame {
+            won_or_drew: true,
+            plies: 0
+        }),
         "one chess completion plus the first-activity-of-the-day bonus"
     );
     let wallet_packet = ack

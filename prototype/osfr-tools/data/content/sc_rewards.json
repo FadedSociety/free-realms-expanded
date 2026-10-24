@@ -5,6 +5,7 @@
   "derby_match": 3,
   "soccer_match": 3,
   "chess_game": 2,
+  "chess_min_plies": 20,
   "dungeon_clear": 10,
   "hardest_dungeon_clear": 25,
   "hardest_dungeons": [
@@ -26,6 +27,10 @@
     }
   ],
   "source": [
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) Chess pays Station Cash only for a game that reached a result through play (the owner 2026-10-24: rewards gated on real completion): a win, a draw, or a loss after at least chess_min_plies plies (half-moves, both sides, default 20, sane bound 0..=400, live-tunable). An instant resign pays nothing, neither the chess amount nor the daily bonus. The ply threshold is a local economy choice, not a recovered client value."
+    },
     {
       "kind": "reconstructed",
       "evidence": "(R) T229 earn table. One verified server completion pays: kart race 3, derby match 3, soccer match 3, chess game 2, quest turn-in 1 (per-quest override allowed), dungeon clear 10 with 25 for the hardest dungeon tier (per-dungeon override allowed). A dungeon clear is the win transition of any loaded combat run: the opening cave in encounters.json and every field_battles.json row, which is how this server plays the guide's dungeons and battles (Bixie Hive, Sheep Watch, King of the Ring, Stone Heart's Hideaway), and the first completed activity of the UTC day adds 5. These are local economy values chosen for this revival, not recovered 2014 Station Cash awards; the client wallet reader 00b3a6e0/00b2b450 proves the balance field, not the amounts. No client-reported score or result reaches an amount."

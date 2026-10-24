@@ -2,7 +2,9 @@ use chess::{ChessMove, ChessParticipant, ChessTables, Kind, Mode, Side, Status, 
 use inventory::Inventory;
 use minigame::{MinigameRuns, RunMode, RunSpec, RunState};
 use osfr_tools::chess_service::{ChessContent, ChessRewardLedger, ChessService};
-use osfr_tools::{chess, chess_service, inventory, minigame, profiles, rewards};
+use osfr_tools::{
+    chess, chess_service, inventory, minigame, profiles, rewards, station_cash::EarnSource,
+};
 use profiles::ProfileState;
 use rewards::{RewardDisplay, RewardGrant, RewardState};
 use serde_json::json;
@@ -386,6 +388,11 @@ fn fools_mate_emits_checkmate_and_settles_one_reward_once() {
         last.terminal.as_ref().unwrap().reason,
         chess::EndReason::Checkmate
     );
+    assert_eq!(
+        tables.table(40).unwrap().position().plies(),
+        4,
+        "fool's mate is four plies"
+    );
     assert_eq!(last.terminal.as_ref().unwrap().winner, Some(202));
     for player in [101, 202] {
         let messages = text(&last.messages, player);
@@ -603,6 +610,11 @@ fn resignation_and_draw_rules_reach_terminal_states() {
         resigned.terminal.unwrap().reason,
         chess::EndReason::Resignation
     );
+    assert_eq!(
+        tables.table(61).unwrap().position().plies(),
+        0,
+        "an instant resign is a game of zero plies"
+    );
 
     let stalemate = chess::Position::from_fen("7k/5Q2/6K1/8/8/8/8/8 b - - 0 1").unwrap();
     assert_eq!(stalemate.status(), Status::Draw);
@@ -627,6 +639,7 @@ fn resignation_and_draw_rules_reach_terminal_states() {
         }
     }
     assert_eq!(repetition.status(), Status::Draw);
+    assert_eq!(repetition.plies(), 8, "two four-ply cycles");
 }
 
 #[test]
@@ -1131,4 +1144,23 @@ fn the_daily_cap_stops_payouts_survives_restore_and_refusals_change_nothing() {
             .is_err()
     );
     assert_eq!(corrupt.ledger(), None);
+}
+
+/// A settled game hands the earn table what it judges by: whether the player won or drew, and
+/// how many plies were played (the earned Station Cash gate lives in `EarnTable`).
+#[test]
+fn a_settled_game_reports_its_result_and_length_for_the_earn_table() {
+    let fixture = RewardFixture::new(CHESS_PLAYER);
+    let mut service = ChessService::with_seed(service_content(1_000), 22).unwrap();
+    let (end, ack, line) = play_to_end(&mut service, &fixture.state(), 1_000);
+    assert_eq!(end, EndOfGame::Won, "the seeded game must be a win");
+    let Some(EarnSource::ChessGame { won_or_drew, plies }) = ack.completed else {
+        panic!("the acknowledged win settles: {:?}", ack.completed);
+    };
+    assert!(won_or_drew);
+    assert!(
+        plies >= line.len() as u32,
+        "every human move is a ply ({plies} plies, {} moves)",
+        line.len()
+    );
 }

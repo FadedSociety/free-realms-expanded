@@ -19,9 +19,10 @@
 
 use crate::{
     activity_portal::ChessActivity,
-    chess::{self, ChessParticipant, ChessScoring, ChessTables, Mode, Side},
+    chess::{self, ChessParticipant, ChessScoring, ChessTables, EndReason, Mode, Side},
     minigame::{MinigameRuns, RunMode, RunOutcome, RunSpec, RunState},
     rewards::{RewardDisplay, RewardGrant, RewardState},
+    station_cash::EarnSource,
 };
 use serde::{Deserialize, Serialize};
 use std::{
@@ -212,9 +213,10 @@ pub struct ChessActivityOutcome {
     pub replies: Vec<Vec<u8>>,
     pub reward_packets: Vec<Vec<u8>>,
     pub reward_state: Option<RewardState>,
-    /// A finished game's settlement was accepted, win or loss: the one-shot completion record the
-    /// earned Station Cash payout keys on.
-    pub completed: bool,
+    /// A finished game's settlement was accepted: the one-shot completion record the earned
+    /// Station Cash payout keys on, carrying what the earn table needs to judge it (a win, a draw,
+    /// or how many plies a loss took).
+    pub completed: Option<EarnSource>,
 }
 
 /// (R) One character's daily chess coin ledger, persisted with the character
@@ -530,13 +532,15 @@ impl ChessService {
         let Some(row) = self.current.as_ref() else {
             return Ok(());
         };
-        let won = self
+        let table = self
             .tables
             .as_ref()
-            .and_then(|tables| tables.table(instance as u64))
-            .and_then(|table| table.result())
-            .and_then(|result| result.winner)
-            == Some(player_id);
+            .and_then(|tables| tables.table(instance as u64));
+        let result = table.and_then(|table| table.result());
+        let won = result.and_then(|result| result.winner) == Some(player_id);
+        let drew = result
+            .is_some_and(|result| matches!(result.reason, EndReason::Draw | EndReason::Stalemate));
+        let plies = table.map_or(0, |table| table.position().plies());
         let elapsed = self
             .started_ms
             .map_or(0, |start| now_ms.saturating_sub(start) / 1000);
@@ -572,7 +576,12 @@ impl ChessService {
             )?;
         out.accepted |= settled.accepted;
         out.changed |= settled.changed;
-        out.completed |= settled.accepted;
+        if settled.accepted {
+            out.completed = Some(EarnSource::ChessGame {
+                won_or_drew: won || drew,
+                plies,
+            });
+        }
         out.replies.extend(settled.replies);
         out.reward_packets.extend(settled.reward_packets);
         if settled.reward_state.is_some() {
@@ -634,7 +643,7 @@ fn from_run(run: RunOutcome) -> ChessActivityOutcome {
         replies: run.replies,
         reward_packets: run.reward_packets,
         reward_state: run.reward_state,
-        completed: false,
+        completed: None,
     }
 }
 

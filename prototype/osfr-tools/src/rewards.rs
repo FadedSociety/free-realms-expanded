@@ -276,8 +276,10 @@ pub fn apply_grant(
     }
 
     // Reward bundle fields and entry ids follow the body consumed by client reader 008e7930. A
-    // Station Cash-only grant has nothing for that bundle; its wallet packet is the display.
-    if !(grant.sc > 0 && coins == 0 && stars == 0 && grant.display.rows.is_empty()) {
+    // Station Cash payout (its transaction carries the wallet) with nothing for that bundle sends
+    // none; its wallet packet is the display, and a ride-only payout shows through its item event.
+    let station_cash = grant.sc > 0 || next.wallet.is_some();
+    if !(station_cash && coins == 0 && stars == 0 && grant.display.rows.is_empty()) {
         outgoing.push(encode_display_bundle(
             coins,
             stars,
