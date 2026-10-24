@@ -1,4 +1,5 @@
 use gateway_reference::{Reference, initial_state};
+use osfr_tools::game_clock::GameClock;
 use osfr_tools::gateway::Gateway;
 use osfr_tools::startup_selfdata as typed_selfdata;
 use osfr_tools::startup_snapshot::StartupSnapshot;
@@ -469,25 +470,33 @@ fn group_child_lengths_follow_the_client_variable_length() {
     }
 }
 
+/// T469: the reply carries the running game clock (apply 0x00bd1830: ServerRate = scale, flag 0 =
+/// client clock runs), not the frozen wall-clock copy (rate 0, flag 1) it sent before.
 #[test]
-fn time_response_uses_current_seconds_and_original_packet_shape() {
+fn time_response_runs_the_game_clock_in_the_original_packet_shape() {
     let reference = Reference::new(VERSION, None);
     let mut gateway = reference.ready();
-    let before = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_secs() as i64;
+    let now = || {
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as i64
+    };
+    let before = now();
     let outcome = gateway.handle(&packet(52, &[0; 13])).unwrap();
-    let after = SystemTime::now()
-        .duration_since(UNIX_EPOCH)
-        .unwrap()
-        .as_secs() as i64;
+    let after = now();
     assert_eq!(outcome.replies.len(), 1);
     let bytes = &outcome.replies[0];
-    assert_eq!(&bytes[..9], &[5, 0, 1, 15, 0, 0, 0, 52, 0]);
-    let seconds = i64::from_le_bytes(bytes[9..17].try_into().unwrap());
-    assert!((before..=after).contains(&seconds));
-    assert_eq!(&bytes[17..], &[0, 0, 0, 0, 1]);
+    assert_eq!(&bytes[..7], &[5, 0, 1, 15, 0, 0, 0]);
+    assert!(
+        (before..=after).any(|now| bytes[7..] == GameClock::default().sync_reply(now)),
+        "{bytes:02x?}"
+    );
+    assert_eq!(
+        &bytes[17..],
+        &[8, 0, 0, 0, 0],
+        "rate 8, UseClientTime false"
+    );
 }
 
 #[test]

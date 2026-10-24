@@ -276,6 +276,7 @@ pub struct Gameplay {
     housing: Option<housing::HousingSession>,
     /// L046: the saved lots, kept unchanged while housing is dormant so a save never drops them.
     dormant_housing: Option<crate::housing_service::HousingServiceState>,
+    game_clock: crate::game_clock::GameClock, // T469 game_clock.json; never saved
 }
 
 #[derive(Default)]
@@ -1195,6 +1196,7 @@ impl Gameplay {
             fishing: Default::default(),
             gathering_nodes,
             world_station_rules,
+            game_clock: crate::game_clock::GameClock::load(npc_content)?,
             content_dir: npc_content.to_path_buf(),
         })
     }
@@ -2937,6 +2939,9 @@ impl Gameplay {
         Ok(lines)
     }
 
+    pub fn game_clock(&self) -> crate::game_clock::GameClock {
+        self.game_clock
+    }
     /// The authored content directory (Studio content editor).
     pub fn content_dir(&self) -> &Path {
         &self.content_dir

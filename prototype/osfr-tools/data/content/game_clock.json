@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "source": "rate: client GameTimeManager ctor 0x010bd190 default scale 8 (the 52 reply's ServerRate replaces it, apply 0x00bd1830). epoch_unix: (R) Sanctuary-main 2cd13f1 commit message: retail 2014 captures sent Time = ServerRate * (unix - zone epoch); value only, we hold no capture",
+  "rate": 8,
+  "epoch_unix": 1221361670
+}

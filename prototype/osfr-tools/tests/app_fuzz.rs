@@ -10,6 +10,7 @@ use osfr_tools::{
     cooking::Cooking,
     derby::{DerbyMessage, ParticipantKey, VehicleHitReport, VehiclePose, encode_inner},
     forging::Forging,
+    game_clock::GameClock,
     game_store::Snapshot,
     gameplay::{Gameplay, GameplayState},
     gateway::{Gateway, GatewayOutcome},
@@ -28,7 +29,7 @@ use std::{
     panic::{AssertUnwindSafe, catch_unwind},
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
-    time::{Duration, Instant},
+    time::{Duration, Instant, SystemTime, UNIX_EPOCH},
 };
 
 const NOW: u64 = 10_000;
@@ -2242,4 +2243,45 @@ fn finding_1_unknown_chest_use_must_preserve_pending_confirmation() {
         result.gameplay_changed,
         "unknown instance Use consumed the pending valid Check (mystery_chest_loot.rs pending.take())"
     );
+}
+
+/// T469: opcode 52 answers with the content clock running (client apply 0x00bd1830), from
+/// `game_clock.json` with gameplay and the client default without; before login it is still
+/// refused and changes nothing.
+#[test]
+fn time_sync_sends_the_content_game_clock() {
+    let fixture = Fixture::new();
+    let tuned = GameClock {
+        rate: 4,
+        epoch_unix: 1_000_000_000,
+    };
+    write_json(
+        &fixture.content.join("game_clock.json"),
+        &json!({"schema_version": 1, "rate": tuned.rate, "epoch_unix": tuned.epoch_unix}),
+    );
+    let mut request = 52u16.to_le_bytes().to_vec();
+    request.extend([0; 12]);
+    request.push(1);
+    let mut early = fixture.unloaded(true, false);
+    let before = early.snapshot();
+    let error = early.handle_at(&wrap(&request), NOW).unwrap_err();
+    assert_eq!(error.to_string(), "time sync before login");
+    assert_eq!(early.snapshot(), before);
+    let unix = || {
+        SystemTime::now()
+            .duration_since(UNIX_EPOCH)
+            .unwrap()
+            .as_secs() as i64
+    };
+    for (content, clock) in [(true, tuned), (false, GameClock::default())] {
+        let mut gateway = fixture.gateway(content, false);
+        let start = unix();
+        let out = gateway.handle_at(&wrap(&request), NOW).unwrap();
+        let end = unix();
+        assert!(
+            (start..=end).any(|now| out.replies == [wrap(&clock.sync_reply(now))]),
+            "content {content}: {:02x?}",
+            out.replies
+        );
+    }
 }

@@ -1599,10 +1599,8 @@ impl Gateway {
                         .as_secs();
                     let seconds =
                         i64::try_from(seconds).map_err(|_| invalid("system time overflow"))?;
-                    let mut inner = 52u16.to_le_bytes().to_vec();
-                    inner.extend_from_slice(&seconds.to_le_bytes());
-                    inner.extend_from_slice(&0i32.to_le_bytes());
-                    inner.push(1);
+                    let clock = gameplay.as_ref().map(Gameplay::game_clock);
+                    let inner = clock.unwrap_or_default().sync_reply(seconds);
                     outcome.replies.push(wrapped(&inner));
                 }
                 Event::Application(inner) => {

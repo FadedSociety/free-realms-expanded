@@ -25,6 +25,7 @@ pub mod enemies;
 pub mod fishing;
 pub mod fishing_service;
 pub mod forging;
+pub mod game_clock;
 pub mod game_rules;
 pub mod game_store;
 pub mod gameplay;
