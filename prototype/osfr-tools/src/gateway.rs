@@ -543,6 +543,7 @@ fn application_handler(body: &[u8]) -> &'static str {
         (Some(41), Some(109 | 122)) => "encounter",
         (Some(42), Some(6 | 9)) => "item_bar",
         (Some(42), Some(15 | 16)) => "item_use",
+        (Some(35), Some(33)) => "consumable_effects",
         // Family 167 is a service byte (1 = activity) and a one-byte sub (2 Play, 4 Refresh).
         (Some(167), _) if body.get(2) == Some(&1) && matches!(body.get(3), Some(2 | 4)) => {
             "activity_portal"

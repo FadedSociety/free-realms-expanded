@@ -50,6 +50,7 @@ mod derby_session;
 mod encounter_rewards;
 mod field_battle;
 mod housing;
+mod item_use;
 mod jobs;
 mod knockout;
 mod live_events;
@@ -277,6 +278,8 @@ pub struct Gameplay {
     /// L046: the saved lots, kept unchanged while housing is dormant so a save never drops them.
     dormant_housing: Option<crate::housing_service::HousingServiceState>,
     game_clock: crate::game_clock::GameClock, // T469 game_clock.json; never saved
+    /// T474 live treat, cake and transformation effects (`gameplay/item_use.rs`); session-only, never saved.
+    consumable_effects: crate::consumable_effects::EffectStack,
 }
 
 #[derive(Default)]
@@ -1197,6 +1200,7 @@ impl Gameplay {
             gathering_nodes,
             world_station_rules,
             game_clock: crate::game_clock::GameClock::load(npc_content)?,
+            consumable_effects: Default::default(),
             content_dir: npc_content.to_path_buf(),
         })
     }
@@ -1714,7 +1718,7 @@ impl Gameplay {
             self.sync_tracked_target(character, &mut out);
             self.append_warp_definitions(character, &mut out);
             self.append_activity_list(&mut out);
-            self.append_item_bar(now_ms, &mut out)?;
+            self.append_item_bar(character.guid, now_ms, &mut out)?;
             self.push_rosters(&mut out);
             self.sync_client_objectives(&mut out);
             self.sync_achievement_progress(&mut out, None)?;
@@ -1802,7 +1806,7 @@ impl Gameplay {
         self.sync_tracked_target(character, &mut out);
         self.append_warp_definitions(character, &mut out);
         self.append_activity_list(&mut out);
-        self.append_item_bar(now_ms, &mut out)?;
+        self.append_item_bar(character.guid, now_ms, &mut out)?;
         out.replies.push(self.recipe_replace_all_packet()?);
         self.push_rosters(&mut out);
         self.sync_client_objectives(&mut out);
@@ -1887,6 +1891,7 @@ impl Gameplay {
         self.tick_gathering_nodes(now_ms, &mut out)?;
         self.tick_live_placements(now_ms, &mut out); // world visibility only, never saved
         self.tick_live_events(now_ms); // quest offer gate only, never saved
+        self.tick_consumable_effects(character.guid, now_ms, &mut out);
         out.replies.splice(0..0, fishing);
         self.settle_achievement_counters(&counters_before, &mut out)?;
         Ok(out)
@@ -2079,6 +2084,9 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Outcome> {
+        if let Some(out) = self.handle_effect_strip(inner, character.guid)? {
+            return Ok(out);
+        }
         if let Some(out) = self.command_refusal(inner, character.guid)? {
             return Ok(out);
         }
@@ -4816,49 +4824,6 @@ impl Gameplay {
             return None;
         }
         Some(encounter_id)
-    }
-
-    /// W146: the four item-bar slots (38/25 at world entry).
-    fn append_item_bar(&mut self, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
-        out.replies
-            .extend(self.item_bar.refresh(&self.inventory, now_ms)?);
-        Ok(())
-    }
-
-    /// W146: item-bar requests. The potion is consumed and the heal applied in this one call, so
-    /// the saved state never holds one without the other. Without an encounter engine the player
-    /// has no tracked health, so nothing is claimed and nothing is spent.
-    fn handle_item_bar(
-        &mut self,
-        inner: &[u8],
-        character: &CharacterState,
-        now_ms: u64,
-    ) -> io::Result<Option<Outcome>> {
-        let Some(encounter) = self.encounter.as_ref() else {
-            return Ok(None);
-        };
-        let player = crate::item_bar::Player {
-            guid: character.guid,
-            alive: encounter.state().player_health > 0,
-        };
-        let Some(reply) = self
-            .item_bar
-            .handle(inner, &mut self.inventory, &player, now_ms)?
-        else {
-            return Ok(None);
-        };
-        let mut out = Outcome {
-            replies: reply.replies,
-            changed: reply.changed,
-            ..Outcome::default()
-        };
-        if reply.heal_percent > 0 {
-            if let Some(encounter) = self.encounter.as_mut() {
-                out.replies
-                    .extend(encounter.heal_player_percent(reply.heal_percent));
-            }
-        }
-        Ok(Some(out))
     }
 
     fn handle_mystery_chest(

@@ -853,6 +853,7 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     result.push(("item_bar", words(42, 6, &[u32::MAX; 3])));
     result.push(("item_bar", words(42, 9, &[u32::MAX; 3])));
     result.push(("item_use", words(42, 15, &[u32::MAX])));
+    result.push(("consumable_effects", words(35, 33, &[u32::MAX])));
     result.push(("encounter", [words(41, 122, &[0, 0]), vec![0]].concat()));
     result.push(("activity_portal", vec![167, 0, 1, 4]));
     result.push((

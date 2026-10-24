@@ -1,7 +1,7 @@
 //! T473: the per-player timed effect stack behind treats, cakes and transformations. One
 //! transform (temporary model), one food aura and one size change can be live at a time; each
-//! has a buff-bar row. Pure state, no I/O and not wired into any handler yet (dormant): the
-//! caller owns the clock and the recipient lists, and sends what `Emit` returns.
+//! has a buff-bar row. Pure state and no I/O: the caller owns the clock and the recipient lists,
+//! and sends what `Emit` returns (`gameplay/item_use.rs` does, T474).
 //!
 //! Wire, every reader checked in the client (dispatcher `0092f460`):
 //! * 35/13 scale: ctor `008b42b0`, reader `008d71b0` (u64 guid, f32 scale); applied by `00962200`.
@@ -9,6 +9,9 @@
 //!   applier `ProxiedCharacter::SwitchToTemporaryAppearance` `0096bd90`.
 //! * 35/15 revert: ctor `008b4310`, reader `008d7230` (u64 guid, i32 0).
 //! * 35/16 poof: `encode_play_composite_effect`, reader `008e5f50`.
+//! * 35/33 strip request from the buff bar's cancel: ctor `008a0fb0` (class
+//!   `PlayerUpdatePacketRequestStripEffect`), sender `00934740`; its serializer is `00913b80`,
+//!   which writes exactly one i32 (the dword at +0xC); the dword at +0x18 is never written.
 //! * 35/41 and 35/42 composite effect on an actor: readers `008d7ad0` and `008d7bc0` (the
 //!   piece_056 encoders); 38/16 and 38/17 buff rows: `build_effect_tag`, reader `008d8870`.
 //!
@@ -35,6 +38,21 @@ pub const MAX_SCALE: f32 = 5.0;
 const BUFF_ID_BASE: i32 = 1_000_000_000;
 const WORLD_TAG_BASE: i32 = 1_500_000_000;
 const ID_RANGE: i32 = 500_000_000;
+
+/// Reads the client's 35/33 (`u16 35, u16 33, i32 id`, 8 bytes, serializer `00913b80`). `Ok(None)`
+/// means some other packet; a short or long 35/33 is an error for that session only.
+pub fn parse_strip(inner: &[u8]) -> std::io::Result<Option<i32>> {
+    if !inner.starts_with(&[35, 0, 33, 0]) {
+        return Ok(None);
+    }
+    let body: [u8; 4] = inner[4..].try_into().map_err(|_| {
+        std::io::Error::new(
+            std::io::ErrorKind::InvalidData,
+            "35/33 strip request is not one i32",
+        )
+    })?;
+    Ok(Some(i32::from_le_bytes(body)))
+}
 
 /// 35/13: the actor's model scale.
 pub fn encode_update_scale(guid: u64, scale: f32) -> Vec<u8> {
