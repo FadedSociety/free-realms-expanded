@@ -94,6 +94,40 @@ fn populated_update() -> FixtureUpdate {
     update
 }
 
+/// Reader `00ac1f50`: model dword, selection dword, definition, then the alias strings and tint.
+#[test]
+fn fixture_asset_bytes_follow_the_client_reader_order() {
+    let asset = FixtureAsset {
+        model_id: 1926,
+        selection_id: 8,
+        definition: populated_update().definition,
+        texture_alias: "fun-block-L1".to_string(),
+        tint_alias: "dyetint".to_string(),
+        tint_id: 3,
+        unknown_b: 0,
+        bytes_c: String::new(),
+        guids: Vec::new(),
+        unknown_c: 0,
+        unknown_d: 0,
+        flag: false,
+    };
+    let bytes = asset.encode().unwrap();
+    let mut head = 42u16.to_le_bytes().to_vec();
+    head.extend_from_slice(&1926u32.to_le_bytes());
+    head.extend_from_slice(&8u32.to_le_bytes());
+    assert_eq!(&bytes[..head.len()], head);
+    let mut tail = Vec::new();
+    for text in ["fun-block-L1", "dyetint"] {
+        tail.extend_from_slice(&(text.len() as i32).to_le_bytes());
+        tail.extend_from_slice(text.as_bytes());
+    }
+    tail.extend_from_slice(&3u32.to_le_bytes()); // tint id
+    tail.extend_from_slice(&[0; 5 * 4]); // preview tint, override text, guid count, two words
+    tail.push(0); // preview flag
+    assert!(bytes.ends_with(&tail));
+    assert_eq!(FixtureAsset::decode(&bytes).unwrap(), asset);
+}
+
 #[test]
 fn place_round_trip_length_and_subtype() {
     let encoded = place().encode().unwrap();
@@ -443,12 +477,12 @@ fn every_subtype_uses_the_same_explicit_family_boundary() {
         HousingPacket::FixtureUpdate(populated_update()),
         HousingPacket::FixtureRemove(FixtureRemove { fixture_guid: 7 }),
         HousingPacket::FixtureAsset(FixtureAsset {
-            unknown_word: 0,
+            model_id: 1926,
             selection_id: 8,
             definition: populated_update().definition,
-            bytes_a: String::new(),
-            bytes_b: String::new(),
-            unknown_a: 0,
+            texture_alias: String::new(),
+            tint_alias: String::new(),
+            tint_id: 0,
             unknown_b: 0,
             bytes_c: String::new(),
             guids: vec![9],

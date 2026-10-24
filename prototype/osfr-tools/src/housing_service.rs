@@ -2008,7 +2008,7 @@ impl HousingService {
     }
 
     /// Build the full 127/28 reader shape. The six-coordinate Legacy bounds are expanded to two
-    /// float4s with zero w values (R); keyed list ordinals and absent factory/display metadata are
+    /// float4s with w = 1 (R, the value Lxzxrus zone files use; the client's use of w is not traced); keyed list ordinals and absent factory/display metadata are
     /// also R because the client supplies no lot resource table or server capture.
     fn instance_data(
         &self,
@@ -2044,8 +2044,8 @@ impl HousingService {
             .iter()
             .map(|area| {
                 [
-                    [area[0], area[1], area[2], 0.0],
-                    [area[3], area[4], area[5], 0.0],
+                    [area[0], area[1], area[2], 1.0],
+                    [area[3], area[4], area[5], 1.0],
                 ]
             })
             .collect();
@@ -2152,12 +2152,13 @@ impl HousingService {
         Ok(ServiceOutcome {
             zone_change: None,
             replies: vec![HousingReply::FixtureAsset(FixtureAsset {
-                unknown_word: 0,
+                model_id: u32::try_from(row.model_id)
+                    .map_err(|_| ServiceError::FixtureConfigInvalid("invalid fixture model id"))?,
                 selection_id,
                 definition: fixture_definition_from_row(row),
-                bytes_a: String::new(),
-                bytes_b: String::new(),
-                unknown_a: 0,
+                texture_alias: String::new(),
+                tint_alias: String::new(),
+                tint_id: 0,
                 unknown_b: 0,
                 bytes_c: String::new(),
                 guids: Vec::new(),

@@ -991,16 +991,20 @@ impl InstanceData {
     }
 }
 
-/// Client 127/42 fixture asset record from `00ac1f50`. Field positions are recovered; opaque
-/// strings/words and their values are represented without inferred semantics.
+/// Client 127/42 fixture asset record from `00ac1f50`. Field positions are recovered; the
+/// alias/tint names come from the Lxzxrus field order only (R) and the rest stay opaque.
 #[derive(Clone, Debug, PartialEq)]
 pub struct FixtureAsset {
-    pub unknown_word: u32,
+    /// Models.txt id. Handler `00ac7f40` passes this first dword (`+12`) to `sub_726E30`, the
+    /// `id % 1000` ModelDefinition lookup; a miss logs `Failed to find ModelDefinition` and no
+    /// placement preview is built.
+    pub model_id: u32,
+    /// Echoed back as the first field of the client's 127/2 (`+16`).
     pub selection_id: u32,
     pub definition: FixtureDefinition,
-    pub bytes_a: String,
-    pub bytes_b: String,
-    pub unknown_a: u32,
+    pub texture_alias: String,
+    pub tint_alias: String,
+    pub tint_id: u32,
     pub unknown_b: u32,
     pub bytes_c: String,
     pub guids: Vec<u64>,
@@ -1012,12 +1016,12 @@ pub struct FixtureAsset {
 impl FixtureAsset {
     pub fn encode(&self) -> io::Result<Vec<u8>> {
         let mut writer = Writer::new(SUB_FIXTURE_ASSET);
-        writer.u32(self.unknown_word);
+        writer.u32(self.model_id);
         writer.u32(self.selection_id);
         self.definition.encode(&mut writer)?;
-        writer.string(&self.bytes_a)?;
-        writer.string(&self.bytes_b)?;
-        writer.u32(self.unknown_a);
+        writer.string(&self.texture_alias)?;
+        writer.string(&self.tint_alias)?;
+        writer.u32(self.tint_id);
         writer.u32(self.unknown_b);
         writer.string(&self.bytes_c)?;
         writer.count(self.guids.len())?;
@@ -1035,12 +1039,12 @@ impl FixtureAsset {
         if reader.subtype()? != SUB_FIXTURE_ASSET {
             return Err(invalid("not a 127/42 fixture-asset payload"));
         }
-        let unknown_word = reader.u32()?;
+        let model_id = reader.u32()?;
         let selection_id = reader.u32()?;
         let definition = FixtureDefinition::decode(&mut reader)?;
-        let bytes_a = reader.string()?;
-        let bytes_b = reader.string()?;
-        let unknown_a = reader.u32()?;
+        let texture_alias = reader.string()?;
+        let tint_alias = reader.string()?;
+        let tint_id = reader.u32()?;
         let unknown_b = reader.u32()?;
         let bytes_c = reader.string()?;
         let count = reader.count()?;
@@ -1049,12 +1053,12 @@ impl FixtureAsset {
             guids.push(reader.u64()?);
         }
         let value = Self {
-            unknown_word,
+            model_id,
             selection_id,
             definition,
-            bytes_a,
-            bytes_b,
-            unknown_a,
+            texture_alias,
+            tint_alias,
+            tint_id,
             unknown_b,
             bytes_c,
             guids,

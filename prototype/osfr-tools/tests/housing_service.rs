@@ -906,6 +906,7 @@ fn fixture_asset_request_resolves_only_a_bound_owned_selection() {
     let asset =
         housing_native::FixtureAsset::decode(&response.replies[0].encode().unwrap()).unwrap();
     assert_eq!(asset.selection_id, SELECTION);
+    assert_eq!(asset.model_id, BLOCK_MODEL as u32);
     assert_eq!(asset.definition.id, BLOCK_FIXTURE);
     assert_eq!(asset.definition.item_definition_id, BLOCK_ITEM);
     assert_eq!(asset.definition.model_id, BLOCK_MODEL);
@@ -1177,6 +1178,15 @@ fn the_reconstructed_default_catalog_has_source_tagged_fixture_rows() {
         HousingService::from_state(empty_config, &empty_state, &empty_inventory).unwrap_err(),
         StateError::Config(ServiceError::FixtureConfigInvalid(
             "empty fixture configuration"
+        ))
+    );
+    // A row without a model id could put 0 in the 127/42 model dword; it is refused at load.
+    let mut no_model = FixtureConfig::capture_defaults();
+    no_model.rows[0].model_id = 0;
+    assert_eq!(
+        HousingService::from_state(no_model, &empty_state, &empty_inventory).unwrap_err(),
+        StateError::Config(ServiceError::FixtureConfigInvalid(
+            "invalid fixture configuration id"
         ))
     );
     assert_eq!(
@@ -1532,7 +1542,7 @@ fn enter_sends_zoning_then_exact_45_28_44_and_item_list_bytes() {
     expected_28.push(0);
     expected_28.extend_from_slice(&0u32.to_le_bytes());
     expected_28.extend_from_slice(&1i32.to_le_bytes());
-    for value in [0.0, -20.0, 0.0, 0.0, 100.0, 20.0, 100.0, 0.0] {
+    for value in [0.0, -20.0, 0.0, 1.0, 100.0, 20.0, 100.0, 1.0] {
         append_float(&mut expected_28, value);
     }
     expected_28.extend_from_slice(&33_439u32.to_le_bytes());
