@@ -212,6 +212,7 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
     }
 
     // T379 appended two unanchored repair-guy binding rows.
-    assert_eq!(npc_count, 1_201);
+    // T498 appended the Burglz row (1,202).
+    assert_eq!(npc_count, 1_202);
     println!("NPC placement sources: {counts:?}");
 }

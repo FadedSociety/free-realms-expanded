@@ -240,8 +240,8 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
 
     // Placing a guessed NPC with evidence moves it between these two counts (W117 moved 4);
     // the regional total is the invariant, not either count. T379 appended two unanchored
-    // repair-guy binding rows, so the total is 1,201.
-    assert_eq!(regional_legacy + regional_reconstructed, 1201);
+    // repair-guy binding rows, so the total is 1,201; T498 appended the Burglz legacy spawn (1,202).
+    assert_eq!(regional_legacy + regional_reconstructed, 1202);
     assert!(
         regional_legacy >= 578,
         "regional NPCs dropped to {regional_legacy}"

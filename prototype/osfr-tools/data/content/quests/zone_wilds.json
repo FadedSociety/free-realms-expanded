@@ -1,0 +1,337 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3000332,
+      "title_string_id": 389951,
+      "intro_text_string_id": 389950,
+      "description_string_id": 389952,
+      "end_text_string_id": 389953,
+      "giver_npc_id": 9500000874,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000965,
+          "dialogue_string_id": 389967,
+          "text_string_id": 38049,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3032 goal 1: NameId 38049; TargetGuid 100000003389 = definition 3389 (Zinnea Magnolio, NameId 38031, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1969), bound to npcs/wilds.json 9500000965 at the same spawn"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000900,
+          "dialogue_string_id": 389970,
+          "text_string_id": 38051,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3032 goal 2: NameId 38051; TargetGuid 100000003388 = definition 3388 (Funnel Bindweed, NameId 38029, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1968), bound to npcs/wilds.json 9500000900 at the same spawn"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9500000926,
+          "dialogue_string_id": 390019,
+          "text_string_id": 38053,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3032 goal 3: NameId 38053; TargetGuid 100000003386 = definition 3386 (Oxalis Shamrock, NameId 38033, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1966), bound to npcs/wilds.json 9500000926 at the same spawn"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "npc_id": 9500000926,
+          "text_string_id": 390017,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3032 goal 4: NameId 390017; TargetGuid 100000003386 = definition 3386 (Oxalis Shamrock, NameId 38033, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1966), bound to npcs/wilds.json 9500000926 at the same spawn; the last goal at the turn-in NPC: its DialogueId 389953 is the quest's end_text_string_id"
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "1": 30
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3032: RewardCoins 5, RewardItems []. Its RewardExperience 90 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 30 goes to profile 1 (Adventurer) on the T202 ladder (four goals)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3032 'Who Done It?' (quest data last changed in 1c36ad7): TitleId 389951, DescriptionId 389952, GiverDialogueId 389950, GiverGuid 100000003380, TargetGuid 100000003386, PrerequisiteQuestId 0. Goals 3 and 4 are two consecutive talks to Oxalis; both are kept. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 389951 'Who Done It?' (title), 389952 (description), 389950 (intro) and 389953 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T498: minted id 3000332 = 3000300 + (fork QuestId 3032 - 3000); XP rung 30 (four goals); coin value 5 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000333,
+      "title_string_id": 3787,
+      "intro_text_string_id": 38142,
+      "description_string_id": 38144,
+      "end_text_string_id": 2134,
+      "giver_npc_id": 9500000926,
+      "prerequisite_quest_ids": [
+        3000332
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000882,
+          "dialogue_string_id": 38163,
+          "text_string_id": 38154,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3033 goal 1: NameId 38154; TargetGuid 100000003370 = definition 3370 (Bulb, NameId 38039, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1950), bound to npcs/wilds.json 9500000882 at the same spawn"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000898,
+          "text_string_id": 38156,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3033 goal 2: NameId 38156; TargetGuid 100000003379 = definition 3379 (Flax, NameId 38138, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1959), bound to npcs/wilds.json 9500000898 at the same spawn; the last goal at the turn-in NPC: its DialogueId 2134 is the quest's end_text_string_id"
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 2,
+          "items": [],
+          "job_xp": {
+            "1": 20
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3033: RewardCoins 2, RewardItems []. Its RewardExperience 80 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 20 goes to profile 1 (Adventurer) on the T202 ladder (two goals)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3033 'Making Amends' (quest data last changed in 1c36ad7): TitleId 3787, DescriptionId 38144, GiverDialogueId 38142, GiverGuid 100000003386, TargetGuid 100000003379, PrerequisiteQuestId 3032. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 3787 'Making Amends' (title), 38144 (description), 38142 (intro) and 2134 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T498: minted id 3000333 = 3000300 + (fork QuestId 3033 - 3000); XP rung 20 (two goals); coin value 2 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000340,
+      "title_string_id": 38385,
+      "intro_text_string_id": 38384,
+      "description_string_id": 38386,
+      "end_text_string_id": 9585,
+      "giver_npc_id": 9500000955,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000958,
+          "dialogue_string_id": 38511,
+          "text_string_id": 38393,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3040 goal 1: NameId 38393; TargetGuid 100000003097 = definition 3097 (Voggun, NameId 20956, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1677), bound to npcs/wilds.json 9500000958 at the same spawn"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000954,
+          "dialogue_string_id": 38402,
+          "text_string_id": 38400,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3040 goal 2: NameId 38400; TargetGuid 100000003113 = definition 3113 (Troggers, NameId 20957, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1693), bound to npcs/wilds.json 9500000954 at the same spawn"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9000000335,
+          "dialogue_string_id": 38511,
+          "text_string_id": 38442,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3040 goal 3: NameId 38442; TargetGuid 100000003095 = definition 3095 (Grosh, NameId 20955, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1675), bound to npcs/wilds.json 9000000335 at the same spawn"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "npc_id": 9500000925,
+          "dialogue_string_id": 38530,
+          "text_string_id": 38515,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3040 goal 4: NameId 38515; TargetGuid 100000003108 = definition 3108 (Nog, NameId 20958, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1688), bound to npcs/wilds.json 9500000925 at the same spawn"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "npc_id": 9500000955,
+          "text_string_id": 38518,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3040 goal 5: NameId 38518; TargetGuid 100000003145 = definition 3145 (Vergosh, NameId 21081, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1725), bound to npcs/wilds.json 9500000955 at the same spawn; the last goal at the turn-in NPC: its DialogueId 9585 is the quest's end_text_string_id"
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {
+            "1": 30
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3040: RewardCoins 30, RewardItems []. Its RewardExperience 90 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 30 goes to profile 1 (Adventurer) on the T202 ladder (five goals)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3040 'Lazy Trolls' (quest data last changed in 1c36ad7): TitleId 38385, DescriptionId 38386, GiverDialogueId 38384, GiverGuid 100000003145, TargetGuid 100000003145, PrerequisiteQuestId 0. Goal 3 (Grosh) reuses Voggun's DialogueId 38511 in the fork; kept. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 38385 'Lazy Trolls' (title), 38386 (description), 38384 (intro) and 9585 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T498: minted id 3000340 = 3000300 + (fork QuestId 3040 - 3000); XP rung 30 (five goals); coin value 30 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000341,
+      "title_string_id": 70107,
+      "intro_text_string_id": 70102,
+      "description_string_id": 70106,
+      "end_text_string_id": 70105,
+      "giver_npc_id": 9500000955,
+      "prerequisite_quest_ids": [
+        3000340
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500001007,
+          "text_string_id": 70110,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3041 goal 1: NameId 70110; TargetGuid 100000003120 = definition 3120 (Burglz, NameId 441415, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700), bound to npcs/wilds.json 9500001007 at the same spawn (the new Burglz row this slice adds); the last goal at the turn-in NPC: its DialogueId 70105 is the quest's end_text_string_id"
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {
+            "1": 15
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3041: RewardCoins 30, RewardItems []. Its RewardExperience 90 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 15 goes to profile 1 (Adventurer) on the T202 ladder (one goal)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3041 'Question at the Quarry' (quest data last changed in 1c36ad7): TitleId 70107, DescriptionId 70106, GiverDialogueId 70102, GiverGuid 100000003145, TargetGuid 100000003120, PrerequisiteQuestId 3040. The turn-in is the new Burglz row. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 70107 'Question at the Quarry' (title), 70106 (description), 70102 (intro) and 70105 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T498: minted id 3000341 = 3000300 + (fork QuestId 3041 - 3000); XP rung 15 (one goal); coin value 30 is the fork's RewardCoins."
+        }
+      ]
+    }
+  ]
+}

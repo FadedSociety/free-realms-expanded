@@ -3191,7 +3191,9 @@
         "Pixie Nursery (the errands are all there); standing spot not stated."
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3000332
+      ],
       "quests_given_text": [
         "See Flax."
       ],
@@ -16505,8 +16507,24 @@
       "quests_given_text": [
         "Missing-fish chain: bring fish from Bulb and a fishbowl (1332727062, 394541242); Blazing Star checks the cats' bowls (4190413770, 2993459977) and sends the player after a Robgoblin Adept (841600982, 3044948559). Title not found."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3000333,
+          "title": "Making Amends",
+          "title_string_id": 3787,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3033: TargetGuid 100000003379 = definition 3379 (Flax, NameId 38138, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1959, this row's position); its last goal (NameId 38156) is a talk to Flax with DialogueId 2134."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T498: Making Amends is handed in to Flax, the fork's TargetGuid, not to its giver; the client has Oxalis send the player to Bulb and then Flax (38144)."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "T498: Making Amends (3000333) is handed in to this NPC, the fork's TargetGuid (R); see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [],
@@ -31090,12 +31108,30 @@
         "Pixie Nursery, near the greenhouse (3978079914, 3184147653 \"the lab workers at the green house: Zinnea Magnolio, Funnel Bindweed, and Oxalis Shamrock\")."
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3000333
+      ],
       "quests_given_text": [
         "Chef errands: \"Oxalis wants you to cook up a meal for the gardeners around Pixie Nursery\" (43249685); buy new recipes from Bordon Cloo (2645354306); cook Savory Spiralmint Soup (2579573797) and Gummyfruit Gumbo (812500869); deliver portions to each gardener (2735689201). Titles are not given on the Chef page (\"Oxalis Shamrock's recipe errands\")."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3000332,
+          "title": "Who Done It?",
+          "title_string_id": 389951,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3032: TargetGuid 100000003386 = definition 3386 (Oxalis Shamrock, NameId 38033, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1966, this row's position); its last goal (NameId 390017) is a talk to Oxalis Shamrock with DialogueId 389953."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T498: Who Done It? is handed in to Oxalis Shamrock, the fork's TargetGuid, not to its giver; the client has Blazing Star send the player to the lab workers (389952)."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "T498: Who Done It? (3000332) is handed in to this NPC, the fork's TargetGuid (R); see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [],
@@ -44196,7 +44232,10 @@
         "\"The main Troll camp\" (\"Report your findings to Vergosh back at the main Troll camp\", 2064782438). [video: green marker 19 m with Bluz, huZ4Hl_YSIc/00006, /00008]"
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3000340,
+        3000341
+      ],
       "quests_given_text": [
         "Collect crates of rocks at the quarry for him (3047426870, 2207463536); check the other camps (1990199215). Titles not found."
       ],
@@ -48558,6 +48597,332 @@
       "heading": 1.052359,
       "model_id": 377,
       "model_file_name": "fairy_farmer_f.adr"
+    },
+    {
+      "npc_id": 9500001007,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Burglz",
+      "name_reason": null,
+      "name_string_id": 441415,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 441415
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Wilds",
+      "zone_id": 16,
+      "zone_reason": null,
+      "region_pages": [
+        "Wilds"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Troll who runs the quarry; turn-in of Question at the Quarry"
+      ],
+      "roles": [
+        "quest_giver"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "Legacy built-content spawn Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700, in the Forest Troll Village area"
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [],
+      "quests_accepted": [
+        {
+          "quest_id": 3000341,
+          "title": "Question at the Quarry",
+          "title_string_id": 70107,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3041: TargetGuid 100000003120 = definition 3120 (Burglz, NameId 441415, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700, this row's position); its last goal (NameId 70110) is a talk to Burglz with DialogueId 70105."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T498: Question at the Quarry is handed in to Burglz, the fork's TargetGuid, not to its giver; the client has Vergosh send the player to Burgl (70106)."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "T498: Question at the Quarry (3000341) is handed in to this NPC, the fork's TargetGuid (R); see the entry's source.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "No vendor stock is recorded for this NPC.",
+      "services": [],
+      "services_reason": "No distinct service is recorded for this NPC.",
+      "position": [
+        -540.8602,
+        0.08854178,
+        1358.897
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        0.9622151876357515,
+        0.0,
+        0.27229016266309647
+      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "Legacy built-content spawn coordinates copied from ../lab/references/Lxzxrus-Free-Realms-Server/src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, ...)); ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json and ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3120 (ModelId=167, ModelFileName=troll_peasant_02.adr, NameId=441415).",
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row"
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row"
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row"
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row"
+          }
+        ],
+        "name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy. NameId resolves in client locale table to 'Burglz'."
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy. NameId resolves in client locale table to 'Burglz'."
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy. NameId resolves in client locale table to 'Burglz'."
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) the fork spawn (-540.86, 1358.9) is 114 m from Vergosh's Wilds row; the zone is that row's"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone_id is a stable content-package key assigned from page order, not a recovered server zone id"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) none yet: Tools for Smashing and Box O' Rocks follow in quest-pickups-wilds-sanctuary"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3041: TargetGuid 100000003120"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T498 hand-in binding; see the entry's source"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Y-axis quaternion derived from the fork heading (sin and cos of half the heading), as the existing legacy_data rows do"
+          }
+        ],
+        "placement": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T498), not read from a guide row"
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1700 (spawnNpcWithGuid(3120, 100000003120, -540.8602, 0.08854178, 1358.897, 2.590048)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3120 and FreeRealms-Legacy src/Resources/Npcs.json Id=3120 (NameId=441415, ModelId=167, ModelFileName=troll_peasant_02.adr); the same spawn row is in Lxzxrus, Sanctuary-main and FreeRealms-Legacy."
+          }
+        ]
+      },
+      "heading": 2.590048,
+      "model_id": 167,
+      "model_file_name": "troll_peasant_02.adr"
     }
   ]
 }

@@ -367,6 +367,42 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         9500000735,
         "Chad Fastflutter: only Raina's referral lines and objective strings; no first-person line of his own.",
     ),
+    (
+        9500000874,
+        "Blazing Star (T498 giver of 3000332): NPCs - Wilds.md:77 quotes no line of hers ('See Flax', standing spot not stated); her first-person text is the quest intro 389950, a QuestOffer proof, but tests/npc_greetings_lakeshore_wilds.rs pins every unlisted Wilds row unbound.",
+    ),
+    (
+        9500000882,
+        "Bulb (T498 talk target of 3000333): NPCs - Wilds.md:71 quotes only third-person objectives (1264997128, 394541242, 4285047538); his reply 38163 is the quest-step dialogue of 3000333 goal 1, not a greeting.",
+    ),
+    (
+        9500000898,
+        "Flax (T498 turn-in of 3000333): NPCs - Wilds.md:70 quotes only third-person fish-chain objectives (314189566, 1332727062, 394541242); his line 2134 is the Making Amends end text, not a greeting.",
+    ),
+    (
+        9500000900,
+        "Funnel Bindweed (T498 talk target of 3000332): NPCs - Wilds.md:73 quotes only drink-ingredient objectives (1396874048, 811508545, 2607838681) and a porch location; his reply 389970 is the quest-step dialogue of 3000332 goal 2, not a greeting.",
+    ),
+    (
+        9500000925,
+        "Nog (T498 talk target of 3000340): NPCs - Wilds.md:118 quotes only location and stew objectives (781547105, 2141422511, 3164390028); 38530 is the quest-step dialogue of 3000340 goal 4, and the other locale lines naming him (21056, 23400, 38516) are objectives.",
+    ),
+    (
+        9500000926,
+        "Oxalis Shamrock (T498 giver of 3000333, turn-in of 3000332): NPCs - Wilds.md:67 quotes only chef-errand objectives (43249685, 2645354306, 2735689201); his first-person lines are the intro 38142 (a QuestOffer proof, but tests/npc_greetings_lakeshore_wilds.rs pins every unlisted Wilds row unbound), the step reply 390019 and the end text 389953.",
+    ),
+    (
+        9500000955,
+        "Vergosh (T498 giver of 3000340 and 3000341): NPCs - Wilds.md:117 quotes only a camp location and quarry objectives (2064782438, 3047426870, 1990199215); his first-person lines are the intros 38384 and 70102 (QuestOffer proofs, but tests/npc_greetings_lakeshore_wilds.rs pins every unlisted Wilds row unbound) and the end text 9585.",
+    ),
+    (
+        9500000965,
+        "Zinnea Magnolio (T498 talk target of 3000332): NPCs - Wilds.md:72 quotes only third-person flower objectives (331882309, 4075335134) and a suspect line (2063005555); her reply 389967 is the quest-step dialogue of 3000332 goal 1, not a greeting.",
+    ),
+    (
+        9500001007,
+        "Burglz (T498 turn-in of 3000341, a new row): the guide row for Burgl (NPCs - Wilds.md:119) quotes only objectives (2090604938, 946401124, 1449038490); his first-person line 70105 is the Question at the Quarry end text, not a greeting, and 441432 is the Seaside banker's greeting and must not be reused.",
+    ),
 ];
 
 /// Any key that marks a third-person objective rather than a speaker's line.
