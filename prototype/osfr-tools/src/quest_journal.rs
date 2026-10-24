@@ -50,6 +50,8 @@ pub enum JournalRequest {
     Lock {
         locked: bool,
     },
+    /// 0 is the id of a request whose wire id was 0 or negative: never in a crosswalk, so
+    /// always refused.
     Breadcrumb {
         quest_id: u32,
     },
@@ -73,17 +75,23 @@ pub fn decode(inner: &[u8]) -> Result<Option<JournalRequest>, Malformed> {
             },
         },
         [49, 0, 15, 0, 0, 0, rest @ ..] => JournalRequest::Breadcrumb {
-            quest_id: quest_id(rest)?,
+            // 0 or negative is an id the client never means; it stays a request so the
+            // caller answers it with the refusal line instead of ending the session (R).
+            quest_id: u32::try_from(signed_id(rest)?).unwrap_or(0),
         },
         _ => return Ok(None),
     }))
 }
 
+/// Exactly one `i32`.
+fn signed_id(body: &[u8]) -> Result<i32, Malformed> {
+    Ok(i32::from_le_bytes(body.try_into().map_err(|_| Malformed)?))
+}
+
 /// Exactly one positive `i32`. The client's "no quest" value is -1 and never a
 /// valid request here (R).
 fn quest_id(body: &[u8]) -> Result<u32, Malformed> {
-    let bytes: [u8; 4] = body.try_into().map_err(|_| Malformed)?;
-    u32::try_from(i32::from_le_bytes(bytes))
+    u32::try_from(signed_id(body)?)
         .ok()
         .filter(|id| *id != 0)
         .ok_or(Malformed)
@@ -159,10 +167,15 @@ struct CrosswalkRecord {
 /// Read `breadcrumb_quests.json` from a content folder. A missing file is an empty
 /// crosswalk; a malformed one is an error so a bad edit cannot silently list nothing.
 pub fn load_crosswalk(dir: &Path) -> io::Result<Crosswalk> {
+    Ok(read_crosswalk(dir)?.0)
+}
+
+/// [`load_crosswalk`] plus every original id the file lists, mapped or not.
+pub fn read_crosswalk(dir: &Path) -> io::Result<(Crosswalk, BTreeSet<u32>)> {
     let invalid = |message: &'static str| io::Error::new(io::ErrorKind::InvalidData, message);
     let path = dir.join(CROSSWALK_FILE);
     if !path.is_file() {
-        return Ok(Crosswalk::new());
+        return Ok(Default::default());
     }
     if fs::metadata(&path)?.len() > MAX_CROSSWALK_BYTES {
         return Err(invalid("breadcrumb crosswalk over 1 MiB"));
@@ -200,7 +213,7 @@ pub fn load_crosswalk(dir: &Path) -> io::Result<Crosswalk> {
             crosswalk.insert(record.original_quest_id, regional);
         }
     }
-    Ok(crosswalk)
+    Ok((crosswalk, seen))
 }
 
 /// A 49/15 start names an ORIGINAL id: rewrite it to the regional quest, or `None` when the

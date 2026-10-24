@@ -202,8 +202,6 @@ fn malformed_journal_packets_are_refused_without_panicking() {
         vec![47, 0, 13, 1, 1],    // trailing byte
         vec![49, 0, 15, 0, 0, 0], // no id
         vec![49, 0, 15, 0, 0, 0, 1, 0, 0],
-        crumb(0),
-        crumb(-5),
         [crumb(9), vec![0]].concat(),
     ] {
         assert_eq!(decode(&packet), Err(Malformed), "{packet:?}");
@@ -214,15 +212,41 @@ fn malformed_journal_packets_are_refused_without_panicking() {
         for len in 0..7 {
             for fill in [0u8, 1, 2, 0x7f, 0x80, 0xff] {
                 let packet = [header, &vec![fill; len]].concat();
+                // A 49/15 may decode to id 0 (see below); never to a negative id as u32.
                 if let Ok(Some(
                     JournalRequest::Select { quest_id } | JournalRequest::Breadcrumb { quest_id },
                 )) = decode(&packet)
                 {
-                    assert!(quest_id > 0 && quest_id <= i32::MAX as u32, "{packet:?}");
+                    assert!(quest_id <= i32::MAX as u32, "{packet:?}");
+                    assert!(quest_id > 0 || header[2] == 15, "{packet:?}");
                 }
             }
         }
     }
+}
+
+/// T497: a 49/15 whose id is 0 or negative is a well-formed request for an id nothing maps
+/// (the caller answers it with the refusal line), not a malformed packet that ends the session.
+#[test]
+fn a_breadcrumb_with_a_non_positive_id_is_a_request_for_id_zero() {
+    for id in [0, -1, -5, i32::MIN] {
+        assert_eq!(
+            decode(&crumb(id)),
+            Ok(Some(JournalRequest::Breadcrumb { quest_id: 0 })),
+            "{id}"
+        );
+    }
+    // The other requests keep refusing a non-positive id.
+    for packet in [select(0), select(-1)] {
+        assert_eq!(decode(&packet), Err(Malformed));
+    }
+    // Id 0 is never startable: no registry entry, no state change.
+    let mut e = engine(20);
+    let before = e.state().clone();
+    let outcome = run(&mut e, &crumb(0));
+    assert!(!outcome.changed && outcome.outbound.is_empty());
+    assert_eq!(outcome.denial, Some(QuestDenial::Unavailable));
+    assert_eq!(e.state(), &before);
 }
 
 #[test]

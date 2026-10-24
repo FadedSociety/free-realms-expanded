@@ -1,0 +1,281 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "profile_id": 137,
+      "original_quest_id": 1968,
+      "icon_id": 20740,
+      "badge_id": 4843,
+      "title_string_id": 412490,
+      "description_string_id": 412491,
+      "regional_quest_id": 3070001,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "lab/reports/original-minigame-packets/demoderby-23083-flow0-frame5077-op147-sub1.bin (434 bytes, sha256 ab3ec4f7878d3eb0acf69eaf1b0d5f3c2e2c051eb577f6f2559156026c712d3e): row 1 of 15, Fisherman; title and description ids resolve in lab/reports/locale-id-to-text.json; client reader 0x00be6f20"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/Sanctuary-PC2009-20261009 src/Sanctuary.Game/Zones/StartingZone.cs:1106-1135 SendListOfActivities (commented-out sample from the same capture; corroboration only)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) regional_quest_id 3070001 is the existing Become-a record for this job (disabled until it is enabled); the original-to-regional mapping is ours"
+        }
+      ]
+    },
+    {
+      "profile_id": 52,
+      "original_quest_id": 1965,
+      "icon_id": 20743,
+      "badge_id": 4842,
+      "title_string_id": 412463,
+      "description_string_id": 412464,
+      "regional_quest_id": 3140001,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "lab/reports/original-minigame-packets/demoderby-23083-flow0-frame5077-op147-sub1.bin (434 bytes, sha256 ab3ec4f7878d3eb0acf69eaf1b0d5f3c2e2c051eb577f6f2559156026c712d3e): row 2 of 15, Soccer Star; title and description ids resolve in lab/reports/locale-id-to-text.json; client reader 0x00be6f20"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/Sanctuary-PC2009-20261009 src/Sanctuary.Game/Zones/StartingZone.cs:1106-1135 SendListOfActivities (commented-out sample from the same capture; corroboration only)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) regional_quest_id 3140001 is the existing Become-a record for this job (disabled until it is enabled); the original-to-regional mapping is ours"
+        }
+      ]
+    },
+    {
+      "profile_id": 49,
+      "original_quest_id": 1960,
+      "icon_id": 8059,
+      "badge_id": 46,
+      "title_string_id": 412342,
+      "description_string_id": 412343,
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "lab/reports/original-minigame-packets/demoderby-23083-flow0-frame5077-op147-sub1.bin (434 bytes, sha256 ab3ec4f7878d3eb0acf69eaf1b0d5f3c2e2c051eb577f6f2559156026c712d3e): row 3 of 15, Demo Derby Driver; title and description ids resolve in lab/reports/locale-id-to-text.json; client reader 0x00be6f20"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/Sanctuary-PC2009-20261009 src/Sanctuary.Game/Zones/StartingZone.cs:1106-1135 SendListOfActivities (commented-out sample from the same capture; corroboration only)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) regional_quest_id is null: this job has no regional Become-a record yet, so Start quest is refused with one chat line"
+        }
+      ]
+    },
+    {
+      "profile_id": 48,
+      "original_quest_id": 1961,
+      "icon_id": 20725,
+      "badge_id": 46,
+      "title_string_id": 407752,
+      "description_string_id": 412379,
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "lab/reports/original-minigame-packets/demoderby-23083-flow0-frame5077-op147-sub1.bin (434 bytes, sha256 ab3ec4f7878d3eb0acf69eaf1b0d5f3c2e2c051eb577f6f2559156026c712d3e): row 4 of 15, Kart Driver; title and description ids resolve in lab/reports/locale-id-to-text.json; client reader 0x00be6f20"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/Sanctuary-PC2009-20261009 src/Sanctuary.Game/Zones/StartingZone.cs:1106-1135 SendListOfActivities (commented-out sample from the same capture; corroboration only)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) regional_quest_id is null: this job has no regional Become-a record yet, so Start quest is refused with one chat line"
+        }
+      ]
+    },
+    {
+      "profile_id": 45,
+      "original_quest_id": 1978,
+      "icon_id": 156,
+      "badge_id": 11,
+      "title_string_id": 413021,
+      "description_string_id": 413022,
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "lab/reports/original-minigame-packets/demoderby-23083-flow0-frame5077-op147-sub1.bin (434 bytes, sha256 ab3ec4f7878d3eb0acf69eaf1b0d5f3c2e2c051eb577f6f2559156026c712d3e): row 5 of 15, Chef; title and description ids resolve in lab/reports/locale-id-to-text.json; client reader 0x00be6f20"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/Sanctuary-PC2009-20261009 src/Sanctuary.Game/Zones/StartingZone.cs:1106-1135 SendListOfActivities (commented-out sample from the same capture; corroboration only)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) regional_quest_id is null: this job has no regional Become-a record yet, so Start quest is refused with one chat line"
+        }
+      ]
+    },
+    {
+      "profile_id": 35,
+      "original_quest_id": 1952,
+      "icon_id": 1335,
+      "badge_id": 32,
+      "title_string_id": 412187,
+      "description_string_id": 412188,
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "lab/reports/original-minigame-packets/demoderby-23083-flow0-frame5077-op147-sub1.bin (434 bytes, sha256 ab3ec4f7878d3eb0acf69eaf1b0d5f3c2e2c051eb577f6f2559156026c712d3e): row 6 of 15, Archer; title and description ids resolve in lab/reports/locale-id-to-text.json; client reader 0x00be6f20"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/Sanctuary-PC2009-20261009 src/Sanctuary.Game/Zones/StartingZone.cs:1106-1135 SendListOfActivities (commented-out sample from the same capture; corroboration only)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) regional_quest_id is null: this job has no regional Become-a record yet, so Start quest is refused with one chat line"
+        }
+      ]
+    },
+    {
+      "profile_id": 32,
+      "original_quest_id": 1966,
+      "icon_id": 21594,
+      "badge_id": 10,
+      "title_string_id": 412471,
+      "description_string_id": 412472,
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "lab/reports/original-minigame-packets/demoderby-23083-flow0-frame5077-op147-sub1.bin (434 bytes, sha256 ab3ec4f7878d3eb0acf69eaf1b0d5f3c2e2c051eb577f6f2559156026c712d3e): row 7 of 15, Warrior; title and description ids resolve in lab/reports/locale-id-to-text.json; client reader 0x00be6f20"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/Sanctuary-PC2009-20261009 src/Sanctuary.Game/Zones/StartingZone.cs:1106-1135 SendListOfActivities (commented-out sample from the same capture; corroboration only)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) regional_quest_id is null: this job has no regional Become-a record yet, so Start quest is refused with one chat line"
+        }
+      ]
+    },
+    {
+      "profile_id": 14,
+      "original_quest_id": 1979,
+      "icon_id": 1341,
+      "badge_id": 11,
+      "title_string_id": 139748,
+      "description_string_id": 413026,
+      "regional_quest_id": 3100001,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "lab/reports/original-minigame-packets/demoderby-23083-flow0-frame5077-op147-sub1.bin (434 bytes, sha256 ab3ec4f7878d3eb0acf69eaf1b0d5f3c2e2c051eb577f6f2559156026c712d3e): row 8 of 15, Miner; title and description ids resolve in lab/reports/locale-id-to-text.json; client reader 0x00be6f20"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/Sanctuary-PC2009-20261009 src/Sanctuary.Game/Zones/StartingZone.cs:1106-1135 SendListOfActivities (commented-out sample from the same capture; corroboration only)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) regional_quest_id 3100001 is the existing Become-a record for this job (disabled until it is enabled); the original-to-regional mapping is ours"
+        }
+      ]
+    },
+    {
+      "profile_id": 12,
+      "original_quest_id": 1967,
+      "icon_id": 1343,
+      "badge_id": 12,
+      "title_string_id": 412481,
+      "description_string_id": 412482,
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "lab/reports/original-minigame-packets/demoderby-23083-flow0-frame5077-op147-sub1.bin (434 bytes, sha256 ab3ec4f7878d3eb0acf69eaf1b0d5f3c2e2c051eb577f6f2559156026c712d3e): row 9 of 15, Wizard; title and description ids resolve in lab/reports/locale-id-to-text.json; client reader 0x00be6f20"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/Sanctuary-PC2009-20261009 src/Sanctuary.Game/Zones/StartingZone.cs:1106-1135 SendListOfActivities (commented-out sample from the same capture; corroboration only)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) regional_quest_id is null: this job has no regional Become-a record yet, so Start quest is refused with one chat line"
+        }
+      ]
+    },
+    {
+      "profile_id": 11,
+      "original_quest_id": 1962,
+      "icon_id": 1340,
+      "badge_id": 13,
+      "title_string_id": 412422,
+      "description_string_id": 412423,
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "lab/reports/original-minigame-packets/demoderby-23083-flow0-frame5077-op147-sub1.bin (434 bytes, sha256 ab3ec4f7878d3eb0acf69eaf1b0d5f3c2e2c051eb577f6f2559156026c712d3e): row 10 of 15, Medic; title and description ids resolve in lab/reports/locale-id-to-text.json; client reader 0x00be6f20"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/Sanctuary-PC2009-20261009 src/Sanctuary.Game/Zones/StartingZone.cs:1106-1135 SendListOfActivities (commented-out sample from the same capture; corroboration only)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) regional_quest_id is null: this job has no regional Become-a record yet, so Start quest is refused with one chat line"
+        }
+      ]
+    },
+    {
+      "profile_id": 4,
+      "original_quest_id": 1964,
+      "icon_id": 1339,
+      "badge_id": 11,
+      "title_string_id": 412445,
+      "description_string_id": 412446,
+      "regional_quest_id": 3130001,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "lab/reports/original-minigame-packets/demoderby-23083-flow0-frame5077-op147-sub1.bin (434 bytes, sha256 ab3ec4f7878d3eb0acf69eaf1b0d5f3c2e2c051eb577f6f2559156026c712d3e): row 11 of 15, Postman; title and description ids resolve in lab/reports/locale-id-to-text.json; client reader 0x00be6f20"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/Sanctuary-PC2009-20261009 src/Sanctuary.Game/Zones/StartingZone.cs:1106-1135 SendListOfActivities (commented-out sample from the same capture; corroboration only)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) regional_quest_id 3130001 is the existing Become-a record for this job (disabled until it is enabled); the original-to-regional mapping is ours"
+        }
+      ]
+    },
+    {
+      "profile_id": 2,
+      "original_quest_id": 1963,
+      "icon_id": 1342,
+      "badge_id": 10,
+      "title_string_id": 412437,
+      "description_string_id": 412438,
+      "regional_quest_id": null,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "lab/reports/original-minigame-packets/demoderby-23083-flow0-frame5077-op147-sub1.bin (434 bytes, sha256 ab3ec4f7878d3eb0acf69eaf1b0d5f3c2e2c051eb577f6f2559156026c712d3e): row 12 of 15, Ninja; title and description ids resolve in lab/reports/locale-id-to-text.json; client reader 0x00be6f20"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/Sanctuary-PC2009-20261009 src/Sanctuary.Game/Zones/StartingZone.cs:1106-1135 SendListOfActivities (commented-out sample from the same capture; corroboration only)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) regional_quest_id is null: this job has no regional Become-a record yet, so Start quest is refused with one chat line"
+        }
+      ]
+    }
+  ]
+}

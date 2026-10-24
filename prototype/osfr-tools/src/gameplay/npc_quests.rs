@@ -31,7 +31,9 @@ impl Gameplay {
             }
             return Ok(());
         };
-        let crosswalk = crate::quest_journal::load_crosswalk(source)?;
+        let (mut crosswalk, listed) = crate::quest_journal::read_crosswalk(source)?;
+        let job_browser = crate::job_browser::load(source, &listed)?;
+        crosswalk.extend(job_browser.crosswalk);
         let state = self.npc_quest_state();
         let engine = crate::quest_engine::QuestEngine::from_split_content(
             source,
@@ -43,6 +45,7 @@ impl Gameplay {
         self.saved_npc_quests = None;
         self.load_live_events(); // T418: before any Talk, not on the first tick
         self.register_breadcrumb_crosswalk(crosswalk);
+        self.job_browser_packet = job_browser.packet;
         self.refresh_npc_quest_eligibility(current_unix_seconds());
         // Bind is the load-time level-change notification. The login packet sync
         // (`append_npc_quest_login_sync`) rebuilds the 49/3 + completion frames from
@@ -388,6 +391,10 @@ impl Gameplay {
             .unwrap_or_default();
         out.replies
             .extend(engine.active_login_packets(&opening_ids)?);
+        // The Jobs window's Become-a list: the same static rows for everyone (R).
+        if !self.job_browser_packet.is_empty() {
+            out.replies.push(self.job_browser_packet.clone());
+        }
         self.npc_quests_synced = true;
         Ok(())
     }

@@ -243,6 +243,8 @@ pub struct Gameplay {
     breadcrumb_quests: std::collections::BTreeMap<u32, u64>,
     /// Original breadcrumb quest id -> regional quest (`data/content/breadcrumb_quests.json`).
     breadcrumb_crosswalk: crate::quest_journal::Crosswalk,
+    /// The 147/1 Jobs-window list (`data/content/job_browser.json`), built at bind; empty = none.
+    job_browser_packet: Vec<u8>,
     /// Client-reported goals the client has been told to watch; not saved.
     client_objectives: crate::quest_engine::ClientObjectives,
     /// The "Take Me There" pin (47/14) the client currently shows; not saved.
@@ -1138,6 +1140,7 @@ impl Gameplay {
             saved_npc_quests,
             breadcrumb_quests: std::collections::BTreeMap::new(),
             breadcrumb_crosswalk: Default::default(),
+            job_browser_packet: Vec::new(),
             client_objectives: Default::default(),
             tracked_pin: crate::quest_journal::Tracker::default(),
             npc_quests_synced: false,
