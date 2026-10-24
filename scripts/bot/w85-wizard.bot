@@ -1,3 +1,4 @@
+# T639: level 4 is tier 2: Wizard basic 279 x 1.75 = 488 (no crit on the first seeded roll); the Gloamling has 558 health.
 # Scratch gateway only. Unlock profile 12 in the scratch profiles.json default_state.
 # Existing 26/13 class switch; this checkout has no realm job command.
 raw 1a000d000c000000
@@ -15,5 +16,5 @@ ability 0 5715144128442986753
 expect 32 7
 expect 35 3
 chat realm fightlog
-expect-text dealt 150
+expect-text dealt 488
 quit

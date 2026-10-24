@@ -157,10 +157,12 @@ impl EncounterEngine {
             }
             // (R) Authored stats are level-one baselines. Reuse final-era HP
             // curve and weapon tiers, rather than inventing per-kind curves.
-            let health_scale = level_health(f.actor.level) as f32 / PLAYER_MAX as f32;
-            f.actor.max_health = (f.actor.max_health as f32 * health_scale).round() as u32;
-            f.actor.damage = (f.actor.damage as f32 * 1.75_f32.powi(weapon_tier(f.actor.level) - 1))
-                .round() as u32;
+            let level = f.actor.level;
+            self.scale.scale_enemy(
+                &mut f.actor,
+                self.scale.health_factor(level),
+                self.scale.tier_factor(level),
+            );
             field.push(FieldEnemy {
                 state: enemy_state(&f.actor),
                 respawn_ms: u64::from(respawn_seconds) * 1000,
@@ -286,10 +288,9 @@ impl EncounterEngine {
         for b in &mut battles {
             // Enemies scale like a player at the difficulty's level gate, so
             // each fight keeps the same share of danger (R).
-            let factor = level_health(difficulty_level(b.difficulty)) as f32 / PLAYER_MAX as f32;
+            let factor = self.scale.health_factor(difficulty_level(b.difficulty));
             for a in &mut b.enemies {
-                a.max_health = (a.max_health as f32 * factor).round() as u32;
-                a.damage = (a.damage as f32 * factor).round() as u32;
+                self.scale.scale_enemy(a, factor, factor);
             }
         }
         for b in &battles {

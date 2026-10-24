@@ -10,17 +10,21 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
+
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 
 #[test]
 fn unbuffed_critical_damage_keeps_existing_integer_rounding() {
     let f = Fixture::new(10000, 0);
-    let mut e = f.load(11, 1); // existing odd basic damage 75
+    let basic = combat_scale::basic(11); // odd, so a crit must round down
+    let mut e = f.load(11, 1);
     let mut critical = false;
     for t in (0..44800).step_by(700) {
         let damage = hit_damages(&e.attack(100, [0.0; 3], 11, 0, t).unwrap())[0];
-        if damage > 75 {
-            assert_eq!(damage, 112, "75 * 3 / 2 rounds down");
+        if damage > basic {
+            assert_eq!(damage, basic * 3 / 2, "x1.5 rounds down");
             critical = true;
         }
     }
@@ -49,7 +53,7 @@ impl Fixture {
         let mut cave = zone.clone();
         cave["zone_id"] = json!(411);
         cave["name"] = json!("SyntheticCave");
-        let content = json!({"schema_version":1,"template_file":"npc.bin","template_sha256":format!("{:x}",Sha256::digest(template)),"world":zone,"world_enemies":[],"dungeons":[{"id":411,"title_id":12,"description_id":13,"objective_id":14,"zone":cave,"guide":null,"enemies":[{"guid":200,"definition_id":401,"model_id":3,"name_id":100,"name":"Synthetic cave enemy","texture_alias":"","position":[0,0,0],"max_health":100,"damage":1,"boss":false}],"reward_coins":0,"reward_items":[]}]});
+        let content = json!({"schema_version":1,"template_file":"npc.bin","template_sha256":format!("{:x}",Sha256::digest(template)),"world":zone,"world_enemies":[],"dungeons":[{"id":411,"title_id":12,"description_id":13,"objective_id":14,"zone":cave,"guide":null,"enemies":[{"guid":200,"definition_id":401,"model_id":3,"name_id":100,"name":"Synthetic cave enemy","texture_alias":"","position":[0,0,0],"max_health":50,"damage":1,"boss":false}],"reward_coins":0,"reward_items":[]}]});
         fs::write(
             dir.join("encounters.json"),
             serde_json::to_vec(&content).unwrap(),
@@ -117,7 +121,11 @@ fn area_damage_hits_each_in_radius_once_and_honours_target_limit() {
     );
     let out = e.job_ability(&a, 100, [0.0; 3], 32, 0).unwrap();
     assert_eq!(hit_damages(&out).len(), 2);
-    assert!(hit_damages(&out).iter().all(|x| *x >= 337));
+    assert!(
+        hit_damages(&out)
+            .iter()
+            .all(|x| *x >= combat_scale::strike(32, 5))
+    );
 }
 #[test]
 fn dot_ticks_on_deadlines_and_does_not_consume_basic_swing_gate() {
@@ -135,7 +143,8 @@ fn dot_ticks_on_deadlines_and_does_not_consume_basic_swing_gate() {
             .all(|x| *x == 1)
     );
     let dot = e.tick([0.0; 3], 12, 1100).unwrap();
-    assert!(hit_damages(&dot).iter().any(|x| *x >= 65));
+    let tick = combat_scale::basic(12) / 2;
+    assert!(hit_damages(&dot).iter().any(|x| *x >= tick));
     assert!(
         !e.attack(100, [0.0; 3], 12, 0, 1100)
             .unwrap()
@@ -143,7 +152,7 @@ fn dot_ticks_on_deadlines_and_does_not_consume_basic_swing_gate() {
             .is_empty()
     );
     let late = e.tick([0.0; 3], 12, 10000).unwrap();
-    assert_eq!(hit_damages(&late).iter().filter(|x| **x >= 65).count(), 1);
+    assert_eq!(hit_damages(&late).iter().filter(|x| **x >= tick).count(), 1);
     assert!(
         hit_damages(&e.tick([0.0; 3], 12, 11000).unwrap())
             .iter()
@@ -178,9 +187,10 @@ fn target_vitals_debuff_only_increases_damage_on_its_target_and_expires() {
     e.job_ability(&a, 100, [0.0; 3], 11, 0).unwrap();
     let marked = hit_damages(&e.attack(100, [0.0; 3], 11, 0, 600).unwrap())[0];
     let other = hit_damages(&e.attack(101, [0.0; 3], 11, 0, 1200).unwrap())[0];
-    assert!(marked >= 458 && other <= 344);
+    let hit = combat_scale::strike(11, 5);
+    assert!(marked >= 2 * hit && other <= hit * 3 / 2);
     let expired = hit_damages(&e.attack(100, [0.0; 3], 11, 0, 2000).unwrap())[0];
-    assert!(expired <= 344);
+    assert!(expired <= hit * 3 / 2);
 }
 
 #[test]
@@ -200,10 +210,10 @@ fn critical_buff_affects_chance_and_damage_and_clears_on_job_change() {
         normal_damage += hit_damages(&normal.attack(100, [0.0; 3], 43, 0, t).unwrap())[0];
         boosted_damage += hit_damages(&boosted.attack(100, [0.0; 3], 43, 0, t).unwrap())[0];
     }
-    assert!(boosted_damage > normal_damage + 500);
+    assert!(boosted_damage > normal_damage + 5 * combat_scale::basic(43));
     boosted.set_player_job(32, 1);
     let hit = hit_damages(&boosted.attack(100, [0.0; 3], 32, 0, 15000).unwrap())[0];
-    assert!(hit <= 165);
+    assert!(hit <= combat_scale::basic(32) * 3 / 2);
 }
 
 #[test]
@@ -258,14 +268,14 @@ fn buff_changes_damage_and_mitigation_then_expires_without_stacking() {
     );
     e.job_ability(&a, 1, [0.0; 3], 43, 0).unwrap();
     let hit = e.attack(100, [0.0; 3], 43, 0, 0).unwrap();
-    assert!(hit_damages(&hit)[0] >= 200);
+    assert!(hit_damages(&hit)[0] >= 2 * combat_scale::basic(43));
     let before = e.player_health().0;
     let incoming = e.tick([0.0; 3], 43, 100).unwrap();
     let taken = hit_damages(&incoming).iter().sum::<u32>();
     assert_eq!(before - e.player_health().0, taken);
     assert!(taken <= 150);
     let hit = e.attack(100, [0.0; 3], 43, 0, 2100).unwrap();
-    assert!(hit_damages(&hit)[0] <= 150);
+    assert!(hit_damages(&hit)[0] <= combat_scale::basic(43) * 3 / 2);
 }
 #[test]
 fn invalid_range_cooldown_and_unavailable_summon_do_not_spend_or_damage() {
@@ -320,7 +330,7 @@ fn knockout_clears_skill_effects() {
     let hit = e.attack(100, [2.0, 0.0, 0.0], 99, 0, now + 100).unwrap();
     assert_eq!(
         hit_damages(&hit),
-        vec![657],
+        vec![combat_scale::strike(99, 20)],
         "caster and target buffs were cleared"
     );
 }
@@ -353,7 +363,7 @@ fn reset_session_clears_skill_effects() {
     let hit = e.attack(100, [2.0, 0.0, 0.0], 99, 0, 2800).unwrap();
     assert_eq!(
         hit_damages(&hit),
-        vec![70],
+        vec![combat_scale::strike(99, 1)],
         "caster and target buffs were cleared"
     );
 }
@@ -364,12 +374,12 @@ fn job_wins(profile: i32) {
     abilities
         .load_job_abilities(&content.join("job_abilities.json"))
         .unwrap();
-    // (R) Same-level field packs use the existing HP curve, three enemies,
+    // (R) Same-level field packs follow the weapon tier ladder, three enemies,
     // no god mode, no basic attack; repeat at every ladder level with only
     // the skills the bar shows there (T421: an upgrade replaces its row).
     for level in [1_u32, 5, 10, 15, 20] {
-        let scale = 1.75_f32.powf((level - 1) as f32 / 4.0);
-        let f = Fixture::new((240.0 * scale) as u32, (12.0 * scale) as u32);
+        let scale = combat_scale::tier_factor(level) as f32;
+        let f = Fixture::new((230.0 * scale) as u32, (12.0 * scale) as u32);
         let mut e = f.load(profile, level);
         let mut defeated = 0;
         let mut casts = 0;

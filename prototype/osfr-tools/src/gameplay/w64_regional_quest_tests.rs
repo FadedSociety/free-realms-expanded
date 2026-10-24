@@ -1825,7 +1825,20 @@ fn medic_job_abilities_strike_heal_and_refuse() {
 
     // Self-centred request (guid 1) picks the summoner in reach.
     let hit = encounter.job_ability(&triage, 1, at, 11, 2_000).unwrap();
-    assert_eq!(damage(&hit), Some(240), "75 x 3.2");
+    let scale: serde_json::Value = serde_json::from_slice(
+        &std::fs::read(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/data/content/combat_scale.json"
+        ))
+        .unwrap(),
+    )
+    .unwrap();
+    let basic = scale["basic_damage"]["11"].as_f64().unwrap();
+    assert_eq!(
+        damage(&hit),
+        Some((basic * 3.2).round() as u32),
+        "basic x 3.2"
+    );
     assert!(
         hit.replies.iter().any(|p| p.starts_with(&[35, 0, 35, 0])),
         "heal number"
@@ -2509,7 +2522,8 @@ fn ability_definition_lookup_and_unsupported_casts_are_explicit() {
 }
 
 /// Final-era scaling on the level-1 baseline: max health x1.75 every four
-/// levels, weapon damage x1.75 per power tier (levels 4, 5, 8, 12).
+/// levels, weapon damage x1.75 per power tier (levels 1, 4, 8, 12, 16). The
+/// numbers come from `combat_scale.json`, so retuning it moves this test.
 #[test]
 fn player_health_and_damage_scale_with_job_level() {
     const SUMMONER: u64 = 100_000_096_001;
@@ -2526,21 +2540,33 @@ fn player_health_and_damage_scale_with_job_level() {
             u32::from_le_bytes(p[8..12].try_into().unwrap()),
         )
     };
+    let scale: serde_json::Value = serde_json::from_slice(
+        &std::fs::read(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/data/content/combat_scale.json"
+        ))
+        .unwrap(),
+    )
+    .unwrap();
+    let (base, ratio) = (
+        scale["player_base_health"].as_f64().unwrap(),
+        scale["tier_ratio"].as_f64().unwrap(),
+    );
+    let curve = |level: i32| base * ratio.powf(f64::from(level - 1) / 4.0);
+    let near = |(now, max): (u32, u32), level: i32| {
+        assert_eq!(now, max, "full health");
+        assert!(
+            (f64::from(max) - curve(level)).abs() <= 1.0,
+            "{max} at {level}"
+        );
+    };
     assert!(
         encounter.set_player_job(32, 1).is_empty(),
         "level 1 is the baseline"
     );
-    assert_eq!(
-        health(&encounter.set_player_job(32, 10)),
-        (3522, 3522),
-        "full stays full"
-    );
-    assert_eq!(health(&encounter.set_player_job(32, 20)), (14_270, 14_270));
-    assert_eq!(
-        health(&encounter.set_player_job(32, 10)),
-        (3522, 3522),
-        "capped down"
-    );
+    near(health(&encounter.set_player_job(32, 10)), 10); // full stays full
+    near(health(&encounter.set_player_job(32, 20)), 20);
+    near(health(&encounter.set_player_job(32, 10)), 10); // capped down
 
     let world = CharacterState {
         guid: 1,
@@ -2557,8 +2583,13 @@ fn player_health_and_damage_scale_with_job_level() {
         .iter()
         .find(|p| p.starts_with(&[32, 0, 7, 0]))
         .map(|p| u32::from_le_bytes(p[28..32].try_into().unwrap()));
-    // Medic 75 at weapon tier 4 (x1.75^3), or a x1.5 crit.
-    assert!(matches!(dealt, Some(402) | Some(603)), "{dealt:?}");
+    // The Medic basic at weapon tier 3 (level 10: x1.75^2), or a x1.5 crit.
+    let basic = scale["basic_damage"]["11"].as_f64().unwrap();
+    let strike = (basic * ratio.powi(2)).round() as u32;
+    assert!(
+        dealt == Some(strike) || dealt == Some(strike * 3 / 2),
+        "{dealt:?} against {strike}"
+    );
 }
 
 /// Job identity: Brawler is the tank, Wizard the most fragile; Ninja crits
@@ -2845,10 +2876,21 @@ fn quest_gated_field_enemies_spawn_fight_and_respawn() {
     assert_eq!(spawns, 4, "four Hooligans appear with the quest");
     assert!(encounter.is_field_enemy(HOOLIGAN));
 
-    // Profile 2 deals 100 per swing; 220 HP falls on the third swing.
+    // Profile 2 swings for its combat_scale basic; the authored 220 HP, scaled, falls
+    // on the swing that crosses it.
+    let scale: serde_json::Value = serde_json::from_slice(
+        &std::fs::read(concat!(
+            env!("CARGO_MANIFEST_DIR"),
+            "/data/content/combat_scale.json"
+        ))
+        .unwrap(),
+    )
+    .unwrap();
+    let health = (220.0 * scale["enemy_health_scale"].as_f64().unwrap()).round() as u64;
+    let swings = health.div_ceil(scale["basic_damage"]["2"].as_u64().unwrap());
     let near = [-1971.408, -34.51335, 541.0];
     let mut defeated = Vec::new();
-    for swing in 0..3_u64 {
+    for swing in 0..swings {
         let out = encounter
             .attack(HOOLIGAN, near, 2, 0, 10_000 + swing * 700)
             .unwrap();
@@ -2870,7 +2912,8 @@ fn quest_gated_field_enemies_spawn_fight_and_respawn() {
 
     // Respawn after 30 s; the player stands far away so nothing aggroes.
     let far = [-1700.0, -30.0, 400.0];
-    let respawned = encounter.tick(far, 2, 10_000 + 30_000 + 1_500).unwrap();
+    let killed_at = 10_000 + (swings - 1) * 700;
+    let respawned = encounter.tick(far, 2, killed_at + 30_100).unwrap();
     assert!(
         respawned
             .replies

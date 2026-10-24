@@ -86,7 +86,7 @@ impl EncounterEngine {
         // already carries the job level's weapon scale, so the curve is
         // applied exactly once (a tier-1 Fight uses the plain basic).
         let tier = self.battle_tier() - 1;
-        let (_, base) = profile_stats(profile, 0);
+        let (_, base) = self.scale.profile_stats(profile, 0);
         let base = (base as f32 * self.damage_scale).round() as u32;
         let mut out = EncounterOutcome::default();
         if let Some(area) = &kind.area {

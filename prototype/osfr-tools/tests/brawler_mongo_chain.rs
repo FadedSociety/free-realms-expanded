@@ -19,6 +19,8 @@
 
 #[path = "support/npc_quest_chain.rs"]
 mod chain;
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
 
 use chain::{
     QUEST_CHOICE, TALK_LABEL, accept, assert_packet_changes_nothing, character_at_for, coins,
@@ -48,6 +50,8 @@ const OTHER: u64 = 252_002;
 const CARLOS: u64 = 9_000_000_042;
 const GATE: u64 = 100_000_124_000;
 const MONGO: u64 = 100_000_124_001;
+/// Mongo's authored (old-scale) health; the loader scales it by `enemy_health_scale`.
+const MONGO_AUTHORED_HEALTH: u32 = 900;
 const BATTLE: u32 = 12_400;
 const BRAWLER: i32 = 43;
 const FIRST: u32 = 3_030_004;
@@ -1512,7 +1516,10 @@ fn the_gate_spawner_is_visible_to_a_second_session() {
         }),
         "A's arena Mongo is not aliased into B's shared view"
     );
-    assert_eq!(mongo_health(&a), Some(900));
+    assert_eq!(
+        mongo_health(&a),
+        Some(combat_scale::enemy_health(MONGO_AUTHORED_HEALTH))
+    );
     assert_eq!(
         a.state()
             .encounter
@@ -1618,7 +1625,10 @@ fn a_failed_quest_event_for_one_player_does_not_stop_the_other() {
     let details = open_gate(&mut b, &fighter, other_at);
     let _ = enter_arena(&mut b, &mut fighter, &details, &mut other_at);
     assert_eq!(active_phase(&b), Some(EncounterPhase::Fighting));
-    assert_eq!(mongo_health(&b), Some(900));
+    assert_eq!(
+        mongo_health(&b),
+        Some(combat_scale::enemy_health(MONGO_AUTHORED_HEALTH))
+    );
     assert!(a.state().encounter.unwrap().active.is_none());
 }
 

@@ -34,7 +34,7 @@
 
 /// Reviewed reconstructed player melee reach in world units (metres).
 ///
-/// This mirrors the production `profile_stats` rows in `src/encounter.rs`
+/// This mirrors the production `profile_stats` reach rows in `src/encounter/combat_scale.rs`
 /// (jobs 2/11/32/43 and the fallback all carry 3.0) and the accepted review
 /// `notes/Reviews/Native Cave Completion 081219.md`.
 pub const PLAYER_MELEE_REACH: f32 = 3.0;

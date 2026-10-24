@@ -22,7 +22,14 @@ use std::{
 };
 
 static SERIAL: AtomicU64 = AtomicU64::new(0);
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
+
 const WOLF: u64 = 100;
+/// Level-1 maximum health (no job set), as the packets carry it.
+fn full() -> i32 {
+    combat_scale::base_health() as i32
+}
 const CHECKPOINT: [f32; 3] = [30.0, 0.0, 40.0];
 const FACING: [f32; 3] = [0.0, 0.0, 1.0];
 
@@ -148,7 +155,7 @@ fn world_knockout_is_held_and_offers_the_window_once() {
     let (mut e, out) = knocked_out(&f);
     assert!(out.changed && out.zoning.is_none());
     assert_eq!(count(&out, &window()), 1);
-    assert_eq!(count(&out, &hp(0, 1000)), 1);
+    assert_eq!(count(&out, &hp(0, full())), 1);
     assert_eq!(window().len(), 20); // 12-byte family header + timer + cost (`008d6730`)
     // Dead players are not hit again and the window is not re-sent.
     let before = e.state().clone();
@@ -202,7 +209,7 @@ fn unanswered_knockout_is_revived_by_the_server() {
     assert_eq!(e.state().player_health, 0);
     let out = e.tick([0.0; 3], 11, 15_200).unwrap();
     assert!(out.changed);
-    assert_eq!(e.state().player_health, 1000);
+    assert_eq!(e.state().player_health, full() as u32);
     let zone = out.zoning.as_ref().expect("safe location");
     assert_eq!((zone.zone_id, zone.position), (0, CHECKPOINT));
     assert_eq!(count(&out, &hide()), 1);
@@ -219,15 +226,19 @@ fn free_revive_returns_to_the_checkpoint_at_full_health_with_grace() {
         (zone.zone_id, zone.position, zone.rotation),
         (0, CHECKPOINT, FACING)
     );
-    assert_eq!(count(&out, &hp(1000, 1000)), 1);
+    assert_eq!(count(&out, &hp(full(), full())), 1);
     assert_eq!(count(&out, &hide()), 1);
-    assert_eq!(e.state().player_health, 1000);
+    assert_eq!(e.state().player_health, full() as u32);
     assert!(e.state().active.is_none());
     // Eight seconds of grace: the wolf standing on the spot cannot kill again.
     let _ = e.on_zone_ready(11, 5_000).unwrap();
     for step in 0..70 {
         e.tick([0.0; 3], 11, 5_100 + step * 100).unwrap();
-        assert_eq!(e.state().player_health, 1000, "inside grace, step {step}");
+        assert_eq!(
+            e.state().player_health,
+            full() as u32,
+            "inside grace, step {step}"
+        );
     }
     e.tick([0.0; 3], 11, 13_300).unwrap();
     assert_eq!(e.state().player_health, 0, "grace is finite");
@@ -285,13 +296,17 @@ fn paid_revive_charges_the_price_once_and_revives_in_place() {
     let (out, price) = e.paid_revive(REVIVE_COST as u32, 5_000);
     assert_eq!(price, REVIVE_COST as u32, "exactly the window's price");
     assert!(out.changed && out.zoning.is_none() && out.rewards.is_empty());
-    assert_eq!(out.replies, vec![hp(1000, 1000), hide()]);
-    assert_eq!(e.state().player_health, 1000);
+    assert_eq!(out.replies, vec![hp(full(), full()), hide()]);
+    assert_eq!(e.state().player_health, full() as u32);
     assert!(e.state().active.is_none());
     // The same grace as the free revive: the wolf on the spot cannot kill again.
     for step in 0..70 {
         e.tick([0.0; 3], 11, 5_100 + step * 100).unwrap();
-        assert_eq!(e.state().player_health, 1000, "inside grace, step {step}");
+        assert_eq!(
+            e.state().player_health,
+            full() as u32,
+            "inside grace, step {step}"
+        );
     }
     // Replayed: nothing to revive, nothing to charge.
     let after = e.state().clone();
@@ -406,7 +421,7 @@ fn a_knockout_saved_to_disk_wakes_up_on_reload() {
     let (e, _) = knocked_out(&f);
     // The gateway saves after the knockout; the window is not persisted.
     let reloaded = EncounterEngine::load(&f.0, Some(e.state().clone())).unwrap();
-    assert_eq!(reloaded.state().player_health, 1000);
+    assert_eq!(reloaded.state().player_health, full() as u32);
     assert!(reloaded.state().active.is_none());
     // The relaxed check is only for the world: a fighting instance at zero
     // health is still an inconsistent save.
@@ -459,7 +474,7 @@ fn lost_instance_revives_through_the_existing_exit() {
         assert_eq!((zone.zone_id, zone.position), (0, location().position));
         assert!(out.completed.is_none() && out.rewards.is_empty());
         assert!(e.state().active.is_none());
-        assert_eq!(e.state().player_health, 1000);
+        assert_eq!(e.state().player_health, full() as u32);
         assert!(untouched(&send(
             &mut e,
             &resume(0, header.0, header.1),

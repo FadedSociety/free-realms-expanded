@@ -36,6 +36,8 @@ use std::{
     fs,
 };
 
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
 #[path = "common/field_battle_fixture.rs"]
 mod field_battle_fixture;
 use field_battle_fixture::*;
@@ -731,15 +733,17 @@ fn every_battle_has_a_valid_non_empty_roster() {
                 index + 1
             );
             let authored_health = u32_field(authored, "max_health");
-            // The loader scales every arena actor by the difficulty's level
-            // factor (R). Difficulty 1 is exactly x1, so the authored health is
-            // observable there; above it, every actor uses the same factor.
+            // The loader scales every arena actor by the combat scale and the
+            // difficulty's level factor (R). Difficulty 1 has factor x1, so the
+            // scaled health is exact there; above it, every actor uses the same
+            // factor.
+            let scaled = combat_scale::enemy_health(authored_health);
             assert!(
-                state.health >= authored_health,
-                "battle {id}: enemy {} scaled below its authored health",
+                state.health >= scaled,
+                "battle {id}: enemy {} scaled below its combat-scale health",
                 index + 1
             );
-            ratios.push(f64::from(state.health) / f64::from(authored_health));
+            ratios.push(f64::from(state.health) / f64::from(scaled));
         }
         if u32_field(row, "difficulty") == 1 {
             assert!(

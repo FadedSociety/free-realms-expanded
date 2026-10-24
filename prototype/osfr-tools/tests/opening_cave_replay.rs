@@ -9,6 +9,9 @@
 //! so an existing completed save needs no migration record. There is no
 //! test-only production hook.
 
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
+
 use osfr_tools::{
     character_store::CharacterState, encounter::EncounterPhase, gameplay::Gameplay,
     gateway::Gateway,
@@ -96,7 +99,7 @@ fn binding(content: &Path) -> Binding {
         encounter_id,
         enemy_max_health: enemies
             .iter()
-            .map(|enemy| enemy["max_health"].as_u64().unwrap() as u32)
+            .map(|enemy| combat_scale::enemy_health(enemy["max_health"].as_u64().unwrap() as u32))
             .collect(),
         dungeon_zone: dungeon["zone"]["zone_id"].as_u64().unwrap() as u32,
         dungeon_position: position(&dungeon["zone"]["position"]),
@@ -207,6 +210,15 @@ fn clear_cave(fixture: &mut Fixture) {
         .map(|enemy| (enemy.guid, enemy.position))
         .collect();
     let mut now = NOW + 10;
+    // Every job strikes for at least the lowest basic attack, so this many hits kill any row.
+    let weakest = combat_scale::basic(0);
+    let max_hits = fixture
+        .binding
+        .enemy_max_health
+        .iter()
+        .map(|health| health.div_ceil(weakest) + 2)
+        .max()
+        .unwrap();
     for (guid, position) in enemies {
         fixture.character.position = position;
         let mut guard = 0;
@@ -237,7 +249,7 @@ fn clear_cave(fixture: &mut Fixture) {
                 .expect("the attack frame is accepted");
             now += 700;
             guard += 1;
-            assert!(guard < 64, "enemy {guid} did not die");
+            assert!(guard < max_hits, "enemy {guid} did not die");
         }
     }
 }

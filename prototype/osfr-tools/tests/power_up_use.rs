@@ -13,6 +13,8 @@ use osfr_tools::{
     gameplay::{Gameplay, Outcome},
     power_ups::{PowerUps, Slot},
 };
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
 #[path = "common/field_enemy_fixture.rs"]
 mod field_enemy_fixture;
 
@@ -610,11 +612,12 @@ fn a_level_fifteen_flame_wave_uses_the_tier_one_basic_once() {
         .handle_in_world(&cast(2, 1), &moved, kill + 1_000)
         .unwrap();
     let dealt = hit_damage(&used, SECOND).expect("the Flame Wave reaches the Hooligan");
-    // The overworld is battle tier 1: a level-15 Brawler's basic is 938 and
-    // the authored tier-1 multiplier is 1.0; a hit may crit for x1.5.
+    // The overworld is battle tier 1: a level-15 Brawler (weapon tier 4) strikes
+    // for its basic, and the authored tier-1 multiplier is 1.0; a hit may crit for x1.5.
+    let basic = combat_scale::strike(43, 15) as i32;
     assert!(
-        dealt == 938 || dealt == 1_407,
-        "a level-15 overworld Flame Wave hit for {dealt}"
+        dealt == basic || dealt == basic * 3 / 2,
+        "a level-15 overworld Flame Wave hit for {dealt}, the basic is {basic}"
     );
 }
 
@@ -638,10 +641,16 @@ fn a_difficulty_five_battle_scales_the_flame_wave_by_its_tier() {
         .handle_in_world(&cast(2, 1), &in_arena, kill + 600)
         .unwrap();
     let dealt = hit_damage(&used, STONE_HEART).expect("the Flame Wave reaches Stone Heart");
-    // Level-1 basic 100 x the authored tier-5 multiplier 9.38 (x1.5 on a crit).
+    // The level-1 basic x the authored tier-5 multiplier (x1.5 on a crit).
+    let kinds: Value =
+        serde_json::from_str(include_str!("../data/content/power_ups.json")).unwrap();
+    let tier_five = kinds["kinds"]["flame_wave"]["damage_by_tier"][4]
+        .as_f64()
+        .unwrap();
+    let expected = (f64::from(combat_scale::basic(43)) * tier_five).round() as i32;
     assert!(
-        dealt == 938 || dealt == 1_407,
-        "a tier-5 Flame Wave hit for {dealt}; the level-1 basic is 100"
+        dealt.abs_diff(expected) <= 1 || dealt.abs_diff(expected * 3 / 2) <= 1,
+        "a tier-5 Flame Wave hit for {dealt}; the level-1 basic x {tier_five} is {expected}"
     );
 }
 
@@ -656,10 +665,10 @@ fn a_shielded_summoner_is_not_stunned_by_earth_shard() {
         position: [136.0, -0.6, 175.0],
         ..arena
     };
-    // Three basics cross the summoner's 75 % threshold (and never its 50 %
+    // Four basics cross the summoner's 75 % threshold (and never its 50 %
     // threshold), so exactly the first minion pair stands.
     let mut now = kill + 500;
-    for _ in 0..3 {
+    for _ in 0..4 {
         now += 700;
         game.handle_in_world(&basic(SUMMONER), &in_arena, now)
             .unwrap();

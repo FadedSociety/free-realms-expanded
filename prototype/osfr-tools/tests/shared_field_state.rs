@@ -42,9 +42,25 @@ impl Drop for Scratch {
     }
 }
 
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
+/// The fixture's authored 300 health on the live scale.
+fn full() -> u32 {
+    combat_scale::enemy_health(300)
+}
+
 mod unit {
     // W116 synthetic shared-field oracle. All combat rules here are (R).
-    use super::E;
+    use super::{E, combat_scale, full};
+    /// The Ninja basic attack the fixture's players strike with (profile 2).
+    pub fn n() -> u32 {
+        combat_scale::basic(2)
+    }
+    /// The authored 204 health the area-and-DoT test uses: it dies on the
+    /// second DoT tick, as 100 health did when a hit was 100.
+    pub fn small() -> u32 {
+        combat_scale::enemy_health(204)
+    }
     use osfr_tools::encounter::EncounterEngine;
     use osfr_tools::opening_abilities::JobAbility;
     use serde_json::json;
@@ -122,7 +138,7 @@ mod unit {
             hp(&a
                 .shared_attack(&mut field, 101, E, [1., 0., 0.], 2, 0)
                 .unwrap()),
-            200
+            full() - n()
         );
         assert_eq!(
             hp(&if canary {
@@ -131,7 +147,7 @@ mod unit {
                 b.shared_attack(&mut field, 202, E, [-1., 0., 0.], 2, 100)
                     .unwrap()
             }),
-            100,
+            full() - 2 * n(),
             "local-copy canary: B must strike the HP left by A"
         );
         assert!(
@@ -140,7 +156,7 @@ mod unit {
                 .replies
                 .is_empty()
         );
-        assert_eq!(field.health(E), Some(100));
+        assert_eq!(field.health(E), Some(full() - 2 * n()));
         for t in 1..=10 {
             for engine in [&mut a, &mut b] {
                 let out = engine.tick([1., 0., 0.], 2, t * 100).unwrap();
@@ -152,7 +168,7 @@ mod unit {
                 );
             }
         }
-        assert_eq!(field.health(E), Some(100));
+        assert_eq!(field.health(E), Some(full() - 2 * n()));
     }
 
     #[test]
@@ -300,12 +316,12 @@ mod unit {
             before,
             "a refused shared action changes nothing"
         );
-        assert_eq!(field.health(E), Some(300));
+        assert_eq!(field.health(E), Some(full()));
         assert_eq!(
             hp(&a
                 .shared_attack(&mut field, 101, E, [1., 0., 0.], 2, 0)
                 .unwrap()),
-            200
+            full() - n()
         );
     }
     #[test]
@@ -347,7 +363,7 @@ mod unit {
             .unwrap();
         world.commit_membership(a);
         assert!(world.field_for_player(101, 0).is_none());
-        assert_eq!(world.field(0).unwrap().health(E), Some(300));
+        assert_eq!(world.field(0).unwrap().health(E), Some(full()));
     }
     // The protected name's "no personal credit" means T240 *reward* credit:
     // the shared DoT pays no `rewards` here. Since T256 the caster's engine
@@ -364,6 +380,10 @@ mod unit {
         other["guid"] = json!(E + 10);
         other["position"] = json!([0, 0, 1]);
         content["enemies"].as_array_mut().unwrap().push(other);
+        for enemy in content["enemies"].as_array_mut().unwrap() {
+            enemy["max_health"] = json!(204);
+        }
+        let dot = (n() as f32 * 0.5).round() as u32;
         fs::write(path, content.to_string()).unwrap();
         let mut a = load(&dir);
         let mut b = load(&dir);
@@ -374,17 +394,17 @@ mod unit {
             hp(&a
                 .shared_job_ability(&mut field, 101, &skill, 101, [1., 0., 0.], 2, 0)
                 .unwrap()),
-            200
+            small() - n()
         );
         assert_eq!(
             hp(&b
                 .shared_job_ability(&mut field, 202, &skill, 202, [-1., 0., 0.], 2, 100)
                 .unwrap()),
-            100
+            small() - 2 * n()
         );
-        assert_eq!(field.health(E + 10), Some(100));
+        assert_eq!(field.health(E + 10), Some(small() - 2 * n()));
         let out = a.shared_effects(&mut field, 101, 1000).unwrap();
-        assert_eq!(hp(&out), 50);
+        assert_eq!(hp(&out), small() - 2 * n() - dot);
         let out = b.shared_effects(&mut field, 202, 1100).unwrap();
         assert_eq!(hp(&out), 0);
         assert_eq!(field.health(E + 10), Some(0));
@@ -424,11 +444,11 @@ mod unit {
         let out = a
             .shared_attack(&mut field, 101, E, [1., 0., 0.], 2, 700)
             .unwrap();
-        assert_eq!(hit(&out, 101), 200);
+        assert_eq!(hit(&out, 101), 2 * n());
         let out = b
             .shared_attack(&mut field, 202, E, [-1., 0., 0.], 2, 1300)
             .unwrap();
-        assert_eq!(hit(&out, 202), 100, "B must not inherit A's caster buff");
+        assert_eq!(hit(&out, 202), n(), "B must not inherit A's caster buff");
         a.shared_job_ability(&mut field, 101, &debuff, E, [1., 0., 0.], 2, 1400)
             .unwrap();
         a.shared_effects(&mut field, 101, 1500).unwrap();
@@ -440,23 +460,31 @@ mod unit {
         let out = b
             .shared_attack(&mut field, 202, E, [-1., 0., 0.], 2, 2100)
             .unwrap();
-        assert_eq!(hit(&out, 202), 200, "the debuff applies to either attacker");
+        assert_eq!(
+            hit(&out, 202),
+            2 * n(),
+            "the debuff applies to either attacker"
+        );
         let out = a
             .shared_attack(&mut field, 101, E, [1., 0., 0.], 2, 2800)
             .unwrap();
         assert_eq!(
             hit(&out, 101),
-            400,
+            4 * n(),
             "A keeps its caster buff after shared calls"
         );
         let out = b
             .shared_attack(&mut field, 202, E, [-1., 0., 0.], 2, 3500)
             .unwrap();
-        assert_eq!(hit(&out, 202), 100, "the debuff expires at 3400");
+        assert_eq!(hit(&out, 202), n(), "the debuff expires at 3400");
         let out = a
             .shared_attack(&mut field, 101, E, [1., 0., 0.], 2, 4200)
             .unwrap();
-        assert_eq!(hit(&out, 101), 200, "the caster buff outlives the debuff");
+        assert_eq!(
+            hit(&out, 101),
+            2 * n(),
+            "the caster buff outlives the debuff"
+        );
     }
     #[test]
     fn refused_shared_ability_leaves_skill_effects_untouched() {
@@ -498,7 +526,7 @@ mod unit {
             .unwrap();
         assert_eq!(
             hit(&out, 101),
-            400,
+            4 * n(),
             "both skill maps survived the refused casts"
         );
     }
@@ -1014,7 +1042,7 @@ fn two_bot_socket_shared_hp_route() {
         );
         assert_eq!(actor_packets(packets, 2, E), 1, "E {i}");
         assert_eq!(actor_packets(packets, 2, M), 1, "M {i}");
-        assert_eq!(hp_values(packets), vec![300]);
+        assert_eq!(hp_values(packets), vec![full()]);
     }
     let cast = [
         vec![36, 0, 10, 0, 1, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0],
@@ -1026,17 +1054,17 @@ fn two_bot_socket_shared_hp_route() {
     a.send_message(&bot::wrap(&self_cast), "36/10 self")
         .unwrap();
     let first = attack_result(&f, &mut a, &mut b, 0);
-    assert_eq!(hp_values(&first[0]), vec![200]);
+    assert_eq!(hp_values(&first[0]), vec![full() - unit::n()]);
     b.send_message(&bot::wrap(&cast), "36/10").unwrap();
     a.send_message(&bot::wrap(&cast), "36/10 early").unwrap();
     let second = attack_result(&f, &mut a, &mut b, 1);
     assert_eq!(
         hp_values(&second[1]),
-        vec![100],
+        vec![full() - 2 * unit::n()],
         "local-copy canary: B must use canonical HP"
     );
-    assert_eq!(hp_values(&first[1]), vec![200]);
-    assert_eq!(hp_values(&second[0]), vec![100]);
+    assert_eq!(hp_values(&first[1]), vec![full() - unit::n()]);
+    assert_eq!(hp_values(&second[0]), vec![full() - 2 * unit::n()]);
     for (packets, actor) in [(&first[0], 101_u64), (&second[1], 202_u64)] {
         assert_eq!(
             packets
@@ -1053,7 +1081,10 @@ fn two_bot_socket_shared_hp_route() {
         assert!(hp_values(&messages).is_empty());
         assert_eq!(actor_packets(&messages, 2, E), 0);
     }
-    assert_eq!(f.host(|s| s.test_field_health(E)), Some(100));
+    assert_eq!(
+        f.host(|s| s.test_field_health(E)),
+        Some(full() - 2 * unit::n())
+    );
     // A parsed but unknown target, and a truncated targeted ability, cannot mutate.
     let mut unknown = cast.clone();
     unknown[16..24].copy_from_slice(&u64::MAX.to_le_bytes());
@@ -1063,7 +1094,10 @@ fn two_bot_socket_shared_hp_route() {
         .unwrap();
     let refused = collect(&mut a, &mut b, Duration::from_millis(500));
     assert!(refused.iter().all(|p| hp_values(p).is_empty()));
-    assert_eq!(f.host(|s| s.test_field_health(E)), Some(100));
+    assert_eq!(
+        f.host(|s| s.test_field_health(E)),
+        Some(full() - 2 * unit::n())
+    );
     // Live equipment removal must revoke shared casts for B alone.
     let unequip = [
         vec![42, 0, 2, 0],
@@ -1075,7 +1109,10 @@ fn two_bot_socket_shared_hp_route() {
     b.send_message(&bot::wrap(&cast), "36/10 unarmed").unwrap();
     let refused = collect(&mut a, &mut b, Duration::from_millis(500));
     assert!(refused.iter().all(|p| hp_values(p).is_empty()));
-    assert_eq!(f.host(|s| s.test_field_health(E)), Some(100));
+    assert_eq!(
+        f.host(|s| s.test_field_health(E)),
+        Some(full() - 2 * unit::n())
+    );
     // Existing original battle-marker / Go route, with separate canonical runs.
     let interact = [vec![26, 0, 8, 0], M.to_le_bytes().to_vec(), vec![0]].concat();
     let go = [
@@ -1147,7 +1184,10 @@ fn two_bot_socket_shared_hp_route() {
     b.send_message(&bot::wrap(&cast), "36/10 other instance")
         .unwrap();
     collect(&mut a, &mut b, Duration::from_millis(500));
-    assert_eq!(f.host(|s| s.test_field_health(E)), Some(100));
+    assert_eq!(
+        f.host(|s| s.test_field_health(E)),
+        Some(full() - 2 * unit::n())
+    );
     println!(
         "W116 receipt: shared HP [200,100], early/unknown/truncated/foreign-instance requests refused; canonical run ids match saves and 41/114. Scratch {}, removed when the fixture drops",
         f.root.display()

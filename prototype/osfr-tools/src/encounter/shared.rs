@@ -371,7 +371,7 @@ impl EncounterEngine {
                         self.enemy(enemy.guid).is_some()
                             && enemy.health > 0
                             && distance(character.position, enemy.position)
-                                <= profile_stats(self.player_profile, 0).0
+                                <= self.scale.profile_stats(self.player_profile, 0).0
                     }))
             {
                 return Ok(None);

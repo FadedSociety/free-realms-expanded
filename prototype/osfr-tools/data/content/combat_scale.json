@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "basic_damage": {
+    "0": 254,
+    "2": 254,
+    "11": 279,
+    "12": 279,
+    "32": 279,
+    "35": 279,
+    "43": 254
+  },
+  "tier_min_levels": [1, 4, 8, 12, 16],
+  "tier_ratio": 1.75,
+  "player_base_health": 500,
+  "enemy_health_scale": 3.72,
+  "enemy_damage_scale": 0.5,
+  "source": [
+    {
+      "field": "basic_damage",
+      "kind": "wiki",
+      "evidence": "notes/Research/Damage Scale.md Q3: live tier-1 first attacks are identical across jobs, Incision 279 = floor(889 x 11/35) (Zap, Sweeping Slash, Barrage, Wallop 0.314), Glancing Blow, Burn and Smack 254 = 889 x 2/7 (0.286); profile ids 2 Ninja, 11 Medic, 12 Wizard, 32 Warrior, 35 Archer, 43 Brawler"
+    },
+    {
+      "field": "basic_damage",
+      "kind": "reconstructed",
+      "evidence": "(R) key 0 is every profile not listed (no combat job active); it takes the lower live value"
+    },
+    {
+      "field": "tier_min_levels",
+      "kind": "client",
+      "evidence": "notes/Research/Damage Scale.md Q4: client locale 13095-13099 'Deals N damage at Level 1/4/8/12/16', the wiki New School ladder and the vendor line (MinProfileRank 1/4/8/12/16); the client keeps no level-to-tier table"
+    },
+    {
+      "field": "tier_ratio",
+      "kind": "wiki",
+      "evidence": "notes/Research/Damage Scale.md Q3: live tier bases 889 / 1554 / 2716 / 4750 / 8302 step x1.748; 1.75 is within 0.3%. (R) the same ratio is the player health growth per four levels (video fit 500 x 1.75^((L-1)/4))"
+    },
+    {
+      "field": "player_base_health",
+      "kind": "video",
+      "evidence": "notes/Research/Damage Scale.md Q3: reviewed HUD frames read 500 at level 1 (Brawler), 4069 at level 16 and 7116 at level 20 against the 500 x 1.75^((L-1)/4) fit"
+    },
+    {
+      "field": "enemy_health_scale",
+      "kind": "reconstructed",
+      "evidence": "(R) T639: player damage is 3.72x the old scale (279 / 75), so enemy health is scaled by the same factor and every time-to-kill stays; no live enemy health exists (Damage Scale.md Q3)"
+    },
+    {
+      "field": "enemy_damage_scale",
+      "kind": "reconstructed",
+      "evidence": "(R) T639: player health halved (1000 -> 500), so enemy damage is halved and each hit takes the same share of health"
+    }
+  ]
+}

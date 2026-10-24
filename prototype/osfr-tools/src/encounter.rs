@@ -19,45 +19,22 @@ use std::{
     sync::Arc,
 };
 
+mod combat_scale;
 mod field;
 pub mod field_rewards;
 mod power_up_use;
 mod revive;
 mod shared;
 mod skills;
+use self::combat_scale::CombatScale;
 pub(crate) use self::field::level_refusal;
 use self::revive::{AUTO_REVIVE_MS, respawn_hide};
 use self::shared::FieldSim;
 pub use self::shared::{SharedFieldAction, SharedFieldState};
 use self::skills::{SkillBuff, SkillDot, SkillEffects};
 
-/// Level-1 player health: the reconstructed baseline the opening was tuned
-/// on. Higher job levels scale from it like the final-era game (see
-/// `level_health`).
-const PLAYER_MAX: u32 = 1000;
-/// Upper bound for saved player health (level 20 is about 14,270).
+/// Upper bound for saved player health (level 20 is about 7,135, 8,205 for a Brawler).
 const PLAYER_HEALTH_CAP: u32 = 20_000;
-
-/// Final-era scaling (the owner chose the final era, 2026-10-15): player health
-/// grows x1.75 every four levels (videos: Medic 10 = 2081, Ninja/Archer/Medic
-/// 14 = 3309-3639, Archer 16 = 4476-4883, level 20 = 7116-9821), kept on our
-/// level-1 baseline of 1000 (R: level-1 health itself is unsourced).
-fn level_health(level: u32) -> u32 {
-    let level = level.clamp(1, 20);
-    (PLAYER_MAX as f32 * 1.75_f32.powf((level - 1) as f32 / 4.0)).round() as u32
-}
-
-/// Weapon power tier a job level can wield (wiki weapon pages: P1 at level 1,
-/// P2 at 4, P3 at 5-8, P4 at 8-12, P5 at 12-20); each tier hits x1.75 harder.
-fn weapon_tier(level: u32) -> i32 {
-    match level {
-        0..=3 => 1,
-        4 => 2,
-        5..=7 => 3,
-        8..=11 => 4,
-        _ => 5,
-    }
-}
 
 /// Combat job identity (R; the owner's design, 2026-10-15): Brawler is the
 /// berserker tank (video level 20: Brawler 9821 vs Archer 8540 health),
@@ -682,8 +659,10 @@ pub struct EncounterEngine {
     // next regeneration step, plus each ability slot's cooldown end.
     energy: i32,
     energy_regen_at: u64,
+    /// Damage, health and tier levels from `combat_scale.json`.
+    scale: CombatScale,
     // The player's max health and weapon damage multiplier at the active
-    // job's level (set by gameplay; level 1 = 1000 and x1).
+    // job's level (set by gameplay; level 1 = the base health and x1).
     max_health: u32,
     damage_scale: f32,
     // Crit chance of the active job (0 until gameplay sets the job) and a
@@ -910,6 +889,7 @@ impl EncounterEngine {
 
     pub fn load(directory: impl AsRef<Path>, state: Option<EncounterState>) -> io::Result<Self> {
         let directory = directory.as_ref();
+        let scale = CombatScale::load(directory)?;
         let bytes = fs::read(directory.join("encounters.json"))?;
         if bytes.len() > 128 * 1024 {
             return Err(invalid("encounter content too large"));
@@ -985,6 +965,12 @@ impl EncounterEngine {
             }
         }
         let content_hash = hash(&bytes);
+        // Authored enemy rows are level-one baselines on the old scale.
+        for a in (content.world_enemies.iter_mut())
+            .chain(content.dungeons.iter_mut().flat_map(|d| &mut d.enemies))
+        {
+            scale.scale_enemy(a, 1.0, 1.0);
+        }
         let mut state = state;
         if let Some(state) = state.as_mut() {
             // Saves from before battles were kept out of `rewarded` can hold
@@ -1000,14 +986,14 @@ impl EncounterEngine {
             active: None,
             world_stage: 0,
             world_enemies: content.world_enemies.iter().map(enemy_state).collect(),
-            player_health: PLAYER_MAX,
+            player_health: scale.player_base_health(),
             rewarded: BTreeSet::new(),
             next_instance_id: 1,
         });
         // (R) A world knockout is held in memory and saved as zero health; the
         // respawn window is not persisted, so a reload wakes the character.
         if state.active.is_none() && state.player_health == 0 {
-            state.player_health = PLAYER_MAX;
+            state.player_health = scale.player_base_health();
         }
         if state.version != 1
             || state.content_sha256 != content_hash
@@ -1032,7 +1018,7 @@ impl EncounterEngine {
             // field_battles.json after load). A save taken mid-battle returns
             // the player to the world at full health instead of failing.
             state.active = None;
-            state.player_health = PLAYER_MAX;
+            state.player_health = scale.player_base_health();
         }
         if let Some(a) = &state.active {
             let d = content
@@ -1068,7 +1054,8 @@ impl EncounterEngine {
             dropped_return,
             energy: ENERGY_MAX,
             energy_regen_at: 0,
-            max_health: PLAYER_MAX,
+            max_health: scale.player_base_health(),
+            scale,
             damage_scale: 1.0,
             crit_percent: 0,
             crit_seed: 0x5eed_c417_0000_0001,
@@ -1190,10 +1177,9 @@ impl EncounterEngine {
         self.job_level = level.clamp(1, 20);
         let (health, crit) = job_identity(profile);
         self.crit_percent = crit;
-        let max = (level_health(level) as f32 * health).round() as u32;
-        let scale = 1.75_f32.powi(weapon_tier(level) - 1);
-        self.damage_scale = scale;
-        if max == self.max_health {
+        let max = (self.scale.level_health(level) as f32 * health).round() as u32;
+        self.damage_scale = self.scale.tier_factor(level);
+        if max == self.max_health && self.state.player_health <= max {
             return Vec::new();
         }
         let was_full = self.state.player_health >= self.max_health;
@@ -1722,7 +1708,7 @@ impl EncounterEngine {
                             )
                             .collect(),
                     };
-                    let range = profile_stats(profile_id, slot).0;
+                    let range = self.scale.profile_stats(profile_id, slot).0;
                     let nearest = states
                         .into_iter()
                         .filter(|s| {
@@ -1829,7 +1815,7 @@ impl EncounterEngine {
         if self.state.player_health == 0 {
             return Ok(EncounterOutcome::default());
         }
-        let (range, damage) = profile_stats(profile_id, slot);
+        let (range, damage) = self.scale.profile_stats(profile_id, slot);
         let damage = (damage as f32 * self.damage_scale).round() as u32;
         self.strike(guid, position, range, damage, now_ms)
     }
@@ -2894,20 +2880,6 @@ fn kite_turn(
     }
 }
 
-fn profile_stats(profile: i32, slot: i32) -> (f32, u32) {
-    let (r, d) = match profile {
-        35 => (30.0, 80),
-        // Wizard: fragile (x0.85 health) but the highest base damage, from
-        // range (the owner, 2026-10-15; was 90).
-        12 => (20.0, 130),
-        2 => (3.0, 100),
-        11 => (3.0, 75),
-        32 => (3.0, 110),
-        43 => (3.0, 100),
-        _ => (3.0, 70),
-    };
-    (r, if slot == 0 { d } else { d * 2 })
-}
 fn header(op: u16, sub: u16) -> Vec<u8> {
     [op.to_le_bytes(), sub.to_le_bytes()].concat()
 }

@@ -2,6 +2,8 @@ use osfr_tools::encounter::{EncounterEngine, EncounterOutcome, Mode};
 use serde_json::{Value, json};
 use std::{collections::BTreeSet, fs};
 
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
 #[path = "common/field_enemy_fixture.rs"]
 mod field_enemy_fixture;
 
@@ -205,7 +207,13 @@ fn group_spawns_roam_kill_and_respawn_on_the_authored_timer() {
             killed_at + 45_100,
         )
         .unwrap();
-    assert_eq!(hp(&at_respawn, GUID), Some((100, 100)));
+    assert_eq!(
+        hp(&at_respawn, GUID),
+        Some((
+            combat_scale::enemy_health(100),
+            combat_scale::enemy_health(100)
+        ))
+    );
     assert!(at_respawn.replies.iter().any(|packet| {
         packet.starts_with(&[35, 0, 2, 0]) && packet[4..12] == GUID.to_le_bytes()
     }));

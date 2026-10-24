@@ -27,6 +27,8 @@ use std::{
     },
 };
 
+#[path = "combat_scale.rs"]
+mod combat_scale;
 #[path = "gateway_packets.rs"]
 mod gateway_packets;
 
@@ -607,9 +609,9 @@ pub fn enter_battle(gateway: &mut Gateway, details: &[u8], row: &Value, now_ms: 
         .expect("the arena run is active");
     assert_eq!(active.phase, EncounterPhase::Fighting);
     assert_eq!(active.enemies.len(), enemy_guids.len());
-    // The loader scales enemy health and damage by the difficulty factor (R),
-    // and only difficulty 1's factor is 1.0, so the authored health is
-    // observable exactly there; higher difficulties spawn at or above it.
+    // The loader scales enemy health by the combat scale and the difficulty
+    // factor (R), and only difficulty 1's factor is 1.0, so the scaled health
+    // is observable exactly there; higher difficulties spawn at or above it.
     let authored_health = u32_field(row, "difficulty") == 1;
     for (actor, state) in row["enemies"]
         .as_array()
@@ -620,10 +622,13 @@ pub fn enter_battle(gateway: &mut Gateway, details: &[u8], row: &Value, now_ms: 
         assert_eq!(state.guid, u64_field(actor, "guid"));
         assert_eq!(state.position, position(&actor["position"]));
         if authored_health {
-            assert_eq!(state.health, u32_field(actor, "max_health"));
+            assert_eq!(
+                state.health,
+                combat_scale::enemy_health(u32_field(actor, "max_health"))
+            );
         } else {
             assert!(
-                state.health >= u32_field(actor, "max_health"),
+                state.health >= combat_scale::enemy_health(u32_field(actor, "max_health")),
                 "actor {} spawned at {} health",
                 state.guid,
                 state.health

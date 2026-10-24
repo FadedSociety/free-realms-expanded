@@ -10,11 +10,17 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
 #[path = "common/job_playtest.rs"]
 mod job_playtest;
 
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 const GUID: u64 = 100;
+/// The fixture wolf's authored 100 health on the live scale.
+fn full() -> u32 {
+    combat_scale::enemy_health(100)
+}
 struct Fixture(PathBuf);
 impl Drop for Fixture {
     fn drop(&mut self) {
@@ -96,7 +102,7 @@ fn home_leash_returns_and_heals_while_ignoring_reaggro() {
     // rather than landing at 12 m within floating-point tolerance.
     f.edit("behaviour", json!({"move_speed":3.1}));
     let mut e = f.load();
-    assert!(hp(&e.attack(GUID, [0.0; 3], 11, 0, 0).unwrap()).unwrap().0 < 100);
+    assert!(hp(&e.attack(GUID, [0.0; 3], 11, 0, 0).unwrap()).unwrap().0 < full());
     let mut returned = false;
     let mut farthest = 0.0_f32;
     for t in 1..=400 {
@@ -114,7 +120,7 @@ fn home_leash_returns_and_heals_while_ignoring_reaggro() {
                     .is_empty()
             );
         }
-        if hp(&out) == Some((100, 100)) {
+        if hp(&out) == Some((full(), full())) {
             returned = true;
             break;
         }
@@ -139,7 +145,7 @@ fn lost_target_returns_at_run_speed_then_heals() {
     let mut healed = false;
     for t in 12..=30 {
         let out = e.tick(at(&e), 11, t * 100).unwrap();
-        healed |= hp(&out) == Some((100, 100));
+        healed |= hp(&out) == Some((full(), full()));
         if healed {
             break;
         }
@@ -162,9 +168,13 @@ fn kill_then_respawn_forgets_skill_effects() {
     e.job_ability(&debuff, GUID, [0.0; 3], 11, 700).unwrap();
     e.job_ability(&dot, GUID, [0.0; 3], 11, 1400).unwrap();
     let out = e.attack(GUID, [0.0; 3], 11, 0, 2100).unwrap();
-    assert_eq!(hp(&out), Some((0, 100)), "the debuff lands the killing hit");
+    assert_eq!(
+        hp(&out),
+        Some((0, full())),
+        "the debuff lands the killing hit"
+    );
     let out = e.tick([100.0, 0.0, 0.0], 11, 3100).unwrap();
-    assert_eq!(hp(&out), Some((100, 100)), "the kill respawns");
+    assert_eq!(hp(&out), Some((full(), full())), "the kill respawns");
     let out = e.tick([100.0, 0.0, 0.0], 11, 4100).unwrap();
     assert!(
         hits_from(&out, 1).is_empty(),
@@ -173,7 +183,11 @@ fn kill_then_respawn_forgets_skill_effects() {
     let out = e.tick([0.0; 3], 11, 4200).unwrap();
     assert!(!hits_from(&out, GUID).is_empty(), "the stun was cleared");
     let out = e.attack(GUID, [0.0; 3], 11, 0, 4300).unwrap();
-    assert_eq!(hp(&out), Some((25, 100)), "the target buff was cleared");
+    assert_eq!(
+        hp(&out),
+        Some((full() - combat_scale::basic(11), full())),
+        "the target buff was cleared"
+    );
 }
 
 #[test]
@@ -192,10 +206,15 @@ fn evade_completion_forgets_skill_effects() {
     e.job_ability(&debuff, GUID, [0.0; 3], 11, 700).unwrap();
     e.job_ability(&dot, GUID, [0.0; 3], 11, 1400).unwrap();
     let out = e.attack(GUID, [0.0; 3], 11, 0, 2100).unwrap();
-    assert_eq!(hp(&out).unwrap().0, 850, "the debuff doubles the hit");
+    let big = combat_scale::enemy_health(1000);
+    assert_eq!(
+        hp(&out).unwrap().0,
+        big - 2 * combat_scale::basic(11),
+        "the debuff doubles the hit"
+    );
     let out = e.tick([100.0, 0.0, 0.0], 11, 2200).unwrap();
     assert!(hits_from(&out, 1).is_empty(), "the dot was not due yet");
-    assert_eq!(hp(&out), Some((1000, 1000)), "the evading actor heals home");
+    assert_eq!(hp(&out), Some((big, big)), "the evading actor heals home");
     let out = e.tick([100.0, 0.0, 0.0], 11, 3500).unwrap();
     assert!(
         hits_from(&out, 1).is_empty(),
@@ -204,7 +223,11 @@ fn evade_completion_forgets_skill_effects() {
     let out = e.tick([0.0; 3], 11, 4200).unwrap();
     assert!(!hits_from(&out, GUID).is_empty(), "the stun was cleared");
     let out = e.attack(GUID, [0.0; 3], 11, 0, 4300).unwrap();
-    assert_eq!(hp(&out), Some((925, 1000)), "the target buff was cleared");
+    assert_eq!(
+        hp(&out),
+        Some((big - combat_scale::basic(11), big)),
+        "the target buff was cleared"
+    );
 }
 
 #[test]
@@ -233,7 +256,11 @@ fn reload_field_enemies_forgets_skill_effects() {
     let out = e.tick([0.0; 3], 11, 4200).unwrap();
     assert!(!hits_from(&out, GUID).is_empty(), "the stun was cleared");
     let out = e.attack(GUID, [0.0; 3], 11, 0, 4300).unwrap();
-    assert_eq!(hp(&out), Some((25, 100)), "the target buff was cleared");
+    assert_eq!(
+        hp(&out),
+        Some((full() - combat_scale::basic(11), full())),
+        "the target buff was cleared"
+    );
 }
 
 #[test]
@@ -267,17 +294,28 @@ fn levels_scale_hp_damage_and_respawn() {
     let mut high = five.load();
     assert_eq!(one.field_level(GUID), Some(1));
     assert_eq!(high.field_level(GUID), Some(5));
-    assert_eq!(hp(&one.on_zone_ready(11, 0).unwrap()), Some((100, 100)));
-    assert_eq!(hp(&high.on_zone_ready(11, 0).unwrap()), Some((175, 175)));
+    assert_eq!(
+        hp(&one.on_zone_ready(11, 0).unwrap()),
+        Some((full(), full()))
+    );
+    // Level 5 is one four-level health step.
+    let health = (full() as f64 * combat_scale::tier_ratio()).round() as u32;
+    assert_eq!(
+        hp(&high.on_zone_ready(11, 0).unwrap()),
+        Some((health, health))
+    );
     let before = high.state().player_health;
     high.tick([0.0; 3], 11, 100).unwrap();
-    assert_eq!(before - high.state().player_health, 21); // 7 * 1.75^(tier 3 - 1)
+    assert_eq!(
+        before - high.state().player_health,
+        combat_scale::enemy_hit(7, 5)
+    );
     for t in 0..3 {
         high.attack(GUID, [0.0; 3], 2, 0, 1000 + t * 700).unwrap();
     }
     assert!(!high.field_teleport_targets().iter().any(|a| a.guid == GUID));
     let out = high.tick([100.0; 3], 11, 4000).unwrap();
-    assert_eq!(hp(&out), Some((175, 175)));
+    assert_eq!(hp(&out), Some((health, health)));
     assert_eq!(at(&high), [0.0; 3]);
 }
 
@@ -301,7 +339,10 @@ fn behaviour_leash_fallback_and_honest_stationary_reach() {
     e.tick([2.6, 0.0, 0.0], 11, 100).unwrap();
     assert_eq!(e.state().player_health, before);
     e.tick([2.5, 0.0, 0.0], 11, 200).unwrap();
-    assert_eq!(e.state().player_health, before - 7);
+    assert_eq!(
+        e.state().player_health,
+        before - combat_scale::enemy_damage(7)
+    );
 }
 
 #[test]

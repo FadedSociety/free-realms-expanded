@@ -54,6 +54,8 @@
 //! - 50/1 reward bundle dispatcher `00b8a640` / reader `00b8a300`: a client-supplied
 //!   bundle is not a grant.
 
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
 
@@ -90,7 +92,8 @@ const GIVER_NAME_ID: u32 = 19_685;
 const WOLF_GUID: u64 = 131_000_102_001;
 const WOLF_DEFINITION: u32 = 3_156;
 const WOLF_CENTRE: [f32; 3] = [-1899.204, -50.59, 307.902];
-const WOLF_HP: u32 = 100;
+/// The shipped actor's authored health; the content loader puts it on the live scale.
+const WOLF_AUTHORED_HP: u32 = 100;
 /// `SharedFieldAction::Ability { slot: 0, .. }` is the ordinary 36/10 basic attack.
 const ATTACK_SLOT: i32 = 0;
 const BRAWLER: i32 = 43;
@@ -307,7 +310,7 @@ fn wolf_content() -> Value {
         .expect("the T245 starting_farnum_wolves actor")
         .clone();
     assert_eq!(enemy["definition_id"], json!(WOLF_DEFINITION));
-    assert_eq!(enemy["max_health"], json!(WOLF_HP));
+    assert_eq!(enemy["max_health"], json!(WOLF_AUTHORED_HP));
     assert_eq!(enemy["power_up_table"], json!("standard"));
     let position: [f32; 3] =
         serde_json::from_value(enemy["position"].clone()).expect("the actor position");
@@ -354,7 +357,14 @@ fn start_quest(game: &mut Gameplay, at: &CharacterState, now: &mut u64) {
     assert_eq!(pending_offer(game), None);
 }
 
-/// The ordinary 36/10 basic attack: the parsed `ClientRequestStartAbility` action that
+/// The wolf's health on the live scale, as the loader gives it.
+fn wolf_hp() -> u32 {
+    combat_scale::enemy_health(WOLF_AUTHORED_HP)
+}
+
+/// The ordinary 36/10 basic attack, struck until the wolf falls (one swing per 700 ms, past
+/// the 600 ms swing clock); the bound is the swings its live-scale health needs, plus one.
+/// Returns the killing swing's outcome. The parsed `ClientRequestStartAbility` action that
 /// `Session::commit_outcome` passes to the shared field after the production
 /// `EncounterEngine::shared_action` parser (writer `0x00a342e0`; the 24-byte wire body is
 /// pinned in `tests/shared_field_state.rs`).
@@ -362,20 +372,29 @@ fn kill_wolf(
     game: &mut Gameplay,
     field: &mut SharedFieldState,
     at: &CharacterState,
-    now: u64,
+    now: &mut u64,
 ) -> Outcome {
     let known = BTreeSet::from([WOLF_GUID]);
-    game.handle_shared_field(
-        &SharedFieldAction::Ability {
-            slot: ATTACK_SLOT,
-            target: WOLF_GUID,
-        },
-        field,
-        &known,
-        at,
-        now,
-    )
-    .expect("the shared-field basic attack is accepted")
+    let max_swings = wolf_hp().div_ceil(combat_scale::strike(BRAWLER, 1)) + 1;
+    for _ in 0..max_swings {
+        let outcome = game
+            .handle_shared_field(
+                &SharedFieldAction::Ability {
+                    slot: ATTACK_SLOT,
+                    target: WOLF_GUID,
+                },
+                field,
+                &known,
+                at,
+                *now,
+            )
+            .expect("the shared-field basic attack is accepted");
+        if field.health(WOLF_GUID) == Some(0) {
+            return outcome;
+        }
+        *now += 700;
+    }
+    panic!("the wolf survived {max_swings} basic attacks");
 }
 
 fn count_definition(game: &Gameplay, definition_id: i32) -> usize {
@@ -433,10 +452,10 @@ fn kill_field_wolf(
     let mut field = game.take_shared_fields().expect("the shared field exists");
     assert_eq!(
         field.health(WOLF_GUID),
-        Some(WOLF_HP),
+        Some(wolf_hp()),
         "the server's wolf starts at full health"
     );
-    let killed = kill_wolf(game, &mut field, &wolf, *now);
+    let killed = kill_wolf(game, &mut field, &wolf, now);
     *now += 700;
     assert_eq!(counts(game, QUEST), [1], "one kill is one objective count");
     (field, killed)
@@ -1012,7 +1031,7 @@ fn the_loop_uses_only_server_owned_ids_and_authoritative_hits() {
         )
         .expect("a forged target is ignored, not an error");
     assert!(!forged.changed && forged.replies.is_empty());
-    assert_eq!(field.health(WOLF_GUID), Some(WOLF_HP));
+    assert_eq!(field.health(WOLF_GUID), Some(wolf_hp()));
     assert_eq!(
         game.state(),
         before_state,
@@ -1044,7 +1063,7 @@ fn the_loop_uses_only_server_owned_ids_and_authoritative_hits() {
         )
         .expect("an out-of-range attack is refused, not an error");
     assert!(!out_of_range.changed && out_of_range.replies.is_empty());
-    assert_eq!(field.health(WOLF_GUID), Some(WOLF_HP));
+    assert_eq!(field.health(WOLF_GUID), Some(wolf_hp()));
     assert_eq!(
         game.state(),
         before_state,
@@ -1066,7 +1085,7 @@ fn the_loop_uses_only_server_owned_ids_and_authoritative_hits() {
     // attack reuses the same field after the two refusals, so a refused attempt that had
     // consumed the attack cooldown would refuse here and fail the objective assertion.
     now += 4;
-    let killed = kill_wolf(&mut game, &mut field, &wolf, now);
+    let killed = kill_wolf(&mut game, &mut field, &wolf, &mut now);
     assert_eq!(field.health(WOLF_GUID), Some(0));
     assert_eq!(counts(&game, QUEST), [1]);
     assert!(objective_update(&killed, QUEST, 1, 1));
@@ -1081,7 +1100,8 @@ fn the_loop_uses_only_server_owned_ids_and_authoritative_hits() {
     );
     let mut zero = fixture.reload(clean);
     let mut zero_field = zero.take_shared_fields().expect("the shared field exists");
-    let zero_kill = kill_wolf(&mut zero, &mut zero_field, &wolf, now + 100);
+    let mut zero_now = now + 100;
+    let zero_kill = kill_wolf(&mut zero, &mut zero_field, &wolf, &mut zero_now);
     assert_eq!(
         zero_field.health(WOLF_GUID),
         Some(0),

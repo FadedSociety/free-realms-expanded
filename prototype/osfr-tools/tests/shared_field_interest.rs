@@ -2,6 +2,30 @@
 // Its historical private socket check remains opt-in; W127's route runs below.
 include!("shared_field_state.rs");
 
+/// The interest fixtures' E dies on the third basic hit, as its 300 health did when a hit was
+/// 100 (the third is overkill).
+fn authored_three() -> u32 {
+    combat_scale::authored_for(unit::n(), 3)
+}
+
+/// E's full health on the live scale.
+fn hp_full() -> u32 {
+    combat_scale::enemy_health(authored_three())
+}
+
+/// E's health after `hits` basic hits (0 once dead).
+fn hp_after(hits: u32) -> u32 {
+    hp_full().saturating_sub(hits * unit::n())
+}
+
+/// Make the content's E the three-hit wolf.
+fn set_three_hit_health(content: &Path) {
+    let path = content.join("field_enemies.json");
+    let mut rows: serde_json::Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    rows["enemies"][0]["max_health"] = json!(authored_three());
+    fs::write(&path, rows.to_string()).unwrap();
+}
+
 fn interest_fixture(passive: usize, exclude_pc: bool) -> Fixture {
     interest_fixture_with(passive, exclude_pc, |_| {})
 }
@@ -22,6 +46,7 @@ fn interest_fixture_with(
     fs::create_dir_all(&root).unwrap();
     let accounts = create_account_store(&root);
     let content = create_content(&root);
+    set_three_hit_health(&content);
     edit_content(&content);
     // Empty passive world except the requested cap fixture. No campaign edits.
     fs::write(
@@ -209,7 +234,7 @@ fn w127_two_bot_observer_death_respawn_route() {
     let startup = interest_login(&f, &mut a, &mut b);
     for packets in &startup {
         assert_eq!(actor_packets(packets, 2, E), 1);
-        assert_eq!(hp_values(packets), vec![300]);
+        assert_eq!(hp_values(packets), vec![hp_full()]);
     }
     let mut damage = [Vec::new(), Vec::new()];
     let enemy_hit_101 = |p: &Vec<u8>| {
@@ -235,9 +260,9 @@ fn w127_two_bot_observer_death_respawn_route() {
     }
     let banks = interest_banks(&f);
     interest_cast(&mut a);
-    let first = interest_committed_result(&f, &mut a, &mut b, 200, 0);
+    let first = interest_committed_result(&f, &mut a, &mut b, hp_after(1), 0);
     for packets in &first {
-        assert_eq!(hp_values(packets), vec![200]);
+        assert_eq!(hp_values(packets), vec![hp_after(1)]);
         assert_eq!(
             hits_from(packets, 101),
             1,
@@ -245,9 +270,9 @@ fn w127_two_bot_observer_death_respawn_route() {
         );
     }
     interest_cast(&mut b);
-    let second = interest_committed_result(&f, &mut a, &mut b, 100, 1);
+    let second = interest_committed_result(&f, &mut a, &mut b, hp_after(2), 1);
     for packets in &second {
-        assert_eq!(hp_values(packets), vec![100]);
+        assert_eq!(hp_values(packets), vec![hp_after(2)]);
         assert_eq!(hits_from(packets, 202), 1);
     }
     let cooldown = collect(&mut a, &mut b, Duration::from_millis(500));
@@ -289,24 +314,27 @@ fn t032_two_bot_private_instance_shared_death() {
     let mut a = f.bot(101, 10801);
     let mut b = f.bot(202, 10802);
     let _public_startup = interest_login(&f, &mut a, &mut b);
-    assert_eq!(f.host(|s| s.test_field_health(E)), Some(300));
+    assert_eq!(f.host(|s| s.test_field_health(E)), Some(hp_full()));
     let child = f.host(|s| s.test_field_child());
     assert_ne!(child, 0);
     f.host(move |s| s.test_transfer(101, child, false)).unwrap();
     let mut entered_a = f.ready(101, &mut a, &mut b);
-    assert_eq!(f.host(move |s| s.test_field_health_in(child, E)), Some(300));
+    assert_eq!(
+        f.host(move |s| s.test_field_health_in(child, E)),
+        Some(hp_full())
+    );
     settle(&mut a, &mut b, &mut entered_a, |messages| {
         actor_packets(&messages[0], 2, E) == 1
-            && hp_values(&messages[0]) == vec![300]
+            && hp_values(&messages[0]) == vec![hp_full()]
             && f.host(|s| s.test_known_npcs(101).contains(&E))
     });
     assert_eq!(actor_packets(&entered_a[0], 2, E), 1);
-    assert_eq!(hp_values(&entered_a[0]), vec![300]);
+    assert_eq!(hp_values(&entered_a[0]), vec![hp_full()]);
     assert_eq!(f.host(|s| s.test_location(101).unwrap().1), child);
     let child_banks = interest_banks(&f);
     interest_cast(&mut a);
-    let first = interest_committed_result_in(&f, child, &mut a, &mut b, 200, 0);
-    assert_eq!(hp_values(&first[0]), vec![200]);
+    let first = interest_committed_result_in(&f, child, &mut a, &mut b, hp_after(1), 0);
+    assert_eq!(hp_values(&first[0]), vec![hp_after(1)]);
     assert_eq!(hits_from(&first[0], 101), 1);
     assert!(hp_values(&first[1]).is_empty());
 
@@ -316,27 +344,27 @@ fn t032_two_bot_private_instance_shared_death() {
     let mut entered_b = f.ready(202, &mut a, &mut b);
     assert_eq!(
         f.host(move |s| s.test_field_health_in(child, E)),
-        Some(200),
+        Some(hp_after(1)),
         "joining must preserve damage already committed in the child"
     );
     settle(&mut a, &mut b, &mut entered_b, |messages| {
         actor_packets(&messages[1], 2, E) == 1
-            && hp_values(&messages[1]) == vec![200]
+            && hp_values(&messages[1]) == vec![hp_after(1)]
             && f.host(|s| s.test_known_npcs(202).contains(&E))
     });
     assert_eq!(actor_packets(&entered_b[1], 2, E), 1);
-    assert_eq!(hp_values(&entered_b[1]), vec![200]);
+    assert_eq!(hp_values(&entered_b[1]), vec![hp_after(1)]);
     assert_eq!(f.host(|s| s.test_location(202).unwrap().1), child);
 
     interest_cast(&mut b);
-    let second = interest_committed_result_in(&f, child, &mut a, &mut b, 100, 1);
+    let second = interest_committed_result_in(&f, child, &mut a, &mut b, hp_after(2), 1);
     let cooldown = collect(&mut a, &mut b, Duration::from_millis(500));
     for packets in cooldown {
         assert!(hp_values(&packets).is_empty());
     }
     interest_cast(&mut a);
     let lethal = interest_committed_result_in(&f, child, &mut a, &mut b, 0, 0);
-    for (batch, hp, attacker) in [(&second, 100, 202), (&lethal, 0, 101)] {
+    for (batch, hp, attacker) in [(&second, hp_after(2), 202), (&lethal, 0, 101)] {
         for packets in batch {
             assert_eq!(hp_values(packets), vec![hp]);
             assert_eq!(hits_from(packets, attacker), 1);
@@ -352,7 +380,7 @@ fn t032_two_bot_private_instance_shared_death() {
     );
     assert_eq!(
         f.host(|s| s.test_field_health(E)),
-        Some(300),
+        Some(hp_full()),
         "the public population is a distinct runtime"
     );
     assert_eq!(
@@ -402,7 +430,7 @@ fn f132_not_ready_same_instance_removes_known_field_actor() {
     assert_eq!(removal, &expected, "35/3 field layout");
     // Readiness returned: the current actor was re-added at its current HP.
     assert_eq!(actor_packets(&cycle[1], 2, E), 1);
-    assert_eq!(hp_values(&cycle[1]), vec![300]);
+    assert_eq!(hp_values(&cycle[1]), vec![hp_full()]);
     assert!(f.host(|s| s.test_location(202).unwrap()).2);
     assert!(f.host(|s| s.test_known_npcs(202).contains(&E)));
     assert!(f.host(|s| s.test_known_npcs(101).contains(&E)));
@@ -436,6 +464,7 @@ fn removals(packets: &[Vec<u8>], guid: u64) -> usize {
 
 fn interest_engine() -> osfr_tools::encounter::EncounterEngine {
     let dir = unit::fixture();
+    set_three_hit_health(&dir);
     let mut engine = osfr_tools::encounter::EncounterEngine::load(&dir, None).unwrap();
     engine
         .load_field_enemies(&dir.join("field_enemies.json"))
@@ -480,10 +509,14 @@ fn w127_exact_death_respawn_clock_and_no_personal_credit() {
             .flat_map(|guid| field.initialization(*guid).unwrap())
             .collect();
         assert_eq!(actor_packets(&init, 2, E), 1);
-        assert_eq!(hp_values(&init), vec![300]);
+        assert_eq!(hp_values(&init), vec![hp_full()]);
         *view = next;
     }
-    for (who, now, hp) in [(101, 0, 200), (202, 100, 100), (101, 600, 0)] {
+    for (who, now, hp) in [
+        (101, 0, hp_after(1)),
+        (202, 100, hp_after(2)),
+        (101, 600, 0),
+    ] {
         let engine = if who == 101 { &mut a } else { &mut b };
         let out = engine
             .shared_attack(&mut field, who, E, [1., 0., 0.], 2, now)
@@ -527,7 +560,7 @@ fn w127_exact_death_respawn_clock_and_no_personal_credit() {
     assert_eq!(field.health(E), Some(0));
     assert!(field.initialization(E).unwrap().is_empty());
     a.shared_motion(&mut field, &[], 2600, 1).unwrap();
-    assert_eq!(field.health(E), Some(300));
+    assert_eq!(field.health(E), Some(hp_full()));
     assert_eq!(field.respawn_at(E), None);
     for view in &mut views {
         let (next, _) = visibility
@@ -538,7 +571,7 @@ fn w127_exact_death_respawn_clock_and_no_personal_credit() {
             .flat_map(|guid| field.initialization(*guid).unwrap())
             .collect();
         assert_eq!(actor_packets(&init, 2, E), 1);
-        assert_eq!(hp_values(&init), vec![300]);
+        assert_eq!(hp_values(&init), vec![hp_full()]);
         *view = next;
         let (again, packets) = visibility
             .shared_view(0, [20., 0., 0.], &field.interest_candidates(false), view)
@@ -580,21 +613,21 @@ fn t032_private_instance_field_is_one_shared_death_for_two_members() {
     let first_hit = a
         .shared_attack(&mut field, 101, E, [1., 0., 0.], 2, 0)
         .unwrap();
-    assert_eq!(hp_values(&first_hit.replies), vec![200]);
+    assert_eq!(hp_values(&first_hit.replies), vec![hp_after(1)]);
     world.install_field(child, field.clone());
     let second = world
         .prepare_membership(202, 0, Some(child), WorldPose::ORIGIN, true, 0)
         .unwrap();
     assert_eq!(
         world.field(child).unwrap().health(E),
-        Some(200),
+        Some(hp_after(1)),
         "a second member must not reset the private field"
     );
     world.commit_membership(second);
     field = world.field(child).unwrap().clone();
     assert_eq!(
         world.field(child).unwrap().health(E),
-        Some(200),
+        Some(hp_after(1)),
         "committing the second member must preserve damaged HP"
     );
     assert_eq!(
@@ -616,10 +649,10 @@ fn t032_private_instance_field_is_one_shared_death_for_two_members() {
             .flat_map(|guid| field.initialization(*guid).unwrap())
             .collect();
         assert_eq!(actor_packets(&init, 2, E), 1);
-        assert_eq!(hp_values(&init), vec![200]);
+        assert_eq!(hp_values(&init), vec![hp_after(1)]);
         *view = next;
     }
-    for (who, now, hp) in [(202, 100, 100), (101, 600, 0)] {
+    for (who, now, hp) in [(202, 100, hp_after(2)), (101, 600, 0)] {
         let engine = if who == 101 { &mut a } else { &mut b };
         let out = engine
             .shared_attack(&mut field, who, E, [1., 0., 0.], 2, now)
@@ -653,7 +686,7 @@ fn t032_private_instance_field_is_one_shared_death_for_two_members() {
     }
     assert_eq!(
         world.field(0).unwrap().health(E),
-        Some(300),
+        Some(hp_full()),
         "private combat must not alter the public population"
     );
     println!(
@@ -686,7 +719,7 @@ fn t032_a_seeded_nonzero_zone_enters_one_shared_public_instance() {
     let hit = a
         .shared_attack(&mut field, 101, E, [1., 0., 0.], 2, 0)
         .unwrap();
-    assert_eq!(hp_values(&hit.replies), vec![200]);
+    assert_eq!(hp_values(&hit.replies), vec![hp_after(1)]);
     world.install_field(instance, field);
     let second = world
         .prepare_membership(202, 9600, None, WorldPose::ORIGIN, true, 0)
@@ -699,7 +732,7 @@ fn t032_a_seeded_nonzero_zone_enters_one_shared_public_instance() {
     world.commit_membership(second);
     assert_eq!(
         world.field(instance).unwrap().health(E),
-        Some(200),
+        Some(hp_after(1)),
         "committing the second member must preserve the shared damaged HP"
     );
     assert_eq!(world.field_instances(), [instance]);
@@ -808,7 +841,7 @@ fn t032_same_zone_transfer_discards_the_pickups_the_client_left_behind() {
     // A kills E with the guaranteed big heart. A stands 1 m away and the drop
     // radius is 0.5 m, so the pickup is still on the ground after commit.
     let mut kill = [Vec::new(), Vec::new()];
-    for (index, hp) in [200, 100, 0].into_iter().enumerate() {
+    for (index, hp) in [hp_after(1), hp_after(2), 0].into_iter().enumerate() {
         interest_cast(&mut a);
         let batch = interest_committed_result(&f, &mut a, &mut b, hp, 0);
         for i in 0..2 {
@@ -887,7 +920,7 @@ fn w127_common_budget_cutoff_engagement_and_exclusion() {
         .unwrap();
     assert!(engaged.contains(&E));
     let init = field.initialization(E).unwrap();
-    assert_eq!(hp_values(&init), vec![200]);
+    assert_eq!(hp_values(&init), vec![hp_after(1)]);
     let (far, removed) = visibility
         .shared_view(
             0,
@@ -947,16 +980,16 @@ fn w127_two_bot_attacker_pc_excluded() {
     let startup = interest_login(&f, &mut a, &mut b);
     for packets in &startup {
         assert_eq!(actor_packets(packets, 2, E), 1);
-        assert_eq!(hp_values(packets), vec![300]);
+        assert_eq!(hp_values(packets), vec![hp_full()]);
     }
     interest_cast(&mut a);
-    let first = interest_committed_result(&f, &mut a, &mut b, 200, 0);
+    let first = interest_committed_result(&f, &mut a, &mut b, hp_after(1), 0);
     interest_cast(&mut b);
-    let second = interest_committed_result(&f, &mut a, &mut b, 100, 1);
+    let second = interest_committed_result(&f, &mut a, &mut b, hp_after(2), 1);
     let _ = collect(&mut a, &mut b, Duration::from_millis(500));
     interest_cast(&mut a);
     let lethal = interest_committed_result(&f, &mut a, &mut b, 0, 0);
-    for (batch, hp) in [(&first, 200), (&second, 100), (&lethal, 0)] {
+    for (batch, hp) in [(&first, hp_after(1)), (&second, hp_after(2)), (&lethal, 0)] {
         for packets in batch {
             assert_eq!(hp_values(packets), vec![hp]);
         }
@@ -1005,28 +1038,28 @@ fn w127_two_bot_npc_cap_cutoff() {
     for packets in &refused {
         assert!(hp_values(packets).is_empty());
     }
-    assert_eq!(f.host(|s| s.test_field_health(E)), Some(300));
+    assert_eq!(f.host(|s| s.test_field_health(E)), Some(hp_full()));
     interest_cast(&mut b);
-    let first = interest_committed_result(&f, &mut a, &mut b, 200, 1);
+    let first = interest_committed_result(&f, &mut a, &mut b, hp_after(1), 1);
     assert_eq!(actor_packets(&first[0], 2, E), 0);
     assert!(hp_values(&first[0]).is_empty());
-    assert_eq!(hp_values(&first[1]), vec![200]);
+    assert_eq!(hp_values(&first[1]), vec![hp_after(1)]);
     f.host(|s| s.test_observer_position(101, [-1., 0., 0.]));
     let mut entered = [Vec::new(), Vec::new()];
     settle(&mut a, &mut b, &mut entered, |e| {
         actor_packets(&e[0], 2, E) >= 1 && removals(&e[0], 130000000063) >= 1
     });
     assert_eq!(actor_packets(&entered[0], 2, E), 1);
-    assert_eq!(hp_values(&entered[0]), vec![200]);
+    assert_eq!(hp_values(&entered[0]), vec![hp_after(1)]);
     assert_eq!(
         removals(&entered[0], 130000000063),
         1,
         "entry displaces one passive row"
     );
     interest_cast(&mut a);
-    let second = interest_committed_result(&f, &mut a, &mut b, 100, 0);
+    let second = interest_committed_result(&f, &mut a, &mut b, hp_after(2), 0);
     for packets in &second {
-        assert_eq!(hp_values(packets), vec![100]);
+        assert_eq!(hp_values(packets), vec![hp_after(2)]);
     }
     let _ = collect(&mut a, &mut b, Duration::from_millis(500));
     interest_cast(&mut b);
@@ -1085,7 +1118,7 @@ fn interest_respawn_and_range(f: &Fixture, a: &mut bot::Bot, b: &mut bot::Bot) {
     for i in 0..2 {
         respawn[i].extend(tail[i].clone());
         assert_eq!(actor_packets(&respawn[i], 2, E), 1);
-        assert_eq!(hp_values(&respawn[i]), vec![300]);
+        assert_eq!(hp_values(&respawn[i]), vec![hp_full()]);
     }
     // Second engagement: B leaves while E lives, then returns during death.
     f.host(|s| {
@@ -1095,12 +1128,12 @@ fn interest_respawn_and_range(f: &Fixture, a: &mut bot::Bot, b: &mut bot::Bot) {
     let mut left = [Vec::new(), Vec::new()];
     settle(a, b, &mut left, |l| removals(&l[1], E) >= 1);
     assert_eq!(removals(&left[1], E), 1);
-    assert_eq!(f.host(|s| s.test_field_health(E)), Some(300));
+    assert_eq!(f.host(|s| s.test_field_health(E)), Some(hp_full()));
     assert!(
         f.host(|s| s.test_known_npcs(101)).contains(&E),
         "A lost E before second engagement"
     );
-    for (who, hp) in [(0, 200), (0, 100), (0, 0)] {
+    for (who, hp) in [(0, hp_after(1)), (0, hp_after(2)), (0, 0)] {
         interest_cast(a);
         let delta = interest_committed_result(f, a, b, hp, who);
         assert_eq!(hp_values(&delta[0]), vec![hp]);

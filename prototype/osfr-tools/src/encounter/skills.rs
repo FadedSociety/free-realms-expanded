@@ -155,7 +155,7 @@ impl EncounterEngine {
         let mut out = EncounterOutcome::default();
         let offensive =
             ability.damage_multiplier > 0.0 || ability.effects.iter().any(JobEffect::needs_target);
-        let (basic_range, base) = profile_stats(profile_id, 0);
+        let (basic_range, base) = self.scale.profile_stats(profile_id, 0);
         let range = if ability.range > 0.0 {
             ability.range
         } else {
@@ -235,10 +235,9 @@ impl EncounterEngine {
         }
         if ability.heal > 0 {
             let before = self.state.player_health;
-            // (R) Keep the native-tested 250 at level one, scale by the existing
-            // HP curve at later levels. Healing never revives a knocked-out actor.
-            let heal = (u64::from(ability.heal) * u64::from(level_health(self.job_level))
-                / u64::from(PLAYER_MAX)) as u32;
+            // (R) Heals follow the damage tier ladder (live Triage 254 / 444 / 776 /
+            // 1357 / 2372, Damage Scale.md Q3). Healing never revives a knocked-out actor.
+            let heal = (ability.heal as f32 * self.damage_scale).round() as u32;
             self.state.player_health = before.saturating_add(heal).min(self.max_health);
             let healed = (self.state.player_health - before) as i32;
             self.log_fight(now_ms, "heal", "you", "you", i64::from(healed));

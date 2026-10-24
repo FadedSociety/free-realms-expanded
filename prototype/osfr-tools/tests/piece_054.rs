@@ -73,26 +73,12 @@ fn production_melee_reach_is_still_the_reviewed_three_units() {
     // reviewed melee reach is widened, if the ranged kits are folded into it, or
     // if the far-hit and repeat gates disappear.
     let encounter = normalized(include_str!("../src/encounter.rs"));
-    for row in [
-        "2 => (3.0, 100)",
-        "11 => (3.0, 75)",
-        "32 => (3.0, 110)",
-        "43 => (3.0, 100)",
-        "_ => (3.0, 70)",
-    ] {
-        assert!(
-            encounter.contains(row),
-            "production melee profile row {row:?} changed"
-        );
-    }
+    // Reach is code; damage per job moved to `combat_scale.json` (T639), so only
+    // the reach rows are pinned here: melee 3.0 for every job but the two ranged kits.
+    let scale = normalized(include_str!("../src/encounter/combat_scale.rs"));
     assert!(
-        encounter.contains("35 => (30.0, 80)"),
-        "the Archer ranged kit was folded into melee"
-    );
-    assert!(
-        // Wizard base damage raised 90 -> 130 by the owner's job design (2026-10-15).
-        encounter.contains("12 => (20.0, 130)"),
-        "the Wizard ranged kit was folded into melee"
+        scale.contains("35 => 30.0, 12 => 20.0, _ => 3.0,"),
+        "the Archer or Wizard ranged kit was folded into melee, or the melee reach changed"
     );
     assert!(
         encounter.contains("distance(position, s.position) > range"),

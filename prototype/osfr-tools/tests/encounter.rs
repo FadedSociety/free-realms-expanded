@@ -10,6 +10,9 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
+
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 struct Fixture(PathBuf);
 impl Drop for Fixture {
@@ -39,7 +42,7 @@ impl Fixture {
         let c = json!({"schema_version":1,"template_file":"npc.bin","template_sha256":format!("{:x}",Sha256::digest(t)),
             "world":zone(0,"SyntheticWorld"),"world_enemies":[actor(100_u64,400,100,1000,vec![7]),actor(101_u64,400,100,10,vec![7])],
             "dungeons":[{"id":411,"title_id":12,"description_id":13,"objective_id":14,"zone":zone(411,"SyntheticCave"),
-                "guide":actor(200_u64,0,1000,0,vec![]),"enemies":[actor(201_u64,500,140,1000,vec![])],"reward_coins":50,"reward_items":[[1195,1]]}]});
+                "guide":actor(200_u64,0,1000,0,vec![]),"enemies":[actor(201_u64,500,100,1000,vec![])],"reward_coins":50,"reward_items":[[1195,1]]}]});
         fs::write(dir.join("encounters.json"), serde_json::to_vec(&c).unwrap()).unwrap();
         Self(dir)
     }
@@ -221,7 +224,7 @@ fn loss_hides_only_surviving_boss_displays_and_retry_registers_them_again() {
     assert_eq!(restored.state(), &saved);
     let retry = restored.retry(43, 3000).unwrap();
     assert!(retry.changed && retry.rewards.is_empty() && retry.zoning.is_some());
-    assert_eq!(restored.state().player_health, 1000);
+    assert_eq!(restored.state().player_health, combat_scale::base_health());
     assert_eq!(
         restored.state().active.as_ref().unwrap().phase,
         EncounterPhase::Loading
@@ -272,7 +275,9 @@ fn terminal_results_wait_for_native_close_and_remove_ack_never_returns_to_world(
             .rewards
             .is_empty()
     );
-    let exit = e.handle(&close_packet(0, 1), 1, [0.0; 3], 43, 10002).unwrap();
+    let exit = e
+        .handle(&close_packet(0, 1), 1, [0.0; 3], 43, 10002)
+        .unwrap();
     assert_eq!(exit.completed, Some(411));
     assert_eq!(exit.zoning.as_ref().unwrap().position, location().position);
     assert!(results_lifecycle(&exit).is_empty()); // The same native state is removed only once.
@@ -343,7 +348,9 @@ fn loss_presents_results_without_zoning_and_retry_resets_presentation() {
     start(&mut e, 200, [0.0; 3], 1000);
     let again = e.tick([0.0; 3], 43, 1100).unwrap();
     assert_eq!(results_lifecycle(&again), [18, 47, 19]);
-    let exit = e.handle(&close_packet(0, 1), 1, [0.0; 3], 43, 1200).unwrap();
+    let exit = e
+        .handle(&close_packet(0, 1), 1, [0.0; 3], 43, 1200)
+        .unwrap();
     assert!(exit.zoning.is_some() && exit.completed.is_none() && exit.rewards.is_empty());
     assert!(results_lifecycle(&exit).is_empty());
 }
@@ -372,13 +379,28 @@ fn native_bar_one_self_centered_basic_resolves_only_a_live_enemy_in_reach() {
         );
     }
     assert!(!e.tick([0.0; 3], 43, 2000).unwrap().changed); // Invalid casts never arm.
-    assert!(e.handle(&packet(1, 0), 1, [0.0; 3], 43, 2100).unwrap().changed);
-    assert_eq!(e.state().active.as_ref().unwrap().enemies[0].health, 40);
-    assert!(!e.handle(&packet(1, 0), 1, [0.0; 3], 43, 2699).unwrap().changed);
+    assert!(
+        e.handle(&packet(1, 0), 1, [0.0; 3], 43, 2100)
+            .unwrap()
+            .changed
+    );
+    assert_eq!(
+        e.state().active.as_ref().unwrap().enemies[0].health,
+        combat_scale::enemy_health(100) - combat_scale::basic(43)
+    );
+    assert!(
+        !e.handle(&packet(1, 0), 1, [0.0; 3], 43, 2699)
+            .unwrap()
+            .changed
+    );
     let win = e.handle(&packet(1, 0), 1, [0.0; 3], 43, 2700).unwrap();
     assert_eq!(win.defeated, vec![500]);
     assert_eq!(win.rewards.len(), 1);
-    assert!(!e.handle(&packet(1, 0), 1, [0.0; 3], 43, 4000).unwrap().changed);
+    assert!(
+        !e.handle(&packet(1, 0), 1, [0.0; 3], 43, 4000)
+            .unwrap()
+            .changed
+    );
 }
 
 /// Build Plan 1.6: a second character (GUID 2) can stand in the world and its
@@ -387,7 +409,10 @@ fn native_bar_one_self_centered_basic_resolves_only_a_live_enemy_in_reach() {
 fn any_character_guid_may_load_and_basic_attack() {
     let f = Fixture::new();
     let mut e = f.load();
-    let second = CharacterState { guid: 2, ..location() };
+    let second = CharacterState {
+        guid: 2,
+        ..location()
+    };
     assert!(e.supports_location(&second));
     e.begin(411, second, 43).unwrap();
     e.on_zone_ready(43, 0).unwrap();
@@ -559,12 +584,12 @@ fn ai_is_bounded_loss_retry_and_far_attacks_do_not_award() {
         e.state().active.as_ref().unwrap().phase,
         EncounterPhase::Loading
     );
-    assert_eq!(e.state().player_health, 1000);
+    assert_eq!(e.state().player_health, combat_scale::base_health());
     assert!(e.state().rewarded.is_empty());
     e.on_zone_ready(1, 2000).unwrap();
     assert!(!e.tick([0.0; 3], 1, 2001).unwrap().changed);
     assert!(!e.tick([0.0; 3], 1, 5000).unwrap().changed);
-    assert_eq!(e.state().player_health, 1000);
+    assert_eq!(e.state().player_health, combat_scale::base_health());
 }
 
 #[test]
@@ -600,12 +625,12 @@ fn melee_requires_contact_and_enemy_motion_attacks_have_native_animation() {
             && p[12..16] == 3_i32.to_le_bytes()
             && p[20] == 1)
     );
-    assert_eq!(e.state().player_health, 1000);
+    assert_eq!(e.state().player_health, combat_scale::base_health());
     let attack = e.tick([4.75, 0.0, 0.0], 43, 1100).unwrap();
     assert!(attack.replies.iter().any(|p| p.starts_with(&[35, 0, 8, 0])
         && p[12..16] == 1001_i32.to_le_bytes()
         && p[20] == 0));
-    assert_eq!(e.state().player_health, 0); // Fixture's attack deals 1000 only at contact.
+    assert_eq!(e.state().player_health, 0); // Fixture's attack kills only at contact.
 }
 
 #[test]
@@ -624,11 +649,13 @@ fn pursuer_reaches_real_scale_contact_without_rounding_stall_and_stops_after_agg
     for now in (100..=2000).step_by(100) {
         e.tick(player, 43, now).unwrap();
     }
-    assert_eq!(e.state().player_health, 980);
+    let hit = combat_scale::enemy_damage(20);
+    let full = combat_scale::base_health();
+    assert_eq!(e.state().player_health, full - hit);
     e.tick(player, 43, 2100).unwrap();
-    assert_eq!(e.state().player_health, 980); // Update frequency does not increase attack rate.
+    assert_eq!(e.state().player_health, full - hit); // Update frequency does not increase attack rate.
     e.tick(player, 43, 2200).unwrap();
-    assert_eq!(e.state().player_health, 960);
+    assert_eq!(e.state().player_health, full - 2 * hit);
     e.tick([300.0, 28.0, 289.0], 43, 2300).unwrap();
     let disengage = e.tick([1000.0, 28.0, 289.0], 43, 2400).unwrap();
     assert!(

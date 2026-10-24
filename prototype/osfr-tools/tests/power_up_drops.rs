@@ -100,7 +100,7 @@ impl Fixture {
     fn load(&self) -> EncounterEngine {
         self.engine(None)
     }
-    /// The player starts at `health` of 1000.
+    /// The player starts at `health` of the 500 base maximum.
     fn load_hurt(&self, health: u32) -> EncounterEngine {
         let mut state = self.engine(None).state().clone();
         state.player_health = health;
@@ -267,18 +267,18 @@ fn an_unloaded_engine_drops_nothing() {
 #[test]
 fn walking_onto_the_big_heart_heals_from_the_server_position_and_asks_for_the_group() {
     let f = Fixture::new(&[Some("boss")]);
-    let mut e = f.load_hurt(400);
+    let mut e = f.load_hurt(100);
     let pickup = pickups(&kill(&mut e, FIRST, 1_000))[0];
     // A player far away collects nothing, whatever the client might claim.
     let far = e.tick(FAR, 11, 1_200).unwrap();
     assert!(removed(&far).is_empty() && health(&far).is_none());
     let near = e.tick(SPOT, 11, 1_400).unwrap();
     assert_eq!(removed(&near), [pickup]);
-    assert_eq!(health(&near), Some((900, 1000)), "50% of max health");
-    assert_eq!(heal_numbers(&near), [500]);
+    assert_eq!(health(&near), Some((350, 500)), "50% of max health");
+    assert_eq!(heal_numbers(&near), [250]);
     assert_eq!(near.group_heal.map(|g| g.percent), Some(50));
     assert!(near.changed, "health is saved, so the outcome is changed");
-    assert_eq!(e.player_health().0, 900);
+    assert_eq!(e.player_health().0, 350);
     let again = e.tick(SPOT, 11, 1_600).unwrap();
     assert!(removed(&again).is_empty() && again.group_heal.is_none());
 }
@@ -286,10 +286,10 @@ fn walking_onto_the_big_heart_heals_from_the_server_position_and_asks_for_the_gr
 #[test]
 fn the_small_heart_heals_only_the_player() {
     let f = Fixture::new(&[Some("t_small")]);
-    let mut e = f.load_hurt(400);
+    let mut e = f.load_hurt(100);
     kill(&mut e, FIRST, 1_000);
     let out = e.tick(SPOT, 11, 1_200).unwrap();
-    assert_eq!(health(&out), Some((550, 1000)), "15% of max health");
+    assert_eq!(health(&out), Some((175, 500)), "15% of max health");
     assert!(out.group_heal.is_none());
 }
 
@@ -312,7 +312,7 @@ fn energy_pickup_adds_energy_up_to_the_bar() {
 #[test]
 fn only_one_stored_kind_is_held_and_a_refused_pickup_stays_on_the_ground() {
     let f = Fixture::new(&[Some("t_flame"), Some("t_shield"), Some("t_small")]);
-    let mut e = f.load_hurt(400);
+    let mut e = f.load_hurt(100);
     let first = pickups(&kill(&mut e, FIRST, 1_000))[0];
     let taken = e.tick(SPOT, 11, 1_200).unwrap();
     assert_eq!(removed(&taken), [first]);
@@ -331,7 +331,7 @@ fn only_one_stored_kind_is_held_and_a_refused_pickup_stays_on_the_ground() {
     // Automatic kinds never need the slot, even while one is held.
     kill(&mut e, FIRST + 2, 3_000);
     let heart = e.tick(SPOT, 11, 3_200).unwrap();
-    assert_eq!(health(&heart), Some((550, 1000)));
+    assert_eq!(health(&heart), Some((175, 500)));
     assert_eq!(e.held_power_up(), Some("flame_wave"));
 }
 
@@ -339,7 +339,7 @@ fn only_one_stored_kind_is_held_and_a_refused_pickup_stays_on_the_ground() {
 fn unclaimed_pickups_despawn_after_the_ttl_and_cannot_be_taken_late() {
     let f = Fixture::new(&[Some("boss")]);
     let ttl = u64::from(PowerUps::load(f.path()).unwrap().pickup.ttl_ms);
-    let mut e = f.load_hurt(400);
+    let mut e = f.load_hurt(100);
     let pickup = pickups(&kill(&mut e, FIRST, 1_000))[0];
     let early = e.tick(FAR, 11, 1_000 + ttl - 1).unwrap();
     assert!(removed(&early).is_empty());
@@ -388,7 +388,7 @@ fn zoning_clears_pickups_but_not_the_held_power_up() {
 #[test]
 fn an_instance_bind_discards_ground_pickups_but_not_the_held_power_up() {
     let f = Fixture::new(&[Some("t_flame"), Some("boss")]);
-    let mut e = f.load_hurt(400);
+    let mut e = f.load_hurt(100);
     e.enter_zone(0);
     // A first drop is picked up; the held kind is player state.
     let first = pickups(&kill(&mut e, FIRST, 1_000))[0];
@@ -424,7 +424,7 @@ fn a_revive_or_same_instance_transfer_reload_discards_ground_pickups() {
     // current instance both send opcode 31 (reader 0x008e4ae0) with the same
     // world instance: the client reloads its scene, so the old drop is gone.
     let f = Fixture::new(&[Some("boss")]);
-    let mut e = f.load_hurt(400);
+    let mut e = f.load_hurt(100);
     e.enter_zone(0);
     kill(&mut e, FIRST, 1_000);
     assert_eq!(e.pickup_count(), 1);
@@ -527,7 +527,7 @@ fn hit(
 
 #[test]
 fn every_participant_gets_their_own_pickup_and_nobody_sees_anothers() {
-    let f = Fixture::sized(&[Some("boss")], 150);
+    let f = Fixture::sized(&[Some("boss")], 100);
     let mut s = shared(&f);
     let first = hit(&mut s.a, &mut s.field, A, FIRST, 0);
     assert!(spawned(&first).is_empty(), "no kill yet");
@@ -568,7 +568,7 @@ fn pickups_in(p: &[u8]) -> bool {
 
 #[test]
 fn a_bystander_who_never_hit_the_enemy_gets_nothing() {
-    let f = Fixture::sized(&[Some("boss")], 150);
+    let f = Fixture::sized(&[Some("boss")], 100);
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     hit(&mut s.b, &mut s.field, B, FIRST, 100);
@@ -580,7 +580,7 @@ fn a_bystander_who_never_hit_the_enemy_gets_nothing() {
 
 #[test]
 fn only_recent_damage_counts_as_taking_part() {
-    let f = Fixture::sized(&[Some("boss")], 150);
+    let f = Fixture::sized(&[Some("boss")], 100);
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     // The shipped window is 30 s; B's kill lands at 31 s.
@@ -593,7 +593,7 @@ fn only_recent_damage_counts_as_taking_part() {
 
 #[test]
 fn a_participant_who_left_the_field_loses_the_drop() {
-    let f = Fixture::sized(&[Some("boss")], 150);
+    let f = Fixture::sized(&[Some("boss")], 100);
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     hit(&mut s.b, &mut s.field, B, FIRST, 100);
@@ -607,7 +607,7 @@ fn a_participant_who_left_the_field_loses_the_drop() {
 
 #[test]
 fn an_unclaimed_drop_lapses() {
-    let f = Fixture::sized(&[Some("boss")], 150);
+    let f = Fixture::sized(&[Some("boss")], 100);
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     hit(&mut s.b, &mut s.field, B, FIRST, 100);
@@ -619,7 +619,7 @@ fn an_unclaimed_drop_lapses() {
 fn the_group_multiplier_thins_shared_rolls_but_not_solo_ones_or_guaranteed_ones() {
     const N: usize = 60;
     let tables = vec![Some("t_roll"); N];
-    let f = Fixture::sized(&tables, 150);
+    let f = Fixture::sized(&tables, 100);
     f.edit_power_ups(|file| {
         file["participation"]["group_chance_multiplier"] = json!(0.05);
     });
@@ -653,7 +653,7 @@ fn the_group_multiplier_thins_shared_rolls_but_not_solo_ones_or_guaranteed_ones(
         "two participants thin the chance: {shared_drops} of 120 rolls"
     );
     // Guaranteed drops are not scaled.
-    let g = Fixture::sized(&[Some("boss")], 150);
+    let g = Fixture::sized(&[Some("boss")], 100);
     g.edit_power_ups(|file| file["participation"]["group_chance_multiplier"] = json!(0.05));
     let mut s = shared(&g);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
@@ -734,7 +734,7 @@ fn pickups_do_not_follow_the_player_into_another_zone() {
 
 #[test]
 fn big_hearts_from_one_kill_share_a_kill_key_so_the_group_heals_once() {
-    let f = Fixture::sized(&[Some("boss"), Some("boss")], 150);
+    let f = Fixture::sized(&[Some("boss"), Some("boss")], 100);
     let mut s = shared(&f);
     hit(&mut s.a, &mut s.field, A, FIRST, 0);
     hit(&mut s.b, &mut s.field, B, FIRST, 100);
@@ -753,13 +753,13 @@ fn big_hearts_from_one_kill_share_a_kill_key_so_the_group_heals_once() {
 #[test]
 fn a_group_heal_restores_a_hurt_member_and_is_silent_at_full_health() {
     let f = Fixture::new(&[]);
-    let mut hurt = f.load_hurt(400);
+    let mut hurt = f.load_hurt(100);
     let out = hurt.receive_group_heal(50);
-    assert_eq!(health(&out), Some((900, 1000)));
-    assert_eq!(heal_numbers(&out), [500]);
+    assert_eq!(health(&out), Some((350, 500)));
+    assert_eq!(heal_numbers(&out), [250]);
     assert!(out.changed);
     let again = hurt.receive_group_heal(50);
-    assert_eq!(health(&again), Some((1000, 1000)));
+    assert_eq!(health(&again), Some((500, 500)));
     let full = hurt.receive_group_heal(50);
     assert!(full.replies.is_empty() && !full.changed);
 }

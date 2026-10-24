@@ -25,6 +25,8 @@ use std::{
     time::{Duration, Instant},
 };
 
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
 #[path = "common/field_reward_fixture.rs"]
 mod field_reward_fixture;
 #[path = "common/group_invite_wire.rs"]
@@ -2678,7 +2680,11 @@ fn one_players_disconnect_or_bad_packet_does_not_stop_the_other() {
     let a_coins = saved_coins(&temp, 2);
     let a_quests = saved_quest_state(&temp, 2);
     let field_before = server.test_field_health(T335_WOLF_TWO);
-    assert_eq!(field_before, Some(200), "the wolf starts at full health");
+    assert_eq!(
+        field_before,
+        Some(combat_scale::enemy_health(200)),
+        "the wolf starts at full health"
+    );
     let mut bad = vec![10, 0];
     for value in [1i32, 0, 2] {
         bad.extend(value.to_le_bytes());

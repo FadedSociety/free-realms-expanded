@@ -26,6 +26,8 @@
 
 #[path = "support/npc_quest_chain.rs"]
 mod chain;
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
 
 use chain::{
     CHARACTER, Fixture, accept, character_at_for, content_dir, content_position, counts, interact,
@@ -354,8 +356,8 @@ fn attack(
 
 #[test]
 fn a_shared_field_kill_moves_the_killers_and_the_contributors_pin() {
-    // Two Brawlers four wolves into "Fighting the Pack" share one 200 HP wolf: B hits,
-    // A lands the lethal swing (credited in A's request), B is credited on its tick.
+    // Two Brawlers four wolves into "Fighting the Pack" share one wolf: B hits, A lands the
+    // lethal swing (credited in A's request), B is credited on its tick.
     let (a_guid, b_guid) = (101, 202);
     let fixture = Fixture::for_character(a_guid).with_field_enemies(&[synthetic_wolf()]);
     let a_at = character_at_for(a_guid, 0, [1.0, 0.0, 0.0]);
@@ -390,7 +392,27 @@ fn a_shared_field_kill_moves_the_killers_and_the_contributors_pin() {
         pins(&hit).is_empty(),
         "a hit that credits nothing keeps the pin"
     );
-    let killed = attack(&mut a, &mut field, &a_at, &known, 200);
+    // A swings until the wolf falls; a swing that does not kill credits nothing. The
+    // bound is the hits its live-scale health needs, so tuning the scale keeps the story.
+    let hits = combat_scale::enemy_health(200).div_ceil(combat_scale::strike(BRAWLER, 1)) + 1;
+    let mut now = 200;
+    let mut killed = attack(&mut a, &mut field, &a_at, &known, now);
+    for _ in 1..hits {
+        if field.health(WOLF_GUID) == Some(0) {
+            break;
+        }
+        assert!(
+            pins(&killed).is_empty(),
+            "a swing that credits nothing keeps the pin"
+        );
+        now += 700;
+        killed = attack(&mut a, &mut field, &a_at, &known, now);
+    }
+    assert_eq!(
+        field.health(WOLF_GUID),
+        Some(0),
+        "A kills the wolf within the bound"
+    );
     assert_eq!(counts(&a, PACK), [5, 0]);
     assert_eq!(
         pins(&killed),
@@ -398,10 +420,10 @@ fn a_shared_field_kill_moves_the_killers_and_the_contributors_pin() {
         "the killer's own request"
     );
 
-    let claimed = b.tick_shared_effects(&mut field, &b_at, 300).unwrap();
+    let claimed = b.tick_shared_effects(&mut field, &b_at, now + 100).unwrap();
     assert_eq!(counts(&b, PACK), [5, 0]);
     assert_eq!(pins(&claimed), vec![giver], "the contributor's shared tick");
-    let idle = b.tick_shared_effects(&mut field, &b_at, 400).unwrap();
+    let idle = b.tick_shared_effects(&mut field, &b_at, now + 200).unwrap();
     assert!(pins(&idle).is_empty());
 }
 

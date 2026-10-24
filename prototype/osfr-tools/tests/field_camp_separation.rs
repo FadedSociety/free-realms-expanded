@@ -17,6 +17,8 @@ use osfr_tools::encounter::EncounterEngine;
 use serde_json::Value;
 use std::fs;
 
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
 #[path = "common/field_camp_centres.rs"]
 mod field_camp_centres;
 #[path = "common/field_enemy_fixture.rs"]
@@ -224,7 +226,8 @@ fn a_level_three_player_at_each_starter_camp_is_hit_only_by_its_own_band() {
     let fixture = RewardFixture::new(Vec::new());
     fixture.write_field(&field);
     // Starter rows are levels 1-3, weapon tier 1, so their hit is the authored
-    // damage times the player's mitigation; a level-4 row would change that.
+    // damage on the live scale times the player's mitigation; a level-4 row would
+    // change that.
     let starter: Vec<(u64, f32)> = field["enemies"]
         .as_array()
         .unwrap()
@@ -238,7 +241,7 @@ fn a_level_three_player_at_each_starter_camp_is_hit_only_by_its_own_band() {
             assert!(row["level"].as_u64().unwrap() <= 3, "{row}");
             (
                 row["guid"].as_u64().unwrap(),
-                row["damage"].as_f64().unwrap() as f32,
+                combat_scale::enemy_damage(row["damage"].as_u64().unwrap() as u32) as f32,
             )
         })
         .collect();

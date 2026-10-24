@@ -53,6 +53,8 @@ use std::{
     fs,
 };
 
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
 #[path = "common/content_copy.rs"]
 mod content_copy;
 #[path = "common/field_battle_fixture.rs"]
@@ -91,10 +93,15 @@ const BOSS_BASE_HEALTH: u32 = 320;
 const BOSS_BASE_DAMAGE: u32 = 22;
 const BANDIT_BASE_HEALTH: u32 = 160;
 const BANDIT_BASE_DAMAGE: u32 = 12;
-/// The loader's difficulty-4 factor is `level_health(9) / 1000 = 3063 / 1000`;
-/// the live arena health is the authored baseline times that factor.
-const BOSS_LIVE_HEALTH: u32 = 980;
-const BANDIT_LIVE_HEALTH: u32 = 490;
+/// The loader's difficulty-4 factor is the level-9 health growth; the live
+/// arena health is the authored baseline times that factor and the combat
+/// scale's enemy health scale.
+fn boss_live_health() -> u32 {
+    combat_scale::enemy_health_at(BOSS_BASE_HEALTH, 9)
+}
+fn bandit_live_health() -> u32 {
+    combat_scale::enemy_health_at(BANDIT_BASE_HEALTH, 9)
+}
 const NAMEPLATE: i32 = 11970;
 /// Images.txt 660: icon_ui_combatstart_panelgraphic_bandithideout.dds.
 const BATTLE_ICON: i32 = 660;
@@ -351,11 +358,11 @@ fn level_nine_starts_the_battle() {
     assert_eq!(
         health,
         [
-            BOSS_LIVE_HEALTH,
-            BANDIT_LIVE_HEALTH,
-            BANDIT_LIVE_HEALTH,
-            BANDIT_LIVE_HEALTH,
-            BANDIT_LIVE_HEALTH
+            boss_live_health(),
+            bandit_live_health(),
+            bandit_live_health(),
+            bandit_live_health(),
+            bandit_live_health()
         ],
         "the loader scales the authored baseline once"
     );

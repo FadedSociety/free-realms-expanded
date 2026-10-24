@@ -1,3 +1,6 @@
+#[path = "common/content_copy.rs"]
+mod content_copy;
+
 use osfr_tools::enemies::{EnemyEngine, EnemyMode, ZoneInstanceKey};
 use osfr_tools::{
     abilities::{
@@ -354,6 +357,22 @@ fn opening_wolf_messages_match_encounter_engine_byte_for_byte() {
     let lab_content = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../../lab/references/opening-journal-text-v2/content");
     assert!(lab_content.join("encounters.json").is_file());
+    // This proves the message layout, and `EnemyEngine` keeps its own unscaled numbers, so
+    // the encounter engine runs on the identity scale (its content directory's own
+    // `combat_scale.json` wins over the bundled one).
+    let scratch = std::env::temp_dir().join(format!("osfr-enemies-scale-{}", std::process::id()));
+    content_copy::copy_tree(&lab_content, &scratch);
+    let mut scale: Value =
+        serde_json::from_slice(&fs::read(project_content.join("combat_scale.json")).unwrap())
+            .unwrap();
+    scale["player_base_health"] = json!(1000);
+    scale["enemy_health_scale"] = json!(1.0);
+    scale["enemy_damage_scale"] = json!(1.0);
+    fs::write(
+        scratch.join("combat_scale.json"),
+        serde_json::to_vec(&scale).unwrap(),
+    )
+    .unwrap();
 
     let key = ZoneInstanceKey {
         zone_id: 0,
@@ -370,12 +389,13 @@ fn opening_wolf_messages_match_encounter_engine_byte_for_byte() {
     )];
     let enemy_messages = enemies.tick(key, &mut players, 100).unwrap().messages;
 
-    let mut encounter = EncounterEngine::load(&lab_content, None).unwrap();
+    let mut encounter = EncounterEngine::load(&scratch, None).unwrap();
     encounter.set_world_stage(STAGE);
     let encounter_messages = encounter
         .tick(players[0].position, 43, 100)
         .unwrap()
         .replies;
+    fs::remove_dir_all(&scratch).unwrap();
     assert_eq!(enemy_messages, encounter_messages);
 }
 

@@ -26,6 +26,9 @@ use std::{
     },
 };
 
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
+
 const FIELD_GUID: u64 = 100;
 const SPAWNER_GUID: u64 = 900;
 const BATTLE_ID: u32 = 96;
@@ -421,11 +424,14 @@ fn chase_stops_in_reach_then_attacks() {
             Frame::Hit {
                 attacker: FIELD_GUID,
                 target: 1,
-                damage: 7,
-                hp: 993,
-                max: 1000,
+                damage: combat_scale::enemy_damage(7),
+                hp: combat_scale::base_health() - combat_scale::enemy_damage(7),
+                max: combat_scale::base_health(),
             },
-            Frame::PlayerHp { hp: 993, max: 1000 },
+            Frame::PlayerHp {
+                hp: combat_scale::base_health() - combat_scale::enemy_damage(7),
+                max: combat_scale::base_health(),
+            },
         ]
     );
     assert!(out.changed);
@@ -492,8 +498,8 @@ fn evade_returns_home_heals_and_stands() {
             },
             Frame::EnemyHp {
                 guid: FIELD_GUID,
-                hp: 1000,
-                max: 1000,
+                hp: combat_scale::enemy_health(1000),
+                max: combat_scale::enemy_health(1000),
             },
         ]
     );

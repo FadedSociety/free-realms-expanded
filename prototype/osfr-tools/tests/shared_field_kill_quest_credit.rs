@@ -24,6 +24,8 @@
 //! (`data/content/quests/adventurer.json`): five `3156` kills from giver
 //! 9000000050, then one Talk to that giver. The field actors are a synthetic
 //! population shared by two sessions, as in `tests/shared_field_state.rs`.
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
 #[path = "support/packets.rs"]
@@ -124,9 +126,21 @@ fn opening_counts(game: &Gameplay) -> Vec<u32> {
         .clone()
 }
 
+/// The authored `max_health` that the live scale turns into `swings` Brawler basic swings
+/// (the last one overkill).
+fn authored_for(swings: u32) -> u32 {
+    combat_scale::authored_for(combat_scale::strike(BRAWLER, 1), swings)
+}
+
+/// The health the loader gives a wolf built for `swings` swings.
+fn scaled(swings: u32) -> u32 {
+    combat_scale::enemy_health(authored_for(swings))
+}
+
 /// A field wolf. `definition_id` is the quest's `defeat`/`model_id` target; 0
 /// is accepted by the content loader (`validate_actor` refuses negatives only).
-fn wolf(guid: u64, definition_id: i32, position: [f32; 3], max_health: u32) -> Value {
+/// `swings` is how many Brawler basic swings kill it.
+fn wolf(guid: u64, definition_id: i32, position: [f32; 3], swings: u32) -> Value {
     json!({
         "guid": guid,
         "definition_id": definition_id,
@@ -135,7 +149,7 @@ fn wolf(guid: u64, definition_id: i32, position: [f32; 3], max_health: u32) -> V
         "name": "Synthetic wolf",
         "texture_alias": "",
         "position": position,
-        "max_health": max_health,
+        "max_health": authored_for(swings),
         "damage": 1,
         "boss": false,
         "level": 1,
@@ -158,7 +172,7 @@ fn five_wolves() -> Vec<Value> {
     ]
     .into_iter()
     .enumerate()
-    .map(|(index, position)| wolf(WOLF_GUID + index as u64, WOLF, position, 100))
+    .map(|(index, position)| wolf(WOLF_GUID + index as u64, WOLF, position, 1))
     .collect()
 }
 
@@ -187,7 +201,7 @@ fn active_quests(guid: u64) -> QuestState {
 
 /// One player's session with an active 3000009 and the opening wolf stage
 /// accepted two goals in, so the next `3156` defeat is the stage's open goal.
-/// `profile` 43 (Brawler) is the quest's job gate and deals 100 per basic swing.
+/// `profile` 43 (Brawler) is the quest's job gate and deals one basic swing (`combat_scale::strike`) per attack.
 fn player(fixture: &Fixture, guid: u64, position: [f32; 3]) -> Gameplay {
     let mut state = Gameplay::load(fixture.path(), None).unwrap().state();
     state.inventory.coins = 0;
@@ -335,8 +349,8 @@ fn the_other_player_in_the_same_field_is_not_credited() {
     // for it. The contributor half of the same kill is covered by
     // `a_contributors_own_quest_advances_once_from_a_shared_field_kill`.
     let fixture = wolf_fixture(&[
-        wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 400),
-        wolf(WOLF_TWO, WOLF, [-2.0, 0.0, 0.0], 100),
+        wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 4),
+        wolf(WOLF_TWO, WOLF, [-2.0, 0.0, 0.0], 1),
     ]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
@@ -348,7 +362,7 @@ fn the_other_player_in_the_same_field_is_not_credited() {
     b.take_shared_fields();
     let known = BTreeSet::from([WOLF_GUID, WOLF_TWO]);
 
-    // A kills the 400 HP wolf alone; B is present but contributes nothing.
+    // A kills the four-swing wolf alone; B is present but contributes nothing.
     let b_before = b.state();
     for now in [0, 700, 1_400, 2_100] {
         attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, now).unwrap();
@@ -405,7 +419,7 @@ fn the_other_player_in_the_same_field_is_not_credited() {
 
 #[test]
 fn a_second_tick_or_close_does_not_double_credit() {
-    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 100)]);
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 1)]);
     let at = [1.0, 0.0, 0.0];
     let character = character_at_for(A, 0, at);
     let mut game = player(&fixture, A, at);
@@ -450,7 +464,7 @@ fn a_second_tick_or_close_does_not_double_credit() {
 fn a_solo_arena_kill_still_credits_and_is_unchanged() {
     // No `take_shared_fields`: the 26/10 basic attack uses the engine's own
     // field copy, the non-shared `strike` path.
-    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 100)]);
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 1)]);
     let at = [1.0, 0.0, 0.0];
     let character = character_at_for(A, 0, at);
     let mut game = player(&fixture, A, at);
@@ -539,7 +553,7 @@ fn the_credit_survives_a_reconnect() {
 fn a_malformed_or_zero_definition_is_ignored() {
     // 0 is a definition id the content loader accepts but no quest can target;
     // the producer skips it, so the kill is not refused and no event is emitted.
-    let fixture = wolf_fixture(&[wolf(WOLF_GUID, 0, [0.0, 0.0, 0.0], 100)]);
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, 0, [0.0, 0.0, 0.0], 1)]);
     let at = [1.0, 0.0, 0.0];
     let character = character_at_for(A, 0, at);
     let mut game = player(&fixture, A, at);
@@ -560,14 +574,14 @@ fn a_malformed_or_zero_definition_is_ignored() {
     // A negative definition is malformed content and is refused at load, so it
     // can never reach the kill event: `OpeningEngine::on_event(Defeat)` and
     // `QuestEvent::KillActorKind` both require a positive id.
-    let bad = wolf_fixture(&[wolf(WOLF_GUID, -1, [0.0, 0.0, 0.0], 100)]);
+    let bad = wolf_fixture(&[wolf(WOLF_GUID, -1, [0.0, 0.0, 0.0], 1)]);
     let error = Gameplay::load(bad.path(), None)
         .err()
         .expect("negative definitions are refused");
     assert_eq!(error.kind(), std::io::ErrorKind::InvalidData);
 
     // A positive definition that is not the quest target is ignored too.
-    let fixture = wolf_fixture(&[wolf(WOLF_GUID, LEVEL_ONE, [0.0, 0.0, 0.0], 100)]);
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, LEVEL_ONE, [0.0, 0.0, 0.0], 1)]);
     let mut game = player(&fixture, A, at);
     let mut field = game.take_shared_fields().unwrap();
     attack(&mut game, &mut field, &character, &known, WOLF_GUID, 0).unwrap();
@@ -585,8 +599,8 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
     // test drives: A's session fails both and its state is unchanged, while B's
     // session in the same field still kills and advances its own quest.
     let fixture = wolf_fixture(&[
-        wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 100),
-        wolf(WOLF_TWO, WOLF, [-2.0, 0.0, 0.0], 100),
+        wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 1),
+        wolf(WOLF_TWO, WOLF, [-2.0, 0.0, 0.0], 1),
     ]);
     let b_at = [-1.0, 0.0, 0.0];
     let b_character = character_at_for(B, 0, b_at);
@@ -626,7 +640,7 @@ fn a_failing_quest_event_for_one_player_does_not_stop_the_other() {
         attack(&mut a, &mut field, &bad, &known, WOLF_GUID, 0).is_err(),
         "A's invalid position is refused"
     );
-    assert_eq!(field.health(WOLF_GUID), Some(100));
+    assert_eq!(field.health(WOLF_GUID), Some(scaled(1)));
     assert_eq!(a.state(), a_before, "A's refused request changed its state");
 
     // A's own accepted kill leaves the unbound stale state untouched.
@@ -653,7 +667,7 @@ fn the_existing_field_and_arena_suites_stay_green() {
     // bytes are also pinned by test 1 here. This test keeps the name's packet
     // contract to the two packets test 1 does not inspect: the 35/8 swing
     // animation and the 32/7 attack result of a shared kill.
-    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 100)]);
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 1)]);
     let at = [1.0, 0.0, 0.0];
     let character = character_at_for(A, 0, at);
     let mut game = player(&fixture, A, at);
@@ -676,7 +690,11 @@ fn the_existing_field_and_arena_suites_stay_green() {
         u64::from_le_bytes(hit[20..28].try_into().unwrap()),
         WOLF_GUID
     );
-    assert_eq!(u32::from_le_bytes(hit[28..32].try_into().unwrap()), 100);
+    // The one-swing wolf has less health than a swing, and the dealt number is clamped to it.
+    assert_eq!(
+        u32::from_le_bytes(hit[28..32].try_into().unwrap()),
+        scaled(1).min(combat_scale::strike(BRAWLER, 1))
+    );
     assert_eq!(u32::from_le_bytes(hit[46..50].try_into().unwrap()), 0);
 }
 
@@ -699,7 +717,7 @@ fn unbound_player(fixture: &Fixture, guid: u64, position: [f32; 3]) -> Gameplay 
 
 #[test]
 fn a_contributors_own_quest_advances_once_from_a_shared_field_kill() {
-    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 2)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
     let a_character = character_at_for(A, 0, a_at);
@@ -710,7 +728,7 @@ fn a_contributors_own_quest_advances_once_from_a_shared_field_kill() {
     b.take_shared_fields();
     let known = BTreeSet::from([WOLF_GUID]);
 
-    // B contributes one 100-damage hit; A lands the lethal 100-damage swing.
+    // B contributes one basic hit; A lands the lethal swing.
     attack(&mut b, &mut field, &b_character, &known, WOLF_GUID, 0).unwrap();
     attack(&mut a, &mut field, &a_character, &known, WOLF_GUID, 100).unwrap();
     assert_eq!(field.health(WOLF_GUID), Some(0));
@@ -773,7 +791,7 @@ fn a_contributors_own_quest_advances_once_from_a_shared_field_kill() {
 
 #[test]
 fn the_credit_pays_the_contributor_reward_and_quest_event_once() {
-    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 2)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
     let a_character = character_at_for(A, 0, a_at);
@@ -824,7 +842,7 @@ fn the_credit_pays_the_contributor_reward_and_quest_event_once() {
 #[test]
 fn an_expired_or_left_field_credit_advances_nothing() {
     // Expiry: the contributor waits past CREDIT_TTL_MS.
-    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 2)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
     let a_character = character_at_for(A, 0, a_at);
@@ -855,7 +873,7 @@ fn an_expired_or_left_field_credit_advances_nothing() {
     );
 
     // Leaving the field: a quest-only credit is dropped by the real prune.
-    let fixture = rewardless_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let fixture = rewardless_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 2)]);
     let mut a = player(&fixture, A, a_at);
     let mut b = player(&fixture, B, b_at);
     let mut field = a.take_shared_fields().unwrap();
@@ -886,7 +904,7 @@ fn a_zero_reward_event_credits_a_contributor_quest() {
     // no `power_up_table`, so `credit_field_kill` sees no drop table and no
     // reward while the definition stays positive. The old early return would
     // leave B without a credit; T302 must still deliver the quest event.
-    let fixture = rewardless_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let fixture = rewardless_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 2)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
     let a_character = character_at_for(A, 0, a_at);
@@ -930,7 +948,7 @@ fn a_zero_or_invalid_definition_is_ignored_without_an_error() {
     // 0 is accepted by the content loader but names no quest target. With no
     // reward table either, the producer's early return still applies and no
     // credit is queued; the kill itself stays server-authoritative.
-    let fixture = rewardless_fixture(&[wolf(WOLF_GUID, 0, [0.0, 0.0, 0.0], 200)]);
+    let fixture = rewardless_fixture(&[wolf(WOLF_GUID, 0, [0.0, 0.0, 0.0], 2)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
     let a_character = character_at_for(A, 0, a_at);
@@ -957,7 +975,7 @@ fn a_zero_or_invalid_definition_is_ignored_without_an_error() {
 
     // A negative definition cannot become a u32 and is refused at content
     // load, before any kill can reach the credit path.
-    let bad = rewardless_fixture(&[wolf(WOLF_GUID, -1, [0.0, 0.0, 0.0], 200)]);
+    let bad = rewardless_fixture(&[wolf(WOLF_GUID, -1, [0.0, 0.0, 0.0], 2)]);
     let error = Gameplay::load(bad.path(), None)
         .err()
         .expect("negative definitions are refused");
@@ -974,7 +992,7 @@ fn a_full_credit_list_drops_the_oldest_and_other_players_continue() {
         .map(|index| {
             let definition = if index == 0 { WOLF } else { LEVEL_ONE };
             // The first wolf takes B's and C's hits before A's lethal swing.
-            let health = if index == 0 { 300 } else { 200 };
+            let health = if index == 0 { 3 } else { 2 };
             wolf(
                 WOLF_GUID + index,
                 definition,
@@ -1073,7 +1091,7 @@ fn a_group_member_who_never_hit_or_engaged_gets_no_credit() {
     // the wolf or became its target. T240's `who` is hitters inside the
     // participation window, the engaged target and the killer; mere
     // co-presence (or group-like membership) is not a contribution.
-    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 2)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
     let d_at = [0.0, 0.0, 1.0];
@@ -1107,7 +1125,7 @@ fn a_player_outside_the_field_instance_gets_no_credit() {
     // The server computes each session's interest set (`known`); an outside
     // player's set never contains this instance's actor, so the request finds
     // no present enemy and records no contribution.
-    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 2)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
     let d_at = [0.0, 0.0, 1.0];
@@ -1134,7 +1152,7 @@ fn a_player_outside_the_field_instance_gets_no_credit() {
     )
     .unwrap();
     assert!(!outside.changed && outside.replies.is_empty());
-    assert_eq!(field.health(WOLF_GUID), Some(200));
+    assert_eq!(field.health(WOLF_GUID), Some(scaled(2)));
     assert_eq!(
         d.state(),
         d_before,
@@ -1167,8 +1185,8 @@ fn a_player_outside_the_field_instance_gets_no_credit() {
 #[test]
 fn a_contributors_opening_defeat_goal_advances_once() {
     let fixture = wolf_fixture(&[
-        wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200),
-        wolf(WOLF_TWO, LEVEL_ONE, [0.0, 0.0, 1.0], 200),
+        wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 2),
+        wolf(WOLF_TWO, LEVEL_ONE, [0.0, 0.0, 1.0], 2),
     ]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
@@ -1207,7 +1225,7 @@ fn a_contributors_opening_defeat_goal_advances_once() {
 
 #[test]
 fn the_killer_and_two_contributors_each_advance_once() {
-    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 300)]);
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 3)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
     let c_at = [0.0, 0.0, 1.0];
@@ -1263,7 +1281,7 @@ fn a_failing_quest_event_for_one_contributor_does_not_change_or_stop_the_other()
     // protected-pass name is historical). B has no bound NPC quest catalogue and
     // an opening stage with no defeat goal: its claim consumes the credit and
     // changes nothing, while C's identical credit still pays.
-    let fixture = rewardless_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 300)]);
+    let fixture = rewardless_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 3)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
     let c_at = [0.0, 0.0, 1.0];
@@ -1317,7 +1335,7 @@ fn a_reward_bearing_credit_advances_a_reconnected_contributor_once() {
     // forfeits it for a departed player (the brief: leaving the field drops it)
     // while the reward pair survives. The protected-pass name predates that
     // split and is kept; this test now pins the reward-only reconnect.
-    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 200)]);
+    let fixture = wolf_fixture(&[wolf(WOLF_GUID, WOLF, [0.0, 0.0, 0.0], 2)]);
     let a_at = [1.0, 0.0, 0.0];
     let b_at = [-1.0, 0.0, 0.0];
     let a_character = character_at_for(A, 0, a_at);
