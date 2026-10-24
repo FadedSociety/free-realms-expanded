@@ -3,6 +3,7 @@
 //! the numbers pinned here are the live ones the note measured (889-based tier
 //! ladder, 500 level-1 health), so a retune of the file moves the helpers.
 use osfr_tools::{
+    character_store::CharacterState,
     encounter::{EncounterEngine, EncounterOutcome},
     opening_abilities::JobAbility,
 };
@@ -75,6 +76,15 @@ impl Fixture {
         .unwrap();
         edit(&mut file);
         fs::write(self.0.join("combat_scale.json"), file.to_string()).unwrap();
+    }
+    /// Add a second world enemy (guid 300, same row as the cave's) so a save holds world enemies.
+    fn world_enemy(&self) {
+        let path = self.0.join("encounters.json");
+        let mut content: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+        let mut actor = content["dungeons"][0]["enemies"][0].clone();
+        actor["guid"] = json!(300);
+        content["world_enemies"] = json!([actor]);
+        fs::write(path, content.to_string()).unwrap();
     }
 }
 
@@ -316,6 +326,47 @@ fn an_invalid_scale_file_refuses_the_load() {
     }
     fs::write(f.0.join("combat_scale.json"), b"not json").unwrap();
     assert!(EncounterEngine::load(&f.0, None).is_err());
+    fs::write(f.0.join("combat_scale.json"), vec![b' '; 17 * 1024]).unwrap();
+    let large = EncounterEngine::load(&f.0, None).err().unwrap();
+    assert!(large.to_string().contains("combat_scale.json"), "{large}");
     f.scale(|_| {}); // canary: the unedited shipped file loads
     assert!(EncounterEngine::load(&f.0, None).is_ok());
+}
+
+#[test]
+fn saved_enemy_health_survives_a_scale_retune_in_both_directions() {
+    let f = Fixture::new(180, 0);
+    f.world_enemy();
+    let mut e = EncounterEngine::load(&f.0, None).unwrap();
+    let home = CharacterState {
+        guid: 1,
+        zone_id: 0,
+        position: [0.0; 3],
+        rotation: [0.0; 3],
+    };
+    e.begin(411, home, 43).unwrap();
+    let mut saved = e.state().clone();
+    let old_max = combat_scale::enemy_health(180);
+    let hurt = 100; // below every retuned max below: kept as it is
+    saved.world_enemies[0].health = hurt;
+    assert_eq!(saved.active.as_ref().unwrap().enemies[0].health, old_max);
+    for (scale, label) in [(2.0_f64, "down"), (8.0, "up")] {
+        f.scale(|v| v["enemy_health_scale"] = json!(scale));
+        let max = (180.0 * scale).round() as u32;
+        let loaded = EncounterEngine::load(&f.0, Some(saved.clone()))
+            .unwrap_or_else(|e| panic!("retune {label}: {e}"));
+        let state = loaded.state();
+        let active = &state.active.as_ref().unwrap().enemies;
+        assert_eq!(state.world_enemies.len() + active.len(), 2);
+        assert_eq!(
+            state.world_enemies[0].health, hurt,
+            "{label}: a hurt enemy keeps its health"
+        );
+        assert_eq!(
+            active[0].health,
+            old_max.min(max),
+            "{label}: a full-health cave enemy is clamped to the new max, never above it"
+        );
+        assert!(active[0].health <= max);
+    }
 }

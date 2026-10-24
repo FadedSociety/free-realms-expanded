@@ -1004,7 +1004,7 @@ impl EncounterEngine {
         {
             return Err(invalid("incompatible encounter state"));
         }
-        validate_enemies(&state.world_enemies, &content.world_enemies)?;
+        restore_enemies(&mut state.world_enemies, &content.world_enemies)?;
         let mut state = state;
         let mut dropped_return = None;
         if state
@@ -1021,7 +1021,7 @@ impl EncounterEngine {
             state.active = None;
             state.player_health = scale.player_base_health();
         }
-        if let Some(a) = &state.active {
+        if let Some(a) = &mut state.active {
             let d = content
                 .dungeons
                 .iter()
@@ -1034,7 +1034,7 @@ impl EncounterEngine {
             {
                 return Err(invalid("invalid encounter return/instance"));
             }
-            validate_enemies(&a.enemies, &d.enemies)?;
+            restore_enemies(&mut a.enemies, &d.enemies)?;
             let cleared = a.enemies.iter().all(|e| e.health == 0);
             if (a.phase == EncounterPhase::Won
                 && (!cleared || !state.rewarded.contains(&d.id) || state.player_health == 0))
@@ -2755,7 +2755,12 @@ fn validate_actor(a: &Actor) -> io::Result<()> {
     }
     Ok(())
 }
-fn validate_enemies(states: &[EnemyState], actors: &[Actor]) -> io::Result<()> {
+/// Saved enemies are absolute health but the scale file is tunable: clamp each to the loaded max
+/// (a full-health enemy stays full when the scale drops), then check the rest.
+fn restore_enemies(states: &mut [EnemyState], actors: &[Actor]) -> io::Result<()> {
+    for (s, a) in states.iter_mut().zip(actors) {
+        s.health = s.health.min(a.max_health);
+    }
     if states.len() != actors.len()
         || states.iter().zip(actors).any(|(s, a)| {
             s.guid != a.guid || s.health > a.max_health || !valid_position(s.position)

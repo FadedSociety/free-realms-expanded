@@ -14,11 +14,40 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "common/combat_scale.rs"]
+mod combat_scale;
+
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 const FIRST: u64 = 100;
 const PICKUP_BASE: u64 = 0x5057_5550_0000_0000;
 const SHIPPED: &str = include_str!("../data/content/power_ups.json");
 const ONE_AT_A_TIME: &str = "You can have one power up active at a time.";
+
+/// The live base maximum health.
+fn base() -> u32 {
+    combat_scale::base_health()
+}
+/// Where the hurt player starts: a fifth of the maximum.
+fn wounded() -> u32 {
+    base() / 5
+}
+/// Health a heart of `percent` of the maximum restores, as the engine rounds it.
+fn gain(percent: u32) -> u32 {
+    base() * percent / 100
+}
+/// Health after one heart of `percent` on the hurt player.
+fn healed(percent: u32) -> u32 {
+    (wounded() + gain(percent)).min(base())
+}
+
+/// The (health, maximum) the client is sent after one heart of `percent`.
+fn hp(percent: u32) -> (i32, i32) {
+    (healed(percent) as i32, base() as i32)
+}
+/// The heal number the client is sent for it.
+fn restored(percent: u32) -> i32 {
+    (healed(percent) - wounded()) as i32
+}
 
 /// One synthetic field enemy per table, all at the origin with 1 health.
 struct Fixture(PathBuf);
@@ -100,7 +129,7 @@ impl Fixture {
     fn load(&self) -> EncounterEngine {
         self.engine(None)
     }
-    /// The player starts at `health` of the 500 base maximum.
+    /// The player starts at `health` of the base maximum.
     fn load_hurt(&self, health: u32) -> EncounterEngine {
         let mut state = self.engine(None).state().clone();
         state.player_health = health;
@@ -267,18 +296,18 @@ fn an_unloaded_engine_drops_nothing() {
 #[test]
 fn walking_onto_the_big_heart_heals_from_the_server_position_and_asks_for_the_group() {
     let f = Fixture::new(&[Some("boss")]);
-    let mut e = f.load_hurt(100);
+    let mut e = f.load_hurt(wounded());
     let pickup = pickups(&kill(&mut e, FIRST, 1_000))[0];
     // A player far away collects nothing, whatever the client might claim.
     let far = e.tick(FAR, 11, 1_200).unwrap();
     assert!(removed(&far).is_empty() && health(&far).is_none());
     let near = e.tick(SPOT, 11, 1_400).unwrap();
     assert_eq!(removed(&near), [pickup]);
-    assert_eq!(health(&near), Some((350, 500)), "50% of max health");
-    assert_eq!(heal_numbers(&near), [250]);
+    assert_eq!(health(&near), Some(hp(50)), "50% of max health");
+    assert_eq!(heal_numbers(&near), [restored(50)]);
     assert_eq!(near.group_heal.map(|g| g.percent), Some(50));
     assert!(near.changed, "health is saved, so the outcome is changed");
-    assert_eq!(e.player_health().0, 350);
+    assert_eq!(e.player_health().0, healed(50));
     let again = e.tick(SPOT, 11, 1_600).unwrap();
     assert!(removed(&again).is_empty() && again.group_heal.is_none());
 }
@@ -286,10 +315,10 @@ fn walking_onto_the_big_heart_heals_from_the_server_position_and_asks_for_the_gr
 #[test]
 fn the_small_heart_heals_only_the_player() {
     let f = Fixture::new(&[Some("t_small")]);
-    let mut e = f.load_hurt(100);
+    let mut e = f.load_hurt(wounded());
     kill(&mut e, FIRST, 1_000);
     let out = e.tick(SPOT, 11, 1_200).unwrap();
-    assert_eq!(health(&out), Some((175, 500)), "15% of max health");
+    assert_eq!(health(&out), Some(hp(15)), "15% of max health");
     assert!(out.group_heal.is_none());
 }
 
@@ -312,7 +341,7 @@ fn energy_pickup_adds_energy_up_to_the_bar() {
 #[test]
 fn only_one_stored_kind_is_held_and_a_refused_pickup_stays_on_the_ground() {
     let f = Fixture::new(&[Some("t_flame"), Some("t_shield"), Some("t_small")]);
-    let mut e = f.load_hurt(100);
+    let mut e = f.load_hurt(wounded());
     let first = pickups(&kill(&mut e, FIRST, 1_000))[0];
     let taken = e.tick(SPOT, 11, 1_200).unwrap();
     assert_eq!(removed(&taken), [first]);
@@ -331,7 +360,7 @@ fn only_one_stored_kind_is_held_and_a_refused_pickup_stays_on_the_ground() {
     // Automatic kinds never need the slot, even while one is held.
     kill(&mut e, FIRST + 2, 3_000);
     let heart = e.tick(SPOT, 11, 3_200).unwrap();
-    assert_eq!(health(&heart), Some((175, 500)));
+    assert_eq!(health(&heart), Some(hp(15)));
     assert_eq!(e.held_power_up(), Some("flame_wave"));
 }
 
@@ -339,7 +368,7 @@ fn only_one_stored_kind_is_held_and_a_refused_pickup_stays_on_the_ground() {
 fn unclaimed_pickups_despawn_after_the_ttl_and_cannot_be_taken_late() {
     let f = Fixture::new(&[Some("boss")]);
     let ttl = u64::from(PowerUps::load(f.path()).unwrap().pickup.ttl_ms);
-    let mut e = f.load_hurt(100);
+    let mut e = f.load_hurt(wounded());
     let pickup = pickups(&kill(&mut e, FIRST, 1_000))[0];
     let early = e.tick(FAR, 11, 1_000 + ttl - 1).unwrap();
     assert!(removed(&early).is_empty());
@@ -388,7 +417,7 @@ fn zoning_clears_pickups_but_not_the_held_power_up() {
 #[test]
 fn an_instance_bind_discards_ground_pickups_but_not_the_held_power_up() {
     let f = Fixture::new(&[Some("t_flame"), Some("boss")]);
-    let mut e = f.load_hurt(100);
+    let mut e = f.load_hurt(wounded());
     e.enter_zone(0);
     // A first drop is picked up; the held kind is player state.
     let first = pickups(&kill(&mut e, FIRST, 1_000))[0];
@@ -424,7 +453,7 @@ fn a_revive_or_same_instance_transfer_reload_discards_ground_pickups() {
     // current instance both send opcode 31 (reader 0x008e4ae0) with the same
     // world instance: the client reloads its scene, so the old drop is gone.
     let f = Fixture::new(&[Some("boss")]);
-    let mut e = f.load_hurt(100);
+    let mut e = f.load_hurt(wounded());
     e.enter_zone(0);
     kill(&mut e, FIRST, 1_000);
     assert_eq!(e.pickup_count(), 1);
@@ -753,13 +782,13 @@ fn big_hearts_from_one_kill_share_a_kill_key_so_the_group_heals_once() {
 #[test]
 fn a_group_heal_restores_a_hurt_member_and_is_silent_at_full_health() {
     let f = Fixture::new(&[]);
-    let mut hurt = f.load_hurt(100);
+    let mut hurt = f.load_hurt(wounded());
     let out = hurt.receive_group_heal(50);
-    assert_eq!(health(&out), Some((350, 500)));
-    assert_eq!(heal_numbers(&out), [250]);
+    assert_eq!(health(&out), Some(hp(50)));
+    assert_eq!(heal_numbers(&out), [restored(50)]);
     assert!(out.changed);
     let again = hurt.receive_group_heal(50);
-    assert_eq!(health(&again), Some((500, 500)));
+    assert_eq!(health(&again), Some((base() as i32, base() as i32)));
     let full = hurt.receive_group_heal(50);
     assert!(full.replies.is_empty() && !full.changed);
 }

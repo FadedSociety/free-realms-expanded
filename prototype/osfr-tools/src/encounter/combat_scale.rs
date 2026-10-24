@@ -53,7 +53,7 @@ impl CombatScale {
         }
         let refuse = |e: &dyn std::fmt::Display| invalid(&format!("{}: {e}", path.display()));
         if fs::metadata(&path).map_err(|e| refuse(&e))?.len() > 16 * 1024 {
-            return Err(invalid("combat scale content too large"));
+            return Err(refuse(&"file too large"));
         }
         let scale: Self = serde_json::from_slice(&fs::read(&path).map_err(|e| refuse(&e))?)
             .map_err(|e| refuse(&e))?;

@@ -56,10 +56,20 @@ mod unit {
     pub fn n() -> u32 {
         combat_scale::basic(2)
     }
-    /// The authored 204 health the area-and-DoT test uses: it dies on the
-    /// second DoT tick, as 100 health did when a hit was 100.
+    /// One DoT tick of the area-and-DoT test's skill: half a basic attack.
+    pub fn dot() -> u32 {
+        (n() as f32 * 0.5).round() as u32
+    }
+    /// The authored health the area-and-DoT test uses: the first whose scaled
+    /// value outlives two hits and one DoT tick, so it dies on the second tick
+    /// at any scale.
+    pub fn authored() -> u32 {
+        (1..)
+            .find(|&h| combat_scale::enemy_health(h) > 2 * n() + dot())
+            .unwrap()
+    }
     pub fn small() -> u32 {
-        combat_scale::enemy_health(204)
+        combat_scale::enemy_health(authored())
     }
     use osfr_tools::encounter::EncounterEngine;
     use osfr_tools::opening_abilities::JobAbility;
@@ -381,9 +391,8 @@ mod unit {
         other["position"] = json!([0, 0, 1]);
         content["enemies"].as_array_mut().unwrap().push(other);
         for enemy in content["enemies"].as_array_mut().unwrap() {
-            enemy["max_health"] = json!(204);
+            enemy["max_health"] = json!(authored());
         }
-        let dot = (n() as f32 * 0.5).round() as u32;
         fs::write(path, content.to_string()).unwrap();
         let mut a = load(&dir);
         let mut b = load(&dir);
@@ -404,7 +413,7 @@ mod unit {
         );
         assert_eq!(field.health(E + 10), Some(small() - 2 * n()));
         let out = a.shared_effects(&mut field, 101, 1000).unwrap();
-        assert_eq!(hp(&out), small() - 2 * n() - dot);
+        assert_eq!(hp(&out), small() - 2 * n() - dot());
         let out = b.shared_effects(&mut field, 202, 1100).unwrap();
         assert_eq!(hp(&out), 0);
         assert_eq!(field.health(E + 10), Some(0));
