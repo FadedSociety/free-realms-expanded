@@ -60,13 +60,18 @@ impl Occupation {
     /// (R) Reconstructed rules. the owner, 2026-10-19: a kart race blocks starting another activity
     /// and a derby blocks warpstone travel, like every other minigame (the old hand-written
     /// lists had left both open).
+    ///
+    /// T481: a gather, craft, chess or fishing activity also closes the ride gate, so starting
+    /// one ends the ride and no ride can be summoned during it. The client dismounts by itself
+    /// only on an ability or item use (`SendDismountRequest` 0x00b06cc0, four callers), never on
+    /// the 26/8 interaction (`PlayClient::RequestInteraction` 0x0092efe0), so the server ends it.
+    /// Their row now matches Encounter's: start, warp, ride and pets; not location.
     pub(super) const fn gates(self) -> Gates {
         use Occupation::*;
         let (start, warp, ride, pets, location) = match self {
-            Forging | Smelting | Cooking | Mining | Harvesting | Chess | Fishing => {
-                (true, true, false, true, false)
+            Forging | Smelting | Cooking | Mining | Harvesting | Chess | Fishing | Encounter => {
+                (true, true, true, true, false)
             }
-            Encounter => (true, true, true, true, false),
             Derby | Soccer | Kart => (true, true, true, true, true),
             FieldEngaged => (false, false, true, false, false),
             // (R) A lot is its own scene: leave it before travelling, riding or starting an
@@ -152,7 +157,21 @@ mod tests {
         );
         assert_eq!(
             members(|g| g.ride),
-            [Encounter, Derby, Soccer, Kart, FieldEngaged, Housing]
+            [
+                Forging,
+                Smelting,
+                Cooking,
+                Mining,
+                Harvesting,
+                Chess,
+                Encounter,
+                Derby,
+                Fishing,
+                Soccer,
+                Kart,
+                FieldEngaged,
+                Housing
+            ]
         );
         assert_eq!(
             members(|g| g.pets),

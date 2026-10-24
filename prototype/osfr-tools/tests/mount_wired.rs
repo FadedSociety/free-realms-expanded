@@ -13,9 +13,12 @@ use osfr_tools::{
     character_store::CharacterState,
     chat,
     gameplay::{Gameplay, Outcome},
-    gateway::Gateway,
+    gateway::{Gateway, GatewayOutcome},
+    harvest_nodes::{GatheringNodes, NodeActor},
+    harvesting::CHEF_PROFILE_ID,
     inventory::InventoryItem,
     mounts::MountService,
+    npc_interaction::NpcInteractRequest,
 };
 use std::path::PathBuf;
 
@@ -313,4 +316,185 @@ fn the_gateway_reports_mounted_to_the_emote_rules_and_settles_rides() {
     );
     assert!(!gateway.emote_context(NOW + 21).mounted);
     assert!(gateway.ride_view().is_none());
+}
+
+// ------------------------------------------------- activities end the ride (T481)
+
+/// Client `SendDismountRequest` 0x00b06cc0 has four callers (ability, item use, movement state)
+/// and none is the 26/8 interaction path (`PlayClient::RequestInteraction` 0x0092efe0), so the
+/// server ends the ride when an activity starts: the `ride` gate in `gameplay/occupation.rs`.
+const MINER_PROFILE: i32 = 14;
+const BLACKSMITH_PROFILE: i32 = 16;
+const ANVIL: [f32; 3] = [354.3665, 48.24031, 316.3203];
+/// Blacksmith recipe 11 at the world anvil and its inputs (as in `crafting_stations_route.rs`).
+const ANVIL_RECIPE: i32 = 11;
+const ANVIL_INPUTS: [(i32, u32); 4] = [(21785, 10), (2752, 5), (55, 5), (56, 5)];
+
+fn node(name: &str) -> NodeActor {
+    let content = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let nodes = GatheringNodes::load(&content).unwrap().unwrap();
+    nodes.actors().find(|a| a.name == name).unwrap().clone()
+}
+
+/// An ordinary player standing at `position` with `job` active, owning the ride and `items`,
+/// already summoned and on it.
+fn rider_at(position: [f32; 3], job: i32, items: &[(i32, u32)]) -> Gateway {
+    let content = lab().join("reports/round59-native-20261015T124443Z/content");
+    let reference = lab().join("references/rust-gateway-reference");
+    let mut character = Gateway::reference_state(&reference).unwrap();
+    character.zone_id = 0;
+    character.position = position;
+    let mut state = Gameplay::load(&content, None).unwrap().state();
+    let profiles = state.profiles.as_mut().unwrap();
+    profiles.unlocked.insert(job);
+    profiles.active = job;
+    let mut id = state
+        .inventory
+        .items
+        .iter()
+        .map(|i| i.id)
+        .max()
+        .unwrap_or(0)
+        + 1000;
+    for (definition_id, count) in [(RIDE_ITEM, 1)].iter().chain(items) {
+        id += 1;
+        state.inventory.items.push(InventoryItem {
+            definition_id: *definition_id,
+            tint: 0,
+            id,
+            count: *count,
+            consumed_count: 0,
+            stored_count: 0,
+            last_cast_time: i64::from(i32::MAX),
+            rental: None,
+            ability_count: 0,
+            activate_enabled: true,
+        });
+    }
+    let mut gateway = Gateway::load_gameplay(&reference, character, &content, Some(state)).unwrap();
+    gateway.set_dev_tools(false);
+    gateway.set_role(AccountRole::Player);
+    gateway.handle_at(&login(), NOW).unwrap();
+    gateway.handle_at(&wrap(&[13, 0]), NOW).unwrap();
+    gateway.handle_at(&wrap(&[10, 0]), NOW).unwrap();
+    let actor = MountService::ride_guid(gateway.state().guid);
+    let board = [
+        vec![168, 0, 1],
+        actor.to_le_bytes().to_vec(),
+        vec![1, 0, 0, 0, 0, 0],
+    ]
+    .concat();
+    gateway.handle_at(&wrap(&spawn()), NOW + 1).unwrap();
+    gateway.handle_at(&wrap(&board), NOW + 10).unwrap();
+    assert!(gateway.emote_context(NOW + 11).mounted && gateway.ride_view().is_some());
+    gateway
+}
+
+fn click(gateway: &mut Gateway, guid: u64) -> GatewayOutcome {
+    let request = NpcInteractRequest {
+        target: guid,
+        trailing_flag: false,
+    };
+    gateway
+        .handle_at(&wrap(&request.encode()), NOW + 100)
+        .unwrap()
+}
+
+fn book_start(gateway: &mut Gateway) -> GatewayOutcome {
+    let packet = [vec![26, 0, 24, 0], ANVIL_RECIPE.to_le_bytes().to_vec()].concat();
+    gateway.handle_at(&wrap(&packet), NOW + 100).unwrap()
+}
+
+/// The server's wire frames wrap the packet in a 7-byte envelope.
+fn gateway_has(out: &GatewayOutcome, family: u16, sub: u8) -> bool {
+    out.replies
+        .iter()
+        .any(|r| r.len() > 9 && r[7..9] == family.to_le_bytes() && r[9] == sub)
+}
+
+fn mounted(gateway: &Gateway) -> bool {
+    gateway.emote_context(NOW + 500).mounted
+}
+
+fn gameplay_json(gateway: &Gateway) -> serde_json::Value {
+    serde_json::to_value(gateway.snapshot().gameplay.unwrap()).unwrap()
+}
+
+fn assert_ride_ended(gateway: &mut Gateway) {
+    let ended = gateway.settle_rides(false);
+    assert!(gateway_has(&ended, 168, 4), "dismount to the rider");
+    assert!(
+        ended
+            .nearby
+            .iter()
+            .any(|r| r.starts_with(&[35, 0, 3, 0, 1, 0])),
+        "ride actor removed for neighbours"
+    );
+    assert!(!mounted(gateway) && gateway.ride_view().is_none());
+    // Idempotent: later messages during the activity send nothing more.
+    let again = gateway.settle_rides(false);
+    assert!(again.replies.is_empty() && again.nearby.is_empty());
+}
+
+#[test]
+fn starting_a_gather_ends_the_ride() {
+    let node = node("Mushrooms");
+    let at = [node.position[0] + 2.0, node.position[1], node.position[2]];
+    let mut gateway = rider_at(at, CHEF_PROFILE_ID, &[]);
+    click(&mut gateway, node.guid);
+    // The gather starts. (R) The gateway's per-message settle runs after the handler, so the
+    // gather's own replies come first and 168/4 follows them (the bin appends `settle_rides`).
+    assert!(
+        gameplay_json(&gateway)["harvesting"]["active"]["instance_id"].is_i64(),
+        "the gather started"
+    );
+    assert_ride_ended(&mut gateway);
+}
+
+#[test]
+fn a_refused_gather_keeps_the_ride() {
+    let node = node("Mushrooms");
+    let near = [node.position[0] + 2.0, node.position[1], node.position[2]];
+    let far = [node.position[0] + 40.0, node.position[1], node.position[2]];
+    // Out of reach, and the wrong active job.
+    for (at, job) in [(far, CHEF_PROFILE_ID), (near, MINER_PROFILE)] {
+        let mut gateway = rider_at(at, job, &[]);
+        click(&mut gateway, node.guid);
+        assert!(gameplay_json(&gateway)["harvesting"]["active"].is_null());
+        let settled = gateway.settle_rides(false);
+        assert!(settled.replies.is_empty() && settled.nearby.is_empty());
+        assert!(mounted(&gateway) && gateway.ride_view().is_some());
+    }
+}
+
+#[test]
+fn no_ride_can_be_summoned_while_gathering() {
+    let node = node("Mushrooms");
+    let at = [node.position[0] + 2.0, node.position[1], node.position[2]];
+    let mut gateway = rider_at(at, CHEF_PROFILE_ID, &[]);
+    click(&mut gateway, node.guid);
+    assert_ride_ended(&mut gateway);
+
+    let before = gateway.snapshot();
+    let refused = gateway.handle_at(&wrap(&spawn()), NOW + 200).unwrap();
+    assert!(
+        refused.replies.iter().any(|r| r[7..11] == [15, 0, 3, 0]),
+        "the notice"
+    );
+    assert!(gateway_has(&refused, 168, 5), "the roster refresh");
+    assert!(refused.nearby.is_empty() && !gateway_has(&refused, 35, 2));
+    assert!(gateway.ride_view().is_none() && !mounted(&gateway));
+    assert_eq!(gateway.snapshot(), before, "a refusal changes nothing");
+    assert!(gameplay_json(&gateway)["harvesting"]["active"]["instance_id"].is_i64());
+}
+
+#[test]
+fn starting_a_crafting_station_ends_the_ride() {
+    let mut gateway = rider_at(ANVIL, BLACKSMITH_PROFILE, &ANVIL_INPUTS);
+    book_start(&mut gateway);
+    assert!(
+        gameplay_json(&gateway)["forging"]["active"]["instance_id"].is_i64(),
+        "the forging run started"
+    );
+    assert_ride_ended(&mut gateway);
 }
