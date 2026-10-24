@@ -246,9 +246,15 @@ impl Rig {
             .collect()
     }
 
-    /// One world-event tick, then each viewer's inner packets.
+    /// One world-event tick on the real wall clock, then each viewer's inner packets.
     fn tick(&mut self, now: u64) -> [Vec<Vec<u8>>; 2] {
-        world_event_routing::tick(&mut self.server.world, &mut self.server.sessions, now);
+        self.tick_at(now, osfr_tools::client_areas::unix_now_ms())
+    }
+
+    /// `tick` on a chosen wall clock (T462: schedules run on it).
+    fn tick_at(&mut self, now: u64, unix_ms: u64) -> [Vec<Vec<u8>>; 2] {
+        let (world, sessions) = (&mut self.server.world, &mut self.server.sessions);
+        world_event_routing::tick(world, sessions, now, unix_ms);
         self.viewers.map(|key| {
             let session = self.server.sessions.get_mut(&key).unwrap();
             super::super::f120_fishing_hour_reconnect::drain_replies(session, now)
@@ -626,5 +632,45 @@ fn t460_say_broadcast_and_area_reach_the_viewers_through_the_tick() {
     assert_eq!(
         rig.tick(T0 + 400),
         [vec![removal(guid, 0), area(false)], vec![area(false)]]
+    );
+}
+
+/// T462: `Server::new` reads the schedule from the content directory, and the production tick
+/// announces to the whole zone one lead before the slot, starts the event for the viewer who is
+/// near its actor, and does not start it again. The daily slot is 12 hours ahead of the real
+/// clock the server read at startup, so the test needs no sleep.
+#[test]
+fn t462_a_scheduled_event_announces_then_starts_through_the_tick() {
+    let line = "Showtime in one minute!";
+    let now_minute = osfr_tools::client_areas::unix_now_ms() / 60_000;
+    let mut file = show();
+    file["events"][0]["schedule"] = json!({"slot_minutes": 1440,
+        "offset_minutes": (now_minute + 720) % 1440, "announce_lead_ms": 60_000,
+        "announce": {"text": line, "locale_id": 432_430}});
+    let Some(mut rig) = Rig::new("t462-schedule", Some(file)) else {
+        return;
+    };
+    let start = (now_minute + 720) * 60_000;
+    let broadcast = osfr_tools::chat::system(line);
+    let quiet = [Vec::<Vec<u8>>::new(), Vec::new()];
+    assert_eq!(rig.tick_at(T0, start - 61_000), quiet, "before the lead");
+    let heard = rig.tick_at(T0 + 100, start - 60_000);
+    assert_eq!(heard, [vec![broadcast.clone()], vec![broadcast]]);
+    assert_eq!(
+        rig.tick_at(T0 + 200, start - 1_000),
+        quiet,
+        "the line goes out once"
+    );
+    let [near, far] = rig.tick_at(T0 + 300, start);
+    assert_eq!(
+        near[0][..4],
+        [35, 0, 2, 0],
+        "the AddNpc of the scheduled run"
+    );
+    assert!(far.is_empty(), "the far viewer is out of range");
+    assert_eq!(
+        rig.tick_at(T0 + 400, start + 1_000),
+        quiet,
+        "the slot does not repeat"
     );
 }

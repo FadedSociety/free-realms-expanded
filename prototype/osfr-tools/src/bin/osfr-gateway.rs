@@ -3383,6 +3383,7 @@ impl Server {
             .set_group_invite_ttl(options.group_invite_ttl_ms)?;
         world.guilds = t006_guilds::GuildWorld::load(&options.state, options.guild_invite_ttl_ms)?;
         world.client_areas = client_area_routing::load(&options)?;
+        world_event_routing::schedule(&mut world, &options);
         if let Some(path) = &options.security_log {
             // Logging is best effort: an unusable file disables it, never the server.
             match SecurityLog::open(path) {
@@ -3798,7 +3799,7 @@ impl Server {
             self.tick_shared_fields(now_ms);
             let unix_ms = osfr_tools::client_areas::unix_now_ms();
             client_area_routing::season_tick(&mut self.world, &mut self.sessions, unix_ms);
-            world_event_routing::tick(&mut self.world, &mut self.sessions, now_ms);
+            world_event_routing::tick(&mut self.world, &mut self.sessions, now_ms, unix_ms);
         }
         let keys = self.sessions.keys().copied().collect::<Vec<_>>();
         for key in keys {

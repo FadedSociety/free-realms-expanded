@@ -213,6 +213,11 @@ impl ClientAreas {
             .fold(0, |mask, (index, _)| mask | 1 << index)
     }
 
+    /// The fixed offset local time uses (no daylight saving).
+    pub fn utc_offset_minutes(&self) -> i32 {
+        self.content.utc_offset_minutes
+    }
+
     /// Unknown season names are never active.
     pub fn is_season_active(&self, name: &str, unix_ms: u64) -> bool {
         let date = self.month_day(unix_ms);

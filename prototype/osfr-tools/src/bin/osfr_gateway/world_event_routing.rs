@@ -52,13 +52,33 @@ fn start(admin: &Session, world: &mut SharedWorld, now_ms: u64, key: &str) -> St
     }
 }
 
+/// T462: read the events that carry a `schedule` from the content directory, once at startup (R:
+/// an edit to a schedule applies at the next restart; `event start` still reads the file each
+/// time). Needs `world.client_areas` loaded first: it owns the clock's offset and the seasons. A
+/// file that cannot be read means no schedule and one log line, never a failed start.
+pub(super) fn schedule(world: &mut SharedWorld, options: &Options) {
+    let Some(dir) = options.content.as_deref() else {
+        return;
+    };
+    match world_events::load_scheduled(dir) {
+        Ok(events) => world.world_events.schedule(
+            events,
+            OPEN_WORLD,
+            osfr_tools::client_areas::unix_now_ms(),
+            &world.client_areas,
+        ),
+        Err(error) => {
+            event(json!({"event":"world_event_schedule_unavailable","reason":error.to_string()}))
+        }
+    }
+}
+
 /// One world-event tick. Once a session's queue refuses a packet it gets none of its later
 /// packets this tick (a small op behind a refused AddNpc would name a guid the client never
 /// saw) and one log line; the runner owes it the removals it missed and shows it the live
 /// actors again later (`WorldEvents::refused`). Only that session is affected (worker rule 17).
-pub(super) fn tick(world: &mut SharedWorld, sessions: &mut SessionMap, now_ms: u64) {
+pub(super) fn tick(world: &mut SharedWorld, sessions: &mut SessionMap, now_ms: u64, unix_ms: u64) {
     let mut refused: BTreeMap<SessionId, Vec<Vec<u8>>> = BTreeMap::new();
-    let unix_ms = osfr_tools::client_areas::unix_now_ms();
     let areas = &mut world.client_areas;
     for (recipient, packet) in world
         .world_events

@@ -9,6 +9,11 @@
 //! its own step (R). Every random choice (one_of at the run's start, cycle order and jitter)
 //! comes from the run's `Rng`, seeded from the run serial and start time (R); tests pass a seed.
 //!
+//! T462, part 3: an event row's optional `schedule` starts it on wall-clock slots from the world
+//! tick (`schedule.rs` holds the slot rules): season gate, overlap skips, a kickoff line before
+//! the start. Admin start and stop stay as they were; a slot whose event is already running
+//! (admin-started, say) is skipped, not queued.
+//!
 //! Wire, every reader checked in the client:
 //! * spawn: AddNpc (`startup_world::build_add_npc`, reader `0x00921a10`), then the optional poof
 //!   as 35/16 PlayCompositeEffect (reader `0x008e5f50`).
@@ -54,6 +59,8 @@ use std::{
 #[path = "restoration/piece_052.rs"]
 pub mod piece_052;
 use piece_052::{ANIM_ID_WALK, MAX_PATROL_SPEED, movement_packet};
+mod schedule;
+use schedule::{Due, Entry, Schedule, ScheduleRow};
 
 pub const FILE: &str = "world_events.json";
 /// 'EVNT' in the high half; the run serial (bits 8..32) and the actor index fill the low half,
@@ -91,7 +98,8 @@ pub enum WorldEventCommand {
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct EventsFile {
-    events: Vec<EventRow>,
+    /// Rows stay JSON until compiled, so `load_scheduled` can drop one broken row alone.
+    events: Vec<serde_json::Value>,
 }
 
 #[derive(Deserialize)]
@@ -100,6 +108,7 @@ struct EventRow {
     key: String,
     actors: Vec<ActorRow>,
     timeline: Vec<StepRow>,
+    schedule: Option<ScheduleRow>,
 }
 
 #[derive(Deserialize)]
@@ -206,6 +215,7 @@ pub struct WorldEvent {
     broadcasts: Vec<Broadcast>,
     /// The branch count of each `one_of`, in file order.
     branches: Vec<usize>,
+    schedule: Option<Schedule>,
 }
 
 #[derive(Debug, PartialEq)]
@@ -275,10 +285,12 @@ fn valid_key(key: &str) -> bool {
             .all(|b| b.is_ascii_lowercase() || b.is_ascii_digit() || b == b'_' || b == b'-')
 }
 
-/// Every event in `<dir>/world_events.json`, validated; a missing file is no events.
-pub fn load(dir: &Path) -> io::Result<Vec<WorldEvent>> {
+/// The file's rows, checked as a whole; a missing file is no events.
+fn read(dir: &Path) -> io::Result<EventsFile> {
     let mut file = match std::fs::File::open(dir.join(FILE)) {
-        Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(Vec::new()),
+        Err(error) if error.kind() == io::ErrorKind::NotFound => {
+            return Ok(EventsFile { events: Vec::new() });
+        }
         file => file?,
     };
     // Checked before reading: the load runs on the server thread inside an admin's commit.
@@ -293,14 +305,43 @@ pub fn load(dir: &Path) -> io::Result<Vec<WorldEvent>> {
     if file.events.len() > MAX_EVENTS {
         return Err(invalid("at most 32 world events"));
     }
+    Ok(file)
+}
+
+/// Each row compiled alone: a row that fails is an `Err` in its place.
+fn compile_rows(file: EventsFile) -> impl Iterator<Item = io::Result<WorldEvent>> {
     let mut keys = BTreeSet::new();
-    file.events
-        .into_iter()
-        .map(|row| match keys.insert(row.key.clone()) {
+    file.events.into_iter().map(move |value| {
+        let row: EventRow = serde_json::from_value(value).map_err(invalid)?;
+        match keys.insert(row.key.clone()) {
             true => compile(row),
             false => Err(invalid(format!("world event {} is listed twice", row.key))),
-        })
-        .collect()
+        }
+    })
+}
+
+/// Every event in `<dir>/world_events.json`, validated; a missing file is no events.
+pub fn load(dir: &Path) -> io::Result<Vec<WorldEvent>> {
+    compile_rows(read(dir)?).collect()
+}
+
+/// The events that carry a `schedule`. Unlike `load`, a row that is broken is logged and left
+/// out, so one bad event never stops another's schedule; a file that cannot be read at all is
+/// still an error.
+pub fn load_scheduled(dir: &Path) -> io::Result<Vec<WorldEvent>> {
+    let mut events = Vec::new();
+    for row in compile_rows(read(dir)?) {
+        match row {
+            Ok(event) if event.schedule.is_some() => events.push(event),
+            Ok(_) => {}
+            Err(error) => println!(
+                "{}",
+                serde_json::json!({"event": "world_event_schedule_refused",
+                    "reason": error.to_string()})
+            ),
+        }
+    }
+    Ok(events)
 }
 
 fn compile(row: EventRow) -> io::Result<WorldEvent> {
@@ -308,6 +349,7 @@ fn compile(row: EventRow) -> io::Result<WorldEvent> {
         key,
         actors: rows,
         timeline,
+        schedule,
     } = row;
     let fail = |what: String| invalid(format!("world event {key}: {what}"));
     if !valid_key(&key) || rows.len() > MAX_ACTORS || timeline.len() > MAX_STEPS {
@@ -374,6 +416,10 @@ fn compile(row: EventRow) -> io::Result<WorldEvent> {
         ..
     } = builder;
     steps.sort_by_key(|step| step.at_ms);
+    let schedule = schedule
+        .map(|row| Schedule::compile(row, &key))
+        .transpose()
+        .map_err(&fail)?;
     for step in &steps {
         if let Op::Remove(effect) = step.op {
             actors[step.actor].remove_effect = effect;
@@ -386,6 +432,7 @@ fn compile(row: EventRow) -> io::Result<WorldEvent> {
         cycles,
         broadcasts,
         branches,
+        schedule,
     })
 }
 
@@ -544,6 +591,9 @@ pub struct WorldEvents {
     pending_off: Vec<(ZoneInstance, i32)>,
     serial: u32,
     tag: i32,
+    /// The scheduled events (T462) and the earliest unix ms any of them needs the tick.
+    schedule: Vec<Entry>,
+    wake_ms: u64,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -622,13 +672,64 @@ fn within(a: [f32; 3], b: [f32; 3], radius: f32, flat: bool) -> bool {
 impl WorldEvents {
     /// Start `event` in `instance`; false, changing nothing, while a run of its key is live.
     pub fn start(&mut self, event: WorldEvent, instance: ZoneInstance, now_ms: u64) -> bool {
-        self.begin(event, instance, now_ms, None)
+        self.begin(Arc::new(event), instance, now_ms, None)
+    }
+
+    /// Replace the schedule with the scheduled events of `events`, running in `instance`. Each
+    /// event's next slot comes from `unix_ms` alone, so a restart never runs a slot late.
+    pub fn schedule(
+        &mut self,
+        events: Vec<WorldEvent>,
+        instance: ZoneInstance,
+        unix_ms: u64,
+        areas: &ClientAreas,
+    ) {
+        self.schedule = Schedule::entries(events, instance);
+        for entry in &mut self.schedule {
+            entry.begin(unix_ms, areas);
+        }
+        self.wake_ms = self
+            .schedule
+            .iter()
+            .map(Entry::wake_ms)
+            .min()
+            .unwrap_or_default(); // nothing scheduled: `run_schedule` never reads it
+    }
+
+    /// Start each scheduled event that is due and send each kickoff line that is due. A start
+    /// for an event that is already running does nothing. With nothing due, one comparison.
+    fn run_schedule(
+        &mut self,
+        now_ms: u64,
+        unix_ms: u64,
+        players: &PlayerRegistry,
+        areas: &ClientAreas,
+        out: &mut Out,
+    ) {
+        if self.schedule.is_empty() || unix_ms < self.wake_ms {
+            return;
+        }
+        let mut entries = std::mem::take(&mut self.schedule);
+        for entry in &mut entries {
+            match entry.step(unix_ms, areas) {
+                Due::Idle => {}
+                Due::Start => {
+                    self.begin(Arc::clone(&entry.event), entry.instance, now_ms, None);
+                }
+                Due::Announce(line) => {
+                    let heard = players.sessions_in(entry.instance).map(|p| p.session_id);
+                    deliver(out, heard, || crate::chat::system(&line));
+                }
+            }
+        }
+        self.wake_ms = entries.iter().map(Entry::wake_ms).min().unwrap_or(u64::MAX);
+        self.schedule = entries;
     }
 
     /// `start` with the run's random stream fixed (`seed`), so a test can draw each branch.
     fn begin(
         &mut self,
-        event: WorldEvent,
+        event: Arc<WorldEvent>,
         instance: ZoneInstance,
         now_ms: u64,
         seed: Option<u64>,
@@ -661,7 +762,7 @@ impl WorldEvents {
             .collect();
         let run = Run {
             actors: vec![Shown::default(); event.actors.len()],
-            event: Arc::new(event),
+            event,
             instance,
             started_ms: now_ms,
             serial,
@@ -710,6 +811,7 @@ impl WorldEvents {
         areas: &mut ClientAreas,
     ) -> Out {
         let mut out = std::mem::take(&mut self.pending);
+        self.run_schedule(now_ms, unix_ms, players, areas, &mut out);
         let mut env = Env {
             players,
             areas: &mut *areas,
@@ -1639,7 +1741,7 @@ mod tests {
     fn animations(timeline: serde_json::Value, seed: u64, until_ms: u64) -> Vec<(u64, i32)> {
         let players = registry(&[(1, WORLD, [1.0, 0.0, 0.0])]);
         let mut events = WorldEvents::default();
-        assert!(events.begin(event_at([0.0; 3], timeline), WORLD, 0, Some(seed)));
+        assert!(events.begin(Arc::new(event_at([0.0; 3], timeline)), WORLD, 0, Some(seed)));
         let mut seen = Vec::new();
         for now in (0..=until_ms).step_by(100) {
             for packet in to(&tick(&mut events, now, &players), 1) {
