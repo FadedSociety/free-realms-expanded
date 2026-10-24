@@ -379,11 +379,21 @@ impl Gameplay {
                 self.profiles = Some(profiles);
             }
             self.refresh_npc_quest_eligibility(current_unix_seconds());
+            // The accepted turn-in is the one-shot completion record. A replayed 49/14 is denied
+            // (no pending turn-in), and the job-gate release sets `changed` with a denial.
+            let completed = quest.denial.is_none() && quest.changed;
             let mut out = Outcome::default();
             self.append_npc_quest_outcome(quest, &mut out)?;
             // T361: a quest's own job XP can raise the level that another active
             // job-level goal watches, so the turn-in notifies like every level path.
             self.sync_job_level_objectives(&mut out)?;
+            if completed {
+                // T229: the quest's Station Cash kind is one more reward on the staged clone.
+                self.pay_earned_station_cash(
+                    crate::station_cash::EarnSource::Quest { id: quest_id },
+                    &mut out,
+                )?;
+            }
             out.replies.push(END_DIALOG_26_4.to_vec());
             return Ok(Some(out));
         }
@@ -1485,6 +1495,7 @@ mod tests {
                 coins: 5,
                 items: Vec::new(),
                 job_xp: BTreeMap::new(),
+                sc: 0,
                 display: RewardDisplay {
                     source_guid: 11,
                     player_guid: 3,

@@ -29,6 +29,8 @@ use std::{
     path::PathBuf,
     sync::atomic::{AtomicU64, Ordering},
 };
+#[path = "support/sc_earn.rs"]
+mod sc_earn;
 
 const OWNER: ParticipantKey = ParticipantKey(0x1000_0000_0000_0001);
 const OTHER: ParticipantKey = ParticipantKey(0x1000_0000_0000_0002);
@@ -202,6 +204,8 @@ impl GameplayFixture {
                     "payment_sources_enabled": false,
                     "not_available_message": "disabled"
                 },
+                // T229: the earn table needs an enabled Station Cash policy and wallet.
+                "station_cash": {"enabled": true},
                 "items": []
             }))
             .unwrap(),
@@ -210,6 +214,11 @@ impl GameplayFixture {
         fs::write(
             path.join("vendors.json"),
             br#"{"schema_version":1,"vendors":[]}"#,
+        )
+        .unwrap();
+        fs::copy(
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/sc_rewards.json"),
+            path.join("sc_rewards.json"),
         )
         .unwrap();
         if !path.join("zones.json").is_file() {
@@ -1225,6 +1234,23 @@ fn gameplay_routes_the_offer_pays_one_completion_and_ignores_replays() {
         vec![instance],
         "the paid match instance is recorded"
     );
+    // T229: the same completion record pays the derby Station Cash kind once, through the one
+    // reward applier, plus the first-activity-of-the-day bonus.
+    let wallet = paid
+        .sc_wallet
+        .clone()
+        .expect("the derby completion writes the Station Cash wallet");
+    assert_eq!(
+        wallet.balance,
+        sc_earn::first_of_day(osfr_tools::station_cash::EarnSource::DerbyMatch),
+        "one derby completion plus the first-activity-of-the-day bonus"
+    );
+    assert!(
+        results
+            .iter()
+            .any(|packet| packet.starts_with(&[66, 0, 11, 0])),
+        "the earned Station Cash pushes the wallet response"
+    );
     let coin_update = results
         .iter()
         .find(|packet| packet.starts_with(&[38, 0, 19]))
@@ -1381,6 +1407,10 @@ fn leaving_or_resetting_before_results_pays_nothing() {
         after_quit.derby.is_none(),
         "an unfinished match writes no ledger row"
     );
+    assert!(
+        after_quit.sc_wallet.is_none(),
+        "an unfinished match pays no Station Cash"
+    );
 
     let mut game = Gameplay::load(&fixture.path, None).unwrap();
     let instance = enter_derby(&mut game, &character, 5_000);
@@ -1389,6 +1419,10 @@ fn leaving_or_resetting_before_results_pays_nothing() {
     assert!(!game.derby_active());
     assert_eq!(game.state().inventory.coins, before_coins);
     assert!(game.state().derby.is_none());
+    assert!(
+        game.state().sc_wallet.is_none(),
+        "a disconnect before the results pays no Station Cash"
+    );
     // The old contact report cannot finish a match that the disconnect dropped.
     let replay = game
         .handle_in_world(&hit(npc, 20.0), &character, 9_000)

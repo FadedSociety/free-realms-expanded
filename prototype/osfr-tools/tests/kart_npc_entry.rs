@@ -38,6 +38,10 @@ use std::{
 mod content_copy;
 
 use content_copy::copy_tree;
+#[path = "support/sc_earn.rs"]
+mod sc_earn;
+use osfr_tools::station_cash::EarnSource;
+use sc_earn::first_of_day;
 
 static NEXT: AtomicU64 = AtomicU64::new(0);
 const GATE_NPC: u64 = 9_000_000_273;
@@ -1278,6 +1282,70 @@ fn clock_only_racing_ticks_do_not_request_a_character_save() {
     assert_eq!(race_phase(&game), RacePhase::Finished);
     let paid = game.tick(&character, now).unwrap();
     assert!(!paid.changed, "a finished race pays and saves once");
+}
+
+/// T229: the paid race finish is the kart completion record, so it pays the kart Station Cash
+/// kind once plus the first-activity-of-the-day bonus; a checkpoint before the finish pays nothing.
+#[test]
+fn a_finished_race_pays_the_kart_station_cash_once() {
+    let fixture = GameplayFixture::new();
+    let character = character();
+    let mut game = fixture.load(None);
+    game.set_dev_tools(true);
+    game.set_role(osfr_tools::account_store::AccountRole::Admin);
+    let green = enter_to_green(&mut game, &character);
+
+    // A checkpoint is progress, not a completion: no Station Cash is earned yet.
+    game.handle_in_world(&gate_hit(PLAYER, 1.0), &character, green + 1_000)
+        .unwrap();
+    assert!(
+        game.state().sc_wallet.is_none(),
+        "an unfinished race pays no Station Cash"
+    );
+
+    let mut now = green + 1_000;
+    for _lap in 0..2 {
+        for gate in 1..=4 {
+            now += 1_000;
+            game.handle_in_world(&gate_hit(PLAYER, gate as f32), &character, now)
+                .unwrap();
+        }
+    }
+    let wallet = game
+        .state()
+        .sc_wallet
+        .expect("the finished race writes the Station Cash wallet");
+    assert_eq!(
+        wallet.balance,
+        first_of_day(EarnSource::KartRace),
+        "the kart completion plus the first-activity-of-the-day bonus"
+    );
+    let replay = game.tick(&character, now).unwrap();
+    assert!(!replay.changed, "a finished race pays once");
+    assert_eq!(game.state().sc_wallet, Some(wallet));
+
+    // A second completed race the same UTC day pays the base amount only: the bonus is per
+    // character per day, not per completion.
+    game.handle_in_world(&[26, 0, 42, 0], &character, now + 1)
+        .expect("the finished race closes");
+    let green = enter_to_green(&mut game, &character);
+    let mut now = green;
+    for _lap in 0..2 {
+        for gate in 1..=4 {
+            now += 1_000;
+            game.handle_in_world(&gate_hit(PLAYER, gate as f32), &character, now)
+                .unwrap();
+        }
+    }
+    let wallet = game
+        .state()
+        .sc_wallet
+        .expect("the second race writes the wallet too");
+    assert_eq!(
+        wallet.balance,
+        first_of_day(EarnSource::KartRace) + sc_earn::table().amount(EarnSource::KartRace),
+        "a second race the same day pays the base amount without a second daily bonus"
+    );
 }
 
 /// Both kart save decisions use the type's save-decision equality: a re-stamped session weapon

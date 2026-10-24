@@ -212,6 +212,9 @@ pub struct ChessActivityOutcome {
     pub replies: Vec<Vec<u8>>,
     pub reward_packets: Vec<Vec<u8>>,
     pub reward_state: Option<RewardState>,
+    /// A finished game's settlement was accepted, win or loss: the one-shot completion record the
+    /// earned Station Cash payout keys on.
+    pub completed: bool,
 }
 
 /// (R) One character's daily chess coin ledger, persisted with the character
@@ -569,6 +572,7 @@ impl ChessService {
             )?;
         out.accepted |= settled.accepted;
         out.changed |= settled.changed;
+        out.completed |= settled.accepted;
         out.replies.extend(settled.replies);
         out.reward_packets.extend(settled.reward_packets);
         if settled.reward_state.is_some() {
@@ -595,6 +599,7 @@ impl ChessRow {
             coins: self.success_coins,
             items: Vec::new(),
             job_xp: BTreeMap::new(),
+            sc: 0,
             display: RewardDisplay {
                 source_guid: player_id,
                 player_guid: player_id,
@@ -629,6 +634,7 @@ fn from_run(run: RunOutcome) -> ChessActivityOutcome {
         replies: run.replies,
         reward_packets: run.reward_packets,
         reward_state: run.reward_state,
+        completed: false,
     }
 }
 

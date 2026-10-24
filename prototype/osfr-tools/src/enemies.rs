@@ -615,6 +615,7 @@ impl EnemyEngine {
                     })
                     .collect(),
                 job_xp,
+                sc: 0,
                 display: RewardDisplay {
                     source_guid: enemy_guid,
                     player_guid: next_player.guid,

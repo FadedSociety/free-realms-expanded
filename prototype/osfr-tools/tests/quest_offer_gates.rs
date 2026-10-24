@@ -42,6 +42,7 @@ fn definition(
             coins: 0,
             items: Vec::new(),
             job_xp: BTreeMap::new(),
+            sc: 0,
             display: RewardDisplay {
                 source_guid: QUEST_GIVER,
                 player_guid: CHARACTER,

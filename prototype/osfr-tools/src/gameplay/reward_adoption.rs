@@ -141,6 +141,31 @@ fn fishing_catch_without_profile_content_changes_no_reward_state() {
     );
 }
 
+/// T229: a fishing round keeps one reward snapshot for the whole round. A Station Cash change made
+/// meanwhile (an order or an earned payout) must survive the next paid catch, so the shared
+/// snapshot never carries the wallet.
+#[test]
+fn fishing_catch_keeps_a_station_cash_change_made_during_the_round() {
+    let mut game = game();
+    begin(&mut game);
+    let shop = game
+        .npc_coin_shop
+        .as_mut()
+        .expect("the reference loads the Marketplace");
+    assert!(shop.sc_catalogue().config().enabled);
+    let mut wallet = shop.sc_wallet().clone();
+    wallet.balance += 40;
+    shop.set_sc_wallet(wallet.clone());
+
+    let outcome = catch(&mut game, FISHING_T0 + 10_000).expect("paid catch");
+    assert!(outcome.changed);
+    assert_eq!(
+        game.npc_coin_shop.as_ref().unwrap().sc_wallet(),
+        &wallet,
+        "the catch adopts no wallet captured when the round began"
+    );
+}
+
 /// F576: a minigame payout replaces the profiles through `adopt_reward_state`. A catch
 /// whose Fisherman XP crosses a job-level goal's rank credits it in the same outcome,
 /// not at a later accept, turn-in or reload.

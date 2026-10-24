@@ -691,6 +691,7 @@ fn client_goal_engine() -> crate::quest_engine::QuestEngine {
             coins: 5,
             items: vec![],
             job_xp: std::collections::BTreeMap::new(),
+            sc: 0,
             display: crate::rewards::RewardDisplay {
                 source_guid: 1,
                 player_guid: 1,

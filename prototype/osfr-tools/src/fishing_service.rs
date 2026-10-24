@@ -1000,6 +1000,7 @@ fn settle_catch(
             count: 1,
         }],
         job_xp,
+        sc: 0,
         display: RewardDisplay {
             source_guid: guid,
             player_guid: guid,

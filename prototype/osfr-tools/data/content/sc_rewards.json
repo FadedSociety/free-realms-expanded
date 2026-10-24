@@ -1,0 +1,54 @@
+{
+  "schema_version": 1,
+  "enabled": true,
+  "kart_race": 3,
+  "derby_match": 3,
+  "soccer_match": 3,
+  "chess_game": 2,
+  "dungeon_clear": 10,
+  "hardest_dungeon_clear": 25,
+  "hardest_dungeons": [
+    12303
+  ],
+  "dungeon_overrides": {},
+  "quest_complete": 1,
+  "quest_overrides": {},
+  "daily_first_activity": 5,
+  "first_clear_ride": {
+    "dungeon_id": 12303,
+    "item_id": 79454
+  },
+  "seasonal_rides": [
+    {
+      "item_id": 79447,
+      "event": "12_days_of_presents",
+      "enabled": false
+    }
+  ],
+  "source": [
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) T229 earn table. One verified server completion pays: kart race 3, derby match 3, soccer match 3, chess game 2, quest turn-in 1 (per-quest override allowed), dungeon clear 10 with 25 for the hardest dungeon tier (per-dungeon override allowed). A dungeon clear is the win transition of any loaded combat run: the opening cave in encounters.json and every field_battles.json row, which is how this server plays the guide's dungeons and battles (Bixie Hive, Sheep Watch, King of the Ring, Stone Heart's Hideaway), and the first completed activity of the UTC day adds 5. These are local economy values chosen for this revival, not recovered 2014 Station Cash awards; the client wallet reader 00b3a6e0/00b2b450 proves the balance field, not the amounts. No client-reported score or result reaches an amount."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The hardest dungeon is 12303, Stone Heart's Hideaway: it is the only loaded combat run at difficulty 5 with a required combat level of 13 (field_battles.json row 12303, enforced by the shared entry gate), while every other loaded run is difficulty 4 or lower and needs level 9 or lower (the next is 12360 Bandit Hideout at difficulty 4, level 9; the opening cave 411 is the first-hour tutorial dungeon). notes/Build Guides/Content/Dungeons/Dungeons.md lists it at difficulty 5, minimum level 13, and data/content/dungeons/stone_heart_s_hideaway.json carries difficulty 5. A harder run added later is a data edit; the first-clear ride is validated to name a dungeon in hardest_dungeons."
+    },
+    {
+      "kind": "client",
+      "evidence": "data/content/field_battles.json row 12303 provenance: client locale Global.Text 426971 'Stone Heart's Hideaway' and 426977 'Defeat Stone Heart'; its 41/114 start screen (reader chain to 0x009bdd70) sends the row's difficulty field to the client."
+    },
+    {
+      "kind": "reconstructed",
+      "evidence": "(R) The first clear of dungeon 12303 grants Chrome Drake (item 79454) once per character save; a later clear pays the dungeon clear only. If the ride is already owned, or the bag cannot store it, the award pays the ride's Marketplace Station Cash value (stores.json sc_price 500 x station_cash.sc_price_scale) instead, recorded in the same staged transaction. `Wallet::earned_rides` is the once-only proof."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "Free Realms wiki, Chrome Drake: virtual reward of the series 5 Trading Card Game loot card (notes/Research/Ride Sources.md row 22). T230 marks both earned-only rides unsold; this slice chooses the TCG promo as the first-clear reward (R)."
+    },
+    {
+      "kind": "wiki",
+      "evidence": "Free Realms wiki, Polar Bear: the 2012 12 Days of Presents quests / Snow Days gift boxes (notes/Research/Ride Sources.md row 23). T418's live events (realm event open/close) only gate quest offers and no seasonal event content (a 12 Days of Presents quest) is loaded, so the row stays dormant and the loader refuses enabled: true until a seasonal event trigger is wired."
+    }
+  ]
+}

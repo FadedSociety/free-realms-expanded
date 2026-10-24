@@ -281,6 +281,7 @@ fn quest(id: u32, giver: u64, objectives: usize) -> QuestDefinition {
             coins: CANARY_COINS,
             items: Vec::new(),
             job_xp: BTreeMap::new(),
+            sc: 0,
             display: RewardDisplay {
                 source_guid: 1,
                 player_guid: CHARACTER,

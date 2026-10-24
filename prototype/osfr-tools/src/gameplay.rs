@@ -69,8 +69,11 @@ mod profile_outfit;
 /// Progress-driven achievement observation over authoritative gameplay state.
 mod progression;
 mod rides;
+/// Station Cash earned by server-verified activity completions (T229).
+mod sc_earnings;
 mod startup_health;
 use self::npc::{dialogue_packet, quest_offer_packet_with};
+use crate::station_cash::EarnSource;
 
 #[derive(Clone)]
 struct DisappearingActor {
@@ -1912,6 +1915,10 @@ impl Gameplay {
                 }
                 // T259: the settled server result credits FinishMinigame once per match.
                 staged.npc_minigame_win(&settled.replies, &mut out)?;
+                if settled.finished {
+                    // T229: one completed match pays once; `settle` accepts once per match.
+                    staged.pay_earned_station_cash(EarnSource::SoccerMatch, &mut out)?;
+                }
             }
             *self = staged;
             return Ok(out);
@@ -1961,6 +1968,8 @@ impl Gameplay {
                     &mut out,
                 )?;
                 staged.npc_quest_profiles_changed(&mut out)?;
+                // T229: the paid finish is the one-shot completion record.
+                staged.pay_earned_station_cash(EarnSource::KartRace, &mut out)?;
             }
             *self = staged;
             return Ok(out);
@@ -2394,54 +2403,6 @@ impl Gameplay {
         Ok(Some(out))
     }
 
-    /// Profile state for a reward transaction; a default one without class content.
-    fn reward_profiles(&self) -> ProfileState {
-        self.profiles
-            .as_ref()
-            .map(|profiles| profiles.state().clone())
-            .unwrap_or_else(|| ProfileState {
-                version: 1,
-                active: 1,
-                unlocked: BTreeSet::from([1]),
-                experience: Default::default(),
-            })
-    }
-
-    /// Snapshot the inventory and profiles for a staged reward transaction.
-    fn reward_snapshot(&self) -> RewardState {
-        RewardState::new(
-            self.inventory.clone(),
-            self.reward_profiles(),
-            self.inventory.state().items.len().max(100),
-        )
-    }
-
-    /// Adopt the inventory and profiles from a staged minigame transaction.
-    ///
-    /// Soccer ticks, fishing catches, chess results and the derby completion payout use
-    /// this path. Progression-extras claims and quest turn-in deliberately keep their
-    /// existing payout implementations because their rollback and commit
-    /// ordering differ.
-    fn adopt_reward_state(&mut self, next: RewardState, out: &mut Outcome) -> io::Result<()> {
-        let before = self.inventory.state().clone();
-        if self
-            .profiles
-            .as_ref()
-            .is_some_and(|profiles| *profiles.state() != next.profiles)
-        {
-            let directory = self
-                .profile_content_directory
-                .as_deref()
-                .ok_or_else(|| invalid("minigame XP needs profile content"))?;
-            self.profiles = Some(Profiles::adopt(&self.profiles, directory, next.profiles)?);
-            self.npc_quest_profiles_changed(out)?;
-        }
-        self.inventory = next.inventory;
-        out.changed = true;
-        self.npc_inventory_events(&before, out)?;
-        Ok(())
-    }
-
     /// W160: a packet while a fishing round exists. Hostile or out-of-order frames change
     /// nothing and never end the connection; only a paid catch changes saved state.
     fn handle_fishing(
@@ -2563,6 +2524,8 @@ impl Gameplay {
                     &mut out,
                 )?;
                 self.npc_quest_profiles_changed(&mut out)?;
+                // T229: the paid finish is the one-shot completion record.
+                self.pay_earned_station_cash(EarnSource::KartRace, &mut out)?;
             }
             return Ok(out);
         }
@@ -3390,6 +3353,10 @@ impl Gameplay {
             self.adopt_reward_state(next, out)?;
         }
         out.replies.extend(change.reward_packets);
+        if change.completed {
+            // T229: a settled game pays once, win or loss; `settle` accepts once.
+            self.pay_earned_station_cash(EarnSource::ChessGame, out)?;
+        }
         // Only the lifecycle result (39/18) advances quests. A checkmate movie
         // message alone is not a payout: the client still has to acknowledge it.
         if lifecycle
@@ -4697,6 +4664,8 @@ impl Gameplay {
                 crate::quest_engine::QuestEvent::CompleteDungeon { encounter_id: id },
                 out,
             )?;
+            // T229: the win transition (once per run, with the win grants) is the clear.
+            self.pay_earned_station_cash(EarnSource::DungeonClear { id }, out)?;
         }
         if let Some(id) = result.completed {
             let result = self

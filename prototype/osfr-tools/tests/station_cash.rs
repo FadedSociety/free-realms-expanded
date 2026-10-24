@@ -43,7 +43,7 @@ fn new_shop(wallet: Wallet, capacity: usize) -> CoinShop {
 fn wallet(balance: u32) -> Wallet {
     Wallet {
         balance,
-        orders: Vec::new(),
+        ..Wallet::default()
     }
 }
 
@@ -474,6 +474,7 @@ fn wallet_survives_serde_and_restores_under_the_data_ceiling() {
     let too_rich = Wallet {
         balance: u32::MAX,
         orders: saved.orders.clone(),
+        ..Wallet::default()
     };
     let restored = Wallet::restore(Some(too_rich), config);
     assert_eq!(restored.balance, config.max_balance);
@@ -495,6 +496,7 @@ fn wallet_survives_serde_and_restores_under_the_data_ceiling() {
     let untouched = Wallet {
         balance: u32::MAX,
         orders: saved.orders.clone(),
+        ..Wallet::default()
     };
     assert_eq!(
         Wallet::restore(Some(untouched.clone()), &disabled),

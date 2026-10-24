@@ -47,11 +47,16 @@
 //! L046 (R): a listed lot deed (item Type 16) is paid like a ride but delivers the lot itself
 //! through the caller's [`LotGrant`]; the deed item is never granted.
 //!
-//! This module grants no Station Cash: slice 2 adds the earned source. Nothing here creates coins.
+//! Slice 2 adds the earned source: `sc_rewards.json` names one verified completion's payout (kart
+//! race, derby match, soccer match, chess game, quest turn-in, dungeon clear and the first
+//! completed activity of the UTC day). `EarnTable` only decides an amount; the completion hook
+//! spends it through the single reward applier (`rewards::apply_grant`, Station Cash as a reward
+//! kind). Nothing here creates coins and no client value reaches an amount.
 
+use crate::content::SourceTag;
 use crate::inventory::Inventory;
 use serde::{Deserialize, Serialize};
-use std::io;
+use std::{collections::BTreeMap, fs, io, path::Path};
 
 /// `PacketBaseInGamePurchase` family.
 const MARKETPLACE_FAMILY: u16 = 66;
@@ -84,6 +89,14 @@ const MAX_ORDER_DETAILS: usize = 16;
 pub const MAX_PRICE_SC: u32 = 10_000_000;
 const MAX_WALLET_BALANCE: u32 = i32::MAX as u32;
 const MAX_ORDER_HISTORY: usize = 4096;
+
+/// (R) Sanity bounds for `sc_rewards.json`; every amount is content, these only bound it.
+pub const MAX_EARN_SC: u32 = 10_000;
+const MAX_EARN_OVERRIDES: usize = 512;
+const MAX_EARN_RIDES: usize = 64;
+const MAX_EARN_FILE_BYTES: u64 = 65_536;
+/// (R) The Station Cash "day" is the UTC day, like the chess ledger.
+const ACTIVITY_DAY_SECONDS: u64 = 86_400;
 
 /// `stores.json.station_cash`: the tunable Marketplace policy. A missing block keeps the feature
 /// off, so older content sets and fixtures keep their payment-free behaviour.
@@ -161,6 +174,280 @@ impl Config {
         }
         Ok(rounded)
     }
+}
+
+/// One server-verified completion that can pay Station Cash (R). The completion itself is never
+/// decoded from a client message: each variant is raised by the owning activity's own accepted
+/// completion record.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum EarnSource {
+    KartRace,
+    DerbyMatch,
+    SoccerMatch,
+    ChessGame,
+    Quest { id: u32 },
+    DungeonClear { id: u32 },
+}
+
+/// A first-clear ride resolved against the live inventory and the Marketplace price.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RideOffer {
+    pub item_id: i32,
+    /// The Marketplace Station Cash value paid when the ride is already owned or cannot be stored.
+    pub sc_equivalent: u32,
+    pub owned: bool,
+    pub room: bool,
+}
+
+/// What one completion earns after the daily bonus and the first-clear ride decision.
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq)]
+pub struct Earned {
+    pub sc: u32,
+    /// The first-clear ride item to grant, when this completion wins it.
+    pub ride: Option<i32>,
+}
+
+impl Earned {
+    /// The one atomic reward for this completion: the Station Cash kind plus the first-clear ride
+    /// item, for the single reward applier (`rewards::apply_grant`). The display stays empty; a
+    /// Station Cash-only grant has no reward bundle (client reader `008e7930` has no SC field).
+    pub fn grant(self) -> crate::rewards::RewardGrant {
+        crate::rewards::RewardGrant {
+            coins: 0,
+            items: self
+                .ride
+                .map(|definition_id| {
+                    vec![crate::rewards::ItemGrant {
+                        definition_id,
+                        count: 1,
+                    }]
+                })
+                .unwrap_or_default(),
+            job_xp: Default::default(),
+            sc: self.sc,
+            display: crate::rewards::RewardDisplay {
+                source_guid: 0,
+                player_guid: 0,
+                reward_kind: 0,
+                icon_id: 0,
+                name_id: 0,
+                rows: Vec::new(),
+            },
+        }
+    }
+}
+
+/// The first clear of one dungeon grants one earn-only ride (R). It is granted once per character
+/// save; an owned ride (or a full bag) pays its Marketplace value instead.
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct FirstClearRide {
+    pub dungeon_id: u32,
+    pub item_id: i32,
+}
+
+/// A data-driven event ride. No seasonal event content exists yet (T418's live events only gate
+/// quest offers), so a row must stay dormant: the loader refuses `enabled: true` rather than
+/// carrying an unreachable trigger.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct SeasonalRide {
+    pub item_id: i32,
+    pub event: String,
+    #[serde(default)]
+    pub enabled: bool,
+}
+
+/// `data/content/sc_rewards.json`: the earn table. Missing keeps earning off, so a content set
+/// without the file pays nothing (like the Marketplace policy). Every amount is (R) and tunable
+/// without a rebuild; `MAX_EARN_SC` bounds a malicious or mistaken edit.
+#[derive(Clone, Debug, Default, Deserialize)]
+#[serde(default, deny_unknown_fields)]
+pub struct EarnTable {
+    pub schema_version: u32,
+    /// The whole table is off when false; a stored wallet is kept.
+    pub enabled: bool,
+    /// One completed race, match or game (the server-observed finish, win or loss).
+    pub kart_race: u32,
+    pub derby_match: u32,
+    pub soccer_match: u32,
+    pub chess_game: u32,
+    /// One won combat run (the opening cave or any field battle), paid at the win transition;
+    /// `hardest_dungeon_clear` replaces it for `hardest_dungeons`.
+    pub dungeon_clear: u32,
+    pub hardest_dungeon_clear: u32,
+    /// Dungeon ids that pay `hardest_dungeon_clear` unless `dungeon_overrides` names them.
+    pub hardest_dungeons: Vec<u32>,
+    /// Per-dungeon amounts; a key here outranks the hardest/default tier.
+    pub dungeon_overrides: BTreeMap<u32, u32>,
+    /// One accepted NPC quest turn-in; `quest_overrides` replaces it per quest.
+    pub quest_complete: u32,
+    /// Per-quest amounts keyed by the quest's numeric id.
+    pub quest_overrides: BTreeMap<u32, u32>,
+    /// Added once per character per UTC day on the first qualifying completion.
+    pub daily_first_activity: u32,
+    pub first_clear_ride: Option<FirstClearRide>,
+    /// Dormant event rides; every row must be disabled until a seasonal event trigger exists.
+    pub seasonal_rides: Vec<SeasonalRide>,
+    pub source: Vec<SourceTag>,
+}
+
+impl EarnTable {
+    pub fn load(path: &Path) -> io::Result<Option<Self>> {
+        let metadata = match fs::metadata(path) {
+            Ok(metadata) => metadata,
+            Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(None),
+            Err(error) => return Err(error),
+        };
+        if !metadata.is_file() || metadata.len() > MAX_EARN_FILE_BYTES {
+            return Err(invalid("invalid Station Cash reward content"));
+        }
+        let bytes = fs::read(path)?;
+        if bytes.len() as u64 > MAX_EARN_FILE_BYTES {
+            return Err(invalid("invalid Station Cash reward content"));
+        }
+        let table: Self = serde_json::from_slice(&bytes)
+            .map_err(|_| invalid("invalid Station Cash reward content"))?;
+        table.validate()?;
+        Ok(Some(table))
+    }
+
+    fn validate(&self) -> io::Result<()> {
+        if self.schema_version != 1 {
+            return Err(invalid("unsupported Station Cash reward schema"));
+        }
+        let amounts = [
+            self.kart_race,
+            self.derby_match,
+            self.soccer_match,
+            self.chess_game,
+            self.dungeon_clear,
+            self.hardest_dungeon_clear,
+            self.quest_complete,
+            self.daily_first_activity,
+        ];
+        if amounts.iter().any(|amount| *amount > MAX_EARN_SC)
+            || self.hardest_dungeons.len() > MAX_EARN_OVERRIDES
+            || self.dungeon_overrides.len() > MAX_EARN_OVERRIDES
+            || self.quest_overrides.len() > MAX_EARN_OVERRIDES
+            || self.seasonal_rides.len() > MAX_EARN_RIDES
+        {
+            return Err(invalid("Station Cash reward value outside bounds"));
+        }
+        let dungeons: std::collections::BTreeSet<u32> =
+            self.hardest_dungeons.iter().copied().collect();
+        if dungeons.len() != self.hardest_dungeons.len()
+            || dungeons.contains(&0)
+            || self
+                .dungeon_overrides
+                .iter()
+                .any(|(id, sc)| *id == 0 || *sc > MAX_EARN_SC)
+            || self
+                .quest_overrides
+                .iter()
+                .any(|(id, sc)| *id == 0 || *sc > MAX_EARN_SC)
+        {
+            return Err(invalid("Station Cash reward key outside bounds"));
+        }
+        if let Some(ride) = self.first_clear_ride {
+            if ride.item_id <= 0 || ride.dungeon_id == 0 || !dungeons.contains(&ride.dungeon_id) {
+                return Err(invalid("invalid Station Cash first-clear ride"));
+            }
+        }
+        let mut rides = std::collections::BTreeSet::new();
+        for ride in &self.seasonal_rides {
+            if ride.item_id <= 0
+                || ride.event.trim().is_empty()
+                || ride.event.len() > 64
+                || ride.enabled
+                || !rides.insert(ride.item_id)
+            {
+                return Err(invalid("invalid or active Station Cash seasonal ride"));
+            }
+        }
+        if self.source.is_empty() {
+            return Err(invalid("Station Cash reward content has no provenance"));
+        }
+        for tag in &self.source {
+            let evidence = tag.evidence().trim();
+            if evidence.is_empty() || (tag.is_reconstructed() && !evidence.starts_with("(R)")) {
+                return Err(invalid("invalid Station Cash reward provenance"));
+            }
+        }
+        Ok(())
+    }
+
+    /// The Station Cash one completion pays before the daily bonus.
+    pub fn amount(&self, source: EarnSource) -> u32 {
+        match source {
+            EarnSource::KartRace => self.kart_race,
+            EarnSource::DerbyMatch => self.derby_match,
+            EarnSource::SoccerMatch => self.soccer_match,
+            EarnSource::ChessGame => self.chess_game,
+            EarnSource::Quest { id } => self
+                .quest_overrides
+                .get(&id)
+                .copied()
+                .unwrap_or(self.quest_complete),
+            EarnSource::DungeonClear { id } => {
+                self.dungeon_overrides.get(&id).copied().unwrap_or_else(|| {
+                    if self.hardest_dungeons.contains(&id) {
+                        self.hardest_dungeon_clear
+                    } else {
+                        self.dungeon_clear
+                    }
+                })
+            }
+        }
+    }
+
+    /// Decide one completion against the staged wallet. `day` is the character's server day; the
+    /// first completion of a day adds the bonus once. The first-clear ride is recorded in the
+    /// wallet in the same staged transaction, so a failed grant records nothing. The once-only
+    /// proof is `earned_rides`, never current ownership: rides trade (T429), and trading the ride
+    /// away must not re-arm the award.
+    pub fn earned(
+        &self,
+        wallet: &mut Wallet,
+        source: EarnSource,
+        day: u64,
+        ride: Option<RideOffer>,
+    ) -> Earned {
+        let mut sc = self.amount(source);
+        if wallet.last_activity_day != Some(day) {
+            wallet.last_activity_day = Some(day);
+            sc = sc.saturating_add(self.daily_first_activity);
+        }
+        let mut earned = Earned { sc, ride: None };
+        let ride = ride.filter(|offer| {
+            self.first_clear_ride.is_some_and(|first| {
+                offer.item_id == first.item_id
+                    && matches!(source, EarnSource::DungeonClear { id } if id == first.dungeon_id)
+            })
+        });
+        if let Some(offer) = ride {
+            let item = u32::try_from(offer.item_id).unwrap_or(0);
+            if item != 0 && !wallet.earned_rides.contains(&item) {
+                wallet.earned_rides.push(item);
+                if wallet.earned_rides.len() > MAX_EARN_RIDES {
+                    let drop = wallet.earned_rides.len() - MAX_EARN_RIDES;
+                    wallet.earned_rides.drain(..drop);
+                }
+                if offer.owned || !offer.room {
+                    earned.sc = earned.sc.saturating_add(offer.sc_equivalent);
+                } else {
+                    earned.ride = Some(offer.item_id);
+                }
+            }
+        }
+        earned
+    }
+}
+
+/// (R) The wall-clock UTC day index used by the first-activity bonus; the gateway never reads a
+/// client clock.
+pub fn activity_day(now_seconds: u64) -> u64 {
+    now_seconds / ACTIVITY_DAY_SECONDS
 }
 
 /// A saved wallet must have a Marketplace to spend it in; otherwise the next save would silently
@@ -276,6 +563,15 @@ impl Catalogue {
             .iter()
             .find(|listing| listing.bundle_id == bundle_id)
     }
+
+    /// The Marketplace Station Cash value of an earn-only ride (never listed). This is the
+    /// "SC equivalent" a first-clear award pays when the ride is already owned.
+    pub fn earn_only_price(&self, item_id: i32) -> Option<u32> {
+        self.earn_only
+            .iter()
+            .find(|listing| listing.item_id == item_id)
+            .map(|listing| listing.price)
+    }
 }
 
 /// One successfully paid order, persisted with the wallet so a reconnect cannot pay it twice.
@@ -295,7 +591,9 @@ pub struct OrderRecord {
 }
 
 /// The per-character Station Cash wallet. `orders` is the replay window; it is part of the save,
-/// so a disconnected or replayed order packet cannot be paid again.
+/// so a disconnected or replayed order packet cannot be paid again. `earned_rides` records the
+/// first-clear rides already awarded and `last_activity_day` the last day the first-completion
+/// bonus was paid; both are written only by the reward applier's staged transaction.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Wallet {
@@ -303,6 +601,12 @@ pub struct Wallet {
     pub balance: u32,
     #[serde(default, skip_serializing_if = "Vec::is_empty")]
     pub orders: Vec<OrderRecord>,
+    /// Earn-only ride item ids whose first-clear award was already settled, oldest first.
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub earned_rides: Vec<u32>,
+    /// UTC day index (`activity_day`) of the last paid first-completion bonus.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub last_activity_day: Option<u64>,
 }
 
 impl Wallet {
@@ -323,11 +627,20 @@ impl Wallet {
                 .orders
                 .drain(..wallet.orders.len() - config.order_history);
         }
+        wallet.earned_rides.retain(|item| *item > 0);
+        wallet.earned_rides.dedup();
+        if wallet.earned_rides.len() > MAX_EARN_RIDES {
+            let drop = wallet.earned_rides.len() - MAX_EARN_RIDES;
+            wallet.earned_rides.drain(..drop);
+        }
         wallet
     }
 
     pub fn is_empty(&self) -> bool {
-        self.balance == 0 && self.orders.is_empty()
+        self.balance == 0
+            && self.orders.is_empty()
+            && self.earned_rides.is_empty()
+            && self.last_activity_day.is_none()
     }
 
     fn replay(&self, order: &OrderDetail, tracking_id: u32) -> Option<u32> {

@@ -216,6 +216,51 @@ impl Drop for Fixture {
     }
 }
 
+/// T229: the wallet one accepted quest turn-in writes (see [`wallet_after`]).
+pub fn wallet_after_quest(
+    wallet: Option<osfr_tools::station_cash::Wallet>,
+    quest_id: u32,
+) -> Option<osfr_tools::station_cash::Wallet> {
+    wallet_after(
+        wallet,
+        osfr_tools::station_cash::EarnSource::Quest { id: quest_id },
+    )
+}
+
+/// T229: the wallet one server-verified completion writes, computed from the shipped earn table
+/// through production's own `EarnTable::earned` (a content change updates the expectation; the
+/// daily bonus and its UTC day are never hard-coded). `None` means the completion left no wallet.
+pub fn wallet_after(
+    wallet: Option<osfr_tools::station_cash::Wallet>,
+    source: osfr_tools::station_cash::EarnSource,
+) -> Option<osfr_tools::station_cash::Wallet> {
+    let table = osfr_tools::station_cash::EarnTable::load(&content_dir().join("sc_rewards.json"))
+        .expect("the earn table reads")
+        .expect("the bundled earn table exists");
+    let now = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .expect("the clock is after the epoch")
+        .as_secs();
+    let mut wallet = wallet.unwrap_or_default();
+    let earned = table.earned(
+        &mut wallet,
+        source,
+        osfr_tools::station_cash::activity_day(now),
+        None,
+    );
+    assert!(
+        earned.sc > 0 && earned.ride.is_none(),
+        "the shipped table pays this completion in Station Cash only"
+    );
+    // The one reward applier adds the decided amount to the staged wallet (below the bundled
+    // ceiling, so the cap and its notice do not apply here).
+    wallet.balance = wallet
+        .balance
+        .checked_add(earned.sc)
+        .expect("the expected wallet balance fits");
+    (!wallet.is_empty()).then_some(wallet)
+}
+
 pub fn character_at_for(guid: u64, zone_id: u32, position: [f32; 3]) -> CharacterState {
     CharacterState {
         guid,

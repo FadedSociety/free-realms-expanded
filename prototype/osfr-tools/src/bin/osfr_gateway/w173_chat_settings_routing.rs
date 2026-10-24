@@ -296,6 +296,7 @@ fn claim_requests_and_bundled_children_are_budgeted_before_staging() {
                 coins: 1,
                 items: Vec::new(),
                 job_xp: Default::default(),
+                sc: 0,
                 display: RewardDisplay {
                     source_guid: 0,
                     player_guid: 1,

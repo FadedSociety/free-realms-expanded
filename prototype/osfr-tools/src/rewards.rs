@@ -9,6 +9,7 @@
 use crate::{
     inventory::{Inventory, MAX_ITEMS},
     profiles::ProfileState,
+    station_cash::{self, Wallet},
 };
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeSet, fmt, io};
@@ -49,18 +50,29 @@ pub struct RewardDisplay {
     pub rows: Vec<RewardBundleRow>,
 }
 
-/// One atomic server grant. `job_xp` maps profile/job ids to XP amounts.
+/// One atomic server grant. `job_xp` maps profile/job ids to XP amounts. `sc` is the Station Cash
+/// kind added by slice 2; it is paid only when the snapshot carries the character's wallet and is
+/// capped by the wallet ceiling. Zero SC is omitted from the save form so existing saves and
+/// serialized grants stay byte-identical.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct RewardGrant {
     pub coins: u32,
     pub items: Vec<ItemGrant>,
     pub job_xp: std::collections::BTreeMap<i32, u32>,
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub sc: u32,
     pub display: RewardDisplay,
 }
 
+fn is_zero(value: &u32) -> bool {
+    *value == 0
+}
+
 /// Runtime state returned by [`apply_grant`]. Persist `applied_grant_keys` with the inventory and
-/// profile snapshot; this module intentionally does not perform persistence.
+/// profile snapshot; this module intentionally does not perform persistence. `wallet` is the
+/// staged Station Cash wallet and `wallet_ceiling` its data cap; both stay `None`/zero for reward
+/// paths that cannot pay Station Cash.
 #[derive(Clone)]
 pub struct RewardState {
     pub inventory: Inventory,
@@ -68,6 +80,8 @@ pub struct RewardState {
     pub applied_grant_keys: BTreeSet<String>,
     /// Maximum occupied inventory stacks. The original client's bag limit is not recovered (R).
     pub bag_capacity: usize,
+    pub wallet: Option<Wallet>,
+    pub wallet_ceiling: u32,
 }
 
 impl RewardState {
@@ -77,7 +91,16 @@ impl RewardState {
             profiles,
             applied_grant_keys: BTreeSet::new(),
             bag_capacity,
+            wallet: None,
+            wallet_ceiling: 0,
         }
+    }
+
+    /// Stage the character's Station Cash wallet and its data ceiling with this transaction.
+    pub fn with_wallet(mut self, wallet: Wallet, ceiling: u32) -> Self {
+        self.wallet = Some(wallet);
+        self.wallet_ceiling = ceiling;
+        self
     }
 }
 
@@ -100,6 +123,8 @@ pub enum GrantFailure {
     InvalidKey,
     /// The display bundle has an unsupported, truncated or oversized row.
     Shape,
+    /// A Station Cash grant on a snapshot that staged no wallet (a server fault, T229).
+    NoWallet,
 }
 
 impl fmt::Display for GrantFailure {
@@ -112,6 +137,7 @@ impl fmt::Display for GrantFailure {
             Self::WireRange => "reward coins or XP exceed the wire field",
             Self::InvalidKey => "invalid reward grant key",
             Self::Shape => "unsupported or truncated reward bundle entry",
+            Self::NoWallet => "Station Cash reward has no wallet",
         })
     }
 }
@@ -228,13 +254,38 @@ pub fn apply_grant(
         return Err(GrantFailure::BagFull);
     }
 
-    // Reward bundle fields and entry ids follow the body consumed by client reader 008e7930.
-    outgoing.push(encode_display_bundle(
-        coins,
-        stars,
-        row_count,
-        &grant.display,
-    )?);
+    // The Station Cash kind (slice 2): pay into the staged wallet, capped by the data ceiling.
+    // Over the ceiling pays up to it and tells the player instead of refusing the whole reward.
+    let mut sc_replies = Vec::new();
+    if grant.sc > 0 {
+        let wallet = next.wallet.as_mut().ok_or(GrantFailure::NoWallet)?;
+        let paid = grant
+            .sc
+            .min(next.wallet_ceiling.saturating_sub(wallet.balance));
+        wallet.balance = wallet
+            .balance
+            .checked_add(paid)
+            .ok_or(GrantFailure::WireRange)?;
+        // 66/11: client reader 00b3a6e0 -> 00b2b450; the record's first u32 is the balance.
+        sc_replies.push(station_cash::wallet_packet(wallet.balance));
+        if paid < grant.sc {
+            sc_replies.push(crate::chat::system(
+                "Station Cash is at its maximum, so the rest of this reward was not paid.",
+            ));
+        }
+    }
+
+    // Reward bundle fields and entry ids follow the body consumed by client reader 008e7930. A
+    // Station Cash-only grant has nothing for that bundle; its wallet packet is the display.
+    if !(grant.sc > 0 && coins == 0 && stars == 0 && grant.display.rows.is_empty()) {
+        outgoing.push(encode_display_bundle(
+            coins,
+            stars,
+            row_count,
+            &grant.display,
+        )?);
+    }
+    outgoing.extend(sc_replies);
     next.applied_grant_keys.insert(grant_key.to_owned());
     Ok((next, outgoing))
 }

@@ -133,6 +133,7 @@ fn reward(coins: u32, items: Vec<ItemGrant>, character_id: u64) -> RewardGrant {
         coins,
         items,
         job_xp: BTreeMap::new(),
+        sc: 0,
         display: RewardDisplay {
             source_guid: 1,
             player_guid: character_id,

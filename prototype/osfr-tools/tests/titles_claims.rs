@@ -303,6 +303,7 @@ fn item_grant() -> RewardGrant {
             count: 1,
         }],
         job_xp: BTreeMap::new(),
+        sc: 0,
         display: RewardDisplay {
             source_guid: 700,
             player_guid: 1,
@@ -319,6 +320,7 @@ fn empty_grant() -> RewardGrant {
         coins: 0,
         items: Vec::new(),
         job_xp: BTreeMap::new(),
+        sc: 0,
         display: RewardDisplay {
             source_guid: 700,
             player_guid: 1,

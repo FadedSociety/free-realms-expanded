@@ -21,6 +21,9 @@ use std::{
     fs,
     path::{Path, PathBuf},
 };
+#[path = "support/sc_earn.rs"]
+mod sc_earn;
+use osfr_tools::station_cash::EarnSource;
 
 const NOW: u64 = 10_000;
 
@@ -449,4 +452,68 @@ fn replay_grants_no_duplicate_economy_or_stage_progress() {
         before.inventory,
         "closing the results grants nothing"
     );
+}
+
+/// T229: the cave is a normal-tier dungeon. Each clear pays the table's clear amount once, at the
+/// win (the first completion of the UTC day adds the bonus); leaving early or closing the results
+/// pays nothing, it grants no earn-only ride, and the wallet survives a reload.
+#[test]
+fn each_cave_clear_pays_the_dungeon_station_cash_once() {
+    let mut fixture = fixture(true, true);
+    let clear = EarnSource::DungeonClear {
+        id: fixture.binding.encounter_id,
+    };
+    let giver = fixture.binding.giver_guid;
+    let giver_zone = fixture.binding.giver_zone;
+    let giver_position = fixture.binding.giver_position;
+
+    // Leaving before the win is not a clear.
+    interact(&mut fixture, giver, 1);
+    enter_dungeon(&mut fixture);
+    exit_cave(&mut fixture);
+    assert!(active(&fixture).is_none(), "the exit ends the run");
+    assert!(
+        fixture.gameplay.state().sc_wallet.is_none(),
+        "leaving early pays no Station Cash"
+    );
+
+    let clear_once = |fixture: &mut Fixture| {
+        fixture.character.zone_id = giver_zone;
+        fixture.character.position = giver_position;
+        fixture
+            .gameplay
+            .initialize_world(&fixture.character.clone(), NOW + 6_000)
+            .expect("the world re-entry is accepted");
+        interact(fixture, giver, 1);
+        enter_dungeon(fixture);
+        clear_cave(fixture);
+        let won = fixture.gameplay.state().sc_wallet;
+        close_results(fixture);
+        assert_eq!(
+            fixture.gameplay.state().sc_wallet,
+            won,
+            "closing the results pays nothing more"
+        );
+        won.expect("the win writes the Station Cash wallet")
+    };
+    let first = clear_once(&mut fixture);
+    assert_eq!(
+        first.balance,
+        sc_earn::first_of_day(clear),
+        "one clear plus the first-activity-of-the-day bonus"
+    );
+    assert!(
+        first.earned_rides.is_empty(),
+        "the cave is not the first-clear ride's dungeon"
+    );
+    let second = clear_once(&mut fixture);
+    assert_eq!(
+        second.balance,
+        first.balance + sc_earn::table().amount(clear),
+        "a second clear the same day pays the clear without a second bonus"
+    );
+
+    let restored =
+        Gameplay::load(&paths().0, Some(fixture.gameplay.state())).expect("the save reloads");
+    assert_eq!(restored.state().sc_wallet, Some(second));
 }

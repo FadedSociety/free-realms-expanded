@@ -30,6 +30,7 @@ fn engine(kind: ObjectiveKind, required: u32) -> QuestEngine {
                 coins: 0,
                 items: vec![],
                 job_xp: BTreeMap::new(),
+                sc: 0,
                 display: RewardDisplay {
                     source_guid: 1,
                     player_guid: 1,

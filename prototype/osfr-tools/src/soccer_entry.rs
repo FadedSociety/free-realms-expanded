@@ -214,6 +214,7 @@ impl Content {
             coins: self.reward.coins,
             items: Vec::new(),
             job_xp: self.reward.job_xp.clone(),
+            sc: 0,
             display: RewardDisplay {
                 source_guid: 0,
                 player_guid,

@@ -48,6 +48,8 @@ use std::{
 mod field_battle_fixture;
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
+#[path = "support/sc_earn.rs"]
+mod sc_earn;
 #[path = "support/terrain.rs"]
 mod terrain;
 
@@ -405,6 +407,22 @@ fn a_level_five_character_can_start_and_win_it_once() {
         economy(&gateway, &prizes),
         paid,
         "leaving pays nothing more"
+    );
+    // T229: the win transition is the dungeon clear: the table's tier plus the first-activity-of-
+    // the-day bonus, paid once with the win grants; the Close pays nothing more.
+    let wallet = won
+        .gameplay
+        .and_then(|state| state.sc_wallet)
+        .expect("the win writes the Station Cash wallet");
+    assert_eq!(
+        wallet.balance,
+        sc_earn::first_of_day(osfr_tools::station_cash::EarnSource::DungeonClear { id: THUGAMUG }),
+        "one clear plus the first-activity-of-the-day bonus"
+    );
+    assert_eq!(
+        gateway.snapshot().gameplay.unwrap().sc_wallet,
+        Some(wallet),
+        "leaving pays no more Station Cash"
     );
 }
 

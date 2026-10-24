@@ -249,6 +249,7 @@ fn grant() -> RewardGrant {
         coins: 5,
         items: Vec::new(),
         job_xp: BTreeMap::new(),
+        sc: 0,
         display: RewardDisplay {
             source_guid: 0,
             player_guid: 800,

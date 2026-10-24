@@ -118,6 +118,7 @@ fn grant() -> RewardGrant {
             count: 2,
         }],
         job_xp: BTreeMap::from([(1, 15)]),
+        sc: 0,
         display: RewardDisplay {
             source_guid: 700,
             player_guid: 800,
@@ -269,6 +270,7 @@ fn empty_bundle_is_69_byte_reader_body_after_three_byte_header() {
         coins: 0,
         items: Vec::new(),
         job_xp: BTreeMap::new(),
+        sc: 0,
         display: RewardDisplay {
             source_guid: 0,
             player_guid: 800,

@@ -20,6 +20,9 @@ use std::{
 #[path = "support/chess_bot.rs"]
 mod chess_bot;
 use chess_bot::{EndOfGame, Human, play_line};
+#[path = "support/sc_earn.rs"]
+mod sc_earn;
+use osfr_tools::station_cash::EarnSource;
 
 const LAKESHORE: [f32; 3] = [-733.952, 9.09, 945.973];
 /// Easy single-player row; the portal id is the client minigame row id.
@@ -501,12 +504,20 @@ fn entry_request_uses_a_server_reply_and_ignores_client_opponent_moves() {
         .unwrap();
     assert!(!early.changed && early.replies.is_empty());
     assert_eq!(coins(&game), before);
+    assert!(
+        game.state().sc_wallet.is_none(),
+        "a fabricated result pays no Station Cash before the server settles the game"
+    );
 
     // Quit retires the run; a new Play publishes a fresh instance id.
     let close = game
         .handle_in_world(&lifecycle(6, instance), &who, 2_700)
         .unwrap();
     assert!(close.changed, "quit retires the run");
+    assert!(
+        game.state().sc_wallet.is_none(),
+        "quitting before the settlement pays no Station Cash"
+    );
     let again = game.handle_in_world(&play(CHESS_ROW), &who, 2_800).unwrap();
     assert_ne!(
         offer_instance(&again),
@@ -574,6 +585,26 @@ fn a_single_player_win_pays_once_after_acknowledgement_and_closes_cleanly() {
     let state = game.state();
     assert_eq!(coins(&game), before + payout, "exactly one content award");
     assert_eq!(state.chess.map(|ledger| ledger.paid_coins), Some(payout));
+    // T229: an accepted settlement is the chess completion record, so it pays the chess Station
+    // Cash kind once plus the first-activity-of-the-day bonus.
+    let wallet = state
+        .sc_wallet
+        .clone()
+        .expect("the settled game writes the Station Cash wallet");
+    assert_eq!(
+        wallet.balance,
+        sc_earn::first_of_day(EarnSource::ChessGame),
+        "one chess completion plus the first-activity-of-the-day bonus"
+    );
+    let wallet_packet = ack
+        .replies
+        .iter()
+        .find(|packet| packet.starts_with(&[66, 0, 11, 0]))
+        .expect("the earned Station Cash pushes the wallet response");
+    assert_eq!(
+        u32::from_le_bytes(wallet_packet[9..13].try_into().unwrap()),
+        wallet.balance
+    );
 
     // A duplicate acknowledgement and late movie traffic cannot pay again.
     let replay = game

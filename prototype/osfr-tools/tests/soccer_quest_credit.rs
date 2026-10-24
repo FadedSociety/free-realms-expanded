@@ -38,6 +38,10 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "support/sc_earn.rs"]
+mod sc_earn;
+use osfr_tools::station_cash::EarnSource;
+
 #[allow(dead_code)] // only `copy_missing` is used here
 #[path = "common/content_copy.rs"]
 mod content_copy;
@@ -404,6 +408,21 @@ fn the_reward_is_paid_once_and_the_result_precedes_the_event() {
         "the coin update carries the new balance"
     );
     assert_eq!(game.inventory_state().coins, coins_before + REWARD_COINS);
+    // T229: a settled match is one completion and pays the soccer Station Cash kind once, plus
+    // the first-activity-of-the-day bonus.
+    let wallet = game
+        .state()
+        .sc_wallet
+        .expect("the settled match writes the Station Cash wallet");
+    assert_eq!(
+        wallet.balance,
+        sc_earn::first_of_day(EarnSource::SoccerMatch),
+        "one soccer completion plus the first-activity-of-the-day bonus"
+    );
+    assert!(
+        index_requiring(&replies, &[66, 0, 11, 0], "the wallet response") > bundle,
+        "the earned Station Cash follows the match payout"
+    );
     assert_eq!(
         game.state().profiles.unwrap().experience,
         xp_before,
@@ -432,6 +451,16 @@ fn a_loss_or_cancel_does_not_advance() {
         coins_before,
         "a loss pays nothing"
     );
+    // T229: the tie still completes the match (server-observed full time), so the Station Cash
+    // kind pays once even though a loss carries no win grant.
+    assert_eq!(
+        game.state()
+            .sc_wallet
+            .expect("the completed match writes the Station Cash wallet")
+            .balance,
+        sc_earn::first_of_day(EarnSource::SoccerMatch),
+        "a completed match pays Station Cash, not a win grant"
+    );
     game.handle_in_world(&[26, 0, 42, 0], &character, lost_at + 250)
         .unwrap();
     assert_eq!(counts(&game), [0]);
@@ -454,6 +483,10 @@ fn a_loss_or_cancel_does_not_advance() {
     assert!(!game.is_soccer_active());
     assert_eq!(counts(&game), [0]);
     assert_eq!(game.inventory_state().coins, coins_before);
+    assert!(
+        game.state().sc_wallet.is_none(),
+        "a cancelled match is not a completion and pays no Station Cash"
+    );
     let later = game.tick(&other, 1_600).unwrap();
     assert!(later.replies.iter().all(|p| !p.starts_with(&[39, 0, 18])));
     assert_eq!(counts(&game), [0]);

@@ -1160,6 +1160,7 @@ impl QuestEngine {
                 coins: stage.reward.coins,
                 items: item_grants,
                 job_xp: BTreeMap::new(),
+                sc: 0,
                 display: RewardDisplay {
                     source_guid: stage.giver_guid,
                     player_guid: character_id,
@@ -2231,7 +2232,8 @@ impl QuestEngine {
             GrantFailure::UnknownItem
             | GrantFailure::BadItem
             | GrantFailure::Shape
-            | GrantFailure::InvalidKey => {
+            | GrantFailure::InvalidKey
+            | GrantFailure::NoWallet => {
                 // Not the player's fault: one bounded line for the operator, like
                 // `quest_save_repair` (fixed text, a u32 id and the class; no identity or chat).
                 eprintln!("quest_turnin_reward_refused quest={quest_id} reason={failure:?}");
@@ -2538,6 +2540,7 @@ fn definition_from_content(
         coins: 0,
         items: Vec::new(),
         job_xp: BTreeMap::new(),
+        sc: 0,
         display: RewardDisplay {
             source_guid: quest.giver_npc_id,
             player_guid: character_id,

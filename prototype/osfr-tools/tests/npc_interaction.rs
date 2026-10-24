@@ -242,6 +242,7 @@ fn quest_giver_talk_candidate_uses_quest_engine_eligibility() {
             coins: 0,
             items: Vec::new(),
             job_xp: BTreeMap::new(),
+            sc: 0,
             display: RewardDisplay {
                 source_guid: QUEST_GIVER_ID,
                 player_guid: 7,

@@ -168,7 +168,7 @@ impl Content {
         let mut state = self.game(None).state();
         state.sc_wallet = Some(Wallet {
             balance,
-            orders: Vec::new(),
+            ..Wallet::default()
         });
         self.game(Some(state))
     }
@@ -330,7 +330,7 @@ fn a_deed_without_a_lot_grant_is_refused_and_never_granted_as_an_item() {
         None,
         Wallet {
             balance: 1_000,
-            orders: Vec::new(),
+            ..Wallet::default()
         },
     )
     .expect("shop loads");

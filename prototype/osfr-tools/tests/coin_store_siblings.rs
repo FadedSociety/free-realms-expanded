@@ -1545,7 +1545,7 @@ fn gateway_sc_wallet_and_ride_order_are_atomic_and_replay_once() {
     let mut state = fixture.state();
     state.sc_wallet = Some(Wallet {
         balance: 150,
-        orders: Vec::new(),
+        ..Wallet::default()
     });
     let mut gateway = fixture.connect(state);
     assert_eq!(wallet_balance(&send(&mut gateway, &marketplace(10))), 150);
@@ -1629,7 +1629,7 @@ fn gateway_sc_balance_and_ride_survive_reload() {
     let mut state = fixture.state();
     state.sc_wallet = Some(Wallet {
         balance: 150,
-        orders: Vec::new(),
+        ..Wallet::default()
     });
     let mut gateway = fixture.connect(state);
     let bought = gateway
@@ -1680,7 +1680,7 @@ fn gateway_sc_full_bag_is_refused_atomically() {
     let mut state = fixture.state();
     state.sc_wallet = Some(Wallet {
         balance: 150,
-        orders: Vec::new(),
+        ..Wallet::default()
     });
     let mut next = 1_000_000i32;
     while state.inventory.items.len() < 100 {

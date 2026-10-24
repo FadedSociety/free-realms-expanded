@@ -342,6 +342,7 @@ fn a_malformed_reward_is_refused_without_mutation() {
             coins: 5,
             items: Vec::new(),
             job_xp: std::collections::BTreeMap::new(),
+            sc: 0,
             display: RewardDisplay {
                 source_guid: 11,
                 player_guid: 3,

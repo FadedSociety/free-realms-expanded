@@ -17,6 +17,8 @@ use std::{
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
 };
+#[path = "support/sc_earn.rs"]
+mod sc_earn;
 
 static NEXT_FIXTURE: AtomicU64 = AtomicU64::new(0);
 
@@ -787,5 +789,74 @@ fn mustang_talk_completes_return_objective_and_pays_once_after_reconnect() {
     assert_eq!(
         gateway.snapshot().gameplay.unwrap().inventory.coins,
         after.inventory.coins
+    );
+}
+
+/// T229: the same routed turn-in pays the quest's Station Cash kind once. The first completion of
+/// the UTC day also pays the data bonus; a repeated 49/14 re-sends nothing and pays nothing.
+#[test]
+fn mustang_turnin_pays_the_quest_station_cash_once_and_survives_reconnect() {
+    let content = content_root();
+    let route = RouteContent::new();
+    let mut character = Gateway::reference_state(&reference_root()).unwrap();
+    character.zone_id = 0;
+    character.position = MUSTANG_POSITION;
+    let mut gameplay = Gameplay::load(&route.0, None).unwrap().state();
+    kart_driver_profiles(&mut gameplay);
+    gameplay.npc_quests = Some(seed_tutorial_prerequisites(&content, character.guid, true));
+    let mut gateway = packet_gateway(&route.0, character, gameplay);
+
+    let options = interaction_options(&mut gateway);
+    let talk = options
+        .iter()
+        .find_map(|(id, label)| (*label == TALK_MENU_STRING_ID).then_some(*id))
+        .expect("Mustang Alli exposes the generic Talk option");
+    let _ = send(&mut gateway, &npc_select(MUSTANG_ALLI, talk));
+    let _ = send(&mut gateway, &quest_choice());
+
+    // Reconnect with the open end screen, like the completion test above.
+    let character = gateway.state().clone();
+    let gameplay = gateway.snapshot().gameplay.unwrap();
+    let mut gateway = packet_gateway(&route.0, character, gameplay);
+    let completed = send(&mut gateway, &quest_end_reply(3_080_002));
+    let completion = bodies(&completed);
+    assert!(
+        completion
+            .iter()
+            .any(|body| body.starts_with(&[66, 0, 11, 0])),
+        "the earned Station Cash pushes the wallet response"
+    );
+    let wallet = gateway
+        .snapshot()
+        .gameplay
+        .unwrap()
+        .sc_wallet
+        .expect("a paid quest writes the Station Cash wallet");
+    assert_eq!(
+        wallet.balance,
+        sc_earn::first_of_day(osfr_tools::station_cash::EarnSource::Quest { id: 3_080_002 }),
+        "one quest completion plus its first-activity-of-the-day bonus"
+    );
+    assert!(wallet.last_activity_day.is_some());
+    let saved = gateway.snapshot();
+
+    // The same turn-in reply is inert: no second grant, no wallet change.
+    let replay = send(&mut gateway, &quest_end_reply(3_080_002));
+    assert!(!replay.gameplay_changed);
+    assert_eq!(gateway.snapshot(), saved);
+
+    // The wallet is in the character save, so a reconnect keeps exactly one payout.
+    let character = gateway.state().clone();
+    let gameplay = gateway.snapshot().gameplay.unwrap();
+    let mut restarted = packet_gateway(&route.0, character, gameplay);
+    assert_eq!(
+        restarted.snapshot().gameplay.unwrap().sc_wallet,
+        Some(wallet.clone())
+    );
+    let replay = send(&mut restarted, &quest_end_reply(3_080_002));
+    assert!(!replay.gameplay_changed);
+    assert_eq!(
+        restarted.snapshot().gameplay.unwrap().sc_wallet,
+        Some(wallet)
     );
 }

@@ -477,6 +477,7 @@ impl DerbyGateway {
             coins: self.content.completion_reward_coins,
             items: Vec::new(),
             job_xp,
+            sc: 0,
             display: RewardDisplay {
                 source_guid: guid,
                 player_guid: guid,

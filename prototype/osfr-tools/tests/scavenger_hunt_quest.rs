@@ -45,7 +45,7 @@ use scavenger_hunt::{
     content_dir, counts, finish_quest, fresh, has_family, has_objective, npc_position,
     objective_update, offer, offer_hunt, pending_offer, pending_turnin, profile_xp,
     quest_end_reply, quest_reply, quest_status, read_json, refused, refused_interaction,
-    release_end_screen, saved, select_job, send, talk, visit,
+    release_end_screen, saved, select_job, send, talk, visit, wallet_after_quest,
 };
 use serde_json::{Value, json};
 use std::{
@@ -277,6 +277,7 @@ fn the_four_stops_complete_and_pay_once() {
     // Compare the whole state and its serialized save bytes, so a partial save
     // or an unexpected item grant fails here.
     let mut expected = before_payout.clone();
+    expected.sc_wallet = wallet_after_quest(expected.sc_wallet.clone(), QUEST);
     expected.inventory.coins = coins_before.checked_add(50).unwrap();
     expected
         .profiles

@@ -321,6 +321,7 @@ impl AchievementBindings {
                         coins: 0,
                         items,
                         job_xp: BTreeMap::new(),
+                        sc: 0,
                         display: rewards::RewardDisplay {
                             source_guid: 0,
                             player_guid: 0,
@@ -781,6 +782,7 @@ fn grant_is_empty(grant: &RewardGrant) -> bool {
     grant.coins == 0
         && grant.items.is_empty()
         && grant.job_xp.is_empty()
+        && grant.sc == 0
         && grant.display.rows.is_empty()
 }
 
@@ -789,6 +791,7 @@ pub(crate) fn empty_grant() -> RewardGrant {
         coins: 0,
         items: Vec::new(),
         job_xp: BTreeMap::new(),
+        sc: 0,
         display: rewards::RewardDisplay {
             source_guid: 0,
             player_guid: 0,

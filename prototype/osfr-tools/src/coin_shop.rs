@@ -207,6 +207,8 @@ pub struct CoinShop {
     sc_wallet: Wallet,
     /// T230: the validated ride catalogue, shared with every staged clone.
     sc_catalogue: Arc<station_cash::Catalogue>,
+    /// T229: the earn table beside the campaign content; absent keeps earnings off.
+    sc_earn: Option<station_cash::EarnTable>,
     vendor_transactions: BTreeMap<u32, (u32, Vec<u8>)>,
     sales: VecDeque<SaleRecord>,
     next_transaction_id: u32,
@@ -249,6 +251,8 @@ impl CoinShop {
             is_member: false,
             sc_wallet,
             sc_catalogue: Arc::new(sc_catalogue),
+            // `load` fills this from the NPC content; `new` alone keeps earning off.
+            sc_earn: None,
             vendor_transactions: BTreeMap::new(),
             sales: VecDeque::new(),
             next_transaction_id: 1,
@@ -268,14 +272,18 @@ impl CoinShop {
         let shop = if shop_enabled {
             let catalogue = StoreCatalogue::load(&npc_content.join("stores.json"))?;
             // (R) Local bag capacity is 100 occupied stacks until an account capacity is wired.
-            Some(Self::new(
+            let mut shop = Self::new(
                 inventory_content,
                 inventory,
                 catalogue,
                 100,
                 profiles,
                 wallet.clone().unwrap_or_default(),
-            )?)
+            )?;
+            // T229: the earn table ships beside the NPC/store content (the same fallback the
+            // Marketplace catalogue uses). A missing file keeps earning off.
+            shop.sc_earn = station_cash::EarnTable::load(&npc_content.join("sc_rewards.json"))?;
+            Some(shop)
         } else {
             None
         };
@@ -309,6 +317,17 @@ impl CoinShop {
 
     pub fn sc_catalogue(&self) -> &station_cash::Catalogue {
         &self.sc_catalogue
+    }
+
+    /// T229: the earn table read beside the campaign content; `None` keeps earnings off.
+    pub fn sc_earn(&self) -> Option<&station_cash::EarnTable> {
+        self.sc_earn.as_ref()
+    }
+
+    /// T229: adopt the Station Cash wallet from one staged reward transaction. The reward path
+    /// is the only writer; the order path still debits the same field.
+    pub fn set_sc_wallet(&mut self, wallet: Wallet) {
+        self.sc_wallet = wallet;
     }
 
     /// Apply one 66/43 vendor buy using the store catalogue's server-side price.

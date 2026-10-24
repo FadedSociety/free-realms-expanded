@@ -425,6 +425,7 @@ pub fn reward_grant(
             })
             .collect(),
         job_xp: BTreeMap::from([(MINER_PROFILE_ID, RECONSTRUCTED_MINER_XP_PER_WIN)]),
+        sc: 0,
         display: RewardDisplay {
             source_guid: player_guid,
             player_guid,

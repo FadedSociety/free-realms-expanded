@@ -46,6 +46,7 @@ use osfr_tools::{
     npc_interaction::{decode_dialogue_26_3, decode_quest_offer_49_1},
     quest_engine::QuestStatus,
     startup_world::parse_add_npc,
+    station_cash::EarnSource,
     world::NpcVisibility,
 };
 use serde_json::json;
@@ -647,7 +648,11 @@ fn a_loss_or_quit_does_not_credit_the_quest() {
     // A goalless full time is a loss: a result, no grant and no quest packet.
     let quest_before = player.game.state().npc_quests;
     let coins_before = coins(&player.game);
-    let save_before = saved(&player.game);
+    // T229: full time is a completed match, so a loss still pays the soccer Station Cash kind
+    // (from the shipped earn table); nothing else in the save changes.
+    let mut after_loss = player.game.state();
+    after_loss.sc_wallet = wallet_after(after_loss.sc_wallet, EarnSource::SoccerMatch);
+    let after_loss = serde_json::to_vec(&after_loss).unwrap();
     let at = player.stamp();
     enter_match(&mut player.game, &player.character, SNOWHILL_SOCCER, at);
     let (replies, lost_at) = tick_to_full_time(&mut player.game, &player.character, at + 200);
@@ -663,8 +668,8 @@ fn a_loss_or_quit_does_not_credit_the_quest() {
     assert_eq!(coins(&player.game), coins_before, "a loss pays nothing");
     assert_eq!(
         saved(&player.game),
-        save_before,
-        "a loss leaves the save as it was"
+        after_loss,
+        "a loss changes only the Station Cash wallet"
     );
 
     // A quit before full time removes the run and credits nothing.
@@ -697,7 +702,7 @@ fn a_loss_or_quit_does_not_credit_the_quest() {
     assert_eq!(coins(&player.game), coins_before);
     assert_eq!(
         saved(&player.game),
-        save_before,
+        after_loss,
         "a quit leaves the save as it was"
     );
 

@@ -544,6 +544,7 @@ fn claim_grant(definition_id: i32) -> RewardGrant {
             count: CLAIM_ITEMS,
         }],
         job_xp: BTreeMap::new(),
+        sc: 0,
         display: RewardDisplay {
             source_guid: 0,
             player_guid: GUID,

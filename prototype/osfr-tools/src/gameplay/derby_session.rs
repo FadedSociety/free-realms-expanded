@@ -217,6 +217,8 @@ impl Gameplay {
             crate::quest_engine::QuestEvent::FinishMinigame { minigame_id },
             out,
         )?;
+        // T229: the same handover pays the derby's Station Cash kind, whatever the coin grant does.
+        self.pay_earned_station_cash(crate::station_cash::EarnSource::DerbyMatch, out)?;
         let Some(grant) = grant else {
             return Ok(());
         };
