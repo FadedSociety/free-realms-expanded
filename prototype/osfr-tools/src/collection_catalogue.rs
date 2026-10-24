@@ -6,12 +6,19 @@
 //! record (client reader `009099d0`), its keyed entry rows (`008dacc0`) and its completion reward
 //! bundle (`008e7930`, entry kinds from `0103c070`). The generator fails on any drift from the
 //! template, so definitions and entries are never edited by hand; reward values may be tuned in the
-//! file within the load bounds below. Nothing at runtime reads it yet, and an absent file keeps the
-//! feature dormant.
+//! file within the load bounds below. An absent file keeps the feature dormant.
 
-use crate::progression_extras::{CollectionCatalogue, CollectionDefinition};
+use crate::{
+    progression_extras::{CollectionCatalogue, CollectionDefinition, empty_grant},
+    rewards::{ItemGrant, RewardGrant},
+};
 use serde::{Deserialize, Serialize};
-use std::{collections::BTreeMap, fs, io, io::Read, path::Path};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fs, io,
+    io::Read,
+    path::Path,
+};
 
 pub const FILE_NAME: &str = "collection_catalogue.json";
 pub const SCHEMA_VERSION: u32 = 1;
@@ -240,6 +247,57 @@ impl CollectionCatalogueContent {
         let &(position, slot) = self.entries.get(&entry_id)?;
         let collection = &self.collections[position];
         Some((&collection.entries[slot], collection))
+    }
+
+    /// What finishing `collection_id` pays (T480): the captured coins, each reward item fitted to
+    /// `gender`, and job XP for the profiles in `unlocked`. Tokens, `collection_add` and
+    /// `quest_add` tails are never paid, since what they do is unknown (R). A girl (2) gets the
+    /// listed girls' id where there is one, else the captured item (R); gender 0 gets the captured
+    /// item (R). An item `item_known` does not accept is skipped so it cannot refuse the rest, and
+    /// so is XP for a locked profile, which the reward applier would refuse whole (R). Unknown
+    /// collection: the empty grant.
+    pub fn completion_grant(
+        &self,
+        collection_id: i32,
+        player_guid: u64,
+        gender: i32,
+        unlocked: &BTreeSet<i32>,
+        item_known: impl Fn(i32) -> bool,
+    ) -> RewardGrant {
+        let mut grant = empty_grant();
+        let Some(collection) = self.collection(collection_id) else {
+            return grant;
+        };
+        let reward = &collection.reward;
+        grant.coins = reward.coins;
+        let fitted = |item: &RewardItem| match item.female_item_definition_id {
+            Some(girls) if gender == 2 && item_known(girls) => Some(girls),
+            _ => item.item_definition_id.filter(|&id| item_known(id)),
+        };
+        grant.items = reward
+            .items
+            .iter()
+            .filter_map(|item| {
+                Some(ItemGrant {
+                    definition_id: fitted(item)?,
+                    count: item.count,
+                })
+            })
+            .collect();
+        for xp in reward
+            .xp
+            .iter()
+            .filter(|xp| unlocked.contains(&xp.profile_id))
+        {
+            let paid = grant.job_xp.entry(xp.profile_id).or_default();
+            *paid = paid.saturating_add(xp.amount);
+        }
+        let display = &mut grant.display;
+        display.source_guid = player_guid;
+        display.player_guid = player_guid;
+        display.icon_id = collection.icon_id;
+        display.name_id = collection.name_id;
+        grant
     }
 
     /// The entry an item fills, only when exactly one entry links that item.

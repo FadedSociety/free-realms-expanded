@@ -295,12 +295,17 @@ fn completing_a_set_records_completion_once() {
     let mut game = fixture.load(None);
     let coins = coins_of(SEASIDE_RARE);
     assert_eq!(coins.len(), 5, "every Seaside Rare entry has a coin");
-    for (guid, position) in &coins {
+    for (i, (guid, position)) in coins.iter().enumerate() {
         let who = at(*position);
         game.update_npc_visibility(&who).unwrap();
         let out = click(&mut game, *guid, &who);
-        assert_eq!(out.replies.len(), 1, "only the 38/10, no reward packet");
         assert!(out.replies[0].starts_with(&[38, 0, 10, 0]));
+        // T480: only the completing click carries reward packets (`collection_rewards.rs`).
+        assert_eq!(
+            out.replies.len() == 1,
+            i < 4,
+            "reward only on the last coin"
+        );
     }
     let ledger = game.state().progression_extras.unwrap().collections;
     assert!(ledger.is_completed(SEASIDE_RARE));

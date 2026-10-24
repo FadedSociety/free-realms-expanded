@@ -8,7 +8,14 @@
 //! `00992b10` sees every entry collected (`0x00939e41`-`0x00939ee9`).
 //!
 //! (R) Coins are personal: collecting one hides it only for the collector (behaviour of
-//! Sanctuary@10f129e `HandleCollectionCoin`, no code). Completion pays nothing yet (empty grant).
+//! Sanctuary@10f129e `HandleCollectionCoin`, no code).
+//!
+//! T480: the click that completes a collection pays its captured reward once, built by
+//! `CollectionCatalogueContent::completion_grant` and applied through `collect`'s completion
+//! path, so the 38/10 comes first and the reward packets (50/1 bundle, XP) after it. The ledger,
+//! bag, coins and XP commit together on a staged copy; a full bag or an XP/coin overflow refuses
+//! the whole pickup and the coin stays clickable. The once-only guard is the saved `completed`
+//! set (the `collection:<id>` key lives only on the per-click snapshot).
 use super::*;
 use crate::{
     collection_catalogue::CollectionCatalogueContent,
@@ -16,8 +23,8 @@ use crate::{
     harvest_nodes::Denied,
     progression_extras::{
         CollectionEntryUpdate, CollectionEvent, CollectionEventOrigin, ProgressionExtras,
-        empty_grant,
     },
+    rewards::GrantFailure,
     world::{NpcVisibility, OPEN_WORLD_ZONE},
 };
 
@@ -40,6 +47,16 @@ pub(super) fn load(
     let Some(coins) = CollectionCoins::load(dir, &catalogue)? else {
         return Ok(None);
     };
+    // A reward item without a definition is never granted; say which, once per load.
+    let skipped: BTreeSet<i32> = catalogue
+        .collections()
+        .iter()
+        .flat_map(|collection| &collection.reward.items)
+        .filter_map(|item| item.captured_item_definition_id)
+        .collect();
+    if !skipped.is_empty() {
+        npc_event(serde_json::json!({"event": "collection_reward_items_skipped", "ids": skipped}));
+    }
     if let Some(visibility) = visibility {
         let ledger = extras.collections();
         visibility.exclude_actor_guids(
@@ -102,22 +119,46 @@ impl Gameplay {
             out.replies.push(chat::system(&denied.message()));
             return Ok(Some(out));
         }
-        out.replies = self.record_collection_entry(&world, coin.entry_id)?;
-        if let Some(visibility) = self.npc_visibility.as_mut() {
+        // Stage everything: a refusal or an error leaves `self` exactly as it was.
+        let mut staged = self.clone();
+        if let Err(error) =
+            staged.record_collection_entry(&world, coin.entry_id, character.guid, &mut out)
+        {
+            let Some(failure) = error
+                .get_ref()
+                .and_then(|e| e.downcast_ref::<GrantFailure>())
+            else {
+                return Err(error);
+            };
+            npc_event(serde_json::json!({
+                "event": "collection_reward_refused",
+                "entry": coin.entry_id,
+                "reason": failure.to_string(),
+            }));
+            out.replies = vec![chat::system(match failure {
+                GrantFailure::BagFull => "Your bag is full. Make room before collecting that.",
+                _ => "You cannot collect that right now.",
+            })];
+            return Ok(Some(out));
+        }
+        if let Some(visibility) = staged.npc_visibility.as_mut() {
             visibility.remove(guid); // the next visibility update sends its 35/3
         }
+        *self = staged;
         out.changed = true;
         Ok(Some(out))
     }
 
-    /// Record `entry_id` on the saved ledger and return its 38/10, built from the catalogue row.
-    /// An `Err` leaves the ledger as it was. The grant is empty, so the transition's reward state
-    /// is the snapshot unchanged and is not adopted; a paying grant must adopt it.
+    /// Record `entry_id` on the saved ledger: its 38/10 first, then, when it completes the
+    /// collection, the reward packets, with the paid bag, coins and XP adopted. An `Err` may leave
+    /// `self` half changed; the caller discards the staged copy.
     fn record_collection_entry(
         &mut self,
         world: &CollectionWorld,
         entry_id: i32,
-    ) -> io::Result<Vec<Vec<u8>>> {
+        player_guid: u64,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
         let (entry, collection) = world
             .catalogue
             .entry(entry_id)
@@ -140,12 +181,24 @@ impl Gameplay {
             wire_update: Some(update),
         };
         let rewards = self.reward_snapshot();
+        let grant = world.catalogue.completion_grant(
+            collection.id,
+            player_guid,
+            self.gender,
+            &rewards.profiles.unlocked,
+            |id| rewards.inventory.has_definition(id),
+        );
         let transition = self.progression_extras.collect(
             world.catalogue.catalogue(),
             event,
-            &empty_grant(),
+            &grant,
             &rewards,
         )?;
-        Ok(transition.collection_packets)
+        out.replies.extend(transition.collection_packets);
+        if !transition.reward_packets.is_empty() {
+            out.replies.extend(transition.reward_packets);
+            self.adopt_reward_state(transition.reward_state, out)?;
+        }
+        Ok(())
     }
 }
