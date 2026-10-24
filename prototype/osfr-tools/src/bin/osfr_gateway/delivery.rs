@@ -21,6 +21,21 @@ pub(super) fn queue_delivery(
     Ok(())
 }
 
+/// The character and whether it was added (true) or removed (false), for the registry's AddPc
+/// (35/1) and RemovePlayer (35/3) tunnel frames; `None` for every other delivery.
+pub(super) fn rider_event(frame: &[u8]) -> Option<(u64, bool)> {
+    let inner = frame.get(7..)?;
+    match inner.get(..4)? {
+        [35, 0, 1, 0] => Some((u64::from_le_bytes(inner.get(4..12)?.try_into().ok()?), true)),
+        // 35/3 carries a u16 submode before the GUID.
+        [35, 0, 3, 0] => Some((
+            u64::from_le_bytes(inner.get(6..14)?.try_into().ok()?),
+            false,
+        )),
+        _ => None,
+    }
+}
+
 /// Wrap one inner application packet in the 5/1 tunnel.
 pub(super) fn wrap_application(inner: &[u8]) -> Vec<u8> {
     let mut out = vec![5, 0, 1];

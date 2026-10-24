@@ -30,6 +30,7 @@ use std::path::{Component, Path};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 mod admin_move;
+mod companions;
 mod staff;
 mod startup_stream;
 mod trade_bridge;
@@ -144,6 +145,8 @@ pub struct GatewayOutcome {
     pub broadcast: Option<String>,
     /// L043: an admin `realm move` the host runs once after a successful commit, like `broadcast`.
     pub admin_move: Option<crate::gameplay::AdminMove>,
+    /// T458: an admin `realm event start|stop`, run by the host after a commit, like `admin_move`.
+    pub world_event: Option<crate::world_events::WorldEventCommand>,
     /// L042: role-gated moderation commands; the host runs them after the commit.
     pub moderation: Vec<crate::moderation::Command>,
     /// Inner application payloads that passed the gateway parser, in request order.
@@ -1348,50 +1351,6 @@ impl Gateway {
         crate::social_chat::emote_context(mounted, self.last_movement_ms, now_ms)
     }
 
-    /// W162: the summoned ride as other players must see it; `None` without one.
-    pub fn ride_view(&self) -> Option<crate::mounts::RideView> {
-        self.gameplay.as_ref()?.ride_view(self.state.guid)
-    }
-
-    /// S17: adopt the roster read from the character document (`Snapshot::pets`) before world
-    /// entry. Without gameplay it stays on disk untouched (`snapshot` then sends `None`).
-    pub fn adopt_pets(&mut self, pets: Option<serde_json::Value>) -> io::Result<()> {
-        if let Some(game) = self.gameplay.as_mut() {
-            game.adopt_pets(pets)?;
-        }
-        Ok(())
-    }
-
-    /// W177: the active pet for AddNpc fanout and late viewers.
-    pub fn pet_view(&self) -> Option<crate::pets::PetPresence> {
-        self.gameplay.as_ref()?.pet_view(self.state.guid)
-    }
-
-    /// W177 (R): a zone transition dismisses the active pet and removes its actor.
-    pub fn settle_pets(&mut self, zoned: bool, now_ms: u64) -> io::Result<GatewayOutcome> {
-        let mut outcome = GatewayOutcome::default();
-        if let Some(game) = self.gameplay.as_mut() {
-            let ended = game.settle_pets(zoned, now_ms)?;
-            outcome.state_changed = ended.changed;
-            outcome.gameplay_changed = ended.changed;
-            outcome.replies = ended.replies.iter().map(|r| wrapped(r)).collect();
-            outcome.nearby = ended.nearby;
-        }
-        Ok(outcome)
-    }
-
-    /// W162: end the ride after a message or tick when the player zoned, entered a fight or
-    /// minigame, or was knocked out. Replies are wrapped like every gateway reply.
-    pub fn settle_rides(&mut self, zoned: bool) -> GatewayOutcome {
-        let mut outcome = GatewayOutcome::default();
-        if let Some(game) = self.gameplay.as_mut() {
-            let ended = game.settle_mounts(&self.state, zoned);
-            outcome.replies = ended.replies.iter().map(|r| wrapped(r)).collect();
-            outcome.nearby = ended.nearby;
-        }
-        outcome
-    }
-
     /// Begin a new local session while retaining the latest character snapshot.
     pub fn reset_session(&mut self) {
         self.logged_in = false;
@@ -1721,6 +1680,7 @@ impl Gateway {
                         // clear an earlier notice; two broadcasts keep the last.
                         outcome.broadcast = result.broadcast.or(outcome.broadcast.take());
                         outcome.admin_move = result.admin_move.or(outcome.admin_move.take());
+                        outcome.world_event = result.world_event.or(outcome.world_event.take());
                         outcome.nearby.extend(result.nearby);
                         outcome.dev_command_denials += usize::from(result.dev_command_denied);
                         outcome.applications.push(inner.clone());

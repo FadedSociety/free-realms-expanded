@@ -103,6 +103,7 @@ pub mod terrain;
 pub mod trace;
 pub mod trade;
 pub mod world;
+pub mod world_events;
 pub mod world_notice;
 pub mod world_text;
 pub mod zone_transition;

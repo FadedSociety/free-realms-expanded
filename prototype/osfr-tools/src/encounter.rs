@@ -32,6 +32,7 @@ use self::revive::{AUTO_REVIVE_MS, respawn_hide};
 use self::shared::FieldSim;
 pub use self::shared::{SharedFieldAction, SharedFieldState};
 use self::skills::{SkillBuff, SkillDot, SkillEffects};
+use crate::abilities::effect_packets::encode_play_composite_effect as composite_effect;
 
 /// Upper bound for saved player health (level 20 is about 7,135, 8,205 for a Brawler).
 const PLAYER_HEALTH_CAP: u32 = 20_000;
@@ -3010,28 +3011,13 @@ fn attack_processed(
     }
     b
 }
-fn animation(guid: u64, id: i32, base: bool) -> Vec<u8> {
+/// 35/8 SetAnimation (client reader `0x008e5dd0`); also world events' writer.
+pub(crate) fn animation(guid: u64, id: i32, base: bool) -> Vec<u8> {
     let mut b = header(35, 8);
     b.extend(guid.to_le_bytes());
     b.extend(id.to_le_bytes());
     b.extend(0_i32.to_le_bytes());
     b.push(u8::from(base));
-    b
-}
-/// 35/16 PlayCompositeEffect: guid, u64 (0), effect id, i32 (0), delay ms,
-/// position (x, y, z, 1), clear flag. Layout from the community packet
-/// catalogue (two emulators agree); native acceptance pending.
-fn composite_effect(guid: u64, effect: i32, p: [f32; 3]) -> Vec<u8> {
-    let mut b = header(35, 16);
-    b.extend(guid.to_le_bytes());
-    b.extend(0_u64.to_le_bytes());
-    b.extend(effect.to_le_bytes());
-    b.extend(0_i32.to_le_bytes());
-    b.extend(0_i32.to_le_bytes());
-    for v in [p[0], p[1], p[2], 1.0] {
-        b.extend(v.to_le_bytes());
-    }
-    b.push(0);
     b
 }
 fn movement(guid: u64, p: [f32; 3], heading: [f32; 3]) -> Vec<u8> {
@@ -3054,11 +3040,7 @@ fn relevance(guids: &[u64], guide: bool) -> Vec<u8> {
     b
 }
 fn remove(guid: u64) -> Vec<u8> {
-    let mut b = header(35, 3);
-    b.extend(1_u16.to_le_bytes());
-    b.extend(guid.to_le_bytes());
-    b.extend([0; 17]);
-    b
+    crate::abilities::effect_packets::encode_remove_gracefully(guid, 0)
 }
 fn replace_string(b: &mut Vec<u8>, offset: usize, s: &str) {
     b.splice(

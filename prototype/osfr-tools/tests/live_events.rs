@@ -371,7 +371,7 @@ fn players_builders_and_bad_ids_cannot_change_the_event() {
         ),
         (
             "realm event start",
-            "Usage: realm event open <quest id>, realm event close <quest id> or realm event list.",
+            "Usage: realm event open|close <quest id>, realm event list or realm event start|stop <world event key>.",
         ),
     ] {
         let before = saved(&admin);

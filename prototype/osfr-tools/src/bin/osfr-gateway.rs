@@ -40,7 +40,7 @@ mod admin_move;
 mod delivery;
 use delivery::{
     chat_error_delivery, field_packet, field_packets_for, field_recipient_matches, queue_delivery,
-    wrap_application,
+    rider_event, wrap_application,
 };
 #[path = "osfr_gateway/client_area_routing.rs"]
 mod client_area_routing;
@@ -52,6 +52,8 @@ mod paths;
 mod t006_guilds;
 #[path = "osfr_gateway/tick_stats.rs"]
 mod tick_stats;
+#[path = "osfr_gateway/world_event_routing.rs"]
+mod world_event_routing;
 use paths::{character_state_path, chat_settings_path, savestate_dir, social_path};
 
 /// Percent-decoding for Studio query strings and paths.
@@ -508,6 +510,8 @@ struct SharedWorld {
     /// T457: opcode-89 client areas (always-on, seasons, event toggles); never saved.
     client_areas: osfr_tools::client_areas::ClientAreas,
     security: Arc<Mutex<Security>>,
+    /// T458: live world-event runs; changed only after a commit and by the 20 Hz tick.
+    world_events: osfr_tools::world_events::WorldEvents,
 }
 
 /// Live chat identity for one session. Zone, position and group are derived from the player
@@ -594,6 +598,7 @@ impl SharedWorld {
             guilds: Default::default(),
             client_areas: Default::default(),
             security: Arc::default(),
+            world_events: Default::default(),
         }
     }
 
@@ -1688,6 +1693,7 @@ impl Session {
         // `commit_outcome` succeeds. Nothing is queued for a refused or failed transaction.
         let broadcast = outcome.broadcast.take();
         let admin_move = outcome.admin_move.take();
+        let world_event = outcome.world_event.take();
         let staged = std::mem::take(&mut outcome.moderation);
         // T008: the jump body is built from this request's final pose; fan it out
         // only after the commit, like the notice above.
@@ -1705,6 +1711,9 @@ impl Session {
             delivery::post_commit(self, sessions, world, broadcast, jump)?;
             if let Some(request) = admin_move {
                 admin_move::run(self, options, sessions, world, membership, now_ms, request)?;
+            }
+            if let Some(command) = world_event {
+                world_event_routing::apply(self, world, now_ms, command)?;
             }
             moderation::run_staged(self, sessions, world, options, staged)?;
         }
@@ -2757,21 +2766,6 @@ fn persist_social_changes(before: &SharedWorld, after: &SharedWorld) -> io::Resu
     Ok(())
 }
 
-/// The character and whether it was added (true) or removed (false), for the registry's AddPc
-/// (35/1) and RemovePlayer (35/3) tunnel frames; `None` for every other delivery.
-fn rider_event(frame: &[u8]) -> Option<(u64, bool)> {
-    let inner = frame.get(7..)?;
-    match inner.get(..4)? {
-        [35, 0, 1, 0] => Some((u64::from_le_bytes(inner.get(4..12)?.try_into().ok()?), true)),
-        // 35/3 carries a u16 submode before the GUID.
-        [35, 0, 3, 0] => Some((
-            u64::from_le_bytes(inner.get(6..14)?.try_into().ok()?),
-            false,
-        )),
-        _ => None,
-    }
-}
-
 /// The selected session that owns `account` or `character`. Login refuses a second selection
 /// while one exists, and an admin move (L043) takes the same rule before it touches a save.
 fn owning_session(sessions: &SessionMap, account: u64, character: u64) -> Option<SessionKey> {
@@ -3804,6 +3798,7 @@ impl Server {
             self.tick_shared_fields(now_ms);
             let unix_ms = osfr_tools::client_areas::unix_now_ms();
             client_area_routing::season_tick(&mut self.world, &mut self.sessions, unix_ms);
+            world_event_routing::tick(&mut self.world, &mut self.sessions, now_ms);
         }
         let keys = self.sessions.keys().copied().collect::<Vec<_>>();
         for key in keys {

@@ -14,6 +14,7 @@
 //! offer is the existing 49/1 (client reader 0x00c7bb60) and each command answers
 //! with one `chat::system` line.
 use super::*;
+use crate::world_events::WorldEventCommand;
 use std::fs;
 
 const EVENTS_FILE: &str = "events.json";
@@ -95,9 +96,25 @@ impl Gameplay {
         }
     }
 
+    /// The `realm event` arm. T458's `start <key>` and `stop <key>` only stage the world event
+    /// for the host, which answers once the admin's transaction commits (`crate::world_events`);
+    /// every other verb answers with one line here.
+    pub(super) fn realm_event(&mut self, args: &[&str], out: &mut Outcome) -> io::Result<()> {
+        out.world_event = match args {
+            ["start", key] => Some(WorldEventCommand::Start(key.to_string())),
+            ["stop", key] => Some(WorldEventCommand::Stop(key.to_string())),
+            _ => {
+                out.replies
+                    .push(chat::system(&self.live_event_command(args)?));
+                None
+            }
+        };
+        Ok(())
+    }
+
     /// `realm event open <id>`, `realm event close <id>` and `realm event list`.
     /// One chat line each; a refusal writes nothing and changes nothing.
-    pub(super) fn realm_event(&mut self, args: &[&str]) -> io::Result<String> {
+    fn live_event_command(&mut self, args: &[&str]) -> io::Result<String> {
         let Some(live) = self.npc_quests.as_ref().map(|q| q.live_events().clone()) else {
             return Ok("Live events need the quest catalogue.".into());
         };
@@ -124,7 +141,7 @@ impl Gameplay {
             [verb @ ("open" | "close"), id] => (*verb == "open", *id),
             _ => {
                 return Ok(
-                    "Usage: realm event open <quest id>, realm event close <quest id> or realm event list."
+                    "Usage: realm event open|close <quest id>, realm event list or realm event start|stop <world event key>."
                         .into(),
                 );
             }

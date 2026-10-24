@@ -67,6 +67,8 @@ pub const CLIENT_UPDATE_SUB_ADD_EFFECT_TAG: u16 = 16;
 pub const CLIENT_UPDATE_SUB_REMOVE_EFFECT_TAG: u16 = 17;
 
 pub const PLAYER_UPDATE_OPCODE: u16 = 35;
+pub const PLAYER_UPDATE_SUB_REMOVE_PLAYER: u16 = 3;
+pub const PLAYER_UPDATE_SUB_PLAY_COMPOSITE_EFFECT: u16 = 16;
 pub const PLAYER_UPDATE_SUB_UPDATE_CHARACTER_STATE: u16 = 20;
 pub const PLAYER_UPDATE_SUB_ADD_COMPOSITE_EFFECT: u16 = 41;
 pub const PLAYER_UPDATE_SUB_REMOVE_COMPOSITE_EFFECT: u16 = 42;
@@ -763,6 +765,42 @@ pub fn decode_remove_composite_effect(bytes: &[u8]) -> Result<(u64, i32), Status
         REMOVE_COMPOSITE_EFFECT_LEN,
     )?;
     Ok((read_u64(bytes, 4)?, read_i32(bytes, 12)?))
+}
+
+/// `PlayerUpdatePacketPlayCompositeEffect` (35/16): guid, u64 (0), composite effect id, i32 (0),
+/// delay ms (0), position (x, y, z, 1) and the clear flag (0). Client reader `0x008e5f50`
+/// (PlayClient case 0x10, called at `0x00931cfd`) reads exactly these fields. Moved from
+/// `encounter.rs` (T458) so world events share the one writer.
+pub fn encode_play_composite_effect(
+    guid: u64,
+    composite_effect_id: i32,
+    position: [f32; 3],
+) -> Vec<u8> {
+    let mut bytes = player_header(PLAYER_UPDATE_SUB_PLAY_COMPOSITE_EFFECT).to_vec();
+    bytes.extend(guid.to_le_bytes());
+    bytes.extend(0_u64.to_le_bytes());
+    push_i32(&mut bytes, composite_effect_id);
+    bytes.extend([0; 8]); // i32 (0), delay ms
+    for value in [position[0], position[1], position[2], 1.0] {
+        bytes.extend(value.to_le_bytes());
+    }
+    bytes.push(0);
+    bytes
+}
+
+/// `PlayerUpdatePacketRemovePlayerGracefully` (35/3, u16 submode 1): guid, then animate (u8),
+/// delay, effect delay, composite effect id and duration (i32 each), all zero but the effect.
+/// Client readers `0x008d69f0` (submode, guid) and `0x008d6a60` (the rest); PlayClient plays a
+/// nonzero composite effect where the actor stood (`0x0093083b`). With effect 0 these are the
+/// removal bytes `encounter.rs` always sent.
+pub fn encode_remove_gracefully(guid: u64, composite_effect_id: i32) -> Vec<u8> {
+    let mut bytes = player_header(PLAYER_UPDATE_SUB_REMOVE_PLAYER).to_vec();
+    bytes.extend(1_u16.to_le_bytes());
+    bytes.extend(guid.to_le_bytes());
+    bytes.extend([0; 9]); // animate, delay, effect delay
+    push_i32(&mut bytes, composite_effect_id);
+    bytes.extend([0; 4]); // duration
+    bytes
 }
 
 /// `PlayerUpdatePacketUpdateCharacterState` (35/20): the flagged status bitmask. The bit values come

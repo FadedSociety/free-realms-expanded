@@ -164,6 +164,7 @@ mod tests {
                 position: [4.0, 5.0, 6.0],
                 rotation: None,
             }),
+            world_event: Some(crate::world_events::WorldEventCommand::Start("show".into())),
         }
     }
 
@@ -193,6 +194,10 @@ mod tests {
         assert_eq!(live.nearby, vec![vec![2], vec![4]]);
         assert_eq!(live.broadcast.as_deref(), Some("staged notice"));
         assert_eq!(live.admin_move.as_ref().unwrap().position, [4.0, 5.0, 6.0]);
+        assert_eq!(
+            live.world_event,
+            Some(crate::world_events::WorldEventCommand::Start("show".into()))
+        );
         // Nothing staged never wipes the live state.
         live.absorb(Outcome::default());
         assert!(live.dev_command_denied && live.changed);
@@ -200,8 +205,8 @@ mod tests {
         assert!(live.scene_zoning.is_some() && live.relocation.is_some());
         assert!(live.group_heal.is_some());
         assert!(
-            live.broadcast.is_some() && live.admin_move.is_some(),
-            "an empty outcome wiped the notice or the move"
+            live.broadcast.is_some() && live.admin_move.is_some() && live.world_event.is_some(),
+            "an empty outcome wiped the notice, the move or the world event"
         );
         assert_eq!(live.replies, vec![vec![1], vec![3]]);
     }

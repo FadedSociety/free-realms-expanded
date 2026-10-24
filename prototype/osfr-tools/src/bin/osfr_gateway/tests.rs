@@ -1776,3 +1776,9 @@ mod l039_login_pose;
 #[cfg(test)]
 #[path = "l043_admin_move.rs"]
 mod l043_admin_move;
+
+/// T458: world events through a real `Server`: admin `realm event start|stop`, the world tick,
+/// late viewers, refusals and a refusing queue.
+#[cfg(test)]
+#[path = "t458_world_events.rs"]
+mod t458_world_events;

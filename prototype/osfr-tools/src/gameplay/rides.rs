@@ -1,4 +1,5 @@
-//! Ride glue for `Gameplay`; the ride rules live in `crate::mounts`.
+//! Ride and pet glue for `Gameplay`; the rules live in `crate::mounts` and `crate::pets`. The pet
+//! glue moved here verbatim from the hub (T458).
 use super::*;
 
 impl Gameplay {
@@ -96,5 +97,70 @@ impl Gameplay {
             heading: 0.0,
         };
         Self::ride_outcome(mounts.wire(&ended, pose))
+    }
+
+    /// S17: the saved roster comes from the character document (`Snapshot::pets`) before
+    /// world entry; `pets_document` hands it back for every save of that document.
+    pub fn adopt_pets(&mut self, pets: Option<serde_json::Value>) -> io::Result<()> {
+        let content = crate::pets::PetService::bundled_content()?;
+        self.pets = crate::pets::PetService::from_document(content, pets)?;
+        Ok(())
+    }
+
+    pub fn pets_document(&self) -> Option<serde_json::Value> {
+        self.pets.document_value()
+    }
+
+    /// W177: the active pet as other players need it for AddNpc replay.
+    pub fn pet_view(&self, owner_guid: u64) -> Option<crate::pets::PetPresence> {
+        self.pets.view(owner_guid)
+    }
+
+    fn pet_outcome(wire: crate::pets::PetWire) -> Outcome {
+        let mut out = Outcome::default();
+        out.changed = wire.changed;
+        if let Some(notice) = wire.notice {
+            out.replies.push(chat::system(notice));
+        }
+        out.replies.extend(wire.private);
+        out.nearby = wire.shared;
+        out
+    }
+
+    /// W177: summon, dismiss and UI mode (family 53). Ownership comes only from the saved
+    /// roster loaded by `adopt_pets`; the actor GUID is derived from the authenticated
+    /// character, never from request bytes.
+    pub(super) fn handle_pets(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Option<Outcome>> {
+        let minigame_active = self.blocks(|gates| gates.pets);
+        let busy = crate::pets::PetBusy { minigame_active };
+        let pets = &mut self.pets;
+        let inventory = &mut self.inventory;
+        let wire = pets.handle_with_inventory(
+            inner,
+            character.guid,
+            character.position,
+            inventory,
+            busy,
+            // Pet need clocks are stored in seconds; the gateway passes milliseconds.
+            now_ms / 1_000,
+        )?;
+        Ok(wire.map(Self::pet_outcome))
+    }
+
+    /// W177 (R): a pet does not zone with its owner; a fresh summon is required.
+    pub fn settle_pets(&mut self, zoned: bool, now_ms: u64) -> io::Result<Outcome> {
+        if !zoned || self.pets.active_pet_id().is_none() {
+            return Ok(Outcome::default());
+        }
+        let mut pets = self.pets.clone();
+        pets.rebase_clock(now_ms / 1_000);
+        let transition = pets.dismiss(now_ms / 1_000)?;
+        self.pets = pets;
+        Ok(Self::pet_outcome(self.pets.wire(transition)))
     }
 }

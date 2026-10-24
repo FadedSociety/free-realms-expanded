@@ -13,7 +13,7 @@ use std::{
 
 #[allow(dead_code)]
 #[path = "restoration/piece_056.rs"]
-mod effect_packets;
+pub(crate) mod effect_packets;
 
 const MAX_JSON_BYTES: u64 = 1_048_576;
 const MAX_ABILITIES: usize = 512;

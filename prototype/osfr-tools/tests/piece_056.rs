@@ -43,7 +43,8 @@ use piece_056::{
     StatusError, StatusKind, StatusLedger, decode_add_composite_effect, decode_add_effect_tag,
     decode_character_state, decode_remove_composite_effect, decode_remove_effect_tag,
     encode_add_composite_effect, encode_add_effect_tag, encode_character_state,
-    encode_profile_rows, encode_remove_composite_effect, encode_remove_effect_tag,
+    encode_play_composite_effect, encode_profile_rows, encode_remove_composite_effect,
+    encode_remove_effect_tag, encode_remove_gracefully,
 };
 
 const SOURCE: u64 = 0x5255_5354_0000_0002;
@@ -178,6 +179,34 @@ fn world_effect_packets_round_trip() {
         decode_remove_composite_effect(&remove).expect("remove composite"),
         (SOURCE, 77)
     );
+}
+
+/// T458: the field order of client readers 0x008e5f50 (35/16) and 0x008d69f0 + 0x008d6a60 (35/3
+/// submode 1), byte for byte. The effect-0 removal is the exact 31 bytes encounter.rs always sent.
+#[test]
+fn play_effect_and_graceful_removal_follow_their_client_readers() {
+    let play = encode_play_composite_effect(SOURCE, 21, [1.0, 2.0, 3.0]);
+    let mut expected = vec![35, 0, 16, 0];
+    expected.extend(SOURCE.to_le_bytes());
+    expected.extend([0; 8]); // u64 at +0x18
+    expected.extend(21_i32.to_le_bytes()); // composite effect id at +0x20
+    expected.extend([0; 8]); // +0x24, delay at +0x28
+    for value in [1.0_f32, 2.0, 3.0, 1.0] {
+        expected.extend(value.to_le_bytes()); // position at +0x30
+    }
+    expected.push(0); // clear flag at +0x40
+    assert_eq!(play, expected);
+
+    let mut expected = vec![35, 0, 3, 0, 1, 0];
+    expected.extend(SOURCE.to_le_bytes());
+    expected.extend([0; 9]); // animate, delay, effect delay
+    expected.extend(21_i32.to_le_bytes()); // composite effect id, played by 0x0093083b
+    expected.extend([0; 4]); // duration
+    assert_eq!(encode_remove_gracefully(SOURCE, 21), expected);
+    let mut plain = vec![35, 0, 3, 0, 1, 0];
+    plain.extend(SOURCE.to_le_bytes());
+    plain.extend([0; 17]);
+    assert_eq!(encode_remove_gracefully(SOURCE, 0), plain);
 }
 
 #[test]
