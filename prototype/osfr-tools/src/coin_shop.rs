@@ -1068,6 +1068,7 @@ impl CoinShop {
                     let outcome = station_cash::preview(
                         &self.sc_catalogue,
                         &self.sc_wallet,
+                        self.inventory.state(),
                         &order,
                         grant_lot,
                     );
@@ -1098,7 +1099,15 @@ impl CoinShop {
                         grant_lot,
                     );
                     changed = outcome.changed;
-                    (outcome.result_code, outcome.replies)
+                    let mut replies = outcome.replies;
+                    if changed && self.marketplace_enabled() {
+                        // T484: grey the bought ride out without reopening the store.
+                        replies.push(station_cash::requirements_packet(
+                            &self.sc_catalogue,
+                            self.inventory.state(),
+                        ));
+                    }
+                    (outcome.result_code, replies)
                 }
             }
             10 => {
@@ -1129,9 +1138,15 @@ impl CoinShop {
             // T380: 66/38 is the store screen's `Opening` request (`00c047a0`). Its 66/39 reply
             // (`00b3e490`) refreshes StoreItemRoot, and that refresh is what fills the bundle
             // list: StoreItems only copies the store once the commerce processor is ready
-            // (`0099aa60`), one client tick after a 66/5 arrives (`00b335f0`). An empty list
-            // keeps every bundle as 66/5 sent it.
-            38 if self.marketplace_enabled() => (1, vec![counted_empty(MARKETPLACE_FAMILY, 39)]),
+            // (`0099aa60`), one client tick after a 66/5 arrives (`00b335f0`). T484: the list
+            // carries each listing's owned flag.
+            38 if self.marketplace_enabled() => (
+                1,
+                vec![station_cash::requirements_packet(
+                    &self.sc_catalogue,
+                    self.inventory.state(),
+                )],
+            ),
             // Bundle content (27), and 66/38 with the Marketplace off: no reply.
             27 | 38 => return Ok(CoinShopOutcome::default()),
             // NpcMerchantV2 buy reply: every result other than 1 is a client-visible refusal.

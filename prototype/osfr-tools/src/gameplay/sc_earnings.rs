@@ -110,13 +110,8 @@ impl Gameplay {
             let price = shop.sc_catalogue().earn_only_price(first.item_id)?;
             Some((first.item_id, price))
         });
-        let owned = ride.is_some_and(|(item, _)| {
-            self.inventory
-                .state()
-                .items
-                .iter()
-                .any(|owned| owned.definition_id == item && owned.count > 0)
-        });
+        let owned =
+            ride.is_some_and(|(item, _)| station_cash::owns_item(self.inventory.state(), item));
         let room = self.inventory.state().items.len() < self.reward_bag_capacity();
         let offer = ride.map(|(item_id, sc_equivalent)| RideOffer {
             item_id,

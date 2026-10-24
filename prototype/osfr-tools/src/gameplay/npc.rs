@@ -811,9 +811,10 @@ impl Gameplay {
                 return Ok(None);
             };
             // The shop was built with the login-time inventory; a reward earned since must not be
-            // lost by the order's staged grant (the coin buy path does the same). A preview or a
-            // wallet read never touches the inventory.
-            if inner.get(2..4) == Some(&[3, 0]) {
+            // lost by the order's staged grant (the coin buy path does the same), and the
+            // ownership check of a preview or an order and the 66/38 owned flags (T484) read it.
+            // A wallet read never touches the inventory.
+            if matches!(inner.get(2..4), Some([1 | 3 | 38, 0])) {
                 shop.sync_inventory(self.inventory.clone());
             }
             // L046: a paid deed grants this character's lot in the housing session; the order

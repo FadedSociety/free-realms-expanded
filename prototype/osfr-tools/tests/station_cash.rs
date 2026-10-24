@@ -177,6 +177,14 @@ fn order_packet_matches_the_client_writer() {
     );
 }
 
+/// The 66/4 in a reply stream. T484: a successful order is followed by a 66/39, so it is not last.
+fn order_reply(replies: &[Vec<u8>]) -> &Vec<u8> {
+    replies
+        .iter()
+        .find(|packet| packet.starts_with(&[66, 0, 4, 0]))
+        .expect("order response")
+}
+
 #[test]
 fn order_debits_exact_price_and_grants_once() {
     let mut shop = new_shop(wallet(200), usize::MAX);
@@ -194,7 +202,7 @@ fn order_debits_exact_price_and_grants_once() {
     assert_eq!(shop.inventory().state().coins, before.0.coins);
     assert_eq!(shop.sc_wallet().orders.len(), 1);
     // 66/4 full layout (`00b2ded0`, T453): tracking id, result, order-id string, discount, total.
-    let reply = outcome.replies.last().expect("order response");
+    let reply = order_reply(&outcome.replies);
     assert_eq!(&reply[..4], &[66, 0, 4, 0]);
     assert_eq!(u32::from_le_bytes(reply[4..8].try_into().unwrap()), 71);
     assert_eq!(u32::from_le_bytes(reply[8..12].try_into().unwrap()), 1);
@@ -393,7 +401,7 @@ fn order_response_tracking_id_precedes_result() {
 
     // (a) Two different rides in one client run, tracking 1 then 2: both complete and succeed.
     let first = shop.handle(&buy(1)).expect("order parses");
-    let reply = first.replies.last().expect("order response");
+    let reply = order_reply(&first.replies);
     assert_eq!(
         client_order_response(reply),
         (1, 1, "1".to_string(), 0, RIDE_PRICE)
@@ -401,7 +409,7 @@ fn order_response_tracking_id_precedes_result() {
     assert_eq!(client_outcome(1, reply), (true, true));
     let second_packet = order_packet(3, 2, other.bundle_id, STORE, 1, "", "", "", "0");
     let second = shop.handle(&second_packet).expect("order parses");
-    let reply = second.replies.last().expect("order response");
+    let reply = order_reply(&second.replies);
     assert_eq!(
         client_order_response(reply),
         (2, 1, "2".to_string(), 0, other.price)
@@ -413,7 +421,7 @@ fn order_response_tracking_id_precedes_result() {
     let paid = snapshot(&shop);
     let replay = shop.handle(&second_packet).expect("replay parses");
     assert!(!replay.changed);
-    let reply = replay.replies.last().expect("order response");
+    let reply = order_reply(&replay.replies);
     assert_eq!(
         client_order_response(reply),
         (2, 1, "2".to_string(), 0, other.price)
@@ -424,7 +432,7 @@ fn order_response_tracking_id_precedes_result() {
     let unknown = shop
         .handle(&order_packet(3, 3, 8, STORE, 1, "", "", "", "0"))
         .expect("order parses");
-    let reply = unknown.replies.last().expect("order response");
+    let reply = order_reply(&unknown.replies);
     assert_eq!(client_order_response(reply), (3, 2, "3".to_string(), 0, 0));
     assert_eq!(client_outcome(3, reply), (true, false));
     assert_eq!(snapshot(&shop), paid);
@@ -433,7 +441,7 @@ fn order_response_tracking_id_precedes_result() {
     let mut poor = new_shop(wallet(RIDE_PRICE - 1), usize::MAX);
     let before = snapshot(&poor);
     let short = poor.handle(&buy(1)).expect("order parses");
-    let reply = short.replies.last().expect("order response");
+    let reply = order_reply(&short.replies);
     assert_eq!(client_order_response(reply), (1, 5, "1".to_string(), 0, 0));
     assert_eq!(client_outcome(1, reply), (true, false));
     assert_eq!(snapshot(&poor), before);

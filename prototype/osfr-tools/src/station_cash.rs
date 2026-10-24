@@ -54,7 +54,7 @@
 //! kind). Nothing here creates coins and no client value reaches an amount.
 
 use crate::content::SourceTag;
-use crate::inventory::Inventory;
+use crate::inventory::{Inventory, InventoryState};
 use serde::{Deserialize, Serialize};
 use std::{collections::BTreeMap, fs, io, path::Path};
 
@@ -68,6 +68,7 @@ const OP_STORE: u16 = 5;
 const OP_CATEGORY_GROUPS: u16 = 6;
 const OP_CATEGORIES: u16 = 7;
 const OP_BUNDLE_GROUPS: u16 = 9;
+const OP_ITEM_REQUIREMENTS: u16 = 39;
 const OP_WALLET_RESPONSE: u16 = 11;
 const OP_ENABLE_MARKETPLACE: u16 = 24;
 const OP_ENABLE_PAYMENT_SOURCES: u16 = 33;
@@ -526,6 +527,14 @@ pub struct Listing {
     pub deed: bool,
 }
 
+impl Listing {
+    /// The player already holds this listing. A deed never enters the bag (its owner check is the
+    /// lot grant), so it is never "owned" here.
+    pub fn owned_by(&self, inventory: &InventoryState) -> bool {
+        !self.deed && owns_item(inventory, self.item_id)
+    }
+}
+
 /// L046: the caller's lot grant for a paid deed. It receives the deed's item id (always from the
 /// server-side listing, never from the client) and `commit`. It returns the lot's replies, or
 /// `None` with nothing changed (no lot for the deed, the owner already has it, or no housing).
@@ -798,10 +807,11 @@ pub fn decode_order(inner: &[u8], preview: bool) -> io::Result<OrderRequest> {
 pub fn preview(
     catalogue: &Catalogue,
     wallet: &Wallet,
+    inventory: &InventoryState,
     order: &OrderRequest,
     grant_lot: LotGrant,
 ) -> OrderOutcome {
-    let (result, total) = match price(catalogue, wallet, order) {
+    let (result, total) = match price(catalogue, wallet, inventory, order) {
         Ok((listing, _, _, None))
             if listing.deed && grant_lot(listing.item_id, false).is_none() =>
         {
@@ -831,7 +841,8 @@ pub fn place_order(
     if busy {
         return refusal(order, ORDER_FAILURE);
     }
-    let (listing, detail, total, replay) = match price(catalogue, wallet, order) {
+    let (listing, detail, total, replay) = match price(catalogue, wallet, inventory.state(), order)
+    {
         Ok(priced) => priced,
         Err(result) => return refusal(order, result),
     };
@@ -901,9 +912,22 @@ pub fn place_order(
     }
 }
 
+/// Whether the player holds the item: any instance of that definition with a positive count, in
+/// any tint (R; a colour variant is its own item id, see `notes/Autopilot/T484.md`). The one
+/// "already owned" rule for the Marketplace order path and its 66/39 flags.
+pub fn owns_item(inventory: &InventoryState, item_id: i32) -> bool {
+    inventory
+        .items
+        .iter()
+        .any(|item| item.definition_id == item_id && item.count > 0)
+}
+
+/// Checks run in this order: the listing, the replay (a paid duplicate still answers success),
+/// ownership (a second copy would stack or duplicate the ride and waste the SC), the balance.
 fn price<'a>(
     catalogue: &'a Catalogue,
     wallet: &Wallet,
+    inventory: &InventoryState,
     order: &OrderRequest,
 ) -> Result<(&'a Listing, OrderDetail, u32, Option<u32>), u32> {
     if order.gift || order.coupon || order.details.len() != 1 {
@@ -916,8 +940,13 @@ fn price<'a>(
     let listing = catalogue.listing(detail.bundle_id).ok_or(ORDER_FAILURE)?;
     let total = listing.price;
     let replay = wallet.replay(&detail, order.tracking_id);
-    if wallet.balance < total && replay.is_none() {
-        return Err(ORDER_INSUFFICIENT_SC);
+    if replay.is_none() {
+        if listing.owned_by(inventory) {
+            return Err(ORDER_FAILURE);
+        }
+        if wallet.balance < total {
+            return Err(ORDER_INSUFFICIENT_SC);
+        }
     }
     Ok((listing, detail, total, replay))
 }
@@ -970,6 +999,21 @@ pub(crate) fn order_packet(tracking_id: u32, result: u32, order_id: &str, total:
     put_string(&mut bytes, order_id);
     put_u32(&mut bytes, 0);
     put_u32(&mut bytes, total);
+    bytes
+}
+
+/// 66/39 (T484). Reader `00b3e490` takes a counted list (`00b32d00`: i32 count, then per entry a
+/// u32 bundle id and a u8 flag, `00b2b590`) and stores `flag == 0` in each found bundle's byte
+/// +242, the `IsViewOnly` column (`009a56d0` case 27). So flag 0 marks an owned ride view-only
+/// and flag 1 leaves it purchasable. Every listing is named, so a ride the player no longer owns
+/// is purchasable again at the next 66/38; the order path (`price`) stays the authority.
+pub fn requirements_packet(catalogue: &Catalogue, inventory: &InventoryState) -> Vec<u8> {
+    let mut bytes = header(OP_ITEM_REQUIREMENTS);
+    put_i32(&mut bytes, catalogue.listings.len() as i32);
+    for listing in &catalogue.listings {
+        put_u32(&mut bytes, listing.bundle_id);
+        bytes.push(u8::from(!listing.owned_by(inventory)));
+    }
     bytes
 }
 

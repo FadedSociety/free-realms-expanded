@@ -224,8 +224,8 @@ fn buying_a_deed_grants_its_lot_once_and_charges_once() {
     assert!(out.changed, "the paid lot is saved");
     assert_eq!(
         subtypes(&out.replies),
-        vec![(66, 11), (127, 49), (127, 39), (66, 4)],
-        "wallet, new-house notice, My Houses list, order result"
+        vec![(66, 11), (127, 49), (127, 39), (66, 4), (66, 39)],
+        "wallet, new-house notice, My Houses list, order result, owned flags (T484)"
     );
     assert_eq!(
         order_result(&out.replies),

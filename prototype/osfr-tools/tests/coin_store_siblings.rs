@@ -13,6 +13,7 @@
 
 use osfr_tools::{
     account_store::AccountRole,
+    chat,
     coin_shop::{self, CoinShop, CoinShopOutcome, StoreCatalogue},
     gameplay::{Gameplay, GameplayState},
     gateway::{Gateway, GatewayOutcome},
@@ -1487,23 +1488,64 @@ fn wallet_reply_sends_no_marketplace_packet_when_station_cash_is_disabled() {
 /// `00c03920`). Its reply 66/39 is read by `00b3e490`: a counted list (`00b32d00`) of a u32
 /// bundle id and a purchase byte (`00b2b590`). After a clean read the client refreshes
 /// StoreItemRoot (`0099a790`), and only that refresh fills the bundle list once its commerce
-/// processor is ready (`0099aa60`). The list is empty: no bundle changes and nothing is saved.
+/// processor is ready (`0099aa60`). T484: the list names every listing (the earn-only row is
+/// absent), purchasable until owned; nothing is saved.
 #[test]
 fn store_screen_opening_gets_the_item_requirements_reply() {
     let fixture = Fixture::new().with_sc();
     let mut gateway = traced(&fixture, fixture.state());
     let before = gateway.snapshot();
     let outcome = deliver(&mut gateway, &marketplace(38));
-    assert_eq!(
-        inner_packets(&outcome),
-        vec![vec![66, 0, 39, 0, 0, 0, 0, 0]]
-    );
+    let mut expected = vec![66, 0, 39, 0, 1, 0, 0, 0];
+    expected.extend((SC_RIDE_ITEM as u32).to_le_bytes());
+    expected.push(1);
+    assert_eq!(inner_packets(&outcome), vec![expected]);
     assert_eq!(outcome.trace.last().unwrap().handler, "merchant");
     assert!(!outcome.state_changed && !outcome.gameplay_changed);
     let refused = deliver(&mut gateway, &[marketplace(38), vec![0]].concat());
     assert!(refused.replies.is_empty());
     assert_eq!(refused.trace.last().unwrap().outcome, "rejected");
     assert_eq!(gateway.snapshot(), before);
+}
+
+/// T484: the shop is built with the login-time inventory, so the NPC route hands it the live bag
+/// before a 66/38, a preview or an order reads ownership. A ride given in the session (the
+/// production `realm give`) shows as owned in the next 66/39 and is refused as a second order.
+#[test]
+fn a_ride_given_in_the_session_is_owned_at_the_next_store_open() {
+    let fixture = Fixture::new().with_sc();
+    let mut state = fixture.state();
+    state.sc_wallet = Some(Wallet {
+        balance: 500,
+        ..Wallet::default()
+    });
+    let mut gateway = fixture.connect(state);
+    let flag = |packets: &[Vec<u8>]| {
+        assert_eq!(packets.len(), 1);
+        *packets[0].last().unwrap()
+    };
+    assert_eq!(flag(&send(&mut gateway, &marketplace(38))), 1);
+    gateway.set_dev_tools(true);
+    gateway.set_role(AccountRole::Admin);
+    send(
+        &mut gateway,
+        &chat::local_request(&format!("realm give {SC_RIDE_ITEM}")),
+    );
+    gateway.set_dev_tools(false);
+    gateway.set_role(AccountRole::Player);
+    assert_eq!(count_definition(&inventory_of(&gateway), SC_RIDE_ITEM), 1);
+    assert_eq!(flag(&send(&mut gateway, &marketplace(38))), 0);
+
+    let before = gateway.snapshot();
+    let preview = send(&mut gateway, &sc_preview(1, SC_RIDE_ITEM as u32, 1));
+    assert_eq!(&preview[0][..4], &[66, 0, 2, 0]);
+    assert_eq!(
+        u32::from_le_bytes(preview[0][8..12].try_into().unwrap()),
+        station_cash::ORDER_FAILURE
+    );
+    let order = send(&mut gateway, &sc_order(2, SC_RIDE_ITEM as u32, 1));
+    assert_eq!(order_result(&order), station_cash::ORDER_FAILURE);
+    assert_eq!(gateway.snapshot(), before, "refusals change nothing");
 }
 
 /// F387: 66/29 (the store's close statistics, `PacketInGamePurchaseStoreClientStatistics` from
@@ -1584,12 +1626,14 @@ fn gateway_sc_wallet_and_ride_order_are_atomic_and_replay_once() {
     assert!(!replay.state_changed);
     assert_eq!(gateway.snapshot(), once);
 
+    // T484: the ride is now owned, which outranks the short balance (the balance reply for an
+    // unowned ride is pinned in `marketplace_owned_rides`).
     let short = gateway
         .handle_at(&wrap(&sc_order(2, SC_RIDE_ITEM as u32, 1)), NOW)
         .unwrap();
     assert_eq!(
         order_result(&inner_packets(&short)),
-        station_cash::ORDER_INSUFFICIENT_SC
+        station_cash::ORDER_FAILURE
     );
     assert!(!short.state_changed);
     assert_eq!(gateway.snapshot(), once);
