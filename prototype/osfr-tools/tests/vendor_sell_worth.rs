@@ -38,7 +38,7 @@ use osfr_tools::{
     station_cash::Wallet,
 };
 use piece_096::{InitMessage, ItemDefinition, TypedWriter, decode_payload};
-use resale::resale;
+use resale::{purchase_price, resale, rows};
 use roosey_shop::{Fixture, data, read_json};
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -212,7 +212,9 @@ fn shop_open_shows_each_owned_item_at_what_165_5_pays() {
 }
 
 /// T633: a weapon, a clothing item and a consumable each pay a tenth of their buy price (the live
-/// wiki tooltips: 85, 118 and 50 for 850, 1182 and 500), not the old Cost / 2.
+/// wiki tooltips: 85, 118 and 50 for 850, 1182 and 500), not the old Cost / 2. This canary and
+/// `shipped_sell_prices_follow_the_tenth_rule_with_room_to_retune` are the only places the rule
+/// is written down; every other suite reads the row's own `sell_price_coins`.
 #[test]
 fn weapon_clothing_and_consumable_sell_for_a_tenth_of_their_price() {
     const WAND: i32 = 75_154;
@@ -225,7 +227,8 @@ fn weapon_clothing_and_consumable_sell_for_a_tenth_of_their_price() {
     fixture.open_shop(&mut gateway);
 
     for (instance, definition) in (900_001..).zip([WAND, CLOAK, BANDAGE]) {
-        let (coins, rule) = (inventory_of(&gateway).coins, resale(definition));
+        let coins = inventory_of(&gateway).coins;
+        let rule = (purchase_price(definition) / 10).max(1);
         assert!(rule > 1, "item {definition} is a priced row");
         let done = completions(&send(&mut gateway, &sell_packet(0, instance, 1)));
         assert_eq!(done.len(), 1, "one 165/6 per sell");
@@ -233,6 +236,33 @@ fn weapon_clothing_and_consumable_sell_for_a_tenth_of_their_price() {
         assert_eq!(done[0].price, rule, "item {definition} pays a tenth");
         assert_eq!(inventory_of(&gateway).coins, coins + rule);
     }
+}
+
+/// T640: the shipped rows still follow the T633 tenth rule, but a hand retune of a few rows is
+/// data, not a regression: only a whole-rule regression (more than 1% of the priced rows off the
+/// rule) fails. Free-issuance zeros (F228) and rows without a sell price are counted as off-rule.
+#[test]
+fn shipped_sell_prices_follow_the_tenth_rule_with_room_to_retune() {
+    let priced: Vec<_> = rows()
+        .iter()
+        .filter(|row| row["no_sale"] == false && row["purchase_price_coins"].is_u64())
+        .collect();
+    assert!(
+        priced.len() > 10_000,
+        "the shipped store has its priced rows"
+    );
+    let off_rule = priced
+        .iter()
+        .filter(|row| {
+            let rule = (row["purchase_price_coins"].as_u64().unwrap() / 10).max(1);
+            row["sell_price_coins"].as_u64() != Some(rule)
+        })
+        .count();
+    assert!(
+        off_rule * 100 <= priced.len(),
+        "{off_rule} of {} priced rows are off the tenth rule",
+        priced.len()
+    );
 }
 
 #[test]
