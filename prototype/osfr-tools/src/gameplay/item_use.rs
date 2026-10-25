@@ -80,9 +80,15 @@ impl Gameplay {
         Ok(())
     }
 
-    /// W146: item-bar requests. The potion is consumed and the heal applied in this one call, so
-    /// the saved state never holds one without the other. Without an encounter engine the player
-    /// has no tracked health, so nothing is claimed and nothing is spent.
+    /// W146: item-bar requests (42/6, 42/9, 42/15 and 42/16 for bar items, 36/10 on bar 2). They
+    /// are routed before the chest route and the shared 42 branch, in both the opening path (after
+    /// its movie block) and the no-opening path; a 36/10 on any other bar still reaches
+    /// `unsupported_cast`.
+    ///
+    /// A single-use item is consumed and its effect applied in this one call, so the saved state
+    /// never holds one without the other. A heal row needs the encounter engine's health; with
+    /// none the player counts as alive and the heal row is refused (R), while an aura, transform
+    /// or scale row still goes through the effect stack.
     ///
     /// T461: a boombox press is never spent. It is refused (36/1, nothing changed) while the
     /// player is mounted (the Mounts guide's wiki rule), busy (the start gate of the occupation
@@ -94,15 +100,17 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
-        let Some(encounter) = self.encounter.as_ref() else {
-            return Ok(None);
-        };
         let player = crate::item_bar::Player {
             guid: character.guid,
-            alive: encounter.state().player_health > 0,
+            alive: self
+                .encounter
+                .as_ref()
+                .is_none_or(|engine| engine.state().player_health > 0),
             can_place_box: character.zone_id == crate::world::OPEN_WORLD_ZONE
                 && !self.is_mounted()
                 && !self.blocks(|gates| gates.start),
+            can_heal: self.encounter.is_some(),
+            transformed: self.consumable_effects.has_transform(),
         };
         let Some(reply) = self
             .item_bar
@@ -120,6 +128,15 @@ impl Gameplay {
             if let Some(encounter) = self.encounter.as_mut() {
                 out.replies
                     .extend(encounter.heal_player_percent(reply.heal_percent));
+            }
+        }
+        if let Some(spec) = reply.effect {
+            // The item bar admitted this exact spec in the same call, before spending the item,
+            // and `apply` runs the same pure check: an error here is unreachable.
+            if let Ok(applied) =
+                self.apply_consumable_effect(character.guid, character.position, spec, now_ms)
+            {
+                out.absorb(applied);
             }
         }
         Ok(Some(out))

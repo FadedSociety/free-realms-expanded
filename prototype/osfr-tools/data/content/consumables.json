@@ -1,0 +1,63 @@
+{
+  "schema_version": 2,
+  "consumables": [
+    {
+      "definition": 2173,
+      "name_id": 422909,
+      "description_id": 422916,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "heal": {
+          "percent": 35
+        }
+      },
+      "source": "Legacy@9e08202 ClientItemDefinitions Id 2173 NameId 422909 DescriptionId 422916 Icon 730; the built-in potion table's 35% / 10 s values are kept (R, W146)."
+    },
+    {
+      "definition": 2982,
+      "name_id": 277,
+      "description_id": 2707,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5030,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1956 (Electric Veal Meat); Legacy@9e08202 ClientItemDefinitions Id 2982 NameId 277 DescriptionId 2707 Icon 2797 SingleUse; effect 5030 PFX_barrier-electricity_blue_loop; duration locale 2707 thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32 (R, OSFR #126)."
+    },
+    {
+      "definition": 4042,
+      "name_id": 1201,
+      "description_id": 2772,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 169,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3042 (Dog, large, floppy ears): model 169, poof 21, DurationMs 1800000, CooldownMs 1800000; Legacy@9e08202 ClientItemDefinitions Id 4042 NameId 1201 DescriptionId 2772 Icon 2851 SingleUse; icon 3843 icon_status_changeform_32 (R, OSFR #126)."
+    },
+    {
+      "definition": 11002,
+      "name_id": 422909,
+      "description_id": 422916,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "heal": {
+          "percent": 35
+        }
+      },
+      "source": "Legacy@9e08202 ClientItemDefinitions Id 11002 NameId 422909 DescriptionId 422916 Icon 730; the built-in potion table's 35% / 10 s values are kept (R, W146)."
+    }
+  ]
+}

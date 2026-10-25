@@ -1,4 +1,5 @@
-//! W146: the four-slot item bar and one useful consumable (Small Health Potion).
+//! W146/T510: the four-slot item bar and the data-driven consumable rows (potions, food auras,
+//! transformation treats and size effects).
 //!
 //! # Recovered original facts
 //!
@@ -19,24 +20,30 @@
 //!
 //! # Reconstructed policy (R)
 //!
-//! * Only the seven recovered consumable rows and the boomboxes in [`boombox::Catalogue`] (owned
-//!   outright, not rented) may sit on the bar; only the Small Health Potion rows (2173, 11002) and
-//!   those boomboxes are usable. Other bar items show disabled and a use is refused.
+//! * A slot holds any owned item whose definition has a [`Effect`] row (schema 2, T510) or a
+//!   boombox in [`boombox::Catalogue`] (owned outright, not rented). Recovery's seven-row
+//!   `use_wire` table is no longer the gate; only the row decides.
+//! * A row is one of four effects: a heal applied here, or an aura, transform or scale handed to
+//!   the effect stack in [`Reply::effect`] for the caller to apply. A row names its own buff icon
+//!   and name; the slot's icon and name still come from [`Inventory::presentation`].
 //! * A boombox press is never spent and saves nothing: it stamps the row's `recast_ms` and hands
 //!   the definition back in [`Reply::boombox`] for the caller to place the box. The caller says in
 //!   [`Player::can_place_box`] whether the player may place one now.
 //! * Heal: the cached wiki gives 2% instantly plus 11% per second for 3 seconds; the effect is
-//!   applied at once as 35% of maximum health. Cooldown 10 s per item definition, shared by every
-//!   slot and by 42/15. Both are tunable in `consumables.json` (see [`Effects`]).
-//! * A use consumes exactly one item. A refusal changes nothing and sends 36/1 (bar use) or a chat
-//!   line. Using at full health is allowed. A bound stack that empties unbinds its slot.
+//!   applied at once as the row's percent of maximum health. Cooldown 10 s per item definition,
+//!   shared by every slot and by 42/15. Both are tunable in `consumables.json` (see [`Effects`]).
+//! * (R) OSFR MinCooldownMs: an accepted use always stamps at least 3 s, for every row and every
+//!   38/25 refresh.
+//! * A use consumes exactly one item when the row is single-use. A refusal changes nothing and
+//!   sends 36/1 (bar use) or a chat line. Using at full health is allowed. A bound stack that
+//!   empties unbinds its slot. A transform row is refused while a transform is live.
 //! * Cooldowns and the pending 42/16 confirmation live in memory only; a relog resets them.
 //! * 42/15 only works for the instance the last 42/16 confirmed, once.
 
-use crate::{abilities, boombox, chat, inventory::Inventory};
+use crate::{abilities, boombox, chat, consumable_effects, inventory::Inventory};
 use serde::{Deserialize, Serialize};
 use std::{
-    collections::BTreeMap,
+    collections::{BTreeMap, BTreeSet},
     fs,
     io::{self, Read},
     path::Path,
@@ -51,18 +58,153 @@ pub mod use_wire;
 use bar_wire::{ActionBarBinding, ActionBarItems, ActionBarSlot, AssignRejection, OwnedAction};
 
 const EFFECTS_FILE: &str = "consumables.json";
-const MAX_EFFECTS_FILE: u64 = 64 * 1024;
-const MAX_EFFECT_ROWS: usize = 16;
-const MAX_COOLDOWN_MS: u32 = 600_000;
+const MAX_EFFECTS_FILE: u64 = 256 * 1024;
+const MAX_EFFECT_ROWS: usize = 512;
+const MAX_COOLDOWN_MS: u32 = 86_400_000;
+/// (R) OSFR `MinCooldownMs`: the client never shows a shorter recast than this.
+const MIN_COOLDOWN_MS: u32 = 3_000;
 const SUB_ASSIGN_BY_RECORD: &[u8] = &[42, 0, 9, 0];
 
-/// One usable consumable. `heal_percent` is of maximum health, 1 to 100.
-#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+/// One usable consumable row. `name_id`/`description_id` are the 42/16 confirm text and the buff
+/// row name; `source` is content provenance that the server never reads.
+#[derive(Clone, Debug, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct Effect {
     pub definition: i32,
-    pub heal_percent: u32,
+    pub name_id: i32,
+    pub description_id: i32,
     pub cooldown_ms: u32,
+    pub single_use: bool,
+    pub effect: EffectKind,
+    pub source: String,
+}
+
+/// The four row effects. A heal is applied by the caller to health; the other three become a
+/// [`consumable_effects::Spec`] that the caller applies through the shared effect stack.
+#[derive(Clone, Copy, Debug, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields, rename_all = "snake_case")]
+pub enum EffectKind {
+    Heal {
+        percent: u32,
+    },
+    Aura {
+        composite_effect_id: i32,
+        duration_ms: u64,
+        delay_ms: u64,
+        icon_id: i32,
+    },
+    Transform {
+        model_id: i32,
+        poof_effect_id: i32,
+        duration_ms: u64,
+        icon_id: i32,
+    },
+    Scale {
+        scale: f32,
+        duration_ms: u64,
+        icon_id: i32,
+    },
+}
+
+impl Effect {
+    /// Sanity bounds, not tuning values.
+    fn valid(&self) -> bool {
+        let duration = |ms: u64| (1..=consumable_effects::MAX_DURATION_MS).contains(&ms);
+        self.definition > 0
+            && self.name_id > 0
+            && self.description_id > 0
+            && self.cooldown_ms <= MAX_COOLDOWN_MS
+            && match self.effect {
+                EffectKind::Heal { percent } => (1..=100).contains(&percent),
+                EffectKind::Aura {
+                    composite_effect_id,
+                    duration_ms,
+                    delay_ms,
+                    icon_id,
+                } => {
+                    composite_effect_id > 0
+                        && icon_id > 0
+                        && duration(duration_ms)
+                        && delay_ms <= consumable_effects::MAX_DELAY_MS
+                }
+                EffectKind::Transform {
+                    model_id,
+                    poof_effect_id,
+                    duration_ms,
+                    icon_id,
+                } => model_id > 0 && poof_effect_id >= 0 && icon_id > 0 && duration(duration_ms),
+                EffectKind::Scale {
+                    scale,
+                    duration_ms,
+                    icon_id,
+                } => {
+                    icon_id > 0
+                        && duration(duration_ms)
+                        && (consumable_effects::MIN_SCALE..=consumable_effects::MAX_SCALE)
+                            .contains(&scale)
+                }
+            }
+    }
+
+    /// (R) OSFR `MinCooldownMs`: every consumer, including the 38/25 sweep, uses this value.
+    fn effective_cooldown_ms(&self) -> u32 {
+        self.cooldown_ms.max(MIN_COOLDOWN_MS)
+    }
+
+    fn heal_percent(&self) -> u32 {
+        match self.effect {
+            EffectKind::Heal { percent } => percent,
+            _ => 0,
+        }
+    }
+
+    /// The effect-stack spec for a non-heal row; `None` for a heal.
+    pub fn spec(&self) -> Option<consumable_effects::Spec> {
+        let (kind, duration_ms, icon_id) = match self.effect {
+            EffectKind::Heal { .. } => return None,
+            EffectKind::Aura {
+                composite_effect_id,
+                duration_ms,
+                delay_ms,
+                icon_id,
+            } => (
+                consumable_effects::Kind::Aura {
+                    composite_effect_id,
+                    delay_ms,
+                },
+                duration_ms,
+                icon_id,
+            ),
+            EffectKind::Transform {
+                model_id,
+                poof_effect_id,
+                duration_ms,
+                icon_id,
+            } => (
+                consumable_effects::Kind::Transform {
+                    model_id,
+                    poof_effect_id,
+                },
+                duration_ms,
+                icon_id,
+            ),
+            EffectKind::Scale {
+                scale,
+                duration_ms,
+                icon_id,
+            } => (
+                consumable_effects::Kind::Scale { scale },
+                duration_ms,
+                icon_id,
+            ),
+        };
+        Some(consumable_effects::Spec {
+            kind,
+            duration_ms,
+            icon_id,
+            name_id: self.name_id,
+        })
+    }
 }
 
 #[derive(Deserialize)]
@@ -72,19 +214,47 @@ struct EffectFile {
     consumables: Vec<Effect>,
 }
 
+/// Schema 1's potion-only row. Its name and description come from the recovered catalogue.
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct LegacyEffect {
+    definition: i32,
+    heal_percent: u32,
+    cooldown_ms: u32,
+}
+
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct LegacyFile {
+    schema_version: u32,
+    consumables: Vec<LegacyEffect>,
+}
+
+#[derive(Deserialize)]
+struct FileVersion {
+    schema_version: u32,
+}
+
 /// The usable consumables. The built-in table is the Small Health Potion rows (R); an optional
 /// `consumables.json` in the content directory replaces it, so values can be tuned without code.
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, PartialEq)]
 pub struct Effects(Vec<Effect>);
 
 impl Default for Effects {
     fn default() -> Self {
         Self(
             [2173, 11002]
-                .map(|definition| Effect {
-                    definition,
-                    heal_percent: 35,
-                    cooldown_ms: 10_000,
+                .map(|definition| {
+                    let item = use_wire::consumable(definition).expect("recovered potion row");
+                    Effect {
+                        definition,
+                        name_id: item.name_id,
+                        description_id: item.description_id,
+                        cooldown_ms: 10_000,
+                        single_use: true,
+                        effect: EffectKind::Heal { percent: 35 },
+                        source: String::new(),
+                    }
                 })
                 .to_vec(),
         )
@@ -92,26 +262,22 @@ impl Default for Effects {
 }
 
 impl Effects {
-    /// Sanity bounds, not tuned values: rows must be recovered catalogue consumables.
+    /// Sanity bounds, not tuned values.
     pub fn new(rows: Vec<Effect>) -> io::Result<Self> {
-        let mut seen = Vec::new();
-        for row in &rows {
-            if !(1..=100).contains(&row.heal_percent)
-                || row.cooldown_ms > MAX_COOLDOWN_MS
-                || use_wire::consumable(row.definition).is_none()
-                || seen.contains(&row.definition)
-            {
-                return Err(invalid("invalid consumable effect row"));
-            }
-            seen.push(row.definition);
-        }
         if rows.len() > MAX_EFFECT_ROWS {
             return Err(invalid("too many consumable effect rows"));
+        }
+        let mut seen = BTreeSet::new();
+        for row in &rows {
+            if !row.valid() || !seen.insert(row.definition) {
+                return Err(invalid("invalid consumable effect row"));
+            }
         }
         Ok(Self(rows))
     }
 
     /// `consumables.json` from the fixed content directory, or the built-in table when absent.
+    /// Schema 1 (the potion-only rows) still loads; schema 2 is the row shape above.
     pub fn load(directory: &Path) -> io::Result<Self> {
         let file = match fs::File::open(directory.join(EFFECTS_FILE)) {
             Ok(file) => file,
@@ -121,17 +287,59 @@ impl Effects {
         let mut bytes = Vec::new();
         file.take(MAX_EFFECTS_FILE + 1).read_to_end(&mut bytes)?;
         if bytes.len() as u64 > MAX_EFFECTS_FILE {
-            return Err(invalid("consumables.json exceeds 64 KiB"));
+            return Err(invalid("consumables.json exceeds 256 KiB"));
         }
-        let parsed: EffectFile = serde_json::from_slice(&bytes).map_err(invalid)?;
-        if parsed.schema_version != 1 {
-            return Err(invalid("unsupported consumables.json version"));
+        let version: FileVersion = serde_json::from_slice(&bytes).map_err(invalid)?;
+        match version.schema_version {
+            1 => {
+                let parsed: LegacyFile = serde_json::from_slice(&bytes).map_err(invalid)?;
+                if parsed.schema_version != 1 {
+                    return Err(invalid("unsupported consumables.json version"));
+                }
+                let rows = parsed
+                    .consumables
+                    .into_iter()
+                    .map(Effect::from_legacy)
+                    .collect::<io::Result<Vec<_>>>()?;
+                Self::new(rows)
+            }
+            2 => {
+                let parsed: EffectFile = serde_json::from_slice(&bytes).map_err(invalid)?;
+                if parsed.schema_version != 2 {
+                    return Err(invalid("unsupported consumables.json version"));
+                }
+                Self::new(parsed.consumables)
+            }
+            _ => Err(invalid("unsupported consumables.json version")),
         }
-        Self::new(parsed.consumables)
     }
 
-    pub fn get(&self, definition: i32) -> Option<Effect> {
-        self.0.iter().copied().find(|e| e.definition == definition)
+    pub fn get(&self, definition: i32) -> Option<&Effect> {
+        self.0.iter().find(|e| e.definition == definition)
+    }
+
+    /// Every loaded row, for content gates that re-check the effect-stack bounds.
+    pub fn rows(&self) -> &[Effect] {
+        &self.0
+    }
+}
+
+impl Effect {
+    /// Schema 1 accepted only the recovered catalogue rows; that stays true.
+    fn from_legacy(row: LegacyEffect) -> io::Result<Self> {
+        let item = use_wire::consumable(row.definition)
+            .ok_or_else(|| invalid("not a recovered consumable"))?;
+        Ok(Self {
+            definition: row.definition,
+            name_id: item.name_id,
+            description_id: item.description_id,
+            cooldown_ms: row.cooldown_ms,
+            single_use: true,
+            effect: EffectKind::Heal {
+                percent: row.heal_percent,
+            },
+            source: String::new(),
+        })
     }
 }
 
@@ -142,17 +350,35 @@ pub struct Player {
     pub alive: bool,
     /// Not mounted, not busy and in the open world: a boombox press is refused otherwise.
     pub can_place_box: bool,
+    /// An encounter engine tracks this player's health, so a heal row may be used. Without one the
+    /// player counts as alive but a heal row is refused (R).
+    pub can_heal: bool,
+    /// A temporary appearance is live, so a transform row is refused (R).
+    pub transformed: bool,
 }
 
 /// What a handled request produced. `heal_percent` is for the caller to apply to the player's
-/// health (the item is already consumed when it is non-zero). `boombox` is the definition of a
-/// box the caller must now place (nothing was consumed or changed for it).
+/// health (the item is already consumed when it is non-zero). `effect` is the non-heal row's spec
+/// for the caller to apply through the effect stack. `boombox` is the definition of a box the
+/// caller must now place (nothing was consumed or changed for it).
 #[derive(Debug, Default)]
 pub struct Reply {
     pub replies: Vec<Vec<u8>>,
+    /// True when the bar or the inventory changed and must be saved. A non-single-use row
+    /// changes neither (its effect and cooldown are session-only).
     pub changed: bool,
     pub heal_percent: u32,
     pub boombox: Option<i32>,
+    pub effect: Option<consumable_effects::Spec>,
+}
+
+/// One accepted use. The item was spent when `spent` is set and the cooldown stamped; the caller
+/// applies `heal_percent` to health or `effect` through the stack.
+struct Use {
+    replies: Vec<Vec<u8>>,
+    heal_percent: u32,
+    effect: Option<consumable_effects::Spec>,
+    spent: bool,
 }
 
 /// The persisted item bar: four slots of owned consumable instances.
@@ -171,9 +397,9 @@ pub struct ItemBar {
     pending: Option<i32>,
 }
 
-/// Read-only view of the inventory for the bar. Only recovered consumables and catalogued
+/// Read-only view of the inventory for the bar. Only items with an effect row and catalogued
 /// boomboxes can back a slot.
-struct View<'a>(&'a Inventory, &'a boombox::Catalogue);
+struct View<'a>(&'a Inventory, &'a boombox::Catalogue, &'a Effects);
 
 impl ActionBarItems for View<'_> {
     fn owned_action(&self, item_instance_id: i32) -> Option<OwnedAction> {
@@ -183,8 +409,9 @@ impl ActionBarItems for View<'_> {
             .items
             .iter()
             .find(|i| i.id == item_instance_id)?;
-        // A rental is never usable here (see `usable`), so a rented box can't take a slot (R).
-        let listed = use_wire::consumable(item.definition_id).is_some()
+        // A rented boombox cannot take a slot (R); a rented row item may bind, but `usable`
+        // refuses every rental at use time.
+        let listed = self.2.get(item.definition_id).is_some()
             || (item.rental.is_none() && self.1.get(item.definition_id).is_some());
         if !listed {
             return None;
@@ -206,6 +433,7 @@ enum Refusal {
     Empty,
     KnockedOut,
     Cooldown(u64),
+    Transformed,
 }
 
 impl Refusal {
@@ -215,6 +443,8 @@ impl Refusal {
             Self::Empty => "You have none of that item left.".into(),
             Self::KnockedOut => "You can't use items while knocked out.".into(),
             Self::Cooldown(ms) => format!("That item is not ready yet ({} s).", ms.div_ceil(1000)),
+            // (R) OSFR's transform-food refusal text.
+            Self::Transformed => "You are already transformed.".into(),
         }
     }
 }
@@ -250,7 +480,7 @@ impl ItemBar {
     }
 
     /// Route one client message. `None` means it is not an item-bar request, or (42/15, 42/16) the
-    /// instance is not a recovered consumable, so the caller keeps its existing handling.
+    /// instance's definition has no effect row, so the caller keeps its existing handling.
     pub fn handle(
         &mut self,
         inner: &[u8],
@@ -281,12 +511,13 @@ impl ItemBar {
             return self.assign(slot, instance, inventory, now_ms).map(Some);
         }
         if let Some((kind, id)) = use_wire::decode_immediate_activation(inner) {
-            let consumable = inventory
+            let listed = inventory
                 .state()
                 .items
                 .iter()
-                .any(|i| i.id == id && use_wire::consumable(i.definition_id).is_some());
-            if !consumable {
+                .find(|i| i.id == id)
+                .is_some_and(|item| self.effects.get(item.definition_id).is_some());
+            if !listed {
                 return Ok(None);
             }
             let reply = match kind {
@@ -310,7 +541,8 @@ impl ItemBar {
     /// 38/25 for all four slots: bound slots with quantity and recast, the rest empty. Stale
     /// bindings (stack gone) are dropped first.
     pub fn refresh(&mut self, inventory: &Inventory, now_ms: u64) -> io::Result<Vec<Vec<u8>>> {
-        self.bar.reconcile(&View(inventory, &self.boomboxes));
+        self.bar
+            .reconcile(&View(inventory, &self.boomboxes, &self.effects));
         (0..bar_wire::ITEM_BAR_SLOTS)
             .map(|slot| {
                 let update = self
@@ -335,7 +567,7 @@ impl ItemBar {
                 slot,
                 item_instance_id: instance,
             },
-            &View(inventory, &self.boomboxes),
+            &View(inventory, &self.boomboxes, &self.effects),
         )?;
         let mut replies = Vec::new();
         if let Some(why) = outcome.rejection {
@@ -356,20 +588,20 @@ impl ItemBar {
     }
 
     fn check(&mut self, id: i32, inventory: &Inventory, player: &Player, now_ms: u64) -> Reply {
-        self.pending = None;
         let row = inventory
             .state()
             .items
             .iter()
             .find(|i| i.id == id)
-            .and_then(|i| use_wire::consumable(i.definition_id));
+            .and_then(|item| self.effects.get(item.definition_id))
+            .map(|row| (row.name_id, row.description_id));
         let refusal = match (self.usable(id, inventory, player, now_ms), row) {
-            (Ok(()), Some(row)) => {
+            (Ok(()), Some((name_id, description_id))) => {
                 self.pending = Some(id);
                 // Success text is the item's own name and description (R): the chest strings
                 // would read "Use a Mystery Key". Category and bundle only matter on failure.
                 let mut bytes = vec![38, 0, 30, 0];
-                for value in [id, 0, 0, row.name_id, row.description_id] {
+                for value in [id, 0, 0, name_id, description_id] {
                     bytes.extend(value.to_le_bytes());
                 }
                 bytes.push(1);
@@ -381,6 +613,7 @@ impl ItemBar {
             (Err(refusal), _) => refusal,
             (Ok(()), None) => Refusal::NotUsable,
         };
+        // A refused check leaves any earlier confirmation pending (a refusal consumes nothing).
         Reply {
             replies: vec![chat::system(&refusal.text())],
             ..Reply::default()
@@ -401,12 +634,14 @@ impl ItemBar {
             });
         }
         match self.consume(id, inventory, player, now_ms) {
-            Ok((mut replies, heal_percent)) => {
+            Ok(used) => {
+                let mut replies = used.replies;
                 replies.extend(self.refresh(inventory, now_ms)?);
                 Ok(Reply {
                     replies,
-                    changed: true,
-                    heal_percent,
+                    changed: used.spent,
+                    heal_percent: used.heal_percent,
+                    effect: used.effect,
                     ..Reply::default()
                 })
             }
@@ -449,12 +684,14 @@ impl ItemBar {
             });
         }
         match self.consume(binding.item_instance_id, inventory, player, now_ms) {
-            Ok((mut replies, heal_percent)) => {
+            Ok(used) => {
+                let mut replies = used.replies;
                 replies.extend(self.refresh(inventory, now_ms)?);
                 Ok(Reply {
                     replies,
-                    changed: true,
-                    heal_percent,
+                    changed: used.spent,
+                    heal_percent: used.heal_percent,
+                    effect: used.effect,
                     ..Reply::default()
                 })
             }
@@ -462,14 +699,15 @@ impl ItemBar {
         }
     }
 
-    /// The one place an item is spent: every check first, then one consume and the recast stamp.
+    /// The one place an item is spent: every check first (including `EffectStack::admits`, which
+    /// the caller's `apply` repeats on the same spec), then one consume and the recast stamp.
     fn consume(
         &mut self,
         id: i32,
         inventory: &mut Inventory,
         player: &Player,
         now_ms: u64,
-    ) -> Result<(Vec<Vec<u8>>, u32), Refusal> {
+    ) -> Result<Use, Refusal> {
         self.usable(id, inventory, player, now_ms)?;
         let definition = inventory
             .state()
@@ -479,9 +717,24 @@ impl ItemBar {
             .map(|i| i.definition_id)
             .ok_or(Refusal::NotUsable)?;
         let effect = self.effects.get(definition).ok_or(Refusal::NotUsable)?;
-        let outcome = inventory.consume(id, 1).map_err(|_| Refusal::NotUsable)?;
+        let spent = effect.single_use;
+        let heal_percent = effect.heal_percent();
+        let spec = effect.spec();
+        let replies = if spent {
+            inventory
+                .consume(id, 1)
+                .map_err(|_| Refusal::NotUsable)?
+                .replies
+        } else {
+            Vec::new()
+        };
         self.last_used.insert(definition, now_ms);
-        Ok((outcome.replies, effect.heal_percent))
+        Ok(Use {
+            replies,
+            heal_percent,
+            effect: spec,
+            spent,
+        })
     }
 
     fn usable(
@@ -507,17 +760,33 @@ impl ItemBar {
         if !player.alive {
             return Err(Refusal::KnockedOut);
         }
-        match self.cooldown_left(item.definition_id, recast, now_ms) {
-            Some(left) => Err(Refusal::Cooldown(left)),
-            None => Ok(()),
+        if let Some(left) = self.cooldown_left(item.definition_id, recast, now_ms) {
+            return Err(Refusal::Cooldown(left));
         }
+        // A boombox has no effect row; every row below is checked after the cooldown, as 42/16
+        // stages it, so a refusal never spends or stamps.
+        let Some(effect) = self.effects.get(item.definition_id) else {
+            return Ok(());
+        };
+        if matches!(effect.effect, EffectKind::Heal { .. }) && !player.can_heal {
+            return Err(Refusal::NotUsable);
+        }
+        if let Some(spec) = effect.spec() {
+            consumable_effects::admits(&spec).map_err(|_| Refusal::NotUsable)?;
+            if matches!(spec.kind, consumable_effects::Kind::Transform { .. }) && player.transformed
+            {
+                return Err(Refusal::Transformed);
+            }
+        }
+        Ok(())
     }
 
-    /// The recast of a usable item: a consumable's cooldown or a catalogued boombox's `recast_ms`.
+    /// The recast of a usable item: an effect row's floored cooldown or a catalogued boombox's
+    /// `recast_ms`.
     fn recast_ms(&self, definition: i32) -> Option<u32> {
         self.effects
             .get(definition)
-            .map(|effect| effect.cooldown_ms)
+            .map(Effect::effective_cooldown_ms)
             .or_else(|| self.boomboxes.get(definition).map(|row| row.recast_ms))
     }
 
@@ -543,7 +812,8 @@ impl ItemBar {
         inventory: &Inventory,
         now_ms: u64,
     ) -> Option<io::Result<Vec<u8>>> {
-        let action = View(inventory, &self.boomboxes).owned_action(binding.item_instance_id)?;
+        let action = View(inventory, &self.boomboxes, &self.effects)
+            .owned_action(binding.item_instance_id)?;
         let mut slot = ActionBarSlot::for_owned_action(&action);
         match self.recast_ms(action.definition_id) {
             Some(recast) => {

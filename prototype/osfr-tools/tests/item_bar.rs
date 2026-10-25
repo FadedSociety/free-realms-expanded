@@ -2,10 +2,11 @@
 //! immediate-use check (42/16 to 38/30, 42/15) for the Small Health Potion. Every refusal has a
 //! canary: the same request succeeds once the one missing fact is supplied.
 use osfr_tools::{
-    inventory::{Inventory, InventoryItem, InventoryState},
+    consumable_effects::{EffectStack, Kind, Spec},
+    inventory::{Inventory, InventoryItem, InventoryState, RentalState},
     item_bar::{
+        Effect, EffectKind, Effects, ItemBar, Player, Reply,
         bar_wire::{self, SLOT_UPDATE_BYTES},
-        Effect, Effects, ItemBar, Player, Reply,
     },
 };
 use serde_json::json;
@@ -20,18 +21,32 @@ static SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 const SMALL: i32 = 2173; // usable
 const SMALL_ALT: i32 = 11002; // usable, second catalogue row of the same item
-const MEDIUM: i32 = 3021; // recovered consumable, no effect yet: assignable, not usable
+const MEDIUM: i32 = 3021; // recovered consumable with no row in the test content
 const HAT: i32 = 200; // not a consumable
+const VEAL: i32 = 2982; // Electric Veal Meat, an aura row
+const BERRIES: i32 = 4042; // Bark Berries, a transform row
+const VEAL_NAME: i32 = 277;
+const VEAL_DESC: i32 = 2707;
+const BUFF_ICON: i32 = 3843; // OSFR's shared change-form buff icon (R)
 const ME: u64 = 77;
 const ALIVE: Player = Player {
     guid: ME,
     alive: true,
     can_place_box: true,
+    can_heal: true,
+    transformed: false,
 };
 const KNOCKED_OUT: Player = Player {
-    guid: ME,
     alive: false,
-    can_place_box: true,
+    ..ALIVE
+};
+const TRANSFORMED: Player = Player {
+    transformed: true,
+    ..ALIVE
+};
+const NO_HEALING: Player = Player {
+    can_heal: false,
+    ..ALIVE
 };
 
 fn digest(bytes: &[u8]) -> String {
@@ -63,7 +78,15 @@ fn serialize_item(item: &InventoryItem) -> Vec<u8> {
     ] {
         bytes.extend(value.to_le_bytes());
     }
-    bytes.push(0); // no rental
+    match &item.rental {
+        Some(rental) => {
+            bytes.push(1);
+            bytes.extend(rental.expiration.to_le_bytes());
+            bytes.extend(rental.upsells.to_le_bytes());
+            bytes.extend(rental.bundle_id.to_le_bytes());
+        }
+        None => bytes.push(0),
+    }
     bytes.extend(item.ability_count.to_le_bytes());
     bytes.push(u8::from(item.activate_enabled));
     bytes
@@ -75,6 +98,76 @@ fn row(id: i32, name: i32, icon: i32, tint: i32, class: i32) -> Vec<u8> {
         bytes[at..at + 4].copy_from_slice(&value.to_le_bytes());
     }
     bytes
+}
+fn row_json(
+    definition: i32,
+    name_id: i32,
+    description_id: i32,
+    cooldown_ms: u32,
+    single_use: bool,
+    effect: serde_json::Value,
+) -> serde_json::Value {
+    json!({
+        "definition": definition,
+        "name_id": name_id,
+        "description_id": description_id,
+        "cooldown_ms": cooldown_ms,
+        "single_use": single_use,
+        "effect": effect,
+        "source": "T510 test row",
+    })
+}
+fn heal_row(definition: i32, percent: u32, cooldown_ms: u32) -> serde_json::Value {
+    row_json(
+        definition,
+        422909,
+        422916,
+        cooldown_ms,
+        true,
+        json!({"heal": {"percent": percent}}),
+    )
+}
+fn aura_row(
+    definition: i32,
+    duration_ms: u64,
+    cooldown_ms: u32,
+    composite_effect_id: i32,
+    delay_ms: u64,
+) -> serde_json::Value {
+    row_json(
+        definition,
+        VEAL_NAME,
+        VEAL_DESC,
+        cooldown_ms,
+        true,
+        json!({"aura": {
+            "composite_effect_id": composite_effect_id,
+            "duration_ms": duration_ms,
+            "delay_ms": delay_ms,
+            "icon_id": BUFF_ICON,
+        }}),
+    )
+}
+fn transform_row(
+    definition: i32,
+    duration_ms: u64,
+    cooldown_ms: u32,
+    model_id: i32,
+    poof_effect_id: i32,
+) -> serde_json::Value {
+    row_json(
+        definition,
+        1201,
+        2772,
+        cooldown_ms,
+        true,
+        json!({"transform": {
+            "model_id": model_id,
+            "poof_effect_id": poof_effect_id,
+            "duration_ms": duration_ms,
+            "icon_id": BUFF_ICON,
+        }}),
+    )
 }
 
 struct Fixture {
@@ -92,6 +185,12 @@ impl Fixture {
         fs::create_dir(&path).unwrap();
         let mut exhausted = item(15, SMALL_ALT, 1, 0);
         exhausted.consumed_count = 1;
+        let mut rented = item(18, VEAL, 2, 0);
+        rented.rental = Some(RentalState {
+            expiration: 0,
+            upsells: 0,
+            bundle_id: 0,
+        });
         let state = InventoryState {
             next_instance_id: None,
             coins: 0,
@@ -102,6 +201,9 @@ impl Fixture {
                 item(13, HAT, 1, 0),
                 item(14, SMALL, 1, 7),
                 exhausted,
+                item(16, VEAL, 2, 0),
+                item(17, BERRIES, 2, 0),
+                rented,
             ],
             equipment: vec![],
         };
@@ -123,6 +225,8 @@ impl Fixture {
             row(SMALL_ALT, 422909, 730, 5, 9),
             row(MEDIUM, 422910, 543, 6, 9),
             row(HAT, 1, 2, 0, 1),
+            row(VEAL, VEAL_NAME, 2797, 0, 9),
+            row(BERRIES, 1201, 2851, 0, 9),
         ];
         let definitions: Vec<_> = rows.iter().map(|bytes| {
             let id = i32::from_le_bytes(bytes[..4].try_into().unwrap());
@@ -144,6 +248,23 @@ impl Fixture {
     }
     fn bar(&self) -> ItemBar {
         ItemBar::load(&self.path, Default::default(), None).unwrap()
+    }
+    /// Write a `consumables.json` into the fixture's content directory.
+    fn write_consumables(&self, value: &serde_json::Value) {
+        fs::write(self.path.join("consumables.json"), value.to_string()).unwrap();
+    }
+    /// Schema 2 content: the two potion rows plus the Electric Veal Meat aura and Bark Berries
+    /// transform rows from data/content.
+    fn write_schema2(&self) {
+        self.write_consumables(&json!({
+            "schema_version": 2,
+            "consumables": [
+                heal_row(SMALL, 35, 10_000),
+                heal_row(SMALL_ALT, 35, 10_000),
+                aura_row(VEAL, 1_800_000, 1_800_000, 5030, 0),
+                transform_row(BERRIES, 1_800_000, 1_800_000, 169, 21),
+            ],
+        }));
     }
 }
 impl Drop for Fixture {
@@ -212,6 +333,11 @@ fn is_ability_failure(reply: &Reply) -> bool {
 fn is_chat(reply: &Reply) -> bool {
     reply.replies.len() == 1 && reply.replies[0].starts_with(&[15, 0, 3, 0])
 }
+/// The 15/3 system line of a chat reply (15/3 header, u32 length, text, flag).
+fn chat_text(reply: &Reply) -> String {
+    let packet = &reply.replies[0];
+    String::from_utf8(packet[8..packet.len() - 1].to_vec()).unwrap()
+}
 fn bound(bar: &ItemBar) -> Vec<(i32, i32)> {
     bar.bindings()
         .iter()
@@ -244,7 +370,7 @@ fn assigning_an_owned_potion_binds_the_slot_and_renders_all_four_slots() {
     assert_eq!((potion.selector_a, potion.target_selector), (1, 2));
     assert_eq!(potion.total_refresh_time, 10_000);
     assert_eq!(potion.cast_age_ms, i32::MAX); // never cast
-                                              // The instance tint overrides the definition tint (14 carries tint 7).
+    // The instance tint overrides the definition tint (14 carries tint 7).
     let reply = run(&mut bar, &mut inventory, &assign(2, 14), &ALIVE, 0).unwrap();
     assert_eq!(slot_updates(&reply)[2].icon_tint, 7);
     assert_eq!(bound(&bar), [(1, 10), (2, 14)]);
@@ -358,20 +484,23 @@ fn assigning_by_record_resolves_definition_and_tint_to_an_owned_stack() {
 fn malformed_and_foreign_messages_are_not_taken() {
     let fixture = Fixture::new();
     let (mut inventory, mut bar) = (fixture.inventory(), fixture.bar());
-    assert!(bar
-        .handle(&assign(0, 10)[..11], &mut inventory, &ALIVE, 0)
-        .is_err());
-    assert!(bar
-        .handle(
+    assert!(
+        bar.handle(&assign(0, 10)[..11], &mut inventory, &ALIVE, 0)
+            .is_err()
+    );
+    assert!(
+        bar.handle(
             &[assign(0, 10), vec![0]].concat(),
             &mut inventory,
             &ALIVE,
             0
         )
-        .is_err());
-    assert!(bar
-        .handle(&cast_on(2, 0, ME)[..20], &mut inventory, &ALIVE, 0)
-        .is_err());
+        .is_err()
+    );
+    assert!(
+        bar.handle(&cast_on(2, 0, ME)[..20], &mut inventory, &ALIVE, 0)
+            .is_err()
+    );
     for foreign in [
         msg(42, 8, &[1, 0, 1, 3]), // equip by record
         msg(42, 3, &[10, 1, 3]),   // equip
@@ -468,19 +597,17 @@ fn bar_use_refusals_spend_nothing_and_each_has_a_canary() {
     let fixture = Fixture::new();
     let (mut inventory, mut bar) = (fixture.inventory(), fixture.bar());
     run(&mut bar, &mut inventory, &assign(0, 10), &ALIVE, 0).unwrap();
-    run(&mut bar, &mut inventory, &assign(1, 12), &ALIVE, 0).unwrap(); // Medium: no effect
     let mut position = msg(36, 10, &[2, 0, 1]);
     for axis in [1.0f32, 2.0, 3.0, 1.0] {
         position.extend(axis.to_le_bytes());
     }
-    let refused: [(&str, Vec<u8>, &Player); 7] = [
+    let refused: [(&str, Vec<u8>, &Player); 6] = [
         ("empty slot", cast(2), &ALIVE),
         ("slot past the last", cast(4), &ALIVE),
         ("negative slot", cast(-1), &ALIVE),
         ("someone else's guid", cast_on(2, 0, ME + 1), &ALIVE),
         ("ground target", position, &ALIVE),
         ("knocked out", cast(0), &KNOCKED_OUT),
-        ("no effect recovered yet", cast(1), &ALIVE),
     ];
     for (why, request, player) in refused {
         let reply = run(&mut bar, &mut inventory, &request, player, 0).unwrap();
@@ -499,9 +626,10 @@ fn bar_use_refusals_spend_nothing_and_each_has_a_canary() {
             .heal_percent,
         35
     );
-    // A medium potion can sit on the bar, greyed out.
+    // A definition without a row can no longer take a slot (T510 replaces the catalogue gate).
     let reply = run(&mut bar, &mut inventory, &assign(1, 12), &ALIVE, 0).unwrap();
-    assert!(!slot_updates(&reply)[1].server_enabled);
+    assert!(!reply.changed && bound(&bar) == [(0, 10)]);
+    assert!(slot_updates(&reply)[1].is_empty);
 }
 
 #[test]
@@ -527,7 +655,7 @@ fn the_check_then_use_flow_confirms_once_and_only_for_the_checked_instance() {
     );
     assert_eq!(packet[24], 1);
     assert_eq!(count(&inventory, 10), 3); // a check never spends
-                                          // A use for a different instance neither works nor keeps the confirmation.
+    // A use for a different instance neither works nor keeps the confirmation.
     let reply = run(&mut bar, &mut inventory, &use_item(11), &ALIVE, 1).unwrap();
     assert!(is_chat(&reply) && count(&inventory, 11) == 1);
     let reply = run(&mut bar, &mut inventory, &use_item(10), &ALIVE, 1).unwrap();
@@ -545,11 +673,7 @@ fn the_check_then_use_flow_confirms_once_and_only_for_the_checked_instance() {
 fn the_check_refuses_with_a_chat_line_not_the_chest_dialog() {
     let fixture = Fixture::new();
     let (mut inventory, mut bar) = (fixture.inventory(), fixture.bar());
-    for (why, id, player) in [
-        ("no effect yet", 12, &ALIVE),
-        ("exhausted", 15, &ALIVE),
-        ("knocked out", 10, &KNOCKED_OUT),
-    ] {
+    for (why, id, player) in [("exhausted", 15, &ALIVE), ("knocked out", 10, &KNOCKED_OUT)] {
         let reply = run(&mut bar, &mut inventory, &check(id), player, 0).unwrap();
         assert!(is_chat(&reply), "{why}"); // never a 38/30 whose Okay opens the marketplace
         let reply = run(&mut bar, &mut inventory, &use_item(id), player, 0).unwrap();
@@ -637,82 +761,399 @@ fn a_tampered_saved_bar_is_refused_at_load() {
 }
 
 #[test]
-fn the_effect_table_is_tunable_from_data_within_sanity_bounds() {
+fn schema_one_still_loads_the_potion_rule() {
     let fixture = Fixture::new();
-    let write = |value: serde_json::Value| {
-        fs::write(fixture.path.join("consumables.json"), value.to_string()).unwrap();
-        ItemBar::load(&fixture.path, Default::default(), None)
-    };
-    let row = |definition, heal, cooldown| json!({"definition":definition,"heal_percent":heal,"cooldown_ms":cooldown});
-    // Absent file: the built-in Small Health Potion rows.
-    assert_eq!(
-        Effects::load(&fixture.path).unwrap().get(SMALL),
-        Some(Effect {
-            definition: SMALL,
-            heal_percent: 35,
-            cooldown_ms: 10_000
-        })
-    );
-    assert_eq!(Effects::load(&fixture.path).unwrap().get(MEDIUM), None);
-    // A tuned file takes effect: Medium becomes usable, Small heals 50% with no recast.
-    let mut bar =
-        write(json!({"schema_version":1,"consumables":[row(SMALL, 50, 0), row(MEDIUM, 20, 1000)]}))
-            .unwrap();
+    // Absent file: the built-in Small Health Potion rows, unchanged.
+    let builtin = Effects::load(&fixture.path).unwrap();
+    let small = builtin.get(SMALL).expect("built-in potion row");
+    assert!(matches!(small.effect, EffectKind::Heal { percent: 35 }));
+    assert_eq!(builtin.get(MEDIUM), None);
+    // Schema 1 (the old potion-only shape) still loads and its values still apply.
+    fixture.write_consumables(&json!({
+        "schema_version": 1,
+        "consumables": [
+            {"definition": SMALL, "heal_percent": 50, "cooldown_ms": 0},
+            {"definition": MEDIUM, "heal_percent": 20, "cooldown_ms": 1000},
+        ],
+    }));
+    let mut bar = ItemBar::load(&fixture.path, Default::default(), None).unwrap();
     let mut inventory = fixture.inventory();
     run(&mut bar, &mut inventory, &assign(0, 10), &ALIVE, 0).unwrap();
     run(&mut bar, &mut inventory, &assign(1, 12), &ALIVE, 0).unwrap();
+    let used = run(&mut bar, &mut inventory, &cast(0), &ALIVE, 3_000).unwrap();
+    assert_eq!(used.heal_percent, 50);
+    let used = run(&mut bar, &mut inventory, &cast(1), &ALIVE, 3_000).unwrap();
+    assert_eq!(used.heal_percent, 20);
+    // The 3 s floor applies to schema-1 rows too (the row says 1000 ms).
+    assert!(is_ability_failure(
+        &run(&mut bar, &mut inventory, &cast(1), &ALIVE, 5_999).unwrap()
+    ));
     assert_eq!(
-        run(&mut bar, &mut inventory, &cast(0), &ALIVE, 0)
-            .unwrap()
-            .heal_percent,
-        50
-    );
-    assert_eq!(
-        run(&mut bar, &mut inventory, &cast(0), &ALIVE, 0)
-            .unwrap()
-            .heal_percent,
-        50
-    );
-    assert_eq!(
-        run(&mut bar, &mut inventory, &cast(1), &ALIVE, 0)
+        run(&mut bar, &mut inventory, &cast(1), &ALIVE, 6_000)
             .unwrap()
             .heal_percent,
         20
     );
-    assert!(is_ability_failure(
-        &run(&mut bar, &mut inventory, &cast(1), &ALIVE, 999).unwrap()
+    // Schema 1 still refuses a definition outside the recovered catalogue.
+    fixture.write_consumables(&json!({
+        "schema_version": 1,
+        "consumables": [{"definition": HAT, "heal_percent": 10, "cooldown_ms": 0}],
+    }));
+    assert!(Effects::load(&fixture.path).is_err());
+}
+
+#[test]
+fn schema_two_rows_load_within_sanity_bounds() {
+    let fixture = Fixture::new();
+    let write = |value: serde_json::Value| {
+        fixture.write_consumables(&value);
+        Effects::load(&fixture.path)
+    };
+    fixture.write_schema2();
+    let effects = Effects::load(&fixture.path).unwrap();
+    assert_eq!(effects.rows().len(), 4);
+    assert!(matches!(
+        effects.get(VEAL).unwrap().effect,
+        EffectKind::Aura {
+            composite_effect_id: 5030,
+            duration_ms: 1_800_000,
+            delay_ms: 0,
+            icon_id: BUFF_ICON,
+        }
     ));
-    // Out-of-bounds or unrecovered rows are refused when the content loads.
+    assert!(matches!(
+        effects.get(BERRIES).unwrap().effect,
+        EffectKind::Transform {
+            model_id: 169,
+            poof_effect_id: 21,
+            duration_ms: 1_800_000,
+            icon_id: BUFF_ICON,
+        }
+    ));
+    for definition in [SMALL, SMALL_ALT] {
+        let row = effects.get(definition).unwrap();
+        assert!(matches!(row.effect, EffectKind::Heal { percent: 35 }));
+        assert!(row.single_use);
+    }
+    // Every loaded row is admissible for the effect stack, so an `apply` after a spend cannot
+    // fail (the only stack refusal is this pure check, and content bounds are stricter).
+    for row in effects.rows() {
+        if let Some(spec) = row.spec() {
+            assert_eq!(
+                EffectStack::default().admits(&spec),
+                Ok(()),
+                "definition {}",
+                row.definition
+            );
+        }
+    }
+    // Each refused shape names its reason; the canary at the end is the same shape accepted.
+    let row = |effect: serde_json::Value| {
+        json!([{
+            "definition": VEAL,
+            "name_id": VEAL_NAME,
+            "description_id": VEAL_DESC,
+            "cooldown_ms": 1000,
+            "single_use": true,
+            "effect": effect,
+            "source": "T510 bounds",
+        }])
+    };
     for (why, value) in [
+        ("cooldown over 24 h", {
+            let mut row = row(json!({"heal": {"percent": 10}}));
+            row[0]["cooldown_ms"] = json!(86_400_001);
+            json!({"schema_version": 2, "consumables": row})
+        }),
         (
             "heal 0",
-            json!({"schema_version":1,"consumables":[row(SMALL, 0, 0)]}),
+            json!({"schema_version": 2, "consumables": row(json!({"heal": {"percent": 0}}))}),
         ),
         (
             "heal over 100",
-            json!({"schema_version":1,"consumables":[row(SMALL, 101, 0)]}),
+            json!({"schema_version": 2, "consumables": row(json!({"heal": {"percent": 101}}))}),
         ),
         (
-            "recast over ten minutes",
-            json!({"schema_version":1,"consumables":[row(SMALL, 10, 600_001)]}),
+            "unknown effect field",
+            json!({"schema_version": 2, "consumables": row(json!({"heal": {"percent": 10, "extra": 1}}))}),
+        ),
+        ("definition 0", {
+            let mut rows = row(json!({"heal": {"percent": 10}}));
+            rows[0]["definition"] = json!(0);
+            json!({"schema_version": 2, "consumables": rows})
+        }),
+        ("name 0", {
+            let mut rows = row(json!({"heal": {"percent": 10}}));
+            rows[0]["name_id"] = json!(0);
+            json!({"schema_version": 2, "consumables": rows})
+        }),
+        ("description 0", {
+            let mut rows = row(json!({"heal": {"percent": 10}}));
+            rows[0]["description_id"] = json!(0);
+            json!({"schema_version": 2, "consumables": rows})
+        }),
+        ("missing source", {
+            let mut rows = row(json!({"heal": {"percent": 10}}));
+            rows[0].as_object_mut().unwrap().remove("source");
+            json!({"schema_version": 2, "consumables": rows})
+        }),
+        ("unknown row field", {
+            let mut rows = row(json!({"heal": {"percent": 10}}));
+            rows[0]["extra"] = json!(1);
+            json!({"schema_version": 2, "consumables": rows})
+        }),
+        (
+            "aura composite 0",
+            json!({"schema_version": 2, "consumables": row(json!({"aura": {"composite_effect_id": 0, "duration_ms": 1, "delay_ms": 0, "icon_id": BUFF_ICON}}))}),
         ),
         (
-            "not a recovered consumable",
-            json!({"schema_version":1,"consumables":[row(HAT, 10, 0)]}),
+            "aura icon 0",
+            json!({"schema_version": 2, "consumables": row(json!({"aura": {"composite_effect_id": 5030, "duration_ms": 1, "delay_ms": 0, "icon_id": 0}}))}),
+        ),
+        (
+            "aura duration 0",
+            json!({"schema_version": 2, "consumables": row(json!({"aura": {"composite_effect_id": 5030, "duration_ms": 0, "delay_ms": 0, "icon_id": BUFF_ICON}}))}),
+        ),
+        (
+            "aura duration over 24 h",
+            json!({"schema_version": 2, "consumables": row(json!({"aura": {"composite_effect_id": 5030, "duration_ms": 86_400_001, "delay_ms": 0, "icon_id": BUFF_ICON}}))}),
+        ),
+        (
+            "aura delay over the stack bound",
+            json!({"schema_version": 2, "consumables": row(json!({"aura": {"composite_effect_id": 5030, "duration_ms": 1, "delay_ms": 10_001, "icon_id": BUFF_ICON}}))}),
+        ),
+        (
+            "transform model 0",
+            json!({"schema_version": 2, "consumables": row(json!({"transform": {"model_id": 0, "poof_effect_id": 21, "duration_ms": 1, "icon_id": BUFF_ICON}}))}),
+        ),
+        (
+            "transform negative poof",
+            json!({"schema_version": 2, "consumables": row(json!({"transform": {"model_id": 169, "poof_effect_id": -1, "duration_ms": 1, "icon_id": BUFF_ICON}}))}),
+        ),
+        (
+            "transform icon 0",
+            json!({"schema_version": 2, "consumables": row(json!({"transform": {"model_id": 169, "poof_effect_id": 21, "duration_ms": 1, "icon_id": 0}}))}),
+        ),
+        (
+            "scale under the stack bound",
+            json!({"schema_version": 2, "consumables": row(json!({"scale": {"scale": 0.24, "duration_ms": 1, "icon_id": BUFF_ICON}}))}),
+        ),
+        (
+            "scale over the stack bound",
+            json!({"schema_version": 2, "consumables": row(json!({"scale": {"scale": 5.01, "duration_ms": 1, "icon_id": BUFF_ICON}}))}),
+        ),
+        (
+            "scale duration 0",
+            json!({"schema_version": 2, "consumables": row(json!({"scale": {"scale": 2.0, "duration_ms": 0, "icon_id": BUFF_ICON}}))}),
+        ),
+        (
+            "unknown effect",
+            json!({"schema_version": 2, "consumables": row(json!({"teleport": {}}))}),
         ),
         (
             "duplicate",
-            json!({"schema_version":1,"consumables":[row(SMALL, 10, 0), row(SMALL, 20, 0)]}),
+            json!({"schema_version": 2, "consumables": [
+                row(json!({"heal": {"percent": 10}}))[0].clone(),
+                row(json!({"heal": {"percent": 20}}))[0].clone(),
+            ]}),
         ),
-        ("schema", json!({"schema_version":2,"consumables":[]})),
+        ("schema 3", json!({"schema_version": 3, "consumables": []})),
         (
-            "unknown field",
-            json!({"schema_version":1,"consumables":[],"extra":1}),
+            "unknown file field",
+            json!({"schema_version": 2, "consumables": [], "extra": 1}),
         ),
     ] {
         assert!(write(value).is_err(), "{why}");
     }
-    assert!(write(json!({"schema_version":1,"consumables":[row(SMALL, 100, 600_000)]})).is_ok());
+    // Canary: the same row shape at the exact bounds loads.
+    assert!(
+        write(
+            json!({"schema_version": 2, "consumables": row(json!({"aura": {
+                "composite_effect_id": 5030,
+                "duration_ms": 86_400_000,
+                "delay_ms": 10_000,
+                "icon_id": BUFF_ICON,
+            }}))})
+        )
+        .is_ok()
+    );
+    assert!(
+        write(json!({"schema_version": 2, "consumables": [{
+            "definition": VEAL,
+            "name_id": VEAL_NAME,
+            "description_id": VEAL_DESC,
+            "cooldown_ms": 86_400_000,
+            "single_use": true,
+            "effect": {"heal": {"percent": 100}},
+            "source": "T510 bounds",
+        }]}))
+        .is_ok()
+    );
+    // Row count and file size bounds. 512 is accepted, 513 is not.
+    let rows = |count: i32| (1..=count).map(effect).collect::<Vec<_>>();
+    assert!(Effects::new(rows(512)).is_ok());
+    assert!(Effects::new(rows(513)).is_err());
+    fs::write(
+        fixture.path.join("consumables.json"),
+        vec![b'x'; 256 * 1024 + 1],
+    )
+    .unwrap();
+    assert!(Effects::load(&fixture.path).is_err());
+}
+
+/// A valid schema-2 row for the row-count bound.
+fn effect(definition: i32) -> Effect {
+    Effect {
+        definition,
+        name_id: VEAL_NAME,
+        description_id: VEAL_DESC,
+        cooldown_ms: 0,
+        single_use: true,
+        effect: EffectKind::Heal { percent: 10 },
+        source: "T510 bounds".into(),
+    }
+}
+
+#[test]
+fn the_shipped_rows_all_fit_the_effect_stack() {
+    let directory = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let effects = Effects::load(&directory).unwrap();
+    assert!(effects.get(VEAL).is_some() && effects.get(BERRIES).is_some());
+    for row in effects.rows() {
+        if let Some(spec) = row.spec() {
+            assert_eq!(
+                EffectStack::default().admits(&spec),
+                Ok(()),
+                "definition {}",
+                row.definition
+            );
+        }
+    }
+}
+
+#[test]
+fn a_schema_two_aura_row_is_used_and_sweeps_its_thirty_minute_recast() {
+    let fixture = Fixture::new();
+    fixture.write_schema2();
+    let (mut inventory, mut bar) = (fixture.inventory(), fixture.bar());
+    run(&mut bar, &mut inventory, &assign(0, 16), &ALIVE, 0).unwrap();
+    let used = run(&mut bar, &mut inventory, &cast(0), &ALIVE, 3_000).unwrap();
+    assert!(used.changed && used.heal_percent == 0);
+    assert_eq!(
+        used.effect,
+        Some(Spec {
+            kind: Kind::Aura {
+                composite_effect_id: 5030,
+                delay_ms: 0,
+            },
+            duration_ms: 1_800_000,
+            icon_id: BUFF_ICON,
+            name_id: VEAL_NAME,
+        })
+    );
+    assert_eq!(count(&inventory, 16), 1);
+    let slot = slot_updates(&used)[0];
+    assert_eq!((slot.quantity, slot.total_refresh_time), (1, 1_800_000));
+    assert_eq!((slot.icon, slot.name), (2797, VEAL_NAME));
+    // The 30-minute window refuses the bar and the 42/16 check alike, changing nothing.
+    let before = (bar.clone(), count(&inventory, 16));
+    for request in [cast(0), check(16)] {
+        let refused = run(&mut bar, &mut inventory, &request, &ALIVE, 1_802_999).unwrap();
+        assert!(refused.effect.is_none() && !refused.changed);
+        assert_eq!((bar.clone(), count(&inventory, 16)), before);
+    }
+    // Canary: exactly on the boundary the same bar request works.
+    let ready = run(&mut bar, &mut inventory, &cast(0), &ALIVE, 1_803_000).unwrap();
+    assert!(ready.changed && ready.effect.is_some() && count(&inventory, 16) == 0);
+}
+
+#[test]
+fn a_transform_row_is_refused_while_a_transform_is_live() {
+    let fixture = Fixture::new();
+    fixture.write_consumables(&json!({
+        "schema_version": 2,
+        "consumables": [
+            heal_row(SMALL, 35, 10_000),
+            transform_row(BERRIES, 60_000, 0, 169, 21),
+        ],
+    }));
+    let (mut inventory, mut bar) = (fixture.inventory(), fixture.bar());
+    run(&mut bar, &mut inventory, &assign(1, 17), &ALIVE, 0).unwrap();
+    let used = run(&mut bar, &mut inventory, &cast(1), &ALIVE, 0).unwrap();
+    assert_eq!(
+        used.effect,
+        Some(Spec {
+            kind: Kind::Transform {
+                model_id: 169,
+                poof_effect_id: 21,
+            },
+            duration_ms: 60_000,
+            icon_id: BUFF_ICON,
+            name_id: 1201,
+        })
+    );
+    assert_eq!(count(&inventory, 17), 1);
+    // At the 3 s floor the recast is over, but a live transform still refuses the treat.
+    let before = (bar.clone(), count(&inventory, 17));
+    let refused = run(&mut bar, &mut inventory, &cast(1), &TRANSFORMED, 3_000).unwrap();
+    assert!(is_ability_failure(&refused) && refused.effect.is_none());
+    assert_eq!((bar.clone(), count(&inventory, 17)), before);
+    // The 42/16 check answers the brief's chat line and also changes nothing.
+    let refused = run(&mut bar, &mut inventory, &check(17), &TRANSFORMED, 3_000).unwrap();
+    assert!(is_chat(&refused));
+    assert_eq!(chat_text(&refused), "You are already transformed.");
+    assert_eq!((bar.clone(), count(&inventory, 17)), before);
+    // Canary: the same request with no live transform succeeds.
+    let ready = run(&mut bar, &mut inventory, &cast(1), &ALIVE, 3_000).unwrap();
+    assert!(ready.changed && ready.effect.is_some() && count(&inventory, 17) == 0);
+}
+
+#[test]
+fn a_refused_check_keeps_the_pending_confirmation() {
+    let fixture = Fixture::new();
+    fixture.write_consumables(&json!({
+        "schema_version": 2,
+        "consumables": [
+            heal_row(SMALL, 35, 10_000),
+            transform_row(BERRIES, 60_000, 0, 169, 21),
+        ],
+    }));
+    let (mut inventory, mut bar) = (fixture.inventory(), fixture.bar());
+    let checked = run(&mut bar, &mut inventory, &check(10), &ALIVE, 0).unwrap();
+    assert!(checked.replies[0].starts_with(&[38, 0, 30, 0]));
+    // A refused check for another item is a refusal, so it must not drop that confirmation.
+    let refused = run(&mut bar, &mut inventory, &check(17), &TRANSFORMED, 0).unwrap();
+    assert!(is_chat(&refused));
+    let used = run(&mut bar, &mut inventory, &use_item(10), &ALIVE, 0).unwrap();
+    assert_eq!((used.heal_percent, count(&inventory, 10)), (35, 2));
+}
+
+#[test]
+fn a_heal_row_needs_health_tracking_and_a_visual_row_does_not() {
+    let fixture = Fixture::new();
+    let (mut inventory, mut bar) = (fixture.inventory(), fixture.bar());
+    run(&mut bar, &mut inventory, &assign(0, 10), &ALIVE, 0).unwrap();
+    let refused = run(&mut bar, &mut inventory, &cast(0), &NO_HEALING, 0).unwrap();
+    assert!(is_ability_failure(&refused) && count(&inventory, 10) == 3);
+    // Aura rows apply from the row alone; only a heal needs the encounter engine (R).
+    fixture.write_schema2();
+    let mut bar = fixture.bar();
+    let mut inventory = fixture.inventory();
+    run(&mut bar, &mut inventory, &assign(0, 16), &NO_HEALING, 0).unwrap();
+    let used = run(&mut bar, &mut inventory, &cast(0), &NO_HEALING, 0).unwrap();
+    assert!(used.effect.is_some() && used.heal_percent == 0 && count(&inventory, 16) == 1);
+}
+
+#[test]
+fn a_rental_item_with_a_row_stays_unusable() {
+    let fixture = Fixture::new();
+    fixture.write_schema2();
+    let (mut inventory, mut bar) = (fixture.inventory(), fixture.bar());
+    run(&mut bar, &mut inventory, &assign(3, 18), &ALIVE, 0).unwrap();
+    let before = (bar.clone(), count(&inventory, 18));
+    let refused = run(&mut bar, &mut inventory, &cast(3), &ALIVE, 0).unwrap();
+    assert!(is_ability_failure(&refused) && refused.effect.is_none());
+    assert_eq!((bar, count(&inventory, 18)), before);
 }
 
 #[test]

@@ -639,6 +639,8 @@ const ME: Player = Player {
     guid: 1,
     alive: true,
     can_place_box: true,
+    can_heal: true,
+    transformed: false,
 };
 
 #[test]

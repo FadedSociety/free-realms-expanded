@@ -186,24 +186,34 @@ fn next_id(cursor: &mut i32, base: i32, live: &[i32]) -> i32 {
     }
 }
 
+/// A pure check on one spec: a caller stages with it before it spends an item. [`EffectStack::apply`]
+/// runs the same function again, so a spec admitted before the spend cannot fail there.
+pub fn admits(spec: &Spec) -> Result<(), Refusal> {
+    if !(1..=MAX_DURATION_MS).contains(&spec.duration_ms) {
+        return Err(Refusal::Duration);
+    }
+    match spec.kind {
+        Kind::Transform { model_id, .. } if model_id <= 0 => Err(Refusal::Id),
+        Kind::Aura {
+            composite_effect_id,
+            ..
+        } if composite_effect_id <= 0 => Err(Refusal::Id),
+        Kind::Aura { delay_ms, .. } if delay_ms > MAX_DELAY_MS => Err(Refusal::Delay),
+        Kind::Scale { scale } if !(MIN_SCALE..=MAX_SCALE).contains(&scale) => Err(Refusal::Scale),
+        _ => Ok(()),
+    }
+}
+
 impl EffectStack {
     /// A pure check: callers stage with it before they spend an item.
     pub fn admits(&self, spec: &Spec) -> Result<(), Refusal> {
-        if !(1..=MAX_DURATION_MS).contains(&spec.duration_ms) {
-            return Err(Refusal::Duration);
-        }
-        match spec.kind {
-            Kind::Transform { model_id, .. } if model_id <= 0 => Err(Refusal::Id),
-            Kind::Aura {
-                composite_effect_id,
-                ..
-            } if composite_effect_id <= 0 => Err(Refusal::Id),
-            Kind::Aura { delay_ms, .. } if delay_ms > MAX_DELAY_MS => Err(Refusal::Delay),
-            Kind::Scale { scale } if !(MIN_SCALE..=MAX_SCALE).contains(&scale) => {
-                Err(Refusal::Scale)
-            }
-            _ => Ok(()),
-        }
+        admits(spec)
+    }
+
+    /// Whether a temporary appearance is live. The item bar refuses a transform treat while one
+    /// is (R, OSFR: a treat never replaces a transform).
+    pub fn has_transform(&self) -> bool {
+        self.slots[TRANSFORM].is_some()
     }
 
     /// Adds `spec`, replacing the live effect of its kind, and returns the new buff id.

@@ -896,7 +896,7 @@ impl Gameplay {
         let npc_content = crate::content::npc_content(directory);
         let npc_content = npc_content.as_path();
         let boomboxes = Arc::new(crate::boombox::Catalogue::load(npc_content)?);
-        let item_bar = crate::item_bar::ItemBar::load(directory, boomboxes, saved_item_bar)?;
+        let item_bar = crate::item_bar::ItemBar::load(npc_content, boomboxes, saved_item_bar)?;
         // W162: the ride catalogue ships with the bundled content; a set without it has no rides.
         let mounts = if npc_content.join("mounts.json").is_file() {
             let path = npc_content.join("mounts.json");
@@ -2195,6 +2195,9 @@ impl Gameplay {
             return Ok(outcome);
         }
         if self.opening.is_none() {
+            if let Some(result) = self.handle_item_bar(inner, character, now_ms)? {
+                return Ok(result);
+            }
             return self.handle(inner, character.guid, character.position, now_ms);
         }
         let mut staged = self.clone();
@@ -4175,8 +4178,6 @@ impl Gameplay {
             }
             return Ok(out);
         }
-        // Item bar (42/6, 42/9, 42/15 and 42/16 for bar items, 36/10 on bar 2) before the chest
-        // route and the shared 42 branch; a 36/10 on any other bar still reaches unsupported_cast.
         if let Some(result) = self.handle_item_bar(inner, character, now_ms)? {
             return Ok(result);
         }
