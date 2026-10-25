@@ -348,6 +348,12 @@ impl PlayerRegistry {
         }
     }
 
+    /// Whether this player is seated on a ride right now (a summoned ride they have not boarded
+    /// carries no seat, so it does not count).
+    pub fn is_mounted(&self, session_id: SessionId) -> bool {
+        self.mounts.contains_key(&session_id)
+    }
+
     /// T027: replace a joined player's public snapshot after a live outfit or job change, so a
     /// viewer who meets them later gets the current look in AddPc. Current viewers are told by
     /// the gameplay 35/6 or 35/7 packet instead.

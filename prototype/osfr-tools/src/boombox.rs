@@ -16,6 +16,13 @@
 //!   +0x10, tag at +0x18) and stopped by 35/42 (case 42, ctor `008b51c0`: guid +0x10, tag
 //!   +0x18). The box's own bounce is `amb_loop_01` (`AnimationTypes.xml:844`, id 2100) and the
 //!   poof is effect 21 `PFX_smoke_black_explosion` (`ActorCompositeEffectDefinitions.xml:283`).
+//! * A synchronized dance step is one 35/63 SetSynchronizedAnimations: u16 35, u16 63, i32 count,
+//!   then `{u64 guid, i32 animation}` per entry. Client dispatcher case 63 (`009316a0`) builds the
+//!   packet (`008eafc0`) and reads it with `00919c90`: header `008d6830` (two u16), `008fc2d0` (an
+//!   i32 count, then per entry `008db2a0`: u64 then i32; no client-side cap), then plays each
+//!   entity found by guid (`00984960`) through `0096c780(animation, -1, 0, 0, 1, 0)`, now and not
+//!   as its base. A dance ends with 35/8 animation 1 (`loc_stand`, `AnimationTypes.xml:101`)
+//!   with the base flag.
 //!
 //! # Reconstructed (R)
 //!
@@ -30,6 +37,17 @@
 //!   its song, on re-entry. One box per owner: a second press before the first ends replaces it
 //!   (the default recast equals the duration, so this only happens if the two are tuned apart).
 //! * A box outlives its owner's session until it expires.
+//! * Dancing (`synchronized` rows only; `independent` and `transform` rows are later slices): each
+//!   tick a session within `range_m` of the box on X/Z, in its zone instance, on foot and wearing
+//!   a model the row has clips for (the keys of `clip_ms`) dances. Overlapping boxes: the higher
+//!   priority wins, then the nearer (Sanctuary rotates by least served instead). A step lasts the
+//!   longest clip of any model minus `blend_ms`, never less than `MIN_STEP_MS`; the clock starts
+//!   at the box's first tick and loops the sequence. Everyone who dances, and everyone who knows
+//!   a dancer, gets the step (a viewer's packet lists only the dancers it knows); a player who
+//!   starts dancing mid-step gets the current step at once, alone (Sanctuary sends only an idle
+//!   and waits for the next step). A dancer who leaves, mounts, or whose box ends or is replaced
+//!   gets 35/8 idle, sent to them and their viewers. A viewer who walks into range sees the
+//!   dancer idle until the next step. A packet carries at most `MAX_ENTRIES`.
 
 use crate::{
     abilities::effect_packets,
@@ -37,6 +55,7 @@ use crate::{
     players::{PlayerRegistry, SessionId, ZoneInstance},
     startup_world::{self, NpcSpawn},
     world,
+    world_events::piece_052::animation_packet,
 };
 use serde::Deserialize;
 use std::{
@@ -58,6 +77,14 @@ const GUID_TAG: u64 = 0x424f_4f4d_0000_0000;
 const POOF_EFFECT: i32 = 21;
 /// The box's own bounce, `amb_loop_01`.
 const BOX_ANIMATION: i32 = 2100;
+/// 35/63 SetSynchronizedAnimations (client case 63, `009316a0`).
+const SYNC_ANIMATIONS: u16 = 63;
+/// Most entries in one 35/63 (R): the client reads any count, this bounds a packet.
+const MAX_ENTRIES: usize = 64;
+/// The animation a dancer returns to: `loc_stand`.
+const IDLE_ANIMATION: i32 = 1;
+/// A dance step never lasts less than this (R), whatever the blend leaves of the clip.
+const MIN_STEP_MS: u32 = 1_000;
 
 /// How the dancers around a box move: all in step, each on its own clips, or transformed.
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
@@ -105,6 +132,20 @@ pub struct Boombox {
 }
 
 impl Boombox {
+    /// How long dance step `step` lasts: the longest clip of any model, less the blend (R: the
+    /// blend is how far the next step overlaps), at least [`MIN_STEP_MS`].
+    pub fn step_ms(&self, step: usize) -> u32 {
+        let longest = self
+            .clip_ms
+            .values()
+            .filter_map(|clips| clips.get(step))
+            .max();
+        match longest.map_or(0, |ms| ms.saturating_sub(self.blend_ms)) {
+            0 => MIN_STEP_MS,
+            ms => ms,
+        }
+    }
+
     /// Sanity bounds, not tuned values.
     fn valid(&self) -> bool {
         let ms = |v: u32| (1..=MAX_MS).contains(&v);
@@ -183,6 +224,89 @@ fn invalid(error: impl Into<Box<dyn std::error::Error + Send + Sync>>) -> io::Er
     io::Error::new(io::ErrorKind::InvalidData, error)
 }
 
+/// 35/63: every `(guid, animation)` plays at once on whoever the client finds. The caller keeps
+/// a packet to [`MAX_ENTRIES`].
+pub fn synchronized_animations(entries: &[(u64, i32)]) -> Vec<u8> {
+    let mut bytes = 35_u16.to_le_bytes().to_vec();
+    bytes.extend(SYNC_ANIMATIONS.to_le_bytes());
+    bytes.extend((entries.len() as i32).to_le_bytes());
+    for (guid, animation) in entries {
+        bytes.extend(guid.to_le_bytes());
+        bytes.extend(animation.to_le_bytes());
+    }
+    bytes
+}
+
+/// Who is told about a dancer: the dancer and every session near them that knows the character
+/// (the rule of `ride_fanout`). Nobody if the dancer left the registry or the zone: their client
+/// dropped the scene, and their viewers were told they were gone.
+fn audience(
+    players: &PlayerRegistry,
+    dancer: SessionId,
+    guid: u64,
+    zone: ZoneInstance,
+) -> Vec<SessionId> {
+    let Some(player) = players.get(dancer).filter(|p| p.zone == zone) else {
+        return Vec::new();
+    };
+    let viewers = players.nearby_sessions(zone, player.position);
+    let knowing = viewers
+        .into_iter()
+        .filter(|v| *v != dancer && players.knows_character(*v, guid));
+    std::iter::once(dancer).chain(knowing).collect()
+}
+
+/// A dancer's session and character guid.
+type Dancers = BTreeMap<SessionId, u64>;
+
+/// A dancer a box let go of: session, character guid and the box's zone.
+type Released = (SessionId, u64, ZoneInstance);
+
+/// A synchronized box's dance: its steps, who may dance and the clock all dancers share.
+#[derive(Clone, Debug)]
+struct Dance {
+    sequence: Vec<i32>,
+    /// Each step's length, from [`Boombox::step_ms`].
+    step_ms: Vec<u32>,
+    /// Player models with clips (the keys of `clip_ms`).
+    models: BTreeSet<i32>,
+    range_m: f32,
+    priority: i32,
+    /// The current step and when it ends; `None` until the first tick.
+    clock: Option<(usize, u64)>,
+    /// Who has been sent the current step.
+    dancing: Dancers,
+}
+
+impl Dance {
+    fn new(row: &Boombox) -> Self {
+        let steps = row.dance_sequence.len();
+        Self {
+            sequence: row.dance_sequence.clone(),
+            step_ms: (0..steps).map(|step| row.step_ms(step)).collect(),
+            models: row.clip_ms.keys().copied().collect(),
+            range_m: row.range_m,
+            priority: row.priority,
+            clock: None,
+            dancing: Dancers::new(),
+        }
+    }
+
+    /// Bring the clock to `now_ms`: the step playing and whether it began this tick.
+    fn step(&mut self, now_ms: u64) -> (usize, bool) {
+        let (step, began) = match self.clock {
+            None => (0, true),
+            Some((step, ends)) if now_ms >= ends => ((step + 1) % self.sequence.len(), true),
+            Some((step, _)) => (step, false),
+        };
+        if began {
+            let ends = now_ms.saturating_add(u64::from(self.step_ms[step]));
+            self.clock = Some((step, ends));
+        }
+        (step, began)
+    }
+}
+
 /// Inner packets to queue, each for one session. The gateway wraps and sends them.
 pub type Sends = Vec<(SessionId, Vec<u8>)>;
 
@@ -200,9 +324,22 @@ struct Placed {
     add: Vec<u8>,
     ends_ms: u64,
     seen_by: BTreeSet<SessionId>,
+    /// `None` for rows that do not dance in step.
+    dance: Option<Dance>,
 }
 
 impl Placed {
+    /// Let every dancer go (the box ends or is replaced); the next tick sends each idle unless
+    /// another box has taken them.
+    fn release(&mut self) -> Vec<Released> {
+        let zone = self.zone;
+        let dancing = self.dance.as_mut().map(|d| std::mem::take(&mut d.dancing));
+        let dancing = dancing.into_iter().flatten();
+        dancing
+            .map(|(session, guid)| (session, guid, zone))
+            .collect()
+    }
+
     /// The box, its poof (first sighting only) and its song, to one session.
     fn show(&mut self, session: SessionId, poof: bool, sends: &mut Sends) {
         self.seen_by.insert(session);
@@ -242,6 +379,8 @@ impl Placed {
 pub struct Boomboxes {
     live: Vec<Placed>,
     next: u32,
+    /// Dancers of boxes that ended or were replaced, sent idle by the next tick.
+    released: Vec<Released>,
 }
 
 impl Boomboxes {
@@ -282,7 +421,9 @@ impl Boomboxes {
             return sends;
         };
         if let Some(old) = self.live.iter().position(|b| b.owner == owner) {
-            self.live.remove(old).end(&mut sends);
+            let mut old = self.live.remove(old);
+            self.released.extend(old.release());
+            old.end(&mut sends);
         }
         let mut placed = Placed {
             guid,
@@ -294,6 +435,7 @@ impl Boomboxes {
             add,
             ends_ms: now_ms.saturating_add(u64::from(row.duration_ms)),
             seen_by: BTreeSet::new(),
+            dance: (row.kind == Kind::Synchronized).then(|| Dance::new(row)),
         };
         for session in players.nearby_sessions(zone, position) {
             placed.show(session, true, &mut sends);
@@ -303,7 +445,7 @@ impl Boomboxes {
     }
 
     /// Once per tick: end boxes whose time is up, show the rest to sessions that came into range
-    /// and take it back from those that left. No boxes means no work.
+    /// and take it back from those that left, then step the dances. No boxes means no work.
     pub fn tick(&mut self, now_ms: u64, players: &PlayerRegistry) -> Sends {
         let mut sends = Sends::new();
         if self.live.is_empty() {
@@ -313,9 +455,11 @@ impl Boomboxes {
             .into_iter()
             .partition(|b| now_ms >= b.ends_ms);
         self.live = live;
-        for placed in ended {
+        for mut placed in ended {
+            self.released.extend(placed.release());
             placed.end(&mut sends);
         }
+        let mut nears = Vec::with_capacity(self.live.len());
         for placed in &mut self.live {
             let near = players.nearby_sessions(placed.zone, placed.position);
             let left: Vec<_> = placed.seen_by.difference(&near).copied().collect();
@@ -327,13 +471,92 @@ impl Boomboxes {
                 }
                 placed.seen_by.remove(&session);
             }
+            for session in &near {
+                if !placed.seen_by.contains(session) {
+                    placed.show(*session, false, &mut sends);
+                }
+            }
+            nears.push(near);
+        }
+        self.dance(now_ms, players, &nears, &mut sends);
+        sends
+    }
+
+    /// Step every synchronized box's dance. `nears[i]` are the sessions near live box `i`.
+    fn dance(
+        &mut self,
+        now_ms: u64,
+        players: &PlayerRegistry,
+        nears: &[BTreeSet<SessionId>],
+        sends: &mut Sends,
+    ) {
+        // A session dances for one box: the highest priority, then the nearest, then the
+        // earliest placed. Value: (box index, priority, distance, character guid).
+        let mut owner: BTreeMap<SessionId, (usize, i32, f32, u64)> = BTreeMap::new();
+        for (index, (placed, near)) in self.live.iter().zip(nears).enumerate() {
+            let Some(dance) = &placed.dance else { continue };
             for session in near {
-                if !placed.seen_by.contains(&session) {
-                    placed.show(session, false, &mut sends);
+                let Some(player) = players.get(*session) else {
+                    continue;
+                };
+                let dx = player.position[0] - placed.position[0];
+                let dz = player.position[2] - placed.position[2];
+                let distance = dx.hypot(dz);
+                if !dance.models.contains(&player.presentation.model)
+                    || players.is_mounted(*session)
+                    || !(distance <= dance.range_m)
+                {
+                    continue;
+                }
+                let wins = owner.get(session).is_none_or(|&(_, priority, nearest, _)| {
+                    dance.priority > priority || (dance.priority == priority && distance < nearest)
+                });
+                if wins {
+                    let guid = player.character_guid;
+                    owner.insert(*session, (index, dance.priority, distance, guid));
                 }
             }
         }
-        sends
+        let mut released = std::mem::take(&mut self.released);
+        let mut steps: BTreeMap<SessionId, Vec<(u64, i32)>> = BTreeMap::new();
+        for (index, placed) in self.live.iter_mut().enumerate() {
+            let zone = placed.zone;
+            let Some(dance) = &mut placed.dance else {
+                continue;
+            };
+            let (step, began) = dance.step(now_ms);
+            let mine: Dancers = owner
+                .iter()
+                .filter(|(_, o)| o.0 == index)
+                .map(|(session, o)| (*session, o.3))
+                .collect();
+            let gone = dance.dancing.iter().filter(|(s, _)| !mine.contains_key(*s));
+            released.extend(gone.map(|(session, guid)| (*session, *guid, zone)));
+            for (session, guid) in &mine {
+                // Everyone when the step begins; otherwise only who is new to this box.
+                if began || !dance.dancing.contains_key(session) {
+                    let play = (*guid, dance.sequence[step]);
+                    for viewer in audience(players, *session, *guid, zone) {
+                        steps.entry(viewer).or_default().push(play);
+                    }
+                }
+            }
+            dance.dancing = mine;
+        }
+        for (viewer, entries) in steps {
+            for chunk in entries.chunks(MAX_ENTRIES) {
+                sends.push((viewer, synchronized_animations(chunk)));
+            }
+        }
+        // A dancer another box took this tick is already dancing there.
+        for (session, guid, zone) in released {
+            if owner.contains_key(&session) {
+                continue;
+            }
+            for viewer in audience(players, session, guid, zone) {
+                sends.push((viewer, animation_packet(guid, IDLE_ANIMATION, true)));
+            }
+        }
     }
 
     /// A guid no live box has, counting up through the low word and wrapping.
@@ -539,5 +762,359 @@ mod tests {
         guids.sort();
         guids.dedup();
         assert_eq!(guids.len(), 4);
+    }
+
+    /// T463: synchronized dances.
+    mod dancing {
+        use super::*;
+        use crate::{mounts::MountTail, players::PlayerPresentation};
+
+        const JINGLE: i32 = 878; // synchronized, four steps: 3531 to 3534, blend 600
+        const HUMAN_M: i32 = 1;
+        const HUMAN_F: i32 = 60;
+        const CREATURE: i32 = 1941; // a transform model: no clips on any synchronized row
+        const OTHER: ZoneInstance = ZoneInstance {
+            zone_id: 0,
+            instance_id: 1,
+        };
+        /// Step ends of Jingle Bell from its first tick at 1000: the longest clip of the four
+        /// player models less the 600 ms blend, 4234, 3834, 6067 and 10400 ms.
+        const STEP_ENDS: [u64; 4] = [5_234, 9_068, 15_135, 25_535];
+
+        /// Sessions `id` (character `id + 600`) as `(id, model, x, z, zone)`, all at y 1.
+        fn world(cap: usize, who: &[(u64, i32, f32, f32, ZoneInstance)]) -> PlayerRegistry {
+            let mut players = PlayerRegistry::new(InterestPolicy::new(100.0, cap).unwrap());
+            for (id, model, x, z, zone) in who {
+                join(&mut players, *id, *model, [*x, 1.0, *z], *zone);
+            }
+            players
+        }
+
+        fn join(
+            players: &mut PlayerRegistry,
+            id: u64,
+            model: i32,
+            at: [f32; 3],
+            zone: ZoneInstance,
+        ) {
+            let mut look = PlayerPresentation::default();
+            look.character_guid = id + 600;
+            look.model = model;
+            let session = SessionId(id);
+            let joined =
+                players.join_with_presentation(session, id + 500, id + 600, zone, at, 0.0, look);
+            joined.unwrap();
+        }
+
+        fn walk(players: &mut PlayerRegistry, id: u64, x: f32) {
+            let zone = players.get(SessionId(id)).unwrap().zone;
+            let at = [x, 1.0, 0.0];
+            let moved = players.update_pose_with_state(SessionId(id), zone, at, 0.0, 0, 0);
+            moved.unwrap();
+        }
+
+        /// A press at the origin: the box stands 2 m toward -x.
+        fn press(live: &mut Boomboxes, row: &Boombox, owner: u64, now: u64, p: &PlayerRegistry) {
+            live.spawn(row, owner, ZONE, [0.0, 1.0, 0.0], 0.0, now, p);
+        }
+
+        fn ride(guid: u64) -> MountTail {
+            MountTail {
+                ride_guid: guid,
+                seat: 0,
+                queue: 0,
+                lift: 0.0,
+            }
+        }
+
+        /// The `(guid, animation)` entries of each 35/63 a session was sent.
+        fn steps(sends: &Sends, session: u64) -> Vec<Vec<(u64, i32)>> {
+            let packets = to(sends, session);
+            let sync = packets
+                .into_iter()
+                .filter(|p| p.starts_with(&[35, 0, 63, 0]));
+            sync.map(|p| {
+                let count = i32::from_le_bytes(p[4..8].try_into().unwrap()) as usize;
+                assert_eq!(p.len(), 8 + 12 * count, "count matches the bytes");
+                (0..count)
+                    .map(|i| {
+                        let at = 8 + 12 * i;
+                        let guid = u64::from_le_bytes(p[at..at + 8].try_into().unwrap());
+                        let anim = i32::from_le_bytes(p[at + 8..at + 12].try_into().unwrap());
+                        (guid, anim)
+                    })
+                    .collect()
+            })
+            .collect()
+        }
+
+        /// The characters a session was told to stand idle: 35/8, animation 1, base set.
+        fn idles(sends: &Sends, session: u64) -> Vec<u64> {
+            let packets = to(sends, session);
+            let idle = packets
+                .into_iter()
+                .filter(|p| p.starts_with(&[35, 0, 8, 0]));
+            idle.map(|p| {
+                assert_eq!(p[12..16], 1_i32.to_le_bytes(), "loc_stand");
+                assert_eq!(p[20], 1, "the base flag");
+                u64::from_le_bytes(p[4..12].try_into().unwrap())
+            })
+            .collect()
+        }
+
+        #[test]
+        fn the_packet_is_the_clients_layout() {
+            let bytes = synchronized_animations(&[(0x0102_0304_0506_0708, 3531), (9, -2)]);
+            let mut want = vec![35, 0, 63, 0, 2, 0, 0, 0];
+            want.extend([8, 7, 6, 5, 4, 3, 2, 1, 0xcb, 0x0d, 0, 0]);
+            want.extend([9, 0, 0, 0, 0, 0, 0, 0, 0xfe, 0xff, 0xff, 0xff]);
+            assert_eq!(bytes, want);
+            assert_eq!(synchronized_animations(&[]), [35, 0, 63, 0, 0, 0, 0, 0]);
+        }
+
+        #[test]
+        fn a_step_is_the_longest_clip_less_the_blend_and_never_below_a_second() {
+            let jingle = row(JINGLE);
+            // Model 60's step 3 is 11000 ms, the others 10667: the longest wins.
+            let lengths: Vec<_> = (0..4).map(|step| jingle.step_ms(step)).collect();
+            assert_eq!(lengths, [4_234, 3_834, 6_067, 10_400]);
+            let mut short = jingle.clone();
+            short.blend_ms = 20_000; // more than any clip
+            assert_eq!(short.step_ms(0), 1_000);
+            short.blend_ms = 4_834; // exactly the clip: nothing left
+            assert_eq!(short.step_ms(0), 1_000);
+            assert_eq!(short.step_ms(9), 1_000, "no such step");
+        }
+
+        #[test]
+        fn dancers_in_range_get_the_same_step_in_one_tick_and_it_advances_on_the_clock() {
+            let players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_F, 5.0, 3.0, ZONE)],
+            );
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(JINGLE), 600, 1_000, &players);
+            let both = |anim| vec![vec![(601, anim), (602, anim)]];
+            let first = live.tick(1_000, &players);
+            assert_eq!(steps(&first, 1), both(3531));
+            assert_eq!(steps(&first, 2), both(3531));
+            for (now, anim) in [(5_234, 3532), (9_068, 3533), (15_135, 3534), (25_535, 3531)] {
+                assert!(STEP_ENDS.contains(&now));
+                // One tick before the boundary nothing moves; at it both get the next step.
+                let before = live.tick(now - 1, &players);
+                assert!(steps(&before, 1).is_empty(), "tick {}", now - 1);
+                let sends = live.tick(now, &players);
+                assert_eq!(steps(&sends, 1), both(anim), "tick {now}");
+                assert_eq!(steps(&sends, 2), both(anim), "tick {now}");
+            }
+        }
+
+        #[test]
+        fn only_sessions_in_range_on_foot_and_with_clips_dance() {
+            let mut players = world(
+                16,
+                &[
+                    (1, HUMAN_M, 0.0, 0.0, ZONE),   // dances
+                    (2, HUMAN_M, 40.0, 0.0, ZONE),  // 42 m from the box: out of range
+                    (3, HUMAN_M, 0.0, 0.0, OTHER),  // another zone instance
+                    (4, HUMAN_F, 1.0, 0.0, ZONE),   // mounted below
+                    (5, CREATURE, 2.0, 0.0, ZONE),  // no clips for this model
+                    (6, 0, 3.0, 0.0, ZONE),         // no presentation model
+                    (7, HUMAN_M, -2.0, 14.9, ZONE), // inside the edge, X/Z only
+                    (8, HUMAN_M, -2.0, 15.1, ZONE), // just outside it
+                ],
+            );
+            players.set_mount(SessionId(4), ride(1));
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(JINGLE), 600, 0, &players);
+            let sends = live.tick(10, &players);
+            // The two dancers are listed, and only them, wherever they are heard.
+            for session in [1, 2, 4, 5, 6, 7, 8] {
+                for list in steps(&sends, session) {
+                    let guids: Vec<_> = list.iter().map(|e| e.0).collect();
+                    assert!(
+                        guids.iter().all(|g| [601, 607].contains(g)),
+                        "session {session}: {guids:?}"
+                    );
+                }
+            }
+            assert_eq!(steps(&sends, 1), [[(601, 3531), (607, 3531)]]);
+            assert_eq!(steps(&sends, 7), [[(601, 3531), (607, 3531)]]);
+            assert!(steps(&sends, 3).is_empty(), "another zone hears nothing");
+            // Height does not count: range is on X/Z.
+            let high = [-2.0, 40.0, 14.0];
+            let moved = players.update_pose_with_state(SessionId(8), ZONE, high, 0.0, 0, 0);
+            moved.unwrap();
+            let sends = live.tick(20, &players);
+            assert_eq!(steps(&sends, 8), [[(608, 3531)]], "a joiner, heard alone");
+        }
+
+        #[test]
+        fn leaving_range_sends_one_idle_to_the_leaver_and_their_viewers() {
+            let mut players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_M, 4.0, 0.0, ZONE)],
+            );
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(JINGLE), 600, 0, &players);
+            live.tick(0, &players);
+            walk(&mut players, 1, 40.0);
+            let sends = live.tick(50, &players);
+            assert_eq!(idles(&sends, 1), [601]);
+            assert_eq!(idles(&sends, 2), [601], "the viewer who knows them");
+            assert!(steps(&sends, 1).is_empty());
+            assert!(live.tick(100, &players).is_empty(), "once, then nothing");
+        }
+
+        #[test]
+        fn mounting_stops_the_dance_and_stepping_off_rejoins_it_mid_step() {
+            let mut players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_M, 4.0, 0.0, ZONE)],
+            );
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(JINGLE), 600, 1_000, &players);
+            live.tick(1_000, &players);
+            players.set_mount(SessionId(1), ride(7));
+            let sends = live.tick(1_050, &players);
+            assert_eq!((idles(&sends, 1), idles(&sends, 2)), (vec![601], vec![601]));
+            assert!(live.tick(1_100, &players).is_empty());
+            // Off the ride the dancer joins at the step now playing, as a single entry.
+            players.set_mount(SessionId(1), MountTail::NONE);
+            let sends = live.tick(1_150, &players);
+            assert_eq!(steps(&sends, 1), [[(601, 3531)]]);
+            assert_eq!(steps(&sends, 2), [[(601, 3531)]]);
+        }
+
+        #[test]
+        fn expiry_sends_idle_to_every_dancer_and_then_nothing() {
+            let players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_F, 4.0, 0.0, ZONE)],
+            );
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(JINGLE), 600, 0, &players);
+            live.tick(0, &players);
+            let ended = live.tick(180_000, &players);
+            assert_eq!(idles(&ended, 1), [601, 602]);
+            assert_eq!(idles(&ended, 2), [601, 602]);
+            assert!(steps(&ended, 1).is_empty());
+            assert!(live.tick(180_050, &players).is_empty());
+        }
+
+        #[test]
+        fn a_replaced_box_lets_its_dancers_go() {
+            let players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(JINGLE), 600, 0, &players);
+            live.tick(0, &players);
+            // The owner presses again 500 m away: the first box ends under the dancer.
+            let again = [500.0, 1.0, 0.0];
+            live.spawn(&row(JINGLE), 600, ZONE, again, 0.0, 100, &players);
+            let sends = live.tick(150, &players);
+            assert_eq!(idles(&sends, 1), [601]);
+            assert!(steps(&sends, 1).is_empty());
+        }
+
+        #[test]
+        fn overlapping_boxes_the_higher_priority_wins_then_the_nearer() {
+            let mut players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+            let mut loud = row(TOTEM); // 3551
+            let mut quiet = row(JINGLE); // 3531, priority 0
+            // The quiet box is nearer (2 m) than the loud one (4 m), but the loud one wins.
+            loud.priority = 5;
+            quiet.spawn_offset_m = 2.0;
+            loud.spawn_offset_m = 4.0;
+            let mut live = Boomboxes::default();
+            press(&mut live, &quiet, 600, 0, &players);
+            press(&mut live, &loud, 601, 0, &players);
+            let sends = live.tick(10, &players);
+            assert_eq!(steps(&sends, 1), [[(601, 3551)]], "listed by one box only");
+            // Equal priority: the nearer wins, whichever was placed first.
+            loud.priority = 0;
+            let mut live = Boomboxes::default();
+            press(&mut live, &loud, 601, 0, &players);
+            press(&mut live, &quiet, 600, 0, &players);
+            let sends = live.tick(10, &players);
+            assert_eq!(steps(&sends, 1), [[(601, 3531)]]);
+            // Walking to the loud box's side hands the dancer over with no idle between.
+            walk(&mut players, 1, -10.0);
+            let sends = live.tick(20, &players);
+            assert!(idles(&sends, 1).is_empty());
+            assert_eq!(steps(&sends, 1), [[(601, 3551)]]);
+        }
+
+        #[test]
+        fn a_viewer_is_told_only_about_the_dancers_it_knows() {
+            // Each session sees only its nearest neighbour.
+            let players = world(
+                1,
+                &[
+                    (1, HUMAN_M, 0.0, 0.0, ZONE),
+                    (2, HUMAN_M, 5.0, 0.0, ZONE),
+                    (3, 0, 6.0, 0.0, ZONE), // watches, does not dance
+                ],
+            );
+            assert!(!players.knows_character(SessionId(3), 601));
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(JINGLE), 600, 0, &players);
+            let sends = live.tick(0, &players);
+            assert_eq!(steps(&sends, 3), [[(602, 3531)]], "it does not know 601");
+            assert_eq!(
+                steps(&sends, 2),
+                [[(602, 3531)]],
+                "it sees only the watcher"
+            );
+        }
+
+        #[test]
+        fn a_crowd_is_split_into_packets_of_at_most_64() {
+            let who: Vec<_> = (1..=70)
+                .map(|id| (id, HUMAN_M, (id % 10) as f32, 0.0, ZONE))
+                .collect();
+            let players = world(200, &who);
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(JINGLE), 600, 0, &players);
+            let sends = live.tick(0, &players);
+            let sizes: Vec<_> = steps(&sends, 1).iter().map(Vec::len).collect();
+            assert_eq!(sizes, [64, 6]);
+        }
+
+        #[test]
+        fn a_disconnect_mid_dance_tells_nobody_and_does_not_stall_the_box() {
+            let mut players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_M, 4.0, 0.0, ZONE)],
+            );
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(JINGLE), 600, 1_000, &players);
+            live.tick(1_000, &players);
+            let _ = players.leave(SessionId(1));
+            let sends = live.tick(1_050, &players);
+            assert!(sends.is_empty(), "the leaver's viewers were told it left");
+            // The box and its remaining dancer carry on at the next step.
+            let sends = live.tick(STEP_ENDS[0], &players);
+            assert_eq!(steps(&sends, 2), [[(602, 3532)]]);
+            // A reconnect is a new session with no dance: out of range it hears nothing, and
+            // walking in makes it a joiner at the step now playing.
+            join(&mut players, 11, HUMAN_M, [900.0, 1.0, 0.0], ZONE);
+            assert!(live.tick(STEP_ENDS[0] + 50, &players).is_empty());
+            walk(&mut players, 11, 3.0);
+            let sends = live.tick(STEP_ENDS[0] + 100, &players);
+            assert_eq!(steps(&sends, 11), [[(611, 3532)]]);
+        }
+
+        #[test]
+        fn other_kinds_and_empty_worlds_send_nothing() {
+            let players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+            let mut live = Boomboxes::default();
+            assert!(live.tick(0, &players).is_empty(), "no live box");
+            for item in [RAINBOW, 1180] {
+                // Independent and transform rows do not dance in step yet.
+                press(&mut live, &row(item), 600 + item as u64, 0, &players);
+            }
+            let sends = live.tick(10, &players);
+            assert!(steps(&sends, 1).is_empty() && idles(&sends, 1).is_empty());
+        }
     }
 }

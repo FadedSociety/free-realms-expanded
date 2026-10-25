@@ -262,6 +262,11 @@ mod tests {
 
         /// A second session in the open world `dx` metres east of the owner.
         fn viewer(&mut self, id: u32, dx: f32) -> SessionKey {
+            self.viewer_as(id, dx, 0)
+        }
+
+        /// As `viewer`, wearing player model `model` (the boxes dance models 1, 2, 60 and 61).
+        fn viewer_as(&mut self, id: u32, dx: f32, model: i32) -> SessionKey {
             let mut session = test_support::enter(&self.options, id);
             session.sender = sender(32 * 1024 * 1024);
             let me = self
@@ -273,6 +278,7 @@ mod tests {
                 .clone();
             let mut look = PlayerPresentation::default();
             look.character_guid = 7_000_000_000 + u64::from(id);
+            look.model = model;
             let at = [me.position[0] + dx, me.position[1], me.position[2]];
             let world = &mut self.scene.world;
             let account = 8_000_000_000 + u64::from(id);
@@ -568,5 +574,73 @@ mod tests {
         rig.tick(3_000 + DURATION);
         let ended = about_box(&rig.drain(healthy, 3_000 + DURATION));
         assert_eq!(subs(&ended), [42, 16, 3]);
+    }
+
+    /// The `(guid, animation)` entries of every 35/63 in a drained batch.
+    fn sync_steps(messages: &[Vec<u8>]) -> Vec<Vec<(u64, i32)>> {
+        let inners = messages.iter().filter_map(|m| m.get(7..));
+        let sync = inners.filter(|inner| inner.starts_with(&[35, 0, 63, 0]));
+        sync.map(|p| {
+            let count = i32::from_le_bytes(p[4..8].try_into().unwrap()) as usize;
+            let entry = |i: usize| {
+                let at = 8 + 12 * i;
+                let guid = u64::from_le_bytes(p[at..at + 8].try_into().unwrap());
+                (
+                    guid,
+                    i32::from_le_bytes(p[at + 8..at + 12].try_into().unwrap()),
+                )
+            };
+            (0..count).map(entry).collect()
+        })
+        .collect()
+    }
+
+    /// The characters a drained batch tells to stand idle (35/8, animation 1).
+    fn idled(messages: &[Vec<u8>]) -> Vec<u64> {
+        let inners = messages.iter().filter_map(|m| m.get(7..));
+        let idle = inners.filter(|inner| inner.starts_with(&[35, 0, 8, 0]));
+        idle.map(|p| u64::from_le_bytes(p[4..12].try_into().unwrap()))
+            .collect()
+    }
+
+    #[test]
+    fn t463_two_dancers_get_the_step_through_the_real_tick_and_expiry_stops_them() {
+        let Some(mut rig) = Rig::new("t463-dance", TOTEM) else {
+            return;
+        };
+        let near = rig.viewer_as(2, 6.0, 60);
+        let bystander = rig.viewer_as(3, 8.0, 0); // no model with clips: watches only
+        let dancer = 7_000_000_002;
+        rig.press(3_000);
+        rig.drain(near, 3_000);
+        rig.drain(bystander, 3_000);
+        rig.tick(3_050);
+        let first = sync_steps(&rig.drain(near, 3_050));
+        // TOTEM is a one-step sequence: 3551, 17567 ms clip less the 600 ms blend.
+        assert_eq!(first.len(), 1);
+        assert!(first[0].contains(&(dancer, 3_551)), "{first:?}");
+        assert!(first[0].iter().all(|(_, anim)| *anim == 3_551));
+        let watched = sync_steps(&rig.drain(bystander, 3_050));
+        assert!(
+            watched
+                .iter()
+                .flatten()
+                .all(|(guid, _)| *guid != 7_000_000_003)
+        );
+        rig.tick(3_100);
+        assert!(
+            sync_steps(&rig.drain(near, 3_100)).is_empty(),
+            "once per step"
+        );
+        // The step repeats when it ends (the box lasts 180 s, the loop 16967 ms).
+        rig.tick(3_050 + 16_967);
+        let again = sync_steps(&rig.drain(near, 3_050 + 16_967));
+        assert!(again[0].contains(&(dancer, 3_551)));
+        // The box ends: the dancer is sent idle.
+        rig.drain(near, 3_000 + DURATION);
+        rig.tick(3_000 + DURATION);
+        assert_eq!(idled(&rig.drain(near, 3_000 + DURATION)), [dancer]);
+        rig.tick(3_000 + DURATION + 50);
+        assert!(idled(&rig.drain(near, 3_000 + DURATION + 50)).is_empty());
     }
 }
