@@ -318,6 +318,8 @@ pub struct Outcome {
     pub admin_move: Option<AdminMove>,
     /// T458: an admin `realm event start|stop`, run by the host once after a successful commit.
     pub world_event: Option<crate::world_events::WorldEventCommand>,
+    /// T461: the definition of a boombox the host places once after a successful commit.
+    pub boombox: Option<i32>,
 }
 
 impl Outcome {
@@ -338,6 +340,7 @@ impl Outcome {
             broadcast,
             admin_move,
             world_event,
+            boombox,
         } = other;
         self.dev_command_denied |= dev_command_denied;
         self.shared_field = shared_field.or(self.shared_field.take());
@@ -351,6 +354,7 @@ impl Outcome {
         self.broadcast = broadcast.or(self.broadcast.take());
         self.admin_move = admin_move.or(self.admin_move.take());
         self.world_event = world_event.or(self.world_event.take());
+        self.boombox = boombox.or(self.boombox.take());
     }
 }
 

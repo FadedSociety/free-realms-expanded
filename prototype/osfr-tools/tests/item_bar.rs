@@ -26,10 +26,12 @@ const ME: u64 = 77;
 const ALIVE: Player = Player {
     guid: ME,
     alive: true,
+    can_place_box: true,
 };
 const KNOCKED_OUT: Player = Player {
     guid: ME,
     alive: false,
+    can_place_box: true,
 };
 
 fn digest(bytes: &[u8]) -> String {

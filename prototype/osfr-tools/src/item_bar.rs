@@ -20,8 +20,11 @@
 //! # Reconstructed policy (R)
 //!
 //! * Only the seven recovered consumable rows and the boomboxes in [`boombox::Catalogue`] (owned
-//!   outright, not rented) may sit on the bar; only the Small Health Potion rows (2173, 11002) are
-//!   usable. Other bar items show disabled and a use is refused.
+//!   outright, not rented) may sit on the bar; only the Small Health Potion rows (2173, 11002) and
+//!   those boomboxes are usable. Other bar items show disabled and a use is refused.
+//! * A boombox press is never spent and saves nothing: it stamps the row's `recast_ms` and hands
+//!   the definition back in [`Reply::boombox`] for the caller to place the box. The caller says in
+//!   [`Player::can_place_box`] whether the player may place one now.
 //! * Heal: the cached wiki gives 2% instantly plus 11% per second for 3 seconds; the effect is
 //!   applied at once as 35% of maximum health. Cooldown 10 s per item definition, shared by every
 //!   slot and by 42/15. Both are tunable in `consumables.json` (see [`Effects`]).
@@ -137,15 +140,19 @@ impl Effects {
 pub struct Player {
     pub guid: u64,
     pub alive: bool,
+    /// Not mounted, not busy and in the open world: a boombox press is refused otherwise.
+    pub can_place_box: bool,
 }
 
 /// What a handled request produced. `heal_percent` is for the caller to apply to the player's
-/// health (the item is already consumed when it is non-zero).
+/// health (the item is already consumed when it is non-zero). `boombox` is the definition of a
+/// box the caller must now place (nothing was consumed or changed for it).
 #[derive(Debug, Default)]
 pub struct Reply {
     pub replies: Vec<Vec<u8>>,
     pub changed: bool,
     pub heal_percent: u32,
+    pub boombox: Option<i32>,
 }
 
 /// The persisted item bar: four slots of owned consumable instances.
@@ -234,6 +241,11 @@ impl ItemBar {
 
     pub fn bindings(&self) -> &[ActionBarBinding] {
         self.bar.bindings()
+    }
+
+    /// The catalogue row of the boombox `definition`, for the host that places the box.
+    pub fn boombox(&self, definition: i32) -> Option<&boombox::Boombox> {
+        self.boomboxes.get(definition)
     }
 
     /// Route one client message. `None` means it is not an item-bar request, or (42/15, 42/16) the
@@ -338,7 +350,7 @@ impl ItemBar {
         Ok(Reply {
             replies,
             changed: before != self.bar,
-            heal_percent: 0,
+            ..Reply::default()
         })
     }
 
@@ -394,6 +406,7 @@ impl ItemBar {
                     replies,
                     changed: true,
                     heal_percent,
+                    ..Reply::default()
                 })
             }
             Err(refusal) => Ok(Reply {
@@ -421,6 +434,19 @@ impl ItemBar {
         let (true, Some(binding)) = (on_self, binding) else {
             return Ok(refused());
         };
+        if let Some(definition) = self.boombox_of(binding.item_instance_id, inventory) {
+            // Every check first; the box is never spent, so only the recast changes.
+            let usable = self.usable(binding.item_instance_id, inventory, player, now_ms);
+            if !player.can_place_box || usable.is_err() {
+                return Ok(refused());
+            }
+            self.last_used.insert(definition, now_ms);
+            return Ok(Reply {
+                replies: self.refresh(inventory, now_ms)?,
+                boombox: Some(definition),
+                ..Reply::default()
+            });
+        }
         match self.consume(binding.item_instance_id, inventory, player, now_ms) {
             Ok((mut replies, heal_percent)) => {
                 replies.extend(self.refresh(inventory, now_ms)?);
@@ -428,6 +454,7 @@ impl ItemBar {
                     replies,
                     changed: true,
                     heal_percent,
+                    ..Reply::default()
                 })
             }
             Err(_) => Ok(refused()),
@@ -469,9 +496,8 @@ impl ItemBar {
             .iter()
             .find(|i| i.id == id)
             .ok_or(Refusal::NotUsable)?;
-        let effect = self
-            .effects
-            .get(item.definition_id)
+        let recast = self
+            .recast_ms(item.definition_id)
             .filter(|_| item.rental.is_none())
             .ok_or(Refusal::NotUsable)?;
         if item.count.saturating_sub(item.consumed_count) == 0 {
@@ -480,16 +506,32 @@ impl ItemBar {
         if !player.alive {
             return Err(Refusal::KnockedOut);
         }
-        match self.cooldown_left(effect, now_ms) {
+        match self.cooldown_left(item.definition_id, recast, now_ms) {
             Some(left) => Err(Refusal::Cooldown(left)),
             None => Ok(()),
         }
     }
 
+    /// The recast of a usable item: a consumable's cooldown or a catalogued boombox's `recast_ms`.
+    fn recast_ms(&self, definition: i32) -> Option<u32> {
+        self.effects
+            .get(definition)
+            .map(|effect| effect.cooldown_ms)
+            .or_else(|| self.boomboxes.get(definition).map(|row| row.recast_ms))
+    }
+
+    /// The definition of the catalogued boombox that instance `id` is, if it is one.
+    fn boombox_of(&self, id: i32, inventory: &Inventory) -> Option<i32> {
+        let item = inventory.state().items.iter().find(|i| i.id == id)?;
+        self.boomboxes
+            .get(item.definition_id)
+            .map(|_| item.definition_id)
+    }
+
     /// Milliseconds of recast left; a clock that went backwards counts as ready.
-    fn cooldown_left(&self, effect: Effect, now_ms: u64) -> Option<u64> {
-        let elapsed = now_ms.checked_sub(*self.last_used.get(&effect.definition)?)?;
-        u64::from(effect.cooldown_ms)
+    fn cooldown_left(&self, definition: i32, recast_ms: u32, now_ms: u64) -> Option<u64> {
+        let elapsed = now_ms.checked_sub(*self.last_used.get(&definition)?)?;
+        u64::from(recast_ms)
             .checked_sub(elapsed)
             .filter(|left| *left > 0)
     }
@@ -502,11 +544,14 @@ impl ItemBar {
     ) -> Option<io::Result<Vec<u8>>> {
         let action = View(inventory, &self.boomboxes).owned_action(binding.item_instance_id)?;
         let mut slot = ActionBarSlot::for_owned_action(&action);
-        match self.effects.get(action.definition_id) {
-            Some(effect) => {
-                slot.total_refresh_time = effect.cooldown_ms as i32; // bounded by MAX_COOLDOWN_MS
-                if self.cooldown_left(effect, now_ms).is_some() {
-                    let used = self.last_used[&effect.definition];
+        match self.recast_ms(action.definition_id) {
+            Some(recast) => {
+                slot.total_refresh_time = recast as i32; // bounded by MAX_COOLDOWN_MS and MAX_MS
+                if self
+                    .cooldown_left(action.definition_id, recast, now_ms)
+                    .is_some()
+                {
+                    let used = self.last_used[&action.definition_id];
                     slot.cast_age = now_ms.saturating_sub(used).min(i32::MAX as u64) as i32;
                 }
             }

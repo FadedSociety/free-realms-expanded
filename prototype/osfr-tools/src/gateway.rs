@@ -147,6 +147,8 @@ pub struct GatewayOutcome {
     pub admin_move: Option<crate::gameplay::AdminMove>,
     /// T458: an admin `realm event start|stop`, run by the host after a commit, like `admin_move`.
     pub world_event: Option<crate::world_events::WorldEventCommand>,
+    /// T461: a boombox press the host places once after the commit, like `admin_move`.
+    pub boombox: Option<i32>,
     /// L042: role-gated moderation commands; the host runs them after the commit.
     pub moderation: Vec<crate::moderation::Command>,
     /// Inner application payloads that passed the gateway parser, in request order.
@@ -1705,6 +1707,7 @@ impl Gateway {
                         outcome.broadcast = result.broadcast.or(outcome.broadcast.take());
                         outcome.admin_move = result.admin_move.or(outcome.admin_move.take());
                         outcome.world_event = result.world_event.or(outcome.world_event.take());
+                        outcome.boombox = result.boombox.or(outcome.boombox.take());
                         outcome.nearby.extend(result.nearby);
                         outcome.dev_command_denials += usize::from(result.dev_command_denied);
                         outcome.applications.push(inner.clone());

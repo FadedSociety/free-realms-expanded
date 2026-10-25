@@ -1,6 +1,7 @@
 //! T459: the boombox catalogue. The shipped `boomboxes.json` is gated against the client's own
 //! tables, the loader keeps rows inside their bounds, and through the real `Gameplay` route an
-//! owned box binds to the item bar (shown disabled) while a use is refused and changes nothing.
+//! owned box binds to the item bar and a press spends nothing (T461 places the box; see its
+//! gateway tests for the world side).
 #[path = "support/models.rs"]
 mod models;
 
@@ -343,7 +344,7 @@ fn failed(out: &Outcome) -> bool {
 }
 
 #[test]
-fn an_owned_boombox_binds_disabled_and_a_use_changes_nothing() {
+fn an_owned_boombox_binds_and_a_press_spends_nothing() {
     let (state, ids) = inventory_with(&[
         (TOTEM, 0, false),
         (REALMS_ROLL, 0, true),
@@ -378,27 +379,40 @@ fn an_owned_boombox_binds_disabled_and_a_use_changes_nothing() {
         );
     }
 
-    // The owned box binds, shown disabled with its count.
+    // The owned box binds, shown enabled with its count and no recast yet.
     let bound = game
         .handle_in_world(&assign(0, ids[0]), &who(), 1_000)
         .unwrap();
-    assert!(bound.changed);
+    assert!(bound.changed && bound.boombox.is_none());
     let slot = slots(&bound.replies)[0];
-    assert!(!slot.is_empty && !slot.server_enabled);
+    assert!(!slot.is_empty && slot.server_enabled);
     assert_eq!(slot.quantity, 1);
 
-    // A use is refused with 36/1: inventory, bar and recast are unchanged.
+    // A press hands the definition to the host and spends nothing: the inventory and the saved
+    // bar are byte-identical, the box is still counted, and the slot shows the row's recast.
     let before = game.state();
     let used = game.handle_in_world(&cast(0), &who(), 2_000).unwrap();
-    assert!(failed(&used) && !used.changed);
+    assert_eq!(used.boombox, Some(TOTEM));
+    assert!(!used.changed && !failed(&used));
+    let slot = slots(&used.replies)[0];
+    assert_eq!((slot.quantity, slot.server_enabled), (1, true));
+    assert_eq!(slot.total_refresh_time, 180_000, "the row's recast_ms");
     let after = game.state();
     assert_eq!(after.inventory, before.inventory);
-    assert_eq!(after.item_bar, before.item_bar);
-    // The binding survives a reload, still disabled.
-    let mut game = Gameplay::load(&reference(), Some(after)).unwrap();
+    // The recast lives in memory only: the saved bar is byte-identical.
+    assert_eq!(
+        serde_json::to_vec(&after.item_bar).unwrap(),
+        serde_json::to_vec(&before.item_bar).unwrap()
+    );
+    // The recast is session-only: a save and reload shows the slot ready, and a press works.
+    let saved = serde_json::from_slice(&serde_json::to_vec(&after).unwrap()).unwrap();
+    let mut game = Gameplay::load(&reference(), Some(saved)).unwrap();
     let login = game.initialize_world(&who(), 0).unwrap();
     let slot = slots(&login.replies)[0];
-    assert!(slot.slot == 0 && !slot.is_empty && !slot.server_enabled);
+    assert!(slot.slot == 0 && !slot.is_empty && slot.server_enabled);
+    assert_eq!(slot.total_refresh_time, 180_000);
+    let again = game.handle_in_world(&cast(0), &who(), 2_100).unwrap();
+    assert_eq!(again.boombox, Some(TOTEM));
     // 42/16 on a box stays outside the item bar: no confirm dialog.
     let check = game
         .handle_in_world(&msg(42, 16, &[ids[0]]), &who(), 3_000)
@@ -414,6 +428,7 @@ fn bar_and_inventory(boomboxes: Catalogue, state: InventoryState) -> (ItemBar, I
 const ME: Player = Player {
     guid: 1,
     alive: true,
+    can_place_box: true,
 };
 
 #[test]
@@ -479,4 +494,52 @@ fn a_saved_binding_whose_row_left_the_content_is_dropped_at_load() {
     let updates = slots(&reloaded.refresh(&inventory, 0).unwrap());
     assert_eq!(updates.len(), 4);
     assert!(updates.iter().all(|s| s.is_empty) && reloaded.is_empty());
+}
+
+#[test]
+fn a_box_press_runs_the_item_checks_and_only_a_ready_valid_press_stamps_the_recast() {
+    let (state, ids) = inventory_with(&[(TOTEM, 0, false), (REALMS_ROLL, 0, true)]);
+    let (mut bar, mut inventory) = bar_and_inventory(Catalogue::load(&content()).unwrap(), state);
+    bar.handle(&assign(0, ids[0]), &mut inventory, &ME, 0)
+        .unwrap();
+    let recast = Catalogue::load(&content())
+        .unwrap()
+        .get(TOTEM)
+        .unwrap()
+        .recast_ms;
+    let press = |bar: &mut ItemBar, inventory: &mut Inventory, player: &Player, now: u64| {
+        bar.handle(&cast(0), inventory, player, now)
+            .unwrap()
+            .unwrap()
+    };
+    // Each refusal is one 36/1 and stamps nothing: the press right after still works.
+    let away = Player {
+        can_place_box: false,
+        ..ME
+    };
+    let knocked_out = Player { alive: false, ..ME };
+    for (why, player) in [("away or busy", away), ("knocked out", knocked_out)] {
+        let before = inventory.state().clone();
+        let out = press(&mut bar, &mut inventory, &player, 1_000);
+        assert!(failed_reply(&out) && out.boombox.is_none(), "{why}");
+        assert_eq!(inventory.state(), &before, "{why}");
+    }
+    let out = press(&mut bar, &mut inventory, &ME, 1_000);
+    assert_eq!(out.boombox, Some(TOTEM));
+    assert!(!out.changed, "nothing is saved");
+    // Inside the recast: refused. Exactly at it: ready again.
+    let inside = press(&mut bar, &mut inventory, &ME, 1_000 + u64::from(recast) - 1);
+    assert!(failed_reply(&inside) && inside.boombox.is_none());
+    let ready = press(&mut bar, &mut inventory, &ME, 1_000 + u64::from(recast));
+    assert_eq!(ready.boombox, Some(TOTEM));
+    // A rented box cannot be bound, so a rental never reaches a press.
+    let out = bar
+        .handle(&assign(1, ids[1]), &mut inventory, &ME, 0)
+        .unwrap()
+        .unwrap();
+    assert!(!out.changed && out.boombox.is_none());
+}
+
+fn failed_reply(reply: &osfr_tools::item_bar::Reply) -> bool {
+    reply.replies.len() == 1 && reply.replies[0].starts_with(&[36, 0, 1, 0])
 }

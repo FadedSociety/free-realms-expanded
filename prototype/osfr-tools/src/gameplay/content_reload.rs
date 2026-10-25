@@ -165,6 +165,7 @@ mod tests {
                 rotation: None,
             }),
             world_event: Some(crate::world_events::WorldEventCommand::Start("show".into())),
+            boombox: Some(878),
         }
     }
 
@@ -198,6 +199,7 @@ mod tests {
             live.world_event,
             Some(crate::world_events::WorldEventCommand::Start("show".into()))
         );
+        assert_eq!(live.boombox, Some(878));
         // Nothing staged never wipes the live state.
         live.absorb(Outcome::default());
         assert!(live.dev_command_denied && live.changed);
@@ -205,8 +207,11 @@ mod tests {
         assert!(live.scene_zoning.is_some() && live.relocation.is_some());
         assert!(live.group_heal.is_some());
         assert!(
-            live.broadcast.is_some() && live.admin_move.is_some() && live.world_event.is_some(),
-            "an empty outcome wiped the notice, the move or the world event"
+            live.broadcast.is_some()
+                && live.admin_move.is_some()
+                && live.world_event.is_some()
+                && live.boombox.is_some(),
+            "an empty outcome wiped the notice, the move, the world event or the boombox"
         );
         assert_eq!(live.replies, vec![vec![1], vec![3]]);
     }

@@ -83,6 +83,11 @@ impl Gameplay {
     /// W146: item-bar requests. The potion is consumed and the heal applied in this one call, so
     /// the saved state never holds one without the other. Without an encounter engine the player
     /// has no tracked health, so nothing is claimed and nothing is spent.
+    ///
+    /// T461: a boombox press is never spent. It is refused (36/1, nothing changed) while the
+    /// player is mounted (the Mounts guide's wiki rule), busy (the start gate of the occupation
+    /// table) or outside the open world (R), and otherwise leaves the definition in
+    /// `Outcome::boombox` for the host to place the box after the commit.
     pub(super) fn handle_item_bar(
         &mut self,
         inner: &[u8],
@@ -95,6 +100,9 @@ impl Gameplay {
         let player = crate::item_bar::Player {
             guid: character.guid,
             alive: encounter.state().player_health > 0,
+            can_place_box: character.zone_id == crate::world::OPEN_WORLD_ZONE
+                && !self.is_mounted()
+                && !self.blocks(|gates| gates.start),
         };
         let Some(reply) = self
             .item_bar
@@ -105,6 +113,7 @@ impl Gameplay {
         let mut out = Outcome {
             replies: reply.replies,
             changed: reply.changed,
+            boombox: reply.boombox,
             ..Outcome::default()
         };
         if reply.heal_percent > 0 {
@@ -114,5 +123,107 @@ impl Gameplay {
             }
         }
         Ok(Some(out))
+    }
+
+    /// T461: the catalogue row of a boombox definition a press named, for the host to place.
+    pub fn boombox_row(&self, definition: i32) -> Option<crate::boombox::Boombox> {
+        self.item_bar.boombox(definition).cloned()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::inventory::InventoryItem;
+
+    const TOTEM: i32 = 8185;
+    const REED: u64 = 9_000_000_181; // a fishing guide in the bundled `fishing_spots.json`
+
+    fn who() -> CharacterState {
+        CharacterState {
+            guid: 1,
+            zone_id: 0,
+            position: [-440.0, 0.8, 1292.0],
+            rotation: [1.0, 0.0, 0.0],
+        }
+    }
+
+    fn press() -> Vec<u8> {
+        let mut bytes = [36_u16.to_le_bytes(), 10_u16.to_le_bytes()].concat();
+        for field in [2_i32, 0, 0] {
+            bytes.extend(field.to_le_bytes());
+        }
+        bytes.extend(1_u64.to_le_bytes());
+        bytes
+    }
+
+    /// A player who holds a box on bar slot 0 and is fishing (a busy occupation), or stands
+    /// outside the open world, cannot place it; the refusal is a bare 36/1 that changes and
+    /// stamps nothing, so the press works as soon as the player is free.
+    #[test]
+    fn a_busy_or_away_player_is_refused_without_a_recast_stamp() {
+        let reference = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../lab/references/rust-opening-cooking-original-assets");
+        let mut saved = Gameplay::load(&reference, None).unwrap().state();
+        let id = saved
+            .inventory
+            .items
+            .iter()
+            .map(|i| i.id)
+            .max()
+            .unwrap_or(0)
+            + 1000;
+        saved.inventory.items.push(InventoryItem {
+            definition_id: TOTEM,
+            tint: 0,
+            id,
+            count: 1,
+            consumed_count: 0,
+            stored_count: 0,
+            last_cast_time: i64::from(i32::MAX),
+            rental: None,
+            ability_count: 0,
+            activate_enabled: false,
+        });
+        let mut game = Gameplay::load(&reference, Some(saved)).unwrap();
+        game.initialize_world(&who(), 0).unwrap();
+        let mut assign = [42_u16.to_le_bytes(), 6_u16.to_le_bytes()].concat();
+        assign.extend(0_i32.to_le_bytes());
+        assign.extend(id.to_le_bytes());
+        game.handle_in_world(&assign, &who(), 500).unwrap();
+
+        let directory = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        let spots = crate::fishing_service::FishingSpots::load(&directory)
+            .unwrap()
+            .unwrap();
+        let rewards = game.reward_snapshot();
+        game.fishing
+            .enter(&spots, REED, 1, 0, who().position, false, 1, rewards)
+            .unwrap();
+        assert!(game.is_occupied(super::occupation::Occupation::Fishing));
+
+        let before = game.state();
+        let refused = game.handle_in_world(&press(), &who(), 1_000).unwrap();
+        assert!(refused.boombox.is_none() && !refused.changed);
+        assert!(refused.replies.len() == 1 && refused.replies[0].starts_with(&[36, 0, 1, 0]));
+        assert_eq!(game.state().inventory, before.inventory);
+
+        game.fishing.reset_all();
+        // Outside the open world (zone 5), free of any occupation: still refused.
+        let away = CharacterState {
+            zone_id: 5,
+            ..who()
+        };
+        let refused = game.handle_in_world(&press(), &away, 1_000).unwrap();
+        assert!(refused.boombox.is_none() && !refused.changed);
+        assert!(refused.replies.len() == 1 && refused.replies[0].starts_with(&[36, 0, 1, 0]));
+        assert_eq!(game.state().inventory, before.inventory);
+
+        let placed = game.handle_in_world(&press(), &who(), 1_001).unwrap();
+        assert_eq!(
+            placed.boombox,
+            Some(TOTEM),
+            "no recast was stamped by the refusal"
+        );
     }
 }

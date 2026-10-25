@@ -42,6 +42,8 @@ use delivery::{
     chat_error_delivery, field_packet, field_packets_for, field_recipient_matches, queue_delivery,
     rider_event, wrap_application,
 };
+#[path = "osfr_gateway/boombox_routing.rs"]
+mod boombox_routing;
 #[path = "osfr_gateway/client_area_routing.rs"]
 mod client_area_routing;
 #[path = "osfr_gateway/moderation.rs"]
@@ -521,6 +523,8 @@ struct SharedWorld {
     security: Arc<Mutex<Security>>,
     /// T458: live world-event runs; changed only after a commit and by the 20 Hz tick.
     world_events: osfr_tools::world_events::WorldEvents,
+    /// T461: the boxes pressed from the item bar; session-only.
+    boomboxes: osfr_tools::boombox::Boomboxes,
 }
 
 /// Live chat identity for one session. Zone, position and group are derived from the player
@@ -601,6 +605,7 @@ impl SharedWorld {
             client_areas: Default::default(),
             security: Arc::default(),
             world_events: Default::default(),
+            boomboxes: Default::default(),
         }
     }
 
@@ -1671,6 +1676,7 @@ impl Session {
         let broadcast = outcome.broadcast.take();
         let admin_move = outcome.admin_move.take();
         let world_event = outcome.world_event.take();
+        let boombox = outcome.boombox.take();
         let staged = std::mem::take(&mut outcome.moderation);
         // T008: the jump body is built from this request's final pose; fan it out
         // only after the commit, like the notice above.
@@ -1686,6 +1692,9 @@ impl Session {
         )?;
         if committed {
             delivery::post_commit(self, sessions, world, broadcast, jump)?;
+            if let Some(definition) = boombox {
+                boombox_routing::place(self, sessions, world, now_ms, definition);
+            }
             if let Some(request) = admin_move {
                 admin_move::run(self, options, sessions, world, membership, now_ms, request)?;
             }
@@ -3777,6 +3786,7 @@ impl Server {
             let unix_ms = osfr_tools::client_areas::unix_now_ms();
             client_area_routing::season_tick(&mut self.world, &mut self.sessions, unix_ms);
             world_event_routing::tick(&mut self.world, &mut self.sessions, now_ms, unix_ms);
+            boombox_routing::tick(&mut self.world, &mut self.sessions, now_ms);
         }
         let keys = self.sessions.keys().copied().collect::<Vec<_>>();
         for key in keys {
