@@ -4,6 +4,9 @@ use content::ContentDb;
 use std::path::Path;
 use world::{InstanceKind, World, WorldError, WorldPose};
 
+#[path = "support/json.rs"]
+mod json;
+
 fn content() -> ContentDb {
     ContentDb::load(Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/world")).unwrap()
 }
@@ -430,4 +433,145 @@ fn zone_less_legacy_regional_npcs_spawn_in_the_open_world_and_teleport_index() {
         packet.starts_with(&[35, 0, 2, 0])
             && startup_world::parse_add_npc(packet).is_ok_and(|spawn| spawn.actor_id == ROOSEY_ID)
     }));
+}
+
+/// T508: a minimal content tree whose only extras rows are `rows` (one regional anchor).
+fn extras_content(tag: &str, rows: serde_json::Value) -> std::path::PathBuf {
+    use serde_json::json;
+    let dir = std::path::PathBuf::from(env!("CARGO_TARGET_TMPDIR")).join(format!("t508-{tag}"));
+    let _ = std::fs::remove_dir_all(&dir);
+    std::fs::create_dir_all(dir.join("npcs")).unwrap();
+    let write = |name: &str, value: serde_json::Value| {
+        std::fs::write(dir.join(name), serde_json::to_vec(&value).unwrap()).unwrap()
+    };
+    write("zones.json", json!({"records": []}));
+    write(
+        "npcs/anchor.json",
+        json!({"records": [{"npc_id": 1, "position": [0.0, 0.0, 0.0]}]}),
+    );
+    write("npc_spawns_extra.json", json!({"records": rows}));
+    dir
+}
+
+fn extra_row(guid: u64, fields: serde_json::Value) -> serde_json::Value {
+    let mut row = serde_json::json!({
+        "spawn_guid": guid, "model_id": 32, "position": [1.0, 0.0, 1.0], "heading": 0.5,
+    });
+    row.as_object_mut()
+        .unwrap()
+        .extend(fields.as_object().unwrap().clone());
+    row
+}
+
+/// The AddNpc a loaded content dir sends for `guid` when a player stands at `position`.
+fn add_npc_at(dir: &Path, guid: u64, position: [f32; 3]) -> startup_world::NpcSpawn {
+    let mut visibility = world::NpcVisibility::load(dir).unwrap();
+    visibility
+        .update(0, position)
+        .unwrap()
+        .iter()
+        .filter(|packet| packet.starts_with(&[35, 0, 2, 0]))
+        .filter_map(|packet| startup_world::parse_add_npc(packet).ok())
+        .find(|npc| npc.actor_id == guid)
+        .unwrap_or_else(|| panic!("{guid} is not drawn"))
+}
+
+fn add_npc_of(dir: &Path, guid: u64) -> startup_world::NpcSpawn {
+    add_npc_at(dir, guid, [1.0, 0.0, 1.0])
+}
+
+#[test]
+fn extra_spawn_display_fields_reach_add_npc_and_plain_rows_keep_the_template() {
+    use serde_json::json;
+    let dir = extras_content(
+        "fields",
+        json!([
+            extra_row(
+                11,
+                json!({"texture_alias": "skullz_mohawkthug", "tint_alias": "mahogany",
+                       "sub_text_name_string_id": 38093, "scale": 1.2})
+            ),
+            extra_row(12, json!({})),
+        ]),
+    );
+    let shown = add_npc_of(&dir, 11);
+    assert_eq!(shown.texture_alias, "skullz_mohawkthug");
+    assert_eq!(shown.tint_alias, "mahogany");
+    assert_eq!(shown.sub_text_name_string_id, 38093);
+    assert_eq!(shown.scale, 1.2);
+
+    // Regression canary: a row without the fields is the template, and the display row
+    // differs from it in those four fields only.
+    let mut plain = add_npc_of(&dir, 12);
+    assert_eq!(plain.texture_alias, "");
+    assert_eq!(plain.tint_alias, "");
+    assert_eq!(plain.sub_text_name_string_id, -1);
+    assert_eq!(plain.scale, 1.0);
+    plain.actor_id = 11;
+    plain.texture_alias = shown.texture_alias.clone();
+    plain.tint_alias = shown.tint_alias.clone();
+    plain.sub_text_name_string_id = shown.sub_text_name_string_id;
+    plain.scale = shown.scale;
+    assert_eq!(plain, shown);
+}
+
+#[test]
+fn extra_spawn_display_fields_out_of_bounds_refuse_the_load() {
+    use serde_json::json;
+    let long = "a".repeat(121);
+    let cases = [
+        json!({"texture_alias": long}),
+        json!({"tint_alias": "bad\u{7}tint"}),
+        json!({"scale": 0.05}),
+        json!({"scale": 10.5}),
+        json!({"sub_text_name_string_id": 0}),
+        json!({"sub_text_name_string_id": -3}),
+    ];
+    for (index, fields) in cases.into_iter().enumerate() {
+        let dir = extras_content(
+            &format!("bad{index}"),
+            json!([extra_row(21, json!({})), extra_row(22, fields)]),
+        );
+        let error = world::NpcVisibility::load(&dir).err().unwrap();
+        assert_eq!(
+            error.kind(),
+            std::io::ErrorKind::InvalidData,
+            "case {index}"
+        );
+        assert!(error.to_string().contains("22"), "case {index}: {error}");
+    }
+    // The longest alias the rule allows still loads.
+    let dir = extras_content(
+        "edge",
+        json!([extra_row(23, json!({"texture_alias": "a".repeat(120)}))]),
+    );
+    assert_eq!(add_npc_of(&dir, 23).texture_alias.len(), 120);
+}
+
+#[test]
+fn shipped_extra_spawns_carry_legacy_skins_and_sanctuary_subtitles() {
+    let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let extras = json::read(&content_dir.join("npc_spawns_extra.json"));
+    let rows = extras["records"].as_array().unwrap();
+    // (spawn guid, texture alias, sub text id): a Legacy skullz thug (Npcs.json Id 3738),
+    // Bezzle the banker and Felipe the postman (Sanctuary-main Ids 33349, 33390).
+    for (guid, alias, sub_text) in [
+        (100_000_003_965_u64, "skullz_mohawkthug", -1),
+        (9_500_000_450, "Banker", 441_416),
+        (9_000_000_086, "", 24_621),
+    ] {
+        let position: [f32; 3] = serde_json::from_value(
+            rows.iter().find(|row| row["spawn_guid"] == guid).unwrap()["position"].clone(),
+        )
+        .unwrap();
+        let npc = add_npc_at(&content_dir, guid, position);
+        assert_eq!(npc.texture_alias, alias, "{guid}");
+        assert_eq!(npc.sub_text_name_string_id, sub_text, "{guid}");
+    }
+    assert!(
+        rows.iter()
+            .filter(|row| row["texture_alias"] == "skullz_mohawkthug")
+            .count()
+            >= 58
+    );
 }

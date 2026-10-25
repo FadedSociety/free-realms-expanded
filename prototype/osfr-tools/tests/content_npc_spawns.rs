@@ -168,6 +168,22 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
                 "{owner}: locale id {name_id} is absent"
             );
         }
+        // T508: a subtitle is a client locale line; an alias is non-empty text of at most 120 chars.
+        if let Some(sub_text) = row["sub_text_name_string_id"].as_u64() {
+            assert!(
+                locale_ids.contains(&sub_text),
+                "{owner}: sub text locale id {sub_text} is absent"
+            );
+        }
+        for key in ["texture_alias", "tint_alias"] {
+            if let Some(alias) = row.get(key) {
+                let alias = alias.as_str().unwrap_or_default();
+                assert!(
+                    (1..=120).contains(&alias.len()),
+                    "{owner}: {key} must be 1..=120 chars"
+                );
+            }
+        }
         // T470: the 90 named Sanctuary NPCs carry a `reference` tag (Sanctuary-main) instead.
         assert!(
             has_source(row, "legacy-data") || has_source(row, "reference"),

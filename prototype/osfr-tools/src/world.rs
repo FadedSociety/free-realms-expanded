@@ -161,6 +161,36 @@ struct ExtraNpc {
     /// T491 (R): a client_areas.json season name; the prop shows only while it is active.
     #[serde(default)]
     season: Option<String>,
+    /// T508: AddNpc display fields (reader 0x00921a10); absent keeps the content template.
+    #[serde(default)]
+    texture_alias: String,
+    #[serde(default)]
+    tint_alias: String,
+    /// Locale id of the line drawn under the name; `None` keeps the template's -1 (none).
+    #[serde(default)]
+    sub_text_name_string_id: Option<i32>,
+    #[serde(default)]
+    scale: Option<f32>,
+}
+
+impl ExtraNpc {
+    /// T508: why the display fields refuse the load, if they do. Aliases follow the
+    /// `combat.rs` text rule (at most 120 bytes, no control chars); the scale bounds are (R).
+    fn display_error(&self) -> Option<&'static str> {
+        let bad_text = |text: &str| text.len() > 120 || text.chars().any(char::is_control);
+        if bad_text(&self.texture_alias) || bad_text(&self.tint_alias) {
+            Some("invalid texture or tint alias")
+        } else if self
+            .scale
+            .is_some_and(|scale| !(0.1..=10.0).contains(&scale))
+        {
+            Some("scale outside 0.1..=10.0")
+        } else if self.sub_text_name_string_id.is_some_and(|id| id <= 0) {
+            Some("sub text id is not positive")
+        } else {
+            None
+        }
+    }
 }
 
 impl NpcVisibility {
@@ -328,6 +358,12 @@ impl NpcVisibility {
 
         let extras: Rows<ExtraNpc> = read_rows(&content_dir.join("npc_spawns_extra.json"))?;
         for npc in extras.records {
+            if let Some(reason) = npc.display_error() {
+                return Err(invalid(format!(
+                    "NPC extra spawn {}: {reason}",
+                    npc.spawn_guid
+                )));
+            }
             // The client-assets catalog contains knocker_m_boss.adr but no
             // knocker_m_boss.dme base model; native NPC creation fails for it.
             // Filter at load time so authored content remains provenance intact.
@@ -354,8 +390,16 @@ impl NpcVisibility {
                 actor_id: npc.spawn_guid,
                 name_string_id: npc.name_string_id.unwrap_or(0) as i32,
                 model_id: npc.model_id as i32,
+                texture_alias: npc.texture_alias,
+                tint_alias: npc.tint_alias,
                 ..content_spawn_template()
             };
+            if let Some(scale) = npc.scale {
+                spawn.scale = scale;
+            }
+            if let Some(sub_text) = npc.sub_text_name_string_id {
+                spawn.sub_text_name_string_id = sub_text;
+            }
             spawn.position = [
                 npc.position[0],
                 npc.position[1],
