@@ -1317,6 +1317,7 @@ class Checker:
             "defeat": ("model_id", "count"), "talk_to_npc": ("npc_id", None),
             "collect_item": ("item_id", "quantity"), "reach_poi": ("poi_id", None),
             "visit_zone": ("zone_id", None), "gather_resource": ("resource_id", "quantity"),
+            "collect_node": ("node_type", "quantity"),
             "craft_recipe": ("recipe_id", "quantity"), "finish_minigame": ("minigame_id", "count"),
             "equip_item": ("definition_id", None), "visit_position": ("zone_id", None),
             "interact_actor": ("actor_guid", None), "complete_dungeon": ("encounter_id", None),
@@ -1345,6 +1346,9 @@ class Checker:
                 valid_target = type(target) is int and 1 <= target <= 0xffffffffffffffff
             elif key in ("item_id", "definition_id", "client_id"):
                 valid_target = type(target) is int and 1 <= target <= 0x7fffffff
+            elif key == "node_type":
+                valid_target = (isinstance(target, str) and 1 <= len(target) <= 64
+                                and not any(ord(c) < 32 for c in target))
             elif key == "profile_id":
                 valid_target = (type(target) is int and 1 <= target <= 0x7fffffff
                                 and target in self.job_profiles)
@@ -1352,6 +1356,10 @@ class Checker:
                 error(field + "." + key, target, "invalid quest objective target")
             if count and not positive(goal.get(count)):
                 error(field + "." + count, goal.get(count), "objective count must be 1..1000000")
+            if goal["kind"] == "collect_node" and not (
+                    type(goal.get("quantity")) is int and 1 <= goal["quantity"] <= 100):
+                error(field + ".quantity", goal.get("quantity"),
+                      "collect_node quantity must be 1..=100")
             if goal["kind"] == "job_level":
                 level = goal.get("level")
                 if not (type(level) is int and 1 <= level <= 20):

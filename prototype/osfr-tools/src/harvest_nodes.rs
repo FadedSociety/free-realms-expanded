@@ -155,22 +155,51 @@ pub enum NodeChange {
     Hide(u64),
 }
 
+/// What a click on a placed node starts. A quest pickup names its `quest_nodes.json` node
+/// type and grants no item (the fork's quest node types have an empty drop table, T503).
+enum SiteKind {
+    Gather(Gather),
+    Pickup(String),
+}
+
+/// How one node file's sites are admitted; one loader, no parallel actor system.
+#[derive(Clone, Copy)]
+enum SiteMode {
+    Gather(Gather),
+    Pickup,
+}
+
 struct Site {
     actor: NodeActor,
-    gather: Gather,
+    kind: SiteKind,
     range: f64,
     respawn_ms: u64,
+}
+
+impl Site {
+    fn in_reach(&self, position: [f32; 3]) -> bool {
+        let reach = self
+            .actor
+            .position
+            .iter()
+            .zip(position)
+            .map(|(a, b)| (f64::from(*a) - f64::from(b)).powi(2))
+            .sum::<f64>();
+        reach.is_finite() && reach <= self.range * self.range
+    }
 }
 
 /// Why a click did not start a run. Every variant leaves the player and the node untouched.
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
 pub enum Denied {
-    /// Hidden (gathered, waiting to grow back) or not placed for this player.
+    /// Hidden (gathered or picked, waiting to grow back) or not placed for this player.
     Gone,
     Busy,
     TooFar,
     NoJob(Gather),
     WrongJob(Gather),
+    /// No active quest has an open collect step for this pickup's node type (T503).
+    NotNeeded,
 }
 
 impl Denied {
@@ -179,6 +208,8 @@ impl Denied {
             Self::Gone => "That has already been gathered. It will grow back soon.".into(),
             Self::Busy => "Finish what you are doing first.".into(),
             Self::TooFar => "Move closer to use that.".into(),
+            // (R) T503 wording; the client has no reader for this refusal.
+            Self::NotNeeded => "You don't need that right now.".into(),
             // Client text 705975744.
             Self::NoJob(Gather::Mining) => {
                 "You need to be a Miner to use that. Visit Sorin in Snowhill to become a Miner!"
@@ -190,12 +221,15 @@ impl Denied {
     }
 }
 
-/// What the clicking player is doing, for [`GatheringNodes::admit`].
+/// What the clicking player is doing, for [`GatheringNodes::admit`] and
+/// [`GatheringNodes::admit_pickup`].
 pub struct Visitor<'a> {
     pub zone: u32,
     pub position: [f32; 3],
     pub busy: bool,
+    /// Read by `admit` only; a quest pickup has no job gate (T503).
     pub active_job: i32,
+    /// Read by `admit` only; a quest pickup has no job gate (T503).
     pub unlocked_jobs: &'a BTreeSet<i32>,
 }
 
@@ -215,20 +249,26 @@ pub struct GatheringNodes {
 }
 
 impl GatheringNodes {
-    /// Reads `harvest_nodes.json` (Chef) and `mining_nodes.json` (Miner) from `dir`; `None` when
-    /// neither exists. Per pool only `max_active_nodes` spawn rows are placed, spread across the
-    /// pool's rows (R: Legacy moves nodes between rows as they respawn; ours stay put). Nodes
-    /// live in the open-world coordinate space whatever `zone_definition_id` says.
+    /// Reads `harvest_nodes.json` (Chef), `mining_nodes.json` (Miner) and `quest_nodes.json`
+    /// (quest pickups, T503) from `dir`; `None` when none exists. Per pool only
+    /// `max_active_nodes` spawn rows are placed, spread across the pool's rows (R: Legacy moves
+    /// nodes between rows as they respawn; ours stay put). Nodes live in the open-world
+    /// coordinate space whatever `zone_definition_id` says.
     pub fn load(dir: &Path) -> io::Result<Option<Self>> {
         let mut sites = BTreeMap::new();
-        for (file, gather, tag) in [
-            ("harvest_nodes.json", Gather::Harvesting, 1_u64),
-            ("mining_nodes.json", Gather::Mining, 2),
+        for (file, mode, tag) in [
+            (
+                "harvest_nodes.json",
+                SiteMode::Gather(Gather::Harvesting),
+                1_u64,
+            ),
+            ("mining_nodes.json", SiteMode::Gather(Gather::Mining), 2),
+            ("quest_nodes.json", SiteMode::Pickup, 3),
         ] {
             let path = dir.join(file);
             if path.is_file() {
                 let content = HarvestNodesContent::load_from(path)?;
-                add_sites(&mut sites, &content, gather, tag)?;
+                add_sites(&mut sites, &content, mode, tag)?;
             }
         }
         Ok((!sites.is_empty()).then(|| Self {
@@ -249,33 +289,78 @@ impl GatheringNodes {
         self.sites.contains_key(&guid)
     }
 
-    /// Ordinary entry check for a click on node `guid` (the caller has checked `is_node`).
+    /// Ordinary entry check for a click on a gather node `guid` (the caller has checked
+    /// `is_node`; a quest pickup never reaches here, see [`Self::admit_pickup`]).
     pub fn admit(&self, guid: u64, who: &Visitor) -> Result<Gather, Denied> {
         let site = self.sites.get(&guid).ok_or(Denied::Gone)?;
+        let SiteKind::Gather(gather) = &site.kind else {
+            return Err(Denied::NotNeeded);
+        };
         if !self.shown.contains(&guid) {
             return Err(Denied::Gone);
         }
         if who.busy {
             return Err(Denied::Busy);
         }
-        let reach = site
-            .actor
-            .position
-            .iter()
-            .zip(who.position)
-            .map(|(a, b)| (f64::from(*a) - f64::from(b)).powi(2))
-            .sum::<f64>();
-        if who.zone != 0 || !reach.is_finite() || reach > site.range * site.range {
+        if who.zone != 0 || !site.in_reach(who.position) {
             return Err(Denied::TooFar);
         }
-        let job = site.gather.job();
+        let job = gather.job();
         if !who.unlocked_jobs.contains(&job) {
-            return Err(Denied::NoJob(site.gather));
+            return Err(Denied::NoJob(*gather));
         }
         if who.active_job != job {
-            return Err(Denied::WrongJob(site.gather));
+            return Err(Denied::WrongJob(*gather));
         }
-        Ok(site.gather)
+        Ok(*gather)
+    }
+
+    /// T503: the quest pickup admission rule (R). A pickup is admitted only while it is
+    /// shown, the player is not busy, the player is in zone 0 within the pool's range, and
+    /// one of the player's active quests has an open collect step for its node type.
+    pub fn admit_pickup(&self, guid: u64, who: &Visitor, needed: bool) -> Result<(), Denied> {
+        let site = self.sites.get(&guid).ok_or(Denied::Gone)?;
+        if !matches!(site.kind, SiteKind::Pickup(_)) {
+            return Err(Denied::Gone);
+        }
+        if !self.shown.contains(&guid) {
+            return Err(Denied::Gone);
+        }
+        if who.busy {
+            return Err(Denied::Busy);
+        }
+        if who.zone != 0 || !site.in_reach(who.position) {
+            return Err(Denied::TooFar);
+        }
+        if !needed {
+            return Err(Denied::NotNeeded);
+        }
+        Ok(())
+    }
+
+    /// The node type key of a quest pickup site, or `None` for a gather node.
+    pub fn pickup_kind(&self, guid: u64) -> Option<&str> {
+        match &self.sites.get(&guid)?.kind {
+            SiteKind::Pickup(node_type) => Some(node_type),
+            SiteKind::Gather(_) => None,
+        }
+    }
+
+    /// T503: the node types of quest pickups that have at least one placed spawn. The
+    /// enabled-quest reachability gate resolves `collect_node` targets against this set.
+    pub fn pickup_kinds(&self) -> BTreeSet<&str> {
+        self.sites
+            .keys()
+            .filter_map(|guid| self.pickup_kind(*guid))
+            .collect()
+    }
+
+    /// T503: the player picked this quest node. It hides now and returns after the pool's
+    /// respawn time, without the Type8 run or its paid bookkeeping.
+    pub fn picked(&mut self, guid: u64, now_ms: u64) -> Option<NodeChange> {
+        let site = self.sites.get(&guid)?;
+        self.regrow.insert(guid, now_ms + site.respawn_ms);
+        self.shown.remove(&guid).then_some(NodeChange::Hide(guid))
     }
 
     /// The run started from `guid` is under way.
@@ -317,12 +402,29 @@ impl GatheringNodes {
 fn add_sites(
     sites: &mut BTreeMap<u64, Site>,
     content: &HarvestNodesContent,
-    gather: Gather,
+    mode: SiteMode,
     tag: u64,
 ) -> io::Result<()> {
     let bad = |what: &str| io::Error::new(io::ErrorKind::InvalidData, what.to_owned());
     if content.schema_version != 1 {
         return Err(bad("unsupported node schema"));
+    }
+    // T503: the whole quest node file is quest-only; a drop table would be a second,
+    // unaudited reward path beside the counted collect goal.
+    if matches!(mode, SiteMode::Pickup)
+        && content
+            .node_types
+            .iter()
+            .any(|kind| !kind.drop_table.is_empty())
+    {
+        return Err(bad("a quest node type has a drop table"));
+    }
+    if content
+        .spawns
+        .iter()
+        .any(|spawn| !content.pools.iter().any(|pool| pool.key == spawn.pool_key))
+    {
+        return Err(bad("a node spawn names an unknown pool"));
     }
     for pool in &content.pools {
         let kind = content
@@ -354,7 +456,10 @@ fn add_sites(
                     model_id: kind.model_id,
                     position: [x, y + kind.placement_y_offset, z],
                 },
-                gather,
+                kind: match mode {
+                    SiteMode::Gather(gather) => SiteKind::Gather(gather),
+                    SiteMode::Pickup => SiteKind::Pickup(pool.node_type.clone()),
+                },
                 range: f64::from(kind.interact_range),
                 respawn_ms: u64::from(pool.respawn_seconds) * 1000,
             };

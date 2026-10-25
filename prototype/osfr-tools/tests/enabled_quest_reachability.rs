@@ -11,12 +11,14 @@
 //!
 //! Resolved objective kinds: `talk_to_npc`, `interact_actor`, `reach_poi`,
 //! `defeat`, `collect_item`, `equip_item`, `craft_recipe`, `complete_dungeon`,
-//! `finish_minigame`, `gather_resource` and `job_level`. The item, recipe,
-//! dungeon, minigame and gather kinds additionally resolve their target ids in
-//! the id sets owned by `tests/support/quest_target_sets.rs`, which names the
-//! owning loader and every `FinishMinigame` emitter. A `job_level` profile must
-//! be declared by the loaded profile content (`Targets::profiles`); its level
-//! bound (1..=20) and its jobs.json profile are the split loader's. A
+//! `finish_minigame`, `gather_resource`, `collect_node` and `job_level`. The item,
+//! recipe, dungeon, minigame, gather and quest-pickup kinds additionally resolve
+//! their target ids in the id sets owned by `tests/support/quest_target_sets.rs`,
+//! which names the owning loader and every `FinishMinigame` emitter. A
+//! `collect_node` node type must have at least one placed spawn in
+//! `quest_nodes.json` (`harvest_nodes::GatheringNodes::load`, T503). A `job_level`
+//! profile must be declared by the loaded profile content (`Targets::profiles`);
+//! its level bound (1..=20) and its jobs.json profile are the split loader's. A
 //! `finish_minigame` id no server path emits is refused instead of being
 //! certified, and `shipped_minigame_producers_are_pinned` fails if the accepted
 //! set drifts.
@@ -63,7 +65,7 @@ use osfr_tools::{
 };
 use quest_catalogue_fixture::{
     Defect, FIXTURE_BATTLE, FIXTURE_DEFECT, FIXTURE_GATHER_RESOURCE, FIXTURE_ITEM,
-    FIXTURE_MINIGAME, FIXTURE_QUEST, FIXTURE_RECIPE, Scratch, fixture,
+    FIXTURE_MINIGAME, FIXTURE_NODE_TYPE, FIXTURE_QUEST, FIXTURE_RECIPE, Scratch, fixture,
 };
 use quest_records::{RawQuest, as_u32, read_quests, sorted_json_paths};
 use quest_target_sets::Targets;
@@ -226,7 +228,7 @@ impl Catalogue {
     /// Objective kinds whose target this gate resolves. Everything else is only
     /// bounded by the split loader; the target test prints the gap.
     fn unchecked_objective_kinds(&self) -> BTreeSet<&str> {
-        const CHECKED: [&str; 11] = [
+        const CHECKED: [&str; 12] = [
             "talk_to_npc",
             "interact_actor",
             "reach_poi",
@@ -237,6 +239,7 @@ impl Catalogue {
             "complete_dungeon",
             "finish_minigame",
             "gather_resource",
+            "collect_node",
             "job_level",
         ];
         self.enabled()
@@ -366,6 +369,14 @@ impl Catalogue {
                         if !self.targets.gather.contains(&resource) {
                             violations.push(format!(
                                 "{owner} (gather_resource): resource {resource} is not a shipped mining/harvesting output or local gather drop"
+                            ));
+                        }
+                    }
+                    "collect_node" => {
+                        let node_type = goal["node_type"].as_str().unwrap_or_default();
+                        if node_type.is_empty() || !self.targets.nodes.contains(node_type) {
+                            violations.push(format!(
+                                "{owner} (collect_node): node type {node_type:?} has no placed spawn in quest_nodes.json"
                             ));
                         }
                     }
@@ -499,12 +510,13 @@ fn every_talk_target_and_visit_point_resolves() {
         catalogue.unchecked_objective_kinds()
     );
     println!(
-        "graded target sets: {} battle/dungeon, {} minigame, {} item, {} recipe, {} gather id(s)",
+        "graded target sets: {} battle/dungeon, {} minigame, {} item, {} recipe, {} gather id(s), {} quest node type(s)",
         catalogue.targets.dungeons.len(),
         catalogue.targets.minigames.len(),
         catalogue.targets.items.len(),
         catalogue.targets.recipes.len(),
-        catalogue.targets.gather.len()
+        catalogue.targets.gather.len(),
+        catalogue.targets.nodes.len()
     );
 
     let reachable: BTreeSet<u32> = catalogue
@@ -695,6 +707,10 @@ fn a_malformed_enabled_row_is_rejected_or_reported() {
 
 /// Rewrite one target field of one fixture quest in its scratch tree.
 fn patch_fixture_objective(scratch: &Scratch, quest: u32, kind: &str, field: &str, value: u64) {
+    patch_fixture_field(scratch, quest, kind, field, json!(value));
+}
+
+fn patch_fixture_field(scratch: &Scratch, quest: u32, kind: &str, field: &str, value: Value) {
     let path = scratch.path().join("quests/fixture.json");
     let mut document = read_json(&path);
     let record = document["records"]
@@ -709,7 +725,7 @@ fn patch_fixture_objective(scratch: &Scratch, quest: u32, kind: &str, field: &st
         .iter_mut()
         .find(|goal| goal["kind"].as_str() == Some(kind))
         .unwrap_or_else(|| panic!("the fixture quest {quest} has a {kind} objective"));
-    goal[field] = json!(value);
+    goal[field] = value;
     fs::write(
         &path,
         serde_json::to_vec_pretty(&document).expect("fixture JSON"),
@@ -734,6 +750,7 @@ fn graded_target_kinds_fail_on_a_scratch_tree() {
     assert!(catalogue.targets.items.contains(&FIXTURE_ITEM));
     assert!(catalogue.targets.recipes.contains(&FIXTURE_RECIPE));
     assert!(catalogue.targets.gather.contains(&FIXTURE_GATHER_RESOURCE));
+    assert!(catalogue.targets.nodes.contains(FIXTURE_NODE_TYPE));
 
     // Canary A: a `complete_dungeon` encounter id no shipped battle or dungeon
     // owns. The quest stays reachable, so the reward gate cannot hide it.
@@ -887,10 +904,30 @@ fn graded_target_kinds_fail_on_a_scratch_tree() {
     let violations = catalogue.target_violations();
     assert_eq!(violations.len(), 1, "{violations:?}");
     assert!(
-        violations[0].contains(&format!("quest {FIXTURE_QUEST} objective 8 (#0)"))
+        violations[0].contains(&format!("quest {FIXTURE_QUEST} objective 9 (#0)"))
             && violations[0].contains("job_level")
             && violations[0].contains("99"),
         "canary G did not name the undeclared job-level profile: {violations:?}"
+    );
+
+    // Canary H (T503): a collect_node naming a node type quest_nodes.json does not
+    // place. The clean fixture's own type resolved above, so only the patch can fail.
+    let pickup = fixture("canary-collect-node", Defect::None);
+    patch_fixture_field(
+        &pickup,
+        FIXTURE_QUEST,
+        "collect_node",
+        "node_type",
+        json!("missing-node"),
+    );
+    let catalogue = Catalogue::load(pickup.path()).expect("the altered pickup quest loads");
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains(&format!("quest {FIXTURE_QUEST} objective 8 (#7)"))
+            && violations[0].contains("collect_node")
+            && violations[0].contains("missing-node"),
+        "canary H did not report the unknown node type: {violations:?}"
     );
 }
 
@@ -912,7 +949,7 @@ fn open_with_job_level(scratch: &Scratch, profile: u32) {
             0,
             json!({
                 "kind": "job_level",
-                "id": 8,
+                "id": 9,
                 "profile_id": profile,
                 "level": 5,
                 "source": [{"kind": "reconstructed", "evidence": "(R) F576 scratch job_level goal"}],

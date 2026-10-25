@@ -71,6 +71,7 @@ mod power_up_use;
 mod profile_outfit;
 /// Progress-driven achievement observation over authoritative gameplay state.
 mod progression;
+mod quest_pickups;
 mod rides;
 /// Station Cash earned by server-verified activity completions (T229).
 mod sc_earnings;
@@ -2362,6 +2363,9 @@ impl Gameplay {
             return Ok(None);
         }
         let target = u64::from_le_bytes(inner[4..12].try_into().unwrap());
+        if let Some(outcome) = self.pick_up_quest_node(inner, character, target, now_ms)? {
+            return Ok(Some(outcome));
+        }
         let Some(nodes) = self.gathering_nodes.as_ref().filter(|n| n.is_node(target)) else {
             return Ok(None);
         };

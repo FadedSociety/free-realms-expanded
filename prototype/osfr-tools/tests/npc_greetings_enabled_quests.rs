@@ -380,6 +380,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Emuzz (T466 Feminine Touch talk target): NPCs - Seaside.md:104 quotes only another speaker's survey and flyer objectives (101404, 95036, 139578); her first-person reply 101414 is the quest-step dialogue of 3000360 goal 2, not a greeting.",
     ),
     (
+        9500000588,
+        "Heddy Heathcliff (T503 giver and turn-in of 3000361): NPCs - Seaside.md row 50 quotes only third-person role, location and quest summaries (4042850801, 570276910, 4186195979); his first-person lines are the quest intro 400433 and the end text 400436, and a QuestOffer proof for 400433 cannot be made because that row says the quest titles are not found, so no uncontested greeting of his own is recovered.",
+    ),
+    (
         9500000633,
         "Tazinna (T466 Feminine Touch talk target): NPCs - Seaside.md:105 quotes only third-person survey lines (101402, 139578); her first-person reply 101412 is the quest-step dialogue of 3000360 goal 1, not a greeting.",
     ),

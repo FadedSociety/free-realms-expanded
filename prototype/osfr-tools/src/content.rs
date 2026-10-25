@@ -236,6 +236,13 @@ pub enum ContentGoal {
         quantity: u32,
         source: Vec<SourceTag>,
     },
+    /// (R) T503: pick up `quantity` quest-only world nodes of one `quest_nodes.json` type.
+    CollectNode {
+        id: u32,
+        node_type: String,
+        quantity: u32,
+        source: Vec<SourceTag>,
+    },
     CraftRecipe {
         id: u32,
         recipe_id: u32,
@@ -292,6 +299,7 @@ impl ContentGoal {
             | Self::VisitZone { id, .. }
             | Self::JobLevel { id, .. }
             | Self::GatherResource { id, .. }
+            | Self::CollectNode { id, .. }
             | Self::CraftRecipe { id, .. }
             | Self::FinishMinigame { id, .. }
             | Self::EquipItem { id, .. }
@@ -888,6 +896,7 @@ fn check_goal_sources(owner: &str, goal: &ContentGoal) -> Result<(), ContentErro
         | ContentGoal::VisitZone { id, source, .. }
         | ContentGoal::JobLevel { id, source, .. }
         | ContentGoal::GatherResource { id, source, .. }
+        | ContentGoal::CollectNode { id, source, .. }
         | ContentGoal::CraftRecipe { id, source, .. }
         | ContentGoal::FinishMinigame { id, source, .. }
         | ContentGoal::EquipItem { id, source, .. }
@@ -981,6 +990,27 @@ fn validate_goal(
             definition_id,
             items.contains(&definition_id.to_string()),
         ),
+        ContentGoal::CollectNode {
+            node_type,
+            quantity,
+            ..
+        } => {
+            if !valid_node_type(node_type) {
+                return Err(ContentError::InvalidRecord {
+                    record: owner.to_owned(),
+                    detail: format!("goal.node_type must be 1..={MAX_NODE_TYPE_CHARS} characters"),
+                });
+            }
+            if !(1..=MAX_COLLECT_NODE_QUANTITY).contains(quantity) {
+                return Err(ContentError::InvalidRecord {
+                    record: owner.to_owned(),
+                    detail: format!("goal.quantity must be 1..={MAX_COLLECT_NODE_QUANTITY}"),
+                });
+            }
+            // The node type resolves against quest_nodes.json in the enabled-quest
+            // reachability gate, not in this id-reference pass.
+            Ok(())
+        }
         // The quest engine validates resource, recipe, minigame and geometry bindings.
         ContentGoal::GatherResource { .. }
         | ContentGoal::CraftRecipe { .. }
@@ -1004,6 +1034,18 @@ fn positive_goal_field(owner: &str, field: &str, value: u64) -> Result<(), Conte
         });
     }
     Ok(())
+}
+
+/// (R) T503: one `collect_node` node-type key, 1..=64 characters with no control
+/// characters. Recovered fork keys are short words; the bound keeps a content typo from
+/// becoming an unbounded key in the save and in the reachability gate.
+const MAX_NODE_TYPE_CHARS: usize = 64;
+/// (R) T503: one `collect_node` count (the fork goals are single digits).
+pub(crate) const MAX_COLLECT_NODE_QUANTITY: u32 = 100;
+
+pub(crate) fn valid_node_type(node_type: &str) -> bool {
+    (1..=MAX_NODE_TYPE_CHARS).contains(&node_type.chars().count())
+        && !node_type.chars().any(char::is_control)
 }
 
 /// (R) Job XP may only name a positive profile id declared by `jobs.json`. The split

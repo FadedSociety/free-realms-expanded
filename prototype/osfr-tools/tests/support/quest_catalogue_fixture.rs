@@ -26,6 +26,8 @@ pub const FIXTURE_MINIGAME: u32 = 9_100_102;
 pub const FIXTURE_BATTLE: u32 = 9_100_200;
 /// The documented local opening drop key (`Gameplay::local_gather_drop`).
 pub const FIXTURE_GATHER_RESOURCE: u32 = 1_001;
+/// T503: the node type `quest_nodes.json` places for the graded `collect_node` goal.
+pub const FIXTURE_NODE_TYPE: &str = "fixture-node";
 const FIXTURE_GIVER: u64 = 9_000_100_001;
 const FIXTURE_TARGET: u64 = 9_000_100_002;
 const FIXTURE_MISSING_GIVER: u64 = 9_000_100_099;
@@ -164,6 +166,13 @@ fn fixture_objectives() -> Value {
                 "quantity": 1,
                 "source": fixture_source(),
             }),
+            json!({
+                "kind": "collect_node",
+                "id": 8,
+                "node_type": FIXTURE_NODE_TYPE,
+                "quantity": 1,
+                "source": fixture_source(),
+            }),
         ]);
     objectives
 }
@@ -245,6 +254,40 @@ fn fixture_field_battles() -> Value {
             "title_id": 1,
             "description_id": 2,
             "difficulty": 1,
+        }],
+    })
+}
+
+/// T503: one placed quest pickup so the graded `collect_node` target resolves through
+/// the production `GatheringNodes::load` (the loader that owns `quest_nodes.json`).
+/// The fixture needs no provenance tags; the loader reads only the typed rows.
+fn fixture_quest_nodes() -> Value {
+    json!({
+        "schema_version": 1,
+        "node_types": [{
+            "key": FIXTURE_NODE_TYPE,
+            "name": "Fixture Node",
+            "model_id": 611,
+            "scale": 1.0,
+            "composite_effect_id": 0,
+            "interact_range": 12,
+            "cursor_id": 0,
+            "placement_y_offset": 0.0,
+            "drop_table": [],
+        }],
+        "pools": [{
+            "key": "fixture-node-pool",
+            "zone_definition_id": 1,
+            "node_type": FIXTURE_NODE_TYPE,
+            "max_active_nodes": 1,
+            "respawn_seconds": 30,
+        }],
+        "spawns": [{
+            "id": 1,
+            "pool_key": "fixture-node-pool",
+            "zone_definition_id": 1,
+            "position": [0.0, 0.0, 0.0],
+            "heading": 0.0,
         }],
     })
 }
@@ -403,6 +446,7 @@ pub fn fixture(name: &str, defect: Defect) -> Scratch {
     );
     write_json(&root.join("recipes.json"), &fixture_recipe_book());
     write_json(&root.join("field_battles.json"), &fixture_field_battles());
+    write_json(&root.join("quest_nodes.json"), &fixture_quest_nodes());
     write_json(
         &root.join("quests/fixture.json"),
         &json!({"schema_version": 1, "records": quests}),

@@ -82,6 +82,7 @@ ACTIVITY_CONTENT = (
     "fishing_spots.json",  # fishing_service.rs: guide NPCs and fish items
     "mining_nodes.json",  # harvest_nodes.rs: clickable copper veins
     "harvest_nodes.json",  # harvest_nodes.rs: clickable mushroom nodes
+    "quest_nodes.json",  # harvest_nodes.rs: (R) quest-only pickup nodes (T503)
 )
 
 # Mirrors the per-file bounds in the Rust loaders and bundle checks.
@@ -98,6 +99,7 @@ ACTIVITY_MAX_BYTES = {
     "fishing_spots.json": 64 * 1024,
     "mining_nodes.json": 1024 * 1024,
     "harvest_nodes.json": 1024 * 1024,
+    "quest_nodes.json": 1024 * 1024,
 }
 
 # (R) Generated runtime content: the builder writes each file only when the
@@ -759,7 +761,7 @@ def check_activity_content(bundle: Path) -> str:
     ):
         raise ValueError("content/fishing_spots.json is invalid")
 
-    for name in ("mining_nodes.json", "harvest_nodes.json"):
+    for name in ("mining_nodes.json", "harvest_nodes.json", "quest_nodes.json"):
         nodes = read_json(content / name)
         if (
             not isinstance(nodes, dict) or nodes.get("schema_version") != 1
@@ -767,13 +769,17 @@ def check_activity_content(bundle: Path) -> str:
                    for key in ("node_types", "pools", "spawns"))
         ):
             raise ValueError(f"content/{name} is invalid")
+        if name == "quest_nodes.json" and any(
+            kind.get("drop_table") for kind in nodes["node_types"]
+        ):
+            raise ValueError(f"content/{name} node type has a drop table")
 
     return (
         f"kart entry {sha256_file(content / 'kart_entry.json')[:12]} "
         f"({len(gates)} gate NPCs, lobby 5 tables), derby {len(derby_gates)} gates, "
         f"mining 18, harvesting 111, "
         f"encounter {dungeons[0]['id']} + {len(world_enemies)} world enemies, "
-        f"fishing {len(spots['spots'])} spots, nodes 2 tables"
+        f"fishing {len(spots['spots'])} spots, nodes 3 tables"
     )
 
 

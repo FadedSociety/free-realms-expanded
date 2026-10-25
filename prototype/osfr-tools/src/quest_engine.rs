@@ -311,6 +311,10 @@ pub enum ObjectiveKind {
     GatherResource {
         resource_id: u32,
     },
+    /// (R) T503: one pickup of a quest-only world node of this `quest_nodes.json` type.
+    CollectNode {
+        node_type: String,
+    },
     CraftRecipe {
         recipe_id: u32,
     },
@@ -681,6 +685,10 @@ pub enum QuestEvent {
     GatherResource {
         resource_id: u32,
         quantity: u32,
+    },
+    /// (R) T503: one picked quest-only node of this type.
+    CollectNode {
+        node_type: String,
     },
     CraftRecipe {
         recipe_id: u32,
@@ -2436,6 +2444,19 @@ fn definition_from_content(
                     resource_id: *resource_id,
                 },
             },
+            ContentGoal::CollectNode {
+                id,
+                node_type,
+                quantity,
+                ..
+            } => QuestObjective {
+                id: *id,
+                required: *quantity,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::CollectNode {
+                    node_type: node_type.clone(),
+                },
+            },
             ContentGoal::CraftRecipe {
                 id,
                 recipe_id,
@@ -2654,6 +2675,11 @@ fn validate_definition(definition: &QuestDefinition) -> io::Result<()> {
                 .iter()
                 .skip(1)
                 .any(|objective| matches!(objective.kind, ObjectiveKind::JobLevel { .. })))
+        // T503: one collect_node count is bounded at load (R; the fork goals are single digits).
+        || definition.objectives.iter().any(|objective| {
+            matches!(objective.kind, ObjectiveKind::CollectNode { .. })
+                && !(1..=crate::content::MAX_COLLECT_NODE_QUANTITY).contains(&objective.required)
+        })
     {
         return Err(invalid("invalid quest objective definition"));
     }
@@ -2793,6 +2819,7 @@ fn valid_objective_kind(kind: &ObjectiveKind) -> bool {
         ObjectiveKind::ReachPoi { poi_id } => *poi_id != 0,
         ObjectiveKind::FinishMinigame { minigame_id } => *minigame_id != 0,
         ObjectiveKind::GatherResource { resource_id } => *resource_id != 0,
+        ObjectiveKind::CollectNode { node_type } => crate::content::valid_node_type(node_type),
         ObjectiveKind::CraftRecipe { recipe_id } => *recipe_id != 0,
         ObjectiveKind::SelectJob { profile_id } => *profile_id > 0,
         ObjectiveKind::JobLevel { profile_id, level } => {
@@ -2854,6 +2881,7 @@ fn validate_event(event: &QuestEvent) -> io::Result<()> {
             resource_id,
             quantity,
         } => *resource_id != 0 && (1..=MAX_COUNT).contains(quantity),
+        QuestEvent::CollectNode { node_type } => crate::content::valid_node_type(node_type),
         QuestEvent::CraftRecipe {
             recipe_id,
             quantity,
@@ -2925,6 +2953,11 @@ fn event_matches(kind: &ObjectiveKind, event: &QuestEvent) -> u32 {
                 quantity,
             },
         ) if a == b => *quantity,
+        (ObjectiveKind::CollectNode { node_type: a }, QuestEvent::CollectNode { node_type: b })
+            if a == b =>
+        {
+            1
+        }
         (
             ObjectiveKind::CraftRecipe { recipe_id: a },
             QuestEvent::CraftRecipe {
@@ -3026,6 +3059,20 @@ impl QuestEngine {
                 _ => None,
             })
             .collect()
+    }
+
+    /// T503: whether picking up `node_type` would credit an open objective now. Reuses
+    /// `current_objectives`, so an ordered quest accepts only its own open step: a pickup
+    /// is admitted only while a quest is actually on its collect step.
+    pub fn wants_node(&self, node_type: &str) -> bool {
+        self.state.quests.keys().any(|quest_id| {
+            self.current_objectives(*quest_id)
+                .into_iter()
+                .any(|objective| {
+                    matches!(&objective.kind,
+                        ObjectiveKind::CollectNode { node_type: kind } if kind == node_type)
+                })
+        })
     }
 }
 

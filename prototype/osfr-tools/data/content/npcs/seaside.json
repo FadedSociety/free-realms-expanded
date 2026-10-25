@@ -21022,7 +21022,9 @@
         "North side of Seaside \"where the fisherman huts are\" (4042850801); \"helping out with the fireworks near Sizzlebottom\" (570276910)"
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3000361
+      ],
       "quests_given_text": [
         "Helmet for Aziwug (3690412624); tin-ore errand for boom powder with extra Seaside Stickers as reward (4186195979; Miner variant 380720476, written \"Hetty\" in 3636694464). Titles not found"
       ],
@@ -21210,7 +21212,7 @@
         "quest_ids_given": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+            "evidence": "(R) T503: A Booming Problem (3000361) is given and handed in here, minted from Lxzxrus QuestId 3061; the fork's GiverGuid and TargetGuid 100000001925 name this row."
           }
         ],
         "quests_given_text": [

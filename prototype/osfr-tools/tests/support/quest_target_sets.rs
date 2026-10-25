@@ -36,13 +36,18 @@
 //!   emits when the learned recipe has no stable id.
 //! * `gather`: mining/harvesting output definition ids plus the local opening
 //!   drops (`Gameplay::local_gather_drop` match keys).
+//! * `nodes`: the node-type keys of quest pickups with at least one placed spawn,
+//!   read through `harvest_nodes::GatheringNodes::load` (the loader that owns
+//!   `quest_nodes.json`, T503).
 //! * `profiles`: the `profiles.json` `profiles[].id` rows `Profiles::load` owns
 //!   (it exposes no id list), read from the profile content root: the opening
 //!   content the session ranks jobs from, not the quest catalogue root.
 
 use super::quest_records::as_u32;
 use osfr_tools::{
-    activity_portal, chess_service, harvesting,
+    activity_portal, chess_service,
+    harvest_nodes::GatheringNodes,
+    harvesting,
     inventory::Inventory,
     mining::{self, Type8Engine},
     recipes::{CraftingJob, RecipeCatalog},
@@ -72,6 +77,8 @@ pub struct Targets {
     pub recipes: BTreeSet<u32>,
     /// Mining/harvesting output definitions plus the local opening drops.
     pub gather: BTreeSet<u32>,
+    /// Placed quest pickup node-type keys (`quest_nodes.json`, T503).
+    pub nodes: BTreeSet<String>,
     /// Profiles the loaded profile content declares; a `job_level` rank is only
     /// real for one of them.
     pub profiles: BTreeSet<u32>,
@@ -210,6 +217,14 @@ impl Targets {
             .extend(read_ids(root, "derby_entry.json", |document| {
                 as_u32(&document["game_id"]).into_iter().collect()
             }));
+
+        // T503: the loader owns `quest_nodes.json`; only placed pickups count, so a
+        // configured type with no spawn is not reachable.
+        if let Some(nodes) = GatheringNodes::load(root)? {
+            targets
+                .nodes
+                .extend(nodes.pickup_kinds().into_iter().map(str::to_owned));
+        }
         Ok(targets)
     }
 }

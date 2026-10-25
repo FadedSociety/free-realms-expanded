@@ -417,6 +417,87 @@
           "evidence": "(R) T466: minted id 3000360 = 3000300 + (fork QuestId 3060 - 3000); XP rung 20 (three goals); coin value 30 is the fork's RewardCoins."
         }
       ]
+    },
+    {
+      "id": 3000361,
+      "title_string_id": 400355,
+      "intro_text_string_id": 400433,
+      "description_string_id": 400356,
+      "end_text_string_id": 400436,
+      "giver_npc_id": 9500000588,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "collect_node",
+          "id": 1,
+          "node_type": "tin-ore",
+          "quantity": 5,
+          "text_string_id": 400357,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3061 goal 1: NameId 400357; Type 2 RequiredCount 5 CollectNodeType \"tin-ore\". Type 2 is the fork's Collect objective (src/Scripts/QuestManager.cs:163 matches a collect goal by node type); 'tin-ore' is the node type key in data/content/quest_nodes.json. The CollectionNodeTypes row has no NameId, so the node's client name id is 0 (R)."
+            },
+            {
+              "kind": "client",
+              "evidence": "Global.Text.400357 'Mine some tin ore' resolves in lab/reports/locale-id-to-text.json."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T503: Type 2 is bound to a server-side counted pickup, not to a collect_item grant; the node type is the quest_nodes.json key and one pickup adds exactly 1."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000588,
+          "text_string_id": 400426,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3061 goal 2: NameId 400426; DialogueId 400436; TargetGuid 100000001925 = definition 1925, bound to npcs/seaside.json 9500000588 (Heddy Heathcliff, NameId 45826) at the same legacy_data spawn. The last goal at the turn-in NPC: its DialogueId 400436 is the quest's end_text_string_id."
+            },
+            {
+              "kind": "client",
+              "evidence": "Global.Text.400426 'Return the tin ore to Heddy Heathcliff' and the end text 400436 resolve in lab/reports/locale-id-to-text.json."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 40,
+          "items": [],
+          "job_xp": {
+            "1": 25
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3061: RewardCoins 40, RewardItems [15916]. Its RewardExperience 90 is not used; job_xp follows the T202 ladder. The fork's item 15916 (Golden Summer Sparkler) is recorded in this note only: item rewards wait for T412, so this reward grants no item."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T503: fork value, unverified; job XP 25 to profile 1 (Adventurer) is the T202 collect rung (notes/Autopilot/T202.md:137-141) and pays the Adventurer whatever job is active. No item is granted."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3061 'A Booming Problem - mine tin ore for Heddy Heathcliff's boom powder' (quest data last changed in 1c36ad7): TitleId 400355, DescriptionId 400356, GiverDialogueId 400433, GiverGuid and TargetGuid 100000001925 (definition 1925 = Heddy Heathcliff), PrerequisiteQuestId 0. AGPL-3.0 source used as data only (ids, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "The 2014 client locale resolves 400355 (title 'A Booming Problem'), 400356 (description), 400433 (intro), 400357 (collect goal) and 400426/400436 (talk goal and end text) in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T503: minted id 3000361 = 3000300 + (fork QuestId 3061 - 3000); XP rung 25 (collect row); the fork's RewardExperience 90 is not used and its item row is deferred to T412."
+        }
+      ]
     }
   ]
 }
