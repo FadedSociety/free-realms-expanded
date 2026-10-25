@@ -26,8 +26,9 @@ mod round70_content;
 mod vendor_fixture;
 
 use gateway_vendor::{
-    NOW, completions, connect_with, count_definition, fixture_root, inner_packets, interact,
-    inventory_of, merchant_status, select, sell_packet, send, vendor_buy_packet, wrap,
+    NOW, buy_back_packet, buy_back_reply, coin_buy_packet, completions, connect_with,
+    count_definition, fixture_root, inner_packets, interact, inventory_of, merchant_status, select,
+    sell_packet, send, vendor_buy_packet, wrap,
 };
 use osfr_tools::{
     coin_shop::{self, CoinShop, StoreCatalogue},
@@ -37,9 +38,10 @@ use osfr_tools::{
     inventory::Inventory,
     npc_interaction::decode_coin_merchant_list_165_10,
     pets::PetService,
-    station_cash::Wallet,
+    station_cash::{DEED_ITEM_TYPE, Wallet},
 };
-use serde_json::Value;
+use serde_json::{Value, json};
+use sha2::{Digest, Sha256};
 use std::{
     collections::BTreeMap,
     fs,
@@ -60,6 +62,8 @@ const RIDE: i32 = 10_530;
 const HOUSE_LOT: i32 = 2_213;
 /// A type-29 furniture row that already has a coin price in the shipped stores.
 const FURNITURE: i32 = 10_472;
+/// An id no shipped catalogue defines; the unreadable-definition test gives it a truncated row.
+const TRUNCATED: i32 = 1_999_999_001;
 const START_COINS: u32 = 100_000;
 
 /// Every vendor-stocked row the coin store refuses on the integration tip, with the reason it is
@@ -113,34 +117,13 @@ fn advertised_items(replies: &[Vec<u8>]) -> Vec<u32> {
         .collect()
 }
 
-/// 165/4 (`00c77230` -> serializer `00c75ed0`): merchant u64, the merchant-record context, the
-/// definition id, tint, then quantity.
 fn buy_165_4(transaction: u32, item: i32) -> Vec<u8> {
-    let mut packet = vec![165, 0, 4, 0];
-    packet.extend(GLORIA.to_le_bytes());
-    packet.extend(transaction.to_le_bytes());
-    packet.extend(item.to_le_bytes());
-    packet.extend(0i32.to_le_bytes());
-    packet.extend(1u32.to_le_bytes());
-    packet
+    coin_buy_packet(GLORIA, transaction, item, 1)
 }
 
-/// 165/12 (`00c759c0`): the sale transaction id plus a context dword.
-fn buy_back_165_12(transaction: u32) -> Vec<u8> {
-    let mut packet = vec![165, 0, 12, 0];
-    packet.extend(transaction.to_le_bytes());
-    packet.extend(0u32.to_le_bytes());
-    packet
-}
-
-/// The 165/13 result word: transaction id, result, context.
+/// The 165/13 result word of a 165/12 buy-back.
 fn buy_back_result(replies: &[Vec<u8>]) -> u32 {
-    let packet = replies
-        .iter()
-        .find(|packet| packet.starts_with(&[165, 0, 13, 0]))
-        .expect("a 165/12 buy-back answers 165/13");
-    assert_eq!(packet.len(), 16);
-    u32::from_le_bytes(packet[8..12].try_into().unwrap())
+    buy_back_reply(replies).1
 }
 
 /// Sell the fixture's seeded item through the real 165/5 path, leaving one buy-back entry.
@@ -211,9 +194,9 @@ fn an_unbound_pet_item_is_refused_through_the_real_165_4_buy() {
 
     // No ledger entry was added for the refused transaction, and the entry from the seed sale
     // is still readable.
-    let probe = send(&mut gateway, &buy_back_165_12(refused_transaction));
+    let probe = send(&mut gateway, &buy_back_packet(refused_transaction, 0));
     assert_eq!(buy_back_result(&probe), coin_shop::RESULT_FAILURE);
-    let restored = send(&mut gateway, &buy_back_165_12(sale));
+    let restored = send(&mut gateway, &buy_back_packet(sale, 0));
     assert_eq!(
         buy_back_result(&restored),
         coin_shop::RESULT_SUCCESS,
@@ -252,9 +235,9 @@ fn an_unbound_pet_item_is_refused_through_the_real_66_43_buy() {
     assert_eq!(merchant_status(&retry[0]), 0);
     assert_unchanged(&gateway, &before, "66/43 retry");
 
-    let probe = send(&mut gateway, &buy_back_165_12(refused_transaction));
+    let probe = send(&mut gateway, &buy_back_packet(refused_transaction, 0));
     assert_eq!(buy_back_result(&probe), coin_shop::RESULT_FAILURE);
-    let restored = send(&mut gateway, &buy_back_165_12(sale));
+    let restored = send(&mut gateway, &buy_back_packet(sale, 0));
     assert_eq!(buy_back_result(&restored), coin_shop::RESULT_SUCCESS);
 }
 
@@ -299,7 +282,7 @@ fn rides_and_house_lots_are_refused_while_furniture_is_sold() {
     let fixture = gloria_fixture("t529-c");
     fixture.stock_price_coins(&[(RIDE, 650), (HOUSE_LOT, 700), (FURNITURE, 200)]);
     let inventory = Inventory::load(fixture.content(), None).expect("fixture inventory loads");
-    for (item, expected) in [(RIDE, 19), (HOUSE_LOT, 16), (FURNITURE, 29)] {
+    for (item, expected) in [(RIDE, 19), (HOUSE_LOT, DEED_ITEM_TYPE), (FURNITURE, 29)] {
         assert_eq!(
             inventory
                 .presentation(item)
@@ -364,20 +347,16 @@ fn every_shipped_vendor_item_is_sellable_or_reviewed_unsellable() {
 
     let vendors = read_json(&data.join("vendors.json"));
     let mut blocked = BTreeMap::new();
+    // The server stocks a vendor from `item_ids` (`npc_interaction.rs` `VendorRecord`), not from
+    // the wiki-shaped `items` rows; NPCs 9000000024 and 9000000027 have an `items` row and no
+    // `item_ids`, so only the loader's list counts here.
     for vendor in vendors["vendors"]
         .as_array()
         .expect("vendor records are an array")
     {
-        for item in vendor["items"]
-            .as_array()
-            .expect("vendor items are an array")
-        {
-            let id = i32::try_from(
-                item["item_id"]
-                    .as_i64()
-                    .expect("vendor item ID is an integer"),
-            )
-            .expect("vendor item ID fits i32");
+        for item in vendor["item_ids"].as_array().into_iter().flatten() {
+            let id = i32::try_from(item.as_i64().expect("vendor item ID is an integer"))
+                .expect("vendor item ID fits i32");
             if let Some(reason) = shop.sale_block(id) {
                 blocked.insert(id, reason);
             }
@@ -389,10 +368,51 @@ fn every_shipped_vendor_item_is_sellable_or_reviewed_unsellable() {
         "the coin store's blocked vendor rows changed; a bound Pet Pal must leave \
          REVIEWED_UNSELLABLE and a newly blocked row must join it"
     );
-    // A definition the shop cannot read is a refusal with a reason, never an error: the buy path
-    // maps this `Some` to the existing invalid-item reply.
-    assert_eq!(
-        shop.sale_block(i32::MAX),
-        Some("item definition type is unreadable")
+}
+
+/// A definition that is present but truncated before its Type field cannot be classified, so the
+/// shop refuses it with the invalid-item reply instead of selling or erroring. The row is added
+/// to the fixture's own `inventory.json` copy with a valid hash, so it loads like a shipped row.
+#[test]
+fn a_priced_item_with_an_unreadable_definition_is_refused_and_not_advertised() {
+    let fixture = gloria_fixture("t529-d");
+    let mut row = TRUNCATED.to_le_bytes().to_vec();
+    row.extend([0; 8]); // far short of the model strings that precede Type
+    let path = fixture.content().join("inventory.json");
+    let mut content = read_json(&path);
+    content["definitions"]
+        .as_array_mut()
+        .expect("definitions are an array")
+        .push(json!({
+            "id": TRUNCATED, "slot": 0, "class_id": 1, "default_tint": 0, "max_stack": 1,
+            "model": "", "texture": "", "tint_alias": "", "effect": 0, "wield_type": 0,
+            "serialized_hex": row.iter().map(|byte| format!("{byte:02x}")).collect::<String>(),
+            "sha256": format!("{:x}", Sha256::digest(&row)),
+        }));
+    fs::write(&path, serde_json::to_vec(&content).unwrap()).expect("fixture inventory writes");
+    fixture.stock_price_coins(&[(TRUNCATED, 50), (FURNITURE, 200)]);
+    let inventory = Inventory::load(fixture.content(), None).expect("fixture inventory loads");
+    assert!(inventory.has_definition(TRUNCATED), "the row is defined");
+    assert!(
+        inventory.presentation(TRUNCATED).is_err(),
+        "the row must be unreadable, not merely unknown"
     );
+
+    let mut gateway = connect(&fixture, fixture.state(1_000, false));
+    let advertised = advertised_items(&open_shop(&fixture, &mut gateway));
+    assert!(!advertised.contains(&(TRUNCATED as u32)));
+    assert!(
+        advertised.contains(&(FURNITURE as u32)),
+        "readable rows stay"
+    );
+
+    let before = gateway.snapshot();
+    let (replies, outcome) = handled(&mut gateway, &buy_165_4(21, TRUNCATED));
+    assert!(!outcome.gameplay_changed && !outcome.state_changed);
+    let done = completions(&replies);
+    assert_eq!(done.len(), 1);
+    assert_eq!(done[0].result, coin_shop::RESULT_INVALID_ITEM);
+    assert_unchanged(&gateway, &before, "unreadable definition");
+    assert_eq!(inventory_of(&gateway).coins, 1_000);
+    assert_eq!(count_definition(&inventory_of(&gateway), TRUNCATED), 0);
 }

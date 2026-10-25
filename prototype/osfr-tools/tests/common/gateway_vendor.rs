@@ -138,6 +138,32 @@ pub fn buy_back_packet(transaction: u32, context: u32) -> Vec<u8> {
     packet
 }
 
+/// 165/13 as the client reads it (`00c71e40`): three dwords after the header, returned as
+/// (transaction, result, context).
+#[allow(dead_code)] // Only the suites that probe a buy-back answer use this parser.
+pub fn buy_back_reply(replies: &[Vec<u8>]) -> (u32, u32, u32) {
+    let packet = replies
+        .iter()
+        .find(|packet| packet.starts_with(&[165, 0, 13, 0]))
+        .expect("a 165/12 buy-back answers 165/13");
+    assert_eq!(packet.len(), 16, "165/13 is the header and three dwords");
+    let word = |at: usize| u32::from_le_bytes(packet[at..at + 4].try_into().unwrap());
+    (word(4), word(8), word(12))
+}
+
+/// 165/4 body (client writer `00c75ed0`, request `00c77230`): u64 merchant, the merchant-record
+/// context dword, the definition id, tint, then quantity.
+#[allow(dead_code)] // Only the coin-store suites send a direct 165/4 buy.
+pub fn coin_buy_packet(merchant: u64, context: u32, item: i32, quantity: u32) -> Vec<u8> {
+    let mut packet = vec![165, 0, 4, 0];
+    packet.extend(merchant.to_le_bytes());
+    packet.extend(context.to_le_bytes());
+    packet.extend(item.to_le_bytes());
+    packet.extend(0i32.to_le_bytes()); // tint
+    packet.extend(quantity.to_le_bytes());
+    packet
+}
+
 /// The 165/6 record as `00c74ef0`/`00c71f30` read it: header, result, leading item,
 /// then kind, u64 merchant, transaction, u64 timestamp, item pair, quantity, unit
 /// price and remaining. `remaining` (`this+13`, the last wire dword) is the buy-back

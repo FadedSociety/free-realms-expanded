@@ -508,7 +508,7 @@ impl CoinShop {
         match item_type {
             2 => (!self.pet_items.contains(&item_id))
                 .then_some("pet item has no pets.json species binding"),
-            16 => Some("house lot (housing preview soft-lock)"),
+            station_cash::DEED_ITEM_TYPE => Some("house lot (housing preview soft-lock)"),
             19 => Some("rides are Station Cash or earned only"),
             _ => None,
         }
