@@ -10,9 +10,10 @@
 //!   (+0x8c) is positive, its gender usage fits (`00bae6a0`) and a unit is left. All 15 boombox
 //!   definitions the server loads pass, so the client sends 42/6 for them. That data source also
 //!   fills the equipment window's Consumables tab, whose row click reaches
-//!   `Ui.AssignToItemActionBar(slot - 18, id)` (42/6 ctor `00c23ed0`); the dock's item-bar picker
-//!   reads the same source (`ScriptsBase.lua` `QuickItem.PopulateSelectors`). The Stuff detail
-//!   pane is not a binding path for a type-1 definition (lead decision 2026-10-25).
+//!   `Ui.AssignToItemActionBar(slot - 18, id)` (binding `00c23ed0`, 42/6 ctor `00c14720`); the
+//!   dock's item-bar picker reads the same source (`ScriptsBase.lua`
+//!   `QuickItem.PopulateSelectors`). (R) Lead decision 2026-10-25: the Stuff detail pane is not
+//!   a binding path for a type-1, slot-0 definition.
 //! * Every model, animation and song effect id is checked against the client's own tables by
 //!   `tests/boombox_catalogue.rs`; each row's `source` cites where its values come from.
 //! * The song is a composite effect attached to the box by tag, 35/41 (client dispatcher

@@ -4,6 +4,12 @@
 //! gateway tests for the world side).
 #[path = "support/models.rs"]
 mod models;
+#[allow(dead_code)]
+#[path = "support/packets.rs"]
+mod packets;
+#[allow(dead_code)]
+#[path = "../src/restoration/piece_096.rs"]
+mod piece_096;
 #[path = "common/round70_content.rs"]
 #[allow(dead_code)]
 mod round70_content;
@@ -15,8 +21,10 @@ use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, Outcome},
     inventory::{Inventory, InventoryItem, InventoryState, RentalState},
+    inventory_v2_fixes::encode_definition_batch_v2,
     item_bar::{ItemBar, Player, use_wire},
 };
+use piece_096::{InitMessage, ItemDefinition, TypedWriter, decode_payload};
 use serde::Deserialize;
 use serde_json::{Value, json};
 use std::{
@@ -565,33 +573,30 @@ fn failed(out: &Outcome) -> bool {
     out.replies.len() == 1 && out.replies[0].starts_with(&[36, 0, 1, 0])
 }
 
-/// Just past the model and texture strings in a serialized `ClientItemDefinition` row: eleven
-/// leading words (slot is word 10 at byte 40), NoTrade/NoSale at 44/45, then GenderUsage, Type and
-/// CategoryId back to back (the `piece_096` layout).
-fn after_strings(record: &[u8]) -> usize {
-    fn skip(row: &[u8], at: usize) -> usize {
-        let length = i32::from_le_bytes(row[at..at + 4].try_into().unwrap());
-        at + 4 + usize::try_from(length).unwrap()
-    }
-    skip(record, skip(record, 46))
+/// The server's definition row for `id` read back with the typed 35/37 reader (`piece_096`), so
+/// the picker fields come from the one canonical layout and move with it.
+fn typed_row(inventory: &Inventory, id: i32) -> ItemDefinition {
+    let record = inventory
+        .definition_record(id)
+        .expect("a catalogue definition");
+    let batch = encode_definition_batch_v2(&[record.to_vec()], &[]).expect("the row encodes");
+    let Ok(InitMessage::ItemDefinitions(rows)) =
+        decode_payload(TypedWriter::ItemDefinitions.slot(), &batch)
+    else {
+        panic!("{id}: the row must match the reader layout");
+    };
+    rows.items.into_iter().next().expect("one row")
 }
-fn wire_field(record: &[u8], at: usize) -> i32 {
-    i32::from_le_bytes(record[at..at + 4].try_into().unwrap())
-}
-/// The definition inside a 38/2 ItemAdd: the item record first, then the server's
-/// `ClientItemDefinition` row starting with its own id.
-fn sent_definition(packet: &[u8], id: i32) -> &[u8] {
-    let payload = &packet[8..];
-    let first = payload
-        .windows(4)
-        .position(|word| word == id.to_le_bytes())
-        .expect("item record definition id");
-    let tail = &payload[first + 4..];
-    let second = tail
-        .windows(4)
-        .position(|word| word == id.to_le_bytes())
-        .expect("inline definition id");
-    &tail[second..]
+/// The picker's gates on a definition (`ConsumablesDataSourceHasRows` `00c31de0`): type
+/// (`+0x6c`) 1, activatable ability (`+0x8c`) positive, gender usage (`+0x68`) 0 = any
+/// (`00bae6a0`), and no equipment slot (`+0x30`, which `008e3760` fills from wire word 10).
+fn picker_fields(row: &ItemDefinition) -> (i32, bool, i32, i32) {
+    (
+        row.item_type,
+        row.activatable_ability_id > 0,
+        row.gender_usage,
+        row.slot,
+    )
 }
 
 /// T702: the client's bar picker (`ConsumablesDataSourceHasRows` `00c31de0`) keeps a row when the
@@ -608,50 +613,49 @@ fn every_shipped_boombox_definition_keeps_the_client_picker_fields() {
     for row in &boxes {
         let id = int(&row["item_id"]);
         let granted = inventory.grant(0, id, 1).unwrap();
-        let add = granted
-            .replies
-            .iter()
-            .find(|reply| reply.starts_with(&[38, 0, 2, 0]))
-            .unwrap_or_else(|| panic!("{id}: no 38/2"));
-        let sent = sent_definition(add, id);
-        let strings = after_strings(sent);
-        assert_eq!(
-            wire_field(sent, strings + 4),
-            1,
-            "{id}: type 1 is the picker's row tag (+0x6c)"
-        );
+        // The 38/2 ItemAdd carries the definition record itself, so the typed row below is the
+        // definition the client reads for the new instance.
+        let record = inventory.definition_record(id).unwrap();
         assert!(
-            wire_field(sent, strings + 34) > 0,
-            "{id}: the picker and isConsumable need ability > 0 (+0x8c)"
+            packets::packet(&granted.replies, 38, 2).ends_with(record),
+            "{id}: the 38/2 inline definition is the catalogue record"
         );
-        // Gender usage 0 is "any" (`00bae6a0`), so every character passes the picker.
-        assert_eq!(wire_field(sent, strings), 0, "{id}: gender usage (+0x68)");
         // Lead decision: keep slot 0. It leaves the Stuff pane's equip state at 0, so that pane
         // shows no action; the Consumables tab is the binding route.
-        assert_eq!(wire_field(sent, 40), 0, "{id}: slot");
+        assert!(
+            picker_fields(&typed_row(&inventory, id)) == (1, true, 0, 0),
+            "{id}: type 1, ability > 0, gender any, slot 0"
+        );
+        // The picker's fourth gate: a unit must be left (`00c31de0`).
+        let item = inventory
+            .state()
+            .items
+            .iter()
+            .find(|item| item.definition_id == id)
+            .unwrap();
+        assert!(
+            i64::from(item.count) - i64::from(item.stored_count) - i64::from(item.consumed_count)
+                > 0,
+            "{id}: count - stored - consumed"
+        );
     }
 }
 
 /// T702: the granted instance binds through 42/6, its 38/25 shows it, and 36/10 on that slot
-/// reaches the T461 placement path. Granting a boombox leaves the potion's definition bytes
-/// untouched; the potion is the other type-1 item that already binds and uses.
+/// reaches the T461 placement path. The Small Health Potion is the other type-1, slot-0 item that
+/// already binds and uses, so its definition keeps the same picker fields.
 #[test]
 fn a_granted_boombox_binds_and_presses_through_t461() {
     let mut inventory = Inventory::load(&reference(), None).unwrap();
-    let potion = inventory.definition_record(11002).unwrap().to_vec();
-    let outcome = inventory.grant(0, 1913, 1).unwrap();
-    assert!(
-        outcome
-            .replies
-            .iter()
-            .any(|reply| reply.starts_with(&[38, 0, 2, 0])),
-        "the 38/2 carries 1913"
-    );
+    let potion = typed_row(&inventory, 11002);
     assert_eq!(
-        inventory.definition_record(11002).unwrap(),
-        potion.as_slice(),
-        "the boombox grant leaves the potion definition byte-identical"
+        picker_fields(&potion),
+        (1, true, 0, 0),
+        "the potion picker fields"
     );
+    assert_eq!(potion.activatable_ability_id, 4696, "the potion's ability");
+    let outcome = inventory.grant(0, 1913, 1).unwrap();
+    packets::packet(&outcome.replies, 38, 2);
     let item = inventory
         .state()
         .items
