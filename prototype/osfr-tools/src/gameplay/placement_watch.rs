@@ -121,6 +121,35 @@ impl Gameplay {
         self.live_dir().join("npc_placements.json")
     }
 
+    /// `realm placements`: the ten nearest placed NPCs, or the reader's refusal.
+    pub(super) fn placements_listing(&self, character: &CharacterState) -> String {
+        let here = character.position;
+        let mut rows = match self.load_placements() {
+            Ok(rows) => rows,
+            Err(error) => return format!("Could not read the placements: {error}."),
+        };
+        rows.sort_by(|left, right| {
+            flat_distance(left.position, here).total_cmp(&flat_distance(right.position, here))
+        });
+        let list: Vec<String> = rows
+            .iter()
+            .take(10)
+            .map(|row| {
+                format!(
+                    "{} model {} ({:.0} m)",
+                    row.guid,
+                    row.model_id,
+                    flat_distance(row.position, here)
+                )
+            })
+            .collect();
+        if rows.is_empty() {
+            "No placed NPCs; realm place <model id> [name text id] [at x z].".to_owned()
+        } else {
+            format!("{} placed NPCs, nearest: {}.", rows.len(), list.join("; "))
+        }
+    }
+
     /// A missing table is empty; a malformed, oversized or non-regular one is
     /// refused, so no command overwrites rows it could not read.
     pub(super) fn load_placements(&self) -> io::Result<Vec<crate::world::Placement>> {

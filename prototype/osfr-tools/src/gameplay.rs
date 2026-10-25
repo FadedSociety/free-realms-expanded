@@ -43,6 +43,7 @@ use std::{
 
 mod admin_move;
 pub use admin_move::{AdminMove, MoveTarget};
+mod coin_authoring;
 mod collection_pickup;
 mod content_reload;
 mod crafting;
@@ -242,6 +243,7 @@ pub struct Gameplay {
     /// start. Not in `realm reload`'s commit list, so a table edit needs a restart.
     npc_ambient: Option<std::sync::Arc<crate::npc_ambient::NpcAmbient>>,
     placement_watch: placement_watch::PlacementWatch, // live stat; never saved
+    coin_edits_watch: placement_watch::PlacementWatch, // T525 coin overlay; never saved
     event_watch: placement_watch::PlacementWatch,     // T418 events.json; never saved
     npc_interaction: Option<NpcInteraction>,
     /// Last NPC Talk packet, retained only for the opt-in offer experiment.
@@ -922,8 +924,12 @@ impl Gameplay {
         } else {
             None
         };
-        let collections =
-            collection_pickup::load(npc_content, &progression_extras, &mut npc_visibility)?;
+        let collections = collection_pickup::load(
+            npc_content,
+            npc_content,
+            &progression_extras,
+            &mut npc_visibility,
+        )?;
         let npc_ambient =
             crate::npc_ambient::NpcAmbient::load(npc_content)?.map(std::sync::Arc::new);
         // Overworld enemies replace their passive Legacy copies (same GUIDs).
@@ -1151,6 +1157,7 @@ impl Gameplay {
             npc_visibility,
             npc_ambient,
             placement_watch: placement_watch::PlacementWatch::default(),
+            coin_edits_watch: placement_watch::PlacementWatch::default(),
             event_watch: placement_watch::PlacementWatch::default(),
             npc_interaction,
             last_npc_dialogue: None,
@@ -1894,6 +1901,7 @@ impl Gameplay {
         let mut out = self.tick_world(character, now_ms)?;
         self.tick_gathering_nodes(now_ms, &mut out)?;
         self.tick_live_placements(now_ms, &mut out); // world visibility only, never saved
+        self.tick_live_coin_edits(now_ms, &mut out); // T525 coin overlay; never saved
         self.tick_live_events(now_ms); // quest offer gate only, never saved
         self.tick_consumable_effects(character.guid, now_ms, &mut out);
         out.replies.splice(0..0, fishing.replies);
@@ -2649,35 +2657,9 @@ impl Gameplay {
                 let text = self.unplace_npc(which, character, out)?;
                 say(out, text);
             }
-            ["placements"] => {
-                let p = character.position;
-                let mut rows = match self.load_placements() {
-                    Ok(rows) => rows,
-                    Err(error) => {
-                        say(out, format!("Could not read the placements: {error}."));
-                        return Ok(true);
-                    }
-                };
-                rows.sort_by(|a, b| {
-                    flat_distance(a.position, p).total_cmp(&flat_distance(b.position, p))
-                });
-                let list: Vec<String> = rows
-                    .iter()
-                    .take(10)
-                    .map(|r| {
-                        format!(
-                            "{} model {} ({:.0} m)",
-                            r.guid,
-                            r.model_id,
-                            flat_distance(r.position, p)
-                        )
-                    })
-                    .collect();
-                let text = if rows.is_empty() {
-                    "No placed NPCs; realm place <model id> [name text id] [at x z].".to_owned()
-                } else {
-                    format!("{} placed NPCs, nearest: {}.", rows.len(), list.join("; "))
-                };
+            ["placements"] => say(out, self.placements_listing(character)),
+            ["coin", rest @ ..] => {
+                let text = self.realm_coin(rest, character, now_ms, out)?;
                 say(out, text);
             }
             ["text", ..] if raw_words.len() > 1 => {
@@ -3592,6 +3574,7 @@ impl Gameplay {
         }
         self.placement_watch.observe(&self.placements_path());
         self.load_live_events();
+        self.reload_coin_edits()?;
         Ok(())
     }
 

@@ -23,10 +23,11 @@
 use super::*;
 use crate::{
     collection_catalogue::CollectionCatalogueContent,
-    collection_coins::CollectionCoins,
+    collection_coins::{CoinEdit, CollectionCoins},
     harvest_nodes::Denied,
     progression_extras::{
-        CollectionEntryUpdate, CollectionEvent, CollectionEventOrigin, ProgressionExtras,
+        CollectionEntryUpdate, CollectionEvent, CollectionEventOrigin, CollectionLedger,
+        ProgressionExtras,
     },
     rewards::GrantFailure,
     world::{NpcVisibility, OPEN_WORLD_ZONE},
@@ -35,20 +36,47 @@ use crate::{
 /// The collection catalogue and the coins bound to it: read-only content shared by staged clones.
 pub(super) struct CollectionWorld {
     catalogue: CollectionCatalogueContent,
+    /// The shipped bindings only; the live overlay is merged again on every edit.
+    content: CollectionCoins,
+    /// Content plus overlay, what pickup and the client view use.
     coins: CollectionCoins,
 }
 
-/// Reads both files from `dir` (dormant unless both exist) and hides every coin `extras` has
-/// already collected, so a relog never sends it.
+impl CollectionWorld {
+    pub(super) fn catalogue(&self) -> &CollectionCatalogueContent {
+        &self.catalogue
+    }
+
+    pub(super) fn coins(&self) -> &CollectionCoins {
+        &self.coins
+    }
+
+    /// A copy with `edits` merged over the shipped bindings.
+    pub(super) fn with_edits(&self, edits: Vec<CoinEdit>) -> io::Result<Self> {
+        let coins = CollectionCoins::merge(self.content.clone(), &self.catalogue, edits)?;
+        Ok(Self {
+            catalogue: self.catalogue.clone(),
+            content: self.content.clone(),
+            coins,
+        })
+    }
+}
+
+/// Reads the catalogue and shipped map from `content_dir` and the overlay from `overlay_dir`
+/// (dormant unless the first two exist). Adds the overlay actors, hides every replaced content
+/// coin and every coin `extras` has already collected, so a relog never sends it.
 pub(super) fn load(
-    dir: &Path,
+    content_dir: &Path,
+    overlay_dir: &Path,
     extras: &ProgressionExtras,
     visibility: &mut Option<NpcVisibility>,
 ) -> io::Result<Option<Arc<CollectionWorld>>> {
-    let Some(catalogue) = CollectionCatalogueContent::load(dir)? else {
+    let Some(catalogue) = CollectionCatalogueContent::load(content_dir)? else {
         return Ok(None);
     };
-    let Some(coins) = CollectionCoins::load(dir, &catalogue)? else {
+    let Some((content, coins)) =
+        CollectionCoins::load_with_overlay(content_dir, overlay_dir, &catalogue)?
+    else {
         return Ok(None);
     };
     // A reward item without a definition is never granted; say which, once per load.
@@ -77,16 +105,49 @@ pub(super) fn load(
             "targets": targets,
         }));
     }
+    let world = CollectionWorld {
+        catalogue,
+        content,
+        coins,
+    };
     if let Some(visibility) = visibility {
-        let ledger = extras.collections();
-        visibility.exclude_actor_guids(
-            coins
+        apply_view(visibility, &world, extras.collections(), std::iter::empty())?;
+    }
+    Ok(Some(Arc::new(world)))
+}
+
+/// Add the overlay actors, hide every replaced content coin and every coin whose entry this
+/// player has collected; `removed` are overlay GUIDs whose row disappeared. Returns the
+/// visibility refresh packets (empty before the first update).
+pub(super) fn apply_view(
+    visibility: &mut NpcVisibility,
+    world: &CollectionWorld,
+    ledger: &CollectionLedger,
+    removed: impl IntoIterator<Item = u64>,
+) -> io::Result<Vec<Vec<u8>>> {
+    for guid in removed {
+        visibility.remove(guid);
+    }
+    for edit in world.coins.edits() {
+        visibility.add_static_actor(
+            edit.spawn_guid,
+            "",
+            edit.name_string_id as i32,
+            edit.model_id as i32,
+            edit.position,
+            0,
+        );
+    }
+    visibility.exclude_actor_guids(
+        world.coins.replaced().chain(
+            world
+                .coins
                 .iter()
                 .filter(|(_, coin)| ledger.is_collected(coin.entry_id))
                 .map(|(guid, _)| guid),
-        );
-    }
-    Ok(Some(Arc::new(CollectionWorld { catalogue, coins })))
+        ),
+    );
+    visibility.refresh()
 }
 
 /// Log a refused collection reward once, naming the entry that failed: the clicked source entry,

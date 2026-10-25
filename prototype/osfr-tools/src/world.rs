@@ -592,6 +592,17 @@ impl NpcVisibility {
         })
     }
 
+    /// Model and position of a loaded actor, including one hidden from this
+    /// viewer (a collected or replaced coin, or a field actor): the authoring
+    /// commands need the content row, not this viewer's filtered view (T525).
+    pub fn authored_spawn(&self, actor_id: u64) -> Option<(u32, [f32; 3])> {
+        self.by_zone
+            .values()
+            .flatten()
+            .find(|npc| npc.spawn.actor_id == actor_id)
+            .and_then(|npc| Some((u32::try_from(npc.spawn.model_id).ok()?, npc.position)))
+    }
+
     /// Where a content actor stands, for click reach checks. Excluded and removed actors have
     /// no position.
     pub fn actor_position(&self, actor_id: u64) -> Option<[f32; 3]> {
