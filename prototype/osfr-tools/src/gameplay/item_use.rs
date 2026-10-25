@@ -100,6 +100,11 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
+        // T528: a saddle is not a bar item; its 42/16/42/15 pair opens the client's own ride
+        // upgrade picker (36/17) and changes nothing.
+        if let Some(out) = self.use_upgrade_item(inner)? {
+            return Ok(Some(out));
+        }
         let player = crate::item_bar::Player {
             guid: character.guid,
             alive: self

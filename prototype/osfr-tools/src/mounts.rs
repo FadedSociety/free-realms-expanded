@@ -35,6 +35,13 @@ const MAX_SPEED: f32 = 64.0;
 const MAX_EFFECT_ID: i32 = 100_000;
 // (R) Sanity bound for the 168/14 upgrade-item allowlist.
 const MAX_UPGRADE_ITEMS: usize = 16;
+
+/// T528: the client Lua function a saddle use opens (`ScriptsBase.lua:34655`
+/// `BrowserV2:ShowUpgradableMounts(upgradeItemDefinitionId)`, no caller in Lua). The colon form is
+/// the one the client's call helper `009797a0` resolves with self: it splits the name at ':' or
+/// '.', requires the left part to be a global table and the right part a function in it, and
+/// pushes the table before the call only for ':'.
+pub const UPGRADE_PICKER_LUA: &str = "BrowserV2:ShowUpgradableMounts";
 // Character stat ids index the client's stat-name table at `0x01af2008` (4 bytes per id):
 // 2 MaxMovementSpeed (`0x01af2010`); 59-63 GlideDefaultForwardSpeed, GlideMinForwardSpeed,
 // GlideMaxForwardSpeed, GlideFallTime, GlideFallSpeed (`0x01af20f4`-`0x01af2104`); 64 GlideEnabled
@@ -810,6 +817,33 @@ impl MountService {
         )
     }
 
+    /// T528: what using `item_instance_id` (42/16 check or 42/15 use) opens. `NotUpgradeItem`
+    /// means the instance is some other item, whose route keeps it; every other error is a
+    /// refusal. Pure and read-only: the picker consumes nothing, the saddle is spent by the
+    /// upgrade itself (`upgrade_plan`).
+    pub fn upgrade_use_plan(
+        &self,
+        inventory: &InventoryState,
+        restrictions: RideRestrictions,
+        item_instance_id: i32,
+    ) -> Result<i32, MountError> {
+        let item = inventory
+            .items
+            .iter()
+            .find(|item| item.id == item_instance_id)
+            .ok_or(MountError::UpgradeItemNotOwned)?;
+        if !self.catalog.is_upgrade_item(item.definition_id) {
+            return Err(MountError::NotUpgradeItem);
+        }
+        if item.count.saturating_sub(item.consumed_count) == 0 {
+            return Err(MountError::UpgradeItemNotOwned);
+        }
+        if !restrictions.allows() {
+            return Err(MountError::Restricted);
+        }
+        Ok(item.definition_id)
+    }
+
     /// T527: validate a 168/14 request. The row must be an owned ride instance, its ride
     /// upgradable and not already trained, the item a configured upgrade item and the player must
     /// hold at least one (the lowest instance id is the one consumed). Pure: nothing changes until
@@ -862,6 +896,20 @@ impl MountService {
     pub fn upgrade_reply(row_id: i32) -> Vec<u8> {
         let mut out = header(15);
         put_i32(&mut out, row_id);
+        out
+    }
+
+    /// T528: 36/17 `AbilityPacketExecuteClientLua` (family 36, ctor `00a2f5e0`, reader
+    /// `00a30060`): the 4-byte header, an i32 byte length and the function name, then three f32
+    /// that the family-36 dispatcher (`00a35cc0` case 17 at `00a367ea`) loads with `fld dword`
+    /// and pushes to Lua as arguments 0, 1 and 2 before it calls `009797a0`. Only the item
+    /// definition id is recovered; the other two arguments are (R) 0.
+    pub fn upgrade_picker(item_definition_id: i32) -> Vec<u8> {
+        let mut out = vec![36, 0, 17, 0];
+        put_string(&mut out, UPGRADE_PICKER_LUA);
+        put_f32(&mut out, item_definition_id as f32);
+        put_f32(&mut out, 0.0);
+        put_f32(&mut out, 0.0);
         out
     }
 
@@ -1390,7 +1438,8 @@ impl MountService {
     }
 }
 
-fn refusal_text(error: MountError) -> &'static str {
+/// The system-chat line for a refused ride request. (R) No refusal packet was recovered.
+pub fn refusal_text(error: MountError) -> &'static str {
     match error {
         MountError::NotOwned => "You do not own that ride.",
         MountError::NotUpgradable => "That ride cannot learn Gliding.",

@@ -600,11 +600,14 @@ impl ItemBar {
                 self.pending = Some(id);
                 // Success text is the item's own name and description (R): the chest strings
                 // would read "Use a Mystery Key". Category and bundle only matter on failure.
-                let mut bytes = vec![38, 0, 30, 0];
-                for value in [id, 0, 0, name_id, description_id] {
-                    bytes.extend(value.to_le_bytes());
-                }
-                bytes.push(1);
+                let bytes = use_wire::encode_immediate_activation_check(
+                    id,
+                    0,
+                    0,
+                    name_id,
+                    description_id,
+                    true,
+                );
                 return Reply {
                     replies: vec![bytes],
                     ..Reply::default()

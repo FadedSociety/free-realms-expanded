@@ -1,6 +1,7 @@
 //! Ride and pet glue for `Gameplay`; the rules live in `crate::mounts` and `crate::pets`. The pet
 //! glue moved here verbatim from the hub (T458).
 use super::*;
+use crate::item_bar::use_wire;
 
 impl Gameplay {
     /// World entry (T424): the pet roster and the owned-ride roster (168/5). The ride roster is
@@ -89,6 +90,64 @@ impl Gameplay {
             now_ms,
         };
         Ok(mounts.handle(inner, &context)?.map(Self::ride_outcome))
+    }
+
+    /// T528: a saddle use from the bag arrives as 42/16 (check) and then 42/15 (use) — the client's
+    /// `InventoryHandler:useItem` calls `EquipScreen.CheckImmediateActivationItem`, shows the
+    /// dialog from the 38/30 reply and sends `UseImmediateActivationItem` on Okay. The check
+    /// answers with the saddle's own name and description; the use sends 36/17 ExecuteClientLua
+    /// (`00a30060`), which calls `BrowserV2:ShowUpgradableMounts(itemDefinitionId)`. Nothing is
+    /// consumed either way: the saddle is spent by the upgrade itself (168/14). An owned item that
+    /// is not a saddle keeps the item bar's, chest route's or inventory's handling; an instance
+    /// the player does not hold is refused with a notice and no packet.
+    pub(super) fn use_upgrade_item(&self, inner: &[u8]) -> io::Result<Option<Outcome>> {
+        let Some((kind, instance)) = use_wire::decode_immediate_activation(inner) else {
+            return Ok(None);
+        };
+        let Some(mounts) = self.mounts.as_ref() else {
+            return Ok(None);
+        };
+        let definition = match mounts.upgrade_use_plan(
+            self.inventory.state(),
+            self.ride_restrictions(),
+            instance,
+        ) {
+            Ok(definition) => definition,
+            Err(crate::mounts::MountError::NotUpgradeItem) => return Ok(None),
+            Err(error) => return Ok(Some(Self::ride_refusal(error))),
+        };
+        let mut out = Outcome::default();
+        match kind {
+            use_wire::ImmediateActivation::Check => {
+                let Some(presentation) = self.inventory.presentation(definition).ok() else {
+                    // A catalogue row the server cannot render sends no dialog (R).
+                    return Ok(Some(Self::ride_refusal(
+                        crate::mounts::MountError::NotUpgradeItem,
+                    )));
+                };
+                out.replies
+                    .push(use_wire::encode_immediate_activation_check(
+                        instance,
+                        0,
+                        0,
+                        presentation.name_id,
+                        presentation.description_id,
+                        true,
+                    ));
+            }
+            use_wire::ImmediateActivation::Use => out
+                .replies
+                .push(crate::mounts::MountService::upgrade_picker(definition)),
+        }
+        Ok(Some(out))
+    }
+
+    /// A ride refusal that sends the owner one system-chat line and no packet.
+    fn ride_refusal(error: crate::mounts::MountError) -> Outcome {
+        Self::ride_outcome(crate::mounts::RideWire {
+            notice: Some(crate::mounts::refusal_text(error)),
+            ..crate::mounts::RideWire::default()
+        })
     }
 
     /// T527: a Training Saddle upgrades one owned winged ride. The plan is pure, the saddle

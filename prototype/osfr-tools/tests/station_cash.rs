@@ -566,6 +566,92 @@ fn bought_ride_catalogue_row_is_no_trade() {
     }
 }
 
+/// T528: the Training Saddle of Gliding is a Station Cash listing in the Winged ride sub-category.
+/// Its sc_price is the (R) placeholder for the owner; the item's own catalogue row is NoSale, so the
+/// 66/3 order is the only way to buy it and no coin path touches the row. The provenance names the
+/// two references the brief cites: Sanctuary/Legacy `StoreBundles.json` bundle 5549 under
+/// CategoryGroupId 266 (Winged), and the wiki Glide Training page.
+#[test]
+fn the_saddle_is_sold_for_station_cash() {
+    const SADDLE: i32 = 79_150;
+    const SADDLE_SC_PRICE: u64 = 200;
+    let mut shop = new_shop(wallet(1_000), usize::MAX);
+    let saddle = shop
+        .sc_catalogue()
+        .listing(SADDLE as u32)
+        .expect("the saddle is listed");
+    assert!(!saddle.deed, "a saddle is not a lot deed");
+    assert!(!saddle.ride, "a saddle is not a ride");
+    let scale = shop.sc_catalogue().config().sc_price_scale;
+    let price = (SADDLE_SC_PRICE as f64 * scale).round() as u32;
+    assert_eq!(saddle.price, price, "listed at the scaled sc_price");
+    assert_eq!(
+        saddle.group, RIDE_CATEGORIES[0].1,
+        "the saddle lists under the Winged child of Rides"
+    );
+
+    let stores: Value =
+        serde_json::from_slice(&std::fs::read(stores()).expect("stores.json reads"))
+            .expect("stores.json parses");
+    let row = stores["items"]
+        .as_array()
+        .expect("store rows")
+        .iter()
+        .find(|row| row["item_id"].as_i64() == Some(i64::from(SADDLE)))
+        .expect("the saddle row");
+    assert_eq!(row["sc_price"].as_u64(), Some(SADDLE_SC_PRICE));
+    assert_eq!(
+        row["no_sale"].as_bool(),
+        Some(true),
+        "NoSale, like its item row"
+    );
+    assert_eq!(row["ride_category"].as_str(), Some("winged"));
+    let basis = row["price_provenance"]["basis"]
+        .as_str()
+        .expect("the row carries its provenance");
+    assert!(
+        basis.contains("5549") && basis.contains("266") && basis.contains("Glide Training"),
+        "the provenance names its sources: {basis}"
+    );
+
+    let before = snapshot(&shop);
+    let order = order_packet(3, 71, SADDLE as u32, STORE, 1, "", "", "", "0");
+    let outcome = shop.handle(&order).expect("order parses");
+    assert_eq!(outcome.result_code, station_cash::ORDER_SUCCESS);
+    assert!(outcome.changed);
+    assert_eq!(shop.sc_wallet().balance, 1_000 - price, "the scaled price");
+    assert_eq!(
+        count_definition(shop.inventory().state(), SADDLE),
+        count_definition(&before.0, SADDLE) + 1,
+        "one saddle granted"
+    );
+    assert_eq!(
+        shop.inventory().state().coins,
+        before.0.coins,
+        "no coin path ran"
+    );
+    // A second order sells another saddle: a stackable, not a single-copy ride (T484).
+    let again = shop
+        .handle(&order_packet(
+            3,
+            72,
+            SADDLE as u32,
+            STORE,
+            1,
+            "",
+            "",
+            "",
+            "0",
+        ))
+        .expect("order parses");
+    assert_eq!(again.result_code, station_cash::ORDER_SUCCESS);
+    assert_eq!(
+        count_definition(shop.inventory().state(), SADDLE),
+        count_definition(&before.0, SADDLE) + 2,
+        "the row sells again"
+    );
+}
+
 /// T634: Dog Ears (a head accessory, three tints) is a wiki Marketplace item at 49 Station Cash
 /// (page revision 36898); its store rows had no price. Castaway Hat spans two item classes under
 /// one name (16031 is the class 1 one), so its wiki price cannot be assigned and its row stays
@@ -898,11 +984,12 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     );
     // 52 rides plus the 9 lot deeds L046 lists, plus T452's 29 listed OSFR-parity rides (6 more
     // are earn-only), plus the 55 items T634 priced from the wiki, plus the 663 Station Cash only
-    // items T638 moved from their Legacy coin price, plus the 4 boomboxes T495 priced.
+    // items T638 moved from their Legacy coin price, plus the 4 boomboxes T495 priced, plus the
+    // Training Saddle of Gliding T528 lists.
     assert_eq!(
         decoded.len(),
-        812,
-        "the shipped listed ride, deed, wiki item and boombox count"
+        813,
+        "the shipped listed ride, deed, wiki item, boombox and saddle count"
     );
     assert!(
         store.len() < osfr_tools::soe::MAX_LOGICAL_MESSAGE / 2,
@@ -1052,7 +1139,8 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         Some(&(untagged as u32)),
         "the Rides node counts only the rows keyed to Rides itself"
     );
-    // T526 gate: every listed ride appears under exactly one child, at its scaled price.
+    // T526 gate: every listed ride appears under exactly one child, at its scaled price. T528: the
+    // Training Saddle of Gliding is not a ride but lists in Winged beside the rides it trains.
     let mut tagged = 0;
     for row in rows.iter().filter(|row| listed(row)) {
         let Some(key) = row["ride_category"].as_str() else {
@@ -1072,13 +1160,16 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         );
         assert_eq!(rides.get(&item), Some(&price_of(row)), "ride {item} price");
     }
-    assert_eq!(tagged, 81, "every listed ride names its final-era type");
+    assert_eq!(
+        tagged, 82,
+        "every listed ride and the T528 saddle name their final-era type"
+    );
     assert_eq!(
         rows.iter()
             .filter(|row| row["ride_category"].is_string())
             .count(),
-        89,
-        "every shipped ride row names its final-era type, earn-only ones included"
+        90,
+        "every shipped ride row and the T528 saddle name their final-era type, earn-only ones included"
     );
     assert_eq!(
         listed_under(RIDE_CATEGORIES[0].1).get(&(RIDE_ITEM as u32)),

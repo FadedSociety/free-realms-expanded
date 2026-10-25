@@ -69,6 +69,9 @@ pub const UPDATE_ACTION_BAR_SLOT_SUB: u16 = 25;
 pub const ADD_EFFECT_TAG_SUB: u16 = 16;
 /// Recovered `ClientUpdatePacketRemoveEffectTag`; the buff/effect-tag binding is unrecovered.
 pub const REMOVE_EFFECT_TAG_SUB: u16 = 17;
+/// Recovered `ClientUpdatePacketImmediateActivationCheck` (native `0089ea30`, handler `00a1a7d0`
+/// raises `InventoryHandler:OnIsItemUsable`).
+pub const IMMEDIATE_ACTIVATION_CHECK_SUB: u16 = 30;
 
 /// Recovered item action bar id used by the dock's consumable calls.
 pub const ITEM_ACTION_BAR_ID: i32 = 2;
@@ -372,6 +375,34 @@ pub fn decode_immediate_activation(bytes: &[u8]) -> Option<(ImmediateActivation,
         kind,
         i32::from_le_bytes([bytes[4], bytes[5], bytes[6], bytes[7]]),
     ))
+}
+
+/// Encode the recovered 25-byte 38/30 `ClientUpdatePacketImmediateActivationCheck`: the instance
+/// id, a marketplace category and bundle (read only when `success` is clear), the dialog's title
+/// and body string ids, then the success flag. Success makes Okay send 42/15 for this instance;
+/// failure routes Okay to the bundle instead.
+pub fn encode_immediate_activation_check(
+    instance_id: i32,
+    category_id: i32,
+    bundle_id: i32,
+    title_string_id: i32,
+    body_string_id: i32,
+    success: bool,
+) -> Vec<u8> {
+    let mut bytes = Vec::with_capacity(25);
+    bytes.extend_from_slice(&CLIENT_UPDATE_MAIN.to_le_bytes());
+    bytes.extend_from_slice(&IMMEDIATE_ACTIVATION_CHECK_SUB.to_le_bytes());
+    for value in [
+        instance_id,
+        category_id,
+        bundle_id,
+        title_string_id,
+        body_string_id,
+    ] {
+        bytes.extend_from_slice(&value.to_le_bytes());
+    }
+    bytes.push(u8::from(success));
+    bytes
 }
 
 /// Decode the recovered 8-byte 36/1 failure and return its localized string id.

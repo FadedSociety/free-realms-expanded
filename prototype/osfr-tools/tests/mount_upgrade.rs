@@ -488,6 +488,172 @@ fn the_upgrade_request_is_a_row_and_an_item() {
     }
 }
 
+/// The saddle's own catalogue name and description ids (round70 `item-catalogue.json` row 79150,
+/// bytes 4 and 8; the locale text is "Training Saddle of Gliding" and the "Use this saddle to
+/// permanently teach..." line).
+const SADDLE_NAME_ID: i32 = 441_011;
+const SADDLE_DESCRIPTION_ID: i32 = 441_012;
+
+/// 42/16 (`00c109f0`, bound to `EquipScreen.CheckImmediateActivationItem`) and 42/15
+/// (`00c10940`, `UseImmediateActivationItem`): the header and one i32 instance id. The client's
+/// inventory `useItem` event sends 42/16 first and 42/15 only after the server's 38/30 success
+/// dialog is accepted (`ScriptsBase.lua:24093-24135`).
+fn check_item(instance: i32) -> Vec<u8> {
+    [vec![42, 0, 16, 0], instance.to_le_bytes().to_vec()].concat()
+}
+
+fn use_item(instance: i32) -> Vec<u8> {
+    [vec![42, 0, 15, 0], instance.to_le_bytes().to_vec()].concat()
+}
+
+/// Reader-faithful 36/17 `AbilityPacketExecuteClientLua` (`00a30060`): the 4-byte header, an i32
+/// byte length and the function name, then three f32 that the dispatcher (`00a367ea`) pushes to
+/// Lua as arguments 0, 1 and 2. `None` when any length or the tail does not match.
+fn execute_client_lua(packet: &[u8]) -> Option<(String, [f32; 3])> {
+    if packet.get(..4)? != [36, 0, 17, 0] {
+        return None;
+    }
+    let length = usize::try_from(i32::from_le_bytes(packet.get(4..8)?.try_into().ok()?)).ok()?;
+    let end = 8usize.checked_add(length)?;
+    let name = String::from_utf8(packet.get(8..end)?.to_vec()).ok()?;
+    let at = end;
+    let number = |offset: usize| -> Option<f32> {
+        Some(f32::from_le_bytes(
+            packet.get(offset..offset + 4)?.try_into().ok()?,
+        ))
+    };
+    let args = [number(at)?, number(at + 4)?, number(at + 8)?];
+    (packet.len() == at + 12).then_some((name, args))
+}
+
+fn check_reply(out: &Outcome) -> Option<&Vec<u8>> {
+    out.replies
+        .iter()
+        .find(|packet| packet.starts_with(&[38, 0, 30, 0]))
+}
+
+/// T528: the saddle is not a bar item, so using it answers with 36/17 and opens the client's own
+/// picker (`BrowserV2:ShowUpgradableMounts`, `ScriptsBase.lua:34655`) on the item definition id.
+#[test]
+fn using_a_saddle_opens_the_upgrade_picker() {
+    // Canary: change `mounts::UPGRADE_PICKER_LUA` to the dot form and the name assertion fails.
+    let mut game = game_with(&[(SADDLE, SADDLE_ROW, 1)]);
+    let before_state = game.state();
+    let before_inventory = game.inventory_state().clone();
+
+    // 42/16: the client's confirmation dialog carries the saddle's own name and description.
+    let checked = game
+        .handle_in_world(&check_item(SADDLE_ROW), &who(), NOW)
+        .unwrap();
+    let packet = check_reply(&checked).expect("the 38/30 check reply");
+    assert_eq!(packet.len(), 25);
+    let word = |at: usize| i32::from_le_bytes(packet[at..at + 4].try_into().unwrap());
+    assert_eq!(word(4), SADDLE_ROW, "the instance the Okay button uses");
+    assert_eq!(word(16), SADDLE_NAME_ID, "the saddle's name");
+    assert_eq!(word(20), SADDLE_DESCRIPTION_ID, "the saddle's description");
+    assert_eq!(packet[24], 1, "success: Okay sends 42/15");
+    assert!(!checked.changed && checked.nearby.is_empty());
+    assert_eq!(game.state(), before_state, "a check consumes nothing");
+
+    // 42/15: exactly one 36/17 to the owner, nothing to observers.
+    let used = game
+        .handle_in_world(&use_item(SADDLE_ROW), &who(), NOW + 1)
+        .unwrap();
+    assert_eq!(used.replies.len(), 1, "one packet for the owner");
+    assert!(used.nearby.is_empty(), "the picker goes only to the owner");
+    let (name, args) = execute_client_lua(&used.replies[0]).expect("a well-formed 36/17");
+    assert_eq!(name, "BrowserV2:ShowUpgradableMounts");
+    assert_eq!(args, [79_150.0, 0.0, 0.0], "the item definition id first");
+    assert!(!used.changed);
+    assert_eq!(
+        game.state(),
+        before_state,
+        "using the saddle consumes nothing"
+    );
+    assert_eq!(game.inventory_state(), &before_inventory);
+
+    // The picker never pends: a repeated use opens it again and still spends nothing.
+    let again = game
+        .handle_in_world(&use_item(SADDLE_ROW), &who(), NOW + 2)
+        .unwrap();
+    assert_eq!(
+        execute_client_lua(&again.replies[0]).map(|(name, _)| name),
+        Some("BrowserV2:ShowUpgradableMounts".to_string())
+    );
+    assert_eq!(game.state(), before_state);
+}
+
+/// T528: an instance the player does not hold, a knocked-out player and a busy one are all
+/// refused with one system-chat line and no packet; nothing changes.
+#[test]
+fn a_saddle_use_is_refused_when_not_owned_or_busy() {
+    // No such instance: the saddle row is not in the bag.
+    let mut game = game_with(&[(SCALED_DRAGON, DRAGON_ROW, 1)]);
+    let before_state = game.state();
+    let before_inventory = game.inventory_state().clone();
+    for request in [check_item(SADDLE_ROW), use_item(SADDLE_ROW)] {
+        let out = game.handle_in_world(&request, &who(), NOW).unwrap();
+        assert!(notice(&out), "a notice");
+        assert_eq!(out.replies.len(), 1, "nothing but the notice");
+        assert!(check_reply(&out).is_none(), "no dialog");
+        assert!(!out.changed);
+        assert_eq!(game.state(), before_state, "state changed");
+        assert_eq!(
+            game.inventory_state(),
+            &before_inventory,
+            "inventory changed"
+        );
+    }
+
+    // Knocked out. A knockout runs no movie, so this request reaches the saddle's own
+    // `ride_restrictions()` gate (`knocked_out` is part of `RideRestrictions::allows`).
+    let mut game = game_with(&[(SADDLE, SADDLE_ROW, 1)]);
+    game.receive_field_damage(u32::MAX, NOW, false).unwrap();
+    let before_state = game.state();
+    let out = game
+        .handle_in_world(&use_item(SADDLE_ROW), &who(), NOW + 10)
+        .unwrap();
+    assert!(notice(&out), "a knocked-out refusal");
+    assert_eq!(out.replies.len(), 1, "nothing but the notice");
+    assert_eq!(
+        game.state(),
+        before_state,
+        "a knockout refusal changed the save"
+    );
+
+    // While gathering: start a real Chef harvest on the shipped mushroom node. The harvesting
+    // movie owns 42/* while it runs, so this refusal is the movie's (also notice-only, no packet).
+    let mut game = game_with_edit(&[(SADDLE, SADDLE_ROW, 1)], |state| {
+        let profiles = state.profiles.as_mut().expect("round70 has job profiles");
+        profiles.unlocked.insert(CHEF);
+        profiles.active = CHEF;
+    });
+    let node = mushroom_node();
+    let at = [node.position[0] + 2.0, node.position[1], node.position[2]];
+    game.handle_in_world(&npc_interact(node.guid), &character_at(at), NOW)
+        .unwrap();
+    assert!(
+        game.state()
+            .harvesting
+            .and_then(|state| state.active)
+            .is_some(),
+        "the gather started"
+    );
+    let before_state = game.state();
+    let before_inventory = game.inventory_state().clone();
+    let out = game
+        .handle_in_world(&use_item(SADDLE_ROW), &who(), NOW + 10)
+        .unwrap();
+    assert!(notice(&out), "a busy refusal");
+    assert_eq!(out.replies.len(), 1, "nothing but the notice");
+    assert_eq!(
+        game.state(),
+        before_state,
+        "a busy refusal changed the save"
+    );
+    assert_eq!(game.inventory_state(), &before_inventory);
+}
+
 #[test]
 fn upgrade_item_data_is_bounded() {
     let bundled: Value = serde_json::from_slice(&fs::read(mounts_json()).unwrap()).unwrap();
