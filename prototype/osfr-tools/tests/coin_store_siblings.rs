@@ -434,6 +434,13 @@ impl Fixture {
             "category_id": 1,
             "category_name_id": 0,
             "category_group_id": 1,
+            // T526: the four ride children, so the gateway emits the child tree.
+            "ride_categories": [
+                {"key":"winged","category_id":2,"category_name_id":5101131,"display_order":10},
+                {"key":"non_winged","category_id":3,"category_name_id":5101134,"display_order":20},
+                {"key":"exotic","category_id":4,"category_name_id":5101132,"display_order":30},
+                {"key":"mechanical","category_id":5,"category_name_id":5101133,"display_order":40}
+            ],
             "sc_price_scale": 1.0,
             "min_price_sc": 1,
             "max_price_sc": 100_000,
@@ -449,7 +456,9 @@ impl Fixture {
                 "member_price_coins": null,
                 "sell_price_coins": null,
                 "no_sale": true,
-                "sc_price": 100
+                "sc_price": 100,
+                // T526: Wolf is a Non-Winged ride, so the bundle lists under child 3.
+                "ride_category": "non_winged"
             }),
             json!({
                 "item_id": 19522,
@@ -1456,6 +1465,21 @@ fn wallet_reply_carries_the_marketplace_handshake_and_the_ride_catalogue() {
         u32::from_le_bytes(store[73..77].try_into().unwrap()),
         SC_RIDE_PRICE,
         "the listed SC price"
+    );
+    // T526: the gateway emits the four ride children, and the bundle names its child's 66/6 group
+    // (`00b3fa00` CategoryGroupId at record offset 110), so Wolf lists under Non-Winged.
+    let tree = market[2];
+    for name_id in [5_101_131u32, 5_101_134, 5_101_132, 5_101_133] {
+        assert!(
+            tree.windows(4)
+                .any(|window| u32::from_le_bytes(window.try_into().unwrap()) == name_id),
+            "66/7 carries the ride child name {name_id}"
+        );
+    }
+    assert_eq!(
+        u32::from_le_bytes(store[150..154].try_into().unwrap()),
+        3,
+        "the bundle's category group is the Non-Winged child"
     );
     assert!(!outcome.state_changed && !outcome.gameplay_changed);
     assert_eq!(

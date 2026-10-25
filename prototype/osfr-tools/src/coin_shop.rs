@@ -121,6 +121,10 @@ struct StoreItem {
     /// T495: listed under the Marketplace's Boombox category instead of Rides.
     #[serde(default)]
     boombox: bool,
+    /// T526: the Marketplace ride sub-category this row lists under. Absent keeps the row under
+    /// the Rides parent; an unknown value is refused by `StoreCatalogue::load`.
+    #[serde(default)]
+    ride_category: Option<station_cash::RideCategory>,
 }
 
 impl StoreCatalogue {
@@ -261,7 +265,8 @@ impl CoinShop {
                     (false, true) => RowKind::Boombox,
                     (false, false) => RowKind::Ride,
                 };
-                item.sc_price.map(|price| (item.item_id, price, kind))
+                item.sc_price
+                    .map(|price| (item.item_id, price, kind, item.ride_category))
             }),
         )?;
         let sc_wallet = Wallet::restore(Some(wallet), sc_catalogue.config());

@@ -19,6 +19,16 @@ const RIDE_ITEM: i32 = 76_856;
 const RIDE_PRICE: u32 = 137;
 const EARN_ONLY_ITEM: i32 = 79_454;
 const STORE: u32 = 1;
+/// T526: the four ride sub-categories: row tag, category id (also its 66/6 group key), client
+/// locale name id and display order. The ids 2-5 are ours (R); the names are the ones Legacy
+/// `StoreBundleCategories.json` gives 266 Winged, 269 Non-Winged, 268 Exotic and 267 Mechanical,
+/// all children of Rides (139).
+const RIDE_CATEGORIES: [(&str, u32, u32, u32); 4] = [
+    ("winged", 2, 5_101_131, 10),
+    ("non_winged", 3, 5_101_134, 20),
+    ("exotic", 4, 5_101_132, 30),
+    ("mechanical", 5, 5_101_133, 40),
+];
 
 fn inventory_content() -> PathBuf {
     std::env::var_os("OSFR_STATION_CASH_CONTENT")
@@ -907,6 +917,8 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     let mut reader = Reader { bytes: tree, at: 4 };
     let mut parents = BTreeMap::new();
     let mut names = BTreeMap::new();
+    let mut counts = BTreeMap::new();
+    let mut orders = BTreeMap::new();
     for _ in 0..reader.u32() {
         reader.u32();
         let id = reader.u32();
@@ -914,8 +926,8 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         reader.string();
         reader.string();
         parents.insert(id, reader.u32());
-        reader.u32();
-        reader.u32();
+        counts.insert(id, reader.u32());
+        orders.insert(id, reader.u32());
     }
     reader.u8();
     assert_eq!(reader.at, tree.len(), "66/7 trailing bytes");
@@ -952,6 +964,14 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
         Some(&0),
         "Boombox is top level, like Rides"
     );
+    // T526: the four ride sub-categories hang under Rides. The parent is record dword 3 (the first
+    // `00b3b080` field), `00b43090` re-keys every node by it, and `0099d7e0` walks the resulting
+    // index, so selecting 139 lists every child's bundles and selecting a child lists only its own.
+    for (key, id, name_id, order) in RIDE_CATEGORIES {
+        assert_eq!(names.get(&id), Some(&name_id), "{key} name");
+        assert_eq!(parents.get(&id), Some(&RIDES), "{key} is a Rides child");
+        assert_eq!(orders.get(&id), Some(&order), "{key} display order");
+    }
     let listed_under = |selected: u32| -> BTreeMap<u32, u32> {
         let under = |mut category: u32| loop {
             if category == selected {
@@ -979,28 +999,109 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     let scale = stores["station_cash"]["sc_price_scale"]
         .as_f64()
         .expect("scale");
+    let rows = stores["items"].as_array().expect("store rows");
+    let listed = |row: &Value| {
+        row["earn_only"].as_bool() != Some(true) && row["boombox"].as_bool() != Some(true)
+    };
+    let price_of =
+        |row: &Value| (row["sc_price"].as_u64().expect("price") as f64 * scale).round() as u32;
     let expected = |boombox: bool| -> BTreeMap<u32, u32> {
-        stores["items"]
-            .as_array()
-            .expect("store rows")
-            .iter()
+        rows.iter()
+            .filter(|row| row["sc_price"].as_u64().is_some())
             .filter(|row| row["earn_only"].as_bool() != Some(true))
             .filter(|row| (row["boombox"].as_bool() == Some(true)) == boombox)
-            .filter_map(|row| {
-                let price = row["sc_price"].as_u64()?;
-                Some((
-                    u32::try_from(row["item_id"].as_i64()?).ok()?,
-                    (price as f64 * scale).round() as u32,
-                ))
-            })
+            .filter_map(|row| Some((u32::try_from(row["item_id"].as_i64()?).ok()?, price_of(row))))
+            .collect()
+    };
+    let expected_category = |key: &str| -> BTreeMap<u32, u32> {
+        rows.iter()
+            .filter(|row| row["sc_price"].as_u64().is_some())
+            .filter(|row| listed(row))
+            .filter(|row| row["ride_category"].as_str() == Some(key))
+            .filter_map(|row| Some((u32::try_from(row["item_id"].as_i64()?).ok()?, price_of(row))))
             .collect()
     };
     let rides = listed_under(RIDES);
     assert_eq!(
         rides,
         expected(false),
-        "Rides lists exactly the shipped non-earn-only, non-boombox rows at their SC prices"
+        "Rides lists every child's non-earn-only, non-boombox row at its SC price"
     );
+    for (key, id, _, _) in RIDE_CATEGORIES {
+        assert_eq!(
+            listed_under(id),
+            expected_category(key),
+            "{key} lists exactly its tagged rows"
+        );
+        assert_eq!(
+            counts.get(&id),
+            Some(&(expected_category(key).len() as u32)),
+            "{key} counts its own bundles"
+        );
+    }
+    // The parent's own group holds only the rows that name no sub-category; the tagged rides reach
+    // it through the child categories above (`0099d7e0` walks descendants).
+    let untagged = rows
+        .iter()
+        .filter(|row| row["sc_price"].as_u64().is_some())
+        .filter(|row| listed(row))
+        .filter(|row| row["ride_category"].is_null())
+        .count();
+    assert_eq!(
+        counts.get(&RIDES),
+        Some(&(untagged as u32)),
+        "the Rides node counts only the rows keyed to Rides itself"
+    );
+    // T526 gate: every listed ride appears under exactly one child, at its scaled price.
+    let mut tagged = 0;
+    for row in rows.iter().filter(|row| listed(row)) {
+        let Some(key) = row["ride_category"].as_str() else {
+            continue;
+        };
+        tagged += 1;
+        let item = u32::try_from(row["item_id"].as_i64().expect("item id")).expect("bounded");
+        let children: Vec<&str> = RIDE_CATEGORIES
+            .iter()
+            .filter(|(_, id, _, _)| listed_under(*id).contains_key(&item))
+            .map(|(key, _, _, _)| *key)
+            .collect();
+        assert_eq!(
+            children,
+            vec![key],
+            "ride {item} lists under exactly one child"
+        );
+        assert_eq!(rides.get(&item), Some(&price_of(row)), "ride {item} price");
+    }
+    assert_eq!(tagged, 81, "every listed ride names its final-era type");
+    assert_eq!(
+        rows.iter()
+            .filter(|row| row["ride_category"].is_string())
+            .count(),
+        89,
+        "every shipped ride row names its final-era type, earn-only ones included"
+    );
+    assert_eq!(
+        listed_under(RIDE_CATEGORIES[0].1).get(&(RIDE_ITEM as u32)),
+        Some(&RIDE_PRICE),
+        "the sample ride is Winged"
+    );
+    // Earn-only rides carry no bundle, so no category can list them.
+    for row in rows
+        .iter()
+        .filter(|row| row["earn_only"].as_bool() == Some(true))
+    {
+        let item = u32::try_from(row["item_id"].as_i64().expect("item id")).expect("bounded");
+        assert!(
+            !decoded.contains_key(&item),
+            "earn-only {item} is a 66/5 bundle"
+        );
+        for (key, id, _, _) in RIDE_CATEGORIES {
+            assert!(
+                !listed_under(id).contains_key(&item),
+                "earn-only {item} is listed under {key}"
+            );
+        }
+    }
     let boomboxes = listed_under(BOOMBOX);
     assert_eq!(
         boomboxes,
@@ -1168,7 +1269,7 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     let packets = station_cash::catalogue_packets(shop.sc_catalogue());
     let config = shop.sc_catalogue().config();
     let listings = shop.sc_catalogue().listings();
-    // T495: Rides, then the Boombox shelf; each is a category, its own group and a bundle count.
+    // T495/T526: Rides and Boombox are top level; the four ride sub-categories hang under Rides.
     let boombox = config
         .boombox_shelf
         .expect("the shipped content has a Boombox shelf");
@@ -1177,12 +1278,20 @@ fn catalogue_navigation_packets_match_the_client_readers() {
             config.category_id,
             config.category_name_id,
             config.category_group_id,
+            0,
+            1,
         ),
         (
             boombox.category_id,
             boombox.category_name_id,
             boombox.category_group_id,
+            0,
+            2,
         ),
+        (2, 5_101_131, 2, config.category_id, 10),
+        (3, 5_101_134, 3, config.category_id, 20),
+        (4, 5_101_132, 4, config.category_id, 30),
+        (5, 5_101_133, 5, config.category_id, 40),
     ];
 
     // 66/7: counted category nodes, then the sorted byte.
@@ -1193,20 +1302,20 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     let mut reader = Reader { bytes: tree, at: 0 };
     assert_eq!(reader.u16(), 66);
     assert_eq!(reader.u16(), 7);
-    assert_eq!(reader.u32(), 2, "two categories");
-    for (order, (category, name, group)) in shelves.iter().enumerate() {
-        assert_eq!(reader.u32(), *category, "category map key");
-        assert_eq!(reader.u32(), *category, "category id");
-        assert_eq!(reader.u32(), *name, "category name id");
+    assert_eq!(reader.u32(), 6, "six categories");
+    for (category, name, group, parent, order) in shelves {
+        assert_eq!(reader.u32(), category, "category map key");
+        assert_eq!(reader.u32(), category, "category id");
+        assert_eq!(reader.u32(), name, "category name id");
         reader.string();
         reader.string();
-        assert_eq!(reader.u32(), 0, "parent id");
+        assert_eq!(reader.u32(), parent, "parent id");
         assert_eq!(
             reader.u32() as usize,
-            listings.iter().filter(|l| l.group == *group).count(),
+            listings.iter().filter(|l| l.group == group).count(),
             "category count"
         );
-        assert_eq!(reader.u32(), order as u32 + 1, "display order");
+        assert_eq!(reader.u32(), order, "display order");
     }
     assert_eq!(reader.u8(), 1, "sorted");
     assert_eq!(reader.at, tree.len(), "66/7 trailing bytes");
@@ -1222,8 +1331,8 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     };
     assert_eq!(reader.u16(), 66);
     assert_eq!(reader.u16(), 6);
-    assert_eq!(reader.u32(), 2, "two category groups");
-    for (category, _, group) in shelves {
+    assert_eq!(reader.u32(), 6, "six category groups");
+    for (category, _, group, _, _) in shelves {
         assert_eq!(reader.u32(), group, "group map key");
         assert_eq!(reader.u32(), group, "group id");
         assert_eq!(reader.u32(), 1, "one category id");
@@ -1436,6 +1545,129 @@ fn bad_boombox_content_is_refused_at_load() {
             "{name} must be refused at load"
         );
     }
+}
+
+/// T526: a ride row's type must be one of the four keys, and a tagged row needs its category
+/// configured. Bad content stops the store at load, never at a sale.
+#[test]
+fn bad_ride_category_content_is_refused_at_load() {
+    shop_after("ride-category-good", |_| {}).expect("the shipped content loads");
+    // The brief's canary, at `StoreCatalogue::load` itself: an unknown type is not a key.
+    let mut stores: Value =
+        serde_json::from_slice(&std::fs::read(stores()).expect("reads")).expect("parses");
+    row_mut(&mut stores, RIDE_ITEM)["ride_category"] = "flying".into();
+    let directory = std::env::temp_dir()
+        .join("op-T526")
+        .join("unknown-category");
+    std::fs::create_dir_all(&directory).expect("temp directory");
+    let path = directory.join("stores.json");
+    std::fs::write(&path, serde_json::to_vec(&stores).expect("serializes")).expect("writes");
+    let loaded = StoreCatalogue::load(&path);
+    std::fs::remove_dir_all(&directory).expect("cleans up");
+    assert!(
+        loaded.is_err(),
+        "ride_category flying must fail StoreCatalogue::load"
+    );
+    type Edit = Box<dyn FnOnce(&mut Value)>;
+    let refused: [(&str, Edit); 3] = [
+        (
+            "category-not-configured",
+            Box::new(|s| s["station_cash"]["ride_categories"] = Value::Array(Vec::new())),
+        ),
+        (
+            "three-categories",
+            Box::new(|s| {
+                s["station_cash"]["ride_categories"]
+                    .as_array_mut()
+                    .expect("children")
+                    .pop();
+            }),
+        ),
+        (
+            "reserved-id",
+            Box::new(|s| s["station_cash"]["ride_categories"][0]["category_id"] = 1.into()),
+        ),
+    ];
+    for (name, edit) in refused {
+        assert!(
+            shop_after(name, edit).is_err(),
+            "{name} must be refused at load"
+        );
+    }
+}
+
+/// T526: a configured child with no bundles is still sent in 66/7 (count 0) and 66/6. The client
+/// recomputes a category's count and deletes a zero-count tree node (`00c402b0` chain, T380), so
+/// an empty child is harmless; its untagged rows list under the Rides parent again.
+#[test]
+fn an_empty_ride_child_is_sent_and_lists_nothing() {
+    let shop = shop_after("empty-winged", |s| {
+        for row in s["items"].as_array_mut().expect("rows") {
+            if row["ride_category"] == "winged" {
+                row.as_object_mut()
+                    .expect("row object")
+                    .remove("ride_category");
+            }
+        }
+    })
+    .expect("content loads");
+    let config = shop.sc_catalogue().config();
+    assert_eq!(
+        shop.sc_catalogue()
+            .listing(RIDE_ITEM as u32)
+            .expect("the sample ride is listed")
+            .group,
+        config.category_group_id,
+        "an untagged row lists under Rides"
+    );
+    assert!(
+        shop.sc_catalogue()
+            .listings()
+            .iter()
+            .all(|listing| listing.group != 2),
+        "no bundle is keyed to the empty Winged child"
+    );
+    let packets = station_cash::catalogue_packets(shop.sc_catalogue());
+    let tree = packets
+        .iter()
+        .find(|packet| packet.starts_with(&[66, 0, 7, 0]))
+        .expect("66/7 category tree");
+    let mut reader = Reader { bytes: tree, at: 4 };
+    let mut counts = BTreeMap::new();
+    for _ in 0..reader.u32() {
+        reader.u32();
+        let id = reader.u32();
+        reader.u32();
+        reader.string();
+        reader.string();
+        reader.u32();
+        counts.insert(id, reader.u32());
+        reader.u32();
+    }
+    reader.u8();
+    assert_eq!(reader.at, tree.len(), "66/7 trailing bytes");
+    assert_eq!(counts.get(&2), Some(&0), "the empty child is sent with 0");
+    let groups = packets
+        .iter()
+        .find(|packet| packet.starts_with(&[66, 0, 6, 0]))
+        .expect("66/6 category groups");
+    let mut reader = Reader {
+        bytes: groups,
+        at: 4,
+    };
+    let mut categories_of = BTreeMap::new();
+    for _ in 0..reader.u32() {
+        let key = reader.u32();
+        reader.u32();
+        let ids: Vec<u32> = (0..reader.u32()).map(|_| reader.u32()).collect();
+        categories_of.insert(key, ids);
+    }
+    assert_eq!(reader.at, groups.len(), "66/6 trailing bytes");
+    assert_eq!(
+        categories_of.get(&2),
+        Some(&vec![2]),
+        "the empty child still has its 66/6 group"
+    );
 }
 
 /// T495: every boombox the store tags is a catalogued client boombox (`boomboxes.json`), none is
