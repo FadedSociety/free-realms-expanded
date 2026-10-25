@@ -643,4 +643,56 @@ mod tests {
         rig.tick(3_000 + DURATION + 50);
         assert!(idled(&rig.drain(near, 3_000 + DURATION + 50)).is_empty());
     }
+
+    /// The base 35/8 `(guid, animation)` pairs a drained batch carries.
+    fn based(messages: &[Vec<u8>]) -> Vec<(u64, i32)> {
+        let inners = messages.iter().filter_map(|m| m.get(7..));
+        let base = inners.filter(|inner| inner.starts_with(&[35, 0, 8, 0]));
+        base.map(|p| {
+            (
+                u64::from_le_bytes(p[4..12].try_into().unwrap()),
+                i32::from_le_bytes(p[12..16].try_into().unwrap()),
+            )
+        })
+        .collect()
+    }
+
+    #[test]
+    fn t494_a_randomizer_rolls_a_model_clip_and_a_model_without_one_stands() {
+        let Some(mut rig) = Rig::new("t494-random", RAINBOW) else {
+            return;
+        };
+        let dancer = rig.viewer_as(2, 6.0, 60); // human_f: has a Rainbow table
+        let standing = rig.viewer_as(3, 8.0, 1941); // the Realms Roll model: no table
+        let owner = rig.press(3_000);
+        // The box, its poof and one of the six colour songs: red..yellow (16448-16453).
+        assert_eq!(subs(&about_box(&owner)), [2, 16, 41]);
+        let song = about_box(&owner)
+            .into_iter()
+            .find(|inner| inner.starts_with(&[35, 0, 41, 0]))
+            .unwrap();
+        let effect = i32::from_le_bytes(song[16..20].try_into().unwrap());
+        assert!((16_448..=16_453).contains(&effect), "{effect}");
+        rig.drain(dancer, 3_000);
+        rig.drain(standing, 3_000);
+        rig.tick(3_050);
+        let rolled = sync_steps(&rig.drain(dancer, 3_050));
+        assert_eq!(rolled.len(), 1, "one single-entry step per dancer");
+        assert_eq!(rolled[0].len(), 1, "{rolled:?}");
+        assert_eq!(rolled[0][0].0, 7_000_000_002);
+        assert!(rolled[0][0].1 > 0, "a client animation id");
+        // The model without a table stands on the row's group (3550) as a base animation, and
+        // is never listed in a 35/63. The owner (default model, no table) stands too.
+        let standing_got = rig.drain(standing, 3_050);
+        assert!(
+            sync_steps(&standing_got)
+                .iter()
+                .flatten()
+                .all(|(guid, _)| *guid != 7_000_000_003)
+        );
+        let bases = based(&standing_got);
+        assert!(bases.contains(&(7_000_000_003, 3_550)), "{bases:?}");
+        assert!(bases.contains(&(1, 3_550)), "the owner stands: {bases:?}");
+        assert!(bases.iter().all(|(_, animation)| *animation == 3_550));
+    }
 }

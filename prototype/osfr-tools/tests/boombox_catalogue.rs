@@ -82,14 +82,16 @@ fn every_model_is_a_client_model() {
                 .into_iter()
                 .filter(|id| *id != 0),
         );
-        // clip_ms is keyed by the dancer's player model.
-        ids.extend(
-            row["clip_ms"]
-                .as_object()
-                .unwrap()
-                .keys()
-                .map(|k| k.parse::<i32>().unwrap()),
-        );
+        // clip_ms and clips are keyed by the dancer's player model.
+        for field in ["clip_ms", "clips"] {
+            ids.extend(
+                row[field]
+                    .as_object()
+                    .into_iter()
+                    .flatten()
+                    .map(|(k, _)| k.parse::<i32>().unwrap()),
+            );
+        }
         for id in ids {
             assert!(
                 models.contains_key(&i64::from(id)),
@@ -140,6 +142,157 @@ fn every_song_is_a_client_effect_definition() {
         }
     }
     assert_eq!(songs, 6, "PFX_music_boombox_red.._yellow (16448-16453)");
+}
+
+/// Every `<AnimationSlot name="..." id="N">` of `AnimationTypes.xml`.
+fn animation_slot_ids() -> std::collections::HashMap<String, i32> {
+    let text = read(&lab(
+        "working/OSFR.Client/OSFR Client/Resources/AnimationTypes.xml",
+    ));
+    text.split("<AnimationSlot")
+        .skip(1)
+        .filter_map(|slot| {
+            let tag = &slot[..slot.find('>')? + 1];
+            let name = tag.split("name=\"").nth(1)?.split('"').next()?.to_string();
+            let at = tag.find(" id=\"")? + 5;
+            let id = tag[at..].split('"').next()?.parse().ok()?;
+            Some((name, id))
+        })
+        .collect()
+}
+
+/// The slot names of one `<AnimationGroup ... id="N">`.
+fn animation_group_slots(group: i32) -> Vec<String> {
+    let text = read(&lab(
+        "working/OSFR.Client/OSFR Client/Resources/AnimationGroups.xml",
+    ));
+    let element = text
+        .split("<AnimationGroup")
+        .skip(1)
+        .find(|element| {
+            element
+                .split('>')
+                .next()
+                .is_some_and(|tag| tag.contains(&format!("id=\"{group}\"")))
+        })
+        .unwrap_or_else(|| panic!("group {group}"));
+    let body = &element[..element.find("</AnimationGroup>").unwrap()];
+    body.split("<AnimationSlot")
+        .skip(1)
+        .filter_map(|slot| {
+            let tag = &slot[..slot.find('>')? + 1];
+            let at = tag.find("name=\"")? + 6;
+            Some(tag[at..].split('"').next()?.to_string())
+        })
+        .collect()
+}
+
+/// The extracted bytes of a client actor definition named in `catalog.tsv`.
+fn actor_definition(catalogue: &str, file: &str) -> Vec<u8> {
+    let relative = catalogue
+        .lines()
+        .find_map(|line| {
+            let fields: Vec<_> = line.split('\t').collect();
+            (fields.get(2).copied() == Some(file)).then(|| *fields.last().unwrap())
+        })
+        .unwrap_or_else(|| panic!("{file} in the extracted asset catalogue"));
+    let path = lab(&format!("extracted/client-assets/{relative}"));
+    fs::read(&path).unwrap_or_else(|error| panic!("{}: {error}", path.display()))
+}
+
+/// Whether `adr` maps `slot` to one of the model's own `_emo_dance_` clips. The actor definition
+/// stores each mapping as `[len]slot\0\x02[len]file\0`; the length counts the trailing NUL.
+fn adr_plays(adr: &[u8], model: &str, slot: &str) -> bool {
+    let needle = format!("{slot}\0\u{2}").into_bytes();
+    let prefix = format!("{model}_emo_dance_").into_bytes();
+    let mut from = 0;
+    while let Some(found) = adr[from..]
+        .windows(needle.len())
+        .position(|window| window == needle)
+    {
+        let rest = &adr[from + found + needle.len()..];
+        if let Some((&length, tail)) = rest.split_first() {
+            let end = usize::from(length).min(tail.len());
+            let name = tail[..end].strip_suffix(&[0]).unwrap_or(&tail[..end]);
+            if name.starts_with(&prefix) && name.ends_with(b".gr2") {
+                return true;
+            }
+        }
+        from += found + 1;
+    }
+    false
+}
+
+/// T494: for each independent row and the four player models, the client data alone rebuilds the
+/// clip set, and it is exactly Sanctuary's measured list with the measured lengths.
+#[test]
+fn the_independent_clip_sets_are_rebuilt_from_the_client() {
+    let ids = animation_slot_ids();
+    let models = models::read_models();
+    let catalogue = read(&lab("extracted/client-assets/catalog.tsv"));
+    let sanctuary: Value = serde_json::from_str(&read(&lab(
+        "references/Sanctuary-main-20261019/src/Resources/Consumables.json",
+    )))
+    .unwrap();
+    let mut independent = 0;
+    for row in rows() {
+        if row["kind"] != "independent" {
+            continue;
+        }
+        independent += 1;
+        let item = int(&row["item_id"]);
+        let slots = animation_group_slots(int(&row["standing_animation_id"]));
+        assert!(slots.len() >= 5, "{item}: the item's dance group has slots");
+        let shaped = row["clips"].as_object().unwrap();
+        assert_eq!(shaped.len(), 4, "{item}: the four player models");
+        let measured = sanctuary["Boomboxes"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|measured| measured["ItemId"] == item)
+            .unwrap_or_else(|| panic!("{item} in Sanctuary's Consumables.json"));
+        for (model, clips) in shaped {
+            let model: i32 = model.parse().unwrap();
+            let name = models[&i64::from(model)]
+                .iter()
+                .find_map(|file| file.strip_suffix(".adr"))
+                .unwrap_or_else(|| panic!("{item}: model {model} has no .adr"));
+            let adr = actor_definition(&catalogue, &format!("{name}.adr"));
+            let mut rebuilt: Vec<i32> = slots
+                .iter()
+                .filter(|slot| adr_plays(&adr, name, slot))
+                .map(|slot| ids[slot])
+                .collect();
+            rebuilt.sort_unstable();
+            let mut ids_shipped = clips
+                .as_array()
+                .unwrap()
+                .iter()
+                .map(|clip| int(&clip["animation_id"]))
+                .collect::<Vec<_>>();
+            ids_shipped.sort_unstable();
+            assert_eq!(ids_shipped, rebuilt, "{item} model {model}: rebuilt ids");
+            let durations = &measured["IndependentDanceDurationsMs"][model.to_string()];
+            let mut want: Vec<i32> = durations
+                .as_object()
+                .unwrap()
+                .keys()
+                .map(|key| key.parse().unwrap())
+                .collect();
+            want.sort_unstable();
+            assert_eq!(rebuilt, want, "{item} model {model}: Sanctuary's list");
+            for clip in clips.as_array().unwrap() {
+                let animation = int(&clip["animation_id"]);
+                let key = animation.to_string();
+                assert_eq!(
+                    durations[key.as_str()].as_u64(),
+                    Some(u64::from(int(&clip["ms"]) as u32)),
+                    "{item} model {model}: clip {animation}"
+                );
+            }
+        }
+    }
+    assert_eq!(independent, 3, "Randomizer, Realmshake and XVD-S");
 }
 
 /// One row of the reference item definitions (W84's item catalogue source).
@@ -214,7 +367,7 @@ fn the_loader_refuses_rows_out_of_bounds_and_a_missing_file_is_empty() {
     let shipped = Catalogue::load(&content()).unwrap();
     assert!(shipped.get(TOTEM).is_some() && shipped.get(CAMPFIRE).is_none());
     assert_eq!(load_with(|_| {}).unwrap(), shipped);
-    let cases: [(&str, fn(&mut Value)); 18] = [
+    let cases: [(&str, fn(&mut Value)); 30] = [
         ("range 0", |f| f["boomboxes"][0]["range_m"] = json!(0)),
         ("range 51", |f| f["boomboxes"][0]["range_m"] = json!(51)),
         ("spawn offset 11", |f| {
@@ -263,6 +416,46 @@ fn the_loader_refuses_rows_out_of_bounds_and_a_missing_file_is_empty() {
         }),
         ("over 256 KiB", |f| {
             f["boomboxes"][0]["source"][0]["evidence"] = json!("x".repeat(256 * 1024));
+        }),
+        ("independent without clips", |f| {
+            f["boomboxes"][2]["clips"] = json!({})
+        }),
+        ("independent without the field", |f| {
+            f["boomboxes"][2].as_object_mut().unwrap().remove("clips");
+        }),
+        ("clips on a synchronized row", |f| {
+            f["boomboxes"][0]["clips"] = f["boomboxes"][2]["clips"].clone()
+        }),
+        ("clip ms 0", |f| {
+            f["boomboxes"][2]["clips"]["1"][0]["ms"] = json!(0)
+        }),
+        ("clip ms 600001", |f| {
+            f["boomboxes"][2]["clips"]["1"][0]["ms"] = json!(600_001)
+        }),
+        ("clip animation 0", |f| {
+            f["boomboxes"][2]["clips"]["1"][0]["animation_id"] = json!(0)
+        }),
+        ("duplicate clip id", |f| {
+            let first = f["boomboxes"][2]["clips"]["1"][0]["animation_id"].clone();
+            f["boomboxes"][2]["clips"]["1"][1]["animation_id"] = first;
+        }),
+        ("empty clip table", |f| {
+            f["boomboxes"][2]["clips"]["1"] = json!([])
+        }),
+        ("clip model 0", |f| {
+            f["boomboxes"][2]["clips"]["0"] = f["boomboxes"][2]["clips"]["1"].clone()
+        }),
+        ("independent standing 0", |f| {
+            f["boomboxes"][2]["standing_animation_id"] = json!(0)
+        }),
+        ("unknown clip field", |f| {
+            f["boomboxes"][2]["clips"]["1"][0]["loop"] = json!(true)
+        }),
+        ("257 clips", |f| {
+            let clips: Vec<Value> = (1..=257)
+                .map(|id| json!({"animation_id": id, "ms": 1_000}))
+                .collect();
+            f["boomboxes"][2]["clips"]["1"] = Value::Array(clips);
         }),
     ];
     for (why, edit) in cases {
