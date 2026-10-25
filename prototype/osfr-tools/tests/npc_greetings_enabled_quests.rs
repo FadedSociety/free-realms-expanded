@@ -324,8 +324,24 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Postmaster Lane: the split Trail of Mail intro 141828 is quoted by the Postman guide under Enve LeStamp's earlier Sasparilla row, so the speaker is contested; no uncontested first-person line exists.",
     ),
     (
+        9000000191,
+        "Sasparilla Brewmaster Wugawump (T502 turn-in of 3000400): NPCs - Wugachug.md:38 quotes only the third-person brewery and party talk (1459611394, 3773925023) and the referral to him; his first-person lines are the Join the Party intro 385978 (he is not that quest's giver) and the end text 385981, which is the quest-step dialogue of 3000400 goal 1, so no uncontested greeting is proven.",
+    ),
+    (
         9000000227,
         "Valerie: only third-person tutorial and objective text; the untied Welcome window 3453817544 is not attributed to her, so no first-person line is recovered.",
+    ),
+    (
+        9500000209,
+        "Sergeant Cargug (T502 turn-in of 3000392): NPCs - Briarwood.md:148 quotes only third-person role and Nettleseed location text (3637816292, 1789311537); 36445 is the objective and 390591 is the end text of 3000392 goal 1, so no first-person line that is not a quest step exists.",
+    ),
+    (
+        9500000213,
+        "Smoggo (T502 giver of 3000392): NPCs - Briarwood.md:114 quotes only a deep-Briarwood location and the new-camp line (3534154508) and 307 names 'Briarwood's Not So Bad' in a title-only row with no giver, so a QuestOffer proof for his intro 390588 cannot be made; 387480 is the objective and 390261 is the end text of 3000391 goal 1.",
+    ),
+    (
+        9500000288,
+        "Blorple (T502 giver of 3000390): NPCs - Merry Vale.md:169 names him as the giver of Misplaced Mugwopp but quotes only the third-person referral 2817473271; NPCs - Greenwood Forest.md:63 quotes only a location (2490543637, 3536286642). His first-person intro 46210 is a QuestOffer candidate, but npc_greetings_job_hubs.rs pins every unlisted greenwood_forest.json row unbound; 46618 is the objective and 46252 is the end text of 3000390 goal 1.",
     ),
     (
         9500000289,
@@ -372,6 +388,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Yancy Gilbert (T466 giver of 3000360): NPCs - Seaside.md:106 quotes only third-person novel and flyer objectives (101401, 101410, 100067) and the player's line 101415; his first-person lines are the Feminine Touch intro 101408 and end text 101411. A QuestOffer proof could bind 101408, but tests/npc_greetings_seaside_briarwood.rs and notes/Autopilot/T317.md pin his Seaside row unbound.",
     ),
     (
+        9500000690,
+        "Headmaster Merk (T502 turn-in of 3000380): NPCs - Shrouded Glade.md:122 quotes the third-person academy role and 203 names him only as Aiding our Allies' hand-in; 440471 is the objective and 440468 is the end text of 3000380 goal 1. The intro 440465 is Camellia's, and he gives no enabled quest, so no first-person greeting of his own is proven.",
+    ),
+    (
         9500000697,
         "Kosha: only the objective string 1664864679; no recovered first-person speech.",
     ),
@@ -414,6 +434,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
     (
         9500000965,
         "Zinnea Magnolio (T498 talk target of 3000332): NPCs - Wilds.md:72 quotes only third-person flower objectives (331882309, 4075335134) and a suspect line (2063005555); her reply 389967 is the quest-step dialogue of 3000332 goal 1, not a greeting.",
+    ),
+    (
+        9500000967,
+        "Boranug (T502 giver of 3000400): NPCs - Wugachug.md:36 quotes only the third-person greeter role and the contest score (401856720), and 148 names 'Welcome to Wugachug!', not this quest; the Join the Party title appears in no guide page, so the QuestOffer proof for his intro 385978 cannot be made. 385984 is the objective; no other first-person line of his is recovered.",
     ),
     (
         9500001007,

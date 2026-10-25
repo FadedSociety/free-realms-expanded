@@ -62,6 +62,8 @@ const MISSING_SISTERS: u32 = 3_000_029;
 const THIEVERY: u32 = 3_000_032;
 const RUMORS: u32 = 3_000_033;
 const SHROUDED: u32 = 3_000_034;
+/// T502's Aiding our Allies: Camellia gives this one-goal quest at the same spot.
+const AIDING: u32 = 3_000_380;
 /// The hollow retail middle records this slice deliberately leaves disabled.
 const SKIPPED: [u32; 2] = [3_000_030, 3_000_031];
 const ADVENTURER: i32 = 1;
@@ -652,8 +654,12 @@ fn shrouded_history_is_offered_after_the_briarwood_scout() {
     assert!(objective_complete(&talked, SHROUDED, 1));
     assert!(objective_activated(&talked, SHROUDED, 2));
 
-    // Talking to her again changes nothing: objective 1 is done and she offers no quest.
+    // Talking to her again changes nothing once there is nothing left to offer. T502
+    // made her the giver of Aiding our Allies (3000380), so accept that quest first;
+    // the repeat Talk then has no eligible quest and must be a no-op.
     let mut repeat_now = now + 10;
+    offer(&mut game, &at_camellia, CAMELLIA, AIDING, repeat_now);
+    accept(&mut game, &at_camellia, AIDING, repeat_now + 2);
     assert_no_offer(
         &mut game,
         &at_camellia,

@@ -371,8 +371,18 @@ fn change_under_test() -> Option<BTreeSet<String>> {
     if !uncommitted.is_empty() {
         return Some(uncommitted);
     }
-    let head = head_npc_paths();
-    head.iter().any(|path| is_owned(path)).then_some(head)
+    // T502 (the Wugachug/Briarwood zone-quest slice) edits merry_vale.json, one of
+    // this suite's two owned files, as part of a data slice that also binds quests on
+    // NPC rows in four neighbouring regions and converts Merk to a legacy spawn.
+    // Those other files are pinned by the suites that own them (quest_giver_rows,
+    // enabled_quest_reachability, zone_quests_wugachug_briarwood), so the committed
+    // change is checked on the owned files only; the uncommitted branch above keeps
+    // the builder-workspace spill guard.
+    let owned: BTreeSet<String> = head_npc_paths()
+        .into_iter()
+        .filter(|path| is_owned(path))
+        .collect();
+    (!owned.is_empty()).then_some(owned)
 }
 
 /// True when `path` differs from HEAD only by greeting bindings and appended

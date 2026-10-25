@@ -1,0 +1,289 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3000380,
+      "title_string_id": 440466,
+      "intro_text_string_id": 440465,
+      "description_string_id": 440467,
+      "end_text_string_id": 440468,
+      "giver_npc_id": 9500000650,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000690,
+          "text_string_id": 440471,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3080 goal 1: NameId 440471 (no DescriptionId); TargetGuid 100000003841 = definition 3841 (Headmaster Merk, NameId 45386, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:2325), bound to npcs/shrouded_glade.json 9500000690 at the same spawn; the last goal at the turn-in NPC: its DialogueId 440468 is the quest's end_text_string_id."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 50,
+          "items": [],
+          "job_xp": {
+            "1": 15
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3080: RewardCoins 50, RewardItems []. Its RewardExperience 120 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 15 goes to profile 1 (Adventurer) on the T202 ladder (one goal)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3080 \"Aiding our Allies\" (quest data last changed in 1c36ad7): TitleId 440466, DescriptionId 440467, GiverDialogueId 440465, ObjectiveDescriptionId 440470, GiverGuid 100000001454 (Arch Druid Camellia), TargetGuid 100000003841 (Headmaster Merk), PrerequisiteQuestId 0, NextQuestId 0. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 440466 \"Aiding our Allies\" (title), 440467 (description), 440465 (intro) and 440468 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T502: minted id 3000380 = 3000300 + (fork QuestId 3080 - 3000); XP rung 15 (one goal); coin value 50 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000390,
+      "title_string_id": 46211,
+      "intro_text_string_id": 46210,
+      "description_string_id": 46212,
+      "end_text_string_id": 46252,
+      "giver_npc_id": 9500000288,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000410,
+          "text_string_id": 46618,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3090 goal 1: NameId 46618, DescriptionId 117225; TargetGuid 100000002301 = definition 2301 (Mugwopp, NameId 46207, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:924), bound to npcs/merry_vale.json 9500000410 at the same spawn; the last goal at the turn-in NPC: its DialogueId 46252 is the quest's end_text_string_id."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {
+            "1": 15
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3090: RewardCoins 15, RewardItems []. Its RewardExperience 60 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 15 goes to profile 1 (Adventurer) on the T202 ladder (one goal)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3090 \"Misplaced Mugwopp\" (quest data last changed in 1c36ad7): TitleId 46211, DescriptionId 46212, GiverDialogueId 46210, ObjectiveDescriptionId 117225, GiverGuid 100000003463 (Blorple), TargetGuid 100000002301 (Mugwopp), PrerequisiteQuestId 0, NextQuestId 3091. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 46211 \"Misplaced Mugwopp\" (title), 46212 (description), 46210 (intro) and 46252 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T502: minted id 3000390 = 3000300 + (fork QuestId 3090 - 3000); XP rung 15 (one goal); coin value 15 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000391,
+      "title_string_id": 390259,
+      "intro_text_string_id": 390258,
+      "description_string_id": 390260,
+      "end_text_string_id": 390261,
+      "giver_npc_id": 9500000410,
+      "prerequisite_quest_ids": [
+        3000390
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000213,
+          "text_string_id": 387480,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3091 goal 1: NameId 387480, DescriptionId 390279; TargetGuid 100000002741 = definition 2741 (Smoggo, NameId 73505, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1321), bound to npcs/briarwood.json 9500000213 at the same spawn; the last goal at the turn-in NPC: its DialogueId 390261 is the quest's end_text_string_id."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 2,
+          "items": [],
+          "job_xp": {
+            "1": 15
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3091: RewardCoins 2, RewardItems []. Its RewardExperience 60 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 15 goes to profile 1 (Adventurer) on the T202 ladder (one goal)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3091 \"How Bad is it?\" (quest data last changed in 1c36ad7): TitleId 390259, DescriptionId 390260, GiverDialogueId 390258, ObjectiveDescriptionId 390277, GiverGuid 100000002301 (Mugwopp), TargetGuid 100000002741 (Smoggo), PrerequisiteQuestId 3090, NextQuestId 3092. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 390259 \"How Bad is it?\" (title), 390260 (description), 390258 (intro) and 390261 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T502: minted id 3000391 = 3000300 + (fork QuestId 3091 - 3000); XP rung 15 (one goal); coin value 2 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000392,
+      "title_string_id": 390589,
+      "intro_text_string_id": 390588,
+      "description_string_id": 390590,
+      "end_text_string_id": 390591,
+      "giver_npc_id": 9500000213,
+      "prerequisite_quest_ids": [
+        3000391
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000209,
+          "text_string_id": 36445,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3092 goal 1: NameId 36445, DescriptionId 390602; TargetGuid 100000002799 = definition 2799 (Sergeant Cargug, NameId 10297, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1379), bound to npcs/briarwood.json 9500000209 at the same spawn; the last goal at the turn-in NPC: its DialogueId 390591 is the quest's end_text_string_id."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 2,
+          "items": [],
+          "job_xp": {
+            "1": 30
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3092: RewardCoins 2, RewardItems []. Its RewardExperience 60 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 30 goes to profile 1 (Adventurer) on the T202 ladder (one goal, the last quest of a three-quest chain)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3092 \"Briarwood's Not So Bad\" (quest data last changed in 1c36ad7): TitleId 390589, DescriptionId 390590, GiverDialogueId 390588, ObjectiveDescriptionId 390604, GiverGuid 100000002741 (Smoggo), TargetGuid 100000002799 (Sergeant Cargug), PrerequisiteQuestId 3091, NextQuestId 0. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 390589 \"Briarwood's Not So Bad\" (title), 390590 (description), 390588 (intro) and 390591 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T502: minted id 3000392 = 3000300 + (fork QuestId 3092 - 3000); XP rung 30 (one goal, the last quest of a three-quest chain); coin value 2 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000400,
+      "title_string_id": 385979,
+      "intro_text_string_id": 385978,
+      "description_string_id": 385980,
+      "end_text_string_id": 385981,
+      "giver_npc_id": 9500000967,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000191,
+          "text_string_id": 385984,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3100 goal 1: NameId 385984, DescriptionId 385983; TargetGuid 100000001661 = definition 1661 (Sasparilla Brewmaster Wugawump, NameId 41237, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:409), bound to npcs/wugachug.json 9000000191 at the same spawn; the last goal at the turn-in NPC: its DialogueId 385981 is the quest's end_text_string_id."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 4,
+          "items": [],
+          "job_xp": {
+            "1": 15
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3100: RewardCoins 4, RewardItems []. Its RewardExperience 50 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 15 goes to profile 1 (Adventurer) on the T202 ladder (one goal)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3100 \"Join the Party\" (quest data last changed in 1c36ad7): TitleId 385979, DescriptionId 385980, GiverDialogueId 385978, ObjectiveDescriptionId 385983, GiverGuid 100000001611 (Boranug), TargetGuid 100000001661 (Sasparilla Brewmaster Wugawump), PrerequisiteQuestId 0, NextQuestId 3101. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 385979 \"Join the Party\" (title), 385980 (description), 385978 (intro) and 385981 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T502: minted id 3000400 = 3000300 + (fork QuestId 3100 - 3000); XP rung 15 (one goal); coin value 4 is the fork's RewardCoins."
+        }
+      ]
+    }
+  ]
+}
