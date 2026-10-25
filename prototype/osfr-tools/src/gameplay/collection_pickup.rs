@@ -89,6 +89,21 @@ pub(super) fn load(
     Ok(Some(Arc::new(CollectionWorld { catalogue, coins })))
 }
 
+/// Log a refused collection reward once, naming the entry that failed: the clicked source entry,
+/// or (T522) the meta entry refused after the source's reward already succeeded.
+fn log_refused_entry(entry: i32, error: &io::Error) {
+    if let Some(failure) = error
+        .get_ref()
+        .and_then(|error| error.downcast_ref::<GrantFailure>())
+    {
+        npc_event(serde_json::json!({
+            "event": "collection_reward_refused",
+            "entry": entry,
+            "reason": failure.to_string(),
+        }));
+    }
+}
+
 impl Gameplay {
     /// A 26/8 click on an exploration coin. `None` for any other target, which keeps its NPC
     /// route. Refusals change nothing; only a pickup marks the save changed.
@@ -150,16 +165,15 @@ impl Gameplay {
             else {
                 return Err(error);
             };
-            npc_event(serde_json::json!({
-                "event": "collection_reward_refused",
-                "entry": coin.entry_id,
-                "reason": failure.to_string(),
+            // A source reward can set `changed` before a later meta entry is refused; the clone
+            // was discarded, so the refusal carries none of the staged outcome.
+            return Ok(Some(Outcome {
+                replies: vec![chat::system(match failure {
+                    GrantFailure::BagFull => "Your bag is full. Make room before collecting that.",
+                    _ => "You cannot collect that right now.",
+                })],
+                ..Outcome::default()
             }));
-            out.replies = vec![chat::system(match failure {
-                GrantFailure::BagFull => "Your bag is full. Make room before collecting that.",
-                _ => "You cannot collect that right now.",
-            })];
-            return Ok(Some(out));
         }
         if let Some(visibility) = staged.npc_visibility.as_mut() {
             visibility.remove(guid); // the next visibility update sends its 35/3
@@ -181,14 +195,20 @@ impl Gameplay {
         player_guid: u64,
         out: &mut Outcome,
     ) -> io::Result<()> {
-        let Some(collection_id) = self.collect_entry(
+        let collection_id = match self.collect_entry(
             world,
             entry_id,
             CollectionEventOrigin::ExplorationCoin,
             player_guid,
             out,
-        )?
-        else {
+        ) {
+            Ok(collection_id) => collection_id,
+            Err(error) => {
+                log_refused_entry(entry_id, &error);
+                return Err(error);
+            }
+        };
+        let Some(collection_id) = collection_id else {
             return Ok(());
         };
         // One level only: the load drops a pair whose source is another pair's target, and a
@@ -196,13 +216,16 @@ impl Gameplay {
         let Some(meta_entry) = world.catalogue.meta_entry(collection_id) else {
             return Ok(());
         };
-        self.collect_entry(
+        if let Err(error) = self.collect_entry(
             world,
             meta_entry,
             CollectionEventOrigin::CollectionBundleEntry,
             player_guid,
             out,
-        )?;
+        ) {
+            log_refused_entry(meta_entry, &error);
+            return Err(error);
+        }
         Ok(())
     }
 

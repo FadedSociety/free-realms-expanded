@@ -170,12 +170,17 @@ fn invalid(message: String) -> io::Error {
 /// T entry (equal `name_id` first, else equal `icon_id`; the icon rule is (R), no 309 source
 /// matches a 309 name) and no two sources name the same entry, so the map is one-to-one. Pairs
 /// whose source is itself a target are then dropped until stable, so a completion cascade stays
-/// within two levels and cannot loop.
-fn meta_map(collections: &[Collection]) -> BTreeMap<i32, i32> {
+/// within two levels and cannot loop. Repeated rows for the same target count their source once;
+/// a source that still names two accepted targets is refused, because only one meta entry is
+/// recorded per completion and keeping the last pair would silently drop the other.
+fn meta_map(collections: &[Collection]) -> io::Result<BTreeMap<i32, i32>> {
     let mut sources: BTreeMap<i32, Vec<&Collection>> = BTreeMap::new();
     for collection in collections {
+        let mut targets = BTreeSet::new();
         for target in &collection.reward.collection_add {
-            sources.entry(*target).or_default().push(collection);
+            if targets.insert(*target) {
+                sources.entry(*target).or_default().push(collection);
+            }
         }
     }
     let by_id: BTreeMap<i32, &Collection> = collections
@@ -230,10 +235,18 @@ fn meta_map(collections: &[Collection]) -> BTreeMap<i32, i32> {
             break;
         }
     }
-    pairs
+    let mut accepted = BTreeSet::new();
+    for (source, _, _) in &pairs {
+        if !accepted.insert(*source) {
+            return Err(invalid(format!(
+                "collection {source}: collection_add names more than one accepted target"
+            )));
+        }
+    }
+    Ok(pairs
         .into_iter()
         .map(|(source, _, entry)| (source, entry))
-        .collect()
+        .collect())
 }
 
 impl CollectionCatalogueContent {
@@ -294,7 +307,7 @@ impl CollectionCatalogueContent {
                 })
                 .map_err(|error| refuse(error.to_string()))?;
         }
-        let meta = meta_map(&file.collections);
+        let meta = meta_map(&file.collections)?;
         Ok(Some(Self {
             collections: file.collections,
             catalogue,
@@ -326,12 +339,13 @@ impl CollectionCatalogueContent {
     }
 
     /// What finishing `collection_id` pays (T480): the captured coins, each reward item fitted to
-    /// `gender`, and job XP for the profiles in `unlocked`. Tokens, `collection_add` and
-    /// `quest_add` tails are never paid, since what they do is unknown (R). A girl (2) gets the
-    /// listed girls' id where there is one, else the captured item (R); gender 0 gets the captured
-    /// item (R). An item `item_known` does not accept is skipped so it cannot refuse the rest, and
-    /// so is XP for a locked profile, which the reward applier would refuse whole (R). Unknown
-    /// collection: the empty grant.
+    /// `gender`, and job XP for the profiles in `unlocked`. Tokens and `quest_add` tails are never
+    /// paid, since what they do is unknown (R). `collection_add` is not paid either; (R) it drives
+    /// the T522 meta map, where completing the source records the target entry it names. A girl
+    /// (2) gets the listed girls' id where there is one, else the captured item (R); gender 0 gets
+    /// the captured item (R). An item `item_known` does not accept is skipped so it cannot refuse
+    /// the rest, and so is XP for a locked profile, which the reward applier would refuse whole
+    /// (R). Unknown collection: the empty grant.
     pub fn completion_grant(
         &self,
         collection_id: i32,

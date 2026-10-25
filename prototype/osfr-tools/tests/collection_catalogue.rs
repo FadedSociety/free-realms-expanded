@@ -333,6 +333,58 @@ fn meta_map_drops_a_chain_whose_source_is_another_target() {
     assert_eq!(content.meta_entry(309), None);
 }
 
+/// T522/F694: a repeated `collection_add` row names the same target once, while a source naming
+/// two different targets cannot map to the one entry a completion records and is refused.
+#[test]
+fn meta_map_dedupes_repeats_and_refuses_two_targets() {
+    let mut repeated: Value = serde_json::from_str(&committed_text()).unwrap();
+    repeated["collections"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|collection| collection["id"] == 284)
+        .unwrap()["reward"]["collection_add"] = json!([309, 309]);
+    let text = serde_json::to_string(&repeated).unwrap();
+    let content = load_text("meta-repeat", Some(&text))
+        .unwrap()
+        .expect("the repeated row still loads");
+    assert_eq!(content.meta_pairs().len(), 14);
+    assert_eq!(content.meta_entry(284), Some(2170));
+
+    // A second target 10000 that the old map would also accept: one entry named like 284.
+    let mut ambiguous: Value = serde_json::from_str(&committed_text()).unwrap();
+    let collections = ambiguous["collections"].as_array_mut().unwrap();
+    let mut target = collections
+        .iter()
+        .find(|collection| collection["id"] == 309)
+        .cloned()
+        .expect("309");
+    target["id"] = json!(10_000);
+    target["name_id"] = json!(419_999);
+    target["entries"] = json!([{
+        "id": 21_000, "index": 1, "name_id": 4404, "icon_id": 9999,
+        "icon_tint_id": 0, "item_definition_id": null, "item_link": null
+    }]);
+    target["reward"] = json!({
+        "coins": 0, "items": [], "xp": [], "tokens": [], "collection_add": [], "quest_add": []
+    });
+    collections.push(target);
+    collections
+        .iter_mut()
+        .find(|collection| collection["id"] == 284)
+        .unwrap()["reward"]["collection_add"] = json!([309, 10_000]);
+    let text = serde_json::to_string(&ambiguous).unwrap();
+    let error = load_text("meta-two-targets", Some(&text))
+        .err()
+        .expect("two targets are refused");
+    assert!(
+        error
+            .to_string()
+            .contains("collection 284: collection_add names more than one accepted target"),
+        "{error}"
+    );
+}
+
 // Generator: the join inputs are AGPL data rows from pinned reference checkouts (no code copied).
 const LEGACY_ITEMS: (&str, &str) = (
     "FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json",

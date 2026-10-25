@@ -58,6 +58,15 @@ impl Fixture {
     /// The opening package, plus (when `tune` is given) the bundled NPC content with the catalogue
     /// rewritten by `tune`.
     fn new(tune: Option<&dyn Fn(&mut Value)>) -> Self {
+        Self::build(tune, tune.is_some())
+    }
+
+    /// The opening package plus the bundled NPC content and catalogue, untouched.
+    fn bundled() -> Self {
+        Self::build(None, true)
+    }
+
+    fn build(tune: Option<&dyn Fn(&mut Value)>, bundled_content: bool) -> Self {
         let dir = std::env::temp_dir().join(format!(
             "osfr-collection-rewards-{}-{}",
             std::process::id(),
@@ -76,7 +85,7 @@ impl Fixture {
         items
             .extend((70341u32..=ELITE_BACKPACK as u32).map(|id| item_catalogue::sized_row(id, 64)));
         item_catalogue::write(&dir, &items);
-        if let Some(tune) = tune {
+        if bundled_content {
             content_copy::copy_tree(&bundled().join("npcs"), &dir.join("npcs"));
             for file in [
                 "npc_spawns_extra.json",
@@ -91,10 +100,12 @@ impl Fixture {
                 dir.join("collection_catalogue.json"),
             )
             .unwrap();
-            let path = dir.join("collection_catalogue.json");
-            let mut catalogue = json(&path);
-            tune(&mut catalogue);
-            fs::write(&path, serde_json::to_vec(&catalogue).unwrap()).unwrap();
+            if let Some(tune) = tune {
+                let path = dir.join("collection_catalogue.json");
+                let mut catalogue = json(&path);
+                tune(&mut catalogue);
+                fs::write(&path, serde_json::to_vec(&catalogue).unwrap()).unwrap();
+            }
         }
         Self { dir }
     }
@@ -444,9 +455,6 @@ fn an_xp_overflow_refuses_the_completing_click_and_changes_nothing() {
     assert!(!removed(&next, guid));
 }
 
-/// T522 fixtures use the shipped coin map and catalogue unchanged.
-fn unchanged(_: &mut Value) {}
-
 /// T522: the load-time map from a completing set to its meta collection entry, from the captured
 /// `collection_add` rows.
 #[test]
@@ -469,18 +477,24 @@ fn map_has_exactly_14_pairs() {
             "set {set}"
         );
     }
-    // A chain target (33 adds 34) has one set for eight entries; 298's three sets all share one
-    // icon with its three entries.
+    // A chain target (33 adds 34) has one set for eight entries; 295-297 all name 298, whose
+    // three entries share one icon, so no target entry is accepted either.
     for source in [33, 295, 296, 297] {
         assert_eq!(catalogue.meta_entry(source), None, "source {source}");
     }
-    assert_eq!(catalogue.meta_entry(298), None);
+    assert!(
+        catalogue
+            .meta_pairs()
+            .values()
+            .all(|entry| ![2104, 2105, 2106].contains(entry)),
+        "298's ambiguous entries are not mapped"
+    );
 }
 
 /// T522: finishing 284 records 309's entry 2170 after 284's own entry, and both are saved.
 #[test]
 fn completing_284_records_309s_entry_2170_after_its_own() {
-    let fixture = Fixture::new(Some(&unchanged));
+    let fixture = Fixture::bundled();
     let mut game = fixture.load(None);
     let coins = coins_of(284);
     let (last, rest) = coins.split_last().unwrap();
@@ -518,7 +532,7 @@ fn completing_284_records_309s_entry_2170_after_its_own() {
 /// T522: finishing all eight Elite sets pays the 309 backpack once, and a relog replay pays nothing.
 #[test]
 fn completing_all_elite_sets_pays_the_backpack_once() {
-    let fixture = Fixture::new(Some(&unchanged));
+    let fixture = Fixture::bundled();
     let mut game = fixture.load(None);
     for set in ELITE_SETS {
         for (guid, position, _) in coins_of(set) {
@@ -545,10 +559,76 @@ fn completing_all_elite_sets_pays_the_backpack_once() {
     assert_eq!(held(&relog.state(), ELITE_BACKPACK), 1);
 }
 
+/// T522/F694: at 99 stacks the eighth set's own 70348 fits, so its reward sets `changed` before
+/// 309's 70349 finds no room. The refusal must discard that staged change: the click records
+/// nothing, hides nothing and saves nothing; with one free slot the same click pays both once.
+#[test]
+fn a_meta_reward_refusal_changes_nothing_and_the_retry_pays_once() {
+    let fixture = Fixture::bundled();
+    let mut game = fixture.load(None);
+    for set in &ELITE_SETS[..7] {
+        for (guid, position, _) in coins_of(*set) {
+            assert!(click(&mut game, guid, position).changed, "set {set}");
+        }
+        assert!(completed(&game, *set), "set {set} completes");
+    }
+    // 99 stacks: the eighth set's 70348 is the hundredth, and 309's 70349 is the 101st.
+    let mut state = game.state();
+    let filler = state.inventory.items[0].clone();
+    for id in 0..99 - state.inventory.items.len() as i32 {
+        let mut item = filler.clone();
+        item.id = 60_000 + id;
+        state.inventory.items.push(item);
+    }
+    state.inventory.next_instance_id = Some(70_000); // above the filler ids
+    assert_eq!(state.inventory.items.len(), 99);
+    let mut game = fixture.load(Some(state));
+    let coins = coins_of(ELITE_SETS[7]);
+    let (last, rest) = coins.split_last().unwrap();
+    for &(guid, position, _) in rest {
+        assert!(click(&mut game, guid, position).changed);
+    }
+    let before = snapshot(&game);
+    let out = click(&mut game, last.0, last.1);
+    assert_eq!(out.replies, vec![chat::system(FULL_BAG)]);
+    assert!(
+        !out.changed,
+        "a refused meta reward must not mark the save changed"
+    );
+    assert_eq!(snapshot(&game), before);
+    assert!(!completed(&game, ELITE_SETS[7]));
+    assert!(!completed(&game, ELITE_EXPLORER));
+    let extras = game.state().progression_extras.unwrap();
+    assert!(
+        !extras.collections.is_collected(last.2 as i32),
+        "the completing source entry is not recorded"
+    );
+    assert!(
+        !extras.collections.is_collected(2177),
+        "309's entry is not recorded"
+    );
+    assert_eq!(held(&game.state(), 70348), 0);
+    assert_eq!(held(&game.state(), ELITE_BACKPACK), 0);
+    // The coin was not hidden: the next visibility update does not drop it.
+    let next = game.update_npc_visibility(&at(last.1)).unwrap();
+    assert!(!removed(&next, last.0));
+    // One free slot: the same click records both entries and pays both rewards once.
+    let mut state = game.state();
+    state.inventory.items.pop();
+    let mut relog = fixture.load(Some(state));
+    let out = click(&mut relog, last.0, last.1);
+    assert!(out.changed && completed(&relog, ELITE_SETS[7]) && completed(&relog, ELITE_EXPLORER));
+    assert_eq!(held(&relog.state(), 70348), 1);
+    assert_eq!(held(&relog.state(), ELITE_BACKPACK), 1);
+    let replay = click(&mut relog, last.0, last.1);
+    assert!(replay.replies.is_empty() && !replay.changed);
+    assert_eq!(held(&relog.state(), ELITE_BACKPACK), 1);
+}
+
 /// T522: a full bag refuses 284's completing click before either ledger entry is recorded.
 #[test]
 fn a_full_bag_completing_elite_click_leaves_309_untouched() {
-    let fixture = Fixture::new(Some(&unchanged));
+    let fixture = Fixture::bundled();
     let mut game = fixture.load(Some(full_bag(&fixture)));
     let coins = coins_of(284);
     let (last, rest) = coins.split_last().unwrap();
