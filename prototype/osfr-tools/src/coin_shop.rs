@@ -226,6 +226,11 @@ pub struct CoinShop {
     sc_catalogue: Arc<station_cash::Catalogue>,
     /// T229: the earn table beside the campaign content; absent keeps earnings off.
     sc_earn: Option<station_cash::EarnTable>,
+    /// T529: store-row item ids the bundled pets content binds to a species, built once with
+    /// the catalogue. A type-2 row outside this set has no pet the server can create, so the
+    /// coin store refuses it; a later pets-content binding makes the row sellable with no code
+    /// change.
+    pet_items: BTreeSet<i32>,
     vendor_transactions: BTreeMap<u32, (u32, Vec<u8>)>,
     sales: VecDeque<SaleRecord>,
     next_transaction_id: u32,
@@ -250,6 +255,16 @@ impl CoinShop {
             crate::housing_service::HousingContent::kit_items(inventory_content)
                 .map_err(|e| io::Error::new(io::ErrorKind::InvalidData, format!("{e:?}")))?,
         );
+        // T529: one bundled-pets parse per shop construction; a buy is only a set lookup. This
+        // is the same species binding `PetContent::definition_for_item` resolves at adoption, so
+        // a type-2 row becomes coin-sellable the moment pets content binds it.
+        let pets = crate::pets::PetService::bundled_content()?;
+        let pet_items = catalogue
+            .items
+            .iter()
+            .filter(|item| pets.definition_for_item(item.item_id).is_some())
+            .map(|item| item.item_id)
+            .collect();
         let sc_catalogue = station_cash::Catalogue::build(
             catalogue.station_cash.clone(),
             &inventory,
@@ -281,6 +296,7 @@ impl CoinShop {
             sc_catalogue: Arc::new(sc_catalogue),
             // `load` fills this from the NPC content; `new` alone keeps earning off.
             sc_earn: None,
+            pet_items,
             vendor_transactions: BTreeMap::new(),
             sales: VecDeque::new(),
             next_transaction_id: 1,
@@ -471,6 +487,33 @@ impl CoinShop {
         self.buy_once(client_transaction_id, item_id, quantity, 0)
     }
 
+    /// T529: why the coin store must not sell this item, or `None` when it may. The item `Type`
+    /// is the client definition field `Inventory::presentation` reads after the model and texture
+    /// strings (`008e3760`). Type 19 is a ride: the item-use switch `00a1ec00` handles case 0x13
+    /// and `00b06db0` owns the mount path (it logs `SpawnMountByItemDefinitionId: item %d`,
+    /// notes/Autopilot/T452.md).
+    /// Type 16 is a house deed/lot: every recorded deed is Type 16 (notes/Autopilot/L046.md) and
+    /// OSFR's 9a8326f forces `ForceDisablePreview` on them after the housing preview soft-lock;
+    /// housing is lead-owned. Type 2 is a pet adoption item, which only the species binding can
+    /// turn into a pet (`PetsHandler::SendPetSummonByItemId` `00b60110`, 53/32). Mapping type to
+    /// policy is (R); the field layout and the type values are pinned by the shipped content.
+    ///
+    /// A definition that exists but cannot be read is refused here instead of becoming an error.
+    /// The reason stays server-side: `buy_once` answers with the existing invalid-item reply.
+    pub fn sale_block(&self, item_id: i32) -> Option<&'static str> {
+        let item_type = match self.inventory.presentation(item_id) {
+            Ok(presentation) => presentation.item_type,
+            Err(_) => return Some("item definition type is unreadable"),
+        };
+        match item_type {
+            2 => (!self.pet_items.contains(&item_id))
+                .then_some("pet item has no pets.json species binding"),
+            16 => Some("house lot (housing preview soft-lock)"),
+            19 => Some("rides are Station Cash or earned only"),
+            _ => None,
+        }
+    }
+
     fn buy_once(
         &mut self,
         transaction_id: u32,
@@ -482,6 +525,19 @@ impl CoinShop {
             || self.catalogue.item(item_id).is_none()
             || !self.inventory.has_definition(item_id)
         {
+            return Ok(self.failure(
+                1,
+                RESULT_INVALID_ITEM,
+                transaction_id,
+                item_id,
+                quantity,
+                0,
+                merchant_id,
+            ));
+        }
+        // T529: what the item is matters before any price or quantity work. The reply and the
+        // unchanged state are the existing invalid-item failure; nothing is debited or granted.
+        if self.sale_block(item_id).is_some() {
             return Ok(self.failure(
                 1,
                 RESULT_INVALID_ITEM,

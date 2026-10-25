@@ -1283,6 +1283,12 @@ fn coin_merchant_packets(
         if !inventory.has_definition(item.item_id) {
             continue;
         }
+        // T529: do not advertise a row the coin store refuses (an unbound pet item, a ride, a
+        // house lot). The same `sale_block` gate decides the buy, so the window and the request
+        // cannot disagree.
+        if shop.is_some_and(|shop| shop.sale_block(item.item_id).is_some()) {
+            continue;
+        }
         let presentation = inventory
             .presentation(item.item_id)
             .map_err(|_| npc_interaction::NpcInteractionError::InvalidPacket)?;

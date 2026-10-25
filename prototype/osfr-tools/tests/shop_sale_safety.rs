@@ -1,0 +1,398 @@
+//! T529: the coin store never sells an item the server cannot make work.
+//!
+//! The buy is refused inside `CoinShop::buy_once`, so the 165/4 direct buy, the 66/43 vendor buy
+//! and the service `buy` entry all share the gate. Type policy:
+//! - type 2 (pet adoption item): sellable only when the bundled pets content binds the id through
+//!   `PetContent::definition_for_item`. The client adopts it with `PetsHandler::SendPetSummonByItemId`
+//!   (`00b60110`, 53/32), and only the species binding can turn it into a pet.
+//! - type 19 (ride): never for coins. Client item-use switch `00a1ec00` case 0x13 enters the
+//!   mount path (`00b06db0` logs `SpawnMountByItemDefinitionId: item %d`); rides are Station Cash
+//!   or earned only (T230).
+//! - type 16 (house deed/lot): never. Every recorded deed is Type 16 (notes/Autopilot/L046.md)
+//!   and OSFR's 9a8326f forces `ForceDisablePreview` on these after the housing preview
+//!   soft-lock; housing is lead-owned.
+//! - type 29 (furniture): stays on sale (R). OSFR keeps 185 coin furniture rows and the items
+//!   wait in the bag until housing decoration lands.
+//!
+//! Every request here goes through the real gateway dispatch: 26/8 + 26/10 open the shipped
+//! Gloria vendor, 165/4 is the client's direct coin buy and 66/43 the vendor buy. A refusal must
+//! change neither the snapshot/save nor the buy-back ledger.
+
+#[path = "common/gateway_vendor.rs"]
+mod gateway_vendor;
+#[path = "common/round70_content.rs"]
+mod round70_content;
+#[path = "common/vendor_fixture.rs"]
+mod vendor_fixture;
+
+use gateway_vendor::{
+    NOW, completions, connect_with, count_definition, fixture_root, inner_packets, interact,
+    inventory_of, merchant_status, select, sell_packet, send, vendor_buy_packet, wrap,
+};
+use osfr_tools::{
+    coin_shop::{self, CoinShop, StoreCatalogue},
+    game_store::Snapshot,
+    gameplay::GameplayState,
+    gateway::{Gateway, GatewayOutcome},
+    inventory::Inventory,
+    npc_interaction::decode_coin_merchant_list_165_10,
+    pets::PetService,
+    station_cash::Wallet,
+};
+use serde_json::Value;
+use std::{
+    collections::BTreeMap,
+    fs,
+    path::{Path, PathBuf},
+};
+use vendor_fixture::{SEEDED_ITEM, VendorFixture};
+
+/// Gloria's shipped vendor record: three type-2 Pet Pals with coin prices and no species binding.
+const GLORIA: u64 = 9_500_000_246;
+const GLORIA_NPC_FILE: &str = "cobblestone_village.json";
+/// Crab, 5,000 coins at Gloria.
+const UNBOUND_PET: i32 = 7_885;
+/// Fritz, one of the 16 adoption item ids `pets.json` binds.
+const BOUND_PET: i32 = 4_324;
+/// Skeletal Dragon (`mounts.json` mount 715, item 10,530).
+const RIDE: i32 = 10_530;
+/// Small Wilds House, a type-16 house deed.
+const HOUSE_LOT: i32 = 2_213;
+/// A type-29 furniture row that already has a coin price in the shipped stores.
+const FURNITURE: i32 = 10_472;
+const START_COINS: u32 = 100_000;
+
+/// Every vendor-stocked row the coin store refuses on the integration tip, with the reason it is
+/// blocked. The content test fails if this list and the shipped `vendors.json` disagree in either
+/// direction, so binding a Pet Pal in pets content must remove its row here.
+const REVIEWED_UNSELLABLE: &[(i32, &str)] = &[
+    (7_885, "pet item has no pets.json species binding"),
+    (10_387, "pet item has no pets.json species binding"),
+    (17_554, "pet item has no pets.json species binding"),
+];
+
+fn data_content() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content")
+}
+
+fn read_json(path: &Path) -> Value {
+    serde_json::from_slice(&fs::read(path).expect("content file reads"))
+        .unwrap_or_else(|error| panic!("{} parses: {error}", path.display()))
+}
+
+fn gloria_fixture(label: &str) -> VendorFixture {
+    VendorFixture::for_vendor(&fixture_root(), label, GLORIA, GLORIA_NPC_FILE)
+}
+
+fn connect(fixture: &VendorFixture, state: GameplayState) -> Gateway {
+    connect_with(
+        fixture.reference(),
+        fixture.character(),
+        fixture.content(),
+        state,
+    )
+}
+
+/// The production shop entry: 26/8 opens the menu and 26/10 selects Gloria's Shop option.
+fn open_shop(fixture: &VendorFixture, gateway: &mut Gateway) -> Vec<Vec<u8>> {
+    send(gateway, &interact(GLORIA));
+    send(gateway, &select(GLORIA, fixture.option()))
+}
+
+/// The item ids the real 165/10 merchant window advertises.
+fn advertised_items(replies: &[Vec<u8>]) -> Vec<u32> {
+    let packet = replies
+        .iter()
+        .find(|packet| packet.starts_with(&[165, 0, 10, 0]))
+        .expect("the Shop choice sends the 165/10 coin merchant list");
+    decode_coin_merchant_list_165_10(packet)
+        .expect("165/10 matches the client reader")
+        .entries
+        .iter()
+        .map(|entry| entry.item_id)
+        .collect()
+}
+
+/// 165/4 (`00c77230` -> serializer `00c75ed0`): merchant u64, the merchant-record context, the
+/// definition id, tint, then quantity.
+fn buy_165_4(transaction: u32, item: i32) -> Vec<u8> {
+    let mut packet = vec![165, 0, 4, 0];
+    packet.extend(GLORIA.to_le_bytes());
+    packet.extend(transaction.to_le_bytes());
+    packet.extend(item.to_le_bytes());
+    packet.extend(0i32.to_le_bytes());
+    packet.extend(1u32.to_le_bytes());
+    packet
+}
+
+/// 165/12 (`00c759c0`): the sale transaction id plus a context dword.
+fn buy_back_165_12(transaction: u32) -> Vec<u8> {
+    let mut packet = vec![165, 0, 12, 0];
+    packet.extend(transaction.to_le_bytes());
+    packet.extend(0u32.to_le_bytes());
+    packet
+}
+
+/// The 165/13 result word: transaction id, result, context.
+fn buy_back_result(replies: &[Vec<u8>]) -> u32 {
+    let packet = replies
+        .iter()
+        .find(|packet| packet.starts_with(&[165, 0, 13, 0]))
+        .expect("a 165/12 buy-back answers 165/13");
+    assert_eq!(packet.len(), 16);
+    u32::from_le_bytes(packet[8..12].try_into().unwrap())
+}
+
+/// Sell the fixture's seeded item through the real 165/5 path, leaving one buy-back entry.
+fn seed_buy_back(gateway: &mut Gateway) -> u32 {
+    let replies = send(gateway, &sell_packet(0, 1, 1));
+    let sale = completions(&replies)
+        .into_iter()
+        .next()
+        .expect("the seeded item sells");
+    assert_eq!(sale.result, coin_shop::RESULT_SUCCESS);
+    sale.transaction
+}
+
+fn handled(gateway: &mut Gateway, packet: &[u8]) -> (Vec<Vec<u8>>, GatewayOutcome) {
+    let outcome = gateway
+        .handle_at(&wrap(packet), NOW)
+        .expect("gateway handles the request");
+    (inner_packets(&outcome), outcome)
+}
+
+fn assert_unbound_pet_item_is_still_unbound() {
+    let pets = PetService::bundled_content().expect("the bundled pets content loads");
+    assert!(
+        pets.definition_for_item(UNBOUND_PET).is_none(),
+        "pets content now binds item {UNBOUND_PET}, so the coin store sells it; pick another \
+         unbound type-2 row for this refusal and update REVIEWED_UNSELLABLE"
+    );
+}
+
+fn assert_unchanged(gateway: &Gateway, before: &Snapshot, label: &str) {
+    assert_eq!(
+        &gateway.snapshot(),
+        before,
+        "{label}: the refused buy changed the snapshot"
+    );
+}
+
+#[test]
+fn an_unbound_pet_item_is_refused_through_the_real_165_4_buy() {
+    assert_unbound_pet_item_is_still_unbound();
+    let fixture = gloria_fixture("t529-a-165-4");
+    let mut gateway = connect(&fixture, fixture.state(START_COINS, false));
+    let replies = open_shop(&fixture, &mut gateway);
+    assert!(
+        !advertised_items(&replies).contains(&(UNBOUND_PET as u32)),
+        "the merchant window advertised a pet item the shop refuses"
+    );
+
+    let sale = seed_buy_back(&mut gateway);
+    let before = gateway.snapshot();
+    let before_inventory = inventory_of(&gateway);
+    let refused_transaction = 0x7000_0001;
+    let (replies, outcome) = handled(&mut gateway, &buy_165_4(refused_transaction, UNBOUND_PET));
+    assert!(
+        !outcome.gameplay_changed,
+        "a refused buy requested a gameplay save"
+    );
+    assert!(!outcome.state_changed, "a refused buy changed the session");
+    let done = completions(&replies);
+    assert_eq!(done.len(), 1, "exactly one 165/6 completion");
+    assert_eq!(done[0].result, coin_shop::RESULT_INVALID_ITEM);
+    assert_eq!(done[0].kind, 1, "the completion is a buy");
+    assert_eq!(done[0].definition, UNBOUND_PET);
+    assert_unchanged(&gateway, &before, "165/4");
+    let after_inventory = inventory_of(&gateway);
+    assert_eq!(after_inventory.coins, before_inventory.coins);
+    assert_eq!(count_definition(&after_inventory, UNBOUND_PET), 0);
+
+    // No ledger entry was added for the refused transaction, and the entry from the seed sale
+    // is still readable.
+    let probe = send(&mut gateway, &buy_back_165_12(refused_transaction));
+    assert_eq!(buy_back_result(&probe), coin_shop::RESULT_FAILURE);
+    let restored = send(&mut gateway, &buy_back_165_12(sale));
+    assert_eq!(
+        buy_back_result(&restored),
+        coin_shop::RESULT_SUCCESS,
+        "the refusal consumed an existing buy-back entry"
+    );
+    assert_eq!(count_definition(&inventory_of(&gateway), SEEDED_ITEM), 1);
+}
+
+#[test]
+fn an_unbound_pet_item_is_refused_through_the_real_66_43_buy() {
+    assert_unbound_pet_item_is_still_unbound();
+    let fixture = gloria_fixture("t529-a-66-43");
+    let mut gateway = connect(&fixture, fixture.state(START_COINS, false));
+    open_shop(&fixture, &mut gateway);
+
+    let sale = seed_buy_back(&mut gateway);
+    let before = gateway.snapshot();
+    let before_inventory = inventory_of(&gateway);
+    let refused_transaction = 0x7100_0001;
+    let packet = vendor_buy_packet(refused_transaction, UNBOUND_PET, 1);
+    let (replies, outcome) = handled(&mut gateway, &packet);
+    assert!(
+        !outcome.gameplay_changed,
+        "a refused buy requested a gameplay save"
+    );
+    assert!(!outcome.state_changed, "a refused buy changed the session");
+    assert_eq!(replies.len(), 1, "one 66/44 answer");
+    assert_eq!(merchant_status(&replies[0]), 0, "the client saw success");
+    assert_unchanged(&gateway, &before, "66/43");
+    assert_eq!(inventory_of(&gateway).coins, before_inventory.coins);
+    assert_eq!(count_definition(&inventory_of(&gateway), UNBOUND_PET), 0);
+
+    // `buy_vendor` does not cache refusals: the same transaction id retried is refused again and
+    // still changes nothing.
+    let (retry, _) = handled(&mut gateway, &packet);
+    assert_eq!(merchant_status(&retry[0]), 0);
+    assert_unchanged(&gateway, &before, "66/43 retry");
+
+    let probe = send(&mut gateway, &buy_back_165_12(refused_transaction));
+    assert_eq!(buy_back_result(&probe), coin_shop::RESULT_FAILURE);
+    let restored = send(&mut gateway, &buy_back_165_12(sale));
+    assert_eq!(buy_back_result(&restored), coin_shop::RESULT_SUCCESS);
+}
+
+#[test]
+fn a_pet_item_bound_by_pets_content_is_sold() {
+    let fixture = gloria_fixture("t529-b");
+    fixture.stock_price_coins(&[(BOUND_PET, 432)]);
+    let pets = PetService::bundled_content().expect("the bundled pets content loads");
+    assert!(
+        pets.definition_for_item(BOUND_PET).is_some(),
+        "item {BOUND_PET} is no longer a pets.json adoption item; pick another bound id"
+    );
+    let inventory = Inventory::load(fixture.content(), None).expect("fixture inventory loads");
+    assert_eq!(
+        inventory
+            .presentation(BOUND_PET)
+            .expect("the bound pet item is defined")
+            .item_type,
+        2,
+        "the bound adoption item is not a type-2 pet row"
+    );
+
+    let mut gateway = connect(&fixture, fixture.state(1_000, false));
+    let replies = open_shop(&fixture, &mut gateway);
+    assert!(
+        advertised_items(&replies).contains(&(BOUND_PET as u32)),
+        "the merchant window hid a bound pet item"
+    );
+    let (replies, outcome) = handled(&mut gateway, &buy_165_4(1, BOUND_PET));
+    assert!(outcome.gameplay_changed, "a successful buy requests a save");
+    let done = completions(&replies);
+    assert_eq!(done.len(), 1);
+    assert_eq!(done[0].result, coin_shop::RESULT_SUCCESS);
+    assert_eq!(done[0].definition, BOUND_PET);
+    assert_eq!(done[0].price, 432);
+    assert_eq!(inventory_of(&gateway).coins, 1_000 - 432);
+    assert_eq!(count_definition(&inventory_of(&gateway), BOUND_PET), 1);
+}
+
+#[test]
+fn rides_and_house_lots_are_refused_while_furniture_is_sold() {
+    let fixture = gloria_fixture("t529-c");
+    fixture.stock_price_coins(&[(RIDE, 650), (HOUSE_LOT, 700), (FURNITURE, 200)]);
+    let inventory = Inventory::load(fixture.content(), None).expect("fixture inventory loads");
+    for (item, expected) in [(RIDE, 19), (HOUSE_LOT, 16), (FURNITURE, 29)] {
+        assert_eq!(
+            inventory
+                .presentation(item)
+                .expect("the fixture item is defined")
+                .item_type,
+            expected,
+            "item {item} no longer has the type this test exercises"
+        );
+    }
+
+    let mut gateway = connect(&fixture, fixture.state(1_000, false));
+    let replies = open_shop(&fixture, &mut gateway);
+    let advertised = advertised_items(&replies);
+    assert!(!advertised.contains(&(RIDE as u32)));
+    assert!(!advertised.contains(&(HOUSE_LOT as u32)));
+    assert!(advertised.contains(&(FURNITURE as u32)));
+
+    for (transaction, item) in [(11, RIDE), (12, HOUSE_LOT)] {
+        let before = gateway.snapshot();
+        let (replies, outcome) = handled(&mut gateway, &buy_165_4(transaction, item));
+        assert!(
+            !outcome.gameplay_changed,
+            "a refused buy requested a gameplay save"
+        );
+        assert!(!outcome.state_changed);
+        let done = completions(&replies);
+        assert_eq!(done.len(), 1);
+        assert_eq!(done[0].result, coin_shop::RESULT_INVALID_ITEM);
+        assert_unchanged(&gateway, &before, "type blocked buy");
+        assert_eq!(inventory_of(&gateway).coins, 1_000);
+        assert_eq!(count_definition(&inventory_of(&gateway), item), 0);
+    }
+
+    // Type-29 furniture stays on sale for coins (R).
+    let (replies, outcome) = handled(&mut gateway, &buy_165_4(13, FURNITURE));
+    assert!(outcome.gameplay_changed);
+    assert_eq!(completions(&replies)[0].result, coin_shop::RESULT_SUCCESS);
+    assert_eq!(inventory_of(&gateway).coins, 800);
+    assert_eq!(count_definition(&inventory_of(&gateway), FURNITURE), 1);
+}
+
+/// The shipped content gate: every item any vendor stocks is either sellable for coins by the
+/// current rules or listed above with its reason. Fails in both directions so binding a Pet Pal
+/// in pets content, restocking a blocked row, or changing an item's type all need a deliberate
+/// update here.
+#[test]
+fn every_shipped_vendor_item_is_sellable_or_reviewed_unsellable() {
+    let data = data_content();
+    let inventory_content = round70_content::source();
+    let inventory = Inventory::load(&inventory_content, None).expect("inventory catalogue loads");
+    let catalogue =
+        StoreCatalogue::load(&data.join("stores.json")).expect("the shipped store catalogue loads");
+    let shop = CoinShop::new(
+        &inventory_content,
+        inventory,
+        catalogue,
+        100,
+        None,
+        Wallet::default(),
+    )
+    .expect("the shop loads with the shipped content");
+
+    let vendors = read_json(&data.join("vendors.json"));
+    let mut blocked = BTreeMap::new();
+    for vendor in vendors["vendors"]
+        .as_array()
+        .expect("vendor records are an array")
+    {
+        for item in vendor["items"]
+            .as_array()
+            .expect("vendor items are an array")
+        {
+            let id = i32::try_from(
+                item["item_id"]
+                    .as_i64()
+                    .expect("vendor item ID is an integer"),
+            )
+            .expect("vendor item ID fits i32");
+            if let Some(reason) = shop.sale_block(id) {
+                blocked.insert(id, reason);
+            }
+        }
+    }
+    let reviewed: BTreeMap<i32, &str> = REVIEWED_UNSELLABLE.iter().copied().collect();
+    assert_eq!(
+        blocked, reviewed,
+        "the coin store's blocked vendor rows changed; a bound Pet Pal must leave \
+         REVIEWED_UNSELLABLE and a newly blocked row must join it"
+    );
+    // A definition the shop cannot read is a refusal with a reason, never an error: the buy path
+    // maps this `Some` to the existing invalid-item reply.
+    assert_eq!(
+        shop.sale_block(i32::MAX),
+        Some("item definition type is unreadable")
+    );
+}

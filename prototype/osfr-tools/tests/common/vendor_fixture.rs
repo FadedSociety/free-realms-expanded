@@ -52,6 +52,13 @@ impl Drop for VendorFixture {
 impl VendorFixture {
     /// Build one single-vendor pack under `root`; `label` names it for debugging.
     pub fn new(root: &Path, label: &str) -> Self {
+        Self::for_vendor(root, label, REPRESENTATIVE_VENDOR, "blackspore_swamp.json")
+    }
+
+    /// T529: the same pack for another shipped vendor record and the NPC file that holds it.
+    /// Only the NPC's zone/position is translated; the stock rows are the shipped ones until
+    /// `stock_price_coins` replaces them.
+    pub fn for_vendor(root: &Path, label: &str, npc_id: u64, npc_file: &str) -> Self {
         let reference = round70_content::reference();
         let content = round70_content::build(root, label, &[]);
         let data = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
@@ -65,8 +72,8 @@ impl VendorFixture {
             .as_array()
             .expect("vendor records are an array")
             .iter()
-            .find(|vendor| vendor["npc_id"].as_u64() == Some(REPRESENTATIVE_VENDOR))
-            .expect("the representative vendor exists")
+            .find(|record| record["npc_id"].as_u64() == Some(npc_id))
+            .expect("the fixture vendor exists")
             .clone();
         fs::write(
             content.join("vendors.json"),
@@ -75,13 +82,13 @@ impl VendorFixture {
         )
         .expect("fixture vendors write");
 
-        let npcs = read_json(&data.join("npcs/blackspore_swamp.json"));
+        let npcs = read_json(&data.join("npcs").join(npc_file));
         let mut npc = npcs["records"]
             .as_array()
             .expect("NPC records are an array")
             .iter()
-            .find(|npc| npc["npc_id"].as_u64() == Some(REPRESENTATIVE_VENDOR))
-            .expect("the representative NPC exists")
+            .find(|record| record["npc_id"].as_u64() == Some(npc_id))
+            .expect("the fixture NPC exists")
             .clone();
         npc["zone_id"] = json!(0);
         npc["zone"] = json!("FabledRealms");
@@ -103,16 +110,16 @@ impl VendorFixture {
         let mut service = NpcInteraction::load(&content.join("npcs"), &content.join("stores.json"))
             .expect("fixture NPC content loads");
         let (zone, position) = service
-            .location(REPRESENTATIVE_VENDOR)
-            .expect("the representative vendor has a location");
+            .location(npc_id)
+            .expect("the fixture vendor has a location");
         let menu = service
-            .interact(REPRESENTATIVE_VENDOR, zone, position, None)
-            .expect("the representative vendor opens");
+            .interact(npc_id, zone, position, None)
+            .expect("the fixture vendor opens");
         let option = u32::try_from(
             menu.options
                 .iter()
                 .find(|option| option.action == NpcAction::Shop)
-                .expect("the representative vendor exposes a shop option")
+                .expect("the fixture vendor exposes a shop option")
                 .id,
         )
         .expect("the shop option id fits the client field");
@@ -129,6 +136,49 @@ impl VendorFixture {
             price,
             sell_price,
         }
+    }
+
+    /// T529: replace this fixture vendor's stock with `rows` (`item_id`, coin price) and give
+    /// every row a coin-only `stores.json` entry in the fixture copy. The shipped content files
+    /// are never written.
+    pub fn stock_price_coins(&self, rows: &[(i32, u32)]) {
+        let vendors = read_json(&self.content.join("vendors.json"));
+        let mut vendor = vendors["vendors"][0].clone();
+        let ids: Vec<i32> = rows.iter().map(|(item, _)| *item).collect();
+        vendor["item_ids"] = json!(ids);
+        fs::write(
+            self.content.join("vendors.json"),
+            serde_json::to_vec(&json!({"schema_version": 1, "vendors": [vendor]}))
+                .expect("fixture vendors serialize"),
+        )
+        .expect("fixture vendors write");
+
+        let mut stores = read_json(&self.content.join("stores.json"));
+        let items = stores["items"]
+            .as_array_mut()
+            .expect("store items are an array");
+        for (item, price) in rows {
+            let row = json!({
+                "item_id": item,
+                "purchase_price_coins": price,
+                "member_discount_percent": null,
+                "member_price_coins": null,
+                "sell_price_coins": null,
+                "no_sale": true
+            });
+            match items
+                .iter_mut()
+                .find(|row| row["item_id"].as_i64() == Some(i64::from(*item)))
+            {
+                Some(existing) => *existing = row,
+                None => items.push(row),
+            }
+        }
+        fs::write(
+            self.content.join("stores.json"),
+            serde_json::to_vec(&stores).expect("fixture stores serialize"),
+        )
+        .expect("fixture stores write");
     }
 
     pub fn content(&self) -> &Path {
