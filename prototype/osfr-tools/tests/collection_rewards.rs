@@ -1,12 +1,16 @@
 //! T480: the click that completes a collection pays its captured reward once, through the real
 //! 26/8 route (`Gameplay::handle_in_world`) that `collection_coin_pickup.rs` drives.
 //!
+//! T522: the same completing click also records the set's meta collection entry (the Elite sets
+//! 284-291 tick `Elite Explorer` 309; 299-304 tick 306), and finishing all eight Elite sets pays
+//! the 309 backpack 70349 once.
+//!
 //! Plain fixtures use the repository's `data/content` catalogue, so Seaside Rare (267: item 17300)
 //! and the girls' boots set (271: 17210, girls' 15561) are the shipped rows. No coin-backed set
 //! pays coins or XP, so those tests copy the bundled NPC content (spawns, NPCs, coins, catalogue)
 //! into the opening package and tune 267's reward in the copied catalogue, which is also what a
 //! data edit would do. The opening package defines neither girls' boots, so a synthetic definition
-//! for 15561 goes in its `item-catalogue.json`.
+//! for 15561 goes in its `item-catalogue.json`; the same file defines the Elite reward items.
 #[path = "common/content_copy.rs"]
 mod content_copy;
 #[path = "common/item_catalogue.rs"]
@@ -15,6 +19,7 @@ mod item_catalogue;
 use osfr_tools::{
     character_store::CharacterState,
     chat,
+    collection_catalogue::CollectionCatalogueContent,
     gameplay::{Gameplay, GameplayState, Outcome},
     identity::{Attachment, CharacterIdentity, NativeCreation},
     npc_interaction::NpcInteractRequest,
@@ -33,6 +38,10 @@ const SET_271: i32 = 271;
 const BOYS: i32 = 17210;
 const GIRLS: i32 = 15561;
 const MEDIC: i32 = 11;
+/// T522: the Elite region sets, `Elite Explorer` (309) and the backpack it pays.
+const ELITE_SETS: [i32; 8] = [284, 285, 286, 287, 288, 289, 290, 291];
+const ELITE_EXPLORER: i32 = 309;
+const ELITE_BACKPACK: i32 = 70349;
 const FULL_BAG: &str = "Your bag is full. Make room before collecting that.";
 const CANNOT: &str = "You cannot collect that right now.";
 static NEXT: AtomicU64 = AtomicU64::new(0);
@@ -61,7 +70,12 @@ impl Fixture {
                     .join("../../../lab/references/opening-journal-text-v2/content")
             });
         content_copy::copy_tree(&opening, &dir);
-        item_catalogue::write(&dir, &[item_catalogue::sized_row(GIRLS as u32, 64)]);
+        // T522: the Elite sets' rewards (70341-70348) and the 309 backpack need definitions so
+        // their completion grants are paid; 70342 also exists in the opening inventory, which wins.
+        let mut items = vec![item_catalogue::sized_row(GIRLS as u32, 64)];
+        items
+            .extend((70341u32..=ELITE_BACKPACK as u32).map(|id| item_catalogue::sized_row(id, 64)));
+        item_catalogue::write(&dir, &items);
         if let Some(tune) = tune {
             content_copy::copy_tree(&bundled().join("npcs"), &dir.join("npcs"));
             for file in [
@@ -428,4 +442,128 @@ fn an_xp_overflow_refuses_the_completing_click_and_changes_nothing() {
     assert!(!completed(&game, SEASIDE_RARE));
     let next = game.update_npc_visibility(&at(position)).unwrap();
     assert!(!removed(&next, guid));
+}
+
+/// T522 fixtures use the shipped coin map and catalogue unchanged.
+fn unchanged(_: &mut Value) {}
+
+/// T522: the load-time map from a completing set to its meta collection entry, from the captured
+/// `collection_add` rows.
+#[test]
+fn map_has_exactly_14_pairs() {
+    let catalogue = CollectionCatalogueContent::load(&bundled())
+        .unwrap()
+        .expect("bundled collection catalogue");
+    assert_eq!(catalogue.meta_pairs().len(), 14);
+    for (offset, set) in ELITE_SETS.iter().enumerate() {
+        assert_eq!(
+            catalogue.meta_entry(*set),
+            Some(2170 + offset as i32),
+            "set {set}"
+        );
+    }
+    for (offset, set) in (299..=304).enumerate() {
+        assert_eq!(
+            catalogue.meta_entry(set),
+            Some(2150 + offset as i32),
+            "set {set}"
+        );
+    }
+    // A chain target (33 adds 34) has one set for eight entries; 298's three sets all share one
+    // icon with its three entries.
+    for source in [33, 295, 296, 297] {
+        assert_eq!(catalogue.meta_entry(source), None, "source {source}");
+    }
+    assert_eq!(catalogue.meta_entry(298), None);
+}
+
+/// T522: finishing 284 records 309's entry 2170 after 284's own entry, and both are saved.
+#[test]
+fn completing_284_records_309s_entry_2170_after_its_own() {
+    let fixture = Fixture::new(Some(&unchanged));
+    let mut game = fixture.load(None);
+    let coins = coins_of(284);
+    let (last, rest) = coins.split_last().unwrap();
+    for &(guid, position, _) in rest {
+        let out = click(&mut game, guid, position);
+        assert_eq!(out.replies.len(), 1, "a non-final click sends only 38/10");
+    }
+    let out = click(&mut game, last.0, last.1);
+    let entries: Vec<u32> = out
+        .replies
+        .iter()
+        .filter(|packet| packet.starts_with(&[38, 0, 10, 0]))
+        .map(|packet| u32::from_le_bytes(packet[4..8].try_into().unwrap()))
+        .collect();
+    assert_eq!(entries, [last.2 as u32, 2170]);
+    let meta = out
+        .replies
+        .iter()
+        .find(|packet| packet.starts_with(&[38, 0, 10, 0]) && packet[4..8] == 2170u32.to_le_bytes())
+        .unwrap();
+    // 38/10 AddEntry in reader `008d8570` order for 2170: entry, icon, tint, name, collection
+    // 309, index, unknown, collected.
+    let mut expected = vec![38, 0, 10, 0];
+    for value in [2170u32, 2239, 0, 419_916, ELITE_EXPLORER as u32, 1, 0] {
+        expected.extend(value.to_le_bytes());
+    }
+    expected.push(1);
+    assert_eq!(meta, &expected);
+    assert!(completed(&game, 284));
+    assert!(!completed(&game, ELITE_EXPLORER));
+    let extras = game.state().progression_extras.unwrap();
+    assert!(extras.collections.is_collected(2170));
+}
+
+/// T522: finishing all eight Elite sets pays the 309 backpack once, and a relog replay pays nothing.
+#[test]
+fn completing_all_elite_sets_pays_the_backpack_once() {
+    let fixture = Fixture::new(Some(&unchanged));
+    let mut game = fixture.load(None);
+    for set in ELITE_SETS {
+        for (guid, position, _) in coins_of(set) {
+            assert!(click(&mut game, guid, position).changed, "set {set}");
+        }
+        assert!(completed(&game, set), "set {set} completes");
+    }
+    assert!(completed(&game, ELITE_EXPLORER));
+    for item in 70341..=70348 {
+        assert_eq!(held(&game.state(), item), 1, "item {item}");
+    }
+    assert_eq!(held(&game.state(), ELITE_BACKPACK), 1);
+    let mut relog = fixture.load(Some(game.state()));
+    assert_eq!(held(&relog.state(), ELITE_BACKPACK), 1);
+    for set in ELITE_SETS {
+        for (guid, position, _) in coins_of(set) {
+            let out = click(&mut relog, guid, position);
+            assert!(
+                out.replies.is_empty() && !out.changed,
+                "set {set} replay is silent"
+            );
+        }
+    }
+    assert_eq!(held(&relog.state(), ELITE_BACKPACK), 1);
+}
+
+/// T522: a full bag refuses 284's completing click before either ledger entry is recorded.
+#[test]
+fn a_full_bag_completing_elite_click_leaves_309_untouched() {
+    let fixture = Fixture::new(Some(&unchanged));
+    let mut game = fixture.load(Some(full_bag(&fixture)));
+    let coins = coins_of(284);
+    let (last, rest) = coins.split_last().unwrap();
+    for &(guid, position, _) in rest {
+        assert!(click(&mut game, guid, position).changed);
+    }
+    let before = snapshot(&game);
+    for _ in 0..2 {
+        let out = click(&mut game, last.0, last.1);
+        assert_eq!(out.replies, vec![chat::system(FULL_BAG)]);
+        assert!(!out.changed);
+        assert_eq!(snapshot(&game), before);
+    }
+    assert!(!completed(&game, 284));
+    let extras = game.state().progression_extras.unwrap();
+    assert!(!extras.collections.is_collected(2170));
+    assert!(!extras.collections.is_completed(ELITE_EXPLORER));
 }

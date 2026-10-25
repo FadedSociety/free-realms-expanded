@@ -156,10 +156,84 @@ pub struct CollectionCatalogueContent {
     entries: BTreeMap<i32, (usize, usize)>,
     /// Item id to the one entry linking it; `None` when several do.
     items: BTreeMap<i32, Option<i32>>,
+    /// T522: source collection id to the meta collection entry its completion records.
+    meta: BTreeMap<i32, i32>,
 }
 
 fn invalid(message: String) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, message)
+}
+
+/// T522: source collection to meta entry, from the captured kind-10 `collection_add` targets.
+///
+/// A target T is accepted only when as many sets add it as T has entries, each source names one
+/// T entry (equal `name_id` first, else equal `icon_id`; the icon rule is (R), no 309 source
+/// matches a 309 name) and no two sources name the same entry, so the map is one-to-one. Pairs
+/// whose source is itself a target are then dropped until stable, so a completion cascade stays
+/// within two levels and cannot loop.
+fn meta_map(collections: &[Collection]) -> BTreeMap<i32, i32> {
+    let mut sources: BTreeMap<i32, Vec<&Collection>> = BTreeMap::new();
+    for collection in collections {
+        for target in &collection.reward.collection_add {
+            sources.entry(*target).or_default().push(collection);
+        }
+    }
+    let by_id: BTreeMap<i32, &Collection> = collections
+        .iter()
+        .map(|collection| (collection.id, collection))
+        .collect();
+    let mut pairs: Vec<(i32, i32, i32)> = Vec::new();
+    for (target_id, set_sources) in sources {
+        let Some(target) = by_id.get(&target_id) else {
+            continue;
+        };
+        if set_sources.len() != target.entries.len() {
+            continue;
+        }
+        let mut matched = Vec::with_capacity(set_sources.len());
+        let mut used = BTreeSet::new();
+        let mut one_to_one = true;
+        for source in set_sources {
+            let named: Vec<&Entry> = target
+                .entries
+                .iter()
+                .filter(|entry| entry.name_id == source.name_id)
+                .collect();
+            let candidates: Vec<&Entry> = if named.is_empty() {
+                target
+                    .entries
+                    .iter()
+                    .filter(|entry| entry.icon_id == source.icon_id)
+                    .collect()
+            } else {
+                named
+            };
+            let [entry] = candidates.as_slice() else {
+                one_to_one = false;
+                break;
+            };
+            if !used.insert(entry.id) {
+                one_to_one = false;
+                break;
+            }
+            matched.push((source.id, target_id, entry.id));
+        }
+        if one_to_one {
+            pairs.extend(matched);
+        }
+    }
+    loop {
+        let targets: BTreeSet<i32> = pairs.iter().map(|(_, target, _)| *target).collect();
+        let before = pairs.len();
+        pairs.retain(|(source, _, _)| !targets.contains(source));
+        if pairs.len() == before {
+            break;
+        }
+    }
+    pairs
+        .into_iter()
+        .map(|(source, _, entry)| (source, entry))
+        .collect()
 }
 
 impl CollectionCatalogueContent {
@@ -220,11 +294,13 @@ impl CollectionCatalogueContent {
                 })
                 .map_err(|error| refuse(error.to_string()))?;
         }
+        let meta = meta_map(&file.collections);
         Ok(Some(Self {
             collections: file.collections,
             catalogue,
             entries,
             items,
+            meta,
         }))
     }
 
@@ -303,5 +379,15 @@ impl CollectionCatalogueContent {
     /// The entry an item fills, only when exactly one entry links that item.
     pub fn entry_for_item(&self, item_definition_id: i32) -> Option<i32> {
         self.items.get(&item_definition_id).copied().flatten()
+    }
+
+    /// T522: the meta collection entry that completing `collection_id` also records.
+    pub fn meta_entry(&self, collection_id: i32) -> Option<i32> {
+        self.meta.get(&collection_id).copied()
+    }
+
+    /// The accepted source-collection to meta-entry pairs (T522).
+    pub fn meta_pairs(&self) -> &BTreeMap<i32, i32> {
+        &self.meta
     }
 }

@@ -299,6 +299,40 @@ fn loader_refuses_bad_files() {
     assert!(error.to_string().contains("over 1 MiB"), "{error}");
 }
 
+/// T522: a target that becomes a source of another accepted target is a deeper chain; its pair is
+/// dropped at load, so a completion cascade stops at two levels and cannot loop.
+#[test]
+fn meta_map_drops_a_chain_whose_source_is_another_target() {
+    let mut document: Value = serde_json::from_str(&committed_text()).unwrap();
+    let collections = document["collections"].as_array_mut().unwrap();
+    let mut target = collections
+        .iter()
+        .find(|collection| collection["id"] == 309)
+        .cloned()
+        .expect("309");
+    target["id"] = json!(10_000);
+    target["name_id"] = json!(419_999);
+    target["entries"] = json!([{
+        "id": 21_000, "index": 1, "name_id": 419_914, "icon_id": 2236,
+        "icon_tint_id": 0, "item_definition_id": null, "item_link": null
+    }]);
+    target["reward"] = json!({
+        "coins": 0, "items": [], "xp": [], "tokens": [], "collection_add": [], "quest_add": []
+    });
+    collections.push(target);
+    collections
+        .iter_mut()
+        .find(|collection| collection["id"] == 309)
+        .unwrap()["reward"]["collection_add"] = json!([10_000]);
+    let text = serde_json::to_string(&document).unwrap();
+    let content = load_text("meta-chain", Some(&text))
+        .unwrap()
+        .expect("the chain still loads");
+    assert_eq!(content.meta_pairs().len(), 14);
+    assert_eq!(content.meta_entry(284), Some(2170));
+    assert_eq!(content.meta_entry(309), None);
+}
+
 // Generator: the join inputs are AGPL data rows from pinned reference checkouts (no code copied).
 const LEGACY_ITEMS: (&str, &str) = (
     "FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json",

@@ -16,6 +16,10 @@
 //! bag, coins and XP commit together on a staged copy; a full bag or an XP/coin overflow refuses
 //! the whole pickup and the coin stays clickable. The once-only guard is the saved `completed`
 //! set (the `collection:<id>` key lives only on the per-click snapshot).
+//!
+//! T522: a completion also records its meta collection entry (the Elite sets 284-291 tick `Elite
+//! Explorer` 309; 299-304 tick 306), mapped at load by `collection_catalogue::meta_map` from the
+//! captured `collection_add` targets. Both states commit in the same staged transaction.
 use super::*;
 use crate::{
     collection_catalogue::CollectionCatalogueContent,
@@ -56,6 +60,22 @@ pub(super) fn load(
         .collect();
     if !skipped.is_empty() {
         npc_event(serde_json::json!({"event": "collection_reward_items_skipped", "ids": skipped}));
+    }
+    // T522: the accepted meta collections, once per load.
+    if !catalogue.meta_pairs().is_empty() {
+        let targets: BTreeSet<i32> = catalogue
+            .meta_pairs()
+            .values()
+            .filter_map(|entry_id| {
+                catalogue
+                    .entry(*entry_id)
+                    .map(|(_, collection)| collection.id)
+            })
+            .collect();
+        npc_event(serde_json::json!({
+            "event": "collection_meta_targets",
+            "targets": targets,
+        }));
     }
     if let Some(visibility) = visibility {
         let ledger = extras.collections();
@@ -150,8 +170,10 @@ impl Gameplay {
     }
 
     /// Record `entry_id` on the saved ledger: its 38/10 first, then, when it completes the
-    /// collection, the reward packets, with the paid bag, coins and XP adopted. An `Err` may leave
-    /// `self` half changed; the caller discards the staged copy.
+    /// collection, the reward packets, with the paid bag, coins and XP adopted. A completed
+    /// collection that maps to a meta collection entry (T522) records that entry too through the
+    /// same staged path, and that collection's completion then pays its own reward. An `Err` may
+    /// leave `self` half changed; the caller discards the staged copy.
     fn record_collection_entry(
         &mut self,
         world: &CollectionWorld,
@@ -159,6 +181,42 @@ impl Gameplay {
         player_guid: u64,
         out: &mut Outcome,
     ) -> io::Result<()> {
+        let Some(collection_id) = self.collect_entry(
+            world,
+            entry_id,
+            CollectionEventOrigin::ExplorationCoin,
+            player_guid,
+            out,
+        )?
+        else {
+            return Ok(());
+        };
+        // One level only: the load drops a pair whose source is another pair's target, and a
+        // meta completion is never cascaded again.
+        let Some(meta_entry) = world.catalogue.meta_entry(collection_id) else {
+            return Ok(());
+        };
+        self.collect_entry(
+            world,
+            meta_entry,
+            CollectionEventOrigin::CollectionBundleEntry,
+            player_guid,
+            out,
+        )?;
+        Ok(())
+    }
+
+    /// Record one catalogue entry, send its 38/10 and, when it completes its collection, build
+    /// and pay the captured reward. The returned id is set only when this event completes that
+    /// collection. An `Err` may leave `self` half changed; the staged caller discards it.
+    fn collect_entry(
+        &mut self,
+        world: &CollectionWorld,
+        entry_id: i32,
+        origin: CollectionEventOrigin,
+        player_guid: u64,
+        out: &mut Outcome,
+    ) -> io::Result<Option<i32>> {
         let (entry, collection) = world
             .catalogue
             .entry(entry_id)
@@ -177,7 +235,7 @@ impl Gameplay {
         };
         let event = CollectionEvent {
             entry_id,
-            origin: CollectionEventOrigin::ExplorationCoin,
+            origin,
             wire_update: Some(update),
         };
         let rewards = self.reward_snapshot();
@@ -199,6 +257,9 @@ impl Gameplay {
             out.replies.extend(transition.reward_packets);
             self.adopt_reward_state(transition.reward_state, out)?;
         }
-        Ok(())
+        Ok(transition
+            .outcome
+            .completion
+            .map(|completion| completion.collection_id))
     }
 }
