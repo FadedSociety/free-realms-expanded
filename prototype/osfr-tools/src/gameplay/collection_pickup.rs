@@ -62,21 +62,18 @@ impl CollectionWorld {
     }
 }
 
-/// Reads the catalogue and shipped map from `content_dir` and the overlay from `overlay_dir`
-/// (dormant unless the first two exist). Adds the overlay actors, hides every replaced content
-/// coin and every coin `extras` has already collected, so a relog never sends it.
+/// Reads the catalogue and shipped map from `content_dir` (dormant unless both exist) and hides
+/// every coin `extras` has already collected, so a relog never sends it. The live overlay is
+/// not read here: `Gameplay::set_world_dir` owns it, from the live-world folder.
 pub(super) fn load(
     content_dir: &Path,
-    overlay_dir: &Path,
     extras: &ProgressionExtras,
     visibility: &mut Option<NpcVisibility>,
 ) -> io::Result<Option<Arc<CollectionWorld>>> {
     let Some(catalogue) = CollectionCatalogueContent::load(content_dir)? else {
         return Ok(None);
     };
-    let Some((content, coins)) =
-        CollectionCoins::load_with_overlay(content_dir, overlay_dir, &catalogue)?
-    else {
+    let Some(content) = CollectionCoins::load(content_dir, &catalogue)? else {
         return Ok(None);
     };
     // A reward item without a definition is never granted; say which, once per load.
@@ -107,8 +104,8 @@ pub(super) fn load(
     }
     let world = CollectionWorld {
         catalogue,
+        coins: content.clone(),
         content,
-        coins,
     };
     if let Some(visibility) = visibility {
         apply_view(visibility, &world, extras.collections(), std::iter::empty())?;
@@ -118,7 +115,8 @@ pub(super) fn load(
 
 /// Add the overlay actors, hide every replaced content coin and every coin whose entry this
 /// player has collected; `removed` are overlay GUIDs whose row disappeared. Returns the
-/// visibility refresh packets (empty before the first update).
+/// visibility refresh packets (empty before the first update): a coin hidden now that the
+/// client already drew gets its 35/3 here.
 pub(super) fn apply_view(
     visibility: &mut NpcVisibility,
     world: &CollectionWorld,
@@ -138,7 +136,7 @@ pub(super) fn apply_view(
             0,
         );
     }
-    visibility.exclude_actor_guids(
+    visibility.hide_actor_guids(
         world.coins.replaced().chain(
             world
                 .coins

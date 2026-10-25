@@ -596,11 +596,15 @@ impl NpcVisibility {
     /// viewer (a collected or replaced coin, or a field actor): the authoring
     /// commands need the content row, not this viewer's filtered view (T525).
     pub fn authored_spawn(&self, actor_id: u64) -> Option<(u32, [f32; 3])> {
+        let npc = self.find_actor(actor_id)?;
+        Some((u32::try_from(npc.spawn.model_id).ok()?, npc.position))
+    }
+
+    fn find_actor(&self, actor_id: u64) -> Option<&VisibleNpc> {
         self.by_zone
             .values()
             .flatten()
             .find(|npc| npc.spawn.actor_id == actor_id)
-            .and_then(|npc| Some((u32::try_from(npc.spawn.model_id).ok()?, npc.position)))
     }
 
     /// Where a content actor stands, for click reach checks. Excluded and removed actors have
@@ -613,16 +617,21 @@ impl NpcVisibility {
         if self.excluded.contains(&actor_id) {
             return None;
         }
-        self.by_zone
-            .values()
-            .flatten()
-            .find(|npc| npc.spawn.actor_id == actor_id)
+        self.find_actor(actor_id)
     }
 
     pub fn exclude_actor_guids(&mut self, actor_guids: impl IntoIterator<Item = u64>) {
+        self.hide_actor_guids(actor_guids);
+        self.visible.retain(|guid| !self.excluded.contains(guid));
+    }
+
+    /// Hide actors from this viewer but keep the shown ones in `visible`, so the next
+    /// [`Self::update`] sends their 35/3 (a coin the client already drew).
+    /// `exclude_actor_guids` forgets them silently, which only suits actors the client
+    /// never received or removes itself.
+    pub fn hide_actor_guids(&mut self, actor_guids: impl IntoIterator<Item = u64>) {
         self.revision = self.revision.wrapping_add(1);
         self.excluded.extend(actor_guids);
-        self.visible.retain(|guid| !self.excluded.contains(guid));
     }
 
     pub fn content_key(&self, runtime_guid: u64) -> Option<u64> {

@@ -67,6 +67,10 @@ pub struct Coin {
 #[serde(deny_unknown_fields)]
 pub struct CoinEditsFile {
     pub schema_version: u32,
+    /// The next live GUID to hand out; it only grows, so an unbound row's GUID is never
+    /// reused (a session that missed the unbind would keep the old actor). 0 = not set.
+    #[serde(default)]
+    pub next_guid: u64,
     pub records: Vec<CoinEdit>,
 }
 
@@ -118,7 +122,10 @@ impl Tier {
         }
     }
 
-    /// 386170 "Rare Exploration Coin", 4412 "Elite Exploration Coin" (client locale).
+    /// 386170 "Rare Exploration Coin", 4412 "Elite Exploration Coin": the `name_string_id` of
+    /// every shipped coin row (`npc_spawns_extra.json`, from Legacy `Npcs.json` Id=4436 and
+    /// Id=2115). The client locale (`en_us_data.dat` lines 86160 and 73554) holds both names but
+    /// is keyed by hash, so the id-to-hash tie is not checked here (R).
     pub fn name_string_id(self) -> u32 {
         match self {
             Self::Rare => 386_170,
@@ -206,17 +213,6 @@ impl CollectionCoins {
     /// Reads `collection_coins.json` from `dir` and the overlay beside it, checked against
     /// `catalogue`; `None` when the shipped map is absent.
     pub fn load(dir: &Path, catalogue: &CollectionCatalogueContent) -> io::Result<Option<Self>> {
-        Ok(Self::load_with_overlay(dir, dir, catalogue)?.map(|(_, merged)| merged))
-    }
-
-    /// [`Self::load`] with the overlay read from `overlay_dir` (the live-world folder when
-    /// `--world` is set). Returns the shipped map and the merged view, so a session can merge a
-    /// later overlay over the same base without re-reading the shipped map.
-    pub fn load_with_overlay(
-        dir: &Path,
-        overlay_dir: &Path,
-        catalogue: &CollectionCatalogueContent,
-    ) -> io::Result<Option<(Self, Self)>> {
         let mut bytes = Vec::new();
         match fs::File::open(dir.join(FILE_NAME)) {
             Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(None),
@@ -260,15 +256,12 @@ impl CollectionCoins {
                 return Err(refuse("spawn_guid is listed twice".into()));
             }
         }
-        let base = Self {
+        Ok(Some(Self {
             pickup_range: file.pickup_range,
             coins,
             edits: Vec::new(),
             replaced: BTreeSet::new(),
-        };
-        let edits = read_edits(&overlay_dir.join(EDITS_FILE_NAME))?;
-        let merged = Self::merge(base.clone(), catalogue, edits)?;
-        Ok(Some((base, merged)))
+        }))
     }
 
     /// Merges validated overlay rows over the shipped bindings: a row with `replaces`
@@ -438,11 +431,22 @@ impl CollectionCoins {
     }
 }
 
-/// Reads `collection_coin_edits.json`; a missing file is an empty overlay.
+/// The rows of [`read_overlay`], for the session watch.
 pub fn read_edits(path: &Path) -> io::Result<Vec<CoinEdit>> {
+    Ok(read_overlay(path)?.records)
+}
+
+/// Reads `collection_coin_edits.json`; a missing file is an empty overlay.
+pub fn read_overlay(path: &Path) -> io::Result<CoinEditsFile> {
     let mut bytes = Vec::new();
     match fs::File::open(path) {
-        Err(error) if error.kind() == io::ErrorKind::NotFound => return Ok(Vec::new()),
+        Err(error) if error.kind() == io::ErrorKind::NotFound => {
+            return Ok(CoinEditsFile {
+                schema_version: EDITS_SCHEMA_VERSION,
+                next_guid: 0,
+                records: Vec::new(),
+            });
+        }
         file => file?.take(MAX_FILE_BYTES + 1).read_to_end(&mut bytes)?,
     };
     if bytes.len() as u64 > MAX_FILE_BYTES {
@@ -453,15 +457,14 @@ pub fn read_edits(path: &Path) -> io::Result<Vec<CoinEdit>> {
     if file.schema_version != EDITS_SCHEMA_VERSION {
         return Err(invalid("unsupported collection coin edits schema".into()));
     }
-    Ok(file.records)
+    if file.next_guid != 0 && !(EDIT_GUID_BASE..=EDIT_GUID_END).contains(&file.next_guid) {
+        return Err(invalid("next_guid is outside the live GUID band".into()));
+    }
+    Ok(file)
 }
 
 /// The exact bytes written to `collection_coin_edits.json`, one atomic write per command.
-pub fn edits_bytes(edits: &[CoinEdit]) -> io::Result<Vec<u8>> {
-    let file = CoinEditsFile {
-        schema_version: EDITS_SCHEMA_VERSION,
-        records: edits.to_vec(),
-    };
-    let text = serde_json::to_string_pretty(&file).map_err(|error| invalid(error.to_string()))?;
+pub fn overlay_bytes(file: &CoinEditsFile) -> io::Result<Vec<u8>> {
+    let text = serde_json::to_string_pretty(file).map_err(|error| invalid(error.to_string()))?;
     Ok((text + "\n").into_bytes())
 }

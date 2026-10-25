@@ -924,12 +924,8 @@ impl Gameplay {
         } else {
             None
         };
-        let collections = collection_pickup::load(
-            npc_content,
-            npc_content,
-            &progression_extras,
-            &mut npc_visibility,
-        )?;
+        let collections =
+            collection_pickup::load(npc_content, &progression_extras, &mut npc_visibility)?;
         let npc_ambient =
             crate::npc_ambient::NpcAmbient::load(npc_content)?.map(std::sync::Arc::new);
         // Overworld enemies replace their passive Legacy copies (same GUIDs).

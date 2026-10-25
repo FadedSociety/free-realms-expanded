@@ -575,3 +575,191 @@ fn a_failed_write_leaves_the_file_and_the_view() {
     assert_eq!(rows.len(), 1);
     assert_eq!(rows[0]["entry_id"], json!(1950));
 }
+
+fn entry_ids(fixture: &Fixture) -> Vec<i64> {
+    let mut ids: Vec<i64> = fixture
+        .rows()
+        .iter()
+        .map(|row| row["entry_id"].as_i64().unwrap())
+        .collect();
+    ids.sort();
+    ids
+}
+
+fn guid_of_entry(fixture: &Fixture, entry: i64) -> u64 {
+    fixture
+        .rows()
+        .iter()
+        .find(|row| row["entry_id"] == json!(entry))
+        .unwrap()["spawn_guid"]
+        .as_u64()
+        .unwrap()
+}
+
+/// Two admin sessions that have not polled each other: the second write starts from the
+/// file, not from its own stale view, so the first admin's coin survives.
+#[test]
+fn a_second_admin_writing_before_a_poll_keeps_the_first_row() {
+    let fixture = Fixture::new();
+    let mut first = fixture.admin();
+    let mut second = fixture.admin();
+    let who = at(HERE);
+    first.update_npc_visibility(&who).unwrap();
+    second.update_npc_visibility(&who).unwrap();
+
+    let out = realm(&mut first, "realm coin place 1950", &who);
+    assert!(said(&out).contains("Placed coin"), "{}", said(&out));
+    let first_guid = single_row(&fixture)["spawn_guid"].as_u64().unwrap();
+
+    let out = realm(&mut second, "realm coin place 1954", &who);
+    assert!(said(&out).contains("Placed coin"), "{}", said(&out));
+    assert_eq!(entry_ids(&fixture), [1950, 1954], "both admins rows");
+    assert!(
+        added(&out.replies, first_guid),
+        "the writer's own view picks up the other admin's coin too"
+    );
+
+    // The same holds for the other commands: a stale move or unbind keeps the other rows.
+    let out = realm(&mut first, "realm coin move 100000002115", &who);
+    assert!(said(&out).contains("Moved coin"), "{}", said(&out));
+    assert_eq!(entry_ids(&fixture), [1950, 1954, 2039]);
+    let unbind = format!("realm coin unbind {first_guid}");
+    let out = realm(&mut second, &unbind, &who);
+    assert!(said(&out).contains("Removed placed coin"), "{}", said(&out));
+    assert_eq!(entry_ids(&fixture), [1954, 2039], "only the named row went");
+    assert_ne!(guid_of_entry(&fixture, 1954), first_guid);
+}
+
+/// A viewer that already drew the content coin gets its 35/3 when an admin moves it.
+#[test]
+fn moving_a_content_coin_removes_it_from_a_viewer_who_saw_it() {
+    let fixture = Fixture::new();
+    let old_spot = at(COIN_2115_AT);
+    let mut viewer = fixture.load(None);
+    assert!(added(
+        &viewer.update_npc_visibility(&old_spot).unwrap(),
+        COIN_2115
+    ));
+    let mut admin = fixture.admin();
+    admin.update_npc_visibility(&at(HERE)).unwrap();
+    let out = realm(&mut admin, "realm coin move 100000002115", &at(HERE));
+    let text = said(&out);
+    assert!(text.contains("Moved coin"), "{text}");
+    assert!(
+        !text.contains("new session"),
+        "the content coin is hidden now: {text}"
+    );
+
+    let ticked = viewer.tick(&old_spot, 1_000).unwrap();
+    assert!(
+        removed(&ticked.replies, COIN_2115),
+        "the viewer's client must drop the old coin"
+    );
+}
+
+/// The acting admin, standing by the content coin, loses it from the screen at once.
+#[test]
+fn moving_a_content_coin_removes_it_from_the_acting_session() {
+    let fixture = Fixture::new();
+    let mut admin = fixture.admin();
+    let spot = at(COIN_2115_AT);
+    assert!(added(
+        &admin.update_npc_visibility(&spot).unwrap(),
+        COIN_2115
+    ));
+    let out = realm(&mut admin, "realm coin move 100000002115", &spot);
+    assert!(said(&out).contains("Moved coin"), "{}", said(&out));
+    assert!(
+        removed(&out.replies, COIN_2115),
+        "35/3 for the content coin"
+    );
+}
+
+/// A live row can be moved: the old actor goes, the new one keeps hiding the content coin.
+#[test]
+fn a_live_row_moves_to_a_new_guid_and_keeps_its_replaces() {
+    let fixture = Fixture::new();
+    let mut game = fixture.admin();
+    let who = at(HERE);
+    game.update_npc_visibility(&who).unwrap();
+    assert!(said(&realm(&mut game, "realm coin place 1950", &who)).contains("Placed coin"));
+    let placed = single_row(&fixture)["spawn_guid"].as_u64().unwrap();
+    let there = at([HERE[0] + 30.0, HERE[1], HERE[2]]);
+    let out = realm(&mut game, &format!("realm coin move {placed}"), &there);
+    assert!(said(&out).contains("Moved coin"), "{}", said(&out));
+    let row = single_row(&fixture);
+    let new = row["spawn_guid"].as_u64().unwrap();
+    assert_ne!(new, placed);
+    assert_eq!(row["entry_id"], json!(1950));
+    assert!(row["replaces"].is_null());
+    assert!(removed(&out.replies, placed), "the old actor goes");
+    assert!(added(&out.replies, new), "the new actor appears");
+
+    // A row that replaced a content coin keeps replacing it across moves.
+    let fixture = Fixture::new();
+    let mut game = fixture.admin();
+    game.update_npc_visibility(&who).unwrap();
+    assert!(said(&realm(&mut game, "realm coin move 100000002115", &who)).contains("Moved"));
+    let first = single_row(&fixture)["spawn_guid"].as_u64().unwrap();
+    let out = realm(&mut game, &format!("realm coin move {first}"), &there);
+    assert!(said(&out).contains("Moved coin"), "{}", said(&out));
+    let row = single_row(&fixture);
+    assert_ne!(row["spawn_guid"].as_u64().unwrap(), first);
+    assert_eq!(row["replaces"], json!(COIN_2115));
+}
+
+/// Unbinding a row that replaced a content coin removes the row and its actor.
+#[test]
+fn unbinding_a_replacing_row_removes_it() {
+    let fixture = Fixture::new();
+    let mut game = fixture.admin();
+    let who = at(HERE);
+    game.update_npc_visibility(&who).unwrap();
+    assert!(said(&realm(&mut game, "realm coin move 100000002115", &who)).contains("Moved"));
+    let new = single_row(&fixture)["spawn_guid"].as_u64().unwrap();
+    let out = realm(&mut game, &format!("realm coin unbind {new}"), &who);
+    assert!(said(&out).contains("Removed placed coin"), "{}", said(&out));
+    assert!(removed(&out.replies, new));
+    assert!(fixture.rows().is_empty());
+}
+
+/// A live GUID is never handed out twice, even when its row was unbound: a session that
+/// missed the unbind would otherwise keep drawing the old coin under the new one.
+#[test]
+fn an_unbound_live_guid_is_never_reused() {
+    let fixture = Fixture::new();
+    let mut game = fixture.admin();
+    let who = at(HERE);
+    game.update_npc_visibility(&who).unwrap();
+    assert!(said(&realm(&mut game, "realm coin place 1950", &who)).contains("Placed coin"));
+    let first = single_row(&fixture)["spawn_guid"].as_u64().unwrap();
+    let out = realm(&mut game, &format!("realm coin unbind {first}"), &who);
+    assert!(said(&out).contains("Removed placed coin"), "{}", said(&out));
+    assert!(said(&realm(&mut game, "realm coin place 1954", &who)).contains("Placed coin"));
+    let second = single_row(&fixture)["spawn_guid"].as_u64().unwrap();
+    assert!(second > first, "{second} reuses or precedes {first}");
+
+    // The counter is in the file, so a fresh session continues from it too.
+    let mut later = fixture.admin();
+    later.update_npc_visibility(&who).unwrap();
+    let unbind = format!("realm coin unbind {second}");
+    assert!(said(&realm(&mut later, &unbind, &who)).contains("Removed placed coin"));
+    assert!(said(&realm(&mut later, "realm coin place 1950", &who)).contains("Placed coin"));
+    let third = single_row(&fixture)["spawn_guid"].as_u64().unwrap();
+    assert!(third > second, "{third} reuses or precedes {second}");
+}
+
+/// A command refuses on an unreadable overlay instead of overwriting rows it cannot read.
+#[test]
+fn a_damaged_overlay_is_refused_not_overwritten() {
+    let fixture = Fixture::new();
+    let mut game = fixture.admin();
+    let who = at(HERE);
+    game.update_npc_visibility(&who).unwrap();
+    assert!(said(&realm(&mut game, "realm coin place 1950", &who)).contains("Placed coin"));
+    let path = fixture.live.join("collection_coin_edits.json");
+    fs::write(&path, b"{not json").unwrap();
+    let out = realm(&mut game, "realm coin place 1954", &who);
+    assert!(said(&out).contains("Nothing changed"), "{}", said(&out));
+    assert_eq!(fs::read(&path).unwrap(), b"{not json");
+}
