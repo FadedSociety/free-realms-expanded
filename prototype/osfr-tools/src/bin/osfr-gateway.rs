@@ -41,6 +41,8 @@ mod admin_move;
 mod ambient;
 #[path = "osfr_gateway/delivery.rs"]
 mod delivery;
+#[path = "osfr_gateway/encounter_invites.rs"]
+mod encounter_invites;
 use delivery::{
     chat_error_delivery, field_packet, field_packets_for, field_recipient_matches, queue_delivery,
     refresh_public_look, rider_event, wrap_application,
@@ -1686,6 +1688,7 @@ impl Session {
         // T008: the jump body is built from this request's final pose; fan it out
         // only after the commit, like the notice above.
         let jump = staged_gateway.take_jump_relay();
+        let invites = encounter_invites::Staged::new(&self.gateway, &outcome);
         let committed = self.commit_outcome(
             staged_gateway,
             previous,
@@ -1707,6 +1710,7 @@ impl Session {
                 world_event_routing::apply(self, world, now_ms, command)?;
             }
             moderation::run_staged(self, sessions, world, options, staged)?;
+            encounter_invites::run(self, sessions, world, membership, now_ms, invites)?;
         }
         Ok(())
     }

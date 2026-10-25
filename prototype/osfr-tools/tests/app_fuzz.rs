@@ -873,6 +873,11 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     result.push(("item_use", words(42, 15, &[u32::MAX])));
     result.push(("consumable_effects", words(35, 33, &[u32::MAX])));
     result.push(("encounter", [words(41, 122, &[0, 0]), vec![0]].concat()));
+    // T440: the answer to a group encounter invite (two header words, a u64, the accept byte).
+    result.push((
+        "encounter_invite",
+        [words(41, 103, &[0, 0, 0, 0]), vec![1]].concat(),
+    ));
     result.push(("activity_portal", vec![167, 0, 1, 4]));
     result.push((
         "activity_portal",

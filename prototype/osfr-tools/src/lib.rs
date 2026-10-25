@@ -23,6 +23,7 @@ pub mod derby;
 pub mod derby_gateway;
 pub mod dev_teleport;
 pub mod encounter;
+pub mod encounter_invite;
 pub mod enemies;
 pub mod fishing;
 pub mod fishing_service;

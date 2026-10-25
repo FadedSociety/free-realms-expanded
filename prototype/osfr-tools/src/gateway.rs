@@ -31,6 +31,7 @@ use std::time::{Duration, SystemTime, UNIX_EPOCH};
 mod admin_move;
 mod application_preload;
 mod companions;
+mod encounter_join;
 mod staff;
 mod startup_stream;
 mod trade_bridge;
@@ -547,6 +548,8 @@ fn application_handler(body: &[u8]) -> &'static str {
         (Some(26), Some(13)) => "class_selection",
         (Some(26), Some(24)) => "recipe_book",
         (Some(41), Some(109 | 122)) => "encounter",
+        // T440: the answer to a group encounter invite; the host routes it after the commit.
+        (Some(41), Some(103)) => "encounter_invite",
         (Some(42), Some(6 | 9)) => "item_bar",
         (Some(42), Some(15 | 16)) => "item_use",
         (Some(35), Some(33)) => "consumable_effects",
@@ -960,7 +963,7 @@ impl Gateway {
     }
 
     /// (R) Host-authorized transfer only. Do not expose this through raw packets
-    /// or developer chat. Ordinary encounter consent is a later build slice.
+    /// or developer chat. Ordinary encounter consent is `stage_encounter_join` (T440).
     pub fn stage_instance_transfer(
         &mut self,
         target: crate::players::ZoneInstance,

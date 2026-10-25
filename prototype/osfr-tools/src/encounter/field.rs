@@ -208,6 +208,18 @@ impl EncounterEngine {
         }
     }
 
+    /// T440: this player's live field-battle run as (battle id, run instance, title string id),
+    /// the one a grouped member may be invited into. Caves and finished runs are never joinable.
+    pub fn joinable_run(&self) -> Option<(u32, i32, i32)> {
+        let run = self.state.active.as_ref()?;
+        let live = matches!(
+            run.phase,
+            EncounterPhase::Loading | EncounterPhase::Fighting
+        );
+        let battle = self.battles.iter().find(|b| b.id == run.encounter_id)?;
+        live.then_some((battle.id, run.instance_id, battle.title_id))
+    }
+
     /// The battle whose start screen is open, consumed by Go (41/108). The
     /// player must still stand within `BATTLE_SCREEN_RADIUS` of the marker:
     /// an out-of-reach screen is dropped so Go cannot start a battle after

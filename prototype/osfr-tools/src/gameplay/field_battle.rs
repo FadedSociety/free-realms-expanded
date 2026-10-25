@@ -123,6 +123,50 @@ impl Gameplay {
         Ok(true)
     }
 
+    /// T440: the live field-battle run a group invite could point at (battle, run, title id).
+    pub fn joinable_run(&self) -> Option<(u32, i32, i32)> {
+        self.encounter.as_ref()?.joinable_run()
+    }
+
+    /// T440: the Go gates a group invite shares, minus the start screen and the prize preview: no
+    /// busy activity, a combat job, the level floor. A knocked-out player passes; `begin` refuses it.
+    fn group_battle_open(&self, battle: u32) -> bool {
+        let profile = self.profiles.as_ref().map_or(0, Profiles::active);
+        !self.activity_busy()
+            && self
+                .abilities
+                .as_ref()
+                .is_some_and(|abilities| abilities.supports_basic(profile))
+            && self.encounter.as_ref().is_some_and(|encounter| {
+                encounter
+                    .battle_level_refusal(battle, self.job_level(profile))
+                    .is_none()
+            })
+    }
+
+    /// T440: whether this player could press Go on `battle` now (the open gates and the prizes).
+    pub fn can_join_group_battle(&self, battle: u32) -> bool {
+        self.group_battle_open(battle) && self.battle_prizes_available(battle)
+    }
+
+    /// T440: Accept on a group invite begins the inviter's battle for this player. Every Go gate
+    /// runs; an `Err` leaves `self` untouched (callers stage on a clone).
+    pub fn join_group_battle(
+        &mut self,
+        battle: u32,
+        character: &CharacterState,
+    ) -> io::Result<Outcome> {
+        if !self.group_battle_open(battle) {
+            return Err(invalid("cannot join this battle now"));
+        }
+        let mut out = Outcome::default();
+        match self.begin_field_battle(battle, character, &mut out)? {
+            BattleStart::Started => Ok(out),
+            BattleStart::Unavailable => Err(invalid(UNAVAILABLE_BATTLE_PRIZE)),
+            BattleStart::Refused(error) => Err(error),
+        }
+    }
+
     fn refuse_battle(&mut self, battle: u32, profile: i32, message: &str, out: &mut Outcome) {
         out.replies.push(chat::system(message));
         out.replies.extend(

@@ -921,6 +921,8 @@ pub struct World {
     // The instance is part of the key because seeded instances reuse the same
     // authored enemy GUID, so guid+ms alone can be two real kills.
     group_heals: std::collections::VecDeque<(InstanceId, u64, u64)>,
+    // T440: outstanding group-encounter invites; cleared when a player or a run goes away.
+    invites: crate::encounter_invite::Invites,
 }
 
 /// (R) Only touched membership data is staged. No packets or world-wide clone.
@@ -1192,7 +1194,12 @@ impl World {
             next_instance_id,
             empty_instance_grace_ms,
             group_heals: std::collections::VecDeque::new(),
+            invites: Default::default(),
         }
+    }
+
+    pub fn invites_mut(&mut self) -> &mut crate::encounter_invite::Invites {
+        &mut self.invites
     }
 
     pub fn player_location(&self, player: PlayerId) -> Option<&PlayerLocation> {
@@ -1469,6 +1476,15 @@ impl World {
                 removed.push(id);
             }
         }
+        // T440: an invite lives while both players are placed and the inviter is still in its run.
+        self.invites.retain(|invitee, row| {
+            now_ms < row.deadline_ms
+                && self.players.contains_key(&invitee)
+                && self
+                    .players
+                    .get(&row.inviter)
+                    .is_some_and(|at| at.instance_id == row.run)
+        });
         removed.sort_unstable();
         removed
     }
