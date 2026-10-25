@@ -12,32 +12,16 @@ from asset_delivery import AssetDelivery
 
 PROJECT = Path(__file__).resolve().parents[1]
 LAB = PROJECT.parent / "lab"
-# R: provisional property-to-scene joins from Housing Core.md, not a client table. Property 25's
-# scene is the one its client icon (icon_hsg_mkt_hsg_hum_condo_w_lot_64.dds) is named after.
-HOUSING_LOTS = [
-    (1, "hsg_emptylot_blackspore_01"),
-    (2, "hsg_emptylot_boat_01"),
-    (3, "hsg_emptylot_bog_shore_01"),
-    (4, "hsg_emptylot_briarfalls_01"),
-    (5, "hsg_emptylot_briarwood_01"),
-    (6, "hsg_emptylot_bw_towers_01"),
-    (8, "hsg_emptylot_gl_staircase_01"),
-    (9, "hsg_emptylot_shrouded_gloam_01"),
-    (10, "hsg_emptylot_island_01"),
-    (14, "hsg_emptylot_seaside_beach_01"),
-    (15, "hsg_emptylot_sh_batcave_01"),
-    (16, "hsg_emptylot_sh_crystalmines_01"),
-    (17, "hsg_emptylot_shrouded_gloam_01"),
-    (18, "hsg_emptylot_snowdays_01"),
-    (19, "hsg_emptylot_snowhill_01"),
-    (20, "hsg_emptylot_vale_steam_01"),
-    (21, "hsg_emptylot_wugachug_01"),
-    (22, "hsg_emptylot_blackspore_01"),
-    (25, "hsg_hum_condo_w_lot"),
-    (29, "hsg_emptylot_snowhill_01"),
-    (33, "hsg_emptylot_briarwood_01"),
-    (34, "hsg_emptylot_wilds_halflot_01"),
-]
+HOUSES_JSON = PROJECT / "prototype/osfr-tools/data/content/houses.json"
+
+
+def enabled_housing_lots():
+    """The enabled (property_id, scene) pairs, read from the shipped lot table (R: the joins are
+    data, so this check and gameplay cannot disagree about which scenes ship)."""
+    lots = json.loads(HOUSES_JSON.read_text(encoding="utf-8"))["lots"]
+    return [(lot["property_id"], lot["scene"]["name"]) for lot in lots if lot["enabled"]]
+
+
 MAGIC = bytes.fromhex("a1b2c3d4")
 
 
@@ -158,7 +142,7 @@ def write_housing_report():
 
     unique_missing = {}
     lots = []
-    for property_id, scene in HOUSING_LOTS:
+    for property_id, scene in enabled_housing_lots():
         missing = []
         for key, record in manifest.items():
             if not key.startswith(scene.lower()):
@@ -189,9 +173,11 @@ def write_housing_report():
         extension = Path(key).suffix.lower() or "<none>"
         counts[extension] = counts.get(extension, 0) + 1
     lot_entries = sum(len(lot["missing_files"]) for lot in lots)
-    assert len(lots) == 22 and len({lot["scene"] for lot in lots}) == 18
-    assert len(unique_missing) == 1350, f"expected 1350 unique missing assets, got {len(unique_missing)}"
-    assert counts == {".gck2": 202, ".gcnk": 67, ".dds": 1081}, counts
+    # Pinned to the enabled rows of houses.json at T516 (23 lots, 23 distinct scenes). Re-pin when
+    # a lot row changes: the numbers are this check's finding, not an independent expectation.
+    assert len(lots) == 23 and len({lot["scene"] for lot in lots}) == 23
+    assert len(unique_missing) == 1760, f"expected 1760 unique missing assets, got {len(unique_missing)}"
+    assert counts == {".bmp": 4, ".dat": 1, ".dds": 1417, ".gck2": 279, ".gcnk": 58, "<none>": 1}, counts
 
     report = {
         "schema_version": 1,

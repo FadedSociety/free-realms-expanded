@@ -34,8 +34,8 @@ const BOG_SHORE_LOT: i32 = 3;
 const BOG_SHORE_DEED: i32 = 17_192;
 const BOG_SHORE_NAME: i32 = 69_974;
 const BOG_SHORE_PRICE: u32 = 100;
-/// Large Wilds House: property 26 is disabled (no scene), deed 2214.
-const DISABLED_DEED: i32 = 2_214;
+/// Apartment: property 24 stays disabled (its client scene is a header-only stub), deed 10337.
+const DISABLED_DEED: i32 = 10_337;
 /// Wilds Condo: the starter (property 25), deed 17184. Free through 127/23 with its kit (L040).
 const CONDO: i32 = 25;
 const CONDO_DEED: i32 = 17_184;
@@ -507,8 +507,8 @@ fn shipped_deeds_name_their_lot_and_only_sold_lots_are_listed() {
             "property {} was never sold",
             lot.property_id
         );
-        // A buyer must get the lot's own scene: the one its deed's source zone file names. This
-        // keeps lots 9 and 14 (and 22) off sale until their scenes are corrected.
+        // A buyer must get the lot's own scene: the one its deed's source zone file names.
+        // T516 corrected lots 9, 14 and 22; they stay unlisted only because no store row sells them.
         let scene = &lot.scene.as_ref().expect("an enabled lot has a scene").name;
         assert!(
             deed.source

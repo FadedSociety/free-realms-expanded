@@ -25,6 +25,7 @@ use inventory::{Inventory, InventoryItem, InventoryState};
 use serde_json::json;
 use sha2::{Digest, Sha256};
 use std::{
+    collections::BTreeSet,
     fs,
     path::PathBuf,
     sync::atomic::{AtomicU64, Ordering},
@@ -1220,7 +1221,7 @@ fn the_housing_snapshot_seam_is_path_free() {
 fn enabled_bundled_lots_have_scene_bounds_and_source_tags() {
     let content = HousingContent::bundled().unwrap();
     assert_eq!(content.lots.len(), 31);
-    assert_eq!(content.lots.iter().filter(|lot| lot.enabled).count(), 22);
+    assert_eq!(content.lots.iter().filter(|lot| lot.enabled).count(), 23);
     for lot in &content.lots {
         assert!(!lot.source_tag.is_empty());
         assert!(!lot.bounds_source.is_empty());
@@ -1231,13 +1232,12 @@ fn enabled_bundled_lots_have_scene_bounds_and_source_tags() {
                     .as_ref()
                     .is_some_and(|scene| !scene.name.is_empty())
             );
-            // Only the Wilds Condo's scene is named by its icon in the client's own manifest.
-            let source = match lot.property_id {
-                25 => "client-manifest (R)",
-                _ => "community-manifest (R)",
-            };
-            assert_eq!(lot.scene_source.as_deref(), Some(source));
-            assert_eq!(lot.bounds_source, "legacy (R)");
+            assert!(
+                lot.scene_source
+                    .as_deref()
+                    .is_some_and(|source| { !source.is_empty() && source.ends_with("(R)") })
+            );
+            assert!(!lot.bounds_source.is_empty() && lot.bounds_source.ends_with("(R)"));
             assert!(lot.disabled_reason.is_none());
         } else {
             assert!(lot.scene.is_none());
@@ -1255,6 +1255,30 @@ fn enabled_bundled_lots_have_scene_bounds_and_source_tags() {
             .iter()
             .any(|source| source.contains("no client lot/zone/build-box table"))
     );
+}
+
+/// T516: every enabled lot has its own scene and a real sky file, never the placeholder.
+#[test]
+fn enabled_lots_have_distinct_scenes_and_shipped_skies() {
+    let content = HousingContent::bundled().unwrap();
+    let mut scenes = BTreeSet::new();
+    for lot in content.lots.iter().filter(|lot| lot.enabled) {
+        let scene = lot.scene.as_ref().expect("an enabled lot has a scene");
+        assert!(
+            scenes.insert(scene.name.as_str()),
+            "property {} reuses scene {}",
+            lot.property_id,
+            scene.name
+        );
+        assert!(
+            scene.sky.starts_with("sky_") && scene.sky.ends_with(".xml"),
+            "property {} names sky {}",
+            lot.property_id,
+            scene.sky
+        );
+        assert_ne!(scene.sky, "sky_test.xml", "property {}", lot.property_id);
+    }
+    assert_eq!(scenes.len(), 23);
 }
 
 #[test]
@@ -1309,6 +1333,53 @@ fn bundled_disabled_lots_refuse_entry_with_a_reason() {
             ServiceError::HouseSceneUnavailable { property_id }
         );
     }
+}
+
+/// T516: a lot saved on a now-closed farm row still loads, and entering it is refused without
+/// changing the lots or the bag.
+#[test]
+fn a_saved_disabled_farm_lot_loads_and_entry_changes_nothing() {
+    let content = HousingContent::bundled().unwrap();
+    let farm = content
+        .lots
+        .iter()
+        .find(|lot| lot.property_id == 33)
+        .expect("the Briarwood farm row");
+    assert!(!farm.enabled && farm.scene.is_none() && farm.scene_source.is_none());
+
+    // A save made before the row was closed: the character already owns the lot.
+    let mut seeded = content.clone();
+    seeded.starter_property_id = 33;
+    seeded.starter_kit = None;
+    let mut before_close =
+        HousingService::with_content(FixtureConfig::capture_defaults(), seeded).unwrap();
+    let house_guid = before_close.grant_starter_lot(OWNER).unwrap();
+    let saved: HousingServiceState =
+        serde_json::from_slice(&serde_json::to_vec(&before_close.state()).unwrap()).unwrap();
+
+    let content_dir = Content::new(vec![item(INSTANCE as i32, BLOCK_ITEM, 1)], &[BLOCK_ITEM]);
+    let mut inventory = content_dir.inventory();
+    let mut service = HousingService::from_state_with_content(
+        FixtureConfig::capture_defaults(),
+        content,
+        &saved,
+        inventory.state(),
+    )
+    .unwrap();
+    assert_eq!(service.lot(house_guid).unwrap().property_id, 33);
+    let before_state = serde_json::to_vec(&service.state()).unwrap();
+    let before_inventory = serde_json::to_vec(inventory.state()).unwrap();
+    assert_eq!(
+        service
+            .handle(OWNER, &enter_frame(house_guid), &mut inventory)
+            .unwrap_err(),
+        ServiceError::HouseSceneUnavailable { property_id: 33 }
+    );
+    assert_eq!(serde_json::to_vec(&service.state()).unwrap(), before_state);
+    assert_eq!(
+        serde_json::to_vec(inventory.state()).unwrap(),
+        before_inventory
+    );
 }
 
 #[test]

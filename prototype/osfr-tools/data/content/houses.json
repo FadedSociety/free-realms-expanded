@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "provenance": "Legacy Houses.json (AGPL-3.0 reference only; SHA256 854b2d3f009b916a928f66d57a42e2bf685dcc853e898d149580eefd26196d3c) supplies provisional spawn and six-float bounds. Scene choices are R matches from client IconId asset names to community-manifest hsg_emptylot names, plus property 25 (Wilds Condo) whose icon names the client-manifest scene hsg_hum_condo_w_lot; no client property-to-scene map exists. No Legacy source code copied.",
+  "provenance": "Legacy Houses.json (AGPL-3.0 reference only; SHA256 854b2d3f009b916a928f66d57a42e2bf685dcc853e898d149580eefd26196d3c) supplies the provisional spawn and six-float bounds only for a row whose scene has no Lxzxrus zone file. Scenes, skies, spawns and build boxes come from Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_*.json Housing zone records (AlchemyDevelopment/Sanctuary housing data, generated in commit 03c251e) wherever that scene has one; the skies of properties 18 and 25-29 come from Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:113-145, property 29's scene is the scout table's unverified hsg_hum_snowhill_01 (R), and properties 26-28's scenes are named by the client's Assets_manifest.txt lines 72611, 72694 and 73003; the closed farms 33-34 are the scout table's rows 144-145. Property 25 (Wilds Condo) is the starter; its icon names the client-manifest scene hsg_hum_condo_w_lot. Scene transition defaults (zone_type 2, geometry 214) remain reconstructed. No client property-to-scene map exists. No Legacy source code copied.",
   "starter_property_id": 25,
   "starter_kit": {
     "item_id": 70429,
@@ -33,7 +33,7 @@
     "client: working OSFR Client Resources/Images/Images.txt resolves each Legacy IconId to a named icon; the client does not link those icons to scenes.",
     "community-manifest: lab/references/osfr-asset-manifest/Assets_manifest.txt lists 24 hsg_emptylot scene names; it supplies no property association.",
     "R: scene candidates match the regional/product words in the client icon asset names; ambiguous or generic rows stay disabled.",
-    "R: Legacy six-float bounds and spawn values remain provisional; scene transition type/sky/geometry defaults are placeholders pending scene/native evidence.",
+    "R: Legacy six-float bounds and spawn values remain provisional where no Lxzxrus zone file exists; scene transition type and geometry defaults are still placeholders pending native evidence; skies (T516) name files shipped in the client's Resources/SKY folder.",
     "R: property 25 (Wilds Condo, name_id 296) is the starter type: the wiki records it as every new player's starter from 2012-01-26 (notes/Research/Pieces/021 Property acquisition.md:107-108) and the client locale's decorating tutorial says 'your new Wilds Condo'; starter grant is one per character, and characters already holding property 1 also receive it once.",
     "R: starter_kit (L040): a new Wilds Condo comes with one Chicken 70429 in the bag, its own unstacked row (the client decorating tutorial lists ItemID 70429 first while TutorialArrow:TutorialActive(), ScriptsBase.lua:33599-33606; client Models.txt 535 chicken.adr) and four Basic Square Blocks 32647 standing in the lot (locale objective 'Redecorate your Wilds Condo by moving some of the blocks it came with'; Legacy ClientItemDefinitions.json 32647 hsg_block_01.adr, client Models.txt 1926). Granting the Chicken, the block item (not the captured 7466) and the count and positions (2 m apart, 6 m in front of the spawn at spawn height) are reconstructed; both items resell for 0 (free issuance)."
   ],
@@ -70,7 +70,7 @@
       "scene": {
         "name": "hsg_emptylot_blackspore_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_blackspore24.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 1,
@@ -79,7 +79,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=1;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=1;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_blackspore_01.json Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -101,12 +101,12 @@
       "max_landmarks": 0,
       "build_areas": [
         [
-          218.8,
+          245.4,
           -100,
-          346.1,
-          481.3,
+          372.0,
+          481.0,
           80.0,
-          505.7
+          492.4
         ]
       ],
       "spawn_position": [
@@ -124,7 +124,7 @@
       "scene": {
         "name": "hsg_emptylot_boat_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_seaside24.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 2,
@@ -133,9 +133,9 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=2;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=2;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_boat_01.json Sky,BuildAreas (R)",
       "enabled": true,
-      "bounds_source": "legacy (R)",
+      "bounds_source": "lxzxrus-whereami (R)",
       "scene_source": "community-manifest (R)",
       "disabled_reason": null,
       "deed": {
@@ -176,7 +176,7 @@
       "scene": {
         "name": "hsg_emptylot_bog_shore_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_housing_wilds.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 3,
@@ -185,7 +185,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=3;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=3;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_bog_shore_01.json Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -230,7 +230,7 @@
       "scene": {
         "name": "hsg_emptylot_briarfalls_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_briarwood24.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 4,
@@ -239,7 +239,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=4;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=4;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_briarfalls_01.json Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -284,7 +284,7 @@
       "scene": {
         "name": "hsg_emptylot_briarwood_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_briarwood24.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 5,
@@ -293,7 +293,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=5;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=5;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_briarwood_01.json Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -338,7 +338,7 @@
       "scene": {
         "name": "hsg_emptylot_bw_towers_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_briarwood24.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 6,
@@ -347,7 +347,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=6;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=6;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_bw_towers_01.json Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -428,7 +428,7 @@
       "scene": {
         "name": "hsg_emptylot_gl_staircase_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_bristlewood_glade.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 8,
@@ -437,7 +437,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=8;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=8;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_gl_staircase_01.json Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -478,9 +478,9 @@
         0
       ],
       "scene": {
-        "name": "hsg_emptylot_shrouded_gloam_01",
+        "name": "hsg_emptylot_gl_valley_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_hidden_valley24.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 9,
@@ -489,7 +489,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=9;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=9;R:cap=9999;R:landmark-cap=0;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_gl_valley_01.json Name,Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -534,7 +534,7 @@
       "scene": {
         "name": "hsg_emptylot_island_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_seaside24.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 10,
@@ -543,7 +543,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=10;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=10;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_island_01.json Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -586,9 +586,9 @@
         0
       ],
       "scene": {
-        "name": "hsg_emptylot_seaside_beach_01",
+        "name": "hsg_emptylot_seaside_cliffs_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_seaside24.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 14,
@@ -597,7 +597,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=14;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=14;R:cap=9999;R:landmark-cap=0;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_seaside_cliffs_01.json Name,Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -642,7 +642,7 @@
       "scene": {
         "name": "hsg_emptylot_sh_batcave_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_bat_cave.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 15,
@@ -651,7 +651,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=15;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=15;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_sh_batcave_01.json Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -694,7 +694,7 @@
       "scene": {
         "name": "hsg_emptylot_sh_crystalmines_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_deep_mines.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 16,
@@ -703,7 +703,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=16;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=16;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_sh_crystalmines_01.json Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -748,7 +748,7 @@
       "scene": {
         "name": "hsg_emptylot_shrouded_gloam_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_shrouded_gloam.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 17,
@@ -757,7 +757,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=17;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=17;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_shrouded_gloam_01.json Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -802,7 +802,7 @@
       "scene": {
         "name": "hsg_emptylot_snowdays_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_hidden_valley24.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 18,
@@ -811,7 +811,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=18;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=18;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;lxzxrus-scout:Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:129 Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -849,7 +849,7 @@
       "scene": {
         "name": "hsg_emptylot_snowhill_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_snowhill_housinglot_01.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 19,
@@ -858,7 +858,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=19;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=19;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_snowhill_01.json Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -903,7 +903,7 @@
       "scene": {
         "name": "hsg_emptylot_vale_steam_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_merryvale24.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 20,
@@ -912,7 +912,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=20;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=20;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_vale_steam_01.json Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -957,7 +957,7 @@
       "scene": {
         "name": "hsg_emptylot_wugachug_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_wugachug24.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 21,
@@ -966,7 +966,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=21;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=21;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_emptylot_wugachug_01.json Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -998,7 +998,7 @@
       ],
       "spawn_position": [
         639.77,
-        5,
+        15,
         557,
         0
       ],
@@ -1009,9 +1009,9 @@
         0
       ],
       "scene": {
-        "name": "hsg_emptylot_blackspore_01",
+        "name": "hsg_hum_blackspore_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_housing_wilds.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 22,
@@ -1020,7 +1020,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=22;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=22;R:cap=9999;R:landmark-cap=0;lxzxrus-data:Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Zones/hsg_hum_blackspore_01.json Name,Sky,SpawnPosition (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -1097,11 +1097,11 @@
         0
       ],
       "scene": null,
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=24;R:cap=9999;R:landmark-cap=0;R:scene-unavailable",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=24;R:cap=9999;R:landmark-cap=0;R:scene-unavailable;client-manifest:Assets_manifest.txt:72337 hsg_hum_condo.gzne 67 bytes, two entries (R)",
       "enabled": false,
       "bounds_source": "legacy (R)",
       "scene_source": null,
-      "disabled_reason": "apartment icon has no matching named community lot scene",
+      "disabled_reason": "hsg_hum_condo.gzne is a 67-byte, two-entry manifest stub (Assets_manifest.txt:72337; 84 raw bytes), probably interior only: the Apartment icon has no named community lot scene",
       "deed": {
         "item_id": 10337,
         "store_bundle_ids": [],
@@ -1140,7 +1140,7 @@
       "scene": {
         "name": "hsg_hum_condo_w_lot",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_sunstone_valley24.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 25,
@@ -1149,7 +1149,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=25;R:cap=9999;R:landmark-cap=0;R:client-manifest-scene:Assets_manifest.txt:72474 hsg_hum_condo_w_lot.gzne.z crc 274745638 (body Assets_004.pack entry 2685) named after icon 38460 icon_hsg_mkt_hsg_hum_condo_w_lot_64.dds;R:transition-defaults zone_type 2, sky_test.xml, geometry 214 (no GZNE reader)",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=25;R:cap=9999;R:landmark-cap=0;R:client-manifest-scene:Assets_manifest.txt:72474 hsg_hum_condo_w_lot.gzne.z crc 274745638 (body Assets_004.pack entry 2685) named after icon 38460 icon_hsg_mkt_hsg_hum_condo_w_lot_64.dds;R:transition-defaults zone_type 2, geometry 214 (no GZNE reader);lxzxrus-scout:Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:136 Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "client-manifest (R)",
@@ -1192,12 +1192,23 @@
         0,
         0
       ],
-      "scene": null,
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=26;R:cap=9999;R:landmark-cap=0;R:scene-unavailable",
-      "enabled": false,
+      "scene": {
+        "name": "hsg_hum_deluxe_01",
+        "zone_type": 2,
+        "sky": "sky_sunstone_valley24.xml",
+        "tutorial": false,
+        "unknown": 1,
+        "zone_id": 26,
+        "update_radius": 0.0,
+        "geometry_id": 214,
+        "override_update_radius": true,
+        "wait_for_zone_ready": false
+      },
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=26;R:cap=9999;R:landmark-cap=0;client-manifest:Assets_manifest.txt:72611 hsg_hum_deluxe_01.gzne (R);lxzxrus-scout:Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:137 Sky (R)",
+      "enabled": true,
       "bounds_source": "legacy (R)",
-      "scene_source": null,
-      "disabled_reason": "deluxe-house icon has no region-specific community lot scene",
+      "scene_source": "client-manifest (R)",
+      "disabled_reason": null,
       "deed": {
         "item_id": 2214,
         "store_bundle_ids": [
@@ -1236,12 +1247,23 @@
         0,
         0
       ],
-      "scene": null,
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=27;R:cap=9999;R:landmark-cap=0;R:scene-unavailable",
-      "enabled": false,
+      "scene": {
+        "name": "hsg_hum_economy_01",
+        "zone_type": 2,
+        "sky": "sky_sunstone_valley24.xml",
+        "tutorial": false,
+        "unknown": 1,
+        "zone_id": 27,
+        "update_radius": 0.0,
+        "geometry_id": 214,
+        "override_update_radius": true,
+        "wait_for_zone_ready": false
+      },
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=27;R:cap=9999;R:landmark-cap=0;client-manifest:Assets_manifest.txt:72694 hsg_hum_economy_01.gzne (R);lxzxrus-scout:Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:138 Sky (R)",
+      "enabled": true,
       "bounds_source": "legacy (R)",
-      "scene_source": null,
-      "disabled_reason": "economy-house icon has no region-specific community lot scene",
+      "scene_source": "client-manifest (R)",
+      "disabled_reason": null,
       "deed": {
         "item_id": 2213,
         "store_bundle_ids": [
@@ -1279,12 +1301,23 @@
         0,
         0
       ],
-      "scene": null,
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=28;R:cap=9999;R:landmark-cap=0;R:scene-unavailable",
-      "enabled": false,
+      "scene": {
+        "name": "hsg_hum_sg_night_club_01",
+        "zone_type": 2,
+        "sky": "sky_sunset.xml",
+        "tutorial": false,
+        "unknown": 1,
+        "zone_id": 28,
+        "update_radius": 0.0,
+        "geometry_id": 214,
+        "override_update_radius": true,
+        "wait_for_zone_ready": false
+      },
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=28;R:cap=9999;R:landmark-cap=0;client-manifest:Assets_manifest.txt:73003 hsg_hum_sg_night_club_01.gzne (R);lxzxrus-scout:Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:139 Sky (R)",
+      "enabled": true,
       "bounds_source": "legacy (R)",
-      "scene_source": null,
-      "disabled_reason": "VIP-house icon has no region-specific community lot scene",
+      "scene_source": "client-manifest (R)",
+      "disabled_reason": null,
       "deed": {
         "item_id": 11140,
         "store_bundle_ids": [
@@ -1323,9 +1356,9 @@
         0
       ],
       "scene": {
-        "name": "hsg_emptylot_snowhill_01",
+        "name": "hsg_hum_snowhill_01",
         "zone_type": 2,
-        "sky": "sky_test.xml",
+        "sky": "sky_snowhill24.xml",
         "tutorial": false,
         "unknown": 1,
         "zone_id": 29,
@@ -1334,7 +1367,7 @@
         "override_update_radius": true,
         "wait_for_zone_ready": false
       },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=29;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match",
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=29;R:cap=9999;R:landmark-cap=0;lxzxrus-scout:Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:140 Scene,Sky (R)",
       "enabled": true,
       "bounds_source": "legacy (R)",
       "scene_source": "community-manifest (R)",
@@ -1482,23 +1515,12 @@
         0,
         0
       ],
-      "scene": {
-        "name": "hsg_emptylot_briarwood_01",
-        "zone_type": 2,
-        "sky": "sky_test.xml",
-        "tutorial": false,
-        "unknown": 1,
-        "zone_id": 33,
-        "update_radius": 0.0,
-        "geometry_id": 214,
-        "override_update_radius": true,
-        "wait_for_zone_ready": false
-      },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=33;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;R:inverted-legacy-box-components-normalized",
-      "enabled": true,
+      "scene": null,
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=33;R:cap=9999;R:landmark-cap=0;R:inverted-legacy-box-components-normalized;lxzxrus-scout:Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:144 Farm plot, no house scene (R)",
+      "enabled": false,
       "bounds_source": "legacy (R)",
-      "scene_source": "community-manifest (R)",
-      "disabled_reason": null,
+      "scene_source": null,
+      "disabled_reason": "farm plot, not a house zone (Lxzxrus housing-scout.md:144-145) (R)",
       "deed": {
         "item_id": 2215,
         "store_bundle_ids": [],
@@ -1534,23 +1556,12 @@
         0,
         0
       ],
-      "scene": {
-        "name": "hsg_emptylot_wilds_halflot_01",
-        "zone_type": 2,
-        "sky": "sky_test.xml",
-        "tutorial": false,
-        "unknown": 1,
-        "zone_id": 34,
-        "update_radius": 0.0,
-        "geometry_id": 214,
-        "override_update_radius": true,
-        "wait_for_zone_ready": false
-      },
-      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=34;R:cap=9999;R:landmark-cap=0;R:icon-name-scene-match;R:inverted-legacy-box-components-normalized",
-      "enabled": true,
+      "scene": null,
+      "source_tag": "legacy-reference:FreeRealms-Legacy@AGPL-3.0:Houses.json:Id=34;R:cap=9999;R:landmark-cap=0;R:inverted-legacy-box-components-normalized;lxzxrus-scout:Lxzxrus-Free-Realms-Server@37ef175 docs/research/housing-scout.md:145 Farm plot, no house scene (R)",
+      "enabled": false,
       "bounds_source": "legacy (R)",
-      "scene_source": "community-manifest (R)",
-      "disabled_reason": null,
+      "scene_source": null,
+      "disabled_reason": "farm plot, not a house zone (Lxzxrus housing-scout.md:144-145) (R)",
       "deed": {
         "item_id": 11435,
         "store_bundle_ids": [],

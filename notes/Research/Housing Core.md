@@ -245,9 +245,9 @@ them with properties.
 | 6 | `icon_hsg_mkt_briarwoodtowers_emptylot_64.dds` | `hsg_emptylot_bw_towers_01` | enabled (R) |
 | 7 | `icon_hsg_mkt_generic_emptylot_64.dds` | — | disabled: generic icon has no unique region scene |
 | 8 | `icon_hsg_mkt_gl_staircase_emptylot_64.dds` | `hsg_emptylot_gl_staircase_01` | enabled (R) |
-| 9 | `icon_hsg_mkt_shrouded_glade_emptylot_64.dds` | `hsg_emptylot_shrouded_gloam_01` | enabled (R, name-to-region match) |
+| 9 | `icon_hsg_mkt_shrouded_glade_emptylot_64.dds` | `hsg_emptylot_gl_valley_01` | enabled (R, Lxzxrus zone file; T516 replaced the duplicated gloam scene) |
 | 10 | `icon_hsg_mkt_island_emptylot_64.dds` | `hsg_emptylot_island_01` | enabled (R) |
-| 14 | `icon_hsg_mkt_seaside_emptylot_64.dds` | `hsg_emptylot_seaside_beach_01` | enabled (R, selected over cliffs scene) |
+| 14 | `icon_hsg_mkt_seaside_emptylot_64.dds` | `hsg_emptylot_seaside_cliffs_01` | enabled (R, Lxzxrus zone file; T516: the beach scene is the Sandy Beach Lot, locale 8321) |
 | 15 | `icon_hsg_mkt_batcave_emptylot_32.dds` | `hsg_emptylot_sh_batcave_01` | enabled (R) |
 | 16 | `icon_hsg_mkt_crystalmines_emptylot_64.dds` | `hsg_emptylot_sh_crystalmines_01` | enabled (R) |
 | 17 | `icon_hsg_mkt_shroudedgloam_lot_64.dds` | `hsg_emptylot_shrouded_gloam_01` | enabled (R) |
@@ -255,26 +255,31 @@ them with properties.
 | 19 | `icon_hsg_mkt_snowhill_emptylot_64.dds` | `hsg_emptylot_snowhill_01` | enabled (R) |
 | 20 | `icon_hsg_mkt_vale_stream_emptylot_64.dds` | `hsg_emptylot_vale_steam_01` | enabled (R, icon/scene spelling differs) |
 | 21 | `icon_hsg_mkt_wugachug_emptylot_64.dds` | `hsg_emptylot_wugachug_01` | enabled (R) |
-| 22 | `icon_hsg_mkt_blackspore_emptylot_64.dds` | `hsg_emptylot_blackspore_01` | enabled (R) |
+| 22 | `icon_hsg_mkt_blackspore_emptylot_64.dds` | `hsg_hum_blackspore_01` | enabled (R, Lxzxrus zone file; T516 replaced the empty Blackspore lot) |
 | 23 | `icon_hsg_mkt_generic_emptylot_64.dds` | — | disabled: generic icon has no unique region scene |
-| 24 | `icon_house_apartment_64.dds` | — | disabled: no matching named community lot scene |
-| 25 | `icon_hsg_mkt_hsg_hum_condo_w_lot_64.dds` | `hsg_hum_condo_w_lot` | enabled, starter (R, `client-manifest`: the icon is named after the scene; see below) |
-| 26 | `icon_house_deluxe_64.dds` | — | disabled: no region-specific community lot scene |
-| 27 | `icon_house_economy_64.dds` | — | disabled: no region-specific community lot scene |
-| 28 | `icon_house_viphouse_64.dds` | — | disabled: no region-specific community lot scene |
-| 29 | `icon_hsg_mkt_snowhill_lodge_64.dds` | `hsg_emptylot_snowhill_01` | enabled (R, region match) |
+| 24 | `icon_house_apartment_64.dds` | — | disabled: `hsg_hum_condo.gzne` is a 67-byte, two-entry header-only stub, probably interior only (T516) |
+| 25 | `icon_hsg_mkt_hsg_hum_condo_w_lot_64.dds` | `hsg_hum_condo_w_lot` | enabled, starter (R, `client-manifest`: the icon is named after the scene; T516 gives it the scout's `sky_sunstone_valley24`) |
+| 26 | `icon_house_deluxe_64.dds` | `hsg_hum_deluxe_01` | enabled (R, `client-manifest:72611`; T516) |
+| 27 | `icon_house_economy_64.dds` | `hsg_hum_economy_01` | enabled (R, `client-manifest:72694`; T516) |
+| 28 | `icon_house_viphouse_64.dds` | `hsg_hum_sg_night_club_01` | enabled (R, `client-manifest:73003`; T516) |
+| 29 | `icon_hsg_mkt_snowhill_lodge_64.dds` | `hsg_hum_snowhill_01` | enabled (R, scout table; zone unverified; T516) |
 | 30 | `icon_hsg_mkt_rumbledome_emptylot_128.dds` | — | disabled: no matching Rumbledome scene |
 | 31 | `icon_hsg_mkt_sunstonevalley_emptylot_64.dds` | — | disabled: no matching Sunstone Valley scene |
 | 32 | `icon_hsg_mkt_dwarfdam_emptylot_64.dds` | — | disabled: no matching Dwarf Dam scene |
-| 33 | `icon_farming_briarwood_lot_01_64.dds` | `hsg_emptylot_briarwood_01` | enabled (R) |
-| 34 | `icon_farming_wilds_lot_64.dds` | `hsg_emptylot_wilds_halflot_01` | enabled (R, selected over rapids scene) |
+| 33 | `icon_farming_briarwood_lot_01_64.dds` | — | disabled: farm plot, not a house zone (Lxzxrus scout:144-145) (R) |
+| 34 | `icon_farming_wilds_lot_64.dds` | — | disabled: farm plot, not a house zone (Lxzxrus scout:144-145) (R) |
 
-All enabled rows use `bounds_source: "legacy (R)"` and `scene_source: "community-manifest (R)"`,
-except property 25 (`client-manifest (R)`); each retains its Legacy six-float box and spawn values.
-Property 25 is the starter. Scene `zone_type`, sky, unknown value, geometry ID and other
-transition fields use the service test defaults (R); only the scene name was matched to a manifest
-entry. These defaults and the bounds have not passed native client acceptance. Nine rows without a
-plausible unique candidate remain disabled and carry a reason in JSON.
+For an enabled row with a Lxzxrus zone file, the bounds are that file's `BuildAreas` (which match
+the Legacy six-float box), except property 2, whose box is the two in-game `!whereami` corners from
+Lxzxrus 7ef1743 and e1dbdae, so its `bounds_source` is `lxzxrus-whereami (R)`; rows without a zone
+file keep `legacy (R)`. `scene_source` is `client-manifest (R)` for properties 25-28 and
+`community-manifest (R)` for the rest. Scene `zone_type`, `unknown`, geometry ID and the other
+transition fields keep the service test defaults (R); zone ids equal property ids. T516 gives every
+enabled row a sky file that ships in the client's `Resources/SKY` folder: the Lxzxrus zone file's
+`Sky` where one exists, otherwise the scout table (`housing-scout.md:113-145`, R). Properties 26-28
+are enabled on the strength of their client-manifest scenes; 33-34 are closed as farm plots. These
+defaults and the bounds have not passed native client acceptance. The other eight rows without a
+plausible unique candidate or house scene stay disabled and carry a reason in JSON.
 
 Property 25's earlier search looked only at `hsg_emptylot_*` names. Its icon names the scene
 `hsg_hum_condo_w_lot`, which ships in the working client: `Assets_manifest.txt:72474`
@@ -282,8 +287,9 @@ Property 25's earlier search looked only at `hsg_emptylot_*` names. Its icon nam
 the scene body is `Assets_004.pack` entry 2685 (`catalog.tsv:72023`, CRC `10604926`, the same
 value). The extracted body is `GZNE` version 3 and holds only terrain material names (`sg_dirt`,
 `sg_grass`, `bw_grass_darkvines` ...), no sky or geometry id, and the toolkit has no GZNE field
-reader, so its transition fields keep the defaults above (R). `hsg_hum_condo.gzne` (84 raw bytes) is
-a header-only stub and is not used.
+reader, so its `zone_type`/geometry transition fields keep the defaults above (R); T516 supplies its
+sky from the scout table (`sky_sunstone_valley24`, R). `hsg_hum_condo.gzne` is a 67-byte manifest
+entry (84 raw bytes), a header-only stub, and is not used.
 
 ### Asset delivery finding
 
@@ -352,4 +358,13 @@ CRC-present except 77 `.dds` (its `.gzne`, `.map`, `.txt`, 20 `.gck2`, 20 `.gcnk
 starter (`hsg_emptylot_blackspore_01`) misses 9 `.gck2` and 52 `.dds`. The script ran with its
 report redirected to a scratch file; rewriting `lab/content/housing-assets/missing.json` is the
 lead's call. Whether the missing `.dds` show as untextured surfaces needs the native check.
+
+T516 re-joined the table to those sources: 23 enabled lots / 23 distinct scenes. A read-only
+recomputation of the same manifest+catalog inputs (the script's report write stays the lead's call)
+gives 1,760 unique missing files (1,760 per-lot entries): 279 `.gck2`, 58 `.gcnk`, 1,417 `.dds`,
+four `.bmp`, one `.dat` and one extensionless `hsg_emptylot_seaside_cliffs_01on` manifest row. The
+three newly enabled Wilds houses miss 28 (26), 164 (27) and 48 (28) files. The script now reads the
+enabled `(property_id, scene)` pairs from `data/content/houses.json`, so its lot list and gameplay
+cannot drift apart; its totals are re-pinned to the T516 rows. The lead still runs the script to
+rewrite `missing.json` and records the native result.
 
