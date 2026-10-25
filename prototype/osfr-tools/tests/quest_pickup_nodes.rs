@@ -26,7 +26,7 @@ use npc_quest_chain::{
 };
 use osfr_tools::{
     gameplay::{Gameplay, Outcome},
-    harvest_nodes::{GatheringNodes, NodeActor},
+    harvest_nodes::{GatheringNodes, NodeActor, NodeChange},
     mining::MINER_PROFILE_ID,
     quest_engine::QuestStatus,
 };
@@ -457,9 +457,13 @@ impl Scratch {
     }
 
     fn write(&self, content: &Value) -> io::Result<()> {
+        self.write_file("quest_nodes.json", content)
+    }
+
+    fn write_file(&self, file: &str, content: &Value) -> io::Result<()> {
         fs::write(
-            self.0.join("quest_nodes.json"),
-            serde_json::to_vec(content).expect("quest node JSON"),
+            self.0.join(file),
+            serde_json::to_vec(content).expect("node JSON"),
         )
     }
 }
@@ -507,6 +511,84 @@ fn load_error(scratch: &Scratch, content: &Value) -> String {
         .err()
         .expect("the bad quest node file must be refused")
         .to_string()
+}
+
+/// A spawn id is unique per node file, not across files: the tag byte gives each file its
+/// own guid space. Before the base's tag byte was cleared, mining (2) and quest (3) spawn 1
+/// both OR-ed to the same guid and `GatheringNodes::load` refused world entry.
+#[test]
+fn same_spawn_id_in_the_mining_and_quest_files_stays_distinct() {
+    let mut mining = node_file(json!([]), "fixture-pool");
+    mining["node_types"][0]["key"] = json!("copper");
+    mining["node_types"][0]["name"] = json!("Copper Vein");
+    mining["node_types"][0]["drop_table"] = json!([{"item_definition_id": 2739, "weight": 100}]);
+    mining["pools"][0]["node_type"] = json!("copper");
+    mining["spawns"][0]["position"] = json!([5.0, 0.0, 0.0]);
+    let dir = Scratch::new("tag-space");
+    dir.write_file("mining_nodes.json", &mining)
+        .expect("scratch mining_nodes.json");
+    dir.write(&node_file(json!([]), "fixture-pool"))
+        .expect("scratch quest_nodes.json");
+    let nodes = GatheringNodes::load(dir.path())
+        .expect("a mining spawn 1 and a quest spawn 1 must not collide")
+        .expect("both files place a node");
+    assert_eq!(nodes.actors().count(), 2);
+    let guids: BTreeSet<u64> = nodes.actors().map(|actor| actor.guid).collect();
+    assert_eq!(guids.len(), 2, "two files' spawn 1 share one guid");
+    let quest = nodes
+        .actors()
+        .find(|actor| actor.name == "Tin Ore")
+        .expect("the quest pickup is placed")
+        .guid;
+    let mining = nodes
+        .actors()
+        .find(|actor| actor.name == "Copper Vein")
+        .expect("the mining node is placed")
+        .guid;
+    assert_eq!(
+        nodes.pickup_kind(quest),
+        Some("tin-ore"),
+        "the quest spawn is the pickup"
+    );
+    assert_eq!(
+        nodes.pickup_kind(mining),
+        None,
+        "the mining spawn is a gather site"
+    );
+}
+
+/// A pick of a node that is already hidden is "no change": it must not push the node's
+/// return past the deadline set by the pick that actually hid it.
+#[test]
+fn repeated_pick_does_not_extend_the_hide() {
+    let dir = Scratch::new("repeat-pick");
+    dir.write(&node_file(json!([]), "fixture-pool"))
+        .expect("scratch quest_nodes.json");
+    let mut nodes = GatheringNodes::load(dir.path())
+        .expect("valid quest nodes load")
+        .expect("one quest node is placed");
+    let guid = nodes.actors().next().expect("placed node").guid;
+    assert!(matches!(
+        nodes.sync(0, false).as_slice(),
+        [NodeChange::Show(_)]
+    ));
+    assert!(matches!(
+        nodes.picked(guid, 1_000),
+        Some(NodeChange::Hide(hidden)) if hidden == guid
+    ));
+    assert!(
+        nodes.picked(guid, 20_000).is_none(),
+        "a repeat pick reported a change"
+    );
+    assert!(
+        nodes.sync(29_999, false).is_empty(),
+        "the node regrew early"
+    );
+    let back = nodes.sync(31_000, false);
+    assert!(
+        matches!(back.as_slice(), [NodeChange::Show(actor)] if actor.guid == guid),
+        "the repeat pick pushed the return past the pool's respawn time"
+    );
 }
 
 #[test]

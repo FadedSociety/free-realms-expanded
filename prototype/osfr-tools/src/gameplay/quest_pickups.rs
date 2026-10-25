@@ -22,7 +22,6 @@ impl Gameplay {
             .gathering_nodes
             .as_ref()
             .and_then(|nodes| nodes.pickup_kind(target))
-            .map(str::to_owned)
         else {
             return Ok(None);
         };
@@ -32,19 +31,13 @@ impl Gameplay {
         let needs = self
             .npc_quests
             .as_ref()
-            .is_some_and(|quests| quests.wants_node(&node_type));
-        let no_jobs = BTreeSet::new();
-        let visitor = crate::harvest_nodes::Visitor {
-            zone: character.zone_id,
-            position: character.position,
-            busy: self.activity_busy(),
-            active_job: 0,
-            unlocked_jobs: &no_jobs,
-        };
-        let denied = self
-            .gathering_nodes
-            .as_ref()
-            .and_then(|nodes| nodes.admit_pickup(target, &visitor, needs).err());
+            .is_some_and(|quests| quests.wants_node(node_type));
+        let busy = self.activity_busy();
+        let denied = self.gathering_nodes.as_ref().and_then(|nodes| {
+            nodes
+                .admit_pickup(target, character.zone_id, character.position, busy, needs)
+                .err()
+        });
         if let Some(denied) = denied {
             out.replies.push(chat::system(&denied.message()));
             return Ok(Some(out));
@@ -55,7 +48,9 @@ impl Gameplay {
             .as_mut()
             .and_then(|nodes| nodes.picked(target, now_ms));
         staged.npc_quest_event(
-            crate::quest_engine::QuestEvent::CollectNode { node_type },
+            crate::quest_engine::QuestEvent::CollectNode {
+                node_type: node_type.to_owned(),
+            },
             &mut out,
         )?;
         if let (Some(hide), Some(visibility)) = (hide, staged.npc_visibility.as_mut()) {
