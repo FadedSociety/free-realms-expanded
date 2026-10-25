@@ -114,7 +114,16 @@ fn every_dance_is_a_client_animation_slot_or_group() {
     );
     for row in rows() {
         let standing = int(&row["standing_animation_id"]);
-        let dances = ints(&row["dance_sequence"]);
+        let independent = row["kind"] == "independent";
+        // One source per kind: an independent row's dance ids are its `clips`, and it carries no
+        // sequence; every other kind's sequence is the ids it plays.
+        let dances = row.get("dance_sequence").map_or_else(Vec::new, ints);
+        assert_eq!(
+            dances.is_empty(),
+            independent,
+            "{}: only an independent row has no dance_sequence",
+            row["item_id"]
+        );
         for id in dances
             .into_iter()
             .chain([standing].into_iter().filter(|id| *id != 0))
@@ -367,7 +376,7 @@ fn the_loader_refuses_rows_out_of_bounds_and_a_missing_file_is_empty() {
     let shipped = Catalogue::load(&content()).unwrap();
     assert!(shipped.get(TOTEM).is_some() && shipped.get(CAMPFIRE).is_none());
     assert_eq!(load_with(|_| {}).unwrap(), shipped);
-    let cases: [(&str, fn(&mut Value)); 30] = [
+    let cases: [(&str, fn(&mut Value)); 32] = [
         ("range 0", |f| f["boomboxes"][0]["range_m"] = json!(0)),
         ("range 51", |f| f["boomboxes"][0]["range_m"] = json!(51)),
         ("spawn offset 11", |f| {
@@ -392,6 +401,15 @@ fn the_loader_refuses_rows_out_of_bounds_and_a_missing_file_is_empty() {
         ("model id 0", |f| f["boomboxes"][0]["model_id"] = json!(0)),
         ("dance id 0", |f| {
             f["boomboxes"][0]["dance_sequence"][0] = json!(0)
+        }),
+        ("synchronized without a dance sequence", |f| {
+            f["boomboxes"][0]
+                .as_object_mut()
+                .unwrap()
+                .remove("dance_sequence");
+        }),
+        ("independent with a dance sequence", |f| {
+            f["boomboxes"][2]["dance_sequence"] = json!([3201, 3211])
         }),
         ("song effect 0", |f| {
             f["boomboxes"][2]["song_effect_ids"][0] = json!(0)

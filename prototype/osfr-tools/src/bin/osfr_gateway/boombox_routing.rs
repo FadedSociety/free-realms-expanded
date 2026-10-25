@@ -301,6 +301,20 @@ mod tests {
             drain_replies(self.scene.sessions.get_mut(&key).unwrap(), now)
         }
 
+        /// `key`'s player now shows the temporary model `model`, keeping its base model, as a
+        /// live transform's AddPc snapshot does (`PlayerPresentation::set_visual`).
+        fn transform(&mut self, key: SessionKey, model: i32) {
+            let id = self.scene.sessions[&key].id;
+            let players = &mut self.scene.world.players;
+            let mut look = players.get(id).unwrap().presentation.clone();
+            look.set_visual(osfr_tools::consumable_effects::Visual {
+                temporary_model: model,
+                scale: 1.0,
+                auras: Vec::new(),
+            });
+            players.set_presentation(id, look).unwrap();
+        }
+
         /// One server tick. The owner is the scene's own session, so it joins the session map
         /// for the tick, as every session is in the real loop.
         fn tick(&mut self, now: u64) {
@@ -663,7 +677,11 @@ mod tests {
             return;
         };
         let dancer = rig.viewer_as(2, 6.0, 60); // human_f: has a Rainbow table
-        let standing = rig.viewer_as(3, 8.0, 1941); // the Realms Roll model: no table
+        let second = rig.viewer_as(4, 10.0, 1); // human_m: has one too
+        let standing = rig.viewer_as(3, 8.0, 1);
+        // Base model 1 has a table, but a live transform shows the Realms Roll model 1941: no
+        // table, so the client shows a model that must stand.
+        rig.transform(standing, 1941);
         let owner = rig.press(3_000);
         // The box, its poof and one of the six colour songs: red..yellow (16448-16453).
         assert_eq!(subs(&about_box(&owner)), [2, 16, 41]);
@@ -674,15 +692,25 @@ mod tests {
         let effect = i32::from_le_bytes(song[16..20].try_into().unwrap());
         assert!((16_448..=16_453).contains(&effect), "{effect}");
         rig.drain(dancer, 3_000);
+        rig.drain(second, 3_000);
         rig.drain(standing, 3_000);
         rig.tick(3_050);
+        // Each table dancer gets its own single-entry 35/63; never one packet with both entries.
         let rolled = sync_steps(&rig.drain(dancer, 3_050));
-        assert_eq!(rolled.len(), 1, "one single-entry step per dancer");
-        assert_eq!(rolled[0].len(), 1, "{rolled:?}");
-        assert_eq!(rolled[0][0].0, 7_000_000_002);
-        assert!(rolled[0][0].1 > 0, "a client animation id");
-        // The model without a table stands on the row's group (3550) as a base animation, and
-        // is never listed in a 35/63. The owner (default model, no table) stands too.
+        assert_eq!(rolled.len(), 2, "one single-entry step per dancer");
+        assert!(rolled.iter().all(|step| step.len() == 1), "{rolled:?}");
+        let entries: Vec<_> = rolled.iter().flatten().copied().collect();
+        assert_eq!(
+            entries.iter().map(|(guid, _)| *guid).collect::<Vec<_>>(),
+            [7_000_000_002, 7_000_000_004]
+        );
+        assert!(entries.iter().all(|(_, animation)| *animation > 0));
+        let seen = sync_steps(&rig.drain(second, 3_050));
+        assert_eq!(seen.len(), 2, "the second dancer sees both, singly");
+        assert!(seen.iter().all(|step| step.len() == 1));
+        assert_eq!(seen.into_iter().flatten().collect::<Vec<_>>(), entries);
+        // The transformed model stands on the row's group (3550) as a base animation, and is
+        // never listed in a 35/63. The owner (default model, no table) stands too.
         let standing_got = rig.drain(standing, 3_050);
         assert!(
             sync_steps(&standing_got)

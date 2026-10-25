@@ -90,7 +90,6 @@
       "item_id": 1913,
       "model_id": 1979,
       "kind": "independent",
-      "dance_sequence": [3550],
       "clip_ms": {},
       "clips": {
         "1": [
@@ -517,7 +516,6 @@
       "item_id": 48244,
       "model_id": 185,
       "kind": "independent",
-      "dance_sequence": [3201, 3211, 3212, 3213, 3214],
       "clip_ms": {},
       "clips": {
         "1": [
@@ -898,7 +896,6 @@
       "item_id": 76935,
       "model_id": 4428,
       "kind": "independent",
-      "dance_sequence": [3570],
       "clip_ms": {},
       "clips": {
         "1": [

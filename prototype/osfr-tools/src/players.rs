@@ -752,6 +752,20 @@ impl PlayerPresentation {
         self.scale = visual.scale;
         self.auras = visual.auras;
     }
+
+    /// The model the client shows the character as: a live transform's temporary model when one
+    /// is set, else the character's own model. The transform replaces the actor rather than its
+    /// base model: the 35/14 case (`00930283`) applies it through `0096bd90`
+    /// (`ProxiedCharacter::SwitchToTemporaryAppearance`), and a late viewer gets the same model in
+    /// the AddPc temporary-appearance slot (reader `0091aa10`). Any rule keyed by the model an
+    /// actor plays, such as a boombox dance table, must use this, not `model`.
+    pub fn display_model(&self) -> i32 {
+        if self.temporary_model != 0 {
+            self.temporary_model
+        } else {
+            self.model
+        }
+    }
 }
 
 fn validate_attachment_wire(bytes: &[u8]) -> Result<usize, RegistryError> {
