@@ -49,6 +49,7 @@ mod crafting;
 mod derby_session;
 mod encounter_rewards;
 mod field_battle;
+mod fishing_scene;
 mod housing;
 mod item_requests;
 mod item_use;
@@ -286,6 +287,8 @@ pub struct Gameplay {
     collections: Option<Arc<collection_pickup::CollectionWorld>>,
     /// Player housing (`gameplay/housing.rs`); `None` when the content has no `houses.json`.
     housing: Option<housing::HousingSession>,
+    /// T514: the fishing hole the player is in (`gameplay/fishing_scene.rs`). Session-only.
+    fishing_hole: Option<fishing_scene::FishingHole>,
     /// L046: the saved lots, kept unchanged while housing is dormant so a save never drops them.
     dormant_housing: Option<crate::housing_service::HousingServiceState>,
     /// Style-card look and tables (`gameplay/style_card_use.rs`).
@@ -1176,6 +1179,7 @@ impl Gameplay {
             collections,
             housing,
             dormant_housing,
+            fishing_hole: None,
             style_cards: style_card_use::StyleCards::saved(saved_look),
             inventory,
             categories: ItemCategories::load(directory)?,
@@ -1655,7 +1659,7 @@ impl Gameplay {
     }
 
     pub fn supports_location(&self, character: &CharacterState) -> bool {
-        if self.soccer.is_some() {
+        if self.soccer.is_some() || self.in_fishing_hole(character) {
             return true;
         }
         if let Some(kart) = self.kart_entry.as_ref().filter(|k| k.active()) {
@@ -1671,31 +1675,13 @@ impl Gameplay {
         if let Some(zone) = self.house_zone() {
             return Some(zone);
         }
-        if let Some(soccer) = self.soccer.as_ref() {
-            // (R) A match owns its own arena scene; the public overworld zone
-            // must not stand in for it, or other players share its instance.
-            let scene = soccer.scene();
-            let zone_id = u32::try_from(scene.id).ok()?;
-            return Some(ZoneTransition {
-                zone_id,
-                name: scene.scene.clone(),
-                sky: scene.sky.clone(),
-                geometry_id: scene.geometry_id,
-                position: scene.position[..3].try_into().unwrap(),
-                rotation: scene.rotation[..3].try_into().unwrap(),
-                tutorial: scene.tutorial,
-            });
-        }
-        if let Some(scene) = self.kart_entry.as_ref().and_then(|k| k.scene()) {
-            return Some(ZoneTransition {
-                zone_id: scene.id as u32,
-                name: scene.scene.clone(),
-                sky: scene.sky.clone(),
-                geometry_id: scene.geometry_id,
-                position: scene.position[..3].try_into().unwrap(),
-                rotation: scene.rotation[..3].try_into().unwrap(),
-                tutorial: scene.tutorial,
-            });
+        // (R) A match, a race or a fishing hole owns its own scene; the public overworld zone
+        // must not stand in for it, or other players share its instance.
+        let scene = (self.soccer.as_ref().map(|soccer| soccer.scene()))
+            .or_else(|| self.kart_entry.as_ref().and_then(|kart| kart.scene()))
+            .or_else(|| self.fishing_hole_scene());
+        if let Some(scene) = scene {
+            return housing::scene_zone(scene);
         }
         self.encounter
             .as_ref()
@@ -1711,7 +1697,7 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Outcome> {
-        if let Some(replies) = self.housing_loaded() {
+        if let Some(replies) = self.housing_loaded().or_else(|| self.fishing_hole_loaded()) {
             return Ok(Outcome {
                 replies,
                 ..Outcome::default()
@@ -1895,22 +1881,14 @@ impl Gameplay {
 
     pub fn tick(&mut self, character: &CharacterState, now_ms: u64) -> io::Result<Outcome> {
         let counters_before = self.achievement_counters();
-        // W160: bite timers and the leash run beside the world tick; nothing here is saved.
-        let fishing = match self.fishing.supervise(
-            character.guid,
-            character.zone_id,
-            character.position,
-            now_ms,
-        ) {
-            Ok(Some(change)) => change.replies,
-            _ => Vec::new(),
-        };
+        let fishing = self.supervise_fishing(character, now_ms)?;
         let mut out = self.tick_world(character, now_ms)?;
         self.tick_gathering_nodes(now_ms, &mut out)?;
         self.tick_live_placements(now_ms, &mut out); // world visibility only, never saved
         self.tick_live_events(now_ms); // quest offer gate only, never saved
         self.tick_consumable_effects(character.guid, now_ms, &mut out);
-        out.replies.splice(0..0, fishing);
+        out.replies.splice(0..0, fishing.replies);
+        out.scene_zoning = fishing.scene_zoning.or(out.scene_zoning.take());
         self.settle_achievement_counters(&counters_before, &mut out)?;
         Ok(out)
     }
@@ -2494,6 +2472,7 @@ impl Gameplay {
         for event in minigame_events {
             self.npc_quest_event(event, &mut out)?;
         }
+        self.leave_fishing_hole(&mut out)?;
         Ok(Some(out))
     }
 

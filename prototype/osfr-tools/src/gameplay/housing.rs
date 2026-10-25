@@ -7,7 +7,7 @@
 //! family 127 falls through exactly as before.
 use super::*;
 use crate::housing_service::{
-    FixtureConfig, HousingContent, HousingService, HousingServiceState, HousingZoneChange,
+    FixtureConfig, HousingContent, HousingService, HousingServiceState, HousingZoneChange, Request,
     ServiceOutcome, decode_request,
 };
 
@@ -83,6 +83,25 @@ impl HousingSession {
     }
 }
 
+/// A scene the player was zoned into (a house lot, a match, a race, a fishing hole) as
+/// `current_zone` reports it to the startup zone record and the membership registry. `None` for
+/// a negative id.
+pub(super) fn scene_zone(
+    scene: &crate::zone_transition::ZoneTransition,
+) -> Option<crate::encounter::ZoneTransition> {
+    let [x, y, z, _] = scene.position;
+    let [rx, ry, rz, _] = scene.rotation;
+    Some(crate::encounter::ZoneTransition {
+        zone_id: u32::try_from(scene.id).ok()?,
+        name: scene.scene.clone(),
+        sky: scene.sky.clone(),
+        geometry_id: scene.geometry_id,
+        position: [x, y, z],
+        rotation: [rx, ry, rz],
+        tutorial: scene.tutorial,
+    })
+}
+
 fn encode_replies(outcome: &ServiceOutcome) -> io::Result<Vec<Vec<u8>>> {
     outcome
         .replies
@@ -106,6 +125,20 @@ impl Gameplay {
         let Some(session) = self.housing.as_ref() else {
             return Ok(None);
         };
+        // The occupation table: another activity (a fishing hole, a match, a race) owns the
+        // player's scene, and a lot entered from it would keep that scene as its way back. Going
+        // from one lot to another stays open.
+        if matches!(decode_request(inner), Ok(Request::Enter { .. }))
+            && self.activity_busy()
+            && !self.is_occupied(occupation::Occupation::Housing)
+        {
+            return Ok(Some(Outcome {
+                replies: vec![chat::system(
+                    "Finish the active activity before entering a house.",
+                )],
+                ..Outcome::default()
+            }));
+        }
         let mut session = session.clone();
         let mut inventory = self.inventory.clone();
         let result = session
@@ -205,24 +238,11 @@ impl Gameplay {
     /// While inside, the lot is the player's scene (like a soccer arena), so the server's
     /// membership registry registers it and gives the visit its own instance.
     pub(super) fn house_zone(&self) -> Option<crate::encounter::ZoneTransition> {
-        let scene = self
-            .housing
-            .as_ref()
-            .filter(|s| s.in_house())?
-            .scene
-            .as_ref()?;
-        Some(crate::encounter::ZoneTransition {
-            zone_id: u32::try_from(scene.id).ok()?,
-            name: scene.scene.clone(),
-            sky: scene.sky.clone(),
-            geometry_id: scene.geometry_id,
-            position: scene.position[..3].try_into().ok()?,
-            rotation: scene.rotation[..3].try_into().ok()?,
-            tutorial: scene.tutorial,
-        })
+        let session = self.housing.as_ref().filter(|s| s.in_house())?;
+        scene_zone(session.scene.as_ref()?)
     }
 
-    /// The op31 frame back to the saved world pose (house and kart race returns).
+    /// The op31 frame back to the saved world pose (house, kart race and fishing-hole returns).
     pub(super) fn world_zoning(
         &self,
         back: &CharacterState,

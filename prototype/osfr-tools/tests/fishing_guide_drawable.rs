@@ -35,6 +35,7 @@ use osfr_tools::{
     gameplay::{Gameplay, Outcome},
     startup_world::parse_add_npc,
     world::NpcVisibility,
+    zone_transition::ZoneTransition,
 };
 use serde_json::Value;
 use std::{
@@ -195,11 +196,36 @@ impl Player {
             "guide {npc} has no menu"
         );
         let option = menu_option(&menu, menu_label());
-        let replies = self.send(&select(npc, option as u32)).replies;
+        let choice = self.send(&select(npc, option as u32));
+        let (instance, game_id) = self.offer(choice);
+        (option, instance, game_id)
+    }
+
+    /// The 39/16 offer's instance and MiniGameData id. At a hole whose scene the client has
+    /// (T514), Go fish! zones the player in and the offer follows the scene load.
+    fn offer(&mut self, choice: Outcome) -> (i32, i32) {
+        let replies = match &choice.scene_zoning {
+            Some(scene) => {
+                self.zone(scene);
+                self.now += 1_000;
+                self.game
+                    .initialize_world(&self.character, self.now)
+                    .unwrap()
+                    .replies
+            }
+            None => choice.replies,
+        };
         let offer = find(&replies, &[39, 0, 16]).expect("the fish option offers the round");
         let instance = i32::from_le_bytes(offer[3..7].try_into().unwrap());
         let game_id = i32::from_le_bytes(offer[11..15].try_into().unwrap());
-        (option, instance, game_id)
+        (instance, game_id)
+    }
+
+    /// The opcode-31 zoning applied to the character, as the gateway stages it.
+    fn zone(&mut self, scene: &ZoneTransition) {
+        self.character.zone_id = scene.id as u32;
+        self.character.position = scene.position[..3].try_into().unwrap();
+        self.character.rotation = scene.rotation[..3].try_into().unwrap();
     }
 
     /// Take the trip and press Go (39/5): the encounter starts and the fishing flag is on.
@@ -218,10 +244,14 @@ impl Player {
         instance
     }
 
-    /// The client's ordinary quit (39/6): the round ends and the flag goes off.
+    /// The client's ordinary quit (39/6): the round ends and the flag goes off; a hole round
+    /// zones the player back to the world.
     fn quit(&mut self, instance: i32) {
         let left = self.send(&lifecycle(6, instance));
         assert_eq!(status_flags(&left.replies), vec![1], "fishing flag off");
+        if let Some(back) = &left.scene_zoning {
+            self.zone(back);
+        }
     }
 
     fn cast_and_hook(&mut self) {
@@ -527,6 +557,11 @@ fn a_trip_can_be_quit_and_a_reconnect_releases_the_round() {
     player.start(GUNTHER);
     player.send(&register(ACTOR));
     player.cast_and_hook();
+    // The save taken in the hole stores the world pose; the reconnect resumes there.
+    player.character = player
+        .game
+        .scene_return()
+        .expect("Gunther's hole is a scene");
     player.game.reset_session();
     player.game = player.fixture.reload_serialized(&player.game);
     let late = player.try_send(&reel(ACTOR));
@@ -552,8 +587,7 @@ fn fishing_entry_uses_no_dev_commands() {
         for out in [&menu, &choice] {
             assert!(!out.dev_command_denied && out.relocation.is_none() && out.zoning.is_none());
         }
-        let offer = find(&choice.replies, &[39, 0, 16]).expect("the trip is offered");
-        let instance = i32::from_le_bytes(offer[3..7].try_into().unwrap());
+        let (instance, _) = player.offer(choice);
         player.send(&lifecycle(5, instance));
         player.quit(instance);
     }

@@ -1302,13 +1302,13 @@ impl Gateway {
 
     pub fn snapshot(&self) -> Snapshot {
         Snapshot {
-            // L012: a save taken mid-match stores the pre-match pose, never the arena scene.
+            // L012, T514: a save taken in a match, a house or a fishing hole stores the world pose.
             character: self
                 .gameplay
                 .as_ref()
                 .and_then(|game| {
                     game.soccer_return(&self.state)
-                        .or_else(|| game.house_return())
+                        .or_else(|| game.scene_return())
                 })
                 .unwrap_or_else(|| self.state.clone()),
             gameplay: self.gameplay.as_ref().map(Gameplay::state),
@@ -1393,7 +1393,7 @@ impl Gateway {
             if let Some(return_location) = game.abandon_soccer_for_reconnect(&self.state) {
                 self.state = return_location;
             }
-            if let Some(return_location) = game.abandon_house_for_reconnect() {
+            if let Some(return_location) = game.abandon_scene_for_reconnect() {
                 self.state = return_location;
             }
             game.reset_session();

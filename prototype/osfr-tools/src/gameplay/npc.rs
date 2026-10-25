@@ -993,10 +993,7 @@ impl Gameplay {
             level,
             rewards,
         ) {
-            Ok(change) => {
-                out.replies = change.replies;
-                out.changed = true;
-            }
+            Ok(change) => self.start_fishing_trip(change, character, &mut out),
             Err(denied) => out.replies.push(chat::system(denied.message())),
         }
         Ok(out)

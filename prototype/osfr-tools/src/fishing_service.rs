@@ -38,6 +38,7 @@ use crate::{
     profiles::ProfileState,
     quest_engine::QuestEvent,
     rewards::{ItemGrant, RewardDisplay, RewardGrant, RewardState, apply_grant},
+    zone_transition::ZoneTransition,
 };
 use serde::Deserialize;
 use std::{
@@ -109,6 +110,9 @@ pub struct Change {
     pub paid: bool,
     /// Player-readable lines the caller sends as chat (W160).
     pub notices: Vec<&'static str>,
+    /// T514: `enter` put this round in its hole's own scene ([`Scene::zoning`]). The caller
+    /// zones the player there now and holds `replies` (the start packets) until it has loaded.
+    pub scene: Option<ZoneTransition>,
 }
 
 #[derive(Clone)]
@@ -125,6 +129,9 @@ struct Tracked {
     zone_words: [f32; 5],
     /// Zone of the spot; `None` for sessions started by `begin` (no zone supervision).
     zone: Option<u32>,
+    /// T514: the round runs in its hole's own scene, so `supervise` keeps no leash and the cast
+    /// reach is measured from the player's latest supervised position.
+    in_scene: bool,
     /// Per-grade payout rows for this round (R, `fishing_spots.json`); `None` for `begin`,
     /// which keeps the low-level entry's caller-owned payout.
     payout: Option<PayoutTable>,
@@ -265,6 +272,7 @@ impl FishingService {
             None,
             None,
             None,
+            None,
             rewards,
         )
     }
@@ -279,6 +287,7 @@ impl FishingService {
         anchor: Vec4,
         zone_words: [f32; 5],
         zone: Option<u32>,
+        scene: Option<ZoneTransition>,
         payout: Option<PayoutTable>,
         cap: Option<CatchCap>,
         rewards: RewardState,
@@ -315,6 +324,7 @@ impl FishingService {
                 anchor,
                 zone_words,
                 zone,
+                in_scene: scene.is_some(),
                 payout,
                 cap,
                 rewards,
@@ -329,6 +339,7 @@ impl FishingService {
         Ok(Change {
             replies: offered.replies,
             changed: true,
+            scene,
             ..Change::default()
         })
     }
@@ -543,8 +554,9 @@ impl FishingService {
     }
 
     /// Ordinary entry (W160): admit the player at a listed guide and offer the round. Staged:
-    /// a refusal changes nothing, and the 39/16 offer and its 41/107 ready in the returned
-    /// [`Change`] are the only effect of success. `busy` is true while another activity runs;
+    /// a refusal changes nothing, and the returned [`Change`] is the only effect of success: the
+    /// 39/16 offer and its 41/107 ready, plus `Change.scene`, the zoning into the hole for a
+    /// cached hole (T514). `busy` is true while another activity runs;
     /// range and "this exact option was offered" are already proven by the NPC menu service.
     #[allow(clippy::too_many_arguments)]
     pub fn enter(
@@ -580,6 +592,14 @@ impl FishingService {
         spec.name_id = spot.name_id;
         spec.description_id = spot.description_id;
         spec.icon_id = spot.icon_id;
+        // T514: a hole whose scene the client has is fished in that scene, from its spawn. The
+        // other holes keep the in-place round at the guide (R) until their scenes are cached.
+        let scene = spot.scene.client_scene_cached.then(|| spot.scene.zoning());
+        let (zone, position) = if scene.is_some() {
+            (spot.scene.zone_id, spot.scene.spawn_position)
+        } else {
+            (zone, position)
+        };
         let anchor = Vec4 {
             x: position[0],
             y: position[1],
@@ -595,6 +615,7 @@ impl FishingService {
                 anchor,
                 spot.scene.zone_words(),
                 Some(zone),
+                scene,
                 Some(spots.payout.clone()),
                 Some(spots.catch_cap.clone()),
                 rewards,
@@ -656,7 +677,9 @@ impl FishingService {
     }
 
     /// Per-tick upkeep for a fishing player: fire the bite timers, and end the round when the
-    /// player has left the spot's zone or walked past the leash (R). `None` without a round.
+    /// player has left the spot's zone or walked past the leash (R). A hole round (T514) has no
+    /// leash: it ends only with its scene, and its cast reach follows the player (R). `None`
+    /// without a round.
     pub fn supervise(
         &mut self,
         guid: u64,
@@ -664,20 +687,30 @@ impl FishingService {
         position: [f32; 3],
         now_ms: u64,
     ) -> Result<Option<Change>, Error> {
-        let Some(tracked) = self.sessions.get(&guid) else {
+        let Some(tracked) = self.sessions.get_mut(&guid) else {
             return Ok(None);
         };
+        let (dx, dz) = (
+            position[0] - tracked.anchor.x,
+            position[2] - tracked.anchor.z,
+        );
+        let reach = dx * dx + dz * dz;
         let away = tracked.zone.is_some_and(|spot_zone| {
-            let (dx, dz) = (
-                position[0] - tracked.anchor.x,
-                position[2] - tracked.anchor.z,
-            );
             spot_zone != zone
-                || !(dx * dx + dz * dz).is_finite()
-                || dx * dx + dz * dz > LEASH_M * LEASH_M
+                || !reach.is_finite()
+                || (!tracked.in_scene && reach > LEASH_M * LEASH_M)
         });
         if away {
             return Ok(Some(self.end(guid)));
+        }
+        let here = Vec4 {
+            x: position[0],
+            y: position[1],
+            z: position[2],
+            w: 1.0,
+        };
+        if tracked.in_scene && finite_vec(here) {
+            tracked.anchor = here;
         }
         self.tick(guid, now_ms).map(Some)
     }
@@ -1555,8 +1588,8 @@ struct Scene {
     /// reconstruction: `bbe_FishingZoneConfig.txt` is lost. With RunScale 1 and word 4 at 0 the
     /// fish X runs from bed X to bed X + (cast distance - BobberMinDistanceFromPlayer).
     underwater_bed_x: f32,
-    /// Provenance only: the scene's .gzne and Areas.xml are in our extracted client catalogue.
-    #[allow(dead_code)]
+    /// The scene's .gzne and Areas.xml are in our extracted client catalogue. T514: only then is
+    /// the round fished in this scene; otherwise it stays in place at the guide (R).
     client_scene_cached: bool,
     source: String,
 }
@@ -1573,7 +1606,7 @@ impl Scene {
             .all(|value| value.is_finite())
             && (0.0..=200.0).contains(&self.underwater_bed_x)
             && self.spawn_position[1] >= self.water_y - 0.5
-            && self.zone_id != 0
+            && i32::try_from(self.zone_id).is_ok_and(|id| id != 0)
             && !self.name.is_empty()
             && !self.source.is_empty()
     }
@@ -1586,6 +1619,27 @@ impl Scene {
         let mut words = CONTENT.registration.zone_words;
         words[1] = self.underwater_bed_x;
         words
+    }
+
+    /// T514: the opcode-31 begin-zoning into this hole (reader `0x008e4ae0`), with the fields
+    /// Lxzxrus 75f7d95 `Player.TeleportToZone` sends (data only): the scene name, the zone id
+    /// and the spawn, type 2 (R), no sky (R), GeometryId 214 (R) and OverrideUpdateRadius. The
+    /// envelope flag and unknown byte are 1 as in the housing world return (R).
+    fn zoning(&self) -> ZoneTransition {
+        let [x, y, z] = self.spawn_position;
+        ZoneTransition {
+            envelope_flag: 1,
+            scene: self.name.clone(),
+            type_id: 2,
+            position: [x, y, z, 1.0],
+            rotation: self.spawn_rotation,
+            unknown: 1,
+            // `valid` keeps the zone id inside i32.
+            id: self.zone_id as i32,
+            geometry_id: 214,
+            override_update_radius: true,
+            ..ZoneTransition::default()
+        }
     }
 }
 
