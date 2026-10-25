@@ -13,7 +13,12 @@
 #[path = "../common/content_copy.rs"]
 mod content_copy;
 
+#[path = "npc_visibility.rs"]
+mod npc_visibility;
+
 pub use content_copy::{copy_missing, copy_tree};
+#[allow(unused_imports)]
+pub use npc_visibility::{content_dir, seen_from};
 
 use osfr_tools::{
     character_store::CharacterState,
@@ -23,8 +28,6 @@ use osfr_tools::{
     inventory::InventoryItem,
     npc_interaction::{decode_dialogue_26_3, decode_quest_offer_49_1},
     quest_engine::QuestStatus,
-    startup_world::{NpcSpawn, parse_add_npc},
-    world::NpcVisibility,
 };
 use serde_json::Value;
 use std::{
@@ -49,10 +52,6 @@ pub const FILLER_ITEM: i32 = 75_060;
 
 static NEXT_FIXTURE: AtomicU64 = AtomicU64::new(0);
 
-pub fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
 pub fn reference_content() -> PathBuf {
     std::env::var_os("OSFR_NPC_QUEST_CHAIN_CONTENT")
         .map(PathBuf::from)
@@ -60,19 +59,6 @@ pub fn reference_content() -> PathBuf {
             Path::new(env!("CARGO_MANIFEST_DIR"))
                 .join("../../../lab/references/opening-anvil-placement-v1/content")
         })
-}
-
-/// A fresh open-world view from `position`: every actor `visibility` sends, as parsed 35/2
-/// AddNpc bodies (client reader `0x00921a10`).
-pub fn seen_from(visibility: &NpcVisibility, position: [f32; 3]) -> Vec<NpcSpawn> {
-    visibility
-        .clone()
-        .update(0, position)
-        .unwrap()
-        .iter()
-        .filter(|packet| packet.starts_with(&[35, 0, 2, 0]))
-        .map(|packet| parse_add_npc(packet).unwrap())
-        .collect()
 }
 
 pub fn read_json(path: &Path) -> Value {
