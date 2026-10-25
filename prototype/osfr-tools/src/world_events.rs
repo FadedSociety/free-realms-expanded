@@ -9,6 +9,8 @@
 //! its own step (R). Every random choice (one_of at the run's start, cycle order and jitter)
 //! comes from the run's `Rng`, seeded from the run serial and start time (R); tests pass a seed.
 //!
+//! T464 adds `face` (turn in place) and ships the Halloween dance-off as the first scheduled event.
+//!
 //! T462, part 3: an event row's optional `schedule` starts it on wall-clock slots from the world
 //! tick (`schedule.rs` holds the slot rules): season gate, overlap skips, a kickoff line before
 //! the start. Admin start and stop stay as they were; a slot whose event is already running
@@ -30,6 +32,8 @@
 //!   the undecoded 77/2 BroadcastPacketZone (R).
 //! * move: opcode 125 (`piece_052::movement_packet`, reader `0x008e5940`), one per tick, and
 //!   the base animation walk (2) while moving, then the actor's stand animation on arrival.
+//! * face (T464): the `move` arrival packet without the walk: opcode 125 at the actor's current
+//!   position with the heading toward the target (R: the original script turns a crew on arrival).
 //! * area: opcode 89 from `ClientAreas::set_area` (T457) to every session in the run's instance.
 //!
 //! Visibility: each tick every live actor shows itself (AddNpc at its current position, current
@@ -187,6 +191,11 @@ enum OpRow {
         to: [f32; 3],
         speed_mps: f32,
     },
+    /// Turn in place toward `to` (on X/Z).
+    Face {
+        actor: String,
+        to: [f32; 3],
+    },
     Area {
         area_id: i32,
         on: bool,
@@ -251,6 +260,7 @@ enum Op {
     TagOff(i32),
     Say(i32),
     Move { to: [f32; 3], speed: f32 },
+    Face([f32; 3]),
     Broadcast(usize),
     Area(i32, bool),
     Cycle(usize),
@@ -488,6 +498,12 @@ impl Builder<'_> {
                 (self.actor(&actor)?, Op::TagOff(positive(effect_id)?))
             }
             OpRow::Say { actor, string_id } => (self.actor(&actor)?, Op::Say(positive(string_id)?)),
+            OpRow::Face { actor, to } => {
+                if !to.iter().all(|v| v.is_finite() && v.abs() <= MAX_COORD) {
+                    return Err("face needs a finite target within 1e6 m".into());
+                }
+                (self.actor(&actor)?, Op::Face(to))
+            }
             OpRow::Move {
                 actor,
                 to,
@@ -659,6 +675,15 @@ fn deliver(out: &mut Out, to: impl Iterator<Item = SessionId>, packet: impl FnOn
     if to.peek().is_some() {
         let packet = packet();
         out.extend(to.map(|session| (session, packet.clone())));
+    }
+}
+
+/// `rotation` turned toward the offset `delta` on X/Z; unchanged when there is no horizontal offset.
+fn facing(rotation: [f32; 4], delta: [f32; 3]) -> [f32; 4] {
+    let flat = delta[0].hypot(delta[2]);
+    match flat > f32::EPSILON {
+        true => [delta[0] / flat, 0.0, delta[2] / flat, 0.0],
+        false => rotation,
     }
 }
 
@@ -989,6 +1014,16 @@ impl Run {
                 shown.base_anim = Some(ANIM_ID_WALK);
                 animation(guid, ANIM_ID_WALK, true)
             }
+            Op::Face(to) => {
+                // A walker turns toward its own target again on its next step.
+                shown.rotation =
+                    facing(shown.rotation, [0, 1, 2].map(|a| to[a] - shown.position[a]));
+                movement_packet(
+                    guid,
+                    shown.position,
+                    [shown.rotation[0], 0.0, shown.rotation[2]],
+                )
+            }
             Op::Say(string_id) => {
                 // Show first: a session that just came into range needs the speaker's AddNpc.
                 self.view(index, env.players, out);
@@ -1046,10 +1081,7 @@ impl Run {
         let delta = [0, 1, 2].map(|axis| to[axis] - shown.position[axis]);
         let length = delta.iter().map(|d| d * d).sum::<f32>().sqrt();
         let step = speed * (elapsed as f32 / 1000.0);
-        let flat = delta[0].hypot(delta[2]);
-        if flat > f32::EPSILON {
-            shown.rotation = [delta[0] / flat, 0.0, delta[2] / flat, 0.0];
-        }
+        shown.rotation = facing(shown.rotation, delta);
         // A non-finite length or step (checked at load, so unreachable) lands on the target.
         let arrived = !(length.is_finite() && step.is_finite()) || length <= step + 1e-3; // 1 mm of f32 drift
         shown.position = if arrived {
@@ -1225,10 +1257,7 @@ mod tests {
         let missing = std::env::temp_dir().join("osfr-t458-no-such-directory");
         assert!(load(&missing).unwrap().is_empty());
         let shipped = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
-        assert!(
-            load(&shipped).unwrap().is_empty(),
-            "the shipped file has no events"
-        );
+        assert!(load(&shipped).is_ok(), "the shipped file loads");
     }
 
     #[test]
@@ -1580,6 +1609,59 @@ mod tests {
             tick(&mut events, 11_000, &players).is_empty(),
             "no more steps"
         );
+    }
+
+    /// `face` turns a standing actor toward its target on X/Z with one opcode 125 packet at the
+    /// actor's own position; a viewer who arrives later gets the AddNpc already turned, a target
+    /// straight above keeps the heading, and a target that is not finite is refused at load.
+    #[test]
+    fn face_turns_the_actor_in_place_and_late_viewers_see_it_turned() {
+        let face =
+            |at_ms, to: [f32; 3]| json!({"at_ms": at_ms, "op": {"face": {"actor": "a", "to": to}}});
+        let turner = event_at(
+            [10.0, 5.0, 10.0],
+            json!([
+                spawn_a(),
+                face(100, [30.0, 9.0, 10.0]),
+                face(200, [10.0, 0.0, 10.0])
+            ]),
+        );
+        let mut players = registry(&[(1, WORLD, [11.0, 0.0, 10.0])]);
+        let mut events = WorldEvents::default();
+        assert!(events.start(turner, WORLD, 0));
+        tick(&mut events, 0, &players);
+        let heading = |packet: &[u8]| -> Vec<u8> { packet[22..34].to_vec() };
+        let toward = |x: f32, z: f32| {
+            [x, 0.0, z]
+                .iter()
+                .flat_map(|v| v.to_le_bytes())
+                .collect::<Vec<u8>>()
+        };
+        let turned = to(&tick(&mut events, 100, &players), 1);
+        assert_eq!(turned.len(), 1);
+        assert_eq!(
+            (turned[0][..2].to_vec(), xyz(&turned[0])),
+            (vec![125, 0], [10.0, 5.0, 10.0])
+        );
+        assert_eq!(heading(&turned[0]), toward(1.0, 0.0), "faces +x, not up");
+        let same = to(&tick(&mut events, 200, &players), 1);
+        assert_eq!(
+            heading(&same[0]),
+            toward(1.0, 0.0),
+            "no horizontal offset: unchanged"
+        );
+        players
+            .join(SessionId(2), 2, 2, WORLD, [11.0, 0.0, 10.0], 0.0)
+            .unwrap();
+        let late = to(&tick(&mut events, 300, &players), 2);
+        assert!(
+            late[0]
+                .windows(12)
+                .any(|w| w == toward(1.0, 0.0).as_slice()),
+            "the late AddNpc carries the turned rotation"
+        );
+        let bad = json!({"events": [event("show", json!([{"at_ms": 0, "op": {"face": {"actor": "a", "to": [1e39, 0.0, 0.0]}}}]))]});
+        assert!(load_json("face", &bad).is_err());
     }
 
     /// `say` reaches the sessions within 30 m (3-D) of the speaker and nobody else; with no

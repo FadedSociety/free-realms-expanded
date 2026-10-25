@@ -782,8 +782,13 @@ mod tests {
         for (label, bad) in cases {
             assert!(!ok(bad), "{label} was accepted");
         }
-        // The shipped file is still valid, with no schedule in it.
+        // The shipped file is still valid; its scheduled event (T464) is not dropped.
         let shipped = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
-        assert!(load_scheduled(&shipped).unwrap().is_empty());
+        let keys: Vec<_> = load_scheduled(&shipped)
+            .unwrap()
+            .into_iter()
+            .map(|e| e.key)
+            .collect();
+        assert_eq!(keys, ["halloween_dance_off"]);
     }
 }
