@@ -38,6 +38,17 @@
 //!   re-keys every node by it, `009a67c0`/`009a5eb0` build the tree from it and `0099d7e0` walks
 //!   it, so a selected category lists its own bundles and its descendants'. The four ride
 //!   sub-categories therefore name the Rides category as their parent.
+//! * T657: the store-bundle data source `009a56d0` names each tile field: case 4 is the description
+//!   id (bundle +164, the third dword `00b3da50` reads), case 5 the price (+176), cases 6-7 the
+//!   image set and tint (`00b2ea50` stores the two strings at the image object +0x18 and the
+//!   getters `atoi` them), case 9 IsOnSale (`00997300`: +243 != 0 or +228 != 0), case 10 SalePrice
+//!   (+272), case 14/15 terms (+208) and case 2 the category group (+204). +243 is not a
+//!   visibility byte; `0099f150` reads +243 as the sale filter and +264 as the hidden flag. The
+//!   old writer sent 1 at +243, so every tile was on sale with SalePrice 0, and sent 0 at +164,
+//!   so every tile showed `<STRING 0 NOT FOUND>`.
+//! * T657: the client recomputes a 66/7 node's count from the bundles and adds one to every parent
+//!   (`00c37e70`); the server writes that same descendant total. `0099f150` filters a bundle by its
+//!   +204 group's 66/6 category, and `0099d7e0` accepts the selected category or any descendant.
 //!
 //! Reconstructed policy (R): Station Cash is a per-character balance (the original wallet was an
 //! account wallet funded by real money; this revival has no payment path, so the save file is the
@@ -98,6 +109,9 @@ const MAX_ORDER_DETAILS: usize = 16;
 pub const MAX_PRICE_SC: u32 = 10_000_000;
 const MAX_WALLET_BALANCE: u32 = i32::MAX as u32;
 const MAX_ORDER_HISTORY: usize = 4096;
+/// (R) Bounds for the T657 category table; the values themselves are content.
+const MAX_ITEM_SHELVES: usize = 64;
+const MAX_ITEM_SHELF_KEYS: usize = 256;
 
 /// (R) Sanity bounds for `sc_rewards.json`; every amount is content, these only bound it.
 pub const MAX_EARN_SC: u32 = 10_000;
@@ -143,6 +157,22 @@ pub struct RideCategoryShelf {
     pub display_order: u32,
 }
 
+/// T657: a top-level Marketplace category for rows that are neither rides nor boomboxes.
+/// `category_id` doubles as the 66/6 group key of the bundles it holds (the convention T526 uses
+/// for the ride children). A row lists here when its `stores.json` item category is in
+/// `item_category_ids`, or else when its item definition type is in `item_types`.
+#[derive(Clone, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct ItemShelf {
+    pub category_id: u32,
+    pub category_name_id: u32,
+    pub display_order: u32,
+    #[serde(default)]
+    pub item_category_ids: Vec<u32>,
+    #[serde(default)]
+    pub item_types: Vec<i32>,
+}
+
 /// `stores.json.station_cash`: the tunable Marketplace policy. A missing block keeps the feature
 /// off, so older content sets and fixtures keep their payment-free behaviour.
 #[derive(Clone, Debug, Deserialize)]
@@ -161,6 +191,9 @@ pub struct Config {
     /// T526: the ride sub-categories under Rides. Empty keeps the pre-T526 single Rides category;
     /// non-empty must name all four, so every `ride_category` row has its child.
     pub ride_categories: Vec<RideCategoryShelf>,
+    /// T657: the top-level categories for every other listing. A listed non-ride row that no shelf
+    /// names is refused at load, so no non-ride row falls back to the Rides parent.
+    pub item_shelves: Vec<ItemShelf>,
     pub sc_price_scale: f64,
     pub min_price_sc: u32,
     pub max_price_sc: u32,
@@ -181,6 +214,7 @@ impl Default for Config {
             category_group_id: 1,
             boombox_shelf: None,
             ride_categories: Vec::new(),
+            item_shelves: Vec::new(),
             sc_price_scale: 1.0,
             min_price_sc: 1,
             max_price_sc: 100_000,
@@ -206,6 +240,7 @@ impl Config {
                     || shelf.category_group_id == self.category_group_id
             })
             || !self.ride_categories_valid()
+            || !self.item_shelves_valid()
             || !self.sc_price_scale.is_finite()
             || self.sc_price_scale <= 0.0
             || self.sc_price_scale > 10.0
@@ -222,6 +257,15 @@ impl Config {
         Ok(())
     }
 
+    /// A category id or group key owned by the Rides parent or the Boombox shelf. The ride
+    /// children and the item shelves are checked against it and each other.
+    fn base_reserved(&self, id: u32) -> bool {
+        let boombox = self.boombox_shelf;
+        id == self.category_id
+            || id == self.category_group_id
+            || boombox.is_some_and(|shelf| id == shelf.category_id || id == shelf.category_group_id)
+    }
+
     /// T526: no sub-categories (the pre-T526 single Rides category), or exactly the four, each
     /// with its own id, order and name. A child id is also its 66/6 group key, so it may not
     /// collide with another shelf's.
@@ -229,13 +273,6 @@ impl Config {
         if self.ride_categories.is_empty() {
             return true;
         }
-        let boombox = self.boombox_shelf;
-        let reserved = |id: u32| {
-            id == self.category_id
-                || id == self.category_group_id
-                || boombox
-                    .is_some_and(|shelf| id == shelf.category_id || id == shelf.category_group_id)
-        };
         let mut keys = BTreeSet::new();
         let mut ids = BTreeSet::new();
         let mut orders = BTreeSet::new();
@@ -246,12 +283,56 @@ impl Config {
                 || shelf.category_id == 0
                 || shelf.category_name_id == 0
                 || shelf.display_order == 0
-                || reserved(shelf.category_id)
+                || self.base_reserved(shelf.category_id)
+                || self
+                    .item_shelves
+                    .iter()
+                    .any(|item| item.category_id == shelf.category_id)
             {
                 return false;
             }
         }
         self.ride_categories.len() == 4
+    }
+
+    /// T657: each item shelf needs its own id, order and name; every item category and item type
+    /// names exactly one shelf, and no shelf reuses a ride/boombox/Rides id or group key.
+    fn item_shelves_valid(&self) -> bool {
+        if self.item_shelves.len() > MAX_ITEM_SHELVES {
+            return false;
+        }
+        let mut ids = BTreeSet::new();
+        let mut orders = BTreeSet::new();
+        let mut categories = BTreeSet::new();
+        let mut types = BTreeSet::new();
+        for shelf in &self.item_shelves {
+            if !ids.insert(shelf.category_id)
+                || !orders.insert(shelf.display_order)
+                || shelf.category_id == 0
+                || shelf.category_name_id == 0
+                || shelf.display_order == 0
+                || (shelf.item_category_ids.is_empty() && shelf.item_types.is_empty())
+                || shelf.item_category_ids.len() + shelf.item_types.len() > MAX_ITEM_SHELF_KEYS
+                || self.base_reserved(shelf.category_id)
+                || self
+                    .ride_categories
+                    .iter()
+                    .any(|ride| ride.category_id == shelf.category_id)
+            {
+                return false;
+            }
+            for category in &shelf.item_category_ids {
+                if *category == 0 || !categories.insert(*category) {
+                    return false;
+                }
+            }
+            for item_type in &shelf.item_types {
+                if *item_type <= 0 || !types.insert(*item_type) {
+                    return false;
+                }
+            }
+        }
+        true
     }
 
     /// T526: the 66/6 group a ride row lists under: its sub-category, or the Rides parent.
@@ -264,6 +345,59 @@ impl Config {
             .find(|shelf| shelf.key == category)
             .map(|shelf| shelf.category_id)
             .ok_or_else(|| invalid("ride category is not configured"))
+    }
+
+    /// T657: the 66/6 group one row lists under. Boomboxes and tagged rides keep their T495/T526
+    /// shelves; every other row takes the item shelf its category (then its item type) names. A
+    /// ride with no tag keeps the Rides parent so older content still lists it; any other row
+    /// without a shelf is a content error, never a Rides fallback (the T657 bug).
+    fn listing_group(
+        &self,
+        kind: RowKind,
+        ride_category: Option<RideCategory>,
+        category_id: Option<u32>,
+        item_type: i32,
+        ride: bool,
+    ) -> io::Result<u32> {
+        // A missing/off block promises a payment-free older content set; no catalogue is sent, so
+        // the category table is not required there. Enabling Station Cash requires it again.
+        if !self.enabled {
+            return Ok(self.category_group_id);
+        }
+        match kind {
+            // Never sent; only its price is read.
+            RowKind::EarnOnly => Ok(self.category_group_id),
+            RowKind::Boombox => self
+                .boombox_shelf
+                .map(|shelf| shelf.category_group_id)
+                .ok_or_else(|| invalid("boombox row without a shelf")),
+            RowKind::Ride => {
+                if ride_category.is_some() {
+                    return self.ride_group(ride_category);
+                }
+                if let Some(shelf) = self.item_shelf(category_id, item_type) {
+                    return Ok(shelf.category_id);
+                }
+                if ride || item_type == RIDE_ITEM_TYPE {
+                    return Ok(self.category_group_id);
+                }
+                Err(invalid("station cash row has no Marketplace category"))
+            }
+        }
+    }
+
+    /// The first item shelf naming this item category, or else this item definition type.
+    fn item_shelf(&self, category_id: Option<u32>, item_type: i32) -> Option<&ItemShelf> {
+        let by_category = category_id.filter(|id| *id > 0).and_then(|id| {
+            self.item_shelves
+                .iter()
+                .find(|shelf| shelf.item_category_ids.contains(&id))
+        });
+        by_category.or_else(|| {
+            self.item_shelves
+                .iter()
+                .find(|shelf| shelf.item_types.contains(&item_type))
+        })
     }
 
     /// `round(sc_price * sc_price_scale)`, refused outside the data bounds.
@@ -616,14 +750,29 @@ pub fn require_wallet_owner(wallet: &Option<Wallet>, shop_present: bool) -> io::
 /// ScriptsBase.lua).
 pub const DEED_ITEM_TYPE: i32 = 16;
 
+/// T657 (R): `ClientItemDefinition.Type` of a ride, the client's ride-record action switch
+/// (`00a1ec00` case 19, see `notes/Autopilot/T452.md`). An untagged ride row with this type still
+/// lists under the Rides parent, so content without `mounts.json` keeps its rides.
+pub const RIDE_ITEM_TYPE: i32 = 19;
+
 /// One row the Marketplace lists: a store bundle equal to one ride item, or to one lot deed.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct Listing {
     pub bundle_id: u32,
     pub item_id: i32,
     pub name_id: u32,
+    /// T657: the item definition's description locale id (0 when it has none). The client's
+    /// `Description` column is bundle +164 (`009a56d0` case 4); a 0 here is the
+    /// `<STRING 0 NOT FOUND>` the native run showed.
+    pub description_id: u32,
+    /// T657: the item definition's image-set id and tint, written as the bundle's two image
+    /// strings. `00b2ea50` stores them and the client `atoi`s them for `ImageSetId` /
+    /// `ImageTintValue` (`009a56d0` cases 6-7). 0 writes an empty string (no icon).
+    pub icon_id: u32,
+    pub icon_tint: u32,
     pub price: u32,
-    /// The category group the bundle belongs to: Rides, or the Boombox shelf's (T495).
+    /// The category group the bundle belongs to: a ride child, Rides, Boombox, or the T657 item
+    /// shelf whose id is also its group key.
     pub group: u32,
     /// L046: the item is a lot deed. An order for it grants the lot through the caller's
     /// [`LotGrant`] and never puts the deed in the inventory.
@@ -631,6 +780,17 @@ pub struct Listing {
     /// The item is a ride (`MountCatalog::mount_for_item` knows it, the rule the Rides roster
     /// uses). Only a ride is single-copy: every other listing sells again and again (T484 review).
     pub ride: bool,
+}
+
+/// T657: one `stores.json` row as the catalogue sees it. `category_id` is the row's item category
+/// (the item definition's `CategoryId`), which the Marketplace category table maps to a shelf.
+#[derive(Clone, Copy, Debug)]
+pub struct StoreRow {
+    pub item_id: i32,
+    pub sc_price: u32,
+    pub kind: RowKind,
+    pub ride_category: Option<RideCategory>,
+    pub category_id: Option<u32>,
 }
 
 impl Listing {
@@ -682,12 +842,19 @@ impl Catalogue {
         config: Config,
         inventory: &Inventory,
         is_ride: impl Fn(i32) -> bool,
-        rows: impl IntoIterator<Item = (i32, u32, RowKind, Option<RideCategory>)>,
+        rows: impl IntoIterator<Item = StoreRow>,
     ) -> io::Result<Self> {
         config.validate()?;
         let mut listings = Vec::new();
         let mut earn_only = Vec::new();
-        for (item_id, sc_price, kind, ride_category) in rows {
+        for row in rows {
+            let StoreRow {
+                item_id,
+                sc_price,
+                kind,
+                ride_category,
+                category_id,
+            } = row;
             if item_id <= 0 || sc_price == 0 || sc_price > MAX_PRICE_SC {
                 return Err(invalid("invalid station cash row"));
             }
@@ -698,20 +865,26 @@ impl Catalogue {
             let Ok(presentation) = inventory.presentation(item_id) else {
                 continue;
             };
-            let group = match (kind, config.boombox_shelf) {
-                (RowKind::Boombox, Some(shelf)) => shelf.category_group_id,
-                (RowKind::Boombox, None) => return Err(invalid("boombox row without a shelf")),
-                _ => config.ride_group(ride_category)?,
-            };
+            let ride = is_ride(item_id);
+            let group = config.listing_group(
+                kind,
+                ride_category,
+                category_id,
+                presentation.item_type,
+                ride,
+            )?;
             let listing = Listing {
                 bundle_id: u32::try_from(item_id)
                     .map_err(|_| invalid("invalid station cash id"))?,
                 item_id,
                 name_id: u32::try_from(presentation.name_id).unwrap_or(0),
+                description_id: u32::try_from(presentation.description_id).unwrap_or(0),
+                icon_id: u32::try_from(presentation.icon_id).unwrap_or(0),
+                icon_tint: u32::try_from(presentation.icon_tint).unwrap_or(0),
                 price: config.scaled_price(sc_price)?,
                 group,
                 deed: presentation.item_type == DEED_ITEM_TYPE,
-                ride: is_ride(item_id),
+                ride,
             };
             if kind == RowKind::EarnOnly {
                 earn_only.push(listing);
@@ -744,8 +917,8 @@ impl Catalogue {
         &self.listings
     }
 
-    /// The 66/7 tree nodes the store shows: Rides and Boombox at the top level, then the ride
-    /// sub-categories under Rides (T526).
+    /// The 66/7 tree nodes the store shows: Rides, Boombox and the T657 item shelves at the top
+    /// level, then the ride sub-categories under Rides (T526).
     fn tree_nodes(&self) -> Vec<TreeNode> {
         let config = &self.config;
         let rides = Shelf {
@@ -753,6 +926,16 @@ impl Catalogue {
             category_name_id: config.category_name_id,
             category_group_id: config.category_group_id,
         };
+        let item_shelves = config.item_shelves.iter().map(|shelf| TreeNode {
+            shelf: Shelf {
+                category_id: shelf.category_id,
+                category_name_id: shelf.category_name_id,
+                // T657: the shelf id is its own 66/6 group key, like the T526 ride children.
+                category_group_id: shelf.category_id,
+            },
+            parent_id: 0,
+            display_order: shelf.display_order,
+        });
         let children = config.ride_categories.iter().map(|shelf| TreeNode {
             shelf: Shelf {
                 category_id: shelf.category_id,
@@ -773,8 +956,39 @@ impl Catalogue {
             parent_id: 0,
             display_order: 2,
         }))
+        .chain(item_shelves)
         .chain(children)
         .collect()
+    }
+
+    /// T657: the 66/7 count written per node. The client recomputes it from the bundles and walks
+    /// each match up the parent chain (`00c37e70`), so a parent counts its descendants too; this
+    /// writes the same number instead of the parent's own (possibly empty) group count.
+    fn category_counts(&self, nodes: &[TreeNode]) -> Vec<u32> {
+        let mut counts = vec![0u32; nodes.len()];
+        let group_index: BTreeMap<u32, usize> = nodes
+            .iter()
+            .enumerate()
+            .map(|(index, node)| (node.shelf.category_group_id, index))
+            .collect();
+        for listing in &self.listings {
+            let Some(&leaf) = group_index.get(&listing.group) else {
+                continue;
+            };
+            let mut at = Some(leaf);
+            while let Some(index) = at {
+                counts[index] = counts[index].saturating_add(1);
+                let parent = nodes[index].parent_id;
+                at = if parent == 0 {
+                    None
+                } else {
+                    nodes
+                        .iter()
+                        .position(|node| node.shelf.category_id == parent)
+                };
+            }
+        }
+        counts
     }
 
     pub fn earn_only(&self) -> &[Listing] {
@@ -1212,25 +1426,22 @@ pub(crate) fn bool_packet(opcode: u16, value: bool) -> Vec<u8> {
 }
 
 /// 66/7 + category tree (`00b48040`/`00b43090`/`00b3fd70`/`00b3b080`): one node per shelf, each
-/// counting the bundles of its group. `00b3b080` reads the parent as the first of its three record
-/// dwords and `00b43090` re-keys every node by it, so a child must name the Rides category here.
+/// counting its own bundles and its descendants' (the client walks the parent chain the same way,
+/// `00c37e70`). `00b3b080` reads the parent as the first of its three record dwords and
+/// `00b43090` re-keys every node by it, so a child must name the Rides category here.
 fn category_tree_packet(catalogue: &Catalogue) -> Vec<u8> {
     let nodes = catalogue.tree_nodes();
+    let counts = catalogue.category_counts(&nodes);
     let mut bytes = header(OP_CATEGORIES);
     put_i32(&mut bytes, nodes.len() as i32);
-    for node in &nodes {
+    for (node, count) in nodes.iter().zip(counts) {
         put_u32(&mut bytes, node.shelf.category_id);
         put_u32(&mut bytes, node.shelf.category_id);
         put_u32(&mut bytes, node.shelf.category_name_id);
         put_string(&mut bytes, "");
         put_string(&mut bytes, "");
         put_u32(&mut bytes, node.parent_id);
-        let count = catalogue
-            .listings
-            .iter()
-            .filter(|listing| listing.group == node.shelf.category_group_id)
-            .count();
-        put_u32(&mut bytes, count as u32);
+        put_u32(&mut bytes, count);
         put_u32(&mut bytes, node.display_order);
     }
     bytes.push(1);
@@ -1294,18 +1505,24 @@ fn store_packet(catalogue: &Catalogue) -> Vec<u8> {
     bytes
 }
 
-/// One bundle record in the reader's order. Names are (R); the positions are the client's.
+/// One bundle record in the reader's order (`00b3da50` then `00b3fa00` then `00b41860`). The
+/// field positions are the client's; the values T657 sets from data are the description, the two
+/// image strings, the price and the sale flag.
 fn bundle_record(bytes: &mut Vec<u8>, catalogue: &Catalogue, listing: &Listing, index: usize) {
     let config = &catalogue.config;
     put_u32(bytes, listing.bundle_id);
     put_u32(bytes, listing.name_id);
-    put_u32(bytes, 0);
+    // +164 Description (`009a56d0` case 4). 0 is the `<STRING 0 NOT FOUND>` the native run showed.
+    put_u32(bytes, listing.description_id);
     put_u32(bytes, 1);
-    put_string(bytes, "");
-    put_string(bytes, "");
+    // The image object at +0x18 (`00b2ea50`): image set and tint strings, `atoi`'d by the client
+    // for `ImageSetId`/`ImageTintValue` (`009a56d0` cases 6-7). An empty string means no icon.
+    put_string(bytes, &decimal(listing.icon_id));
+    put_string(bytes, &decimal(listing.icon_tint));
     bytes.push(0);
     put_string(bytes, "");
     put_u32(bytes, config.currency_type);
+    // +176 Price (`009a56d0` case 5).
     put_u32(bytes, listing.price);
     put_u32(bytes, 0);
     put_u32(bytes, 0);
@@ -1323,9 +1540,15 @@ fn bundle_record(bytes: &mut Vec<u8>, catalogue: &Catalogue, listing: &Listing, 
     put_string(bytes, "");
     put_u32(bytes, config.store_id);
     put_u32(bytes, listing.group);
-    bytes.push(1);
+    // +243 IsOnSale, or +228 non-zero (`00997300`, `009a56d0` case 9). No shipped row is on sale;
+    // the old writer's 1 here is why every tile carried the SALE! badge and showed SalePrice 0
+    // (`009a56d0` case 10) instead of Price.
+    bytes.push(0);
+    // +208 is the terms locale id, not a visibility byte: `009a56d0` cases 14-15 read it as
+    // `HasTermsAndConditions`/`TermsAndConditions`. The old 1 named locale 1.
+    put_u32(bytes, 0);
+    // +212 MaxPerOrder (`009a56d0` case 16). The order path accepts quantity 1 only, so is 1.
     put_u32(bytes, 1);
-    put_u32(bytes, index as u32 + 1);
     put_u32(bytes, index as u32 + 1);
     put_u32(bytes, 0);
     put_u32(bytes, 0);
@@ -1349,6 +1572,15 @@ fn bundle_record(bytes: &mut Vec<u8>, catalogue: &Catalogue, listing: &Listing, 
     bytes.push(0);
     put_u32(bytes, 0);
     put_u32(bytes, 0);
+}
+
+/// The decimal image/tint string the client `atoi`s; 0 means no icon and writes an empty string.
+fn decimal(value: u32) -> String {
+    if value == 0 {
+        String::new()
+    } else {
+        value.to_string()
+    }
 }
 
 fn header(opcode: u16) -> Vec<u8> {

@@ -19,7 +19,7 @@
 //! membership and real-money orders stay refused (R).
 
 use crate::inventory::Inventory;
-use crate::station_cash::{self, RowKind, Wallet};
+use crate::station_cash::{self, RowKind, StoreRow, Wallet};
 use serde::Deserialize;
 use std::{
     collections::{BTreeMap, BTreeSet, VecDeque},
@@ -125,6 +125,10 @@ struct StoreItem {
     /// the Rides parent; an unknown value is refused by `StoreCatalogue::load`.
     #[serde(default)]
     ride_category: Option<station_cash::RideCategory>,
+    /// T657: the row's item category (the item definition's `CategoryId`). The category table
+    /// maps it to a Marketplace shelf; absent or 0 falls back to the item type.
+    #[serde(default)]
+    category_id: Option<u32>,
 }
 
 impl StoreCatalogue {
@@ -280,8 +284,13 @@ impl CoinShop {
                     (false, true) => RowKind::Boombox,
                     (false, false) => RowKind::Ride,
                 };
-                item.sc_price
-                    .map(|price| (item.item_id, price, kind, item.ride_category))
+                item.sc_price.map(|sc_price| StoreRow {
+                    item_id: item.item_id,
+                    sc_price,
+                    kind,
+                    ride_category: item.ride_category,
+                    category_id: item.category_id,
+                })
             }),
         )?;
         let sc_wallet = Wallet::restore(Some(wallet), sc_catalogue.config());

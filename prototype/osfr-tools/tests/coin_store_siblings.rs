@@ -1452,17 +1452,28 @@ fn wallet_reply_carries_the_marketplace_handshake_and_the_ride_catalogue() {
         "the handshake and the four catalogue rows follow the wallet"
     );
     assert_eq!(market[0][4], 1, "the Marketplace is enabled");
-    // The fixture lists one ride. The bundle record is the reader's 185 bytes, the map key is
-    // the item id and the price sits at the `00b3da50` price position.
+    // The fixture lists one ride. The bundle record is the reader's 185 bytes plus the two image
+    // strings T657 now fills from the item definition (Wolf 14289: image set 6873, tint 121, so
+    // seven payload bytes), the map key is the item id and the price sits at the `00b3da50` price
+    // position.
     let store = market[5];
-    assert_eq!(store.len(), 36 + 185, "one 66/5 bundle");
+    let image_bytes = "6873".len() + "121".len();
+    assert_eq!(
+        store.len(),
+        36 + 185 + image_bytes,
+        "one 66/5 bundle with its image strings"
+    );
     assert_eq!(
         u32::from_le_bytes(store[36..40].try_into().unwrap()),
         SC_RIDE_ITEM as u32,
         "the bundle map key is the ride item"
     );
     assert_eq!(
-        u32::from_le_bytes(store[73..77].try_into().unwrap()),
+        u32::from_le_bytes(
+            store[73 + image_bytes..77 + image_bytes]
+                .try_into()
+                .unwrap()
+        ),
         SC_RIDE_PRICE,
         "the listed SC price"
     );
@@ -1477,7 +1488,11 @@ fn wallet_reply_carries_the_marketplace_handshake_and_the_ride_catalogue() {
         );
     }
     assert_eq!(
-        u32::from_le_bytes(store[150..154].try_into().unwrap()),
+        u32::from_le_bytes(
+            store[150 + image_bytes..154 + image_bytes]
+                .try_into()
+                .unwrap()
+        ),
         3,
         "the bundle's category group is the Non-Winged child"
     );

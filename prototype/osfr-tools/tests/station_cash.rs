@@ -11,7 +11,10 @@ use osfr_tools::{
     station_cash::{self, Wallet},
 };
 use serde_json::Value;
-use std::{collections::BTreeMap, path::PathBuf};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    path::PathBuf,
+};
 
 /// A listed ride: item 76856 (the five-hundred-and-fifty Station Cash mount) is 549 SC of
 /// provenance, so the shipped 0.25 scale lists it at 137.
@@ -60,6 +63,15 @@ fn wallet(balance: u32) -> Wallet {
 fn put_string(bytes: &mut Vec<u8>, value: &str) {
     bytes.extend((value.len() as i32).to_le_bytes());
     bytes.extend_from_slice(value.as_bytes());
+}
+
+/// T657: the bundle image-set/tint strings; 0 writes an empty string (no icon).
+fn decimal(value: u32) -> String {
+    if value == 0 {
+        String::new()
+    } else {
+        value.to_string()
+    }
 }
 
 /// The client order serializer `00b3fc60`/`00b3af80` (66/1 or 66/3), with one detail.
@@ -1108,11 +1120,26 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
             .filter_map(|row| Some((u32::try_from(row["item_id"].as_i64()?).ok()?, price_of(row))))
             .collect()
     };
+    // T657: the real client Marketplace categories for the non-ride rows, named by Legacy
+    // `StoreBundleCategories.json` and resolved by the client locale.
+    const CLOTHES: u32 = 45;
+    const PETS: u32 = 59;
+    const HOUSING: u32 = 116;
+    for (id, name_id) in [(CLOTHES, 23_327), (PETS, 954), (HOUSING, 21_088)] {
+        assert_eq!(names.get(&id), Some(&name_id), "category {id} name");
+        assert_eq!(parents.get(&id), Some(&0), "category {id} is top level");
+    }
+    let expected_rides: BTreeMap<u32, u32> = rows
+        .iter()
+        .filter(|row| row["sc_price"].as_u64().is_some())
+        .filter(|row| listed(row))
+        .filter(|row| row["ride_category"].is_string())
+        .filter_map(|row| Some((u32::try_from(row["item_id"].as_i64()?).ok()?, price_of(row))))
+        .collect();
     let rides = listed_under(RIDES);
     assert_eq!(
-        rides,
-        expected(false),
-        "Rides lists every child's non-earn-only, non-boombox row at its SC price"
+        rides, expected_rides,
+        "Rides lists the ride rows, and only them"
     );
     for (key, id, _, _) in RIDE_CATEGORIES {
         assert_eq!(
@@ -1126,19 +1153,64 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
             "{key} counts its own bundles"
         );
     }
-    // The parent's own group holds only the rows that name no sub-category; the tagged rides reach
-    // it through the child categories above (`0099d7e0` walks descendants).
-    let untagged = rows
-        .iter()
-        .filter(|row| row["sc_price"].as_u64().is_some())
-        .filter(|row| listed(row))
-        .filter(|row| row["ride_category"].is_null())
-        .count();
-    assert_eq!(
-        counts.get(&RIDES),
-        Some(&(untagged as u32)),
-        "the Rides node counts only the rows keyed to Rides itself"
+    // T657: a ride and a clothing listing land in different categories. Turkey Hat (41) is item
+    // category 101 (Hats), so the Clothes & Armor shelf 45; the sample ride is a Winged child.
+    const TURKEY_HAT: u32 = 41;
+    assert!(
+        !rides.contains_key(&TURKEY_HAT),
+        "clothing is not under Rides"
     );
+    let clothes = listed_under(CLOTHES);
+    assert_eq!(
+        clothes.get(&TURKEY_HAT),
+        Some(&25),
+        "Turkey Hat is clothing at its scaled price"
+    );
+    assert!(
+        clothes.contains_key(&(DOG_EARS[0] as u32)),
+        "another clothing row is under the same shelf"
+    );
+    assert!(
+        !clothes.contains_key(&(RIDE_ITEM as u32)),
+        "the sample ride is not under Clothes"
+    );
+    let pets = listed_under(PETS);
+    assert_eq!(pets.get(&2171), Some(&100), "Dakota is a pet");
+    assert_eq!(
+        pets.get(&27608),
+        Some(&50),
+        "a pet costume is not clothing (item category 6)"
+    );
+    let housing = listed_under(HOUSING);
+    assert_eq!(housing.get(&11037), Some(&150), "a housing fixture");
+    assert_eq!(housing.get(&17192), Some(&100), "a lot deed");
+    // Every bundle is under exactly one leaf category; the leaves cover the whole catalogue.
+    let mut covered = BTreeSet::new();
+    for leaf in RIDE_CATEGORIES
+        .iter()
+        .map(|(_, id, _, _)| *id)
+        .chain([BOOMBOX, CLOTHES, PETS, HOUSING])
+    {
+        for item in listed_under(leaf).keys() {
+            assert!(
+                covered.insert(*item),
+                "listing {item} is in two leaf categories"
+            );
+        }
+    }
+    assert_eq!(
+        covered,
+        decoded.keys().copied().collect(),
+        "every bundle has a leaf category"
+    );
+    // T657: the written count is the client's recompute (`00c37e70`): the node plus descendants.
+    for id in names.keys() {
+        assert_eq!(
+            counts.get(id),
+            Some(&(listed_under(*id).len() as u32)),
+            "count of category {id}"
+        );
+    }
     // T526 gate: every listed ride appears under exactly one child, at its scaled price. T528: the
     // Training Saddle of Gliding is not a ride but lists in Winged beside the rides it trains.
     let mut tagged = 0;
@@ -1253,7 +1325,10 @@ impl<'a> Reader<'a> {
 /// `00b48700` -> `00b2dfd0` -> `00b45340` -> `00b2ea50` -> `00b43170` -> `00b41860` ->
 /// `00b3da50` -> `00b2ea50` -> `00b370d0` -> `00b2f390` -> `00b3fa00` -> `00b41860`'s ten-field
 /// continuation. The tail after `00b3fa00` is the part a scan-for-a-u32 test cannot catch; a short
-/// record misaligns every following bundle, so the last byte must be consumed exactly.
+/// record misaligns every following bundle, so the last byte must be consumed exactly. T657: the
+/// description, image-set, image-tint, price, IsOnSale and SalePrice values are compared with the
+/// item catalogue, so the native `<STRING 0 NOT FOUND>`, empty icon, price 0 and SALE! badge cannot
+/// come back.
 #[test]
 fn store_packet_matches_the_client_reader_field_for_field() {
     let shop = new_shop(Wallet::default(), usize::MAX);
@@ -1264,10 +1339,19 @@ fn store_packet_matches_the_client_reader_field_for_field() {
         .expect("66/5 store packet");
     // Header (4) + inner type, store id and the store definition (two strings) + bundle count:
     // 36 bytes. Every bundle is a u32 map key plus a 181-byte record (definition 106, `00b3fa00`
-    // tail 44, `00b41860` continuation 31). Assert the exact reader size as well as walking it, so
-    // a field added to or dropped from the writer cannot pass by ending where the test stops.
+    // tail 44, `00b41860` continuation 31); the two image strings add their payload length. Assert
+    // the exact reader size as well as walking it, so a field added to or dropped from the writer
+    // cannot pass by ending where the test stops.
     let listings = shop.sc_catalogue().listings();
-    assert_eq!(store.len(), 36 + listings.len() * 185, "66/5 packet size");
+    let inventory = shop.inventory();
+    let expected_size = 36
+        + listings
+            .iter()
+            .map(|listing| 185 + decimal(listing.icon_id).len() + decimal(listing.icon_tint).len())
+            .sum::<usize>();
+    assert_eq!(store.len(), expected_size, "66/5 packet size");
+    let mut described = 0usize;
+    let mut turkey_hat_description = None;
     let mut reader = Reader {
         bytes: store,
         at: 0,
@@ -1289,17 +1373,46 @@ fn store_packet_matches_the_client_reader_field_for_field() {
     reader.string();
     assert_eq!(reader.u32() as usize, listings.len(), "bundle map count");
     for listing in listings {
+        let presentation = inventory
+            .presentation(listing.item_id)
+            .unwrap_or_else(|error| panic!("item {}: {error}", listing.item_id));
         assert_eq!(reader.u32(), listing.bundle_id, "bundle map key");
         // MarketingBundleDefinition (`00b3da50`).
         assert_eq!(reader.u32(), listing.bundle_id, "bundle id");
         assert_eq!(reader.u32(), listing.name_id, "name id");
+        // T657: tile Description (`009a56d0` case 4) from the item catalogue.
+        let description = reader.u32();
+        assert_eq!(
+            description,
+            u32::try_from(presentation.description_id).unwrap_or(0),
+            "description id (item {})",
+            listing.item_id
+        );
+        if description != 0 {
+            described += 1;
+        }
+        if listing.item_id == 41 {
+            turkey_hat_description = Some(description);
+        }
         reader.u32();
-        reader.u32();
-        reader.string();
-        reader.string();
+        // T657: the image object at +0x18 (`00b2ea50`); the client `atoi`s both strings for
+        // `ImageSetId`/`ImageTintValue` (`009a56d0` cases 6-7).
+        assert_eq!(
+            reader.string(),
+            decimal(u32::try_from(presentation.icon_id).unwrap_or(0)).as_bytes(),
+            "image set id (item {})",
+            listing.item_id
+        );
+        assert_eq!(
+            reader.string(),
+            decimal(u32::try_from(presentation.icon_tint).unwrap_or(0)).as_bytes(),
+            "image tint (item {})",
+            listing.item_id
+        );
         reader.u8();
         reader.string();
         assert_eq!(reader.u32(), config.currency_type);
+        // T657: tile Price (`009a56d0` case 5).
         assert_eq!(reader.u32(), listing.price, "listed price");
         reader.u32();
         reader.u32();
@@ -1316,19 +1429,16 @@ fn store_packet_matches_the_client_reader_field_for_field() {
         assert_eq!(reader.u32(), listing.item_id as u32, "game item id");
         assert_eq!(reader.u32(), listing.item_id as u32, "marketing item id");
         reader.string();
-        // StoreBundleDefinition tail (`00b3fa00`): StoreId, CategoryGroupId, visible, then eight
-        // u32 and three bytes.
+        // StoreBundleDefinition tail (`00b3fa00`): StoreId, CategoryGroupId, IsOnSale (+243), the
+        // terms id (+208), MaxPerOrder (+212), six more u32 and three bytes.
         assert_eq!(reader.u32(), config.store_id);
         assert_eq!(reader.u32(), listing.group, "bundle category group");
-        reader.u8();
-        reader.u32();
-        reader.u32();
-        reader.u32();
-        reader.u32();
-        reader.u32();
-        reader.u32();
-        reader.u32();
-        reader.u32();
+        assert_eq!(reader.u8(), 0, "no shipped row is on sale");
+        assert_eq!(reader.u32(), 0, "no terms and conditions locale id");
+        assert_eq!(reader.u32(), 1, "max per order");
+        for _ in 0..6 {
+            reader.u32();
+        }
         reader.u8();
         reader.u8();
         reader.u8();
@@ -1337,13 +1447,19 @@ fn store_packet_matches_the_client_reader_field_for_field() {
         assert_eq!(reader.u32(), 0, "00b41860 field 2");
         assert_eq!(reader.u8(), 0, "00b41860 field 3");
         assert_eq!(reader.u32(), 0, "00b41860 field 4");
-        assert_eq!(reader.u32(), 0, "00b41860 field 5");
-        assert_eq!(reader.u32(), 0, "00b41860 field 6");
+        assert_eq!(reader.u32(), 0, "00b41860 field 5 (members price)");
+        assert_eq!(reader.u32(), 0, "00b41860 field 6 (sale price)");
         assert_eq!(reader.u8(), 0, "00b41860 field 7");
         assert_eq!(reader.u8(), 0, "00b41860 field 8");
         assert_eq!(reader.u32(), 0, "00b41860 field 9");
         assert_eq!(reader.u32(), 0, "00b41860 field 10");
     }
+    assert!(described > 0, "some tiles carry a real description id");
+    assert_eq!(
+        turkey_hat_description,
+        Some(4177),
+        "Turkey Hat's own description (item catalogue bytes)"
+    );
     assert_eq!(
         reader.at,
         store.len(),
@@ -1360,10 +1476,9 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     let packets = station_cash::catalogue_packets(shop.sc_catalogue());
     let config = shop.sc_catalogue().config();
     let listings = shop.sc_catalogue().listings();
-    // T495/T526: Rides and Boombox are top level; the four ride sub-categories hang under Rides.
-    let boombox = config
-        .boombox_shelf
-        .expect("the shipped content has a Boombox shelf");
+    // T495/T526/T657: Rides and Boombox are top level, then the three T657 item shelves, then the
+    // four ride sub-categories under Rides. The ids and names are the client's real Marketplace
+    // categories (Legacy `StoreBundleCategories.json`); each shelf id is its own 66/6 group key.
     let shelves = [
         (
             config.category_id,
@@ -1372,18 +1487,42 @@ fn catalogue_navigation_packets_match_the_client_readers() {
             0,
             1,
         ),
-        (
-            boombox.category_id,
-            boombox.category_name_id,
-            boombox.category_group_id,
-            0,
-            2,
-        ),
+        (89, 151_365, 89, 0, 2),
+        (45, 23_327, 45, 0, 3),
+        (59, 954, 59, 0, 4),
+        (116, 21_088, 116, 0, 5),
         (2, 5_101_131, 2, config.category_id, 10),
         (3, 5_101_134, 3, config.category_id, 20),
         (4, 5_101_132, 4, config.category_id, 30),
         (5, 5_101_133, 5, config.category_id, 40),
     ];
+    // T657: a node's count is its own bundles plus its descendants', the number the client
+    // recomputes (`00c37e70`).
+    let under = |selected: u32| -> u32 {
+        let subtree: Vec<u32> = shelves
+            .iter()
+            .filter(|(category, _, _, _, _)| {
+                let mut at = *category;
+                loop {
+                    if at == selected {
+                        break true;
+                    }
+                    match shelves.iter().find(|(node, _, _, _, _)| *node == at) {
+                        Some((_, _, _, parent, _)) if *parent != 0 => at = *parent,
+                        _ => break false,
+                    }
+                }
+            })
+            .map(|(_, _, group, _, _)| *group)
+            .collect();
+        u32::try_from(
+            listings
+                .iter()
+                .filter(|listing| subtree.contains(&listing.group))
+                .count(),
+        )
+        .expect("bounded")
+    };
 
     // 66/7: counted category nodes, then the sorted byte.
     let tree = packets
@@ -1393,19 +1532,19 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     let mut reader = Reader { bytes: tree, at: 0 };
     assert_eq!(reader.u16(), 66);
     assert_eq!(reader.u16(), 7);
-    assert_eq!(reader.u32(), 6, "six categories");
-    for (category, name, group, parent, order) in shelves {
+    assert_eq!(
+        reader.u32() as usize,
+        shelves.len(),
+        "nine categories (T657 adds three item shelves)"
+    );
+    for (category, name, _, parent, order) in shelves {
         assert_eq!(reader.u32(), category, "category map key");
         assert_eq!(reader.u32(), category, "category id");
         assert_eq!(reader.u32(), name, "category name id");
         reader.string();
         reader.string();
         assert_eq!(reader.u32(), parent, "parent id");
-        assert_eq!(
-            reader.u32() as usize,
-            listings.iter().filter(|l| l.group == group).count(),
-            "category count"
-        );
+        assert_eq!(reader.u32(), under(category), "category count");
         assert_eq!(reader.u32(), order, "display order");
     }
     assert_eq!(reader.u8(), 1, "sorted");
@@ -1422,7 +1561,7 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     };
     assert_eq!(reader.u16(), 66);
     assert_eq!(reader.u16(), 6);
-    assert_eq!(reader.u32(), 6, "six category groups");
+    assert_eq!(reader.u32() as usize, shelves.len(), "nine category groups");
     for (category, _, group, _, _) in shelves {
         assert_eq!(reader.u32(), group, "group map key");
         assert_eq!(reader.u32(), group, "group id");
@@ -1689,15 +1828,22 @@ fn bad_ride_category_content_is_refused_at_load() {
 
 /// T526: a configured child with no bundles is still sent in 66/7 (count 0) and 66/6. The client
 /// recomputes a category's count and deletes a zero-count tree node (`00c402b0` chain, T380), so
-/// an empty child is harmless; its untagged rows list under the Rides parent again.
+/// an empty child is harmless; its untagged ride rows list under the Rides parent again. T657:
+/// the T528 Training Saddle is not a ride (item type 80001) and no item shelf names it, so it
+/// cannot be untagged; it moves to another child to leave Winged empty.
 #[test]
 fn an_empty_ride_child_is_sent_and_lists_nothing() {
     let shop = shop_after("empty-winged", |s| {
         for row in s["items"].as_array_mut().expect("rows") {
-            if row["ride_category"] == "winged" {
+            if row["ride_category"] != "winged" {
+                continue;
+            }
+            if row["price_provenance"]["ride_id"].is_u64() {
                 row.as_object_mut()
                     .expect("row object")
                     .remove("ride_category");
+            } else {
+                row["ride_category"] = "mechanical".into();
             }
         }
     })
@@ -1759,6 +1905,46 @@ fn an_empty_ride_child_is_sent_and_lists_nothing() {
         Some(&vec![2]),
         "the empty child still has its 66/6 group"
     );
+}
+
+/// T657: the category table is content. A listed row no shelf names, a shelf list with a
+/// duplicate item category, and a missing table are refused when the shop loads, never at a sale.
+#[test]
+fn bad_item_shelf_content_is_refused_at_load() {
+    shop_after("item-shelf-good", |_| {}).expect("the shipped content loads");
+    type Edit = Box<dyn FnOnce(&mut Value)>;
+    let refused: [(&str, Edit); 3] = [
+        (
+            "no-shelves",
+            Box::new(|s| s["station_cash"]["item_shelves"] = Value::Array(Vec::new())),
+        ),
+        (
+            "duplicate-item-category",
+            Box::new(|s| {
+                // 101 is also the clothes shelf's; 6 stays so the build would still succeed if
+                // only the duplicate check were missing.
+                s["station_cash"]["item_shelves"][1]["item_category_ids"] =
+                    serde_json::json!([6, 101]);
+            }),
+        ),
+        (
+            "unmapped-item-category",
+            Box::new(|s| row_mut(s, 41)["category_id"] = 999.into()),
+        ),
+    ];
+    for (name, edit) in refused {
+        assert!(
+            shop_after(name, edit).is_err(),
+            "{name} must be refused at load"
+        );
+    }
+    // A package with Station Cash off keeps the old payment-free behaviour even when it carries
+    // priced rows: no catalogue is sent, so the category table is not required.
+    shop_after("item-shelf-disabled", |s| {
+        s["station_cash"]["enabled"] = false.into();
+        s["station_cash"]["item_shelves"] = Value::Array(Vec::new());
+    })
+    .expect("a disabled Marketplace keeps an older content set loading");
 }
 
 /// T495: every boombox the store tags is a catalogued client boombox (`boomboxes.json`), none is
