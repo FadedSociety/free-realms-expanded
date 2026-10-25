@@ -5,6 +5,7 @@ use mounts::{
     ActiveRide, MountCatalog, MountDefinition, MountEffectKind, MountError, MountService,
     MountSource, MountState, MountType, RideContext, RidePose, RideRestrictions,
 };
+use osfr_tools::startup_world::{NpcSpawn, parse_add_npc};
 use std::path::PathBuf;
 
 const OWNER: u64 = 0x1112_1314_1516_1718;
@@ -12,6 +13,8 @@ const OBSERVER: u64 = 0x2122_2324_2526_2728;
 const MOUNT_ACTOR: u64 = 0x0102_0304_0506_0708;
 const ITEM_DEFINITION: i32 = 70;
 const MOUNT_ID: i32 = 7;
+/// The live boarding and dismount composite effect (PFX_Teleport_Flash, T483).
+const FLASH: i32 = 46;
 
 fn source() -> Vec<MountSource> {
     vec![MountSource::Reconstructed(
@@ -48,6 +51,7 @@ fn catalog() -> MountCatalog {
         }],
         8.0,
         Default::default(),
+        FLASH,
     )
     .unwrap()
 }
@@ -118,7 +122,7 @@ fn expected_mount_response() -> Vec<u8> {
     bytes.extend_from_slice(&0_i32.to_le_bytes()); // seat
     bytes.extend_from_slice(&1_i32.to_le_bytes()); // queue position: the client mounts on 1
     bytes.extend_from_slice(&1_i32.to_le_bytes()); // (R) Mount's fourth argument, as in the AddPc tail
-    bytes.extend_from_slice(&0_i32.to_le_bytes()); // (R) stored on the rider (+0x17bc)
+    bytes.extend_from_slice(&FLASH.to_le_bytes()); // stored on the rider (+0x17bc): the flash
     bytes.extend_from_slice(&0.0_f32.to_le_bytes()); // (R) Mount's last argument
     bytes
 }
@@ -126,7 +130,7 @@ fn expected_mount_response() -> Vec<u8> {
 fn expected_dismount_response() -> Vec<u8> {
     let mut bytes = vec![0xa8, 0x00, 0x04];
     bytes.extend_from_slice(&OWNER.to_le_bytes());
-    bytes.extend_from_slice(&0_i32.to_le_bytes()); // (R) unresolved result
+    bytes.extend_from_slice(&FLASH.to_le_bytes()); // stored on the rider (+0x17c0): the flash
     bytes
 }
 
@@ -184,6 +188,7 @@ fn spawn_mount_dismount_then_despawn_have_expected_bytes_and_fanout() {
             actor_guid: MOUNT_ACTOR,
             model_id: Some(33),
             max_movement_speed: 12.5,
+            ..
         }
     ));
     assert_eq!(
@@ -610,4 +615,151 @@ fn spawn_by_item_picks_the_lowest_owned_instance() {
     let wire = service.handle(&item, &context(&other, 0)).unwrap().unwrap();
     assert!(wire.notice.is_some());
     assert_eq!(service.state(), &MountState::Empty);
+}
+
+/// The real ride catalogue with the item looks of the runtime item catalogue (round 70 capture),
+/// loaded once: the full catalogue is large.
+fn runtime_service() -> MountService {
+    static BASE: std::sync::OnceLock<MountService> = std::sync::OnceLock::new();
+    BASE.get_or_init(|| {
+        let manifest = PathBuf::from(env!("CARGO_MANIFEST_DIR"));
+        let runtime = manifest.join("../../../lab/reports/round70-native-20261016T061000Z/content");
+        let items = Inventory::load(&runtime, None).unwrap();
+        MountService::load(&manifest.join("data/content/mounts.json"), &items).unwrap()
+    })
+    .clone()
+}
+
+/// The 35/2 AddNpc among `packets`, through the production reader.
+fn ride_npc(packets: &[Vec<u8>]) -> NpcSpawn {
+    let npc: Vec<_> = packets
+        .iter()
+        .filter(|p| p.starts_with(&[35, 0, 2, 0]))
+        .collect();
+    assert_eq!(npc.len(), 1, "exactly one ride actor");
+    parse_add_npc(npc[0]).expect("the ride actor parses through the AddNpc reader")
+}
+
+/// Summon instance 1 of `item` (dyed with `dye`, 0 = undyed) and return what everyone sees.
+fn summon_look(item: i32, dye: i32) -> (NpcSpawn, NpcSpawn) {
+    let mut owned = inventory(&[item]);
+    owned.items[0].tint = dye;
+    let mut service = runtime_service();
+    let wire = service
+        .handle(&request(1), &context(&owned, 0))
+        .unwrap()
+        .unwrap();
+    assert!(wire.notice.is_none(), "item {item} was refused");
+    let live = ride_npc(&wire.shared);
+    let late = service
+        .view(OWNER)
+        .unwrap()
+        .packets(context(&owned, 0).pose);
+    (live, ride_npc(&late))
+}
+
+#[test]
+fn the_ride_actor_wears_the_owned_items_texture_and_tint() {
+    // (item, texture, tint alias, tint id) from the shipped item catalogue rows.
+    let cases = [
+        (76855, "basic-goldtips", "goldtips-purple", 427), // Gold-Tipped Dragon
+        (7960, "basic-scales", "scales-blue", 470),        // Scaled Dragon
+        (16920, "lavadecal", "bubblegum", 92),             // Basalt Surfboard
+        (15733, "freerealmslogo", "bubblegum", 92),        // Surfboard
+    ];
+    for (item, texture, alias, tint) in cases {
+        let (live, late) = summon_look(item, 0);
+        assert_eq!(live.texture_alias, texture, "item {item}");
+        assert_eq!(live.tint_alias, alias, "item {item}");
+        assert_eq!(live.tint_id, tint, "item {item}");
+        assert_eq!(live.hide_nameplate, 1, "item {item}");
+        // A viewer who walks up later draws the same ride.
+        assert_eq!(late, live, "item {item}");
+    }
+    // A dyed instance wears its own tint over the item's default.
+    let (dyed, _) = summon_look(76855, 249);
+    assert_eq!(
+        (dyed.tint_id, dyed.texture_alias.as_str()),
+        (249, "basic-goldtips")
+    );
+}
+
+#[test]
+fn an_item_the_catalogue_does_not_define_keeps_the_ride_rows_look() {
+    // The synthetic fixture has no item catalogue behind it: no texture, the ride row's alias.
+    let owned = inventory(&[ITEM_DEFINITION]);
+    let mut service = MountService::new(catalog());
+    let wire = service
+        .handle(&request(1), &context(&owned, 0))
+        .unwrap()
+        .unwrap();
+    let npc = ride_npc(&wire.shared);
+    assert_eq!(
+        (
+            npc.texture_alias.as_str(),
+            npc.tint_alias.as_str(),
+            npc.tint_id
+        ),
+        ("", "dyetint", 0)
+    );
+    assert_eq!(npc.hide_nameplate, 1);
+}
+
+#[test]
+fn mount_and_dismount_carry_the_teleport_flash() {
+    // Byte offsets of the effect i32: 168/2 after rider, mount, seat, queue, argument; 168/4 after rider.
+    let effect = |p: &[u8], at: usize| i32::from_le_bytes(p[at..at + 4].try_into().unwrap());
+    let owned = inventory(&[ITEM_DEFINITION]);
+    let mut service = MountService::new(catalog());
+    let actor = MountService::ride_guid(OWNER);
+    service
+        .handle(&request(1), &context(&owned, 0))
+        .unwrap()
+        .unwrap();
+
+    // A refused board sends no effect and changes nothing.
+    let before = service.state().clone();
+    let wrong = [vec![168, 0, 1], (actor ^ 1).to_le_bytes().to_vec()].concat();
+    let refused = service
+        .handle(&wrong, &context(&owned, 5_000))
+        .unwrap()
+        .unwrap();
+    assert!(refused.notice.is_some() && refused.shared.is_empty());
+    assert_eq!(service.state(), &before);
+
+    let board = [vec![168, 0, 1], actor.to_le_bytes().to_vec()].concat();
+    let boarded = service
+        .handle(&board, &context(&owned, 5_000))
+        .unwrap()
+        .unwrap();
+    let live: Vec<_> = boarded
+        .shared
+        .iter()
+        .filter(|p| p.starts_with(&[168, 0, 2]))
+        .collect();
+    assert_eq!(live.len(), 1);
+    assert_eq!(effect(live[0], 31), FLASH);
+
+    // A late joiner is sent the boarding without the flash.
+    let late = service
+        .view(OWNER)
+        .unwrap()
+        .packets(context(&owned, 0).pose);
+    let late: Vec<_> = late
+        .iter()
+        .filter(|p| p.starts_with(&[168, 0, 2]))
+        .collect();
+    assert_eq!((late.len(), effect(late[0], 31)), (1, 0));
+
+    let away = service
+        .handle(&[168, 0, 3], &context(&owned, 9_000))
+        .unwrap()
+        .unwrap();
+    let live: Vec<_> = away
+        .shared
+        .iter()
+        .filter(|p| p.starts_with(&[168, 0, 4]))
+        .collect();
+    assert_eq!(live.len(), 1);
+    assert_eq!(effect(live[0], 11), FLASH);
 }

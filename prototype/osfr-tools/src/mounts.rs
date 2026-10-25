@@ -31,6 +31,8 @@ const SPAWN_DEBOUNCE_MS: u64 = 1_000;
 const SEATED_QUEUE: i32 = 1;
 // (R) Sanity ceiling for ride, glide and on-foot speeds (units per second).
 const MAX_SPEED: f32 = 64.0;
+// (R) Sanity ceiling for the composite effect id of a boarding or dismount flash.
+const MAX_EFFECT_ID: i32 = 100_000;
 // Character stat ids index the client's stat-name table at `0x01af2008` (4 bytes per id):
 // 2 MaxMovementSpeed (`0x01af2010`); 59-63 GlideDefaultForwardSpeed, GlideMinForwardSpeed,
 // GlideMaxForwardSpeed, GlideFallTime, GlideFallSpeed (`0x01af20f4`-`0x01af2104`); 64 GlideEnabled
@@ -133,12 +135,21 @@ struct TrainedGlide {
     source: Vec<MountSource>,
 }
 
+/// The composite effect a live boarding or dismount plays on the rider (0 turns it off).
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct FlashEffect {
+    id: i32,
+    source: Vec<MountSource>,
+}
+
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct MountsDocument {
     schema_version: u32,
     on_foot: OnFoot,
     trained_glide: TrainedGlide,
+    mount_effect: FlashEffect,
     mount_types: Vec<MountType>,
     mounts: Vec<MountDefinition>,
 }
@@ -150,6 +161,7 @@ pub struct MountCatalog {
     item_to_mount: BTreeMap<i32, i32>,
     on_foot_speed: f32,
     trained_glide: RideStats,
+    mount_effect_id: i32,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -179,6 +191,7 @@ impl MountCatalog {
         if document.schema_version != 1
             || !valid_sources(&document.on_foot.source)
             || !valid_sources(&document.trained_glide.source)
+            || !valid_sources(&document.mount_effect.source)
         {
             return Err(invalid_data("unsupported mount content schema"));
         }
@@ -187,17 +200,20 @@ impl MountCatalog {
             document.mounts,
             document.on_foot.max_movement_speed,
             document.trained_glide.stats,
+            document.mount_effect.id,
         )
         .map_err(|_| invalid_data("invalid mount content records"))
     }
 
     /// `on_foot_speed` is what a ride's end restores; `trained_glide` is the glide block of an
-    /// upgradable ride its owner trained.
+    /// upgradable ride its owner trained; `mount_effect_id` is the composite effect a live
+    /// boarding or dismount plays (T483; 0 is off).
     pub fn new(
         mount_types: Vec<MountType>,
         mounts: Vec<MountDefinition>,
         on_foot_speed: f32,
         trained_glide: RideStats,
+        mount_effect_id: i32,
     ) -> Result<Self, MountError> {
         if mount_types.is_empty()
             || mount_types.len() > 128
@@ -205,6 +221,7 @@ impl MountCatalog {
             || mounts.len() > 4096
             || !(on_foot_speed > 0.0 && on_foot_speed <= MAX_SPEED)
             || !trained_glide.valid()
+            || !(0..=MAX_EFFECT_ID).contains(&mount_effect_id)
         {
             return Err(MountError::InvalidCatalog);
         }
@@ -266,6 +283,7 @@ impl MountCatalog {
             item_to_mount,
             on_foot_speed,
             trained_glide,
+            mount_effect_id,
         })
     }
 
@@ -409,12 +427,23 @@ impl RideRestrictions {
     }
 }
 
+/// How a ride actor is drawn (T483): the owned item's catalogue texture and tint, so rides that
+/// share a model look different, else the ride row's own values.
+#[derive(Clone, Debug, PartialEq)]
+pub struct RideLook {
+    pub texture_alias: String,
+    pub tint_alias: String,
+    pub tint_id: i32,
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub struct ActiveRide {
     pub mount_id: i32,
     /// T482: the inventory instance (roster row id) this ride was summoned from.
     pub instance_id: i32,
     pub actor_guid: u64,
+    /// T483: fixed when the ride is summoned, so observers and late joiners draw the same ride.
+    pub look: RideLook,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -446,6 +475,7 @@ pub enum MountEffectKind {
         actor_guid: u64,
         model_id: Option<i32>,
         max_movement_speed: f32,
+        look: RideLook,
     },
     DespawnRide {
         actor_guid: u64,
@@ -724,6 +754,28 @@ impl MountService {
         )
     }
 
+    /// (T483) The ride item's catalogue texture and tint, tinted the way `write_attachment` dresses
+    /// an item (the instance's dye, else the item's default). An item the catalogue does not
+    /// define falls back to the ride row.
+    fn ride_look(&self, item: &InventoryItem, mount: &MountDefinition) -> RideLook {
+        match self.looks.get(&item.definition_id) {
+            Some(look) => RideLook {
+                texture_alias: look.texture.clone(),
+                tint_alias: look.tint_alias.clone(),
+                tint_id: if item.tint != 0 {
+                    item.tint
+                } else {
+                    look.default_tint
+                },
+            },
+            None => RideLook {
+                texture_alias: String::new(),
+                tint_alias: mount.tint_alias.clone(),
+                tint_id: mount.tint_id,
+            },
+        }
+    }
+
     /// The summon itself, after the guards passed and the instance was chosen.
     fn spawn_instance(
         &mut self,
@@ -742,6 +794,7 @@ impl MountService {
             .and_then(|mount| self.catalog.mount_arc(mount.id))
             .ok_or(MountError::UnknownMount)?;
         let mount_id = mount.id;
+        let look = self.ride_look(item, &mount);
         if self
             .last_spawn_ms
             .is_some_and(|last| now_ms.saturating_sub(last) < SPAWN_DEBOUNCE_MS)
@@ -763,7 +816,7 @@ impl MountService {
             if let MountState::Mounted { rider_guid, .. } = &self.state {
                 outcome.effects.push(packet(
                     recipients.clone(),
-                    encode_dismount_response(*rider_guid),
+                    encode_dismount_response(*rider_guid, self.catalog.mount_effect_id),
                 ));
             }
             outcome.effects.push(MountEffect {
@@ -777,6 +830,7 @@ impl MountService {
             mount_id,
             instance_id,
             actor_guid,
+            look: look.clone(),
         });
         self.last_spawn_ms = Some(now_ms);
         // The client needs the automount id/GUID list entry before the actor update.
@@ -791,6 +845,7 @@ impl MountService {
                 actor_guid,
                 model_id: mount.model_id,
                 max_movement_speed: mount.max_movement_speed,
+                look,
             },
         });
         if was_mounted {
@@ -847,7 +902,12 @@ impl MountService {
             effects: vec![
                 packet(
                     recipients(owner_guid, observers),
-                    encode_mount_response(rider_guid, ride.actor_guid, seat_index),
+                    encode_mount_response(
+                        rider_guid,
+                        ride.actor_guid,
+                        seat_index,
+                        self.catalog.mount_effect_id,
+                    ),
                 ),
                 rider_stats(owner_guid, self.catalog.boarded_stats(mount)),
             ],
@@ -878,7 +938,7 @@ impl MountService {
             } => {
                 effects.push(packet(
                     all_recipients.clone(),
-                    encode_dismount_response(rider_guid),
+                    encode_dismount_response(rider_guid, self.catalog.mount_effect_id),
                 ));
                 ride
             }
@@ -1012,6 +1072,7 @@ pub struct RideView {
     pub actor_guid: u64,
     pub seat: Option<u32>,
     mount: Arc<MountDefinition>,
+    look: RideLook,
 }
 
 impl RideView {
@@ -1056,12 +1117,14 @@ impl RideView {
 
     pub fn packets(&self, pose: RidePose) -> Vec<Vec<u8>> {
         let mut out = Vec::new();
-        out.extend(add_ride_npc(&self.mount, self.actor_guid, pose));
+        out.extend(add_ride_npc(&self.mount, &self.look, self.actor_guid, pose));
         if let Some(seat) = self.seat {
+            // Effect 0: the viewer walked up, so the boarding flash must not replay (T483).
             out.push(encode_mount_response(
                 self.rider_guid,
                 self.actor_guid,
                 seat,
+                0,
             ));
         }
         out
@@ -1084,6 +1147,7 @@ impl MountService {
                 _ => None,
             },
             mount: self.catalog.mount_arc(ride.mount_id)?,
+            look: ride.look.clone(),
         })
     }
 
@@ -1151,10 +1215,11 @@ impl MountService {
                 MountEffectKind::SpawnRide {
                     mount_id,
                     actor_guid,
+                    look,
                     ..
                 } => {
                     if let Some(mount) = self.catalog.mount_arc(*mount_id) {
-                        target.extend(add_ride_npc(&mount, *actor_guid, pose));
+                        target.extend(add_ride_npc(&mount, look, *actor_guid, pose));
                     }
                 }
                 MountEffectKind::DespawnRide { actor_guid } => {
@@ -1182,15 +1247,24 @@ fn refusal_text(error: MountError) -> &'static str {
 }
 
 /// AddNpc for a ride. Field values come from the captured content template (`world.rs`), made
-/// non-interactable; the model, name and tint come from the ride record. The animation and seat
-/// definitions live in the client's actor definition, not in this packet (R for everything else).
-fn add_ride_npc(mount: &MountDefinition, actor_guid: u64, pose: RidePose) -> Option<Vec<u8>> {
+/// non-interactable; the model and name come from the ride record, the texture and tint from the
+/// owned item (`RideLook`). The animation and seat definitions live in the client's actor
+/// definition, not in this packet (R for everything else). The nameplate is hidden as Sanctuary
+/// does for a ride (R).
+fn add_ride_npc(
+    mount: &MountDefinition,
+    look: &RideLook,
+    actor_guid: u64,
+    pose: RidePose,
+) -> Option<Vec<u8>> {
     let npc = startup_world::NpcSpawn {
         actor_id: actor_guid,
         name_string_id: mount.name_string_id,
         model_id: mount.model_id?,
-        tint_alias: mount.tint_alias.clone(),
-        tint_id: mount.tint_id,
+        texture_alias: look.texture_alias.clone(),
+        tint_alias: look.tint_alias.clone(),
+        tint_id: look.tint_id,
+        hide_nameplate: 1,
         speed: mount.max_movement_speed,
         is_interactable: 0,
         interact_range: 0,
@@ -1245,22 +1319,32 @@ fn encode_mount_list(
     out
 }
 
-fn encode_mount_response(rider_guid: u64, mount_guid: u64, seat_index: u32) -> Vec<u8> {
+/// Client reader `00b04c80` (read by `00b06100` case 2): rider, mount, seat, queue, Mount's third
+/// argument, then the i32 stored on the rider (+0x17bc) that `Mount` (`00972d30`) looks up
+/// (`007c4710`) and plays as a composite effect, then a float.
+fn encode_mount_response(
+    rider_guid: u64,
+    mount_guid: u64,
+    seat_index: u32,
+    effect_id: i32,
+) -> Vec<u8> {
     let mut out = header(2);
     put_u64(&mut out, rider_guid);
     put_u64(&mut out, mount_guid);
     put_i32(&mut out, seat_index as i32);
     put_i32(&mut out, SEATED_QUEUE); // queue position; the client mounts when it is 1 (00b06100)
     put_i32(&mut out, SEATED_QUEUE); // (R) Mount's fourth argument, as in the AddPc tail
-    put_i32(&mut out, 0); // (R) stored on the rider (+0x17bc); Legacy puts an effect id here
+    put_i32(&mut out, effect_id); // stored on the rider (+0x17bc): the boarding flash, 0 = none
     put_f32(&mut out, 0.0); // (R) Mount's last argument; keep 0
     out
 }
 
-fn encode_dismount_response(rider_guid: u64) -> Vec<u8> {
+/// Client reader `00b04dc0` (read by `00b06100` case 4): rider, then the i32 stored on the rider
+/// (+0x17c0) that `Dismount` (`00973050`) looks up (`007c4710`) and plays like the boarding one.
+fn encode_dismount_response(rider_guid: u64, effect_id: i32) -> Vec<u8> {
     let mut out = header(4);
     put_u64(&mut out, rider_guid);
-    put_i32(&mut out, 0); // (R) unresolved dismount result
+    put_i32(&mut out, effect_id); // the dismount flash, 0 = none
     out
 }
 

@@ -370,7 +370,12 @@ fn a_second_player_in_range_sees_the_ride_and_its_removal() {
     assert_eq!(view.seat, Some(0));
     let scene = view.packets(pose());
     assert_eq!(&scene[0][..4], &[35, 0, 2, 0]);
-    assert_eq!(scene[1], boarded.shared[0]);
+    // T483: the live boarding carries the teleport flash; the replay for a viewer who walks up
+    // is the same packet without it (the effect i32 sits after rider, mount, seat, queue, arg).
+    let mut replay = boarded.shared[0].clone();
+    assert_ne!(replay[31..35], [0; 4], "the live boarding plays the flash");
+    replay[31..35].fill(0);
+    assert_eq!(scene[1], replay);
     // A ride that is summoned but not boarded has no attachment to replay.
     let mut idle = MountService::new(catalog());
     handle(&mut idle, &spawn_request(ROW), &owned, 0);

@@ -450,6 +450,10 @@ fn an_upgradable_ride_glides_only_when_trained() {
 #[test]
 fn mount_stats_bounds_are_enforced() {
     assert!(load_edited("bundled", |_| {}).is_ok());
+    // 0 turns the boarding flash off and 100000 is the ceiling (T483).
+    for id in [0, 100_000] {
+        assert!(load_edited("flash", |d| d["mount_effect"]["id"] = id.into()).is_ok());
+    }
     let stats = |field: &str, value: Value| {
         let field = field.to_owned();
         move |document: &mut Value| {
@@ -496,6 +500,20 @@ fn mount_stats_bounds_are_enforced() {
             }),
         ),
         (
+            "flash-negative",
+            Box::new(|document: &mut Value| document["mount_effect"]["id"] = (-1).into()),
+        ),
+        (
+            "flash-too-high",
+            Box::new(|document: &mut Value| document["mount_effect"]["id"] = 100_001.into()),
+        ),
+        (
+            "flash-unsourced",
+            Box::new(|document: &mut Value| {
+                document["mount_effect"]["source"] = Value::Array(vec![])
+            }),
+        ),
+        (
             "trained-unsourced",
             Box::new(|document: &mut Value| {
                 document["trained_glide"]["source"] = Value::Array(vec![])
@@ -518,18 +536,28 @@ fn mount_stats_bounds_are_enforced() {
         stats: nan,
         ..wolf.clone()
     };
-    assert!(MountCatalog::new(types.clone(), vec![with_stats], 8.0, RideStats::default()).is_err());
-    assert!(MountCatalog::new(types.clone(), vec![wolf.clone()], 8.0, nan).is_err());
+    assert!(
+        MountCatalog::new(
+            types.clone(),
+            vec![with_stats],
+            8.0,
+            RideStats::default(),
+            46
+        )
+        .is_err()
+    );
+    assert!(MountCatalog::new(types.clone(), vec![wolf.clone()], 8.0, nan, 46).is_err());
     assert!(
         MountCatalog::new(
             types.clone(),
             vec![wolf.clone()],
             f32::NAN,
-            RideStats::default()
+            RideStats::default(),
+            46
         )
         .is_err()
     );
-    assert!(MountCatalog::new(types, vec![wolf], 8.0, RideStats::default()).is_ok());
+    assert!(MountCatalog::new(types, vec![wolf], 8.0, RideStats::default(), 46).is_ok());
 }
 
 // ------------------------------------------------------------------ movement allowance

@@ -30,6 +30,19 @@
       }
     ]
   },
+  "mount_effect": {
+    "id": 46,
+    "source": [
+      {
+        "kind": "legacy",
+        "evidence": "Sanctuary main (AGPL-3.0, value only, no code) src/Sanctuary.Gateway/Handlers/MountBasePacket/PacketMountSpawnHandler.cs:21 MountTeleportCompositeEffectId = 46 (PFX_Teleport_Flash), sent on the live PacketMountResponse and, in src/Sanctuary.Game/Entities/Player.cs:306-310, on the live PacketDismountResponse; client readers 00b04c80 and 00b04dc0 store the i32 on the rider (+0x17bc, +0x17c0) and Mount 00972d30 / Dismount 00973050 look it up (007c4710) and play it"
+      },
+      {
+        "kind": "reconstructed",
+        "evidence": "That 46 is the composite effect PFX_Teleport_Flash was not checked against the client's effect table (R); 0 turns the flash off. Bounded 0..=100000."
+      }
+    ]
+  },
   "mount_types": [
     {
       "id": 0,
