@@ -834,11 +834,46 @@
     },
     {
       "id": 3130017,
+      "job": 4,
       "title_string_id": 387935,
       "giver_npc_id": 9000000080,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 4,
+          "level": 10,
+          "text_string_id": 117855,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Band 3 - Seaside (Enve LeStamp), row 14; client Global.Text 387934 (offer: 'Return to me when you are a level 10 postman'), 387936 (wait: 'Your training will continue once you have reached level 10 as a postman. Return to Enve LeStamp at that time.') and 387937 (end: 'A level 10 postman! Well done'); src/restoration/piece_042.rs POSTMAN_LEVEL_GATES gate(10, 387935, 387936, 387934, 387937, 'Enve LeStamp'). The target is the Postman job (profile 4)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T663: the client text names the job and level; the server side is one authoritative job_level objective (T361), completed from the server's own Profiles::rank curve, never from a Talk or a client claim. The return to Enve is the 49/13 turn-in at the giver; quest-lines/quests.json q3130017 lists it as a second 'talk' step with no client string of its own."
+            },
+            {
+              "kind": "client",
+              "evidence": "T403 goal text Global.Text 117855 'Achieve Level 10 as a Postman': the guide's own objective line for this quest (quest-lines/quests.json q3130017, text_locale_id 117855), the Postman twin of the Warrior level-gate label 117836."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T663: no source gives this quest a reward (quest-lines/quests.json q3130017: 'unknown; no reward data in record, client text or wiki'). Fifteen coins are the T361 level-gate payout the Warrior W5 gate uses, paid once by the 49/14 turn-in; no item and no job XP, so the pinned quest_job_xp table is untouched."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -862,7 +897,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T663: the level gate is the one job_level objective (T361); ContentDb v1 has no other free-text objective field"
         },
         {
           "kind": "reconstructed",
@@ -874,7 +909,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T663: the guide reward cell is unknown; the 15-coin gate payout is reconstructed"
         },
         {
           "kind": "reconstructed",
@@ -884,7 +919,7 @@
       "description_string_id": 387936,
       "intro_text_string_id": 387934,
       "end_text_string_id": 387937,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3130018,
