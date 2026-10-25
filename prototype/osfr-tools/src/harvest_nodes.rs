@@ -31,6 +31,17 @@ pub struct HarvestNodesContent {
     pub node_types: Vec<HarvestNodeType>,
     pub pools: Vec<HarvestNodePool>,
     pub spawns: Vec<HarvestNodeSpawn>,
+    /// Generator findings (T523). Absent and empty for the Legacy files.
+    #[serde(default)]
+    pub gaps: HarvestNodeGaps,
+}
+
+/// Import gaps the generator records; nothing is refused for them.
+#[derive(Clone, Debug, Default, Deserialize, PartialEq)]
+pub struct HarvestNodeGaps {
+    /// Pool drop items that the collection catalogue (T447) does not link to exactly one entry.
+    #[serde(default)]
+    pub drop_items_without_entry: Vec<u32>,
 }
 
 impl HarvestNodesContent {
@@ -55,9 +66,15 @@ pub struct HarvestNodeType {
     pub model_id: u32,
     pub scale: f32,
     pub composite_effect_id: u32,
+    /// Sanctuary adds these on top of the main effect (sparkling water); Legacy has none.
+    #[serde(default)]
+    pub extra_composite_effect_ids: Vec<u32>,
     pub interact_range: u32,
     pub cursor_id: u32,
     pub placement_y_offset: f32,
+    /// Sanctuary's rare-node subtitle locale row; absent on common types and Legacy nodes.
+    #[serde(default)]
+    pub sub_text_name_id: Option<i32>,
     /// Legacy drop table; unused by the Type8 payout, and absent for mining nodes.
     #[serde(default)]
     pub drop_table: Vec<HarvestNodeDrop>,
@@ -82,6 +99,10 @@ pub struct HarvestNodePool {
     pub node_type: String,
     pub max_active_nodes: u32,
     pub respawn_seconds: u32,
+    /// Sanctuary keeps the loot table on the pool, Legacy on the type. Not read by W171, whose
+    /// Type8 payout owns the reward.
+    #[serde(default)]
+    pub drop_table: Vec<HarvestNodeDrop>,
     #[serde(default)]
     pub source_tag: Option<String>,
     #[serde(default)]
