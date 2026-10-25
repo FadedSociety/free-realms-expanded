@@ -43,6 +43,10 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
         .collect();
     files.sort();
 
+    // T470: a `reference_data` row is drawn by the extras row that shares its position.
+    let extras = read_json(&data_root.parent().unwrap().join("npc_spawns_extra.json"));
+    let extras = extras["records"].as_array().unwrap();
+
     let mut positions = HashSet::new();
     let mut counts = BTreeMap::<String, usize>::new();
     let mut npc_count = 0usize;
@@ -68,7 +72,7 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
             assert!(
                 matches!(
                     placement,
-                    "captured" | "legacy_data" | "poi_anchor" | "unanchored"
+                    "captured" | "legacy_data" | "reference_data" | "poi_anchor" | "unanchored"
                 ),
                 "{owner}: unknown placement class {placement:?}"
             );
@@ -137,6 +141,42 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
                 number(&position[1], &owner),
                 number(&position[2], &owner),
             ];
+            if placement == "reference_data" {
+                // Interaction range reads this row; the drawn body is the extras row.
+                // They must stand at the same place or a click lands on empty ground.
+                assert_eq!(source, "reference_spawn", "{owner}: unexpected source");
+                assert!(
+                    candidates.is_empty(),
+                    "{owner}: reference row has candidates"
+                );
+                assert!(
+                    npc["heading"].as_f64().is_some_and(f64::is_finite),
+                    "{owner}: reference row needs a finite heading"
+                );
+                assert!(
+                    npc["field_sources"]["position"]
+                        .as_array()
+                        .unwrap()
+                        .iter()
+                        .any(|tag| tag["kind"] == "reference"
+                            && tag["evidence"].as_str().is_some_and(
+                                |text| text.contains("Sanctuary-main-20261019@10f129e")
+                            )),
+                    "{owner}: position lacks the Sanctuary-main reference tag"
+                );
+                let bodies: Vec<_> = extras
+                    .iter()
+                    .filter(|row| row["content_key"] == npc["npc_id"])
+                    .collect();
+                assert_eq!(bodies.len(), 1, "{owner}: needs exactly one extras body");
+                for axis in 0..3 {
+                    let body = number(&bodies[0]["position"][axis], &owner);
+                    assert!(
+                        (body - xyz[axis]).abs() <= 1e-3,
+                        "{owner}: extras body differs from the interaction row on axis {axis}"
+                    );
+                }
+            }
             if source.starts_with("reconstructed_") {
                 let key = xyz.map(|value| if value == 0.0 { 0 } else { value.to_bits() });
                 assert!(

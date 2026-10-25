@@ -168,10 +168,21 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
                 "{owner}: locale id {name_id} is absent"
             );
         }
+        // T470: the 90 named Sanctuary NPCs carry a `reference` tag (Sanctuary-main) instead.
         assert!(
-            has_source(row, "legacy-data"),
-            "{owner}: missing Legacy tag"
+            has_source(row, "legacy-data") || has_source(row, "reference"),
+            "{owner}: missing Legacy or reference tag"
         );
+        for tag in row["source"].as_array().unwrap() {
+            if tag["kind"] == "reference" {
+                assert!(
+                    tag["evidence"]
+                        .as_str()
+                        .is_some_and(|text| text.contains("Sanctuary-main-20261019@10f129e")),
+                    "{owner}: a reference tag must name the Sanctuary-main commit"
+                );
+            }
+        }
         finite_xyz(row, &owner);
         assert!(
             row["heading"].as_f64().is_some_and(f64::is_finite),
@@ -253,8 +264,10 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // priced-vendor spawns, T385's appended 4 fishing-guide spawns, T409's
     // appended Manager Landon, T467's two Sanctuary card tables, and T479's 3
     // exploration coins (3,307). T468 moved the 632 Legacy rows Lxzxrus 9c5ef6b
-    // pruned as misplaced to npc_spawns_retired.json.
-    assert_eq!(extra_rows.len(), 2675);
+    // pruned as misplaced to npc_spawns_retired.json (2,675). T470 drew 90 named
+    // Sanctuary-main NPCs as extras (2,765); T500 already draws Dani and Honey as
+    // `legacy_data` regional rows, so they must not gain a second body.
+    assert_eq!(extra_rows.len(), 2765);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

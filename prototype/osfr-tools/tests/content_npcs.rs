@@ -65,7 +65,7 @@ fn validate_sources(owner: &str, value: &Value) {
         assert!(
             matches!(
                 kind,
-                "client" | "video" | "wiki" | "reconstructed" | "legacy-data"
+                "client" | "video" | "wiki" | "reconstructed" | "legacy-data" | "reference"
             ),
             "{owner}: invalid source kind {kind:?}"
         );
@@ -252,8 +252,9 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
                         tag["kind"] == "client"
                             || tag["kind"] == "video"
                             || tag["kind"] == "legacy-data"
+                            || tag["kind"] == "reference"
                     }),
-                    "NPC {npc_id}: position lacks a client/video source"
+                    "NPC {npc_id}: position lacks a client/video/reference source"
                 );
             }
             if !npc["vendor_stock"].is_null() {

@@ -59464,6 +59464,2796 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "spawn_guid": 9500000442,
+      "legacy_npc_id": null,
+      "content_key": 9500000442,
+      "model_id": 32,
+      "model_file_name": "fairy_m_farmer_01.adr",
+      "name": "Banter",
+      "name_string_id": 7581,
+      "position": [
+        -1554.0695,
+        -37.08123,
+        323.9954
+      ],
+      "heading": -1.99139,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3377 spawnNpcWithGuid(33086); src/Resources/Npcs.json Id=33086"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.7581 = Banter (lab/reports/locale-id-to-text.json); Models.txt 32 = fairy_m_farmer_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000446,
+      "legacy_npc_id": null,
+      "content_key": 9500000446,
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "name": "Bella",
+      "name_string_id": 37189,
+      "position": [
+        -1372.4197,
+        -28.62082,
+        185.58435
+      ],
+      "heading": -0.488419997,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3398 spawnNpcWithGuid(33107); src/Resources/Npcs.json Id=33107"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.37189 = Bella (lab/reports/locale-id-to-text.json); Models.txt 384 = fairy_sanctuary_f.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000184,
+      "legacy_npc_id": null,
+      "content_key": 9000000184,
+      "model_id": 184,
+      "model_file_name": "human_m_freestyle_01.agr",
+      "name": "Roscoe",
+      "name_string_id": 78660,
+      "position": [
+        -1386.3351,
+        -30.39162,
+        242.65764
+      ],
+      "heading": -0.376160001,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3407 spawnNpcWithGuid(33116); src/Resources/Npcs.json Id=33116"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.78660 = Roscoe (lab/reports/locale-id-to-text.json); Models.txt 184 = human_m_freestyle_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000532,
+      "legacy_npc_id": null,
+      "content_key": 9500000532,
+      "model_id": 345,
+      "model_file_name": "fairy_royalguard_m.adr",
+      "name": "Sergeant Larkspur",
+      "name_string_id": 441907,
+      "position": [
+        -1479.0936,
+        -33.065235,
+        338.74832
+      ],
+      "heading": -2.26485398,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3434 spawnNpcWithGuid(33143); src/Resources/Npcs.json Id=33143"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.441907 = Sergeant Larkspur (lab/reports/locale-id-to-text.json); Models.txt 345 = fairy_royalguard_m.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000475,
+      "legacy_npc_id": null,
+      "content_key": 9500000475,
+      "model_id": 488,
+      "model_file_name": "chugawug_farmer_m.adr",
+      "name": "Farmer Wug",
+      "name_string_id": 434638,
+      "position": [
+        -1443.4198,
+        -35.901257,
+        315.6108
+      ],
+      "heading": 0.118100999,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3452 spawnNpcWithGuid(33161); src/Resources/Npcs.json Id=33161"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.434638 = Farmer Wug (lab/reports/locale-id-to-text.json); Models.txt 488 = chugawug_farmer_m.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset -0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000535,
+      "legacy_npc_id": null,
+      "content_key": 9500000535,
+      "model_id": 363,
+      "model_file_name": "fairy_m_freestyle_speedy_01.agr",
+      "name": "Speedy",
+      "name_string_id": 7608,
+      "position": [
+        -1414.1581,
+        -30.63569,
+        287.13123
+      ],
+      "heading": 1.02903392,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3456 spawnNpcWithGuid(33165); src/Resources/Npcs.json Id=33165"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.7608 = Speedy (lab/reports/locale-id-to-text.json); Models.txt 363 = fairy_m_freestyle_speedy_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000502,
+      "legacy_npc_id": null,
+      "content_key": 9500000502,
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr",
+      "name": "Kellin Warpwatcher",
+      "name_string_id": 384749,
+      "position": [
+        -1424.6484,
+        -28.323662,
+        346.41522
+      ],
+      "heading": 2.82232961,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3459 spawnNpcWithGuid(33168); src/Resources/Npcs.json Id=33168"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.384749 = Kellin Warpwatcher (lab/reports/locale-id-to-text.json); Models.txt 468 = fairy_druid_m.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000454,
+      "legacy_npc_id": null,
+      "content_key": 9500000454,
+      "model_id": 557,
+      "model_file_name": "human_m_freestyle_11.agr",
+      "name": "Brent",
+      "name_string_id": 116863,
+      "position": [
+        -1398.4119,
+        -29.4235,
+        279.55112
+      ],
+      "heading": -0.863035,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3539 spawnNpcWithGuid(33307); src/Resources/Npcs.json Id=33307"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.116863 = Brent (lab/reports/locale-id-to-text.json); Models.txt 557 = human_m_freestyle_11.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000501,
+      "legacy_npc_id": null,
+      "content_key": 9500000501,
+      "model_id": 4606,
+      "model_file_name": "human_f_kara_loft.agr",
+      "name": "Kara Loft",
+      "name_string_id": 5102585,
+      "position": [
+        -1360.5583,
+        -30.573048,
+        267.5858
+      ],
+      "heading": 0.923382988,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3545 spawnNpcWithGuid(33313); src/Resources/Npcs.json Id=33313"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.5102585 = Kara Loft (lab/reports/locale-id-to-text.json); Models.txt 4606 = human_f_kara_loft.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000514,
+      "legacy_npc_id": null,
+      "content_key": 9500000514,
+      "model_id": 1457,
+      "model_file_name": "human_m_manager_landon.agr",
+      "name": "Preston Daly",
+      "name_string_id": 422709,
+      "position": [
+        -1391.5509,
+        -27.172358,
+        334.9232
+      ],
+      "heading": -1.16716897,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3551 spawnNpcWithGuid(33320); src/Resources/Npcs.json Id=33320"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.422709 = Preston Daly (lab/reports/locale-id-to-text.json); Models.txt 1457 = human_m_manager_landon.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000471,
+      "legacy_npc_id": null,
+      "content_key": 9500000471,
+      "model_id": 377,
+      "model_file_name": "fairy_farmer_f.adr",
+      "name": "Dusti Rodez",
+      "name_string_id": 427443,
+      "position": [
+        -1390.8529,
+        -26.98959,
+        349.9977
+      ],
+      "heading": -2.43903208,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3552 spawnNpcWithGuid(33321); src/Resources/Npcs.json Id=33321"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.427443 = Dusti Rodez (lab/reports/locale-id-to-text.json); Models.txt 377 = fairy_farmer_f.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000523,
+      "legacy_npc_id": null,
+      "content_key": 9500000523,
+      "model_id": 525,
+      "model_file_name": "human_m_wizard_rio.agr",
+      "name": "Rio Cloudjumps",
+      "name_string_id": 430047,
+      "position": [
+        -1353.3813,
+        -24.40232,
+        326.98505
+      ],
+      "heading": 0.945779966,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3557 spawnNpcWithGuid(33326); src/Resources/Npcs.json Id=33326"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.430047 = Rio Cloudjumps (lab/reports/locale-id-to-text.json); Models.txt 525 = human_m_wizard_rio.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000492,
+      "legacy_npc_id": null,
+      "content_key": 9500000492,
+      "model_id": 167,
+      "model_file_name": "troll_peasant_02.adr",
+      "name": "Gulsh",
+      "name_string_id": 10087,
+      "position": [
+        -1317.8207,
+        -37.87405,
+        309.27405
+      ],
+      "heading": -1.62969995,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3560 spawnNpcWithGuid(33330); src/Resources/Npcs.json Id=33330"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.10087 = Gulsh (lab/reports/locale-id-to-text.json); Models.txt 167 = troll_peasant_02.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset -20.7 m; the name matches 2 regional rows and this one (9500000492, Sanctuary) is chosen by the T470 brief; off the terrain grid (cave or structure)"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000495,
+      "legacy_npc_id": null,
+      "content_key": 9500000495,
+      "model_id": 359,
+      "model_file_name": "human_f_chef_01.agr",
+      "name": "Helga Humbleloaf",
+      "name_string_id": 23792,
+      "position": [
+        -1292.5607,
+        -14.222776,
+        278.35022
+      ],
+      "heading": 0.557256955,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3564 spawnNpcWithGuid(33334); src/Resources/Npcs.json Id=33334"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.23792 = Helga Humbleloaf (lab/reports/locale-id-to-text.json); Models.txt 359 = human_f_chef_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.8 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000485,
+      "legacy_npc_id": null,
+      "content_key": 9500000485,
+      "model_id": 438,
+      "model_file_name": "human_m_andrew.agr",
+      "name": "Ghost Hunter",
+      "name_string_id": 416777,
+      "position": [
+        -1303.5355,
+        -14.222798,
+        298.76352
+      ],
+      "heading": -0.167109002,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3568 spawnNpcWithGuid(33338); src/Resources/Npcs.json Id=33338"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.416777 = Ghost Hunter (lab/reports/locale-id-to-text.json); Models.txt 438 = human_m_andrew.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000513,
+      "legacy_npc_id": null,
+      "content_key": 9500000513,
+      "model_id": 241,
+      "model_file_name": "fairychild_f_pigtailsdress.adr",
+      "name": "Posey",
+      "name_string_id": 10089,
+      "position": [
+        -1288.7145,
+        -14.6931,
+        295.96365
+      ],
+      "heading": -1.88986005,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3569 spawnNpcWithGuid(33339); src/Resources/Npcs.json Id=33339"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.10089 = Posey (lab/reports/locale-id-to-text.json); Models.txt 241 = fairychild_f_pigtailsdress.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000464,
+      "legacy_npc_id": null,
+      "content_key": 9500000464,
+      "model_id": 488,
+      "model_file_name": "chugawug_farmer_m.adr",
+      "name": "Coin Farmer Dang Dang",
+      "name_string_id": 429145,
+      "position": [
+        -1295.7673,
+        -14.00394,
+        318.4211
+      ],
+      "heading": 2.43222998,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3572 spawnNpcWithGuid(33342); src/Resources/Npcs.json Id=33342"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.429145 = Coin Farmer Dang Dang (lab/reports/locale-id-to-text.json); Models.txt 488 = chugawug_farmer_m.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000490,
+      "legacy_npc_id": null,
+      "content_key": 9500000490,
+      "model_id": 345,
+      "model_file_name": "fairy_royalguard_m.adr",
+      "name": "Guard Snapdragon",
+      "name_string_id": 10100,
+      "position": [
+        -1293.969,
+        -14.54378,
+        325.96902
+      ],
+      "heading": 1.99407995,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3578 spawnNpcWithGuid(33348); src/Resources/Npcs.json Id=33348"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.10100 = Guard Snapdragon (lab/reports/locale-id-to-text.json); Models.txt 345 = fairy_royalguard_m.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000450,
+      "legacy_npc_id": null,
+      "content_key": 9500000450,
+      "model_id": 4106,
+      "model_file_name": "robgoblin_m_banker.adr",
+      "name": "Bezzle",
+      "name_string_id": 441072,
+      "position": [
+        -1285.1818,
+        -14.385261,
+        341.38376
+      ],
+      "heading": 2.52264593,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3579 spawnNpcWithGuid(33349); src/Resources/Npcs.json Id=33349"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.441072 = Bezzle (lab/reports/locale-id-to-text.json); Models.txt 4106 = robgoblin_m_banker.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.6 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000444,
+      "legacy_npc_id": null,
+      "content_key": 9500000444,
+      "model_id": 365,
+      "model_file_name": "human_m_burton_01.agr",
+      "name": "Barton",
+      "name_string_id": 10095,
+      "position": [
+        -1288.0,
+        -14.99535,
+        336.0
+      ],
+      "heading": -2.94020008,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3580 spawnNpcWithGuid(33350); src/Resources/Npcs.json Id=33350"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.10095 = Barton (lab/reports/locale-id-to-text.json); Models.txt 365 = human_m_burton_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000023,
+      "legacy_npc_id": null,
+      "content_key": 9000000023,
+      "model_id": 824,
+      "model_file_name": "human_f_medicstudent.agr",
+      "name": "Beth Callahan",
+      "name_string_id": 388395,
+      "position": [
+        -1379.9756,
+        -24.526918,
+        419.66104
+      ],
+      "heading": -1.838184,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3587 spawnNpcWithGuid(33357); src/Resources/Npcs.json Id=33357"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.388395 = Beth Callahan (lab/reports/locale-id-to-text.json); Models.txt 824 = human_f_medicstudent.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000486,
+      "legacy_npc_id": null,
+      "content_key": 9500000486,
+      "model_id": 362,
+      "model_file_name": "fairy_f_freestyle_glitter_01.agr",
+      "name": "Glitter",
+      "name_string_id": 7609,
+      "position": [
+        -1380.6334,
+        -24.553,
+        422.01578
+      ],
+      "heading": -2.2177999,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3588 spawnNpcWithGuid(33358); src/Resources/Npcs.json Id=33358"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.7609 = Glitter (lab/reports/locale-id-to-text.json); Models.txt 362 = fairy_f_freestyle_glitter_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000478,
+      "legacy_npc_id": null,
+      "content_key": 9500000478,
+      "model_id": 1713,
+      "model_file_name": "human_m_costume_finklestein.agr",
+      "name": "Finklestein",
+      "name_string_id": 415613,
+      "position": [
+        -1282.0,
+        -14.34194,
+        367.0
+      ],
+      "heading": 1.67903996,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3600 spawnNpcWithGuid(33376); src/Resources/Npcs.json Id=33376"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.415613 = Finklestein (lab/reports/locale-id-to-text.json); Models.txt 1713 = human_m_costume_finklestein.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.7 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000086,
+      "legacy_npc_id": null,
+      "content_key": 9000000086,
+      "model_id": 442,
+      "model_file_name": "fairy_m_courier_01.agr",
+      "name": "Felipe",
+      "name_string_id": 21276,
+      "position": [
+        -1276.9783,
+        -14.72255,
+        303.08456
+      ],
+      "heading": -0.771869999,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3614 spawnNpcWithGuid(33390); src/Resources/Npcs.json Id=33390"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.21276 = Felipe (lab/reports/locale-id-to-text.json); Models.txt 442 = fairy_m_courier_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000499,
+      "legacy_npc_id": null,
+      "content_key": 9500000499,
+      "model_id": 361,
+      "model_file_name": "fairy_m_freestyle_jestin_01.agr",
+      "name": "Jestin",
+      "name_string_id": 7606,
+      "position": [
+        -1266.5746,
+        -14.34303,
+        294.57748
+      ],
+      "heading": -0.742749979,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3616 spawnNpcWithGuid(33392); src/Resources/Npcs.json Id=33392"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.7606 = Jestin (lab/reports/locale-id-to-text.json); Models.txt 361 = fairy_m_freestyle_jestin_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.4 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000483,
+      "legacy_npc_id": null,
+      "content_key": 9500000483,
+      "model_id": 398,
+      "model_file_name": "fairy_sanctuary_m_01.adr",
+      "name": "Flurti",
+      "name_string_id": 10088,
+      "position": [
+        -1267.7494,
+        -14.28769,
+        331.39166
+      ],
+      "heading": -1.52144003,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3623 spawnNpcWithGuid(33399); src/Resources/Npcs.json Id=33399"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.10088 = Flurti (lab/reports/locale-id-to-text.json); Models.txt 398 = fairy_sanctuary_m_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.7 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000496,
+      "legacy_npc_id": null,
+      "content_key": 9500000496,
+      "model_id": 398,
+      "model_file_name": "fairy_sanctuary_m_01.adr",
+      "name": "Ikee",
+      "name_string_id": 14699,
+      "position": [
+        -1269.0454,
+        -14.28768,
+        339.73743
+      ],
+      "heading": -1.45788002,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3624 spawnNpcWithGuid(33400); src/Resources/Npcs.json Id=33400"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.14699 = Ikee (lab/reports/locale-id-to-text.json); Models.txt 398 = fairy_sanctuary_m_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.7 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000507,
+      "legacy_npc_id": null,
+      "content_key": 9500000507,
+      "model_id": 30,
+      "model_file_name": "fairy_m_old_01.adr",
+      "name": "Napoleon",
+      "name_string_id": 391444,
+      "position": [
+        -1268.7357,
+        -14.196147,
+        272.35593
+      ],
+      "heading": -0.244037996,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3630 spawnNpcWithGuid(33406); src/Resources/Npcs.json Id=33406"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.391444 = Napoleon (lab/reports/locale-id-to-text.json); Models.txt 30 = fairy_m_old_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.8 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000466,
+      "legacy_npc_id": null,
+      "content_key": 9500000466,
+      "model_id": 574,
+      "model_file_name": "fairy_m_blacksmith_01.agr",
+      "name": "Crofti",
+      "name_string_id": 10175,
+      "position": [
+        -1264.3824,
+        -14.225539,
+        276.819
+      ],
+      "heading": -1.81506396,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3640 spawnNpcWithGuid(33416); src/Resources/Npcs.json Id=33416"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.10175 = Crofti (lab/reports/locale-id-to-text.json); Models.txt 574 = fairy_m_blacksmith_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.8 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000527,
+      "legacy_npc_id": null,
+      "content_key": 9500000527,
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "name": "Ruby",
+      "name_string_id": 15413,
+      "position": [
+        -1274.8175,
+        -14.195748,
+        218.83417
+      ],
+      "heading": 1.10833202,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3646 spawnNpcWithGuid(33422); src/Resources/Npcs.json Id=33422"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.15413 = Ruby (lab/reports/locale-id-to-text.json); Models.txt 384 = fairy_sanctuary_f.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.8 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000445,
+      "legacy_npc_id": null,
+      "content_key": 9500000445,
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "name": "Baxi Sparkletoes",
+      "name_string_id": 382902,
+      "position": [
+        -1272.5175,
+        -14.195691,
+        212.49059
+      ],
+      "heading": 1.389184,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3650 spawnNpcWithGuid(33426); src/Resources/Npcs.json Id=33426"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.382902 = Baxi Sparkletoes (lab/reports/locale-id-to-text.json); Models.txt 384 = fairy_sanctuary_f.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.8 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000458,
+      "legacy_npc_id": null,
+      "content_key": 9500000458,
+      "model_id": 401,
+      "model_file_name": "fairy_seaside_f_01.adr",
+      "name": "Cadie",
+      "name_string_id": 10094,
+      "position": [
+        -1256.5768,
+        -14.196147,
+        229.7627
+      ],
+      "heading": -1.93813001,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3651 spawnNpcWithGuid(33427); src/Resources/Npcs.json Id=33427"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.10094 = Cadie (lab/reports/locale-id-to-text.json); Models.txt 401 = fairy_seaside_f_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.7 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000448,
+      "legacy_npc_id": null,
+      "content_key": 9500000448,
+      "model_id": 401,
+      "model_file_name": "fairy_seaside_f_01.adr",
+      "name": "Bellis",
+      "name_string_id": 70739,
+      "position": [
+        -1271.1044,
+        -14.23458,
+        195.22244
+      ],
+      "heading": 0.668550012,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3655 spawnNpcWithGuid(33431); src/Resources/Npcs.json Id=33431"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.70739 = Bellis (lab/reports/locale-id-to-text.json); Models.txt 401 = fairy_seaside_f_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.8 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000473,
+      "legacy_npc_id": null,
+      "content_key": 9500000473,
+      "model_id": 4748,
+      "model_file_name": "human_m_edwin.agr",
+      "name": "Edwin",
+      "name_string_id": 5102997,
+      "position": [
+        -1250.3472,
+        -14.225539,
+        219.84692
+      ],
+      "heading": -2.00274491,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3657 spawnNpcWithGuid(33433); src/Resources/Npcs.json Id=33433"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.5102997 = Edwin (lab/reports/locale-id-to-text.json); Models.txt 4748 = human_m_edwin.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.7 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000511,
+      "legacy_npc_id": null,
+      "content_key": 9500000511,
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "name": "Orchid",
+      "name_string_id": 14700,
+      "position": [
+        -1265.861,
+        -14.19592,
+        191.88835
+      ],
+      "heading": 1.22878099,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3658 spawnNpcWithGuid(33434); src/Resources/Npcs.json Id=33434"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.14700 = Orchid (lab/reports/locale-id-to-text.json); Models.txt 384 = fairy_sanctuary_f.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.8 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000534,
+      "legacy_npc_id": null,
+      "content_key": 9500000534,
+      "model_id": 1708,
+      "model_file_name": "fairy_m_costume_skelly.agr",
+      "name": "Skelly",
+      "name_string_id": 415500,
+      "position": [
+        -1263.0421,
+        -13.7635,
+        370.0121
+      ],
+      "heading": -1.24565005,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3662 spawnNpcWithGuid(33438); src/Resources/Npcs.json Id=33438"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.415500 = Skelly (lab/reports/locale-id-to-text.json); Models.txt 1708 = fairy_m_costume_skelly.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +1.2 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000525,
+      "legacy_npc_id": null,
+      "content_key": 9500000525,
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "name": "Rose",
+      "name_string_id": 10073,
+      "position": [
+        -1275.1486,
+        -14.33461,
+        390.1828
+      ],
+      "heading": 1.85735,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3664 spawnNpcWithGuid(33440); src/Resources/Npcs.json Id=33440"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.10073 = Rose (lab/reports/locale-id-to-text.json); Models.txt 384 = fairy_sanctuary_f.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.7 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000376,
+      "legacy_npc_id": null,
+      "content_key": 9000000376,
+      "model_id": 762,
+      "model_file_name": "fairy_m_gilly.adr",
+      "name": "Lavarius Sparksizzle",
+      "name_string_id": 79014,
+      "position": [
+        -1240.8615,
+        -14.19615,
+        196.12605
+      ],
+      "heading": -2.00905992,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3665 spawnNpcWithGuid(33441); src/Resources/Npcs.json Id=33441"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.79014 = Lavarius Sparksizzle (lab/reports/locale-id-to-text.json); Models.txt 762 = fairy_m_gilly.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.6 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000537,
+      "legacy_npc_id": null,
+      "content_key": 9500000537,
+      "model_id": 4605,
+      "model_file_name": "human_m_sunstone_jones.agr",
+      "name": "Sunstone Jones",
+      "name_string_id": 5102577,
+      "position": [
+        -1231.4524,
+        5.534741,
+        327.4739
+      ],
+      "heading": 2.40545105,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3669 spawnNpcWithGuid(33445); src/Resources/Npcs.json Id=33445"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.5102577 = Sunstone Jones (lab/reports/locale-id-to-text.json); Models.txt 4605 = human_m_sunstone_jones.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000164,
+      "legacy_npc_id": null,
+      "content_key": 9000000164,
+      "model_id": 764,
+      "model_file_name": "fairy_m_osgood.adr",
+      "name": "Osgood",
+      "name_string_id": 45555,
+      "position": [
+        -1238.1771,
+        -14.19615,
+        190.59244
+      ],
+      "heading": -1.83369003,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3670 spawnNpcWithGuid(33446); src/Resources/Npcs.json Id=33446"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.45555 = Osgood (lab/reports/locale-id-to-text.json); Models.txt 764 = fairy_m_osgood.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.2 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000190,
+      "legacy_npc_id": null,
+      "content_key": 9000000190,
+      "model_id": 179,
+      "model_file_name": "changeling_m.adr",
+      "name": "Sandbur",
+      "name_string_id": 10090,
+      "position": [
+        -1231.0,
+        4.94757,
+        349.0
+      ],
+      "heading": 1.86758008,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3673 spawnNpcWithGuid(33449); src/Resources/Npcs.json Id=33449"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.10090 = Sandbur (lab/reports/locale-id-to-text.json); Models.txt 179 = changeling_m.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000489,
+      "legacy_npc_id": null,
+      "content_key": 9500000489,
+      "model_id": 345,
+      "model_file_name": "fairy_royalguard_m.adr",
+      "name": "Guard Banee",
+      "name_string_id": 10079,
+      "position": [
+        -1216.3442,
+        3.7568169,
+        312.30713
+      ],
+      "heading": -0.894525974,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3676 spawnNpcWithGuid(33453); src/Resources/Npcs.json Id=33453"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.10079 = Guard Banee (lab/reports/locale-id-to-text.json); Models.txt 345 = fairy_royalguard_m.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000343,
+      "legacy_npc_id": null,
+      "content_key": 9500000343,
+      "model_id": 366,
+      "model_file_name": "fairy_f_freestyle_03.agr",
+      "name": "Dori Tendersole",
+      "name_string_id": 36468,
+      "position": [
+        -763.651,
+        -0.379606,
+        861.4495
+      ],
+      "heading": -1.84007705,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3687 spawnNpcWithGuid(33465); src/Resources/Npcs.json Id=33465"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36468 = Dori Tendersole (lab/reports/locale-id-to-text.json); Models.txt 366 = fairy_f_freestyle_03.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset -0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000043,
+      "legacy_npc_id": null,
+      "content_key": 9000000043,
+      "model_id": 732,
+      "model_file_name": "fairy_m_chaz_strongarm.agr",
+      "name": "Chaz Strongarm",
+      "name_string_id": 117044,
+      "position": [
+        -752.6455,
+        -0.037248,
+        841.50726
+      ],
+      "heading": -0.052078003,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3688 spawnNpcWithGuid(33466); src/Resources/Npcs.json Id=33466"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.117044 = Chaz Strongarm (lab/reports/locale-id-to-text.json); Models.txt 732 = fairy_m_chaz_strongarm.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000341,
+      "legacy_npc_id": null,
+      "content_key": 9500000341,
+      "model_id": 553,
+      "model_file_name": "human_m_freestyle_07.agr",
+      "name": "Big Mike",
+      "name_string_id": 103818,
+      "position": [
+        -589.0522,
+        -0.579432,
+        954.71844
+      ],
+      "heading": 1.10142006,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3690 spawnNpcWithGuid(33468); src/Resources/Npcs.json Id=33468"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.103818 = Big Mike (lab/reports/locale-id-to-text.json); Models.txt 553 = human_m_freestyle_07.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000352,
+      "legacy_npc_id": null,
+      "content_key": 9500000352,
+      "model_id": 391,
+      "model_file_name": "fairy_m_warrior_01.agr",
+      "name": "Len Tyril",
+      "name_string_id": 76038,
+      "position": [
+        -610.0557,
+        -0.29669,
+        976.0766
+      ],
+      "heading": -2.22600006,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3691 spawnNpcWithGuid(33469); src/Resources/Npcs.json Id=33469"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.76038 = Len Tyril (lab/reports/locale-id-to-text.json); Models.txt 391 = fairy_m_warrior_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000027,
+      "legacy_npc_id": null,
+      "content_key": 9000000027,
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "name": "Bluerose",
+      "name_string_id": 19676,
+      "position": [
+        -808.26825,
+        1.521399,
+        844.8542
+      ],
+      "heading": -3.14122605,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3701 spawnNpcWithGuid(33479); src/Resources/Npcs.json Id=33479"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.19676 = Bluerose (lab/reports/locale-id-to-text.json); Models.txt 384 = fairy_sanctuary_f.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000185,
+      "legacy_npc_id": null,
+      "content_key": 9000000185,
+      "model_id": 519,
+      "model_file_name": "human_m_hooligan_brawler_03.agr",
+      "name": "Rourke Ironfist",
+      "name_string_id": 22805,
+      "position": [
+        -758.4285,
+        0.199004,
+        841.9175
+      ],
+      "heading": -0.0979499985,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3756 spawnNpcWithGuid(33534); src/Resources/Npcs.json Id=33534"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.22805 = Rourke Ironfist (lab/reports/locale-id-to-text.json); Models.txt 519 = human_m_hooligan_brawler_03.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000146,
+      "legacy_npc_id": null,
+      "content_key": 9000000146,
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "name": "Merri De'Flor",
+      "name_string_id": 19671,
+      "position": [
+        -755.6111,
+        0.463986,
+        851.4252
+      ],
+      "heading": -2.40588683,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3760 spawnNpcWithGuid(33538); src/Resources/Npcs.json Id=33538"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.19671 = Merri De'Flor (lab/reports/locale-id-to-text.json); Models.txt 384 = fairy_sanctuary_f.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000351,
+      "legacy_npc_id": null,
+      "content_key": 9500000351,
+      "model_id": 385,
+      "model_file_name": "fairy_f_warrior_01.agr",
+      "name": "Lan Spryleaf",
+      "name_string_id": 76029,
+      "position": [
+        -762.4121,
+        3.577816,
+        885.152
+      ],
+      "heading": 1.78634404,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3764 spawnNpcWithGuid(33542); src/Resources/Npcs.json Id=33542"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.76029 = Lan Spryleaf (lab/reports/locale-id-to-text.json); Models.txt 385 = fairy_f_warrior_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset -0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000360,
+      "legacy_npc_id": null,
+      "content_key": 9500000360,
+      "model_id": 485,
+      "model_file_name": "fairy_petulia_f.adr",
+      "name": "Natali",
+      "name_string_id": 388323,
+      "position": [
+        -721.9529,
+        9.966442,
+        885.3096
+      ],
+      "heading": -0.604641049,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3767 spawnNpcWithGuid(33545); src/Resources/Npcs.json Id=33545"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.388323 = Natali (lab/reports/locale-id-to-text.json); Models.txt 485 = fairy_petulia_f.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000358,
+      "legacy_npc_id": null,
+      "content_key": 9500000358,
+      "model_id": 184,
+      "model_file_name": "human_m_freestyle_01.agr",
+      "name": "Mister Nooklings",
+      "name_string_id": 19682,
+      "position": [
+        -724.5998,
+        10.11478,
+        910.71655
+      ],
+      "heading": -0.352139988,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3778 spawnNpcWithGuid(33556); src/Resources/Npcs.json Id=33556"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.19682 = Mister Nooklings (lab/reports/locale-id-to-text.json); Models.txt 184 = human_m_freestyle_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset -0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000359,
+      "legacy_npc_id": null,
+      "content_key": 9500000359,
+      "model_id": 391,
+      "model_file_name": "fairy_m_warrior_01.agr",
+      "name": "Mort McFly",
+      "name_string_id": 76040,
+      "position": [
+        -674.4438,
+        0.0039357557,
+        1019.27356
+      ],
+      "heading": -1.64757836,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3793 spawnNpcWithGuid(33571); src/Resources/Npcs.json Id=33571"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.76040 = Mort McFly (lab/reports/locale-id-to-text.json); Models.txt 391 = fairy_m_warrior_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000367,
+      "legacy_npc_id": null,
+      "content_key": 9500000367,
+      "model_id": 385,
+      "model_file_name": "fairy_f_warrior_01.agr",
+      "name": "Tyn Redwing",
+      "name_string_id": 76041,
+      "position": [
+        -588.3918,
+        0.27487227,
+        948.9176
+      ],
+      "heading": -0.702262902,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3800 spawnNpcWithGuid(33578); src/Resources/Npcs.json Id=33578"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.76041 = Tyn Redwing (lab/reports/locale-id-to-text.json); Models.txt 385 = fairy_f_warrior_01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset -0.3 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000778,
+      "legacy_npc_id": null,
+      "content_key": 9500000778,
+      "model_id": 468,
+      "model_file_name": "fairy_druid_m.adr",
+      "name": "Vaelen Warpwatcher",
+      "name_string_id": 130731,
+      "position": [
+        56.24998,
+        31.53844,
+        374.89914
+      ],
+      "heading": 2.65564989,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3823 spawnNpcWithGuid(33601); src/Resources/Npcs.json Id=33601"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.130731 = Vaelen Warpwatcher (lab/reports/locale-id-to-text.json); Models.txt 468 = fairy_druid_m.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000093,
+      "legacy_npc_id": null,
+      "content_key": 9000000093,
+      "model_id": 36,
+      "model_file_name": "fairy_f_valinda.adr",
+      "name": "Frostpetal",
+      "name_string_id": 5448,
+      "position": [
+        72.91805,
+        20.55249,
+        331.20828
+      ],
+      "heading": -2.29090002,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3830 spawnNpcWithGuid(33609); src/Resources/Npcs.json Id=33609"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.5448 = Frostpetal (lab/reports/locale-id-to-text.json); Models.txt 36 = fairy_f_valinda.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset -0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000732,
+      "legacy_npc_id": null,
+      "content_key": 9500000732,
+      "model_id": 837,
+      "model_file_name": "human_m_snowhill.adr",
+      "name": "Calvin Coldcastle",
+      "name_string_id": 420397,
+      "position": [
+        120.38808,
+        22.07155,
+        378.245
+      ],
+      "heading": 2.25076006,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3836 spawnNpcWithGuid(33615); src/Resources/Npcs.json Id=33615"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.420397 = Calvin Coldcastle (lab/reports/locale-id-to-text.json); Models.txt 837 = human_m_snowhill.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000757,
+      "legacy_npc_id": null,
+      "content_key": 9500000757,
+      "model_id": 4552,
+      "model_file_name": "penguin_baby_8bit_01.adr",
+      "name": "Momma Meepster",
+      "name_string_id": 5102405,
+      "position": [
+        127.7159,
+        22.608934,
+        423.17685
+      ],
+      "heading": -2.37502192,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3844 spawnNpcWithGuid(33623); src/Resources/Npcs.json Id=33623"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.5102405 = Momma Meepster (lab/reports/locale-id-to-text.json); Models.txt 4552 = penguin_baby_8bit_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000739,
+      "legacy_npc_id": null,
+      "content_key": 9500000739,
+      "model_id": 4103,
+      "model_file_name": "sogg_f_vendor.adr",
+      "name": "Cragara",
+      "name_string_id": 440941,
+      "position": [
+        130.87897,
+        28.729305,
+        290.85706
+      ],
+      "heading": -0.0971219953,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3845 spawnNpcWithGuid(33624); src/Resources/Npcs.json Id=33624"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.440941 = Cragara (lab/reports/locale-id-to-text.json); Models.txt 4103 = sogg_f_vendor.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset -0.0 m; the name matches 6 regional rows and this one (9500000739, Snowhill) is chosen by the T470 brief"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000016,
+      "legacy_npc_id": null,
+      "content_key": 9000000016,
+      "model_id": 49,
+      "model_file_name": "fairy_m_02.adr",
+      "name": "Assistant Chef Edward",
+      "name_string_id": 90184,
+      "position": [
+        193.70468,
+        22.740154,
+        363.95743
+      ],
+      "heading": 0.508053002,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3851 spawnNpcWithGuid(33632); src/Resources/Npcs.json Id=33632"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.90184 = Assistant Chef Edward (lab/reports/locale-id-to-text.json); Models.txt 49 = fairy_m_02.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000133,
+      "legacy_npc_id": null,
+      "content_key": 9000000133,
+      "model_id": 32,
+      "model_file_name": "fairy_m_farmer_01.adr",
+      "name": "Lucca De'Flor",
+      "name_string_id": 23788,
+      "position": [
+        200.15443,
+        23.023718,
+        352.0755
+      ],
+      "heading": -0.266582996,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3853 spawnNpcWithGuid(33634); src/Resources/Npcs.json Id=33634"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.23788 = Lucca De'Flor (lab/reports/locale-id-to-text.json); Models.txt 32 = fairy_m_farmer_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000773,
+      "legacy_npc_id": null,
+      "content_key": 9500000773,
+      "model_id": 559,
+      "model_file_name": "human_m_freestyle_06.agr",
+      "name": "Tad Slopeslider",
+      "name_string_id": 117257,
+      "position": [
+        230.13184,
+        21.062761,
+        322.42804
+      ],
+      "heading": 0.840897975,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3864 spawnNpcWithGuid(33645); src/Resources/Npcs.json Id=33645"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.117257 = Tad Slopeslider (lab/reports/locale-id-to-text.json); Models.txt 559 = human_m_freestyle_06.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000743,
+      "legacy_npc_id": null,
+      "content_key": 9500000743,
+      "model_id": 573,
+      "model_file_name": "fairy_f_freestyle_11.agr",
+      "name": "Downey",
+      "name_string_id": 90117,
+      "position": [
+        228.3293,
+        23.97881,
+        371.45712
+      ],
+      "heading": -0.0269199998,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3867 spawnNpcWithGuid(33648); src/Resources/Npcs.json Id=33648"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.90117 = Downey (lab/reports/locale-id-to-text.json); Models.txt 573 = fairy_f_freestyle_11.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.3 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000754,
+      "legacy_npc_id": null,
+      "content_key": 9500000754,
+      "model_id": 12,
+      "model_file_name": "fairychild_m_pointyhair.adr",
+      "name": "Kiel",
+      "name_string_id": 6156,
+      "position": [
+        139.7237,
+        23.588022,
+        393.91772
+      ],
+      "heading": -1.71889496,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3869 spawnNpcWithGuid(33650); src/Resources/Npcs.json Id=33650"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.6156 = Kiel (lab/reports/locale-id-to-text.json); Models.txt 12 = fairychild_m_pointyhair.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000758,
+      "legacy_npc_id": null,
+      "content_key": 9500000758,
+      "model_id": 48,
+      "model_file_name": "fairy_m_01.adr",
+      "name": "Mr. Twinkle",
+      "name_string_id": 3070,
+      "position": [
+        151.57108,
+        23.40974,
+        386.2754
+      ],
+      "heading": 3.10415006,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3871 spawnNpcWithGuid(33652); src/Resources/Npcs.json Id=33652"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.3070 = Mr. Twinkle (lab/reports/locale-id-to-text.json); Models.txt 48 = fairy_m_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000132,
+      "legacy_npc_id": null,
+      "content_key": 9000000132,
+      "model_id": 48,
+      "model_file_name": "fairy_m_01.adr",
+      "name": "Loryn",
+      "name_string_id": 178,
+      "position": [
+        198.0,
+        28.99752,
+        429.0
+      ],
+      "heading": 1.56097996,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3881 spawnNpcWithGuid(33663); src/Resources/Npcs.json Id=33663"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.178 = Loryn (lab/reports/locale-id-to-text.json); Models.txt 48 = fairy_m_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000753,
+      "legacy_npc_id": null,
+      "content_key": 9500000753,
+      "model_id": 30,
+      "model_file_name": "fairy_m_old_01.adr",
+      "name": "Jonathon Forkpath",
+      "name_string_id": 92578,
+      "position": [
+        224.36874,
+        23.615072,
+        405.206
+      ],
+      "heading": 0.13566596,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3887 spawnNpcWithGuid(33669); src/Resources/Npcs.json Id=33669"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.92578 = Jonathon Forkpath (lab/reports/locale-id-to-text.json); Models.txt 30 = fairy_m_old_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000158,
+      "legacy_npc_id": null,
+      "content_key": 9000000158,
+      "model_id": 49,
+      "model_file_name": "fairy_m_02.adr",
+      "name": "Murphy",
+      "name_string_id": 3063,
+      "position": [
+        263.157,
+        24.16891,
+        243.43916
+      ],
+      "heading": -0.391319999,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3888 spawnNpcWithGuid(33670); src/Resources/Npcs.json Id=33670"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.3063 = Murphy (lab/reports/locale-id-to-text.json); Models.txt 49 = fairy_m_02.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +4.4 m; off the terrain grid (cave or structure)"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000755,
+      "legacy_npc_id": null,
+      "content_key": 9500000755,
+      "model_id": 48,
+      "model_file_name": "fairy_m_01.adr",
+      "name": "Lealin",
+      "name_string_id": 5454,
+      "position": [
+        258.30026,
+        22.13371,
+        261.57437
+      ],
+      "heading": 2.46031999,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3890 spawnNpcWithGuid(33672); src/Resources/Npcs.json Id=33672"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.5454 = Lealin (lab/reports/locale-id-to-text.json); Models.txt 48 = fairy_m_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +3.2 m; off the terrain grid (cave or structure)"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000727,
+      "legacy_npc_id": null,
+      "content_key": 9500000727,
+      "model_id": 21,
+      "model_file_name": "penguin_bert.adr",
+      "name": "Bert",
+      "name_string_id": 177,
+      "position": [
+        221.56438,
+        27.782915,
+        433.13718
+      ],
+      "heading": -1.88184107,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3902 spawnNpcWithGuid(33688); src/Resources/Npcs.json Id=33688"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.177 = Bert (lab/reports/locale-id-to-text.json); Models.txt 21 = penguin_bert.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000781,
+      "legacy_npc_id": null,
+      "content_key": 9500000781,
+      "model_id": 837,
+      "model_file_name": "human_m_snowhill.adr",
+      "name": "Willie",
+      "name_string_id": 36827,
+      "position": [
+        290.09042,
+        27.68708,
+        294.96246
+      ],
+      "heading": 0.914959985,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3905 spawnNpcWithGuid(33691); src/Resources/Npcs.json Id=33691"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36827 = Willie (lab/reports/locale-id-to-text.json); Models.txt 837 = human_m_snowhill.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000744,
+      "legacy_npc_id": null,
+      "content_key": 9500000744,
+      "model_id": 31,
+      "model_file_name": "penguin_ernie.adr",
+      "name": "Ernie",
+      "name_string_id": 179,
+      "position": [
+        226.00937,
+        26.844666,
+        431.26334
+      ],
+      "heading": 0.782830048,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3913 spawnNpcWithGuid(33699); src/Resources/Npcs.json Id=33699"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.179 = Ernie (lab/reports/locale-id-to-text.json); Models.txt 31 = penguin_ernie.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000726,
+      "legacy_npc_id": null,
+      "content_key": 9500000726,
+      "model_id": 43,
+      "model_file_name": "fairy_f_03.adr",
+      "name": "Arci Joan",
+      "name_string_id": 391188,
+      "position": [
+        293.91885,
+        25.35067,
+        355.42157
+      ],
+      "heading": -0.0215909989,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3923 spawnNpcWithGuid(33709); src/Resources/Npcs.json Id=33709"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.391188 = Arci Joan (lab/reports/locale-id-to-text.json); Models.txt 43 = fairy_f_03.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000749,
+      "legacy_npc_id": null,
+      "content_key": 9500000749,
+      "model_id": 573,
+      "model_file_name": "fairy_f_freestyle_11.agr",
+      "name": "Fritti Bluebelle",
+      "name_string_id": 90186,
+      "position": [
+        286.7907,
+        27.49383,
+        406.30832
+      ],
+      "heading": -1.059289,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3939 spawnNpcWithGuid(33730); src/Resources/Npcs.json Id=33730"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.90186 = Fritti Bluebelle (lab/reports/locale-id-to-text.json); Models.txt 573 = fairy_f_freestyle_11.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000737,
+      "legacy_npc_id": null,
+      "content_key": 9500000737,
+      "model_id": 32,
+      "model_file_name": "fairy_m_farmer_01.adr",
+      "name": "Cinn",
+      "name_string_id": 4554,
+      "position": [
+        283.14688,
+        27.71902,
+        426.77893
+      ],
+      "heading": -1.915841,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3941 spawnNpcWithGuid(33732); src/Resources/Npcs.json Id=33732"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4554 = Cinn (lab/reports/locale-id-to-text.json); Models.txt 32 = fairy_m_farmer_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000195,
+      "legacy_npc_id": null,
+      "content_key": 9000000195,
+      "model_id": 181,
+      "model_file_name": "human_f_explorer_caucasian01.agr",
+      "name": "Senari",
+      "name_string_id": 4726,
+      "position": [
+        302.2244,
+        26.45855,
+        396.3599
+      ],
+      "heading": -1.94461002,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3945 spawnNpcWithGuid(33736); src/Resources/Npcs.json Id=33736"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.4726 = Senari (lab/reports/locale-id-to-text.json); Models.txt 181 = human_f_explorer_caucasian01.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset -0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000143,
+      "legacy_npc_id": null,
+      "content_key": 9000000143,
+      "model_id": 34,
+      "model_file_name": "fairy_f_lorina.adr",
+      "name": "Mayor Crystalline",
+      "name_string_id": 182,
+      "position": [
+        299.41,
+        27.40738,
+        409.01
+      ],
+      "heading": -1.1774953,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3946 spawnNpcWithGuid(33737); src/Resources/Npcs.json Id=33737"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.182 = Mayor Crystalline (lab/reports/locale-id-to-text.json); Models.txt 34 = fairy_f_lorina.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000725,
+      "legacy_npc_id": null,
+      "content_key": 9500000725,
+      "model_id": 439,
+      "model_file_name": "human_f_mary.agr",
+      "name": "Annabelle",
+      "name_string_id": 21849,
+      "position": [
+        245.12933,
+        24.82404,
+        470.14413
+      ],
+      "heading": 2.67620994,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3949 spawnNpcWithGuid(33740); src/Resources/Npcs.json Id=33740"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.21849 = Annabelle (lab/reports/locale-id-to-text.json); Models.txt 439 = human_f_mary.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset -0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000215,
+      "legacy_npc_id": null,
+      "content_key": 9000000215,
+      "model_id": 657,
+      "model_file_name": "fairy_m_freestyle_08.agr",
+      "name": "Tevin",
+      "name_string_id": 79022,
+      "position": [
+        303.51282,
+        27.23725,
+        410.2941
+      ],
+      "heading": -1.07071997,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3950 spawnNpcWithGuid(33741); src/Resources/Npcs.json Id=33741"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.79022 = Tevin (lab/reports/locale-id-to-text.json); Models.txt 657 = fairy_m_freestyle_08.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000738,
+      "legacy_npc_id": null,
+      "content_key": 9500000738,
+      "model_id": 42,
+      "model_file_name": "fairy_f_02.adr",
+      "name": "Clara Chatterhag",
+      "name_string_id": 36808,
+      "position": [
+        274.12158,
+        26.39462,
+        458.62057
+      ],
+      "heading": -2.28326987,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3957 spawnNpcWithGuid(33762); src/Resources/Npcs.json Id=33762"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.36808 = Clara Chatterhag (lab/reports/locale-id-to-text.json); Models.txt 42 = fairy_f_02.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.3 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000745,
+      "legacy_npc_id": null,
+      "content_key": 9500000745,
+      "model_id": 38,
+      "model_file_name": "human_m_miner_01.adr",
+      "name": "Everett",
+      "name_string_id": 420809,
+      "position": [
+        322.78738,
+        25.583282,
+        378.4836
+      ],
+      "heading": -1.86024798,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3958 spawnNpcWithGuid(33763); src/Resources/Npcs.json Id=33763"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.420809 = Everett (lab/reports/locale-id-to-text.json); Models.txt 38 = human_m_miner_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset -0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000774,
+      "legacy_npc_id": null,
+      "content_key": 9500000774,
+      "model_id": 1963,
+      "model_file_name": "human_m_tiger_the_party_animal_holiday.agr",
+      "name": "Tiger the Party Animal",
+      "name_string_id": 420171,
+      "position": [
+        309.24753,
+        27.300243,
+        464.9833
+      ],
+      "heading": 0.23715501,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3974 spawnNpcWithGuid(33790); src/Resources/Npcs.json Id=33790"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.420171 = Tiger the Party Animal (lab/reports/locale-id-to-text.json); Models.txt 1963 = human_m_tiger_the_party_animal_holiday.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m; the name matches 3 regional rows and this one (9500000774, Snowhill) is chosen by the T470 brief"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000782,
+      "legacy_npc_id": null,
+      "content_key": 9500000782,
+      "model_id": 11,
+      "model_file_name": "fairychild_f_sleevesandshorts.adr",
+      "name": "Wintara",
+      "name_string_id": 7053,
+      "position": [
+        98.93682,
+        61.759792,
+        541.33356
+      ],
+      "heading": -3.06333709,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3982 spawnNpcWithGuid(33813); src/Resources/Npcs.json Id=33813"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.7053 = Wintara (lab/reports/locale-id-to-text.json); Models.txt 11 = fairychild_f_sleevesandshorts.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000764,
+      "legacy_npc_id": null,
+      "content_key": 9500000764,
+      "model_id": 565,
+      "model_file_name": "human_m_roland_spore.agr",
+      "name": "Roland Sporeling",
+      "name_string_id": 432170,
+      "position": [
+        -0.607118,
+        102.32443,
+        472.90552
+      ],
+      "heading": -0.266676996,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3988 spawnNpcWithGuid(33824); src/Resources/Npcs.json Id=33824"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.432170 = Roland Sporeling (lab/reports/locale-id-to-text.json); Models.txt 565 = human_m_roland_spore.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000180,
+      "legacy_npc_id": null,
+      "content_key": 9000000180,
+      "model_id": 428,
+      "model_file_name": "fairy_m_sakka.agr",
+      "name": "Ree Peatpants",
+      "name_string_id": 388454,
+      "position": [
+        -54.12951,
+        5.171237,
+        332.04172
+      ],
+      "heading": 1.33056104,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3996 spawnNpcWithGuid(33834); src/Resources/Npcs.json Id=33834"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.388454 = Ree Peatpants (lab/reports/locale-id-to-text.json); Models.txt 428 = fairy_m_sakka.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000422,
+      "legacy_npc_id": null,
+      "content_key": 9000000422,
+      "model_id": 44,
+      "model_file_name": "human_f_gardener.adr",
+      "name": "Perry",
+      "name_string_id": 3059,
+      "position": [
+        -73.08731,
+        11.02224,
+        242.89047
+      ],
+      "heading": -0.108579995,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4038 spawnNpcWithGuid(33879); src/Resources/Npcs.json Id=33879"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.3059 = Perry (lab/reports/locale-id-to-text.json); Models.txt 44 = human_f_gardener.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000776,
+      "legacy_npc_id": null,
+      "content_key": 9500000776,
+      "model_id": 1084,
+      "model_file_name": "human_m_soccerblue.agr",
+      "name": "Tommy Crackletoe",
+      "name_string_id": 410139,
+      "position": [
+        -144.0924,
+        -5.572653,
+        255.03143
+      ],
+      "heading": -0.810944,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4111 spawnNpcWithGuid(33953); src/Resources/Npcs.json Id=33953"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.410139 = Tommy Crackletoe (lab/reports/locale-id-to-text.json); Models.txt 1084 = human_m_soccerblue.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000092,
+      "legacy_npc_id": null,
+      "content_key": 9000000092,
+      "model_id": 1085,
+      "model_file_name": "human_m_soccerred.agr",
+      "name": "Fred Futbol",
+      "name_string_id": 410136,
+      "position": [
+        -166.81015,
+        -5.494034,
+        251.50894
+      ],
+      "heading": 1.089162,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4122 spawnNpcWithGuid(33964); src/Resources/Npcs.json Id=33964"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.410136 = Fred Futbol (lab/reports/locale-id-to-text.json); Models.txt 1085 = human_m_soccerred.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.0 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9000000098,
+      "legacy_npc_id": null,
+      "content_key": 9000000098,
+      "model_id": 966,
+      "model_file_name": "human_m_gerold.agr",
+      "name": "Gerold",
+      "name_string_id": 104054,
+      "position": [
+        -207.1201,
+        -19.14542,
+        290.6031
+      ],
+      "heading": -1.39930999,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4163 spawnNpcWithGuid(34006); src/Resources/Npcs.json Id=34006"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.104054 = Gerold (lab/reports/locale-id-to-text.json); Models.txt 966 = human_m_gerold.agr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 9500000844,
+      "legacy_npc_id": null,
+      "content_key": 9500000844,
+      "model_id": 3994,
+      "model_file_name": "drake_m_boss.adr",
+      "name": "Quetzalcoatl",
+      "name_string_id": 439215,
+      "position": [
+        670.818,
+        86.87835,
+        2241.3074
+      ],
+      "heading": -1.17306138,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4252 spawnNpcWithGuid(36198); src/Resources/Npcs.json Id=36198"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.439215 = Quetzalcoatl (lab/reports/locale-id-to-text.json); Models.txt 3994 = drake_m_boss.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) another emulator placement with no stated source; ground offset +0.1 m"
+        }
+      ],
+      "position_w": null
     }
   ]
 }
