@@ -54,6 +54,9 @@ pub(super) struct Gates {
     pub(super) pets: bool,
     /// Ordinary location reports are ignored because the activity owns movement.
     pub(super) location: bool,
+    /// Using a style card (a look change that starts nothing). Everything that closes `start`
+    /// closes it, except a house lot: the player's own home is where cards are used.
+    pub(super) style_card: bool,
 }
 
 impl Occupation {
@@ -84,6 +87,8 @@ impl Occupation {
             ride,
             pets,
             location,
+            // (R) the owner/lead 2026-10-25: a card works inside the player's own lot.
+            style_card: start && !matches!(self, Housing),
         }
     }
 }
@@ -181,5 +186,13 @@ mod tests {
             ]
         );
         assert_eq!(members(|g| g.location), [Derby, Soccer, Kart, Housing]);
+        // A style card is refused wherever starting an activity is, except at home.
+        assert_eq!(
+            members(|g| g.style_card),
+            [
+                Forging, Smelting, Cooking, Mining, Harvesting, Chess, Encounter, Derby, Fishing,
+                Soccer, Kart
+            ]
+        );
     }
 }

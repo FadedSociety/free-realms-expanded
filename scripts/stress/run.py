@@ -1214,6 +1214,8 @@ def main() -> int:
             reference, resources, server_id = lab / "references" / "rust-gateway-reference", run_dir / "login-resources", run_dir / "server.id"
             server_id.write_bytes(os.urandom(32))
             bundle_args = []
+        # Every gateway (the verify one too) loads the login resources: style cards need them.
+        bundle_args += ["--resources", str(resources)]
         scenario = scenario_from_content(content)
         metadata["scenario"] = scenario
         store, records = create_accounts(account_exe, run_dir, scenario, args.bots, args.broker_login)

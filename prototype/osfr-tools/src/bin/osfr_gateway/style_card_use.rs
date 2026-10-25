@@ -323,6 +323,44 @@ fn a_relogged_player_shows_the_saved_look_to_viewers() {
     );
 }
 
+/// A viewer in another zone instance, even at the same spot, gets no 35/39: the fanout only asks
+/// the player's own instance, and that viewer no longer knows the player.
+#[test]
+fn a_viewer_in_another_instance_hears_nothing() {
+    if !bin_test_target("t478") {
+        return;
+    }
+    let mut rig = Rig::new("other-instance");
+    let player = rig.add(1, Seat::Player, None);
+    let (same, other) = (rig.add(2, Seat::Near, None), rig.add(3, Seat::Near, None));
+    // Move the third viewer into the next instance of the same zone, at the same position.
+    let id = rig.sessions[&rig.keys[other]].id;
+    let here = rig.world.players.get(id).unwrap().clone();
+    let elsewhere = ZoneInstance {
+        instance_id: here.zone.instance_id + 1,
+        ..here.zone
+    };
+    rig.world
+        .players
+        .update_pose(id, elsewhere, here.position, here.heading)
+        .unwrap();
+    for index in 0..3 {
+        rig.drain(index);
+    }
+
+    rig.try_send(player, &request(10, CARD), NOW).unwrap();
+
+    assert_eq!(
+        of(&rig.drain(same), &[35, 0, 39, 0]).len(),
+        1,
+        "a viewer in the player's instance gets it"
+    );
+    assert!(
+        rig.drain(other).is_empty(),
+        "a viewer in another instance hears nothing"
+    );
+}
+
 /// Only viewers who already met the player may be told of the change (a stranger would get a
 /// 35/39 for a guid it has no AddPc for): the fanout treats 35/39 like 35/6 and 35/7.
 #[test]

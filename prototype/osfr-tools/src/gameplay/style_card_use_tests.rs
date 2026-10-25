@@ -64,6 +64,13 @@ impl Content {
         identity: &CharacterIdentity,
         tables: bool,
     ) -> Gameplay {
+        let mut game = self.unidentified(cards, tables);
+        game.apply_identity(identity).unwrap();
+        game
+    }
+
+    /// The same before any identity is applied: a session that has not finished logging in.
+    fn unidentified(&self, cards: &[(i32, i32, u32)], tables: bool) -> Gameplay {
         let mut state = Gameplay::load(&self.0, None).unwrap().state();
         for &(id, definition, count) in cards {
             state.inventory.items.push(card_item(id, definition, count));
@@ -79,7 +86,6 @@ impl Content {
         state.inventory.next_instance_id = Some(i64::from(next));
         let mut game = Gameplay::load(&self.0, Some(state)).unwrap();
         game.set_style_tables(tables.then(fixture::tables));
-        game.apply_identity(identity).unwrap();
         game
     }
 }
@@ -289,6 +295,69 @@ fn refused_style_card_changes_nothing() {
             assert_eq!(state_bytes(&game), before);
         }
     });
+}
+
+/// Finding 5: a player with no look yet is told so, not that the server lacks style cards.
+#[test]
+fn a_player_with_no_look_gets_its_own_refusal() {
+    let content = Content::new(false);
+    let mut game = content.unidentified(&[(CARD, CLEAN_SHAVEN, 1)], true);
+    assert!(game.look().is_none());
+    let before = state_bytes(&game);
+    let out = use_card(&mut game, 10, CARD);
+    assert_eq!(
+        chat_lines(&out),
+        ["Your character's look is not ready yet."]
+    );
+    assert!(!out.changed && out.nearby.is_empty());
+    assert_eq!(state_bytes(&game), before);
+    assert_eq!(count(&game, CARD), Some(1));
+}
+
+/// Finding 4 (R): the player's own housing lot is where a card is used, so being inside it does
+/// not count as busy; the card applies, is spent and is saved.
+#[test]
+fn a_card_works_inside_the_own_housing_lot() {
+    let content = Content::new(false);
+    // No starter kit: the round70 catalogue has no kit item definitions.
+    let mut houses = crate::housing_service::HousingContent::bundled().unwrap();
+    houses.starter_kit = None;
+    fs::write(
+        content.0.join("houses.json"),
+        serde_json::to_vec(&houses).unwrap(),
+    )
+    .unwrap();
+    let mut game = content.game(&[(CARD, CLEAN_SHAVEN, 1)], &boy(), true);
+    let character = character();
+    let grant = game
+        .handle_in_world(&[127, 0, 23, 0], &character, NOW)
+        .unwrap();
+    let lot = crate::housing_native::InstanceList::decode(
+        &grant
+            .replies
+            .iter()
+            .find(|r| r.starts_with(&[127, 0, 39, 0]))
+            .unwrap()[2..],
+    )
+    .unwrap()
+    .records[0]
+        .instance_guid;
+    let mut enter = vec![127, 0, 19, 0];
+    enter.extend(lot.to_le_bytes());
+    enter.extend(0i32.to_le_bytes());
+    enter.push(0);
+    game.handle_in_world(&enter, &character, NOW).unwrap();
+    assert!(
+        game.house_return().is_some(),
+        "the player is inside the lot"
+    );
+
+    let out = use_card(&mut game, 10, CARD);
+    assert_eq!(chat_lines(&out), Vec::<String>::new(), "no refusal");
+    assert!(out.changed);
+    assert_eq!(out.nearby, [change(5, "", 0, CARD)]);
+    assert_eq!(game.look().unwrap().model_customization, "");
+    assert_eq!(count(&game, CARD), None, "the card is spent");
 }
 
 /// 26/13-style job changes and relogs: the look belongs to the character.

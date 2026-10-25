@@ -67,8 +67,12 @@ impl Gameplay {
                 ..Outcome::default()
             }))
         };
-        let (Some(tables), Some(look)) = (self.style_cards.tables.clone(), self.look()) else {
+        let Some(tables) = self.style_cards.tables.clone() else {
             return refuse("Style cards are not available on this server.");
+        };
+        // No identity applied and no saved look: nothing to restyle yet.
+        let Some(look) = self.look() else {
+            return refuse("Your character's look is not ready yet.");
         };
         let items = &self.inventory.state().items;
         let owned = match request {
@@ -97,8 +101,8 @@ impl Gameplay {
             Ok(card) => card,
             Err(refusal) => return refuse(refusal.message()),
         };
-        // (R) The same gate as starting an activity.
-        if self.blocks(|gates| gates.start) {
+        // (R) The same gate as starting an activity, except inside the player's own lot.
+        if self.blocks(|gates| gates.style_card) {
             return refuse("Finish what you are doing before using a style card.");
         }
         let record = match card.record(&look, &*tables, item_id) {

@@ -116,7 +116,9 @@ if run_options.rust_reference:
     reference = run_options.rust_reference.resolve()
     gateway_binary = lab.parent / "project/prototype/osfr-tools/target/release/osfr-gateway.exe"
     server_command = [str(gateway_binary), f"127.0.0.1:{server_port}", "--reference", str(reference),
-                      "--state", str(state_file), "--seconds", str(run_options.seconds + 10)]
+                      "--state", str(state_file), "--seconds", str(run_options.seconds + 10),
+                      # The client's own tables: style cards (42/10, 42/12) refuse without them.
+                      "--resources", str(client / "Resources")]
     if run_options.content:
         server_command += ["--content", str(run_options.content.resolve())]
     if run_options.dev_tools:
