@@ -5,14 +5,16 @@
 //! `npc_spawns_extra.json` row carries the NPC's `content_key` (the existing
 //! content-keyed bodies, including T470's and T372's). Client evidence: 35/2
 //! AddNpc reader `0x00921a10` reads the actor u64, the name i32, the model i32,
-//! the scale f32, a position vec4 and a rotation vec4, so a drawn NPC stands
-//! where its row says it does.
+//! the chat-bubble colours and size, the scale f32 (this+84), a position vec4 and a
+//! rotation vec4, so a drawn NPC stands where its row says it does.
 
-use osfr_tools::world::NpcVisibility;
+#[path = "support/json.rs"]
+mod json;
+
+use osfr_tools::{startup_world::parse_add_npc, world::NpcVisibility};
 use serde_json::Value;
 use std::{
     collections::BTreeSet,
-    fs,
     path::{Path, PathBuf},
 };
 
@@ -20,30 +22,19 @@ fn content_dir() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
 }
 
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(
-        &fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
-    )
-    .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-}
-
 fn lakeshore_rows() -> Vec<Value> {
-    read_json(&content_dir().join("npcs/lakeshore.json"))["records"]
+    json::read(&content_dir().join("npcs/lakeshore.json"))["records"]
         .as_array()
         .unwrap()
         .clone()
 }
 
-fn xyz(value: &Value) -> [f32; 3] {
-    serde_json::from_value(value.clone()).unwrap()
-}
-
-/// Every row that world.rs draws from the regional file itself must reach the
-/// 35/2 visibility list exactly once, at the row's own position.
+/// Every row that world.rs draws from the regional file itself must reach a player
+/// standing at it, in the 35/2 AddNpc the gateway sends, exactly once and at the row's
+/// own position.
 #[test]
 fn every_lakeshore_legacy_row_is_drawn_at_its_position() {
     let visibility = NpcVisibility::load(&content_dir()).unwrap();
-    let targets = visibility.teleport_targets(0);
     let mut legacy = 0;
     for row in lakeshore_rows() {
         if row["placement"] != "legacy_data" {
@@ -51,9 +42,15 @@ fn every_lakeshore_legacy_row_is_drawn_at_its_position() {
         }
         legacy += 1;
         let npc_id = row["npc_id"].as_u64().unwrap();
-        let drawn: Vec<_> = targets
+        let position: [f32; 3] = serde_json::from_value(row["position"].clone()).unwrap();
+        let drawn: Vec<_> = visibility
+            .clone()
+            .update(0, position)
+            .unwrap()
             .iter()
-            .filter(|target| target.guid == npc_id)
+            .filter(|packet| packet.starts_with(&[35, 0, 2, 0]))
+            .map(|packet| parse_add_npc(packet).unwrap())
+            .filter(|npc| npc.actor_id == npc_id)
             .collect();
         assert_eq!(
             drawn.len(),
@@ -62,8 +59,8 @@ fn every_lakeshore_legacy_row_is_drawn_at_its_position() {
             row["name"]
         );
         assert_eq!(
-            drawn[0].position,
-            xyz(&row["position"]),
+            drawn[0].position[..3],
+            position,
             "NPC {npc_id} ({}) must be drawn at its declared position",
             row["name"]
         );
@@ -86,13 +83,20 @@ fn drawn_lakeshore_bodies_are_one_per_npc_and_a_metre_apart() {
         .filter(|row| row["placement"] == "legacy_data")
         .map(|row| row["npc_id"].as_u64().unwrap())
         .collect();
-    for extra in read_json(&content.join("npc_spawns_extra.json"))["records"]
+    for extra in json::read(&content.join("npc_spawns_extra.json"))["records"]
         .as_array()
         .unwrap()
     {
-        if extra["content_key"]
-            .as_u64()
-            .is_some_and(|key| ids.contains(&key))
+        // The loader skips capture-matched rows, the model-less knocker boss and key 0
+        // (`world.rs` NpcVisibility::load); the expectation must skip the same rows.
+        let unrenderable = !extra["capture_match"].is_null()
+            || extra["model_file_name"]
+                .as_str()
+                .is_some_and(|name| name.eq_ignore_ascii_case("knocker_m_boss.adr"));
+        if !unrenderable
+            && extra["content_key"]
+                .as_u64()
+                .is_some_and(|key| key != 0 && ids.contains(&key))
         {
             expected.insert(extra["spawn_guid"].as_u64().unwrap());
         }
