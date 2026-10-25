@@ -2,8 +2,8 @@
 //! `world_events.json`. Every id in it is gated against the client's own tables; the run is
 //! driven through the real `WorldEvents::tick` for each ending; the schedule is swept over a day
 //! in and a day out of season.
-#[path = "support/models.rs"]
-mod models;
+#[path = "support/world_event_content.rs"]
+mod world_event_content;
 
 use osfr_tools::{
     chat,
@@ -12,11 +12,8 @@ use osfr_tools::{
     world_events::{self, WorldEvent, WorldEvents},
 };
 use serde_json::Value;
-use std::{
-    collections::{BTreeMap, BTreeSet, HashSet},
-    fs,
-    path::{Path, PathBuf},
-};
+use std::collections::BTreeSet;
+use world_event_content::{assert_every_id_resolves, content, locale, ops, row, shipped};
 
 const KEY: &str = "halloween_dance_off";
 const WORLD: ZoneInstance = ZoneInstance {
@@ -32,164 +29,24 @@ const POOF: i32 = 21; // PFX_smoke_black_explosion
 const BOOMBOX_SPARKS: i32 = 5120;
 const FIREWORKS: i32 = 5349;
 
-fn crate_root() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-}
-fn content() -> PathBuf {
-    crate_root().join("data/content")
-}
-fn lab(path: &str) -> PathBuf {
-    crate_root().join("../../../lab").join(path)
-}
-fn read(path: &Path) -> String {
-    fs::read_to_string(path).unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-}
-fn shipped() -> Value {
-    serde_json::from_str(&read(&content().join(world_events::FILE))).unwrap()
-}
-fn row(file: &Value) -> &Value {
-    file["events"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .find(|event| event["key"] == KEY)
-        .unwrap_or_else(|| panic!("{KEY} is not shipped"))
-}
-fn int(value: &Value) -> i32 {
-    i32::try_from(value.as_i64().unwrap()).unwrap()
-}
-/// Every `id="N"` of a `<tag ...>` element in a client file.
-fn xml_ids(path: &Path, tag: &str) -> HashSet<i32> {
-    let open = format!("<{tag} ");
-    read(path)
-        .split(&open)
-        .skip(1)
-        .filter_map(|element| {
-            let element = &element[..element.find('>')?];
-            let at = element.find(" id=\"")? + 5;
-            element[at..].split('"').next()?.parse().ok()
-        })
-        .collect()
-}
-fn resources(file: &str) -> PathBuf {
-    lab("working/OSFR.Client/OSFR Client/Resources").join(file)
-}
-fn locale() -> BTreeMap<i64, String> {
-    let rows: Value = serde_json::from_str(&read(&lab("reports/locale-id-to-text.json"))).unwrap();
-    rows.as_array()
-        .unwrap()
-        .iter()
-        .map(|row| {
-            (
-                row["id"].as_i64().unwrap(),
-                row["text"].as_str().unwrap().to_owned(),
-            )
-        })
-        .collect()
-}
-
-/// Every step's op of the timeline, the `one_of` branches' included: `(op name, its fields)`.
-fn ops(timeline: &Value) -> Vec<(String, Value)> {
-    let mut found = Vec::new();
-    for step in timeline.as_array().unwrap() {
-        let (name, fields) = step["op"].as_object().unwrap().iter().next().unwrap();
-        match name.as_str() {
-            "one_of" => {
-                for branch in fields["branches"].as_array().unwrap() {
-                    found.extend(ops(branch));
-                }
-            }
-            _ => found.push((name.clone(), fields.clone())),
-        }
-    }
-    found
-}
-
 #[test]
 fn every_id_resolves_against_the_client() {
     let file = shipped();
-    let event = row(&file);
-    let ops = ops(&event["timeline"]);
-    let locale = locale();
-    let (mut strings, mut areas, mut animations, mut effects) = (
-        BTreeSet::new(),
-        BTreeSet::new(),
-        BTreeSet::new(),
-        BTreeSet::new(),
-    );
-    let announce = &event["schedule"]["announce"];
-    strings.insert(int(&announce["locale_id"]));
+    let event = row(&file, KEY);
+    let ids = assert_every_id_resolves(event);
     assert_eq!(
-        announce["text"], locale[&5197],
+        ids.areas,
+        BTreeSet::from([4299, 4300, 4302, 4303, 4304, 4305])
+    );
+    assert_eq!(
+        ids.effects,
+        BTreeSet::from([POOF, BOOMBOX_SPARKS, FIREWORKS])
+    );
+    assert_eq!(
+        event["schedule"]["announce"]["text"],
+        locale()[&5197],
         "the kickoff line is the client's"
     );
-
-    let models = models::read_models();
-    for actor in event["actors"].as_array().unwrap() {
-        let model = actor["model_id"].as_i64().unwrap();
-        assert!(
-            models.contains_key(&model),
-            "model {model} is not in Models.txt"
-        );
-        animations.insert(int(&actor["stand_animation_id"]));
-        let name = int(&actor["name_string_id"]);
-        if name != 0 {
-            strings.insert(name);
-            assert_eq!(
-                actor["npc_name"],
-                locale[&i64::from(name)],
-                "actor {}",
-                actor["key"]
-            );
-        }
-        assert!(!actor["source"].as_str().unwrap().is_empty());
-    }
-    for (name, op) in &ops {
-        let id = |field: &str| int(&op[field]);
-        match name.as_str() {
-            "say" => drop(strings.insert(id("string_id"))),
-            "broadcast" => {
-                strings.insert(id("locale_id"));
-                let line = locale[&i64::from(id("locale_id"))].as_str();
-                assert!(
-                    op["text"].as_str().unwrap().ends_with(line),
-                    "{}",
-                    op["text"]
-                );
-            }
-            "area" => drop(areas.insert(id("area_id"))),
-            "base_anim" => drop(animations.insert(id("id"))),
-            "cycle_anim" => animations.extend(op["ids"].as_array().unwrap().iter().map(int)),
-            "tag_on" | "tag_off" => drop(effects.insert(id("effect_id"))),
-            "spawn" | "remove" if !op["effect_id"].is_null() => {
-                effects.insert(id("effect_id"));
-            }
-            "spawn" | "remove" | "move" | "face" => {}
-            other => panic!("unexpected op {other}"),
-        }
-    }
-    for id in &strings {
-        assert!(
-            locale.contains_key(&i64::from(*id)),
-            "string {id} is not in the locale"
-        );
-    }
-    let area_file = lab("extracted/named/Assets_000/Assets_000/FabledRealmsAreas.xml");
-    let known = xml_ids(&area_file, "AreaDefinition");
-    assert_eq!(areas, BTreeSet::from([4299, 4300, 4302, 4303, 4304, 4305]));
-    assert!(areas.iter().all(|id| known.contains(id)), "{areas:?}");
-    let mut known = xml_ids(&resources("AnimationTypes.xml"), "AnimationSlot");
-    known.extend(xml_ids(&resources("AnimationGroups.xml"), "AnimationGroup"));
-    assert!(
-        animations.iter().all(|id| known.contains(id)),
-        "{animations:?}"
-    );
-    let known = xml_ids(
-        &resources("ActorCompositeEffectDefinitions.xml"),
-        "EffectDefinition",
-    );
-    assert_eq!(effects, BTreeSet::from([POOF, BOOMBOX_SPARKS, FIREWORKS]));
-    assert!(effects.iter().all(|id| known.contains(id)), "{effects:?}");
 }
 
 /// One viewer standing on the dance spot, in the open world.
@@ -271,7 +128,7 @@ fn both_endings() -> [Heard; 2] {
 #[test]
 fn the_six_rounds_alternate_sides_and_every_song_area_goes_off_once() {
     let file = shipped();
-    let event = row(&file);
+    let event = row(&file, KEY);
     let idx =
         |keys: &[&str]| -> BTreeSet<u64> { keys.iter().map(|k| index_of(event, k)).collect() };
     let vampires = idx(&["ed", "vampire1", "vampire2", "vampire3"]);
@@ -344,7 +201,7 @@ fn the_six_rounds_alternate_sides_and_every_song_area_goes_off_once() {
 #[test]
 fn each_ending_names_its_winner_leaves_one_cake_and_no_actor_behind() {
     let file = shipped();
-    let event = row(&file);
+    let event = row(&file, KEY);
     let key = |index: u64| event["actors"][index as usize]["key"].as_str().unwrap();
     let says = |heard: &Heard| -> Vec<(String, i32)> {
         heard
@@ -485,7 +342,7 @@ fn stopping_early_switches_the_song_off_and_removes_every_actor() {
 /// Sweeps one UTC day from midnight in 30 s ticks: `(kickoff lines, start lines, start minutes)`.
 fn sweep(day_ms: u64) -> (usize, usize, Vec<u64>) {
     let file = shipped();
-    let event = row(&file);
+    let event = row(&file, KEY);
     let kickoff = chat::system(event["schedule"]["announce"]["text"].as_str().unwrap());
     let start_line = ops(&event["timeline"])
         .into_iter()

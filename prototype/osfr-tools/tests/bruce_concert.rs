@@ -2,14 +2,18 @@
 //! `bruce_snowhill` and `bruce_wugachug`, that alternate on 240-minute slots (offsets 0 and 120).
 //! The first test checks every client id the rows use against the client's own tables; the rest
 //! drive the real `WorldEvents` runner on a fixed clock with the shipped file and areas.
-use osfr_tools::client_areas::ClientAreas;
-use osfr_tools::players::{InterestPolicy, PlayerRegistry, SessionId, ZoneInstance};
-use osfr_tools::world_events::{self, WorldEvents, piece_052::animation_packet};
-use serde_json::Value;
-use std::{
-    collections::BTreeSet,
-    fs,
-    path::{Path, PathBuf},
+#[path = "support/world_event_content.rs"]
+mod world_event_content;
+
+use osfr_tools::{
+    client_areas::ClientAreas,
+    players::{InterestPolicy, PlayerRegistry, SessionId, ZoneInstance},
+    startup_world::{NpcSpawn, parse_add_npc},
+    world_events::{self, WorldEvents},
+};
+use std::collections::BTreeSet;
+use world_event_content::{
+    assert_every_id_resolves, content, int, lab, locale, read, read_models, resources, row, shipped,
 };
 
 const WORLD: ZoneInstance = ZoneInstance {
@@ -20,35 +24,16 @@ const WORLD: ZoneInstance = ZoneInstance {
 const MIDNIGHT_UTC_MS: u64 = 1_792_800_000_000;
 const IDLE: [i32; 6] = [3333, 3354, 3363, 3319, 3347, 3346];
 const AIR_GUITAR: i32 = 3350;
+/// The stand animation every actor row uses, in both client animation tables as `loc_stand`.
+const STAND: i32 = 1;
 const POOF: i32 = 21;
 const GATHER_S: u64 = 300;
 const LEAVES_S: u64 = 481; // gathering 300 s plus the 181 s song
 const SNOWHILL: [f32; 3] = [317.66, 29.83, 484.14];
 const WUGACHUG: [f32; 3] = [74.6, 26.78, -413.2];
-
-fn manifest() -> PathBuf {
-    PathBuf::from(env!("CARGO_MANIFEST_DIR"))
-}
-
-fn content() -> PathBuf {
-    manifest().join("data/content")
-}
-
-fn lab() -> PathBuf {
-    manifest().join("../../../lab")
-}
-
-fn client_resources() -> PathBuf {
-    lab().join("working/OSFR.Client/OSFR Client/Resources")
-}
-
-fn read(path: &Path) -> String {
-    fs::read_to_string(path).unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-}
-
-fn shipped_file() -> Value {
-    serde_json::from_str(&read(&content().join(world_events::FILE))).unwrap()
-}
+/// The script's headings (BruceConcert.lua:28,34), which the shipped rows carry.
+const SNOW_HEADING: f32 = -2.4;
+const WUGA_HEADING: f32 = -1.715594;
 
 /// The value of attribute `name` in an XML start tag.
 fn attribute<'a>(tag: &'a str, name: &str) -> &'a str {
@@ -68,121 +53,103 @@ fn area_tag(text: &str, id: i32) -> &str {
         .unwrap_or_else(|| panic!("area {id} is not in FabledRealmsAreas.xml"))
 }
 
-/// Every id the rows use, gathered from the raw file so the check cannot share a mistake with the loader.
-#[derive(Default)]
-struct Ids {
-    models: BTreeSet<i64>,
-    names: BTreeSet<i64>,
-    locales: Vec<(i64, String)>,
-    areas: BTreeSet<i64>,
-    animations: BTreeSet<i64>,
-    effects: BTreeSet<i64>,
+/// Local midnight in unix ms: UTC midnight minus the content's UTC offset. A negative offset
+/// (west of UTC) moves local midnight later, so a checked signed subtraction is required.
+fn local_midnight(unix_midnight_ms: u64, offset_minutes: i32) -> u64 {
+    u64::try_from(i64::try_from(unix_midnight_ms).unwrap() - i64::from(offset_minutes) * 60_000)
+        .unwrap()
 }
 
-fn collect(file: &Value) -> Ids {
-    let mut ids = Ids::default();
-    let bruce = |event: &&Value| event["key"].as_str().unwrap().starts_with("bruce_");
-    for event in file["events"].as_array().unwrap().iter().filter(bruce) {
-        for actor in event["actors"].as_array().unwrap() {
-            ids.models.insert(actor["model_id"].as_i64().unwrap());
-            ids.names.insert(actor["name_string_id"].as_i64().unwrap());
-        }
-        for step in event["timeline"].as_array().unwrap() {
-            let (op, body) = step["op"].as_object().unwrap().iter().next().unwrap();
-            match op.as_str() {
-                "spawn" | "remove" => {
-                    ids.effects.extend(body["effect_id"].as_i64());
-                }
-                "broadcast" => {
-                    let text = body["text"].as_str().unwrap().to_owned();
-                    ids.locales
-                        .extend(body["locale_id"].as_i64().map(|id| (id, text)));
-                }
-                "area" => {
-                    ids.areas.insert(body["area_id"].as_i64().unwrap());
-                }
-                "cycle_anim" => ids.animations.extend(
-                    body["ids"]
-                        .as_array()
-                        .unwrap()
-                        .iter()
-                        .map(|v| v.as_i64().unwrap()),
-                ),
-                other => panic!("the concert uses no {other} op"),
-            }
-        }
-    }
-    ids
+/// The stand slot plus the two `cycle_anim` sets, so a change to either list moves both checks.
+fn wanted_animations() -> BTreeSet<i32> {
+    IDLE.into_iter().chain([STAND, AIR_GUITAR]).collect()
 }
 
 #[test]
 fn every_id_resolves_in_the_client_tables() {
-    let ids = collect(&shipped_file());
+    let file = shipped();
     // Models.txt: the model row only. Its other numbers (3333, ...) are unrelated models.
-    let models = read(&client_resources().join("Models.txt"));
-    assert_eq!(ids.models, BTreeSet::from([20]));
+    let models = read_models();
     assert!(
-        models
-            .lines()
-            .any(|l| l.starts_with("20^human_rockstar_m.adr^"))
+        models[&20].contains("human_rockstar_m.adr"),
+        "{:?}",
+        models[&20]
     );
-    // Locale: the nameplate is "Bruce", and a broadcast with a locale id copies that client line.
-    let locale: Value =
-        serde_json::from_str(&read(&lab().join("reports/locale-id-to-text.json"))).unwrap();
-    let text = |id: i64| {
-        let row = locale
-            .as_array()
-            .unwrap()
-            .iter()
-            .find(|row| row["id"] == id);
-        row.unwrap_or_else(|| panic!("locale {id} is missing"))["text"]
-            .as_str()
-            .unwrap()
-            .to_owned()
-    };
-    assert_eq!(ids.names, BTreeSet::from([201]));
-    assert_eq!(text(201), "Bruce");
-    assert_eq!(
-        ids.locales,
-        [(
-            5142,
-            "A concert is starting at the Wugachug Stage!".to_owned()
-        )]
-    );
-    assert_eq!(text(5142), ids.locales[0].1);
-    // Animations: the emote slot and group, in both client tables.
-    let types = read(&client_resources().join("AnimationTypes.xml"));
-    let groups = read(&client_resources().join("AnimationGroups.xml"));
-    let wanted: BTreeSet<i64> = IDLE
-        .iter()
-        .chain([&AIR_GUITAR])
-        .map(|&id| i64::from(id))
-        .collect();
-    assert_eq!(ids.animations, wanted);
-    for id in wanted {
-        let in_types = types.lines().any(|l| {
-            l.contains("<AnimationSlot name=\"emo_") && l.contains(&format!(" id=\"{id}\" "))
-        });
-        let in_groups = groups.lines().any(|l| {
-            l.contains("<AnimationGroup name=\"emo_") && l.contains(&format!(" id=\"{id}\""))
-        });
-        assert!(
-            in_types && in_groups,
-            "animation {id}: types {in_types}, groups {in_groups}"
-        );
-    }
-    // Areas: both stage areas ship disabled with a music property, and each stage is inside its own.
-    let areas_xml =
-        read(&lab().join("extracted/named/Assets_000/Assets_000/FabledRealmsAreas.xml"));
-    assert_eq!(ids.areas, BTreeSet::from([17, 4285]));
-    for (id, stage, music) in [(17, SNOWHILL, "5393"), (4285, WUGACHUG, "17715")] {
-        let tag = area_tag(&areas_xml, id);
+    let locale = locale();
+    assert_eq!(locale[&201], "Bruce");
+    let types = read(&resources("AnimationTypes.xml"));
+    let groups = read(&resources("AnimationGroups.xml"));
+    let effects = read(&resources("ActorCompositeEffectDefinitions.xml"));
+    let areas_xml = read(&lab(
+        "extracted/named/Assets_000/Assets_000/FabledRealmsAreas.xml",
+    ));
+    for (key, area, stage, heading, music, line) in [
+        ("bruce_snowhill", 17, SNOWHILL, SNOW_HEADING, "5393", None),
+        (
+            "bruce_wugachug",
+            4285,
+            WUGACHUG,
+            WUGA_HEADING,
+            "17715",
+            Some(5142),
+        ),
+    ] {
+        let event = row(&file, key);
+        let ids = assert_every_id_resolves(event);
+        assert_eq!(ids.models, BTreeSet::from([20]));
+        let mut strings = BTreeSet::from([201]);
+        strings.extend(line);
+        assert_eq!(ids.strings, strings);
+        if let Some(id) = line {
+            // The client line exists and copies verbatim (shared gate: it ends the text).
+            let (locale_id, text) = &ids.broadcasts[0];
+            assert_eq!(
+                (*locale_id, text.as_str()),
+                (id, locale[&i64::from(id)].as_str())
+            );
+        } else {
+            assert!(ids.broadcasts.is_empty(), "Snowhill has no client line");
+        }
+        assert_eq!(ids.areas, BTreeSet::from([area]));
+        assert_eq!(ids.effects, BTreeSet::from([POOF]));
+        // Animations: the stand slot, and the emote slot and group, in both client tables.
+        let wanted = wanted_animations();
+        assert_eq!(ids.animations, wanted);
+        for id in wanted {
+            let id = i64::from(id);
+            let in_types = if id == i64::from(STAND) {
+                types
+                    .lines()
+                    .any(|l| l.contains("<AnimationSlot name=\"loc_stand\" id=\"1\" "))
+            } else {
+                types.lines().any(|l| {
+                    l.contains("<AnimationSlot name=\"emo_")
+                        && l.contains(&format!(" id=\"{id}\" "))
+                })
+            };
+            let in_groups = if id == i64::from(STAND) {
+                groups
+                    .lines()
+                    .any(|l| l.contains("<AnimationGroup name=\"loc_stand\" id=\"1\">"))
+            } else {
+                groups.lines().any(|l| {
+                    l.contains("<AnimationGroup name=\"emo_")
+                        && l.contains(&format!(" id=\"{id}\""))
+                })
+            };
+            assert!(
+                in_types && in_groups,
+                "animation {id}: types {in_types}, groups {in_groups}"
+            );
+        }
+        // Areas: each stage ships disabled with its music, and the stage is inside it.
+        let tag = area_tag(&areas_xml, area);
         assert_eq!(attribute(tag, "AreaEnabled"), "0");
         let after = &areas_xml[areas_xml.find(tag).unwrap()..];
         let body = &after[..after.find("</AreaDefinition>").unwrap()];
         assert!(
             body.contains(&format!("SoundDefinitionId=\"{music}\"")),
-            "area {id} music"
+            "area {area} music"
         );
         let centre = ["x1", "y1", "z1"].map(|axis| attribute(tag, axis).parse::<f64>().unwrap());
         let radius: f64 = attribute(tag, "radius").parse().unwrap();
@@ -192,13 +159,37 @@ fn every_id_resolves_in_the_client_tables() {
             .sqrt();
         assert!(
             distance <= radius,
-            "stage {stage:?} is {distance} m from area {id}, radius {radius}"
+            "stage {stage:?} is {distance} m from area {area}, radius {radius}"
         );
+        // The shipped pose is the script's, so a typo in the row fails even if the wire copies it.
+        let actor = &event["actors"][0];
+        for (axis, expected) in stage.iter().enumerate() {
+            let got = actor["position"][axis].as_f64().unwrap() as f32;
+            assert!((got - expected).abs() < 1e-3, "{key} x{axis}: {got}");
+        }
+        let shipped_heading = actor["heading"].as_f64().unwrap() as f32;
+        assert!(
+            (shipped_heading - heading).abs() < 1e-6,
+            "{key} heading {shipped_heading}"
+        );
+        assert_eq!(int(&actor["stand_animation_id"]), STAND);
     }
-    // The poof is Sanctuary's StageChangeCompositeEffectId (BruceConcert.lua:8), PFX_smoke_black_explosion.
-    assert_eq!(ids.effects, BTreeSet::from([i64::from(POOF)]));
-    let effects = read(&client_resources().join("ActorCompositeEffectDefinitions.xml"));
+    // The poof is Sanctuary's StageChangeCompositeEffectId (BruceConcert.lua:8),
+    // PFX_smoke_black_explosion.
     assert!(effects.contains("<EffectDefinition name=\"PFX_smoke_black_explosion\" id=\"21\" "));
+}
+
+#[test]
+fn a_negative_utc_offset_moves_local_midnight_later() {
+    assert_eq!(local_midnight(MIDNIGHT_UTC_MS, 0), MIDNIGHT_UTC_MS);
+    assert_eq!(
+        local_midnight(MIDNIGHT_UTC_MS, -360),
+        MIDNIGHT_UTC_MS + 6 * HOUR * 1000
+    );
+    assert_eq!(
+        local_midnight(MIDNIGHT_UTC_MS, 330),
+        MIDNIGHT_UTC_MS - 5 * HOUR * 1000 - 30 * 60_000
+    );
 }
 
 /// A packet's meaning: what the test counts and orders.
@@ -223,14 +214,15 @@ struct Rig {
     /// Every packet the runner sent, with the local second it was sent. Session 1 stands at
     /// Snowhill's stage and session 2 at Wugachug's.
     log: Vec<(u64, SessionId, Seen)>,
+    /// Every AddNpc body the runner sent, decoded by the production reader.
+    spawns: Vec<(SessionId, NpcSpawn)>,
     guid: Option<u64>,
 }
 
 impl Rig {
     fn new() -> Self {
         let areas = ClientAreas::load(&content()).unwrap();
-        let midnight = MIDNIGHT_UTC_MS
-            - u64::try_from(i64::from(areas.utc_offset_minutes()) * 60_000).unwrap();
+        let midnight = local_midnight(MIDNIGHT_UTC_MS, areas.utc_offset_minutes());
         let mut players = PlayerRegistry::new(InterestPolicy::new(100.0, 64).unwrap());
         for (session, at) in [(1, SNOWHILL), (2, WUGACHUG)] {
             players
@@ -243,6 +235,7 @@ impl Rig {
             players,
             midnight,
             log: Vec::new(),
+            spawns: Vec::new(),
             guid: None,
         }
     }
@@ -275,33 +268,47 @@ impl Rig {
             &mut self.areas,
         );
         for (session, packet) in out {
-            let seen = self.decode(&packet);
+            let seen = self.decode(session, &packet);
             self.log.push((second, session, seen));
         }
     }
 
-    fn decode(&mut self, packet: &[u8]) -> Seen {
+    fn decode(&mut self, session: SessionId, packet: &[u8]) -> Seen {
         let i32_at = |at: usize| i32::from_le_bytes(packet[at..at + 4].try_into().unwrap());
-        match packet[..2] {
-            [89, 0] => Seen::Area(i32_at(2), packet[6] != 0),
-            [15, 0] => Seen::Line(String::from_utf8(packet[8..packet.len() - 1].to_vec()).unwrap()),
-            [35, 0] if packet[2] == 2 => {
-                self.guid = Some(u64::from_le_bytes(packet[4..12].try_into().unwrap()));
+        match packet[..4] {
+            // 89/0 area, client reader 0x008d5c60: i32 area id at 2, on flag at 6.
+            [89, 0, ..] => Seen::Area(i32_at(2), packet[6] != 0),
+            // 15/3 system line from `chat::system`: the text follows the 8-byte header.
+            [15, 0, ..] => {
+                Seen::Line(String::from_utf8(packet[8..packet.len() - 1].to_vec()).unwrap())
+            }
+            // 35/2 AddNpc, client body reader 0x00921a10: actor id at 4, name/model and the
+            // transform follow; the production parser checks the whole sequence.
+            [35, 0, 2, 0] => {
+                let spawn = parse_add_npc(packet).expect("the AddNpc body parses");
+                self.guid = Some(spawn.actor_id);
+                self.spawns.push((session, spawn));
                 Seen::AddNpc
             }
-            [35, 0] if packet[2] == 16 => Seen::Poof(i32_at(20)),
-            [35, 0] if packet[2] == 3 => Seen::Remove(i32_at(23)),
-            [35, 0] if packet[2] == 8 => {
-                let guid = self.guid.expect("an animation before any AddNpc");
-                let idle = IDLE
-                    .iter()
-                    .find(|&&id| packet == animation_packet(guid, id, false));
-                match idle {
-                    Some(&id) => Seen::Idle(id),
-                    None => {
-                        assert_eq!(packet, animation_packet(guid, AIR_GUITAR, false));
-                        Seen::Guitar
-                    }
+            // 35/16 PlayCompositeEffect, client reader 0x008e5f50: effect id at 20.
+            [35, 0, 16, 0] => Seen::Poof(i32_at(20)),
+            // 35/3 RemovePlayerGracefully, client readers 0x008d69f0 then 0x008d6a60:
+            // composite effect id at 23.
+            [35, 0, 3, 0] => Seen::Remove(i32_at(23)),
+            // 35/8 SetAnimation, client reader 0x008e5dd0: u64 guid at 4, i32 animation id
+            // at 12, i32 zero at 16, u8 base flag at 20 (21 bytes).
+            [35, 0, 8, 0] => {
+                assert_eq!(packet.len(), 21, "{packet:?}");
+                let guid = u64::from_le_bytes(packet[4..12].try_into().unwrap());
+                assert_eq!(Some(guid), self.guid, "an animation for another actor");
+                assert_eq!(i32_at(16), 0, "the client reader's second i32");
+                assert_eq!(packet[20], 0, "a one-shot animation, not a base change");
+                let id = i32_at(12);
+                if IDLE.contains(&id) {
+                    Seen::Idle(id)
+                } else {
+                    assert_eq!(id, AIR_GUITAR);
+                    Seen::Guitar
                 }
             }
             _ => panic!("unexpected packet {packet:?}"),
@@ -424,6 +431,49 @@ fn the_two_events_alternate_between_the_stages_every_two_hours() {
         assert!(inside, "{seen:?} at {second}");
     }
     assert_nothing_left(&mut rig, snow_4 + 600);
+}
+
+#[test]
+fn the_spawn_carries_the_shipped_actor_and_pose() {
+    let mut rig = Rig::new();
+    // A slot start is chosen strictly after the arming time, so arm a minute early.
+    rig.schedule(DAY - 60);
+    rig.run(DAY - 60, DAY, 1);
+    rig.run(DAY + 2 * HOUR, DAY + 2 * HOUR, 1);
+    let file = shipped();
+    for (session, key) in [(1, "bruce_snowhill"), (2, "bruce_wugachug")] {
+        let actor = &row(&file, key)["actors"][0];
+        // 35/2 AddNpc (client body reader 0x00921a10) carries the row's model, name and pose.
+        let spawned: Vec<&NpcSpawn> = rig
+            .spawns
+            .iter()
+            .filter(|(other, _)| other.0 == session)
+            .map(|(_, spawn)| spawn)
+            .collect();
+        assert_eq!(spawned.len(), 1, "{key}");
+        let spawn = spawned[0];
+        assert_eq!(spawn.model_id, int(&actor["model_id"]));
+        assert_eq!(spawn.name_string_id, int(&actor["name_string_id"]));
+        assert_eq!(spawn.npc_name, actor["npc_name"].as_str().unwrap());
+        assert_eq!(spawn.stand_animation_id, int(&actor["stand_animation_id"]));
+        for axis in 0..3 {
+            let expected = actor["position"][axis].as_f64().unwrap() as f32;
+            assert!(
+                (spawn.position[axis] - expected).abs() < 1e-3,
+                "{key} AddNpc x{axis}: {}",
+                spawn.position[axis]
+            );
+        }
+        assert_eq!(spawn.position[3], 1.0);
+        assert_eq!(spawn.rotation[1], 0.0);
+        assert_eq!(spawn.rotation[3], 0.0);
+        let heading = actor["heading"].as_f64().unwrap() as f32;
+        let spawned_heading = spawn.rotation[0].atan2(spawn.rotation[2]);
+        assert!(
+            (spawned_heading - heading).abs() < 1e-4,
+            "{key} AddNpc heading {spawned_heading}"
+        );
+    }
 }
 
 #[test]
