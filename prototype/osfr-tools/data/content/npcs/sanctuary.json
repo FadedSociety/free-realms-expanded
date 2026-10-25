@@ -38484,8 +38484,8 @@
       "name_string_id": 440729,
       "name_string_ids": [
         {
-          "table": "unspecified",
-          "id": 3006978437
+          "table": "client_locale",
+          "id": 440729
         }
       ],
       "name_string_id_reason": null,
@@ -38518,29 +38518,23 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1494.332694,
-        -35.049,
-        406.824314
+        -840.8241,
+        -49.89272,
+        -696.3012
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.11971220728891936,
+        0.8283685317560137,
         0.0,
-        0.9928086358538663
+        0.560183519568709
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
       "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 24,
-          "poi_name": "Queensfields",
-          "match_score": 12
-        }
-      ],
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 24 by longest normalized whole-name score 12; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Legacy built-content spawn coordinates copied from ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2026 (spawnNpcWithGuid(3283, 100000003283, -840.8241, -49.89272, -696.3012, 1.952378)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr). Position matched by the spawn's client name (talk_spawns.py) (R).",
       "source": [
         {
           "kind": "client",
@@ -38553,6 +38547,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2026 (spawnNpcWithGuid(3283, 100000003283, -840.8241, -49.89272, -696.3012, 1.952378)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr)."
         }
       ],
       "field_sources": {
@@ -38620,22 +38618,22 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part C. Memorial Caverns, Queensfields dungeons and bosses, row 121; source cell: [client] [wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2026 (spawnNpcWithGuid(3283, 100000003283, -840.8241, -49.89272, -696.3012, 1.952378)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr). NameId resolves in the client locale table to 'Necronomicus'."
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part C. Memorial Caverns, Queensfields dungeons and bosses, row 121; source cell: [client] [wiki]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 440729 = 'Necronomicus'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part C. Memorial Caverns, Queensfields dungeons and bosses, row 121; source cell: [client] [wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2026 (spawnNpcWithGuid(3283, 100000003283, -840.8241, -49.89272, -696.3012, 1.952378)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr). NameId resolves in the client locale table to 'Necronomicus'."
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part C. Memorial Caverns, Queensfields dungeons and bosses, row 121; source cell: [client] [wiki]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 440729 = 'Necronomicus'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_id_reason": [
@@ -38822,18 +38820,14 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=24 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=24 NameId=7262 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2026 (spawnNpcWithGuid(3283, 100000003283, -840.8241, -49.89272, -696.3012, 1.952378)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr)."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2026 (spawnNpcWithGuid(3283, 100000003283, -840.8241, -49.89272, -696.3012, 1.952378)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr)."
           }
         ],
         "position_w": [
@@ -38844,36 +38838,36 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=24 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=24 NameId=7262 matches native name_string_id."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2026 (spawnNpcWithGuid(3283, 100000003283, -840.8241, -49.89272, -696.3012, 1.952378)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr)."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) Y-axis yaw quaternion [0, sin(h/2), 0, cos(h/2)] of the spawn heading; the raw heading is retained separately."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2026 (spawnNpcWithGuid(3283, 100000003283, -840.8241, -49.89272, -696.3012, 1.952378)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr)."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2026 (spawnNpcWithGuid(3283, 100000003283, -840.8241, -49.89272, -696.3012, 1.952378)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr)."
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) medium measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2026 (spawnNpcWithGuid(3283, 100000003283, -840.8241, -49.89272, -696.3012, 1.952378)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr)."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2026 (spawnNpcWithGuid(3283, 100000003283, -840.8241, -49.89272, -696.3012, 1.952378)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr)."
           }
         ],
         "capture_match": [
@@ -38881,8 +38875,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2026 (spawnNpcWithGuid(3283, 100000003283, -840.8241, -49.89272, -696.3012, 1.952378)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2026 (spawnNpcWithGuid(3283, 100000003283, -840.8241, -49.89272, -696.3012, 1.952378)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2026 (spawnNpcWithGuid(3283, 100000003283, -840.8241, -49.89272, -696.3012, 1.952378)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr)."
+          }
         ]
-      }
+      },
+      "heading": 1.952378,
+      "model_id": 4220,
+      "model_file_name": "necronomicus_m.adr"
     },
     {
       "npc_id": 9000000160,
@@ -40596,9 +40611,14 @@
       "reference_ids": [],
       "name": "One of Three",
       "name_reason": null,
-      "name_string_id": null,
-      "name_string_ids": [],
-      "name_string_id_reason": "No client name-string id appears in the NPC-name cell.",
+      "name_string_id": 5102446,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 5102446
+        }
+      ],
+      "name_string_id_reason": "(R) The regional guide name cell carries no id; the row uses the reference spawn's Npcs.json NameId 5102446, which the client locale resolves to 'One of Three'.",
       "zone": "Sanctuary",
       "zone_id": 10,
       "zone_reason": null,
@@ -40626,34 +40646,23 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1675.247,
-        -15.399,
-        123.509
+        -2020.201,
+        -33.10506,
+        550.6256
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        -0.8414709848078965,
+        -0.967369577183902,
         0.0,
-        0.5403023058681398
+        0.2533694952811775
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 135,
-          "poi_name": "Bumbleberry Patch",
-          "match_score": 17
-        },
-        {
-          "poi_id": 24,
-          "poi_name": "Queensfields",
-          "match_score": 12
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 135 by longest normalized whole-name score 17; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Legacy built-content spawn coordinates copied from ../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2833 (spawnNpcWithGuid(4167, 100000004167, -2020.201, -33.10506, 550.6256, -2.629269)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4167 (NameId=5102446, ModelId=4564, ModelFileName=human_m_wraith_white.agr). Position matched by the spawn's client name (talk_spawns.py) (R).",
       "source": [
         {
           "kind": "wiki",
@@ -40662,6 +40671,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2833 (spawnNpcWithGuid(4167, 100000004167, -2020.201, -33.10506, 550.6256, -2.629269)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4167 (NameId=5102446, ModelId=4564, ModelFileName=human_m_wraith_white.agr)."
         }
       ],
       "field_sources": {
@@ -40709,20 +40722,28 @@
         ],
         "name_string_id": [
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part C. Memorial Caverns, Queensfields dungeons and bosses, row 122; source cell: [wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2833 (spawnNpcWithGuid(4167, 100000004167, -2020.201, -33.10506, 550.6256, -2.629269)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4167 (NameId=5102446, ModelId=4564, ModelFileName=human_m_wraith_white.agr). NameId resolves in the client locale table to 'One of Three'."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 5102446 = 'One of Three'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part C. Memorial Caverns, Queensfields dungeons and bosses, row 122; source cell: [wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2833 (spawnNpcWithGuid(4167, 100000004167, -2020.201, -33.10506, 550.6256, -2.629269)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4167 (NameId=5102446, ModelId=4564, ModelFileName=human_m_wraith_white.agr). NameId resolves in the client locale table to 'One of Three'."
+          },
+          {
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 5102446 = 'One of Three'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_id_reason": [
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part C. Memorial Caverns, Queensfields dungeons and bosses, row 122; source cell: [wiki]"
+            "kind": "reconstructed",
+            "evidence": "(R) records why the guide's missing name id was replaced by the reference spawn's client locale id"
           }
         ],
         "zone": [
@@ -40859,18 +40880,14 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=135 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=135 NameId=434698 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2833 (spawnNpcWithGuid(4167, 100000004167, -2020.201, -33.10506, 550.6256, -2.629269)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4167 (NameId=5102446, ModelId=4564, ModelFileName=human_m_wraith_white.agr)."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2833 (spawnNpcWithGuid(4167, 100000004167, -2020.201, -33.10506, 550.6256, -2.629269)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4167 (NameId=5102446, ModelId=4564, ModelFileName=human_m_wraith_white.agr)."
           }
         ],
         "position_w": [
@@ -40881,36 +40898,36 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=135 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=135 NameId=434698 matches native name_string_id."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2833 (spawnNpcWithGuid(4167, 100000004167, -2020.201, -33.10506, 550.6256, -2.629269)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4167 (NameId=5102446, ModelId=4564, ModelFileName=human_m_wraith_white.agr)."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) Y-axis yaw quaternion [0, sin(h/2), 0, cos(h/2)] of the spawn heading; the raw heading is retained separately."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2833 (spawnNpcWithGuid(4167, 100000004167, -2020.201, -33.10506, 550.6256, -2.629269)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4167 (NameId=5102446, ModelId=4564, ModelFileName=human_m_wraith_white.agr)."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2833 (spawnNpcWithGuid(4167, 100000004167, -2020.201, -33.10506, 550.6256, -2.629269)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4167 (NameId=5102446, ModelId=4564, ModelFileName=human_m_wraith_white.agr)."
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2833 (spawnNpcWithGuid(4167, 100000004167, -2020.201, -33.10506, 550.6256, -2.629269)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4167 (NameId=5102446, ModelId=4564, ModelFileName=human_m_wraith_white.agr)."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2833 (spawnNpcWithGuid(4167, 100000004167, -2020.201, -33.10506, 550.6256, -2.629269)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4167 (NameId=5102446, ModelId=4564, ModelFileName=human_m_wraith_white.agr)."
           }
         ],
         "capture_match": [
@@ -40918,8 +40935,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2833 (spawnNpcWithGuid(4167, 100000004167, -2020.201, -33.10506, 550.6256, -2.629269)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4167 (NameId=5102446, ModelId=4564, ModelFileName=human_m_wraith_white.agr)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2833 (spawnNpcWithGuid(4167, 100000004167, -2020.201, -33.10506, 550.6256, -2.629269)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4167 (NameId=5102446, ModelId=4564, ModelFileName=human_m_wraith_white.agr)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2833 (spawnNpcWithGuid(4167, 100000004167, -2020.201, -33.10506, 550.6256, -2.629269)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4167 (NameId=5102446, ModelId=4564, ModelFileName=human_m_wraith_white.agr)."
+          }
         ]
-      }
+      },
+      "heading": -2.629269,
+      "model_id": 4564,
+      "model_file_name": "human_m_wraith_white.agr"
     },
     {
       "npc_id": 9500000511,
