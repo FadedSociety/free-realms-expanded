@@ -21,7 +21,7 @@ use osfr_tools::{
     gameplay::{Gameplay, GameplayState, Outcome},
     gateway::Gateway,
     inventory::InventoryItem,
-    npc_interaction::decode_quest_offer_49_1,
+    npc_interaction::{decode_dialogue_26_3, decode_quest_offer_49_1},
     quest_engine::QuestStatus,
 };
 use serde_json::Value;
@@ -33,6 +33,8 @@ use std::{
 };
 
 pub const CHARACTER: u64 = 194_017;
+/// The Adventurer profile every imported zone quest pays its XP to.
+pub const ADVENTURER: i32 = 1;
 /// Generic Talk option label in the reconstructed 26/9 menu.
 pub const TALK_LABEL: u32 = 3_300;
 /// First response row of the quest dialogue (client 26/6).
@@ -619,8 +621,183 @@ pub fn finish_quest(
     assert_eq!(coins(game), coins_before + expected_coins);
     assert_eq!(profile_xp(game, profile), xp_before + expected_xp);
     assert_eq!(quest_status(game, quest_id), QuestStatus::Completed);
+    assert_eq!(pending_offer(game), None);
     assert_eq!(pending_turnin(game), None);
     completed
+}
+
+/// One imported community zone quest: giver, the ordered Talk steps before the
+/// turn-in (each with the 26/3 body its NPC speaks when the step completes), and
+/// the final Talk at `turnin`.
+pub struct ZoneQuest {
+    pub id: u32,
+    pub giver: u64,
+    /// Title, intro and description ids the 49/1 card carries.
+    pub card: [u32; 3],
+    pub steps: &'static [(u64, u32)],
+    pub turnin: u64,
+    pub end_text: u32,
+    pub coins: u32,
+    pub xp: u32,
+}
+
+/// A zone's quest runner: where its NPC rows live, the runtime actor the client
+/// clicks for each row, and the one 26/8 -> 26/10 -> 26/6 offer, 49/2 accept,
+/// ordered Talk step and 26/6 -> 49/13 -> 49/14 turn-in walk every zone suite uses.
+pub struct ZoneQuests {
+    /// The zone file under `data/content/npcs` holding every NPC not in `files`.
+    pub default_file: &'static str,
+    /// NPCs whose row lives in another zone file (a giver in a neighbouring zone).
+    pub files: &'static [(u64, &'static str)],
+    /// Extra spawns: the runtime actor guid -> the content NPC its `content_key` names.
+    pub runtime: &'static [(u64, u64)],
+}
+
+impl ZoneQuests {
+    /// The NPC content file a row lives in.
+    fn file(&self, npc: u64) -> &'static str {
+        self.files
+            .iter()
+            .find_map(|(id, file)| (*id == npc).then_some(*file))
+            .unwrap_or(self.default_file)
+    }
+
+    /// The actor the client clicks: an extra spawn is its runtime guid, every other
+    /// row spawns as its own content key.
+    pub fn actor(&self, npc: u64) -> u64 {
+        self.runtime
+            .iter()
+            .find_map(|(id, actor)| (*id == npc).then_some(*actor))
+            .unwrap_or(npc)
+    }
+
+    /// The character at `npc`'s content row; every imported zone quest is in zone 0.
+    pub fn at(&self, guid: u64, npc: u64) -> CharacterState {
+        character_at_for(guid, 0, content_position(self.file(npc), npc))
+    }
+
+    /// Offer the quest at its giver and accept it, pinning the 49/1 card ids.
+    pub fn accept(&self, game: &mut Gameplay, guid: u64, quest: &ZoneQuest, now: &mut u64) {
+        let giver = self.at(guid, quest.giver);
+        let offered = offer(game, &giver, self.actor(quest.giver), quest.id, *now);
+        let card = offered
+            .replies
+            .iter()
+            .find(|packet| has_family(packet, 49, 1, Some(quest.id)))
+            .and_then(|packet| decode_quest_offer_49_1(packet).ok())
+            .expect("the 49/1 card decodes");
+        assert_eq!(
+            [
+                card.name_string_id,
+                card.intro_text_string_id,
+                card.description_string_id
+            ],
+            quest.card,
+            "quest {}: 49/1 title, intro and description",
+            quest.id
+        );
+        accept(game, &giver, quest.id, *now + 2);
+        *now += 10;
+    }
+
+    /// Complete one ordered Talk objective, clicking the runtime actor of an extra spawn.
+    pub fn step(
+        &self,
+        game: &mut Gameplay,
+        guid: u64,
+        quest: &ZoneQuest,
+        index: usize,
+        now: &mut u64,
+    ) {
+        let (npc, body) = quest.steps[index];
+        let talked = talk(game, &self.at(guid, npc), self.actor(npc), *now);
+        assert_eq!(
+            dialogue_body(&talked),
+            body,
+            "quest {} step {}: the NPC's 26/3 line",
+            quest.id,
+            index + 1
+        );
+        assert!(
+            talked.changed,
+            "quest {} step {} did not advance",
+            quest.id,
+            index + 1
+        );
+        assert_eq!(counts(game, quest.id)[index], 1);
+        *now += 10;
+    }
+
+    /// The final Talk, the held 49/13 with its reward bundle, and the 49/14 that pays.
+    pub fn turn_in(
+        &self,
+        game: &mut Gameplay,
+        guid: u64,
+        quest: &ZoneQuest,
+        profile: i32,
+        now: &mut u64,
+    ) {
+        let turnin = self.at(guid, quest.turnin);
+        let talked = talk(game, &turnin, self.actor(quest.turnin), *now);
+        assert!(talked.changed, "quest {}: the final Talk", quest.id);
+        assert_eq!(pending_turnin(game), Some(quest.id));
+        let end = release_end_screen(
+            game,
+            &turnin,
+            quest.id,
+            self.actor(quest.turnin),
+            quest.end_text,
+            *now + 2,
+        );
+        assert_eq!(end_screen_reward(&end), (quest.coins, quest.xp));
+        finish_quest(
+            game,
+            &turnin,
+            quest.id,
+            profile,
+            quest.coins,
+            quest.xp,
+            *now + 4,
+        );
+        *now += 10;
+    }
+
+    /// Offer, accept, walk every ordered step and turn the quest in.
+    pub fn run(
+        &self,
+        game: &mut Gameplay,
+        guid: u64,
+        quest: &ZoneQuest,
+        profile: i32,
+        now: &mut u64,
+    ) {
+        self.accept(game, guid, quest, now);
+        for index in 0..quest.steps.len() {
+            self.step(game, guid, quest, index, now);
+        }
+        self.turn_in(game, guid, quest, profile, now);
+    }
+}
+
+/// The 26/3 dialogue body (its first dword) a completed Talk step speaks. Client
+/// reader `0x00a9ef10`; the layout is the one `decode_dialogue_26_3` parses.
+pub fn dialogue_body(outcome: &Outcome) -> u32 {
+    let packet = outcome
+        .replies
+        .iter()
+        .find(|packet| packet.starts_with(&[26, 0, 3, 0]))
+        .expect("a Talk answers 26/3");
+    decode_dialogue_26_3(packet)
+        .expect("the 26/3 decodes")
+        .initial_dwords[0]
+}
+
+/// A player on the Adventurer ladder with `active` as the saved job, so the XP
+/// destination is observable. The fixture owns the quest and reward ledger.
+pub fn zone_player(fixture: &Fixture, guid: u64, active: i32) -> Gameplay {
+    let mut state = fixture.game_as(guid, None).state();
+    seed_active_profile(&mut state, active, &[ADVENTURER]);
+    fixture.game_as(guid, Some(state))
 }
 
 pub fn counts(game: &Gameplay, quest_id: u32) -> Vec<u32> {
