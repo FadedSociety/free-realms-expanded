@@ -5,7 +5,10 @@
 //! layouts follow mapped client readers. Interest limits and fallback AddPc
 //! presentation values are reconstructed policy (R).
 
-use crate::mounts::MountTail;
+use crate::{
+    abilities::effect_packets::encode_add_composite_effect,
+    consumable_effects::encode_update_scale, mounts::MountTail,
+};
 use std::collections::{BTreeMap, BTreeSet};
 use std::fmt;
 
@@ -68,6 +71,19 @@ pub struct PlayerPresentation {
     /// 0 without a weapon; `validate` refuses negatives. Late joiners get it through
     /// `set_presentation`; current viewers get the live 35/6.
     pub wield_type: i32,
+    /// Public visual state, fed by `consumable_effects::Visual` (`Gateway::player_presentation`):
+    /// the temporary model a live transform shows, 0 when none. Written at the AddPc
+    /// temporary-model slot (client reader `0091aa10` stores it at +324); `validate` refuses a
+    /// negative value.
+    pub temporary_model: i32,
+    /// Public visual state, fed by `consumable_effects::Visual`: the model scale, 1.0 when normal.
+    /// A late viewer needs the 35/13 follow-up only when this is not 1.0; `validate` refuses a
+    /// non-finite or non-positive value.
+    pub scale: f32,
+    /// Public visual state, fed by `consumable_effects::Visual`: one (world tag, composite effect
+    /// id) pair per started aura, each followed by its own 35/41. `validate` refuses a
+    /// non-positive pair and bounds the list.
+    pub auras: Vec<(i32, i32)>,
 }
 
 impl Default for PlayerPresentation {
@@ -92,6 +108,9 @@ impl Default for PlayerPresentation {
             active_profile: 0, // (R) compatibility profile until gateway supplies the active one.
             attachments_wire: vec![0; 4], // (R) no active-profile attachments.
             wield_type: 0,     // (R) no equipped-weapon value supplied.
+            temporary_model: 0, // (R) no transform.
+            scale: 1.0,        // normal size; only a live Scale effect changes it.
+            auras: Vec::new(), // no started aura.
         }
     }
 }
@@ -134,6 +153,8 @@ pub enum MessageKind {
     Spawn,
     Position,
     Despawn,
+    /// T512: the 35/13 scale or 35/41 aura a viewer gets right after a subject's `Spawn`.
+    Visual,
 }
 
 #[derive(Clone, Debug, Eq, PartialEq)]
@@ -635,6 +656,13 @@ impl PlayerRegistry {
                         self.mounts.get(subject).copied().unwrap_or(MountTail::NONE),
                     ),
                 });
+                messages.extend(build_visual_followups(player).into_iter().map(|bytes| {
+                    OutboundMessage {
+                        recipient: viewer,
+                        kind: MessageKind::Visual,
+                        bytes,
+                    }
+                }));
             }
         }
         if let Some(updated) = updated_session {
@@ -678,6 +706,14 @@ impl PlayerPresentation {
             || !self.max_movement_speed.is_finite()
             || self.max_movement_speed < 0.0
             || self.wield_type < 0
+            || self.temporary_model < 0
+            || !self.scale.is_finite()
+            || self.scale <= 0.0
+            || self.auras.len() > 32 // (R) local sanity bound; the stack has one aura slot.
+            || self
+                .auras
+                .iter()
+                .any(|(tag, composite)| *tag <= 0 || *composite <= 0)
         {
             return Err(RegistryError::InvalidPresentation);
         }
@@ -706,6 +742,15 @@ impl PlayerPresentation {
             return Err(RegistryError::InvalidPresentation);
         }
         Ok(())
+    }
+
+    /// The public visual state of `consumable_effects::Visual`: the temporary model, the scale
+    /// and the started auras. `Gateway::player_presentation` fills it whenever it rebuilds the
+    /// AddPc snapshot; a late viewer then gets the follow-ups in `build_visual_followups`.
+    pub fn set_visual(&mut self, visual: crate::consumable_effects::Visual) {
+        self.temporary_model = visual.temporary_model;
+        self.scale = visual.scale;
+        self.auras = visual.auras;
     }
 }
 
@@ -809,7 +854,7 @@ fn build_add_pc(player: &PlayerSession, mount: MountTail) -> Vec<u8> {
         u8::from(presentation.member),
         u8::from(presentation.referee),
     ]);
-    put_i32(&mut inner, 0); // (R) no temporary model override.
+    put_i32(&mut inner, presentation.temporary_model); // client reader 0091aa10 reads it here.
     put_i32(&mut inner, 0); // (R) guild runtime is not routed.
     put_i32(&mut inner, presentation.active_profile);
     for _ in 0..4 {
@@ -828,6 +873,29 @@ fn build_add_pc(player: &PlayerSession, mount: MountTail) -> Vec<u8> {
         put_i32(&mut inner, 0); // (R) VIP icon/title and Unknown17.
     }
     tunnel(&inner)
+}
+
+/// T512: what a viewer must receive right after the subject's AddPc so a client that arrives
+/// late shows the live transform's size and auras; the temporary model is already inside AddPc.
+/// A plain player produces an empty list, so the spawn path allocates nothing extra.
+fn build_visual_followups(player: &PlayerSession) -> Vec<Vec<u8>> {
+    let presentation = &player.presentation;
+    let mut packets = Vec::new();
+    if presentation.scale != 1.0 {
+        packets.push(tunnel(&encode_update_scale(
+            player.character_guid,
+            presentation.scale,
+        )));
+    }
+    for &(tag, composite) in &presentation.auras {
+        packets.push(tunnel(&encode_add_composite_effect(
+            player.character_guid,
+            tag,
+            composite,
+            player.character_guid,
+        )));
+    }
+    packets
 }
 
 fn build_position_update(player: &PlayerSession) -> Vec<u8> {

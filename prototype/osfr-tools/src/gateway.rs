@@ -18,7 +18,7 @@ use crate::movement::{
 use crate::{
     players::PlayerPresentation,
     startup_selfdata::{self, SelfData},
-    startup_snapshot::StartupSnapshot,
+    startup_snapshot::{StartupSnapshot, configured_path},
 };
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
@@ -849,7 +849,7 @@ impl Gateway {
             snapshot.validate()?;
             snapshot
         } else {
-            let snapshot = StartupSnapshot::load(&configured_snapshot_path(directory)?)?;
+            let snapshot = StartupSnapshot::load(&configured_path(directory)?)?;
             if snapshot.login.zone.zone_id != manifest.initial_state.zone_id {
                 return Err(invalid("startup snapshot belongs to another initial zone"));
             }
@@ -1080,6 +1080,7 @@ impl Gateway {
         if let Some(game) = &self.gameplay {
             look.attachments_wire = game.profile_attachments(profile)?;
             look.wield_type = game.public_wield_type(profile);
+            look.set_visual(game.consumable_effects().visual());
         }
         Ok(look)
     }
@@ -1906,17 +1907,6 @@ fn load_profile_rank_offsets(content: &Path) -> io::Result<BTreeMap<i32, usize>>
         }
     }
     Ok(offsets)
-}
-
-fn configured_snapshot_path(reference: &Path) -> io::Result<std::path::PathBuf> {
-    if let Some(path) = std::env::var_os("OSFR_GATEWAY_STARTUP_SNAPSHOT") {
-        return Ok(path.into());
-    }
-    let lab_root = reference
-        .parent()
-        .and_then(Path::parent)
-        .ok_or_else(|| invalid("set OSFR_GATEWAY_STARTUP_SNAPSHOT to the typed startup JSON"))?;
-    Ok(lab_root.join("content/startup-snapshot/startup.json"))
 }
 
 #[cfg(test)]

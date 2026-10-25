@@ -134,6 +134,19 @@ pub struct EffectTagSnapshot {
     pub definition_blob_hex: String,
 }
 
+/// The typed startup snapshot path the gateway loads: `OSFR_GATEWAY_STARTUP_SNAPSHOT` when set,
+/// else the captured snapshot beside the reference content.
+pub(crate) fn configured_path(reference: &Path) -> io::Result<std::path::PathBuf> {
+    if let Some(path) = std::env::var_os("OSFR_GATEWAY_STARTUP_SNAPSHOT") {
+        return Ok(path.into());
+    }
+    let lab_root = reference
+        .parent()
+        .and_then(Path::parent)
+        .ok_or_else(|| invalid("set OSFR_GATEWAY_STARTUP_SNAPSHOT to the typed startup JSON"))?;
+    Ok(lab_root.join("content/startup-snapshot/startup.json"))
+}
+
 impl StartupSnapshot {
     /// Empty but structurally valid content for synthetic gateway tests.
     pub fn empty() -> Self {

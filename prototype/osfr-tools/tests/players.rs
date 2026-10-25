@@ -123,6 +123,9 @@ fn oracle_presentation() -> PlayerPresentation {
         active_profile: 33,
         attachments_wire: attachments,
         wield_type: 44,
+        temporary_model: 0,
+        scale: 1.0,
+        auras: Vec::new(),
     }
 }
 
@@ -176,6 +179,25 @@ fn presentation_with(model: &str, profile: i32) -> PlayerPresentation {
         attachments.extend_from_slice(&value.to_le_bytes());
     }
     presentation.attachments_wire = attachments;
+    presentation
+}
+
+/// The AddPc temporary-model field (client reader `0091aa10` reads it after the three bools and
+/// stores it at +324). The tail after it is fixed width (guild, profile, titles, effect tags,
+/// mount, wield, VIP): 68 bytes, so 72 from the field to the inner end. The 5/1 tunnel adds 7.
+fn temporary_model(add_pc: &[u8]) -> i32 {
+    let inner = &add_pc[7..];
+    let offset = inner.len() - 72;
+    i32::from_le_bytes(inner[offset..offset + 4].try_into().unwrap())
+}
+
+/// T512: a live transform, size change and one started aura, as the gateway snapshot would
+/// carry them (`PlayerPresentation::set_visual`).
+fn visual_presentation() -> PlayerPresentation {
+    let mut presentation = presentation_with("dog", 1);
+    presentation.temporary_model = 169;
+    presentation.scale = 2.0;
+    presentation.auras = vec![(1_500_000_001, 4_321)];
     presentation
 }
 
@@ -664,6 +686,15 @@ fn oversized_and_invalid_presentations_are_rejected_without_joining() {
     let mut negative_wield = PlayerPresentation::default();
     negative_wield.character_guid = 1001;
     negative_wield.wield_type = -1;
+    let mut negative_temporary_model = PlayerPresentation::default();
+    negative_temporary_model.character_guid = 1001;
+    negative_temporary_model.temporary_model = -1;
+    let mut non_finite_scale = PlayerPresentation::default();
+    non_finite_scale.character_guid = 1001;
+    non_finite_scale.scale = f32::NAN;
+    let mut non_positive_aura = PlayerPresentation::default();
+    non_positive_aura.character_guid = 1001;
+    non_positive_aura.auras = vec![(0, 4_321)];
     let mut mismatched_character = PlayerPresentation::default();
     mismatched_character.character_guid = 1002;
 
@@ -674,6 +705,9 @@ fn oversized_and_invalid_presentations_are_rejected_without_joining() {
         non_finite_speed,
         negative_speed,
         negative_wield,
+        negative_temporary_model,
+        non_finite_scale,
+        non_positive_aura,
         mismatched_character,
     ] {
         let mut registry = registry(20.0, 10);
@@ -744,4 +778,275 @@ fn jump_relay_window_is_per_session_and_clears_on_leave() {
             .contains(&SessionId(1)),
         "a rejoined session is visible to the relay audience again"
     );
+}
+
+/// T512: the viewer who arrives after the visual change gets, in order, the AddPc carrying the
+/// temporary model, then 35/13 for the size, then one 35/41 per aura (client readers `0091aa10`,
+/// `008d71b0`, `008d7ad0`). The viewer who already sees the player gets nothing new.
+#[test]
+fn a_late_viewer_gets_the_temporary_model_scale_and_auras_in_order() {
+    let mut registry = registry(30.0, 10);
+    let shared_zone = zone(7, 11);
+    join_presented(
+        &mut registry,
+        1,
+        101,
+        1001,
+        shared_zone,
+        [1.0, 2.0, 3.0],
+        0.0,
+        visual_presentation(),
+    );
+
+    let joined = join(
+        &mut registry,
+        2,
+        102,
+        1002,
+        shared_zone,
+        [4.0, 5.0, 6.0],
+        1.0,
+    );
+    let to_viewer: Vec<_> = joined
+        .iter()
+        .filter(|message| message.recipient == SessionId(2))
+        .collect();
+    assert_eq!(to_viewer.len(), 3, "AddPc, scale, then the aura");
+    assert_eq!(to_viewer[0].kind, MessageKind::Spawn);
+    assert_eq!(temporary_model(&to_viewer[0].bytes), 169);
+
+    let mut scale = vec![35, 0, 13, 0];
+    scale.extend(1001_u64.to_le_bytes());
+    scale.extend(2.0_f32.to_le_bytes());
+    assert_eq!(to_viewer[1].kind, MessageKind::Visual);
+    assert_eq!(to_viewer[1].bytes, wrap(&scale));
+
+    let mut aura = vec![35, 0, 41, 0];
+    aura.extend(1001_u64.to_le_bytes());
+    aura.extend(1_500_000_001_i32.to_le_bytes());
+    aura.extend(4_321_i32.to_le_bytes());
+    aura.extend(1001_u64.to_le_bytes());
+    aura.extend([0; 8]);
+    assert_eq!(to_viewer[2].kind, MessageKind::Visual);
+    assert_eq!(to_viewer[2].bytes, wrap(&aura));
+
+    // The player already in view only receives the newcomer's AddPc.
+    let to_subject: Vec<_> = joined
+        .iter()
+        .filter(|message| message.recipient == SessionId(1))
+        .collect();
+    assert_eq!(to_subject.len(), 1);
+    assert_eq!(to_subject[0].kind, MessageKind::Spawn);
+}
+
+/// T512: the temporary-model field already existed, so a plain player's AddPc is byte-identical
+/// to the frame the writer produced before the change (captured from the pre-change code).
+#[test]
+fn a_plain_players_add_pc_bytes_are_unchanged() {
+    const PLAIN_ADD_PC_HEX: &str = concat!(
+        "050001c300000023000100e9030000000000000000000000000000000000000000000000000000000000000000000000000000000000000000803f00000040000040400000803f00000000000000000000803f000000000000000000000000000000000000000000000000000000000000000000000000000000000000204100000000000000000000000000000000000000000000000000000000000000000000000000000000000000ffffffffffffffff000000000000000000000000000000000000000000000000"
+    );
+    let mut registry = registry(30.0, 10);
+    let shared_zone = zone(7, 11);
+    join(
+        &mut registry,
+        1,
+        101,
+        1001,
+        shared_zone,
+        [1.0, 2.0, 3.0],
+        0.0,
+    );
+    let joined = join(
+        &mut registry,
+        2,
+        102,
+        1002,
+        shared_zone,
+        [4.0, 5.0, 6.0],
+        1.0,
+    );
+    let spawn = message(&joined, 2, MessageKind::Spawn);
+    assert_eq!(spawn, bytes_from_hex(PLAIN_ADD_PC_HEX));
+    assert_eq!(temporary_model(spawn), 0);
+}
+
+/// T512: the snapshot refresh for a player who is already visible queues nothing for the current
+/// viewer; the live 35/14 went out through `Outcome::nearby` when the effect started. A later
+/// pose update relays only the pose.
+#[test]
+fn a_snapshot_refresh_sends_no_visuals_to_a_current_viewer() {
+    let mut registry = registry(30.0, 10);
+    let shared_zone = zone(7, 11);
+    join_presented(
+        &mut registry,
+        1,
+        101,
+        1001,
+        shared_zone,
+        [1.0, 2.0, 3.0],
+        0.0,
+        visual_presentation(),
+    );
+    join(
+        &mut registry,
+        2,
+        102,
+        1002,
+        shared_zone,
+        [4.0, 5.0, 6.0],
+        1.0,
+    );
+
+    let mut changed = visual_presentation();
+    changed.character_guid = 1001;
+    changed.temporary_model = 170;
+    changed.scale = 1.5;
+    changed.auras = vec![(1_500_000_002, 4_322)];
+    registry.set_presentation(SessionId(1), changed).unwrap();
+
+    let moved = registry
+        .update_pose(SessionId(1), shared_zone, [2.0; 3], 0.5)
+        .unwrap();
+    assert_eq!(moved.len(), 1);
+    assert_eq!(moved[0].recipient, SessionId(2));
+    assert_eq!(moved[0].kind, MessageKind::Position);
+}
+
+/// T512: the snapshot fields line up with the real `EffectStack::visual()`. Once the effects
+/// expire, the next viewer's AddPc is the plain one and carries no follow-ups.
+#[test]
+fn an_expired_visual_clears_the_late_viewers_snapshot() {
+    use osfr_tools::consumable_effects::{EffectStack, Kind, Spec};
+
+    let guid = 1001;
+    let position = [1.0, 2.0, 3.0];
+    let mut stack = EffectStack::default();
+    for kind in [
+        Kind::Transform {
+            model_id: 169,
+            poof_effect_id: 0,
+        },
+        Kind::Scale { scale: 2.0 },
+        Kind::Aura {
+            composite_effect_id: 4_321,
+            delay_ms: 0,
+        },
+    ] {
+        let spec = Spec {
+            kind,
+            duration_ms: 60_000,
+            icon_id: 1,
+            name_id: 1,
+        };
+        stack.apply(guid, position, spec, 0).unwrap();
+    }
+    let mut presentation = PlayerPresentation::default();
+    presentation.character_guid = guid;
+    presentation.set_visual(stack.visual());
+    assert_eq!(
+        (presentation.temporary_model, presentation.scale),
+        (169, 2.0)
+    );
+    assert_eq!(presentation.auras.len(), 1);
+
+    let mut registry = registry(30.0, 10);
+    let shared_zone = zone(7, 11);
+    join_presented(
+        &mut registry,
+        1,
+        101,
+        guid,
+        shared_zone,
+        position,
+        0.0,
+        presentation.clone(),
+    );
+    let joined = join(
+        &mut registry,
+        2,
+        102,
+        1002,
+        shared_zone,
+        [4.0, 5.0, 6.0],
+        1.0,
+    );
+    assert_eq!(
+        joined
+            .iter()
+            .filter(
+                |message| message.recipient == SessionId(2) && message.kind == MessageKind::Visual
+            )
+            .count(),
+        2,
+        "the size and the started aura"
+    );
+
+    // Expiry is a visible change, so the gateway would refresh the snapshot from the empty stack.
+    assert!(!stack.tick(guid, 60_000).to_nearby.is_empty());
+    presentation.set_visual(stack.visual());
+    registry
+        .set_presentation(SessionId(1), presentation)
+        .unwrap();
+    let later = join(
+        &mut registry,
+        3,
+        103,
+        1003,
+        shared_zone,
+        [5.0, 5.0, 6.0],
+        0.0,
+    );
+    let to_later: Vec<_> = later
+        .iter()
+        .filter(|message| message.recipient == SessionId(3))
+        .collect();
+    assert_eq!(to_later.len(), 2, "one AddPc per visible player");
+    assert!(
+        to_later
+            .iter()
+            .all(|message| message.kind == MessageKind::Spawn)
+    );
+    assert!(
+        to_later
+            .iter()
+            .all(|message| temporary_model(&message.bytes) == 0)
+    );
+}
+
+/// T512: a snapshot that cannot describe a player is refused before it replaces the live one.
+#[test]
+fn a_refused_visual_snapshot_leaves_the_live_presentation_unchanged() {
+    let mut registry = registry(30.0, 10);
+    let shared_zone = zone(7, 11);
+    join_presented(
+        &mut registry,
+        1,
+        101,
+        1001,
+        shared_zone,
+        [1.0, 2.0, 3.0],
+        0.0,
+        visual_presentation(),
+    );
+    let before = registry.get(SessionId(1)).unwrap().presentation.clone();
+    let breaks: [fn(&mut PlayerPresentation); 7] = [
+        |presentation| presentation.temporary_model = -1,
+        |presentation| presentation.scale = f32::NAN,
+        |presentation| presentation.scale = 0.0,
+        |presentation| presentation.scale = f32::INFINITY,
+        |presentation| presentation.auras = vec![(0, 4_321)],
+        |presentation| presentation.auras = vec![(1_500_000_001, 0)],
+        |presentation| presentation.auras = vec![(1, 2); 33],
+    ];
+    for break_it in breaks {
+        let mut candidate = before.clone();
+        candidate.character_guid = 1001;
+        break_it(&mut candidate);
+        assert_eq!(
+            registry.set_presentation(SessionId(1), candidate),
+            Err(RegistryError::InvalidPresentation)
+        );
+        assert_eq!(registry.get(SessionId(1)).unwrap().presentation, before);
+    }
 }

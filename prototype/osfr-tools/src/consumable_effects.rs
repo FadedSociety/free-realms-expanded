@@ -131,7 +131,7 @@ impl Emit {
     }
 }
 
-/// What the actor should look like now, for the spawn packet (a later brief reads it).
+/// What the actor should look like now, for the AddPc snapshot (`players.rs`, T512).
 #[derive(Clone, Debug, PartialEq)]
 pub struct Visual {
     pub temporary_model: i32,
