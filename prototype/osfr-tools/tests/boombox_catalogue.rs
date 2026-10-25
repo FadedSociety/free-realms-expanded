@@ -114,15 +114,18 @@ fn every_dance_is_a_client_animation_slot_or_group() {
     );
     for row in rows() {
         let standing = int(&row["standing_animation_id"]);
-        // One source per kind: a synchronized row's sequence is the ids it plays, an independent
-        // row's dance ids are its `clips`, and a transform row has no dance data at all.
+        // One source per kind: a synchronized row's sequence is the steps it plays, a transform
+        // row's one entry is its base dance, and an independent row's dance ids are its `clips`.
         let dances = row.get("dance_sequence").map_or_else(Vec::new, ints);
         assert_eq!(
             !dances.is_empty(),
-            row["kind"] == "synchronized",
-            "{}: only a synchronized row has a dance_sequence",
+            row["kind"] != "independent",
+            "{}: only a dance row has a dance_sequence",
             row["item_id"]
         );
+        if row["kind"] == "transform" {
+            assert_eq!(dances.len(), 1, "{}: one transform dance", row["item_id"]);
+        }
         for id in dances
             .into_iter()
             .chain([standing].into_iter().filter(|id| *id != 0))
@@ -375,7 +378,7 @@ fn the_loader_refuses_rows_out_of_bounds_and_a_missing_file_is_empty() {
     let shipped = Catalogue::load(&content()).unwrap();
     assert!(shipped.get(TOTEM).is_some() && shipped.get(CAMPFIRE).is_none());
     assert_eq!(load_with(|_| {}).unwrap(), shipped);
-    let cases: [(&str, fn(&mut Value)); 34] = [
+    let cases: [(&str, fn(&mut Value)); 35] = [
         ("range 0", |f| f["boomboxes"][0]["range_m"] = json!(0)),
         ("range 51", |f| f["boomboxes"][0]["range_m"] = json!(51)),
         ("spawn offset 11", |f| {
@@ -416,8 +419,14 @@ fn the_loader_refuses_rows_out_of_bounds_and_a_missing_file_is_empty() {
         ("transform without a model", |f| {
             f["boomboxes"][1]["transform_model_id"] = json!(0)
         }),
-        ("transform with a dance sequence", |f| {
-            f["boomboxes"][1]["dance_sequence"] = json!([3541])
+        ("transform without a dance sequence", |f| {
+            f["boomboxes"][1]
+                .as_object_mut()
+                .unwrap()
+                .remove("dance_sequence");
+        }),
+        ("transform with two dances", |f| {
+            f["boomboxes"][1]["dance_sequence"] = json!([3541, 3542])
         }),
         ("transform with clip lengths", |f| {
             f["boomboxes"][1]["clip_ms"]["1941"] = json!([12667])

@@ -46,12 +46,14 @@ pub(super) fn place(
 /// not stop the server: the boxes are dropped (logged once) and the tick goes on without them.
 pub(super) fn tick(world: &mut SharedWorld, sessions: &mut SessionMap, now_ms: u64) {
     let ticked = contain(|| {
-        let sends = world.boomboxes.tick(now_ms, &world.players);
+        let sends = world.boomboxes.tick(now_ms, &mut world.players);
         deliver(sends, None, sessions, world);
         Ok(())
     });
     if let Err(error) = ticked {
+        // The boxes are gone, so no AddPc may keep advertising a transform they applied.
         world.boomboxes = Default::default();
+        world.players.clear_temporary_models();
         event(json!({"event": "boombox_tick_failed", "reason": error.to_string()}));
     }
 }
@@ -101,6 +103,9 @@ mod tests {
 
     const RAINBOW: i32 = 1913; // the one shipped row with a song
     const TOTEM: i32 = 8185; // no song
+    const REALMS_ROLL: i32 = 1180; // the transform row
+    const RROLL_MODEL: i32 = 1941; // human_m_realmsroll.adr
+    const RROLL_DANCE: i32 = 3541; // emo_dance_rroll_01
     const WOLF_ITEM: i32 = 14289; // a ride item (bundled `mounts.json`, Wolf 993)
     const OWNER: u32 = 461;
     /// The high word of every box guid.
@@ -262,11 +267,18 @@ mod tests {
 
         /// A second session in the open world `dx` metres east of the owner.
         fn viewer(&mut self, id: u32, dx: f32) -> SessionKey {
-            self.viewer_as(id, dx, 0)
+            self.viewer_as(id, dx, 0).0
         }
 
         /// As `viewer`, wearing player model `model` (the boxes dance models 1, 2, 60 and 61).
-        fn viewer_as(&mut self, id: u32, dx: f32, model: i32) -> SessionKey {
+        /// Also returns the AddPc/movement messages the registry built for the join, which the
+        /// real gateway delivers after `join_player`.
+        fn viewer_as(
+            &mut self,
+            id: u32,
+            dx: f32,
+            model: i32,
+        ) -> (SessionKey, Vec<osfr_tools::players::OutboundMessage>) {
             let mut session = test_support::enter(&self.options, id);
             session.sender = sender(32 * 1024 * 1024);
             let me = self
@@ -286,7 +298,7 @@ mod tests {
             let joined = world
                 .players
                 .join_with_presentation(session.id, account, character, zone, at, 0.0, look);
-            joined.unwrap();
+            let joined = joined.unwrap();
             world.joined.insert(session.id);
             let key = SessionKey {
                 peer: session.peer,
@@ -294,7 +306,7 @@ mod tests {
             };
             world.session_keys.insert(session.id, key);
             self.scene.sessions.insert(key, session);
-            key
+            (key, joined)
         }
 
         fn drain(&mut self, key: SessionKey, now: u64) -> Vec<Vec<u8>> {
@@ -344,6 +356,12 @@ mod tests {
         fn saved(&self) -> Vec<u8> {
             let state = self.scene.session.gateway.snapshot().gameplay.unwrap();
             serde_json::to_vec(&(&state.inventory, &state.item_bar)).unwrap()
+        }
+
+        /// The character's whole saved gameplay state, byte for byte.
+        fn saved_state(&self) -> Vec<u8> {
+            let state = self.scene.session.gateway.snapshot().gameplay.unwrap();
+            serde_json::to_vec(&state).unwrap()
         }
 
         fn count(&self, item: i32) -> Option<u32> {
@@ -590,6 +608,68 @@ mod tests {
         assert_eq!(subs(&ended), [42, 16, 3]);
     }
 
+    /// The `(model, guid)` of every 35/14 in a drained batch (client reader `008d6890`).
+    fn temporary_models(messages: &[Vec<u8>]) -> Vec<(i32, u64)> {
+        let inners = messages.iter().filter_map(|m| m.get(7..));
+        let models = inners.filter(|inner| inner.starts_with(&[35, 0, 14, 0]));
+        models
+            .map(|p| {
+                assert_eq!(p.len(), 16);
+                (
+                    i32::from_le_bytes(p[4..8].try_into().unwrap()),
+                    u64::from_le_bytes(p[8..16].try_into().unwrap()),
+                )
+            })
+            .collect()
+    }
+
+    /// The guids of every 35/15 in a drained batch (client reader `008d7230`).
+    fn reverts(messages: &[Vec<u8>]) -> Vec<u64> {
+        let inners = messages.iter().filter_map(|m| m.get(7..));
+        let reverts = inners.filter(|inner| inner.starts_with(&[35, 0, 15, 0]));
+        reverts
+            .map(|p| {
+                assert_eq!(p.len(), 16);
+                assert_eq!(p[12..16], 0_i32.to_le_bytes());
+                u64::from_le_bytes(p[4..12].try_into().unwrap())
+            })
+            .collect()
+    }
+
+    /// The `(guid, animation, base)` of every 35/8 in a drained batch.
+    fn animations(messages: &[Vec<u8>]) -> Vec<(u64, i32, bool)> {
+        let inners = messages.iter().filter_map(|m| m.get(7..));
+        let animations = inners.filter(|inner| inner.starts_with(&[35, 0, 8, 0]));
+        animations
+            .map(|p| {
+                (
+                    u64::from_le_bytes(p[4..12].try_into().unwrap()),
+                    i32::from_le_bytes(p[12..16].try_into().unwrap()),
+                    p[20] == 1,
+                )
+            })
+            .collect()
+    }
+
+    /// The AddPc a joining viewer was sent for `guid`.
+    fn add_pc_of(messages: &[osfr_tools::players::OutboundMessage], guid: u64) -> Option<&[u8]> {
+        messages
+            .iter()
+            .filter(|m| m.kind == osfr_tools::players::MessageKind::Spawn)
+            .map(|m| m.bytes.as_slice())
+            .find(|bytes| bytes.get(11..19) == Some(&guid.to_le_bytes()[..]))
+    }
+
+    /// The temporary appearance at +0x144 (client writer `0091adcf`): 68 bytes follow it (guild,
+    /// active profile, four title dwords, effects, the mount block, wield and VIP), so it is at
+    /// `inner.len() - 72` for every presentation.
+    fn add_pc_model(frame: &[u8]) -> i32 {
+        let inner = &frame[7..];
+        assert!(inner.starts_with(&[35, 0, 1, 0]));
+        let at = inner.len() - 72;
+        i32::from_le_bytes(inner[at..at + 4].try_into().unwrap())
+    }
+
     /// The `(guid, animation)` entries of every 35/63 in a drained batch.
     fn sync_steps(messages: &[Vec<u8>]) -> Vec<Vec<(u64, i32)>> {
         let inners = messages.iter().filter_map(|m| m.get(7..));
@@ -622,8 +702,8 @@ mod tests {
         let Some(mut rig) = Rig::new("t463-dance", TOTEM) else {
             return;
         };
-        let near = rig.viewer_as(2, 6.0, 60);
-        let bystander = rig.viewer_as(3, 8.0, 0); // no model with clips: watches only
+        let near = rig.viewer_as(2, 6.0, 60).0;
+        let bystander = rig.viewer_as(3, 8.0, 0).0; // no model with clips: watches only
         let dancer = 7_000_000_002;
         rig.press(3_000);
         rig.drain(near, 3_000);
@@ -676,9 +756,9 @@ mod tests {
         let Some(mut rig) = Rig::new("t494-random", RAINBOW) else {
             return;
         };
-        let dancer = rig.viewer_as(2, 6.0, 60); // human_f: has a Rainbow table
-        let second = rig.viewer_as(4, 10.0, 1); // human_m: has one too
-        let standing = rig.viewer_as(3, 8.0, 1);
+        let dancer = rig.viewer_as(2, 6.0, 60).0; // human_f: has a Rainbow table
+        let second = rig.viewer_as(4, 10.0, 1).0; // human_m: has one too
+        let standing = rig.viewer_as(3, 8.0, 1).0;
         // Base model 1 has a table, but a live transform shows the Realms Roll model 1941: no
         // table, so the client shows a model that must stand.
         rig.transform(standing, 1941);
@@ -722,5 +802,113 @@ mod tests {
         assert!(bases.contains(&(7_000_000_003, 3_550)), "{bases:?}");
         assert!(bases.contains(&(1, 3_550)), "the owner stands: {bases:?}");
         assert!(bases.iter().all(|(_, animation)| *animation == 3_550));
+    }
+
+    #[test]
+    fn t492_a_pressed_realms_roll_transforms_and_a_late_viewer_sees_the_model() {
+        let Some(mut rig) = Rig::new("t492-roll", REALMS_ROLL) else {
+            return;
+        };
+        let owner = rig.scene.session.character_guid;
+        // 20 m away: in the registry's interest radius (so it is a directed viewer) but out of
+        // the box's 15 m range, so it is not transformed itself.
+        let (near, joined) = rig.viewer_as(2, 20.0, 0);
+        let near_character = 7_000_000_002;
+        let before = add_pc_of(&joined, owner).expect("the owner's AddPc");
+        assert_eq!(add_pc_model(before), 0, "plain before the press");
+        let saved = rig.saved_state();
+
+        rig.press(3_000);
+        rig.drain(near, 3_000);
+        rig.tick(3_050);
+        let owner_packets = rig.drain_owner(3_050);
+        let near_packets = rig.drain(near, 3_050);
+        for messages in [&owner_packets, &near_packets] {
+            assert_eq!(temporary_models(messages), [(RROLL_MODEL, owner)]);
+            assert_eq!(animations(messages), [(owner, RROLL_DANCE, true)]);
+            let at = |sub: u8| {
+                messages
+                    .iter()
+                    .position(|m| m.get(7..).is_some_and(|i| i.starts_with(&[35, 0, sub, 0])))
+                    .unwrap()
+            };
+            assert!(at(14) < at(8), "35/14 before the base animation");
+        }
+        assert!(
+            temporary_models(&near_packets)
+                .iter()
+                .all(|(_, guid)| *guid != near_character),
+            "the 20 m viewer is outside the box's range"
+        );
+        // A viewer who joins now sees the model in the owner's AddPc.
+        let (_later, later_join) = rig.viewer_as(3, 25.0, 0);
+        let frame = add_pc_of(&later_join, owner).expect("the owner's AddPc");
+        assert_eq!(add_pc_model(frame), RROLL_MODEL);
+        assert_eq!(
+            rig.saved_state(),
+            saved,
+            "the transform is session-only: the save is unchanged"
+        );
+    }
+
+    #[test]
+    fn t492_a_refusing_viewer_queue_skips_only_that_viewer_and_the_tick_goes_on() {
+        let Some(mut rig) = Rig::new("t492-queue", REALMS_ROLL) else {
+            return;
+        };
+        let owner = rig.scene.session.character_guid;
+        let stuck = rig.viewer(2, 6.0);
+        let healthy = rig.viewer(3, 8.0);
+        // The stuck viewer's queue refuses everything from here on.
+        rig.scene.sessions.get_mut(&stuck).unwrap().sender = sender(1);
+        rig.press(3_000);
+        rig.drain(healthy, 3_000);
+        rig.tick(3_050);
+        let served = temporary_models(&rig.drain(healthy, 3_050));
+        // All three in-range players are transformed; the healthy viewer hears about all of
+        // them, including the viewer whose own queue refused.
+        assert_eq!(served.len(), 3, "{served:?}");
+        assert!(
+            served.iter().all(|(model, _)| *model == RROLL_MODEL),
+            "{served:?}"
+        );
+        for guid in [owner, 7_000_000_002, 7_000_000_003] {
+            assert!(served.iter().any(|(_, named)| *named == guid), "{guid}");
+        }
+        // The box and the other players carry on: expiry still reverts all three.
+        rig.tick(3_000 + DURATION);
+        assert_eq!(
+            reverts(&rig.drain(healthy, 3_000 + DURATION)).len(),
+            3,
+            "the shared tick kept running"
+        );
+    }
+
+    #[test]
+    fn t492_leaving_range_reverts_and_a_later_viewer_sees_them_plain() {
+        let Some(mut rig) = Rig::new("t492-leave", REALMS_ROLL) else {
+            return;
+        };
+        let (viewer, _) = rig.viewer_as(2, 6.0, 0);
+        let me = 7_000_000_002;
+        rig.press(3_000);
+        rig.drain(viewer, 3_000);
+        rig.tick(3_050);
+        let mut shown = Vec::new();
+        shown.extend(temporary_models(&rig.drain(viewer, 3_050)));
+        shown.extend(temporary_models(&rig.drain_owner(3_050)));
+        assert!(shown.contains(&(RROLL_MODEL, me)), "{shown:?}");
+        rig.move_viewer(viewer, 40.0);
+        rig.tick(3_100);
+        let viewer_packets = rig.drain(viewer, 3_100);
+        let owner_packets = rig.drain_owner(3_100);
+        for messages in [&viewer_packets, &owner_packets] {
+            assert_eq!(reverts(messages), [me]);
+            assert_eq!(idled(messages), [me], "then loc_stand");
+        }
+        // A viewer who joins now gets the plain model.
+        let (_later, later_join) = rig.viewer_as(3, 45.0, 0);
+        let frame = add_pc_of(&later_join, me).expect("the player's AddPc");
+        assert_eq!(add_pc_model(frame), 0);
     }
 }

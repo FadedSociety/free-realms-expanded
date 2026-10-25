@@ -76,9 +76,10 @@ pub struct PlayerPresentation {
     /// `set_presentation`; current viewers get the live 35/6.
     pub wield_type: i32,
     /// Public visual state, fed by `consumable_effects::Visual` (`Gateway::player_presentation`):
-    /// the temporary model a live transform shows, 0 when none. Written at the AddPc
+    /// the temporary model a live consumable transform shows, 0 when none. Written at the AddPc
     /// temporary-model slot (client reader `0091aa10` stores it at +324); `validate` refuses a
-    /// negative value.
+    /// negative value. A live boombox transform is a separate layer
+    /// (`PlayerRegistry::temporary_models`) and overrides this value in AddPc while it is applied.
     pub temporary_model: i32,
     /// Public visual state, fed by `consumable_effects::Visual`: the model scale, 1.0 when normal.
     /// A late viewer needs the 35/13 follow-up only when this is not 1.0; `validate` refuses a
@@ -219,6 +220,11 @@ pub struct PlayerRegistry {
     // W167: the ride a seated player shows in later AddPc frames (the native pending-mount
     // block). Absent means `MountTail::NONE`.
     mounts: BTreeMap<SessionId, MountTail>,
+    // T492: the temporary appearance (+0x144) a live boombox transform put on a session, for
+    // later AddPc frames. Session-only: never saved, dropped with the session, 0 means none.
+    // Separate from `PlayerSession::presentation.temporary_model` (a consumable transform);
+    // `build_add_pc` prefers this layer while it is applied and falls back to the consumable.
+    temporary_models: BTreeMap<SessionId, i32>,
 }
 
 impl PlayerRegistry {
@@ -231,6 +237,7 @@ impl PlayerRegistry {
             cells: BTreeMap::new(),
             views: BTreeMap::new(),
             mounts: BTreeMap::new(),
+            temporary_models: BTreeMap::new(),
         }
     }
 
@@ -367,6 +374,7 @@ impl PlayerRegistry {
         self.sessions.remove(&session_id);
         self.views.remove(&session_id);
         self.mounts.remove(&session_id);
+        self.temporary_models.remove(&session_id);
         for (owners, guid) in [
             (&mut self.account_owners, removed.account_guid),
             (&mut self.character_owners, removed.character_guid),
@@ -395,6 +403,27 @@ impl PlayerRegistry {
     /// carries no seat, so it does not count).
     pub fn is_mounted(&self, session_id: SessionId) -> bool {
         self.mounts.contains_key(&session_id)
+    }
+
+    /// T492: set the temporary model later AddPc frames carry for this session (client writer
+    /// `0091adcf` writes it at +0x144). `0` (or less) clears it. Session-only and idempotent; an
+    /// unknown session is ignored. Current viewers are sent 35/14 or 35/15 by the caller instead.
+    /// This is the boombox layer: while non-zero it overrides the consumable visual in AddPc.
+    pub fn set_temporary_model(&mut self, session_id: SessionId, model: i32) {
+        if !self.sessions.contains_key(&session_id) {
+            return;
+        }
+        if model <= 0 {
+            self.temporary_models.remove(&session_id);
+        } else {
+            self.temporary_models.insert(session_id, model);
+        }
+    }
+
+    /// Drop every temporary model (T492). The boombox tick panicked after changing some, and its
+    /// boxes are gone, so no stale model may survive into a later AddPc frame.
+    pub fn clear_temporary_models(&mut self) {
+        self.temporary_models.clear();
     }
 
     /// T027: replace a joined player's public snapshot after a live outfit or job change, so a
@@ -459,10 +488,16 @@ impl PlayerRegistry {
         affected.insert(session_id);
         let old_cell = (current.zone, self.cell(current.position));
         let new_cell = (zone, self.cell(position));
+        let zone_changed = current.zone != zone;
         if old_cell != new_cell {
             let (old_zone, old_position) = (current.zone, current.position);
             self.remove_cell(session_id, old_zone, old_position);
             self.insert_cell(session_id, zone, position);
+        }
+        if zone_changed {
+            // A boombox transform ends with its scene. Clear the AddPc layer now: a viewer in
+            // the new zone must not see the old model before the next box tick notices.
+            self.temporary_models.remove(&session_id);
         }
         let changed = self.sessions.get_mut(&session_id).unwrap();
         changed.zone = zone;
@@ -670,13 +705,12 @@ impl PlayerRegistry {
         }
         for subject in current_view.difference(old_view) {
             if let Some(player) = self.sessions.get(subject) {
+                let mount = self.mounts.get(subject).copied().unwrap_or(MountTail::NONE);
+                let temporary = self.temporary_models.get(subject).copied().unwrap_or(0);
                 messages.push(OutboundMessage {
                     recipient: viewer,
                     kind: MessageKind::Spawn,
-                    bytes: build_add_pc(
-                        player,
-                        self.mounts.get(subject).copied().unwrap_or(MountTail::NONE),
-                    ),
+                    bytes: build_add_pc(player, mount, temporary),
                 });
                 messages.extend(build_visual_followups(player).into_iter().map(|bytes| {
                     OutboundMessage {
@@ -847,7 +881,10 @@ fn distance_squared(left: [f32; 3], right: [f32; 3]) -> f64 {
     dx * dx + dy * dy + dz * dz
 }
 
-fn build_add_pc(player: &PlayerSession, mount: MountTail) -> Vec<u8> {
+/// `boombox_model` is the live boombox transform layer (`PlayerRegistry::temporary_models`), 0
+/// when none. It wins over the presentation's consumable visual because it is the later
+/// temporary-appearance write while the player stands in the box.
+fn build_add_pc(player: &PlayerSession, mount: MountTail, boombox_model: i32) -> Vec<u8> {
     let mut inner = Vec::with_capacity(195);
     put_u16(&mut inner, 35);
     put_u16(&mut inner, 1);
@@ -890,7 +927,16 @@ fn build_add_pc(player: &PlayerSession, mount: MountTail) -> Vec<u8> {
         u8::from(presentation.member),
         u8::from(presentation.referee),
     ]);
-    put_i32(&mut inner, presentation.temporary_model); // client reader 0091aa10 reads it here.
+    // +0x144 (client reader `0091aa10` stores it at +324; client writer `0091add1`). Two
+    // session-only layers write it: a consumable transform (`presentation.temporary_model`) and a
+    // live boombox transform (`boombox_model`). While a box has the player, its model is the
+    // appearance current viewers were last sent, so AddPc carries it; otherwise the consumable.
+    let temporary_model = if boombox_model != 0 {
+        boombox_model
+    } else {
+        presentation.temporary_model
+    };
+    put_i32(&mut inner, temporary_model);
     put_i32(&mut inner, 0); // (R) guild runtime is not routed.
     put_i32(&mut inner, presentation.active_profile);
     for _ in 0..4 {

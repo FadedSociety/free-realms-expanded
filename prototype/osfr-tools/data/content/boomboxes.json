@@ -47,6 +47,7 @@
       "item_id": 1180,
       "model_id": 1973,
       "kind": "transform",
+      "dance_sequence": [3541],
       "clip_ms": {},
       "blend_ms": 600,
       "song_effect_ids": [],
@@ -76,6 +77,10 @@
         {
           "kind": "client",
           "evidence": "Models.txt:1915 1941^human_m_realmsroll.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "AnimationTypes.xml:1054 emo_dance_rroll_01 id 3541 type 4 (rroll branch); only human_m has the base actor entry human_m_emo_dance_roll_A.gr2 (Assets_manifest.txt:41662)"
         },
         {
           "kind": "reconstructed",

@@ -16,6 +16,13 @@
 //!   +0x10, tag at +0x18) and stopped by 35/42 (case 42, ctor `008b51c0`: guid +0x10, tag
 //!   +0x18). The box's own bounce is `amb_loop_01` (`AnimationTypes.xml:844`, id 2100) and the
 //!   poof is effect 21 `PFX_smoke_black_explosion` (`ActorCompositeEffectDefinitions.xml:283`).
+//! * A transform row's dancers take its temporary appearance: 35/14 (dispatcher case 14 at
+//!   `00930283`, ctor `008b4370`, reader `008d6890` -> header `008d6830`, i32 model, u64 guid;
+//!   applier `ProxiedCharacter::SwitchToTemporaryAppearance` `0096bd90`) and revert with 35/15
+//!   (case 15 at `00931452`, ctor `008b4310`, reader `008d7230`: u64 guid, i32 0; applier
+//!   `0096a110(0)`). The dance itself is 35/8 with the base flag (encoder
+//!   `world_events::piece_052::animation_packet`). The model is also the AddPc field at +0x144
+//!   (client writer `0091add1`), so a later viewer sees it.
 //! * A synchronized dance step is one 35/63 SetSynchronizedAnimations: u16 35, u16 63, i32 count,
 //!   then `{u64 guid, i32 animation}` per entry. Client dispatcher case 63 (`009316a0`) builds the
 //!   packet (`008eafc0`) and reads it with `00919c90`: header `008d6830` (two u16), `008fc2d0` (an
@@ -59,22 +66,34 @@
 //!   its song, on re-entry. One box per owner: a second press before the first ends replaces it
 //!   (the default recast equals the duration, so this only happens if the two are tuned apart).
 //! * A box outlives its owner's session until it expires.
-//! * Dancing, each row kind by its own rule. Every tick a session within `range_m` of the box on
-//!   X/Z, in its zone instance and on foot dances; overlapping boxes go to the higher priority,
-//!   then the nearer (Sanctuary rotates by least served instead). `synchronized` rows (T463) need
-//!   a model in `clip_ms`: one shared sequence, a step lasting the longest clip of any model
+//! * Each tick a session within `range_m` of a box on X/Z, in its zone instance, takes that box:
+//!   `synchronized` and `independent` boxes need it on foot (a synchronized one also needs a model
+//!   in `clip_ms`, `independent` rows roll `clips` for any model and stand a model without a
+//!   table on `standing_animation_id`); a `transform` box takes it mounted too. Overlapping boxes:
+//!   the higher priority wins, then the nearer (Sanctuary rotates by least served instead).
+//!   `synchronized` rows (T463) share one sequence, a step lasting the longest clip of any model
 //!   minus `blend_ms`, never less than `MIN_STEP_MS`, everyone listed in one 35/63 per viewer.
-//!   `independent` rows (T494) roll every dancer its own `clips` entry for its model, never the
-//!   one just played, re-rolled `blend_ms` before its end; each clip is its own single-entry
-//!   35/63 for the dancer and every viewer who knows them, and a model with no table stands on
-//!   the row's `standing_animation_id` as a base 35/8. A player who starts dancing mid-step gets
-//!   the current step at once (Sanctuary sends only an idle and waits for the next step). A
-//!   dancer who leaves, mounts, or whose box ends or is replaced gets 35/8 idle, sent to them and
-//!   their viewers. A viewer who walks into range sees the dancer idle until the next step. One
-//!   synchronized packet carries at most `MAX_ENTRIES`.
+//!   `independent` rows (T494) roll every dancer its own `clips` entry, never the one just
+//!   played, re-rolled `blend_ms` before its end; each clip is its own single-entry 35/63 for the
+//!   dancer and every viewer who knows them. A player who starts dancing mid-step gets the
+//!   current clip at once (Sanctuary sends only an idle and waits for the next step).
+//! * A transform row's player gets 35/14 (the row's `transform_model_id`) and then 35/8 base
+//!   `dance_sequence[0]` (R: Sanctuary's `StartRealmsRollDance`), sent to the player and their
+//!   viewers. A mounted player is transformed but gets no dance (R); on foot again it dances.
+//!   When the player's mount state changes, 35/14 is re-sent once after `transform_reapply_ms`
+//!   (the brief's 2 s; Sanctuary instead re-applies when the client reports no temporary
+//!   appearance).
+//! * A dancer who leaves, mounts, or whose box ends or is replaced gets 35/8 idle. A transformed
+//!   player who leaves, zones, or whose box ends or is replaced gets 35/15 and then 35/8 idle;
+//!   when another box takes them in the same tick the idle is skipped (a transform box sends
+//!   35/14 instead, a dance box the current clip). A live consumable transform (T512's
+//!   `PlayerPresentation::temporary_model`) is put back with 35/14 after the 35/15, because the
+//!   client has only the one temporary-appearance slot. A viewer who walks into range sees the
+//!   dancer idle until the next clip. One synchronized packet carries at most `MAX_ENTRIES`.
 
 use crate::{
     abilities::effect_packets,
+    consumable_effects::{encode_remove_temporary_appearance, encode_temporary_appearance},
     encounter::SharedFieldState,
     players::{PlayerRegistry, SessionId, ZoneInstance},
     power_ups::Rng,
@@ -150,9 +169,10 @@ pub struct Boombox {
     pub item_id: i32,
     pub model_id: i32,
     pub kind: Kind,
-    /// The synchronized sequence, one animation per step (R: Sanctuary's rows). Empty unless
-    /// `kind` is `Synchronized`: an `Independent` row's dance ids are its `clips`, and a
-    /// `Transform` row has no dance data. The loader refuses a sequence on either.
+    /// The dance ids, one per step (R: Sanctuary's rows). A `Synchronized` row's sequence is its
+    /// stepped dance; a `Transform` row carries its one base dance (`dance_sequence[0]`); an
+    /// `Independent` row has no sequence (its ids are `clips`). The loader refuses an empty
+    /// sequence on the first two kinds and one on `Independent`.
     #[serde(default)]
     pub dance_sequence: Vec<i32>,
     /// Player model id -> one clip length per dance step. Empty unless `kind` is `Synchronized`,
@@ -198,19 +218,20 @@ impl Boombox {
         let ms = |v: u32| (1..=MAX_MS).contains(&v);
         let transform = self.kind == Kind::Transform;
         let synchronized = self.kind == Kind::Synchronized;
+        let independent = self.kind == Kind::Independent;
+        let sequence = self.dance_sequence.len();
         self.item_id > 0
             && self.model_id > 0
-            && synchronized == !self.dance_sequence.is_empty()
+            && (sequence > 0) != independent
+            && (!transform || sequence == 1)
             && self.dance_sequence.iter().all(|id| *id > 0)
             && self.song_effect_ids.iter().all(|id| *id > 0)
             && self.standing_animation_id >= 0
             && synchronized == !self.clip_ms.is_empty()
             && self.clip_ms.iter().all(|(model, clips)| {
-                *model > 0
-                    && clips.len() == self.dance_sequence.len()
-                    && clips.iter().all(|v| ms(*v))
+                *model > 0 && clips.len() == sequence && clips.iter().all(|v| ms(*v))
             })
-            && (self.kind == Kind::Independent) == !self.clips.is_empty()
+            && independent == !self.clips.is_empty()
             && self.clips.iter().all(|(model, clips)| {
                 *model > 0
                     && !clips.is_empty()
@@ -324,8 +345,15 @@ fn audience(
 /// A dancer's session and character guid.
 type Dancers = BTreeMap<SessionId, u64>;
 
-/// A dancer a box let go of: session, character guid and the box's zone.
-type Released = (SessionId, u64, ZoneInstance);
+/// A participant a box let go of: session, character guid, the box's zone and the temporary
+/// model it had (0 for a dance box).
+#[derive(Clone, Debug)]
+struct Released {
+    session: SessionId,
+    guid: u64,
+    zone: ZoneInstance,
+    model: i32,
+}
 
 /// Drop every dancer of `dancing` this box no longer owns (gone, mounted, out of range or taken by
 /// a higher-priority box), for the next idle fanout. `guid` is the character the dancer was shown
@@ -344,7 +372,12 @@ fn release_unowned<T>(
         .collect();
     for session in gone {
         if let Some(dancer) = dancing.remove(&session) {
-            released.push((session, guid(&dancer), zone));
+            released.push(Released {
+                session,
+                guid: guid(&dancer),
+                zone,
+                model: 0,
+            });
         }
     }
 }
@@ -357,8 +390,6 @@ struct Synchronized {
     step_ms: Vec<u32>,
     /// Player models with clips (the keys of `clip_ms`).
     models: BTreeSet<i32>,
-    range_m: f32,
-    priority: i32,
     /// The current step and when it ends; `None` until the first tick.
     clock: Option<(usize, u64)>,
     /// Who has been sent the current step.
@@ -372,8 +403,6 @@ impl Synchronized {
             sequence: row.dance_sequence.clone(),
             step_ms: (0..steps).map(|step| row.step_ms(step)).collect(),
             models: row.clip_ms.keys().copied().collect(),
-            range_m: row.range_m,
-            priority: row.priority,
             clock: None,
             dancing: Dancers::new(),
         }
@@ -439,20 +468,6 @@ impl Dance {
         }
     }
 
-    fn priority(&self) -> i32 {
-        match self {
-            Self::Synchronized(dance) => dance.priority,
-            Self::Independent(dance) => dance.row.priority,
-        }
-    }
-
-    fn range_m(&self) -> f32 {
-        match self {
-            Self::Synchronized(dance) => dance.range_m,
-            Self::Independent(dance) => dance.row.range_m,
-        }
-    }
-
     /// Whether the shown `model` may dance: a synchronized step needs clips for it, an
     /// independent dancer without a table stands on the row's standing group.
     fn allows(&self, model: i32) -> bool {
@@ -470,6 +485,44 @@ impl Dance {
                 .into_iter()
                 .map(|(session, solo)| (session, solo.guid))
                 .collect(),
+        }
+    }
+}
+
+/// One player a transform box has changed: its guid, the mount state it was applied in and the
+/// dance it was sent.
+#[derive(Clone, Debug)]
+struct Transformed {
+    guid: u64,
+    mounted: bool,
+    /// The client is playing the row's dance animation (35/8 base).
+    dancing: bool,
+    /// When to send 35/14 again after a mount change, if any.
+    reapply_at: Option<u64>,
+}
+
+/// A transform box's live spell: one model for everyone in range and who has it.
+#[derive(Clone, Debug)]
+struct Transform {
+    model: i32,
+    reapply_ms: u32,
+    /// The row's one dance, `dance_sequence[0]` (R: Sanctuary's `StartRealmsRollDance`).
+    dance: i32,
+    transformed: BTreeMap<SessionId, Transformed>,
+}
+
+impl Transform {
+    fn new(row: &Boombox) -> Self {
+        Self {
+            model: row.transform_model_id,
+            reapply_ms: row.transform_reapply_ms,
+            // The catalogue requires exactly one; a bad caller gets idle, not a tick panic.
+            dance: row
+                .dance_sequence
+                .first()
+                .copied()
+                .unwrap_or(IDLE_ANIMATION),
+            transformed: BTreeMap::new(),
         }
     }
 }
@@ -536,20 +589,41 @@ struct Placed {
     add: Vec<u8>,
     ends_ms: u64,
     seen_by: BTreeSet<SessionId>,
+    /// Who this box competes for, from the row. Equal priority goes to the nearer box.
+    priority: i32,
+    range_m: f32,
     /// `None` for `transform` rows, which do not dance.
     dance: Option<Dance>,
+    /// `None` for rows that do not transform.
+    transform: Option<Transform>,
 }
 
 impl Placed {
-    /// Let every dancer go (the box ends or is replaced); the next tick sends each idle unless
-    /// another box has taken them.
+    /// Let every participant go (the box ends or is replaced); the next tick sends each idle (and
+    /// a transform's 35/15) unless another box has taken them.
     fn release(&mut self) -> Vec<Released> {
         let zone = self.zone;
-        let dancing = self.dance.as_mut().map(Dance::leave).unwrap_or_default();
-        dancing
-            .into_iter()
-            .map(|(session, guid)| (session, guid, zone))
-            .collect()
+        let mut released = Vec::new();
+        for (session, guid) in self.dance.as_mut().map(Dance::leave).unwrap_or_default() {
+            released.push(Released {
+                session,
+                guid,
+                zone,
+                model: 0,
+            });
+        }
+        if let Some(transform) = self.transform.as_mut() {
+            let model = transform.model;
+            for (session, changed) in std::mem::take(&mut transform.transformed) {
+                released.push(Released {
+                    session,
+                    guid: changed.guid,
+                    zone,
+                    model,
+                });
+            }
+        }
+        released
     }
 
     /// The box, its poof (first sighting only) and its song, to one session.
@@ -591,7 +665,7 @@ impl Placed {
 pub struct Boomboxes {
     live: Vec<Placed>,
     next: u32,
-    /// Dancers of boxes that ended or were replaced, sent idle by the next tick.
+    /// Participants of boxes that ended or were replaced, sent idle (and 35/15) by the next tick.
     released: Vec<Released>,
     /// Draws the song of each box and every independent clip. One stream for the world, like
     /// Sanctuary's `Random.Shared`; the seed comes from the OS (0 if that fails).
@@ -662,6 +736,9 @@ impl Boomboxes {
             add,
             ends_ms: now_ms.saturating_add(u64::from(row.duration_ms)),
             seen_by: BTreeSet::new(),
+            priority: row.priority,
+            range_m: row.range_m,
+            transform: (row.kind == Kind::Transform).then(|| Transform::new(&row)),
             dance: Dance::new(row),
         };
         for session in players.nearby_sessions(zone, position) {
@@ -672,8 +749,9 @@ impl Boomboxes {
     }
 
     /// Once per tick: end boxes whose time is up, show the rest to sessions that came into range
-    /// and take it back from those that left, then step the dances. No boxes means no work.
-    pub fn tick(&mut self, now_ms: u64, players: &PlayerRegistry) -> Sends {
+    /// and take it back from those that left, then take one box per session (transform or dance)
+    /// and send it. No boxes means no work.
+    pub fn tick(&mut self, now_ms: u64, players: &mut PlayerRegistry) -> Sends {
         let mut sends = Sends::new();
         if self.live.is_empty() {
             return sends;
@@ -709,19 +787,22 @@ impl Boomboxes {
         sends
     }
 
-    /// Step every box's dance. `nears[i]` are the sessions near live box `i`.
+    /// One box per session (a transform applies, a dance box steps). `nears[i]` are the sessions
+    /// near live box `i`.
     fn dance(
         &mut self,
         now_ms: u64,
-        players: &PlayerRegistry,
+        players: &mut PlayerRegistry,
         nears: &[BTreeSet<SessionId>],
         sends: &mut Sends,
     ) {
-        // A session dances for one box: the highest priority, then the nearest, then the
+        // A session belongs to one box: the highest priority, then the nearest, then the
         // earliest placed. Value: (box index, priority, distance, character guid, shown model).
         let mut owner: BTreeMap<SessionId, (usize, i32, f32, u64, i32)> = BTreeMap::new();
         for (index, (placed, near)) in self.live.iter().zip(nears).enumerate() {
-            let Some(dance) = &placed.dance else { continue };
+            if placed.dance.is_none() && placed.transform.is_none() {
+                continue;
+            }
             for session in near {
                 let Some(player) = players.get(*session) else {
                     continue;
@@ -729,22 +810,32 @@ impl Boomboxes {
                 let dx = player.position[0] - placed.position[0];
                 let dz = player.position[2] - placed.position[2];
                 let distance = dx.hypot(dz);
+                if distance > placed.range_m {
+                    continue;
+                }
                 let model = player.presentation.display_model();
-                if !dance.allows(model)
-                    || players.is_mounted(*session)
-                    || !(distance <= dance.range_m())
+                if let Some(dance) = &placed.dance
+                    && (players.is_mounted(*session) || !dance.allows(model))
                 {
                     continue;
                 }
                 let wins = owner
                     .get(session)
                     .is_none_or(|&(_, priority, nearest, _, _)| {
-                        dance.priority() > priority
-                            || (dance.priority() == priority && distance < nearest)
+                        placed.priority > priority
+                            || (placed.priority == priority && distance < nearest)
                     });
                 if wins {
-                    let guid = player.character_guid;
-                    owner.insert(*session, (index, dance.priority(), distance, guid, model));
+                    owner.insert(
+                        *session,
+                        (
+                            index,
+                            placed.priority,
+                            distance,
+                            player.character_guid,
+                            model,
+                        ),
+                    );
                 }
             }
         }
@@ -753,105 +844,211 @@ impl Boomboxes {
         let rng = &mut self.rng;
         for (index, placed) in self.live.iter_mut().enumerate() {
             let zone = placed.zone;
-            let Some(dance) = &mut placed.dance else {
-                continue;
-            };
             // Who this box owns this tick, straight from the shared winner map.
             let owned = |session: &SessionId| owner.get(session).is_some_and(|o| o.0 == index);
-            match dance {
-                Dance::Synchronized(dance) => {
-                    let (step, began) = dance.step(now_ms);
-                    release_unowned(
-                        &mut dance.dancing,
-                        &owned,
-                        |guid: &u64| *guid,
-                        zone,
-                        &mut released,
-                    );
-                    for (session, o) in owner.iter().filter(|(_, o)| o.0 == index) {
-                        let guid = o.3;
-                        // Everyone when the step begins; otherwise only who is new to this box.
-                        if began || !dance.dancing.contains_key(session) {
-                            for viewer in audience(players, *session, guid, zone) {
-                                steps
-                                    .entry(viewer)
-                                    .or_default()
-                                    .push((guid, dance.sequence[step]));
+            if let Some(dance) = &mut placed.dance {
+                match dance {
+                    Dance::Synchronized(dance) => {
+                        let (step, began) = dance.step(now_ms);
+                        release_unowned(
+                            &mut dance.dancing,
+                            &owned,
+                            |guid: &u64| *guid,
+                            zone,
+                            &mut released,
+                        );
+                        for (session, o) in owner.iter().filter(|(_, o)| o.0 == index) {
+                            let guid = o.3;
+                            // Everyone when the step begins; otherwise only who is new here.
+                            if began || !dance.dancing.contains_key(session) {
+                                for viewer in audience(players, *session, guid, zone) {
+                                    steps
+                                        .entry(viewer)
+                                        .or_default()
+                                        .push((guid, dance.sequence[step]));
+                                }
                             }
+                            dance.dancing.insert(*session, guid);
                         }
-                        dance.dancing.insert(*session, guid);
+                    }
+                    Dance::Independent(dance) => {
+                        release_unowned(
+                            &mut dance.dancing,
+                            &owned,
+                            |solo: &Solo| solo.guid,
+                            zone,
+                            &mut released,
+                        );
+                        for (session, o) in owner.iter().filter(|(_, o)| o.0 == index) {
+                            let (guid, model) = (o.3, o.4);
+                            let previous = dance.dancing.get(session).filter(|solo| {
+                                solo.guid == guid && solo.model == model && now_ms < solo.ends_ms
+                            });
+                            // A clip still playing is kept as it is; no packet is sent for it.
+                            if previous.and_then(|solo| solo.clip).is_some() {
+                                continue;
+                            }
+                            let past = dance.dancing.get(session).and_then(|solo| solo.clip);
+                            let mut solo = Solo {
+                                guid,
+                                model,
+                                clip: None,
+                                ends_ms: 0,
+                            };
+                            match dance.row.clips.get(&model) {
+                                Some(clips) => {
+                                    if let Some(clip) = choose(clips, past.unwrap_or(0), rng) {
+                                        solo.clip = Some(clip.animation_id);
+                                        solo.ends_ms = clip_ends(now_ms, clip, dance.row.blend_ms);
+                                        // One single-entry 35/63 per viewer: an independent clip
+                                        // is not a group step, so it never shares a packet.
+                                        for viewer in audience(players, *session, guid, zone) {
+                                            sends.push((
+                                                viewer,
+                                                synchronized_animations(&[(
+                                                    guid,
+                                                    clip.animation_id,
+                                                )]),
+                                            ));
+                                        }
+                                    }
+                                }
+                                // Standing: send the row's standing group as base 35/8 once.
+                                None => {
+                                    if past.is_some() || !dance.dancing.contains_key(session) {
+                                        for viewer in audience(players, *session, guid, zone) {
+                                            let packet = animation_packet(
+                                                guid,
+                                                dance.row.standing_animation_id,
+                                                true,
+                                            );
+                                            sends.push((viewer, packet));
+                                        }
+                                    }
+                                }
+                            }
+                            dance.dancing.insert(*session, solo);
+                        }
                     }
                 }
-                Dance::Independent(dance) => {
-                    release_unowned(
-                        &mut dance.dancing,
-                        &owned,
-                        |solo: &Solo| solo.guid,
-                        zone,
-                        &mut released,
-                    );
-                    for (session, o) in owner.iter().filter(|(_, o)| o.0 == index) {
-                        let (guid, model) = (o.3, o.4);
-                        let previous = dance.dancing.get(session).filter(|solo| {
-                            solo.guid == guid && solo.model == model && now_ms < solo.ends_ms
+            } else if let Some(transform) = &mut placed.transform {
+                let (model, reapply_ms, dance) =
+                    (transform.model, transform.reapply_ms, transform.dance);
+                let gone: Vec<SessionId> = transform
+                    .transformed
+                    .keys()
+                    .filter(|session| !owned(session))
+                    .copied()
+                    .collect();
+                for session in gone {
+                    if let Some(changed) = transform.transformed.remove(&session) {
+                        released.push(Released {
+                            session,
+                            guid: changed.guid,
+                            zone,
+                            model,
                         });
-                        // A clip still playing is kept as it is; no packet is sent for it.
-                        if previous.and_then(|solo| solo.clip).is_some() {
+                    }
+                }
+                for (session, o) in owner.iter().filter(|(_, o)| o.0 == index) {
+                    let guid = o.3;
+                    let mounted = players.is_mounted(*session);
+                    if let Some(changed) = transform.transformed.get_mut(session) {
+                        if changed.mounted != mounted {
+                            changed.mounted = mounted;
+                            if changed.dancing {
+                                changed.dancing = false;
+                                for viewer in audience(players, *session, guid, zone) {
+                                    sends.push((
+                                        viewer,
+                                        animation_packet(guid, IDLE_ANIMATION, true),
+                                    ));
+                                }
+                            }
+                            changed.reapply_at = Some(now_ms.saturating_add(u64::from(reapply_ms)));
                             continue;
                         }
-                        let past = dance.dancing.get(session).and_then(|solo| solo.clip);
-                        let mut solo = Solo {
-                            guid,
-                            model,
-                            clip: None,
-                            ends_ms: 0,
-                        };
-                        match dance.row.clips.get(&model) {
-                            Some(clips) => {
-                                if let Some(clip) = choose(clips, past.unwrap_or(0), rng) {
-                                    solo.clip = Some(clip.animation_id);
-                                    solo.ends_ms = clip_ends(now_ms, clip, dance.row.blend_ms);
-                                    // One single-entry 35/63 per viewer: an independent clip is
-                                    // not a group step, so it never shares a packet.
-                                    for viewer in audience(players, *session, guid, zone) {
-                                        sends.push((
-                                            viewer,
-                                            synchronized_animations(&[(guid, clip.animation_id)]),
-                                        ));
-                                    }
-                                }
-                            }
-                            // Standing: send the row's standing group as the base 35/8 once.
-                            None => {
-                                if past.is_some() || !dance.dancing.contains_key(session) {
-                                    for viewer in audience(players, *session, guid, zone) {
-                                        let packet = animation_packet(
-                                            guid,
-                                            dance.row.standing_animation_id,
-                                            true,
-                                        );
-                                        sends.push((viewer, packet));
-                                    }
-                                }
+                        if !changed.reapply_at.is_some_and(|due| now_ms >= due) {
+                            continue;
+                        }
+                        changed.reapply_at = None;
+                        players.set_temporary_model(*session, model);
+                        let viewers = audience(players, *session, guid, zone);
+                        for viewer in &viewers {
+                            sends.push((*viewer, encode_temporary_appearance(model, guid)));
+                        }
+                        if !mounted {
+                            changed.dancing = true;
+                            for viewer in &viewers {
+                                sends.push((*viewer, animation_packet(guid, dance, true)));
                             }
                         }
-                        dance.dancing.insert(*session, solo);
+                    } else {
+                        players.set_temporary_model(*session, model);
+                        let viewers = audience(players, *session, guid, zone);
+                        for viewer in &viewers {
+                            sends.push((*viewer, encode_temporary_appearance(model, guid)));
+                        }
+                        if !mounted {
+                            for viewer in &viewers {
+                                sends.push((*viewer, animation_packet(guid, dance, true)));
+                            }
+                        }
+                        transform.transformed.insert(
+                            *session,
+                            Transformed {
+                                guid,
+                                mounted,
+                                dancing: !mounted,
+                                reapply_at: None,
+                            },
+                        );
                     }
+                }
+            }
+        }
+        // Releases before the new steps: a transform-to-dance hand-over must revert the
+        // temporary appearance before the new box's step starts on the base model. A player
+        // another box took needs no idle: that box's packets already say what to play.
+        for released in released {
+            let next = owner.get(&released.session).map(|o| o.0);
+            let next_model = next
+                .and_then(|index| self.live[index].transform.as_ref())
+                .map_or(0, |transform| transform.model);
+            if released.model != 0 {
+                players.set_temporary_model(released.session, next_model);
+            }
+            if next.is_some() && (released.model == 0 || next_model != 0) {
+                continue;
+            }
+            let viewers = audience(players, released.session, released.guid, released.zone);
+            if released.model != 0 && next_model == 0 {
+                for viewer in &viewers {
+                    sends.push((*viewer, encode_remove_temporary_appearance(released.guid)));
+                }
+                // The 35/15 dropped the appearance; a consumable transform (T512) the boombox
+                // overrode is still the player's live look, so put it back before the idle.
+                let restore = players
+                    .get(released.session)
+                    .map_or(0, |player| player.presentation.temporary_model);
+                if restore > 0 {
+                    for viewer in &viewers {
+                        sends.push((*viewer, encode_temporary_appearance(restore, released.guid)));
+                    }
+                }
+            }
+            if next.is_none() {
+                for viewer in viewers {
+                    sends.push((
+                        viewer,
+                        animation_packet(released.guid, IDLE_ANIMATION, true),
+                    ));
                 }
             }
         }
         for (viewer, entries) in steps {
             for chunk in entries.chunks(MAX_ENTRIES) {
                 sends.push((viewer, synchronized_animations(chunk)));
-            }
-        }
-        // A dancer another box took this tick is already dancing there.
-        for (session, guid, zone) in released {
-            if owner.contains_key(&session) {
-                continue;
-            }
-            for viewer in audience(players, session, guid, zone) {
-                sends.push((viewer, animation_packet(guid, IDLE_ANIMATION, true)));
             }
         }
     }
@@ -871,7 +1068,10 @@ impl Boomboxes {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use crate::players::InterestPolicy;
+    use crate::{
+        mounts::MountTail,
+        players::{InterestPolicy, PlayerPresentation},
+    };
 
     const RAINBOW: i32 = 1913; // the one shipped row with songs
     const TOTEM: i32 = 8185; // no songs
@@ -924,6 +1124,95 @@ mod tests {
         }
         bytes.push(0);
         bytes
+    }
+
+    /// Sessions `id` (character `id + 600`) as `(id, model, x, z, zone)`, all at y 1.
+    fn world(cap: usize, who: &[(u64, i32, f32, f32, ZoneInstance)]) -> PlayerRegistry {
+        let mut players = PlayerRegistry::new(InterestPolicy::new(100.0, cap).unwrap());
+        for (id, model, x, z, zone) in who {
+            join(&mut players, *id, *model, [*x, 1.0, *z], *zone);
+        }
+        players
+    }
+
+    fn join(
+        players: &mut PlayerRegistry,
+        id: u64,
+        model: i32,
+        at: [f32; 3],
+        zone: ZoneInstance,
+    ) -> Vec<crate::players::OutboundMessage> {
+        let mut look = PlayerPresentation::default();
+        look.character_guid = id + 600;
+        look.model = model;
+        let session = SessionId(id);
+        let joined =
+            players.join_with_presentation(session, id + 500, id + 600, zone, at, 0.0, look);
+        joined.unwrap()
+    }
+
+    fn walk(players: &mut PlayerRegistry, id: u64, x: f32) {
+        let zone = players.get(SessionId(id)).unwrap().zone;
+        let at = [x, 1.0, 0.0];
+        let moved = players.update_pose_with_state(SessionId(id), zone, at, 0.0, 0, 0);
+        moved.unwrap();
+    }
+
+    /// A press at the origin: the box stands 2 m toward -x.
+    fn press(live: &mut Boomboxes, row: &Boombox, owner: u64, now: u64, p: &PlayerRegistry) {
+        live.spawn(
+            Arc::new(row.clone()),
+            owner,
+            ZONE,
+            [0.0, 1.0, 0.0],
+            0.0,
+            now,
+            p,
+        );
+    }
+
+    fn ride(guid: u64) -> MountTail {
+        MountTail {
+            ride_guid: guid,
+            seat: 0,
+            queue: 0,
+            lift: 0.0,
+        }
+    }
+
+    /// The `(guid, animation)` entries of each 35/63 a session was sent.
+    fn steps(sends: &Sends, session: u64) -> Vec<Vec<(u64, i32)>> {
+        let packets = to(sends, session);
+        let sync = packets
+            .into_iter()
+            .filter(|p| p.starts_with(&[35, 0, 63, 0]));
+        sync.map(|p| {
+            let count = i32::from_le_bytes(p[4..8].try_into().unwrap()) as usize;
+            assert_eq!(p.len(), 8 + 12 * count, "count matches the bytes");
+            (0..count)
+                .map(|i| {
+                    let at = 8 + 12 * i;
+                    let guid = u64::from_le_bytes(p[at..at + 8].try_into().unwrap());
+                    let anim = i32::from_le_bytes(p[at + 8..at + 12].try_into().unwrap());
+                    (guid, anim)
+                })
+                .collect()
+        })
+        .collect()
+    }
+
+    /// The characters a session was told to stand idle: 35/8, animation 1, base set.
+    fn idles(sends: &Sends, session: u64) -> Vec<u64> {
+        let packets = to(sends, session);
+        let idle = packets
+            .into_iter()
+            .filter(|p| p.starts_with(&[35, 0, 8, 0]));
+        idle.map(|p| {
+            assert_eq!(p[12..16], 1_i32.to_le_bytes(), "loc_stand");
+            assert_eq!(p[20], 1, "the base flag");
+            u64::from_le_bytes(p[4..12].try_into().unwrap())
+        })
+        .collect()
     }
 
     #[test]
@@ -984,7 +1273,7 @@ mod tests {
     #[test]
     fn expiry_stops_the_song_poofs_and_removes_once_then_nothing() {
         let mut live = Boomboxes::default();
-        let players = registry();
+        let mut players = registry();
         live.spawn(
             Arc::new(row(RAINBOW)),
             600,
@@ -997,13 +1286,13 @@ mod tests {
         // Before its time is up the box only steps its dance: the near session (model 0, no
         // table) stands on the row's group as one base 35/8; the viewer that knows it hears the
         // same one packet, with no dancer of its own, and the far session hears nothing.
-        let early = live.tick(1_000 + 179_999, &players);
+        let early = live.tick(1_000 + 179_999, &mut players);
         let standing = animation_packet(601, 3_550, true);
         assert_eq!(to(&early, 1), [standing.as_slice()]);
         assert_eq!(to(&early, 2), [standing.as_slice()]);
         assert!(to(&early, 3).is_empty(), "the far session is not shown it");
         assert!(early.iter().all(|(_, p)| p.starts_with(&[35, 0, 8, 0])));
-        let ended = live.tick(1_000 + 180_000, &players);
+        let ended = live.tick(1_000 + 180_000, &mut players);
         let guid = GUID_TAG | 1;
         for session in [1, 2] {
             let packets = scenery(&to(&ended, session));
@@ -1016,7 +1305,7 @@ mod tests {
             assert_eq!(packets[2], SharedFieldState::removal(guid));
         }
         assert!(to(&ended, 3).is_empty());
-        assert!(live.tick(1_000 + 999_999, &players).is_empty());
+        assert!(live.tick(1_000 + 999_999, &mut players).is_empty());
         assert!(live.live.is_empty());
     }
 
@@ -1040,25 +1329,25 @@ mod tests {
                 .unwrap();
         };
         arrive(&mut players);
-        let shown = live.tick(50, &players);
+        let shown = live.tick(50, &mut players);
         let packets = scenery(&to(&shown, 3));
         assert_eq!(packets.len(), 2, "AddNpc and song, no poof");
         assert!(packets[0].starts_with(&[35, 0, 2, 0]) && packets[1].starts_with(&[35, 0, 41, 0]));
-        assert!(live.tick(100, &players).is_empty(), "exactly once");
+        assert!(live.tick(100, &mut players).is_empty(), "exactly once");
         // Walking out sends the removal; coming back shows the box again.
         players
             .update_pose_with_state(SessionId(3), ZONE, [900.0, 1.0, 0.0], 0.0, 0, 0)
             .unwrap();
-        let gone = live.tick(150, &players);
+        let gone = live.tick(150, &mut players);
         assert_eq!(
             scenery(&to(&gone, 3)),
             [SharedFieldState::removal(guid).as_slice()]
         );
         arrive(&mut players);
-        assert_eq!(scenery(&to(&live.tick(200, &players), 3)).len(), 2);
+        assert_eq!(scenery(&to(&live.tick(200, &mut players), 3)).len(), 2);
         // A session that left the registry is dropped without a word.
         let _ = players.leave(SessionId(3));
-        assert!(live.tick(250, &players).is_empty());
+        assert!(live.tick(250, &mut players).is_empty());
         assert!(live.live[0].seen_by.iter().all(|s| s.0 != 3));
     }
 
@@ -1140,7 +1429,7 @@ mod tests {
     /// T463: synchronized dances.
     mod dancing {
         use super::*;
-        use crate::{mounts::MountTail, players::PlayerPresentation};
+        use crate::mounts::MountTail;
 
         const JINGLE: i32 = 878; // synchronized, four steps: 3531 to 3534, blend 600
         const HUMAN_M: i32 = 1;
@@ -1279,22 +1568,22 @@ mod tests {
 
         #[test]
         fn dancers_in_range_get_the_same_step_in_one_tick_and_it_advances_on_the_clock() {
-            let players = world(
+            let mut players = world(
                 16,
                 &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_F, 5.0, 3.0, ZONE)],
             );
             let mut live = Boomboxes::default();
             press(&mut live, &row(JINGLE), 600, 1_000, &players);
             let both = |anim| vec![vec![(601, anim), (602, anim)]];
-            let first = live.tick(1_000, &players);
+            let first = live.tick(1_000, &mut players);
             assert_eq!(steps(&first, 1), both(3531));
             assert_eq!(steps(&first, 2), both(3531));
             for (now, anim) in [(5_234, 3532), (9_068, 3533), (15_135, 3534), (25_535, 3531)] {
                 assert!(STEP_ENDS.contains(&now));
                 // One tick before the boundary nothing moves; at it both get the next step.
-                let before = live.tick(now - 1, &players);
+                let before = live.tick(now - 1, &mut players);
                 assert!(steps(&before, 1).is_empty(), "tick {}", now - 1);
-                let sends = live.tick(now, &players);
+                let sends = live.tick(now, &mut players);
                 assert_eq!(steps(&sends, 1), both(anim), "tick {now}");
                 assert_eq!(steps(&sends, 2), both(anim), "tick {now}");
             }
@@ -1318,7 +1607,7 @@ mod tests {
             players.set_mount(SessionId(4), ride(1));
             let mut live = Boomboxes::default();
             press(&mut live, &row(JINGLE), 600, 0, &players);
-            let sends = live.tick(10, &players);
+            let sends = live.tick(10, &mut players);
             // The two dancers are listed, and only them, wherever they are heard.
             for session in [1, 2, 4, 5, 6, 7, 8] {
                 for list in steps(&sends, session) {
@@ -1336,7 +1625,7 @@ mod tests {
             let high = [-2.0, 40.0, 14.0];
             let moved = players.update_pose_with_state(SessionId(8), ZONE, high, 0.0, 0, 0);
             moved.unwrap();
-            let sends = live.tick(20, &players);
+            let sends = live.tick(20, &mut players);
             assert_eq!(steps(&sends, 8), [[(608, 3531)]], "a joiner, heard alone");
         }
 
@@ -1348,13 +1637,16 @@ mod tests {
             );
             let mut live = Boomboxes::default();
             press(&mut live, &row(JINGLE), 600, 0, &players);
-            live.tick(0, &players);
+            live.tick(0, &mut players);
             walk(&mut players, 1, 40.0);
-            let sends = live.tick(50, &players);
+            let sends = live.tick(50, &mut players);
             assert_eq!(idles(&sends, 1), [601]);
             assert_eq!(idles(&sends, 2), [601], "the viewer who knows them");
             assert!(steps(&sends, 1).is_empty());
-            assert!(live.tick(100, &players).is_empty(), "once, then nothing");
+            assert!(
+                live.tick(100, &mut players).is_empty(),
+                "once, then nothing"
+            );
         }
 
         #[test]
@@ -1365,44 +1657,44 @@ mod tests {
             );
             let mut live = Boomboxes::default();
             press(&mut live, &row(JINGLE), 600, 1_000, &players);
-            live.tick(1_000, &players);
+            live.tick(1_000, &mut players);
             players.set_mount(SessionId(1), ride(7));
-            let sends = live.tick(1_050, &players);
+            let sends = live.tick(1_050, &mut players);
             assert_eq!((idles(&sends, 1), idles(&sends, 2)), (vec![601], vec![601]));
-            assert!(live.tick(1_100, &players).is_empty());
+            assert!(live.tick(1_100, &mut players).is_empty());
             // Off the ride the dancer joins at the step now playing, as a single entry.
             players.set_mount(SessionId(1), MountTail::NONE);
-            let sends = live.tick(1_150, &players);
+            let sends = live.tick(1_150, &mut players);
             assert_eq!(steps(&sends, 1), [[(601, 3531)]]);
             assert_eq!(steps(&sends, 2), [[(601, 3531)]]);
         }
 
         #[test]
         fn expiry_sends_idle_to_every_dancer_and_then_nothing() {
-            let players = world(
+            let mut players = world(
                 16,
                 &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_F, 4.0, 0.0, ZONE)],
             );
             let mut live = Boomboxes::default();
             press(&mut live, &row(JINGLE), 600, 0, &players);
-            live.tick(0, &players);
-            let ended = live.tick(180_000, &players);
+            live.tick(0, &mut players);
+            let ended = live.tick(180_000, &mut players);
             assert_eq!(idles(&ended, 1), [601, 602]);
             assert_eq!(idles(&ended, 2), [601, 602]);
             assert!(steps(&ended, 1).is_empty());
-            assert!(live.tick(180_050, &players).is_empty());
+            assert!(live.tick(180_050, &mut players).is_empty());
         }
 
         #[test]
         fn a_replaced_box_lets_its_dancers_go() {
-            let players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+            let mut players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
             let mut live = Boomboxes::default();
             press(&mut live, &row(JINGLE), 600, 0, &players);
-            live.tick(0, &players);
+            live.tick(0, &mut players);
             // The owner presses again 500 m away: the first box ends under the dancer.
             let again = [500.0, 1.0, 0.0];
             live.spawn(Arc::new(row(JINGLE)), 600, ZONE, again, 0.0, 100, &players);
-            let sends = live.tick(150, &players);
+            let sends = live.tick(150, &mut players);
             assert_eq!(idles(&sends, 1), [601]);
             assert!(steps(&sends, 1).is_empty());
         }
@@ -1419,18 +1711,18 @@ mod tests {
             let mut live = Boomboxes::default();
             press(&mut live, &quiet, 600, 0, &players);
             press(&mut live, &loud, 601, 0, &players);
-            let sends = live.tick(10, &players);
+            let sends = live.tick(10, &mut players);
             assert_eq!(steps(&sends, 1), [[(601, 3551)]], "listed by one box only");
             // Equal priority: the nearer wins, whichever was placed first.
             loud.priority = 0;
             let mut live = Boomboxes::default();
             press(&mut live, &loud, 601, 0, &players);
             press(&mut live, &quiet, 600, 0, &players);
-            let sends = live.tick(10, &players);
+            let sends = live.tick(10, &mut players);
             assert_eq!(steps(&sends, 1), [[(601, 3531)]]);
             // Walking to the loud box's side hands the dancer over with no idle between.
             walk(&mut players, 1, -10.0);
-            let sends = live.tick(20, &players);
+            let sends = live.tick(20, &mut players);
             assert!(idles(&sends, 1).is_empty());
             assert_eq!(steps(&sends, 1), [[(601, 3551)]]);
         }
@@ -1438,7 +1730,7 @@ mod tests {
         #[test]
         fn a_viewer_is_told_only_about_the_dancers_it_knows() {
             // Each session sees only its nearest neighbour.
-            let players = world(
+            let mut players = world(
                 1,
                 &[
                     (1, HUMAN_M, 0.0, 0.0, ZONE),
@@ -1449,7 +1741,7 @@ mod tests {
             assert!(!players.knows_character(SessionId(3), 601));
             let mut live = Boomboxes::default();
             press(&mut live, &row(JINGLE), 600, 0, &players);
-            let sends = live.tick(0, &players);
+            let sends = live.tick(0, &mut players);
             assert_eq!(steps(&sends, 3), [[(602, 3531)]], "it does not know 601");
             assert_eq!(
                 steps(&sends, 2),
@@ -1463,10 +1755,10 @@ mod tests {
             let who: Vec<_> = (1..=70)
                 .map(|id| (id, HUMAN_M, (id % 10) as f32, 0.0, ZONE))
                 .collect();
-            let players = world(200, &who);
+            let mut players = world(200, &who);
             let mut live = Boomboxes::default();
             press(&mut live, &row(JINGLE), 600, 0, &players);
-            let sends = live.tick(0, &players);
+            let sends = live.tick(0, &mut players);
             let sizes: Vec<_> = steps(&sends, 1).iter().map(Vec::len).collect();
             assert_eq!(sizes, [64, 6]);
         }
@@ -1479,30 +1771,30 @@ mod tests {
             );
             let mut live = Boomboxes::default();
             press(&mut live, &row(JINGLE), 600, 1_000, &players);
-            live.tick(1_000, &players);
+            live.tick(1_000, &mut players);
             let _ = players.leave(SessionId(1));
-            let sends = live.tick(1_050, &players);
+            let sends = live.tick(1_050, &mut players);
             assert!(sends.is_empty(), "the leaver's viewers were told it left");
             // The box and its remaining dancer carry on at the next step.
-            let sends = live.tick(STEP_ENDS[0], &players);
+            let sends = live.tick(STEP_ENDS[0], &mut players);
             assert_eq!(steps(&sends, 2), [[(602, 3532)]]);
             // A reconnect is a new session with no dance: out of range it hears nothing, and
             // walking in makes it a joiner at the step now playing.
             join(&mut players, 11, HUMAN_M, [900.0, 1.0, 0.0], ZONE);
-            assert!(live.tick(STEP_ENDS[0] + 50, &players).is_empty());
+            assert!(live.tick(STEP_ENDS[0] + 50, &mut players).is_empty());
             walk(&mut players, 11, 3.0);
-            let sends = live.tick(STEP_ENDS[0] + 100, &players);
+            let sends = live.tick(STEP_ENDS[0] + 100, &mut players);
             assert_eq!(steps(&sends, 11), [[(611, 3532)]]);
         }
 
         #[test]
         fn other_kinds_and_empty_worlds_send_nothing() {
-            let players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+            let mut players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
             let mut live = Boomboxes::default();
-            assert!(live.tick(0, &players).is_empty(), "no live box");
+            assert!(live.tick(0, &mut players).is_empty(), "no live box");
             // Realms Roll transforms its dancers; only a synchronized or independent row dances.
             press(&mut live, &row(1180), 1180, 0, &players);
-            let sends = live.tick(10, &players);
+            let sends = live.tick(10, &mut players);
             assert!(steps(&sends, 1).is_empty() && idles(&sends, 1).is_empty());
         }
 
@@ -1544,7 +1836,7 @@ mod tests {
 
             #[test]
             fn every_roll_comes_from_the_model_table_and_never_repeats_the_last() {
-                let players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+                let mut players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
                 let table = ids(RAINBOW, HUMAN_M);
                 assert_eq!(table.len(), 73, "the Rainbow Randomizer's model-1 table");
                 let mut live = seeded(7);
@@ -1555,7 +1847,7 @@ mod tests {
                 let mut now = 1_000;
                 let mut previous = None;
                 for roll in 0..30 {
-                    let sends = live.tick(now, &players);
+                    let sends = live.tick(now, &mut players);
                     let entries = rolled(&sends, 1);
                     assert_eq!(entries.len(), 1, "roll {roll} at {now}: {entries:?}");
                     let (guid, animation) = entries[0];
@@ -1576,13 +1868,13 @@ mod tests {
 
             #[test]
             fn two_dancers_can_hold_different_clips_at_the_same_moment() {
-                let players = world(
+                let mut players = world(
                     16,
                     &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_M, 4.0, 0.0, ZONE)],
                 );
                 let mut live = seeded(1);
                 press(&mut live, &row(RAINBOW), 600, 0, &players);
-                let sends = live.tick(0, &players);
+                let sends = live.tick(0, &mut players);
                 // One single-entry 35/63 per dancer, not one packet with both entries.
                 let packets = steps(&sends, 1);
                 assert_eq!(packets.len(), 2, "one packet per dancer");
@@ -1598,7 +1890,7 @@ mod tests {
 
             #[test]
             fn a_two_clip_table_alternates_and_never_repeats() {
-                let players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+                let mut players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
                 // With only two clips every roll must be the one not playing, so an "allow a
                 // repeat" regression fails here; on the 73-clip table it could pass for a seed.
                 let mut short = row(RAINBOW);
@@ -1621,7 +1913,7 @@ mod tests {
                 let mut now = 0;
                 let mut previous = None;
                 for roll in 0..20 {
-                    let entries = rolled(&live.tick(now, &players), 1);
+                    let entries = rolled(&live.tick(now, &mut players), 1);
                     assert_eq!(entries.len(), 1, "roll {roll} at {now}");
                     let animation = entries[0].1;
                     assert_ne!(
@@ -1656,7 +1948,7 @@ mod tests {
                 );
                 let mut live = seeded(5);
                 press(&mut live, &row(RAINBOW), 600, 0, &players);
-                let sends = live.tick(0, &players);
+                let sends = live.tick(0, &mut players);
                 assert!(
                     steps(&sends, 1).is_empty(),
                     "the shown model has no table: no 35/63"
@@ -1666,18 +1958,18 @@ mod tests {
 
             #[test]
             fn a_replaced_independent_box_lets_its_dancers_go() {
-                let players = world(
+                let mut players = world(
                     16,
                     &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_M, 4.0, 0.0, ZONE)],
                 );
                 let mut live = seeded(6);
                 press(&mut live, &row(RAINBOW), 600, 0, &players);
-                live.tick(0, &players);
+                live.tick(0, &mut players);
                 // The owner presses again 500 m away: the first box ends under both dancers, who
                 // get the idle and no further clip.
                 let again = [500.0, 1.0, 0.0];
                 live.spawn(Arc::new(row(RAINBOW)), 600, ZONE, again, 0.0, 100, &players);
-                let sends = live.tick(150, &players);
+                let sends = live.tick(150, &mut players);
                 assert_eq!(idles(&sends, 1), [601, 602]);
                 assert_eq!(idles(&sends, 2), [601, 602]);
                 assert!(steps(&sends, 1).is_empty());
@@ -1714,20 +2006,20 @@ mod tests {
 
             #[test]
             fn a_model_without_a_table_stands_on_the_row_group_as_a_base_animation() {
-                let players = world(16, &[(1, TRANSFORMED, 0.0, 0.0, ZONE)]);
+                let mut players = world(16, &[(1, TRANSFORMED, 0.0, 0.0, ZONE)]);
                 let mut live = seeded(5);
                 press(&mut live, &row(RAINBOW), 600, 0, &players);
-                let sends = live.tick(0, &players);
+                let sends = live.tick(0, &mut players);
                 assert!(steps(&sends, 1).is_empty(), "no 35/63");
                 assert_eq!(bases(&sends, 1), [(601, 3_550)]);
                 // The base plays until the box ends: it is sent once, not every tick.
-                let again = live.tick(5_000, &players);
+                let again = live.tick(5_000, &mut players);
                 assert!(bases(&again, 1).is_empty() && steps(&again, 1).is_empty());
             }
 
             #[test]
             fn a_one_clip_table_repeats_it_instead_of_rerolling_forever() {
-                let players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+                let mut players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
                 let mut single = row(RAINBOW);
                 single.clips.insert(
                     HUMAN_M,
@@ -1738,14 +2030,14 @@ mod tests {
                 );
                 let mut live = seeded(9);
                 press(&mut live, &single, 600, 0, &players);
-                assert_eq!(rolled(&live.tick(0, &players), 1), [(601, 3_201)]);
-                assert!(live.tick(4_399, &players).is_empty(), "still playing");
-                assert_eq!(rolled(&live.tick(4_400, &players), 1), [(601, 3_201)]);
+                assert_eq!(rolled(&live.tick(0, &mut players), 1), [(601, 3_201)]);
+                assert!(live.tick(4_399, &mut players).is_empty(), "still playing");
+                assert_eq!(rolled(&live.tick(4_400, &mut players), 1), [(601, 3_201)]);
             }
 
             #[test]
             fn a_clip_shorter_than_the_blend_waits_a_second() {
-                let players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+                let mut players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
                 let mut short = row(RAINBOW);
                 short.clips.insert(
                     HUMAN_M,
@@ -1762,10 +2054,10 @@ mod tests {
                 );
                 let mut live = seeded(4);
                 press(&mut live, &short, 600, 0, &players);
-                let first = rolled(&live.tick(0, &players), 1);
+                let first = rolled(&live.tick(0, &mut players), 1);
                 assert_eq!(first.len(), 1);
-                assert!(live.tick(999, &players).is_empty(), "the 1000 ms floor");
-                let second = rolled(&live.tick(1_000, &players), 1);
+                assert!(live.tick(999, &mut players).is_empty(), "the 1000 ms floor");
+                let second = rolled(&live.tick(1_000, &mut players), 1);
                 assert_eq!(second.len(), 1);
                 assert_ne!(first[0].1, second[0].1);
             }
@@ -1779,26 +2071,26 @@ mod tests {
                 let mut live = seeded(6);
                 let rainbow = row(RAINBOW);
                 press(&mut live, &rainbow, 600, 1_000, &players);
-                live.tick(1_000, &players);
+                live.tick(1_000, &mut players);
                 // Walking out of range frees only the leaver, told to them and their viewer.
                 walk(&mut players, 1, 40.0);
-                let left = live.tick(1_100, &players);
+                let left = live.tick(1_100, &mut players);
                 assert_eq!(idles(&left, 1), [601]);
                 assert_eq!(idles(&left, 2), [601], "session 2 knows session 1");
                 walk(&mut players, 1, 0.0);
-                live.tick(1_200, &players);
+                live.tick(1_200, &mut players);
                 // Mounting frees the rider, then the box's own expiry frees the rest.
                 players.set_mount(SessionId(1), ride(7));
-                let mounted = live.tick(1_300, &players);
+                let mounted = live.tick(1_300, &mut players);
                 assert_eq!(idles(&mounted, 1), [601]);
                 players.set_mount(SessionId(1), MountTail::NONE);
-                live.tick(1_400, &players);
-                let ended = live.tick(1_000 + u64::from(rainbow.duration_ms), &players);
+                live.tick(1_400, &mut players);
+                let ended = live.tick(1_000 + u64::from(rainbow.duration_ms), &mut players);
                 assert_eq!(idles(&ended, 1), [601, 602]);
                 assert_eq!(idles(&ended, 2), [601, 602]);
                 assert!(steps(&ended, 1).is_empty());
                 assert!(
-                    live.tick(1_000 + u64::from(rainbow.duration_ms) + 50, &players)
+                    live.tick(1_000 + u64::from(rainbow.duration_ms) + 50, &mut players)
                         .is_empty()
                 );
             }
@@ -1811,26 +2103,26 @@ mod tests {
                 );
                 let mut live = seeded(13);
                 press(&mut live, &row(RAINBOW), 600, 1_000, &players);
-                let first = rolled(&live.tick(1_000, &players), 2);
+                let first = rolled(&live.tick(1_000, &mut players), 2);
                 let own = first
                     .iter()
                     .find(|(guid, _)| *guid == 602)
                     .expect("session 2 sees its own clip");
                 let _ = players.leave(SessionId(1));
                 assert!(
-                    live.tick(1_050, &players).is_empty(),
+                    live.tick(1_050, &mut players).is_empty(),
                     "the leaver's viewers were told it left"
                 );
                 // The remaining dancer re-rolls on its own clock.
-                let sends = live.tick(ends(RAINBOW, 1_000, own.1), &players);
+                let sends = live.tick(ends(RAINBOW, 1_000, own.1), &mut players);
                 let second = rolled(&sends, 2);
                 assert_eq!(second.len(), 1);
                 assert_ne!(second[0].1, own.1);
                 // A reconnect is a new session: walking in joins at a fresh clip.
                 join(&mut players, 11, HUMAN_M, [900.0, 1.0, 0.0], ZONE);
-                assert!(rolled(&live.tick(75_000, &players), 11).is_empty());
+                assert!(rolled(&live.tick(75_000, &mut players), 11).is_empty());
                 walk(&mut players, 11, 3.0);
-                assert_eq!(rolled(&live.tick(75_050, &players), 11).len(), 1);
+                assert_eq!(rolled(&live.tick(75_050, &mut players), 11).len(), 1);
             }
 
             #[test]
@@ -1839,12 +2131,414 @@ mod tests {
                 assert_eq!(ids(REALMSHAKE, HUMAN_M).len(), 53);
                 assert_eq!(ids(RAINBOW, HUMAN_F), ids(RAINBOW, HUMAN_M));
                 // A model with a table but a different one still never rolls outside its own.
-                let players = world(16, &[(1, HUMAN_F, 0.0, 0.0, ZONE)]);
+                let mut players = world(16, &[(1, HUMAN_F, 0.0, 0.0, ZONE)]);
                 let table = ids(RAINBOW, HUMAN_F);
                 let mut live = seeded(12);
                 press(&mut live, &row(RAINBOW), 600, 0, &players);
-                assert!(table.contains(&rolled(&live.tick(0, &players), 1)[0].1));
+                assert!(table.contains(&rolled(&live.tick(0, &mut players), 1)[0].1));
             }
+        }
+    }
+
+    /// T492: the Realms Roll transform (row 1180, model 1941, dance 3541).
+    mod transforms {
+        use super::*;
+
+        const REALMS_ROLL: i32 = 1180;
+        const JINGLE: i32 = 878;
+        const HUMAN_M: i32 = 1;
+        const MODEL: i32 = 1941; // human_m_realmsroll.adr (Models.txt:1915)
+        const DANCE: i32 = 3541; // emo_dance_rroll_01 (AnimationTypes.xml:1054)
+        const OTHER: ZoneInstance = ZoneInstance {
+            zone_id: 0,
+            instance_id: 1,
+        };
+
+        /// 35/14, reader `008d6890`: header, i32 model, u64 guid.
+        fn appearance(guid: u64, model: i32) -> Vec<u8> {
+            let mut bytes = vec![35, 0, 14, 0];
+            bytes.extend(model.to_le_bytes());
+            bytes.extend(guid.to_le_bytes());
+            bytes
+        }
+
+        /// 35/15, reader `008d7230`: header, u64 guid, i32 0.
+        fn revert(guid: u64) -> Vec<u8> {
+            let mut bytes = vec![35, 0, 15, 0];
+            bytes.extend(guid.to_le_bytes());
+            bytes.extend(0_i32.to_le_bytes());
+            bytes
+        }
+
+        /// The `(model, guid)` of every 35/14 a session was sent.
+        fn appearances(sends: &Sends, session: u64) -> Vec<(i32, u64)> {
+            let packets = to(sends, session);
+            let appearance = packets
+                .into_iter()
+                .filter(|p| p.starts_with(&[35, 0, 14, 0]));
+            appearance
+                .map(|p| {
+                    assert_eq!(p.len(), 16);
+                    (
+                        i32::from_le_bytes(p[4..8].try_into().unwrap()),
+                        u64::from_le_bytes(p[8..16].try_into().unwrap()),
+                    )
+                })
+                .collect()
+        }
+
+        /// The guids of every 35/15 a session was sent.
+        fn reversions(sends: &Sends, session: u64) -> Vec<u64> {
+            let packets = to(sends, session);
+            let revert = packets
+                .into_iter()
+                .filter(|p| p.starts_with(&[35, 0, 15, 0]));
+            revert
+                .map(|p| {
+                    assert_eq!(p.len(), 16);
+                    assert_eq!(p[12..16], 0_i32.to_le_bytes());
+                    u64::from_le_bytes(p[4..12].try_into().unwrap())
+                })
+                .collect()
+        }
+
+        /// The `(guid, animation, base)` of every 35/8 a session was sent.
+        fn animations(sends: &Sends, session: u64) -> Vec<(u64, i32, bool)> {
+            let packets = to(sends, session);
+            let animation = packets
+                .into_iter()
+                .filter(|p| p.starts_with(&[35, 0, 8, 0]));
+            animation
+                .map(|p| {
+                    (
+                        u64::from_le_bytes(p[4..12].try_into().unwrap()),
+                        i32::from_le_bytes(p[12..16].try_into().unwrap()),
+                        p[20] == 1,
+                    )
+                })
+                .collect()
+        }
+
+        /// The models sent for `guid`, however many other players share the audience.
+        fn own(sends: &Sends, session: u64, guid: u64) -> Vec<i32> {
+            appearances(sends, session)
+                .into_iter()
+                .filter(|(_, named)| *named == guid)
+                .map(|(model, _)| model)
+                .collect()
+        }
+
+        /// The animations sent for `guid`, as `(animation, base)`.
+        fn own_animations(sends: &Sends, session: u64, guid: u64) -> Vec<(i32, bool)> {
+            animations(sends, session)
+                .into_iter()
+                .filter(|(named, _, _)| *named == guid)
+                .map(|(_, animation, base)| (animation, base))
+                .collect()
+        }
+
+        /// The 35/8 dance a transform row plays: `dance_sequence[0]` with the base flag.
+        fn dance(guid: u64, animation: i32) -> Vec<u8> {
+            let mut bytes = vec![35, 0, 8, 0];
+            bytes.extend(guid.to_le_bytes());
+            bytes.extend(animation.to_le_bytes());
+            bytes.extend(0_i32.to_le_bytes());
+            bytes.push(1);
+            bytes
+        }
+
+        /// The temporary model in the AddPc a viewer was sent for `guid`. The field is +0x144 and
+        /// 68 bytes follow it, so it sits at `inner.len() - 72` for any presentation.
+        fn add_pc_model(
+            messages: &[crate::players::OutboundMessage],
+            viewer: u64,
+            guid: u64,
+        ) -> Option<i32> {
+            let message = messages.iter().find(|m| {
+                m.recipient == SessionId(viewer)
+                    && m.kind == crate::players::MessageKind::Spawn
+                    && m.bytes.get(11..19) == Some(&guid.to_le_bytes()[..])
+            })?;
+            let inner = message.bytes.get(7..)?;
+            assert!(inner.starts_with(&[35, 0, 1, 0]));
+            let at = inner.len() - 72;
+            Some(i32::from_le_bytes(inner[at..at + 4].try_into().unwrap()))
+        }
+
+        #[test]
+        fn a_player_in_range_is_transformed_then_dances_to_the_player_and_a_viewer() {
+            // Session 2 is 20 m away: inside the 100 m interest radius (so it knows session 1)
+            // but outside the box's 15 m range, so it only watches.
+            let mut players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_M, 20.0, 0.0, ZONE)],
+            );
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(REALMS_ROLL), 600, 0, &players);
+            let sends = live.tick(10, &mut players);
+            for session in [1, 2] {
+                assert_eq!(
+                    to(&sends, session),
+                    [
+                        appearance(601, MODEL).as_slice(),
+                        dance(601, DANCE).as_slice()
+                    ],
+                    "35/14 then 35/8 base {DANCE} for session {session}"
+                );
+            }
+            assert!(
+                own(&sends, 2, 602).is_empty(),
+                "the far viewer is not transformed itself"
+            );
+            // A later viewer gets the model in AddPc.
+            let later = join(&mut players, 3, HUMAN_M, [20.0, 1.0, 0.0], ZONE);
+            assert_eq!(add_pc_model(&later, 3, 601), Some(MODEL));
+        }
+
+        #[test]
+        fn leaving_range_reverts_then_idles_once_and_a_disconnect_is_silent() {
+            let mut players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_M, 20.0, 0.0, ZONE)],
+            );
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(REALMS_ROLL), 600, 0, &players);
+            live.tick(10, &mut players);
+            walk(&mut players, 1, 40.0);
+            let sends = live.tick(50, &mut players);
+            for session in [1, 2] {
+                assert_eq!(reversions(&sends, session), [601]);
+                assert_eq!(idles(&sends, session), [601], "then loc_stand");
+                assert_eq!(
+                    to(&sends, session),
+                    [revert(601).as_slice(), dance(601, 1).as_slice()],
+                    "the reader's 35/15 bytes, then idle"
+                );
+            }
+            assert!(
+                live.tick(100, &mut players).is_empty(),
+                "once, then nothing"
+            );
+            // A disconnect is never told anything (the client dropped the actor already).
+            walk(&mut players, 1, 0.0);
+            live.tick(150, &mut players);
+            let _ = players.leave(SessionId(1));
+            let silent = live.tick(200, &mut players);
+            assert!(to(&silent, 1).is_empty());
+        }
+
+        #[test]
+        fn leaving_range_restores_a_live_consumable_transform_after_the_revert() {
+            let mut players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_M, 20.0, 0.0, ZONE)],
+            );
+            // T512: the consumable effect stack has a live temporary appearance on session 1.
+            let mut look = players.get(SessionId(1)).unwrap().presentation.clone();
+            look.temporary_model = 169;
+            players.set_presentation(SessionId(1), look).unwrap();
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(REALMS_ROLL), 600, 0, &players);
+            live.tick(0, &mut players);
+            walk(&mut players, 1, 40.0);
+            let sends = live.tick(50, &mut players);
+            for session in [1, 2] {
+                assert_eq!(
+                    to(&sends, session),
+                    [
+                        revert(601).as_slice(),
+                        appearance(601, 169).as_slice(),
+                        dance(601, 1).as_slice(),
+                    ],
+                    "revert, the still-live consumable look, then idle"
+                );
+            }
+        }
+
+        #[test]
+        fn the_transform_box_beats_an_overlapping_jingle_bell_and_neither_lists_them() {
+            let mut players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_M, 4.0, 0.0, ZONE)],
+            );
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(JINGLE), 601, 0, &players);
+            let first = live.tick(0, &mut players);
+            assert_eq!(steps(&first, 1), [[(601, 3531), (602, 3531)]]);
+            assert_eq!(steps(&first, 2), [[(601, 3531), (602, 3531)]]);
+            // Realms Roll at the same spot: priority 100 against Jingle Bell's 0.
+            press(&mut live, &row(REALMS_ROLL), 600, 10, &players);
+            let overlap = live.tick(50, &mut players);
+            for (session, guid) in [(1, 601), (2, 602)] {
+                assert_eq!(own(&overlap, session, guid), [MODEL]);
+                assert_eq!(own_animations(&overlap, session, guid), [(DANCE, true)]);
+            }
+            // Neither box's 35/63 names them, even when Jingle Bell's next step begins.
+            for session in [1, 2] {
+                assert!(steps(&overlap, session).is_empty());
+            }
+            let next = live.tick(4_234, &mut players);
+            for session in [1, 2] {
+                assert!(steps(&next, session).is_empty(), "not listed");
+                assert!(appearances(&next, session).is_empty(), "not re-applied");
+            }
+        }
+
+        #[test]
+        fn an_expired_transform_hands_over_to_a_sync_box_after_the_revert() {
+            // Session 2 is a viewer only: 20 m from the 15 m boxes.
+            let mut players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_M, 20.0, 0.0, ZONE)],
+            );
+            let mut short = row(REALMS_ROLL);
+            short.duration_ms = 50;
+            let mut live = Boomboxes::default();
+            press(&mut live, &short, 600, 0, &players);
+            press(&mut live, &row(JINGLE), 601, 0, &players);
+            // Both boxes are on the spot; priority 100 keeps the player transformed first.
+            let transformed = live.tick(0, &mut players);
+            assert_eq!(appearances(&transformed, 1), [(MODEL, 601)]);
+            assert!(steps(&transformed, 1).is_empty());
+            // The transform box expires and Jingle Bell takes over. The revert must precede the
+            // new 35/63, or the dance starts on the temporary model.
+            let sends = live.tick(60, &mut players);
+            for session in [1, 2] {
+                let packets: Vec<&[u8]> = to(&sends, session)
+                    .into_iter()
+                    .filter(|p| p.starts_with(&[35, 0, 15, 0]) || p.starts_with(&[35, 0, 63, 0]))
+                    .collect();
+                assert_eq!(packets.len(), 2, "{packets:?}");
+                assert_eq!(packets[0], revert(601).as_slice(), "35/15 first");
+                assert!(packets[1].starts_with(&[35, 0, 63, 0]), "then the step");
+            }
+        }
+
+        #[test]
+        fn a_mount_change_reapplies_the_model_once_after_two_seconds() {
+            let mut players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_M, 20.0, 0.0, ZONE)],
+            );
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(REALMS_ROLL), 600, 0, &players);
+            live.tick(1_000, &mut players);
+            players.set_mount(SessionId(1), ride(9));
+            let mounted = live.tick(1_050, &mut players);
+            assert_eq!(idles(&mounted, 1), [601], "the dance stops");
+            assert!(appearances(&mounted, 1).is_empty(), "not immediately");
+            assert_eq!(to(&mounted, 2).len(), 1, "the viewer sees the idle");
+            assert!(live.tick(3_049, &mut players).is_empty(), "2 s not yet");
+            let due = live.tick(3_050, &mut players);
+            assert_eq!(appearances(&due, 1), [(MODEL, 601)]);
+            assert_eq!(appearances(&due, 2), [(MODEL, 601)]);
+            assert!(
+                animations(&due, 1).is_empty(),
+                "mounted players get no dance"
+            );
+            assert!(live.tick(3_100, &mut players).is_empty(), "once");
+            // Off the ride: the model is re-sent after the delay and the dance starts again.
+            players.set_mount(SessionId(1), MountTail::NONE);
+            assert!(live.tick(3_150, &mut players).is_empty());
+            let ready = live.tick(5_150, &mut players);
+            assert_eq!(appearances(&ready, 1), [(MODEL, 601)]);
+            assert_eq!(animations(&ready, 1), [(601, DANCE, true)]);
+        }
+
+        #[test]
+        fn a_mounted_player_is_transformed_but_does_not_dance() {
+            let mut players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_M, 20.0, 0.0, ZONE)],
+            );
+            players.set_mount(SessionId(1), ride(9));
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(REALMS_ROLL), 600, 0, &players);
+            let sends = live.tick(10, &mut players);
+            assert_eq!(appearances(&sends, 1), [(MODEL, 601)]);
+            assert!(animations(&sends, 1).is_empty(), "no 3541 mounted");
+            assert_eq!(appearances(&sends, 2), [(MODEL, 601)]);
+        }
+
+        #[test]
+        fn expiry_reverts_then_idles_to_the_player_and_their_viewer() {
+            let mut players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_M, 20.0, 0.0, ZONE)],
+            );
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(REALMS_ROLL), 600, 0, &players);
+            live.tick(1_000, &mut players);
+            let ended = live.tick(180_000, &mut players);
+            for session in [1, 2] {
+                assert_eq!(reversions(&ended, session), [601]);
+                assert_eq!(idles(&ended, session), [601]);
+            }
+            assert!(live.tick(180_050, &mut players).is_empty(), "then nothing");
+        }
+
+        #[test]
+        fn a_reconnect_starts_untransformed_and_the_next_tick_transforms_again() {
+            let mut players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(REALMS_ROLL), 600, 0, &players);
+            live.tick(1_000, &mut players);
+            let _ = players.leave(SessionId(1));
+            let joined = join(&mut players, 11, HUMAN_M, [0.0, 1.0, 0.0], ZONE);
+            assert!(joined.is_empty(), "nobody else is near the new session");
+            let late = join(&mut players, 12, HUMAN_M, [20.0, 1.0, 0.0], ZONE);
+            assert_eq!(add_pc_model(&late, 12, 611), Some(0), "starts plain");
+            let sends = live.tick(1_100, &mut players);
+            assert_eq!(appearances(&sends, 11), [(MODEL, 611)]);
+            assert_eq!(animations(&sends, 11), [(611, DANCE, true)]);
+            let later = join(&mut players, 13, HUMAN_M, [20.0, 1.0, 0.0], ZONE);
+            assert_eq!(add_pc_model(&later, 13, 611), Some(MODEL));
+        }
+
+        #[test]
+        fn a_replaced_transform_box_lets_its_players_go() {
+            let mut players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(REALMS_ROLL), 600, 0, &players);
+            live.tick(0, &mut players);
+            // The owner presses again 500 m away: the old box ends under the player.
+            live.spawn(
+                Arc::new(row(TOTEM)),
+                600,
+                ZONE,
+                [500.0, 1.0, 0.0],
+                0.0,
+                1_000,
+                &players,
+            );
+            let sends = live.tick(1_050, &mut players);
+            assert_eq!(reversions(&sends, 1), [601]);
+            assert_eq!(idles(&sends, 1), [601]);
+        }
+
+        #[test]
+        fn zoning_out_is_silent_and_clears_the_add_pc_model() {
+            let mut players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_M, 20.0, 0.0, ZONE)],
+            );
+            let mut live = Boomboxes::default();
+            press(&mut live, &row(REALMS_ROLL), 600, 0, &players);
+            live.tick(1_000, &mut players);
+            players
+                .update_pose_with_state(SessionId(1), OTHER, [0.0, 1.0, 0.0], 0.0, 0, 0)
+                .unwrap();
+            // The new zone's AddPc is already plain; the scene change itself ended the
+            // transform, before the next box tick could notice.
+            let early = join(&mut players, 11, HUMAN_M, [20.0, 1.0, 0.0], OTHER);
+            assert_eq!(add_pc_model(&early, 11, 601), Some(0));
+            let sends = live.tick(1_100, &mut players);
+            assert!(
+                to(&sends, 1).is_empty() && to(&sends, 2).is_empty(),
+                "the client dropped the actor with the scene"
+            );
+            let late = join(&mut players, 12, HUMAN_M, [20.0, 1.0, 0.0], OTHER);
+            assert_eq!(add_pc_model(&late, 12, 601), Some(0));
         }
     }
 }

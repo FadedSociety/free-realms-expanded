@@ -571,6 +571,90 @@ fn add_pc_matches_the_research_oracle_schema_byte_for_byte() {
 }
 
 #[test]
+fn a_temporary_model_is_the_add_pc_field_and_zero_without_one() {
+    let mut registry = registry(30.0, 10);
+    let shared_zone = zone(7, 11);
+    join(&mut registry, 1, 101, 1001, shared_zone, [0.0; 3], 0.0);
+    registry.set_temporary_model(SessionId(1), 1941);
+    let viewer = join(
+        &mut registry,
+        2,
+        102,
+        1002,
+        shared_zone,
+        [1.0, 0.0, 0.0],
+        0.0,
+    );
+    let transformed = spawn_message(&viewer, 2, 1001);
+    assert_default_add_pc(transformed, 1001, [0.0; 3], 0.0);
+    assert_eq!(temporary_model(transformed), 1941);
+
+    // A player with no transform keeps 0 for a later viewer, and clearing restores it.
+    let third = join(
+        &mut registry,
+        3,
+        103,
+        1003,
+        shared_zone,
+        [2.0, 0.0, 0.0],
+        0.0,
+    );
+    assert_eq!(temporary_model(spawn_message(&third, 3, 1002)), 0);
+    registry.set_temporary_model(SessionId(1), 0);
+    registry.set_temporary_model(SessionId(999), 1941); // an unknown session is ignored
+    let fourth = join(
+        &mut registry,
+        4,
+        104,
+        1004,
+        shared_zone,
+        [3.0, 0.0, 0.0],
+        0.0,
+    );
+    assert_eq!(temporary_model(spawn_message(&fourth, 4, 1001)), 0);
+}
+
+/// T492 + T512 share the +0x144 slot: a live boombox transform is the model current viewers were
+/// last sent, so it wins the AddPc; once it ends the consumable visual is carried again.
+#[test]
+fn a_boombox_transform_overrides_the_consumable_visual_in_add_pc() {
+    let mut registry = registry(30.0, 10);
+    let shared_zone = zone(7, 11);
+    join_presented(
+        &mut registry,
+        1,
+        101,
+        1001,
+        shared_zone,
+        [0.0; 3],
+        0.0,
+        visual_presentation(),
+    );
+    registry.set_temporary_model(SessionId(1), 1941);
+    let viewer = join(
+        &mut registry,
+        2,
+        102,
+        1002,
+        shared_zone,
+        [1.0, 0.0, 0.0],
+        0.0,
+    );
+    assert_eq!(temporary_model(spawn_message(&viewer, 2, 1001)), 1941);
+    registry.set_temporary_model(SessionId(1), 0);
+    let later = join(
+        &mut registry,
+        3,
+        103,
+        1003,
+        shared_zone,
+        [2.0, 0.0, 0.0],
+        0.0,
+    );
+    assert_eq!(temporary_model(spawn_message(&later, 3, 1001)), 169);
+}
+
+#[test]
 fn add_pc_direction_matches_native_yaw_for_cardinal_headings() {
     for heading in [
         0.0,
