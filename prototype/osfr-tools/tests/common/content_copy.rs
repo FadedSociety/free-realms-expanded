@@ -17,6 +17,15 @@ pub fn copy_tree(from: &std::path::Path, to: &std::path::Path) {
     }
 }
 
+/// Hard-link one file into place, copying only when the filesystem refuses the
+/// link (a different volume, or a permission the sandbox withholds).
+#[allow(dead_code)] // the field-battle suites link; the other includes use another helper
+pub fn hard_link_or_copy(from: &std::path::Path, to: &std::path::Path) {
+    if fs::hard_link(from, to).is_err() {
+        fs::copy(from, to).unwrap();
+    }
+}
+
 /// Copy every entry in `from` that `to` does not already supply, recursively.
 /// The destination's existing files win, so a fixture's own profile/inventory
 /// files survive an overlay of the repository content.

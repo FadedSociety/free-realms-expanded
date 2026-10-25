@@ -1300,6 +1300,11 @@ impl EncounterEngine {
                 total.feedback = out.feedback;
             }
         }
+        // T658 review: `realm win` is a debug shortcut, not a loot route, so it
+        // pays no chance drop (`realm give` grants one for inspection).
+        for reward in &mut total.rewards {
+            reward.bonus_items.clear();
+        }
         Ok(total)
     }
 

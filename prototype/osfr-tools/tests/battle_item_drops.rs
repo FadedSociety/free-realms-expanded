@@ -8,6 +8,7 @@
 
 use osfr_tools::{
     account_store::AccountRole,
+    chat,
     gateway::Gateway,
     inventory::{Inventory, InventoryState, MAX_ITEMS},
 };
@@ -64,10 +65,7 @@ fn content_with_chance(chance: f64) -> PathBuf {
     for entry in fs::read_dir(manifest_dir().join(RUNTIME_CONTENT)).unwrap() {
         let entry = entry.unwrap();
         if entry.file_type().unwrap().is_file() {
-            let target = root.join(entry.file_name());
-            if fs::hard_link(entry.path(), &target).is_err() {
-                fs::copy(entry.path(), &target).unwrap();
-            }
+            content_copy::hard_link_or_copy(&entry.path(), &root.join(entry.file_name()));
         }
     }
     content_copy::copy_missing(&content_dir(), &root);
@@ -104,25 +102,40 @@ fn count(gateway: &Gateway, item: i32) -> u32 {
         .sum()
 }
 
-/// Win `battle_id` once from its marker: (gateway, economy before, after).
-fn win(
-    content: &Path,
-    battle_id: u32,
-    prizes: &BTreeSet<i32>,
-    guid: u64,
-) -> (Gateway, Economy, Economy) {
-    win_with_bag(content, battle_id, prizes, guid, |bag| bag)
+/// How a test wins the battle: the production melee route, or the developer
+/// `realm win`, which never grants a chance drop.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum Route {
+    Fight,
+    DevWin,
+}
+
+/// One finished run: everything a test asserts about the production route.
+struct BattleRun {
+    fixture: Fixture,
+    gateway: Gateway,
+    /// The bag the fight started with, after `shape`.
+    bag: InventoryState,
+    before: Economy,
+    after: Economy,
+    replies: Vec<Vec<u8>>,
+}
+
+/// Win `battle_id` once from its marker through the melee route.
+fn win(content: &Path, battle_id: u32, prizes: &BTreeSet<i32>, guid: u64) -> BattleRun {
+    run_battle(content, battle_id, prizes, guid, Route::Fight, |bag| bag)
 }
 
 /// `win`, with the bag replaced by `shape(bag)` before the fight (reloaded
 /// through the production `load_gameplay` restore path, as a save would be).
-fn win_with_bag(
+fn run_battle(
     content: &Path,
     battle_id: u32,
     prizes: &BTreeSet<i32>,
     guid: u64,
+    route: Route,
     shape: impl FnOnce(InventoryState) -> InventoryState,
-) -> (Gateway, Economy, Economy) {
+) -> BattleRun {
     let mut fixture = Fixture::new();
     fixture.content = content.to_path_buf();
     let file = battles();
@@ -150,10 +163,20 @@ fn win_with_bag(
     let screen = open_battle(&mut gateway, u64_field(&row["spawner"], "guid"), row, 300);
     enter_battle(&mut gateway, &screen, row, 400);
     let mut now = 2_000;
-    let replies = fight_to_win(&mut gateway, &mut now, row);
+    let replies = match route {
+        Route::Fight => fight_to_win(&mut gateway, &mut now, row),
+        Route::DevWin => send(&mut gateway, &chat::local_request("realm win"), now).replies,
+    };
     assert_eq!(won_flag(&replies), Some(1));
     let after = economy(&gateway, prizes);
-    (gateway, before, after)
+    BattleRun {
+        fixture,
+        gateway,
+        bag,
+        before,
+        after,
+        replies,
+    }
 }
 
 #[test]
@@ -163,11 +186,15 @@ fn a_forced_drop_lands_with_the_win_and_the_prize_stays_one() {
     let file = battles();
     let row = battle(&file, YETI_BATTLE);
     let prizes = prize_ids(row);
-    let (gateway, before, after) = win(&content, YETI_BATTLE, &prizes, 8_601);
+    let run = win(&content, YETI_BATTLE, &prizes, 8_601);
     let quantity = u32_field(&shipped_drops(YETI_BATTLE)[0], "quantity");
-    assert_eq!(count(&gateway, item), quantity, "the drop is in the bag");
+    assert_eq!(
+        count(&run.gateway, item),
+        quantity,
+        "the drop is in the bag"
+    );
     // The wheel still pays coins, one prize and the active job's XP.
-    assert_payout(&before, &after, row, &prizes, BATTLE_JOB_XP);
+    assert_payout(&run.before, &run.after, row, &prizes, BATTLE_JOB_XP);
     let _ = fs::remove_dir_all(content);
 }
 
@@ -178,9 +205,9 @@ fn a_zero_chance_drops_nothing_and_the_win_pays_as_before() {
     let file = battles();
     let row = battle(&file, YETI_BATTLE);
     let prizes = prize_ids(row);
-    let (gateway, before, after) = win(&content, YETI_BATTLE, &prizes, 8_602);
-    assert_eq!(count(&gateway, item), 0, "chance 0 never drops");
-    assert_payout(&before, &after, row, &prizes, BATTLE_JOB_XP);
+    let run = win(&content, YETI_BATTLE, &prizes, 8_602);
+    assert_eq!(count(&run.gateway, item), 0, "chance 0 never drops");
+    assert_payout(&run.before, &run.after, row, &prizes, BATTLE_JOB_XP);
     let _ = fs::remove_dir_all(content);
 }
 
@@ -191,47 +218,10 @@ fn a_battle_without_a_drop_row_awards_nothing_new() {
     let file = battles();
     let row = battle(&file, PLAIN_BATTLE);
     let prizes = prize_ids(row);
-    let (gateway, before, after) = win(&content, PLAIN_BATTLE, &prizes, 8_603);
-    assert_eq!(count(&gateway, yeti_item()), 0, "no drop row, no drop");
-    assert_payout(&before, &after, row, &prizes, BATTLE_JOB_XP);
+    let run = win(&content, PLAIN_BATTLE, &prizes, 8_603);
+    assert_eq!(count(&run.gateway, yeti_item()), 0, "no drop row, no drop");
+    assert_payout(&run.before, &run.after, row, &prizes, BATTLE_JOB_XP);
     let _ = fs::remove_dir_all(content);
-}
-
-/// The bag holds one stack of every prize (so the prize merges instead of
-/// needing a slot) and `filler` stacks of an uncapped item that is neither a
-/// prize nor the drop, up to `capacity` stacks.
-fn bag_holding_prizes(
-    base: InventoryState,
-    prizes: &BTreeSet<i32>,
-    item: i32,
-    capacity: usize,
-) -> InventoryState {
-    let inventory = Inventory::load(&manifest_dir().join(RUNTIME_CONTENT), None).unwrap();
-    let filler = inventory
-        .definition_ids()
-        .find(|id| {
-            *id != item
-                && !prizes.contains(id)
-                && inventory
-                    .trade_flags(*id)
-                    .is_some_and(|(_, max_stack)| max_stack.is_none())
-        })
-        .expect("an uncapped filler item");
-    let mut state = base;
-    state
-        .items
-        .retain(|stack| stack.definition_id != item && !prizes.contains(&stack.definition_id));
-    let mut id = state.items.iter().map(|stack| stack.id).max().unwrap_or(0) + 1;
-    for &prize in prizes {
-        state.items.push(stack(id, prize, 1));
-        id += 1;
-    }
-    while state.items.len() < capacity {
-        state.items.push(stack(id, filler, 1));
-        id += 1;
-    }
-    state.next_instance_id = Some(i64::from(id));
-    state
 }
 
 #[test]
@@ -242,19 +232,122 @@ fn a_bag_with_no_slot_loses_only_the_drop() {
     let row = battle(&file, YETI_BATTLE);
     let prizes = prize_ids(row);
     // One free slot: the prize merges into its stack, the drop takes the slot.
-    let (open, before, after) = win_with_bag(&content, YETI_BATTLE, &prizes, 8_604, |bag| {
-        bag_holding_prizes(bag, &prizes, item, MAX_ITEMS - 1)
+    let open = run_battle(&content, YETI_BATTLE, &prizes, 8_604, Route::Fight, |bag| {
+        full_bag(&bag, MAX_ITEMS - 1, YETI_BATTLE, PrizeStacks::Keep)
     });
-    assert_eq!(count(&open, item), 1, "the drop fits the free slot");
-    assert_payout(&before, &after, row, &prizes, BATTLE_JOB_XP);
+    assert_eq!(count(&open.gateway, item), 1, "the drop fits the free slot");
+    assert_payout(&open.before, &open.after, row, &prizes, BATTLE_JOB_XP);
     // No free slot: the same win pays coins, prize and XP and loses the drop.
-    let (full, before, after) = win_with_bag(&content, YETI_BATTLE, &prizes, 8_605, |bag| {
-        bag_holding_prizes(bag, &prizes, item, MAX_ITEMS)
+    let full = run_battle(&content, YETI_BATTLE, &prizes, 8_605, Route::Fight, |bag| {
+        full_bag(&bag, MAX_ITEMS, YETI_BATTLE, PrizeStacks::Keep)
     });
-    assert_eq!(count(&full, item), 0, "a full bag cannot take the drop");
-    assert_payout(&before, &after, row, &prizes, BATTLE_JOB_XP);
-    let bag = full.snapshot().gameplay.unwrap().inventory;
+    assert_eq!(
+        count(&full.gateway, item),
+        0,
+        "a full bag cannot take the drop"
+    );
+    assert_payout(&full.before, &full.after, row, &prizes, BATTLE_JOB_XP);
+    let bag = full.gateway.snapshot().gameplay.unwrap().inventory;
     assert_eq!(bag.items.len(), MAX_ITEMS, "the bag did not grow");
+    let _ = fs::remove_dir_all(content);
+}
+
+/// (R) The refusal line `encounter_rewards.rs` owns; no recovered locale row
+/// names it, and T658 review item 8 added the chance drop to its wording.
+const REWARD_REFUSED: &str = "This reward, any prize item and any chance drop it carried were not granted: your coin balance or active job is at its limit.";
+
+/// T658 review item 1/2: `realm win` is the developer shortcut, so it pays the
+/// deterministic prize, coins and XP but never mints the chance drop. A test
+/// that inspects the bag through the dev route must not be a coin flip.
+#[test]
+fn the_dev_win_never_grants_the_chance_drop() {
+    let content = content_with_chance(1.0);
+    let item = yeti_item();
+    let file = battles();
+    let row = battle(&file, YETI_BATTLE);
+    let prizes = prize_ids(row);
+    let run = run_battle(
+        &content,
+        YETI_BATTLE,
+        &prizes,
+        8_606,
+        Route::DevWin,
+        |bag| bag,
+    );
+    assert_eq!(
+        count(&run.gateway, item),
+        0,
+        "realm win never mints the drop"
+    );
+    assert_payout(&run.before, &run.after, row, &prizes, BATTLE_JOB_XP);
+    let _ = fs::remove_dir_all(content);
+}
+
+/// T658 review item 8: a player at the coin cap loses the whole win reward,
+/// including the chance drop, is told so, and no inventory byte changes.
+#[test]
+fn a_capped_win_refuses_the_drop_with_the_rest_and_changes_nothing() {
+    let content = content_with_chance(1.0);
+    let item = yeti_item();
+    let file = battles();
+    let row = battle(&file, YETI_BATTLE);
+    let prizes = prize_ids(row);
+    let run = run_battle(
+        &content,
+        YETI_BATTLE,
+        &prizes,
+        8_607,
+        Route::Fight,
+        |mut bag| {
+            bag.coins = i32::MAX as u32;
+            bag
+        },
+    );
+    assert_eq!(
+        count(&run.gateway, item),
+        0,
+        "the refused drop is not granted"
+    );
+    assert_eq!(run.after, run.before, "the refused reward changes nothing");
+    assert_eq!(
+        run.gateway.snapshot().gameplay.unwrap().inventory,
+        run.bag,
+        "no stack, coin or the drop was touched"
+    );
+    assert!(
+        run.replies.iter().any(|reply| reply
+            .windows(REWARD_REFUSED.len())
+            .any(|window| window == REWARD_REFUSED.as_bytes())),
+        "the player is told the chance drop went with the refused reward"
+    );
+    let _ = fs::remove_dir_all(content);
+}
+
+/// T658 review item 3: the drop lands in the saved bag, survives the results
+/// Close, and reloads through the production `game_store` reconnect.
+#[test]
+fn a_forced_drop_survives_the_results_close_and_a_reconnect() {
+    let content = content_with_chance(1.0);
+    let item = yeti_item();
+    let quantity = u32_field(&shipped_drops(YETI_BATTLE)[0], "quantity");
+    let file = battles();
+    let row = battle(&file, YETI_BATTLE);
+    let prizes = prize_ids(row);
+    let mut run = win(&content, YETI_BATTLE, &prizes, 8_608);
+    assert_eq!(count(&run.gateway, item), quantity, "the win pays the drop");
+    let closed = send(&mut run.gateway, &[26, 0, 42, 0], 5_000);
+    assert!(closed.began_zoning, "Close returns to the open world");
+    assert_eq!(
+        count(&run.gateway, item),
+        quantity,
+        "the results Close keeps the drop"
+    );
+    let reopened = reopen(&run.fixture, &run.gateway, "drop-save", 6_000);
+    assert_eq!(
+        count(&reopened, item),
+        quantity,
+        "the saved bag keeps the drop"
+    );
     let _ = fs::remove_dir_all(content);
 }
 
@@ -262,6 +355,17 @@ fn a_bag_with_no_slot_loses_only_the_drop() {
 fn the_shipped_rows_are_data_driven_and_grantable() {
     let inventory = Inventory::load(&manifest_dir().join(RUNTIME_CONTENT), None).unwrap();
     let file = battles();
+    // T658 review item 9: a repeatable 25% drop must not be a coin faucet. The
+    // runtime catalogue leaves the drop's ResellValue at 0 and `stores.json`
+    // carries no sell row, so `CoinShop::sell_unit_price` refuses it; a future
+    // catalogue or store price fails here before it becomes farmable coins.
+    let store_sell_rows: BTreeSet<i32> = read_json(&content_dir().join("stores.json"))["items"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|row| row["sell_price_coins"].is_u64())
+        .filter_map(|row| row["item_id"].as_i64().map(|id| id as i32))
+        .collect();
     let mut with_drops = 0;
     for row in file["battles"].as_array().unwrap() {
         for drop in row["drops"].as_array().into_iter().flatten() {
@@ -280,6 +384,17 @@ fn the_shipped_rows_are_data_driven_and_grantable() {
             for tag in tags.iter().filter(|t| t["kind"] == "reconstructed") {
                 assert!(tag["evidence"].as_str().unwrap().starts_with("(R)"));
             }
+            let (no_sale, worth) = inventory
+                .sale_flags(item)
+                .expect("the drop has a catalogue definition");
+            assert!(
+                no_sale || worth == 0,
+                "drop {item} carries Worth {worth}: 25% per win becomes a coin faucet"
+            );
+            assert!(
+                !store_sell_rows.contains(&item),
+                "drop {item} has a stores.json sell price: 25% per win becomes a coin faucet"
+            );
         }
     }
     assert!(

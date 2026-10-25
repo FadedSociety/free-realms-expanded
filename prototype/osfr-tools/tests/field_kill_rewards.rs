@@ -49,7 +49,7 @@ const MID_F1: u64 = 131_000_102_013;
 
 /// The one fixed refusal line for a reward the wallet or active job cannot
 /// take. `(R)` text: no recovered client locale row names it.
-const REWARD_REFUSED: &str = "This reward and any prize item it carried were not granted: your coin balance or active job is at its limit.";
+const REWARD_REFUSED: &str = "This reward, any prize item and any chance drop it carried were not granted: your coin balance or active job is at its limit.";
 
 /// A field actor with no power-up table: only the kill reward path is used.
 fn actor(guid: u64, definition_id: i32, level: u32, position: [f32; 3], max_health: u32) -> Value {
@@ -724,9 +724,9 @@ fn start_battle(
 
 /// F276: the representability gate also covers the one non-field encounter
 /// reward (a battle win). A player at the coin cap gets no half-payout and no
-/// prize item, one explicit system line saying the reward and any prize it
-/// carried were not granted, and the battle still completes; another player
-/// is paid.
+/// prize item, one explicit system line saying the reward, any prize and any
+/// chance drop it carried were not granted, and the battle still completes;
+/// another player is paid.
 #[test]
 fn a_battle_reward_at_the_coin_cap_is_refused_with_feedback() {
     // Overworld battle 12310: 25 coins, one prize row and no combat-level
@@ -747,7 +747,7 @@ fn a_battle_reward_at_the_coin_cap_is_refused_with_feedback() {
     assert!(won.changed, "the battle still completes: {text}");
     assert!(
         text.contains(REWARD_REFUSED),
-        "the player is told the reward and any prize it carried were not granted: {text}"
+        "the player is told the reward, any prize and any chance drop were not granted: {text}"
     );
     let state = capped.state();
     assert_eq!(

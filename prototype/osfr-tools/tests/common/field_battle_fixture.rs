@@ -124,6 +124,7 @@ impl Fixture {
             &snapshot.gameplay.as_ref().unwrap().inventory,
             capacity,
             battle,
+            PrizeStacks::MakeRoom,
         );
         snapshot.gameplay.as_mut().unwrap().inventory = bag.clone();
         let gameplay = snapshot.gameplay.unwrap();
@@ -947,16 +948,25 @@ pub fn runtime_inventory() -> &'static Inventory {
     })
 }
 
-/// A real uncapped catalogue row that is not one of this battle's prizes, so
-/// each filler stack stays separate and no granted prize merges into it.
+/// A real uncapped catalogue row that is not one of this battle's prizes or
+/// chance drops, so each filler stack stays separate and no granted item
+/// merges into it.
 pub fn filler_definition(battle_id: u32) -> i32 {
     let file = battles();
-    let prizes = prize_ids(battle(&file, battle_id));
+    let row = battle(&file, battle_id);
+    let mut excluded = prize_ids(row);
+    excluded.extend(
+        row["drops"]
+            .as_array()
+            .into_iter()
+            .flatten()
+            .filter_map(|drop| i32::try_from(drop["item_id"].as_i64()?).ok()),
+    );
     let inventory = runtime_inventory();
     inventory
         .definition_ids()
         .find(|id| {
-            !prizes.contains(id)
+            !excluded.contains(id)
                 && inventory
                     .trade_flags(*id)
                     .is_some_and(|(_, max_stack)| max_stack.is_none())
@@ -979,10 +989,25 @@ pub fn stack(id: i32, definition_id: i32, count: u32) -> InventoryItem {
     }
 }
 
-/// Replace the base bag's prize stacks (so each previewed prize needs a new
-/// stack) and pad to exactly `capacity` stacks. `capacity == MAX_ITEMS`
-/// leaves no room for the bundle; `MAX_ITEMS - prizes` does.
-pub fn full_bag(base: &InventoryState, capacity: usize, battle_id: u32) -> InventoryState {
+/// What `full_bag` does with the base bag's own prize stacks.
+#[derive(Clone, Copy, PartialEq, Eq)]
+pub enum PrizeStacks {
+    /// Clear them, so each previewed prize needs a new stack.
+    MakeRoom,
+    /// Keep them (adding one of each the base lacks), so a granted prize
+    /// merges into an existing stack instead of needing a slot.
+    Keep,
+}
+
+/// Replace or keep the base bag's prize stacks, then pad to exactly `capacity`
+/// stacks with unique filler. `capacity == MAX_ITEMS` leaves no room for a
+/// granted prize or a drop; `MAX_ITEMS - 1` leaves one.
+pub fn full_bag(
+    base: &InventoryState,
+    capacity: usize,
+    battle_id: u32,
+    prize_stacks: PrizeStacks,
+) -> InventoryState {
     assert!(
         base.items.len() <= capacity,
         "the base bag ({} stacks) is larger than {capacity}",
@@ -991,19 +1016,34 @@ pub fn full_bag(base: &InventoryState, capacity: usize, battle_id: u32) -> Inven
     let file = battles();
     let prizes = prize_ids(battle(&file, battle_id));
     let mut state = base.clone();
-    let removed: std::collections::BTreeSet<i32> = state
-        .items
-        .iter()
-        .filter(|item| prizes.contains(&item.definition_id))
-        .map(|item| item.id)
-        .collect();
-    state
-        .items
-        .retain(|item| !prizes.contains(&item.definition_id));
-    state
-        .equipment
-        .retain(|item| !removed.contains(&item.item_id));
+    if prize_stacks == PrizeStacks::MakeRoom {
+        let removed: std::collections::BTreeSet<i32> = state
+            .items
+            .iter()
+            .filter(|item| prizes.contains(&item.definition_id))
+            .map(|item| item.id)
+            .collect();
+        state
+            .items
+            .retain(|item| !prizes.contains(&item.definition_id));
+        state
+            .equipment
+            .retain(|item| !removed.contains(&item.item_id));
+    }
     let mut id = state.items.iter().map(|item| item.id).max().unwrap_or(0) + 1;
+    if prize_stacks == PrizeStacks::Keep {
+        for &prize in &prizes {
+            if !state.items.iter().any(|item| item.definition_id == prize) {
+                state.items.push(stack(id, prize, 1));
+                id += 1;
+            }
+        }
+        assert!(
+            state.items.len() <= capacity,
+            "the kept prize stacks ({}) are larger than {capacity}",
+            state.items.len()
+        );
+    }
     let filler = filler_definition(battle_id);
     while state.items.len() < capacity {
         state.items.push(stack(id, filler, 1));

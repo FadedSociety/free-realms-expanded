@@ -30,6 +30,10 @@ use std::{
     },
 };
 
+#[allow(dead_code)] // this suite only hard-links; the helper also has `copy_tree`
+#[path = "common/content_copy.rs"]
+mod content_copy;
+
 const RUNTIME_CONTENT: &str = "../../../lab/reports/round70-native-20261016T061000Z/content";
 /// The shipped battle whose prize rows the synthetic bundle replaces.
 const BATTLE: u32 = 12310;
@@ -169,12 +173,6 @@ fn read_json(path: &Path) -> Value {
     serde_json::from_slice(&fs::read(path).unwrap()).unwrap()
 }
 
-fn hard_link_or_copy(source: &Path, destination: &Path) {
-    if fs::hard_link(source, destination).is_err() {
-        fs::copy(source, destination).unwrap();
-    }
-}
-
 /// `field_battles.json` with battle 12310's prize rows replaced. The rest of
 /// the shipped row (spawner, arena, enemies, coins) is untouched.
 fn synthetic_battles(bundle: Bundle) -> Value {
@@ -237,7 +235,7 @@ fn shared_content(bundle: Bundle) -> PathBuf {
         if !entry.file_type().unwrap().is_file() || entry.file_name() == "zones.json" {
             continue;
         }
-        hard_link_or_copy(&entry.path(), &root.join(entry.file_name()));
+        content_copy::hard_link_or_copy(&entry.path(), &root.join(entry.file_name()));
     }
     fs::write(
         root.join("zones.json"),

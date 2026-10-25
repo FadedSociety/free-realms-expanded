@@ -788,7 +788,7 @@ fn a_full_bag_defers_the_first_clear_ride_until_a_later_clear_has_room() {
     let seed = hardest_session(&fixture, 2_003);
     // 99 stacks: the win's prize takes the 100th, so no stack is free when the clear pays.
     let mut gateway = fb::reopen_with(&fixture, &seed, "full.json", 400, |state| {
-        state.inventory = fb::full_bag(&state.inventory, 99, dungeon);
+        state.inventory = fb::full_bag(&state.inventory, 99, dungeon, fb::PrizeStacks::MakeRoom);
     });
     assert_eq!(
         gateway.snapshot().gameplay.unwrap().inventory.items.len(),

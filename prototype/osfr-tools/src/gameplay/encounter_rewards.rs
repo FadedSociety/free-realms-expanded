@@ -5,12 +5,13 @@
 //! payout is applied. A pair the wallet or the active job cannot take (the wire
 //! coin field is `i32`, experience is `u32`) is therefore refused whole, logged
 //! and answered with one system line instead of faulting the shared-field tick
-//! for every other player. The refusal says the reward and any prize item it
-//! carried were not granted, so a capped player knows where the item went.
+//! for every other player. The refusal says the reward, any prize item and any
+//! chance drop it carried were not granted, so a capped player knows where the
+//! item went.
 use super::*;
 
 /// (R) Local copy: no recovered client locale row exists for this refusal.
-const REWARD_UNREPRESENTABLE: &str = "This reward and any prize item it carried were not granted: your coin balance or active job is at its limit.";
+const REWARD_UNREPRESENTABLE: &str = "This reward, any prize item and any chance drop it carried were not granted: your coin balance or active job is at its limit.";
 
 /// (R) The same refusal for a finished derby's flat completion payout (`derby_session.rs`). No
 /// recovered client locale row names it either, so it uses one bounded local line.
