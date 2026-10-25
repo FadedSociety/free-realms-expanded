@@ -38860,8 +38860,8 @@
         ],
         "placement_confidence": [
           {
-            "kind": "legacy-data",
-            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2026 (spawnNpcWithGuid(3283, 100000003283, -840.8241, -49.89272, -696.3012, 1.952378)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr)."
+            "kind": "reconstructed",
+            "evidence": "(R) Medium means one unambiguous Legacy spawn matched by client name; not a captured actor or native appearance check."
           }
         ],
         "placement_candidates": [
@@ -40920,8 +40920,8 @@
         ],
         "placement_confidence": [
           {
-            "kind": "legacy-data",
-            "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2833 (spawnNpcWithGuid(4167, 100000004167, -2020.201, -33.10506, 550.6256, -2.629269)); ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4167 (NameId=5102446, ModelId=4564, ModelFileName=human_m_wraith_white.agr)."
+            "kind": "reconstructed",
+            "evidence": "(R) Medium means one unambiguous Legacy spawn matched by client name; not a captured actor or native appearance check."
           }
         ],
         "placement_candidates": [

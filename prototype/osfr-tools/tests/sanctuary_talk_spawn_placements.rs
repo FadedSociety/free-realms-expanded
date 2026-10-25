@@ -16,37 +16,24 @@
 //! Positions and names are read from the shipped data; the only pinned literals are the
 //! placement brief's marker text, the cited spawn call shape and the 1 m duplicate rule.
 
-#[path = "support/json.rs"]
-mod json;
+#[path = "support/models.rs"]
+mod models;
+#[path = "support/npc_quest_chain.rs"]
+mod npc_quest_chain;
+#[path = "support/placement.rs"]
+mod placement;
 
+use npc_quest_chain::{content_dir, read_json};
 use osfr_tools::{startup_world::parse_add_npc, world::NpcVisibility};
+use placement::{distance, xyz};
 use serde_json::Value;
-use std::{
-    collections::BTreeSet,
-    path::{Path, PathBuf},
-};
+use std::collections::BTreeSet;
 
 /// The marker the placement brief requires in every position reason it writes.
 const MARKER: &str = "matched by the spawn's client name (talk_spawns.py) (R)";
 /// `world.rs` loads every regional and extra spawn into the open-world label (R).
 const WORLD_ZONE: u32 = 0;
 const MIN_SEPARATION_M: f64 = 1.0;
-
-fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
-fn xyz(value: &Value) -> [f32; 3] {
-    serde_json::from_value(value.clone()).expect("a finite xyz position")
-}
-
-fn distance(left: [f32; 3], right: [f32; 3]) -> f64 {
-    left.iter()
-        .zip(right)
-        .map(|(a, b)| f64::from(a - b).powi(2))
-        .sum::<f64>()
-        .sqrt()
-}
 
 /// The rows this slice placed: the `sanctuary.json` rows whose position reason carries the
 /// brief's marker. Other zones' briefs write the same marker into their own files, so the
@@ -55,7 +42,7 @@ fn distance(left: [f32; 3], right: [f32; 3]) -> f64 {
 /// placement contract.
 fn placed_rows() -> Vec<(String, Value)> {
     let file = "sanctuary.json";
-    json::read(&content_dir().join("npcs").join(file))["records"]
+    read_json(&content_dir().join("npcs").join(file))["records"]
         .as_array()
         .unwrap()
         .iter()
@@ -67,6 +54,16 @@ fn placed_rows() -> Vec<(String, Value)> {
         })
         .map(|row| (file.to_owned(), row.clone()))
         .collect()
+}
+
+/// A `Key=value` pair out of the Legacy `Npcs.json` citation in a row's position reason
+/// (`Npcs.json Id=3283 (NameId=440729, ModelId=4220, ModelFileName=necronomicus_m.adr)`).
+fn cited_field<'a>(reason: &'a str, key: &str) -> &'a str {
+    let tail = reason
+        .split(&format!("{key}="))
+        .nth(1)
+        .unwrap_or_else(|| panic!("the position reason cites no {key}"));
+    tail.split([',', ')']).next().unwrap().trim()
 }
 
 /// The spawn the row itself cites: `spawnNpcWithGuid(ref, guid, x, y, z, heading)`.
@@ -101,6 +98,7 @@ fn every_placed_row_is_drawn_at_its_position() {
         "no NPC row carries the talk-spawns placement marker"
     );
     let visibility = NpcVisibility::load(&content_dir()).unwrap();
+    let client_models = models::read_models();
     let mut ids = BTreeSet::new();
     for (file, row) in &rows {
         let id = row["npc_id"].as_u64().unwrap();
@@ -146,15 +144,28 @@ fn every_placed_row_is_drawn_at_its_position() {
             .filter(|npc| npc.actor_id == id)
             .collect();
         assert_eq!(adds.len(), 1, "{owner}: exactly one AddNpc");
+        // The model and name come from the Legacy `Npcs.json` entry the row cites, not from
+        // the row's own fields, so a mistyped id cannot agree with itself; the client's
+        // `Models.txt` must map the model id to the cited file.
+        let reason = row["position_reason"].as_str().unwrap();
+        let cited_model: i32 = cited_field(reason, "ModelId").parse().unwrap();
+        let cited_name: i32 = cited_field(reason, "NameId").parse().unwrap();
+        let cited_file = cited_field(reason, "ModelFileName").to_ascii_lowercase();
+        assert!(
+            client_models
+                .get(&i64::from(cited_model))
+                .is_some_and(|files| files.contains(&cited_file)),
+            "{owner}: Models.txt does not map model {cited_model} to {cited_file}"
+        );
+        assert_eq!(adds[0].model_id, cited_model, "{owner}: AddNpc model");
         assert_eq!(
-            adds[0].model_id,
-            row["model_id"].as_i64().unwrap() as i32,
-            "{owner}: AddNpc model"
+            adds[0].name_string_id, cited_name,
+            "{owner}: AddNpc name id"
         );
         assert_eq!(
-            adds[0].name_string_id,
-            row["name_string_id"].as_i64().unwrap() as i32,
-            "{owner}: AddNpc name id"
+            row["model_file_name"].as_str().map(str::to_ascii_lowercase),
+            Some(cited_file),
+            "{owner}: row model file"
         );
         assert_eq!(
             [
@@ -170,9 +181,20 @@ fn every_placed_row_is_drawn_at_its_position() {
     println!("T696 placed {} rows: {ids:?}", rows.len());
 }
 
-/// The brief's duplicate rule, over every drawn NPC row the loader binds to content: a
-/// regional `legacy_data` row or an `npc_spawns_extra.json` body with a `content_key`.
-/// Unnamed scene props are not NPC rows and are excluded, as is anything the loader drops.
+/// Pre-existing pairs (keyed row, unkeyed extras body) already closer than 1 m before T696:
+/// the same two characters drawn by a regional row and by a separate extras body. They are
+/// recorded here so the latch can be strict for everything else; fixing them moves extras
+/// data outside this slice.
+const KNOWN_CLOSE_PAIRS: [(u64, u64); 2] = [
+    (9_000_000_174, 100_000_002_298),
+    (9_000_000_179, 100_000_003_853),
+];
+
+/// The brief's duplicate rule. Every drawn actor in the open world is a candidate: regional
+/// `legacy_data` rows and every kept `npc_spawns_extra.json` body. A row bound to content
+/// (`content_key`) is an NPC row and must stand more than 1 m from every other drawn actor,
+/// keyed or not (unkeyed bodies include named NPCs and enemies). Unkeyed bodies are not
+/// compared with each other: scene props and enemy groups stack at one point by design.
 #[test]
 fn no_two_drawn_npc_rows_share_a_position() {
     let visibility = NpcVisibility::load(&content_dir()).unwrap();
@@ -183,24 +205,39 @@ fn no_two_drawn_npc_rows_share_a_position() {
     let mut drawn: Vec<(u64, [f32; 3])> = visibility
         .teleport_targets(WORLD_ZONE)
         .into_iter()
-        .filter(|target| visibility.content_key(target.guid).is_some())
         .map(|target| (target.guid, target.position))
         .collect();
     drawn.sort_by_key(|(id, _)| *id);
     for id in &placed {
         assert!(
-            drawn.iter().any(|(actor, _)| actor == id),
+            visibility.content_key(*id).is_some() && drawn.iter().any(|(actor, _)| actor == id),
             "placed NPC {id} is not in the drawn NPC set"
         );
     }
+    let mut close = Vec::new();
+    let mut keyed = 0;
     for (index, (id, position)) in drawn.iter().enumerate() {
+        let id_keyed = visibility.content_key(*id).is_some();
+        keyed += usize::from(id_keyed);
         for (other, other_position) in &drawn[index + 1..] {
+            if !id_keyed && visibility.content_key(*other).is_none() {
+                continue;
+            }
             let apart = distance(*position, *other_position);
-            assert!(
-                apart > MIN_SEPARATION_M,
-                "drawn NPC rows {id} and {other} stand {apart:.3} m apart"
-            );
+            if apart <= MIN_SEPARATION_M
+                && !KNOWN_CLOSE_PAIRS.contains(&(*id, *other))
+                && !KNOWN_CLOSE_PAIRS.contains(&(*other, *id))
+            {
+                close.push((*id, *other, apart));
+            }
         }
     }
-    println!("T696: {} content-keyed drawn NPC rows checked", drawn.len());
+    println!(
+        "T696: {} drawn actors, {keyed} keyed; close {close:?}",
+        drawn.len()
+    );
+    assert!(
+        close.is_empty(),
+        "NPC rows within 1 m of another actor: {close:?}"
+    );
 }
