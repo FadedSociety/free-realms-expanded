@@ -75,9 +75,16 @@ impl Content {
             dir.join("houses.json"),
         )
         .unwrap();
-        // The captured catalogue has no Basic Square Block, so a picked-up kit block needs this
-        // synthetic definition row to enter the bag.
-        item_catalogue::write(&dir, &[item_catalogue::sized_row(KIT_BLOCK as u32, 64)]);
+        // The captured catalogue has no Basic Square Block and no Standard Outdoor Chair, so a
+        // picked-up kit block and the generated table's chair need these synthetic definition rows
+        // to enter the bag.
+        item_catalogue::write(
+            &dir,
+            &[
+                item_catalogue::sized_row(KIT_BLOCK as u32, 64),
+                item_catalogue::sized_row(TABLE_CHAIR as u32, 64),
+            ],
+        );
         Self(dir)
     }
 
@@ -91,6 +98,17 @@ impl Content {
         fs::write(
             content.0.join("houses.json"),
             serde_json::to_vec(&houses).unwrap(),
+        )
+        .unwrap();
+        content
+    }
+
+    /// The bundled lots plus the generated fixture table (T518).
+    fn with_fixtures() -> Self {
+        let content = Self::with_houses();
+        fs::copy(
+            PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/housing_fixtures.json"),
+            content.0.join("housing_fixtures.json"),
         )
         .unwrap();
         content
@@ -152,7 +170,10 @@ fn granted(game: &mut Gameplay) -> PlayerHousingInstanceInfo {
 fn the_first_grant_gives_the_starter_lot_once_and_lists_it() {
     let content = Content::with_houses();
     let mut game = content.game();
-    assert!(game.state().housing.is_none(), "no lot before the first ask");
+    assert!(
+        game.state().housing.is_none(),
+        "no lot before the first ask"
+    );
     let first = game.handle_in_world(&GRANT, &character(), 1_000).unwrap();
     assert!(first.changed, "the grant is saved");
     let lot = only_list(&first.replies).records[0].clone();
@@ -169,7 +190,9 @@ fn the_first_grant_gives_the_starter_lot_once_and_lists_it() {
     let again = game.handle_in_world(&GRANT, &character(), 2_000).unwrap();
     assert!(!again.changed, "a repeated ask grants nothing");
     assert_eq!(only_list(&again.replies).records, vec![lot.clone()]);
-    let listed = game.handle_in_world(&list_request(OWNER), &character(), 3_000).unwrap();
+    let listed = game
+        .handle_in_world(&list_request(OWNER), &character(), 3_000)
+        .unwrap();
     assert_eq!(only_list(&listed.replies).records, vec![lot]);
 }
 
@@ -216,8 +239,12 @@ fn entering_changes_scene_and_the_house_packets_wait_for_the_load() {
     let content = Content::with_houses();
     let mut game = content.game();
     let lot = granted(&mut game);
-    let out = game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000).unwrap();
-    let scene = out.scene_zoning.expect("entering moves the client to the lot scene");
+    let out = game
+        .handle_in_world(&enter(lot.instance_guid), &character(), 2_000)
+        .unwrap();
+    let scene = out
+        .scene_zoning
+        .expect("entering moves the client to the lot scene");
     let starter = HousingContent::bundled().unwrap();
     let row = starter
         .lots
@@ -243,7 +270,10 @@ fn entering_changes_scene_and_the_house_packets_wait_for_the_load() {
         "a zero head size hides the player's head"
     );
     let again = game.initialize_world(&character(), 4_000).unwrap();
-    assert!(again.replies.is_empty(), "a second load inside the house resends nothing");
+    assert!(
+        again.replies.is_empty(),
+        "a second load inside the house resends nothing"
+    );
 }
 
 #[test]
@@ -251,14 +281,21 @@ fn saves_and_reconnects_inside_a_house_keep_the_world_pose() {
     let content = Content::with_houses();
     let mut game = content.game();
     let lot = granted(&mut game);
-    assert_eq!(game.house_return(), None, "outside, saves use the live pose");
-    game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000).unwrap();
+    assert_eq!(
+        game.house_return(),
+        None,
+        "outside, saves use the live pose"
+    );
+    game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000)
+        .unwrap();
     assert_eq!(game.house_return(), Some(character()));
     assert_eq!(game.abandon_house_for_reconnect(), Some(character()));
     assert_eq!(game.house_return(), None, "the reconnect left the house");
     let saved = game.state();
     let mut reloaded = Gameplay::load(&content.0, Some(saved)).unwrap();
-    let listed = reloaded.handle_in_world(&list_request(OWNER), &character(), 3_000).unwrap();
+    let listed = reloaded
+        .handle_in_world(&list_request(OWNER), &character(), 3_000)
+        .unwrap();
     assert_eq!(only_list(&listed.replies).records, vec![lot]);
 }
 
@@ -308,7 +345,8 @@ fn leaving_returns_to_the_world_pose() {
     let content = Content::with_houses();
     let mut game = content.game();
     let lot = granted(&mut game);
-    game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000).unwrap();
+    game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000)
+        .unwrap();
     game.initialize_world(&character(), 3_000).unwrap();
     // Inside the lot the client reports lot coordinates; the return still uses the entry pose.
     let mut inside = character();
@@ -341,7 +379,10 @@ fn refused_requests_change_nothing() {
         if let Ok(out) = out {
             assert!(!out.changed, "{what}");
             assert!(out.scene_zoning.is_none(), "{what}");
-            assert!(out.replies.iter().all(|r| subtype(r).is_none()), "{what}: a chat line only");
+            assert!(
+                out.replies.iter().all(|r| subtype(r).is_none()),
+                "{what}: a chat line only"
+            );
         }
         assert_eq!(game.state(), before, "{what}");
         assert_eq!(game.house_return(), None, "{what}");
@@ -591,6 +632,88 @@ fn single(id: i32, definition_id: i32) -> InventoryItem {
         ability_count: 0,
         activate_enabled: false,
     }
+}
+
+/// The generated table's Standard Outdoor Chair (item 15602, client model 1865). The capture
+/// defaults have no row for it, so it distinguishes the two tables.
+const TABLE_CHAIR: i32 = 15_602;
+const TABLE_CHAIR_MODEL: i32 = 1_865;
+
+/// A character save holding one single unit of each item, loaded through the real save path.
+fn owning(content: &Content, definitions: &[i32]) -> Gameplay {
+    let mut state = content.game().state();
+    let mut id = state
+        .inventory
+        .items
+        .iter()
+        .map(|i| i.id)
+        .max()
+        .unwrap_or(0);
+    for &definition in definitions {
+        id += 1;
+        state.inventory.items.push(single(id, definition));
+    }
+    Gameplay::load(&content.0, Some(state)).unwrap()
+}
+
+#[test]
+fn the_generated_fixture_table_lists_an_owned_block_and_chair_on_entry() {
+    let content = Content::with_fixtures();
+    let mut game = owning(&content, &[KIT_BLOCK, TABLE_CHAIR]);
+    let lot = granted(&mut game);
+    game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000)
+        .unwrap();
+    let loaded = game.initialize_world(&character(), 3_000).unwrap();
+    let list = FixtureItemList::decode(reply(&loaded.replies, 43)).unwrap();
+    let mut listed: Vec<i32> = list
+        .items
+        .iter()
+        .map(|item| item.item_definition_id)
+        .collect();
+    listed.sort();
+    assert_eq!(
+        listed,
+        [TABLE_CHAIR, KIT_BLOCK, CHICKEN],
+        "the bag's three placeable items are listed"
+    );
+    let block = list
+        .definitions
+        .iter()
+        .find(|definition| definition.item_definition_id == KIT_BLOCK)
+        .expect("the block's generated definition");
+    assert_eq!((block.id, block.model_id), (KIT_BLOCK, 1_926));
+    let chair = list
+        .definitions
+        .iter()
+        .find(|definition| definition.item_definition_id == TABLE_CHAIR)
+        .expect("the chair's generated definition");
+    assert_eq!((chair.id, chair.model_id), (TABLE_CHAIR, TABLE_CHAIR_MODEL));
+    // The 127/40 records carry the same generated row: model and aliases.
+    let updates = updates(&loaded.replies);
+    assert_eq!(updates.len(), KIT_BLOCKS);
+    let kit = &updates[0];
+    assert_eq!(kit.definition.model_id, 1_926);
+    assert_eq!(kit.instance.customization.texture_alias, "fun-block-L1");
+    assert_eq!(kit.instance.customization.tint_alias, "dyetint");
+}
+
+#[test]
+fn without_the_generated_table_the_capture_defaults_still_apply() {
+    let content = Content::with_houses();
+    let mut game = owning(&content, &[TABLE_CHAIR]);
+    let lot = granted(&mut game);
+    game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000)
+        .unwrap();
+    let loaded = game.initialize_world(&character(), 3_000).unwrap();
+    let list = FixtureItemList::decode(reply(&loaded.replies, 43)).unwrap();
+    assert_eq!(list.items.len(), 1, "the Chicken only");
+    assert_eq!(list.items[0].item_definition_id, CHICKEN);
+    assert!(
+        list.items
+            .iter()
+            .all(|item| item.item_definition_id != TABLE_CHAIR),
+        "the capture defaults have no chair row"
+    );
 }
 
 #[test]
@@ -976,7 +1099,10 @@ fn the_gateway_sends_the_scene_change_then_the_house_after_the_load() {
         .unwrap();
     assert!(entered.began_zoning, "{:?}", entered.trace);
     assert!(
-        entered.replies.iter().any(|r| r.get(7..9) == Some(&[31, 0][..])),
+        entered
+            .replies
+            .iter()
+            .any(|r| r.get(7..9) == Some(&[31, 0][..])),
         "an opcode-31 begin-zoning frame is sent"
     );
     // The server binary then registers the player's scene and places them in it (the step

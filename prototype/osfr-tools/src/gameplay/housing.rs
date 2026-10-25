@@ -38,9 +38,14 @@ impl HousingSession {
             return Ok(None);
         }
         let content = HousingContent::load(&path).map_err(|e| invalid(format!("{e:?}")))?;
-        // ponytail: placement rows are the reconstructed defaults until decorating (slice 2)
-        // gets a real fixture table.
-        let config = FixtureConfig::capture_defaults();
+        // The generated table (T518) when the content directory ships it; the historical captured
+        // rows stay the fallback for content packages without one.
+        let fixtures = directory.join("housing_fixtures.json");
+        let config = if fixtures.is_file() {
+            FixtureConfig::load(&fixtures).map_err(|e| invalid(format!("{e:?}")))?
+        } else {
+            FixtureConfig::capture_defaults()
+        };
         let service = match saved {
             Some(state) => {
                 HousingService::from_state_with_content(config, content, state, inventory)

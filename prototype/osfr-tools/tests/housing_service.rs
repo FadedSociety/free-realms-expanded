@@ -206,8 +206,8 @@ fn lot_definition(property: PropertyDefinition) -> HousingLotDefinition {
     }
 }
 
-fn service_with_lot() -> HousingService {
-    let mut service = HousingService::new(FixtureConfig::capture_defaults());
+fn service_with_config(config: FixtureConfig) -> HousingService {
+    let mut service = HousingService::new(config);
     service
         .register_house_definition(lot_definition(property()))
         .unwrap();
@@ -219,6 +219,10 @@ fn service_with_lot() -> HousingService {
         })
         .unwrap();
     service
+}
+
+fn service_with_lot() -> HousingService {
+    service_with_config(FixtureConfig::capture_defaults())
 }
 
 fn test_housing_content() -> HousingContent {
@@ -780,6 +784,9 @@ fn furniture_without_one_unambiguous_fixture_row_is_refused() {
         model_id: 1,
         category: String::new(),
         lua_call: String::new(),
+        texture_alias: String::new(),
+        tint_alias: String::new(),
+        default_tint_id: 0,
         provenance: "test-only duplicate row".to_string(),
     });
     let mut ambiguous = HousingService::new(config);
@@ -1200,6 +1207,184 @@ fn the_reconstructed_default_catalog_has_source_tagged_fixture_rows() {
         .state(),
         empty_state
     );
+}
+
+/// The generated table the server ships in its content directory (T518).
+fn bundled_fixtures() -> FixtureConfig {
+    FixtureConfig::load(
+        &PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/housing_fixtures.json"),
+    )
+    .unwrap()
+}
+
+#[test]
+fn the_bundled_fixture_table_covers_the_placeable_items() {
+    let config = bundled_fixtures();
+    config.validate().expect("the generated table validates");
+    assert!(
+        config.rows.len() > 1_000,
+        "one row per placeable item, got {}",
+        config.rows.len()
+    );
+    // The generator sorts by item id, so a regenerated table reviews as a small diff.
+    assert!(
+        config
+            .rows
+            .windows(2)
+            .all(|pair| pair[0].item_definition_id < pair[1].item_definition_id),
+        "rows ascend by item id"
+    );
+    // The seven packet-captured rows keep their captured fixture and model ids.
+    for (item, fixture, model) in [
+        (7_466, 34, 1_926),
+        (14_300, 902, 2_159),
+        (77_259, 490, 1_988),
+        (7_462, 323, 1_945),
+        (16_039, 68, 3_002),
+        (18_110, 1_074, 3_058),
+        (16_040, 69, 3_003),
+    ] {
+        let row = config.row_for_item_definition(item).unwrap();
+        assert_eq!(
+            (row.fixture_definition_id, row.model_id),
+            (fixture, model),
+            "item {item}"
+        );
+    }
+    assert_eq!(
+        config.row_for_item_definition(70_429).unwrap().model_id,
+        535
+    );
+    assert_eq!(
+        config.row_for_item_definition(32_647).unwrap().model_id,
+        1_926
+    );
+    // An item without an icon tint or a texture alias keeps empty/zero values, not an error.
+    let chicken = config.row_for_item_definition(70_429).unwrap();
+    assert_eq!(
+        (chicken.texture_alias.as_str(), chicken.default_tint_id),
+        ("", 0)
+    );
+    // The Basic Square Block carries the decorate preview's aliases and its icon tint.
+    let block = config.row_for_item_definition(32_647).unwrap();
+    assert_eq!(
+        (
+            block.texture_alias.as_str(),
+            block.tint_alias.as_str(),
+            block.default_tint_id,
+        ),
+        ("fun-block-L1", "dyetint", 227)
+    );
+    // One row per item definition and per fixture definition, never a model id of 0, and a
+    // source for every row.
+    let items: BTreeSet<i32> = config
+        .rows
+        .iter()
+        .map(|row| row.item_definition_id)
+        .collect();
+    let fixtures: BTreeSet<i32> = config
+        .rows
+        .iter()
+        .map(|row| row.fixture_definition_id)
+        .collect();
+    assert_eq!(items.len(), config.rows.len(), "unique item ids");
+    assert_eq!(fixtures.len(), config.rows.len(), "unique fixture ids");
+    assert!(config.rows.iter().all(|row| row.model_id > 0));
+    assert!(config.rows.iter().all(|row| !row.provenance.is_empty()));
+}
+
+/// Canary: a duplicated row must fail validation (the generator refuses the same case).
+#[test]
+fn a_duplicated_fixture_row_is_refused_at_load() {
+    let mut config = bundled_fixtures();
+    let first = config.rows[0].clone();
+    config.rows.push(first.clone());
+    assert_eq!(
+        config.validate().unwrap_err(),
+        ServiceError::FixtureConfigInvalid("duplicate fixture definition id")
+    );
+    config.rows.pop();
+    let mut same_item = first;
+    same_item.fixture_definition_id = i32::MAX;
+    config.rows.push(same_item);
+    assert_eq!(
+        config.validate().unwrap_err(),
+        ServiceError::FixtureConfigInvalid("duplicate item definition id")
+    );
+    // The load path refuses the whole table before any lot is adopted.
+    let empty = HousingServiceState {
+        schema_version: SERVICE_SCHEMA_VERSION,
+        lots: Vec::new(),
+    };
+    assert!(matches!(
+        HousingService::from_state(config, &empty, &no_items()),
+        Err(StateError::Config(ServiceError::FixtureConfigInvalid(
+            "duplicate item definition id"
+        )))
+    ));
+}
+
+#[test]
+fn a_save_made_with_the_capture_defaults_reloads_with_the_generated_table() {
+    let mut service = service_with_lot();
+    let mut stock = TestStock::new(vec![owned(INSTANCE, BLOCK_ITEM, 1)]);
+    enter(&mut service, &mut stock);
+    place(&mut service, &mut stock);
+    let state = service.state();
+    assert_eq!(
+        state.lots[0].fixtures[0].fixture_definition_id, BLOCK_FIXTURE,
+        "the capture-defaults save holds fixture 34"
+    );
+    let restored = HousingService::from_state(bundled_fixtures(), &state, &no_items()).unwrap();
+    assert_eq!(
+        restored.state(),
+        state,
+        "the placed fixture survives the swap"
+    );
+    let row = restored
+        .config()
+        .row_for_item_definition(BLOCK_ITEM)
+        .unwrap();
+    assert_eq!(
+        (row.fixture_definition_id, row.model_id),
+        (BLOCK_FIXTURE, BLOCK_MODEL),
+        "fixture 34 stays the Blue Square Block's definition"
+    );
+}
+
+#[test]
+fn a_127_42_for_a_generated_row_carries_its_model_aliases_and_tint() {
+    let mut service = service_with_config(bundled_fixtures());
+    let mut stock = TestStock::new(vec![owned(INSTANCE, KIT_BLOCK, 1)]);
+    enter(&mut service, &mut stock);
+    service.offer(OWNER, SELECTION, INSTANCE, &stock).unwrap();
+    let response = service
+        .handle(OWNER, &place_request_frame(SELECTION), &mut stock)
+        .unwrap();
+    assert_eq!(opcodes(&response), vec![REPLY_PLACE_REQUEST]);
+    let asset =
+        housing_native::FixtureAsset::decode(&response.replies[0].encode().unwrap()).unwrap();
+    assert_eq!(asset.model_id, BLOCK_MODEL as u32);
+    assert_eq!(asset.definition.model_id, BLOCK_MODEL);
+    assert_eq!(asset.texture_alias, "fun-block-L1");
+    assert_eq!(asset.tint_alias, "dyetint");
+    assert_eq!(asset.tint_id, 227);
+    // The same row feeds the 127/40 customization block.
+    let placed = service
+        .handle(
+            OWNER,
+            &place_frame(SELECTION, &block_transform(position(), ZERO_ROTATION, 1.0)),
+            &mut stock,
+        )
+        .unwrap();
+    assert_eq!(
+        opcodes(&placed),
+        vec![REPLY_FIXTURE_UPDATE, REPLY_HOUSE_INFO]
+    );
+    let update =
+        housing_native::FixtureUpdate::decode(&placed.replies[0].encode().unwrap()).unwrap();
+    assert_eq!(update.instance.customization.texture_alias, "fun-block-L1");
+    assert_eq!(update.instance.customization.tint_alias, "dyetint");
 }
 
 #[test]

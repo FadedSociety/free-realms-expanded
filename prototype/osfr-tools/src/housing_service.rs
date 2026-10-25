@@ -38,9 +38,9 @@ use crate::housing::{
 use crate::housing_native::{
     CouplingDisplay, Customization, FixtureAsset, FixtureDefinition,
     FixtureInstance as WireFixtureInstance, FixtureInstanceInfo, FixtureItemList, FixtureRemove,
-    FixtureUpdate, HouseInfo, HousePermissionRecord, InstanceData, InstanceList, NotifyHouseAdded,
-    PlaceFixture as WirePlaceFixture, PlacementDenied, PlayerHousingInstanceInfo, PositionUpdate,
-    ZoneData,
+    FixtureUpdate, HouseInfo, HousePermissionRecord, InstanceData, InstanceList, MAX_STRING,
+    NotifyHouseAdded, PlaceFixture as WirePlaceFixture, PlacementDenied, PlayerHousingInstanceInfo,
+    PositionUpdate, ZoneData,
 };
 use crate::inventory::{
     Inventory, InventoryItem, InventoryState, instance_ids::allocate_from_snapshot,
@@ -51,6 +51,7 @@ use std::{
     fs::File,
     io::{self, Read},
     path::Path,
+    sync::Arc,
 };
 
 // The recovered client writers live in `src/restoration/piece_025.rs`, which is not registered in
@@ -104,6 +105,9 @@ pub const MAX_STATE_FIXTURES: usize = 4_096;
 const MAX_HOUSING_CONTENT_BYTES: usize = 1024 * 1024;
 /// RECONSTRUCTED bound on one fixture-configuration table.
 const MAX_CONFIG_ROWS: usize = 4_096;
+/// RECONSTRUCTED bound for one fixture-configuration file (`housing_fixtures.json`; the generated
+/// table is about 460 KiB).
+const MAX_FIXTURE_CONTENT_BYTES: usize = 4 * 1024 * 1024;
 /// RECONSTRUCTED sanity bound on the fixtures a starter kit stands in a new lot (L040).
 pub const MAX_STARTER_KIT_FIXTURES: usize = 16;
 
@@ -945,8 +949,12 @@ const SAVE_MISSING: &[&str] = &[
     "opaque FUN_00abd1d0 block",
 ];
 
-/// RECONSTRUCTED programmatic stand-in for the unrecovered retail fixture-definition table: which
-/// item definition places as which fixture definition and model.
+/// One row of the fixture configuration table: which item definition places as which fixture
+/// definition and model. The production rows are generated from the pinned item data and the
+/// client `Models.txt` (`scripts/build_housing_fixtures.py`, T518); the fixture definition id is
+/// our own convention (R) except for the seven captured rows, because the client receives the
+/// definition in 127/42 and 127/43 and only needs a stable unique key. (R) The retail server-side
+/// fixture definition and action table is not recovered.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct FixtureConfigRow {
@@ -957,13 +965,25 @@ pub struct FixtureConfigRow {
     pub category: String,
     #[serde(default)]
     pub lua_call: String,
-    /// Provenance. The bundled fallback is reconstructed from an older packet-derived artifact;
-    /// it is not client-table evidence or verified retail fixture content.
+    /// The item's texture material alias, sent in the 127/42 alias slots and as the 127/40
+    /// customization texture.
+    #[serde(default)]
+    pub texture_alias: String,
+    /// The item's dye-tint material alias (127/42 and 127/40).
+    #[serde(default)]
+    pub tint_alias: String,
+    /// (R) The item's `Icon.TintId`; the client's default tint for the fixture. 0 when the item
+    /// has no tint.
+    #[serde(default)]
+    pub default_tint_id: i32,
+    /// Provenance. `capture_defaults` rows are reconstructed from an older packet-derived
+    /// artifact; generated rows cite the pinned item row and the client model id.
     pub provenance: String,
 }
 
-/// The fixture configuration table. It is content, not save state: the lead may load it from a
-/// package `content/` file later, which is why it is serde-enabled.
+/// The fixture configuration table. It is content, not save state: `HousingSession::load` reads
+/// `housing_fixtures.json` from the content directory, and `capture_defaults` is the fallback when
+/// that file is absent.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct FixtureConfig {
@@ -973,9 +993,10 @@ pub struct FixtureConfig {
 }
 
 impl FixtureConfig {
-    /// Historical reconstructed fixture rows used as test defaults, plus the two starter-kit rows
-    /// (L040) until the item-derived table lands. The current client guide does not validate
-    /// these tuples; flags, category, Lua calls, actions and effects remain unknown.
+    /// Historical reconstructed fixture rows, used when the content directory has no
+    /// `housing_fixtures.json` and by the tests, plus the two starter-kit rows (L040). The current
+    /// client guide does not validate these tuples; flags, category, Lua calls, actions and
+    /// effects remain unknown.
     pub fn capture_defaults() -> Self {
         let row = |fixture_definition_id: i32, item_definition_id: i32, model_id: i32| {
             FixtureConfigRow {
@@ -984,6 +1005,9 @@ impl FixtureConfig {
                 model_id,
                 category: String::new(),
                 lua_call: String::new(),
+                texture_alias: String::new(),
+                tint_alias: String::new(),
+                default_tint_id: 0,
                 provenance: format!(
                     "R:unverified-legacy-packet-derived-artifact; lab/references/OpenSourceFreeRealms/ofrserver/Packets/p2.pcap 127/40 record: \
                      fixture definition {fixture_definition_id}, item definition \
@@ -1060,7 +1084,28 @@ impl FixtureConfig {
         Ok(first)
     }
 
-    fn validate(&self) -> Result<(), ServiceError> {
+    /// Read and validate one fixture-configuration file. A broken document is refused whole, so a
+    /// caller never continues with a partial table.
+    pub fn load(path: &Path) -> Result<Self, ServiceError> {
+        let file = File::open(path)
+            .map_err(|_| ServiceError::FixtureConfigInvalid("cannot open fixture configuration"))?;
+        let mut bytes = Vec::new();
+        file.take((MAX_FIXTURE_CONTENT_BYTES + 1) as u64)
+            .read_to_end(&mut bytes)
+            .map_err(|_| ServiceError::FixtureConfigInvalid("cannot read fixture configuration"))?;
+        if bytes.len() > MAX_FIXTURE_CONTENT_BYTES {
+            return Err(ServiceError::FixtureConfigInvalid(
+                "fixture configuration exceeds 4 MiB",
+            ));
+        }
+        let config: Self = serde_json::from_slice(&bytes).map_err(|_| {
+            ServiceError::FixtureConfigInvalid("invalid fixture configuration JSON")
+        })?;
+        config.validate()?;
+        Ok(config)
+    }
+
+    pub fn validate(&self) -> Result<(), ServiceError> {
         if self.schema_version != 1 {
             return Err(ServiceError::FixtureConfigInvalid(
                 "unsupported fixture configuration schema",
@@ -1077,11 +1122,23 @@ impl FixtureConfig {
             ));
         }
         let mut fixture_ids = BTreeSet::new();
+        let mut item_ids = BTreeSet::new();
         if self.rows.iter().any(|row| {
             row.fixture_definition_id <= 0 || row.item_definition_id <= 0 || row.model_id <= 0
         }) {
             return Err(ServiceError::FixtureConfigInvalid(
                 "invalid fixture configuration id",
+            ));
+        }
+        // A negative tint has no unsigned wire form, and an alias longer than the codec's string
+        // bound would fail every 127/42 for that row: both are refused here, at load.
+        if self.rows.iter().any(|row| {
+            row.default_tint_id < 0
+                || row.texture_alias.len() > MAX_STRING
+                || row.tint_alias.len() > MAX_STRING
+        }) {
+            return Err(ServiceError::FixtureConfigInvalid(
+                "invalid fixture configuration row",
             ));
         }
         if self
@@ -1091,6 +1148,15 @@ impl FixtureConfig {
         {
             return Err(ServiceError::FixtureConfigInvalid(
                 "duplicate fixture definition id",
+            ));
+        }
+        if self
+            .rows
+            .iter()
+            .any(|row| !item_ids.insert(row.item_definition_id))
+        {
+            return Err(ServiceError::FixtureConfigInvalid(
+                "duplicate item definition id",
             ));
         }
         Ok(())
@@ -1136,7 +1202,9 @@ pub struct HousingServiceState {
 /// The housing service for one server process.
 #[derive(Clone, Debug)]
 pub struct HousingService {
-    config: FixtureConfig,
+    /// The fixture table is shared by every session clone. `HousingSession` clones its whole
+    /// service per family-127 packet, so the table must not be copied with it.
+    config: Arc<FixtureConfig>,
     housing: Housing,
     /// Session state: the lot each actor last entered, and its last edit-mode request. Neither is
     /// persisted, because a reconnect re-enters.
@@ -1154,7 +1222,7 @@ pub struct HousingService {
 impl HousingService {
     pub fn new(config: FixtureConfig) -> Self {
         Self {
-            config,
+            config: Arc::new(config),
             housing: Housing::new(),
             entered: BTreeMap::new(),
             edit_mode: BTreeMap::new(),
@@ -1338,7 +1406,7 @@ impl HousingService {
             }
         }
         Ok(Self {
-            config,
+            config: Arc::new(config),
             housing,
             entered: BTreeMap::new(),
             edit_mode: BTreeMap::new(),
@@ -1370,7 +1438,7 @@ impl HousingService {
     }
 
     pub fn config(&self) -> &FixtureConfig {
-        &self.config
+        self.config.as_ref()
     }
 
     pub fn lot(&self, house_guid: u64) -> Result<LotSnapshot, ServiceError> {
@@ -2149,6 +2217,9 @@ impl HousingService {
         let row = self
             .config
             .row_for_item_definition(instance.definition_id)?;
+        // Client reader 00ac1f50: the model dword, the selection dword, the definition, then the
+        // two alias strings and the tint dword. The aliases and tint come from the item row (R for
+        // the semantic names; the slot order is the client's).
         Ok(ServiceOutcome {
             zone_change: None,
             replies: vec![HousingReply::FixtureAsset(FixtureAsset {
@@ -2156,9 +2227,10 @@ impl HousingService {
                     .map_err(|_| ServiceError::FixtureConfigInvalid("invalid fixture model id"))?,
                 selection_id,
                 definition: fixture_definition_from_row(row),
-                texture_alias: String::new(),
-                tint_alias: String::new(),
-                tint_id: 0,
+                texture_alias: row.texture_alias.clone(),
+                tint_alias: row.tint_alias.clone(),
+                tint_id: u32::try_from(row.default_tint_id)
+                    .map_err(|_| ServiceError::FixtureConfigInvalid("invalid fixture tint id"))?,
                 unknown_b: 0,
                 bytes_c: String::new(),
                 guids: Vec::new(),
@@ -2170,8 +2242,9 @@ impl HousingService {
         })
     }
 
-    /// Build a `127/40` fixture record using the current local codec. Unresolved definition and tail
-    /// fields use empty/zero placeholders (R); successful encoding is not client-acceptance proof.
+    /// Build a `127/40` fixture record using the current local codec. The customization block
+    /// carries the row's texture and tint aliases; unresolved definition and tail fields use
+    /// empty/zero placeholders (R); successful encoding is not client-acceptance proof.
     fn fixture_update(
         &self,
         placed: &PlacedFixture,
@@ -2195,8 +2268,10 @@ impl HousingService {
                 unknown10: 0,
                 customization: Customization {
                     kind: 0,
-                    texture_alias: String::new(),
-                    tint_alias: String::new(),
+                    // Client 127/40 reader sub_AB6F40 -> sub_8E8510: kind dword, texture alias,
+                    // tint alias, tint dword, override string. The alias values are the item's.
+                    texture_alias: row.texture_alias.clone(),
+                    tint_alias: row.tint_alias.clone(),
                     tint_id: 0,
                     texture_override: String::new(),
                 },
