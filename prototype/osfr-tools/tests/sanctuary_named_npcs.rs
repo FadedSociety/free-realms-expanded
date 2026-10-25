@@ -12,12 +12,14 @@
 
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
+#[path = "support/terrain.rs"]
+mod terrain;
 
 use npc_quest_chain::{
     CHARACTER, Fixture, TALK_LABEL, character_at_for, content_dir, interact, menu_option,
     npc_interact, npc_select, read_json, seen_from,
 };
-use osfr_tools::{startup_world::parse_add_npc, terrain::Terrain, world::NpcVisibility};
+use osfr_tools::{startup_world::parse_add_npc, world::NpcVisibility};
 use serde_json::Value;
 use std::{collections::BTreeSet, fs};
 
@@ -77,13 +79,6 @@ fn moved() -> Vec<(Value, Value)> {
             (row, body)
         })
         .collect()
-}
-
-fn lab_root() -> std::path::PathBuf {
-    std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab")
-        .canonicalize()
-        .unwrap()
 }
 
 fn body_position(id: u64) -> [f32; 3] {
@@ -208,8 +203,7 @@ fn gulsh_is_the_cave_seller() {
     // His spawn is 20.7 m under the terrain grid: the cave below the Sanctuary bridge.
     // Measured on the shipped grid, not read from the extras row's own source text.
     let [x, y, z] = xyz(&body["position"]);
-    let terrain = Terrain::load(&lab_root().join("terrain")).unwrap();
-    let ground = terrain
+    let ground = terrain::load()
         .height_at(0, x, z)
         .expect("terrain covers his spawn");
     assert!(
@@ -237,24 +231,39 @@ fn a_click_works_where_she_stands_and_not_at_her_old_guess() {
     );
 
     // Her old position is out of range. With her menu open, a far 26/8 and a far 26/10 are
-    // both refused and change nothing: the open menu still answers from beside her.
-    let mut game = fixture.game(None);
-    let menu = interact(&mut game, &near, MAYOR, NOW);
+    // both refused and change nothing: the open menu still answers from beside her, exactly
+    // as it does in a game that never saw the far clicks.
+    let mut control = fixture.game(None);
+    let menu = interact(&mut control, &near, MAYOR, NOW);
     let talk = menu_option(&menu, TALK_LABEL);
+    let expected = control
+        .handle_in_world(&npc_select(MAYOR, talk), &near, NOW + 3)
+        .unwrap();
+    assert!(
+        !expected.replies.is_empty(),
+        "Talk answers with her dialogue"
+    );
+
+    let mut game = fixture.game(None);
+    interact(&mut game, &near, MAYOR, NOW);
     let state = game.state();
     let far = character_at_for(CHARACTER, 0, MAYOR_OLD_POSITION);
-    assert!(
-        game.handle_in_world(&npc_interact(MAYOR), &far, NOW + 1)
-            .is_err()
-    );
-    assert!(
-        game.handle_in_world(&npc_select(MAYOR, talk), &far, NOW + 2)
-            .is_err()
-    );
+    for (packet, message) in [
+        (npc_interact(MAYOR), "NPC interaction is unavailable"),
+        (npc_select(MAYOR, talk), "NPC menu choice is unavailable"),
+    ] {
+        let refusal = game
+            .handle_in_world(&packet, &far, NOW + 1)
+            .err()
+            .expect("a far click is refused");
+        assert_eq!(refusal.to_string(), message, "{:?}", &packet[..4]);
+    }
     assert_eq!(game.state(), state, "a refused far click changes nothing");
-    assert!(
-        game.handle_in_world(&npc_select(MAYOR, talk), &near, NOW + 3)
-            .is_ok(),
+    let survived = game
+        .handle_in_world(&npc_select(MAYOR, talk), &near, NOW + 3)
+        .unwrap();
+    assert_eq!(
+        survived.replies, expected.replies,
         "the open menu survived the refused far clicks"
     );
 }

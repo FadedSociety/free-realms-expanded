@@ -141,18 +141,6 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
                 number(&position[1], &owner),
                 number(&position[2], &owner),
             ];
-            // A `reference` position tag claims a Sanctuary-main spawn; only a `reference_data` row
-            // (with its one extras body, below) may carry it. Any other row would cite another
-            // NPC's spawn while standing somewhere else.
-            assert!(
-                placement == "reference_data"
-                    || !npc["field_sources"]["position"]
-                        .as_array()
-                        .unwrap()
-                        .iter()
-                        .any(|tag| tag["kind"] == "reference"),
-                "{owner}: a {placement} row carries a reference position tag"
-            );
             if placement == "reference_data" {
                 // Interaction range reads this row; the drawn body is the extras row.
                 // They must stand at the same place or a click lands on empty ground.

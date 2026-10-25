@@ -125,6 +125,52 @@ fn content_npc_row(
     })
 }
 
+/// A `reference` tag claims a Sanctuary-main spawn, so only a `reference_data` row may carry
+/// one, on any field (T470 wrote them onto rows that stand elsewhere). Returns the first
+/// field of `npc` that breaks that rule.
+fn stray_reference_field(npc: &Value) -> Option<&str> {
+    if npc["placement"] == "reference_data" {
+        return None;
+    }
+    npc["field_sources"]
+        .as_object()?
+        .iter()
+        .find(|(_, tags)| {
+            tags.as_array()
+                .is_some_and(|tags| tags.iter().any(|tag| tag["kind"] == "reference"))
+        })
+        .map(|(field, _)| field.as_str())
+}
+
+#[test]
+fn a_reference_tag_off_a_reference_row_is_caught_on_any_field() {
+    let tagged = |placement: &str, field: &str| {
+        json!({
+            "placement": placement,
+            "field_sources": { "position": [{"kind": "client"}], field: [{"kind": "reference"}] }
+        })
+    };
+    for field in [
+        "rotation",
+        "placement_source",
+        "position_reason",
+        "position",
+    ] {
+        assert_eq!(
+            stray_reference_field(&tagged("unanchored", field)),
+            Some(field)
+        );
+        assert_eq!(
+            stray_reference_field(&tagged("poi_anchor", field)),
+            Some(field)
+        );
+        assert_eq!(
+            stray_reference_field(&tagged("reference_data", field)),
+            None
+        );
+    }
+}
+
 #[test]
 fn regional_npc_batch_and_resolved_job_references_validate() {
     let root = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
@@ -203,6 +249,11 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
             for field_sources in tagged_fields.values() {
                 validate_sources(&format!("NPC {npc_id} field"), field_sources);
             }
+            assert_eq!(
+                stray_reference_field(npc),
+                None,
+                "NPC {npc_id}: a reference tag on a row that is not reference_data"
+            );
             for field in [
                 "npc_id",
                 "name",
