@@ -229,7 +229,7 @@ Items marked (R) are reconstructed policy, not original behaviour. Items marked 
 5. **Which port is which.** Host and gateway roles of the two `lvsccg` statics and their ports are inferred.
 6. **Mission id in `39/0x28`.** The third value is read as a campaign mission id from states 3 and 4 only.
 7. **`RequestTCGChallenge` trigger** and the Lua `Shutdown` entry (`00c04920`, unmapped).
-8. **`TradingCardGame.StartTutorial` naming.** The Lua names the TCG launch "StartTutorial" (it is called for the lobby, the welcome-screen link and the store); the keys `0x6d54a188` and `0xbfd77cb0` are activity ids hashed in the client and not yet resolved to MiniGameData rows.
+8. ~~**`TradingCardGame.StartTutorial` naming.**~~ Resolved (T504): `StartTutorial` (`00c04970`) joins activity `Tcg.ActivityId` (key `0x6d54a188`, default 1049, MiniGameData 537, the tutorial row) and `StartTreasureWar` (`00c049f0`) joins `Scg.ActivityId` (key `0xbfd77cb0`, default 1078, MiniGameData 727); both are 167/1/2 through `00be7d80`.
 9. **TYPE 3 rows.** Rows 7, 11, 107 and 108 are TYPE 3; only row 11 has TCG text ("FR Trading Card Game / FIGHT!"). Piece 010 found rows 7 and 108 resolve to unrelated text and 107 to nothing. What TYPE 3 launches is unknown. Mini-game group 57 (`gotoPortal`) is not a row in `MiniGameGroupData.txt`.
 10. **Campaign table.** 74 mapped entries versus 40 test missions (`BuildTestCampaigns`) versus 8 campaigns in the screen builder; the `Tcg_Opponent` strings are not in the main client locale, and the shipped `campaign.dat` has a single scenario.
 11. **Deck builder in Treasure War.** The wiki says decks are drawn at random from owned cards; the client has `FRTWDeck*` add and remove actions and a spellbook colour setter. Which is live is unknown.

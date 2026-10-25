@@ -3,13 +3,17 @@
 //! The list reader below is written from the client reader chain (`00be79d0` -> `00be75c0` ->
 //! `00be6fa0` -> `00be63e0`), not from the writer under test, and fails on any trailing or missing
 //! byte exactly as the client does. All content is synthetic; no player names or chat appear.
-use osfr_tools::activity_portal::{
-    Activity, Catalogue, ChessActivity, Kind, Refusal, Request, Viewer, parse,
+use osfr_tools::{
+    activity_portal::{Activity, Catalogue, ChessActivity, Kind, Refusal, Request, Viewer, parse},
+    card_game,
 };
 use std::{
     fs,
     path::PathBuf,
-    sync::atomic::{AtomicU64, Ordering},
+    sync::{
+        Arc,
+        atomic::{AtomicU64, Ordering},
+    },
 };
 
 static NEXT: AtomicU64 = AtomicU64::new(0);
@@ -396,7 +400,7 @@ fn chess_row(row_id: u32) -> ChessActivity {
 fn chess_rows_follow_battles_and_open_without_a_combat_job() {
     let catalogue = Catalogue::new(vec![row(96, 0)])
         .unwrap()
-        .with_chess_rows(vec![chess_row(20), chess_row(66)])
+        .append([chess_row(20), chess_row(66)].map(Activity::from))
         .unwrap();
     let civilian = Viewer {
         combat_job: false,
@@ -433,13 +437,119 @@ fn chess_rows_follow_battles_and_open_without_a_combat_job() {
     assert!(
         Catalogue::new(vec![row(96, 0)])
             .unwrap()
-            .with_chess_rows(vec![chess_row(96)])
+            .append([chess_row(96).into()])
             .is_err()
     );
     assert!(
         Catalogue::new(vec![row(96, 0)])
             .unwrap()
-            .with_chess_rows(vec![chess_row(0)])
+            .append([chess_row(0).into()])
+            .is_err()
+    );
+}
+
+fn cards() -> Arc<card_game::Content> {
+    card_game::Content::load_optional(
+        &PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content"),
+    )
+    .unwrap()
+    .expect("card_game.json ships")
+}
+
+/// T504: every card row decodes through the client reader with no trailing bytes, and each field
+/// is its data row's value (`Kind::CardGame` rows read the data row, not a compiled table).
+#[test]
+fn card_rows_match_the_client_reader() {
+    let cards = cards();
+    let catalogue = Catalogue::assemble(None, None, None, Some(&cards)).unwrap();
+    let list = decode_list(&catalogue.list_packet(Viewer {
+        combat_job: false,
+        level: 0,
+    }));
+    assert_eq!(list.rows.len(), 17);
+    for (n, data) in cards.rows().iter().enumerate() {
+        let row = &list.rows[n];
+        let dwords = [
+            data.id,
+            data.app_system_id,
+            data.category,
+            data.image_set_id,
+            data.position,
+            data.display_name_id,
+            data.display_description_id,
+            data.name_id,
+            data.description_id,
+            1, // (R) entry type: the world tunnel, not Legacy's server_type 2
+            0, // preferred
+            data.tutorial_activity_id.unwrap_or(0),
+            data.difficulty as u32, // the lobby's -1 is 0xFFFFFFFF
+            0,
+            0,
+            0,
+        ];
+        assert_eq!(row[..], dwords, "row {}", data.id);
+        assert_eq!(
+            list.strings[n],
+            (data.detail_image.clone(), data.thumbnail_image.clone())
+        );
+        assert_eq!(list.flags[n], (u8::from(data.can_player_join), 0));
+    }
+    let lobby = &list.rows[0];
+    assert_eq!((lobby[0], lobby[12]), (7, u32::MAX));
+    // 14 deck rows point at the tutorial; the lobby, tutorial and Treasure War do not.
+    let tutorials = list.rows.iter().filter(|row| row[11] == 1049).count();
+    assert_eq!(tutorials, 14);
+}
+
+#[test]
+fn card_rows_are_refused_in_order_unknown_busy_closed() {
+    let cards = cards();
+    let catalogue = Catalogue::assemble(None, None, None, Some(&cards))
+        .unwrap()
+        .append([chess_row(20).into()])
+        .unwrap();
+    assert_eq!(
+        catalogue.kind(490),
+        Some(Kind::CardGame { minigame_id: 500 })
+    );
+    for id in [7, 490, 1049] {
+        assert_eq!(catalogue.admit(id, FIGHTER, true), Err(Refusal::Busy));
+        let refusal = catalogue.admit(id, FIGHTER, false).unwrap_err();
+        assert_eq!(refusal, Refusal::CardGameClosed, "row {id}");
+        assert!(refusal.message().contains("currently unavailable"));
+    }
+    assert_eq!(
+        catalogue.admit(1078, FIGHTER, false),
+        Err(Refusal::TreasureWarClosed)
+    );
+    assert_eq!(catalogue.admit(1079, FIGHTER, true), Err(Refusal::Unknown));
+    // The chess row beside them still opens.
+    assert!(catalogue.admit(20, FIGHTER, false).is_ok());
+}
+
+#[test]
+fn assembly_refuses_collisions_and_too_many_rows() {
+    let cards = cards();
+    // A chess row may not reuse a card id, and chess ids repeat nowhere.
+    let published = Catalogue::assemble(None, None, None, Some(&cards)).unwrap();
+    assert!(published.append([chess_row(7).into()]).is_err());
+    assert!(
+        Catalogue::default()
+            .append([chess_row(20).into(), chess_row(20).into()])
+            .is_err()
+    );
+    // 17 card rows plus 47 battles fit; one more does not.
+    let battles = |n: u32| (1000..1000 + n).map(|id| row(id, 0)).collect::<Vec<_>>();
+    assert!(
+        Catalogue::new(battles(47))
+            .unwrap()
+            .append(cards.portal_rows())
+            .is_ok()
+    );
+    assert!(
+        Catalogue::new(battles(48))
+            .unwrap()
+            .append(cards.portal_rows())
             .is_err()
     );
 }

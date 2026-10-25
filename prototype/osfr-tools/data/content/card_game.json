@@ -1,0 +1,543 @@
+{
+  "schema_version": 1,
+  "source": "Card-game portal rows (Trading Card Game category 11 and Treasure War category 26). Wire values are the FreeRealms-Legacy origin/minigame@345dc18 ClientActivityDefinitions.json rows (the ids 1049 and 1078 are the client's own Tcg.ActivityId/Scg.ActivityId defaults, StartTutorial 00c04970 and StartTreasureWar 00c049f0); each row is cross-checked against the client MiniGameData.txt and ActivityCategories.txt. Garrison's decks (ids 493 and 501, category 99, placeholder art) are left out. server_type is kept as data; the server publishes entry type 1 (R).",
+  "rows": [
+    {
+      "id": 7,
+      "minigame_id": 499,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 2,
+      "server_type": 2,
+      "display_name_id": 92784,
+      "display_description_id": 92785,
+      "name_id": 92784,
+      "description_id": 92785,
+      "can_player_join": true,
+      "detail_image": "tcg_lobby_detail.dds",
+      "thumbnail_image": "tcg_lobby_thumb.dds",
+      "difficulty": -1,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:2706; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 499 (TYPE 16, NAME_ID 92784, DESCRIPTION_ID 92785, DIFFICULTY -1); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt tcg_lobby_detail.dds and tcg_lobby_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 490,
+      "minigame_id": 500,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 9,
+      "server_type": 2,
+      "display_name_id": 426323,
+      "display_description_id": 92752,
+      "name_id": 92720,
+      "description_id": 92752,
+      "can_player_join": true,
+      "tutorial_activity_id": 1049,
+      "detail_image": "sams_trick_detail.dds",
+      "thumbnail_image": "sams_trick_thumb.dds",
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:2724; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 500 (TYPE 16, NAME_ID 92720, DESCRIPTION_ID 92752, DIFFICULTY 1); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt sams_trick_detail.dds and sams_trick_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 491,
+      "minigame_id": 504,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 7,
+      "server_type": 2,
+      "display_name_id": 426323,
+      "display_description_id": 92756,
+      "name_id": 92724,
+      "description_id": 92756,
+      "can_player_join": true,
+      "tutorial_activity_id": 1049,
+      "detail_image": "poes_trick_detail.dds",
+      "thumbnail_image": "poes_trick_thumb.dds",
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:2762; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 504 (TYPE 16, NAME_ID 92724, DESCRIPTION_ID 92756, DIFFICULTY 1); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt poes_trick_detail.dds and poes_trick_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 492,
+      "minigame_id": 508,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 4,
+      "server_type": 2,
+      "display_name_id": 426323,
+      "display_description_id": 92760,
+      "name_id": 92728,
+      "description_id": 92760,
+      "can_player_join": true,
+      "tutorial_activity_id": 1049,
+      "detail_image": "brys_trick_detail.dds",
+      "thumbnail_image": "brys_trick_thumb.dds",
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:2800; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 508 (TYPE 16, NAME_ID 92728, DESCRIPTION_ID 92760, DIFFICULTY 1); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt brys_trick_detail.dds and brys_trick_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 494,
+      "minigame_id": 516,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 17,
+      "server_type": 2,
+      "display_name_id": 426323,
+      "display_description_id": 92768,
+      "name_id": 92736,
+      "description_id": 92768,
+      "can_player_join": true,
+      "tutorial_activity_id": 1049,
+      "detail_image": "shiftys_trick_detail.dds",
+      "thumbnail_image": "shiftys_trick_thumb.dds",
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:2874; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 516 (TYPE 16, NAME_ID 92736, DESCRIPTION_ID 92768, DIFFICULTY 2); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt shiftys_trick_detail.dds and shiftys_trick_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 495,
+      "minigame_id": 520,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 13,
+      "server_type": 2,
+      "display_name_id": 426323,
+      "display_description_id": 92772,
+      "name_id": 92740,
+      "description_id": 92772,
+      "can_player_join": true,
+      "tutorial_activity_id": 1049,
+      "detail_image": "jammis_trick_detail.dds",
+      "thumbnail_image": "jammis_trick_thumb.dds",
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:2912; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 520 (TYPE 16, NAME_ID 92740, DESCRIPTION_ID 92772, DIFFICULTY 2); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt jammis_trick_detail.dds and jammis_trick_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 496,
+      "minigame_id": 524,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 11,
+      "server_type": 2,
+      "display_name_id": 426323,
+      "display_description_id": 92776,
+      "name_id": 92744,
+      "description_id": 92776,
+      "can_player_join": true,
+      "tutorial_activity_id": 1049,
+      "detail_image": "aris_trick_detail.dds",
+      "thumbnail_image": "aris_trick_thumb.dds",
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:2950; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 524 (TYPE 16, NAME_ID 92744, DESCRIPTION_ID 92776, DIFFICULTY 2); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt aris_trick_detail.dds and aris_trick_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 497,
+      "minigame_id": 528,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 15,
+      "server_type": 2,
+      "display_name_id": 426323,
+      "display_description_id": 92780,
+      "name_id": 92748,
+      "description_id": 92780,
+      "can_player_join": true,
+      "tutorial_activity_id": 1049,
+      "detail_image": "maples_trick_detail.dds",
+      "thumbnail_image": "maples_trick_thumb.dds",
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:2988; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 528 (TYPE 16, NAME_ID 92748, DESCRIPTION_ID 92780, DIFFICULTY 2); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt maples_trick_detail.dds and maples_trick_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 498,
+      "minigame_id": 503,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 8,
+      "server_type": 2,
+      "display_name_id": 426323,
+      "display_description_id": 92755,
+      "name_id": 92723,
+      "description_id": 92755,
+      "can_player_join": true,
+      "tutorial_activity_id": 1049,
+      "detail_image": "sams_tournament_detail.dds",
+      "thumbnail_image": "sams_tournament_thumb.dds",
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:2743; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 503 (TYPE 16, NAME_ID 92723, DESCRIPTION_ID 92755, DIFFICULTY 1); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt sams_tournament_detail.dds and sams_tournament_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 499,
+      "minigame_id": 507,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 6,
+      "server_type": 2,
+      "display_name_id": 426323,
+      "display_description_id": 92759,
+      "name_id": 92727,
+      "description_id": 92759,
+      "can_player_join": true,
+      "tutorial_activity_id": 1049,
+      "detail_image": "poes_tournament_detail.dds",
+      "thumbnail_image": "poes_tournament_thumb.dds",
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:2781; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 507 (TYPE 16, NAME_ID 92727, DESCRIPTION_ID 92759, DIFFICULTY 1); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt poes_tournament_detail.dds and poes_tournament_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 500,
+      "minigame_id": 511,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 3,
+      "server_type": 2,
+      "display_name_id": 426323,
+      "display_description_id": 92763,
+      "name_id": 92731,
+      "description_id": 92763,
+      "can_player_join": true,
+      "tutorial_activity_id": 1049,
+      "detail_image": "brys_tournament_detail.dds",
+      "thumbnail_image": "brys_tournament_thumb.dds",
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:2819; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 511 (TYPE 16, NAME_ID 92731, DESCRIPTION_ID 92763, DIFFICULTY 1); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt brys_tournament_detail.dds and brys_tournament_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 502,
+      "minigame_id": 519,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 16,
+      "server_type": 2,
+      "display_name_id": 426323,
+      "display_description_id": 92771,
+      "name_id": 92739,
+      "description_id": 92771,
+      "can_player_join": true,
+      "tutorial_activity_id": 1049,
+      "detail_image": "shiftys_tournament_detail.dds",
+      "thumbnail_image": "shiftys_tournament_thumb.dds",
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:2893; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 519 (TYPE 16, NAME_ID 92739, DESCRIPTION_ID 92771, DIFFICULTY 2); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt shiftys_tournament_detail.dds and shiftys_tournament_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 503,
+      "minigame_id": 523,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 12,
+      "server_type": 2,
+      "display_name_id": 426323,
+      "display_description_id": 92775,
+      "name_id": 92743,
+      "description_id": 92775,
+      "can_player_join": true,
+      "tutorial_activity_id": 1049,
+      "detail_image": "jammis_tournament_detail.dds",
+      "thumbnail_image": "jammis_tournament_thumb.dds",
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:2931; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 523 (TYPE 16, NAME_ID 92743, DESCRIPTION_ID 92775, DIFFICULTY 2); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt jammis_tournament_detail.dds and jammis_tournament_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 504,
+      "minigame_id": 527,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 10,
+      "server_type": 2,
+      "display_name_id": 426323,
+      "display_description_id": 92779,
+      "name_id": 92747,
+      "description_id": 92779,
+      "can_player_join": true,
+      "tutorial_activity_id": 1049,
+      "detail_image": "aris_tournament_detail.dds",
+      "thumbnail_image": "aris_tournament_thumb.dds",
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:2969; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 527 (TYPE 16, NAME_ID 92747, DESCRIPTION_ID 92779, DIFFICULTY 2); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt aris_tournament_detail.dds and aris_tournament_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 505,
+      "minigame_id": 531,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 14,
+      "server_type": 2,
+      "display_name_id": 426323,
+      "display_description_id": 92783,
+      "name_id": 92751,
+      "description_id": 92783,
+      "can_player_join": true,
+      "tutorial_activity_id": 1049,
+      "detail_image": "maples_tournament_detail.dds",
+      "thumbnail_image": "maples_tournament_thumb.dds",
+      "difficulty": 2,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:3007; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 531 (TYPE 16, NAME_ID 92751, DESCRIPTION_ID 92783, DIFFICULTY 2); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt maples_tournament_detail.dds and maples_tournament_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 1049,
+      "minigame_id": 537,
+      "app_system_id": 1,
+      "category": 11,
+      "image_set_id": 7591,
+      "position": 5,
+      "server_type": 2,
+      "display_name_id": 426323,
+      "display_description_id": 102281,
+      "name_id": 102280,
+      "description_id": 102281,
+      "can_player_join": true,
+      "detail_image": "tcg_tutorial_detail.dds",
+      "thumbnail_image": "tcg_tutorial_thumb.dds",
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:3026; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 537 (TYPE 16, NAME_ID 102280, DESCRIPTION_ID 102281, DIFFICULTY 1); ActivityCategories.txt row 11 (CONTENT_ID 36, NAME_ID 3388); Assets_manifest.txt tcg_tutorial_detail.dds and tcg_tutorial_thumb.dds"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) image_set_id 7591 is the Legacy value. The Flash consumer of row +0x14 (GetCell 00cfc180 col 6, Lua addHorzItem_lua) is not traceable from the exe. Legacy ImageSetId values across its rows (soccer 1317, combat 1345, fishing 21061, chess 7543) name Resources/Images/Images.txt icons, several with no ImageSets.txt row, so the column is read as an Images.txt id: 7591 is icon_category_minigames_tradingcardgame_64.dds (Images.txt:5049); ImageSets.txt:6847 reuses the number for a housing icon, which is not meant"
+        }
+      ]
+    },
+    {
+      "id": 1078,
+      "minigame_id": 727,
+      "app_system_id": 1,
+      "category": 26,
+      "image_set_id": 0,
+      "position": 1,
+      "server_type": 2,
+      "display_name_id": 6949,
+      "display_description_id": 5405,
+      "name_id": 6949,
+      "description_id": 5405,
+      "can_player_join": true,
+      "detail_image": "treasure_wars_detail.dds",
+      "thumbnail_image": "treasure_wars_thumb.dds",
+      "difficulty": 1,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "FreeRealms-Legacy origin/minigame@345dc18 src/Resources/ClientActivityDefinitions.json:3207; Lxzxrus-Free-Realms-Server@37ef175 same file, identical"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt row 727 (TYPE 23, NAME_ID 6949, DESCRIPTION_ID 5405, DIFFICULTY 1); ActivityCategories.txt row 26 (CONTENT_ID 36, NAME_ID 629); Assets_manifest.txt treasure_wars_detail.dds and treasure_wars_thumb.dds"
+        }
+      ]
+    }
+  ]
+}

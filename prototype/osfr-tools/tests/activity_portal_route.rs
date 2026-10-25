@@ -7,6 +7,7 @@
 //! (`OSFR_ACTIVITY_CONTENT` overrides the default directory).
 use osfr_tools::{
     account_store::AccountRole,
+    card_game,
     character_store::CharacterState,
     chat,
     gameplay::{Gameplay, Outcome},
@@ -265,5 +266,160 @@ fn a_finished_battle_closes_and_play_works_again() {
     assert!(
         again.zoning.is_some(),
         "the portal works again after returning"
+    );
+}
+
+/// T504: the card-game rows ride the same 167/1/1 as everything else: the lobby, the 14 decks and
+/// the tutorial under Trading Card Game (category 11, client `ActivityCategories.txt` row 11)
+/// and Treasure War under category 26 (row 26).
+#[test]
+fn world_entry_lists_the_card_game_rows() {
+    const TRADING_CARD: u32 = 11;
+    const TREASURE_WAR: u32 = 26;
+    let mut game = game();
+    let entry = game.initialize_world(&character(), 500).unwrap();
+    let rows = decode_list(lists(&entry)[0]);
+    let mut expected: Vec<u32> = vec![7];
+    expected.extend([
+        490, 491, 492, 494, 495, 496, 497, 498, 499, 500, 502, 503, 504, 505,
+    ]);
+    expected.extend([1049, 1078]);
+    for id in expected {
+        let mut listed = rows.iter().filter(|row| row.id == id);
+        let row = listed
+            .next()
+            .unwrap_or_else(|| panic!("card row {id} is listed"));
+        assert!(listed.next().is_none(), "card row {id} is listed once");
+        let category = if id == 1078 {
+            TREASURE_WAR
+        } else {
+            TRADING_CARD
+        };
+        assert_eq!(row.category, category, "card row {id} category");
+        assert!(row.can_join, "card row {id}: PLAY! is on for everyone");
+    }
+    // Battles keep their own category beside them.
+    assert_eq!(
+        rows.iter().find(|row| row.id == BATTLE).unwrap().category,
+        10
+    );
+}
+
+fn card_ids() -> Vec<u32> {
+    let dir = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let cards = card_game::Content::load_optional(&dir).unwrap().unwrap();
+    cards.rows().iter().map(|row| row.id).collect()
+}
+
+/// An ordinary player in the production-shaped gateway session.
+fn player(fixture: &field_battle_fixture::Fixture, guid: u64) -> osfr_tools::gateway::Gateway {
+    let mut gateway = fixture.gateway(LAKESHORE, guid);
+    gateway.set_dev_tools(false);
+    gateway.set_role(AccountRole::Player);
+    gateway
+}
+
+fn only_chat(outcome: &osfr_tools::gateway::GatewayOutcome) -> String {
+    assert_eq!(outcome.replies.len(), 1, "exactly one reply");
+    assert!(!outcome.state_changed && !outcome.gameplay_changed && !outcome.began_zoning);
+    field_battle_fixture::chat_text(outcome)
+}
+
+#[test]
+fn playing_a_card_row_says_unavailable_and_changes_nothing() {
+    use field_battle_fixture::{portal_play, send};
+    let fixture = field_battle_fixture::Fixture::new();
+    let mut gateway = player(&fixture, 5_041);
+    let before = gateway.snapshot();
+    let before_json = serde_json::to_vec(&before.gameplay).unwrap();
+    for (n, id) in [1049, 490, 7, 1078, 490].into_iter().enumerate() {
+        let out = send(&mut gateway, &portal_play(id), 1_000 + 10_000 * n as u64);
+        let text = only_chat(&out);
+        if id == 1078 {
+            assert_eq!(text, "Treasure War is not open yet.");
+        } else {
+            assert!(
+                text.contains("Trading Card Game is currently unavailable"),
+                "{text}"
+            );
+        }
+        assert_eq!(gateway.snapshot(), before, "row {id} left the save alone");
+        assert_eq!(
+            serde_json::to_vec(&gateway.snapshot().gameplay).unwrap(),
+            before_json
+        );
+    }
+
+    // An unlisted id is refused first, whatever the player is doing.
+    let unknown = send(&mut gateway, &portal_play(1079), 90_000);
+    assert!(only_chat(&unknown).contains("not available"));
+
+    // A busy player gets the Busy refusal before the card one (the gateway drops packets while
+    // the arena loads, so this phase drives `Gameplay` directly); the unlisted id still wins.
+    let mut game = self::game();
+    game.initialize_world(&character(), 500).unwrap();
+    switch_to_combat(&mut game);
+    let started = game
+        .handle_in_world(&play(BATTLE), &character(), 2_000)
+        .unwrap();
+    assert!(
+        started.zoning.is_some(),
+        "the battle row works on this content"
+    );
+    for id in card_ids() {
+        let busy = game
+            .handle_in_world(&play(id), &character(), 3_000)
+            .unwrap();
+        assert!(
+            chat_text(&busy).contains("Finish what you are doing"),
+            "row {id}"
+        );
+        assert!(busy.zoning.is_none() && !busy.changed, "row {id}");
+    }
+    let still_unknown = game
+        .handle_in_world(&play(1079), &character(), 4_000)
+        .unwrap();
+    assert!(chat_text(&still_unknown).contains("not available"));
+}
+
+/// The catalogue is assembled by one function: after `realm reload battles` the list still holds the
+/// chess, soccer and card rows (the old reload dropped soccer).
+#[test]
+fn reload_battles_keeps_chess_soccer_and_card_rows() {
+    use field_battle_fixture::{chat_text, send};
+    let fixture = field_battle_fixture::Fixture::new();
+    let (mut gateway, loaded) = fixture.session(LAKESHORE, 5_042);
+    let listed = |out: &osfr_tools::gateway::GatewayOutcome| {
+        let packets: Vec<&[u8]> = out
+            .replies
+            .iter()
+            .map(|r| field_battle_fixture::unframe(r))
+            .filter(|r| r.starts_with(&[167, 0, 1, 1]))
+            .collect();
+        assert_eq!(packets.len(), 1);
+        decode_list(packets[0])
+            .into_iter()
+            .map(|row| (row.id, row.category))
+            .collect::<Vec<_>>()
+    };
+    let at_startup = listed(&loaded);
+    for id in card_ids().into_iter().chain([20, 66, 67, 42, 43, 44]) {
+        assert!(at_startup.iter().any(|row| row.0 == id), "{id} at startup");
+    }
+    let reloaded = send(
+        &mut gateway,
+        &chat::local_request("realm reload battles"),
+        1_000,
+    );
+    assert!(
+        chat_text(&reloaded).contains("battles"),
+        "{}",
+        chat_text(&reloaded)
+    );
+    let refreshed = send(&mut gateway, &REFRESH, 20_000);
+    assert_eq!(
+        listed(&refreshed),
+        at_startup,
+        "reload publishes the startup list"
     );
 }

@@ -33,28 +33,36 @@
 //!   and opens the finder on `Activities.Category<row ID>`, adding every row of it (Lua
 //!   `BrowserV2:PopulateGames`, `MinigameDetail:Populate`). Row 10 is "Battles" (name 31018), row
 //!   18 is "Micro-Games" (31026), row 22 is "Soccer" (31030).
+//! * Card-game rows (T504, `card_game.rs`) take every wire value from their data row: category 11
+//!   "Trading Card Game" and 26 "Treasure War" (`ActivityCategories.txt`), app system id,
+//!   position, display and tutorial ids, art and difficulty.
 //!
 //! # Reconstructed policy (R)
 //!
 //! * Only activities backed by a running battle or a configured native soccer match are published:
 //!   one row per `field_battles.json` battle (category 10, Battles) and one per `soccer.json` game
 //!   (category 22, art `Soccer_Briarwood.dds`; both values are the client `ActivityCategories.txt`
-//!   row 22), entry type 1. Every other activity (races, mining, card game ...) is simply not
-//!   listed, so the client cannot ask for it.
+//!   row 22), entry type 1, plus chess and the card-game rows. Every other activity (races,
+//!   mining ...) is simply not listed, so the client cannot ask for it.
 //! * `CanPlayerJoin` is per player: battle rows require a combat job at the configured level;
 //!   chess is open, and soccer uses its own configured level floor without a job gate. A
 //!   refused Play says why in chat (the 147/2 join-error body is not recovered). The owning
 //!   activity, never the portal request, awards.
-//! * The preferred/featured/tutorial/AppSystem/chest fields and the two unknown dwords are 0.
+//! * For battles, chess and soccer the preferred/featured/tutorial/AppSystem/chest fields and the two
+//!   unknown dwords are 0.
 //!   Image names come from each row's client category (`bandit_hideout_detail.dds` for battles and
 //!   `Soccer_Briarwood.dds` for soccer).
+//! * (R) A card-game row is listed, so the client can ask, and Play answers with the client's own
+//!   "currently unavailable" line (Global.Text 140987): there is no card service yet. Rows publish
+//!   entry type 1 like every other row.
 
+use crate::{card_game, chess_service::ChessService, soccer_entry};
 use serde::Deserialize;
 use std::{
-    collections::BTreeSet,
     fs,
     io::{self, Read},
     path::Path,
+    sync::Arc,
 };
 
 const FAMILY: u16 = 167;
@@ -82,12 +90,14 @@ const PLAY_LEN: usize = 12;
 
 /// What a published row starts. Battles use the encounter engine; chess rows
 /// name the client minigame row the chess table service understands; soccer
-/// rows begin the session-local native match service.
+/// rows begin the session-local native match service; card-game rows start
+/// nothing yet (no card service): Play is refused.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum Kind {
     Battle,
     Chess { row_id: u32 },
     Soccer,
+    CardGame { minigame_id: u32 },
 }
 
 /// One published activity: a battle of the frozen package.
@@ -112,6 +122,20 @@ pub struct ChessActivity {
     pub description_id: u32,
     pub icon_id: u32,
     pub difficulty: u32,
+}
+
+impl From<ChessActivity> for Activity {
+    fn from(row: ChessActivity) -> Self {
+        Self {
+            id: row.row_id,
+            name_id: row.name_id,
+            description_id: row.description_id,
+            icon_id: row.icon_id,
+            difficulty: row.difficulty,
+            required_level: 0,
+            kind: Kind::Chess { row_id: row.row_id },
+        }
+    }
 }
 
 #[derive(Deserialize)]
@@ -148,6 +172,9 @@ pub enum Refusal {
     Busy,
     NotCombatJob,
     LevelTooLow(u32),
+    /// No card server exists yet (T504).
+    CardGameClosed,
+    TreasureWarClosed,
 }
 
 impl Refusal {
@@ -157,6 +184,10 @@ impl Refusal {
             Self::Busy => "Finish what you are doing before starting an activity.".into(),
             Self::NotCombatJob => "Switch to a combat job before starting a battle.".into(),
             Self::LevelTooLow(level) => format!("This activity needs level {level}."),
+            // Client Global.Text 140987.
+            Self::CardGameClosed => "The Free Realms Trading Card Game is currently unavailable. Please try again in a few minutes.".into(),
+            // (R) The client has no Treasure War closed line.
+            Self::TreasureWarClosed => "Treasure War is not open yet.".into(),
         }
     }
 }
@@ -169,39 +200,55 @@ pub enum Request {
 
 /// The published activities. Empty by default, which publishes an empty list.
 ///
-/// Soccer rows live in the same list so the client can ask for them with the
+/// Soccer, chess and card-game rows live in the same list so the client can ask for them with the
 /// portal Play request. The wire row shape is identical; `Kind` selects the
 /// admission and category rules.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct Catalogue {
     rows: Vec<Activity>,
+    /// The card-game rows' own wire values (`Kind::CardGame` rows read them by id).
+    cards: Option<Arc<card_game::Content>>,
 }
 
 impl Catalogue {
     /// Build from rows; ids must be unique and nonzero (they are the client's hash keys).
     pub fn new(rows: Vec<Activity>) -> io::Result<Self> {
         validate_rows(&rows)?;
-        Ok(Self { rows })
+        Ok(Self { rows, cards: None })
     }
 
-    /// Append soccer rows loaded from the soccer content file. Their ids share
-    /// the portal namespace with battles, so a collision is refused.
-    pub fn add_soccer_rows(&mut self, rows: Vec<Activity>) -> io::Result<()> {
-        validate_rows(&rows)?;
-        if self.rows.len() + rows.len() > MAX_ACTIVITIES {
-            return Err(invalid("too many activities"));
+    /// The one place the catalogue is assembled, at startup and on `realm reload battles`:
+    /// battles, then chess, soccer and card-game rows. Every append is validated together
+    /// (ids unique and nonzero, at most `MAX_ACTIVITIES`), so both callers publish the same list.
+    pub fn assemble(
+        battles: Option<&Path>,
+        chess: Option<&ChessService>,
+        soccer: Option<&Arc<soccer_entry::Content>>,
+        cards: Option<&Arc<card_game::Content>>,
+    ) -> io::Result<Self> {
+        let base = battles.map_or_else(|| Ok(Self::default()), Self::load)?;
+        let chess = chess.map(ChessService::activities).unwrap_or_default();
+        let soccer = soccer.map(|content| content.portal_rows());
+        let mut catalogue = base
+            .append(chess.into_iter().map(Activity::from))?
+            .append(soccer.unwrap_or_default())?;
+        if let Some(cards) = cards {
+            catalogue = catalogue.append(cards.portal_rows())?;
+            catalogue.cards = Some(cards.clone());
         }
-        if rows
-            .iter()
-            .any(|row| self.rows.iter().any(|other| other.id == row.id))
-        {
-            return Err(invalid("activity ids must be unique and nonzero"));
-        }
-        if rows.iter().any(|row| row.kind != Kind::Soccer) {
-            return Err(invalid("soccer catalogue rows have the wrong kind"));
-        }
+        Ok(catalogue)
+    }
+
+    /// The card-game content behind the card rows, so a rebuild can publish them again.
+    pub fn cards(&self) -> Option<&Arc<card_game::Content>> {
+        self.cards.as_ref()
+    }
+
+    /// Rows after the current ones. Ids share one namespace, so a collision is refused.
+    pub fn append(mut self, rows: impl IntoIterator<Item = Activity>) -> io::Result<Self> {
         self.rows.extend(rows);
-        Ok(())
+        validate_rows(&self.rows)?;
+        Ok(self)
     }
 
     /// True when `id` is a published soccer row (never a battle).
@@ -246,30 +293,6 @@ impl Catalogue {
         self.rows.iter().find(|a| a.id == id).map(|a| a.kind)
     }
 
-    /// Publish chess rows after the battle rows. A chess row is one
-    /// single-player minigame row; the encounter engine never sees it.
-    pub fn with_chess_rows(mut self, rows: Vec<ChessActivity>) -> io::Result<Self> {
-        let mut ids: BTreeSet<u32> = self.rows.iter().map(|a| a.id).collect();
-        for row in rows {
-            if row.row_id == 0 || !ids.insert(row.row_id) {
-                return Err(invalid("chess activity ids must be unique and nonzero"));
-            }
-            self.rows.push(Activity {
-                id: row.row_id,
-                name_id: row.name_id,
-                description_id: row.description_id,
-                icon_id: row.icon_id,
-                difficulty: row.difficulty,
-                required_level: 0,
-                kind: Kind::Chess { row_id: row.row_id },
-            });
-        }
-        if self.rows.len() > MAX_ACTIVITIES {
-            return Err(invalid("too many activities"));
-        }
-        Ok(self)
-    }
-
     /// Admission for a Play. Order matters: an unknown id reveals nothing about the player.
     pub fn admit(&self, id: u32, viewer: Viewer, busy: bool) -> Result<&Activity, Refusal> {
         let activity = self
@@ -300,51 +323,107 @@ impl Catalogue {
                     return Err(Refusal::LevelTooLow(activity.required_level));
                 }
             }
+            // (R) No card server yet: every card row is refused, before any state changes.
+            Kind::CardGame { .. } => {
+                return Err(match self.card(id) {
+                    Some(card) if card.category == card_game::TREASURE_WAR_CATEGORY => {
+                        Refusal::TreasureWarClosed
+                    }
+                    Some(_) => Refusal::CardGameClosed,
+                    None => Refusal::Unknown,
+                });
+            }
         }
         Ok(activity)
     }
 
+    /// The card-game data row behind a `Kind::CardGame` activity id.
+    fn card(&self, id: u32) -> Option<&card_game::Row> {
+        self.cards.as_ref()?.rows().iter().find(|row| row.id == id)
+    }
+
+    /// The values of row `index` that differ per kind; `None` when its data row is missing.
+    fn wire(&self, index: usize, a: &Activity, viewer: Viewer) -> Option<Wire<'_>> {
+        let plain = Wire {
+            app_system_id: 0,
+            category: 0,
+            position: index as u32 + 1,
+            display_name: a.name_id,
+            display_description: a.description_id,
+            tutorial: 0,
+            can_join: true,
+            detail: ART,
+            thumbnail: ART,
+        };
+        Some(match a.kind {
+            Kind::Battle => Wire {
+                category: COMBAT_CATEGORY,
+                can_join: viewer.combat_job && viewer.level >= a.required_level,
+                ..plain
+            },
+            Kind::Chess { .. } => Wire {
+                category: CHESS_CATEGORY,
+                detail: CHESS_DETAIL,
+                thumbnail: CHESS_THUMBNAIL,
+                ..plain
+            },
+            Kind::Soccer => Wire {
+                category: SOCCER_CATEGORY,
+                can_join: viewer.level >= a.required_level,
+                detail: SOCCER_ART,
+                thumbnail: SOCCER_ART,
+                ..plain
+            },
+            Kind::CardGame { .. } => {
+                let card = self.card(a.id)?;
+                Wire {
+                    app_system_id: card.app_system_id,
+                    category: card.category,
+                    position: card.position,
+                    display_name: card.display_name_id,
+                    display_description: card.display_description_id,
+                    tutorial: card.tutorial_activity_id.unwrap_or(0),
+                    can_join: card.can_player_join,
+                    detail: &card.detail_image,
+                    thumbnail: &card.thumbnail_image,
+                }
+            }
+        })
+    }
+
     /// 167/1/1: the whole list for this player. Sent at world entry and on every 167/1/4.
+    /// One row writer for every kind; the layout is the client reader `00be63e0`.
     pub fn list_packet(&self, viewer: Viewer) -> Vec<u8> {
+        let rows: Vec<(&Activity, Wire)> = self
+            .rows
+            .iter()
+            .enumerate()
+            .filter_map(|(index, a)| Some((a, self.wire(index, a, viewer)?)))
+            .collect();
         let mut out = header(SUB_LIST);
         out.extend(ENTRY_WORLD_TUNNEL.to_le_bytes());
-        out.extend((self.rows.len() as i32).to_le_bytes());
-        for (position, a) in self.rows.iter().enumerate() {
-            let (category, detail, thumbnail, can_join) = match a.kind {
-                Kind::Battle => (
-                    COMBAT_CATEGORY,
-                    ART,
-                    ART,
-                    viewer.combat_job && viewer.level >= a.required_level,
-                ),
-                Kind::Chess { .. } => (CHESS_CATEGORY, CHESS_DETAIL, CHESS_THUMBNAIL, true),
-                Kind::Soccer => (
-                    SOCCER_CATEGORY,
-                    SOCCER_ART,
-                    SOCCER_ART,
-                    viewer.level >= a.required_level,
-                ),
-            };
+        out.extend((rows.len() as i32).to_le_bytes());
+        for (a, w) in rows {
             for dword in [
                 a.id,
-                0, // AppSystemId
-                category,
+                w.app_system_id,
+                w.category,
                 a.icon_id,
-                position as u32 + 1, // ActivityPositionId
+                w.position,
+                w.display_name,
+                w.display_description,
                 a.name_id,
                 a.description_id,
-                a.name_id,
-                a.description_id,
-                ENTRY_WORLD_TUNNEL,
+                ENTRY_WORLD_TUNNEL, // (R) card rows too; see `card_game.rs`
             ] {
                 out.extend(dword.to_le_bytes());
             }
-            out.push(u8::from(can_join));
+            out.push(u8::from(w.can_join));
             out.extend(0u32.to_le_bytes()); // preferred state
             out.extend(0u32.to_le_bytes()); // featured windows
-            out.extend(0u32.to_le_bytes()); // TutorialActivityId
+            out.extend(w.tutorial.to_le_bytes()); // TutorialActivityId
             out.push(0); // MembersOnly
-            for name in [detail, thumbnail] {
+            for name in [w.detail, w.thumbnail] {
                 out.extend((name.len() as i32).to_le_bytes());
                 out.extend(name.as_bytes());
             }
@@ -354,6 +433,19 @@ impl Catalogue {
         }
         out
     }
+}
+
+/// The per-kind values of one 167/1/1 row; id, image set, name ids and difficulty come from `Activity`.
+struct Wire<'a> {
+    app_system_id: u32,
+    category: u32,
+    position: u32,
+    display_name: u32,
+    display_description: u32,
+    tutorial: u32,
+    can_join: bool,
+    detail: &'a str,
+    thumbnail: &'a str,
 }
 
 /// Decode a client message of family 167. `Ok(None)` for other families and for sub-ops the

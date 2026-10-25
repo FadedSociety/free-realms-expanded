@@ -958,14 +958,6 @@ impl Gameplay {
         } else {
             None
         };
-        let mut activities = if battle_file.is_file() {
-            crate::activity_portal::Catalogue::load(&battle_file)?
-        } else {
-            Default::default()
-        };
-        if let Some(chess) = &chess {
-            activities = activities.with_chess_rows(chess.activities())?;
-        }
         let soccer_path = [directory, bundled_npc_content.as_path()]
             .into_iter()
             .map(|base| base.join(crate::soccer_entry::CONTENT_FILE))
@@ -974,9 +966,12 @@ impl Gameplay {
             Some(path) => Some(Arc::new(crate::soccer_entry::Content::load(&path)?)),
             None => None,
         };
-        if let Some(content) = &soccer_content {
-            activities.add_soccer_rows(content.portal_rows())?;
-        }
+        let activities = crate::activity_portal::Catalogue::assemble(
+            battle_file.is_file().then_some(battle_file.as_path()),
+            chess.as_ref(),
+            soccer_content.as_ref(),
+            crate::card_game::Content::load_optional(npc_content)?.as_ref(),
+        )?;
         let mut npc_interaction = if npc_content.join("npcs").is_dir()
             && npc_content.join("stores.json").is_file()
             && npc_content.join("vendors.json").is_file()
@@ -3294,6 +3289,8 @@ impl Gameplay {
                     Ok((soccer, crate::activity_portal::Kind::Soccer)) => {
                         self.begin_soccer(soccer, character, &mut out)?;
                     }
+                    // `admit` refuses every card row (no card service yet).
+                    Ok((_, crate::activity_portal::Kind::CardGame { .. })) => {}
                     Ok((battle, crate::activity_portal::Kind::Battle)) => {
                         match self.begin_field_battle(battle, character, &mut out)? {
                             field_battle::BattleStart::Started => {}

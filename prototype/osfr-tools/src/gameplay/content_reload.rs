@@ -60,13 +60,12 @@ impl Gameplay {
             if path.is_file() {
                 if let Some(encounter) = self.encounter.as_mut() {
                     encounter.reload_field_battles(&path)?;
-                    self.activities = crate::activity_portal::Catalogue::load(&path)?;
-                    if let Some(chess) = &self.chess {
-                        self.activities = self
-                            .activities
-                            .clone()
-                            .with_chess_rows(chess.activities())?;
-                    }
+                    self.activities = crate::activity_portal::Catalogue::assemble(
+                        Some(&path),
+                        self.chess.as_ref(),
+                        self.soccer_content.as_ref(),
+                        self.activities.cards(),
+                    )?;
                     if let Some(visibility) = self.npc_visibility.as_mut() {
                         for (guid, name, name_id, model_id, position, icon) in
                             encounter.battle_spawners()

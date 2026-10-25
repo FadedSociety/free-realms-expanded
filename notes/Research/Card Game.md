@@ -97,8 +97,16 @@ The relevant client Lua is
 sender is `00be7d80`; it looks up the activity id and sends through
 `PacketTunneledClientWorldPacket` (gateway opcode 6) for entry type 1 or
 `PacketTunneledClientPacket` (gateway opcode 5) for entry type 2. The inner
-activity-join body and the two hashed activity keys (`0x6d54a188` for TCG,
-`0xbfd77cb0` for Treasure War) are not yet resolved.
+activity-join body is 167/1/2 (`activity_portal.rs`: header, u32 activity id,
+u32 client clock offset). The two hashed keys are Lua globals, resolved by T504:
+`0x6d54a188` is `Tcg.ActivityId` and `0xbfd77cb0` is `Scg.ActivityId`
+(registered by PlayClient init `0092e3bc`); `StartTutorial` (`00c04970`) and
+`StartTreasureWar` (`00c049f0`) scan the settings list for them and fall back
+to 1049.0 and 1078.0. FreeRealms-Legacy's activity ids 1049 (tutorial, MiniGameData
+537) and 1078 (Treasure War, MiniGameData 727) are those defaults, so they are the
+original ids. T504 ships the 16 category-11 rows and Treasure War from
+`data/content/card_game.json` and answers Play with a refusal until a card
+service exists.
 
 ### Main-game launch handshake
 
@@ -492,6 +500,17 @@ Gate:
 - native gate: the Windows client reaches the loading panel and accepts the
   launch or failure path. Do not claim a playable card UI at this slice.
 
+Unproven candidate step (T504, not built): the client's 39 dispatcher
+(`009bfea0`) case 0x43 fires `ActivityEvents:OnCreateGameResult` only when the
+byte at +0x18 of the packet (ctor `009aa230`) is 0. No Lua listener was found,
+and where it sits relative to BeginLoad is (R). The 117/118 OneTimeSession
+exchange is not the TCG ticket: its only senders are `0093bec0` (session type
+41, vtable slot `01820298` beside the PacketInGamePurchase strings) and
+`0093bf50` (type 68, "RequestChinaSnsSesstionTicket"). The ticket stays
+39/0x28 (`009a9de0`, two i32 halves). The sequence hint comes from TCG-Files
+(no licence, nothing copied), and nothing there shows FreeRealmsTCG.dll
+actually loaded.
+
 ### Slice 3: TCG card-service bootstrap
 
 Deliver the separate listener and the DLL-compatible framing:
@@ -636,8 +655,9 @@ Gate:
    between a product record and a playable card.
 5. `.cln` record boundaries, quantities, and the four-byte prefix.
 6. Which actor triggers the `39/0x26` challenge request.
-7. The two hashed activity ids and the inner activity-join body behind gateway
-   opcodes 5/6.
+7. ~~The two hashed activity ids and the inner activity-join body behind gateway
+   opcodes 5/6.~~ Resolved by T504: `Tcg.ActivityId` 1049 and `Scg.ActivityId` 1078
+   (defaults at `00c04970` / `00c049f0`), body 167/1/2.
 8. The sessionID dialog trigger and the exact gateway-to-card login transcript.
 9. Card Duelist quest prerequisites, coin/XP amounts, and prize-card grants.
 10. TYPE 3 rows 7, 107, and 108, which do not resolve cleanly to TCG content.
