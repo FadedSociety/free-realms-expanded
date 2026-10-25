@@ -12,8 +12,8 @@ mod gateway_vendor;
 mod resale;
 
 use gateway_vendor::{
-    NOW, count_definition, inner_packets, interact, inventory_of, login, merchant_status, select,
-    sell_packet, send, vendor_buy_packet, wrap,
+    NOW, coin_buy_packet, count_definition, inner_packets, interact, inventory_of, login,
+    merchant_status, select, sell_packet, send, vendor_buy_packet, wrap,
 };
 use osfr_tools::{
     account_store::AccountRole,
@@ -59,16 +59,6 @@ fn inventory_content() -> PathBuf {
         .unwrap_or_else(|| {
             PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab/references/rust-gameplay")
         })
-}
-
-fn buy_packet(merchant: u64, transaction: u32, item: i32, quantity: u32) -> Vec<u8> {
-    let mut packet = vec![165, 0, 4, 0];
-    packet.extend(merchant.to_le_bytes());
-    packet.extend(transaction.to_le_bytes());
-    packet.extend(item.to_le_bytes());
-    packet.extend(0i32.to_le_bytes()); // tint
-    packet.extend(quantity.to_le_bytes()); // quantity (client writer 0x00c75ed0)
-    packet
 }
 
 fn bundle(children: &[Vec<u8>]) -> Vec<u8> {
@@ -242,7 +232,7 @@ fn native_sell_changes_exactly_one_stack_and_the_coin_balance() {
     // Ordinary native BUY first: one stack, exact price.
     let before_buy = counter.state();
     let bought = counter
-        .send(&buy_packet(VENDOR_ID, 90_001, 8, 1))
+        .send(&coin_buy_packet(VENDOR_ID, 90_001, 8, 1))
         .expect("buy is accepted");
     assert_eq!(bought.result_code, RESULT_OK);
     let after_buy = counter.state();
@@ -858,7 +848,7 @@ fn gateway_buy_then_sell_round_trip_from_the_native_window() {
     let (mut gateway, _) = fixture.at_open_shop();
     let before = inventory_of(&gateway);
     // Ordinary BUY through the same window (165/4 names the shop by its content key).
-    let replies = send(&mut gateway, &buy_packet(NPC, 31_001, 8, 1));
+    let replies = send(&mut gateway, &coin_buy_packet(NPC, 31_001, 8, 1));
     assert_eq!(completions(&replies)[0].result, RESULT_OK);
     let bought = inventory_of(&gateway);
     assert_eq!(bought.coins, before.coins - 15);

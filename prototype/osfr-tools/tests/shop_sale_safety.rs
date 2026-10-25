@@ -26,7 +26,7 @@ mod round70_content;
 mod vendor_fixture;
 
 use gateway_vendor::{
-    NOW, buy_back_packet, buy_back_reply, coin_buy_packet, completions, connect_with,
+    NOW, buy_back_packet, buy_back_result, coin_buy_packet, completions, connect_with,
     count_definition, fixture_root, inner_packets, interact, inventory_of, merchant_status, select,
     sell_packet, send, vendor_buy_packet, wrap,
 };
@@ -40,8 +40,7 @@ use osfr_tools::{
     pets::PetService,
     station_cash::{DEED_ITEM_TYPE, Wallet},
 };
-use serde_json::{Value, json};
-use sha2::{Digest, Sha256};
+use serde_json::Value;
 use std::{
     collections::BTreeMap,
     fs,
@@ -119,11 +118,6 @@ fn advertised_items(replies: &[Vec<u8>]) -> Vec<u32> {
 
 fn buy_165_4(transaction: u32, item: i32) -> Vec<u8> {
     coin_buy_packet(GLORIA, transaction, item, 1)
-}
-
-/// The 165/13 result word of a 165/12 buy-back.
-fn buy_back_result(replies: &[Vec<u8>]) -> u32 {
-    buy_back_reply(replies).1
 }
 
 /// Sell the fixture's seeded item through the real 165/5 path, leaving one buy-back entry.
@@ -354,7 +348,10 @@ fn every_shipped_vendor_item_is_sellable_or_reviewed_unsellable() {
         .as_array()
         .expect("vendor records are an array")
     {
-        for item in vendor["item_ids"].as_array().into_iter().flatten() {
+        for item in vendor["item_ids"]
+            .as_array()
+            .expect("vendor item_ids is an array")
+        {
             let id = i32::try_from(item.as_i64().expect("vendor item ID is an integer"))
                 .expect("vendor item ID fits i32");
             if let Some(reason) = shop.sale_block(id) {
@@ -378,18 +375,7 @@ fn a_priced_item_with_an_unreadable_definition_is_refused_and_not_advertised() {
     let fixture = gloria_fixture("t529-d");
     let mut row = TRUNCATED.to_le_bytes().to_vec();
     row.extend([0; 8]); // far short of the model strings that precede Type
-    let path = fixture.content().join("inventory.json");
-    let mut content = read_json(&path);
-    content["definitions"]
-        .as_array_mut()
-        .expect("definitions are an array")
-        .push(json!({
-            "id": TRUNCATED, "slot": 0, "class_id": 1, "default_tint": 0, "max_stack": 1,
-            "model": "", "texture": "", "tint_alias": "", "effect": 0, "wield_type": 0,
-            "serialized_hex": row.iter().map(|byte| format!("{byte:02x}")).collect::<String>(),
-            "sha256": format!("{:x}", Sha256::digest(&row)),
-        }));
-    fs::write(&path, serde_json::to_vec(&content).unwrap()).expect("fixture inventory writes");
+    fixture.define_item(TRUNCATED, &row);
     fixture.stock_price_coins(&[(TRUNCATED, 50), (FURNITURE, 200)]);
     let inventory = Inventory::load(fixture.content(), None).expect("fixture inventory loads");
     assert!(inventory.has_definition(TRUNCATED), "the row is defined");
