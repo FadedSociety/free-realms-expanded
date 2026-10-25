@@ -15202,14 +15202,14 @@
       "reference_ids": [],
       "name": "Dani",
       "name_reason": null,
-      "name_string_id": 2482033792,
+      "name_string_id": 14701,
       "name_string_ids": [
         {
-          "table": "unspecified",
-          "id": 2482033792
+          "table": "client_locale",
+          "id": 14701
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "T500: the guide's name cell carries the hashed id 2482033792, which the client cannot resolve as a nameplate; the client locale id 14701 is 'Dani' (lab/reports/locale-id-to-text.json), the fork NameId of definition 33373.",
       "zone": "Sanctuary",
       "zone_id": 10,
       "zone_reason": null,
@@ -15241,29 +15241,23 @@
       ],
       "services_reason": null,
       "position": [
-        -1411.635418,
-        -27.631,
-        358.937856
+        -1284.0914,
+        -14.196148,
+        263.81052
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.9016198145155808,
+        0.6628562212296795,
         0.0,
-        0.43252943260879895
+        0.7487467061544313
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 5,
-          "poi_name": "Sanctuary",
-          "match_score": 0
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform.",
+      "position_reason": "Legacy built-content spawn coordinates copied from ../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3597 (spawnNpcWithGuid(33373, 100000033373, ...)); ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33373 (ModelId=384, ModelFileName=fairy_sanctuary_f.adr, NameId=14701). (R) the fork does not say where the position comes from.",
       "source": [
         {
           "kind": "client",
@@ -15276,6 +15270,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3597 (spawnNpcWithGuid(33373, 100000033373, -1284.0914, -14.196148, 263.81052, 1.44925404)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33373 (NameId=14701, ModelId=384, ModelFileName=fairy_sanctuary_f.adr), row added in e3deee7."
         }
       ],
       "field_sources": {
@@ -15343,32 +15341,20 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 77; source cell: [client] [wiki Super Spooktacular]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 77; source cell: [client] [wiki Super Spooktacular]"
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3597 (spawnNpcWithGuid(33373, 100000033373, -1284.0914, -14.196148, 263.81052, 1.44925404)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33373 (NameId=14701, ModelId=384, ModelFileName=fairy_sanctuary_f.adr), row added in e3deee7. NameId resolves in the client locale table to 'Dani'."
           }
         ],
         "name_string_ids": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 77; source cell: [client] [wiki Super Spooktacular]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 77; source cell: [client] [wiki Super Spooktacular]"
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3597 (spawnNpcWithGuid(33373, 100000033373, -1284.0914, -14.196148, 263.81052, 1.44925404)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33373 (NameId=14701, ModelId=384, ModelFileName=fairy_sanctuary_f.adr), row added in e3deee7. NameId resolves in the client locale table to 'Dani'."
           }
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 77; source cell: [client] [wiki Super Spooktacular]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 77; source cell: [client] [wiki Super Spooktacular]"
+            "kind": "reconstructed",
+            "evidence": "(R) T500: records why the guide hash id was replaced by the client locale id"
           }
         ],
         "zone": [
@@ -15549,18 +15535,14 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 5 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3597 (spawnNpcWithGuid(33373, 100000033373, -1284.0914, -14.196148, 263.81052, 1.44925404)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33373 (NameId=14701, ModelId=384, ModelFileName=fairy_sanctuary_f.adr), row added in e3deee7."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3597 (spawnNpcWithGuid(33373, 100000033373, -1284.0914, -14.196148, 263.81052, 1.44925404)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33373 (NameId=14701, ModelId=384, ModelFileName=fairy_sanctuary_f.adr), row added in e3deee7."
           }
         ],
         "position_w": [
@@ -15571,36 +15553,36 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 5 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3597 (spawnNpcWithGuid(33373, 100000033373, -1284.0914, -14.196148, 263.81052, 1.44925404)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33373 (NameId=14701, ModelId=384, ModelFileName=fairy_sanctuary_f.adr), row added in e3deee7."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) Y-axis quaternion derived from the fork heading (sin and cos of half the heading), as the existing legacy_data rows do"
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3597 (spawnNpcWithGuid(33373, 100000033373, -1284.0914, -14.196148, 263.81052, 1.44925404)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33373 (NameId=14701, ModelId=384, ModelFileName=fairy_sanctuary_f.adr), row added in e3deee7."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3597 (spawnNpcWithGuid(33373, 100000033373, -1284.0914, -14.196148, 263.81052, 1.44925404)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33373 (NameId=14701, ModelId=384, ModelFileName=fairy_sanctuary_f.adr), row added in e3deee7."
           }
         ],
         "placement_confidence": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) T500: the fork does not say where the position comes from; replaces the reconstructed zone-centre position. High means one fork spawn bound by NameId and exact position, not native-client confirmation."
           }
         ],
         "placement_candidates": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) a legacy_data placement has no POI candidates"
           }
         ],
         "capture_match": [
@@ -15608,8 +15590,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3597 (spawnNpcWithGuid(33373, 100000033373, -1284.0914, -14.196148, 263.81052, 1.44925404)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33373 (NameId=14701, ModelId=384, ModelFileName=fairy_sanctuary_f.adr), row added in e3deee7."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3597 (spawnNpcWithGuid(33373, 100000033373, -1284.0914, -14.196148, 263.81052, 1.44925404)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33373 (NameId=14701, ModelId=384, ModelFileName=fairy_sanctuary_f.adr), row added in e3deee7."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3597 (spawnNpcWithGuid(33373, 100000033373, -1284.0914, -14.196148, 263.81052, 1.44925404)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33373 (NameId=14701, ModelId=384, ModelFileName=fairy_sanctuary_f.adr), row added in e3deee7."
+          }
         ]
-      }
+      },
+      "heading": 1.44925404,
+      "model_id": 384,
+      "model_file_name": "fairy_sanctuary_f.adr"
     },
     {
       "npc_id": 9500000468,
@@ -19817,7 +19820,10 @@
         "Sanctuary (690633245, 3453890318)"
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3000310,
+        3000311
+      ],
       "quests_given_text": [
         "Looking for Lavender (title 2150004359; interview Dani, Honey and Barin Battlerock, 2646210010); fish-photo errand"
       ],
@@ -20005,7 +20011,7 @@
         "quest_ids_given": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+            "evidence": "(R) T500: Looking for Lavender (3000310) and A Reliable Source (3000311) are given and handed in here; ids minted from QuestIds 3010 and 3011"
           }
         ],
         "quests_given_text": [
@@ -31607,14 +31613,14 @@
       ],
       "name": "Honey",
       "name_reason": null,
-      "name_string_id": 901526272,
+      "name_string_id": 7666,
       "name_string_ids": [
         {
-          "table": "unspecified",
-          "id": 901526272
+          "table": "client_locale",
+          "id": 7666
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "T500: the guide's name cell carries the hashed id 901526272, which the client cannot resolve as a nameplate; the client locale id 7666 is 'Honey' (lab/reports/locale-id-to-text.json), the fork NameId of definition 33146.",
       "zone": "Sanctuary",
       "zone_id": 10,
       "zone_reason": null,
@@ -31739,34 +31745,23 @@
       ],
       "services_reason": null,
       "position": [
-        -1491.91308,
-        -35.049,
-        410.707853
+        -1503.994,
+        -34.46316,
+        377.915
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.11971220728891936,
+        -0.2766439167188096,
         0.0,
-        0.9928086358538663
+        0.9609724987440985
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 24,
-          "poi_name": "Queensfields",
-          "match_score": 12
-        },
-        {
-          "poi_id": 5,
-          "poi_name": "Sanctuary",
-          "match_score": 9
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 24 by longest normalized whole-name score 12; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Legacy built-content spawn coordinates copied from ../lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3437 (spawnNpcWithGuid(33146, 100000033146, ...)); ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33146 (ModelId=377, ModelFileName=fairy_farmer_f.adr, NameId=7666). (R) the fork does not say where the position comes from.",
       "source": [
         {
           "kind": "client",
@@ -31779,6 +31774,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3437 (spawnNpcWithGuid(33146, 100000033146, -1503.994, -34.46316, 377.915, -0.560599925)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33146 (NameId=7666, ModelId=377, ModelFileName=fairy_farmer_f.adr), row added in e3deee7."
         }
       ],
       "field_sources": {
@@ -31846,32 +31845,20 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 47; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 47; source cell: [client] [wiki]"
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3437 (spawnNpcWithGuid(33146, 100000033146, -1503.994, -34.46316, 377.915, -0.560599925)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33146 (NameId=7666, ModelId=377, ModelFileName=fairy_farmer_f.adr), row added in e3deee7. NameId resolves in the client locale table to 'Honey'."
           }
         ],
         "name_string_ids": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 47; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 47; source cell: [client] [wiki]"
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3437 (spawnNpcWithGuid(33146, 100000033146, -1503.994, -34.46316, 377.915, -0.560599925)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33146 (NameId=7666, ModelId=377, ModelFileName=fairy_farmer_f.adr), row added in e3deee7. NameId resolves in the client locale table to 'Honey'."
           }
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 47; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sanctuary.md#Part A. Palace, guards, trainers and quest givers, row 47; source cell: [client] [wiki]"
+            "kind": "reconstructed",
+            "evidence": "(R) T500: records why the guide hash id was replaced by the client locale id"
           }
         ],
         "zone": [
@@ -32144,18 +32131,14 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=24 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=24 NameId=7262 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3437 (spawnNpcWithGuid(33146, 100000033146, -1503.994, -34.46316, 377.915, -0.560599925)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33146 (NameId=7666, ModelId=377, ModelFileName=fairy_farmer_f.adr), row added in e3deee7."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3437 (spawnNpcWithGuid(33146, 100000033146, -1503.994, -34.46316, 377.915, -0.560599925)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33146 (NameId=7666, ModelId=377, ModelFileName=fairy_farmer_f.adr), row added in e3deee7."
           }
         ],
         "position_w": [
@@ -32166,36 +32149,36 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=24 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=24 NameId=7262 matches native name_string_id."
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3437 (spawnNpcWithGuid(33146, 100000033146, -1503.994, -34.46316, 377.915, -0.560599925)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33146 (NameId=7666, ModelId=377, ModelFileName=fairy_farmer_f.adr), row added in e3deee7."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) Y-axis quaternion derived from the fork heading (sin and cos of half the heading), as the existing legacy_data rows do"
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3437 (spawnNpcWithGuid(33146, 100000033146, -1503.994, -34.46316, 377.915, -0.560599925)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33146 (NameId=7666, ModelId=377, ModelFileName=fairy_farmer_f.adr), row added in e3deee7."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3437 (spawnNpcWithGuid(33146, 100000033146, -1503.994, -34.46316, 377.915, -0.560599925)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33146 (NameId=7666, ModelId=377, ModelFileName=fairy_farmer_f.adr), row added in e3deee7."
           }
         ],
         "placement_confidence": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) T500: the fork does not say where the position comes from; replaces the reconstructed POI-anchor position. High means one fork spawn bound by NameId and exact position, not native-client confirmation."
           }
         ],
         "placement_candidates": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) a legacy_data placement has no POI candidates"
           }
         ],
         "capture_match": [
@@ -32203,8 +32186,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3437 (spawnNpcWithGuid(33146, 100000033146, -1503.994, -34.46316, 377.915, -0.560599925)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33146 (NameId=7666, ModelId=377, ModelFileName=fairy_farmer_f.adr), row added in e3deee7."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3437 (spawnNpcWithGuid(33146, 100000033146, -1503.994, -34.46316, 377.915, -0.560599925)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33146 (NameId=7666, ModelId=377, ModelFileName=fairy_farmer_f.adr), row added in e3deee7."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3437 (spawnNpcWithGuid(33146, 100000033146, -1503.994, -34.46316, 377.915, -0.560599925)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=33146 (NameId=7666, ModelId=377, ModelFileName=fairy_farmer_f.adr), row added in e3deee7."
+          }
         ]
-      }
+      },
+      "heading": -0.560599925,
+      "model_id": 377,
+      "model_file_name": "fairy_farmer_f.adr"
     },
     {
       "npc_id": 9500000496,
@@ -39561,14 +39565,16 @@
       "presence": "listed",
       "title_or_role": [],
       "roles": [
-        "ambient"
+        "quest_giver"
       ],
       "enemy_kind": null,
       "location_evidence": [
         "Sanctuary; wiki puts her with Sir Whittington in the Lake of Tears"
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3000301
+      ],
       "quests_given_text": [],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
@@ -39729,6 +39735,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) role categories normalize the guide title/role, quest, service, section, and job-reference evidence; they do not describe native actor behavior"
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T500: Nomi gives Nomi's Little Brother (3000301), so her role is quest_giver, not ambient"
           }
         ],
         "enemy_kind": [
@@ -39752,7 +39762,7 @@
         "quest_ids_given": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+            "evidence": "(R) T500: Nomi's Little Brother (3000301) is given and handed in here; id minted from Lxzxrus QuestId 3001"
           }
         ],
         "quests_given_text": [
@@ -61303,6 +61313,295 @@
       "model_id": 4,
       "model_file_name": "robgoblin_m_basic.adr",
       "greeting_string_id": 76061
+    },
+    {
+      "npc_id": 9500001008,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Hasti",
+      "name_reason": null,
+      "name_string_id": 46273,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 46273
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Sanctuary",
+      "zone_id": 10,
+      "zone_reason": null,
+      "region_pages": [
+        "Sanctuary"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Nomi's little brother; talk target of Nomi's Little Brother"
+      ],
+      "roles": [
+        "ambient"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "Legacy built-content spawn Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1596, west of Sanctuary; the guide for Merry Vale lists Hasti among the racetrack ambassador targets with no row (NPCs - Merry Vale.md:166)."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [],
+      "quests_accepted": [],
+      "quests_accepted_reason": "T500: Hasti is a talk target of Nomi's Little Brother (3000301), not a hand-in.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "No vendor stock is recorded for this NPC.",
+      "services": [],
+      "services_reason": "No distinct service is recorded for this NPC.",
+      "position": [
+        -2252.73,
+        -15.94524,
+        564.0553
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        -0.1247501400478039,
+        0.0,
+        0.9921881890841341
+      ],
+      "placement": "unanchored",
+      "placement_source": "reconstructed_unanchored_default",
+      "placement_confidence": "low",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "(R) T500: this unanchored regional row does not spawn a duplicate actor. Its position is the Legacy extra-spawn transform of actor 3016 (FabledRealms.lua:1596), so NPC range checks use the actor the client actually sees; the extra spawn carries content_key 9500001008.",
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1596 (spawnNpcWithGuid(3016, 100000003016, -2252.73, -15.94524, 564.0553, -0.250152)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3016 (NameId=46273, ModelId=242, ModelFileName=fairychild_m_mohawkshorts.adr); the same spawn is npc_spawns_extra.json spawn_guid 100000003016."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row. T500: content_key 9500001008 on that extra spawn binds the Legacy Hasti actor to this row."
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row. T500: content_key 9500001008 on that extra spawn binds the Legacy Hasti actor to this row."
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row. T500: content_key 9500001008 on that extra spawn binds the Legacy Hasti actor to this row."
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row. T500: content_key 9500001008 on that extra spawn binds the Legacy Hasti actor to this row."
+          }
+        ],
+        "name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1596 (spawnNpcWithGuid(3016, 100000003016, -2252.73, -15.94524, 564.0553, -0.250152)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3016 (NameId=46273, ModelId=242, ModelFileName=fairychild_m_mohawkshorts.adr); the same spawn is npc_spawns_extra.json spawn_guid 100000003016. NameId resolves in the client locale table to 'Hasti'."
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1596 (spawnNpcWithGuid(3016, 100000003016, -2252.73, -15.94524, 564.0553, -0.250152)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3016 (NameId=46273, ModelId=242, ModelFileName=fairychild_m_mohawkshorts.adr); the same spawn is npc_spawns_extra.json spawn_guid 100000003016. NameId resolves in the client locale table to 'Hasti'."
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1596 (spawnNpcWithGuid(3016, 100000003016, -2252.73, -15.94524, 564.0553, -0.250152)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3016 (NameId=46273, ModelId=242, ModelFileName=fairychild_m_mohawkshorts.adr); the same spawn is npc_spawns_extra.json spawn_guid 100000003016. NameId resolves in the client locale table to 'Hasti'."
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1596 (spawnNpcWithGuid(3016, 100000003016, -2252.73, -15.94524, 564.0553, -0.250152)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3016 (NameId=46273, ModelId=242, ModelFileName=fairychild_m_mohawkshorts.adr); the same spawn is npc_spawns_extra.json spawn_guid 100000003016."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T500: the position is the existing Legacy extra-spawn transform bound to this content key; the regional row remains unanchored and does not spawn."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1596 (spawnNpcWithGuid(3016, 100000003016, -2252.73, -15.94524, 564.0553, -0.250152)); Sanctuary-main-20261019@10f129e src/Resources/Npcs.json Id=3016 (NameId=46273, ModelId=242, ModelFileName=fairychild_m_mohawkshorts.adr); the same spawn is npc_spawns_extra.json spawn_guid 100000003016."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Y-axis quaternion derived from the fork heading (sin and cos of half the heading), as the existing legacy_data rows do"
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T500: the position is a Legacy actor binding, not a zone-centre offset; the regional row is unspawned and the extra spawn draws Hasti."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T500: low; the regional row is scaffolding for the bound extra spawn."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T500), not read from a guide row"
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T500: the range anchor is aligned to the bound Legacy actor so a client click on that actor resolves to this content key."
+          }
+        ]
+      }
     }
   ]
 }

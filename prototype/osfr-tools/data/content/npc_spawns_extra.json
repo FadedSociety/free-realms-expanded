@@ -26017,6 +26017,7 @@
     {
       "spawn_guid": 100000003016,
       "legacy_npc_id": 3016,
+      "content_key": 9500001008,
       "model_id": 242,
       "model_file_name": "fairychild_m_mohawkshorts.adr",
       "name": "Hasti",
@@ -26032,6 +26033,10 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1759; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3016 (ModelId=242, ModelFileName=fairychild_m_mohawkshorts.adr, NameId=46273)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T500: content_key 9500001008 binds this Legacy Hasti actor (FabledRealms.lua:1596) to the new Hasti row in npcs/sanctuary.json, so Nomi's Little Brother can credit a Talk to it. The actor, model and transform are unchanged."
         }
       ],
       "position_w": null

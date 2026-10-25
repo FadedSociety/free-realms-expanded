@@ -1,0 +1,240 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3000301,
+      "title_string_id": 46280,
+      "intro_text_string_id": 46279,
+      "description_string_id": 46621,
+      "end_text_string_id": 73239,
+      "giver_npc_id": 9500000509,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500001008,
+          "dialogue_string_id": 140679,
+          "text_string_id": 46621,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3001 goal 1: NameId 46621; TargetGuid 100000003016 = definition 3016 (Hasti, NameId 46273, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1596), bound to npcs/sanctuary.json 9500001008 (the new Hasti row this slice adds) and to the extra spawn npc_spawns_extra.json spawn_guid 100000003016 through its content_key"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000509,
+          "text_string_id": 74455,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3001 goal 2: NameId 74455; TargetGuid 100000002335 = definition 2335 (Nomi, NameId 46272, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:941), bound to npcs/sanctuary.json 9500000509 at the same spawn; the last goal at the turn-in NPC: its DialogueId 73239 is the quest's end_text_string_id"
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 20,
+          "items": [],
+          "job_xp": {
+            "1": 20
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3001: RewardCoins 20, RewardItems []. Its RewardExperience 50 is not used; job_xp follows the T202 ladder. Sanctuary-main-20261019@10f129e src/Resources/Quests.json QuestId=3001 says RewardCoins 30; 20 is used."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Coins: Lxzxrus 20 against Sanctuary-main 30, 20 used. Job XP 20 goes to profile 1 (Adventurer) on the T202 ladder (two goals)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3001 \"Nomi's Little Brother\" (quest data last changed in 1c36ad7): TitleId 46280, DescriptionId 46621, GiverDialogueId 46279, GiverGuid 100000002335, TargetGuid 100000002335, PrerequisiteQuestId 0, NextQuestId 3002 (not imported here). AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 46280 \"Nomi's Little Brother\" (title), 46621 (description and goal 1 text), 46279 (intro) and 73239 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T500: minted id 3000301 = 3000300 + (fork QuestId 3001 - 3000); XP rung 20 (two goals); coin value 20 is the Lxzxrus RewardCoins (Sanctuary-main says 30)."
+        }
+      ]
+    },
+    {
+      "id": 3000310,
+      "title_string_id": 390787,
+      "intro_text_string_id": 390786,
+      "description_string_id": 390788,
+      "end_text_string_id": 390789,
+      "giver_npc_id": 9500000476,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000467,
+          "dialogue_string_id": 390817,
+          "text_string_id": 390798,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Quests.json QuestId=3010 goal 1: NameId 390798; Targets NpcId 33373 (definition 33373, Dani, NameId 14701, Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3597), bound to npcs/sanctuary.json 9500000467 at the same spawn; the row is made drawable at that spawn by this slice"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000107,
+          "dialogue_string_id": 390820,
+          "text_string_id": 390800,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Quests.json QuestId=3010 goal 2: NameId 390800; Targets NpcId 33146 (definition 33146, Honey, NameId 7666, Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3437), bound to npcs/sanctuary.json 9000000107 at the same spawn; the row is made drawable at that spawn by this slice"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9500000443,
+          "dialogue_string_id": 390822,
+          "text_string_id": 390802,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Quests.json QuestId=3010 goal 3: NameId 390802; Targets NpcId 2359 (definition 2359, Barin Battlerock, NameId 46783, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:965), bound to npcs/sanctuary.json 9500000443 at the same spawn"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "npc_id": 9500000476,
+          "text_string_id": 390804,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Quests.json QuestId=3010 goal 4: NameId 390804; Targets NpcId 2419 (definition 2419, Feldman, NameId 390781, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1014), bound to npcs/sanctuary.json 9500000476 at the same spawn; the last goal at the turn-in NPC: its DialogueId 390789 is the quest's end_text_string_id"
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 36,
+          "items": [],
+          "job_xp": {
+            "1": 30
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Quests.json QuestId=3010: RewardCoins 36, RewardItems []. Its RewardExperience 100 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 30 goes to profile 1 (Adventurer) on the T202 ladder (four goals)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Resources/Quests.json (last changed in 34bba5b) QuestId=3010 \"Looking for Lavender\": TitleId 390787, DescriptionId 390788, GiverDialogueId 390786, GiverNpcId 2419, TargetNpcId 2419, no PrerequisiteQuestId, NextQuestId 3011. Lxzxrus parks this quest in Quests.disabled.json because its Dani and Honey goals point at guids that never spawn (100000040011, 100000040012); Sanctuary-main spawns both (Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3597 and :3437). AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 390787 \"Looking for Lavender\" (title), 390788 (description), 390786 (intro) and 390789 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T500: minted id 3000310 = 3000300 + (fork QuestId 3010 - 3000); XP rung 30 (four goals); coin value 36 is the Sanctuary-main RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000311,
+      "title_string_id": 390845,
+      "intro_text_string_id": 390844,
+      "description_string_id": 390846,
+      "end_text_string_id": 390847,
+      "giver_npc_id": 9500000476,
+      "prerequisite_quest_ids": [
+        3000310
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000715,
+          "dialogue_string_id": 390855,
+          "text_string_id": 390850,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3011 goal 1: NameId 390850; TargetGuid 100000001419 = definition 1419 (Suni Sorrowsmile, NameId 45429, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:176), bound to npcs/shrouded_glade.json 9500000715 at the same spawn"
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000476,
+          "text_string_id": 390804,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3011 goal 2: NameId 390804; TargetGuid 100000002419 = definition 2419 (Feldman, NameId 390781, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:1014), bound to npcs/sanctuary.json 9500000476 at the same spawn; the last goal at the turn-in NPC: its DialogueId 390847 is the quest's end_text_string_id"
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {
+            "1": 20
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3011: RewardCoins 24, RewardItems []. Its RewardExperience 80 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 20 goes to profile 1 (Adventurer) on the T202 ladder (two goals)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3011 \"A Reliable Source\" (quest data last changed in 1c36ad7): TitleId 390845, DescriptionId 390846, GiverDialogueId 390844, GiverGuid 100000002419, TargetGuid 100000002419, PrerequisiteQuestId 0. Sanctuary-main-20261019@10f129e src/Resources/Quests.json (34bba5b) QuestId=3011 has PrerequisiteQuestId 3010 and the same goals; 3000310 is used; Lxzxrus has no prerequisite because it parked 3010. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 390845 \"A Reliable Source\" (title), 390846 (description, names Suni Sorrowsmile), 390844 (intro) and 390847 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T500: minted id 3000311 = 3000300 + (fork QuestId 3011 - 3000); prerequisite 3000310 from Sanctuary-main; XP rung 20 (two goals); coin value 24 is the fork RewardCoins."
+        }
+      ]
+    }
+  ]
+}

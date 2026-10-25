@@ -312,6 +312,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Diggy (T466 Touring Seaside talk target): NPCs - Seaside.md:45 quotes only third-person cooking objectives and other speakers' referrals (428610, 21340, 384277, 100280); locale 93435 ('finest seafood') has no speaker in any guide row, and 93429 is the quest-step goal text, so no first-person line of his own is proven.",
     ),
     (
+        9000000107,
+        "Honey (T500 talk target of 3000310): NPCs - Sanctuary.md:47 quotes only a farm location and harvesting objectives (841702301, 2418103113, 623626341) and the interview mention (2478429130); her reply 390820 is the quest-step dialogue of 3000310 goal 2, not a greeting. Her chef quest intros are disabled quests.",
+    ),
+    (
         9000000140,
         "Manager Landon (T409): his client lines are third person (402947, 402841, 416471, 402687); the first-person substitute plea 418984 is the Snowy Scrimmage offer intro, whose speaker the Soccer Star guide leaves unnamed (1591815111), so no uncontested greeting of his own is recovered.",
     ),
@@ -334,6 +338,14 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
     (
         9500000309,
         "Hrugagu: only third-person arrow-delivery objectives; the three recipient replies cannot be assigned to one recruit.",
+    ),
+    (
+        9500000443,
+        "Barin Battlerock (T500 talk target of 3000310): NPCs - Sanctuary.md:76 gives only a role and a video location, 'Interview target in Looking for Lavender'; his reply 390822 is the quest-step dialogue of 3000310 goal 3, not a greeting, and 390802 is the objective.",
+    ),
+    (
+        9500000467,
+        "Dani (T500 talk target of 3000310): NPCs - Sanctuary.md:77 quotes only a Pixiewood location (3686406336) and card-quest and pet-trick objectives (4174833278); her reply 390817 is the quest-step dialogue of 3000310 goal 1, not a greeting, and 390798 is the objective.",
     ),
     (
         9500000561,
@@ -362,6 +374,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
     (
         9500000697,
         "Kosha: only the objective string 1664864679; no recovered first-person speech.",
+    ),
+    (
+        9500000715,
+        "Suni Sorrowsmile (T500 talk target of 3000311): NPCs - Shrouded Glade.md:59 quotes only the third-person 'Suni can be found in the Shrouded Glade' (3882523674) and objectives; her reply 390855 is the quest-step dialogue of 3000311 goal 1, not a greeting, and 390850 is the objective.",
     ),
     (
         9500000735,
@@ -402,6 +418,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
     (
         9500001007,
         "Burglz (T498 turn-in of 3000341, a new row): the guide row for Burgl (NPCs - Wilds.md:119) quotes only objectives (2090604938, 946401124, 1449038490); his first-person line 70105 is the Question at the Quarry end text, not a greeting, and 441432 is the Seaside banker's greeting and must not be reused.",
+    ),
+    (
+        9500001008,
+        "Hasti (T500 talk target of 3000301, a new row bound to extra spawn 100000003016): NPCs - Merry Vale.md:166 lists him only as a racetrack ambassador target with no row; his reply 140679 is the quest-step dialogue of 3000301 goal 1, not a greeting, and 46621 is the objective.",
     ),
 ];
 

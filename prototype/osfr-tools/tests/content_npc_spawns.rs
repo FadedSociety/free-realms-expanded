@@ -240,8 +240,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
 
     // Placing a guessed NPC with evidence moves it between these two counts (W117 moved 4);
     // the regional total is the invariant, not either count. T379 appended two unanchored
-    // repair-guy binding rows, so the total is 1,201; T498 appended the Burglz legacy spawn (1,202).
-    assert_eq!(regional_legacy + regional_reconstructed, 1202);
+    // repair-guy binding rows, so the total is 1,201; T498 appended the Burglz legacy spawn (1,202);
+    // T500 appended the unanchored Hasti row (1,203) and moved Dani and Honey to legacy spawns.
+    assert_eq!(regional_legacy + regional_reconstructed, 1203);
     assert!(
         regional_legacy >= 578,
         "regional NPCs dropped to {regional_legacy}"
