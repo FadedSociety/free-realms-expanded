@@ -17,7 +17,6 @@ use crate::movement::{
 };
 use crate::{
     players::PlayerPresentation,
-    profiles::ProfileState,
     startup_selfdata::{self, SelfData},
     startup_snapshot::StartupSnapshot,
 };
@@ -111,6 +110,7 @@ pub struct Gateway {
     dev_tools: bool,
     role_commands: bool,
     terrain: Option<std::sync::Arc<crate::terrain::Terrain>>,
+    style_tables: Option<std::sync::Arc<crate::style_cards::ClientTables>>,
     world_dir: Option<std::path::PathBuf>,
     stock_text: Option<std::sync::Arc<std::collections::HashSet<u32>>>,
     role: crate::account_store::AccountRole,
@@ -910,6 +910,7 @@ impl Gateway {
             dev_tools: false,
             role_commands: false,
             terrain: None,
+            style_tables: None,
             world_dir: None,
             stock_text: None,
             role: crate::account_store::AccountRole::Player,
@@ -1055,15 +1056,17 @@ impl Gateway {
         if let Some(identity) = &self.identity {
             look.first_name.clone_from(&identity.first_name);
             look.last_name.clone_from(&identity.last_name);
-            look.model = identity.model;
-            look.head.clone_from(&identity.head);
-            look.hair.clone_from(&identity.hair);
-            look.hair_color = identity.hair_color;
-            look.eye_color = identity.eye_color;
-            look.skin_tone.clone_from(&identity.skin_tone);
-            look.face_paint.clone_from(&identity.face_paint);
-            look.model_customization
-                .clone_from(&identity.model_customization);
+        }
+        if let Some(appearance) = self.current_look(self.gameplay.as_ref()) {
+            (look.model, look.hair_color, look.eye_color) = (
+                appearance.model,
+                appearance.hair_color,
+                appearance.eye_color,
+            );
+            (look.head, look.hair, look.skin_tone) =
+                (appearance.head, appearance.hair, appearance.skin_tone);
+            (look.face_paint, look.model_customization) =
+                (appearance.face_paint, appearance.model_customization);
         }
         // Without loaded profiles, self-data keeps the template's job; match it.
         let profile = self
@@ -1107,6 +1110,7 @@ impl Gateway {
         gameplay.set_dev_tools(self.dev_tools);
         gameplay.set_role_commands(self.role_commands);
         gameplay.set_terrain(self.terrain.clone());
+        gameplay.set_style_tables(self.style_tables.clone());
         gameplay.set_world_dir(self.world_dir.clone())?;
         gameplay.set_stock_text(self.stock_text.clone());
         gameplay.set_role(self.role);
@@ -1223,6 +1227,27 @@ impl Gateway {
         }
         self.world_dir = dir;
         Ok(())
+    }
+
+    /// The client tables style cards resolve through; without them every use is refused.
+    pub fn set_style_tables(
+        &mut self,
+        tables: Option<std::sync::Arc<crate::style_cards::ClientTables>>,
+    ) {
+        if let Some(gameplay) = self.gameplay.as_mut() {
+            gameplay.set_style_tables(tables.clone());
+        }
+        self.style_tables = tables;
+    }
+
+    /// The look self-data and AddPc show: the style-card look, else the identity's.
+    fn current_look(&self, gameplay: Option<&Gameplay>) -> Option<crate::style_cards::Look> {
+        let saved = gameplay.and_then(Gameplay::look);
+        saved.or_else(|| {
+            self.identity
+                .as_ref()
+                .map(crate::style_cards::Look::from_identity)
+        })
     }
 
     /// Ground heights for enemy movement and developer teleports.
@@ -1848,84 +1873,6 @@ impl Gateway {
         }
         self.gameplay = Some(gameplay);
         Ok(outcome)
-    }
-
-    fn build_self_message(
-        &self,
-        state: &CharacterState,
-        gameplay: Option<&Gameplay>,
-    ) -> io::Result<Vec<u8>> {
-        let mut data = self.self_data_template.clone();
-        data.identity.guid = state.guid;
-        for index in 0..3 {
-            data.transform.position[index] = state.position[index].to_bits();
-            data.transform.rotation[index] = state.rotation[index].to_bits();
-        }
-        if let Some(identity) = &self.identity {
-            data.identity.model = identity.model as u32;
-            data.appearance.head.clone_from(&identity.head);
-            data.appearance.hair.clone_from(&identity.hair);
-            data.appearance.hair_color = identity.hair_color as u32;
-            data.appearance.eye_color = identity.eye_color as u32;
-            data.appearance.skin_tone.clone_from(&identity.skin_tone);
-            data.appearance.face_paint.clone_from(&identity.face_paint);
-            data.appearance
-                .model_customization
-                .clone_from(&identity.model_customization);
-            data.appearance.customization_ids =
-                [1, 2, 5, 4, 3].map(|index| identity.creation.choices[index] as u32);
-            data.name.first.clone_from(&identity.first_name);
-            data.name.last.clone_from(&identity.last_name);
-            data.gender = identity.gender as u32;
-        }
-        let mut collections = crate::progression_extras::CollectionLedger::default();
-        if let Some(game) = gameplay {
-            let current = game.state();
-            data.inventory = current.inventory;
-            collections = current.progression_extras.unwrap_or_default().collections;
-            if let Some(profiles) = current.profiles {
-                self.apply_profile_state(&mut data, &profiles)?;
-            }
-            data.jobs.profiles.extend(game.staff_job_rows());
-        }
-        crate::progression_extras::apply_collected_flags(&mut data.collections, &collections);
-        Gameplay::write_self_quests(gameplay, &mut data)?;
-        // (R) Action-bar assignments have no field in the current saved
-        // GameplayState, so preserve the captured typed rows until that state exists.
-        // The module-owned opaque post-effect tail remains untouched.
-        Ok(startup_selfdata::build_self(&data))
-    }
-
-    fn apply_profile_state(&self, data: &mut SelfData, profiles: &ProfileState) -> io::Result<()> {
-        data.jobs.active_profile_id = profiles.active as u32;
-        for (id, rank_offset) in &self.profile_rank_offsets {
-            let row = data
-                .jobs
-                .profiles
-                .iter_mut()
-                .find(|row| row.map_key == *id as u32)
-                .ok_or_else(|| invalid("self-data is missing a configured job profile"))?;
-            // The content offset includes the four-byte profile-map key; the
-            // typed row stores its opaque prefix after that key.
-            let offset = rank_offset
-                .checked_sub(4)
-                .ok_or_else(|| invalid("invalid job progression offset"))?;
-            let end = offset
-                .checked_add(12)
-                .ok_or_else(|| invalid("job progression offset overflow"))?;
-            let progression = row
-                .opaque_before_equipment_without_key
-                .get_mut(offset..end)
-                .ok_or_else(|| invalid("self-data job progression field is truncated"))?;
-            let xp = profiles.experience.get(id).copied().unwrap_or(0);
-            let rank = (1 + xp / 100).min(20) as i32;
-            let progress = if rank == 20 { 0 } else { (xp % 100) as i32 };
-            // (R) The local rank curve and zero-star policy match Profiles.
-            progression[..4].copy_from_slice(&rank.to_le_bytes());
-            progression[4..8].copy_from_slice(&progress.to_le_bytes());
-            progression[8..12].copy_from_slice(&0i32.to_le_bytes());
-        }
-        Ok(())
     }
 }
 

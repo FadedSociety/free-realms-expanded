@@ -50,6 +50,7 @@ mod derby_session;
 mod encounter_rewards;
 mod field_battle;
 mod housing;
+mod item_requests;
 mod item_use;
 mod jobs;
 mod knockout;
@@ -73,6 +74,7 @@ mod rides;
 /// Station Cash earned by server-verified activity completions (T229).
 mod sc_earnings;
 mod startup_health;
+mod style_card_use;
 use self::npc::{dialogue_packet, quest_offer_packet_with};
 use crate::station_cash::EarnSource;
 
@@ -147,6 +149,10 @@ pub struct GameplayState {
     pub sc_wallet: Option<crate::station_cash::Wallet>, // T230: save form; live value is in CoinShop.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub housing: Option<crate::housing_service::HousingServiceState>, // Lead housing slice 1.
+    /// The look after style cards (`style_cards::Look`); `None` is the identity's look. Persisted
+    /// here, never in `CharacterIdentity`; compared for "changed"; sent in self-data, AddPc and 35/39.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub appearance: Option<crate::style_cards::Look>,
 }
 
 /// Opt-in Harvesting candidate bound by this gateway integration: Farnum's
@@ -279,6 +285,8 @@ pub struct Gameplay {
     housing: Option<housing::HousingSession>,
     /// L046: the saved lots, kept unchanged while housing is dormant so a save never drops them.
     dormant_housing: Option<crate::housing_service::HousingServiceState>,
+    /// Style-card look and tables (`gameplay/style_card_use.rs`).
+    style_cards: style_card_use::StyleCards,
     game_clock: crate::game_clock::GameClock, // T469 game_clock.json; never saved
     /// T474 live treat, cake and transformation effects (`gameplay/item_use.rs`); session-only, never saved.
     consumable_effects: crate::consumable_effects::EffectStack,
@@ -615,6 +623,7 @@ impl Gameplay {
         let saved_sc_wallet = state.as_ref().and_then(|s| s.sc_wallet.clone());
         let saved_housing = state.as_ref().and_then(|s| s.housing.clone());
         let saved_item_bar = state.as_ref().and_then(|s| s.item_bar.clone());
+        let saved_look = state.as_ref().and_then(|s| s.appearance.clone());
         if let Some(saved) = state.as_ref().and_then(|s| s.warpstones.as_ref()) {
             warp.restore(saved);
         }
@@ -1162,6 +1171,7 @@ impl Gameplay {
             collections,
             housing,
             dormant_housing,
+            style_cards: style_card_use::StyleCards::saved(saved_look),
             inventory,
             categories: ItemCategories::load(directory)?,
             quests: QuestEngine::load(directory, quests)?,
@@ -1388,6 +1398,7 @@ impl Gameplay {
                 .housing
                 .as_ref()
                 .map_or_else(|| self.dormant_housing.clone(), |h| h.state()),
+            appearance: self.style_cards.saved_look(),
         }
     }
 
@@ -4198,6 +4209,9 @@ impl Gameplay {
         if let Some(result) = self.handle_item_bar(inner, character, now_ms)? {
             return Ok(result);
         }
+        if let Some(result) = self.handle_style_card(inner, character.guid)? {
+            return Ok(result);
+        }
         if let Some(result) = self.handle_mystery_chest(inner, character.guid)? {
             return Ok(result);
         }
@@ -4828,33 +4842,6 @@ impl Gameplay {
         Some(encounter_id)
     }
 
-    fn handle_mystery_chest(
-        &mut self,
-        inner: &[u8],
-        player_guid: u64,
-    ) -> io::Result<Option<Outcome>> {
-        let Some(content) = &self.mystery_chests else {
-            return Ok(None);
-        };
-        let Some(request) = mystery_chest::parse_request(inner)? else {
-            return Ok(None);
-        };
-        let before = self.inventory.state().clone();
-        let result = content.handle(
-            &mut self.inventory,
-            &mut self.pending_chest,
-            request,
-            player_guid,
-        )?;
-        let mut out = Outcome {
-            replies: result.replies,
-            changed: result.changed,
-            ..Outcome::default()
-        };
-        self.npc_inventory_events(&before, &mut out)?;
-        Ok(Some(out))
-    }
-
     /// Job level on the local rank curve (R): one base rank, one per 100 XP,
     /// capped at 20 (as `character_eligibility` uses).
     fn job_level(&self, profile: i32) -> u32 {
@@ -4935,6 +4922,7 @@ impl Gameplay {
     }
 
     pub fn apply_identity(&mut self, identity: &CharacterIdentity) -> io::Result<bool> {
+        self.remember_identity_look(identity);
         if self.profiles.is_none() {
             return Ok(false);
         }
@@ -5030,6 +5018,9 @@ impl Gameplay {
                 }
             }
             return Ok(out);
+        }
+        if let Some(result) = self.handle_style_card(inner, guid)? {
+            return Ok(result);
         }
         if let Some(result) = self.handle_mystery_chest(inner, guid)? {
             return Ok(result);
@@ -5173,3 +5164,6 @@ mod reward_adoption;
 
 #[cfg(test)]
 mod s15_npc_transactions;
+
+#[cfg(test)]
+mod style_card_use_tests;

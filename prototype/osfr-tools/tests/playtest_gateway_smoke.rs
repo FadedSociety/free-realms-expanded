@@ -255,6 +255,7 @@ fn options(temp: &TempDir, reference: &Reference, store: &Path, dev_tools: bool)
         studio_port: 0,
         client_logs: None,
         terrain: None,
+        resources: None,
         world: None,
         stock_text: None,
         allow_lan: false,

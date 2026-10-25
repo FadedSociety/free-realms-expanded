@@ -199,6 +199,7 @@ fn account_store_gateway_talk_to_samantha_sends_quest_offer() {
         studio_port: 0,
         client_logs: None,
         terrain: None,
+        resources: None,
         world: None,
         stock_text: None,
         allow_lan: false,

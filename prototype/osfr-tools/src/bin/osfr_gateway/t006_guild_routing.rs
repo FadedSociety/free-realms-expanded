@@ -41,6 +41,7 @@ fn options(scratch: &Path) -> Options {
         studio_port: 0,
         client_logs: None,
         terrain: None,
+        resources: None,
         world: Some(scratch.join("world")),
         stock_text: None,
         allow_lan: false,

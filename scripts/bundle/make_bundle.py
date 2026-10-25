@@ -341,6 +341,7 @@ $env:OSFR_GATEWAY_STARTUP_SNAPSHOT = Join-Path $bundle 'startup\\startup.json'
 & .\\prototype\\osfr-tools\\target\\release\\osfr-gateway.exe 127.0.0.1:20041 `
   --reference "$bundle\\reference" --state "$runtime\\character.json" `
   --content "$bundle\\content" --terrain "$bundle\\terrain" `
+  --resources "$bundle\\login-resources" `
   --client-locale "$bundle\\client-locale" `
   --account-store "$runtime\\accounts.json" --handoff-key-file "$runtime\\handoff.key"
 ```

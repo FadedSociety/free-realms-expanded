@@ -17,7 +17,7 @@ mod fixtures;
 const NOW: u64 = 1_000;
 
 /// The reference client login for this session's character (the fixture hardcodes guid 1).
-fn login(guid: u64) -> Vec<u8> {
+pub(super) fn login(guid: u64) -> Vec<u8> {
     let mut bytes = 1u16.to_le_bytes().to_vec();
     for (index, value) in ["t199", "1.910.1.530630", ""].into_iter().enumerate() {
         bytes.extend((value.len() as u32).to_le_bytes());
@@ -37,7 +37,7 @@ fn content() -> PathBuf {
 /// A copy of the reference whose save starts at `guid`; each session is its own character.
 /// The gateway looks for the startup snapshot at `<lab root>/content/startup-snapshot`, so
 /// the scratch layout mirrors `lab/references` and `lab/content`.
-fn reference(scratch: &Path, guid: u64) -> PathBuf {
+pub(super) fn reference(scratch: &Path, guid: u64) -> PathBuf {
     let lab = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
     let target = scratch.join("references").join(format!("reference-{guid}"));
     copy_tree(&lab.join("references/rust-gateway-reference"), &target);
@@ -76,6 +76,7 @@ fn options(scratch: &Path, guid: u64, with_content: bool) -> Options {
         studio_port: 0,
         client_logs: None,
         terrain: None,
+        resources: None,
         world: None,
         stock_text: None,
         allow_lan: false,

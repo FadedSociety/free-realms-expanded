@@ -29,6 +29,7 @@ fn w120_player_denial_is_logged_and_studio_requires_admin() {
         studio_port: 0,
         client_logs: None,
         terrain: None,
+        resources: None,
         world: Some(scratch.join("world")),
         stock_text: None,
         allow_lan: false,
@@ -177,6 +178,7 @@ fn pose_only_saves_are_coalesced_and_flushed_by_tick() {
         studio_port: 0,
         client_logs: None,
         terrain: None,
+        resources: None,
         world: None,
         stock_text: None,
         allow_lan: false,
@@ -314,6 +316,7 @@ fn private_direct_pose_reaches_session_and_unlocks_reliable_rocket_use() {
         studio_port: 0,
         client_logs: None,
         terrain: None,
+        resources: None,
         world: None,
         stock_text: None,
         allow_lan: false,
@@ -952,6 +955,7 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
         studio_port: 0,
         client_logs: None,
         terrain: None,
+        resources: None,
         world: None,
         stock_text: None,
         allow_lan: false,
@@ -1782,3 +1786,9 @@ mod l043_admin_move;
 #[cfg(test)]
 #[path = "t458_world_events.rs"]
 mod t458_world_events;
+
+/// T478: a style card through the real dispatch and commit path: viewers in range, a late
+/// joiner's AddPc, a failed save and a relog.
+#[cfg(test)]
+#[path = "style_card_use.rs"]
+mod style_card_use;

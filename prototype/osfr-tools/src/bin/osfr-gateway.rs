@@ -302,6 +302,8 @@ pub struct Options {
     pub client_logs: Option<PathBuf>,
     /// Ground-height grids (`zone_<id>.hgt` from osfr-terrain).
     pub terrain: Option<Arc<osfr_tools::terrain::Terrain>>,
+    /// Client `Resources` tables a style card resolves through (`--resources`); off without them.
+    pub resources: Option<Arc<osfr_tools::style_cards::ClientTables>>,
     /// World Builder live layer: placed NPCs, marks, authored content.
     pub world: Option<PathBuf>,
     /// Row keys of the stock client locale, so authored text ids avoid them.
@@ -332,6 +334,7 @@ impl Options {
         let mut studio_port = 47_800;
         let mut client_logs = None;
         let mut terrain = None;
+        let mut resources = None;
         let mut world = None;
         let mut stock_text = None;
         let mut security_log = None;
@@ -371,6 +374,11 @@ impl Options {
                         &value,
                     ))?))
                 }
+                "--resources" => {
+                    resources = Some(Arc::new(osfr_tools::style_cards::ClientTables::load(
+                        Path::new(&value),
+                    )?))
+                }
                 "--trace" | "--tick-stats-seconds" => {} // read in `run`
                 _ => return Err(format!("unknown option {key}").into()),
             }
@@ -409,6 +417,7 @@ impl Options {
             studio_port,
             client_logs,
             terrain,
+            resources,
             world,
             stock_text,
             allow_lan,
@@ -568,13 +577,6 @@ impl Security {
     }
 }
 
-/// Live appearance updates name a player and are safe only for viewers who
-/// already received that player's AddPc.
-fn live_outfit_packet(packet: &[u8]) -> bool {
-    // 35/7 reader 0x0091af50; 35/6 is T027's existing equipment-change prefix.
-    matches!(packet, [35, 0, 6, 0, ..] | [35, 0, 7, 0, ..])
-}
-
 impl SharedWorld {
     fn new() -> Self {
         // (R) Local runner defaults; native visibility radius and group cap are unknown.
@@ -718,32 +720,6 @@ impl SharedWorld {
                     bytes: message.bytes,
                 }),
         );
-        deliveries
-    }
-
-    /// W162: `packets` for other players in interest range of `session`. Live appearance updates
-    /// also require the recipient's directed view to contain the actor. The registry position is
-    /// read before a zone transfer removes the player.
-    fn ride_fanout(&self, session: SessionId, packets: &[Vec<u8>]) -> Vec<Delivery> {
-        let is_joined = self.joined.contains(&session);
-        let Some(player) = self.players.get(session).filter(|_| is_joined) else {
-            return Vec::new();
-        };
-        let mut deliveries = Vec::new();
-        for other in self.players.nearby_sessions(player.zone, player.position) {
-            if other == session {
-                continue;
-            }
-            let knows_character = self.players.knows_character(other, player.character_guid);
-            for packet in packets {
-                if knows_character || !live_outfit_packet(packet) {
-                    deliveries.push(Delivery {
-                        recipient: other,
-                        bytes: wrap_application(packet),
-                    });
-                }
-            }
-        }
         deliveries
     }
 
@@ -974,6 +950,7 @@ fn load_gateway_from(
     // `realm` commands run by role without --dev-tools (Studio stays off).
     gateway.set_role_commands(options.account_store.is_some());
     gateway.set_terrain(options.terrain.clone());
+    gateway.set_style_tables(options.resources.clone());
     // L039: every save load passes here; a recovered pose is saved at once (atomic replace).
     if let Some((from, reason)) = gateway.recover_login_pose() {
         save(state_path, &gateway.snapshot())?;

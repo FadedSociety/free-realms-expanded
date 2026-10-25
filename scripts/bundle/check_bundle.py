@@ -404,6 +404,8 @@ def run_smoke(bundle: Path, reference_manifest: dict, exe: dict[str, Path] | Non
                     str(bundle / "content"),
                     "--terrain",
                     str(bundle / "terrain"),
+                    "--resources",
+                    str(bundle / "login-resources"),
                     "--client-locale",
                     str(bundle / "client-locale"),
                     "--seconds",

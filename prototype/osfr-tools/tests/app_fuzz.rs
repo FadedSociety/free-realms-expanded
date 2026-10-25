@@ -784,6 +784,10 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
         ));
     }
     result.push(("inventory", words(35, 34, &[u32::MAX, 0])));
+    // T478: UseStyleCard names an item id; UseStyleCardByItemRecord a definition id.
+    for sub in [10, 12] {
+        result.push(("gameplay.handle_in_world", words(42, sub, &[u32::MAX])));
+    }
     result.push(("merchant", words(66, 43, &[u32::MAX; 4])));
     result.push(("merchant", words(165, 4, &[u32::MAX; 6])));
     result.push(("merchant", words(165, 5, &[u32::MAX; 4])));

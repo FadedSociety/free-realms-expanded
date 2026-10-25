@@ -240,3 +240,39 @@ pub(super) fn field_recipient_matches(
     }
     loaded && location.is_some_and(|(id, ready)| id == instance && ready)
 }
+
+/// Live appearance updates name a player and are safe only for viewers who
+/// already received that player's AddPc.
+pub(super) fn live_outfit_packet(packet: &[u8]) -> bool {
+    // 35/7 reader 0x0091af50; 35/6 is T027's existing equipment-change prefix; 35/39 is a style
+    // card's look change (reader 0x0091aff0).
+    matches!(packet, [35, 0, 6 | 7 | 39, 0, ..])
+}
+
+impl SharedWorld {
+    /// W162: `packets` for other players in interest range of `session`. Live appearance updates
+    /// also require the recipient's directed view to contain the actor. The registry position is
+    /// read before a zone transfer removes the player.
+    pub(super) fn ride_fanout(&self, session: SessionId, packets: &[Vec<u8>]) -> Vec<Delivery> {
+        let is_joined = self.joined.contains(&session);
+        let Some(player) = self.players.get(session).filter(|_| is_joined) else {
+            return Vec::new();
+        };
+        let mut deliveries = Vec::new();
+        for other in self.players.nearby_sessions(player.zone, player.position) {
+            if other == session {
+                continue;
+            }
+            let knows_character = self.players.knows_character(other, player.character_guid);
+            for packet in packets {
+                if knows_character || !live_outfit_packet(packet) {
+                    deliveries.push(Delivery {
+                        recipient: other,
+                        bytes: wrap_application(packet),
+                    });
+                }
+            }
+        }
+        deliveries
+    }
+}

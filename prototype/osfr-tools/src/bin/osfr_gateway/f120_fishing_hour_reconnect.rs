@@ -274,6 +274,7 @@ fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing
         studio_port: 0,
         client_logs: None,
         terrain: None,
+        resources: None,
         world: Some(scratch.0.join("world")),
         stock_text: None,
         allow_lan: false,

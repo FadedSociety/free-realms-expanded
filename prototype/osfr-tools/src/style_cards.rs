@@ -1,8 +1,10 @@
-//! Style cards (item type 12), part 1: the 42/10-42/12 requests, the card-to-record rule and
-//! the 35/39 and 35/65 customization packets. Pure: no I/O and no state. Routing, ownership,
-//! consuming the card and saving the look are part 2.
+//! Style cards (item type 12): the 42/10-42/12 requests, the card-to-record rule, the 35/39 and
+//! 35/65 customization packets and the client tables a card resolves through. Pure apart from
+//! loading those tables. Routing, ownership, consuming the card and saving the look are
+//! `gameplay/style_card_use.rs`.
 use crate::identity::{CharacterIdentity, Reader, invalid, string};
-use std::io;
+use serde::{Deserialize, Serialize};
+use std::{collections::BTreeMap, fs, io, path::Path};
 
 /// Mapping tables in `identity::Resources` order, also the index of `Look::ids`.
 pub const HEAD: usize = 0;
@@ -63,6 +65,18 @@ pub enum Refusal {
     WrongModel,
     /// PARAM2 names no row of its table, or the row breaks the identity string bound.
     UnknownMapping,
+}
+
+impl Refusal {
+    /// The chat line a refused use sends (R: the client has no refusal packet for a style card).
+    pub fn message(self) -> &'static str {
+        match self {
+            Self::NotAStyleCard => "That item is not a style card.",
+            Self::UnsupportedSlot | Self::UnknownMapping => "That style card cannot be used.",
+            Self::WrongGender => "That style card is not made for your character.",
+            Self::WrongModel => "That style card does not fit your character.",
+        }
+    }
 }
 
 /// One change record as the client reads it (`008e9710`): i32 id, string, i32 param, i32 item.
@@ -195,9 +209,12 @@ fn fits(stem: &str, asset: &str) -> bool {
     rest.is_some_and(|rest| rest.starts_with('_'))
 }
 
-/// The customizable part of a character's appearance. Every field is persisted (part 2 writes
-/// it back to `CharacterIdentity`), compared (an equal look is no change) and sent (35/65).
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
+/// The customizable part of a character's appearance. Every field is persisted
+/// (`GameplayState::appearance`; `CharacterIdentity` is never rewritten), compared (an equal
+/// look is no change) and sent wherever its packet has the field: 35/39 and 35/65, self-data
+/// and AddPc.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize)]
+#[serde(deny_unknown_fields)]
 pub struct Look {
     pub model: i32,
     pub head: String,
@@ -289,6 +306,76 @@ pub fn customization_data(look: &Look, tables: &impl Tables) -> Vec<u8> {
     let mut out = vec![35, 0, 65, 0];
     put_records(&mut out, &records);
     out
+}
+
+/// The tables read from a client `Resources` tree (the bundle's `login-resources`): the same
+/// files and columns as `identity::Resources::load`, which keeps its copy private.
+pub struct ClientTables {
+    models: BTreeMap<i32, (i32, String)>,
+    mappings: [BTreeMap<i32, String>; 5],
+}
+
+impl ClientTables {
+    pub fn load(directory: &Path) -> io::Result<Self> {
+        let mut models = BTreeMap::new();
+        for row in rows(&directory.join("Models.txt"))? {
+            // Column 13 IS_VALID_FOR_PC, 5 GENDER, 1 MODEL_FILE_NAME.
+            if row.len() >= 14 && row[13] == "1" {
+                if let (Ok(id), Ok(gender)) = (row[0].parse(), row[5].parse()) {
+                    let stem = row[1].strip_suffix(".adr").unwrap_or(&row[1]);
+                    models.insert(id, (gender, stem.to_owned()));
+                }
+            }
+        }
+        let mut mappings: [BTreeMap<i32, String>; 5] = Default::default();
+        // `HEAD` .. `SKIN_TONE` order.
+        let names = [
+            "Head",
+            "Hair",
+            "ModelCustomization",
+            "FacePaint",
+            "SkinTone",
+        ];
+        for (table, name) in mappings.iter_mut().zip(names) {
+            let file = directory
+                .join("CharacterCreate")
+                .join(format!("{name}Mappings.txt"));
+            for row in rows(&file)? {
+                if let (Some(text), Ok(id)) = (row.get(1), row[0].parse()) {
+                    table.insert(id, text.clone());
+                }
+            }
+        }
+        if models.is_empty() || mappings.iter().any(BTreeMap::is_empty) {
+            return Err(invalid("missing style card resources"));
+        }
+        Ok(Self { models, mappings })
+    }
+}
+
+impl Tables for ClientTables {
+    fn model(&self, id: i32) -> Option<(i32, &str)> {
+        let (gender, stem) = self.models.get(&id)?;
+        Some((*gender, stem))
+    }
+
+    fn mapping(&self, table: usize, id: i32) -> Option<&str> {
+        self.mappings.get(table)?.get(&id).map(String::as_str)
+    }
+}
+
+/// The `^`-separated rows of a client text table, without `#` comments and blank lines.
+fn rows(path: &Path) -> io::Result<Vec<Vec<String>>> {
+    let bytes = fs::read(path)?;
+    if bytes.len() > 32 * 1024 * 1024 {
+        return Err(invalid("style card resource exceeds local bound"));
+    }
+    let text = String::from_utf8(bytes).map_err(invalid)?;
+    Ok(text
+        .lines()
+        .filter(|line| !line.starts_with('#') && !line.is_empty())
+        .map(|line| line.split('^').map(str::to_owned).collect())
+        .collect())
 }
 
 /// `00913230`: i32 count, then each record as `008e9710` reads it.

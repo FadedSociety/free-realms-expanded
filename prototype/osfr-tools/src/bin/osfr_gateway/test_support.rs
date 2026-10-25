@@ -174,6 +174,7 @@ pub fn options(state: PathBuf) -> Options {
         studio_port: 0,
         client_logs: None,
         terrain: None,
+        resources: None,
         world: None,
         stock_text: None,
         allow_lan: false,

@@ -99,6 +99,7 @@ impl Fixture {
             client_logs: None,
             terrain: None,
             world: None,
+            resources: None,
             stock_text: None,
             allow_lan: false,
             security_log: None,

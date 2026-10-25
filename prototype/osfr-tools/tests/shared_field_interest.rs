@@ -104,6 +104,7 @@ fn interest_fixture_with(
             std::sync::Arc::new(osfr_tools::terrain::Terrain::load(&directory).unwrap())
         }),
         world: None,
+        resources: None,
         stock_text: None,
         allow_lan: false,
         security_log: None,
