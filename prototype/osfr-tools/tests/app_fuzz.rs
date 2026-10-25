@@ -755,11 +755,13 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
         result.push(("derby", input));
     }
     // Family 168 (mounts, W162) has a one-byte subtype: 1 board, 3 dismount, 6 spawn, 8 spawn by
-    // item, and the family wildcard's unknown subtype.
+    // item, 14 upgrade (T527: a row id and an upgrade item definition id), and the family
+    // wildcard's unknown subtype.
     result.push(("mounts", [vec![168, 0, 1], vec![0xff; 8]].concat()));
     result.push(("mounts", vec![168, 0, 3, 0]));
     result.push(("mounts", [vec![168, 0, 6], vec![0xff; 4]].concat()));
     result.push(("mounts", [vec![168, 0, 8], vec![0xff; 4], vec![1]].concat()));
+    result.push(("mounts", [vec![168, 0, 14], vec![0xff; 8]].concat()));
     result.push(("mounts", vec![168, 0, 0xff, 0xff]));
     // Family 53 (pets, W177) has a one-byte subtype: summon, the serializer-shaped
     // dismiss (u32 id + action), a truncated dismiss, UI mode, summon by item, and

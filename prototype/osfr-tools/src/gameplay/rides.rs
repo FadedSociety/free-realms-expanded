@@ -65,6 +65,15 @@ impl Gameplay {
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
+        // T527: 168/14 consumes a saddle and writes the saved ride flags, so it is staged here
+        // before the session-scoped mount service sees it.
+        if let Some(crate::mounts::MountRequest::Upgrade {
+            row_id,
+            item_definition_id,
+        }) = crate::mounts::decode_request(inner)?
+        {
+            return self.upgrade_ride(row_id, item_definition_id);
+        }
         let restrictions = self.ride_restrictions();
         let Some(mounts) = self.mounts.as_mut() else {
             return Ok(None);
@@ -80,6 +89,45 @@ impl Gameplay {
             now_ms,
         };
         Ok(mounts.handle(inner, &context)?.map(Self::ride_outcome))
+    }
+
+    /// T527: a Training Saddle upgrades one owned winged ride. The plan is pure, the saddle
+    /// consume is transactional and the flag is recorded only after it succeeds, so a refusal
+    /// changes nothing. Success replies: the item update, the roster (168/5) with that row's
+    /// is_upgraded set, then 168/15 naming the row the client re-summons.
+    fn upgrade_ride(
+        &mut self,
+        row_id: i32,
+        item_definition_id: i32,
+    ) -> io::Result<Option<Outcome>> {
+        let restrictions = self.ride_restrictions();
+        let Some(mounts) = self.mounts.as_mut() else {
+            return Ok(None);
+        };
+        let plan = match mounts.upgrade_plan(
+            self.inventory.state(),
+            restrictions,
+            row_id,
+            item_definition_id,
+        ) {
+            Ok(plan) => plan,
+            Err(error) => {
+                let wire = mounts.refusal(self.inventory.state(), error);
+                return Ok(Some(Self::ride_outcome(wire)));
+            }
+        };
+        // The plan just found this instance; a failed consume is an internal error, and the
+        // gateway discards this staged game (nothing changes).
+        let consumed = self.inventory.consume(plan.item_instance_id, 1)?;
+        mounts.commit_upgrade(plan.row_id);
+        let mut replies = consumed.replies;
+        replies.push(mounts.list_packet(self.inventory.state()));
+        replies.push(crate::mounts::MountService::upgrade_reply(plan.row_id));
+        Ok(Some(Outcome {
+            replies,
+            changed: true,
+            ..Outcome::default()
+        }))
     }
 
     /// W162 (R): a ride ends when the player zones, a fight or kart race starts, the player is

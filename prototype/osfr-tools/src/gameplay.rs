@@ -155,6 +155,11 @@ pub struct GameplayState {
     /// here, never in `CharacterIdentity`; compared for "changed"; sent in self-data, AddPc and 35/39.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub appearance: Option<crate::style_cards::Look>,
+    /// T527: inventory instance ids of rides trained to glide (per owned ride, not per ride
+    /// definition). Pruned to owned rows on save; absent when empty so older saves stay
+    /// byte-identical.
+    #[serde(default, skip_serializing_if = "BTreeSet::is_empty")]
+    pub upgraded_rides: BTreeSet<i32>,
 }
 
 /// Opt-in Harvesting candidate bound by this gateway integration: Farnum's
@@ -628,6 +633,10 @@ impl Gameplay {
     }
 
     pub fn load(directory: &Path, state: Option<GameplayState>) -> io::Result<Self> {
+        let saved_upgrades = state
+            .as_ref()
+            .map(|s| s.upgraded_rides.clone())
+            .unwrap_or_default();
         let mut warp = piece_077::WarpRegistry::curated();
         let saved_derby = state.as_ref().and_then(|s| s.derby.clone());
         let saved_chess = state.as_ref().and_then(|s| s.chess);
@@ -900,7 +909,9 @@ impl Gameplay {
         // W162: the ride catalogue ships with the bundled content; a set without it has no rides.
         let mounts = if npc_content.join("mounts.json").is_file() {
             let path = npc_content.join("mounts.json");
-            Some(crate::mounts::MountService::load(&path, &inventory)?)
+            Some(
+                crate::mounts::MountService::load(&path, &inventory)?.with_upgraded(saved_upgrades),
+            )
         } else {
             None
         };
@@ -1401,6 +1412,9 @@ impl Gameplay {
                 .as_ref()
                 .map_or_else(|| self.dormant_housing.clone(), |h| h.state()),
             appearance: self.style_cards.saved_look(),
+            upgraded_rides: self.mounts.as_ref().map_or_else(BTreeSet::new, |mounts| {
+                mounts.saved_upgrades(self.inventory.state())
+            }),
         }
     }
 

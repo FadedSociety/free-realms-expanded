@@ -33,6 +33,8 @@ const SEATED_QUEUE: i32 = 1;
 const MAX_SPEED: f32 = 64.0;
 // (R) Sanity ceiling for the composite effect id of a boarding or dismount flash.
 const MAX_EFFECT_ID: i32 = 100_000;
+// (R) Sanity bound for the 168/14 upgrade-item allowlist.
+const MAX_UPGRADE_ITEMS: usize = 16;
 // Character stat ids index the client's stat-name table at `0x01af2008` (4 bytes per id):
 // 2 MaxMovementSpeed (`0x01af2010`); 59-63 GlideDefaultForwardSpeed, GlideMinForwardSpeed,
 // GlideMaxForwardSpeed, GlideFallTime, GlideFallSpeed (`0x01af20f4`-`0x01af2104`); 64 GlideEnabled
@@ -143,6 +145,15 @@ struct FlashEffect {
     source: Vec<MountSource>,
 }
 
+/// T527: one item definition that trains an owned ride to glide. This list is the only set of
+/// item ids 168/14 accepts, so a hostile client cannot name any other item it happens to hold.
+#[derive(Deserialize)]
+#[serde(deny_unknown_fields)]
+struct UpgradeItem {
+    item_definition_id: i32,
+    source: Vec<MountSource>,
+}
+
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct MountsDocument {
@@ -150,6 +161,7 @@ struct MountsDocument {
     on_foot: OnFoot,
     trained_glide: TrainedGlide,
     mount_effect: FlashEffect,
+    upgrade_items: Vec<UpgradeItem>,
     mount_types: Vec<MountType>,
     mounts: Vec<MountDefinition>,
 }
@@ -162,6 +174,8 @@ pub struct MountCatalog {
     on_foot_speed: f32,
     trained_glide: RideStats,
     mount_effect_id: i32,
+    /// T527: item definitions that may train a ride (`mounts.json` `upgrade_items`).
+    upgrade_items: BTreeSet<i32>,
 }
 
 #[derive(Clone, Copy, Debug, Eq, PartialEq)]
@@ -171,6 +185,10 @@ pub enum MountError {
     UnknownMount,
     UnknownMountItem,
     NotOwned,
+    NotUpgradable,
+    AlreadyUpgraded,
+    NotUpgradeItem,
+    UpgradeItemNotOwned,
     Restricted,
     WrongMountActor,
     InvalidSeat,
@@ -195,14 +213,17 @@ impl MountCatalog {
         {
             return Err(invalid_data("unsupported mount content schema"));
         }
-        Self::new(
+        let mut catalog = Self::new(
             document.mount_types,
             document.mounts,
             document.on_foot.max_movement_speed,
             document.trained_glide.stats,
             document.mount_effect.id,
         )
-        .map_err(|_| invalid_data("invalid mount content records"))
+        .map_err(|_| invalid_data("invalid mount content records"))?;
+        catalog.upgrade_items = upgrade_item_ids(document.upgrade_items)
+            .map_err(|_| invalid_data("invalid mount upgrade items"))?;
+        Ok(catalog)
     }
 
     /// `on_foot_speed` is what a ride's end restores; `trained_glide` is the glide block of an
@@ -284,16 +305,22 @@ impl MountCatalog {
             on_foot_speed,
             trained_glide,
             mount_effect_id,
+            upgrade_items: BTreeSet::new(),
         })
     }
 
     /// The full 38/7 block a boarded ride sends its rider, always all nine stats so a replacement
     /// ride never keeps an earlier ride's glide. The glide comes from the ride's own stats when
     /// they enable it, else from `trained_glide` for a trained upgradable ride, else it is off.
-    fn boarded_stats(&self, mount: &MountDefinition) -> Vec<CharacterStat> {
+    fn boarded_stats(
+        &self,
+        mount: &MountDefinition,
+        instance_id: i32,
+        upgraded: &BTreeSet<i32>,
+    ) -> Vec<CharacterStat> {
         let glide = if mount.stats.glide_enabled {
             mount.stats
-        } else if mount.is_upgradable && trained(mount) {
+        } else if mount.is_upgradable && trained(mount, instance_id, upgraded) {
             self.trained_glide
         } else {
             RideStats::default()
@@ -341,6 +368,11 @@ impl MountCatalog {
         self.item_to_mount
             .get(&item_definition_id)
             .and_then(|mount_id| self.mount(*mount_id))
+    }
+
+    /// T527: whether this item definition may train a ride (the content allowlist).
+    pub fn is_upgrade_item(&self, item_definition_id: i32) -> bool {
+        self.upgrade_items.contains(&item_definition_id)
     }
 
     /// Ownership is derived from positive-count inventory instances. Item-to-
@@ -527,6 +559,9 @@ pub struct MountService {
     last_sent: Option<SentRoster>,
     /// T482: the catalogue look of every ride item, for each row's tint alias.
     looks: BTreeMap<i32, ItemLook>,
+    /// T527: inventory instance ids this character trained to glide. Persisted as
+    /// `GameplayState::upgraded_rides` and set only after a saddle was consumed.
+    upgraded: BTreeSet<i32>,
 }
 
 /// T482: every field of the last roster that comes from live state. A row's name and image set
@@ -547,6 +582,7 @@ impl MountService {
             last_spawn_ms: None,
             last_sent: None,
             looks: BTreeMap::new(),
+            upgraded: BTreeSet::new(),
         }
     }
 
@@ -566,6 +602,26 @@ impl MountService {
 
     pub fn catalog(&self) -> &MountCatalog {
         &self.catalog
+    }
+
+    /// T527: restore the flags a save carries (`GameplayState::upgraded_rides`).
+    pub fn with_upgraded(mut self, upgraded: BTreeSet<i32>) -> Self {
+        self.upgraded = upgraded;
+        self
+    }
+
+    /// T527: the saved form, keeping only instance ids this character still owns as ride rows.
+    /// A traded or sold ride loses its training (R).
+    pub fn saved_upgrades(&self, inventory: &InventoryState) -> BTreeSet<i32> {
+        self.upgraded
+            .iter()
+            .copied()
+            .filter(|instance_id| {
+                (self.catalog)
+                    .owned_instance(inventory, *instance_id)
+                    .is_some()
+            })
+            .collect()
     }
 
     /// True while the rider sits on the ride. This is the `mounted` input of the emote rules
@@ -601,7 +657,7 @@ impl MountService {
                 .collect(),
             active_guid: active.map(|ride| ride.actor_guid),
         });
-        encode_mount_list(&rows, active, &self.looks)
+        encode_mount_list(&rows, active, &self.looks, &self.upgraded)
     }
 
     /// The roster again when an owned ride item, its tint or the active ride changed since the
@@ -754,7 +810,62 @@ impl MountService {
         )
     }
 
-    /// (T483) The ride item's catalogue texture and tint, tinted the way `write_attachment` dresses
+    /// T527: validate a 168/14 request. The row must be an owned ride instance, its ride
+    /// upgradable and not already trained, the item a configured upgrade item and the player must
+    /// hold at least one (the lowest instance id is the one consumed). Pure: nothing changes until
+    /// the caller consumed that item and called `commit_upgrade`.
+    pub fn upgrade_plan(
+        &self,
+        inventory: &InventoryState,
+        restrictions: RideRestrictions,
+        row_id: i32,
+        item_definition_id: i32,
+    ) -> Result<RideUpgrade, MountError> {
+        if !restrictions.allows() {
+            return Err(MountError::Restricted);
+        }
+        let item = (self.catalog)
+            .owned_instance(inventory, row_id)
+            .ok_or(MountError::NotOwned)?;
+        let mount = (self.catalog)
+            .mount_for_item(item.definition_id)
+            .ok_or(MountError::NotOwned)?;
+        if !mount.is_upgradable {
+            return Err(MountError::NotUpgradable);
+        }
+        if trained(mount, row_id, &self.upgraded) {
+            return Err(MountError::AlreadyUpgraded);
+        }
+        if !self.catalog.is_upgrade_item(item_definition_id) {
+            return Err(MountError::NotUpgradeItem);
+        }
+        let saddle = inventory
+            .items
+            .iter()
+            .filter(|held| held.definition_id == item_definition_id && held.count > 0)
+            .min_by_key(|held| held.id)
+            .ok_or(MountError::UpgradeItemNotOwned)?;
+        Ok(RideUpgrade {
+            row_id,
+            item_instance_id: saddle.id,
+        })
+    }
+
+    /// T527: record the training after the saddle was consumed.
+    pub fn commit_upgrade(&mut self, row_id: i32) {
+        self.upgraded.insert(row_id);
+    }
+
+    /// T527: 168/15 (reader `00b05590` -> `00b05220` reads one i32 into the reply at +0xc). On it
+    /// the client shows "UpgradeSuccessful", dismounts and re-summons this row with 168/6
+    /// (`00b06100` case 15, "Automount after upgrade: id %d").
+    pub fn upgrade_reply(row_id: i32) -> Vec<u8> {
+        let mut out = header(15);
+        put_i32(&mut out, row_id);
+        out
+    }
+
+    /// T483: The ride item's catalogue texture and tint, tinted the way `write_attachment` dresses
     /// an item (the instance's dye, else the item's default). An item the catalogue does not
     /// define falls back to the ride row.
     fn ride_look(&self, item: &InventoryItem, mount: &MountDefinition) -> RideLook {
@@ -909,7 +1020,11 @@ impl MountService {
                         self.catalog.mount_effect_id,
                     ),
                 ),
-                rider_stats(owner_guid, self.catalog.boarded_stats(mount)),
+                rider_stats(
+                    owner_guid,
+                    self.catalog
+                        .boarded_stats(mount, ride.instance_id, &self.upgraded),
+                ),
             ],
             debounced: false,
         })
@@ -988,15 +1103,29 @@ impl MountService {
 /// automount: id %d"), so `Spawn::mount_id` names that instance, not a ride.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub enum MountRequest {
-    Mount { target: u64 },
+    Mount {
+        target: u64,
+    },
     Dismount,
-    Spawn { mount_id: i32 },
-    SpawnByItem { item_definition_id: i32 },
+    Spawn {
+        mount_id: i32,
+    },
+    SpawnByItem {
+        item_definition_id: i32,
+    },
+    /// T527: train the owned ride row `row_id` with the item definition
+    /// `item_definition_id` (both are client-supplied and validated).
+    Upgrade {
+        row_id: i32,
+        item_definition_id: i32,
+    },
 }
 
 /// `Ok(None)` when the message is not a mount request this server answers; `Err` when it is one
 /// with a malformed body. The 168/1 and 168/3 serializers were not recovered, so those two accept
-/// a bounded tail (R) and read only the leading target GUID.
+/// a bounded tail (R) and read only the leading target GUID. T527: 168/14's writer `00bff500`
+/// writes `this+0xc` then `this+0x10` as two i32s (`Mount.Upgrade` `00bffbc0` stores the Lua
+/// mount id in the first and the item definition id in the second).
 pub fn decode_request(inner: &[u8]) -> io::Result<Option<MountRequest>> {
     if inner.len() < 3 || inner[..2] != FAMILY.to_le_bytes() {
         return Ok(None);
@@ -1012,7 +1141,11 @@ pub fn decode_request(inner: &[u8]) -> io::Result<Option<MountRequest>> {
         (8, 5) => MountRequest::SpawnByItem {
             item_definition_id: word(0),
         },
-        (1 | 3 | 6 | 8, _) => return Err(invalid_data("malformed mount request")),
+        (14, 8) => MountRequest::Upgrade {
+            row_id: word(0),
+            item_definition_id: word(4),
+        },
+        (1 | 3 | 6 | 8 | 14, _) => return Err(invalid_data("malformed mount request")),
         _ => return Ok(None),
     }))
 }
@@ -1032,6 +1165,16 @@ pub struct RideContext<'a> {
     pub restrictions: RideRestrictions,
     pub pose: RidePose,
     pub now_ms: u64,
+}
+
+/// T527: what a valid 168/14 request will change. The plan is pure; the caller consumes
+/// `item_instance_id` and only then calls `MountService::commit_upgrade`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct RideUpgrade {
+    /// The owned ride row the client picked (the request's first i32).
+    pub row_id: i32,
+    /// The owned saddle instance to consume (one count).
+    pub item_instance_id: i32,
 }
 
 /// Inner application packets for one handled event. `private` goes to the owner only; `shared`
@@ -1151,6 +1294,16 @@ impl MountService {
         })
     }
 
+    /// A refusal changes nothing and sends the owner a roster refresh, which makes the client
+    /// rebuild its mount UI, plus a short notice (R: no refusal packet was recovered).
+    pub fn refusal(&mut self, inventory: &InventoryState, error: MountError) -> RideWire {
+        RideWire {
+            private: vec![self.list_packet(inventory)],
+            notice: Some(refusal_text(error)),
+            ..RideWire::default()
+        }
+    }
+
     /// Answer one client request. A refusal changes nothing and sends the owner a roster refresh,
     /// which makes the client rebuild its mount UI, plus a short notice (R: no refusal packet was
     /// recovered).
@@ -1161,6 +1314,9 @@ impl MountService {
         let owner = ctx.guid;
         let actor = Self::ride_guid(owner);
         let result = match request {
+            // T527: gameplay routes 168/14 before this service because consuming the saddle
+            // belongs to the inventory it holds; the session-scoped service never commits one.
+            MountRequest::Upgrade { .. } => return Ok(None),
             MountRequest::Spawn { mount_id } => self.spawn_row(
                 owner,
                 ctx.inventory,
@@ -1193,11 +1349,7 @@ impl MountService {
         };
         Ok(Some(match result {
             Ok(outcome) => self.wire(&outcome, ctx.pose),
-            Err(error) => RideWire {
-                private: vec![self.list_packet(ctx.inventory)],
-                notice: Some(refusal_text(error)),
-                ..RideWire::default()
-            },
+            Err(error) => self.refusal(ctx.inventory, error),
         }))
     }
 
@@ -1241,6 +1393,10 @@ impl MountService {
 fn refusal_text(error: MountError) -> &'static str {
     match error {
         MountError::NotOwned => "You do not own that ride.",
+        MountError::NotUpgradable => "That ride cannot learn Gliding.",
+        MountError::AlreadyUpgraded => "That ride already knows Gliding.",
+        MountError::NotUpgradeItem => "That item cannot train a ride.",
+        MountError::UpgradeItemNotOwned => "You do not have that training saddle.",
         MountError::Restricted => "You cannot use a ride here right now.",
         _ => "That ride is not available.",
     }
@@ -1293,6 +1449,7 @@ fn encode_mount_list(
     rows: &[(&InventoryItem, &MountDefinition)],
     active: Option<&ActiveRide>,
     looks: &BTreeMap<i32, ItemLook>,
+    upgraded: &BTreeSet<i32>,
 ) -> Vec<u8> {
     let mut out = header(LIST);
     put_i32(&mut out, rows.len() as i32);
@@ -1314,7 +1471,8 @@ fn encode_mount_list(
             alias.map_or(&mount.tint_alias, |look| &look.tint_alias),
         );
         out.push(u8::from(mount.is_upgradable));
-        out.push(u8::from(mount.is_upgraded));
+        // T527: training is per owned instance, so two copies of one ride differ here.
+        out.push(u8::from(trained(mount, item.id, upgraded)));
     }
     out
 }
@@ -1369,10 +1527,11 @@ fn rider_stats(rider_guid: u64, stats: Vec<CharacterStat>) -> MountEffect {
     }
 }
 
-/// Whether the owner trained this upgradable ride to glide. ponytail: the ride record's
-/// `is_upgraded` until glide training adds a per-owned-ride flag here.
-fn trained(mount: &MountDefinition) -> bool {
-    mount.is_upgraded
+/// Whether this owned instance knows Gliding: the ride definition's own flag, or the saved
+/// per-instance training (T527). The flag lives with the inventory instance, so two copies of
+/// one ride train separately.
+fn trained(mount: &MountDefinition, instance_id: i32, upgraded: &BTreeSet<i32>) -> bool {
+    mount.is_upgraded || upgraded.contains(&instance_id)
 }
 
 fn float_stat(id: i32, value: f32) -> CharacterStat {
@@ -1424,6 +1583,23 @@ fn valid_sources(sources: &[MountSource]) -> bool {
             | MountSource::Wiki(value)
             | MountSource::Reconstructed(value) => !value.trim().is_empty(),
         })
+}
+
+/// T527: the item definitions 168/14 accepts, validated and deduplicated.
+fn upgrade_item_ids(items: Vec<UpgradeItem>) -> Result<BTreeSet<i32>, MountError> {
+    if items.len() > MAX_UPGRADE_ITEMS {
+        return Err(MountError::InvalidCatalog);
+    }
+    let mut ids = BTreeSet::new();
+    for item in items {
+        if item.item_definition_id <= 0
+            || !valid_sources(&item.source)
+            || !ids.insert(item.item_definition_id)
+        {
+            return Err(MountError::InvalidCatalog);
+        }
+    }
+    Ok(ids)
 }
 
 fn invalid_data(error: impl std::fmt::Display) -> io::Error {

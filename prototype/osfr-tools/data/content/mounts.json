@@ -43,6 +43,21 @@
       }
     ]
   },
+  "upgrade_items": [
+    {
+      "item_definition_id": 79150,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Item definition 79150 in lab/reports/round70-native-20261016T061000Z/content/item-catalogue.json; the client locale names it 'Training Saddle of Gliding' and the upgrade prompt (441983) comes from ScriptsBase.lua:34683-34689; the 168/14 request carries the item definition id (writer 00bff500)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "The original server's upgrade-item allowlist was not recovered; 79150 is the only accepted saddle (R). Bounded list (16 rows)."
+        }
+      ]
+    }
+  ],
   "mount_types": [
     {
       "id": 0,
