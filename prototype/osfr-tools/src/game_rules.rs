@@ -288,13 +288,12 @@ pub fn encode_account_info_values(values: AccountInfoValues) -> [u8; 12] {
     bytes
 }
 
-/// Encode the native opcode-100 membership update. `kind` is the opaque i16
-/// read before the member value; its meaning is unresolved. The client stores
-/// the following i32 as a truthy membership flag.
-pub fn encode_membership_activation(kind: i16, is_member: bool) -> Vec<u8> {
-    let mut inner = Vec::with_capacity(8);
+/// Encode the native opcode-100 membership update. Dispatch case 0x64 (0x00948b5c)
+/// calls the strict wrapper 0x008f6e30, whose reader 0x008d5ee0 reads the i16
+/// opcode and then one i32; 0x00a12470 stores that i32 at game-state +0x464.
+pub fn encode_membership_activation(is_member: bool) -> Vec<u8> {
+    let mut inner = Vec::with_capacity(6);
     inner.extend_from_slice(&100u16.to_le_bytes());
-    inner.extend_from_slice(&kind.to_le_bytes());
     inner.extend_from_slice(&u32::from(is_member).to_le_bytes());
     tunnel(&inner)
 }

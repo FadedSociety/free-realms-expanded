@@ -180,15 +180,18 @@ fn account_info_values_encode_member_and_nonmember_records() {
     );
 }
 
+/// Dispatch case 0x64 (0x00948b5c) passes allowTrailing = 0 to 0x008f6e30, whose reader
+/// 0x008d5ee0 reads the i16 opcode then one i32, so the inner payload is exactly
+/// [100, 0, member, 0, 0, 0].
 #[test]
 fn membership_wire_messages_match_native_reader_layouts() {
     assert_eq!(
-        encode_membership_activation(0x1234, true),
-        [5, 0, 1, 8, 0, 0, 0, 100, 0, 0x34, 0x12, 1, 0, 0, 0]
+        encode_membership_activation(true),
+        [5, 0, 1, 6, 0, 0, 0, 100, 0, 1, 0, 0, 0]
     );
     assert_eq!(
-        encode_membership_activation(0x1234, false),
-        [5, 0, 1, 8, 0, 0, 0, 100, 0, 0x34, 0x12, 0, 0, 0, 0]
+        encode_membership_activation(false),
+        [5, 0, 1, 6, 0, 0, 0, 100, 0, 0, 0, 0, 0]
     );
 }
 
