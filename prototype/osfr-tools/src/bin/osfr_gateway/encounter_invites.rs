@@ -111,9 +111,10 @@ fn offer(
 }
 
 /// The responder is this session, never the packet, and no reply field is a key (a real client's
-/// word B is its last battle instance). A reply with no live invite changes nothing; otherwise the
-/// invite is consumed, and Accept enters the server-held run only after the group, the inviter's
-/// live run and this player's Go gates are rechecked.
+/// word B is its last battle instance). A reply with no live invite changes nothing. Decline
+/// consumes the invite. Accept enters the server-held run only after the group, the inviter's
+/// live run and this player's Go gates are rechecked, and consumes the invite only once that
+/// join has committed: a refused Accept leaves it answerable until it expires.
 fn answer(
     me: &mut Session,
     sessions: &mut SessionMap,
@@ -123,11 +124,12 @@ fn answer(
     reply: &Reply,
 ) -> Result<(), Box<dyn std::error::Error>> {
     let guid = me.character_guid;
-    let Some(row) = membership.invites_mut().answer(guid, now_ms) else {
+    let Some(row) = membership.invites_mut().live(guid, now_ms).cloned() else {
         return Ok(());
     };
     if !reply.accept {
-        return Ok(()); // Decline: only the invite is cleared; the party is not touched.
+        membership.invites_mut().answer(guid, now_ms); // The party is not touched.
+        return Ok(());
     }
     let grouped = world
         .social
@@ -150,9 +152,11 @@ fn answer(
         return Ok(());
     };
     let previous = me.gateway.state().clone();
-    me.commit_outcome(
+    if me.commit_outcome(
         staged, previous, outcome, world, membership, sessions, now_ms,
-    )?;
+    )? {
+        membership.invites_mut().answer(guid, now_ms);
+    }
     Ok(())
 }
 
@@ -161,6 +165,15 @@ impl Server {
     /// The party the character is in, from the live social state (tests only).
     pub fn test_group(&self, guid: u64) -> Option<u32> {
         self.world.social.group_of(guid)
+    }
+
+    /// The live field-battle run the character's session holds (tests only).
+    pub fn test_joinable_run(&self, guid: u64) -> Option<(u32, i32, i32)> {
+        let key = self
+            .world
+            .session_keys
+            .get(self.world.active_sessions.get(&guid)?)?;
+        self.sessions.get(key)?.gateway.joinable_run()
     }
 
     /// Move the server clock forward: every deadline is measured on `start` (tests only).

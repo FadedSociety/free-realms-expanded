@@ -133,6 +133,14 @@ impl Invites {
         true
     }
 
+    /// The invitee's live invite, left in place: an Accept reads it, rechecks, and consumes it
+    /// with `answer` only once the join has committed, so a refused Accept burns nothing.
+    pub fn live(&self, invitee: u64, now_ms: u64) -> Option<&Pending> {
+        self.rows
+            .get(&invitee)
+            .filter(|row| now_ms < row.deadline_ms)
+    }
+
     /// Consume the invitee's live invite (one answer per invite), else change nothing. The
     /// caller passes the session's own character; no reply field is a key. An expired row is
     /// dropped and answers nothing.
@@ -244,6 +252,22 @@ mod tests {
         assert_eq!((got.inviter, got.run), (101, 5));
         assert_eq!(table.answer(202, 10), None, "replay");
         assert!(table.rows.is_empty());
+    }
+
+    #[test]
+    fn live_reads_the_invite_without_consuming_it() {
+        let mut table = Invites::default();
+        assert!(table.offer(202, pending(101, 5), 0, 8));
+        assert_eq!(table.live(202, 10).map(|row| row.run), Some(5));
+        assert_eq!(
+            table.live(202, 10).map(|row| row.run),
+            Some(5),
+            "still there"
+        );
+        assert_eq!(table.live(303, 10), None);
+        assert_eq!(table.live(202, 1_000), None, "expired");
+        assert_eq!(table.rows.len(), 1);
+        assert!(table.answer(202, 10).is_some());
     }
 
     #[test]

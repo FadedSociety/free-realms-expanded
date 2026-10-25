@@ -5,8 +5,9 @@
 //! location, membership and save bytes. Accept puts B into A's World instance through one
 //! transfer, also when the reply carries a stale non-zero word B (a real client's `client+0xc10`
 //! is its last 41/107 instance). A reply with no invite, an expired deadline (injected clock), a
-//! replayed accept and an accept after the starter left the run change nothing. Ungrouped and
-//! ineligible players get no invite.
+//! replayed accept and an accept after the starter left the run change nothing and send nothing
+//! (both inboxes stay empty), and a refused accept leaves the invite answerable. Accept begins
+//! the same battle for B in A's run. Ungrouped and ineligible players get no invite.
 //!
 //! Client layouts (IDA): 41/102 reader `00a9f920`, 41/103 writer `00a97720` (see
 //! `src/encounter_invite.rs`).
@@ -345,23 +346,41 @@ impl Rig {
     }
 
     fn b_sends(&mut self, inner: &[u8]) {
-        self.pump(Duration::from_millis(300));
-        self.take(0);
-        self.take(1);
+        self.settle();
         self.b.send_message(&bot::wrap(inner), "41/103").unwrap();
     }
 
-    /// Nothing B owns changed and nothing was sent to either bot, after the server settled.
+    /// Pump until nothing but ambient traffic has arrived for 400 ms (a scene load can stream for
+    /// seconds), then empty both inboxes.
+    fn settle(&mut self) {
+        let deadline = Instant::now() + PATIENCE;
+        let mut quiet_since = Instant::now();
+        while quiet_since.elapsed() < Duration::from_millis(400) {
+            assert!(Instant::now() < deadline, "the server never went quiet");
+            self.pump(Duration::from_millis(50));
+            if self.inbox.iter().flatten().any(|m| !ambient(m)) {
+                quiet_since = Instant::now();
+            }
+            self.take(0);
+            self.take(1);
+        }
+    }
+
+    /// Nothing B owns changed and, after the server settled, neither bot was sent anything but
+    /// ambient actor traffic (family 125 updates, 35/8 NPC idle animations): those arrive on the
+    /// server's own timer whatever B answered. Any other message, such as a refusal chat, an
+    /// error reply or a transfer, fails.
     fn assert_inert(&mut self, what: &str, before: &Place) {
         self.pump(Duration::from_millis(600));
         assert_eq!(*before, self.place(B), "{what}: B's place changed");
-        let (a, b) = (self.take(0), self.take(1));
-        assert!(
-            a.iter()
-                .chain(&b)
-                .all(|m| !m.starts_with(&[31, 0]) && !is_sub(m, 41, 102)),
-            "{what}: the server answered"
-        );
+        for (who, got) in [("A", self.take(0)), ("B", self.take(1))] {
+            let sent: Vec<_> = got
+                .iter()
+                .filter(|m| !ambient(m))
+                .map(|m| m[..m.len().min(8)].to_vec())
+                .collect();
+            assert!(sent.is_empty(), "{what}: {who} was sent {sent:?}");
+        }
     }
 }
 
@@ -497,6 +516,17 @@ fn a_grouped_start_invites_the_member_and_only_accept_enters_the_run() {
     assert_eq!((at_b.0.zone_id, at_b.1), (9600, run));
     assert_eq!(at_a.1, at_b.1, "B shares A's instance id");
     assert_eq!(at_b.3, BTreeSet::from([A, B]));
+    // The battle itself began for B: the same battle, in A's run, live (not just a transfer).
+    let title =
+        field_battle_fixture::i32_field(field_battle_fixture::battle(&battles, BATTLE), "title_id");
+    assert_eq!(
+        rig.host(|s| s.test_joinable_run(A)),
+        Some((BATTLE, run, title))
+    );
+    assert_eq!(
+        rig.host(|s| s.test_joinable_run(B)),
+        Some((BATTLE, run, title))
+    );
     assert_ne!(outside, rig.place(B));
     assert!(rig.group(A).is_some() && rig.group(A) == rig.group(B));
 
@@ -535,6 +565,33 @@ fn an_accept_rechecks_the_party_and_the_go_gates_after_the_invite() {
     // B drops the combat job after the invite: Accept's Go gates refuse it.
     round(&mut rig, "B lost the combat job", Rig::b_goes_idle);
     assert!(rig.group(A).is_some() && rig.group(A) == rig.group(B));
+}
+
+#[test]
+fn a_refused_accept_leaves_the_invite_answerable() {
+    let mut rig = Rig::new(true, Some(BRAWLER));
+    let run = rig.a_starts_battle();
+    rig.pump(Duration::from_millis(600));
+    assert_eq!(invites_in(&rig.take(1)).len(), 1);
+    // B drops the combat job, so Accept's Go gates refuse it: nothing moves and no message goes.
+    rig.b_goes_idle();
+    rig.pump(Duration::from_millis(600));
+    let before = rig.place(B);
+    rig.b_answers(reply(0, STALE_RUN, B, true));
+    rig.assert_inert("accept without a combat job", &before);
+    assert_eq!(rig.host(|s| s.test_joinable_run(B)), None);
+    // B picks the combat job back up and answers the same invite: it was not burned.
+    rig.take(1);
+    let job = field_battle_fixture::switch_job(BRAWLER);
+    rig.b.send_message(&bot::wrap(&job), "26/13").unwrap();
+    rig.until("B's job change back", |rig| {
+        rig.inbox[1].iter().any(|m| is_sub(m, 38, 21))
+    });
+    rig.b_answers(reply(0, 0, B, true));
+    rig.until("B in A's instance", |rig| {
+        rig.host(move |s| s.test_location(B).is_some_and(|row| row.1 == run))
+    });
+    assert_eq!(rig.host(|s| s.test_joinable_run(B)).map(|r| r.1), Some(run));
 }
 
 #[test]
@@ -619,6 +676,10 @@ fn an_ungrouped_or_ineligible_player_gets_no_invite() {
     assert!(invites_in(&rig.take(1)).is_empty());
 }
 
+/// Actor traffic the server sends on its own timer: family 125 updates, 35/8 NPC animations.
+fn ambient(message: &[u8]) -> bool {
+    message.starts_with(&[125, 0]) || is_sub(message, 35, 8)
+}
 fn is_sub(message: &[u8], family: u16, sub: u16) -> bool {
     message.starts_with(&[
         family as u8,
