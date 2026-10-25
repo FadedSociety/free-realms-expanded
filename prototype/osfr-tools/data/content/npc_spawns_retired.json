@@ -4,7 +4,8 @@
     "removed_by": "../lab/references/Lxzxrus-Free-Realms-Server 9c5ef6b42a54018c488d76ebdd7cb18593afbdc3 (2026-09-14) deletes these spawnNpcWithGuid rows from src/Scripts/Zone/FabledRealms.lua; its message calls them 700+ NPCs placed out of bounds or misplaced in the overworld.",
     "confirmed_by": "../lab/references/Sanctuary-main-20261019 10f129e7f3e2094304d20ccee6e3f7136a5e889d spawns none of the 834 ids. It and Lxzxrus main both descend from 9c5ef6b, so this is one community judgment, not two.",
     "derivation": "First argument of every spawnNpcWithGuid in ../lab/references/FreeRealms-Legacy (9e08202) src/Scripts/Zone/FabledRealms.lua (4,253 ids) minus ../lab/references/Sanctuary (4f028dc) (3,426 ids) = 834 ids, equal to the net removals of 9c5ef6b. 635 were npc_spawns_extra.json rows by legacy_npc_id; 632 moved here unchanged and in order (T468), the 3 below stay live.",
-    "runtime": "Never loaded: src/world.rs draws npc_spawns_extra.json only. Moving a row back restores it."
+    "runtime": "Never loaded: src/world.rs draws npc_spawns_extra.json only. Moving a row back restores it.",
+    "season_tags": "(R) T491 product choice, not recovered client data: the 12 rows below whose model_file_name contains halloween (spawn_guids 100000012182, 100000019691, 100000019693, 100000019719, 100000019720, 100000019721, 100000019722, 100000019723, 100000019724, 100000019725, 100000019774, 100000019775) carry \"season\": \"Halloween\", so a future rehome shows them only during the client_areas.json Halloween season. No client file ties these props to that season; T468 retired them as out-of-bounds housing-demo props."
   },
   "exempt": {
     "spawn_guids": [

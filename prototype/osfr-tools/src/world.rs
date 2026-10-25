@@ -393,8 +393,9 @@ impl NpcVisibility {
     }
 
     /// T491: [`Self::load`] for play: the props of a `client_areas.json` season that is not
-    /// active now are dropped. A server that runs across a season end keeps them until a
-    /// restart (R): `realm reload` never re-reads `npc_spawns_extra.json`.
+    /// active now are dropped. The table is per session: one that runs across a season end
+    /// keeps them until a restart (R), because `realm reload` never re-reads
+    /// `npc_spawns_extra.json`; a session that starts after it follows the load clock.
     pub fn load_in_season(content_dir: &Path) -> io::Result<Self> {
         Self::load_in_season_at(content_dir, crate::client_areas::unix_now_ms())
     }
@@ -469,6 +470,7 @@ impl NpcVisibility {
             name: placement.name.clone(),
             position: p,
             heading: Some(placement.heading).filter(|value| value.is_finite()),
+            // T491: placed and battle actors are never seasonal.
             season: None,
         });
         npcs.sort_by_key(|npc| npc.spawn.actor_id);
@@ -548,6 +550,7 @@ impl NpcVisibility {
             position,
             // (R) Battle spawners carry no content yaw; keep the approach rule.
             heading: None,
+            // T491: placed and battle actors are never seasonal.
             season: None,
         });
         npcs.sort_by_key(|npc| npc.spawn.actor_id);
