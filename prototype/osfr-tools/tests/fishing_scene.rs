@@ -535,10 +535,29 @@ fn the_gateway_zones_into_the_hole_saves_the_world_pose_and_brings_the_player_ba
         .handle_at(&wrap(&npc(10, SELVI, Some(option))), 11_100)
         .unwrap();
     assert!(entered.began_zoning);
+    // The hole frame, field by field in the client reader `0x008e4ae0` order: opcode, name,
+    // type, position, rotation, sky, tutorial, unknown, id, radius, geometry and the two
+    // booleans. The Gameplay test checks the same struct before it is encoded; this asserts the
+    // bytes the gateway actually sends, so a wrong field cannot pass here.
     let scene = zoning(&entered.replies);
     assert_eq!(
-        (scene.scene.as_str(), scene.id),
-        ("sg_fishing_stream", HOLE as i32)
+        scene,
+        ZoneTransition {
+            envelope_flag: 1,
+            scene: "sg_fishing_stream".to_string(),
+            type_id: 2,
+            position: [SPAWN[0], SPAWN[1], SPAWN[2], 1.0],
+            rotation: [0.0, 0.0, 0.0, 1.0],
+            sky: String::new(),
+            tutorial: false,
+            unknown: 1,
+            id: HOLE as i32,
+            update_radius: 0.0,
+            geometry_id: 214,
+            override_update_radius: true,
+            wait_for_zone_ready: false,
+        },
+        "the hole frame matches the client reader field for field"
     );
     assert!(
         !starts(&inner(&entered.replies), &[39, 0, 16]),
