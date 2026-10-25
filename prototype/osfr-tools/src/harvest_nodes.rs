@@ -1,5 +1,6 @@
-//! Harvest-node content imported from the pinned Legacy data tables, and (W171) the ordinary
-//! way into mining and harvesting: a node actor in the world that a player clicks.
+//! Harvest-node content imported from the pinned Legacy data tables and the community
+//! collection tables (T523, dormant), and (W171) the ordinary way into mining and harvesting:
+//! a node actor in the world that a player clicks.
 //!
 //! Recovered: a click on any interactable actor sends 26/8 (`PlayClient::RequestInteraction`,
 //! `0092efe0`). Everything below that is reconstructed policy (R): the node is a plain actor,
@@ -20,11 +21,29 @@ use std::{
 };
 
 const MAX_FILE_BYTES: u64 = 1 << 20;
-/// Node actor guids: "NOD", the node file's tag byte (1 harvesting, 2 mining, 3 quest
-/// pickup), then the content spawn id. The tag is OR-ed into that byte, so it starts at
-/// zero: over the old 0x45, tags 2 and 3 both became 0x47. Clear of NPC, placement and
-/// pickup ids.
+/// Node actor guids: "NOD", the node file's tag byte, then the content spawn id. The tag is
+/// OR-ed into a zero byte, so every tag needs its own value; see `NODE_FILES`. Clear of NPC,
+/// placement and pickup ids.
 const NODE_GUID_BASE: u64 = 0x4e4f_4400_0000_0000;
+
+/// Guid tag byte owned by each node content file. Tags share one spawn-id space, so no two
+/// files may reuse one. `COLLECTION_NODE_TAG` is reserved for the dormant community
+/// collection file (T523, `collection_nodes.json`) and is not loaded yet.
+const HARVEST_NODE_TAG: u64 = 1;
+const MINING_NODE_TAG: u64 = 2;
+const QUEST_NODE_TAG: u64 = 3;
+pub const COLLECTION_NODE_TAG: u64 = 4;
+
+/// The node files `GatheringNodes::load` reads and the guid tag each one owns.
+const NODE_FILES: [(&str, Option<Gather>, u64); 3] = [
+    (
+        "harvest_nodes.json",
+        Some(Gather::Harvesting),
+        HARVEST_NODE_TAG,
+    ),
+    ("mining_nodes.json", Some(Gather::Mining), MINING_NODE_TAG),
+    ("quest_nodes.json", None, QUEST_NODE_TAG),
+];
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
 pub struct HarvestNodesContent {
@@ -34,7 +53,8 @@ pub struct HarvestNodesContent {
     pub node_types: Vec<HarvestNodeType>,
     pub pools: Vec<HarvestNodePool>,
     pub spawns: Vec<HarvestNodeSpawn>,
-    /// Generator findings (T523). Absent and empty for the Legacy files.
+    /// Generator findings (T523). Absent and empty for the Legacy files. Not read at runtime;
+    /// collection-node-pickups owns it.
     #[serde(default)]
     pub gaps: HarvestNodeGaps,
 }
@@ -69,13 +89,15 @@ pub struct HarvestNodeType {
     pub model_id: u32,
     pub scale: f32,
     pub composite_effect_id: u32,
-    /// Sanctuary adds these on top of the main effect (sparkling water); Legacy has none.
+    /// Sanctuary adds these on top of the main effect (sparkling water); Legacy has none. Not
+    /// read at runtime; collection-node-pickups owns it.
     #[serde(default)]
     pub extra_composite_effect_ids: Vec<u32>,
     pub interact_range: u32,
     pub cursor_id: u32,
     pub placement_y_offset: f32,
-    /// Sanctuary's rare-node subtitle locale row; absent on common types and Legacy nodes.
+    /// Sanctuary's rare-node subtitle locale row; absent on common types and Legacy nodes. Not
+    /// read at runtime; collection-node-pickups owns it.
     #[serde(default)]
     pub sub_text_name_id: Option<i32>,
     /// Legacy drop table; unused by the Type8 payout, and absent for mining nodes.
@@ -271,11 +293,7 @@ impl GatheringNodes {
     /// coordinate space whatever `zone_definition_id` says.
     pub fn load(dir: &Path) -> io::Result<Option<Self>> {
         let mut sites = BTreeMap::new();
-        for (file, gather, tag) in [
-            ("harvest_nodes.json", Some(Gather::Harvesting), 1_u64),
-            ("mining_nodes.json", Some(Gather::Mining), 2),
-            ("quest_nodes.json", None, 3),
-        ] {
+        for (file, gather, tag) in NODE_FILES {
             let path = dir.join(file);
             if path.is_file() {
                 let content = HarvestNodesContent::load_from(path)?;
@@ -426,6 +444,12 @@ impl GatheringNodes {
     }
 }
 
+/// The world guid of one node: "NOD", the file's tag byte and the content spawn id. Two files
+/// must never share a tag, or two spawns with the same id would get one guid.
+fn node_guid(tag: u64, spawn_id: u32) -> u64 {
+    NODE_GUID_BASE | tag << 32 | u64::from(spawn_id)
+}
+
 fn add_sites(
     sites: &mut BTreeMap<u64, Site>,
     content: &HarvestNodesContent,
@@ -474,7 +498,7 @@ fn add_sites(
             if !spawn.position.iter().all(|v| v.is_finite()) {
                 return Err(bad("node position is not finite"));
             }
-            let guid = NODE_GUID_BASE | tag << 32 | u64::from(spawn.id);
+            let guid = node_guid(tag, spawn.id);
             let [x, y, z] = spawn.position;
             let site = Site {
                 actor: NodeActor {
@@ -514,4 +538,45 @@ pub fn payout_fits(inventory: &Inventory, spec: &Type8BoardSpec) -> bool {
         })
         .collect();
     inventory.clone().grant_bundle(0, &grants).is_ok()
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// T523 review: five collection spawns (100..=104) reuse quest pickup ids, and the old
+    /// tag-3 plan would have made `add_sites` refuse the load as a duplicate spawn id. Every
+    /// loader tag and the reserved collection tag must stay in its own guid space.
+    #[test]
+    fn node_file_tags_give_distinct_guids_for_the_same_spawn_id() {
+        let mut tags: Vec<u64> = NODE_FILES.iter().map(|(_, _, tag)| *tag).collect();
+        tags.push(COLLECTION_NODE_TAG);
+        assert!(
+            tags.iter().all(|tag| *tag < 256),
+            "a tag must fit the guid's tag byte"
+        );
+        let guids: BTreeSet<u64> = tags.iter().map(|tag| node_guid(*tag, 100)).collect();
+        assert_eq!(guids.len(), tags.len(), "two node files share a guid space");
+    }
+
+    /// The committed collection file loads beside the quest file on its own tag. The pool
+    /// caps place quest spawn 103 and collection spawn 103, the one overlapping placed id.
+    #[test]
+    fn the_collection_file_loads_beside_the_quest_file() {
+        let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        let mut sites = BTreeMap::new();
+        let quest = HarvestNodesContent::load_from(dir.join("quest_nodes.json")).unwrap();
+        add_sites(&mut sites, &quest, None, QUEST_NODE_TAG).unwrap();
+        let collection = HarvestNodesContent::load_from(dir.join("collection_nodes.json")).unwrap();
+        // The site kind is irrelevant to the guid space; this runs `add_sites`' bounds.
+        add_sites(
+            &mut sites,
+            &collection,
+            Some(Gather::Harvesting),
+            COLLECTION_NODE_TAG,
+        )
+        .expect("tag 4 keeps collection spawn 103 clear of quest spawn 103");
+        assert!(sites.contains_key(&node_guid(QUEST_NODE_TAG, 103)));
+        assert!(sites.contains_key(&node_guid(COLLECTION_NODE_TAG, 103)));
+    }
 }

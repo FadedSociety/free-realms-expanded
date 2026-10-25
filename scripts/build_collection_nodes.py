@@ -48,10 +48,6 @@ def tag(path, key):
     return f"sanctuary@{SHORT_REV}:{path}#{key}"
 
 
-def rows(path):
-    return json.loads(show(path))
-
-
 def client_ids():
     """Model ids, effect-definition ids and cursor ids the client resources name."""
     models = set()
@@ -90,8 +86,8 @@ def main():
     models, effects, cursors = client_ids()
     legacy = {row["Id"] for row in json.loads(LEGACY_ITEMS.read_text(encoding="utf-8-sig"))}
 
-    type_rows = rows(TYPES)
-    pool_rows = rows(POOLS)
+    type_rows = json.loads(show(TYPES))
+    pool_rows = json.loads(show(POOLS))
     spawn_paths = git(
         "ls-tree", "-r", "--name-only", REV, "--", SPAWNS
     ).decode("utf-8-sig").split()
