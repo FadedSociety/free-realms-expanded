@@ -13601,6 +13601,7 @@
     {
       "spawn_guid": 100000002187,
       "legacy_npc_id": 2187,
+      "content_key": 9500001009,
       "model_id": 339,
       "model_file_name": "human_f_freestyle_01.agr",
       "name": "Shannon",
@@ -13616,6 +13617,10 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:939; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2187 (ModelId=339, ModelFileName=human_f_freestyle_01.agr, NameId=40518)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T501: content_key 9500001009 binds this Legacy Shannon actor (Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:834) to the new Shannon row in npcs/merry_vale.json 9500001009, so Suspicious Serenity (3000371) can credit a Talk to it. The actor, model and transform are unchanged."
         }
       ],
       "position_w": null
@@ -14626,6 +14631,7 @@
     {
       "spawn_guid": 100000002279,
       "legacy_npc_id": 2279,
+      "content_key": 9500001010,
       "model_id": 222,
       "model_file_name": "chugawug_f_02.adr",
       "name": "Sugaboo",
@@ -14641,6 +14647,10 @@
         {
           "kind": "legacy-data",
           "evidence": "../lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1025; ../lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2279 (ModelId=222, ModelFileName=chugawug_f_02.adr, NameId=40355)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T501: content_key 9500001010 binds this Legacy Sugaboo actor (Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:902) to the new Sugaboo row in npcs/merry_vale.json 9500001010, so Birthday Surprises (3000376) can credit a Talk to it. The actor, model and transform are unchanged."
         }
       ],
       "position_w": null

@@ -83,8 +83,8 @@ fn job_batch_loads_and_npc_references_resolve_or_are_declared() {
         }));
     }
     // T466 added quests/zone_seaside.json, the first zone-quests slice; T498 added zone_wilds.json;
-    // T500 added zone_sanctuary.json.
-    assert_eq!(fs::read_dir(root.join("quests")).unwrap().count(), 21);
+    // T500 added zone_sanctuary.json; T501 added zone_merry_vale.json.
+    assert_eq!(fs::read_dir(root.join("quests")).unwrap().count(), 22);
 
     let mut referenced_npcs = HashSet::new();
     for job in jobs["records"].as_array().unwrap() {

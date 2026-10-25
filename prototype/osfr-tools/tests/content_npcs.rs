@@ -324,8 +324,9 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
         .collect();
     quest_files.sort();
     // T466 added quests/zone_seaside.json (five records), the first zone-quests slice;
-    // T498 added quests/zone_wilds.json (four records); T500 added quests/zone_sanctuary.json (three).
-    assert_eq!(quest_files.len(), 21);
+    // T498 added quests/zone_wilds.json (four records); T500 added quests/zone_sanctuary.json (three);
+    // T501 added quests/zone_merry_vale.json (five).
+    assert_eq!(quest_files.len(), 22);
     let mut quest_records = Vec::new();
     let mut quest_ids_by_giver = BTreeMap::<u64, Vec<u32>>::new();
     let mut resolved_giver_occurrences = 0usize;
@@ -462,8 +463,8 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     }
     // T379 appended two unanchored repair-guy binding rows.
     // T498 appended the Burglz row (the Wilds quarry troll) to npcs/wilds.json; T500 appended Hasti
-    // to npcs/sanctuary.json (1,203).
-    assert_eq!(content_npcs.len(), 1203);
+    // to npcs/sanctuary.json (1,203); T501 appended Shannon and Sugaboo to npcs/merry_vale.json (1,205).
+    assert_eq!(content_npcs.len(), 1205);
     let expected_npc_count = loader_npcs.len();
     write_json(
         &scratch.join("npcs.json"),
@@ -474,12 +475,12 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     assert_eq!(db.zones.len(), 17);
     assert_eq!(db.npcs.len(), expected_npc_count);
     assert_eq!(db.jobs.len(), 17);
-    assert_eq!(db.quests.len(), 667); // T498: four Wilds zone quests; T500: three Sanctuary ones
+    assert_eq!(db.quests.len(), 672); // T498: four Wilds zone quests; T500: three Sanctuary ones; T501: five Merry Vale ones
     assert_eq!(resolved_reference_ids.len(), 295);
     assert_eq!(unresolved_ids.len(), 170);
     assert_eq!(
         resolved_giver_occurrences + unresolved_giver_occurrences,
-        667
+        672
     );
     println!(
         "NPC refs: {} resolved, {} unresolved; quest giver occurrences: {} resolved, {} unresolved; positions: {} known, {} unknown",

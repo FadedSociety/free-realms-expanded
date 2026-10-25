@@ -212,7 +212,7 @@ fn regional_npcs_have_unique_sourced_placements_and_captures_match_exactly() {
     }
 
     // T379 appended two unanchored repair-guy binding rows.
-    // T498 appended the Burglz row (1,202); T500 appended Hasti (1,203).
-    assert_eq!(npc_count, 1_203);
+    // T498 appended the Burglz row (1,202); T500 appended Hasti (1,203); T501 Shannon and Sugaboo (1,205).
+    assert_eq!(npc_count, 1_205);
     println!("NPC placement sources: {counts:?}");
 }

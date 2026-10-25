@@ -7242,12 +7242,31 @@
           ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3000376,
+        3000377
+      ],
       "quests_given_text": [
         "Dubawug's Sweetheart (wiki: only available in the 2010 Festival; \"Help Dubawug win back his sweetheart.\", 3966958711; \"Pay Cudip for Dubawug\", 4031112949); birthday gifts: ask the ladies around town what they would like (2441056566, 2695342494, 1333285077), then pick up pie from Jarvie and pots and pans from Plexi (475223862). Titles for the birthday chain not found."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3000375,
+          "title": "Picking Petals",
+          "title_string_id": 387034,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3075: TargetGuid 100000002271 = definition 2271 (Dubawug, NameId 70967, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:894, this row's position); its last goal (NameId 387039) is a talk to Dubawug with DialogueId 387036."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T501: Picking Petals is handed in to Dubawug, the fork's TargetGuid, not to its giver."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "T501: Picking Petals (3000375) is handed in to Dubawug, the fork's TargetGuid (R); see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [],
@@ -7488,7 +7507,7 @@
         "quest_ids_given": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+            "evidence": "(R) T501: Birthday Surprises (3000376) and The Perfect Present (3000377) are given here, minted from Lxzxrus QuestIds 3076 and 3077; 3000376 hands in at the same NPC and 3000377 at Verna."
           }
         ],
         "quests_given_text": [
@@ -7504,13 +7523,13 @@
         "quests_accepted": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+            "evidence": "(R) T501: Picking Petals (3000375) is handed in to Dubawug, the fork's TargetGuid (R); see the entry's source."
           }
         ],
         "quests_accepted_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+            "evidence": "(R) T501: Picking Petals (3000375) is handed in to Dubawug, the fork's TargetGuid (R); see the entry's source."
           }
         ],
         "vendor_stock": [
@@ -18528,7 +18547,9 @@
           ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3000370
+      ],
       "quests_given_text": [
         "A Very Merry Welcome (he hands out the list of people to visit, 477430737); Party Flyers (1552129612); The Party Pooper, Busting the Fourth Wall, Cakey Clue (wiki list); the kidnapping chain (Mayor McFairy!, Unmasking the Villain: \"Mayor McFairy ... has given me all of the tools I need to enter the cavern north of Merry Vale\", 1876015264); points players to Yvelle (1210912217); is named as the hand-in after cheering visitors up (\"Now that you've spread cheer to everyone, speak to the Mayor of Merry Vale!\", 4155924993, by wording). See the quest table."
       ],
@@ -18834,7 +18855,7 @@
         "quest_ids_given": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+            "evidence": "(R) T501: The Party Pooper (3000370) is given here, minted from Lxzxrus QuestId 3070; the fork's TargetGuid hands it in at Wugunbump."
           }
         ],
         "quests_given_text": [
@@ -31533,12 +31554,30 @@
           ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3000375
+      ],
       "quests_given_text": [
         "Birthday chain: \"Verna is concerned that Dubawug has forgotten about her birthday. Look around Merry Vale for him\" (3049505363, 2896366823); receives the presents (\"Bring the presents to Verna\", 283719533). The Festival of Hearts version is Dubawug's Sweetheart."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3000377,
+          "title": "The Perfect Present",
+          "title_string_id": 387067,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3077: TargetGuid 100000002220 = definition 2220 (Verna, NameId 387029, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:867, this row's position); its last goal (NameId 387076) is a talk to Verna with DialogueId 387069."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T501: The Perfect Present is handed in to Verna, the fork's TargetGuid, not to its giver."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "T501: The Perfect Present (3000377) is handed in to Verna, the fork's TargetGuid (R); see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [],
@@ -31779,7 +31818,7 @@
         "quest_ids_given": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+            "evidence": "(R) T501: Picking Petals (3000375) is given here, minted from Lxzxrus QuestId 3075; the fork's TargetGuid hands it in at Dubawug."
           }
         ],
         "quests_given_text": [
@@ -31795,13 +31834,13 @@
         "quests_accepted": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+            "evidence": "(R) T501: The Perfect Present (3000377) is handed in to Verna, the fork's TargetGuid (R); see the entry's source."
           }
         ],
         "quests_accepted_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+            "evidence": "(R) T501: The Perfect Present (3000377) is handed in to Verna, the fork's TargetGuid (R); see the entry's source."
           }
         ],
         "vendor_stock": [
@@ -32025,12 +32064,30 @@
           ]
         }
       ],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3000371
+      ],
       "quests_given_text": [
         "Suspicious Serenity (wiki giver; \"Wugunbump thinks that something strange is going on around Merry Vale ... talk to the family members of the missing children\", 1729137906, 1472403084); Where is Lugunwump? (wiki giver; search the three bridges, 3112934980, 3841763330); At the End of the Rainbow (wiki giver); The Party Pooper (wiki: he appears; \"Try cheering Wugunbump up with the famous Merry Vale cotton candy!\", 1500338333)."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3000370,
+          "title": "The Party Pooper",
+          "title_string_id": 385597,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3070: TargetGuid 100000004355 = definition 4355 (Wugunbump, NameId 40344, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:2838, this row's position); its last goal (NameId 385602) is a talk to Wugunbump with DialogueId 385599."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T501: The Party Pooper is handed in to Wugunbump, the fork's TargetGuid, not to its giver."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "T501: The Party Pooper (3000370) is handed in to Wugunbump, the fork's TargetGuid (R); see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [],
@@ -32271,7 +32328,7 @@
         "quest_ids_given": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+            "evidence": "(R) T501: Suspicious Serenity (3000371) is given here, minted from Lxzxrus QuestId 3071; the fork's TargetGuid hands it in at the same NPC."
           }
         ],
         "quests_given_text": [
@@ -32287,13 +32344,13 @@
         "quests_accepted": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+            "evidence": "(R) T501: The Party Pooper (3000370) is handed in to Wugunbump, the fork's TargetGuid (R); see the entry's source."
           }
         ],
         "quests_accepted_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+            "evidence": "(R) T501: The Party Pooper (3000370) is handed in to Wugunbump, the fork's TargetGuid (R); see the entry's source."
           }
         ],
         "vendor_stock": [
@@ -33311,6 +33368,584 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+          }
+        ]
+      }
+    },
+    {
+      "npc_id": 9500001009,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Shannon",
+      "name_reason": null,
+      "name_string_id": 40518,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 40518
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Merry Vale",
+      "zone_id": 9,
+      "zone_reason": null,
+      "region_pages": [
+        "Merry Vale"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Human family member; talk target of Suspicious Serenity"
+      ],
+      "roles": [
+        "ambient"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "Legacy built-content spawn Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:834, in Merry Vale; the Merry Vale guide has no Shannon row."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [],
+      "quests_accepted": [],
+      "quests_accepted_reason": "T501: Shannon is a talk target of Suspicious Serenity (3000371), not a hand-in.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "No vendor stock is recorded for this NPC.",
+      "services": [],
+      "services_reason": "No distinct service is recorded for this NPC.",
+      "position": [
+        -1091.724,
+        -39.94047,
+        -464.5027
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        -0.320234014405485,
+        0.0,
+        0.9473384696177748
+      ],
+      "placement": "unanchored",
+      "placement_source": "reconstructed_unanchored_default",
+      "placement_confidence": "low",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "(R) T501: this unanchored regional row does not spawn a duplicate actor. Its position is the Legacy extra-spawn transform of actor 2187 (FabledRealms.lua:834), so NPC range checks use the actor the client actually sees; the extra spawn carries content_key 9500001009.",
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:834 (spawnNpcWithGuid(2187, 100000002187, -1091.724, -39.94047, -464.5027, -0.651953)); Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Npcs.json Id=2187 (NameId=40518, ModelId=339, ModelFileName=human_f_freestyle_01.agr); the same spawn is npc_spawns_extra.json spawn_guid 100000002187. NameId resolves in the client locale table to 'Shannon'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row. T501: content_key 9500001009 on extra spawn 100000002187 binds the Legacy Shannon actor to this row."
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row. T501: content_key 9500001009 on extra spawn 100000002187 binds the Legacy Shannon actor to this row."
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row. T501: content_key 9500001009 on extra spawn 100000002187 binds the Legacy Shannon actor to this row."
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row. T501: content_key 9500001009 on extra spawn 100000002187 binds the Legacy Shannon actor to this row."
+          }
+        ],
+        "name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:834 (spawnNpcWithGuid(2187, 100000002187, -1091.724, -39.94047, -464.5027, -0.651953)); Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Npcs.json Id=2187 (NameId=40518, ModelId=339, ModelFileName=human_f_freestyle_01.agr); the same spawn is npc_spawns_extra.json spawn_guid 100000002187. NameId resolves in the client locale table to 'Shannon'."
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:834 (spawnNpcWithGuid(2187, 100000002187, -1091.724, -39.94047, -464.5027, -0.651953)); Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Npcs.json Id=2187 (NameId=40518, ModelId=339, ModelFileName=human_f_freestyle_01.agr); the same spawn is npc_spawns_extra.json spawn_guid 100000002187. NameId resolves in the client locale table to 'Shannon'."
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:834 (spawnNpcWithGuid(2187, 100000002187, -1091.724, -39.94047, -464.5027, -0.651953)); Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Npcs.json Id=2187 (NameId=40518, ModelId=339, ModelFileName=human_f_freestyle_01.agr); the same spawn is npc_spawns_extra.json spawn_guid 100000002187. NameId resolves in the client locale table to 'Shannon'."
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:834 (spawnNpcWithGuid(2187, 100000002187, -1091.724, -39.94047, -464.5027, -0.651953)); Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Npcs.json Id=2187 (NameId=40518, ModelId=339, ModelFileName=human_f_freestyle_01.agr); the same spawn is npc_spawns_extra.json spawn_guid 100000002187. NameId resolves in the client locale table to 'Shannon'."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T501: the position is the existing Legacy extra-spawn transform bound to this content key; the regional row remains unanchored and does not spawn."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:834 (spawnNpcWithGuid(2187, 100000002187, -1091.724, -39.94047, -464.5027, -0.651953)); Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Npcs.json Id=2187 (NameId=40518, ModelId=339, ModelFileName=human_f_freestyle_01.agr); the same spawn is npc_spawns_extra.json spawn_guid 100000002187. NameId resolves in the client locale table to 'Shannon'."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Y-axis quaternion derived from the fork heading (sin and cos of half the heading), as the existing legacy_data rows do"
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T501: the position is a Legacy actor binding, not a zone-centre offset; the regional row is unspawned and the extra spawn draws Shannon."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T501: the range anchor is aligned to the bound Legacy actor so a client click on that actor resolves to content_key 9500001009."
+          }
+        ]
+      }
+    },
+    {
+      "npc_id": 9500001010,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "Sugaboo",
+      "name_reason": null,
+      "name_string_id": 40355,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 40355
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Merry Vale",
+      "zone_id": 9,
+      "zone_reason": null,
+      "region_pages": [
+        "Merry Vale"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Chugawug family member; talk target of Birthday Surprises"
+      ],
+      "roles": [
+        "ambient"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "Legacy built-content spawn Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:902, near the Chugawug camp in Merry Vale; the Merry Vale guide has no Sugaboo row."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [],
+      "quests_accepted": [],
+      "quests_accepted_reason": "T501: Sugaboo is a talk target of Birthday Surprises (3000376), not a hand-in.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "No vendor stock is recorded for this NPC.",
+      "services": [],
+      "services_reason": "No distinct service is recorded for this NPC.",
+      "position": [
+        -1007.71,
+        -39.03788,
+        -312.3969
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        -0.9983148856158193,
+        0.0,
+        0.05802920952308064
+      ],
+      "placement": "unanchored",
+      "placement_source": "reconstructed_unanchored_default",
+      "placement_confidence": "low",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "(R) T501: this unanchored regional row does not spawn a duplicate actor. Its position is the Legacy extra-spawn transform of actor 2279 (FabledRealms.lua:902), so NPC range checks use the actor the client actually sees; the extra spawn carries content_key 9500001010.",
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:902 (spawnNpcWithGuid(2279, 100000002279, -1007.71, -39.03788, -312.3969, -3.025469)); Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Npcs.json Id=2279 (NameId=40355, ModelId=222, ModelFileName=chugawug_f_02.adr); the same spawn is npc_spawns_extra.json spawn_guid 100000002279. NameId resolves in the client locale table to 'Sugaboo'."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row. T501: content_key 9500001010 on extra spawn 100000002279 binds the Legacy Sugaboo actor to this row."
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row. T501: content_key 9500001010 on extra spawn 100000002279 binds the Legacy Sugaboo actor to this row."
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row. T501: content_key 9500001010 on extra spawn 100000002279 binds the Legacy Sugaboo actor to this row."
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) NPC id is a reconstructed package key (next free 95000xxxxx id); no actor id is captured for this row. T501: content_key 9500001010 on extra spawn 100000002279 binds the Legacy Sugaboo actor to this row."
+          }
+        ],
+        "name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:902 (spawnNpcWithGuid(2279, 100000002279, -1007.71, -39.03788, -312.3969, -3.025469)); Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Npcs.json Id=2279 (NameId=40355, ModelId=222, ModelFileName=chugawug_f_02.adr); the same spawn is npc_spawns_extra.json spawn_guid 100000002279. NameId resolves in the client locale table to 'Sugaboo'."
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:902 (spawnNpcWithGuid(2279, 100000002279, -1007.71, -39.03788, -312.3969, -3.025469)); Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Npcs.json Id=2279 (NameId=40355, ModelId=222, ModelFileName=chugawug_f_02.adr); the same spawn is npc_spawns_extra.json spawn_guid 100000002279. NameId resolves in the client locale table to 'Sugaboo'."
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:902 (spawnNpcWithGuid(2279, 100000002279, -1007.71, -39.03788, -312.3969, -3.025469)); Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Npcs.json Id=2279 (NameId=40355, ModelId=222, ModelFileName=chugawug_f_02.adr); the same spawn is npc_spawns_extra.json spawn_guid 100000002279. NameId resolves in the client locale table to 'Sugaboo'."
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "zone": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "presence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "roles": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:902 (spawnNpcWithGuid(2279, 100000002279, -1007.71, -39.03788, -312.3969, -3.025469)); Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Npcs.json Id=2279 (NameId=40355, ModelId=222, ModelFileName=chugawug_f_02.adr); the same spawn is npc_spawns_extra.json spawn_guid 100000002279. NameId resolves in the client locale table to 'Sugaboo'."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T501: the position is the existing Legacy extra-spawn transform bound to this content key; the regional row remains unanchored and does not spawn."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "legacy-data",
+            "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:902 (spawnNpcWithGuid(2279, 100000002279, -1007.71, -39.03788, -312.3969, -3.025469)); Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Npcs.json Id=2279 (NameId=40355, ModelId=222, ModelFileName=chugawug_f_02.adr); the same spawn is npc_spawns_extra.json spawn_guid 100000002279. NameId resolves in the client locale table to 'Sugaboo'."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Y-axis quaternion derived from the fork heading (sin and cos of half the heading), as the existing legacy_data rows do"
+          }
+        ],
+        "placement": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T501: the position is a Legacy actor binding, not a zone-centre offset; the regional row is unspawned and the extra spawn draws Sugaboo."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) authored for this slice (T501), not read from a guide row"
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T501: the range anchor is aligned to the bound Legacy actor so a client click on that actor resolves to content_key 9500001010."
           }
         ]
       }

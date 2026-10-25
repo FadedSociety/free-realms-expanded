@@ -423,6 +423,14 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         9500001008,
         "Hasti (T500 talk target of 3000301, a new row bound to extra spawn 100000003016): NPCs - Merry Vale.md:166 lists him only as a racetrack ambassador target with no row; his reply 140679 is the quest-step dialogue of 3000301 goal 1, not a greeting, and 46621 is the objective.",
     ),
+    (
+        9500001009,
+        "Shannon (T501 talk target of 3000371, a new row bound to extra spawn 100000002187): the Merry Vale guide has no Shannon row; locale 40518 is only her name and the adjacent 40519 is the Scary Stories quest line, not hers; her reply 74214 is the quest-step dialogue of 3000371 goal 3, so no first-person line of her own is proven.",
+    ),
+    (
+        9500001010,
+        "Sugaboo (T501 talk target of 3000376, a new row bound to extra spawn 100000002279): the Merry Vale guide has no Sugaboo row; locale 40355 is only her name and 40356 is the quest_dialog challenge line tagged Sugaboo that no guide row or production quest record binds, while her reply 387057 is the quest-step dialogue of 3000376 goal 1, so no greeting is proven.",
+    ),
 ];
 
 /// Any key that marks a third-person objective rather than a speaker's line.

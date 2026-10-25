@@ -1,0 +1,408 @@
+{
+  "schema_version": 1,
+  "records": [
+    {
+      "id": 3000370,
+      "title_string_id": 385597,
+      "intro_text_string_id": 385596,
+      "description_string_id": 385598,
+      "end_text_string_id": 385599,
+      "giver_npc_id": 9500000405,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000432,
+          "text_string_id": 385602,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3070 goal 1: NameId 385602, DescriptionId 385603; TargetGuid 100000004355 = definition 4355 (Wugunbump, NameId 40344, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:2838), bound to npcs/merry_vale.json 9500000432 at the same spawn; the last goal at the turn-in NPC: its DialogueId 385599 is the quest's end_text_string_id."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 6,
+          "items": [],
+          "job_xp": {
+            "1": 15
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3070: RewardCoins 6, RewardItems []. Its RewardExperience 60 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 15 goes to profile 1 (Adventurer) on the T202 ladder (one goal)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3070 \"The Party Pooper\" (quest data last changed in 1c36ad7): TitleId 385597, DescriptionId 385598, GiverDialogueId 385596, GiverGuid 100000002177 (Mayor McFairy), TargetGuid 100000004355 (Wugunbump), PrerequisiteQuestId 0, NextQuestId 3071. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 385597 \"The Party Pooper\" (title), 385598 (description), 385596 (intro) and 385599 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T501: minted id 3000370 = 3000300 + (fork QuestId 3070 - 3000); XP rung 15 (one goal); coin value 6 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000371,
+      "title_string_id": 74199,
+      "intro_text_string_id": 74198,
+      "description_string_id": 74200,
+      "end_text_string_id": 74201,
+      "giver_npc_id": 9500000432,
+      "prerequisite_quest_ids": [
+        3000370
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000419,
+          "dialogue_string_id": 74217,
+          "text_string_id": 74204,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3071 goal 1: NameId 74204, DescriptionId 74205; TargetGuid 100000002280 = definition 2280 (Rimpadun, NameId 40378, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:903), bound to npcs/merry_vale.json 9500000419 at the same spawn."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000418,
+          "dialogue_string_id": 74222,
+          "text_string_id": 74206,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3071 goal 2: NameId 74206, DescriptionId 74207; TargetGuid 100000002222 = definition 2222 (Ratsplat, NameId 40488, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:869), bound to npcs/merry_vale.json 9500000418 at the same spawn."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9500001009,
+          "dialogue_string_id": 74214,
+          "text_string_id": 74208,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3071 goal 3: NameId 74208, DescriptionId 74209; TargetGuid 100000002187 = definition 2187 (Shannon, NameId 40518, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:834), bound to npcs/merry_vale.json 9500001009 at the same spawn; it is the new row this slice adds, whose position is the extra spawn npc_spawns_extra.json spawn_guid 100000002187 through its content_key; the fork's goal DialogId is the reply this quest's Shannon step speaks."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "npc_id": 9500000421,
+          "dialogue_string_id": 74226,
+          "text_string_id": 74210,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3071 goal 4: NameId 74210, DescriptionId 74211; TargetGuid 100000002185 = definition 2185 (Rosalie, NameId 117030, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:832), bound to npcs/merry_vale.json 9500000421 at the same spawn."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 5,
+          "npc_id": 9500000432,
+          "text_string_id": 74212,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3071 goal 5: NameId 74212, DescriptionId 74213; TargetGuid 100000004355 = definition 4355 (Wugunbump, NameId 40344, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:2838), bound to npcs/merry_vale.json 9500000432 at the same spawn; the last goal at the turn-in NPC: its DialogueId 74201 is the quest's end_text_string_id."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 30,
+          "items": [],
+          "job_xp": {
+            "1": 30
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3071: RewardCoins 30, RewardItems []. Its RewardExperience 100 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 30 goes to profile 1 (Adventurer) on the T202 ladder (five goals)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3071 \"Suspicious Serenity\" (quest data last changed in 1c36ad7): TitleId 74199, DescriptionId 74200, GiverDialogueId 74198, GiverGuid 100000004355 (Wugunbump), TargetGuid 100000004355 (Wugunbump), PrerequisiteQuestId 3070, NextQuestId 0. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 74199 \"Suspicious Serenity\" (title), 74200 (description), 74198 (intro) and 74201 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T501: minted id 3000371 = 3000300 + (fork QuestId 3071 - 3000); XP rung 30 (five goals); coin value 30 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000375,
+      "title_string_id": 387034,
+      "intro_text_string_id": 387033,
+      "description_string_id": 387035,
+      "end_text_string_id": 387036,
+      "giver_npc_id": 9500000431,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000381,
+          "text_string_id": 387039,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3075 goal 1: NameId 387039, DescriptionId 387040; TargetGuid 100000002271 = definition 2271 (Dubawug, NameId 70967, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:894), bound to npcs/merry_vale.json 9500000381 at the same spawn; the last goal at the turn-in NPC: its DialogueId 387036 is the quest's end_text_string_id."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 10,
+          "items": [],
+          "job_xp": {
+            "1": 15
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3075: RewardCoins 10, RewardItems []. Its RewardExperience 50 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 15 goes to profile 1 (Adventurer) on the T202 ladder (one goal)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3075 \"Picking Petals\" (quest data last changed in 1c36ad7): TitleId 387034, DescriptionId 387035, GiverDialogueId 387033, GiverGuid 100000002220 (Verna), TargetGuid 100000002271 (Dubawug), PrerequisiteQuestId 0, NextQuestId 3076. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 387034 \"Picking Petals\" (title), 387035 (description), 387033 (intro) and 387036 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T501: minted id 3000375 = 3000300 + (fork QuestId 3075 - 3000); XP rung 15 (one goal); coin value 10 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000376,
+      "title_string_id": 387044,
+      "intro_text_string_id": 387043,
+      "description_string_id": 387045,
+      "end_text_string_id": 387046,
+      "giver_npc_id": 9500000381,
+      "prerequisite_quest_ids": [
+        3000375
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500001010,
+          "dialogue_string_id": 387057,
+          "text_string_id": 387049,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3076 goal 1: NameId 387049, DescriptionId 387050; TargetGuid 100000002279 = definition 2279 (Sugaboo, NameId 40355, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:902), bound to npcs/merry_vale.json 9500001010 at the same spawn; it is the new row this slice adds, whose position is the extra spawn npc_spawns_extra.json spawn_guid 100000002279 through its content_key; the fork's goal DialogId is the reply this quest's Sugaboo step speaks."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000222,
+          "dialogue_string_id": 387059,
+          "text_string_id": 71001,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3076 goal 2: NameId 71001, DescriptionId 387052; TargetGuid 100000002200 = definition 2200 (Tumbolina, NameId 70891, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:847), bound to npcs/merry_vale.json 9000000222 at the same spawn; the client lost this quest's own \"Speak with Tumbolina\" row 387051; the fork uses 71001, the same words."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9500000417,
+          "dialogue_string_id": 387061,
+          "text_string_id": 387053,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3076 goal 3: NameId 387053, DescriptionId 387054; TargetGuid 100000002219 = definition 2219 (Plexi, NameId 46432, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:866), bound to npcs/merry_vale.json 9500000417 at the same spawn."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 4,
+          "npc_id": 9500000381,
+          "text_string_id": 387055,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3076 goal 4: NameId 387055, DescriptionId 387056; TargetGuid 100000002271 = definition 2271 (Dubawug, NameId 70967, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:894), bound to npcs/merry_vale.json 9500000381 at the same spawn; the last goal at the turn-in NPC: its DialogueId 387046 is the quest's end_text_string_id."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 24,
+          "items": [],
+          "job_xp": {
+            "1": 30
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3076: RewardCoins 24, RewardItems []. Its RewardExperience 80 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 30 goes to profile 1 (Adventurer) on the T202 ladder (four goals)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3076 \"Birthday Surprises\" (quest data last changed in 1c36ad7): TitleId 387044, DescriptionId 387045, GiverDialogueId 387043, GiverGuid 100000002271 (Dubawug), TargetGuid 100000002271 (Dubawug), PrerequisiteQuestId 3075, NextQuestId 3077. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 387044 \"Birthday Surprises\" (title), 387045 (description), 387043 (intro) and 387046 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T501: minted id 3000376 = 3000300 + (fork QuestId 3076 - 3000); XP rung 30 (four goals); coin value 24 is the fork's RewardCoins."
+        }
+      ]
+    },
+    {
+      "id": 3000377,
+      "title_string_id": 387067,
+      "intro_text_string_id": 387066,
+      "description_string_id": 387068,
+      "end_text_string_id": 387069,
+      "giver_npc_id": 9500000381,
+      "prerequisite_quest_ids": [
+        3000376
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000044,
+          "dialogue_string_id": 387080,
+          "text_string_id": 387072,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3077 goal 1: NameId 387072, DescriptionId 387073; TargetGuid 100000002217 = definition 2217 (Chef Jarvie, NameId 41263, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:864), bound to npcs/merry_vale.json 9000000044 at the same spawn."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9500000417,
+          "dialogue_string_id": 387081,
+          "text_string_id": 387074,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3077 goal 2: NameId 387074, DescriptionId 387075; TargetGuid 100000002219 = definition 2219 (Plexi, NameId 46432, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:866), bound to npcs/merry_vale.json 9500000417 at the same spawn."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 3,
+          "npc_id": 9500000431,
+          "text_string_id": 387076,
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3077 goal 3: NameId 387076, DescriptionId 387077; TargetGuid 100000002220 = definition 2220 (Verna, NameId 387029, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:867), bound to npcs/merry_vale.json 9500000431 at the same spawn; the last goal at the turn-in NPC: its DialogueId 387069 is the quest's end_text_string_id."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 18,
+          "items": [],
+          "job_xp": {
+            "1": 30
+          },
+          "source": [
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3077: RewardCoins 18, RewardItems []. Its RewardExperience 80 is not used; job_xp follows the T202 ladder."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) fork value, unverified; the forks call their own rewards placeholders. Job XP 30 goes to profile 1 (Adventurer) on the T202 ladder (three goals and the last quest of a three-quest chain)."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3077 \"The Perfect Present\" (quest data last changed in 1c36ad7): TitleId 387067, DescriptionId 387068, GiverDialogueId 387066, GiverGuid 100000002271 (Dubawug), TargetGuid 100000002220 (Verna), PrerequisiteQuestId 3076, NextQuestId 0. AGPL-3.0 source used as data only (ids, positions, counts, text ids)."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 387067 \"The Perfect Present\" (title), 387068 (description), 387066 (intro) and 387069 (end text) resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T501: minted id 3000377 = 3000300 + (fork QuestId 3077 - 3000); XP rung 30 (three goals and the last quest of a three-quest chain); coin value 18 is the fork's RewardCoins."
+        }
+      ]
+    }
+  ]
+}
