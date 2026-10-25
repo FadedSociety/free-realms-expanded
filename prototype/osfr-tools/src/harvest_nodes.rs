@@ -27,12 +27,15 @@ const MAX_FILE_BYTES: u64 = 1 << 20;
 const NODE_GUID_BASE: u64 = 0x4e4f_4400_0000_0000;
 
 /// Guid tag byte owned by each node content file. Tags share one spawn-id space, so no two
-/// files may reuse one. `COLLECTION_NODE_TAG` is reserved for the dormant community
-/// collection file (T523, `collection_nodes.json`) and is not loaded yet.
+/// files may reuse one. `COLLECTION_NODE_TAG` names the dormant community collection file
+/// (T523, `collection_nodes.json`), which nothing loads yet. T524 moves that file to tag 5 and
+/// gives tag 4 to its per-node effect companions; no tag is reserved from another source, so
+/// the live invariant is uniqueness (`tests/node_guid_namespace.rs`).
 const HARVEST_NODE_TAG: u64 = 1;
 const MINING_NODE_TAG: u64 = 2;
 const QUEST_NODE_TAG: u64 = 3;
-pub const COLLECTION_NODE_TAG: u64 = 4;
+#[cfg(test)]
+const COLLECTION_NODE_TAG: u64 = 4;
 
 /// The node files `GatheringNodes::load` reads and the guid tag each one owns.
 const NODE_FILES: [(&str, Option<Gather>, u64); 3] = [
@@ -444,8 +447,9 @@ impl GatheringNodes {
     }
 }
 
-/// The world guid of one node: "NOD", the file's tag byte and the content spawn id. Two files
-/// must never share a tag, or two spawns with the same id would get one guid.
+/// The world guid of one node: "NOD", the file's tag byte and the content spawn id. No two
+/// live sources (files or T524's tag-4 effect companions) may share a tag, or two spawns with
+/// the same id would get one guid.
 fn node_guid(tag: u64, spawn_id: u32) -> u64 {
     NODE_GUID_BASE | tag << 32 | u64::from(spawn_id)
 }
@@ -546,11 +550,16 @@ mod tests {
 
     /// T523 review: five collection spawns (100..=104) reuse quest pickup ids, and the old
     /// tag-3 plan would have made `add_sites` refuse the load as a duplicate spawn id. Every
-    /// loader tag and the reserved collection tag must stay in its own guid space.
+    /// loader tag and the collection tag must stay in its own guid space; T524's tag-4 effect
+    /// companions share that space, which `tests/node_guid_namespace.rs` checks on the loader.
     #[test]
     fn node_file_tags_give_distinct_guids_for_the_same_spawn_id() {
         let mut tags: Vec<u64> = NODE_FILES.iter().map(|(_, _, tag)| *tag).collect();
-        tags.push(COLLECTION_NODE_TAG);
+        // T524 wires the collection file into NODE_FILES at tag 5; only add the dormant file's
+        // tag while the loader leaves it out.
+        if !tags.contains(&COLLECTION_NODE_TAG) {
+            tags.push(COLLECTION_NODE_TAG);
+        }
         assert!(
             tags.iter().all(|tag| *tag < 256),
             "a tag must fit the guid's tag byte"
