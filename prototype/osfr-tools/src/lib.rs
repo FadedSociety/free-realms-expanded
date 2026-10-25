@@ -37,6 +37,7 @@ pub mod harvesting;
 mod hash;
 pub mod housing;
 pub mod housing_native;
+pub mod housing_rating;
 pub mod housing_service;
 pub mod identity;
 pub mod inventory;

@@ -1004,3 +1004,152 @@ fn the_gateway_sends_the_scene_change_then_the_house_after_the_load() {
     expected.extend([40; KIT_BLOCKS]);
     assert_eq!(house, expected, "the house follows the lot load");
 }
+
+// ---- T517: the rating directory probe (174/16 -> an empty 174/17), before and inside a lot. ----
+
+/// 174/16 as the client writer `0x00abfe70` lays it out: header, system, empty candidate id, owner
+/// and correlation. 34 bytes for the housing system.
+fn candidate_info(system: &str, owner: u64, correlation: u64) -> Vec<u8> {
+    let mut inner = vec![174, 0, 16];
+    for text in [system, ""] {
+        inner.extend((text.len() as u32).to_le_bytes());
+        inner.extend(text.as_bytes());
+    }
+    inner.extend(owner.to_le_bytes());
+    inner.extend(correlation.to_le_bytes());
+    inner
+}
+
+/// 174/17 with no candidates: header, echoed correlation, u32 count.
+fn empty_candidate_info_reply(correlation: u64) -> Vec<u8> {
+    let mut bytes = vec![174, 0, 17];
+    bytes.extend(correlation.to_le_bytes());
+    bytes.extend(0u32.to_le_bytes());
+    bytes
+}
+
+#[test]
+fn the_rating_probe_is_answered_with_an_empty_directory_inside_and_outside_a_house() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let lot = granted(&mut game);
+    let correlation = 0x1122_3344_5566_7788;
+    let request = candidate_info("Housing", OWNER, correlation);
+    assert_eq!(request.len(), 34, "the native layout");
+    let expected = empty_candidate_info_reply(correlation);
+
+    // The 127/39 list path sends the probe with no house visited.
+    let outside = serde_json::to_vec(&game.state()).unwrap();
+    let out = game.handle_in_world(&request, &character(), 2_000).unwrap();
+    assert!(!out.changed, "the probe is read-only");
+    assert_eq!(out.replies, vec![expected.clone()], "one empty 174/17");
+    assert_eq!(
+        serde_json::to_vec(&game.state()).unwrap(),
+        outside,
+        "no housing, inventory or save change"
+    );
+
+    // The 127/45 zone-data path sends it again inside the lot, and every repeat is answered.
+    game.handle_in_world(&enter(lot.instance_guid), &character(), 3_000)
+        .unwrap();
+    game.initialize_world(&character(), 4_000).unwrap();
+    let inside = serde_json::to_vec(&game.state()).unwrap();
+    for now in [5_000, 6_000] {
+        let out = game.handle_in_world(&request, &character(), now).unwrap();
+        assert!(!out.changed);
+        assert_eq!(
+            out.replies,
+            vec![expected.clone()],
+            "each repeated probe gets one reply"
+        );
+        assert_eq!(
+            serde_json::to_vec(&game.state()).unwrap(),
+            inside,
+            "no housing, inventory or save change"
+        );
+    }
+}
+
+#[test]
+fn malformed_rating_probes_send_nothing_and_change_nothing() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    granted(&mut game);
+    let valid = candidate_info("Housing", OWNER, 7);
+    let mut trailing = valid.clone();
+    trailing.push(0);
+    let mut wrong_subtype = valid.clone();
+    wrong_subtype[2] = 15;
+    let mut oversize = vec![174, 0, 16];
+    oversize.extend(257u32.to_le_bytes());
+    oversize.extend(vec![b'A'; 257]);
+    let mut bad_utf8 = vec![174, 0, 16];
+    bad_utf8.extend(7u32.to_le_bytes());
+    bad_utf8.extend([0xff; 7]);
+
+    for (what, inner) in [
+        ("truncated", valid[..valid.len() - 1].to_vec()),
+        ("trailing byte", trailing),
+        ("oversize string", oversize),
+        ("wrong system", candidate_info("Chat", OWNER, 7)),
+        ("invalid utf-8", bad_utf8),
+        ("wrong subtype", wrong_subtype),
+    ] {
+        let before = serde_json::to_vec(&game.state()).unwrap();
+        let out = game.handle_in_world(&inner, &character(), 8_000).unwrap();
+        assert!(!out.changed, "{what}");
+        assert!(
+            out.replies.is_empty(),
+            "{what}: no reply, got {:02x?}",
+            out.replies
+        );
+        assert_eq!(
+            serde_json::to_vec(&game.state()).unwrap(),
+            before,
+            "{what}: state and inventory stay byte-equal"
+        );
+    }
+}
+
+#[test]
+fn content_without_houses_leaves_the_rating_probe_alone() {
+    let mut game = Gameplay::load(&reference_content(), None).unwrap();
+    let before = serde_json::to_vec(&game.state()).unwrap();
+    let out = game
+        .handle_in_world(&candidate_info("Housing", OWNER, 1), &character(), 1_000)
+        .unwrap();
+    assert!(!out.changed);
+    assert!(
+        out.replies.is_empty(),
+        "dormant without houses.json: {:02x?}",
+        out.replies
+    );
+    assert_eq!(serde_json::to_vec(&game.state()).unwrap(), before);
+    assert!(game.state().housing.is_none());
+}
+
+#[test]
+fn the_gateway_answers_the_rating_probe_instead_of_logging_unknown_application_message() {
+    let content = Content::with_houses();
+    let mut gateway = world_gateway(&content);
+    let before = gateway.snapshot();
+    let correlation = 0x0f0e_0d0c_0b0a_0908;
+    let request = candidate_info("Housing", OWNER, correlation);
+    let out = gateway.handle_at(&wrap(&request), 12_000).unwrap();
+    let expected = empty_candidate_info_reply(correlation);
+    let inner: Vec<_> = out
+        .replies
+        .iter()
+        .filter_map(|reply| reply.get(7..))
+        .collect();
+    assert_eq!(inner, vec![&expected[..]], "exactly one 174/17 reply");
+    assert!(!out.state_changed);
+    assert!(
+        out.trace
+            .iter()
+            .all(|event| event.reason.as_deref() != Some("unknown application message")),
+        "{:?}",
+        out.trace
+    );
+    assert_eq!(gateway.snapshot(), before, "the probe is read-only");
+}

@@ -851,6 +851,16 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     bubble.extend(2i32.to_le_bytes());
     bubble.extend(0u64.to_le_bytes());
     result.push(("chat_settings", bubble));
+    // T517: the housing rating directory probe (174/16). Family 174 uses a u8 subtype, so the
+    // header is built by hand; the empty 174/17 reply leaves every snapshot untouched.
+    let mut rating = vec![174, 0, 16];
+    for text in ["Housing", ""] {
+        rating.extend((text.len() as u32).to_le_bytes());
+        rating.extend(text.as_bytes());
+    }
+    rating.extend(0x1122_3344_5566_7788u64.to_le_bytes());
+    rating.extend(0x99aa_bbcc_ddee_ff00u64.to_le_bytes());
+    result.push(("gameplay.handle_in_world", rating));
     // W174: handled requests whose refusal sends nothing, then the quiet list (R). A wildcard
     // family needs a seed with an unknown subtype for the source inventory.
     result.push(("recipe_book", words(26, 24, &[u32::MAX])));

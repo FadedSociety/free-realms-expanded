@@ -111,14 +111,33 @@ fn encode_replies(outcome: &ServiceOutcome) -> io::Result<Vec<Vec<u8>>> {
 }
 
 impl Gameplay {
-    /// Family 127. Requests are staged on a copy of the session and the inventory, so a refusal
-    /// (one chat line, plus the client's 127/53 for a decorate request) changes nothing. What the
-    /// request did to the backpack reaches the client as ordinary inventory updates.
+    /// Family 127, plus the 174/16 rating directory probe. Requests are staged on a copy of the
+    /// session and the inventory, so a refusal (one chat line, plus the client's 127/53 for a
+    /// decorate request) changes nothing. What the request did to the backpack reaches the client
+    /// as ordinary inventory updates.
     pub(super) fn handle_housing(
         &mut self,
         inner: &[u8],
         character: &CharacterState,
     ) -> io::Result<Option<Outcome>> {
+        // T517: on every house entry the client asks the rating directory for one candidate (127/39
+        // list handler `0x00ac2a10`, 127/45 zone-data handler `0x00ac36c0`). Decode first so a
+        // dormant server refuses malformed bodies on the same bounded path; while housing content
+        // is loaded answer with the still-empty directory (reply reader `0x00c85530` needs only the
+        // echoed correlation and a zero count). Read-only: nothing to stage or roll back.
+        if let Some(request) = crate::housing_rating::CandidateInfoRequest::decode(inner)
+            && self.housing.is_some()
+            && request.system == crate::housing_rating::HOUSING_SYSTEM
+        {
+            let reply = crate::housing_rating::CandidateInfoReply {
+                correlation: request.correlation,
+                candidates: Vec::new(),
+            };
+            return Ok(Some(Outcome {
+                replies: vec![reply.encode_inner()?],
+                ..Outcome::default()
+            }));
+        }
         if !inner.starts_with(&FAMILY) {
             return Ok(None);
         }
