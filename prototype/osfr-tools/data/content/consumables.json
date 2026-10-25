@@ -12,7 +12,404 @@
           "percent": 35
         }
       },
-      "source": "Legacy@9e08202 ClientItemDefinitions Id 2173 NameId 422909 DescriptionId 422916 Icon 730; the built-in potion table's 35% / 10 s values are kept (R, W146)."
+      "source": "Sanctuary-main@10f129e Consumables.json has no potion row; item 2173 (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree: Id 2173 NameId 422909 DescriptionId 422916 SingleUse true); the built-in table's 35% / 10 s heal values are kept (R, W146)."
+    },
+    {
+      "definition": 11002,
+      "name_id": 422909,
+      "description_id": 422916,
+      "cooldown_ms": 10000,
+      "single_use": true,
+      "effect": {
+        "heal": {
+          "percent": 35
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json has no potion row; item 11002 (Sanctuary-main@10f129e and Legacy@9e08202 ClientItemDefinitions agree: Id 11002 NameId 422909 DescriptionId 422916 SingleUse true); the built-in table's 35% / 10 s heal values are kept (R, W146)."
+    },
+    {
+      "definition": 36,
+      "name_id": 2951,
+      "description_id": 2952,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5343,
+          "duration_ms": 1800000,
+          "delay_ms": 300,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 660 (Can of Beans); item 36 ActivatableAbilityId 660 (Legacy@9e08202 ClientItemDefinitions Id 36 NameId 2951 DescriptionId 2952 SingleUse true); effect 5343 PFX_smoke_green_pelvis_fart-m; duration 1800000 (R) OSFR default; cooldown 1800000 (R, OSFR #125); EffectDelayMs 300; QuickChatId 3340 ignored; the effect is not a loop, so it plays once (R); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2939,
+      "name_id": 234,
+      "description_id": 2740,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 175,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 1998 (Mauthe Dog); item 2939 ActivatableAbilityId 1998 (Legacy@9e08202 ClientItemDefinitions Id 2939 NameId 234 DescriptionId 2740 SingleUse true); model 175 mauthedog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2740: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2940,
+      "name_id": 235,
+      "description_id": 2753,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 130,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 1997 (Antelope); item 2940 ActivatableAbilityId 1997 (Legacy@9e08202 ClientItemDefinitions Id 2940 NameId 235 DescriptionId 2753 SingleUse true); model 130 antelope.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2753: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2943,
+      "name_id": 238,
+      "description_id": 2771,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 77,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 1994 (Forest Troll); item 2943 ActivatableAbilityId 1994 (Legacy@9e08202 ClientItemDefinitions Id 2943 NameId 238 DescriptionId 2771 SingleUse true); model 77 troll_forest.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2771: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2947,
+      "name_id": 242,
+      "description_id": 3152,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 176,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 1990 (Wolf); item 2947 ActivatableAbilityId 1990 (Legacy@9e08202 ClientItemDefinitions Id 2947 NameId 242 DescriptionId 3152 SingleUse true); model 176 wolf.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2950,
+      "name_id": 245,
+      "description_id": 2729,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 28,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 1987 (Bat); item 2950 ActivatableAbilityId 1987 (Legacy@9e08202 ClientItemDefinitions Id 2950 NameId 245 DescriptionId 2729 SingleUse true); model 28 bat_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2729: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2951,
+      "name_id": 246,
+      "description_id": 2761,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 77,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 1986 (Forest Troll); item 2951 ActivatableAbilityId 1986 (Legacy@9e08202 ClientItemDefinitions Id 2951 NameId 246 DescriptionId 2761 SingleUse true); model 77 troll_forest.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2761: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2954,
+      "name_id": 249,
+      "description_id": 3121,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 139,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 1983 (Warthog); item 2954 ActivatableAbilityId 1983 (Legacy@9e08202 ClientItemDefinitions Id 2954 NameId 249 DescriptionId 3121 SingleUse true); model 139 warthog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2958,
+      "name_id": 253,
+      "description_id": 2765,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 136,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 1979 (Nanny Goat); item 2958 ActivatableAbilityId 1979 (Legacy@9e08202 ClientItemDefinitions Id 2958 NameId 253 DescriptionId 2765 SingleUse true); model 136 nannygoat.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2963,
+      "name_id": 258,
+      "description_id": 2703,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5698,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 2004 (Steaming Pretzels); item 2963 ActivatableAbilityId 2004 (Legacy@9e08202 ClientItemDefinitions Id 2963 NameId 258 DescriptionId 2703 SingleUse true); effect 5698 WFX_fire_orange_loop; duration locale 2703: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2965,
+      "name_id": 260,
+      "description_id": 2699,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 16471,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1973 (Scrumptious Soup); item 2965 ActivatableAbilityId 1973 (Legacy@9e08202 ClientItemDefinitions Id 2965 NameId 260 DescriptionId 2699 SingleUse true); effect 16471 PFX_hearts_red_up_skel_loop; duration locale 2699: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2968,
+      "name_id": 263,
+      "description_id": 2695,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 53,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1970 (Frosty Flakes); item 2968 ActivatableAbilityId 1970 (Legacy@9e08202 ClientItemDefinitions Id 2968 NameId 263 DescriptionId 2695 SingleUse true); effect 53 PFX_snowflakes_white_sphere_loop; duration locale 2695: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2969,
+      "name_id": 264,
+      "description_id": 2701,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 1107,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1969 (Pixiedust Pie); item 2969 ActivatableAbilityId 1969 (Legacy@9e08202 ClientItemDefinitions Id 2969 NameId 264 DescriptionId 2701 SingleUse true); effect 1107 PFX_pixie_dust_med_interact_loop; duration locale 2701: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2970,
+      "name_id": 265,
+      "description_id": 2692,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5732,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1968 (Arbor Buttercake); item 2970 ActivatableAbilityId 1968 (Legacy@9e08202 ClientItemDefinitions Id 2970 NameId 265 DescriptionId 2692 SingleUse true); effect 5732 WFX_leaves_multi_falling_skel_loop; duration locale 2692: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2971,
+      "name_id": 266,
+      "description_id": 2704,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5031,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1967 (Hot Sauce Buns); item 2971 ActivatableAbilityId 1967 (Legacy@9e08202 ClientItemDefinitions Id 2971 NameId 266 DescriptionId 2704 SingleUse true); effect 5031 PFX_barrier-fire_orange_loop; duration locale 2704: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2972,
+      "name_id": 267,
+      "description_id": 2693,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15665,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1966 (Firefrog Legs); item 2972 ActivatableAbilityId 1966 (Legacy@9e08202 ClientItemDefinitions Id 2972 NameId 267 DescriptionId 2693 SingleUse true); effect 15665 PFX_fire-ring_blue_up_med_loop_w; duration locale 2693: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2973,
+      "name_id": 268,
+      "description_id": 2702,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5721,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1965 (Noxious Pork Chops); item 2973 ActivatableAbilityId 1965 (Legacy@9e08202 ClientItemDefinitions Id 2973 NameId 268 DescriptionId 2702 SingleUse true); effect 5721 WFX_bubbles_green_up_skel_loop; duration locale 2702: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2974,
+      "name_id": 269,
+      "description_id": 2706,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5232,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1964 (Graveyard Flambe (shadow flames)); item 2974 ActivatableAbilityId 1964 (Legacy@9e08202 ClientItemDefinitions Id 2974 NameId 269 DescriptionId 2706 SingleUse true); effect 5232 PFX_fire_purple_skel_loop; duration locale 2706: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2975,
+      "name_id": 270,
+      "description_id": 2711,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5726,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1963 (Roaring Rapids Roast); item 2975 ActivatableAbilityId 1963 (Legacy@9e08202 ClientItemDefinitions Id 2975 NameId 270 DescriptionId 2711 SingleUse true); effect 5726 WFX_drips_blue_falling_skel_loop; duration locale 2711: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2976,
+      "name_id": 271,
+      "description_id": 2698,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15915,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1962 (Deep Mines Delight); item 2976 ActivatableAbilityId 1962 (Legacy@9e08202 ClientItemDefinitions Id 2976 NameId 271 DescriptionId 2698 SingleUse true); effect 15915 PFX_halloween_ghosts_circling_head_loop; duration locale 2698: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2977,
+      "name_id": 272,
+      "description_id": 2710,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5102,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1961 (Silver Surf 'n Turf); item 2977 ActivatableAbilityId 1961 (Legacy@9e08202 ClientItemDefinitions Id 2977 NameId 272 DescriptionId 2710 SingleUse true); effect 5102 PFX_water_blue_cog_elemental-barrier_loop; duration locale 2710: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2978,
+      "name_id": 273,
+      "description_id": 2709,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5049,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1960 (Mr. Gleam's Granola Bar); item 2978 ActivatableAbilityId 1960 (Legacy@9e08202 ClientItemDefinitions Id 2978 NameId 273 DescriptionId 2709 SingleUse true); effect 5049 PFX_shield_swirl_blue_barrier_loop; duration locale 2709: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2980,
+      "name_id": 275,
+      "description_id": 2696,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 1088,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1958 (Fiery Fury Candy); item 2980 ActivatableAbilityId 1958 (Legacy@9e08202 ClientItemDefinitions Id 2980 NameId 275 DescriptionId 2696 SingleUse true); effect 1088 PFX_magic-swirls_white-orange_hands_buff_loop; duration locale 2696: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 2981,
+      "name_id": 276,
+      "description_id": 2705,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5032,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1957 (Rocking Road Mix); item 2981 ActivatableAbilityId 1957 (Legacy@9e08202 ClientItemDefinitions Id 2981 NameId 276 DescriptionId 2705 SingleUse true); effect 5032 PFX_barrier-rock_gray_loop; duration locale 2705: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
     },
     {
       "definition": 2982,
@@ -28,7 +425,551 @@
           "icon_id": 3843
         }
       },
-      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1956 (Electric Veal Meat); Legacy@9e08202 ClientItemDefinitions Id 2982 NameId 277 DescriptionId 2707 Icon 2797 SingleUse; effect 5030 PFX_barrier-electricity_blue_loop; duration locale 2707 thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32 (R, OSFR #126)."
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1956 (Electric Veal Meat); item 2982 ActivatableAbilityId 1956 (Legacy@9e08202 ClientItemDefinitions Id 2982 NameId 277 DescriptionId 2707 SingleUse true); effect 5030 PFX_barrier-electricity_blue_loop; duration locale 2707: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 3006,
+      "name_id": 242,
+      "description_id": 3153,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 176,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 2031 (Wolf); item 3006 ActivatableAbilityId 2031 (Legacy@9e08202 ClientItemDefinitions Id 3006 NameId 242 DescriptionId 3153 SingleUse true); model 176 wolf.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3153: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 3991,
+      "name_id": 3967,
+      "description_id": 3971,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5343,
+          "duration_ms": 1800000,
+          "delay_ms": 300,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 660 (Can of Beans); item 3991 ActivatableAbilityId 660 (Legacy@9e08202 ClientItemDefinitions Id 3991 NameId 3967 DescriptionId 3971 SingleUse true); effect 5343 PFX_smoke_green_pelvis_fart-m; duration 1800000 (R) OSFR default; cooldown 1800000 (R, OSFR #125); EffectDelayMs 300; QuickChatId 3340 ignored; the effect is not a loop, so it plays once (R); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 3993,
+      "name_id": 411119,
+      "description_id": 411118,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 180,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3058 (Snake); item 3993 ActivatableAbilityId 3058 (Legacy@9e08202 ClientItemDefinitions Id 3993 NameId 411119 DescriptionId 411118 SingleUse true); model 180 snake.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4001,
+      "name_id": 1160,
+      "description_id": 2767,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 70,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3001 (Forest Giant); item 4001 ActivatableAbilityId 3001 (Legacy@9e08202 ClientItemDefinitions Id 4001 NameId 1160 DescriptionId 2767 SingleUse true); model 70 forestgiant.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2767: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4002,
+      "name_id": 1161,
+      "description_id": 3115,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 160,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3002 (Man-Eating Fungus); item 4002 ActivatableAbilityId 3002 (Legacy@9e08202 ClientItemDefinitions Id 4002 NameId 1161 DescriptionId 3115 SingleUse true); model 160 maneatingfungus.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3115: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4005,
+      "name_id": 1164,
+      "description_id": 3129,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 28,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3005 (Bat); item 4005 ActivatableAbilityId 3005 (Legacy@9e08202 ClientItemDefinitions Id 4005 NameId 1164 DescriptionId 3129 SingleUse true); model 28 bat_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4011,
+      "name_id": 1170,
+      "description_id": 2722,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 50,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3011 (Cat (shorthair)); item 4011 ActivatableAbilityId 3011 (Legacy@9e08202 ClientItemDefinitions Id 4011 NameId 1170 DescriptionId 2722 SingleUse true); model 50 cat_shorthair.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2722: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4012,
+      "name_id": 1171,
+      "description_id": 2723,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 50,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3012 (Cat (shorthair)); item 4012 ActivatableAbilityId 3012 (Legacy@9e08202 ClientItemDefinitions Id 4012 NameId 1171 DescriptionId 2723 SingleUse true); model 50 cat_shorthair.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2723: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4013,
+      "name_id": 1172,
+      "description_id": 2725,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 50,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3013 (Cat (shorthair)); item 4013 ActivatableAbilityId 3013 (Legacy@9e08202 ClientItemDefinitions Id 4013 NameId 1172 DescriptionId 2725 SingleUse true); model 50 cat_shorthair.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2725: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4014,
+      "name_id": 1173,
+      "description_id": 2724,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 50,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3014 (Cat (shorthair)); item 4014 ActivatableAbilityId 3014 (Legacy@9e08202 ClientItemDefinitions Id 4014 NameId 1173 DescriptionId 2724 SingleUse true); model 50 cat_shorthair.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2724: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4015,
+      "name_id": 1174,
+      "description_id": 2726,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 50,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3015 (Cat (shorthair)); item 4015 ActivatableAbilityId 3015 (Legacy@9e08202 ClientItemDefinitions Id 4015 NameId 1174 DescriptionId 2726 SingleUse true); model 50 cat_shorthair.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2726: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4016,
+      "name_id": 1175,
+      "description_id": 2728,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 50,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3016 (Cat (shorthair)); item 4016 ActivatableAbilityId 3016 (Legacy@9e08202 ClientItemDefinitions Id 4016 NameId 1175 DescriptionId 2728 SingleUse true); model 50 cat_shorthair.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2728: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4017,
+      "name_id": 1176,
+      "description_id": 2734,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 28,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3017 (Bat); item 4017 ActivatableAbilityId 3017 (Legacy@9e08202 ClientItemDefinitions Id 4017 NameId 1176 DescriptionId 2734 SingleUse true); model 28 bat_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2734: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4018,
+      "name_id": 1177,
+      "description_id": 2730,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 28,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3018 (Bat); item 4018 ActivatableAbilityId 3018 (Legacy@9e08202 ClientItemDefinitions Id 4018 NameId 1177 DescriptionId 2730 SingleUse true); model 28 bat_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2730: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4019,
+      "name_id": 1178,
+      "description_id": 2737,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 28,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3019 (Bat); item 4019 ActivatableAbilityId 3019 (Legacy@9e08202 ClientItemDefinitions Id 4019 NameId 1178 DescriptionId 2737 SingleUse true); model 28 bat_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2737: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4020,
+      "name_id": 1179,
+      "description_id": 2732,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 28,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3020 (Bat); item 4020 ActivatableAbilityId 3020 (Legacy@9e08202 ClientItemDefinitions Id 4020 NameId 1179 DescriptionId 2732 SingleUse true); model 28 bat_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2732: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4021,
+      "name_id": 1180,
+      "description_id": 2736,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 28,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3021 (Bat); item 4021 ActivatableAbilityId 3021 (Legacy@9e08202 ClientItemDefinitions Id 4021 NameId 1180 DescriptionId 2736 SingleUse true); model 28 bat_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2736: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4022,
+      "name_id": 1181,
+      "description_id": 2738,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 28,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3022 (Bat); item 4022 ActivatableAbilityId 3022 (Legacy@9e08202 ClientItemDefinitions Id 4022 NameId 1181 DescriptionId 2738 SingleUse true); model 28 bat_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2738: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4023,
+      "name_id": 1182,
+      "description_id": 2735,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 28,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3023 (Bat); item 4023 ActivatableAbilityId 3023 (Legacy@9e08202 ClientItemDefinitions Id 4023 NameId 1182 DescriptionId 2735 SingleUse true); model 28 bat_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2735: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4024,
+      "name_id": 1183,
+      "description_id": 2731,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 28,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3024 (Bat); item 4024 ActivatableAbilityId 3024 (Legacy@9e08202 ClientItemDefinitions Id 4024 NameId 1183 DescriptionId 2731 SingleUse true); model 28 bat_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2731: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4025,
+      "name_id": 1184,
+      "description_id": 2733,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 28,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3025 (Bat); item 4025 ActivatableAbilityId 3025 (Legacy@9e08202 ClientItemDefinitions Id 4025 NameId 1184 DescriptionId 2733 SingleUse true); model 28 bat_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2733: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4026,
+      "name_id": 1185,
+      "description_id": 2744,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 65,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3026 (Chugawug Greenwood Soldier); item 4026 ActivatableAbilityId 3026 (Legacy@9e08202 ClientItemDefinitions Id 4026 NameId 1185 DescriptionId 2744 SingleUse true); model 65 chugawug_m_greenwood_soldier.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2744: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4027,
+      "name_id": 1186,
+      "description_id": 2751,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 175,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3027 (Mauthe Dog); item 4027 ActivatableAbilityId 3027 (Legacy@9e08202 ClientItemDefinitions Id 4027 NameId 1186 DescriptionId 2751 SingleUse true); model 175 mauthedog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2751: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4028,
+      "name_id": 1187,
+      "description_id": 2747,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 175,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3028 (Mauthe Dog); item 4028 ActivatableAbilityId 3028 (Legacy@9e08202 ClientItemDefinitions Id 4028 NameId 1187 DescriptionId 2747 SingleUse true); model 175 mauthedog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2747: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4029,
+      "name_id": 1188,
+      "description_id": 2752,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 175,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3029 (Mauthe Dog); item 4029 ActivatableAbilityId 3029 (Legacy@9e08202 ClientItemDefinitions Id 4029 NameId 1188 DescriptionId 2752 SingleUse true); model 175 mauthedog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2752: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4030,
+      "name_id": 1189,
+      "description_id": 2749,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 175,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3030 (Mauthe Dog); item 4030 ActivatableAbilityId 3030 (Legacy@9e08202 ClientItemDefinitions Id 4030 NameId 1189 DescriptionId 2749 SingleUse true); model 175 mauthedog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2749: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4031,
+      "name_id": 1190,
+      "description_id": 2742,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 175,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3031 (Mauthe Dog); item 4031 ActivatableAbilityId 3031 (Legacy@9e08202 ClientItemDefinitions Id 4031 NameId 1190 DescriptionId 2742 SingleUse true); model 175 mauthedog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2742: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4032,
+      "name_id": 1191,
+      "description_id": 2748,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 175,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3032 (Mauthe Dog); item 4032 ActivatableAbilityId 3032 (Legacy@9e08202 ClientItemDefinitions Id 4032 NameId 1191 DescriptionId 2748 SingleUse true); model 175 mauthedog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2748: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4033,
+      "name_id": 1192,
+      "description_id": 2741,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 175,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3033 (Mauthe Dog); item 4033 ActivatableAbilityId 3033 (Legacy@9e08202 ClientItemDefinitions Id 4033 NameId 1192 DescriptionId 2741 SingleUse true); model 175 mauthedog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2741: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4034,
+      "name_id": 1193,
+      "description_id": 2746,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 175,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3034 (Mauthe Dog); item 4034 ActivatableAbilityId 3034 (Legacy@9e08202 ClientItemDefinitions Id 4034 NameId 1193 DescriptionId 2746 SingleUse true); model 175 mauthedog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2746: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4035,
+      "name_id": 1194,
+      "description_id": 2750,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 175,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3035 (Mauthe Dog); item 4035 ActivatableAbilityId 3035 (Legacy@9e08202 ClientItemDefinitions Id 4035 NameId 1194 DescriptionId 2750 SingleUse true); model 175 mauthedog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2750: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4036,
+      "name_id": 1195,
+      "description_id": 2744,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 175,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3036 (Mauthe Dog); item 4036 ActivatableAbilityId 3036 (Legacy@9e08202 ClientItemDefinitions Id 4036 NameId 1195 DescriptionId 2744 SingleUse true); model 175 mauthedog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2744: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4037,
+      "name_id": 1196,
+      "description_id": 2743,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 175,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3037 (Mauthe Dog); item 4037 ActivatableAbilityId 3037 (Legacy@9e08202 ClientItemDefinitions Id 4037 NameId 1196 DescriptionId 2743 SingleUse true); model 175 mauthedog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2743: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4038,
+      "name_id": 1197,
+      "description_id": 3130,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 130,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3038 (Antelope); item 4038 ActivatableAbilityId 3038 (Legacy@9e08202 ClientItemDefinitions Id 4038 NameId 1197 DescriptionId 3130 SingleUse true); model 130 antelope.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3130: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
     },
     {
       "definition": 4042,
@@ -44,20 +985,519 @@
           "icon_id": 3843
         }
       },
-      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3042 (Dog, large, floppy ears): model 169, poof 21, DurationMs 1800000, CooldownMs 1800000; Legacy@9e08202 ClientItemDefinitions Id 4042 NameId 1201 DescriptionId 2772 Icon 2851 SingleUse; icon 3843 icon_status_changeform_32 (R, OSFR #126)."
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3042 (Dog (large, floppy ears)); item 4042 ActivatableAbilityId 3042 (Legacy@9e08202 ClientItemDefinitions Id 4042 NameId 1201 DescriptionId 2772 SingleUse true); model 169 dog_large_floppy.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2772: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
     },
     {
-      "definition": 11002,
-      "name_id": 422909,
-      "description_id": 422916,
-      "cooldown_ms": 10000,
+      "definition": 4043,
+      "name_id": 1202,
+      "description_id": 2773,
+      "cooldown_ms": 1800000,
       "single_use": true,
       "effect": {
-        "heal": {
-          "percent": 35
+        "transform": {
+          "model_id": 170,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
         }
       },
-      "source": "Legacy@9e08202 ClientItemDefinitions Id 11002 NameId 422909 DescriptionId 422916 Icon 730; the built-in potion table's 35% / 10 s values are kept (R, W146)."
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3043 (Dog (large, pointy ears)); item 4043 ActivatableAbilityId 3043 (Legacy@9e08202 ClientItemDefinitions Id 4043 NameId 1202 DescriptionId 2773 SingleUse true); model 170 dog_large_pointy.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2773: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4044,
+      "name_id": 1203,
+      "description_id": 2774,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 171,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3044 (Dog (large, short ears)); item 4044 ActivatableAbilityId 3044 (Legacy@9e08202 ClientItemDefinitions Id 4044 NameId 1203 DescriptionId 2774 SingleUse true); model 171 dog_large_shortears.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 2774: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4045,
+      "name_id": 1204,
+      "description_id": 3133,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 172,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3045 (Dog (small, floppy ears)); item 4045 ActivatableAbilityId 3045 (Legacy@9e08202 ClientItemDefinitions Id 4045 NameId 1204 DescriptionId 3133 SingleUse true); model 172 dog_small_floppy.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3133: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4046,
+      "name_id": 1205,
+      "description_id": 3135,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 173,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3046 (Dog (small, pointy ears)); item 4046 ActivatableAbilityId 3046 (Legacy@9e08202 ClientItemDefinitions Id 4046 NameId 1205 DescriptionId 3135 SingleUse true); model 173 dog_small_pointy.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3135: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4047,
+      "name_id": 1206,
+      "description_id": 3134,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 364,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3047 (Dog (small, fluffy)); item 4047 ActivatableAbilityId 3047 (Legacy@9e08202 ClientItemDefinitions Id 4047 NameId 1206 DescriptionId 3134 SingleUse true); model 364 dog_small_fluffy.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3134: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4051,
+      "name_id": 1210,
+      "description_id": 3125,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 136,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3051 (Nanny Goat); item 4051 ActivatableAbilityId 3051 (Legacy@9e08202 ClientItemDefinitions Id 4051 NameId 1210 DescriptionId 3125 SingleUse true); model 136 nannygoat.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3125: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4052,
+      "name_id": 1211,
+      "description_id": 3127,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 138,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3052 (Snow Hog); item 4052 ActivatableAbilityId 3052 (Legacy@9e08202 ClientItemDefinitions Id 4052 NameId 1211 DescriptionId 3127 SingleUse true); model 138 snowhog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3127: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4053,
+      "name_id": 1212,
+      "description_id": 3124,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 139,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3053 (Warthog); item 4053 ActivatableAbilityId 3053 (Legacy@9e08202 ClientItemDefinitions Id 4053 NameId 1212 DescriptionId 3124 SingleUse true); model 139 warthog.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3124: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4055,
+      "name_id": 1214,
+      "description_id": 3128,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 188,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3055 (Robgoblin Mage (female)); item 4055 ActivatableAbilityId 3055 (Legacy@9e08202 ClientItemDefinitions Id 4055 NameId 1214 DescriptionId 3128 SingleUse true); model 188 robgoblin_f_mage.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3128: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4056,
+      "name_id": 1215,
+      "description_id": 3132,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 348,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3056 (Sheep (shaved ewe)); item 4056 ActivatableAbilityId 3056 (Legacy@9e08202 ClientItemDefinitions Id 4056 NameId 1215 DescriptionId 3132 SingleUse true); model 348 ewe_shaved.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3132: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4057,
+      "name_id": 1216,
+      "description_id": 2759,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 142,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3057 (Wolf (Vine Golem)); item 4057 ActivatableAbilityId 3057 (Legacy@9e08202 ClientItemDefinitions Id 4057 NameId 1216 DescriptionId 2759 SingleUse true); model 142 wolf_vinegolum.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4058,
+      "name_id": 1217,
+      "description_id": 3136,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 180,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3058 (Snake); item 4058 ActivatableAbilityId 3058 (Legacy@9e08202 ClientItemDefinitions Id 4058 NameId 1217 DescriptionId 3136 SingleUse true); model 180 snake.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4059,
+      "name_id": 1218,
+      "description_id": 3131,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 52,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3059 (Black Widow); item 4059 ActivatableAbilityId 3059 (Legacy@9e08202 ClientItemDefinitions Id 4059 NameId 1218 DescriptionId 3131 SingleUse true); model 52 blackwidow_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4060,
+      "name_id": 1219,
+      "description_id": 3140,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 77,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3060 (Forest Troll); item 4060 ActivatableAbilityId 3060 (Legacy@9e08202 ClientItemDefinitions Id 4060 NameId 1219 DescriptionId 3140 SingleUse true); model 77 troll_forest.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3140: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4061,
+      "name_id": 1220,
+      "description_id": 3145,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 77,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3061 (Forest Troll); item 4061 ActivatableAbilityId 3061 (Legacy@9e08202 ClientItemDefinitions Id 4061 NameId 1220 DescriptionId 3145 SingleUse true); model 77 troll_forest.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3145: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4062,
+      "name_id": 1221,
+      "description_id": 3146,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 77,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3062 (Forest Troll); item 4062 ActivatableAbilityId 3062 (Legacy@9e08202 ClientItemDefinitions Id 4062 NameId 1221 DescriptionId 3146 SingleUse true); model 77 troll_forest.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3146: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4063,
+      "name_id": 1222,
+      "description_id": 3148,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 77,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3063 (Forest Troll); item 4063 ActivatableAbilityId 3063 (Legacy@9e08202 ClientItemDefinitions Id 4063 NameId 1222 DescriptionId 3148 SingleUse true); model 77 troll_forest.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3148: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4064,
+      "name_id": 1223,
+      "description_id": 3147,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 77,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3064 (Forest Troll); item 4064 ActivatableAbilityId 3064 (Legacy@9e08202 ClientItemDefinitions Id 4064 NameId 1223 DescriptionId 3147 SingleUse true); model 77 troll_forest.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3147: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4065,
+      "name_id": 1224,
+      "description_id": 3144,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 77,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3065 (Forest Troll); item 4065 ActivatableAbilityId 3065 (Legacy@9e08202 ClientItemDefinitions Id 4065 NameId 1224 DescriptionId 3144 SingleUse true); model 77 troll_forest.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3144: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4066,
+      "name_id": 1225,
+      "description_id": 3149,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 142,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3066 (Wolf (Vine Golem)); item 4066 ActivatableAbilityId 3066 (Legacy@9e08202 ClientItemDefinitions Id 4066 NameId 1225 DescriptionId 3149 SingleUse true); model 142 wolf_vinegolum.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3149: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4067,
+      "name_id": 1226,
+      "description_id": 2762,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 142,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3067 (Wolf (Vine Golem)); item 4067 ActivatableAbilityId 3067 (Legacy@9e08202 ClientItemDefinitions Id 4067 NameId 1226 DescriptionId 2762 SingleUse true); model 142 wolf_vinegolum.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4070,
+      "name_id": 1229,
+      "description_id": 2758,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 177,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3070 (Evil Wolf); item 4070 ActivatableAbilityId 3070 (Legacy@9e08202 ClientItemDefinitions Id 4070 NameId 1229 DescriptionId 2758 SingleUse true); model 177 wolf_evil.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4071,
+      "name_id": 1230,
+      "description_id": 3117,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 71,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3071 (Necro Wart Zombie); item 4071 ActivatableAbilityId 3071 (Legacy@9e08202 ClientItemDefinitions Id 4071 NameId 1230 DescriptionId 3117 SingleUse true); model 71 necrowartzombie_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3117: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 4072,
+      "name_id": 1231,
+      "description_id": 3118,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 71,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3072 (Necro Wart Zombie); item 4072 ActivatableAbilityId 3072 (Legacy@9e08202 ClientItemDefinitions Id 4072 NameId 1231 DescriptionId 3118 SingleUse true); model 71 necrowartzombie_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3118: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 15958,
+      "name_id": 272,
+      "description_id": 2710,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5102,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1961 (Silver Surf 'n Turf); item 15958 ActivatableAbilityId 1961 (Legacy@9e08202 ClientItemDefinitions Id 15958 NameId 272 DescriptionId 2710 SingleUse true); effect 5102 PFX_water_blue_cog_elemental-barrier_loop; duration locale 2710: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 15959,
+      "name_id": 275,
+      "description_id": 2696,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 1088,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1958 (Fiery Fury Candy); item 15959 ActivatableAbilityId 1958 (Legacy@9e08202 ClientItemDefinitions Id 15959 NameId 275 DescriptionId 2696 SingleUse true); effect 1088 PFX_magic-swirls_white-orange_hands_buff_loop; duration locale 2696: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 15960,
+      "name_id": 1215,
+      "description_id": 3132,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 348,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3056 (Sheep (shaved ewe)); item 15960 ActivatableAbilityId 3056 (Legacy@9e08202 ClientItemDefinitions Id 15960 NameId 1215 DescriptionId 3132 SingleUse true); model 348 ewe_shaved.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3132: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 15961,
+      "name_id": 1231,
+      "description_id": 3118,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 71,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 3072 (Necro Wart Zombie); item 15961 ActivatableAbilityId 3072 (Legacy@9e08202 ClientItemDefinitions Id 15961 NameId 1231 DescriptionId 3118 SingleUse true); model 71 necrowartzombie_01.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; duration locale 3118: thirty minutes; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 69839,
+      "name_id": 16639,
+      "description_id": 16652,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "transform": {
+          "model_id": 22,
+          "poof_effect_id": 21,
+          "duration_ms": 1800000,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json Transformations AbilityId 4373 (Boss Cake - Cakenstein); item 69839 ActivatableAbilityId 4373 (Legacy@9e08202 ClientItemDefinitions Id 69839 NameId 16639 DescriptionId 16652 SingleUse true); model 22 cakenstein.adr, poof 21 PFX_smoke_black_explosion; DurationMs 1800000; CooldownMs 1800000; icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 77418,
+      "name_id": 267,
+      "description_id": 2693,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 15665,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1966 (Firefrog Legs); item 77418 ActivatableAbilityId 1966 (Legacy@9e08202 ClientItemDefinitions Id 77418 NameId 267 DescriptionId 2693 SingleUse true); effect 15665 PFX_fire-ring_blue_up_med_loop_w; duration locale 2693: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 77419,
+      "name_id": 269,
+      "description_id": 2706,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5232,
+          "duration_ms": 1800000,
+          "delay_ms": 0,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 1964 (Graveyard Flambe (shadow flames)); item 77419 ActivatableAbilityId 1964 (Legacy@9e08202 ClientItemDefinitions Id 77419 NameId 269 DescriptionId 2706 SingleUse true); effect 5232 PFX_fire_purple_skel_loop; duration locale 2706: thirty minutes; cooldown 1800000 (R, OSFR #125); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
+    },
+    {
+      "definition": 79153,
+      "name_id": 5101135,
+      "description_id": 5101136,
+      "cooldown_ms": 1800000,
+      "single_use": true,
+      "effect": {
+        "aura": {
+          "composite_effect_id": 5343,
+          "duration_ms": 1800000,
+          "delay_ms": 300,
+          "icon_id": 3843
+        }
+      },
+      "source": "Sanctuary-main@10f129e Consumables.json FoodEffects AbilityId 660 (Can of Beans); item 79153 ActivatableAbilityId 660 (Legacy@9e08202 ClientItemDefinitions Id 79153 NameId 5101135 DescriptionId 5101136 SingleUse true); effect 5343 PFX_smoke_green_pelvis_fart-m; duration 1800000 (R) OSFR default; cooldown 1800000 (R, OSFR #125); EffectDelayMs 300; QuickChatId 3340 ignored; the effect is not a loop, so it plays once (R); icon 3843 icon_status_changeform_32.dds (R, OSFR #126)."
     }
   ]
 }
