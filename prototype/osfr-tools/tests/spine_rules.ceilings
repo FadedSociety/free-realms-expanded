@@ -2,8 +2,8 @@
 # them after every green batch (999999 = not measured yet). Builders may not edit this file.
 busy_outside_occupation 20
 hex_outside_trace 3
-hub:src/bin/osfr-gateway.rs 4659
+hub:src/bin/osfr-gateway.rs 4643
 hub:src/encounter.rs 2997
-hub:src/gameplay.rs 5212
-hub:src/gateway.rs 2203
+hub:src/gameplay.rs 5209
+hub:src/gateway.rs 2151
 plain_fs_write 4
