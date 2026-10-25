@@ -2797,10 +2797,7 @@ impl Gameplay {
                     }
                 }
             }
-            ["win"] => {
-                let result = self.encounter.as_mut().unwrap().debug_win(now_ms)?;
-                self.apply_encounter(result, out)?;
-            }
+            ["win"] => self.developer_win(now_ms, out)?,
             ["sim", rest @ ..] => {
                 let battle = rest
                     .first()

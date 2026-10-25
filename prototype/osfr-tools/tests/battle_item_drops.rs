@@ -9,8 +9,10 @@
 use osfr_tools::{
     account_store::AccountRole,
     chat,
+    coin_shop::CoinShop,
     gateway::Gateway,
     inventory::{Inventory, InventoryState, MAX_ITEMS},
+    profiles::Profiles,
 };
 use serde_json::{Value, json};
 use std::{
@@ -87,6 +89,17 @@ fn content_with_chance(chance: f64) -> PathBuf {
     )
     .unwrap();
     root
+}
+
+/// The NPC content `Gameplay::load` binds for this runtime package: its own
+/// `npcs/` when it has one, else the bundled `data/content`.
+fn npc_content() -> PathBuf {
+    let runtime = manifest_dir().join(RUNTIME_CONTENT);
+    if runtime.join("npc_spawns_extra.json").is_file() && runtime.join("npcs").is_dir() {
+        runtime
+    } else {
+        content_dir()
+    }
 }
 
 fn count(gateway: &Gateway, item: i32) -> u32 {
@@ -246,6 +259,13 @@ fn a_bag_with_no_slot_loses_only_the_drop() {
         0,
         "a full bag cannot take the drop"
     );
+    assert!(
+        full.bag
+            .items
+            .iter()
+            .all(|stack| stack.definition_id != item),
+        "the shaped bag starts without the chance drop"
+    );
     assert_payout(&full.before, &full.after, row, &prizes, BATTLE_JOB_XP);
     let bag = full.gateway.snapshot().gameplay.unwrap().inventory;
     assert_eq!(bag.items.len(), MAX_ITEMS, "the bag did not grow");
@@ -274,9 +294,16 @@ fn the_dev_win_never_grants_the_chance_drop() {
         Route::DevWin,
         |bag| bag,
     );
+    let held: u32 = run
+        .bag
+        .items
+        .iter()
+        .filter(|stack| stack.definition_id == item)
+        .map(|stack| stack.count)
+        .sum();
     assert_eq!(
         count(&run.gateway, item),
-        0,
+        held,
         "realm win never mints the drop"
     );
     assert_payout(&run.before, &run.after, row, &prizes, BATTLE_JOB_XP);
@@ -292,7 +319,7 @@ fn a_capped_win_refuses_the_drop_with_the_rest_and_changes_nothing() {
     let file = battles();
     let row = battle(&file, YETI_BATTLE);
     let prizes = prize_ids(row);
-    let run = run_battle(
+    let mut run = run_battle(
         &content,
         YETI_BATTLE,
         &prizes,
@@ -319,6 +346,20 @@ fn a_capped_win_refuses_the_drop_with_the_rest_and_changes_nothing() {
             .windows(REWARD_REFUSED.len())
             .any(|window| window == REWARD_REFUSED.as_bytes())),
         "the player is told the chance drop went with the refused reward"
+    );
+    // F681 review item 6: a refused win still completes, so the results Close
+    // must free the player and leave the bag and economy exactly as they were.
+    let closed = send(&mut run.gateway, &[26, 0, 42, 0], 5_000);
+    assert!(closed.began_zoning, "Close returns to the open world");
+    assert_eq!(
+        run.gateway.snapshot().gameplay.unwrap().inventory,
+        run.bag,
+        "the results Close does not alter the refused bag"
+    );
+    assert_eq!(
+        economy(&run.gateway, &prizes),
+        run.before,
+        "the refused reward stays refused after Close"
     );
     let _ = fs::remove_dir_all(content);
 }
@@ -353,19 +394,24 @@ fn a_forced_drop_survives_the_results_close_and_a_reconnect() {
 
 #[test]
 fn the_shipped_rows_are_data_driven_and_grantable() {
-    let inventory = Inventory::load(&manifest_dir().join(RUNTIME_CONTENT), None).unwrap();
+    let runtime = manifest_dir().join(RUNTIME_CONTENT);
+    let inventory = Inventory::load(&runtime, None).unwrap();
+    let profiles = Profiles::load(&runtime, None).unwrap();
+    // T658 review item 9: a repeatable 25% drop must not be a coin faucet.
+    // `CoinShop::sell_unit_price` is the one effective sale price the Sell tab
+    // uses (store row, free issuance or the client Worth fallback), so a
+    // runtime catalogue or code-level price fails here before it can be farmed.
+    let shop = CoinShop::load(
+        &runtime,
+        &npc_content(),
+        true,
+        inventory.clone(),
+        Some(&profiles),
+        None,
+    )
+    .expect("the shipped shop loads")
+    .expect("the shipped content enables the shop");
     let file = battles();
-    // T658 review item 9: a repeatable 25% drop must not be a coin faucet. The
-    // runtime catalogue leaves the drop's ResellValue at 0 and `stores.json`
-    // carries no sell row, so `CoinShop::sell_unit_price` refuses it; a future
-    // catalogue or store price fails here before it becomes farmable coins.
-    let store_sell_rows: BTreeSet<i32> = read_json(&content_dir().join("stores.json"))["items"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .filter(|row| row["sell_price_coins"].is_u64())
-        .filter_map(|row| row["item_id"].as_i64().map(|id| id as i32))
-        .collect();
     let mut with_drops = 0;
     for row in file["battles"].as_array().unwrap() {
         for drop in row["drops"].as_array().into_iter().flatten() {
@@ -384,16 +430,10 @@ fn the_shipped_rows_are_data_driven_and_grantable() {
             for tag in tags.iter().filter(|t| t["kind"] == "reconstructed") {
                 assert!(tag["evidence"].as_str().unwrap().starts_with("(R)"));
             }
-            let (no_sale, worth) = inventory
-                .sale_flags(item)
-                .expect("the drop has a catalogue definition");
-            assert!(
-                no_sale || worth == 0,
-                "drop {item} carries Worth {worth}: 25% per win becomes a coin faucet"
-            );
-            assert!(
-                !store_sell_rows.contains(&item),
-                "drop {item} has a stores.json sell price: 25% per win becomes a coin faucet"
+            let price = shop.sell_unit_price(item).unwrap_or(0);
+            assert_eq!(
+                price, 0,
+                "drop {item} sells for {price} coins: 25% per win becomes a coin faucet"
             );
         }
     }

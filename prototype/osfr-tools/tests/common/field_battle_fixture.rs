@@ -948,6 +948,16 @@ pub fn runtime_inventory() -> &'static Inventory {
     })
 }
 
+/// The definition ids a battle's chance-drop rows name.
+fn battle_drop_ids(row: &Value) -> BTreeSet<i32> {
+    row["drops"]
+        .as_array()
+        .into_iter()
+        .flatten()
+        .filter_map(|drop| i32::try_from(drop["item_id"].as_i64()?).ok())
+        .collect()
+}
+
 /// A real uncapped catalogue row that is not one of this battle's prizes or
 /// chance drops, so each filler stack stays separate and no granted item
 /// merges into it.
@@ -955,13 +965,7 @@ pub fn filler_definition(battle_id: u32) -> i32 {
     let file = battles();
     let row = battle(&file, battle_id);
     let mut excluded = prize_ids(row);
-    excluded.extend(
-        row["drops"]
-            .as_array()
-            .into_iter()
-            .flatten()
-            .filter_map(|drop| i32::try_from(drop["item_id"].as_i64()?).ok()),
-    );
+    excluded.extend(battle_drop_ids(row));
     let inventory = runtime_inventory();
     inventory
         .definition_ids()
@@ -999,9 +1003,10 @@ pub enum PrizeStacks {
     Keep,
 }
 
-/// Replace or keep the base bag's prize stacks, then pad to exactly `capacity`
-/// stacks with unique filler. `capacity == MAX_ITEMS` leaves no room for a
-/// granted prize or a drop; `MAX_ITEMS - 1` leaves one.
+/// Replace or keep the base bag's prize stacks (a battle's chance-drop stacks
+/// are always removed), then pad to exactly `capacity` stacks with unique
+/// filler. `capacity == MAX_ITEMS` leaves no room for a granted prize or a
+/// drop; `MAX_ITEMS - 1` leaves one.
 pub fn full_bag(
     base: &InventoryState,
     capacity: usize,
@@ -1014,8 +1019,26 @@ pub fn full_bag(
         base.items.len()
     );
     let file = battles();
-    let prizes = prize_ids(battle(&file, battle_id));
+    let row = battle(&file, battle_id);
+    let prizes = prize_ids(row);
     let mut state = base.clone();
+    // A chance drop the base bag already holds would count as this win's
+    // grant; start without one so the tests measure only the win's drop.
+    let drops = battle_drop_ids(row);
+    if !drops.is_empty() {
+        let removed: std::collections::BTreeSet<i32> = state
+            .items
+            .iter()
+            .filter(|item| drops.contains(&item.definition_id))
+            .map(|item| item.id)
+            .collect();
+        state
+            .items
+            .retain(|item| !drops.contains(&item.definition_id));
+        state
+            .equipment
+            .retain(|item| !removed.contains(&item.item_id));
+    }
     if prize_stacks == PrizeStacks::MakeRoom {
         let removed: std::collections::BTreeSet<i32> = state
             .items

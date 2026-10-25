@@ -18,6 +18,17 @@ const REWARD_UNREPRESENTABLE: &str = "This reward, any prize item and any chance
 pub(super) const DERBY_PAYOUT_REFUSED: &str = "Your demolition derby completion reward was not granted: your coin balance or Demo Derby Driver progress is at its limit.";
 
 impl Gameplay {
+    /// Apply the developer `realm win` route to the active encounter. A content
+    /// set without an encounter engine refuses with feedback, never a panic.
+    pub(super) fn developer_win(&mut self, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
+        let Some(encounter) = self.encounter.as_mut() else {
+            out.replies.push(chat::system("No encounter is active."));
+            return Ok(());
+        };
+        let result = encounter.debug_win(now_ms)?;
+        self.apply_encounter(result, out)
+    }
+
     /// Apply one encounter reward. A reward that cannot be represented is
     /// refused whole for this player and leaves the rest of the outcome alone;
     /// inventory/item refusals keep the existing atomic `grant_bundle` rule.

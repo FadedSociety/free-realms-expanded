@@ -624,7 +624,7 @@ struct FieldBattleFile {
 pub struct EncounterReward {
     pub coins: u32,
     pub items: Vec<(i32, u32)>,
-    /// Chance drops, granted only if the bag has room; never refuse the rest.
+    /// Chance drops: granted only if the bag has room; never refuse the rest. The developer `realm win` (debug_win) clears them, so the dev route never grants one.
     pub bonus_items: Vec<(i32, u32)>,
     /// Experience for the active (combat) job: battles level combat jobs.
     pub job_xp: u32,

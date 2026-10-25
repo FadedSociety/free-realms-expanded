@@ -2697,6 +2697,32 @@ fn developer_cheat_console_drives_a_battle() {
     );
 }
 
+/// F681 review item 7 (pre-existing): a game without an encounter engine refuses
+/// `realm win` with feedback instead of the `unwrap` panic. Content loading makes
+/// opening and encounter present together, so this is defense in depth for a
+/// state a future reload path could leave behind.
+#[test]
+fn realm_win_without_an_encounter_engine_is_a_refusal() {
+    let mut game = Gameplay::load(&reference(), None).unwrap();
+    game.set_dev_tools(true);
+    game.set_role(crate::account_store::AccountRole::Admin);
+    game.encounter = None;
+    let character = CharacterState {
+        guid: 1,
+        zone_id: 0,
+        position: [-440.0, 0.8, 1292.0],
+        rotation: [1.0, 0.0, 0.0],
+    };
+    let bag = game.inventory.state().clone();
+    let out = game
+        .handle_in_world(&offer_chat("realm win"), &character, 1_000)
+        .unwrap();
+    let text = String::from_utf8_lossy(&out.replies.concat()).to_string();
+    assert!(text.contains("No encounter is active."), "{text}");
+    assert!(out.zoning.is_none(), "the refusal does not zone");
+    assert_eq!(game.inventory.state(), &bag, "the refusal changes nothing");
+}
+
 /// Battle spawners (data/content/field_battles.json) are world-style AddNpc
 /// actors sent by proximity, so the client keeps and renders them.
 #[test]
