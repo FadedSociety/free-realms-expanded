@@ -2044,6 +2044,10 @@ fn refused_reload_all_keeps_behaviour_and_shared_field_state() {
     let profiles = game.profiles.as_mut().unwrap();
     profiles.unlock(profile).unwrap();
     profiles.activate(profile).unwrap();
+    // T521: the initial save has no Medic weapon, so arm the job the way a
+    // job switch does; an unarmed job now sends the empty bar.
+    game.ensure_outfit(profile, &mut Outcome::default())
+        .unwrap();
     let level = game.job_level(profile);
     let before_abilities = game
         .abilities
@@ -2457,6 +2461,8 @@ fn ability_definition_lookup_and_unsupported_casts_are_explicit() {
     let profiles = game.profiles.as_mut().unwrap();
     profiles.unlock(11).unwrap();
     profiles.select(11, &game.inventory).unwrap();
+    // T521: the initial save has no Medic weapon; arm it as a job switch does.
+    game.ensure_outfit(11, &mut Outcome::default()).unwrap();
     let level = game.job_level(11);
     let loaded: Vec<Vec<u8>> = game
         .abilities

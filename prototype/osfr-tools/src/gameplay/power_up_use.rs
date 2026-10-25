@@ -24,7 +24,39 @@ impl Gameplay {
             .as_ref()
             .ok_or_else(|| invalid("ability content is not loaded"))?;
         let power_up = self.encounter.as_ref().and_then(|e| e.held_power_up_slot());
-        abilities.activation_with_power_up(profile, self.job_level(profile), power_up.as_ref())
+        let weapon = abilities.weapon_label(profile, &self.inventory);
+        abilities.activation_with_power_up(
+            profile,
+            self.job_level(profile),
+            power_up.as_ref(),
+            weapon,
+        )
+    }
+
+    /// T521: after an inventory request commits, resend the job toolbar once
+    /// when the active combat job's slot-7 weapon changed. A no-op replay,
+    /// another slot, a noncombat job or another profile's outfit leaves the
+    /// bar alone. The comparison runs only on the inventory branch, never per
+    /// tick.
+    pub(crate) fn resend_bar_after_weapon_change(
+        &self,
+        before: &InventoryState,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        let Some(profile) = self.profiles.as_ref().map(Profiles::active) else {
+            return Ok(());
+        };
+        let Some(abilities) = self.abilities.as_ref() else {
+            return Ok(());
+        };
+        if !abilities.supports_basic(profile)
+            || before.equipped_weapon_item(profile)
+                == self.inventory.state().equipped_weapon_item(profile)
+        {
+            return Ok(());
+        }
+        out.replies.extend(self.ability_activation_for(profile)?);
+        Ok(())
     }
 
     /// After a world tick, resend the toolbar only when a pickup or a

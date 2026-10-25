@@ -85,6 +85,19 @@ pub struct InventoryState {
     pub next_instance_id: Option<i64>,
 }
 
+impl InventoryState {
+    /// The instance in native Weapon slot 7 for `profile`, 0 when the slot is
+    /// empty. The one place that names the weapon slot: the cast gate
+    /// (`equipped_weapon_for_class`), the toolbar label and the toolbar resend
+    /// comparison all read it.
+    pub fn equipped_weapon_item(&self, profile: i32) -> i32 {
+        self.equipment
+            .iter()
+            .find(|entry| entry.profile_id == profile && entry.slot == 7)
+            .map_or(0, |entry| entry.item_id)
+    }
+}
+
 #[derive(Clone, Debug, Default)]
 pub struct InventoryOutcome {
     /// Inner application messages, before the gateway's tunnel wrapper.
@@ -674,20 +687,44 @@ impl Inventory {
             .expect("visible owned definitions are present in the startup catalogue")
     }
 
+    /// `profile`'s slot-7 weapon definition when its live `ClientItemDefinition`
+    /// row names `required_class` and the weapon slot (native `008e3760` class
+    /// at row 44, slot at row 52). `None` when the slot is empty, the item is
+    /// not owned, or the class differs. One join for the cast gate in
+    /// `abilities::equipped_weapon_matches` and the toolbar label in
+    /// `OpeningAbilities::weapon_label`.
+    pub fn equipped_weapon_for_class(&self, profile: i32, required_class: i32) -> Option<i32> {
+        if required_class <= 0 {
+            return None;
+        }
+        let item_id = self.state.equipped_weapon_item(profile);
+        let item = self
+            .state
+            .items
+            .iter()
+            .find(|item| item.id == item_id && item.count > 0)?;
+        let request = [
+            vec![35, 0, 34, 0],
+            item.definition_id.to_le_bytes().to_vec(),
+            vec![0; 4],
+        ]
+        .concat();
+        let replies = self.definition_replies(&request).ok()?;
+        let row = replies.first()?;
+        (row.get(44..48) == Some(required_class.to_le_bytes().as_slice())
+            && row.get(52..56) == Some(7_i32.to_le_bytes().as_slice()))
+        .then_some(item.definition_id)
+    }
+
     /// `profile`'s weapon (slot 7) definition's client wield type, 0 when the slot is empty or
     /// the item or definition is missing. Same join as `abilities::equipped_weapon_matches`;
     /// never reads `EquippedItem.category` as a class. Negative content values clamp to 0.
     pub fn equipped_wield_type(&self, profile: i32) -> i32 {
+        let item_id = self.state.equipped_weapon_item(profile);
         self.state
-            .equipment
+            .items
             .iter()
-            .find(|e| e.profile_id == profile && e.slot == 7)
-            .and_then(|e| {
-                self.state
-                    .items
-                    .iter()
-                    .find(|i| i.id == e.item_id && i.count > 0)
-            })
+            .find(|i| i.id == item_id && i.count > 0)
             .and_then(|item| self.content.definitions.get(&item.definition_id))
             .map_or(0, |definition| definition.wield_type.max(0))
     }

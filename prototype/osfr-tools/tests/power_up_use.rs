@@ -6,7 +6,9 @@
 //! shipped field Hooligans and a guaranteed drop loaded by the production
 //! `Gameplay::load` content root. Nothing here calls the power-up code directly.
 use osfr_tools::{
+    account_store::AccountRole,
     character_store::CharacterState,
+    chat,
     derby::{DerbyConfig, DerbyRules, DerbyVehicleTemplate},
     derby_gateway::{DerbyGates, DerbyGatewayContent},
     encounter::SharedFieldAction,
@@ -1010,6 +1012,56 @@ fn a_derby_return_keeps_the_held_power_up_on_its_slot() {
         slot_ids(bar)[2],
         Some(slot.definition_id),
         "slot 2 still shows the held kind"
+    );
+}
+
+/// T521: a committed weapon change resends the bar through the power-up
+/// seam; the held kind keeps its key on the armed and on the unarmed bar.
+#[test]
+fn held_power_up_survives_weapon_change() {
+    let fixture = Fixture::new();
+    let (mut game, location, _) = fresh_game(&fixture, 0);
+    game.set_dev_tools(true);
+    game.set_role(AccountRole::Admin);
+    let kill = hold(&mut game, &location);
+    let slot = fixture.slot("flame_wave");
+    let given = game
+        .handle_in_world(
+            &chat::local_request("realm give 75031"),
+            &location,
+            kill + 300,
+        )
+        .unwrap();
+    assert!(!given.replies.is_empty(), "the second hammer is granted");
+    let second = game
+        .state()
+        .inventory
+        .items
+        .iter()
+        .rev()
+        .find(|item| item.definition_id == 75031)
+        .expect("the granted hammer instance")
+        .id;
+    let equipped = game
+        .handle_in_world(&command(42, 3, &[second, 43, 7]), &location, kill + 400)
+        .unwrap();
+    assert_eq!(
+        slot_ids(toolbar(&equipped).expect("the equip resends the bar"))[2],
+        Some(slot.definition_id),
+        "the held kind keeps its key after an equip"
+    );
+    let unequipped = game
+        .handle_in_world(&command(42, 2, &[7, 43]), &location, kill + 500)
+        .unwrap();
+    let ids = slot_ids(toolbar(&unequipped).expect("the unequip resends the bar"));
+    assert_eq!(
+        ids[2],
+        Some(slot.definition_id),
+        "the held kind survives the unarmed bar"
+    );
+    assert!(
+        ids[0].is_none() && ids[1].is_none() && ids[3..].iter().all(Option::is_none),
+        "the unarmed bar is otherwise empty: {ids:?}"
     );
 }
 

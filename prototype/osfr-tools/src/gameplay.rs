@@ -4200,13 +4200,13 @@ impl Gameplay {
                     .into_iter()
                     .filter(|r| !(inactive && r.starts_with(&[35, 0, 6, 0]))),
             );
-            if let Some(packet) = broadcast {
-                out.nearby.push(packet);
-            }
+            out.nearby.extend(broadcast);
             if result.changed {
                 self.npc_inventory_events(&inventory_before, &mut out)?;
                 self.opening_equipment_events(&mut out)?;
                 self.sync_world_stage(&mut out)?;
+                // T521: a committed slot-7 change relabels or empties the bar.
+                self.resend_bar_after_weapon_change(&inventory_before, &mut out)?;
             }
             return Ok(out);
         }
@@ -5008,11 +5008,10 @@ impl Gameplay {
                     .into_iter()
                     .filter(|r| !(inactive && r.starts_with(&[35, 0, 6, 0]))),
             );
-            if let Some(packet) = broadcast {
-                out.nearby.push(packet);
-            }
+            out.nearby.extend(broadcast);
             self.npc_inventory_events(&before, &mut out)?;
             out.replies.extend(self.learn_consumed_patterns(&before)?);
+            self.resend_bar_after_weapon_change(&before, &mut out)?;
         }
         if inner.starts_with(&[26, 0, 13, 0]) {
             if inner.len() != 8 {

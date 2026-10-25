@@ -41,6 +41,20 @@ struct Content {
 /// `resetButtons` clears 0..3; native populate `0x008ee3d0` hands it every row.
 const JOB_ROWS: i32 = 3;
 
+/// What the live slot-7 weapon means for one combat job's toolbar (T521).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum WeaponLabel {
+    /// No inventory was read: label the basic slot with the content's
+    /// `weapon_name_id` (unit tests, content reload).
+    Starter,
+    /// A slot-7 weapon whose class matches the job: label the basic slot with
+    /// this `ClientItemDefinition` name id.
+    Equipped(i32),
+    /// No matching weapon: the combat bar is eight empty slots, like a
+    /// noncombat job (R, OSFR #124). A held power-up keeps its key slot.
+    Unarmed,
+}
+
 /// A job ability beyond the basic attack, on toolbar row 1..=JOB_ROWS (keys 2-4).
 /// Names, icons and heal amounts are client/wiki facts; damage, energy and
 /// cooldowns are reconstructed (R). See data/content/job_abilities.json.
@@ -316,6 +330,32 @@ impl OpeningAbilities {
         crate::abilities::equipped_weapon_matches(inventory, profile, required)
     }
 
+    /// What the live slot-7 weapon means for this job's toolbar (T521). A
+    /// matching weapon names the basic slot with its definition's `name_id`;
+    /// an empty slot or a wrong-class weapon leaves the job unarmed (R, OSFR
+    /// #124). Display only: `weapon_matches` remains the cast-time authority.
+    pub fn weapon_label(
+        &self,
+        profile: i32,
+        inventory: &crate::inventory::Inventory,
+    ) -> WeaponLabel {
+        let Some(required) = self
+            .basics
+            .get(&profile)
+            .and_then(|basic| basic.weapon_class)
+        else {
+            return WeaponLabel::Starter;
+        };
+        match inventory.equipped_weapon_for_class(profile, required) {
+            Some(definition) => inventory
+                .presentation(definition)
+                .map_or(WeaponLabel::Starter, |presentation| {
+                    WeaponLabel::Equipped(presentation.name_id)
+                }),
+            None => WeaponLabel::Unarmed,
+        }
+    }
+
     /// Whether `level` unlocks a job ability `previous` did not.
     pub fn unlocks_between(&self, profile_id: i32, previous: u32, level: u32) -> bool {
         self.jobs.get(&profile_id).is_some_and(|slots| {
@@ -328,19 +368,22 @@ impl OpeningAbilities {
     /// Definitions precede their toolbar. Noncombat jobs receive eight empty
     /// slots so switching jobs clears the prior combat toolbar.
     pub fn activation(&self, profile_id: i32, level: u32) -> io::Result<Vec<Vec<u8>>> {
-        self.activation_with_power_up(profile_id, level, None)
+        self.activation_with_power_up(profile_id, level, None, WeaponLabel::Starter)
     }
 
     /// `activation` with a held power-up on its own key slot
     /// (`power_ups::SLOT`). The authored job row below it is not moved: the
     /// client's bar shows the kind instead for as long as it is held, which is
     /// the locale's "add super shield to bar" behavior, and the same row comes
-    /// back on the next activation once the kind is used.
+    /// back on the next activation once the kind is used. `weapon` is the live
+    /// slot-7 verdict: `Unarmed` sends the eight empty slots a noncombat job
+    /// gets (R, OSFR #124) and still places a held power-up on its key.
     pub fn activation_with_power_up(
         &self,
         profile_id: i32,
         level: u32,
         power_up: Option<&PowerUpSlot>,
+        weapon: WeaponLabel,
     ) -> io::Result<Vec<Vec<u8>>> {
         if profile_id <= 0 {
             return Err(invalid("invalid hotbar profile"));
@@ -350,22 +393,26 @@ impl OpeningAbilities {
         put(&mut toolbar, 8);
         let mut replies = Vec::new();
         if let Some(basic) = self.basics.get(&profile_id) {
-            // The evidenced 36/13 definition is 160 bytes. All optional fields
-            // are zero for the supported basic attack: no mana/aura/AoE effects.
-            replies.push(definition(
-                basic.definition_id,
-                basic.name_id,
-                basic.description_id,
-                basic.icon_id,
-                0,
-            ));
-            ability_entry(
-                &mut toolbar,
-                basic.definition_id,
-                0,
-                basic.icon_id,
-                basic.weapon_name_id,
-            );
+            if weapon == WeaponLabel::Unarmed {
+                put(&mut toolbar, 0);
+            } else {
+                // The evidenced 36/13 definition is 160 bytes. All optional
+                // fields are zero for the supported basic attack: no mana/aura/AoE.
+                replies.push(definition(
+                    basic.definition_id,
+                    basic.name_id,
+                    basic.description_id,
+                    basic.icon_id,
+                    0,
+                ));
+                let name_id = match weapon {
+                    WeaponLabel::Equipped(name_id) => name_id,
+                    WeaponLabel::Starter | WeaponLabel::Unarmed => basic.weapon_name_id,
+                };
+                // The client resolves this name id and passes it to
+                // HandlerActionBar:setButtonData (native populate 0x008ee3d0).
+                ability_entry(&mut toolbar, basic.definition_id, 0, basic.icon_id, name_id);
+            }
             for (index, ability) in self.job_bar(profile_id, level).into_iter().enumerate() {
                 if let Some(power_up) =
                     power_up.filter(|_| index as i32 + 1 == crate::power_ups::SLOT)
@@ -386,6 +433,9 @@ impl OpeningAbilities {
                     );
                     continue;
                 }
+                // An unarmed job shows no skill rows, but a held power-up kept
+                // its key above (R, OSFR #124).
+                let ability = ability.filter(|_| weapon != WeaponLabel::Unarmed);
                 let Some(ability) = ability else {
                     // Not learned yet: the slot stays empty (keys keep their order).
                     put(&mut toolbar, 0);
