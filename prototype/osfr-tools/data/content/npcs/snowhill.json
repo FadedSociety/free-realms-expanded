@@ -1660,7 +1660,7 @@
       ],
       "name": "Baron von Darkcheat",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 294,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -1679,7 +1679,7 @@
           "id": 3958155406
         }
       ],
-      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "name_string_id_reason": "Client locale Global.Text.294 resolves to 'Baron von Darkcheat'; the Legacy spawn's Npcs.json Id=3579 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other locale-table ids.",
       "zone": "Snowhill",
       "zone_id": 13,
       "zone_reason": null,
@@ -1758,34 +1758,23 @@
       ],
       "services_reason": null,
       "position": [
-        49.73192,
-        30.987,
-        364.675853
+        578.1666,
+        49.00199,
+        478.8249
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.676868416297486,
+        -0.9973590034162929,
         0.0,
-        0.7361040327419306
+        0.07262932124465382
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 3,
-          "poi_name": "Snowhill",
-          "match_score": 8
-        },
-        {
-          "poi_id": 13,
-          "poi_name": "Seaside",
-          "match_score": 7
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 3 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Legacy built-content spawn bound to this existing regional key: matched by the spawn's client name (talk_spawns.py) (R). Coordinates and heading copied from ../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2322; src/Resources/Npcs.json Id=3579 (ModelId=3883, ModelFileName=dwarf_darkcheat.adr, NameId=294). Not a captured retail transform, collision proof or native appearance verification.",
       "source": [
         {
           "kind": "client",
@@ -1798,6 +1787,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2322; src/Resources/Npcs.json Id=3579 (ModelId=3883, ModelFileName=dwarf_darkcheat.adr, NameId=294)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T695: spawn joined to this existing regional key by the client name its Npcs.json NameId resolves (talk_spawns.py); medium confidence, not a captured actor or native appearance check."
         }
       ],
       "field_sources": {
@@ -1865,12 +1862,8 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Seasonal and roaming visitors, row 152; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Seasonal and roaming visitors, row 152; source cell: [client][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2322; src/Resources/Npcs.json Id=3579 (ModelId=3883, ModelFileName=dwarf_darkcheat.adr, NameId=294). NameId resolves in client locale to 'Baron von Darkcheat'."
           }
         ],
         "name_string_ids": [
@@ -1885,12 +1878,8 @@
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Seasonal and roaming visitors, row 152; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Seasonal and roaming visitors, row 152; source cell: [client][wiki]"
+            "kind": "reconstructed",
+            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other locale-table ids."
           }
         ],
         "zone": [
@@ -2131,18 +2120,18 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=3 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=3 NameId=3961 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2322; src/Resources/Npcs.json Id=3579 (ModelId=3883, ModelFileName=dwarf_darkcheat.adr, NameId=294)."
           }
         ],
         "position_reason": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2322; src/Resources/Npcs.json Id=3579 (ModelId=3883, ModelFileName=dwarf_darkcheat.adr, NameId=294)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "evidence": "(R) The reason records a client-name join (talk_spawns.py), not a captured transform."
           }
         ],
         "position_w": [
@@ -2153,45 +2142,70 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=3 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=3 NameId=3961 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2322; src/Resources/Npcs.json Id=3579 (ModelId=3883, ModelFileName=dwarf_darkcheat.adr, NameId=294)."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2322; src/Resources/Npcs.json Id=3579 (ModelId=3883, ModelFileName=dwarf_darkcheat.adr, NameId=294)."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2322; src/Resources/Npcs.json Id=3579 (ModelId=3883, ModelFileName=dwarf_darkcheat.adr, NameId=294)."
           }
         ],
         "placement_confidence": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2322; src/Resources/Npcs.json Id=3579 (ModelId=3883, ModelFileName=dwarf_darkcheat.adr, NameId=294)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) Medium means one unambiguous Legacy spawn matched by client name; not a captured actor or native appearance check."
           }
         ],
         "placement_candidates": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2322; src/Resources/Npcs.json Id=3579 (ModelId=3883, ModelFileName=dwarf_darkcheat.adr, NameId=294)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) Empty: the client-name join (talk_spawns.py) found one spawn and no competing POI candidate."
           }
         ],
         "capture_match": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+            "evidence": "(R) Null: no startup AddNpc actor was identity-matched to this regional row; the T695 Legacy spawn is evidence, not a capture."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2322; src/Resources/Npcs.json Id=3579 (ModelId=3883, ModelFileName=dwarf_darkcheat.adr, NameId=294)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2322; src/Resources/Npcs.json Id=3579 (ModelId=3883, ModelFileName=dwarf_darkcheat.adr, NameId=294)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2322; src/Resources/Npcs.json Id=3579 (ModelId=3883, ModelFileName=dwarf_darkcheat.adr, NameId=294)."
           }
         ]
-      }
+      },
+      "heading": -2.996206,
+      "model_id": 3883,
+      "model_file_name": "dwarf_darkcheat.adr"
     },
     {
       "npc_id": 9500000727,
@@ -4147,7 +4161,7 @@
       "reference_ids": [],
       "name": "Bruce",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 201,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -4170,7 +4184,7 @@
           "id": 4155617834
         }
       ],
-      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "name_string_id_reason": "Client locale Global.Text.201 resolves to 'Bruce'; the Legacy spawn's Npcs.json Id=3549 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other locale-table ids.",
       "zone": "Snowhill",
       "zone_id": 13,
       "zone_reason": null,
@@ -4202,39 +4216,23 @@
       ],
       "services_reason": null,
       "position": [
-        -1490.912358,
-        -35.049,
-        404.107496
+        -1405.09,
+        -34.49589,
+        496.5363
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.11971220728891936,
+        -0.2806084788647988,
         0.0,
-        0.9928086358538663
+        0.9598223177178075
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 24,
-          "poi_name": "Queensfields",
-          "match_score": 12
-        },
-        {
-          "poi_id": 5,
-          "poi_name": "Sanctuary",
-          "match_score": 9
-        },
-        {
-          "poi_id": 3,
-          "poi_name": "Snowhill",
-          "match_score": 8
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 24 by longest normalized whole-name score 12; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Legacy built-content spawn bound to this existing regional key: matched by the spawn's client name (talk_spawns.py) (R). Coordinates and heading copied from ../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2292; src/Resources/Npcs.json Id=3549 (ModelId=20, ModelFileName=human_rockstar_m.adr, NameId=201). Not a captured retail transform, collision proof or native appearance verification.",
       "source": [
         {
           "kind": "client",
@@ -4247,6 +4245,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2292; src/Resources/Npcs.json Id=3549 (ModelId=20, ModelFileName=human_rockstar_m.adr, NameId=201)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T695: spawn joined to this existing regional key by the client name its Npcs.json NameId resolves (talk_spawns.py); medium confidence, not a captured actor or native appearance check."
         }
       ],
       "field_sources": {
@@ -4314,12 +4320,8 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Town centre: town hall, Clocktower, gates, Post Office, stage, row 33; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Town centre: town hall, Clocktower, gates, Post Office, stage, row 33; source cell: [client][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2292; src/Resources/Npcs.json Id=3549 (ModelId=20, ModelFileName=human_rockstar_m.adr, NameId=201). NameId resolves in client locale to 'Bruce'."
           }
         ],
         "name_string_ids": [
@@ -4334,12 +4336,8 @@
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Town centre: town hall, Clocktower, gates, Post Office, stage, row 33; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#Town centre: town hall, Clocktower, gates, Post Office, stage, row 33; source cell: [client][wiki]"
+            "kind": "reconstructed",
+            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other locale-table ids."
           }
         ],
         "zone": [
@@ -4520,18 +4518,18 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=24 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=24 NameId=7262 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2292; src/Resources/Npcs.json Id=3549 (ModelId=20, ModelFileName=human_rockstar_m.adr, NameId=201)."
           }
         ],
         "position_reason": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2292; src/Resources/Npcs.json Id=3549 (ModelId=20, ModelFileName=human_rockstar_m.adr, NameId=201)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "evidence": "(R) The reason records a client-name join (talk_spawns.py), not a captured transform."
           }
         ],
         "position_w": [
@@ -4542,45 +4540,70 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=24 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=24 NameId=7262 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2292; src/Resources/Npcs.json Id=3549 (ModelId=20, ModelFileName=human_rockstar_m.adr, NameId=201)."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2292; src/Resources/Npcs.json Id=3549 (ModelId=20, ModelFileName=human_rockstar_m.adr, NameId=201)."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2292; src/Resources/Npcs.json Id=3549 (ModelId=20, ModelFileName=human_rockstar_m.adr, NameId=201)."
           }
         ],
         "placement_confidence": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2292; src/Resources/Npcs.json Id=3549 (ModelId=20, ModelFileName=human_rockstar_m.adr, NameId=201)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) Medium means one unambiguous Legacy spawn matched by client name; not a captured actor or native appearance check."
           }
         ],
         "placement_candidates": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2292; src/Resources/Npcs.json Id=3549 (ModelId=20, ModelFileName=human_rockstar_m.adr, NameId=201)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) Empty: the client-name join (talk_spawns.py) found one spawn and no competing POI candidate."
           }
         ],
         "capture_match": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+            "evidence": "(R) Null: no startup AddNpc actor was identity-matched to this regional row; the T695 Legacy spawn is evidence, not a capture."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2292; src/Resources/Npcs.json Id=3549 (ModelId=20, ModelFileName=human_rockstar_m.adr, NameId=201)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2292; src/Resources/Npcs.json Id=3549 (ModelId=20, ModelFileName=human_rockstar_m.adr, NameId=201)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2292; src/Resources/Npcs.json Id=3549 (ModelId=20, ModelFileName=human_rockstar_m.adr, NameId=201)."
           }
         ]
-      }
+      },
+      "heading": -0.568856,
+      "model_id": 20,
+      "model_file_name": "human_rockstar_m.adr"
     },
     {
       "npc_id": 9000000034,
@@ -10391,14 +10414,14 @@
       ],
       "name": "Derp Axemaker",
       "name_reason": null,
-      "name_string_id": 3429375594,
+      "name_string_id": 77270,
       "name_string_ids": [
         {
           "table": "ucdt",
           "id": 3429375594
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "Client locale Global.Text.77270 resolves to 'Derp Axemaker'; the Legacy spawn's Npcs.json Id=3286 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other locale-table ids.",
       "zone": "Snowhill",
       "zone_id": 13,
       "zone_reason": null,
@@ -10836,29 +10859,23 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        48.190681,
-        30.987,
-        362.589909
+        -519.457,
+        10.24161,
+        -34.68288
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.676868416297486,
+        -0.8045180144012751,
         0.0,
-        0.7361040327419306
+        0.5939282486157985
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
       "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 3,
-          "poi_name": "Snowhill",
-          "match_score": 8
-        }
-      ],
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 3 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Legacy built-content spawn bound to this existing regional key: matched by the spawn's client name (talk_spawns.py) (R). Coordinates and heading copied from ../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2029; src/Resources/Npcs.json Id=3286 (ModelId=574, ModelFileName=fairy_m_blacksmith_01.agr, NameId=77270). Not a captured retail transform, collision proof or native appearance verification.",
       "source": [
         {
           "kind": "client",
@@ -10875,6 +10892,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2029; src/Resources/Npcs.json Id=3286 (ModelId=574, ModelFileName=fairy_m_blacksmith_01.agr, NameId=77270)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T695: spawn joined to this existing regional key by the client name its Npcs.json NameId resolves (talk_spawns.py); medium confidence, not a captured actor or native appearance check."
         }
       ],
       "field_sources": {
@@ -10962,16 +10987,8 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 134; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 134; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 134; source cell: [client][video][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2029; src/Resources/Npcs.json Id=3286 (ModelId=574, ModelFileName=fairy_m_blacksmith_01.agr, NameId=77270). NameId resolves in client locale to 'Derp Axemaker'."
           }
         ],
         "name_string_ids": [
@@ -10990,16 +11007,8 @@
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 134; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 134; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 134; source cell: [client][video][wiki]"
+            "kind": "reconstructed",
+            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other locale-table ids."
           }
         ],
         "zone": [
@@ -11516,18 +11525,18 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=3 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=3 NameId=3961 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2029; src/Resources/Npcs.json Id=3286 (ModelId=574, ModelFileName=fairy_m_blacksmith_01.agr, NameId=77270)."
           }
         ],
         "position_reason": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2029; src/Resources/Npcs.json Id=3286 (ModelId=574, ModelFileName=fairy_m_blacksmith_01.agr, NameId=77270)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "evidence": "(R) The reason records a client-name join (talk_spawns.py), not a captured transform."
           }
         ],
         "position_w": [
@@ -11538,45 +11547,70 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=3 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=3 NameId=3961 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2029; src/Resources/Npcs.json Id=3286 (ModelId=574, ModelFileName=fairy_m_blacksmith_01.agr, NameId=77270)."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2029; src/Resources/Npcs.json Id=3286 (ModelId=574, ModelFileName=fairy_m_blacksmith_01.agr, NameId=77270)."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2029; src/Resources/Npcs.json Id=3286 (ModelId=574, ModelFileName=fairy_m_blacksmith_01.agr, NameId=77270)."
           }
         ],
         "placement_confidence": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2029; src/Resources/Npcs.json Id=3286 (ModelId=574, ModelFileName=fairy_m_blacksmith_01.agr, NameId=77270)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) medium measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) Medium means one unambiguous Legacy spawn matched by client name; not a captured actor or native appearance check."
           }
         ],
         "placement_candidates": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2029; src/Resources/Npcs.json Id=3286 (ModelId=574, ModelFileName=fairy_m_blacksmith_01.agr, NameId=77270)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) Empty: the client-name join (talk_spawns.py) found one spawn and no competing POI candidate."
           }
         ],
         "capture_match": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+            "evidence": "(R) Null: no startup AddNpc actor was identity-matched to this regional row; the T695 Legacy spawn is evidence, not a capture."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2029; src/Resources/Npcs.json Id=3286 (ModelId=574, ModelFileName=fairy_m_blacksmith_01.agr, NameId=77270)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2029; src/Resources/Npcs.json Id=3286 (ModelId=574, ModelFileName=fairy_m_blacksmith_01.agr, NameId=77270)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2029; src/Resources/Npcs.json Id=3286 (ModelId=574, ModelFileName=fairy_m_blacksmith_01.agr, NameId=77270)."
           }
         ]
-      }
+      },
+      "heading": -1.869727,
+      "model_id": 574,
+      "model_file_name": "fairy_m_blacksmith_01.agr"
     },
     {
       "npc_id": 9500000742,
@@ -20032,14 +20066,14 @@
       ],
       "name": "Jeni Shortfuse",
       "name_reason": null,
-      "name_string_id": 3295904826,
+      "name_string_id": 22808,
       "name_string_ids": [
         {
           "table": "ucdt",
           "id": 3295904826
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "Client locale Global.Text.22808 resolves to 'Jeni Shortfuse'; the Legacy spawn's Npcs.json Id=3698 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other locale-table ids.",
       "zone": "Snowhill",
       "zone_id": 13,
       "zone_reason": null,
@@ -20118,39 +20152,23 @@
       ],
       "services_reason": null,
       "position": [
-        386.62256,
-        117.92403,
-        -16.92501
+        370.6606,
+        115.225,
+        -8.103738
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        -0.31838941457772124,
+        -0.10992093240645097,
         0.0,
-        0.947960010066277
+        0.9939403345366846
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 73,
-          "poi_name": "Howling Hills",
-          "match_score": 13
-        },
-        {
-          "poi_id": 5,
-          "poi_name": "Sanctuary",
-          "match_score": 9
-        },
-        {
-          "poi_id": 3,
-          "poi_name": "Snowhill",
-          "match_score": 8
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 73 by longest normalized whole-name score 13; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Legacy built-content spawn bound to this existing regional key: matched by the spawn's client name (talk_spawns.py) (R). Coordinates and heading copied from ../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2378; src/Resources/Npcs.json Id=3698 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=22808). Not a captured retail transform, collision proof or native appearance verification.",
       "source": [
         {
           "kind": "client",
@@ -20167,6 +20185,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2378; src/Resources/Npcs.json Id=3698 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=22808)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T695: spawn joined to this existing regional key by the client name its Npcs.json NameId resolves (talk_spawns.py); medium confidence, not a captured actor or native appearance check."
         }
       ],
       "field_sources": {
@@ -20254,16 +20280,8 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 132; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 132; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 132; source cell: [client][video][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2378; src/Resources/Npcs.json Id=3698 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=22808). NameId resolves in client locale to 'Jeni Shortfuse'."
           }
         ],
         "name_string_ids": [
@@ -20282,16 +20300,8 @@
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 132; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 132; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 132; source cell: [client][video][wiki]"
+            "kind": "reconstructed",
+            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other locale-table ids."
           }
         ],
         "zone": [
@@ -20580,18 +20590,18 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=73 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=73 NameId=6488 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2378; src/Resources/Npcs.json Id=3698 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=22808)."
           }
         ],
         "position_reason": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2378; src/Resources/Npcs.json Id=3698 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=22808)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "evidence": "(R) The reason records a client-name join (talk_spawns.py), not a captured transform."
           }
         ],
         "position_w": [
@@ -20602,45 +20612,70 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=73 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=73 NameId=6488 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2378; src/Resources/Npcs.json Id=3698 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=22808)."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2378; src/Resources/Npcs.json Id=3698 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=22808)."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2378; src/Resources/Npcs.json Id=3698 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=22808)."
           }
         ],
         "placement_confidence": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2378; src/Resources/Npcs.json Id=3698 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=22808)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) Medium means one unambiguous Legacy spawn matched by client name; not a captured actor or native appearance check."
           }
         ],
         "placement_candidates": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2378; src/Resources/Npcs.json Id=3698 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=22808)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) Empty: the client-name join (talk_spawns.py) found one spawn and no competing POI candidate."
           }
         ],
         "capture_match": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+            "evidence": "(R) Null: no startup AddNpc actor was identity-matched to this regional row; the T695 Legacy spawn is evidence, not a capture."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2378; src/Resources/Npcs.json Id=3698 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=22808)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2378; src/Resources/Npcs.json Id=3698 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=22808)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2378; src/Resources/Npcs.json Id=3698 (ModelId=548, ModelFileName=human_f_freestyle_06.agr, NameId=22808)."
           }
         ]
-      }
+      },
+      "heading": -0.220287,
+      "model_id": 548,
+      "model_file_name": "human_f_freestyle_06.agr"
     },
     {
       "npc_id": 9500000753,
@@ -32520,14 +32555,14 @@
       "reference_ids": [],
       "name": "Sakka",
       "name_reason": null,
-      "name_string_id": 2352789148,
+      "name_string_id": 21964,
       "name_string_ids": [
         {
           "table": "ucdt",
           "id": 2352789148
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "Client locale Global.Text.21964 resolves to 'Sakka'; the Legacy spawn's Npcs.json Id=3385 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other locale-table ids.",
       "zone": "Snowhill",
       "zone_id": 13,
       "zone_reason": null,
@@ -32559,29 +32594,23 @@
       ],
       "services_reason": null,
       "position": [
-        44.658487,
-        30.987,
-        368.718738
+        -295.2761,
+        1.902695,
+        -717.1608
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.676868416297486,
+        0.273978596697935,
         0.0,
-        0.7361040327419306
+        0.9617357893680729
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
       "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 3,
-          "poi_name": "Snowhill",
-          "match_score": 8
-        }
-      ],
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 3 by longest normalized whole-name score 8; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Legacy built-content spawn bound to this existing regional key: matched by the spawn's client name (talk_spawns.py) (R). Coordinates and heading copied from ../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2128; src/Resources/Npcs.json Id=3385 (ModelId=428, ModelFileName=fairy_m_sakka.agr, NameId=21964). Not a captured retail transform, collision proof or native appearance verification.",
       "source": [
         {
           "kind": "client",
@@ -32594,6 +32623,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2128; src/Resources/Npcs.json Id=3385 (ModelId=428, ModelFileName=fairy_m_sakka.agr, NameId=21964)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T695: spawn joined to this existing regional key by the client name its Npcs.json NameId resolves (talk_spawns.py); medium confidence, not a captured actor or native appearance check."
         }
       ],
       "field_sources": {
@@ -32661,12 +32698,8 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 136; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 136; source cell: [client][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2128; src/Resources/Npcs.json Id=3385 (ModelId=428, ModelFileName=fairy_m_sakka.agr, NameId=21964). NameId resolves in client locale to 'Sakka'."
           }
         ],
         "name_string_ids": [
@@ -32681,12 +32714,8 @@
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 136; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 136; source cell: [client][wiki]"
+            "kind": "reconstructed",
+            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other locale-table ids."
           }
         ],
         "zone": [
@@ -32867,18 +32896,18 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=3 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=3 NameId=3961 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2128; src/Resources/Npcs.json Id=3385 (ModelId=428, ModelFileName=fairy_m_sakka.agr, NameId=21964)."
           }
         ],
         "position_reason": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2128; src/Resources/Npcs.json Id=3385 (ModelId=428, ModelFileName=fairy_m_sakka.agr, NameId=21964)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "evidence": "(R) The reason records a client-name join (talk_spawns.py), not a captured transform."
           }
         ],
         "position_w": [
@@ -32889,45 +32918,70 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=3 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=3 NameId=3961 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2128; src/Resources/Npcs.json Id=3385 (ModelId=428, ModelFileName=fairy_m_sakka.agr, NameId=21964)."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2128; src/Resources/Npcs.json Id=3385 (ModelId=428, ModelFileName=fairy_m_sakka.agr, NameId=21964)."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2128; src/Resources/Npcs.json Id=3385 (ModelId=428, ModelFileName=fairy_m_sakka.agr, NameId=21964)."
           }
         ],
         "placement_confidence": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2128; src/Resources/Npcs.json Id=3385 (ModelId=428, ModelFileName=fairy_m_sakka.agr, NameId=21964)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) medium measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) Medium means one unambiguous Legacy spawn matched by client name; not a captured actor or native appearance check."
           }
         ],
         "placement_candidates": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2128; src/Resources/Npcs.json Id=3385 (ModelId=428, ModelFileName=fairy_m_sakka.agr, NameId=21964)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) Empty: the client-name join (talk_spawns.py) found one spawn and no competing POI candidate."
           }
         ],
         "capture_match": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+            "evidence": "(R) Null: no startup AddNpc actor was identity-matched to this regional row; the T695 Legacy spawn is evidence, not a capture."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2128; src/Resources/Npcs.json Id=3385 (ModelId=428, ModelFileName=fairy_m_sakka.agr, NameId=21964)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2128; src/Resources/Npcs.json Id=3385 (ModelId=428, ModelFileName=fairy_m_sakka.agr, NameId=21964)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2128; src/Resources/Npcs.json Id=3385 (ModelId=428, ModelFileName=fairy_m_sakka.agr, NameId=21964)."
           }
         ]
-      }
+      },
+      "heading": 0.555055,
+      "model_id": 428,
+      "model_file_name": "fairy_m_sakka.agr"
     },
     {
       "npc_id": 9500000767,
@@ -34012,14 +34066,14 @@
       ],
       "name": "Shimmer Shinyaxe",
       "name_reason": null,
-      "name_string_id": 3376477222,
+      "name_string_id": 76995,
       "name_string_ids": [
         {
           "table": "ucdt",
           "id": 3376477222
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "Client locale Global.Text.76995 resolves to 'Shimmer Shinyaxe'; the Legacy spawn's Npcs.json Id=3289 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other locale-table ids.",
       "zone": "Snowhill",
       "zone_id": 13,
       "zone_reason": null,
@@ -34144,34 +34198,23 @@
       ],
       "services_reason": null,
       "position": [
-        -448.63,
-        26.369,
-        -9.106
+        -506.4454,
+        10.03743,
+        -34.96611
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.7043449979183415,
+        -0.5940128590689405,
         0.0,
-        0.7098578195014911
+        0.8044555446143329
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 28,
-          "poi_name": "Dartmoor Quarry",
-          "match_score": 15
-        },
-        {
-          "poi_id": 3,
-          "poi_name": "Snowhill",
-          "match_score": 8
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 28 by longest normalized whole-name score 15; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Legacy built-content spawn bound to this existing regional key: matched by the spawn's client name (talk_spawns.py) (R). Coordinates and heading copied from ../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2032; src/Resources/Npcs.json Id=3289 (ModelId=33, ModelFileName=fairy_m_miner_01.adr, NameId=76995). Not a captured retail transform, collision proof or native appearance verification.",
       "source": [
         {
           "kind": "client",
@@ -34184,6 +34227,14 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2032; src/Resources/Npcs.json Id=3289 (ModelId=33, ModelFileName=fairy_m_miner_01.adr, NameId=76995)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T695: spawn joined to this existing regional key by the client name its Npcs.json NameId resolves (talk_spawns.py); medium confidence, not a captured actor or native appearance check."
         }
       ],
       "field_sources": {
@@ -34251,12 +34302,8 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 135; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 135; source cell: [client][wiki]"
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2032; src/Resources/Npcs.json Id=3289 (ModelId=33, ModelFileName=fairy_m_miner_01.adr, NameId=76995). NameId resolves in client locale to 'Shimmer Shinyaxe'."
           }
         ],
         "name_string_ids": [
@@ -34271,12 +34318,8 @@
         ],
         "name_string_id_reason": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 135; source cell: [client][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Snowhill.md#South of town and the outskirts, row 135; source cell: [client][wiki]"
+            "kind": "reconstructed",
+            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other locale-table ids."
           }
         ],
         "zone": [
@@ -34553,18 +34596,18 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=28 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=28 NameId=382819 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2032; src/Resources/Npcs.json Id=3289 (ModelId=33, ModelFileName=fairy_m_miner_01.adr, NameId=76995)."
           }
         ],
         "position_reason": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2032; src/Resources/Npcs.json Id=3289 (ModelId=33, ModelFileName=fairy_m_miner_01.adr, NameId=76995)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "evidence": "(R) The reason records a client-name join (talk_spawns.py), not a captured transform."
           }
         ],
         "position_w": [
@@ -34575,45 +34618,70 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=28 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=28 NameId=382819 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2032; src/Resources/Npcs.json Id=3289 (ModelId=33, ModelFileName=fairy_m_miner_01.adr, NameId=76995)."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2032; src/Resources/Npcs.json Id=3289 (ModelId=33, ModelFileName=fairy_m_miner_01.adr, NameId=76995)."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2032; src/Resources/Npcs.json Id=3289 (ModelId=33, ModelFileName=fairy_m_miner_01.adr, NameId=76995)."
           }
         ],
         "placement_confidence": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2032; src/Resources/Npcs.json Id=3289 (ModelId=33, ModelFileName=fairy_m_miner_01.adr, NameId=76995)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) Medium means one unambiguous Legacy spawn matched by client name; not a captured actor or native appearance check."
           }
         ],
         "placement_candidates": [
           {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2032; src/Resources/Npcs.json Id=3289 (ModelId=33, ModelFileName=fairy_m_miner_01.adr, NameId=76995)."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "evidence": "(R) Empty: the client-name join (talk_spawns.py) found one spawn and no competing POI candidate."
           }
         ],
         "capture_match": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
+            "evidence": "(R) Null: no startup AddNpc actor was identity-matched to this regional row; the T695 Legacy spawn is evidence, not a capture."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2032; src/Resources/Npcs.json Id=3289 (ModelId=33, ModelFileName=fairy_m_miner_01.adr, NameId=76995)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2032; src/Resources/Npcs.json Id=3289 (ModelId=33, ModelFileName=fairy_m_miner_01.adr, NameId=76995)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "../lab/references/FreeRealms-Legacy (9e082025391177d5a33ee18c714ddd06b457a695) src/Scripts/Zone/FabledRealms.lua:2032; src/Resources/Npcs.json Id=3289 (ModelId=33, ModelFileName=fairy_m_miner_01.adr, NameId=76995)."
           }
         ]
-      }
+      },
+      "heading": -1.272076,
+      "model_id": 33,
+      "model_file_name": "fairy_m_miner_01.adr"
     },
     {
       "npc_id": 9500000768,
