@@ -330,8 +330,8 @@ fn pay_field_reward(reward: Option<(u32, u32)>, out: &mut EncounterOutcome) {
         if coins > 0 || job_xp > 0 {
             out.rewards.push(EncounterReward {
                 coins,
-                items: Vec::new(),
                 job_xp,
+                ..Default::default()
             });
         }
     }

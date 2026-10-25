@@ -1271,6 +1271,23 @@
           "name_id": 422909,
           "icon_id": 730
         }
+      ],
+      "drops": [
+        {
+          "item_id": 893,
+          "quantity": 1,
+          "chance": 0.25,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Item definition 893 (lab/reports/native-20261024T0455Z-new/content/item-catalogue.json) carries name locale 2219 'Yeti yarn' and description locale 2224 'Some yarn you found in a yeti's hand after you fought him. You can sell this to a merchant.' (lab/reports/locale-id-to-text.json); lab/references/quest-lines/wiring/drop.json row 2219. Battle 12310's roster is three Yeti actors (name 2245 'Yeti')."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) 25% per win, one yarn, granted only if it fits the bag. No source gives the rate, the yeti that carries it or whether it dropped per kill or per fight; the quest-lines answer for this item is live 'unsure'. Retune or set 0 in data."
+            }
+          ]
+        }
       ]
     },
     {

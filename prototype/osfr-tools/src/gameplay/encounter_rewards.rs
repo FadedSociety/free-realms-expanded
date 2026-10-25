@@ -43,6 +43,13 @@ impl Gameplay {
         if reward.job_xp > 0 {
             self.award_job_xp(reward.job_xp, out)?;
         }
+        // A chance drop lands only if the bag takes it whole; a full bag loses
+        // the drop, never the win's coins, prize or XP (T658).
+        for &drop in &reward.bonus_items {
+            if self.inventory.accepts_reward_bundle(&[drop]) {
+                self.grant_reward(0, &[drop], out)?;
+            }
+        }
         Ok(())
     }
 }

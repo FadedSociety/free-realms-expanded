@@ -20,6 +20,7 @@ use std::{
 };
 
 mod arena;
+mod battle_drops;
 mod combat_scale;
 mod field;
 pub mod field_rewards;
@@ -536,6 +537,9 @@ struct FieldBattle {
     icon_id: i32,
     #[serde(default)]
     prizes: Vec<Prize>,
+    /// Chance items on a win, beside the prize wheel (`battle_drops.rs`).
+    #[serde(default)]
+    drops: Vec<battle_drops::BattleDrop>,
     /// Overhead crossed-swords icon on the spawner: an Images.txt id sent as
     /// AddNpc NameplateImageId (1345 icon_minigame_combat_encounter_start_64;
     /// 11968-11970 the easy/medium/hard variants). Which one the live game
@@ -620,6 +624,8 @@ struct FieldBattleFile {
 pub struct EncounterReward {
     pub coins: u32,
     pub items: Vec<(i32, u32)>,
+    /// Chance drops, granted only if the bag has room; never refuse the rest.
+    pub bonus_items: Vec<(i32, u32)>,
     /// Experience for the active (combat) job: battles level combat jobs.
     pub job_xp: u32,
 }
@@ -1994,7 +2000,7 @@ impl EncounterEngine {
                     // and shown as the loot wheel's landing slot.
                     let prize = (!d.prizes.is_empty())
                         .then(|| d.prizes[(now_ms % d.prizes.len() as u64) as usize].clone());
-                    let (id, instance, objective_id, reward) = (
+                    let (id, instance, objective_id, mut reward) = (
                         d.id,
                         active.instance_id,
                         d.objective_id,
@@ -2010,9 +2016,11 @@ impl EncounterEngine {
                                 .copied()
                                 .chain(prize.iter().map(|p| (p.item_id, p.quantity)))
                                 .collect(),
+                            ..Default::default()
                         },
                     );
                     let repeatable = d.guide.is_none();
+                    reward.bonus_items = self.roll_battle_drops(id);
                     self.state.active.as_mut().unwrap().phase = EncounterPhase::Won;
                     out.win_completed = Some(id);
                     // The cave rewards once; overworld battles every win (R).

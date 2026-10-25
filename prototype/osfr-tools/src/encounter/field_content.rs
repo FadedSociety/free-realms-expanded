@@ -273,6 +273,7 @@ impl EncounterEngine {
             {
                 return Err(invalid("invalid field battle prizes"));
             }
+            battle_drops::validate(&b.drops)?;
             for a in std::iter::once(&b.spawner).chain(&b.enemies) {
                 validate_actor(a)?;
                 if !guids.insert(a.guid) {
