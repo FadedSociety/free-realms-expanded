@@ -15,6 +15,7 @@ use crate::movement::{
     self, Decision as MovementDecision, ExpectedDiscontinuity, MovementState, MovementUpdate,
     SpeedModifiers,
 };
+use crate::style_cards::{FACE_PAINT, HAIR, HEAD, SKIN_TONE};
 use crate::{
     players::PlayerPresentation,
     startup_selfdata::{self, SelfData},
@@ -29,6 +30,7 @@ use std::path::{Component, Path};
 use std::time::{Duration, SystemTime, UNIX_EPOCH};
 
 mod admin_move;
+mod application_preload;
 mod companions;
 mod staff;
 mod startup_stream;
@@ -502,6 +504,9 @@ fn application_handler(body: &[u8]) -> &'static str {
         // T006: family 129 (guilds) is answered by the binary's guild router; naming it here
         // keeps an understood refusal out of the "unknown application message" log.
         (Some(129), _) => "guilds",
+        // T519: the Fotomat portrait request and the quiet portrait upload CRC.
+        (Some(115), _) => "fotomat",
+        (Some(156), Some(2)) => "fotomat",
         // T007: the matchmaking list/stats/join, the empty in-progress list, and the
         // lobby close. Family 101 has a one-byte subtype, so 101/9 is matched on body[2].
         (Some(101), _) if body.get(2) == Some(&9) => "matchmaking",
@@ -570,19 +575,6 @@ fn application_handler(body: &[u8]) -> &'static str {
         | (Some(165), Some(2 | 4 | 5 | 8 | 12 | 14)) => "merchant",
         _ => "gameplay.handle_in_world",
     }
-}
-
-fn quiet_application(body: &[u8]) -> bool {
-    matches!(
-        application_handler(body),
-        "client_metrics"
-            | "client_log"
-            | "ui_telemetry"
-            | "announcements_request"
-            | "client_exit_notice"
-            | "free_interaction"
-            | "profile_notice"
-    )
 }
 
 fn set_trace(
@@ -1069,6 +1061,8 @@ impl Gateway {
                 (appearance.head, appearance.hair, appearance.skin_tone);
             (look.face_paint, look.model_customization) =
                 (appearance.face_paint, appearance.model_customization);
+            look.customization_ids =
+                [HEAD, HAIR, SKIN_TONE, FACE_PAINT].map(|slot| appearance.ids[slot]);
         }
         // Without loaded profiles, self-data keeps the template's job; match it.
         let profile = self
@@ -1634,6 +1628,10 @@ impl Gateway {
                 }
                 Event::Application(inner) => {
                     impulse = None;
+                    if let Some(reply) = self.fotomat_loading_reply(&inner, state.guid, loaded) {
+                        outcome.replies.push(wrapped(&reply));
+                        continue;
+                    }
                     if let Some(game) = gameplay.as_mut() {
                         if !loaded && !(ready && game.accepts_kart_loading_application(&inner)) {
                             set_trace(
@@ -1647,7 +1645,7 @@ impl Gateway {
                             continue;
                         }
                         // W174: these requests are accepted and discarded before gameplay.
-                        if quiet_application(&inner) {
+                        if application_preload::quiet_application(&inner) {
                             outcome.applications.push(inner.clone());
                             continue;
                         }

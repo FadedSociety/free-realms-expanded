@@ -1,6 +1,7 @@
 //! Application-delivery framing for the gateway: one place that wraps an inner packet in
-//! the 5/1 tunnel the client decodes, builds a chat refusal, fans a server notice out, or
-//! filters shared-field packets per recipient.
+//! the 5/1 tunnel the client decodes, builds a chat refusal, fans a server notice out,
+//! filters shared-field packets per recipient, or keeps the public look later AddPc
+//! deliveries use.
 use super::*;
 
 /// Queue one delivery: on the current session, or on the recipient's own session when it is
@@ -19,6 +20,19 @@ pub(super) fn queue_delivery(
         }
     }
     Ok(())
+}
+
+/// (R) Inspect shows only unlocked jobs with ranks and the active job's worn items; no look
+/// (no profiles loaded) means no Inspect entry. The same snapshot feeds AddPc for later viewers.
+pub(super) fn refresh_public_look(world: &mut SharedWorld, guid: u64, gateway: &Gateway) {
+    match gateway.public_look() {
+        Some(look) => {
+            world.public_looks.insert(guid, look);
+        }
+        None => {
+            world.public_looks.remove(&guid);
+        }
+    }
 }
 
 /// The character and whether it was added (true) or removed (false), for the registry's AddPc
@@ -42,6 +56,20 @@ pub(super) fn wrap_application(inner: &[u8]) -> Vec<u8> {
     out.extend_from_slice(&(inner.len() as u32).to_le_bytes());
     out.extend_from_slice(inner);
     out
+}
+
+/// The 156/3 reply to the requesting session, or none when the Fotomat module refuses. The
+/// caller returns these deliveries unchanged; a refusal stores nothing and sends nothing.
+pub(super) fn fotomat_reply(
+    session: &Session,
+    inner: &[u8],
+    world: &SharedWorld,
+) -> Option<Vec<Delivery>> {
+    let reply = osfr_tools::fotomat::request(inner, session.id, &world.players)?;
+    Some(vec![Delivery {
+        recipient: session.id,
+        bytes: wrap_application(&reply),
+    }])
 }
 
 /// T008/F290: one opcode-164 jump body to the sessions whose directed view

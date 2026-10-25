@@ -911,6 +911,14 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     result.push(("ui_telemetry", vec![194, 0, 0xff, 0xff]));
     result.push(("announcements_request", vec![193, 0, 1, 0]));
     result.push(("announcements_request", vec![193, 0, 0xff, 0xff]));
+    // T519: the Fotomat 156/2 request and the top-level 115 portrait upload CRC. The
+    // wildcard 115 family and the 156/2 subtype must each have a source-inventory seed.
+    let mut portrait = vec![156, 0, 2, 0];
+    portrait.extend(u64::MAX.to_le_bytes());
+    portrait.extend(8u32.to_le_bytes());
+    portrait.extend(b"Headshot");
+    result.push(("fotomat", portrait));
+    result.push(("fotomat", vec![115, 0, 0xff, 0xff, 0xff, 0xff]));
     result.push(("unknown", words(0xffff, 0xffff, &[u32::MAX; 2])));
     let mut movement = 125u16.to_le_bytes().to_vec();
     movement.extend(u64::MAX.to_le_bytes());

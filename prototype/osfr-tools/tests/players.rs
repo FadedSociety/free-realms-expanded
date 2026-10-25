@@ -116,6 +116,7 @@ fn oracle_presentation() -> PlayerPresentation {
         skin_tone: "skin".into(),
         face_paint: "paint".into(),
         model_customization: "custom".into(),
+        customization_ids: [0; 4],
         max_movement_speed: 12.5,
         underage: true,
         member: true,

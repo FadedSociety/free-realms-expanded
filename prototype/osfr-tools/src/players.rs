@@ -61,6 +61,10 @@ pub struct PlayerPresentation {
     pub skin_tone: String,
     pub face_paint: String,
     pub model_customization: String,
+    /// Mapping ids of head, hair, skin tone and face paint, in that order: the four ids in the
+    /// 156/3 portrait record (`00bd37e0`). AddPc does not carry them. `fotomat` refuses a
+    /// negative id; no other consumer reads them.
+    pub customization_ids: [i32; 4],
     pub max_movement_speed: f32,
     pub underage: bool,
     pub member: bool,
@@ -101,10 +105,11 @@ impl Default for PlayerPresentation {
             skin_tone: String::new(),
             face_paint: String::new(),
             model_customization: String::new(),
-            max_movement_speed: 10.0, // (R) matches the gateway's reconstructed base speed.
-            underage: false,          // (R) display default only.
-            member: false,            // (R) display default only.
-            referee: false,           // (R) display default; never grants a server role.
+            customization_ids: [0; 4], // (R) no mapping ids until the gateway supplies a look.
+            max_movement_speed: 10.0,  // (R) matches the gateway's reconstructed base speed.
+            underage: false,           // (R) display default only.
+            member: false,             // (R) display default only.
+            referee: false,            // (R) display default; never grants a server role.
             active_profile: 0, // (R) compatibility profile until gateway supplies the active one.
             attachments_wire: vec![0; 4], // (R) no active-profile attachments.
             wield_type: 0,     // (R) no equipped-weapon value supplied.
@@ -261,6 +266,23 @@ impl PlayerRegistry {
                 .get(&viewer)
                 .is_some_and(|view| view.members.contains(owner))
         })
+    }
+
+    /// The presentation `viewer` may see for `character`: its own record, or a character the
+    /// viewer already knows (its directed AddPc). `None` must send no reply and store nothing;
+    /// this is the Fotomat 156/2 visibility rule.
+    pub fn presentation_of(
+        &self,
+        viewer: SessionId,
+        character: u64,
+    ) -> Option<&PlayerPresentation> {
+        let owner = *self.character_owners.get(&character)?;
+        if owner != viewer && !self.knows_character(viewer, character) {
+            return None;
+        }
+        self.sessions
+            .get(&owner)
+            .map(|session| &session.presentation)
     }
 
     pub fn join(

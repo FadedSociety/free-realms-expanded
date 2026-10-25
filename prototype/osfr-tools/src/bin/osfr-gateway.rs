@@ -5,6 +5,7 @@ use osfr_tools::trace;
 use osfr_tools::account_store::AccountStore;
 use osfr_tools::bundle_budget::BundleBudget;
 use osfr_tools::character_store::CharacterState;
+use osfr_tools::fotomat;
 use osfr_tools::game_rules::{GameRuleSet, MembershipState, RulePolicy};
 use osfr_tools::game_store::{load_or_create, save};
 use osfr_tools::gameplay::Gameplay;
@@ -42,7 +43,7 @@ mod ambient;
 mod delivery;
 use delivery::{
     chat_error_delivery, field_packet, field_packets_for, field_recipient_matches, queue_delivery,
-    rider_event, wrap_application,
+    refresh_public_look, rider_event, wrap_application,
 };
 #[path = "osfr_gateway/boombox_routing.rs"]
 mod boombox_routing;
@@ -2132,6 +2133,11 @@ impl Session {
         world: &mut SharedWorld,
         now_ms: u64,
     ) -> Vec<Delivery> {
+        // T519: 156/2 is answered from the target's live presentation; 115 is checked and
+        // dropped. A refusal sends nothing and stores nothing.
+        if fotomat::is_request(inner) || fotomat::is_upload(inner) {
+            return delivery::fotomat_reply(self, inner, world).unwrap_or_default();
+        }
         if inner.starts_with(&[26, 0, 19, 0])
             || inner == [149, 0, 2]
             || (inner.starts_with(&[26, 0, 10, 0]) && self.radial.menu_target().is_some())
@@ -2729,19 +2735,6 @@ fn settle_trades(
         ));
     }
     Ok(deliveries)
-}
-
-/// (R) Inspect shows only unlocked jobs with ranks and the active job's worn
-/// items; no look (no profiles loaded) means no Inspect entry.
-fn refresh_public_look(world: &mut SharedWorld, guid: u64, gateway: &Gateway) {
-    match gateway.public_look() {
-        Some(look) => {
-            world.public_looks.insert(guid, look);
-        }
-        None => {
-            world.public_looks.remove(&guid);
-        }
-    }
 }
 
 fn persist_social_changes(before: &SharedWorld, after: &SharedWorld) -> io::Result<()> {
@@ -4608,3 +4601,9 @@ fn shared_combat_budget_pins_rate_burst_and_session_cap() {
 #[cfg(test)]
 #[path = "osfr_gateway/t006_guild_routing.rs"]
 mod t006_guild_routing;
+
+/// T519: Fotomat 156/2/115 through `Session::route_application` with no sockets. The 156/3
+/// is rebuilt from the target's live presentation and enforced by the directory view.
+#[cfg(test)]
+#[path = "osfr_gateway/fotomat_routing.rs"]
+mod fotomat_routing;
