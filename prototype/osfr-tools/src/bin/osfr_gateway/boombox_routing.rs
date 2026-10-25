@@ -31,7 +31,7 @@ pub(super) fn place(
         return;
     };
     let sends = world.boomboxes.spawn(
-        &row,
+        row,
         owner.character_guid,
         zone,
         at,

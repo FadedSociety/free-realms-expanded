@@ -125,9 +125,10 @@ impl Gameplay {
         Ok(Some(out))
     }
 
-    /// T461: the catalogue row of a boombox definition a press named, for the host to place.
-    pub fn boombox_row(&self, definition: i32) -> Option<crate::boombox::Boombox> {
-        self.item_bar.boombox(definition).cloned()
+    /// T461: the catalogue row of a boombox definition a press named, for the host to place. The
+    /// catalogue's shared pointer, so the host never copies the independent clip tables.
+    pub fn boombox_row(&self, definition: i32) -> Option<std::sync::Arc<crate::boombox::Boombox>> {
+        self.item_bar.boombox(definition)
     }
 }
 
@@ -224,6 +225,22 @@ mod tests {
             placed.boombox,
             Some(TOTEM),
             "no recast was stamped by the refusal"
+        );
+    }
+
+    /// F690: the host's row is the catalogue's shared pointer, not a fresh copy of the clip table.
+    #[test]
+    fn a_boombox_row_lookup_returns_the_shared_catalogue_row() {
+        let reference = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../lab/references/rust-opening-cooking-original-assets");
+        let game = Gameplay::load(&reference, None).unwrap();
+        let first = game
+            .boombox_row(TOTEM)
+            .expect("the bundled catalogue has the totem");
+        let second = game.boombox_row(TOTEM).unwrap();
+        assert!(
+            std::sync::Arc::ptr_eq(&first, &second),
+            "the lookup copied the row instead of handing out the catalogue's pointer"
         );
     }
 }

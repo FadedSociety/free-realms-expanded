@@ -243,9 +243,10 @@ impl ItemBar {
         self.bar.bindings()
     }
 
-    /// The catalogue row of the boombox `definition`, for the host that places the box.
-    pub fn boombox(&self, definition: i32) -> Option<&boombox::Boombox> {
-        self.boomboxes.get(definition)
+    /// The catalogue row of the boombox `definition`, for the host that places the box. The
+    /// catalogue's shared pointer, not a copy: a press must not copy the clip tables.
+    pub fn boombox(&self, definition: i32) -> Option<Arc<boombox::Boombox>> {
+        self.boomboxes.get(definition).cloned()
     }
 
     /// Route one client message. `None` means it is not an item-bar request, or (42/15, 42/16) the

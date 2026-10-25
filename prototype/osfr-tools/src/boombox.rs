@@ -120,7 +120,8 @@ const MIN_STEP_MS: u32 = 1_000;
 pub enum Kind {
     Synchronized,
     Independent,
-    /// Dancers take `transform_model_id`; only this kind has one.
+    /// Dancers take `transform_model_id`; only this kind has one. A transform row has no dance
+    /// data: its `dance_sequence` and `clip_ms` are empty.
     Transform,
 }
 
@@ -149,13 +150,13 @@ pub struct Boombox {
     pub item_id: i32,
     pub model_id: i32,
     pub kind: Kind,
-    /// The synchronized sequence, one animation per step (R: Sanctuary's rows). Empty on an
-    /// `Independent` row, whose only dance ids are its `clips`; the loader refuses a sequence on
-    /// one and requires it on the others.
+    /// The synchronized sequence, one animation per step (R: Sanctuary's rows). Empty unless
+    /// `kind` is `Synchronized`: an `Independent` row's dance ids are its `clips`, and a
+    /// `Transform` row has no dance data. The loader refuses a sequence on either.
     #[serde(default)]
     pub dance_sequence: Vec<i32>,
-    /// Player model id -> one clip length per dance step. Empty for `Independent` boxes, which use
-    /// `clips` instead.
+    /// Player model id -> one clip length per dance step. Empty unless `kind` is `Synchronized`,
+    /// the only kind whose dance uses it.
     pub clip_ms: BTreeMap<i32, Vec<u32>>,
     /// Player model id -> the clips that model may be rolled, in any order (independent rows only;
     /// empty otherwise). A model missing from the map stands on `standing_animation_id`.
@@ -196,13 +197,14 @@ impl Boombox {
     fn valid(&self) -> bool {
         let ms = |v: u32| (1..=MAX_MS).contains(&v);
         let transform = self.kind == Kind::Transform;
+        let synchronized = self.kind == Kind::Synchronized;
         self.item_id > 0
             && self.model_id > 0
-            && (self.kind == Kind::Independent) == self.dance_sequence.is_empty()
+            && synchronized == !self.dance_sequence.is_empty()
             && self.dance_sequence.iter().all(|id| *id > 0)
             && self.song_effect_ids.iter().all(|id| *id > 0)
             && self.standing_animation_id >= 0
-            && (self.kind == Kind::Independent) == self.clip_ms.is_empty()
+            && synchronized == !self.clip_ms.is_empty()
             && self.clip_ms.iter().all(|(model, clips)| {
                 *model > 0
                     && clips.len() == self.dance_sequence.len()
@@ -246,9 +248,10 @@ struct CatalogueFile {
     boomboxes: Vec<Boombox>,
 }
 
-/// Every boombox row, read-only and shared. Nothing about it is saved.
+/// Every boombox row, read-only and shared. Nothing about it is saved. A press hands out the stored
+/// row, so a live box points at the catalogue's clip table instead of copying it.
 #[derive(Clone, Debug, Default, PartialEq)]
-pub struct Catalogue(Vec<Boombox>);
+pub struct Catalogue(Vec<Arc<Boombox>>);
 
 impl Catalogue {
     /// `boomboxes.json` from the content directory; a missing file is an empty catalogue.
@@ -273,10 +276,11 @@ impl Catalogue {
                 return Err(invalid(format!("invalid boombox row {}", row.item_id)));
             }
         }
-        Ok(Self(rows))
+        Ok(Self(rows.into_iter().map(Arc::new).collect()))
     }
 
-    pub fn get(&self, item_id: i32) -> Option<&Boombox> {
+    /// The row for `item_id`, shared: callers clone the pointer, never the row.
+    pub fn get(&self, item_id: i32) -> Option<&Arc<Boombox>> {
         self.0.iter().find(|row| row.item_id == item_id)
     }
 }
@@ -403,25 +407,16 @@ struct Solo {
 /// An independent box's dance: every dancer rolls its own clips on its own clock.
 #[derive(Clone, Debug)]
 struct Independent {
-    /// Player model -> the clips it may play. A model missing here stands. Shared, not copied:
-    /// a live box is cloned with the world on every application message.
-    clips: Arc<BTreeMap<i32, Vec<Clip>>>,
-    blend_ms: u32,
-    range_m: f32,
-    priority: i32,
-    /// The row's `standing_animation_id`: the base 35/8 a model with no table dances.
-    standing: i32,
+    /// The catalogue row the box was pressed from, shared, not copied: a live box is cloned with
+    /// the world on every application message and carries a whole clip table per player model.
+    row: Arc<Boombox>,
     dancing: BTreeMap<SessionId, Solo>,
 }
 
 impl Independent {
-    fn new(row: &Boombox) -> Self {
+    fn new(row: Arc<Boombox>) -> Self {
         Self {
-            clips: Arc::new(row.clips.clone()),
-            blend_ms: row.blend_ms,
-            range_m: row.range_m,
-            priority: row.priority,
-            standing: row.standing_animation_id,
+            row,
             dancing: BTreeMap::new(),
         }
     }
@@ -435,9 +430,10 @@ enum Dance {
 }
 
 impl Dance {
-    fn new(row: &Boombox) -> Option<Self> {
+    /// The dance of a row, sharing the catalogue row rather than copying its tables.
+    fn new(row: Arc<Boombox>) -> Option<Self> {
         match row.kind {
-            Kind::Synchronized => Some(Self::Synchronized(Synchronized::new(row))),
+            Kind::Synchronized => Some(Self::Synchronized(Synchronized::new(&row))),
             Kind::Independent => Some(Self::Independent(Independent::new(row))),
             Kind::Transform => None,
         }
@@ -446,14 +442,14 @@ impl Dance {
     fn priority(&self) -> i32 {
         match self {
             Self::Synchronized(dance) => dance.priority,
-            Self::Independent(dance) => dance.priority,
+            Self::Independent(dance) => dance.row.priority,
         }
     }
 
     fn range_m(&self) -> f32 {
         match self {
             Self::Synchronized(dance) => dance.range_m,
-            Self::Independent(dance) => dance.range_m,
+            Self::Independent(dance) => dance.row.range_m,
         }
     }
 
@@ -615,10 +611,11 @@ impl Default for Boomboxes {
 
 impl Boomboxes {
     /// Put `owner`'s box beside them and show it to everyone in range. A box the owner already
-    /// has is ended first. `at` and `heading` are the owner's pose.
+    /// has is ended first. `at` and `heading` are the owner's pose. `row` is the catalogue's
+    /// shared pointer, so the box never copies its dance table.
     pub fn spawn(
         &mut self,
-        row: &Boombox,
+        row: Arc<Boombox>,
         owner: u64,
         zone: ZoneInstance,
         at: [f32; 3],
@@ -809,11 +806,11 @@ impl Boomboxes {
                             clip: None,
                             ends_ms: 0,
                         };
-                        match dance.clips.get(&model) {
+                        match dance.row.clips.get(&model) {
                             Some(clips) => {
                                 if let Some(clip) = choose(clips, past.unwrap_or(0), rng) {
                                     solo.clip = Some(clip.animation_id);
-                                    solo.ends_ms = clip_ends(now_ms, clip, dance.blend_ms);
+                                    solo.ends_ms = clip_ends(now_ms, clip, dance.row.blend_ms);
                                     // One single-entry 35/63 per viewer: an independent clip is
                                     // not a group step, so it never shares a packet.
                                     for viewer in audience(players, *session, guid, zone) {
@@ -828,7 +825,11 @@ impl Boomboxes {
                             None => {
                                 if past.is_some() || !dance.dancing.contains_key(session) {
                                     for viewer in audience(players, *session, guid, zone) {
-                                        let packet = animation_packet(guid, dance.standing, true);
+                                        let packet = animation_packet(
+                                            guid,
+                                            dance.row.standing_animation_id,
+                                            true,
+                                        );
                                         sends.push((viewer, packet));
                                     }
                                 }
@@ -882,7 +883,7 @@ mod tests {
     fn row(item: i32) -> Boombox {
         let directory = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
         let catalogue = Catalogue::load(&directory).unwrap();
-        catalogue.get(item).unwrap().clone()
+        (**catalogue.get(item).unwrap()).clone()
     }
 
     /// Sessions 1, 2 near the origin and 3 far away, all in `ZONE`.
@@ -929,7 +930,7 @@ mod tests {
     fn a_press_shows_the_box_its_poof_and_song_to_those_in_range_only() {
         let mut live = Boomboxes::default();
         let sends = live.spawn(
-            &row(RAINBOW),
+            Arc::new(row(RAINBOW)),
             600,
             ZONE,
             [0.0, 1.0, 0.0],
@@ -968,8 +969,15 @@ mod tests {
         }
         assert!(to(&sends, 3).is_empty(), "the far session is not shown it");
         // A row with no songs sends no 35/41.
-        let quiet =
-            Boomboxes::default().spawn(&row(TOTEM), 600, ZONE, [0.0; 3], 0.0, 0, &registry());
+        let quiet = Boomboxes::default().spawn(
+            Arc::new(row(TOTEM)),
+            600,
+            ZONE,
+            [0.0; 3],
+            0.0,
+            0,
+            &registry(),
+        );
         assert_eq!(to(&quiet, 1).len(), 2);
     }
 
@@ -978,7 +986,7 @@ mod tests {
         let mut live = Boomboxes::default();
         let players = registry();
         live.spawn(
-            &row(RAINBOW),
+            Arc::new(row(RAINBOW)),
             600,
             ZONE,
             [0.0, 1.0, 0.0],
@@ -1016,7 +1024,15 @@ mod tests {
     fn a_session_in_range_later_is_shown_once_and_one_that_left_is_taken_back() {
         let mut live = Boomboxes::default();
         let mut players = registry();
-        live.spawn(&row(RAINBOW), 600, ZONE, [0.0, 1.0, 0.0], 0.0, 0, &players);
+        live.spawn(
+            Arc::new(row(RAINBOW)),
+            600,
+            ZONE,
+            [0.0, 1.0, 0.0],
+            0.0,
+            0,
+            &players,
+        );
         let guid = GUID_TAG | 1;
         let arrive = |players: &mut PlayerRegistry| {
             players
@@ -1050,8 +1066,24 @@ mod tests {
     fn a_second_box_from_one_owner_replaces_the_first() {
         let mut live = Boomboxes::default();
         let players = registry();
-        live.spawn(&row(RAINBOW), 600, ZONE, [0.0, 1.0, 0.0], 0.0, 0, &players);
-        let sends = live.spawn(&row(TOTEM), 600, ZONE, [0.0, 1.0, 0.0], 0.0, 10, &players);
+        live.spawn(
+            Arc::new(row(RAINBOW)),
+            600,
+            ZONE,
+            [0.0, 1.0, 0.0],
+            0.0,
+            0,
+            &players,
+        );
+        let sends = live.spawn(
+            Arc::new(row(TOTEM)),
+            600,
+            ZONE,
+            [0.0, 1.0, 0.0],
+            0.0,
+            10,
+            &players,
+        );
         assert_eq!(live.live.len(), 1);
         let packets = to(&sends, 1);
         // The old box's stop, poof and removal, then the new box's AddNpc and poof.
@@ -1065,12 +1097,20 @@ mod tests {
         let mut live = Boomboxes::default();
         let players = registry();
         for owner in [1, 2] {
-            live.spawn(&row(TOTEM), owner, ZONE, [0.0; 3], 0.0, 0, &players);
+            live.spawn(
+                Arc::new(row(TOTEM)),
+                owner,
+                ZONE,
+                [0.0; 3],
+                0.0,
+                0,
+                &players,
+            );
         }
         // The counter is about to wrap onto the two live guids (low words 1 and 2).
         live.next = u32::MAX;
-        live.spawn(&row(TOTEM), 3, ZONE, [0.0; 3], 0.0, 0, &players);
-        live.spawn(&row(TOTEM), 4, ZONE, [0.0; 3], 0.0, 0, &players);
+        live.spawn(Arc::new(row(TOTEM)), 3, ZONE, [0.0; 3], 0.0, 0, &players);
+        live.spawn(Arc::new(row(TOTEM)), 4, ZONE, [0.0; 3], 0.0, 0, &players);
         let mut guids: Vec<u64> = live.live.iter().map(|b| b.guid).collect();
         assert_eq!(
             guids.iter().map(|g| *g as u32).collect::<Vec<_>>(),
@@ -1080,6 +1120,21 @@ mod tests {
         guids.sort();
         guids.dedup();
         assert_eq!(guids.len(), 4);
+    }
+
+    #[test]
+    fn a_live_box_points_at_the_pressed_catalogue_row_instead_of_copying_its_table() {
+        let players = registry();
+        let pressed = Arc::new(row(RAINBOW));
+        let mut live = Boomboxes::default();
+        live.spawn(Arc::clone(&pressed), 600, ZONE, [0.0; 3], 0.0, 0, &players);
+        let Some(Dance::Independent(dance)) = &live.live[0].dance else {
+            panic!("the Randomizer dances independently");
+        };
+        assert!(
+            Arc::ptr_eq(&dance.row, &pressed),
+            "the box shares the row's clip table, it does not copy it"
+        );
     }
 
     /// T463: synchronized dances.
@@ -1133,7 +1188,15 @@ mod tests {
 
         /// A press at the origin: the box stands 2 m toward -x.
         fn press(live: &mut Boomboxes, row: &Boombox, owner: u64, now: u64, p: &PlayerRegistry) {
-            live.spawn(row, owner, ZONE, [0.0, 1.0, 0.0], 0.0, now, p);
+            live.spawn(
+                Arc::new(row.clone()),
+                owner,
+                ZONE,
+                [0.0, 1.0, 0.0],
+                0.0,
+                now,
+                p,
+            );
         }
 
         fn ride(guid: u64) -> MountTail {
@@ -1338,7 +1401,7 @@ mod tests {
             live.tick(0, &players);
             // The owner presses again 500 m away: the first box ends under the dancer.
             let again = [500.0, 1.0, 0.0];
-            live.spawn(&row(JINGLE), 600, ZONE, again, 0.0, 100, &players);
+            live.spawn(Arc::new(row(JINGLE)), 600, ZONE, again, 0.0, 100, &players);
             let sends = live.tick(150, &players);
             assert_eq!(idles(&sends, 1), [601]);
             assert!(steps(&sends, 1).is_empty());
@@ -1613,7 +1676,7 @@ mod tests {
                 // The owner presses again 500 m away: the first box ends under both dancers, who
                 // get the idle and no further clip.
                 let again = [500.0, 1.0, 0.0];
-                live.spawn(&row(RAINBOW), 600, ZONE, again, 0.0, 100, &players);
+                live.spawn(Arc::new(row(RAINBOW)), 600, ZONE, again, 0.0, 100, &players);
                 let sends = live.tick(150, &players);
                 assert_eq!(idles(&sends, 1), [601, 602]);
                 assert_eq!(idles(&sends, 2), [601, 602]);
@@ -1629,8 +1692,15 @@ mod tests {
                 let mut live = seeded(11);
                 let mut seen = BTreeSet::new();
                 for n in 0..32 {
-                    let sends =
-                        live.spawn(&rainbow, 600 + n, ZONE, [0.0, 1.0, 0.0], 0.0, n, &players);
+                    let sends = live.spawn(
+                        Arc::new(rainbow.clone()),
+                        600 + n,
+                        ZONE,
+                        [0.0, 1.0, 0.0],
+                        0.0,
+                        n,
+                        &players,
+                    );
                     let song = to(&sends, 1)
                         .into_iter()
                         .find(|p| p.starts_with(&[35, 0, 41, 0]))

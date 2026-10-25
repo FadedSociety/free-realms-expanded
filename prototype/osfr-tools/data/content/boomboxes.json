@@ -47,10 +47,7 @@
       "item_id": 1180,
       "model_id": 1973,
       "kind": "transform",
-      "dance_sequence": [3541],
-      "clip_ms": {
-        "1941": [12667]
-      },
+      "clip_ms": {},
       "blend_ms": 600,
       "song_effect_ids": [],
       "standing_animation_id": 0,
