@@ -60,6 +60,7 @@ struct Season {
     start_day: u8,
     end_month: u8,
     end_day: u8,
+    /// May be empty: a season no client area belongs to still gates events (`is_season_active`).
     area_ids: Vec<i32>,
     source: String,
 }
@@ -119,7 +120,6 @@ impl Content {
                 && names.insert(season.name.as_str())
                 && valid_date(season.start_month, season.start_day)
                 && valid_date(season.end_month, season.end_day)
-                && !season.area_ids.is_empty()
                 && valid_ids(&season.area_ids, Some(switchable))
                 && !season.source.trim().is_empty()
         }) {

@@ -179,6 +179,118 @@ fn world_ready_sends_the_pad_and_the_season_areas_only_in_season() {
     );
 }
 
+/// `(name, (start month, day), (end month, day), area ids)` of every season row in the shipped file.
+fn shipped_seasons() -> Vec<(String, (i64, i64), (i64, i64), Vec<i64>)> {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/client_areas.json");
+    let content: serde_json::Value = serde_json::from_slice(&fs::read(path).unwrap()).unwrap();
+    let number = |row: &serde_json::Value, key: &str| row[key].as_i64().unwrap();
+    let rows = content["seasons"].as_array().unwrap().iter();
+    rows.map(|row| {
+        let ids = row["area_ids"].as_array().unwrap().iter();
+        (
+            row["name"].as_str().unwrap().to_string(),
+            (number(row, "start_month"), number(row, "start_day")),
+            (number(row, "end_month"), number(row, "end_day")),
+            ids.map(|id| id.as_i64().unwrap()).collect(),
+        )
+    })
+    .collect()
+}
+
+/// First and last minute of a season's window in `year`; a window that wraps the year end
+/// (start after end) finishes in the next year.
+fn window(year: i64, start: (i64, i64), end: (i64, i64)) -> (u64, u64) {
+    let wraps = i64::from(start > end);
+    (
+        at(year, start.0, start.1, 0, 0),
+        at(year + wraps, end.0, end.1, 23, 59),
+    )
+}
+
+#[test]
+fn every_shipped_season_is_active_inside_its_window_and_not_outside() {
+    const DAY: u64 = 24 * 60 * 60_000;
+    let areas = shipped();
+    let rows = shipped_seasons();
+    // The seasons the schedule evidence gives (quest-lines/wiring/seasons.json, merged by name).
+    let names: BTreeSet<&str> = rows.iter().map(|row| row.0.as_str()).collect();
+    for name in [
+        "Halloween",
+        "Snow Days",
+        "12 Days of Presents",
+        "Festival of Hearts",
+        "Birthday Bash",
+        "Child's Play Charity Drive",
+        "Summer Camp",
+        "Turkey Dance",
+    ] {
+        assert!(
+            names.contains(name),
+            "{name} is missing from client_areas.json"
+        );
+    }
+    for (name, start, end, _) in rows {
+        let active = |time| areas.is_season_active(&name, time);
+        // 2028 is a leap year, 2026 is not.
+        for year in [2026, 2028] {
+            let (first, last) = window(year, start, end);
+            assert!(
+                last - first < 182 * DAY,
+                "{name} is longer than half a year"
+            );
+            assert!(active(first) && active(last), "{name} {year} edges");
+            assert!(active(first + (last - first) / 2), "{name} {year} middle");
+            assert!(!active(first - 60_000), "{name} {year} the day before");
+            assert!(!active(last + 60_000), "{name} {year} the day after");
+            let opposite = first + (last - first) / 2 + 183 * DAY;
+            assert!(!active(opposite), "{name} {year} half a year later");
+        }
+    }
+}
+
+#[test]
+fn a_season_without_client_areas_gates_by_date_and_switches_nothing() {
+    let rows = shipped_seasons();
+    let quiet: Vec<_> = rows.iter().filter(|row| row.3.is_empty()).collect();
+    assert!(
+        !quiet.is_empty(),
+        "the evidence seasons have no client areas"
+    );
+    for (name, start, end, _) in quiet {
+        let (first, last) = window(2026, *start, *end);
+        let mut areas = shipped();
+        assert!(
+            !areas.is_season_active("Halloween", first),
+            "{name} overlaps Halloween"
+        );
+        // Only the pad is held, in and out of the window.
+        let pad = enables([4173]);
+        assert_eq!(read_all(&areas.world_ready_packets(first)), pad, "{name}");
+        assert_eq!(
+            read_all(&areas.world_ready_packets(last + 60_000)),
+            pad,
+            "{name}"
+        );
+        // Crossing either edge changes no area, so no packet.
+        assert!(areas.season_changes(first - 60_000).is_empty());
+        assert!(areas.season_changes(first).is_empty(), "{name} opens");
+        assert!(
+            areas.season_changes(last + 60_000).is_empty(),
+            "{name} closes"
+        );
+    }
+
+    // The loader takes an empty list too, whatever the shipped rows are.
+    let (_dir, areas) = custom(
+        "quiet",
+        0,
+        serde_json::json!([{"name": "Quiet", "start_month": 3, "start_day": 1, "end_month": 3,
+            "end_day": 2, "area_ids": [], "source": "test"}]),
+    );
+    assert!(areas.is_season_active("Quiet", at(2026, 3, 1, 12, 0)));
+    assert!(areas.world_ready_packets(at(2026, 3, 1, 12, 0)).is_empty());
+}
+
 #[test]
 fn an_event_toggle_reports_elapsed_time_and_unknown_ids_are_refused() {
     let mut areas = shipped();
@@ -340,10 +452,6 @@ fn missing_content_means_no_areas_and_malformed_content_names_the_file() {
         (
             "season id",
             Box::new(|c| c["seasons"][0]["area_ids"] = serde_json::json!([4173])),
-        ),
-        (
-            "empty season",
-            Box::new(|c| c["seasons"][0]["area_ids"] = serde_json::json!([])),
         ),
         (
             "duplicate name",

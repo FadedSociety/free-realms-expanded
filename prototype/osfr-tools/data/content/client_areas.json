@@ -20,6 +20,69 @@
       "end_day": 11,
       "area_ids": [3992, 3993, 3994, 3995, 3996, 3997, 3998, 3999, 4000, 4001, 4002, 4003, 4004],
       "source": "reference Sanctuary 10f129e src/Resources/Zones/FabledRealms.json:28-51 SeasonalClientAreas Halloween; (R) dates, the wiki only says the event ran in October; client FabledRealmsAreas.xml:3156-3195 Halloween_Pixiewood_1-10, Briarwood, Snowhill, StillWater"
+    },
+    {
+      "name": "Snow Days",
+      "start_month": 12,
+      "start_day": 1,
+      "end_month": 1,
+      "end_day": 14,
+      "area_ids": [],
+      "source": "quest-lines/schedules.json svholiday-celebrations (12 rows, same event). (R) Union of the two fully dated runs: Dec 18 2009 to Jan 3 2010 (articles 705, 718) and Dec 1 2013 to Jan 14 2014 (wiki Snow Days); no other year is dated, and the yearly repeat is a judgement. No switchable client area carries this season's name in FabledRealmsAreas.xml (all 138 AreaEnabled=0 rows read), so area_ids is empty and the row only gates events."
+    },
+    {
+      "name": "12 Days of Presents",
+      "start_month": 12,
+      "start_day": 13,
+      "end_month": 12,
+      "end_day": 25,
+      "area_ids": [],
+      "source": "quest-lines/schedules.json sv12-days-of-presents, svbig-present, sv12-days-of-holidays and svsoe-12-days-of-holidays-promotion (12 Days of Holidays is the same event). Daily challenges Dec 13 to Dec 24 2012 (articles 2813, 2827); presents open Dec 25 (locale:441441, 441963). (R) Dec 25 is inside the window for the opening day; 2013 dates rest on the wiki. No switchable client area carries this season's name in FabledRealmsAreas.xml (all 138 AreaEnabled=0 rows read), so area_ids is empty and the row only gates events."
+    },
+    {
+      "name": "Festival of Hearts",
+      "start_month": 2,
+      "start_day": 1,
+      "end_month": 3,
+      "end_day": 31,
+      "area_ids": [],
+      "source": "quest-lines/schedules.json svfestival-of-hearts (9 rows, same event). (R) The wiki gives only the months, February through March in Merry Vale; dated starts are Feb 12 2010 (article 967), Feb 7 2012 and Feb 4 2014 (wiki news), so whole months are used and no end day is sourced. No switchable client area carries this season's name in FabledRealmsAreas.xml (all 138 AreaEnabled=0 rows read), so area_ids is empty and the row only gates events."
+    },
+    {
+      "name": "Birthday Bash",
+      "start_month": 4,
+      "start_day": 28,
+      "end_month": 5,
+      "end_day": 24,
+      "area_ids": [],
+      "source": "quest-lines/schedules.json svbirthday-party-for-free-realms (the 11 Birthday Bash rows, plus Anniversary Birthday Party, Free Realms Birthday, Birthday Party and Anniversary Party, merged as one event). Anniversary Apr 28 or 29 (articles 1267, 2099, 2107); runs ended May 10 2010 (1267), May 18 2011 (2099), May 24 2012 (2580). (R) The start is the anniversary anchor, no article gives a posting day. No switchable client area carries this season's name in FabledRealmsAreas.xml (all 138 AreaEnabled=0 rows read), so area_ids is empty and the row only gates events."
+    },
+    {
+      "name": "Child's Play Charity Drive",
+      "start_month": 12,
+      "start_day": 6,
+      "end_month": 12,
+      "end_day": 31,
+      "area_ids": [],
+      "source": "quest-lines/schedules.json svchild-s-play-charity-drive. Dec 6 to Dec 31 2011 (wiki Snowflake), Dec 21 to Dec 31 2010 (article 1972). (R) The 2009 run's Jan 1 to 17 tail rests on one year and is left out (the other row, svsoe-child-s-play-charity-drive, keeps it). No switchable client area carries this season's name in FabledRealmsAreas.xml (all 138 AreaEnabled=0 rows read), so area_ids is empty and the row only gates events."
+    },
+    {
+      "name": "Summer Camp",
+      "start_month": 6,
+      "start_day": 4,
+      "end_month": 9,
+      "end_day": 6,
+      "area_ids": [],
+      "source": "quest-lines/schedules.json svmerri-s-marinated-mystery-meat (Jun 4 2010, articles 1498, 1502; last event Sep 2-3, article 1780) and svsummer-camp (Jun 7 2010, tentonhammer node/86237; Labor Day Sep 6 2010 computed). (R) Union of both rows; only 2010 is dated and the yearly repeat is a judgement. No switchable client area carries this season's name in FabledRealmsAreas.xml (all 138 AreaEnabled=0 rows read), so area_ids is empty and the row only gates events."
+    },
+    {
+      "name": "Turkey Dance",
+      "start_month": 11,
+      "start_day": 22,
+      "end_month": 11,
+      "end_day": 29,
+      "area_ids": [],
+      "source": "quest-lines/schedules.json svturkey-dance and svbaile-de-pavos-turkey-dance (Thanksgiving Turkey Dance is the same event). Nov 25 and 26 2010 (articles 645, 1918). (R) Thanksgiving Thursday and the Friday after can fall anywhere in Nov 22 to Nov 29, so the window covers every year. No switchable client area carries this season's name in FabledRealmsAreas.xml (all 138 AreaEnabled=0 rows read), so area_ids is empty and the row only gates events."
     }
   ]
 }
