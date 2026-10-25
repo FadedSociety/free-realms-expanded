@@ -252,7 +252,7 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
                         tag["kind"] == "client"
                             || tag["kind"] == "video"
                             || tag["kind"] == "legacy-data"
-                            || tag["kind"] == "reference"
+                            || (tag["kind"] == "reference" && npc["placement"] == "reference_data")
                     }),
                     "NPC {npc_id}: position lacks a client/video/reference source"
                 );

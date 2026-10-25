@@ -13,8 +13,11 @@
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
 
-use npc_quest_chain::{CHARACTER, Fixture, character_at_for, content_dir, npc_interact, read_json};
-use osfr_tools::{startup_world::parse_add_npc, world::NpcVisibility};
+use npc_quest_chain::{
+    CHARACTER, Fixture, TALK_LABEL, character_at_for, content_dir, interact, menu_option,
+    npc_interact, npc_select, read_json,
+};
+use osfr_tools::{startup_world::parse_add_npc, terrain::Terrain, world::NpcVisibility};
 use serde_json::Value;
 use std::{collections::BTreeSet, fs};
 
@@ -74,6 +77,13 @@ fn moved() -> Vec<(Value, Value)> {
             (row, body)
         })
         .collect()
+}
+
+fn lab_root() -> std::path::PathBuf {
+    std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab")
+        .canonicalize()
+        .unwrap()
 }
 
 fn body_position(id: u64) -> [f32; 3] {
@@ -207,11 +217,16 @@ fn gulsh_is_the_cave_seller() {
     assert_eq!(gulsh["zone"], "Sanctuary");
     assert_eq!(body["name"], "Gulsh");
     // His spawn is 20.7 m under the terrain grid: the cave below the Sanctuary bridge.
-    assert!(body["source"].as_array().unwrap().iter().any(|tag| {
-        tag["evidence"]
-            .as_str()
-            .is_some_and(|text| text.contains("ground offset -20.7 m"))
-    }));
+    // Measured on the shipped grid, not read from the extras row's own source text.
+    let [x, y, z] = xyz(&body["position"]);
+    let terrain = Terrain::load(&lab_root().join("terrain")).unwrap();
+    let ground = terrain
+        .height_at(0, x, z)
+        .expect("terrain covers his spawn");
+    assert!(
+        (y - (ground - 20.7)).abs() < 1.0,
+        "Gulsh stands at y {y}, ground {ground}: expected about 20.7 m below"
+    );
 }
 
 #[test]
@@ -232,23 +247,30 @@ fn a_click_works_where_she_stands_and_not_at_her_old_guess() {
         "a player 2 m from her new position gets her menu"
     );
 
-    // The same click from her old position is out of range: nothing is sent or changed.
+    // Her old position is out of range. With her menu open, a far 26/8 and a far 26/10 are
+    // both refused and change nothing: the open menu still answers from beside her.
     let mut game = fixture.game(None);
-    let (state, save) = (game.state(), serde_json::to_vec(&game.state()).unwrap());
+    let menu = interact(&mut game, &near, MAYOR, NOW);
+    let talk = menu_option(&menu, TALK_LABEL);
+    let state = game.state();
     let far = character_at_for(CHARACTER, 0, MAYOR_OLD_POSITION);
-    if let Ok(outcome) = game.handle_in_world(&npc_interact(MAYOR), &far, NOW) {
-        assert!(!outcome.changed);
-        assert!(
-            outcome
-                .replies
-                .iter()
-                .all(|packet| !packet.starts_with(&[26, 0, 9, 0]))
-        );
-    }
-    assert_eq!(game.state(), state);
-    assert_eq!(serde_json::to_vec(&game.state()).unwrap(), save);
+    assert!(
+        game.handle_in_world(&npc_interact(MAYOR), &far, NOW + 1)
+            .is_err()
+    );
+    assert!(
+        game.handle_in_world(&npc_select(MAYOR, talk), &far, NOW + 2)
+            .is_err()
+    );
+    assert_eq!(game.state(), state, "a refused far click changes nothing");
+    assert!(
+        game.handle_in_world(&npc_select(MAYOR, talk), &near, NOW + 3)
+            .is_ok(),
+        "the open menu survived the refused far clicks"
+    );
 }
 
+/// Each session builds its own visibility from the same content: both draw her identically.
 #[test]
 fn two_sessions_both_see_her() {
     let position = body_position(MAYOR);
