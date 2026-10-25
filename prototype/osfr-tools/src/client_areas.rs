@@ -218,13 +218,19 @@ impl ClientAreas {
         self.content.utc_offset_minutes
     }
 
-    /// Unknown season names are never active.
-    pub fn is_season_active(&self, name: &str, unix_ms: u64) -> bool {
+    /// `None` for a season the content does not define.
+    pub fn season_state(&self, name: &str, unix_ms: u64) -> Option<bool> {
         let date = self.month_day(unix_ms);
         self.content
             .seasons
             .iter()
-            .any(|season| season.name == name && season.contains(date))
+            .find(|season| season.name == name)
+            .map(|season| season.contains(date))
+    }
+
+    /// Unknown season names are never active.
+    pub fn is_season_active(&self, name: &str, unix_ms: u64) -> bool {
+        self.season_state(name, unix_ms) == Some(true)
     }
 
     /// Areas held on by always-on rows, the seasons in `seasons`, or an event toggle.

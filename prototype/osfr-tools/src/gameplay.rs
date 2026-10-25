@@ -905,7 +905,7 @@ impl Gameplay {
         let mut npc_visibility = if npc_content.join("npc_spawns_extra.json").is_file()
             && npc_content.join("npcs").is_dir()
         {
-            Some(crate::world::NpcVisibility::load(npc_content)?)
+            Some(crate::world::NpcVisibility::load_in_season(npc_content)?)
         } else {
             None
         };

@@ -68,6 +68,8 @@ struct VisibleNpc {
     position: [f32; 3],
     /// (R) Content yaw the actor faces; `None` when the row carries no transform.
     heading: Option<f32>,
+    /// T491: the client season this prop belongs to; `None` rows show all year.
+    season: Option<String>,
 }
 
 #[derive(Clone, Default)]
@@ -156,6 +158,9 @@ struct ExtraNpc {
     heading: Option<f32>,
     #[serde(default)]
     capture_match: Option<serde_json::Value>,
+    /// T491 (R): a client_areas.json season name; the prop shows only while it is active.
+    #[serde(default)]
+    season: Option<String>,
 }
 
 impl NpcVisibility {
@@ -314,6 +319,7 @@ impl NpcVisibility {
                     name: npc.name,
                     position,
                     heading: heading.filter(|value| value.is_finite()),
+                    season: None,
                 });
         }
         if anchors.is_empty() {
@@ -371,6 +377,7 @@ impl NpcVisibility {
                     name: npc.name,
                     position: npc.position,
                     heading: npc.heading.filter(|value| value.is_finite()),
+                    season: npc.season,
                 });
         }
         let placements = content_dir.join("npc_placements.json");
@@ -383,6 +390,53 @@ impl NpcVisibility {
             npcs.sort_by_key(|npc| npc.spawn.actor_id);
         }
         Ok(result)
+    }
+
+    /// T491: [`Self::load`] for play: the props of a `client_areas.json` season that is not
+    /// active now are dropped. A server that runs across a season end keeps them until a
+    /// restart (R): `realm reload` never re-reads `npc_spawns_extra.json`.
+    pub fn load_in_season(content_dir: &Path) -> io::Result<Self> {
+        Self::load_in_season_at(content_dir, crate::client_areas::unix_now_ms())
+    }
+
+    /// [`Self::load_in_season`] with an explicit clock, so tests pass a fixed instant.
+    pub fn load_in_season_at(content_dir: &Path, unix_ms: u64) -> io::Result<Self> {
+        let areas = crate::client_areas::ClientAreas::load(content_dir)?;
+        let mut result = Self::load(content_dir)?;
+        result.retain_in_season(|season| areas.season_state(season, unix_ms))?;
+        Ok(result)
+    }
+
+    /// Drops the rows of seasons `active` reports as over; `None` means the season is not
+    /// defined, which fails the call (naming the row) and drops nothing. Call it on the freshly
+    /// loaded table: a row a viewer already knows leaves on the next update's 35/3 diff.
+    pub fn retain_in_season(&mut self, active: impl Fn(&str) -> Option<bool>) -> io::Result<()> {
+        let mut over = BTreeSet::new();
+        for npc in self.by_zone.values().flatten() {
+            let Some(season) = npc.season.as_deref() else {
+                continue;
+            };
+            match active(season) {
+                None => {
+                    return Err(invalid(format!(
+                        "NPC spawn {} names season {season:?}, which client_areas.json does not define",
+                        npc.spawn.actor_id
+                    )));
+                }
+                Some(false) => {
+                    over.insert(npc.spawn.actor_id);
+                }
+                Some(true) => {}
+            }
+        }
+        if over.is_empty() {
+            return Ok(());
+        }
+        for npcs in Arc::make_mut(&mut self.by_zone).values_mut() {
+            npcs.retain(|npc| !over.contains(&npc.spawn.actor_id));
+        }
+        self.content_keys.retain(|guid, _| !over.contains(guid));
+        Ok(())
     }
 
     /// Add or replace a placed NPC in the open world. Call [`Self::remove`]
@@ -415,6 +469,7 @@ impl NpcVisibility {
             name: placement.name.clone(),
             position: p,
             heading: Some(placement.heading).filter(|value| value.is_finite()),
+            season: None,
         });
         npcs.sort_by_key(|npc| npc.spawn.actor_id);
         self.placed.insert(placement.guid);
@@ -493,6 +548,7 @@ impl NpcVisibility {
             position,
             // (R) Battle spawners carry no content yaw; keep the approach rule.
             heading: None,
+            season: None,
         });
         npcs.sort_by_key(|npc| npc.spawn.actor_id);
     }
