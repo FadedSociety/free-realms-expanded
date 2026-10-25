@@ -3,35 +3,29 @@
 //!
 //! `lab/fleet/quests/talk_spawns.py` joins a regional NPC row to a FreeRealms-Legacy /
 //! Sanctuary-main spawn by the client name the spawn's `Npcs.json` NameId resolves. The
-//! rows this brief places record that join in `position_reason` and are `legacy_data`,
-//! the only placement `world.rs` draws from `npcs/*.json`. They are sent as the ordinary
+//! rows this brief places (`PLACED`, by id) are `legacy_data` / `legacy_data_spawn`, the
+//! only placement `world.rs` draws from `npcs/*.json`. They are sent as the ordinary
 //! 35/2 AddNpc body: u64 actor, i32 name id, i32 model id, then the transform (client
 //! reader `0x00921a10`). No new wire shape.
 
-use osfr_tools::{
-    startup_world::{NpcSpawn, parse_add_npc},
-    world::NpcVisibility,
-};
+#[path = "support/npc_quest_chain.rs"]
+mod npc_quest_chain;
+
+use npc_quest_chain::{content_dir, read_json, seen_from};
+use osfr_tools::{startup_world::NpcSpawn, world::NpcVisibility};
 use serde_json::Value;
-use std::{
-    fs,
-    path::{Path, PathBuf},
-};
+use std::{collections::BTreeSet, fs, path::Path};
 
-/// (R) The join marker this brief's rows carry; the data decides which ids they are.
-const SPAWN_MATCH: &str = "matched by the spawn's client name (talk_spawns.py)";
-const OPEN_WORLD_ZONE: u32 = 0;
-
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(
-        &fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
-    )
-    .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-}
-
-fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
+/// The six rows this brief placed, by npc_id (R: the data decides the spawn; the ids are
+/// the brief's list, so a copy edit can never silently drop one from the check).
+const PLACED: [u64; 6] = [
+    9_000_000_020,
+    9_500_000_729,
+    9_000_000_069,
+    9_000_000_115,
+    9_500_000_766,
+    9_000_000_201,
+];
 
 fn rows(path: &Path) -> Vec<Value> {
     read_json(path)["records"]
@@ -45,15 +39,19 @@ fn position(row: &Value) -> [f32; 3] {
         .unwrap_or_else(|error| panic!("NPC {}: position: {error}", row["npc_id"]))
 }
 
-/// The rows this brief placed: `legacy_data` at a reference spawn, marked with the join.
+/// The brief's rows: all six exist, are `legacy_data` and come from the Legacy spawn table.
 fn placed_rows() -> Vec<Value> {
-    rows(&content_dir().join("npcs/snowhill.json"))
-        .into_iter()
-        .filter(|row| {
-            row["placement"] == "legacy_data"
-                && row["position_reason"]
-                    .as_str()
-                    .is_some_and(|reason| reason.contains(SPAWN_MATCH))
+    let all = rows(&content_dir().join("npcs/snowhill.json"));
+    PLACED
+        .iter()
+        .map(|id| {
+            let row = all
+                .iter()
+                .find(|row| row["npc_id"].as_u64() == Some(*id))
+                .unwrap_or_else(|| panic!("{id}: no Snowhill row"));
+            assert_eq!(row["placement"], "legacy_data", "{id}: placement");
+            assert_eq!(row["placement_source"], "legacy_data_spawn", "{id}: source");
+            row.clone()
         })
         .collect()
 }
@@ -66,24 +64,9 @@ fn distance(left: [f32; 3], right: [f32; 3]) -> f64 {
         .sqrt()
 }
 
-/// A fresh view from `position`: every actor the visibility sends, by AddNpc body.
-fn seen_from(base: &NpcVisibility, position: [f32; 3]) -> Vec<NpcSpawn> {
-    base.clone()
-        .update(OPEN_WORLD_ZONE, position)
-        .unwrap()
-        .iter()
-        .filter(|packet| packet.starts_with(&[35, 0, 2, 0]))
-        .map(|packet| parse_add_npc(packet).unwrap())
-        .collect()
-}
-
 #[test]
 fn every_row_this_brief_placed_is_drawn_at_its_spawn_position() {
     let placed = placed_rows();
-    assert!(
-        !placed.is_empty(),
-        "no Snowhill row records the talk_spawns spawn join"
-    );
     let base = NpcVisibility::load(&content_dir()).unwrap();
     for row in &placed {
         let id = row["npc_id"].as_u64().unwrap();
@@ -123,30 +106,45 @@ fn every_row_this_brief_placed_is_drawn_at_its_spawn_position() {
     }
 }
 
+/// Every NPC the client sees: `legacy_data` regional rows (actor = npc_id) and the extras
+/// bodies that carry a regional row's `content_key` (actor = spawn_guid). Scenery extras
+/// without a regional row legitimately overlap, so they stay out of the scan.
 #[test]
 fn drawn_npc_rows_do_not_share_a_position() {
-    let mut drawn = Vec::new();
+    let mut drawn: Vec<(String, u64, [f32; 3])> = Vec::new();
+    let mut regional_ids = BTreeSet::new();
     for entry in fs::read_dir(content_dir().join("npcs")).unwrap() {
         let path = entry.unwrap().path();
         if path.extension().and_then(|ext| ext.to_str()) != Some("json") {
             continue;
         }
         for row in rows(&path) {
-            if row["placement"] != "legacy_data" {
-                continue;
-            }
             let id = row["npc_id"].as_u64().unwrap();
-            let owner = format!("{} ({id})", path.display());
-            drawn.push((owner, id, position(&row)));
+            regional_ids.insert(id);
+            if row["placement"] == "legacy_data" {
+                drawn.push((format!("{} ({id})", path.display()), id, position(&row)));
+            }
         }
     }
-    for row in placed_rows() {
-        let id = row["npc_id"].as_u64().unwrap();
+    for body in rows(&content_dir().join("npc_spawns_extra.json")) {
+        let drawable = body["capture_match"].is_null() && body["content_key"].as_u64() != Some(0);
+        if drawable
+            && body["content_key"]
+                .as_u64()
+                .is_some_and(|key| regional_ids.contains(&key))
+        {
+            let guid = body["spawn_guid"].as_u64().unwrap();
+            drawn.push((format!("extras body {guid}"), guid, position(&body)));
+        }
+    }
+    for id in PLACED {
         assert!(
             drawn.iter().any(|(_, drawn_id, _)| *drawn_id == id),
             "{id}: the placement scan must include this brief's row"
         );
     }
+    let actors: BTreeSet<_> = drawn.iter().map(|(_, id, _)| *id).collect();
+    assert_eq!(actors.len(), drawn.len(), "an actor id is drawn twice");
     for (index, (left_owner, _, left)) in drawn.iter().enumerate() {
         for (right_owner, _, right) in &drawn[index + 1..] {
             let gap = distance(*left, *right);

@@ -1679,7 +1679,7 @@
           "id": 3958155406
         }
       ],
-      "name_string_id_reason": "Client locale Global.Text.294 resolves to 'Baron von Darkcheat'; the Legacy spawn's Npcs.json Id=3579 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other locale-table ids.",
+      "name_string_id_reason": "Client locale Global.Text.294 resolves to 'Baron von Darkcheat'; the Legacy spawn's Npcs.json Id=3579 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other ucdt ids.",
       "zone": "Snowhill",
       "zone_id": 13,
       "zone_reason": null,
@@ -1879,7 +1879,7 @@
         "name_string_id_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other locale-table ids."
+            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other ucdt ids."
           }
         ],
         "zone": [
@@ -4184,7 +4184,7 @@
           "id": 4155617834
         }
       ],
-      "name_string_id_reason": "Client locale Global.Text.201 resolves to 'Bruce'; the Legacy spawn's Npcs.json Id=3549 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other locale-table ids.",
+      "name_string_id_reason": "Client locale Global.Text.201 resolves to 'Bruce'; the Legacy spawn's Npcs.json Id=3549 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other ucdt ids.",
       "zone": "Snowhill",
       "zone_id": 13,
       "zone_reason": null,
@@ -4337,7 +4337,7 @@
         "name_string_id_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other locale-table ids."
+            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other ucdt ids."
           }
         ],
         "zone": [
@@ -10421,7 +10421,7 @@
           "id": 3429375594
         }
       ],
-      "name_string_id_reason": "Client locale Global.Text.77270 resolves to 'Derp Axemaker'; the Legacy spawn's Npcs.json Id=3286 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other locale-table ids.",
+      "name_string_id_reason": "Client locale Global.Text.77270 resolves to 'Derp Axemaker'; the Legacy spawn's Npcs.json Id=3286 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other ucdt ids.",
       "zone": "Snowhill",
       "zone_id": 13,
       "zone_reason": null,
@@ -11008,7 +11008,7 @@
         "name_string_id_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other locale-table ids."
+            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other ucdt ids."
           }
         ],
         "zone": [
@@ -20073,7 +20073,7 @@
           "id": 3295904826
         }
       ],
-      "name_string_id_reason": "Client locale Global.Text.22808 resolves to 'Jeni Shortfuse'; the Legacy spawn's Npcs.json Id=3698 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other locale-table ids.",
+      "name_string_id_reason": "Client locale Global.Text.22808 resolves to 'Jeni Shortfuse'; the Legacy spawn's Npcs.json Id=3698 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other ucdt ids.",
       "zone": "Snowhill",
       "zone_id": 13,
       "zone_reason": null,
@@ -20301,7 +20301,7 @@
         "name_string_id_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other locale-table ids."
+            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other ucdt ids."
           }
         ],
         "zone": [
@@ -32562,7 +32562,7 @@
           "id": 2352789148
         }
       ],
-      "name_string_id_reason": "Client locale Global.Text.21964 resolves to 'Sakka'; the Legacy spawn's Npcs.json Id=3385 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other locale-table ids.",
+      "name_string_id_reason": "Client locale Global.Text.21964 resolves to 'Sakka'; the Legacy spawn's Npcs.json Id=3385 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other ucdt ids.",
       "zone": "Snowhill",
       "zone_id": 13,
       "zone_reason": null,
@@ -32715,7 +32715,7 @@
         "name_string_id_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other locale-table ids."
+            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other ucdt ids."
           }
         ],
         "zone": [
@@ -34073,7 +34073,7 @@
           "id": 3376477222
         }
       ],
-      "name_string_id_reason": "Client locale Global.Text.76995 resolves to 'Shimmer Shinyaxe'; the Legacy spawn's Npcs.json Id=3289 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other locale-table ids.",
+      "name_string_id_reason": "Client locale Global.Text.76995 resolves to 'Shimmer Shinyaxe'; the Legacy spawn's Npcs.json Id=3289 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's other ucdt ids.",
       "zone": "Snowhill",
       "zone_id": 13,
       "zone_reason": null,
@@ -34319,7 +34319,7 @@
         "name_string_id_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other locale-table ids."
+            "evidence": "(R) T695: the primary name id is the Legacy spawn's Npcs.json NameId; name_string_ids keeps the guide's other ucdt ids."
           }
         ],
         "zone": [

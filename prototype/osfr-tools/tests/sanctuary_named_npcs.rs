@@ -15,7 +15,7 @@ mod npc_quest_chain;
 
 use npc_quest_chain::{
     CHARACTER, Fixture, TALK_LABEL, character_at_for, content_dir, interact, menu_option,
-    npc_interact, npc_select, read_json,
+    npc_interact, npc_select, read_json, seen_from,
 };
 use osfr_tools::{startup_world::parse_add_npc, terrain::Terrain, world::NpcVisibility};
 use serde_json::Value;
@@ -92,17 +92,6 @@ fn body_position(id: u64) -> [f32; 3] {
         .find(|row| row["content_key"].as_u64() == Some(id))
         .map(|row| xyz(&row["position"]))
         .unwrap()
-}
-
-/// A fresh player view: every actor the visibility sends for `position`, by actor id.
-fn seen_from(base: &NpcVisibility, position: [f32; 3]) -> Vec<osfr_tools::startup_world::NpcSpawn> {
-    base.clone()
-        .update(0, position)
-        .unwrap()
-        .iter()
-        .filter(|packet| packet.starts_with(&[35, 0, 2, 0]))
-        .map(|packet| parse_add_npc(packet).unwrap())
-        .collect()
 }
 
 #[test]
