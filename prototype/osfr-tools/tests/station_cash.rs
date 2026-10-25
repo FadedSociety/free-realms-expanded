@@ -888,11 +888,11 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     );
     // 52 rides plus the 9 lot deeds L046 lists, plus T452's 29 listed OSFR-parity rides (6 more
     // are earn-only), plus the 55 items T634 priced from the wiki, plus the 663 Station Cash only
-    // items T638 moved from their Legacy coin price.
+    // items T638 moved from their Legacy coin price, plus the 4 boomboxes T495 priced.
     assert_eq!(
         decoded.len(),
-        808,
-        "the shipped listed ride, deed and wiki item count"
+        812,
+        "the shipped listed ride, deed, wiki item and boombox count"
     );
     assert!(
         store.len() < osfr_tools::soe::MAX_LOGICAL_MESSAGE / 2,
@@ -940,24 +940,38 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     // portal tile (`ClientStorePortalCategories.txt`, name 27547) all open category 139.
     const RIDES: u32 = 139;
     assert_eq!(names.get(&RIDES), Some(&27_547), "the Rides category node");
-    let under_rides = |mut category: u32| loop {
-        if category == RIDES {
-            return true;
-        }
-        match parents.get(&category) {
-            Some(&parent) if parent != 0 => category = parent,
-            _ => return false,
-        }
+    // T495: the Boombox category, from Legacy `StoreBundleCategories.json` (id 89, name 151365).
+    const BOOMBOX: u32 = 89;
+    assert_eq!(
+        names.get(&BOOMBOX),
+        Some(&151_365),
+        "the Boombox category node"
+    );
+    assert_eq!(
+        parents.get(&BOOMBOX),
+        Some(&0),
+        "Boombox is top level, like Rides"
+    );
+    let listed_under = |selected: u32| -> BTreeMap<u32, u32> {
+        let under = |mut category: u32| loop {
+            if category == selected {
+                return true;
+            }
+            match parents.get(&category) {
+                Some(&parent) if parent != 0 => category = parent,
+                _ => return false,
+            }
+        };
+        decoded
+            .iter()
+            .filter(|(_, (_, group))| {
+                categories_of
+                    .get(group)
+                    .is_some_and(|ids| ids.iter().any(|id| under(*id)))
+            })
+            .map(|(key, (price, _))| (*key, *price))
+            .collect()
     };
-    let listed: BTreeMap<u32, u32> = decoded
-        .iter()
-        .filter(|(_, (_, group))| {
-            categories_of
-                .get(group)
-                .is_some_and(|ids| ids.iter().any(|id| under_rides(*id)))
-        })
-        .map(|(key, (price, _))| (*key, *price))
-        .collect();
 
     let stores: Value =
         serde_json::from_slice(&std::fs::read(stores()).expect("stores.json reads"))
@@ -965,22 +979,42 @@ fn world_entry_store_rows_are_the_shipped_rides_at_their_scaled_prices() {
     let scale = stores["station_cash"]["sc_price_scale"]
         .as_f64()
         .expect("scale");
-    let expected: BTreeMap<u32, u32> = stores["items"]
-        .as_array()
-        .expect("store rows")
-        .iter()
-        .filter(|row| row["earn_only"].as_bool() != Some(true))
-        .filter_map(|row| {
-            let price = row["sc_price"].as_u64()?;
-            Some((
-                u32::try_from(row["item_id"].as_i64()?).ok()?,
-                (price as f64 * scale).round() as u32,
-            ))
-        })
-        .collect();
+    let expected = |boombox: bool| -> BTreeMap<u32, u32> {
+        stores["items"]
+            .as_array()
+            .expect("store rows")
+            .iter()
+            .filter(|row| row["earn_only"].as_bool() != Some(true))
+            .filter(|row| (row["boombox"].as_bool() == Some(true)) == boombox)
+            .filter_map(|row| {
+                let price = row["sc_price"].as_u64()?;
+                Some((
+                    u32::try_from(row["item_id"].as_i64()?).ok()?,
+                    (price as f64 * scale).round() as u32,
+                ))
+            })
+            .collect()
+    };
+    let rides = listed_under(RIDES);
     assert_eq!(
-        listed, expected,
-        "Rides lists exactly the shipped non-earn-only rides at their SC prices"
+        rides,
+        expected(false),
+        "Rides lists exactly the shipped non-earn-only, non-boombox rows at their SC prices"
+    );
+    let boomboxes = listed_under(BOOMBOX);
+    assert_eq!(
+        boomboxes,
+        expected(true),
+        "Boombox lists exactly the tagged boomboxes at their SC prices"
+    );
+    assert_eq!(
+        boomboxes.len(),
+        11,
+        "the wiki-documented Marketplace boomboxes"
+    );
+    assert!(
+        boomboxes.keys().all(|id| !rides.contains_key(id)),
+        "no boombox is listed under Rides"
     );
 }
 
@@ -1093,7 +1127,7 @@ fn store_packet_matches_the_client_reader_field_for_field() {
         // StoreBundleDefinition tail (`00b3fa00`): StoreId, CategoryGroupId, visible, then eight
         // u32 and three bytes.
         assert_eq!(reader.u32(), config.store_id);
-        assert_eq!(reader.u32(), config.category_group_id);
+        assert_eq!(reader.u32(), listing.group, "bundle category group");
         reader.u8();
         reader.u32();
         reader.u32();
@@ -1134,8 +1168,24 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     let packets = station_cash::catalogue_packets(shop.sc_catalogue());
     let config = shop.sc_catalogue().config();
     let listings = shop.sc_catalogue().listings();
+    // T495: Rides, then the Boombox shelf; each is a category, its own group and a bundle count.
+    let boombox = config
+        .boombox_shelf
+        .expect("the shipped content has a Boombox shelf");
+    let shelves = [
+        (
+            config.category_id,
+            config.category_name_id,
+            config.category_group_id,
+        ),
+        (
+            boombox.category_id,
+            boombox.category_name_id,
+            boombox.category_group_id,
+        ),
+    ];
 
-    // 66/7: one counted category node, then the sorted byte.
+    // 66/7: counted category nodes, then the sorted byte.
     let tree = packets
         .iter()
         .find(|packet| packet.starts_with(&[66, 0, 7, 0]))
@@ -1143,19 +1193,25 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     let mut reader = Reader { bytes: tree, at: 0 };
     assert_eq!(reader.u16(), 66);
     assert_eq!(reader.u16(), 7);
-    assert_eq!(reader.u32(), 1, "one category");
-    assert_eq!(reader.u32(), config.category_id, "category map key");
-    assert_eq!(reader.u32(), config.category_id, "category id");
-    assert_eq!(reader.u32(), config.category_name_id, "category name id");
-    reader.string();
-    reader.string();
-    assert_eq!(reader.u32(), 0, "parent id");
-    assert_eq!(reader.u32() as usize, listings.len(), "category count");
-    assert_eq!(reader.u32(), 1, "display order");
+    assert_eq!(reader.u32(), 2, "two categories");
+    for (order, (category, name, group)) in shelves.iter().enumerate() {
+        assert_eq!(reader.u32(), *category, "category map key");
+        assert_eq!(reader.u32(), *category, "category id");
+        assert_eq!(reader.u32(), *name, "category name id");
+        reader.string();
+        reader.string();
+        assert_eq!(reader.u32(), 0, "parent id");
+        assert_eq!(
+            reader.u32() as usize,
+            listings.iter().filter(|l| l.group == *group).count(),
+            "category count"
+        );
+        assert_eq!(reader.u32(), order as u32 + 1, "display order");
+    }
     assert_eq!(reader.u8(), 1, "sorted");
     assert_eq!(reader.at, tree.len(), "66/7 trailing bytes");
 
-    // 66/6: one counted group with one category id.
+    // 66/6: one counted group per shelf, each with its one category id.
     let groups = packets
         .iter()
         .find(|packet| packet.starts_with(&[66, 0, 6, 0]))
@@ -1166,11 +1222,13 @@ fn catalogue_navigation_packets_match_the_client_readers() {
     };
     assert_eq!(reader.u16(), 66);
     assert_eq!(reader.u16(), 6);
-    assert_eq!(reader.u32(), 1, "one category group");
-    assert_eq!(reader.u32(), config.category_group_id, "group map key");
-    assert_eq!(reader.u32(), config.category_group_id, "group id");
-    assert_eq!(reader.u32(), 1, "one category id");
-    assert_eq!(reader.u32(), config.category_id);
+    assert_eq!(reader.u32(), 2, "two category groups");
+    for (category, _, group) in shelves {
+        assert_eq!(reader.u32(), group, "group map key");
+        assert_eq!(reader.u32(), group, "group id");
+        assert_eq!(reader.u32(), 1, "one category id");
+        assert_eq!(reader.u32(), category);
+    }
     assert_eq!(reader.at, groups.len(), "66/6 trailing bytes");
 
     // 66/9: one counted bundle group; each entry is the map key, the entry's own bundle id and
@@ -1201,4 +1259,240 @@ fn catalogue_navigation_packets_match_the_client_readers() {
         assert_eq!(reader.u32(), index as u32 + 1, "entry display order");
     }
     assert_eq!(reader.at, bundle_groups.len(), "66/9 trailing bytes");
+}
+
+/// T495: Realms Roll (wiki 1000 SC, 250 listed) is a boombox the Marketplace sells. The
+/// reward-only boomboxes (TCG and Mystery Chest prizes) have no Marketplace price on the wiki.
+const REALMS_ROLL: i32 = 1_180;
+const REWARD_ONLY_BOOMBOXES: [i32; 4] = [8_185, 35_759, 56_774, 69_825];
+
+fn buy_item(tracking: u32, item: i32) -> Vec<u8> {
+    order_packet(3, tracking, item as u32, STORE, 1, "", "", "", "0")
+}
+
+/// T495 gate 2: one order grants exactly one boombox and debits once; a replay grants nothing.
+#[test]
+fn a_boombox_order_debits_once_and_grants_one_and_a_replay_grants_nothing() {
+    let mut shop = new_shop(wallet(1_000), usize::MAX);
+    let listing = *shop
+        .sc_catalogue()
+        .listing(REALMS_ROLL as u32)
+        .expect("Realms Roll is listed");
+    let shelf = shop.sc_catalogue().config().boombox_shelf.expect("shelf");
+    assert_eq!(
+        listing.group, shelf.category_group_id,
+        "listed under Boombox"
+    );
+    let before = snapshot(&shop);
+    let packet = buy_item(301, REALMS_ROLL);
+    let outcome = shop.handle(&packet).expect("order parses");
+    assert_eq!(outcome.result_code, station_cash::ORDER_SUCCESS);
+    assert!(outcome.changed);
+    assert_eq!(shop.sc_wallet().balance, 1_000 - listing.price);
+    assert_eq!(
+        count_definition(shop.inventory().state(), REALMS_ROLL),
+        count_definition(&before.0, REALMS_ROLL) + 1,
+        "exactly one boombox"
+    );
+    assert_eq!(shop.inventory().state().coins, before.0.coins);
+    assert_eq!(shop.sc_wallet().orders.len(), 1);
+    let once = snapshot(&shop);
+
+    let replay = shop.handle(&packet).expect("replay parses");
+    assert_eq!(replay.result_code, station_cash::ORDER_SUCCESS);
+    assert!(!replay.changed);
+    assert_eq!(
+        snapshot(&shop),
+        once,
+        "a replayed order grants and debits nothing"
+    );
+
+    // F656: only rides are single-copy. No client item definition marks a boombox unique
+    // (the Realms Roll row has MaxStackSize 1 and no unique flag), so a second order with a fresh tracking id is a second
+    // sale: one more debit, one more boombox.
+    let second = shop
+        .handle(&buy_item(302, REALMS_ROLL))
+        .expect("order parses");
+    assert_eq!(second.result_code, station_cash::ORDER_SUCCESS);
+    assert!(second.changed);
+    assert_eq!(shop.sc_wallet().balance, 1_000 - 2 * listing.price);
+    assert_eq!(
+        count_definition(shop.inventory().state(), REALMS_ROLL),
+        count_definition(&before.0, REALMS_ROLL) + 2,
+        "a second copy"
+    );
+}
+
+/// T495: a refused boombox order changes nothing, and a boombox the wiki does not sell for
+/// Station Cash is not a listing.
+#[test]
+fn boombox_refusals_change_nothing() {
+    let price = new_shop(wallet(0), usize::MAX)
+        .sc_catalogue()
+        .listing(REALMS_ROLL as u32)
+        .expect("listed")
+        .price;
+    let mut cases = vec![
+        (
+            "insufficient",
+            price - 1,
+            usize::MAX,
+            REALMS_ROLL,
+            station_cash::ORDER_INSUFFICIENT_SC,
+        ),
+        (
+            "full bag",
+            1_000,
+            0,
+            REALMS_ROLL,
+            station_cash::ORDER_FAILURE,
+        ),
+    ];
+    for item in REWARD_ONLY_BOOMBOXES {
+        cases.push((
+            "reward only",
+            1_000,
+            usize::MAX,
+            item,
+            station_cash::ORDER_FAILURE,
+        ));
+    }
+    for (label, balance, capacity, item, result) in cases {
+        let mut shop = new_shop(wallet(balance), capacity);
+        let before = snapshot(&shop);
+        let outcome = shop.handle(&buy_item(310, item)).expect("order parses");
+        assert_eq!(outcome.result_code, result, "{label} {item}");
+        assert!(!outcome.changed, "{label} {item}");
+        assert_eq!(snapshot(&shop), before, "{label} {item}");
+    }
+    let shop = new_shop(wallet(0), usize::MAX);
+    for item in REWARD_ONLY_BOOMBOXES {
+        assert!(
+            shop.sc_catalogue().listing(item as u32).is_none(),
+            "{item} is not sold"
+        );
+    }
+}
+
+/// Build a shop from the shipped `stores.json` after `edit`; the edited copy lives in `%TEMP%`.
+fn shop_after(name: &str, edit: impl FnOnce(&mut Value)) -> std::io::Result<CoinShop> {
+    let mut stores: Value =
+        serde_json::from_slice(&std::fs::read(stores()).expect("stores.json reads"))
+            .expect("stores.json parses");
+    edit(&mut stores);
+    let directory = std::env::temp_dir().join("op-T495").join(name);
+    std::fs::create_dir_all(&directory).expect("temp directory");
+    let path = directory.join("stores.json");
+    std::fs::write(&path, serde_json::to_vec(&stores).expect("serializes")).expect("writes");
+    let loaded = StoreCatalogue::load(&path);
+    std::fs::remove_dir_all(&directory).expect("cleans up");
+    let content = inventory_content();
+    let inventory = Inventory::load(&content, None).expect("item content loads");
+    CoinShop::new(
+        &content,
+        inventory,
+        loaded?,
+        usize::MAX,
+        None,
+        Wallet::default(),
+    )
+}
+
+fn row_mut(stores: &mut Value, item: i32) -> &mut Value {
+    stores["items"]
+        .as_array_mut()
+        .expect("rows")
+        .iter_mut()
+        .find(|row| row["item_id"] == item)
+        .expect("row")
+}
+
+/// T495: bad boombox content is refused when the shop loads, never at purchase.
+#[test]
+fn bad_boombox_content_is_refused_at_load() {
+    shop_after("good", |_| {}).expect("the shipped content loads");
+    type Edit = Box<dyn FnOnce(&mut Value)>;
+    let refused: [(&str, Edit); 4] = [
+        (
+            "no-shelf",
+            Box::new(|s| s["station_cash"]["boombox_shelf"] = Value::Null),
+        ),
+        (
+            "same-group",
+            Box::new(|s| s["station_cash"]["boombox_shelf"]["category_group_id"] = 1.into()),
+        ),
+        (
+            "overflow",
+            Box::new(|s| row_mut(s, REALMS_ROLL)["sc_price"] = 500_000.into()),
+        ),
+        (
+            "unpriced-tag",
+            Box::new(|s| row_mut(s, REWARD_ONLY_BOOMBOXES[0])["boombox"] = true.into()),
+        ),
+    ];
+    for (name, edit) in refused {
+        assert!(
+            shop_after(name, edit).is_err(),
+            "{name} must be refused at load"
+        );
+    }
+}
+
+/// T495: every boombox the store tags is a catalogued client boombox (`boomboxes.json`), none is
+/// a reward-only box, and a wiki-priced row's number is on the cited wiki page revision.
+#[test]
+fn boombox_rows_match_the_catalogue_and_their_wiki_pages() {
+    let content = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let catalogued: Vec<i64> = serde_json::from_slice::<Value>(
+        &std::fs::read(content.join("boomboxes.json")).expect("boomboxes.json reads"),
+    )
+    .expect("parses")["boomboxes"]
+        .as_array()
+        .expect("rows")
+        .iter()
+        .map(|row| row["item_id"].as_i64().expect("item id"))
+        .collect();
+    let stores: Value =
+        serde_json::from_slice(&std::fs::read(stores()).expect("reads")).expect("parses");
+    let wiki = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab/references/freerealms-wiki/wikitext");
+    let mut tagged = 0;
+    for row in stores["items"].as_array().expect("rows") {
+        let item = row["item_id"].as_i64().expect("item id");
+        if row["boombox"].as_bool() != Some(true) {
+            continue;
+        }
+        tagged += 1;
+        assert!(
+            catalogued.contains(&item),
+            "{item} is not a catalogued boombox"
+        );
+        assert!(
+            !REWARD_ONLY_BOOMBOXES.contains(&(item as i32)),
+            "{item} is reward only"
+        );
+        let provenance = &row["price_provenance"];
+        if provenance["sc_basis"] != "W" {
+            assert!(
+                provenance["basis"]
+                    .as_str()
+                    .is_some_and(|text| text.starts_with("(R)")),
+                "{item}: an estimated price is marked (R)"
+            );
+            continue;
+        }
+        let price = row["sc_price"].as_u64().expect("price");
+        let revision = format!("-{}-", provenance["wiki_rev_id"]);
+        let page = std::fs::read_dir(&wiki)
+            .expect("wiki wikitext")
+            .map(|entry| entry.expect("entry").path())
+            .find(|path| path.to_string_lossy().contains(&revision))
+            .unwrap_or_else(|| panic!("{item}: wiki revision {revision} is not in the harvest"));
+        let text = String::from_utf8_lossy(&std::fs::read(page).expect("page reads")).into_owned();
+        assert!(
+            text.contains(&format!("SC|{price}}}")) || text.contains(&format!("{price} SC")),
+            "{item}: the wiki page does not say {price} SC"
+        );
+    }
+    assert_eq!(tagged, 11);
 }

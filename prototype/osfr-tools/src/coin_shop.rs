@@ -19,7 +19,7 @@
 //! membership and real-money orders stay refused (R).
 
 use crate::inventory::Inventory;
-use crate::station_cash::{self, Wallet};
+use crate::station_cash::{self, RowKind, Wallet};
 use serde::Deserialize;
 use std::{
     collections::{BTreeMap, BTreeSet, VecDeque},
@@ -118,6 +118,9 @@ struct StoreItem {
     /// T230: never listed in the Marketplace (slice 2 reward rides such as the Chrome Drake).
     #[serde(default)]
     earn_only: bool,
+    /// T495: listed under the Marketplace's Boombox category instead of Rides.
+    #[serde(default)]
+    boombox: bool,
 }
 
 impl StoreCatalogue {
@@ -170,6 +173,7 @@ impl StoreCatalogue {
                     .sc_price
                     .is_some_and(|price| price == 0 || price > station_cash::MAX_PRICE_SC)
                 || (item.earn_only && item.sc_price.is_none())
+                || (item.boombox && (item.earn_only || item.sc_price.is_none()))
                 || (item.sc_price.is_some()
                     && (item.purchase_price_coins.is_some()
                         || item.member_price_coins.is_some()
@@ -252,8 +256,12 @@ impl CoinShop {
                     .is_some_and(|rides| rides.mount_for_item(item_id).is_some())
             },
             catalogue.items.iter().filter_map(|item| {
-                item.sc_price
-                    .map(|price| (item.item_id, price, item.earn_only))
+                let kind = match (item.earn_only, item.boombox) {
+                    (true, _) => RowKind::EarnOnly,
+                    (false, true) => RowKind::Boombox,
+                    (false, false) => RowKind::Ride,
+                };
+                item.sc_price.map(|price| (item.item_id, price, kind))
             }),
         )?;
         let sc_wallet = Wallet::restore(Some(wallet), sc_catalogue.config());

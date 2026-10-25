@@ -101,6 +101,16 @@ const MAX_EARN_FILE_BYTES: u64 = 65_536;
 /// (R) The Station Cash "day" is the UTC day, like the chess ledger.
 const ACTIVITY_DAY_SECONDS: u64 = 86_400;
 
+/// One Marketplace category: its 66/7 node, the 66/6 group that holds it and the group key a
+/// bundle's record names (`0099f150` matches a bundle to a category through that group).
+#[derive(Clone, Copy, Debug, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Shelf {
+    pub category_id: u32,
+    pub category_name_id: u32,
+    pub category_group_id: u32,
+}
+
 /// `stores.json.station_cash`: the tunable Marketplace policy. A missing block keeps the feature
 /// off, so older content sets and fixtures keep their payment-free behaviour.
 #[derive(Clone, Debug, Deserialize)]
@@ -113,6 +123,9 @@ pub struct Config {
     pub category_id: u32,
     pub category_name_id: u32,
     pub category_group_id: u32,
+    /// T495: the Boombox category beside Rides. Rows tagged `boombox` list there; none may be
+    /// tagged while this is absent.
+    pub boombox_shelf: Option<Shelf>,
     pub sc_price_scale: f64,
     pub min_price_sc: u32,
     pub max_price_sc: u32,
@@ -131,6 +144,7 @@ impl Default for Config {
             category_id: 1,
             category_name_id: 0,
             category_group_id: 1,
+            boombox_shelf: None,
             sc_price_scale: 1.0,
             min_price_sc: 1,
             max_price_sc: 100_000,
@@ -149,6 +163,12 @@ impl Config {
         if self.store_id == 0
             || self.category_id == 0
             || self.category_group_id == 0
+            || self.boombox_shelf.is_some_and(|shelf| {
+                shelf.category_id == 0
+                    || shelf.category_group_id == 0
+                    || shelf.category_id == self.category_id
+                    || shelf.category_group_id == self.category_group_id
+            })
             || !self.sc_price_scale.is_finite()
             || self.sc_price_scale <= 0.0
             || self.sc_price_scale > 10.0
@@ -522,6 +542,8 @@ pub struct Listing {
     pub item_id: i32,
     pub name_id: u32,
     pub price: u32,
+    /// The category group the bundle belongs to: Rides, or the Boombox shelf's (T495).
+    pub group: u32,
     /// L046: the item is a lot deed. An order for it grants the lot through the caller's
     /// [`LotGrant`] and never puts the deed in the inventory.
     pub deed: bool,
@@ -545,6 +567,17 @@ impl Listing {
 /// With `commit` false it only answers whether the grant would succeed and changes nothing.
 pub type LotGrant<'a> = &'a mut dyn FnMut(i32, bool) -> Option<Vec<Vec<u8>>>;
 
+/// How a `stores.json` row with an `sc_price` is sold (T495).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub enum RowKind {
+    /// Listed under the Rides category (every priced row that is not one of the others).
+    Ride,
+    /// Listed under the Boombox category.
+    Boombox,
+    /// Slice 2 reward row: never listed, never ordered.
+    EarnOnly,
+}
+
 /// The validated Station Cash catalogue built from `stores.json` rows and the live item catalogue.
 #[derive(Clone, Debug)]
 pub struct Catalogue {
@@ -559,12 +592,12 @@ impl Catalogue {
         config: Config,
         inventory: &Inventory,
         is_ride: impl Fn(i32) -> bool,
-        rows: impl IntoIterator<Item = (i32, u32, bool)>,
+        rows: impl IntoIterator<Item = (i32, u32, RowKind)>,
     ) -> io::Result<Self> {
         config.validate()?;
         let mut listings = Vec::new();
         let mut earn_only = Vec::new();
-        for (item_id, sc_price, reward_only) in rows {
+        for (item_id, sc_price, kind) in rows {
             if item_id <= 0 || sc_price == 0 || sc_price > MAX_PRICE_SC {
                 return Err(invalid("invalid station cash row"));
             }
@@ -575,16 +608,22 @@ impl Catalogue {
             let Ok(presentation) = inventory.presentation(item_id) else {
                 continue;
             };
+            let group = match (kind, config.boombox_shelf) {
+                (RowKind::Boombox, Some(shelf)) => shelf.category_group_id,
+                (RowKind::Boombox, None) => return Err(invalid("boombox row without a shelf")),
+                _ => config.category_group_id,
+            };
             let listing = Listing {
                 bundle_id: u32::try_from(item_id)
                     .map_err(|_| invalid("invalid station cash id"))?,
                 item_id,
                 name_id: u32::try_from(presentation.name_id).unwrap_or(0),
                 price: config.scaled_price(sc_price)?,
+                group,
                 deed: presentation.item_type == DEED_ITEM_TYPE,
                 ride: is_ride(item_id),
             };
-            if reward_only {
+            if kind == RowKind::EarnOnly {
                 earn_only.push(listing);
             } else {
                 listings.push(listing);
@@ -613,6 +652,17 @@ impl Catalogue {
 
     pub fn listings(&self) -> &[Listing] {
         &self.listings
+    }
+
+    /// The categories the store shows, Rides first (T495).
+    fn shelves(&self) -> Vec<Shelf> {
+        let config = &self.config;
+        let rides = Shelf {
+            category_id: config.category_id,
+            category_name_id: config.category_name_id,
+            category_group_id: config.category_group_id,
+        };
+        std::iter::once(rides).chain(config.boombox_shelf).collect()
     }
 
     pub fn earn_only(&self) -> &[Listing] {
@@ -1049,32 +1099,42 @@ pub(crate) fn bool_packet(opcode: u16, value: bool) -> Vec<u8> {
     bytes
 }
 
-/// 66/7 + category tree (`00b48040`/`00b43090`/`00b3fd70`/`00b3b080`).
+/// 66/7 + category tree (`00b48040`/`00b43090`/`00b3fd70`/`00b3b080`): one top-level node per
+/// shelf, counting the bundles of its group.
 fn category_tree_packet(catalogue: &Catalogue) -> Vec<u8> {
-    let config = &catalogue.config;
+    let shelves = catalogue.shelves();
     let mut bytes = header(OP_CATEGORIES);
-    put_i32(&mut bytes, 1); // one category
-    put_u32(&mut bytes, config.category_id);
-    put_u32(&mut bytes, config.category_id);
-    put_u32(&mut bytes, config.category_name_id);
-    put_string(&mut bytes, "");
-    put_string(&mut bytes, "");
-    put_u32(&mut bytes, 0);
-    put_u32(&mut bytes, catalogue.listings.len() as u32);
-    put_u32(&mut bytes, 1);
+    put_i32(&mut bytes, shelves.len() as i32);
+    for (index, shelf) in shelves.iter().enumerate() {
+        put_u32(&mut bytes, shelf.category_id);
+        put_u32(&mut bytes, shelf.category_id);
+        put_u32(&mut bytes, shelf.category_name_id);
+        put_string(&mut bytes, "");
+        put_string(&mut bytes, "");
+        put_u32(&mut bytes, 0);
+        let count = catalogue
+            .listings
+            .iter()
+            .filter(|listing| listing.group == shelf.category_group_id)
+            .count();
+        put_u32(&mut bytes, count as u32);
+        put_u32(&mut bytes, index as u32 + 1); // display order (R): 0x00b3b080 does not show its meaning
+    }
     bytes.push(1);
     bytes
 }
 
-/// 66/6 + one category group holding the category (`00b44d70`/`00b3ad20`).
+/// 66/6 + one category group per shelf, each holding its category (`00b44d70`/`00b3ad20`).
 fn category_groups_packet(catalogue: &Catalogue) -> Vec<u8> {
-    let config = &catalogue.config;
+    let shelves = catalogue.shelves();
     let mut bytes = header(OP_CATEGORY_GROUPS);
-    put_i32(&mut bytes, 1); // one group
-    put_u32(&mut bytes, config.category_group_id);
-    put_u32(&mut bytes, config.category_group_id);
-    put_i32(&mut bytes, 1);
-    put_u32(&mut bytes, config.category_id);
+    put_i32(&mut bytes, shelves.len() as i32);
+    for shelf in &shelves {
+        put_u32(&mut bytes, shelf.category_group_id);
+        put_u32(&mut bytes, shelf.category_group_id);
+        put_i32(&mut bytes, 1);
+        put_u32(&mut bytes, shelf.category_id);
+    }
     bytes
 }
 
@@ -1149,7 +1209,7 @@ fn bundle_record(bytes: &mut Vec<u8>, catalogue: &Catalogue, listing: &Listing, 
     put_u32(bytes, listing.item_id as u32);
     put_string(bytes, "");
     put_u32(bytes, config.store_id);
-    put_u32(bytes, config.category_group_id);
+    put_u32(bytes, listing.group);
     bytes.push(1);
     put_u32(bytes, 1);
     put_u32(bytes, index as u32 + 1);
