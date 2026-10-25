@@ -2135,7 +2135,7 @@ impl Session {
     ) -> Vec<Delivery> {
         // T519: 156/2 is answered from the target's live presentation; 115 is checked and
         // dropped. A refusal sends nothing and stores nothing.
-        if fotomat::is_request(inner) || fotomat::is_upload(inner) {
+        if fotomat::handles(inner) {
             return delivery::fotomat_reply(self, inner, world).unwrap_or_default();
         }
         if inner.starts_with(&[26, 0, 19, 0])

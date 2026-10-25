@@ -65,14 +65,11 @@ impl Gateway {
             data.transform.rotation[index] = state.rotation[index].to_bits();
         }
         if let Some(look) = self.current_look(gameplay) {
-            use crate::style_cards::{FACE_PAINT, HAIR, HEAD, MODEL_CUSTOMIZATION, SKIN_TONE};
             data.identity.model = look.model as u32;
             data.appearance.hair_color = look.hair_color as u32;
             data.appearance.eye_color = look.eye_color as u32;
-            // The client's customization order: head, hair, skin tone, face paint, model customization.
-            data.appearance.customization_ids =
-                [HEAD, HAIR, SKIN_TONE, FACE_PAINT, MODEL_CUSTOMIZATION]
-                    .map(|table| look.ids[table] as u32);
+            // Self-data carries all five ids; the order lives on `Look`.
+            data.appearance.customization_ids = look.customization_ids().map(|id| id as u32);
             (data.appearance.head, data.appearance.hair) = (look.head, look.hair);
             (data.appearance.skin_tone, data.appearance.face_paint) =
                 (look.skin_tone, look.face_paint);

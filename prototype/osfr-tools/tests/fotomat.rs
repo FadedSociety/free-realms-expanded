@@ -156,10 +156,9 @@ fn fotomat_refuses_without_reply() {
     }
 
     // 115 is the top-level portrait CRC: exactly u16 115 + u32 CRC, and it never replies.
-    assert_eq!(
-        fotomat::parse_upload_crc(&[115, 0, 1, 2, 3, 4]),
-        Some(0x0403_0201)
-    );
+    assert!(fotomat::is_upload(&[115, 0, 1, 2, 3, 4]));
+    assert!(fotomat::handles(&[115, 0, 1, 2, 3, 4]));
+    assert!(!fotomat::is_request(&[115, 0, 1, 2, 3, 4]));
     for body in [
         vec![],
         vec![115, 0],
@@ -168,7 +167,7 @@ fn fotomat_refuses_without_reply() {
         vec![115, 0, 1, 2, 3, 4, 5],
         vec![114, 0, 1, 2, 3, 4],
     ] {
-        assert!(fotomat::parse_upload_crc(&body).is_none(), "{body:02x?}");
+        assert!(!fotomat::is_upload(&body), "{body:02x?}");
         assert!(
             fotomat::handle(&body, |_| panic!("115 must not look up a presentation")).is_none(),
             "{body:02x?}"
@@ -219,9 +218,33 @@ fn login_time_request_is_handled_or_dropped_cleanly() {
     assert!(image.image.is_empty());
     assert_eq!(image.head, "<race>_<gender>_head_african.adr");
     assert_eq!(image.customization_ids, [2, 1, 3, 0]);
+    assert_eq!(
+        fotomat::requested_guid(&request(guid, "Headshot")),
+        Some(guid)
+    );
+
+    // A six-byte 115 is owned and shape-checked before Loaded: no reply, no state, and the
+    // trace stays "handled" instead of being forwarded or dropped as unloaded.
+    gateway.set_trace_enabled(true);
+    let before = gateway.snapshot();
+    let outcome = gateway
+        .handle_at(&wrap(&[115, 0, 1, 2, 3, 4]), 700)
+        .unwrap();
+    assert!(outcome.replies.is_empty());
+    assert_eq!(outcome.trace[0].handler, "fotomat");
+    assert_eq!(outcome.trace[0].outcome, "handled");
+    assert_eq!(gateway.snapshot(), before);
+
+    // Any other 115 length is not the notice: it falls to the normal pre-Loaded path.
+    let outcome = gateway.handle_at(&wrap(&[115, 0, 1, 2, 3]), 700).unwrap();
+    assert!(outcome.replies.is_empty());
+    assert_ne!(
+        outcome.trace[0].outcome, "handled",
+        "a malformed 115 is not the six-byte notice"
+    );
+    assert_eq!(gateway.snapshot(), before);
 
     // Another guid is not this session's presentation: no reply and no state.
-    let before = gateway.snapshot();
     let outcome = gateway
         .handle_at(&wrap(&request(guid + 1, "Headshot")), 700)
         .unwrap();

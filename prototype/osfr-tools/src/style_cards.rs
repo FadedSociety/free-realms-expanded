@@ -13,6 +13,12 @@ pub const MODEL_CUSTOMIZATION: usize = 2;
 pub const FACE_PAINT: usize = 3;
 pub const SKIN_TONE: usize = 4;
 
+/// The client's customization mapping order: head, hair, skin tone, face paint, model
+/// customization. Self-data carries all five (R: Sanctuary `ClientPcData.Serialize`); the 156/3
+/// portrait record (`00bd37e0`) carries only the first four, in the same order.
+pub const CUSTOMIZATION_ORDER: [usize; 5] =
+    [HEAD, HAIR, SKIN_TONE, FACE_PAINT, MODEL_CUSTOMIZATION];
+
 /// The client tables a card resolves through: `Resources/Models.txt` and the five
 /// `Resources/CharacterCreate/*Mappings.txt`, as `identity::Resources` loads them.
 pub trait Tables {
@@ -243,6 +249,19 @@ impl Look {
             model_customization: identity.model_customization.clone(),
             ids: [c[1], c[2], c[3], c[4], c[5]],
         }
+    }
+
+    /// The five mapping ids in self-data order, all in one place: (R) head, hair, skin tone,
+    /// face paint, model customization (Sanctuary `ClientPcData.Serialize`).
+    pub fn customization_ids(&self) -> [i32; 5] {
+        CUSTOMIZATION_ORDER.map(|slot| self.ids[slot])
+    }
+
+    /// (R) The 156/3 portrait record's four ids (`00bd37e0`): the first four self-data ids. The
+    /// record has no model-customization id.
+    pub fn portrait_ids(&self) -> [i32; 4] {
+        let ids = self.customization_ids();
+        std::array::from_fn(|index| ids[index])
     }
 
     /// The look after one record: the one place that decides which field each record id

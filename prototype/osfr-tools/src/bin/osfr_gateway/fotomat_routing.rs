@@ -275,6 +275,18 @@ fn login_time_request_is_answered_before_world_entry() {
     assert!(image.image.is_empty());
     assert!(!scene.world.joined.contains(&scene.session.id));
 
+    // A pre-Loaded 115 is quiet: the six-byte shape is owned, no reply and no state change.
+    let before = scene.session.gateway.snapshot();
+    for body in [
+        vec![115, 0, 1, 2, 3, 4],
+        vec![115, 0, 1, 2, 3],
+        vec![115, 0, 1, 2, 3, 4, 5],
+    ] {
+        let replies = send(&mut scene, &options, &body, 60);
+        assert!(replies.is_empty(), "{body:02x?}");
+        assert_eq!(scene.session.gateway.snapshot(), before, "{body:02x?}");
+    }
+
     // The client can still finish entering the world after the pre-load answer.
     scene.send(&options, &[13, 0], 100).unwrap();
     scene.send(&options, &[10, 0], 200).unwrap();

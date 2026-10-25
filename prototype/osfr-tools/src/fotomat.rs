@@ -59,21 +59,33 @@ pub fn is_request(body: &[u8]) -> bool {
     body.starts_with(&[FAMILY as u8, 0, REQUEST_SUBTYPE as u8, 0])
 }
 
-/// Whether `body` starts with the top-level 115 opcode.
+/// The top-level 115 portrait upload notice: u16 115 + u32 CRC-32, exactly six bytes. Only the
+/// shape is used; the CRC value belongs to the lead's pending-CRC ingress (a later task), so a
+/// notice that passes this check is accepted quietly and stores nothing.
 pub fn is_upload(body: &[u8]) -> bool {
-    body.starts_with(&CRC_OPCODE.to_le_bytes())
+    body.len() == 6 && body.starts_with(&CRC_OPCODE.to_le_bytes())
+}
+
+/// Whether this module owns the body at all. Both the pre-Loaded stage and the in-world route
+/// dispatch on this; a malformed 156/2 or 115 is still dropped without a reply.
+pub fn handles(body: &[u8]) -> bool {
+    is_request(body) || is_upload(body)
+}
+
+/// The guid a well-formed 156/2 asks for, without building a presentation. `None` for any other
+/// body. The pre-Loaded answer checks this before it clones the session's presentation.
+pub fn requested_guid(body: &[u8]) -> Option<u64> {
+    parse_request(body).map(|request| request.guid)
 }
 
 /// One inbound body this module owns. A 156/2 for a presentation the viewer may see becomes
-/// one 156/3; a 115 is checked and dropped; everything else returns `None` and changes nothing.
+/// one 156/3; a 115 is shape-checked and dropped; everything else returns `None` and changes
+/// nothing.
 pub fn handle<'a>(
     body: &[u8],
     presentation: impl FnOnce(u64) -> Option<&'a PlayerPresentation>,
 ) -> Option<Vec<u8>> {
     if is_upload(body) {
-        // The upload ingress (lead) will keep this CRC pending; this task only accepts the
-        // exact 6-byte shape and stores nothing.
-        let _ = parse_upload_crc(body);
         return None;
     }
     let request = parse_request(body)?;
@@ -85,15 +97,6 @@ pub fn handle<'a>(
 /// the player's own character. An invisible target sends no reply and leaves no pending state.
 pub fn request(body: &[u8], viewer: SessionId, players: &PlayerRegistry) -> Option<Vec<u8>> {
     handle(body, |guid| players.presentation_of(viewer, guid))
-}
-
-/// 115: u16 115 + u32 CRC-32, exactly six bytes. The upload ingress is a later task, so the
-/// value is only parsed (and tested) here.
-pub fn parse_upload_crc(body: &[u8]) -> Option<u32> {
-    if body.len() != 6 || body.get(..2) != Some(&CRC_OPCODE.to_le_bytes()) {
-        return None;
-    }
-    Some(u32::from_le_bytes(body.get(2..6)?.try_into().ok()?))
 }
 
 fn parse_request(body: &[u8]) -> Option<Request> {

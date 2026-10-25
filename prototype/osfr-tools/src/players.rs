@@ -61,9 +61,9 @@ pub struct PlayerPresentation {
     pub skin_tone: String,
     pub face_paint: String,
     pub model_customization: String,
-    /// Mapping ids of head, hair, skin tone and face paint, in that order: the four ids in the
-    /// 156/3 portrait record (`00bd37e0`). AddPc does not carry them. `fotomat` refuses a
-    /// negative id; no other consumer reads them.
+    /// The 156/3 portrait record's four mapping ids (head, hair, skin tone, face paint), from
+    /// `style_cards::Look::portrait_ids`, which owns their order. AddPc does not carry them.
+    /// `fotomat` refuses a negative id; no other consumer reads them.
     pub customization_ids: [i32; 4],
     pub max_movement_speed: f32,
     pub underage: bool,

@@ -470,3 +470,35 @@ fn customization_data_round_trips() {
         assert_eq!(rebuilt, look(model), "every field is sent");
     }
 }
+
+/// The 156/3 portrait record (`00bd37e0`) carries four mapping ids. They must be the first four
+/// self-data ids, so a change to either order cannot silently swap head, hair, skin and face.
+#[test]
+fn portrait_ids_are_the_first_four_self_data_ids() {
+    for model in [HUMAN_M, FAIRY_M, HUMAN_F, FAIRY_F] {
+        let look = look(model);
+        assert_eq!(
+            look.customization_ids(),
+            [
+                look.ids[HEAD],
+                look.ids[HAIR],
+                look.ids[SKIN_TONE],
+                look.ids[FACE_PAINT],
+                look.ids[MODEL_CUSTOMIZATION],
+            ]
+        );
+        assert_eq!(
+            look.portrait_ids(),
+            [
+                look.ids[HEAD],
+                look.ids[HAIR],
+                look.ids[SKIN_TONE],
+                look.ids[FACE_PAINT],
+            ]
+        );
+        assert_eq!(
+            look.portrait_ids().as_slice(),
+            &look.customization_ids()[..4]
+        );
+    }
+}

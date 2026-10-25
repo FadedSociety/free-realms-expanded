@@ -15,7 +15,6 @@ use crate::movement::{
     self, Decision as MovementDecision, ExpectedDiscontinuity, MovementState, MovementUpdate,
     SpeedModifiers,
 };
-use crate::style_cards::{FACE_PAINT, HAIR, HEAD, SKIN_TONE};
 use crate::{
     players::PlayerPresentation,
     startup_selfdata::{self, SelfData},
@@ -1052,6 +1051,7 @@ impl Gateway {
             look.last_name.clone_from(&identity.last_name);
         }
         if let Some(appearance) = self.current_look(self.gameplay.as_ref()) {
+            look.customization_ids = appearance.portrait_ids();
             (look.model, look.hair_color, look.eye_color) = (
                 appearance.model,
                 appearance.hair_color,
@@ -1061,8 +1061,6 @@ impl Gateway {
                 (appearance.head, appearance.hair, appearance.skin_tone);
             (look.face_paint, look.model_customization) =
                 (appearance.face_paint, appearance.model_customization);
-            look.customization_ids =
-                [HEAD, HAIR, SKIN_TONE, FACE_PAINT].map(|slot| appearance.ids[slot]);
         }
         // Without loaded profiles, self-data keeps the template's job; match it.
         let profile = self
@@ -1628,8 +1626,10 @@ impl Gateway {
                 }
                 Event::Application(inner) => {
                     impulse = None;
-                    if let Some(reply) = self.fotomat_loading_reply(&inner, state.guid, loaded) {
-                        outcome.replies.push(wrapped(&reply));
+                    if !loaded && crate::fotomat::handles(&inner) {
+                        if let Some(reply) = self.fotomat_loading_reply(&inner, state.guid) {
+                            outcome.replies.push(wrapped(&reply));
+                        }
                         continue;
                     }
                     if let Some(game) = gameplay.as_mut() {
