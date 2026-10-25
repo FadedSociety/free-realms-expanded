@@ -476,7 +476,7 @@
           ]
         }
       ],
-      "quest_ids_given":       [
+      "quest_ids_given": [
         3000400
       ],
       "quests_given_text": [
@@ -721,7 +721,7 @@
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part A. The entrance, the Sasparilla Brewery and the Party Tent, row 36; source cell: [client][video]"
           }
         ],
-        "quest_ids_given":         [
+        "quest_ids_given": [
           {
             "kind": "reconstructed",
             "evidence": "(R) T502: Join the Party (3000400) is given here, minted from Lxzxrus QuestId 3100; the fork's TargetGuid hands it in at Sasparilla Brewmaster."
@@ -14555,7 +14555,7 @@
       "quests_given_text": [
         "The Brewery errand chain: \"A Sasparilla Brewmaster never rests! I need you to speak with Brockoom ... Farmer Murglot ... Guard Thoomlug\" (3759436651; objective 1685817269); bixie trouble (\"wants you to deal with the bixies\", 3598316925; \"Hurry to Brewmaster Wugawump and tell him about the bixies in Sweetwater Climb!\", 2694227573); party scouting (\"scout out some party locations\", 1392384911, 3411949842; thanks 1425009787); sasparilla bills to Runalug (2048485603, 3134368944); a job for Virtalot (4219676670, 1637372591); the party-tent monsters (2070279671, by wording); the thugawug raid letter to Glugmort (\"Deliver Sasparilla Brewmaster Wugawump's letter to Glugmort at the Greenwood Camp.\", 2970237973). Job quests: Card Duelist: Squash the Shuffler (wiki giver) and Card Duelist: Parcel Recovery (wiki lists him; the video shows Runalug first). Sends the reward: \"go tell Brockoom to let you have some of the private stock!\" (307692584)."
       ],
-      "quests_accepted":       [
+      "quests_accepted": [
         {
           "quest_id": 3000400,
           "title": "Join the Party",
@@ -14572,7 +14572,7 @@
           ]
         }
       ],
-      "quests_accepted_reason":       "T502: Join the Party (3000400) is handed in to Sasparilla Brewmaster Wugawump, the fork's TargetGuid (R); see the entry's source.",
+      "quests_accepted_reason": "T502: Join the Party (3000400) is handed in to Sasparilla Brewmaster Wugawump, the fork's TargetGuid (R); see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [
@@ -14964,13 +14964,13 @@
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part A. The entrance, the Sasparilla Brewery and the Party Tent, row 38; source cell: [client][video][wiki]"
           }
         ],
-        "quests_accepted":         [
+        "quests_accepted": [
           {
             "kind": "reconstructed",
             "evidence": "(R) T502: Join the Party (3000400) is handed in to Sasparilla Brewmaster Wugawump, the fork's TargetGuid (R); see the entry's source."
           }
         ],
-        "quests_accepted_reason":         [
+        "quests_accepted_reason": [
           {
             "kind": "reconstructed",
             "evidence": "(R) T502: Join the Party (3000400) is handed in to Sasparilla Brewmaster Wugawump, the fork's TargetGuid (R); see the entry's source."

@@ -361,56 +361,114 @@ fn head_npc_paths() -> BTreeSet<String> {
     .collect()
 }
 
-/// The NPC paths of the change that must be checked: the uncommitted NPC edit
-/// in a builder workspace, or the HEAD commit when it touched one of the two
-/// owned files (the committed review state). A tip whose change does not touch
-/// the owned files has no content change for this suite to check, and each
-/// other region is pinned by the suite that owns it.
-fn change_under_test() -> Option<BTreeSet<String>> {
-    let uncommitted = uncommitted_npc_paths();
-    if !uncommitted.is_empty() {
-        return Some(uncommitted);
-    }
-    // T502 (the Wugachug/Briarwood zone-quest slice) edits merry_vale.json, one of
-    // this suite's two owned files, as part of a data slice that also binds quests on
-    // NPC rows in four neighbouring regions and converts Merk to a legacy spawn.
-    // Those other files are pinned by the suites that own them (quest_giver_rows,
-    // enabled_quest_reachability, zone_quests_wugachug_briarwood), so the committed
-    // change is checked on the owned files only; the uncommitted branch above keeps
-    // the builder-workspace spill guard.
-    let owned: BTreeSet<String> = head_npc_paths()
-        .into_iter()
-        .filter(|path| is_owned(path))
-        .collect();
-    (!owned.is_empty()).then_some(owned)
+/// Where the change under test is read from.
+#[derive(Clone, Copy, PartialEq, Eq)]
+enum ChangeBase {
+    /// A builder workspace: the working tree against HEAD.
+    WorkingTree,
+    /// A committed review state: the HEAD commit against its parent. Comparing
+    /// the commit's own diff, not HEAD against an identical working tree, is what
+    /// makes this guard work after the integrator commits.
+    Commit,
 }
 
-/// True when `path` differs from HEAD only by greeting bindings and appended
-/// rows: the HEAD records in the same order, each unchanged apart from
-/// `greeting_string_id` and its `field_sources` entry, then any new rows, and
-/// the same top-level metadata. A builder workspace may carry another slice's
-/// uncommitted binding or appended row (T379's repair guys); that is that
-/// slice's change, pinned by its own suite, not this suite's spill.
-fn is_greeting_only_change(path: &str) -> bool {
-    let output = git(&["show", &format!("HEAD:{path}")]);
-    if !output.status.success() {
-        return false;
+/// The NPC paths and revision pair of the change that must be checked: the
+/// uncommitted NPC edit in a builder workspace, or the HEAD commit when it
+/// touched one of the two owned files (the committed review state). A tip whose
+/// change does not touch the owned files has no content change for this suite to
+/// check, and each other region is pinned by the suite that owns it.
+fn change_under_test() -> Option<(ChangeBase, BTreeSet<String>)> {
+    let uncommitted = uncommitted_npc_paths();
+    if !uncommitted.is_empty() {
+        return Some((ChangeBase::WorkingTree, uncommitted));
     }
-    let Ok(old) = serde_json::from_slice::<Value>(&output.stdout) else {
-        return false;
+    let head = head_npc_paths();
+    head.iter()
+        .any(|path| is_owned(path))
+        .then_some((ChangeBase::Commit, head))
+}
+
+/// One revision of `path` in the repository, or `None` when git or JSON fails.
+fn document_at(revision: &str, path: &str) -> Option<Value> {
+    let output = git(&["show", &format!("{revision}:{path}")]);
+    if !output.status.success() {
+        return None;
+    }
+    serde_json::from_slice(&output.stdout).ok()
+}
+
+/// The working-tree version of `path`, or `None` when it is missing or not JSON.
+fn working_document(path: &str) -> Option<Value> {
+    serde_json::from_str(&fs::read_to_string(repo_root().join(path)).ok()?).ok()
+}
+
+/// The fields a quest-binding slice may rewrite on a row it does not own, plus
+/// the `field_sources` evidence that moves with each field.
+const QUEST_BINDING_FIELDS: [&str; 4] = [
+    "quest_ids_given",
+    "quests_accepted",
+    "quests_accepted_reason",
+    "roles",
+];
+
+/// T502's `legacy_data` conversion of the existing Merk row: his spawn fields and
+/// the diagnostics that explain them. The zone-quest suite
+/// (`zone_quests_wugachug_briarwood::aiding_our_allies_ends_at_merk`) pins the
+/// resulting model, name and drawable row, so this guard allows that one row's
+/// conversion and still rejects every other foreign change.
+const MERK_LEGACY_FIELDS: [&str; 12] = [
+    "heading",
+    "model_file_name",
+    "model_id",
+    "name_string_id",
+    "placement",
+    "placement_candidates",
+    "placement_confidence",
+    "placement_source",
+    "position",
+    "position_reason",
+    "rotation",
+    "source",
+];
+
+/// `row` with `fields` and their `field_sources` evidence removed.
+fn without_fields(row: &Value, fields: &[&str]) -> Value {
+    let mut row = row.clone();
+    let Some(object) = row.as_object_mut() else {
+        return row;
     };
-    let Ok(text) = fs::read_to_string(repo_root().join(path)) else {
-        return false;
-    };
-    let Ok(new) = serde_json::from_str::<Value>(&text) else {
-        return false;
-    };
+    for field in fields {
+        object.remove(*field);
+    }
+    if let Some(sources) = object
+        .get_mut("field_sources")
+        .and_then(Value::as_object_mut)
+    {
+        for field in fields {
+            sources.remove(*field);
+        }
+    }
+    row
+}
+
+/// True when `new` differs from `old` only by rows `allowed` accepts: the same
+/// top-level metadata and the HEAD rows in the same order. `appended_ok` keeps
+/// the greeting allowance that another slice may append a row; a quest-binding
+/// allowance never accepts an unreviewed new row.
+fn changed_rows_are(
+    old: &Value,
+    new: &Value,
+    appended_ok: bool,
+    allowed: impl Fn(&Value, &Value) -> bool,
+) -> bool {
     let (Some(old_records), Some(new_records)) =
         (old["records"].as_array(), new["records"].as_array())
     else {
         return false;
     };
-    if new_records.len() < old_records.len() {
+    if new_records.len() < old_records.len()
+        || (!appended_ok && new_records.len() != old_records.len())
+    {
         return false;
     }
     let mut old_document = old.clone();
@@ -424,24 +482,41 @@ fn is_greeting_only_change(path: &str) -> bool {
     if old_document != new_document {
         return false;
     }
-    old_records.iter().zip(new_records).all(|(old, new)| {
-        if old["npc_id"] != new["npc_id"] {
-            return false;
+    old_records
+        .iter()
+        .zip(new_records)
+        .all(|(old, new)| old["npc_id"] == new["npc_id"] && (old == new || allowed(old, new)))
+}
+
+/// True when `new` differs from `old` only by greeting bindings and appended
+/// rows: the HEAD records in the same order, each unchanged apart from
+/// `greeting_string_id` and its `field_sources` entry, then any new rows, and
+/// the same top-level metadata. A builder workspace may carry another slice's
+/// uncommitted binding or appended row (T379's repair guys); that is that
+/// slice's change, pinned by its own suite, not this suite's spill.
+fn is_greeting_only_change_between(old: &Value, new: &Value) -> bool {
+    changed_rows_are(old, new, true, |old, new| {
+        without_fields(old, &["greeting_string_id"]) == without_fields(new, &["greeting_string_id"])
+    })
+}
+
+/// True when `new` differs from `old` only by quest bindings and their
+/// provenance on the HEAD rows, plus T502's `legacy_data` conversion of Merk.
+/// The quest suites pin those fields; a greeting, a moved row or any other
+/// foreign content change does not pass.
+fn is_quest_binding_change_between(path: &str, old: &Value, new: &Value) -> bool {
+    changed_rows_are(old, new, false, |old, new| {
+        let quest_old = without_fields(old, &QUEST_BINDING_FIELDS);
+        let quest_new = without_fields(new, &QUEST_BINDING_FIELDS);
+        if quest_old == quest_new {
+            return true;
         }
-        let (mut old, mut new) = (old.clone(), new.clone());
-        for document in [&mut old, &mut new] {
-            let Some(object) = document.as_object_mut() else {
-                return false;
-            };
-            object.remove("greeting_string_id");
-            if let Some(sources) = object
-                .get_mut("field_sources")
-                .and_then(Value::as_object_mut)
-            {
-                sources.remove("greeting_string_id");
-            }
-        }
-        old == new
+        path.ends_with("/shrouded_glade.json")
+            && old["npc_id"].as_u64() == Some(9_500_000_690)
+            && old["placement"].as_str() != Some("legacy_data")
+            && new["placement"].as_str() == Some("legacy_data")
+            && without_fields(&quest_old, &MERK_LEGACY_FIELDS)
+                == without_fields(&quest_new, &MERK_LEGACY_FIELDS)
     })
 }
 
@@ -788,19 +863,127 @@ fn the_existing_greetings_and_other_regions_are_unchanged() {
     }
 
     // The change under test (the uncommitted NPC edit in a builder workspace,
-    // or HEAD when HEAD touched an owned file) may change only the two owned
-    // NPC files. Another greeting slice's uncommitted greeting-only binding in
-    // a shared builder workspace is that slice's change, not this suite's
-    // spill; any other edit outside the two owned files still fails.
-    let Some(changed) = change_under_test() else {
+    // or the HEAD commit against its parent) may change only the two owned NPC
+    // files. A foreign file may carry a quest-binding slice's fields (T502's
+    // change, pinned by the quest suites) and, while uncommitted, another
+    // slice's greeting-only binding or appended row. The complete greeting set
+    // of the two regions with no greeting suite is pinned by
+    // `npc_greetings_shrouded_glade_wugachug`; any other edit outside the two
+    // owned files fails.
+    let Some((base, changed)) = change_under_test() else {
         return;
     };
     for path in &changed {
+        if is_owned(path) {
+            continue;
+        }
+        let (old, new) = match base {
+            ChangeBase::WorkingTree => (document_at("HEAD", path), working_document(path)),
+            ChangeBase::Commit => (document_at("HEAD^", path), document_at("HEAD", path)),
+        };
+        let (Some(old), Some(new)) = (old, new) else {
+            panic!("{path} changed: the change under test is not readable JSON");
+        };
         assert!(
-            is_owned(path) || is_greeting_only_change(path),
+            is_quest_binding_change_between(path, &old, &new)
+                || (base == ChangeBase::WorkingTree && is_greeting_only_change_between(&old, &new)),
             "{path} changed: this slice owns only merry_vale.json and stillwater_crossing.json"
         );
     }
+}
+
+#[test]
+fn the_change_guard_allows_quest_bindings_and_rejects_a_foreign_greeting() {
+    // A small NPC region behind the two T502 changes the guard must allow: a
+    // quest binding on an existing row, and Merk's `poi_anchor` -> `legacy_data`
+    // conversion. The top level and row ids are the guard's own inputs.
+    let old = serde_json::json!({
+        "schema_version": 1,
+        "region_page": "Briarwood",
+        "region_zone_id": 2,
+        "records": [
+            {
+                "npc_id": 9500000213_u64,
+                "name": "Smoggo",
+                "roles": ["ambient"],
+                "quest_ids_given": [],
+                "quests_accepted": [],
+                "greeting_string_id": 0,
+                "field_sources": {
+                    "roles": [{"kind": "wiki", "evidence": "old"}],
+                    "greeting_string_id": [{"kind": "client", "evidence": "old"}]
+                }
+            },
+            {
+                "npc_id": 9500000690_u64,
+                "name": "Headmaster Merk",
+                "placement": "poi_anchor",
+                "position": [900.0, 2.0, 2236.0],
+                "greeting_string_id": 0,
+                "field_sources": {
+                    "placement": [{"kind": "reconstructed", "evidence": "old"}],
+                    "position": [{"kind": "client", "evidence": "old"}]
+                }
+            }
+        ]
+    });
+    let briarwood = "prototype/osfr-tools/data/content/npcs/briarwood.json";
+    let shrouded_glade = "prototype/osfr-tools/data/content/npcs/shrouded_glade.json";
+
+    // T502's foreign changes: a quest binding on an existing row, and Merk's
+    // conversion (the zone-quest suite pins his drawn model and name).
+    let mut quest = old.clone();
+    quest["records"][0]["roles"] = serde_json::json!(["ambient", "quest_giver"]);
+    quest["records"][0]["quest_ids_given"] = serde_json::json!([3000392]);
+    quest["records"][0]["quests_accepted"] = serde_json::json!([{"quest_id": 3000391}]);
+    quest["records"][0]["quests_accepted_reason"] = Value::from("T502 hand-in");
+    quest["records"][0]["field_sources"] = serde_json::json!({
+        "roles": [{"kind": "wiki", "evidence": "new"}],
+        "quest_ids_given": [{"kind": "legacy-data", "evidence": "new"}],
+        "quests_accepted": [{"kind": "legacy-data", "evidence": "new"}],
+        "quests_accepted_reason": [{"kind": "legacy-data", "evidence": "new"}],
+        "greeting_string_id": [{"kind": "client", "evidence": "old"}]
+    });
+    assert!(is_quest_binding_change_between(briarwood, &old, &quest));
+
+    let mut merk = old.clone();
+    let row = &mut merk["records"][1];
+    row["placement"] = Value::from("legacy_data");
+    row["position"] = serde_json::json!([482.1476, 65.42416, 1747.054]);
+    row["name_string_id"] = Value::from(45_386);
+    row["model_id"] = Value::from(3_952);
+    row["quests_accepted"] = serde_json::json!([{"quest_id": 3000380}]);
+    row["field_sources"] = serde_json::json!({
+        "placement": [{"kind": "legacy-data", "evidence": "new"}],
+        "position": [{"kind": "legacy-data", "evidence": "new"}],
+        "name_string_id": [{"kind": "legacy-data", "evidence": "new"}],
+        "model_id": [{"kind": "legacy-data", "evidence": "new"}],
+        "quests_accepted": [{"kind": "legacy-data", "evidence": "new"}]
+    });
+    assert!(is_quest_binding_change_between(shrouded_glade, &old, &merk));
+
+    // A foreign greeting binding is not a quest binding. The committed guard
+    // rejects it; the builder-workspace allowance still names it a greeting
+    // change, so the message points at the right suite.
+    let mut greeting = old.clone();
+    greeting["records"][0]["greeting_string_id"] = Value::from(440_465);
+    greeting["records"][0]["field_sources"]["greeting_string_id"] =
+        serde_json::json!([{"kind": "client", "evidence": "new"}]);
+    assert!(!is_quest_binding_change_between(briarwood, &old, &greeting));
+    assert!(is_greeting_only_change_between(&old, &greeting));
+
+    // Any other foreign content change is still rejected, and a quest-binding
+    // allowance never accepts an unreviewed appended row.
+    let mut moved = old.clone();
+    moved["records"][0]["position"] = serde_json::json!([1.0, 2.0, 3.0]);
+    assert!(!is_quest_binding_change_between(briarwood, &old, &moved));
+
+    let mut appended = quest.clone();
+    appended["records"]
+        .as_array_mut()
+        .expect("records")
+        .push(serde_json::json!({"npc_id": 1, "name": "new"}));
+    assert!(!is_quest_binding_change_between(briarwood, &old, &appended));
 }
 
 #[test]

@@ -1291,7 +1291,7 @@
         "\"In front of the Druid Academy\" (wiki Quest:Aiding our Allies). Video: nameplate, speech \"So tired... I can't... go on...\" and a cot in the druid cave (ct2JrtOiO4g/00310, /00406, /00408)."
       ],
       "quests_given": [],
-      "quest_ids_given":       [
+      "quest_ids_given": [
         3000380
       ],
       "quests_given_text": [
@@ -1596,7 +1596,7 @@
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 121; source cell: [client] [video] [wiki Arch Druid Camellia]"
           }
         ],
-        "quest_ids_given":         [
+        "quest_ids_given": [
           {
             "kind": "reconstructed",
             "evidence": "(R) T502: Aiding our Allies (3000380) is given here, minted from Lxzxrus QuestId 3080; the fork's TargetGuid hands it in at Headmaster Merk."
@@ -20608,7 +20608,7 @@
       "reference_ids": [],
       "name": "Headmaster Merk",
       "name_reason": null,
-      "name_string_id":       45386,
+      "name_string_id": 45386,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -20759,7 +20759,7 @@
         "The druid arc, see #Quest index: Fortify Our Defenses, Essssspionage and the later druid titles (\"Headmaster Merk wants you to set up a defense for the Druid Camp\" 2188759314; \"Headmaster Merk needs you to find evidence that the Dwarves are behind the invasion\" 754690363; \"Speak with Headmaster Merk to help take back Shrouded Glade.\" 1812947502); hands over Power Stones (3121392492).",
         "Friend or Foe: The Tradesgoblin and Friend or Foe: The Monster (wiki Sunstone list); target of Aiding our Allies and the middle stop in Friend or Foe: The Savage; gives the Gloam power stone in House Cleaning (\"Take this power stone. Use it to absorb the Gloam influence off of the spikes\", 402239456)."
       ],
-      "quests_accepted":       [
+      "quests_accepted": [
         {
           "quest_id": 3000380,
           "title": "Aiding our Allies",
@@ -20776,7 +20776,7 @@
           ]
         }
       ],
-      "quests_accepted_reason":       "T502: Aiding our Allies (3000380) is handed in to Headmaster Merk, the fork's TargetGuid (R); see the entry's source.",
+      "quests_accepted_reason": "T502: Aiding our Allies (3000380) is handed in to Headmaster Merk, the fork's TargetGuid (R); see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [
@@ -20784,25 +20784,25 @@
         "Power stones (709920425)."
       ],
       "services_reason": null,
-      "position":       [
+      "position": [
         482.1476,
         65.42416,
         1747.054
       ],
       "position_w": null,
-      "rotation":       [
+      "rotation": [
         0.0,
         -0.7529961231518917,
         0.0,
         0.6580249528081904
       ],
-      "placement":       "legacy_data",
-      "placement_source":       "legacy_data_spawn",
-      "placement_confidence":       "high",
-      "placement_candidates":       [],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "high",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason":       "Legacy built-content spawn coordinates copied from ../lab/references/Lxzxrus-Free-Realms-Server/src/Scripts/Zone/FabledRealms.lua:2325 (definition 3841: 482.1476, 65.42416, 1747.054, heading -1.705207); ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=3841 (NameId=45386, ModelId=3952, ModelFileName=fairy_druid_m_factionleader.adr). Client text 440470 says Arch Druid Camellia 'asked you to aid the dwarves of Sunstone Valley', and the wiki note kept in this row's title_or_role and quests_given sources places Merk in Rumble Ridge. The spawn is 4.3 m from Dorn Geargrinder, whose row 9500000668 is in this same file (FabledRealms.lua:2324). The zone label stays Shrouded Glade / zone_id 12 (R): the guide keeps his row with the glade cast because he acts in the glade during the invasion. (R) Replaces the POI-anchor position this row carried before T502.",
-      "source":       [
+      "position_reason": "Legacy built-content spawn coordinates copied from ../lab/references/Lxzxrus-Free-Realms-Server/src/Scripts/Zone/FabledRealms.lua:2325 (definition 3841: 482.1476, 65.42416, 1747.054, heading -1.705207); ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=3841 (NameId=45386, ModelId=3952, ModelFileName=fairy_druid_m_factionleader.adr). Client text 440470 says Arch Druid Camellia 'asked you to aid the dwarves of Sunstone Valley', and the wiki note kept in this row's title_or_role and quests_given sources places Merk in Rumble Ridge. The spawn is 4.3 m from Dorn Geargrinder, whose row 9500000668 is in this same file (FabledRealms.lua:2324). The zone label stays Shrouded Glade / zone_id 12 (R): the guide keeps his row with the glade cast because he acts in the glade during the invasion. (R) Replaces the POI-anchor position this row carried before T502.",
+      "source": [
         {
           "kind": "client",
           "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 122; source cell: [client] [video] [wiki Druids, Shrouded Gloam]"
@@ -20979,7 +20979,7 @@
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part A. Rumble Ridge: the Freewheelers and Wheelie Pete's Roadhouse, row 35; source cell: [client][video][wiki]"
           }
         ],
-        "name_string_id":         [
+        "name_string_id": [
           {
             "kind": "client",
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Shrouded Glade.md#Part F. The Gloam invasion cast, row 122; source cell: [client] [video] [wiki Druids, Shrouded Gloam]"
@@ -21333,13 +21333,13 @@
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part A. Rumble Ridge: the Freewheelers and Wheelie Pete's Roadhouse, row 35; source cell: [client][video][wiki]"
           }
         ],
-        "quests_accepted":         [
+        "quests_accepted": [
           {
             "kind": "reconstructed",
             "evidence": "(R) T502: Aiding our Allies (3000380) is handed in to Headmaster Merk, the fork's TargetGuid (R); see the entry's source."
           }
         ],
-        "quests_accepted_reason":         [
+        "quests_accepted_reason": [
           {
             "kind": "reconstructed",
             "evidence": "(R) T502: Aiding our Allies (3000380) is handed in to Headmaster Merk, the fork's TargetGuid (R); see the entry's source."
@@ -21429,13 +21429,13 @@
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part A. Rumble Ridge: the Freewheelers and Wheelie Pete's Roadhouse, row 35; source cell: [client][video][wiki]"
           }
         ],
-        "position":         [
+        "position": [
           {
             "kind": "legacy-data",
             "evidence": "../lab/references/Lxzxrus-Free-Realms-Server/src/Scripts/Zone/FabledRealms.lua:2325 spawn definition 3841; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=3841 (NameId=45386, ModelId=3952, ModelFileName=fairy_druid_m_factionleader.adr). The pinned FreeRealms-Legacy fork has the same transform at its src/Scripts/Zone/FabledRealms.lua:2508."
           }
         ],
-        "position_reason":         [
+        "position_reason": [
           {
             "kind": "legacy-data",
             "evidence": "../lab/references/Lxzxrus-Free-Realms-Server/src/Scripts/Zone/FabledRealms.lua:2325 spawn definition 3841; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=3841 (NameId=45386, ModelId=3952, ModelFileName=fairy_druid_m_factionleader.adr)"
@@ -21447,7 +21447,7 @@
             "evidence": "(R) Null because no captured NPC float4 W component was joined."
           }
         ],
-        "rotation":         [
+        "rotation": [
           {
             "kind": "legacy-data",
             "evidence": "../lab/references/Lxzxrus-Free-Realms-Server/src/Scripts/Zone/FabledRealms.lua:2325 spawn definition 3841; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=3841 (NameId=45386, ModelId=3952, ModelFileName=fairy_druid_m_factionleader.adr)"
@@ -21457,25 +21457,25 @@
             "evidence": "(R) Existing Y-axis yaw-quaternion conversion from raw heading; raw heading is retained separately."
           }
         ],
-        "placement":         [
+        "placement": [
           {
             "kind": "legacy-data",
             "evidence": "../lab/references/Lxzxrus-Free-Realms-Server/src/Scripts/Zone/FabledRealms.lua:2325 spawn definition 3841; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=3841 (NameId=45386, ModelId=3952, ModelFileName=fairy_druid_m_factionleader.adr)"
           }
         ],
-        "placement_source":         [
+        "placement_source": [
           {
             "kind": "legacy-data",
             "evidence": "../lab/references/Lxzxrus-Free-Realms-Server/src/Scripts/Zone/FabledRealms.lua:2325 spawn definition 3841; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=3841 (NameId=45386, ModelId=3952, ModelFileName=fairy_druid_m_factionleader.adr)"
           }
         ],
-        "placement_confidence":         [
+        "placement_confidence": [
           {
             "kind": "reconstructed",
             "evidence": "(R) High means one normalized locale name and one unambiguous Legacy spawn, not native-client confirmation; T502 replaced the POI anchor with the FabledRealms.lua:2325 transform."
           }
         ],
-        "placement_candidates":         [
+        "placement_candidates": [
           {
             "kind": "legacy-data",
             "evidence": "../lab/references/Lxzxrus-Free-Realms-Server/src/Scripts/Zone/FabledRealms.lua:2325 spawn definition 3841; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=3841 (NameId=45386, ModelId=3952, ModelFileName=fairy_druid_m_factionleader.adr) No competing regional row or spawn candidate; T502 retires the POI anchor candidates."
@@ -21488,21 +21488,21 @@
           }
         ]
       ,
-        "heading":         [
+        "heading": [
           {
             "kind": "legacy-data",
             "evidence": "../lab/references/Lxzxrus-Free-Realms-Server/src/Scripts/Zone/FabledRealms.lua:2325 spawn definition 3841; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=3841 (NameId=45386, ModelId=3952, ModelFileName=fairy_druid_m_factionleader.adr)"
           }
         ]
       ,
-        "model_id":         [
+        "model_id": [
           {
             "kind": "legacy-data",
             "evidence": "../lab/references/Lxzxrus-Free-Realms-Server/src/Scripts/Zone/FabledRealms.lua:2325 spawn definition 3841; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=3841 (NameId=45386, ModelId=3952, ModelFileName=fairy_druid_m_factionleader.adr)"
           }
         ]
       ,
-        "model_file_name":         [
+        "model_file_name": [
           {
             "kind": "legacy-data",
             "evidence": "../lab/references/Lxzxrus-Free-Realms-Server/src/Scripts/Zone/FabledRealms.lua:2325 spawn definition 3841; ../lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=3841 (NameId=45386, ModelId=3952, ModelFileName=fairy_druid_m_factionleader.adr)"

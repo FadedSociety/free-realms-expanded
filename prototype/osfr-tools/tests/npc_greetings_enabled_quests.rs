@@ -325,7 +325,7 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
     ),
     (
         9000000191,
-        "Sasparilla Brewmaster Wugawump (T502 turn-in of 3000400): NPCs - Wugachug.md:38 quotes only the third-person brewery and party talk (1459611394, 3773925023) and the referral to him; his first-person lines are the Join the Party intro 385978 (he is not that quest's giver) and the end text 385981, which is the quest-step dialogue of 3000400 goal 1, so no uncontested greeting is proven.",
+        "Sasparilla Brewmaster Wugawump (T502 turn-in of 3000400): NPCs - Wugachug.md:38 quotes only the third-person brewery and party talk (1459611394, 3773925023) and the referral to him; his first-person line is the Join the Party end text 385981, which is the quest-step dialogue of 3000400 goal 1, and the intro 385978 belongs to Boranug, that quest's giver, so no uncontested greeting of his own is proven.",
     ),
     (
         9000000227,

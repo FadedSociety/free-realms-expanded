@@ -2677,7 +2677,7 @@
           ]
         }
       ],
-      "quest_ids_given":       [
+      "quest_ids_given": [
         3000390
       ],
       "quests_given_text": [
@@ -2982,7 +2982,7 @@
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part B. The Greenwood Camp (chugawug archer camp) and the merchants around it, row 63; source cell: [client][video][wiki]"
           }
         ],
-        "quest_ids_given":         [
+        "quest_ids_given": [
           {
             "kind": "reconstructed",
             "evidence": "(R) T502: Misplaced Mugwopp (3000390) is given here, minted from Lxzxrus QuestId 3090; the fork's TargetGuid hands it in at Mugwopp."

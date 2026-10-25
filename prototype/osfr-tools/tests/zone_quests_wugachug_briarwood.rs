@@ -25,7 +25,7 @@ mod npc_quest_chain;
 use npc_quest_chain::{
     ADVENTURER, CHARACTER, Fixture, ZoneQuest, ZoneQuests, active_job, assert_no_offer,
     assert_packet_changes_nothing, coins, content_dir, counts, profile_xp, quest_end_reply,
-    quest_reply, quest_status, saved, zone_player,
+    quest_reply, quest_status, read_json, saved, zone_player,
 };
 use osfr_tools::{quest_engine::QuestStatus, startup_world::parse_add_npc, world::NpcVisibility};
 
@@ -111,30 +111,32 @@ const JOIN_PARTY: ZoneQuest = ZoneQuest {
 };
 
 /// Every NPC row in `data/content/npcs`, as the production content loader reads
-/// them (T502 only changes one: Merk's `name_string_id` becomes 45386).
+/// them (T502 only changes one: Merk's `name_string_id` becomes 45386). The JSON
+/// read is the shared `npc_quest_chain::read_json`, so a read-rule change lands
+/// here too.
 fn npc_rows() -> Vec<(String, serde_json::Value)> {
     let dir = content_dir().join("npcs");
-    let mut files: Vec<_> = std::fs::read_dir(&dir)
+    let mut files: Vec<std::path::PathBuf> = std::fs::read_dir(&dir)
         .expect("NPC content directory")
         .map(|entry| entry.expect("NPC content entry").path())
         .collect();
     files.sort();
     files
         .into_iter()
-        .filter_map(|path| {
-            let name = path.file_name()?.to_str()?.to_owned();
-            let document: serde_json::Value =
-                serde_json::from_slice(&std::fs::read(&path).expect("NPC file")).expect("NPC json");
-            Some(
-                document["records"]
-                    .as_array()
-                    .expect("NPC records")
-                    .iter()
-                    .map(|row| (name.clone(), row.clone()))
-                    .collect::<Vec<_>>(),
-            )
+        .flat_map(|path| {
+            let name = path
+                .file_name()
+                .and_then(|name| name.to_str())
+                .expect("NPC file name")
+                .to_owned();
+            let document = read_json(&path);
+            document["records"]
+                .as_array()
+                .expect("NPC records")
+                .iter()
+                .map(|row| (name.clone(), row.clone()))
+                .collect::<Vec<_>>()
         })
-        .flatten()
         .collect()
 }
 

@@ -59161,7 +59161,7 @@
       "quests_given_text": [
         "Chapter 1: The Weapon Shipment (his wife: client 3897364578); Treeleaf's Retreat (client 3309875870); Amaranthus in Bristlewood Glade (575707451); the shambler in Dark Spore Depths (1116511517); The Mushroom Gigas (1791384205); a smuggler camp (60850863, Shady Smugglers); the taste-tester escort (275365818). Titles beyond the Chapter 1 quest are not proven."
       ],
-      "quests_accepted":       [
+      "quests_accepted": [
         {
           "quest_id": 3000392,
           "title": "Briarwood's Not So Bad",
@@ -59178,7 +59178,7 @@
           ]
         }
       ],
-      "quests_accepted_reason":       "T502: Briarwood's Not So Bad (3000392) is handed in to Sergeant Cargug, the fork's TargetGuid (R); see the entry's source.",
+      "quests_accepted_reason": "T502: Briarwood's Not So Bad (3000392) is handed in to Sergeant Cargug, the fork's TargetGuid (R); see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [],
@@ -59496,13 +59496,13 @@
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 148; source cell: [client][video][wiki]"
           }
         ],
-        "quests_accepted":         [
+        "quests_accepted": [
           {
             "kind": "reconstructed",
             "evidence": "(R) T502: Briarwood's Not So Bad (3000392) is handed in to Sergeant Cargug, the fork's TargetGuid (R); see the entry's source."
           }
         ],
-        "quests_accepted_reason":         [
+        "quests_accepted_reason": [
           {
             "kind": "reconstructed",
             "evidence": "(R) T502: Briarwood's Not So Bad (3000392) is handed in to Sergeant Cargug, the fork's TargetGuid (R); see the entry's source."
@@ -60996,7 +60996,7 @@
       "title_or_role": [
         "Friend of Mugwopp, opening a new camp (client 3534154508)."
       ],
-      "roles":       [
+      "roles": [
         "ambient",
         "quest_giver"
       ],
@@ -61005,13 +61005,13 @@
         "\"Deep into Briarwood\" (client 727442162). [video: green marker 11 m beside Cortez, EJYVXogAhhE/00110]"
       ],
       "quests_given": [],
-      "quest_ids_given":       [
+      "quest_ids_given": [
         3000392
       ],
       "quests_given_text": [
         "Smoggo's Sword; the target of Misplaced Mugwopp."
       ],
-      "quests_accepted":       [
+      "quests_accepted": [
         {
           "quest_id": 3000391,
           "title": "How Bad is it?",
@@ -61028,7 +61028,7 @@
           ]
         }
       ],
-      "quests_accepted_reason":       "T502: How Bad is it? (3000391) is handed in to Smoggo, the fork's TargetGuid (R); see the entry's source.",
+      "quests_accepted_reason": "T502: How Bad is it? (3000391) is handed in to Smoggo, the fork's TargetGuid (R); see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [
@@ -61224,7 +61224,7 @@
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Mother Lode Quarry, crafting station and the Vale of the Ancients dig camp, row 114; source cell: [client][video]"
           }
         ],
-        "roles":         [
+        "roles": [
           {
             "kind": "client",
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Mother Lode Quarry, crafting station and the Vale of the Ancients dig camp, row 114; source cell: [client][video]"
@@ -61272,7 +61272,7 @@
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Mother Lode Quarry, crafting station and the Vale of the Ancients dig camp, row 114; source cell: [client][video]"
           }
         ],
-        "quest_ids_given":         [
+        "quest_ids_given": [
           {
             "kind": "reconstructed",
             "evidence": "(R) T502: Briarwood's Not So Bad (3000392) is given here, minted from Lxzxrus QuestId 3092; the fork's TargetGuid hands it in at Sergeant Cargug."
@@ -61288,13 +61288,13 @@
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Mother Lode Quarry, crafting station and the Vale of the Ancients dig camp, row 114; source cell: [client][video]"
           }
         ],
-        "quests_accepted":         [
+        "quests_accepted": [
           {
             "kind": "reconstructed",
             "evidence": "(R) T502: How Bad is it? (3000391) is handed in to Smoggo, the fork's TargetGuid (R); see the entry's source."
           }
         ],
-        "quests_accepted_reason":         [
+        "quests_accepted_reason": [
           {
             "kind": "reconstructed",
             "evidence": "(R) T502: How Bad is it? (3000391) is handed in to Smoggo, the fork's TargetGuid (R); see the entry's source."

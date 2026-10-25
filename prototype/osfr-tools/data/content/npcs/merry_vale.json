@@ -20813,13 +20813,13 @@
           ]
         }
       ],
-      "quest_ids_given":       [
+      "quest_ids_given": [
         3000391
       ],
       "quests_given_text": [
         "Misplaced Mugwopp (title 1862904283; Blorple gives it; the quest then goes on to Smoggo in Briarwood, see NPCs - Briarwood)."
       ],
-      "quests_accepted":       [
+      "quests_accepted": [
         {
           "quest_id": 3000390,
           "title": "Misplaced Mugwopp",
@@ -20836,7 +20836,7 @@
           ]
         }
       ],
-      "quests_accepted_reason":       "T502: Misplaced Mugwopp (3000390) is handed in to Mugwopp, the fork's TargetGuid (R); see the entry's source.",
+      "quests_accepted_reason": "T502: Misplaced Mugwopp (3000390) is handed in to Mugwopp, the fork's TargetGuid (R); see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [],
@@ -21014,7 +21014,7 @@
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part D. Townsfolk and visitors, row 91; source cell: [client]"
           }
         ],
-        "quest_ids_given":         [
+        "quest_ids_given": [
           {
             "kind": "reconstructed",
             "evidence": "(R) T502: How Bad is it? (3000391) is given here, minted from Lxzxrus QuestId 3091; the fork's TargetGuid hands it in at Smoggo."
@@ -21026,13 +21026,13 @@
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Merry Vale.md#Part D. Townsfolk and visitors, row 91; source cell: [client]"
           }
         ],
-        "quests_accepted":         [
+        "quests_accepted": [
           {
             "kind": "reconstructed",
             "evidence": "(R) T502: Misplaced Mugwopp (3000390) is handed in to Mugwopp, the fork's TargetGuid (R); see the entry's source."
           }
         ],
-        "quests_accepted_reason":         [
+        "quests_accepted_reason": [
           {
             "kind": "reconstructed",
             "evidence": "(R) T502: Misplaced Mugwopp (3000390) is handed in to Mugwopp, the fork's TargetGuid (R); see the entry's source."
