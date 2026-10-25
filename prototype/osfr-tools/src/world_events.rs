@@ -180,10 +180,11 @@ enum OpRow {
         actor: String,
         string_id: i32,
     },
-    /// The client locale line, copied as text; `locale_id` is its provenance and is never sent.
+    /// The line, copied as text; `locale_id` is its client locale provenance and is never sent.
+    /// Left out, the line is a reconstruction (R) with no client locale entry (T493).
     Broadcast {
         text: String,
-        locale_id: i32,
+        locale_id: Option<i32>,
         radius_m: Option<f32>,
     },
     Move {
@@ -524,7 +525,7 @@ impl Builder<'_> {
                 locale_id,
                 radius_m,
             } => {
-                positive(locale_id)?;
+                locale_id.map(positive).transpose()?;
                 let radius = radius_m.is_none_or(|r| r > 0.0 && r <= MAX_RADIUS_M);
                 let line = !text.trim().is_empty()
                     && text.len() <= MAX_TEXT_BYTES
@@ -1956,6 +1957,8 @@ mod tests {
             walk(json!([1.0, 0.0, 1.0]), 0.1),
             say("hi", 1, json!(null)),
             say("hi", 1, json!(9_000.0)),
+            // T493: a reconstructed line has no client locale entry, so the field may be left out.
+            step(json!({"broadcast": {"text": "hi"}})),
             step(json!({"say": {"actor": "a", "string_id": 1}})),
             step(json!({"area": {"area_id": 1, "on": true}})),
             cycle(100, json!([1])),

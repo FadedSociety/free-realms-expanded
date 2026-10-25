@@ -11,7 +11,7 @@ use osfr_tools::{
     players::{InterestPolicy, PlayerRegistry, SessionId, ZoneInstance},
     world_events::{self, WorldEvent, WorldEvents},
 };
-use serde_json::{Value, json};
+use serde_json::Value;
 use std::{
     collections::{BTreeMap, BTreeSet, HashSet},
     fs,
@@ -482,25 +482,6 @@ fn stopping_early_switches_the_song_off_and_removes_every_actor() {
     );
 }
 
-/// The shipped file plus the two Bruce stages when T493 has not shipped them: the dance-off's
-/// skip list needs their slot rows, so the sweep works before and after that content lands.
-fn scheduled_events() -> Vec<WorldEvent> {
-    let mut file = shipped();
-    let rows = file["events"].as_array_mut().unwrap();
-    for (key, offset) in [("bruce_snowhill", 0), ("bruce_wugachug", 120)] {
-        if !rows.iter().any(|event| event["key"] == key) {
-            rows.push(json!({"key": key, "actors": [], "timeline": [],
-                "schedule": {"slot_minutes": 240, "offset_minutes": offset}}));
-        }
-    }
-    let dir = std::env::temp_dir().join(format!("osfr-t464-{}", std::process::id()));
-    fs::create_dir_all(&dir).unwrap();
-    fs::write(dir.join(world_events::FILE), file.to_string()).unwrap();
-    let events = world_events::load_scheduled(&dir);
-    let _ = fs::remove_dir_all(&dir);
-    events.unwrap()
-}
-
 /// Sweeps one UTC day from midnight in 30 s ticks: `(kickoff lines, start lines, start minutes)`.
 fn sweep(day_ms: u64) -> (usize, usize, Vec<u64>) {
     let file = shipped();
@@ -515,7 +496,9 @@ fn sweep(day_ms: u64) -> (usize, usize, Vec<u64>) {
     let start = chat::system(start_line.as_str().unwrap());
     let (players, mut areas) = (viewer(), ClientAreas::load(&content()).unwrap());
     let mut events = WorldEvents::default();
-    events.schedule(scheduled_events(), WORLD, day_ms, &areas);
+    // Bruce's two slot rows are in the shipped file; the dance-off's skip list needs them (T493).
+    let scheduled = world_events::load_scheduled(&content()).unwrap();
+    events.schedule(scheduled, WORLD, day_ms, &areas);
     let (mut kickoffs, mut starts, mut minutes) = (0, 0, Vec::new());
     for at in (0..DAY_MS).step_by(30_000) {
         for (_, packet) in events.tick(at, day_ms + at, &players, &mut areas) {

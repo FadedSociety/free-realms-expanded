@@ -1,6 +1,38 @@
 {
   "events": [
     {
+      "key": "bruce_snowhill",
+      "actors": [
+        {"key": "bruce", "model_id": 20, "name_string_id": 201, "npc_name": "Bruce", "position": [317.66, 29.83, 484.14], "heading": -2.4, "stand_animation_id": 1, "hide_nameplate": false, "source": "T493. Position and heading: reference Sanctuary 10f129e src/Scripts/Zone/BruceConcert.lua:28 (Snowhill). Bruce: reference Sanctuary 10f129e src/Resources/Npcs.json Id 3549 (NameId 201, ModelId 20); client Models.txt row 20 human_rockstar_m.adr, locale 201 Bruce. Stage music area 17: client FabledRealmsAreas.xml (SnowHill_Stage id 17, sphere (317,30,484) r58, SoundDefinitionId 5393, line 23). Poof 21: BruceConcert.lua:8 (client ActorCompositeEffectDefinitions.xml:283 PFX_smoke_black_explosion). Idle ids 3333/3354/3363/3319/3347/3346 and air guitar 3350: BruceConcert.lua:13-19, client AnimationTypes.xml. Gathering 300 s and song 181 s: BruceConcert.lua:10-11, so Bruce leaves at 481 s. Idle plays every 15 s plus up to 10 s of jitter, the 15-25 s Sanctuary draws. (R) stand_animation_id 1 (as enemies.rs) and the 240-minute slot with offset 0 (Sanctuary alternates stages every 2-hour slot of the local day). Broadcast text: (R) no client line exists for Snowhill, worded after client locale 5142; locale 94141 only names the place."}
+      ],
+      "timeline": [
+        {"at_ms": 0, "op": {"spawn": {"actor": "bruce", "effect_id": 21}}},
+        {"at_ms": 0, "op": {"broadcast": {"text": "A concert is starting at the Snowhill Stage!"}}},
+        {"at_ms": 0, "op": {"cycle_anim": {"actors": ["bruce"], "ids": [3333, 3354, 3363, 3319, 3347, 3346], "every_ms": 15000, "jitter_ms": 10000, "until_ms": 300000, "order": "random"}}},
+        {"at_ms": 300000, "op": {"area": {"area_id": 17, "on": true}}},
+        {"at_ms": 300000, "op": {"cycle_anim": {"actors": ["bruce"], "ids": [3350], "every_ms": 8000, "jitter_ms": 0, "until_ms": 181000, "order": "sequence"}}},
+        {"at_ms": 481000, "op": {"area": {"area_id": 17, "on": false}}},
+        {"at_ms": 481000, "op": {"remove": {"actor": "bruce", "effect_id": 21}}}
+      ],
+      "schedule": {"slot_minutes": 240, "offset_minutes": 0}
+    },
+    {
+      "key": "bruce_wugachug",
+      "actors": [
+        {"key": "bruce", "model_id": 20, "name_string_id": 201, "npc_name": "Bruce", "position": [74.6, 26.78, -413.2], "heading": -1.715594, "stand_animation_id": 1, "hide_nameplate": false, "source": "T493. Position and heading: reference Sanctuary 10f129e src/Scripts/Zone/BruceConcert.lua:34 (Wugachug; the script has -1.715594). Bruce: reference Sanctuary 10f129e src/Resources/Npcs.json Id 3549 (NameId 201, ModelId 20); client Models.txt row 20 human_rockstar_m.adr, locale 201 Bruce. Stage music area 4285: client FabledRealmsAreas.xml (bruce_concert_wugachug_large id 4285, sphere (75,27,-413) r165, SoundDefinitionId 17715, line 3478). Poof 21: BruceConcert.lua:8 (client ActorCompositeEffectDefinitions.xml:283 PFX_smoke_black_explosion). Idle ids 3333/3354/3363/3319/3347/3346 and air guitar 3350: BruceConcert.lua:13-19, client AnimationTypes.xml. Gathering 300 s and song 181 s: BruceConcert.lua:10-11, so Bruce leaves at 481 s. Idle plays every 15 s plus up to 10 s of jitter, the 15-25 s Sanctuary draws. (R) stand_animation_id 1 (as enemies.rs) and the 240-minute slot with offset 120 (Sanctuary alternates stages every 2-hour slot of the local day). Broadcast text: client locale 5142."}
+      ],
+      "timeline": [
+        {"at_ms": 0, "op": {"spawn": {"actor": "bruce", "effect_id": 21}}},
+        {"at_ms": 0, "op": {"broadcast": {"text": "A concert is starting at the Wugachug Stage!", "locale_id": 5142}}},
+        {"at_ms": 0, "op": {"cycle_anim": {"actors": ["bruce"], "ids": [3333, 3354, 3363, 3319, 3347, 3346], "every_ms": 15000, "jitter_ms": 10000, "until_ms": 300000, "order": "random"}}},
+        {"at_ms": 300000, "op": {"area": {"area_id": 4285, "on": true}}},
+        {"at_ms": 300000, "op": {"cycle_anim": {"actors": ["bruce"], "ids": [3350], "every_ms": 8000, "jitter_ms": 0, "until_ms": 181000, "order": "sequence"}}},
+        {"at_ms": 481000, "op": {"area": {"area_id": 4285, "on": false}}},
+        {"at_ms": 481000, "op": {"remove": {"actor": "bruce", "effect_id": 21}}}
+      ],
+      "schedule": {"slot_minutes": 240, "offset_minutes": 120}
+    },
+    {
       "key": "halloween_dance_off",
       "actors": [
         {"key": "boombox", "model_id": 1661, "name_string_id": 432116, "npc_name": "Dance-Off Boombox", "position": [-2384.79, -26.83, 1210.41], "heading": 0.0985, "stand_animation_id": 1, "hide_nameplate": false, "source": "Sanctuary 10f129e src/Resources/Npcs.json id 40008 (model, name, nameplate); client Models.txt model 1661; position and heading from src/Scripts/Zone/HalloweenDanceOff.lua (e3deee7)"},
