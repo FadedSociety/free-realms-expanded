@@ -1402,6 +1402,18 @@ fn the_housing_snapshot_seam_is_path_free() {
     assert_eq!(round_trip, state);
 }
 
+/// T516/F689: the row provenance names only sources this table is allowed to carry.
+/// `scene_source` says where the property-to-scene association came from (enabled rows);
+/// `bounds_source` says where the six-float box came from. A new source must be added here
+/// deliberately, so a typo or a fabricated source fails this test.
+const SCENE_SOURCES: [&str; 4] = [
+    "client-manifest (R)",
+    "community-manifest (R)",
+    "lxzxrus-scout (R)",
+    "lxzxrus-zone (R)",
+];
+const BOUNDS_SOURCES: [&str; 3] = ["legacy (R)", "lxzxrus-whereami (R)", "lxzxrus-zone (R)"];
+
 #[test]
 fn enabled_bundled_lots_have_scene_bounds_and_source_tags() {
     let content = HousingContent::bundled().unwrap();
@@ -1409,20 +1421,29 @@ fn enabled_bundled_lots_have_scene_bounds_and_source_tags() {
     assert_eq!(content.lots.iter().filter(|lot| lot.enabled).count(), 23);
     for lot in &content.lots {
         assert!(!lot.source_tag.is_empty());
-        assert!(!lot.bounds_source.is_empty());
         assert!(!lot.build_areas.is_empty());
+        assert!(
+            BOUNDS_SOURCES.contains(&lot.bounds_source.as_str()),
+            "property {} bounds_source {:?}",
+            lot.property_id,
+            lot.bounds_source
+        );
         if lot.enabled {
             assert!(
                 lot.scene
                     .as_ref()
                     .is_some_and(|scene| !scene.name.is_empty())
             );
+            let scene_source = lot
+                .scene_source
+                .as_deref()
+                .expect("an enabled lot has a scene source");
             assert!(
-                lot.scene_source
-                    .as_deref()
-                    .is_some_and(|source| { !source.is_empty() && source.ends_with("(R)") })
+                SCENE_SOURCES.contains(&scene_source),
+                "property {} scene_source {:?}",
+                lot.property_id,
+                scene_source
             );
-            assert!(!lot.bounds_source.is_empty() && lot.bounds_source.ends_with("(R)"));
             assert!(lot.disabled_reason.is_none());
         } else {
             assert!(lot.scene.is_none());
@@ -1442,7 +1463,33 @@ fn enabled_bundled_lots_have_scene_bounds_and_source_tags() {
     );
 }
 
-/// T516: every enabled lot has its own scene and a real sky file, never the placeholder.
+/// T516/F689: the client's `Resources/SKY` files that enabled lots name (working client
+/// `lab/working/OSFR.Client/OSFR Client/Resources/SKY`, listed 2026-10-25). A new or changed sky
+/// must be re-listed there and added here, so an invented name cannot pass.
+const SHIPPED_SKIES: [&str; 15] = [
+    "sky_bat_cave.xml",
+    "sky_blackspore24.xml",
+    "sky_briarwood24.xml",
+    "sky_bristlewood_glade.xml",
+    "sky_deep_mines.xml",
+    "sky_hidden_valley24.xml",
+    "sky_housing_wilds.xml",
+    "sky_merryvale24.xml",
+    "sky_seaside24.xml",
+    "sky_shrouded_gloam.xml",
+    "sky_snowhill24.xml",
+    "sky_snowhill_housinglot_01.xml",
+    "sky_sunset.xml",
+    "sky_sunstone_valley24.xml",
+    "sky_wugachug24.xml",
+];
+
+/// T516: every enabled lot has its own scene, and every enabled lot but the lead-owned starter
+/// has a real sky file, never the placeholder.
+///
+/// F689: every enabled row except the lead-owned starter names a sky from `SHIPPED_SKIES`. The
+/// starter (property 25, L030) keeps `sky_test.xml` until the lead accepts the scout's
+/// `sky_sunstone_valley24`; pinning the placeholder here makes that a deliberate change.
 #[test]
 fn enabled_lots_have_distinct_scenes_and_shipped_skies() {
     let content = HousingContent::bundled().unwrap();
@@ -1455,13 +1502,19 @@ fn enabled_lots_have_distinct_scenes_and_shipped_skies() {
             lot.property_id,
             scene.name
         );
-        assert!(
-            scene.sky.starts_with("sky_") && scene.sky.ends_with(".xml"),
-            "property {} names sky {}",
-            lot.property_id,
-            scene.sky
-        );
-        assert_ne!(scene.sky, "sky_test.xml", "property {}", lot.property_id);
+        if lot.property_id == content.starter_property_id {
+            assert_eq!(
+                scene.sky, "sky_test.xml",
+                "the lead-owned starter keeps its placeholder sky"
+            );
+        } else {
+            assert!(
+                SHIPPED_SKIES.contains(&scene.sky.as_str()),
+                "property {} names sky {} which the client's Resources/SKY does not ship",
+                lot.property_id,
+                scene.sky
+            );
+        }
     }
     assert_eq!(scenes.len(), 23);
 }

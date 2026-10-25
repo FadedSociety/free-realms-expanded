@@ -258,7 +258,7 @@ them with properties.
 | 22 | `icon_hsg_mkt_blackspore_emptylot_64.dds` | `hsg_hum_blackspore_01` | enabled (R, Lxzxrus zone file; T516 replaced the empty Blackspore lot) |
 | 23 | `icon_hsg_mkt_generic_emptylot_64.dds` | — | disabled: generic icon has no unique region scene |
 | 24 | `icon_house_apartment_64.dds` | — | disabled: `hsg_hum_condo.gzne` is a 67-byte, two-entry header-only stub, probably interior only (T516) |
-| 25 | `icon_hsg_mkt_hsg_hum_condo_w_lot_64.dds` | `hsg_hum_condo_w_lot` | enabled, starter (R, `client-manifest`: the icon is named after the scene; T516 gives it the scout's `sky_sunstone_valley24`) |
+| 25 | `icon_hsg_mkt_hsg_hum_condo_w_lot_64.dds` | `hsg_hum_condo_w_lot` | enabled, starter (R, `client-manifest`: the icon is named after the scene; keeps the `sky_test.xml` transition placeholder pending L030/native evidence; scout sky `sky_sunstone_valley24`, R) |
 | 26 | `icon_house_deluxe_64.dds` | `hsg_hum_deluxe_01` | enabled (R, `client-manifest:72611`; T516) |
 | 27 | `icon_house_economy_64.dds` | `hsg_hum_economy_01` | enabled (R, `client-manifest:72694`; T516) |
 | 28 | `icon_house_viphouse_64.dds` | `hsg_hum_sg_night_club_01` | enabled (R, `client-manifest:73003`; T516) |
@@ -270,14 +270,18 @@ them with properties.
 | 34 | `icon_farming_wilds_lot_64.dds` | — | disabled: farm plot, not a house zone (Lxzxrus scout:144-145) (R) |
 
 For an enabled row with a Lxzxrus zone file, the bounds are that file's `BuildAreas` (which match
-the Legacy six-float box), except property 2, whose box is the two in-game `!whereami` corners from
-Lxzxrus 7ef1743 and e1dbdae, so its `bounds_source` is `lxzxrus-whereami (R)`; rows without a zone
-file keep `legacy (R)`. `scene_source` is `client-manifest (R)` for properties 25-28 and
+the Legacy six-float box), so its `bounds_source` is `lxzxrus-zone (R)`. Property 2 is the
+exception: its box is the two in-game `!whereami` corners from Lxzxrus 7ef1743 and e1dbdae, so its
+`bounds_source` is `lxzxrus-whereami (R)`. Rows without a zone file (18 and 25-29) keep
+`legacy (R)`. `scene_source` is `client-manifest (R)` for properties 25-28, `lxzxrus-zone (R)` for
+9, 14 and 22 (their scene joins are the zone file's `Name`), `lxzxrus-scout (R)` for 29, and
 `community-manifest (R)` for the rest. Scene `zone_type`, `unknown`, geometry ID and the other
 transition fields keep the service test defaults (R); zone ids equal property ids. T516 gives every
-enabled row a sky file that ships in the client's `Resources/SKY` folder: the Lxzxrus zone file's
-`Sky` where one exists, otherwise the scout table (`housing-scout.md:113-145`, R). Properties 26-28
-are enabled on the strength of their client-manifest scenes; 33-34 are closed as farm plots. These
+enabled row except the lead-owned starter (property 25) a sky file that ships in the client's
+`Resources/SKY` folder: the Lxzxrus zone file's `Sky` where one exists, otherwise the scout table
+(`housing-scout.md:113-145`, R). Property 25 keeps the `sky_test.xml` transition placeholder
+pending L030/native evidence; its scout sky is `sky_sunstone_valley24` (R). Properties 26-28 are
+enabled on the strength of their client-manifest scenes; 33-34 are closed as farm plots. These
 defaults and the bounds have not passed native client acceptance. The other eight rows without a
 plausible unique candidate or house scene stay disabled and carry a reason in JSON.
 
@@ -287,8 +291,9 @@ Property 25's earlier search looked only at `hsg_emptylot_*` names. Its icon nam
 the scene body is `Assets_004.pack` entry 2685 (`catalog.tsv:72023`, CRC `10604926`, the same
 value). The extracted body is `GZNE` version 3 and holds only terrain material names (`sg_dirt`,
 `sg_grass`, `bw_grass_darkvines` ...), no sky or geometry id, and the toolkit has no GZNE field
-reader, so its `zone_type`/geometry transition fields keep the defaults above (R); T516 supplies its
-sky from the scout table (`sky_sunstone_valley24`, R). `hsg_hum_condo.gzne` is a 67-byte manifest
+reader, so its `zone_type`/geometry transition fields keep the defaults above (R); its `sky` keeps
+the `sky_test.xml` placeholder pending native evidence (the scout table names
+`sky_sunstone_valley24`, R). `hsg_hum_condo.gzne` is a 67-byte manifest
 entry (84 raw bytes), a header-only stub, and is not used.
 
 ### Asset delivery finding

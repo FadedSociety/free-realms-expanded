@@ -165,7 +165,8 @@ pub struct HousingLotDefinition {
     pub scene: Option<HousingScene>,
     /// (R) The client exposes no property-to-scene association.
     pub scene_source: Option<String>,
-    /// (R) Legacy bounds are provisional, not recovered client build areas.
+    /// (R) Where the box came from: the Lxzxrus zone file or whereami readings, else Legacy
+    /// (provisional, not a recovered client build area).
     pub bounds_source: String,
     /// (R) Why this row has no safe community scene-name candidate.
     pub disabled_reason: Option<String>,
