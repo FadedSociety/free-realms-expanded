@@ -891,14 +891,9 @@ impl Gameplay {
         if opening.is_some() {
             learned_recipes.extend([11, 70, 4, 2002]);
         }
-        let bundled_npc_content = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
-        let npc_content = if directory.join("npc_spawns_extra.json").is_file()
-            && directory.join("npcs").is_dir()
-        {
-            directory
-        } else {
-            bundled_npc_content.as_path()
-        };
+        let bundled_npc_content = crate::content::bundled_content();
+        let npc_content = crate::content::npc_content(directory);
+        let npc_content = npc_content.as_path();
         let boomboxes = Arc::new(crate::boombox::Catalogue::load(npc_content)?);
         let item_bar = crate::item_bar::ItemBar::load(directory, boomboxes, saved_item_bar)?;
         // W162: the ride catalogue ships with the bundled content; a set without it has no rides.
@@ -980,10 +975,7 @@ impl Gameplay {
             soccer_content.as_ref(),
             crate::card_game::Content::load_optional(npc_content)?.as_ref(),
         )?;
-        let mut npc_interaction = if npc_content.join("npcs").is_dir()
-            && npc_content.join("stores.json").is_file()
-            && npc_content.join("vendors.json").is_file()
-        {
+        let mut npc_interaction = if crate::content::npc_shop_enabled(npc_content) {
             Some(NpcInteraction::load(
                 &npc_content.join("npcs"),
                 &npc_content.join("stores.json"),
@@ -4083,18 +4075,8 @@ impl Gameplay {
                     return Ok(out);
                 }
                 match command {
-                    "exit" => {
-                        let result = self.encounter.as_mut().unwrap().exit()?;
-                        self.apply_encounter(result, &mut out)?;
-                    }
-                    "retry" => {
-                        let result = self
-                            .encounter
-                            .as_mut()
-                            .unwrap()
-                            .retry(self.profiles.as_ref().unwrap().active(), now_ms)?;
-                        self.apply_encounter(result, &mut out)?;
-                    }
+                    "exit" => self.developer_exit(&mut out)?,
+                    "retry" => self.developer_retry(now_ms, &mut out)?,
                     "mine" => {
                         if !self.dev_tools {
                             out.replies.push(chat::system(

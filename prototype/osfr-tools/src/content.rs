@@ -6,10 +6,33 @@ use serde_json::Value;
 use std::{
     collections::{BTreeMap, HashSet},
     fmt, fs,
-    path::Path,
+    path::{Path, PathBuf},
 };
 
 pub const SCHEMA_VERSION: u32 = 1;
+
+/// The server's bundled authored content directory.
+pub fn bundled_content() -> PathBuf {
+    PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content")
+}
+
+/// The NPC content set `Gameplay::load` binds: the save's own directory when it
+/// carries the NPC package, else the bundled content.
+pub fn npc_content(directory: &Path) -> PathBuf {
+    if directory.join("npc_spawns_extra.json").is_file() && directory.join("npcs").is_dir() {
+        directory.to_path_buf()
+    } else {
+        bundled_content()
+    }
+}
+
+/// Whether that set has what the NPC interaction layer (and its coin shop)
+/// needs. `Gameplay::load` binds both from this one rule.
+pub fn npc_shop_enabled(content: &Path) -> bool {
+    content.join("npcs").is_dir()
+        && content.join("stores.json").is_file()
+        && content.join("vendors.json").is_file()
+}
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(

@@ -2723,6 +2723,35 @@ fn realm_win_without_an_encounter_engine_is_a_refusal() {
     assert_eq!(game.inventory.state(), &bag, "the refusal changes nothing");
 }
 
+/// F688 review item 4: the sibling developer routes `exit` and `retry` took the
+/// same engine `unwrap`; each now refuses like `win` instead of a panic.
+#[test]
+fn realm_exit_and_retry_without_an_encounter_engine_are_refusals() {
+    let mut game = Gameplay::load(&reference(), None).unwrap();
+    game.set_dev_tools(true);
+    game.set_role(crate::account_store::AccountRole::Admin);
+    game.encounter = None;
+    let character = CharacterState {
+        guid: 1,
+        zone_id: 0,
+        position: [-440.0, 0.8, 1292.0],
+        rotation: [1.0, 0.0, 0.0],
+    };
+    let bag = game.inventory.state().clone();
+    for (now, command) in [(1_000, "realm exit"), (1_001, "realm retry")] {
+        let out = game
+            .handle_in_world(&offer_chat(command), &character, now)
+            .unwrap();
+        let text = String::from_utf8_lossy(&out.replies.concat()).to_string();
+        assert!(
+            text.contains("No encounter is active."),
+            "{command}: {text}"
+        );
+        assert!(out.zoning.is_none(), "{command} does not zone");
+        assert_eq!(game.inventory.state(), &bag, "{command} changes nothing");
+    }
+}
+
 /// Battle spawners (data/content/field_battles.json) are world-style AddNpc
 /// actors sent by proximity, so the client keeps and renders them.
 #[test]

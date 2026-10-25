@@ -10,6 +10,7 @@ use osfr_tools::{
     account_store::AccountRole,
     chat,
     coin_shop::CoinShop,
+    content,
     gateway::Gateway,
     inventory::{Inventory, InventoryState, MAX_ITEMS},
     profiles::Profiles,
@@ -91,17 +92,6 @@ fn content_with_chance(chance: f64) -> PathBuf {
     root
 }
 
-/// The NPC content `Gameplay::load` binds for this runtime package: its own
-/// `npcs/` when it has one, else the bundled `data/content`.
-fn npc_content() -> PathBuf {
-    let runtime = manifest_dir().join(RUNTIME_CONTENT);
-    if runtime.join("npc_spawns_extra.json").is_file() && runtime.join("npcs").is_dir() {
-        runtime
-    } else {
-        content_dir()
-    }
-}
-
 fn count(gateway: &Gateway, item: i32) -> u32 {
     gateway
         .snapshot()
@@ -113,6 +103,21 @@ fn count(gateway: &Gateway, item: i32) -> u32 {
         .filter(|stack| stack.definition_id == item)
         .map(|stack| stack.count)
         .sum()
+}
+
+/// The 15/3 system lines a run sent, in order (what the chat panel shows).
+/// Client reader `0x00b0f5f0` (dispatched from `0x00b14350`): u32 text length,
+/// that many bytes, then one flag byte.
+fn system_lines(replies: &[Vec<u8>]) -> Vec<String> {
+    replies
+        .iter()
+        .map(|reply| unframe(reply))
+        .filter(|packet| packet.starts_with(&[15, 0, 3, 0]) && packet.len() >= 8)
+        .map(|packet| {
+            let length = u32::from_le_bytes(packet[4..8].try_into().unwrap()) as usize;
+            String::from_utf8_lossy(&packet[8..8 + length]).into_owned()
+        })
+        .collect()
 }
 
 /// How a test wins the battle: the production melee route, or the developer
@@ -237,6 +242,8 @@ fn a_battle_without_a_drop_row_awards_nothing_new() {
     let _ = fs::remove_dir_all(content);
 }
 
+/// A full bag loses only the chance drop: the win's coins, prize and XP still
+/// pay, and no system line announces the loss (a lead UX decision, pinned here).
 #[test]
 fn a_bag_with_no_slot_loses_only_the_drop() {
     let content = content_with_chance(1.0);
@@ -269,6 +276,18 @@ fn a_bag_with_no_slot_loses_only_the_drop() {
     assert_payout(&full.before, &full.after, row, &prizes, BATTLE_JOB_XP);
     let bag = full.gateway.snapshot().gameplay.unwrap().inventory;
     assert_eq!(bag.items.len(), MAX_ITEMS, "the bag did not grow");
+    // F688 review BLOCKER: the skip is silent. A later change that announces
+    // the full-bag loss must fail here for the lead's UX decision.
+    let full_lines = system_lines(&full.replies);
+    assert!(
+        !full_lines.is_empty(),
+        "the win still sends its system line"
+    );
+    assert_eq!(
+        full_lines,
+        system_lines(&open.replies),
+        "the full-bag skip sends no system chat line of its own"
+    );
     let _ = fs::remove_dir_all(content);
 }
 
@@ -401,10 +420,13 @@ fn the_shipped_rows_are_data_driven_and_grantable() {
     // `CoinShop::sell_unit_price` is the one effective sale price the Sell tab
     // uses (store row, free issuance or the client Worth fallback), so a
     // runtime catalogue or code-level price fails here before it can be farmed.
+    // F685 review item 3: take the NPC content and the shop-enabled flag from
+    // the one rule `Gameplay::load` uses, not a second copy of it.
+    let npc_content = content::npc_content(&runtime);
     let shop = CoinShop::load(
         &runtime,
-        &npc_content(),
-        true,
+        &npc_content,
+        content::npc_shop_enabled(&npc_content),
         inventory.clone(),
         Some(&profiles),
         None,
