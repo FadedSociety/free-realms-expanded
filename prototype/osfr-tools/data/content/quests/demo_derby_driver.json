@@ -1053,9 +1053,53 @@
       "id": 3060024,
       "title_string_id": 403467,
       "giver_npc_id": 9000000124,
+      "job": 49,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "visit_position",
+          "id": 1,
+          "zone_id": 0,
+          "position": [
+            -1264.574,
+            -49.042,
+            784.906
+          ],
+          "radius": 8.0,
+          "text_string_id": 395567,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 395567 'Pass out some fliers around Stillwater Crossing to promote a charity demolition derby event.' (quest-lines/quests.json q3060024 objective; quest-lines/objective-specs.json q3060024)."
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "FreeRealms-Legacy@9e08202 src/Resources/PointOfInterests.json:240 PoI 18 'Stillwater Crossing', Position [-1264.574, -49.042, 784.906] (AGPL-3.0, used as data only). Kanan (npcs/stillwater_crossing.json 9000000124) stands about 55 m away at the same town."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T661: the flier hand-out is a client click on a stack of fliers plus the pass-out itself (locale 394096, 394301); neither has a recovered client id, so the goal is a visit to the town's point of interest, radius 8 as 3000029 uses. Objective id 1 is a local authored key."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "49": 10
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T661: quest-lines/quests.json q3060024 cites no reward (no client, wiki or article source); the one-goal sibling 3060004 pays 5 coins and 10 Demo Derby Driver (profile 49) job XP, so this one-goal quest pays the same."
+            }
+          ]
+        }
+      ],
+      "description_string_id": 395567,
+      "intro_text_string_id": 393392,
       "source": [
         {
           "kind": "client",
@@ -1071,10 +1115,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1082,11 +1122,15 @@
           "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
         },
         {
+          "kind": "client",
+          "evidence": "Global.Text 403467 'Demo Derby: Think of the Kittens' (title); 393392 (offer, intro_text_string_id); 395567 (objective, also description_string_id as 3000022 and 3030007 do). quest-lines/quests.json q3060024 and quest-lines/dialogs.json q3060024: live 'yes'; the offer's speaker is not attested, the giver Kanan is the record's and the guide's (Demolition Derby Driver.md row 21)."
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T661: enabled with no predecessor, as the record already had none. The guide's order puts 3060023 (Taking on the Tank, giver unplaced, not live-wireable) before it, so this is a playtest entry like 3000009 (T241). The Demo Derby Driver (49) offer gate follows the enabled siblings 3060004 and 3060005. No progress or completion line is bound: locale 394301 (progress) has no quest slot and no completion line is tagged to this quest."
         }
       ],
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3060025,
