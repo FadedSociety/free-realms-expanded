@@ -184,6 +184,12 @@ impl Gameplay {
             out.changed = !out.replies.is_empty();
             self.pay_derby_completion(character, &mut out)?;
         }
+        // T528: a saddle or chest check/use mid-match is refused with a line, not dropped (the
+        // soccer route's rule); the derby owns the rest of 42/*.
+        if crate::item_bar::use_wire::decode_immediate_activation(inner).is_some() {
+            out.replies
+                .push(chat::system("Finish the derby before using equipment."));
+        }
         Ok(out)
     }
 

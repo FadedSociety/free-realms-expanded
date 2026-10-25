@@ -71,8 +71,6 @@ use std::io;
 
 /// Root opcode for inventory (client request) packets: `u16` opcode + `u16` subtype.
 pub const OPCODE_INVENTORY: u16 = 42;
-/// Root opcode for client-update (server reply) packets: `u16` opcode + `u16` subtype.
-pub const OPCODE_CLIENT_UPDATE: u16 = 38;
 /// Root opcode for reward packets: `u16` opcode + `u8` subtype.
 pub const OPCODE_REWARD: u16 = 50;
 
@@ -80,8 +78,6 @@ pub const OPCODE_REWARD: u16 = 50;
 pub const SUBTYPE_USE_IMMEDIATE_ACTIVATION: u16 = 15;
 /// `InventoryPacketCheckImmediateActivationItem` subtype.
 pub const SUBTYPE_CHECK_IMMEDIATE_ACTIVATION: u16 = 16;
-/// `ClientUpdatePacketImmediateActivationCheck` subtype.
-pub const SUBTYPE_IMMEDIATE_ACTIVATION_REPLY: u16 = 30;
 /// `RewardBundlePacket` subtype.
 pub const SUBTYPE_REWARD_BUNDLE: u8 = 1;
 
@@ -144,16 +140,14 @@ pub fn parse_request(bytes: &[u8]) -> io::Result<Option<Request>> {
 /// `success == true` (byte 1) makes the dialog's Okay button send the use request for this
 /// instance; `false` routes Okay to the marketplace bundle instead.
 pub fn check_reply(item_id: i32, success: bool) -> Vec<u8> {
-    let mut bytes = Vec::with_capacity(25);
-    bytes.extend_from_slice(&OPCODE_CLIENT_UPDATE.to_le_bytes());
-    bytes.extend_from_slice(&SUBTYPE_IMMEDIATE_ACTIVATION_REPLY.to_le_bytes());
-    bytes.extend_from_slice(&item_id.to_le_bytes());
-    bytes.extend_from_slice(&CHECK_REPLY_CATEGORY_ID.to_le_bytes());
-    bytes.extend_from_slice(&CHECK_REPLY_BUNDLE_ID.to_le_bytes());
-    bytes.extend_from_slice(&CHECK_REPLY_TITLE_STRING_ID.to_le_bytes());
-    bytes.extend_from_slice(&CHECK_REPLY_BODY_STRING_ID.to_le_bytes());
-    bytes.push(u8::from(success));
-    bytes
+    crate::item_bar::use_wire::encode_immediate_activation_check(
+        item_id,
+        CHECK_REPLY_CATEGORY_ID,
+        CHECK_REPLY_BUNDLE_ID,
+        CHECK_REPLY_TITLE_STRING_ID,
+        CHECK_REPLY_BODY_STRING_ID,
+        success,
+    )
 }
 
 /// Builds the `50/1` reward bundle that opens the Mystery Chest panel for one item.

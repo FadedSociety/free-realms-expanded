@@ -41,7 +41,7 @@ const MAX_UPGRADE_ITEMS: usize = 16;
 /// the one the client's call helper `009797a0` resolves with self: it splits the name at ':' or
 /// '.', requires the left part to be a global table and the right part a function in it, and
 /// pushes the table before the call only for ':'.
-pub const UPGRADE_PICKER_LUA: &str = "BrowserV2:ShowUpgradableMounts";
+const UPGRADE_PICKER_LUA: &str = "BrowserV2:ShowUpgradableMounts";
 // Character stat ids index the client's stat-name table at `0x01af2008` (4 bytes per id):
 // 2 MaxMovementSpeed (`0x01af2010`); 59-63 GlideDefaultForwardSpeed, GlideMinForwardSpeed,
 // GlideMaxForwardSpeed, GlideFallTime, GlideFallSpeed (`0x01af20f4`-`0x01af2104`); 64 GlideEnabled
@@ -818,8 +818,8 @@ impl MountService {
     }
 
     /// T528: what using `item_instance_id` (42/16 check or 42/15 use) opens. `NotUpgradeItem`
-    /// means the instance is some other item, whose route keeps it; every other error is a
-    /// refusal. Pure and read-only: the picker consumes nothing, the saddle is spent by the
+    /// means the instance is some other item, or none the player holds, and its own route (item
+    /// bar, chest, inventory) answers it; every other error is a refusal. Pure and read-only: the picker consumes nothing, the saddle is spent by the
     /// upgrade itself (`upgrade_plan`).
     pub fn upgrade_use_plan(
         &self,
@@ -831,7 +831,7 @@ impl MountService {
             .items
             .iter()
             .find(|item| item.id == item_instance_id)
-            .ok_or(MountError::UpgradeItemNotOwned)?;
+            .ok_or(MountError::NotUpgradeItem)?;
         if !self.catalog.is_upgrade_item(item.definition_id) {
             return Err(MountError::NotUpgradeItem);
         }
@@ -876,7 +876,10 @@ impl MountService {
         let saddle = inventory
             .items
             .iter()
-            .filter(|held| held.definition_id == item_definition_id && held.count > 0)
+            .filter(|held| {
+                held.definition_id == item_definition_id
+                    && held.count.saturating_sub(held.consumed_count) > 0
+            })
             .min_by_key(|held| held.id)
             .ok_or(MountError::UpgradeItemNotOwned)?;
         Ok(RideUpgrade {

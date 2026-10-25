@@ -583,12 +583,14 @@ fn using_a_saddle_opens_the_upgrade_picker() {
     assert_eq!(game.state(), before_state);
 }
 
-/// T528: an instance the player does not hold, a knocked-out player and a busy one are all
-/// refused with one system-chat line and no packet; nothing changes.
+/// T528: a knocked-out player, a busy one and a fully consumed saddle stack are refused with one
+/// system-chat line and no packet; nothing changes.
 #[test]
 fn a_saddle_use_is_refused_when_not_owned_or_busy() {
-    // No such instance: the saddle row is not in the bag.
-    let mut game = game_with(&[(SCALED_DRAGON, DRAGON_ROW, 1)]);
+    // A saddle stack whose every unit is consumed is not owned for use.
+    let mut game = game_with_edit(&[(SADDLE, SADDLE_ROW, 1)], |state| {
+        state.inventory.items.last_mut().unwrap().consumed_count = 1;
+    });
     let before_state = game.state();
     let before_inventory = game.inventory_state().clone();
     for request in [check_item(SADDLE_ROW), use_item(SADDLE_ROW)] {
@@ -621,8 +623,9 @@ fn a_saddle_use_is_refused_when_not_owned_or_busy() {
         "a knockout refusal changed the save"
     );
 
-    // While gathering: start a real Chef harvest on the shipped mushroom node. The harvesting
-    // movie owns 42/* while it runs, so this refusal is the movie's (also notice-only, no packet).
+    // While gathering: start a real Chef harvest on the shipped mushroom node. The 42/15 is not
+    // gated by a movie here; `upgrade_use_plan` refuses it through `RideRestrictions::allows`,
+    // whose Harvesting row has `ride: true` (`gameplay/occupation.rs`).
     let mut game = game_with_edit(&[(SADDLE, SADDLE_ROW, 1)], |state| {
         let profiles = state.profiles.as_mut().expect("round70 has job profiles");
         profiles.unlocked.insert(CHEF);
@@ -722,4 +725,52 @@ fn upgrade_item_data_is_bounded() {
     for (name, edit) in refused {
         assert!(load(&*edit).is_err(), "{name} loaded");
     }
+}
+
+/// T528: an instance that is not a saddle (unknown to the bag, or another item) is not this
+/// route's: it gets no saddle notice and no picker, and nothing changes. Review F706: it used to
+/// be answered with "You do not have that training saddle."
+#[test]
+fn a_non_saddle_instance_is_left_to_its_own_route() {
+    let mut game = game_with(&[(SCALED_DRAGON, DRAGON_ROW, 1)]);
+    let before_state = game.state();
+    let before_inventory = game.inventory_state().clone();
+    // 900_999 is unknown to the bag; DRAGON_ROW is an owned ride, not an upgrade item.
+    for instance in [900_999, DRAGON_ROW] {
+        for request in [check_item(instance), use_item(instance)] {
+            let out = game.handle_in_world(&request, &who(), NOW).unwrap();
+            let saddle_text = osfr_tools::chat::system("You do not have that training saddle.");
+            assert!(
+                !out.replies.contains(&saddle_text),
+                "a saddle notice for instance {instance}"
+            );
+            assert!(
+                out.replies.iter().all(|r| execute_client_lua(r).is_none()),
+                "no picker"
+            );
+            assert!(!out.changed);
+            assert_eq!(game.state(), before_state, "state changed");
+            assert_eq!(game.inventory_state(), &before_inventory);
+        }
+    }
+}
+
+/// T527 `upgrade_plan` and T528 `upgrade_use_plan` share one rule for which saddle counts: a stack
+/// whose units are all consumed is not held, so 168/14 refuses it too and trains nothing.
+#[test]
+fn a_fully_consumed_saddle_cannot_train_a_ride() {
+    let mut game = game_with_edit(
+        &[(SCALED_DRAGON, DRAGON_ROW, 1), (SADDLE, SADDLE_ROW, 2)],
+        |state| state.inventory.items.last_mut().unwrap().consumed_count = 2,
+    );
+    let before_state = game.state();
+    let before_inventory = game.inventory_state().clone();
+    let out = game
+        .handle_in_world(&upgrade(DRAGON_ROW, SADDLE), &who(), NOW)
+        .unwrap();
+    assert!(notice(&out), "a refusal notice");
+    assert_eq!(upgrade_reply(&out), None, "no re-summon");
+    assert!(!out.changed);
+    assert_eq!(game.state(), before_state, "state changed");
+    assert_eq!(game.inventory_state(), &before_inventory);
 }

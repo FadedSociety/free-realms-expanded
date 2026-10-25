@@ -1069,6 +1069,36 @@ fn offer_cancel_through_gameplay_restores_the_job_and_keeps_stale_quit_inert() {
     assert_eq!(game.state(), after);
 }
 
+/// T528: a 42/16 check or 42/15 use of any item while a match is on is answered with one notice
+/// and changes nothing (the saddle route is never reached, so the derby must not drop it silently).
+#[test]
+fn an_item_check_or_use_during_a_derby_is_refused_with_a_notice() {
+    let fixture = GameplayFixture::new();
+    let mut game = Gameplay::load(&fixture.path, None).unwrap();
+    let character = CharacterState {
+        guid: OWNER.raw(),
+        zone_id: 0,
+        position: [0.0; 3],
+        rotation: [0.0, 0.0, 1.0],
+    };
+    enter_derby(&mut game, &character, 1_000);
+    assert!(game.derby_active());
+    let before = game.state();
+    for subtype in [15u8, 16] {
+        let request = [vec![42, 0, subtype, 0], 900_002i32.to_le_bytes().to_vec()].concat();
+        let out = game.handle_in_world(&request, &character, 2_000).unwrap();
+        assert_eq!(out.replies.len(), 1, "one notice, subtype {subtype}");
+        assert!(out.replies[0].starts_with(&[15, 0, 3, 0]), "a system line");
+        assert!(!out.changed);
+        assert_eq!(game.state(), before, "a refusal changed the save");
+    }
+    // Another 42/* record is still left to the derby (canary: nothing is sent for it).
+    let other = game
+        .handle_in_world(&[42, 0, 6, 0, 0, 0, 0, 0], &character, 2_100)
+        .unwrap();
+    assert!(other.replies.is_empty());
+}
+
 /// The F164 regression, kept by name for the routed offer. A fabricated stationary collision is a
 /// client report, so it is resolved by the server (it damages the NPC) but it cannot pay by itself:
 /// T219 pays only at the server-observed results phase. Leaving before results therefore pays

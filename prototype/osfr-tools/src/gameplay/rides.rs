@@ -97,9 +97,10 @@ impl Gameplay {
     /// dialog from the 38/30 reply and sends `UseImmediateActivationItem` on Okay. The check
     /// answers with the saddle's own name and description; the use sends 36/17 ExecuteClientLua
     /// (`00a30060`), which calls `BrowserV2:ShowUpgradableMounts(itemDefinitionId)`. Nothing is
-    /// consumed either way: the saddle is spent by the upgrade itself (168/14). An owned item that
-    /// is not a saddle keeps the item bar's, chest route's or inventory's handling; an instance
-    /// the player does not hold is refused with a notice and no packet.
+    /// consumed either way: the saddle is spent by the upgrade itself (168/14). An instance that
+    /// is not a saddle, or not held, keeps the item bar's, chest route's or inventory's handling;
+    /// a saddle that is held but unusable (consumed, or riding is blocked) is refused with a
+    /// notice and no packet.
     pub(super) fn use_upgrade_item(&self, inner: &[u8]) -> io::Result<Option<Outcome>> {
         let Some((kind, instance)) = use_wire::decode_immediate_activation(inner) else {
             return Ok(None);
