@@ -1,11 +1,14 @@
-//! Style cards, part 2: 42/10 UseStyleCard and 42/12 UseStyleCardByItemRecord change the
-//! character's look, consume one card, and tell the player and everyone nearby (35/39).
+//! Style cards: 42/10 UseStyleCard and 42/12 UseStyleCardByItemRecord change the character's
+//! look, consume one card, and tell the player and everyone nearby (35/39); 42/11
+//! PreviewStyleCard is the store try-on, answered to its sender only with preview 1 and saved
+//! nowhere. World entry sends 35/65 so the client has the committed set a closed preview
+//! reverts to (`00bd8a00`; see `notes/Autopilot/T520.md`).
 //!
-//! The request only names a card the player owns. The slot, mapping and gender come from the
+//! A use request only names a card the player owns. The slot, mapping and gender come from the
 //! card's catalogue row and the strings from the client tables (`style_cards::StyleCard`), so a
 //! hostile client can pick which owned card to spend and nothing else. The look lives in the
-//! character save (`GameplayState::appearance`); `CharacterIdentity` is never rewritten.
-//! 42/11 PreviewStyleCard stays unrouted.
+//! character save (`GameplayState::appearance`); `CharacterIdentity` is never rewritten. A
+//! preview needs no ownership (it is a store try-on) but changes no state at all.
 use super::*;
 use crate::style_cards::{self, ClientTables, Look, Request, StyleCard};
 
@@ -49,18 +52,53 @@ impl Gameplay {
         cards.appearance.clone().or_else(|| cards.base.clone())
     }
 
-    /// 42/10 and 42/12. `None` for every other request. Every refusal is one chat line and
-    /// changes nothing: the card, the look and the save stay as they were.
+    /// The 35/65 that installs the client's committed customization set: the current look as
+    /// the eight records the client's replace-all (`00bd9730`) accepts. World entry only; a
+    /// closed 42/11 preview reverts to this set (`00bd8a00`). `None` when style cards are off
+    /// or the look is not ready, so a session without them receives nothing.
+    pub(super) fn customization_data(&self) -> Option<Vec<u8>> {
+        let tables = self.style_cards.tables.as_ref()?;
+        Some(style_cards::customization_data(&self.look()?, &**tables))
+    }
+
+    /// 42/10, 42/11 and 42/12. `None` for every other request. A use refusal is one chat line;
+    /// a preview refusal sends nothing. Every refusal changes nothing: the card, the look and
+    /// the save stay as they were.
     pub(super) fn handle_style_card(
         &mut self,
         inner: &[u8],
         guid: u64,
     ) -> io::Result<Option<Outcome>> {
-        if !matches!(inner.get(..4), Some([42, 0, 10 | 12, 0])) {
+        if !matches!(inner.get(..4), Some([42, 0, 10..=12, 0])) {
             return Ok(None);
         }
         // Like every malformed inventory request, a wrong length ends the session.
         let request = style_cards::decode_request(inner)?;
+        // 42/11 PreviewStyleCard is the store try-on: any type 12 definition that fits the current
+        // look, owned or not, answered to the sender only. Every refusal sends nothing and
+        // changes nothing (no card is spent, the saved look is untouched).
+        if let Request::Preview(definition) = request {
+            let Some(tables) = self.style_cards.tables.as_ref() else {
+                return Ok(Some(Outcome::default()));
+            };
+            let Some(look) = self.look() else {
+                return Ok(Some(Outcome::default()));
+            };
+            let record = self
+                .inventory
+                .definition_record(definition)
+                .ok_or(style_cards::Refusal::NotAStyleCard)
+                .and_then(StyleCard::from_row)
+                .and_then(|card| card.record(&look, &**tables, 0));
+            let replies = match record {
+                Ok(record) => vec![style_cards::customization_change(guid, true, &[record])],
+                Err(_) => Vec::new(),
+            };
+            return Ok(Some(Outcome {
+                replies,
+                ..Outcome::default()
+            }));
+        }
         let refuse = |text: &str| {
             Ok(Some(Outcome {
                 replies: vec![chat::system(text)],
@@ -82,7 +120,8 @@ impl Gameplay {
                 .iter()
                 .filter(|item| item.definition_id == definition)
                 .min_by_key(|item| item.id),
-            Request::Preview(_) => return Ok(None),
+            // Every preview returned above.
+            Request::Preview(_) => None,
         };
         let Some(&crate::inventory::InventoryItem {
             id: item_id,

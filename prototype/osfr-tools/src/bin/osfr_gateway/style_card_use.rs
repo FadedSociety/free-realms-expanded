@@ -369,3 +369,32 @@ fn a_look_change_is_a_live_outfit_packet() {
     assert!(live_outfit_packet(&[35, 0, 39, 0, 1]));
     assert!(!live_outfit_packet(&[35, 0, 65, 0]));
 }
+
+/// T520: the store try-on (42/11) goes to its sender only and changes nothing: no viewer
+/// traffic, no card spent, no state for the commit to save, so the save file is byte-identical.
+#[test]
+fn a_preview_reaches_only_the_player_and_saves_nothing() {
+    if !bin_test_target("t520") {
+        return;
+    }
+    let mut rig = Rig::new("preview");
+    let player = rig.add(1, Seat::Player, None);
+    let viewer = rig.add(2, Seat::Near, None);
+    for index in 0..2 {
+        rig.drain(index);
+    }
+    let (snapshot, file) = (rig.snapshot(player), rig.save(player));
+
+    rig.try_send(player, &request(11, SKULL_FACE_PAINT), NOW)
+        .unwrap();
+
+    let own = rig.drain(player);
+    let previews = of(&own, &[35, 0, 39, 0]);
+    assert_eq!(previews.len(), 1, "one preview to its sender");
+    assert_eq!(previews[0][4..12], 1u64.to_le_bytes(), "naming the player");
+    assert_eq!(previews[0][12], 1, "preview on");
+    assert!(of(&own, &[38, 0, 4, 0]).is_empty(), "no card is spent");
+    assert!(rig.drain(viewer).is_empty(), "the viewer hears nothing");
+    assert_eq!(rig.snapshot(player), snapshot, "no state changed");
+    assert_eq!(rig.save(player), file, "the save file is unchanged");
+}

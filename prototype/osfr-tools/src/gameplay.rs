@@ -1709,6 +1709,7 @@ impl Gameplay {
         }
         if self.opening.is_none() {
             let mut out = self.initialization(character.position)?;
+            out.replies.extend(self.customization_data());
             self.append_npc_quest_login_sync(&mut out)?;
             self.npc_location_event(character, &mut out)?;
             self.sync_tracked_target(character, &mut out);
@@ -1760,6 +1761,7 @@ impl Gameplay {
                 .unwrap()
                 .activation(profile, &self.inventory)?,
         );
+        out.replies.extend(self.customization_data());
         out.replies.extend(self.ability_activation_for(profile)?);
         let result = self
             .opening
