@@ -509,11 +509,63 @@
     },
     {
       "id": 3040011,
+      "job": 120,
       "title_string_id": 103744,
       "giver_npc_id": 9000000170,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "finish_minigame",
+          "id": 1,
+          "minigame_id": 507,
+          "count": 1,
+          "text_string_id": 103739,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "original quest 1304 objective 12597 (name 103739 'As a Card Duelist; Beat Poe's Tournament Deck'), lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json ClientQuestData.ClientQuests[10]"
+            },
+            {
+              "kind": "client",
+              "evidence": "Resources/MiniGameData.txt row '507^16^92727' is the only row named Poe's Tournament Deck (locale 92727); Legacy ClientActivityDefinitions.json activity 499 links it too"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the record does not name minigame 507; it is matched by the unique name. Count 1 because the record stores required 0. Finishing counts, not winning (the FinishMinigame rule). Nothing emits a TYPE 16 card duel yet, so the quest stays disabled."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 0,
+          "items": [
+            {
+              "definition_id": 51187,
+              "count": 1,
+              "source": [
+                {
+                  "kind": "client",
+                  "evidence": "original quest 1304 RewardBundleEntryItem: definition 51187 (name 143039 'Duelist Nature Cap', icon 3410, tint 242), quantity 1; lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json ClientQuests[10]; runtime item catalogue lists 51187 as a head baseball cap, default_tint 242"
+                }
+              ]
+            }
+          ],
+          "job_xp": {
+            "120": 300
+          },
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "original quest 1304 RewardBundle: coins 0, XP 300 (reader 0x008e7930 layout in src/mystery_chest.rs: +1 coins, +5 XP), profile 120; lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json ClientQuests[10]"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the 300 XP is credited to profile 120, the record's profile; the recorded value stays tunable data. On the local 100-XP curve it is 3 ranks at once: a balance call before enabling."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "wiki",
@@ -533,10 +585,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -545,11 +593,19 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "original quest 1304 'Card Duelist: Poe's Best Deck' (lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json ClientQuestData.ClientQuests[10]): title 103744, description 103745, journal 103738, profile 120; objective 12597 text 103739"
+        },
+        {
+          "kind": "client",
+          "evidence": "Resources/MiniGameData.txt '507^16^92727' is the only row named Poe's Tournament Deck"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T505: job 120 gates the offer to a Card Duelist (profile 120 learned at Sam Potts); giver Poe stays 9000000170; stays disabled until a duel result exists (no server path credits a TYPE 16 duel)."
         }
       ],
       "description_string_id": 103745,
@@ -1664,11 +1720,64 @@
     },
     {
       "id": 3040034,
+      "job": 120,
       "title_string_id": 407019,
-      "giver_npc_id": 9000000082,
+      "giver_npc_id": 9000000074,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000082,
+          "text_string_id": 407045,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "original quest 1875 objective 15573 (name 407045 'Meet Esther', blurb 407046; objective type 2 = meet); lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json ClientQuests[18]"
+            }
+          ]
+        },
+        {
+          "kind": "finish_minigame",
+          "id": 2,
+          "minigame_id": 668,
+          "count": 1,
+          "text_string_id": 407047,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "original quest 1875 objective 15574 (name 407047 \"Play and beat 'Esther's Friendly Deck'\"); lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json ClientQuests[18]"
+            },
+            {
+              "kind": "client",
+              "evidence": "Resources/MiniGameData.txt '668^16^407123' is Esther's Friendly Deck (locale 407123)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) count 1 (the record stores required 0); finishing counts, not winning. Nothing emits a TYPE 16 card duel yet, so the quest stays disabled."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 3,
+          "items": [],
+          "job_xp": {
+            "120": 100
+          },
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "original quest 1875 RewardBundle: coins 3, XP 100, no item, profile 120; lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json ClientQuests[18]"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) the 100 XP is credited to profile 120, the record's profile; the value stays tunable data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1688,10 +1797,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1700,11 +1805,19 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "original quest 1875 'Card Duelist: Esther, the Brains' (lab/working/OSFR.Server/OSFR Server/Customize/PacketSendSelfToClient.json ClientQuestData.ClientQuests[18]): title 407019, description 407020, journal 407044, profile 120; objectives 15573 and 15574"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 407020 ('Dominic of Briarwood wants you to meet Esther...') and intro 407018 (Dominic speaking) name Dominic as the giver; end text 407021 is Esther speaking, so she takes the turn-in"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T505: giver moved from Esther to Dominic 9000000074 (the NPC lists moved with it); Esther takes the turn-in through her quests_accepted entry; job 120 gates the offer; stays disabled until a duel result exists."
         }
       ],
       "description_string_id": 407020,

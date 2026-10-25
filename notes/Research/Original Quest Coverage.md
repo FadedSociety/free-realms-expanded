@@ -45,6 +45,8 @@ Supplied journal ids and titles (original ids, canned data):
 2270 Defensive Strategy | 2287 The Great Scare | 2347 Welcome Home | 2513 Hero's Journal
 ```
 
+Card Duelist: supplied records 1304 and 1875 are bound to the content quests 3040011 and 3040034 (objectives, rewards, Dominic as giver of 1875); both stay disabled until a card duel can produce a result.
+
 Thirteen journal hub registrations cover the three opening hubs:
 2513, 2514 (Briarwood Caverns); 2521-2526 (Farnum Farmstead);
 2527-2530, 2566 (Cobblestone Village). None carries a recovered title,

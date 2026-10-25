@@ -21158,14 +21158,63 @@
               "evidence": "title_string_id corrected from raw locale hash 727420106 to Global.Text id 413775 (content_check text_raw_hash, 2026-10-15)"
             }
           ]
+        },
+        {
+          "quest_id": 3040034,
+          "title": "Card Duelist: Esther, the Brains",
+          "title_string_id": 407019,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 33; name 'Card Duelist: Esther, the Brains'; title id cell 2401845827 ucdt; 1795503479 ugdt; bare title 1071125660 ucdt"
+            },
+            {
+              "kind": "wiki",
+              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 33; name 'Card Duelist: Esther, the Brains'; title id cell 2401845827 ucdt; 1795503479 ugdt; bare title 1071125660 ucdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) quest id 3040034 is a stable batch key; the guide does not provide a numeric server quest id"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+            },
+            {
+              "kind": "client",
+              "evidence": "title_string_id corrected from raw locale hash 2401845827 to Global.Text id 407019 (content_check text_raw_hash, 2026-10-15)"
+            },
+            {
+              "kind": "client",
+              "evidence": "(R) T505: moved from Esther to Dominic. Locale 407020 ('Dominic of Briarwood wants you to meet Esther') and intro 407018 (Dominic speaking) name Dominic as the giver of original quest 1875; Esther speaks the end text 407021 and takes the turn-in."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
         3040030,
-        3040031
+        3040031,
+        3040034
       ],
       "quests_given_text": [
-        "Card Duelist: A Card Dueling Rumor (Poe Tatters sends the player here), Card Duelist: Dominic's New Card, Card Duelist: Break Time."
+        "Card Duelist: A Card Dueling Rumor (Poe Tatters sends the player here), Card Duelist: Dominic's New Card, Card Duelist: Break Time, Card Duelist: Esther, the Brains."
       ],
       "quests_accepted": [],
       "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
@@ -21386,6 +21435,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) quest id 3040031 is a stable batch key; the guide does not provide a numeric server quest id"
+          },
+          {
+            "kind": "client",
+            "evidence": "(R) T505: quest 3040034 is given by Dominic, not Esther (locale 407018, 407020 name Dominic; 407021 is Esther's end text)."
           }
         ],
         "quest_ids_given": [
@@ -21428,6 +21481,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) quest id 3040031 is a stable batch key; the guide does not provide a numeric server quest id"
+          },
+          {
+            "kind": "client",
+            "evidence": "(R) T505: quest 3040034 is given by Dominic, not Esther (locale 407018, 407020 name Dominic; 407021 is Esther's end text)."
           }
         ],
         "quests_given_text": [
@@ -23347,50 +23404,6 @@
           ]
         },
         {
-          "quest_id": 3040034,
-          "title": "Card Duelist: Esther, the Brains",
-          "title_string_id": 407019,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 33; name 'Card Duelist: Esther, the Brains'; title id cell 2401845827 ucdt; 1795503479 ugdt; bare title 1071125660 ucdt"
-            },
-            {
-              "kind": "wiki",
-              "evidence": "notes/Build Guides/Content/Jobs/Card Duelist.md: Quest line > Part 2 - Briarwood and the Greenwood dig site (Shattered Past, TCG Series 2), row 33; name 'Card Duelist: Esther, the Brains'; title id cell 2401845827 ucdt; 1795503479 ugdt; bare title 1071125660 ucdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3040034 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 2401845827 to Global.Text id 407019 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3040035,
           "title": "Card Duelist: Confronting Ambrose",
           "title_string_id": 413787,
@@ -23434,14 +23447,29 @@
       "quest_ids_given": [
         3040032,
         3040033,
-        3040034,
         3040035
       ],
       "quests_given_text": [
-        "Card Duelist: Quick Game of Cards (inferred), Card Duelist: Esther's Special Card, Card Duelist: Esther, the Brains, Card Duelist: Confronting Ambrose (Ambrose Worcester is in Greenwood Forest)."
+        "Card Duelist: Quick Game of Cards (inferred), Card Duelist: Esther's Special Card, Card Duelist: Confronting Ambrose (Ambrose Worcester is in Greenwood Forest)."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3040034,
+          "title": "Card Duelist: Esther, the Brains",
+          "title_string_id": 407019,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "original quest 1875: end text 407021 is Esther speaking (she has just lost the game), and objective 15573 'Meet Esther' (407045) sends the player to her."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T505: Esther is the hand-in NPC; the giver is Dominic."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "Original quest 1875's end text (407021) is Esther speaking; the recorded giver is Dominic (407018, 407020).",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [
@@ -23679,6 +23707,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) quest id 3040035 is a stable batch key; the guide does not provide a numeric server quest id"
+          },
+          {
+            "kind": "client",
+            "evidence": "(R) T505: quest 3040034 is given by Dominic, not Esther (locale 407018, 407020 name Dominic; 407021 is Esther's end text)."
           }
         ],
         "quest_ids_given": [
@@ -23741,6 +23773,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) quest id 3040035 is a stable batch key; the guide does not provide a numeric server quest id"
+          },
+          {
+            "kind": "client",
+            "evidence": "(R) T505: quest 3040034 is given by Dominic, not Esther (locale 407018, 407020 name Dominic; 407021 is Esther's end text)."
           }
         ],
         "quests_given_text": [
@@ -23753,6 +23789,10 @@
           {
             "kind": "reconstructed",
             "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+          },
+          {
+            "kind": "client",
+            "evidence": "(R) T505: Esther takes the turn-in of 3040034 (locale 407021, end text spoken by Esther)."
           }
         ],
         "quests_accepted_reason": [
