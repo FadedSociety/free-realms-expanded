@@ -4,6 +4,9 @@
 //! gateway tests for the world side).
 #[path = "support/models.rs"]
 mod models;
+#[path = "common/round70_content.rs"]
+#[allow(dead_code)]
+mod round70_content;
 #[path = "support/xml.rs"]
 mod xml;
 
@@ -560,6 +563,122 @@ fn slots(replies: &[Vec<u8>]) -> Vec<use_wire::ActionBarSlotUpdate> {
 }
 fn failed(out: &Outcome) -> bool {
     out.replies.len() == 1 && out.replies[0].starts_with(&[36, 0, 1, 0])
+}
+
+/// Just past the model and texture strings in a serialized `ClientItemDefinition` row: eleven
+/// leading words (slot is word 10 at byte 40), NoTrade/NoSale at 44/45, then GenderUsage, Type and
+/// CategoryId back to back (the `piece_096` layout).
+fn after_strings(record: &[u8]) -> usize {
+    fn skip(row: &[u8], at: usize) -> usize {
+        let length = i32::from_le_bytes(row[at..at + 4].try_into().unwrap());
+        at + 4 + usize::try_from(length).unwrap()
+    }
+    skip(record, skip(record, 46))
+}
+fn wire_field(record: &[u8], at: usize) -> i32 {
+    i32::from_le_bytes(record[at..at + 4].try_into().unwrap())
+}
+/// The definition inside a 38/2 ItemAdd: the item record first, then the server's
+/// `ClientItemDefinition` row starting with its own id.
+fn sent_definition(packet: &[u8], id: i32) -> &[u8] {
+    let payload = &packet[8..];
+    let first = payload
+        .windows(4)
+        .position(|word| word == id.to_le_bytes())
+        .expect("item record definition id");
+    let tail = &payload[first + 4..];
+    let second = tail
+        .windows(4)
+        .position(|word| word == id.to_le_bytes())
+        .expect("inline definition id");
+    &tail[second..]
+}
+
+/// T702: the client's bar picker (`ConsumablesDataSourceHasRows` `00c31de0`) keeps a row when the
+/// definition's type (`+0x6c`) is 1, its activatable ability (`+0x8c`) is positive, its gender
+/// usage (`+0x68`) fits (`00bae6a0`) and a unit is left; the equipment window's Consumables tab
+/// reads the same ability as column 10, named `isConsumable` (`00cb1500` case 10), and its row
+/// click sends 42/6. Pin those fields on the definition the server sends for every catalogue
+/// boombox, including the ten rows only the merged item catalogue carries.
+#[test]
+fn every_shipped_boombox_definition_keeps_the_client_picker_fields() {
+    let mut inventory = Inventory::load(&round70_content::source(), None).unwrap();
+    let boxes = rows();
+    assert_eq!(boxes.len(), 15);
+    for row in &boxes {
+        let id = int(&row["item_id"]);
+        let granted = inventory.grant(0, id, 1).unwrap();
+        let add = granted
+            .replies
+            .iter()
+            .find(|reply| reply.starts_with(&[38, 0, 2, 0]))
+            .unwrap_or_else(|| panic!("{id}: no 38/2"));
+        let sent = sent_definition(add, id);
+        let strings = after_strings(sent);
+        assert_eq!(
+            wire_field(sent, strings + 4),
+            1,
+            "{id}: type 1 is the picker's row tag (+0x6c)"
+        );
+        assert!(
+            wire_field(sent, strings + 34) > 0,
+            "{id}: the picker and isConsumable need ability > 0 (+0x8c)"
+        );
+        // Gender usage 0 is "any" (`00bae6a0`), so every character passes the picker.
+        assert_eq!(wire_field(sent, strings), 0, "{id}: gender usage (+0x68)");
+        // Lead decision: keep slot 0. It leaves the Stuff pane's equip state at 0, so that pane
+        // shows no action; the Consumables tab is the binding route.
+        assert_eq!(wire_field(sent, 40), 0, "{id}: slot");
+    }
+}
+
+/// T702: the granted instance binds through 42/6, its 38/25 shows it, and 36/10 on that slot
+/// reaches the T461 placement path. Granting a boombox leaves the potion's definition bytes
+/// untouched; the potion is the other type-1 item that already binds and uses.
+#[test]
+fn a_granted_boombox_binds_and_presses_through_t461() {
+    let mut inventory = Inventory::load(&reference(), None).unwrap();
+    let potion = inventory.definition_record(11002).unwrap().to_vec();
+    let outcome = inventory.grant(0, 1913, 1).unwrap();
+    assert!(
+        outcome
+            .replies
+            .iter()
+            .any(|reply| reply.starts_with(&[38, 0, 2, 0])),
+        "the 38/2 carries 1913"
+    );
+    assert_eq!(
+        inventory.definition_record(11002).unwrap(),
+        potion.as_slice(),
+        "the boombox grant leaves the potion definition byte-identical"
+    );
+    let item = inventory
+        .state()
+        .items
+        .iter()
+        .find(|item| item.definition_id == 1913)
+        .unwrap();
+    assert_eq!(
+        (item.count, item.consumed_count, item.stored_count),
+        (1, 0, 0),
+        "the picker's count - stored - consumed"
+    );
+    let instance = item.id;
+
+    let mut saved = Gameplay::load(&reference(), None).unwrap().state();
+    saved.inventory = inventory.state().clone();
+    let mut game = Gameplay::load(&reference(), Some(saved)).unwrap();
+    game.initialize_world(&who(), 0).unwrap();
+    let bound = game
+        .handle_in_world(&assign(0, instance), &who(), 1_000)
+        .unwrap();
+    let slot = slots(&bound.replies)[0];
+    assert!(
+        !slot.is_empty && slot.server_enabled && slot.quantity == 1,
+        "the bar shows the granted box"
+    );
+    let pressed = game.handle_in_world(&cast(0), &who(), 2_000).unwrap();
+    assert_eq!(pressed.boombox, Some(1913), "36/10 places the box");
 }
 
 #[test]
