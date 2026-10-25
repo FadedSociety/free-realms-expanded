@@ -313,8 +313,8 @@ fn the_high_camps_use_verified_w102_centres_and_unique_guids() {
     let groups = field["spawn_groups"].as_array().unwrap();
     assert_eq!(
         enemies.len(),
-        34,
-        "24 pre-T296 + 4 HIGH + 6 elite T332 actors"
+        50,
+        "24 pre-T296 + 4 HIGH + 6 elite T332 actors + 16 T699 quest targets"
     );
     assert_eq!(
         groups.len(),
@@ -339,7 +339,7 @@ fn the_high_camps_use_verified_w102_centres_and_unique_guids() {
         }
     }
     assert_eq!(areas.len(), 30, "30 actors carry a spawn area");
-    assert_eq!(guids.len(), 34);
+    assert_eq!(guids.len(), 50);
 
     for (index, (guid, level, area, reference_guid)) in HIGH.into_iter().enumerate() {
         let row = actor(&field, guid);
@@ -481,8 +481,8 @@ fn the_existing_camps_and_rewards_are_unchanged() {
     let groups = field["spawn_groups"].as_array().unwrap();
     assert_eq!(
         enemies.len(),
-        34,
-        "24 pre-T296 + 4 HIGH + 6 elite T332 actors"
+        50,
+        "24 pre-T296 + 4 HIGH + 6 elite T332 actors + 16 T699 quest targets"
     );
     assert_eq!(
         groups.len(),

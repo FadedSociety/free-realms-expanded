@@ -1946,6 +1946,601 @@
           "evidence": "(R) T415 audited centre 40.4 m from the nearest same-kind Legacy NPC row 23623 (FabledRealms.lua:4152), off the W102 starter centres (field_camp_separation rules; checker output in notes/Autopilot/T415.md). Elite band actor at level 20 in band 19-20; part of the six-actor/three-group T332 shape with a 180 s group respawn. Local progression above the level 13-14 high camps, reusing the shipped 930060 Hooligan base definition; count and rates are local policy. HP/damage are the base definition's level-one values (180/15); W105 scaling by level produces the live stats. Not a recovered 2014 field level."
         }
       ]
+    },
+    {
+      "guid": 100000004115,
+      "definition_id": 4115,
+      "model_id": 199,
+      "name_id": 75450,
+      "name": "Thugawug Thug!",
+      "texture_alias": "",
+      "position": [
+        -2018.592,
+        -36.7976,
+        -540.6624
+      ],
+      "max_health": 100,
+      "damage": 8,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3000024
+      ],
+      "level": 5,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2781 spawns Npcs 4115 (chugawug_m_bandit_01.adr, NameId 75450) at [-2018.592, -36.7976, -540.6624] heading 1.570665"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 75450 'Thugawug Thug!'; quest q3000024 objective 0.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3000024 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000001638,
+      "definition_id": 1638,
+      "model_id": 199,
+      "name_id": 75454,
+      "name": "Thugawug Fumbler",
+      "texture_alias": "",
+      "position": [
+        60.05896,
+        24.74841,
+        -461.3186
+      ],
+      "max_health": 100,
+      "damage": 8,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3010005
+      ],
+      "level": 5,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:405 spawns Npcs 1638 (chugawug_m_bandit_01.adr, no NameId) at [60.05896, 24.74841, -461.3186] heading -2.957728"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 75454 'Thugawug Fumbler'; quest q3010005 objective 0.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010005 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000001639,
+      "definition_id": 1639,
+      "model_id": 199,
+      "name_id": 75449,
+      "name": "Thugawug Sneak!",
+      "texture_alias": "",
+      "position": [
+        55.08064,
+        24.74841,
+        -463.7793
+      ],
+      "max_health": 100,
+      "damage": 8,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3010018,
+        3150012
+      ],
+      "level": 5,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:406 spawns Npcs 1639 (chugawug_m_bandit_01.adr, no NameId) at [55.08064, 24.74841, -463.7793] heading -1.798183"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 75449 'Thugawug Sneak!'; quest q3010018 objective 0.0; q3150012 objective 0.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010018/3150012 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000003491,
+      "definition_id": 3491,
+      "model_id": 200,
+      "name_id": 75453,
+      "name": "Thugawug Bumbler!",
+      "texture_alias": "",
+      "position": [
+        -1736.447,
+        -10.14404,
+        -547.9819
+      ],
+      "max_health": 180,
+      "damage": 8,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3150012
+      ],
+      "level": 9,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2234 spawns Npcs 3491 (chugawug_f_bandit_01.adr, NameId 440717) at [-1736.447, -10.14404, -547.9819] heading -2.256337"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 75453 'Thugawug Bumbler!'; quest q3150012 objective 0.1 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 9, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3150012 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000001294,
+      "definition_id": 1294,
+      "model_id": 4,
+      "name_id": 2232,
+      "name": "Robgoblin",
+      "texture_alias": "",
+      "position": [
+        -524.9218,
+        1.09766,
+        620.9789
+      ],
+      "max_health": 100,
+      "damage": 8,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3010008,
+        3010011,
+        3090007
+      ],
+      "level": 5,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:80 spawns Npcs 1294 (robgoblin_m_basic.adr, no NameId) at [-524.9218, 1.09766, 620.9789] heading 2.992548"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 2232 'Robgoblin'; quest q3010011 objective 0.0; q3010008 objective 0.0; q3090007 objective 0.1 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010008/3010011/3090007 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000001474,
+      "definition_id": 1474,
+      "model_id": 4,
+      "name_id": 39582,
+      "name": "Robgoblin Initiate",
+      "texture_alias": "",
+      "position": [
+        -1723.147,
+        -30.28921,
+        838.4714
+      ],
+      "max_health": 180,
+      "damage": 8,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3160006
+      ],
+      "level": 9,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:241 spawns Npcs 1474 (robgoblin_m_basic.adr, no NameId) at [-1723.147, -30.28921, 838.4714] heading -1.171042"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 39582 'Robgoblin Initiate'; quest q3160006 objective 0.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 9, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3160006 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000002660,
+      "definition_id": 2660,
+      "model_id": 235,
+      "name_id": 4477,
+      "name": "Fungus Golem",
+      "texture_alias": "",
+      "position": [
+        -508.4022,
+        -64.65299,
+        1883.235
+      ],
+      "max_health": 180,
+      "damage": 8,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3000040
+      ],
+      "level": 5,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1403 spawns Npcs 2660 (bear_vinegolem_fungus.adr, NameId 73652) at [-508.4022, -64.65299, 1883.235] heading -1.473097"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 4477 'Fungus Golem'; quest q3000040 objective 0.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 5, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3000040 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000002872,
+      "definition_id": 2872,
+      "model_id": 142,
+      "name_id": 103401,
+      "name": "Vicious Vinewolf",
+      "texture_alias": "",
+      "position": [
+        -709.0309,
+        -49.96,
+        1759.59
+      ],
+      "max_health": 100,
+      "damage": 8,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 60,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3010025
+      ],
+      "level": 5,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1615 spawns Npcs 2872 (wolf_vinegolum.adr, no NameId) at [-709.0309, -49.96, 1759.59] heading -2.657655"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 103401 'Vicious Vinewolf'; quest q3010025 objective 0.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010025 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000002644,
+      "definition_id": 2644,
+      "model_id": 74,
+      "name_id": 4084,
+      "name": "Hedge Guardian",
+      "texture_alias": "",
+      "position": [
+        -531.8245,
+        -69.41573,
+        2059.387
+      ],
+      "max_health": 180,
+      "damage": 8,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3010025
+      ],
+      "level": 7,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1387 spawns Npcs 2644 (treesoldier.adr, NameId 4092) at [-531.8245, -69.41573, 2059.387] heading -0.227283"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 4084 'Hedge Guardian'; quest q3010025 objective 2.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 7, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010025 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000003965,
+      "definition_id": 3965,
+      "model_id": 4011,
+      "name_id": 439761,
+      "name": "Skullz Brawler",
+      "texture_alias": "",
+      "position": [
+        497.5524,
+        3.552023,
+        2173.647
+      ],
+      "max_health": 180,
+      "damage": 8,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 90,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3020035
+      ],
+      "level": 7,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2632 spawns Npcs 3965 (dwarf_m_bikerthug_skullz.adr, NameId 439217) at [497.5524, 3.552023, 2173.647] heading 1.038882"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 439761 'Skullz Brawler'; quest q3020035 objective 3.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 7, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3020035 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000003115,
+      "definition_id": 3115,
+      "model_id": 77,
+      "name_id": 36237,
+      "name": "Troll Roughguard",
+      "texture_alias": "",
+      "position": [
+        -469.5099,
+        1.134247,
+        1221.431
+      ],
+      "max_health": 180,
+      "damage": 8,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3030040
+      ],
+      "level": 9,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1858 spawns Npcs 3115 (troll_forest.adr, no NameId) at [-469.5099, 1.134247, 1221.431] heading 2.655006"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 36237 'Troll Roughguard'; quest q3030040 objective 0.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 9, health 180, damage 8, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3030040 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000003066,
+      "definition_id": 3066,
+      "model_id": 1296,
+      "name_id": 19366,
+      "name": "Willow Slamdash",
+      "texture_alias": "",
+      "position": [
+        -919.3732,
+        -40.93911,
+        1162.697
+      ],
+      "max_health": 200,
+      "damage": 10,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3060010
+      ],
+      "level": 13,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1809 spawns Npcs 3066 (fairy_f_willow_slamdash.agr, NameId 19366) at [-919.3732, -40.93911, 1162.697] heading -0.214843"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 19366 'Willow Slamdash'; quest q3060010 objective 1.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3060010 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000003148,
+      "definition_id": 3148,
+      "model_id": 77,
+      "name_id": 5135,
+      "name": "Troll Spider Trainer",
+      "texture_alias": "",
+      "position": [
+        -376.5034,
+        3.259202,
+        1245.693
+      ],
+      "max_health": 200,
+      "damage": 10,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3110025
+      ],
+      "level": 13,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1891 spawns Npcs 3148 (troll_forest.adr, no NameId) at [-376.5034, 3.259202, 1245.693] heading -0.890737"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 5135 'Troll Spider Trainer'; quest q3110025 objective 1.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3110025 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000003135,
+      "definition_id": 3135,
+      "model_id": 77,
+      "name_id": 5234,
+      "name": "Troll Naturalist",
+      "texture_alias": "",
+      "position": [
+        -500.4824,
+        1.019878,
+        1302.095
+      ],
+      "max_health": 200,
+      "damage": 10,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3110025
+      ],
+      "level": 13,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1878 spawns Npcs 3135 (troll_forest.adr, no NameId) at [-500.4824, 1.019878, 1302.095] heading -2.142427"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 5234 'Troll Naturalist'; quest q3110025 objective 2.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3110025 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000003592,
+      "definition_id": 3592,
+      "model_id": 1938,
+      "name_id": 78096,
+      "name": "Frostfang Snarler",
+      "texture_alias": "",
+      "position": [
+        458.109,
+        42.04036,
+        447.6769
+      ],
+      "max_health": 200,
+      "damage": 10,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3150002
+      ],
+      "level": 13,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2335 spawns Npcs 3592 (sg_spawner_wolf_01.adr, NameId 78096) at [458.109, 42.04036, 447.6769] heading -1.24983"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 78096 'Frostfang Snarler'; quest q3150002 objective 0.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3150002 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
+    },
+    {
+      "guid": 100000004857,
+      "definition_id": 4857,
+      "model_id": 139,
+      "name_id": 23196,
+      "name": "Warthog",
+      "texture_alias": "",
+      "position": [
+        -329.7278,
+        -79.72085,
+        2413.552
+      ],
+      "max_health": 200,
+      "damage": 10,
+      "boss": false,
+      "power_up_table": "standard",
+      "respawn_seconds": 120,
+      "aggro_range": 8.0,
+      "quest_ids": [
+        3160031
+      ],
+      "level": 13,
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3424 spawns Npcs 4857 (warthog.adr, no NameId) at [-329.7278, -79.72085, 2413.552] heading -2.575285"
+        },
+        {
+          "kind": "client",
+          "evidence": "locale 23196 'Warthog'; quest q3160031 objective 1.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3160031 is active, per the owner's field notes (overworld enemies belong to active quests)"
+        }
+      ]
     }
   ]
 }

@@ -76,8 +76,8 @@
     "existing_model_id_gaps": 0,
     "known_ability_evidence_strings": 28,
     "w58b_definitions_added": 24,
-    "client_model_table_pairs_checked": 85,
-    "catalog_pairs_present": 83,
+    "client_model_table_pairs_checked": 107,
+    "catalog_pairs_present": 105,
     "catalog_pairs_missing": 2,
     "world_rows_resolved": 36,
     "world_rows_partial": 3,
@@ -115,7 +115,7 @@
     },
     "t015_definitions_added": 30,
     "t015_model_id_to_adr_pairs_checked": 30,
-    "total_definitions": 85
+    "total_definitions": 107
   },
   "definition_field_sources": {
     "3156": {
@@ -20179,6 +20179,754 @@
         "reader": "not_applicable",
         "reason": "T015 checked the shipped model table and catalog bytes; no ADR closure or native actor capture was performed."
       },
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 4115,
+      "enemy_id": "thugawug_thug",
+      "kind": "Thugawug Thug!",
+      "model_id": 199,
+      "adr": "chugawug_m_bandit_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 200,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 199,
+        "filename": "chugawug_m_bandit_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 14499,
+        "extracted_path": "pack_04/000765.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "client",
+      "match_method": "quest_target_name",
+      "matched_tokens": [
+        "thugawug",
+        "thug"
+      ],
+      "binding_evidence": "T699: reference actor definition 4115 (Npcs.json ModelId 199, chugawug_m_bandit_01.adr) shares model 199 with the quest target 'Thugawug Thug!' (locale 75450). Kill target of q3000024 objective 0.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 1638,
+      "enemy_id": "thugawug_fumbler",
+      "kind": "Thugawug Fumbler",
+      "model_id": 199,
+      "adr": "chugawug_m_bandit_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 200,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 199,
+        "filename": "chugawug_m_bandit_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 14499,
+        "extracted_path": "pack_04/000765.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "thugawug",
+        "fumbler"
+      ],
+      "binding_evidence": "T699: reference actor definition 1638 (Npcs.json ModelId 199, chugawug_m_bandit_01.adr) shares model 199 with the quest target 'Thugawug Fumbler' (locale 75454). Kill target of q3010005 objective 0.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 1639,
+      "enemy_id": "thugawug_sneak",
+      "kind": "Thugawug Sneak!",
+      "model_id": 199,
+      "adr": "chugawug_m_bandit_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 200,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 199,
+        "filename": "chugawug_m_bandit_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 14499,
+        "extracted_path": "pack_04/000765.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "thugawug",
+        "sneak"
+      ],
+      "binding_evidence": "T699: reference actor definition 1639 (Npcs.json ModelId 199, chugawug_m_bandit_01.adr) shares model 199 with the quest target 'Thugawug Sneak!' (locale 75449). Kill target of q3010018 objective 0.0; q3150012 objective 0.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 3491,
+      "enemy_id": "thugawug_bumbler",
+      "kind": "Thugawug Bumbler!",
+      "model_id": 200,
+      "adr": "chugawug_f_bandit_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 201,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 200,
+        "filename": "chugawug_f_bandit_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 14628,
+        "extracted_path": "pack_04/000894.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "thugawug",
+        "bumbler"
+      ],
+      "binding_evidence": "T699: reference actor definition 3491 (Npcs.json ModelId 200, chugawug_f_bandit_01.adr) shares model 200 with the quest target 'Thugawug Bumbler!' (locale 75453). Kill target of q3150012 objective 0.1.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 1294,
+      "enemy_id": "robgoblin_pondblaster",
+      "kind": "Robgoblin",
+      "model_id": 4,
+      "adr": "robgoblin_m_basic.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 5,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 4,
+        "filename": "robgoblin_m_basic.adr",
+        "row_scale": "0.000000",
+        "description": "Combat NPC"
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 1362,
+        "extracted_path": "pack_00/001360.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "robgoblin"
+      ],
+      "binding_evidence": "T699: reference actor definition 1294 (Npcs.json ModelId 4, robgoblin_m_basic.adr) shares model 4 with the quest target 'Robgoblin' (locale 2232). Kill target of q3010011 objective 0.0; q3010008 objective 0.0; q3090007 objective 0.1.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 1474,
+      "enemy_id": "robgoblin_initiate",
+      "kind": "Robgoblin Initiate",
+      "model_id": 4,
+      "adr": "robgoblin_m_basic.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 5,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 4,
+        "filename": "robgoblin_m_basic.adr",
+        "row_scale": "0.000000",
+        "description": "Combat NPC"
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 1362,
+        "extracted_path": "pack_00/001360.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "robgoblin",
+        "initiate"
+      ],
+      "binding_evidence": "T699: reference actor definition 1474 (Npcs.json ModelId 4, robgoblin_m_basic.adr) shares model 4 with the quest target 'Robgoblin Initiate' (locale 39582). Kill target of q3160006 objective 0.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 2660,
+      "enemy_id": "fungus_golem",
+      "kind": "Fungus Golem",
+      "model_id": 235,
+      "adr": "bear_vinegolem_fungus.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 236,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 235,
+        "filename": "bear_vinegolem_fungus.adr",
+        "row_scale": "0.000000",
+        "description": "Vingolem Bear - Fungus variant"
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 22041,
+        "extracted_path": "pack_06/001604.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "fungus",
+        "golem"
+      ],
+      "binding_evidence": "T699: reference actor definition 2660 (Npcs.json ModelId 235, bear_vinegolem_fungus.adr) shares model 235 with the quest target 'Fungus Golem' (locale 4477). Kill target of q3000040 objective 0.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 2872,
+      "enemy_id": "vicious_vinewolf",
+      "kind": "Vicious Vinewolf",
+      "model_id": 142,
+      "adr": "wolf_vinegolum.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 143,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 142,
+        "filename": "wolf_vinegolum.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 24332,
+        "extracted_path": "pack_07/000112.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "vicious",
+        "vinewolf"
+      ],
+      "binding_evidence": "T699: reference actor definition 2872 (Npcs.json ModelId 142, wolf_vinegolum.adr) shares model 142 with the quest target 'Vicious Vinewolf' (locale 103401). Kill target of q3010025 objective 0.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 2644,
+      "enemy_id": "hedge_guardian",
+      "kind": "Hedge Guardian",
+      "model_id": 74,
+      "adr": "treesoldier.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 75,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 74,
+        "filename": "treesoldier.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 21019,
+        "extracted_path": "pack_06/000582.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "hedge",
+        "guardian"
+      ],
+      "binding_evidence": "T699: reference actor definition 2644 (Npcs.json ModelId 74, treesoldier.adr) shares model 74 with the quest target 'Hedge Guardian' (locale 4084). Kill target of q3010025 objective 2.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 2834,
+      "enemy_id": "smuggler_han",
+      "kind": "Smuggler Han",
+      "model_id": 669,
+      "adr": "human_blackspore_thief_m.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 670,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 669,
+        "filename": "human_blackspore_thief_m.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 21426,
+        "extracted_path": "pack_06/000989.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "smuggler",
+        "han"
+      ],
+      "binding_evidence": "T699: reference actor definition 2834 (Npcs.json ModelId 669, human_blackspore_thief_m.adr) shares model 669 with the quest target 'Smuggler Han' (locale 77317). Kill target of q3010028 objective 0.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 1551,
+      "enemy_id": "smuggler_hannah",
+      "kind": "Smuggler Hannah",
+      "model_id": 685,
+      "adr": "human_blackspore_thief_f.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 686,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 685,
+        "filename": "human_blackspore_thief_f.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 29858,
+        "extracted_path": "pack_08/001139.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "smuggler",
+        "hannah"
+      ],
+      "binding_evidence": "T699: reference actor definition 1551 (Npcs.json ModelId 685, human_blackspore_thief_f.adr) shares model 685 with the quest target 'Smuggler Hannah' (locale 77319). Kill target of q3010028 objective 0.1.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 3965,
+      "enemy_id": "skullz_brawler",
+      "kind": "Skullz Brawler",
+      "model_id": 4011,
+      "adr": "dwarf_m_bikerthug_skullz.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 3193,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 4011,
+        "filename": "dwarf_m_bikerthug_skullz.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 9316,
+        "extracted_path": "pack_02/002509.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "skullz",
+        "brawler"
+      ],
+      "binding_evidence": "T699: reference actor definition 3965 (Npcs.json ModelId 4011, dwarf_m_bikerthug_skullz.adr) shares model 4011 with the quest target 'Skullz Brawler' (locale 439761). Kill target of q3020035 objective 3.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 1237,
+      "enemy_id": "hewey_the_bear",
+      "kind": "Hewey the Bear",
+      "model_id": 91,
+      "adr": "bear_normal.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 92,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 91,
+        "filename": "bear_normal.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 87810,
+        "extracted_path": "pack_18/006138.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "hewey",
+        "the",
+        "bear"
+      ],
+      "binding_evidence": "T699: reference actor definition 1237 (Npcs.json ModelId 91, bear_normal.adr) shares model 91 with the quest target 'Hewey the Bear' (locale 5734). Kill target of q3030010 objective 2.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 2529,
+      "enemy_id": "frostfang_growler",
+      "kind": "Frostfang Growler",
+      "model_id": 3284,
+      "adr": "wolf_generic.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 2470,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 3284,
+        "filename": "wolf_generic.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 10255,
+        "extracted_path": "pack_03/000417.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "frostfang",
+        "growler"
+      ],
+      "binding_evidence": "T699: reference actor definition 2529 (Npcs.json ModelId 3284, wolf_generic.adr) shares model 3284 with the quest target 'Frostfang Growler' (locale 104067). Kill target of q3030012 objective 0.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 3115,
+      "enemy_id": "troll_roughguard",
+      "kind": "Troll Roughguard",
+      "model_id": 77,
+      "adr": "troll_forest.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 78,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 77,
+        "filename": "troll_forest.adr",
+        "row_scale": "0.000000",
+        "description": "Combat NPC"
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 22044,
+        "extracted_path": "pack_06/001607.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "troll",
+        "roughguard"
+      ],
+      "binding_evidence": "T699: reference actor definition 3115 (Npcs.json ModelId 77, troll_forest.adr) shares model 77 with the quest target 'Troll Roughguard' (locale 36237). Kill target of q3030040 objective 0.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 3066,
+      "enemy_id": "willow_slamdash",
+      "kind": "Willow Slamdash",
+      "model_id": 1296,
+      "adr": "fairy_f_willow_slamdash.agr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 1297,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 1296,
+        "filename": "fairy_f_willow_slamdash.agr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 51309,
+        "extracted_path": "pack_13/000523.agr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "client",
+      "match_method": "quest_target_name",
+      "matched_tokens": [
+        "willow",
+        "slamdash"
+      ],
+      "binding_evidence": "T699: reference actor definition 3066 (Npcs.json ModelId 1296, fairy_f_willow_slamdash.agr) shares model 1296 with the quest target 'Willow Slamdash' (locale 19366). Kill target of q3060010 objective 1.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 3148,
+      "enemy_id": "troll_spider_trainer",
+      "kind": "Troll Spider Trainer",
+      "model_id": 77,
+      "adr": "troll_forest.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 78,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 77,
+        "filename": "troll_forest.adr",
+        "row_scale": "0.000000",
+        "description": "Combat NPC"
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 22044,
+        "extracted_path": "pack_06/001607.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "troll",
+        "spider",
+        "trainer"
+      ],
+      "binding_evidence": "T699: reference actor definition 3148 (Npcs.json ModelId 77, troll_forest.adr) shares model 77 with the quest target 'Troll Spider Trainer' (locale 5135). Kill target of q3110025 objective 1.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 3135,
+      "enemy_id": "troll_naturalist",
+      "kind": "Troll Naturalist",
+      "model_id": 77,
+      "adr": "troll_forest.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 78,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 77,
+        "filename": "troll_forest.adr",
+        "row_scale": "0.000000",
+        "description": "Combat NPC"
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 22044,
+        "extracted_path": "pack_06/001607.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "troll",
+        "naturalist"
+      ],
+      "binding_evidence": "T699: reference actor definition 3135 (Npcs.json ModelId 77, troll_forest.adr) shares model 77 with the quest target 'Troll Naturalist' (locale 5234). Kill target of q3110025 objective 2.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 3592,
+      "enemy_id": "frostfang_snarler",
+      "kind": "Frostfang Snarler",
+      "model_id": 1938,
+      "adr": "sg_spawner_wolf_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 1912,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 1938,
+        "filename": "sg_spawner_wolf_01.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 77345,
+        "extracted_path": "pack_17/001852.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "client",
+      "match_method": "quest_target_name",
+      "matched_tokens": [
+        "frostfang",
+        "snarler"
+      ],
+      "binding_evidence": "T699: reference actor definition 3592 (Npcs.json ModelId 1938, sg_spawner_wolf_01.adr) shares model 1938 with the quest target 'Frostfang Snarler' (locale 78096). Kill target of q3150002 objective 0.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 4857,
+      "enemy_id": "battle_warthog",
+      "kind": "Warthog",
+      "model_id": 139,
+      "adr": "warthog.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 140,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 139,
+        "filename": "warthog.adr",
+        "row_scale": "0.000000",
+        "description": ""
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 21438,
+        "extracted_path": "pack_06/001001.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "warthog"
+      ],
+      "binding_evidence": "T699: reference actor definition 4857 (Npcs.json ModelId 139, warthog.adr) shares model 139 with the quest target 'Warthog' (locale 23196). Kill target of q3160031 objective 1.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 1495,
+      "enemy_id": "foreman_ironfist",
+      "kind": "Foreman Ironfist",
+      "model_id": 10,
+      "adr": "ghostdwarf_m_miner_01.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 11,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 10,
+        "filename": "ghostdwarf_m_miner_01.adr",
+        "row_scale": "0.000000",
+        "description": "Combat NPC"
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 23867,
+        "extracted_path": "pack_06/003430.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "foreman",
+        "ironfist"
+      ],
+      "binding_evidence": "T699: reference actor definition 1495 (Npcs.json ModelId 10, ghostdwarf_m_miner_01.adr) shares model 10 with the quest target 'Foreman Ironfist' (locale 71199). Kill target of q3160032 objective 1.0.",
+      "adr_closure": null,
+      "runtime_scale": null,
+      "texture_alias": "",
+      "capture": null
+    },
+    {
+      "definition_id": 2714,
+      "enemy_id": "queen_arachnia",
+      "kind": "Queen Arachnia",
+      "model_id": 53,
+      "adr": "blackwidowqueen.adr",
+      "models_txt": {
+        "path": "lab/working/OSFR.Client/OSFR Client/Resources/Models.txt",
+        "line": 54,
+        "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be",
+        "model_id": 53,
+        "filename": "blackwidowqueen.adr",
+        "row_scale": "0.000000",
+        "description": "Combat NPC"
+      },
+      "catalog": {
+        "path": "lab/extracted/client-assets/catalog.tsv",
+        "line": 24420,
+        "extracted_path": "pack_07/000200.adr",
+        "sha256": "12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9"
+      },
+      "catalog_status": "present",
+      "name_binding_status": "R",
+      "match_method": "quest_target_name_R",
+      "matched_tokens": [
+        "queen",
+        "arachnia"
+      ],
+      "binding_evidence": "T699: reference actor definition 2714 (Npcs.json ModelId 53, blackwidowqueen.adr) shares model 53 with the quest target 'Queen Arachnia' (locale 3592). Kill target of q3160029 objective 1.0.",
+      "adr_closure": null,
       "runtime_scale": null,
       "texture_alias": "",
       "capture": null

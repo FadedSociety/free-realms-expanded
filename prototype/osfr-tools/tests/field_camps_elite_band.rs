@@ -243,6 +243,8 @@ const LEVEL_TWENTY_ACTOR: u64 = 131000110020;
 const LEVEL_TWENTY_WOLF: u64 = 131000110156;
 /// The elite camp's shared 180 s respawn.
 const ELITE_RESPAWN_MS: u64 = 180_000;
+/// T699 appended this many quest-gated quest-target actors after the elite six.
+const T699_ACTORS: usize = 16;
 
 fn shipped_field() -> Value {
     serde_json::from_slice(&fs::read(content_path()).unwrap()).unwrap()
@@ -399,12 +401,16 @@ fn six_elite_camps_load_with_levels_fifteen_to_twenty() {
     let enemies = field["enemies"].as_array().unwrap();
     let groups = field["spawn_groups"].as_array().unwrap();
 
-    assert_eq!(enemies.len(), 34, "28 pre-T332 + 6 elite actors");
+    assert_eq!(
+        enemies.len(),
+        50,
+        "28 pre-T332 + 6 elite actors + 16 T699 quest targets"
+    );
     assert_eq!(groups.len(), 13, "10 pre-T332 + 3 elite groups");
     assert_eq!(
         engine.field_guids().len(),
-        34,
-        "the live field vector grows from 28 to 34"
+        50,
+        "the live field vector grows from 28 to 34 + 16 T699 quest targets"
     );
     assert_eq!(
         &engine.field_guids()[..EXISTING_ACTORS.len()],
@@ -890,7 +896,10 @@ fn the_existing_camps_and_wolf_quest_are_unchanged() {
     let field = shipped_field();
     let enemies = field["enemies"].as_array().unwrap();
     let groups = field["spawn_groups"].as_array().unwrap();
-    assert_eq!(enemies.len(), EXISTING_ACTORS.len() + ELITE.len());
+    assert_eq!(
+        enemies.len(),
+        EXISTING_ACTORS.len() + ELITE.len() + T699_ACTORS
+    );
     assert_eq!(groups.len(), EXISTING_GROUPS.len() + CAMPS.len());
     assert_eq!(
         enemies[..EXISTING_ACTORS.len()]
@@ -914,7 +923,7 @@ fn the_existing_camps_and_wolf_quest_are_unchanged() {
         "the 28 old actors and 10 old groups are a deep-equal prefix"
     );
     assert_eq!(
-        enemies[EXISTING_ACTORS.len()..]
+        enemies[EXISTING_ACTORS.len()..EXISTING_ACTORS.len() + ELITE.len()]
             .iter()
             .map(|row| row["guid"].as_u64().unwrap())
             .collect::<Vec<_>>(),
