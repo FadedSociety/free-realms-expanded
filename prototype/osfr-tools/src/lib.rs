@@ -66,6 +66,7 @@ pub mod movement;
 pub mod mystery_chest;
 pub mod mystery_chest_loot;
 pub mod net_policy;
+pub mod npc_ambient;
 pub mod npc_interaction;
 pub mod opening;
 pub mod opening_abilities;

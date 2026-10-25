@@ -110,7 +110,7 @@ fn f160_a_full_reliable_queue_refuses_only_its_own_view() {
 const F213_JONES: u64 = 9_000_000_121;
 const F213_REFERRAL_TO_JONES: u32 = 3_030_006;
 
-fn f213_login(guid: u64, version: &str, ticket: &str) -> Vec<u8> {
+pub(super) fn f213_login(guid: u64, version: &str, ticket: &str) -> Vec<u8> {
     let mut bytes = 1u16.to_le_bytes().to_vec();
     for (index, text) in [ticket, version, ""].iter().enumerate() {
         bytes.extend((text.len() as u32).to_le_bytes());
@@ -158,7 +158,7 @@ fn f213_application_body(message: &[u8]) -> Option<&[u8]> {
     (message.len() == length + 7).then_some(&message[7..])
 }
 
-fn f213_bodies(sender: &mut ReliableSender, now: u64) -> Vec<Vec<u8>> {
+pub(super) fn f213_bodies(sender: &mut ReliableSender, now: u64) -> Vec<Vec<u8>> {
     let codec = Codec::new(CRC_SEED, 3, true, MAX_MESSAGE).unwrap();
     sender
         .poll(now)
@@ -259,7 +259,7 @@ fn f213_sync_field_views_replays_pending_end_screen_after_the_speaker_spawn() {
         .clone();
     let before_sync = server.sessions[&keys[0]].gateway.snapshot();
     server
-        .sync_field_views(0, &field, false)
+        .sync_field_views(0, &field, false, now)
         .expect("the shared field view syncs");
     assert_eq!(
         server.sessions[&keys[0]].gateway.snapshot(),
@@ -309,7 +309,7 @@ fn f213_sync_field_views_replays_pending_end_screen_after_the_speaker_spawn() {
         .expect("the shared scene accepts the unready viewer");
     server.membership.commit_membership(change);
     server
-        .sync_field_views(0, &field, false)
+        .sync_field_views(0, &field, false, now)
         .expect("the unready view reconciles");
     assert!(
         !server.sessions[&keys[0]].known_npcs.contains(&F213_JONES),

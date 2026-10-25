@@ -1,0 +1,689 @@
+{
+  "schema_version": 1,
+  "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json (R) AnimationIds and Min/MaxIntervalMs values; model_ids are every client Resources/Models.txt id bound to model_file_name; the ids are client Resources/AnimationTypes.xml AnimationSlot ids. Upstream gives no source for the measured-looking intervals, so the schedule values stay (R).",
+  "max_packets_per_viewer_per_tick": 4,
+  "rows": [
+    {
+      "model_ids": [
+        13
+      ],
+      "model_file_name": "chugawug_f_01.adr",
+      "animation_ids": [
+        3302,
+        3306
+      ],
+      "min_interval_ms": 3796,
+      "max_interval_ms": 5563,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=chugawug_f_01.adr (R); client slots emo_applaud(3302), emo_cheer(3306)"
+    },
+    {
+      "model_ids": [
+        222
+      ],
+      "model_file_name": "chugawug_f_02.adr",
+      "animation_ids": [
+        3316
+      ],
+      "min_interval_ms": 9936,
+      "max_interval_ms": 10434,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=chugawug_f_02.adr (R); client slots emo_laugh(3316)"
+    },
+    {
+      "model_ids": [
+        667
+      ],
+      "model_file_name": "chugawug_m_01_blue_drinking.agr",
+      "animation_ids": [
+        3302,
+        3306
+      ],
+      "min_interval_ms": 3807,
+      "max_interval_ms": 5604,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=chugawug_m_01_blue_drinking.agr (R); client slots emo_applaud(3302), emo_cheer(3306)"
+    },
+    {
+      "model_ids": [
+        221
+      ],
+      "model_file_name": "chugawug_m_02.adr",
+      "animation_ids": [
+        3306,
+        3302
+      ],
+      "min_interval_ms": 3809,
+      "max_interval_ms": 5712,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=chugawug_m_02.adr (R); client slots emo_cheer(3306), emo_applaud(3302)"
+    },
+    {
+      "model_ids": [
+        15
+      ],
+      "model_file_name": "chugawug_m_miner_01.adr",
+      "animation_ids": [
+        3106
+      ],
+      "min_interval_ms": 17392,
+      "max_interval_ms": 87297,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=chugawug_m_miner_01.adr (R); client slots emo_talk_neutral_long(3106)"
+    },
+    {
+      "model_ids": [
+        514,
+        977
+      ],
+      "model_file_name": "dog_large_dalmation.adr",
+      "animation_ids": [
+        5213,
+        5210,
+        5214,
+        5209,
+        5212
+      ],
+      "min_interval_ms": 2063,
+      "max_interval_ms": 4705,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=dog_large_dalmation.adr (R); client slots pet_stand_loop_13(5213), pet_stand_loop_10(5210), pet_stand_loop_14(5214), pet_stand_loop_9(5209), pet_stand_loop_12(5212)"
+    },
+    {
+      "model_ids": [
+        170,
+        973
+      ],
+      "model_file_name": "dog_large_pointy.adr",
+      "animation_ids": [
+        5524,
+        5522
+      ],
+      "min_interval_ms": 3029,
+      "max_interval_ms": 4180,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=dog_large_pointy.adr (R); client slots pet_confused(5524), pet_vocalize_playful(5522)"
+    },
+    {
+      "model_ids": [
+        172,
+        975
+      ],
+      "model_file_name": "dog_small_floppy.adr",
+      "animation_ids": [
+        5514
+      ],
+      "min_interval_ms": 102571,
+      "max_interval_ms": 102571,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=dog_small_floppy.adr (R); client slots pet_poop(5514)"
+    },
+    {
+      "model_ids": [
+        364,
+        980
+      ],
+      "model_file_name": "dog_small_fluffy.adr",
+      "animation_ids": [
+        5213,
+        5210,
+        5214
+      ],
+      "min_interval_ms": 1696,
+      "max_interval_ms": 3460,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=dog_small_fluffy.adr (R); client slots pet_stand_loop_13(5213), pet_stand_loop_10(5210), pet_stand_loop_14(5214)"
+    },
+    {
+      "model_ids": [
+        41
+      ],
+      "model_file_name": "fairy_f_01.adr",
+      "animation_ids": [
+        3307,
+        3319,
+        3317
+      ],
+      "min_interval_ms": 8439,
+      "max_interval_ms": 9968,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairy_f_01.adr (R); client slots emo_confused(3307), emo_point(3319), emo_no(3317)"
+    },
+    {
+      "model_ids": [
+        42
+      ],
+      "model_file_name": "fairy_f_02.adr",
+      "animation_ids": [
+        3103,
+        3307,
+        3301
+      ],
+      "min_interval_ms": 10069,
+      "max_interval_ms": 10106,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairy_f_02.adr (R); client slots emo_talk_exclaim(3103), emo_confused(3307), emo_angry(3301)"
+    },
+    {
+      "model_ids": [
+        43
+      ],
+      "model_file_name": "fairy_f_03.adr",
+      "animation_ids": [
+        3103,
+        3102
+      ],
+      "min_interval_ms": 10087,
+      "max_interval_ms": 10087,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairy_f_03.adr (R); client slots emo_talk_exclaim(3103), emo_talk_inquire(3102)"
+    },
+    {
+      "model_ids": [
+        524
+      ],
+      "model_file_name": "fairy_f_freestyle_06.agr",
+      "animation_ids": [
+        3302,
+        3306
+      ],
+      "min_interval_ms": 3859,
+      "max_interval_ms": 5453,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairy_f_freestyle_06.agr (R); client slots emo_applaud(3302), emo_cheer(3306)"
+    },
+    {
+      "model_ids": [
+        571
+      ],
+      "model_file_name": "fairy_f_freestyle_09.agr",
+      "animation_ids": [
+        3101
+      ],
+      "min_interval_ms": 787,
+      "max_interval_ms": 912,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairy_f_freestyle_09.agr (R); client slots emo_talk_basic(3101)"
+    },
+    {
+      "model_ids": [
+        572
+      ],
+      "model_file_name": "fairy_f_freestyle_10.agr",
+      "animation_ids": [
+        3306,
+        3302
+      ],
+      "min_interval_ms": 3868,
+      "max_interval_ms": 5549,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairy_f_freestyle_10.agr (R); client slots emo_cheer(3306), emo_applaud(3302)"
+    },
+    {
+      "model_ids": [
+        49
+      ],
+      "model_file_name": "fairy_m_02.adr",
+      "animation_ids": [
+        3101,
+        3102
+      ],
+      "min_interval_ms": 9968,
+      "max_interval_ms": 45334,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairy_m_02.adr (R); client slots emo_talk_basic(3101), emo_talk_inquire(3102)"
+    },
+    {
+      "model_ids": [
+        574
+      ],
+      "model_file_name": "fairy_m_blacksmith_01.agr",
+      "animation_ids": [
+        3101
+      ],
+      "min_interval_ms": 45289,
+      "max_interval_ms": 45324,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairy_m_blacksmith_01.agr (R); client slots emo_talk_basic(3101)"
+    },
+    {
+      "model_ids": [
+        575
+      ],
+      "model_file_name": "fairy_m_freestyle_04.agr",
+      "animation_ids": [
+        3302,
+        3306
+      ],
+      "min_interval_ms": 3885,
+      "max_interval_ms": 5678,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairy_m_freestyle_04.agr (R); client slots emo_applaud(3302), emo_cheer(3306)"
+    },
+    {
+      "model_ids": [
+        654
+      ],
+      "model_file_name": "fairy_m_freestyle_05.agr",
+      "animation_ids": [
+        3101
+      ],
+      "min_interval_ms": 4565,
+      "max_interval_ms": 4815,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairy_m_freestyle_05.agr (R); client slots emo_talk_basic(3101)"
+    },
+    {
+      "model_ids": [
+        657
+      ],
+      "model_file_name": "fairy_m_freestyle_08.agr",
+      "animation_ids": [
+        3306,
+        3302
+      ],
+      "min_interval_ms": 3822,
+      "max_interval_ms": 5654,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairy_m_freestyle_08.agr (R); client slots emo_cheer(3306), emo_applaud(3302)"
+    },
+    {
+      "model_ids": [
+        30
+      ],
+      "model_file_name": "fairy_m_old_01.adr",
+      "animation_ids": [
+        3101
+      ],
+      "min_interval_ms": 4575,
+      "max_interval_ms": 4809,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairy_m_old_01.adr (R); client slots emo_talk_basic(3101)"
+    },
+    {
+      "model_ids": [
+        384
+      ],
+      "model_file_name": "fairy_sanctuary_f.adr",
+      "animation_ids": [
+        3103,
+        3101,
+        3316
+      ],
+      "min_interval_ms": 4587,
+      "max_interval_ms": 10170,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairy_sanctuary_f.adr (R); client slots emo_talk_exclaim(3103), emo_talk_basic(3101), emo_laugh(3316)"
+    },
+    {
+      "model_ids": [
+        398
+      ],
+      "model_file_name": "fairy_sanctuary_m_01.adr",
+      "animation_ids": [
+        3103
+      ],
+      "min_interval_ms": 4566,
+      "max_interval_ms": 4783,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairy_sanctuary_m_01.adr (R); client slots emo_talk_exclaim(3103)"
+    },
+    {
+      "model_ids": [
+        414
+      ],
+      "model_file_name": "fairy_seaside_m_01_lod0.adr",
+      "animation_ids": [
+        3101,
+        3316
+      ],
+      "min_interval_ms": 6068,
+      "max_interval_ms": 7294,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairy_seaside_m_01_lod0.adr (R); client slots emo_talk_basic(3101), emo_laugh(3316)"
+    },
+    {
+      "model_ids": [
+        241
+      ],
+      "model_file_name": "fairychild_f_pigtailsdress.adr",
+      "animation_ids": [
+        3101
+      ],
+      "min_interval_ms": 49968,
+      "max_interval_ms": 125929,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairychild_f_pigtailsdress.adr (R); client slots emo_talk_basic(3101)"
+    },
+    {
+      "model_ids": [
+        242
+      ],
+      "model_file_name": "fairychild_m_mohawkshorts.adr",
+      "animation_ids": [
+        3306,
+        3302
+      ],
+      "min_interval_ms": 3874,
+      "max_interval_ms": 8954,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fairychild_m_mohawkshorts.adr (R); client slots emo_cheer(3306), emo_applaud(3302)"
+    },
+    {
+      "model_ids": [
+        418
+      ],
+      "model_file_name": "fish.adr",
+      "animation_ids": [
+        2002,
+        2001
+      ],
+      "min_interval_ms": 31214,
+      "max_interval_ms": 93164,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=fish.adr (R); client slots amb_oneshot_02(2002), amb_oneshot_01(2001)"
+    },
+    {
+      "model_ids": [
+        339
+      ],
+      "model_file_name": "human_f_freestyle_01.agr",
+      "animation_ids": [
+        5001,
+        3308,
+        3306,
+        3317,
+        3307
+      ],
+      "min_interval_ms": 6024,
+      "max_interval_ms": 11827,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=human_f_freestyle_01.agr (R); client slots pet_trick_01_level1(5001), emo_congrats(3308), emo_cheer(3306), emo_no(3317), emo_confused(3307)"
+    },
+    {
+      "model_ids": [
+        358
+      ],
+      "model_file_name": "human_f_freestyle_02.agr",
+      "animation_ids": [
+        3306,
+        3302
+      ],
+      "min_interval_ms": 3828,
+      "max_interval_ms": 5555,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=human_f_freestyle_02.agr (R); client slots emo_cheer(3306), emo_applaud(3302)"
+    },
+    {
+      "model_ids": [
+        548
+      ],
+      "model_file_name": "human_f_freestyle_06.agr",
+      "animation_ids": [
+        3306,
+        3302,
+        5001,
+        3317,
+        3308,
+        3307
+      ],
+      "min_interval_ms": 3944,
+      "max_interval_ms": 12666,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=human_f_freestyle_06.agr (R); client slots emo_cheer(3306), emo_applaud(3302), pet_trick_01_level1(5001), emo_no(3317), emo_congrats(3308), emo_confused(3307)"
+    },
+    {
+      "model_ids": [
+        504,
+        577
+      ],
+      "model_file_name": "human_f_freestyle_07.agr",
+      "animation_ids": [
+        3302,
+        3306
+      ],
+      "min_interval_ms": 3809,
+      "max_interval_ms": 5490,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=human_f_freestyle_07.agr (R); client slots emo_applaud(3302), emo_cheer(3306)"
+    },
+    {
+      "model_ids": [
+        551
+      ],
+      "model_file_name": "human_f_freestyle_10.agr",
+      "animation_ids": [
+        3302,
+        3306
+      ],
+      "min_interval_ms": 3894,
+      "max_interval_ms": 5438,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=human_f_freestyle_10.agr (R); client slots emo_applaud(3302), emo_cheer(3306)"
+    },
+    {
+      "model_ids": [
+        424
+      ],
+      "model_file_name": "human_m_farmer_henry.agr",
+      "animation_ids": [
+        1112,
+        3320,
+        3101,
+        3334,
+        3307
+      ],
+      "min_interval_ms": 4552,
+      "max_interval_ms": 8854,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=human_m_farmer_henry.agr (R); client slots com_cast_02(1112), emo_ponder(3320), emo_talk_basic(3101), emo_yawn(3334), emo_confused(3307)"
+    },
+    {
+      "model_ids": [
+        311
+      ],
+      "model_file_name": "human_m_freestyle_02.agr",
+      "animation_ids": [
+        3306,
+        3302
+      ],
+      "min_interval_ms": 3822,
+      "max_interval_ms": 5441,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=human_m_freestyle_02.agr (R); client slots emo_cheer(3306), emo_applaud(3302)"
+    },
+    {
+      "model_ids": [
+        558
+      ],
+      "model_file_name": "human_m_freestyle_05.agr",
+      "animation_ids": [
+        3306,
+        3302,
+        3333
+      ],
+      "min_interval_ms": 3872,
+      "max_interval_ms": 30231,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=human_m_freestyle_05.agr (R); client slots emo_cheer(3306), emo_applaud(3302), emo_wave(3333)"
+    },
+    {
+      "model_ids": [
+        559
+      ],
+      "model_file_name": "human_m_freestyle_06.agr",
+      "animation_ids": [
+        3306,
+        3302
+      ],
+      "min_interval_ms": 3783,
+      "max_interval_ms": 5452,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=human_m_freestyle_06.agr (R); client slots emo_cheer(3306), emo_applaud(3302)"
+    },
+    {
+      "model_ids": [
+        526,
+        555
+      ],
+      "model_file_name": "human_m_freestyle_09.agr",
+      "animation_ids": [
+        3101,
+        3306,
+        3302,
+        3316
+      ],
+      "min_interval_ms": 4185,
+      "max_interval_ms": 7281,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=human_m_freestyle_09.agr (R); client slots emo_talk_basic(3101), emo_cheer(3306), emo_applaud(3302), emo_laugh(3316)"
+    },
+    {
+      "model_ids": [
+        505,
+        557
+      ],
+      "model_file_name": "human_m_freestyle_11.agr",
+      "animation_ids": [
+        3302,
+        3306
+      ],
+      "min_interval_ms": 3879,
+      "max_interval_ms": 5490,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=human_m_freestyle_11.agr (R); client slots emo_applaud(3302), emo_cheer(3306)"
+    },
+    {
+      "model_ids": [
+        203
+      ],
+      "model_file_name": "human_m_hooligan_brawler_01.agr",
+      "animation_ids": [
+        3306,
+        3334
+      ],
+      "min_interval_ms": 30088,
+      "max_interval_ms": 108698,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=human_m_hooligan_brawler_01.agr (R); client slots emo_cheer(3306), emo_yawn(3334)"
+    },
+    {
+      "model_ids": [
+        38
+      ],
+      "model_file_name": "human_m_miner_01.adr",
+      "animation_ids": [
+        3335,
+        3317,
+        3102,
+        3112,
+        3101
+      ],
+      "min_interval_ms": 5180,
+      "max_interval_ms": 84411,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=human_m_miner_01.adr (R); client slots emo_yes(3335), emo_no(3317), emo_talk_inquire(3102), emo_talk_angry_long(3112), emo_talk_basic(3101)"
+    },
+    {
+      "model_ids": [
+        7
+      ],
+      "model_file_name": "humanchild_f_skirtandtunic.adr",
+      "animation_ids": [
+        3302,
+        3306,
+        3101,
+        2101,
+        2103,
+        2102
+      ],
+      "min_interval_ms": 3910,
+      "max_interval_ms": 19289,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=humanchild_f_skirtandtunic.adr (R); client slots emo_applaud(3302), emo_cheer(3306), emo_talk_basic(3101), amb_loop_01_fidget_01(2101), amb_loop_01_fidget_03(2103), amb_loop_01_fidget_02(2102)"
+    },
+    {
+      "model_ids": [
+        688
+      ],
+      "model_file_name": "humanchild_m_afro.adr",
+      "animation_ids": [
+        2103,
+        2102,
+        2101
+      ],
+      "min_interval_ms": 11762,
+      "max_interval_ms": 19406,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=humanchild_m_afro.adr (R); client slots amb_loop_01_fidget_03(2103), amb_loop_01_fidget_02(2102), amb_loop_01_fidget_01(2101)"
+    },
+    {
+      "model_ids": [
+        8
+      ],
+      "model_file_name": "humanchild_m_tshirtwithbaggypants.adr",
+      "animation_ids": [
+        3101
+      ],
+      "min_interval_ms": 10067,
+      "max_interval_ms": 13543,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=humanchild_m_tshirtwithbaggypants.adr (R); client slots emo_talk_basic(3101)"
+    },
+    {
+      "model_ids": [
+        9
+      ],
+      "model_file_name": "humanchild_m_tshirtwithbeltbig.adr",
+      "animation_ids": [
+        3306,
+        3302,
+        2103,
+        2101,
+        2102
+      ],
+      "min_interval_ms": 3865,
+      "max_interval_ms": 17034,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=humanchild_m_tshirtwithbeltbig.adr (R); client slots emo_cheer(3306), emo_applaud(3302), amb_loop_01_fidget_03(2103), amb_loop_01_fidget_01(2101), amb_loop_01_fidget_02(2102)"
+    },
+    {
+      "model_ids": [
+        47
+      ],
+      "model_file_name": "penguin_baby_01.adr",
+      "animation_ids": [
+        206,
+        202,
+        203,
+        205,
+        204
+      ],
+      "min_interval_ms": 3548,
+      "max_interval_ms": 4976,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=penguin_baby_01.adr (R); client slots loc_fidget_06(206), loc_fidget_02(202), loc_fidget_03(203), loc_fidget_05(205), loc_fidget_04(204)"
+    },
+    {
+      "model_ids": [
+        4106
+      ],
+      "model_file_name": "robgoblin_m_banker.adr",
+      "animation_ids": [
+        3101
+      ],
+      "min_interval_ms": 30285,
+      "max_interval_ms": 38396,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=robgoblin_m_banker.adr (R); client slots emo_talk_basic(3101)"
+    },
+    {
+      "model_ids": [
+        4
+      ],
+      "model_file_name": "robgoblin_m_basic.adr",
+      "animation_ids": [
+        3201
+      ],
+      "min_interval_ms": 8873,
+      "max_interval_ms": 9257,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=robgoblin_m_basic.adr (R); client slots emo_dance_basic(3201)"
+    },
+    {
+      "model_ids": [
+        151
+      ],
+      "model_file_name": "sg_treasure_chest_01.adr",
+      "animation_ids": [
+        1111,
+        1112
+      ],
+      "min_interval_ms": 2148,
+      "max_interval_ms": 2159,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=sg_treasure_chest_01.adr (R); client slots com_cast_01(1111), com_cast_02(1112)"
+    },
+    {
+      "model_ids": [
+        1760,
+        1781
+      ],
+      "model_file_name": "triceratops_m_basic.adr",
+      "animation_ids": [
+        5022,
+        5012,
+        5021,
+        5002,
+        5001
+      ],
+      "min_interval_ms": 15953,
+      "max_interval_ms": 17986,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=triceratops_m_basic.adr (R); client slots pet_trick_03_level2(5022), pet_trick_02_level2(5012), pet_trick_03_level1(5021), pet_trick_01_level2(5002), pet_trick_01_level1(5001)"
+    },
+    {
+      "model_ids": [
+        167
+      ],
+      "model_file_name": "troll_peasant_02.adr",
+      "animation_ids": [
+        3112
+      ],
+      "min_interval_ms": 91078,
+      "max_interval_ms": 91078,
+      "source": "Sanctuary-main-20261019@10f129e src/Resources/NpcAmbient.json ModelFileName=troll_peasant_02.adr (R); client slots emo_talk_angry_long(3112)"
+    }
+  ]
+}

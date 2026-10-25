@@ -35,6 +35,16 @@ impl Gameplay {
         self.npc_visibility.as_ref().map_or(0, |v| v.revision())
     }
 
+    /// T507: the per-model ambient animation table, when the content set has one.
+    pub fn npc_ambient(&self) -> Option<&crate::npc_ambient::NpcAmbient> {
+        self.npc_ambient.as_deref()
+    }
+
+    /// Client model of a passive content actor; excluded field actors have none.
+    pub fn npc_model(&self, guid: u64) -> Option<u32> {
+        self.npc_visibility.as_ref()?.model_of(guid)
+    }
+
     pub fn shared_npc_view(
         &self,
         character: &CharacterState,

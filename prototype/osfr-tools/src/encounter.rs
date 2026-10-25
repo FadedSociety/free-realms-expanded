@@ -2861,7 +2861,9 @@ fn attack_processed(
     b
 }
 /// 35/8 SetAnimation (client reader `0x008e5dd0`); also world events' writer.
-pub(crate) fn animation(guid: u64, id: i32, base: bool) -> Vec<u8> {
+/// Public because the gateway binary (and its embedded test harnesses) is a
+/// separate crate from this library and must not add a fourth copy (T507).
+pub fn animation(guid: u64, id: i32, base: bool) -> Vec<u8> {
     let mut b = header(35, 8);
     b.extend(guid.to_le_bytes());
     b.extend(id.to_le_bytes());

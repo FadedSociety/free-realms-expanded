@@ -231,6 +231,9 @@ pub struct Gameplay {
     mystery_chests: Option<Arc<MysteryChests>>,
     pending_chest: Option<i32>,
     npc_visibility: Option<crate::world::NpcVisibility>,
+    /// T507: per-model ambient animation rows; immutable content loaded at
+    /// start. Not in `realm reload`'s commit list, so a table edit needs a restart.
+    npc_ambient: Option<std::sync::Arc<crate::npc_ambient::NpcAmbient>>,
     placement_watch: placement_watch::PlacementWatch, // live stat; never saved
     event_watch: placement_watch::PlacementWatch,     // T418 events.json; never saved
     npc_interaction: Option<NpcInteraction>,
@@ -911,6 +914,8 @@ impl Gameplay {
         };
         let collections =
             collection_pickup::load(npc_content, &progression_extras, &mut npc_visibility)?;
+        let npc_ambient =
+            crate::npc_ambient::NpcAmbient::load(npc_content)?.map(std::sync::Arc::new);
         // Overworld enemies replace their passive Legacy copies (same GUIDs).
         let mut encounter = encounter;
         if let Some(engine) = encounter.as_mut() {
@@ -1137,6 +1142,7 @@ impl Gameplay {
             mystery_chests,
             pending_chest: None,
             npc_visibility,
+            npc_ambient,
             placement_watch: placement_watch::PlacementWatch::default(),
             event_watch: placement_watch::PlacementWatch::default(),
             npc_interaction,

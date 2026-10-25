@@ -572,10 +572,19 @@ impl NpcVisibility {
     }
 
     /// Model of a visible content actor, for content-defined fixtures such as
-    /// crafting stations. Excluded actors have none.
+    /// crafting stations and the T507 ambient pass. Excluded actors have none.
+    /// Every `by_zone` row list is sorted by actor id (load and `place`), so the
+    /// per-tick lookup is a binary search instead of a scan of every NPC.
     pub fn model_of(&self, actor_id: u64) -> Option<u32> {
-        self.shown(actor_id)
-            .and_then(|npc| u32::try_from(npc.spawn.model_id).ok())
+        if self.excluded.contains(&actor_id) {
+            return None;
+        }
+        self.by_zone.values().find_map(|npcs| {
+            let index = npcs
+                .binary_search_by_key(&actor_id, |npc| npc.spawn.actor_id)
+                .ok()?;
+            u32::try_from(npcs[index].spawn.model_id).ok()
+        })
     }
 
     /// Where a content actor stands, for click reach checks. Excluded and removed actors have

@@ -36,6 +36,8 @@ use osfr_tools::world::{NpcVisibility, World, WorldPose};
 
 #[path = "osfr_gateway/admin_move.rs"]
 mod admin_move;
+#[path = "osfr_gateway/ambient.rs"]
+mod ambient;
 #[path = "osfr_gateway/delivery.rs"]
 mod delivery;
 use delivery::{
@@ -1565,7 +1567,9 @@ impl Session {
             }
             return Err("account character selection is required before gateway use".into());
         }
-        if let Err(error) = self.select_character_from_login(options, message, sessions, &world.security) {
+        if let Err(error) =
+            self.select_character_from_login(options, message, sessions, &world.security)
+        {
             if let Some(trace) = &self.trace {
                 trace_gateway_rejected(
                     trace,
@@ -2965,6 +2969,8 @@ pub struct Server {
     faulted_fields: BTreeSet<i32>,
     /// Shared fields with nobody in them that already settled: not ticked until someone enters.
     dormant_fields: BTreeSet<i32>,
+    /// (T507) Start of the last ambient pass: the next window is `(npc_ambient_ms, now]`.
+    npc_ambient_ms: u64,
     start: Instant,
     generation: u32,
     trace: Option<trace::Trace>,
@@ -3010,6 +3016,8 @@ impl Server {
                 );
             }
         }
+        // (T507) One ambient window per tick, shared by every instance's viewers.
+        self.npc_ambient_ms = now_ms;
     }
 
     fn tick_shared_instance(
@@ -3047,7 +3055,7 @@ impl Server {
             .values()
             .map(|s| (s.id, s.known_npcs.clone()))
             .collect();
-        self.sync_field_views(instance, &field, true)?;
+        self.sync_field_views(instance, &field, true, now_ms)?;
         for (key, player) in &mut active {
             player.known_npcs = Some(self.sessions[key].known_npcs.clone());
         }
@@ -3082,7 +3090,7 @@ impl Server {
         let Some(elapsed) = field.due(now_ms) else {
             self.membership.install_field(instance, field.clone());
             if resync {
-                self.sync_field_views(instance, &field, false)?;
+                self.sync_field_views(instance, &field, false, now_ms)?;
             }
             return Ok(());
         };
@@ -3166,34 +3174,9 @@ impl Server {
             .collect::<Vec<_>>();
         self.queue_field_deliveries(deliveries);
         if resync {
-            self.sync_field_views(instance, &field, false)?;
+            self.sync_field_views(instance, &field, false, now_ms)?;
         }
         Ok(())
-    }
-
-    /// (R) A full reliable queue refuses that recipient only: the shared field
-    /// and every other viewer keep ticking, and the next tick retries.
-    fn refuse_field_delivery(session: &Session, error: Box<dyn std::error::Error>) {
-        event(json!({
-            "event":"field_delivery_refused",
-            "character":session.character_guid,
-            "reason":error.to_string()
-        }));
-    }
-
-    fn queue_field_deliveries(&mut self, deliveries: Vec<Delivery>) {
-        for delivery in deliveries {
-            if let Some(session) = self
-                .world
-                .session_keys
-                .get(&delivery.recipient)
-                .and_then(|key| self.sessions.get_mut(key))
-            {
-                if let Err(error) = session.queue_shared_message(&delivery.bytes) {
-                    Self::refuse_field_delivery(session, error);
-                }
-            }
-        }
     }
 
     fn sync_field_views(
@@ -3201,6 +3184,7 @@ impl Server {
         instance: i32,
         field: &osfr_tools::encounter::SharedFieldState,
         hold_deaths: bool,
+        now_ms: u64,
     ) -> Result<(), Box<dyn std::error::Error>> {
         let candidates = field.interest_candidates(hold_deaths);
         let Some(row) = self.membership.instance(instance) else {
@@ -3212,6 +3196,7 @@ impl Server {
             .iter()
             .flat_map(|npc| self.world.players.nearby_sessions(zone, npc.position))
             .collect();
+        let ambient_from = self.npc_ambient_ms;
         for session in self.sessions.values_mut() {
             let Some((location_instance, ready)) = self
                 .membership
@@ -3230,6 +3215,12 @@ impl Server {
                 Some((location_instance, ready)),
                 instance,
             );
+            // (T507) Ambient before the unchanged-view skip so idle NPCs animate
+            // every tick. `hold_deaths` marks the first pass of this instance;
+            // later resync passes in the same tick must not repeat the window.
+            if valid && hold_deaths {
+                ambient::queue_due(session, ambient_from, now_ms);
+            }
             let fields: Vec<_> = candidates
                 .iter()
                 .copied()
@@ -3402,6 +3393,7 @@ impl Server {
             studio_assets: BTreeMap::new(),
             faulted_fields: BTreeSet::new(),
             dormant_fields: BTreeSet::new(),
+            npc_ambient_ms: 0,
             handshakes: IpLimiter::new(HANDSHAKES_PER_IP.0, HANDSHAKES_PER_IP.1, 1024),
             refused: 0,
             refusal_logged: None,
@@ -4556,6 +4548,11 @@ mod f160_field_views;
 #[cfg(test)]
 #[path = "osfr_gateway/dormant_fields.rs"]
 mod dormant_fields;
+
+/// T507: passive NPCs play per-model ambient animations through the shared tick.
+#[cfg(test)]
+#[path = "osfr_gateway/t507_npc_ambient.rs"]
+mod t507_npc_ambient;
 
 /// W173: the chat channel switches and bubble colour (26/32, 26/33, 26/18) through
 /// `Session::route_application` with three sessions and no sockets.

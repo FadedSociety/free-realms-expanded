@@ -249,6 +249,33 @@ pub(super) fn live_outfit_packet(packet: &[u8]) -> bool {
     matches!(packet, [35, 0, 6 | 7 | 39, 0, ..])
 }
 
+impl Server {
+    /// (R) A full reliable queue refuses that recipient only: the shared field
+    /// and every other viewer keep ticking, and the next tick retries.
+    pub(super) fn refuse_field_delivery(session: &Session, error: Box<dyn std::error::Error>) {
+        event(json!({
+            "event":"field_delivery_refused",
+            "character":session.character_guid,
+            "reason":error.to_string()
+        }));
+    }
+
+    pub(super) fn queue_field_deliveries(&mut self, deliveries: Vec<Delivery>) {
+        for delivery in deliveries {
+            if let Some(session) = self
+                .world
+                .session_keys
+                .get(&delivery.recipient)
+                .and_then(|key| self.sessions.get_mut(key))
+            {
+                if let Err(error) = session.queue_shared_message(&delivery.bytes) {
+                    Self::refuse_field_delivery(session, error);
+                }
+            }
+        }
+    }
+}
+
 impl SharedWorld {
     /// W162: `packets` for other players in interest range of `session`. Live appearance updates
     /// also require the recipient's directed view to contain the actor. The registry position is
