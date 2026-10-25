@@ -318,14 +318,12 @@ impl Rng {
 
     /// SplitMix64 finalizer. `next_u64` applies it to each draw; chess also
     /// uses it to derive one table seed from the process seed.
-    pub fn mix(mut value: u64) -> u64 {
-        value = (value ^ (value >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
-        value = (value ^ (value >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
-        value ^ (value >> 31)
+    pub fn mix(value: u64) -> u64 {
+        crate::hash::finish64(value)
     }
 
     pub fn next_u64(&mut self) -> u64 {
-        self.0 = self.0.wrapping_add(0x9e37_79b9_7f4a_7c15);
+        self.0 = self.0.wrapping_add(crate::hash::GOLDEN_GAMMA);
         Self::mix(self.0)
     }
 

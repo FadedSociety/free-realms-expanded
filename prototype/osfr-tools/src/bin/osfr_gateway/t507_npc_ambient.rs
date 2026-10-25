@@ -5,15 +5,11 @@
 use super::*;
 use serde_json::Value;
 
+#[path = "../../../tests/support/json.rs"]
+mod json;
+
 const CHUGAWUG_MODEL: u64 = 13;
 const FIELD_ENEMY_MODEL: u64 = 203;
-
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(
-        &fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
-    )
-    .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-}
 
 /// One bundled extra spawn of `model`, its actor GUID and position.
 fn spawn_of_model(document: &Value, model: u64) -> (u64, [f32; 3]) {
@@ -133,8 +129,8 @@ fn t507_ambient_animations_follow_the_model_table_for_every_viewer() {
         return;
     }
     let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
-    let extras = read_json(&content.join("npc_spawns_extra.json"));
-    let enemies = read_json(&content.join("field_enemies.json"));
+    let extras = json::read(&content.join("npc_spawns_extra.json"));
+    let enemies = json::read(&content.join("field_enemies.json"));
     let (actor, actor_at) = spawn_of_model(&extras, CHUGAWUG_MODEL);
     let (field_enemy, field_at) = field_enemy_with_ambient_model(&enemies);
     let (mut server, keys, scratch) = super::t020_group_routing::server_rig("t507-ambient");
@@ -225,9 +221,47 @@ fn t507_ambient_animations_follow_the_model_table_for_every_viewer() {
         .expect("the chugawug row fires again");
     let before_known = server.sessions[&keys[0]].known_npcs.clone();
     let before_state = server.sessions[&keys[0]].gateway.snapshot();
-    server.sessions.get_mut(&keys[0]).unwrap().sender = sender(1);
+    {
+        let refused = server.sessions.get_mut(&keys[0]).unwrap();
+        refused.sender = sender(1);
+        // The Studio inspector records a shared message before the reliable
+        // queue decides, so a refused attempt stays observable; without it this
+        // test cannot tell a refusal from the hook skipping the viewer.
+        refused.recent_on = true;
+        refused.recent.clear();
+    }
     server.npc_ambient_ms = refused_firing - 1;
     server.tick_shared_fields(refused_firing);
+    let actor_hex: String = actor
+        .to_le_bytes()
+        .iter()
+        .map(|byte| format!("{byte:02x}"))
+        .collect();
+    let refused_attempts = server.sessions[&keys[0]]
+        .recent
+        .iter()
+        .filter(|message| {
+            // `hex` is the whole inner packet: the 35/8 header, then the GUID.
+            message["dir"] == "out"
+                && message["family"] == 35
+                && message["sub"] == 8
+                && message["hex"].as_str().is_some_and(|body| {
+                    body.starts_with("23000800")
+                        && body
+                            .get(8..)
+                            .is_some_and(|body| body.starts_with(&actor_hex))
+                })
+        })
+        .count();
+    assert_eq!(
+        refused_attempts, 1,
+        "the due firing reached the 1-byte queue once and was refused"
+    );
+    assert_eq!(
+        server.sessions[&keys[0]].sender.pending_packets(),
+        0,
+        "the full queue accepted nothing"
+    );
     assert_eq!(
         server.sessions[&keys[0]].known_npcs, before_known,
         "a refused ambient packet changes nothing"
@@ -268,6 +302,59 @@ fn t507_ambient_animations_follow_the_model_table_for_every_viewer() {
     assert!(
         ambient_for(&seen, field_enemy).is_empty(),
         "a field enemy receives no ambient 35/8"
+    );
+
+    // Regression (T507 review): a fired window queues once even when its tick
+    // takes the resync branch. `tick_shared_instance` replays
+    // `sync_field_views(..., false, now)` after a committed change, so queue a
+    // committed lethal HP packet (35/5 with hp 0) to force that branch; the
+    // ambient `hold_deaths` gate is what stops the window firing twice. Then
+    // repeat the same `sync_field_views(false)` call with the tick's own
+    // window, which is deterministic even if the field has no due simulation.
+    server.sessions.get_mut(&keys[0]).unwrap().sender = sender(32 * 1024 * 1024);
+    let resync_firing = (firing + 1..=firing + 120_000)
+        .find(|now| {
+            ambient
+                .due(actor, CHUGAWUG_MODEL as u32, now - 1, *now)
+                .is_some()
+        })
+        .expect("the chugawug row fires again");
+    let mut lethal = vec![35, 0, 5, 0];
+    lethal.extend(actor.to_le_bytes());
+    lethal.extend(0_i32.to_le_bytes()); // hp zero: the held-corpse resync trigger
+    lethal.extend(1000_i32.to_le_bytes());
+    lethal.extend(0_i32.to_le_bytes());
+    server.membership.queue_field_packets(0, vec![lethal]);
+    server.npc_ambient_ms = resync_firing - 1;
+    server.tick_shared_fields(resync_firing);
+    assert!(
+        !server.faulted_fields.contains(&0),
+        "the resync tick must finish, or its second view pass never runs"
+    );
+    let seen = bodies(&mut server, keys[0], resync_firing);
+    assert!(
+        seen.iter()
+            .any(|body| body.starts_with(&[35, 0, 5, 0]) && body[4..12] == actor.to_le_bytes()),
+        "the committed lethal HP packet reaches the viewer and forces the resync"
+    );
+    assert_eq!(
+        ambient_for(&seen, actor).len(),
+        1,
+        "one 35/8 for a firing whose tick also resyncs the field"
+    );
+    let field = server
+        .membership
+        .field(0)
+        .cloned()
+        .expect("the open-world shared field");
+    server.npc_ambient_ms = resync_firing - 1;
+    server
+        .sync_field_views(0, &field, false, resync_firing)
+        .expect("the resync pass reconciles");
+    let seen = bodies(&mut server, keys[0], resync_firing);
+    assert!(
+        seen.is_empty(),
+        "a resync pass must not replay the ambient window: {seen:?}"
     );
 
     let _ = fs::remove_dir_all(scratch);

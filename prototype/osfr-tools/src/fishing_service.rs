@@ -32,6 +32,7 @@ use crate::{
     fishing::{
         self, ClientRequest, Error, FishRun, Handle, Outcome, Phase, ResultBody, RunFish, Sub, Vec4,
     },
+    hash::mix64,
     inventory::Inventory,
     minigame::{MinigameRuns, RunMode, RunSpec, RunState},
     profiles::ProfileState,
@@ -1380,13 +1381,6 @@ fn mix32(mut value: u32) -> u32 {
     value ^= value >> 15;
     value = value.wrapping_mul(0x846c_a68b);
     value ^ (value >> 16)
-}
-
-fn mix64(mut value: u64) -> u64 {
-    value = value.wrapping_add(0x9e37_79b9_7f4a_7c15);
-    value = (value ^ (value >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
-    value = (value ^ (value >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
-    value ^ (value >> 31)
 }
 
 fn finite_vec(value: Vec4) -> bool {

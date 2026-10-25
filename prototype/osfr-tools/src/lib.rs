@@ -34,6 +34,7 @@ pub mod gameplay;
 pub mod gateway;
 pub mod guilds;
 pub mod harvesting;
+mod hash;
 pub mod housing;
 pub mod housing_native;
 pub mod housing_service;

@@ -576,8 +576,10 @@ impl NpcVisibility {
 
     /// Model of a visible content actor, for content-defined fixtures such as
     /// crafting stations and the T507 ambient pass. Excluded actors have none.
-    /// Every `by_zone` row list is sorted by actor id (load and `place`), so the
-    /// per-tick lookup is a binary search instead of a scan of every NPC.
+    /// Every `by_zone` row list is sorted by actor id (load and `place`), so a
+    /// lookup is one binary search per zone until the actor's zone is reached.
+    /// Every insert uses `OPEN_WORLD_ZONE` today, so the T507 pass pays one
+    /// search per known actor (at most 64) per viewer per tick.
     pub fn model_of(&self, actor_id: u64) -> Option<u32> {
         if self.excluded.contains(&actor_id) {
             return None;

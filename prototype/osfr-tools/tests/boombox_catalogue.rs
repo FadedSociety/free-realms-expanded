@@ -4,6 +4,8 @@
 //! gateway tests for the world side).
 #[path = "support/models.rs"]
 mod models;
+#[path = "support/xml.rs"]
+mod xml;
 
 use osfr_tools::{
     boombox::Catalogue,
@@ -15,7 +17,6 @@ use osfr_tools::{
 use serde::Deserialize;
 use serde_json::{Value, json};
 use std::{
-    collections::HashSet,
     fs, io,
     path::{Path, PathBuf},
     sync::{
@@ -58,18 +59,8 @@ fn int(value: &Value) -> i32 {
 fn ints(value: &Value) -> Vec<i32> {
     value.as_array().unwrap().iter().map(int).collect()
 }
-/// Every `id="N"` of a `<tag ...>` element in a client resource file.
-fn xml_ids(file: &str, tag: &str) -> HashSet<i32> {
-    let text = read(&lab("working/OSFR.Client/OSFR Client/Resources").join(file));
-    let open = format!("<{tag} ");
-    text.split(&open)
-        .skip(1)
-        .filter_map(|element| {
-            let element = &element[..element.find('>')?];
-            let at = element.find(" id=\"")? + 5;
-            element[at..].split('"').next()?.parse().ok()
-        })
-        .collect()
+fn resources() -> PathBuf {
+    lab("working/OSFR.Client/OSFR Client/Resources")
 }
 fn temp_dir() -> PathBuf {
     let path = std::env::temp_dir().join(format!(
@@ -113,8 +104,8 @@ fn every_model_is_a_client_model() {
 
 #[test]
 fn every_dance_is_a_client_animation_slot_or_group() {
-    let slots = xml_ids("AnimationTypes.xml", "AnimationSlot");
-    let groups = xml_ids("AnimationGroups.xml", "AnimationGroup");
+    let slots = xml::ids(&resources().join("AnimationTypes.xml"), "AnimationSlot");
+    let groups = xml::ids(&resources().join("AnimationGroups.xml"), "AnimationGroup");
     assert!(
         slots.contains(&3531) && groups.contains(&3200),
         "the parser reads both tables"
@@ -137,7 +128,10 @@ fn every_dance_is_a_client_animation_slot_or_group() {
 
 #[test]
 fn every_song_is_a_client_effect_definition() {
-    let effects = xml_ids("ActorCompositeEffectDefinitions.xml", "EffectDefinition");
+    let effects = xml::ids(
+        &resources().join("ActorCompositeEffectDefinitions.xml"),
+        "EffectDefinition",
+    );
     let mut songs = 0;
     for row in rows() {
         for id in ints(&row["song_effect_ids"]) {

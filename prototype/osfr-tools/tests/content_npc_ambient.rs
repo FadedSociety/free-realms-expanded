@@ -5,22 +5,17 @@
 //! client `AnimationSlot` ids and the model ids must be the client `Models.txt`
 //! ids that draw the row's file, so the runtime key is the AddNpc model id.
 
+#[path = "support/json.rs"]
+mod json;
 #[path = "support/models.rs"]
 mod models;
+#[path = "support/xml.rs"]
+mod xml;
 
-use serde_json::Value;
 use std::{
     collections::{HashMap, HashSet},
-    fs,
     path::{Path, PathBuf},
 };
-
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(
-        &fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
-    )
-    .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
-}
 
 fn client_resources() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
@@ -33,37 +28,11 @@ fn client_resources() -> PathBuf {
         .join("lab/working/OSFR.Client/OSFR Client/Resources")
 }
 
-fn attribute<'a>(tag: &'a str, name: &str) -> Option<&'a str> {
-    let needle = format!("{name}=\"");
-    let start = tag.find(&needle)? + needle.len();
-    let end = tag[start..].find('"')? + start;
-    Some(&tag[start..end])
-}
-
-/// One client XML element table, e.g. every `AnimationSlot` id.
-fn xml_ids(path: &Path, element: &str) -> HashSet<i32> {
-    let text =
-        fs::read_to_string(path).unwrap_or_else(|error| panic!("{}: {error}", path.display()));
-    let mut ids = HashSet::new();
-    let mut rest = text.as_str();
-    while let Some(open) = rest.find(&format!("<{element}")) {
-        let tail = &rest[open..];
-        let Some(end) = tail.find('>') else {
-            break;
-        };
-        if let Some(id) = attribute(&tail[..end], "id").and_then(|id| id.parse().ok()) {
-            ids.insert(id);
-        }
-        rest = &tail[end..];
-    }
-    ids
-}
-
 #[test]
 fn ambient_rows_name_client_slots_and_models() {
     let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
-    let document = read_json(&content.join("npc_ambient.json"));
-    let slots = xml_ids(
+    let document = json::read(&content.join("npc_ambient.json"));
+    let slots = xml::ids(
         &client_resources().join("AnimationTypes.xml"),
         "AnimationSlot",
     );

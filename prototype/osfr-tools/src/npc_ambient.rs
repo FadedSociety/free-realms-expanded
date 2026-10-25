@@ -6,7 +6,14 @@
 //! intervals are (R). The schedule is stateless: an actor's firing times depend
 //! only on its GUID, so every viewer that knows the actor plays the same
 //! animation in the same tick window.
+//!
+//! Animation slot ids are client data and production must not read the client
+//! resources, so the loader rejects only structural errors: the content gate
+//! (`tests/content_npc_ambient.rs`) checks every id against the client
+//! `AnimationTypes.xml`. A hand-edited play-package table with an unknown slot
+//! is server-operator content, not client input; the client ignores the id.
 
+use crate::hash::mix64;
 use serde::Deserialize;
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -148,14 +155,14 @@ impl NpcAmbient {
     pub fn due(&self, guid: u64, model_id: u32, from_ms: u64, to_ms: u64) -> Option<i32> {
         let row = self.rows.get(&model_id)?;
         let span = row.max_interval_ms - row.min_interval_ms + 1;
-        let period = row.min_interval_ms + splitmix64(guid) % span;
-        let phase = splitmix64(guid ^ PHASE_SALT) % period;
+        let period = row.min_interval_ms + mix64(guid) % span;
+        let phase = mix64(guid ^ PHASE_SALT) % period;
         let last = phase + to_ms.checked_sub(phase)? / period * period;
         if last <= from_ms {
             return None;
         }
         let firing = (last - phase) / period;
-        let index = splitmix64(guid ^ firing.wrapping_add(1).wrapping_mul(FIRING_SALT));
+        let index = mix64(guid ^ firing.wrapping_add(1).wrapping_mul(FIRING_SALT));
         Some(row.animation_ids[(index % row.animation_ids.len() as u64) as usize])
     }
 
@@ -184,13 +191,6 @@ impl NpcAmbient {
         }
         due
     }
-}
-
-fn splitmix64(mut value: u64) -> u64 {
-    value = value.wrapping_add(0x9e37_79b9_7f4a_7c15);
-    value = (value ^ (value >> 30)).wrapping_mul(0xbf58_476d_1ce4_e5b9);
-    value = (value ^ (value >> 27)).wrapping_mul(0x94d0_49bb_1331_11eb);
-    value ^ (value >> 31)
 }
 
 fn invalid(error: impl std::fmt::Display) -> io::Error {

@@ -11,11 +11,13 @@
 #[path = "models.rs"]
 mod models;
 pub use models::read_models;
+#[path = "xml.rs"]
+mod xml;
 
 use osfr_tools::world_events;
 use serde_json::Value;
 use std::{
-    collections::{BTreeMap, BTreeSet, HashSet},
+    collections::{BTreeMap, BTreeSet},
     fs,
     path::{Path, PathBuf},
 };
@@ -52,20 +54,6 @@ pub fn row<'a>(file: &'a Value, key: &str) -> &'a Value {
 
 pub fn int(value: &Value) -> i32 {
     i32::try_from(value.as_i64().unwrap()).unwrap()
-}
-
-/// Every `id="N"` of a `<tag ...>` element in a client file.
-fn xml_ids(path: &Path, tag: &str) -> HashSet<i32> {
-    let open = format!("<{tag} ");
-    read(path)
-        .split(&open)
-        .skip(1)
-        .filter_map(|element| {
-            let element = &element[..element.find('>')?];
-            let at = element.find(" id=\"")? + 5;
-            element[at..].split('"').next()?.parse().ok()
-        })
-        .collect()
 }
 
 pub fn resources(file: &str) -> PathBuf {
@@ -208,7 +196,7 @@ pub fn assert_every_id_resolves(event: &Value) -> Ids {
             "model {model} is not in Models.txt"
         );
     }
-    let known = xml_ids(
+    let known = xml::ids(
         &lab("extracted/named/Assets_000/Assets_000/FabledRealmsAreas.xml"),
         "AreaDefinition",
     );
@@ -217,14 +205,17 @@ pub fn assert_every_id_resolves(event: &Value) -> Ids {
         "areas {:?}",
         ids.areas
     );
-    let mut known = xml_ids(&resources("AnimationTypes.xml"), "AnimationSlot");
-    known.extend(xml_ids(&resources("AnimationGroups.xml"), "AnimationGroup"));
+    let mut known = xml::ids(&resources("AnimationTypes.xml"), "AnimationSlot");
+    known.extend(xml::ids(
+        &resources("AnimationGroups.xml"),
+        "AnimationGroup",
+    ));
     assert!(
         ids.animations.iter().all(|id| known.contains(id)),
         "animations {:?}",
         ids.animations
     );
-    let known = xml_ids(
+    let known = xml::ids(
         &resources("ActorCompositeEffectDefinitions.xml"),
         "EffectDefinition",
     );
