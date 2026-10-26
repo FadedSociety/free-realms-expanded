@@ -47394,6 +47394,323 @@
       "model_id": 49,
       "model_file_name": "fairy_m_02.adr",
       "greeting_string_id": 74937
+    },
+    {
+      "npc_id": 9500001014,
+      "id_kind": "reconstructed_content_key",
+      "reference_ids": [],
+      "name": "1 Way Back Way",
+      "name_reason": null,
+      "name_string_id": 5012,
+      "name_string_ids": [
+        {
+          "table": "client_locale",
+          "id": 5012
+        }
+      ],
+      "name_string_id_reason": null,
+      "zone": "Snowhill",
+      "zone_id": 13,
+      "zone_reason": null,
+      "region_pages": [
+        "Snowhill"
+      ],
+      "presence": "listed",
+      "title_or_role": [
+        "Quest prop: the mailbox that marks the Snowhill suite address (Fisherman: Snowhill Getaway)"
+      ],
+      "roles": [
+        "ambient"
+      ],
+      "enemy_kind": null,
+      "location_evidence": [
+        "T739: the Snowhill mailbox the quest text 'your suite is located in Snowhill at 1 Way Back Way' (locale 410182) sends the player to."
+      ],
+      "quests_given": [],
+      "quest_ids_given": [],
+      "quests_given_text": [
+        "None. The row is the clickable prop for q3070037-o1."
+      ],
+      "quests_accepted": [],
+      "quests_accepted_reason": "(R) This row is a clickable quest prop, not a quest giver or hand-in.",
+      "vendor_stock": null,
+      "vendor_stock_reason": "(R) No vendor stock is recorded for this prop.",
+      "services": [],
+      "services_reason": "(R) No distinct service is recorded for this prop.",
+      "position": [
+        287.1002,
+        23.8283,
+        341.68228
+      ],
+      "position_w": null,
+      "rotation": [
+        0.0,
+        -0.7811496030372641,
+        0.0,
+        0.6243438937594606
+      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
+      "capture_match": null,
+      "position_reason": "Legacy built-content spawn coordinates copied from lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012). Position matched by spawnobj-infer (R). Quest objective q3070037-o1 (visit_position) waits on this row's position.",
+      "source": [
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T739: a clickable prop the reference spawn names and the server did not place; the content key is a new unique 95000xxxxx id, drawn by NpcVisibility::load and clickable through NpcInteraction."
+        }
+      ],
+      "field_sources": {
+        "npc_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T739: a clickable prop the reference spawn names and the server did not place; the content key is a new unique 95000xxxxx id, drawn by NpcVisibility::load and clickable through NpcInteraction."
+          }
+        ],
+        "id_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T739: a clickable prop the reference spawn names and the server did not place; the content key is a new unique 95000xxxxx id, drawn by NpcVisibility::load and clickable through NpcInteraction."
+          }
+        ],
+        "reference_ids": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) No Npcs.json Id alias is registered: no job or quest join names this prop."
+          }
+        ],
+        "name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012). NameId resolves in the client locale table to '1 Way Back Way'."
+          }
+        ],
+        "name_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T739: authored for this slice, not read from a guide row."
+          }
+        ],
+        "name_string_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012). NameId resolves in the client locale table to '1 Way Back Way'."
+          }
+        ],
+        "name_string_ids": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012). NameId resolves in the client locale table to '1 Way Back Way'."
+          }
+        ],
+        "name_string_id_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T739: the spawn's NameId is the client name id."
+          }
+        ],
+        "zone": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T739: the zone follows the file's regional page and the spawn's drawn neighbours, not a captured zone id."
+          }
+        ],
+        "zone_id": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) zone_id is the stable content-package key of the file's region."
+          }
+        ],
+        "zone_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T739: no zone disagreement; the file and the spawn agree."
+          }
+        ],
+        "region_pages": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T739: the file's regional page."
+          }
+        ],
+        "presence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T739: a listed prop row, not a quest-only mention."
+          }
+        ],
+        "title_or_role": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T739: the role names the quest prop; no native behaviour is claimed."
+          }
+        ],
+        "roles": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T739: ambient is the inert loader role; the row claims no vendor, trainer, quest-giver or enemy behaviour."
+          }
+        ],
+        "enemy_kind": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T739: this row does not establish an enemy kind."
+          }
+        ],
+        "location_evidence": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012)."
+          }
+        ],
+        "quests_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) This row is a clickable quest prop, not a quest giver or hand-in."
+          }
+        ],
+        "quest_ids_given": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) This row is a clickable quest prop, not a quest giver or hand-in."
+          }
+        ],
+        "quests_given_text": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) This row is a clickable quest prop, not a quest giver or hand-in."
+          }
+        ],
+        "quests_accepted": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) This row is a clickable quest prop, not a quest giver or hand-in."
+          }
+        ],
+        "quests_accepted_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) This row is a clickable quest prop, not a quest giver or hand-in."
+          }
+        ],
+        "vendor_stock": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T739: no vendor stock."
+          }
+        ],
+        "vendor_stock_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T739: no vendor stock."
+          }
+        ],
+        "services": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T739: no distinct service."
+          }
+        ],
+        "services_reason": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T739: no distinct service."
+          }
+        ],
+        "position": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012)."
+          }
+        ],
+        "position_w": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Null because no captured prop float4 W component was joined."
+          }
+        ],
+        "rotation": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012)."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Y-axis yaw quaternion [0, sin(h/2), 0, cos(h/2)] of the cited spawn heading; the raw heading is retained separately."
+          }
+        ],
+        "placement": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012)."
+          }
+        ],
+        "placement_source": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012)."
+          }
+        ],
+        "placement_confidence": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Medium means one unambiguous reference spawn matched by the spawn-object evidence; not a captured actor or native appearance check."
+          }
+        ],
+        "placement_candidates": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012)."
+          }
+        ],
+        "capture_match": [
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) Null means no startup AddNpc actor was identity-matched to this prop."
+          }
+        ],
+        "position_reason": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012)."
+          }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012)."
+          }
+        ],
+        "objective_ids": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012). T739: the objective ids come from the quest-line objective specs that name this reference spawn (q3070037-o1)."
+          }
+        ]
+      },
+      "heading": -1.79301,
+      "model_id": 910,
+      "model_file_name": "sg_mailbox_01.adr",
+      "objective_ids": [
+        "q3070037-o1"
+      ]
     }
   ]
 }

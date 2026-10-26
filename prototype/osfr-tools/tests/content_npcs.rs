@@ -515,8 +515,9 @@ fn regional_npc_batch_and_resolved_job_references_validate() {
     }
     // T379 appended two unanchored repair-guy binding rows.
     // T498 appended the Burglz row (the Wilds quarry troll) to npcs/wilds.json; T500 appended Hasti
-    // to npcs/sanctuary.json (1,203); T501 appended Shannon and Sugaboo to npcs/merry_vale.json (1,205).
-    assert_eq!(content_npcs.len(), 1205);
+    // to npcs/sanctuary.json (1,203); T501 appended Shannon and Sugaboo to npcs/merry_vale.json (1,205);
+    // T739 appended four clickable quest props (1,209).
+    assert_eq!(content_npcs.len(), 1209);
     let expected_npc_count = loader_npcs.len();
     write_json(
         &scratch.join("npcs.json"),

@@ -17,44 +17,16 @@ mod placement;
 
 use npc_quest_chain::{content_dir, read_json, seen_from};
 use osfr_tools::world::NpcVisibility;
-use placement::{distance, xyz, xyz_f64};
-use serde_json::Value;
-use std::{
-    fs,
-    path::{Path, PathBuf},
+use placement::{
+    cited_spawn, distance, has_source_kind, normalize_name, reference_npcs_row, regional_rows, xyz,
+    xyz_f64,
 };
+use serde_json::Value;
 
 /// The provenance phrase T698 requires on every row it places.
 const SPAWN_MARKER: &str = "matched by the spawn's client name (talk_spawns.py) (R)";
 /// Two NPCs closer than this are the same standing spot (the brief's 1 m rule).
 const SAME_SPOT_METRES: f64 = 1.0;
-
-fn crate_root() -> &'static Path {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-}
-
-/// The CartoonMMO root, the parent of the repository checkout and `lab/`.
-fn project_parent() -> PathBuf {
-    crate_root()
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .parent()
-        .unwrap()
-        .to_path_buf()
-}
-
-fn regional_rows() -> Vec<Value> {
-    let mut rows = Vec::new();
-    for entry in fs::read_dir(content_dir().join("npcs")).unwrap() {
-        let path = entry.unwrap().path();
-        if path.extension().and_then(|ext| ext.to_str()) == Some("json") {
-            rows.extend(read_json(&path)["records"].as_array().unwrap().clone());
-        }
-    }
-    rows
-}
 
 /// The zone files this brief's rows live in. The Sanctuary and Snowhill briefs write the
 /// same marker into their own files (with their own citation shape), so the scan stays here.
@@ -89,86 +61,6 @@ fn placed_by_this_brief() -> Vec<Value> {
         }
     }
     rows
-}
-
-fn has_kind(value: &Value, kind: &str) -> bool {
-    value
-        .as_array()
-        .is_some_and(|tags| tags.iter().any(|tag| tag["kind"] == kind))
-}
-
-/// The source line and spawn values cited by a `position_reason`.
-struct CitedSpawn {
-    source: String,
-    line: usize,
-    ref_id: u64,
-    position: [f64; 3],
-    heading: f64,
-}
-
-fn cited_spawn(reason: &str) -> CitedSpawn {
-    let start = reason
-        .find("copied from ")
-        .unwrap_or_else(|| panic!("position reason does not cite a source: {reason:?}"))
-        + "copied from ".len();
-    let citation = reason[start..].split(';').next().unwrap().trim().to_owned();
-    let (source, line) = citation
-        .rsplit_once(':')
-        .unwrap_or_else(|| panic!("citation has no line: {citation:?}"));
-    let line = line.parse::<usize>().unwrap();
-    let text = fs::read_to_string(project_parent().join(source))
-        .unwrap_or_else(|error| panic!("{source}: {error}"));
-    let row = text
-        .lines()
-        .nth(line - 1)
-        .unwrap_or_else(|| panic!("{source}:{line} is past the end"));
-    let call = row
-        .find("spawnNpc")
-        .unwrap_or_else(|| panic!("{source}:{line}: no spawnNpc call"));
-    let open = call
-        + row[call..]
-            .find('(')
-            .unwrap_or_else(|| panic!("{source}:{line}: no argument list"));
-    let close = open
-        + row[open..]
-            .find(')')
-            .unwrap_or_else(|| panic!("{source}:{line}: unterminated argument list"));
-    let args: Vec<&str> = row[open + 1..close].split(',').map(str::trim).collect();
-    assert!(args.len() >= 5, "{source}:{line}: unexpected spawn arity");
-    let number = |index: usize| -> f64 {
-        args[index]
-            .parse()
-            .unwrap_or_else(|error| panic!("{source}:{line}: {error}"))
-    };
-    let last = args.len();
-    CitedSpawn {
-        source: source.to_owned(),
-        line,
-        ref_id: args[0]
-            .parse()
-            .unwrap_or_else(|error| panic!("{source}:{line}: npc id: {error}")),
-        position: [number(last - 4), number(last - 3), number(last - 2)],
-        heading: number(last - 1),
-    }
-}
-
-fn npcs_row(source: &str, ref_id: u64) -> Value {
-    let path = source.replace("/Scripts/Zone/FabledRealms.lua", "/Resources/Npcs.json");
-    assert_ne!(path, source, "source path does not name the zone script");
-    let rows = read_json(&project_parent().join(path));
-    rows.as_array()
-        .unwrap()
-        .iter()
-        .find(|row| row["Id"].as_u64() == Some(ref_id))
-        .unwrap_or_else(|| panic!("{source}: Npcs.json Id {ref_id}"))
-        .clone()
-}
-
-fn normalize(name: &str) -> String {
-    name.chars()
-        .filter(|ch| ch.is_ascii_alphanumeric())
-        .map(|ch| ch.to_ascii_lowercase())
-        .collect()
 }
 
 #[test]
@@ -221,7 +113,7 @@ fn placed_rows_match_the_cited_spawn_and_the_loader_draws_them() {
             spawn.source,
             spawn.line
         );
-        let reference = npcs_row(&spawn.source, spawn.ref_id);
+        let reference = reference_npcs_row(&spawn.source, spawn.ref_id);
         assert_eq!(
             row["model_id"].as_u64(),
             reference["ModelId"].as_u64(),
@@ -237,8 +129,8 @@ fn placed_rows_match_the_cited_spawn_and_the_loader_draws_them() {
             .get(&name_id)
             .unwrap_or_else(|| panic!("{owner}: spawn NameId {name_id} does not resolve"));
         assert_eq!(
-            normalize(row["name"].as_str().unwrap()),
-            normalize(locale_name),
+            normalize_name(row["name"].as_str().unwrap()),
+            normalize_name(locale_name),
             "{owner}: spawn NameId {name_id} does not name this row"
         );
         let bound = row["name_string_id"].as_u64().unwrap_or_else(|| {
@@ -260,11 +152,11 @@ fn placed_rows_match_the_cited_spawn_and_the_loader_draws_them() {
             "{owner}: rotation is not the spawn heading"
         );
         assert!(
-            has_kind(&row["field_sources"]["position"], "legacy-data"),
+            has_source_kind(&row["field_sources"]["position"], "legacy-data"),
             "{owner}: position lacks Legacy provenance"
         );
         assert!(
-            has_kind(&row["source"], "legacy-data"),
+            has_source_kind(&row["source"], "legacy-data"),
             "{owner}: source lacks a Legacy tag"
         );
 

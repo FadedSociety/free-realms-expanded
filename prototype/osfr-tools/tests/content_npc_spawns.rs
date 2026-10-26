@@ -292,10 +292,11 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // the regional total is the invariant, not either count. T379 appended two unanchored
     // repair-guy binding rows, so the total is 1,201; T498 appended the Burglz legacy spawn (1,202);
     // T500 appended the unanchored Hasti row (1,203) and moved Dani and Honey to legacy spawns;
-    // T501 appended the unanchored Shannon and Sugaboo rows (1,205).
-    assert_eq!(regional_legacy + regional_reconstructed, 1205);
+    // T501 appended the unanchored Shannon and Sugaboo rows (1,205); T739 appended four
+    // `legacy_data` clickable quest props (1,209, all Legacy spawns).
+    assert_eq!(regional_legacy + regional_reconstructed, 1209);
     assert!(
-        regional_legacy >= 578,
+        regional_legacy >= 582,
         "regional NPCs dropped to {regional_legacy}"
     );
     // T257's appended rows, T279's Geoffrey row inserted after Carlos, T300's
