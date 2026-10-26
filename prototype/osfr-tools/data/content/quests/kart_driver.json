@@ -1064,11 +1064,11 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9500000613,
-          "text_string_id": 394664,
+          "text_string_id": 394910,
           "source": [
             {
               "kind": "client",
-              "evidence": "locale 394664 (quest_objective, Frost Ridge, this quest's title hint): 'You need to obtain another sponsor ... Petal Oceanmist at Frost Ridge Speedway might be someone to talk to about a potential sponsorship.' quest-lines/quests.json q3080019; objective-specs-fixed.json q3080019 index 0 (talk_to_npc)."
+              "evidence": "locale 394910, the client's direct objective line quoted by notes/Build Guides/Content/Jobs/Kart Driver.md line 77 (row 17): 'Talk to Petal Oceanmist at Frost Ridge Speedway to see if she will offer you a sponsorship.' 394911 is the short form. 394664 (the narrative hint 'You need to obtain another sponsor ...') stays the quest description, not the tracker goal. quest-lines/quests.json q3080019; objective-specs-fixed.json q3080019 index 0 (talk_to_npc)."
             },
             {
               "kind": "reconstructed",
@@ -1107,7 +1107,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T726: one talk_to_npc objective at Petal Oceanmist (client objective 394664); ContentDb v1 has no other free-text objective field"
+          "evidence": "(R) T726: one talk_to_npc objective at Petal Oceanmist. F745: the tracker goal is the client's action line 394910; the narrative hint 394664 stays the quest description. ContentDb v1 has no other free-text objective field"
         },
         {
           "kind": "reconstructed",
@@ -1127,11 +1127,11 @@
         },
         {
           "kind": "client",
-          "evidence": "T726: dialogs.json q3080019 binds 394665 (quest_dialog tagged to this title; Petal's sponsor pitch ending 'You think you're the right racer for us to sponsor?') as the offer and 394666 (quest_dialog tagged to this title; Petal's reply about the fast lap at Frost Ridge) as the progress line. 394662, the old intro, is tagged to Self Promotion (Amber Violet's post-race line), not to this quest."
+          "evidence": "T726: dialogs.json q3080019 binds 394665 (quest_dialog tagged to this title; Petal's sponsor pitch ending 'You think you're the right racer for us to sponsor?') as the offer and 394666 (quest_dialog tagged to this title; Petal's reply about the fast lap at Frost Ridge) as the progress line. notes/Build Guides/Content/Jobs/Kart Driver.md line 77 (row 17) names Petal Oceanmist as the giver and quotes the offer hash 1191567603 (Global.Text.394665). 394662, the old intro, is tagged to Self Promotion (Amber Violet's post-race line), not to this quest."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T726: intro is the offer line 394665; end text is 394666, the line Petal speaks when the player returns to her, since the quest ends on the Talk at her and the client has no completion line for it. No prerequisite: the predecessor (Icy Perfection or Self Promotion) is unsettled and both are disabled."
+          "evidence": "(R) T726/F745: intro is the offer line 394665; end text is 394666, the line Petal speaks when the player returns to her, since the quest ends on the Talk at her and the client has no completion line for it. No prerequisite is authored (intentional orphan): the predecessor (Icy Perfection, 3080018, or Self Promotion) is disabled and its giver row is unresolved, so requiring it would make this quest unreachable; the job gate 48 is the only gate. Enabling the predecessor and gating this quest on it is a later content task that needs the lead's acceptance of the current orphan order."
         }
       ],
       "description_string_id": 394664,

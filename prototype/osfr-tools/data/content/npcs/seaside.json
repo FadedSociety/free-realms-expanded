@@ -33328,6 +33328,7 @@
         }
       ],
       "name_string_id_reason": "Client locale Global.Text.394904 resolves to 'Petal Oceanmist'; the Legacy spawn's Npcs.json Id=2990 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's regional table ids.",
+      "greeting_string_id": 394665,
       "zone": null,
       "zone_id": null,
       "zone_reason": "The source section identifies cross-zone content but does not place this NPC in the page region.",
@@ -33347,7 +33348,20 @@
       ],
       "quests_given": [
         {
-          "quest_id": 3080019
+          "quest_id": 3080019,
+          "title": "Kart Driver: Seaside Board of Tourism Sponsorship",
+          "title_string_id": 394663,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway (rivals: Sparks Blitzwing, Linx Redline, Amber Violet; sponsor: Petal Oceanmist), row 17; name 'Kart Driver: Seaside Board of Tourism Sponsorship'; title id cell 2204157846 ucdt / 3766626738 ugdt"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T726: quest id 3080019 is a stable batch key; the guide does not provide a numeric server quest id, and data/content/quests/kart_driver.json binds title_string_id 394663 (Global.Text.394663 = the guide title)."
+            }
+          ]
         }
       ],
       "quest_ids_given": [
@@ -33356,8 +33370,24 @@
       "quests_given_text": [
         "Kart Driver: Seaside Board of Tourism Sponsorship and the Frost Ridge challenges; she does not stand in Seaside. Kart Driver"
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3080019,
+          "title": "Kart Driver: Seaside Board of Tourism Sponsorship",
+          "title_string_id": 394663,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md row 17: the quest's objective is the Talk to Petal Oceanmist at Frost Ridge Speedway (3043997278 / Global.Text.394910), so Petal is the hand-in NPC."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T726/F745: data/content/quests/kart_driver.json quest 3080019 ends on the talk_to_npc objective at 9500000613; this row's quests_accepted names the same NPC as the explicit turn-in binding, so the loader's turn-in matches the record's final Talk."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "T726: the final Talk to Petal completes 3080019's only objective and holds the 49/13, so she is the hand-in NPC; see the entry's source.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [],
@@ -33459,6 +33489,16 @@
             "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part H. Event, guest and cross-zone NPCs, row 175; source cell: [client]"
           }
         ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T378: en_us_data.dat line 31544 Global.Text.394665, JenkinsLookup2 hash 1191567603; Petal's first-person Seaside Board of Tourism sponsor offer ('Brrr! It's cold out here! ... I work for the Seaside Board of Tourism ... You think you're the right racer for us to sponsor?'). notes/Build Guides/Content/Jobs/Kart Driver.md line 77 (row 17) names Petal Oceanmist as the giver and quotes the offer hash 1191567603. data/content/quests/kart_driver.json quest 3080019 has giver_npc_id 9500000613 and intro_text_string_id 394665."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T378/F745: use this recovered speaker line as the fixed default Talk greeting. The original server greeting/phase binding is not recovered; no text is invented and a later quest phase does not change the body."
+          }
+        ],
         "zone": [
           {
             "kind": "client",
@@ -33541,8 +33581,12 @@
         ],
         "quest_ids_given": [
           {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 2 - Frost Ridge Speedway, row 17; name 'Kart Driver: Seaside Board of Tourism Sponsorship'; title id cell 2204157846 ucdt / 3766626738 ugdt"
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+            "evidence": "(R) T726: the guide does not provide a numeric server quest id; 3080019 is the stable batch key data/content/quests/kart_driver.json authors for this title."
           }
         ],
         "quests_given_text": [
@@ -33553,14 +33597,18 @@
         ],
         "quests_accepted": [
           {
+            "kind": "client",
+            "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md row 17: the objective is the Talk to Petal Oceanmist at Frost Ridge Speedway (3043997278 / Global.Text.394910), so Petal is the hand-in NPC."
+          },
+          {
             "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+            "evidence": "(R) T726/F745: data/content/quests/kart_driver.json quest 3080019 ends on the talk_to_npc objective at 9500000613; this row's quests_accepted binds that same NPC as the turn-in."
           }
         ],
         "quests_accepted_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+            "evidence": "(R) T726: the final Talk to Petal completes 3080019's only objective and holds the 49/13."
           }
         ],
         "vendor_stock": [

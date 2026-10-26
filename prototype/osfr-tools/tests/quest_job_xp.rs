@@ -1084,9 +1084,9 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             KART_DRIVER,
             30,
         ),
-        // T726: the Seaside Board of Tourism Sponsorship, a talk-only quest at Petal
-        // Oceanmist (9500000613). Same 5 coin / 30 XP rung as 3080002; no source gives
-        // it a reward.
+        // T726: the Seaside Board of Tourism Sponsorship (Petal Oceanmist, 9500000613);
+        // 5 coins / 30 Kart Driver XP repeat 3080002's rung (no source gives a reward).
+        // F745 keeps the row as the decision pin the final scan's allowlist needs.
         (
             "kart_driver.json",
             3_080_019,

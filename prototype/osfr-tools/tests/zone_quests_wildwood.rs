@@ -75,7 +75,7 @@ fn record(id: u32) -> &'static RawQuest {
 /// the shipped record, never pinned here.
 fn quest(id: u32, giver: u64, turnin: u64) -> ZoneQuest {
     let record = record(id);
-    let (coins, xp) = record.reward_totals();
+    let (coins, xp) = record.reward_totals(KART);
     ZoneQuest {
         id,
         giver,
@@ -314,7 +314,7 @@ fn shipped_records_keep_the_checked_objectives_and_payouts() {
         assert_eq!(record.objectives.len(), 1);
         assert_eq!(record.objectives[0]["kind"], json!("talk_to_npc"));
         assert_eq!(record.objectives[0]["npc_id"].as_u64(), Some(target));
-        let (coins, xp) = record.reward_totals();
+        let (coins, xp) = record.reward_totals(KART);
         assert!(coins > 0 && xp > 0, "quest {quest} has a real payout");
         let raw = read_json(&content_dir().join("quests/kart_driver.json"));
         let row = raw["records"]

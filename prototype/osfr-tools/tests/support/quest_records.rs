@@ -31,6 +31,7 @@ pub struct RawQuest {
     pub job: Option<i32>,
     pub min_level: Option<u32>,
     pub objectives: Vec<Value>,
+    /// The raw reward rows [`RawQuest::reward_totals`] reads; the loader validates them.
     pub rewards: Vec<Value>,
     /// The 49/1 card text ids and the 49/13 end text (absent means 0, the
     /// loader's default), before the loader's `i32` cast.
@@ -40,14 +41,21 @@ pub struct RawQuest {
 }
 
 impl RawQuest {
-    /// The (coins, job XP) the reward rows pay, the pair the 49/13 end screen shows.
-    pub fn reward_totals(&self) -> (u32, u32) {
+    /// The (coins, `profile` XP) the reward rows pay this profile. The 49/13 star
+    /// word is the sum of *every* profile's XP (`end_screen_reward`), so a test that
+    /// compares that word with one profile's grant must pass the profile here and
+    /// assert the one-profile shape; summing every profile would hide a wrong-profile
+    /// grant.
+    pub fn reward_totals(&self, profile: i32) -> (u32, u32) {
+        let key = profile.to_string();
         let sum = |row: &Value| -> (u64, u64) {
             (
                 row["coins"].as_u64().unwrap_or(0),
                 row["job_xp"]
                     .as_object()
-                    .map_or(0, |xp| xp.values().filter_map(Value::as_u64).sum()),
+                    .and_then(|xp| xp.get(&key))
+                    .and_then(Value::as_u64)
+                    .unwrap_or(0),
             )
         };
         let (coins, xp) = self

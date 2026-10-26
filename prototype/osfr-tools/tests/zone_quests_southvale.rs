@@ -9,7 +9,7 @@
 //! (T361, completed by a real `realm level`), the Talk that holds the 49/13, the
 //! 26/6 that releases it and the 49/14 turn-in. The quest records, cards, end
 //! texts and payouts come from `tests/support/quest_records.rs`, so the reward sum
-//! is the loader's (every row, every job-XP profile), not one row's. The only
+//! is the loader's (every row, the Miner profile's XP), not one row's. The only
 //! pinned values are the two level gates the client text names.
 //!
 //! Client readers (IDA, 2014 client; no new wire): 49/1 `0x00c7b7a0`, 49/2
@@ -73,7 +73,7 @@ fn record(id: u32) -> &'static RawQuest {
 /// The quest with its card, end text and payout read from the shipped record.
 fn quest(id: u32, giver: u64, turnin: u64) -> ZoneQuest {
     let shipped = record(id);
-    let (coins, xp) = shipped.reward_totals();
+    let (coins, xp) = shipped.reward_totals(MINER);
     assert!(coins > 0, "quest {id} has a real payout");
     ZoneQuest {
         id,

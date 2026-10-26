@@ -68,7 +68,7 @@ struct Greeting {
     proof: &'static str,
 }
 
-const NEW_GREETINGS: [Greeting; 22] = [
+const NEW_GREETINGS: [Greeting; 23] = [
     Greeting {
         npc_id: 9000000072,
         file: SEASIDE,
@@ -310,6 +310,19 @@ const NEW_GREETINGS: [Greeting; 22] = [
         guide_line: 101,
         quest: None,
         proof: "self-identifying first-person line",
+    },
+    // T726/F745: Petal's first-person Seaside Board of Tourism pitch is the 49/1
+    // offer intro of her quest, so the guide's giver row proves the speaker.
+    Greeting {
+        npc_id: 9500000613,
+        file: SEASIDE,
+        greeting: 394665,
+        hash: 1191567603,
+        dat_line: 31544,
+        guide: KART_GUIDE,
+        guide_line: 77,
+        quest: Some(("kart_driver.json", 3080019)),
+        proof: "first-person Seaside Board of Tourism sponsor offer",
     },
 ];
 

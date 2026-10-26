@@ -403,11 +403,14 @@ fn working_document(path: &str) -> Option<Value> {
 }
 
 /// The fields a quest-binding slice may rewrite on a row it does not own, plus
-/// the `field_sources` evidence that moves with each field.
-const QUEST_BINDING_FIELDS: [&str; 4] = [
+/// the `field_sources` evidence that moves with each field. `quests_given` is the
+/// object form of `quest_ids_given`, so a slice that lists its quest there (T726)
+/// is as much a quest-binding change as one that edits the id list.
+const QUEST_BINDING_FIELDS: [&str; 5] = [
     "quest_ids_given",
     "quests_accepted",
     "quests_accepted_reason",
+    "quests_given",
     "roles",
 ];
 
@@ -497,6 +500,21 @@ fn changed_rows_are(
 fn is_greeting_only_change_between(old: &Value, new: &Value) -> bool {
     changed_rows_are(old, new, true, |old, new| {
         without_fields(old, &["greeting_string_id"]) == without_fields(new, &["greeting_string_id"])
+    })
+}
+
+/// F745: one foreign row may carry a quest-binding edit and a greeting binding
+/// together (T726's Petal quest metadata plus the T378 greeting fix). Each half is
+/// allowed on its own above, and the owning quest and greeting suites pin the
+/// values; only the combination used to fail.
+fn is_quest_binding_and_greeting_change_between(old: &Value, new: &Value) -> bool {
+    changed_rows_are(old, new, false, |old, new| {
+        let fields: Vec<&str> = QUEST_BINDING_FIELDS
+            .iter()
+            .copied()
+            .chain(["greeting_string_id"])
+            .collect();
+        without_fields(old, &fields) == without_fields(new, &fields)
     })
 }
 
@@ -923,9 +941,12 @@ fn the_existing_greetings_and_other_regions_are_unchanged() {
         let (Some(old), Some(new)) = (old, new) else {
             panic!("{path} changed: the change under test is not readable JSON");
         };
+        let working_tree = base == ChangeBase::WorkingTree;
         assert!(
             is_quest_binding_change_between(path, &old, &new)
-                || (base == ChangeBase::WorkingTree && is_greeting_only_change_between(&old, &new)),
+                || (working_tree
+                    && (is_greeting_only_change_between(&old, &new)
+                        || is_quest_binding_and_greeting_change_between(&old, &new))),
             "{path} changed: this slice owns only merry_vale.json and stillwater_crossing.json"
         );
     }
@@ -1063,6 +1084,21 @@ fn the_change_guard_allows_quest_bindings_and_rejects_a_foreign_greeting() {
         serde_json::json!([{"kind": "client", "evidence": "new"}]);
     assert!(!is_quest_binding_change_between(briarwood, &old, &greeting));
     assert!(is_greeting_only_change_between(&old, &greeting));
+
+    // F745's Petal row is both at once: T726's quest metadata and the greeting
+    // binding. The builder workspace allows the combination; it is not a blanket
+    // pass, so any other field on the row still fails.
+    let mut combined = quest.clone();
+    combined["records"][0]["greeting_string_id"] = Value::from(440_465);
+    combined["records"][0]["field_sources"]["greeting_string_id"] =
+        serde_json::json!([{"kind": "client", "evidence": "new"}]);
+    assert!(!is_quest_binding_change_between(briarwood, &old, &combined));
+    assert!(is_quest_binding_and_greeting_change_between(
+        &old, &combined
+    ));
+    let mut spill = combined.clone();
+    spill["records"][0]["position"] = serde_json::json!([1.0, 2.0, 3.0]);
+    assert!(!is_quest_binding_and_greeting_change_between(&old, &spill));
 
     // Any other foreign content change is still rejected, and a quest-binding
     // allowance never accepts an unreviewed appended row.
