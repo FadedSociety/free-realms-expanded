@@ -30,6 +30,7 @@ use osfr_tools::{
     encounter_invite::{self as invite, Reply},
     identity::{NativeCreation, Resources},
     login,
+    world::{InstanceKind, World, WorldPose},
 };
 use serde_json::json;
 use std::{
@@ -613,12 +614,8 @@ fn a_refused_accept_leaves_the_invite_answerable() {
     assert_eq!(rig.host(|s| s.test_joinable_run(B)).map(|r| r.1), Some(run));
 }
 
-#[test]
-fn the_world_sweep_voids_an_invite_when_a_player_or_the_run_goes_away() {
-    use osfr_tools::{
-        encounter_invite::Pending,
-        world::{InstanceKind, World, WorldPose},
-    };
+/// A runtime World with one encounter run (zone 9600, child of the public instance) and its id.
+fn encounter_world() -> (World, i32) {
     let mut world = World::runtime();
     world
         .register_runtime_zone(osfr_tools::content::Zone {
@@ -634,23 +631,34 @@ fn the_world_sweep_voids_an_invite_when_a_player_or_the_run_goes_away() {
     let run = world
         .create_child_instance(0, 9600, InstanceKind::Encounter { encounter_id: 0 }, 0)
         .unwrap();
-    let pose = WorldPose::ORIGIN;
-    let place = |world: &mut World, guid: u64, zone: u32, target: Option<i32>| {
-        let change = world
-            .prepare_membership(guid, zone, target, pose, true, 0)
-            .unwrap();
-        world.commit_membership(change);
-    };
-    let row = || Pending {
+    (world, run)
+}
+
+/// One membership install, as the gateway's commit step does it.
+fn place(world: &mut World, guid: u64, zone: u32, target: Option<i32>) {
+    let change = world
+        .prepare_membership(guid, zone, target, WorldPose::ORIGIN, true, 0)
+        .unwrap();
+    world.commit_membership(change);
+}
+
+/// A's invite for B into `run`, expiring at 30 s.
+fn row(run: i32) -> invite::Pending {
+    invite::Pending {
         inviter: A,
         run,
         encounter: BATTLE,
         deadline_ms: 30_000,
-    };
+    }
+}
+
+#[test]
+fn the_world_sweep_voids_an_invite_when_a_player_or_the_run_goes_away() {
+    let (mut world, run) = encounter_world();
     let offered = |world: &mut World| {
         place(world, A, 9600, Some(run));
         place(world, B, 0, None);
-        assert!(world.invites_mut().offer(B, row(), 0, 16));
+        assert!(world.invites_mut().offer(B, row(run), 0, 16));
         world.collect_empty_instances(1_000);
         assert_eq!(
             world.invites_mut().len(),
@@ -681,40 +689,10 @@ fn the_world_sweep_voids_an_invite_when_a_player_or_the_run_goes_away() {
 
 #[test]
 fn the_membership_install_that_places_the_invitee_in_the_run_removes_the_invite() {
-    use osfr_tools::{
-        encounter_invite::Pending,
-        world::{InstanceKind, World, WorldPose},
-    };
-    let mut world = World::runtime();
-    world
-        .register_runtime_zone(osfr_tools::content::Zone {
-            id: 9600,
-            name: "9600".into(),
-            geometry_id: Some(9600),
-            zone_type: Some(2),
-            tutorial: Some(false),
-            sky: Some(String::new()),
-            source: Vec::new(),
-        })
-        .unwrap();
-    let run = world
-        .create_child_instance(0, 9600, InstanceKind::Encounter { encounter_id: 0 }, 0)
-        .unwrap();
-    let place = |world: &mut World, guid: u64, zone: u32, target: Option<i32>| {
-        let change = world
-            .prepare_membership(guid, zone, target, WorldPose::ORIGIN, true, 0)
-            .unwrap();
-        world.commit_membership(change);
-    };
+    let (mut world, run) = encounter_world();
     place(&mut world, A, 9600, Some(run));
     place(&mut world, B, 0, None);
-    let row = Pending {
-        inviter: A,
-        run,
-        encounter: BATTLE,
-        deadline_ms: 30_000,
-    };
-    assert!(world.invites_mut().offer(B, row, 0, 16));
+    assert!(world.invites_mut().offer(B, row(run), 0, 16));
     // Moving elsewhere, and another player entering the run, answer nothing.
     place(&mut world, B, 0, None);
     place(&mut world, 303, 9600, Some(run));
