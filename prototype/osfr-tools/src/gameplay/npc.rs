@@ -1027,7 +1027,7 @@ impl Gameplay {
             if let Some(line) = engine.step_dialogue_for(&quest) {
                 context.body_string_id = Some(line);
             }
-            self.append_npc_quest_outcome(quest, out)?;
+            self.append_npc_quest_outcome_synced(quest, out)?;
         }
         let pending_after = self
             .npc_quests

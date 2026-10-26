@@ -201,6 +201,21 @@ impl Gameplay {
         Ok(())
     }
 
+    /// T743: [`Self::append_npc_quest_outcome`] for an event outcome. A step that just opened
+    /// may be a job-level goal the character's rank already meets, so credit it now.
+    pub(super) fn append_npc_quest_outcome_synced(
+        &mut self,
+        quest: crate::quest_engine::QuestOutcome,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        let activated = quest.activated_step();
+        self.append_npc_quest_outcome(quest, out)?;
+        if activated {
+            self.sync_job_level_objectives(out)?;
+        }
+        Ok(())
+    }
+
     pub(super) fn append_npc_quest_outcome(
         &self,
         quest: crate::quest_engine::QuestOutcome,
@@ -273,7 +288,7 @@ impl Gameplay {
     ) -> io::Result<()> {
         if let Some(engine) = &mut self.npc_quests {
             let result = engine.on_event(event)?;
-            self.append_npc_quest_outcome(result, out)?;
+            self.append_npc_quest_outcome_synced(result, out)?;
         }
         // Quest events also arrive from movement, ticks and automatic outcomes, not only
         // `handle_in_world`. Synchronize here so a goal opened on any of those paths is

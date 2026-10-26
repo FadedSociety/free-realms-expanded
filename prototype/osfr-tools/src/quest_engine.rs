@@ -641,6 +641,18 @@ pub struct QuestOutcome {
     pub denial: Option<QuestDenial>,
 }
 
+impl QuestOutcome {
+    /// Whether an ordered quest just opened its next step (a 49/8 `ObjectiveActivated`).
+    pub fn activated_step(&self) -> bool {
+        self.outbound.iter().any(|message| {
+            matches!(
+                message,
+                OutboundMessage::Quest(QuestMessage::ObjectiveActivated { .. })
+            )
+        })
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum OutboundMessage {
     Quest(QuestMessage),
@@ -2096,15 +2108,22 @@ impl QuestEngine {
                     .iter()
                     .zip(&definition.objectives)
                     .all(|(count, objective)| *count == objective.required);
-            let named_objective_target = match &event {
-                QuestEvent::TalkToNpc { npc_id } => definition.objectives.iter().any(|objective| {
-                    matches!(
-                        &objective.kind,
-                        ObjectiveKind::TalkToNpc { npc_id: target } if target == npc_id
-                    )
-                }),
-                _ => false,
-            };
+            // T743: in an ordered quest only the final step's NPC is a named end-screen target;
+            // an earlier step's NPC (3090027: Beth, then a rank goal) is not where it ends.
+            let named_objective_target =
+                match &event {
+                    QuestEvent::TalkToNpc { npc_id } => definition
+                        .objectives
+                        .iter()
+                        .enumerate()
+                        .any(|(index, objective)| {
+                            matches!(
+                                &objective.kind,
+                                ObjectiveKind::TalkToNpc { npc_id: target } if target == npc_id
+                            ) && (!definition.ordered || index + 1 == definition.objectives.len())
+                        }),
+                    _ => false,
+                };
             if ready
                 && self.state.pending_turnin.is_none()
                 && (event_is_talk_to(&event, definition.turnin_npc_id) || named_objective_target)
@@ -2112,6 +2131,7 @@ impl QuestEngine {
                 // Both conditions are Talk-only, so this records the NPC the player talked to.
                 if let QuestEvent::TalkToNpc { npc_id: actor_id } = &event {
                     self.state.open_pending_turnin(quest_id, *actor_id);
+                    outcome.changed = true;
                     outcome
                         .outbound
                         .push(OutboundMessage::Quest(QuestMessage::QuestEnd {
@@ -2729,14 +2749,6 @@ fn validate_definition(definition: &QuestDefinition) -> io::Result<()> {
                 || objective.description.len() > 4096
                 || !valid_objective_kind(&objective.kind)
         })
-        // F576: a job-level goal is checked at accept and on a rank change, never when an
-        // earlier ordered step completes, so in an ordered quest it may only be the first step.
-        || (definition.ordered
-            && definition
-                .objectives
-                .iter()
-                .skip(1)
-                .any(|objective| matches!(objective.kind, ObjectiveKind::JobLevel { .. })))
         // T503: one collect_node count is bounded at load (R; the fork goals are single digits).
         || definition.objectives.iter().any(|objective| {
             matches!(objective.kind, ObjectiveKind::CollectNode { .. })
@@ -3109,8 +3121,9 @@ impl QuestEngine {
 
     /// The open job-level goals of the character's active quests. `current_objectives`
     /// already limits an ordered quest to its first unfinished step, so a later goal
-    /// cannot be credited early; `validate_definition` refuses a job-level goal that is
-    /// not an ordered quest's first step, so none waits behind an earlier one.
+    /// cannot be credited early. A goal that becomes the open step after earlier steps
+    /// (T743) is credited by the caller's sync when the step activates (`QuestOutcome::
+    /// activated_step`) and on every later rank change.
     pub fn open_job_level_objectives(&self) -> Vec<(i32, u8)> {
         self.state
             .quests

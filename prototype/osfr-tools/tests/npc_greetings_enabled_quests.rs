@@ -308,6 +308,10 @@ const BINDINGS: &[Binding] = &[
 /// unbound id that is not listed here.
 const BLANK_WITH_REASON: &[(u64, &str)] = &[
     (
+        9000000023,
+        "Beth Callahan (T743 talk target of 3090027): the client names her only in third person (387592 'Speak to Beth Callahan', the objective text, and Doctor Callahan's offer speech 387576 that sends the player to her); quest-lines/objective-specs-fixed.json q3090027 records no first-person line, so none is recovered.",
+    ),
+    (
         9000000069,
         "Derp Axemaker (T729 giver of 3100012 and 3100013): the only first-person lines the client has for him are the offer intros 387452 and 77415 of those two quests, and quest-lines/dialogs.json leaves both speakers unattributed; binding a QuestOffer greeting moves the Snowhill bound-row pins in the region greeting tests, which this quest-data change does not touch, so he stays unbound.",
     ),

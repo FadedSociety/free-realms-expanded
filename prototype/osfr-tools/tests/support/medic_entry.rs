@@ -21,6 +21,9 @@ pub const HOUSE_CALL: u32 = 3_090_003;
 pub const PILLS: u32 = 3_090_004;
 pub const VITAMINS: u32 = 3_090_005;
 pub const LEVEL_FIVE: u32 = 3_090_006;
+/// T743: Doctor Callahan's Seaside level-20 gate, the only Medic record past the Sanctuary
+/// chapter that is enabled (see `zone_quests_seaside_round3.rs`).
+pub const LEVEL_TWENTY: u32 = 3_090_027;
 /// The next Medic record; it stays disabled in this slice (no friendly-NPC
 /// Target Vitals path), and no later record may become offerable by accident.
 pub const SURGICAL_PRECISION: u32 = 3_090_008;
@@ -74,7 +77,8 @@ pub fn assert_enabled_medic_chapter_records() {
             u64::from(HOUSE_CALL),
             u64::from(PILLS),
             u64::from(VITAMINS),
-            u64::from(LEVEL_FIVE)
+            u64::from(LEVEL_FIVE),
+            u64::from(LEVEL_TWENTY)
         ]
     );
 
@@ -367,7 +371,8 @@ pub fn assert_enabled_medic_chapter_records() {
     // Surgical Precision onward stay closed.
     for record in records {
         let id = record["id"].as_u64().unwrap();
-        if id == u64::from(3_090_002_u32) || id >= 3_090_007 {
+        // T743 enables Callahan's Seaside level-20 gate (3090027); its own suite covers it.
+        if id == u64::from(3_090_002_u32) || (id >= 3_090_007 && id != u64::from(LEVEL_TWENTY)) {
             assert_eq!(
                 record["enabled"].as_bool(),
                 Some(false),

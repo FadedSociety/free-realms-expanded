@@ -1079,13 +1079,24 @@ fn a_malformed_job_level_goal_is_a_load_error() {
         clean.is_enabled(SYNTHETIC_QUEST),
         "the clean goal is enabled"
     );
-    // F576: a job-level goal may open an ordered quest, so the refusal below is about
-    // its position, not about mixing kinds.
+    // F576 + T743: a job-level goal loads as the first or a later ordered step; the
+    // gameplay sync credits a later one when the step before it completes
+    // (`tests/zone_quests_seaside_round3.rs`).
     let mut first = job_level_goal(WARRIOR, 5);
     first.as_array_mut().unwrap().push(talk_goal(2));
     assert!(
         load(first).is_ok(),
         "a job-level goal as the first ordered step loads"
+    );
+    let mut later = json!([talk_goal(1)]);
+    later
+        .as_array_mut()
+        .unwrap()
+        .push(job_level_goal(WARRIOR, 5)[0].clone());
+    later[1]["id"] = json!(2);
+    assert!(
+        load(later).is_ok(),
+        "a job-level goal after an earlier ordered step loads"
     );
 
     for (label, goal) in [
@@ -1108,21 +1119,6 @@ fn a_malformed_job_level_goal_is_a_load_error() {
                 "profile_id": WARRIOR,
                 "level": 5,
                 "source": []
-            }]),
-        ),
-        (
-            // F576: nothing re-checks a job-level goal when an earlier ordered step
-            // completes, so a later job-level step could never be credited.
-            "a job-level goal after an earlier ordered step",
-            json!([talk_goal(1), {
-                "kind": "job_level",
-                "id": 2,
-                "profile_id": WARRIOR,
-                "level": 5,
-                "source": [{
-                    "kind": "reconstructed",
-                    "evidence": "(R) F576 synthetic later job_level step"
-                }]
             }]),
         ),
     ] {

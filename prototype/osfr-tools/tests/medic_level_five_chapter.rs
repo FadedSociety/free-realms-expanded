@@ -878,7 +878,8 @@ fn surgical_precision_stays_disabled() {
     let document = read_json(&content_dir().join("quests/medic.json"));
     for record in document["records"].as_array().unwrap() {
         let id = record["id"].as_u64().unwrap();
-        if id >= 3_090_007 {
+        // T743 enables Callahan's Seaside level-20 gate; the rest stay off.
+        if id >= 3_090_007 && id != u64::from(LEVEL_TWENTY) {
             assert_eq!(
                 record["enabled"].as_bool(),
                 Some(false),

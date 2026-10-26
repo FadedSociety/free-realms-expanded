@@ -1567,11 +1567,63 @@
     },
     {
       "id": 3090027,
+      "job": 11,
+      "min_level": 15,
       "title_string_id": 387577,
       "giver_npc_id": 9000000072,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3090006
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000023,
+          "text_string_id": 387592,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 4: level 15 to 20 (shock paddles, the patrol and the school letter), row 27; Global.Text 387592 'Speak to Beth Callahan' (npc_name 388395); quest-lines/objective-specs-fixed.json q3090027 objective 0 (client order: Beth first, then the rank goal). The offer speech 387576 sends the player to her."
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "Beth Callahan 9000000023 stands at Sanctuary-main-20261019@10f129e FabledRealms.lua:3587 (Npcs.json Id=33357), drawn by npc_spawns_extra.json spawn_guid 9000000023 whose content_key is the row."
+            }
+          ]
+        },
+        {
+          "kind": "job_level",
+          "id": 2,
+          "profile_id": 11,
+          "level": 20,
+          "text_string_id": 387591,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Medic.md: Quest line > Band 4: level 15 to 20 (shock paddles, the patrol and the school letter), row 27; Global.Text 387591 'Reach level 20 as a medic and return to Doctor Callahan.'; quest-lines/objective-specs-fixed.json q3090027 objective 1 (profile 11 is Medic in jobs.json)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T743: the server's authoritative job_level objective (T361); it completes from the Medic rank curve, never from a Talk or a client claim. It is the second step, so the engine credits it when Beth's Talk opens it (an already rank-20 Medic completes it at once) and on every later rank change; the 'return' is the turn-in at Callahan, the quest's giver."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "11": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T743: 5 coins and 25 Medic (profile 11) XP, the Medic level-gate payout of 3090006 (T278). The client has no reward text for this quest. No item is granted."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1591,29 +1643,33 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "T743 giver and turn-in: Doctor Callahan 9000000072 (npcs/seaside.json, legacy_data). Global.Text 387576 is his first-person offer speech (the quest intro), 387578 the card description and 387579 the level-20 turn-in line (the end text); lab/reports/locale-id-to-text.json. quest-lines/quests.json q3090027 lists the same giver; quest-lines/dialogs.json swaps the 387576/387578 slots and the client roles win."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T743 prerequisite: the chain's real predecessor 3090026 (Omitted Admission) has no giver row (9000000280 is a batch key with no NPC) and stays disabled, so this chapter follows the last enabled Medic quest 3090006, as T257 did for Warrior W4. The skipped Medic steps 3090007-3090026 keep their records."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T743 job 11 (Medic) gate and min_level 15: the guide places this row in 'Band 4: level 15 to 20'; the offer is gated on the server's own Medic rank, never a client claim."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T743 enabled: Callahan offers it, Beth's Talk and the rank-20 goal complete it, and Callahan takes it in."
         }
       ],
       "description_string_id": 387578,
       "intro_text_string_id": 387576,
       "end_text_string_id": 387579,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3090028,
