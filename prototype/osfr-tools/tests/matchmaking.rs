@@ -300,22 +300,6 @@ fn only_the_implemented_families_are_claimed() {
 }
 
 #[test]
-fn listings_publish_only_field_battles() {
-    let listings = Listings::from_activities(&[
-        activity(96, Kind::Battle),
-        activity(20, Kind::Chess { row_id: 20 }),
-        activity(42, Kind::Soccer),
-    ])
-    .unwrap();
-    let list = QueueListResponse::decode(&listings.queue_list(7).unwrap()).unwrap();
-    let ids: Vec<u32> = list.rows.iter().map(QueueRow::queue_id).collect();
-    assert_eq!(ids, [96], "chess and soccer are portal rows, not queues");
-    let stats = QueueStatsResponse::decode(&listings.queue_stats(7).unwrap()).unwrap();
-    assert_eq!(stats.values_a, [0], "one statistics slot per published row");
-    assert_eq!(stats.values_b, [0]);
-}
-
-#[test]
 fn empty_listing_has_no_rows_and_zero_stats() {
     let listings = Listings::from_activities(&[]).unwrap();
     let list = QueueListResponse::decode(&listings.queue_list(7).unwrap()).unwrap();

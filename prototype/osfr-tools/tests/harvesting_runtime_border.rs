@@ -8,13 +8,13 @@
 //! `Gameplay::load` even though its regular tiles cannot fall.
 //!
 //! RED baseline: that unpadded eight-kind document loads; GREEN refuses it (row-0 and column-0
-//! cells both tested) while the padded writer output, the Mining-only campaign and the
-//! no-content legacy campaign stay permissive.
+//! cells both tested). The permissive side (padded writer output, Mining-only and no-content
+//! legacy campaigns) is asserted in `harvesting_runtime_tiles.rs`.
 //!
 //! Fixtures copy the private harvesting campaign content into a temp directory and rewrite only
 //! `harvesting.json`; a refusal must leave the tree byte-identical.
 
-use osfr_tools::{gameplay::Gameplay, harvesting, mining};
+use osfr_tools::{gameplay::Gameplay, harvesting};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{
@@ -178,28 +178,4 @@ fn unpadded_eight_kind_export_is_refused_without_mutation() {
     document["spec"]["shape"] = Value::Array(shape);
     fixture.write_document(&document);
     expect_refused(&fixture, "playable rectangle on column 0");
-}
-
-#[test]
-fn padded_content_mining_and_legacy_stay_permissive() {
-    let fixture = Fixture::new();
-    harvesting::write_content(&fixture.directory, GAME_ID).expect("writer");
-    let gameplay = fixture
-        .load()
-        .expect("the padded writer output loads through the border gate");
-    assert!(gameplay.state().harvesting.is_some());
-
-    let fixture = Fixture::new();
-    fs::remove_file(fixture.harvesting_path()).unwrap();
-    let gameplay = fixture
-        .load()
-        .expect("legacy campaign without harvesting loads");
-    assert!(gameplay.state().harvesting.is_none());
-
-    let fixture = Fixture::new();
-    fs::remove_file(fixture.harvesting_path()).unwrap();
-    mining::write_content(&fixture.directory, mining::MINING_GAME_ID).expect("mining writer");
-    let gameplay = fixture.load().expect("mining content stays permissive");
-    assert!(gameplay.state().mining.is_some());
-    assert!(gameplay.state().harvesting.is_none());
 }

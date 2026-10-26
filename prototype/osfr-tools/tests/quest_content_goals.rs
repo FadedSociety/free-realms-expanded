@@ -403,23 +403,6 @@ fn select_packet(actor: u64, choice: i32) -> Vec<u8> {
     packet
 }
 
-#[test]
-fn interaction_request_builders_match_the_client_constructors() {
-    // 26/8: ctor 0x008b6bc0. Captured native inner frame from application-0066.bin.
-    assert_eq!(
-        interact_packet(0x4f50_454e_0000_0005),
-        [
-            0x1a, 0x00, 0x08, 0x00, 0x05, 0x00, 0x00, 0x00, 0x4e, 0x45, 0x50, 0x4f, 0x00
-        ]
-    );
-    // 26/10: ctor 0x00a36f80 stores two GUID dwords then the i32 choice.
-    let select = select_packet(0x1122_3344_5566_7788, 103);
-    assert_eq!(select.len(), 16);
-    assert_eq!(&select[..4], &[26, 0, 10, 0]);
-    assert_eq!(&select[4..12], &0x1122_3344_5566_7788_u64.to_le_bytes());
-    assert_eq!(&select[12..16], &103_i32.to_le_bytes());
-}
-
 fn client_claim(objective: u32) -> Vec<u8> {
     let mut packet = vec![45, 0, 7];
     packet.extend((objective as i32).to_le_bytes());

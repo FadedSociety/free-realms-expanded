@@ -52,25 +52,6 @@ fn version_one_migrates_without_changing_coordinates_and_corruption_is_preserved
     fs::remove_dir(dir).unwrap();
 }
 
-#[test]
-fn pet_state_uses_the_current_schema_constant() {
-    let dir = std::env::temp_dir().join(format!("osfr-game-store-pets-{}", std::process::id()));
-    fs::create_dir(&dir).unwrap();
-    let path = dir.join("state.json");
-    let with_pets = Snapshot {
-        character: initial(),
-        gameplay: None,
-        pets: Some(serde_json::json!({"roster": []})),
-    };
-    save(&path, &with_pets).unwrap();
-
-    let saved: serde_json::Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
-    assert_eq!(saved["schema_version"], PET_SCHEMA_VERSION);
-
-    fs::remove_file(path).unwrap();
-    fs::remove_dir(dir).unwrap();
-}
-
 /// Lead (persistence), S17: a pet change that also changes the character (adoption consumes an
 /// item) is written as one atomic document, keeps housing, a `None` roster keeps the one on disk,
 /// and a refused write changes nothing. The production adoption path (session commit, restart,

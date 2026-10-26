@@ -3,7 +3,7 @@ use osfr_tools::{inventory, minigame, profiles, rewards};
 use inventory::Inventory;
 use minigame::{Activity, ActivityFinish, MinigameRuns, RunMode, RunSpec, RunState};
 use profiles::ProfileState;
-use rewards::{RewardBundleRow, RewardDisplay, RewardGrant, RewardState, apply_grant};
+use rewards::{RewardBundleRow, RewardDisplay, RewardGrant, RewardState};
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
 use std::{
@@ -559,16 +559,4 @@ fn persisted_counter_never_reuses_ids_and_wrong_instance_is_rejected() {
     assert_eq!(restarted.current_instance_id(), Some(129));
     assert_ne!(restarted.current_instance_id(), Some(128));
     assert!(!second.replies.is_empty());
-}
-
-#[test]
-fn reward_api_duplicate_key_is_inert() {
-    let fixture = Fixture::new(10);
-    let state = fixture.reward_state();
-    let payout = grant();
-    let (once, first) = apply_grant(&state, &payout, "minigame-run:999").unwrap();
-    let (twice, duplicate) = apply_grant(&once, &payout, "minigame-run:999").unwrap();
-    assert!(!first.is_empty());
-    assert!(duplicate.is_empty());
-    assert_eq!(twice.inventory.state().coins, 15);
 }

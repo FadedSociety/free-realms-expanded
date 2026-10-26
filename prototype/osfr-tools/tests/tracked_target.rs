@@ -108,16 +108,6 @@ fn talk_and_interact_objectives_point_at_the_npc() {
 }
 
 #[test]
-fn kill_objectives_point_at_the_field_enemies_home() {
-    assert_eq!(
-        locate_kind(ObjectiveKind::KillActorKind {
-            actor_kind_id: ENEMY_KIND
-        }),
-        Some(pin(4, ENEMY_GUID, 0, [-1971.4, -34.5, 539.8]))
-    );
-}
-
-#[test]
 fn reach_poi_and_visit_position_use_their_own_geometry() {
     assert_eq!(
         locate_kind(ObjectiveKind::ReachPoi { poi_id: POI }),
@@ -155,7 +145,8 @@ fn a_battle_only_kill_points_at_its_battle_marker() {
 
 #[test]
 fn a_field_enemy_still_wins_over_a_battle_marker() {
-    // 930050 has both a field home and a battle; the field home is where it roams.
+    // 930050 has both a field home and a battle; the field home is where it roams (this is also
+    // the plain field-enemy kill pin).
     assert_eq!(
         locate_kind(ObjectiveKind::KillActorKind {
             actor_kind_id: ENEMY_KIND

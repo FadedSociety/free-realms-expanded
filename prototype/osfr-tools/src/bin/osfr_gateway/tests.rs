@@ -938,18 +938,6 @@ fn a_refused_precommit_transfer_keeps_its_staged_bytes_until_dispatch_end() {
     );
 }
 
-/// The F264 protected name (`lab/autopilot/protected-pass.txt`, and the six integration suites that
-/// embed this module): an alias for the test above. It keeps the historical selector working while
-/// the real test name says that the refused transfer's staged bytes stay charged until the dispatch
-/// ends, not that a refund happens. F322 review finding 4.
-#[test]
-fn a_refused_precommit_transfer_releases_its_reply_budget() {
-    if !test_support::bin_test_target("gateway") {
-        return;
-    }
-    a_refused_precommit_transfer_keeps_its_staged_bytes_until_dispatch_end();
-}
-
 /// Session-test scratch directory and `Options` builder, shared with `lead_trade_commit`.
 #[cfg(test)]
 #[path = "test_support.rs"]

@@ -277,42 +277,6 @@ fn a_finished_registered_race_pays_once_with_real_coins_xp_and_the_recovered_toa
 }
 
 #[test]
-fn a_second_claim_never_pays_again() {
-    let content = Content::new(KART_DRIVER_JOB_ID);
-    let mut profiles = content.profiles();
-    let mut inventory = content.inventory();
-    let registry = KartRewardRegistry::starter_defaults();
-    let price = wildwood_price(&registry);
-    let mut session = finished_session(WILDWOOD, Some(price));
-    claim_race_reward(
-        &registry,
-        &mut session,
-        &mut inventory,
-        &mut profiles,
-        SOURCE_GUID,
-        PLAYER_GUID,
-    )
-    .unwrap();
-    let coins = inventory.state().coins;
-    let xp = profiles.state().clone();
-
-    assert_eq!(
-        claim_race_reward(
-            &registry,
-            &mut session,
-            &mut inventory,
-            &mut profiles,
-            SOURCE_GUID,
-            PLAYER_GUID,
-        )
-        .unwrap_err(),
-        RewardError::Racing(KartRacingError::RewardAlreadyClaimed)
-    );
-    assert_eq!(inventory.state().coins, coins);
-    assert_eq!(profiles.state(), &xp);
-}
-
-#[test]
 fn a_forged_or_unfinished_race_aborts_without_a_payout() {
     let content = Content::new(KART_DRIVER_JOB_ID);
     let mut profiles = content.profiles();

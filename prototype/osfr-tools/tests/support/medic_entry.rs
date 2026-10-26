@@ -2,9 +2,7 @@
 //!
 //! `medic_entry_chain.rs` includes this with
 //! `#[path = "support/medic_entry.rs"] mod medic_entry;` and re-exports the
-//! constants; `medic_entry_content.rs` is the focused content target that runs
-//! the same check without the packet flow. Test-only; production never copies
-//! content.
+//! constants. Test-only; production never copies content.
 #![allow(dead_code)]
 
 use super::npc_quest_chain::{content_dir, content_position, read_json};
@@ -57,8 +55,7 @@ pub const EXAM_END_TEXT: u32 = 24_259;
 /// workload..."): raw locale hash 1171210927 = Global.Text 24266.
 pub const HOUSE_END_TEXT: u32 = 24_266;
 
-/// Shared by the protected chain test (the integrator pins that target/name) and
-/// the focused content target, so both run the same checks without a second copy.
+/// The chapter content check; the protected chain test calls it (the integrator pins that name).
 pub fn assert_enabled_medic_chapter_records() {
     let document = read_json(&content_dir().join("quests/medic.json"));
     let records = document["records"].as_array().unwrap();

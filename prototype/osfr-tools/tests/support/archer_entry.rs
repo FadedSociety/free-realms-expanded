@@ -1,6 +1,6 @@
 //! Shared fixture and packet helpers for the Archer entry chapter tests.
 //!
-//! `archer_entry_chain.rs` and `archer_entry_content.rs` include this file with
+//! `archer_entry_chain.rs` includes this file with
 //! `#[path = "support/archer_entry.rs"] mod archer_entry;`. Test-only; production never copies
 //! content. The fixture supplies profile/inventory content; the repository's
 //! `job_trainers.json`, `npcs/` and split quests are bound from `data/content` exactly as the
@@ -203,8 +203,7 @@ pub fn archer_xp(game: &Gameplay) -> u32 {
     profile_xp(game, ARCHER)
 }
 
-/// Shared by the protected chain test (the integrator pins that target/name) and the
-/// focused content target, so both run the same checks without a second copy.
+/// The chapter content check; the protected chain test calls it (the integrator pins that name).
 pub fn assert_enabled_archer_chapter_records() {
     let document = read_json(&content_dir().join("quests/archer.json"));
     let records = document["records"].as_array().unwrap();

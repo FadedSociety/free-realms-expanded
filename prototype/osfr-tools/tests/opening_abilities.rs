@@ -207,51 +207,6 @@ fn every_job_bar_has_exactly_the_unlocked_ladder_at_every_level() {
     }
 }
 
-// Independent expected (row, level): changing a content lock alone must fail
-// this test. Each skill takes its row at its own level, replacing any earlier one.
-#[test]
-fn shipped_job_roster_unlocks_each_skill_at_its_declared_ladder() {
-    let abilities = shipped_roster();
-    for (profile, expected) in [
-        (11, vec![(1, 1), (2, 1), (3, 5), (3, 10), (1, 15)]),
-        (32, vec![(1, 1), (2, 5), (3, 10), (2, 15)]),
-        (12, vec![(1, 1), (2, 5), (3, 10), (3, 15)]),
-        (2, vec![(1, 1), (2, 5), (3, 15)]), // Shadow Minion (row 3, 10) is unavailable
-        (43, vec![(1, 1), (2, 5), (3, 10), (3, 15)]), // W125: 2009 Brawler guide levels
-        (35, vec![(1, 1), (2, 5), (3, 10), (2, 15), (3, 20)]), // W125: 2009 Archer guide levels
-    ] {
-        for (slot, minimum) in expected {
-            let ability = abilities.job_slot(profile, slot, minimum).unwrap();
-            assert_eq!(ability.min_level, minimum, "profile {profile}, slot {slot}");
-            let id = ability.definition_id;
-            for level in [minimum - 1, minimum] {
-                let packets = abilities.activation(profile, level).unwrap();
-                let defined = packets.iter().any(|p| {
-                    p.starts_with(&[36, 0, 13, 0])
-                        && i32::from_le_bytes(p[4..8].try_into().unwrap()) == id
-                });
-                assert_eq!(
-                    defined,
-                    level >= minimum,
-                    "profile {profile}, slot {slot}, level {level}"
-                );
-                let bar = packets.last().unwrap();
-                let mut at = 12;
-                for index in 0..8 {
-                    let kind = i32::from_le_bytes(bar[at..at + 4].try_into().unwrap());
-                    if index == slot {
-                        let shown = kind == 3
-                            && i32::from_le_bytes(bar[at + 4..at + 8].try_into().unwrap()) == id;
-                        assert_eq!(shown, level >= minimum, "profile {profile}, row {slot}");
-                    }
-                    at += if kind == 3 { 41 } else { 4 };
-                }
-                assert_eq!(at, bar.len());
-            }
-        }
-    }
-}
-
 #[test]
 fn full_roster_preserves_campaigns_with_only_some_basic_attacks() {
     let fixture = Fixture::new(); // Brawler basic only

@@ -589,8 +589,7 @@ fn two_archers_count_the_same_recruit_independently() {
 }
 
 /// `lab/autopilot/protected-pass.txt` pins this name in this target. The content
-/// assertions live in the shared support module so the focused content target runs
-/// the same checks.
+/// assertions live in the shared support module.
 #[test]
 fn enabled_archer_chapter_records_are_complete_and_others_stay_disabled() {
     assert_enabled_archer_chapter_records();

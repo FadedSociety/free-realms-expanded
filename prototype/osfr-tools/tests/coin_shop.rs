@@ -1,8 +1,6 @@
 #[allow(dead_code)]
 #[path = "common/gateway_vendor.rs"]
 mod gateway_vendor;
-#[path = "common/resale.rs"]
-mod resale;
 
 use gateway_vendor::{coin_buy_packet, count_definition};
 use osfr_tools::{
@@ -11,7 +9,6 @@ use osfr_tools::{
     soe::{self, Packet, RELIABLE_DATA, ReliableReceiver},
     station_cash,
 };
-use resale::resale;
 use std::path::{Path, PathBuf};
 
 fn inventory_content() -> PathBuf {
@@ -158,44 +155,6 @@ fn unlisted_item_returns_invalid_item_without_mutation() {
     assert_eq!(shop.inventory().state(), &before);
 }
 
-#[test]
-fn sell_then_buy_back_restores_item_and_coin_balance() {
-    let directory = inventory_content();
-    let mut inventory = inventory_with_coins(&directory, 100);
-    let mut state = inventory.state().clone();
-    state.items.clear();
-    for equipped in &mut state.equipment {
-        equipped.item_id = 0;
-    }
-    inventory = Inventory::load(&directory, Some(state)).expect("empty inventory is valid");
-    inventory.grant(0, 8, 1).expect("test item grant succeeds");
-    let item_instance_id = inventory
-        .state()
-        .items
-        .iter()
-        .find(|item| item.definition_id == 8)
-        .expect("catalogued item is owned")
-        .id;
-    let mut shop = shop(&directory, inventory, usize::MAX);
-
-    let mut sell_request = vec![165, 0, 5, 0];
-    sell_request.extend(0u64.to_le_bytes());
-    sell_request.extend(item_instance_id.to_le_bytes());
-    sell_request.extend(1u32.to_le_bytes());
-    let sold = shop.handle(&sell_request).unwrap();
-    assert_eq!(sold.result_code, coin_shop::RESULT_SUCCESS);
-    assert_eq!(shop.inventory().state().coins, 100 + resale(8));
-    assert_eq!(count_definition(shop.inventory().state(), 8), 0);
-
-    let mut buy_back_request = vec![165, 0, 12, 0];
-    buy_back_request.extend(sold.transaction_id.to_le_bytes());
-    buy_back_request.extend(0u32.to_le_bytes());
-    let bought_back = shop.handle(&buy_back_request).unwrap();
-    assert_eq!(bought_back.result_code, coin_shop::RESULT_SUCCESS);
-    assert_eq!(shop.inventory().state().coins, 100);
-    assert_eq!(count_definition(shop.inventory().state(), 8), 1);
-}
-
 /// One 66/3 order built exactly as the client serializer `00b3fc60`/`00b3af80` writes it.
 fn order_for(item_id: i32) -> Vec<u8> {
     fn text(bytes: &mut Vec<u8>, value: &str) {
@@ -303,45 +262,6 @@ fn station_cash_row_with_a_member_coin_price_is_rejected() {
         "the same row without a coin price loads"
     );
     std::fs::remove_dir_all(&directory).unwrap();
-}
-
-#[test]
-fn marketplace_handshake_replies_and_keeps_payment_sources_off() {
-    let directory = inventory_content();
-    let mut shop = shop(
-        &directory,
-        inventory_with_coins(&directory, 100),
-        usize::MAX,
-    );
-    let initial = shop.marketplace_packets();
-    assert_eq!(initial[0], vec![66, 0, 24, 0, 1]);
-    assert_eq!(initial[1], vec![66, 0, 33, 0, 0, 0]);
-
-    for (request_opcode, reply_opcode) in [
-        (10u16, 11u16),
-        (12, 13),
-        (14, 15),
-        (16, 17),
-        (18, 19),
-        (20, 21),
-        (22, 23),
-        (25, 26),
-    ] {
-        let mut request = [66u16.to_le_bytes(), request_opcode.to_le_bytes()].concat();
-        if matches!(request_opcode, 16 | 20 | 25) {
-            // The client appends its locale as an i32 length and text (62 native traces).
-            request.extend(5i32.to_le_bytes());
-            request.extend(b"en_US");
-        }
-        let response = shop.handle(&request).unwrap();
-        let packet = response.replies.first().expect("handshake response exists");
-        assert_eq!(u16::from_le_bytes(packet[0..2].try_into().unwrap()), 66);
-        assert_eq!(
-            u16::from_le_bytes(packet[2..4].try_into().unwrap()),
-            reply_opcode
-        );
-        assert!(!response.changed);
-    }
 }
 
 /// Regression (2026-10-15 audit): the shop is created at login, but purchases

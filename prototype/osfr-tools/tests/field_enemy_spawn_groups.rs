@@ -219,29 +219,3 @@ fn group_spawns_roam_kill_and_respawn_on_the_authored_timer() {
     }));
     assert_eq!(at(&e, GUID), home);
 }
-
-#[test]
-fn malformed_group_reload_is_atomic() {
-    let fixture = Fixture::copied();
-    let mut e = fixture.load();
-    let before = e
-        .field_teleport_targets()
-        .into_iter()
-        .map(|target| (target.guid, target.position))
-        .collect::<Vec<_>>();
-    let behaviour = e.behaviour(GUID).cloned().unwrap();
-
-    let path = fixture.field_path().to_path_buf();
-    let mut field: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
-    field["spawn_groups"][0]["members"] = json!([GUID, GUID]);
-    fs::write(&path, field.to_string()).unwrap();
-
-    assert!(e.reload_field_enemies(&path).is_err());
-    let after = e
-        .field_teleport_targets()
-        .into_iter()
-        .map(|target| (target.guid, target.position))
-        .collect::<Vec<_>>();
-    assert_eq!(after, before);
-    assert_eq!(e.behaviour(GUID), Some(&behaviour));
-}

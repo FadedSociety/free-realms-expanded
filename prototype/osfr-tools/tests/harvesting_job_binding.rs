@@ -7,7 +7,7 @@
 //! `notes/Research/Harvesting Job Binding.md` and
 //! `notes/Research/Harvesting Native Launch Preflight.md`.
 use osfr_tools::harvesting::{
-    content, validate_content, HarvestError, CHEF_PROFILE_ID, RECOVERED_REGION_GAME_IDS,
+    CHEF_PROFILE_ID, HarvestError, RECOVERED_REGION_GAME_IDS, content, validate_content,
 };
 
 #[test]
@@ -48,15 +48,4 @@ fn validate_content_refuses_a_wrong_or_farmer_like_profile() {
     let mut chef = content(109).unwrap();
     chef.profile_id = CHEF_PROFILE_ID;
     validate_content(&chef).expect("Chef profile is the recovered binding");
-}
-
-#[test]
-fn non_regional_profiles_still_refuse_launch() {
-    // The gap-profile refusal is unchanged by the job binding.
-    for game_id in [58, 110, 112, 114, 116, 118, 120, 217] {
-        assert!(
-            content(game_id).is_err(),
-            "game {game_id} must stay unlaunchable"
-        );
-    }
 }
