@@ -1111,13 +1111,13 @@ fn node_content_is_bounded_and_unique() {
     let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
     let nodes = GatheringNodes::load(&content).unwrap().unwrap();
     let actors: Vec<_> = nodes.actors().collect();
-    // 12 + 2 mushroom nodes (pool maxima), 4 copper veins and 5 quest-only tin-ore
-    // pickups (T503, `quest_nodes.json`).
-    assert_eq!(actors.len(), 23);
+    // 12 + 2 mushroom nodes (pool maxima), 4 copper veins, 5 quest-only tin-ore pickups
+    // (T503, `quest_nodes.json`) and 166 placed collection nodes (T524, the 34 pool maxima).
+    assert_eq!(actors.len(), 189);
     let mut ids: Vec<_> = actors.iter().map(|a| a.guid).collect();
     ids.sort();
     ids.dedup();
-    assert_eq!(ids.len(), 23);
+    assert_eq!(ids.len(), 189);
     assert!(
         actors
             .iter()

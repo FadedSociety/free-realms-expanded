@@ -1,5 +1,5 @@
-//! T523: the community collection-node data is imported whole, stays dormant, and agrees with
-//! the collection catalogue (T447). No server path loads it yet; these gates read the data files.
+//! T523: the community collection-node data is imported whole and agrees with the collection
+//! catalogue (T447). T524: the gameplay node loader reads it as the third node kind.
 
 use osfr_tools::{
     collection_catalogue::CollectionCatalogueContent,
@@ -265,21 +265,34 @@ fn legacy_mushroom_and_mining_files_still_load_with_the_new_fields_defaulted() {
 }
 
 #[test]
-fn collection_nodes_are_dormant_for_the_gathering_loader() {
+fn the_gathering_loader_reads_collection_nodes() {
     let dir = TempDir::new();
     fs::copy(data_file(FILE), dir.0.join(FILE)).unwrap();
-    assert!(
-        GatheringNodes::load(&dir.0).unwrap().is_none(),
-        "GatheringNodes::load picked up collection_nodes.json"
+    let nodes = GatheringNodes::load(&dir.0)
+        .unwrap()
+        .expect("T524 loads collection_nodes.json as sparkling nodes");
+    let actors: Vec<_> = nodes
+        .actors()
+        .filter(|a| nodes.is_collect(a.guid))
+        .collect();
+    let content = load();
+    let expected: usize = content
+        .pools
+        .iter()
+        .map(|pool| pool.max_active_nodes as usize)
+        .sum();
+    assert_eq!(
+        actors.len(),
+        expected,
+        "one placed actor per active pool slot"
     );
-
-    // Control: the same loader does read the Legacy file, so the None above is not a bad path.
-    fs::copy(
-        data_file("harvest_nodes.json"),
-        dir.0.join("harvest_nodes.json"),
-    )
-    .unwrap();
-    assert!(GatheringNodes::load(&dir.0).unwrap().is_some());
+    assert!(
+        actors.iter().all(|a| a.composite_effect_id != 0),
+        "every collection type sparkles"
+    );
+    // Control: an empty directory still places nothing.
+    let empty = TempDir::new();
+    assert!(GatheringNodes::load(&empty.0).unwrap().is_none());
 }
 
 #[test]

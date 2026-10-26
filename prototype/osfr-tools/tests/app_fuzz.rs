@@ -37,6 +37,9 @@ const OUTPUT_LIMIT: usize = 1_048_576; // (R) T3 per-call oracle, includes forwa
 const NPC: u64 = 700;
 /// T450: exploration coin 1946, placed out of the fixture player's reach.
 const COIN: u64 = 100_000_001_946;
+/// T524: placed collection node 151 (Stillwater sparkling water, tag 5), over 1 km from the
+/// fixture player's origin, so the click exercises the Collect reach refusal.
+const COLLECT_NODE: u64 = 0x4e4f_4405_0000_0097;
 const QUEST: u32 = 701;
 const CHEST: i32 = 910_190;
 const LOOT: i32 = 910_191;
@@ -213,7 +216,13 @@ impl Fixture {
                 "name_string_id":386170,"position":[-507.1435,-27.20111,-1201.367]}]}),
         );
         let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
-        for file in ["collection_catalogue.json", "collection_coins.json"] {
+        // T524: the node actor loader; every node is far from the origin, so the Collect
+        // admission refuses each click-derived guid without changing state.
+        for file in [
+            "collection_catalogue.json",
+            "collection_coins.json",
+            "collection_nodes.json",
+        ] {
             fs::copy(shipped.join(file), content.join(file)).unwrap();
         }
         write_json(
@@ -684,6 +693,12 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     coin.extend(COIN.to_le_bytes());
     coin.push(0);
     result.push(("npc_interaction", coin));
+    // T524: the same 26/8 click on a collection-node guid (refused: the fixture player is
+    // over 1 km from the nearest placed node, and the click changes nothing).
+    let mut collect = words(26, 8, &[]);
+    collect.extend(COLLECT_NODE.to_le_bytes());
+    collect.push(0);
+    result.push(("npc_interaction", collect));
     for sub in [14, 15, 17, 21, 30] {
         result.push(("social_router", words(26, sub, &[u32::MAX; 5])));
     }

@@ -53,7 +53,7 @@ fn tag(guid: u64) -> u64 {
 }
 
 /// The guids the real loader places from `file` alone. `None` means the file is not wired into
-/// `GatheringNodes::load` yet (`collection_nodes.json` is dormant until T524).
+/// `GatheringNodes::load`.
 fn load_one(file: &str) -> Option<Vec<u64>> {
     let dir = TempDir::new();
     fs::copy(content_dir().join(file), dir.0.join(file)).unwrap();
@@ -67,13 +67,7 @@ fn no_two_live_node_guids_share_a_tag_or_a_value() {
     let mut all = BTreeSet::new();
     let mut tags = BTreeSet::new();
     for file in FILES {
-        let Some(guids) = load_one(file) else {
-            assert_eq!(
-                file, "collection_nodes.json",
-                "{file} is missing from the node loader"
-            );
-            continue;
-        };
+        let guids = load_one(file).unwrap_or_else(|| panic!("{file} is missing from the loader"));
         let source_tags: BTreeSet<u64> = guids.iter().map(|guid| tag(*guid)).collect();
         assert_eq!(
             source_tags.len(),

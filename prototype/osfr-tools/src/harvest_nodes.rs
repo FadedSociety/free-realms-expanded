@@ -1,16 +1,24 @@
 //! Harvest-node content imported from the pinned Legacy data tables and the community
-//! collection tables (T523, dormant), and (W171) the ordinary way into mining and harvesting:
+//! collection tables (T523), and (W171) the ordinary way into mining and harvesting:
 //! a node actor in the world that a player clicks.
 //!
 //! Recovered: a click on any interactable actor sends 26/8 (`PlayClient::RequestInteraction`,
 //! `0092efe0`). Everything below that is reconstructed policy (R): the node is a plain actor,
 //! 26/8 on it starts the Type8 run directly (as Legacy's collection nodes do, no menu), the
 //! required job, the range, the per-player depletion and the respawn timers.
+//!
+//! T524 adds the community `collection_nodes.json` hardpoints as a third kind: a sparkling
+//! personal node that grants one item from its pool's drop table and fills that item's
+//! collection entry. It has no job gate (R: Sanctuary's `HandleCollectionNode`), and the
+//! parent module owns the grant and the ledger tick (`gameplay/collection_pickup.rs`).
 
 use crate::{
     harvesting::CHEF_PROFILE_ID,
     inventory::Inventory,
     mining::{MINER_PROFILE_ID, Type8BoardSpec},
+    power_ups::Rng,
+    startup_world::NpcSpawn,
+    world::{NpcVisibility, content_spawn_template},
 };
 use serde::Deserialize;
 use std::{
@@ -27,25 +35,37 @@ const MAX_FILE_BYTES: u64 = 1 << 20;
 const NODE_GUID_BASE: u64 = 0x4e4f_4400_0000_0000;
 
 /// Guid tag byte owned by each node content file. Tags share one spawn-id space, so no two
-/// files may reuse one. `COLLECTION_NODE_TAG` names the dormant community collection file
-/// (T523, `collection_nodes.json`), which nothing loads yet. T524 moves that file to tag 5 and
-/// gives tag 4 to its per-node effect companions; no tag is reserved from another source, so
-/// the live invariant is uniqueness (`tests/node_guid_namespace.rs`).
+/// files may reuse one. T524 loads the community collection file (T523,
+/// `collection_nodes.json`) at tag 5, because its spawn ids overlap the quest file's; tag 4
+/// is the per-node effect companions' (`COMPANION_TAG`). No tag is reserved from another
+/// source, so the live invariant is uniqueness (`tests/node_guid_namespace.rs`).
 const HARVEST_NODE_TAG: u64 = 1;
 const MINING_NODE_TAG: u64 = 2;
 const QUEST_NODE_TAG: u64 = 3;
-#[cfg(test)]
-const COLLECTION_NODE_TAG: u64 = 4;
+const COMPANION_TAG: u64 = 4;
+const COLLECTION_NODE_TAG: u64 = 5;
+/// The client's invisible cube (Models.txt row 271), the model of effect-only actors.
+const INVISIBLE_CUBE_MODEL: u32 = 271;
 
-/// The node files `GatheringNodes::load` reads and the guid tag each one owns.
-const NODE_FILES: [(&str, Option<Gather>, u64); 3] = [
+/// The node files `GatheringNodes::load` reads, what a click on each does, and the guid tag
+/// each one owns.
+const NODE_FILES: [(&str, NodeSource, u64); 4] = [
     (
         "harvest_nodes.json",
-        Some(Gather::Harvesting),
+        NodeSource::Gather(Gather::Harvesting),
         HARVEST_NODE_TAG,
     ),
-    ("mining_nodes.json", Some(Gather::Mining), MINING_NODE_TAG),
-    ("quest_nodes.json", None, QUEST_NODE_TAG),
+    (
+        "mining_nodes.json",
+        NodeSource::Gather(Gather::Mining),
+        MINING_NODE_TAG,
+    ),
+    ("quest_nodes.json", NodeSource::Pickup, QUEST_NODE_TAG),
+    (
+        "collection_nodes.json",
+        NodeSource::Collect,
+        COLLECTION_NODE_TAG,
+    ),
 ];
 
 #[derive(Clone, Debug, Deserialize, PartialEq)]
@@ -190,13 +210,21 @@ impl Gather {
     }
 }
 
-/// One node as the world draws it (AddNpc via `NpcVisibility::add_static_actor`).
+/// One node as the world draws it (AddNpc via `NpcVisibility::add_prepared_actor`).
 #[derive(Clone, Debug, PartialEq)]
 pub struct NodeActor {
     pub guid: u64,
     pub name: String,
     pub model_id: u32,
     pub position: [f32; 3],
+    /// T524: the node type's `composite_effect_id` (its sparkle); 0 for none.
+    pub composite_effect_id: u32,
+    /// T524: the node type's interaction range, sent in the AddNpc `interact_range` field.
+    pub interact_range: u32,
+    /// T524: the rare-node subtitle locale row; -1 for none.
+    pub sub_text_name_id: i32,
+    /// T524: the type's one extra effect (water), drawn by its companion actor.
+    pub extra_composite_effect_id: Option<u32>,
 }
 
 pub enum NodeChange {
@@ -204,11 +232,22 @@ pub enum NodeChange {
     Hide(u64),
 }
 
-/// What a click on a placed node starts. A quest pickup names its `quest_nodes.json` node
-/// type and grants no item (the fork's quest node types have an empty drop table, T503).
+/// Which file placed a node. T524: Collect carries the pool's drop table into its sites.
+#[derive(Clone, Copy)]
+enum NodeSource {
+    Gather(Gather),
+    Pickup,
+    Collect,
+}
+
+/// What a click on a placed node does. A quest pickup names its `quest_nodes.json` node
+/// type and grants no item (the fork's quest node types have an empty drop table, T503);
+/// a collection node grants one item from its pool's table (T524).
+#[derive(Clone)]
 enum SiteKind {
     Gather(Gather),
     Pickup(String),
+    Collect { drops: Arc<[HarvestNodeDrop]> },
 }
 
 struct Site {
@@ -289,18 +328,19 @@ pub struct GatheringNodes {
 }
 
 impl GatheringNodes {
-    /// Reads `harvest_nodes.json` (Chef), `mining_nodes.json` (Miner) and `quest_nodes.json`
-    /// (quest pickups, T503) from `dir`; `None` when none exists. Per pool only
-    /// `max_active_nodes` spawn rows are placed, spread across the pool's rows (R: Legacy moves
-    /// nodes between rows as they respawn; ours stay put). Nodes live in the open-world
-    /// coordinate space whatever `zone_definition_id` says.
+    /// Reads `harvest_nodes.json` (Chef), `mining_nodes.json` (Miner), `quest_nodes.json`
+    /// (quest pickups, T503) and `collection_nodes.json` (sparkling collection nodes, T524)
+    /// from `dir`; `None` when none exists. Per pool only `max_active_nodes` spawn rows are
+    /// placed, spread across the pool's rows (R: Legacy moves nodes between rows as they
+    /// respawn; ours stay put). Nodes live in the open-world coordinate space whatever
+    /// `zone_definition_id` says.
     pub fn load(dir: &Path) -> io::Result<Option<Self>> {
         let mut sites = BTreeMap::new();
-        for (file, gather, tag) in NODE_FILES {
+        for (file, source, tag) in NODE_FILES {
             let path = dir.join(file);
             if path.is_file() {
                 let content = HarvestNodesContent::load_from(path)?;
-                add_sites(&mut sites, &content, gather, tag)?;
+                add_sites(&mut sites, &content, source, tag)?;
             }
         }
         Ok((!sites.is_empty()).then(|| Self {
@@ -319,6 +359,14 @@ impl GatheringNodes {
 
     pub fn is_node(&self, guid: u64) -> bool {
         self.sites.contains_key(&guid)
+    }
+
+    /// T524: whether this guid is a sparkling collection node.
+    pub fn is_collect(&self, guid: u64) -> bool {
+        matches!(
+            self.sites.get(&guid).map(|site| &site.kind),
+            Some(SiteKind::Collect { .. })
+        )
     }
 
     /// Ordinary entry check for a click on a gather node `guid` (the caller has checked
@@ -360,6 +408,38 @@ impl GatheringNodes {
         Ok(())
     }
 
+    /// T524: the collection-node admission rule. The same placed, shown, busy, zone and
+    /// range lines as [`Self::admit_common`] with the same [`Denied`] texts, and no job
+    /// gate (R: Sanctuary's `HandleCollectionNode` has none).
+    pub fn admit_collect(
+        &self,
+        guid: u64,
+        zone: u32,
+        position: [f32; 3],
+        busy: bool,
+    ) -> Result<(), Denied> {
+        let site = self.admit_common(guid, zone, position, busy)?;
+        match site.kind {
+            SiteKind::Collect { .. } => Ok(()),
+            _ => Err(Denied::Gone),
+        }
+    }
+
+    /// T524: the one item this player's click on a collection node yields, a weighted pick
+    /// from the pool's table. Seeded from the player guid, node guid and the server's click
+    /// time, so each click rolls afresh yet no client field steers it and a refused click
+    /// advances nothing (R: Sanctuary draws its shared stream per click). `None` only for a
+    /// non-collect or unvalidated site.
+    pub fn collect_item(&self, guid: u64, player_guid: u64, now_ms: u64) -> Option<u32> {
+        let SiteKind::Collect { drops } = &self.sites.get(&guid)?.kind else {
+            return None;
+        };
+        let mut rng = Rng::seeded(Rng::mix(
+            player_guid ^ guid.rotate_left(17) ^ now_ms.rotate_left(41),
+        ));
+        weighted_item(drops, &mut rng)
+    }
+
     /// The admission lines every node shares: placed, shown, not busy, in the open world and
     /// within the node's own interact range. The caller adds its kind rule.
     fn admit_common(
@@ -382,11 +462,11 @@ impl GatheringNodes {
         Ok(site)
     }
 
-    /// The node type key of a quest pickup site, or `None` for a gather node.
+    /// The node type key of a quest pickup site, or `None` for a gather or collection node.
     pub fn pickup_kind(&self, guid: u64) -> Option<&str> {
         match &self.sites.get(&guid)?.kind {
             SiteKind::Pickup(node_type) => Some(node_type),
-            SiteKind::Gather(_) => None,
+            SiteKind::Gather(_) | SiteKind::Collect { .. } => None,
         }
     }
 
@@ -399,10 +479,10 @@ impl GatheringNodes {
             .collect()
     }
 
-    /// T503: the player picked this quest node. It hides now and returns after the pool's
-    /// respawn time, without the Type8 run or its paid bookkeeping. A node that is not shown
-    /// changes nothing: no `Hide`, no new deadline.
-    pub fn picked(&mut self, guid: u64, now_ms: u64) -> Option<NodeChange> {
+    /// T503/T524: the player consumed this node (a quest pickup or a collection node). It
+    /// hides now and returns after the pool's respawn time, without the Type8 run or its paid
+    /// bookkeeping. A node that is not shown changes nothing: no `Hide`, no new deadline.
+    pub fn consume(&mut self, guid: u64, now_ms: u64) -> Option<NodeChange> {
         let site = self.sites.get(&guid)?;
         if !self.shown.remove(&guid) {
             return None;
@@ -457,7 +537,7 @@ fn node_guid(tag: u64, spawn_id: u32) -> u64 {
 fn add_sites(
     sites: &mut BTreeMap<u64, Site>,
     content: &HarvestNodesContent,
-    gather: Option<Gather>,
+    source: NodeSource,
     tag: u64,
 ) -> io::Result<()> {
     let bad = |what: &str| io::Error::new(io::ErrorKind::InvalidData, what.to_owned());
@@ -465,14 +545,23 @@ fn add_sites(
         return Err(bad("unsupported node schema"));
     }
     // T503: the whole quest node file is quest-only; a drop table would be a second,
-    // unaudited reward path beside the counted collect goal.
-    if gather.is_none()
+    // unaudited reward path beside the counted collect goal. T524: the collection file keeps
+    // its drops on the pool (the imported tables do); a type table would be silently ignored.
+    if matches!(source, NodeSource::Pickup | NodeSource::Collect)
         && content
             .node_types
             .iter()
-            .any(|kind| !kind.drop_table.is_empty())
+            .any(|node_type| !node_type.drop_table.is_empty())
     {
-        return Err(bad("a quest node type has a drop table"));
+        return Err(bad("a quest or collect node type has a drop table"));
+    }
+    // T524: one companion guid (tag 4) per extra effect, so more than one cannot be drawn.
+    if content
+        .node_types
+        .iter()
+        .any(|node_type| node_type.extra_composite_effect_ids.len() > 1)
+    {
+        return Err(bad("a node type has more than one extra composite effect"));
     }
     if content
         .spawns
@@ -482,15 +571,36 @@ fn add_sites(
         return Err(bad("a node spawn names an unknown pool"));
     }
     for pool in &content.pools {
-        let kind = content
+        let node_type = content
             .node_types
             .iter()
-            .find(|kind| kind.key == pool.node_type)
+            .find(|node_type| node_type.key == pool.node_type)
             .ok_or_else(|| bad("pool names an unknown node type"))?;
-        if !(1..=50).contains(&kind.interact_range) || !(1..=86_400).contains(&pool.respawn_seconds)
+        if !(1..=50).contains(&node_type.interact_range)
+            || !(1..=86_400).contains(&pool.respawn_seconds)
         {
             return Err(bad("node range or respawn out of bounds"));
         }
+        let kind = match source {
+            NodeSource::Gather(gather) => SiteKind::Gather(gather),
+            NodeSource::Pickup => SiteKind::Pickup(pool.node_type.clone()),
+            NodeSource::Collect => {
+                // T524: a collect pool must be able to yield one item; an empty or all-zero
+                // table would make every click a silent no-op.
+                if pool
+                    .drop_table
+                    .iter()
+                    .map(|drop| u64::from(drop.weight))
+                    .sum::<u64>()
+                    == 0
+                {
+                    return Err(bad("a collection pool has no drops"));
+                }
+                SiteKind::Collect {
+                    drops: Arc::from(pool.drop_table.clone()),
+                }
+            }
+        };
         let rows: Vec<_> = content
             .spawns
             .iter()
@@ -507,15 +617,19 @@ fn add_sites(
             let site = Site {
                 actor: NodeActor {
                     guid,
-                    name: kind.name.clone(),
-                    model_id: kind.model_id,
-                    position: [x, y + kind.placement_y_offset, z],
+                    name: node_type.name.clone(),
+                    model_id: node_type.model_id,
+                    position: [x, y + node_type.placement_y_offset, z],
+                    composite_effect_id: node_type.composite_effect_id,
+                    interact_range: node_type.interact_range,
+                    sub_text_name_id: node_type.sub_text_name_id.unwrap_or(-1),
+                    extra_composite_effect_id: node_type
+                        .extra_composite_effect_ids
+                        .first()
+                        .copied(),
                 },
-                kind: match gather {
-                    Some(gather) => SiteKind::Gather(gather),
-                    None => SiteKind::Pickup(pool.node_type.clone()),
-                },
-                range: f64::from(kind.interact_range),
+                kind: kind.clone(),
+                range: f64::from(node_type.interact_range),
                 respawn_ms: u64::from(pool.respawn_seconds) * 1000,
             };
             if sites.insert(guid, site).is_some() {
@@ -524,6 +638,86 @@ fn add_sites(
         }
     }
     Ok(())
+}
+
+/// T524: weighted pick over a validated collect table (positive total weight).
+fn weighted_item(drops: &[HarvestNodeDrop], rng: &mut Rng) -> Option<u32> {
+    let total: u64 = drops.iter().map(|drop| u64::from(drop.weight)).sum();
+    if total == 0 {
+        return None;
+    }
+    let mut at = rng.next_u64() % total;
+    for drop in drops {
+        let weight = u64::from(drop.weight);
+        if at < weight {
+            return Some(drop.item_definition_id);
+        }
+        at -= weight;
+    }
+    None
+}
+
+/// T524: draw and remove node actors, sparkle included. The caller sends
+/// `visibility.refresh()` to the client. Moved out of the gameplay hub so it only dispatches.
+pub fn apply_node_changes(visibility: &mut NpcVisibility, changes: Vec<NodeChange>) {
+    for change in changes {
+        match change {
+            NodeChange::Show(node) => {
+                visibility.add_prepared_actor(
+                    node_spawn(&node, true),
+                    node.name.clone(),
+                    node.position,
+                );
+                if let Some(companion) = companion_actor(&node) {
+                    visibility.add_prepared_actor(
+                        node_spawn(&companion, false),
+                        companion.name.clone(),
+                        companion.position,
+                    );
+                }
+            }
+            NodeChange::Hide(guid) => {
+                visibility.remove(guid);
+                visibility.remove(companion_guid(guid));
+            }
+        }
+    }
+}
+
+/// T524: a node's AddNpc spawn. `content_spawn_template` supplies the captured constants;
+/// the type's sparkle, reach and rare subtitle are the node's own fields (AddNpc reader
+/// `00921a10` field sequence, writer `startup_world::write_npc_body`).
+fn node_spawn(node: &NodeActor, interactable: bool) -> NpcSpawn {
+    let mut spawn = content_spawn_template();
+    spawn.actor_id = node.guid;
+    spawn.model_id = node.model_id as i32;
+    spawn.position = [node.position[0], node.position[1], node.position[2], 1.0];
+    spawn.rotation = [0.0, 0.0, 1.0, 0.0];
+    spawn.composite_effect_id = node.composite_effect_id as i32;
+    spawn.interact_range = node.interact_range as i32;
+    spawn.sub_text_name_string_id = node.sub_text_name_id;
+    spawn.is_interactable = u8::from(interactable);
+    spawn
+}
+
+/// T524: the invisible non-interactable actor that carries the type's extra effect (water:
+/// 15381 on the node, 5742 on this cube). The loader allows one extra effect per type, so its
+/// tag-4 guid is unique.
+fn companion_actor(node: &NodeActor) -> Option<NodeActor> {
+    Some(NodeActor {
+        guid: companion_guid(node.guid),
+        name: String::new(),
+        model_id: INVISIBLE_CUBE_MODEL,
+        position: node.position,
+        composite_effect_id: node.extra_composite_effect_id?,
+        interact_range: 0,
+        sub_text_name_id: -1,
+        extra_composite_effect_id: None,
+    })
+}
+
+fn companion_guid(node_guid: u64) -> u64 {
+    (node_guid & !(0xff_u64 << 32)) | (COMPANION_TAG << 32)
 }
 
 /// Start gate for the bag (R): a win that cannot be stored rolls back and strands the run, so
@@ -554,12 +748,7 @@ mod tests {
     /// companions share that space, which `tests/node_guid_namespace.rs` checks on the loader.
     #[test]
     fn node_file_tags_give_distinct_guids_for_the_same_spawn_id() {
-        let mut tags: Vec<u64> = NODE_FILES.iter().map(|(_, _, tag)| *tag).collect();
-        // T524 wires the collection file into NODE_FILES at tag 5; only add the dormant file's
-        // tag while the loader leaves it out.
-        if !tags.contains(&COLLECTION_NODE_TAG) {
-            tags.push(COLLECTION_NODE_TAG);
-        }
+        let tags: Vec<u64> = NODE_FILES.iter().map(|(_, _, tag)| *tag).collect();
         assert!(
             tags.iter().all(|tag| *tag < 256),
             "a tag must fit the guid's tag byte"
@@ -575,16 +764,15 @@ mod tests {
         let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
         let mut sites = BTreeMap::new();
         let quest = HarvestNodesContent::load_from(dir.join("quest_nodes.json")).unwrap();
-        add_sites(&mut sites, &quest, None, QUEST_NODE_TAG).unwrap();
+        add_sites(&mut sites, &quest, NodeSource::Pickup, QUEST_NODE_TAG).unwrap();
         let collection = HarvestNodesContent::load_from(dir.join("collection_nodes.json")).unwrap();
-        // The site kind is irrelevant to the guid space; this runs `add_sites`' bounds.
         add_sites(
             &mut sites,
             &collection,
-            Some(Gather::Harvesting),
+            NodeSource::Collect,
             COLLECTION_NODE_TAG,
         )
-        .expect("tag 4 keeps collection spawn 103 clear of quest spawn 103");
+        .expect("tag 5 keeps collection spawn 103 clear of quest spawn 103");
         assert!(sites.contains_key(&node_guid(QUEST_NODE_TAG, 103)));
         assert!(sites.contains_key(&node_guid(COLLECTION_NODE_TAG, 103)));
     }

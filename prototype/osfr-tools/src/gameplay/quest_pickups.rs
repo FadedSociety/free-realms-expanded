@@ -46,7 +46,7 @@ impl Gameplay {
         let hide = staged
             .gathering_nodes
             .as_mut()
-            .and_then(|nodes| nodes.picked(target, now_ms));
+            .and_then(|nodes| nodes.consume(target, now_ms));
         staged.npc_quest_event(
             crate::quest_engine::QuestEvent::CollectNode {
                 node_type: node_type.to_owned(),

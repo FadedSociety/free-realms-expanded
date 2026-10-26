@@ -15,7 +15,7 @@
     "collection_catalogue": "data/content/collection_catalogue.json (T447) via entry_for_item; 0 of 1024 distinct drop items have no unique entry",
     "policy": "source_tag sanctuary@10f129e:<file>#<Id> on each pool and spawn; max_active_nodes, respawn_seconds, drop weights, positions and headings are community policy (R)",
     "input_hashes": "sha256_git_blob.* are the input blobs at the pinned revision (git show), not the CRLF worktree checkout",
-    "dormant": "not read by GatheringNodes::load; collection-node-pickups owns the runtime import",
+    "loaded": "T524: GatheringNodes::load reads this file (guid tag 5) as sparkling collect nodes; the gameplay handler is gameplay/collection_pickup.rs",
     "sha256_git_blob.src/Resources/CollectionNodeTypes.json": "373be1037360938e20a312779425da1a365c01440d8d7906ab7d12fd501a5458",
     "sha256_git_blob.src/Resources/CollectionNodePools.json": "72bedb9b687c526e26a7ce9d167c2846d0994c45945d1da37b98833c46859fde",
     "sha256_git_blob.src/Resources/CollectionNodeSpawns/1/blackspore-fossils.json": "6ea3b60c40039e7a027c4dbeb2d03194a240e5773574d0bcbae91e5b04b6b05b",

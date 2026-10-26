@@ -10,7 +10,7 @@ use crate::{
     encounter::{EncounterEngine, EncounterOutcome, EncounterState, ZoneTransition},
     forging::{Forging, ForgingState},
     game_rules::GameRuleSet,
-    harvest_nodes::Gather,
+    harvest_nodes::{Gather, apply_node_changes},
     harvesting,
     identity::CharacterIdentity,
     inventory::{Inventory, InventoryState},
@@ -229,7 +229,8 @@ pub struct Gameplay {
     fishing_spots: Option<Arc<crate::fishing_service::FishingSpots>>,
     /// The player's fishing round, if any. Ephemeral by design: a reconnect releases it.
     fishing: crate::fishing_service::FishingService,
-    /// W171 (R): this player's ore and mushroom nodes. Not persisted: a login sees every node.
+    /// W171/T524 (R): this player's ore, mushroom, quest and collection nodes. Not persisted:
+    /// a login sees every node.
     gathering_nodes: Option<crate::harvest_nodes::GatheringNodes>,
     /// (R) World-model station rules. Opening actors and current placements are
     /// resolved at use so a placement reload cannot leave stale coordinates.
@@ -432,29 +433,6 @@ fn item_change_packet(inner: &[u8], guid: u64, replies: &[Vec<u8>]) -> Option<Ve
     let mut packet = packet.clone();
     packet.get_mut(4..12)?.copy_from_slice(&guid.to_le_bytes());
     Some(packet)
-}
-
-/// W171: draw and remove node actors. The caller sends `visibility.refresh()` to the client.
-fn apply_node_changes(
-    visibility: &mut crate::world::NpcVisibility,
-    changes: Vec<crate::harvest_nodes::NodeChange>,
-) {
-    use crate::harvest_nodes::NodeChange;
-    for change in changes {
-        match change {
-            NodeChange::Show(node) => visibility.add_static_actor(
-                node.guid,
-                &node.name,
-                0,
-                node.model_id as i32,
-                node.position,
-                0,
-            ),
-            NodeChange::Hide(guid) => {
-                visibility.remove(guid);
-            }
-        }
-    }
 }
 
 fn npc_event(value: serde_json::Value) {
@@ -2388,6 +2366,19 @@ impl Gameplay {
             return Ok(None);
         }
         let target = u64::from_le_bytes(inner[4..12].try_into().unwrap());
+        // T524: a sparkling collection node grants an item instead of starting a run. Its
+        // handler lives in the pickup module with the shared collection ledger.
+        if self
+            .gathering_nodes
+            .as_ref()
+            .is_some_and(|nodes| nodes.is_collect(target))
+        {
+            npc_interaction::decode_npc_interact_26_8(inner)
+                .map_err(|_| invalid("invalid node interaction request"))?;
+            return self
+                .handle_collection_node(character, target, now_ms)
+                .map(Some);
+        }
         if let Some(outcome) = self.pick_up_quest_node(inner, character, target, now_ms)? {
             return Ok(Some(outcome));
         }

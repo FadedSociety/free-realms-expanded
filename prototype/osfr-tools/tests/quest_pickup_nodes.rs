@@ -573,11 +573,11 @@ fn repeated_pick_does_not_extend_the_hide() {
         [NodeChange::Show(_)]
     ));
     assert!(matches!(
-        nodes.picked(guid, 1_000),
+        nodes.consume(guid, 1_000),
         Some(NodeChange::Hide(hidden)) if hidden == guid
     ));
     assert!(
-        nodes.picked(guid, 20_000).is_none(),
+        nodes.consume(guid, 20_000).is_none(),
         "a repeat pick reported a change"
     );
     assert!(

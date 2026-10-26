@@ -584,15 +584,24 @@ impl NpcVisibility {
         }
         spawn.position = [position[0], position[1], position[2], 1.0];
         spawn.rotation = facing(0.0);
+        self.add_prepared_actor(spawn, name.to_string(), position);
+    }
+
+    /// T524: insert a static content actor whose AddNpc presentation fields are already set
+    /// (composite effect, interact range, rare subtitle), such as a sparkling collection node
+    /// or its invisible effect companion. Shown by proximity like every static actor.
+    pub(crate) fn add_prepared_actor(&mut self, spawn: NpcSpawn, name: String, position: [f32; 3]) {
+        self.revision = self.revision.wrapping_add(1);
+        let actor_id = spawn.actor_id;
         let npcs = Arc::make_mut(&mut self.by_zone)
             .entry(OPEN_WORLD_ZONE)
             .or_default();
         npcs.retain(|npc| npc.spawn.actor_id != actor_id);
         npcs.push(VisibleNpc {
             spawn,
-            name: Some(name.to_string()),
+            name: Some(name),
             position,
-            // (R) Battle spawners carry no content yaw; keep the approach rule.
+            // (R) Static actors keep the approach rule; no content yaw is sent.
             heading: None,
             // T491: placed and battle actors are never seasonal.
             season: None,

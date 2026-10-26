@@ -24,7 +24,7 @@ use super::*;
 use crate::{
     collection_catalogue::CollectionCatalogueContent,
     collection_coins::{CoinEdit, CollectionCoins},
-    harvest_nodes::Denied,
+    harvest_nodes::{Denied, apply_node_changes},
     progression_extras::{
         CollectionEntryUpdate, CollectionEvent, CollectionEventOrigin, CollectionLedger,
         ProgressionExtras,
@@ -215,9 +215,13 @@ impl Gameplay {
         }
         // Stage everything: a refusal or an error leaves `self` exactly as it was.
         let mut staged = self.clone();
-        if let Err(error) =
-            staged.record_collection_entry(&world, coin.entry_id, character.guid, &mut out)
-        {
+        if let Err(error) = staged.record_collection_entry(
+            &world,
+            coin.entry_id,
+            CollectionEventOrigin::ExplorationCoin,
+            character.guid,
+            &mut out,
+        ) {
             let Some(failure) = error
                 .get_ref()
                 .and_then(|e| e.downcast_ref::<GrantFailure>())
@@ -242,25 +246,137 @@ impl Gameplay {
         Ok(Some(out))
     }
 
-    /// Record `entry_id` on the saved ledger: its 38/10 first, then, when it completes the
-    /// collection, the reward packets, with the paid bag, coins and XP adopted. A completed
-    /// collection that maps to a meta collection entry (T522) records that entry too through the
-    /// same staged path, and that collection's completion then pays its own reward. An `Err` may
-    /// leave `self` half changed; the caller discards the staged copy.
+    /// T524: a 26/8 click on a sparkling collection node (the caller matched the guid with
+    /// `GatheringNodes::is_collect` and validated the request). The node's pool yields one
+    /// item; the item's catalogue entry is recorded through the same shared ledger path as a
+    /// coin, and the node hides for this player until the pool's respawn. Every refusal
+    /// answers one chat line before anything is staged, so it changes nothing.
+    pub(super) fn handle_collection_node(
+        &mut self,
+        character: &CharacterState,
+        target: u64,
+        now_ms: u64,
+    ) -> io::Result<Outcome> {
+        let mut out = Outcome::default();
+        let denied = self.gathering_nodes.as_ref().and_then(|nodes| {
+            nodes
+                .admit_collect(
+                    target,
+                    character.zone_id,
+                    character.position,
+                    self.activity_busy(),
+                )
+                .err()
+        });
+        if let Some(denied) = denied {
+            out.replies.push(chat::system(&denied.message()));
+            return Ok(out);
+        }
+        let Some(item) = self
+            .gathering_nodes
+            .as_ref()
+            .and_then(|nodes| nodes.collect_item(target, character.guid, now_ms))
+        else {
+            out.replies.push(chat::system(&Denied::Gone.message()));
+            return Ok(out);
+        };
+        let item = match i32::try_from(item) {
+            Ok(item) if self.inventory.has_definition(item) => item,
+            _ => {
+                npc_event(serde_json::json!({
+                    "event": "collection_node_bad_item",
+                    "item": item,
+                }));
+                out.replies
+                    .push(chat::system("You cannot gather that right now."));
+                return Ok(out);
+            }
+        };
+        // Same start gate as the Type8 path: a grant that cannot be stored changes nothing.
+        // (Not redundant: `grant_reward` reports a full bag as a plain "inventory is full"
+        // error, which would answer the generic line instead of this one.)
+        if self
+            .inventory
+            .clone()
+            .grant_bundle(0, &[(item, 1)])
+            .is_err()
+        {
+            out.replies.push(chat::system(
+                "Your bag is full. Make room before gathering.",
+            ));
+            return Ok(out);
+        }
+        // Stage the item grant, then its 38/10, then the hide: one commit or none.
+        let mut staged = self.clone();
+        let mut staged_out = Outcome::default();
+        let staged_result = staged
+            .grant_reward(0, &[(item, 1)], &mut staged_out)
+            .and_then(|()| {
+                let Some(world) = staged.collections.clone() else {
+                    return Ok(());
+                };
+                let Some(entry) = world.catalogue.entry_for_item(item) else {
+                    return Ok(());
+                };
+                if staged.progression_extras.collections().is_collected(entry) {
+                    return Ok(());
+                }
+                staged.record_collection_entry(
+                    &world,
+                    entry,
+                    CollectionEventOrigin::HarvestNode,
+                    character.guid,
+                    &mut staged_out,
+                )
+            });
+        if let Err(error) = staged_result {
+            let failure = error
+                .get_ref()
+                .and_then(|error| error.downcast_ref::<GrantFailure>());
+            npc_event(serde_json::json!({
+                "event": "collection_node_refused",
+                "item": item,
+                "reason": error.to_string(),
+            }));
+            out.replies.push(chat::system(match failure {
+                Some(GrantFailure::BagFull) => "Your bag is full. Make room before gathering.",
+                _ => "You cannot gather that right now.",
+            }));
+            return Ok(out);
+        }
+        let Some(hide) = staged
+            .gathering_nodes
+            .as_mut()
+            .and_then(|nodes| nodes.consume(target, now_ms))
+        else {
+            // Admission proved the node shown; never send a grant that cannot hide it.
+            return Ok(out);
+        };
+        if let Some(visibility) = staged.npc_visibility.as_mut() {
+            apply_node_changes(visibility, vec![hide]);
+            staged_out.replies.extend(visibility.refresh()?);
+        }
+        *self = staged;
+        out.replies.extend(staged_out.replies);
+        out.changed = true;
+        Ok(out)
+    }
+
+    /// Record `entry_id` on the saved ledger with this event's origin: its 38/10 first,
+    /// then, when it completes the collection, the reward packets, with the paid bag, coins
+    /// and XP adopted. A completed collection that maps to a meta collection entry (T522)
+    /// records that entry too through the same staged path, and that collection's completion
+    /// then pays its own reward. An `Err` may leave `self` half changed; the caller discards
+    /// the staged copy.
     fn record_collection_entry(
         &mut self,
         world: &CollectionWorld,
         entry_id: i32,
+        origin: CollectionEventOrigin,
         player_guid: u64,
         out: &mut Outcome,
     ) -> io::Result<()> {
-        let collection_id = match self.collect_entry(
-            world,
-            entry_id,
-            CollectionEventOrigin::ExplorationCoin,
-            player_guid,
-            out,
-        ) {
+        let collection_id = match self.collect_entry(world, entry_id, origin, player_guid, out) {
             Ok(collection_id) => collection_id,
             Err(error) => {
                 log_refused_entry(entry_id, &error);
