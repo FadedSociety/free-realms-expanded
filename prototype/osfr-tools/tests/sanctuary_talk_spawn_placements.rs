@@ -25,7 +25,7 @@ mod placement;
 
 use npc_quest_chain::{content_dir, read_json};
 use osfr_tools::{startup_world::parse_add_npc, world::NpcVisibility};
-use placement::{distance, xyz};
+use placement::{distance, drawn_npcs, xyz};
 use serde_json::Value;
 use std::collections::BTreeSet;
 
@@ -202,33 +202,30 @@ fn no_two_drawn_npc_rows_share_a_position() {
         .iter()
         .map(|(_, row)| row["npc_id"].as_u64().unwrap())
         .collect();
-    let mut drawn: Vec<(u64, [f32; 3])> = visibility
-        .teleport_targets(WORLD_ZONE)
-        .into_iter()
-        .map(|target| (target.guid, target.position))
-        .collect();
-    drawn.sort_by_key(|(id, _)| *id);
+    let drawn = drawn_npcs(&visibility);
     for id in &placed {
         assert!(
-            visibility.content_key(*id).is_some() && drawn.iter().any(|(actor, _)| actor == id),
+            drawn
+                .iter()
+                .any(|npc| npc.actor == *id && npc.content_key.is_some()),
             "placed NPC {id} is not in the drawn NPC set"
         );
     }
     let mut close = Vec::new();
     let mut keyed = 0;
-    for (index, (id, position)) in drawn.iter().enumerate() {
-        let id_keyed = visibility.content_key(*id).is_some();
+    for (index, npc) in drawn.iter().enumerate() {
+        let (id, id_keyed) = (npc.actor, npc.content_key.is_some());
         keyed += usize::from(id_keyed);
-        for (other, other_position) in &drawn[index + 1..] {
-            if !id_keyed && visibility.content_key(*other).is_none() {
+        for other in &drawn[index + 1..] {
+            if !id_keyed && other.content_key.is_none() {
                 continue;
             }
-            let apart = distance(*position, *other_position);
+            let apart = distance(npc.position, other.position);
             if apart <= MIN_SEPARATION_M
-                && !KNOWN_CLOSE_PAIRS.contains(&(*id, *other))
-                && !KNOWN_CLOSE_PAIRS.contains(&(*other, *id))
+                && !KNOWN_CLOSE_PAIRS.contains(&(id, other.actor))
+                && !KNOWN_CLOSE_PAIRS.contains(&(other.actor, id))
             {
-                close.push((*id, *other, apart));
+                close.push((id, other.actor, apart));
             }
         }
     }
