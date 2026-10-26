@@ -1762,6 +1762,7 @@
     {
       "id": 3000022,
       "title_string_id": 94247,
+      "intro_text_string_id": 116460,
       "giver_npc_id": 9000000227,
       "prerequisite_quest_ids": [],
       "excludes_quest_ids": [
@@ -1844,7 +1845,7 @@
         },
         {
           "kind": "client",
-          "evidence": "description 116637 'Introduce yourself to Francis Panic in Stillwater Crossing.' = guide hash 3437900159 (Adventurer C3); the shared title 94247's block belongs to the Cobblestone version, so intro/end text stay empty"
+          "evidence": "description 116637 (Global.Text; the Stillwater objective text) = guide hash 3437900159 (Adventurer C3); the shared title 94247 belongs to the Cobblestone version. The Stillwater offer text is 116460 (Global.Text; quest_dialog in the locale index, zone Stillwater Crossing, hint the talk target), the Stillwater wording of the tip bound as 3000021's intro 94246 and 3000020's intro 104097. No end text is bound: 116463 is tagged to the next quest, Power Problems (T731)."
         },
         {
           "kind": "wiki",
