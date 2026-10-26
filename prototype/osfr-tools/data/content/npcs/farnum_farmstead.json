@@ -366,7 +366,7 @@
       "reference_ids": [],
       "name": "Aunt Daisy",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 41222,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -377,7 +377,7 @@
           "id": 894171021
         }
       ],
-      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "name_string_id_reason": "Client locale Global.Text.41222 resolves to 'Aunt Daisy'; the Legacy spawn's Npcs.json Id=3216 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's regional table ids.",
       "zone": "Farnum Farmstead",
       "zone_id": 5,
       "zone_reason": null,
@@ -485,8 +485,12 @@
         ],
         "name_string_id": [
           {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1959; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3216 (ModelId=491, ModelFileName=human_f_aunt_daisy.agr, NameId=41222). (R) The spawn's client NameId resolves to 'Aunt Daisy', the row's name (talk_spawns.py)."
+          },
+          {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Cobblestone Village.md#Part C. Other quest givers and residents, row 60; source cell: [client]"
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 41222 = 'Aunt Daisy'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [
@@ -9771,7 +9775,7 @@
       ],
       "name": "Vicki",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 77630,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -9782,7 +9786,7 @@
           "id": 1769888521
         }
       ],
-      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "name_string_id_reason": "Client locale Global.Text.77630 resolves to 'Vicki'; the Legacy spawn's Npcs.json Id=3775 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's regional table ids.",
       "zone": "Farnum Farmstead",
       "zone_id": 5,
       "zone_reason": null,
@@ -10049,12 +10053,12 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md#Part D. Job NPCs who stand at the farm, row 70; source cell: [client] [wiki Vicki, Archer]"
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2454; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3775 (ModelId=551, ModelFileName=human_f_freestyle_10.agr, NameId=77630). (R) The spawn's client NameId resolves to 'Vicki', the row's name (talk_spawns.py)."
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Farnum Farmstead.md#Part D. Job NPCs who stand at the farm, row 70; source cell: [client] [wiki Vicki, Archer]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 77630 = 'Vicki'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [

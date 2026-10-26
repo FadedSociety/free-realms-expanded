@@ -9451,7 +9451,7 @@
       "reference_ids": [],
       "name": "Golmie Greasebeard",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 439687,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -9482,7 +9482,7 @@
           "id": 1573877505
         }
       ],
-      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "name_string_id_reason": "Client locale Global.Text.439687 resolves to 'Golmie Greasebeard'; the Legacy spawn's Npcs.json Id=3842 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's regional table ids.",
       "zone": "Sunstone Valley",
       "zone_id": 15,
       "zone_reason": null,
@@ -9739,16 +9739,12 @@
         ],
         "name_string_id": [
           {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2509; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3842 (ModelId=3954, ModelFileName=dwarf_engineer.adr, NameId=439687). (R) The spawn's client NameId resolves to 'Golmie Greasebeard', the row's name (talk_spawns.py)."
+          },
+          {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part A. Rumble Ridge: the Freewheelers and Wheelie Pete's Roadhouse, row 34; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part A. Rumble Ridge: the Freewheelers and Wheelie Pete's Roadhouse, row 34; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part A. Rumble Ridge: the Freewheelers and Wheelie Pete's Roadhouse, row 34; source cell: [client][video][wiki]"
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 439687 = 'Golmie Greasebeard'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [
@@ -25236,7 +25232,7 @@
       ],
       "name": "Rumble King Don",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442192,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -25247,7 +25243,7 @@
           "id": 564759467
         }
       ],
-      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "name_string_id_reason": "Client locale Global.Text.442192 resolves to 'Rumble King Don'; the Legacy spawn's Npcs.json Id=4798 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's regional table ids.",
       "zone": "Sunstone Valley",
       "zone_id": 15,
       "zone_reason": null,
@@ -25404,16 +25400,12 @@
         ],
         "name_string_id": [
           {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3365; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4798 (ModelId=4219, ModelFileName=dwarf_m_rumblekingdon.adr, NameId=442192). (R) The spawn's client NameId resolves to 'Rumble King Don', the row's name (talk_spawns.py)."
+          },
+          {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part F. The Rumbledome and the Realmkeeper captives, row 91; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part F. The Rumbledome and the Realmkeeper captives, row 91; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part F. The Rumbledome and the Realmkeeper captives, row 91; source cell: [client][video][wiki]"
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 442192 = 'Rumble King Don'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [
@@ -30248,7 +30240,7 @@
       "reference_ids": [],
       "name": "Starlight",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 413056,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -30259,7 +30251,7 @@
           "id": 2420202721
         }
       ],
-      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "name_string_id_reason": "Client locale Global.Text.413056 resolves to 'Starlight'; the Legacy spawn's Npcs.json Id=4018 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's regional table ids.",
       "zone": null,
       "zone_id": null,
       "zone_reason": "The guide explicitly leaves the standing place unproven or gives no place.",
@@ -30387,12 +30379,12 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part I. Pony Vale (through the Mystical Barrier), row 155; source cell: [client][wiki]"
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2685; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4018 (ModelId=2099, ModelFileName=horse_m.adr, NameId=413056). (R) The spawn's client NameId resolves to 'Starlight', the row's name (talk_spawns.py)."
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Sunstone Valley.md#Part I. Pony Vale (through the Mystical Barrier), row 155; source cell: [client][wiki]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 413056 = 'Starlight'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [

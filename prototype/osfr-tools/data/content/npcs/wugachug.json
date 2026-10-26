@@ -5210,7 +5210,7 @@
       "reference_ids": [],
       "name": "General Wugashima",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 442916,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -5225,7 +5225,7 @@
           "id": 2056211811
         }
       ],
-      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "name_string_id_reason": "Client locale Global.Text.442916 resolves to 'General Wugashima'; the Legacy spawn's Npcs.json Id=4243 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's regional table ids.",
       "zone": "Wugachug",
       "zone_id": 17,
       "zone_reason": null,
@@ -5390,12 +5390,12 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 90; source cell: [client][wiki]"
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2909; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4243 (ModelId=4468, ModelFileName=chugawug_m_ninjawug_bixie_rider_general_01.adr, NameId=442916). (R) The spawn's client NameId resolves to 'General Wugashima', the row's name (talk_spawns.py)."
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wugachug.md#Part D. The Heroes story, the Chug-a-Mug Challenge and Sweetwater Climb, row 90; source cell: [client][wiki]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 442916 = 'General Wugashima'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [

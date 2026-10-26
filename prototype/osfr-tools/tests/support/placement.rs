@@ -11,6 +11,13 @@ pub fn xyz(value: &Value) -> [f32; 3] {
     serde_json::from_value(value.clone()).expect("a finite xyz position")
 }
 
+/// The authored `f64` position, for comparing a row with its cited source line
+/// before the loader narrows it to `f32`. Panics when the value is not three
+/// finite numbers.
+pub fn xyz_f64(value: &Value) -> [f64; 3] {
+    serde_json::from_value(value.clone()).expect("a finite xyz position")
+}
+
 /// One NPC body the loader draws in the open world: its actor id, the regional row it is
 /// bound to (`None` for scene props and enemies) and where it stands.
 pub struct Drawn {

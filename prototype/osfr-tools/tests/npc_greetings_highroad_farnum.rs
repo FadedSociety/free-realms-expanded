@@ -187,10 +187,13 @@ const W126_GREETINGS: [(&str, u64, u32); 19] = [
 /// and the Trading Card Game Riley is named only in third-person objectives
 /// (the first-person "Riley" line is the lazy cat pet, a different actor).
 /// The note lists this set and why each row stays blank.
-const UNBOUND: [(&str, u64); 7] = [
+const UNBOUND: [(&str, u64); 10] = [
     ("highroad_junction.json", 9500000328), // Bowawow, vendor
     ("highroad_junction.json", 9500000331), // Cillian, vendor
     ("highroad_junction.json", 9500000333), // Gaston, vendor
+    ("highroad_junction.json", 9500000338), // Two of Three, T698 reference spawn
+    ("farnum_farmstead.json", 9500000267),  // Aunt Daisy, T698 reference spawn
+    ("farnum_farmstead.json", 9000000230),  // Vicki, T698 reference spawn
     ("farnum_farmstead.json", 9500000269),  // Estus, vendor
     ("farnum_farmstead.json", 9500000276),  // Riley, Trading Card Game prodigy
     ("farnum_farmstead.json", 9500000277),  // Rocky, vendor

@@ -504,16 +504,24 @@ fn is_greeting_only_change_between(old: &Value, new: &Value) -> bool {
 /// carry it, so a foreign NPC file may carry exactly those rows' placement change.
 const REFERENCE_SPAWN_MARKER: &str = "matched by the spawn's client name (talk_spawns.py) (R)";
 
-/// T698 (`data/content/npcs/*.json`): an undrawn `poi_anchor`/`unanchored` row
-/// becomes `legacy_data` at the reference spawn cited in its `position_reason`.
-/// The row's identity, zone and quest fields stay put; the placement values are
-/// pinned by `content_npc_placement.rs`, `content_npc_spawns.rs` and
+/// The fields a follow-up may bind on a row T698 already placed. The rest of the row
+/// (position, model, greeting, quests) must stay byte-for-byte equal.
+const NAME_BINDING_FIELDS: [&str; 2] = ["name_string_id", "name_string_id_reason"];
+
+/// T698 (`data/content/npcs/*.json`): either the row's own `poi_anchor`/`unanchored`
+/// -> `legacy_data` placement change, or a later name-only binding of the spawn `NameId`
+/// on a row T698 already placed. In both cases the row's identity, zone, quest and
+/// greeting fields stay put; the placement values are pinned by
+/// `content_npc_placement.rs`, `content_npc_spawns.rs` and
 /// `npc_reference_spawn_placements.rs`.
 fn is_reference_spawn_row(old: &Value, new: &Value) -> bool {
-    new["position_reason"]
+    let marked = new["position_reason"]
         .as_str()
-        .is_some_and(|reason| reason.contains(REFERENCE_SPAWN_MARKER))
-        && matches!(old["placement"].as_str(), Some("poi_anchor" | "unanchored"))
+        .is_some_and(|reason| reason.contains(REFERENCE_SPAWN_MARKER));
+    if !marked || old["greeting_string_id"] != new["greeting_string_id"] {
+        return false;
+    }
+    let newly_placed = matches!(old["placement"].as_str(), Some("poi_anchor" | "unanchored"))
         && new["placement"] == "legacy_data"
         && new["placement_source"] == "legacy_data_spawn"
         && new["placement_confidence"] == "medium"
@@ -523,7 +531,12 @@ fn is_reference_spawn_row(old: &Value, new: &Value) -> bool {
         && old["zone_id"] == new["zone_id"]
         && old["roles"] == new["roles"]
         && old["quest_ids_given"] == new["quest_ids_given"]
-        && old["quests_accepted"] == new["quests_accepted"]
+        && old["quests_accepted"] == new["quests_accepted"];
+    newly_placed
+        || (old["placement"] == "legacy_data"
+            && old["placement_source"] == "legacy_data_spawn"
+            && without_fields(old, &NAME_BINDING_FIELDS)
+                == without_fields(new, &NAME_BINDING_FIELDS))
 }
 
 /// True when `new` differs from `old` only by quest bindings and their
@@ -1009,6 +1022,36 @@ fn the_change_guard_allows_quest_bindings_and_rejects_a_foreign_greeting() {
         briarwood,
         &reference_old,
         &unmarked
+    ));
+    // The allowance covers placement fields only: a reference-spawn row that also
+    // gains a greeting is a foreign greeting change, even though the marker matches.
+    let mut cited_greeting = reference_new.clone();
+    cited_greeting["records"][0]["greeting_string_id"] = Value::from(440_465);
+    assert!(!is_quest_binding_change_between(
+        briarwood,
+        &reference_old,
+        &cited_greeting
+    ));
+    // A follow-up may bind the spawn NameId on a row T698 already placed, and nothing
+    // else; the same greeting change is still rejected there.
+    let mut bound = reference_new.clone();
+    bound["records"][0]["name_string_id"] = Value::from(101_924);
+    bound["records"][0]["name_string_id_reason"] = Value::from("spawn NameId 101924");
+    bound["records"][0]["field_sources"]["name_string_id"] =
+        serde_json::json!([{"kind": "legacy-data", "evidence": "spawn"}]);
+    bound["records"][0]["field_sources"]["name_string_id_reason"] =
+        serde_json::json!([{"kind": "legacy-data", "evidence": "spawn"}]);
+    assert!(is_quest_binding_change_between(
+        briarwood,
+        &reference_new,
+        &bound
+    ));
+    let mut bound_greeting = bound.clone();
+    bound_greeting["records"][0]["greeting_string_id"] = Value::from(440_465);
+    assert!(!is_quest_binding_change_between(
+        briarwood,
+        &reference_new,
+        &bound_greeting
     ));
 
     // A foreign greeting binding is not a quest binding. The committed guard

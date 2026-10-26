@@ -37,6 +37,15 @@ fn has_source(row: &Value, kind: &str) -> bool {
     })
 }
 
+/// The client's own model table maps `model_id` to `model_file`. The shipped file name
+/// alone is not enough: a row can name a real body while its id points at another one.
+fn models_map(models: &HashMap<i64, HashSet<String>>, model_id: u64, model_file: &str) -> bool {
+    let key = i64::try_from(model_id).expect("model id fits a signed table id");
+    models
+        .get(&key)
+        .is_some_and(|names| names.contains(&model_file.trim().to_ascii_lowercase()))
+}
+
 #[test]
 fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     let crate_root = Path::new(env!("CARGO_MANIFEST_DIR"));
@@ -128,22 +137,25 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
                     shipped_names.contains(&model_file.to_ascii_lowercase()),
                     "{owner}: model file {model_file:?} is absent from catalog.tsv and Assets_manifest.txt"
                 );
-                // T698: a row placed from a reference spawn may keep only the
-                // guide's hashed regional name ids (name_string_ids); its
-                // name_string_id is null then, so the client renders no
-                // nameplate. A present id must still resolve.
-                match row["name_string_id"].as_u64() {
-                    Some(name_id) => assert!(
-                        locale_ids.contains(&name_id),
-                        "{owner}: locale id {name_id} is absent"
-                    ),
-                    None => assert!(
-                        row["position_reason"]
-                            .as_str()
-                            .is_some_and(|reason| reason.contains("talk_spawns.py")),
-                        "{owner}: null name_string_id is allowed only on T698 reference-spawn rows"
-                    ),
-                }
+                // F733: the shipped file name alone is not enough. The client draws the
+                // body its model table maps the id to, so gate the id/file pair here too.
+                let model_id = row["model_id"]
+                    .as_u64()
+                    .unwrap_or_else(|| panic!("{owner}: model id is missing"));
+                assert!(
+                    models_map(&models, model_id, model_file),
+                    "{owner}: Models.txt does not map model {model_id} to {model_file:?}"
+                );
+                // F733: every reference-spawn row must bind the spawn's client NameId. A
+                // missing id would draw the body with name id 0 and no nameplate, so it is
+                // a content error, not a silent allowance.
+                let name_id = row["name_string_id"]
+                    .as_u64()
+                    .unwrap_or_else(|| panic!("{owner}: name_string_id is missing"));
+                assert!(
+                    locale_ids.contains(&name_id),
+                    "{owner}: locale id {name_id} is absent"
+                );
                 assert!(
                     row["heading"].as_f64().is_some_and(f64::is_finite),
                     "{owner}"
@@ -169,12 +181,8 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
             "{owner}: model file {model_file:?} is absent from catalog.tsv and Assets_manifest.txt"
         );
         let model_id = row["model_id"].as_u64().unwrap();
-        let model_file_key = model_file.trim().to_ascii_lowercase();
-        let model_key = i64::try_from(model_id).expect("model id fits a signed table id");
         assert!(
-            models
-                .get(&model_key)
-                .is_some_and(|names| names.contains(&model_file_key)),
+            models_map(&models, model_id, model_file),
             "{owner}: Models.txt does not map model {model_id} to {model_file:?}"
         );
         if let Some(name_id) = row["name_string_id"].as_u64() {

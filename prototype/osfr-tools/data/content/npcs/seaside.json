@@ -8521,14 +8521,14 @@
       "reference_ids": [],
       "name": "Captain Sunspark",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 437145,
       "name_string_ids": [
         {
           "table": "unspecified",
           "id": 2707872564
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "Client locale Global.Text.437145 resolves to 'Captain Sunspark'; the Legacy spawn's Npcs.json Id=2378 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's regional table ids.",
       "zone": "Seaside",
       "zone_id": 11,
       "zone_reason": null,
@@ -8658,16 +8658,12 @@
         ],
         "name_string_id": [
           {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1121; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2378 (ModelId=345, ModelFileName=fairy_royalguard_m.adr, NameId=437145). (R) The spawn's client NameId resolves to 'Captain Sunspark', the row's name (talk_spawns.py)."
+          },
+          {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part H. Event, guest and cross-zone NPCs, row 170; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part H. Event, guest and cross-zone NPCs, row 170; source cell: [client] [wiki]"
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) T698: the guide's name cell carries hashed locale id 2707872564, not a client Global.Text id; the reference spawn's NameId is 437145. name_string_ids keeps the regional table ids."
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 437145 = 'Captain Sunspark'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [
@@ -33324,14 +33320,14 @@
       "reference_ids": [],
       "name": "Petal Oceanmist",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 394904,
       "name_string_ids": [
         {
           "table": "unspecified",
           "id": 2342248259
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "Client locale Global.Text.394904 resolves to 'Petal Oceanmist'; the Legacy spawn's Npcs.json Id=2990 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's regional table ids.",
       "zone": null,
       "zone_id": null,
       "zone_reason": "The source section identifies cross-zone content but does not place this NPC in the page region.",
@@ -33437,12 +33433,12 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Seaside.md#Part H. Event, guest and cross-zone NPCs, row 175; source cell: [client]"
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1733; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2990 (ModelId=36, ModelFileName=fairy_f_valinda.adr, NameId=394904). (R) The spawn's client NameId resolves to 'Petal Oceanmist', the row's name (talk_spawns.py)."
           },
           {
-            "kind": "reconstructed",
-            "evidence": "(R) T698: the guide's name cell carries hashed locale id 2342248259, not a client Global.Text id; the reference spawn's NameId is 394904. name_string_ids keeps the regional table ids."
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 394904 = 'Petal Oceanmist'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [

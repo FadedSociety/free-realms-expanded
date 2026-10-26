@@ -9292,7 +9292,7 @@
       "reference_ids": [],
       "name": "Two of Three",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 5102447,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -9303,7 +9303,7 @@
           "id": 2882839841
         }
       ],
-      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "name_string_id_reason": "Client locale Global.Text.5102447 resolves to 'Two of Three'; the Legacy spawn's Npcs.json Id=4168 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's regional table ids.",
       "zone": "Highroad Junction",
       "zone_id": 7,
       "zone_reason": null,
@@ -9434,12 +9434,12 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part F. Enemies, bosses and event NPCs, row 91; source cell: [client] [wiki Two of Three]"
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2834; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4168 (ModelId=4565, ModelFileName=human_m_wraith_gray.agr, NameId=5102447). (R) The spawn's client NameId resolves to 'Two of Three', the row's name (talk_spawns.py)."
           },
           {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Stillwater Crossing.md#Part F. Enemies, bosses and event NPCs, row 91; source cell: [client] [wiki Two of Three]"
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 5102447 = 'Two of Three'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [

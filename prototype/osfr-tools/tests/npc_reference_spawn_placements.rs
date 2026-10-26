@@ -8,11 +8,16 @@
 //! Client wire: 35/2 AddNpc reader `0x00921a10` (u64 actor, i32 name id, i32 model
 //! id) via the shared `seen_from` (`parse_add_npc`); no wire shape changed.
 
+#[path = "common/npc_greetings.rs"]
+mod npc_greetings;
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
+#[path = "support/placement.rs"]
+mod placement;
 
 use npc_quest_chain::{content_dir, read_json, seen_from};
 use osfr_tools::world::NpcVisibility;
+use placement::{distance, xyz, xyz_f64};
 use serde_json::Value;
 use std::{
     fs,
@@ -38,11 +43,6 @@ fn project_parent() -> PathBuf {
         .parent()
         .unwrap()
         .to_path_buf()
-}
-
-/// The repository's `lab/` sibling, which holds the cited source and locale data.
-fn lab_dir() -> PathBuf {
-    project_parent().join("lab")
 }
 
 fn regional_rows() -> Vec<Value> {
@@ -89,30 +89,6 @@ fn placed_by_this_brief() -> Vec<Value> {
         }
     }
     rows
-}
-
-fn xyz(row: &Value) -> [f32; 3] {
-    let position = row["position"]
-        .as_array()
-        .unwrap_or_else(|| panic!("{}: position array", row["npc_id"]));
-    assert_eq!(position.len(), 3, "{}: xyz position", row["npc_id"]);
-    [
-        position[0].as_f64().expect("x") as f32,
-        position[1].as_f64().expect("y") as f32,
-        position[2].as_f64().expect("z") as f32,
-    ]
-}
-
-/// The authored f64 position, for comparing the row with its cited source line
-/// before the loader narrows it to f32.
-fn xyz_f64(row: &Value) -> [f64; 3] {
-    let position = row["position"].as_array().unwrap();
-    assert_eq!(position.len(), 3, "{}: xyz position", row["npc_id"]);
-    [
-        position[0].as_f64().expect("x"),
-        position[1].as_f64().expect("y"),
-        position[2].as_f64().expect("z"),
-    ]
 }
 
 fn has_kind(value: &Value, kind: &str) -> bool {
@@ -188,17 +164,6 @@ fn npcs_row(source: &str, ref_id: u64) -> Value {
         .clone()
 }
 
-fn locale_text(name_id: u64) -> String {
-    let rows = read_json(&lab_dir().join("reports/locale-id-to-text.json"));
-    rows.as_array()
-        .unwrap()
-        .iter()
-        .find(|row| row["id"].as_u64() == Some(name_id))
-        .and_then(|row| row["text"].as_str())
-        .unwrap_or_else(|| panic!("NameId {name_id} does not resolve in the report"))
-        .to_owned()
-}
-
 fn normalize(name: &str) -> String {
     name.chars()
         .filter(|ch| ch.is_ascii_alphanumeric())
@@ -209,10 +174,12 @@ fn normalize(name: &str) -> String {
 #[test]
 fn placed_rows_match_the_cited_spawn_and_the_loader_draws_them() {
     let rows = placed_by_this_brief();
-    assert!(
-        !rows.is_empty(),
-        "no row carries the T698 reference-spawn marker"
+    assert_eq!(
+        rows.len(),
+        16,
+        "the brief places 16 rows; a row lost its reference-spawn marker"
     );
+    let locale = npc_greetings::locale_id_to_text();
     let base = NpcVisibility::load(&content_dir()).unwrap();
     for row in rows {
         let id = row["npc_id"].as_u64().unwrap();
@@ -237,7 +204,7 @@ fn placed_rows_match_the_cited_spawn_and_the_loader_draws_them() {
             reason.contains(&format!("{}:{}", spawn.source, spawn.line)),
             "{owner}: reason does not cite its line"
         );
-        let authored = xyz_f64(&row);
+        let authored = xyz_f64(&row["position"]);
         for axis in 0..3 {
             assert!(
                 (authored[axis] - spawn.position[axis]).abs() <= 1e-9,
@@ -246,7 +213,7 @@ fn placed_rows_match_the_cited_spawn_and_the_loader_draws_them() {
                 spawn.line
             );
         }
-        let position = xyz(&row);
+        let position = xyz(&row["position"]);
         let heading = row["heading"].as_f64().unwrap();
         assert!(
             (heading - spawn.heading).abs() <= 1e-9,
@@ -266,10 +233,20 @@ fn placed_rows_match_the_cited_spawn_and_the_loader_draws_them() {
             "{owner}: model file"
         );
         let name_id = reference["NameId"].as_u64().unwrap();
+        let locale_name = locale
+            .get(&name_id)
+            .unwrap_or_else(|| panic!("{owner}: spawn NameId {name_id} does not resolve"));
         assert_eq!(
             normalize(row["name"].as_str().unwrap()),
-            normalize(&locale_text(name_id)),
+            normalize(locale_name),
             "{owner}: spawn NameId {name_id} does not name this row"
+        );
+        let bound = row["name_string_id"].as_u64().unwrap_or_else(|| {
+            panic!("{owner}: T698 regressed this row's name id to null; bind the spawn's NameId")
+        });
+        assert_eq!(
+            bound, name_id,
+            "{owner}: bound name id is not the spawn's NameId"
         );
 
         let rotation = row["rotation"].as_array().unwrap();
@@ -305,6 +282,10 @@ fn placed_rows_match_the_cited_spawn_and_the_loader_draws_them() {
             row["model_id"].as_u64().unwrap() as i32,
             "{owner}: AddNpc model"
         );
+        assert_eq!(
+            drawn[0].name_string_id, name_id as i32,
+            "{owner}: AddNpc name id"
+        );
         for axis in 0..3 {
             assert!(
                 (drawn[0].position[axis] - position[axis]).abs() <= 1e-3,
@@ -321,7 +302,7 @@ fn no_two_drawn_regional_npc_rows_share_a_position() {
         .iter()
         .filter(|row| row["placement"] == "legacy_data")
         .filter_map(|row| {
-            let position = xyz(row);
+            let position = xyz(&row["position"]);
             position.iter().all(|value| value.is_finite()).then(|| {
                 (
                     row["npc_id"].as_u64().unwrap(),
@@ -334,15 +315,10 @@ fn no_two_drawn_regional_npc_rows_share_a_position() {
     assert!(drawn.len() > 1, "the content has drawn regional NPCs");
     for (index, (left_id, left_name, left)) in drawn.iter().enumerate() {
         for (right_id, right_name, right) in drawn.iter().skip(index + 1) {
-            let distance = left
-                .iter()
-                .zip(right)
-                .map(|(a, b)| (f64::from(*a) - f64::from(*b)).powi(2))
-                .sum::<f64>()
-                .sqrt();
+            let apart = distance(*left, *right);
             assert!(
-                distance > SAME_SPOT_METRES,
-                "{left_id} ({left_name}) and {right_id} ({right_name}) share a spot ({distance:.2} m)"
+                apart > SAME_SPOT_METRES,
+                "{left_id} ({left_name}) and {right_id} ({right_name}) share a spot ({apart:.2} m)"
             );
         }
     }
@@ -352,20 +328,18 @@ fn no_two_drawn_regional_npc_rows_share_a_position() {
     let base = NpcVisibility::load(&content_dir()).unwrap();
     for row in placed_by_this_brief() {
         let id = row["npc_id"].as_u64().unwrap();
-        let position = xyz(&row);
+        let position = xyz(&row["position"]);
         for other in seen_from(&base, position) {
             if other.actor_id == id {
                 continue;
             }
-            let distance = position
-                .iter()
-                .zip(&other.position)
-                .map(|(a, b)| (f64::from(*a) - f64::from(*b)).powi(2))
-                .sum::<f64>()
-                .sqrt();
+            let apart = distance(
+                position,
+                [other.position[0], other.position[1], other.position[2]],
+            );
             assert!(
-                distance > SAME_SPOT_METRES,
-                "NPC {id} shares its spot with actor {} ({distance:.2} m)",
+                apart > SAME_SPOT_METRES,
+                "NPC {id} shares its spot with actor {} ({apart:.2} m)",
                 other.actor_id
             );
         }

@@ -9,14 +9,14 @@
       "reference_ids": [],
       "name": "Admiral Fishfinder",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 427718,
       "name_string_ids": [
         {
           "table": "ucdt",
           "id": 1719553458
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "Client locale Global.Text.427718 resolves to 'Admiral Fishfinder'; the Legacy spawn's Npcs.json Id=2852 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's regional table ids.",
       "zone": "Briarwood",
       "zone_id": 2,
       "zone_reason": null,
@@ -148,16 +148,12 @@
         ],
         "name_string_id": [
           {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1595; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2852 (ModelId=2116, ModelFileName=fairy_f_pirate_01.agr, NameId=427718). (R) The spawn's client NameId resolves to 'Admiral Fishfinder', the row's name (talk_spawns.py)."
+          },
+          {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 166; source cell: [client name][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Nettleseed, row 166; source cell: [client name][wiki]"
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) T698: the guide's name cell carries hashed locale id 1719553458, not a client Global.Text id; the reference spawn's NameId is 427718. name_string_ids keeps the regional table ids."
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 427718 = 'Admiral Fishfinder'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [
@@ -35057,14 +35053,14 @@
       "reference_ids": [],
       "name": "Kade Carmichael",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 101924,
       "name_string_ids": [
         {
           "table": "ucdt",
           "id": 3822937627
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "Client locale Global.Text.101924 resolves to 'Kade Carmichael'; the Legacy spawn's Npcs.json Id=2679 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's regional table ids.",
       "zone": "Briarwood",
       "zone_id": 2,
       "zone_reason": null,
@@ -35220,20 +35216,12 @@
         ],
         "name_string_id": [
           {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1422; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=2679 (ModelId=833, ModelFileName=human_m_kade_carmichael.agr, NameId=101924). (R) The spawn's client NameId resolves to 'Kade Carmichael', the row's name (talk_spawns.py)."
+          },
+          {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 138; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 138; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 138; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) T698: the guide's name cell carries hashed locale id 3822937627, not a client Global.Text id; the reference spawn's NameId is 101924. name_string_ids keeps the regional table ids."
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 101924 = 'Kade Carmichael'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [
@@ -39857,14 +39845,14 @@
       "reference_ids": [],
       "name": "Linx Redline",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 394366,
       "name_string_ids": [
         {
           "table": "ucdt",
           "id": 1089119489
         }
       ],
-      "name_string_id_reason": null,
+      "name_string_id_reason": "Client locale Global.Text.394366 resolves to 'Linx Redline'; the Legacy spawn's Npcs.json Id=3015 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's regional table ids.",
       "zone": "Briarwood",
       "zone_id": 2,
       "zone_reason": null,
@@ -39972,12 +39960,12 @@
         ],
         "name_string_id": [
           {
-            "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Briarwood.md#Tangletrack Speedway, row 133; source cell: [client]"
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1758; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3015 (ModelId=1300, ModelFileName=fairy_m_linx_redline.agr, NameId=394366). (R) The spawn's client NameId resolves to 'Linx Redline', the row's name (talk_spawns.py)."
           },
           {
-            "kind": "reconstructed",
-            "evidence": "(R) T698: the guide's name cell carries hashed locale id 1089119489, not a client Global.Text id; the reference spawn's NameId is 394366. name_string_ids keeps the regional table ids."
+            "kind": "client",
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 394366 = 'Linx Redline'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [

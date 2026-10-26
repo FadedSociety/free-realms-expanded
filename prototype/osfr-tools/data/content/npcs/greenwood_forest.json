@@ -5108,7 +5108,7 @@
       "reference_ids": [],
       "name": "Chatty",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 5102985,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -5127,7 +5127,7 @@
           "id": 2061884656
         }
       ],
-      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "name_string_id_reason": "Client locale Global.Text.5102985 resolves to 'Chatty'; the Legacy spawn's Npcs.json Id=4630 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's regional table ids.",
       "zone": "Greenwood Forest",
       "zone_id": 6,
       "zone_reason": null,
@@ -5283,16 +5283,12 @@
         ],
         "name_string_id": [
           {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3264; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4630 (ModelId=277, ModelFileName=chatdy.adr, NameId=5102985). (R) The spawn's client NameId resolves to 'Chatty', the row's name (talk_spawns.py)."
+          },
+          {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part A. The Summer Camp: Camp Chatty and Camp Robbie, row 39; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part A. The Summer Camp: Camp Chatty and Camp Robbie, row 39; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part A. The Summer Camp: Camp Chatty and Camp Robbie, row 39; source cell: [client][video][wiki]"
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 5102985 = 'Chatty'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [
@@ -19967,7 +19963,7 @@
       "reference_ids": [],
       "name": "Robbie",
       "name_reason": null,
-      "name_string_id": null,
+      "name_string_id": 429024,
       "name_string_ids": [
         {
           "table": "ucdt",
@@ -19982,7 +19978,7 @@
           "id": 4012397822
         }
       ],
-      "name_string_id_reason": "The guide lists multiple locale-table name IDs; see name_string_ids.",
+      "name_string_id_reason": "Client locale Global.Text.429024 resolves to 'Robbie'; the Legacy spawn's Npcs.json Id=4623 NameId supplies it (matched by name, talk_spawns.py). name_string_ids keeps the guide's regional table ids.",
       "zone": "Greenwood Forest",
       "zone_id": 6,
       "zone_reason": null,
@@ -20219,16 +20215,12 @@
         ],
         "name_string_id": [
           {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3257; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4623 (ModelId=1027, ModelFileName=robgoblin_m_bobgoblin.adr, NameId=429024). (R) The spawn's client NameId resolves to 'Robbie', the row's name (talk_spawns.py)."
+          },
+          {
             "kind": "client",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part A. The Summer Camp: Camp Chatty and Camp Robbie, row 44; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "video",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part A. The Summer Camp: Camp Chatty and Camp Robbie, row 44; source cell: [client][video][wiki]"
-          },
-          {
-            "kind": "wiki",
-            "evidence": "notes/Build Guides/Content/NPCs/NPCs - Greenwood Forest.md#Part A. The Summer Camp: Camp Chatty and Camp Robbie, row 44; source cell: [client][video][wiki]"
+            "evidence": "lab/reports/locale-id-to-text.json Global.Text 429024 = 'Robbie'; the client locale table resolves the spawn's NameId. AddNpc reader 0x00921a10 reads the name dword after the GUID."
           }
         ],
         "name_string_ids": [
