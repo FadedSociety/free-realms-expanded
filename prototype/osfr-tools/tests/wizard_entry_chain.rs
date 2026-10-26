@@ -833,6 +833,11 @@ fn enabled_wizard_chapter_records_are_complete_and_drawable() {
     let enabled: Vec<&Value> = records
         .iter()
         .filter(|record| record["enabled"].as_bool().unwrap_or(false))
+        // T723 enables Osgood's level gates and Helping a Friend (tests/zone_quests_sanctuary_round3.rs);
+        // this test covers Fizzlesticks' Robgoblin Camp chapter.
+        .filter(|record| {
+            ![3_160_017, 3_160_019, 3_160_024].contains(&record["id"].as_u64().unwrap())
+        })
         .collect();
     assert_eq!(
         enabled

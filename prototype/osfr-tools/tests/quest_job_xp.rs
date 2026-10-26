@@ -1396,6 +1396,11 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             if listed.contains(&(file, id)) {
                 continue;
             }
+            // T723: Chef: Reach Level 5 is a level gate (job gate 45, coins only, no XP);
+            // tests/zone_quests_sanctuary_round3.rs covers it.
+            if (file, id) == ("chef.json", 3_050_020) {
+                continue;
+            }
             for reward in record["rewards"].as_array().into_iter().flatten() {
                 assert_eq!(
                     reward["job_xp"],

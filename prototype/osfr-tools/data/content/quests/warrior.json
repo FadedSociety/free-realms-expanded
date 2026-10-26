@@ -893,11 +893,58 @@
     },
     {
       "id": 3150016,
+      "job": 32,
       "title_string_id": 387606,
       "giver_npc_id": 9000000205,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 32,
+          "level": 15,
+          "text_string_id": 387587,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387587 (lab/reports/locale-id-to-text.json) is the level-gate objective text for Warrior level 15; lab/references/quest-lines/wiring/round3/sanctuary.json gives job_level profile 32 level 15 (objcheck, critic-passed)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T723: one authoritative job_level objective at profile 32, level 15, completed from the server's own Profiles::rank curve (T361), never from a Talk or a client claim; job_level is objective #0 as quest_engine requires for an ordered quest."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000205,
+          "text_string_id": 387585,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387585 (lab/reports/locale-id-to-text.json): 'Reach level 15 as a warrior, then return to Sir Whittington.' (the return to Sir Whittington, npc 9000000205, who is the giver)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T723: talk target npc 9000000205 is a drawn row (placement legacy_data, or a reference_data row drawn by its npc_spawns_extra.json body), so the Talk can run; the final Talk to a named objective target opens the 49/13 end screen at that NPC."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T723: the level-gate payout is 15 coins, paid once by the 49/14 turn-in, with no item and no job XP: the same reconstructed gate pay as Warrior W5 (T361) and Postman level 10 (T663). The answer for this quest records no reward (quest-lines/quests.json: unknown), so the number is ours and lives in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -917,10 +964,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -928,11 +971,17 @@
           "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
         },
         {
+          "kind": "client",
+          "evidence": "Global.Text 387606 title, 387582 wait text 'Your warrior training will continue once you have reached level 15 as a warrior. Return to Sir Whittington at that time.', 387583 'Welcome back. We have much to do.' (lab/reports/locale-id-to-text.json; lab/references/quest-lines/dialogs.json q3150016: progress and complete both Sir Whittington)."
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T723: enabled on the round-3 spec: job_level profile 32 (Warrior) level 15, then the return Talk to Sir Whittington (a drawn Sanctuary legacy_data row). The client tags the lines Snowhill; the only documented spawn is Sanctuary, so the server follows the drawn row. The answer finds no offer line (387580 and 387594 are turn-away lines), so intro stays 0."
         }
       ],
-      "enabled": false
+      "enabled": true,
+      "description_string_id": 387582,
+      "end_text_string_id": 387583
     },
     {
       "id": 3150017,

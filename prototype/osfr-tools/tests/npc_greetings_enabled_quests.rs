@@ -316,6 +316,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Diggy (T466 Touring Seaside talk target): NPCs - Seaside.md:45 quotes only third-person cooking objectives and other speakers' referrals (428610, 21340, 384277, 100280); locale 93435 ('finest seafood') has no speaker in any guide row, and 93429 is the quest-step goal text, so no first-person line of his own is proven.",
     ),
     (
+        9000000086,
+        "Felipe (T723 giver and talk target of Become a Postman 3130001): NPCs - Sanctuary.md:58 and Postman.md:33 quote only third-person lines (the find-Felipe objectives, 802297762, 4100717826) and his level-5 block line 458233643, which belongs to the later Postman: Achieve Level 5 gate; the quest's own lines 412445, 412446 and 412451 are the title, description and objective, so no uncontested first-person greeting of his own is recovered.",
+    ),
+    (
         9000000107,
         "Honey (T500 talk target of 3000310): NPCs - Sanctuary.md:47 quotes only a farm location and harvesting objectives (841702301, 2418103113, 623626341) and the interview mention (2478429130); her reply 390820 is the quest-step dialogue of 3000310 goal 2, not a greeting. Her chef quest intros are disabled quests.",
     ),
@@ -328,8 +332,16 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Merri De'Flor (T727 talk target of 3060011): NPCs - Lakeshore.md:27 quotes only third-person lines about her (1113274275, 1119011320, 9582519, 446677410) and the restaurant minigame prompts; the sponsor lines 393379 (Old Betty's offer, dialogs.json q3060011) and 394288 (no attributed speaker) are not hers, so no first-person line of her own is recovered.",
     ),
     (
+        9000000164,
+        "Osgood (T723 giver of Wizard: Reach Level 10, Helping a Friend and Reach Level 15; talk target of both gates): NPCs - Sanctuary.md:60 quotes only his role, the wand build and his level-10 and level-15 blocks; his first-person lines 387662, 387665, 387666, 387669 and 37310 are the offers and end texts of those three quests, whose speaker the guide leaves unnamed, and a quest line is not a standing greeting, so none is bound.",
+    ),
+    (
         9000000173,
         "Postmaster Lane: the split Trail of Mail intro 141828 is quoted by the Postman guide under Enve LeStamp's earlier Sasparilla row, so the speaker is contested; no uncontested first-person line exists.",
+    ),
+    (
+        9000000190,
+        "Sandbur (T723 talk target of Wizard: Helping a Friend): NPCs - Sanctuary.md:61 gives him no quote of his own (a role, a location and the quests he receives items for); 37312 is the quest's objective text 'Speak with Sandbur in Sanctuary's Inner Circle.', not a line he speaks, so no first-person greeting is recovered.",
     ),
     (
         9000000191,

@@ -930,11 +930,58 @@
     },
     {
       "id": 3160017,
+      "job": 12,
       "title_string_id": 387663,
       "giver_npc_id": 9000000164,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 12,
+          "level": 10,
+          "text_string_id": 387688,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387688 (lab/reports/locale-id-to-text.json) is the level-gate objective text for Wizard level 10; lab/references/quest-lines/wiring/round3/sanctuary.json gives job_level profile 12 level 10 (objcheck, critic-passed)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T723: one authoritative job_level objective at profile 12, level 10, completed from the server's own Profiles::rank curve (T361), never from a Talk or a client claim; job_level is objective #0 as quest_engine requires for an ordered quest."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000164,
+          "text_string_id": 387685,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387685 (lab/reports/locale-id-to-text.json): 'Reach level 10 as a wizard, then return to Osgood.' (the return to Osgood, npc 9000000164, who is the giver)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T723: talk target npc 9000000164 is a drawn row (placement legacy_data, or a reference_data row drawn by its npc_spawns_extra.json body), so the Talk can run; the final Talk to a named objective target opens the 49/13 end screen at that NPC."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T723: the level-gate payout is 15 coins, paid once by the 49/14 turn-in, with no item and no job XP: the same reconstructed gate pay as Warrior W5 (T361) and Postman level 10 (T663). The answer for this quest records no reward (quest-lines/quests.json: unknown), so the number is ours and lives in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -954,10 +1001,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -966,17 +1009,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 387662 (Osgood's offer: come back at level 10), 387663 title, 387664 wait text, 387665 end text (lab/reports/locale-id-to-text.json; lab/references/quest-lines/dialogs.json q3160017, final)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T723: enabled on the round-3 spec: job_level profile 12 (Wizard) level 10, then the return Talk to Osgood 9000000164 (a drawn reference_data row at the FabledRealms.lua:3670 spawn). No prerequisite: the answer's previous quest (3160016) is disabled and the record keeps its empty list."
         }
       ],
       "description_string_id": 387664,
       "intro_text_string_id": 387662,
       "end_text_string_id": 387665,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3160018,
@@ -1032,6 +1079,7 @@
     },
     {
       "id": 3160019,
+      "job": 12,
       "title_string_id": 37311,
       "giver_npc_id": 9000000164,
       "prerequisite_quest_ids": [
@@ -1042,15 +1090,34 @@
           "kind": "talk_to_npc",
           "id": 1,
           "npc_id": 9000000190,
+          "text_string_id": 37312,
           "source": [
             {
               "kind": "client",
               "evidence": "description 37312 'Speak with Sandbur in Sanctuary's Inner Circle.'; target resolved by scripts/quest_talk_objectives.py"
+            },
+            {
+              "kind": "client",
+              "evidence": "Global.Text 37312 'Speak with Sandbur in Sanctuary's Inner Circle.' (lab/reports/locale-id-to-text.json; lab/references/quest-lines/wiring/round3/sanctuary.json q3160019 objective 0, objfix, critic-passed): the objective text the 49/3 goal line sends."
             }
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "12": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T723: no source gives this quest a reward (quest-lines/quests.json q3160019: none). 5 coins and 25 Wizard (profile 12) job XP are the pay of the enabled sibling rows 3160003 to 3160005; the numbers live in data and are tunable."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1070,10 +1137,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1082,20 +1145,20 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
         },
         {
+          "kind": "client",
+          "evidence": "Global.Text 37310 (Osgood's offer: help a friend), 37311 title, 37312 'Speak with Sandbur in Sanctuary's Inner Circle.' (lab/reports/locale-id-to-text.json; lab/references/quest-lines/dialogs.json q3160019)."
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) W110: DISABLED: existing enabled quest has unspawned giver/talk target(s) [9000000164, 9000000190]; objectives and rewards preserved."
+          "evidence": "(R) T723: enabled on the round-3 spec (talk_to_npc Sandbur 9000000190, a drawn reference_data row at the FabledRealms.lua:3673 spawn). The talk target is also the hand-in (the named-objective-target rule). Prerequisite 3160017 stays."
         }
       ],
       "description_string_id": 37312,
       "intro_text_string_id": 37310,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3160020,
@@ -1305,11 +1368,60 @@
     },
     {
       "id": 3160024,
+      "job": 12,
       "title_string_id": 387667,
       "giver_npc_id": 9000000164,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "prerequisite_quest_ids": [
+        3160019
+      ],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 12,
+          "level": 15,
+          "text_string_id": 387693,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387693 (lab/reports/locale-id-to-text.json) is the level-gate objective text for Wizard level 15; lab/references/quest-lines/wiring/round3/sanctuary.json gives job_level profile 12 level 15 (objcheck, critic-passed)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T723: one authoritative job_level objective at profile 12, level 15, completed from the server's own Profiles::rank curve (T361), never from a Talk or a client claim; job_level is objective #0 as quest_engine requires for an ordered quest."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000164,
+          "text_string_id": 387691,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387691 (lab/reports/locale-id-to-text.json): 'Reach level 15 as a wizard, then return to Osgood.' (the return to Osgood, npc 9000000164, who is the giver)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T723: talk target npc 9000000164 is a drawn row (placement legacy_data, or a reference_data row drawn by its npc_spawns_extra.json body), so the Talk can run; the final Talk to a named objective target opens the 49/13 end screen at that NPC."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T723: the level-gate payout is 15 coins, paid once by the 49/14 turn-in, with no item and no job XP: the same reconstructed gate pay as Warrior W5 (T361) and Postman level 10 (T663). The answer for this quest records no reward (quest-lines/quests.json: unknown), so the number is ours and lives in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1329,10 +1441,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1341,17 +1449,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 387666 (Osgood's line: come back at level 15), 387667 title, 387668 wait text, 387669 end text 'Great, you're back!' (lab/reports/locale-id-to-text.json; lab/references/quest-lines/dialogs.json q3160024)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T723: enabled on the round-3 spec: job_level profile 12 (Wizard) level 15, then the return Talk to Osgood. The answer states no predecessor on purpose (the guide's row 21, 'Filling in the Gaps', precedes it by table order only and is disabled). Prerequisite 3160019 (Helping a Friend, guide row 17) is ours: without one Osgood offers this level-15 gate in the same breath as the level-10 gate to a rank-1 Wizard, and the guide puts rows 15 and 17 first."
         }
       ],
       "description_string_id": 387668,
       "intro_text_string_id": 387666,
       "end_text_string_id": 387669,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3160025,

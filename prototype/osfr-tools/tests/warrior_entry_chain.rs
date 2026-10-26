@@ -60,6 +60,7 @@ const W2: u32 = 3_150_002;
 const W3: u32 = 3_150_003;
 const W4: u32 = 3_150_004;
 const W5: u32 = 3_150_005;
+const W16: u32 = 3_150_016;
 const W1_TITLE: u32 = 22_526;
 const W4_TITLE: u32 = 22_580;
 const W4_DESCRIPTION: u32 = 22_581;
@@ -851,11 +852,12 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
             .iter()
             .map(|row| row["id"].as_u64().unwrap())
             .collect::<Vec<_>>(),
-        vec![u64::from(W1), u64::from(W4), u64::from(W5)]
+        // T723 enables the level-15 gate W16 next to the W5 gate.
+        vec![u64::from(W1), u64::from(W4), u64::from(W5), u64::from(W16)]
     );
     for record in &enabled {
-        if record["id"].as_u64() == Some(u64::from(W5)) {
-            continue; // the level gate has its own shape below
+        if [W5, W16].contains(&(record["id"].as_u64().unwrap() as u32)) {
+            continue; // the level gates have their own shape (W16: tests/zone_quests_sanctuary_round3.rs)
         }
         assert_eq!(record["job"].as_i64(), Some(i64::from(WARRIOR)));
         assert!(
@@ -953,7 +955,7 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
     // generated content already carried.
     for record in records {
         let id = record["id"].as_u64().unwrap();
-        if id == u64::from(W1) || id == u64::from(W4) || id == u64::from(W5) {
+        if [W1, W4, W5, W16].contains(&(id as u32)) {
             continue;
         }
         assert_eq!(record["enabled"].as_bool(), Some(false), "quest {id}");

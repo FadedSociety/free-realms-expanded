@@ -1087,11 +1087,58 @@
     },
     {
       "id": 3050020,
+      "job": 45,
       "title_string_id": 387247,
       "giver_npc_id": 9000000028,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 45,
+          "level": 5,
+          "text_string_id": 387248,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387248 (lab/reports/locale-id-to-text.json) is the level-gate objective text for Chef level 5; lab/references/quest-lines/wiring/round3/sanctuary.json gives job_level profile 45 level 5 (objcheck, critic-passed)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T723: one authoritative job_level objective at profile 45, level 5, completed from the server's own Profiles::rank curve (T361), never from a Talk or a client claim; job_level is objective #0 as quest_engine requires for an ordered quest."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000028,
+          "text_string_id": 387248,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387248 (lab/reports/locale-id-to-text.json): 'Your cooking career will continue once you have reached level 5 as a Chef. Return to Bordon Cloo at that time.' (the return to Bordon Cloo, npc 9000000028, who is the giver)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T723: talk target npc 9000000028 is a drawn row (placement legacy_data, or a reference_data row drawn by its npc_spawns_extra.json body), so the Talk can run; the final Talk to a named objective target opens the 49/13 end screen at that NPC."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T723: the level-gate payout is 15 coins, paid once by the 49/14 turn-in, with no item and no job XP: the same reconstructed gate pay as Warrior W5 (T361) and Postman level 10 (T663). The answer for this quest records no reward (quest-lines/quests.json: unknown), so the number is ours and lives in data."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1111,10 +1158,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -1123,17 +1166,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 387246 (Bordon Cloo's offer: come back at level 5), 387247 title, 387248 description and objectives, 387249 end text (lab/reports/locale-id-to-text.json; lab/references/quest-lines/dialogs.json q3050020; quest-lines/quests.json q3050020 live 'yes')."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T723: enabled on the round-3 spec: job_level profile 45 (Chef) level 5, then the return Talk to Bordon Cloo 9000000028, a drawn vendor row. job gate 45 keeps the quest Chef-only like the enabled 3050004."
         }
       ],
       "description_string_id": 387248,
       "intro_text_string_id": 387246,
       "end_text_string_id": 387249,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3050021,

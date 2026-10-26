@@ -6,8 +6,37 @@
       "title_string_id": 412445,
       "giver_npc_id": 9000000086,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000086,
+          "text_string_id": 412451,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 412451 (lab/reports/locale-id-to-text.json): 'Speak to Felipe' (quest-lines/quests.json q3130001 objective; Felipe 9000000086 is the Sanctuary courier, a drawn reference_data row at the FabledRealms.lua:3614 spawn)"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T723: talk target npc 9000000086 is a drawn row (placement legacy_data, or a reference_data row drawn by its npc_spawns_extra.json body), so the Talk can run; the final Talk to a named objective target opens the 49/13 end screen at that NPC."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T723: the answer records 'Postman job unlock; no coin or item reward recorded (rewards not documented)' (quest-lines/quests.json q3130001), which means undocumented, not none. The quest is ungated, so a player who is not yet a Postman can finish it and no Postman XP is paid; 5 coins is a reconstructed token payout, in data and tunable."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -27,10 +56,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
@@ -39,15 +64,19 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 412445 title 'Become a Postman', 412446 description 'Learn how to be a postman by finding Felipe in Sanctuary.', 412451 objective 'Speak to Felipe', 384165 'Find Felipe in Sanctuary and become a postman!' (lab/reports/locale-id-to-text.json)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T723: enabled on the round-3 spec. It is also the quest the Jobs window starts: job_browser.json maps original 1964 to this record, so the 49/15 Start quest button offers it. No dialog line is bound (the answer finds no offer, progress or end line), so the 49/1 card carries intro 0 and the end screen text 0."
         }
       ],
       "description_string_id": 412446,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3130002,
