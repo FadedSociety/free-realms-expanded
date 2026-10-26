@@ -580,6 +580,10 @@ pub struct Pet {
     /// The inventory definition consumed to adopt this pet, when one was required.
     #[serde(default)]
     pub adoption_item_definition_id: Option<i32>,
+    /// T456: the adoption item instance's tint; `None` uses the model's default tint. Left out of
+    /// the save when unset, so an older roster round-trips byte for byte (l043 admin move).
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub tint: Option<i32>,
     updated_at: u64,
 }
 
@@ -1174,6 +1178,7 @@ impl PetService {
         };
         let actor_guid = Self::pet_guid(owner_guid);
         let mut next = self.clone();
+        let summoning = matches!(request, PetRequest::Summon { .. });
         let applied = match request {
             PetRequest::Summon { pet_id } => {
                 next.rebase_clock(now);
@@ -1211,6 +1216,7 @@ impl PetService {
                         pet_set_name_packet(active.actor_guid, &name, true),
                         next.list_packet(),
                     ],
+                    shared: vec![pet_set_name_packet(active.actor_guid, &name, true)],
                     changed: true,
                     ..PetWire::default()
                 };
@@ -1226,7 +1232,11 @@ impl PetService {
         match applied {
             Ok(transition) => {
                 *self = next;
-                Ok(Some(self.wire(transition)))
+                let mut wire = self.wire(transition);
+                if summoning {
+                    wire.private.push(self.list_packet());
+                }
+                Ok(Some(wire))
             }
             Err(error) => Ok(Some(PetWire {
                 private: vec![self.list_packet()],
@@ -1277,6 +1287,13 @@ impl PetService {
             Ok((transition, inventory_replies)) => {
                 *self = next;
                 *inventory = next_inventory;
+                // T456: a pet adopted from a tinted item keeps that tint in its record.
+                let adopted = self.active.map(|active| active.pet_id);
+                if let Some(pet) = self.roster.pets.iter_mut().find(|p| Some(p.id) == adopted) {
+                    if pet.tint.is_none() && tint != 0 {
+                        pet.tint = i32::try_from(tint).ok();
+                    }
+                }
                 // Actor creation precedes both the roster (whose trailing active
                 // pair activates the pet) and the explicit activation.
                 let mut wire = self.wire(transition.clone());
@@ -1374,7 +1391,7 @@ impl PetService {
         bytes.extend((self.roster.pets.len() as u32).to_le_bytes());
         for pet in &self.roster.pets {
             bytes.extend(pet.id.to_le_bytes()); // list key, before the record
-            append_pet_record(&mut bytes, pet);
+            append_pet_record(&mut bytes, pet, &self.content);
         }
         let (pet_id, actor_guid) = self
             .active
@@ -1669,6 +1686,7 @@ fn insert_pet(
         favorite_tricks: [None; 4],
         equipment: PetEquipment::default(),
         adoption_item_definition_id: definition.adoption_item_definition_id,
+        tint: None,
         updated_at: now,
     });
     Ok(id)
@@ -1879,10 +1897,28 @@ pub fn pet_removal_packet(actor_guid: u64) -> Vec<u8> {
     bytes
 }
 
-fn append_pet_record(out: &mut Vec<u8>, pet: &Pet) {
+/// T456: one 53/5 pet record in the order the client's reader `00912cf0` consumes it (offsets
+/// are the record object's): u32 id (+0x00), u8 sex (+0x04), u32 icon (+0x08), four f32 needs
+/// (+0x20..+0x2c), u8 members-only (+0x30), tricks (+0x34: key, 8 u32, u8 known; element reader
+/// `008ce1a0`), equipped ids (+0xbc), item classes (+0xe4: key, id, unknown), name (+0x0c),
+/// u32 name text id (+0x1c), u32 tint (+0x100), tint alias (+0x108), u32 image set (+0xfc),
+/// u8 vanity (+0x104), u32 attachment group (+0x118), u8 tutorial (+0x11c), 4 favourite and
+/// 8 utility u32.
+fn append_pet_record(out: &mut Vec<u8>, pet: &Pet, content: &PetContent) {
+    let model = content.model(content.model_id(&pet.model));
+    let item = pet
+        .adoption_item_definition_id
+        .and_then(|id| content.item(id));
+    // Old wiki species without catalogue rows fall back to the species icon (R).
+    let species_icon = content
+        .species
+        .iter()
+        .find(|species| species.species_id == Some(pet.species_id))
+        .and_then(|species| species.icon.as_ref());
     put_u32(out, pet.id);
-    out.push(0); // Unknown client flag at record +0x04.
-    put_u32(out, pet.species_id);
+    // (R) The client column is the sex; the model's Models.txt GENDER value fills it.
+    out.push(model.and_then(|m| m.gender).map_or(0, |g| g as u8));
+    put_u32(out, model.and_then(|m| m.icon_id).unwrap_or(0) as u32);
     for value in [
         pet.needs.food,
         pet.needs.groom,
@@ -1891,14 +1927,36 @@ fn append_pet_record(out: &mut Vec<u8>, pet: &Pet) {
     ] {
         put_f32(out, value);
     }
-    out.push(0); // Unknown client flag at record +0x30.
-    put_count(out, pet.learned_tricks.len());
-    for trick_id in &pet.learned_tricks {
-        put_u32(out, *trick_id);
-        for _ in 0..8 {
-            put_u32(out, 0);
+    out.push(u8::from(item.is_some_and(|item| item.members_only)));
+    // The model's trick list in the client's order, then any learned trick it lacks (old saves).
+    let mut rows: Vec<(u32, bool)> = model.map_or_else(Vec::new, |model| {
+        model
+            .tricks
+            .iter()
+            .map(|t| (t.id, t.known || pet.learned_tricks.contains(&t.id)))
+            .collect()
+    });
+    for id in &pet.learned_tricks {
+        if !rows.iter().any(|(row, _)| row == id) {
+            rows.push((*id, true));
         }
-        out.push(1);
+    }
+    put_count(out, rows.len());
+    for (order, (trick_id, known)) in rows.into_iter().enumerate() {
+        let trick = content.tricks.iter().find(|t| t.id == trick_id);
+        let field =
+            |f: fn(&PetTrickDefinition) -> Option<i32>| trick.and_then(f).unwrap_or(0) as u32;
+        put_u32(out, trick_id);
+        put_u32(out, trick_id);
+        put_u32(out, field(|t| t.icon_id));
+        put_u32(out, field(|t| t.name_id));
+        put_u32(out, field(|t| t.skill_level));
+        put_u32(out, field(|t| t.unknown5));
+        put_u32(out, field(|t| t.unknown6));
+        put_u32(out, field(|t| t.tooltip_id));
+        // (R) The per-model order: the model rows are stored in Pets.json Unknown8 order.
+        put_u32(out, order as u32 + 1);
+        out.push(u8::from(known));
     }
     let item_ids: Vec<i32> = [
         pet.equipment.head,
@@ -1914,15 +1972,36 @@ fn append_pet_record(out: &mut Vec<u8>, pet: &Pet) {
     for item_id in item_ids {
         put_u32(out, item_id as u32);
     }
-    put_count(out, 0); // Profile item rows are not part of this bounded slice.
+    let classes = model.map_or(&[][..], |m| m.item_classes.as_slice());
+    put_count(out, classes.len());
+    for class in classes {
+        put_u32(out, class.key as u32);
+        put_u32(out, class.id as u32);
+        put_u32(out, class.unknown as u32);
+    }
     put_string(out, &pet.name);
-    put_u32(out, 0);
-    put_u32(out, 0);
-    put_string(out, "");
-    put_u32(out, 0);
-    out.push(0);
-    put_u32(out, 0);
-    out.push(0);
+    put_u32(out, item.map_or(0, |item| item.name_id) as u32);
+    let tint = pet
+        .tint
+        .or_else(|| model.and_then(|m| m.default_tint_id))
+        .or_else(|| species_icon.map(|icon| icon.tint_id))
+        .unwrap_or(0);
+    put_u32(out, tint as u32);
+    // (R) +0x108 resolves through sub_7961D0; the model's default tint alias fills it.
+    put_string(
+        out,
+        model
+            .and_then(|m| m.default_tint_alias.as_deref())
+            .unwrap_or(""),
+    );
+    let image_set = item
+        .and_then(|item| item.image_set_id)
+        .or_else(|| species_icon.map(|icon| icon.image_set_id))
+        .unwrap_or(0);
+    put_u32(out, image_set as u32);
+    out.push(u8::from(model.is_some_and(|m| m.vanity)));
+    put_u32(out, 0); // (R) Attachment item group: no source.
+    out.push(0); // Tutorial pet flag.
     for trick_id in pet.favorite_tricks {
         put_u32(out, trick_id.unwrap_or(0));
     }

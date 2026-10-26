@@ -27,6 +27,15 @@ impl InventoryFixture {
 
     /// `(instance id, definition id, count)` rows; each distinct definition gets a minimal row.
     pub fn with_items(rows: &[(i32, i32, u32)]) -> Self {
+        let tinted: Vec<_> = rows
+            .iter()
+            .map(|&(id, def, count)| (id, def, count, 0))
+            .collect();
+        Self::with_tinted_items(&tinted)
+    }
+
+    /// `(instance id, definition id, count, tint)` rows (T456: a tinted adoption item).
+    pub fn with_tinted_items(rows: &[(i32, i32, u32, i32)]) -> Self {
         let sequence = SEQUENCE.fetch_add(1, Ordering::Relaxed);
         let directory = std::env::temp_dir().join(format!(
             "osfr-pets-inventory-{}-{sequence}",
@@ -37,7 +46,10 @@ impl InventoryFixture {
             coins: 0,
             items: rows
                 .iter()
-                .map(|&(id, definition_id, count)| item(id, definition_id, count))
+                .map(|&(id, definition_id, count, tint)| InventoryItem {
+                    tint,
+                    ..item(id, definition_id, count)
+                })
                 .collect(),
             equipment: Vec::<EquippedItem>::new(),
             next_instance_id: None,

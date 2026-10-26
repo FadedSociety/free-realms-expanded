@@ -145,14 +145,13 @@ fn an_owned_pet_summons_one_server_actor_and_the_serializer_dismiss_removes_it()
     assert!(actor_packet(&summon_wire.shared, actor));
     // Actor creation precedes activation: the client resolves the actor as soon
     // as PetActive arrives.
+    // T456: the owner's replies end with 53/9 then the roster (53/5).
     assert_eq!(
-        summon_wire.private[..summon_wire.private.len() - 1],
+        summon_wire.private[..summon_wire.private.len() - 2],
         summon_wire.shared
     );
-    let active = summon_wire
-        .private
-        .last()
-        .expect("activation follows the actor");
+    let active = &summon_wire.private[summon_wire.private.len() - 2]; // then the roster (T456)
+    assert_eq!(&summon_wire.private.last().unwrap()[..3], [53, 0, 5]);
     assert_eq!(&active[..3], [53, 0, 9]);
     assert_eq!(&active[3..7], &pet_id.to_le_bytes());
     assert_eq!(&active[7..15], &actor.to_le_bytes());
@@ -592,9 +591,15 @@ fn roster_reload_preserves_ownership_and_the_client_list_reports_no_active_actor
     assert_eq!(keys, vec![pet_id], "one list key per pet");
     assert_eq!(pets.len(), 1, "one owned pet");
     assert_eq!(pets[0].id, pet_id, "record id");
-    assert_eq!(pets[0].species_id, 652);
+    assert_ne!(
+        pets[0].icon, 652,
+        "+0x08 is the model icon, not the species id (T456)"
+    );
     assert_eq!(pets[0].name, "");
-    assert_eq!(pets[0].tricks, vec![1]);
+    assert!(
+        pets[0].tricks.contains(&1),
+        "a learned trick stays listed (T456)"
+    );
     assert_eq!(active, 0);
     assert_eq!(actor, 0);
 }
@@ -613,34 +618,38 @@ fn decode_pet_list(bytes: &[u8]) -> (Vec<u32>, Vec<DecodedPet>, u32, u64) {
         keys.push(at.u32());
         let mut pet = DecodedPet {
             id: at.u32(),
-            species_id: 0,
+            icon: 0,
             name: String::new(),
             tricks: Vec::new(),
             items: Vec::new(),
             favorites: Vec::new(),
             utilities: Vec::new(),
         };
-        assert_eq!(at.u8(), 0, "unknown record flag at +0x04");
-        pet.species_id = at.u32();
+        at.u8(); // T456: +0x04 sex (the model's Models.txt GENDER (R))
+        pet.icon = at.u32(); // +0x08 icon id
         for _ in 0..4 {
             assert!(at.f32().is_finite(), "need value");
         }
-        assert_eq!(at.u8(), 0, "unknown record flag at +0x30");
+        at.u8(); // +0x30 members-only
         for _ in 0..at.u32() {
-            pet.tricks.push(at.u32());
+            let key = at.u32();
             for _ in 0..8 {
                 at.u32();
             }
-            assert_eq!(at.u8(), 1, "known trick flag");
+            if at.u8() == 1 {
+                pet.tricks.push(key); // known tricks only
+            }
         }
         for _ in 0..at.u32() {
             pet.items.push(at.u32());
         }
-        assert_eq!(at.u32(), 0, "profile item rows");
+        for _ in 0..at.u32() {
+            at.take(12); // T456: item-class rows (key, id, unknown)
+        }
         pet.name = at.string();
         at.u32();
         at.u32();
-        assert_eq!(at.string(), "", "second string");
+        at.string(); // +0x108 tint alias
         at.u32();
         assert_eq!(at.u8(), 0);
         at.u32();
@@ -661,7 +670,7 @@ fn decode_pet_list(bytes: &[u8]) -> (Vec<u32>, Vec<DecodedPet>, u32, u64) {
 
 struct DecodedPet {
     id: u32,
-    species_id: u32,
+    icon: u32,
     name: String,
     tricks: Vec<u32>,
     items: Vec<u32>,
