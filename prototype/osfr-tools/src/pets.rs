@@ -148,12 +148,16 @@ pub struct PetItem {
     pub item_id: i32,
     pub model_id: i32,
     pub name_id: i32,
+    /// The client locale text for `name_id`. An item-only pet has no wiki species row, so this is
+    /// its display name and AddNpc name (the 53/5 record still carries `name_id`).
+    pub name: String,
     #[serde(default)]
     pub image_set_id: Option<i32>,
     #[serde(default)]
     pub icon_tint_id: Option<i32>,
     #[serde(default)]
     pub tint_alias: Option<String>,
+    /// The client item's texture alias for this pet model; used when no wiki species row has one.
     #[serde(default)]
     pub texture_alias: Option<String>,
     #[serde(default)]
@@ -406,8 +410,9 @@ impl PetContent {
         self.model(model_id).is_some_and(|model| model.vanity)
     }
 
-    /// The client model id for a pet ADR; where two ids (male and female) share an ADR, the
-    /// lower one (R). Unknown ADRs stay zero.
+    /// The client model id for a pet ADR. Seven ADRs have two or three client ids (male/female or
+    /// colour variants) and the item and species rows name only the ADR, so the lower id is the
+    /// deterministic choice (R); no client field distinguishes the variants. Unknown ADRs stay zero.
     pub fn model_id(&self, adr: &str) -> i32 {
         self.models
             .iter()
@@ -529,6 +534,9 @@ impl PetContent {
         let mut pet_item_ids = BTreeSet::new();
         for item in &self.items {
             if item.item_id <= 0
+                || item.name.is_empty()
+                || item.name.chars().count() > 64
+                || item.name.chars().any(char::is_control)
                 || item.src.is_empty()
                 || !pet_item_ids.insert(item.item_id)
                 || !model_ids.contains(&item.model_id)
@@ -619,6 +627,8 @@ pub struct Pet {
     pub model: String,
     pub name: String,
     pub needs: PetNeeds,
+    /// A set, not the client's order: the model's `tricks` rows keep the Pets.json `Unknown8` order
+    /// for the 53/5 record, and this holds learned ids that model row does not list (old saves).
     pub learned_tricks: BTreeSet<u32>,
     pub favorite_tricks: [Option<u32>; 4],
     pub equipment: PetEquipment,
@@ -951,25 +961,43 @@ impl PetService {
         self.ui_mode
     }
 
-    fn texture_alias(&self, species_id: u32) -> String {
-        self.content
-            .species
-            .iter()
-            .find(|species| species.species_id == Some(species_id))
-            .and_then(|species| species.texture_alias.clone())
-            .unwrap_or_default()
-    }
-
-    fn display_name(&self, pet: &Pet) -> String {
-        if !pet.name.is_empty() {
-            return pet.name.clone();
-        }
+    /// The wiki species texture alias, else the adoption item's (an item-only pet has no species row).
+    fn texture_alias(&self, pet: &Pet) -> String {
         self.content
             .species
             .iter()
             .find(|species| species.species_id == Some(pet.species_id))
-            .map(|species| species.name.clone())
+            .and_then(|species| species.texture_alias.clone())
+            .or_else(|| {
+                self.adoption_item(pet)
+                    .and_then(|item| item.texture_alias.clone())
+            })
             .unwrap_or_default()
+    }
+
+    /// The chosen name, else the wiki species name, else the adoption item's client name. An
+    /// item-only species id is the item id, so the item row is the only name source it has.
+    fn display_name(&self, pet: &Pet) -> String {
+        if !pet.name.is_empty() {
+            return pet.name.clone();
+        }
+        if let Some(species) = self
+            .content
+            .species
+            .iter()
+            .find(|species| species.species_id == Some(pet.species_id))
+        {
+            return species.name.clone();
+        }
+        self.adoption_item(pet)
+            .map(|item| item.name.clone())
+            .unwrap_or_default()
+    }
+
+    /// The item definition this pet was adopted from, when the save records one.
+    fn adoption_item(&self, pet: &Pet) -> Option<&PetItem> {
+        pet.adoption_item_definition_id
+            .and_then(|id| self.content.item(id))
     }
 
     /// (R) One active pet per owner; the actor id never comes from the client.
@@ -990,7 +1018,7 @@ impl PetService {
             species_id: pet.species_id,
             model: pet.model.clone(),
             model_id: self.content.model_id(&pet.model),
-            texture_alias: self.texture_alias(pet.species_id),
+            texture_alias: self.texture_alias(pet),
             name: self.display_name(pet),
             speed: self.content.movement_speed.speed,
             position: active.position,
@@ -1147,11 +1175,16 @@ impl PetService {
             return Err(invalid("invalid pet summon identity or position"));
         }
         // (R) The adapter supplies the actor id; this prototype starts it at the owner's position.
-        let (species_id, model, name) = {
+        let (species_id, model, name, texture_alias) = {
             let pet = self
                 .pet(pet_id)
                 .ok_or_else(|| invalid("pet is not owned"))?;
-            (pet.species_id, pet.model.clone(), self.display_name(pet))
+            (
+                pet.species_id,
+                pet.model.clone(),
+                self.display_name(pet),
+                self.texture_alias(pet),
+            )
         };
         self.advance_time(now)?;
         let mut broadcasts = Vec::new();
@@ -1186,7 +1219,7 @@ impl PetService {
             species_id,
             model,
             model_id,
-            texture_alias: self.texture_alias(species_id),
+            texture_alias,
             name,
             speed: self.content.movement_speed.speed,
             // F762: the AddNpc places the pet where its pose is (beside the owner), not on them.

@@ -51,9 +51,9 @@ use vendor_fixture::{SEEDED_ITEM, VendorFixture};
 /// Gloria's shipped vendor record: three type-2 Pet Pals with coin prices (bound pets since T454).
 const GLORIA: u64 = 9_500_000_246;
 const GLORIA_NPC_FILE: &str = "cobblestone_village.json";
-/// A type-2 pet item no model resolves (T454: `scripts/pets_import.py` leaves only 17543 and 30589
-/// unbound; Gloria's Pet Pals 7885, 10387 and 17554 are now adoptable pets the shop sells).
-const UNBOUND_PET: i32 = 17_543;
+/// A fixture-only Type-2 row: since T454 every client Type-2 item (528) is an adoption item, so the
+/// unbound case is defined in the fixture copy by hand (see `unbound_pet_definition`).
+const UNBOUND_PET: i32 = 1_999_999_002;
 /// Fritz, one of the 16 adoption item ids `pets.json` binds.
 const BOUND_PET: i32 = 4_324;
 /// Skeletal Dragon (`mounts.json` mount 715, item 10,530).
@@ -145,6 +145,37 @@ fn assert_unbound_pet_item_is_still_unbound() {
     );
 }
 
+/// A readable Type-2 definition row, in the layout `Inventory::presentation` reads: the id at +0,
+/// name id at +4, icon at +12, the model and texture counted strings, then GenderUsage and Type.
+/// The loader requires the first word to be the definition id.
+fn unbound_pet_definition() -> Vec<u8> {
+    let mut bytes = vec![0u8; 46];
+    bytes[0..4].copy_from_slice(&UNBOUND_PET.to_le_bytes());
+    for _ in 0..2 {
+        bytes.extend(0u32.to_le_bytes()); // empty model and texture strings
+    }
+    let mut fields = [0u8; 48];
+    fields[4..8].copy_from_slice(&2i32.to_le_bytes()); // Type 2: a pet adoption item
+    bytes.extend(fields);
+    bytes.extend(0u32.to_le_bytes()); // empty tint alias
+    bytes
+}
+
+/// Add the fixture-only type-2 row and price it in the fixture's own vendor copy.
+fn stock_unbound_pet(fixture: &VendorFixture) {
+    fixture.define_item(UNBOUND_PET, &unbound_pet_definition());
+    fixture.stock_price_coins(&[(UNBOUND_PET, 10_000)]);
+    let inventory = Inventory::load(fixture.content(), None).expect("fixture inventory loads");
+    assert_eq!(
+        inventory
+            .presentation(UNBOUND_PET)
+            .expect("the synthetic row is readable")
+            .item_type,
+        2,
+        "the fixture-only row is a pet adoption item"
+    );
+}
+
 fn assert_unchanged(gateway: &Gateway, before: &Snapshot, label: &str) {
     assert_eq!(
         &gateway.snapshot(),
@@ -157,8 +188,8 @@ fn assert_unchanged(gateway: &Gateway, before: &Snapshot, label: &str) {
 fn an_unbound_pet_item_is_refused_through_the_real_165_4_buy() {
     assert_unbound_pet_item_is_still_unbound();
     let fixture = gloria_fixture("t529-a-165-4");
-    // No shipped vendor stocks an unbound pet item any more (T454), so this copy does.
-    fixture.stock_price_coins(&[(UNBOUND_PET, 10_000)]);
+    // No shipped vendor stocks an unbound pet item, so this copy defines and stocks one.
+    stock_unbound_pet(&fixture);
     let mut gateway = connect(&fixture, fixture.state(START_COINS, false));
     let replies = open_shop(&fixture, &mut gateway);
     assert!(
@@ -203,8 +234,8 @@ fn an_unbound_pet_item_is_refused_through_the_real_165_4_buy() {
 fn an_unbound_pet_item_is_refused_through_the_real_66_43_buy() {
     assert_unbound_pet_item_is_still_unbound();
     let fixture = gloria_fixture("t529-a-66-43");
-    // No shipped vendor stocks an unbound pet item any more (T454), so this copy does.
-    fixture.stock_price_coins(&[(UNBOUND_PET, 10_000)]);
+    // No shipped vendor stocks an unbound pet item, so this copy defines and stocks one.
+    stock_unbound_pet(&fixture);
     let mut gateway = connect(&fixture, fixture.state(START_COINS, false));
     open_shop(&fixture, &mut gateway);
 

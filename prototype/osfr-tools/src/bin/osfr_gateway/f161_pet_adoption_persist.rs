@@ -12,6 +12,11 @@ pub(crate) mod pet_wire;
 /// Bundled `pets.json`: species 1000015 (Char) is adopted from item 70352.
 pub(crate) const ADOPTION_ITEM: i32 = 70_352;
 const PET_SPECIES: u32 = 1_000_015;
+/// The Wolf item (15493) with its model 3284: a Type-2 item no wiki species row lists, so its species
+/// id is the item id and its name and texture come from the item row. It is defined in this pack's
+/// `inventory.json` (Gloria's Crab 7885 is not), so the real gateway can grant and adopt it.
+const WOLF_ITEM: i32 = 15_493;
+const WOLF_MODEL: i32 = 3_284;
 
 /// A selected, world-loaded session, as `Session::new` + the handshake leave it.
 fn world_loaded(options: &Options, id: u32) -> Scene {
@@ -23,6 +28,10 @@ fn world_loaded(options: &Options, id: u32) -> Scene {
 
 /// Add one owned adoption certificate to the live inventory, as a purchase or reward would.
 pub(crate) fn grant_certificate(session: &mut Session) {
+    grant_certificate_for(session, ADOPTION_ITEM);
+}
+
+fn grant_certificate_for(session: &mut Session, definition: i32) {
     let mut state = session
         .gateway
         .inventory_state()
@@ -30,7 +39,7 @@ pub(crate) fn grant_certificate(session: &mut Session) {
         .clone();
     let id = state.items.iter().map(|item| item.id).max().unwrap_or(0) + 1_000;
     state.items.push(InventoryItem {
-        definition_id: ADOPTION_ITEM,
+        definition_id: definition,
         tint: 0,
         id,
         count: 1,
@@ -45,13 +54,17 @@ pub(crate) fn grant_certificate(session: &mut Session) {
     session.gateway.adopt_trade_inventory(state).unwrap();
 }
 
-fn owns_certificate(session: &Session) -> bool {
+fn owns_definition(session: &Session, definition: i32) -> bool {
     session.gateway.inventory_state().is_some_and(|state| {
         state
             .items
             .iter()
-            .any(|item| item.definition_id == ADOPTION_ITEM)
+            .any(|item| item.definition_id == definition)
     })
+}
+
+fn owns_certificate(session: &Session) -> bool {
+    owns_definition(session, ADOPTION_ITEM)
 }
 
 /// A pose that the movement reader accepts, so the certificate reaches disk before adoption.
@@ -154,6 +167,81 @@ fn a_spent_certificate_and_its_pet_survive_a_restart_together() {
         scene.session.gateway.pet_view().map(|pet| pet.species_id),
         Some(PET_SPECIES)
     );
+}
+
+/// T454/F759: an item-only pet (the Wolf item) has no wiki species row, so its species id is the
+/// item id and its display name and texture come from the item row. The real gateway path must
+/// adopt it, persist the species and its model tricks, and still name it after a reconnect.
+#[test]
+fn an_item_only_pet_pal_survives_a_restart_with_its_name() {
+    if !bin_test_target("f161") {
+        return;
+    }
+    let scratch = Scratch::new("f161-wolf");
+    let state = scratch.state();
+    let options = test_support::options(state.clone());
+    let mut scene = world_loaded(&options, 641);
+    grant_certificate_for(&mut scene.session, WOLF_ITEM);
+    let movement = pose(&scene.session);
+    scene
+        .send(&options, &movement, 10_000)
+        .expect("the pose commits");
+    assert!(carries_certificate(&document(&state), WOLF_ITEM));
+
+    scene
+        .send(
+            &options,
+            &pet_wire::summon_by_item(WOLF_ITEM as u32, 0),
+            11_000,
+        )
+        .expect("adoption commits");
+    assert!(
+        !owns_definition(&scene.session, WOLF_ITEM),
+        "the Wolf item is spent"
+    );
+    let adopted = scene
+        .session
+        .gateway
+        .pet_view()
+        .expect("the adopted pet is out");
+    assert_eq!(adopted.species_id, WOLF_ITEM as u32);
+    assert_eq!(adopted.model_id, WOLF_MODEL);
+    assert_eq!(adopted.name, "Wolf");
+    assert_eq!(adopted.texture_alias, "base");
+
+    let saved = document(&state);
+    let roster = saved["pets"]["pets"]
+        .as_array()
+        .expect("the roster is in the same document");
+    assert_eq!(roster.len(), 1);
+    assert_eq!(roster[0]["species_id"], serde_json::json!(WOLF_ITEM));
+    assert_eq!(
+        roster[0]["adoption_item_definition_id"],
+        serde_json::json!(WOLF_ITEM)
+    );
+    assert_eq!(
+        roster[0]["learned_tricks"],
+        serde_json::json!([2057, 2058, 2059]),
+        "the model's known tricks persist with the pet"
+    );
+    let pet_id = roster[0]["id"].as_u64().unwrap() as u32;
+
+    drop(scene);
+    let mut scene = world_loaded(&options, 642);
+    scene
+        .send(&options, &pet_wire::summon(pet_id), 20_000)
+        .expect("the restored roster accepts a summon");
+    let restored = scene
+        .session
+        .gateway
+        .pet_view()
+        .expect("the restored pet is out");
+    assert_eq!(restored.species_id, WOLF_ITEM as u32);
+    assert_eq!(
+        restored.name, "Wolf",
+        "the saved adoption item names the pet after the reconnect"
+    );
+    assert_eq!(restored.texture_alias, "base");
 }
 
 /// S17 (17c): the roster rides in the one character document. The adoption's file inventory and
