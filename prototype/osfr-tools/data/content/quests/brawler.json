@@ -1571,13 +1571,48 @@
     },
     {
       "id": 3030027,
+      "job": 43,
+      "min_level": 5,
       "title_string_id": 140995,
       "giver_npc_id": 9000000009,
-      "prerequisite_quest_ids": [
-        3030026
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000415,
+          "text_string_id": 141002,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "locale 141002 'Talk to Nurble at the Robgoblin Camp.' and 140996 (the description); Nurble is 9000000415 (npcs/wilds.json, Legacy spawn FabledRealms.lua:106, NameId 20518 = 'Nurble'). quest-lines/quests.json q3030027, objective-specs-fixed.json (objcheck, settled): one Talk target, no count."
+            },
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md row 91: Nurble is the hand-in for Brawler: IOU!, and locale 140998 ('has sought repayment from Nurble') is the completion line, so the Talk is the last step and Nurble turns the quest in; locale 140997 is the end text."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T724: objective id 1 is a server binding, not a recovered retail objective id."
+            }
+          ]
+        }
       ],
-      "objectives": [],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "43": 25
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T724: the retail payout is unknown (quest-lines/quests.json q3030027 rewards [] and no client reward line; the silver-dust payment in locale 140994 is narrative). Five coins and 25 Brawler (profile 43) XP follow the T252 small-quest fallback of the other enabled Brawler quests, paid once by the quest grant key."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1597,29 +1632,21 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) source explicitly says after row M7; mapped that page label to the preceding batch content key"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T724: the guide's predecessor (M7 Missing Money, 3030026) and its chain 3030023-3030026 stay disabled, so keeping the prerequisite would make this quest unreachable (tests/enabled_quest_reachability.rs). The prerequisite is dropped and replaced by the band gate: job 43 with min_level 5, because the band opens at 'Brawler: Achieve Level 5' (M2) and the guide names the band level 5 to 10. A playtest entry, not the retail order; restore [3030026] when that chain is built."
         }
       ],
       "description_string_id": 140996,
       "intro_text_string_id": 140994,
       "end_text_string_id": 140997,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3030028,

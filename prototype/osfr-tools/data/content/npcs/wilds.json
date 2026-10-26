@@ -30655,8 +30655,24 @@
       "quests_given_text": [
         "Brawler: One Man's Junk..., Brawler: Curious Key; hand-in for Brawler: IOU! (Andrew's IOU, 207172090, 1788405370); cleans the book in Sticky Spell Book (1701507967)."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3030027,
+          "title": "Brawler: IOU! (wiki: \"IOU\")",
+          "title_string_id": 140995,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/NPCs/NPCs - Wilds.md row 91 and notes/Build Guides/Content/Jobs/Brawler.md row M8: Brawler: IOU! is handed in to Nurble at the Robgoblin Camp; locale 141002 'Talk to Nurble at the Robgoblin Camp.' and 140998 ('has sought repayment from Nurble') close the quest."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T724: M8 completes when the player talks to Nurble, so the turn-in NPC is Nurble rather than the giver Andrew; M9 One Man's Junk is then given by Nurble."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "Brawler: IOU! (3030027) is handed in here; the guide isolates no other hand-in for this NPC.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [

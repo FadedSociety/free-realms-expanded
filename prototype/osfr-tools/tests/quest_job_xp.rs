@@ -993,7 +993,7 @@ fn content_overflow_is_rejected_at_load() {
 fn configured_job_xp_and_job_gates_match_the_task_table() {
     let content = content_dir();
     // (file, quest id, giver, prerequisites, reward coins, job gate, profile, XP)
-    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 24] = [
+    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 25] = [
         (
             "adventurer.json",
             INTRODUCE_YOURSELF,
@@ -1223,6 +1223,18 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             BRAWLER,
             25,
         ),
+        // T724: Brawler: IOU! (M8), a playtest entry behind the band gate (min_level 5 replaces the
+        // disabled 3030026 prerequisite); the guide's reward cell is unknown, so the small-quest rung.
+        (
+            "brawler.json",
+            3_030_027,
+            9_000_000_009,
+            &[],
+            5,
+            Some(BRAWLER),
+            BRAWLER,
+            25,
+        ),
         // T334: the second Miner chapter, after T300's playable 3100002. 5 coins
         // and 15 Miner XP mirror the first rung; the guide's reward cell is unknown
         // and no item is granted.
@@ -1268,6 +1280,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_000_033 | 3_000_034 => "(R) T377:",
             3_030_004 | 3_030_005 => "(R) T252:",
             3_030_009 => "(R) T331:",
+            3_030_027 => "(R) T724:",
             3_100_003 => "(R) T334:",
             3_100_004 => "(R) T411:",
             _ => "",
