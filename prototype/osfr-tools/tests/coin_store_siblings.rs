@@ -8,9 +8,14 @@
 //! a data-configured buy-back window, buy-back price equal to the sale price, gifts and orders
 //! refused, Station Cash and membership lists empty.
 //!
-//! The fixture and packet helpers are copied from `vendor_sell.rs`; some go unused here.
+//! The fixture is copied from `vendor_sell.rs`; the packet builders and the 165/6 parser are the
+//! shared `tests/common/gateway_vendor.rs` ones.
 #![allow(dead_code)]
 
+use gateway_vendor::{
+    NOW, buy_back_packet, completions, count_definition, inner_packets, inventory_of, sell_packet,
+    send, wrap,
+};
 use osfr_tools::{
     account_store::AccountRole,
     chat,
@@ -30,6 +35,8 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "common/gateway_vendor.rs"]
+mod gateway_vendor;
 #[path = "common/item_catalogue.rs"]
 #[allow(dead_code)]
 mod item_catalogue;
@@ -66,79 +73,6 @@ fn inventory_content() -> PathBuf {
         .unwrap_or_else(|| {
             PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab/references/rust-gameplay")
         })
-}
-
-fn sell_packet(merchant: u64, instance: i32, quantity: u32) -> Vec<u8> {
-    let mut packet = vec![165, 0, 5, 0];
-    packet.extend(merchant.to_le_bytes());
-    packet.extend(instance.to_le_bytes());
-    packet.extend(quantity.to_le_bytes());
-    packet
-}
-
-fn buy_packet(merchant: u64, transaction: u32, item: i32, quantity: u32) -> Vec<u8> {
-    let mut packet = vec![165, 0, 4, 0];
-    packet.extend(merchant.to_le_bytes());
-    packet.extend(transaction.to_le_bytes());
-    packet.extend(item.to_le_bytes());
-    packet.extend(0i32.to_le_bytes()); // tint
-    packet.extend(quantity.to_le_bytes()); // quantity (client writer 0x00c75ed0)
-    packet
-}
-
-/// The 165/6 record as `00c74ef0`/`00c71f30` read it. Field names beyond the result are (R).
-#[derive(Debug, PartialEq)]
-struct Completion {
-    result: u32,
-    leading_item: i32,
-    kind: u32,
-    merchant: u64,
-    transaction: u32,
-    timestamp: u64,
-    definition: i32,
-    tint: i32,
-    quantity: u32,
-    price: u32,
-    remaining: u32,
-}
-
-fn parse_completion(packet: &[u8]) -> Completion {
-    // header 4 + result 4 + item 4 + record (4+8+4+8+4+4+4+4+4) = 56: the client reader
-    // overruns on anything shorter, which is how the earlier 52-byte frame failed.
-    assert_eq!(packet.len(), 56, "completion must match the reader size");
-    assert_eq!(&packet[..4], &[165, 0, 6, 0]);
-    let u32_at = |at: usize| u32::from_le_bytes(packet[at..at + 4].try_into().unwrap());
-    let u64_at = |at: usize| u64::from_le_bytes(packet[at..at + 8].try_into().unwrap());
-    Completion {
-        result: u32_at(4),
-        leading_item: u32_at(8) as i32,
-        kind: u32_at(12),
-        merchant: u64_at(16),
-        transaction: u32_at(24),
-        timestamp: u64_at(28),
-        definition: u32_at(36) as i32,
-        tint: u32_at(40) as i32,
-        quantity: u32_at(44),
-        price: u32_at(48),
-        remaining: u32_at(52),
-    }
-}
-
-fn completions(replies: &[Vec<u8>]) -> Vec<Completion> {
-    replies
-        .iter()
-        .filter(|packet| packet.starts_with(&[165, 0, 6, 0]))
-        .map(|packet| parse_completion(packet))
-        .collect()
-}
-
-fn count_definition(state: &InventoryState, definition_id: i32) -> u32 {
-    state
-        .items
-        .iter()
-        .filter(|item| item.definition_id == definition_id)
-        .map(|item| item.count)
-        .sum()
 }
 
 /// Instance ids whose stack differs between two states (added, removed or modified).
@@ -236,19 +170,11 @@ impl Counter {
 // Routed fixture (the real gameplay.rs path)
 // ---------------------------------------------------------------------------------------------
 
-const NOW: u64 = 10_000;
 const NPC: u64 = 700;
 const STACK_MANY: i32 = 900_001; // definition 75060 x3, sell 375 each
 const STACK_NO_SALE: i32 = 900_003; // definition 1180
 const STACK_ONE: i32 = 900_004; // definition 8 x1, sell 7
 static NEXT: AtomicU64 = AtomicU64::new(0);
-
-fn wrap(inner: &[u8]) -> Vec<u8> {
-    let mut bytes = vec![5, 0, 1];
-    bytes.extend((inner.len() as u32).to_le_bytes());
-    bytes.extend(inner);
-    bytes
-}
 
 fn bundle(messages: &[Vec<u8>]) -> Vec<u8> {
     let mut bytes = vec![0, 25];
@@ -560,29 +486,9 @@ impl Fixture {
     }
 }
 
-/// Tunnel payloads of every reply, with the 7-byte application wrapper removed.
-fn inner_packets(outcome: &GatewayOutcome) -> Vec<Vec<u8>> {
-    outcome.replies.iter().map(|p| p[7..].to_vec()).collect()
-}
-
-fn inventory_of(gateway: &Gateway) -> InventoryState {
-    gateway.snapshot().gameplay.unwrap().inventory
-}
-
-fn send(gateway: &mut Gateway, packet: &[u8]) -> Vec<Vec<u8>> {
-    inner_packets(&gateway.handle_at(&wrap(packet), NOW).unwrap())
-}
-
 // ---------------------------------------------------------------------------------------------
 // Packet builders and readers for the sibling requests
 // ---------------------------------------------------------------------------------------------
-
-fn buy_back_packet(transaction: u32, context: u32) -> Vec<u8> {
-    let mut packet = vec![165, 0, 12, 0];
-    packet.extend(transaction.to_le_bytes());
-    packet.extend(context.to_le_bytes());
-    packet
-}
 
 /// 165/13 as the client reads it (`00c71e40`): three dwords after the header.
 fn parse_buy_back(packet: &[u8]) -> (u32, u32, u32) {

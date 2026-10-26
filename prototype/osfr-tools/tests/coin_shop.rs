@@ -1,9 +1,13 @@
+#[allow(dead_code)]
+#[path = "common/gateway_vendor.rs"]
+mod gateway_vendor;
 #[path = "common/resale.rs"]
 mod resale;
 
+use gateway_vendor::{coin_buy_packet, count_definition};
 use osfr_tools::{
     coin_shop::{self, CoinShop, StoreCatalogue},
-    inventory::{Inventory, InventoryState},
+    inventory::Inventory,
     soe::{self, Packet, RELIABLE_DATA, ReliableReceiver},
     station_cash,
 };
@@ -42,15 +46,6 @@ fn shop(directory: &Path, inventory: Inventory, capacity: usize) -> CoinShop {
     .expect("shop state loads")
 }
 
-fn count_definition(state: &InventoryState, definition_id: i32) -> u32 {
-    state
-        .items
-        .iter()
-        .filter(|item| item.definition_id == definition_id)
-        .map(|item| item.count)
-        .sum()
-}
-
 fn merchant_status(result: &coin_shop::CoinShopOutcome) -> u32 {
     let packet = result.replies.last().expect("vendor reply exists");
     assert_eq!(packet.len(), 56);
@@ -73,12 +68,7 @@ fn buy_debits_exact_cost_and_retry_is_idempotent() {
     );
     let original_count = count_definition(shop.inventory().state(), 8);
 
-    let mut request = vec![165, 0, 4, 0];
-    request.extend(0u64.to_le_bytes());
-    request.extend(71001u32.to_le_bytes());
-    request.extend(8i32.to_le_bytes());
-    request.extend(0i32.to_le_bytes()); // tint
-    request.extend(1u32.to_le_bytes()); // quantity (client writer 0x00c75ed0)
+    let request = coin_buy_packet(0, 71001, 8, 1);
     // The gateway's session receiver limits (`osfr-gateway.rs`).
     let mut receiver =
         ReliableReceiver::new(0, 1024, soe::MAX_LOGICAL_MESSAGE, 2 * 1024 * 1024).unwrap();
