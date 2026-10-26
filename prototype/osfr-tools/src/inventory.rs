@@ -649,6 +649,15 @@ impl Inventory {
         })
     }
 
+    /// T485: a definition's `(item type, slot, class)` for the pet utility check, the slot and
+    /// class as the row records them (the client's 35/34 row carries class at +44 and slot at
+    /// +52, after the 12-byte header). `None` when the row is unknown or cannot carry its type.
+    pub fn kit_facts(&self, definition_id: i32) -> Option<(i32, i32, i32)> {
+        let definition = self.content.definitions.get(&definition_id)?;
+        let item_type = self.presentation(definition_id).ok()?.item_type;
+        Some((item_type, definition.slot, definition.class_id))
+    }
+
     pub fn profile_equipment(&self, profile_id: i32) -> Vec<u8> {
         let visible = self.client_visible_state();
         let entries: Vec<_> = visible

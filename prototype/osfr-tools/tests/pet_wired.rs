@@ -335,6 +335,16 @@ fn a_walking_owner_moves_the_summoned_pet_for_viewers_without_a_save() {
 }
 
 #[test]
+fn the_world_tick_shows_a_summoned_pets_live_needs_without_a_save() {
+    let save = Save::new();
+    let mut game = game(&save.path);
+    game.handle_in_world(&summon(1), &who(), NOW).unwrap();
+    let out = game.pet_tick(&who(), NOW + 100).expect("a pet is out");
+    assert!(has(&out.replies, 53, 3), "T485 live 53/3 needs");
+    assert!(!out.changed, "live needs never mark a save");
+}
+
+#[test]
 fn no_pet_means_no_tick_and_a_dismissed_pet_sends_no_moves() {
     let save = Save::new();
     let mut game = game(&save.path);

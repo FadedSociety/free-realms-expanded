@@ -791,6 +791,10 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     ));
     result.push(("pets", vec![53, 0, 24, 2, 0, 0, 0]));
     result.push(("pets", [vec![53, 0, 32], vec![0xff; 8]].concat()));
+    // T485: utility fit/remove, feed and water.
+    result.push(("pets", [vec![53, 0, 16], vec![0xff; 13]].concat()));
+    result.push(("pets", [vec![53, 0, 19], vec![0xff; 8]].concat()));
+    result.push(("pets", vec![53, 0, 28, 0xff]));
     result.push(("gameplay.handle_in_world", vec![53, 0, 0xff, 0xff]));
     result.push(("combat", words(36, 10, &[1, 0, 0, u32::MAX, u32::MAX])));
     result.push(("combat", words(36, 12, &[u32::MAX])));

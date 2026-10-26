@@ -36,6 +36,20 @@ impl InventoryFixture {
 
     /// `(instance id, definition id, count, tint)` rows (T456: a tinted adoption item).
     pub fn with_tinted_items(rows: &[(i32, i32, u32, i32)]) -> Self {
+        Self::build(rows, &[])
+    }
+
+    /// T485: `with_items`, plus pet kit definitions `(definition id, slot, class)` whose rows
+    /// carry item type 4 where `Inventory::presentation` reads it.
+    pub fn with_kit_items(rows: &[(i32, i32, u32)], kit: &[(i32, i32, i32)]) -> Self {
+        let tinted: Vec<_> = rows
+            .iter()
+            .map(|&(id, def, count)| (id, def, count, 0))
+            .collect();
+        Self::build(&tinted, kit)
+    }
+
+    fn build(rows: &[(i32, i32, u32, i32)], kit: &[(i32, i32, i32)]) -> Self {
         let sequence = SEQUENCE.fetch_add(1, Ordering::Relaxed);
         let directory = std::env::temp_dir().join(format!(
             "osfr-pets-inventory-{}-{sequence}",
@@ -82,11 +96,20 @@ impl InventoryFixture {
         let definitions: Vec<_> = ids
             .into_iter()
             .map(|id| {
-                let bytes = [id.to_le_bytes(), 8i32.to_le_bytes()].concat();
+                let (bytes, slot, class) = match kit.iter().find(|row| row.0 == id) {
+                    // Prefix (46 bytes), two empty model strings, GenderUsage, then Type 4.
+                    Some(&(_, slot, class)) => {
+                        let mut bytes = vec![0; 62];
+                        bytes[..4].copy_from_slice(&id.to_le_bytes());
+                        bytes[58..].copy_from_slice(&4i32.to_le_bytes());
+                        (bytes, slot, class)
+                    }
+                    None => ([id.to_le_bytes(), 8i32.to_le_bytes()].concat(), 0, 1),
+                };
                 json!({
                     "id": id,
-                    "slot": 0,
-                    "class_id": 1,
+                    "slot": slot,
+                    "class_id": class,
                     "default_tint": 0,
                     "max_stack": 20,
                     "model": "",

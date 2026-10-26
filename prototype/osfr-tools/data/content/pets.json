@@ -2993,18 +2993,18 @@
       "source": [
         {
           "kind": "reference",
-          "evidence": "FreeRealms-Legacy data only: src/Resources/ClientItemDefinitions.json at 9e082025391177d5a33ee18c714ddd06b457a695 sha256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; item ids require client confirmation"
+          "evidence": "FreeRealms-Legacy src/Resources/ClientItemDefinitions.json at 9e082025391177d5a33ee18c714ddd06b457a695 sha256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025, row Id 1835: Type 4, Slot 205, Param1 6 (the utility slot), Param2 120 (the restore; foods run 50..400 on a scale not recovered)"
         },
         {
           "kind": "client",
-          "evidence": "notes/Build Guides/Gameplay/Pets.md care section and notes/Build Guides/Content/Jobs/Pet Trainer.md care item table: food, shampoo, conditioner are consumed"
+          "evidence": "notes/Build Guides/Gameplay/Pets.md care section: food, shampoo, conditioner are consumed"
         },
         {
           "kind": "reconstructed",
-          "evidence": "Per-item need restore amount and action binding are server policy (R); use 0-100 need scale"
+          "evidence": "Param2 is applied as need points on the 0-100 bar and clamps at the maximum (R)"
         }
       ],
-      "restore": 25,
+      "restore": 120,
       "consumes": true,
       "need": "food",
       "definition_id": 1835
@@ -42543,5 +42543,15 @@
     "warp_far_ms": 5000,
     "warp_climb_m": 6.0,
     "send_ms": 500
+  },
+  "care": {
+    "feed_effect_ms": 900,
+    "feed_end_ms": 6000,
+    "status_interval_ms": 1500,
+    "status_epsilon": 0.5,
+    "source": {
+      "kind": "reconstructed",
+      "evidence": "T485: feed apply and end delays after 53/20 begin, and the live 53/3 refresh gap and threshold, are server policy (R); the client sends 53/19 and waits for 53/20 kinds 1, 2 or 6 (00b5ce60)"
+    }
   }
 }

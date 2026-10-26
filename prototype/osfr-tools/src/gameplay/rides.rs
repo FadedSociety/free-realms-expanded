@@ -248,14 +248,15 @@ impl Gameplay {
         let busy = crate::pets::PetBusy { minigame_active };
         let pets = &mut self.pets;
         let inventory = &mut self.inventory;
-        let wire = pets.handle_with_inventory(
+        // Pet need clocks are whole seconds and care timers (T485) milliseconds; the pet service
+        // converts.
+        let wire = pets.handle_at_ms(
             inner,
             character.guid,
             character.position,
             inventory,
             busy,
-            // Pet need clocks are stored in seconds; the gateway passes milliseconds.
-            now_ms / 1_000,
+            now_ms,
         )?;
         Ok(wire.map(Self::pet_outcome))
     }
@@ -279,10 +280,14 @@ impl Gameplay {
     }
 
     /// T455: the world tick for a summoned pet (a still owner settles it); `None` without one.
+    /// T485: also its care timers and live needs; only a feed's apply step marks a save.
     pub fn pet_tick(&mut self, character: &CharacterState, now_ms: u64) -> Option<Outcome> {
         self.pets.active_pet_id()?;
         let mut out = Outcome::default();
         self.follow_pet(character, now_ms, &mut out);
+        let care = self.pets.care_tick(&mut self.inventory, now_ms);
+        out.changed |= care.changed;
+        out.replies.extend(care.private);
         Some(out)
     }
 
@@ -292,9 +297,12 @@ impl Gameplay {
             return Ok(Outcome::default());
         }
         let mut pets = self.pets.clone();
+        let feed_end = pets.care_end_packet();
         pets.rebase_clock(now_ms / 1_000);
         let transition = pets.dismiss(now_ms / 1_000)?;
         self.pets = pets;
-        Ok(Self::pet_outcome(self.pets.wire(transition)))
+        let mut out = Self::pet_outcome(self.pets.wire(transition));
+        out.replies.extend(feed_end);
+        Ok(out)
     }
 }

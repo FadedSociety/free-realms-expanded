@@ -33,6 +33,9 @@ impl Gateway {
             .as_mut()
             .and_then(|g| g.pet_tick(state, now_ms))
         {
+            // T485: a feed's apply step spends a food, so it is saved like any other change.
+            outcome.state_changed = result.changed;
+            outcome.gameplay_changed = result.changed;
             outcome.replies = result.replies.iter().map(|r| wrapped(r)).collect();
             outcome.nearby = result.nearby;
         }
