@@ -50,7 +50,7 @@ fn saved_position(options: &Options) -> [f32; 3] {
 }
 
 /// One 125 position update from `position`, facing +z.
-fn step(guid: u64, position: [f32; 3]) -> Vec<u8> {
+pub(crate) fn step(guid: u64, position: [f32; 3]) -> Vec<u8> {
     let mut inner = 125_u16.to_le_bytes().to_vec();
     inner.extend(guid.to_le_bytes());
     for value in position.into_iter().chain([0.0, 0.0, 1.0]) {

@@ -1081,7 +1081,8 @@ impl PetService {
             texture_alias: self.texture_alias(species_id),
             name,
             speed: self.content.movement_speed.speed,
-            position: owner_position,
+            // F762: the AddNpc places the pet where its pose is (beside the owner), not on them.
+            position: pose.position,
         }));
         Ok(PetTransition {
             owner_message: pet_active_packet(pet_id, actor_guid),

@@ -1137,4 +1137,108 @@ mod tests {
         }
         assert_eq!(rig.saved_state(), saved, "the pet dance saves nothing");
     }
+
+    /// The pet's 125 frames for `actor` in delivered messages (wrapped or not).
+    fn pet_moves(messages: &[Vec<u8>], actor: u64) -> usize {
+        let mut head = vec![125, 0];
+        head.extend(actor.to_le_bytes());
+        messages
+            .iter()
+            .filter(|m| m.windows(head.len()).any(|w| w == head.as_slice()))
+            .count()
+    }
+
+    fn apart(a: [f32; 3], b: [f32; 3]) -> f32 {
+        ((a[0] - b[0]).powi(2) + (a[2] - b[2]).powi(2)).sqrt()
+    }
+
+    /// F762 (T455 review, real path): A summons a pet and walks; viewer B receives the pet's 125
+    /// moves through the gateway's nearby path and the world tick; a late viewer C is sent the
+    /// pet's AddNpc where it stands (`with_pets`), not on A; the walk saves nothing. Reuses
+    /// this module's `Rig` (owner, viewers, ticks, drains).
+    #[test]
+    fn f762_a_walking_owners_pet_moves_for_viewers_and_a_late_viewer_sees_it_where_it_stands() {
+        let Some(mut rig) = Rig::new("f762-pet", RAINBOW) else {
+            return;
+        };
+        let owner = rig.scene.session.character_guid;
+        let viewer = rig.viewer(2, 6.0);
+        grant_certificate(&mut rig.scene.session);
+        let summon = pet_wire::summon_by_item(ADOPTION_ITEM as u32, 0);
+        rig.scene.send(&rig.options, &summon, 2_000).unwrap();
+        let pet = rig.scene.world.pets.get(&owner).cloned().expect("summoned");
+        let me = rig.scene.session.id;
+        let start = rig.scene.world.players.get(me).unwrap().position;
+        assert!(
+            apart(pet.position, start) >= 1.0,
+            "the pet spawns beside its owner, not on them: {:?} / {start:?}",
+            pet.position
+        );
+        // The summon's AddNpc, as the owner and viewer B receive it, carries that pose too.
+        let mut add_npc = vec![35, 0, 2, 0];
+        add_npc.extend(pet.actor_guid.to_le_bytes());
+        let xyz: Vec<u8> = pet.position.iter().flat_map(|v| v.to_le_bytes()).collect();
+        for (who, messages) in [
+            ("owner", rig.drain_owner(2_000)),
+            ("viewer", rig.drain(viewer, 2_000)),
+        ] {
+            let spawn = messages
+                .iter()
+                .find(|m| m.windows(add_npc.len()).any(|w| w == add_npc.as_slice()))
+                .unwrap_or_else(|| panic!("{who} gets the pet's AddNpc"));
+            assert!(
+                spawn.windows(12).any(|w| w == xyz.as_slice()),
+                "{who}'s AddNpc is at the pet's pose"
+            );
+        }
+        // The walk itself may discover a warpstone; following must not touch the saved roster.
+        let roster = rig.scene.snapshot().pets;
+
+        let mut seen = 0;
+        for step in 1..=20u64 {
+            let at = [start[0], start[1], start[2] + 0.5 * step as f32];
+            let now = 2_000 + step * 100;
+            let walk = super::super::tests::l039_login_pose::step(owner, at);
+            rig.scene.dispatch(&rig.options, &walk, now).unwrap();
+            seen += pet_moves(&rig.drain(viewer, now), pet.actor_guid);
+        }
+        for step in 1..=20u64 {
+            let now = 4_000 + step * 100;
+            rig.tick(now);
+            seen += pet_moves(&rig.drain(viewer, now), pet.actor_guid);
+        }
+        assert!(seen > 0, "viewer B receives the pet's 125 moves");
+        assert_eq!(
+            rig.scene.snapshot().pets,
+            roster,
+            "following saves no pet state"
+        );
+
+        let (late, joined) = rig.viewer_as(3, 8.0, 1);
+        let late_id = rig.scene.sessions[&late].id;
+        let pet = rig.scene.world.pets.get(&owner).cloned().unwrap();
+        let owner_at = rig.scene.world.players.get(me).unwrap().position;
+        let deliveries = joined
+            .into_iter()
+            // `super::super`, not `crate`: integration harnesses embed the gateway as a module.
+            .map(|message| super::super::Delivery {
+                recipient: message.recipient,
+                bytes: message.bytes,
+            })
+            .collect();
+        let spawn = rig
+            .scene
+            .world
+            .with_pets(deliveries)
+            .into_iter()
+            .find(|d| d.recipient == late_id && d.bytes.get(7..19) == Some(add_npc.as_slice()))
+            .expect("the late viewer is sent the pet's AddNpc");
+        let xyz: Vec<u8> = pet.position.iter().flat_map(|v| v.to_le_bytes()).collect();
+        assert!(
+            spawn.bytes.windows(12).any(|w| w == xyz.as_slice()),
+            // (the pet has moved since the summon: this is its current pose)
+            "the AddNpc carries the pet's pose"
+        );
+        assert!(apart(pet.position, owner_at) >= 1.0, "not on its owner");
+    }
 }

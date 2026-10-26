@@ -1791,7 +1791,7 @@ mod f276_field_session_save;
 /// L039: a save off the map or deep under the terrain enters at the nearest warpstone.
 #[cfg(test)]
 #[path = "l039_login_pose.rs"]
-mod l039_login_pose;
+pub(super) mod l039_login_pose;
 
 /// L043 (lead): admin `realm move` of an online, loading or offline character, through a real
 /// `Server` in account-store mode.
