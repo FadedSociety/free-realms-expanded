@@ -16,6 +16,10 @@ use std::{
     path::PathBuf,
 };
 
+#[path = "common/gateway_packets.rs"]
+#[allow(dead_code)]
+mod gateway_packets;
+
 /// A listed ride: item 76856 (the five-hundred-and-fifty Station Cash mount) is 549 SC of
 /// provenance, so the shipped 0.25 scale lists it at 137.
 const RIDE_ITEM: i32 = 76_856;
@@ -105,6 +109,36 @@ fn order_packet(
 
 fn buy(tracking: u32) -> Vec<u8> {
     order_packet(3, tracking, RIDE_ITEM as u32, STORE, 1, "", "", "", "0")
+}
+
+/// The 35/37 batch body (`00a3db70`): payload byte length (the count plus the records), record
+/// count, then the serialized records back to back. Returns `(count, records bytes)`.
+fn definition_batch(packet: &[u8]) -> (i32, &[u8]) {
+    assert_eq!(&packet[..4], &[35, 0, 37, 0], "35/37 header");
+    let length = i32::from_le_bytes(packet[4..8].try_into().unwrap());
+    let count = i32::from_le_bytes(packet[8..12].try_into().unwrap());
+    assert_eq!(
+        length as usize,
+        packet.len() - 8,
+        "35/37 payload length counts the record-count dword"
+    );
+    (count, &packet[12..])
+}
+
+/// The 66/28 reply (`00b2e2d0`): counted (store id, bundle id) pairs.
+fn content_pairs(packet: &[u8]) -> Vec<(u32, u32)> {
+    assert_eq!(&packet[..4], &[66, 0, 28, 0], "66/28 header");
+    let count = i32::from_le_bytes(packet[4..8].try_into().unwrap());
+    assert_eq!(packet.len(), 8 + count as usize * 8, "66/28 pair count");
+    packet[8..]
+        .chunks_exact(8)
+        .map(|pair| {
+            (
+                u32::from_le_bytes(pair[..4].try_into().unwrap()),
+                u32::from_le_bytes(pair[4..].try_into().unwrap()),
+            )
+        })
+        .collect()
 }
 
 fn snapshot(shop: &CoinShop) -> (InventoryState, Wallet) {
@@ -1328,7 +1362,8 @@ impl<'a> Reader<'a> {
 /// record misaligns every following bundle, so the last byte must be consumed exactly. T657: the
 /// description, image-set, image-tint, price, IsOnSale and SalePrice values are compared with the
 /// item catalogue, so the native `<STRING 0 NOT FOUND>`, empty icon, price 0 and SALE! badge cannot
-/// come back.
+/// come back. T744: the members-only price (+268) is read for every row and must equal the regular
+/// price, because a 0 there is the 100% member discount the native run showed.
 #[test]
 fn store_packet_matches_the_client_reader_field_for_field() {
     let shop = new_shop(Wallet::default(), usize::MAX);
@@ -1352,6 +1387,9 @@ fn store_packet_matches_the_client_reader_field_for_field() {
     assert_eq!(store.len(), expected_size, "66/5 packet size");
     let mut described = 0usize;
     let mut turkey_hat_description = None;
+    // T744: every listing's (regular price, member price, IsOnSale, description) as the wire
+    // carries them, so the boombox rows can be compared with the rest of the store.
+    let mut tiles = BTreeMap::new();
     let mut reader = Reader {
         bytes: store,
         at: 0,
@@ -1415,8 +1453,10 @@ fn store_packet_matches_the_client_reader_field_for_field() {
         reader.u8();
         reader.string();
         assert_eq!(reader.u32(), config.currency_type);
-        // T657: tile Price (`009a56d0` case 5).
-        assert_eq!(reader.u32(), listing.price, "listed price");
+        // T657: tile Price (`009a56d0` case 5). T744: no listed row's data price is 0.
+        let price = reader.u32();
+        assert_eq!(price, listing.price, "listed price");
+        assert!(price > 0, "item {} listed price", listing.item_id);
         reader.u32();
         reader.u32();
         reader.u32();
@@ -1436,7 +1476,8 @@ fn store_packet_matches_the_client_reader_field_for_field() {
         // terms id (+208), MaxPerOrder (+212), six more u32 and three bytes.
         assert_eq!(reader.u32(), config.store_id);
         assert_eq!(reader.u32(), listing.group, "bundle category group");
-        assert_eq!(reader.u8(), 0, "no shipped row is on sale");
+        let on_sale = reader.u8();
+        assert_eq!(on_sale, 0, "no shipped row is on sale");
         assert_eq!(reader.u32(), 0, "no terms and conditions locale id");
         assert_eq!(reader.u32(), 1, "max per order");
         for _ in 0..6 {
@@ -1450,7 +1491,15 @@ fn store_packet_matches_the_client_reader_field_for_field() {
         assert_eq!(reader.u32(), 0, "00b41860 field 2");
         assert_eq!(reader.u8(), 0, "00b41860 field 3");
         assert_eq!(reader.u32(), 0, "00b41860 field 4");
-        assert_eq!(reader.u32(), 0, "00b41860 field 5 (members price)");
+        // T744: the members-only price (+268, `009a56d0` case 32) is the regular price when the
+        // row has no member price. A 0 here is the 100% member discount the native run showed.
+        let member_price = reader.u32();
+        assert_eq!(
+            member_price, price,
+            "00b41860 field 5 (members price, item {})",
+            listing.item_id
+        );
+        tiles.insert(listing.item_id, (price, member_price, on_sale, description));
         assert_eq!(reader.u32(), 0, "00b41860 field 6 (sale price)");
         assert_eq!(reader.u8(), 0, "00b41860 field 7");
         assert_eq!(reader.u8(), 0, "00b41860 field 8");
@@ -1463,11 +1512,153 @@ fn store_packet_matches_the_client_reader_field_for_field() {
         Some(4177),
         "Turkey Hat's own description (item catalogue bytes)"
     );
+    // T744: the Boombox rows the native run showed (Jingle Bell 878, Realms Roll 1180, Rainbow
+    // 1913, XVD-S 48244, Pop-Dance 76927, Tiki 76928) all carry the same shape and a real price.
+    // A member and a non-member both pay the regular price: the client's `getItemPrice` returns
+    // Price to a non-member and `getMOItemPrice` returns MembersOnlyPrice to a member, so equal
+    // values mean a 0% discount. The three rows that used to show the "profile" placeholder are
+    // items whose definitions were only missing on the client side; the 66/5 shape is identical.
+    for id in [878, 1180, 1913, 48_244, 76_927, 76_928] {
+        let (price, member_price, on_sale, description) = tiles
+            .get(&id)
+            .unwrap_or_else(|| panic!("boombox {id} is listed"));
+        assert!(*price > 0, "boombox {id} regular price");
+        assert_eq!(
+            *member_price, *price,
+            "boombox {id} member price is the regular price"
+        );
+        assert_eq!(*on_sale, 0, "boombox {id} is not on sale");
+        assert_ne!(*description, 0, "boombox {id} description");
+    }
     assert_eq!(
         reader.at,
         store.len(),
         "the store packet has trailing unread bytes"
     );
+}
+
+/// T744: the client asked for the bundle content of exactly these rows before the native run
+/// (their definitions were absent from its local map), and the tile stayed on its "profile"
+/// placeholder because the server never answered. The 66/27 reply now carries the 35/37 item
+/// definitions first and the 66/28 pending-clearing pairs second, through the same
+/// `CoinShop::handle` entry the gateway uses.
+#[test]
+fn content_request_sends_the_item_definitions_then_the_66_28_pairs() {
+    let mut shop = new_shop(Wallet::default(), usize::MAX);
+    let before = snapshot(&shop);
+    let request =
+        gateway_packets::marketplace_content(&[(STORE, 878, &[878]), (STORE, 76_927, &[76_927])]);
+    let outcome = shop.handle(&request).expect("content request parses");
+    assert_eq!(outcome.result_code, 1);
+    assert!(!outcome.changed, "definitions are presentation, not state");
+    assert_eq!(
+        outcome.replies.len(),
+        2,
+        "the definitions must precede the 66/28 pending clear"
+    );
+    let (count, records) = definition_batch(&outcome.replies[0]);
+    assert_eq!(count, 2);
+    let expected = [
+        shop.inventory().definition_record(878).expect("item 878"),
+        shop.inventory()
+            .definition_record(76_927)
+            .expect("item 76927"),
+    ];
+    assert_eq!(
+        records,
+        expected.concat().as_slice(),
+        "the two requested rows, in request order"
+    );
+    assert_eq!(
+        content_pairs(&outcome.replies[1]),
+        vec![(STORE, 878), (STORE, 76_927)]
+    );
+    assert_eq!(
+        snapshot(&shop),
+        before,
+        "a content reply changes no session state"
+    );
+}
+
+/// T744: a hostile or stale 66/27 cannot select content, cannot grow the reply and changes nothing.
+/// Only a listed bundle of the configured store is confirmed, and the item ids in the request are
+/// never used to choose a definition.
+#[test]
+fn content_request_refusals_and_unknown_bundles_change_nothing() {
+    let mut shop = new_shop(Wallet::default(), usize::MAX);
+    let before = snapshot(&shop);
+    let empty = station_cash::content_response_packet(&[]);
+    // A count above the parser bound, a truncated entry and a trailing byte are refused.
+    assert!(shop.handle(&[66, 0, 27, 0, 9, 0, 0, 0]).is_err());
+    let mut truncated = gateway_packets::marketplace_content(&[(STORE, 878, &[878])]);
+    truncated.truncate(truncated.len() - 1);
+    assert!(shop.handle(&truncated).is_err());
+    let mut trailing = gateway_packets::marketplace_content(&[(STORE, 878, &[878])]);
+    trailing.push(0);
+    assert!(shop.handle(&trailing).is_err());
+    // An unlisted bundle and a bundle from another store are not confirmed.
+    for request in [
+        gateway_packets::marketplace_content(&[(STORE, 999_999_999, &[1])]),
+        gateway_packets::marketplace_content(&[(STORE + 1, 878, &[878])]),
+    ] {
+        let outcome = shop.handle(&request).expect("bounded request parses");
+        assert!(!outcome.changed);
+        assert_eq!(outcome.replies, vec![empty.clone()]);
+    }
+    // A listed bundle's reply is the server's item, not the client's ids: a bogus id list still
+    // gets item 878's definition because 878 is what the bundle contains.
+    let request = gateway_packets::marketplace_content(&[(STORE, 878, &[1, 2, 3])]);
+    let outcome = shop.handle(&request).expect("listed request parses");
+    assert_eq!(
+        station_cash::content_response_packet(&[(STORE, 878)]),
+        outcome.replies[1]
+    );
+    let (count, records) = definition_batch(&outcome.replies[0]);
+    assert_eq!(count, 1);
+    assert_eq!(
+        &records[..4],
+        &878i32.to_le_bytes(),
+        "the server's listing chooses the definition"
+    );
+    assert_eq!(snapshot(&shop), before);
+}
+
+/// T744: the native client's own 66/27 bodies (trace `server-trace.jsonl` in the 2026-10-26 run,
+/// `ts_ms` 539171 and 539184): one store-1 entry per missing Boombox, with the item id repeated as
+/// the marketing item id. These exact bodies are decoded and answered here, so the parser is
+/// tested against the shipped client, not only against the test helper.
+#[test]
+fn captured_66_27_requests_decode_and_are_answered() {
+    let captured = [
+        [
+            66u8, 0, 27, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0x6e, 0x03, 0, 0, 1, 0, 0, 0, 0x6e, 0x03, 0, 0,
+        ],
+        [
+            66, 0, 27, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0x7f, 0x2c, 0x01, 0, 1, 0, 0, 0, 0x7f, 0x2c,
+            0x01, 0,
+        ],
+        [
+            66, 0, 27, 0, 1, 0, 0, 0, 1, 0, 0, 0, 0x80, 0x2c, 0x01, 0, 1, 0, 0, 0, 0x80, 0x2c,
+            0x01, 0,
+        ],
+    ];
+    for (body, item) in captured.into_iter().zip([878i32, 76_927, 76_928]) {
+        let decoded = station_cash::decode_content_request(&body).expect("captured request");
+        assert_eq!(decoded.len(), 1);
+        assert_eq!(decoded[0].store_id, STORE);
+        assert_eq!(decoded[0].bundle_id, item as u32);
+        assert_eq!(decoded[0].item_ids, vec![item as u32]);
+        let mut shop = new_shop(Wallet::default(), usize::MAX);
+        let outcome = shop.handle(&body).expect("captured request is answered");
+        assert_eq!(outcome.replies.len(), 2);
+        let (count, records) = definition_batch(&outcome.replies[0]);
+        assert_eq!(count, 1);
+        assert_eq!(records, shop.inventory().definition_record(item).unwrap());
+        assert_eq!(
+            content_pairs(&outcome.replies[1]),
+            vec![(STORE, item as u32)]
+        );
+    }
 }
 
 /// T230: walk the catalogue navigation packets in their client reader order: category tree

@@ -177,3 +177,22 @@ pub fn move_to(guid: u64, position: [f32; 3]) -> Vec<u8> {
     packet.extend([0, 0]);
     packet
 }
+
+/// T744: Marketplace 66/27 store-bundle content request (`00b41a30` -> `00b3dd80` ->
+/// `00b37140`): a count, then per entry store id, bundle id, item-id count and the requested item
+/// ids. The native client sends one 24-byte request (one 16-byte entry) per bundle whose item
+/// definitions it lacks (2026-10-26 trace: 878, 76927 and 76928 only).
+#[allow(dead_code)] // Included by suites that never request Marketplace content.
+pub fn marketplace_content(entries: &[(u32, u32, &[u32])]) -> Vec<u8> {
+    let mut bytes = vec![66, 0, 27, 0];
+    bytes.extend((entries.len() as u32).to_le_bytes());
+    for (store, bundle, item_ids) in entries {
+        bytes.extend(store.to_le_bytes());
+        bytes.extend(bundle.to_le_bytes());
+        bytes.extend((item_ids.len() as u32).to_le_bytes());
+        for id in *item_ids {
+            bytes.extend(id.to_le_bytes());
+        }
+    }
+    bytes
+}

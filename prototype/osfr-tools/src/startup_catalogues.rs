@@ -107,6 +107,12 @@ pub struct StatUpdate<'a> {
 /// definitions after one byte-length and one count (`0092f460`, `00a3db70`,
 /// `008e3760`, `00919e10`); `00a3c290` caches/replaces definitions by id.
 pub fn build_item_definitions(definitions: &[ItemDefinition<'_>]) -> Vec<u8> {
+    tunnel(&build_item_definitions_inner(definitions))
+}
+
+/// The same 35/37 body without the world-packet tunnel, for a reply the caller already wraps
+/// (T744 sends it as the Marketplace 66/27 content reply).
+pub fn build_item_definitions_inner(definitions: &[ItemDefinition<'_>]) -> Vec<u8> {
     let records_length = definitions.iter().fold(0usize, |length, definition| {
         assert!(definition.serialized_record.len() >= 4);
         assert_eq!(
@@ -127,7 +133,7 @@ pub fn build_item_definitions(definitions: &[ItemDefinition<'_>]) -> Vec<u8> {
     for definition in definitions {
         inner.extend_from_slice(definition.serialized_record);
     }
-    tunnel(&inner)
+    inner
 }
 
 /// Coin store family 165/sub-opcode 1: counted static and dynamic lists.

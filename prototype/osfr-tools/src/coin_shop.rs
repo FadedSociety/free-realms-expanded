@@ -1240,7 +1240,42 @@ impl CoinShop {
                     self.inventory.state(),
                 )],
             ),
-            // Bundle content (27), and 66/38 with the Marketplace off: no reply.
+            // T744: 66/27 is the store screen's request for bundle content definitions. The client
+            // asked for these bundles because its local item-definition map lacks their items; the
+            // 35/37 batch must arrive before 66/28, because the 66/28 handler (`00b40050`) clears a
+            // bundle's pending entry only once every content item resolves. A reply is driven by the
+            // server's listing and catalogue, never by the client's item ids (hostile input note in
+            // T744.md).
+            27 if self.marketplace_enabled() => {
+                let requests = station_cash::decode_content_request(inner)?;
+                let store_id = self.sc_catalogue.config().store_id;
+                let mut seen = BTreeSet::new();
+                let mut confirmed = BTreeSet::new();
+                let mut records = Vec::new();
+                for request in &requests {
+                    if request.store_id != store_id {
+                        continue;
+                    }
+                    let Some(listing) = self.sc_catalogue.listing(request.bundle_id) else {
+                        continue;
+                    };
+                    let Some(record) = self.inventory.definition_record(listing.item_id) else {
+                        continue;
+                    };
+                    if seen.insert(listing.item_id) {
+                        records.push((listing.item_id, record));
+                    }
+                    confirmed.insert((request.store_id, request.bundle_id));
+                }
+                let mut replies = Vec::new();
+                if !records.is_empty() {
+                    replies.push(station_cash::item_definitions_packet(&records));
+                }
+                let confirmed = confirmed.into_iter().collect::<Vec<_>>();
+                replies.push(station_cash::content_response_packet(&confirmed));
+                (1, replies)
+            }
+            // Bundle content with the Marketplace off, and 66/38 with it off: no reply.
             27 | 38 => return Ok(CoinShopOutcome::default()),
             // NpcMerchantV2 buy reply: every result other than 1 is a client-visible refusal.
             43 => (

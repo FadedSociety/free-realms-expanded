@@ -35,6 +35,9 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "common/gateway_packets.rs"]
+#[allow(dead_code)]
+mod gateway_packets;
 #[path = "common/gateway_vendor.rs"]
 mod gateway_vendor;
 #[path = "common/item_catalogue.rs"]
@@ -1195,9 +1198,10 @@ fn marketplace_payment_like_rows_stay_refused_or_free() {
 fn unrecovered_marketplace_rows_and_malformed_requests_change_nothing() {
     let mut counter = Counter::new(100, |_| {});
     let before = counter.state();
-    // Bundle content (27): no reply, no state.
-    let outcome = counter.shop.handle(&marketplace(27)).unwrap();
-    assert!(outcome.replies.is_empty() && !outcome.changed, "66/27");
+    // Bundle content (27): a bare header has no request list, so it is refused like any other
+    // malformed body and changes nothing. The valid request/reply is covered by the station-cash
+    // suite and the routed gateway test.
+    assert!(counter.shop.handle(&marketplace(27)).is_err(), "66/27");
     let mut long = marketplace(14);
     long.resize(65, 0);
     let bad_locales = [
@@ -1618,6 +1622,40 @@ fn gateway_sc_catalogue_lists_the_ride_and_skips_earn_only() {
     assert!(contains_u32(store, SC_RIDE_ITEM as u32));
     assert!(contains_u32(store, SC_RIDE_PRICE));
     assert!(!contains_u32(store, SC_EARN_ONLY_ITEM as u32));
+}
+
+/// T744: the routed 66/27 content request is answered with the bundle's 35/37 item definitions
+/// followed by the 66/28 pending-clear pair. The definitions must come first: the 66/28 handler
+/// (`00b40050`) clears a bundle only after its content items resolve, so a client that has not
+/// received the definitions would keep the tile on its loading placeholder. Nothing is persisted.
+#[test]
+fn gateway_sc_content_request_carries_item_definitions_and_the_content_pair() {
+    let fixture = Fixture::new().with_sc();
+    let mut gateway = fixture.connect(fixture.state());
+    let once = gateway.snapshot();
+    let request =
+        gateway_packets::marketplace_content(&[(1, SC_RIDE_ITEM as u32, &[SC_RIDE_ITEM as u32])]);
+    let packets = send(&mut gateway, &request);
+    assert_eq!(packets.len(), 2, "definitions then the content pair");
+    // 35/37 (`00a3db70`): payload byte length, record count, then the serialized rows.
+    let definitions = &packets[0];
+    assert_eq!(&definitions[..4], &[35, 0, 37, 0]);
+    let length = i32::from_le_bytes(definitions[4..8].try_into().unwrap());
+    let count = i32::from_le_bytes(definitions[8..12].try_into().unwrap());
+    assert_eq!(count, 1, "one definition for the one listed bundle");
+    assert_eq!(length as usize, definitions.len() - 8, "35/37 length");
+    assert_eq!(
+        &definitions[12..16],
+        &SC_RIDE_ITEM.to_le_bytes(),
+        "the requested bundle's item definition id"
+    );
+    // 66/28 (`00b2e2d0`): count, then (store id, bundle id).
+    let mut expected = vec![66, 0, 28, 0];
+    expected.extend(1u32.to_le_bytes());
+    expected.extend(1u32.to_le_bytes());
+    expected.extend((SC_RIDE_ITEM as u32).to_le_bytes());
+    assert_eq!(packets[1], expected);
+    assert_eq!(gateway.snapshot(), once, "content replies change nothing");
 }
 
 /// T230: the wallet and the granted ride survive a reconnect through the character snapshot,

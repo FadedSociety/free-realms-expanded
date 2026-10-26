@@ -49,6 +49,13 @@
 //! * T657: the client recomputes a 66/7 node's count from the bundles and adds one to every parent
 //!   (`00c37e70`); the server writes that same descendant total. `0099f150` filters a bundle by its
 //!   +204 group's 66/6 category, and `0099d7e0` accepts the selected category or any descendant.
+//! * T744: `009a56d0` case 32 reads the members-only price from bundle +268; the client's
+//!   `getMOItemPrice` uses it for a member (`MarketplaceDataSource.as`), so 0 is a 100% discount,
+//!   not "no discount". A row without a member price writes its regular price there. The tile also
+//!   stays on its loading placeholder while the bundle's item definitions are missing: the client
+//!   asks for them with 66/27 (serializer `00b41a30`/`00b3dd80`; `00b47b20`/`00b48120`), and the
+//!   66/28 reply (`00b40050`, reader `00b2e2d0`) clears the pending bundle only after the item
+//!   definitions (35/37) arrived, so the reply sends the 35/37 batch first.
 //!
 //! Reconstructed policy (R): Station Cash is a per-character balance (the original wallet was an
 //! account wallet funded by real money; this revival has no payment path, so the save file is the
@@ -90,6 +97,8 @@ const OP_BUNDLE_GROUPS: u16 = 9;
 const OP_ITEM_REQUIREMENTS: u16 = 39;
 const OP_WALLET_RESPONSE: u16 = 11;
 const OP_ENABLE_MARKETPLACE: u16 = 24;
+const OP_CONTENT_REQUEST: u16 = 27;
+const OP_CONTENT_RESPONSE: u16 = 28;
 const OP_ENABLE_PAYMENT_SOURCES: u16 = 33;
 
 /// Marketplace result 1 is success in the client reader `00b3b6d0`.
@@ -105,6 +114,10 @@ const MAX_ORDER_STRING: usize = 256;
 const MAX_LOCALE_STRING: usize = 32;
 const MAX_DETAIL_STRING: usize = 64;
 const MAX_ORDER_DETAILS: usize = 16;
+/// T744: the client streams two bundles per 66/27 request (`00b48120`); these only bound a
+/// hostile body.
+const MAX_CONTENT_REQUESTS: usize = 8;
+const MAX_CONTENT_REQUEST_ITEMS: usize = 32;
 /// Sanity bounds for the data-configured values.
 pub const MAX_PRICE_SC: u32 = 10_000_000;
 const MAX_WALLET_BALANCE: u32 = i32::MAX as u32;
@@ -773,6 +786,9 @@ pub struct Listing {
     /// `ImageTintValue` (`009a56d0` cases 6-7). 0 writes an empty string (no icon).
     pub icon_id: u32,
     pub icon_tint: u32,
+    /// The regular Station Cash price, written at +176 (`009a56d0` case 5). The members-only price
+    /// at +268 is written as the same value: no row carries a member SC price, and the client reads
+    /// +268 as the member price, so 0 would be a 100% discount (T744).
     pub price: u32,
     /// The category group the bundle belongs to: a ride child, Rides, Boombox, or the T657 item
     /// shelf whose id is also its group key.
@@ -1194,6 +1210,88 @@ pub fn decode_order(inner: &[u8], preview: bool) -> io::Result<OrderRequest> {
     })
 }
 
+/// One 66/27 store-bundle content request entry. The client sends the store, the bundle and the
+/// marketing item ids it read from that bundle's entry list (`00b3dd80`/`00b37140`). The ids are
+/// a hint only: the reply is driven by the server's listing, never by a client id (T744).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct ContentRequest {
+    pub store_id: u32,
+    pub bundle_id: u32,
+    pub item_ids: Vec<u32>,
+}
+
+/// Read a 66/27 content request: a count, then per entry a store id, a bundle id, an item-id
+/// count and that many ids. The client's serializer is `00b41a30` -> `00b3dd80` -> `00b37140`;
+/// the Legacy reference names the same three fields (behaviour reference only). A negative
+/// count, a count that cannot fit in the body or any trailing byte is refused.
+pub fn decode_content_request(inner: &[u8]) -> io::Result<Vec<ContentRequest>> {
+    if inner.len() < 8
+        || inner.len() > MAX_ORDER_PACKET
+        || inner[..2] != MARKETPLACE_FAMILY.to_le_bytes()
+        || inner[2..4] != OP_CONTENT_REQUEST.to_le_bytes()
+    {
+        return Err(invalid("not a Marketplace content request"));
+    }
+    let mut reader = Reader {
+        bytes: &inner[4..],
+        at: 0,
+    };
+    let count = reader.u32()? as usize;
+    if count > MAX_CONTENT_REQUESTS {
+        return Err(invalid("too many Marketplace content requests"));
+    }
+    let mut requests = Vec::with_capacity(count);
+    for _ in 0..count {
+        let store_id = reader.u32()?;
+        let bundle_id = reader.u32()?;
+        let items = reader.u32()? as usize;
+        if items > MAX_CONTENT_REQUEST_ITEMS {
+            return Err(invalid("too many Marketplace content items"));
+        }
+        let mut item_ids = Vec::with_capacity(items);
+        for _ in 0..items {
+            item_ids.push(reader.u32()?);
+        }
+        requests.push(ContentRequest {
+            store_id,
+            bundle_id,
+            item_ids,
+        });
+    }
+    reader.finish()?;
+    Ok(requests)
+}
+
+/// 66/28: the counted `(store id, bundle id)` pairs whose item definitions the reply carries.
+/// Client reader `00b2e2d0` reads the count and the eight-byte records into the response
+/// object; `00b40050` then clears each bundle's pending-content entry.
+pub fn content_response_packet(entries: &[(u32, u32)]) -> Vec<u8> {
+    let mut bytes = header(OP_CONTENT_RESPONSE);
+    put_i32(&mut bytes, entries.len() as i32);
+    for (store_id, bundle_id) in entries {
+        put_u32(&mut bytes, *store_id);
+        put_u32(&mut bytes, *bundle_id);
+    }
+    bytes
+}
+
+/// The 35/37 item-definition batch for a 66/27 reply, before the caller's world-packet wrap.
+/// The framing is the startup catalogue's (`00a3db70`): payload byte length, record count, then
+/// the serialized `ClientItemDefinition` rows. `(id, record)` pairs come from the server's
+/// listing and its loaded catalogue, so the record already starts with the id.
+pub fn item_definitions_packet(records: &[(i32, &[u8])]) -> Vec<u8> {
+    let definitions = records
+        .iter()
+        .map(
+            |(id, serialized_record)| crate::startup_catalogues::ItemDefinition {
+                id: *id,
+                serialized_record,
+            },
+        )
+        .collect::<Vec<_>>();
+    crate::startup_catalogues::build_item_definitions_inner(&definitions)
+}
+
 /// Price and validate an order without changing anything; 66/2 reply. A new deed order also asks
 /// `grant_lot` without committing, so a lot the order would refuse is refused here too.
 pub fn preview(
@@ -1569,14 +1667,19 @@ fn bundle_record(bytes: &mut Vec<u8>, catalogue: &Catalogue, listing: &Listing, 
     bytes.push(0);
     bytes.push(0);
     // Client reader `00b41860` continues after the `00b3fa00` tail with ten more fields:
-    // u32, u32, u8, u32, u32, u32, u8, u8, u32, u32 (31 bytes). Their meanings are not
-    // recovered, so every one is zero (R). A short record makes the client consume the next
-    // bundle's map key as these fields, misaligning every following entry.
+    // u32, u32, u8, u32, u32, u32, u8, u8, u32, u32 (31 bytes). Only the members-only price
+    // (field 5, +268) and the sale price (field 6, +272) have recovered readers (`009a56d0`
+    // cases 32 and 10); the rest stay zero (R). A short record makes the client consume the
+    // next bundle's map key as these fields, misaligning every following entry.
     put_u32(bytes, 0);
     put_u32(bytes, 0);
     bytes.push(0);
     put_u32(bytes, 0);
-    put_u32(bytes, 0);
+    // +268 MembersOnlyPrice (`009a56d0` case 32). No shipped row has a member SC price, and the
+    // client's member price is this field alone (`MarketplaceDataSource.getMOItemPrice`), so 0
+    // is a 100% member discount. The regular price here means "no discount" (T744 native run).
+    put_u32(bytes, listing.price);
+    // +272 SalePrice (`009a56d0` case 10); IsOnSale is 0, so this field is never read as the price.
     put_u32(bytes, 0);
     bytes.push(0);
     bytes.push(0);
