@@ -23651,29 +23651,23 @@
       ],
       "services_reason": null,
       "position": [
-        -1413.420038,
-        -27.631,
-        342.851581
+        -1399.3837,
+        -29.449934,
+        278.26196
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.9016198145155808,
+        -0.4357307582748913,
         0.0,
-        0.43252943260879895
+        0.9000770557531106
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "reference_data",
+      "placement_source": "reference_spawn",
       "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 5,
-          "poi_name": "Sanctuary",
-          "match_score": 9
-        }
-      ],
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 5 by longest normalized whole-name score 9; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "(R) Sanctuary-main@10f129e placement FabledRealms.lua:3538; replaces reconstructed guess [-1413.42, -27.631, 342.852]",
       "source": [
         {
           "kind": "client",
@@ -23963,18 +23957,14 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=5 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=5 NameId=3499 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3538 spawnNpcWithGuid(33306); src/Resources/Npcs.json Id=33306"
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3538 spawnNpcWithGuid(33306); src/Resources/Npcs.json Id=33306"
           }
         ],
         "position_w": [
@@ -23985,36 +23975,32 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=5 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=5 NameId=3499 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3538 spawnNpcWithGuid(33306); src/Resources/Npcs.json Id=33306"
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3538 spawnNpcWithGuid(33306); src/Resources/Npcs.json Id=33306"
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3538 spawnNpcWithGuid(33306); src/Resources/Npcs.json Id=33306"
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) medium measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3538 spawnNpcWithGuid(33306); src/Resources/Npcs.json Id=33306"
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3538 spawnNpcWithGuid(33306); src/Resources/Npcs.json Id=33306"
           }
         ],
         "capture_match": [
@@ -24022,8 +24008,15 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3538 spawnNpcWithGuid(33306); src/Resources/Npcs.json Id=33306"
+          }
         ]
-      }
+      },
+      "heading": -0.901700003
     },
     {
       "npc_id": 9500000483,
@@ -59811,29 +59804,23 @@
       ],
       "services_reason": null,
       "position": [
-        -1422.405694,
-        -27.631,
-        342.832292
+        -1266.9845,
+        -14.225539,
+        290.2942
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.9016198145155808,
+        -0.5800674558538811,
         0.0,
-        0.43252943260879895
+        0.8145684419735433
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 5,
-          "poi_name": "Sanctuary",
-          "match_score": 0
-        }
-      ],
+      "placement": "reference_data",
+      "placement_source": "reference_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 5. This is not a recovered NPC transform.",
+      "position_reason": "(R) Sanctuary-main@10f129e placement FabledRealms.lua:3617; replaces reconstructed guess [-1422.406, -27.631, 342.832]",
       "source": [
         {
           "kind": "client",
@@ -60123,18 +60110,14 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 5 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3617 spawnNpcWithGuid(33393); src/Resources/Npcs.json Id=33393"
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3617 spawnNpcWithGuid(33393); src/Resources/Npcs.json Id=33393"
           }
         ],
         "position_w": [
@@ -60145,36 +60128,32 @@
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 5 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3617 spawnNpcWithGuid(33393); src/Resources/Npcs.json Id=33393"
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3617 spawnNpcWithGuid(33393); src/Resources/Npcs.json Id=33393"
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3617 spawnNpcWithGuid(33393); src/Resources/Npcs.json Id=33393"
           }
         ],
         "placement_confidence": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3617 spawnNpcWithGuid(33393); src/Resources/Npcs.json Id=33393"
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3617 spawnNpcWithGuid(33393); src/Resources/Npcs.json Id=33393"
           }
         ],
         "capture_match": [
@@ -60182,8 +60161,15 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "reference",
+            "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3617 spawnNpcWithGuid(33393); src/Resources/Npcs.json Id=33393"
+          }
         ]
-      }
+      },
+      "heading": -1.237623
     },
     {
       "npc_id": 9500000544,

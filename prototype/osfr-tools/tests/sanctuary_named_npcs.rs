@@ -9,6 +9,9 @@
 //! `0x00921a10` (u64 actor, i32 name id, i32 model id); 26/8 constructor `0x008b6bc0`
 //! (u64 target + bool); 26/9 chain `0x00aa2360 -> 0x00aa2220 -> 0x00aa1600 -> 0x00aa04d0`.
 //! No new wire shape.
+//!
+//! T506 moved 19 more drawn NPCs (the Lakeshore merchants, Skye, Drill Sergeant Dewey and
+//! others) from their POI guesses to the same placements, so 109 rows are `reference_data`.
 
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
@@ -28,6 +31,12 @@ const REF: &str = "Sanctuary-main-20261019@10f129e";
 /// guess to her Sanctuary-main spawn (FabledRealms.lua:3946).
 const MAYOR: u64 = 9_000_000_143;
 const MAYOR_OLD_POSITION: [f32; 3] = [52.757_717, 30.987, 367.513_31];
+/// T506: Drill Sergeant Dewey, and where the POI guess put him (the Sanctuary POI).
+const DEWEY: u64 = 9_000_000_076;
+const DEWEY_OLD_POSITION: [f32; 3] = [-1412.821_604, -27.631, 353.933_558];
+/// Legacy-data anchors that mark the towns: Ty (Lakeshore) and Brody Sparfist (Snowhill).
+const TY: u64 = 9_000_000_223;
+const BRODY: u64 = 9_000_000_033;
 /// Names the lead held back (the regions disagree, so it may be another NPC) plus the two
 /// duplicate rows of NPCs that are already drawn: Morninglory (extras 9000000155) and Chip
 /// Numbwing (extras 9500000736).
@@ -90,9 +99,13 @@ fn body_position(id: u64) -> [f32; 3] {
 }
 
 #[test]
-fn all_90_are_drawn_once() {
+fn every_reference_row_is_drawn_once() {
     let rows = moved();
-    assert_eq!(rows.len(), 90, "the task draws 90 named NPCs");
+    assert_eq!(
+        rows.len(),
+        109,
+        "T470 drew 90 named NPCs, T506 moved 19 more"
+    );
     let extras = extra_rows();
     let guids: BTreeSet<_> = extras
         .iter()
@@ -212,45 +225,46 @@ fn gulsh_is_the_cave_seller() {
     );
 }
 
-#[test]
-fn a_click_works_where_she_stands_and_not_at_her_old_guess() {
+/// A 26/8 click from 2 m of the drawn body opens the menu; the same click and a 26/10 choice from
+/// the old guess are out of range and change nothing.
+fn click_works_only_at_the_new_position(npc: u64, old_position: [f32; 3]) {
     let fixture = Fixture::for_character(CHARACTER);
     let mut game = fixture.game(None);
-    // Where the client draws her: the extras body, not the regional row.
-    let position = body_position(MAYOR);
+    // Where the client draws the NPC: the extras body, not the regional row.
+    let position = body_position(npc);
 
     let near = character_at_for(CHARACTER, 0, [position[0] + 2.0, position[1], position[2]]);
     let menu = game
-        .handle_in_world(&npc_interact(MAYOR), &near, NOW)
+        .handle_in_world(&npc_interact(npc), &near, NOW)
         .unwrap();
     assert!(
         menu.replies
             .iter()
             .any(|packet| packet.starts_with(&[26, 0, 9, 0])),
-        "a player 2 m from her new position gets her menu"
+        "a player 2 m from {npc}'s new position gets the menu"
     );
 
-    // Her old position is out of range. With her menu open, a far 26/8 and a far 26/10 are
-    // both refused and change nothing: the open menu still answers from beside her, exactly
+    // The old position is out of range. With the menu open, a far 26/8 and a far 26/10 are
+    // both refused and change nothing: the open menu still answers from beside the NPC, exactly
     // as it does in a game that never saw the far clicks.
     let mut control = fixture.game(None);
-    let menu = interact(&mut control, &near, MAYOR, NOW);
+    let menu = interact(&mut control, &near, npc, NOW);
     let talk = menu_option(&menu, TALK_LABEL);
     let expected = control
-        .handle_in_world(&npc_select(MAYOR, talk), &near, NOW + 3)
+        .handle_in_world(&npc_select(npc, talk), &near, NOW + 3)
         .unwrap();
     assert!(
         !expected.replies.is_empty(),
-        "Talk answers with her dialogue"
+        "Talk answers with the dialogue"
     );
 
     let mut game = fixture.game(None);
-    interact(&mut game, &near, MAYOR, NOW);
+    interact(&mut game, &near, npc, NOW);
     let state = game.state();
-    let far = character_at_for(CHARACTER, 0, MAYOR_OLD_POSITION);
+    let far = character_at_for(CHARACTER, 0, old_position);
     for (packet, message) in [
-        (npc_interact(MAYOR), "NPC interaction is unavailable"),
-        (npc_select(MAYOR, talk), "NPC menu choice is unavailable"),
+        (npc_interact(npc), "NPC interaction is unavailable"),
+        (npc_select(npc, talk), "NPC menu choice is unavailable"),
     ] {
         let refusal = game
             .handle_in_world(&packet, &far, NOW + 1)
@@ -260,12 +274,58 @@ fn a_click_works_where_she_stands_and_not_at_her_old_guess() {
     }
     assert_eq!(game.state(), state, "a refused far click changes nothing");
     let survived = game
-        .handle_in_world(&npc_select(MAYOR, talk), &near, NOW + 3)
+        .handle_in_world(&npc_select(npc, talk), &near, NOW + 3)
         .unwrap();
     assert_eq!(
         survived.replies, expected.replies,
         "the open menu survived the refused far clicks"
     );
+}
+
+#[test]
+fn a_click_works_where_she_stands_and_not_at_her_old_guess() {
+    click_works_only_at_the_new_position(MAYOR, MAYOR_OLD_POSITION);
+}
+
+/// T506: five Lakeshore merchants and Skye stood at the Cooking Table POI near (88, 42, 1020),
+/// 680-930 m from their towns; Dewey stood at the Sanctuary POI, 1.7 km from Snowhill, though
+/// the client says he is near the Snowhill town hall (string 414618, wording as shipped).
+#[test]
+fn lakeshore_merchants_and_dewey_stand_in_their_towns() {
+    let regional = regional_rows();
+    let position = |id: u64| {
+        let row = regional.iter().find(|row| row["npc_id"] == id).unwrap();
+        xyz(&row["position"])
+    };
+    let distance = |a: [f32; 3], b: [f32; 3]| {
+        a.iter()
+            .zip(b)
+            .map(|(a, b)| f64::from(a - b).powi(2))
+            .sum::<f64>()
+            .sqrt()
+    };
+    // Lorraine, Grasberg, Kimi, Kristane, Alexander. The brief asked for 150 m, but Sanctuary's
+    // own Lakeshore cluster spreads 160-195 m from Ty, so the bound is 200 m.
+    for merchant in [
+        9_500_000_354_u64,
+        9_500_000_344,
+        9_500_000_348,
+        9_500_000_349,
+        9_500_000_339,
+    ] {
+        assert!(
+            distance(position(merchant), position(TY)) < 200.0,
+            "merchant {merchant} is not in Lakeshore"
+        );
+    }
+    // Skye is 195 m from Brody, inside the bound by 5 m.
+    for snowhill in [DEWEY, 9_500_000_769] {
+        assert!(
+            distance(position(snowhill), position(BRODY)) < 200.0,
+            "NPC {snowhill} is not in Snowhill"
+        );
+    }
+    click_works_only_at_the_new_position(DEWEY, DEWEY_OLD_POSITION);
 }
 
 /// Each session builds its own visibility from the same content: both draw her identically.

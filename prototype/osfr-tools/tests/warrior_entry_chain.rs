@@ -279,7 +279,7 @@ fn one_spawn_row(key: u64) -> Value {
 }
 
 /// Build the production loader and return the 35/2 AddNpc for `npc_id` at its
-/// reconstructed Snowhill position.
+/// Snowhill row's position.
 fn drawn_npc(npc_id: u64) -> osfr_tools::startup_world::NpcSpawn {
     let position = content_position("snowhill.json", npc_id);
     let mut visibility = world::NpcVisibility::load(&content_dir()).expect("NpcVisibility loads");
@@ -744,25 +744,34 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
         );
         let position: [f32; 3] = serde_json::from_value(row["position"].clone()).unwrap();
         assert!(position.iter().all(|value| value.is_finite()));
-        let regional: [f32; 3] = serde_json::from_value(
-            read_json(&content_dir().join("npcs/snowhill.json"))["records"]
-                .as_array()
-                .unwrap()
-                .iter()
-                .find(|npc| npc["npc_id"].as_u64() == Some(key))
-                .unwrap()["position"]
-                .clone(),
-        )
-        .unwrap();
+        let snowhill = read_json(&content_dir().join("npcs/snowhill.json"));
+        let regional_row = snowhill["records"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|npc| npc["npc_id"].as_u64() == Some(key))
+            .unwrap();
+        let regional: [f32; 3] = serde_json::from_value(regional_row["position"].clone()).unwrap();
         for axis in 0..3 {
             assert!(
                 (position[axis] - regional[axis]).abs() < 1e-3,
-                "the spawn must use the Snowhill row's reconstructed position"
+                "the spawn must stand where the Snowhill row does"
             );
         }
-        assert_eq!(row["heading"].as_f64(), Some(0.0), "(R) heading 0.0");
+        // T506: both stand at Sanctuary-main's placement, heading included.
+        assert_eq!(regional_row["placement"], "reference_data");
+        assert!(
+            row["heading"]
+                .as_f64()
+                .is_some_and(|heading| heading != 0.0)
+        );
+        assert_eq!(row["heading"], regional_row["heading"]);
         let sources = row["source"].as_array().unwrap();
-        assert_eq!(sources.len(), 5, "five provenance entries");
+        assert_eq!(
+            sources.len(),
+            6,
+            "five provenance entries and the reference"
+        );
         assert!(
             sources
                 .iter()

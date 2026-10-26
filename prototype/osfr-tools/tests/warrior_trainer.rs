@@ -307,10 +307,10 @@ fn gateway_at(content: &Content, state: GameplayState, near: [f32; 3]) -> Gatewa
 
 #[test]
 fn dewey_is_drawable_and_has_a_warrior_trainer_row() {
-    // The Snowhill record alone is a POI anchor: it names and places Dewey but has no model.
+    // The Snowhill record names and places Dewey (Sanctuary-main's spawn, T506) but has no model.
     let regional = regional_npc(DEWEY);
     assert_eq!(regional["name"], "Drill Sergeant Dewey");
-    assert_eq!(regional["placement"], "poi_anchor");
+    assert_eq!(regional["placement"], "reference_data");
     assert!(
         regional["roles"]
             .as_array()
@@ -348,7 +348,7 @@ fn dewey_is_drawable_and_has_a_warrior_trainer_row() {
     for (axis, (spawned, shared)) in position.iter().zip(regional_position).enumerate() {
         assert!(
             (spawned - shared).abs() < 1e-3,
-            "axis {axis}: the spawn must use the reconstructed Snowhill POI position"
+            "axis {axis}: the spawn must stand where the interaction row does"
         );
     }
 

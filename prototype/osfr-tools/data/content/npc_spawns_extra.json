@@ -59642,11 +59642,11 @@
       "name": "Drill Sergeant Dewey",
       "name_string_id": 22435,
       "position": [
-        -1412.821604,
-        -27.631,
-        353.933558
+        317.7469,
+        26.46915,
+        424.5907
       ],
-      "heading": 0.0,
+      "heading": -1.12853004,
       "capture_match": null,
       "source": [
         {
@@ -59667,7 +59667,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The spawn reuses the Snowhill POI position [-1412.821604, -27.631, 353.933558] and reuses NPC key 9000000076 as the runtime actor GUID, so the ordinary 26/8 click addresses the same content identity. (R) Heading 0.0 is deterministic; no recovered heading exists. (R) Model 995 human_m_warrior_01.agr is the client's human male Warrior body model, chosen to fit the video's 'Warrior Trainer' nameplate; the live model id is unknown. (R) The 9000000000-range actor GUID is this project's content-key space, not a recovered server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.0 m), replacing the POI guess [-1412.821604, -27.631, 353.933558]; the spawn reuses NPC key 9000000076 as the runtime actor GUID, so the ordinary 26/8 click addresses the same content identity. (R) Heading is the same emulator's, not a captured value. (R) Model 995 human_m_warrior_01.agr is the client's human male Warrior body model, chosen to fit the video's 'Warrior Trainer' nameplate; the live model id is unknown. (R) The 9000000000-range actor GUID is this project's content-key space, not a recovered server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3968 spawnNpcWithGuid(33773); src/Resources/Npcs.json Id=33773"
         }
       ],
       "position_w": null
@@ -59681,11 +59685,11 @@
       "name": "Morninglory",
       "name_string_id": 5102192,
       "position": [
-        265.81537,
-        50.78422,
-        169.9138
+        261.79507,
+        48.96282,
+        211.63281
       ],
-      "heading": 0.0,
+      "heading": 0.349949977,
       "capture_match": null,
       "source": [
         {
@@ -59706,7 +59710,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T257: reuses Snowhill NPC key 9000000155 as the runtime actor GUID and the Snowhill row's reconstructed position [265.81537, 50.78422, 169.9138], so the ordinary 26/8 click addresses the same content identity. (R) Heading 0.0 is deterministic; no recovered heading exists. (R) Model 731 fairy_f_morninglory.agr is the Legacy model table's dedicated Morninglory body; it is present in the client catalog.tsv (Assets_005.pack entry 527, pack_17/000527.agr). (R) The 9000000000-range actor GUID is this project's content-key space, not a recovered server GUID."
+          "evidence": "(R) T257: reuses Snowhill NPC key 9000000155 as the runtime actor GUID; the position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.0 m), replacing the Snowhill row's reconstructed guess [265.81537, 50.78422, 169.9138], so the ordinary 26/8 click addresses the same content identity. (R) Heading is the same emulator's, not a captured value. (R) Model 731 fairy_f_morninglory.agr is the Legacy model table's dedicated Morninglory body; it is present in the client catalog.tsv (Assets_005.pack entry 527, pack_17/000527.agr). (R) The 9000000000-range actor GUID is this project's content-key space, not a recovered server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3929 spawnNpcWithGuid(33718); src/Resources/Npcs.json Id=33718"
         }
       ],
       "position_w": null
@@ -59720,11 +59728,11 @@
       "name": "Steele",
       "name_string_id": 434620,
       "position": [
-        55.284345,
-        30.987,
-        359.281601
+        319.51495,
+        26.05179,
+        430.15677
       ],
-      "heading": 0.0,
+      "heading": -0.890770018,
       "capture_match": null,
       "source": [
         {
@@ -59745,7 +59753,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T257: reuses Snowhill NPC key 9000000208 as the runtime actor GUID and the Snowhill row's reconstructed position [55.284345, 30.987, 359.281601], so the ordinary 26/8 click addresses the same content identity. (R) Heading 0.0 is deterministic; no recovered heading exists. (R) Model 391 fairy_m_warrior_01.agr is the client's male pixie/fairy Warrior body, chosen because Legacy has no Steele model and the wiki describes Steele as a male pixie; it is present in catalog.tsv (Assets_006.pack entry 592, pack_18/000592.agr). (R) The 9000000000-range actor GUID is this project's content-key space, not a recovered server GUID."
+          "evidence": "(R) T257: reuses Snowhill NPC key 9000000208 as the runtime actor GUID; the position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.0 m), replacing the Snowhill row's reconstructed guess [55.284345, 30.987, 359.281601], so the ordinary 26/8 click addresses the same content identity. (R) Heading is the same emulator's, not a captured value. (R) Model 391 fairy_m_warrior_01.agr is the client's male pixie/fairy Warrior body, chosen because Legacy has no Steele model and the wiki describes Steele as a male pixie; it is present in catalog.tsv (Assets_006.pack entry 592, pack_18/000592.agr). (R) The 9000000000-range actor GUID is this project's content-key space, not a recovered server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3970 spawnNpcWithGuid(33776); src/Resources/Npcs.json Id=33776"
         }
       ],
       "position_w": null
@@ -59849,11 +59861,11 @@
       "name": "Fladnag",
       "name_string_id": 5102517,
       "position": [
-        57.361211,
-        30.987,
-        358.624822
+        230.88478,
+        25.246117,
+        430.04623
       ],
-      "heading": 0.0,
+      "heading": -3.07482004,
       "capture_match": null,
       "source": [
         {
@@ -59866,7 +59878,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T372: this slice adds the 25 priced vendor spawns missing from the playtest package. (R) The position [57.361211, 30.987, 358.624822] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4586/fairy_m_merchant_wizard_asian_mantis.agr is a male pixie wizard merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) T372: this slice adds the 25 priced vendor spawns missing from the playtest package. (R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.1 m), not a captured transform; it replaces the reconstructed poi_anchor guess [57.361211, 30.987, 358.624822]. (R) Heading is the same emulator's, not a captured value. (R) Model 4586/fairy_m_merchant_wizard_asian_mantis.agr is a male pixie wizard merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3912 spawnNpcWithGuid(33698); src/Resources/Npcs.json Id=33698"
         }
       ],
       "position_w": null
@@ -60004,11 +60020,11 @@
       "name": "Dempsy",
       "name_string_id": 5102200,
       "position": [
-        58.447775,
-        30.987,
-        362.571361
+        237.1437,
+        26.234308,
+        436.1044
       ],
-      "heading": 0.0,
+      "heading": 1.38882005,
       "capture_match": null,
       "source": [
         {
@@ -60021,7 +60037,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The position [58.447775, 30.987, 362.571361] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4499/human_m_merchant_brawler_caucasian.agr is a male human brawler merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.0 m), not a captured transform; it replaces the reconstructed poi_anchor guess [58.447775, 30.987, 362.571361]. (R) Heading is the same emulator's, not a captured value. (R) Model 4499/human_m_merchant_brawler_caucasian.agr is a male human brawler merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3926 spawnNpcWithGuid(33715); src/Resources/Npcs.json Id=33715"
         }
       ],
       "position_w": null
@@ -60035,11 +60055,11 @@
       "name": "Sonja",
       "name_string_id": 5102437,
       "position": [
-        59.218049,
-        30.987,
-        358.721507
+        233.37015,
+        23.61321,
+        387.91855
       ],
-      "heading": 0.0,
+      "heading": 1.08215001,
       "capture_match": null,
       "source": [
         {
@@ -60052,7 +60072,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The position [59.218049, 30.987, 358.721507] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4558/human_f_merchant_warrior_asian.agr is a female human warrior merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.0 m), not a captured transform; it replaces the reconstructed poi_anchor guess [59.218049, 30.987, 358.721507]. (R) Heading is the same emulator's, not a captured value. (R) Model 4558/human_f_merchant_warrior_asian.agr is a female human warrior merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3883 spawnNpcWithGuid(33665); src/Resources/Npcs.json Id=33665"
         }
       ],
       "position_w": null
@@ -60066,11 +60090,11 @@
       "name": "Spratt",
       "name_string_id": 5102292,
       "position": [
-        48.595198,
-        30.987,
-        371.774098
+        228.21536,
+        23.48963,
+        385.24973
       ],
-      "heading": 0.0,
+      "heading": -1.24267901,
       "capture_match": null,
       "source": [
         {
@@ -60083,7 +60107,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The position [48.595198, 30.987, 371.774098] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4520/fairy_f_merchant_medic_african_mayfly.agr is a female pixie medic merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.1 m), not a captured transform; it replaces the reconstructed poi_anchor guess [48.595198, 30.987, 371.774098]. (R) Heading is the same emulator's, not a captured value. (R) Model 4520/fairy_f_merchant_medic_african_mayfly.agr is a female pixie medic merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3884 spawnNpcWithGuid(33666); src/Resources/Npcs.json Id=33666"
         }
       ],
       "position_w": null
@@ -60097,11 +60125,11 @@
       "name": "Tommy",
       "name_string_id": 5101985,
       "position": [
-        42.671733,
-        30.987,
-        366.244185
+        235.03586,
+        23.664875,
+        384.34042
       ],
-      "heading": 0.0,
+      "heading": 0.56215605,
       "capture_match": null,
       "source": [
         {
@@ -60114,7 +60142,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The position [42.671733, 30.987, 366.244185] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4475/human_m_merchant_archer_african.agr is a male human archer merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.0 m), not a captured transform; it replaces the reconstructed poi_anchor guess [42.671733, 30.987, 366.244185]. (R) Heading is the same emulator's, not a captured value. (R) Model 4475/human_m_merchant_archer_african.agr is a male human archer merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3885 spawnNpcWithGuid(33667); src/Resources/Npcs.json Id=33667"
         }
       ],
       "position_w": null
@@ -60159,11 +60191,11 @@
       "name": "Alexander",
       "name_string_id": 5102438,
       "position": [
-        84.921306,
-        42.0,
-        1017.636314
+        -759.3783,
+        0.020418,
+        859.9176
       ],
-      "heading": 0.0,
+      "heading": -1.99780999,
       "capture_match": null,
       "source": [
         {
@@ -60176,7 +60208,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The position [84.921306, 42.0, 1017.636314] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4561/fairy_m_merchant_warrior_asian_spark.agr is a male pixie warrior merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.1 m), not a captured transform; it replaces the reconstructed poi_anchor guess [84.921306, 42.0, 1017.636314]. (R) Heading is the same emulator's, not a captured value. (R) Model 4561/fairy_m_merchant_warrior_asian_spark.agr is a male pixie warrior merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3757 spawnNpcWithGuid(33535); src/Resources/Npcs.json Id=33535"
         }
       ],
       "position_w": null
@@ -60190,11 +60226,11 @@
       "name": "Kimi",
       "name_string_id": 5101986,
       "position": [
-        86.129151,
-        42.0,
-        1024.083487
+        -774.88715,
+        0.230093,
+        861.7282
       ],
-      "heading": 0.0,
+      "heading": 2.34716702,
       "capture_match": null,
       "source": [
         {
@@ -60207,7 +60243,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The position [86.129151, 42.0, 1024.083487] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4487/fairy_f_merchant_archer_african_decadent.agr is a female pixie archer merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.1 m), not a captured transform; it replaces the reconstructed poi_anchor guess [86.129151, 42.0, 1024.083487]. (R) Heading is the same emulator's, not a captured value. (R) Model 4487/fairy_f_merchant_archer_african_decadent.agr is a female pixie archer merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3700 spawnNpcWithGuid(33478); src/Resources/Npcs.json Id=33478"
         }
       ],
       "position_w": null
@@ -60221,11 +60261,11 @@
       "name": "Kristane",
       "name_string_id": 5102201,
       "position": [
-        88.341642,
-        42.0,
-        1014.919496
+        -763.6466,
+        0.075717,
+        836.9289
       ],
-      "heading": 0.0,
+      "heading": -0.780399958,
       "capture_match": null,
       "source": [
         {
@@ -60238,7 +60278,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The position [88.341642, 42.0, 1014.919496] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4508/fairy_f_merchant_brawler_african_raven.agr is a female pixie brawler merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.0 m), not a captured transform; it replaces the reconstructed poi_anchor guess [88.341642, 42.0, 1014.919496]. (R) Heading is the same emulator's, not a captured value. (R) Model 4508/fairy_f_merchant_brawler_african_raven.agr is a female pixie brawler merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3755 spawnNpcWithGuid(33533); src/Resources/Npcs.json Id=33533"
         }
       ],
       "position_w": null
@@ -60252,11 +60296,11 @@
       "name": "Dizzy Toad",
       "name_string_id": 5102377,
       "position": [
-        46.524663,
-        30.987,
-        368.416367
+        -33.279736,
+        10.13236,
+        259.21094
       ],
-      "heading": 0.0,
+      "heading": -1.07136001,
       "capture_match": null,
       "source": [
         {
@@ -60269,7 +60313,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The position [46.524663, 30.987, 368.416367] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4529/fairy_m_merchant_ninja_asian_fire.agr is a male pixie ninja merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.0 m), not a captured transform; it replaces the reconstructed poi_anchor guess [46.524663, 30.987, 368.416367]. (R) Heading is the same emulator's, not a captured value. (R) Model 4529/fairy_m_merchant_ninja_asian_fire.agr is a male pixie ninja merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4003 spawnNpcWithGuid(33842); src/Resources/Npcs.json Id=33842"
         }
       ],
       "position_w": null
@@ -60314,11 +60362,11 @@
       "name": "Masa",
       "name_string_id": 5102119,
       "position": [
-        -729.937593,
-        9.09,
-        949.356347
+        -782.4307,
+        5.557206,
+        892.12964
       ],
-      "heading": 0.0,
+      "heading": 0.731347972,
       "capture_match": null,
       "source": [
         {
@@ -60331,7 +60379,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The position [-729.937593, 9.09, 949.356347] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4496/fairy_m_merchant_blacksmith_caucasian_fire.agr is a male pixie blacksmith merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.0 m), not a captured transform; it replaces the reconstructed poi_anchor guess [-729.937593, 9.09, 949.356347]. (R) Heading is the same emulator's, not a captured value. (R) Model 4496/fairy_m_merchant_blacksmith_caucasian_fire.agr is a male pixie blacksmith merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3699 spawnNpcWithGuid(33477); src/Resources/Npcs.json Id=33477"
         }
       ],
       "position_w": null
@@ -60345,11 +60397,11 @@
       "name": "Florina",
       "name_string_id": 45951,
       "position": [
-        -1413.420038,
-        -27.631,
-        342.851581
+        -1399.3837,
+        -29.449934,
+        278.26196
       ],
-      "heading": 0.0,
+      "heading": -0.901700003,
       "capture_match": null,
       "source": [
         {
@@ -60362,7 +60414,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The position [-1413.420038, -27.631, 342.851581] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 573/fairy_f_freestyle_11.agr is a female pixie merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.0 m), not a captured transform; it replaces the reconstructed poi_anchor guess [-1413.420038, -27.631, 342.851581]. (R) Heading is the same emulator's, not a captured value. (R) Model 573/fairy_f_freestyle_11.agr is a female pixie merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3538 spawnNpcWithGuid(33306); src/Resources/Npcs.json Id=33306"
         }
       ],
       "position_w": null
@@ -60407,11 +60463,11 @@
       "name": "Grasberg",
       "name_string_id": 5102559,
       "position": [
-        93.742299,
-        42.0,
-        1018.957419
+        -784.2302,
+        5.083301,
+        896.4583
       ],
-      "heading": 0.0,
+      "heading": 1.73828101,
       "capture_match": null,
       "source": [
         {
@@ -60424,7 +60480,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The position [93.742299, 42.0, 1018.957419] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4598/human_m_merchant_miner_cauasian.agr is a male human miner merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.0 m), not a captured transform; it replaces the reconstructed poi_anchor guess [93.742299, 42.0, 1018.957419]. (R) Heading is the same emulator's, not a captured value. (R) Model 4598/human_m_merchant_miner_cauasian.agr is a male human miner merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3728 spawnNpcWithGuid(33506); src/Resources/Npcs.json Id=33506"
         }
       ],
       "position_w": null
@@ -60438,11 +60498,11 @@
       "name": "Wake",
       "name_string_id": 5102400,
       "position": [
-        -1422.405694,
-        -27.631,
-        342.832292
+        -1266.9845,
+        -14.225539,
+        290.2942
       ],
-      "heading": 0.0,
+      "heading": -1.237623,
       "capture_match": null,
       "source": [
         {
@@ -60455,7 +60515,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The position [-1422.405694, -27.631, 342.832292] is the NPC row's reconstructed unanchored placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4545/human_f_merchant_postman_african.agr is a female human postman merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.7 m), not a captured transform; it replaces the reconstructed unanchored guess [-1422.405694, -27.631, 342.832292]. (R) Heading is the same emulator's, not a captured value. (R) Model 4545/human_f_merchant_postman_african.agr is a female human postman merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3617 spawnNpcWithGuid(33393); src/Resources/Npcs.json Id=33393"
         }
       ],
       "position_w": null
@@ -60469,11 +60533,11 @@
       "name": "Lorraine",
       "name_string_id": 5102506,
       "position": [
-        93.014407,
-        42.0,
-        1023.383347
+        -816.7909,
+        2.009025,
+        839.6132
       ],
-      "heading": 0.0,
+      "heading": 0.83435801,
       "capture_match": null,
       "source": [
         {
@@ -60486,7 +60550,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The position [93.014407, 42.0, 1023.383347] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4574/human_f_merchant_chef_caucasian.agr is a female human chef merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.0 m), not a captured transform; it replaces the reconstructed poi_anchor guess [93.014407, 42.0, 1023.383347]. (R) Heading is the same emulator's, not a captured value. (R) Model 4574/human_f_merchant_chef_caucasian.agr is a female human chef merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3698 spawnNpcWithGuid(33476); src/Resources/Npcs.json Id=33476"
         }
       ],
       "position_w": null
@@ -60500,11 +60568,11 @@
       "name": "Reba",
       "name_string_id": 5102420,
       "position": [
-        45.355617,
-        30.987,
-        357.031637
+        215.32555,
+        28.237514,
+        441.73898
       ],
-      "heading": 0.0,
+      "heading": -2.74149799,
       "capture_match": null,
       "source": [
         {
@@ -60517,7 +60585,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The position [45.355617, 30.987, 357.031637] is the NPC row's reconstructed unanchored placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4549/human_f_merchant_postman_caucasian.agr is a female human postman merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.0 m), not a captured transform; it replaces the reconstructed unanchored guess [45.355617, 30.987, 357.031637]. (R) Heading is the same emulator's, not a captured value. (R) Model 4549/human_f_merchant_postman_caucasian.agr is a female human postman merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3908 spawnNpcWithGuid(33694); src/Resources/Npcs.json Id=33694"
         }
       ],
       "position_w": null
@@ -60531,11 +60603,11 @@
       "name": "Skye",
       "name_string_id": 5102505,
       "position": [
-        84.12376,
-        42.0,
-        1023.392761
+        203.77641,
+        23.083303,
+        352.81158
       ],
-      "heading": 0.0,
+      "heading": -0.237981002,
       "capture_match": null,
       "source": [
         {
@@ -60548,7 +60620,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) The position [84.12376, 42.0, 1023.392761] is the NPC row's reconstructed poi_anchor placement, not a captured transform. (R) Heading 0.0; no finite heading was recovered. (R) Model 4577/fairy_f_merchant_chef_african_decadent.agr is a female pixie chef merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+          "evidence": "(R) The position is another emulator's placement (Sanctuary-main, no stated source; ground offset +0.0 m), not a captured transform; it replaces the reconstructed poi_anchor guess [84.12376, 42.0, 1023.392761]. (R) Heading is the same emulator's, not a captured value. (R) Model 4577/fairy_f_merchant_chef_african_decadent.agr is a female pixie chef merchant client body chosen from Models.txt because the row has no model binding; exact appearance is unrecovered. (R) spawn_guid/content_key reuse the 9500000000-range NPC content key as the runtime actor GUID; the actor is not a captured server GUID."
+        },
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3860 spawnNpcWithGuid(33641); src/Resources/Npcs.json Id=33641"
         }
       ],
       "position_w": null
