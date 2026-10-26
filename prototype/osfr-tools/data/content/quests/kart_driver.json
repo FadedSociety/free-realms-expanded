@@ -473,47 +473,68 @@
     },
     {
       "id": 3080007,
+      "job": 48,
       "title_string_id": 394235,
-      "giver_npc_id": 9000000379,
+      "intro_text_string_id": 101178,
+      "description_string_id": 101160,
+      "giver_npc_id": 9500000164,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000950,
+          "text_string_id": 101185,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 101185 'Challenge T.R. Walker Jr to a race.' resolves in lab/reports/locale-id-to-text.json; dialogs.json q3080007 lists 101170 as the T.R. progress reminder and 101186 as T.R.'s post-race concession (not a hand-in line)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T732: objective kind and target from objective-specs-fixed q3080007 (talk_to_npc 9500000950, T.R. Walker Jr.'s placed legacy_data row in data/content/npcs/wilds.json). No count: the text names one challenge."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "48": 15
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred membership bonus or random loot."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202: one-talk referral rung = 15 Kart Driver (profile 48) job XP. The quest answer and the client locale record no coin or XP figure for this quest, so the value is reconstructed, not recovered."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 5; name 'Kart Driver: Challenging T.R'; title id cell 930143283 ucdt; 2370752381 ugdt"
+          "evidence": "Global.Text 394235 'Kart Driver: Challenging T.R.' (title) and 101185 (objective) resolve in lab/reports/locale-id-to-text.json; 101178 is Linx Redline's offer line and 101160 the goal description (lab/references/quest-lines/dialogs.json q3080007)."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway, row 5; giver Linx Redline [client 2003102719]; objective 'Challenge T.R. Walker Jr to a race.' (8001231)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) quest id 3080007 is a stable batch key; the guide does not provide a numeric server quest id"
+          "evidence": "(R) T732: the guide's unresolved giver key 9000000379 is replaced by the placed legacy_data Linx Redline row 9500000164 (data/content/npcs/briarwood.json, placed by T698 at FabledRealms.lua:1758), the row the preceding quest 3080006 also targets. The talk target is the placed T.R. Walker Jr. row 9500000950."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T732: objective kind/id from objective-specs-fixed q3080007; job 48 (Kart Driver) gate and the 5 coins + 15 XP reward follow T202/W110. No prerequisite: the guide's predecessor 3080006 is still a disabled stub."
         }
       ],
-      "description_string_id": 394236,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3080008,
@@ -567,49 +588,68 @@
     },
     {
       "id": 3080009,
+      "job": 48,
       "title_string_id": 394484,
-      "giver_npc_id": 9000000249,
+      "intro_text_string_id": 394486,
+      "description_string_id": 394485,
+      "giver_npc_id": 9500000872,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000872,
+          "text_string_id": 394490,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 394490 'Talk to Blammo at the Wildwood Speedway.' resolves in lab/reports/locale-id-to-text.json; the target is Blammo's placed row 9500000872 (npc_name 394488)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T732: objective kind and target from objective-specs-fixed q3080009 (talk_to_npc 9500000872). The target is the giver, so the turn-in is the same Blammo talk."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "48": 15
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) W110: five-coin fallback for an unknown quest payout, in the existing small final-era coin-reward style; no inferred membership bonus or random loot."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T202: one-talk referral rung = 15 Kart Driver (profile 48) job XP. The quest answer and the client locale record no coin or XP amount for this quest, so the value is reconstructed, not recovered."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
-          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway (rivals: Verve McNichols, Linx Redline, T.R. Walker Jr.; sponsor: Blammo), row 7; name \"Kart Driver: Exploder's League Sponsorship\"; title id cell 970314492 ucdt; 2206174359 ugdt"
+          "evidence": "Global.Text 394484 'Kart Driver: Exploder's League Sponsorship' and 394490 (objective) resolve in lab/reports/locale-id-to-text.json; lab/references/quest-lines/dialogs.json q3080009 binds offer 394486 (Blammo's pitch), description 394485, and no progress or completion line."
+        },
+        {
+          "kind": "client",
+          "evidence": "notes/Build Guides/Content/Jobs/Kart Driver.md: Quest line > Tier 1 - Wildwood Speedway, row 7; giver Blammo (Robgoblin Exploder's League) [client 1313376882]; objective 'Talk to Blammo at the Wildwood Speedway.' (4044742507)."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) quest id 3080009 is a stable batch key; the guide does not provide a numeric server quest id"
+          "evidence": "(R) T732: the guide's unresolved giver key 9000000249 is replaced by the placed legacy_data Blammo row 9500000872 (data/content/npcs/wilds.json, model robgoblin_m_basic.adr), whose name id 394488 is the client npc_name."
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+          "evidence": "(R) T732: objective kind/id from objective-specs-fixed q3080009; job 48 (Kart Driver) gate and the 5 coins + 15 XP reward follow T202/W110. No prerequisite: the guide's predecessor 3080008 is still a disabled stub."
         }
       ],
-      "description_string_id": 394485,
-      "intro_text_string_id": 394483,
-      "end_text_string_id": 394486,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3080010,

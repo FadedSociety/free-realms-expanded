@@ -2501,7 +2501,9 @@
         "\"A robgoblin at the Wildwood Speedway\" (241877165)."
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3080009
+      ],
       "quests_given_text": [
         "Kart Driver: Exploder's League Sponsorship, Kart Driver: Wildwood Sprint Challenge, Kart Driver: Wildwood Endurance Challenge, Kart Driver: Dominating at Wildwood, Kart Driver: Guest of Honor (hands off to Squee at the Robgoblin Camp)."
       ],
@@ -2689,7 +2691,7 @@
         "quest_ids_given": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+            "evidence": "(R) T732: 3080009 (Kart Driver: Exploder's League Sponsorship) is offered here; the guide's unresolved giver key 9000000249 is this placed Blammo row, whose name id 394488 is the client npc_name."
           }
         ],
         "quests_given_text": [
@@ -41406,8 +41408,12 @@
       "quests_given_text": [
         "Target of Kart Driver: You Want To Go Fast?; sends the player to Blammo for a sponsor (241877165)."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3080007
+        }
+      ],
+      "quests_accepted_reason": "(R) T732: 3080007's only objective is a Talk to T.R. Walker Jr. and its 49/13 end screen opens at that actor; the giver remains Linx Redline 9500000164.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [
@@ -41602,13 +41608,13 @@
         "quests_accepted": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+            "evidence": "(R) T732: 3080007 is completed at T.R. Walker Jr. after the challenge Talk; the end-screen actor is this row."
           }
         ],
         "quests_accepted_reason": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) the regional NPC row does not isolate a distinct quest hand-in for this NPC"
+            "evidence": "(R) T732: 3080007 is completed at T.R. Walker Jr. after the challenge Talk; the end-screen actor is this row."
           }
         ],
         "vendor_stock": [

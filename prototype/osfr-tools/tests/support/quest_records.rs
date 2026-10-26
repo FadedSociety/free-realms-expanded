@@ -32,6 +32,11 @@ pub struct RawQuest {
     pub min_level: Option<u32>,
     pub objectives: Vec<Value>,
     pub rewards: Vec<Value>,
+    /// The 49/1 card text ids and the 49/13 end text (absent means 0, the
+    /// loader's default), before the loader's `i32` cast.
+    pub intro_text_string_id: u32,
+    pub description_string_id: u32,
+    pub end_text_string_id: u32,
 }
 
 impl RawQuest {
@@ -122,6 +127,9 @@ pub fn read_quests(root: &Path) -> Vec<RawQuest> {
                 min_level: as_u32(&record["min_level"]),
                 objectives,
                 rewards: record["rewards"].as_array().cloned().unwrap_or_default(),
+                intro_text_string_id: as_u32(&record["intro_text_string_id"]).unwrap_or(0),
+                description_string_id: as_u32(&record["description_string_id"]).unwrap_or(0),
+                end_text_string_id: as_u32(&record["end_text_string_id"]).unwrap_or(0),
             });
         }
     }

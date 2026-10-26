@@ -993,7 +993,7 @@ fn content_overflow_is_rejected_at_load() {
 fn configured_job_xp_and_job_gates_match_the_task_table() {
     let content = content_dir();
     // (file, quest id, giver, prerequisites, reward coins, job gate, profile, XP)
-    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 26] = [
+    let expected: [(&str, u32, u64, &[u32], u32, Option<i32>, i32, u32); 28] = [
         (
             "adventurer.json",
             INTRODUCE_YOURSELF,
@@ -1096,6 +1096,28 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             Some(KART_DRIVER),
             KART_DRIVER,
             30,
+        ),
+        // T732: two Wildwood round-3 quests. Each is a one-Talk referral; the
+        // predecessor stubs are still disabled, so neither gains a prerequisite.
+        (
+            "kart_driver.json",
+            3_080_007,
+            9_500_000_164,
+            &[],
+            5,
+            Some(KART_DRIVER),
+            KART_DRIVER,
+            15,
+        ),
+        (
+            "kart_driver.json",
+            3_080_009,
+            9_500_000_872,
+            &[],
+            5,
+            Some(KART_DRIVER),
+            KART_DRIVER,
+            15,
         ),
         ("ninja.json", NINJA_PATH, TY, &[], 0, Some(NINJA), NINJA, 15),
         (
@@ -1281,8 +1303,8 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
     // the independent Missing Sisters playtest entry, T277 adds Local Hero, T252's two
     // Cobblestone Brawler records and T331's hand-off are added with their own tags,
     // T334 adds the second Miner chapter behind T300's practice test, T377 adds
-    // the two chapter records after E4, T411 adds the third Miner chapter and T726 adds
-    // Petal Oceanmist's sponsorship quest.
+    // the two chapter records after E4, T411 adds the third Miner chapter, T726 adds
+    // Petal Oceanmist's sponsorship quest and T732 adds the two Wildwood referrals.
     // A later task's decision tag counts only for the record that task decided, so a
     // new quest cannot satisfy the table by carrying someone else's tag.
     let has_decision = |quest_id: u32, source: &Value| {
@@ -1297,6 +1319,7 @@ fn configured_job_xp_and_job_gates_match_the_task_table() {
             3_030_027 => "(R) T724:",
             3_100_003 => "(R) T334:",
             3_100_004 => "(R) T411:",
+            3_080_007 | 3_080_009 => "(R) T732:",
             3_080_019 => "(R) T726:",
             _ => "",
         };

@@ -356,6 +356,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Tucker Thunderjolt (T727 talk target of 3060013): NPCs - Wilds.md:184 gives only a role ('Crash Davis's teammate'), the location 'Outside of Thunder Falls' (1929354201, 2909963659) and the sponsor referral 880667942; 394016 is the quest objective and 402845 the journal-style completion line, and no first-person line of his own is recovered.",
     ),
     (
+        9500000164,
+        "Linx Redline (T732 giver of 3080007): NPCs - Briarwood.md:122/133 and Kart Driver.md row 5 quote only third-person race objectives and the T.R. hand-off; his own line 101178 is the quest offer and 101170 the progress reminder, not a greeting.",
+    ),
+    (
         9500000209,
         "Sergeant Cargug (T502 turn-in of 3000392): NPCs - Briarwood.md:148 quotes only third-person role and Nettleseed location text (3637816292, 1789311537); 36445 is the objective and 390591 is the end text of 3000392 goal 1, so no first-person line that is not a quest step exists.",
     ),
@@ -436,6 +440,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Chad Fastflutter: only Raina's referral lines and objective strings; no first-person line of his own.",
     ),
     (
+        9500000872,
+        "Blammo (T732 giver and talk target of 3080009): NPCs - Wilds.md:148 and Kart Driver.md row 7 quote only the third-person Exploder's League role; his line 394486 is the quest offer, not a greeting.",
+    ),
+    (
         9500000874,
         "Blazing Star (T498 giver of 3000332): NPCs - Wilds.md:77 quotes no line of hers ('See Flax', standing spot not stated); her first-person text is the quest intro 389950, a QuestOffer proof, but tests/npc_greetings_lakeshore_wilds.rs pins every unlisted Wilds row unbound.",
     ),
@@ -458,6 +466,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
     (
         9500000926,
         "Oxalis Shamrock (T498 giver of 3000333, turn-in of 3000332): NPCs - Wilds.md:67 quotes only chef-errand objectives (43249685, 2645354306, 2735689201); his first-person lines are the intro 38142 (a QuestOffer proof, but tests/npc_greetings_lakeshore_wilds.rs pins every unlisted Wilds row unbound), the step reply 390019 and the end text 389953.",
+    ),
+    (
+        9500000950,
+        "T.R. Walker Jr. (T732 talk target and end-screen actor of 3080007): Kart Driver.md row 5 quotes only the third-person challenge objective; his line 101186 is the post-race concession, not a greeting.",
     ),
     (
         9500000955,

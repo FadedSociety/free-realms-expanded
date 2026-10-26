@@ -39871,7 +39871,9 @@
         "Tangletrack."
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3080007
+      ],
       "quests_given_text": [
         "Kart Driver: The Showdown."
       ],
@@ -40063,7 +40065,7 @@
         "quest_ids_given": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) no stable numeric quest id is linked in the current job batch"
+            "evidence": "(R) T732: 3080007 (Kart Driver: Challenging T.R.) is offered here; the guide's unresolved giver key 9000000379 is this placed Linx Redline row (T698)."
           }
         ],
         "quests_given_text": [
