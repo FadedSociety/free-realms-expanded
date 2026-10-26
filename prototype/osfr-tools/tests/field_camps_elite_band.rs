@@ -244,7 +244,7 @@ const LEVEL_TWENTY_WOLF: u64 = 131000110156;
 /// The elite camp's shared 180 s respawn.
 const ELITE_RESPAWN_MS: u64 = 180_000;
 /// T699 appended this many quest-gated quest-target actors after the elite six.
-const T699_ACTORS: usize = 16;
+const T699_ACTORS: usize = 15;
 
 fn shipped_field() -> Value {
     serde_json::from_slice(&fs::read(content_path()).unwrap()).unwrap()
@@ -403,14 +403,14 @@ fn six_elite_camps_load_with_levels_fifteen_to_twenty() {
 
     assert_eq!(
         enemies.len(),
-        50,
-        "28 pre-T332 + 6 elite actors + 16 T699 quest targets"
+        49,
+        "28 pre-T332 + 6 elite actors + 15 T699 quest targets"
     );
     assert_eq!(groups.len(), 13, "10 pre-T332 + 3 elite groups");
     assert_eq!(
         engine.field_guids().len(),
-        50,
-        "the live field vector grows from 28 to 34 + 16 T699 quest targets"
+        49,
+        "the live field vector grows from 28 to 34 + 15 T699 quest targets"
     );
     assert_eq!(
         &engine.field_guids()[..EXISTING_ACTORS.len()],
@@ -1016,8 +1016,8 @@ fn the_existing_camps_and_wolf_quest_are_unchanged() {
     );
     assert_eq!(
         rewards["definition_overrides"].as_array().unwrap().len(),
-        1,
-        "the wolf definition override is unchanged"
+        1 + T699_ACTORS,
+        "the wolf definition override plus one 0/0 override per T699 quest target"
     );
 }
 

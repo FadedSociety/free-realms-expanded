@@ -1948,7 +1948,7 @@
       ]
     },
     {
-      "guid": 100000004115,
+      "guid": 5064655448674664451,
       "definition_id": 4115,
       "model_id": 199,
       "name_id": 75450,
@@ -1962,7 +1962,6 @@
       "max_health": 100,
       "damage": 8,
       "boss": false,
-      "power_up_table": "standard",
       "respawn_seconds": 60,
       "aggro_range": 8.0,
       "quest_ids": [
@@ -1980,12 +1979,12 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3000024 is active, per the owner's field notes (overworld enemies belong to active quests)"
+          "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3000024 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
     },
     {
-      "guid": 100000001638,
+      "guid": 5064655448674664452,
       "definition_id": 1638,
       "model_id": 199,
       "name_id": 75454,
@@ -1999,7 +1998,6 @@
       "max_health": 100,
       "damage": 8,
       "boss": false,
-      "power_up_table": "standard",
       "respawn_seconds": 60,
       "aggro_range": 8.0,
       "quest_ids": [
@@ -2017,12 +2015,12 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010005 is active, per the owner's field notes (overworld enemies belong to active quests)"
+          "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010005 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
     },
     {
-      "guid": 100000001639,
+      "guid": 5064655448674664453,
       "definition_id": 1639,
       "model_id": 199,
       "name_id": 75449,
@@ -2036,7 +2034,6 @@
       "max_health": 100,
       "damage": 8,
       "boss": false,
-      "power_up_table": "standard",
       "respawn_seconds": 60,
       "aggro_range": 8.0,
       "quest_ids": [
@@ -2055,12 +2052,12 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010018/3150012 is active, per the owner's field notes (overworld enemies belong to active quests)"
+          "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010018/3150012 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
     },
     {
-      "guid": 100000003491,
+      "guid": 5064655448674664454,
       "definition_id": 3491,
       "model_id": 200,
       "name_id": 75453,
@@ -2074,7 +2071,6 @@
       "max_health": 180,
       "damage": 8,
       "boss": false,
-      "power_up_table": "standard",
       "respawn_seconds": 90,
       "aggro_range": 8.0,
       "quest_ids": [
@@ -2092,16 +2088,16 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) level 9, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3150012 is active, per the owner's field notes (overworld enemies belong to active quests)"
+          "evidence": "(R) level 9, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3150012 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
     },
     {
-      "guid": 100000001294,
+      "guid": 5064655448674664455,
       "definition_id": 1294,
       "model_id": 4,
-      "name_id": 2232,
-      "name": "Robgoblin",
+      "name_id": 95047,
+      "name": "Robgoblin Pondblasters",
       "texture_alias": "",
       "position": [
         -524.9218,
@@ -2111,7 +2107,6 @@
       "max_health": 100,
       "damage": 8,
       "boss": false,
-      "power_up_table": "standard",
       "respawn_seconds": 60,
       "aggro_range": 8.0,
       "quest_ids": [
@@ -2127,16 +2122,16 @@
         },
         {
           "kind": "client",
-          "evidence": "locale 2232 'Robgoblin'; quest q3010011 objective 0.0; q3010008 objective 0.0; q3090007 objective 0.1 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
+          "evidence": "locale 95047 'Robgoblin Pondblasters' (the target's own name; model 4 is shared with the generic locale 2232 'Robgoblin'); quest q3010011 objective 0.0; q3090007 objective 0.1 (lab/references/quest-lines/wiring/enemy-rows-needed.json). q3010008 objective 0.0 is a dynamite drop count, not a kill: it stays needs-server"
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010008/3010011/3090007 is active, per the owner's field notes (overworld enemies belong to active quests)"
+          "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010011/3090007 (3010008 gates the row for its drop count) is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
     },
     {
-      "guid": 100000001474,
+      "guid": 5064655448674664456,
       "definition_id": 1474,
       "model_id": 4,
       "name_id": 39582,
@@ -2150,7 +2145,6 @@
       "max_health": 180,
       "damage": 8,
       "boss": false,
-      "power_up_table": "standard",
       "respawn_seconds": 90,
       "aggro_range": 8.0,
       "quest_ids": [
@@ -2168,12 +2162,12 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) level 9, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3160006 is active, per the owner's field notes (overworld enemies belong to active quests)"
+          "evidence": "(R) level 9, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3160006 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
     },
     {
-      "guid": 100000002660,
+      "guid": 5064655448674664457,
       "definition_id": 2660,
       "model_id": 235,
       "name_id": 4477,
@@ -2187,7 +2181,6 @@
       "max_health": 180,
       "damage": 8,
       "boss": false,
-      "power_up_table": "standard",
       "respawn_seconds": 90,
       "aggro_range": 8.0,
       "quest_ids": [
@@ -2205,12 +2198,12 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) level 5, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3000040 is active, per the owner's field notes (overworld enemies belong to active quests)"
+          "evidence": "(R) level 5, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3000040 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
     },
     {
-      "guid": 100000002872,
+      "guid": 5064655448674664458,
       "definition_id": 2872,
       "model_id": 142,
       "name_id": 103401,
@@ -2224,7 +2217,6 @@
       "max_health": 100,
       "damage": 8,
       "boss": false,
-      "power_up_table": "standard",
       "respawn_seconds": 60,
       "aggro_range": 8.0,
       "quest_ids": [
@@ -2242,12 +2234,12 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010025 is active, per the owner's field notes (overworld enemies belong to active quests)"
+          "evidence": "(R) level 5, health 100, damage 8, respawn 60 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010025 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
     },
     {
-      "guid": 100000002644,
+      "guid": 5064655448674664459,
       "definition_id": 2644,
       "model_id": 74,
       "name_id": 4084,
@@ -2261,7 +2253,6 @@
       "max_health": 180,
       "damage": 8,
       "boss": false,
-      "power_up_table": "standard",
       "respawn_seconds": 90,
       "aggro_range": 8.0,
       "quest_ids": [
@@ -2279,12 +2270,12 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) level 7, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010025 is active, per the owner's field notes (overworld enemies belong to active quests)"
+          "evidence": "(R) level 7, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3010025 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
     },
     {
-      "guid": 100000003965,
+      "guid": 5064655448674664460,
       "definition_id": 3965,
       "model_id": 4011,
       "name_id": 439761,
@@ -2298,7 +2289,6 @@
       "max_health": 180,
       "damage": 8,
       "boss": false,
-      "power_up_table": "standard",
       "respawn_seconds": 90,
       "aggro_range": 8.0,
       "quest_ids": [
@@ -2316,12 +2306,12 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) level 7, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3020035 is active, per the owner's field notes (overworld enemies belong to active quests)"
+          "evidence": "(R) level 7, health 180, damage 8, respawn 90 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3020035 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
     },
     {
-      "guid": 100000003115,
+      "guid": 5064655448674664461,
       "definition_id": 3115,
       "model_id": 77,
       "name_id": 36237,
@@ -2335,7 +2325,6 @@
       "max_health": 180,
       "damage": 8,
       "boss": false,
-      "power_up_table": "standard",
       "respawn_seconds": 120,
       "aggro_range": 8.0,
       "quest_ids": [
@@ -2353,49 +2342,12 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) level 9, health 180, damage 8, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3030040 is active, per the owner's field notes (overworld enemies belong to active quests)"
+          "evidence": "(R) level 9, health 180, damage 8, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3030040 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
     },
     {
-      "guid": 100000003066,
-      "definition_id": 3066,
-      "model_id": 1296,
-      "name_id": 19366,
-      "name": "Willow Slamdash",
-      "texture_alias": "",
-      "position": [
-        -919.3732,
-        -40.93911,
-        1162.697
-      ],
-      "max_health": 200,
-      "damage": 10,
-      "boss": false,
-      "power_up_table": "standard",
-      "respawn_seconds": 120,
-      "aggro_range": 8.0,
-      "quest_ids": [
-        3060010
-      ],
-      "level": 13,
-      "source": [
-        {
-          "kind": "legacy-data",
-          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:1809 spawns Npcs 3066 (fairy_f_willow_slamdash.agr, NameId 19366) at [-919.3732, -40.93911, 1162.697] heading -0.214843"
-        },
-        {
-          "kind": "client",
-          "evidence": "locale 19366 'Willow Slamdash'; quest q3060010 objective 1.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json)"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3060010 is active, per the owner's field notes (overworld enemies belong to active quests)"
-        }
-      ]
-    },
-    {
-      "guid": 100000003148,
+      "guid": 5064655448674664462,
       "definition_id": 3148,
       "model_id": 77,
       "name_id": 5135,
@@ -2409,7 +2361,6 @@
       "max_health": 200,
       "damage": 10,
       "boss": false,
-      "power_up_table": "standard",
       "respawn_seconds": 120,
       "aggro_range": 8.0,
       "quest_ids": [
@@ -2427,12 +2378,12 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3110025 is active, per the owner's field notes (overworld enemies belong to active quests)"
+          "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3110025 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
     },
     {
-      "guid": 100000003135,
+      "guid": 5064655448674664463,
       "definition_id": 3135,
       "model_id": 77,
       "name_id": 5234,
@@ -2446,7 +2397,6 @@
       "max_health": 200,
       "damage": 10,
       "boss": false,
-      "power_up_table": "standard",
       "respawn_seconds": 120,
       "aggro_range": 8.0,
       "quest_ids": [
@@ -2464,12 +2414,12 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3110025 is active, per the owner's field notes (overworld enemies belong to active quests)"
+          "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3110025 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
     },
     {
-      "guid": 100000003592,
+      "guid": 5064655448674664464,
       "definition_id": 3592,
       "model_id": 1938,
       "name_id": 78096,
@@ -2483,7 +2433,6 @@
       "max_health": 200,
       "damage": 10,
       "boss": false,
-      "power_up_table": "standard",
       "respawn_seconds": 120,
       "aggro_range": 8.0,
       "quest_ids": [
@@ -2501,12 +2450,12 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3150002 is active, per the owner's field notes (overworld enemies belong to active quests)"
+          "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3150002 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
     },
     {
-      "guid": 100000004857,
+      "guid": 5064655448674664465,
       "definition_id": 4857,
       "model_id": 139,
       "name_id": 23196,
@@ -2520,7 +2469,6 @@
       "max_health": 200,
       "damage": 10,
       "boss": false,
-      "power_up_table": "standard",
       "respawn_seconds": 120,
       "aggro_range": 8.0,
       "quest_ids": [
@@ -2538,7 +2486,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3160031 is active, per the owner's field notes (overworld enemies belong to active quests)"
+          "evidence": "(R) level 13, health 200, damage 10, respawn 120 s and aggro 8.0 m are local balance on the shipped field ladder; the position is the reference spawn, not a recovered 2014 overworld placement. Present only while quest 3160031 is active, per the owner's field notes (overworld enemies belong to active quests). The GUID is a fresh actor id, not the retail actor GUID that npc_spawns_extra.json draws for the same NPC, so removing this quest actor never removes the NPC. No power-up table and a 0/0 field_kill_rewards.json override: a kill only reports to the quest"
         }
       ]
     }

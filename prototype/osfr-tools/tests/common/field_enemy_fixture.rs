@@ -100,6 +100,21 @@ impl Fixture {
         engine
     }
 
+    /// [`Fixture::load`] with the shipped field kill payouts and power-up drop
+    /// tables, for a suite that must see what a kill pays or drops.
+    pub fn load_paying(&self) -> EncounterEngine {
+        fs::copy(
+            content_dir().join("field_kill_rewards.json"),
+            self.dir.join("field_kill_rewards.json"),
+        )
+        .unwrap();
+        let mut engine = self.load();
+        engine
+            .load_power_ups(&content_dir().join("power_ups.json"))
+            .unwrap();
+        engine
+    }
+
     /// The field file this fixture loads (the private copy in [`Fixture::copied`]).
     pub fn field_path(&self) -> &Path {
         &self.field

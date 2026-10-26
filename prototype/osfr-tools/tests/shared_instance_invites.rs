@@ -41,8 +41,9 @@ use std::{
 };
 
 const HANDOFF_KEY: &[u8] = b"synthetic-handoff-key";
-// Upper bound for "the server gets to it", never a pace.
-const PATIENCE: Duration = Duration::from_secs(30);
+// Upper bound for "the server gets to it", never a pace. A loaded integration
+// host can take twice as long as an idle one, so leave headroom.
+const PATIENCE: Duration = Duration::from_secs(60);
 const BRAWLER: i32 = 43;
 const BATTLE: u32 = 96;
 const A: u64 = 101;
@@ -180,13 +181,22 @@ impl Rig {
     fn log_in(&mut self) {
         let store = AccountStore::load(&self.accounts).unwrap();
         let version = self.seed.version.clone();
+        // Both handshakes go out before either reply is awaited: the gateway
+        // drops a session that has not sent its login by its login deadline, so
+        // a slow first reply must not spend the second bot's window.
         for (guid, bot) in [(A, &mut self.a), (B, &mut self.b)] {
             let account = store.account(guid).unwrap();
             let ticket = login::gateway_binding_ticket(HANDOFF_KEY, account, guid);
             bot.send_message(&bot::login_message(guid, &ticket, &version), "1")
                 .unwrap();
+        }
+        for bot in [&mut self.a, &mut self.b] {
             bot.wait_for(PATIENCE, |_| true).unwrap();
+        }
+        for bot in [&mut self.a, &mut self.b] {
             bot.send_message(&packet(13), "13").unwrap();
+        }
+        for bot in [&mut self.a, &mut self.b] {
             bot.wait_for(PATIENCE, |_| true).unwrap();
         }
         self.a.send_message(&packet(10), "10").unwrap();

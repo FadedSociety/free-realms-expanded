@@ -20322,7 +20322,7 @@
     {
       "definition_id": 1294,
       "enemy_id": "robgoblin_pondblaster",
-      "kind": "Robgoblin",
+      "kind": "Robgoblin Pondblasters",
       "model_id": 4,
       "adr": "robgoblin_m_basic.adr",
       "models_txt": {
@@ -20344,9 +20344,10 @@
       "name_binding_status": "R",
       "match_method": "quest_target_name_R",
       "matched_tokens": [
-        "robgoblin"
+        "robgoblin",
+        "pondblasters"
       ],
-      "binding_evidence": "T699: reference actor definition 1294 (Npcs.json ModelId 4, robgoblin_m_basic.adr) shares model 4 with the quest target 'Robgoblin' (locale 2232). Kill target of q3010011 objective 0.0; q3010008 objective 0.0; q3090007 objective 0.1.",
+      "binding_evidence": "T699/F722: reference actor definition 1294 (Npcs.json ModelId 4, robgoblin_m_basic.adr) shares model 4 with the quest target 'Robgoblin Pondblasters' (locale 95047). Kill target of q3010011 objective 0.0 and q3090007 objective 0.1; q3010008 objective 0.0 is a drop count (needs-server).",
       "adr_closure": null,
       "runtime_scale": null,
       "texture_alias": "",
