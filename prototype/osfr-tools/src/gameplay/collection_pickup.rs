@@ -20,14 +20,19 @@
 //! T522: a completion also records its meta collection entry (the Elite sets 284-291 tick `Elite
 //! Explorer` 309; 299-304 tick 306), mapped at load by `collection_catalogue::meta_map` from the
 //! captured `collection_add` targets. Both states commit in the same staged transaction.
+//!
+//! T524: a 26/8 click on a sparkling collection node grants one item from the node pool's
+//! weighted table and records the item's catalogue entry through the same ledger path. The
+//! roll is a per-player stream seeded from OS entropy, so the client cannot steer it; the item
+//! grant, its 38/10 and the node hide commit together, and a missing catalogue or entry
+//! refuses before anything is staged.
 use super::*;
 use crate::{
     collection_catalogue::CollectionCatalogueContent,
     collection_coins::{CoinEdit, CollectionCoins},
     harvest_nodes::{Denied, apply_node_changes},
     progression_extras::{
-        CollectionEntryUpdate, CollectionEvent, CollectionEventOrigin, CollectionLedger,
-        ProgressionExtras,
+        CollectionEntryUpdate, CollectionEvent, CollectionLedger, ProgressionExtras,
     },
     rewards::GrantFailure,
     world::{NpcVisibility, OPEN_WORLD_ZONE},
@@ -164,6 +169,15 @@ fn log_refused_entry(entry: i32, error: &io::Error) {
 }
 
 impl Gameplay {
+    /// T524: deterministic collection-node rolls for tests and offline fixtures. `Gameplay::load`
+    /// seeds the per-player stream from OS entropy and the request path never calls this, so no
+    /// client value can reach a roll.
+    pub fn seed_collection_rolls(&mut self, seed: u64) {
+        if let Some(nodes) = self.gathering_nodes.as_mut() {
+            nodes.seed_rolls(seed);
+        }
+    }
+
     /// A 26/8 click on an exploration coin. `None` for any other target, which keeps its NPC
     /// route. Refusals change nothing; only a pickup marks the save changed.
     pub(super) fn handle_collection_coin(
@@ -215,13 +229,9 @@ impl Gameplay {
         }
         // Stage everything: a refusal or an error leaves `self` exactly as it was.
         let mut staged = self.clone();
-        if let Err(error) = staged.record_collection_entry(
-            &world,
-            coin.entry_id,
-            CollectionEventOrigin::ExplorationCoin,
-            character.guid,
-            &mut out,
-        ) {
+        if let Err(error) =
+            staged.record_collection_entry(&world, coin.entry_id, character.guid, &mut out)
+        {
             let Some(failure) = error
                 .get_ref()
                 .and_then(|e| e.downcast_ref::<GrantFailure>())
@@ -275,7 +285,7 @@ impl Gameplay {
         let Some(item) = self
             .gathering_nodes
             .as_ref()
-            .and_then(|nodes| nodes.collect_item(target, character.guid, now_ms))
+            .and_then(|nodes| nodes.collect_item(target))
         else {
             out.replies.push(chat::system(&Denied::Gone.message()));
             return Ok(out);
@@ -292,15 +302,32 @@ impl Gameplay {
                 return Ok(out);
             }
         };
+        // T524 review: the item and its ledger entry commit together, so a content set with
+        // the node file but not the collection catalogue (or without an entry for this drop)
+        // must refuse before staging; otherwise the bag gains a free item and the node hides
+        // while the collection can never fill.
+        let Some(world) = self.collections.clone() else {
+            npc_event(serde_json::json!({
+                "event": "collection_node_no_content",
+                "item": item,
+            }));
+            out.replies
+                .push(chat::system("You cannot gather that right now."));
+            return Ok(out);
+        };
+        let Some(entry) = world.catalogue.entry_for_item(item) else {
+            npc_event(serde_json::json!({
+                "event": "collection_node_no_entry",
+                "item": item,
+            }));
+            out.replies
+                .push(chat::system("You cannot gather that right now."));
+            return Ok(out);
+        };
         // Same start gate as the Type8 path: a grant that cannot be stored changes nothing.
         // (Not redundant: `grant_reward` reports a full bag as a plain "inventory is full"
         // error, which would answer the generic line instead of this one.)
-        if self
-            .inventory
-            .clone()
-            .grant_bundle(0, &[(item, 1)])
-            .is_err()
-        {
+        if !self.inventory.accepts_reward_bundle(&[(item, 1)]) {
             out.replies.push(chat::system(
                 "Your bag is full. Make room before gathering.",
             ));
@@ -312,22 +339,10 @@ impl Gameplay {
         let staged_result = staged
             .grant_reward(0, &[(item, 1)], &mut staged_out)
             .and_then(|()| {
-                let Some(world) = staged.collections.clone() else {
-                    return Ok(());
-                };
-                let Some(entry) = world.catalogue.entry_for_item(item) else {
-                    return Ok(());
-                };
                 if staged.progression_extras.collections().is_collected(entry) {
                     return Ok(());
                 }
-                staged.record_collection_entry(
-                    &world,
-                    entry,
-                    CollectionEventOrigin::HarvestNode,
-                    character.guid,
-                    &mut staged_out,
-                )
+                staged.record_collection_entry(&world, entry, character.guid, &mut staged_out)
             });
         if let Err(error) = staged_result {
             let failure = error
@@ -362,21 +377,19 @@ impl Gameplay {
         Ok(out)
     }
 
-    /// Record `entry_id` on the saved ledger with this event's origin: its 38/10 first,
-    /// then, when it completes the collection, the reward packets, with the paid bag, coins
-    /// and XP adopted. A completed collection that maps to a meta collection entry (T522)
-    /// records that entry too through the same staged path, and that collection's completion
-    /// then pays its own reward. An `Err` may leave `self` half changed; the caller discards
-    /// the staged copy.
+    /// Record `entry_id` on the saved ledger: its 38/10 first, then, when it completes the
+    /// collection, the reward packets, with the paid bag, coins and XP adopted. A completed
+    /// collection that maps to a meta collection entry (T522) records that entry too through
+    /// the same staged path, and that collection's completion then pays its own reward. An
+    /// `Err` may leave `self` half changed; the caller discards the staged copy.
     fn record_collection_entry(
         &mut self,
         world: &CollectionWorld,
         entry_id: i32,
-        origin: CollectionEventOrigin,
         player_guid: u64,
         out: &mut Outcome,
     ) -> io::Result<()> {
-        let collection_id = match self.collect_entry(world, entry_id, origin, player_guid, out) {
+        let collection_id = match self.collect_entry(world, entry_id, player_guid, out) {
             Ok(collection_id) => collection_id,
             Err(error) => {
                 log_refused_entry(entry_id, &error);
@@ -391,13 +404,7 @@ impl Gameplay {
         let Some(meta_entry) = world.catalogue.meta_entry(collection_id) else {
             return Ok(());
         };
-        if let Err(error) = self.collect_entry(
-            world,
-            meta_entry,
-            CollectionEventOrigin::CollectionBundleEntry,
-            player_guid,
-            out,
-        ) {
+        if let Err(error) = self.collect_entry(world, meta_entry, player_guid, out) {
             log_refused_entry(meta_entry, &error);
             return Err(error);
         }
@@ -411,7 +418,6 @@ impl Gameplay {
         &mut self,
         world: &CollectionWorld,
         entry_id: i32,
-        origin: CollectionEventOrigin,
         player_guid: u64,
         out: &mut Outcome,
     ) -> io::Result<Option<i32>> {
@@ -433,7 +439,6 @@ impl Gameplay {
         };
         let event = CollectionEvent {
             entry_id,
-            origin,
             wire_update: Some(update),
         };
         let rewards = self.reward_snapshot();

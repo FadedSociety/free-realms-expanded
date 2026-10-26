@@ -10,13 +10,16 @@
 //! T524 adds the community `collection_nodes.json` hardpoints as a third kind: a sparkling
 //! personal node that grants one item from its pool's drop table and fills that item's
 //! collection entry. It has no job gate (R: Sanctuary's `HandleCollectionNode`), and the
-//! parent module owns the grant and the ledger tick (`gameplay/collection_pickup.rs`).
+//! parent module owns the grant and the ledger tick (`gameplay/collection_pickup.rs`). Only the
+//! collection kind sends the type's full AddNpc presentation (effect, integer range, rare
+//! subtitle, extra-effect companion); the Chef mushrooms only gain their sparkle, and mining
+//! and quest actors keep the captured template fields.
 
 use crate::{
     harvesting::CHEF_PROFILE_ID,
     inventory::Inventory,
     mining::{MINER_PROFILE_ID, Type8BoardSpec},
-    power_ups::Rng,
+    power_ups::{Rng, pick_weighted},
     startup_world::NpcSpawn,
     world::{NpcVisibility, content_spawn_template},
 };
@@ -112,15 +115,15 @@ pub struct HarvestNodeType {
     pub model_id: u32,
     pub scale: f32,
     pub composite_effect_id: u32,
-    /// Sanctuary adds these on top of the main effect (sparkling water); Legacy has none. Not
-    /// read at runtime; collection-node-pickups owns it.
+    /// Sanctuary adds these on top of the main effect (sparkling water). T524 draws the one
+    /// extra effect as a tag-4 invisible companion, for collection nodes only.
     #[serde(default)]
     pub extra_composite_effect_ids: Vec<u32>,
     pub interact_range: u32,
     pub cursor_id: u32,
     pub placement_y_offset: f32,
-    /// Sanctuary's rare-node subtitle locale row; absent on common types and Legacy nodes. Not
-    /// read at runtime; collection-node-pickups owns it.
+    /// Sanctuary's rare-node subtitle locale row; absent on common types and Legacy nodes.
+    /// T524 sends it for collection nodes only.
     #[serde(default)]
     pub sub_text_name_id: Option<i32>,
     /// Legacy drop table; unused by the Type8 payout, and absent for mining nodes.
@@ -147,8 +150,9 @@ pub struct HarvestNodePool {
     pub node_type: String,
     pub max_active_nodes: u32,
     pub respawn_seconds: u32,
-    /// Sanctuary keeps the loot table on the pool, Legacy on the type. Not read by W171, whose
-    /// Type8 payout owns the reward.
+    /// Sanctuary keeps the loot table on the pool, Legacy on the type. T524's collection
+    /// clicks roll this table (the import keeps the type tables empty); W171's Type8 payout
+    /// still owns the gather reward.
     #[serde(default)]
     pub drop_table: Vec<HarvestNodeDrop>,
     #[serde(default)]
@@ -217,19 +221,49 @@ pub struct NodeActor {
     pub name: String,
     pub model_id: u32,
     pub position: [f32; 3],
-    /// T524: the node type's `composite_effect_id` (its sparkle); 0 for none.
-    pub composite_effect_id: u32,
-    /// T524: the node type's interaction range, sent in the AddNpc `interact_range` field.
-    pub interact_range: u32,
-    /// T524: the rare-node subtitle locale row; -1 for none.
-    pub sub_text_name_id: i32,
-    /// T524: the type's one extra effect (water), drawn by its companion actor.
+    /// T524: what this node kind adds to the captured AddNpc template.
+    pub presentation: NodePresentation,
+}
+
+impl NodeActor {
+    /// T524: the tag-4 effect companion this actor draws, when its type declares an extra
+    /// effect. Show and hide read this one rule, so a node kind without an extra effect can
+    /// never remove another kind's companion that shares its spawn id.
+    pub fn companion_guid(&self) -> Option<u64> {
+        self.presentation
+            .extra_composite_effect_id
+            .map(|_| companion_guid(self.guid))
+    }
+}
+
+/// T524: the AddNpc presentation fields a node kind adds to the captured static-actor
+/// template. A `None` field keeps the template's captured value, so mining and quest actors
+/// stay byte-identical to the pre-T524 captures. Only collection nodes send the full set; the
+/// Chef mushrooms override the sparkle alone (the brief's "only the mushroom types start
+/// sparkling").
+#[derive(Clone, Debug, Default, PartialEq)]
+pub struct NodePresentation {
+    /// AddNpc `composite_effect_id` (after `vertical_offset`): the node type's sparkle.
+    pub composite_effect_id: Option<u32>,
+    /// AddNpc `interact_range` (after `speed`/flag 28): the type's integer range. The client's
+    /// X-prompt radius is the AddNpc float `unknown_float_51`, not this field, and server
+    /// admission uses [`Site::range`].
+    pub interact_range: Option<u32>,
+    /// AddNpc `sub_text_name_string_id` (after the three animation ids): the rare-node
+    /// subtitle.
+    pub sub_text_name_id: Option<i32>,
+    /// The type's one extra effect (water), drawn by a tag-4 invisible cube companion.
     pub extra_composite_effect_id: Option<u32>,
 }
 
 pub enum NodeChange {
     Show(NodeActor),
-    Hide(u64),
+    /// `companion` is the tag-4 effect actor the shown node drew (none for every other kind),
+    /// so a hide removes only the companion that belongs to this node.
+    Hide {
+        guid: u64,
+        companion: Option<u64>,
+    },
 }
 
 /// Which file placed a node. T524: Collect carries the pool's drop table into its sites.
@@ -253,6 +287,9 @@ enum SiteKind {
 struct Site {
     actor: NodeActor,
     kind: SiteKind,
+    /// Server-side admission reach, from the node type; every kind uses it. The integer
+    /// AddNpc `interact_range` a collect node sends is a different consumer of the same content
+    /// row, so the two are not interchangeable.
     range: f64,
     respawn_ms: u64,
 }
@@ -325,6 +362,10 @@ pub struct GatheringNodes {
     paid: Vec<u64>,
     /// Hidden nodes and the time they return.
     regrow: BTreeMap<u64, u64>,
+    /// T524: this player's collection roll stream, seeded from OS entropy at load and drawn
+    /// when a click commits ([`Self::consume`]); a refused click draws nothing. Not saved: a
+    /// relog starts a fresh stream.
+    rolls: Rng,
 }
 
 impl GatheringNodes {
@@ -343,13 +384,26 @@ impl GatheringNodes {
                 add_sites(&mut sites, &content, source, tag)?;
             }
         }
-        Ok((!sites.is_empty()).then(|| Self {
+        if sites.is_empty() {
+            return Ok(None);
+        }
+        Ok(Some(Self {
             sites: Arc::new(sites),
             shown: BTreeSet::new(),
             current: None,
             paid: Vec::new(),
             regrow: BTreeMap::new(),
+            // The stream is the only roll source; a missing OS seed fails the load closed
+            // rather than falling back to a predictable seed a client could learn.
+            rolls: Rng::from_entropy()?,
         }))
+    }
+
+    /// (R) Replace the collection roll stream. Tests and offline fixtures only: [`Self::load`]
+    /// seeds from OS entropy and the request path never calls this, so no client value can
+    /// reach a roll.
+    pub fn seed_rolls(&mut self, seed: u64) {
+        self.rolls = Rng::seeded(seed);
     }
 
     /// Every node this player can ever see, shown or not.
@@ -425,19 +479,22 @@ impl GatheringNodes {
         }
     }
 
-    /// T524: the one item this player's click on a collection node yields, a weighted pick
-    /// from the pool's table. Seeded from the player guid, node guid and the server's click
-    /// time, so each click rolls afresh yet no client field steers it and a refused click
-    /// advances nothing (R: Sanctuary draws its shared stream per click). `None` only for a
-    /// non-collect or unvalidated site.
-    pub fn collect_item(&self, guid: u64, player_guid: u64, now_ms: u64) -> Option<u32> {
+    /// T524: the item a click on collection node `guid` would yield: one weighted pick from
+    /// the pool's table. It draws from a copy of this player's stream, so a refused click
+    /// advances nothing; [`Self::consume`] makes the draw when the click commits. `None` for a
+    /// non-collect site or a table that cannot yield (the loader refuses those).
+    pub fn collect_item(&self, guid: u64) -> Option<u32> {
         let SiteKind::Collect { drops } = &self.sites.get(&guid)?.kind else {
             return None;
         };
-        let mut rng = Rng::seeded(Rng::mix(
-            player_guid ^ guid.rotate_left(17) ^ now_ms.rotate_left(41),
-        ));
-        weighted_item(drops, &mut rng)
+        let mut rolls = self.rolls.clone();
+        pick_weighted(
+            drops
+                .iter()
+                .map(|drop| (&drop.item_definition_id, drop.weight)),
+            &mut rolls,
+        )
+        .copied()
     }
 
     /// The admission lines every node shares: placed, shown, not busy, in the open world and
@@ -482,13 +539,21 @@ impl GatheringNodes {
     /// T503/T524: the player consumed this node (a quest pickup or a collection node). It
     /// hides now and returns after the pool's respawn time, without the Type8 run or its paid
     /// bookkeeping. A node that is not shown changes nothing: no `Hide`, no new deadline.
+    /// A collection click also commits its one roll here, so only a pick that hides draws from
+    /// the stream.
     pub fn consume(&mut self, guid: u64, now_ms: u64) -> Option<NodeChange> {
         let site = self.sites.get(&guid)?;
         if !self.shown.remove(&guid) {
             return None;
         }
+        if matches!(site.kind, SiteKind::Collect { .. }) {
+            self.rolls.next_u64();
+        }
         self.regrow.insert(guid, now_ms + site.respawn_ms);
-        Some(NodeChange::Hide(guid))
+        Some(NodeChange::Hide {
+            guid,
+            companion: site.actor.companion_guid(),
+        })
     }
 
     /// The run started from `guid` is under way.
@@ -520,7 +585,10 @@ impl GatheringNodes {
             if want && self.shown.insert(*guid) {
                 changes.push(NodeChange::Show(site.actor.clone()));
             } else if !want && self.shown.remove(guid) {
-                changes.push(NodeChange::Hide(*guid));
+                changes.push(NodeChange::Hide {
+                    guid: *guid,
+                    companion: site.actor.companion_guid(),
+                });
             }
         }
         changes
@@ -563,6 +631,16 @@ fn add_sites(
     {
         return Err(bad("a node type has more than one extra composite effect"));
     }
+    // T524: only collection nodes draw a tag-4 effect companion; another kind's extra effect
+    // would be loaded and silently ignored, so refuse it instead.
+    if !matches!(source, NodeSource::Collect)
+        && content
+            .node_types
+            .iter()
+            .any(|node_type| !node_type.extra_composite_effect_ids.is_empty())
+    {
+        return Err(bad("a non-collect node type has an extra composite effect"));
+    }
     if content
         .spawns
         .iter()
@@ -601,6 +679,22 @@ fn add_sites(
                 }
             }
         };
+        // T524: collection nodes send the type's effect, AddNpc range, rare subtitle and one
+        // extra-effect companion; the Chef mushrooms override the sparkle alone; mining and
+        // quest actors keep the pre-T524 captured template fields.
+        let presentation = match source {
+            NodeSource::Collect => NodePresentation {
+                composite_effect_id: Some(node_type.composite_effect_id),
+                interact_range: Some(node_type.interact_range),
+                sub_text_name_id: node_type.sub_text_name_id,
+                extra_composite_effect_id: node_type.extra_composite_effect_ids.first().copied(),
+            },
+            NodeSource::Gather(Gather::Harvesting) => NodePresentation {
+                composite_effect_id: Some(node_type.composite_effect_id),
+                ..NodePresentation::default()
+            },
+            NodeSource::Gather(Gather::Mining) | NodeSource::Pickup => NodePresentation::default(),
+        };
         let rows: Vec<_> = content
             .spawns
             .iter()
@@ -620,13 +714,7 @@ fn add_sites(
                     name: node_type.name.clone(),
                     model_id: node_type.model_id,
                     position: [x, y + node_type.placement_y_offset, z],
-                    composite_effect_id: node_type.composite_effect_id,
-                    interact_range: node_type.interact_range,
-                    sub_text_name_id: node_type.sub_text_name_id.unwrap_or(-1),
-                    extra_composite_effect_id: node_type
-                        .extra_composite_effect_ids
-                        .first()
-                        .copied(),
+                    presentation: presentation.clone(),
                 },
                 kind: kind.clone(),
                 range: f64::from(node_type.interact_range),
@@ -638,23 +726,6 @@ fn add_sites(
         }
     }
     Ok(())
-}
-
-/// T524: weighted pick over a validated collect table (positive total weight).
-fn weighted_item(drops: &[HarvestNodeDrop], rng: &mut Rng) -> Option<u32> {
-    let total: u64 = drops.iter().map(|drop| u64::from(drop.weight)).sum();
-    if total == 0 {
-        return None;
-    }
-    let mut at = rng.next_u64() % total;
-    for drop in drops {
-        let weight = u64::from(drop.weight);
-        if at < weight {
-            return Some(drop.item_definition_id);
-        }
-        at -= weight;
-    }
-    None
 }
 
 /// T524: draw and remove node actors, sparkle included. The caller sends
@@ -676,26 +747,34 @@ pub fn apply_node_changes(visibility: &mut NpcVisibility, changes: Vec<NodeChang
                     );
                 }
             }
-            NodeChange::Hide(guid) => {
+            NodeChange::Hide { guid, companion } => {
                 visibility.remove(guid);
-                visibility.remove(companion_guid(guid));
+                if let Some(companion) = companion {
+                    visibility.remove(companion);
+                }
             }
         }
     }
 }
 
-/// T524: a node's AddNpc spawn. `content_spawn_template` supplies the captured constants;
-/// the type's sparkle, reach and rare subtitle are the node's own fields (AddNpc reader
-/// `00921a10` field sequence, writer `startup_world::write_npc_body`).
+/// T524: a node's AddNpc spawn. `content_spawn_template` supplies the captured constants; the
+/// node's [`NodePresentation`] overrides the fields its kind owns (AddNpc reader `00921a10`
+/// field sequence, writer `startup_world::write_npc_body`).
 fn node_spawn(node: &NodeActor, interactable: bool) -> NpcSpawn {
     let mut spawn = content_spawn_template();
     spawn.actor_id = node.guid;
     spawn.model_id = node.model_id as i32;
     spawn.position = [node.position[0], node.position[1], node.position[2], 1.0];
     spawn.rotation = [0.0, 0.0, 1.0, 0.0];
-    spawn.composite_effect_id = node.composite_effect_id as i32;
-    spawn.interact_range = node.interact_range as i32;
-    spawn.sub_text_name_string_id = node.sub_text_name_id;
+    if let Some(effect) = node.presentation.composite_effect_id {
+        spawn.composite_effect_id = effect as i32;
+    }
+    if let Some(range) = node.presentation.interact_range {
+        spawn.interact_range = range as i32;
+    }
+    if let Some(sub_text) = node.presentation.sub_text_name_id {
+        spawn.sub_text_name_string_id = sub_text;
+    }
     spawn.is_interactable = u8::from(interactable);
     spawn
 }
@@ -705,19 +784,31 @@ fn node_spawn(node: &NodeActor, interactable: bool) -> NpcSpawn {
 /// tag-4 guid is unique.
 fn companion_actor(node: &NodeActor) -> Option<NodeActor> {
     Some(NodeActor {
-        guid: companion_guid(node.guid),
+        guid: node.companion_guid()?,
         name: String::new(),
         model_id: INVISIBLE_CUBE_MODEL,
         position: node.position,
-        composite_effect_id: node.extra_composite_effect_id?,
-        interact_range: 0,
-        sub_text_name_id: -1,
-        extra_composite_effect_id: None,
+        presentation: NodePresentation {
+            composite_effect_id: node.presentation.extra_composite_effect_id,
+            // The cube is an effect carrier, not an interaction target: the old literal
+            // values are explicit here rather than inherited from the template.
+            interact_range: Some(0),
+            sub_text_name_id: Some(-1),
+            extra_composite_effect_id: None,
+        },
     })
 }
 
+/// The tag-4 guid of a node's effect companion: the node's spawn id under the companion tag.
 fn companion_guid(node_guid: u64) -> u64 {
     (node_guid & !(0xff_u64 << 32)) | (COMPANION_TAG << 32)
+}
+
+/// T524: the world guid of the `spawn_id` row in `collection_nodes.json`: "NOD", the
+/// collection tag (5) and the content spawn id. Public so a test or a content tool names a
+/// placed collection node without copying the tag.
+pub fn collection_node_guid(spawn_id: u32) -> u64 {
+    node_guid(COLLECTION_NODE_TAG, spawn_id)
 }
 
 /// Start gate for the bag (R): a win that cannot be stored rolls back and strands the run, so
@@ -755,6 +846,33 @@ mod tests {
         );
         let guids: BTreeSet<u64> = tags.iter().map(|tag| node_guid(*tag, 100)).collect();
         assert_eq!(guids.len(), tags.len(), "two node files share a guid space");
+    }
+
+    /// The public constructor names a placed collection node on the loader's own tag, and a
+    /// collection actor's companion is its spawn id under the tag-4 byte.
+    #[test]
+    fn a_collection_guid_and_its_companion_use_the_loader_tags() {
+        let collected = collection_node_guid(103);
+        assert_eq!((collected >> 32) & 0xff, COLLECTION_NODE_TAG);
+        assert_eq!(collected & 0xffff_ffff, 103);
+        let dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        let content = HarvestNodesContent::load_from(dir.join("collection_nodes.json")).unwrap();
+        let mut sites = BTreeMap::new();
+        add_sites(
+            &mut sites,
+            &content,
+            NodeSource::Collect,
+            COLLECTION_NODE_TAG,
+        )
+        .unwrap();
+        let water = sites
+            .values()
+            .map(|site| &site.actor)
+            .find(|actor| actor.presentation.extra_composite_effect_id.is_some())
+            .expect("the imported water type has an extra effect");
+        let companion = water.companion_guid().expect("the water companion");
+        assert_eq!((companion >> 32) & 0xff, COMPANION_TAG);
+        assert_eq!(companion & 0xffff_ffff, water.guid & 0xffff_ffff);
     }
 
     /// The committed collection file loads beside the quest file on its own tag. The pool

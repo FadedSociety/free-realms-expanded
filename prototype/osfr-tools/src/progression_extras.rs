@@ -487,19 +487,9 @@ impl CollectionMessage {
     }
 }
 
-/// One of the gameplay sources that can supply a newly collected entry (R).
-#[derive(Clone, Copy, Debug, PartialEq, Eq)]
-pub enum CollectionEventOrigin {
-    ExplorationCoin,
-    HarvestNode,
-    QuestReward,
-    CollectionBundleEntry,
-}
-
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct CollectionEvent {
     pub entry_id: i32,
-    pub origin: CollectionEventOrigin,
     /// Checked against the entry and sent only when it is newly collected.
     pub wire_update: Option<CollectionEntryUpdate>,
 }

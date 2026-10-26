@@ -287,9 +287,42 @@ fn the_gathering_loader_reads_collection_nodes() {
         "one placed actor per active pool slot"
     );
     assert!(
-        actors.iter().all(|a| a.composite_effect_id != 0),
+        actors
+            .iter()
+            .all(|a| a.presentation.composite_effect_id.is_some_and(|id| id != 0)),
         "every collection type sparkles"
     );
+    // T524 review: the full AddNpc presentation is the collection kind's; a mining or quest
+    // actor keeps the captured template fields, and the Chef mushrooms only gain their sparkle.
+    for file in ["mining_nodes.json", "quest_nodes.json"] {
+        let dir = TempDir::new();
+        fs::copy(data_file(file), dir.0.join(file)).unwrap();
+        let nodes = GatheringNodes::load(&dir.0).unwrap().expect("a node file");
+        assert!(
+            nodes.actors().all(|actor| actor.presentation
+                == osfr_tools::harvest_nodes::NodePresentation::default()),
+            "{file} actors must keep the captured AddNpc template fields"
+        );
+    }
+    let dir = TempDir::new();
+    fs::copy(
+        data_file("harvest_nodes.json"),
+        dir.0.join("harvest_nodes.json"),
+    )
+    .unwrap();
+    let harvest = GatheringNodes::load(&dir.0)
+        .unwrap()
+        .expect("mushroom nodes");
+    assert!(harvest.actors().all(|actor| {
+        actor
+            .presentation
+            .composite_effect_id
+            .is_some_and(|id| id != 0)
+            && actor.presentation.interact_range.is_none()
+            && actor.presentation.sub_text_name_id.is_none()
+            && actor.presentation.extra_composite_effect_id.is_none()
+            && actor.companion_guid().is_none()
+    }));
     // Control: an empty directory still places nothing.
     let empty = TempDir::new();
     assert!(GatheringNodes::load(&empty.0).unwrap().is_none());

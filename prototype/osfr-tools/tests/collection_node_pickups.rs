@@ -3,31 +3,43 @@
 //! A jobless player clicks (26/8) a placed `collection_nodes.json` node in range: one item
 //! from the pool's weighted table is granted, that item's collection entry is recorded through
 //! the shared T450 ledger path (the 38/10 follows the item grant), and the node hides until the
-//! pool's respawn. Every refusal changes nothing. The suite also pins the AddNpc sparkle fields,
-//! the water companion actor, relog and the gateway dispatch.
+//! pool's respawn. Every refusal changes nothing. The suite also pins the AddNpc sparkle fields
+//! (scoped to the collection nodes and the Chef mushrooms), the water companion actor, the
+//! content gaps that must refuse, relog and the gateway dispatch.
 //!
-//! Node guids are `harvest_nodes`' "NOD" base, tag 5 (`collection_nodes.json`) and the content
-//! spawn id; the water companion is tag 4. The gameplay content is the private opening package
-//! (its item definitions are the ones the campaign ships) plus the shipped Mining18 board for
-//! the busy case; node, catalogue and coin content are the repository's `data/content`.
+//! Node guids come from `harvest_nodes::collection_node_guid`; the roll is a per-player OS
+//! entropy stream in production, so a test that pins an item seeds the stream with
+//! `Gameplay::seed_collection_rolls` (the same seed on a probe `GatheringNodes` computes the
+//! expected item without going through the request). The gameplay content is the private
+//! opening package plus a definition for every water-pool drop; node, catalogue and coin
+//! content are the repository's `data/content` unless a test builds a minimal NPC package.
 
-#[path = "common/content_copy.rs"]
-mod content_copy;
+#[path = "common/gateway_vendor.rs"]
+mod gateway_vendor;
+#[path = "common/item_catalogue.rs"]
+mod item_catalogue;
 #[path = "support/json.rs"]
 mod json;
+#[path = "support/pickup_fixture.rs"]
+mod pickup_fixture;
 
 use osfr_tools::{
     character_store::CharacterState,
     collection_catalogue::CollectionCatalogueContent,
-    gameplay::{Gameplay, GameplayState, Outcome},
-    gateway::{Gateway, GatewayOutcome},
-    harvest_nodes::{GatheringNodes, NodeActor},
+    gameplay::{Gameplay, Outcome},
+    gateway::Gateway,
+    harvest_nodes::{
+        GatheringNodes, NodeActor, NodeChange, apply_node_changes, collection_node_guid,
+    },
     harvesting::CHEF_PROFILE_ID,
     inventory::InventoryItem,
-    mining::{self, MINER_PROFILE_ID},
+    mining::MINER_PROFILE_ID,
     npc_interaction::NpcInteractRequest,
     startup_world::parse_add_npc,
+    world::NpcVisibility,
 };
+use pickup_fixture::{PickupFixture, added, at, bundled, removed, snapshot};
+use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, BTreeSet},
     fs,
@@ -35,25 +47,22 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
-/// `harvest_nodes::NODE_GUID_BASE`; the loader owns the value, the test only builds clicks.
-const NODE_GUID_BASE: u64 = 0x4e4f_4400_0000_0000;
-/// Sparkling water nodes: spawns 186 and 840 share a pool (for the second-find gate).
+/// Sparkling water: spawn 151 in the 18-drop `stillwater-sparkling-water` pool.
 const WATER_NODE: u32 = 151;
+/// Two nodes in different pools with the same 18-item table (Stillwater and Sanctuary
+/// central), for the "entry already collected" case.
 const SAME_ITEM_A: u32 = 186;
 const SAME_ITEM_B: u32 = 840;
 /// The rare-node subtitle locale row (`Rare Collection`) on every rare collection type.
 const RARE_SUBTITLE: i32 = -2_118_222_202;
 const FILLER: i32 = 1195;
-const PLAYER: u64 = 1;
+/// The seeded click: `seed_collection_rolls(ROLL_SEED)` makes the next roll `WATER_ITEM`.
+/// `WATER_ITEM` is the pinned first draw of SplitMix64 seed 7 over the water pool's weights
+/// (18 rows of weight 100, in `collection_nodes.json` order); it is in the middle of the table
+/// so an "always the first drop" bug cannot pass.
+const ROLL_SEED: u64 = 7;
+const WATER_ITEM: i32 = 23_179;
 static NEXT: AtomicU64 = AtomicU64::new(0);
-
-fn bundled() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
-fn collect_guid(spawn_id: u32) -> u64 {
-    NODE_GUID_BASE | 5 << 32 | u64::from(spawn_id)
-}
 
 fn shipped_nodes() -> GatheringNodes {
     GatheringNodes::load(&bundled())
@@ -61,39 +70,17 @@ fn shipped_nodes() -> GatheringNodes {
         .expect("the shipped node tables are present")
 }
 
-/// The roll of `WATER_NODE` for the test player at `now_ms`: the seed is the player guid,
-/// node guid and click time, so a click's item is pinned by the click's `now_ms`.
-fn water_item(now_ms: u64) -> i32 {
-    shipped_nodes()
-        .collect_item(collect_guid(WATER_NODE), PLAYER, now_ms)
+/// The first draw of `seed` on `spawn_id`'s pool, computed on a probe loader (no request).
+fn seeded_item(seed: u64, spawn_id: u32) -> i32 {
+    let mut nodes = shipped_nodes();
+    nodes.seed_rolls(seed);
+    nodes
+        .collect_item(collection_node_guid(spawn_id))
         .expect("a collect roll") as i32
 }
 
-/// The item definitions of the fixture's inventory content (the private opening package
-/// defines far fewer than the shipped item catalogue, so most pool items are undefined here).
-fn defined_items() -> BTreeSet<i32> {
-    let inventory = json::read(
-        &Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../../../lab/references/opening-journal-text-v2/content/inventory.json"),
-    );
-    inventory["definitions"]
-        .as_array()
-        .unwrap()
-        .iter()
-        .map(|definition| definition["id"].as_i64().unwrap() as i32)
-        .collect()
-}
-
-/// The first click time at or after `from_ms` whose `WATER_NODE` roll the fixture defines.
-fn water_click_at(from_ms: u64) -> u64 {
-    let defined = defined_items();
-    (from_ms..)
-        .find(|now_ms| defined.contains(&water_item(*now_ms)))
-        .expect("some roll lands on a defined item")
-}
-
 fn node(spawn_id: u32) -> NodeActor {
-    let guid = collect_guid(spawn_id);
+    let guid = collection_node_guid(spawn_id);
     shipped_nodes()
         .actors()
         .find(|actor| actor.guid == guid)
@@ -129,13 +116,14 @@ fn catalogue() -> CollectionCatalogueContent {
         .expect("the catalogue file")
 }
 
-fn at(position: [f32; 3]) -> CharacterState {
-    CharacterState {
-        guid: PLAYER,
-        zone_id: 0,
-        position,
-        rotation: [1.0, 0.0, 0.0],
-    }
+/// Define every drop of the water pool in the fixture pack, so a click can never refuse for an
+/// undefined item (the gateway test cannot seed the roll; the pinned test still knows its item).
+fn define_water_drops(fixture: &PickupFixture) {
+    let rows: Vec<Value> = pool_drops(WATER_NODE)
+        .into_iter()
+        .map(|item| item_catalogue::sized_row(item, 64))
+        .collect();
+    item_catalogue::write(fixture.dir(), &rows);
 }
 
 fn click(game: &mut Gameplay, target: u64, who: &CharacterState, now_ms: u64) -> Outcome {
@@ -158,24 +146,6 @@ fn view(game: &mut Gameplay, who: &CharacterState) {
         .expect("the NPC view update is served");
 }
 
-fn removed(outcome: &Outcome, guid: u64) -> bool {
-    outcome
-        .replies
-        .iter()
-        .any(|packet| packet.starts_with(&[35, 0, 3, 0]) && has_guid(packet, guid))
-}
-
-fn added(outcome: &Outcome, guid: u64) -> bool {
-    outcome
-        .replies
-        .iter()
-        .any(|packet| packet.starts_with(&[35, 0, 2, 0]) && has_guid(packet, guid))
-}
-
-fn has_guid(packet: &[u8], guid: u64) -> bool {
-    packet.windows(8).any(|window| window == guid.to_le_bytes())
-}
-
 fn said(outcome: &Outcome, needle: &str) -> bool {
     outcome.replies.iter().any(|packet| {
         if !packet.starts_with(&[15, 0, 3, 0]) || packet.len() < 9 {
@@ -189,18 +159,16 @@ fn said(outcome: &Outcome, needle: &str) -> bool {
 }
 
 /// Definition counts that a pickup could change; rentals are not stack rows.
-fn counts(state: &GameplayState) -> BTreeMap<i32, u32> {
+fn counts(items: &[InventoryItem]) -> BTreeMap<i32, u32> {
     let mut counts = BTreeMap::new();
-    for item in &state.inventory.items {
-        if item.rental.is_none() {
-            *counts.entry(item.definition_id).or_default() += item.count;
-        }
+    for item in items.iter().filter(|item| item.rental.is_none()) {
+        *counts.entry(item.definition_id).or_default() += item.count;
     }
     counts
 }
 
-/// The item a pickup can change, one entry per definition.
-fn delta(before: &GameplayState, after: &GameplayState) -> Vec<(i32, u32)> {
+/// The items a pickup can change, one entry per definition.
+fn delta(before: &[InventoryItem], after: &[InventoryItem]) -> Vec<(i32, u32)> {
     let before = counts(before);
     let after = counts(after);
     let mut changed = Vec::new();
@@ -215,15 +183,17 @@ fn delta(before: &GameplayState, after: &GameplayState) -> Vec<(i32, u32)> {
     changed
 }
 
+fn state_delta(
+    before: &osfr_tools::gameplay::GameplayState,
+    after: &osfr_tools::gameplay::GameplayState,
+) -> Vec<(i32, u32)> {
+    delta(&before.inventory.items, &after.inventory.items)
+}
+
 fn collected(game: &Gameplay, entry: i32) -> bool {
     game.state()
         .progression_extras
         .is_some_and(|extras| extras.collections.is_collected(entry))
-}
-
-/// What a refusal must leave alone: the save and the visibility revision.
-fn snapshot(game: &Gameplay) -> (GameplayState, u64) {
-    (game.state(), game.npc_visibility_revision())
 }
 
 fn add_entry(entry_id: i32) -> Vec<u8> {
@@ -267,48 +237,7 @@ fn entry_packet_index(outcome: &Outcome) -> Option<usize> {
         .position(|packet| packet.starts_with(&[38, 0, 10, 0]))
 }
 
-struct Fixture {
-    dir: PathBuf,
-}
-
-impl Fixture {
-    fn new() -> Self {
-        let dir = std::env::temp_dir().join(format!(
-            "osfr-collect-node-{}-{}",
-            std::process::id(),
-            NEXT.fetch_add(1, Ordering::Relaxed)
-        ));
-        let opening = Path::new(env!("CARGO_MANIFEST_DIR"))
-            .join("../../../lab/references/opening-journal-text-v2/content");
-        content_copy::copy_tree(&opening, &dir);
-        // The busy case starts a real Mining18 run; its board and outputs are shipped.
-        fs::copy(
-            bundled().join(mining::CONTENT_FILE),
-            dir.join(mining::CONTENT_FILE),
-        )
-        .unwrap();
-        Self { dir }
-    }
-
-    fn load(&self, state: Option<GameplayState>) -> Gameplay {
-        Gameplay::load(&self.dir, state).expect("gameplay content loads")
-    }
-
-    /// The opening save: neither gather job is unlocked, so a collect click that ran the
-    /// gather admission would answer NoJob. The snapshot requires the active job to stay
-    /// unlocked, so the minimum valid save keeps job 1 and no Miner/Chef.
-    fn jobless(&self) -> GameplayState {
-        self.load(None).state()
-    }
-}
-
-impl Drop for Fixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.dir);
-    }
-}
-
-fn fill_inventory(state: &mut GameplayState) {
+fn fill_inventory(state: &mut osfr_tools::gameplay::GameplayState) {
     let items = &mut state.inventory.items;
     let mut next = items.iter().map(|item| item.id).max().unwrap_or(0) + 1;
     while items.len() < 4096 {
@@ -330,8 +259,9 @@ fn fill_inventory(state: &mut GameplayState) {
 }
 
 #[test]
-fn a_jobless_player_gets_one_item_and_its_entry_through_the_real_click() {
-    let fixture = Fixture::new();
+fn a_jobless_player_gets_the_pinned_item_and_its_entry_through_the_real_click() {
+    let fixture = PickupFixture::new("collect-node");
+    define_water_drops(&fixture);
     let state = fixture.jobless();
     let profiles = state.profiles.as_ref().expect("the opening profiles");
     assert!(
@@ -343,21 +273,24 @@ fn a_jobless_player_gets_one_item_and_its_entry_through_the_real_click() {
     let node = node(WATER_NODE);
     let who = at(node.position);
     let before = game.state();
-    let now_ms = water_click_at(1_000);
-    let out = click(&mut game, node.guid, &who, now_ms);
+    assert_eq!(
+        seeded_item(ROLL_SEED, WATER_NODE),
+        WATER_ITEM,
+        "the pinned seed's first draw moved"
+    );
+    game.seed_collection_rolls(ROLL_SEED);
+    let out = click(&mut game, node.guid, &who, 1_000);
 
     assert!(out.changed, "the pickup is a saved change");
-    // Exactly one item, pinned by the click's time, and one the node's pool can yield.
-    let item = water_item(now_ms);
-    let gained = delta(&before, &game.state());
+    // Exactly one item, the one the seeded stream pinned.
     assert_eq!(
-        gained,
-        vec![(item, 1)],
+        state_delta(&before, &game.state()),
+        vec![(WATER_ITEM, 1)],
         "exactly one item definition changed"
     );
     assert!(
-        pool_drops(WATER_NODE).contains(&(item as u32)),
-        "item {item} is not in the pool table"
+        pool_drops(WATER_NODE).contains(&(WATER_ITEM as u32)),
+        "item {WATER_ITEM} is not in the pool table"
     );
     // The item grant precedes the entry tick (38/10).
     let item_at = item_packet(&out).expect("the item grant packet");
@@ -368,7 +301,7 @@ fn a_jobless_player_gets_one_item_and_its_entry_through_the_real_click() {
     );
     // 38/10 carries the catalogue row for the item's entry, exactly once.
     let entry = catalogue()
-        .entry_for_item(item)
+        .entry_for_item(WATER_ITEM)
         .expect("every shipped drop item maps to one entry");
     assert!(collected(&game, entry));
     let mut add_entry_out = out
@@ -383,44 +316,37 @@ fn a_jobless_player_gets_one_item_and_its_entry_through_the_real_click() {
         "the pickup fell through"
     );
     // The node hides for this player in the same click.
-    assert!(removed(&out, node.guid), "the node was not hidden");
+    assert!(removed(&out.replies, node.guid), "the node was not hidden");
 }
 
 #[test]
 fn a_second_node_with_the_same_item_grants_it_and_records_nothing() {
-    let fixture = Fixture::new();
+    let fixture = PickupFixture::new("collect-node-repeat");
+    define_water_drops(&fixture);
     let mut game = fixture.load(Some(fixture.jobless()));
     let first = node(SAME_ITEM_A);
     let second = node(SAME_ITEM_B);
-    let nodes = shipped_nodes();
-    let defined = defined_items();
-    let first_at = (1_000..)
-        .find(|now_ms| {
-            nodes
-                .collect_item(first.guid, PLAYER, *now_ms)
-                .is_some_and(|item| defined.contains(&(item as i32)))
-        })
-        .expect("a defined first roll");
-    let item = nodes
-        .collect_item(first.guid, PLAYER, first_at)
-        .expect("first roll");
-    // The second click's time is chosen so the shared pool rolls the same item again.
-    let second_at = (first_at + 1..)
-        .find(|now_ms| nodes.collect_item(second.guid, PLAYER, *now_ms) == Some(item))
-        .expect("the shared pool can repeat an item");
+    // The two pools hold the same 18-item table, so the same seed draws the same item on both.
+    let first_item = seeded_item(ROLL_SEED, SAME_ITEM_A);
+    assert_eq!(first_item, seeded_item(ROLL_SEED, SAME_ITEM_B));
 
     let before = game.state();
-    let first_out = click(&mut game, first.guid, &at(first.position), first_at);
+    game.seed_collection_rolls(ROLL_SEED);
+    let first_out = click(&mut game, first.guid, &at(first.position), 1_000);
     assert!(
         entry_packet(&first_out).is_some(),
         "the first find records its entry"
     );
-    let entry = catalogue().entry_for_item(item as i32).expect("entry");
+    let entry = catalogue().entry_for_item(first_item).expect("entry");
     assert!(collected(&game, entry));
 
     let after_first = game.state();
-    let second_out = click(&mut game, second.guid, &at(second.position), second_at);
-    assert_eq!(delta(&after_first, &game.state()), vec![(item as i32, 1)]);
+    game.seed_collection_rolls(ROLL_SEED);
+    let second_out = click(&mut game, second.guid, &at(second.position), 2_000);
+    assert_eq!(
+        state_delta(&after_first, &game.state()),
+        vec![(first_item, 1)]
+    );
     assert!(
         entry_packet(&second_out).is_none(),
         "a known entry was recorded twice"
@@ -428,60 +354,174 @@ fn a_second_node_with_the_same_item_grants_it_and_records_nothing() {
     assert!(collected(&game, entry));
     let ledger = game.state().progression_extras.unwrap().collections;
     assert_eq!(ledger.collected_count(), 1, "one entry was recorded");
-    assert_eq!(delta(&before, &game.state()), vec![(item as i32, 2)]);
+    assert_eq!(state_delta(&before, &game.state()), vec![(first_item, 2)]);
 }
 
 #[test]
 fn the_node_hides_now_and_returns_after_its_pool_respawn() {
-    let fixture = Fixture::new();
+    let fixture = PickupFixture::new("collect-node-respawn");
+    define_water_drops(&fixture);
     let mut game = fixture.load(Some(fixture.jobless()));
     let node = node(WATER_NODE);
     let who = at(node.position);
-    let first_at = water_click_at(1_000);
-    let out = click(&mut game, node.guid, &who, first_at);
-    assert!(removed(&out, node.guid), "the click hides the node");
+    game.seed_collection_rolls(ROLL_SEED);
+    let out = click(&mut game, node.guid, &who, 1_000);
+    assert!(removed(&out.replies, node.guid), "the click hides the node");
     // Water pools respawn in 60 s.
     assert!(!added(
-        &game.tick(&who, first_at + 59_999).unwrap(),
+        &game.tick(&who, 1_000 + 59_999).unwrap().replies,
         node.guid
     ));
-    let back = game.tick(&who, first_at + 60_000).unwrap();
-    assert!(added(&back, node.guid), "the node did not grow back");
-
-    // The returned node rolls afresh: the item is the one pinned by this click's time.
-    let again_at = water_click_at(first_at + 60_100);
-    let before = game.state();
-    click(&mut game, node.guid, &who, again_at);
-    assert_eq!(
-        delta(&before, &game.state()),
-        vec![(water_item(again_at), 1)]
+    let back = game.tick(&who, 1_000 + 60_000).unwrap();
+    assert!(
+        added(&back.replies, node.guid),
+        "the node did not grow back"
     );
+
+    // The returned node rolls afresh: the next seeded draw is granted.
+    game.seed_collection_rolls(ROLL_SEED + 1);
+    let expected = seeded_item(ROLL_SEED + 1, WATER_NODE);
+    let before = game.state();
+    click(&mut game, node.guid, &who, 1_000 + 60_100);
+    assert_eq!(state_delta(&before, &game.state()), vec![(expected, 1)]);
 }
 
 #[test]
-fn every_click_rolls_afresh_from_the_pools_table() {
-    let nodes = shipped_nodes();
+fn every_click_draws_afresh_from_the_pools_table() {
+    let mut nodes = shipped_nodes();
     let spawn = busiest_pool_spawn();
-    let guid = collect_guid(spawn);
+    let guid = collection_node_guid(spawn);
     let table = pool_drops(spawn);
-    let items: BTreeSet<u32> = (0..200u64)
-        .map(|click| {
-            let now_ms = 1_000 + click * 61_000;
-            let item = nodes.collect_item(guid, PLAYER, now_ms).expect("a roll");
-            assert_eq!(nodes.collect_item(guid, PLAYER, now_ms), Some(item));
-            item
-        })
-        .collect();
-    assert!(
-        items.iter().all(|item| table.contains(item)),
-        "a roll left the pool's table"
-    );
+    nodes.seed_rolls(9);
+    assert!(!nodes.sync(0, false).is_empty());
+    let mut now = 1_000;
+    let mut items = BTreeSet::new();
+    for _ in 0..200 {
+        let item = nodes.collect_item(guid).expect("a roll");
+        assert!(table.contains(&item), "a roll {item} left the pool's table");
+        assert!(
+            nodes.consume(guid, now).is_some(),
+            "the click did not hide the node"
+        );
+        now += 61_000;
+        nodes.sync(now, false);
+        items.insert(item);
+    }
     assert!(
         items.len() > 40,
-        "200 clicks on one node of a {}-drop pool reached only {} items",
+        "200 draws on one node of a {}-drop pool reached only {} items",
         table.len(),
         items.len()
     );
+}
+
+/// A scratch directory holding just the node files a test writes.
+struct Scratch(PathBuf);
+
+impl Scratch {
+    fn new(prefix: &str) -> Self {
+        let path = std::env::temp_dir().join(format!(
+            "osfr-{prefix}-{}-{}",
+            std::process::id(),
+            NEXT.fetch_add(1, Ordering::Relaxed)
+        ));
+        fs::create_dir_all(&path).unwrap();
+        Self(path)
+    }
+
+    fn path(&self) -> &Path {
+        &self.0
+    }
+
+    fn write(&self, file: &str, value: Value) {
+        fs::write(self.path().join(file), serde_json::to_vec(&value).unwrap()).unwrap();
+    }
+}
+
+impl Drop for Scratch {
+    fn drop(&mut self) {
+        let _ = fs::remove_dir_all(&self.0);
+    }
+}
+
+/// One synthetic node file: `type_key`'s type, one pool and one spawn at `position`.
+fn node_file(
+    type_key: &str,
+    name: &str,
+    model_id: u32,
+    effect: u32,
+    extra: &[u32],
+    drops: &[(u32, u32)],
+    spawn_id: u32,
+) -> Value {
+    json!({
+        "schema_version": 1,
+        "node_types": [{
+            "key": type_key,
+            "name": name,
+            "model_id": model_id,
+            "scale": 1.0,
+            "composite_effect_id": effect,
+            "extra_composite_effect_ids": extra,
+            "interact_range": 12,
+            "cursor_id": 0,
+            "placement_y_offset": 0.0,
+            "drop_table": [],
+        }],
+        "pools": [{
+            "key": "pool",
+            "zone_definition_id": 1,
+            "node_type": type_key,
+            "max_active_nodes": 1,
+            "respawn_seconds": 60,
+            "drop_table": drops
+                .iter()
+                .map(|(item, weight)| json!({"item_definition_id": item, "weight": weight}))
+                .collect::<Vec<_>>(),
+        }],
+        "spawns": [{
+            "id": spawn_id,
+            "pool_key": "pool",
+            "zone_definition_id": 1,
+            "position": [0.0, 0.0, 0.0],
+            "heading": 0.0,
+        }],
+    })
+}
+
+#[test]
+fn the_collection_roll_follows_the_pools_weights() {
+    let scratch = Scratch::new("collect-weights");
+    scratch.write(
+        "collection_nodes.json",
+        node_file(
+            "synthetic",
+            "Synthetic node",
+            1,
+            5742,
+            &[],
+            &[(11, 1), (12, 2), (13, 7)],
+            900,
+        ),
+    );
+    let mut nodes = GatheringNodes::load(scratch.path())
+        .unwrap()
+        .expect("the synthetic collection node loads");
+    let guid = collection_node_guid(900);
+    let mut counts = BTreeMap::new();
+    for seed in 0..20_000u64 {
+        nodes.seed_rolls(seed);
+        let item = nodes.collect_item(guid).expect("a roll");
+        *counts.entry(item).or_insert(0u32) += 1;
+    }
+    for (item, weight) in [(11u32, 1u32), (12, 2), (13, 7)] {
+        let share = f64::from(counts[&item]) / 20_000.0;
+        let expected = f64::from(weight) / 10.0;
+        assert!(
+            (share - expected).abs() < 0.02,
+            "item {item}: {share} vs {expected}"
+        );
+    }
 }
 
 /// A spawn of the pool with the most drops (the junk pools, 246+ items on a few nodes).
@@ -508,36 +548,27 @@ fn refusals_change_nothing() {
     let node = node(WATER_NODE);
 
     // A full bag refuses with the gathering text and keeps the item and the ledger.
-    let fixture = Fixture::new();
+    let fixture = PickupFixture::new("collect-refuse-bag");
+    define_water_drops(&fixture);
     let mut state = fixture.jobless();
     fill_inventory(&mut state);
     let mut game = fixture.load(Some(state));
     let who = at(node.position);
     view(&mut game, &who);
     let before = snapshot(&game);
-    let now_ms = water_click_at(1_000);
-    let out = raw_click(&mut game, node.guid, &who, now_ms);
+    game.seed_collection_rolls(ROLL_SEED);
+    let out = raw_click(&mut game, node.guid, &who, 1_000);
     assert!(said(&out, "Your bag is full. Make room before gathering."));
     assert!(!out.changed);
     assert_eq!(snapshot(&game), before);
+    assert!(
+        !removed(&out.replies, node.guid),
+        "a refused click hid the node"
+    );
     assert!(!collected(
         &game,
-        catalogue().entry_for_item(water_item(now_ms)).unwrap()
+        catalogue().entry_for_item(WATER_ITEM).unwrap()
     ));
-
-    // A roll the running content does not define refuses with the generic line and keeps
-    // the node.
-    let defined = defined_items();
-    let undefined_at = (1_000..)
-        .find(|now_ms| !defined.contains(&water_item(*now_ms)))
-        .expect("some roll lands on an undefined item");
-    let mut game = fixture.load(Some(fixture.jobless()));
-    view(&mut game, &who);
-    let before = snapshot(&game);
-    let out = raw_click(&mut game, node.guid, &who, undefined_at);
-    assert!(said(&out, "You cannot gather that right now."));
-    assert!(!out.changed);
-    assert_eq!(snapshot(&game), before);
 
     // Out of range and off the open world refuse with the shared texts.
     let mut game = fixture.load(Some(fixture.jobless()));
@@ -550,10 +581,12 @@ fn refusals_change_nothing() {
     ] {
         view(&mut game, &who);
         let before = snapshot(&game);
+        game.seed_collection_rolls(ROLL_SEED);
         let out = raw_click(&mut game, node.guid, &who, 1_000);
         assert!(said(&out, "Move closer to use that."));
         assert!(!out.changed);
         assert_eq!(snapshot(&game), before);
+        assert!(!removed(&out.replies, node.guid));
     }
     // One player's busy run refuses another activity, unchanged.
     let mut state = fixture.jobless();
@@ -573,6 +606,7 @@ fn refusals_change_nothing() {
     let who = at(node.position);
     view(&mut game, &who);
     let before = snapshot(&game);
+    game.seed_collection_rolls(ROLL_SEED);
     let out = raw_click(&mut game, node.guid, &who, 1_100);
     assert!(said(&out, "Finish what you are doing first."));
     assert!(!out.changed);
@@ -581,18 +615,101 @@ fn refusals_change_nothing() {
     // A second click on the hidden node gets the existing Gone text and no grant.
     let mut game = fixture.load(Some(fixture.jobless()));
     let who = at(node.position);
-    let first_at = water_click_at(1_000);
-    assert!(click(&mut game, node.guid, &who, first_at).changed);
+    game.seed_collection_rolls(ROLL_SEED);
+    assert!(click(&mut game, node.guid, &who, 1_000).changed);
     let before = snapshot(&game);
-    let out = raw_click(&mut game, node.guid, &who, first_at + 1_000);
+    let out = raw_click(&mut game, node.guid, &who, 2_000);
     assert!(said(&out, "That has already been gathered."));
     assert!(!out.changed);
     assert_eq!(snapshot(&game), before);
 }
 
+/// The fixture folder is the session's NPC content root, so the click sees only the node file
+/// copied here and the collection files this test supplies.
+fn npc_package_with_node_file(prefix: &str, catalogue: bool) -> PickupFixture {
+    let fixture = PickupFixture::npc_package(prefix);
+    fs::copy(
+        bundled().join("collection_nodes.json"),
+        fixture.dir().join("collection_nodes.json"),
+    )
+    .unwrap();
+    if catalogue {
+        for file in ["collection_catalogue.json", "collection_coins.json"] {
+            fs::copy(bundled().join(file), fixture.dir().join(file)).unwrap();
+        }
+    }
+    fixture
+}
+
+#[test]
+fn a_missing_collection_catalogue_refuses_before_any_grant() {
+    let fixture = npc_package_with_node_file("collect-no-catalogue", false);
+    let mut game = fixture.load(Some(fixture.jobless()));
+    let node = node(WATER_NODE);
+    let who = at(node.position);
+    view(&mut game, &who);
+    let before = snapshot(&game);
+    let out = raw_click(&mut game, node.guid, &who, 1_000);
+    assert!(said(&out, "You cannot gather that right now."));
+    assert!(!out.changed);
+    assert_eq!(snapshot(&game), before);
+    assert!(!removed(&out.replies, node.guid), "the node was hidden");
+    assert!(state_delta(&before.0, &game.state()).is_empty());
+}
+
+/// Rewrite every pool's drop table to the one item, so the click's roll is fixed.
+fn retune_drops(fixture: &PickupFixture, item: u32) {
+    let path = fixture.dir().join("collection_nodes.json");
+    let mut content = json::read(&path);
+    for pool in content["pools"].as_array_mut().unwrap() {
+        pool["drop_table"] = json!([{"item_definition_id": item, "weight": 1}]);
+    }
+    fs::write(&path, serde_json::to_vec(&content).unwrap()).unwrap();
+}
+
+#[test]
+fn a_drop_without_a_catalogue_entry_refuses_before_any_grant() {
+    let fixture = npc_package_with_node_file("collect-no-entry", true);
+    // Defined by the fixture's item catalogue but linked to no collection entry.
+    item_catalogue::write(fixture.dir(), &[item_catalogue::sized_row(9_999_999, 64)]);
+    retune_drops(&fixture, 9_999_999);
+    let mut game = fixture.load(Some(fixture.jobless()));
+    let node = node(WATER_NODE);
+    let who = at(node.position);
+    view(&mut game, &who);
+    let before = snapshot(&game);
+    let out = raw_click(&mut game, node.guid, &who, 1_000);
+    assert!(
+        catalogue().entry_for_item(9_999_999).is_none(),
+        "the fixture item must not have an entry"
+    );
+    assert!(said(&out, "You cannot gather that right now."));
+    assert!(!out.changed);
+    assert_eq!(snapshot(&game), before);
+    assert!(!removed(&out.replies, node.guid), "the node was hidden");
+    assert!(state_delta(&before.0, &game.state()).is_empty());
+}
+
+#[test]
+fn an_undefined_drop_refuses_before_any_grant() {
+    let fixture = npc_package_with_node_file("collect-undefined", true);
+    retune_drops(&fixture, 9_999_998);
+    let mut game = fixture.load(Some(fixture.jobless()));
+    let node = node(WATER_NODE);
+    let who = at(node.position);
+    view(&mut game, &who);
+    let before = snapshot(&game);
+    let out = raw_click(&mut game, node.guid, &who, 1_000);
+    assert!(said(&out, "You cannot gather that right now."));
+    assert!(!out.changed);
+    assert_eq!(snapshot(&game), before);
+    assert!(!removed(&out.replies, node.guid), "the node was hidden");
+    assert!(state_delta(&before.0, &game.state()).is_empty());
+}
+
 #[test]
 fn the_actor_packets_carry_the_types_sparkle_and_the_water_companion() {
-    let fixture = Fixture::new();
+    let fixture = PickupFixture::new("collect-actor-packets");
     let mut game = fixture.load(None);
     let nodes = shipped_nodes();
     let find = |name: &str| {
@@ -612,7 +729,7 @@ fn the_actor_packets_carry_the_types_sparkle_and_the_water_companion() {
     assert_eq!(spawn.interact_range, 12);
     assert_eq!(spawn.sub_text_name_string_id, -1);
     assert_eq!(spawn.is_interactable, 1);
-    assert!(companion(&packets, flowers.guid).is_none());
+    assert!(companion(&packets, &flowers).is_none());
 
     // Rare flowers: the big effect and the Rare Collection subtitle.
     let rare = find("Rare Pile of Flowers");
@@ -629,7 +746,7 @@ fn the_actor_packets_carry_the_types_sparkle_and_the_water_companion() {
     let spawn = parsed(&packets, water.guid);
     assert_eq!(spawn.model_id, 271);
     assert_eq!(spawn.composite_effect_id, 15381, "water bubbles");
-    let companion = companion(&packets, water.guid).expect("the water companion");
+    let companion = companion(&packets, &water).expect("the water companion");
     assert_eq!(companion.model_id, 271, "invisible cube");
     assert_eq!(companion.composite_effect_id, 5742);
     assert_eq!(companion.is_interactable, 0);
@@ -638,21 +755,27 @@ fn the_actor_packets_carry_the_types_sparkle_and_the_water_companion() {
         [water.position[0], water.position[1], water.position[2], 1.0]
     );
 
-    // Chef mushrooms start sparkling too; their Type8 flow is unchanged (gathering_nodes).
+    // T524 review: the Chef mushrooms only gain their sparkle; their AddNpc range and
+    // subtitle stay the captured template's. Mining actors keep the whole template.
     let mushroom = nodes
         .actors()
         .find(|actor| actor.name == "Mushrooms")
         .expect("a mushroom node")
         .clone();
     let packets = game.update_npc_visibility(&at(mushroom.position)).unwrap();
-    assert_eq!(parsed(&packets, mushroom.guid).composite_effect_id, 5742);
+    let spawn = parsed(&packets, mushroom.guid);
+    assert_eq!(spawn.composite_effect_id, 5742);
+    assert_eq!(spawn.interact_range, 100);
+    assert_eq!(spawn.sub_text_name_string_id, -1);
     let ore = nodes
         .actors()
         .find(|actor| actor.name == "Copper Vein")
         .expect("a copper vein")
         .clone();
     let packets = game.update_npc_visibility(&at(ore.position)).unwrap();
-    assert_eq!(parsed(&packets, ore.guid).composite_effect_id, 0);
+    let spawn = parsed(&packets, ore.guid);
+    assert_eq!(spawn.composite_effect_id, 0);
+    assert_eq!(spawn.interact_range, 100);
 }
 
 fn parsed(packets: &[Vec<u8>], guid: u64) -> osfr_tools::startup_world::NpcSpawn {
@@ -664,8 +787,8 @@ fn parsed(packets: &[Vec<u8>], guid: u64) -> osfr_tools::startup_world::NpcSpawn
 }
 
 /// The tag-4 companion of a collection node, when it has one.
-fn companion(packets: &[Vec<u8>], node_guid: u64) -> Option<osfr_tools::startup_world::NpcSpawn> {
-    let companion = node_guid - (1 << 32);
+fn companion(packets: &[Vec<u8>], node: &NodeActor) -> Option<osfr_tools::startup_world::NpcSpawn> {
+    let companion = node.companion_guid()?;
     packets
         .iter()
         .filter_map(|packet| parse_add_npc(packet).ok())
@@ -673,47 +796,117 @@ fn companion(packets: &[Vec<u8>], node_guid: u64) -> Option<osfr_tools::startup_
 }
 
 #[test]
+fn hiding_a_non_collect_node_keeps_the_water_companion_visible() {
+    // A quest node and a water collection node share spawn id 900, so their tag-4 companion
+    // guid is the same; hiding the quest node must not remove the water companion.
+    let scratch = Scratch::new("collect-companion");
+    scratch.write(
+        "quest_nodes.json",
+        node_file("tin-ore", "Tin Ore", 611, 5386, &[], &[], 900),
+    );
+    scratch.write(
+        "collection_nodes.json",
+        node_file(
+            "sparkling-water",
+            "Sparkling Water",
+            271,
+            15381,
+            &[5742],
+            &[(11, 1)],
+            900,
+        ),
+    );
+    let mut nodes = GatheringNodes::load(scratch.path())
+        .unwrap()
+        .expect("both synthetic node files load");
+    let quest = nodes
+        .actors()
+        .find(|actor| actor.name == "Tin Ore")
+        .expect("the quest node")
+        .guid;
+    let water = nodes
+        .actors()
+        .find(|actor| actor.name == "Sparkling Water")
+        .expect("the water node")
+        .clone();
+    let companion = water.companion_guid().expect("the water companion");
+
+    let mut visibility = NpcVisibility::default();
+    apply_node_changes(&mut visibility, nodes.sync(0, false));
+    let packets = visibility.update(0, [0.0, 0.0, 0.0]).unwrap();
+    assert!(added(&packets, companion), "the companion was not drawn");
+
+    let hide = nodes
+        .consume(quest, 1_000)
+        .expect("the quest node is shown");
+    assert!(
+        matches!(
+            hide,
+            NodeChange::Hide {
+                companion: None,
+                ..
+            }
+        ),
+        "a quest node carried a companion"
+    );
+    apply_node_changes(&mut visibility, vec![hide]);
+    let after = visibility.update(0, [0.0, 0.0, 0.0]).unwrap();
+    assert!(removed(&after, quest), "the quest node did not hide");
+    assert!(
+        !removed(&after, companion),
+        "hiding the quest node removed the water companion"
+    );
+    assert!(
+        visibility.visible().contains(&companion),
+        "the water companion is no longer tracked"
+    );
+}
+
+#[test]
 fn relog_keeps_the_entry_and_shows_every_node_again() {
-    let fixture = Fixture::new();
+    let fixture = PickupFixture::new("collect-node-relog");
+    define_water_drops(&fixture);
     let mut game = fixture.load(Some(fixture.jobless()));
     let node = node(WATER_NODE);
     let who = at(node.position);
-    let now_ms = water_click_at(1_000);
-    assert!(click(&mut game, node.guid, &who, now_ms).changed);
-    let entry = catalogue().entry_for_item(water_item(now_ms)).unwrap();
+    game.seed_collection_rolls(ROLL_SEED);
+    assert!(click(&mut game, node.guid, &who, 1_000).changed);
+    let entry = catalogue().entry_for_item(WATER_ITEM).unwrap();
     assert!(collected(&game, entry));
 
     let mut relog = fixture.load(Some(game.state()));
     assert!(collected(&relog, entry), "the saved ledger lost the entry");
     // Nodes are personal and never saved: every one is shown again.
     let packets = relog.update_npc_visibility(&who).unwrap();
-    assert!(
-        packets
-            .iter()
-            .any(|packet| { parse_add_npc(packet).is_ok_and(|spawn| spawn.actor_id == node.guid) })
-    );
-    assert!(click(&mut relog, node.guid, &who, water_click_at(2_000)).changed);
+    assert!(added(&packets, node.guid));
+    relog.seed_collection_rolls(ROLL_SEED);
+    assert!(click(&mut relog, node.guid, &who, 2_000).changed);
     assert!(collected(&relog, entry));
 }
 
 #[test]
 fn a_pickup_is_personal_to_the_player() {
-    let fixture = Fixture::new();
+    let fixture = PickupFixture::new("collect-node-personal");
+    define_water_drops(&fixture);
     let mut first = fixture.load(Some(fixture.jobless()));
     let mut second = fixture.load(Some(fixture.jobless()));
     let node = node(WATER_NODE);
     let who = at(node.position);
-    let now_ms = water_click_at(1_000);
-    assert!(click(&mut first, node.guid, &who, now_ms).changed);
-    let out = click(&mut second, node.guid, &who, now_ms);
+    first.seed_collection_rolls(ROLL_SEED);
+    assert!(click(&mut first, node.guid, &who, 1_000).changed);
+    second.seed_collection_rolls(ROLL_SEED);
+    let out = click(&mut second, node.guid, &who, 1_000);
     assert!(out.changed, "the second player could not pick the node");
     assert!(entry_packet(&out).is_some(), "the second ledger was empty");
 }
 
-/// The gateway dispatch: 26/8 reaches the collect handler and the outcome is saved.
+/// The gateway dispatch: 26/8 reaches the collect handler and the outcome is saved. The roll is
+/// the server's own entropy stream here (no gateway seed hook), so the item is read back from
+/// the save and checked against the pool/catalogue rather than pinned.
 #[test]
 fn the_gateway_click_route_grants_and_records() {
-    let fixture = Fixture::new();
+    let fixture = PickupFixture::new("collect-gateway");
+    define_water_drops(&fixture);
     let reference = Path::new(env!("CARGO_MANIFEST_DIR"))
         .join("../../../lab/references/rust-gateway-reference");
     let node = node(WATER_NODE);
@@ -721,89 +914,59 @@ fn the_gateway_click_route_grants_and_records() {
     character.zone_id = 0;
     character.position = node.position;
     let mut gateway =
-        Gateway::load_gameplay(&reference, character, &fixture.dir, Some(fixture.jobless()))
-            .unwrap();
-    login(&mut gateway);
-    tick_gateway(&mut gateway, 1_500);
-    let click_at = water_click_at(2_000);
-    let entry = catalogue().entry_for_item(water_item(click_at)).unwrap();
-    let out = click_gateway(&mut gateway, node.guid, click_at);
+        gateway_vendor::connect_with(&reference, character, fixture.dir(), fixture.jobless());
+    let before = gateway.snapshot().gameplay.expect("gameplay").inventory;
+    let outcome = gateway
+        .handle_at(
+            &gateway_vendor::wrap(&gateway_vendor::interact(node.guid)),
+            11_000,
+        )
+        .expect("the gateway handles the click");
     assert!(
-        out.gameplay_changed,
+        outcome.gameplay_changed,
         "the gateway did not persist the pickup"
     );
-    let gameplay = gateway.snapshot().gameplay.unwrap();
+    let after = gateway.snapshot().gameplay.expect("gameplay");
+    let gained = delta(&before.items, &after.inventory.items);
+    assert_eq!(gained.len(), 1, "one definition changed: {gained:?}");
+    let (item, count) = gained[0];
+    assert_eq!(count, 1);
     assert!(
-        gameplay
+        pool_drops(WATER_NODE).contains(&(item as u32)),
+        "item {item} is not in the click's pool table"
+    );
+    let entry = catalogue()
+        .entry_for_item(item)
+        .expect("shipped drop entry");
+    assert!(
+        after
             .progression_extras
             .is_some_and(|extras| extras.collections.is_collected(entry)),
         "the gateway route did not record the entry"
     );
-    assert!(scroll(&out, entry), "the 38/10 did not reach the client");
+    let replies = gateway_vendor::inner_packets(&outcome);
+    assert!(
+        replies.iter().any(|packet| packet == &add_entry(entry)),
+        "the 38/10 did not reach the client"
+    );
+    assert!(
+        removed(&replies, node.guid),
+        "the node removal did not reach the client"
+    );
 }
 
-fn wrap(inner: &[u8]) -> Vec<u8> {
-    let mut bytes = vec![5, 0, 1];
-    bytes.extend((inner.len() as u32).to_le_bytes());
-    bytes.extend(inner);
-    bytes
-}
-
-fn inner(reply: &[u8]) -> &[u8] {
-    if reply.starts_with(&[5, 0, 1]) && reply.len() >= 7 {
-        let length = u32::from_le_bytes(reply[3..7].try_into().unwrap()) as usize;
-        if length == reply.len() - 7 {
-            return &reply[7..];
-        }
-    }
-    reply
-}
-
-fn send(gateway: &mut Gateway, packet: &[u8], now_ms: u64) -> GatewayOutcome {
-    gateway
-        .handle_at(&wrap(packet), now_ms)
-        .expect("gateway frame")
-}
-
-fn tick_gateway(gateway: &mut Gateway, now_ms: u64) -> GatewayOutcome {
-    gateway.tick_at(now_ms).expect("tick")
-}
-
-fn login(gateway: &mut Gateway) -> Vec<GatewayOutcome> {
-    let mut bytes = 1u16.to_le_bytes().to_vec();
-    for (index, text) in ["local-private-test", "1.910.1.530630", ""]
-        .iter()
-        .enumerate()
-    {
-        bytes.extend((text.len() as u32).to_le_bytes());
-        bytes.extend(text.as_bytes());
-        if index == 0 {
-            bytes.extend(1u64.to_le_bytes());
-        }
-    }
-    vec![
-        gateway.handle_at(&bytes, 0).unwrap(),
-        send(gateway, &13u16.to_le_bytes(), 1_000),
-        send(gateway, &10u16.to_le_bytes(), 1_000),
-    ]
-}
-
-fn click_gateway(gateway: &mut Gateway, guid: u64, now_ms: u64) -> GatewayOutcome {
-    let request = NpcInteractRequest {
-        target: guid,
-        trailing_flag: false,
-    };
-    send(gateway, &request.encode(), now_ms)
-}
-
-fn scroll(outcome: &GatewayOutcome, entry: i32) -> bool {
-    let expected = add_entry(entry);
-    outcome
-        .replies
-        .iter()
-        .any(|reply| inner(reply) == expected.as_slice())
-        && outcome
-            .replies
-            .iter()
-            .any(|reply| inner(reply).starts_with(&[35, 0, 3, 0]))
+/// T524 review: a mining node type that declares an extra effect is refused, because only the
+/// collection kind draws a tag-4 companion.
+#[test]
+fn a_non_collect_extra_effect_is_refused_at_load() {
+    let scratch = Scratch::new("collect-extra-effect");
+    scratch.write(
+        "mining_nodes.json",
+        node_file("copper-vein", "Copper Vein", 259, 0, &[5742], &[], 1),
+    );
+    let error = GatheringNodes::load(scratch.path())
+        .err()
+        .expect("a mining type must not declare an extra effect")
+        .to_string();
+    assert!(error.contains("extra composite effect"), "{error}");
 }

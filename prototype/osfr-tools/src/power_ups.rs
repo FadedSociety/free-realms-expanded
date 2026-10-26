@@ -354,21 +354,36 @@ pub fn roll_scaled<'a>(table: &'a Table, rng: &mut Rng, chance_scale: f64) -> Ve
     drops
 }
 
-/// Weighted pick. `None` only for an all-zero pool, which validation rejects.
-fn pick<'a>(pool: &'a BTreeMap<String, u32>, rng: &mut Rng) -> Option<&'a str> {
-    let total: u64 = pool.values().map(|&w| u64::from(w)).sum();
+/// Weighted pick over `(value, weight)` pairs: one draw, uniform over the summed weights.
+/// `None` only for an all-zero table, which content validation rejects. Both the power-up
+/// pool and a collection node's drop table borrow this, so a weighting fix reaches both.
+pub(crate) fn pick_weighted<'a, T, I>(pairs: I, rng: &mut Rng) -> Option<&'a T>
+where
+    I: IntoIterator<Item = (&'a T, u32)> + Clone,
+{
+    let total: u64 = pairs
+        .clone()
+        .into_iter()
+        .map(|(_, weight)| u64::from(weight))
+        .sum();
     if total == 0 {
         return None;
     }
     let mut at = rng.next_u64() % total;
-    for (kind, &weight) in pool {
+    for (value, weight) in pairs {
         let weight = u64::from(weight);
         if at < weight {
-            return Some(kind);
+            return Some(value);
         }
         at -= weight;
     }
     None
+}
+
+/// Weighted pick over a named kind pool. `None` only for an all-zero pool, which validation
+/// rejects.
+fn pick<'a>(pool: &'a BTreeMap<String, u32>, rng: &mut Rng) -> Option<&'a str> {
+    pick_weighted(pool.iter().map(|(kind, &weight)| (kind, weight)), rng).map(String::as_str)
 }
 
 fn in_range(value: f64, low: f64, high: f64) -> bool {
@@ -381,4 +396,44 @@ fn sourced(text: &str) -> bool {
 
 fn invalid(message: &str) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, message.to_owned())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// T524 review: one canonical weighted pick, shared with the collection-node roll.
+    #[test]
+    fn pick_weighted_follows_the_weights_and_refuses_an_empty_table() {
+        let table = [(11u32, 1u32), (12, 2), (13, 7)];
+        let mut counts = BTreeMap::new();
+        for seed in 0..20_000u64 {
+            let mut rng = Rng::seeded(seed);
+            let picked =
+                pick_weighted(table.iter().map(|(item, weight)| (item, *weight)), &mut rng)
+                    .copied()
+                    .expect("a weighted table has a pick");
+            *counts.entry(picked).or_insert(0u32) += 1;
+        }
+        for (item, weight) in table {
+            let share = f64::from(counts[&item]) / 20_000.0;
+            let expected = f64::from(weight) / 10.0;
+            assert!(
+                (share - expected).abs() < 0.02,
+                "item {item}: {share} vs {expected}"
+            );
+        }
+        assert_eq!(
+            pick_weighted(std::iter::empty::<(&u32, u32)>(), &mut Rng::seeded(1)),
+            None
+        );
+        let zero = [(1u32, 0u32)];
+        assert_eq!(
+            pick_weighted(
+                zero.iter().map(|(item, weight)| (item, *weight)),
+                &mut Rng::seeded(1)
+            ),
+            None
+        );
+    }
 }

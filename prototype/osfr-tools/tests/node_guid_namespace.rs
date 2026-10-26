@@ -52,23 +52,27 @@ fn tag(guid: u64) -> u64 {
     (guid >> 32) & 0xff
 }
 
-/// The guids the real loader places from `file` alone. `None` means the file is not wired into
-/// `GatheringNodes::load`.
-fn load_one(file: &str) -> Option<Vec<u64>> {
+/// The actors the real loader places from `file` alone, with their effect companions. `None`
+/// means the file is not wired into `GatheringNodes::load`.
+fn load_one(file: &str) -> Option<Vec<(u64, Option<u64>)>> {
     let dir = TempDir::new();
     fs::copy(content_dir().join(file), dir.0.join(file)).unwrap();
-    GatheringNodes::load(&dir.0)
-        .unwrap()
-        .map(|nodes| nodes.actors().map(|actor| actor.guid).collect())
+    GatheringNodes::load(&dir.0).unwrap().map(|nodes| {
+        nodes
+            .actors()
+            .map(|actor| (actor.guid, actor.companion_guid()))
+            .collect()
+    })
 }
 
 #[test]
 fn no_two_live_node_guids_share_a_tag_or_a_value() {
     let mut all = BTreeSet::new();
     let mut tags = BTreeSet::new();
+    let mut companion_tags = BTreeSet::new();
     for file in FILES {
-        let guids = load_one(file).unwrap_or_else(|| panic!("{file} is missing from the loader"));
-        let source_tags: BTreeSet<u64> = guids.iter().map(|guid| tag(*guid)).collect();
+        let actors = load_one(file).unwrap_or_else(|| panic!("{file} is missing from the loader"));
+        let source_tags: BTreeSet<u64> = actors.iter().map(|(guid, _)| tag(*guid)).collect();
         assert_eq!(
             source_tags.len(),
             1,
@@ -85,29 +89,28 @@ fn no_two_live_node_guids_share_a_tag_or_a_value() {
             tags.insert(source_tag),
             "{file} reuses node tag {source_tag} already owned by another source"
         );
-        for guid in &guids {
+        for (guid, companion) in &actors {
             assert!(
                 all.insert(*guid),
                 "{file} guid {guid:#x} is also another source's guid"
             );
-        }
-        if file == "collection_nodes.json" {
-            // T524: every collection node's effect companion keeps the spawn id and uses tag 4.
-            assert_ne!(
-                source_tag, COMPANION_TAG,
-                "collection tag aliases its own effect companions"
-            );
-            for guid in &guids {
-                let companion = (*guid & !(0xff_u64 << 32)) | (COMPANION_TAG << 32);
+            if let Some(companion) = companion {
+                companion_tags.insert(tag(*companion));
                 assert!(
-                    !all.contains(&companion),
-                    "collection node {guid:#x} and its companion {companion:#x} collide"
+                    all.insert(*companion),
+                    "{file} companion {companion:#x} collides with another actor"
                 );
             }
         }
     }
+    // T524: the tag-4 effect companions keep their node's spawn id and own their own tag
+    // byte; no node source may live there and every companion must be distinct.
     assert!(
         !tags.contains(&COMPANION_TAG),
         "a live node source uses the tag-4 effect-companion namespace"
+    );
+    assert!(
+        companion_tags.iter().all(|tag| *tag == COMPANION_TAG),
+        "an effect companion left the tag-4 namespace: {companion_tags:?}"
     );
 }

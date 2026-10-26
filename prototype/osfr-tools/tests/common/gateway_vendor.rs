@@ -1,5 +1,5 @@
 //! Shared gateway packet plumbing for the vendor suites (`vendor_sell`,
-//! `vendor_stock_coverage`, `vendor_buy_sell_gateway`).
+//! `vendor_stock_coverage`, `vendor_buy_sell_gateway`) and the collection-node suite.
 //!
 //! Client-derived bodies: 26/8 constructor `008b6bc0` (u64 target + bool),
 //! 26/10 constructor `00a36f80` (u64 target + i32 choice), 66/43 serializer
@@ -8,6 +8,9 @@
 //! 165/12 buy-back request written by `00c759c0` (caller `00c76600`).
 //! The 7-byte tunnel prefix mirrors the captured client wrapper (`005`, subtype
 //! `1`, payload length).
+//!
+//! Each include site uses a subset of the helpers.
+#![allow(dead_code)]
 //!
 //! The 165/6 completion parser lives here too, so a layout correction lands in
 //! one place.

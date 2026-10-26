@@ -574,7 +574,10 @@ fn repeated_pick_does_not_extend_the_hide() {
     ));
     assert!(matches!(
         nodes.consume(guid, 1_000),
-        Some(NodeChange::Hide(hidden)) if hidden == guid
+        Some(NodeChange::Hide {
+            guid: hidden,
+            companion: None
+        }) if hidden == guid
     ));
     assert!(
         nodes.consume(guid, 20_000).is_none(),

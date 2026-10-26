@@ -7,9 +7,8 @@ use osfr_tools::{
 use progression_extras::{
     AchievementBindings, AchievementProgression, AchievementRule, ClaimItem, ClaimWindow,
     CollectionCatalogue, CollectionDefinition, CollectionEntryUpdate, CollectionEvent,
-    CollectionEventOrigin, CollectionLedger, CollectionMessage, CollectionProgression, TitleState,
-    claim_request, definitions_request, promotional_packet, title_select_request,
-    validate_reward_rows,
+    CollectionLedger, CollectionMessage, CollectionProgression, TitleState, claim_request,
+    definitions_request, promotional_packet, title_select_request, validate_reward_rows,
 };
 use serde_json::{Value, json};
 use sha2::{Digest, Sha256};
@@ -260,7 +259,6 @@ fn collect_refuses_wire_ids_that_do_not_name_the_entry() {
         let refused = progression.collect(
             CollectionEvent {
                 entry_id,
-                origin: CollectionEventOrigin::HarvestNode,
                 wire_update: Some(wire),
             },
             &coin_grant(5),
@@ -295,7 +293,6 @@ fn collection_completes_and_grants_once_across_gameplay_sources() {
         .collect(
             CollectionEvent {
                 entry_id: 101,
-                origin: CollectionEventOrigin::HarvestNode,
                 wire_update: Some(update(11, 101)),
             },
             &reward,
@@ -310,7 +307,6 @@ fn collection_completes_and_grants_once_across_gameplay_sources() {
         .collect(
             CollectionEvent {
                 entry_id: 102,
-                origin: CollectionEventOrigin::QuestReward,
                 wire_update: Some(update(11, 102)),
             },
             &reward,
@@ -323,7 +319,6 @@ fn collection_completes_and_grants_once_across_gameplay_sources() {
         .collect(
             CollectionEvent {
                 entry_id: 103,
-                origin: CollectionEventOrigin::CollectionBundleEntry,
                 wire_update: Some(update(11, 103)),
             },
             &reward,
@@ -345,7 +340,6 @@ fn collection_completes_and_grants_once_across_gameplay_sources() {
         .collect(
             CollectionEvent {
                 entry_id: 103,
-                origin: CollectionEventOrigin::CollectionBundleEntry,
                 wire_update: Some(update(11, 103)),
             },
             &reward,
@@ -373,7 +367,6 @@ fn completing_with_an_empty_grant_sends_no_reward_toast() {
         .collect(
             CollectionEvent {
                 entry_id: 101,
-                origin: CollectionEventOrigin::ExplorationCoin,
                 wire_update: Some(update(11, 101)),
             },
             &coin_grant(0),

@@ -3,25 +3,21 @@
 //! The gameplay content is the private opening package the gathering suite uses, copied with the
 //! shipped `mining.json` so a player can be busy; NPCs, coins and the collection catalogue are the
 //! repository's `data/content`. Coin 1946 ticks Seaside Rare Exploration (267) entry 1937.
-#[path = "common/content_copy.rs"]
-mod content_copy;
+#[path = "support/pickup_fixture.rs"]
+mod pickup_fixture;
 
 use osfr_tools::{
     account_store::AccountRole,
     character_store::CharacterState,
     chat,
-    gameplay::{Gameplay, GameplayState, Outcome},
+    gameplay::{Gameplay, Outcome},
     harvest_nodes::GatheringNodes,
     mining::MINER_PROFILE_ID,
     npc_interaction::NpcInteractRequest,
 };
+use pickup_fixture::{PickupFixture as Fixture, added, at, bundled, removed, snapshot};
 use serde_json::Value;
-use std::{
-    collections::BTreeSet,
-    fs,
-    path::{Path, PathBuf},
-    sync::atomic::{AtomicU64, Ordering},
-};
+use std::{collections::BTreeSet, fs, path::Path};
 
 const COIN: u64 = 100_000_001_946;
 const COIN_AT: [f32; 3] = [-507.1435, -27.20111, -1201.367];
@@ -30,44 +26,6 @@ const SEASIDE_RARE: i32 = 267;
 /// Boddington, a placed Blackspore vendor (`npcs/`, `vendors.json`).
 const VENDOR: u64 = 9_500_000_007;
 const VENDOR_AT: [f32; 3] = [-2496.12, -23.96224, 1084.769];
-static NEXT: AtomicU64 = AtomicU64::new(0);
-
-fn bundled() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
-struct Fixture {
-    dir: PathBuf,
-}
-
-impl Fixture {
-    fn new() -> Self {
-        let dir = std::env::temp_dir().join(format!(
-            "osfr-coin-pickup-{}-{}",
-            std::process::id(),
-            NEXT.fetch_add(1, Ordering::Relaxed)
-        ));
-        let opening = std::env::var_os("OSFR_TYPE8_CONTENT")
-            .map(PathBuf::from)
-            .unwrap_or_else(|| {
-                Path::new(env!("CARGO_MANIFEST_DIR"))
-                    .join("../../../lab/references/opening-journal-text-v2/content")
-            });
-        content_copy::copy_tree(&opening, &dir);
-        fs::copy(bundled().join("mining.json"), dir.join("mining.json")).unwrap();
-        Self { dir }
-    }
-
-    fn load(&self, state: Option<GameplayState>) -> Gameplay {
-        Gameplay::load(&self.dir, state).unwrap()
-    }
-}
-
-impl Drop for Fixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_dir_all(&self.dir);
-    }
-}
 
 fn json(path: &Path) -> Value {
     serde_json::from_slice(&fs::read(path).unwrap()).unwrap()
@@ -96,15 +54,6 @@ fn coins_of(collection: i32) -> Vec<(u64, [f32; 3])> {
         .collect()
 }
 
-fn at(position: [f32; 3]) -> CharacterState {
-    CharacterState {
-        guid: 1,
-        zone_id: 0,
-        position,
-        rotation: [1.0, 0.0, 0.0],
-    }
-}
-
 fn click(game: &mut Gameplay, target: u64, who: &CharacterState) -> Outcome {
     let request = NpcInteractRequest {
         target,
@@ -113,29 +62,10 @@ fn click(game: &mut Gameplay, target: u64, who: &CharacterState) -> Outcome {
     game.handle_in_world(&request.encode(), who, 1_000).unwrap()
 }
 
-/// 35/2 AddNpc: the actor guid follows the header (reader `0x00921a10`).
-fn added(packets: &[Vec<u8>], guid: u64) -> bool {
-    packets
-        .iter()
-        .any(|p| p.starts_with(&[35, 0, 2, 0]) && p.get(4..12) == Some(&guid.to_le_bytes()[..]))
-}
-
-/// 35/3: a u16 count, then the guid (reader `0x008d69f0`).
-fn removed(packets: &[Vec<u8>], guid: u64) -> bool {
-    packets
-        .iter()
-        .any(|p| p.starts_with(&[35, 0, 3, 0]) && p.get(6..14) == Some(&guid.to_le_bytes()[..]))
-}
-
 fn ledger_holds(game: &Gameplay, entry: i32) -> bool {
     game.state()
         .progression_extras
         .is_some_and(|extras| extras.collections.is_collected(entry))
-}
-
-/// What a refusal must leave alone: the save and the visibility revision.
-fn snapshot(game: &Gameplay) -> (GameplayState, u64) {
-    (game.state(), game.npc_visibility_revision())
 }
 
 /// Standing on coin 1946, which the client has been sent.
@@ -148,7 +78,7 @@ fn at_coin(fixture: &Fixture) -> (Gameplay, CharacterState) {
 
 #[test]
 fn click_in_range_collects_and_hides() {
-    let fixture = Fixture::new();
+    let fixture = Fixture::new("coin-pickup");
     let (mut game, who) = at_coin(&fixture);
     let out = click(&mut game, COIN, &who);
     // 38/10 AddEntry in reader `008d8570` order: entry, icon, tint, name, collection, index,
@@ -170,7 +100,7 @@ fn click_in_range_collects_and_hides() {
 
 #[test]
 fn second_click_does_nothing() {
-    let fixture = Fixture::new();
+    let fixture = Fixture::new("coin-pickup");
     let (mut game, who) = at_coin(&fixture);
     assert!(click(&mut game, COIN, &who).changed);
     let before = snapshot(&game);
@@ -181,7 +111,7 @@ fn second_click_does_nothing() {
 
 #[test]
 fn out_of_range_and_busy_refuse_without_change() {
-    let fixture = Fixture::new();
+    let fixture = Fixture::new("coin-pickup");
     let mut state = fixture.load(None).state();
     let profiles = state.profiles.as_mut().unwrap();
     profiles.unlocked.insert(MINER_PROFILE_ID);
@@ -220,7 +150,7 @@ fn out_of_range_and_busy_refuse_without_change() {
 
 #[test]
 fn relog_keeps_coin_hidden() {
-    let fixture = Fixture::new();
+    let fixture = Fixture::new("coin-pickup");
     let (mut game, who) = at_coin(&fixture);
     let fresh = game.shared_npc_view(&who, &[], &BTreeSet::new()).unwrap();
     assert!(
@@ -240,11 +170,11 @@ fn relog_keeps_coin_hidden() {
 
 #[test]
 fn content_reload_keeps_coin_hidden() {
-    let fixture = Fixture::new();
+    let fixture = Fixture::new("coin-pickup");
     let (mut game, who) = at_coin(&fixture);
     assert!(click(&mut game, COIN, &who).changed);
     assert!(removed(&game.update_npc_visibility(&who).unwrap(), COIN));
-    let world = fixture.dir.join("live");
+    let world = fixture.dir().join("live");
     fs::create_dir_all(&world).unwrap();
     game.set_dev_tools(true);
     game.set_role(AccountRole::Admin);
@@ -266,7 +196,7 @@ fn content_reload_keeps_coin_hidden() {
 
 #[test]
 fn other_player_still_sees_it() {
-    let fixture = Fixture::new();
+    let fixture = Fixture::new("coin-pickup");
     let (mut first, who) = at_coin(&fixture);
     assert!(click(&mut first, COIN, &who).changed);
     let (mut second, who) = at_coin(&fixture);
@@ -278,7 +208,7 @@ fn other_player_still_sees_it() {
 
 #[test]
 fn non_coin_click_falls_through() {
-    let fixture = Fixture::new();
+    let fixture = Fixture::new("coin-pickup");
     let mut game = fixture.load(None);
     let who = at(VENDOR_AT);
     assert!(added(&game.update_npc_visibility(&who).unwrap(), VENDOR));
@@ -291,7 +221,7 @@ fn non_coin_click_falls_through() {
 
 #[test]
 fn completing_a_set_records_completion_once() {
-    let fixture = Fixture::new();
+    let fixture = Fixture::new("coin-pickup");
     let mut game = fixture.load(None);
     let coins = coins_of(SEASIDE_RARE);
     assert_eq!(coins.len(), 5, "every Seaside Rare entry has a coin");
@@ -331,7 +261,7 @@ fn the_three_added_coins_record_their_entries() {
             .find(|row| row["spawn_guid"] == guid)
             .expect("coin spawn row");
         let position = [0, 1, 2].map(|i| row["position"][i].as_f64().unwrap() as f32);
-        let fixture = Fixture::new();
+        let fixture = Fixture::new("coin-pickup");
         let mut game = fixture.load(None);
         let who = at(position);
         assert!(added(&game.update_npc_visibility(&who).unwrap(), guid));
