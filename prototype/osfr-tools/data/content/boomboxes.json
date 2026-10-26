@@ -1297,5 +1297,28 @@
         }
       ]
     }
-  ]
+  ],
+  "pets": {
+    "pet_dance_animation_id": 3201,
+    "pet_dance_ms": 4000,
+    "pet_gap_ms": { "min_ms": 500, "max_ms": 2000 },
+    "source": [
+      {
+        "kind": "client",
+        "evidence": "Resources/AnimationTypes.xml:1156 AnimationSlot name=emo_dance_basic id=3201 type=4 priority=1; Resources/AnimationGroups.xml:1972 AnimationGroup name=emo_dance_basic id=3201 (one member slot of that name); the 35/8 reader 0x00908a50 (dispatch 0x009315e7) plays the id now when its flags bit 0 is clear, on the actor it finds by guid"
+      },
+      {
+        "kind": "reference",
+        "evidence": "../lab/references/Sanctuary-main-20261019@10f129e src/Sanctuary.Game/Entities/PlayerPet.cs:182-186 PetDanceAnimationGroupId 3201, PetDanceDurationMs 4000, PetDanceGapMinMs 500, PetDanceGapMaxMs 2000; :280 PetDanceAnimations is that one pair; :572-592 the next play is now + duration + a random gap while the owner is in dance range"
+      },
+      {
+        "kind": "client",
+        "evidence": "every pet species model's own .adr maps the emo_dance_basic slot to a creature clip except vulture_pet.adr, which maps it to nothing (list in notes/Autopilot/T537.md; extracted client-asset catalogue)"
+      },
+      {
+        "kind": "reconstructed",
+        "evidence": "(R) the first play is immediate where Sanctuary starts a joining pet up to 3 s later (PetDanceJoinMaxDelayMs); owner movement, pet facing and pet water state are not gated here, because the tick carries no pet facing or water state"
+      }
+    ]
+  }
 }

@@ -529,7 +529,7 @@ fn the_loader_refuses_rows_out_of_bounds_and_a_missing_file_is_empty() {
     let shipped = Catalogue::load(&content()).unwrap();
     assert!(shipped.get(TOTEM).is_some() && shipped.get(CAMPFIRE).is_none());
     assert_eq!(load_with(|_| {}).unwrap(), shipped);
-    let cases: [(&str, fn(&mut Value)); 39] = [
+    let cases: [(&str, fn(&mut Value)); 47] = [
         ("range 0", |f| f["boomboxes"][0]["range_m"] = json!(0)),
         ("range 51", |f| f["boomboxes"][0]["range_m"] = json!(51)),
         ("spawn offset 11", |f| {
@@ -651,6 +651,25 @@ fn the_loader_refuses_rows_out_of_bounds_and_a_missing_file_is_empty() {
                 .collect();
             f["boomboxes"][2]["clips"]["1"] = Value::Array(clips);
         }),
+        // T537: the top-level `pets` block.
+        ("pet animation 0", |f| {
+            f["pets"]["pet_dance_animation_id"] = json!(0)
+        }),
+        ("pet dance 0", |f| f["pets"]["pet_dance_ms"] = json!(0)),
+        ("pet dance 600001", |f| {
+            f["pets"]["pet_dance_ms"] = json!(600_001)
+        }),
+        ("pet gap inverted", |f| {
+            f["pets"]["pet_gap_ms"]["min_ms"] = json!(2_001)
+        }),
+        ("pet gap 600001", |f| {
+            f["pets"]["pet_gap_ms"]["max_ms"] = json!(600_001)
+        }),
+        ("pet block without provenance", |f| {
+            f["pets"]["source"] = json!([])
+        }),
+        ("unknown pet field", |f| f["pets"]["gap_ms"] = json!(1)),
+        ("pets not an object", |f| f["pets"] = json!(1)),
     ];
     for (why, edit) in cases {
         assert!(load_with(edit).is_err(), "{why}");
@@ -658,6 +677,38 @@ fn the_loader_refuses_rows_out_of_bounds_and_a_missing_file_is_empty() {
     let empty = temp_dir();
     assert_eq!(Catalogue::load(&empty).unwrap(), Catalogue::default());
     let _ = fs::remove_dir_all(&empty);
+}
+
+/// T537: the `pets` block is the client's own dance on Sanctuary's measured clock; a file without
+/// it keeps the pet dance off, and the boxes still load.
+#[test]
+fn the_pets_block_is_the_client_dance_and_absent_means_off() {
+    let shipped = Catalogue::load(&content()).unwrap();
+    let pets = shipped.pet_dance().expect("the shipped file has the block");
+    assert_eq!(
+        (
+            pets.pet_dance_animation_id,
+            pets.pet_dance_ms,
+            pets.pet_gap_ms.min_ms,
+            pets.pet_gap_ms.max_ms,
+        ),
+        (3_201, 4_000, 500, 2_000)
+    );
+    assert!(!pets.source.is_empty(), "provenance rides with the values");
+    // 3201 is a client animation slot and a group whose one member slot carries that same name, so
+    // the client resolves it whichever table it looks in.
+    assert_eq!(animation_slot_ids()["emo_dance_basic"], 3_201);
+    assert_eq!(
+        animation_group_slots(3_201),
+        [String::from("emo_dance_basic")]
+    );
+    // Without the block the feature is off and the rows still load.
+    let absent = load_with(|file| {
+        file.as_object_mut().unwrap().remove("pets");
+    })
+    .unwrap();
+    assert!(absent.pet_dance().is_none());
+    assert_eq!(absent.get(TOTEM).map(|row| row.item_id), Some(TOTEM));
 }
 
 fn who() -> CharacterState {

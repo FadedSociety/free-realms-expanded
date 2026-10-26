@@ -66,6 +66,15 @@
 //!   whose own error string names it), and a late viewer gets the same model in the AddPc
 //!   temporary-appearance slot (reader `0091aa10` stores it at +324, T512). So a dance table is
 //!   looked up by [`crate::players::PlayerPresentation::display_model`], the model the client shows.
+//! * A dancer's summoned pet dances too (T537). While a session dances and has a pet out, the pet
+//!   gets 35/8 with the play flag (reader `00908a50`, dispatcher case at `009315e7`: bit 0 set
+//!   stores the id as the entity's base animation at +0x51C, clear calls `0096c780` and plays it
+//!   now) of the `pets` block's animation on the pet's own actor guid. Animation 3201 is slot
+//!   `emo_dance_basic` (`AnimationTypes.xml:1156`) and group `emo_dance_basic`
+//!   (`AnimationGroups.xml:1972`), whose one member slot carries that name; every pet species
+//!   model but `vulture_pet.adr` maps the slot to a creature clip in its own `.adr` (list in
+//!   `notes/Autopilot/T537.md`). The guid is `PetPresence::actor_guid`, the id the pet's AddNpc
+//!   spawned, never a second scheme.
 //!
 //! # Reconstructed (R)
 //!
@@ -111,11 +120,17 @@
 //!   `PlayerPresentation::temporary_model`) is put back with 35/14 after the 35/15, because the
 //!   client has only the one temporary-appearance slot. A viewer who walks into range sees the
 //!   dancer idle until the next clip. One synchronized packet carries at most `MAX_ENTRIES`.
+//! * (T537) A pet's dance is the `pets` block's animation for `pet_dance_ms`, then a random gap in
+//!   `pet_gap_ms`, repeated while its owner dances. The first play is immediate; Sanctuary starts a
+//!   pet that joins a dance up to 3 s later (`PetDanceJoinMaxDelayMs`) and also idles it while the
+//!   owner moves, the pet does not face them, or it stands in water. Those are open gaps: the tick
+//!   has no pet facing or water state.
 
 use crate::{
     abilities::effect_packets,
     consumable_effects::{encode_remove_temporary_appearance, encode_temporary_appearance},
     encounter::SharedFieldState,
+    pets::PetPresence,
     players::{PlayerRegistry, SessionId, ZoneInstance},
     power_ups::Rng,
     startup_world::{self, ActorLook, NpcSpawn},
@@ -317,17 +332,71 @@ impl Boombox {
     }
 }
 
+/// T537: the top-level `pets` block — a dancing owner's summoned pet dances too. A file without it
+/// keeps the pet dance off: no packet is ever built.
+#[derive(Clone, Debug, PartialEq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PetDance {
+    /// The animation a pet plays: 35/8 with the base flag clear, so it plays now
+    /// (`emo_dance_basic`, 3201).
+    pub pet_dance_animation_id: i32,
+    /// One play's length, before the gap that follows it (R: Sanctuary's 4000 ms dance).
+    pub pet_dance_ms: u32,
+    /// The random gap after a play (R: Sanctuary's 500-2000 ms).
+    pub pet_gap_ms: PetGap,
+    pub source: Vec<Source>,
+}
+
+/// The random gap a pet waits after a dance, drawn uniformly from `min_ms..=max_ms`.
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct PetGap {
+    pub min_ms: u32,
+    pub max_ms: u32,
+}
+
+impl PetDance {
+    /// The wait after one play. The loader keeps `min_ms <= max_ms`; saturating arithmetic keeps a
+    /// caller-built block from panicking the tick.
+    fn gap_ms(&self, rng: &mut Rng) -> u32 {
+        let span = u64::from(
+            self.pet_gap_ms
+                .max_ms
+                .saturating_sub(self.pet_gap_ms.min_ms),
+        ) + 1;
+        self.pet_gap_ms
+            .min_ms
+            .saturating_add((rng.next_u64() % span) as u32)
+    }
+
+    /// Sanity bounds, not tuned values.
+    fn valid(&self) -> bool {
+        let ms = |value: u32| (1..=MAX_MS).contains(&value);
+        self.pet_dance_animation_id > 0
+            && ms(self.pet_dance_ms)
+            && ms(self.pet_gap_ms.max_ms)
+            && self.pet_gap_ms.min_ms <= self.pet_gap_ms.max_ms
+            && !self.source.is_empty()
+    }
+}
+
 #[derive(Deserialize)]
 #[serde(deny_unknown_fields)]
 struct CatalogueFile {
     schema_version: u32,
     boomboxes: Vec<Boombox>,
+    /// T537: absent keeps the pet dance off (serde leaves a missing `Option` as `None`).
+    pets: Option<PetDance>,
 }
 
 /// Every boombox row, read-only and shared. Nothing about it is saved. A press hands out the stored
 /// row, so a live box points at the catalogue's clip table instead of copying it.
 #[derive(Clone, Debug, Default, PartialEq)]
-pub struct Catalogue(Vec<Arc<Boombox>>);
+pub struct Catalogue {
+    rows: Vec<Arc<Boombox>>,
+    /// T537: the top-level `pets` block, shared for the same reason as the rows.
+    pets: Option<Arc<PetDance>>,
+}
 
 impl Catalogue {
     /// `boomboxes.json` from the content directory; a missing file is an empty catalogue.
@@ -352,12 +421,23 @@ impl Catalogue {
                 return Err(invalid(format!("invalid boombox row {}", row.item_id)));
             }
         }
-        Ok(Self(rows.into_iter().map(Arc::new).collect()))
+        if parsed.pets.as_ref().is_some_and(|pets| !pets.valid()) {
+            return Err(invalid("invalid boomboxes.json pets block"));
+        }
+        Ok(Self {
+            rows: rows.into_iter().map(Arc::new).collect(),
+            pets: parsed.pets.map(Arc::new),
+        })
     }
 
     /// The row for `item_id`, shared: callers clone the pointer, never the row.
     pub fn get(&self, item_id: i32) -> Option<&Arc<Boombox>> {
-        self.0.iter().find(|row| row.item_id == item_id)
+        self.rows.iter().find(|row| row.item_id == item_id)
+    }
+
+    /// T537: the `pets` block, shared; `None` when the file has none, which keeps the dance off.
+    pub fn pet_dance(&self) -> Option<&Arc<PetDance>> {
+        self.pets.as_ref()
     }
 }
 
@@ -399,6 +479,9 @@ fn audience(
 
 /// A dancer's session and character guid.
 type Dancers = BTreeMap<SessionId, u64>;
+
+/// A session's winning box this tick: box index, priority, distance, character guid, shown model.
+type Winner = (usize, i32, f32, u64, i32);
 
 /// A participant a box let go of: session, character guid, the box's zone and the temporary
 /// model it had (0 for a dance box).
@@ -742,6 +825,11 @@ pub struct Boomboxes {
     rng: Rng,
     /// The permanent boxes as they were built, so a restart after a fault can start them afresh.
     fixed: Vec<Placed>,
+    /// T537: the catalogue's `pets` block, shared (the world is cloned per message). `None` — the
+    /// block absent from `boomboxes.json` — keeps the pet dance off.
+    pet_dance: Option<Arc<PetDance>>,
+    /// T537: each dancing session's summoned pet, with the time its next dance is due.
+    pet_dancers: BTreeMap<SessionId, u64>,
 }
 
 impl Default for Boomboxes {
@@ -752,6 +840,8 @@ impl Default for Boomboxes {
             released: Vec::new(),
             rng: Rng::from_entropy().unwrap_or_else(|_| Rng::seeded(0)),
             fixed: Vec::new(),
+            pet_dance: None,
+            pet_dancers: BTreeMap::new(),
         }
     }
 }
@@ -790,6 +880,7 @@ impl Boomboxes {
             });
         }
         boxes.live = boxes.fixed.clone();
+        boxes.pet_dance = catalogue.pet_dance().cloned();
         Ok(boxes)
     }
 
@@ -799,6 +890,8 @@ impl Boomboxes {
         Self {
             live: self.fixed.clone(),
             fixed: self.fixed.clone(),
+            // The `pets` block outlives a fault; the dancers it had do not.
+            pet_dance: self.pet_dance.clone(),
             ..Self::default()
         }
     }
@@ -876,8 +969,14 @@ impl Boomboxes {
 
     /// Once per tick: end boxes whose time is up, show the rest to sessions that came into range
     /// and take it back from those that left, then take one box per session (transform or dance)
-    /// and send it. No boxes means no work.
-    pub fn tick(&mut self, now_ms: u64, players: &mut PlayerRegistry) -> Sends {
+    /// and send it. No boxes means no work. `pets` is the world's summoned pets, keyed by their
+    /// owner's character guid; the T537 pet dance needs it and nothing else does.
+    pub fn tick_with_pets(
+        &mut self,
+        now_ms: u64,
+        players: &mut PlayerRegistry,
+        pets: &BTreeMap<u64, PetPresence>,
+    ) -> Sends {
         let mut sends = Sends::new();
         if self.live.is_empty() {
             return sends;
@@ -912,8 +1011,13 @@ impl Boomboxes {
             }
             nears.push(near);
         }
-        self.dance(now_ms, players, &nears, &mut sends);
+        self.dance(now_ms, players, pets, &nears, &mut sends);
         sends
+    }
+
+    /// [`Self::tick_with_pets`] for a world with no summoned pet.
+    pub fn tick(&mut self, now_ms: u64, players: &mut PlayerRegistry) -> Sends {
+        self.tick_with_pets(now_ms, players, &BTreeMap::new())
     }
 
     /// One box per session (a transform applies, a dance box steps). `nears[i]` are the sessions
@@ -922,12 +1026,13 @@ impl Boomboxes {
         &mut self,
         now_ms: u64,
         players: &mut PlayerRegistry,
+        pets: &BTreeMap<u64, PetPresence>,
         nears: &[BTreeSet<SessionId>],
         sends: &mut Sends,
     ) {
         // A session belongs to one box: the highest priority, then the nearest, then the
-        // earliest placed. Value: (box index, priority, distance, character guid, shown model).
-        let mut owner: BTreeMap<SessionId, (usize, i32, f32, u64, i32)> = BTreeMap::new();
+        // earliest placed.
+        let mut owner: BTreeMap<SessionId, Winner> = BTreeMap::new();
         for (index, (placed, near)) in self.live.iter().zip(nears).enumerate() {
             if placed.dance.is_none() && placed.transform.is_none() {
                 continue;
@@ -1180,6 +1285,59 @@ impl Boomboxes {
                 sends.push((viewer, synchronized_animations(chunk)));
             }
         }
+        self.pet_dances(now_ms, players, pets, &owner, sends);
+    }
+
+    /// T537: while a session dances, its summoned pet dances beside it. The `pets` block fixes the
+    /// animation, the play's length and the gap after it; without the block nothing is sent. The
+    /// packet names the pet's own actor guid and goes to the owner and everyone near them who
+    /// knows the owner, the same audience as the owner's own dance. `owner` is this tick's winner
+    /// map, so this costs no allocation at all until a dancer has a pet out.
+    fn pet_dances(
+        &mut self,
+        now_ms: u64,
+        players: &PlayerRegistry,
+        pets: &BTreeMap<u64, PetPresence>,
+        owner: &BTreeMap<SessionId, Winner>,
+        sends: &mut Sends,
+    ) {
+        let Some(block) = self.pet_dance.as_ref() else {
+            return;
+        };
+        let (animation, dance_ms) = (block.pet_dance_animation_id, block.pet_dance_ms);
+        // A dance box's winners all dance; a transform box's mounted rider stands (R).
+        let dancing = |session: &SessionId| {
+            owner.get(session).is_some_and(|winner| {
+                self.live[winner.0].dance.is_some() || !players.is_mounted(*session)
+            })
+        };
+        let mut clocks = std::mem::take(&mut self.pet_dancers);
+        clocks.retain(|session, _| dancing(session));
+        for session in owner.keys().filter(|session| dancing(session)) {
+            // A dancer that left the registry, or whose pet was dismissed, is dropped without a
+            // word: the client already removed that actor.
+            let Some(player) = players.get(*session) else {
+                clocks.remove(session);
+                continue;
+            };
+            let Some(pet) = pets.get(&player.character_guid) else {
+                clocks.remove(session);
+                continue;
+            };
+            let next = clocks.entry(*session).or_insert(now_ms);
+            if now_ms < *next {
+                continue;
+            }
+            let gap = u64::from(block.gap_ms(&mut self.rng));
+            *next = now_ms
+                .saturating_add(u64::from(dance_ms))
+                .saturating_add(gap);
+            let packet = animation_packet(pet.actor_guid, animation, false);
+            for viewer in audience(players, *session, player.character_guid, player.zone) {
+                sends.push((viewer, packet.clone()));
+            }
+        }
+        self.pet_dancers = clocks;
     }
 
     /// A guid no live box has, counting up through the low word and wrapping.
@@ -2897,6 +3055,223 @@ mod tests {
             let mut players = registry();
             let mut none = Boomboxes::permanent(&catalogue, &[]).unwrap();
             assert!(none.live.is_empty() && none.tick(0, &mut players).is_empty());
+        }
+    }
+
+    /// T537: a dancing owner's summoned pet dances beside them.
+    mod pets {
+        use super::*;
+        use crate::pets::PetPresence;
+
+        const JINGLE: i32 = 878; // synchronized; model 1 has clips
+        const HUMAN_M: i32 = 1;
+        /// A pet actor id that is not derived from its owner, so a packet naming it proves the
+        /// tick uses the presence's own `actor_guid` and never recomputes one.
+        const PET_ACTOR: u64 = 0x4d49_4c4b_0000_0007;
+
+        fn presence(owner: u64) -> PetPresence {
+            PetPresence {
+                owner_guid: owner,
+                pet_id: 3,
+                actor_guid: PET_ACTOR,
+                species_id: 652,
+                model: "wolf_coyote.adr".into(),
+                model_id: 1,
+                texture_alias: String::new(),
+                name: String::new(),
+                speed: 1.0,
+                position: [0.0, 1.0, 0.0],
+            }
+        }
+
+        /// The world's pet table: `owner`'s one summoned pet.
+        fn pets_of(owner: u64) -> BTreeMap<u64, PetPresence> {
+            BTreeMap::from([(owner, presence(owner))])
+        }
+
+        /// A service with the `pets` block (3201 after 4000 ms plus a gap in `min_ms..=max_ms`).
+        fn service(seed: u64, min_ms: u32, max_ms: u32) -> Boomboxes {
+            let mut live = Boomboxes::default();
+            live.pet_dance = Some(Arc::new(PetDance {
+                pet_dance_animation_id: 3_201,
+                pet_dance_ms: 4_000,
+                pet_gap_ms: PetGap { min_ms, max_ms },
+                source: Vec::new(),
+            }));
+            live.rng = Rng::seeded(seed);
+            live
+        }
+
+        /// The pet plays a session was sent: 35/8 `(guid, animation)` with the base flag clear.
+        fn plays(sends: &Sends, session: u64) -> Vec<(u64, i32)> {
+            let plays = to(sends, session)
+                .into_iter()
+                .filter(|packet| packet.starts_with(&[35, 0, 8, 0]) && packet[20] == 0);
+            plays
+                .map(|packet| {
+                    (
+                        u64::from_le_bytes(packet[4..12].try_into().unwrap()),
+                        i32::from_le_bytes(packet[12..16].try_into().unwrap()),
+                    )
+                })
+                .collect()
+        }
+
+        /// When each of the first four plays happens, from one tick a millisecond.
+        fn schedule(seed: u64) -> Vec<u64> {
+            let mut players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+            let mut live = service(seed, 500, 2_000);
+            press(&mut live, &row(JINGLE), 600, 0, &players);
+            let pets = pets_of(601);
+            let mut at = Vec::new();
+            let mut now = 0;
+            // Bounded: four plays of at most 6 s each fit well inside 60 s.
+            while at.len() < 4 && now < 60_000 {
+                if !plays(&live.tick_with_pets(now, &mut players, &pets), 1).is_empty() {
+                    at.push(now);
+                }
+                now += 1;
+            }
+            at
+        }
+
+        #[test]
+        fn a_dancing_owners_pet_plays_on_its_own_actor_every_dance_plus_gap() {
+            let mut players = world(
+                16,
+                &[
+                    (1, HUMAN_M, 0.0, 0.0, ZONE),   // the dancer, and the pet's owner
+                    (2, HUMAN_M, 4.0, 0.0, ZONE),   // a viewer near them
+                    (3, HUMAN_M, 900.0, 0.0, ZONE), // out of the box's range
+                ],
+            );
+            let mut live = service(7, 500, 500);
+            press(&mut live, &row(JINGLE), 600, 1_000, &players);
+            let pets = pets_of(601);
+            // The client's own 21 bytes: 35/8, the pet's guid, 3201, an i32 0 and flags 0 (play now,
+            // reader `00908a50`; bit 0 would store it as the entity's base animation instead).
+            let mut want = vec![35, 0, 8, 0];
+            want.extend(PET_ACTOR.to_le_bytes());
+            want.extend(3_201_i32.to_le_bytes());
+            want.extend([0; 5]);
+            assert_eq!(want.len(), 21);
+            let first = live.tick_with_pets(1_000, &mut players, &pets);
+            for session in [1, 2] {
+                assert!(
+                    to(&first, session).contains(&want.as_slice()),
+                    "session {session} hears the pet"
+                );
+                assert_eq!(plays(&first, session), [(PET_ACTOR, 3_201)]);
+            }
+            assert!(to(&first, 3).is_empty(), "the far session is not shown it");
+            // Four seconds of dance and the block's 500 ms gap: nothing a millisecond early.
+            assert!(plays(&live.tick_with_pets(5_499, &mut players, &pets), 1).is_empty());
+            assert_eq!(
+                plays(&live.tick_with_pets(5_500, &mut players, &pets), 1),
+                [(PET_ACTOR, 3_201)]
+            );
+            assert!(plays(&live.tick_with_pets(5_501, &mut players, &pets), 1).is_empty());
+        }
+
+        #[test]
+        fn the_gap_is_drawn_from_the_block_and_a_seed_repeats_the_schedule() {
+            let first = schedule(11);
+            assert_eq!(first.len(), 4);
+            assert_eq!(first[0], 0, "the first play is immediate");
+            for pair in first.windows(2) {
+                let gap = pair[1] - pair[0] - 4_000;
+                assert!(
+                    (500..=2_000).contains(&gap),
+                    "gap {gap} ms ending at {}",
+                    pair[1]
+                );
+            }
+            assert!(
+                first.windows(3).any(|w| w[1] - w[0] != w[2] - w[1]),
+                "the gap is drawn per play: {first:?}"
+            );
+            assert_eq!(first, schedule(11), "a seed repeats the schedule");
+            assert_ne!(first, schedule(12), "another seed draws another one");
+        }
+
+        #[test]
+        fn the_pet_dance_stops_with_the_dance_or_the_pet() {
+            let mut players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+            let mut live = service(5, 500, 500);
+            press(&mut live, &row(JINGLE), 600, 0, &players);
+            // No summoned pet: the dancer dances alone.
+            let none: BTreeMap<u64, PetPresence> = BTreeMap::new();
+            assert!(plays(&live.tick_with_pets(0, &mut players, &none), 1).is_empty());
+            // Summoned mid-dance: the pet plays at once.
+            let mut pets = pets_of(601);
+            assert_eq!(
+                plays(&live.tick_with_pets(100, &mut players, &pets), 1),
+                [(PET_ACTOR, 3_201)]
+            );
+            // Dismissed mid-dance: the world's table loses the owner and nothing more is sent.
+            pets.remove(&601);
+            assert!(plays(&live.tick_with_pets(4_600, &mut players, &pets), 1).is_empty());
+            // Summoned again: it plays at once; then the owner walks out of the box's range.
+            pets = pets_of(601);
+            assert_eq!(
+                plays(&live.tick_with_pets(5_000, &mut players, &pets), 1),
+                [(PET_ACTOR, 3_201)]
+            );
+            walk(&mut players, 1, 40.0);
+            assert!(plays(&live.tick_with_pets(9_500, &mut players, &pets), 1).is_empty());
+            // Back in range the dance restarts and the pet plays again, then the box ends.
+            walk(&mut players, 1, 0.0);
+            assert_eq!(
+                plays(&live.tick_with_pets(10_000, &mut players, &pets), 1),
+                [(PET_ACTOR, 3_201)]
+            );
+            assert!(plays(&live.tick_with_pets(10_001, &mut players, &pets), 1).is_empty());
+            // A disconnect mid-dance: nothing is sent to the leaver, and a reconnect starts the
+            // dance (and the pet's clock) from scratch.
+            let _ = players.leave(SessionId(1));
+            assert!(plays(&live.tick_with_pets(20_000, &mut players, &pets), 1).is_empty());
+            join(&mut players, 1, HUMAN_M, [0.0, 1.0, 0.0], ZONE);
+            assert_eq!(
+                plays(&live.tick_with_pets(20_050, &mut players, &pets), 1),
+                [(PET_ACTOR, 3_201)]
+            );
+            let ended = live.tick_with_pets(180_000, &mut players, &pets);
+            assert!(
+                plays(&ended, 1).is_empty(),
+                "the box's end stops the pet too"
+            );
+            assert!(plays(&live.tick_with_pets(180_050, &mut players, &pets), 1).is_empty());
+        }
+
+        #[test]
+        fn without_the_pets_block_the_pet_never_dances() {
+            let mut players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+            let mut live = Boomboxes::default();
+            assert!(live.pet_dance.is_none(), "the block is absent");
+            press(&mut live, &row(JINGLE), 600, 0, &players);
+            let pets = pets_of(601);
+            for now in [0, 4_500, 9_000, 13_500] {
+                let sends = live.tick_with_pets(now, &mut players, &pets);
+                assert!(plays(&sends, 1).is_empty(), "tick {now}");
+                assert!(
+                    !sends
+                        .iter()
+                        .any(|(_, packet)| packet.get(4..12) == Some(&PET_ACTOR.to_le_bytes()[..])),
+                    "tick {now}: no packet names the pet"
+                );
+            }
+        }
+
+        #[test]
+        fn a_restart_keeps_the_pets_block_and_forgets_the_clocks() {
+            let mut live = service(5, 500, 500);
+            live.pet_dancers.insert(SessionId(1), 9);
+            let again = live.restarted();
+            assert!(
+                again.pet_dance.is_some(),
+                "the block survives a fault restart"
+            );
+            assert!(again.pet_dancers.is_empty(), "the dancers do not");
         }
     }
 }

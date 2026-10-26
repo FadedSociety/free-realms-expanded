@@ -1756,9 +1756,9 @@ fn end_session_forgets_the_character_jump_relay_budget() {
 
 /// F161: a pet adoption spends a certificate and adds a pet in one atomic document; a refused
 /// replacement leaves the document and the live session unchanged. Declared here because the
-/// hub file is at its line ceiling.
+/// hub file is at its line ceiling. T537 reuses its certificate grant to summon a real pet.
 #[path = "f161_pet_adoption_persist.rs"]
-mod f161_pet_adoption_persist;
+pub(crate) mod f161_pet_adoption_persist;
 
 /// F261: the begin-zoning commit clears the previous scene's ground pickups on the staged
 /// clone, including a free revive into the instance the session is already bound to. Declared

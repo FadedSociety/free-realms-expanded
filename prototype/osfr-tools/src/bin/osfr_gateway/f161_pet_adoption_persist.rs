@@ -7,10 +7,10 @@ use super::*;
 use osfr_tools::inventory::InventoryItem;
 
 #[path = "pet_wire.rs"]
-mod pet_wire;
+pub(crate) mod pet_wire;
 
 /// Bundled `pets.json`: species 1000015 (Char) is adopted from item 70352.
-const ADOPTION_ITEM: i32 = 70_352;
+pub(crate) const ADOPTION_ITEM: i32 = 70_352;
 const PET_SPECIES: u32 = 1_000_015;
 
 /// A selected, world-loaded session, as `Session::new` + the handshake leave it.
@@ -22,7 +22,7 @@ fn world_loaded(options: &Options, id: u32) -> Scene {
 }
 
 /// Add one owned adoption certificate to the live inventory, as a purchase or reward would.
-fn grant_certificate(session: &mut Session) {
+pub(crate) fn grant_certificate(session: &mut Session) {
     let mut state = session
         .gateway
         .inventory_state()

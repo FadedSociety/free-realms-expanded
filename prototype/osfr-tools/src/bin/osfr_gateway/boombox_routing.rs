@@ -60,7 +60,10 @@ pub(super) fn place(
 /// not stop the server: the boxes are dropped (logged once) and the tick goes on without them.
 pub(super) fn tick(world: &mut SharedWorld, sessions: &mut SessionMap, now_ms: u64) {
     let ticked = contain(|| {
-        let sends = world.boomboxes.tick(now_ms, &mut world.players);
+        // T537: the summoned pets ride along, so a dancer's pet dances too.
+        let sends = world
+            .boomboxes
+            .tick_with_pets(now_ms, &mut world.players, &world.pets);
         deliver(sends, None, sessions, world);
         Ok(())
     });
@@ -108,6 +111,9 @@ fn deliver(
 #[cfg(test)]
 mod tests {
     use super::super::f120_fishing_hour_reconnect::drain_replies;
+    use super::super::tests::f161_pet_adoption_persist::{
+        ADOPTION_ITEM, grant_certificate, pet_wire,
+    };
     use super::super::tests::test_support::{self, Scene, Scratch, bin_test_target};
     use super::*;
     use osfr_tools::item_bar::use_wire::{
@@ -1048,5 +1054,87 @@ mod tests {
             error.contains("NPC spawn 42") && error.contains("999999"),
             "{error}"
         );
+    }
+
+    #[test]
+    fn t537_a_dancing_owners_summoned_pet_dances_and_a_dismissal_stops_it() {
+        let Some(mut rig) = Rig::new("t537-pet", RAINBOW) else {
+            return;
+        };
+        // The world's boxes come from the real startup loader, so the shipped `pets` block is live.
+        rig.scene.world.boomboxes = load(&rig.options).unwrap();
+        let owner = rig.scene.session.character_guid;
+        let stuck = rig.viewer_as(2, 6.0, 60).0;
+        let healthy = rig.viewer_as(3, 10.0, 1).0;
+        // The client's own summon-by-item (53/32) adopts the certificate's pet and puts its actor
+        // in the shared world; every later step reads that one entry.
+        grant_certificate(&mut rig.scene.session);
+        let summon = pet_wire::summon_by_item(ADOPTION_ITEM as u32, 0);
+        rig.scene.send(&rig.options, &summon, 2_000).unwrap();
+        let pet = rig
+            .scene
+            .world
+            .pets
+            .get(&owner)
+            .cloned()
+            .expect("the summoned pet is in the shared world");
+        assert_ne!(pet.actor_guid, owner, "the pet has its own actor");
+        rig.press(3_000);
+        rig.drain(stuck, 3_000);
+        rig.drain(healthy, 3_000);
+        rig.drain_owner(3_000);
+        // The dance is an animation only: the saved character document must not move.
+        let saved = rig.saved_state();
+
+        // The first tick of the dance plays the pet's animation on the pet's guid, to the owner and
+        // both viewers.
+        rig.tick(3_050);
+        let play = (pet.actor_guid, 3_201, false);
+        assert!(animations(&rig.drain_owner(3_050)).contains(&play), "owner");
+        assert!(
+            animations(&rig.drain(stuck, 3_050)).contains(&play),
+            "stuck"
+        );
+        assert!(
+            animations(&rig.drain(healthy, 3_050)).contains(&play),
+            "healthy"
+        );
+        // The pet's own clock: nothing more until 4 s plus the block's 500-2000 ms gap. A tick at
+        // the latest due time plays it again, and a stuck viewer's queue skips only that viewer.
+        rig.tick(3_100);
+        assert!(animations(&rig.drain_owner(3_100)).is_empty(), "not yet");
+        rig.scene.sessions.get_mut(&stuck).unwrap().sender = sender(1);
+        rig.tick(3_050 + 6_000);
+        assert!(
+            animations(&rig.drain_owner(3_050 + 6_000)).contains(&play),
+            "the owner is still served"
+        );
+        assert!(
+            animations(&rig.drain(healthy, 3_050 + 6_000)).contains(&play),
+            "so is the healthy viewer"
+        );
+        assert!(
+            animations(&rig.drain(stuck, 3_050 + 6_000)).is_empty(),
+            "the stuck viewer's queue refused"
+        );
+        // The pet's removal below takes the ordinary delivery path, where a refusing recipient
+        // fails the request (`queue_delivery`); the refusal was already proved above.
+        rig.scene.sessions.get_mut(&stuck).unwrap().sender = sender(32 * 1024 * 1024);
+
+        // The client's own dismiss (53/4) empties the shared world's pet table: no pet packet again,
+        // even though the owner still dances.
+        let dismiss = [53, 0, 4, 0, 0, 0, 0, 0];
+        rig.scene.send(&rig.options, &dismiss, 9_100).unwrap();
+        assert!(rig.scene.world.pets.get(&owner).is_none(), "dismissed");
+        rig.tick(15_050);
+        for messages in [rig.drain_owner(15_050), rig.drain(healthy, 15_050)] {
+            assert!(
+                !animations(&messages)
+                    .iter()
+                    .any(|(guid, _, _)| *guid == pet.actor_guid),
+                "no pet packet after the dismissal"
+            );
+        }
+        assert_eq!(rig.saved_state(), saved, "the pet dance saves nothing");
     }
 }
