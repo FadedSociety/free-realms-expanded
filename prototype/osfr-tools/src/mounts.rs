@@ -467,13 +467,9 @@ impl RideRestrictions {
 }
 
 /// How a ride actor is drawn (T483): the owned item's catalogue texture and tint, so rides that
-/// share a model look different, else the ride row's own values.
-#[derive(Clone, Debug, PartialEq)]
-pub struct RideLook {
-    pub texture_alias: String,
-    pub tint_alias: String,
-    pub tint_id: i32,
-}
+/// share a model look different, else the ride row's own values. The same look type draws a
+/// placed boombox (T712); see [`startup_world::ActorLook`].
+pub use crate::startup_world::ActorLook as RideLook;
 
 #[derive(Clone, Debug, PartialEq)]
 pub struct ActiveRide {
@@ -1465,13 +1461,10 @@ fn add_ride_npc(
     actor_guid: u64,
     pose: RidePose,
 ) -> Option<Vec<u8>> {
-    let npc = startup_world::NpcSpawn {
+    let mut npc = startup_world::NpcSpawn {
         actor_id: actor_guid,
         name_string_id: mount.name_string_id,
         model_id: mount.model_id?,
-        texture_alias: look.texture_alias.clone(),
-        tint_alias: look.tint_alias.clone(),
-        tint_id: look.tint_id,
         hide_nameplate: 1,
         speed: mount.max_movement_speed,
         is_interactable: 0,
@@ -1480,6 +1473,7 @@ fn add_ride_npc(
         rotation: [pose.heading.sin(), 0.0, pose.heading.cos(), 0.0],
         ..world::content_spawn_template()
     };
+    look.apply(&mut npc);
     world::unframe_tunnel(&startup_world::build_add_npc(&npc)).ok()
 }
 

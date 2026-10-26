@@ -19,13 +19,23 @@
 //!   dock's item-bar picker reads the same source (`ScriptsBase.lua`
 //!   `QuickItem.PopulateSelectors`). (R) Lead decision 2026-10-25: the Stuff detail pane is not
 //!   a binding path for a type-1, slot-0 definition.
-//! * Every model, animation and song effect id is checked against the client's own tables by
-//!   `tests/boombox_catalogue.rs`; each row's `source` cites where its values come from.
+//! * Every model, animation, look alias and song effect id is checked against the client's own
+//!   tables and actor definitions by `tests/boombox_catalogue.rs`; each row's `source` cites
+//!   where its values come from.
+//! * The placed box is 35/2 AddNpc. Reader `00921a10` stores the actor's `texture_alias` and
+//!   `tint_alias` in two counted strings, then an i32 `tint_id` at `this+68` (decimal, `+0x44`);
+//!   the actor definition's own `TextureAliasesRead` (`007e2500`) and `TintAliasesRead` (`007e2940`)
+//!   parse the model `.adr`'s alias → texture and alias → colour tables. An alias the model does
+//!   not define falls back to its default skin client-side (R, T508), which is why a row sends
+//!   only its own model's aliases: the rainbow model defines no texture alias and its six tints
+//!   are Red, Orange, Yellow, Green, Blue and Purple; its `.dma` defaults the body material red.
 //! * The song is a composite effect attached to the box by tag, 35/41 (client dispatcher
 //!   jump table `0092F540` case 41: ctor `008c4d50`, reader `008f82e0` -> `008d7ad0`: guid at
 //!   +0x10, tag at +0x18) and stopped by 35/42 (case 42, ctor `008b51c0`: guid +0x10, tag
-//!   +0x18). The box's own bounce is `amb_loop_01` (`AnimationTypes.xml:844`, id 2100) and the
-//!   poof is effect 21 `PFX_smoke_black_explosion` (`ActorCompositeEffectDefinitions.xml:283`).
+//!   +0x18). The six colour songs are effect ids 16448-16453, `PFX_music_boombox_red`, `_blue`,
+//!   `_green`, `_orange`, `_purple`, `_yellow`. The box's own bounce is `amb_loop_01`
+//!   (`AnimationTypes.xml:844`, id 2100) and the poof is effect 21
+//!   `PFX_smoke_black_explosion` (`ActorCompositeEffectDefinitions.xml:283`).
 //! * A transform row's dancers take its temporary appearance: 35/14 (dispatcher case 14 at
 //!   `00930283`, ctor `008b4370`, reader `008d6890` -> header `008d6830`, i32 model, u64 guid;
 //!   applier `ProxiedCharacter::SwitchToTemporaryAppearance` `0096bd90`) and revert with 35/15
@@ -67,11 +77,12 @@
 //! * The box stands `spawn_offset_m` to the owner's left (Sanctuary: the player's rotation applied
 //!   to -X; here `(-cos h, 0, sin h)` for the repo's facing `(sin h, 0, cos h)`), at the owner's
 //!   height, facing the way the owner faces. Not interactable, no nameplate, no interact range.
-//! * The song is one random effect of the row's `song_effect_ids`, one pick per spawn (R: the
-//!   rows and their six colour effects are Sanctuary's and the client's; no client spawn-time
-//!   pick was located). It is attached by 35/41 with the owner as the effect's source guid, as
-//!   `Placed::show` passes it; the reader (`008d7ad0`) calls that field the source, and what the
-//!   client does with it for a song is unrecovered.
+//! * The Rainbow Randomizer rolls one of its six `tints` per placement and plays that colour's
+//!   song (the wiki: "it appears in one randomly chosen colored tint ... they all play a different
+//!   tune"; the client effect names carry the same colours). The roll is this server's choice
+//!   (R): no client spawn-time pick was located. The song is attached by 35/41 with the owner as
+//!   the effect's source guid, as `Placed::show` passes it; the reader (`008d7ad0`) calls that
+//!   field the source, and what the client does with it for a song is unrecovered.
 //! * A viewer who leaves the box's range is sent the removal (35/3) and sees the box again, with
 //!   its song, on re-entry. One box per owner: a second press before the first ends replaces it
 //!   (the default recast equals the duration, so this only happens if the two are tuned apart).
@@ -107,7 +118,7 @@ use crate::{
     encounter::SharedFieldState,
     players::{PlayerRegistry, SessionId, ZoneInstance},
     power_ups::Rng,
-    startup_world::{self, NpcSpawn},
+    startup_world::{self, ActorLook, NpcSpawn},
     world,
     world_events::piece_052::animation_packet,
 };
@@ -138,6 +149,11 @@ const SYNC_ANIMATIONS: u16 = 63;
 const MAX_ENTRIES: usize = 64;
 /// Most clips one player model may have in an independent box's table (sanity bound).
 const MAX_CLIPS: usize = 256;
+/// Most colour tints one box may roll (sanity bound; the Rainbow row has six).
+const MAX_TINTS: usize = 16;
+/// Longest texture or tint alias (the mount catalogue's bound; the AddNpc codec reads a counted
+/// string, so this is a data sanity limit, not a client limit).
+const MAX_ALIAS: usize = 4096;
 /// The animation a dancer returns to: `loc_stand`.
 const IDLE_ANIMATION: i32 = 1;
 /// A dance step never lasts less than this (R), whatever the blend leaves of the clip.
@@ -172,6 +188,17 @@ pub struct Clip {
     pub ms: u32,
 }
 
+/// One look a placed box can take: the actor's tint alias (a name the model's `.adr` defines) and
+/// the song effect that colour plays, 0 for no song. The Rainbow Randomizer has one per colour;
+/// every other row has one. The colour pick is also the song pick, so a box's tune always matches
+/// its tint.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Deserialize)]
+#[serde(deny_unknown_fields)]
+pub struct Tint {
+    pub alias: String,
+    pub song_effect_id: i32,
+}
+
 /// One boombox. Ids of 0 mean "none" for `standing_animation_id` and `transform_model_id`.
 #[derive(Clone, Debug, PartialEq, Deserialize)]
 #[serde(deny_unknown_fields)]
@@ -193,7 +220,9 @@ pub struct Boombox {
     #[serde(default)]
     pub clips: BTreeMap<i32, Vec<Clip>>,
     pub blend_ms: u32,
-    pub song_effect_ids: Vec<i32>,
+    /// The looks a press may roll, chosen once per placed box. At least one; more than one makes
+    /// the box a randomiser, and the pick fixes both the tint alias and the song effect.
+    pub tints: Vec<Tint>,
     pub standing_animation_id: i32,
     pub priority: i32,
     pub transform_model_id: i32,
@@ -203,8 +232,12 @@ pub struct Boombox {
     pub range_m: f32,
     pub spawn_offset_m: f32,
     pub recast_ms: u32,
+    /// The model `.adr`'s texture alias, empty when the model defines none. An alias the model
+    /// does not define is ignored by the client and falls back to its default skin (T508).
     pub texture_alias: String,
-    pub tint_alias: String,
+    /// The item's dye tint id (0 when it has none). It rides beside the rolled tint alias; the
+    /// shipped boxes all carry no dye tint, so the alias alone selects the colour.
+    pub tint_id: i32,
     pub source: Vec<Source>,
 }
 
@@ -235,7 +268,19 @@ impl Boombox {
             && (sequence > 0) != independent
             && (!transform || sequence == 1)
             && self.dance_sequence.iter().all(|id| *id > 0)
-            && self.song_effect_ids.iter().all(|id| *id > 0)
+            && (1..=MAX_TINTS).contains(&self.tints.len())
+            && self.tints.iter().all(|tint| {
+                tint.alias.len() <= MAX_ALIAS
+                    && tint.song_effect_id >= 0
+                    && self
+                        .tints
+                        .iter()
+                        .filter(|other| other.alias == tint.alias)
+                        .count()
+                        == 1
+            })
+            && self.texture_alias.len() <= MAX_ALIAS
+            && self.tint_id >= 0
             && self.standing_animation_id >= 0
             && synchronized == !self.clip_ms.is_empty()
             && self.clip_ms.iter().all(|(model, clips)| {
@@ -692,8 +737,8 @@ pub struct Boomboxes {
     next: u32,
     /// Participants of boxes that ended or were replaced, sent idle (and 35/15) by the next tick.
     released: Vec<Released>,
-    /// Draws the song of each box and every independent clip. One stream for the world, like
-    /// Sanctuary's `Random.Shared`; the seed comes from the OS (0 if that fails).
+    /// Draws each box's colour (and with it the song) and every independent clip. One stream for
+    /// the world, like Sanctuary's `Random.Shared`; the seed comes from the OS (0 if that fails).
     rng: Rng,
     /// The permanent boxes as they were built, so a restart after a fault can start them afresh.
     fixed: Vec<Placed>,
@@ -779,16 +824,22 @@ impl Boomboxes {
             at[2] + heading.sin() * reach,
         ];
         let guid = self.next_guid();
+        // One pick fixes both the colour and the song, so they cannot disagree.
+        let tint = pick(&row.tints, &mut self.rng).cloned().unwrap_or_default();
         let mut npc = NpcSpawn {
             actor_id: guid,
             model_id: row.model_id,
-            texture_alias: row.texture_alias.clone(),
-            tint_alias: row.tint_alias.clone(),
             position: [position[0], position[1], position[2], 1.0],
             rotation: [heading.sin(), 0.0, heading.cos(), 0.0],
             ..world::content_spawn_template()
         };
         stand_as_box(&mut npc);
+        ActorLook {
+            texture_alias: row.texture_alias.clone(),
+            tint_alias: tint.alias.clone(),
+            tint_id: row.tint_id,
+        }
+        .apply(&mut npc);
         let Ok(add) = world::unframe_tunnel(&startup_world::build_add_npc(&npc)) else {
             return sends;
         };
@@ -807,7 +858,7 @@ impl Boomboxes {
             zone,
             position,
             tag: guid as u32 as i32,
-            song: pick(&row.song_effect_ids, &mut self.rng).copied(),
+            song: (tint.song_effect_id > 0).then_some(tint.song_effect_id),
             add,
             ends_ms: Some(now_ms.saturating_add(u64::from(row.duration_ms))),
             seen_by: BTreeSet::new(),
@@ -1295,9 +1346,10 @@ mod tests {
 
     #[test]
     fn a_press_shows_the_box_its_poof_and_song_to_those_in_range_only() {
+        let rainbow = row(RAINBOW);
         let mut live = Boomboxes::default();
         let sends = live.spawn(
-            Arc::new(row(RAINBOW)),
+            Arc::new(rainbow.clone()),
             600,
             ZONE,
             [0.0, 1.0, 0.0],
@@ -1318,14 +1370,31 @@ mod tests {
             );
             assert_eq!(npc.position, [at[0], at[1], at[2], 1.0]);
             assert_eq!(npc.rotation, [0.0, 0.0, 1.0, 0.0]);
-            assert_eq!(npc.texture_alias, "boombox-rainbow-M");
             assert_eq!(
                 (npc.hide_nameplate, npc.is_interactable, npc.interact_range),
                 (1, 0, 0)
             );
             assert_eq!(packets[1], poof(guid, at));
             let effect = i32::from_le_bytes(packets[2][16..20].try_into().unwrap());
-            assert!(row(RAINBOW).song_effect_ids.contains(&effect));
+            let tint = rainbow
+                .tints
+                .iter()
+                .find(|tint| tint.song_effect_id == effect)
+                .expect("the song belongs to one of the row's colour tints");
+            // The AddNpc carries the same colour the song plays, not just the song.
+            assert_eq!(
+                (
+                    npc.texture_alias.as_str(),
+                    npc.tint_alias.as_str(),
+                    npc.tint_id
+                ),
+                (
+                    rainbow.texture_alias.as_str(),
+                    tint.alias.as_str(),
+                    rainbow.tint_id
+                )
+            );
+            assert!(!tint.alias.is_empty(), "a rainbow colour has a tint alias");
             let mut song = vec![35, 0, 41, 0];
             song.extend(guid.to_le_bytes());
             song.extend((guid as u32 as i32).to_le_bytes());
@@ -1335,9 +1404,11 @@ mod tests {
             assert_eq!(packets[2], song);
         }
         assert!(to(&sends, 3).is_empty(), "the far session is not shown it");
-        // A row with no songs sends no 35/41.
+        // A row with no look keeps the model's default appearance (empty aliases, as the old
+        // unresolved item aliases also rendered) and sends no 35/41.
+        let totem = row(TOTEM);
         let quiet = Boomboxes::default().spawn(
-            Arc::new(row(TOTEM)),
+            Arc::new(totem.clone()),
             600,
             ZONE,
             [0.0; 3],
@@ -1346,6 +1417,19 @@ mod tests {
             &registry(),
         );
         assert_eq!(to(&quiet, 1).len(), 2);
+        let npc = startup_world::parse_add_npc(to(&quiet, 1)[0]).unwrap();
+        assert_eq!(
+            (
+                npc.texture_alias.as_str(),
+                npc.tint_alias.as_str(),
+                npc.tint_id
+            ),
+            (
+                totem.texture_alias.as_str(),
+                totem.tints[0].alias.as_str(),
+                totem.tint_id
+            )
+        );
     }
 
     #[test]
@@ -2054,11 +2138,10 @@ mod tests {
             }
 
             #[test]
-            fn the_randomizer_song_is_always_one_of_its_six() {
+            fn the_randomizer_colour_and_song_are_always_one_of_its_six() {
                 let players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
                 let rainbow = row(RAINBOW);
-                let songs = rainbow.song_effect_ids.clone();
-                assert_eq!(songs.len(), 6);
+                assert_eq!(rainbow.tints.len(), 6);
                 let mut live = seeded(11);
                 let mut seen = BTreeSet::new();
                 for n in 0..32 {
@@ -2071,13 +2154,24 @@ mod tests {
                         n,
                         &players,
                     );
-                    let song = to(&sends, 1)
+                    let packets = to(&sends, 1);
+                    let npc = startup_world::parse_add_npc(packets[0]).unwrap();
+                    let song = packets
                         .into_iter()
                         .find(|p| p.starts_with(&[35, 0, 41, 0]))
                         .expect("the box has a song");
                     let effect = i32::from_le_bytes(song[16..20].try_into().unwrap());
-                    assert!(songs.contains(&effect), "spawn {n}: {effect}");
-                    seen.insert(effect);
+                    let tint = rainbow
+                        .tints
+                        .iter()
+                        .find(|tint| tint.song_effect_id == effect)
+                        .unwrap_or_else(|| panic!("spawn {n}: {effect}"));
+                    assert_eq!(
+                        (npc.tint_alias.as_str(), npc.tint_id),
+                        (tint.alias.as_str(), rainbow.tint_id),
+                        "spawn {n}: the colour matches the song"
+                    );
+                    seen.insert((tint.alias.clone(), effect));
                 }
                 assert!(seen.len() > 1, "the pick varies: {seen:?}");
             }

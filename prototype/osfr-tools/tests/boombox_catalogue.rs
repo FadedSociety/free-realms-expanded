@@ -17,17 +17,20 @@ mod round70_content;
 mod xml;
 
 use osfr_tools::{
-    boombox::Catalogue,
+    boombox::{Boomboxes, Catalogue},
     character_store::CharacterState,
     gameplay::{Gameplay, Outcome},
     inventory::{Inventory, InventoryItem, InventoryState, RentalState},
     inventory_v2_fixes::encode_definition_batch_v2,
     item_bar::{ItemBar, Player, use_wire},
+    players::{InterestPolicy, PlayerRegistry, SessionId, ZoneInstance},
+    startup_world,
 };
 use piece_096::{InitMessage, ItemDefinition, TypedWriter, decode_payload};
 use serde::Deserialize;
 use serde_json::{Value, json};
 use std::{
+    collections::BTreeSet,
     fs, io,
     path::{Path, PathBuf},
     sync::{
@@ -72,6 +75,73 @@ fn ints(value: &Value) -> Vec<i32> {
 }
 fn resources() -> PathBuf {
     lab("working/OSFR.Client/OSFR Client/Resources")
+}
+/// The texture and tint alias names of one actor definition (`.adr`). A record is
+/// `03 04 <hash> 04 <len> <alias> 00`, then `05 04 <r> 06 04 <g> 07 04 <b> 08 01 <flag>` for a
+/// tint alias, or `05 <len> <texture>.dds 00` for a texture alias (the client's
+/// `TintAliasesRead` / `TextureAliasesRead`).
+fn adr_look(bytes: &[u8]) -> (BTreeSet<String>, BTreeSet<String>) {
+    let (mut textures, mut tints) = (BTreeSet::new(), BTreeSet::new());
+    let mut i = 0;
+    while i + 8 < bytes.len() {
+        if bytes[i] != 3 || bytes[i + 1] != 4 || bytes[i + 6] != 4 {
+            i += 1;
+            continue;
+        }
+        let start = i + 8;
+        let Some(end) = bytes[start..].iter().position(|byte| *byte == 0) else {
+            break;
+        };
+        let end = start + end;
+        let alias = String::from_utf8_lossy(&bytes[start..end]).into_owned();
+        let after = end + 1;
+        if bytes.get(after) == Some(&5) {
+            if bytes.get(after + 1) == Some(&4) {
+                tints.insert(alias);
+            } else {
+                let texture_start = after + 2;
+                if let Some(tail) = bytes.get(texture_start..) {
+                    if let Some(length) = tail.iter().position(|byte| *byte == 0) {
+                        let texture = &tail[..length];
+                        if texture.to_ascii_lowercase().ends_with(b".dds") {
+                            textures.insert(alias);
+                        }
+                    }
+                }
+            }
+        }
+        i = end;
+    }
+    (textures, tints)
+}
+/// The client effect id of each `PFX_music_boombox_<colour>` definition.
+fn music_effect_colours() -> BTreeSet<(i32, String)> {
+    let text = read(&resources().join("ActorCompositeEffectDefinitions.xml"));
+    let mut found = BTreeSet::new();
+    for line in text
+        .lines()
+        .filter(|line| line.contains("PFX_music_boombox_"))
+    {
+        let name = line
+            .split("name=\"")
+            .nth(1)
+            .unwrap()
+            .split('"')
+            .next()
+            .unwrap();
+        let id = line
+            .split("id=\"")
+            .nth(1)
+            .unwrap()
+            .split('"')
+            .next()
+            .unwrap();
+        found.insert((
+            id.parse().unwrap(),
+            name.trim_start_matches("PFX_music_boombox_").to_owned(),
+        ));
+    }
+    found
 }
 fn temp_dir() -> PathBuf {
     let path = std::env::temp_dir().join(format!(
@@ -151,15 +221,33 @@ fn every_dance_is_a_client_animation_slot_or_group() {
 }
 
 #[test]
-fn every_song_is_a_client_effect_definition() {
+fn every_song_is_a_client_effect_definition_named_for_its_colour() {
     let effects = xml::ids(
         &resources().join("ActorCompositeEffectDefinitions.xml"),
         "EffectDefinition",
     );
+    let colours: Vec<(String, i32)> = music_effect_colours()
+        .into_iter()
+        .map(|(id, colour)| (colour, id))
+        .collect();
     let mut songs = 0;
     for row in rows() {
-        for id in ints(&row["song_effect_ids"]) {
+        for tint in row["tints"].as_array().unwrap() {
+            let id = int(&tint["song_effect_id"]);
+            if id == 0 {
+                continue;
+            }
             assert!(effects.contains(&id), "{}: effect {id}", row["item_id"]);
+            let colour = tint["alias"].as_str().unwrap().to_ascii_lowercase();
+            let (client_colour, _) = colours
+                .iter()
+                .find(|(_, effect)| *effect == id)
+                .unwrap_or_else(|| panic!("{}: effect {id}", row["item_id"]));
+            assert_eq!(
+                colour, *client_colour,
+                "{}: tint {} and effect {id}",
+                row["item_id"], tint["alias"]
+            );
             songs += 1;
         }
     }
@@ -333,7 +421,7 @@ struct ItemRow {
 }
 
 #[test]
-fn the_catalogue_is_exactly_the_client_boombox_items_with_their_model_and_aliases() {
+fn the_catalogue_is_exactly_the_client_boombox_items_with_their_model_and_item_provenance() {
     let path = lab("references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json");
     let items: Vec<ItemRow> = serde_json::from_str(read(&path).trim_start_matches('\u{feff}'))
         .unwrap_or_else(|error| panic!("{}: {error}", path.display()));
@@ -363,9 +451,61 @@ fn the_catalogue_is_exactly_the_client_boombox_items_with_their_model_and_aliase
                 item.id
             );
         }
-        assert_eq!(row["texture_alias"], item.texture.as_str(), "{}", item.id);
-        assert_eq!(row["tint_alias"], item.tint.as_str(), "{}", item.id);
+        // The item's own aliases are provenance only: an actor's alias must name an alias the
+        // model `.adr` defines (the look test below), so the item row stays in `source` instead.
+        let source = serde_json::to_string(&row["source"]).unwrap();
+        if !item.texture.is_empty() {
+            assert!(source.contains(&item.texture), "{}: item texture", item.id);
+        }
+        assert!(source.contains(&item.tint), "{}: item tint", item.id);
     }
+}
+
+/// T712: every placed box's AddNpc must carry aliases the actor's own `.adr` defines. The client
+/// resolves `texture_alias`/`tint_alias` against that definition (`TextureAliasesRead`
+/// `007e2500`, `TintAliasesRead` `007e2940`) and falls back to the default skin for an unknown
+/// alias (T508); the Rainbow Randomizer's six random tints are that model's own six colours.
+#[test]
+fn every_boombox_wears_an_alias_its_client_model_defines() {
+    let models = models::read_models();
+    let catalog = read(&lab("extracted/client-assets/catalog.tsv"));
+    for row in rows() {
+        let model = row["model_id"].as_i64().unwrap();
+        let file = models[&model]
+            .iter()
+            .find(|name| name.ends_with(".adr"))
+            .unwrap_or_else(|| panic!("{}: model {model} has no .adr", row["item_id"]));
+        let (textures, tints) = adr_look(&actor_definition(&catalog, file));
+        let texture = row["texture_alias"].as_str().unwrap();
+        assert!(
+            texture.is_empty() || textures.contains(texture),
+            "{}: texture {texture:?} is not one of {file}'s {textures:?}",
+            row["item_id"]
+        );
+        for tint in row["tints"].as_array().unwrap() {
+            let alias = tint["alias"].as_str().unwrap();
+            assert!(
+                alias.is_empty() || tints.contains(alias),
+                "{}: tint {alias:?} is not one of {file}'s {tints:?}",
+                row["item_id"]
+            );
+        }
+    }
+    // The randomizer's six colours, paired with the six colour songs in the data.
+    let rainbow = rows()
+        .into_iter()
+        .find(|row| int(&row["item_id"]) == 1913)
+        .unwrap();
+    let aliases: Vec<_> = rainbow["tints"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|tint| tint["alias"].as_str().unwrap())
+        .collect();
+    assert_eq!(
+        aliases,
+        ["Red", "Blue", "Green", "Orange", "Purple", "Yellow"]
+    );
 }
 
 /// The shipped file with one edit, loaded from a scratch content directory.
@@ -389,7 +529,7 @@ fn the_loader_refuses_rows_out_of_bounds_and_a_missing_file_is_empty() {
     let shipped = Catalogue::load(&content()).unwrap();
     assert!(shipped.get(TOTEM).is_some() && shipped.get(CAMPFIRE).is_none());
     assert_eq!(load_with(|_| {}).unwrap(), shipped);
-    let cases: [(&str, fn(&mut Value)); 35] = [
+    let cases: [(&str, fn(&mut Value)); 39] = [
         ("range 0", |f| f["boomboxes"][0]["range_m"] = json!(0)),
         ("range 51", |f| f["boomboxes"][0]["range_m"] = json!(51)),
         ("spawn offset 11", |f| {
@@ -424,8 +564,19 @@ fn the_loader_refuses_rows_out_of_bounds_and_a_missing_file_is_empty() {
         ("independent with a dance sequence", |f| {
             f["boomboxes"][2]["dance_sequence"] = json!([3201, 3211])
         }),
-        ("song effect 0", |f| {
-            f["boomboxes"][2]["song_effect_ids"][0] = json!(0)
+        ("no tints", |f| f["boomboxes"][0]["tints"] = json!([])),
+        ("duplicate tint alias", |f| {
+            let first = f["boomboxes"][2]["tints"][0]["alias"].clone();
+            f["boomboxes"][2]["tints"][1]["alias"] = first;
+        }),
+        ("negative song effect", |f| {
+            f["boomboxes"][2]["tints"][0]["song_effect_id"] = json!(-1)
+        }),
+        ("unknown tint field", |f| {
+            f["boomboxes"][2]["tints"][0]["colour"] = json!(1)
+        }),
+        ("texture alias over 4096", |f| {
+            f["boomboxes"][0]["texture_alias"] = json!("x".repeat(4097))
         }),
         ("transform without a model", |f| {
             f["boomboxes"][1]["transform_model_id"] = json!(0)
@@ -683,6 +834,48 @@ fn a_granted_boombox_binds_and_presses_through_t461() {
     );
     let pressed = game.handle_in_world(&cast(0), &who(), 2_000).unwrap();
     assert_eq!(pressed.boombox, Some(1913), "36/10 places the box");
+
+    // T712: the row the press lookup returns places a box whose AddNpc carries the row's look.
+    // A colour's song and tint are one pick, so the tune always matches the box's tint.
+    let zone = ZoneInstance {
+        zone_id: 0,
+        instance_id: 0,
+    };
+    let at = [-440.0, 0.8, 1292.0];
+    let mut players = PlayerRegistry::new(InterestPolicy::new(100.0, 16).unwrap());
+    players.join(SessionId(1), 1, 600, zone, at, 0.0).unwrap();
+    for row in rows() {
+        let item = int(&row["item_id"]);
+        let row = game.boombox_row(item).expect("the pressed row");
+        let (texture, tint_id, tints) = (row.texture_alias.clone(), row.tint_id, row.tints.clone());
+        let sends = Boomboxes::default().spawn(row, 600, zone, at, 0.0, 0, &players);
+        let packets: Vec<_> = sends
+            .iter()
+            .filter(|(who, _)| *who == SessionId(1))
+            .map(|(_, packet)| packet)
+            .collect();
+        let npc = startup_world::parse_add_npc(packets[0]).unwrap();
+        assert_eq!(
+            (npc.texture_alias.as_str(), npc.tint_id),
+            (texture.as_str(), tint_id),
+            "{item}: the row's texture and tint id"
+        );
+        let tint = tints
+            .iter()
+            .find(|tint| tint.alias == npc.tint_alias)
+            .unwrap_or_else(|| panic!("{item}: tint {:?} is not one of the row's", npc.tint_alias));
+        if tint.song_effect_id > 0 {
+            let song = packets
+                .iter()
+                .find(|packet| packet.starts_with(&[35, 0, 41, 0]))
+                .expect("the colour's song");
+            assert_eq!(
+                i32::from_le_bytes(song[16..20].try_into().unwrap()),
+                tint.song_effect_id,
+                "{item}: the song belongs to the tint"
+            );
+        }
+    }
 }
 
 #[test]

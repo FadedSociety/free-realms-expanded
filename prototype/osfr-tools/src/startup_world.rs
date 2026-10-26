@@ -611,6 +611,7 @@ pub struct NpcSpawn {
     pub animation_id: i32,
     pub attachments: Vec<NpcAttachment>,
     pub disposition: i32,
+    /// The three appearance fields; [`ActorLook`] owns their assignment (35/2 reader `00921a10`).
     pub texture_alias: String,
     pub tint_alias: String,
     pub tint_id: i32,
@@ -685,6 +686,28 @@ pub struct NpcSpawn {
     pub unknown_field_68: i32,
     pub name_scale: f32,
     pub nameplate_image_id: i32,
+}
+
+/// How an actor is drawn: the model `.adr`'s texture alias and tint alias, plus a dye tint id.
+/// These are [`NpcSpawn`]'s three appearance fields (35/2 reader `00921a10`). The item/model look
+/// paths that share one (the ride actor, the placed boombox) write them through
+/// [`ActorLook::apply`]; a spawn with its own content (a pet, a static NPC) may set them directly.
+/// An alias the actor definition does not define falls back to the model's default skin
+/// client-side (T508), so callers pass only aliases their model defines (or empty).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ActorLook {
+    pub texture_alias: String,
+    pub tint_alias: String,
+    pub tint_id: i32,
+}
+
+impl ActorLook {
+    /// Write the look onto `spawn`'s texture alias, tint alias and tint id.
+    pub fn apply(&self, spawn: &mut NpcSpawn) {
+        spawn.texture_alias.clone_from(&self.texture_alias);
+        spawn.tint_alias.clone_from(&self.tint_alias);
+        spawn.tint_id = self.tint_id;
+    }
 }
 
 fn read_f32_array<const N: usize>(reader: &mut Reader<'_>) -> Result<[f32; N], String> {

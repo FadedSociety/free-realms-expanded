@@ -13,7 +13,9 @@
         "61": [4834, 4434, 6667, 10667]
       },
       "blend_ms": 600,
-      "song_effect_ids": [],
+      "tints": [
+          {"alias": "", "song_effect_id": 0}
+      ],
       "standing_animation_id": 0,
       "priority": 0,
       "transform_model_id": 0,
@@ -22,8 +24,8 @@
       "range_m": 15,
       "spawn_offset_m": 2,
       "recast_ms": 180000,
-      "texture_alias": "boombox-xmas-M",
-      "tint_alias": "dyetint",
+      "texture_alias": "",
+      "tint_id": 0,
       "source": [
         {
           "kind": "reference",
@@ -38,6 +40,10 @@
           "evidence": "Models.txt:1910 1936^mkt_boombox_xmas_01.adr"
         },
         {
+          "kind": "client",
+          "evidence": "mkt_boombox_xmas_01.adr: the extracted actor definition's texture and tint aliases (texture none; tints none), the three appearance fields AddNpc carries (reader 0x00921a10: texture +0x24, tint +0x34, tint id +0x44; alias tables 0x007e2500/0x007e2940)"
+        },
+        {
           "kind": "reconstructed",
           "evidence": "(R) clip and blend lengths were measured by Sanctuary, not read from client data; duration, range and spawn offset are Sanctuary's BoomboxDefinition defaults (BoomboxDefinition.cs:9-11) and the recast is the duration with its 3000 ms floor (14914ac)"
         }
@@ -50,7 +56,9 @@
       "dance_sequence": [3541],
       "clip_ms": {},
       "blend_ms": 600,
-      "song_effect_ids": [],
+      "tints": [
+          {"alias": "", "song_effect_id": 0}
+      ],
       "standing_animation_id": 0,
       "priority": 100,
       "transform_model_id": 1941,
@@ -59,8 +67,8 @@
       "range_m": 15,
       "spawn_offset_m": 2,
       "recast_ms": 180000,
-      "texture_alias": "boombox-realmsroll-M",
-      "tint_alias": "dyetint",
+      "texture_alias": "",
+      "tint_id": 0,
       "source": [
         {
           "kind": "reference",
@@ -81,6 +89,10 @@
         {
           "kind": "client",
           "evidence": "AnimationTypes.xml:1054 emo_dance_rroll_01 id 3541 type 4 (rroll branch); only human_m has the base actor entry human_m_emo_dance_roll_A.gr2 (Assets_manifest.txt:41662)"
+        },
+        {
+          "kind": "client",
+          "evidence": "mkt_boombox_realmsroll_01.adr: the extracted actor definition's texture and tint aliases (texture none; tints none), the three appearance fields AddNpc carries (reader 0x00921a10: texture +0x24, tint +0x34, tint id +0x44; alias tables 0x007e2500/0x007e2940)"
         },
         {
           "kind": "reconstructed",
@@ -396,7 +408,14 @@
         ]
       },
       "blend_ms": 600,
-      "song_effect_ids": [16448, 16449, 16450, 16451, 16452, 16453],
+      "tints": [
+          {"alias": "Red", "song_effect_id": 16448},
+          {"alias": "Blue", "song_effect_id": 16449},
+          {"alias": "Green", "song_effect_id": 16450},
+          {"alias": "Orange", "song_effect_id": 16451},
+          {"alias": "Purple", "song_effect_id": 16452},
+          {"alias": "Yellow", "song_effect_id": 16453}
+      ],
       "standing_animation_id": 3550,
       "priority": 0,
       "transform_model_id": 0,
@@ -405,8 +424,8 @@
       "range_m": 15,
       "spawn_offset_m": 2,
       "recast_ms": 180000,
-      "texture_alias": "boombox-rainbow-M",
-      "tint_alias": "dyetint",
+      "texture_alias": "",
+      "tint_id": 0,
       "source": [
         {
           "kind": "reference",
@@ -423,6 +442,14 @@
         {
           "kind": "client",
           "evidence": "Models.txt:1953 1979^mkt_boombox_rainbow_01.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "mkt_boombox_rainbow_01.adr: the extracted actor definition's texture and tint aliases (texture none; tints Red, Orange, Yellow, Green, Blue, Purple), the three appearance fields AddNpc carries (reader 0x00921a10: texture +0x24, tint +0x34, tint id +0x44; alias tables 0x007e2500/0x007e2940); the colour songs are ActorCompositeEffectDefinitions.xml 16448-16453 PFX_music_boombox_red/_blue/_green/_orange/_purple/_yellow"
+        },
+        {
+          "kind": "reference",
+          "evidence": "../lab/references/freerealms-wiki: 'Rainbow Randomizer Boombox' page: 'When taken out, it appears in one randomly chosen colored tint. Whether it's red, purple, yellow, orange, green, or blue, they all play a different tune.'"
         },
         {
           "kind": "reconstructed",
@@ -442,7 +469,9 @@
         "61": [17567]
       },
       "blend_ms": 600,
-      "song_effect_ids": [],
+      "tints": [
+          {"alias": "", "song_effect_id": 0}
+      ],
       "standing_animation_id": 0,
       "priority": 0,
       "transform_model_id": 0,
@@ -451,8 +480,8 @@
       "range_m": 15,
       "spawn_offset_m": 2,
       "recast_ms": 180000,
-      "texture_alias": "boombox-totem-M",
-      "tint_alias": "dyetint",
+      "texture_alias": "",
+      "tint_id": 0,
       "source": [
         {
           "kind": "reference",
@@ -465,6 +494,10 @@
         {
           "kind": "client",
           "evidence": "Models.txt:2189 2217^mkt_boombox_totem.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "mkt_boombox_totem.adr: the extracted actor definition's texture and tint aliases (texture none; tints none), the three appearance fields AddNpc carries (reader 0x00921a10: texture +0x24, tint +0x34, tint id +0x44; alias tables 0x007e2500/0x007e2940)"
         },
         {
           "kind": "reconstructed",
@@ -484,7 +517,9 @@
         "61": [5000, 4967, 4967, 4967]
       },
       "blend_ms": 600,
-      "song_effect_ids": [],
+      "tints": [
+          {"alias": "notint", "song_effect_id": 0}
+      ],
       "standing_animation_id": 0,
       "priority": 0,
       "transform_model_id": 0,
@@ -493,8 +528,8 @@
       "range_m": 15,
       "spawn_offset_m": 2,
       "recast_ms": 180000,
-      "texture_alias": "boombox-dwarftech-M",
-      "tint_alias": "dyetint",
+      "texture_alias": "boombox-dwarftech-P",
+      "tint_id": 0,
       "source": [
         {
           "kind": "reference",
@@ -507,6 +542,10 @@
         {
           "kind": "client",
           "evidence": "Models.txt:3194 4012^mkt_boombox_dwarftech_01.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "mkt_boombox_dwarftech_01.adr: the extracted actor definition's texture and tint aliases (texture boombox-dwarftech-P; tints notint), the three appearance fields AddNpc carries (reader 0x00921a10: texture +0x24, tint +0x34, tint id +0x44; alias tables 0x007e2500/0x007e2940)"
         },
         {
           "kind": "reconstructed",
@@ -550,7 +589,9 @@
         ]
       },
       "blend_ms": 600,
-      "song_effect_ids": [],
+      "tints": [
+          {"alias": "", "song_effect_id": 0}
+      ],
       "standing_animation_id": 3200,
       "priority": 0,
       "transform_model_id": 0,
@@ -560,7 +601,7 @@
       "spawn_offset_m": 2,
       "recast_ms": 180000,
       "texture_alias": "",
-      "tint_alias": "dyetint",
+      "tint_id": 0,
       "source": [
         {
           "kind": "reference",
@@ -577,6 +618,10 @@
         {
           "kind": "client",
           "evidence": "Models.txt:186 185^sh_primitive_radio_01.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "sh_primitive_radio_01.adr: the extracted actor definition's texture and tint aliases (texture none; tints none), the three appearance fields AddNpc carries (reader 0x00921a10: texture +0x24, tint +0x34, tint id +0x44; alias tables 0x007e2500/0x007e2940)"
         },
         {
           "kind": "reconstructed",
@@ -600,7 +645,9 @@
         "61": [5801]
       },
       "blend_ms": 600,
-      "song_effect_ids": [],
+      "tints": [
+          {"alias": "", "song_effect_id": 0}
+      ],
       "standing_animation_id": 0,
       "priority": 0,
       "transform_model_id": 0,
@@ -609,8 +656,8 @@
       "range_m": 15,
       "spawn_offset_m": 2,
       "recast_ms": 180000,
-      "texture_alias": "boombox-ghettoblaster-M",
-      "tint_alias": "dyetint",
+      "texture_alias": "",
+      "tint_id": 0,
       "source": [
         {
           "kind": "reference",
@@ -623,6 +670,10 @@
         {
           "kind": "client",
           "evidence": "Models.txt:1635 1661^mkt_boombox_ghettoblaster_01.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "mkt_boombox_ghettoblaster_01.adr: the extracted actor definition's texture and tint aliases (texture none; tints none), the three appearance fields AddNpc carries (reader 0x00921a10: texture +0x24, tint +0x34, tint id +0x44; alias tables 0x007e2500/0x007e2940)"
         },
         {
           "kind": "reconstructed",
@@ -642,7 +693,9 @@
         "61": [6067, 6100, 6100, 6100]
       },
       "blend_ms": 600,
-      "song_effect_ids": [],
+      "tints": [
+          {"alias": "notint", "song_effect_id": 0}
+      ],
       "standing_animation_id": 0,
       "priority": 0,
       "transform_model_id": 0,
@@ -652,7 +705,7 @@
       "spawn_offset_m": 2,
       "recast_ms": 180000,
       "texture_alias": "boombox-realmshake-M",
-      "tint_alias": "dyetint",
+      "tint_id": 0,
       "source": [
         {
           "kind": "reference",
@@ -665,6 +718,10 @@
         {
           "kind": "client",
           "evidence": "Models.txt:3410 4428^mkt_boombox_realmshake_01.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "mkt_boombox_realmshake_01.adr: the extracted actor definition's texture and tint aliases (texture boombox-realmshake-M; tints notint), the three appearance fields AddNpc carries (reader 0x00921a10: texture +0x24, tint +0x34, tint id +0x44; alias tables 0x007e2500/0x007e2940)"
         },
         {
           "kind": "reconstructed",
@@ -688,7 +745,9 @@
         "61": [3901, 3867, 3867, 3934]
       },
       "blend_ms": 600,
-      "song_effect_ids": [],
+      "tints": [
+          {"alias": "bw-boombox-electricslide-M", "song_effect_id": 0}
+      ],
       "standing_animation_id": 0,
       "priority": 0,
       "transform_model_id": 0,
@@ -697,8 +756,8 @@
       "range_m": 15,
       "spawn_offset_m": 2,
       "recast_ms": 180000,
-      "texture_alias": "boombox-bw-M",
-      "tint_alias": "dyetint",
+      "texture_alias": "bw-boombox-electricslide-M",
+      "tint_id": 0,
       "source": [
         {
           "kind": "reference",
@@ -711,6 +770,10 @@
         {
           "kind": "client",
           "evidence": "Models.txt:1063 1062^bw_boombox_01.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "bw_boombox_01.adr: the extracted actor definition's texture and tint aliases (texture bw-boombox-electricslide-M; tints bw-boombox-electricslide-M), the three appearance fields AddNpc carries (reader 0x00921a10: texture +0x24, tint +0x34, tint id +0x44; alias tables 0x007e2500/0x007e2940)"
         },
         {
           "kind": "reconstructed",
@@ -734,7 +797,9 @@
         "61": [6401, 6401, 6401, 6367]
       },
       "blend_ms": 600,
-      "song_effect_ids": [],
+      "tints": [
+          {"alias": "", "song_effect_id": 0}
+      ],
       "standing_animation_id": 0,
       "priority": 0,
       "transform_model_id": 0,
@@ -743,8 +808,8 @@
       "range_m": 15,
       "spawn_offset_m": 2,
       "recast_ms": 180000,
-      "texture_alias": "boombox-tiki-M",
-      "tint_alias": "dyetint",
+      "texture_alias": "",
+      "tint_id": 0,
       "source": [
         {
           "kind": "reference",
@@ -757,6 +822,10 @@
         {
           "kind": "client",
           "evidence": "Models.txt:2173 2201^mkt_boombox_tiki_01.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "mkt_boombox_tiki_01.adr: the extracted actor definition's texture and tint aliases (texture none; tints none), the three appearance fields AddNpc carries (reader 0x00921a10: texture +0x24, tint +0x34, tint id +0x44; alias tables 0x007e2500/0x007e2940)"
         },
         {
           "kind": "reconstructed",
@@ -776,7 +845,9 @@
         "61": [5000, 4967, 4967, 4534]
       },
       "blend_ms": 600,
-      "song_effect_ids": [],
+      "tints": [
+          {"alias": "notint", "song_effect_id": 0}
+      ],
       "standing_animation_id": 0,
       "priority": 0,
       "transform_model_id": 0,
@@ -785,8 +856,8 @@
       "range_m": 15,
       "spawn_offset_m": 2,
       "recast_ms": 180000,
-      "texture_alias": "boombox-bigband-M",
-      "tint_alias": "dyetint",
+      "texture_alias": "boombox-bigband-L1",
+      "tint_id": 0,
       "source": [
         {
           "kind": "reference",
@@ -799,6 +870,10 @@
         {
           "kind": "client",
           "evidence": "Models.txt:3278 4096^mkt_boombox_bigband_01.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "mkt_boombox_bigband_01.adr: the extracted actor definition's texture and tint aliases (texture boombox-bigband-L1; tints notint), the three appearance fields AddNpc carries (reader 0x00921a10: texture +0x24, tint +0x34, tint id +0x44; alias tables 0x007e2500/0x007e2940)"
         },
         {
           "kind": "reconstructed",
@@ -818,7 +893,9 @@
         "61": [5000, 4967, 4967, 4934]
       },
       "blend_ms": 600,
-      "song_effect_ids": [],
+      "tints": [
+          {"alias": "notint", "song_effect_id": 0}
+      ],
       "standing_animation_id": 0,
       "priority": 0,
       "transform_model_id": 0,
@@ -827,8 +904,8 @@
       "range_m": 15,
       "spawn_offset_m": 2,
       "recast_ms": 180000,
-      "texture_alias": "boombox-western-M",
-      "tint_alias": "dyetint",
+      "texture_alias": "boombox-western-L1",
+      "tint_id": 0,
       "source": [
         {
           "kind": "reference",
@@ -841,6 +918,10 @@
         {
           "kind": "client",
           "evidence": "Models.txt:3281 4099^mkt_boombox_western_01.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "mkt_boombox_western_01.adr: the extracted actor definition's texture and tint aliases (texture boombox-western-L1; tints notint), the three appearance fields AddNpc carries (reader 0x00921a10: texture +0x24, tint +0x34, tint id +0x44; alias tables 0x007e2500/0x007e2940)"
         },
         {
           "kind": "reconstructed",
@@ -860,7 +941,9 @@
         "61": [5000, 4967, 4967, 4967]
       },
       "blend_ms": 600,
-      "song_effect_ids": [],
+      "tints": [
+          {"alias": "notint", "song_effect_id": 0}
+      ],
       "standing_animation_id": 0,
       "priority": 0,
       "transform_model_id": 0,
@@ -869,8 +952,8 @@
       "range_m": 15,
       "spawn_offset_m": 2,
       "recast_ms": 180000,
-      "texture_alias": "",
-      "tint_alias": "dyetint",
+      "texture_alias": "boombox-xylophone-L1",
+      "tint_id": 0,
       "source": [
         {
           "kind": "reference",
@@ -883,6 +966,10 @@
         {
           "kind": "client",
           "evidence": "Models.txt:3282 4100^mkt_boombox_xylophone_01.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "mkt_boombox_xylophone_01.adr: the extracted actor definition's texture and tint aliases (texture boombox-xylophone-L1; tints notint), the three appearance fields AddNpc carries (reader 0x00921a10: texture +0x24, tint +0x34, tint id +0x44; alias tables 0x007e2500/0x007e2940)"
         },
         {
           "kind": "reconstructed",
@@ -1122,7 +1209,9 @@
         ]
       },
       "blend_ms": 600,
-      "song_effect_ids": [],
+      "tints": [
+          {"alias": "notint", "song_effect_id": 0}
+      ],
       "standing_animation_id": 3570,
       "priority": 0,
       "transform_model_id": 0,
@@ -1132,7 +1221,7 @@
       "spawn_offset_m": 2,
       "recast_ms": 180000,
       "texture_alias": "boombox-realmshake-M",
-      "tint_alias": "dyetint",
+      "tint_id": 0,
       "source": [
         {
           "kind": "reference",
@@ -1149,6 +1238,10 @@
         {
           "kind": "client",
           "evidence": "Models.txt:3410 4428^mkt_boombox_realmshake_01.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "mkt_boombox_realmshake_01.adr: the extracted actor definition's texture and tint aliases (texture boombox-realmshake-M; tints notint), the three appearance fields AddNpc carries (reader 0x00921a10: texture +0x24, tint +0x34, tint id +0x44; alias tables 0x007e2500/0x007e2940)"
         },
         {
           "kind": "reconstructed",
@@ -1168,7 +1261,9 @@
         "61": [5867, 5867, 5867, 5867, 5867]
       },
       "blend_ms": 600,
-      "song_effect_ids": [],
+      "tints": [
+          {"alias": "", "song_effect_id": 0}
+      ],
       "standing_animation_id": 0,
       "priority": 0,
       "transform_model_id": 0,
@@ -1177,8 +1272,8 @@
       "range_m": 15,
       "spawn_offset_m": 2,
       "recast_ms": 180000,
-      "texture_alias": "boombox-valentines-M",
-      "tint_alias": "dyetint",
+      "texture_alias": "",
+      "tint_id": 0,
       "source": [
         {
           "kind": "reference",
@@ -1191,6 +1286,10 @@
         {
           "kind": "client",
           "evidence": "Models.txt:2033 2059^mkt_boombox_valentines_01.adr"
+        },
+        {
+          "kind": "client",
+          "evidence": "mkt_boombox_valentines_01.adr: the extracted actor definition's texture and tint aliases (texture none; tints none), the three appearance fields AddNpc carries (reader 0x00921a10: texture +0x24, tint +0x34, tint id +0x44; alias tables 0x007e2500/0x007e2940)"
         },
         {
           "kind": "reconstructed",
