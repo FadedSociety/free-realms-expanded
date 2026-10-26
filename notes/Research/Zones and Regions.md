@@ -8,6 +8,11 @@ status: research
 Research for T749 (2026-10-26), no code change. Scope: find the client's real zone and
 region identifiers, the world's region bounds, the "Now entering" banner and chat trigger,
 and a position -> region rule, then give an ordered build plan. The commit is this note.
+**F752 (review fix) corrected this note:** the 15/2 header is `u16 15, u16 2` (not a `u8`
+subtype), the live NPC path already spawns every drawn NPC in zone 0, the group counts are
+the shipped T753 590-sphere grouping and the 707-vs-697 difference is the 10 box rows, the
+10 m grid is dropped, and the 15/2 display frame is cited. Evidence is in
+`notes/Autopilot/F752.md`.
 
 Evidence labels used below: **client** = first-party 2014 client code/data; **(R)** =
 reconstructed or inferred by this research; **community** = a pinned community project,
@@ -48,26 +53,29 @@ quotes small values and paths.
    does not derive the banner from position by itself, except through the optional
    `CurrentPOI` path (below).
 5. **The "Now entering <area>" chat line is a different server packet:** client
-   `BaseChatPacket` **family 15, subtype 2** (`ChatPacketEnterArea`). Reader
-   `0x00b109b0` -> `0x00b10580` consumes one `u32`; the display path `0x00b10250` looks up
+   `BaseChatPacket` **family 15, subtype 2** (`ChatPacketEnterArea`). The receive
+   dispatcher `0x00b14350` first calls the shared base reader `0x00b0f550`, which consumes
+   **two `u16` header words** (family, subtype), then case 2 calls `0x00b109b0` ->
+   `0x00b10580`, which consumes one `u32` area id. The display path `0x00b10250` looks up
    the locale key `EnteringChatArea` and formats the client string **numeric id 3604**,
    `Now entering [*area*].`, binding the packet value as the `area` parameter. The packet
-   carries an **area name string id**, not a region id.
+   carries an **area name string id**, not a region id. A `u8` subtype is wrong: the
+   reader's second header word is a `u16`.
 6. **The banner region bounds can be computed two ways:** the recovered nine-region
    `AreaDefinitions` table already in `piece_076` (community `FabledRealms.json`: four
    rectangles and five circles) and the client's own `FabledRealmsAreas.xml` area spheres
-   in 17 name-prefix groups plus named beds. The recovered shapes are the coarse banner
+   in 19 shipped place groups plus named beds. The recovered shapes are the coarse banner
    regions; the first-party area groups are the place bounds and a refinement. The note
    gives both, their overlaps and gaps. The combined rule covers 1091/1209 NPC rows
    (90.2%); 118 rows remain unplaced, grouped below.
-7. **Build order:** (a) one `regions.json` + loader + `RegionTable` lookup, (a2) role-based
-   NPC placement on the accepted map fits (after the region table; only Seaside currently
-   qualifies), (b) a data pass giving every location row `zone_id 0` (world) or instance
-   zone + `region_id` + `place_id`, (c) teleport/`realm goto` through the same lookup, (d)
-   the 47/9 banner and 15/2 chat line on change, (e) dungeon zone ids. Each step's
-   acceptance test and native check is in the build plan. The existing 17-row `zones.json`
-   should stop being loaded as `Zone`; the world `Zone` is 0/FabledRealms and instance zones
-   are `.gzne` scenes.
+7. **Build order:** (a) one `regions.json` + loader + `RegionTable` lookup, **shipped by
+   T753**, (a2) role-based NPC placement on the accepted map fits (after the region table;
+   only Seaside currently qualifies), (b) a data pass giving every location row `zone_id 0`
+   (world) or instance zone + `region_id` + `place_id`, (c) teleport/`realm goto` through
+   the same lookup, (d) the 47/9 banner and 15/2 chat line on change, (e) dungeon zone ids.
+   Each step's acceptance test and native check is in the build plan. The existing 17-row
+   `zones.json` should stop being loaded as `Zone`; the world `Zone` is 0/FabledRealms and
+   instance zones are `.gzne` scenes.
 
 ## 1. What the client calls a zone
 
@@ -210,10 +218,14 @@ Greenwood Forest, Highroad Junction, Lakeshore, Merry Vale, Sanctuary, Seaside, 
 Glade, Snowhill, Stillwater Crossing, Sunstone Valley, Wilds, Wugachug. Every row says
 `(R) zone package id ... no native numeric zone id or geometry mapping`. The client
 `FabledRealmsAreas.xml` uses those names as **areas/places**, not `.gzne` scenes; only
-`FabledRealms` (world) and the instance scenes are `.gzne` names. `world.rs` currently
-uses `zones.json` to map NPC `zone` names to `zone_id`s and then uses `npc.zone_id`
-directly; that is the source of the package-id/zone mismatch. The 17 ids do not equal
-the client region ids. The crosswalk (`(R)` by name/position) is:
+`FabledRealms` (world) and the instance scenes are `.gzne` names. Live
+`NpcVisibility::load` (`world.rs`) reads `zones.json` only to build its nearest-anchor
+list; it inserts **every drawn regional spawn into `OPEN_WORLD_ZONE` (zone 0)** and every
+drawn extra spawn likewise, and the computed package/region id is discarded for extras
+(`let _ = zone_id`). `World::runtime` passes an empty `ContentDb`, and `World::new`'s
+`npcs_by_zone` index is used only by tests, so the package ids never select a live NPC
+zone and there is no live package-id/zone mismatch. The 17 ids are still not client region
+ids. The crosswalk (`(R)` by name/position) is:
 
 | package id | `zones.json` name | client region id / place |
 | ---: | --- | --- |
@@ -318,17 +330,24 @@ places.
 ### 3.2 First-party client area groups (places and refinements)
 
 `FabledRealmsAreas.xml` has 1,279 `AreaDefinition` rows (1,239 spheres, 40 boxes; 138
-`AreaEnabled="0"`). The lead's filter is top-level, always-on spheres with a positive
-radius: our exact parse yields **697** rows; the lead's brief counted **707** and we could
-not reproduce the extra 10 exactly (the per-prefix counts below match the lead's table
-except Seaside, 30 vs 31). Treat 697 as the declared first-party sphere set and pin that
-count in the loader test; if the lead wants the 707 set, the extra 10 rows need naming
-before the bounds change. Prefix aliases: `thewilds`/`thewild`/`the` -> Wilds;
-`merryvale`/`meryvale` -> Merryvale; `briarwood`/`brairwood` -> Briarwood;
-`shroudedglade`/`shrouded` -> Shrouded Glade; `stillwatercrossing`/`stillwater`;
-`farnumfarmstead`/`farnum`; `queensfields`/`queensfiels`;
-`memorialcaves`/`memorialcaverns`; `briarheart`; plus the named beds `Newbiezone`,
-`MerryVale`, `Shrouded_Glade`, `AMB_BED_Desert_Day`/`Night`, `TheWild_WaguChugBrewery`.
+`AreaEnabled="0"`; 473 rows carry a `parentAreaId`). The exact filter used here is
+**top-level** (no `parentAreaId`), **always-on** (`AreaEnabled != "0"`), **sphere**,
+**radius > 0**: **697** rows. It is not "with Property children": only 692 of the 697 have
+a `Property` child; the five without are `RaceTrack`, `Snowhill_YetiCaves_Exterior`,
+`TheWild_smallvillage_1`, `Area937` and `Wugachug_Stage`. The lead's **707** is the same
+filter **including the 10 top-level always-on box rows** (806 top-level shapes = 778
+spheres + 28 boxes; 99 disabled leaves 707 = 697 spheres + 10 boxes). Pin **697 spheres /
+707 shapes** in the loader test. The group counts below are the shipped T753
+`regions.json` grouping: 19 place groups holding **590** of the 697 spheres; the other 107
+top-level spheres have unassigned prefixes such as `mine`, `hotspring`, `butterflies` and
+`pixienursery`. Group aliases (`regions.json` evidence): `thewilds*`/`thewild*`/`wilds*`
+-> Wilds; `merryvale*`/`meryvale*`; `briarwood*`/`brairwood*`;
+`shroudedglade*`/`shrouded*`; `stillwatercrossing*`/`stillwater*`;
+`farnumfarmstead*`/`farnum*`; `queensfields*`; `memorialcaves*`/`memorialcaverns*`/
+`memorial*`; `briarheart*`; `amb*`/`sunstone*`; plus the named beds `Newbiezone`,
+`MerryVale`, `Shrouded_Glade` and `TheWild_WaguChugBrewery`. The earlier claim that the
+per-prefix counts matched the lead's table except Seaside was false; the values below are
+the measured grouping and the test must pin these, not raw prefix counts.
 
 | group | parent banner id | shapes | AABB `(min x, min z)..(max x, max z)` | approx km² | largest shape |
 | --- | --- | ---: | --- | ---: | --- |
@@ -338,27 +357,27 @@ before the bounds change. Prefix aliases: `thewilds`/`thewild`/`the` -> Wilds;
 | Merryvale | 4 | 57 | `(-1315, -761)..(-765, -129)` | 0.25 | `MerryVale` `(-1040, -404) r275` |
 | Sanctuary | 5 | 36 | `(-1658, -231)..(-753, 787)` | 0.57 | `Sanctuary_waterfall_spray_01` `(-1239, 533) r250` |
 | Queensfields | 5 | 4 | `(-1529, 227)..(-1363, 406)` | 0.01 | `Queensfields_butterflies_01` `(-1403, 267) r40` |
-| Memorial Caves | 5 | 6 | `(-1030, 257)..(-834, 405)` | 0.02 | `MemorialCaverns_dragonflies_01` `(-906, 345) r60` |
+| Memorial Caves | 5 | 7 | `(-1051, 257)..(-834, 405)` | 0.02 | `MemorialCaverns_dragonflies_01` `(-906, 345) r60` |
 | Seaside | 6 | 30 | `(-991, -1588)..(94, -814)` | 0.35 | `Seaside_waterfall_spray_01` `(-673, -1080) r250` |
 | Shrouded Glade | 7 | 19 | `(-436, 761)..(442, 1570)` | 0.47 | `Shrouded_Glade` `(96, 1190) r250` |
 | Snowhill | 8 | 27 | `(-65, 117)..(727, 644)` | 0.15 | `Snowhill_Bed_1` `(156, 390) r135` |
 | Wugachug | 9 | 4 | `(-153, -773)..(263, -246)` | 0.17 | `Wugachug_waterfall_spray_01` `(47, -540) r200` |
-| Sunstone Valley | 10 | 2 | `(-552, 815)..(1476, 2908)` | 3.35 | `AMB_BED_Desert_Night` `(448, 1815) r1000` |
-| Wilds | 1 | 147 | `(-2249, -903)..(469, 1690)` | 1.31 | `TheWild_SkullVillage` `(-314, 1410) r280` |
+| Sunstone Valley | 10 | 9 | `(-552, 815)..(1476, 2908)` | 3.35 | `AMB_BED_Desert_Night` `(448, 1815) r1000` |
+| Wilds | 1 | 148 | `(-2249, -903)..(469, 1690)` | 1.31 | `TheWild_SkullVillage` `(-314, 1410) r280` |
 | Lakeshore | 1 | 18 | `(-901, 459)..(-391, 936)` | 0.11 | `Lakeshore_MX` `(-751, 765) r150` |
 | Crossroads | 1 | 17 | `(-1911, 295)..(-1740, 533)` | 0.02 | `Crossroads_butterflies_01` `(-1820, 433) r40` |
 | Highroad Junction | 1 | 51 | `(-766, -380)..(-253, 704)` | 0.15 | `HighroadJunction_fireflies_10` `(-513, 227) r150` |
-| Stillwater Crossing | 1 | 45 | `(-1593, 620)..(-710, 1406)` | 0.35 | `StillwaterCrossing_waterfall_spray_01` `(-994, 1156) r250` |
+| Stillwater Crossing | 1 | 51 | `(-1593, 620)..(-710, 1406)` | 0.35 | `StillwaterCrossing_waterfall_spray_01` `(-994, 1156) r250` |
 | Farnum Farmstead | 1 | 6 | `(-2267, 134)..(-2015, 386)` | 0.05 | `Farnum_Farmstead` `(-2141, 260) r126` |
 | Newbiezone (region 1) | 1 | 1 | `(-2472, 15)..(-1642, 845)` | 0.54 | `Newbiezone` `(-2057, 430) r415`; `RegionOverride=1` |
 
 The approximate area/coverage is a 20 m grid over the union of the group's spheres; the
 AABB is the union extent, not the playable shape. The largest shape is often an ambient
 sound/effect sphere (waterfall spray, fireflies), not the group's centre; use it as a
-marker, not a precise centre. The `Sunstone` value uses both desert beds (r765 day,
-r1000 night); the night bed is an ambience/lighting bed and should not be the region
-bound — use the day r765 circle `(711, 2143)` as the coarse Sunstone region and treat the
-night bed as a place/ambience.
+marker, not a precise centre. The Sunstone group now carries the two `AMB_BED_Desert_*`
+beds plus seven `AMB_EMIT_*`/`AMB_Emit_*` ambient rows; for the banner region use the day
+r765 circle `(711, 2143)` and treat the night bed and the ambient rows as
+places/ambience, not the region bound.
 
 `Greenwood Forest` and `Cobblestone Village` have **no** first-party `FabledRealmsAreas.xml`
 prefix group. They exist in content (`npcs/greenwood_forest.json`,
@@ -391,25 +410,31 @@ Durango Zoo 1, Highroad Junction 1, Sanctuary 1. Representative clusters (100 m 
 `(-1600,-600)` 14 and `(-2000,-700)` 12 (Greenwood Forest camps),
 `(-800,900)` 13 (Lakeshore/Stillwater edge), `(-300,-100)` 8 (Highroad/Wilds),
 `(0,2800)` 4 (Briarheart north edge), `(-400,-900)` 4 (Wilds/Pixie Nursery).
-The zero-position rows are placeholders (`placement: unanchored`, `reconstructed_zone_center`);
-they are not world locations.
+The 183 `placement: unanchored` rows are reconstruction scaffolding, not drawn spawns:
+`NpcVisibility::load` draws only `placement: legacy_data` rows. Their `placement_source`
+distinguishes **171 `reconstructed_zone_center`** rows (placed at a zone anchor; the
+group-centre cluster) from **12 `reconstructed_unanchored_default`** rows. Only four of the
+twelve are near the world origin (ids `9500000257`, `9500000258`, `9500000259` and
+`9500000265` in `npcs/durango_zoo.json`, within ~4 m); the other eight carry plausible
+world coordinates (Cobblestone Village, Greenwood Forest, Merry Vale, Sanctuary, Seaside).
+Use `placement_source`, not `placement`, and do not drop or zero the eight.
 
 ### 3.4 Position -> region rule
 
 1. If the point is inside a **first-party place group**, the highest-priority group wins
    (priority in data: starting area 100, banner region groups 50, named places 30,
    Wilds 10, Sunstone 5; then smaller area, then stable id). `place_id` and
-   `region_id` come from that row's `parent_region`.
+   `region_id` come from that row's `region_id`.
 2. Else if inside a **recovered nine-region shape**, the region id 2..10 wins; `place_id`
    is null (or the region's default place).
 3. Else if inside the client `Newbiezone` sphere, region 1 wins (no banner).
 4. Else `None`; the caller must not invent a region.
 
-This is O(697) sphere/box checks per query if naive. At 20 Hz per moving player this is
-only a few million checks/s for a small server, but a 10 m precomputed grid (about
-400 x 450 cells over the world AABB, one `region_id`/`place_id` per cell) makes it O(1)
-and allocation-free. The grid is built once at content load; values that change (region
-shape/priority) are data reloads, not per-tick work. The note's build plan uses the grid.
+The shipped T753 `RegionTable::region_at`/`place_at` scans at most 19 place rows and 10
+region rows per query, with no allocation; at 20 Hz per moving player this is negligible
+for a small server. Do not add the proposed 10 m precomputed grid: it is a second
+representation of the region data with its own reload/atomicity rules, and no profile has
+shown a cost. Revisit only with a measured hot path.
 
 ## 4. The "Now entering" banner and chat line
 
@@ -421,8 +446,9 @@ shape/priority) are data reloads, not per-tick work. The note's build plan uses 
   case arm, not the payload reader. The reader is `sub_A8DA50` -> `sub_A8B360`
   (`0x00a8b360`), and the payload is **two length-prefixed strings**, not an untraced
   region id. IDA beats the older note.
-- Payload reader `sub_A8DA50` -> `sub_A8B360` (0x00a8b360):
-  `u16 family`, `u8 subtype`, then **two** length-prefixed byte strings. The dispatcher
+- Payload reader `sub_A8DA50` -> `sub_A8B360` (0x00a8b360); its base reader
+  `sub_A8B240` (`0x00a8b240`) consumes `u16 family`, `u8 subtype`, then the payload reads
+  **two** length-prefixed byte strings. The dispatcher
   pushes both strings to Lua (`sub_70C580`, which constructs a Lua string at
   `0x0070bd80`); the first is `zoneId`, the second is unused by the current Lua function.
   **`(R)` both strings:** the reader is first-party, but we did not identify a preserved
@@ -457,26 +483,34 @@ at region hubs, disable 47/9 to avoid double banners.
 
 ### 4.2 Chat line: server 15/2 `ChatPacketEnterArea`
 
-- Client `BaseChatPacketReceiveDispatcher` `0x00b14350`, case 2 constructs
-  `ChatPacketEnterArea` and calls `sub_B109B0`; `sub_B10580` reads exactly one `u32` from
-  the body into packet field 3. The display path `0x00b10250` looks up the locale key
-  `EnteringChatArea` (numeric id **3604**, text `Now entering [*area*].`), binds the
-  packet value as the `area` parameter, and appends the formatted line to chat.
-- Wire: client `BaseChatPacket` family **15**, subtype/mode **2**, then one `u32` area
-  **string id**. The packet is server->client; the client's own chat request path is
-  15/1 `PacketChat`, and the server's `social_chat` routes client 15/1. The outer gateway
-  envelope is the existing tunneled application frame; use the chat module's writer.
+- Client `BaseChatPacketReceiveDispatcher` `0x00b14350` first calls the shared base reader
+  `0x00b0f550`, which consumes **two `u16` header words** (family, subtype); case 2 then
+  calls `sub_B109B0` -> `sub_B10580`, which reads exactly one `u32` into packet field 3.
+  The display path `0x00b10250` looks up the locale key `EnteringChatArea` (numeric id
+  **3604**, text `Now entering [*area*].`), binds the packet value as the `area`
+  parameter, and appends the formatted line to chat.
+- Wire: `u16 15`, `u16 2`, `u32` area **string id** (8 bytes before the outer envelope;
+  for Snowhill `0F 00 02 00 79 0F 00 00`, since 3961 = `0x0F79`). The header is **not**
+  `u16 15, u8 2`: the base reader waits for a `u16` subtype, so a `u8` subtype would be
+  read together with the first area byte as `0x7902`, case 2 would never run, and the u32
+  would be read from the wrong offset. The existing 15/1 writer agrees (`social_chat.rs`
+  emits `[15, 0, 1, 0]` for family 15/subtype 1). The packet is server->client; the
+  client's own chat request path is 15/1 `PacketChat`, and the server's `social_chat`
+  routes client 15/1. The outer gateway envelope is the existing tunneled application
+  frame; use the chat module's writer.
 - The area value is a **name string id**, not the 47/9 region id. For Snowhill send
   **3961**, not 8: the client prints `Now entering Snowhill.` For a sub-area use its place
   id (e.g. Lakeshore 18899, Mire's Edge 117002, Snowhill Hot Springs 4807). `(R)` the u32
   is a locale id: the reader proves the u32, the formatter and `[*area*]` template prove
   the parameter substitution, and the locale map supplies the numeric ids; we did not
-  identify a preserved 15/2 frame in the reviewed captures (the frames are login/zone/
-  minigame), so the native check is still required.
-- The original sends this line on area/region entry, including instance scenes: the
-  video OCR of kart races has `Now entering Briarwood.` while the player is on a kart
-  track. The server should send it when the **place/region name actually changes**, not
-  for every position tick.
+  identify a preserved 15/2 packet frame in the reviewed captures (the frames are login/
+  zone/minigame), so the native check is still required.
+- The original sends this line on area/region entry, including instance scenes:
+  `lab/video-archive/out/P2SusMJ2_tQ/frames/00010.jpg` shows the kart/garage scene in
+  Briarwood with five `Now entering Briarwood.` lines in the area chat, and `00012.jpg`
+  shows the same line later. The repeated lines are why the send rule below is `(R)`; the
+  video proves the original sends the line, not the wire bytes. The server should send it
+  when the **place/region name actually changes**, not for every position tick.
 
 ## 5. Map-label registration (affine fits)
 
@@ -592,9 +626,10 @@ The full data pass is build step (b); this is the measured starting point.
 
 The 118 NPC rows outside both region sources are listed in §3.3 by content zone and
 cluster. The 118 gaps break down as **Greenwood Forest 40**, **Wilds 29 + Lakeshore 15 (44
-combined)**, **zero/unanchored placeholders 12**, **Snowhill 7**, **Briarwood 5 (the
-Briarheart north edge)**, **Merry Vale 4**, **Seaside 2**, **Blackspore 1**, **Durango Zoo
-1**, **Highroad Junction 1**, **Sanctuary 1**. Cobblestone Village is inside `Newbiezone`
+combined)**, **`reconstructed_unanchored_default` 12** (four near the origin, eight with
+plausible coordinates; see §3.3), **Snowhill 7**, **Briarwood 5 (the Briarheart north
+edge)**, **Merry Vale 4**, **Seaside 2**, **Blackspore 1**, **Durango Zoo 1**,
+**Highroad Junction 1**, **Sanctuary 1**. Cobblestone Village is inside `Newbiezone`
 (region 1) and is already covered; it is a place row, not a gap. The `zones.json` names can
 supply place names, but not bounds for Greenwood Forest, Cobblestone Village or Durango
 Zoo.
@@ -605,65 +640,80 @@ Each step is small enough for one builder. The owning modules are named so the h
 (`gameplay.rs`, `bin/osfr-gateway.rs`, `encounter.rs`, `gateway.rs`) get only a thin call.
 No step changes session plumbing, saves ordering, economy, or launcher/login.
 
-### (a) One shared zone/region lookup in data
+### (a) One shared zone/region lookup in data — shipped by T753
 
-**Deliverable:** `data/content/regions.json` + a focused `src/world_regions.rs` loader and
-`RegionTable` (no new dependency, no gameplay code). Extend `src/content.rs` (content
-owner, not a hub) with `regions: Vec<Region>`; keep `zones.json` for legacy names only, or
-migrate its 17 rows into `places` with explicit `unresolved` flags.
+**Status:** T753 (commit 7d416a61) shipped this slice: `data/content/regions.json`,
+`src/world_regions.rs` (`RegionTable`), loaded by the live owner `NpcVisibility::load`
+(`src/world.rs`) through `Gameplay::load` (`src/gameplay.rs`), with
+`Gameplay::region_table()` and `realm reload regions` staged on the `Gameplay` clone.
+`ContentDb` was **not** extended (its NPC index is test-only; do not add a second table
+there). The shipped schema drops the unrecovered BeginZoning `zone_type`/`tutorial`/`sky`
+fields and has no `parent_place`; use the shipped row shape. `zones.json` stays for its
+nearest-anchor use until step (b).
 
-Schema (all values data-driven):
+Shipped schema (row shape; the shipped table has 19 group rows, not one row per building):
 
 ```json
 {
   "schema_version": 1,
+  "client_name_ids": [3961],
   "zones": [
     {"id": 0, "scene": "FabledRealms", "kind": "world", "geometry_id": 2,
-     "zone_type": 2, "tutorial": false, "sky": ""}
+     "source": [{"kind": "client", "evidence": "..."}]}
   ],
   "regions": [
     {"id": 2, "name": "Blackspore", "name_string_id": 3500,
      "banner_swf": "blackspore_notification.swf", "parent_zone": 0,
-     "priority": 50, "shapes": [{"shape": "rect", "x1": -2820, "z1": 820,
-       "x2": -1680, "z2": 1700}], "source": [{"kind": "community", "evidence": "..."}]}
+     "shapes": [{"shape": "rect", "x1": -2820, "z1": 820, "x2": -1680, "z2": 1700}],
+     "source": [{"kind": "reconstructed", "evidence": "..."}]}
   ],
   "places": [
-    {"id": "sanctuary_town_hall", "name": "Town Hall", "name_string_id": 74172,
-     "region_id": 5, "parent_place": "sanctuary", "priority": 30,
-     "shapes": [{"shape": "sphere", "x": -975.6, "z": 414.5, "r": 30}],
-     "source": [{"kind": "client", "evidence": "FabledRealmsAreas.xml:..."}]}
+    {"id": "snowhill", "name": "Snowhill", "name_string_id": 3961, "region_id": 8,
+     "priority": 50,
+     "shapes": [{"shape": "sphere", "x": 156, "z": 390, "r": 135}],
+     "source": [{"kind": "client", "evidence": "..."}]}
   ]
 }
 ```
 
-Sanity checks at load (fail closed, `Result`, no panic): zone id 0 exists and is the only
-world zone; every scene name is a known `.gzne` stem or explicitly `unresolved`; region
-ids are exactly 1..10, unique, with a name id and (for 2..10) a `*_notification.swf`;
-place ids/keys unique; every `parent_region` exists; every shape has finite coordinates
-and positive radius or ordered box corners; every place/region has a `source`; reject
-`geometry_id 214` for the world and any `geometry_id` not in the captured/scene allowlist
-until checked; reject a region id used as a zone id and vice versa; reject duplicate
-scene names; cap shapes/places (data-driven) to keep the lookup bounded.
+Sanity checks at load (fail closed, `Result`, no panic; all implemented in T753): zone id
+0 exists and is the only world zone; every scene name is a known `.gzne` stem or
+explicitly `unresolved`; region ids are exactly 1..10, unique, with a name id and (for
+2..10) a `*_notification.swf`; place ids/keys unique; every place `region_id` exists;
+every shape has finite coordinates and positive radius or ordered box corners; every
+place/region has a `source`; reject `geometry_id 214` for the world and any `geometry_id`
+not in the captured/scene allowlist until checked; reject a region id used as a zone id
+and vice versa; reject duplicate scene names; cap zones/places/shapes/name ids
+(data-driven) to keep the lookup bounded.
 
-`RegionTable::classify(x,z)` returns `(ZoneKind, Option<region_id>, Option<place_id>)`
-using §3.4; `region_at`/`place_at` are O(1) via a 10 m grid built at load. Add a
-`Region::name_id`/`banner_id` method and document each field's rule on the struct
-(checklist 18).
+`RegionTable::region_at(zone,x,z)` / `place_at(zone,x,z)` implement §3.4 and return
+`Option`; the `Region`/`Place` fields each document their rule on the struct (checklist
+18).
 
-**Acceptance tests:** `tests/world_regions.rs` — synthetic table cases for duplicates,
-missing name id, invalid shape, unknown parent, out-of-range ids; pin the client data
-counts (2 world/region scenes, 697 top-level client spheres, 49 Blackspore, 36 Sanctuary,
-33 Snowhill, 30 Seaside, 18 Lakeshore, 18 Shrouded Glade, 17 Crossroads, 5 Farnum,
-3 Wugachug, 4 Queensfields, 4 Memorial Caves; recovered 9 shapes); classify
-Sanctuary/Snowhill/Blackspore/Greenwood/Lakeshore/Newbiezone points; refusal/unknown returns
-`None` and changes no state; **canary:** change one shape bound and the pinned count/
-classification fails, then revert. Existing `tests/content.rs`/`content_check.py --strict`
-stays green. **Native check:** a read-only `realm region <x> <z>` debug line (or a
-`--check` mode) prints the table row; compare 10 points to the client area `ContainsPoint`
-(`ClientAreaSphere::ContainsPoint 0x00b0b0b0`, box `0x00b0b1c0`) by hand.
+**Acceptance tests:** `tests/world_regions.rs` drives the live `Gameplay::load` (not
+`ContentDb`), with synthetic table cases for duplicates, missing name id, invalid shape,
+unknown place region and out-of-range ids; the reload transaction is covered by the inline
+`content_reload` test and the existing `realm reload all` regression, not a second copy.
+Pin the **shipped** data counts (**1** world zone, **10** regions, **19** place groups, **590** grouped
+spheres, **9** recovered region shapes and the per-group list: **49** Blackspore, **54**
+Briarwood, **2** Briarheart, **57** Merryvale, **36** Sanctuary, **4** Queensfields,
+**7** Memorial Caves, **30** Seaside, **19** Shrouded Glade, **27** Snowhill, **4**
+Wugachug, **9** Sunstone Valley, **148** Wilds, **18** Lakeshore, **17** Crossroads,
+**51** Highroad Junction, **51** Stillwater Crossing, **6** Farnum and **1** Newbiezone).
+The client XML measurement is recorded above, not pinned by the suite because the XML is
+not in the repo: **697** top-level always-on spheres of **707** top-level shapes with the
+filter above. Classify Sanctuary/Snowhill/Blackspore/Greenwood/Lakeshore/Newbiezone
+points; refusal/unknown returns `None` and changes no state; **canary:** change one shape
+bound and the pinned count/classification fails, then revert. Existing
+`tests/content.rs`/`content_check.py --strict` stays green. A **gateway-level test is
+still required for step (d)**: a synthetic `RegionTable`/`ContentDb` test alone does not
+prove the running gateway loads the table or sends anything. **Native check:** a read-only
+`realm region <x> <z>` debug line (or a `--check` mode) prints the table row; compare 10
+points to the client area `ContainsPoint` (`ClientAreaSphere::ContainsPoint 0x00b0b0b0`,
+box `0x00b0b1c0`) by hand.
 
-**Perf:** one grid build at load; per lookup O(1), no allocation; reload rebuilds the
-table atomically via the existing content reload path.
+**Perf:** one scan of at most 19 place rows + 10 region rows per lookup, no allocation; no
+grid. Reload swaps the table atomically through the existing content reload path.
 
 ### (a2) NPC placement by role from registered map labels (after the region table)
 
@@ -694,8 +744,12 @@ invent a position. Convert `zones.json` package ids to place keys/region ids; do
 them as `Zone`.
 
 - NPC rows: world NPCs -> zone 0; `region_id` from the recovered nine shapes; `place_id`
-  from the client groups; `zone` text kept as a display/region page. This alone fixes
-  "no zone id for npc": every drawn NPC becomes a zone-0 target.
+  from the client groups; `zone` text kept as a display/region page. There is **no live
+  "no zone id for npc" refusal to fix**: `NpcVisibility::load` already inserts every drawn
+  regional and extra spawn into `OPEN_WORLD_ZONE` and discards the computed package/region
+  id. The data pass's value is the region/place classification for display, not the NPC
+  zone target. Do not change the test-only `World::new`/`ContentDb` index and call it a
+  fix; the gateway route uses `NpcVisibility`.
 - `npc_spawns_extra`: same pass; leave retired/unanchored rows explicit; do not reuse a
   retired row as a live spawn.
 - `quest_nodes`: the 5 Briarwood package rows at `(-245,-1166)` are a data error; either
@@ -712,8 +766,8 @@ them as `Zone`.
 - `encounters.json`: change world `geometry_id` to 2; keep `sg_npx_cavern_01` 214 only if
   the client accepts it (native check); no 214 placeholder.
 - `zones.json`: either delete it or convert its 17 rows to named places (with
-  `unresolved` for Durango Zoo) and remove it from `ContentDb.zones`; the `.gzne` stems
-  are the only scenes.
+  `unresolved` for Durango Zoo) and remove it from the test-only `ContentDb.zones` as well;
+  the `.gzne` stems are the only scenes.
 
 **Acceptance tests:** `content_check.py --strict` with a new rule: every world location
 row has zone 0; every instance row's zone exists; every `region_id` is 1..10; every drawn
@@ -728,20 +782,25 @@ no "no zone" refusal; a dungeon with a `.gzne` enters and returns.
 
 ### (c) Teleport and `realm goto` use the lookup
 
-**Deliverable:** `world.rs` NPC zone resolution uses `zone_id 0` for world rows and the
-instance zone for instance rows; `dev_teleport` targets include every zone-0 drawn NPC;
-`admin_move`/warpstone/teleport destinations use the same `RegionTable` for the arrival
-region/place. No new teleport path: reuse `dev_teleport::handle` and the existing
-movement token/expected-discontinuity path.
+**Deliverable:** keep the existing `NpcVisibility::load` rule: every drawn world NPC is
+already inserted into `OPEN_WORLD_ZONE` (zone 0) and the package/region id it computes is
+diagnostic only. Do **not** change the test-only `World::new`/`ContentDb` index and call it
+a fix; no live "no zone id for npc" refusal exists. `dev_teleport` targets include every
+zone-0 drawn NPC; `admin_move`/warpstone/teleport destinations use the same `RegionTable`
+for the arrival region/place. No new teleport path: reuse `dev_teleport::handle` and the
+existing movement token/expected-discontinuity path.
 
 **Acceptance tests:** `tests/dev_teleport.rs` — list is non-empty for zone 0; `realm goto
 <npc>` works for a legacy NPC in each region; unknown/ambiguous/refused targets change
 nothing (snapshot position, inventory, quest state; assert equal); teleport into a
 non-world instance still requires a target in that zone; no new `WORLD_ZONE` constant
-copy (grep: `dev_teleport::WORLD_ZONE` is the one). `tests/world.rs` — NPC zone ids are 0
-or registered; no NPC in a region-only id. `cargo test --test spine_rules`. Canary: make a
-NPC zone id 1 and `realm goto list`/the zone test fails; revert. **Native check:** the
-same `realm goto` in each region, plus a warpstone teleport; no `no zone id for npc`.
+copy (grep: `dev_teleport::WORLD_ZONE` is the one). `tests/world.rs` — every drawn NPC
+target is in zone 0 or a registered instance, never a region-only id (see
+`zone_less_legacy_regional_npcs_spawn_in_the_open_world_and_teleport_index`). A
+gateway-level test (real session/bot) `realm goto`s a legacy NPC in each region; do not
+assert this through `ContentDb`. `cargo test --test spine_rules`. Canary: put a drawn NPC
+in a region-only zone and `realm goto list`/the zone test fails; revert. **Native check:**
+the same `realm goto` in each region, plus a warpstone teleport; no `no zone id for npc`.
 
 ### (d) Banner and chat line on region/place change
 
@@ -751,8 +810,9 @@ of server client-area/UI packets) that builds:
 - 47/9 inner packet: `u16 47, u8 9, u32 len + decimal zone id bytes, u32 len + name
   bytes`; only for region ids 2..10 with a known SWF; use the gateway's existing
   application/tunnel envelope.
-- 15/2 inner packet: `u16 15, u8 2, u32 name_string_id` from the region/place table; use
-  the existing chat writer/reliable path; no client text/format strings.
+- 15/2 inner packet: `u16 15, u16 2, u32 name_string_id` from the region/place table; use
+  the existing chat writer/reliable path; no client text/format strings. The shared base
+  reader `0x00b0f550` reads the second header word as a `u16`; a `u8` subtype is wrong.
 - Session state: `last_region_id`, `last_place_id`, `last_banner_ms` (not persisted); on a
   region change send 47/9 once; on a place/region change send 15/2 once; on world entry or
   reconnect recompute from the saved position and send the current banner/chat once;
@@ -764,8 +824,11 @@ of server client-area/UI packets) that builds:
   is server->client only; client chat remains 15/1 in `social_chat`.
 
 **Acceptance tests:** `tests/region_banner.rs` — byte-level builders for 47/9 `"8"` +
-`"Snowhill"` and 15/2 `3961`, with the client reader layout (and a canary: a wrong byte
-length/subtype fails); a fake session that moves across the Snowhill boundary gets exactly
+`"Snowhill"` and 15/2 `3961`; the 15/2 expected bytes are `0F 00 02 00 79 0F 00 00`, and
+the canary is the old wrong layout `0F 00 02 79 0F 00 00` (a `u8` subtype), which must fail
+because the reader consumes subtype `0x7902` and never reaches case 2. Also canary a wrong
+47/9 byte length. Drive a **real gateway session** (or the existing bot helper), not a fake
+session or a copied builder: a player that moves across the Snowhill boundary gets exactly
 one 47/9 and one 15/2, staying still sends none, reconnect sends one, a refused teleport
 changes no state; a client 47/9/15/2 is refused and changes nothing. `cargo test --test
 app_fuzz` only if an inbound selector is added (none planned); `tests/spine_rules`.
@@ -792,10 +855,12 @@ region/chat on entry uses the dungeon's place name id, not the region id.
 
 ## 9. Open gaps and (R) rules
 
-- **No identified 47/9 or 15/2 frame** in the reviewed captures (login/zone/minigame
-  frames; a raw byte scan is not proof because frames are encapsulated). The readers are
-  first-party; the two-string 47/9 payload (first = decimal zone id, second = unused/name)
-  and the 15/2 u32-as-string-id are `(R)` until the native check.
+- **No identified 47/9 or 15/2 packet frame** in the reviewed captures (login/zone/
+  minigame frames; a raw byte scan is not proof because frames are encapsulated). The
+  15/2 display is visible in `P2SusMJ2_tQ/frames/00010.jpg` (chat line), but not its wire
+  bytes. The readers are first-party; the two-string 47/9 payload (first = decimal zone
+  id, second = unused/name) and the 15/2 u32-as-string-id are `(R)` until the native
+  check. The 15/2 header width is **not** `(R)`: `0x00b0f550` reads two `u16` words.
 - **Geometry id semantics** are only partly recovered: the client uses it to select the
   journal region (`FUN_00a44b70`), but the content's world `214` contradicts the captured
   world `2`; the `id` field is an instance id, not a type. The note recommends captured/
@@ -816,7 +881,10 @@ region/chat on entry uses the dungeon's place name id, not the region id.
   Greenwood/Cobblestone bounds must be reconstructed from NPC clusters (R) or left
   unresolved; Durango has only placeholder rows.
 - **The 118 NPC gaps** are listed by content zone/cluster in §3.3; the full per-row report
-  is the output of step (b), not this note. Do not force a region on a zero/unanchored row.
+  is the output of step (b), not this note. Do not force a region on a
+  `reconstructed_zone_center` row, and use `placement_source` for the 12
+  `reconstructed_unanchored_default` rows; only four of those are near the origin (see
+  §3.3).
 - **Region 1/no banner:** the only `RegionOverride` is `Newbiezone` id 1; the Lua table
   has no SWF for 1. Never send 47/9 with 1 (no SWF); the chat line can still use a place
   name id.
@@ -836,13 +904,15 @@ region/chat on entry uses the dungeon's place name id, not the region id.
   `terrain.terrain_loads_zone_files_by_id`, and `gameplay.housing.scene_zone`. The graph
   server was available; no grep-only fallback was needed for the owner search. The
   research then read the owning modules and the hub call sites, not the whole hubs.
-- **Modules touched:** none; this commit is two notes only. The build plan names owners:
-  `content.rs` (content table), new `world_regions.rs` (lookup), `world.rs` (NPC zone
-  resolution), `dev_teleport.rs` (realm goto), `client_areas.rs`/new `region_banner.rs`
-  (47/9 + 15/2), `social_chat.rs` (15/2 send), `dungeons` content (step e). Hub files
+- **Modules touched:** none by the T749 research commit; F752 corrected this note after
+  review. The shipped owners are `src/world_regions.rs` (lookup) and `src/world.rs`
+  (`NpcVisibility::load`), reached through `Gameplay::load`; step (b) uses the content
+  tables, step (d) `client_areas.rs`/`social_chat.rs`, step (e) dungeon content. Hub files
   (`gameplay.rs`, `bin/osfr-gateway.rs`, `encounter.rs`, `gateway.rs`) get no new logic
   beyond a single call; net lines added per hub file: **0**.
 - **Deleted:** none. **Net hub lines:** 0. **Tests:** none changed; the plan's tests are
-  for the follow-up builders.
+  for the follow-up builders. F752's corrected counts/byte vectors are measured in
+  `notes/Autopilot/F752.md`.
 - **Scratch:** all analysis scripts/outputs are in `%TEMP%\t749` (outside the workspace);
-  no scratch files were added to the repository.
+  F752's verification scripts are in `%TEMP%\f752`; no scratch files were added to the
+  repository.

@@ -22,7 +22,7 @@ mod npc_greetings;
 use osfr_tools::{gameplay::Gameplay, world_regions::RegionTable};
 use serde_json::{Value, json};
 use std::{
-    collections::BTreeSet,
+    collections::{BTreeMap, BTreeSet},
     fs,
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
@@ -164,6 +164,65 @@ fn live_gameplay_load_classifies_section_3_4_points() {
     }
     assert_eq!(table.region_at(0, f32::NAN, 0.0), None);
     assert_eq!(table.region_at(0, 0.0, f32::INFINITY), None);
+}
+
+#[test]
+fn shipped_place_group_counts_match_the_research_table() {
+    // F752 (review finding 4): the per-group counts in notes/Research/Zones and
+    // Regions.md section 3.2 are the shipped regions.json grouping, not raw prefixes.
+    // The 697 top-level always-on spheres split into 590 grouped + 107 unassigned
+    // (T753 open gap); the 10 top-level box rows are likewise unassigned.
+    let document = shipped();
+    let counts = document["places"]
+        .as_array()
+        .expect("places")
+        .iter()
+        .map(|place| {
+            (
+                place["id"].as_str().expect("place id"),
+                place["shapes"].as_array().expect("shapes").len(),
+            )
+        })
+        .collect::<BTreeMap<_, _>>();
+    let expected = BTreeMap::from([
+        ("blackspore", 49),
+        ("briarheart", 2),
+        ("briarwood", 54),
+        ("crossroads", 17),
+        ("farnum_farmstead", 6),
+        ("highroad_junction", 51),
+        ("lakeshore", 18),
+        ("memorial_caverns", 7),
+        ("merryvale", 57),
+        ("newbiezone", 1),
+        ("queensfields", 4),
+        ("sanctuary", 36),
+        ("seaside", 30),
+        ("shrouded_glade", 19),
+        ("snowhill", 27),
+        ("stillwater_crossing", 51),
+        ("sunstone_valley", 9),
+        ("wilds", 148),
+        ("wugachug", 4),
+    ]);
+    assert_eq!(counts, expected, "per-group client sphere counts");
+    assert_eq!(counts.values().sum::<usize>(), 590, "grouped spheres");
+    let region_shapes = document["regions"]
+        .as_array()
+        .expect("regions")
+        .iter()
+        .skip(1)
+        .map(|region| region["shapes"].as_array().expect("shapes").len())
+        .sum::<usize>();
+    assert_eq!(region_shapes, 9, "recovered nine-region shapes");
+
+    // The live owner loads the same 19 rows through Gameplay::load.
+    let live = gameplay();
+    assert_eq!(
+        live.region_table().expect("live table").places().len(),
+        expected.len(),
+        "live place rows"
+    );
 }
 
 #[test]
