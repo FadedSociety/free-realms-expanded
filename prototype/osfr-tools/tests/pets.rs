@@ -1,13 +1,8 @@
 use osfr_tools::pets::{
-    PetBusy, PetContent, PetDefinition, PetEquipmentSlot, PetPresenceEvent, PetService, model_id,
+    PetBusy, PetContent, PetDefinition, PetEquipmentSlot, PetPresenceEvent, PetService,
 };
-use osfr_tools::{
-    character_store::CharacterState,
-    game_store,
-    inventory::{EquippedItem, Inventory, InventoryItem, InventoryState},
-};
-use serde_json::{Value, json};
-use sha2::{Digest, Sha256};
+use osfr_tools::{character_store::CharacterState, game_store};
+use serde_json::Value;
 use std::{
     fs,
     path::PathBuf,
@@ -16,139 +11,9 @@ use std::{
 
 static SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
-struct InventoryFixture {
-    directory: PathBuf,
-    inventory: Inventory,
-}
-
-impl InventoryFixture {
-    fn new() -> Self {
-        let sequence = SEQUENCE.fetch_add(1, Ordering::Relaxed);
-        let directory = std::env::temp_dir().join(format!(
-            "osfr-pets-inventory-{}-{sequence}",
-            std::process::id()
-        ));
-        fs::create_dir(&directory).unwrap();
-        let state = InventoryState {
-            coins: 0,
-            items: vec![
-                item(10, 9001, 1),
-                item(11, 1835, 2),
-                item(12, 1836, 1),
-                item(13, 9002, 1),
-            ],
-            equipment: Vec::<EquippedItem>::new(),
-            next_instance_id: None,
-        };
-        let mut packet = vec![5, 0, 1, 0, 0, 0, 0, 12, 0, 0, 0, 0, 0];
-        packet.extend([0xA5; 8]);
-        let coins_offset = packet.len();
-        packet.extend(0i32.to_le_bytes());
-        let items_offset = packet.len();
-        packet.extend((state.items.len() as i32).to_le_bytes());
-        for row in &state.items {
-            packet.extend(serialize_item(row));
-        }
-        packet.extend(b"fixture-tail");
-        let length = packet.len();
-        packet[3..7].copy_from_slice(&((length - 7) as u32).to_le_bytes());
-        packet[9..13].copy_from_slice(&((length - 13) as u32).to_le_bytes());
-        let span = |kind: &str, offset: usize, length: usize| {
-            json!({
-                "kind": kind,
-                "offset": offset,
-                "length": length,
-                "profile_id": 0,
-                "sha256": digest(&packet[offset..offset + length]),
-            })
-        };
-        let definitions: Vec<_> = [9001i32, 1835, 1836, 9002]
-            .into_iter()
-            .map(|id| {
-                let bytes = [id.to_le_bytes(), 8i32.to_le_bytes()].concat();
-                json!({
-                    "id": id,
-                    "slot": 0,
-                    "class_id": 1,
-                    "default_tint": 0,
-                    "max_stack": 20,
-                    "model": "",
-                    "texture": "",
-                    "tint_alias": "",
-                    "effect": 0,
-                    "wield_type": 0,
-                    "serialized_hex": bytes.iter().map(|b| format!("{b:02x}")).collect::<String>(),
-                    "sha256": digest(&bytes),
-                })
-            })
-            .collect();
-        let manifest = json!({
-            "schema_version": 1,
-            "player_guid": 1,
-            "default_state": state,
-            "profiles": [],
-            "spans": [
-                span("coins", coins_offset, 4),
-                span("items", items_offset, packet.len() - items_offset - b"fixture-tail".len()),
-            ],
-            "definitions": definitions,
-        });
-        fs::write(
-            directory.join("inventory.json"),
-            serde_json::to_vec(&manifest).unwrap(),
-        )
-        .unwrap();
-        let inventory = Inventory::load(&directory, None).unwrap();
-        Self {
-            directory,
-            inventory,
-        }
-    }
-}
-
-impl Drop for InventoryFixture {
-    fn drop(&mut self) {
-        let _ = fs::remove_file(self.directory.join("inventory.json"));
-        let _ = fs::remove_dir(&self.directory);
-    }
-}
-
-fn item(id: i32, definition_id: i32, count: u32) -> InventoryItem {
-    InventoryItem {
-        definition_id,
-        tint: 0,
-        id,
-        count,
-        consumed_count: 0,
-        stored_count: 0,
-        last_cast_time: i64::from(i32::MAX),
-        rental: None,
-        ability_count: 0,
-        activate_enabled: false,
-    }
-}
-
-fn serialize_item(item: &InventoryItem) -> Vec<u8> {
-    let mut bytes = Vec::new();
-    for value in [
-        item.definition_id,
-        item.tint,
-        item.id,
-        item.count as i32,
-        item.consumed_count as i32,
-        item.last_cast_time as i32,
-    ] {
-        bytes.extend(value.to_le_bytes());
-    }
-    bytes.push(u8::from(item.rental.is_some()));
-    bytes.extend(item.ability_count.to_le_bytes());
-    bytes.push(u8::from(item.activate_enabled));
-    bytes
-}
-
-fn digest(bytes: &[u8]) -> String {
-    format!("{:x}", Sha256::digest(bytes))
-}
+#[path = "support/pet_inventory.rs"]
+mod pet_inventory;
+use pet_inventory::InventoryFixture;
 
 fn definition() -> PetDefinition {
     PetDefinition {
@@ -610,7 +475,11 @@ fn every_bound_pet_model_has_a_models_txt_id() {
         .filter_map(|row| row["model"].as_str())
         .collect();
     assert_eq!(models.len(), 26);
+    let bundled = PetContent::bundled().unwrap();
     for model in models {
-        assert!(model_id(model) > 0, "missing Models.txt id for {model}");
+        assert!(
+            bundled.model_id(model) > 0,
+            "missing Models.txt id for {model}"
+        );
     }
 }

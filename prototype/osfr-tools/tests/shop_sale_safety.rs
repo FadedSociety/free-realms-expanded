@@ -48,11 +48,12 @@ use std::{
 };
 use vendor_fixture::{SEEDED_ITEM, VendorFixture};
 
-/// Gloria's shipped vendor record: three type-2 Pet Pals with coin prices and no species binding.
+/// Gloria's shipped vendor record: three type-2 Pet Pals with coin prices (bound pets since T454).
 const GLORIA: u64 = 9_500_000_246;
 const GLORIA_NPC_FILE: &str = "cobblestone_village.json";
-/// Crab, 5,000 coins at Gloria.
-const UNBOUND_PET: i32 = 7_885;
+/// A type-2 pet item no model resolves (T454: `scripts/pets_import.py` leaves only 17543 and 30589
+/// unbound; Gloria's Pet Pals 7885, 10387 and 17554 are now adoptable pets the shop sells).
+const UNBOUND_PET: i32 = 17_543;
 /// Fritz, one of the 16 adoption item ids `pets.json` binds.
 const BOUND_PET: i32 = 4_324;
 /// Skeletal Dragon (`mounts.json` mount 715, item 10,530).
@@ -68,11 +69,8 @@ const START_COINS: u32 = 100_000;
 /// Every vendor-stocked row the coin store refuses on the integration tip, with the reason it is
 /// blocked. The content test fails if this list and the shipped `vendors.json` disagree in either
 /// direction, so binding a Pet Pal in pets content must remove its row here.
-const REVIEWED_UNSELLABLE: &[(i32, &str)] = &[
-    (7_885, "pet item has no pets.json species binding"),
-    (10_387, "pet item has no pets.json species binding"),
-    (17_554, "pet item has no pets.json species binding"),
-];
+/// T454 bound every Pet Pal Gloria sells, so no shipped vendor row is blocked any more.
+const REVIEWED_UNSELLABLE: &[(i32, &str)] = &[];
 
 fn data_content() -> PathBuf {
     PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content")
@@ -159,6 +157,8 @@ fn assert_unchanged(gateway: &Gateway, before: &Snapshot, label: &str) {
 fn an_unbound_pet_item_is_refused_through_the_real_165_4_buy() {
     assert_unbound_pet_item_is_still_unbound();
     let fixture = gloria_fixture("t529-a-165-4");
+    // No shipped vendor stocks an unbound pet item any more (T454), so this copy does.
+    fixture.stock_price_coins(&[(UNBOUND_PET, 10_000)]);
     let mut gateway = connect(&fixture, fixture.state(START_COINS, false));
     let replies = open_shop(&fixture, &mut gateway);
     assert!(
@@ -203,6 +203,8 @@ fn an_unbound_pet_item_is_refused_through_the_real_165_4_buy() {
 fn an_unbound_pet_item_is_refused_through_the_real_66_43_buy() {
     assert_unbound_pet_item_is_still_unbound();
     let fixture = gloria_fixture("t529-a-66-43");
+    // No shipped vendor stocks an unbound pet item any more (T454), so this copy does.
+    fixture.stock_price_coins(&[(UNBOUND_PET, 10_000)]);
     let mut gateway = connect(&fixture, fixture.state(START_COINS, false));
     open_shop(&fixture, &mut gateway);
 

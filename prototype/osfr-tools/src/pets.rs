@@ -21,37 +21,6 @@ const MAX_PETS: usize = 50;
 const PET_CONTENT: &str = include_str!("../data/content/pets.json");
 /// (R) One active pet per owner, so an owner-derived actor id is unique while summoned.
 const PET_GUID_TAG: u64 = 0x4000_0000_0000_0000;
-/// Client `Models.txt` pet ADR -> numeric model id. The pet content only ships
-/// the ADR, so this recovered binding is what lets `AddNpc` name the model.
-/// Where a male and female id share an ADR, the lower id is used (R).
-const MODEL_IDS: &[(&str, i32)] = &[
-    ("bat_m_pinkeye.adr", 4566),
-    ("beetle_clockwork.adr", 3885),
-    ("dog_large_dalmation.adr", 514),
-    ("dog_large_dukey.adr", 3793),
-    ("dog_large_floppy.adr", 169),
-    ("dog_large_husky.adr", 1454),
-    ("dog_large_pointyghost.adr", 1018),
-    ("dog_large_stbernard.adr", 4109),
-    ("dog_small_fluffy.adr", 364),
-    ("dragon_m_basic.adr", 1756),
-    ("dragon_m_phoenix.adr", 3358),
-    ("duckbill_m.adr", 1921),
-    ("groundhog_m.adr", 2036),
-    ("groundhog_m_sharkfin.adr", 3030),
-    ("hydra_basic.adr", 3405),
-    ("monkey_clockwork_m.adr", 939),
-    ("pony_pegasus_m_fire.adr", 3432),
-    ("reindeer_m.adr", 1934),
-    ("robgoblin_minimech.adr", 4068),
-    ("rofle_m.adr", 3287),
-    ("spider_m.adr", 1924),
-    ("tiger_m_lava.adr", 3479),
-    ("treeble.adr", 376),
-    ("tyrannosaurus_m.adr", 1759),
-    ("vulture_pet.adr", 3985),
-    ("wolf_coyote.adr", 1521),
-];
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -67,6 +36,85 @@ pub struct PetContent {
     care_items: Vec<PetCareItem>,
     need_policy: NeedPolicy,
     movement_speed: MovementSpeed,
+    /// T454: the sources `scripts/pets_import.py` read (path, commit, sha256).
+    #[serde(default)]
+    imports: Vec<PetImport>,
+    /// T454: every pet model the client ships (`Models.txt` ids), with its tricks and item classes.
+    #[serde(default)]
+    models: Vec<PetModel>,
+    /// T454: every pet item (`ClientItemDefinitions` type 2) whose model resolves to a `models` row.
+    #[serde(default)]
+    items: Vec<PetItem>,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+struct PetImport {
+    name: String,
+    path: String,
+    commit: Option<String>,
+    sha256: String,
+}
+
+/// One client pet model: `Models.txt` id and ADR, icon, default tint, vanity flag, its
+/// tricks in the client's order and its item classes.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct PetModel {
+    pub model_id: i32,
+    pub adr: String,
+    #[serde(default)]
+    pub gender: Option<i32>,
+    #[serde(default)]
+    pub icon_id: Option<i32>,
+    #[serde(default)]
+    pub default_tint_id: Option<i32>,
+    #[serde(default)]
+    pub default_tint_alias: Option<String>,
+    #[serde(default)]
+    pub vanity: bool,
+    #[serde(default)]
+    pub tricks: Vec<PetModelTrick>,
+    #[serde(default)]
+    pub item_classes: Vec<PetItemClass>,
+    src: String,
+    #[serde(default)]
+    unknown_reasons: BTreeMap<String, String>,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct PetModelTrick {
+    pub id: u32,
+    pub known: bool,
+}
+
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct PetItemClass {
+    pub key: i32,
+    pub id: i32,
+    pub unknown: i32,
+}
+
+/// One pet item: the adoption item a player uses (53/32) to get a pet of `model_id`.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct PetItem {
+    pub item_id: i32,
+    pub model_id: i32,
+    pub name_id: i32,
+    #[serde(default)]
+    pub image_set_id: Option<i32>,
+    #[serde(default)]
+    pub icon_tint_id: Option<i32>,
+    #[serde(default)]
+    pub tint_alias: Option<String>,
+    #[serde(default)]
+    pub texture_alias: Option<String>,
+    #[serde(default)]
+    pub members_only: bool,
+    src: String,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -176,7 +224,21 @@ struct NamePart {
 #[serde(deny_unknown_fields)]
 struct PetTrickDefinition {
     id: u32,
-    waypoint_count: usize,
+    /// PetTrickGesturePoints.txt waypoints; absent = no gesture record (client 00cc9330 scores nothing).
+    #[serde(default)]
+    waypoint_count: Option<usize>,
+    #[serde(default)]
+    icon_id: Option<i32>,
+    #[serde(default)]
+    name_id: Option<i32>,
+    #[serde(default)]
+    tooltip_id: Option<i32>,
+    #[serde(default)]
+    skill_level: Option<i32>,
+    #[serde(default)]
+    unknown5: Option<i32>,
+    #[serde(default)]
+    unknown6: Option<i32>,
     source: Vec<SourceTag>,
 }
 
@@ -232,27 +294,83 @@ impl PetContent {
 
     pub fn definition(&self, species_id: u32) -> Option<PetDefinition> {
         // R: Wiki catalogue rows without a resolved runtime id and model remain research-only.
-        self.species
-            .iter()
-            .find(|definition| definition.species_id == Some(species_id))
-            .and_then(|definition| {
-                Some(PetDefinition {
-                    species_id,
-                    model: definition.model.clone()?,
-                    adoption_item_definition_id: definition.adoption_item_ids.first().copied(),
-                    initial_tricks: Vec::new(),
-                })
-            })
-    }
-
-    /// Resolve the pet created by an owned adoption item definition.
-    pub fn definition_for_item(&self, item_definition_id: i32) -> Option<PetDefinition> {
-        let species_id = self
+        let Some(species) = self
             .species
             .iter()
-            .find(|species| species.adoption_item_ids.contains(&item_definition_id))?
-            .species_id?;
-        self.definition(species_id)
+            .find(|definition| definition.species_id == Some(species_id))
+        else {
+            // A pet adopted from an item with no wiki species row keeps the item id as its species (R).
+            return i32::try_from(species_id)
+                .ok()
+                .and_then(|item_id| self.item_definition(item_id, species_id));
+        };
+        let model = species.model.clone()?;
+        Some(PetDefinition {
+            species_id,
+            initial_tricks: self.known_tricks(self.model_id(&model)),
+            model,
+            adoption_item_definition_id: species.adoption_item_ids.first().copied(),
+        })
+    }
+
+    /// Resolve the pet created by an owned adoption item definition: the imported item row
+    /// first, then (for items without one) the wiki species that lists the item.
+    pub fn definition_for_item(&self, item_definition_id: i32) -> Option<PetDefinition> {
+        let wiki_species = self
+            .species
+            .iter()
+            .find(|species| species.adoption_item_ids.contains(&item_definition_id))
+            .and_then(|species| species.species_id);
+        if self.item(item_definition_id).is_some() {
+            // (R) An item no wiki species lists becomes its own species id.
+            let species_id = wiki_species.or_else(|| u32::try_from(item_definition_id).ok())?;
+            return self.item_definition(item_definition_id, species_id);
+        }
+        self.definition(wiki_species?)
+    }
+
+    fn item_definition(&self, item_id: i32, species_id: u32) -> Option<PetDefinition> {
+        let item = self.item(item_id)?;
+        Some(PetDefinition {
+            species_id,
+            model: self.model(item.model_id)?.adr.clone(),
+            adoption_item_definition_id: Some(item_id),
+            initial_tricks: self.known_tricks(item.model_id),
+        })
+    }
+
+    fn known_tricks(&self, model_id: i32) -> Vec<u32> {
+        self.model(model_id).map_or_else(Vec::new, |model| {
+            model
+                .tricks
+                .iter()
+                .filter(|trick| trick.known)
+                .map(|trick| trick.id)
+                .collect()
+        })
+    }
+
+    pub fn model(&self, model_id: i32) -> Option<&PetModel> {
+        self.models.iter().find(|model| model.model_id == model_id)
+    }
+
+    pub fn item(&self, item_id: i32) -> Option<&PetItem> {
+        self.items.iter().find(|item| item.item_id == item_id)
+    }
+
+    pub fn is_vanity(&self, model_id: i32) -> bool {
+        self.model(model_id).is_some_and(|model| model.vanity)
+    }
+
+    /// The client model id for a pet ADR; where two ids (male and female) share an ADR, the
+    /// lower one (R). Unknown ADRs stay zero.
+    pub fn model_id(&self, adr: &str) -> i32 {
+        self.models
+            .iter()
+            .filter(|model| model.adr == adr)
+            .map(|model| model.model_id)
+            .min()
+            .unwrap_or(0)
     }
 
     fn validate(&self) -> io::Result<()> {
@@ -329,10 +447,44 @@ impl PetContent {
         let mut trick_ids = BTreeSet::new();
         for trick in &self.tricks {
             if trick.id == 0
-                || !(3..=15).contains(&trick.waypoint_count)
+                || trick
+                    .waypoint_count
+                    .is_some_and(|count| !(3..=15).contains(&count))
                 || !trick_ids.insert(trick.id)
             {
                 return Err(invalid("invalid pet trick content"));
+            }
+        }
+        let mut model_ids = BTreeSet::new();
+        for model in &self.models {
+            if model.model_id <= 0
+                || !valid_model(&model.adr)
+                || model.src.is_empty()
+                || !model_ids.insert(model.model_id)
+                || model.tricks.len() > 16
+                || model.item_classes.len() > 16
+                || model
+                    .tricks
+                    .iter()
+                    .any(|trick| !trick_ids.contains(&trick.id))
+            {
+                return Err(invalid("invalid pet model content"));
+            }
+        }
+        let species_ids: BTreeSet<i64> = self
+            .species
+            .iter()
+            .filter_map(|species| species.species_id.map(i64::from))
+            .collect();
+        let mut pet_item_ids = BTreeSet::new();
+        for item in &self.items {
+            if item.item_id <= 0
+                || item.src.is_empty()
+                || !pet_item_ids.insert(item.item_id)
+                || !model_ids.contains(&item.model_id)
+                || species_ids.contains(&i64::from(item.item_id))
+            {
+                return Err(invalid("invalid pet item content"));
             }
         }
         let mut item_ids = BTreeSet::new();
@@ -357,15 +509,6 @@ impl PetContent {
     fn has_trick(&self, trick_id: u32) -> bool {
         self.tricks.iter().any(|trick| trick.id == trick_id)
     }
-}
-
-/// Resolve the recovered numeric model id for a pet ADR. Unknown ADRs remain
-/// zero; every model bound by the bundled content has a checked mapping.
-pub fn model_id(model: &str) -> i32 {
-    MODEL_IDS
-        .iter()
-        .find(|(file, _)| *file == model)
-        .map_or(0, |(_, id)| *id)
 }
 
 /// Content-backed definition; W46c species ids are explicitly reconstructed.
@@ -732,7 +875,7 @@ impl PetService {
             actor_guid: active.actor_guid,
             species_id: pet.species_id,
             model: pet.model.clone(),
-            model_id: model_id(&pet.model),
+            model_id: self.content.model_id(&pet.model),
             texture_alias: self.texture_alias(pet.species_id),
             name: self.display_name(pet),
             speed: self.content.movement_speed.speed,
@@ -912,7 +1055,7 @@ impl PetService {
             follow_target: None,
             in_water: false,
         });
-        let model_id = model_id(&model);
+        let model_id = self.content.model_id(&model);
         broadcasts.push(PetPresenceEvent::Spawn(PetPresence {
             owner_guid,
             pet_id,
