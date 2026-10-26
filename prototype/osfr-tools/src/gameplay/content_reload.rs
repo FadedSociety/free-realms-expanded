@@ -10,6 +10,8 @@
 //! A new `Gameplay` field is not reload content until it is added to that list.
 //! In particular `npc_interaction` is not reloaded: `NpcInteraction::load` runs only
 //! in `Gameplay::load`, so a vendor role or `vendors.json` mapping fix needs a restart.
+//! T753: `regions.json` belongs to `NpcVisibility`; `reload regions` and `reload all`
+//! re-read it on the staged clone and publish it with the same commit.
 //!
 //! The regression `refused_reload_all_keeps_behaviour_and_shared_field_state`
 //! is in `gameplay/w64_regional_quest_tests.rs`: `lab/autopilot/protected-pass.txt`
@@ -114,9 +116,19 @@ impl Gameplay {
                 done.push("placed NPCs");
             }
         }
+        if (all && self.npc_visibility.is_some()) || what == "regions" {
+            // T753: `content_dir` is already the NPC content set `NpcVisibility::load`
+            // bound, so a save directory's bundled fallback is not re-resolved here.
+            let visibility = self
+                .npc_visibility
+                .as_mut()
+                .ok_or_else(|| invalid("regions requires the NPC content set"))?;
+            visibility.reload_regions(&dir)?;
+            done.push("regions");
+        }
         if done.is_empty() {
             return Err(invalid(
-                "unknown target; use realm reload [all|battles|enemies|abilities|behaviours|power_ups|placements]",
+                "unknown target; use realm reload [all|battles|enemies|abilities|behaviours|power_ups|placements|regions]",
             ));
         }
         Ok(done.join(", "))
@@ -213,5 +225,79 @@ mod tests {
             "an empty outcome wiped the notice, the move, the world event or the boombox"
         );
         assert_eq!(live.replies, vec![vec![1], vec![3]]);
+    }
+
+    /// T753: a `regions` reload stages `regions.json` and publishes it only when the
+    /// whole file validates; a malformed file leaves the loaded table in place.
+    #[test]
+    fn regions_reload_swaps_the_table_and_refuses_a_malformed_one() {
+        struct Scratch(PathBuf);
+        impl Scratch {
+            fn new() -> Self {
+                let path = std::env::temp_dir()
+                    .join(format!("osfr-t753-regions-reload-{}", std::process::id()));
+                let _ = std::fs::remove_dir_all(&path);
+                std::fs::create_dir_all(&path).unwrap();
+                Self(path)
+            }
+        }
+        impl Drop for Scratch {
+            fn drop(&mut self) {
+                let _ = std::fs::remove_dir_all(&self.0);
+            }
+        }
+
+        let reference = PathBuf::from(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../lab/references/rust-opening-cooking-original-assets");
+        assert!(
+            reference.join("inventory.json").is_file(),
+            "the opening reference is required at {}",
+            reference.display()
+        );
+        let mut game = Gameplay::load(&reference, None).expect("opening reference loads");
+        assert_eq!(
+            game.region_table()
+                .unwrap()
+                .region(8)
+                .unwrap()
+                .name_string_id,
+            3961
+        );
+
+        let scratch = Scratch::new();
+        let mut value: serde_json::Value = serde_json::from_slice(
+            &std::fs::read(crate::content::bundled_content().join("regions.json")).unwrap(),
+        )
+        .unwrap();
+        value["regions"][7]["name_string_id"] = 3500.into();
+        std::fs::write(
+            scratch.0.join("regions.json"),
+            serde_json::to_vec(&value).unwrap(),
+        )
+        .unwrap();
+        game.content_dir = scratch.0.clone();
+        let mut out = Outcome::default();
+        assert_eq!(game.reload_content("regions", &mut out).unwrap(), "regions");
+        assert_eq!(
+            game.region_table()
+                .unwrap()
+                .region(8)
+                .unwrap()
+                .name_string_id,
+            3500
+        );
+
+        std::fs::write(scratch.0.join("regions.json"), b"{ not json").unwrap();
+        let error = game.reload_content("regions", &mut out).unwrap_err();
+        assert!(error.to_string().contains("regions.json"), "{error}");
+        assert_eq!(
+            game.region_table()
+                .unwrap()
+                .region(8)
+                .unwrap()
+                .name_string_id,
+            3500,
+            "a refused reload left the previous table in place"
+        );
     }
 }

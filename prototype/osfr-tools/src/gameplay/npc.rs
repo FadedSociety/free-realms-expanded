@@ -47,6 +47,12 @@ impl Gameplay {
         self.npc_visibility.as_ref()?.model_of(guid)
     }
 
+    /// T753: the world zone/region/place table `NpcVisibility::load` read, or `None`
+    /// when the content set has no `regions.json`. The later zone slices call this.
+    pub fn region_table(&self) -> Option<&crate::world_regions::RegionTable> {
+        self.npc_visibility.as_ref()?.region_table()
+    }
+
     pub fn shared_npc_view(
         &self,
         character: &CharacterState,

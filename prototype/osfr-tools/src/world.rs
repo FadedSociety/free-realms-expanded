@@ -88,6 +88,9 @@ pub struct NpcVisibility {
     revision: u64,
     /// Station model -> client prompt reach; see [`Self::set_station_reach`].
     station_reach: Arc<BTreeMap<u32, f32>>,
+    /// T753: world zone/region/place table from `regions.json`; `None` when the
+    /// content set has no file.
+    regions: Option<Arc<crate::world_regions::RegionTable>>,
 }
 
 /// (R) One candidate in the common passive/hostile NPC budget. Engaged actors
@@ -246,6 +249,16 @@ impl NpcVisibility {
     pub fn revision(&self) -> u64 {
         self.revision
     }
+    /// T753: the world region table `load` read from `regions.json`, if the set has one.
+    pub fn region_table(&self) -> Option<&crate::world_regions::RegionTable> {
+        self.regions.as_deref()
+    }
+    /// T753: re-read `regions.json` for `realm reload`; a refusal leaves the current
+    /// table (the load publishes only after the whole file validates).
+    pub fn reload_regions(&mut self, content_dir: &Path) -> io::Result<()> {
+        self.regions = crate::world_regions::RegionTable::load(content_dir)?.map(Arc::new);
+        Ok(())
+    }
     pub fn enable_shared_interest(&mut self) {
         self.shared = true;
     }
@@ -326,6 +339,7 @@ impl NpcVisibility {
     /// Loads regional NPC rows and the zone-less Legacy placement table.
     /// Extra spawn zones use nearest positioned regional NPC as local policy (R).
     pub fn load(content_dir: &Path) -> io::Result<Self> {
+        let regions = crate::world_regions::RegionTable::load(content_dir)?.map(Arc::new);
         let zones: Rows<ZoneName> = read_rows(&content_dir.join("zones.json"))?;
         let zone_ids: HashMap<_, _> = zones
             .records
@@ -346,7 +360,10 @@ impl NpcVisibility {
         }
         regional.sort_by_key(|npc| npc.npc_id);
 
-        let mut result = Self::default();
+        let mut result = Self {
+            regions,
+            ..Self::default()
+        };
         let mut anchors = Vec::new();
         for npc in regional {
             let Some(position) = npc.position.filter(|p| p.iter().all(|v| v.is_finite())) else {

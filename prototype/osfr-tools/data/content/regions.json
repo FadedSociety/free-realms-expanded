@@ -1,0 +1,4318 @@
+{
+  "schema_version": 1,
+  "client_name_ids": [
+    3499,
+    3500,
+    3501,
+    3502,
+    3505,
+    3793,
+    3961,
+    4029,
+    4428,
+    7262,
+    18140,
+    18735,
+    18899,
+    20776,
+    74183,
+    103701,
+    103715
+  ],
+  "zones": [
+    {
+      "id": 0,
+      "scene": "FabledRealms",
+      "kind": "world",
+      "geometry_id": 2,
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "Assets_004.pack entry 6041 FabledRealms.gzne (lab/extracted/client-assets/catalog.tsv); piece_078 capture p2.pcap frame 21274 carries scene FabledRealms, id 0, geometry 2"
+        }
+      ]
+    }
+  ],
+  "regions": [
+    {
+      "id": 1,
+      "name": "The Wilds",
+      "name_string_id": 20776,
+      "banner_swf": null,
+      "parent_zone": 0,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -2057,
+          "z": 430,
+          "r": 415
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.20776 = \"The Wilds\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml line 3549 area id 6093 name=\"Newbiezone\" has Property type=\"AdvJournal\" RegionOverride=\"1\"; the client region selector 0x00a44b70 falls back to region id 1 when no journal geometry id matches"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.4 step 3: region 1 is the default region (no banner), selected inside the client Newbiezone sphere; locale name 20776 \"The Wilds\" is the default playfield's recovered name"
+        }
+      ]
+    },
+    {
+      "id": 2,
+      "name": "Blackspore",
+      "name_string_id": 3500,
+      "banner_swf": "blackspore_notification.swf",
+      "parent_zone": 0,
+      "shapes": [
+        {
+          "shape": "rect",
+          "x1": -2820,
+          "z1": 820,
+          "x2": -1680,
+          "z2": 1700
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.3500 = \"Blackspore\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "client",
+          "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 2 to \"blackspore_notification\" (+ .swf)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 2 id/name match the first-party banner table"
+        }
+      ]
+    },
+    {
+      "id": 3,
+      "name": "Briarwood",
+      "name_string_id": 18140,
+      "banner_swf": "briarwood_notification.swf",
+      "parent_zone": 0,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -540,
+          "z": 2240,
+          "r": 700
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.18140 = \"Briarwood\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "client",
+          "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 3 to \"briarwood_notification\" (+ .swf)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 3 id/name match the first-party banner table"
+        }
+      ]
+    },
+    {
+      "id": 4,
+      "name": "Merry Vale",
+      "name_string_id": 4428,
+      "banner_swf": "merryvale_notification.swf",
+      "parent_zone": 0,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -1040,
+          "z": -404,
+          "r": 275
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.4428 = \"Merry Vale\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "client",
+          "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 4 to \"merryvale_notification\" (+ .swf)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 4 id/name match the first-party banner table"
+        }
+      ]
+    },
+    {
+      "id": 5,
+      "name": "Sanctuary",
+      "name_string_id": 3499,
+      "banner_swf": "sanctuary_notification.swf",
+      "parent_zone": 0,
+      "shapes": [
+        {
+          "shape": "rect",
+          "x1": -1540,
+          "z1": 130,
+          "x2": -860,
+          "z2": 490
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.3499 = \"Sanctuary\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "client",
+          "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 5 to \"sanctuary_notification\" (+ .swf)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 5 id/name match the first-party banner table"
+        }
+      ]
+    },
+    {
+      "id": 6,
+      "name": "Seaside",
+      "name_string_id": 3501,
+      "banner_swf": "seaside_notification.swf",
+      "parent_zone": 0,
+      "shapes": [
+        {
+          "shape": "rect",
+          "x1": -1162,
+          "z1": -1343,
+          "x2": 37,
+          "z2": -993
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.3501 = \"Seaside\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "client",
+          "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 6 to \"seaside_notification\" (+ .swf)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 6 id/name match the first-party banner table"
+        }
+      ]
+    },
+    {
+      "id": 7,
+      "name": "Shrouded Glade",
+      "name_string_id": 3502,
+      "banner_swf": "shroudedglade_notification.swf",
+      "parent_zone": 0,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": 96,
+          "z": 1190,
+          "r": 250
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.3502 = \"Shrouded Glade\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "client",
+          "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 7 to \"shroudedglade_notification\" (+ .swf)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 7 id/name match the first-party banner table"
+        }
+      ]
+    },
+    {
+      "id": 8,
+      "name": "Snowhill",
+      "name_string_id": 3961,
+      "banner_swf": "snowhill_notification.swf",
+      "parent_zone": 0,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": 380,
+          "z": 400,
+          "r": 350
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.3961 = \"Snowhill\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "client",
+          "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 8 to \"snowhill_notification\" (+ .swf)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 8 id/name match the first-party banner table"
+        }
+      ]
+    },
+    {
+      "id": 9,
+      "name": "Wugachug",
+      "name_string_id": 3505,
+      "banner_swf": "wugachug_notification.swf",
+      "parent_zone": 0,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": 66,
+          "z": -396,
+          "r": 165
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.3505 = \"Wugachug\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "client",
+          "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 9 to \"wugachug_notification\" (+ .swf)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 9 id/name match the first-party banner table"
+        }
+      ]
+    },
+    {
+      "id": 10,
+      "name": "Sunstone Valley",
+      "name_string_id": 3793,
+      "banner_swf": "sunstone_notification.swf",
+      "parent_zone": 0,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": 711,
+          "z": 2143,
+          "r": 765
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.3793 = \"Sunstone Valley\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "client",
+          "evidence": "ScriptsBase.lua:11642-11664 NotificationHandler:LoadingZone maps zone id 10 to \"sunstone_notification\" (+ .swf)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.1 recovered nine-region AreaDefinitions table (src/restoration/piece_076.rs REGION_AREAS, community FabledRealms.json); region 10 id/name match the first-party banner table"
+        }
+      ]
+    }
+  ],
+  "places": [
+    {
+      "id": "blackspore",
+      "name": "Blackspore",
+      "name_string_id": 3500,
+      "region_id": 2,
+      "priority": 50,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -1832,
+          "z": 1054,
+          "r": 240
+        },
+        {
+          "shape": "sphere",
+          "x": -1873,
+          "z": 890,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1786,
+          "z": 903,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1834,
+          "z": 938,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1855,
+          "z": 923,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1863,
+          "z": 935,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1861,
+          "z": 947,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1835,
+          "z": 894,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -2247,
+          "z": 973,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -2455,
+          "z": 1169,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -2262,
+          "z": 1058,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1874,
+          "z": 975,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -2375,
+          "z": 1128,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -2268,
+          "z": 1175,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -1920,
+          "z": 887,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -2259,
+          "z": 1004,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1753,
+          "z": 1016,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1936,
+          "z": 1014,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -2031,
+          "z": 1068,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1754,
+          "z": 983,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -1867,
+          "z": 1067,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -1953,
+          "z": 989,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -2238,
+          "z": 913,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -2209,
+          "z": 1026,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -2064,
+          "z": 910,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -2334,
+          "z": 1271,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -2530,
+          "z": 1178,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -2382,
+          "z": 1072,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -2084,
+          "z": 1148,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -2074,
+          "z": 1058,
+          "r": 80
+        },
+        {
+          "shape": "sphere",
+          "x": -1785,
+          "z": 1059,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1711,
+          "z": 1089,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1727,
+          "z": 1106,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -2322,
+          "z": 1086,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -2353,
+          "z": 1237,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -1885,
+          "z": 869,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -2194,
+          "z": 1121,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -2183,
+          "z": 1086,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -2177,
+          "z": 924,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -2469,
+          "z": 1032,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -2572,
+          "z": 1047,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -2331,
+          "z": 1322,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -2305,
+          "z": 1245,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -2418,
+          "z": 1351,
+          "r": 35
+        },
+        {
+          "shape": "sphere",
+          "x": -2115,
+          "z": 1125,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1767,
+          "z": 1069,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -1745,
+          "z": 903,
+          "r": 45
+        },
+        {
+          "shape": "sphere",
+          "x": -2128,
+          "z": 962,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -2432,
+          "z": 1276,
+          "r": 50
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 307-1763: top-level always-on positive-radius sphere rows named blackspore* (no parentAreaId), projected to x/z; 49 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.3500 = \"Blackspore\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place blackspore under client region 2, and section 3.4 gives it priority 50"
+        }
+      ]
+    },
+    {
+      "id": "briarheart",
+      "name": "Briarheart",
+      "name_string_id": 4029,
+      "region_id": 3,
+      "priority": 30,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -227,
+          "z": 2559,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -22,
+          "z": 2809,
+          "r": 25
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 1802-1811: top-level always-on positive-radius sphere rows named briarheart* (no parentAreaId), projected to x/z; 2 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.4029 = \"Briarheart\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place briarheart under client region 3, and section 3.4 gives it priority 30"
+        }
+      ]
+    },
+    {
+      "id": "briarwood",
+      "name": "Briarwood",
+      "name_string_id": 18140,
+      "region_id": 3,
+      "priority": 50,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -883,
+          "z": 1593,
+          "r": 95
+        },
+        {
+          "shape": "sphere",
+          "x": -789,
+          "z": 1580,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -842,
+          "z": 1710,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -772,
+          "z": 1666,
+          "r": 251
+        },
+        {
+          "shape": "sphere",
+          "x": -427,
+          "z": 1969,
+          "r": 233
+        },
+        {
+          "shape": "sphere",
+          "x": -1085,
+          "z": 2169,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -145,
+          "z": 2257,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -281,
+          "z": 2504,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -66,
+          "z": 2706,
+          "r": 100
+        },
+        {
+          "shape": "sphere",
+          "x": -630,
+          "z": 2606,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -591,
+          "z": 2520,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -570,
+          "z": 2499,
+          "r": 22
+        },
+        {
+          "shape": "sphere",
+          "x": -773,
+          "z": 1731,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -796,
+          "z": 1812,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -730,
+          "z": 1784,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -674,
+          "z": 1725,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -747,
+          "z": 1671,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -852,
+          "z": 1744,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -886,
+          "z": 1834,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -934,
+          "z": 1774,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -902,
+          "z": 1904,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -983,
+          "z": 1887,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1061,
+          "z": 1955,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1004,
+          "z": 1953,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -644,
+          "z": 1752,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -818,
+          "z": 1886,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -161,
+          "z": 2266,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -140,
+          "z": 2261,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -145,
+          "z": 2274,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -519,
+          "z": 2450,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -606,
+          "z": 2530,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -596,
+          "z": 2537,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -619,
+          "z": 2572,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -623,
+          "z": 2592,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -614,
+          "z": 2573,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -892,
+          "z": 1512,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -562,
+          "z": 1971,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -736,
+          "z": 2014,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -723,
+          "z": 2182,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -715,
+          "z": 2308,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -574,
+          "z": 2227,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -839,
+          "z": 2152,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -164,
+          "z": 2276,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -535,
+          "z": 2342,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -634,
+          "z": 2397,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -521,
+          "z": 2488,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -210,
+          "z": 2362,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -277,
+          "z": 2349,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -352,
+          "z": 2269,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -410,
+          "z": 2280,
+          "r": 80
+        },
+        {
+          "shape": "sphere",
+          "x": -306,
+          "z": 2175,
+          "r": 80
+        },
+        {
+          "shape": "sphere",
+          "x": -144,
+          "z": 2273,
+          "r": 80
+        },
+        {
+          "shape": "sphere",
+          "x": -522,
+          "z": 2451,
+          "r": 250
+        },
+        {
+          "shape": "sphere",
+          "x": -1040,
+          "z": 1408,
+          "r": 20
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 210-2466: top-level always-on positive-radius sphere rows named brairwood*, briarwood* (no parentAreaId), projected to x/z; 54 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.18140 = \"Briarwood\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place briarwood under client region 3, and section 3.4 gives it priority 50"
+        }
+      ]
+    },
+    {
+      "id": "crossroads",
+      "name": "Crossroads",
+      "name_string_id": 20776,
+      "region_id": 1,
+      "priority": 30,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -1820,
+          "z": 433,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1793,
+          "z": 493,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1853,
+          "z": 490,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1857,
+          "z": 325,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1881,
+          "z": 469,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1878,
+          "z": 437,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1854,
+          "z": 493,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1881,
+          "z": 414,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1831,
+          "z": 378,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1776,
+          "z": 466,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1760,
+          "z": 449,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1810,
+          "z": 438,
+          "r": 10
+        },
+        {
+          "shape": "sphere",
+          "x": -1890,
+          "z": 488,
+          "r": 10
+        },
+        {
+          "shape": "sphere",
+          "x": -1839,
+          "z": 433,
+          "r": 10
+        },
+        {
+          "shape": "sphere",
+          "x": -1831,
+          "z": 423,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1776,
+          "z": 458,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1852,
+          "z": 491,
+          "r": 2
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 1555-2405: top-level always-on positive-radius sphere rows named crossroads* (no parentAreaId), projected to x/z; 17 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.20776 = \"The Wilds\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place crossroads under client region 1, and section 3.4 gives it priority 30"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the client locale has no text row for the Crossroads area name; the default region 1 name id 20776 (\"The Wilds\") is its display name"
+        }
+      ]
+    },
+    {
+      "id": "farnum_farmstead",
+      "name": "Farnum Farmstead",
+      "name_string_id": 18735,
+      "region_id": 1,
+      "priority": 30,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -2141,
+          "z": 260,
+          "r": 126
+        },
+        {
+          "shape": "sphere",
+          "x": -2091,
+          "z": 311,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -2142,
+          "z": 265,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -2098,
+          "z": 262,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -2099,
+          "z": 310,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -2057,
+          "z": 246,
+          "r": 25
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 271-2481: top-level always-on positive-radius sphere rows named farnum*, farnumfarmstead* (no parentAreaId), projected to x/z; 6 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.18735 = \"Farnum Farmstead\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place farnum_farmstead under client region 1, and section 3.4 gives it priority 30"
+        }
+      ]
+    },
+    {
+      "id": "highroad_junction",
+      "name": "Highroad Junction",
+      "name_string_id": 103715,
+      "region_id": 1,
+      "priority": 30,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -536,
+          "z": 149,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -424,
+          "z": 221,
+          "r": 10
+        },
+        {
+          "shape": "sphere",
+          "x": -480,
+          "z": 199,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -528,
+          "z": 209,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -482,
+          "z": 287,
+          "r": 80
+        },
+        {
+          "shape": "sphere",
+          "x": -622,
+          "z": 168,
+          "r": 100
+        },
+        {
+          "shape": "sphere",
+          "x": -556,
+          "z": 517,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -515,
+          "z": 623,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -557,
+          "z": 476,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -628,
+          "z": 575,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -567,
+          "z": 612,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -531,
+          "z": 577,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -533,
+          "z": 546,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -539,
+          "z": 523,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -572,
+          "z": 540,
+          "r": 10
+        },
+        {
+          "shape": "sphere",
+          "x": -474,
+          "z": -80,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -428,
+          "z": -94,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -449,
+          "z": -85,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -473,
+          "z": -53,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -422,
+          "z": -26,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -446,
+          "z": -12,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -425,
+          "z": 26,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -352,
+          "z": 20,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -484,
+          "z": -2,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -432,
+          "z": -119,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -434,
+          "z": -81,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -293,
+          "z": -340,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -539,
+          "z": 151,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -564,
+          "z": 496,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -537,
+          "z": 539,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -563,
+          "z": 602,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -606,
+          "z": 674,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -427,
+          "z": 600,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -461,
+          "z": 313,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -386,
+          "z": 147,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -413,
+          "z": 177,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -407,
+          "z": 149,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -375,
+          "z": 154,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -426,
+          "z": 164,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -443,
+          "z": 278,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -706,
+          "z": 453,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -513,
+          "z": 227,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -488,
+          "z": 175,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -451,
+          "z": 304,
+          "r": 35
+        },
+        {
+          "shape": "sphere",
+          "x": -395,
+          "z": 244,
+          "r": 80
+        },
+        {
+          "shape": "sphere",
+          "x": -536,
+          "z": 149,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -414,
+          "z": 177,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -462,
+          "z": 307,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -542,
+          "z": 549,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -565,
+          "z": 498,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -551,
+          "z": 632,
+          "r": 30
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 1965-2424: top-level always-on positive-radius sphere rows named highroadjunction* (no parentAreaId), projected to x/z; 51 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.103715 = \"Highroad Junction\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place highroad_junction under client region 1, and section 3.4 gives it priority 30"
+        }
+      ]
+    },
+    {
+      "id": "lakeshore",
+      "name": "Lakeshore",
+      "name_string_id": 18899,
+      "region_id": 1,
+      "priority": 30,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -701,
+          "z": 519,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -579,
+          "z": 699,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -524,
+          "z": 822,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -431,
+          "z": 780,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -719,
+          "z": 833,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -822,
+          "z": 865,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -745,
+          "z": 770,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -814,
+          "z": 711,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -609,
+          "z": 630,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -751,
+          "z": 765,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -813,
+          "z": 709,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -722,
+          "z": 835,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -536,
+          "z": 931,
+          "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": -736,
+          "z": 763,
+          "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": -705,
+          "z": 746,
+          "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": -670,
+          "z": 722,
+          "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": -656,
+          "z": 685,
+          "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": -658,
+          "z": 652,
+          "r": 5
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 952-3335: top-level always-on positive-radius sphere rows named lakeshore* (no parentAreaId), projected to x/z; 18 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.18899 = \"Lakeshore\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place lakeshore under client region 1, and section 3.4 gives it priority 30"
+        }
+      ]
+    },
+    {
+      "id": "memorial_caverns",
+      "name": "Memorial Caverns",
+      "name_string_id": 74183,
+      "region_id": 5,
+      "priority": 30,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -863,
+          "z": 318,
+          "r": 29
+        },
+        {
+          "shape": "sphere",
+          "x": -904,
+          "z": 341,
+          "r": 32
+        },
+        {
+          "shape": "sphere",
+          "x": -1011,
+          "z": 300,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -906,
+          "z": 345,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -906,
+          "z": 317,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -1006,
+          "z": 301,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1010,
+          "z": 301,
+          "r": 20
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 515-1793: top-level always-on positive-radius sphere rows named memorial*, memorialcaverns*, memorialcaves* (no parentAreaId), projected to x/z; 7 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.74183 = \"Memorial Caverns\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place memorial_caverns under client region 5, and section 3.4 gives it priority 30"
+        }
+      ]
+    },
+    {
+      "id": "merryvale",
+      "name": "Merry Vale",
+      "name_string_id": 4428,
+      "region_id": 4,
+      "priority": 50,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -896,
+          "z": -679,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1044,
+          "z": -463,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1033,
+          "z": -569,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -934,
+          "z": -499,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1068,
+          "z": -514,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1009,
+          "z": -528,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -990,
+          "z": -485,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -882,
+          "z": -428,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -885,
+          "z": -379,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1113,
+          "z": -460,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -959,
+          "z": -509,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -966,
+          "z": -373,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1040,
+          "z": -404,
+          "r": 275
+        },
+        {
+          "shape": "sphere",
+          "x": -1126,
+          "z": -437,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1101,
+          "z": -455,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1043,
+          "z": -553,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1010,
+          "z": -571,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -1036,
+          "z": -523,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1031,
+          "z": -468,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1005,
+          "z": -514,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -871,
+          "z": -721,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -945,
+          "z": -659,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -923,
+          "z": -603,
+          "r": 41
+        },
+        {
+          "shape": "sphere",
+          "x": -936,
+          "z": -577,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1003,
+          "z": -473,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1033,
+          "z": -415,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1058,
+          "z": -385,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1139,
+          "z": -346,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1121,
+          "z": -358,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1147,
+          "z": -375,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1144,
+          "z": -351,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1078,
+          "z": -277,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1078,
+          "z": -299,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1053,
+          "z": -257,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1036,
+          "z": -316,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1009,
+          "z": -348,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1004,
+          "z": -327,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -994,
+          "z": -317,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -979,
+          "z": -341,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -963,
+          "z": -396,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -986,
+          "z": -445,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -943,
+          "z": -518,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -949,
+          "z": -499,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1170,
+          "z": -427,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1192,
+          "z": -443,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1171,
+          "z": -448,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1112,
+          "z": -412,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1048,
+          "z": -471,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1112,
+          "z": -412,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -876,
+          "z": -415,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1026,
+          "z": -330,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1142,
+          "z": -305,
+          "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": -979,
+          "z": -269,
+          "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": -947,
+          "z": -246,
+          "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": -899,
+          "z": -480,
+          "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": -873,
+          "z": -510,
+          "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": -843,
+          "z": -513,
+          "r": 5
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 862-3359: top-level always-on positive-radius sphere rows named merryvale*, meryvale* (no parentAreaId), projected to x/z; 57 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.4428 = \"Merry Vale\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place merryvale under client region 4, and section 3.4 gives it priority 50"
+        }
+      ]
+    },
+    {
+      "id": "newbiezone",
+      "name": "Newbiezone",
+      "name_string_id": 20776,
+      "region_id": 1,
+      "priority": 100,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -2057,
+          "z": 430,
+          "r": 415
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 3549-3549: top-level always-on positive-radius sphere rows named newbiezone* (no parentAreaId), projected to x/z; 1 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.20776 = \"The Wilds\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place newbiezone under client region 1, and section 3.4 gives it priority 100"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) the client locale has no text row for the Newbiezone area name; the default region 1 name id 20776 (\"The Wilds\") is its display name"
+        }
+      ]
+    },
+    {
+      "id": "queensfields",
+      "name": "Queensfields",
+      "name_string_id": 7262,
+      "region_id": 5,
+      "priority": 30,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -1403,
+          "z": 267,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1517,
+          "z": 361,
+          "r": 10
+        },
+        {
+          "shape": "sphere",
+          "x": -1509,
+          "z": 266,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1437,
+          "z": 386,
+          "r": 20
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 1558-1681: top-level always-on positive-radius sphere rows named queensfields*, queensfiels* (no parentAreaId), projected to x/z; 4 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.7262 = \"Queensfields\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place queensfields under client region 5, and section 3.4 gives it priority 30"
+        }
+      ]
+    },
+    {
+      "id": "sanctuary",
+      "name": "Sanctuary",
+      "name_string_id": 3499,
+      "region_id": 5,
+      "priority": 50,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -1470,
+          "z": 131,
+          "r": 188
+        },
+        {
+          "shape": "sphere",
+          "x": -1185,
+          "z": 305,
+          "r": 66
+        },
+        {
+          "shape": "sphere",
+          "x": -1241,
+          "z": 525,
+          "r": 58
+        },
+        {
+          "shape": "sphere",
+          "x": -1191,
+          "z": 524,
+          "r": 68
+        },
+        {
+          "shape": "sphere",
+          "x": -1152,
+          "z": 23,
+          "r": 49
+        },
+        {
+          "shape": "sphere",
+          "x": -1193,
+          "z": 273,
+          "r": 39
+        },
+        {
+          "shape": "sphere",
+          "x": -974,
+          "z": 425,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -933,
+          "z": 227,
+          "r": 16
+        },
+        {
+          "shape": "sphere",
+          "x": -932,
+          "z": 238,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1038,
+          "z": 305,
+          "r": 63
+        },
+        {
+          "shape": "sphere",
+          "x": -1228,
+          "z": 537,
+          "r": 63
+        },
+        {
+          "shape": "sphere",
+          "x": -1315,
+          "z": 307,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1309,
+          "z": 309,
+          "r": 12
+        },
+        {
+          "shape": "sphere",
+          "x": -1239,
+          "z": 533,
+          "r": 250
+        },
+        {
+          "shape": "sphere",
+          "x": -1225,
+          "z": 537,
+          "r": 250
+        },
+        {
+          "shape": "sphere",
+          "x": -1158,
+          "z": 30,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -1145,
+          "z": 22,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -1214,
+          "z": 314,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1073,
+          "z": 389,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1102,
+          "z": 240,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1018,
+          "z": 190,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -927,
+          "z": 384,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1148,
+          "z": 382,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -903,
+          "z": 395,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -1165,
+          "z": 21,
+          "r": 120
+        },
+        {
+          "shape": "sphere",
+          "x": -1367,
+          "z": 324,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1371,
+          "z": 297,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1164,
+          "z": 19,
+          "r": 250
+        },
+        {
+          "shape": "sphere",
+          "x": -1214,
+          "z": 315,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -927,
+          "z": 380,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1373,
+          "z": 220,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -1456,
+          "z": 352,
+          "r": 4
+        },
+        {
+          "shape": "sphere",
+          "x": -1516,
+          "z": 346,
+          "r": 4
+        },
+        {
+          "shape": "sphere",
+          "x": -912,
+          "z": 370,
+          "r": 4
+        },
+        {
+          "shape": "sphere",
+          "x": -1525,
+          "z": 297,
+          "r": 4
+        },
+        {
+          "shape": "sphere",
+          "x": -1500,
+          "z": 489,
+          "r": 4
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 241-3391: top-level always-on positive-radius sphere rows named sanctuary* (no parentAreaId), projected to x/z; 36 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.3499 = \"Sanctuary\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place sanctuary under client region 5, and section 3.4 gives it priority 50"
+        }
+      ]
+    },
+    {
+      "id": "seaside",
+      "name": "Seaside",
+      "name_string_id": 3501,
+      "region_id": 6,
+      "priority": 50,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -702,
+          "z": -1208,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -499,
+          "z": -1159,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -420,
+          "z": -1118,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -727,
+          "z": -1099,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -634,
+          "z": -1029,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -680,
+          "z": -1068,
+          "r": 140
+        },
+        {
+          "shape": "sphere",
+          "x": -673,
+          "z": -1080,
+          "r": 250
+        },
+        {
+          "shape": "sphere",
+          "x": -678,
+          "z": -1064,
+          "r": 250
+        },
+        {
+          "shape": "sphere",
+          "x": -951,
+          "z": -1085,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -788,
+          "z": -1153,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -783,
+          "z": -1132,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -736,
+          "z": -1149,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -565,
+          "z": -1119,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -373,
+          "z": -1205,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -439,
+          "z": -1226,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -200,
+          "z": -1226,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -222,
+          "z": -1226,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -234,
+          "z": -1242,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -53,
+          "z": -1241,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -84,
+          "z": -1249,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -51,
+          "z": -1225,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -106,
+          "z": -1388,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -678,
+          "z": -1074,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -547,
+          "z": -906,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -791,
+          "z": -1267,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -603,
+          "z": -1090,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -374,
+          "z": -1203,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -625,
+          "z": -1215,
+          "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": -634,
+          "z": -1317,
+          "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": -656,
+          "z": -1374,
+          "r": 5
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 1438-3379: top-level always-on positive-radius sphere rows named seaside* (no parentAreaId), projected to x/z; 30 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.3501 = \"Seaside\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place seaside under client region 6, and section 3.4 gives it priority 50"
+        }
+      ]
+    },
+    {
+      "id": "shrouded_glade",
+      "name": "Shrouded Glade",
+      "name_string_id": 3502,
+      "region_id": 7,
+      "priority": 50,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": 97,
+          "z": 981,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": 102,
+          "z": 961,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -236,
+          "z": 1012,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -189,
+          "z": 1064,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -99,
+          "z": 1145,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -55,
+          "z": 1200,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": 173,
+          "z": 1124,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": 96,
+          "z": 1190,
+          "r": 250
+        },
+        {
+          "shape": "sphere",
+          "x": -61,
+          "z": 1230,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": 177,
+          "z": 1125,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 276,
+          "z": 1186,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 325,
+          "z": 1207,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 242,
+          "z": 1203,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": 9,
+          "z": 1340,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": 4,
+          "z": 1360,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": 6,
+          "z": 1370,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": 89,
+          "z": 1034,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": 89,
+          "z": 1161,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -11,
+          "z": 1102,
+          "r": 20
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 1126-2460: top-level always-on positive-radius sphere rows named shrouded*, shroudedglade* (no parentAreaId), projected to x/z; 19 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.3502 = \"Shrouded Glade\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place shrouded_glade under client region 7, and section 3.4 gives it priority 50"
+        }
+      ]
+    },
+    {
+      "id": "snowhill",
+      "name": "Snowhill",
+      "name_string_id": 3961,
+      "region_id": 8,
+      "priority": 50,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": 156,
+          "z": 390,
+          "r": 135
+        },
+        {
+          "shape": "sphere",
+          "x": 310,
+          "z": 405,
+          "r": 35
+        },
+        {
+          "shape": "sphere",
+          "x": 351,
+          "z": 311,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 631,
+          "z": 447,
+          "r": 96
+        },
+        {
+          "shape": "sphere",
+          "x": 250,
+          "z": 407,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 261,
+          "z": 523,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": 349,
+          "z": 316,
+          "r": 16
+        },
+        {
+          "shape": "sphere",
+          "x": 378,
+          "z": 574,
+          "r": 70
+        },
+        {
+          "shape": "sphere",
+          "x": 286,
+          "z": 234,
+          "r": 54
+        },
+        {
+          "shape": "sphere",
+          "x": 54,
+          "z": 182,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 311,
+          "z": 137,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 64,
+          "z": 259,
+          "r": 49
+        },
+        {
+          "shape": "sphere",
+          "x": 436,
+          "z": 489,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 399,
+          "z": 512,
+          "r": 55
+        },
+        {
+          "shape": "sphere",
+          "x": 268,
+          "z": 251,
+          "r": 12
+        },
+        {
+          "shape": "sphere",
+          "x": 466,
+          "z": 448,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 91,
+          "z": 532,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": 306,
+          "z": 589,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": 108,
+          "z": 257,
+          "r": 80
+        },
+        {
+          "shape": "sphere",
+          "x": 629,
+          "z": 421,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": 127,
+          "z": 475,
+          "r": 33
+        },
+        {
+          "shape": "sphere",
+          "x": -45,
+          "z": 301,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": 105,
+          "z": 290,
+          "r": 4
+        },
+        {
+          "shape": "sphere",
+          "x": 119,
+          "z": 261,
+          "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": 129,
+          "z": 241,
+          "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": 80,
+          "z": 491,
+          "r": 4
+        },
+        {
+          "shape": "sphere",
+          "x": 61,
+          "z": 506,
+          "r": 4
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 1-3395: top-level always-on positive-radius sphere rows named snowhill* (no parentAreaId), projected to x/z; 27 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.3961 = \"Snowhill\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place snowhill under client region 8, and section 3.4 gives it priority 50"
+        }
+      ]
+    },
+    {
+      "id": "stillwater_crossing",
+      "name": "Stillwater Crossing",
+      "name_string_id": 103701,
+      "region_id": 1,
+      "priority": 30,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": -1166,
+          "z": 761,
+          "r": 100
+        },
+        {
+          "shape": "sphere",
+          "x": -1139,
+          "z": 700,
+          "r": 80
+        },
+        {
+          "shape": "sphere",
+          "x": -1131,
+          "z": 764,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1351,
+          "z": 826,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -1177,
+          "z": 956,
+          "r": 80
+        },
+        {
+          "shape": "sphere",
+          "x": -1226,
+          "z": 942,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1208,
+          "z": 941,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1266,
+          "z": 1033,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1211,
+          "z": 1044,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1251,
+          "z": 1026,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1347,
+          "z": 981,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -1352,
+          "z": 1101,
+          "r": 65
+        },
+        {
+          "shape": "sphere",
+          "x": -994,
+          "z": 1156,
+          "r": 250
+        },
+        {
+          "shape": "sphere",
+          "x": -980,
+          "z": 1147,
+          "r": 250
+        },
+        {
+          "shape": "sphere",
+          "x": -1370,
+          "z": 942,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1393,
+          "z": 949,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1415,
+          "z": 952,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1450,
+          "z": 885,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -1423,
+          "z": 868,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1453,
+          "z": 802,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1372,
+          "z": 802,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1318,
+          "z": 807,
+          "r": 10
+        },
+        {
+          "shape": "sphere",
+          "x": -1285,
+          "z": 849,
+          "r": 10
+        },
+        {
+          "shape": "sphere",
+          "x": -1287,
+          "z": 875,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1281,
+          "z": 878,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1284,
+          "z": 876,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1232,
+          "z": 804,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1251,
+          "z": 865,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1364,
+          "z": 974,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1445,
+          "z": 953,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -1523,
+          "z": 971,
+          "r": 70
+        },
+        {
+          "shape": "sphere",
+          "x": -1114,
+          "z": 1224,
+          "r": 70
+        },
+        {
+          "shape": "sphere",
+          "x": -979,
+          "z": 1043,
+          "r": 70
+        },
+        {
+          "shape": "sphere",
+          "x": -920,
+          "z": 1060,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -860,
+          "z": 1092,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -1227,
+          "z": 814,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1373,
+          "z": 757,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1443,
+          "z": 794,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1424,
+          "z": 870,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1445,
+          "z": 960,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1333,
+          "z": 910,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1226,
+          "z": 947,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1178,
+          "z": 740,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1451,
+          "z": 884,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1199,
+          "z": 848,
+          "r": 90
+        },
+        {
+          "shape": "sphere",
+          "x": -1272,
+          "z": 806,
+          "r": 70
+        },
+        {
+          "shape": "sphere",
+          "x": -1199,
+          "z": 848,
+          "r": 2
+        },
+        {
+          "shape": "sphere",
+          "x": -1210,
+          "z": 940,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1265,
+          "z": 808,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1104,
+          "z": 1025,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1422,
+          "z": 869,
+          "r": 20
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 1836-2472: top-level always-on positive-radius sphere rows named stillwater*, stillwatercrossing* (no parentAreaId), projected to x/z; 51 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.103701 = \"Stillwater Crossing\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place stillwater_crossing under client region 1, and section 3.4 gives it priority 30"
+        }
+      ]
+    },
+    {
+      "id": "sunstone_valley",
+      "name": "Sunstone Valley",
+      "name_string_id": 3793,
+      "region_id": 10,
+      "priority": 5,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": 711,
+          "z": 2143,
+          "r": 765
+        },
+        {
+          "shape": "sphere",
+          "x": 448,
+          "z": 1815,
+          "r": 1000
+        },
+        {
+          "shape": "sphere",
+          "x": 531,
+          "z": 1926,
+          "r": 75
+        },
+        {
+          "shape": "sphere",
+          "x": 859,
+          "z": 1701,
+          "r": 125
+        },
+        {
+          "shape": "sphere",
+          "x": 926,
+          "z": 2381,
+          "r": 125
+        },
+        {
+          "shape": "sphere",
+          "x": 794,
+          "z": 2384,
+          "r": 125
+        },
+        {
+          "shape": "sphere",
+          "x": 623,
+          "z": 2418,
+          "r": 125
+        },
+        {
+          "shape": "sphere",
+          "x": 915,
+          "z": 1729,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": 529,
+          "z": 1926,
+          "r": 40
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 3512-3546: top-level always-on positive-radius sphere rows named amb*, sunstone* (no parentAreaId), projected to x/z; 9 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.3793 = \"Sunstone Valley\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place sunstone_valley under client region 10, and section 3.4 gives it priority 5"
+        }
+      ]
+    },
+    {
+      "id": "wilds",
+      "name": "The Wilds",
+      "name_string_id": 20776,
+      "region_id": 1,
+      "priority": 10,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": 32,
+          "z": 268,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -22,
+          "z": 260,
+          "r": 32
+        },
+        {
+          "shape": "sphere",
+          "x": -55,
+          "z": 279,
+          "r": 75
+        },
+        {
+          "shape": "sphere",
+          "x": -26,
+          "z": 310,
+          "r": 13
+        },
+        {
+          "shape": "sphere",
+          "x": -78,
+          "z": 226,
+          "r": 19
+        },
+        {
+          "shape": "sphere",
+          "x": -179,
+          "z": 323,
+          "r": 19
+        },
+        {
+          "shape": "sphere",
+          "x": -196,
+          "z": 210,
+          "r": 19
+        },
+        {
+          "shape": "sphere",
+          "x": -418,
+          "z": 363,
+          "r": 41
+        },
+        {
+          "shape": "sphere",
+          "x": -386,
+          "z": 289,
+          "r": 19
+        },
+        {
+          "shape": "sphere",
+          "x": -385,
+          "z": 107,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -514,
+          "z": 326,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -531,
+          "z": 202,
+          "r": 23
+        },
+        {
+          "shape": "sphere",
+          "x": -1242,
+          "z": 167,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -764,
+          "z": 119,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -745,
+          "z": -26,
+          "r": 17
+        },
+        {
+          "shape": "sphere",
+          "x": -598,
+          "z": -8,
+          "r": 17
+        },
+        {
+          "shape": "sphere",
+          "x": -705,
+          "z": -150,
+          "r": 16
+        },
+        {
+          "shape": "sphere",
+          "x": 448,
+          "z": 483,
+          "r": 21
+        },
+        {
+          "shape": "sphere",
+          "x": -509,
+          "z": -53,
+          "r": 16
+        },
+        {
+          "shape": "sphere",
+          "x": -149,
+          "z": -701,
+          "r": 150
+        },
+        {
+          "shape": "sphere",
+          "x": -485,
+          "z": 767,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -1867,
+          "z": 445,
+          "r": 112
+        },
+        {
+          "shape": "sphere",
+          "x": -1874,
+          "z": 681,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -314,
+          "z": 1410,
+          "r": 280
+        },
+        {
+          "shape": "sphere",
+          "x": -1526,
+          "z": 881,
+          "r": 39
+        },
+        {
+          "shape": "sphere",
+          "x": -1149,
+          "z": 1119,
+          "r": 43
+        },
+        {
+          "shape": "sphere",
+          "x": -814,
+          "z": 1078,
+          "r": 120
+        },
+        {
+          "shape": "sphere",
+          "x": -196,
+          "z": 1057,
+          "r": 45
+        },
+        {
+          "shape": "sphere",
+          "x": -3,
+          "z": 1242,
+          "r": 55
+        },
+        {
+          "shape": "sphere",
+          "x": 250,
+          "z": 1209,
+          "r": 75
+        },
+        {
+          "shape": "sphere",
+          "x": -68,
+          "z": 922,
+          "r": 66
+        },
+        {
+          "shape": "sphere",
+          "x": -1930,
+          "z": 623,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1946,
+          "z": 667,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": 73,
+          "z": -557,
+          "r": 90
+        },
+        {
+          "shape": "sphere",
+          "x": -1942,
+          "z": 608,
+          "r": 45
+        },
+        {
+          "shape": "sphere",
+          "x": -8,
+          "z": -542,
+          "r": 45
+        },
+        {
+          "shape": "sphere",
+          "x": -620,
+          "z": -601,
+          "r": 70
+        },
+        {
+          "shape": "sphere",
+          "x": -1383,
+          "z": 542,
+          "r": 30
+        },
+        {
+          "shape": "sphere",
+          "x": -1414,
+          "z": 520,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": 25,
+          "z": 1223,
+          "r": 45
+        },
+        {
+          "shape": "sphere",
+          "x": -1362,
+          "z": -689,
+          "r": 58
+        },
+        {
+          "shape": "sphere",
+          "x": -1044,
+          "z": -420,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -1947,
+          "z": 626,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -1930,
+          "z": 628,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -1948,
+          "z": 663,
+          "r": 180
+        },
+        {
+          "shape": "sphere",
+          "x": -115,
+          "z": 936,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -89,
+          "z": 926,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -211,
+          "z": -537,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -1886,
+          "z": 413,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1826,
+          "z": 338,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1920,
+          "z": 311,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -2039,
+          "z": 306,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -2073,
+          "z": 463,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -2135,
+          "z": 489,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -2144,
+          "z": 254,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -2210,
+          "z": 355,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -2229,
+          "z": 300,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1902,
+          "z": 92,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1860,
+          "z": -23,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1630,
+          "z": 15,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1757,
+          "z": 59,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1793,
+          "z": 312,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1816,
+          "z": 437,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1699,
+          "z": 430,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1619,
+          "z": 348,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1537,
+          "z": 303,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1474,
+          "z": 217,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1411,
+          "z": 371,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1390,
+          "z": 211,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1399,
+          "z": 153,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1283,
+          "z": 99,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1330,
+          "z": 19,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1327,
+          "z": -43,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1493,
+          "z": -82,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1582,
+          "z": 44,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1384,
+          "z": 464,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1421,
+          "z": 560,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1354,
+          "z": 497,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1461,
+          "z": 596,
+          "r": 25
+        },
+        {
+          "shape": "sphere",
+          "x": -1532,
+          "z": 491,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1631,
+          "z": 487,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1980,
+          "z": 499,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -2156,
+          "z": 643,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -2170,
+          "z": 514,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -446,
+          "z": 793,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -499,
+          "z": 786,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -477,
+          "z": 716,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -808,
+          "z": 717,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -854,
+          "z": 831,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -797,
+          "z": 864,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -686,
+          "z": 890,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1918,
+          "z": -588,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -2009,
+          "z": -604,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1948,
+          "z": -642,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -2016,
+          "z": -545,
+          "r": 15
+        },
+        {
+          "shape": "sphere",
+          "x": -1961,
+          "z": -449,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -2016,
+          "z": -306,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1930,
+          "z": -110,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1901,
+          "z": -21,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1298,
+          "z": 290,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1151,
+          "z": 322,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1103,
+          "z": 410,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -959,
+          "z": 286,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -928,
+          "z": 361,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1025,
+          "z": 182,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1086,
+          "z": 210,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1145,
+          "z": 1205,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1087,
+          "z": 1217,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1120,
+          "z": 1284,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -1116,
+          "z": 1374,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -120,
+          "z": 212,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -171,
+          "z": 253,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -321,
+          "z": 344,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -345,
+          "z": 223,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -342,
+          "z": 153,
+          "r": 20
+        },
+        {
+          "shape": "sphere",
+          "x": -284,
+          "z": -19,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -391,
+          "z": -406,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -591,
+          "z": -470,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -554,
+          "z": -281,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -733,
+          "z": 27,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -617,
+          "z": 70,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -627,
+          "z": 247,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -522,
+          "z": 408,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -340,
+          "z": 605,
+          "r": 80
+        },
+        {
+          "shape": "sphere",
+          "x": -562,
+          "z": 1136,
+          "r": 80
+        },
+        {
+          "shape": "sphere",
+          "x": -2036,
+          "z": 413,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -1940,
+          "z": 132,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -1491,
+          "z": -516,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -1703,
+          "z": -764,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -1199,
+          "z": -724,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -1349,
+          "z": -394,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -323,
+          "z": -223,
+          "r": 90
+        },
+        {
+          "shape": "sphere",
+          "x": -617,
+          "z": -208,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -525,
+          "z": -10,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -436,
+          "z": 132,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -450,
+          "z": 261,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -338,
+          "z": 787,
+          "r": 70
+        },
+        {
+          "shape": "sphere",
+          "x": -406,
+          "z": 1091,
+          "r": 70
+        },
+        {
+          "shape": "sphere",
+          "x": -519,
+          "z": -833,
+          "r": 70
+        },
+        {
+          "shape": "sphere",
+          "x": -639,
+          "z": -782,
+          "r": 50
+        },
+        {
+          "shape": "sphere",
+          "x": -492,
+          "z": -457,
+          "r": 60
+        },
+        {
+          "shape": "sphere",
+          "x": -266,
+          "z": 274,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -364,
+          "z": 258,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -545,
+          "z": 256,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -564,
+          "z": 395,
+          "r": 40
+        },
+        {
+          "shape": "sphere",
+          "x": -209,
+          "z": -522,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": -1759,
+          "z": -156,
+          "r": 5
+        },
+        {
+          "shape": "sphere",
+          "x": -1776,
+          "z": -171,
+          "r": 5
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 86-3367: top-level always-on positive-radius sphere rows named thewild*, thewilds*, wilds* (no parentAreaId), projected to x/z; 148 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.20776 = \"The Wilds\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place wilds under client region 1, and section 3.4 gives it priority 10"
+        }
+      ]
+    },
+    {
+      "id": "wugachug",
+      "name": "Wugachug",
+      "name_string_id": 3505,
+      "region_id": 9,
+      "priority": 50,
+      "shapes": [
+        {
+          "shape": "sphere",
+          "x": 47,
+          "z": -540,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": 63,
+          "z": -573,
+          "r": 200
+        },
+        {
+          "shape": "sphere",
+          "x": 77,
+          "z": -412,
+          "r": 37
+        },
+        {
+          "shape": "sphere",
+          "x": 66,
+          "z": -396,
+          "r": 150
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "FabledRealmsAreas.xml lines 235-2389: top-level always-on positive-radius sphere rows named wugachug*, TheWild_WaguChugBrewery (no parentAreaId), projected to x/z; 4 shapes"
+        },
+        {
+          "kind": "client",
+          "evidence": "client locale Global.Text.3505 = \"Wugachug\" (lab/reports/locale-id-to-text.json)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T749 section 3.2 groups these rows as place wugachug under client region 9, and section 3.4 gives it priority 50"
+        }
+      ]
+    }
+  ]
+}

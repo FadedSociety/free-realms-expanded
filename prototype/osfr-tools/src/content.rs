@@ -586,7 +586,7 @@ fn unique_ids(
     Ok(seen)
 }
 
-fn check_sources(record: &str, sources: &[SourceTag]) -> Result<(), ContentError> {
+pub(crate) fn check_sources(record: &str, sources: &[SourceTag]) -> Result<(), ContentError> {
     if sources.is_empty() {
         return Err(ContentError::InvalidProvenance {
             record: record.to_owned(),
