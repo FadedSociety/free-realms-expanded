@@ -9615,34 +9615,23 @@
       ],
       "services_reason": null,
       "position": [
-        899.838214,
-        2.463198,
-        2234.162154
+        473.0612,
+        65.21813,
+        1743.415
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        -0.9839107013146425,
+        0.01207670642249089,
         0.0,
-        0.17866094099866447
+        0.9999270739218861
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 152,
-          "poi_name": "Sunstone Valley",
-          "match_score": 15
-        },
-        {
-          "poi_id": 151,
-          "poi_name": "Rumble Ridge",
-          "match_score": 12
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 152 by longest normalized whole-name score 15; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Legacy built-content spawn coordinates copied from lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2509; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3842 (ModelId=3954, ModelFileName=dwarf_engineer.adr, NameId=439687). (R) matched by the spawn's client name (talk_spawns.py) (R).",
       "source": [
         {
           "kind": "client",
@@ -9659,6 +9648,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2509; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3842 (ModelId=3954, ModelFileName=dwarf_engineer.adr, NameId=439687). (R) The spawn's client NameId resolves to 'Golmie Greasebeard', the row's name (talk_spawns.py)."
         }
       ],
       "field_sources": {
@@ -10012,58 +10005,54 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=152 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=152 NameId=1695 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2509; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3842 (ModelId=3954, ModelFileName=dwarf_engineer.adr, NameId=439687)."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2509; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3842 (ModelId=3954, ModelFileName=dwarf_engineer.adr, NameId=439687)."
           }
         ],
         "position_w": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2509; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3842 (ModelId=3954, ModelFileName=dwarf_engineer.adr, NameId=439687). Legacy spawn has XYZ only."
           }
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=152 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=152 NameId=1695 matches native name_string_id."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2509; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3842 (ModelId=3954, ModelFileName=dwarf_engineer.adr, NameId=439687)."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) Y-axis yaw quaternion from the spawn heading; the raw heading is retained separately."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2509; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3842 (ModelId=3954, ModelFileName=dwarf_engineer.adr, NameId=439687)."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2509; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3842 (ModelId=3954, ModelFileName=dwarf_engineer.adr, NameId=439687)."
           }
         ],
         "placement_confidence": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) Medium means one name-matched reference spawn and no competing regional row; not native-client confirmation."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2509; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3842 (ModelId=3954, ModelFileName=dwarf_engineer.adr, NameId=439687). No competing regional row or spawn candidate."
           }
         ],
         "capture_match": [
@@ -10071,8 +10060,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2509; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3842 (ModelId=3954, ModelFileName=dwarf_engineer.adr, NameId=439687)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2509; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3842 (ModelId=3954, ModelFileName=dwarf_engineer.adr, NameId=439687)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2509; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=3842 (ModelId=3954, ModelFileName=dwarf_engineer.adr, NameId=439687)."
+          }
         ]
-      }
+      },
+      "heading": 0.024154,
+      "model_id": 3954,
+      "model_file_name": "dwarf_engineer.adr"
     },
     {
       "npc_id": 9500000822,
@@ -25270,29 +25280,23 @@
       ],
       "services_reason": null,
       "position": [
-        426.81245,
-        71.52556,
-        1842.050153
+        414.9147,
+        74.74953,
+        1822.205
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        0.8923044834340326,
+        0.970739884606006,
         0.0,
-        0.4514340581342132
+        0.24013345546824172
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
       "placement_confidence": "medium",
-      "placement_candidates": [
-        {
-          "poi_id": 146,
-          "poi_name": "The Rumbledome",
-          "match_score": 14
-        }
-      ],
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 146 by longest normalized whole-name score 14; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Legacy built-content spawn coordinates copied from lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3365; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4798 (ModelId=4219, ModelFileName=dwarf_m_rumblekingdon.adr, NameId=442192). (R) matched by the spawn's client name (talk_spawns.py) (R).",
       "source": [
         {
           "kind": "client",
@@ -25309,6 +25313,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3365; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4798 (ModelId=4219, ModelFileName=dwarf_m_rumblekingdon.adr, NameId=442192). (R) The spawn's client NameId resolves to 'Rumble King Don', the row's name (talk_spawns.py)."
         }
       ],
       "field_sources": {
@@ -25666,58 +25674,54 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=146 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=146 NameId=439064 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3365; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4798 (ModelId=4219, ModelFileName=dwarf_m_rumblekingdon.adr, NameId=442192)."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3365; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4798 (ModelId=4219, ModelFileName=dwarf_m_rumblekingdon.adr, NameId=442192)."
           }
         ],
         "position_w": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3365; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4798 (ModelId=4219, ModelFileName=dwarf_m_rumblekingdon.adr, NameId=442192). Legacy spawn has XYZ only."
           }
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=146 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=146 NameId=439064 matches native name_string_id."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3365; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4798 (ModelId=4219, ModelFileName=dwarf_m_rumblekingdon.adr, NameId=442192)."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) Y-axis yaw quaternion from the spawn heading; the raw heading is retained separately."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3365; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4798 (ModelId=4219, ModelFileName=dwarf_m_rumblekingdon.adr, NameId=442192)."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3365; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4798 (ModelId=4219, ModelFileName=dwarf_m_rumblekingdon.adr, NameId=442192)."
           }
         ],
         "placement_confidence": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) medium measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) Medium means one name-matched reference spawn and no competing regional row; not native-client confirmation."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3365; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4798 (ModelId=4219, ModelFileName=dwarf_m_rumblekingdon.adr, NameId=442192). No competing regional row or spawn candidate."
           }
         ],
         "capture_match": [
@@ -25725,8 +25729,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3365; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4798 (ModelId=4219, ModelFileName=dwarf_m_rumblekingdon.adr, NameId=442192)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3365; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4798 (ModelId=4219, ModelFileName=dwarf_m_rumblekingdon.adr, NameId=442192)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3365; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4798 (ModelId=4219, ModelFileName=dwarf_m_rumblekingdon.adr, NameId=442192)."
+          }
         ]
-      }
+      },
+      "heading": 2.656586,
+      "model_id": 4219,
+      "model_file_name": "dwarf_m_rumblekingdon.adr"
     },
     {
       "npc_id": 9500000849,
@@ -30262,29 +30287,23 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        898.265836,
-        2.463198,
-        2232.016337
+        986.8932,
+        17.69587,
+        1251.908
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        -0.9839107013146425,
+        -0.7227916773829833,
         0.0,
-        0.17866094099866447
+        0.6910659817310452
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 152,
-          "poi_name": "Sunstone Valley",
-          "match_score": 0
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 152. This is not a recovered NPC transform.",
+      "position_reason": "Legacy built-content spawn coordinates copied from lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2685; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4018 (ModelId=2099, ModelFileName=horse_m.adr, NameId=413056). (R) matched by the spawn's client name (talk_spawns.py) (R).",
       "source": [
         {
           "kind": "client",
@@ -30297,6 +30316,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2685; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4018 (ModelId=2099, ModelFileName=horse_m.adr, NameId=413056). (R) The spawn's client NameId resolves to 'Starlight', the row's name (talk_spawns.py)."
         }
       ],
       "field_sources": {
@@ -30566,58 +30589,54 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 152 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2685; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4018 (ModelId=2099, ModelFileName=horse_m.adr, NameId=413056)."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2685; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4018 (ModelId=2099, ModelFileName=horse_m.adr, NameId=413056)."
           }
         ],
         "position_w": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2685; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4018 (ModelId=2099, ModelFileName=horse_m.adr, NameId=413056). Legacy spawn has XYZ only."
           }
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 152 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2685; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4018 (ModelId=2099, ModelFileName=horse_m.adr, NameId=413056)."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) Y-axis yaw quaternion from the spawn heading; the raw heading is retained separately."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2685; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4018 (ModelId=2099, ModelFileName=horse_m.adr, NameId=413056)."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2685; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4018 (ModelId=2099, ModelFileName=horse_m.adr, NameId=413056)."
           }
         ],
         "placement_confidence": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) Medium means one name-matched reference spawn and no competing regional row; not native-client confirmation."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2685; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4018 (ModelId=2099, ModelFileName=horse_m.adr, NameId=413056). No competing regional row or spawn candidate."
           }
         ],
         "capture_match": [
@@ -30625,8 +30644,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2685; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4018 (ModelId=2099, ModelFileName=horse_m.adr, NameId=413056)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2685; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4018 (ModelId=2099, ModelFileName=horse_m.adr, NameId=413056)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2685; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4018 (ModelId=2099, ModelFileName=horse_m.adr, NameId=413056)."
+          }
         ]
-      }
+      },
+      "heading": -1.615667,
+      "model_id": 2099,
+      "model_file_name": "horse_m.adr"
     },
     {
       "npc_id": 9500000859,

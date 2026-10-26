@@ -500,15 +500,41 @@ fn is_greeting_only_change_between(old: &Value, new: &Value) -> bool {
     })
 }
 
+/// T698's provenance marker: only rows a name-matched reference spawn placed
+/// carry it, so a foreign NPC file may carry exactly those rows' placement change.
+const REFERENCE_SPAWN_MARKER: &str = "matched by the spawn's client name (talk_spawns.py) (R)";
+
+/// T698 (`data/content/npcs/*.json`): an undrawn `poi_anchor`/`unanchored` row
+/// becomes `legacy_data` at the reference spawn cited in its `position_reason`.
+/// The row's identity, zone and quest fields stay put; the placement values are
+/// pinned by `content_npc_placement.rs`, `content_npc_spawns.rs` and
+/// `npc_reference_spawn_placements.rs`.
+fn is_reference_spawn_row(old: &Value, new: &Value) -> bool {
+    new["position_reason"]
+        .as_str()
+        .is_some_and(|reason| reason.contains(REFERENCE_SPAWN_MARKER))
+        && matches!(old["placement"].as_str(), Some("poi_anchor" | "unanchored"))
+        && new["placement"] == "legacy_data"
+        && new["placement_source"] == "legacy_data_spawn"
+        && new["placement_confidence"] == "medium"
+        && old["npc_id"] == new["npc_id"]
+        && old["name"] == new["name"]
+        && old["zone"] == new["zone"]
+        && old["zone_id"] == new["zone_id"]
+        && old["roles"] == new["roles"]
+        && old["quest_ids_given"] == new["quest_ids_given"]
+        && old["quests_accepted"] == new["quests_accepted"]
+}
+
 /// True when `new` differs from `old` only by quest bindings and their
-/// provenance on the HEAD rows, plus T502's `legacy_data` conversion of Merk.
-/// The quest suites pin those fields; a greeting, a moved row or any other
-/// foreign content change does not pass.
+/// provenance on the HEAD rows, plus T502's `legacy_data` conversion of Merk
+/// and T698's reference-spawn placements. The quest suites pin those fields; a
+/// greeting, a moved row or any other foreign content change does not pass.
 fn is_quest_binding_change_between(path: &str, old: &Value, new: &Value) -> bool {
     changed_rows_are(old, new, false, |old, new| {
         let quest_old = without_fields(old, &QUEST_BINDING_FIELDS);
         let quest_new = without_fields(new, &QUEST_BINDING_FIELDS);
-        if quest_old == quest_new {
+        if quest_old == quest_new || is_reference_spawn_row(old, new) {
             return true;
         }
         path.ends_with("/shrouded_glade.json")
@@ -961,6 +987,29 @@ fn the_change_guard_allows_quest_bindings_and_rejects_a_foreign_greeting() {
         "quests_accepted": [{"kind": "legacy-data", "evidence": "new"}]
     });
     assert!(is_quest_binding_change_between(shrouded_glade, &old, &merk));
+
+    // T698's reference-spawn placement is the one foreign NPC change allowed on
+    // every region file; it is recognised by the row's own provenance marker.
+    let mut reference_old = old.clone();
+    reference_old["records"][0]["placement"] = Value::from("poi_anchor");
+    let mut reference_new = reference_old.clone();
+    let row = &mut reference_new["records"][0];
+    row["placement"] = Value::from("legacy_data");
+    row["placement_source"] = Value::from("legacy_data_spawn");
+    row["placement_confidence"] = Value::from("medium");
+    row["position_reason"] = Value::from(format!("reference spawn: {REFERENCE_SPAWN_MARKER}"));
+    assert!(is_quest_binding_change_between(
+        briarwood,
+        &reference_old,
+        &reference_new
+    ));
+    let mut unmarked = reference_new.clone();
+    unmarked["records"][0]["position_reason"] = Value::from("moved without a spawn citation");
+    assert!(!is_quest_binding_change_between(
+        briarwood,
+        &reference_old,
+        &unmarked
+    ));
 
     // A foreign greeting binding is not a quest binding. The committed guard
     // rejects it; the builder-workspace allowance still names it a greeting

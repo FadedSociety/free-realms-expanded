@@ -9334,44 +9334,23 @@
       "services": [],
       "services_reason": "The regional row lists no distinct service.",
       "position": [
-        -1265.534403,
-        -49.042,
-        788.478653
+        -245.2278,
+        3.118001,
+        578.0795
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        -0.1514153744349448,
+        -0.28539064512849927,
         0.0,
-        0.9884702243288492
+        0.958411278978466
       ],
-      "placement": "poi_anchor",
-      "placement_source": "reconstructed_poi_name_match",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 18,
-          "poi_name": "Stillwater Crossing",
-          "match_score": 19
-        },
-        {
-          "poi_id": 17,
-          "poi_name": "Highroad Junction",
-          "match_score": 17
-        },
-        {
-          "poi_id": 121,
-          "poi_name": "Cursed Graveyard!",
-          "match_score": 16
-        },
-        {
-          "poi_id": 134,
-          "poi_name": "Spiralmint Patch",
-          "match_score": 16
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) Chosen POI id 18 by longest normalized whole-name score 19; final NPC xyz uses deterministic XZ spiral offset and is not a captured NPC transform.",
+      "position_reason": "Legacy built-content spawn coordinates copied from lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2834; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4168 (ModelId=4565, ModelFileName=human_m_wraith_gray.agr, NameId=5102447). (R) matched by the spawn's client name (talk_spawns.py) (R).",
       "source": [
         {
           "kind": "client",
@@ -9384,6 +9363,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2834; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4168 (ModelId=4565, ModelFileName=human_m_wraith_gray.agr, NameId=5102447). (R) The spawn's client NameId resolves to 'Two of Three', the row's name (talk_spawns.py)."
         }
       ],
       "field_sources": {
@@ -9661,58 +9644,54 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=18 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=18 NameId=103701 matches native name_string_id."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2834; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4168 (ModelId=4565, ModelFileName=human_m_wraith_gray.agr, NameId=5102447)."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2834; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4168 (ModelId=4565, ModelFileName=human_m_wraith_gray.agr, NameId=5102447)."
           }
         ],
         "position_w": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2834; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4168 (ModelId=4565, ModelFileName=human_m_wraith_gray.agr, NameId=5102447). Legacy spawn has XYZ only."
           }
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest id=18 position/heading (opcode 57); English label crosswalk ../lab/references/FreeRealms-Legacy/src/Resources/PointOfInterests.json Id=18 NameId=103701 matches native name_string_id."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2834; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4168 (ModelId=4565, ModelFileName=human_m_wraith_gray.agr, NameId=5102447)."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) Y-axis yaw quaternion from the spawn heading; the raw heading is retained separately."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) poi_anchor is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2834; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4168 (ModelId=4565, ModelFileName=human_m_wraith_gray.agr, NameId=5102447)."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_poi_name_match records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2834; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4168 (ModelId=4565, ModelFileName=human_m_wraith_gray.agr, NameId=5102447)."
           }
         ],
         "placement_confidence": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) Medium means one name-matched reference spawn and no competing regional row; not native-client confirmation."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2834; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4168 (ModelId=4565, ModelFileName=human_m_wraith_gray.agr, NameId=5102447). No competing regional row or spawn candidate."
           }
         ],
         "capture_match": [
@@ -9720,8 +9699,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2834; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4168 (ModelId=4565, ModelFileName=human_m_wraith_gray.agr, NameId=5102447)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2834; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4168 (ModelId=4565, ModelFileName=human_m_wraith_gray.agr, NameId=5102447)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:2834; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4168 (ModelId=4565, ModelFileName=human_m_wraith_gray.agr, NameId=5102447)."
+          }
         ]
-      }
+      },
+      "heading": -0.578828,
+      "model_id": 4565,
+      "model_file_name": "human_m_wraith_gray.agr"
     },
     {
       "npc_id": 9000000228,

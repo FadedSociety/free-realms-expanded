@@ -391,6 +391,9 @@ fn npc_visibility_loads_content_caps_the_view_and_respects_startup_exclusions() 
 #[test]
 fn zone_less_legacy_regional_npcs_spawn_in_the_open_world_and_teleport_index() {
     const ROOSEY_ID: u64 = 9_500_000_255;
+    // T698 placed two more zone-less rows (Petal Oceanmist, Starlight) from
+    // their reference spawns, so the open-world index grows from 50 to 52.
+    const ZONE_LESS: usize = 52;
     let content_dir = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
     let npc_dir = content_dir.join("npcs");
     let mut zone_less_ids = Vec::new();
@@ -411,7 +414,7 @@ fn zone_less_legacy_regional_npcs_spawn_in_the_open_world_and_teleport_index() {
             }
         }
     }
-    assert_eq!(zone_less_ids.len(), 50);
+    assert_eq!(zone_less_ids.len(), ZONE_LESS);
 
     let mut visibility = world::NpcVisibility::load(&content_dir).unwrap();
     let targets = visibility.teleport_targets(0);
@@ -420,7 +423,7 @@ fn zone_less_legacy_regional_npcs_spawn_in_the_open_world_and_teleport_index() {
             .iter()
             .filter(|id| targets.iter().any(|target| target.guid == **id))
             .count(),
-        50
+        ZONE_LESS
     );
     let roosey = targets
         .iter()

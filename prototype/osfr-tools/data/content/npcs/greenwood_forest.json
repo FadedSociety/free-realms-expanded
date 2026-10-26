@@ -5159,29 +5159,23 @@
       ],
       "services_reason": null,
       "position": [
-        -1588.508017,
-        -45.37643,
-        -547.609395
+        -1556.533,
+        -40.64807,
+        -625.8194
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        -0.1082126844707508,
+        0.17664618123057463,
         0.0,
-        0.9941277658931138
+        0.9842744163375654
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 6,
-          "poi_name": "Greenwood Forest",
-          "match_score": 0
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 6. This is not a recovered NPC transform.",
+      "position_reason": "Legacy built-content spawn coordinates copied from lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3264; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4630 (ModelId=277, ModelFileName=chatdy.adr, NameId=5102985). (R) matched by the spawn's client name (talk_spawns.py) (R).",
       "source": [
         {
           "kind": "client",
@@ -5198,6 +5192,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3264; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4630 (ModelId=277, ModelFileName=chatdy.adr, NameId=5102985). (R) The spawn's client NameId resolves to 'Chatty', the row's name (talk_spawns.py)."
         }
       ],
       "field_sources": {
@@ -5551,58 +5549,54 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 6 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3264; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4630 (ModelId=277, ModelFileName=chatdy.adr, NameId=5102985)."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3264; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4630 (ModelId=277, ModelFileName=chatdy.adr, NameId=5102985)."
           }
         ],
         "position_w": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3264; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4630 (ModelId=277, ModelFileName=chatdy.adr, NameId=5102985). Legacy spawn has XYZ only."
           }
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 6 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3264; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4630 (ModelId=277, ModelFileName=chatdy.adr, NameId=5102985)."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) Y-axis yaw quaternion from the spawn heading; the raw heading is retained separately."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3264; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4630 (ModelId=277, ModelFileName=chatdy.adr, NameId=5102985)."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3264; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4630 (ModelId=277, ModelFileName=chatdy.adr, NameId=5102985)."
           }
         ],
         "placement_confidence": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) Medium means one name-matched reference spawn and no competing regional row; not native-client confirmation."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3264; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4630 (ModelId=277, ModelFileName=chatdy.adr, NameId=5102985). No competing regional row or spawn candidate."
           }
         ],
         "capture_match": [
@@ -5610,8 +5604,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3264; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4630 (ModelId=277, ModelFileName=chatdy.adr, NameId=5102985)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3264; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4630 (ModelId=277, ModelFileName=chatdy.adr, NameId=5102985)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3264; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4630 (ModelId=277, ModelFileName=chatdy.adr, NameId=5102985)."
+          }
         ]
-      }
+      },
+      "heading": 0.355156,
+      "model_id": 277,
+      "model_file_name": "chatdy.adr"
     },
     {
       "npc_id": 9500000295,
@@ -20080,29 +20095,23 @@
       ],
       "services_reason": null,
       "position": [
-        -1584.495221,
-        -45.37643,
-        -540.379158
+        -1562.003,
+        -42.86308,
+        -452.6263
       ],
       "position_w": null,
       "rotation": [
         0.0,
-        -0.1082126844707508,
+        -0.8481519619708274,
         0.0,
-        0.9941277658931138
+        0.5297530079244819
       ],
-      "placement": "unanchored",
-      "placement_source": "reconstructed_zone_center",
-      "placement_confidence": "low",
-      "placement_candidates": [
-        {
-          "poi_id": 6,
-          "poi_name": "Greenwood Forest",
-          "match_score": 0
-        }
-      ],
+      "placement": "legacy_data",
+      "placement_source": "legacy_data_spawn",
+      "placement_confidence": "medium",
+      "placement_candidates": [],
       "capture_match": null,
-      "position_reason": "(R) No POI-name match in this NPC location text; position is offset around reconstructed zone center from POI ids 6. This is not a recovered NPC transform.",
+      "position_reason": "Legacy built-content spawn coordinates copied from lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3257; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4623 (ModelId=1027, ModelFileName=robgoblin_m_bobgoblin.adr, NameId=429024). (R) matched by the spawn's client name (talk_spawns.py) (R).",
       "source": [
         {
           "kind": "client",
@@ -20119,6 +20128,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) NPC id is a reconstructed package key; no actor id is captured for this regional row"
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3257; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4623 (ModelId=1027, ModelFileName=robgoblin_m_bobgoblin.adr, NameId=429024). (R) The spawn's client NameId resolves to 'Robbie', the row's name (talk_spawns.py)."
         }
       ],
       "field_sources": {
@@ -20472,58 +20485,54 @@
         ],
         "position": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 6 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
-          },
-          {
-            "kind": "reconstructed",
-            "evidence": "(R) NPC position is POI/zone anchor plus deterministic golden-angle XZ offset, except exact AddNpc identity matches copied without offset."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3257; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4623 (ModelId=1027, ModelFileName=robgoblin_m_bobgoblin.adr, NameId=429024)."
           }
         ],
         "position_reason": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) This explanation distinguishes native POI input from reconstructed NPC coordinates; zone defaults remain flagged unanchored."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3257; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4623 (ModelId=1027, ModelFileName=robgoblin_m_bobgoblin.adr, NameId=429024)."
           }
         ],
         "position_w": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Null because no captured NPC float4 W component was joined."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3257; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4623 (ModelId=1027, ModelFileName=robgoblin_m_bobgoblin.adr, NameId=429024). Legacy spawn has XYZ only."
           }
         ],
         "rotation": [
           {
-            "kind": "client",
-            "evidence": "../lab/content/startup-snapshot/startup.json world.points_of_interest rows 6 provide the native coordinates used for a reconstructed zone center/centroid; their POI headings are not NPC transforms."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3257; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4623 (ModelId=1027, ModelFileName=robgoblin_m_bobgoblin.adr, NameId=429024)."
           },
           {
             "kind": "reconstructed",
-            "evidence": "(R) POI heading converted to a Y-axis yaw quaternion; center uses the lowest-id POI heading, default uses identity; exact captures retain native quaternion."
+            "evidence": "(R) Y-axis yaw quaternion from the spawn heading; the raw heading is retained separately."
           }
         ],
         "placement": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) unanchored is a reconstructed placement classification; only matching AddNpc identity is exact."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3257; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4623 (ModelId=1027, ModelFileName=robgoblin_m_bobgoblin.adr, NameId=429024)."
           }
         ],
         "placement_source": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) reconstructed_zone_center records placement method and provenance, not a recovered NPC transform."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3257; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4623 (ModelId=1027, ModelFileName=robgoblin_m_bobgoblin.adr, NameId=429024)."
           }
         ],
         "placement_confidence": [
           {
             "kind": "reconstructed",
-            "evidence": "(R) low measures anchor name-resolution confidence; NPC XYZ remains reconstructed."
+            "evidence": "(R) Medium means one name-matched reference spawn and no competing regional row; not native-client confirmation."
           }
         ],
         "placement_candidates": [
           {
-            "kind": "reconstructed",
-            "evidence": "(R) Candidates are whole-name POI text matches sorted by normalized label length descending then POI id ascending; zone-center POI inputs are listed with score zero."
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3257; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4623 (ModelId=1027, ModelFileName=robgoblin_m_bobgoblin.adr, NameId=429024). No competing regional row or spawn candidate."
           }
         ],
         "capture_match": [
@@ -20531,8 +20540,29 @@
             "kind": "reconstructed",
             "evidence": "(R) Null means no regional name-string or model-id identity matched any of the 23 startup AddNpc rows; regional rows currently have no model_id."
           }
+        ],
+        "heading": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3257; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4623 (ModelId=1027, ModelFileName=robgoblin_m_bobgoblin.adr, NameId=429024)."
+          }
+        ],
+        "model_id": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3257; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4623 (ModelId=1027, ModelFileName=robgoblin_m_bobgoblin.adr, NameId=429024)."
+          }
+        ],
+        "model_file_name": [
+          {
+            "kind": "legacy-data",
+            "evidence": "lab/references/FreeRealms-Legacy/src/Scripts/Zone/FabledRealms.lua:3257; lab/references/FreeRealms-Legacy/src/Resources/Npcs.json Id=4623 (ModelId=1027, ModelFileName=robgoblin_m_bobgoblin.adr, NameId=429024)."
+          }
         ]
-      }
+      },
+      "heading": -2.024974,
+      "model_id": 1027,
+      "model_file_name": "robgoblin_m_bobgoblin.adr"
     },
     {
       "npc_id": 9500000319,

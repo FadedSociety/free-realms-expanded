@@ -120,15 +120,30 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
                     "{owner}: position lacks Legacy provenance"
                 );
                 let model_file = row["model_file_name"].as_str().unwrap();
+                // T698: three reference-spawn models ship only in the client
+                // Assets_manifest.txt (Robbie's robgoblin, Rumble King Don and
+                // General Wugashima), not the extracted catalog.tsv. Accept
+                // either shipped list, as the extras branch below already does.
                 assert!(
-                    catalog_names.contains(&model_file.to_ascii_lowercase()),
-                    "{owner}: model file {model_file:?} is absent from catalog.tsv"
+                    shipped_names.contains(&model_file.to_ascii_lowercase()),
+                    "{owner}: model file {model_file:?} is absent from catalog.tsv and Assets_manifest.txt"
                 );
-                let name_id = row["name_string_id"].as_u64().unwrap();
-                assert!(
-                    locale_ids.contains(&name_id),
-                    "{owner}: locale id {name_id} is absent"
-                );
+                // T698: a row placed from a reference spawn may keep only the
+                // guide's hashed regional name ids (name_string_ids); its
+                // name_string_id is null then, so the client renders no
+                // nameplate. A present id must still resolve.
+                match row["name_string_id"].as_u64() {
+                    Some(name_id) => assert!(
+                        locale_ids.contains(&name_id),
+                        "{owner}: locale id {name_id} is absent"
+                    ),
+                    None => assert!(
+                        row["position_reason"]
+                            .as_str()
+                            .is_some_and(|reason| reason.contains("talk_spawns.py")),
+                        "{owner}: null name_string_id is allowed only on T698 reference-spawn rows"
+                    ),
+                }
                 assert!(
                     row["heading"].as_f64().is_some_and(f64::is_finite),
                     "{owner}"
