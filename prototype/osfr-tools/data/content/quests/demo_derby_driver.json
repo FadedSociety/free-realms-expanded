@@ -537,10 +537,50 @@
     {
       "id": 3060011,
       "title_string_id": 403454,
-      "giver_npc_id": 9000000065,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "giver_npc_id": 9000000289,
+      "job": 49,
+      "prerequisite_quest_ids": [
+        3060005
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000146,
+          "text_string_id": 394022,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 394022 'Pay a visit to Crash's sponsor in Lakeshore to help secure funding for a new car.' (quest-lines/quests.json q3060011 objective; wiring/round3/thunder-falls.json q3060011). Progress line 394288 'Have you spoken to Merri De'Flor yet?' makes the goal a conversation with her."
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "Merri De'Flor (9000000146) is drawn at Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3760 spawnNpcWithGuid(33538) through data/content/npc_spawns_extra.json spawn_guid 9000000146 (content_key 9000000146, name id 19671), so the Talk target is a spawned server actor (T697)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T727: objective id 1 and the Talk event binding are local authored keys. The guide's retail goal id 2464380195 differs from the client id 394022 (dialogs.json open note); the client id is used. The retail quest also had a restaurant 'serve customers' leg (locale 3900869778, 472161072) that the server has no mechanic for; this quest ends at the visit."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "49": 10
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T727: quest-lines/quests.json q3060011 cites no reward (the only reward-like text, 402847, is a news line with no coin, XP or item amount). The one-goal siblings 3060004 and 3060024 pay 5 coins and 10 Demo Derby Driver (profile 49) job XP on the T202 first-step rung, so this one-goal quest pays the same."
+            }
+          ]
+        }
+      ],
+      "description_string_id": 394022,
+      "intro_text_string_id": 393379,
       "source": [
         {
           "kind": "client",
@@ -556,7 +596,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T727: the one objective is the guide's sponsor visit (client 394022); the numeric Talk target is a local authored key."
         },
         {
           "kind": "reconstructed",
@@ -568,10 +608,22 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T727: reward 5 coins / 10 profile-49 job XP, see the reward row."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 403454 'Demo Derby: So Long, Betty!' (title), 393379 (offer, intro_text_string_id: Crash's first-person plea) and 394022 (objective, also description_string_id as 3060024 does); quest-lines/quests.json q3060011 and quest-lines/dialogs.json q3060011 (final): live 'unsure'. No complete line is attested (402847 is a news line), so end_text_string_id stays unset."
+        },
+        {
+          "kind": "legacy-data",
+          "evidence": "Giver: the old giver id 9000000065 is only in npcs_unresolved.json; the drawn Crash Davis row is 9000000289 (npcs/wilds.json, legacy_data, name 100234 'Crash Davis' via name_string_id 419307, references 9000000064/289/292), the giver of the sibling derby records 3060005 and 3060012. The row now lists this quest."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T727: prerequisite 3060005 (License to Drive) is the nearest enabled earlier step of the guide's Series 1 order (Demolition Derby Driver.md row 8 follows rows 2-7, 'after Spare Parts or Dealing Damage (inferred)'), and keeps Crash from offering this before the license test. The skipped steps 3060006-3060010 are disabled stubs, so they cannot be prerequisites. Derby Driver (49) offer gate follows the enabled siblings."
         }
       ],
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3060012,
@@ -616,9 +668,48 @@
       "id": 3060013,
       "title_string_id": 403448,
       "giver_npc_id": 9000000289,
-      "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "job": 49,
+      "prerequisite_quest_ids": [
+        3060011
+      ],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000495,
+          "text_string_id": 394016,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 394016 'See what the hold up is with Tucker Thunderjolt outside of Thunder Falls.' (quest-lines/quests.json q3060013 objective; wiring/round3/thunder-falls.json q3060013); name 19365 'Tucker Thunderjolt'."
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "data/content/npcs/wilds.json Tucker Thunderjolt (9000000495) is placement=legacy_data (T698: FreeRealms-Legacy@9e08202 src/Scripts/Zone/FabledRealms.lua:1836, Npcs.json Id=3093, name 19365), so the Talk target is a spawned server actor."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T727: objective id 1 and the Talk event binding are local authored keys. The retail quest continued with 'Find kart parts along the path behind Tucker' (6 pickups) and a return to Tucker (guide row 10); the fixed spec (round3/thunder-falls.json) lists only the talk step, the parts leg has no recovered client id, so this quest ends at the first conversation."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "49": 10
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T727: quest-lines/quests.json q3060013 cites no reward (402845 is a completion line with no coin, XP or item amount). The one-goal siblings 3060004 and 3060024 pay 5 coins and 10 Demo Derby Driver (profile 49) job XP on the T202 first-step rung, so this one-goal quest pays the same."
+            }
+          ]
+        }
+      ],
+      "description_string_id": 394016,
       "source": [
         {
           "kind": "client",
@@ -638,7 +729,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T727: the one objective is the guide's first step, the Talk to Tucker (client 394016); the numeric Talk target is a local authored key."
         },
         {
           "kind": "reconstructed",
@@ -650,10 +741,18 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T727: reward 5 coins / 10 profile-49 job XP, see the reward row."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 403448 'Demo Derby: Tucker's Troubles' (title) and 394016 (objective, also description_string_id as 3060024 does); quest-lines/quests.json q3060013 (final, confidence 0.35, live 'unsure') and quest-lines/dialogs.json q3060013: offer null, progress null, complete 402845 (a journal-style completion line, not NPC speech). The offer candidates 393373 and 393333 are not hint-tied to this quest, so intro_text_string_id and end_text_string_id stay unset."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T727: prerequisite 3060011 (So Long, Betty!), the nearest enabled earlier row of the guide's order (row 10 follows rows 8 and 9; row 9, Crash for Coin, is a disabled stub); the guide says only 'early in this series' and the answer's previous link is unsupported. Without it Crash would offer this beside Betty, and before the license test. Derby Driver (49) offer gate follows the enabled siblings."
         }
       ],
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3060014,

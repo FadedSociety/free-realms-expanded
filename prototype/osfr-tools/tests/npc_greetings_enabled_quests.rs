@@ -320,6 +320,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Manager Landon (T409): his client lines are third person (402947, 402841, 416471, 402687); the first-person substitute plea 418984 is the Snowy Scrimmage offer intro, whose speaker the Soccer Star guide leaves unnamed (1591815111), so no uncontested greeting of his own is recovered.",
     ),
     (
+        9000000146,
+        "Merri De'Flor (T727 talk target of 3060011): NPCs - Lakeshore.md:27 quotes only third-person lines about her (1113274275, 1119011320, 9582519, 446677410) and the restaurant minigame prompts; the sponsor lines 393379 and 394288 are Crash Davis's, not hers, so no first-person line of her own is recovered.",
+    ),
+    (
         9000000173,
         "Postmaster Lane: the split Trail of Mail intro 141828 is quoted by the Postman guide under Enve LeStamp's earlier Sasparilla row, so the speaker is contested; no uncontested first-person line exists.",
     ),
@@ -330,6 +334,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
     (
         9000000227,
         "Valerie: only third-person tutorial and objective text; the untied Welcome window 3453817544 is not attributed to her, so no first-person line is recovered.",
+    ),
+    (
+        9000000495,
+        "Tucker Thunderjolt (T727 talk target of 3060013): NPCs - Wilds.md:184 gives only a role ('Crash Davis's teammate'), the location 'Outside of Thunder Falls' (1929354201, 2909963659) and the sponsor referral 880667942; 394016 is the quest objective and 402845 the journal-style completion line, and no first-person line of his own is recovered.",
     ),
     (
         9500000209,
