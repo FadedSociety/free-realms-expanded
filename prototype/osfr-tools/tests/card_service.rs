@@ -1,7 +1,9 @@
-//! T763: the TCG service wire against byte fixtures built in the DLL writers' field order
-//! (lab/content/tcg/analysis/lead-login-decode-2026-10-26.md), not from this crate's encoder.
+//! T763/T764: the TCG service wire against byte fixtures built in the DLL writers' field order
+//! (lab/content/tcg/analysis/lead-login-decode-2026-10-26.md), not from this crate's encoder,
+//! and the one-time launch tickets the session login is checked against.
 use osfr_tools::card_service::{
-    self, ConnectionServer, MAX_FRAME, Reader, SessionLogin, client_frame, put_int, reply,
+    self, ConnectionServer, LaunchTickets, MAX_FRAME, Reader, SessionLogin, client_frame, put_int,
+    reply,
 };
 
 fn int(value: i32) -> Vec<u8> {
@@ -10,10 +12,17 @@ fn int(value: i32) -> Vec<u8> {
     out
 }
 
-/// A client string as `10097b40` writes it: length, text, NUL (the length byte is literal).
+/// A client string as `10097b40` writes it: length, text, NUL. The compact length is spelled
+/// out by hand: one byte below 16, else `0x20 | low nibble` and the rest.
 fn text(value: &str) -> Vec<u8> {
-    assert!(value.len() < 16, "fixture strings use a one-byte length");
-    [vec![value.len() as u8], value.as_bytes().to_vec(), vec![0]].concat()
+    let length = value.len();
+    assert!(length < 256, "fixture strings stay short");
+    let prefix = if length < 16 {
+        vec![length as u8]
+    } else {
+        vec![0x20 | (length & 0xF) as u8, (length >> 4) as u8]
+    };
+    [prefix, value.as_bytes().to_vec(), vec![0]].concat()
 }
 
 /// Three class levels of `[id, version]` as the client writes them (`1019de90`).
@@ -33,22 +42,23 @@ fn gateway_request() -> Vec<u8> {
     .concat()
 }
 
-/// The client's 411 at version 8 (`103c9140` -> `1017b700`).
-fn session_login(session: &str) -> Vec<u8> {
+/// The client's 411 at version 8 (`103c9140` -> `1017b700`), fields in the writer's order with
+/// the names from `1017b4b0`.
+fn session_login(character_id: &str, ticket: &str) -> Vec<u8> {
     [
         headers(&[0x2B, 0x19], 8),
-        text(session),
+        text("w-session"), // SessionID (the game's --sessionID)
         // {1: 1314, 2: 7, 4: 9}: count 3, then key/value pairs.
         vec![0x03, 0x01, 0x22, 0x52, 0x02, 0x07, 0x04, 0x09],
-        text("x"),
-        text(""),
-        vec![0x00],
-        text("winXP"),
-        text("en_US"),
-        text("FR"),
-        text("Standalone"),
-        text(""),
-        text("STATION"),
+        text("winXP"),  // Platform
+        text(""),       // Match Challenge Key
+        vec![0x01],     // Is Parent Session ID (the exe passes --host=fr)
+        text("FR"),     // Login Client
+        text("en_US"),  // Locale
+        text("Tester"), // CharacterName
+        text(character_id),
+        text(ticket),
+        text("STATION"), // Login Namespace
     ]
     .concat()
 }
@@ -160,29 +170,104 @@ fn read_results(body: &[u8]) -> (bool, i32, i32, String) {
     (success, code, account, session)
 }
 
+const CHARACTER: u64 = 123_456_789;
+const TTL_MS: u64 = 120_000;
+
+/// The login, its ticket checked against the store, answered the way a listener would.
+fn login_with(tickets: &mut LaunchTickets, character_id: &str, ticket: &str, now: u64) -> Vec<u8> {
+    let body = session_login(character_id, ticket);
+    let check = |login: &SessionLogin| {
+        tickets
+            .redeem(&login.ticket, &login.character_id, now)
+            .map(|_| 42)
+    };
+    reply(&body, "127.0.0.1", 17782, check).unwrap().unwrap()
+}
+
 #[test]
-fn a_routed_session_login_is_accepted_only_for_a_known_session() {
-    let body = session_login("w-ticket");
+fn a_routed_session_login_names_every_field() {
+    let body = session_login("123456789", "987654321");
     let bytes = frame(Some([1_000_000_000, 0, 0]), &body);
     let (used, parsed) = client_frame(&bytes).unwrap().unwrap();
     assert_eq!(used, bytes.len());
     assert_eq!(parsed.routing, Some([1_000_000_000, 0, 0]));
-    let login = SessionLogin::decode(parsed.body).unwrap();
-    assert_eq!(login.session_id, "w-ticket");
-    assert_eq!(login.data_versions, vec![(1, 1314), (2, 7), (4, 9)]);
-    assert_eq!(login.strings.last().map(String::as_str), Some("STATION"));
-    assert_eq!(login.strings.len(), 8);
+    assert_eq!(
+        SessionLogin::decode(parsed.body).unwrap(),
+        SessionLogin {
+            session_id: "w-session".into(),
+            data_versions: vec![(1, 1314), (2, 7), (4, 9)],
+            platform: "winXP".into(),
+            match_challenge_key: String::new(),
+            is_parent_session: true,
+            login_client: "FR".into(),
+            locale: "en_US".into(),
+            character_name: "Tester".into(),
+            character_id: "123456789".into(),
+            ticket: "987654321".into(),
+            namespace: "STATION".into(),
+        }
+    );
+}
 
-    let accept = |session: &str| (session == "w-ticket").then_some(42);
-    let answer = reply(parsed.body, "127.0.0.1", 17782, accept)
-        .unwrap()
-        .unwrap();
-    assert_eq!(read_results(&answer[4..]), (true, 0, 42, "w-ticket".into()));
+#[test]
+fn a_launch_ticket_logs_its_own_character_in_once() {
+    let mut tickets = LaunchTickets::new(TTL_MS);
+    let ticket = tickets.mint(CHARACTER, 1_000).unwrap();
+    assert_ne!(ticket, 0);
+    let character = CHARACTER.to_string();
+    let answer = login_with(&mut tickets, &character, &ticket.to_string(), 2_000);
+    assert_eq!(
+        read_results(&answer[4..]),
+        (true, 0, 42, "w-session".into())
+    );
+    // Single use: the same ticket again is refused.
+    let again = login_with(&mut tickets, &character, &ticket.to_string(), 3_000);
+    assert_eq!(read_results(&again[4..]), (false, 1, 0, String::new()));
+    assert_eq!(tickets.outstanding(), 0);
+}
 
-    let refused = reply(&session_login("someone-else"), "127.0.0.1", 17782, accept)
-        .unwrap()
-        .unwrap();
-    assert_eq!(read_results(&refused[4..]), (false, 1, 0, String::new()));
+#[test]
+fn a_wrong_character_expired_replaced_or_malformed_ticket_is_refused() {
+    let mut tickets = LaunchTickets::new(TTL_MS);
+    let character = CHARACTER.to_string();
+
+    // Another character's id spends the ticket: the right character cannot use it after.
+    let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
+    assert_eq!(tickets.redeem(&ticket, "5", 1), None);
+    assert_eq!(tickets.redeem(&ticket, &character, 2), None);
+
+    // Expired.
+    let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
+    assert_eq!(tickets.redeem(&ticket, &character, TTL_MS), None);
+
+    // A second launch replaces the first ticket.
+    let first = tickets.mint(CHARACTER, 0).unwrap().to_string();
+    let second = tickets.mint(CHARACTER, 1).unwrap().to_string();
+    assert_eq!(tickets.outstanding(), 1);
+    assert_eq!(tickets.redeem(&first, &character, 2), None);
+    assert_eq!(tickets.redeem(&second, &character, 3), Some(CHARACTER));
+
+    // Malformed decimals never match, and do not spend a real ticket.
+    let ticket = tickets.mint(CHARACTER, 0).unwrap();
+    for bad in [
+        String::new(),
+        format!("+{ticket}"),
+        format!(" {ticket}"),
+        format!("{ticket}x"),
+        "18446744073709551616".into(),
+    ] {
+        assert_eq!(tickets.redeem(&bad, &character, 1), None, "{bad:?}");
+    }
+    assert_eq!(
+        tickets.redeem(&ticket.to_string(), &character, 2),
+        Some(CHARACTER)
+    );
+
+    // Expired tickets are dropped when a new one is minted.
+    tickets.mint(1, 0).unwrap();
+    tickets.mint(2, 0).unwrap();
+    tickets.mint(3, TTL_MS + 1).unwrap();
+    assert_eq!(tickets.outstanding(), 1);
 }
 
 #[test]
@@ -201,10 +286,10 @@ fn partial_oversized_unknown_and_malformed_frames() {
     let lobby = headers(&[0x2C, 0x05], 1);
     assert_eq!(reply(&lobby, "h", 1, |_| None).unwrap(), None);
     // A 411 with the wrong class id at a later level, or trailing bytes, is refused.
-    let mut mixed = session_login("w-ticket");
+    let mut mixed = session_login("1", "2");
     mixed[3] = 0x2E;
     assert!(SessionLogin::decode(&mixed).is_err());
-    let mut trailing = session_login("w-ticket");
+    let mut trailing = session_login("1", "2");
     trailing.push(0);
     assert!(SessionLogin::decode(&trailing).is_err());
 }

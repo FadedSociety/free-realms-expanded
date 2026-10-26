@@ -3,7 +3,7 @@
 //! codec, the per-level class header, client frames, the gateway (414) and the session login
 //! (411 -> 81). Pure: the TCP listener and the one-time ticket check live with their callers.
 
-use std::io;
+use std::{collections::BTreeMap, io};
 
 /// `GatewayCommand_GetConnectionServer`: request and reply share the layout.
 pub const GET_CONNECTION_SERVER: i32 = 414;
@@ -228,17 +228,24 @@ impl ConnectionServer {
     }
 }
 
-/// 411 `LoginCommand_SendSessionID` (writer `1017b700`, reader `1017b950`). The first string is
-/// the launcher's `--sessionID` (the session dialog's `+0x68`, `103c9140`); the client's local
-/// data versions follow ({1: 1314, 2: archetypes, 4: rules}), then platform strings.
+/// 411 `LoginCommand_SendSessionID` (writer `1017b700`, reader `1017b950`); field names from its
+/// describe method `1017b4b0`. `session_id` is the game's own session ticket (`--sessionID`,
+/// exe `00ad47f0`); `ticket` is the 64-bit launch ticket the server sent in 39/0x28
+/// (`--ticket=%llu`), and `character_id` the character guid, both as decimal text.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct SessionLogin {
     pub session_id: String,
+    /// The client's local data versions ({1: 1314, 2: archetypes, 4: rules}).
     pub data_versions: Vec<(i32, i32)>,
-    /// Every later string in reader order (`+44`, `+72`, `+104` OS, `+132` locale, ...,
-    /// `+244` namespace), as far as the version carries them.
-    pub strings: Vec<String>,
-    pub host_flag: bool,
+    pub platform: String,
+    pub match_challenge_key: String,
+    pub is_parent_session: bool,
+    pub login_client: String,
+    pub locale: String,
+    pub character_name: String,
+    pub character_id: String,
+    pub ticket: String,
+    pub namespace: String,
 }
 
 impl SessionLogin {
@@ -258,30 +265,30 @@ impl SessionLogin {
             for _ in 0..count {
                 login.data_versions.push((reader.int()?, reader.int()?));
             }
-            login.strings.push(reader.string()?);
+            login.platform = reader.string()?;
         }
         if version > 2 {
-            login.strings.push(reader.string()?);
+            login.match_challenge_key = reader.string()?;
         }
         if version > 3 {
-            login.host_flag = reader.int()? != 0;
+            login.is_parent_session = reader.int()? != 0;
         }
         if version > 4 {
-            login.strings.push(reader.string()?);
-            login.strings.push(reader.string()?);
+            login.login_client = reader.string()?;
+            login.locale = reader.string()?;
         }
         if version > 5 {
-            login.strings.push(reader.string()?);
+            login.character_name = reader.string()?;
             if version == 6 {
                 reader.int()?;
             }
         }
         if version > 6 {
-            login.strings.push(reader.string()?);
-            login.strings.push(reader.string()?);
+            login.character_id = reader.string()?;
+            login.ticket = reader.string()?;
         }
         if version > 7 {
-            login.strings.push(reader.string()?);
+            login.namespace = reader.string()?;
         }
         if !reader.finished() {
             return Err(invalid("card login command has trailing bytes"));
@@ -305,14 +312,72 @@ pub fn login_results(success: bool, code: i32, account_id: i32, session_id: &str
     body
 }
 
+/// T764: one-time card launch tickets (lead security). The game server mints one per launch and
+/// sends it in 39/0x28; the card login (411) must present it with the same character id before
+/// it expires, and it works once.
+#[derive(Debug)]
+pub struct LaunchTickets {
+    ttl_ms: u64,
+    /// ticket -> (character guid, expiry ms); at most one outstanding ticket per character.
+    issued: BTreeMap<u64, (u64, u64)>,
+}
+
+impl LaunchTickets {
+    pub fn new(ttl_ms: u64) -> Self {
+        Self {
+            ttl_ms,
+            issued: BTreeMap::new(),
+        }
+    }
+
+    /// A fresh non-zero random ticket for `character`. It replaces any the character still
+    /// holds, and expired tickets are dropped, so the table stays bounded by live launches.
+    pub fn mint(&mut self, character: u64, now_ms: u64) -> io::Result<u64> {
+        self.issued
+            .retain(|_, (owner, expires)| *expires > now_ms && *owner != character);
+        loop {
+            let mut bytes = [0; 8];
+            getrandom::getrandom(&mut bytes)
+                .map_err(|_| invalid("no OS randomness for a card launch ticket"))?;
+            let ticket = u64::from_le_bytes(bytes);
+            if ticket != 0 && !self.issued.contains_key(&ticket) {
+                let expires = now_ms.saturating_add(self.ttl_ms);
+                self.issued.insert(ticket, (character, expires));
+                return Ok(ticket);
+            }
+        }
+    }
+
+    /// Redeem the ticket and character id a 411 carries (decimal text, the client's `%llu`):
+    /// the character when the ticket was issued to it and has not expired. A presented ticket
+    /// is spent whether or not it matched, so one guess never gets a second try.
+    pub fn redeem(&mut self, ticket: &str, character: &str, now_ms: u64) -> Option<u64> {
+        let ticket = decimal(ticket)?;
+        let (owner, expires) = self.issued.remove(&ticket)?;
+        (now_ms < expires && decimal(character) == Some(owner)).then_some(owner)
+    }
+
+    pub fn outstanding(&self) -> usize {
+        self.issued.len()
+    }
+}
+
+/// A strict unsigned decimal: digits only, no sign, spaces or overflow.
+fn decimal(text: &str) -> Option<u64> {
+    if text.is_empty() || text.len() > 20 || !text.bytes().all(|b| b.is_ascii_digit()) {
+        return None;
+    }
+    text.parse().ok()
+}
+
 /// The login stub: answer one client body. A 414 is sent to `host:port` (this service); a 411
-/// is accepted when `account_for` maps its session id to an account (the caller's one-time
-/// ticket check). Anything else is not handled yet (`None`). Replies are server frames.
+/// is accepted when `account_for` maps the login (its launch ticket and character id) to an
+/// account. Anything else is not handled yet (`None`). Replies are server frames.
 pub fn reply(
     body: &[u8],
     host: &str,
     port: u16,
-    account_for: impl FnOnce(&str) -> Option<i32>,
+    account_for: impl FnOnce(&SessionLogin) -> Option<i32>,
 ) -> io::Result<Option<Vec<u8>>> {
     match class_id(body)? {
         GET_CONNECTION_SERVER => {
@@ -328,7 +393,7 @@ pub fn reply(
         }
         SEND_SESSION_ID => {
             let login = SessionLogin::decode(body)?;
-            let body = match account_for(&login.session_id) {
+            let body = match account_for(&login) {
                 Some(account) => login_results(true, 0, account, &login.session_id),
                 // (R) The failure code's text is not recovered; 1 is "refused".
                 None => login_results(false, 1, 0, ""),
