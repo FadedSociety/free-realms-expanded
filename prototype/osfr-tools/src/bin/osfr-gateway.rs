@@ -788,10 +788,8 @@ impl SharedWorld {
                 if !added {
                     return Some(vec![pet_removal_packet(pet.actor_guid)]);
                 }
-                let mut view = pet.clone();
-                let player = self.players.get(*self.active_sessions.get(&guid)?)?;
-                view.position = player.position;
-                view.spawn_packet().map(|packet| vec![packet])
+                // T455: the pet's own (followed) position, not its owner's.
+                pet.spawn_packet().map(|packet| vec![packet])
             });
             out.push(delivery);
             out.extend(extra.into_iter().flatten().map(|packet| Delivery {

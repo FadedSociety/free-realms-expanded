@@ -42525,5 +42525,23 @@
       "members_only": false,
       "src": "ClientItemDefinitions.json Id=78070"
     }
-  ]
+  ],
+  "follow": {
+    "side_m": 2.0,
+    "behind_m": 2.0,
+    "min_speed": 2.0,
+    "max_speed": 12.0,
+    "catch_up_start_m": 10.0,
+    "catch_up_gain": 0.5,
+    "max_speed_multiplier": 2.0,
+    "settle_delay_ms": 750,
+    "settle_radius_m": 2.3,
+    "settle_min_deg": 30.0,
+    "settle_max_deg": 70.0,
+    "warp_owner_jump_m": 30.0,
+    "warp_far_m": 100.0,
+    "warp_far_ms": 5000,
+    "warp_climb_m": 6.0,
+    "send_ms": 500
+  }
 }

@@ -45,6 +45,9 @@ pub struct PetContent {
     /// T454: every pet item (`ClientItemDefinitions` type 2) whose model resolves to a `models` row.
     #[serde(default)]
     items: Vec<PetItem>,
+    /// T455: how a summoned pet follows its owner; all (R) defaults.
+    #[serde(default)]
+    follow: Option<crate::pet_follow::FollowConfig>,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -455,6 +458,9 @@ impl PetContent {
                 return Err(invalid("invalid pet trick content"));
             }
         }
+        if self.follow.as_ref().is_some_and(|follow| !follow.valid()) {
+            return Err(invalid("invalid pet follow content"));
+        }
         let mut model_ids = BTreeSet::new();
         for model in &self.models {
             if model.model_id <= 0
@@ -766,6 +772,8 @@ struct ActivePet {
     position: [f32; 3],
     follow_target: Option<[f32; 3]>,
     in_water: bool,
+    /// T455: session-only follow pose; never saved, never part of the roster.
+    pose: crate::pet_follow::PetPose,
 }
 
 #[derive(Clone)]
@@ -1047,13 +1055,20 @@ impl PetService {
                 actor_guid: active.actor_guid,
             });
         }
+        // T455: the pet appears beside its owner, not inside it (the first follow step snaps it
+        // to the ground). Content without a follow block keeps the owner's position.
+        let pose = self.content.follow.as_ref().map_or_else(
+            || crate::pet_follow::spawn_at(owner_position),
+            |follow| crate::pet_follow::spawn(follow, owner_position),
+        );
         self.active = Some(ActivePet {
             pet_id,
             owner_guid,
             actor_guid,
-            position: owner_position,
+            position: pose.position,
             follow_target: None,
             in_water: false,
+            pose,
         });
         let model_id = self.content.model_id(&model);
         broadcasts.push(PetPresenceEvent::Spawn(PetPresence {
@@ -1292,9 +1307,23 @@ impl PetService {
                 PetPresenceEvent::Despawn { actor_guid, .. } => {
                     wire.shared.push(pet_removal_packet(actor_guid));
                 }
-                // Pet locomotion has no recovered actor-move packet; the owner still receives
-                // the client-shaped location acknowledgement from `follow_location`.
-                PetPresenceEvent::Follow { .. } => {}
+                // T455: a follow click moves the pet to the spot with the enemy 125 writer (R).
+                PetPresenceEvent::Follow { actor_guid, target } => {
+                    let heading = self.active.map_or([0.0, 0.0, 1.0], |active| {
+                        let d = [
+                            target[0] - active.position[0],
+                            target[2] - active.position[2],
+                        ];
+                        let n = (d[0] * d[0] + d[1] * d[1]).sqrt();
+                        if n > 1e-4 {
+                            [d[0] / n, 0.0, d[1] / n]
+                        } else {
+                            [0.0, 0.0, 1.0]
+                        }
+                    });
+                    wire.shared
+                        .push(crate::enemies::movement_packet(actor_guid, target, heading));
+                }
             }
         }
         // Actor removal and creation must precede activation: the client's
@@ -1302,6 +1331,40 @@ impl PetService {
         // skips binding when the proxied actor does not exist yet.
         wire.private = wire.shared.clone();
         wire.private.push(transition.owner_message);
+        wire
+    }
+
+    /// T455: move the summoned pet after its owner (an accepted owner update or a world tick).
+    /// The 125 frames go to the owner (`private`) and to viewers (`shared`). Never marks a save.
+    pub fn follow_owner(
+        &mut self,
+        owner_guid: u64,
+        owner_position: [f32; 3],
+        ground: impl Fn(f32, f32) -> Option<f32>,
+        now_ms: u64,
+    ) -> PetWire {
+        let mut wire = PetWire::default();
+        let (Some(follow), Some(active)) = (self.content.follow.as_ref(), self.active.as_mut())
+        else {
+            return wire;
+        };
+        if active.owner_guid != owner_guid {
+            return wire;
+        }
+        let owner = crate::pet_follow::OwnerPose {
+            position: owner_position,
+            at_ms: now_ms,
+        };
+        let (pose, step) =
+            crate::pet_follow::step(follow, owner, active.pose, ground, self.ui_mode != 0);
+        active.pose = pose;
+        active.position = pose.position;
+        if let Some(step) = step {
+            let packet =
+                crate::enemies::movement_packet(active.actor_guid, step.position, step.heading);
+            wire.private.push(packet.clone());
+            wire.shared.push(packet);
+        }
         wire
     }
 

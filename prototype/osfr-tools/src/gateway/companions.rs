@@ -24,6 +24,21 @@ impl Gateway {
         self.gameplay.as_ref()?.pet_view(self.state.guid)
     }
 
+    /// T455: the summoned pet's follow step on the world tick, on the live gameplay (no clone).
+    pub(super) fn pet_tick(&mut self, now_ms: u64) -> GatewayOutcome {
+        let mut outcome = GatewayOutcome::default();
+        let state = &self.state;
+        if let Some(result) = self
+            .gameplay
+            .as_mut()
+            .and_then(|g| g.pet_tick(state, now_ms))
+        {
+            outcome.replies = result.replies.iter().map(|r| wrapped(r)).collect();
+            outcome.nearby = result.nearby;
+        }
+        outcome
+    }
+
     /// W177 (R): a zone transition dismisses the active pet and removes its actor.
     pub fn settle_pets(&mut self, zoned: bool, now_ms: u64) -> io::Result<GatewayOutcome> {
         let mut outcome = GatewayOutcome::default();

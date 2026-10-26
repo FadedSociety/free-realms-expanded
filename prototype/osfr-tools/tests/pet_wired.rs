@@ -271,3 +271,81 @@ fn the_gateway_exposes_the_saved_pet_roster_and_clears_the_actor_on_zoning() {
     );
     assert!(gateway.pet_view().is_none());
 }
+
+/// T455: frames for the pet's own actor (opcode 125).
+fn pet_moves(packets: &[Vec<u8>], actor: u64) -> usize {
+    packets
+        .iter()
+        .filter(|packet| packet.starts_with(&[125, 0]) && packet[2..10] == actor.to_le_bytes())
+        .count()
+}
+
+#[test]
+fn a_walking_owner_moves_the_summoned_pet_for_viewers_without_a_save() {
+    let save = Save::new();
+    let mut game = game(&save.path);
+    let actor = PetService::pet_guid(who().guid);
+    game.handle_in_world(&summon(1), &who(), NOW).unwrap();
+    let mut owner = who();
+    let (mut to_viewers, mut to_owner) = (0, 0);
+    for step in 1..=20u64 {
+        owner.position[2] += 0.5;
+        let out = game.on_location(&owner, NOW + step * 100).unwrap();
+        assert!(!out.changed, "following never marks a save");
+        to_viewers += pet_moves(&out.nearby, actor);
+        to_owner += pet_moves(&out.replies, actor);
+    }
+    assert!(
+        to_viewers > 0 && to_viewers == to_owner,
+        "{to_viewers} / {to_owner}"
+    );
+    // The world tick settles the pet beside a still owner: one stop frame, no save.
+    let mut settled = 0;
+    for step in 21..=60u64 {
+        let out = game
+            .pet_tick(&owner, NOW + step * 100)
+            .expect("a pet is out");
+        assert!(!out.changed);
+        settled += pet_moves(&out.nearby, actor);
+    }
+    // Walk and stop frames share the wire layout; the pure test pins exactly one stop frame.
+    assert!(
+        (1..=4).contains(&settled),
+        "{settled} frames while settling"
+    );
+    for step in 61..=80u64 {
+        let out = game.pet_tick(&owner, NOW + step * 100).unwrap();
+        assert_eq!(
+            pet_moves(&out.nearby, actor),
+            0,
+            "a settled pet stays quiet"
+        );
+    }
+    // A late viewer is shown the pet where it stands, not on its owner.
+    let view = game.pet_view(who().guid).unwrap();
+    let gap = ((view.position[0] - owner.position[0]).powi(2)
+        + (view.position[2] - owner.position[2]).powi(2))
+    .sqrt();
+    assert!(
+        (1.0..=3.0).contains(&gap),
+        "pet {:?} owner {:?}",
+        view.position,
+        owner.position
+    );
+}
+
+#[test]
+fn no_pet_means_no_tick_and_a_dismissed_pet_sends_no_moves() {
+    let save = Save::new();
+    let mut game = game(&save.path);
+    assert!(game.pet_tick(&who(), NOW).is_none());
+    let actor = PetService::pet_guid(who().guid);
+    game.handle_in_world(&summon(1), &who(), NOW).unwrap();
+    game.handle_in_world(&[53, 0, 4, 0, 0, 0, 0, 0], &who(), NOW + 1)
+        .unwrap();
+    let mut owner = who();
+    owner.position[2] += 5.0;
+    let out = game.on_location(&owner, NOW + 2_000).unwrap();
+    assert_eq!(pet_moves(&out.nearby, actor), 0);
+    assert!(game.pet_tick(&owner, NOW + 3_000).is_none());
+}

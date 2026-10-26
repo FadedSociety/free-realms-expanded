@@ -77,6 +77,7 @@ pub mod opening_abilities;
 pub mod opening_journal;
 pub mod opening_world;
 pub mod pathing;
+pub mod pet_follow;
 pub mod pets;
 pub mod player_radial;
 pub mod players;

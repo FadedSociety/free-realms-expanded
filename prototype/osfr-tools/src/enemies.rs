@@ -794,7 +794,7 @@ fn animation_packet(guid: u64, animation_id: i32, base: bool) -> Vec<u8> {
     bytes
 }
 
-fn movement_packet(guid: u64, position: [f32; 3], heading: [f32; 3]) -> Vec<u8> {
+pub(crate) fn movement_packet(guid: u64, position: [f32; 3], heading: [f32; 3]) -> Vec<u8> {
     // (R) Opcode 125 layout and flags match the accepted opening EncounterEngine writer.
     let mut bytes = 125_u16.to_le_bytes().to_vec();
     bytes.extend(guid.to_le_bytes());

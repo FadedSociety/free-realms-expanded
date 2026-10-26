@@ -1590,6 +1590,7 @@ impl Gateway {
                         outcome
                             .replies
                             .extend(result.replies.iter().map(|reply| wrapped(reply)));
+                        outcome.nearby.extend(result.nearby);
                         outcome.replies.extend(
                             game.update_npc_visibility(&state)?
                                 .iter()
@@ -1827,7 +1828,7 @@ impl Gateway {
             && !game.derby_active()
             && !game.is_soccer_active()
         {
-            return Ok(GatewayOutcome::default());
+            return Ok(self.pet_tick(now_ms));
         }
         let mut gameplay = game.clone();
         let result = gameplay.tick(&self.state, now_ms)?;

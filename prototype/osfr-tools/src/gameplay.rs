@@ -1831,6 +1831,7 @@ impl Gameplay {
             },
             &mut out,
         )?;
+        self.follow_pet(character, now_ms, &mut out);
         if self.opening.is_none() {
             let result = self.on_position(character.position, now_ms)?;
             out.changed |= result.changed;

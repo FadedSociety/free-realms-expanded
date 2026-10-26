@@ -260,6 +260,32 @@ impl Gameplay {
         Ok(wire.map(Self::pet_outcome))
     }
 
+    /// T455: the summoned pet follows its owner after an accepted owner move or a world tick.
+    /// Frames go to the owner (replies) and to viewers (nearby); a follow step never saves.
+    pub(super) fn follow_pet(
+        &mut self,
+        character: &CharacterState,
+        now_ms: u64,
+        out: &mut Outcome,
+    ) {
+        let zone = character.zone_id;
+        let terrain = self.terrain.clone();
+        let ground = move |x: f32, z: f32| terrain.as_ref()?.height_at(zone, x, z);
+        let wire = self
+            .pets
+            .follow_owner(character.guid, character.position, ground, now_ms);
+        out.replies.extend(wire.private);
+        out.nearby.extend(wire.shared);
+    }
+
+    /// T455: the world tick for a summoned pet (a still owner settles it); `None` without one.
+    pub fn pet_tick(&mut self, character: &CharacterState, now_ms: u64) -> Option<Outcome> {
+        self.pets.active_pet_id()?;
+        let mut out = Outcome::default();
+        self.follow_pet(character, now_ms, &mut out);
+        Some(out)
+    }
+
     /// W177 (R): a pet does not zone with its owner; a fresh summon is required.
     pub fn settle_pets(&mut self, zoned: bool, now_ms: u64) -> io::Result<Outcome> {
         if !zoned || self.pets.active_pet_id().is_none() {
