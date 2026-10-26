@@ -157,6 +157,9 @@ mod tests {
 
     #[test]
     fn percentiles_are_nearest_rank_and_p99_is_not_the_max() {
+        if !super::super::tests::test_support::bin_test_target("tick-stats") {
+            return;
+        }
         let mut rng = 1;
         let mut steps = series(5);
         // 1..=100 µs in a scrambled order: p50 = 50, p99 = 99, max = 100.
@@ -169,6 +172,9 @@ mod tests {
 
     #[test]
     fn a_window_keeps_a_bounded_sample_with_exact_count_and_max() {
+        if !super::super::tests::test_support::bin_test_target("tick-stats") {
+            return;
+        }
         assert_eq!(series(5).capacity, 1_000, "5 s at 200 steps a second");
         assert_eq!(series(600).capacity, HARD_CAP as usize, "capped");
         let mut rng = 1;
@@ -193,6 +199,9 @@ mod tests {
 
     #[test]
     fn a_zero_window_is_off_and_the_flag_is_bounded() {
+        if !super::super::tests::test_support::bin_test_target("tick-stats") {
+            return;
+        }
         let args = |list: &[&str]| list.iter().map(|s| s.to_string()).collect::<Vec<_>>();
         let window = |list: &[&str]| TickStats::window_from_args(args(list).into_iter());
         let mut off = TickStats::new(window(&["127.0.0.1:0"]).unwrap());
@@ -220,6 +229,9 @@ mod tests {
     /// loaded machine cannot stretch it.
     #[test]
     fn a_window_emits_one_event_with_the_session_count() {
+        if !super::super::tests::test_support::bin_test_target("tick-stats") {
+            return;
+        }
         let (mut server, _keys, scratch) =
             super::super::t020_group_routing::server_rig("tick-stats");
         let window = Duration::from_secs(5);

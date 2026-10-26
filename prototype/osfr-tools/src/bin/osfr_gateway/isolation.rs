@@ -15,6 +15,9 @@ thread_local! {
 
 #[test]
 fn a_panicking_session_ends_alone_and_the_server_keeps_running() {
+    if !super::tests::test_support::bin_test_target("isolation") {
+        return;
+    }
     let (mut server, keys, scratch) = super::t020_group_routing::server_rig("isolation");
     let victim = server.sessions.get_mut(&keys[0]).unwrap();
     let (victim_id, victim_guid) = (victim.id, victim.character_guid);
@@ -43,6 +46,9 @@ fn a_panicking_session_ends_alone_and_the_server_keeps_running() {
 
 #[test]
 fn a_failing_tick_save_ends_alone_and_the_server_keeps_running() {
+    if !super::tests::test_support::bin_test_target("isolation") {
+        return;
+    }
     let (mut server, keys, scratch) = super::t020_group_routing::server_rig("tick-save-error");
     let victim = server.sessions.get_mut(&keys[0]).unwrap();
     let old_guid = victim.character_guid;
@@ -141,6 +147,9 @@ fn movie_gateway(reference: &std::path::Path, scratch: &std::path::Path) -> Gate
 
 #[test]
 fn a_movie_error_ends_only_that_session_and_not_the_server() {
+    if !super::tests::test_support::bin_test_target("isolation") {
+        return;
+    }
     let (mut server, keys, scratch) = super::t020_group_routing::server_rig("movie-error");
     let reference = server.options.reference.clone();
     let gateway = movie_gateway(&reference, &scratch);

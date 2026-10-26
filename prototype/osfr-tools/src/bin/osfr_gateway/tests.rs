@@ -10,6 +10,9 @@ fn wrap(inner: &[u8]) -> Vec<u8> {
 
 #[test]
 fn w120_player_denial_is_logged_and_studio_requires_admin() {
+    if !test_support::bin_test_target("gateway") {
+        return;
+    }
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
     let scratch = std::env::temp_dir().join(format!("osfr-w120-session-{}", std::process::id()));
     fs::create_dir_all(&scratch).unwrap();
@@ -160,6 +163,9 @@ fn w120_player_denial_is_logged_and_studio_requires_admin() {
 }
 #[test]
 fn pose_only_saves_are_coalesced_and_flushed_by_tick() {
+    if !test_support::bin_test_target("gateway") {
+        return;
+    }
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
     let scratch = std::env::temp_dir().join(format!("osfr-pose-save-{}", std::process::id()));
     let _ = fs::remove_dir_all(&scratch);
@@ -290,6 +296,9 @@ fn direct(app: &[u8], compressed: bool) -> Vec<u8> {
 #[test]
 #[ignore = "requires OSFR_KART_WEAPONS private content and initialization"]
 fn private_direct_pose_reaches_session_and_unlocks_reliable_rocket_use() {
+    if !test_support::bin_test_target("gateway") {
+        return;
+    }
     let root = PathBuf::from(env::var_os("OSFR_KART_WEAPONS").unwrap());
     let nonce = SystemTime::now()
         .duration_since(UNIX_EPOCH)
@@ -511,6 +520,9 @@ fn private_direct_pose_reaches_session_and_unlocks_reliable_rocket_use() {
 /// multi-byte character ("0\u{e9}0") panicked the server. Non-hex input is now refused.
 #[test]
 fn studio_hex_refuses_non_hex_input_instead_of_panicking() {
+    if !test_support::bin_test_target("gateway") {
+        return;
+    }
     assert_eq!(trace::parse_hex("2300"), Some(vec![0x23, 0x00]));
     assert_eq!(trace::parse_hex("0\u{e9}0"), None);
     assert_eq!(trace::parse_hex("zz"), None);
@@ -520,6 +532,9 @@ fn studio_hex_refuses_non_hex_input_instead_of_panicking() {
 
 #[test]
 fn live_outfit_fanout_respects_directed_visibility_cap() {
+    if !test_support::bin_test_target("gateway") {
+        return;
+    }
     let mut world = SharedWorld::new();
     world.players = PlayerRegistry::new(InterestPolicy::new(100.0, 1).unwrap());
     let zone = ZoneInstance {
@@ -591,6 +606,9 @@ fn live_outfit_fanout_respects_directed_visibility_cap() {
 /// commits it, so the assertion proves the split ran rather than a whole-bundle `handle_at`.
 #[test]
 fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
+    if !test_support::bin_test_target("gateway") {
+        return;
+    }
     let scratch = test_support::Scratch::new("f179-split");
     let content = test_support::vendor_content(&scratch);
     // 43 maximum-size rows are ~2.7 MiB per child: two children stay under the 8 MiB bundle
@@ -773,6 +791,9 @@ fn a_split_combat_bundle_obeys_the_bundle_reply_budget() {
 /// `lab/autopilot/protected-pass.txt` still selects it.
 #[test]
 fn a_refused_precommit_transfer_keeps_its_staged_bytes_until_dispatch_end() {
+    if !test_support::bin_test_target("gateway") {
+        return;
+    }
     let scratch = test_support::Scratch::new("f286-transfer");
     let content = test_support::vendor_content(&scratch);
     // Each staged reply is charged with its 7-byte application wrapper (`wrapped`). The 26/10
@@ -923,6 +944,9 @@ fn a_refused_precommit_transfer_keeps_its_staged_bytes_until_dispatch_end() {
 /// ends, not that a refund happens. F322 review finding 4.
 #[test]
 fn a_refused_precommit_transfer_releases_its_reply_budget() {
+    if !test_support::bin_test_target("gateway") {
+        return;
+    }
     a_refused_precommit_transfer_keeps_its_staged_bytes_until_dispatch_end();
 }
 
@@ -937,6 +961,9 @@ pub(super) mod test_support;
 /// server relay window it used to assert, so every accepted jump now relays.
 #[test]
 fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
+    if !test_support::bin_test_target("gateway") {
+        return;
+    }
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
     let scratch = std::env::temp_dir().join(format!("osfr-jump-{}", std::process::id()));
     let _ = fs::remove_dir_all(&scratch);
@@ -1516,6 +1543,9 @@ fn jump_relay_reaches_only_directed_viewers_and_is_throttled() {
 /// the empty-bucket guard, not a second proof of the cleanup.
 #[test]
 fn end_session_forgets_the_character_jump_relay_budget() {
+    if !test_support::bin_test_target("gateway") {
+        return;
+    }
     let scratch = test_support::Scratch::new("f309-jump-leave");
     let mut server = Server::new(test_support::options(scratch.state())).unwrap();
     let mut login = 1u16.to_le_bytes().to_vec();

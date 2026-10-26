@@ -337,6 +337,9 @@ fn broadcast(text: &str) -> Vec<u8> {
 
 #[test]
 fn admin_broadcast_reaches_every_online_session_once() {
+    if !super::tests::test_support::bin_test_target("t199") {
+        return;
+    }
     let mut rig = Rig::new("all", &[(1, true), (2, false), (3, false)]);
     let text = "Scavenger hunt starts at noon";
     rig.send(0, &broadcast(text), NOW);
@@ -355,6 +358,9 @@ fn admin_broadcast_reaches_every_online_session_once() {
 
 #[test]
 fn player_and_builder_broadcasts_are_refused_without_fanout() {
+    if !super::tests::test_support::bin_test_target("t199") {
+        return;
+    }
     let mut rig = Rig::new("refused", &[(1, true), (2, false)]);
     let before = (rig.snapshot(0), rig.save(0));
     for role in [AccountRole::Builder, AccountRole::Player] {
@@ -386,6 +392,9 @@ fn player_and_builder_broadcasts_are_refused_without_fanout() {
 
 #[test]
 fn announcement_does_not_change_character_state_or_save() {
+    if !super::tests::test_support::bin_test_target("t199") {
+        return;
+    }
     let mut rig = Rig::new("save", &[(1, true), (2, false)]);
     let before = (rig.snapshot(0), rig.save(0));
     rig.send(0, &broadcast("No state change"), NOW);
@@ -400,6 +409,9 @@ fn announcement_does_not_change_character_state_or_save() {
 
 #[test]
 fn two_admins_each_get_one_announcement() {
+    if !super::tests::test_support::bin_test_target("t199") {
+        return;
+    }
     let mut rig = Rig::new("two", &[(1, true), (2, true), (3, false)]);
     for (index, text) in [(0, "First notice"), (1, "Second notice")] {
         rig.send(index, &broadcast(text), NOW);
@@ -415,6 +427,9 @@ fn two_admins_each_get_one_announcement() {
 
 #[test]
 fn no_online_sessions_is_a_no_op() {
+    if !super::tests::test_support::bin_test_target("t199") {
+        return;
+    }
     let mut rig = Rig::new("solo", &[(1, true)]);
     rig.add_lurker(2);
     let before = rig.save(0);
@@ -433,6 +448,9 @@ fn no_online_sessions_is_a_no_op() {
 
 #[test]
 fn invalid_text_is_refused_without_a_save_or_a_witness_notice() {
+    if !super::tests::test_support::bin_test_target("t199") {
+        return;
+    }
     let mut rig = Rig::new("invalid", &[(1, true), (2, false)]);
     let before = (rig.snapshot(0), rig.save(0));
     let long = "a".repeat(201);
@@ -484,6 +502,9 @@ fn invalid_text_is_refused_without_a_save_or_a_witness_notice() {
 /// own and must not clear the one the first child staged.
 #[test]
 fn a_bundle_that_broadcasts_then_helps_keeps_the_notice() {
+    if !super::tests::test_support::bin_test_target("t199") {
+        return;
+    }
     let mut rig = Rig::new("bundle", &[(1, true), (2, false)]);
     let text = "Hunt at noon";
     rig.try_send_raw(
@@ -510,6 +531,9 @@ fn a_bundle_that_broadcasts_then_helps_keeps_the_notice() {
 
 #[test]
 fn a_failed_save_never_announces() {
+    if !super::tests::test_support::bin_test_target("t199") {
+        return;
+    }
     let mut rig = Rig::new("failsave", &[(1, true), (2, false)]);
     let before = rig.save(0);
     rig.break_save(0);
@@ -536,6 +560,9 @@ fn a_failed_save_never_announces() {
 
 #[test]
 fn a_replayed_reliable_packet_announces_once() {
+    if !super::tests::test_support::bin_test_target("t199") {
+        return;
+    }
     let mut rig = Rig::new("replay", &[(1, true), (2, false)]);
     let text = "Only once";
     let message = broadcast(text);
@@ -554,6 +581,9 @@ fn a_replayed_reliable_packet_announces_once() {
 
 #[test]
 fn maximum_length_escaped_text_reaches_each_recipient_byte_exactly() {
+    if !super::tests::test_support::bin_test_target("t199") {
+        return;
+    }
     let mut rig = Rig::new("maximum", &[(1, true), (2, false), (3, false)]);
     let text = "<&>".repeat(66) + "ab";
     assert_eq!(text.chars().count(), 200);

@@ -3,6 +3,9 @@ use super::*;
 
 #[test]
 fn an_empty_field_settles_once_then_sleeps_until_someone_enters() {
+    if !super::tests::test_support::bin_test_target("dormant") {
+        return;
+    }
     let (mut server, keys, scratch) = super::t020_group_routing::server_rig("dormant");
     let instance = server.membership.public_instance(0).unwrap();
     assert!(server.membership.field_instances().contains(&instance));

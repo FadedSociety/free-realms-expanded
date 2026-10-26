@@ -69,6 +69,9 @@ fn leftovers(directory: &Path) -> Vec<String> {
 
 #[test]
 fn a_settled_trade_moves_coins_in_both_saves_and_both_live_sessions() {
+    if !super::tests::test_support::bin_test_target("lead-trade") {
+        return;
+    }
     let dir = Scratch::new("trade-ok");
     let mut a = party(&dir, 1, 101);
     let mut b = party(&dir, 2, 202);
@@ -100,6 +103,9 @@ fn a_settled_trade_moves_coins_in_both_saves_and_both_live_sessions() {
 
 #[test]
 fn a_stale_trade_moves_nothing_and_writes_nothing() {
+    if !super::tests::test_support::bin_test_target("lead-trade") {
+        return;
+    }
     let dir = Scratch::new("trade-stale");
     let mut a = party(&dir, 3, 101);
     let mut b = party(&dir, 4, 202);
@@ -133,6 +139,9 @@ fn a_stale_trade_moves_nothing_and_writes_nothing() {
 
 #[test]
 fn an_interrupted_trade_is_finished_from_its_journal_at_start() {
+    if !super::tests::test_support::bin_test_target("lead-trade") {
+        return;
+    }
     let dir = Scratch::new("trade-recover");
     let mut a = party(&dir, 5, 101);
     let mut b = party(&dir, 6, 202);

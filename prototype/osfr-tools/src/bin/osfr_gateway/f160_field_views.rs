@@ -56,6 +56,9 @@ fn sender(max_queued_bytes: usize) -> ReliableSender {
 /// ticking, the other viewer's removal is delivered, and a later tick retries.
 #[test]
 fn f160_a_full_reliable_queue_refuses_only_its_own_view() {
+    if !super::tests::test_support::bin_test_target("f160") {
+        return;
+    }
     if !super::t020_group_routing::fixtures_present() {
         eprintln!("skip f160-view: the private lab fixtures are absent");
         return;
@@ -179,6 +182,9 @@ pub(super) fn f213_bodies(sender: &mut ReliableSender, now: u64) -> Vec<Vec<u8>>
 /// the `known` set, readiness and queueing that this path adds.
 #[test]
 fn f213_sync_field_views_replays_pending_end_screen_after_the_speaker_spawn() {
+    if !super::tests::test_support::bin_test_target("f160") {
+        return;
+    }
     // `server_rig` needs the private lab fixture pair. A clean checkout must not fail this
     // regression in setup (it reads as a product defect), so report a visible skip and
     // return; the test stays un-`#[ignore]`d, so it still runs wherever the fixtures exist.
@@ -373,6 +379,9 @@ fn t499_markers(bodies: &[Vec<u8>]) -> (Vec<(usize, u64, i32)>, Vec<u64>) {
 /// the pass after the player's quest changes (the abandon is a real 26/23 through the gateway).
 #[test]
 fn t499_shared_view_sends_markers_after_spawn_and_refreshes_on_quest_change() {
+    if !super::tests::test_support::bin_test_target("f160") {
+        return;
+    }
     if !super::t020_group_routing::fixtures_present() {
         eprintln!("skip t499-markers: the private lab fixtures are absent");
         return;

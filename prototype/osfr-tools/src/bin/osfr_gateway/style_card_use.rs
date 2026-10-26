@@ -365,6 +365,9 @@ fn a_viewer_in_another_instance_hears_nothing() {
 /// 35/39 for a guid it has no AddPc for): the fanout treats 35/39 like 35/6 and 35/7.
 #[test]
 fn a_look_change_is_a_live_outfit_packet() {
+    if !bin_test_target("t478") {
+        return;
+    }
     use super::super::delivery::live_outfit_packet;
     assert!(live_outfit_packet(&[35, 0, 39, 0, 1]));
     assert!(!live_outfit_packet(&[35, 0, 65, 0]));

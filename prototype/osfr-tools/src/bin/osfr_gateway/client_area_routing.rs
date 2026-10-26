@@ -105,6 +105,9 @@ mod tests {
 
     #[test]
     fn loading_the_open_world_sends_the_enabled_areas_and_a_new_session_gets_them_again() {
+        if !super::super::tests::test_support::bin_test_target("client-area") {
+            return;
+        }
         let scratch = Scratch::new("t457-load");
         let options = test_support::options(scratch.state());
         if !test_support::fixtures_present(&options) {
@@ -144,6 +147,9 @@ mod tests {
     /// `realm race` is the developer entry to the recovered kart scene transfer (F286).
     #[test]
     fn a_session_loading_an_instance_zone_gets_no_areas() {
+        if !super::super::tests::test_support::bin_test_target("client-area") {
+            return;
+        }
         let scratch = Scratch::new("t457-instance");
         let mut options = test_support::options(scratch.state());
         if !test_support::fixtures_present(&options) {
@@ -186,6 +192,9 @@ mod tests {
 
     #[test]
     fn a_season_change_reaches_loaded_sessions_and_a_full_queue_skips_only_its_own() {
+        if !super::super::tests::test_support::bin_test_target("client-area") {
+            return;
+        }
         let scratch = Scratch::new("t457-season");
         let options = test_support::options(scratch.state());
         if !test_support::fixtures_present(&options) {

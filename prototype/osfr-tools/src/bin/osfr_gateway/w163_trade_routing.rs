@@ -189,6 +189,9 @@ fn subs(deliveries: &[Delivery]) -> Vec<(u64, u8)> {
 
 #[test]
 fn radial_trade_entry_starts_an_invite_for_the_other_session() {
+    if !super::tests::test_support::bin_test_target("w163") {
+        return;
+    }
     let mut rig = rig("invite");
     let menu = rig
         .a
@@ -229,6 +232,9 @@ fn radial_trade_entry_starts_an_invite_for_the_other_session() {
 
 #[test]
 fn a_full_trade_ends_in_a_settlement_and_cancels_when_the_commit_refuses() {
+    if !super::tests::test_support::bin_test_target("w163") {
+        return;
+    }
     let mut rig = rig("full");
     rig.a
         .route_application(&select(A, B), &mut rig.world, 1_000);
@@ -318,6 +324,9 @@ fn a_full_trade_ends_in_a_settlement_and_cancels_when_the_commit_refuses() {
 
 #[test]
 fn leaving_the_world_or_walking_away_ends_the_trade_for_the_partner() {
+    if !super::tests::test_support::bin_test_target("w163") {
+        return;
+    }
     let mut rig = rig("leave");
     rig.a
         .route_application(&select(A, B), &mut rig.world, 1_000);
@@ -390,6 +399,9 @@ fn leaving_the_world_or_walking_away_ends_the_trade_for_the_partner() {
 
 #[test]
 fn hostile_trade_packets_from_one_session_cannot_reach_the_other() {
+    if !super::tests::test_support::bin_test_target("w163") {
+        return;
+    }
     let mut rig = rig("hostile");
     rig.a
         .route_application(&select(A, B), &mut rig.world, 1_000);
@@ -430,6 +442,9 @@ fn hostile_trade_packets_from_one_session_cannot_reach_the_other() {
 
 #[test]
 fn a_loaded_gameplay_inventory_is_registered_and_kept_current_for_trading() {
+    if !super::tests::test_support::bin_test_target("w163") {
+        return;
+    }
     let mut rig = rig("refresh");
     let mut login = 1u16.to_le_bytes().to_vec();
     for (i, value) in ["w163", "1.910.1.530630", ""].into_iter().enumerate() {

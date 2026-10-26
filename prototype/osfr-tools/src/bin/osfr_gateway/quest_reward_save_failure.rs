@@ -448,6 +448,9 @@ fn complete_quest(scene: &mut Scene, options: &Options, quest_id: u32, now: &mut
 
 #[test]
 fn a_working_turn_in_pays_coins_items_and_xp_once() {
+    if !super::test_support::bin_test_target("t258") {
+        return;
+    }
     if !Fixture::ready() {
         return;
     }
@@ -511,6 +514,9 @@ fn a_working_turn_in_pays_coins_items_and_xp_once() {
 
 #[test]
 fn a_failed_save_leaves_the_character_and_save_unchanged() {
+    if !super::test_support::bin_test_target("t258") {
+        return;
+    }
     if !Fixture::ready() {
         return;
     }
@@ -680,6 +686,9 @@ fn stage_pending_turnin(server: &mut Server, session: &mut Session, guid: u64, n
 /// stays in the world and later turns in its own quest with a working save.
 #[test]
 fn a_failed_save_ends_only_that_session() {
+    if !super::test_support::bin_test_target("t258") {
+        return;
+    }
     if !Fixture::ready() {
         return;
     }
@@ -880,6 +889,9 @@ fn a_failed_save_ends_only_that_session() {
 
 #[test]
 fn a_failed_save_does_not_consume_the_turn_in() {
+    if !super::test_support::bin_test_target("t258") {
+        return;
+    }
     if !Fixture::ready() {
         return;
     }
@@ -963,6 +975,9 @@ fn a_failed_save_does_not_consume_the_turn_in() {
 
 #[test]
 fn a_replay_after_a_successful_turn_in_pays_nothing_more() {
+    if !super::test_support::bin_test_target("t258") {
+        return;
+    }
     if !Fixture::ready() {
         return;
     }
@@ -1028,6 +1043,9 @@ fn a_replay_after_a_successful_turn_in_pays_nothing_more() {
 
 #[test]
 fn a_full_bag_refuses_the_turn_in_and_changes_nothing() {
+    if !super::test_support::bin_test_target("t258") {
+        return;
+    }
     if !Fixture::ready() {
         return;
     }

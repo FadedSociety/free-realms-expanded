@@ -62,6 +62,9 @@ fn step(guid: u64, position: [f32; 3]) -> Vec<u8> {
 
 #[test]
 fn a_save_off_the_map_or_deep_under_it_enters_at_the_nearest_warpstone() {
+    if !super::test_support::bin_test_target("l039") {
+        return;
+    }
     for (name, saved) in [
         ("off the map", [-2600.0, 0.0, 400.0]),
         ("300 m under", [-1900.0, -340.0, 400.0]),
@@ -107,6 +110,9 @@ fn a_save_off_the_map_or_deep_under_it_enters_at_the_nearest_warpstone() {
 
 #[test]
 fn without_terrain_or_on_the_ground_a_save_loads_unchanged() {
+    if !super::test_support::bin_test_target("l039") {
+        return;
+    }
     for (name, saved, with_terrain) in [
         (
             "off the map, no terrain loaded",

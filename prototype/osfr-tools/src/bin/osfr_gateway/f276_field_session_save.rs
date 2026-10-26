@@ -128,6 +128,9 @@ impl Fixture {
 
 #[test]
 fn a_refused_field_replay_through_the_session_writes_no_save() {
+    if !super::test_support::bin_test_target("f276") {
+        return;
+    }
     let fixture = Fixture::new();
     let options = Options {
         content: Some(fixture.content.clone()),

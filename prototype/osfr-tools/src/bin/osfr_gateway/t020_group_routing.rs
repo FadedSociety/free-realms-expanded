@@ -132,6 +132,9 @@ pub(super) fn fixtures_present() -> bool {
 /// require every lab file the rig opens, not just the first two.
 #[test]
 fn the_fixture_guard_requires_every_lab_file_server_new_opens() {
+    if !super::tests::test_support::bin_test_target("t020") {
+        return;
+    }
     let scratch = super::tests::test_support::Scratch::new("fixture-guard");
     let reference = scratch.path().join("reference");
     let content = scratch.path().join("content");
@@ -349,6 +352,9 @@ fn invited_id(deliveries: &[Delivery], index: usize) -> u32 {
 
 #[test]
 fn two_sessions_form_chat_and_leave_a_party_and_refusals_change_nothing() {
+    if !super::tests::test_support::bin_test_target("t020") {
+        return;
+    }
     let mut rig = rig("party");
     let a = 0;
     let b = 1;
@@ -469,6 +475,9 @@ fn two_sessions_form_chat_and_leave_a_party_and_refusals_change_nothing() {
 
 #[test]
 fn interleaved_invites_cannot_overlap_membership_or_group_chat() {
+    if !super::tests::test_support::bin_test_target("t020") {
+        return;
+    }
     let mut rig = rig("interleaved");
     let (a, b, c) = (0, 1, 2);
 
@@ -535,6 +544,9 @@ fn interleaved_invites_cannot_overlap_membership_or_group_chat() {
 
 #[test]
 fn late_accept_is_refused_by_the_request_without_a_cleanup_tick() {
+    if !super::tests::test_support::bin_test_target("t020") {
+        return;
+    }
     let mut rig = rig("late-accept");
     let member = 0;
     let target = 1;
@@ -588,6 +600,9 @@ fn late_accept_is_refused_by_the_request_without_a_cleanup_tick() {
 
 #[test]
 fn replacement_invite_expires_the_previous_row_before_capacity_check() {
+    if !super::tests::test_support::bin_test_target("t020") {
+        return;
+    }
     let mut rig = rig("replacement");
     let (a, b, c) = (0, 1, 2);
     let first = send_at(&mut rig, a, &invite(a, b, 0), 1_000);
@@ -638,6 +653,9 @@ fn replacement_invite_expires_the_previous_row_before_capacity_check() {
 
 #[test]
 fn same_group_reinvitation_binds_responses_to_the_new_generation() {
+    if !super::tests::test_support::bin_test_target("t020") {
+        return;
+    }
     let mut rig = rig("reinvite-generation");
     let (a, b) = (0, 1);
     let first = send_at(&mut rig, a, &invite(a, b, 0), 1_000);
@@ -690,6 +708,9 @@ fn same_group_reinvitation_binds_responses_to_the_new_generation() {
 
 #[test]
 fn native_group_packets_carry_no_padding_after_the_header() {
+    if !super::tests::test_support::bin_test_target("t020") {
+        return;
+    }
     let mut rig = rig("native-wire");
     let (a, b) = (0, 1);
 
@@ -788,6 +809,9 @@ fn native_group_packets_carry_no_padding_after_the_header() {
 
 #[test]
 fn server_configuration_applies_bounded_group_invite_lifetime() {
+    if !super::tests::test_support::bin_test_target("t020") {
+        return;
+    }
     let scratch = std::env::temp_dir().join(format!("osfr-t020-config-{}", std::process::id()));
     fs::create_dir_all(&scratch).unwrap();
     let mut configured = options(&scratch);
@@ -804,6 +828,9 @@ fn server_configuration_applies_bounded_group_invite_lifetime() {
 
 #[test]
 fn disconnect_dissolves_the_party_and_clears_party_chat_for_the_survivor() {
+    if !super::tests::test_support::bin_test_target("t020") {
+        return;
+    }
     let mut rig = rig("disconnect");
     let (a, b) = (0, 1);
     let invited = send(&mut rig, a, &invite(a, b, 0));
@@ -835,6 +862,9 @@ fn disconnect_dissolves_the_party_and_clears_party_chat_for_the_survivor() {
 
 #[test]
 fn chat_identity_is_the_live_registry_row_through_join_leave_and_end_session() {
+    if !super::tests::test_support::bin_test_target("t020") {
+        return;
+    }
     // The production join is covered through the real socket by
     // `two_bot_socket_membership_and_transfer`; this test drives the leave and end-session
     // halves of the same three-way invariant.
@@ -875,6 +905,9 @@ fn chat_identity_is_the_live_registry_row_through_join_leave_and_end_session() {
 
 #[test]
 fn end_session_of_the_owner_dissolves_the_party_and_clears_survivor_chat() {
+    if !super::tests::test_support::bin_test_target("t020") {
+        return;
+    }
     let (mut server, keys, scratch) = server_rig("end-session-owner");
     let (a, b) = (0, 1);
     let invited = route_server(&mut server, keys[a], &invite(a, b, 0));
@@ -902,6 +935,9 @@ fn end_session_of_the_owner_dissolves_the_party_and_clears_survivor_chat() {
 
 #[test]
 fn stale_non_owning_end_session_preserves_the_live_party_and_chat() {
+    if !super::tests::test_support::bin_test_target("t020") {
+        return;
+    }
     let (mut server, keys, scratch) = server_rig("end-session-stale");
     let (a, b) = (0, 1);
     let invited = route_server(&mut server, keys[a], &invite(a, b, 0));
@@ -968,6 +1004,9 @@ fn stale_non_owning_end_session_preserves_the_live_party_and_chat() {
 
 #[test]
 fn forged_body_identities_do_not_select_another_character_or_invite() {
+    if !super::tests::test_support::bin_test_target("t020") {
+        return;
+    }
     let mut rig = rig("forged-body");
     let (a, b, c) = (0, 1, 2);
     let invited_b = send(&mut rig, a, &invite(a, b, 0));
@@ -1016,6 +1055,9 @@ fn forged_body_identities_do_not_select_another_character_or_invite() {
 /// with no committed place claims nothing. Drives the real `Session::heal_group`.
 #[test]
 fn f182_a_big_heart_group_heal_claims_the_pickers_instance() {
+    if !super::tests::test_support::bin_test_target("t020") {
+        return;
+    }
     let (mut server, keys, scratch) = server_rig("f182-heal");
     // One group: A picks up the heart, B is the hurt member.
     let invited = route_server(&mut server, keys[0], &invite(0, 1, 0));
@@ -1079,6 +1121,9 @@ fn f182_a_big_heart_group_heal_claims_the_pickers_instance() {
 /// member moves into the picker's instance a fresh kill heals once.
 #[test]
 fn f234_a_cross_instance_group_member_is_not_healed_or_saved() {
+    if !super::tests::test_support::bin_test_target("t020") {
+        return;
+    }
     let (mut server, keys, scratch) = server_rig("f234-heal");
     let invited = route_server(&mut server, keys[0], &invite(0, 1, 0));
     let invite_id = invited_id(&invited, 1);

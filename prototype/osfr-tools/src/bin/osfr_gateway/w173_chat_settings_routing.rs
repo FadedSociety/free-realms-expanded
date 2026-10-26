@@ -223,6 +223,9 @@ fn muted(world: &SharedWorld, index: usize, channel: ChatChannel) -> bool {
 
 #[test]
 fn a_muted_channel_is_dropped_for_that_player_only() {
+    if !super::tests::test_support::bin_test_target("w173") {
+        return;
+    }
     let mut rig = rig("mute");
     let [a, b, c] = &mut rig.sessions;
     let world = &mut rig.world;
@@ -246,6 +249,9 @@ fn a_muted_channel_is_dropped_for_that_player_only() {
 
 #[test]
 fn forged_names_and_wild_values_change_nothing() {
+    if !super::tests::test_support::bin_test_target("w173") {
+        return;
+    }
     let mut rig = rig("forged");
     let [a, ..] = &mut rig.sessions;
     let world = &mut rig.world;
@@ -267,6 +273,9 @@ fn forged_names_and_wild_values_change_nothing() {
 
 #[test]
 fn a_bubble_colour_is_stored_for_the_sender_alone() {
+    if !super::tests::test_support::bin_test_target("w173") {
+        return;
+    }
     let mut rig = rig("bubble");
     let [_, b, _] = &mut rig.sessions;
     let world = &mut rig.world;
@@ -285,6 +294,9 @@ fn a_bubble_colour_is_stored_for_the_sender_alone() {
 
 #[test]
 fn claim_requests_and_bundled_children_are_budgeted_before_staging() {
+    if !super::tests::test_support::bin_test_target("w173") {
+        return;
+    }
     const CLAIM: u64 = 0xA11C_E5;
     let mut rig = rig("claim-budget");
     let session = &mut rig.sessions[0];
@@ -369,6 +381,9 @@ fn claim_requests_and_bundled_children_are_budgeted_before_staging() {
 
 #[test]
 fn combat_bundle_children_are_budgeted_once() {
+    if !super::tests::test_support::bin_test_target("w173") {
+        return;
+    }
     let mut rig = rig("combat-budget");
     let session = &mut rig.sessions[0];
     log_in(session, "combat-budget");
@@ -419,6 +434,9 @@ fn combat_bundle_children_are_budgeted_once() {
 /// sibling has no budget left. The free child is proven effective on its own.
 #[test]
 fn mixed_bundle_is_dropped_whole_when_its_budgeted_child_is_refused() {
+    if !super::tests::test_support::bin_test_target("w173") {
+        return;
+    }
     let mut rig = rig("mixed-budget");
     let session = &mut rig.sessions[0];
     log_in(session, "mixed-budget");
@@ -504,6 +522,9 @@ fn mixed_bundle_is_dropped_whole_when_its_budgeted_child_is_refused() {
 /// while another account still has its own allowance.
 #[test]
 fn account_budget_is_shared_across_sessions_and_not_across_accounts() {
+    if !super::tests::test_support::bin_test_target("w173") {
+        return;
+    }
     let mut rig = rig("account-budget");
     rig.sessions[1].account_guid = rig.sessions[0].account_guid;
     for (index, ticket) in ["account-a", "account-a-second", "account-b"]

@@ -302,6 +302,9 @@ fn has(deliveries: &[Delivery], index: usize, sub: u16) -> bool {
 
 #[test]
 fn create_then_invite_accept_reaches_the_online_founder() {
+    if !super::tests::test_support::bin_test_target("t006") {
+        return;
+    }
     let mut rig = eligible_rig("founder-online");
     log_in(&mut rig.sessions[0], "t006-founder");
     // The real gateway path creates the guild; the creator is a connected session, so the
@@ -334,6 +337,9 @@ fn create_then_invite_accept_reaches_the_online_founder() {
 
 #[test]
 fn motd_routes_through_dispatch_is_saved_and_survives_a_restart() {
+    if !super::tests::test_support::bin_test_target("t006") {
+        return;
+    }
     let mut rig = rig("persist", true);
     let guild = rig.world.guilds.store().guild_guid_for(GUIDS[0]).unwrap();
     for (index, session) in rig.sessions.iter_mut().enumerate() {
@@ -363,6 +369,9 @@ fn motd_routes_through_dispatch_is_saved_and_survives_a_restart() {
 
 #[test]
 fn create_below_job_rank_15_changes_nothing() {
+    if !super::tests::test_support::bin_test_target("t006") {
+        return;
+    }
     let mut rig = rig("eligibility", false);
     log_in(&mut rig.sessions[0], "t006-eligibility");
     dispatch(&mut rig, 0, &create("Lantern Guild"), 1_000);
@@ -375,6 +384,9 @@ fn create_below_job_rank_15_changes_nothing() {
 
 #[test]
 fn create_at_job_rank_16_routes_through_dispatch_and_persists() {
+    if !super::tests::test_support::bin_test_target("t006") {
+        return;
+    }
     let mut rig = eligible_rig("create");
     log_in(&mut rig.sessions[0], "t006-create");
     dispatch(&mut rig, 0, &create("Lantern Guild"), 1_000);
@@ -398,6 +410,9 @@ fn create_at_job_rank_16_routes_through_dispatch_and_persists() {
 
 #[test]
 fn invite_accept_presence_and_guild_chat_reach_the_real_router() {
+    if !super::tests::test_support::bin_test_target("t006") {
+        return;
+    }
     let mut rig = rig("flow", true);
     let guild = rig.world.guilds.store().guild_guid_for(GUIDS[0]).unwrap();
 
@@ -464,6 +479,9 @@ fn invite_accept_presence_and_guild_chat_reach_the_real_router() {
 
 #[test]
 fn guild_request_refused_by_the_account_budget_changes_nothing() {
+    if !super::tests::test_support::bin_test_target("t006") {
+        return;
+    }
     let mut rig = rig("budget", true);
     let guild = rig.world.guilds.store().guild_guid_for(GUIDS[0]).unwrap();
     log_in(&mut rig.sessions[0], "t006-budget");
@@ -485,6 +503,9 @@ fn guild_request_refused_by_the_account_budget_changes_nothing() {
 
 #[test]
 fn a_guildless_member_request_is_silent_and_writes_nothing() {
+    if !super::tests::test_support::bin_test_target("t006") {
+        return;
+    }
     let mut rig = rig("guildless", true);
     log_in(&mut rig.sessions[1], "t006-guildless");
     rig.sessions[1].recent_on = true;
@@ -502,6 +523,9 @@ fn a_guildless_member_request_is_silent_and_writes_nothing() {
 
 #[test]
 fn a_guild_save_failure_rolls_back_the_staged_motd() {
+    if !super::tests::test_support::bin_test_target("t006") {
+        return;
+    }
     let mut rig = rig("save-failure", true);
     let guild = rig.world.guilds.store().guild_guid_for(GUIDS[0]).unwrap();
     log_in(&mut rig.sessions[0], "t006-save");

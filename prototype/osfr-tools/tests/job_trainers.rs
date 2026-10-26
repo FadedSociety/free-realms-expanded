@@ -739,12 +739,18 @@ fn trainer_position(npcs: &[Value], trainer: &Trainer) -> [f32; 3] {
 fn an_ordinary_player_learns_each_trainers_job_once_and_only_switches_to_a_complete_outfit() {
     let content = Content::new();
     let npcs = npc_rows();
+    // The base save and the profile table are the same for every trainer; only the active
+    // profile differs, so the loop stages that on a clone instead of re-reading the content.
+    let base = Gameplay::load(&content.0, None).expect("the trainer content loads");
+    let profiles = Profiles::load(&content.0, None).unwrap();
     let mut checked = Vec::new();
     let mut selectable = 0;
     for trainer in trainers(&content) {
         let position = trainer_position(&npcs, &trainer);
         let near = [position[0] + 2.0, position[1], position[2]];
-        let mut gateway = gateway_at(&content, state_for(&content, &trainer, true), near);
+        let mut state = base.state();
+        state.profiles = Some(profile_state(&profiles, &trainer, true));
+        let mut gateway = gateway_at(&content, state, near);
         assert!(
             !unlocked(&gateway).contains(&i64::from(trainer.profile)),
             "{}",

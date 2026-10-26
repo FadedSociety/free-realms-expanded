@@ -287,6 +287,9 @@ impl Rig {
 /// next `send` found no live session. The budget is backdated here instead of waited out.
 #[test]
 fn a_stall_past_the_idle_budget_ends_no_rig_session() {
+    if !super::super::tests::test_support::bin_test_target("l042") {
+        return;
+    }
     let files = Files::new("stall");
     let mut rig = Rig::new(&files);
     let keys = [MO, PIP].map(|index| rig.join(index).unwrap());
@@ -310,6 +313,9 @@ fn a_stall_past_the_idle_budget_ends_no_rig_session() {
 
 #[test]
 fn moderator_cannot_target_admin_moderator_or_self() {
+    if !super::super::tests::test_support::bin_test_target("l042") {
+        return;
+    }
     let files = Files::new("hierarchy");
     let mut rig = Rig::new(&files);
     let [ada, mo, mia] = [ADA, MO, MIA].map(|index| rig.join(index).unwrap());
@@ -350,6 +356,9 @@ fn moderator_cannot_target_admin_moderator_or_self() {
 
 #[test]
 fn moderation_refusals_change_nothing() {
+    if !super::super::tests::test_support::bin_test_target("l042") {
+        return;
+    }
     let files = Files::new("refusals");
     let mut rig = Rig::new(&files);
     let [mo, pip, bea] = [MO, PIP, BEA].map(|index| rig.join(index).unwrap());
@@ -395,6 +404,9 @@ fn moderation_refusals_change_nothing() {
 
 #[test]
 fn mute_blocks_chat_and_survives_relog() {
+    if !super::super::tests::test_support::bin_test_target("l042") {
+        return;
+    }
     let files = Files::new("mute");
     let mut rig = Rig::new(&files);
     let [mo, pip] = [MO, PIP].map(|index| rig.join(index).unwrap());
@@ -473,6 +485,9 @@ fn mute_blocks_chat_and_survives_relog() {
 
 #[test]
 fn ban_kicks_only_the_target() {
+    if !super::super::tests::test_support::bin_test_target("l042") {
+        return;
+    }
     let files = Files::new("ban");
     let mut rig = Rig::new(&files);
     let [ada, mo, pip, bea] = [ADA, MO, PIP, BEA].map(|index| rig.join(index).unwrap());
@@ -534,6 +549,9 @@ fn ban_kicks_only_the_target() {
 /// "Quill" "Zed Vox") is still one target: sanctions are per account.
 #[test]
 fn one_accounts_look_alike_names_stay_mutable_kickable_and_bannable() {
+    if !super::super::tests::test_support::bin_test_target("l042") {
+        return;
+    }
     let files = Files::new("look-alike");
     let mut rig = Rig::new(&files);
     let [mo, quill] = [MO, QUILL].map(|index| rig.join(index).unwrap());
@@ -566,6 +584,9 @@ fn one_accounts_look_alike_names_stay_mutable_kickable_and_bannable() {
 
 #[test]
 fn moderation_audit_has_ids_only() {
+    if !super::super::tests::test_support::bin_test_target("l042") {
+        return;
+    }
     let files = Files::new("audit");
     let mut rig = Rig::new(&files);
     let [mo, _pip] = [MO, PIP].map(|index| rig.join(index).unwrap());
@@ -638,6 +659,9 @@ fn add_pc_flags(messages: &[Vec<u8>], guid: u64) -> Vec<[u8; 3]> {
 /// login, which a kick forces.
 #[test]
 fn addpc_referee_flag_is_the_login_role() {
+    if !super::super::tests::test_support::bin_test_target("l042") {
+        return;
+    }
     let files = Files::new("referee");
     let mut rig = Rig::new(&files);
     let pip = rig.join(PIP).unwrap();

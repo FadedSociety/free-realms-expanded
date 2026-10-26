@@ -76,6 +76,9 @@ impl Scene {
 
 #[test]
 fn a_failed_vendor_save_changes_nothing_and_preserves_buy_back_state() {
+    if !super::test_support::bin_test_target("l011") {
+        return;
+    }
     let scratch = Scratch::new("l011-failed-save");
     let fixture = VendorFixture::new(scratch.path(), "content");
     let options = options(&fixture, scratch.state());
@@ -234,6 +237,9 @@ fn a_failed_vendor_save_changes_nothing_and_preserves_buy_back_state() {
 
 #[test]
 fn control_a_working_save_commits_the_same_purchase() {
+    if !super::test_support::bin_test_target("l011") {
+        return;
+    }
     let scratch = Scratch::new("l011-control");
     let fixture = VendorFixture::new(scratch.path(), "content");
     let options = options(&fixture, scratch.state());
@@ -290,6 +296,9 @@ fn control_a_working_save_commits_the_same_purchase() {
 /// leaves no world or membership row, and the surviving sessions still answer a datagram.
 #[test]
 fn a_failed_vendor_save_ends_only_that_session() {
+    if !super::test_support::bin_test_target("l011") {
+        return;
+    }
     let scratch = Scratch::new("l011-server");
     let fixture = VendorFixture::new(scratch.path(), "content");
     let (mut server, keys, server_scratch) = super::super::t020_group_routing::server_rig("l011");

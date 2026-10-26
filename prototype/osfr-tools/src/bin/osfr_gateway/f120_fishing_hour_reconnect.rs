@@ -215,6 +215,9 @@ fn try_catch(
 
 #[test]
 fn an_hour_cap_survives_reconnect_save_reload_and_a_blocked_catch_writes_nothing() {
+    if !super::tests::test_support::bin_test_target("f120") {
+        return;
+    }
     let root = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("../../../lab");
     let content_source = std::env::var_os("OSFR_OPENING_REFERENCE")
         .map(PathBuf::from)

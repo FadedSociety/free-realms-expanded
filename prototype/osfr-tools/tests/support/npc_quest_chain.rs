@@ -34,7 +34,10 @@ use std::{
     collections::BTreeSet,
     fs,
     path::{Path, PathBuf},
-    sync::atomic::{AtomicU64, Ordering},
+    sync::{
+        OnceLock,
+        atomic::{AtomicU64, Ordering},
+    },
 };
 
 pub const CHARACTER: u64 = 194_017;
@@ -186,12 +189,63 @@ impl Fixture {
     }
 
     /// Bind the split catalogue for a specific character, so a second session in
-    /// the same fixture owns its own quest and reward ledger.
+    /// the same fixture owns its own quest and reward ledger. The bind reads
+    /// [`Self::quest_catalogue`], which keeps every quest and giver binding but drops the NPC
+    /// rows the loader never reads.
     pub fn game_as(&self, character_id: u64, state: Option<GameplayState>) -> Gameplay {
         let mut game = Gameplay::load(&self.path, state).expect("opening fixture loads");
-        game.bind_npc_quest_catalogue(&content_dir(), character_id)
+        game.bind_npc_quest_catalogue(&self.quest_catalogue(), character_id)
             .expect("split quest content loads");
         game
+    }
+
+    /// The shipped split quest catalogue, narrowed to what the quest loader reads, inside this
+    /// fixture (built once, reused by every later bind). `QuestEngine::from_split_content` reads
+    /// all 25 MB of `data/content/npcs` for each NPC's quest bindings alone, and a suite that
+    /// binds one engine per save layer pays that once per layer. The copy keeps every quest file,
+    /// the job/crosswalk/job-browser/marker side files and exactly the NPC rows that carry a
+    /// binding (the loader keeps nothing else from a row), so every giver and turn-in mapping and
+    /// every cross-check against `data/content` is unchanged. No test writes to `data/content`,
+    /// so the binding rows are read once per test binary.
+    fn quest_catalogue(&self) -> PathBuf {
+        let catalogue = self.path.join("quest-catalogue");
+        if catalogue.join("quests").is_dir() {
+            return catalogue;
+        }
+        let source = content_dir();
+        fs::create_dir_all(catalogue.join("quests")).unwrap();
+        fs::create_dir_all(catalogue.join("npcs")).unwrap();
+        for entry in fs::read_dir(source.join("quests")).unwrap() {
+            let path = entry.unwrap().path();
+            if path.extension().is_some_and(|ext| ext == "json") {
+                fs::copy(
+                    &path,
+                    catalogue.join("quests").join(path.file_name().unwrap()),
+                )
+                .unwrap();
+            }
+        }
+        for name in [
+            "jobs.json",
+            "job_browser.json",
+            "quest_markers.json",
+            "breadcrumb_quests.json",
+        ] {
+            let path = source.join(name);
+            if path.is_file() {
+                fs::copy(&path, catalogue.join(name)).unwrap();
+            }
+        }
+        fs::write(
+            catalogue.join("npcs/bindings.json"),
+            serde_json::to_vec(&serde_json::json!({
+                "schema_version": 1,
+                "records": quest_binding_rows(),
+            }))
+            .unwrap(),
+        )
+        .unwrap();
+        catalogue
     }
 
     /// Reload the saved character through the same production bind the session uses.
@@ -211,6 +265,41 @@ impl Fixture {
         let state: GameplayState = serde_json::from_slice(&bytes).unwrap();
         self.game_as(character_id, Some(state))
     }
+}
+
+/// The shipped NPC rows that name a quest, in directory order. `from_split_content` keeps an NPC
+/// row's id and its three quest-binding lists and nothing else, so this is the whole of the
+/// 25 MB `data/content/npcs` tree the loader reads. Read once per test binary: every fixture's
+/// narrowed catalogue is written from it.
+fn quest_binding_rows() -> &'static [Value] {
+    static ROWS: OnceLock<Vec<Value>> = OnceLock::new();
+    ROWS.get_or_init(|| {
+        let mut rows = Vec::new();
+        for entry in fs::read_dir(content_dir().join("npcs")).unwrap() {
+            let path = entry.unwrap().path();
+            if path.extension().is_none_or(|ext| ext != "json") {
+                continue;
+            }
+            for record in read_json(&path)["records"].as_array().unwrap() {
+                let bound = ["quest_ids_given", "quests_given", "quests_accepted"]
+                    .iter()
+                    .any(|key| {
+                        record[*key]
+                            .as_array()
+                            .is_some_and(|bindings| !bindings.is_empty())
+                    });
+                if bound {
+                    rows.push(serde_json::json!({
+                        "npc_id": record["npc_id"],
+                        "quest_ids_given": record["quest_ids_given"],
+                        "quests_given": record["quests_given"],
+                        "quests_accepted": record["quests_accepted"],
+                    }));
+                }
+            }
+        }
+        rows
+    })
 }
 
 impl Drop for Fixture {
@@ -299,8 +388,19 @@ pub fn fill_bag(state: &mut GameplayState) {
     state.inventory.next_instance_id = Some(i64::from(base) + BAG_SLOTS as i64);
 }
 
+/// `npc_id`'s row position in the shipped `npcs/<file>` record. The zone files are up to 3 MB and
+/// the suites ask for many rows, so each file is parsed once per test binary; no test writes to
+/// `data/content`.
 pub fn content_position(file: &str, npc_id: u64) -> [f32; 3] {
-    let document = read_json(&content_dir().join("npcs").join(file));
+    static DOCUMENTS: OnceLock<std::sync::Mutex<std::collections::BTreeMap<String, Value>>> =
+        OnceLock::new();
+    let mut documents = DOCUMENTS
+        .get_or_init(|| std::sync::Mutex::new(std::collections::BTreeMap::new()))
+        .lock()
+        .unwrap_or_else(|error| error.into_inner());
+    let document = documents
+        .entry(file.to_owned())
+        .or_insert_with(|| read_json(&content_dir().join("npcs").join(file)));
     let row = document["records"]
         .as_array()
         .unwrap()

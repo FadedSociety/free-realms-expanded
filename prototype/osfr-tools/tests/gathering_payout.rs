@@ -206,7 +206,14 @@ impl Fixture {
 
     /// Fresh gateway with the run offered; returns the instance id.
     fn started(&self) -> (Gateway, i32) {
-        let mut gateway = self.gateway_from(Some(self.state()));
+        self.started_with(self.state())
+    }
+
+    /// As [`Self::started`], from a save staged once per fixture. The content does not change
+    /// between phases, so a case that runs several phases re-uses one staged state instead of
+    /// re-reading the content for each.
+    fn started_with(&self, state: GameplayState) -> (Gateway, i32) {
+        let mut gateway = self.gateway_from(Some(state));
         say(&mut gateway, self.game.command, 2_000);
         let id = active(&gateway, self.game).expect("run offered") as i32;
         (gateway, id)
@@ -551,9 +558,10 @@ fn ordinary_win_pays_once_then_close_returns_to_the_world() {
 #[test]
 fn quit_before_win_clears_the_run_and_pays_nothing_in_every_phase() {
     for game in GAMES {
+        let fixture = Fixture::new(game);
+        let base = fixture.state();
         for target in PHASES {
-            let fixture = Fixture::new(game);
-            let (mut gateway, id) = fixture.started();
+            let (mut gateway, id) = fixture.started_with(base.clone());
             drive(&mut gateway, game, id, target);
             let before = economy(&gateway, game);
 
@@ -771,9 +779,10 @@ fn a_win_saved_and_replayed_after_reload_pays_once() {
 #[test]
 fn reconnect_releases_an_unfinished_run_without_paying() {
     for game in GAMES {
+        let fixture = Fixture::new(game);
+        let base = fixture.state();
         for target in ["Offered", "Playing", "LevelComplete"] {
-            let fixture = Fixture::new(game);
-            let (mut gateway, id) = fixture.started();
+            let (mut gateway, id) = fixture.started_with(base.clone());
             drive(&mut gateway, game, id, target);
             let reconnected = fixture.reconnected(&gateway);
             assert!(
@@ -789,8 +798,7 @@ fn reconnect_releases_an_unfinished_run_without_paying() {
             );
         }
         // A paid Won run is also released on reconnect, keeping its single payout.
-        let fixture = Fixture::new(game);
-        let (mut gateway, id) = fixture.started();
+        let (mut gateway, id) = fixture.started_with(base.clone());
         win(&mut gateway, game, id);
         let mut reconnected = fixture.reconnected(&gateway);
         assert!(active(&reconnected, game).is_none(), "{} won", game.name);
