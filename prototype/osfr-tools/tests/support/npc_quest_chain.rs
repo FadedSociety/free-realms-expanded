@@ -207,7 +207,7 @@ impl Fixture {
     /// binding (the loader keeps nothing else from a row), so every giver and turn-in mapping and
     /// every cross-check against `data/content` is unchanged. No test writes to `data/content`,
     /// so the binding rows are read once per test binary.
-    fn quest_catalogue(&self) -> PathBuf {
+    pub fn quest_catalogue(&self) -> PathBuf {
         let catalogue = self.path.join("quest-catalogue");
         if catalogue.join("quests").is_dir() {
             return catalogue;

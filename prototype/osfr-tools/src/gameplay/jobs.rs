@@ -122,6 +122,10 @@ impl Gameplay {
             .inventory
             .profile_attachments(self.profiles.as_ref().unwrap().active())?;
         self.profiles.as_mut().unwrap().activate(job)?;
+        // T499/F736: every job switch settles quest eligibility where it happens (see
+        // `stage_job_selection`, `begin_kart_race`, `begin_derby`), so the marker pass that ends
+        // this packet reads the new job.
+        self.refresh_npc_quest_eligibility(current_unix_seconds());
         self.sync_player_level(out);
         // Repair the outfit and weapon before the bar: T521 labels the basic
         // slot from the live slot-7 weapon, so a job re-armed here must not
@@ -186,6 +190,7 @@ impl Gameplay {
         selection.replies.insert(0, activation);
         selection.changed |= changed;
         *self = staged;
+        self.refresh_npc_quest_eligibility(current_unix_seconds());
         out.changed |= selection.changed;
         out.replies.extend(selection.replies);
         out.nearby.extend(selection.nearby);

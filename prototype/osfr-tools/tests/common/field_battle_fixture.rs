@@ -33,7 +33,10 @@ mod combat_scale;
 mod gateway_packets;
 
 #[allow(unused_imports)] // Each suite uses the subset its route needs.
-pub use gateway_packets::{dialogue_choice, interact, melee, quest_end_reply, quest_reply};
+pub use gateway_packets::{
+    body as unframe, chat, dialogue_choice, interact, melee, move_to, quest_end_reply, quest_reply,
+    wrap,
+};
 
 pub const RUNTIME_CONTENT: &str = "../../../lab/reports/round70-native-20261016T061000Z/content";
 pub const REFERENCE: &str = "../../../lab/references/rust-gateway-reference";
@@ -223,23 +226,6 @@ pub fn prize_ids(row: &Value) -> std::collections::BTreeSet<i32> {
 // Packet helpers (shapes pinned by `field_battle_roster`).
 // ---------------------------------------------------------------------------
 
-pub fn wrap(inner: &[u8]) -> Vec<u8> {
-    let mut bytes = vec![5, 0, 1];
-    bytes.extend((inner.len() as u32).to_le_bytes());
-    bytes.extend(inner);
-    bytes
-}
-
-pub fn unframe(reply: &[u8]) -> &[u8] {
-    if reply.starts_with(&[5, 0, 1]) && reply.len() >= 7 {
-        let length = u32::from_le_bytes(reply[3..7].try_into().unwrap()) as usize;
-        if length == reply.len() - 7 {
-            return &reply[7..];
-        }
-    }
-    reply
-}
-
 pub fn send(gateway: &mut Gateway, inner: &[u8], now_ms: u64) -> GatewayOutcome {
     gateway
         .handle_at(&wrap(inner), now_ms)
@@ -261,16 +247,6 @@ pub fn go(details: &[u8]) -> Vec<u8> {
     let mut packet = vec![41, 0, 108, 0];
     packet.extend(&details[4..12]);
     packet.extend(0_u64.to_le_bytes());
-    packet
-}
-
-pub fn move_to(guid: u64, position: [f32; 3]) -> Vec<u8> {
-    let mut packet = 125_u16.to_le_bytes().to_vec();
-    packet.extend(guid.to_le_bytes());
-    for value in position.into_iter().chain([0.0, 0.0, 1.0]) {
-        packet.extend(value.to_le_bytes());
-    }
-    packet.extend([0, 0]);
     packet
 }
 

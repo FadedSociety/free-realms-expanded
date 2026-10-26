@@ -1,5 +1,8 @@
-//! Request bodies shared by the S6 packet tests, the vendor suites and the
-//! field-battle fixtures.
+//! Request bodies and the two gateway envelope helpers shared by the S6 packet
+//! tests, the vendor suites and the field-battle fixtures.
+//!
+//! The `005` tunnel (`wrap`) and its reply reader (`body`) are the client's
+//! application framing; the 125 movement body is the gateway's Position event.
 //!
 //! Client-derived shapes: the chat request reader is `00b11600`; the NPC menu
 //! constructor is 26/8 `008b6bc0` (u64 target + bool); the menu selection
@@ -136,4 +139,41 @@ pub fn blocked_families(target: u64) -> [Vec<u8>; 5] {
         ability(target, 0),
         equip,
     ]
+}
+
+/// The `005` application tunnel a client uses for its initialization and movement
+/// messages: `[5, 0, 1]`, the inner length, then the body.
+#[allow(dead_code)] // Included by sites that only read the bodies.
+pub fn wrap(inner: &[u8]) -> Vec<u8> {
+    let mut message = vec![5, 0, 1];
+    message.extend((inner.len() as u32).to_le_bytes());
+    message.extend(inner);
+    message
+}
+
+/// The application body of a gateway reply (its `005` tunnel stripped when the
+/// length matches), so a test reads the family the client reads.
+#[allow(dead_code)] // Included by sites that never unwrap a reply.
+pub fn body(reply: &[u8]) -> &[u8] {
+    if reply.starts_with(&[5, 0, 1]) && reply.len() >= 7 {
+        let length = u32::from_le_bytes(reply[3..7].try_into().unwrap()) as usize;
+        if length == reply.len() - 7 {
+            return &reply[7..];
+        }
+    }
+    reply
+}
+
+/// Client opcode 125 (`Event::Position`; production reader `gateway::parse_message`,
+/// native sender `00934a20` in `movement.rs`): the character guid, position, a
+/// `[0, 0, 1]` direction and the two zero state bytes.
+#[allow(dead_code)] // Included by suites that do not move a character.
+pub fn move_to(guid: u64, position: [f32; 3]) -> Vec<u8> {
+    let mut packet = 125_u16.to_le_bytes().to_vec();
+    packet.extend(guid.to_le_bytes());
+    for value in position.into_iter().chain([0.0, 0.0, 1.0]) {
+        packet.extend(value.to_le_bytes());
+    }
+    packet.extend([0, 0]);
+    packet
 }

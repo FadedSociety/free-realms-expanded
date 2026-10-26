@@ -1,23 +1,30 @@
 //! T499: quest markers on the visibility and quest paths. Every step is a client request through
-//! `Gameplay::handle_in_world` or the NPC-view calls the gateway makes: `update_npc_visibility`
-//! (per player) and `shared_npc_view` plus `quest_marker_packets` (shared field).
+//! `Gameplay::handle_in_world`, the real gateway wrapper (`Gateway::handle_at`), or the NPC-view
+//! calls the gateway makes: `update_npc_visibility` (per player) and `shared_npc_view` plus
+//! `quest_marker_packets` (shared field).
 //!
-//! Wire model, from the client readers cited in `src/quest_markers.rs`: a 35/10 is
-//! u16 35, u16 10, an i32 count, then 39-byte elements (u64 guid at 0, image id at 17,
-//! `008db310`); a 35/11 is the same header, a count, then 16-byte elements (u64 guid first,
-//! `008db550`). A 35/2 AddNpc carries the actor id at 4..12 (`00921a10`).
+//! The wire decoder is `support/quest_marker_packets.rs` (client readers `008db310`, `008db550`).
 
 #[path = "support/archer_entry.rs"]
 mod archer_entry;
+#[path = "common/gateway_packets.rs"]
+mod gateway_packets;
+#[path = "support/quest_marker_packets.rs"]
+mod quest_marker_packets;
+// Only `reference()` is used; the rest of the shared round70 fixture is other suites' base.
+#[path = "common/round70_content.rs"]
+#[allow(dead_code)]
+mod round70_content;
 
 use archer_entry::{
-    BOLLYLOG, Fixture, HRUGAGU, LUGABOW, PATH, accept, activate_brawler, character_at_for,
+    BOLLYLOG, BRAWLER, Fixture, HRUGAGU, LUGABOW, PATH, accept, activate_brawler, character_at_for,
     content_position, learn_archer, offer, quest_reply, recruit_spawn, saved, seed_active_profile,
     send,
 };
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::Gameplay,
+    gateway::Gateway,
     quest_engine::{CharacterEligibility, QuestEngine},
 };
 use std::collections::BTreeSet;
@@ -34,6 +41,13 @@ const ROAD_GIVER: u64 = 9_000_000_295;
 const ROAD_NEXT_GIVER: u64 = 9_000_000_289;
 const RULES_OF_THE_ROAD: u32 = 3_060_004;
 const DERBY_PROFILE: i32 = 49;
+/// A derby arena driver; `derby_gates.json` lists it and it stands in `wilds.json` beside the
+/// Rules of the Road giver, whose quest is gated on the Demo Derby Driver job.
+const CRASH: u64 = ROAD_NEXT_GIVER;
+const DERBY_LABEL: u32 = 3053;
+/// A kart race gate (`kart_gates.json`) in `wilds.json`, with its menu label.
+const KART_GATE: u64 = 9_000_000_273;
+const KART_LABEL: u32 = 3052;
 
 fn at(npc: u64, file: &str) -> CharacterState {
     character_at_for(archer_entry::CHARACTER, 0, content_position(file, npc))
@@ -43,35 +57,15 @@ fn at_merigold() -> CharacterState {
     at(MERIGOLD, "highroad_junction.json")
 }
 
-fn word(bytes: &[u8], at: usize) -> usize {
-    i32::from_le_bytes(bytes[at..at + 4].try_into().unwrap()) as usize
-}
-
-fn guid(bytes: &[u8], at: usize) -> u64 {
-    u64::from_le_bytes(bytes[at..at + 8].try_into().unwrap())
-}
-
 /// Every (guid, image id) the 35/10 packets in `packets` carry.
 fn shown(packets: &[Vec<u8>]) -> Vec<(u64, i32)> {
-    packets
-        .iter()
-        .filter(|packet| packet.starts_with(&[35, 0, 10, 0]))
-        .flat_map(|packet| {
-            (0..word(packet, 4)).map(move |row| {
-                let at = 8 + row * 39;
-                (guid(packet, at), word(packet, at + 17) as i32)
-            })
-        })
-        .collect()
+    let (rows, _) = quest_marker_packets::markers(packets);
+    rows.iter().map(|row| (row.guid, row.image)).collect()
 }
 
 /// Every guid the 35/11 packets in `packets` clear.
 fn cleared(packets: &[Vec<u8>]) -> Vec<u64> {
-    packets
-        .iter()
-        .filter(|packet| packet.starts_with(&[35, 0, 11, 0]))
-        .flat_map(|packet| (0..word(packet, 4)).map(move |row| guid(packet, 8 + row * 16)))
-        .collect()
+    quest_marker_packets::markers(packets).1
 }
 
 fn marker_count(packets: &[Vec<u8>]) -> usize {
@@ -79,15 +73,23 @@ fn marker_count(packets: &[Vec<u8>]) -> usize {
 }
 
 fn spawn_index(packets: &[Vec<u8>], actor: u64) -> Option<usize> {
-    packets
-        .iter()
-        .position(|packet| packet.starts_with(&[35, 0, 2, 0]) && guid(packet, 4) == actor)
+    quest_marker_packets::spawn_index(packets, actor)
 }
 
 fn marker_index(packets: &[Vec<u8>], actor: u64, image: i32) -> Option<usize> {
-    packets
+    quest_marker_packets::markers(packets)
+        .0
         .iter()
-        .position(|packet| shown(std::slice::from_ref(packet)).contains(&(actor, image)))
+        .find(|row| (row.guid, row.image) == (actor, image))
+        .map(|row| row.index)
+}
+
+/// The application bodies of a `Gateway::handle_at` reply batch (the shared tunnel reader).
+fn bodies(replies: &[Vec<u8>]) -> Vec<Vec<u8>> {
+    replies
+        .iter()
+        .map(|reply| gateway_packets::body(reply).to_vec())
+        .collect()
 }
 
 fn offer_and_accept(game: &mut Gameplay, character: &CharacterState, giver: u64, quest: u32) {
@@ -104,6 +106,13 @@ fn giver_shows_available_after_add_npc() {
     let spawn = spawn_index(&batch, MERIGOLD).expect("Merigold is added");
     let marker = marker_index(&batch, MERIGOLD, AVAILABLE).expect("Merigold gets '!'");
     assert!(spawn < marker, "a marker never precedes its AddNpc");
+    // The row carries the NPC's own name string id, the one its AddNpc names.
+    let name = osfr_tools::startup_world::parse_add_npc(&batch[spawn])
+        .unwrap()
+        .name_string_id;
+    let row = quest_marker_packets::markers(&batch).0;
+    assert_ne!(name, 0);
+    assert_eq!(row.iter().find(|r| r.guid == MERIGOLD).unwrap().name, name);
 
     // Shared field: the same order out of `shared_npc_view`, once, and nothing when known.
     let game = fixture.game(None);
@@ -280,6 +289,170 @@ fn job_switch_settles_markers_in_its_own_packet() {
         0
     );
     assert_eq!(game.quest_marker_revision(), switched);
+}
+
+/// A live rebind (an admin content reload) rebuilds the engine on the same `Gameplay`; it must
+/// continue the revision past the engine it replaces, or the marker pass would see an unchanged
+/// number and never refresh what the client still shows.
+#[test]
+fn live_rebind_continues_the_revision_and_keeps_markers() {
+    let fixture = Fixture::new();
+    let mut game = fixture.game(None);
+    let character = at_merigold();
+    game.update_npc_visibility(&character).unwrap();
+    offer(&mut game, &character, MERIGOLD, HIGHROAD, 2_000);
+    let before = game.quest_marker_revision();
+    game.bind_npc_quest_catalogue(&fixture.quest_catalogue(), archer_entry::CHARACTER)
+        .expect("the live rebind loads");
+    let rebound = game.quest_marker_revision();
+    assert!(
+        rebound > before,
+        "a rebind continues past the engine it replaces"
+    );
+    // The rebind restored the offer from the live state, so the next pass still owns a marker
+    // change to send for what the client already shows.
+    let refreshed = game.update_npc_visibility(&character).unwrap();
+    assert!(marker_count(&refreshed) > 0, "the rebind refreshes markers");
+    assert_eq!(
+        game.update_npc_visibility(&character).unwrap(),
+        Vec::<Vec<u8>>::new(),
+        "one refresh per rebind"
+    );
+}
+
+/// The real gateway wrapper (`gateway.rs` `Event::Position`): a move that brings Merigold inside
+/// the 100-unit view sends her AddNpc and then her '!' from the same pass, so a client never
+/// receives a notification for an actor it has not spawned.
+#[test]
+fn gateway_position_sends_the_marker_after_the_add_npc() {
+    let fixture = Fixture::new();
+    // The narrowed quest catalogue is the production bind's input; copy its split files into the
+    // fixture so `Gameplay::load` (NPC rows, profiles) and the bind read one content directory.
+    archer_entry::copy_missing(&fixture.quest_catalogue(), fixture.path());
+    let npc = content_position("highroad_junction.json", MERIGOLD);
+    let far = [npc[0] + 150.0, npc[1], npc[2]];
+    let character = character_at_for(archer_entry::CHARACTER, 0, far);
+    let mut gateway = Gateway::load_gameplay(
+        &round70_content::reference(),
+        character,
+        fixture.path(),
+        None,
+    )
+    .expect("the gateway content loads");
+    let guid = archer_entry::CHARACTER;
+    gateway
+        .handle_at(&gateway_packets::login(guid), 1_000)
+        .expect("login handles");
+    gateway
+        .handle_at(&gateway_packets::wrap(&[13, 0]), 1_010)
+        .expect("ready handles");
+    let loaded = gateway
+        .handle_at(&gateway_packets::wrap(&[10, 0]), 1_020)
+        .expect("loaded handles");
+    assert!(
+        spawn_index(&bodies(&loaded.replies), MERIGOLD).is_none(),
+        "150 units is outside the 100-unit view"
+    );
+    let near = [npc[0] + 40.0, npc[1], npc[2]];
+    let moved = gateway
+        .handle_at(
+            &gateway_packets::wrap(&gateway_packets::move_to(guid, near)),
+            2_000,
+        )
+        .expect("the accepted move handles");
+    let batch = bodies(&moved.replies);
+    let spawn = spawn_index(&batch, MERIGOLD).expect("the move adds Merigold");
+    let marker = marker_index(&batch, MERIGOLD, AVAILABLE).expect("Merigold gets '!'");
+    assert!(spawn < marker, "the marker follows its AddNpc");
+}
+
+/// A session in `wilds.json` with the kart and derby packages bound, the shape the shipped
+/// content has: the derby gate is the NPC the Rules of the Road quest already stands beside.
+fn race_fixture(active: i32, stands_at: u64) -> (Fixture, Gameplay, CharacterState) {
+    let fixture = Fixture::new();
+    for file in [
+        "kart_entry.json",
+        "kart_gates.json",
+        "kart_lobby.json",
+        "derby_entry.json",
+        "derby_gates.json",
+    ] {
+        std::fs::copy(
+            archer_entry::content_dir().join(file),
+            fixture.path().join(file),
+        )
+        .unwrap();
+    }
+    let mut state = fixture.game(None).state();
+    seed_active_profile(&mut state, active, &[BRAWLER]);
+    let game = fixture.game(Some(state));
+    let character = at(stands_at, "wilds.json");
+    (fixture, game, character)
+}
+
+/// Entering the derby through the driver's menu changes the job inside the same packet that the
+/// marker pass reads: the job-gated giver shows its '!' in that reply, not one request later.
+#[test]
+fn derby_entry_settles_markers_in_its_own_packet() {
+    let (_fixture, mut game, character) = race_fixture(BRAWLER, CRASH);
+    let first = game.update_npc_visibility(&character).unwrap();
+    assert!(
+        !shown(&first).iter().any(|(id, _)| *id == ROAD_GIVER),
+        "the Brawler cannot take the derby quest"
+    );
+    let menu = archer_entry::interact(&mut game, &character, CRASH, 2_000);
+    let option = archer_entry::menu_option(&menu, DERBY_LABEL);
+    let entered = send(
+        &mut game,
+        &character,
+        &archer_entry::npc_select(CRASH, option),
+        2_100,
+    );
+    assert!(
+        shown(&entered.replies).contains(&(ROAD_GIVER, AVAILABLE)),
+        "the new job's quest shows in the entry reply"
+    );
+}
+
+/// Every kart switch settles eligibility where the job changes: the race clears the derby job's
+/// '!' in its own reply, the exit puts it back in its own reply, and a refused request after the
+/// exit sends no marker and moves nothing.
+#[test]
+fn kart_race_switches_settle_markers_in_their_own_packets() {
+    let (_fixture, mut game, character) = race_fixture(DERBY_PROFILE, KART_GATE);
+    let first = game.update_npc_visibility(&character).unwrap();
+    assert!(shown(&first).contains(&(ROAD_GIVER, AVAILABLE)));
+    let menu = archer_entry::interact(&mut game, &character, KART_GATE, 1_900);
+    let option = archer_entry::menu_option(&menu, KART_LABEL);
+    let racing = send(
+        &mut game,
+        &character,
+        &archer_entry::npc_select(KART_GATE, option),
+        2_000,
+    );
+    assert!(
+        cleared(&racing.replies).contains(&ROAD_GIVER),
+        "the Kart Driver cannot take the derby quest"
+    );
+    let back = send(
+        &mut game,
+        &character,
+        &gateway_packets::chat("realm exit"),
+        3_000,
+    );
+    assert!(
+        shown(&back.replies).contains(&(ROAD_GIVER, AVAILABLE)),
+        "the restored job's quest returns in the exit reply"
+    );
+    let settled = game.quest_marker_revision();
+    let before = saved(&game);
+    let refused = game.handle_in_world(&quest_reply(RULES_OF_THE_ROAD, true), &character, 4_000);
+    assert_eq!(
+        marker_count(&refused.map(|out| out.replies).unwrap_or_default()),
+        0
+    );
+    assert_eq!(game.quest_marker_revision(), settled);
+    assert_eq!(saved(&game), before);
 }
 
 #[test]

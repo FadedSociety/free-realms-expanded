@@ -119,6 +119,7 @@ impl Gameplay {
             )?;
         }
         self.ensure_outfit(crate::derby_gateway::DEMO_DERBY_DRIVER_PROFILE, &mut out)?;
+        self.refresh_npc_quest_eligibility(current_unix_seconds());
         // Last, after the outfit repair: the 38/21 attachment list comes from what
         // the player wears now (client reader `0x0091b080`).
         let activation = self.profiles.as_ref().unwrap().activation(

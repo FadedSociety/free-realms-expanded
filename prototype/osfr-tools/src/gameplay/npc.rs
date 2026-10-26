@@ -940,6 +940,7 @@ impl Gameplay {
             self.give_starter_outfit(48, false, &mut out)?;
         }
         self.ensure_outfit(48, &mut out)?;
+        self.refresh_npc_quest_eligibility(current_unix_seconds());
         // Last, after the outfit repair: the 38/21 attachment list comes from what
         // the player wears now (client reader `0x0091b080`).
         out.replies.insert(

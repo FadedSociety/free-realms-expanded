@@ -1,6 +1,8 @@
 //! F160: shared-field view reconciliation around readiness/world-load loss, and
 //! the per-recipient delivery isolation that keeps one full queue out of the tick.
 use super::*;
+#[path = "../../../tests/support/quest_marker_packets.rs"]
+mod quest_marker_packets;
 use osfr_tools::quest_engine::{QuestProgress, QuestStatus};
 use serde_json::Value;
 
@@ -354,27 +356,6 @@ fn f213_sync_field_views_replays_pending_end_screen_after_the_speaker_spawn() {
     let _ = fs::remove_dir_all(scratch);
 }
 
-fn t499_markers(bodies: &[Vec<u8>]) -> (Vec<(usize, u64, i32)>, Vec<u64>) {
-    // 35/10 elements are 39 bytes from offset 8 (guid at 0, image at 17, reader 008db310);
-    // 35/11 elements are 16 bytes from offset 8 (reader 008db550).
-    let count = |body: &[u8]| i32::from_le_bytes(body[4..8].try_into().unwrap()) as usize;
-    let guid = |body: &[u8], at: usize| u64::from_le_bytes(body[at..at + 8].try_into().unwrap());
-    let mut shown = Vec::new();
-    let mut cleared = Vec::new();
-    for (index, body) in bodies.iter().enumerate() {
-        if body.starts_with(&[35, 0, 10, 0]) {
-            for row in 0..count(body) {
-                let at = 8 + row * 39;
-                let image = i32::from_le_bytes(body[at + 17..at + 21].try_into().unwrap());
-                shown.push((index, guid(body, at), image));
-            }
-        } else if body.starts_with(&[35, 0, 11, 0]) {
-            cleared.extend((0..count(body)).map(|row| guid(body, 8 + row * 16)));
-        }
-    }
-    (shown, cleared)
-}
-
 /// T499: the shared view sends '?' after the talk target's 35/2, nothing while idle, and a 35/11
 /// the pass after the player's quest changes (the abandon is a real 26/23 through the gateway).
 #[test]
@@ -457,27 +438,22 @@ fn t499_shared_view_sends_markers_after_spawn_and_refreshes_on_quest_change() {
     };
 
     let first = pass(&mut server, now + 10);
-    let spawn = first
-        .iter()
-        .position(|body| {
-            body.starts_with(&[35, 0, 2, 0])
-                && u64::from_le_bytes(body[4..12].try_into().unwrap()) == F213_JONES
-        })
-        .expect("the view spawns Jones");
-    let (shown, _) = t499_markers(&first);
+    let spawn =
+        quest_marker_packets::spawn_index(&first, F213_JONES).expect("the view spawns Jones");
+    let (shown, _) = quest_marker_packets::markers(&first);
     let marker = shown
         .iter()
-        .find(|(_, id, _)| *id == F213_JONES)
+        .find(|row| row.guid == F213_JONES)
         .expect("Jones gets a marker");
-    assert_eq!(marker.2, 6, "'?' over the talk target");
+    assert_eq!(marker.image, 6, "'?' over the talk target");
     assert!(
-        spawn < marker.0,
+        spawn < marker.index,
         "the marker follows the AddNpc in the same delivery"
     );
 
     let idle = pass(&mut server, now + 20);
     assert_eq!(
-        t499_markers(&idle),
+        quest_marker_packets::markers(&idle),
         (Vec::new(), Vec::new()),
         "an idle pass sends no marker"
     );
@@ -490,15 +466,15 @@ fn t499_shared_view_sends_markers_after_spawn_and_refreshes_on_quest_change() {
         .handle_at(&wrap_application(&abandon), now + 30)
         .unwrap();
     let changed = pass(&mut server, now + 40);
-    let (shown, cleared) = t499_markers(&changed);
+    let (shown, cleared) = quest_marker_packets::markers(&changed);
     assert!(
         cleared.contains(&F213_JONES),
         "the abandoned quest clears '?'"
     );
-    assert!(shown.iter().all(|(_, id, _)| *id != F213_JONES));
+    assert!(shown.iter().all(|row| row.guid != F213_JONES));
     let idle = pass(&mut server, now + 50);
     assert_eq!(
-        t499_markers(&idle),
+        quest_marker_packets::markers(&idle),
         (Vec::new(), Vec::new()),
         "one refresh per change"
     );

@@ -4110,8 +4110,6 @@ impl Gameplay {
             if let Some(changed) = self.stage_job_selection(id, &mut out)? {
                 out.replies.extend(self.ability_activation_for(id)?);
                 self.sync_player_level(&mut out);
-                // T499: the job is part of quest eligibility; the marker pass reads it at the end of this packet.
-                self.refresh_npc_quest_eligibility(current_unix_seconds());
                 self.opening_equipment_events(&mut out)?;
                 self.sync_world_stage(&mut out)?;
                 self.announce_profile_outfit(character.guid, &outfit_before, changed, &mut out)?;

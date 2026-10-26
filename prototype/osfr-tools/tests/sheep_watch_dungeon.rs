@@ -608,6 +608,26 @@ fn refusals_change_nothing() {
     // Forged Go with no open start screen.
     let mut gateway = fixture.gateway(MARKER, 4001);
     assert!(send(&mut gateway, &switch_job(BRAWLER), 300).state_changed);
+    // A kart race activates the Kart Driver inside its own packet and the exit restores the
+    // real job; both settle quest eligibility where the profile changes. Without that, the
+    // next forged packet refreshes the stale eligibility and answers with marker packets.
+    let racing = send(&mut gateway, &chat("realm race"), 320);
+    assert!(
+        racing.state_changed && racing.began_zoning,
+        "the race starts"
+    );
+    // The scene transition makes the client load the race scene again.
+    send(&mut gateway, &13_u16.to_le_bytes(), 330);
+    send(&mut gateway, &10_u16.to_le_bytes(), 335);
+    let exited = send(&mut gateway, &chat("realm exit"), 340);
+    assert!(
+        exited.state_changed && exited.began_zoning,
+        "the race exits"
+    );
+    // The return transition loads the world again; then the eligibility must already be the
+    // restored job's, so the next forged packet cannot settle a stale race job and answer it.
+    send(&mut gateway, &13_u16.to_le_bytes(), 350);
+    send(&mut gateway, &10_u16.to_le_bytes(), 355);
     let before = (gateway.snapshot(), saved_bytes(&gateway));
     let mut forged = vec![41, 0, 108, 0];
     forged.extend(SHEEP_WATCH.to_le_bytes());
