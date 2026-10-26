@@ -823,7 +823,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T729: the level gate is one job_level objective (T361, profile 14 = Miner, level 10 from the client text), completed from the server's own Miner rank and never from a client claim. The return to Derp Axemaker is the 49/13 turn-in at the giver; quest-lines/objective-specs-fixed.json q3100012 lists it as a second talk step with no client string of its own. It is enabled here only because 3100013 (Finding Southvale) lists it as its prerequisite and a disabled prerequisite makes that quest unreachable."
+              "evidence": "(R) T729: the level gate is one job_level objective (T361, profile 14 = Miner, level 10 from the client text), completed from the server's own Miner rank and never from a client claim. The return to Derp Axemaker is the 49/13 turn-in at the giver; quest-lines/objective-specs-fixed.json q3100012 lists it as a second talk step with no client string of its own. It is enabled here only because 3100013 (Finding Southvale) lists it as its prerequisite and a disabled prerequisite makes that quest unreachable. F746: the fixed spec splits the goal into part 0 (the pure level line 387509, 'Level up to 10 as a miner.') and part 1 (the return line 387507); this one-objective fold carries 387507 as the tracker text because its second half is the 49/13 turn-in at Derp and the client never shows the return as a separate goal, so 387509 is not shown on its own."
             }
           ]
         }
@@ -1383,6 +1383,10 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T729/F746: end text 77625 is Silverray's anecdote about Grumpore, not a turn-in line (quest-lines/objective-specs-fixed.json q3100020 open; quest-lines/dialogs.json q3100020 complete null). It is kept as the 49/13 debrief because the client has no completion line; a sourced replacement is an open gap for the lead."
         }
       ],
       "description_string_id": 77624,

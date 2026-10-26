@@ -313,7 +313,7 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
     ),
     (
         9000000069,
-        "Derp Axemaker (T729 giver of 3100012 and 3100013): the only first-person lines the client has for him are the offer intros 387452 and 77415 of those two quests, and quest-lines/dialogs.json leaves both speakers unattributed; binding a QuestOffer greeting moves the Snowhill bound-row pins in the region greeting tests, which this quest-data change does not touch, so he stays unbound.",
+        "Derp Axemaker (T729 giver of 3100012 and 3100013): the only first-person lines of his enabled quests are their offer intros 387452 and 77415, and quest-lines/dialogs.json leaves both speakers unattributed; binding a QuestOffer greeting moves the Snowhill bound-row pins in the region greeting tests, which this quest-data change does not touch, so he stays unbound. His disabled quests carry other first-person intros, but a disabled quest offers no proof and is not a greeting source.",
     ),
     (
         9000000070,

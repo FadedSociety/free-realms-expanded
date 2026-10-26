@@ -1,36 +1,35 @@
-//! T729: the Southvale Miner quests the fixed objective specs let the server run today,
-//! enabled in `data/content/quests/miner.json`: "Reach Level 10" (3100012) and "Finding
-//! Southvale" (3100013) at Derp Axemaker, and "Reach Level 15" (3100019) and "See For
-//! Yourself" (3100020) at Grumpore.
+//! T729/F746: the Southvale Miner quests the fixed objective specs let the server
+//! run today, enabled in `data/content/quests/miner.json`: "Reach Level 10"
+//! (3100012) and "Finding Southvale" (3100013) at Derp Axemaker, and "Reach Level
+//! 15" (3100019) and "See For Yourself" (3100020) at Grumpore.
 //!
-//! Every test drives the production in-world router through `tests/support/npc_quest_chain.rs`:
-//! the 26/8 -> 26/10 -> 26/6 offer (49/1, decoded with the production reader), the 49/2 accept,
-//! the `job_level` goal (T361, completed by a real `realm level`), the Talk that holds the
-//! 49/13, the 26/6 that releases it and the 49/14 turn-in. Rewards, text ids and level targets
-//! are read from the quest data, never pinned here.
+//! Every test drives the production in-world router through
+//! `tests/support/npc_quest_chain.rs`: the 26/8 -> 26/10 -> 26/6 offer (49/1,
+//! decoded with the production reader), the 49/2 accept, the `job_level` goal
+//! (T361, completed by a real `realm level`), the Talk that holds the 49/13, the
+//! 26/6 that releases it and the 49/14 turn-in. The quest records, cards, end
+//! texts and payouts come from `tests/support/quest_records.rs`, so the reward sum
+//! is the loader's (every row, every job-XP profile), not one row's. The only
+//! pinned values are the two level gates the client text names.
 //!
-//! Client readers (IDA, 2014 client; no new wire): 49/1 `0x00c7b7a0`, 49/2 `0x00a86400`,
-//! 49/13 `QuestEndPacket::ReadFields` `0x00c7b990` (actor `6..14`, quest `14..18`, end text
-//! `18..22`, one dword, then the reward bundle `0x008e7930`), 49/14 `0x00a864c0`.
+//! Client readers (IDA, 2014 client; no new wire): 49/1 `0x00c7b7a0`, 49/2
+//! `0x00a86400`, 49/13 `QuestEndPacket::ReadFields` `0x00c7b990` (actor `6..14`,
+//! quest `14..18`, end text `18..22`, one dword, then the reward bundle
+//! `0x008e7930`), 49/14 `0x00a864c0`.
 
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
+#[path = "support/quest_records.rs"]
+mod quest_records;
 
 use npc_quest_chain::{
-    ADVENTURER, CHARACTER, Fixture, accept, assert_no_offer, assert_packet_changes_nothing,
-    character_at_for, coins, content_dir, content_position, counts, end_screen_reward,
-    finish_quest, objective_complete, offer, pending_turnin, profile_xp, quest_end_reply,
-    quest_reply, quest_status, read_json, release_end_screen, seed_active_profile, send, talk,
+    ADVENTURER, CHARACTER, Fixture, ZoneQuest, ZoneQuests, assert_no_offer,
+    assert_packet_changes_nothing, coins, content_dir, counts, objective_complete, pending_turnin,
+    profile_xp, quest_end_reply, quest_reply, quest_status, realm_level, talk, zone_player,
 };
-use osfr_tools::{
-    account_store::AccountRole,
-    character_store::CharacterState,
-    chat,
-    gameplay::{Gameplay, Outcome},
-    npc_interaction::decode_quest_offer_49_1,
-    quest_engine::QuestStatus,
-};
-use serde_json::Value;
+use osfr_tools::quest_engine::QuestStatus;
+use quest_records::{RawQuest, as_u32, read_quests};
+use std::sync::OnceLock;
 
 const DERP: u64 = 9_000_000_069;
 const MILI: u64 = 9_000_000_405;
@@ -40,116 +39,72 @@ const LEVEL_TEN: u32 = 3_100_012;
 const SOUTHVALE: u32 = 3_100_013;
 const LEVEL_FIFTEEN: u32 = 3_100_019;
 const SEE_FOR_YOURSELF: u32 = 3_100_020;
+/// The client text's Miner ranks: 387507 "Reach Level 10 ..." and 387518
+/// "Reach Level 15 ...". Pinned so a data edit to 11 or 16 fails here.
+const LEVEL_TEN_GATE: u32 = 10;
+const LEVEL_FIFTEEN_GATE: u32 = 15;
 const MINER: i32 = 14;
 const OTHER: u64 = CHARACTER + 1;
 
-/// The shipped quest record, for the values the tests must not pin.
-fn record(quest: u32) -> Value {
-    read_json(&content_dir().join("quests/miner.json"))["records"]
-        .as_array()
-        .unwrap()
+/// Every NPC row is in `greenwood_forest.json` except Derp (Snowhill) and
+/// Silverray (Blackspore).
+const MAP: ZoneQuests = ZoneQuests {
+    default_file: "greenwood_forest.json",
+    files: &[
+        (DERP, "snowhill.json"),
+        (SILVERRAY, "blackspore_swamp.json"),
+    ],
+    runtime: &[],
+};
+
+/// The shipped quest records, read once through the shared record reader.
+fn shipped_quests() -> &'static [RawQuest] {
+    static RECORDS: OnceLock<Vec<RawQuest>> = OnceLock::new();
+    RECORDS.get_or_init(|| read_quests(&content_dir()))
+}
+
+fn record(id: u32) -> &'static RawQuest {
+    shipped_quests()
         .iter()
-        .find(|row| row["id"].as_u64() == Some(u64::from(quest)))
-        .cloned()
-        .unwrap_or_else(|| panic!("quest {quest} ships in miner.json"))
+        .find(|quest| quest.id == id)
+        .unwrap_or_else(|| panic!("the shipped quest record {id}"))
 }
 
-fn reward(quest: u32) -> (u32, u32) {
-    let row = &record(quest)["rewards"][0];
-    (
-        row["coins"].as_u64().unwrap() as u32,
-        row["job_xp"][MINER.to_string()].as_u64().unwrap_or(0) as u32,
-    )
-}
-
-/// The rank a `job_level` goal asks for.
-fn target_level(quest: u32) -> u32 {
-    record(quest)["objectives"][0]["level"].as_u64().unwrap() as u32
-}
-
-fn derp(guid: u64) -> CharacterState {
-    character_at_for(guid, 0, content_position("snowhill.json", DERP))
-}
-
-fn mili(guid: u64) -> CharacterState {
-    character_at_for(guid, 0, content_position("greenwood_forest.json", MILI))
-}
-
-fn silverray(guid: u64) -> CharacterState {
-    character_at_for(
-        guid,
-        0,
-        content_position("blackspore_swamp.json", SILVERRAY),
-    )
-}
-
-fn grumpore(guid: u64) -> CharacterState {
-    character_at_for(guid, 0, content_position("greenwood_forest.json", GRUMPORE))
-}
-
-/// A character with `active` selected and both jobs learned. The offer gate reads the
-/// *active* job (`Gameplay::character_eligibility`), so the Miner job must be the active one.
-fn player(fixture: &Fixture, guid: u64, active: i32) -> Gameplay {
-    let mut state = fixture.game_as(guid, None).state();
-    seed_active_profile(&mut state, active, &[ADVENTURER, MINER]);
-    fixture.game_as(guid, Some(state))
-}
-
-fn realm_level(game: &mut Gameplay, who: &CharacterState, level: u32, now: u64) -> Outcome {
-    game.set_dev_tools(true);
-    game.set_role(AccountRole::Admin);
-    send(
-        game,
-        who,
-        &chat::local_request(&format!("realm level {level}")),
-        now,
-    )
-}
-
-/// Offer, check the 49/1 card against the record, accept.
-fn accepted(game: &mut Gameplay, who: &CharacterState, npc: u64, quest: u32, now: u64) {
-    let offered = offer(game, who, npc, quest, now);
-    let card = offered
-        .replies
-        .iter()
-        .find_map(|packet| decode_quest_offer_49_1(packet).ok())
-        .expect("the 49/1 card decodes");
-    let record = record(quest);
-    let field = |key: &str| record[key].as_u64().unwrap_or(0) as u32;
-    assert_eq!(
-        [
-            card.name_string_id,
-            card.intro_text_string_id,
-            card.description_string_id
+/// The quest with its card, end text and payout read from the shipped record.
+fn quest(id: u32, giver: u64, turnin: u64) -> ZoneQuest {
+    let shipped = record(id);
+    let (coins, xp) = shipped.reward_totals();
+    assert!(coins > 0, "quest {id} has a real payout");
+    ZoneQuest {
+        id,
+        giver,
+        card: [
+            u32::try_from(shipped.title_string_id).expect("quest title id fits u32"),
+            shipped.intro_text_string_id,
+            shipped.description_string_id,
         ],
-        [
-            field("title_string_id"),
-            field("intro_text_string_id"),
-            field("description_string_id")
-        ],
-        "49/1 title, intro and description come from the record"
-    );
-    accept(game, who, quest, now + 2);
-}
-
-/// The final Talk, the end screen and the 49/14: coins and Miner XP from the data.
-fn turn_in(game: &mut Gameplay, who: &CharacterState, npc: u64, quest: u32, now: u64) {
-    let (coins, xp) = reward(quest);
-    assert!(coins > 0, "quest {quest} pays something");
-    talk(game, who, npc, now);
-    assert_eq!(pending_turnin(game), Some(quest));
-    let end_text = record(quest)["end_text_string_id"].as_u64().unwrap() as u32;
-    let end = release_end_screen(game, who, quest, npc, end_text, now + 2);
-    assert_eq!(end_screen_reward(&end), (coins, xp));
-    finish_quest(game, who, quest, MINER, coins, xp, now + 4);
+        steps: &[],
+        turnin,
+        end_text: shipped.end_text_string_id,
+        coins,
+        xp,
+    }
 }
 
 #[test]
 fn a_miner_walks_the_level_ten_gate_then_finds_mili_and_is_paid_once_each() {
     let fixture = Fixture::new();
-    let mut game = player(&fixture, CHARACTER, MINER);
-    let (derp, mili) = (derp(CHARACTER), mili(CHARACTER));
+    let mut game = zone_player(&fixture, CHARACTER, MINER);
+    let level_ten = quest(LEVEL_TEN, DERP, DERP);
+    let southvale = quest(SOUTHVALE, DERP, MILI);
+    let (derp, mili) = (MAP.at(CHARACTER, DERP), MAP.at(CHARACTER, MILI));
     let mut now = 1_000;
+
+    assert_eq!(
+        as_u32(&record(LEVEL_TEN).objectives[0]["level"]),
+        Some(LEVEL_TEN_GATE),
+        "the shipped level gate is the client text's level 10"
+    );
 
     // The Southvale errand waits behind the gate: a forged accept before it changes nothing.
     assert_packet_changes_nothing(
@@ -160,7 +115,7 @@ fn a_miner_walks_the_level_ten_gate_then_finds_mili_and_is_paid_once_each() {
         "a forged 49/2 for Finding Southvale before the gate",
     );
 
-    accepted(&mut game, &derp, DERP, LEVEL_TEN, now);
+    MAP.accept(&mut game, CHARACTER, &level_ten, &mut now);
     assert_eq!(counts(&game, LEVEL_TEN), [0], "rank 1 is short of the gate");
     now += 100;
     assert_packet_changes_nothing(
@@ -172,7 +127,7 @@ fn a_miner_walks_the_level_ten_gate_then_finds_mili_and_is_paid_once_each() {
     );
 
     now += 100;
-    let level = realm_level(&mut game, &derp, target_level(LEVEL_TEN), now);
+    let level = realm_level(&mut game, &derp, LEVEL_TEN_GATE, now);
     assert!(
         objective_complete(&level, LEVEL_TEN, 1),
         "reaching the rank sends the existing 49/10"
@@ -181,12 +136,12 @@ fn a_miner_walks_the_level_ten_gate_then_finds_mili_and_is_paid_once_each() {
 
     now += 100;
     let coins_before = coins(&game);
-    turn_in(&mut game, &derp, DERP, LEVEL_TEN, now);
-    assert_eq!(coins(&game), coins_before + reward(LEVEL_TEN).0);
+    MAP.turn_in(&mut game, CHARACTER, &level_ten, MINER, &mut now);
+    assert_eq!(coins(&game), coins_before + level_ten.coins);
 
     // The gate is done, so Derp now sends the Miner south.
     now += 100;
-    accepted(&mut game, &derp, DERP, SOUTHVALE, now);
+    MAP.accept(&mut game, CHARACTER, &southvale, &mut now);
     assert_eq!(counts(&game, SOUTHVALE), [0]);
     now += 100;
     assert_no_offer(
@@ -201,10 +156,9 @@ fn a_miner_walks_the_level_ten_gate_then_finds_mili_and_is_paid_once_each() {
     // Mili is the named target: the Talk at her camp opens the end screen there.
     now += 100;
     let (coins_before, xp_before) = (coins(&game), profile_xp(&game, MINER));
-    turn_in(&mut game, &mili, MILI, SOUTHVALE, now);
-    let (paid, xp) = reward(SOUTHVALE);
-    assert_eq!(coins(&game), coins_before + paid);
-    assert_eq!(profile_xp(&game, MINER), xp_before + xp);
+    MAP.turn_in(&mut game, CHARACTER, &southvale, MINER, &mut now);
+    assert_eq!(coins(&game), coins_before + southvale.coins);
+    assert_eq!(profile_xp(&game, MINER), xp_before + southvale.xp);
 
     // Replays and a second offer change nothing.
     now += 100;
@@ -222,15 +176,24 @@ fn a_miner_walks_the_level_ten_gate_then_finds_mili_and_is_paid_once_each() {
 #[test]
 fn grumpore_holds_the_level_fifteen_gate_until_the_rank_is_real() {
     let fixture = Fixture::new();
-    let mut game = player(&fixture, CHARACTER, MINER);
-    let grumpore = grumpore(CHARACTER);
+    let mut game = zone_player(&fixture, CHARACTER, MINER);
+    let level_fifteen = quest(LEVEL_FIFTEEN, GRUMPORE, GRUMPORE);
+    let see_for_yourself = quest(SEE_FOR_YOURSELF, GRUMPORE, SILVERRAY);
+    let grumpore = MAP.at(CHARACTER, GRUMPORE);
     let mut now = 1_000;
-    accepted(&mut game, &grumpore, GRUMPORE, LEVEL_FIFTEEN, now);
+
+    assert_eq!(
+        as_u32(&record(LEVEL_FIFTEEN).objectives[0]["level"]),
+        Some(LEVEL_FIFTEEN_GATE),
+        "the shipped level gate is the client text's level 15"
+    );
+
+    MAP.accept(&mut game, CHARACTER, &level_fifteen, &mut now);
     assert_eq!(counts(&game, LEVEL_FIFTEEN), [0]);
 
     // One rank short never credits, and Grumpore has nothing to hand in or offer.
     now += 100;
-    realm_level(&mut game, &grumpore, target_level(LEVEL_FIFTEEN) - 1, now);
+    realm_level(&mut game, &grumpore, LEVEL_FIFTEEN_GATE - 1, now);
     assert_eq!(counts(&game, LEVEL_FIFTEEN), [0]);
     assert_no_offer(
         &mut game,
@@ -250,14 +213,14 @@ fn grumpore_holds_the_level_fifteen_gate_until_the_rank_is_real() {
     assert_eq!(quest_status(&game, LEVEL_FIFTEEN), QuestStatus::Active);
 
     now += 100;
-    let level = realm_level(&mut game, &grumpore, target_level(LEVEL_FIFTEEN), now);
+    let level = realm_level(&mut game, &grumpore, LEVEL_FIFTEEN_GATE, now);
     assert!(objective_complete(&level, LEVEL_FIFTEEN, 1));
     assert_eq!(counts(&game, LEVEL_FIFTEEN), [1]);
 
     now += 100;
     let coins_before = coins(&game);
-    turn_in(&mut game, &grumpore, GRUMPORE, LEVEL_FIFTEEN, now);
-    assert_eq!(coins(&game), coins_before + reward(LEVEL_FIFTEEN).0);
+    MAP.turn_in(&mut game, CHARACTER, &level_fifteen, MINER, &mut now);
+    assert_eq!(coins(&game), coins_before + level_fifteen.coins);
 
     now += 100;
     assert_packet_changes_nothing(
@@ -270,7 +233,7 @@ fn grumpore_holds_the_level_fifteen_gate_until_the_rank_is_real() {
 
     // The gate opens Grumpore's next errand, a Talk at Silverray in Blackspore.
     now += 100;
-    accepted(&mut game, &grumpore, GRUMPORE, SEE_FOR_YOURSELF, now);
+    MAP.accept(&mut game, CHARACTER, &see_for_yourself, &mut now);
     assert_no_offer(
         &mut game,
         &grumpore,
@@ -280,16 +243,10 @@ fn grumpore_holds_the_level_fifteen_gate_until_the_rank_is_real() {
     );
     now += 100;
     let (coins_before, xp_before) = (coins(&game), profile_xp(&game, MINER));
-    turn_in(
-        &mut game,
-        &silverray(CHARACTER),
-        SILVERRAY,
-        SEE_FOR_YOURSELF,
-        now,
-    );
-    let (paid, xp) = reward(SEE_FOR_YOURSELF);
-    assert_eq!(coins(&game), coins_before + paid);
-    assert_eq!(profile_xp(&game, MINER), xp_before + xp);
+    MAP.turn_in(&mut game, CHARACTER, &see_for_yourself, MINER, &mut now);
+    assert_eq!(coins(&game), coins_before + see_for_yourself.coins);
+    assert_eq!(profile_xp(&game, MINER), xp_before + see_for_yourself.xp);
+    assert_eq!(pending_turnin(&game), None);
     now += 100;
     assert_no_offer(
         &mut game,
@@ -303,29 +260,26 @@ fn grumpore_holds_the_level_fifteen_gate_until_the_rank_is_real() {
 #[test]
 fn only_the_active_miner_is_offered_the_gates() {
     let fixture = Fixture::new();
-    let mut game = player(&fixture, CHARACTER, ADVENTURER);
+    let mut game = zone_player(&fixture, CHARACTER, ADVENTURER);
     let mut now = 1_000;
     assert_no_offer(
         &mut game,
-        &derp(CHARACTER),
+        &MAP.at(CHARACTER, DERP),
         DERP,
         &mut now,
         "Derp for an Adventurer",
     );
     assert_no_offer(
         &mut game,
-        &grumpore(CHARACTER),
+        &MAP.at(CHARACTER, GRUMPORE),
         GRUMPORE,
         &mut now,
         "Grumpore for an Adventurer",
     );
-    for (quest, who) in [
-        (LEVEL_TEN, derp(CHARACTER)),
-        (LEVEL_FIFTEEN, grumpore(CHARACTER)),
-    ] {
+    for (quest, npc) in [(LEVEL_TEN, DERP), (LEVEL_FIFTEEN, GRUMPORE)] {
         assert_packet_changes_nothing(
             &mut game,
-            &who,
+            &MAP.at(CHARACTER, npc),
             &quest_reply(quest, true),
             now,
             "a forged 49/2 with another job active",
@@ -336,17 +290,18 @@ fn only_the_active_miner_is_offered_the_gates() {
 #[test]
 fn progress_survives_a_reconnect_and_players_are_independent() {
     let fixture = Fixture::new();
-    let mut game = player(&fixture, CHARACTER, MINER);
-    let mut other = player(&fixture, OTHER, MINER);
-    let (grumpore, other_grumpore) = (grumpore(CHARACTER), grumpore(OTHER));
+    let mut game = zone_player(&fixture, CHARACTER, MINER);
+    let mut other = zone_player(&fixture, OTHER, MINER);
+    let level_fifteen = quest(LEVEL_FIFTEEN, GRUMPORE, GRUMPORE);
+    let grumpore = MAP.at(CHARACTER, GRUMPORE);
     let mut now = 1_000;
-    accepted(&mut game, &grumpore, GRUMPORE, LEVEL_FIFTEEN, now);
-    accepted(&mut other, &other_grumpore, GRUMPORE, LEVEL_FIFTEEN, now);
+    MAP.accept(&mut game, CHARACTER, &level_fifteen, &mut now);
+    MAP.accept(&mut other, OTHER, &level_fifteen, &mut now);
 
-    let mut game = fixture.reload_serialized(&game);
+    let mut game = fixture.save_and_reload(&game, &grumpore);
     assert_eq!(quest_status(&game, LEVEL_FIFTEEN), QuestStatus::Active);
     now += 100;
-    realm_level(&mut game, &grumpore, target_level(LEVEL_FIFTEEN), now);
+    realm_level(&mut game, &grumpore, LEVEL_FIFTEEN_GATE, now);
     assert_eq!(counts(&game, LEVEL_FIFTEEN), [1]);
     assert_eq!(
         counts(&other, LEVEL_FIFTEEN),
@@ -357,29 +312,48 @@ fn progress_survives_a_reconnect_and_players_are_independent() {
     // The held end screen (shown, 49/14 not yet sent) also survives a save.
     now += 100;
     talk(&mut game, &grumpore, GRUMPORE, now);
-    let end_text = record(LEVEL_FIFTEEN)["end_text_string_id"]
-        .as_u64()
-        .unwrap() as u32;
-    release_end_screen(
-        &mut game,
-        &grumpore,
-        LEVEL_FIFTEEN,
-        GRUMPORE,
-        end_text,
-        now + 2,
-    );
-    let mut game = fixture.reload_serialized(&game);
+    let mut game = fixture.save_and_reload(&game, &grumpore);
     assert_eq!(pending_turnin(&game), Some(LEVEL_FIFTEEN));
-    let (coins, xp) = reward(LEVEL_FIFTEEN);
-    finish_quest(
-        &mut game,
-        &grumpore,
-        LEVEL_FIFTEEN,
-        MINER,
-        coins,
-        xp,
-        now + 10,
-    );
+    // A reconnect has no in-memory 26/6 choice, so the client Talks again; the saved
+    // actor must still reopen the 49/13.
+    now += 100;
+    talk(&mut game, &grumpore, GRUMPORE, now);
+    MAP.pay_held_turnin(&mut game, CHARACTER, &level_fifteen, MINER, &mut now);
+    assert_eq!(quest_status(&game, LEVEL_FIFTEEN), QuestStatus::Completed);
     assert_eq!(quest_status(&other, LEVEL_FIFTEEN), QuestStatus::Active);
     assert_eq!(counts(&other, LEVEL_FIFTEEN), [0]);
+}
+
+/// Finding Southvale's only objective is a Talk at Mili, a named target rather
+/// than the quest's fallback turn-in NPC (Derp). A save made with the end screen
+/// held must keep the actor: the 49/13 after a reconnect opens at Mili.
+#[test]
+fn finding_southvale_reopens_at_mili_after_the_real_save_envelope() {
+    let fixture = Fixture::new();
+    let mut game = zone_player(&fixture, CHARACTER, MINER);
+    let level_ten = quest(LEVEL_TEN, DERP, DERP);
+    let southvale = quest(SOUTHVALE, DERP, MILI);
+    let (derp, mili) = (MAP.at(CHARACTER, DERP), MAP.at(CHARACTER, MILI));
+    let mut now = 1_000;
+
+    MAP.accept(&mut game, CHARACTER, &level_ten, &mut now);
+    now += 10;
+    realm_level(&mut game, &derp, LEVEL_TEN_GATE, now);
+    now += 10;
+    MAP.turn_in(&mut game, CHARACTER, &level_ten, MINER, &mut now);
+
+    MAP.accept(&mut game, CHARACTER, &southvale, &mut now);
+    now += 10;
+    talk(&mut game, &mili, MILI, now);
+    assert_eq!(pending_turnin(&game), Some(SOUTHVALE));
+
+    let mut game = fixture.save_and_reload(&game, &mili);
+    assert_eq!(pending_turnin(&game), Some(SOUTHVALE));
+    // A reconnect has no in-memory 26/6 choice: the second Talk at Mili must reopen the
+    // 49/13 from the saved actor. If the actor were lost, the Derp fallback would refuse
+    // the Talk and pay_held_turnin would find no 49/13 to release.
+    now += 10;
+    talk(&mut game, &mili, MILI, now);
+    MAP.pay_held_turnin(&mut game, CHARACTER, &southvale, MINER, &mut now);
+    assert_eq!(quest_status(&game, SOUTHVALE), QuestStatus::Completed);
 }

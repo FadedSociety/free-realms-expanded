@@ -21,7 +21,9 @@ pub use content_copy::{copy_missing, copy_tree};
 pub use npc_visibility::{content_dir, seen_from};
 
 use osfr_tools::{
+    account_store::AccountRole,
     character_store::CharacterState,
+    chat,
     encounter::{FieldParticipant, SharedFieldAction, SharedFieldState},
     gameplay::{Gameplay, GameplayState, Outcome},
     gateway::Gateway,
@@ -264,6 +266,22 @@ impl Fixture {
         let bytes = serde_json::to_vec(&game.state()).unwrap();
         let state: GameplayState = serde_json::from_slice(&bytes).unwrap();
         self.game_as(character_id, Some(state))
+    }
+
+    /// The production save envelope, not a `GameplayState` proxy: `game_store::save`
+    /// -> `load_or_create` -> the same split-catalogue bind a login performs.
+    pub fn save_and_reload(&self, game: &Gameplay, character: &CharacterState) -> Gameplay {
+        let path = self.path.join("character-save.json");
+        let snapshot = osfr_tools::game_store::Snapshot {
+            character: character.clone(),
+            gameplay: Some(game.state()),
+            pets: None,
+        };
+        osfr_tools::game_store::save(&path, &snapshot).expect("the character save writes");
+        let loaded = osfr_tools::game_store::load_or_create(&path, character.clone())
+            .expect("the character save loads");
+        assert_eq!(loaded.character, *character);
+        self.game_as(character.guid, loaded.gameplay)
     }
 }
 
@@ -913,6 +931,25 @@ pub fn zone_player(fixture: &Fixture, guid: u64, active: i32) -> Gameplay {
     let mut state = fixture.game_as(guid, None).state();
     seed_active_profile(&mut state, active, &[ADVENTURER]);
     fixture.game_as(guid, Some(state))
+}
+
+/// The developer `realm level <level>` command, run as an admin. This is the
+/// production rank path a `job_level` goal reads; a quest never trusts a client
+/// level claim.
+pub fn realm_level(
+    game: &mut Gameplay,
+    character: &CharacterState,
+    level: u32,
+    now: u64,
+) -> Outcome {
+    game.set_dev_tools(true);
+    game.set_role(AccountRole::Admin);
+    send(
+        game,
+        character,
+        &chat::local_request(&format!("realm level {level}")),
+        now,
+    )
 }
 
 pub fn counts(game: &Gameplay, quest_id: u32) -> Vec<u32> {
