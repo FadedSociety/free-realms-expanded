@@ -4,7 +4,21 @@
 //! who has seen it, when it ends) live in the library; this only finds the owner's pose and
 //! queues the packets. A refused queue is logged and skips only that recipient.
 use super::*;
-use osfr_tools::boombox::Sends;
+use osfr_tools::boombox::{Boomboxes, Catalogue, Sends};
+
+/// T536: the world's permanent boxes (the extra NPC rows naming a boombox), read once at startup
+/// from the NPC content set `Gameplay::load` binds. No content means none. A row naming an item
+/// the catalogue lacks fails the start.
+pub(super) fn load(options: &Options) -> io::Result<Boomboxes> {
+    let Some(dir) = options.content.as_deref() else {
+        return Ok(Boomboxes::default());
+    };
+    let dir = osfr_tools::content::npc_content(dir);
+    Boomboxes::permanent(
+        &Catalogue::load(&dir)?,
+        &osfr_tools::world::boombox_props(&dir)?,
+    )
+}
 
 /// The owner's pressed box: placed beside them at their registry pose, after the commit that
 /// refused or accepted the press has already answered the owner (recast, 38/25).
@@ -51,8 +65,9 @@ pub(super) fn tick(world: &mut SharedWorld, sessions: &mut SessionMap, now_ms: u
         Ok(())
     });
     if let Err(error) = ticked {
-        // The boxes are gone, so no AddPc may keep advertising a transform they applied.
-        world.boomboxes = Default::default();
+        // The boxes are gone, so no AddPc may keep advertising a transform they applied. The world's
+        // permanent boxes start again.
+        world.boomboxes = world.boomboxes.restarted();
         world.players.clear_temporary_models();
         event(json!({"event": "boombox_tick_failed", "reason": error.to_string()}));
     }
@@ -910,5 +925,128 @@ mod tests {
         let (_later, later_join) = rig.viewer_as(3, 45.0, 0);
         let frame = add_pc_of(&later_join, me).expect("the player's AddPc");
         assert_eq!(add_pc_model(frame), 0);
+    }
+
+    /// T536: a catalogue-bound radio prop at `at`, as the startup load builds one.
+    fn radio_at(at: [f32; 3]) -> osfr_tools::boombox::Boomboxes {
+        let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        let prop = osfr_tools::world::BoomboxProp {
+            spawn_guid: 100_000_033_617,
+            item_id: 48244, // Boombox XVD-S
+            position: at,
+        };
+        let catalogue = osfr_tools::boombox::Catalogue::load(&shipped).unwrap();
+        osfr_tools::boombox::Boomboxes::permanent(&catalogue, &[prop]).unwrap()
+    }
+
+    #[test]
+    fn t536_a_radio_dances_a_player_through_the_real_tick_and_never_sends_the_box_or_expires() {
+        let Some(mut rig) = Rig::new("t536-radio", TOTEM) else {
+            return;
+        };
+        let (viewer, _) = rig.viewer_as(2, 4.0, 60);
+        let dancer = 7_000_000_002;
+        let me = rig.scene.world.players.get(rig.scene.session.id).unwrap();
+        let at = [me.position[0] + 3.0, me.position[1], me.position[2]];
+        rig.scene.world.boomboxes = radio_at(at);
+        rig.drain(viewer, 3_000);
+        rig.drain_owner(3_000);
+        // One tick: the model-60 player gets a clip of the XVD-S table as a single-entry 35/63.
+        rig.tick(3_050);
+        let table = {
+            let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+            let row = osfr_tools::boombox::Catalogue::load(&shipped).unwrap();
+            let row = row.get(48244).unwrap().clone();
+            row.clips[&60]
+                .iter()
+                .map(|c| c.animation_id)
+                .collect::<Vec<_>>()
+        };
+        let first = rig.drain(viewer, 3_050);
+        let steps = sync_steps(&first);
+        assert_eq!(steps.len(), 1, "{steps:?}");
+        assert_eq!(steps[0].len(), 1);
+        assert_eq!(steps[0][0].0, dancer);
+        assert!(table.contains(&steps[0][0].1), "{steps:?}");
+        // Ten days later the radio is still there: it dances the player again, and neither
+        // session was ever sent an AddNpc, poof, song or removal for it.
+        let later = 3_050 + 10 * 24 * 3_600 * 1_000;
+        rig.drain_owner(3_050);
+        rig.tick(later);
+        let again = rig.drain(viewer, later);
+        assert_eq!(sync_steps(&again).len(), 1, "still dancing: {again:?}");
+        for messages in [&first, &again, &rig.drain_owner(later)] {
+            assert!(about_box(messages).is_empty(), "no box packets");
+        }
+        // Walking out of range stands the dancer down once; walking back, the radio dances them.
+        rig.move_viewer(viewer, 40.0);
+        rig.tick(later + 100);
+        assert_eq!(idled(&rig.drain(viewer, later + 100)), [dancer]);
+        rig.move_viewer(viewer, 4.0);
+        rig.tick(later + 200);
+        let back = rig.drain(viewer, later + 200);
+        assert_eq!(
+            sync_steps(&back).len(),
+            1,
+            "the radio is still there: {back:?}"
+        );
+    }
+
+    /// A content directory carrying an NPC package: an `npcs` folder and `rows` as the extras.
+    fn npc_package(scratch: &Scratch, rows: Vec<serde_json::Value>) -> PathBuf {
+        let dir = scratch.path().join("content");
+        fs::create_dir_all(dir.join("npcs")).unwrap();
+        let file = json!({"schema_version": 1, "records": rows});
+        fs::write(dir.join("npc_spawns_extra.json"), file.to_string()).unwrap();
+        dir
+    }
+
+    #[test]
+    fn t536_startup_seeds_the_shipped_radios_and_a_missing_item_fails_the_load() {
+        let scratch = Scratch::new("t536-load");
+        let mut options = test_support::options(scratch.state());
+        // A content directory without an NPC package binds the bundled one, which has the radios.
+        options.content = Some(scratch.path().to_path_buf());
+        let mut world = SharedWorld::new();
+        world.boomboxes = load(&options).unwrap();
+        let zone = ZoneInstance {
+            zone_id: 0,
+            instance_id: 0,
+        };
+        // Session 1 stands at the first radio, session 2 at the second, session 3 far from both.
+        for (id, at) in [
+            (1, [88.9, 23.5, 410.6]),
+            (2, [-63.0, 5.9, 327.7]),
+            (3, [5000.0, 0.0, 5000.0]),
+        ] {
+            let joined = world
+                .players
+                .join(SessionId(id), id + 500, id + 600, zone, at, 0.0);
+            joined.unwrap();
+        }
+        let sends = world.boomboxes.tick(1_000, &mut world.players);
+        let dancing: BTreeSet<_> = sends.iter().map(|(session, _)| session.0).collect();
+        assert_eq!(
+            dancing,
+            BTreeSet::from([1, 2]),
+            "both radios, and only near them"
+        );
+        // No content means no radios.
+        options.content = None;
+        let mut bare = SharedWorld::new();
+        bare.boomboxes = load(&options).unwrap();
+        bare.players
+            .join(SessionId(1), 501, 601, zone, [88.9, 23.5, 410.6], 0.0)
+            .unwrap();
+        assert!(bare.boomboxes.tick(1_000, &mut bare.players).is_empty());
+        // A row naming an item the catalogue lacks fails the start, naming the row.
+        let row = json!({"spawn_guid": 42, "model_id": 185, "position": [0.0, 0.0, 0.0],
+            "boombox_item_id": 999_999});
+        options.content = Some(npc_package(&scratch, vec![row]));
+        let error = load(&options).unwrap_err().to_string();
+        assert!(
+            error.contains("NPC spawn 42") && error.contains("999999"),
+            "{error}"
+        );
     }
 }

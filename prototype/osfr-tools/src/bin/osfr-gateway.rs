@@ -3371,6 +3371,7 @@ impl Server {
         world.guilds = t006_guilds::GuildWorld::load(&options.state, options.guild_invite_ttl_ms)?;
         world.client_areas = client_area_routing::load(&options)?;
         world_event_routing::schedule(&mut world, &options);
+        world.boomboxes = boombox_routing::load(&options)?;
         if let Some(path) = &options.security_log {
             // Logging is best effort: an unusable file disables it, never the server.
             match SecurityLog::open(path) {

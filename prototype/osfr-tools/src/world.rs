@@ -171,9 +171,28 @@ struct ExtraNpc {
     sub_text_name_string_id: Option<i32>,
     #[serde(default)]
     scale: Option<f32>,
+    /// T536 (R): the `boomboxes.json` item this prop is, a permanent dance spot. The prop is
+    /// drawn like any extra row (standing as a box); `boombox::Boomboxes::permanent` makes it
+    /// dance, for the whole server, from [`boombox_props`].
+    #[serde(default)]
+    boombox_item_id: Option<i32>,
 }
 
 impl ExtraNpc {
+    /// Whether the row is drawn at all: the loader and [`boombox_props`] share this one rule.
+    fn drawn(&self) -> bool {
+        // The client-assets catalog contains knocker_m_boss.adr but no
+        // knocker_m_boss.dme base model; native NPC creation fails for it.
+        // Filter at load time so authored content remains provenance intact.
+        self.capture_match.is_none()
+            && !self
+                .model_file_name
+                .as_deref()
+                .is_some_and(|name| name.eq_ignore_ascii_case("knocker_m_boss.adr"))
+            && self.position.iter().all(|v| v.is_finite())
+            && self.content_key != Some(0)
+    }
+
     /// T508: why the display fields refuse the load, if they do. Aliases follow the
     /// `combat.rs` text rule (at most 120 bytes, no control chars); the scale bounds are (R).
     fn display_error(&self) -> Option<&'static str> {
@@ -191,6 +210,36 @@ impl ExtraNpc {
             None
         }
     }
+}
+
+/// A drawn extra row that is a permanent boombox: its actor, catalogue item and position.
+#[derive(Clone, Debug, PartialEq)]
+pub struct BoomboxProp {
+    pub spawn_guid: u64,
+    pub item_id: i32,
+    pub position: [f32; 3],
+}
+
+/// The permanent boombox props of `npc_spawns_extra.json` (T536). A content set without the file
+/// has none; one that cannot be read is an error, not an empty list.
+pub fn boombox_props(content_dir: &Path) -> io::Result<Vec<BoomboxProp>> {
+    let path = content_dir.join("npc_spawns_extra.json");
+    if !path.is_file() {
+        return Ok(Vec::new());
+    }
+    let extras: Rows<ExtraNpc> = read_rows(&path)?;
+    Ok(extras
+        .records
+        .into_iter()
+        .filter(ExtraNpc::drawn)
+        .filter_map(|npc| {
+            Some(BoomboxProp {
+                spawn_guid: npc.spawn_guid,
+                item_id: npc.boombox_item_id?,
+                position: npc.position,
+            })
+        })
+        .collect())
 }
 
 impl NpcVisibility {
@@ -364,17 +413,7 @@ impl NpcVisibility {
                     npc.spawn_guid
                 )));
             }
-            // The client-assets catalog contains knocker_m_boss.adr but no
-            // knocker_m_boss.dme base model; native NPC creation fails for it.
-            // Filter at load time so authored content remains provenance intact.
-            if npc.capture_match.is_some()
-                || npc
-                    .model_file_name
-                    .as_deref()
-                    .is_some_and(|name| name.eq_ignore_ascii_case("knocker_m_boss.adr"))
-                || !npc.position.iter().all(|v| v.is_finite())
-                || npc.content_key == Some(0)
-            {
+            if !npc.drawn() {
                 continue;
             }
             let zone_id = anchors
@@ -407,6 +446,9 @@ impl NpcVisibility {
                 npc.position_w.unwrap_or(1.0),
             ];
             spawn.rotation = facing(npc.heading.unwrap_or(0.0));
+            if npc.boombox_item_id.is_some() {
+                crate::boombox::stand_as_box(&mut spawn);
+            }
             // Server-only binding; client AddNpc reader 0x00921a10 reads the
             // ordinary name/model/transform fields already populated above.
             if let Some(content_key) = npc.content_key {

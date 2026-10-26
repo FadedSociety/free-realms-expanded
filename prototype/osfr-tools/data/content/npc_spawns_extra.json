@@ -64054,6 +64054,68 @@
       "position_w": null,
       "sub_text_name_string_id": 439223,
       "scale": 1.5
+    },
+    {
+      "spawn_guid": 100000033617,
+      "legacy_npc_id": null,
+      "model_id": 185,
+      "model_file_name": "sh_primitive_radio_01.adr",
+      "name": "Boom Box",
+      "name_string_id": 18044,
+      "position": [
+        88.90495,
+        23.542553,
+        410.57498
+      ],
+      "heading": 2.34577802,
+      "boombox_item_id": 48244,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3838 spawnNpcWithGuid(33617); src/Resources/Npcs.json Id=33617 (ModelId 185, NameId 18044, Animation 2100, BoomboxItemId 48244)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.18044 = Boom Box (lab/reports/locale-id-to-text.json); Models.txt 185 = sh_primitive_radio_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T536: Sanctuary turns this radio into a permanent dance spot (BaseZone.cs:789-791); the role is Sanctuary's, not a 2014 fact. spawn_guid 100000033617 is Sanctuary's own actor guid for Id 33617; no Legacy radio lies within 1 m of it (nearest, 100000001906 and 100000002028, are over 1.5 km away). Position is Sanctuary's raw value; its VerticalOffset -0.1 is not applied"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033838,
+      "legacy_npc_id": null,
+      "model_id": 185,
+      "model_file_name": "sh_primitive_radio_01.adr",
+      "name": "Boom Box",
+      "name_string_id": 18044,
+      "position": [
+        -63.054962,
+        5.882222,
+        327.70673
+      ],
+      "heading": -2.98661589,
+      "boombox_item_id": 48244,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:4000 spawnNpcWithGuid(33838); src/Resources/Npcs.json Id=33838 (ModelId 185, NameId 18044, Animation 2100, BoomboxItemId 48244)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.18044 = Boom Box (lab/reports/locale-id-to-text.json); Models.txt 185 = sh_primitive_radio_01.adr"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T536: Sanctuary turns this radio into a permanent dance spot (BaseZone.cs:789-791); the role is Sanctuary's, not a 2014 fact. spawn_guid 100000033838 is Sanctuary's own actor guid for Id 33838; no Legacy radio lies within 1 m of it (nearest, 100000001906 and 100000002028, are over 1.5 km away). Position is Sanctuary's raw value"
+        }
+      ],
+      "position_w": null
     }
   ]
 }

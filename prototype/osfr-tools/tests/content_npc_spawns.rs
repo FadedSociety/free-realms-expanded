@@ -305,8 +305,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // exploration coins (3,307). T468 moved the 632 Legacy rows Lxzxrus 9c5ef6b
     // pruned as misplaced to npc_spawns_retired.json (2,675). T470 drew 90 named
     // Sanctuary-main NPCs as extras (2,765); T500 already draws Dani and Honey as
-    // `legacy_data` regional rows, so they must not gain a second body.
-    assert_eq!(extra_rows.len(), 2765);
+    // `legacy_data` regional rows, so they must not gain a second body. T536 drew Sanctuary's two
+    // permanent-dance radios (2,767).
+    assert_eq!(extra_rows.len(), 2767);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

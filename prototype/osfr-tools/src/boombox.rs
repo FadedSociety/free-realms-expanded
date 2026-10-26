@@ -3,6 +3,11 @@
 //! beside the player with a poof and its song, never uses up the item, and removes the box
 //! after the row's duration. Everything here is session-only; nothing is saved.
 //!
+//! T536: an NPC row of `npc_spawns_extra.json` with a `boombox_item_id` is a permanent box, a
+//! dance spot that never expires ([`Boomboxes::permanent`]). It is the prop's own NPC, so it
+//! sends no AddNpc, poof, song or removal (R: no song; Sanctuary's `BaseZone.cs:789` starts the
+//! same permanent box with song tag 0). Its dancers are handled like any other box's.
+//!
 //! # Recovered original facts
 //!
 //! * The client offers an item for the item bar (`BaseClient.Inventory.Consumables`, row
@@ -532,6 +537,14 @@ impl Transform {
     }
 }
 
+/// How a box stands in the world, pressed or permanent: bouncing, no nameplate, not interactable.
+pub fn stand_as_box(spawn: &mut NpcSpawn) {
+    spawn.animation_id = BOX_ANIMATION;
+    spawn.hide_nameplate = 1;
+    spawn.is_interactable = 0;
+    spawn.interact_range = 0;
+}
+
 /// One of `items` at random, or `None` for an empty list.
 fn pick<'a, T>(items: &'a [T], rng: &mut Rng) -> Option<&'a T> {
     if items.is_empty() {
@@ -590,9 +603,11 @@ struct Placed {
     /// The song's effect tag: unique per live box, so a tag can never name two songs.
     tag: i32,
     song: Option<i32>,
-    /// The box's AddNpc, built once.
+    /// The box's AddNpc, built once. Empty for a permanent box, whose prop is already an NPC.
     add: Vec<u8>,
-    ends_ms: u64,
+    /// When the box ends. `None` is a permanent box (T536): it never ends, and it is never shown,
+    /// taken back or replaced, because its prop is the NPC list's. This one field decides it.
+    ends_ms: Option<u64>,
     seen_by: BTreeSet<SessionId>,
     /// Who this box competes for, from the row. Equal priority goes to the nearer box.
     priority: i32,
@@ -604,6 +619,11 @@ struct Placed {
 }
 
 impl Placed {
+    /// A permanent box (see `ends_ms`).
+    fn permanent(&self) -> bool {
+        self.ends_ms.is_none()
+    }
+
     /// Let every participant go (the box ends or is replaced); the next tick sends each idle (and
     /// a transform's 35/15) unless another box has taken them.
     fn release(&mut self) -> Vec<Released> {
@@ -675,6 +695,8 @@ pub struct Boomboxes {
     /// Draws the song of each box and every independent clip. One stream for the world, like
     /// Sanctuary's `Random.Shared`; the seed comes from the OS (0 if that fails).
     rng: Rng,
+    /// The permanent boxes as they were built, so a restart after a fault can start them afresh.
+    fixed: Vec<Placed>,
 }
 
 impl Default for Boomboxes {
@@ -684,11 +706,58 @@ impl Default for Boomboxes {
             next: 0,
             released: Vec::new(),
             rng: Rng::from_entropy().unwrap_or_else(|_| Rng::seeded(0)),
+            fixed: Vec::new(),
         }
     }
 }
 
 impl Boomboxes {
+    /// A world whose `props` are permanent boxes of their catalogue rows (T536). A prop naming an
+    /// item the catalogue lacks is an error naming its actor: the load fails, nothing is skipped
+    /// (R: Sanctuary silently skips the id).
+    pub fn permanent(catalogue: &Catalogue, props: &[world::BoomboxProp]) -> io::Result<Self> {
+        let mut boxes = Self::default();
+        for prop in props {
+            let row = catalogue.get(prop.item_id).ok_or_else(|| {
+                invalid(format!(
+                    "NPC spawn {} names boombox item {}, which boomboxes.json does not define",
+                    prop.spawn_guid, prop.item_id
+                ))
+            })?;
+            boxes.fixed.push(Placed {
+                guid: prop.spawn_guid,
+                owner: 0,
+                // (R) The extras are drawn in the public open world (as `world_events`).
+                zone: ZoneInstance {
+                    zone_id: world::OPEN_WORLD_ZONE,
+                    instance_id: 0,
+                },
+                position: prop.position,
+                tag: 0,
+                song: None,
+                add: Vec::new(),
+                ends_ms: None,
+                seen_by: BTreeSet::new(),
+                priority: row.priority,
+                range_m: row.range_m,
+                transform: (row.kind == Kind::Transform).then(|| Transform::new(row)),
+                dance: Dance::new(Arc::clone(row)),
+            });
+        }
+        boxes.live = boxes.fixed.clone();
+        Ok(boxes)
+    }
+
+    /// Only the permanent boxes, each as freshly built: what the world runs on after a fault drops
+    /// every pressed box and every dancer.
+    pub fn restarted(&self) -> Self {
+        Self {
+            live: self.fixed.clone(),
+            fixed: self.fixed.clone(),
+            ..Self::default()
+        }
+    }
+
     /// Put `owner`'s box beside them and show it to everyone in range. A box the owner already
     /// has is ended first. `at` and `heading` are the owner's pose. `row` is the catalogue's
     /// shared pointer, so the box never copies its dance table.
@@ -710,23 +779,24 @@ impl Boomboxes {
             at[2] + heading.sin() * reach,
         ];
         let guid = self.next_guid();
-        let npc = NpcSpawn {
+        let mut npc = NpcSpawn {
             actor_id: guid,
             model_id: row.model_id,
             texture_alias: row.texture_alias.clone(),
             tint_alias: row.tint_alias.clone(),
-            animation_id: BOX_ANIMATION,
-            hide_nameplate: 1,
-            is_interactable: 0,
-            interact_range: 0,
             position: [position[0], position[1], position[2], 1.0],
             rotation: [heading.sin(), 0.0, heading.cos(), 0.0],
             ..world::content_spawn_template()
         };
+        stand_as_box(&mut npc);
         let Ok(add) = world::unframe_tunnel(&startup_world::build_add_npc(&npc)) else {
             return sends;
         };
-        if let Some(old) = self.live.iter().position(|b| b.owner == owner) {
+        if let Some(old) = self
+            .live
+            .iter()
+            .position(|b| !b.permanent() && b.owner == owner)
+        {
             let mut old = self.live.remove(old);
             self.released.extend(old.release());
             old.end(&mut sends);
@@ -739,7 +809,7 @@ impl Boomboxes {
             tag: guid as u32 as i32,
             song: pick(&row.song_effect_ids, &mut self.rng).copied(),
             add,
-            ends_ms: now_ms.saturating_add(u64::from(row.duration_ms)),
+            ends_ms: Some(now_ms.saturating_add(u64::from(row.duration_ms))),
             seen_by: BTreeSet::new(),
             priority: row.priority,
             range_m: row.range_m,
@@ -763,7 +833,7 @@ impl Boomboxes {
         }
         let (ended, live): (Vec<_>, Vec<_>) = std::mem::take(&mut self.live)
             .into_iter()
-            .partition(|b| now_ms >= b.ends_ms);
+            .partition(|b| b.ends_ms.is_some_and(|ends| now_ms >= ends));
         self.live = live;
         for mut placed in ended {
             self.released.extend(placed.release());
@@ -772,18 +842,21 @@ impl Boomboxes {
         let mut nears = Vec::with_capacity(self.live.len());
         for placed in &mut self.live {
             let near = players.nearby_sessions(placed.zone, placed.position);
-            let left: Vec<_> = placed.seen_by.difference(&near).copied().collect();
-            for session in left {
-                // A session that left the zone or the server is not told: its client already
-                // dropped the box with the scene.
-                if players.get(session).is_some_and(|p| p.zone == placed.zone) {
-                    sends.push((session, SharedFieldState::removal(placed.guid)));
+            // A permanent box is never shown or taken back: its prop is the NPC list's.
+            if !placed.permanent() {
+                let left: Vec<_> = placed.seen_by.difference(&near).copied().collect();
+                for session in left {
+                    // A session that left the zone or the server is not told: its client already
+                    // dropped the box with the scene.
+                    if players.get(session).is_some_and(|p| p.zone == placed.zone) {
+                        sends.push((session, SharedFieldState::removal(placed.guid)));
+                    }
+                    placed.seen_by.remove(&session);
                 }
-                placed.seen_by.remove(&session);
-            }
-            for session in &near {
-                if !placed.seen_by.contains(session) {
-                    placed.show(*session, false, &mut sends);
+                for session in &near {
+                    if !placed.seen_by.contains(session) {
+                        placed.show(*session, false, &mut sends);
+                    }
                 }
             }
             nears.push(near);
@@ -2544,6 +2617,192 @@ mod tests {
             );
             let late = join(&mut players, 12, HUMAN_M, [20.0, 1.0, 0.0], OTHER);
             assert_eq!(add_pc_model(&late, 12, 601), Some(0));
+        }
+    }
+
+    /// T536: the world's permanent boxes, the radio props.
+    mod permanent {
+        use super::*;
+
+        const XVD: i32 = 48244; // the radios' catalogue row: independent dances, no songs
+        const RADIO: u64 = 100_000_033_617;
+        const OTHER_RADIO: u64 = 100_000_033_838;
+        const HUMAN_M: i32 = 1;
+
+        /// A world with permanent XVD-S radios at `(actor guid, position)`; every draw is seeded.
+        fn radios(at: &[(u64, [f32; 3])]) -> Boomboxes {
+            let directory = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+            let props: Vec<_> = at
+                .iter()
+                .map(|(spawn_guid, position)| world::BoomboxProp {
+                    spawn_guid: *spawn_guid,
+                    item_id: XVD,
+                    position: *position,
+                })
+                .collect();
+            let mut live =
+                Boomboxes::permanent(&Catalogue::load(&directory).unwrap(), &props).unwrap();
+            live.rng = Rng::seeded(3);
+            live
+        }
+
+        /// The animation each single-entry 35/63 sent to `session` plays for character `guid`.
+        fn rolled(sends: &Sends, session: u64, guid: u64) -> Vec<i32> {
+            let found = steps(sends, session).into_iter().flatten();
+            found
+                .filter(|(who, _)| *who == guid)
+                .map(|(_, a)| a)
+                .collect()
+        }
+
+        fn xvd_ids(model: i32) -> Vec<i32> {
+            row(XVD).clips[&model]
+                .iter()
+                .map(|c| c.animation_id)
+                .collect()
+        }
+
+        #[test]
+        fn a_permanent_box_never_expires_and_sends_no_scenery() {
+            let mut players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+            let mut live = radios(&[(RADIO, [5.0, 1.0, 0.0])]);
+            // Each tick is past the last clip's end, so each one re-rolls: a box that expired
+            // would send its removal and then nothing, so no step would follow.
+            for now in [0, 180_000, 600_000, 99_999_999_999] {
+                let sends = live.tick(now, &mut players);
+                assert!(
+                    sends.iter().all(|(_, p)| p.starts_with(&[35, 0, 63, 0])),
+                    "tick {now}: only dance steps, never an AddNpc, poof, song or removal"
+                );
+                let rolls = rolled(&sends, 1, 601);
+                assert_eq!(rolls.len(), 1, "tick {now}");
+                assert!(
+                    xvd_ids(HUMAN_M).contains(&rolls[0]),
+                    "a clip of the model's table"
+                );
+            }
+            assert_eq!(live.live.len(), 1);
+            assert!(live.live[0].permanent());
+        }
+
+        #[test]
+        fn a_player_at_the_radio_dances_and_stops_on_leaving() {
+            let mut players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, 1941, 1.0, 0.0, ZONE)],
+            );
+            let mut live = radios(&[(RADIO, [5.0, 1.0, 0.0])]);
+            let sends = live.tick(1_000, &mut players);
+            // A model with a table rolls one of its clips; a model without one stands on the
+            // row's standing group, as a pressed XVD-S box does.
+            assert!(xvd_ids(HUMAN_M).contains(&rolled(&sends, 1, 601)[0]));
+            let standing = animation_packet(602, row(XVD).standing_animation_id, true);
+            let bases = to(&sends, 2)
+                .into_iter()
+                .filter(|p| p.starts_with(&[35, 0, 8, 0]));
+            assert_eq!(bases.collect::<Vec<_>>(), [standing.as_slice()]);
+            // Out of its 15 m range: each dancer is told idle, and so is the one who sees it.
+            walk(&mut players, 1, 40.0);
+            walk(&mut players, 2, 40.0);
+            let left = live.tick(1_100, &mut players);
+            assert_eq!(idles(&left, 1), [601, 602]);
+            assert_eq!(idles(&left, 2), [601, 602]);
+            assert!(live.tick(1_200, &mut players).is_empty());
+            // Back in range, the dance starts again.
+            walk(&mut players, 1, 0.0);
+            let back = live.tick(1_300, &mut players);
+            assert_eq!(rolled(&back, 1, 601).len(), 1);
+        }
+
+        #[test]
+        fn a_viewer_out_of_range_of_the_radio_sees_the_dancer_and_does_not_dance() {
+            let mut players = world(
+                16,
+                &[(1, HUMAN_M, 0.0, 0.0, ZONE), (2, HUMAN_M, 60.0, 0.0, ZONE)],
+            );
+            let mut live = radios(&[(RADIO, [5.0, 1.0, 0.0])]);
+            // Session 2 is 55 m from the radio, so it does not dance, but it knows session 1 and
+            // is told its step like a viewer of any box.
+            let sends = live.tick(1_000, &mut players);
+            assert_eq!(rolled(&sends, 1, 601).len(), 1);
+            assert_eq!(rolled(&sends, 2, 601), rolled(&sends, 1, 601));
+            assert!(rolled(&sends, 2, 602).is_empty() && idles(&sends, 2).is_empty());
+        }
+
+        #[test]
+        fn a_players_own_box_next_to_a_radio_follows_the_priority_rule() {
+            let mut players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+            let own = row(TOTEM); // priority 0, stands 2 m away, steps 3551
+            let mut loud = own.clone();
+            loud.priority = 5;
+            // The radio is 1 m away, nearer than the player's own box: equal priority, the
+            // nearer one wins, and the dancer is listed by that box only.
+            let mut live = radios(&[(RADIO, [1.0, 1.0, 0.0])]);
+            press(&mut live, &own, 600, 0, &players);
+            let sends = live.tick(10, &mut players);
+            let rolls = rolled(&sends, 1, 601);
+            assert_eq!(rolls.len(), 1);
+            assert!(
+                xvd_ids(HUMAN_M).contains(&rolls[0]),
+                "the radio won: {rolls:?}"
+            );
+            // A higher-priority own box of the same player wins over the radio.
+            let mut live = radios(&[(RADIO, [1.0, 1.0, 0.0])]);
+            press(&mut live, &loud, 600, 0, &players);
+            let sends = live.tick(10, &mut players);
+            assert_eq!(rolled(&sends, 1, 601), [3551]);
+            // When that box ends, the radio takes the player over, with no idle between.
+            let after = live.tick(u64::from(loud.duration_ms) + 10, &mut players);
+            assert!(idles(&after, 1).is_empty());
+            assert!(xvd_ids(HUMAN_M).contains(&rolled(&after, 1, 601)[0]));
+        }
+
+        #[test]
+        fn a_press_never_replaces_a_permanent_box() {
+            let players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+            let mut live = radios(&[(RADIO, [5.0, 1.0, 0.0])]);
+            // The radio's owner field is 0; a press by owner 0 must still leave it standing.
+            press(&mut live, &row(TOTEM), 0, 0, &players);
+            press(&mut live, &row(TOTEM), 0, 10, &players);
+            assert_eq!(live.live.len(), 2);
+            assert!(live.live[0].permanent() && live.live[0].guid == RADIO);
+        }
+
+        #[test]
+        fn a_restart_keeps_the_radios_afresh_and_drops_pressed_boxes_and_dancers() {
+            let mut players = world(16, &[(1, HUMAN_M, 0.0, 0.0, ZONE)]);
+            let mut live = radios(&[(RADIO, [5.0, 1.0, 0.0]), (OTHER_RADIO, [900.0, 1.0, 0.0])]);
+            press(&mut live, &row(TOTEM), 600, 0, &players);
+            live.tick(10, &mut players);
+            let mut again = live.restarted();
+            assert_eq!(
+                again.live.iter().map(|b| b.guid).collect::<Vec<_>>(),
+                [RADIO, OTHER_RADIO]
+            );
+            // The dancer's clock was dropped: the first tick rolls again at once.
+            let sends = again.tick(20, &mut players);
+            assert_eq!(rolled(&sends, 1, 601).len(), 1);
+        }
+
+        #[test]
+        fn an_unknown_item_fails_naming_the_actor_and_no_props_change_nothing() {
+            let directory = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+            let catalogue = Catalogue::load(&directory).unwrap();
+            let prop = |spawn_guid, item_id| world::BoomboxProp {
+                spawn_guid,
+                item_id,
+                position: [0.0; 3],
+            };
+            let error = Boomboxes::permanent(&catalogue, &[prop(RADIO, XVD), prop(77, 1)])
+                .unwrap_err()
+                .to_string();
+            assert!(
+                error.contains("77") && error.contains("boombox item 1"),
+                "{error}"
+            );
+            let mut players = registry();
+            let mut none = Boomboxes::permanent(&catalogue, &[]).unwrap();
+            assert!(none.live.is_empty() && none.tick(0, &mut players).is_empty());
         }
     }
 }

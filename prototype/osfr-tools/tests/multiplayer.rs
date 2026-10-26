@@ -1293,6 +1293,7 @@ impl PlaytestContent {
                 "jobs.json",
                 "field_kill_rewards.json",
                 "npc_spawns_extra.json",
+                "boomboxes.json",
             ],
         );
         let _ = fs::create_dir_all(fixture.dir().join("quests"));
