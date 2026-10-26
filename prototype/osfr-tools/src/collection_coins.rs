@@ -124,8 +124,8 @@ impl Tier {
 
     /// 386170 "Rare Exploration Coin", 4412 "Elite Exploration Coin": the `name_string_id` of
     /// every shipped coin row (`npc_spawns_extra.json`, from Legacy `Npcs.json` Id=4436 and
-    /// Id=2115). The client locale (`en_us_data.dat` lines 86160 and 73554) holds both names but
-    /// is keyed by hash, so the id-to-hash tie is not checked here (R).
+    /// Id=2115). The client locale (`en_us_data.dat`) holds both names but is keyed by hash,
+    /// so the id-to-hash tie is not checked here (R).
     pub fn name_string_id(self) -> u32 {
         match self {
             Self::Rare => 386_170,
@@ -210,8 +210,9 @@ fn invalid(message: String) -> io::Error {
 }
 
 impl CollectionCoins {
-    /// Reads `collection_coins.json` from `dir` and the overlay beside it, checked against
-    /// `catalogue`; `None` when the shipped map is absent.
+    /// Reads `collection_coins.json` from `dir`, checked against `catalogue`; `None` when the
+    /// shipped map is absent. Shipped map only: the overlay is read by `read_overlay` /
+    /// `Gameplay::set_world_dir`.
     pub fn load(dir: &Path, catalogue: &CollectionCatalogueContent) -> io::Result<Option<Self>> {
         let mut bytes = Vec::new();
         match fs::File::open(dir.join(FILE_NAME)) {
@@ -452,7 +453,7 @@ pub fn read_overlay(path: &Path) -> io::Result<CoinEditsFile> {
     if bytes.len() as u64 > MAX_FILE_BYTES {
         return Err(invalid("collection coin edits over 1 MiB".into()));
     }
-    let file: CoinEditsFile = serde_json::from_slice(&bytes)
+    let mut file: CoinEditsFile = serde_json::from_slice(&bytes)
         .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?;
     if file.schema_version != EDITS_SCHEMA_VERSION {
         return Err(invalid("unsupported collection coin edits schema".into()));
@@ -460,6 +461,13 @@ pub fn read_overlay(path: &Path) -> io::Result<CoinEditsFile> {
     if file.next_guid != 0 && !(EDIT_GUID_BASE..=EDIT_GUID_END).contains(&file.next_guid) {
         return Err(invalid("next_guid is outside the live GUID band".into()));
     }
+    // An overlay written before the counter existed has none: lift it above every row, so an
+    // unbound top row's GUID is never handed out again.
+    let above_rows = file
+        .records
+        .iter()
+        .map(|edit| edit.spawn_guid.saturating_add(1));
+    file.next_guid = file.next_guid.max(above_rows.max().unwrap_or(0));
     Ok(file)
 }
 

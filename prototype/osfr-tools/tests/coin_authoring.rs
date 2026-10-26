@@ -763,3 +763,25 @@ fn a_damaged_overlay_is_refused_not_overwritten() {
     assert!(said(&out).contains("Nothing changed"), "{}", said(&out));
     assert_eq!(fs::read(&path).unwrap(), b"{not json");
 }
+
+/// An overlay written before the counter existed has no `next_guid`: unbinding its top row must
+/// not let the next placement reuse that GUID.
+#[test]
+fn an_unbound_guid_is_not_reused_in_an_overlay_without_a_counter() {
+    let fixture = Fixture::new();
+    let mut game = fixture.admin();
+    let who = at(HERE);
+    game.update_npc_visibility(&who).unwrap();
+    assert!(said(&realm(&mut game, "realm coin place 1950", &who)).contains("Placed coin"));
+    let first = single_row(&fixture)["spawn_guid"].as_u64().unwrap();
+    let path = fixture.live.join("collection_coin_edits.json");
+    let mut file: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    file.as_object_mut().unwrap().remove("next_guid");
+    fs::write(&path, serde_json::to_vec_pretty(&file).unwrap()).unwrap();
+
+    let out = realm(&mut game, &format!("realm coin unbind {first}"), &who);
+    assert!(said(&out).contains("Removed placed coin"), "{}", said(&out));
+    assert!(said(&realm(&mut game, "realm coin place 1954", &who)).contains("Placed coin"));
+    let second = single_row(&fixture)["spawn_guid"].as_u64().unwrap();
+    assert!(second > first, "{second} reuses or precedes {first}");
+}

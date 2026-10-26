@@ -391,16 +391,10 @@ impl Gameplay {
     }
 }
 
-/// Hand out the file's next live GUID and advance its counter: above every row in the file
-/// and every GUID handed out before, so an unbound GUID is never reused.
+/// Hand out the file's next live GUID and advance its counter (`read_overlay` already lifted
+/// it above every row), so an unbound GUID is never reused.
 fn allocate_live_guid(file: &mut CoinEditsFile) -> Option<u64> {
-    let above_rows = file
-        .records
-        .iter()
-        .map(|edit| edit.spawn_guid.saturating_add(1))
-        .max()
-        .unwrap_or(0);
-    let guid = file.next_guid.max(above_rows).max(EDIT_GUID_BASE);
+    let guid = file.next_guid.max(EDIT_GUID_BASE);
     (guid < EDIT_GUID_END).then(|| {
         file.next_guid = guid + 1;
         guid
