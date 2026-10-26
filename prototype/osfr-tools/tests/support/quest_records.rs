@@ -31,6 +31,27 @@ pub struct RawQuest {
     pub job: Option<i32>,
     pub min_level: Option<u32>,
     pub objectives: Vec<Value>,
+    pub rewards: Vec<Value>,
+}
+
+impl RawQuest {
+    /// The (coins, job XP) the reward rows pay, the pair the 49/13 end screen shows.
+    pub fn reward_totals(&self) -> (u32, u32) {
+        let sum = |row: &Value| -> (u64, u64) {
+            (
+                row["coins"].as_u64().unwrap_or(0),
+                row["job_xp"]
+                    .as_object()
+                    .map_or(0, |xp| xp.values().filter_map(Value::as_u64).sum()),
+            )
+        };
+        let (coins, xp) = self
+            .rewards
+            .iter()
+            .map(sum)
+            .fold((0, 0), |a, b| (a.0 + b.0, a.1 + b.1));
+        (coins as u32, xp as u32)
+    }
 }
 
 pub fn sorted_json_paths(directory: &Path) -> Vec<PathBuf> {
@@ -100,6 +121,7 @@ pub fn read_quests(root: &Path) -> Vec<RawQuest> {
                     .and_then(|job| i32::try_from(job).ok()),
                 min_level: as_u32(&record["min_level"]),
                 objectives,
+                rewards: record["rewards"].as_array().cloned().unwrap_or_default(),
             });
         }
     }

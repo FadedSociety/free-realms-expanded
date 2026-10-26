@@ -33345,8 +33345,14 @@
       "location_evidence": [
         "Frost Ridge Speedway, Snowhill (3043997278)"
       ],
-      "quests_given": [],
-      "quest_ids_given": [],
+      "quests_given": [
+        {
+          "quest_id": 3080019
+        }
+      ],
+      "quest_ids_given": [
+        3080019
+      ],
       "quests_given_text": [
         "Kart Driver: Seaside Board of Tourism Sponsorship and the Frost Ridge challenges; she does not stand in Seaside. Kart Driver"
       ],

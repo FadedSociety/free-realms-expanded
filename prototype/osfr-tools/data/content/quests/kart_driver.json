@@ -1015,11 +1015,43 @@
     },
     {
       "id": 3080019,
+      "job": 48,
       "title_string_id": 394663,
-      "giver_npc_id": 9000000423,
+      "giver_npc_id": 9500000613,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9500000613,
+          "text_string_id": 394664,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "locale 394664 (quest_objective, Frost Ridge, this quest's title hint): 'You need to obtain another sponsor ... Petal Oceanmist at Frost Ridge Speedway might be someone to talk to about a potential sponsorship.' quest-lines/quests.json q3080019; objective-specs-fixed.json q3080019 index 0 (talk_to_npc)."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T726: the target row is 9500000613 (Petal Oceanmist, seaside.json, drawn by T698 at FreeRealms-Legacy FabledRealms.lua:1733). The record's old giver 9000000423 is npcs_unresolved.json 'Petal Oceanmist [client 1191567603]', the same person, so giver and talk target are one NPC like 3060004; the Talk is the turn-in."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "48": 30
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T726: no source gives this quest a reward (quest-lines/quests.json q3080019: no reward line; 394688 belongs to The Price of Fame). 5 coins and 30 Kart Driver (profile 48) job XP repeat the enabled sibling 3080002's rung in kart_driver.json; no item."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1035,7 +1067,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T726: one talk_to_npc objective at Petal Oceanmist (client objective 394664); ContentDb v1 has no other free-text objective field"
         },
         {
           "kind": "reconstructed",
@@ -1047,17 +1079,25 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T726: the guide reward cell is unknown; the sibling-rung reward is reconstructed"
         },
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "T726: dialogs.json q3080019 binds 394665 (quest_dialog tagged to this title; Petal's sponsor pitch ending 'You think you're the right racer for us to sponsor?') as the offer and 394666 (quest_dialog tagged to this title; Petal's reply about the fast lap at Frost Ridge) as the progress line. 394662, the old intro, is tagged to Self Promotion (Amber Violet's post-race line), not to this quest."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T726: intro is the offer line 394665; end text is 394666, the line Petal speaks when the player returns to her, since the quest ends on the Talk at her and the client has no completion line for it. No prerequisite: the predecessor (Icy Perfection or Self Promotion) is unsettled and both are disabled."
         }
       ],
       "description_string_id": 394664,
-      "intro_text_string_id": 394662,
-      "end_text_string_id": 394665,
-      "enabled": false
+      "intro_text_string_id": 394665,
+      "end_text_string_id": 394666,
+      "enabled": true
     },
     {
       "id": 3080020,

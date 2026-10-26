@@ -392,6 +392,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Heddy Heathcliff (T503 giver and turn-in of 3000361): NPCs - Seaside.md row 50 quotes only third-person role, location and quest summaries (4042850801, 570276910, 4186195979); his first-person lines are the quest intro 400433 and the end text 400436, and a QuestOffer proof for 400433 cannot be made because that row says the quest titles are not found, so no uncontested greeting of his own is recovered.",
     ),
     (
+        9500000613,
+        "Petal Oceanmist (T726 giver and turn-in of 3080019): NPCs - Seaside.md:175 quotes only her role, the Frost Ridge location and the quest title (3043997278); her first-person lines 394665 (the quest offer intro) and 394666 (the end text) are the quest-step dialogue of 3080019, and 394906, 394907, 394910 and 394911 are third-person lines about her, so no uncontested greeting of her own is proven.",
+    ),
+    (
         9500000633,
         "Tazinna (T466 Feminine Touch talk target): NPCs - Seaside.md:105 quotes only third-person survey lines (101402, 139578); her first-person reply 101412 is the quest-step dialogue of 3000360 goal 1, not a greeting.",
     ),
