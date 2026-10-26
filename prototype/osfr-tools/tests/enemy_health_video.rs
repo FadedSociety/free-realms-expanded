@@ -12,8 +12,9 @@
 //!   of the content it was filmed in (a difficulty-5 dungeon enemy is level 20,
 //!   the open-world level-4 fight's Cray Marauder is level 3).
 //! - `EncounterEngine::load`: a world or dungeon row's health scales by that
-//!   level exactly like a field enemy's (`scale_enemy`); before T737 the level
-//!   was ignored at that load point, so every level-20 row died in one hit.
+//!   level exactly like a field enemy's (`CombatScale::scale_world_enemy`);
+//!   before T737 the level was ignored at that load point, so every level-20
+//!   row died in one hit.
 //!
 //! Each fight below drives the shipped row through the real loader and
 //! `EncounterEngine::attack` at the video's own player level and job. A data
@@ -21,13 +22,13 @@
 
 use osfr_tools::encounter::EncounterEngine;
 use serde_json::Value;
-use std::{
-    fs,
-    path::{Path, PathBuf},
-};
 
 #[path = "common/field_enemy_fixture.rs"]
 mod field_enemy_fixture;
+#[path = "support/json.rs"]
+mod support_json;
+
+use support_json::read as read_json;
 
 /// One observed fight: definition id, the video's player profile and level, the
 /// basic-hit range read from the fights, and the source (video id and seconds).
@@ -116,14 +117,9 @@ const FIGHTS: [Fight; 10] = [
     },
 ];
 
-fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
 /// A shipped `enemies.json` definition by definition id.
 fn definition(definition_id: i64) -> Value {
-    let file: Value =
-        serde_json::from_slice(&fs::read(content_dir().join("enemies.json")).unwrap()).unwrap();
+    let file = read_json(&field_enemy_fixture::content_dir().join("enemies.json"));
     file["definitions"]
         .as_array()
         .unwrap()
@@ -265,14 +261,12 @@ fn the_enemy_health_scale_is_tunable_from_data() {
         tuned_health > base_health && tuned_swings > base_swings,
         "x2 enemy_health_scale must lengthen the fight: {base_health}/{base_swings} -> {tuned_health}/{tuned_swings}"
     );
-    // A data reload changes the fight, and it changes it by the file's factor:
-    // compare with the shipped factor rather than pinning the tuned number.
-    let shipped: f64 = serde_json::from_slice::<Value>(
-        &fs::read(content_dir().join("combat_scale.json")).unwrap(),
-    )
-    .unwrap()["enemy_health_scale"]
-        .as_f64()
-        .unwrap();
+    // A fresh engine load changes the fight, and it changes it by the file's
+    // factor: compare with the shipped factor rather than pinning the tuned
+    // number. Live reload is not implemented: `gameplay/content_reload.rs` has
+    // no `combat_scale` target, so a running session keeps the loaded scale.
+    let shipped_scale = read_json(&field_enemy_fixture::content_dir().join("combat_scale.json"));
+    let shipped = shipped_scale["enemy_health_scale"].as_f64().unwrap();
     let expected = (f64::from(tuned_health) * shipped / 7.44).round() as u32;
     assert!(
         base_health.abs_diff(expected) <= 1,
@@ -299,4 +293,24 @@ fn an_out_of_bounds_enemy_scale_refuses_the_load() {
     let fixture = field_enemy_fixture::Fixture::with_world_enemies(rows);
     fixture.scale(|_| {});
     assert!(fixture.load_encounters().is_ok());
+}
+
+/// A row's level is a content band, not a value to clamp: a row outside 1..=20
+/// must refuse the load instead of silently becoming level 1 or 20
+/// (`CombatScale::health_factor` clamps, so the load has to reject it first).
+#[test]
+fn a_row_level_outside_the_content_band_refuses_the_load() {
+    for level in [0, 21] {
+        let mut rows = world_rows();
+        rows[0]["level"] = serde_json::json!(level);
+        let fixture = field_enemy_fixture::Fixture::with_world_enemies(rows);
+        let error = fixture
+            .load_encounters()
+            .err()
+            .unwrap_or_else(|| panic!("enemy level {level} must refuse the load"));
+        assert!(
+            error.to_string().contains("invalid encounter actor"),
+            "the refusal names the actor rule: {error}"
+        );
+    }
 }

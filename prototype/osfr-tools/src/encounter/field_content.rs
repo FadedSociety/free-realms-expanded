@@ -123,7 +123,6 @@ impl EncounterEngine {
                 || f.actor.boss
                 || !(1..=3600).contains(&respawn_seconds)
                 || !(aggro_range > 0.0 && aggro_range <= 40.0)
-                || !(1..=20).contains(&f.actor.level)
                 || f.level_band.is_some_and(|[lo, hi]| {
                     lo == 0 || lo > f.actor.level || hi < f.actor.level || hi > 20
                 })
@@ -155,14 +154,9 @@ impl EncounterEngine {
             if !guids.insert(f.actor.guid) {
                 return Err(invalid("duplicate field enemy GUID"));
             }
-            // (R) Authored stats are level-one baselines. Reuse final-era HP
+            // (R) Authored stats are level-one baselines. Reuse the final-era HP
             // curve and weapon tiers, rather than inventing per-kind curves.
-            let level = f.actor.level;
-            self.scale.scale_enemy(
-                &mut f.actor,
-                self.scale.health_factor(level),
-                self.scale.tier_factor(level),
-            );
+            self.scale.scale_field_enemy(&mut f.actor);
             field.push(FieldEnemy {
                 state: enemy_state(&f.actor),
                 respawn_ms: u64::from(respawn_seconds) * 1000,

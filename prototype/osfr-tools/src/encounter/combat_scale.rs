@@ -140,4 +140,17 @@ impl CombatScale {
         a.max_health = health.round() as u32;
         a.damage = damage.round() as u32;
     }
+
+    /// A loaded world or dungeon row (R, T737): its authored health is a
+    /// level-one baseline, so its own content level scales it like a player's.
+    /// Damage stays as authored; no video measures enemy damage.
+    pub(super) fn scale_world_enemy(&self, a: &mut Actor) {
+        self.scale_enemy(a, self.health_factor(a.level), 1.0);
+    }
+
+    /// A loaded field enemy: its content level scales health on the player
+    /// curve and its weapon-tier damage (R, T737).
+    pub(super) fn scale_field_enemy(&self, a: &mut Actor) {
+        self.scale_enemy(a, self.health_factor(a.level), self.tier_factor(a.level));
+    }
 }
