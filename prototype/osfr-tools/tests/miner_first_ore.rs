@@ -2112,13 +2112,14 @@ fn the_objective_is_produced_by_the_shipped_mining_board() {
         "the stale empty-record tags are gone"
     );
 
-    // Gem Appraisal stays disabled; 3100020 stays unreachable behind disabled 3100019.
+    // Gem Appraisal stays disabled. T729 enabled the Southvale gate 3100019, so 3100020 follows it
+    // and now pays a reward (the reachability gate refuses an empty one).
     assert_eq!(row(records, 3_100_005)["enabled"], json!(false));
     assert_eq!(
         row(records, 3_100_020)["prerequisite_quest_ids"],
         json!([3_100_019])
     );
-    assert_eq!(row(records, 3_100_019)["enabled"], json!(false));
+    assert_ne!(row(records, 3_100_019)["enabled"], json!(false));
 
     // The production loader reads the shipped board; `reward_transaction` (src/mining.rs)
     // pays collected / per_reward * cluster_quantity per output row, so a won board pays

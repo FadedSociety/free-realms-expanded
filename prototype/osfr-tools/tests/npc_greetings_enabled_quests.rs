@@ -308,6 +308,10 @@ const BINDINGS: &[Binding] = &[
 /// unbound id that is not listed here.
 const BLANK_WITH_REASON: &[(u64, &str)] = &[
     (
+        9000000069,
+        "Derp Axemaker (T729 giver of 3100012 and 3100013): the only first-person lines the client has for him are the offer intros 387452 and 77415 of those two quests, and quest-lines/dialogs.json leaves both speakers unattributed; binding a QuestOffer greeting moves the Snowhill bound-row pins in the region greeting tests, which this quest-data change does not touch, so he stays unbound.",
+    ),
+    (
         9000000070,
         "Diggy (T466 Touring Seaside talk target): NPCs - Seaside.md:45 quotes only third-person cooking objectives and other speakers' referrals (428610, 21340, 384277, 100280); locale 93435 ('finest seafood') has no speaker in any guide row, and 93429 is the quest-step goal text, so no first-person line of his own is proven.",
     ),

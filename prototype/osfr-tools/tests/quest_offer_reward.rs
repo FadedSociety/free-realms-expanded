@@ -43,15 +43,16 @@ const ADVENTURER: i32 = 1;
 const COBBLESTONE_GIVER: u64 = 9_000_000_189;
 /// Ricky Danger 9_500_000_254, the one-talk objective target of quest 3000021.
 const COBBLESTONE_TARGET: u64 = 9_500_000_254;
-/// Grumpore 9000000337; gives the no-reward quest 3100020.
-const MINER_GIVER: u64 = 9_000_000_337;
-/// 3100020's prerequisite. Later content disabled it, so the test restores the
+/// Supply Master Leo 9000000479; gives the no-reward quest 3020014 (T729 gave 3100020, the
+/// previous fixture, a reward when it enabled its prerequisite).
+const EMPTY_REWARD_GIVER: u64 = 9_000_000_479;
+/// 3020014's prerequisite. Content disables it, so the test restores the
 /// completed-quest save state that `repair_counters` preserves for exactly this case.
-const DISABLED_PREREQUISITE: u32 = 3_100_019;
+const DISABLED_PREREQUISITE: u32 = 3_020_013;
 /// One Talk, 5 coins and 20 Adventurer XP, no items and no display rows.
 const REWARD_QUEST: u32 = 3_000_021;
 /// Enabled record with empty `rewards`, so its bundle is the 69-byte base.
-const EMPTY_REWARD_QUEST: u32 = 3_100_020;
+const EMPTY_REWARD_QUEST: u32 = 3_020_014;
 /// Greenwood Forest giver 9000000444; quest 3000024 pays 13 coins and 25 Adventurer XP.
 const SECOND_GIVER: u64 = 9_000_000_444;
 const SECOND_REWARD_QUEST: u32 = 3_000_024;
@@ -78,7 +79,7 @@ fn engine(character_id: u64) -> QuestEngine {
     .expect("split quest content loads")
 }
 
-/// A session whose save already completed 3100020's prerequisite before content
+/// A session whose save already completed 3020014's prerequisite before content
 /// disabled it: `repair_counters` preserves that historical progress, and the real
 /// Talk path then offers the enabled no-reward quest. No other enabled quest has an
 /// empty reward and an offerable giver on this content.
@@ -196,11 +197,11 @@ fn the_offer_card_carries_the_authored_reward() {
 fn an_empty_reward_quest_still_sends_the_69_byte_base() {
     let fixture = Fixture::for_character(CHARACTER);
     let mut game = game_with_completed_prerequisite(&fixture);
-    let character = character_at(CHARACTER, MINER_GIVER);
+    let character = character_at(CHARACTER, EMPTY_REWARD_GIVER);
     let offered = offer(
         &mut game,
         &character,
-        MINER_GIVER,
+        EMPTY_REWARD_GIVER,
         EMPTY_REWARD_QUEST,
         2_000,
     );
@@ -225,7 +226,7 @@ fn an_empty_reward_quest_still_sends_the_69_byte_base() {
     );
     assert_eq!(
         u64::from_le_bytes(bundle[37..45].try_into().unwrap()),
-        MINER_GIVER,
+        EMPTY_REWARD_GIVER,
         "the display source GUID is the quest's giver"
     );
     assert_eq!(
@@ -233,7 +234,7 @@ fn an_empty_reward_quest_still_sends_the_69_byte_base() {
         CHARACTER,
         "the display player GUID is this character"
     );
-    assert_trailing_fields(&packet, MINER_GIVER);
+    assert_trailing_fields(&packet, EMPTY_REWARD_GIVER);
 }
 
 #[test]

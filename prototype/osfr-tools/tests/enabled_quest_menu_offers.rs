@@ -27,7 +27,7 @@
 //! another's chain has a strictly smaller chain, so no shared save completes a
 //! quest it must offer. A disabled prerequisite can only be the historical
 //! completed entry `repair_counters` keeps; [`HISTORICAL_PREREQUISITE`] names the
-//! two enabled quests T314 already reports for that, and any other one fails.
+//! enabled quest T314 already reports for that, and any other one fails.
 
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
@@ -62,10 +62,10 @@ const OTHER: u64 = CHARACTER + 1;
 /// Enabled records on the T384 tree (tip `33200d2`). Fewer means content was
 /// disabled or lost; the failure prints the new count.
 const SHIPPED_ENABLED: usize = 50;
-/// Enabled quests whose chain runs through a disabled record (`3020013`,
-/// `3100019`), so only a historical save reaches their offer. T314 reports both;
-/// re-enabling or re-pointing the prerequisite is a content task.
-const HISTORICAL_PREREQUISITE: [u32; 2] = [3_020_014, 3_100_020];
+/// Enabled quests whose chain runs through a disabled record (`3020013`), so only a
+/// historical save reaches their offer. T314 reports it (T729 enabled `3100019`, which
+/// took `3100020` off the list); re-enabling or re-pointing the prerequisite is a content task.
+const HISTORICAL_PREREQUISITE: [u32; 1] = [3_020_014];
 /// The ordinary client requests the gate sends. A dev `realm` command
 /// (offer, goto, place) is a 15/x chat request and never one of these.
 const MENU_REQUESTS: [[u8; 4]; 5] = [

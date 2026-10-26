@@ -805,11 +805,42 @@
     },
     {
       "id": 3100012,
+      "job": 14,
       "title_string_id": 387453,
       "giver_npc_id": 9000000069,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 14,
+          "level": 10,
+          "text_string_id": 387507,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387507 'Reach Level 10 as a Miner, then return to Derp Axemaker.' (quest-lines/quests.json q3100012 objective text_locale_id 387507); the same block holds the wait line and the end line this record already carries."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T729: the level gate is one job_level objective (T361, profile 14 = Miner, level 10 from the client text), completed from the server's own Miner rank and never from a client claim. The return to Derp Axemaker is the 49/13 turn-in at the giver; quest-lines/objective-specs-fixed.json q3100012 lists it as a second talk step with no client string of its own. It is enabled here only because 3100013 (Finding Southvale) lists it as its prerequisite and a disabled prerequisite makes that quest unreachable."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T729: no source gives this level gate a reward (quest-lines/quests.json q3100012: rewards empty). Fifteen coins are the T361/T663 level-gate payout, paid once by the 49/14 turn-in; no item and no job XP."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -829,7 +860,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T729: the level gate is the one job_level objective (T361); ContentDb v1 has no other free-text objective field"
         },
         {
           "kind": "reconstructed",
@@ -841,7 +872,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T729: the 15-coin level-gate payout is reconstructed; the guide reward cell is unknown"
         },
         {
           "kind": "reconstructed",
@@ -851,17 +882,49 @@
       "description_string_id": 387454,
       "intro_text_string_id": 387452,
       "end_text_string_id": 387455,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3100013,
+      "job": 14,
       "title_string_id": 77416,
       "giver_npc_id": 9000000069,
       "prerequisite_quest_ids": [
         3100012
       ],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000405,
+          "text_string_id": 77424,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 77424 'Travel to the Southvale Outpost and speak with Mili Ironcall, the camp's foreman.' (quest-lines/quests.json q3100013, quest-lines/wiring/round3/southvale.json q3100013). Mili Ironcall 9000000405 is the drawn legacy_data row at the Southvale Outpost position in npcs/greenwood_forest.json."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T729: the one Talk at Mili is the final objective, so the end screen opens at Mili (QuestEngine named objective target) with end text 77418, her arrival line; quest-lines/dialogs.json q3100013 leaves the complete slot empty."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "14": 15
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T729: 5 coins and 15 Miner (profile 14) XP mirror T334's Miner referral 3100003 (Trixi); the guide reward cell is unknown (quest-lines/quests.json q3100013: rewards empty). No item is granted, so this creates no free, sellable or re-grantable gear."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -881,7 +944,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T729: the travel step is one talk_to_npc objective at Mili Ironcall (T403 goal text 77424)"
         },
         {
           "kind": "reconstructed",
@@ -893,7 +956,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T729: 5 coins and 15 Miner XP reconstructed from the T334 referral rung; the guide reward cell is unknown"
         },
         {
           "kind": "reconstructed",
@@ -903,7 +966,7 @@
       "description_string_id": 77417,
       "intro_text_string_id": 77415,
       "end_text_string_id": 77418,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3100014,
@@ -1165,11 +1228,42 @@
     },
     {
       "id": 3100019,
+      "job": 14,
       "title_string_id": 387459,
       "giver_npc_id": 9000000337,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "job_level",
+          "id": 1,
+          "profile_id": 14,
+          "level": 15,
+          "text_string_id": 387518,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 387518 'Reach Level 15 as a Miner, then return to Grumpore.' (quest-lines/quests.json q3100019 objective text_locale_id 387518); the same block holds the wait line and the end line this record already carries."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T729: the level gate is one job_level objective (T361, profile 14 = Miner, level 15 from the client text), completed from the server's own Miner rank and never from a client claim. The return to Grumpore is the 49/13 turn-in at the giver; quest-lines/objective-specs-fixed.json q3100019 lists it as a second talk step with no client string of its own. The record has no prerequisite in the data (the guide order puts 3100018 first; that quest cannot run, see notes/Autopilot/T729.md)."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 15,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T729: no source gives this level gate a reward (quest-lines/quests.json q3100019: rewards empty). Fifteen coins are the T361/T663 level-gate payout, paid once by the 49/14 turn-in; no item and no job XP. Global.Text 387521 '30 Ticket Chest' is tagged quest_reward beside these strings, but nothing ties it to this quest and the server has no such item, so it is not used."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1189,7 +1283,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T729: the level gate is the one job_level objective (T361); ContentDb v1 has no other free-text objective field"
         },
         {
           "kind": "reconstructed",
@@ -1201,7 +1295,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T729: the 15-coin level-gate payout is reconstructed; the guide reward cell is unknown"
         },
         {
           "kind": "reconstructed",
@@ -1210,10 +1304,11 @@
       ],
       "description_string_id": 387460,
       "end_text_string_id": 387461,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3100020,
+      "job": 14,
       "title_string_id": 77623,
       "giver_npc_id": 9000000337,
       "prerequisite_quest_ids": [
@@ -1237,7 +1332,21 @@
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {
+            "14": 15
+          },
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T729: 5 coins and 15 Miner (profile 14) XP mirror T334's Miner referral 3100003 and 3100013 (the quest is one Talk at Silverray); the guide reward cell is unknown (quest-lines/quests.json q3100020: rewards empty). No item is granted, so this creates no free, sellable or re-grantable gear. It had no reward and no `job`; enabling its prerequisite 3100019 made it reachable, and the reachability gate refuses an empty reward."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -1257,7 +1366,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T729: the one talk_to_npc objective at Silverray (T403 goal text 77624) is the whole quest; spec_complete in quest-lines/objective-specs-fixed.json q3100020"
         },
         {
           "kind": "reconstructed",
@@ -1269,7 +1378,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
+          "evidence": "(R) T729: the 5-coin 15-XP referral reward is reconstructed; the guide reward cell is unknown"
         },
         {
           "kind": "reconstructed",
