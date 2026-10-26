@@ -133,8 +133,9 @@ impl Invites {
         true
     }
 
-    /// The invitee's live invite, left in place: an Accept reads it, rechecks, and consumes it
-    /// with `answer` only once the join has committed, so a refused Accept burns nothing.
+    /// The invitee's live invite, left in place: an Accept reads it and rechecks. A Decline
+    /// consumes it with `answer`; a committed join removes it with `forget`, inside the World
+    /// install, so a refused Accept burns nothing and no step sits between join and removal.
     pub fn live(&self, invitee: u64, now_ms: u64) -> Option<&Pending> {
         self.rows
             .get(&invitee)
@@ -147,6 +148,13 @@ impl Invites {
     pub fn answer(&mut self, invitee: u64, now_ms: u64) -> Option<Pending> {
         let row = self.rows.remove(&invitee)?;
         (now_ms < row.deadline_ms).then_some(row)
+    }
+
+    /// Drop the invitee's invite to `run` (they are now in it). Any other row stays.
+    pub fn forget(&mut self, invitee: u64, run: i32) {
+        if self.rows.get(&invitee).is_some_and(|row| row.run == run) {
+            self.rows.remove(&invitee);
+        }
     }
 
     pub fn len(&self) -> usize {

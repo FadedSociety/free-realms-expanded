@@ -1290,6 +1290,8 @@ impl World {
                 ..change.location
             },
         );
+        // T440/F713: landing in an invite's run answers that invite, in this same install.
+        self.invites.forget(change.player, target);
         if ready {
             self.mark_zone_ready(change.player, target)
                 .expect("prepared membership matches its ready instance");

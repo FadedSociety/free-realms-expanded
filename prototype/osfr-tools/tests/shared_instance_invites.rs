@@ -5,9 +5,10 @@
 //! location, membership and save bytes. Accept puts B into A's World instance through one
 //! transfer, also when the reply carries a stale non-zero word B (a real client's `client+0xc10`
 //! is its last 41/107 instance). A reply with no invite, an expired deadline (injected clock), a
-//! replayed accept and an accept after the starter left the run change nothing and send nothing
-//! (both inboxes stay empty), and a refused accept leaves the invite answerable. Accept begins
-//! the same battle for B in A's run. Ungrouped and ineligible players get no invite.
+//! replayed accept and an accept after the starter left the run change nothing and send no
+//! message beyond ambient actor traffic. Only a Decline or a committed join consumes the invite
+//! (the table is read through `test_has_invite`); a refused accept leaves it answerable. Accept
+//! begins the same battle for B in A's run. Ungrouped and ineligible players get no invite.
 //!
 //! Client layouts (IDA): 41/102 reader `00a9f920`, 41/103 writer `00a97720` (see
 //! `src/encounter_invite.rs`).
@@ -230,6 +231,10 @@ impl Rig {
             .send(Box::new(move |server| tx.send(f(server)).unwrap()))
             .unwrap();
         rx.recv_timeout(PATIENCE).unwrap()
+    }
+
+    fn has_invite(&self, guid: u64) -> bool {
+        self.host(move |s| s.test_has_invite(guid))
     }
 
     fn group(&self, guid: u64) -> Option<u32> {
@@ -464,12 +469,14 @@ fn a_grouped_start_invites_the_member_and_only_accept_enters_the_run() {
     ] {
         rig.b_sends(&bytes);
         rig.assert_inert(what, &before);
+        assert!(rig.has_invite(B), "{what}: the invite is still answerable");
     }
 
     // Decline with the stale word B a client that already saw a battle sends: the invite is
     // cleared and nothing else moves; both stay grouped.
     rig.b_answers(reply(0, STALE_RUN, B, false));
     rig.assert_inert("decline", &before);
+    assert!(!rig.has_invite(B), "a decline consumes the invite");
     assert!(rig.group(A).is_some() && rig.group(A) == rig.group(B));
     // A late accept finds no invite.
     rig.b_answers(reply(0, 0, B, true));
@@ -538,6 +545,7 @@ fn a_grouped_start_invites_the_member_and_only_accept_enters_the_run() {
         Some((BATTLE, run, title))
     );
     assert_ne!(outside, rig.place(B));
+    assert!(!rig.has_invite(B), "the committed join consumed the invite");
     assert!(rig.group(A).is_some() && rig.group(A) == rig.group(B));
 
     // A replayed accept sends nothing and moves nobody.
@@ -590,6 +598,7 @@ fn a_refused_accept_leaves_the_invite_answerable() {
     rig.b_answers(reply(0, STALE_RUN, B, true));
     rig.assert_inert("accept without a combat job", &before);
     assert_eq!(rig.host(|s| s.test_joinable_run(B)), None);
+    assert!(rig.has_invite(B), "a refused accept keeps the invite");
     // B picks the combat job back up and answers the same invite: it was not burned.
     rig.take(1);
     let job = field_battle_fixture::switch_job(BRAWLER);
@@ -668,6 +677,51 @@ fn the_world_sweep_voids_an_invite_when_a_player_or_the_run_goes_away() {
     offered(&mut world);
     world.collect_empty_instances(30_000);
     assert!(world.invites_mut().is_empty(), "expired");
+}
+
+#[test]
+fn the_membership_install_that_places_the_invitee_in_the_run_removes_the_invite() {
+    use osfr_tools::{
+        encounter_invite::Pending,
+        world::{InstanceKind, World, WorldPose},
+    };
+    let mut world = World::runtime();
+    world
+        .register_runtime_zone(osfr_tools::content::Zone {
+            id: 9600,
+            name: "9600".into(),
+            geometry_id: Some(9600),
+            zone_type: Some(2),
+            tutorial: Some(false),
+            sky: Some(String::new()),
+            source: Vec::new(),
+        })
+        .unwrap();
+    let run = world
+        .create_child_instance(0, 9600, InstanceKind::Encounter { encounter_id: 0 }, 0)
+        .unwrap();
+    let place = |world: &mut World, guid: u64, zone: u32, target: Option<i32>| {
+        let change = world
+            .prepare_membership(guid, zone, target, WorldPose::ORIGIN, true, 0)
+            .unwrap();
+        world.commit_membership(change);
+    };
+    place(&mut world, A, 9600, Some(run));
+    place(&mut world, B, 0, None);
+    let row = Pending {
+        inviter: A,
+        run,
+        encounter: BATTLE,
+        deadline_ms: 30_000,
+    };
+    assert!(world.invites_mut().offer(B, row, 0, 16));
+    // Moving elsewhere, and another player entering the run, answer nothing.
+    place(&mut world, B, 0, None);
+    place(&mut world, 303, 9600, Some(run));
+    assert_eq!(world.invites_mut().len(), 1);
+    // B landing in the invited run is the answer: gone in the same install.
+    place(&mut world, B, 9600, Some(run));
+    assert!(world.invites_mut().is_empty());
 }
 
 #[test]

@@ -113,8 +113,9 @@ fn offer(
 /// The responder is this session, never the packet, and no reply field is a key (a real client's
 /// word B is its last battle instance). A reply with no live invite changes nothing. Decline
 /// consumes the invite. Accept enters the server-held run only after the group, the inviter's
-/// live run and this player's Go gates are rechecked, and consumes the invite only once that
-/// join has committed: a refused Accept leaves it answerable until it expires.
+/// live run and this player's Go gates are rechecked. The invite is not consumed here: the join's
+/// own membership install removes it (`World::commit_membership`), so it goes with the join or
+/// not at all, and a refused Accept leaves it answerable until it expires.
 fn answer(
     me: &mut Session,
     sessions: &mut SessionMap,
@@ -152,11 +153,9 @@ fn answer(
         return Ok(());
     };
     let previous = me.gateway.state().clone();
-    if me.commit_outcome(
+    me.commit_outcome(
         staged, previous, outcome, world, membership, sessions, now_ms,
-    )? {
-        membership.invites_mut().answer(guid, now_ms);
-    }
+    )?;
     Ok(())
 }
 
@@ -174,6 +173,12 @@ impl Server {
             .session_keys
             .get(self.world.active_sessions.get(&guid)?)?;
         self.sessions.get(key)?.gateway.joinable_run()
+    }
+
+    /// Whether the character holds a live encounter invite (tests only).
+    pub fn test_has_invite(&mut self, guid: u64) -> bool {
+        let now = self.start.elapsed().as_millis() as u64;
+        self.membership.invites_mut().live(guid, now).is_some()
     }
 
     /// Move the server clock forward: every deadline is measured on `start` (tests only).
