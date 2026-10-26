@@ -1380,15 +1380,18 @@ fn store_packet_matches_the_client_reader_field_for_field() {
         // MarketingBundleDefinition (`00b3da50`).
         assert_eq!(reader.u32(), listing.bundle_id, "bundle id");
         assert_eq!(reader.u32(), listing.name_id, "name id");
-        // T657: tile Description (`009a56d0` case 4) from the item catalogue.
+        // T657: tile Description (`009a56d0` case 4) from the item catalogue; an item without one
+        // shows its name (F719), so no tile resolves locale id 0.
         let description = reader.u32();
+        let real = u32::try_from(presentation.description_id).unwrap_or(0);
         assert_eq!(
             description,
-            u32::try_from(presentation.description_id).unwrap_or(0),
+            if real == 0 { listing.name_id } else { real },
             "description id (item {})",
             listing.item_id
         );
-        if description != 0 {
+        assert_ne!(description, 0, "item {} description", listing.item_id);
+        if real != 0 {
             described += 1;
         }
         if listing.item_id == 41 {
@@ -1907,13 +1910,44 @@ fn an_empty_ride_child_is_sent_and_lists_nothing() {
     );
 }
 
+/// F719: a ride row with no `ride_category` tag lists under Rides even when its row carries a
+/// shelved item category (101 is the Clothes shelf's); it never lands on an item shelf.
+#[test]
+fn an_untagged_ride_with_a_shelved_item_category_still_lists_under_rides() {
+    let shop = shop_after("ride-with-shelved-category", |s| {
+        let row = row_mut(s, RIDE_ITEM);
+        row.as_object_mut()
+            .expect("row object")
+            .remove("ride_category");
+        row["category_id"] = 101.into();
+    })
+    .expect("content loads");
+    let catalogue = shop.sc_catalogue();
+    let ride = catalogue.listing(RIDE_ITEM as u32).expect("ride is listed");
+    assert_eq!(ride.group, catalogue.config().category_group_id, "Rides");
+    let clothes = catalogue
+        .config()
+        .item_shelves
+        .iter()
+        .find(|shelf| shelf.item_category_ids.contains(&101))
+        .expect("the clothes shelf");
+    assert!(
+        catalogue
+            .listings()
+            .iter()
+            .filter(|listing| listing.group == clothes.category_id)
+            .all(|listing| listing.item_id != RIDE_ITEM),
+        "the ride is not under Clothes"
+    );
+}
+
 /// T657: the category table is content. A listed row no shelf names, a shelf list with a
 /// duplicate item category, and a missing table are refused when the shop loads, never at a sale.
 #[test]
 fn bad_item_shelf_content_is_refused_at_load() {
     shop_after("item-shelf-good", |_| {}).expect("the shipped content loads");
     type Edit = Box<dyn FnOnce(&mut Value)>;
-    let refused: [(&str, Edit); 3] = [
+    let refused: [(&str, Edit); 5] = [
         (
             "no-shelves",
             Box::new(|s| s["station_cash"]["item_shelves"] = Value::Array(Vec::new())),
@@ -1930,6 +1964,15 @@ fn bad_item_shelf_content_is_refused_at_load() {
         (
             "unmapped-item-category",
             Box::new(|s| row_mut(s, 41)["category_id"] = 999.into()),
+        ),
+        (
+            // 1 and 2 are the Rides and Boombox top-level orders (F719).
+            "shelf-order-collides-with-rides",
+            Box::new(|s| s["station_cash"]["item_shelves"][0]["display_order"] = 1.into()),
+        ),
+        (
+            "shelf-order-collides-with-boombox",
+            Box::new(|s| s["station_cash"]["item_shelves"][0]["display_order"] = 2.into()),
         ),
     ];
     for (name, edit) in refused {

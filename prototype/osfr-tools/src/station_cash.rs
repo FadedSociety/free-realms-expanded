@@ -302,7 +302,8 @@ impl Config {
             return false;
         }
         let mut ids = BTreeSet::new();
-        let mut orders = BTreeSet::new();
+        // 1 and 2 are the Rides and Boombox top-level orders (`tree_nodes`).
+        let mut orders = BTreeSet::from([1, 2]);
         let mut categories = BTreeSet::new();
         let mut types = BTreeSet::new();
         for shelf in &self.item_shelves {
@@ -348,9 +349,10 @@ impl Config {
     }
 
     /// T657: the 66/6 group one row lists under. Boomboxes and tagged rides keep their T495/T526
-    /// shelves; every other row takes the item shelf its category (then its item type) names. A
-    /// ride with no tag keeps the Rides parent so older content still lists it; any other row
-    /// without a shelf is a content error, never a Rides fallback (the T657 bug).
+    /// shelves; an untagged ride keeps the Rides parent so older content still lists it (checked
+    /// before the item shelves, so a ride's own item category cannot move it); every other row
+    /// takes the item shelf its category (then its item type) names, and one without a shelf is a
+    /// content error, never a Rides fallback (the T657 bug).
     fn listing_group(
         &self,
         kind: RowKind,
@@ -375,11 +377,12 @@ impl Config {
                 if ride_category.is_some() {
                     return self.ride_group(ride_category);
                 }
-                if let Some(shelf) = self.item_shelf(category_id, item_type) {
-                    return Ok(shelf.category_id);
-                }
+                // A ride keeps the Rides parent even when its row carries a shelved item category.
                 if ride || item_type == RIDE_ITEM_TYPE {
                     return Ok(self.category_group_id);
+                }
+                if let Some(shelf) = self.item_shelf(category_id, item_type) {
+                    return Ok(shelf.category_id);
                 }
                 Err(invalid("station cash row has no Marketplace category"))
             }
@@ -761,8 +764,8 @@ pub struct Listing {
     pub bundle_id: u32,
     pub item_id: i32,
     pub name_id: u32,
-    /// T657: the item definition's description locale id (0 when it has none). The client's
-    /// `Description` column is bundle +164 (`009a56d0` case 4); a 0 here is the
+    /// T657: the item definition's description locale id, or its name id when it has none (R).
+    /// The client's `Description` column is bundle +164 (`009a56d0` case 4); a 0 here is the
     /// `<STRING 0 NOT FOUND>` the native run showed.
     pub description_id: u32,
     /// T657: the item definition's image-set id and tint, written as the bundle's two image
@@ -866,6 +869,7 @@ impl Catalogue {
                 continue;
             };
             let ride = is_ride(item_id);
+            let name_id = u32::try_from(presentation.name_id).unwrap_or(0);
             let group = config.listing_group(
                 kind,
                 ride_category,
@@ -877,8 +881,13 @@ impl Catalogue {
                 bundle_id: u32::try_from(item_id)
                     .map_err(|_| invalid("invalid station cash id"))?,
                 item_id,
-                name_id: u32::try_from(presentation.name_id).unwrap_or(0),
-                description_id: u32::try_from(presentation.description_id).unwrap_or(0),
+                name_id,
+                // (R) An item with no description id shows its name there: the client prints
+                // `<STRING 0 NOT FOUND>` for id 0 (native run, 2026-10-25).
+                description_id: u32::try_from(presentation.description_id)
+                    .ok()
+                    .filter(|id| *id != 0)
+                    .unwrap_or(name_id),
                 icon_id: u32::try_from(presentation.icon_id).unwrap_or(0),
                 icon_tint: u32::try_from(presentation.icon_tint).unwrap_or(0),
                 price: config.scaled_price(sc_price)?,
@@ -961,9 +970,10 @@ impl Catalogue {
         .collect()
     }
 
-    /// T657: the 66/7 count written per node. The client recomputes it from the bundles and walks
-    /// each match up the parent chain (`00c37e70`), so a parent counts its descendants too; this
-    /// writes the same number instead of the parent's own (possibly empty) group count.
+    /// T657: the 66/7 count written per node. The client zeroes every node's count (`00c402b0`)
+    /// and recomputes it from the bundles, walking each match up the parent chain (`00c37e70`), so
+    /// only the transient tree before the bundles arrive sees this number; it is the same value
+    /// (a parent counts its descendants too) and is kept so that tree is not empty.
     fn category_counts(&self, nodes: &[TreeNode]) -> Vec<u32> {
         let mut counts = vec![0u32; nodes.len()];
         let group_index: BTreeMap<u32, usize> = nodes
@@ -1512,7 +1522,7 @@ fn bundle_record(bytes: &mut Vec<u8>, catalogue: &Catalogue, listing: &Listing, 
     let config = &catalogue.config;
     put_u32(bytes, listing.bundle_id);
     put_u32(bytes, listing.name_id);
-    // +164 Description (`009a56d0` case 4). 0 is the `<STRING 0 NOT FOUND>` the native run showed.
+    // +164 Description (`009a56d0` case 4); never 0 (`Listing::description_id`).
     put_u32(bytes, listing.description_id);
     put_u32(bytes, 1);
     // The image object at +0x18 (`00b2ea50`): image set and tint strings, `atoi`'d by the client
