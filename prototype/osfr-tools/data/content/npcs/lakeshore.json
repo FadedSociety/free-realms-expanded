@@ -8876,8 +8876,24 @@
       "quests_given_text": [
         "Fisherman: Fisherman: Bluerose's Best Bait, Fisherman: Fish Fry, Fisherman: Fish Market, Fisherman: McScuttle Family Farm. Chef fish-dish orders: Flutterfish Medley, Butter Flyfish Flambe, Purple-Nosed Sharkfin Soup, Baconfish Bits, Toothy Tetra Vitamins, Feral Catfish Oil (see Chef). Demo Derby: So Long, Betty! (Crash Davis's sponsor, 1097952445). Taste-tester interview for Darkthorne (777462508, 3935731894; Chef line in NPCs - Briarwood). Family-recipe request for Bordon Cloo (3604292456; see town quests). Receives the water-boil warning (see town quests)."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3060011,
+          "title": "Demo Derby: So Long, Betty!",
+          "title_string_id": 403454,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 394022 'Pay a visit to Crash's sponsor in Lakeshore to help secure funding for a new car.' and 394288 'Have you spoken to Merri De'Flor yet?' (quest-lines/quests.json q3060011): the goal is a conversation with Merri; title 403454 'Demo Derby: So Long, Betty!'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T741: the quest's one goal is the Talk to Merri, so the turn-in NPC is Merri rather than the giver Crash Davis (as T724 does for Nurble); the QuestEngine loader reads this row for turnin_npc_id."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "Demo Derby: So Long, Betty! (3060011) is handed in here; the guide isolates no other hand-in for this NPC.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [

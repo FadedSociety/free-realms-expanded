@@ -11162,6 +11162,26 @@
           ]
         },
         {
+          "quest_id": 3060011,
+          "title": "Demo Derby: So Long, Betty!",
+          "title_string_id": 403454,
+          "relation": "gives",
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "notes/Build Guides/Content/Jobs/Demolition Derby Driver.md: Quest line > Series 1: Thunder Falls and Crash Davis (training, karts, Crash for Coin), row 8; name 'Demo Derby: So Long, Betty!'; title id cell 1649272454 ucdt; 3265586030 ugdt"
+            },
+            {
+              "kind": "client",
+              "evidence": "Global.Text 403454 'Demo Derby: So Long, Betty!' (quest-lines/quests.json q3060011); the row's quests_given_text already lists the quest."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T741: quest id 3060011 is a stable batch key and the structured binding the quest record (data/content/quests/demo_derby_driver.json giver_npc_id 9000000289) already points at; quest_title_string_id reads this entry for the offer title."
+            }
+          ]
+        },
+        {
           "quest_id": 3060012,
           "title": "Demo Derby: Thunder Falls Crash for Coin",
           "title_string_id": 403484,
@@ -43761,8 +43781,24 @@
       "quests_given_text": [
         "Demo Derby: Curious Crash (inferred), Demo Derby: Arena Revenge (inferred), Demo Derby: Seeking a Sponsor (sends the player to Kanan in Stillwater Crossing, 880667942)."
       ],
-      "quests_accepted": [],
-      "quests_accepted_reason": "No explicit quoted hand-in to this NPC was isolated; full guide quest text remains in quests_given_text.",
+      "quests_accepted": [
+        {
+          "quest_id": 3060013,
+          "title": "Demo Derby: Tucker's Troubles",
+          "title_string_id": 403448,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 394016 'See what the hold up is with Tucker Thunderjolt outside of Thunder Falls.' (quest-lines/quests.json q3060013 objective) and title 403448 'Demo Derby: Tucker's Troubles'."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T741: the quest's one goal is the Talk to Tucker, so the turn-in NPC is Tucker rather than the giver Crash Davis (as T724 does for Nurble); the QuestEngine loader reads this row for turnin_npc_id."
+            }
+          ]
+        }
+      ],
+      "quests_accepted_reason": "Demo Derby: Tucker's Troubles (3060013) is handed in here; the guide isolates no other hand-in for this NPC.",
       "vendor_stock": null,
       "vendor_stock_reason": "The page provides no vendor stock for this NPC.",
       "services": [],

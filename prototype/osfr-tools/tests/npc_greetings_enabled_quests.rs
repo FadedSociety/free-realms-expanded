@@ -325,7 +325,7 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
     ),
     (
         9000000146,
-        "Merri De'Flor (T727 talk target of 3060011): NPCs - Lakeshore.md:27 quotes only third-person lines about her (1113274275, 1119011320, 9582519, 446677410) and the restaurant minigame prompts; the sponsor lines 393379 and 394288 are Crash Davis's, not hers, so no first-person line of her own is recovered.",
+        "Merri De'Flor (T727 talk target of 3060011): NPCs - Lakeshore.md:27 quotes only third-person lines about her (1113274275, 1119011320, 9582519, 446677410) and the restaurant minigame prompts; the sponsor lines 393379 (Old Betty's offer, dialogs.json q3060011) and 394288 (no attributed speaker) are not hers, so no first-person line of her own is recovered.",
     ),
     (
         9000000173,

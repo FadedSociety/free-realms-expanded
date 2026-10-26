@@ -604,10 +604,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) T727: reward 5 coins / 10 profile-49 job XP, see the reward row."
         },
         {
@@ -710,6 +706,7 @@
         }
       ],
       "description_string_id": 394016,
+      "end_text_string_id": 402845,
       "source": [
         {
           "kind": "client",
@@ -737,19 +734,19 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) T727: reward 5 coins / 10 profile-49 job XP, see the reward row."
         },
         {
           "kind": "client",
-          "evidence": "Global.Text 403448 'Demo Derby: Tucker's Troubles' (title) and 394016 (objective, also description_string_id as 3060024 does); quest-lines/quests.json q3060013 (final, confidence 0.35, live 'unsure') and quest-lines/dialogs.json q3060013: offer null, progress null, complete 402845 (a journal-style completion line, not NPC speech). The offer candidates 393373 and 393333 are not hint-tied to this quest, so intro_text_string_id and end_text_string_id stay unset."
+          "evidence": "Global.Text 403448 'Demo Derby: Tucker's Troubles' (title) and 394016 (objective, also description_string_id as 3060024 does); quest-lines/quests.json q3060013 (final, confidence 0.35, live 'unsure') and quest-lines/dialogs.json q3060013: offer null, progress null, complete 402845 ('[*player*] completed an odd errand for fellow derby driver Tucker Thunderjolt.', quest_reward tag, speaker null). The offer candidates 393373 and 393333 are not hint-tied to this quest, so intro_text_string_id stays unset."
         },
         {
           "kind": "reconstructed",
           "evidence": "(R) T727: prerequisite 3060011 (So Long, Betty!), the nearest enabled earlier row of the guide's order (row 10 follows rows 8 and 9; row 9, Crash for Coin, is a disabled stub); the guide says only 'early in this series' and the answer's previous link is unsupported. Without it Crash would offer this beside Betty, and before the license test. Derby Driver (49) offer gate follows the enabled siblings."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T741: end_text_string_id 402845 is the only completion line tied to this quest. It is a journal-style line, not NPC speech, and the 49/13 end-text field (QuestEndPacket::ReadFields 0x00c7b990, bytes 18..22) is the end screen's own line, not spoken dialogue, so the completion line is bound there; before T741 the 49/13 carried 0 and the end screen had no debrief line."
         }
       ],
       "enabled": true

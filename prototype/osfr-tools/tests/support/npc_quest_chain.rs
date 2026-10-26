@@ -841,6 +841,20 @@ impl ZoneQuests {
         let turnin = self.at(guid, quest.turnin);
         let talked = talk(game, &turnin, self.actor(quest.turnin), *now);
         assert!(talked.changed, "quest {}: the final Talk", quest.id);
+        self.pay_held_turnin(game, guid, quest, profile, now);
+    }
+
+    /// With the hand-in already held (the final Talk done, possibly before a reload), the
+    /// 26/6 that releases the 49/13 and the 49/14 that pays.
+    pub fn pay_held_turnin(
+        &self,
+        game: &mut Gameplay,
+        guid: u64,
+        quest: &ZoneQuest,
+        profile: i32,
+        now: &mut u64,
+    ) {
+        let turnin = self.at(guid, quest.turnin);
         assert_eq!(pending_turnin(game), Some(quest.id));
         let end = release_end_screen(
             game,
