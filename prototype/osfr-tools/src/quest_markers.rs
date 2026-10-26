@@ -20,6 +20,7 @@ use std::{
     fs,
     io::{self, Read},
     path::Path,
+    sync::Arc,
 };
 
 /// Optional content next to the other split files. Absent file = no markers.
@@ -85,6 +86,15 @@ impl QuestMarkerContent {
             QuestMarker::TurnIn => self.turnin_image_id,
         }
     }
+}
+
+/// What `Gameplay` keeps for markers; none of it is saved. No `content` (no file bound) means
+/// no markers. `rendered` is the engine revision the per-player visibility path last sent
+/// markers for (`gameplay/npc_quests.rs`); the shared path keeps that in the gateway session.
+#[derive(Clone, Debug, Default)]
+pub struct MarkerView {
+    pub content: Option<Arc<QuestMarkerContent>>,
+    pub rendered: u64,
 }
 
 fn invalid(error: impl ToString) -> io::Error {

@@ -1,4 +1,5 @@
 //! NPC interaction router: the 26/x, 45/7, 49/x, 165/x and 66/x families, NPC visibility, and the dialogue, merchant and quest-offer packet builders.
+use super::npc_quests::added_npcs;
 use super::*;
 
 impl Gameplay {
@@ -26,6 +27,7 @@ impl Gameplay {
                 "removed": packets.iter().filter(|p| p.starts_with(&[35, 0, 3, 0])).count(),
             }));
         }
+        self.append_quest_markers(&mut packets);
         self.append_pending_turnin_screen(&mut packets)?;
         Ok(packets)
     }
@@ -56,6 +58,7 @@ impl Gameplay {
             .as_ref()
             .unwrap_or(&crate::world::NpcVisibility::default())
             .shared_view(character.zone_id, character.position, fields, known)?;
+        packets.extend(self.marker_packets(&added_npcs(&packets), &BTreeSet::new()));
         self.append_shared_pending_end_screen(&mut packets);
         Ok((visible, packets))
     }

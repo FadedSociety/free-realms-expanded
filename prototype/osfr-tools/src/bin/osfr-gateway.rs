@@ -453,9 +453,11 @@ struct Session {
     sender: ReliableSender,
     gateway: Gateway,
     // (R) Directed shared-field view cache (W106): unchanged inputs retain the
-    // known set; one update site writes all four after a successful delivery.
+    // known set; one update site writes all five after a successful delivery.
     known_npcs: BTreeSet<u64>,
     npc_visibility_revision: Option<u64>,
+    /// T499: the quest revision this view last sent markers for (`Gameplay::quest_marker_revision`).
+    quest_marker_revision: u64,
     npc_view_position: Option<[f32; 3]>,
     npc_view_fields: Vec<osfr_tools::world::NpcInterest>,
     state_path: PathBuf,
@@ -1078,6 +1080,7 @@ impl Session {
             recent_on: options.dev_tools,
             known_npcs: BTreeSet::new(),
             npc_visibility_revision: None,
+            quest_marker_revision: 0,
             npc_view_position: None,
             npc_view_fields: Vec::new(),
             social_path: social_identity
@@ -3231,8 +3234,13 @@ impl Server {
                 .gateway
                 .gameplay()
                 .map_or(0, |game| game.npc_visibility_revision());
+            let quest_revision = session
+                .gateway
+                .gameplay()
+                .map_or(0, |game| game.quest_marker_revision());
             if valid
                 && session.npc_visibility_revision == Some(revision)
+                && session.quest_marker_revision == quest_revision
                 && session.npc_view_position == Some(session.gateway.state().position)
                 && session.npc_view_fields == fields
             {
@@ -3268,6 +3276,10 @@ impl Server {
                         let (wanted, packets) =
                             game.shared_npc_view(session.gateway.state(), &fields, &known)?;
                         refreshed.extend(packets);
+                        if session.quest_marker_revision != quest_revision {
+                            let kept = known.intersection(&wanted).copied().collect();
+                            refreshed.extend(game.quest_marker_packets(&kept));
+                        }
                         Ok::<_, io::Error>((wanted, refreshed))
                     })
                     .transpose()?
@@ -3291,6 +3303,7 @@ impl Server {
                 continue;
             }
             session.npc_visibility_revision = Some(revision);
+            session.quest_marker_revision = quest_revision;
             session.known_npcs = wanted;
             session.npc_view_position = valid.then_some(session.gateway.state().position);
             session.npc_view_fields = fields;

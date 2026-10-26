@@ -1,6 +1,7 @@
 //! NPC quest glue: catalogue binding, breadcrumbs, eligibility and quest events for NPC interactions.
 use super::npc::quest_offer_packet;
 use super::*;
+use crate::quest_markers::{encode_add_notifications, encode_remove_notifications, marker_for};
 
 impl Gameplay {
     /// Bind the split quest catalogue and its character-owned eligibility.
@@ -34,13 +35,20 @@ impl Gameplay {
         let (mut crosswalk, listed) = crate::quest_journal::read_crosswalk(source)?;
         let job_browser = crate::job_browser::load(source, &listed)?;
         crosswalk.extend(job_browser.crosswalk);
+        let markers = source.join(crate::quest_markers::CONTENT_FILE);
+        let markers = markers
+            .is_file()
+            .then(|| crate::quest_markers::QuestMarkerContent::load(&markers))
+            .transpose()?;
         let state = self.npc_quest_state();
-        let engine = crate::quest_engine::QuestEngine::from_split_content(
+        let mut engine = crate::quest_engine::QuestEngine::from_split_content(
             source,
             character_id,
             crate::quest_engine::CharacterEligibility::default(),
             state,
         )?;
+        engine.continue_revision(self.quest_marker_revision());
+        self.quest_markers.content = markers.map(Arc::new);
         self.npc_quests = Some(engine);
         self.saved_npc_quests = None;
         self.load_live_events(); // T418: before any Talk, not on the first tick
@@ -424,5 +432,100 @@ impl Gameplay {
         let own = |id| quests.get(&id).is_some_and(|q| q.accepted && !q.rewarded);
         retain_quests(data, own, completed);
         Ok(())
+    }
+}
+
+/// Runtime guids of the 35/2 AddNpc packets in `packets` (actor id at 4..12, reader `00921a10`).
+pub(super) fn added_npcs(packets: &[Vec<u8>]) -> BTreeSet<u64> {
+    packets
+        .iter()
+        .filter(|packet| packet.starts_with(&[35, 0, 2, 0]))
+        .filter_map(|packet| Some(u64::from_le_bytes(packet.get(4..12)?.try_into().ok()?)))
+        .collect()
+}
+
+/// T499 quest markers: '!' and '?' over NPCs, from this player's own quest state. Markers are
+/// per player and never saved; a reconnect recomputes them when the NPCs are added again.
+impl Gameplay {
+    /// The engine's quest revision, which the marker passes compare; 0 without a catalogue.
+    pub fn quest_marker_revision(&self) -> u64 {
+        self.npc_quests
+            .as_ref()
+            .map_or(0, |engine| engine.revision())
+    }
+
+    /// Shared-field path: refresh the markers of NPCs the client already `known`s after the quest
+    /// revision moved (new NPCs get theirs from [`Self::shared_npc_view`]).
+    pub fn quest_marker_packets(&self, known: &BTreeSet<u64>) -> Vec<Vec<u8>> {
+        self.marker_packets(&BTreeSet::new(), known)
+    }
+
+    /// Per-player path: after a batch, add markers for the NPCs it spawned and, when the quest
+    /// revision moved since the last batch, refresh the rest of what the tracker shows.
+    /// Cost with nothing new and an unchanged revision: one scan of `packets`.
+    pub(super) fn append_quest_markers(&mut self, packets: &mut Vec<Vec<u8>>) {
+        let revision = self.quest_marker_revision();
+        let added = added_npcs(packets);
+        let stale = match &self.npc_visibility {
+            Some(visibility) if self.quest_markers.rendered != revision => {
+                visibility.visible().difference(&added).copied().collect()
+            }
+            _ => BTreeSet::new(),
+        };
+        self.quest_markers.rendered = revision;
+        if !added.is_empty() || !stale.is_empty() {
+            // A trailing 26/4 (close dialogue) stays the last packet of its reply.
+            let end =
+                packets.len() - usize::from(packets.last().is_some_and(|p| p == &[26, 0, 4, 0]));
+            let markers = self.marker_packets(&added, &stale);
+            packets.splice(end..end, markers);
+        }
+    }
+
+    /// 35/10 for each NPC with a marker, then one 35/11 for the `known` quest NPCs that have
+    /// none. `fresh` NPCs only get a 35/10: their AddNpc is already in the batch ahead of this
+    /// one, and a new actor has nothing to clear. Guids are runtime guids; a guid the NPC table
+    /// does not show gets nothing. Reads the quest state, never changes it.
+    pub(super) fn marker_packets(
+        &self,
+        fresh: &BTreeSet<u64>,
+        known: &BTreeSet<u64>,
+    ) -> Vec<Vec<u8>> {
+        let (Some(engine), Some(content), Some(npcs)) = (
+            self.npc_quests.as_ref(),
+            self.quest_markers.content.as_deref(),
+            self.npc_visibility.as_ref(),
+        ) else {
+            return Vec::new();
+        };
+        let (mut show, mut clear) = (Vec::new(), Vec::new());
+        for (guids, refresh) in [(fresh, false), (known, true)] {
+            if guids.is_empty() {
+                continue;
+            }
+            for (guid, key, name_id) in npcs.marker_targets(guids) {
+                match marker_for(engine, key) {
+                    Some(marker) => show.push((guid, content.image_id(marker), name_id)),
+                    None if refresh && engine.is_quest_npc(key) => clear.push(guid),
+                    None => {}
+                }
+            }
+        }
+        // The encoders refuse only more than 256 rows and the view holds at most 64 NPCs, so a
+        // refusal is a skipped marker for this player, logged, never an error out of the tick.
+        let encoded = [
+            (!show.is_empty()).then(|| encode_add_notifications(&show)),
+            (!clear.is_empty()).then(|| encode_remove_notifications(&clear)),
+        ];
+        encoded
+            .into_iter()
+            .flatten()
+            .filter_map(|packet| {
+                if packet.is_none() {
+                    npc_event(serde_json::json!({"event": "quest_marker_skipped"}));
+                }
+                packet
+            })
+            .collect()
     }
 }

@@ -347,3 +347,151 @@ fn f213_sync_field_views_replays_pending_end_screen_after_the_speaker_spawn() {
     );
     let _ = fs::remove_dir_all(scratch);
 }
+
+fn t499_markers(bodies: &[Vec<u8>]) -> (Vec<(usize, u64, i32)>, Vec<u64>) {
+    // 35/10 elements are 39 bytes from offset 8 (guid at 0, image at 17, reader 008db310);
+    // 35/11 elements are 16 bytes from offset 8 (reader 008db550).
+    let count = |body: &[u8]| i32::from_le_bytes(body[4..8].try_into().unwrap()) as usize;
+    let guid = |body: &[u8], at: usize| u64::from_le_bytes(body[at..at + 8].try_into().unwrap());
+    let mut shown = Vec::new();
+    let mut cleared = Vec::new();
+    for (index, body) in bodies.iter().enumerate() {
+        if body.starts_with(&[35, 0, 10, 0]) {
+            for row in 0..count(body) {
+                let at = 8 + row * 39;
+                let image = i32::from_le_bytes(body[at + 17..at + 21].try_into().unwrap());
+                shown.push((index, guid(body, at), image));
+            }
+        } else if body.starts_with(&[35, 0, 11, 0]) {
+            cleared.extend((0..count(body)).map(|row| guid(body, 8 + row * 16)));
+        }
+    }
+    (shown, cleared)
+}
+
+/// T499: the shared view sends '?' after the talk target's 35/2, nothing while idle, and a 35/11
+/// the pass after the player's quest changes (the abandon is a real 26/23 through the gateway).
+#[test]
+fn t499_shared_view_sends_markers_after_spawn_and_refreshes_on_quest_change() {
+    if !super::t020_group_routing::fixtures_present() {
+        eprintln!("skip t499-markers: the private lab fixtures are absent");
+        return;
+    }
+    let (mut server, keys, scratch) = super::t020_group_routing::server_rig("t499-markers");
+    let now = 1_000;
+    let guid = server.sessions[&keys[0]].character_guid;
+    let content = server
+        .options
+        .content
+        .clone()
+        .expect("the field rig loads gameplay content");
+    let manifest: Value =
+        serde_json::from_slice(&fs::read(server.options.reference.join("manifest.json")).unwrap())
+            .unwrap();
+    let version = manifest["client_version"].as_str().unwrap().to_owned();
+    let jones = f213_npc_position(F213_JONES);
+    let mut character = server.sessions[&keys[0]].gateway.state().clone();
+    character.zone_id = 0;
+    character.position = jones;
+    let mut saved = server.sessions[&keys[0]]
+        .gateway
+        .gameplay()
+        .expect("the session loads gameplay")
+        .state();
+    // Active and not done: Jones is the talk target, so he shows '?' (image 6).
+    saved.npc_quests.as_mut().unwrap().quests.insert(
+        F213_REFERRAL_TO_JONES,
+        QuestProgress {
+            status: QuestStatus::Active,
+            counts: vec![0],
+        },
+    );
+    let mut gateway = Gateway::load_gameplay(
+        &server.options.reference,
+        character.clone(),
+        &content,
+        Some(saved),
+    )
+    .expect("the saved chapter loads");
+    gateway.take_shared_fields();
+    gateway
+        .handle_at(&f213_login(character.guid, &version, "t499-markers"), now)
+        .unwrap();
+    gateway
+        .handle_at(&wrap_application(&[13, 0]), now + 1)
+        .unwrap();
+    gateway
+        .handle_at(&wrap_application(&[10, 0]), now + 2)
+        .unwrap();
+    let session = server.sessions.get_mut(&keys[0]).unwrap();
+    session.gateway = gateway;
+    session.sender = f213_sender();
+    let pose = WorldPose {
+        position: [jones[0], jones[1], jones[2], 1.0],
+        rotation: [0.0, 0.0, 1.0, 0.0],
+    };
+    let change = server
+        .membership
+        .prepare_membership(guid, 0, Some(0), pose, true, now + 3)
+        .unwrap();
+    server.membership.commit_membership(change);
+    let field = server
+        .membership
+        .field(0)
+        .expect("the shared field seed is installed")
+        .clone();
+    let pass = |server: &mut Server, at: u64| {
+        server
+            .sync_field_views(0, &field, false, at)
+            .expect("the view syncs");
+        f213_bodies(&mut server.sessions.get_mut(&keys[0]).unwrap().sender, at)
+    };
+
+    let first = pass(&mut server, now + 10);
+    let spawn = first
+        .iter()
+        .position(|body| {
+            body.starts_with(&[35, 0, 2, 0])
+                && u64::from_le_bytes(body[4..12].try_into().unwrap()) == F213_JONES
+        })
+        .expect("the view spawns Jones");
+    let (shown, _) = t499_markers(&first);
+    let marker = shown
+        .iter()
+        .find(|(_, id, _)| *id == F213_JONES)
+        .expect("Jones gets a marker");
+    assert_eq!(marker.2, 6, "'?' over the talk target");
+    assert!(
+        spawn < marker.0,
+        "the marker follows the AddNpc in the same delivery"
+    );
+
+    let idle = pass(&mut server, now + 20);
+    assert_eq!(
+        t499_markers(&idle),
+        (Vec::new(), Vec::new()),
+        "an idle pass sends no marker"
+    );
+
+    let mut abandon = vec![26, 0, 23, 0];
+    abandon.extend(F213_REFERRAL_TO_JONES.to_le_bytes());
+    let session = server.sessions.get_mut(&keys[0]).unwrap();
+    session
+        .gateway
+        .handle_at(&wrap_application(&abandon), now + 30)
+        .unwrap();
+    let changed = pass(&mut server, now + 40);
+    let (shown, cleared) = t499_markers(&changed);
+    assert!(
+        cleared.contains(&F213_JONES),
+        "the abandoned quest clears '?'"
+    );
+    assert!(shown.iter().all(|(_, id, _)| *id != F213_JONES));
+    let idle = pass(&mut server, now + 50);
+    assert_eq!(
+        t499_markers(&idle),
+        (Vec::new(), Vec::new()),
+        "one refresh per change"
+    );
+    let _ = fs::remove_dir_all(scratch);
+}

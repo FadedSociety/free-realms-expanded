@@ -807,6 +807,12 @@ pub struct QuestEngine {
     exclusions: BTreeMap<u32, Vec<u32>>,
     location_quests: BTreeMap<u32, BTreeSet<u32>>,
     poi_locations: BTreeMap<u32, (u32, [f32; 3], f32)>,
+    /// T499: moves whenever anything `quest_markers::marker_for` reads changes (a method's
+    /// `changed` outcome, a new eligibility, a live event opening or closing). Not saved; it
+    /// restarts at 0 on load, and a live rebind continues from the old engine's value.
+    revision: u64,
+    /// T499: every NPC that gives, takes in or is a talk target of any quest. Built once.
+    quest_npcs: BTreeSet<u64>,
 }
 
 /// 49/13 fields before the reward bundle: the turn-in actor as an 8-byte value, then three
@@ -1268,6 +1274,19 @@ impl QuestEngine {
         }
         repair_counters(&mut state, &indexed, &disabled);
         validate_state(&state, character_id, &indexed, &disabled)?;
+        let quest_npcs = indexed
+            .values()
+            .flat_map(|definition| {
+                let talks = definition
+                    .objectives
+                    .iter()
+                    .filter_map(|goal| match goal.kind {
+                        ObjectiveKind::TalkToNpc { npc_id } => Some(npc_id),
+                        _ => None,
+                    });
+                talks.chain([definition.giver_npc_id, definition.turnin_npc_id])
+            })
+            .collect();
         let mut engine = Self {
             character_id,
             eligibility,
@@ -1282,6 +1301,8 @@ impl QuestEngine {
             exclusions: BTreeMap::new(),
             location_quests: BTreeMap::new(),
             poi_locations: BTreeMap::new(),
+            revision: 0,
+            quest_npcs,
             state,
             options: EngineOptions {
                 opening_order: None,
@@ -1322,7 +1343,30 @@ impl QuestEngine {
     }
 
     pub fn set_eligibility(&mut self, eligibility: CharacterEligibility) {
+        if self.eligibility != eligibility {
+            self.bump();
+        }
         self.eligibility = eligibility;
+    }
+
+    /// T499: see the `revision` field. Callers compare it for equality only.
+    pub fn revision(&self) -> u64 {
+        self.revision
+    }
+
+    /// T499: a rebuilt engine (a live content rebind) continues past the one it replaces, so
+    /// a stored revision can never match by accident.
+    pub(crate) fn continue_revision(&mut self, previous: u64) {
+        self.revision = previous.wrapping_add(1);
+    }
+
+    /// T499: whether any quest names this NPC as giver, turn-in or talk target.
+    pub fn is_quest_npc(&self, npc_id: u64) -> bool {
+        self.quest_npcs.contains(&npc_id)
+    }
+
+    fn bump(&mut self) {
+        self.revision = self.revision.wrapping_add(1);
     }
 
     pub fn job_profile_ids(&self) -> impl Iterator<Item = (&str, i32)> {
@@ -1661,6 +1705,7 @@ impl QuestEngine {
             return QuestOutcome::default();
         }
         self.state.selected_quest_id = Some(quest_id);
+        self.bump();
         QuestOutcome {
             changed: true,
             ..QuestOutcome::default()
@@ -1674,6 +1719,7 @@ impl QuestEngine {
             return QuestOutcome::default();
         }
         self.state.auto_switch_selected = auto_switch;
+        self.bump();
         QuestOutcome {
             changed: true,
             ..QuestOutcome::default()
@@ -1703,6 +1749,7 @@ impl QuestEngine {
         );
         self.state.pending_offer = Some(quest_id);
         self.dev_offer = None;
+        self.bump();
         QuestOutcome {
             changed: true,
             outbound: vec![OutboundMessage::Quest(QuestMessage::QuestInfo { quest_id })],
@@ -1736,6 +1783,7 @@ impl QuestEngine {
         );
         self.state.pending_offer = Some(quest_id);
         self.dev_offer = Some(quest_id);
+        self.bump();
         true
     }
 
@@ -1769,8 +1817,12 @@ impl QuestEngine {
     /// T418: open exactly the live events in `open` (the live world's
     /// `events.json`). Returns the ids that are not live events; they are ignored.
     pub fn set_open_events(&mut self, open: &BTreeSet<u32>) -> Vec<u32> {
+        let mut moved = false;
         for (id, is_open) in &mut self.live_events {
-            *is_open = open.contains(id);
+            moved |= std::mem::replace(is_open, open.contains(id)) != *is_open;
+        }
+        if moved {
+            self.bump();
         }
         open.iter()
             .copied()
@@ -1901,6 +1953,7 @@ impl QuestEngine {
                 required: objective.required,
             }
         }));
+        self.revision = self.revision.wrapping_add(1); // `definition` still borrows self
         let mut outcome = QuestOutcome {
             changed: true,
             outbound: packets.into_iter().map(OutboundMessage::Quest).collect(),
@@ -1923,6 +1976,7 @@ impl QuestEngine {
         self.state.pending_offer = None;
         self.dev_offer = None;
         self.state.quests.remove(&quest_id);
+        self.bump();
         QuestOutcome {
             changed: true,
             ..QuestOutcome::default()
@@ -2067,6 +2121,10 @@ impl QuestEngine {
                 }
             }
         }
+        // A Talk can open the end screen without moving a count: its outbound says so.
+        if outcome.changed || !outcome.outbound.is_empty() {
+            self.bump();
+        }
         Ok(outcome)
     }
 
@@ -2134,6 +2192,7 @@ impl QuestEngine {
             return denied(QuestDenial::Incomplete);
         }
         self.state.open_pending_turnin(quest_id, npc_id);
+        self.bump();
         QuestOutcome {
             changed: true,
             outbound: vec![OutboundMessage::Quest(QuestMessage::QuestEnd {
@@ -2174,6 +2233,7 @@ impl QuestEngine {
         if self.state.selected_quest_id == Some(quest_id) {
             self.state.selected_quest_id = None;
         }
+        self.revision = self.revision.wrapping_add(1); // `definition` still borrows self
         let completed_count = self
             .state
             .quests
@@ -2227,6 +2287,7 @@ impl QuestEngine {
             // abandon (F249 review).
             GrantFailure::LockedProfile => {
                 self.state.clear_pending_turnin();
+                self.bump();
                 return QuestOutcome {
                     changed: true,
                     denial: Some(QuestDenial::Job),
@@ -2267,6 +2328,7 @@ impl QuestEngine {
         if self.state.selected_quest_id == Some(quest_id) {
             self.state.selected_quest_id = None;
         }
+        self.bump();
         QuestOutcome {
             changed: true,
             outbound: vec![OutboundMessage::Quest(QuestMessage::QuestAbandoned {

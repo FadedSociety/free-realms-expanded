@@ -684,6 +684,26 @@ impl NpcVisibility {
             .flatten()
     }
 
+    /// The actors this tracker has sent and not removed (empty in shared mode).
+    pub fn visible(&self) -> &BTreeSet<u64> {
+        &self.visible
+    }
+
+    /// `(runtime guid, content key, name string id)` for each of `guids` that is a shown
+    /// content actor: what a quest marker needs. One pass over the table for any number of guids.
+    pub fn marker_targets<'a>(
+        &'a self,
+        guids: &'a BTreeSet<u64>,
+    ) -> impl Iterator<Item = (u64, u64, i32)> + 'a {
+        let shown = self.by_zone.values().flatten();
+        shown
+            .filter(|npc| guids.contains(&npc.spawn.actor_id))
+            .filter_map(|npc| {
+                let guid = npc.spawn.actor_id;
+                Some((guid, self.content_key(guid)?, npc.spawn.name_string_id))
+            })
+    }
+
     /// Placed actor model ids and positions, for content-defined scene fixtures
     /// such as crafting stations. Zones use the open-world label recorded by
     /// the loader.

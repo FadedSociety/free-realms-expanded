@@ -675,7 +675,13 @@ pub struct NpcSpawn {
     pub unknown_field_64: i32,
     pub fly_by_effect_id: i32,
     pub active_profile: i32,
-    pub unknown_field_67: i32,
+    /// Quest-marker image set for this viewer (the field after `active_profile`). (R) Name and
+    /// position from Lxzxrus `PlayerUpdatePacketAddNpc.cs:303`; the client reader `00921a10` is
+    /// not traced for it. Kept 0: AddNpc is shared across viewers and markers are per player,
+    /// so they ride 35/10 (`quest_markers.rs`) instead. The captured startup snapshots still
+    /// spell it `unknown_field_67`, so that name stays readable.
+    #[serde(alias = "unknown_field_67")]
+    pub notification_image_set_id: i32,
     pub unknown_field_68: i32,
     pub name_scale: f32,
     pub nameplate_image_id: i32,
@@ -851,7 +857,7 @@ fn write_npc_body(out: &mut Vec<u8>, value: &NpcSpawn) {
     put_i32(out, value.unknown_field_64);
     put_i32(out, value.fly_by_effect_id);
     put_i32(out, value.active_profile);
-    put_i32(out, value.unknown_field_67);
+    put_i32(out, value.notification_image_set_id);
     put_i32(out, value.unknown_field_68);
     put_f32(out, value.name_scale);
     put_i32(out, value.nameplate_image_id);
@@ -958,7 +964,7 @@ pub fn parse_add_npc(bytes: &[u8]) -> Result<NpcSpawn, String> {
     let unknown_field_64 = reader.i32()?;
     let fly_by_effect_id = reader.i32()?;
     let active_profile = reader.i32()?;
-    let unknown_field_67 = reader.i32()?;
+    let notification_image_set_id = reader.i32()?;
     let unknown_field_68 = reader.i32()?;
     let name_scale = reader.f32()?;
     let nameplate_image_id = reader.i32()?;
@@ -1035,7 +1041,7 @@ pub fn parse_add_npc(bytes: &[u8]) -> Result<NpcSpawn, String> {
         unknown_field_64,
         fly_by_effect_id,
         active_profile,
-        unknown_field_67,
+        notification_image_set_id,
         unknown_field_68,
         name_scale,
         nameplate_image_id,

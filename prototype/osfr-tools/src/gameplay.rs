@@ -265,6 +265,8 @@ pub struct Gameplay {
     job_browser_packet: Vec<u8>,
     /// Client-reported goals the client has been told to watch; not saved.
     client_objectives: crate::quest_engine::ClientObjectives,
+    /// T499 quest-marker content and the per-player render revision; not saved.
+    quest_markers: crate::quest_markers::MarkerView,
     /// The "Take Me There" pin (47/14) the client currently shows; not saved.
     tracked_pin: crate::quest_journal::Tracker,
     /// Regional quest state is sent once per network session, not after every zone load.
@@ -1166,6 +1168,7 @@ impl Gameplay {
             breadcrumb_crosswalk: Default::default(),
             job_browser_packet: Vec::new(),
             client_objectives: Default::default(),
+            quest_markers: Default::default(),
             tracked_pin: crate::quest_journal::Tracker::default(),
             npc_quests_synced: false,
             health_synced: false,
@@ -2046,6 +2049,7 @@ impl Gameplay {
         let mut out = self.handle_in_world_inner(inner, character, now_ms)?;
         self.sync_tracked_target(character, &mut out);
         self.sync_client_objectives(&mut out);
+        self.append_quest_markers(&mut out.replies);
         self.settle_achievement_counters(&counters_before, &mut out)?;
         Ok(out)
     }
@@ -4115,6 +4119,8 @@ impl Gameplay {
             if let Some(changed) = self.stage_job_selection(id, &mut out)? {
                 out.replies.extend(self.ability_activation_for(id)?);
                 self.sync_player_level(&mut out);
+                // T499: the job is part of quest eligibility; the marker pass reads it at the end of this packet.
+                self.refresh_npc_quest_eligibility(current_unix_seconds());
                 self.opening_equipment_events(&mut out)?;
                 self.sync_world_stage(&mut out)?;
                 self.announce_profile_outfit(character.guid, &outfit_before, changed, &mut out)?;
