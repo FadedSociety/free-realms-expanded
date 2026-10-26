@@ -1845,7 +1845,11 @@
         },
         {
           "kind": "client",
-          "evidence": "description 116637 (Global.Text; the Stillwater objective text) = guide hash 3437900159 (Adventurer C3); the shared title 94247 belongs to the Cobblestone version. The Stillwater offer text is 116460 (Global.Text; quest_dialog in the locale index, zone Stillwater Crossing, hint the talk target), the Stillwater wording of the tip bound as 3000021's intro 94246 and 3000020's intro 104097. No end text is bound: 116463 is tagged to the next quest, Power Problems (T731)."
+          "evidence": "description 116637 (Global.Text; the Stillwater objective text) = guide hash 3437900159 (Adventurer C3); the shared title 94247 belongs to the Cobblestone version. No end text is bound: 116463 is tagged to the next quest, Power Problems (T731)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T731 offer text intro_text_string_id 116460: the locale index tags it quest_dialog, zone Stillwater Crossing, hint the talk target, but no client record binds it to this quest. dialogs.json q3000022 and objective-specs-fixed.json q3000022 both reject it as 'a tip, not a Valerie offer'. It is bound as the Stillwater wording of the tip its sibling records carry (3000021 intro 94246, 3000020 intro 104097), an inference those two passes dispute (F747)."
         },
         {
           "kind": "wiki",
