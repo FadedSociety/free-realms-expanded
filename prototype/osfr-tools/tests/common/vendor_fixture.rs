@@ -17,12 +17,13 @@ use osfr_tools::{
     npc_interaction::{NpcAction, NpcInteraction},
 };
 use serde_json::json;
-use sha2::{Digest, Sha256};
 use std::{
     fs,
     path::{Path, PathBuf},
 };
 
+#[path = "item_catalogue.rs"]
+mod item_catalogue;
 #[path = "round70_content.rs"]
 mod round70_content;
 
@@ -182,8 +183,8 @@ impl VendorFixture {
         .expect("fixture stores write");
     }
 
-    /// Add a definition row with the raw `serialized` bytes (and their valid hash) to this
-    /// fixture's own `inventory.json`, so it loads like a shipped row. The shipped file is
+    /// Add a definition row (`item_catalogue::row`, the shared row schema) with the raw
+    /// `serialized` bytes to this fixture's own `inventory.json`, so it loads like a shipped row. The shipped file is
     /// never written.
     pub fn define_item(&self, id: i32, serialized: &[u8]) {
         let path = self.content.join("inventory.json");
@@ -191,12 +192,7 @@ impl VendorFixture {
         content["definitions"]
             .as_array_mut()
             .expect("definitions are an array")
-            .push(json!({
-                "id": id, "slot": 0, "class_id": 1, "default_tint": 0, "max_stack": 1,
-                "model": "", "texture": "", "tint_alias": "", "effect": 0, "wield_type": 0,
-                "serialized_hex": serialized.iter().map(|byte| format!("{byte:02x}")).collect::<String>(),
-                "sha256": format!("{:x}", Sha256::digest(serialized)),
-            }));
+            .push(item_catalogue::row(id, serialized.to_vec()));
         fs::write(
             path,
             serde_json::to_vec(&content).expect("fixture inventory serializes"),
