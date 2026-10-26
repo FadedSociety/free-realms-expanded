@@ -1,11 +1,19 @@
 //! Position helpers shared by the NPC placement suites (T696 and later).
 //!
-//! Test-only; production reads positions through `world.rs`.
+//! Test-only; production reads positions through `world.rs`. The JSON reader and the content
+//! root come from the canonical `support` helpers, so a placement scan reads the same tree as
+//! the loaders it checks instead of a second hardcoded path.
 #![allow(dead_code)]
+
+#[path = "json.rs"]
+mod json;
+#[path = "npc_visibility.rs"]
+mod npc_visibility;
 
 use osfr_tools::world::NpcVisibility;
 use serde_json::Value;
 use std::{
+    collections::{BTreeMap, HashMap, HashSet},
     fs,
     path::{Path, PathBuf},
 };
@@ -71,22 +79,13 @@ pub fn project_parent() -> PathBuf {
 /// Every regional NPC row of `data/content/npcs/*.json`, in file order.
 pub fn regional_rows() -> Vec<Value> {
     let mut rows = Vec::new();
-    for entry in
-        fs::read_dir(Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/npcs")).unwrap()
-    {
+    for entry in fs::read_dir(npc_visibility::content_dir().join("npcs")).unwrap() {
         let path = entry.unwrap().path();
         if path.extension().and_then(|ext| ext.to_str()) == Some("json") {
-            rows.extend(read_json(&path)["records"].as_array().unwrap().clone());
+            rows.extend(json::read(&path)["records"].as_array().unwrap().clone());
         }
     }
     rows
-}
-
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(
-        &fs::read(path).unwrap_or_else(|error| panic!("{}: {error}", path.display())),
-    )
-    .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
 }
 
 /// The source line and spawn transform a placement row's `position_reason` cites:
@@ -149,7 +148,7 @@ pub fn cited_spawn(reason: &str) -> CitedSpawn {
 pub fn reference_npcs_row(source: &str, ref_id: u64) -> Value {
     let path = source.replace("/Scripts/Zone/FabledRealms.lua", "/Resources/Npcs.json");
     assert_ne!(path, source, "source path does not name the zone script");
-    let rows = read_json(&project_parent().join(path));
+    let rows = json::read(&project_parent().join(path));
     rows.as_array()
         .unwrap()
         .iter()
@@ -171,4 +170,141 @@ pub fn has_source_kind(value: &Value, kind: &str) -> bool {
     value
         .as_array()
         .is_some_and(|tags| tags.iter().any(|tag| tag["kind"] == kind))
+}
+
+/// Assert one `legacy_data` row placed from a cited `spawnNpc` line still stands where that
+/// line says, names and models the cited reference `Npcs.json` row, and is drawn by the
+/// production loader as that actor (`NpcVisibility::load` -> 35/2 AddNpc, reader `0x00921a10`).
+///
+/// `locale` is `npc_greetings::locale_id_to_text`; `models` is the client `Models.txt` map.
+pub fn assert_placed_row_matches_cited_spawn(
+    row: &Value,
+    locale: &BTreeMap<u64, String>,
+    models: &HashMap<i64, HashSet<String>>,
+    visibility: &NpcVisibility,
+) {
+    let id = row["npc_id"].as_u64().unwrap();
+    let owner = format!("{id} ({})", row["name"]);
+    assert_eq!(row["placement"], "legacy_data", "{owner}: placement");
+    assert_eq!(
+        row["placement_source"], "legacy_data_spawn",
+        "{owner}: placement source"
+    );
+    assert_eq!(
+        row["placement_confidence"], "medium",
+        "{owner}: placement confidence"
+    );
+    assert!(
+        row["placement_candidates"].as_array().unwrap().is_empty(),
+        "{owner}: placement candidates"
+    );
+
+    // The row's own citation is the independent witness: it must name the transform and the
+    // reference body the row stores, or the row was moved away from the evidence it cites.
+    let reason = row["position_reason"].as_str().unwrap();
+    let spawn = cited_spawn(reason);
+    assert!(
+        reason.contains(&format!("{}:{}", spawn.source, spawn.line)),
+        "{owner}: reason does not cite its line"
+    );
+    let authored = xyz_f64(&row["position"]);
+    for axis in 0..3 {
+        assert!(
+            (authored[axis] - spawn.position[axis]).abs() <= 1e-9,
+            "{owner}: position axis {axis} differs from {}:{}",
+            spawn.source,
+            spawn.line
+        );
+    }
+    let position = xyz(&row["position"]);
+    let heading = row["heading"].as_f64().unwrap();
+    assert!(
+        (heading - spawn.heading).abs() <= 1e-9,
+        "{owner}: heading differs from {}:{}",
+        spawn.source,
+        spawn.line
+    );
+
+    // The cited reference row and the client's own model and locale tables.
+    let reference = reference_npcs_row(&spawn.source, spawn.ref_id);
+    assert_eq!(
+        row["model_id"].as_u64(),
+        reference["ModelId"].as_u64(),
+        "{owner}: model id"
+    );
+    assert_eq!(
+        row["model_file_name"].as_str(),
+        reference["ModelFileName"].as_str(),
+        "{owner}: model file"
+    );
+    let name_id = reference["NameId"].as_u64().unwrap();
+    let locale_name = locale
+        .get(&name_id)
+        .unwrap_or_else(|| panic!("{owner}: spawn NameId {name_id} does not resolve"));
+    assert_eq!(
+        normalize_name(row["name"].as_str().unwrap()),
+        normalize_name(locale_name),
+        "{owner}: spawn NameId {name_id} does not name this row"
+    );
+    assert_eq!(
+        row["name_string_id"].as_u64(),
+        Some(name_id),
+        "{owner}: the row binds a name id that is not the spawn's NameId"
+    );
+    let model_id = row["model_id"].as_u64().unwrap();
+    let model_file = row["model_file_name"].as_str().unwrap();
+    assert!(
+        models
+            .get(&i64::try_from(model_id).unwrap())
+            .is_some_and(|files| files.contains(&model_file.to_ascii_lowercase())),
+        "{owner}: Models.txt does not map model {model_id} to {model_file}"
+    );
+
+    // The content rotation is the spawn heading as a Y-axis quaternion.
+    let rotation = row["rotation"].as_array().unwrap();
+    let yaw = 2.0
+        * rotation[1]
+            .as_f64()
+            .unwrap()
+            .atan2(rotation[3].as_f64().unwrap());
+    assert!(
+        (yaw - heading).abs() <= 1e-9,
+        "{owner}: rotation is not the spawn heading"
+    );
+    assert!(
+        has_source_kind(&row["field_sources"]["position"], "legacy-data"),
+        "{owner}: position lacks Legacy provenance"
+    );
+    assert!(
+        has_source_kind(&row["source"], "legacy-data"),
+        "{owner}: source lacks a Legacy tag"
+    );
+
+    // The production loader draws the row, and the 35/2 body the client receives carries the
+    // row's own identity, model and place.
+    assert_eq!(visibility.content_key(id), Some(id), "{owner}: content key");
+    assert_eq!(
+        visibility.actor_position(id),
+        Some(position),
+        "{owner}: loader position"
+    );
+    let seen = npc_visibility::seen_from(visibility, position);
+    let drawn: Vec<_> = seen.iter().filter(|npc| npc.actor_id == id).collect();
+    assert_eq!(drawn.len(), 1, "{owner}: exactly one drawn actor");
+    assert_eq!(
+        drawn[0].model_id,
+        i32::try_from(model_id).unwrap(),
+        "{owner}: AddNpc model"
+    );
+    assert_eq!(
+        drawn[0].name_string_id,
+        i32::try_from(name_id).unwrap(),
+        "{owner}: AddNpc name id"
+    );
+    for axis in 0..3 {
+        assert!(
+            (drawn[0].position[axis] - position[axis]).abs() <= 1e-3,
+            "{owner}: AddNpc position axis {axis}"
+        );
+    }
 }

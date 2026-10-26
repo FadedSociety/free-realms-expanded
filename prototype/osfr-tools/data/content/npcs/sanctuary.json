@@ -61623,8 +61623,8 @@
         ],
         "objective_ids": [
           {
-            "kind": "legacy-data",
-            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3584; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33354 (ModelId=544, ModelFileName=sg_rock_01.adr, NameId=103686). T739: the objective ids come from the quest-line objective specs that name this reference spawn (q3040010-o0 and q3040010-o1)."
+            "kind": "reconstructed",
+            "evidence": "(R) T739: lab/references/quest-lines/wiring/spawn-objects.json matched q3040010-o0 and q3040010-o1 to this reference spawn (spawnobj-infer); Scripts/Zone/FabledRealms.lua:3584 and Resources/Npcs.json Id=33354 carry no objective id, so the binding is inferred and revisionable, not recovered."
           }
         ]
       },
@@ -61941,8 +61941,8 @@
         ],
         "objective_ids": [
           {
-            "kind": "legacy-data",
-            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3563; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33333 (ModelId=151, ModelFileName=sg_treasure_chest_01.adr, NameId=5091). T739: the objective ids come from the quest-line objective specs that name this reference spawn (q3070046-o0 and q3070046-o1)."
+            "kind": "reconstructed",
+            "evidence": "(R) T739: lab/references/quest-lines/wiring/spawn-objects.json matched q3070046-o0 and q3070046-o1 to this reference spawn (spawnobj-infer); Scripts/Zone/FabledRealms.lua:3563 and Resources/Npcs.json Id=33333 carry no objective id, so the binding is inferred and revisionable, not recovered."
           }
         ]
       },
@@ -62259,8 +62259,8 @@
         ],
         "objective_ids": [
           {
-            "kind": "legacy-data",
-            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3613; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33389 (ModelId=340, ModelFileName=sg_mailbox_group_01.adr, NameId=17267). T739: the objective ids come from the quest-line objective specs that name this reference spawn (q3130003-o1)."
+            "kind": "reconstructed",
+            "evidence": "(R) T739: lab/references/quest-lines/wiring/spawn-objects.json matched q3130003-o1 to this reference spawn (spawnobj-infer); Scripts/Zone/FabledRealms.lua:3613 and Resources/Npcs.json Id=33389 carry no objective id, so the binding is inferred and revisionable, not recovered."
           }
         ]
       },

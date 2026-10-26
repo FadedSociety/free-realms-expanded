@@ -47700,8 +47700,8 @@
         ],
         "objective_ids": [
           {
-            "kind": "legacy-data",
-            "evidence": "lab/references/Sanctuary-main-20261019/src/Scripts/Zone/FabledRealms.lua:3906; lab/references/Sanctuary-main-20261019/src/Resources/Npcs.json Id=33692 (ModelId=910, ModelFileName=sg_mailbox_01.adr, NameId=5012). T739: the objective ids come from the quest-line objective specs that name this reference spawn (q3070037-o1)."
+            "kind": "reconstructed",
+            "evidence": "(R) T739: lab/references/quest-lines/wiring/spawn-objects.json matched q3070037-o1 to this reference spawn (spawnobj-infer); Scripts/Zone/FabledRealms.lua:3906 and Resources/Npcs.json Id=33692 carry no objective id, so the binding is inferred and revisionable, not recovered."
           }
         ]
       },

@@ -6,8 +6,7 @@
 //! too, because its cited model is not shipped by this client and its position is a mining
 //! cluster far from the Greenwood Forest lake camp the quest text names. This slice places the
 //! remaining four props (Planter, Treasure Chest, Sanctuary Postboxes, 1 Way Back Way — six
-//! objectives) as `legacy_data` regional rows, so the zone quest briefs can bind their
-//! objectives.
+//! objectives) as `legacy_data` regional rows, so the zone quest briefs can bind their objectives.
 //!
 //! The wire path is unchanged: `NpcVisibility::load` draws a regional `legacy_data` row as its
 //! own actor and `update` sends the 35/2 AddNpc the client reads (reader `0x00921a10`: u64
@@ -17,7 +16,8 @@
 //!
 //! Every value compared here is read from the content row, the cited `FabledRealms.lua` line,
 //! that source's `Resources/Npcs.json`, the client locale table or the client `Models.txt`; the
-//! only pinned literals are the brief's provenance marker and the 1 m duplicate rule.
+//! only pinned literals are the brief's provenance marker and the 1 m duplicate rule. The row
+//! placement assertions are shared with T698 (`support/placement.rs`).
 
 #[path = "support/models.rs"]
 mod models;
@@ -30,14 +30,11 @@ mod placement;
 
 use npc_greetings::{
     GREETING_HEADER, MENU_HEADER, character_at, content_dir, gameplay_dir, interact,
-    locale_id_to_text, select, service,
+    locale_id_to_text, read_json, select, service,
 };
 use npc_visibility::seen_from;
 use osfr_tools::{gameplay::Gameplay, npc_interaction::NpcInteractionError, world::NpcVisibility};
-use placement::{
-    cited_spawn, distance, has_source_kind, normalize_name, reference_npcs_row, regional_rows, xyz,
-    xyz_f64,
-};
+use placement::{assert_placed_row_matches_cited_spawn, distance, has_source_kind, xyz};
 use serde_json::Value;
 use std::collections::BTreeSet;
 
@@ -45,17 +42,25 @@ use std::collections::BTreeSet;
 const MARKER: &str = "matched by spawnobj-infer (R)";
 /// Two drawn actors closer than this are the same standing spot (the brief's 1 m rule).
 const SAME_SPOT_METRES: f64 = 1.0;
+/// The zone files this brief's rows live in. A later spawnobj brief may use the same phrase in
+/// another zone file, so the scan stays scoped here and the count pin covers only these two.
+const BRIEF_ZONES: [&str; 2] = ["sanctuary", "snowhill"];
 
-/// The rows this brief placed: the regional rows whose `position_reason` carries its marker.
+/// The rows this brief placed: in its zone files, `position_reason` carries its marker.
 fn placed_props() -> Vec<Value> {
-    regional_rows()
-        .into_iter()
-        .filter(|row| {
-            row["position_reason"]
+    let mut rows = Vec::new();
+    for zone in BRIEF_ZONES {
+        let path = content_dir().join("npcs").join(format!("{zone}.json"));
+        for row in read_json(&path)["records"].as_array().unwrap() {
+            if row["position_reason"]
                 .as_str()
                 .is_some_and(|reason| reason.contains(MARKER))
-        })
-        .collect()
+            {
+                rows.push(row.clone());
+            }
+        }
+    }
+    rows
 }
 
 #[test]
@@ -75,102 +80,12 @@ fn every_placed_prop_is_drawn_at_its_cited_spawn_and_clickable() {
         let id = row["npc_id"].as_u64().unwrap();
         let owner = format!("{id} ({})", row["name"]);
         assert!(ids.insert(id), "{owner}: one placed prop per actor id");
-        assert_eq!(row["placement"], "legacy_data", "{owner}: placement");
-        assert_eq!(
-            row["placement_source"], "legacy_data_spawn",
-            "{owner}: placement source"
-        );
-        assert_eq!(
-            row["placement_confidence"], "medium",
-            "{owner}: placement confidence"
-        );
-        assert!(
-            row["placement_candidates"].as_array().unwrap().is_empty(),
-            "{owner}: placement candidates"
-        );
+        assert_placed_row_matches_cited_spawn(row, &locale, &models, &base);
 
-        // The row's own citation is the independent witness: it must name the transform and the
-        // reference body the row stores, or the row was moved away from the evidence it cites.
+        // The objective ids the zone briefs bind are the lead's spawnobj-infer join, not the
+        // spawn line: neither `FabledRealms.lua` nor `Npcs.json` carries an objective id, so
+        // the field source must stay reconstructed and cite the join.
         let reason = row["position_reason"].as_str().unwrap();
-        let spawn = cited_spawn(reason);
-        assert!(
-            reason.contains(&format!("{}:{}", spawn.source, spawn.line)),
-            "{owner}: reason does not cite its line"
-        );
-        let authored = xyz_f64(&row["position"]);
-        for axis in 0..3 {
-            assert!(
-                (authored[axis] - spawn.position[axis]).abs() <= 1e-9,
-                "{owner}: position axis {axis} differs from {}:{}",
-                spawn.source,
-                spawn.line
-            );
-        }
-        let position = xyz(&row["position"]);
-        let heading = row["heading"].as_f64().unwrap();
-        assert!(
-            (heading - spawn.heading).abs() <= 1e-9,
-            "{owner}: heading differs from {}:{}",
-            spawn.source,
-            spawn.line
-        );
-
-        // The cited reference row and the client's own model and locale tables.
-        let reference = reference_npcs_row(&spawn.source, spawn.ref_id);
-        assert_eq!(
-            row["model_id"].as_u64(),
-            reference["ModelId"].as_u64(),
-            "{owner}: model id"
-        );
-        assert_eq!(
-            row["model_file_name"].as_str(),
-            reference["ModelFileName"].as_str(),
-            "{owner}: model file"
-        );
-        let name_id = reference["NameId"].as_u64().unwrap();
-        let locale_name = locale
-            .get(&name_id)
-            .unwrap_or_else(|| panic!("{owner}: spawn NameId {name_id} does not resolve"));
-        assert_eq!(
-            normalize_name(row["name"].as_str().unwrap()),
-            normalize_name(locale_name),
-            "{owner}: spawn NameId {name_id} does not name this row"
-        );
-        assert_eq!(
-            row["name_string_id"].as_u64(),
-            Some(name_id),
-            "{owner}: the row binds a name id that is not the spawn's NameId"
-        );
-        let model_id = row["model_id"].as_u64().unwrap();
-        let model_file = row["model_file_name"].as_str().unwrap();
-        assert!(
-            models
-                .get(&i64::try_from(model_id).unwrap())
-                .is_some_and(|files| files.contains(&model_file.to_ascii_lowercase())),
-            "{owner}: Models.txt does not map model {model_id} to {model_file}"
-        );
-
-        // The content rotation is the spawn heading as a Y-axis quaternion.
-        let rotation = row["rotation"].as_array().unwrap();
-        let yaw = 2.0
-            * rotation[1]
-                .as_f64()
-                .unwrap()
-                .atan2(rotation[3].as_f64().unwrap());
-        assert!(
-            (yaw - heading).abs() <= 1e-9,
-            "{owner}: rotation is not the spawn heading"
-        );
-        assert!(
-            has_source_kind(&row["field_sources"]["position"], "legacy-data"),
-            "{owner}: position lacks Legacy provenance"
-        );
-        assert!(
-            has_source_kind(&row["source"], "legacy-data"),
-            "{owner}: source lacks a Legacy tag"
-        );
-
-        // The objective ids the zone briefs bind, noted on the row itself.
         let objectives = row["objective_ids"]
             .as_array()
             .unwrap_or_else(|| panic!("{owner}: objective_ids is missing"));
@@ -186,34 +101,25 @@ fn every_placed_prop_is_drawn_at_its_cited_spawn_and_clickable() {
                 "{owner}: position reason does not name {objective}"
             );
         }
-
-        // The production loader draws the row, and the 35/2 body the client receives carries
-        // the row's own identity, model and place.
-        assert_eq!(base.content_key(id), Some(id), "{owner}: content key");
-        assert_eq!(
-            base.actor_position(id),
-            Some(position),
-            "{owner}: loader position"
+        let sources = &row["field_sources"]["objective_ids"];
+        assert!(
+            has_source_kind(sources, "reconstructed"),
+            "{owner}: objective_ids provenance is not the (R) spawnobj-infer join"
         );
-        let seen = seen_from(&base, position);
-        let drawn: Vec<_> = seen.iter().filter(|npc| npc.actor_id == id).collect();
-        assert_eq!(drawn.len(), 1, "{owner}: exactly one drawn actor");
-        assert_eq!(
-            drawn[0].model_id,
-            i32::try_from(model_id).unwrap(),
-            "{owner}: AddNpc model"
+        assert!(
+            !has_source_kind(sources, "legacy-data"),
+            "{owner}: objective_ids cites the spawn line, which carries no objective ids"
         );
-        assert_eq!(
-            drawn[0].name_string_id,
-            i32::try_from(name_id).unwrap(),
-            "{owner}: AddNpc name id"
+        let evidence: String = sources
+            .as_array()
+            .unwrap()
+            .iter()
+            .filter_map(|tag| tag["evidence"].as_str())
+            .collect();
+        assert!(
+            evidence.contains("spawn-objects.json") && evidence.contains("spawnobj-infer"),
+            "{owner}: objective_ids evidence does not cite the spawnobj-infer join"
         );
-        for axis in 0..3 {
-            assert!(
-                (drawn[0].position[axis] - position[axis]).abs() <= 1e-3,
-                "{owner}: AddNpc position axis {axis}"
-            );
-        }
 
         // A click on the drawn actor opens the menu the router sends, and a click from outside
         // the range is refused without disturbing it.
