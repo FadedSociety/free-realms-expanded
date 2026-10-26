@@ -7,6 +7,7 @@ pub mod activity_portal;
 pub mod boombox;
 pub mod bundle_budget;
 pub mod card_game;
+pub mod card_service;
 pub mod character_store;
 pub mod chat;
 pub mod chess;

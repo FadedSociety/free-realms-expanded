@@ -1,0 +1,344 @@
+//! T763: the Card Duelist (TCG) service wire, decoded from `tcg/FreeRealmsTCG.dll`
+//! (lab/content/tcg/analysis/lead-login-decode-2026-10-26.md): the compact integer and string
+//! codec, the per-level class header, client frames, the gateway (414) and the session login
+//! (411 -> 81). Pure: the TCP listener and the one-time ticket check live with their callers.
+
+use std::io;
+
+/// `GatewayCommand_GetConnectionServer`: request and reply share the layout.
+pub const GET_CONNECTION_SERVER: i32 = 414;
+/// `LoginCommand_SendSessionID`, written by the client at version 8 (`1017b920`).
+pub const SEND_SESSION_ID: i32 = 411;
+/// `LoginCommand_Results`; the client's own copy is version 6, which adds a zlib blob.
+pub const LOGIN_RESULTS: i32 = 81;
+/// The version this server writes 81 at: every field the handler `10179530` uses, no blob.
+const LOGIN_RESULTS_VERSION: i32 = 5;
+/// The header is written once per class level because `1019de90` is virtual: the command,
+/// its family (Gateway/Login Command) and NetworkCommand.
+const HEADER_LEVELS: usize = 3;
+/// The DLL's frame sanity limit for a string (`10097b80`).
+const MAX_STRING: usize = 0x140_0000;
+/// (R) Largest client frame accepted; the client's own commands are far smaller.
+pub const MAX_FRAME: usize = 64 * 1024;
+
+/// Compact integer writer `10097a40` (the codec's big-endian mode byte `1080205c` is never
+/// set): a value above `!value` is complemented and flagged; the first byte carries the low
+/// nibble, the flag (0x10) and the count of following bytes (bits 5-7), which hold the rest
+/// little-endian.
+pub fn put_int(out: &mut Vec<u8>, value: i32) {
+    let mut value = value as u32;
+    let complemented = !value < value;
+    if complemented {
+        value = !value;
+    }
+    let mut bytes = vec![(value & 0xF) as u8];
+    let mut rest = value >> 4;
+    while rest != 0 {
+        bytes.push(rest as u8);
+        rest >>= 8;
+    }
+    bytes[0] |= (u8::from(complemented) << 4) | (((bytes.len() - 1) as u8) << 5);
+    out.extend(bytes);
+}
+
+/// String writer `10097b40`: the length, then the text and its NUL.
+pub fn put_string(out: &mut Vec<u8>, value: &str) {
+    put_int(out, value.len() as i32);
+    out.extend(value.as_bytes());
+    out.push(0);
+}
+
+/// The class header for every level of a command: `(id, version)` three times.
+pub fn put_headers(out: &mut Vec<u8>, id: i32, version: i32) {
+    for _ in 0..HEADER_LEVELS {
+        put_int(out, id);
+        put_int(out, version);
+    }
+}
+
+/// A command body read field by field, as the DLL's readers do.
+pub struct Reader<'a> {
+    bytes: &'a [u8],
+    at: usize,
+}
+
+impl<'a> Reader<'a> {
+    pub fn new(bytes: &'a [u8]) -> Self {
+        Self { bytes, at: 0 }
+    }
+
+    fn byte(&mut self) -> io::Result<u8> {
+        let byte = *self
+            .bytes
+            .get(self.at)
+            .ok_or_else(|| invalid("card command is truncated"))?;
+        self.at += 1;
+        Ok(byte)
+    }
+
+    /// Compact integer reader `100977a0`. More than four following bytes is refused: the
+    /// writer never makes them, and the client's shift would wrap.
+    pub fn int(&mut self) -> io::Result<i32> {
+        let first = self.byte()?;
+        let extra = u32::from(first >> 5);
+        if extra > 4 {
+            return Err(invalid("card integer is too long"));
+        }
+        let mut value = u32::from(first & 0xF);
+        for index in 0..extra {
+            value = value.wrapping_add(u32::from(self.byte()?) << (4 + 8 * index));
+        }
+        if first & 0x10 != 0 {
+            value = !value;
+        }
+        Ok(value as i32)
+    }
+
+    /// String reader `10097b80`: the length, then that many bytes plus the NUL.
+    pub fn string(&mut self) -> io::Result<String> {
+        let length = usize::try_from(self.int()?)
+            .ok()
+            .filter(|length| *length <= MAX_STRING)
+            .ok_or_else(|| invalid("card string length is invalid"))?;
+        let end = self
+            .at
+            .checked_add(length + 1)
+            .filter(|end| *end <= self.bytes.len())
+            .ok_or_else(|| invalid("card string is truncated"))?;
+        let text = std::str::from_utf8(&self.bytes[self.at..self.at + length])
+            .map_err(|_| invalid("card string is not UTF-8"))?
+            .to_owned();
+        self.at = end;
+        Ok(text)
+    }
+
+    /// The headers of every class level (`1019def0`); returns the first (most-derived)
+    /// version, the one versioned readers branch on.
+    pub fn headers(&mut self, id: i32) -> io::Result<i32> {
+        let mut first = None;
+        for _ in 0..HEADER_LEVELS {
+            if self.int()? != id {
+                return Err(invalid("card command has the wrong class id"));
+            }
+            let version = self.int()?;
+            first.get_or_insert(version);
+        }
+        Ok(first.unwrap_or_default())
+    }
+
+    pub fn finished(&self) -> bool {
+        self.at == self.bytes.len()
+    }
+}
+
+/// The class id of a command body, without consuming it (`10097860`).
+pub fn class_id(body: &[u8]) -> io::Result<i32> {
+    Reader::new(body).int()
+}
+
+/// One client frame (`101921e0`): `htonl(length)`, then three routing words and the body; the
+/// gateway request (414) is sent without routing words (`101935d0`).
+#[derive(Debug, PartialEq, Eq)]
+pub struct ClientFrame<'a> {
+    pub routing: Option<[u32; 3]>,
+    pub body: &'a [u8],
+}
+
+/// Split the next client frame off `buffer`: `Ok(None)` until the whole frame has arrived,
+/// else the bytes consumed and the frame.
+pub fn client_frame(buffer: &[u8]) -> io::Result<Option<(usize, ClientFrame<'_>)>> {
+    let Some(length) = buffer.get(..4) else {
+        return Ok(None);
+    };
+    let length = u32::from_be_bytes(length.try_into().unwrap()) as usize;
+    if length > MAX_FRAME {
+        return Err(invalid("card frame is too large"));
+    }
+    let Some(payload) = buffer.get(4..4 + length) else {
+        return Ok(None);
+    };
+    // A routed frame starts with the big-endian routing word 1000000000, whose first byte never
+    // reads as the compact 414 a gateway body starts with.
+    let frame = if class_id(payload).ok() == Some(GET_CONNECTION_SERVER) {
+        ClientFrame {
+            routing: None,
+            body: payload,
+        }
+    } else {
+        let words = payload
+            .get(..12)
+            .ok_or_else(|| invalid("card frame has no routing words"))?;
+        let word = |at: usize| u32::from_be_bytes(words[at..at + 4].try_into().unwrap());
+        ClientFrame {
+            routing: Some([word(0), word(4), word(8)]),
+            body: &payload[12..],
+        }
+    };
+    Ok(Some((4 + length, frame)))
+}
+
+/// A server frame as the client's receiver (`10192500`) reads it: `htonl(length)` and the body.
+pub fn server_frame(body: &[u8]) -> Vec<u8> {
+    let mut frame = (body.len() as u32).to_be_bytes().to_vec();
+    frame.extend(body);
+    frame
+}
+
+/// 414 `GatewayCommand_GetConnectionServer` (writer `10121d20`, reader `10121c60`). The client
+/// fills the session id and user name (`101935d0`); the reply's `ok` sends it to `host:port`
+/// (`10121980`, event 150), otherwise `error` is shown (event 149).
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct ConnectionServer {
+    pub session_id: String,
+    pub username: String,
+    pub host: String,
+    pub port: i32,
+    pub ok: bool,
+    pub error: i32,
+}
+
+impl ConnectionServer {
+    pub fn decode(body: &[u8]) -> io::Result<Self> {
+        let mut reader = Reader::new(body);
+        reader.headers(GET_CONNECTION_SERVER)?;
+        let command = Self {
+            session_id: reader.string()?,
+            username: reader.string()?,
+            host: reader.string()?,
+            port: reader.int()?,
+            ok: reader.int()? != 0,
+            error: reader.int()?,
+        };
+        if !reader.finished() {
+            return Err(invalid("card gateway command has trailing bytes"));
+        }
+        Ok(command)
+    }
+
+    pub fn encode(&self) -> Vec<u8> {
+        let mut body = Vec::new();
+        put_headers(&mut body, GET_CONNECTION_SERVER, 1);
+        put_string(&mut body, &self.session_id);
+        put_string(&mut body, &self.username);
+        put_string(&mut body, &self.host);
+        put_int(&mut body, self.port);
+        put_int(&mut body, i32::from(self.ok));
+        put_int(&mut body, self.error);
+        body
+    }
+}
+
+/// 411 `LoginCommand_SendSessionID` (writer `1017b700`, reader `1017b950`). The first string is
+/// the launcher's `--sessionID` (the session dialog's `+0x68`, `103c9140`); the client's local
+/// data versions follow ({1: 1314, 2: archetypes, 4: rules}), then platform strings.
+#[derive(Clone, Debug, Default, PartialEq, Eq)]
+pub struct SessionLogin {
+    pub session_id: String,
+    pub data_versions: Vec<(i32, i32)>,
+    /// Every later string in reader order (`+44`, `+72`, `+104` OS, `+132` locale, ...,
+    /// `+244` namespace), as far as the version carries them.
+    pub strings: Vec<String>,
+    pub host_flag: bool,
+}
+
+impl SessionLogin {
+    /// The reader's version gates (`1017b950`).
+    pub fn decode(body: &[u8]) -> io::Result<Self> {
+        let mut reader = Reader::new(body);
+        let version = reader.headers(SEND_SESSION_ID)?;
+        let mut login = Self {
+            session_id: reader.string()?,
+            ..Self::default()
+        };
+        if version > 1 {
+            let count = usize::try_from(reader.int()?)
+                .ok()
+                .filter(|count| *count <= 64)
+                .ok_or_else(|| invalid("card login version map is invalid"))?;
+            for _ in 0..count {
+                login.data_versions.push((reader.int()?, reader.int()?));
+            }
+            login.strings.push(reader.string()?);
+        }
+        if version > 2 {
+            login.strings.push(reader.string()?);
+        }
+        if version > 3 {
+            login.host_flag = reader.int()? != 0;
+        }
+        if version > 4 {
+            login.strings.push(reader.string()?);
+            login.strings.push(reader.string()?);
+        }
+        if version > 5 {
+            login.strings.push(reader.string()?);
+            if version == 6 {
+                reader.int()?;
+            }
+        }
+        if version > 6 {
+            login.strings.push(reader.string()?);
+            login.strings.push(reader.string()?);
+        }
+        if version > 7 {
+            login.strings.push(reader.string()?);
+        }
+        if !reader.finished() {
+            return Err(invalid("card login command has trailing bytes"));
+        }
+        Ok(login)
+    }
+}
+
+/// 81 `LoginCommand_Results` at version 5 (reader `10179c70`): success, code, the account id
+/// the client adopts as its player id (`10068ac0`), a flag and a word the handler passes on
+/// (both 0, R), and the session id it keeps. A success raises client events 14 and 136.
+pub fn login_results(success: bool, code: i32, account_id: i32, session_id: &str) -> Vec<u8> {
+    let mut body = Vec::new();
+    put_headers(&mut body, LOGIN_RESULTS, LOGIN_RESULTS_VERSION);
+    put_int(&mut body, i32::from(success));
+    put_int(&mut body, code);
+    put_int(&mut body, account_id);
+    put_int(&mut body, 0);
+    put_int(&mut body, 0);
+    put_string(&mut body, session_id);
+    body
+}
+
+/// The login stub: answer one client body. A 414 is sent to `host:port` (this service); a 411
+/// is accepted when `account_for` maps its session id to an account (the caller's one-time
+/// ticket check). Anything else is not handled yet (`None`). Replies are server frames.
+pub fn reply(
+    body: &[u8],
+    host: &str,
+    port: u16,
+    account_for: impl FnOnce(&str) -> Option<i32>,
+) -> io::Result<Option<Vec<u8>>> {
+    match class_id(body)? {
+        GET_CONNECTION_SERVER => {
+            let request = ConnectionServer::decode(body)?;
+            let answer = ConnectionServer {
+                host: host.to_owned(),
+                port: i32::from(port),
+                ok: true,
+                error: 0,
+                ..request
+            };
+            Ok(Some(server_frame(&answer.encode())))
+        }
+        SEND_SESSION_ID => {
+            let login = SessionLogin::decode(body)?;
+            let body = match account_for(&login.session_id) {
+                Some(account) => login_results(true, 0, account, &login.session_id),
+                // (R) The failure code's text is not recovered; 1 is "refused".
+                None => login_results(false, 1, 0, ""),
+            };
+            Ok(Some(server_frame(&body)))
+        }
+        _ => Ok(None),
+    }
+}
+
+fn invalid(message: &'static str) -> io::Error {
+    io::Error::new(io::ErrorKind::InvalidData, message)
+}
