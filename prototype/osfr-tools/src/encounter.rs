@@ -187,6 +187,10 @@ struct Actor {
     position: [f32; 3],
     max_health: u32,
     damage: u32,
+    /// Server-side content band, never sent to the client. The field and the
+    /// world/dungeon loaders scale authored health by `health_factor(level)`
+    /// when they load the row; only the field loader scales damage too (R).
+    /// Absent means level 1, so every pre-T737 row keeps its old numbers.
     #[serde(default = "one")]
     level: u32,
     boss: bool,
@@ -974,11 +978,13 @@ impl EncounterEngine {
             }
         }
         let content_hash = hash(&bytes);
-        // Authored enemy rows are level-one baselines on the old scale.
+        // Authored enemy rows are level-one health baselines on the old scale;
+        // their content level scales health like a field enemy's (T737). Enemy
+        // damage stays as authored: no video measures it.
         for a in (content.world_enemies.iter_mut())
             .chain(content.dungeons.iter_mut().flat_map(|d| &mut d.enemies))
         {
-            scale.scale_enemy(a, 1.0, 1.0);
+            scale.scale_enemy(a, scale.health_factor(a.level), 1.0);
         }
         let mut state = state;
         if let Some(state) = state.as_mut() {

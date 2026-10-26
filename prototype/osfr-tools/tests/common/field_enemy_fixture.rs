@@ -34,6 +34,28 @@ impl Fixture {
         Self::new()
     }
 
+    /// Put `rows` in the encounter content's `world_enemies`, so the production
+    /// `EncounterEngine::load` scaling and the real attack path see them. Rows
+    /// need `"stages": [0]` to be reachable at world stage 0.
+    pub fn with_world_enemies(rows: Vec<Value>) -> Self {
+        let fixture = Self::new();
+        let path = fixture.dir.join("encounters.json");
+        let mut content: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+        content["world_enemies"] = json!(rows);
+        fs::write(&path, content.to_string()).unwrap();
+        fixture
+    }
+
+    /// Write a `combat_scale.json` beside the encounter content; it overrides
+    /// the bundled file for the next load (`EncounterEngine::load`).
+    pub fn scale(&self, edit: impl FnOnce(&mut Value)) {
+        let mut file: Value =
+            serde_json::from_slice(&fs::read(content_dir().join("combat_scale.json")).unwrap())
+                .unwrap();
+        edit(&mut file);
+        fs::write(self.dir.join("combat_scale.json"), file.to_string()).unwrap();
+    }
+
     /// Load a private copy of the shipped field file, so a test may rewrite it
     /// to exercise the reload path.
     pub fn copied() -> Self {
@@ -92,12 +114,18 @@ impl Fixture {
     /// The production load order: the encounter content, then the behaviour
     /// presets, then the field actors that name them.
     pub fn load(&self) -> EncounterEngine {
-        let mut engine = EncounterEngine::load(&self.dir, None).unwrap();
+        let mut engine = self.load_encounters().unwrap();
         engine
             .load_behaviours(&content_dir().join("behaviours.json"))
             .unwrap();
         engine.load_field_enemies(&self.field).unwrap();
         engine
+    }
+
+    /// The first production load step alone, so a refusal test sees the error
+    /// (`combat_scale.json` and `encounters.json` are read here).
+    pub fn load_encounters(&self) -> std::io::Result<EncounterEngine> {
+        EncounterEngine::load(&self.dir, None)
     }
 
     /// [`Fixture::load`] with the shipped field kill payouts and power-up drop

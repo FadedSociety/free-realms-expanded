@@ -572,7 +572,7 @@
       "model_id": 160,
       "name_string_id": 73988,
       "texture_alias": "",
-      "level": 13,
+      "level": 14,
       "max_health": 340,
       "damage": 31,
       "move_speed": 3.0,
@@ -588,7 +588,7 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was verified; grant no per-kill reward."
       },
-      "source": "Models.txt row 161 maps model_id=160 to ADR=maneatingfungus.adr; catalog=present. Name/model choice remains (R), based on the Legacy name-id crosswalk recorded in enemies_unresolved.json. Name/id is client locale-backed. (R) Combat statistics use the documented W58 difficulty scaling; field provenance is in enemies_unresolved.json."
+      "source": "Models.txt row 161 maps model_id=160 to ADR=maneatingfungus.adr; catalog=present. Name/model choice remains (R), based on the Legacy name-id crosswalk recorded in enemies_unresolved.json. Name/id is client locale-backed. (R) Combat statistics use the documented W58 difficulty scaling; field provenance is in enemies_unresolved.json. (R) T737 video fit: Dark Spore Depths is a difficulty-5 dungeon (data/content/dungeons/dark_spore_depths.json); the level-20 Ninja fight at OWvui60zJQw 134-154s reads 8,351 health, about four basics, and the target badge read level 14. Level 14 x 6.13 x 3.72 x 340 = 7,796, four level-20 Ninja basics."
     },
     {
       "id": "w58_sandscale_hunter_l3_enemy",
@@ -1144,7 +1144,7 @@
       "model_id": 471,
       "name_string_id": 76573,
       "texture_alias": "",
-      "level": null,
+      "level": 3,
       "max_health": 180,
       "damage": 15,
       "move_speed": 3.0,
@@ -1160,7 +1160,7 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was verified; grant no per-kill reward."
       },
-      "source": "(R) Model association and all combat policy are reconstructed. (R) Stats, AI, level, and rewards are prototype defaults."
+      "source": "(R) Model association and all combat policy are reconstructed. (R) Stats, AI, level, and rewards are prototype defaults. (R) T737 video fit: target level 3 read beside the nameplate at SUgDAmJpyVs 44s (player level 4 Brawler), and the 44-52s / 176-202s fights read about 200-300 health; level 3 x 3.72 = 886 health is two level-4 Brawler basics, inside the video's 2-3 hit kill. The same kind also appears in Cray Caves (difficulty 5, data/content/dungeons/cray_caves.json); this open-world instance is the low-level one."
     },
     {
       "id": "w58b_jarvus",
@@ -1326,8 +1326,8 @@
       "model_id": 408,
       "name_string_id": 17075,
       "texture_alias": "",
-      "level": null,
-      "max_health": 540,
+      "level": 20,
+      "max_health": 260,
       "damage": 30,
       "move_speed": 3.0,
       "aggro_radius": 40.0,
@@ -1342,7 +1342,7 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was verified; grant no per-kill reward."
       },
-      "source": "(R) Model association and all combat policy are reconstructed. (R) Stats, AI, level, and rewards are prototype defaults."
+      "source": "(R) Model association and all combat policy are reconstructed. (R) Stats, AI, level, and rewards are prototype defaults. (R) T737 video fit: Forest Troll Fort is a difficulty-5 dungeon (data/content/dungeons/forest_troll_fort.json) and the video's two level-20 Ninja fights are FiWCkh0St38 362-384s and 428-468s; they read about 7,468-14,666 health, 3-6 basic hits. Level 20 and a 260 health baseline give 260 x 14.27 x 3.72 = 13,802, six level-20 Ninja basics, so the boss row is authored at 260 instead of the prototype 540."
     },
     {
       "id": "w58b_collin",
@@ -1638,7 +1638,7 @@
       "model_id": 512,
       "name_string_id": 16811,
       "texture_alias": "",
-      "level": null,
+      "level": 16,
       "max_health": 540,
       "damage": 30,
       "move_speed": 3.0,
@@ -1654,7 +1654,7 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was verified; grant no per-kill reward."
       },
-      "source": "Client locale id 16811 resolves to 'Elder Mugwort' (lab/reports/locale-id-to-text.json, SHA256 f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844). lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:513 maps model_id=512 to fairy_druidmugwort_m.adr (SHA256 0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be). lab/extracted/client-assets/catalog.tsv:31457 contains pack_08/002738.adr (30245 bytes, CRC32 4634de42, SHA256 7e3837a468ffcaf641818d1c68829aa84cc9f2780ba6e66739bf8512a76de722; catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9). (R) Elder Mugwort has an exact client name; the unique model filename containing 'mugwort' is fairy_druidmugwort_m.adr. Stats, level, AI and rewards are reconstructed; no native dungeon actor tuple was captured."
+      "source": "Client locale id 16811 resolves to 'Elder Mugwort' (lab/reports/locale-id-to-text.json, SHA256 f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844). lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:513 maps model_id=512 to fairy_druidmugwort_m.adr (SHA256 0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be). lab/extracted/client-assets/catalog.tsv:31457 contains pack_08/002738.adr (30245 bytes, CRC32 4634de42, SHA256 7e3837a468ffcaf641818d1c68829aa84cc9f2780ba6e66739bf8512a76de722; catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9). (R) Elder Mugwort has an exact client name; the unique model filename containing 'mugwort' is fairy_druidmugwort_m.adr. Stats, level, AI and rewards are reconstructed; no native dungeon actor tuple was captured. (R) T737 video fit: Mugwort's Hollow is a difficulty-4 dungeon (data/content/dungeons/mugwort_s_hollow.json) and the level-20 Ninja fight at OawnLys6j-o 400-422s reads 17,729 health, seven counted hits; level 16 x 8.15 x 3.72 x 540 = 16,381, seven level-20 Ninja basics."
     },
     {
       "id": "floren",
@@ -2132,7 +2132,7 @@
       "model_id": 470,
       "name_string_id": 76159,
       "texture_alias": "",
-      "level": null,
+      "level": 20,
       "max_health": 180,
       "damage": 15,
       "move_speed": 3.0,
@@ -2148,7 +2148,7 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was verified; grant no per-kill reward."
       },
-      "source": "Client locale id 76159 resolves to 'Ocean Cray Defender' (lab/reports/locale-id-to-text.json, SHA256 f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844). lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:471 maps model_id=470 to cray_ocean.adr (SHA256 0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be). lab/extracted/client-assets/catalog.tsv:24920 contains pack_07/000700.adr (12068 bytes, CRC32 b0902afc, SHA256 c3a265d6837b47f8e57d0461186683f47090b92869c8e01febe4cb783f7a58bc; catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9). (R) Ocean Cray Defenders maps to the exact singular client name and ocean cray model. Stats, level, AI and rewards are reconstructed; no native dungeon actor tuple was captured."
+      "source": "Client locale id 76159 resolves to 'Ocean Cray Defender' (lab/reports/locale-id-to-text.json, SHA256 f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844). lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:471 maps model_id=470 to cray_ocean.adr (SHA256 0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be). lab/extracted/client-assets/catalog.tsv:24920 contains pack_07/000700.adr (12068 bytes, CRC32 b0902afc, SHA256 c3a265d6837b47f8e57d0461186683f47090b92869c8e01febe4cb783f7a58bc; catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9). (R) Ocean Cray Defenders maps to the exact singular client name and ocean cray model. Stats, level, AI and rewards are reconstructed; no native dungeon actor tuple was captured. (R) T737 video fit: the level-20 Ninja fights in Cray Caves (difficulty 5, data/content/dungeons/cray_caves.json) at BJy3sgpdqpw 76-102s and 162-188s read 11,045-17,430 health, 4.4-7 basic hits; level 20 x 14.27 x 3.72 x 180 = 9,555, five level-20 Ninja basics."
     },
     {
       "id": "ocean_cray_brood_mother",
@@ -2158,7 +2158,7 @@
       "model_id": 470,
       "name_string_id": 419788,
       "texture_alias": "",
-      "level": null,
+      "level": 20,
       "max_health": 180,
       "damage": 15,
       "move_speed": 3.0,
@@ -2174,7 +2174,7 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was verified; grant no per-kill reward."
       },
-      "source": "Client locale id 419788 resolves to 'Ocean Cray Brood Mother' (lab/reports/locale-id-to-text.json, SHA256 f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844). lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:471 maps model_id=470 to cray_ocean.adr (SHA256 0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be). lab/extracted/client-assets/catalog.tsv:24920 contains pack_07/000700.adr (12068 bytes, CRC32 b0902afc, SHA256 c3a265d6837b47f8e57d0461186683f47090b92869c8e01febe4cb783f7a58bc; catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9). (R) Ocean Cray Brood Mothers maps to the exact singular client name and ocean cray model. Stats, level, AI and rewards are reconstructed; no native dungeon actor tuple was captured."
+      "source": "Client locale id 419788 resolves to 'Ocean Cray Brood Mother' (lab/reports/locale-id-to-text.json, SHA256 f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844). lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:471 maps model_id=470 to cray_ocean.adr (SHA256 0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be). lab/extracted/client-assets/catalog.tsv:24920 contains pack_07/000700.adr (12068 bytes, CRC32 b0902afc, SHA256 c3a265d6837b47f8e57d0461186683f47090b92869c8e01febe4cb783f7a58bc; catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9). (R) Ocean Cray Brood Mothers maps to the exact singular client name and ocean cray model. Stats, level, AI and rewards are reconstructed; no native dungeon actor tuple was captured. (R) T737 video fit: the level-20 Ninja fights in Cray Caves at BJy3sgpdqpw 306-318s and 400-428s read 4,980-33,003 health (2-13 basic hits, two attackers in the first); level 20 x 14.27 x 3.72 x 180 = 9,555, five basics."
     },
     {
       "id": "elder_swamp_cray",
@@ -2184,7 +2184,7 @@
       "model_id": 677,
       "name_string_id": 75949,
       "texture_alias": "",
-      "level": null,
+      "level": 3,
       "max_health": 180,
       "damage": 15,
       "move_speed": 3.0,
@@ -2200,7 +2200,7 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was verified; grant no per-kill reward."
       },
-      "source": "Client locale id 75949 resolves to 'Elder Swamp Cray' (lab/reports/locale-id-to-text.json, SHA256 f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844). lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:678 maps model_id=677 to cray_boss_swamp.adr (SHA256 0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be). lab/extracted/client-assets/catalog.tsv:20186 contains pack_05/002476.adr (11780 bytes, CRC32 3f81a8cf, SHA256 fffcdd16362225f176a97d1574c0a582eae4fc578e93ac5706297943acbbbdac; catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9). (R) Elder Swamp Cray maps to the exact client name and boss swamp cray model. Stats, level, AI and rewards are reconstructed; no native dungeon actor tuple was captured."
+      "source": "Client locale id 75949 resolves to 'Elder Swamp Cray' (lab/reports/locale-id-to-text.json, SHA256 f1f22a30107c824af4b3021c8c7c323c927d3c6a9b82efc387e9eaba6ae62844). lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:678 maps model_id=677 to cray_boss_swamp.adr (SHA256 0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be). lab/extracted/client-assets/catalog.tsv:20186 contains pack_05/002476.adr (11780 bytes, CRC32 3f81a8cf, SHA256 fffcdd16362225f176a97d1574c0a582eae4fc578e93ac5706297943acbbbdac; catalog SHA256 12bfd0f81236ffc02e6a9a661e1ffb14890a2bd4ac2306c14b20e9cbe445b1c9). (R) Elder Swamp Cray maps to the exact client name and boss swamp cray model. Stats, level, AI and rewards are reconstructed; no native dungeon actor tuple was captured. (R) T737 video fit: the level-2/3 Ninja fights at -5UUuwaVXnM 324-334s and n9NH7VCyJrU 150-152s read about 635-1,058 health and 2.5-4 Ninja basics; level 3 x 1.32 x 3.72 x 180 = 886, four level-2 Ninja basics. Cracked Claw Caverns is a difficulty-1 dungeon (data/content/dungeons/cracked_claw_caverns.json)."
     },
     {
       "id": "giant_bat",
@@ -2392,7 +2392,7 @@
       "model_id": 235,
       "name_string_id": 4477,
       "texture_alias": "",
-      "level": 5,
+      "level": 20,
       "max_health": 180,
       "damage": 15,
       "move_speed": 3.0,
@@ -2408,7 +2408,7 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was recovered for this quest target; grant no per-kill reward."
       },
-      "source": "(R) actor_kind_id/definition_id 2660 is the FreeRealms-Legacy Npcs.json row 2660 (NameId 73652 ('Ursine Vine'), model 235 bear_vinegolem_fungus.adr); name_string_id 4477 is the client locale string 'Fungus Golem' (lab/reports/locale-id-to-text.json); model 235 maps to bear_vinegolem_fungus.adr at lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:236 and to client-assets catalog.tsv:22041 (pack_06/001604.adr). Kill target of q3000040 objective 0.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json). Level 5, health 180 and damage 15 follow the existing final-era tier ladder (W58 rows: level 5 180/15, 9 260/23, 13 340/31; boss 5 540/30, 9 780/46, 13 1020/62) and the other combat fields are the existing prototype defaults. Field spawn at FabledRealms.lua:1403 (-508.4022, -64.65299, 1883.235)."
+      "source": "(R) actor_kind_id/definition_id 2660 is the FreeRealms-Legacy Npcs.json row 2660 (NameId 73652 ('Ursine Vine'), model 235 bear_vinegolem_fungus.adr); name_string_id 4477 is the client locale string 'Fungus Golem' (lab/reports/locale-id-to-text.json); model 235 maps to bear_vinegolem_fungus.adr at lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:236 and to client-assets catalog.tsv:22041 (pack_06/001604.adr). Kill target of q3000040 objective 0.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json). Level 5, health 180 and damage 15 follow the existing final-era tier ladder (W58 rows: level 5 180/15, 9 260/23, 13 340/31; boss 5 540/30, 9 780/46, 13 1020/62) and the other combat fields are the existing prototype defaults. Field spawn at FabledRealms.lua:1403 (-508.4022, -64.65299, 1883.235). (R) T737: the level-5 number above is the early FabledRealms field spawn, which field_enemies.json places with its own level 5. The video's sighting is the Dark Spore Depths difficulty-5 dungeon instance fought by a level-20 Ninja (data/content/dungeons/dark_spore_depths.json; OrfNBeSJByM 254-276s reads 17,430 health and about seven basic hits), so this catalogue row takes the dungeon instance's level 20: 180 x 14.27 x 3.72 = 9,555, five level-20 Ninja basics."
     },
     {
       "id": "vicious_vinewolf",
@@ -2564,7 +2564,7 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was recovered for this quest target; grant no per-kill reward."
       },
-      "source": "(R) actor_kind_id/definition_id 1237 is the FreeRealms-Legacy Npcs.json row 1237 (no NameId, unnamed reference, model 91 bear_normal.adr); name_string_id 5734 is the client locale string 'Hewey the Bear' (lab/reports/locale-id-to-text.json); model 91 maps to bear_normal.adr at lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:92 and to client-assets catalog.tsv:87810 (pack_18/006138.adr). Kill target of q3030010 objective 2.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json). Level 5, health 540 and damage 30 follow the existing final-era tier ladder (W58 rows: level 5 180/15, 9 260/23, 13 340/31; boss 5 540/30, 9 780/46, 13 1020/62) and the other combat fields are the existing prototype defaults."
+      "source": "(R) actor_kind_id/definition_id 1237 is the FreeRealms-Legacy Npcs.json row 1237 (no NameId, unnamed reference, model 91 bear_normal.adr); name_string_id 5734 is the client locale string 'Hewey the Bear' (lab/reports/locale-id-to-text.json); model 91 maps to bear_normal.adr at lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:92 and to client-assets catalog.tsv:87810 (pack_18/006138.adr). Kill target of q3030010 objective 2.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json). Level 5, health 540 and damage 30 follow the existing final-era tier ladder (W58 rows: level 5 180/15, 9 260/23, 13 340/31; boss 5 540/30, 9 780/46, 13 1020/62) and the other combat fields are the existing prototype defaults. (R) T737 video fit: the level-1/5 Brawler fight at _PEkuJgkSDw 178-204s reads 4,190 health, four counted hits for half the bar; level 5 x 1.75 x 3.72 x 540 = 3,515, about eight level-5 Brawler basics. Hewey's Escape is difficulty 1 (data/content/dungeons/hewey_s_escape.json)."
     },
     {
       "id": "frostfang_growler",
@@ -2756,7 +2756,7 @@
       "model_id": 10,
       "name_string_id": 71199,
       "texture_alias": "",
-      "level": 13,
+      "level": 20,
       "max_health": 1020,
       "damage": 62,
       "move_speed": 3.0,
@@ -2772,7 +2772,7 @@
         "items": [],
         "source": "(R) No original per-enemy loot table or reward was recovered for this quest target; grant no per-kill reward."
       },
-      "source": "(R) actor_kind_id/definition_id 1495 is the FreeRealms-Legacy Npcs.json row 1495 (no NameId, unnamed reference, model 10 ghostdwarf_m_miner_01.adr); name_string_id 71199 is the client locale string 'Foreman Ironfist' (lab/reports/locale-id-to-text.json); model 10 maps to ghostdwarf_m_miner_01.adr at lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:11 and to client-assets catalog.tsv:23867 (pack_06/003430.adr). Kill target of q3160032 objective 1.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json). Level 13, health 1020 and damage 62 follow the existing final-era tier ladder (W58 rows: level 5 180/15, 9 260/23, 13 340/31; boss 5 540/30, 9 780/46, 13 1020/62) and the other combat fields are the existing prototype defaults."
+      "source": "(R) actor_kind_id/definition_id 1495 is the FreeRealms-Legacy Npcs.json row 1495 (no NameId, unnamed reference, model 10 ghostdwarf_m_miner_01.adr); name_string_id 71199 is the client locale string 'Foreman Ironfist' (lab/reports/locale-id-to-text.json); model 10 maps to ghostdwarf_m_miner_01.adr at lab/working/OSFR.Client/OSFR Client/Resources/Models.txt:11 and to client-assets catalog.tsv:23867 (pack_06/003430.adr). Kill target of q3160032 objective 1.0 (lab/references/quest-lines/wiring/enemy-rows-needed.json). Level 13, health 1020 and damage 62 follow the existing final-era tier ladder (W58 rows: level 5 180/15, 9 260/23, 13 340/31; boss 5 540/30, 9 780/46, 13 1020/62) and the other combat fields are the existing prototype defaults. (R) T737 video fit: Haunted Mines is a difficulty-5 dungeon (data/content/dungeons/haunted_mines.json); the two level-20 Ninjas at X6zfuEFRcQk 188-212s read 61,741 health over 24.4 s (about 25 basic hits), and level 20 x 14.27 x 3.72 x 1020 = 54,147, 23 basics."
     },
     {
       "id": "queen_arachnia",
