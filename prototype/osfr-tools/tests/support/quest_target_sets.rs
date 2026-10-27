@@ -42,9 +42,9 @@
 //! * `profiles`: the `profiles.json` `profiles[].id` rows `Profiles::load` owns
 //!   (it exposes no id list), read from the profile content root: the opening
 //!   content the session ranks jobs from, not the quest catalogue root.
-//! * `pet_tricks`: the `pets.json` `tricks[].id` rows `PetContent` loads (its
-//!   trick rows are private to the crate, so the raw authored ids are read, like
-//!   `encounters.json` above). A `perform_pet_trick` target must be one of them.
+//! * `pet_tricks`: `PetContent`'s authored `tricks[].id` rows, read through its
+//!   accessor from the bundled `pets.json` the pet service serves. A
+//!   `perform_pet_trick` target must be one of them.
 
 use super::quest_records::as_u32;
 use osfr_tools::{
@@ -53,6 +53,7 @@ use osfr_tools::{
     harvesting,
     inventory::Inventory,
     mining::{self, Type8Engine},
+    pets::PetContent,
     recipes::{CraftingJob, RecipeCatalog},
     soccer_entry,
 };
@@ -230,13 +231,11 @@ impl Targets {
                 .nodes
                 .extend(nodes.pickup_kinds().into_iter().map(str::to_owned));
         }
-        // T788: `PetContent` owns `pets.json` but keeps its trick rows private, so the
-        // authored trick ids are read raw; an absent file yields none (every target fails).
+        // T788: `PetContent` owns the trick table and the server serves it bundled, so the gate
+        // reads the ids production does instead of re-parsing `pets.json`.
         targets
             .pet_tricks
-            .extend(read_ids(root, "pets.json", |document| {
-                array_ids(document, "tricks", "id")
-            }));
+            .extend(PetContent::bundled()?.trick_ids());
         Ok(targets)
     }
 }

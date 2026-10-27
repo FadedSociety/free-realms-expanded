@@ -952,7 +952,7 @@ fn unknown_trick_id_is_rejected_at_load() {
     let catalogue = Catalogue::load(clean.path()).expect("the clean fixture loads");
     assert!(
         catalogue.targets.pet_tricks.contains(&FIXTURE_PET_TRICK),
-        "the fixture pets.json declares its trick id"
+        "the bundled pets.json declares the fixture trick id"
     );
     assert!(
         catalogue.target_violations().is_empty(),
@@ -993,6 +993,35 @@ fn unknown_trick_id_is_rejected_at_load() {
     assert!(
         Catalogue::load(zero.path()).is_err(),
         "from_split_content must reject a zero trick id"
+    );
+}
+
+/// T788: every authored `perform_pet_trick` step, including the ten disabled Pet Trainer records
+/// the reachability gate skips, names a bundled `pets.json` trick id. The enabled gate only
+/// resolves reachable enabled quests, so a typo in a disabled record would otherwise ship.
+#[test]
+fn every_authored_pet_trick_step_names_a_bundled_trick() {
+    let root = content_dir();
+    let targets = Targets::load(&root, &reference_content()).expect("the target sets load");
+    let mut steps = 0;
+    for quest in read_quests(&root) {
+        for goal in &quest.objectives {
+            if goal["kind"].as_str() != Some("perform_pet_trick") {
+                continue;
+            }
+            steps += 1;
+            let trick = as_u32(&goal["trick_id"]).unwrap_or(0);
+            assert!(
+                targets.pet_tricks.contains(&trick),
+                "quest {} objective {}: trick {trick} is not a bundled pets.json trick id",
+                quest.id,
+                goal["id"].as_u64().unwrap_or(0)
+            );
+        }
+    }
+    assert!(
+        steps >= 13,
+        "the authored pet-trick steps shrank to {steps}; the disabled records are no longer covered"
     );
 }
 

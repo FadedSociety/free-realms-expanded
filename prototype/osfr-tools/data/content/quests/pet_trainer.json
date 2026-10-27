@@ -218,7 +218,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says 'your pet', so this id is the classic dog row; the same-named rows other species carry (their own ids) are not covered by one trick id, which is the documented gap."
+              "evidence": "(R) T788: count 1 per step; the objective text names the trick but no count, so one accepted perform per step is reconstructed. The objective text says 'your pet', so this id is the classic dog row; the same-named rows other species carry (their own ids) are not covered by one trick id, which is the documented gap."
             }
           ]
         }
@@ -340,7 +340,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says dog, and id 11 is the dog rows' 'Sit Up'."
+              "evidence": "(R) T788: count 1 per step; the objective text names the trick but no count, so one accepted perform per step is reconstructed. The objective text says dog, and id 11 is the dog rows' 'Sit Up'."
             }
           ]
         }
@@ -412,7 +412,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says cat, and id 3001 is the cat rows' 'Jump'."
+              "evidence": "(R) T788: count 1 per step; the objective text names the trick but no count, so one accepted perform per step is reconstructed. The objective text says cat, and id 3001 is the cat rows' 'Jump'."
             }
           ]
         }
@@ -601,7 +601,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says dog, and id 16 is the dog rows' 'Peek-a-boo'."
+              "evidence": "(R) T788: count 1 per step; the objective text names the trick but no count, so one accepted perform per step is reconstructed. The objective text says dog, and id 16 is the dog rows' 'Peek-a-boo'."
             }
           ]
         },
@@ -689,7 +689,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says dog, and id 12 is the dog rows' 'Roll Over'. June Bug is a dog, so the same id covers the borrowed pet."
+              "evidence": "(R) T788: count 1 per step; the objective text names the trick but no count, so one accepted perform per step is reconstructed. The objective text says dog, and id 12 is the dog rows' 'Roll Over'. June Bug is a dog, so the same id covers the borrowed pet."
             }
           ]
         }
@@ -761,7 +761,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says cat, and id 3003 is the cat rows' 'Box'."
+              "evidence": "(R) T788: count 1 per step; the objective text names the trick but no count, so one accepted perform per step is reconstructed. The objective text says cat, and id 3003 is the cat rows' 'Box'."
             }
           ]
         }
@@ -996,7 +996,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective says 'your pet' and the offer text says both cats and dogs can do Handstand; id 14 is the dog rows' Handstand (cats use 3000), so a cat cannot credit this id (documented gap)."
+              "evidence": "(R) T788: count 1 per step; the objective text names the trick but no count, so one accepted perform per step is reconstructed. The objective says 'your pet' and the offer text says both cats and dogs can do Handstand; id 14 is the dog rows' Handstand (cats use 3000), so a cat cannot credit this id (documented gap)."
             }
           ]
         }
@@ -1068,7 +1068,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says cat, and id 3004 is the cat rows' 'Spin'. The offer text calls Spin cat-only."
+              "evidence": "(R) T788: count 1 per step; the objective text names the trick but no count, so one accepted perform per step is reconstructed. The objective text says cat, and id 3004 is the cat rows' 'Spin'. The offer text calls Spin cat-only."
             }
           ]
         }
@@ -1357,7 +1357,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says 'your pet', so this id is the classic dog row; the same-named rows other species carry (their own ids) are not covered by one trick id, which is the documented gap."
+              "evidence": "(R) T788: count 1 per step; the objective text names the trick but no count, so one accepted perform per step is reconstructed. The objective text says 'your pet', so this id is the classic dog row; the same-named rows other species carry (their own ids) are not covered by one trick id, which is the documented gap."
             }
           ]
         }
@@ -1549,7 +1549,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T788: count 1 from the singular trick in the objective text. Part 1 of 4 in the objective text's order (Speak, Handstand, Play Dead, Dance); the split loader runs steps in order."
+              "evidence": "(R) T788: count 1 per step; the objective text names the trick but no count, so one accepted perform per step is reconstructed. One ordered step per named trick, part 1 of 4 in the objective text's order (Speak, Handstand, Play Dead, Dance); the split loader runs steps in order."
             }
           ]
         },
@@ -1570,7 +1570,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T788: count 1 from the singular trick in the objective text. Part 2 of 4; id 14 is the dog rows' Handstand."
+              "evidence": "(R) T788: count 1 per step; the objective text names the trick but no count, so one accepted perform per step is reconstructed. One ordered step per named trick, part 2 of 4; id 14 is the dog rows' Handstand."
             }
           ]
         },
@@ -1591,7 +1591,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T788: count 1 from the singular trick in the objective text. Part 3 of 4; id 15 is the dog rows' Play Dead."
+              "evidence": "(R) T788: count 1 per step; the objective text names the trick but no count, so one accepted perform per step is reconstructed. One ordered step per named trick, part 3 of 4; id 15 is the dog rows' Play Dead."
             }
           ]
         },
@@ -1612,7 +1612,7 @@
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T788: count 1 from the singular trick in the objective text. Part 4 of 4; id 13 is the dog rows' Dance."
+              "evidence": "(R) T788: count 1 per step; the objective text names the trick but no count, so one accepted perform per step is reconstructed. One ordered step per named trick, part 4 of 4; id 13 is the dog rows' Dance."
             }
           ]
         }

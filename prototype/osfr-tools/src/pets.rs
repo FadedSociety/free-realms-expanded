@@ -583,6 +583,13 @@ impl PetContent {
         self.models.iter().find(|model| model.model_id == model_id)
     }
 
+    /// T788: the trick ids a `perform_pet_trick` objective may name. `validate` already proved
+    /// them unique and non-zero, and the quest engine reads this table instead of re-parsing the
+    /// JSON, so a schema change cannot leave the reachability gate on a stale copy.
+    pub fn trick_ids(&self) -> impl Iterator<Item = u32> + '_ {
+        self.tricks.iter().map(|trick| trick.id)
+    }
+
     pub fn item(&self, item_id: i32) -> Option<&PetItem> {
         self.items.iter().find(|item| item.item_id == item_id)
     }

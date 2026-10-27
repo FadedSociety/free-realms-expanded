@@ -19,7 +19,7 @@ use npc_quest_chain::{CHARACTER, Fixture};
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::Gameplay,
-    pets::{PetBusy, PetContent, PetRequest, PetService, PetTrickAnimation, PetWire},
+    pets::{PetBusy, PetContent, PetRequest, PetService, PetWire},
     world_events::piece_052::animation_packet,
 };
 use pet_inventory::InventoryFixture;
@@ -33,19 +33,6 @@ const TRICK: u32 = 11;
 /// A vanity Pet Pal (T454).
 const CRAB_ITEM: i32 = 7885;
 const DISMISS: [u8; 8] = [53, 0, 4, 0, 0, 0, 0, 0];
-
-/// The shipped animation row of the dog for `trick`.
-fn row(trick: u32) -> PetTrickAnimation {
-    PetContent::bundled()
-        .unwrap()
-        .model(364)
-        .unwrap()
-        .trick_animations
-        .iter()
-        .find(|row| row.trick_id == trick)
-        .unwrap()
-        .clone()
-}
 
 /// The shipped `care.trick` number `key`.
 fn rule(key: &str) -> u64 {
@@ -88,11 +75,15 @@ fn unlocks(pet: u32, trick: u32) -> Vec<Vec<u8>> {
 }
 
 fn owner_animation(trick: u32) -> Vec<u8> {
-    animation_packet(OWNER, row(trick).owner_animation_id, false)
+    animation_packet(OWNER, trick_row(trick).owner_animation_id, false)
 }
 
 fn pet_animation(trick: u32) -> Vec<u8> {
-    animation_packet(PetService::pet_guid(OWNER), row(trick).animation_id, false)
+    animation_packet(
+        PetService::pet_guid(OWNER),
+        trick_row(trick).animation_id,
+        false,
+    )
 }
 
 /// Every trick packet in `packets`, in order: 53/15, 53/20 and 35/8.
@@ -173,8 +164,8 @@ fn trick_requests_decode_with_exact_lengths() {
 fn a_known_trick_runs_kind_1_lock_owner_animation_pet_animation_then_the_result_and_the_unlocks() {
     let (mut service, mut fixture, pet) = ready();
     let (delay, run) = (
-        row(TRICK).start_delay_ms as u64,
-        row(TRICK).duration_ms as u64,
+        trick_row(TRICK).start_delay_ms as u64,
+        trick_row(TRICK).duration_ms as u64,
     );
     let start = START + 1_000;
 
@@ -324,7 +315,7 @@ fn a_vanity_pet_is_refused_even_with_a_trick_row_forced_onto_its_model() {
     // model a trick and an animation row, then ask. Only the vanity rule can refuse it.
     let probe = PetContent::bundled().unwrap();
     let crab_model = probe.model_id(&probe.definition_for_item(CRAB_ITEM).unwrap().model);
-    let template = row(TRICK);
+    let template = trick_row(TRICK);
     let content = content_with(|document| {
         let model = model_row(document, i64::from(crab_model));
         model["tricks"] = json!([{"id": TRICK, "known": true}]);
@@ -430,8 +421,8 @@ fn without_the_trick_rules_every_perform_is_refused() {
 fn a_perform_during_another_trick_is_refused_and_the_first_trick_runs_on() {
     let (mut service, mut fixture, pet) = ready();
     let (delay, run) = (
-        row(TRICK).start_delay_ms as u64,
-        row(TRICK).duration_ms as u64,
+        trick_row(TRICK).start_delay_ms as u64,
+        trick_row(TRICK).duration_ms as u64,
     );
     let start = START + 1_000;
     send(&mut service, &mut fixture, &perform_trick(TRICK), start);
@@ -500,8 +491,8 @@ fn a_perform_during_another_trick_is_refused_and_the_first_trick_runs_on() {
 fn a_gesture_report_for_the_running_trick_ends_it_only_once_the_pet_animation_began() {
     let (mut service, mut fixture, pet) = ready();
     let (delay, run) = (
-        row(TRICK).start_delay_ms as u64,
-        row(TRICK).duration_ms as u64,
+        trick_row(TRICK).start_delay_ms as u64,
+        trick_row(TRICK).duration_ms as u64,
     );
     let start = START + 1_000;
     send(&mut service, &mut fixture, &perform_trick(TRICK), start);
@@ -553,8 +544,8 @@ fn a_gesture_report_for_the_running_trick_ends_it_only_once_the_pet_animation_be
 fn a_gesture_report_for_a_different_trick_is_ignored() {
     let (mut service, mut fixture, pet) = ready();
     let (delay, run) = (
-        row(TRICK).start_delay_ms as u64,
-        row(TRICK).duration_ms as u64,
+        trick_row(TRICK).start_delay_ms as u64,
+        trick_row(TRICK).duration_ms as u64,
     );
     let start = START + 1_000;
     send(&mut service, &mut fixture, &perform_trick(TRICK), start);
@@ -585,8 +576,8 @@ fn a_gesture_report_for_a_different_trick_is_ignored() {
 fn a_late_gesture_report_is_answered_with_the_unlocks_only_within_the_grace_window() {
     let (mut service, mut fixture, pet) = ready();
     let (delay, run) = (
-        row(TRICK).start_delay_ms as u64,
-        row(TRICK).duration_ms as u64,
+        trick_row(TRICK).start_delay_ms as u64,
+        trick_row(TRICK).duration_ms as u64,
     );
     let grace = rule("gesture_grace_ms");
     let start = START + 1_000;
@@ -622,8 +613,8 @@ fn a_late_gesture_report_is_answered_with_the_unlocks_only_within_the_grace_wind
 #[test]
 fn a_dismiss_a_new_summon_water_and_zoning_end_the_trick_with_the_unlocks_and_no_stale_timer() {
     let (delay, run) = (
-        row(TRICK).start_delay_ms as u64,
-        row(TRICK).duration_ms as u64,
+        trick_row(TRICK).start_delay_ms as u64,
+        trick_row(TRICK).duration_ms as u64,
     );
     let start = START + 1_000;
     let end = start + delay + run;
@@ -920,8 +911,8 @@ fn a_trick_runs_through_gameplay_for_the_owner_and_the_viewers() {
     game.adopt_pets(service.document_value()).unwrap();
     game.initialize_world(&who, START).unwrap();
     let (delay, run) = (
-        row(TRICK).start_delay_ms as u64,
-        row(TRICK).duration_ms as u64,
+        trick_row(TRICK).start_delay_ms as u64,
+        trick_row(TRICK).duration_ms as u64,
     );
     let start = START + 1_000;
     let actor = PetService::pet_guid(who.guid);
@@ -936,7 +927,7 @@ fn a_trick_runs_through_gameplay_for_the_owner_and_the_viewers() {
     let accepted = game
         .handle_in_world(&perform_trick(TRICK), &who, start + 20)
         .unwrap();
-    let owner = animation_packet(who.guid, row(TRICK).owner_animation_id, false);
+    let owner = animation_packet(who.guid, trick_row(TRICK).owner_animation_id, false);
     assert_eq!(
         traffic(&accepted.replies),
         vec![
@@ -948,7 +939,7 @@ fn a_trick_runs_through_gameplay_for_the_owner_and_the_viewers() {
     assert_eq!(traffic(&accepted.nearby), vec![owner]);
     assert!(!accepted.changed);
 
-    let pet_plays = animation_packet(actor, row(TRICK).animation_id, false);
+    let pet_plays = animation_packet(actor, trick_row(TRICK).animation_id, false);
     let at_delay = game
         .pet_tick(&who, start + 20 + delay)
         .expect("a pet is out");

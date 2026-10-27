@@ -25,13 +25,15 @@ mod pet_inventory;
 mod pet_wire;
 
 use npc_quest_chain::{
-    ADVENTURER, CHARACTER, Fixture, accept, character_at_for, content_dir, counts, finish_quest,
-    offer, pending_turnin, quest_status, read_json, release_end_screen, saved, send, talk,
+    ADVENTURER, CHARACTER, Fixture, QUEST_CHOICE, accept, character_at_for, content_dir,
+    content_position, counts, dialogue_choice, finish_quest, gateway_send, gateway_talk,
+    has_family, offer, pending_turnin, quest_reply, quest_status, read_json, release_end_screen,
+    saved, send, talk,
 };
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::{Gameplay, Outcome},
-    pets::{PetContent, PetTrickAnimation},
+    gateway::Gateway,
     quest_engine::QuestStatus,
 };
 use pet_wire::{perform_trick, summon};
@@ -41,7 +43,8 @@ use std::fs;
 /// The disabled Pet Trainer record under test: Roscoe's dog trick "Sit Up".
 const QUEST: u32 = 3_120_007;
 /// Roscoe in `data/content/npcs/sanctuary.json`; his extra spawn keeps the same runtime guid
-/// (`npc_spawns_extra.json` `spawn_guid`), so the menu actor is the content NPC id.
+/// (`npc_spawns_extra.json` `spawn_guid`) and the same position, so the shared
+/// `content_position` helper reads the one interaction spot.
 const GIVER: u64 = 9_000_000_184;
 /// The quest's end text (locale 90033): "Great! You're becoming a better pet trainer!".
 const END_TEXT: u32 = 90033;
@@ -51,8 +54,6 @@ const TRICK: u32 = 11;
 const OTHER_TRICK: u32 = 12;
 /// A trick id no `pets.json` row has.
 const UNKNOWN_TRICK: u32 = 999_999;
-/// The bundled dog's model (`data/content/pets.json` models row 364).
-const DOG_MODEL: i32 = 364;
 /// A chess activity row in the shipped `data/content/chess.json`; entering it closes the
 /// occupation table's pets gate.
 const CHESS_ROW: u32 = 20;
@@ -101,19 +102,6 @@ fn fixture(count: Option<u32>) -> Fixture {
     fixture
 }
 
-/// The content row position Roscoe is talked to at. The player stands at the row, so the 12 m
-/// interaction radius always holds; the row's regional zone label is inside the one world zone.
-fn giver_position() -> [f32; 3] {
-    let document = read_json(&content_dir().join("npc_spawns_extra.json"));
-    let row = document["records"]
-        .as_array()
-        .expect("npc_spawns_extra records")
-        .iter()
-        .find(|row| row["spawn_guid"].as_u64() == Some(GIVER))
-        .expect("Roscoe has an extra spawn");
-    serde_json::from_value(row["position"].clone()).expect("Roscoe has a position")
-}
-
 /// A game that owns one adopted dog and has accepted the quest under test.
 fn armed(count: Option<u32>) -> (Fixture, Gameplay, CharacterState, u32) {
     let fixture = fixture(count);
@@ -121,7 +109,8 @@ fn armed(count: Option<u32>) -> (Fixture, Gameplay, CharacterState, u32) {
     let mut game = fixture.game(None);
     game.adopt_pets(service.document_value())
         .expect("the dog roster loads");
-    let who = character_at_for(CHARACTER, 0, giver_position());
+    // The player stands at Roscoe's shipped row, so the 12 m interaction radius always holds.
+    let who = character_at_for(CHARACTER, 0, content_position("sanctuary.json", GIVER));
     let mut now = START;
     offer(&mut game, &who, GIVER, QUEST, now);
     accept(&mut game, &who, QUEST, now + 2);
@@ -138,22 +127,9 @@ fn armed(count: Option<u32>) -> (Fixture, Gameplay, CharacterState, u32) {
     (fixture, game, who, pet)
 }
 
-/// The trick's shipped animation row on the dog model.
-fn trick_row(trick: u32) -> PetTrickAnimation {
-    PetContent::bundled()
-        .expect("pets.json loads")
-        .model(DOG_MODEL)
-        .expect("the dog model row")
-        .trick_animations
-        .iter()
-        .find(|row| row.trick_id == trick)
-        .unwrap_or_else(|| panic!("the dog has an animation row for trick {trick}"))
-        .clone()
-}
-
 /// When the running trick has fully ended: its pet animation delay plus its run time.
 fn trick_end(started: u64) -> u64 {
-    let row = trick_row(TRICK);
+    let row = care::trick_row(TRICK);
     started + u64::from(row.start_delay_ms) + u64::from(row.duration_ms)
 }
 
@@ -163,8 +139,8 @@ fn perform(game: &mut Gameplay, who: &CharacterState, trick: u32, now: u64) -> O
 }
 
 /// The server accepted the 53/7: it answered the trick-name line (53/15 kind 1).
-fn accepted(outcome: &Outcome) -> bool {
-    outcome.replies.iter().any(|packet| {
+fn accepted(replies: &[Vec<u8>]) -> bool {
+    replies.iter().any(|packet| {
         packet.len() >= 11
             && packet.starts_with(&[53, 0, 15])
             && u32::from_le_bytes(packet[7..11].try_into().unwrap()) == 1
@@ -210,7 +186,10 @@ fn turn_in(game: &mut Gameplay, who: &CharacterState, now: u64) {
 fn an_accepted_trick_credits_the_quest_objective_and_the_turnin_pays() {
     let (_fixture, mut game, who, _pet) = armed(None);
     let performed = perform(&mut game, &who, TRICK, START + 20);
-    assert!(accepted(&performed), "the dog knows Sit Up and has a row");
+    assert!(
+        accepted(&performed.replies),
+        "the dog knows Sit Up and has a row"
+    );
     assert_eq!(counts(&game, QUEST), [1], "the accepted trick credits once");
     assert!(performed.changed, "crediting the step marks the save");
     assert!(
@@ -252,7 +231,7 @@ fn credit_does_not_wait_for_the_animation() {
         "the result line only comes when the trick's own timer ends"
     );
     assert!(
-        trick_row(TRICK).start_delay_ms > 0,
+        care::trick_row(TRICK).start_delay_ms > 0,
         "the animation is delayed"
     );
 }
@@ -269,19 +248,24 @@ fn each_accepted_perform_counts_once() {
     );
 
     // A second 53/7 while the trick runs is refused by the pet session and credits nothing.
+    let before = saved(&game);
     let during = START + 300;
     let refused = perform(&mut game, &who, TRICK, during);
-    assert!(!accepted(&refused), "a running trick refuses another");
+    assert!(
+        !accepted(&refused.replies),
+        "a running trick refuses another"
+    );
     assert!(
         quest_packets(&refused).is_empty(),
         "the refused perform sends no quest packet"
     );
+    assert_eq!(saved(&game), before, "a running trick changes nothing");
     assert_eq!(counts(&game, QUEST), [1]);
 
     end_trick(&mut game, &who, first);
     let second = trick_end(first) + 1;
     let performed = perform(&mut game, &who, TRICK, second);
-    assert!(accepted(&performed), "the pet is free again");
+    assert!(accepted(&performed.replies), "the pet is free again");
     assert_eq!(
         counts(&game, QUEST),
         [2],
@@ -293,7 +277,10 @@ fn each_accepted_perform_counts_once() {
     end_trick(&mut game, &who, second);
     let before = saved(&game);
     let after = perform(&mut game, &who, TRICK, trick_end(second) + 1);
-    assert!(accepted(&after), "the pet still performs the known trick");
+    assert!(
+        accepted(&after.replies),
+        "the pet still performs the known trick"
+    );
     assert!(
         quest_packets(&after).is_empty(),
         "a completed step sends no update"
@@ -310,7 +297,10 @@ fn perform_after_completion_changes_nothing() {
     end_trick(&mut game, &who, started);
     let completed = saved(&game);
     let again = perform(&mut game, &who, TRICK, trick_end(started) + 1);
-    assert!(accepted(&again), "the trick itself is still allowed");
+    assert!(
+        accepted(&again.replies),
+        "the trick itself is still allowed"
+    );
     assert!(!again.changed, "a completed objective marks no save");
     assert!(
         quest_packets(&again).is_empty(),
@@ -325,7 +315,7 @@ fn other_trick_changes_nothing() {
     let before = saved(&game);
     let performed = perform(&mut game, &who, OTHER_TRICK, START + 500);
     assert!(
-        accepted(&performed),
+        accepted(&performed.replies),
         "the dog knows Roll Over too, so only the objective can refuse it"
     );
     assert!(
@@ -341,7 +331,10 @@ fn unknown_trick_credits_nothing() {
     let (_fixture, mut game, who, _pet) = armed(None);
     let before = saved(&game);
     let refused = perform(&mut game, &who, UNKNOWN_TRICK, START + 600);
-    assert!(!accepted(&refused), "no model row declares this trick");
+    assert!(
+        !accepted(&refused.replies),
+        "no model row declares this trick"
+    );
     assert!(
         quest_packets(&refused).is_empty(),
         "an unknown trick sends no quest packet"
@@ -372,7 +365,10 @@ fn blocked_pet_credits_nothing() {
 
     let before = saved(&game);
     let refused = perform(&mut game, &who, TRICK, START + 710);
-    assert!(!accepted(&refused), "a blocked pet refuses the trick");
+    assert!(
+        !accepted(&refused.replies),
+        "a blocked pet refuses the trick"
+    );
     assert!(
         quest_packets(&refused).is_empty(),
         "a blocked pet sends no quest packet"
@@ -381,41 +377,75 @@ fn blocked_pet_credits_nothing() {
     assert_eq!(saved(&game), before, "a blocked pet changes nothing");
 }
 
+/// Open and accept the quest through the real gateway path: the 26/8 click, the 26/10 Talk row,
+/// the 26/6 offer choice and the 49/2 accept. The gateway stages and commits the accepted state.
+fn accept_through_gateway(gateway: &mut Gateway, now: u64) {
+    let dialogue = gateway_talk(gateway, GIVER, now);
+    assert!(
+        dialogue
+            .iter()
+            .any(|packet| packet.starts_with(&[26, 0, 3, 0])),
+        "Talk opens the 26/3 dialogue"
+    );
+    let offered = gateway_send(gateway, &dialogue_choice(QUEST_CHOICE), now + 2);
+    assert!(
+        offered
+            .iter()
+            .any(|packet| packet.starts_with(&[49, 0, 1, 0])),
+        "the 26/6 choice offers the Pet Trainer record"
+    );
+    let accepted = gateway_send(gateway, &quest_reply(QUEST, true), now + 4);
+    assert!(
+        accepted
+            .iter()
+            .any(|packet| has_family(packet, 49, 3, Some(QUEST))),
+        "the 49/2 accept sends QuestAdd"
+    );
+}
+
 #[test]
 fn another_players_pet_does_not_credit_me() {
     let fixture = fixture(None);
-    let (service, _pet) = care::dog();
-    let mut mine = fixture.game(None);
-    mine.adopt_pets(service.document_value()).unwrap();
-    let who = character_at_for(CHARACTER, 0, giver_position());
-    offer(&mut mine, &who, GIVER, QUEST, START);
-    accept(&mut mine, &who, QUEST, START + 2);
-    let before = saved(&mine);
+    let at = content_position("sanctuary.json", GIVER);
+    // Two real sessions at Roscoe; each owns its own quest ledger and accepts the record.
+    let mut mine = fixture.session(CHARACTER, at, None);
+    accept_through_gateway(&mut mine, START);
+    let mut theirs = fixture.session(CHARACTER + 1, at, None);
+    accept_through_gateway(&mut theirs, START + 10);
 
-    // The other session owns its own dog and performs the same trick at the same spot.
-    let other = CHARACTER + 1;
+    // The first session holds its accepted quest and has summoned no pet.
+    let before = saved(mine.gameplay().expect("the session has gameplay"));
+    assert_eq!(counts(mine.gameplay().unwrap(), QUEST), [0]);
+
+    // The other session's own dog performs the same trick at the same spot.
     let (other_service, other_pet) = care::dog();
-    let mut theirs = fixture.game_as(other, None);
     theirs
         .adopt_pets(other_service.document_value())
         .expect("the other dog roster loads");
-    let their_who = character_at_for(other, 0, giver_position());
-    let summoning = send(&mut theirs, &their_who, &summon(other_pet), START + 10);
+    let summoning = gateway_send(&mut theirs, &summon(other_pet), START + 20);
     assert!(
         summoning
-            .replies
             .iter()
-            .any(|packet| packet.starts_with(&[53, 0, 9]))
+            .any(|packet| packet.starts_with(&[53, 0, 9])),
+        "the other dog is summoned (53/9 PetActive, reader 00b556c0)"
     );
-    let performed = perform(&mut theirs, &their_who, TRICK, START + 20);
-    assert!(accepted(&performed), "the other player's dog performs");
+    let performed = gateway_send(&mut theirs, &perform_trick(TRICK), START + 30);
+    assert!(
+        accepted(&performed),
+        "the other player's dog performs the accepted trick"
+    );
+    assert_eq!(
+        counts(theirs.gameplay().unwrap(), QUEST),
+        [1],
+        "the trick credits the performing owner's accepted objective"
+    );
 
     assert_eq!(
-        saved(&mine),
+        saved(mine.gameplay().unwrap()),
         before,
         "another player's pet performs on their own session"
     );
-    assert_eq!(counts(&mine, QUEST), [0]);
+    assert_eq!(counts(mine.gameplay().unwrap(), QUEST), [0]);
 }
 
 #[test]

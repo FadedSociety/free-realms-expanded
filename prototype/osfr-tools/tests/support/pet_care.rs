@@ -5,7 +5,7 @@
 #![allow(dead_code)] // each includer uses a subset
 
 use super::{json, pet_inventory::InventoryFixture, pet_wire};
-use osfr_tools::pets::{PetBusy, PetContent, PetService, PetWire};
+use osfr_tools::pets::{PetBusy, PetContent, PetService, PetTrickAnimation, PetWire};
 use serde_json::Value;
 use std::{io, path::Path};
 
@@ -71,6 +71,21 @@ pub fn model_pet(content: PetContent, model_id: i32) -> (PetService, u32) {
     definition.model = content.model(model_id).unwrap().adr.clone();
     let id = service.adopt_vendor_grant(1, &definition, 0).unwrap();
     (service, id)
+}
+
+/// The shipped animation row of the dog (model 364) for `trick`. The trick and pet-trick
+/// objective suites both time a trick from it, so a content edit that drops the model or the row
+/// fails every suite that performs a trick.
+pub fn trick_row(trick: u32) -> PetTrickAnimation {
+    PetContent::bundled()
+        .expect("pets.json loads")
+        .model(364)
+        .expect("the dog model row")
+        .trick_animations
+        .iter()
+        .find(|row| row.trick_id == trick)
+        .unwrap_or_else(|| panic!("the dog has an animation row for trick {trick}"))
+        .clone()
 }
 
 /// The shipped `pets.json` document.
