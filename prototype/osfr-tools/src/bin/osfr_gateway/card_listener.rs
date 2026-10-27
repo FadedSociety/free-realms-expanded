@@ -1,14 +1,15 @@
 //! T770: the Card Duelist card service, a TCP listener beside the UDP gateway. The card window
 //! (`tcg/FreeRealmsTCG.dll`) asks 414 for its connection server (answered with this listener),
 //! then logs in with 411; the login's launch ticket and character id are redeemed once in the
-//! session that minted the ticket (T764/T765). Commands after login are logged, not answered
-//! yet. Off unless the card content's launch block names a port.
+//! session that minted the ticket (T764/T765). T808: a refused login is closed once its 81 is
+//! written; after login the client's ping (112) is echoed. Other commands are logged, not
+//! answered yet. Off unless the card content's launch block names a port.
 //!
 //! T782: every step prints one JSON event line (`events`, drained by `Server::poll_card`):
 //! `card_connected`, `card_gateway_request` (a 414 answered), `card_login` (a 411: `ok`, the
 //! character on success, else the refusal `reason`; T805: also the 411's `version` and field
-//! `lengths`), `card_command_unhandled` and `card_closed` with its reason. A ticket or session id
-//! is never in an event.
+//! `lengths`), `card_ping` (T808: a ping echoed), `card_command_unhandled` and `card_closed` with
+//! its reason. A ticket or session id is never in an event.
 use super::*;
 use osfr_tools::card_service;
 use serde_json::Value;
@@ -20,7 +21,7 @@ const MAX_CONNECTIONS: usize = 16;
 const MAX_PER_ADDRESS: usize = 4;
 /// (R) A connection that has not logged in this long after opening is closed.
 const LOGIN_DEADLINE_MS: u64 = 30_000;
-/// (R) Unhandled commands, and answered 414/411 requests, logged per connection (each count
+/// (R) Unhandled commands, and answered 414/411/ping requests, logged per connection (each count
 /// apart), so a chatty client cannot fill the log.
 const LOGGED_PER_KIND: u32 = 16;
 
@@ -168,7 +169,8 @@ impl Connection {
                 Err(_) => return Some("bad_frame"),
             };
             let mut login = None;
-            let reply = card_service::reply(&body, host, port, |l| {
+            let logged_in = self.character.is_some();
+            let reply = card_service::reply(&body, host, port, logged_in, |l| {
                 let redeemed = redeem(&l.ticket, &l.character_id);
                 // T805: the 411's shape for its event: lengths only, never a value.
                 let lengths = json!({
@@ -176,19 +178,23 @@ impl Connection {
                     "character_id":l.character_id.len(),"ticket":l.ticket.len()
                 });
                 login = Some((redeemed, l.version, lengths));
-                // (R) The account id the 81 carries: the character's 31-bit slot.
-                redeemed.ok().map(|guid| (guid & 0x7fff_ffff) as i32)
+                redeemed.ok()
             });
             match reply {
                 // ponytail: replies are a few dozen bytes, so a full send buffer means a dead
                 // peer; a write queue comes with the lobby's larger messages.
                 Ok(Some(frame)) => {
-                    let character = login.as_ref().and_then(|(redeemed, ..)| redeemed.ok());
+                    let redeemed = login.as_ref().map(|(redeemed, ..)| *redeemed);
                     self.log_answer(&body, login, host, port, events);
                     if self.stream.write_all(&frame).is_err() {
                         return Some("write_failed");
                     }
-                    self.character = self.character.or(character);
+                    match redeemed {
+                        // T808: the refused 81 is written; the client shows it, nothing follows.
+                        Some(Err(_)) => return Some("login_refused"),
+                        Some(Ok(character)) => self.character = self.character.or(Some(character)),
+                        None => {}
+                    }
                 }
                 Ok(None) => {
                     self.unhandled += 1;
@@ -224,6 +230,9 @@ impl Connection {
                 "event":"card_login","peer":peer,"ok":redeemed.is_ok(),"character":redeemed.ok(),
                 "reason":redeemed.err(),"version":version,"lengths":lengths
             }),
+            (Ok(card_service::PING), _) => {
+                json!({"event":"card_ping","peer":peer,"character":self.character})
+            }
             _ => return,
         };
         self.answered += 1;
@@ -412,14 +421,15 @@ pub(super) mod tests {
         body
     }
 
-    /// Send one login and return the 81's success flag and account id, plus what redeem saw.
+    /// Send one login and return the 81's success flag, code and account id, plus what redeem
+    /// saw.
     fn log_in(
         card: &mut CardListener,
         client: &mut TcpStream,
         character_id: &str,
         ticket: &str,
         accept: Result<u64, &'static str>,
-    ) -> (bool, i32, Vec<(String, String)>) {
+    ) -> (bool, i32, i32, Vec<(String, String)>) {
         client
             .write_all(&frame(true, &session_login(character_id, ticket)))
             .unwrap();
@@ -440,9 +450,9 @@ pub(super) mod tests {
         let mut results = card_service::Reader::new(&body);
         results.headers(81).unwrap();
         let success = results.int().unwrap() != 0;
-        let _code = results.int().unwrap();
+        let code = results.int().unwrap();
         let account = results.int().unwrap();
-        (success, account, seen)
+        (success, code, account, seen)
     }
 
     #[test]
@@ -451,21 +461,68 @@ pub(super) mod tests {
             return;
         }
         let mut card = listener();
-        let mut client = client(&card);
-        let (ok, account, seen) = log_in(&mut card, &mut client, "5041", "77", refuse("", ""));
-        assert!(!ok, "a ticket no session minted is refused");
-        assert_eq!(account, 0);
-        assert_eq!(seen, [("77".to_owned(), "5041".to_owned())]);
-        assert_eq!(card.connections[0].character, None);
-
-        let guid = (1u64 << 40) | 5041;
-        let (ok, account, _) = log_in(&mut card, &mut client, &guid.to_string(), "78", Ok(guid));
-        assert!(ok);
+        let mut refused = client(&card);
+        let (ok, code, account, seen) =
+            log_in(&mut card, &mut refused, "5041", "77", refuse("", ""));
         assert_eq!(
-            account, 5041,
-            "the account id is the character's low 31 bits"
+            (ok, code, account),
+            (false, 63, 0),
+            "refused with 63, \"Your session is not valid.\""
         );
+        assert_eq!(seen, [("77".to_owned(), "5041".to_owned())]);
+        // T808: the refused connection is closed once its 81 is written, not at the deadline.
+        assert_eq!(closed(&card), ["login_refused"]);
+        assert_eq!(
+            refused.read(&mut [0; 1]).unwrap(),
+            0,
+            "the client sees the close"
+        );
+
+        // T808: a guid whose low 31 bits are 0 still gets a non-zero account id.
+        let guid = 1u64 << 31;
+        let mut accepted = client(&card);
+        let (ok, code, account, _) =
+            log_in(&mut card, &mut accepted, &guid.to_string(), "78", Ok(guid));
+        assert_eq!((ok, code), (true, 0));
+        assert_ne!(account, 0, "account id 0 crashes the client");
+        assert_eq!(account, card_service::account_id(guid));
         assert_eq!(card.connections[0].character, Some(guid));
+    }
+
+    /// T808: the client's ping as its writer `10190020` builds it: one header (112, 1), then the
+    /// spoof value.
+    fn ping(spoof: i32) -> Vec<u8> {
+        [int(112), int(1), int(spoof)].concat()
+    }
+
+    #[test]
+    fn a_card_ping_is_echoed_once_logged_in() {
+        if !test_support::bin_test_target("card") {
+            return;
+        }
+        let mut card = listener();
+        let mut stranger = client(&card);
+        stranger.write_all(&frame(true, &ping(7))).unwrap();
+        wait_for(&mut card, "card_command_unhandled");
+        let unhandled = card
+            .events
+            .iter()
+            .find(|e| e["event"] == "card_command_unhandled");
+        assert_eq!(unhandled.unwrap()["class"], 112, "no echo before login");
+
+        let mut player = client(&card);
+        log_in(&mut card, &mut player, "", "78", Ok(5041));
+        player.write_all(&frame(true, &ping(1234))).unwrap();
+        // Compact 112 = `20 07`, version `01`, spoof 1234 = `22 4D`.
+        assert_eq!(
+            answer(&mut card, &mut player, 3),
+            [0x20, 0x07, 0x01, 0x22, 0x4D]
+        );
+        let pings = card.events.iter().filter(|e| e["event"] == "card_ping");
+        assert_eq!(
+            pings.map(|e| &e["character"]).collect::<Vec<_>>(),
+            [&json!(5041)]
+        );
     }
 
     #[test]
@@ -643,12 +700,14 @@ pub(super) mod tests {
             return;
         }
         let mut card = listener();
-        let mut client = client(&card);
         let guid = (1u64 << 40) | 5041;
-        log_in(&mut card, &mut client, "", "271828182845", Err("expired"));
+        // T808: a refusal closes its connection, so the second login opens another.
+        let mut refused = client(&card);
+        log_in(&mut card, &mut refused, "", "271828182845", Err("expired"));
+        let mut accepted = client(&card);
         log_in(
             &mut card,
-            &mut client,
+            &mut accepted,
             &guid.to_string(),
             "314159265358",
             Ok(guid),

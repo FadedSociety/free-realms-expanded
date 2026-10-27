@@ -15,6 +15,12 @@ pub const SEND_SESSION_ID: i32 = 411;
 pub const LOGIN_RESULTS: i32 = 81;
 /// The version this server writes 81 at: every field the handler `10179530` uses, no blob.
 const LOGIN_RESULTS_VERSION: i32 = 5;
+/// T808: a refused 81's code, the client's message 63 "Your session is not valid." (message
+/// factory `1038a440`). One code for every refusal: a spent ticket is gone, so it cannot be told
+/// from an unknown one (70, "already been used", would need a spent list).
+const REFUSED: i32 = 63;
+/// `NetworkCommand_Ping` (creator `10190080`, id `1018fdf0`, version 1 `1018fe40`).
+pub const PING: i32 = 112;
 /// The header is written once per class level because `1019de90` is virtual: the command,
 /// its family (Gateway/Login Command) and NetworkCommand.
 const HEADER_LEVELS: usize = 3;
@@ -310,6 +316,35 @@ pub fn login_results(success: bool, code: i32, account_id: i32, session_id: &str
     body
 }
 
+/// T808: the account id an accepted login's 81 carries for `character`. Never 0: the success
+/// handler (`10179530` -> `10068ac0`) stores no player for 0 and `10007ed0` then writes through a
+/// null player. Deterministic per character and positive; the account store's sequential guids
+/// (from 1) map to themselves up to `i32::MAX`.
+pub fn account_id(character: u64) -> i32 {
+    (character.wrapping_sub(1) % i32::MAX as u64 + 1) as i32
+}
+
+/// 112 `NetworkCommand_Ping`: the client sends one at login and every 10 s after (`1037c490`), and
+/// a server copy resets its "no response" counter (execute `1018fe80` -> `10068dd0`), so the
+/// service echoes it. One header, since the class has no family level (writer `10190020` calls
+/// the header writer `1019de90` once; reader `1018ffe0`), then the spoof value.
+fn ping_echo(body: &[u8]) -> io::Result<Vec<u8>> {
+    let mut reader = Reader::new(body);
+    if reader.int()? != PING {
+        return Err(invalid("card ping has the wrong class id"));
+    }
+    reader.int()?;
+    let spoof = reader.int()?;
+    if !reader.finished() {
+        return Err(invalid("card ping has trailing bytes"));
+    }
+    let mut echo = Vec::new();
+    for value in [PING, 1, spoof] {
+        put_int(&mut echo, value);
+    }
+    Ok(echo)
+}
+
 /// The refusal of a ticket no live session holds: never minted, already spent, or its session
 /// ended.
 pub const UNKNOWN_TICKET: &str = "unknown_ticket";
@@ -435,13 +470,15 @@ fn decimal(text: &str) -> Option<u64> {
 }
 
 /// The login stub: answer one client body. A 414 is sent to `host:port` (this service); a 411
-/// is accepted when `account_for` maps the login (its launch ticket and character id) to an
-/// account. Anything else is not handled yet (`None`). Replies are server frames.
+/// is accepted when `character_for` maps the login (its launch ticket and character id) to a
+/// character, whose [`account_id`] the 81 carries; a ping is echoed once `logged_in`. Anything
+/// else is not handled yet (`None`). Replies are server frames.
 pub fn reply(
     body: &[u8],
     host: &str,
     port: u16,
-    account_for: impl FnOnce(&SessionLogin) -> Option<i32>,
+    logged_in: bool,
+    character_for: impl FnOnce(&SessionLogin) -> Option<u64>,
 ) -> io::Result<Option<Vec<u8>>> {
     match class_id(body)? {
         GET_CONNECTION_SERVER => {
@@ -457,13 +494,14 @@ pub fn reply(
         }
         SEND_SESSION_ID => {
             let login = SessionLogin::decode(body)?;
-            let body = match account_for(&login) {
-                Some(account) => login_results(true, 0, account, &login.session_id),
-                // (R) The failure code's text is not recovered; 1 is "refused".
-                None => login_results(false, 1, 0, ""),
+            let body = match character_for(&login) {
+                // Code 0: on success, 76 would open username registration (`103c9750`).
+                Some(character) => login_results(true, 0, account_id(character), &login.session_id),
+                None => login_results(false, REFUSED, 0, ""),
             };
             Ok(Some(server_frame(&body)))
         }
+        PING if logged_in => Ok(Some(server_frame(&ping_echo(body)?))),
         _ => Ok(None),
     }
 }

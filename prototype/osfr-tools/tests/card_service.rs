@@ -132,7 +132,7 @@ fn the_gateway_request_is_unrouted_and_answered_with_this_service() {
         ("w-ticket", "tester", 87)
     );
 
-    let answer = reply(parsed.body, "127.0.0.1", 17782, |_| None)
+    let answer = reply(parsed.body, "127.0.0.1", 17782, false, |_| None)
         .unwrap()
         .unwrap();
     let length = u32::from_be_bytes(answer[..4].try_into().unwrap()) as usize;
@@ -182,7 +182,9 @@ fn login_with(tickets: &mut LaunchTickets, character_id: &str, ticket: &str, now
             .ok()
             .map(|_| 42)
     };
-    reply(&body, "127.0.0.1", 17782, check).unwrap().unwrap()
+    reply(&body, "127.0.0.1", 17782, false, check)
+        .unwrap()
+        .unwrap()
 }
 
 #[test]
@@ -222,9 +224,9 @@ fn a_launch_ticket_logs_its_own_character_in_once() {
         read_results(&answer[4..]),
         (true, 0, 42, "w-session".into())
     );
-    // Single use: the same ticket again is refused.
+    // Single use: the same ticket again is refused, with message 63 "Your session is not valid."
     let again = login_with(&mut tickets, &character, &ticket.to_string(), 3_000);
-    assert_eq!(read_results(&again[4..]), (false, 1, 0, String::new()));
+    assert_eq!(read_results(&again[4..]), (false, 63, 0, String::new()));
     assert_eq!(tickets.outstanding(), 0);
 }
 
@@ -235,7 +237,7 @@ fn a_refused_card_login_changes_nothing_and_the_next_one_still_logs_in() {
     let mut tickets = LaunchTickets::new(TTL_MS);
     let ticket = tickets.mint(CHARACTER, 1_000).unwrap().to_string();
     let refused = login_with(&mut tickets, "Tester", &ticket, 2_000);
-    assert_eq!(read_results(&refused[4..]), (false, 1, 0, String::new()));
+    assert_eq!(read_results(&refused[4..]), (false, 63, 0, String::new()));
     assert_eq!(tickets.outstanding(), 1, "the refusal spent nothing");
     let accepted = login_with(&mut tickets, "", &ticket, 2_500);
     assert_eq!(
@@ -245,7 +247,7 @@ fn a_refused_card_login_changes_nothing_and_the_next_one_still_logs_in() {
     let again = login_with(&mut tickets, "", &ticket, 3_000);
     assert_eq!(
         read_results(&again[4..]),
-        (false, 1, 0, String::new()),
+        (false, 63, 0, String::new()),
         "single use"
     );
 }
@@ -330,6 +332,34 @@ fn a_wrong_character_expired_replaced_or_malformed_ticket_is_refused() {
     assert_eq!(tickets.outstanding(), 1);
 }
 
+/// T808: the account id a success carries is never 0 (the client's handler writes through a null
+/// player for 0), positive, and the identity for the store's sequential guids.
+#[test]
+fn every_character_gets_a_non_zero_account_id() {
+    for (guid, account) in [(1, 1), (5041, 5041), (0x7fff_fffe, 0x7fff_fffe)] {
+        assert_eq!(card_service::account_id(guid), account);
+    }
+    for guid in [0, 0x7fff_ffff, 1 << 31, 1 << 32, (1 << 40) | 5041, u64::MAX] {
+        let account = card_service::account_id(guid);
+        assert!(account > 0, "{guid:#x} -> {account}");
+    }
+}
+
+/// T808: the client's ping (writer `10190020`: one header, then the spoof value) is echoed once
+/// logged in, byte for byte as the client's reader `1018ffe0` reads it; before login it is left
+/// to the caller.
+#[test]
+fn a_ping_is_echoed_only_after_login() {
+    // Compact 112 = `20 07`, version `01`, spoof 1234 = `22 4D`.
+    let ping = [0x20, 0x07, 0x01, 0x22, 0x4D];
+    let echo = reply(&ping, "h", 1, true, |_| None).unwrap().unwrap();
+    assert_eq!(echo, [&[0, 0, 0, 5][..], &ping].concat());
+    assert_eq!(reply(&ping, "h", 1, false, |_| None).unwrap(), None);
+    // A ping the client's reader would not read the same way is an error, never echoed.
+    assert!(reply(&[0x20, 0x07, 0x01, 0x22, 0x4D, 0], "h", 1, true, |_| None).is_err());
+    assert!(reply(&[0x20, 0x07, 0x01], "h", 1, true, |_| None).is_err());
+}
+
 #[test]
 fn a_full_ticket_table_refuses_and_the_next_mint_sweeps_expired_ones() {
     let mut tickets = LaunchTickets::new(TTL_MS);
@@ -372,7 +402,7 @@ fn partial_oversized_unknown_and_malformed_frames() {
 
     // A command this stub does not answer yet (92 LobbyCommand_Join) is left to the caller.
     let lobby = headers(&[0x2C, 0x05], 1);
-    assert_eq!(reply(&lobby, "h", 1, |_| None).unwrap(), None);
+    assert_eq!(reply(&lobby, "h", 1, true, |_| None).unwrap(), None);
     // A 411 with the wrong class id at a later level, or trailing bytes, is refused.
     let mut mixed = session_login("1", "2");
     mixed[3] = 0x2E;
