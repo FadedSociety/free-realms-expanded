@@ -36,10 +36,8 @@ const PET_GUID_TAG: u64 = 0x4000_0000_0000_0000;
 /// T489: 7 (perform trick), 8 (gesture result) and 14 (favourite trick) join them.
 pub const DECODED_SUBTYPES: [u8; 12] = [4, 6, 7, 8, 14, 16, 18, 19, 22, 24, 28, 32];
 /// T485: the client's utility slots are the kit item's definition slot minus 199 (`00c077a0`):
-/// shampoo 200 -> 1 .. vitamins 206 -> 7. Feeding needs the bowl (204) and the food (205).
+/// shampoo 200 -> 1 .. vitamins 206 -> 7. [`KitRole`] owns both directions.
 const UTILITY_SLOT_OFFSET: i32 = 199;
-const BOWL_SLOT: usize = 5;
-const FOOD_SLOT: usize = 6;
 /// T485: the item type of every pet kit row (Legacy ClientItemDefinitions slots 200..206).
 const PET_KIT_TYPE: i32 = 4;
 /// T485: 53/20 PetUtilityNotify kinds (`00b5ce60` switch): begin, end + unlock, unlock.
@@ -75,6 +73,10 @@ pub struct PetContent {
     /// T797: every client item definition with `Type` 4 (the pet kit) in its care-panel slot, with the
     /// client locale name and `Param2`; the care path accepts only items recorded here.
     care_items: Vec<PetCareItem>,
+    /// T797: the pinned client item definitions file the `care_items` rows were read from (path,
+    /// commit, sha256), so a client-data drop knows which revision the kit table copies.
+    #[serde(default)]
+    care_items_source: Option<PetImport>,
     need_policy: NeedPolicy,
     movement_speed: MovementSpeed,
     /// T454: the sources `scripts/pets_import.py` read (path, commit, sha256).
@@ -472,6 +474,15 @@ impl KitRole {
             206 => Some(Self::Vitamin),
             _ => None,
         }
+    }
+
+    /// The fitted utility slot: the definition slot minus [`UTILITY_SLOT_OFFSET`]
+    /// (`00c077a0`), found through [`Self::from_slot`] so the fit and the action cannot
+    /// disagree; the bowl is 5 and the food 6.
+    fn utility_slot(self) -> usize {
+        (UTILITY_SLOT_OFFSET + 1..=UTILITY_SLOT_OFFSET + 7)
+            .find(|slot| Self::from_slot(*slot) == Some(self))
+            .map_or(0, |slot| (slot - UTILITY_SLOT_OFFSET) as usize)
     }
 }
 
@@ -2200,10 +2211,10 @@ impl PetService {
         {
             return None;
         }
-        let bowl = fitted_item(pet, inventory, BOWL_SLOT)?;
+        let bowl = fitted_item(pet, inventory, KitRole::Bowl.utility_slot())?;
         self.is_kit(bowl.definition_id, KitRole::Bowl)
             .then_some(())?;
-        let food = fitted_item(pet, inventory, FOOD_SLOT)?;
+        let food = fitted_item(pet, inventory, KitRole::Food.utility_slot())?;
         self.is_kit(food.definition_id, KitRole::Food)
             .then_some(food.id)
     }

@@ -26,11 +26,6 @@ use std::sync::Arc;
 /// The pet handler's state word while grooming (`00b5ec17`) and while idle (kinds 2, 4, 6).
 const TACTILE_GROOM: u32 = 2;
 const TACTILE_PET: u32 = 0;
-/// Utility slots of the grooming kit: the definition slot minus 199 (`00c077a0`), so shampoo 200
-/// is 1, conditioner 201 is 2 and the brush 203 is 4 (R: the 15 catalogue rows in slot 203).
-const SHAMPOO_SLOT: usize = 1;
-const CONDITIONER_SLOT: usize = 2;
-const BRUSH_SLOT: usize = 4;
 /// The chat line when a full bar ends the session: no client string says it (R, T812; the
 /// locale has only quest-specific lines), so the owner is told in chat.
 const GROOM_DONE: &str = "Your pet is squeaky clean!";
@@ -182,17 +177,17 @@ impl PetService {
         if decayed(policy, pet, true, now_ms / 1_000)?.groom >= policy.maximum {
             return None;
         }
-        fitted_item(pet, inventory, BRUSH_SLOT)
+        fitted_item(pet, inventory, KitRole::Brush.utility_slot())
             .filter(|brush| self.is_kit(brush.definition_id, KitRole::Brush))?;
         // T797: the shampoo and conditioner must be recorded kit items in their slots; the brush
         // above is kept, these two are spent.
-        let consumable = |slot, role| {
-            let item = fitted_item(pet, inventory, slot)?;
+        let consumable = |role: KitRole| {
+            let item = fitted_item(pet, inventory, role.utility_slot())?;
             self.is_kit(item.definition_id, role).then_some(item.id)
         };
         Some((
-            consumable(SHAMPOO_SLOT, KitRole::Shampoo)?,
-            consumable(CONDITIONER_SLOT, KitRole::Conditioner),
+            consumable(KitRole::Shampoo)?,
+            consumable(KitRole::Conditioner),
         ))
     }
 

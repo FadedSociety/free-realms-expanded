@@ -7,7 +7,11 @@
 use super::{json, pet_inventory::InventoryFixture, pet_wire};
 use osfr_tools::pets::{PetBusy, PetContent, PetService, PetTrickAnimation, PetWire};
 use serde_json::Value;
-use std::{io, path::Path};
+use std::{
+    collections::BTreeMap,
+    io,
+    path::{Path, PathBuf},
+};
 
 /// Shipped catalogue rows (lab/reports/item-catalogue-20261015), all class 73: bowl 11 slot 204,
 /// Simple Pet Food 1835 slot 205, Simple Pet Shampoo 1836 slot 200, Basic Pet Conditioner 10521
@@ -90,7 +94,29 @@ pub fn trick_row(trick: u32) -> PetTrickAnimation {
 
 /// The shipped `pets.json` document.
 pub fn pets_json() -> Value {
-    json::read(&Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/pets.json"))
+    json::read(&content_dir().join("pets.json"))
+}
+
+/// The shipped `data/content` root.
+pub fn content_dir() -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
+}
+
+/// A private-lab path (`lab/<path>`): the pinned client tables the pet gates check.
+pub fn lab(path: &str) -> PathBuf {
+    Path::new(env!("CARGO_MANIFEST_DIR"))
+        .join("../../../lab")
+        .join(path)
+}
+
+/// The client locale id -> text table (`lab/reports/locale-id-to-text.json`).
+pub fn locale() -> BTreeMap<i64, String> {
+    json::read(&lab("reports/locale-id-to-text.json"))
+        .as_array()
+        .expect("locale rows are an array")
+        .iter()
+        .filter_map(|row| Some((row["id"].as_i64()?, row["text"].as_str()?.to_owned())))
+        .collect()
 }
 
 /// The shipped content after `edit`, or why it refuses to load.

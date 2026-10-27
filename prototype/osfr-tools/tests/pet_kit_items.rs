@@ -9,7 +9,8 @@
 //! definitions (`lab/reports/round70-.../content/item-catalogue.json`, read through `Inventory`) and
 //! the client locale (`lab/reports/locale-id-to-text.json`). The slot is the client care-panel tab
 //! (`BaseClient.PetInventory` `ShampooData`, `ConditionerData`, `BrushData`, `FoodBowlData`,
-//! `FoodData`, `VitaminData`); `00c077a0` maps it to the utility slot.
+//! `FoodData`, `VitaminData`); `00c077a0` maps it to the utility slot. A public checkout has no
+//! private lab: the client-side gate reports a skip there and the shipped-content checks still run.
 
 #[path = "support/pet_care.rs"]
 mod care;
@@ -22,7 +23,9 @@ mod pet_wire;
 #[path = "common/round70_content.rs"]
 mod round70_content;
 
-use care::{OWNER, T0, fit, notify_kinds, send, statuses, words};
+use care::{
+    OWNER, T0, content_dir, fit, lab, locale, notify_kinds, pets_json, send, statuses, words,
+};
 use osfr_tools::{
     inventory::Inventory,
     pets::{PetEquipmentSlot, PetService},
@@ -31,7 +34,7 @@ use pet_inventory::InventoryFixture;
 use serde_json::Value;
 use std::{
     collections::{BTreeMap, BTreeSet},
-    path::{Path, PathBuf},
+    path::PathBuf,
 };
 
 /// The six client care-panel slots: shampoo, conditioner, brush, food bowl, food and vitamins.
@@ -51,41 +54,32 @@ const SHAMPOO_INSTANCE: i32 = 103;
 /// The client `Resources/AnimationTypes.xml` slot `pet_feed`.
 const PET_FEED_ANIMATION: i32 = 5_507;
 
-fn content_dir() -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content")
-}
-
-fn lab(path: &str) -> PathBuf {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-        .join("../../../lab")
-        .join(path)
-}
-
 fn kit_rows() -> Vec<Value> {
-    json::read(&content_dir().join("pets.json"))["care_items"]
+    pets_json()["care_items"]
         .as_array()
         .expect("care_items is an array")
         .clone()
 }
 
-fn client_kit_items() -> Vec<Value> {
-    json::read(&lab(
-        "references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json",
-    ))
-    .as_array()
-    .expect("client item definitions are an array")
-    .iter()
-    .filter(|row| row["Type"].as_i64() == Some(4))
-    .cloned()
-    .collect()
+/// The pinned client item definitions file: absent in a public checkout.
+fn client_items_path() -> PathBuf {
+    lab("references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json")
 }
 
-fn locale() -> BTreeMap<i64, String> {
-    json::read(&lab("reports/locale-id-to-text.json"))
+/// Whether every private table the client-side gate reads is present.
+fn client_tables() -> bool {
+    client_items_path().is_file()
+        && lab("reports/locale-id-to-text.json").is_file()
+        && round70_content::source().is_dir()
+}
+
+fn client_kit_items() -> Vec<Value> {
+    json::read(&client_items_path())
         .as_array()
-        .expect("locale rows are an array")
+        .expect("client item definitions are an array")
         .iter()
-        .filter_map(|row| Some((row["id"].as_i64()?, row["text"].as_str()?.to_owned())))
+        .filter(|row| row["Type"].as_i64() == Some(4))
+        .cloned()
         .collect()
 }
 
@@ -140,6 +134,10 @@ fn animations(packets: &[Vec<u8>]) -> Vec<(u64, i32, u8)> {
 
 #[test]
 fn every_client_pet_kit_item_is_recorded_with_its_slot_name_and_param() {
+    if !client_tables() {
+        eprintln!("skipped: the private client kit tables are absent");
+        return;
+    }
     let catalogue = catalogue();
     let locale = locale();
     let rows = kit_rows();
@@ -199,7 +197,7 @@ fn every_client_pet_kit_item_is_recorded_with_its_slot_name_and_param() {
             "item {id} runtime name id"
         );
     }
-    let models = json::read(&content_dir().join("pets.json"));
+    let models = pets_json();
     let model_classes: BTreeSet<i64> = models["models"]
         .as_array()
         .unwrap()
@@ -217,8 +215,6 @@ fn every_client_pet_kit_item_is_recorded_with_its_slot_name_and_param() {
 
 #[test]
 fn both_pet_merchants_stock_every_non_test_kit_item_at_its_client_cost() {
-    let catalogue = catalogue();
-    let locale = locale();
     let rows = kit_rows();
     let by_id: BTreeMap<i64, &Value> = rows
         .iter()
@@ -232,6 +228,15 @@ fn both_pet_merchants_stock_every_non_test_kit_item_at_its_client_cost() {
         .map(|row| (int(row, "item_id"), row))
         .collect();
     let vendors = json::read(&content_dir().join("vendors.json"));
+    // Every stocked kit item carries the client Cost, or the 5-coin (R) floor where that Cost is
+    // 0. A public checkout has no client table, so this half of the gate reports a skip and the
+    // shipped-content checks below still run.
+    let client_costs: Option<BTreeMap<i64, i64>> = client_items_path().is_file().then(|| {
+        client_kit_items()
+            .iter()
+            .map(|row| (int(row, "Id"), row["Cost"].as_i64().unwrap_or(0)))
+            .collect()
+    });
     let expected: BTreeSet<i64> = rows
         .iter()
         .filter(|row| !is_test(row) && int(row, "definition_id") != BAIT_DEF)
@@ -271,26 +276,16 @@ fn both_pet_merchants_stock_every_non_test_kit_item_at_its_client_cost() {
         let mut stocked_test = BTreeSet::new();
         for item in &items {
             let id = int(item, "item_id");
-            let (item_type, slot, _) = catalogue
-                .kit_facts(id as i32)
-                .unwrap_or_else(|| panic!("stocked item {id} has no runtime definition"));
-            if item_type != 4 {
-                continue; // Gloria also sells pet pals (type 2).
-            }
-            let row = by_id
-                .get(&id)
-                .unwrap_or_else(|| panic!("stocked kit item {id} is not in pets.json"));
+            let Some(row) = by_id.get(&id) else {
+                continue; // Gloria also sells pet pals; only the recorded kit rows are checked here.
+            };
+            let slot = int(row, "slot");
             assert!(
-                KIT_SLOTS.contains(&i64::from(slot)),
+                KIT_SLOTS.contains(&slot),
                 "stocked item {id} slot {slot} is not a care-panel slot"
             );
-            assert_eq!(int(row, "slot"), i64::from(slot), "stocked item {id} slot");
             let name_id = int(row, "name_id");
-            assert_eq!(
-                row["label"].as_str(),
-                Some(locale[&name_id].as_str()),
-                "stocked item {id} name"
-            );
+            let label = row["label"].as_str().unwrap_or_default();
             assert_eq!(
                 item["item_name_id"].as_i64(),
                 Some(name_id),
@@ -298,7 +293,7 @@ fn both_pet_merchants_stock_every_non_test_kit_item_at_its_client_cost() {
             );
             assert_eq!(
                 item["item_source"]["english_text"].as_str(),
-                Some(locale[&name_id].as_str()),
+                Some(label),
                 "stocked item {id} english text"
             );
             let price = prices
@@ -310,6 +305,17 @@ fn both_pet_merchants_stock_every_non_test_kit_item_at_its_client_cost() {
                     .is_some_and(|p| p > 0),
                 "stocked item {id} has no positive price"
             );
+            if let Some(costs) = &client_costs {
+                let cost = costs
+                    .get(&id)
+                    .unwrap_or_else(|| panic!("stocked item {id} is not a client Type-4 row"));
+                let expected = if *cost > 0 { *cost } else { 5 };
+                assert_eq!(
+                    price["purchase_price_coins"].as_i64(),
+                    Some(expected),
+                    "stocked item {id} is not at its client Cost ({cost})"
+                );
+            }
             for field in [
                 "purchase_price_coins",
                 "member_price_coins",

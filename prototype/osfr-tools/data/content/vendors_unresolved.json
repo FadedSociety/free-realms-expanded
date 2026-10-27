@@ -20,7 +20,7 @@
     },
     "store_prices": {
       "path": "data/content/stores.json",
-      "sha256": "f8cccfbdc7684120e898da4f94235c978e2fdc582f93e8477738112fd7d3a935",
+      "sha256": "3ad30a8a0d6e0630086d68b38b0718af861c5cc7a6c0f824ba252343d81a2925",
       "scope": "reference price, not captured NPC quote"
     },
     "wiki_corpus": {

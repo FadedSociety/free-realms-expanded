@@ -4376,6 +4376,12 @@
       "src": "T797 ClientItemDefinitions.json Id 68931 (Type 4, Slot 201, Cost 120, Param2 0); locale 407465"
     }
   ],
+  "care_items_source": {
+    "name": "care_items",
+    "path": "lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json",
+    "commit": "9e082025391177d5a33ee18c714ddd06b457a695",
+    "sha256": "40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025"
+  },
   "need_policy": {
     "source": {
       "kind": "reconstructed",
