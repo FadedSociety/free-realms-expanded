@@ -21,35 +21,26 @@ use std::{
     path::{Path, PathBuf},
 };
 
+#[path = "common/gateway_packets.rs"]
+mod gateway_packets;
 #[path = "common/gateway_reference.rs"]
 mod gateway_reference;
-
-fn manifest_dir() -> &'static Path {
-    Path::new(env!("CARGO_MANIFEST_DIR"))
-}
-
-fn content() -> PathBuf {
-    manifest_dir().join("data/content")
-}
+#[path = "support/json.rs"]
+mod json;
+#[path = "support/npc_visibility.rs"]
+mod npc_visibility;
+use gateway_packets::{login_with_version, wrap};
+use json::read as read_json;
+use npc_visibility::content_dir as content;
 
 fn golden_path() -> PathBuf {
-    manifest_dir().join("tests/fixtures/startup_golden.json")
+    Path::new(env!("CARGO_MANIFEST_DIR")).join("tests/fixtures/startup_golden.json")
 }
 
-/// What the capturing server wrote into its own startup text, the capture character's name and
-/// its pets' names; none of it may survive in content or in a built message.
-const FORBIDDEN: [&str; 10] = [
-    "osfr",
-    "discord",
-    "open source",
-    "captain zeus",
-    "captain zax",
-    "colonel boss",
-    "ultra shadow",
-    "royal rex",
-    "hurricane",
-    "zinx",
-];
+/// What the capturing server wrote into its own startup text; none of it may survive in content
+/// or in a built message. The sample character's own name and pets are gone structurally
+/// (`self_data_content_is_typed_json_that_round_trips`), so their names are not listed here.
+const FORBIDDEN: [&str; 3] = ["osfr", "discord", "open source"];
 
 /// (R) The self data's neutral birthday; the capture account's own numbers are never kept,
 /// not even here as a forbidden list.
@@ -70,10 +61,12 @@ fn scrub_self(data: &mut SelfData) {
     for row in &mut data.post_quest_records.keyed_strings {
         row.value_bytes.clear();
     }
-    // The capture account's pet names; the texture aliases beside them stay.
-    for row in &mut data.post_quest_records.variable_records {
-        row.first_string.clear();
-    }
+    // (R) None of the sample character's progress: its second quest list (101 records), known
+    // recipes, pet rows and active effect. Gameplay writes none of these at login.
+    data.quest_records.second.clear();
+    data.post_quest_records.recipes.clear();
+    data.post_quest_records.variable_records.clear();
+    data.effects.clear();
     // Nothing owned or worn (the slot rows stay), nothing collected, an empty quest journal.
     data.inventory.items.clear();
     for worn in &mut data.inventory.equipment {
@@ -105,10 +98,6 @@ fn scrub_snapshot(snapshot: &mut StartupSnapshot) {
     }
 }
 
-fn read_json(path: &Path) -> Value {
-    serde_json::from_slice(&fs::read(path).unwrap()).unwrap()
-}
-
 fn write_json(path: &Path, value: &impl serde::Serialize) {
     fs::create_dir_all(path.parent().unwrap()).unwrap();
     let mut text = serde_json::to_vec_pretty(value).unwrap();
@@ -116,35 +105,14 @@ fn write_json(path: &Path, value: &impl serde::Serialize) {
     fs::write(path, text).unwrap();
 }
 
-// Client packets, as `tests/gateway.rs` writes them.
-fn packet(opcode: u16, fields: &[u8]) -> Vec<u8> {
-    let mut inner = opcode.to_le_bytes().to_vec();
-    inner.extend_from_slice(fields);
-    let mut bytes = vec![5, 0, 1];
-    bytes.extend_from_slice(&(inner.len() as u32).to_le_bytes());
-    bytes.extend_from_slice(&inner);
-    bytes
-}
-
-fn login(guid: u64, version: &str) -> Vec<u8> {
-    let mut bytes = 1u16.to_le_bytes().to_vec();
-    for text in ["startup-content-ticket"] {
-        bytes.extend_from_slice(&(text.len() as u32).to_le_bytes());
-        bytes.extend_from_slice(text.as_bytes());
-    }
-    bytes.extend_from_slice(&guid.to_le_bytes());
-    for text in [version, ""] {
-        bytes.extend_from_slice(&(text.len() as u32).to_le_bytes());
-        bytes.extend_from_slice(text.as_bytes());
-    }
-    bytes
-}
-
 /// A session up to the client's ready and loaded signals: the 46 startup messages, in order.
 fn startup_of(gateway: &mut Gateway, state: &CharacterState, version: &str) -> Vec<Vec<u8>> {
-    let mut messages = gateway.handle(&login(state.guid, version)).unwrap().replies;
-    messages.extend(gateway.handle(&packet(13, &[])).unwrap().replies);
-    assert!(gateway.handle(&packet(10, &[])).unwrap().entered_world);
+    let mut messages = gateway
+        .handle(&login_with_version(state.guid, version))
+        .unwrap()
+        .replies;
+    messages.extend(gateway.handle(&wrap(&[13, 0])).unwrap().replies);
+    assert!(gateway.handle(&wrap(&[10, 0])).unwrap().entered_world);
     assert!(gateway.is_world_loaded());
     messages
 }
@@ -321,8 +289,12 @@ fn self_data_content_is_typed_json_that_round_trips() {
         json!(serde_json::from_str::<Value>(&text).unwrap())
     );
     assert_eq!(data.name.first, "New");
-    // A fresh character: nothing owned, no journal entries, no collected flag.
+    // A fresh character: nothing owned, no journal entries or other quest records, no recipes,
+    // pets or effects, no collected flag.
     assert!(data.inventory.items.is_empty() && data.quest_records.first.is_empty());
+    assert!(data.quest_records.second.is_empty() && data.effects.is_empty());
+    let post = &data.post_quest_records;
+    assert!(post.recipes.is_empty() && post.variable_records.is_empty());
     assert!(
         data.collections
             .iter()

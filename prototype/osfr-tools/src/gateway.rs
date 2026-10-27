@@ -829,10 +829,7 @@ impl Gateway {
         content: &Path,
         saved: Option<GameplayState>,
     ) -> io::Result<Self> {
-        let mut gameplay = Gameplay::load(content, saved)?;
-        gameplay.bind_npc_quest_catalogue(content, state.guid)?;
-        let profile_rank_offsets = load_profile_rank_offsets(content)?;
-        Self::load_internal(directory, state, Some(gameplay), None, profile_rank_offsets)
+        Self::load_with_gameplay(directory, state, content, saved)
     }
 
     fn load_internal<'a>(

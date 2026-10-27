@@ -120,15 +120,19 @@ impl Gateway {
         content: &Path,
         saved: Option<GameplayState>,
     ) -> io::Result<Self> {
+        Self::load_with_gameplay(Source::Content(content), state, content, saved)
+    }
+
+    /// Gameplay from `content`, startup from `source`: the one body of both gameplay loads.
+    pub(super) fn load_with_gameplay<'a>(
+        source: impl Into<Source<'a>>,
+        state: CharacterState,
+        content: &Path,
+        saved: Option<GameplayState>,
+    ) -> io::Result<Self> {
         let mut gameplay = Gameplay::load(content, saved)?;
         gameplay.bind_npc_quest_catalogue(content, state.guid)?;
         let offsets = load_profile_rank_offsets(content)?;
-        Self::load_internal(
-            Source::Content(content),
-            state,
-            Some(gameplay),
-            None,
-            offsets,
-        )
+        Self::load_internal(source, state, Some(gameplay), None, offsets)
     }
 }
