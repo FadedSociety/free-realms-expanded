@@ -52,6 +52,19 @@ pub fn select(npc_id: u64, option: u32) -> Vec<u8> {
     packet
 }
 
+/// 127/19 `ClientHousingPacketEnterRequest`: the captured 17-byte body
+/// `7f 00 13 00 <house guid:8> <unknown:i32> <unknown2:bool>`. Client constructor
+/// `sub_AA83C0` (`0x00aa83c0`, base `sub_AA4990(19)`) stores the guid as two dwords at
+/// +16/+20, an i32 at +24 and a byte at +28; `sub_AC3FE0` fills the guid and a zero i32.
+#[allow(dead_code)] // Included by sites that never enter a house.
+pub fn enter_house(lot: u64) -> Vec<u8> {
+    let mut packet = vec![127, 0, 19, 0];
+    packet.extend(lot.to_le_bytes());
+    packet.extend(0i32.to_le_bytes());
+    packet.push(0);
+    packet
+}
+
 /// The client version the vendor/save-failure suites send; it is the reference
 /// manifest's `client_version` (`lab/references/rust-gateway-reference`).
 pub const DEFAULT_CLIENT_VERSION: &str = "1.910.1.530630";

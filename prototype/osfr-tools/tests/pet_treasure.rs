@@ -25,7 +25,7 @@ mod round70_content;
 
 use care::*;
 use gateway_packets::{body, login, wrap};
-use npc_quest_chain::{CHARACTER, Fixture, content_dir};
+use npc_quest_chain::{CHARACTER, Fixture};
 use osfr_tools::{
     character_store::CharacterState,
     chat,
@@ -41,7 +41,6 @@ use pet_wire::{feed, groom, perform_trick, summon, water};
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, BTreeSet},
-    fs,
     path::Path,
 };
 
@@ -1190,27 +1189,17 @@ fn session(fixture: &Fixture, state: Option<GameplayState>) -> (Gameplay, u32) {
     (game, pet)
 }
 
-/// The housing family's `houses.json`, which the opening fixture does not ship: without it the
-/// player cannot be inside a house. The content copy is the test fixture's own, never Git's.
-fn with_houses(fixture: &Fixture) {
-    fs::copy(
-        content_dir().join("houses.json"),
-        fixture.path().join("houses.json"),
-    )
-    .unwrap();
-}
-
 /// 127/23 grants the starter lot and 127/19 enters it: the player is inside a house, where the
-/// start gate is closed (so the open refuses) and the pets gate is open.
-fn enter_house(game: &mut Gameplay, who: &CharacterState, now: u64) {
+/// start gate is closed (so the open refuses) and the pets gate is open. The content must carry
+/// `houses.json` (`Fixture::copy_content`); the enter body is the shared
+/// `gateway_packets::enter_house`.
+fn grant_and_enter_house(game: &mut Gameplay, who: &CharacterState, now: u64) {
     let granted = game.handle_in_world(&[127, 0, 23, 0], who, now).unwrap();
     assert!(granted.changed, "the starter lot is granted");
     let lot = game.state().housing.expect("the grant saves the lot").lots[0].lot_guid;
-    let mut enter = vec![127, 0, 19, 0];
-    enter.extend(lot.to_le_bytes());
-    enter.extend(0i32.to_le_bytes());
-    enter.push(0);
-    let inside = game.handle_in_world(&enter, who, now + 1).unwrap();
+    let inside = game
+        .handle_in_world(&gateway_packets::enter_house(lot), who, now + 1)
+        .unwrap();
     assert!(inside.scene_zoning.is_some(), "the lot scene loads");
 }
 
@@ -1390,10 +1379,10 @@ fn the_world_tick_plays_the_hunt_in_order_for_the_owner_and_the_viewers() {
 #[test]
 fn a_pet_in_a_house_does_not_hunt_and_a_pet_outside_it_does() {
     let fixture = fixture();
-    with_houses(&fixture);
+    fixture.copy_content("houses.json");
     let (mut game, pet) = session(&fixture, None);
     let owner = who();
-    enter_house(&mut game, &owner, START);
+    grant_and_enter_house(&mut game, &owner, START);
     let mut at = START;
     while at < START + 80_000 {
         at += TICK;
@@ -1423,12 +1412,12 @@ fn a_pet_in_a_house_does_not_hunt_and_a_pet_outside_it_does() {
 #[test]
 fn the_chest_cannot_be_opened_while_another_activity_owns_the_player() {
     let fixture = fixture();
-    with_houses(&fixture);
+    fixture.copy_content("houses.json");
     let (mut game, _) = session(&fixture, None);
     let owner = who();
     let (at, _, spawn) = dig_up(&mut game, &owner, START);
     let guid = spawn.actor_id;
-    enter_house(&mut game, &owner, at + 1);
+    grant_and_enter_house(&mut game, &owner, at + 1);
     let before = game.state();
     let saved = game.pets_document();
     for step in 1..=3 {

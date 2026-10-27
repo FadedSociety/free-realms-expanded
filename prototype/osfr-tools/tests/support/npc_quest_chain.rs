@@ -117,6 +117,14 @@ impl Fixture {
         copy_missing(source, &self.path);
     }
 
+    /// Copy one repository content file into this fixture's own tree. The opening
+    /// fixture does not ship every family (for example the housing family's
+    /// `houses.json`), and a session reads only the fixture's `game` directory, so
+    /// a test that needs one copies it here rather than into `data/content`.
+    pub fn copy_content(&self, name: &str) {
+        fs::copy(content_dir().join(name), self.path.join(name)).unwrap();
+    }
+
     /// A copy without the opening scene and the campaign files that require it,
     /// so `Gameplay::on_location` cannot advance the opening story. Event-quest
     /// tests use it when their objective and wallet deltas must be exact.
