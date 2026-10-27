@@ -15,19 +15,23 @@
 //! is one `Option`, so a second open finds nothing.
 //!
 //! Client facts: model 151 (`Models.txt`, `sg_treasure_chest_01.adr`) declares the texture aliases
-//! `Default1` to `Default3` (one chest texture per tier) and has no open animation, so opening just
-//! removes the actor (35/3). The locale names the tiers (140227 Common, 140234 Rare, 140235 Elite
-//! Pet Treasure). `pet_sniff` 5520 and `pet_digging` 5525 are pet animation slots
+//! `Default1` to `Default3` (one chest texture per tier) and the `com_cast_01`/`com_cast_02` slots
+//! (`sg_treasure_chest_open.gr2`/`sg_treasure_chest_close.gr2`). The brief does not ask for the open
+//! animation, so opening only removes the actor (35/3); the original look would be that slot sent
+//! before the removal. The locale names the tiers (140227 Common, 140234 Rare, 140235 Elite Pet
+//! Treasure). `pet_sniff` 5520 and `pet_digging` 5525 are pet animation slots
 //! (`AnimationTypes.xml`, type 4; 5525 is also the unrelated PLAYER_DRAW_EFFECT id in
-//! `PetTrickGestureSettings.txt`); only 16 pet ADRs declare both, so the importer marks those
-//! models (`PetModel::digs`) and every other pet hunts without the two animations. A click on an
-//! interactable actor sends 26/8 (ctor `008b6bc0`: u64 guid, u8 flag; `0093bff0` looks the actor up
-//! by guid and sends it through `0092efe0`); the AddNpc float `unknown_float_51` is the client's
-//! X-prompt radius (T400). Every number and the reward tables are reconstructed (R) and live in the
-//! `treasure` block of `pets.json`.
+//! `PetTrickGestureSettings.txt`); 16 of the 152 pet ADRs declare both, so the importer marks the
+//! 21 model rows that use one of them (`PetModel::digs`) and every other pet hunts without the two
+//! animations. A click on an interactable actor sends 26/8 (ctor `008b6bc0`: u64 guid, u8 flag;
+//! `0093bff0` looks the actor up by guid and sends it through `0092efe0`); the AddNpc float
+//! `unknown_float_51` is the client's X-prompt radius (T400). Every number and the reward tables
+//! are reconstructed (R) from the Sanctuary reference (`src/Resources/Rewards.json` keys
+//! `pet-treasure-*` and `Entities/PlayerPet.cs`; data only, no code) and live in the `treasure`
+//! block of `pets.json` with their provenance.
 
 use super::{
-    ActivePet, PetBusy, PetService, PetWire, SourceTag, decayed, idle::PetAnimation, pet_mut,
+    ActivePet, PetService, PetWire, SourceTag, decayed, idle::PetAnimation, pet_mut,
     pet_removal_packet,
 };
 use crate::{
@@ -286,12 +290,15 @@ impl PetService {
 
     /// The world tick of the treasure hunt: an expired chest is removed (to the owner only), and the
     /// summoned pet works through wait, find roll, sniff, dig and chest. `owner` is the owner's
-    /// position (the chest appears toward it), `wall_secs` the wall clock the cooldown is kept in.
-    /// Only the moment the chest appears marks a save (the cooldown). Costs a few comparisons per
-    /// tick; nothing is rolled or allocated unless a timer is due.
+    /// position (the chest appears toward it), `wall_secs` the wall clock the cooldown is kept in,
+    /// `busy` the caller's start-activity gate (the one `open_treasure`'s caller refuses with, so
+    /// the hunt cannot produce a chest the owner may not open). Only the moment the chest appears
+    /// marks a save (the cooldown). Costs a few comparisons and up to two linear scans of the
+    /// model rows (vanity, and the ADR's `digs` when an animation plays) per settled tick;
+    /// nothing is rolled or allocated unless a timer is due.
     pub fn treasure_tick(
         &mut self,
-        busy: PetBusy,
+        busy: bool,
         owner: [f32; 3],
         ground: impl Fn(f32, f32) -> Option<f32>,
         now_ms: u64,
@@ -359,12 +366,12 @@ impl PetService {
 
     /// The hunt may run: the pet stands settled and out of water, no care action runs, it is not
     /// lying down, it is not a vanity pet, its mood is up, its cooldown is over, no chest is
-    /// waiting and the owner is not in a minigame. A clock that ran backwards hunts nothing.
+    /// waiting and the owner is not busy. A clock that ran backwards hunts nothing.
     fn may_hunt(
         &self,
         config: &TreasureConfig,
         active: &ActivePet,
-        busy: PetBusy,
+        busy: bool,
         now_ms: u64,
         wall_secs: u64,
     ) -> bool {
@@ -378,7 +385,7 @@ impl PetService {
             wall_secs >= found.saturating_add(cooldown)
                 || found > wall_secs.saturating_add(cooldown)
         });
-        !busy.minigame_active
+        !busy
             && self.treasure.chest.is_none()
             && active.pose.settled()
             && !active.in_water

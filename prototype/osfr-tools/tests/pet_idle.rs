@@ -21,6 +21,7 @@ use osfr_tools::{
     character_store::CharacterState,
     gameplay::Gameplay,
     pets::{PetContent, PetService},
+    startup_world::parse_add_npc,
     world_events::piece_052::ANIM_ID_STAND,
 };
 use pet_inventory::InventoryFixture;
@@ -1029,9 +1030,17 @@ fn a_pet_idles_and_shows_bubbles_through_gameplay_for_the_owner_and_the_viewers(
     for _ in 0..(45_000 / TICK) {
         at += TICK;
         let out = game.pet_tick(&who, at).expect("a pet is out");
-        // T533: a settled dog also hunts (sniff 5520, dig 5525), and its find saves the cooldown.
-        let found = out.replies.iter().any(|p| p.starts_with(&[35, 0, 2, 0]));
-        assert!(!out.changed || found, "idle visuals save nothing");
+        // T533: a settled dog also hunts (sniff 5520, dig 5525), and the one save an idle tick may
+        // make is the find of its chest (model 151, `sg_treasure_chest_01.adr`): any other saving
+        // tick is a regression.
+        let found = out.replies.iter().any(|packet| {
+            packet.starts_with(&[35, 0, 2, 0])
+                && parse_add_npc(packet).is_ok_and(|npc| npc.model_id == 151)
+        });
+        assert!(
+            !out.changed || found,
+            "only a find may save on an idle tick"
+        );
         assert_eq!(visual(&out.replies), visual(&out.nearby));
         for play in plays(&out.nearby, actor) {
             if idle.contains(&play.animation) || bathroom.contains(&play.animation) {

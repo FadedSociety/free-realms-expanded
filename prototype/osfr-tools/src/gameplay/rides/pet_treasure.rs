@@ -3,10 +3,7 @@
 //! payout goes through the one reward path (`rewards::apply_grant`, adopted by
 //! `adopt_reward_state`), so the bag limit and the atomic staging are the ordinary ones.
 use super::*;
-use crate::{
-    pets::PetBusy,
-    rewards::{GrantFailure, apply_grant},
-};
+use crate::rewards::{GrantFailure, apply_grant};
 
 const BAG_FULL: &str = "Your bag is full. Make room before opening the treasure.";
 const BUSY: &str = "Finish the active activity before opening the treasure.";
@@ -21,9 +18,10 @@ impl Gameplay {
         now_ms: u64,
         out: &mut Outcome,
     ) {
-        let busy = PetBusy {
-            minigame_active: self.blocks(|gates| gates.pets),
-        };
+        // The hunt and the open must read the same busy gate: a pet that digs up a chest its owner
+        // cannot click (housing keeps the pets gate open but closes the start gate) wastes the find
+        // and the cooldown. `activity_busy` is exactly what `pet_treasure_26_8` refuses with.
+        let busy = self.activity_busy();
         let ground = terrain_height(self.terrain.clone(), character.zone_id);
         let wire = self.pets.treasure_tick(
             busy,

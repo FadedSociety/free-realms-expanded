@@ -1,8 +1,9 @@
 //! T533: pet treasure. A summoned, settled, non-vanity pet in a good mood sometimes sniffs, digs and
 //! unearths a chest that only its owner sees and can open, once, for a reward from the `treasure`
-//! block of `pets.json`. The service tests drive the world tick the way `Gameplay::pet_tick` does
-//! (`follow_owner`, `care_tick`, `treasure_tick`); the `Gameplay` tests go through `pet_tick`,
-//! `handle_in_world` (26/8 on the chest) and `settle_pets`.
+//! block of `pets.json`. The service tests drive the service calls `Gameplay::pet_tick` makes
+//! (`follow_owner`, `care_tick`, `treasure_tick`) for the rules the service owns; the world tick's
+//! order and every path through the session go through `pet_tick`, `handle_in_world` (26/8 on the
+//! chest), `settle_pets` and the housing request the busy gate reads.
 #[path = "support/pet_care.rs"]
 mod care;
 #[path = "common/gateway_packets.rs"]
@@ -24,7 +25,7 @@ mod round70_content;
 
 use care::*;
 use gateway_packets::{body, login, wrap};
-use npc_quest_chain::{CHARACTER, Fixture};
+use npc_quest_chain::{CHARACTER, Fixture, content_dir};
 use osfr_tools::{
     character_store::CharacterState,
     chat,
@@ -32,14 +33,15 @@ use osfr_tools::{
     gateway::Gateway,
     inventory::{Inventory, InventoryItem},
     npc_interaction::NpcInteractRequest,
-    pets::{PetBusy, PetContent, PetService, TreasureRefusal, pet_removal_packet},
+    pets::{PetContent, PetService, TreasureRefusal, pet_removal_packet},
     startup_world::{NpcSpawn, parse_add_npc},
 };
 use pet_inventory::InventoryFixture;
-use pet_wire::{feed, summon, water};
+use pet_wire::{feed, groom, perform_trick, summon, water};
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, BTreeSet},
+    fs,
     path::Path,
 };
 
@@ -58,6 +60,8 @@ const DIG: i32 = 5525;
 const CAT: i32 = 50;
 /// Crab, a vanity Pet Pal (T454).
 const CRAB_ITEM: i32 = 7885;
+/// A trick the dog's model (364) knows and has an animation row for (T489).
+const TRICK: u32 = 11;
 const DISMISS: [u8; 8] = [53, 0, 4, 0, 0, 0, 0, 0];
 const SEEDS: std::ops::Range<u64> = 0..8;
 
@@ -120,7 +124,10 @@ impl Seen {
     }
 }
 
-/// The owner's pet summoned at `start`, ticked the way `Gameplay::pet_tick` does it.
+/// The owner's pet summoned at `start`, with the three service calls a world tick makes. This is
+/// the service-level harness: the content rules, the cooldown in the roster, the find schedule and
+/// the open all live in `PetService`. The world tick's own order and every session path are pinned
+/// through `Gameplay::pet_tick` below, never by this harness.
 struct Dig {
     service: PetService,
     fixture: InventoryFixture,
@@ -128,7 +135,8 @@ struct Dig {
     actor: u64,
     owner: [f32; 3],
     wall: u64,
-    busy: PetBusy,
+    /// The owner's start-activity busy gate, as `Gameplay::pet_tick` passes `activity_busy`.
+    busy: bool,
     at: u64,
 }
 
@@ -154,7 +162,7 @@ impl Dig {
             actor: PetService::pet_guid(OWNER),
             owner: [0.0; 3],
             wall: WALL,
-            busy: PetBusy::default(),
+            busy: false,
             at: start,
         }
     }
@@ -396,11 +404,9 @@ fn a_pet_with_a_low_mood_a_vanity_pet_and_a_busy_one_never_dig() {
             !digs(&mut Dig::new(service, crab, seed, START), long),
             "a vanity pet, seed {seed}"
         );
-        // A minigame is running.
+        // The owner is busy with another activity (the start gate closed, as the open reads it).
         let mut busy = Dig::dog(seed);
-        busy.busy = PetBusy {
-            minigame_active: true,
-        };
+        busy.busy = true;
         assert!(!digs(&mut busy, long), "a busy owner, seed {seed}");
         // The owner keeps walking, so the pet never settles.
         let mut walking = Dig::dog(seed);
@@ -557,38 +563,57 @@ fn the_cooldown_blocks_a_second_find_and_survives_a_save_and_a_reload() {
 
 #[test]
 fn a_pet_that_stops_being_settled_cancels_the_dig_and_no_cooldown_starts() {
-    let mut dog = Dig::dog(2);
-    let sniff = loop {
-        let tick = dog.step();
-        assert!(dog.at < START + 120_000, "the pet never sniffed");
-        if slots(&tick.private) == [SNIFF] {
-            break tick;
-        }
-    };
+    // Whether the pet is still settled is the world tick's call (`follow_owner` runs first), so this
+    // goes through `Gameplay::pet_tick`.
+    let fixture = fixture();
+    let (mut game, pet) = session(&fixture, None);
+    let mut owner = who();
+    let (mut at, mut sniff) = (START, None);
+    while sniff.is_none() && at < START + 120_000 {
+        at += TICK;
+        let out = game.pet_tick(&owner, at).expect("a pet is out");
+        sniff = (slots(&out.replies) == [SNIFF]).then_some(at);
+    }
+    let sniff = sniff.expect("the pet never sniffed");
     // The owner walks off in the middle of the sniff: no dig, no chest, no cooldown.
     for _ in 0..20 {
-        dog.owner[2] += 1.0;
-        let tick = dog.step();
+        owner.position[2] += 1.0;
+        at += TICK;
+        let out = game.pet_tick(&owner, at).expect("a pet is out");
         assert!(
-            tick.chest().is_none() && slots(&tick.private) != [DIG],
-            "after {}",
-            sniff.at
+            chests(&out.replies).is_empty() && slots(&out.replies) != [DIG],
+            "after {sniff}"
         );
     }
-    assert_eq!(dog.found_at(), None, "an interrupted dig costs nothing");
+    assert_eq!(
+        found_at(&game.pets_document().unwrap(), pet),
+        None,
+        "an interrupted dig costs nothing"
+    );
     // Standing still again, the hunt starts over and finds.
-    assert!(dog.until_chest(5 * 60_000).is_some());
-    assert_eq!(dog.found_at(), Some(WALL));
+    dig_up(&mut game, &owner, at);
+    assert!(
+        found_at(&game.pets_document().unwrap(), pet).is_some(),
+        "the cooldown starts with the find"
+    );
 }
 
 #[test]
 fn the_dig_and_the_care_actions_refuse_each_other() {
-    // A dog with the bowl and the food fitted, and a 20 s wait, so a feed at 18 s lands inside it.
+    // A dog with the bowl, the food, the shampoo and the brush fitted, and a 20 s wait, so a feed
+    // at 18 s lands inside it.
     let ready = |content: PetContent| {
         let (mut service, pet) = dog_with(content);
         let mut fixture = kit();
         send(&mut service, &mut fixture, &fit(pet, 5, BOWL_ITEM), START);
         send(&mut service, &mut fixture, &fit(pet, 6, FOOD_ITEM), START);
+        send(
+            &mut service,
+            &mut fixture,
+            &fit(pet, 1, SHAMPOO_ITEM),
+            START,
+        );
+        send(&mut service, &mut fixture, &fit(pet, 4, BRUSH_ITEM), START);
         let mut dog = Dig::new(service, pet, 4, START);
         dog.fixture = fixture;
         dog
@@ -628,14 +653,14 @@ fn the_dig_and_the_care_actions_refuse_each_other() {
         sniffed >= fed_at + feed_ms + 20_000 - TICK,
         "fed at {fed_at}, sniffed at {sniffed}"
     );
-    // While the pet sniffs or digs, a feed is refused and starts nothing.
+    // While the pet sniffs or digs, every care action is refused and starts nothing.
     let mut dog = ready(steady());
     while slots(&dog.step().private) != [SNIFF] {
         assert!(dog.at < START + 120_000, "the pet never sniffed");
     }
     let before = dog.service.document_value();
-    let refused = dog.send(&feed(dog.pet));
     // A refused feed answers 53/20 kind 6 (unlock) so the care panel never sticks; kind 1 would be a start.
+    let refused = dog.send(&feed(dog.pet));
     assert_eq!(
         notify_kinds(&refused.private),
         [6],
@@ -644,7 +669,29 @@ fn the_dig_and_the_care_actions_refuse_each_other() {
     assert_eq!(
         dog.service.document_value(),
         before,
-        "a refusal changes nothing"
+        "a refused feed changes nothing"
+    );
+    let refused = dog.send(&groom(dog.pet));
+    assert_eq!(
+        notify_kinds(&refused.private),
+        [6],
+        "no groom starts mid-dig"
+    );
+    assert_eq!(
+        dog.service.document_value(),
+        before,
+        "a refused groom changes nothing"
+    );
+    let refused = dog.send(&perform_trick(TRICK));
+    assert_eq!(
+        notify_kinds(&refused.private),
+        [6],
+        "no trick starts mid-dig"
+    );
+    assert_eq!(
+        dog.service.document_value(),
+        before,
+        "a refused trick changes nothing"
     );
     assert!(dog.until_chest(30_000).is_some(), "the dig goes on");
 }
@@ -826,16 +873,28 @@ fn an_unopened_chest_expires_for_the_owner_alone_and_its_cooldown_stays() {
 
 #[test]
 fn a_clock_that_ran_backwards_or_content_without_the_block_hunts_nothing_and_breaks_nothing() {
-    // The pet's saved clock is at 20 s; a tick before it is a clock that ran backwards.
-    let (service, pet) = dog();
+    // The pet's needs clock is at 20 s after its summon. A 2 s find wait armed at 1 s is due at 3 s,
+    // so every tick up to 20 s runs with the clock still behind the pet's: the needs cannot be
+    // decayed there (the mood unknown), and the hunt must not start.
+    let quick = tuned(|treasure| {
+        treasure["find_min_ms"] = json!(2_000);
+        treasure["find_max_ms"] = json!(2_000);
+    });
+    let (service, pet) = dog_with(quick);
     let mut dog = Dig::new(service, pet, 1, 20_000);
-    for at in [1_000, 2_000, 3_000] {
+    for at in (1_000..20_000).step_by(TICK as usize) {
         let seen = dog.tick(at);
         assert!(!seen.eventful(), "no hunt, no chest, no save at {at}");
     }
     assert!(!dog.service.has_treasure());
+    assert_eq!(
+        dog.found_at(),
+        None,
+        "nothing was saved before the clock recovered"
+    );
     // The same session recovers once the clock is sane.
     assert!(dog.until_chest(5 * 60_000).is_some());
+    assert_eq!(dog.found_at(), Some(WALL), "and then the find is saved");
     // Content without a `treasure` block: the tick is a no-op.
     let none = content_with(|document| {
         document.as_object_mut().unwrap().remove("treasure");
@@ -1130,6 +1189,30 @@ fn session(fixture: &Fixture, state: Option<GameplayState>) -> (Gameplay, u32) {
     (game, pet)
 }
 
+/// The housing family's `houses.json`, which the opening fixture does not ship: without it the
+/// player cannot be inside a house. The content copy is the test fixture's own, never Git's.
+fn with_houses(fixture: &Fixture) {
+    fs::copy(
+        content_dir().join("houses.json"),
+        fixture.path().join("houses.json"),
+    )
+    .unwrap();
+}
+
+/// 127/23 grants the starter lot and 127/19 enters it: the player is inside a house, where the
+/// start gate is closed (so the open refuses) and the pets gate is open.
+fn enter_house(game: &mut Gameplay, who: &CharacterState, now: u64) {
+    let granted = game.handle_in_world(&[127, 0, 23, 0], who, now).unwrap();
+    assert!(granted.changed, "the starter lot is granted");
+    let lot = game.state().housing.expect("the grant saves the lot").lots[0].lot_guid;
+    let mut enter = vec![127, 0, 19, 0];
+    enter.extend(lot.to_le_bytes());
+    enter.extend(0i32.to_le_bytes());
+    enter.push(0);
+    let inside = game.handle_in_world(&enter, who, now + 1).unwrap();
+    assert!(inside.scene_zoning.is_some(), "the lot scene loads");
+}
+
 /// World ticks until the chest appears (at most two minutes): the tick, its outcome and the chest.
 fn dig_up(game: &mut Gameplay, who: &CharacterState, from: u64) -> (u64, Outcome, NpcSpawn) {
     let mut at = from;
@@ -1247,6 +1330,125 @@ fn the_owner_digs_up_a_chest_and_opens_it_once_through_gameplay() {
         saved,
         "opening saves no second stamp"
     );
+}
+
+/// F819 (T533 review finding 8): the world tick's order, through `Gameplay::pet_tick`: the pet
+/// settles (`follow_pet` runs first), the sniff plays, then the dig, and only then the chest, for
+/// the owner and the viewers. The `Dig` harness above composes the three service calls for the
+/// rules the service owns; a reorder in `pet_tick` fails here.
+#[test]
+fn the_world_tick_plays_the_hunt_in_order_for_the_owner_and_the_viewers() {
+    let fixture = fixture();
+    let sniff_ms = treasure()["sniff"]["duration_ms"].as_u64().unwrap();
+    let dig_ms = treasure()["dig"]["duration_ms"].as_u64().unwrap();
+    let (find_min, find_max) = (rule("find_min_ms"), rule("find_max_ms"));
+    for _ in 0..3 {
+        let (mut game, _) = session(&fixture, None);
+        let owner = who();
+        let (mut at, mut events, mut chest) = (START, Vec::new(), None);
+        while chest.is_none() && at < START + 120_000 {
+            at += TICK;
+            let out = game.pet_tick(&owner, at).expect("a pet is out");
+            events.extend(slots(&out.replies).into_iter().map(|slot| (at, slot)));
+            assert_eq!(
+                slots(&out.replies),
+                slots(&out.nearby),
+                "the owner and the viewers see the same hunt"
+            );
+            chest = chests(&out.replies)
+                .into_iter()
+                .next()
+                .map(|spawn| (at, out, spawn));
+        }
+        let (chest_at, found, spawn) = chest.expect("the world tick dug up a chest");
+        let played: Vec<i32> = events.iter().map(|(_, slot)| *slot).collect();
+        assert_eq!(played, [SNIFF, DIG], "the world tick's order");
+        let (sniff_at, dig_at) = (events[0].0, events[1].0);
+        assert!(
+            (sniff_ms..sniff_ms + TICK).contains(&(dig_at - sniff_at)),
+            "sniff at {sniff_at}, dig at {dig_at}"
+        );
+        assert!(
+            (dig_ms..dig_ms + TICK).contains(&(chest_at - dig_at)),
+            "dig at {dig_at}, chest at {chest_at}"
+        );
+        // The wait is the data's window, counted from the moment the pet stood settled.
+        assert!(
+            sniff_at >= START + find_min && sniff_at <= START + 10_000 + find_max + TICK,
+            "sniffed at {sniff_at}"
+        );
+        assert!(found.changed, "the find saves the cooldown");
+        assert_eq!(spawn.model_id, CHEST_MODEL);
+    }
+}
+
+/// F819 (T533 review finding 1): a pet in a house does not hunt. Housing closes the start gate (the
+/// open's gate) but keeps the pets gate open, so before the fix a happy dog dug up a chest there,
+/// every click was refused, the zone change cleared the chest, and the find and its 8 h cooldown
+/// were lost. The control is the same content and the same dog, outside any lot.
+#[test]
+fn a_pet_in_a_house_does_not_hunt_and_a_pet_outside_it_does() {
+    let fixture = fixture();
+    with_houses(&fixture);
+    let (mut game, pet) = session(&fixture, None);
+    let owner = who();
+    enter_house(&mut game, &owner, START);
+    let mut at = START;
+    while at < START + 80_000 {
+        at += TICK;
+        let out = game.pet_tick(&owner, at).expect("the pet is out");
+        assert!(
+            chests(&out.replies).is_empty(),
+            "no chest inside a house, at {at}"
+        );
+        assert!(!out.changed, "nothing is saved inside a house, at {at}");
+    }
+    assert_eq!(
+        found_at(&game.pets_document().unwrap(), pet),
+        None,
+        "no cooldown was spent inside the house"
+    );
+    // The same dog, outside any lot, hunts and saves its find.
+    let (mut world, _) = session(&fixture, None);
+    let (_, out, spawn) = dig_up(&mut world, &owner, START);
+    assert!(out.changed, "the outdoor find saves the cooldown");
+    assert_eq!(spawn.model_id, CHEST_MODEL);
+}
+
+/// F819: the open's busy gate (T533 checklist 4). A live chest cannot be opened while another
+/// activity owns the player; here a house, the cheapest start-gate occupation (it keeps the pets
+/// gate open, so the pet still exists and follows). The refusal changes nothing and keeps the
+/// chest, so it can be clicked again later; the free open is covered by the tests above.
+#[test]
+fn the_chest_cannot_be_opened_while_another_activity_owns_the_player() {
+    let fixture = fixture();
+    with_houses(&fixture);
+    let (mut game, _) = session(&fixture, None);
+    let owner = who();
+    let (at, _, spawn) = dig_up(&mut game, &owner, START);
+    let guid = spawn.actor_id;
+    enter_house(&mut game, &owner, at + 1);
+    let before = game.state();
+    let saved = game.pets_document();
+    for step in 1..=3 {
+        let refused = game
+            .handle_in_world(&click(guid), &owner, at + step * 1_000)
+            .unwrap();
+        assert!(!refused.changed, "a refused open changes nothing");
+        assert!(said(
+            &refused,
+            "Finish the active activity before opening the treasure."
+        ));
+        assert_eq!(removals(&refused.replies, guid), 0, "the chest stays");
+        assert_eq!(game.state(), before);
+        assert_eq!(game.pets_document(), saved);
+    }
+    // The chest still opens: the same session may click it once the lot is left (the reconnect
+    // path drops the visit here, because the fixture carries no opening world content).
+    assert!(game.abandon_house_for_reconnect().is_some());
+    let opened = game.handle_in_world(&click(guid), &owner, at + 4).unwrap();
+    assert!(opened.changed, "the free owner opens the chest");
+    assert_eq!(removals(&opened.replies, guid), 1);
 }
 
 #[test]
