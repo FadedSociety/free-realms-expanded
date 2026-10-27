@@ -1,6 +1,15 @@
 //! W177 patch proof: the saved pet roster and active actor through `Gameplay` and `Gateway`.
 //! Drop this in as `tests/pet_wired.rs` after `apply_shared_patch.py`; it does not compile before
 //! (`Gameplay::adopt_pets`, `handle_pets`, `settle_pets`, `Gateway::pet_view`).
+//! F778: the gateway tick's save flags and a whole-document save/reload of a feed's apply.
+#[path = "common/gateway_packets.rs"]
+mod gateway_packets;
+#[path = "support/pet_inventory.rs"]
+mod pet_inventory;
+#[path = "../src/bin/osfr_gateway/pet_wire.rs"]
+mod pet_wire;
+
+use gateway_packets::{body, wrap};
 use osfr_tools::{
     character_store::CharacterState,
     game_store,
@@ -95,13 +104,6 @@ fn name_request(name: &str) -> Vec<u8> {
         name.as_bytes().to_vec(),
     ]
     .concat()
-}
-
-fn wrap(inner: &[u8]) -> Vec<u8> {
-    let mut bytes = vec![5, 0, 1];
-    bytes.extend((inner.len() as u32).to_le_bytes());
-    bytes.extend(inner);
-    bytes
 }
 
 fn login() -> Vec<u8> {
@@ -358,4 +360,128 @@ fn no_pet_means_no_tick_and_a_dismissed_pet_sends_no_moves() {
     let out = game.on_location(&owner, NOW + 2_000).unwrap();
     assert_eq!(pet_moves(&out.nearby, actor), 0);
     assert!(game.pet_tick(&owner, NOW + 3_000).is_none());
+}
+
+/// The opening package's catalogue: bowl 8 (slot 204) and Simple Pet Food 1835 (slot 205), both
+/// type 4 and class 73, so the bundled Char (model class 73) takes them.
+const BOWL_DEF: i32 = 8;
+const FOOD_DEF: i32 = 1_835;
+const BOWL_INSTANCE: i32 = 9_001;
+const FOOD_INSTANCE: i32 = 9_002;
+
+/// A saved roster whose only pet has the bowl in utility slot 5 and the food in slot 6.
+fn fitted_roster(bowl: i32, food: i32) -> serde_json::Value {
+    let content = PetService::bundled_content().unwrap();
+    let mut pets = PetService::new(content.clone()).unwrap();
+    let definition = content.definition(PET_SPECIES).unwrap();
+    assert_eq!(pets.adopt_vendor_grant(1, &definition, 0).unwrap(), 1);
+    let mut document = pets.document_value().unwrap();
+    document["pets"][0]["equipment"]["utilities"][5] = serde_json::json!(bowl);
+    document["pets"][0]["equipment"]["utilities"][6] = serde_json::json!(food);
+    document
+}
+
+/// A feed that started in the opening scene applies through the gateway tick, marks both save
+/// flags, and the eaten food and raised need survive a whole-document save and reload (F778).
+#[test]
+fn a_feed_apply_sets_both_save_flags_and_survives_a_whole_document_reload() {
+    let save = Save::new();
+    let content = lab().join("references/rust-opening-cooking-original-assets");
+    let reference = lab().join("references/rust-gateway-reference");
+    let mut state = Gameplay::load(&content, None).unwrap().state();
+    state
+        .inventory
+        .items
+        .push(pet_inventory::item(BOWL_INSTANCE, BOWL_DEF, 1));
+    state
+        .inventory
+        .items
+        .push(pet_inventory::item(FOOD_INSTANCE, FOOD_DEF, 2));
+    let mut gateway = Gateway::load_gameplay(&reference, who(), &content, Some(state)).unwrap();
+    gateway
+        .adopt_pets(Some(fitted_roster(BOWL_INSTANCE, FOOD_INSTANCE)))
+        .unwrap();
+    gateway.handle_at(&login(), NOW).unwrap();
+    gateway.handle_at(&wrap(&[13, 0]), NOW + 1).unwrap();
+    gateway.handle_at(&wrap(&[10, 0]), NOW + 2).unwrap();
+    let summoned = gateway.handle_at(&wrap(&summon(1)), NOW + 3).unwrap();
+    assert!(
+        summoned
+            .replies
+            .iter()
+            .any(|packet| body(packet).starts_with(&[53, 0, 9])),
+        "the pet is out"
+    );
+    let notify_kind = |packets: &[Vec<u8>]| -> Option<u32> {
+        packets
+            .iter()
+            .find(|packet| body(packet).starts_with(&[53, 0, 20]))
+            .map(|packet| u32::from_le_bytes(body(packet)[7..11].try_into().unwrap()))
+    };
+    let started = gateway
+        .handle_at(&wrap(&pet_wire::feed(1)), NOW + 4)
+        .unwrap();
+    assert_eq!(notify_kind(&started.replies), Some(1), "the feed begins");
+    // F778: this is the opening scene's tick branch, which used to run `gameplay.tick` alone, so
+    // the feed never applied there.
+    let applied = gateway.tick_at(NOW + 1_000).unwrap();
+    assert!(
+        applied
+            .replies
+            .iter()
+            .any(|packet| body(packet).starts_with(&[53, 0, 3])),
+        "the apply sends the raised needs"
+    );
+    assert!(
+        applied.state_changed && applied.gameplay_changed,
+        "the apply marks both save flags"
+    );
+    let live = gateway.gameplay().unwrap().inventory_state();
+    assert_eq!(
+        live.items
+            .iter()
+            .find(|item| item.id == FOOD_INSTANCE)
+            .map(|item| item.count),
+        Some(1),
+        "one food is eaten"
+    );
+
+    game_store::save(&save.path, &gateway.snapshot()).unwrap();
+    let document = game_store::load_or_create(&save.path, who()).unwrap();
+    {
+        let gameplay = document.gameplay.as_ref().expect("the gameplay document");
+        assert_eq!(
+            gameplay
+                .inventory
+                .items
+                .iter()
+                .find(|item| item.id == FOOD_INSTANCE)
+                .map(|item| item.count),
+            Some(1),
+            "the eaten food is in the saved document"
+        );
+        let pets = document.pets.as_ref().expect("the roster is saved");
+        assert_eq!(
+            pets["pets"][0]["needs"]["food"].as_f64(),
+            Some(100.0),
+            "the raised food need is saved"
+        );
+        assert_eq!(
+            pets["pets"][0]["equipment"]["utilities"][6],
+            serde_json::json!(FOOD_INSTANCE),
+            "the fitted food stays in the saved roster"
+        );
+    }
+    let mut reloaded = Gameplay::load(&content, document.gameplay).unwrap();
+    reloaded.adopt_pets(document.pets).unwrap();
+    assert_eq!(
+        reloaded
+            .inventory_state()
+            .items
+            .iter()
+            .find(|item| item.id == FOOD_INSTANCE)
+            .map(|item| item.count),
+        Some(1),
+        "the reloaded session keeps the food consumed"
+    );
 }

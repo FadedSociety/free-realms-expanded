@@ -1660,7 +1660,7 @@ impl PetService {
                 next.dismiss(now)
             }
             // Redeeming an adoption item consumes it, which needs the live inventory
-            // (`handle_with_inventory`); this read-only view cannot adopt.
+            // (`handle_at_ms`); this read-only view cannot adopt.
             PetRequest::SummonByItem { .. } => {
                 Err(invalid("pet adoption requires the live inventory"))
             }
@@ -1739,10 +1739,10 @@ impl PetService {
         }
     }
 
-    /// Handle pet requests with the character's live inventory. This is the
-    /// gateway route: subtype 32 may create a pet from an owned adoption item,
-    /// while all other requests use the same staged path as `handle`.
-    pub fn handle_with_inventory(
+    /// Handle pet requests with the character's live inventory on a clock in whole seconds.
+    /// The gateway route is `handle_at_ms`; the tests that predate the millisecond care timers
+    /// use this wrapper. Every other request uses the same staged path as `handle`.
+    pub fn handle_at_seconds(
         &mut self,
         inner: &[u8],
         owner_guid: u64,
@@ -1846,6 +1846,10 @@ impl PetService {
         );
         match applied {
             Ok((transition, inventory_replies)) => {
+                // F778: the adopted pet replaces the active one, which drops a running feed,
+                // grooming session or trick. End them like a normal summon does; the client's
+                // care panel only unlocks on 53/20 kinds 2, 4 and 6.
+                let care_end = self.care_end_packets();
                 *self = next;
                 *inventory = next_inventory;
                 // Actor creation precedes both the roster (whose trailing active
@@ -1855,6 +1859,7 @@ impl PetService {
                 private.extend(wire.shared.iter().cloned());
                 private.push(self.list_packet());
                 private.push(transition.owner_message);
+                private.extend(care_end);
                 wire.private = private;
                 Ok(Some(wire))
             }
@@ -1942,8 +1947,10 @@ impl PetService {
 
     /// T485: fit (53/16 action 0) or remove (action 1) a kit item in utility slot 1..=7. A fit
     /// needs an owned pet that is not vanity (R) and an owned type-4 item whose definition slot
-    /// is `slot + 199` and whose class the pet's model lists. Every outcome echoes 53/16
-    /// privately: the new slot, or on a refusal the slot as it was (nothing changes).
+    /// is `slot + 199` and whose class the pet's model lists. A refusal of a slot in 1..=7 echoes
+    /// 53/16 with the slot as it was (nothing changes). F778: a slot outside 1..=7 echoes nothing
+    /// at all, because the client's 53/16 handler (`00b5ce60` case 16, write at `00b5ea69`)
+    /// stores the echoed slot into its pet record without a bounds check.
     fn utility(
         &mut self,
         remove: bool,
@@ -1952,9 +1959,12 @@ impl PetService {
         item: u32,
         inventory: &Inventory,
     ) -> PetWire {
-        let index = usize::try_from(slot)
+        let Some(index) = usize::try_from(slot)
             .ok()
-            .filter(|index| (1..=7).contains(index));
+            .filter(|index| (1..=7).contains(index))
+        else {
+            return PetWire::default();
+        };
         let echo = |fitted: Option<i32>| PetWire {
             private: vec![pet_utility_packet(
                 fitted.is_none(),
@@ -1964,13 +1974,15 @@ impl PetService {
             )],
             ..PetWire::default()
         };
-        let before = index.and_then(|index| self.pet(pet_id)?.equipment.utilities[index]);
-        let accepted = match (index, self.pet(pet_id)) {
-            (Some(_), Some(_)) if remove => Some(None),
-            (Some(index), Some(pet)) => self.kit_item(pet, index, item, inventory).map(Some),
-            _ => None,
+        let before = self
+            .pet(pet_id)
+            .and_then(|pet| pet.equipment.utilities[index]);
+        let accepted = match self.pet(pet_id) {
+            Some(_) if remove => Some(None),
+            Some(pet) => self.kit_item(pet, index, item, inventory).map(Some),
+            None => None,
         };
-        let (Some(index), Some(next)) = (index, accepted) else {
+        let Some(next) = accepted else {
             return echo(before);
         };
         if let Ok(pet) = pet_mut(&mut self.roster, pet_id) {
@@ -2062,8 +2074,10 @@ impl PetService {
     /// food consumed through `care`, `changed` set) and ends with 53/20 kind 2 at
     /// `feed_end_ms`. Live needs: a decayed view (the roster is not written) goes out as 53/3
     /// once it moved by `status_epsilon` and `status_interval_ms` has passed. T531: a settled pet's
-    /// idle animations and its thought bubbles ride the same tick (`idle_tick`). A failure is a
-    /// refusal for this player, never an error out of the tick.
+    /// idle animations and its thought bubbles ride the same tick (`idle_tick`). F778: an apply that
+    /// emptied the fitted food's stack also echoes that slot as a 53/16 clear, so the care panel
+    /// does not keep a ghost food. A failure is a refusal for this player, never an error out of the
+    /// tick.
     pub fn care_tick(&mut self, inventory: &mut Inventory, now_ms: u64) -> PetWire {
         let mut wire = PetWire::default();
         // The content is shared (`Arc`): holding it costs no copy on this per-tick path.
@@ -2075,6 +2089,7 @@ impl PetService {
             let elapsed = now_ms.saturating_sub(feeding.started_ms);
             if let Some(food) = feeding.food.filter(|_| elapsed >= care.feed_effect_ms) {
                 feeding.food = None;
+                let fitted = self.pet(active.pet_id).map(|pet| pet.equipment.utilities);
                 // A food that left the bag consumes nothing; the feed still ends on time.
                 if let Ok(outcome) = self.care(
                     active.pet_id,
@@ -2086,6 +2101,21 @@ impl PetService {
                     wire.private.extend(outcome.inventory_replies);
                     wire.private.push(outcome.pet_status_packet);
                     wire.changed = true;
+                    // F778: the last unit clears its fitted slot in `care` (`spend_one`); the
+                    // care panel still shows the food the 53/16 echo told it about (`00b5ce60`
+                    // case 16), so clear those slots on the client too.
+                    if let (Some(fitted), Some(pet)) = (fitted, self.pet(active.pet_id)) {
+                        for (index, was) in fitted.iter().enumerate() {
+                            if *was == Some(food) && pet.equipment.utilities[index].is_none() {
+                                wire.private.push(pet_utility_packet(
+                                    true,
+                                    active.pet_id,
+                                    index as u32,
+                                    0,
+                                ));
+                            }
+                        }
+                    }
                     let needs = self.pet(active.pet_id).map(|pet| pet.needs);
                     if let (Some(active), Some(needs)) = (self.active.as_mut(), needs) {
                         active.shown = Some((needs, now_ms));

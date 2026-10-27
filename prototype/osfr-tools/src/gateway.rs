@@ -1847,7 +1847,7 @@ impl Gateway {
             return Ok(self.pet_tick(now_ms));
         }
         let mut gameplay = game.clone();
-        let result = gameplay.tick(&self.state, now_ms)?;
+        let result = gameplay.tick_with_pets(&self.state, now_ms)?;
         let mut outcome = GatewayOutcome {
             group_heal: result.group_heal,
             state_changed: result.changed,

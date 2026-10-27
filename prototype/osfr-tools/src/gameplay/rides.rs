@@ -5,6 +5,12 @@ use crate::item_bar::use_wire;
 
 mod pet_treasure;
 
+/// F778: the shared client `53/*` pet request bodies, the same file the gateway's session tests
+/// and `tests/pet_routing.rs` include (test-only).
+#[cfg(test)]
+#[path = "../bin/osfr_gateway/pet_wire.rs"]
+mod pet_wire;
+
 /// The terrain height under (x, z) in `zone`: the pet's follow step and its chest stand on it.
 fn terrain_height(
     terrain: Option<std::sync::Arc<crate::terrain::Terrain>>,
@@ -370,6 +376,24 @@ impl Gameplay {
         Some(out)
     }
 
+    /// F778: the world tick for the gateway branches that run `tick` on a clone (the opening
+    /// scene, a kart race loading, the derby, soccer). The pet's follow step and care timers run
+    /// there too, so a feed started in the opening zone still eats and ends. The common path runs
+    /// `pet_tick` alone, without `tick`.
+    pub fn tick_with_pets(
+        &mut self,
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Outcome> {
+        let mut out = self.tick(character, now_ms)?;
+        if let Some(pet) = self.pet_tick(character, now_ms) {
+            out.changed |= pet.changed;
+            out.replies.extend(pet.replies);
+            out.nearby.extend(pet.nearby);
+        }
+        Ok(out)
+    }
+
     /// W177 (R): a pet does not zone with its owner; T487 remembers it so the destination's
     /// loaded signal (`enter_world`) or the first update there can summon it again.
     pub fn settle_pets(&mut self, zoned: bool, now_ms: u64) -> io::Result<Outcome> {
@@ -393,5 +417,103 @@ impl Gameplay {
         out.replies.extend(care_end);
         out.replies.splice(0..0, chest);
         Ok(out)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::fishing_service::FishingSpots;
+    use crate::pets::{PetEquipmentSlot, PetService};
+    use pet_wire::{feed, summon};
+
+    /// The opening package's catalogue: bowl 8 (slot 204) and Simple Pet Food 1835 (slot 205),
+    /// both type 4 and class 73, so the bundled Char (model class 73) takes them.
+    const BOWL_DEF: i32 = 8;
+    const FOOD_DEF: i32 = 1_835;
+    /// A fishing guide in the bundled `fishing_spots.json`.
+    const REED: u64 = 9_000_000_181;
+
+    fn who() -> CharacterState {
+        CharacterState {
+            guid: 1,
+            zone_id: 0,
+            position: [-440.0, 0.8, 1292.0],
+            rotation: [1.0, 0.0, 0.0],
+        }
+    }
+
+    /// A 53/20 PetUtilityNotify for `pet`: the kind and four zero words.
+    fn notify(pet: u32, kind: u32) -> Vec<u8> {
+        let mut bytes = vec![53, 0, 20];
+        for value in [pet, kind, 0, 0, 0, 0] {
+            bytes.extend(value.to_le_bytes());
+        }
+        bytes
+    }
+
+    fn first_owned(game: &Gameplay, definition: i32) -> i32 {
+        game.inventory_state()
+            .items
+            .iter()
+            .find(|item| item.definition_id == definition && item.count > 0)
+            .unwrap_or_else(|| panic!("no owned item {definition}"))
+            .id
+    }
+
+    /// F778: `Gameplay::handle_pets` computes the pets busy flag from the occupation table, which
+    /// the service-level pet_care suite never exercises. A player fishing (a real
+    /// `Occupation::Fishing`), with a bowl and food fitted and the pet out, gets kind 6 and no
+    /// state change; once free the same feed begins.
+    #[test]
+    fn a_busy_player_cannot_feed_and_the_refusal_changes_nothing() {
+        let reference = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../lab/references/rust-opening-cooking-original-assets");
+        let mut game = Gameplay::load(&reference, None).unwrap();
+        game.inventory.grant(0, BOWL_DEF, 1).unwrap();
+        game.inventory.grant(0, FOOD_DEF, 2).unwrap();
+        let content = PetService::bundled_content().unwrap();
+        let mut pets = PetService::new(content.clone()).unwrap();
+        let definition = content.definition(1_000_015).unwrap();
+        let pet = pets.adopt_vendor_grant(1, &definition, 0).unwrap();
+        for (definition, slot) in [(BOWL_DEF, 5), (FOOD_DEF, 6)] {
+            let item = first_owned(&game, definition);
+            pets.equip_item(pet, item, PetEquipmentSlot::Utility(slot), &game.inventory)
+                .unwrap();
+        }
+        game.adopt_pets(pets.document_value()).unwrap();
+        game.initialize_world(&who(), 0).unwrap();
+        game.handle_in_world(&summon(pet), &who(), 1_000).unwrap();
+        assert_eq!(game.pet_view(1).map(|view| view.pet_id), Some(pet));
+
+        let directory = std::path::Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        let spots = FishingSpots::load(&directory).unwrap().unwrap();
+        let rewards = game.reward_snapshot();
+        game.fishing
+            .enter(&spots, REED, 1, 0, who().position, false, 1, rewards)
+            .unwrap();
+        assert!(
+            game.blocks(|gates| gates.pets),
+            "fishing closes the pets gate"
+        );
+        let inventory = game.inventory_state().clone();
+        let roster = game.pets_document();
+        let refused = game.handle_in_world(&feed(pet), &who(), 2_000).unwrap();
+        assert_eq!(
+            refused.replies,
+            vec![notify(pet, 6)],
+            "the refusal is 53/20 unlock"
+        );
+        assert!(!refused.changed);
+        assert_eq!(game.inventory_state(), &inventory, "nothing was spent");
+        assert_eq!(game.pets_document(), roster, "the roster is unchanged");
+
+        game.fishing.reset_all();
+        let started = game.handle_in_world(&feed(pet), &who(), 3_000).unwrap();
+        assert_eq!(
+            started.replies,
+            vec![notify(pet, 1)],
+            "free again, the feed begins"
+        );
     }
 }

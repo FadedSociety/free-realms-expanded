@@ -39,8 +39,10 @@ impl InventoryFixture {
         Self::build(rows, &[])
     }
 
-    /// T485: `with_items`, plus pet kit definitions `(definition id, slot, class)` whose rows
-    /// carry item type 4 where `Inventory::presentation` reads it.
+    /// T485/F778: `with_items`, plus pet kit definitions `(definition id, slot, class)`. The
+    /// serialized row carries them (type 4 after the model strings, class the ninth dword `+32`,
+    /// slot the eleventh `+40`); the manifest's own `slot`/`class_id` stay generic so a fit can
+    /// only work when `Inventory::kit_facts` reads the row the client receives.
     pub fn with_kit_items(rows: &[(i32, i32, u32)], kit: &[(i32, i32, i32)]) -> Self {
         let tinted: Vec<_> = rows
             .iter()
@@ -96,20 +98,24 @@ impl InventoryFixture {
         let definitions: Vec<_> = ids
             .into_iter()
             .map(|id| {
-                let (bytes, slot, class) = match kit.iter().find(|row| row.0 == id) {
-                    // Prefix (46 bytes), two empty model strings, GenderUsage, then Type 4.
+                let bytes = match kit.iter().find(|row| row.0 == id) {
+                    // Prefix (46 bytes), two empty model strings, GenderUsage, then Type 4;
+                    // class is the ninth dword and slot the eleventh of the fixed prefix.
                     Some(&(_, slot, class)) => {
                         let mut bytes = vec![0; 62];
                         bytes[..4].copy_from_slice(&id.to_le_bytes());
+                        bytes[32..36].copy_from_slice(&class.to_le_bytes());
+                        bytes[40..44].copy_from_slice(&slot.to_le_bytes());
                         bytes[58..].copy_from_slice(&4i32.to_le_bytes());
-                        (bytes, slot, class)
+                        bytes
                     }
-                    None => ([id.to_le_bytes(), 8i32.to_le_bytes()].concat(), 0, 1),
+                    None => [id.to_le_bytes(), 8i32.to_le_bytes()].concat(),
                 };
                 json!({
                     "id": id,
-                    "slot": slot,
-                    "class_id": class,
+                    // The row above is the fact a reader must use (F778).
+                    "slot": 0,
+                    "class_id": 1,
                     "default_tint": 0,
                     "max_stack": 20,
                     "model": "",

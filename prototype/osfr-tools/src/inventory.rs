@@ -649,13 +649,18 @@ impl Inventory {
         })
     }
 
-    /// T485: a definition's `(item type, slot, class)` for the pet utility check, the slot and
-    /// class as the row records them (the client's 35/34 row carries class at +44 and slot at
-    /// +52, after the 12-byte header). `None` when the row is unknown or cannot carry its type.
+    /// T485: a definition's `(item type, slot, class)` for the pet utility check, all read from
+    /// the serialized `ClientItemDefinition` row the client receives: type from the block after
+    /// the model strings and class/slot from the fixed prefix (class the ninth dword `+32`, slot
+    /// the eleventh `+40`; `piece_096` `decode_items` `leading[8]`/`leading[10]`, and the 35/34
+    /// reply row sees them at `+44`/`+52` after its 12-byte header). `None` when the row is
+    /// unknown or too short to carry them.
     pub fn kit_facts(&self, definition_id: i32) -> Option<(i32, i32, i32)> {
         let definition = self.content.definitions.get(&definition_id)?;
         let item_type = self.presentation(definition_id).ok()?.item_type;
-        Some((item_type, definition.slot, definition.class_id))
+        let class = read(&definition.bytes, 32).ok()?;
+        let slot = read(&definition.bytes, 40).ok()?;
+        Some((item_type, slot, class))
     }
 
     pub fn profile_equipment(&self, profile_id: i32) -> Vec<u8> {

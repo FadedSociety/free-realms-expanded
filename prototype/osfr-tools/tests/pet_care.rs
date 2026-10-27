@@ -86,8 +86,8 @@ fn fitting_echoes_53_16_and_a_wrong_slot_type_or_vanity_pet_changes_nothing() {
         vec![words(&[53, 0, 16, 0], &[pet, 5, BOWL_ITEM as u32])]
     );
     assert!(!wire.changed);
-    // A plain item, an unknown slot and an item not owned: an empty slot echoes as removed.
-    for (slot, item) in [(1, PLAIN_ITEM), (8, SHAMPOO_ITEM), (1, 99)] {
+    // A plain item or an item not owned: the unchanged (empty) slot echoes as removed.
+    for (slot, item) in [(1, PLAIN_ITEM), (1, 99)] {
         let wire = send(&mut service, &mut fixture, &fit(pet, slot, item), T0);
         assert_eq!(
             wire.private,
@@ -95,6 +95,19 @@ fn fitting_echoes_53_16_and_a_wrong_slot_type_or_vanity_pet_changes_nothing() {
             "{slot} {item}"
         );
         assert!(!wire.changed);
+    }
+    // F778: a slot outside the client's eight utility entries echoes nothing. The client's
+    // 53/16 handler stores the echoed slot into its pet record with no bounds check
+    // (00b5ce60 case 16, write at 00b5ea69), so a forged slot would corrupt or crash it.
+    for slot in [0u32, 8, 0x3fff_ffff] {
+        let wire = send(
+            &mut service,
+            &mut fixture,
+            &fit(pet, slot, SHAMPOO_ITEM),
+            T0,
+        );
+        assert_eq!(wire.private, Vec::<Vec<u8>>::new(), "slot {slot}");
+        assert!(!wire.changed, "slot {slot}");
     }
     assert_eq!(service.document_value(), roster);
     assert_eq!(fixture.inventory.state(), &inventory);
@@ -224,6 +237,84 @@ fn a_second_feed_during_one_and_a_dismiss_spend_nothing_more() {
     assert_eq!(count(&fixture, FOOD_ITEM), 2);
 }
 
+/// The bundled Char species (1000015) is adopted from item 70352.
+const ADOPT_DEF: i32 = 70_352;
+const ADOPT_ITEM: i32 = 27;
+
+#[test]
+fn adopting_a_pet_during_a_feed_ends_the_feed_without_spending_the_food() {
+    let (mut service, pet) = dog();
+    let mut fixture = InventoryFixture::with_kit_items(
+        &[
+            (BOWL_ITEM, BOWL, 1),
+            (FOOD_ITEM, FOOD, 2),
+            (ADOPT_ITEM, ADOPT_DEF, 1),
+        ],
+        &KIT,
+    );
+    send(&mut service, &mut fixture, &fit(pet, 5, BOWL_ITEM), T0);
+    send(&mut service, &mut fixture, &fit(pet, 6, FOOD_ITEM), T0);
+    send(&mut service, &mut fixture, &summon(pet), T0);
+    let started = send(&mut service, &mut fixture, &feed(pet), T0 + 1_000);
+    assert_eq!(notify_kinds(&started.private), vec![1]);
+
+    let adopted = send(
+        &mut service,
+        &mut fixture,
+        &pet_wire::summon_by_item(ADOPT_DEF as u32, 0),
+        T0 + 1_500,
+    );
+    // F778: the adopted pet replaced the one being fed, so the feed ends (kind 2) as it does
+    // on a re-summon; the client's care panel only unlocks on 53/20 kinds 2, 4 and 6.
+    assert_eq!(notify_kinds(&adopted.private), vec![2]);
+    assert!(adopted.changed);
+    assert_eq!(service.active_pet_id(), Some(2), "the adopted pet is out");
+    assert!(
+        fixture
+            .inventory
+            .state()
+            .items
+            .iter()
+            .all(|item| item.definition_id != ADOPT_DEF || item.count == 0),
+        "the certificate is spent"
+    );
+    for at in [T0 + 2_000, T0 + 8_000] {
+        assert!(!service.care_tick(&mut fixture.inventory, at).changed);
+    }
+    assert_eq!(count(&fixture, FOOD_ITEM), 2, "the fed food was not eaten");
+}
+
+#[test]
+fn feeding_the_last_food_clears_the_fitted_slot_for_the_client() {
+    let (mut service, pet) = dog();
+    let mut fixture =
+        InventoryFixture::with_kit_items(&[(BOWL_ITEM, BOWL, 1), (FOOD_ITEM, FOOD, 1)], &KIT);
+    send(&mut service, &mut fixture, &fit(pet, 5, BOWL_ITEM), T0);
+    send(&mut service, &mut fixture, &fit(pet, 6, FOOD_ITEM), T0);
+    send(&mut service, &mut fixture, &summon(pet), T0);
+    send(&mut service, &mut fixture, &feed(pet), T0 + 1_000);
+    let applied = service.care_tick(&mut fixture.inventory, T0 + 2_000);
+    assert!(applied.changed);
+    assert_eq!(count(&fixture, FOOD_ITEM), 0, "the last food is eaten");
+    assert_eq!(
+        service.pet(pet).unwrap().equipment.utilities[6],
+        None,
+        "the empty stack leaves the slot"
+    );
+    // The care panel shows the slot from the 53/16 echo it already received (00b5ce60 case
+    // 16), so the empty slot is echoed as removed for the client too.
+    assert_eq!(
+        applied
+            .private
+            .iter()
+            .filter(|packet| packet.starts_with(&[53, 0, 16]))
+            .cloned()
+            .collect::<Vec<_>>(),
+        vec![words(&[53, 0, 16, 1], &[pet, 6, 0])]
+    );
+    assert_eq!(count(&fixture, BOWL_ITEM), 1, "the bowl stays");
+}
+
 #[test]
 fn a_reconnect_before_the_apply_step_eats_nothing_and_after_it_keeps_one_eaten() {
     let content = PetContent::bundled().unwrap();
@@ -264,20 +355,30 @@ fn live_needs_reach_the_owner_at_most_every_1_5_s_without_a_save() {
     let mut fixture = kit();
     send(&mut service, &mut fixture, &summon(pet), T0);
     let roster = service.document_value();
-    let mut sent = Vec::new();
-    for step in 1..=100u64 {
+    // 60 s at the shipped 0.02/s summoned decay moves the bars by 1.2; the 0.5 epsilon is
+    // crossed twice, so the gap and the value change are both exercised (F778: 10 s was below
+    // the epsilon and never tested either).
+    let mut sent: Vec<(u64, f32)> = Vec::new();
+    for step in 1..=600u64 {
         let at = T0 + step * 100;
         let wire = service.care_tick(&mut fixture.inventory, at);
         assert!(!wire.changed, "live needs never mark a save");
         for status in statuses(&wire.private) {
             assert_eq!(u32_at(status, 3), pet);
-            sent.push(at);
+            sent.push((at, f32::from_le_bytes(status[7..11].try_into().unwrap())));
         }
     }
-    assert!(!sent.is_empty(), "a summoned pet's needs are shown");
     assert!(
-        sent.windows(2).all(|pair| pair[1] - pair[0] >= 1_500),
+        sent.len() >= 2,
+        "the summoned pet's needs are shown more than once: {sent:?}"
+    );
+    assert!(
+        sent.windows(2).all(|pair| pair[1].0 - pair[0].0 >= 1_500),
         "{sent:?}"
+    );
+    assert!(
+        sent.windows(2).all(|pair| pair[1].1 < pair[0].1),
+        "each 53/3 carries the decayed food value: {sent:?}"
     );
     assert_eq!(
         service.document_value(),

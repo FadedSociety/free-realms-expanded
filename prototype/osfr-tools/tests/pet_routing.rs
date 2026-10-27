@@ -304,7 +304,7 @@ fn each_adoption_item_adopts_a_new_pet_even_when_the_species_is_owned() {
     assert_eq!(certificates(&inventory), 2);
     for pet in [1u32, 2] {
         let wire = service
-            .handle_with_inventory(
+            .handle_at_seconds(
                 &summon_by_item(70352, 0),
                 OWNER,
                 [0.0, 1.0, 2.0],
@@ -322,7 +322,7 @@ fn each_adoption_item_adopts_a_new_pet_even_when_the_species_is_owned() {
 
     let roster = service.roster_snapshot();
     let refused = service
-        .handle_with_inventory(
+        .handle_at_seconds(
             &summon_by_item(70352, 0),
             OWNER,
             [0.0, 1.0, 2.0],
@@ -350,7 +350,7 @@ fn an_owned_adoption_item_can_create_and_summon_a_roster_pet() {
         .map_or(0, |item| item.count);
     let request = summon_by_item(70352, 0);
     let wire = service
-        .handle_with_inventory(
+        .handle_at_seconds(
             &request,
             OWNER,
             [0.0, 1.0, 2.0],
@@ -778,7 +778,7 @@ fn an_item_record_with_a_wrong_tint_refuses_without_consuming_or_saving() {
     // definition id when the second found nothing, so this pair consumed the
     // owned 70352 item and created a pet.
     let wire = service
-        .handle_with_inventory(
+        .handle_at_seconds(
             &summon_by_item(70352, 999_999),
             OWNER,
             [0.0; 3],

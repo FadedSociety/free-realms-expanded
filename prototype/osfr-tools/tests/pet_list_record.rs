@@ -149,7 +149,7 @@ fn adopt(item: i32, tint: i32) -> (PetService, Record) {
     let mut fixture = InventoryFixture::with_tinted_items(&[(10, item, 1, tint)]);
     let mut service = PetService::new(PetContent::bundled().unwrap()).unwrap();
     let wire = service
-        .handle_with_inventory(
+        .handle_at_seconds(
             &pet_wire::summon_by_item(item as u32, tint as u32),
             33,
             [0.0; 3],

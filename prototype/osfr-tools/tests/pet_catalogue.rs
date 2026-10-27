@@ -57,7 +57,7 @@ fn summon(
     item: i32,
 ) -> startup_world::NpcSpawn {
     let wire = game
-        .handle_with_inventory(
+        .handle_at_seconds(
             &summon_by_item(item as u32, 0),
             33,
             [1.0, 2.0, 3.0],
@@ -252,7 +252,7 @@ fn an_owned_item_that_is_not_a_pet_changes_nothing() {
     let mut service = PetService::new(bundled()).unwrap();
     let before = service.roster_snapshot();
     let wire = service
-        .handle_with_inventory(
+        .handle_at_seconds(
             &summon_by_item(1835, 0),
             33,
             [0.0; 3],
@@ -282,7 +282,7 @@ fn a_full_roster_refuses_the_item_and_keeps_it() {
         "each request spent exactly one certificate"
     );
     let wire = service
-        .handle_with_inventory(
+        .handle_at_seconds(
             &summon_by_item(CRAB_ITEM as u32, 0),
             33,
             [0.0; 3],
