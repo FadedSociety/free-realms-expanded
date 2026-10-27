@@ -220,7 +220,9 @@ impl ConnectionServer {
 /// 411 `LoginCommand_SendSessionID` (writer `1017b700`, reader `1017b950`); field names from its
 /// describe method `1017b4b0`. `session_id` is the game's own session ticket (`--sessionID`,
 /// exe `00ad47f0`); `ticket` is the 64-bit launch ticket the server sent in 39/0x28
-/// (`--ticket=%llu`), and `character_id` the character guid, both as decimal text.
+/// (`--ticket=%llu`), and `character_id` the character guid, both as decimal text. The retail
+/// exe passes no `--characterID` (native 2026-10-27: its command line carries `--character=<name>`
+/// and `--ticket` only), so `character_id` arrives empty.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct SessionLogin {
     pub session_id: String,
@@ -338,12 +340,15 @@ impl LaunchTickets {
     }
 
     /// Redeem the ticket and character id a 411 carries (decimal text, the client's `%llu`):
-    /// the character when the ticket was issued to it and has not expired. A presented ticket
-    /// is spent whether or not it matched, so one guess never gets a second try.
+    /// the character the ticket was issued to, while it has not expired. The random, single-use
+    /// ticket is the credential; the retail client sends no character id (empty), and a
+    /// non-empty one must name the owner. A presented ticket is spent whether or not it
+    /// matched, so one guess never gets a second try.
     pub fn redeem(&mut self, ticket: &str, character: &str, now_ms: u64) -> Option<u64> {
         let ticket = decimal(ticket)?;
         let (owner, expires) = self.issued.remove(&ticket)?;
-        (now_ms < expires && decimal(character) == Some(owner)).then_some(owner)
+        let named = character.is_empty() || decimal(character) == Some(owner);
+        (now_ms < expires && named).then_some(owner)
     }
 
     pub fn outstanding(&self) -> usize {

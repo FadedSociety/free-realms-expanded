@@ -227,6 +227,20 @@ fn a_launch_ticket_logs_its_own_character_in_once() {
 }
 
 #[test]
+fn the_retail_login_without_a_character_id_redeems_by_ticket_alone() {
+    // Native 2026-10-27: the exe passes `--character=<name> --ticket=<n>` and no `--characterID`.
+    let mut tickets = LaunchTickets::new(TTL_MS);
+    let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
+    assert_eq!(tickets.redeem(&ticket, "", 1), Some(CHARACTER));
+    assert_eq!(tickets.redeem(&ticket, "", 2), None, "single use");
+    let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
+    assert_eq!(tickets.redeem(&ticket, "", TTL_MS), None, "expired");
+    let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
+    assert_eq!(tickets.redeem(&ticket, " ", 1), None, "a non-empty id must be a decimal");
+    assert_eq!(tickets.redeem("", "", 1), None);
+}
+
+#[test]
 fn a_wrong_character_expired_replaced_or_malformed_ticket_is_refused() {
     let mut tickets = LaunchTickets::new(TTL_MS);
     let character = CHARACTER.to_string();
