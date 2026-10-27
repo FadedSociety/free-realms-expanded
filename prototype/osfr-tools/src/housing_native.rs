@@ -838,8 +838,10 @@ pub struct HousePermissionRecord {
 /// are reconstructed policy (R); the optional factory payload is deliberately fail-closed.
 ///
 /// Each fixture is a `u32` key then a bare `FixtureInstance` (`00ab8c50` -> `00ab6f40`, 133 bytes
-/// with empty strings), not a whole 127/40 record: the p2.pcap 127/28 has its 2015 records 137
-/// bytes apart. The definition, info and tail of a 127/40 never ride here.
+/// with empty strings), not a whole 127/40 record: the 127/28 in the community-preserved `p2.pcap`
+/// client capture (reliable record seq 12619, frame 29882) carries 2,015 such records, most 137
+/// bytes apart; non-empty strings make a record longer. The definition, info and tail of a 127/40
+/// never ride here.
 #[derive(Clone, Debug, PartialEq)]
 pub struct InstanceData {
     pub house_guid: u64,

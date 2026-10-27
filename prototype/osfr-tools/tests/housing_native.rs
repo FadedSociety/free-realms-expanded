@@ -600,8 +600,9 @@ fn private_housing_corpus_round_trips_through_registered_codec() {
 }
 
 /// Client `00ab8c50` reads a `u32` key and a bare `FixtureInstance` (`00ab6f40`) per 127/28
-/// fixture. A retail 127/28 spaces its records 137 bytes apart (4 + 133 with empty strings); a
-/// whole 127/40 record per fixture shifted every later field, the build box included.
+/// fixture. The community-preserved `p2.pcap` capture spaces most of its 2,015 records 137 bytes
+/// apart (4 + 133 with empty strings); a whole 127/40 record per fixture shifted every later field,
+/// the build box included.
 #[test]
 fn instance_data_fixtures_are_bare_instances_so_the_build_box_stays_aligned() {
     let box_ = [[87.2, -100.0, -47.7, 1.0], [138.3, 60.0, -11.6, 1.0]];

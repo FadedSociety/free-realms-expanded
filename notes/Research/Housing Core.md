@@ -168,12 +168,16 @@ Evidence inspected:
 
 Consequently the existing Legacy six-float boxes remain provisional policy only. The `127/28`
 builder transcribes each local `[min_x, min_y, min_z, max_x, max_y, max_z]` box into the client
-reader's two float4 records by writing `w = 1`. A retail 127/28 (`p2.pcap`, another lot) carries
-w = 1.0 on both corners, and the client's containment test `sub_105C290` masks w out
-(`xmmword_1CB54A0` = (1, 1, 1, 0), set by `sub_173C140`), so w cannot refuse a placement. The boxes
-stay provisional policy (R), not client-derived; the Condo's building objects fit inside its box.
-The same capture fixes the 127/28 fixture record as a `u32` key plus a bare `FixtureInstance`
-(`00ab8c50` -> `00ab6f40`, 137 bytes apart), not a whole 127/40 record (T799).
+reader's two float4 records by writing `w = 1`. The community-preserved `p2.pcap` client capture
+(reliable record seq 12619, frame 29882; another lot) carries w = 1.0 on both corners, and the
+client's containment test `sub_105C290` masks w out (`xmmword_1CB54A0` = (1, 1, 1, 0), set by
+`sub_173C140`), so w cannot refuse a placement. The boxes stay provisional policy (R), not
+client-derived; the Condo's building objects fit inside its box. The same capture fixes the 127/28
+fixture record as a `u32` key plus a bare `FixtureInstance` (`00ab8c50` -> `00ab6f40`, 137 bytes
+with empty strings), not a whole 127/40 record (T799). The capture's 127/28 begins in reliable
+record seq 12619 (opcode 13) and carries 2,015 records; the earlier `Housing Path.md` scan saw only
+the unreliable application messages, so its "does not contain a decoded 127/28" is about that
+scan, not this record.
 
 ### Reader layouts and service values
 
@@ -188,7 +192,8 @@ policy, not an original server value.
   counts, unknown bool/word, counted build areas (`00ab7250`, two float4s each), icon/preview flags,
   score, unknown u64, members flag, two strings, unknown bool, then an optional factory record. The
   service emits full empty/display fields and factory marker false (R); current fixtures are encoded
-  as full records, while list keys are stable ordinals (R). A true factory marker fails closed.
+  as a `u32` key plus a bare `FixtureInstance`, and the separate 127/40 records carry the info,
+  definition and tail; list keys are stable ordinals (R). A true factory marker fails closed.
 - **127/42 fixture asset** — handler `00ac7f40`, reader `00ac1f50`. The body is two u32 words,
   fixture-definition tail `00abeb40`, two length-prefixed spans, two u32 words, another span, a
   counted u64 GUID list (`00aafa90`), two u32 words and a bool. The selection review establishes
@@ -386,32 +391,32 @@ The client draws a fixture only from the NPC a 35/2 AddNpc spawns; the 127/28 in
 of an actor back through `sub_105C8C0`). A placed Chicken vanished because the server sent the
 127/40 and 127/44 and never the actor.
 
-Evidence (retail `p2.pcap`, the 127/28 of 2015 fixtures and its 9 placements; decoded with the
-instance layout of `00ab6f40`):
+Evidence (community-preserved `p2.pcap` client capture, the 127/28 of 2,015 fixtures and its 9
+placements; decoded with the instance layout of `00ab6f40`):
 
-- Every fixture in the 127/28 has its own 35/2 whose actor id is the record's NPC guid (2015 of 2015
-  paired). On entry they arrive before the 127/45, 127/28 and 127/43; a placement answers 127/40,
-  127/44, then 35/2, 35/9, 35/20, and a pickup 127/41, 127/44, then the 35/3 of that NPC.
+- Every fixture in the 127/28 has its own 35/2 whose actor id is the record's NPC guid (2,015 of
+  2,015 paired). On entry they arrive before the 127/45, 127/28 and 127/43; a placement answers
+  127/40, 127/44, then 35/2, 35/9, 35/20, and a pickup 127/41, 127/44, then the 35/3 of that NPC.
 - The 35/2 of a fixture: model, texture alias, tint alias and tint (the item's default, or the dye)
   of the item; the record's position; `rotation` equal to the record's `tilt`, and the actor's own
-  `tilt` equal to the record's `rotation` (2015 of 2015, rotated or not); scale 1, nameplate hidden,
-  interactable, range 100, `active_profile` 144. A 35/2 rebuilt from these values matches the
-  retail bytes except the item's name string id, which the server has no table for (R: 0).
-- The record's customization block is empty in all 9 placements and all 2015 instances; the look is
-  on the actor. (Before T806 the 127/40 carried the item's aliases there.)
+  `tilt` equal to the record's `rotation` (2,015 of 2,015, rotated or not); scale 1, nameplate
+  hidden, interactable, range 100, `active_profile` 144. A 35/2 rebuilt from these values matches
+  the capture's bytes except the item's name string id, which the server has no table for (R: 0).
+- The record's customization block is empty in all 9 placements and all 2,015 instances; the look
+  is on the actor. (Before T806 the 127/40 carried the item's aliases there.)
 - `rotation` is Euler (yaw, pitch, roll in radians, then 0), not a quaternion (values 1.5708, 3.1416,
   -0.3285); the client's 127/2 sends the same lanes (zeros for an unrotated item), and `tilt` is the
-  facing `(sin yaw cos pitch, -sin pitch, cos yaw cos pitch, 0)` (2015 of 2015, to rounding). The
+  facing `(sin yaw cos pitch, -sin pitch, cos yaw cos pitch, 0)` (2,015 of 2,015, to rounding). The
   client derives the same tilt from the rotation (`sub_105CD30` -> `sub_776970`).
-- A retail 127/51 carries the NPC guid; the client sends the fixture guid in its 127/3 and 127/5.
+- The capture's 127/51 carries the NPC guid; the client sends the fixture guid in its 127/3 and 127/5.
 
 Before T806 an unrotated placement was identity-mapped to `[1, 0, 0, 0]`, which as Euler is a one
 radian yaw, and any real turn was refused as a non-unit quaternion.
 
-Open (R): the actor's name string id, the 35/9 (three 100s) and 35/20 (status 1) the retail server
-sends after each 35/2, the 35/16 effect after a move, and a live 127/51 to the NPC for a fixture
-another visitor moves. Lots saved before T806 stored `[1, 0, 0, 0]`; T826 reads that pair back as
-unrotated on load.
+Open (R): the actor's name string id, the 35/9 (three 100s) and 35/20 (status 1) the capture's
+server sends after each 35/2, the 35/16 effect after a move, and a live 127/51 to the NPC for a
+fixture another visitor moves. Lots saved before T806 stored `[1, 0, 0, 0]`; T826 reads that pair
+back as unrotated on load.
 
 ## The radial menu's guid (T826, native 2026-10-27)
 

@@ -11,7 +11,8 @@
 use osfr_tools::{housing, housing_native, housing_service, inventory, zone_transition};
 
 use housing::{
-    HousingError, PERMISSION_CAN_EDIT, PERMISSION_CAN_VISIT, PropertyDefinition, PropertyGrant,
+    FixtureTransform, HousingError, PERMISSION_CAN_EDIT, PERMISSION_CAN_VISIT, PropertyDefinition,
+    PropertyGrant, SavedFixture,
 };
 use housing_service::{
     BASE_OPCODE, FixtureConfig, FixtureConfigRow, FurnitureStock, HousingContent,
@@ -1021,7 +1022,7 @@ fn a_non_finite_rotation_is_refused_and_rolled_back() {
 
 /// The client's rotation lanes are Euler angles, not a quaternion: a quarter turn and a tipped
 /// turn place (T806; both were refused as a "non-unit rotation"), the record keeps the lanes and
-/// the tilt is the facing they imply, as in all 2015 retail instances of p2.pcap.
+/// the tilt is the facing they imply, as in all 2,015 instances of the community-preserved p2.pcap.
 #[test]
 fn a_client_euler_rotation_places_and_the_tilt_is_its_facing() {
     for (yaw, pitch, facing) in [
@@ -1084,7 +1085,7 @@ fn a_typed_move_stages_the_transform_and_keeps_the_item_placed() {
     assert_eq!(opcodes(&outcome), vec![REPLY_POSITION, REPLY_HOUSE_INFO]);
     let position =
         housing_native::PositionUpdate::decode(&outcome.replies[0].encode().unwrap()).unwrap();
-    // Retail's 127/51 names the NPC that draws the fixture, not the fixture (T806).
+    // The capture's 127/51 names the NPC that draws the fixture, not the fixture (T806).
     assert_eq!(
         position.actor_guid,
         housing_service::fixture_actor_guid(guid)
@@ -1530,7 +1531,7 @@ fn a_127_42_for_a_generated_row_carries_its_model_aliases_and_tint() {
     );
     assert_eq!(
         npc.tint_id, 227,
-        "the item's default tint, as retail's fun-block actors"
+        "the item's default tint, as the capture's fun-block actors"
     );
 }
 
@@ -2019,6 +2020,106 @@ fn enter_sends_zoning_then_exact_45_28_44_and_item_list_bytes() {
     let mut expected_43 = vec![127, 0, 43, 0];
     expected_43.extend_from_slice(&[0u8; 12]);
     assert_eq!(outcome.replies[3].encode_inner().unwrap(), expected_43);
+}
+
+/// T799 finding 4: the 127/28 payload byte-for-byte with one standing fixture. The client reads a
+/// `u32` key then a bare `FixtureInstance` (`00ab8c50` -> `00ab6f40`) between the caps and the
+/// permission count; a whole 127/40 record would shift the build box. The community-preserved
+/// `p2.pcap` capture carries the same key + instance shape (reliable record seq 12619).
+#[test]
+fn instance_data_encodes_a_fixture_as_key_and_bare_instance_bytes() {
+    let service = service_with_lot();
+    let mut state = service.state();
+    let fixture_guid = 0x00a0_0000_0000_0001;
+    let fixture = SavedFixture {
+        fixture_guid,
+        house_guid: HOUSE,
+        item_instance_id: INSTANCE,
+        fixture_definition_id: BLOCK_FIXTURE,
+        transform: FixtureTransform {
+            position: [10.0, 0.0, 20.0],
+            rotation: ZERO_ROTATION,
+            tilt: [0.0, 0.0, 1.0, 0.0],
+            scale: 1.0,
+            tint_id: 0,
+        },
+        placed_by: OWNER,
+    };
+    state.lots[0].fixtures.push(fixture);
+    state.lots[0].count = 1;
+    let mut service = HousingService::from_state_with_content(
+        FixtureConfig::capture_defaults(),
+        test_housing_content(),
+        &state,
+        &no_items(),
+    )
+    .unwrap();
+    let mut stock = TestStock::default();
+    let outcome = service
+        .handle(OWNER, &enter_frame(HOUSE), &mut stock)
+        .unwrap();
+    assert_eq!(
+        opcodes(&outcome)[..2],
+        [REPLY_ZONE_DATA, REPLY_INSTANCE_DATA]
+    );
+
+    let mut expected = vec![127, 0, 28, 0];
+    expected.extend_from_slice(&HOUSE.to_le_bytes());
+    expected.extend_from_slice(&OWNER.to_le_bytes());
+    append_text(&mut expected, "");
+    expected.extend_from_slice(&0u64.to_le_bytes());
+    expected.extend_from_slice(&6_514u32.to_le_bytes());
+    append_text(&mut expected, "");
+    for value in [0u32, 4, 2, 1] {
+        expected.extend_from_slice(&value.to_le_bytes());
+    }
+    // The keyed list entry: key, then the bare FixtureInstance the client reads.
+    expected.extend_from_slice(&1u32.to_le_bytes());
+    expected.extend_from_slice(&fixture_guid.to_le_bytes());
+    expected.extend_from_slice(&HOUSE.to_le_bytes());
+    expected.extend_from_slice(&BLOCK_FIXTURE.to_le_bytes());
+    expected.extend_from_slice(&0i32.to_le_bytes());
+    for value in [10.0, 0.0, 20.0, 1.0] {
+        append_float(&mut expected, value);
+    }
+    for value in [0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 1.0, 0.0] {
+        append_float(&mut expected, value);
+    }
+    expected.extend_from_slice(&housing_service::fixture_actor_guid(fixture_guid).to_le_bytes());
+    expected.extend_from_slice(&0i32.to_le_bytes()); // tint
+    expected.extend_from_slice(&0i32.to_le_bytes()); // unknown10
+    expected.extend_from_slice(&0i32.to_le_bytes()); // customization kind
+    append_text(&mut expected, "");
+    append_text(&mut expected, "");
+    expected.extend_from_slice(&0i32.to_le_bytes()); // customization tint
+    append_text(&mut expected, "");
+    append_text(&mut expected, "");
+    append_text(&mut expected, "");
+    expected.extend_from_slice(&0i32.to_le_bytes()); // unknown13
+    append_text(&mut expected, "");
+    append_float(&mut expected, 1.0);
+    expected.push(0);
+    expected.extend_from_slice(&0i32.to_le_bytes()); // unknown17
+    // Permissions, flags and counts, then the build box the placement is tested against.
+    expected.extend_from_slice(&0u32.to_le_bytes());
+    expected.extend_from_slice(&[0, 1]);
+    expected.extend_from_slice(&1u32.to_le_bytes());
+    expected.extend_from_slice(&0u32.to_le_bytes());
+    expected.push(0);
+    expected.extend_from_slice(&0u32.to_le_bytes());
+    expected.extend_from_slice(&1i32.to_le_bytes());
+    for value in [0.0, -20.0, 0.0, 1.0, 100.0, 20.0, 100.0, 1.0] {
+        append_float(&mut expected, value);
+    }
+    expected.extend_from_slice(&33_439u32.to_le_bytes());
+    expected.extend_from_slice(&[0, 0]);
+    expected.extend_from_slice(&0u32.to_le_bytes());
+    expected.extend_from_slice(&0u64.to_le_bytes());
+    expected.push(0);
+    append_text(&mut expected, "");
+    append_text(&mut expected, "");
+    expected.extend_from_slice(&[0, 0]);
+    assert_eq!(outcome.replies[1].encode_inner().unwrap(), expected);
 }
 
 #[test]

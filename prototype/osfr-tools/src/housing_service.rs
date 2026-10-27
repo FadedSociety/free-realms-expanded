@@ -125,16 +125,17 @@ const HOUSE_HEAD_SIZE_TENTHS: i32 = 10;
 const FIXTURE_ACTOR_BIT: u64 = 1 << 55;
 
 /// The guid of the NPC that draws a fixture (T806). The client keeps a fixture record and draws
-/// nothing from it: a retail server sends each fixture's world actor as a 35/2 AddNpc and puts its
-/// guid in the record's NPC field (`FixtureInstance` +216; `sub_AC8340` indexes the record by it,
-/// `sub_105DE10`), and moves it with a 127/51 addressed to that guid (handler `00ab8dc0`, entity
-/// lookup `sub_984960`). Derived from the fixture guid, so a saved lot needs no second id.
+/// nothing from it: in the community-preserved `p2.pcap` capture the server sends each fixture's
+/// world actor as a 35/2 AddNpc and puts its guid in the record's NPC field (`FixtureInstance`
+/// +216; `sub_AC8340` indexes the record by it, `sub_105DE10`), and moves it with a 127/51
+/// addressed to that guid (handler `00ab8dc0`, entity lookup `sub_984960`). Derived from the
+/// fixture guid, so a saved lot needs no second id.
 pub fn fixture_actor_guid(fixture_guid: u64) -> u64 {
     fixture_guid | FIXTURE_ACTOR_BIT
 }
 
-/// The facing a client-form rotation (yaw, pitch, roll in radians) implies. A retail record carries
-/// it as `tilt`, and its AddNpc as `rotation` (p2.pcap: all 2015 instances).
+/// The facing a client-form rotation (yaw, pitch, roll in radians) implies. A 127/40 record carries
+/// it as `tilt`, and its AddNpc as `rotation` (community-preserved `p2.pcap`: all 2,015 instances).
 fn facing(rotation: [f32; 4]) -> [f32; 4] {
     let [yaw, pitch, ..] = rotation;
     [
@@ -2153,10 +2154,11 @@ impl HousingService {
     }
 
     /// Build the full 127/28 reader shape. The six-coordinate Legacy bounds are expanded to two
-    /// float4s with w = 1: the retail p2.pcap 127/28 carries w = 1.0 on both corners, and the
-    /// client's containment test `sub_105C290` masks w out (`xmmword_1CB54A0` = (1, 1, 1, 0),
-    /// set by `sub_173C140`), so w cannot fail it. Keyed list ordinals and absent factory/display
-    /// metadata are R: no capture of a lot like this one exists.
+    /// float4s with w = 1: the community-preserved `p2.pcap` client capture (reliable record seq
+    /// 12619, frame 29882) carries w = 1.0 on both corners, and the client's containment test
+    /// `sub_105C290` masks w out (`xmmword_1CB54A0` = (1, 1, 1, 0), set by `sub_173C140`), so w
+    /// cannot fail it. Keyed list ordinals and absent factory/display metadata are R: the capture
+    /// is a different lot, so no 127/28 of this one exists.
     fn instance_data(
         &self,
         lot: &LotSnapshot,
@@ -2166,12 +2168,7 @@ impl HousingService {
         for (index, saved) in lot.fixtures.iter().enumerate() {
             let key = u32::try_from(index + 1)
                 .map_err(|_| ServiceError::HousingContentInvalid("too many house fixtures"))?;
-            let placed = placed_from_saved(saved);
-            fixtures.push((
-                key,
-                self.fixture_update(&placed, saved.fixture_definition_id)?
-                    .instance,
-            ));
+            fixtures.push((key, Self::fixture_instance(&placed_from_saved(saved))));
         }
         let permissions = lot
             .permissions
@@ -2323,11 +2320,48 @@ impl HousingService {
         })
     }
 
+    /// The bare `FixtureInstance` inside a 127/28 keyed list (client `00ab8c50` -> `00ab6f40`).
+    /// The list carries only this instance; the 127/40 carries the definition, info and tail, and
+    /// the model, aliases and tint ride the fixture's actor (T806), so no configuration row is read
+    /// here. That keeps the 127/28 list decoupled from a definition lookup it does not need.
+    fn fixture_instance(placed: &PlacedFixture) -> WireFixtureInstance {
+        let [x, y, z] = placed.transform.position;
+        WireFixtureInstance {
+            guid: placed.fixture_guid,
+            house_guid: placed.house_guid,
+            fixture_definition_id: placed.fixture_definition_id,
+            unknown4: 0,
+            position: [x, y, z, 1.0],
+            rotation: placed.transform.rotation,
+            // Derived, so a lot saved before T806 (which stored a wrong tilt) is sent right.
+            tilt: facing(placed.transform.rotation),
+            npc_guid: fixture_actor_guid(placed.fixture_guid),
+            tint_id: placed.transform.tint_id,
+            unknown10: 0,
+            // Client 127/40 reader sub_AB6F40 -> sub_8E8510: kind dword, texture alias, tint
+            // alias, tint dword, override string; all empty, as the capture sends them.
+            customization: Customization {
+                kind: 0,
+                texture_alias: String::new(),
+                tint_alias: String::new(),
+                tint_id: 0,
+                texture_override: String::new(),
+            },
+            unknown11: String::new(),
+            unknown12: String::new(),
+            unknown13: 0,
+            xml_data: String::new(),
+            scale: placed.transform.scale,
+            unknown16: false,
+            unknown17: 0,
+        }
+    }
+
     /// Build a `127/40` fixture record using the current local codec. The record carries no look:
-    /// all 9 retail 127/40s and all 2015 retail 127/28 instances leave the customization block
-    /// empty (p2.pcap), and the model, texture alias and tint ride the fixture's actor
-    /// ([`Self::fixture_actor`]). Unresolved definition and tail fields use empty/zero
-    /// placeholders (R); successful encoding is not client-acceptance proof.
+    /// all 9 127/40s and all 2,015 127/28 instances of the community-preserved `p2.pcap` capture
+    /// leave the customization block empty, and the model, texture alias and tint ride the
+    /// fixture's actor ([`Self::fixture_actor`]). Unresolved definition and tail fields use
+    /// empty/zero placeholders (R); successful encoding is not client-acceptance proof.
     fn fixture_update(
         &self,
         placed: &PlacedFixture,
@@ -2336,37 +2370,8 @@ impl HousingService {
         let row = self
             .config
             .row_for_fixture_definition(fixture_definition_id)?;
-        let [x, y, z] = placed.transform.position;
         Ok(FixtureUpdate {
-            instance: WireFixtureInstance {
-                guid: placed.fixture_guid,
-                house_guid: placed.house_guid,
-                fixture_definition_id: placed.fixture_definition_id,
-                unknown4: 0,
-                position: [x, y, z, 1.0],
-                rotation: placed.transform.rotation,
-                // Derived, so a lot saved before T806 (which stored a wrong tilt) is sent right.
-                tilt: facing(placed.transform.rotation),
-                npc_guid: fixture_actor_guid(placed.fixture_guid),
-                tint_id: placed.transform.tint_id,
-                unknown10: 0,
-                // Client 127/40 reader sub_AB6F40 -> sub_8E8510: kind dword, texture alias, tint
-                // alias, tint dword, override string; all empty, as retail sends them.
-                customization: Customization {
-                    kind: 0,
-                    texture_alias: String::new(),
-                    tint_alias: String::new(),
-                    tint_id: 0,
-                    texture_override: String::new(),
-                },
-                unknown11: String::new(),
-                unknown12: String::new(),
-                unknown13: 0,
-                xml_data: String::new(),
-                scale: placed.transform.scale,
-                unknown16: false,
-                unknown17: 0,
-            },
+            instance: Self::fixture_instance(placed),
             info: FixtureInstanceInfo {
                 fixture_guid: placed.fixture_guid,
                 item_definition_id: row.item_definition_id,
@@ -2383,12 +2388,13 @@ impl HousingService {
         })
     }
 
-    /// The NPC that draws a placed fixture (T806), the 35/2 a retail server sends beside its
-    /// 127/40. Values are those of the 2015 fixture AddNpcs in p2.pcap: the fixture's position,
-    /// `rotation` the facing and `tilt` the Euler rotation (the pairing held for every one,
-    /// rotated or not), scale 1, the item's model, aliases and tint (the dyed tint when the item
-    /// has one, else the item's own default), nameplate hidden and interactable. Name id, status
-    /// and health follow-ups (35/9, 35/20) are not sent (R): the actor draws without them.
+    /// The NPC that draws a placed fixture (T806), the 35/2 a server sends beside its 127/40.
+    /// Values are those of the 2,015 fixture AddNpcs of the community-preserved `p2.pcap` capture:
+    /// the fixture's position, `rotation` the facing and `tilt` the Euler rotation (the pairing
+    /// held for every one, rotated or not), scale 1, the item's model, aliases and tint (the dyed
+    /// tint when the item has one, else the item's own default), nameplate hidden and interactable.
+    /// Name id, status and health follow-ups (35/9, 35/20) are not sent (R): the actor draws
+    /// without them.
     fn fixture_actor(
         &self,
         placed: &PlacedFixture,

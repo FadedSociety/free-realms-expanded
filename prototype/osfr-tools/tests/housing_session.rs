@@ -282,8 +282,8 @@ fn entering_changes_scene_and_the_house_packets_wait_for_the_load() {
 /// T799: the client refuses every placement unless the preview box sits inside a box of the
 /// 127/28 list (`sub_105C290` over the list `00ab7250` reads). A whole 127/40 record per fixture
 /// shifted every field after the fixtures, so the Condo, which stands four kit blocks, sent a box
-/// the client never saw. The record must hold the lot's box, w = 1 as retail sends it, and the
-/// kit as bare instances that the 127/40s then complete by guid.
+/// the client never saw. The record must hold the lot's box, w = 1 as the community-preserved
+/// capture sends it, and the kit as bare instances that the 127/40s then complete by guid.
 #[test]
 fn the_condos_house_record_carries_its_build_box_and_the_kit_as_bare_instances() {
     let content = Content::with_houses();
@@ -1349,8 +1349,8 @@ fn the_gateway_answers_the_rating_probe_instead_of_logging_unknown_application_m
 }
 
 /// T806 (native 2026-10-27): the client placed the Chicken and it "disappeared into the void". It
-/// draws a fixture only from the NPC a 35/2 spawns, which retail sends after the 127/40 and 127/44
-/// and links by the record's NPC guid; there was none, so nothing was ever drawn.
+/// draws a fixture only from the NPC a 35/2 spawns, which the capture's server sends after the
+/// 127/40 and 127/44 and links by the record's NPC guid; there was none, so nothing was ever drawn.
 #[test]
 fn a_placed_fixture_is_drawn_by_its_own_actor() {
     let content = Content::with_houses();
@@ -1375,7 +1375,8 @@ fn a_placed_fixture_is_drawn_by_its_own_actor() {
     assert_eq!(npc.actor_id, fixture_actor_guid(update.instance.guid));
     assert_eq!(npc.model_id, update.definition.model_id);
     assert_eq!(npc.position, update.instance.position);
-    // The pairing of every retail fixture: the actor faces the record's tilt and tilts by its rotation.
+    // The pairing of every fixture in the capture: the actor faces the record's tilt and tilts by
+    // its rotation.
     assert_eq!(
         (npc.rotation, npc.tilt),
         (update.instance.tilt, update.instance.rotation)
@@ -1383,7 +1384,8 @@ fn a_placed_fixture_is_drawn_by_its_own_actor() {
     // The client sent no rotation: zeros, facing +Z (it was identity-mapped to a 1 radian yaw).
     assert_eq!(update.instance.rotation, [0.0; 4]);
     assert_eq!(update.instance.tilt, [0.0, 0.0, 1.0, 0.0]);
-    // What the retail fixture AddNpcs of p2.pcap share (the content NPC template differs).
+    // What the fixture AddNpcs of the community-preserved p2.pcap share (the content NPC template
+    // differs).
     assert_eq!(
         (npc.hide_nameplate, npc.is_interactable, npc.has_tilt),
         (1, 1, 1)
@@ -1465,8 +1467,8 @@ fn a_pickup_removes_the_fixtures_actor() {
     );
 }
 
-/// A turn the client sends as Euler lanes (retail p2.pcap: 1.5708 = a quarter turn) was refused
-/// as a non-unit quaternion, so no fixture could ever be turned.
+/// A turn the client sends as Euler lanes (community-preserved p2.pcap: 1.5708 = a quarter turn)
+/// was refused as a non-unit quaternion, so no fixture could ever be turned.
 #[test]
 fn a_turned_fixture_places_and_its_actor_turns_with_it() {
     let content = Content::with_houses();
