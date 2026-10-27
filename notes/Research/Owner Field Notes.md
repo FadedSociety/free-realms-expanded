@@ -47,7 +47,7 @@ Observations the owner gathers from original-game videos and screenshots. They a
   - Locale: 3270315144 "What are you looking at? Get out of here!" and 3640848319 "Lets see what they brought to the party!" (numeric ids in the 2026-10-15 entry below).
 
 ### Encounter start screen ("Hooligan Bullies!")
-![[attachments/hooligan-bullies-start-screen.jpg]]
+(Reference frame from a gameplay video, kept locally; not redistributed.)
 - Title "Hooligan Bullies!" (the spawner's NameId 74753). **Difficulty: 5 red dots**, "Requires a level 13 combat job" (locale 4201).
 - Description: "Hooligans are bullying everyone in sight! Go in and knock some sense into them!" (hash 1428427418).
 - **Prizes**: "Win the game and you could win one of these prizes!" Three items: Ninja's Power Shard of Second Wind, Ninja's Power Shard of Regeneration V, Ninja's Shadow Blade of Soul Power. The prizes seem to follow the player's job (a Ninja here).
@@ -85,7 +85,7 @@ Observations the owner gathers from original-game videos and screenshots. They a
 - Other names along the route: Len Tyril (76038) at the Lakeshore bridge, Laggosh (20959) in front of the troll dungeon, Vergosh (21081) pacing by the Forest Troll Fort.
 - **Area entry banner:** entering a new area shows that area's emblem picture with its name. the owner can send a screenshot of the UI.
   - Screenshot (FreeRealmsPro "Brawler and Ninja training guide part 2", 0:38): "Now Entering..." above a round emblem (Snowhill: a purple mountain) and the large area name "Snowhill", top centre, fading over the world.
-  ![[attachments/now-entering-snowhill.jpg]]
+  (Reference frame kept locally; not redistributed.)
 
 ### Battle flow, corrected (the owner, 2026-10-15)
 - **No tent.** The battle marker is the enemy itself: the Troll Summoner model walks around the overworld with the crossed-swords icon over it. Walk up and click it to open the start screen.
