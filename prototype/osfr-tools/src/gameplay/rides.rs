@@ -436,7 +436,8 @@ impl Gameplay {
     }
 
     /// T455: the world tick for a summoned pet (a still owner settles it); `None` without one.
-    /// T485: also its care timers and live needs; only a feed's apply step marks a save.
+    /// T485: also its care timers and live needs; a feed's apply step and T488 a grooming
+    /// session's end mark a save.
     /// T487: the first tick after a race or battle ends is also where a remembered pet returns
     /// (`follow_pet` covers both cases). T533: and its treasure hunt, which also runs for a chest
     /// still waiting after its pet is gone; a find marks the save (the cooldown). T532: the
@@ -514,13 +515,17 @@ impl Gameplay {
 mod tests {
     use super::*;
     use crate::fishing_service::FishingSpots;
+    use crate::gameplay::occupation::Occupation;
     use crate::pets::{PetEquipmentSlot, PetService};
-    use pet_wire::{feed, summon};
+    use pet_wire::{feed, groom, summon};
 
-    /// The opening package's catalogue: bowl 8 (slot 204) and Simple Pet Food 1835 (slot 205),
-    /// both type 4 and class 73, so the bundled Char (model class 73) takes them.
+    /// The opening package's catalogue: bowl 8 (slot 204), Simple Pet Food 1835 (slot 205),
+    /// shampoo 1836 (slot 200) and brush 56778 (slot 203), all type 4 and class 73, so the bundled
+    /// Char (model class 73) takes them.
     const BOWL_DEF: i32 = 8;
     const FOOD_DEF: i32 = 1_835;
+    const SHAMPOO_DEF: i32 = 1_836;
+    const BRUSH_DEF: i32 = 56_778;
     /// A fishing guide in the bundled `fishing_spots.json`.
     const REED: u64 = 9_000_000_181;
 
@@ -605,5 +610,63 @@ mod tests {
             vec![notify(pet, 1)],
             "free again, the feed begins"
         );
+    }
+
+    /// T488/F796: a grooming session is an `Occupation`, so the shared busy table refuses another
+    /// activity while it runs. The session itself keeps the pets gate open (its 53/22 strokes are
+    /// pet packets), and its timeout frees the player again.
+    #[test]
+    fn a_grooming_session_closes_the_start_gate_and_keeps_the_pets_gate_open() {
+        let reference = std::path::Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../lab/references/rust-opening-cooking-original-assets");
+        let mut game = Gameplay::load(&reference, None).unwrap();
+        game.inventory.grant(0, SHAMPOO_DEF, 2).unwrap();
+        game.inventory.grant(0, BRUSH_DEF, 1).unwrap();
+        let content = PetService::bundled_content().unwrap();
+        let mut pets = PetService::new(content.clone()).unwrap();
+        let definition = content.definition(1_000_015).unwrap();
+        let pet = pets.adopt_vendor_grant(1, &definition, 0).unwrap();
+        for (definition, slot) in [(SHAMPOO_DEF, 1), (BRUSH_DEF, 4)] {
+            let item = first_owned(&game, definition);
+            pets.equip_item(pet, item, PetEquipmentSlot::Utility(slot), &game.inventory)
+                .unwrap();
+        }
+        game.adopt_pets(pets.document_value()).unwrap();
+        game.initialize_world(&who(), 0).unwrap();
+        game.handle_in_world(&summon(pet), &who(), 1_000).unwrap();
+        assert!(!game.activity_busy(), "a summoned pet is not an activity");
+
+        let started = game.handle_in_world(&groom(pet), &who(), 2_000).unwrap();
+        assert!(
+            started
+                .replies
+                .iter()
+                .any(|packet| packet.starts_with(&[53, 0, 20])),
+            "the groom starts"
+        );
+        assert!(
+            game.is_occupied(Occupation::Groom),
+            "the groom occupies the player"
+        );
+        assert!(
+            game.activity_busy(),
+            "another activity must refuse to start"
+        );
+        assert!(
+            !game.blocks(|gates| gates.pets),
+            "pet care itself stays open"
+        );
+
+        // The session's timeout frees the player.
+        let ended = game.pet_tick(&who(), 62_000).unwrap();
+        assert!(
+            ended
+                .replies
+                .iter()
+                .any(|packet| packet.starts_with(&[53, 0, 20])),
+            "the timeout ends it"
+        );
+        assert!(!game.is_occupied(Occupation::Groom));
+        assert!(!game.activity_busy(), "the player is free again");
     }
 }

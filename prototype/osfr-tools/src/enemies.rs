@@ -785,13 +785,10 @@ fn attack_processed_packet(
     bytes
 }
 
-fn animation_packet(guid: u64, animation_id: i32, base: bool) -> Vec<u8> {
-    let mut bytes = header(35, 8);
-    bytes.extend(guid.to_le_bytes());
-    bytes.extend(animation_id.to_le_bytes());
-    bytes.extend(0_i32.to_le_bytes());
-    bytes.push(u8::from(base));
-    bytes
+/// Encode one 35/8 animation message (native reader `00908a50`). T488/F796: the bytes come from
+/// the one writer, `world_events::piece_052::animation_packet`, so the two sites cannot drift.
+pub(crate) fn animation_packet(guid: u64, animation_id: i32, base: bool) -> Vec<u8> {
+    crate::world_events::piece_052::animation_packet(guid, animation_id, base)
 }
 
 pub(crate) fn movement_packet(guid: u64, position: [f32; 3], heading: [f32; 3]) -> Vec<u8> {

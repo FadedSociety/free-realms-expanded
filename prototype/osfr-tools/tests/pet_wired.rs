@@ -4,6 +4,8 @@
 //! F778: the gateway tick's save flags and a whole-document save/reload of a feed's apply.
 #[path = "common/gateway_packets.rs"]
 mod gateway_packets;
+#[path = "support/json.rs"]
+mod json;
 #[path = "support/pet_inventory.rs"]
 mod pet_inventory;
 #[path = "../src/bin/osfr_gateway/pet_wire.rs"]
@@ -16,6 +18,7 @@ use osfr_tools::{
     gameplay::Gameplay,
     gateway::Gateway,
     pets::{PetService, pet_removal_packet},
+    world_events::piece_052::animation_packet,
 };
 use std::{
     fs,
@@ -125,6 +128,14 @@ fn has(packets: &[Vec<u8>], family: u16, subtype: u8) -> bool {
     packets.iter().any(|packet| {
         packet.get(..2) == Some(&family.to_le_bytes()) && packet.get(2) == Some(&subtype)
     })
+}
+
+/// The kind word of the first 53/20 PetUtilityNotify in `packets` (tunnel-unwrapped).
+fn notify_kind(packets: &[Vec<u8>]) -> Option<u32> {
+    packets
+        .iter()
+        .find(|packet| body(packet).starts_with(&[53, 0, 20]))
+        .map(|packet| u32::from_le_bytes(body(packet)[7..11].try_into().unwrap()))
 }
 
 fn actor_packet(packets: &[Vec<u8>], actor: u64) -> bool {
@@ -369,16 +380,70 @@ const FOOD_DEF: i32 = 1_835;
 const BOWL_INSTANCE: i32 = 9_001;
 const FOOD_INSTANCE: i32 = 9_002;
 
-/// A saved roster whose only pet has the bowl in utility slot 5 and the food in slot 6.
-fn fitted_roster(bowl: i32, food: i32) -> serde_json::Value {
+/// A saved roster whose only pet has `(utility slot, item instance)` rows fitted.
+fn fitted_roster(utilities: &[(usize, i32)]) -> serde_json::Value {
     let content = PetService::bundled_content().unwrap();
     let mut pets = PetService::new(content.clone()).unwrap();
     let definition = content.definition(PET_SPECIES).unwrap();
     assert_eq!(pets.adopt_vendor_grant(1, &definition, 0).unwrap(), 1);
     let mut document = pets.document_value().unwrap();
-    document["pets"][0]["equipment"]["utilities"][5] = serde_json::json!(bowl);
-    document["pets"][0]["equipment"]["utilities"][6] = serde_json::json!(food);
+    for &(slot, instance) in utilities {
+        document["pets"][0]["equipment"]["utilities"][slot] = serde_json::json!(instance);
+    }
     document
+}
+
+/// The opening package's kit rows: shampoo 1836 (slot 200) and brush 56778 (slot 203), both
+/// type 4 class 73, so the bundled Char takes them.
+const SHAMPOO_DEF: i32 = 1_836;
+const BRUSH_DEF: i32 = 56_778;
+const SHAMPOO_INSTANCE: i32 = 9_003;
+const BRUSH_INSTANCE: i32 = 9_004;
+
+/// A logged-in gateway at the opening scene whose bag holds the grooming kit and whose summoned
+/// Char has it fitted.
+fn groom_gateway() -> Gateway {
+    let content = lab().join("references/rust-opening-cooking-original-assets");
+    let reference = lab().join("references/rust-gateway-reference");
+    let mut state = Gameplay::load(&content, None).unwrap().state();
+    state
+        .inventory
+        .items
+        .push(pet_inventory::item(SHAMPOO_INSTANCE, SHAMPOO_DEF, 2));
+    state
+        .inventory
+        .items
+        .push(pet_inventory::item(BRUSH_INSTANCE, BRUSH_DEF, 1));
+    let mut gateway = Gateway::load_gameplay(&reference, who(), &content, Some(state)).unwrap();
+    gateway
+        .adopt_pets(Some(fitted_roster(&[
+            (1, SHAMPOO_INSTANCE),
+            (4, BRUSH_INSTANCE),
+        ])))
+        .unwrap();
+    gateway.handle_at(&login(), NOW).unwrap();
+    gateway.handle_at(&wrap(&[13, 0]), NOW + 1).unwrap();
+    gateway.handle_at(&wrap(&[10, 0]), NOW + 2).unwrap();
+    let summoned = gateway.handle_at(&wrap(&summon(1)), NOW + 3).unwrap();
+    assert!(
+        summoned
+            .replies
+            .iter()
+            .any(|packet| body(packet).starts_with(&[53, 0, 9])),
+        "the pet is out"
+    );
+    gateway
+}
+
+/// One number from the shipped `care.groom` rules.
+fn groom_rule(key: &str) -> i64 {
+    let path = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/pets.json");
+    json::read(&path)["care"]["groom"][key].as_i64().unwrap()
+}
+
+/// The configured dry-off (35/8) animation for `actor`.
+fn dry_off(actor: u64) -> Vec<u8> {
+    animation_packet(actor, groom_rule("dry_off_animation") as i32, false)
 }
 
 /// A feed that started in the opening scene applies through the gateway tick, marks both save
@@ -399,7 +464,10 @@ fn a_feed_apply_sets_both_save_flags_and_survives_a_whole_document_reload() {
         .push(pet_inventory::item(FOOD_INSTANCE, FOOD_DEF, 2));
     let mut gateway = Gateway::load_gameplay(&reference, who(), &content, Some(state)).unwrap();
     gateway
-        .adopt_pets(Some(fitted_roster(BOWL_INSTANCE, FOOD_INSTANCE)))
+        .adopt_pets(Some(fitted_roster(&[
+            (5, BOWL_INSTANCE),
+            (6, FOOD_INSTANCE),
+        ])))
         .unwrap();
     gateway.handle_at(&login(), NOW).unwrap();
     gateway.handle_at(&wrap(&[13, 0]), NOW + 1).unwrap();
@@ -412,12 +480,6 @@ fn a_feed_apply_sets_both_save_flags_and_survives_a_whole_document_reload() {
             .any(|packet| body(packet).starts_with(&[53, 0, 9])),
         "the pet is out"
     );
-    let notify_kind = |packets: &[Vec<u8>]| -> Option<u32> {
-        packets
-            .iter()
-            .find(|packet| body(packet).starts_with(&[53, 0, 20]))
-            .map(|packet| u32::from_le_bytes(body(packet)[7..11].try_into().unwrap()))
-    };
     let started = gateway
         .handle_at(&wrap(&pet_wire::feed(1)), NOW + 4)
         .unwrap();
@@ -484,4 +546,74 @@ fn a_feed_apply_sets_both_save_flags_and_survives_a_whole_document_reload() {
         Some(1),
         "the reloaded session keeps the food consumed"
     );
+}
+
+/// T488/F796: the wrappers around a grooming session that the service suite drives directly. A
+/// stroke that fills the bar ends through `handle_pets`/`pet_outcome` (kind 4 to the owner and the
+/// dry-off to viewers); a timeout ends through the world tick's `pet_tick` (`nearby` dry-off); and
+/// a zone change ends it through `settle_pets` (kind 4).
+#[test]
+fn a_groom_ends_through_the_gameplay_fanout_tick_and_zoning_with_kind_4() {
+    let actor = PetService::pet_guid(who().guid);
+    let dry_off = dry_off(actor);
+
+    // Full bar: brisk strokes fill the bar through the request path (200 is well over the shipped
+    // 100-point bar at the shipped cap; the loop stops at the first end).
+    let mut gateway = groom_gateway();
+    let started = gateway
+        .handle_at(&wrap(&pet_wire::groom(1)), NOW + 4)
+        .unwrap();
+    assert_eq!(notify_kind(&started.replies), Some(3), "the session starts");
+    let mut ended = None;
+    for step in 1..=200u64 {
+        let wire = gateway
+            .handle_at(
+                &wrap(&pet_wire::tactile(2, 300, 15_000)),
+                NOW + 4 + step * 300,
+            )
+            .unwrap();
+        if notify_kind(&wire.replies) == Some(4) {
+            ended = Some(wire);
+            break;
+        }
+    }
+    let ended = ended.expect("the bar fills before the timeout");
+    assert_eq!(notify_kind(&ended.replies), Some(4), "the session ends");
+    assert!(
+        ended.replies.iter().any(|packet| body(packet) == dry_off),
+        "the owner sees the dry-off"
+    );
+    assert!(
+        ended.nearby.iter().any(|packet| *packet == dry_off),
+        "viewers see the dry-off"
+    );
+    assert!(
+        ended.state_changed && ended.gameplay_changed,
+        "the end is saved"
+    );
+    assert!(gateway.pet_view().is_some(), "the pet stays out");
+
+    // Timeout: the world tick ends the session and fans the dry-off to viewers.
+    let mut gateway = groom_gateway();
+    gateway
+        .handle_at(&wrap(&pet_wire::groom(1)), NOW + 4)
+        .unwrap();
+    let after = NOW + 4 + groom_rule("seconds") as u64 * 1_000 + 1_000;
+    let ticked = gateway.tick_at(after).unwrap();
+    assert_eq!(notify_kind(&ticked.replies), Some(4), "the tick ends it");
+    assert!(
+        ticked.nearby.iter().any(|packet| *packet == dry_off),
+        "the tick fans the dry-off to viewers"
+    );
+    assert!(ticked.state_changed && ticked.gameplay_changed);
+
+    // Zoning: the session ends with kind 4 before the pet is dismissed.
+    let mut gateway = groom_gateway();
+    gateway
+        .handle_at(&wrap(&pet_wire::groom(1)), NOW + 4)
+        .unwrap();
+    let zoned = gateway.settle_pets(true, NOW + 5).unwrap();
+    assert_eq!(notify_kind(&zoned.replies), Some(4), "zoning ends it");
+    assert!(zoned.state_changed && zoned.gameplay_changed);
+    assert!(gateway.pet_view().is_none(), "the pet was left behind");
 }

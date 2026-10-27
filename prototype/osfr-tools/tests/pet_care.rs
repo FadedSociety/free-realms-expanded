@@ -237,10 +237,6 @@ fn a_second_feed_during_one_and_a_dismiss_spend_nothing_more() {
     assert_eq!(count(&fixture, FOOD_ITEM), 2);
 }
 
-/// The bundled Char species (1000015) is adopted from item 70352.
-const ADOPT_DEF: i32 = 70_352;
-const ADOPT_ITEM: i32 = 27;
-
 #[test]
 fn adopting_a_pet_during_a_feed_ends_the_feed_without_spending_the_food() {
     let (mut service, pet) = dog();

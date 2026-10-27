@@ -104,7 +104,8 @@ pub fn movement_packet(guid: u64, position: [f32; 3], heading: [f32; 3]) -> Vec<
 /// Encode one opcode 35/subtype 8 animation message.
 ///
 /// `base` sets the entity's base animation (Flags bit 0); clearing it plays the
-/// animation immediately, which is what an attack uses.
+/// animation immediately, which is what an attack uses. T488/F796: this is the one
+/// 35/8 encoder; `enemies::animation_packet` delegates here.
 pub fn animation_packet(guid: u64, animation_id: i32, base: bool) -> Vec<u8> {
     let mut b = ANIMATION_OPCODE.to_le_bytes().to_vec();
     b.extend(ANIMATION_SUBTYPE.to_le_bytes());

@@ -31,7 +31,10 @@ const TACTILE_PET: u32 = 0;
 const SHAMPOO_SLOT: usize = 1;
 const CONDITIONER_SLOT: usize = 2;
 const BRUSH_SLOT: usize = 4;
-/// The per-second gain cap counts in fixed windows this long.
+/// The per-second gain cap counts in fixed windows this long. A span that straddles a boundary
+/// can see up to two caps (worst case 2x over one second), accepted and pinned by
+/// `a_stroke_span_across_a_window_boundary_sees_at_most_two_caps`: a session is 60 s and only
+/// need points move, so the cap bounds a fast groom, not an economy.
 const WINDOW_MS: u64 = 1_000;
 
 /// The `care.groom` rules; `valid` keeps them sane at content load, so a bad file fails there.
@@ -106,10 +109,16 @@ impl PetService {
         now_ms: u64,
     ) -> PetWire {
         self.try_groom(pet_id, inventory, busy, now_ms)
-            .unwrap_or_else(|| PetWire {
-                private: vec![pet_utility_notify_packet(pet_id, NOTIFY_UNLOCK, 0)],
-                ..PetWire::default()
-            })
+            .unwrap_or_else(|| Self::unlock(pet_id))
+    }
+
+    /// The 53/20 kind 6 unlock: the client clears its state word and unlocks the utilities
+    /// (`00b56a00`, which does not read the pet id word).
+    fn unlock(pet_id: u32) -> PetWire {
+        PetWire {
+            private: vec![pet_utility_notify_packet(pet_id, NOTIFY_UNLOCK, 0)],
+            ..PetWire::default()
+        }
     }
 
     fn try_groom(
@@ -179,9 +188,11 @@ impl PetService {
     }
 
     /// 53/22: a stroke report. While grooming, mode 2 raises the groom bar; with no session,
-    /// mode 0 is petting and raises play. Anything else (a stale mode, a pet that is out of water
-    /// or busy, a vanity pet) is dropped silently: an answer of kind 6 would clear the client's
-    /// grooming state under a session that is still running.
+    /// mode 0 is petting and raises play. A grooming-mode report with no server session is a
+    /// stale client lock (it missed kind 4), so it is answered with kind 6 and changes nothing.
+    /// Anything else (petting in water, on a vanity pet or while busy, an unknown mode) is
+    /// dropped silently: kind 6 would clear the client's state under a session that is still
+    /// running.
     pub(super) fn tactile(
         &mut self,
         mode: u32,
@@ -190,6 +201,9 @@ impl PetService {
         busy: PetBusy,
         now_ms: u64,
     ) -> PetWire {
+        if mode == TACTILE_GROOM && self.active.is_none_or(|active| active.grooming.is_none()) {
+            return Self::unlock(self.active.map_or(0, |active| active.pet_id));
+        }
         let content = Arc::clone(&self.content);
         let (Some(groom), Some(active)) = (
             content.care.as_ref().and_then(|care| care.groom.as_ref()),

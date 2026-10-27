@@ -1,7 +1,8 @@
-//! T488: pet grooming through the gateway route (`PetService::handle_at_ms`, which
-//! `Gameplay::handle_pets` calls) and the world tick (`care_tick`, which `Gameplay::pet_tick`
-//! calls): 53/18 starts a timed session (53/20 kind 3, shampoo spent), 53/22 strokes raise the
-//! groom bar (or, with no session, play), and a session ends with 53/20 kind 4.
+//! T488: pet grooming through the service's two entry points (`PetService::handle_at_ms`, which
+//! `Gameplay::handle_pets` calls, and `care_tick`, which `Gameplay::pet_tick` calls): 53/18 starts
+//! a timed session (53/20 kind 3, shampoo spent), 53/22 strokes raise the groom bar (or, with no
+//! session, play), and a session ends with 53/20 kind 4. The `Gameplay`/gateway wrappers are
+//! covered by `tests/pet_wired.rs`.
 #[path = "support/pet_care.rs"]
 mod care;
 #[path = "support/json.rs"]
@@ -17,7 +18,7 @@ use osfr_tools::{
     world_events::piece_052::animation_packet,
 };
 use pet_inventory::InventoryFixture;
-use pet_wire::{feed, groom, summon, tactile, water};
+use pet_wire::{feed, groom, summon, summon_by_item, tactile, water};
 use serde_json::Value;
 use std::path::Path;
 
@@ -80,6 +81,12 @@ fn assert_refused(
     // No session is running either: the tick never ends one.
     let later = service.care_tick(&mut fixture.inventory, START + 200_000);
     assert!(notify_kinds(&later.private).is_empty(), "{why}");
+}
+
+/// `wire` is the lone kind-6 unlock of `pet` and nothing else changed.
+fn assert_unlocked(wire: PetWire, pet: u32, why: &str) {
+    assert_eq!(wire.private, vec![notify(pet, 6, 0)], "{why}");
+    assert!(wire.shared.is_empty() && !wire.changed, "{why}");
 }
 
 #[test]
@@ -187,11 +194,11 @@ fn strokes_raise_groom_and_a_full_bar_ends_the_session_with_status_dry_off_and_k
     assert!(wire.changed);
     assert_eq!(groom_need(&service, pet), 100.0);
 
-    // The session is over: later strokes and ticks add nothing and end nothing.
+    // The session is over: later strokes only unlock a stale client mode and add nothing.
     let roster = service.document_value();
     for extra in 1..=3 {
         let late = stroke(&mut service, &mut fixture, at + extra * 300, BRISK);
-        assert!(late.private.is_empty() && !late.changed);
+        assert_unlocked(late, pet, "no session after the full bar");
     }
     assert_eq!(service.document_value(), roster);
     let tick = service.care_tick(&mut fixture.inventory, at + 120_000);
@@ -220,7 +227,7 @@ fn a_timeout_ends_the_session_with_kind_4() {
     // No further gain, and the end is sent once.
     let roster = service.document_value();
     let late = stroke(&mut service, &mut fixture, start + time + 300, BRISK);
-    assert!(late.private.is_empty());
+    assert_unlocked(late, pet, "no session after the timeout");
     assert_eq!(service.document_value(), roster);
     let tick = service.care_tick(&mut fixture.inventory, start + time + 5_000);
     assert!(notify_kinds(&tick.private).is_empty() && !tick.changed);
@@ -400,15 +407,20 @@ fn petting_needs_a_free_summoned_pet_and_no_session_and_strokes_need_their_mode(
         assert!(wire.private.is_empty() && wire.shared.is_empty() && !wire.changed);
         assert_eq!(service.document_value(), roster, "{packet:?}");
     };
-    // No pet out.
+    // No pet out: petting counts for nothing; a grooming-mode report is a stale client lock and
+    // is unlocked with id 0 (there is no active pet id to name).
     let (mut service, pet) = dog();
     let mut fixture = kit();
     ignored(&mut service, &mut fixture, &tactile(0, 300, 5_000), at);
-    ignored(&mut service, &mut fixture, &tactile(2, 300, 5_000), at);
+    let stale = send(&mut service, &mut fixture, &tactile(2, 300, 5_000), at);
+    assert_unlocked(stale, 0, "no pet out");
     // Not in water, and not while the owner is busy.
     send(&mut service, &mut fixture, &summon(pet), START);
     send(&mut service, &mut fixture, &water(true), at);
     ignored(&mut service, &mut fixture, &tactile(0, 300, 5_000), at);
+    // In water there is no session either, so the stale mode is still unlocked.
+    let wet = send(&mut service, &mut fixture, &tactile(2, 300, 5_000), at);
+    assert_unlocked(wet, pet, "in water with no session");
     send(&mut service, &mut fixture, &water(false), at);
     let busy = service
         .handle_at_ms(
@@ -424,8 +436,9 @@ fn petting_needs_a_free_summoned_pet_and_no_session_and_strokes_need_their_mode(
         .unwrap()
         .unwrap();
     assert!(busy.private.is_empty() && !busy.changed);
-    // A groom mode with no session, and an unknown mode, count for nothing.
-    ignored(&mut service, &mut fixture, &tactile(2, 300, 15_000), at);
+    // A groom mode with no session is unlocked; an unknown mode counts for nothing.
+    let stale = send(&mut service, &mut fixture, &tactile(2, 300, 15_000), at);
+    assert_unlocked(stale, pet, "no session");
     ignored(&mut service, &mut fixture, &tactile(1, 300, 15_000), at);
 
     // A session takes only its own mode: petting messages do not count during grooming.
@@ -451,6 +464,46 @@ fn petting_needs_a_free_summoned_pet_and_no_session_and_strokes_need_their_mode(
     let crab = service.adopt_vendor_grant(2, &crab, 0).unwrap();
     send(&mut service, &mut fixture, &summon(crab), START);
     ignored(&mut service, &mut fixture, &tactile(0, 300, 5_000), at);
+}
+
+/// F796/Finding 7: a client that missed the kind-4 end keeps its grooming state word at 2. A
+/// mode-2 report with no server session must unlock it (kind 6) without changing anything; while
+/// a session is live the same answer would clear the client under it, so the server stays silent.
+#[test]
+fn a_grooming_mode_report_without_a_session_is_unlocked_with_kind_6() {
+    let start = START + 1_000;
+    // A session that ran out its time: the kind 4 went out, but the client may have missed it.
+    let (mut service, mut fixture, pet) = ready();
+    send(&mut service, &mut fixture, &groom(pet), start);
+    let seconds = number("seconds") as u64 * 1_000;
+    let ended = service.care_tick(&mut fixture.inventory, start + seconds);
+    assert_eq!(notify_kinds(&ended.private), vec![4]);
+    let roster = service.document_value();
+    let stale = stroke(&mut service, &mut fixture, start + seconds + 300, BRISK);
+    assert_unlocked(stale, pet, "stale after the timeout");
+    assert_eq!(service.document_value(), roster);
+
+    // A live session is not cleared by a kind 6: a busy mode-2 report stays silent.
+    let (mut service, mut fixture, pet) = ready();
+    send(&mut service, &mut fixture, &groom(pet), start);
+    let busy = service
+        .handle_at_ms(
+            &tactile(2, 300, 15_000),
+            OWNER,
+            [0.0; 3],
+            &mut fixture.inventory,
+            PetBusy {
+                minigame_active: true,
+            },
+            start + 300,
+        )
+        .unwrap()
+        .unwrap();
+    assert!(
+        busy.private.is_empty() && !busy.changed,
+        "the live session is left alone"
+    );
+    assert!(service.is_grooming());
 }
 
 #[test]
@@ -495,6 +548,35 @@ fn hostile_stroke_values_are_clamped_per_message_and_per_second() {
     );
 }
 
+/// F796/Finding 4: the per-second cap counts fixed one-second windows, so a span that straddles a
+/// boundary can see two caps over about one second. The 2x worst case is accepted (a 60 s session,
+/// need points only) and pinned here; the old threat note claimed the cap held over any span.
+#[test]
+fn a_stroke_span_across_a_window_boundary_sees_at_most_two_caps() {
+    let (mut service, mut fixture, pet) = ready();
+    let start = START + 1_000;
+    send(&mut service, &mut fixture, &groom(pet), start);
+    let base = groom_need(&service, pet);
+    let huge = (1, i32::MAX as u32);
+    let cap = number("max_gain_per_second");
+    // Three messages fill the first window just before its boundary...
+    for at in [start, start + 1, start + 2] {
+        stroke(&mut service, &mut fixture, at, huge);
+    }
+    let first = f64::from(groom_need(&service, pet) - base);
+    assert!(
+        first <= cap && first > cap - 0.5,
+        "{first} in the first window"
+    );
+    // ...and the next message after it opens a fresh cap inside the same second.
+    for at in [start + 1_001, start + 1_002, start + 1_003] {
+        stroke(&mut service, &mut fixture, at, huge);
+    }
+    let both = f64::from(groom_need(&service, pet) - base);
+    assert!(both > cap + 1.0, "{both} across the boundary");
+    assert!(both <= 2.0 * cap, "{both} over 1.002 s");
+}
+
 #[test]
 fn a_dismiss_water_a_new_summon_and_zoning_end_the_session_with_kind_4_and_no_more_gain() {
     let start = START + 1_000;
@@ -521,7 +603,7 @@ fn a_dismiss_water_a_new_summon_and_zoning_end_the_session_with_kind_4_and_no_mo
     send(&mut service, &mut fixture, &summon(pet), start + 500);
     let roster = service.document_value();
     let wire = stroke(&mut service, &mut fixture, start + 800, BRISK);
-    assert!(wire.private.is_empty());
+    assert_unlocked(wire, pet, "no gain after the dismiss");
     assert_eq!(
         service.document_value(),
         roster,
@@ -547,7 +629,7 @@ fn a_dismiss_water_a_new_summon_and_zoning_end_the_session_with_kind_4_and_no_mo
     send(&mut service, &mut fixture, &water(false), start + 450);
     let roster = service.document_value();
     let late = stroke(&mut service, &mut fixture, start + 500, BRISK);
-    assert!(late.private.is_empty());
+    assert_unlocked(late, pet, "no gain after the water");
     assert_eq!(service.document_value(), roster, "no gain after the water");
     let restart = send(&mut service, &mut fixture, &groom(pet), start + 600);
     assert_eq!(
@@ -555,6 +637,63 @@ fn a_dismiss_water_a_new_summon_and_zoning_end_the_session_with_kind_4_and_no_mo
         vec![3],
         "a new session starts clean"
     );
+}
+
+/// F796/Finding 1: a pet summoned by an owned adoption item (53/32) replaces the active pet, so a
+/// running session must end with kind 4 like a 53/4 summon does; otherwise the client stays
+/// locked in grooming. The feed half is `tests/pet_care.rs`'s adoption test (kind 2).
+#[test]
+fn summon_by_item_during_a_groom_ends_the_session_with_kind_4_and_summons_the_new_pet() {
+    let start = START + 1_000;
+    let (mut service, pet) = dog();
+    let mut fixture = InventoryFixture::with_kit_items(
+        &[
+            (SHAMPOO_ITEM, SHAMPOO, 2),
+            (CONDITIONER_ITEM, CONDITIONER, 1),
+            (BRUSH_ITEM, BRUSH, 1),
+            (ADOPT_ITEM, ADOPT_DEF, 1),
+        ],
+        &KIT,
+    );
+    for (slot, item) in [(1, SHAMPOO_ITEM), (2, CONDITIONER_ITEM), (4, BRUSH_ITEM)] {
+        send(&mut service, &mut fixture, &fit(pet, slot, item), START);
+    }
+    send(&mut service, &mut fixture, &summon(pet), START);
+    send(&mut service, &mut fixture, &groom(pet), start);
+    stroke(&mut service, &mut fixture, start + 300, BRISK);
+    let raised = groom_need(&service, pet);
+
+    let adopted = send(
+        &mut service,
+        &mut fixture,
+        &summon_by_item(ADOPT_DEF as u32, 0),
+        start + 500,
+    );
+    assert_eq!(
+        notify_kinds(&adopted.private),
+        vec![4],
+        "the replaced pet's session ends"
+    );
+    assert_eq!(adopted.private.last(), Some(&notify(pet, 4, 0)));
+    assert!(adopted.changed);
+    let new_pet = service.active_pet_id().expect("the adopted pet is out");
+    assert_ne!(new_pet, pet);
+    assert!(!service.is_grooming(), "the new pet has no session");
+    assert_eq!(
+        count(&fixture, SHAMPOO_ITEM),
+        1,
+        "the old session's shampoo"
+    );
+    assert_eq!(count(&fixture, ADOPT_ITEM), 0, "the certificate was spent");
+
+    // The old session is gone: no gain, no second end, and only the new pet's stale-mode unlock.
+    let roster = service.document_value();
+    let late = stroke(&mut service, &mut fixture, start + 800, BRISK);
+    assert_unlocked(late, new_pet, "no session after the adoption");
+    assert!((groom_need(&service, pet) - raised).abs() < 1e-4);
+    assert_eq!(service.document_value(), roster);
+    let tick = service.care_tick(&mut fixture.inventory, start + 120_000);
+    assert!(notify_kinds(&tick.private).is_empty() && !tick.changed);
 }
 
 #[test]
@@ -578,7 +717,7 @@ fn a_reconnect_mid_session_keeps_the_spent_shampoo_and_the_gains_but_not_the_ses
     send(&mut reloaded, &mut fixture, &summon(pet), start + 2_000);
     let roster = reloaded.document_value();
     let wire = stroke(&mut reloaded, &mut fixture, start + 2_300, BRISK);
-    assert!(wire.private.is_empty());
+    assert_unlocked(wire, pet, "the session did not survive the reconnect");
     assert_eq!(reloaded.document_value(), roster);
     let tick = reloaded.care_tick(&mut fixture.inventory, start + seconds + 5_000);
     assert!(notify_kinds(&tick.private).is_empty() && !tick.changed);

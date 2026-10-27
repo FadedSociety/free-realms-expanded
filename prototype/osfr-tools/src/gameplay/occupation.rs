@@ -41,6 +41,8 @@ occupations!(
     FieldEngaged,
     // Lead housing slice 1: inside a house lot (a separate scene).
     Housing,
+    // T488: a pet grooming session (53/20 kind 3 until kind 4), a timed activity.
+    Groom,
 );
 
 /// What an occupation blocks while it is active.
@@ -82,6 +84,11 @@ impl Occupation {
             // (R) A lot is its own scene: leave it before travelling, riding or starting an
             // activity; pets may follow (the lot's pet autospawn flag); housing owns movement.
             Housing => (true, true, true, false, true),
+            // T488: a groom session closes the start gate, so no craft, gather, fight or minigame
+            // begins mid-session. It keeps the pets gate open (its own 53/22 strokes are pet
+            // packets, and a dismissed or wet pet already ends it with kind 4) and travel, riding
+            // and movement open; zoning and water end it.
+            Groom => (true, false, false, false, false),
         };
         Gates {
             start,
@@ -119,6 +126,7 @@ impl Gameplay {
             Occupation::Kart => self.kart_entry.as_ref().is_some_and(|k| k.active()),
             Occupation::FieldEngaged => self.field_engaged,
             Occupation::Housing => self.housing.as_ref().is_some_and(|h| h.in_house()),
+            Occupation::Groom => self.pets.is_grooming(),
         }
     }
 
@@ -142,7 +150,8 @@ mod tests {
 
     /// Pins the table; changing a gate is a deliberate, tested edit. The start and warp rows
     /// include kart and derby since the owner closed those gaps (2026-10-19). Housing (lead,
-    /// 2026-10-20) closes start, warp and ride, keeps pets, and owns location.
+    /// 2026-10-20) closes start, warp and ride, keeps pets, and owns location. T488/F796: a groom
+    /// session closes start (and so style cards) but keeps pets, travel, riding and movement open.
     #[test]
     fn gates_reproduce_the_replaced_busy_lists() {
         let members = |gate: fn(super::Gates) -> bool| -> Vec<Occupation> {
@@ -156,7 +165,7 @@ mod tests {
             members(|g| g.start),
             [
                 Forging, Smelting, Cooking, Mining, Harvesting, Chess, CardGame, Encounter, Derby,
-                Fishing, Soccer, Kart, Housing
+                Fishing, Soccer, Kart, Housing, Groom
             ]
         );
         assert_eq!(
@@ -198,7 +207,7 @@ mod tests {
             members(|g| g.style_card),
             [
                 Forging, Smelting, Cooking, Mining, Harvesting, Chess, CardGame, Encounter, Derby,
-                Fishing, Soccer, Kart
+                Fishing, Soccer, Kart, Groom
             ]
         );
     }

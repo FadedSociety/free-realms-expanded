@@ -31,6 +31,10 @@ pub const PLAIN_ITEM: i32 = 24;
 pub const CONDITIONER_ITEM: i32 = 25;
 pub const BRUSH_ITEM: i32 = 26;
 pub const OWNER: u64 = 33;
+/// The bundled Char species (1000015) is adopted from item 70352; `ADOPT_ITEM` is the fixture
+/// instance the adoption consumes.
+pub const ADOPT_DEF: i32 = 70_352;
+pub const ADOPT_ITEM: i32 = 27;
 /// 3,000 s after adoption: idle decay has lowered the needs, so a feed or a brushing visibly
 /// raises them.
 pub const T0: u64 = 3_000_000;

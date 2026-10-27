@@ -1216,6 +1216,11 @@ impl PetService {
         self.active.map(|active| active.pet_id)
     }
 
+    /// T488: whether a grooming session (a timed occupation) is running on the summoned pet.
+    pub fn is_grooming(&self) -> bool {
+        self.active.is_some_and(|active| active.grooming.is_some())
+    }
+
     pub fn ui_mode(&self) -> u32 {
         self.ui_mode
     }
@@ -2129,7 +2134,9 @@ impl PetService {
 
     /// T485: the summoned pet's care on the world tick. A feed applies at `feed_effect_ms` (one
     /// food consumed through `care`, `changed` set) and ends with 53/20 kind 2 at
-    /// `feed_end_ms`. Live needs: a decayed view (the roster is not written) goes out as 53/3
+    /// `feed_end_ms`. T488: a grooming session that ran out its time ends here with its final
+    /// needs, the dry-off animation and 53/20 kind 4 (`changed`, the gains are saved). Live needs:
+    /// a decayed view (the roster is not written) goes out as 53/3
     /// once it moved by `status_epsilon` and `status_interval_ms` has passed. T531: a settled pet's
     /// idle animations and its thought bubbles ride the same tick (`idle_tick`). F778: an apply that
     /// emptied the fitted food's stack also echoes that slot as a 53/16 clear, so the care panel
