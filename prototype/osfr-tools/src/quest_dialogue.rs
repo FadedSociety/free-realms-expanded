@@ -15,6 +15,7 @@
 //! conversation without finishing it. Nothing here decides when a quest step
 //! completes; `QuestEngine::DialogueFinished` does that after a finished cursor.
 
+use crate::npc_interaction::dialogue_choice_row;
 use serde::{Deserialize, Serialize};
 use std::collections::VecDeque;
 
@@ -30,10 +31,6 @@ pub const MAX_DEPTH: usize = 2;
 /// (R) Last-line button label when content gives no `response_text_id`; client
 /// locale 103085 ("You got it!"). The fork uses the same fallback.
 pub const YOU_GOT_IT_STRING_ID: u32 = 103_085;
-/// Response row fields shared with the existing NPC rows (`0x00a9b480` reads five
-/// dwords): `[id, 17, label, 0, 18]`.
-const ROW_SECOND: u32 = 17;
-const ROW_FIFTH: u32 = 18;
 
 #[derive(Clone, Debug, Deserialize, Eq, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
@@ -66,26 +63,12 @@ impl DialogueLine {
     /// choices shows one continue button; its label falls back to "You got it!".
     pub fn response_rows(&self) -> Vec<[u32; 5]> {
         if self.choices.is_empty() {
-            return vec![[
-                1,
-                ROW_SECOND,
-                self.response_text_id.unwrap_or(YOU_GOT_IT_STRING_ID),
-                0,
-                ROW_FIFTH,
-            ]];
+            let label = self.response_text_id.unwrap_or(YOU_GOT_IT_STRING_ID);
+            return vec![dialogue_choice_row(1, label)];
         }
-        self.choices
-            .iter()
-            .enumerate()
-            .map(|(index, choice)| {
-                [
-                    index as u32 + 1,
-                    ROW_SECOND,
-                    choice.response_text_id,
-                    0,
-                    ROW_FIFTH,
-                ]
-            })
+        (1..)
+            .zip(&self.choices)
+            .map(|(id, choice)| dialogue_choice_row(id, choice.response_text_id))
             .collect()
     }
 }

@@ -151,7 +151,7 @@ impl Gameplay {
             self.quest_conversation = None;
             return Ok(None);
         }
-        if let Some(out) = self.npc_dialogue_26_6(inner)? {
+        if let Some(out) = self.npc_dialogue_26_6(inner, character)? {
             return Ok(Some(out));
         }
         if let Some(out) = self.npc_dialogue_close_26_4(inner)? {
@@ -196,7 +196,11 @@ impl Gameplay {
         Ok(None)
     }
 
-    fn npc_dialogue_26_6(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
+    fn npc_dialogue_26_6(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+    ) -> io::Result<Option<Outcome>> {
         if inner.starts_with(&[26, 0, 6, 0]) {
             let selected = npc_interaction::decode_dialogue_response_26_6(inner)
                 .map_err(|_| invalid("invalid dialogue response"))?;
@@ -204,7 +208,7 @@ impl Gameplay {
             // T543: an open conversation answers its own 26/3 rows (ids 1..=5) before
             // any explainer or quest-offer handling; those rows never use 300/301/0.
             if self.quest_conversation.is_some() {
-                return Ok(Some(self.npc_conversation_answer(selected)?));
+                return Ok(Some(self.npc_conversation_answer(selected, character)?));
             }
             // T773: a greeter tips row re-renders the same dialogue with that page's
             // body. It is read-only, so the interaction (and its offered rows) stays
@@ -283,13 +287,34 @@ impl Gameplay {
     /// T543: answer the open conversation's 26/3. `Next` shows the next line;
     /// `Finished` closes it and credits a `complete_after_dialogue` step through the
     /// quest engine; `Abandoned` (an answer the question does not offer) closes it
-    /// and changes no quest or saved state. The cursor was already taken out of
-    /// `self`, so every arm leaves the dialog closed unless it puts it back.
-    fn npc_conversation_answer(&mut self, selected: i32) -> io::Result<Outcome> {
+    /// and changes no quest or saved state. An answer from a player who is no longer
+    /// in reach of the NPC (F810: the start gate checked range once) ends it the same
+    /// way, before the answer is read. The cursor was already taken out of `self`, so
+    /// every arm leaves the dialog closed unless it puts it back.
+    fn npc_conversation_answer(
+        &mut self,
+        selected: i32,
+        character: &CharacterState,
+    ) -> io::Result<Outcome> {
         let mut open = self
             .quest_conversation
             .take()
             .expect("the caller checked an open conversation");
+        let in_reach = self.npc_interaction.as_ref().is_some_and(|interaction| {
+            interaction.in_reach_of_active(open.npc_id, character.zone_id, character.position)
+        });
+        if !in_reach {
+            npc_event(serde_json::json!({
+                "event": "conversation_end",
+                "quest_id": open.quest_id,
+                "objective_id": open.objective_id,
+                "outcome": "out_of_reach"
+            }));
+            return Ok(Outcome {
+                replies: vec![END_DIALOG_26_4.to_vec()],
+                ..Outcome::default()
+            });
+        }
         let mut out = Outcome::default();
         match open.conversation.answer(selected) {
             crate::quest_dialogue::ConversationStep::Next => {
@@ -310,7 +335,6 @@ impl Gameplay {
                 self.quest_conversation = Some(open);
             }
             crate::quest_dialogue::ConversationStep::Finished => {
-                out.replies.push(END_DIALOG_26_4.to_vec());
                 npc_event(serde_json::json!({
                     "event": "conversation_end",
                     "quest_id": open.quest_id,
@@ -326,6 +350,20 @@ impl Gameplay {
                         },
                         &mut out,
                     )?;
+                }
+                // A finish that readies the quest opens its 49/13 end screen. Like the
+                // held Talk path (released by 26/6 over the open dialog), it names the
+                // runtime actor the client clicked, not the content key, and no 26/4
+                // closes the dialog first.
+                let mut end_screen = false;
+                for packet in &mut out.replies {
+                    if packet.starts_with(&[49, 0, 13, 0]) {
+                        patch_npc_actor(packet, open.actor_id);
+                        end_screen = true;
+                    }
+                }
+                if !end_screen {
+                    out.replies.insert(0, END_DIALOG_26_4.to_vec());
                 }
             }
             crate::quest_dialogue::ConversationStep::Abandoned => {

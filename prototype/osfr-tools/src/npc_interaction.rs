@@ -799,6 +799,20 @@ impl NpcInteraction {
         }
     }
 
+    /// Whether `npc_id` is still this session's active NPC and the player stands in its reach.
+    /// The 26/10 start gate checks range once; a later 26/6 answer (T543 quest conversation)
+    /// repeats it so a player who walked or teleported away cannot keep answering.
+    pub fn in_reach_of_active(&self, npc_id: u64, zone_id: u32, position: [f32; 3]) -> bool {
+        self.active
+            .as_ref()
+            .is_some_and(|active| active.npc_id == npc_id)
+            && self
+                .content
+                .npcs
+                .get(&npc_id)
+                .is_some_and(|npc| check_range(npc, zone_id, position).is_ok())
+    }
+
     /// (R) T773: remember the 26/3 a Talk actually sent: its exact rows and the page body
     /// behind each explainer row. A later Talk replaces them and closing the interaction
     /// clears them, so a 26/6 can only replay what the client was shown.
@@ -1276,7 +1290,7 @@ pub fn encode_dialogue_close_26_4() -> Vec<u8> {
 /// and image IDs. Lua `DialogTest` uses response background set 18. `300` and
 /// `17` remain reconstructed response/opaque fields (R); image ID 0 means no
 /// separate image, and locale row 8075 is "Goodbye".
-fn dialogue_choice(response_id: i32, label_string_id: u32) -> [u32; 5] {
+pub fn dialogue_choice_row(response_id: i32, label_string_id: u32) -> [u32; 5] {
     [response_id as u32, 17, label_string_id, 0, 18]
 }
 
@@ -1285,17 +1299,17 @@ pub const QUEST_CHOICE_RESPONSE: i32 = 301;
 
 /// Dialog row that leads to a quest offer, labelled with the quest title.
 pub fn quest_dialogue_choice(title_string_id: u32) -> [u32; 5] {
-    dialogue_choice(QUEST_CHOICE_RESPONSE, title_string_id)
+    dialogue_choice_row(QUEST_CHOICE_RESPONSE, title_string_id)
 }
 
 pub fn goodbye_dialogue_choice() -> [u32; 5] {
-    dialogue_choice(GOODBYE_CHOICE_RESPONSE, GOODBYE_STRING_ID)
+    dialogue_choice_row(GOODBYE_CHOICE_RESPONSE, GOODBYE_STRING_ID)
 }
 
 /// (R) Dialog row that opens one greeter explainer page (T773), labelled with its own
 /// `Global.Text` id; the client echoes dword 1 in 26/6.
 pub fn explainer_dialogue_choice(response_id: i32, label_string_id: u32) -> [u32; 5] {
-    dialogue_choice(response_id, label_string_id)
+    dialogue_choice_row(response_id, label_string_id)
 }
 
 /// The response rows one 26/3 carries: the quest row when the same Talk offers a quest,

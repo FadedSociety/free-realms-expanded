@@ -13,6 +13,9 @@
 #[path = "../common/content_copy.rs"]
 mod content_copy;
 
+#[path = "../common/gateway_packets.rs"]
+mod gateway_packets;
+
 #[path = "npc_visibility.rs"]
 mod npc_visibility;
 
@@ -29,7 +32,7 @@ use osfr_tools::{
     gateway::Gateway,
     inventory::InventoryItem,
     npc_interaction::{decode_dialogue_26_3, decode_quest_offer_49_1},
-    quest_engine::QuestStatus,
+    quest_engine::{QuestProgress, QuestStatus},
 };
 use serde_json::Value;
 use std::{
@@ -249,6 +252,52 @@ impl Fixture {
         )
         .unwrap();
         catalogue
+    }
+
+    /// Rewrite one quest record in this fixture's narrowed catalogue (the shipped tree is never
+    /// touched) and return the file's original bytes, so a test can put them back.
+    pub fn patch_quest(&self, file: &str, quest_id: u32, edit: impl FnOnce(&mut Value)) -> Vec<u8> {
+        let path = self.quest_catalogue().join("quests").join(file);
+        let original = fs::read(&path).unwrap();
+        let mut document: Value = serde_json::from_slice(&original).unwrap();
+        let record = document["records"]
+            .as_array_mut()
+            .unwrap()
+            .iter_mut()
+            .find(|record| record["id"] == quest_id)
+            .unwrap_or_else(|| panic!("quest {quest_id} is in {file}"));
+        edit(record);
+        fs::write(&path, serde_json::to_vec_pretty(&document).unwrap()).unwrap();
+        original
+    }
+
+    /// A logged-in, world-loaded `Gateway` session standing at `position`, running this
+    /// fixture's gameplay with the split quest catalogue bound for `guid`. Requests go through
+    /// [`gateway_send`], the real `Gateway::handle_at` framing and commit rules.
+    pub fn session(&self, guid: u64, position: [f32; 3], state: Option<GameplayState>) -> Gateway {
+        let reference = Path::new(env!("CARGO_MANIFEST_DIR"))
+            .join("../../../lab/references/rust-gateway-reference");
+        let version = read_json(&reference.join("manifest.json"))["client_version"]
+            .as_str()
+            .unwrap()
+            .to_owned();
+        let mut character = Gateway::reference_state(&reference).unwrap();
+        character.guid = guid;
+        character.position = position;
+        let mut gateway = Gateway::load(&reference, character).unwrap();
+        gateway.enable_gameplay(&self.path, state).unwrap();
+        gateway
+            .gameplay_mut()
+            .unwrap()
+            .bind_npc_quest_catalogue(&self.quest_catalogue(), guid)
+            .unwrap();
+        let login = gateway_packets::login_with_version(guid, &version);
+        gateway.handle_at(&login, 0).unwrap();
+        // The client's Ready (13) then Loaded (10) events.
+        for (event, now) in [(13_u16, 100), (10_u16, 200)] {
+            gateway_send(&mut gateway, &event.to_le_bytes(), now);
+        }
+        gateway
     }
 
     /// Reload the saved character through the same production bind the session uses.
@@ -502,6 +551,18 @@ pub fn send(game: &mut Gameplay, character: &CharacterState, packet: &[u8], now:
                 &packet[..packet.len().min(4)]
             )
         })
+}
+
+/// One request through the real `Gateway::handle_at` framing: the application bodies it replies
+/// with, `005` tunnel stripped.
+pub fn gateway_send(gateway: &mut Gateway, inner: &[u8], now: u64) -> Vec<Vec<u8>> {
+    gateway
+        .handle_at(&gateway_packets::wrap(inner), now)
+        .expect("gateway frame")
+        .replies
+        .iter()
+        .map(|reply| gateway_packets::body(reply).to_vec())
+        .collect()
 }
 
 pub fn has_family(packet: &[u8], family: u16, subtype: u16, id: Option<u32>) -> bool {
@@ -845,6 +906,16 @@ impl ZoneQuests {
         *now += 10;
     }
 
+    /// Talk at `npc`, clicking its runtime actor.
+    pub fn talk(&self, game: &mut Gameplay, guid: u64, npc: u64, now: u64) -> Outcome {
+        talk(game, &self.at(guid, npc), self.actor(npc), now)
+    }
+
+    /// Click response `row` of the open dialogue while standing at `npc`.
+    pub fn answer(&self, game: &mut Gameplay, guid: u64, npc: u64, row: i32, now: u64) -> Outcome {
+        send(game, &self.at(guid, npc), &dialogue_choice(row), now)
+    }
+
     /// Complete one ordered Talk objective, clicking the runtime actor of an extra spawn.
     pub fn step(
         &self,
@@ -942,14 +1013,48 @@ impl ZoneQuests {
 /// The 26/3 dialogue body (its first dword) a completed Talk step speaks. Client
 /// reader `0x00a9ef10`; the layout is the one `decode_dialogue_26_3` parses.
 pub fn dialogue_body(outcome: &Outcome) -> u32 {
-    let packet = outcome
-        .replies
+    dialogue_line(&outcome.replies).0
+}
+
+/// The 26/3 body and its five-dword response rows (the first dword is the id a 26/6 echoes),
+/// decoded with the production reader. A quest conversation answers every step with one.
+pub fn dialogue_line(replies: &[Vec<u8>]) -> (u32, Vec<[u32; 5]>) {
+    let packet = replies
         .iter()
         .find(|packet| packet.starts_with(&[26, 0, 3, 0]))
-        .expect("a Talk answers 26/3");
-    decode_dialogue_26_3(packet)
-        .expect("the 26/3 decodes")
-        .initial_dwords[0]
+        .expect("the reply carries a 26/3");
+    let decoded = decode_dialogue_26_3(packet).expect("the 26/3 decodes");
+    (decoded.initial_dwords[0], decoded.choices)
+}
+
+/// 26/8 then the Talk row of the 26/10 menu through [`gateway_send`], like [`talk`] does for a
+/// bare `Gameplay`. Returns the 26/10 replies (the dialogue or the conversation's first line).
+pub fn gateway_talk(gateway: &mut Gateway, target: u64, now: u64) -> Vec<Vec<u8>> {
+    let menu = gateway_send(gateway, &npc_interact(target), now);
+    let menu = menu
+        .iter()
+        .find(|packet| packet.starts_with(&[26, 0, 9, 0]))
+        .expect("26/8 answers the 26/9 menu");
+    let choice = menu_option_bytes(menu, TALK_LABEL);
+    gateway_send(gateway, &npc_select(target, choice), now + 1)
+}
+
+/// Whether the replies carry the server's 26/4 EndDialog.
+pub fn dialogue_closed(replies: &[Vec<u8>]) -> bool {
+    replies.iter().any(|packet| packet == &[26, 0, 4, 0])
+}
+
+/// Put `quest_id` in the saved quest state with `status` and `counts`, when a test needs a
+/// quest mid-way without replaying its chain (the loader still validates the counters). The
+/// full chains have their own suites.
+pub fn seed_quest(state: &mut GameplayState, quest_id: u32, status: QuestStatus, counts: &[u32]) {
+    state.npc_quests.as_mut().unwrap().quests.insert(
+        quest_id,
+        QuestProgress {
+            status,
+            counts: counts.to_vec(),
+        },
+    );
 }
 
 /// A player on the Adventurer ladder with `active` as the saved job, so the XP
