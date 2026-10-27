@@ -9,7 +9,7 @@
 mod npc_quest_chain;
 
 use npc_quest_chain::{
-    CHARACTER, Fixture, character_at_for, content_dir, pending_offer, saved, send,
+    CHARACTER, Fixture, breadcrumb_start, character_at_for, content_dir, pending_offer, saved, send,
 };
 use osfr_tools::{
     gameplay::Gameplay,
@@ -225,10 +225,6 @@ fn two_players_each_get_their_own_147_1() {
     );
 }
 
-fn breadcrumb(id: i32) -> Vec<u8> {
-    [&[49, 0, 15, 0, 0, 0][..], &id.to_le_bytes()].concat()
-}
-
 #[test]
 fn start_quest_with_a_disabled_or_unmapped_id() {
     let fixture = Fixture::new();
@@ -240,7 +236,12 @@ fn start_quest_with_a_disabled_or_unmapped_id() {
         .enumerate()
     {
         let before = saved(&game);
-        let out = send(&mut game, &character(), &breadcrumb(id), 100 + step as u64);
+        let out = send(
+            &mut game,
+            &character(),
+            &breadcrumb_start(id),
+            100 + step as u64,
+        );
         assert!(!out.changed, "id {id}");
         assert_eq!(out.replies, refusal, "id {id}");
         assert_eq!(saved(&game), before, "id {id} changed the save");
@@ -255,7 +256,7 @@ fn zero_or_negative_breadcrumb_is_refused_politely() {
     for (step, id) in [0, -1, i32::MIN].into_iter().enumerate() {
         let before = saved(&game);
         let out = game
-            .handle_in_world(&breadcrumb(id), &character(), 200 + step as u64)
+            .handle_in_world(&breadcrumb_start(id), &character(), 200 + step as u64)
             .unwrap_or_else(|error| panic!("id {id} ended the session: {error}"));
         assert!(!out.changed, "id {id}");
         assert_eq!(out.replies, refusal, "id {id}");
@@ -263,7 +264,13 @@ fn zero_or_negative_breadcrumb_is_refused_politely() {
     }
     // The session goes on: an ordinary request still answers.
     assert_eq!(
-        send(&mut game, &character(), &breadcrumb(ARCHER_ORIGINAL), 300).replies,
+        send(
+            &mut game,
+            &character(),
+            &breadcrumb_start(ARCHER_ORIGINAL),
+            300
+        )
+        .replies,
         refusal
     );
     // A request that is not even the right size is still an error, and 47/12 is untouched.
@@ -343,7 +350,7 @@ fn start_quest_with_a_mapped_id() {
     let out = send(
         &mut game,
         &character(),
-        &breadcrumb(FISHERMAN_ORIGINAL),
+        &breadcrumb_start(FISHERMAN_ORIGINAL),
         400,
     );
     assert!(out.changed);

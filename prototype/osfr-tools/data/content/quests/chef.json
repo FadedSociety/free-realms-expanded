@@ -1170,7 +1170,7 @@
         },
         {
           "kind": "client",
-          "evidence": "Global.Text 387246 (Bordon Cloo's offer: come back at level 5), 387247 title, 387248 description and objectives, 387249 end text (lab/reports/locale-id-to-text.json; lab/references/quest-lines/dialogs.json q3050020; quest-lines/quests.json q3050020 live 'yes')."
+          "evidence": "Global.Text 387246 (a progress line, not an offer: lab/references/quest-lines/dialogs.json q3050020 offer is null; used as the 49/1 intro: come back at level 5), 387247 title, 387248 objective hint and 49/1 description, 387249 complete line and 49/13 end text (lab/reports/locale-id-to-text.json; quest-lines/quests.json q3050020 live 'yes')."
         },
         {
           "kind": "reconstructed",

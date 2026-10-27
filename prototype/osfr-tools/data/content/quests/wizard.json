@@ -1453,7 +1453,7 @@
         },
         {
           "kind": "client",
-          "evidence": "Global.Text 387666 (Osgood's line: come back at level 15), 387667 title, 387668 wait text, 387669 end text 'Great, you're back!' (lab/reports/locale-id-to-text.json; lab/references/quest-lines/dialogs.json q3160024)."
+          "evidence": "Global.Text 387666 (a progress line, not an offer: lab/references/quest-lines/dialogs.json q3160024 offer is null; used as the 49/1 intro: come back at level 15), 387667 title, 387668 wait text, 387669 a followup line (dialogs q3160024 complete is null; used as the 49/13 end text) 'Great, you're back!' (lab/reports/locale-id-to-text.json; quest-lines/quests.json q3160024)."
         },
         {
           "kind": "reconstructed",

@@ -24,19 +24,7 @@
           ]
         }
       ],
-      "rewards": [
-        {
-          "coins": 5,
-          "items": [],
-          "job_xp": {},
-          "source": [
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) T723: the answer records 'Postman job unlock; no coin or item reward recorded (rewards not documented)' (quest-lines/quests.json q3130001), which means undocumented, not none. The quest is ungated, so a player who is not yet a Postman can finish it and no Postman XP is paid; 5 coins is a reconstructed token payout, in data and tunable."
-            }
-          ]
-        }
-      ],
+      "rewards": [],
       "source": [
         {
           "kind": "client",
@@ -72,11 +60,11 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) T723: enabled on the round-3 spec. It is also the quest the Jobs window starts: job_browser.json maps original 1964 to this record, so the 49/15 Start quest button offers it. No dialog line is bound (the answer finds no offer, progress or end line), so the 49/1 card carries intro 0 and the end screen text 0."
+          "evidence": "(R) T723/F751: kept disabled. The answer's reward is the Postman job unlock (quest-lines/quests.json q3130001) and no quest turn-in can grant a profile (the only Postman unlock path is the trainer menu), so nothing can pay the cited reward; the 49/1 intro and 49/13 end text are also unbound (dialogs q3130001 has no offer, progress or complete line). Do not substitute coins for the unlock (review 605e90c finding 1): the 49/15 Jobs-window Start is refused and unlocks nothing until a completion path grants profile 4."
         }
       ],
       "description_string_id": 412446,
-      "enabled": true
+      "enabled": false
     },
     {
       "id": 3130002,

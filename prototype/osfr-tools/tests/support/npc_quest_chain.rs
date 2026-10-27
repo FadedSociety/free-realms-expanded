@@ -461,6 +461,18 @@ pub fn quest_end_reply(quest_id: u32) -> Vec<u8> {
     packet
 }
 
+/// 49/15 `QuestStartBreadcrumb`: the client's 10-byte request, `[49, 0, 15, 0,
+/// 0, 0]` then the ORIGINAL quest id as `i32`. Header writer `0x00a8f860` writes
+/// `u16 49` then `u32 15`; payload writer `0x00a91730` writes the id from the
+/// ctor's `+0xc`. Sender `0x00a97f90` (`Ui.StartBreadcrumbQuest`, Lua `0x00c18aa0`)
+/// -> ctor `0x00a86580`: family 49, subtype 15, the id at `+0xc`. The server
+/// decoder is `quest_journal::decode`. The client sends the original id; the
+/// server translates it through `breadcrumb_quests.json` or the Jobs-window
+/// crosswalk.
+pub fn breadcrumb_start(original_quest_id: i32) -> Vec<u8> {
+    [&[49, 0, 15, 0, 0, 0][..], &original_quest_id.to_le_bytes()].concat()
+}
+
 /// 26/23 abandon, the client's 8-byte body: writer `0x00c0a350` (preamble `0x0090ac70`
 /// writes u16 26 + u16 23, then the u32 quest id).
 pub fn quest_abandon(quest_id: u32) -> Vec<u8> {
