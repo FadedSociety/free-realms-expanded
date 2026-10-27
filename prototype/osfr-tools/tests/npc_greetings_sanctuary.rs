@@ -404,6 +404,9 @@ fn a_bound_npc_sends_its_greeting_in_26_3() {
         roles(&merchant).contains("vendor"),
         "the edited set must include a merchant"
     );
+    // T774: the vendor role alone no longer opens a window. Every merchant in this
+    // edited set has no priced `vendors.json` stock, so none may list Shop; the client
+    // must never open an empty merchant window.
     let (zone, position) = service.location(MERCHANT).expect("merchant location");
     let menu = service
         .interact(MERCHANT, zone, position, None)
@@ -411,8 +414,8 @@ fn a_bound_npc_sends_its_greeting_in_26_3() {
     assert!(
         menu.options
             .iter()
-            .any(|option| option.action == NpcAction::Shop),
-        "the merchant must still list Shop beside Talk"
+            .all(|option| option.action != NpcAction::Shop),
+        "a merchant without priced stock must not list Shop"
     );
     let greeter = npc_record("sanctuary.json", GREETER);
     let greeter_roles = roles(&greeter);

@@ -350,6 +350,24 @@ fn open_shop(interaction: &mut NpcInteraction, npc_id: u64) -> MerchantWindow {
     window
 }
 
+/// T774: a vendor with no priced stock offers no Shop choice, so the client can
+/// never open an empty merchant window (`npc_interaction::build_options`).
+fn assert_no_shop_option(interaction: &mut NpcInteraction, npc_id: u64) {
+    let (zone, position) = interaction
+        .location(npc_id)
+        .unwrap_or_else(|| panic!("NPC {npc_id} has a spawn location"));
+    let menu = interaction
+        .interact(npc_id, zone, position, None)
+        .unwrap_or_else(|error| panic!("NPC {npc_id} interaction failed: {error:?}"));
+    assert!(
+        !menu
+            .options
+            .iter()
+            .any(|option| option.action == NpcAction::Shop),
+        "NPC {npc_id} offers Shop without priced stock"
+    );
+}
+
 /// Legacy protected name. It enumerates the 59 selected-hub vendor-role rows
 /// and pins the known 30 stocked / 1 resolved-empty / 28 unresolved split; it
 /// is a content-completeness audit, **not** evidence that the T108 20-vendor
@@ -485,10 +503,7 @@ fn the_selected_hub_vendors_have_nonempty_grantable_stock() {
                 );
                 assert_eq!(record["stock_completeness"], "partial_evidence_reference");
                 empty.insert(npc_id);
-                assert!(
-                    open_shop(&mut interaction, npc_id).items.is_empty(),
-                    "NPC {npc_id} resolution exception still exposes stock"
-                );
+                assert_no_shop_option(&mut interaction, npc_id);
             }
             continue;
         }
@@ -520,10 +535,7 @@ fn the_selected_hub_vendors_have_nonempty_grantable_stock() {
             "NPC {npc_id} unresolved record has no reason"
         );
         empty.insert(npc_id);
-        assert!(
-            open_shop(&mut interaction, npc_id).items.is_empty(),
-            "NPC {npc_id} unresolved exception still exposes stock"
-        );
+        assert_no_shop_option(&mut interaction, npc_id);
     }
 
     let expected_exceptions: BTreeSet<u64> = SELECTED_HUB_STOCK_EXCEPTIONS

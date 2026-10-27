@@ -110,6 +110,8 @@ pub struct InteractionMenu {
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub struct MerchantItem {
     pub item_id: i32,
+    /// Always `Some` in a [`MerchantWindow`]: a row without a price is not stock and is not
+    /// listed. Optional because the price the client displays comes from the item definition.
     pub purchase_price_coins: Option<u32>,
 }
 
@@ -892,8 +894,11 @@ impl NpcInteraction {
         }
         // (R) The content `vendor` role opens the stock window; the explicit `vendors.json`
         // mapping authorizes which priced items it may show or sell (`load` refuses a mapping
-        // for a role-less NPC). A role-bearing NPC without a mapping opens an empty window.
-        if has_role(npc, NpcRole::Vendor) {
+        // for a role-less NPC). A shop row needs a `stores.json` purchase price: the 165/10
+        // list is built from priced rows only (`coin_merchant_packets`), so a role-bearing NPC
+        // with no priced stock has no window to open. T774: it used to offer Shop and the client
+        // opened an empty merchant window (native 2026-10-26, Mr. Twinkle).
+        if has_role(npc, NpcRole::Vendor) && !self.merchant_window(npc).items.is_empty() {
             options.push((NpcAction::Shop, SHOP_STRING_ID));
         }
         if self.content.race_gates.contains(&npc.npc_id) {
@@ -964,6 +969,8 @@ impl NpcInteraction {
 
     fn merchant_window(&self, npc: &NpcRecord) -> MerchantWindow {
         // (R) Item IDs require an explicit vendor mapping; never show the global price catalogue.
+        // The stock list is the buy list: a row without a `stores.json` purchase price cannot be
+        // bought and the merchant list skips it, so it is not part of the window either.
         let items = self
             .content
             .vendor_items
@@ -974,7 +981,7 @@ impl NpcInteraction {
                 let price = self.content.prices.get(item_id)?;
                 Some(MerchantItem {
                     item_id: price.item_id,
-                    purchase_price_coins: price.purchase_price_coins,
+                    purchase_price_coins: Some(price.purchase_price_coins?),
                 })
             })
             .collect();
