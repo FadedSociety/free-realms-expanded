@@ -127,6 +127,7 @@ impl MysteryChests {
             return Ok(InventoryOutcome {
                 replies: vec![mystery_chest::check_reply(id, success)],
                 changed: false,
+                ..InventoryOutcome::default()
             });
         }
         // A Use for another instance must not cancel this chest's confirmation (W90).
@@ -140,12 +141,14 @@ impl MysteryChests {
                     "Opening requires an owned Mystery Chest and Mystery Key.",
                 )],
                 changed: false,
+                ..InventoryOutcome::default()
             });
         };
         if !confirmed {
             return Ok(InventoryOutcome {
                 replies: vec![chat::system("Confirm the Mystery Chest before opening it.")],
                 changed: false,
+                ..InventoryOutcome::default()
             });
         }
         let choices = &self.rewards[&chest.definition_id];

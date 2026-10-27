@@ -147,6 +147,7 @@ mod tests {
             shared_field: Some(crate::encounter::SharedFieldAction::Ability { slot: 3, target: 9 }),
             replies: vec![vec![3]],
             changed: true,
+            granted_items: vec![(41, 2)],
             zoning: Some(crate::encounter::ZoneTransition {
                 zone_id: 7,
                 name: "Seven".into(),
@@ -193,6 +194,7 @@ mod tests {
         ));
         assert_eq!(live.replies, vec![vec![1], vec![3]]);
         assert!(live.changed);
+        assert_eq!(live.granted_items, vec![(41, 2)]);
         assert_eq!(live.zoning.as_ref().unwrap().zone_id, 7);
         assert_eq!(live.scene_zoning.as_ref().unwrap().scene, "Seven");
         assert_eq!(live.relocation.as_ref().unwrap().position, [1.0, 2.0, 3.0]);
@@ -217,6 +219,7 @@ mod tests {
         assert!(live.shared_field.is_some() && live.zoning.is_some());
         assert!(live.scene_zoning.is_some() && live.relocation.is_some());
         assert!(live.group_heal.is_some());
+        assert_eq!(live.granted_items, vec![(41, 2)]);
         assert!(
             live.broadcast.is_some()
                 && live.admin_move.is_some()

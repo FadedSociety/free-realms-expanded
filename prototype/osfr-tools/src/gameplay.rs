@@ -321,6 +321,9 @@ pub struct Outcome {
     pub shared_field: Option<crate::encounter::SharedFieldAction>,
     pub replies: Vec<Vec<u8>>,
     pub changed: bool,
+    /// T772: inventory stacks this outcome granted, as `(instance id, units)`. The NPC dispatch
+    /// boundary and `realm give` settle them into pets; a refusal grants nothing.
+    pub granted_items: Vec<(i32, u32)>,
     pub zoning: Option<ZoneTransition>,
     /// Complete native scene transition. Vehicle scenes need the captured
     /// quaternion's fourth component, which the legacy encounter writer omits.
@@ -355,6 +358,7 @@ impl Outcome {
             shared_field,
             replies,
             changed,
+            granted_items,
             zoning,
             scene_zoning,
             relocation,
@@ -369,6 +373,7 @@ impl Outcome {
         self.shared_field = shared_field.or(self.shared_field.take());
         self.replies.extend(replies);
         self.changed |= changed;
+        self.granted_items.extend(granted_items);
         self.zoning = zoning.or(self.zoning.take());
         self.scene_zoning = scene_zoning.or(self.scene_zoning.take());
         self.relocation = relocation.or(self.relocation.take());
@@ -2760,26 +2765,7 @@ impl Gameplay {
                 let on = self.encounter.as_mut().is_some_and(|e| e.toggle_god());
                 say(out, format!("God mode {}.", if on { "on" } else { "off" }));
             }
-            ["give", item, rest @ ..] => {
-                let (Ok(item), count) = (
-                    item.parse::<i32>(),
-                    rest.first()
-                        .and_then(|n| n.parse::<u32>().ok())
-                        .unwrap_or(1),
-                ) else {
-                    say(out, "Usage: realm give <item id> [count]".into());
-                    return Ok(true);
-                };
-                let before = self.inventory.state().clone();
-                match self.grant_reward(0, &[(item, count.clamp(1, 999))], out) {
-                    // T772: a pet item becomes a pet at once.
-                    Ok(()) => {
-                        self.adopt_gained_pets(&before, now_ms, out)?;
-                        say(out, format!("Gave {count} x item {item}."));
-                    }
-                    Err(error) => say(out, format!("Could not give item {item}: {error}")),
-                }
-            }
+            ["give", item, rest @ ..] => return self.realm_give(item, rest, now_ms, out),
             ["coins", n] => {
                 let Ok(coins) = n.parse::<u32>() else {
                     say(out, "Usage: realm coins <amount>".into());
@@ -4867,6 +4853,7 @@ impl Gameplay {
         let result = self.inventory.grant_bundle(coins, items)?;
         out.changed |= result.changed;
         out.replies.extend(result.replies);
+        out.granted_items.extend(result.granted);
         self.npc_inventory_events(&before, out)?;
         Ok(())
     }

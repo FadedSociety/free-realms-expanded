@@ -34,6 +34,8 @@ use gateway_vendor::{
     sell_packet, send, vendor_buy_packet, wrap,
 };
 use osfr_tools::{
+    account_store::AccountRole,
+    chat,
     coin_shop::{self, CoinShop, StoreCatalogue},
     game_store::Snapshot,
     gameplay::GameplayState,
@@ -60,6 +62,8 @@ const GLORIA_NPC_FILE: &str = "cobblestone_village.json";
 const UNBOUND_PET: i32 = 1_999_999_002;
 /// Fritz, one of the 16 adoption item ids `pets.json` binds.
 const BOUND_PET: i32 = 4_324;
+/// The shipped Gloria Crab (model 1667, vanity) the T772 brief buys.
+const CRAB_PET: i32 = 7_885;
 /// Skeletal Dragon (`mounts.json` mount 715, item 10,530).
 const RIDE: i32 = 10_530;
 /// Small Wilds House, a type-16 house deed.
@@ -309,7 +313,7 @@ fn a_pet_item_bound_by_pets_content_is_sold() {
     assert_eq!(inventory_of(&gateway).coins, 1_000 - 432);
     // T772: the bought item is adopted at once: a pet in the roster (and its 53/5), none in the bag.
     assert_eq!(count_definition(&inventory_of(&gateway), BOUND_PET), 0);
-    assert_adopted(&gateway, &replies, 1);
+    assert_adopted(&gateway, &replies, BOUND_PET, 1);
 }
 
 /// T772: the saved roster's pets, from the gateway's save document.
@@ -321,13 +325,13 @@ fn roster(gateway: &Gateway) -> Vec<Value> {
         .unwrap_or_default()
 }
 
-/// T772: `count` pets adopted from `BOUND_PET`, and the reply carried the 53/5 roster.
-fn assert_adopted(gateway: &Gateway, replies: &[Vec<u8>], count: usize) {
+/// T772: `count` pets adopted from `item`, and the reply carried the 53/5 roster.
+fn assert_adopted(gateway: &Gateway, replies: &[Vec<u8>], item: i32, count: usize) {
     let pets = roster(gateway);
     assert_eq!(pets.len(), count, "the roster holds every bought pet");
     assert!(
         pets.iter()
-            .all(|pet| pet["adoption_item_definition_id"] == BOUND_PET),
+            .all(|pet| pet["adoption_item_definition_id"] == item),
         "each pet records the item it was adopted from"
     );
     assert!(
@@ -349,7 +353,7 @@ fn a_pet_item_bought_through_the_66_43_vendor_buy_is_adopted() {
     );
     assert_eq!(inventory_of(&gateway).coins, 1_000 - 432);
     assert_eq!(count_definition(&inventory_of(&gateway), BOUND_PET), 0);
-    assert_adopted(&gateway, &replies, 1);
+    assert_adopted(&gateway, &replies, BOUND_PET, 1);
 }
 
 #[test]
@@ -376,6 +380,168 @@ fn a_full_roster_refuses_a_pet_buy_before_money_moves() {
     assert_unchanged(&gateway, &before, "full roster");
     assert_eq!(inventory_of(&gateway).coins, 10_000 - 50 * 10);
     assert_eq!(count_definition(&inventory_of(&gateway), BOUND_PET), 0);
+}
+
+/// F792: a shop whose session never announced the roster room fails closed on a pet buy, so a
+/// forgotten `sync_pet_room` cannot bypass the full-roster gate and strand the item.
+#[test]
+fn a_pet_buy_without_a_known_roster_room_is_refused() {
+    let fixture = gloria_fixture("f792-room-unset");
+    fixture.stock_price_coins(&[(CRAB_PET, 432)]);
+    let inventory = Inventory::load(
+        fixture.content(),
+        Some(fixture.state(1_000, false).inventory),
+    )
+    .expect("fixture inventory loads");
+    let catalogue =
+        StoreCatalogue::load(&fixture.content().join("stores.json")).expect("stores load");
+    let mut shop = CoinShop::new(
+        fixture.content(),
+        inventory,
+        catalogue,
+        100,
+        None,
+        Wallet::default(),
+    )
+    .expect("shop loads");
+    let before = shop.inventory().state().clone();
+    let refused = shop.buy(1, CRAB_PET, 1).expect("buy parses");
+    assert_eq!(
+        refused.result_code,
+        coin_shop::RESULT_SERVICE_UNAVAILABLE,
+        "unknown room must refuse, not skip the gate"
+    );
+    assert!(!refused.changed);
+    assert_eq!(shop.inventory().state(), &before);
+}
+
+/// T772: the brief's shipped Gloria Crab (model 1667, vanity) is bought through the real 66/43
+/// path, adopted with its model, and the saved roster comes back on reconnect.
+#[test]
+fn the_shipped_crab_buy_is_adopted_and_the_roster_survives_reconnect() {
+    let fixture = gloria_fixture("t772-crab");
+    fixture.stock_price_coins(&[(CRAB_PET, 432)]);
+    let mut gateway = connect(&fixture, fixture.state(1_000, false));
+    open_shop(&fixture, &mut gateway);
+    let (replies, outcome) = handled(&mut gateway, &vendor_buy_packet(7, CRAB_PET, 1));
+    assert!(outcome.gameplay_changed, "the adoption saves with the buy");
+    assert_eq!(inventory_of(&gateway).coins, 1_000 - 432);
+    assert_eq!(count_definition(&inventory_of(&gateway), CRAB_PET), 0);
+    assert_adopted(&gateway, &replies, CRAB_PET, 1);
+
+    let pets = roster(&gateway);
+    let content = PetService::bundled_content().expect("the bundled pets content loads");
+    let definition = content
+        .definition_for_item(CRAB_PET)
+        .expect("the shipped Crab is bound to a species");
+    assert_eq!(content.model_id(&definition.model), 1_667, "Crab model");
+    assert!(content.is_vanity(1_667), "Crab is a vanity pet");
+    assert_eq!(
+        pets[0]["species_id"].as_u64(),
+        Some(u64::from(definition.species_id))
+    );
+    assert_eq!(pets[0]["model"].as_str(), Some(definition.model.as_str()));
+
+    let saved = gateway.snapshot();
+    let saved_pets = saved.pets.clone().expect("the adopted pet is saved");
+    let mut restored = Gateway::load_gameplay(
+        fixture.reference(),
+        gateway.state().clone(),
+        fixture.content(),
+        saved.gameplay,
+    )
+    .expect("the saved gameplay reloads");
+    restored
+        .adopt_pets(saved.pets)
+        .expect("the saved roster reloads");
+    let restored_pets = roster(&restored);
+    assert_eq!(restored_pets.len(), 1, "reconnect keeps the bought pet");
+    assert_eq!(
+        restored_pets[0]["model"].as_str(),
+        Some(definition.model.as_str())
+    );
+    assert_eq!(restored.snapshot().pets, Some(saved_pets));
+}
+
+/// The production server loads opening content, which owns the developer command handler.
+/// The minimal vendor fixture omits those files, so copy the matching source package files.
+fn with_developer_commands(fixture: &VendorFixture) {
+    for file in [
+        "opening.json",
+        "profiles.json",
+        "opening-abilities.json",
+        "encounters.json",
+        "encounter-template.bin",
+    ] {
+        let source = round70_content::source().join(file);
+        fs::copy(&source, fixture.content().join(file))
+            .unwrap_or_else(|error| panic!("fixture {file} copies: {error}"));
+    }
+}
+
+/// T772: `realm give 70352` (the brief's grant hook) adopts at once, saves, and reloads.
+#[test]
+fn realm_give_adopts_a_pet_item_and_the_roster_survives_reconnect() {
+    let fixture = gloria_fixture("t772-realm-give");
+    with_developer_commands(&fixture);
+    let mut gateway = connect(&fixture, fixture.state(0, false));
+    gateway.set_dev_tools(true);
+    gateway.set_role(AccountRole::Admin);
+    let (replies, outcome) = handled(&mut gateway, &chat::local_request("realm give 70352"));
+    assert!(
+        outcome.gameplay_changed,
+        "the grant and adoption save together: {replies:?}"
+    );
+    assert_eq!(count_definition(&inventory_of(&gateway), 70352), 0);
+    assert_adopted(&gateway, &replies, 70352, 1);
+
+    let saved = gateway.snapshot();
+    let saved_pets = saved.pets.clone().expect("the adopted pet is saved");
+    let mut restored = Gateway::load_gameplay(
+        fixture.reference(),
+        gateway.state().clone(),
+        fixture.content(),
+        saved.gameplay,
+    )
+    .expect("the saved gameplay reloads");
+    restored
+        .adopt_pets(saved.pets)
+        .expect("the saved roster reloads");
+    assert_eq!(
+        roster(&restored).len(),
+        1,
+        "reconnect keeps the granted pet"
+    );
+    assert_eq!(restored.snapshot().pets, Some(saved_pets));
+}
+
+/// F792: an over-room grant is refused whole, before the inventory changes, so no invisible
+/// category-200 item is stranded in the bag.
+#[test]
+fn realm_give_refuses_pet_items_the_roster_cannot_hold() {
+    let fixture = gloria_fixture("t772-realm-give-overflow");
+    with_developer_commands(&fixture);
+    let mut gateway = connect(&fixture, fixture.state(0, false));
+    gateway.set_dev_tools(true);
+    gateway.set_role(AccountRole::Admin);
+    for _ in 0..50 {
+        handled(&mut gateway, &chat::local_request("realm give 70352"));
+    }
+    assert_eq!(roster(&gateway).len(), 50);
+
+    let before = gateway.snapshot();
+    let (replies, outcome) = handled(&mut gateway, &chat::local_request("realm give 70352"));
+    assert!(!outcome.gameplay_changed && !outcome.state_changed);
+    assert_eq!(
+        gateway.snapshot(),
+        before,
+        "the over-room grant changed nothing"
+    );
+    assert_eq!(count_definition(&inventory_of(&gateway), 70352), 0);
+    assert!(
+        !replies.iter().any(|p| p.starts_with(&[53, 0, 5])),
+        "a refusal sends no roster"
+    );
 }
 
 #[test]
@@ -602,7 +768,7 @@ fn a_bought_pet_item_credits_nothing() {
             0,
         );
         let (replies, _) = handled(&mut gateway, &buy(1, BOUND_PET, 1));
-        assert_adopted(&gateway, &replies, 1);
+        assert_adopted(&gateway, &replies, BOUND_PET, 1);
         assert_eq!(collected(&gateway), 0, "{label}: an adopted pet counted");
     }
 }

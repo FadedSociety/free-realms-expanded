@@ -206,6 +206,9 @@ pub struct CoinShopOutcome {
     pub transaction_id: u32,
     pub replies: Vec<Vec<u8>>,
     pub changed: bool,
+    /// T772: the inventory stacks this buy added, as `(instance id, units)`, so the caller can
+    /// adopt pet adoption items at once. A refusal, sell or cached retry adds none.
+    pub granted: Vec<(i32, u32)>,
 }
 
 #[derive(Clone)]
@@ -236,8 +239,9 @@ pub struct CoinShop {
     /// change.
     pet_items: BTreeSet<i32>,
     /// T772: how many more pets the session's roster holds; a bought pet item is adopted at once,
-    /// so a buy of more is refused before money moves. Unlimited until the session sets it.
-    pet_room: usize,
+    /// so a buy of more is refused before money moves. `None` until the session announces it, and
+    /// then a bound pet buy fails closed rather than skipping the full-roster gate.
+    pet_room: Option<usize>,
     vendor_transactions: BTreeMap<u32, (u32, Vec<u8>)>,
     sales: VecDeque<SaleRecord>,
     next_transaction_id: u32,
@@ -309,7 +313,7 @@ impl CoinShop {
             // `load` fills this from the NPC content; `new` alone keeps earning off.
             sc_earn: None,
             pet_items,
-            pet_room: usize::MAX,
+            pet_room: None,
             vendor_transactions: BTreeMap::new(),
             sales: VecDeque::new(),
             next_transaction_id: 1,
@@ -360,7 +364,7 @@ impl CoinShop {
 
     /// T772: the session's free pet roster slots, set beside `sync_inventory` before a buy.
     pub fn sync_pet_room(&mut self, room: usize) {
-        self.pet_room = room;
+        self.pet_room = Some(room);
     }
 
     pub fn set_member_status(&mut self, is_member: bool) {
@@ -407,6 +411,7 @@ impl CoinShop {
                 transaction_id: client_transaction_id,
                 replies: vec![response.clone()],
                 changed: false,
+                ..CoinShopOutcome::default()
             });
         }
         // (R) Keep the session idempotency cache bounded under client-controlled IDs.
@@ -442,6 +447,7 @@ impl CoinShop {
                 transaction_id: client_transaction_id,
                 replies: vec![response.clone()],
                 changed: false,
+                ..CoinShopOutcome::default()
             };
         }
         vendor_refusal(client_transaction_id, result_code)
@@ -567,9 +573,8 @@ impl CoinShop {
             ));
         }
         // T772: a bought pet item becomes a pet at once, so more than the roster holds is refused
-        // like any impossible quantity, before money moves.
-        let over_roster = self.pet_items.contains(&item_id) && quantity as usize > self.pet_room;
-        if quantity == 0 || quantity > i32::MAX as u32 || over_roster {
+        // like any impossible quantity, before money moves; an unknown room fails closed.
+        if quantity == 0 || quantity > i32::MAX as u32 {
             return Ok(self.failure(
                 1,
                 RESULT_INVALID_QUANTITY,
@@ -579,6 +584,30 @@ impl CoinShop {
                 0,
                 merchant_id,
             ));
+        }
+        if self.pet_items.contains(&item_id) {
+            let Some(room) = self.pet_room else {
+                return Ok(self.failure(
+                    1,
+                    RESULT_SERVICE_UNAVAILABLE,
+                    transaction_id,
+                    item_id,
+                    quantity,
+                    0,
+                    merchant_id,
+                ));
+            };
+            if quantity as usize > room {
+                return Ok(self.failure(
+                    1,
+                    RESULT_INVALID_QUANTITY,
+                    transaction_id,
+                    item_id,
+                    quantity,
+                    0,
+                    merchant_id,
+                ));
+            }
         }
         let item = self.catalogue.item(item_id).expect("item was checked");
         let unit_price = if self.is_member {
@@ -668,6 +697,7 @@ impl CoinShop {
             transaction_id,
             replies,
             changed: true,
+            granted: granted.granted,
         })
     }
 
@@ -977,6 +1007,7 @@ impl CoinShop {
             transaction_id,
             replies,
             changed: true,
+            ..CoinShopOutcome::default()
         })
     }
 
@@ -1060,6 +1091,7 @@ impl CoinShop {
             transaction_id: sale_transaction_id,
             replies,
             changed: true,
+            granted: restored.granted,
         })
     }
 
@@ -1093,6 +1125,7 @@ impl CoinShop {
                 merchant_id,
             )],
             changed: false,
+            ..CoinShopOutcome::default()
         }
     }
 
@@ -1309,6 +1342,7 @@ impl CoinShop {
             transaction_id,
             replies,
             changed,
+            ..CoinShopOutcome::default()
         })
     }
 }
@@ -1357,6 +1391,7 @@ fn buy_back_result(transaction_id: u32, result: u32, context: u32) -> CoinShopOu
         transaction_id,
         replies: vec![buy_back_packet(transaction_id, result, context)],
         changed: false,
+        ..CoinShopOutcome::default()
     }
 }
 
@@ -1465,6 +1500,7 @@ fn vendor_refusal(transaction_id: u32, result_code: u32) -> CoinShopOutcome {
         transaction_id,
         replies: vec![merchant_buy_result_packet(false)],
         changed: false,
+        ..CoinShopOutcome::default()
     }
 }
 

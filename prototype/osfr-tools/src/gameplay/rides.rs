@@ -325,20 +325,60 @@ impl Gameplay {
         Ok(Some(out))
     }
 
-    /// T772: pet adoption items this transaction added (a coin buy, a grant) become pets at once,
-    /// with the 53/5 roster after them.
-    pub(super) fn adopt_gained_pets(
-        &mut self,
-        before: &crate::inventory::InventoryState,
-        now_ms: u64,
-        out: &mut Outcome,
-    ) -> io::Result<()> {
+    /// T772: adoption items an outcome granted become pets at once, with the 53/5 roster after
+    /// them. The one settlement for a purchase, a buy-back and `realm give`; a refusal granted
+    /// nothing and costs one empty check.
+    pub(super) fn settle_granted_pets(&mut self, now_ms: u64, out: &mut Outcome) -> io::Result<()> {
+        if out.granted_items.is_empty() {
+            return Ok(());
+        }
+        let granted = std::mem::take(&mut out.granted_items);
         let replies = self
             .pets
-            .adopt_gained(before, &mut self.inventory, now_ms / 1_000)?;
+            .adopt_granted(&granted, &mut self.inventory, now_ms / 1_000)?;
         out.changed |= !replies.is_empty();
         out.replies.extend(replies);
         Ok(())
+    }
+
+    /// T772/F792: `realm give <item> [count]`. A pet adoption item beyond the roster's room is
+    /// refused before the grant, so no category-200 item is stranded in the bag.
+    pub(super) fn realm_give(
+        &mut self,
+        item: &str,
+        rest: &[&str],
+        now_ms: u64,
+        out: &mut Outcome,
+    ) -> io::Result<bool> {
+        let (Ok(item), count) = (
+            item.parse::<i32>(),
+            rest.first()
+                .and_then(|n| n.parse::<u32>().ok())
+                .unwrap_or(1)
+                .clamp(1, 999),
+        ) else {
+            out.replies
+                .push(chat::system("Usage: realm give <item id> [count]"));
+            return Ok(true);
+        };
+        let room = self.pets.room();
+        if count as usize > room && self.pets.is_adoption_item(item) {
+            out.replies.push(chat::system(&format!(
+                "The pet roster has room for {room} more; giving {count} would leave pet items hidden in the bag."
+            )));
+            return Ok(true);
+        }
+        match self.grant_reward(0, &[(item, count)], out) {
+            Ok(()) => {
+                self.settle_granted_pets(now_ms, out)?;
+                out.replies
+                    .push(chat::system(&format!("Gave {count} x item {item}.")));
+            }
+            Err(error) => out.replies.push(chat::system(&format!(
+                "Could not give item {item}: {error}"
+            ))),
+        }
+        Ok(true)
     }
 
     /// T487: the pet a zone change left behind comes back through the normal summon path, beside

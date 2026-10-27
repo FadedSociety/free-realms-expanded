@@ -103,6 +103,10 @@ pub struct InventoryOutcome {
     /// Inner application messages, before the gateway's tunnel wrapper.
     pub replies: Vec<Vec<u8>>,
     pub changed: bool,
+    /// T772: each stack a grant added to, as `(instance id, units added)`. Pet adoption items in
+    /// this list become pets at once (`PetService::adopt_granted`); a consume or equip leaves it
+    /// empty.
+    pub granted: Vec<(i32, u32)>,
 }
 
 /// Fields from the community-verified ClientItemDefinition serializer.
@@ -988,6 +992,7 @@ impl Inventory {
         Ok(InventoryOutcome {
             replies: vec![reply],
             changed: true,
+            ..InventoryOutcome::default()
         })
     }
 
@@ -1008,6 +1013,7 @@ impl Inventory {
         Ok(InventoryOutcome {
             replies: vec![reply],
             changed: true,
+            ..InventoryOutcome::default()
         })
     }
 
@@ -1123,6 +1129,7 @@ impl Inventory {
                     .is_some_and(|count| definition.fits_one_stack(count))
         }) {
             item.count += quantity;
+            outcome.granted.push((item.id, quantity));
             outcome.replies.push(item_update(item));
         } else {
             if staged.state.items.len() >= MAX_ITEMS {
@@ -1145,6 +1152,7 @@ impl Inventory {
                 ability_count: 0,
                 activate_enabled: false,
             };
+            outcome.granted.push((id, quantity));
             let mut payload = Vec::new();
             write_item(&mut payload, &item)?;
             payload.extend_from_slice(&definition.bytes);
@@ -1171,6 +1179,7 @@ impl Inventory {
         for &(definition, quantity) in items {
             let item = staged.grant(0, definition, quantity)?;
             outcome.changed |= item.changed;
+            outcome.granted.extend(item.granted);
             outcome.replies.extend(item.replies);
         }
         *self = staged;
@@ -1192,6 +1201,7 @@ impl Inventory {
         let mut outcome = InventoryOutcome {
             replies: Vec::new(),
             changed: true,
+            granted: Vec::new(),
         };
         if staged.state.items[index].count == quantity {
             for equipped in staged
@@ -1275,6 +1285,7 @@ impl Inventory {
             return Ok(InventoryOutcome {
                 replies: self.definition_replies(inner)?,
                 changed: false,
+                ..InventoryOutcome::default()
             });
         }
         if family != 42 {
@@ -1303,6 +1314,7 @@ impl Inventory {
                 Ok(InventoryOutcome {
                     replies: vec![reply],
                     changed,
+                    ..InventoryOutcome::default()
                 })
             }
             3 => {
@@ -1389,6 +1401,7 @@ impl Inventory {
         Ok(InventoryOutcome {
             replies: vec![reply, visible],
             changed,
+            ..InventoryOutcome::default()
         })
     }
 
@@ -1471,6 +1484,7 @@ fn refused(reason: &str) -> InventoryOutcome {
     InventoryOutcome {
         replies: vec![line],
         changed: false,
+        ..InventoryOutcome::default()
     }
 }
 /// Why this player cannot put this item in this slot of this profile, if so.

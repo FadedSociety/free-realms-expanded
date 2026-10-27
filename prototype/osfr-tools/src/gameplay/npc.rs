@@ -122,6 +122,10 @@ impl Gameplay {
         // T794: a 165/12 buy-back returns what a 165/5 sale took, at the sale price. It is no new
         // item, and counting it would let sell + buy-back loop a collect objective for free. A
         // sale needs no case: `npc_inventory_events` counts gains only, so a loss lowers nothing.
+        // T772: every NPC path that can add a pet adoption item (a coin or vendor buy, a
+        // buy-back) settles it into the roster here, once, before the collect events: an adopted
+        // item never sits in the bag, so it counts for nothing.
+        self.settle_granted_pets(now_ms, &mut out)?;
         if !inner.starts_with(&[165, 0, 12, 0]) {
             self.npc_inventory_events(&before, &mut out)?;
         }
@@ -180,13 +184,13 @@ impl Gameplay {
         if let Some(out) = self.npc_select_26_10(inner, character, now_ms)? {
             return Ok(Some(out));
         }
-        if let Some(out) = self.npc_store_165(inner, character, now_ms)? {
+        if let Some(out) = self.npc_store_165(inner, character)? {
             return Ok(Some(out));
         }
         if let Some(out) = self.npc_merchant_66(inner, character)? {
             return Ok(Some(out));
         }
-        if let Some(out) = self.npc_merchant_buy_66_43(inner, character, now_ms)? {
+        if let Some(out) = self.npc_merchant_buy_66_43(inner, character)? {
             return Ok(Some(out));
         }
         Ok(None)
@@ -884,7 +888,6 @@ impl Gameplay {
         &mut self,
         inner: &[u8],
         character: &CharacterState,
-        now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
         if matches!(inner, [0xa5, 0, 2 | 4 | 5 | 8 | 12 | 14, 0, ..]) {
             if let Some(shop) = &mut self.npc_coin_shop {
@@ -912,7 +915,6 @@ impl Gameplay {
                 // a purchase overwrote everything earned since (10-15 audit).
                 shop.sync_inventory(self.inventory.clone());
                 shop.sync_pet_room(self.pets.room());
-                let before = self.inventory.state().clone();
                 let outcome = interaction.handle_coin_store(
                     shop,
                     &request,
@@ -926,16 +928,20 @@ impl Gameplay {
                             "guid": merchant,
                             "content_key": content_key,
                             "subtype": u16::from_le_bytes(inner[2..4].try_into().unwrap()),
-                            "outcome": "accepted"
+                            "outcome": if outcome.result_code == crate::coin_shop::RESULT_SUCCESS {
+                                "accepted"
+                            } else {
+                                "refused"
+                            },
+                            "result": outcome.result_code
                         }));
                         self.inventory = shop.inventory().clone();
-                        let mut out = Outcome {
+                        return Ok(Some(Outcome {
                             replies: outcome.replies,
                             changed: outcome.changed,
+                            granted_items: outcome.granted,
                             ..Outcome::default()
-                        };
-                        self.adopt_gained_pets(&before, now_ms, &mut out)?;
-                        return Ok(Some(out));
+                        }));
                     }
                     Err(error) => {
                         npc_event(serde_json::json!({
@@ -1005,7 +1011,6 @@ impl Gameplay {
         &mut self,
         inner: &[u8],
         character: &CharacterState,
-        now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
         if inner.starts_with(&[66, 0, 43, 0]) {
             let Ok(request) = npc_interaction::decode_merchant_buy_66_43(inner) else {
@@ -1044,7 +1049,6 @@ impl Gameplay {
             };
             shop.sync_inventory(self.inventory.clone());
             shop.sync_pet_room(self.pets.room());
-            let before = self.inventory.state().clone();
             let outcome = if let Some(result_code) = refusal_code {
                 shop.refuse_vendor_buy(transaction_id, result_code)
             } else {
@@ -1066,15 +1070,15 @@ impl Gameplay {
                     "accepted"
                 } else {
                     "refused"
-                }
+                },
+                "result": outcome.result_code
             }));
-            let mut out = Outcome {
+            return Ok(Some(Outcome {
                 replies: outcome.replies,
                 changed: outcome.changed,
+                granted_items: outcome.granted,
                 ..Outcome::default()
-            };
-            self.adopt_gained_pets(&before, now_ms, &mut out)?;
-            return Ok(Some(out));
+            }));
         }
         Ok(None)
     }

@@ -1372,51 +1372,49 @@ impl PetService {
         MAX_PETS.saturating_sub(self.roster.pets.len())
     }
 
-    /// T772: adoption items gained since `before` become pets at once. The original created the
-    /// pet at purchase; here the bag hides category-200 rows (`00a6d9b0`) and the Pets window
-    /// reads only the 53/5 roster (`00b596f0`). Each unit is consumed as it is adopted; units
-    /// past the roster's room stay owned (R). Returns the inventory replies and the 53/5 roster,
-    /// or nothing when no pet was adopted.
-    pub fn adopt_gained(
+    /// T772: whether `item_definition_id` creates a pet when granted. One binding answers both
+    /// the coin store's pet rows and this adoption, so a data change moves both together.
+    pub fn is_adoption_item(&self, item_definition_id: i32) -> bool {
+        self.content
+            .definition_for_item(item_definition_id)
+            .is_some()
+    }
+
+    /// T772: the inventory stacks a buy or grant added (`granted` as `(instance id, units)`)
+    /// become pets at once. The original is thought to create the pet at purchase (R); here the
+    /// bag hides category-200 rows (`00a6d9b0`) and the Pets window reads only the 53/5 roster
+    /// (`00b596f0`). Each unit is consumed into its own pet; a unit past the roster's room stays
+    /// owned. Returns the inventory replies and the 53/5 roster, or nothing when no pet was
+    /// adopted.
+    pub fn adopt_granted(
         &mut self,
-        before: &InventoryState,
+        granted: &[(i32, u32)],
         inventory: &mut Inventory,
         now: u64,
     ) -> io::Result<Vec<Vec<u8>>> {
-        let units = |state: &InventoryState, definition: i32| -> u32 {
-            state
+        let mut replies = Vec::new();
+        let mut room = self.room();
+        for &(instance_id, units) in granted {
+            if room == 0 {
+                break;
+            }
+            let Some(item) = inventory
+                .state()
                 .items
                 .iter()
-                .filter(|item| item.definition_id == definition)
-                .map(|item| item.count)
-                .sum()
-        };
-        let held: BTreeSet<i32> = inventory
-            .state()
-            .items
-            .iter()
-            .map(|i| i.definition_id)
-            .collect();
-        let mut replies = Vec::new();
-        for item_definition in held {
-            let gained = units(inventory.state(), item_definition)
-                .saturating_sub(units(before, item_definition));
-            let Some(mut definition) = self.content.definition_for_item(item_definition) else {
+                .find(|item| item.id == instance_id)
+            else {
                 continue;
             };
-            definition.adoption_item_definition_id = Some(item_definition);
-            for _ in 0..gained.min(self.room() as u32) {
-                let instance = inventory
-                    .state()
-                    .items
-                    .iter()
-                    .filter(|item| item.definition_id == item_definition)
-                    .map(|item| item.id)
-                    .max()
-                    .ok_or_else(|| invalid("a gained pet item is not owned"))?;
+            let item_definition = item.definition_id;
+            let Some(definition) = self.content.definition_for_item(item_definition) else {
+                continue;
+            };
+            for _ in 0..units.min(room as u32) {
                 let (_, adopted) =
-                    self.adopt_with_replies(inventory, instance, &definition, now)?;
+                    self.adopt_with_replies(inventory, instance_id, &definition, now)?;
                 replies.extend(adopted);
+                room -= 1;
             }
         }
         if !replies.is_empty() {
@@ -2880,8 +2878,9 @@ fn append_pet_record(out: &mut Vec<u8>, pet: &Pet, content: &PetContent) {
         .find(|species| species.species_id == Some(pet.species_id))
         .and_then(|species| species.icon.as_ref());
     put_u32(out, pet.id);
-    // The sex column is a bool (`00912cf0` stores `value != 0`, shown as "0"/"1"); Models.txt
-    // GENDER 2 (female) is true, as in the recorded sample (model 364), and 1 or none false (F767).
+    // The sex column is a bool (`00912cf0` stores `value != 0`, shown as "0"/"1"). (R) Models.txt
+    // GENDER 2 (female) is true, and 1 or none false, inferred from the one recorded sample
+    // (York, model 364, item 23930).
     out.push(u8::from(model.and_then(|m| m.gender) == Some(2)));
     put_u32(out, model.and_then(|m| m.icon_id).unwrap_or(0) as u32);
     for value in [

@@ -829,7 +829,7 @@ fn a_package_configured_pet_speed_reaches_the_actor_packet() {
 }
 
 /// T772: a granted adoption item (`realm give`, a buy) becomes a pet at once through
-/// `adopt_gained`: each gained unit is consumed into its own pet, units past the roster's room
+/// `adopt_granted`: each granted unit is consumed into its own pet, units past the roster's room
 /// stay owned, and the 53/5 roster closes the replies once.
 #[test]
 fn gained_adoption_items_become_pets_up_to_the_roster_room() {
@@ -840,10 +840,11 @@ fn gained_adoption_items_become_pets_up_to_the_roster_room() {
     }
     assert_eq!(service.room(), 1);
     let mut inventory = inventory_handle(70352);
-    let before = inventory.state().clone();
-    inventory.grant(0, 70352, 1).unwrap();
-    inventory.grant(0, 70352, 1).unwrap();
-    let replies = service.adopt_gained(&before, &mut inventory, 10).unwrap();
+    let mut granted = Vec::new();
+    for _ in 0..2 {
+        granted.extend(inventory.grant(0, 70352, 1).unwrap().granted);
+    }
+    let replies = service.adopt_granted(&granted, &mut inventory, 10).unwrap();
     assert_eq!(service.room(), 0, "the roster filled to its 50 pets");
     let left: u32 = inventory
         .state()
@@ -861,11 +862,10 @@ fn gained_adoption_items_become_pets_up_to_the_roster_room() {
             .count(),
         1
     );
-    // Nothing gained since: nothing adopted, no replies.
-    let unchanged = inventory.state().clone();
+    // Nothing granted: nothing adopted, no replies.
     assert!(
         service
-            .adopt_gained(&unchanged, &mut inventory, 11)
+            .adopt_granted(&[], &mut inventory, 11)
             .unwrap()
             .is_empty()
     );
