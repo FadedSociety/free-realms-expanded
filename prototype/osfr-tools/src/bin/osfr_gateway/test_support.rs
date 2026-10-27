@@ -184,6 +184,16 @@ pub fn options(state: PathBuf) -> Options {
     }
 }
 
+/// The client's Play on an activity-portal row (167/1/2: the activity, then its trailing word),
+/// the same bytes `tests/common/field_battle_fixture.rs` sends. The bin target cannot include
+/// that integration fixture, so the builder lives here once for every bin test.
+pub fn portal_play(activity: u32) -> Vec<u8> {
+    let mut play = vec![167, 0, 1, 2];
+    play.extend(activity.to_le_bytes());
+    play.extend(0_u32.to_le_bytes());
+    play
+}
+
 /// `Server::step` for a rig whose sessions have no client behind them. A real client keeps
 /// the 60 s idle budget alive with its datagrams and KeepAlives; a rig's `dispatch_message`
 /// calls and its test body do not, so a loaded host that stalls a test past the budget would

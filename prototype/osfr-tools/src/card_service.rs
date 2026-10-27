@@ -511,8 +511,8 @@ pub fn sync_complete() -> Vec<u8> {
 pub const UNKNOWN_TICKET: &str = "unknown_ticket";
 
 /// T764: one-time card launch tickets (lead security). The game server mints one per launch and
-/// sends it in 39/0x28; the card login (411) must present it (with the same character id when
-/// its 411 carries one) before it expires, and it works once. (R) The store is per session (one
+/// sends it in 39/0x28; the card login (411) must present it, and a character id the 411 carries
+/// must name the owner, before it expires; it works once. (R) The store is per session (one
 /// card character, one live launch), and `now_ms` is the caller's monotonic clock, the same one
 /// for mint and redeem.
 #[derive(Clone)]
@@ -566,32 +566,36 @@ impl LaunchTickets {
     }
 
     /// Redeem the ticket and character id a 411 carries (decimal text, the client's `%llu`):
-    /// the character the ticket was issued to, while it has not expired. The random, single-use
-    /// ticket is the credential; the retail client sends no character id (empty), and a
-    /// non-empty one must name the owner. A refusal changes nothing: only a matching, unexpired
-    /// ticket is spent, so a wrong id leaves the ticket as it was (and an expired one stays until
-    /// the next mint sweeps it). A refusal is the fixed word the card listener logs (T805):
-    /// `no_ticket_field`, `ticket_not_decimal`, [`UNKNOWN_TICKET`], `expired` or
-    /// `character_mismatch`.
+    /// `Some` holds the character the ticket was issued to, while it has not expired. `None`
+    /// means this store does not hold the ticket at all (never minted here, already spent, or
+    /// its session ended), so a listener scanning the live sessions moves on to the next store;
+    /// the card listener logs that case as [`UNKNOWN_TICKET`]. The random, single-use ticket is
+    /// the credential; the retail client sends no character id (empty), and a non-empty one must
+    /// name the owner. A refusal changes nothing: only a matching, unexpired ticket is spent, so
+    /// a wrong id leaves the ticket as it was (and an expired one stays until the next mint
+    /// sweeps it). A refusal is the fixed word the card listener logs (T805):
+    /// `no_ticket_field`, `ticket_not_decimal`, `expired` or `character_mismatch`.
     pub fn redeem(
         &mut self,
         ticket: &str,
         character: &str,
         now_ms: u64,
-    ) -> Result<u64, &'static str> {
+    ) -> Option<Result<u64, &'static str>> {
         if ticket.is_empty() {
-            return Err("no_ticket_field");
+            return Some(Err("no_ticket_field"));
         }
-        let ticket = decimal(ticket).ok_or("ticket_not_decimal")?;
-        let (owner, expires) = self.issued.get(&ticket).copied().ok_or(UNKNOWN_TICKET)?;
+        let Some(ticket) = decimal(ticket) else {
+            return Some(Err("ticket_not_decimal"));
+        };
+        let (owner, expires) = self.issued.get(&ticket).copied()?;
         if now_ms >= expires {
-            return Err("expired");
+            return Some(Err("expired"));
         }
         if !character.is_empty() && decimal(character) != Some(owner) {
-            return Err("character_mismatch");
+            return Some(Err("character_mismatch"));
         }
         self.issued.remove(&ticket);
-        Ok(owner)
+        Some(Ok(owner))
     }
 
     /// Tickets still held, expired ones included until the next [`Self::mint`] sweeps them.
@@ -631,9 +635,9 @@ fn decimal(text: &str) -> Option<u64> {
 }
 
 /// The login stub: answer one client body. A 414 is sent to `host:port` (this service); a 411
-/// is accepted when `character_for` maps the login (its launch ticket and character id) to a
-/// character, whose [`account_id`] the 81 carries; a ping is echoed once `logged_in`. Anything
-/// else is not handled yet (`None`). Replies are server frames.
+/// is accepted when `character_for` maps the login (its launch ticket, and the character id it
+/// names when present) to a character, whose [`account_id`] the 81 carries; a ping is echoed
+/// once `logged_in`. Anything else is not handled yet (`None`). Replies are server frames.
 pub fn reply(
     body: &[u8],
     host: &str,

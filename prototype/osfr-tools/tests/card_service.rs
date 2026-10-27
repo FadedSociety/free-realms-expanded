@@ -3,11 +3,11 @@
 //! and the one-time launch tickets the session login is checked against.
 use osfr_tools::card_service::{
     self, ConnectionServer, LaunchTickets, MAX_FRAME, MAX_TICKETS, Reader, SessionLogin,
-    UNKNOWN_TICKET, client_frame, reply,
+    client_frame, reply,
 };
 #[path = "support/card_packets.rs"]
 mod card_packets;
-use card_packets::{frame, gateway_request, headers, int, session_login, text};
+use card_packets::{frame, gateway_request, headers, int, read_results, session_login, text};
 
 #[test]
 fn compact_integers_match_the_dll_writer() {
@@ -89,21 +89,6 @@ fn the_gateway_request_is_unrouted_and_answered_with_this_service() {
     );
 }
 
-/// The 81 reply read the way `10179c70` reads it.
-fn read_results(body: &[u8]) -> (bool, i32, i32, String) {
-    let mut reader = Reader::new(body);
-    let version = reader.headers(card_service::LOGIN_RESULTS).unwrap();
-    assert_eq!(version, 5);
-    let success = reader.int().unwrap() != 0;
-    let code = reader.int().unwrap(); // version >= 3
-    let account = reader.int().unwrap();
-    reader.int().unwrap(); // version > 1
-    reader.int().unwrap(); // version > 3
-    let session = reader.string().unwrap(); // version > 4
-    assert!(reader.finished(), "no zlib blob below version 6");
-    (success, code, account, session)
-}
-
 const CHARACTER: u64 = 123_456_789;
 const TTL_MS: u64 = 120_000;
 
@@ -113,7 +98,7 @@ fn login_with(tickets: &mut LaunchTickets, character_id: &str, ticket: &str, now
     let check = |login: &SessionLogin| {
         tickets
             .redeem(&login.ticket, &login.character_id, now)
-            .ok()
+            .and_then(Result::ok)
             .map(|_| 42)
     };
     reply(&body, "127.0.0.1", 17782, false, check)
@@ -193,26 +178,22 @@ fn the_retail_login_without_a_character_id_redeems_by_ticket_alone() {
     // 0x10D2450; its strings have no `--characterID`), so the 411's CharacterID is empty.
     let mut tickets = LaunchTickets::new(TTL_MS);
     let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
-    assert_eq!(tickets.redeem(&ticket, "", 1), Ok(CHARACTER));
-    assert_eq!(
-        tickets.redeem(&ticket, "", 2),
-        Err(UNKNOWN_TICKET),
-        "single use"
-    );
+    assert_eq!(tickets.redeem(&ticket, "", 1), Some(Ok(CHARACTER)));
+    assert_eq!(tickets.redeem(&ticket, "", 2), None, "single use");
     // A non-empty id must be the owner's decimal, and a refusal leaves the ticket usable.
     let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
     for bad in [" ", "Tester", "12x", "+123456789"] {
         assert_eq!(
             tickets.redeem(&ticket, bad, 1),
-            Err("character_mismatch"),
+            Some(Err("character_mismatch")),
             "{bad:?}"
         );
         assert_eq!(tickets.outstanding(), 1, "a refusal changes nothing");
     }
-    assert_eq!(tickets.redeem(&ticket, "", 2), Ok(CHARACTER));
+    assert_eq!(tickets.redeem(&ticket, "", 2), Some(Ok(CHARACTER)));
     let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
-    assert_eq!(tickets.redeem(&ticket, "", TTL_MS), Err("expired"));
-    assert_eq!(tickets.redeem("", "", 1), Err("no_ticket_field"));
+    assert_eq!(tickets.redeem(&ticket, "", TTL_MS), Some(Err("expired")));
+    assert_eq!(tickets.redeem("", "", 1), Some(Err("no_ticket_field")));
 }
 
 #[test]
@@ -222,25 +203,34 @@ fn a_wrong_character_expired_replaced_or_malformed_ticket_is_refused() {
 
     // A refused login changes nothing: after the wrong character, the right one still redeems.
     let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
-    assert_eq!(tickets.redeem(&ticket, "5", 1), Err("character_mismatch"));
+    assert_eq!(
+        tickets.redeem(&ticket, "5", 1),
+        Some(Err("character_mismatch"))
+    );
     assert_eq!(tickets.outstanding(), 1, "the ticket was not spent");
-    assert_eq!(tickets.redeem(&ticket, &character, 2), Ok(CHARACTER));
+    assert_eq!(tickets.redeem(&ticket, &character, 2), Some(Ok(CHARACTER)));
 
     // Expired: refused without spending; the next mint sweeps the dead ticket.
     let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
-    assert_eq!(tickets.redeem(&ticket, &character, TTL_MS), Err("expired"));
+    assert_eq!(
+        tickets.redeem(&ticket, &character, TTL_MS),
+        Some(Err("expired"))
+    );
     assert_eq!(tickets.outstanding(), 1);
 
     // A second launch replaces the first ticket.
     let first = tickets.mint(CHARACTER, 0).unwrap().to_string();
     let second = tickets.mint(CHARACTER, 1).unwrap().to_string();
     assert_eq!(tickets.outstanding(), 1);
-    assert_eq!(tickets.redeem(&first, &character, 2), Err(UNKNOWN_TICKET));
-    assert_eq!(tickets.redeem(&second, &character, 3), Ok(CHARACTER));
+    assert_eq!(tickets.redeem(&first, &character, 2), None);
+    assert_eq!(tickets.redeem(&second, &character, 3), Some(Ok(CHARACTER)));
 
     // Malformed decimals never match, and do not spend a real ticket.
     let ticket = tickets.mint(CHARACTER, 0).unwrap();
-    assert_eq!(tickets.redeem("", &character, 1), Err("no_ticket_field"));
+    assert_eq!(
+        tickets.redeem("", &character, 1),
+        Some(Err("no_ticket_field"))
+    );
     for bad in [
         format!("+{ticket}"),
         format!(" {ticket}"),
@@ -249,14 +239,14 @@ fn a_wrong_character_expired_replaced_or_malformed_ticket_is_refused() {
     ] {
         assert_eq!(
             tickets.redeem(&bad, &character, 1),
-            Err("ticket_not_decimal"),
+            Some(Err("ticket_not_decimal")),
             "{bad:?}"
         );
     }
     assert_eq!(tickets.outstanding(), 1);
     assert_eq!(
         tickets.redeem(&ticket.to_string(), &character, 2),
-        Ok(CHARACTER)
+        Some(Ok(CHARACTER))
     );
 
     // Expired tickets are dropped when a new one is minted.

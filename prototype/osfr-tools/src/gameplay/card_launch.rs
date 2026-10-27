@@ -46,18 +46,18 @@ impl Gameplay {
             .transpose()
     }
 
-    /// T766's card listener: redeem a card login's launch ticket and character id in the
-    /// session that minted it. `Ok(character)` once; never again for that ticket. A session
-    /// without a launch block holds no ticket.
+    /// T766's card listener: redeem a card login's launch ticket in the session that minted it
+    /// (a character id the 411 carries, if any, must name the owner). `Ok(character)` once, never
+    /// again for that ticket; `None` when this session holds no such ticket, so the listener
+    /// moves on to the next live session. A session without a launch block holds no ticket.
     pub fn redeem_card_ticket(
         &mut self,
         ticket: &str,
         character: &str,
         now_ms: u64,
-    ) -> Result<u64, &'static str> {
+    ) -> Option<Result<u64, &'static str>> {
         self.card_launches
-            .as_mut()
-            .ok_or(crate::card_service::UNKNOWN_TICKET)?
+            .as_mut()?
             .redeem(ticket, character, now_ms)
     }
 }

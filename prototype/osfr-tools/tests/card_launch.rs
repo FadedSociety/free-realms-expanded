@@ -21,6 +21,8 @@ use std::{
     },
 };
 
+#[path = "support/card_packets.rs"]
+mod card_packets;
 #[path = "common/content_copy.rs"]
 #[allow(dead_code)] // this suite only overlays and links; the helper also has `copy_tree`
 mod content_copy;
@@ -28,6 +30,7 @@ mod content_copy;
 mod field_battle_fixture;
 #[path = "support/json.rs"]
 mod json;
+use card_packets::ticket_of;
 use field_battle_fixture::{Fixture, bundle, content_dir, portal_play, send, unframe, wrap};
 
 static FIXTURE_SERIAL: AtomicU64 = AtomicU64::new(0);
@@ -154,13 +157,6 @@ fn offer_preload(offer: &[u8]) -> String {
 fn offer_flags(offer: &[u8]) -> [u8; 5] {
     let at = 15 + 6 * 4 + 1 + 3 * 69 + 4;
     offer[at..at + 5].try_into().unwrap()
-}
-
-/// The 64-bit ticket a 39/0x28 carries (two i32 halves after the run header, low then high).
-fn ticket_of(packet: &[u8]) -> u64 {
-    assert_eq!((packet[0], packet[2], packet.len()), (39, 0x28, 15 + 8));
-    (u64::from(u32::from_le_bytes(packet[19..23].try_into().unwrap())) << 32)
-        | u64::from(u32::from_le_bytes(packet[15..19].try_into().unwrap()))
 }
 
 fn subs(packets: &[Vec<u8>]) -> Vec<(u8, u8)> {
@@ -320,7 +316,8 @@ fn the_type_16_handshake_sends_a_one_time_ticket_in_39_28() {
     let character = CHARACTER.to_string();
     assert_eq!(
         launches.redeem(&first.to_string(), &character, 2_050),
-        Err("unknown_ticket")
+        None,
+        "replaced by the second ticket"
     );
 
     // Start, now that a ticket was sent: 39/17 alone, the client hosts the card DLL itself.
@@ -333,15 +330,15 @@ fn the_type_16_handshake_sends_a_one_time_ticket_in_39_28() {
     // (T764 fix) does not spend the ticket. The retail 411's id is empty (T804).
     assert_eq!(
         launches.redeem(&second.to_string(), "1", 2_200),
-        Err("character_mismatch")
+        Some(Err("character_mismatch"))
     );
     assert_eq!(
         launches.redeem(&second.to_string(), &character, 2_250),
-        Ok(CHARACTER)
+        Some(Ok(CHARACTER))
     );
     assert_eq!(
         launches.redeem(&second.to_string(), &character, 2_275),
-        Err("unknown_ticket"),
+        None,
         "single use"
     );
     let spent = launches
@@ -355,12 +352,9 @@ fn the_type_16_handshake_sends_a_one_time_ticket_in_39_28() {
     let last = ticket_of(&spent.replies[0]);
     assert_eq!(
         launches.redeem(&last.to_string(), &character, 2_500),
-        Ok(CHARACTER)
+        Some(Ok(CHARACTER))
     );
-    assert_eq!(
-        launches.redeem(&last.to_string(), &character, 2_600),
-        Err("unknown_ticket")
-    );
+    assert_eq!(launches.redeem(&last.to_string(), &character, 2_600), None);
 
     // A ticket expires after the launch block's lifetime.
     let late = launches
@@ -369,7 +363,7 @@ fn the_type_16_handshake_sends_a_one_time_ticket_in_39_28() {
     let late = ticket_of(&late.replies[0]);
     assert_eq!(
         launches.redeem(&late.to_string(), &character, 3_000 + 120_000),
-        Err("expired")
+        Some(Err("expired"))
     );
 
     // Leaving the card window ends the run (39/19); later requests are ignored.
@@ -432,11 +426,11 @@ fn the_card_start_order_runs_end_to_end_through_the_gateway() {
     let service = gateway.gameplay_mut().unwrap();
     assert_eq!(
         service.redeem_card_ticket(&ticket.to_string(), &character, 3_000),
-        Ok(5_064)
+        Some(Ok(5_064))
     );
     assert_eq!(
         service.redeem_card_ticket(&ticket.to_string(), &character, 3_100),
-        Err("unknown_ticket")
+        None
     );
 
     // Closing the card window: 39/6 -> 39/19, then the client's 39/7 ack.
@@ -758,9 +752,10 @@ fn a_login_without_a_card_launch_block_sends_no_session_ticket() {
 }
 
 /// T798: the session ticket is not a credential. The card login is authorised by the one-time
-/// launch ticket and its character id only: the 82's ticket redeems nothing, with the right
-/// character id and while a launch ticket is outstanding, and the launch ticket still works
-/// afterwards. A trace never shows the 82's body as hex.
+/// launch ticket only (a non-empty character id must name the owner, and the retail 411 carries
+/// none, T804): the 82's ticket redeems nothing, with the right character id and while a launch
+/// ticket is outstanding, and the launch ticket still works afterwards. A trace never shows the
+/// 82's body as hex.
 #[test]
 fn the_session_ticket_authorises_nothing_and_is_never_traced() {
     let Some(fixture) = launch_fixture() else {
@@ -796,10 +791,10 @@ fn the_session_ticket_authorises_nothing_and_is_never_traced() {
     let service = gateway.gameplay_mut().unwrap();
     assert_eq!(
         service.redeem_card_ticket(&ticket, &character, 3_000),
-        Err("ticket_not_decimal")
+        Some(Err("ticket_not_decimal"))
     );
     assert_eq!(
         service.redeem_card_ticket(&launch.to_string(), &character, 3_100),
-        Ok(5_096)
+        Some(Ok(5_096))
     );
 }

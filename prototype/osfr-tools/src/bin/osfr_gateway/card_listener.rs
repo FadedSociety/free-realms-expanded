@@ -1,7 +1,8 @@
 //! T770: the Card Duelist card service, a TCP listener beside the UDP gateway. The card window
 //! (`tcg/FreeRealmsTCG.dll`) asks 414 for its connection server (answered with this listener),
-//! then logs in with 411; the login's launch ticket and character id are redeemed once in the
-//! session that minted the ticket (T764/T765). T808: a refused login is closed once its 81 is
+//! then logs in with 411; the login's launch ticket is redeemed once in the session that minted
+//! the ticket (T764/T765; a character id the 411 carries, if any, must name its owner, and the
+//! retail client sends none). T808: a refused login is closed once its 81 is
 //! written; after login the client's ping (112) is echoed. T813: a login pushes the launch
 //! block's lobby (94 -> 92 -> 291), which opens the lobby screen. T825: then the starter
 //! collection sync (83, and per client Update 84, 85, 86); the client's status (137) is echoed and
@@ -457,8 +458,10 @@ impl Server {
     }
 
     /// The live session that minted a card login's launch ticket redeems it. T805: the retail
-    /// 411 carries no character id, so the ticket alone finds its session; a ticket no live
-    /// session holds is `unknown_ticket`.
+    /// 411 carries no character id, so the ticket alone finds its session; `None` from a
+    /// session's store means that session never held it (or spent it already), so the scan moves
+    /// on. A session that holds it but refuses (expired, or an id that is not the owner's) names
+    /// the refusal, and a ticket no live session holds is `unknown_ticket`.
     // ponytail: one scan of the live sessions per card login (one login per launch); a
     // server-wide ticket index if the player count ever makes it show.
     fn redeem_card_ticket(
@@ -471,9 +474,8 @@ impl Server {
             let Some(game) = session.gateway.gameplay_mut() else {
                 continue;
             };
-            match game.redeem_card_ticket(ticket, character, now_ms) {
-                Err(card_service::UNKNOWN_TICKET) => {}
-                redeemed => return redeemed,
+            if let Some(redeemed) = game.redeem_card_ticket(ticket, character, now_ms) {
+                return redeemed;
             }
         }
         Err(card_service::UNKNOWN_TICKET)
@@ -488,7 +490,9 @@ mod card_packets;
 #[cfg(test)]
 pub(super) mod tests {
     use super::super::tests::test_support;
-    use super::card_packets::{ROUTING, frame, gateway_request, int, ping, session_login, text};
+    use super::card_packets::{
+        ROUTING, frame, gateway_request, int, ping, read_results, session_login, text, ticket_in,
+    };
     use super::*;
     use std::time::Duration;
 
@@ -537,8 +541,13 @@ pub(super) mod tests {
 
     /// Poll until the client has a whole server frame, then return its body.
     fn answer(card: &mut CardListener, client: &mut TcpStream, now: u64) -> Vec<u8> {
+        answer_with(|| card.poll(now, refuse), client)
+    }
+
+    /// `answer` for a caller that drives another poll (the gateway's `Server::poll_card`).
+    fn answer_with(mut poll: impl FnMut(), client: &mut TcpStream) -> Vec<u8> {
         for _ in 0..200 {
-            card.poll(now, refuse);
+            poll();
             client.set_nonblocking(true).unwrap();
             let mut length = [0; 4];
             let ready = client.peek(&mut length).map(|n| n == 4).unwrap_or(false);
@@ -601,11 +610,7 @@ pub(super) mod tests {
             std::thread::sleep(Duration::from_millis(5));
         }
         let body = body.expect("the login was read");
-        let mut results = card_service::Reader::new(&body);
-        results.headers(81).unwrap();
-        let success = results.int().unwrap() != 0;
-        let code = results.int().unwrap();
-        let account = results.int().unwrap();
+        let (success, code, account, _) = read_results(&body);
         (success, code, account, seen)
     }
 
@@ -955,8 +960,9 @@ pub(super) mod tests {
         panic!("the oversized frame left the connection open");
     }
 
+    /// No launch block, no card service: a login, whatever it names, is `unknown_ticket`.
     #[test]
-    fn a_login_for_a_character_with_no_live_session_is_refused() {
+    fn a_card_login_without_a_card_launch_block_is_refused() {
         if !test_support::bin_test_target("card") {
             return;
         }
@@ -975,22 +981,13 @@ pub(super) mod tests {
         assert!(server.card.is_none(), "no launch block, no card service");
     }
 
-    /// The launch ticket of the 39/0x28 among `replies`: two i32 halves after the 15-byte run
-    /// header, low then high.
-    fn ticket_in(replies: &[Vec<u8>]) -> u64 {
-        let mut head = vec![39, 0, 0x28];
-        head.extend(osfr_tools::card_game::FIRST_INSTANCE_ID.to_le_bytes());
-        let found = replies.iter().find_map(|reply| {
-            let at = reply.windows(head.len()).position(|w| w == head)?;
-            let half = |o: usize| reply[at + o..at + o + 4].try_into().map(u32::from_le_bytes);
-            Some(u64::from(half(15).ok()?) | u64::from(half(19).ok()?) << 32)
-        });
-        found.expect("a 39/0x28 answers the 39/37")
-    }
-
-    /// T805 (native 2026-10-27): the retail 411 names no character id, so the server finds the
-    /// session that minted a launch ticket by the ticket alone. Two in-world sessions each mint
-    /// one through the real Play -> 39/37 path; each redeems once with an empty id.
+    /// T805 (native 2026-10-27, T804 review finding 3): the retail 411 names no character id, so
+    /// the server finds the session that minted a launch ticket by the ticket alone. Two in-world
+    /// sessions each mint one through the real Play -> 39/37 path; the retail-shaped 411s then
+    /// cross the bound listener and `Server::poll_card`, and each 81 is a success (the 81's flag
+    /// is the `redeemed.is_ok()` the `card_login` event records). Each ticket is held by one
+    /// session only, a refusal changes nothing, and a ticket found under a wrong character id
+    /// names `character_mismatch`, never the next session's answer or a bare `unknown_ticket`.
     #[test]
     fn a_card_login_without_a_character_id_redeems_in_the_minting_session() {
         if !test_support::bin_test_target("card") {
@@ -1017,30 +1014,67 @@ pub(super) mod tests {
             scene.send(options, &[13, 0], 1_000).unwrap();
             scene.send(options, &[10, 0], 1_001).unwrap();
             // Play on the Trading Card Game row (167/1/2, row 490), then the card manager's 39/37.
-            let mut play = vec![167, 0, 1, 2];
-            play.extend(490u32.to_le_bytes());
-            play.extend(0u32.to_le_bytes());
-            scene.exchange(options, &play, 1_100);
+            scene.exchange(options, &test_support::portal_play(490), 1_100);
             let mut ask = vec![39, 0, 37];
             for value in [osfr_tools::card_game::FIRST_INSTANCE_ID, -1, -1] {
                 ask.extend(value.to_le_bytes());
             }
             let ticket = ticket_in(&scene.exchange(options, &ask, 1_200));
-            minted.push((ticket.to_string(), scene.session.gateway.state().guid));
             let key = SessionKey {
                 peer: scene.session.peer,
                 connection_id: scene.session.request.id,
             };
+            minted.push((ticket.to_string(), key));
             server.sessions.insert(key, scene.session);
         }
-        for (ticket, guid) in &minted {
-            assert_eq!(server.redeem_card_ticket(ticket, "", 2_000), Ok(*guid));
+        // Each ticket is held by its own session only.
+        for (index, (_, key)) in minted.iter().enumerate() {
+            let session = server.sessions.get_mut(key).unwrap();
+            let gameplay = session.gateway.gameplay_mut().unwrap();
             assert_eq!(
-                server.redeem_card_ticket(ticket, "", 2_001),
-                Err(card_service::UNKNOWN_TICKET),
-                "single use"
+                gameplay.redeem_card_ticket(&minted[1 - index].0, "", 1_800),
+                None,
+                "another session's ticket is not this session's"
             );
         }
+        // The first session's ticket under another character id: found and refused by name, and
+        // the scan does not fall through to an `unknown_ticket`. A malformed field keeps its own
+        // word too.
+        assert_eq!(
+            server.redeem_card_ticket(&minted[0].0, "2", 1_900),
+            Err("character_mismatch")
+        );
+        assert_eq!(
+            server.redeem_card_ticket("not-a-ticket", "", 1_900),
+            Err("ticket_not_decimal")
+        );
+
+        let card = listener();
+        server.card = Some(card);
+        let login = |server: &mut Server, ticket: &str, now: u64| {
+            let mut client = client(server.card.as_ref().unwrap());
+            client
+                .write_all(&frame(Some(ROUTING), &session_login("", ticket)))
+                .unwrap();
+            read_results(&answer_with(|| server.poll_card(now), &mut client))
+        };
+        assert_eq!(
+            login(&mut server, "77", 2_000),
+            (false, 63, 0, String::new()),
+            "a ticket no session holds is refused"
+        );
+        for (number, (ticket, _)) in minted.iter().enumerate() {
+            assert_eq!(
+                login(&mut server, ticket, 2_001 + number as u64),
+                (true, 0, card_service::account_id(1), "w-session".to_owned()),
+                "the minting session's ticket logs in (the fixture's character)"
+            );
+        }
+        assert_eq!(
+            login(&mut server, &minted[0].0, 2_010),
+            (false, 63, 0, String::new()),
+            "single use, and the refusal above spent nothing"
+        );
     }
 
     #[test]

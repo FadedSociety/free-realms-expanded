@@ -232,15 +232,16 @@ impl Launches {
         Ok(outcome)
     }
 
-    /// The card login's ticket and character id (T766's listener): the character on success,
-    /// else the refusal word (`LaunchTickets::redeem`). A refusal changes nothing; the retail
+    /// The card login's ticket and the character id it carries, if any (T766's listener): `Some`
+    /// holds the character on success or the refusal word ([`LaunchTickets::redeem`]), `None`
+    /// when this session's store does not hold the ticket. A refusal changes nothing; the retail
     /// 411's character id is empty (T804), so the ticket alone finds the session.
     pub fn redeem(
         &mut self,
         ticket: &str,
         character: &str,
         now_ms: u64,
-    ) -> Result<u64, &'static str> {
+    ) -> Option<Result<u64, &'static str>> {
         self.tickets.redeem(ticket, character, now_ms)
     }
 }
@@ -249,11 +250,11 @@ impl Launches {
 /// The card window starts its session login only for a non-empty session ticket (DLL
 /// `1037b5f0`), and the exe's card manager (`00ad47f0`) takes that ticket and the station name
 /// from this packet only. The ticket is a fresh random value that is not a credential: the card
-/// login is authorised by the one-time launch ticket (`LaunchTickets`; its 411 character id is
-/// empty in the retail client, T804), and the card service only echoes the session id back. The
-/// client logs it and the DLL sends it in plain TCP, so it is never the launcher session, the
-/// gateway ticket or a launch ticket. The station name and realms stay empty (R): the card
-/// service needs none of them.
+/// login is authorised by the one-time launch ticket (`LaunchTickets`; a character id the 411
+/// carries, if any, must name the owner, and the retail client sends none, T804), and the card
+/// service only echoes the session id back. The client logs it and the DLL sends it in plain
+/// TCP, so it is never the launcher session, the gateway ticket or a launch ticket. The station
+/// name and realms stay empty (R): the card service needs none of them.
 pub fn session_data_packet() -> io::Result<Vec<u8>> {
     let mut bytes = [0; 16];
     getrandom::getrandom(&mut bytes)
