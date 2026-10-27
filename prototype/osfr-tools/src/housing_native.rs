@@ -836,6 +836,10 @@ pub struct HousePermissionRecord {
 /// S2C 127/28 client `00ac9dd0` housing instance record. The reader fixes this complete field order.
 /// The zero/empty values selected by the service, and the six-to-eight-float bounds conversion,
 /// are reconstructed policy (R); the optional factory payload is deliberately fail-closed.
+///
+/// Each fixture is a `u32` key then a bare `FixtureInstance` (`00ab8c50` -> `00ab6f40`, 133 bytes
+/// with empty strings), not a whole 127/40 record: the p2.pcap 127/28 has its 2015 records 137
+/// bytes apart. The definition, info and tail of a 127/40 never ride here.
 #[derive(Clone, Debug, PartialEq)]
 pub struct InstanceData {
     pub house_guid: u64,
@@ -847,7 +851,7 @@ pub struct InstanceData {
     pub unknown7: u32,
     pub max_fixtures: u32,
     pub max_landmarks: u32,
-    pub fixtures: Vec<(u32, FixtureUpdate)>,
+    pub fixtures: Vec<(u32, FixtureInstance)>,
     pub permissions: Vec<HousePermissionRecord>,
     pub is_locked: bool,
     pub is_flora_allowed: bool,
@@ -882,7 +886,7 @@ impl InstanceData {
         writer.count(self.fixtures.len())?;
         for (key, fixture) in &self.fixtures {
             writer.u32(*key);
-            fixture.encode_record(&mut writer)?;
+            fixture.encode(&mut writer)?;
         }
         writer.count(self.permissions.len())?;
         for permission in &self.permissions {
@@ -932,7 +936,7 @@ impl InstanceData {
         let fixture_count = reader.count()?;
         let mut fixtures = Vec::with_capacity(fixture_count.min(64));
         for _ in 0..fixture_count {
-            fixtures.push((reader.u32()?, FixtureUpdate::decode_record(&mut reader)?));
+            fixtures.push((reader.u32()?, FixtureInstance::decode(&mut reader)?));
         }
         let permission_count = reader.count()?;
         let mut permissions = Vec::with_capacity(permission_count.min(64));

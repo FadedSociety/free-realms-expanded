@@ -168,8 +168,12 @@ Evidence inspected:
 
 Consequently the existing Legacy six-float boxes remain provisional policy only. The `127/28`
 builder transcribes each local `[min_x, min_y, min_z, max_x, max_y, max_z]` box into the client
-reader's two float4 records by writing `w = 0` (R). This makes synthetic enabled test content
-serializable; it does not make those boxes client-derived or safe for a real lot.
+reader's two float4 records by writing `w = 1`. A retail 127/28 (`p2.pcap`, another lot) carries
+w = 1.0 on both corners, and the client's containment test `sub_105C290` masks w out
+(`xmmword_1CB54A0` = (1, 1, 1, 0), set by `sub_173C140`), so w cannot refuse a placement. The boxes
+stay provisional policy (R), not client-derived; the Condo's building objects fit inside its box.
+The same capture fixes the 127/28 fixture record as a `u32` key plus a bare `FixtureInstance`
+(`00ab8c50` -> `00ab6f40`, 137 bytes apart), not a whole 127/40 record (T799).
 
 ### Reader layouts and service values
 

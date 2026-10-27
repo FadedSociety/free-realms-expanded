@@ -15,8 +15,8 @@ use osfr_tools::{
     gateway::Gateway,
     housing::{FixtureTransform, SavedFixture},
     housing_native::{
-        FixtureAsset, FixtureItemList, FixtureRemove, FixtureUpdate, HouseInfo, InstanceList,
-        PlacementDenied, PlayerHousingInstanceInfo, ZoneData,
+        FixtureAsset, FixtureItemList, FixtureRemove, FixtureUpdate, HouseInfo, InstanceData,
+        InstanceList, PlacementDenied, PlayerHousingInstanceInfo, ZoneData,
     },
     housing_service::HousingContent,
     inventory::{InventoryItem, MAX_ITEMS},
@@ -274,6 +274,46 @@ fn entering_changes_scene_and_the_house_packets_wait_for_the_load() {
         again.replies.is_empty(),
         "a second load inside the house resends nothing"
     );
+}
+
+/// T799: the client refuses every placement unless the preview box sits inside a box of the
+/// 127/28 list (`sub_105C290` over the list `00ab7250` reads). A whole 127/40 record per fixture
+/// shifted every field after the fixtures, so the Condo, which stands four kit blocks, sent a box
+/// the client never saw. The record must hold the lot's box, w = 1 as retail sends it, and the
+/// kit as bare instances that the 127/40s then complete by guid.
+#[test]
+fn the_condos_house_record_carries_its_build_box_and_the_kit_as_bare_instances() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let lot = granted(&mut game);
+    game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000)
+        .unwrap();
+    let loaded = game.initialize_world(&character(), 3_000).unwrap();
+    let record = InstanceData::decode(reply(&loaded.replies, 28)).unwrap();
+
+    let starter = HousingContent::bundled().unwrap();
+    let row = starter
+        .lots
+        .iter()
+        .find(|row| row.property_id == starter.starter_property_id)
+        .unwrap();
+    let [a, b, c, d, e, f] = row.build_areas[0];
+    let expected = [[a, b, c, 1.0], [d, e, f, 1.0]];
+    assert_eq!(record.build_areas, vec![expected]);
+    let [min, max] = expected;
+    assert!((0..3).all(|lane| min[lane] < max[lane]), "min below max");
+    assert!(
+        (0..3).all(|lane| min[lane] <= ON_THE_LOT[lane] && ON_THE_LOT[lane] <= max[lane]),
+        "the test click spot is on the lot"
+    );
+
+    let kit: BTreeSet<u64> = updates(&loaded.replies)
+        .iter()
+        .map(|u| u.instance.guid)
+        .collect();
+    assert_eq!(kit.len(), KIT_BLOCKS);
+    let listed: BTreeSet<u64> = record.fixtures.iter().map(|(_, f)| f.guid).collect();
+    assert_eq!(listed, kit, "the 127/28 lists the kit the 127/40s complete");
 }
 
 #[test]

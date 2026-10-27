@@ -2077,8 +2077,10 @@ impl HousingService {
     }
 
     /// Build the full 127/28 reader shape. The six-coordinate Legacy bounds are expanded to two
-    /// float4s with w = 1 (R, the value Lxzxrus zone files use; the client's use of w is not traced); keyed list ordinals and absent factory/display metadata are
-    /// also R because the client supplies no lot resource table or server capture.
+    /// float4s with w = 1: the retail p2.pcap 127/28 carries w = 1.0 on both corners, and the
+    /// client's containment test `sub_105C290` masks w out (`xmmword_1CB54A0` = (1, 1, 1, 0),
+    /// set by `sub_173C140`), so w cannot fail it. Keyed list ordinals and absent factory/display
+    /// metadata are R: no capture of a lot like this one exists.
     fn instance_data(
         &self,
         lot: &LotSnapshot,
@@ -2091,7 +2093,8 @@ impl HousingService {
             let placed = placed_from_saved(saved);
             fixtures.push((
                 key,
-                self.fixture_update(&placed, saved.fixture_definition_id)?,
+                self.fixture_update(&placed, saved.fixture_definition_id)?
+                    .instance,
             ));
         }
         let permissions = lot

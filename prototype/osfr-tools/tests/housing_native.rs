@@ -451,7 +451,7 @@ fn every_subtype_uses_the_same_explicit_family_boundary() {
             unknown7: 0,
             max_fixtures: 8,
             max_landmarks: 0,
-            fixtures: vec![(1, empty_update())],
+            fixtures: vec![(1, empty_update().instance)],
             permissions: vec![HousePermissionRecord {
                 key: 1,
                 pair: [9, 10],
@@ -597,4 +597,50 @@ fn private_housing_corpus_round_trips_through_registered_codec() {
         counts.into_iter().collect::<Vec<_>>(),
         vec![(2, 8), (40, 9), (41, 8), (44, 19)]
     );
+}
+
+/// Client `00ab8c50` reads a `u32` key and a bare `FixtureInstance` (`00ab6f40`) per 127/28
+/// fixture. A retail 127/28 spaces its records 137 bytes apart (4 + 133 with empty strings); a
+/// whole 127/40 record per fixture shifted every later field, the build box included.
+#[test]
+fn instance_data_fixtures_are_bare_instances_so_the_build_box_stays_aligned() {
+    let box_ = [[87.2, -100.0, -47.7, 1.0], [138.3, 60.0, -11.6, 1.0]];
+    let with = |count: usize| InstanceData {
+        house_guid: 5,
+        owner_guid: 6,
+        owner_name: String::new(),
+        unknown4: 0,
+        name_id: 7,
+        name: String::new(),
+        unknown7: 0,
+        max_fixtures: 8,
+        max_landmarks: 0,
+        fixtures: (1..=count as u32)
+            .map(|key| (key, empty_update().instance))
+            .collect(),
+        permissions: Vec::new(),
+        is_locked: false,
+        is_flora_allowed: true,
+        cur_fixture_count: count as u32,
+        cur_landmark_count: 0,
+        unknown14: false,
+        unknown15: 0,
+        build_areas: vec![box_],
+        icon_id: 11,
+        preview: false,
+        unknown18: false,
+        furniture_score: 0,
+        unknown20: 0,
+        is_members_only: false,
+        unknown22: String::new(),
+        unknown23: String::new(),
+        unknown24: false,
+    };
+    let sizes: Vec<usize> = (0..3).map(|n| with(n).encode().unwrap().len()).collect();
+    assert_eq!(sizes[1] - sizes[0], 137, "key + 133-byte FixtureInstance");
+    assert_eq!(sizes[2] - sizes[1], 137);
+    let four = with(4);
+    let decoded = InstanceData::decode(&four.encode().unwrap()).unwrap();
+    assert_eq!(decoded, four);
+    assert_eq!(decoded.build_areas, vec![box_]);
 }
