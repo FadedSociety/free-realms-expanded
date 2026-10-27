@@ -38,6 +38,10 @@ const SELVI: u64 = 9_000_000_194;
 const REED: u64 = 9_000_000_181;
 /// Lila Darklure: Darklit Lagoon (hole 560, scene not cached), drawable.
 const LILA: u64 = 9_000_000_377;
+/// Big J: Wintery Basin (spot 600, hole 564, scene cached). The native check arrived here.
+const BIG_J: u64 = 9_000_000_024;
+const WINTER: u32 = 564;
+const WINTER_SPAWN: [f32; 3] = [202.42, 5.74, 290.33];
 const HOLE: u32 = 562;
 const SPAWN: [f32; 3] = [441.42, -60.31, 475.08];
 const ACTOR: Handle = Handle {
@@ -131,9 +135,13 @@ fn at(guide: u64) -> CharacterState {
 
 /// The player inside the hole, as the gateway stages it after the zoning.
 fn in_hole(position: [f32; 3]) -> CharacterState {
+    in_scene(HOLE, position)
+}
+
+fn in_scene(zone: u32, position: [f32; 3]) -> CharacterState {
     CharacterState {
         guid: GUID,
-        zone_id: HOLE,
+        zone_id: zone,
         position,
         rotation: [0.0, 0.0, 0.0],
     }
@@ -315,6 +323,66 @@ fn the_hole_round_has_no_leash_casts_from_the_player_and_ends_with_its_scene() {
     assert_eq!(status_flags(&gone.replies), vec![1]);
     assert_world_return(&gone.scene_zoning.expect("a server end zones back"), &world);
     assert!(game.tick(&at(SELVI), 4_400).unwrap().scene_zoning.is_none());
+}
+
+/// The native check's hole: Go fish! at Big J zones into Wintery Basin, Go starts the round,
+/// registration answers with that area's fish in both the model list packet (138/3) and the
+/// Fish Finder update (138/4), and a cast from the spawn is accepted.
+#[test]
+fn wintery_basin_arrival_lists_its_fish_and_accepts_a_cast() {
+    let content = Content::new();
+    let mut game = content.game();
+    let out = go_fish(&mut game, BIG_J, &at(BIG_J), 1_000);
+    let scene = out.scene_zoning.expect("a cached hole zones the player in");
+    assert_eq!(
+        (scene.scene.as_str(), scene.id),
+        ("sh_fishing_medpond", WINTER as i32)
+    );
+    assert_eq!(&scene.position[..3], &WINTER_SPAWN);
+    let here = in_scene(WINTER, WINTER_SPAWN);
+    let loaded = game.initialize_world(&here, 2_000).unwrap();
+    let instance = offer_instance(&loaded.replies);
+    let go = game
+        .handle_in_world(&lifecycle(5, instance), &here, 3_000)
+        .unwrap();
+    assert_eq!(
+        status_flags(&go.replies),
+        vec![0x40_0001],
+        "fishing flag on"
+    );
+    let registered = game
+        .handle_in_world(&register(ACTOR), &here, 3_100)
+        .unwrap();
+    let finder = registered
+        .replies
+        .iter()
+        .find(|reply| reply.starts_with(&[138, 0, 4, 0]))
+        .expect("the Fish Finder update follows registration");
+    let rows = fishing_packets::fish_info_rows(finder);
+    let registered_rows = registered
+        .replies
+        .iter()
+        .find(|reply| reply.starts_with(&[138, 0, 3, 0]))
+        .map(|reply| fishing_packets::register_fish_rows(reply))
+        .expect("the register answer");
+    assert_eq!(rows, registered_rows);
+    assert_eq!(rows.len(), 7, "Wintery Basin's fish");
+    for row in &rows {
+        assert!(
+            row.name_id > 0 && row.name_id < 6_000_000,
+            "a numeric Global.Text id, not a raw locale hash: {row:?}"
+        );
+        assert!(row.icon_id > 0, "a Fish Finder icon: {row:?}");
+    }
+    // The player stands at the spot; a 10 m cast is inside the 3..20 m reach.
+    let cast = game
+        .handle_in_world(&cast_at(ACTOR, WINTER_SPAWN, 10.0), &here, 3_200)
+        .unwrap();
+    assert!(starts(&cast.replies, &[138, 0, 8, 0]), "the bobber lands");
+    assert!(
+        starts(&cast.replies, &[138, 0, 18, 0]),
+        "the fish run starts"
+    );
 }
 
 #[test]

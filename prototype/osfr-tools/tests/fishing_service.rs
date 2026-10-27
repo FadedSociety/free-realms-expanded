@@ -193,7 +193,7 @@ fn registration_cast_bite_reel_catch_has_exact_messages_and_one_item() {
     let registered = service.handle(&register_request(), PLAYER, T0).unwrap();
     assert_eq!(
         packet_ids(&registered),
-        vec![(138, 3), (138, 1), (138, 11), (138, 11)]
+        vec![(138, 3), (138, 1), (138, 4), (138, 11), (138, 11)]
     );
 
     let cast = service.handle(&cast_request(), PLAYER, T0 + 10).unwrap();
@@ -325,6 +325,82 @@ fn registration_sends_the_client_compiled_player_defaults() {
     );
 }
 
+/// The Fish Finder reads only the rows the server sends, and the client resolves each name as
+/// `Global.Text.<id>` (`0x0097bca0`): a raw locale hash renders nothing. Its rows are refreshed
+/// only by 138/4 (case 4 calls `0x00cd4480`), so the register answer must be followed by the
+/// area's own fish, each with a numeric name id and a real icon set.
+#[test]
+fn registration_followed_by_the_fish_finder_lists_the_areas_fish() {
+    let (_fixture, mut service) = running();
+    let registered = service.handle(&register_request(), PLAYER, T0).unwrap();
+    assert_eq!(packet_ids(&registered)[..3], [(138, 3), (138, 1), (138, 4)]);
+    let content: Value = serde_json::from_str(FishingService::content_json()).unwrap();
+    let species: BTreeMap<&str, &Value> = content["species"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|row| (row["key"].as_str().unwrap(), row))
+        .collect();
+    // `running()` begins the round in Sacred Grove Shallows.
+    let area = content["areas"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| row["key"] == "sacred_grove_shallows")
+        .unwrap();
+    let expected: Vec<&str> = area["fish"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|key| key.as_str().unwrap())
+        .collect();
+    let registered_rows = fishing_packets::register_fish_rows(&registered.replies[0]);
+    let finder = registered
+        .replies
+        .iter()
+        .find(|reply| reply.starts_with(&[138, 0, 4, 0]))
+        .expect("the Fish Finder update follows registration");
+    let finder_rows = fishing_packets::fish_info_rows(finder);
+    assert_eq!(
+        registered_rows, finder_rows,
+        "138/3 and 138/4 list the same fish"
+    );
+    assert_eq!(finder_rows.len(), expected.len());
+    let mut types = BTreeSet::new();
+    for (row, key) in finder_rows.iter().zip(expected) {
+        let fish = species[key];
+        assert_eq!(
+            u64::from(row.type_id),
+            fish["type_id"].as_u64().unwrap(),
+            "{key}: type"
+        );
+        assert_eq!(
+            u64::from(row.name_id),
+            fish["name_id"].as_u64().unwrap(),
+            "{key}: name"
+        );
+        assert_eq!(
+            u64::from(row.icon_id),
+            fish["icon_id"].as_u64().unwrap(),
+            "{key}: icon"
+        );
+        assert!(
+            row.name_id > 0 && row.name_id < 6_000_000,
+            "{key}: a numeric Global.Text id, not a raw locale hash"
+        );
+        assert!(row.icon_id > 0, "{key}: has a Fish Finder icon");
+        assert!(types.insert(row.type_id), "{key}: unique type");
+    }
+    assert!(
+        finder_rows.iter().any(|row| row.catchable),
+        "a level 1 fisherman can catch at least one of the area's fish"
+    );
+    assert!(
+        finder_rows.iter().any(|row| !row.catchable),
+        "the row flag still follows the minimum level"
+    );
+}
+
 #[test]
 fn a_refused_cast_sends_nothing_and_changes_nothing() {
     let (fixture, mut service) = running();
@@ -406,7 +482,7 @@ fn disconnect_mid_fight_clears_ephemeral_state_without_grant() {
 fn leave_despawns_schools_and_drops_attempt_without_reward() {
     let (_fixture, mut service) = running();
     let registered = service.handle(&register_request(), PLAYER, T0).unwrap();
-    assert_eq!(registered.replies.len(), 4);
+    assert_eq!(registered.replies.len(), 5);
     service.handle(&cast_request(), PLAYER, T0 + 1).unwrap();
     let left = service.leave(PLAYER).unwrap();
     assert_eq!(packet_ids(&left), vec![(138, 12), (138, 12)]);

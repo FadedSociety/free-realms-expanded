@@ -84,6 +84,10 @@ const CATCH_CAP_NOTICE: &str = "The fishing reward limit has been reached, so th
 /// player's current stacks plus this, so a catch never fails for want of a slot (R: the bag limit
 /// itself is unrecovered, and this keeps a large existing inventory from blocking every catch).
 const MAX_FISH_STACKS: usize = 160;
+/// Sanity ceiling for a numeric client text id. The client resolves a fish name by formatting
+/// `Global.Text.<id>` and hashing it (`0x0097bca0`), so a raw locale hash (the old `name_id`
+/// values, all above 4x10^8) never resolves; the locale scanner covers ids up to 6,000,000.
+const MAX_TEXT_ID: u32 = 6_000_000;
 
 static CONTENT: LazyLock<Content> = LazyLock::new(|| {
     let content: Content =
@@ -229,6 +233,9 @@ impl FishingService {
             })
             && CONTENT.species.iter().all(|fish| {
                 !fish.name.is_empty()
+                    && fish.name_id > 0
+                    && fish.name_id < MAX_TEXT_ID
+                    && fish.icon_id > 0
                     && fish.source_tags.values().all(|tag| !tag.is_empty())
                     && fish.size_weights.iter().any(|weight| *weight > 0)
             })
@@ -768,6 +775,10 @@ impl FishingService {
             let mut replies = vec![
                 registration_reply(tracked)?,
                 update_data_reply(actor, tracked.anchor),
+                // The Fish Finder's rows are refreshed by 138/4 (its case 4 calls `0x00cd4480`;
+                // case 3 only rebuilds the list), so they follow registration in their own
+                // packet, as the played server sends them (register, update data, fish info).
+                fish_info_reply(tracked)?,
             ];
             replies.extend(
                 content_area
@@ -1138,9 +1149,18 @@ fn registration_reply(tracked: &Tracked) -> Result<Vec<u8>, Error> {
             out.extend(value.to_le_bytes());
         }
     }
-    push_count(&mut out, CONTENT.registration.integer_values.len());
-    for value in &CONTENT.registration.integer_values {
-        out.extend(value.to_le_bytes());
+    // 138/3 integer list: `0x008dab40` reads a count then that many u32, and the client creates
+    // one model actor at the origin for each. Send the distinct fish shapes; a played register
+    // response carries exactly these (Lxzxrus `FishModelIds`).
+    let mut models: Vec<i32> = Vec::new();
+    for id in CONTENT.models.fish_by_grade {
+        if !models.contains(&id) {
+            models.push(id);
+        }
+    }
+    push_count(&mut out, models.len());
+    for value in models {
+        out.extend((value as u32).to_le_bytes());
     }
     let visible = area
         .fish
@@ -1746,7 +1766,6 @@ struct Registration {
     /// The 138/3 zone block (`0x00b67240`). Word 3 (TensionMeterAmplifier) goes out as a u32.
     /// A spot's scene replaces word 1 ([`Scene::zone_words`]).
     zone_words: [f32; 5],
-    integer_values: Vec<u32>,
     source: String,
 }
 

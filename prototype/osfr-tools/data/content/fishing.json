@@ -39,7 +39,6 @@
       1.0,
       0.0
     ],
-    "integer_values": [],
     "source": "client compiled defaults at 0x0107b6d0 (wire order reader 0x00b65880); the shipped bbe_FishingPlayerConfig.txt is lost, so these are fallbacks, not proven live tuning"
   },
   "models": {
@@ -67,7 +66,7 @@
     "source_tags": {
       "bobber": "client compiled FishingPlayerConfig default 0x0107b6d0 sets BobberModelId (+0x54) to 0x427; client Models.txt 1063 fishing_bobber_bbe.adr. Sent in 138/8; 0x00ccfdb0 looks it up unchecked",
       "run_header": "R: 138/18 header model, the lure drawn at the hook and read unchecked at 0x00b6da36 when the head record +0x30 (on_hook) is 0, so unused while we send 1; client Models.txt 1673 sg_fishing_lure_bbe.adr; the lure choice is a hint from Lxzxrus 75f7d95 FishingSession.cs HookLureModelId",
-      "fish_by_grade": "R: client Models.txt 1670 fishing_thin_fish_bbe, 1671 fishing_medium_fish_bbe, 1672 fishing_fat_fish_bbe, for size grades 1-4; the grade pairing is not recovered",
+      "fish_by_grade": "R: client Models.txt 1670 fishing_thin_fish_bbe, 1671 fishing_medium_fish_bbe, 1672 fishing_fat_fish_bbe, for size grades 1-4; the grade pairing is not recovered. The 138/3 integer list is the distinct ids here: the client creates each model actor at the origin on registration (played register response, Lxzxrus FishingSession.FishModelIds).",
       "fish_motion": "R: 138/18 record floats +0x34..+0x58 (reader 0x00b67550, copied to the fish at 0x00b6d749); values are a hint from Lxzxrus 37ef175 docs/research/fishing/FISHING_RE_NOTES.md:240-245 ('lively'); integers freeze the fish",
       "fish_motion_tail": "R: 138/18 record float +0x5c (read by 0x008d53b0); same hint"
     }
@@ -263,8 +262,8 @@
     {
       "key": "flutterfish",
       "name": "Flutterfish",
-      "name_id": 3684473514,
-      "type_id": 1001,
+      "name_id": 23278,
+      "type_id": 2868,
       "minimum_level": 1,
       "rarity": 1,
       "difficulty": 1,
@@ -280,19 +279,21 @@
         3
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4264
     },
     {
       "key": "slugmud_skipper",
       "name": "Slugmud Skipper",
-      "name_id": 1323940429,
-      "type_id": 1002,
+      "name_id": 99924,
+      "type_id": 68049,
       "minimum_level": 1,
       "rarity": 1,
       "difficulty": 1,
@@ -308,19 +309,21 @@
         2
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4276
     },
     {
       "key": "butter_flyfish",
       "name": "Butter Flyfish",
-      "name_id": 4078677637,
-      "type_id": 1003,
+      "name_id": 99925,
+      "type_id": 68053,
       "minimum_level": 5,
       "rarity": 2,
       "difficulty": 2,
@@ -336,19 +339,21 @@
         5
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4254
     },
     {
       "key": "tickled_trout",
       "name": "Tickled Trout",
-      "name_id": 201959869,
-      "type_id": 1004,
+      "name_id": 99963,
+      "type_id": 68001,
       "minimum_level": 1,
       "rarity": 1,
       "difficulty": 1,
@@ -364,19 +369,21 @@
         3
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4422
     },
     {
       "key": "tangletooth_shark",
       "name": "Tangletooth Shark",
-      "name_id": 2297626118,
-      "type_id": 1005,
+      "name_id": 407895,
+      "type_id": 68113,
       "minimum_level": 20,
       "rarity": 5,
       "difficulty": 5,
@@ -392,19 +399,21 @@
         25
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4421
     },
     {
       "key": "feral_catfish",
       "name": "Feral Catfish",
-      "name_id": 4139537974,
-      "type_id": 1006,
+      "name_id": 99926,
+      "type_id": 68056,
       "minimum_level": 17,
       "rarity": 4,
       "difficulty": 4,
@@ -420,19 +429,21 @@
         20
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4262
     },
     {
       "key": "cheery_salmon",
       "name": "Cheery Salmon",
-      "name_id": 3740293957,
-      "type_id": 1007,
+      "name_id": 99927,
+      "type_id": 68063,
       "minimum_level": 10,
       "rarity": 3,
       "difficulty": 3,
@@ -448,19 +459,21 @@
         12
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4257
     },
     {
       "key": "chipsen_fish",
       "name": "Chipsen Fish",
-      "name_id": 1764105760,
-      "type_id": 1008,
+      "name_id": 99928,
+      "type_id": 68067,
       "minimum_level": 14,
       "rarity": 3,
       "difficulty": 3,
@@ -476,19 +489,21 @@
         11
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4258
     },
     {
       "key": "baconfish",
       "name": "Baconfish",
-      "name_id": 97750453,
-      "type_id": 1009,
+      "name_id": 99929,
+      "type_id": 68069,
       "minimum_level": 20,
       "rarity": 5,
       "difficulty": 4,
@@ -504,19 +519,21 @@
         22
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4249
     },
     {
       "key": "creeping_cod",
       "name": "Creeping Cod",
-      "name_id": 3825681255,
-      "type_id": 1010,
+      "name_id": 99930,
+      "type_id": 68081,
       "minimum_level": 1,
       "rarity": 1,
       "difficulty": 1,
@@ -532,19 +549,21 @@
         3
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4260
     },
     {
       "key": "bitter_betta",
       "name": "Bitter Betta",
-      "name_id": 2581337494,
-      "type_id": 1011,
+      "name_id": 99935,
+      "type_id": 68097,
       "minimum_level": 1,
       "rarity": 1,
       "difficulty": 1,
@@ -560,19 +579,21 @@
         2
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki first occurrence; duplicate level-20 entry is unresolved",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4250
     },
     {
       "key": "golden_scaled_nettler",
       "name": "Golden Scaled Nettler",
-      "name_id": 1843206912,
-      "type_id": 1012,
+      "name_id": 99971,
+      "type_id": 68009,
       "minimum_level": 1,
       "rarity": 2,
       "difficulty": 2,
@@ -588,18 +609,21 @@
         6
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level_rarity_difficulty_selection_weight_weight_size_weights": "R; wiki level absent",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already",
+        "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R"
+      },
+      "icon_id": 4420
     },
     {
       "key": "globfish",
       "name": "Globfish",
-      "name_id": 3446142081,
-      "type_id": 1013,
+      "name_id": 6169,
+      "type_id": 2147,
       "minimum_level": 1,
       "rarity": 1,
       "difficulty": 1,
@@ -615,19 +639,21 @@
         3
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4268
     },
     {
       "key": "blind_swurglefish",
       "name": "Blind Swurglefish",
-      "name_id": 1712345757,
-      "type_id": 1014,
+      "name_id": 23275,
+      "type_id": 2865,
       "minimum_level": 5,
       "rarity": 2,
       "difficulty": 2,
@@ -643,19 +669,21 @@
         6
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4251
     },
     {
       "key": "fanged_grouper",
       "name": "Fanged Grouper",
-      "name_id": 1213211111,
-      "type_id": 1015,
+      "name_id": 99939,
+      "type_id": 68091,
       "minimum_level": 14,
       "rarity": 4,
       "difficulty": 4,
@@ -671,19 +699,21 @@
         18
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4261
     },
     {
       "key": "changed_salmon",
       "name": "Changed Salmon",
-      "name_id": 3593608617,
-      "type_id": 1016,
+      "name_id": 99940,
+      "type_id": 68094,
       "minimum_level": 10,
       "rarity": 3,
       "difficulty": 3,
@@ -699,19 +729,21 @@
         12
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4256
     },
     {
       "key": "briar_nibbler",
       "name": "Briar Nibbler",
-      "name_id": 2964441616,
-      "type_id": 1017,
+      "name_id": 99941,
+      "type_id": 68101,
       "minimum_level": 17,
       "rarity": 4,
       "difficulty": 4,
@@ -727,19 +759,21 @@
         17
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4556
     },
     {
       "key": "ink_cod",
       "name": "Ink Cod",
-      "name_id": 1396025175,
-      "type_id": 1018,
+      "name_id": 99931,
+      "type_id": 68073,
       "minimum_level": 1,
       "rarity": 1,
       "difficulty": 1,
@@ -755,19 +789,21 @@
         3
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4635
     },
     {
       "key": "purplenosed_shark",
       "name": "Purplenosed Shark",
-      "name_id": 1740067327,
-      "type_id": 1019,
+      "name_id": 99932,
+      "type_id": 68075,
       "minimum_level": 14,
       "rarity": 4,
       "difficulty": 4,
@@ -783,19 +819,21 @@
         19
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4274
     },
     {
       "key": "old_sole",
       "name": "Old Sole",
-      "name_id": 1398907761,
-      "type_id": 1020,
+      "name_id": 99933,
+      "type_id": 68087,
       "minimum_level": 10,
       "rarity": 3,
       "difficulty": 3,
@@ -811,19 +849,21 @@
         12
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4271
     },
     {
       "key": "thorny_trout",
       "name": "Thorny Trout",
-      "name_id": 1571765311,
-      "type_id": 1021,
+      "name_id": 99934,
+      "type_id": 68090,
       "minimum_level": 5,
       "rarity": 2,
       "difficulty": 2,
@@ -839,19 +879,21 @@
         5
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4280
     },
     {
       "key": "roach_loach",
       "name": "Roach Loach",
-      "name_id": 1471786984,
-      "type_id": 1022,
+      "name_id": 99936,
+      "type_id": 68099,
       "minimum_level": 17,
       "rarity": 4,
       "difficulty": 3,
@@ -867,19 +909,21 @@
         16
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4275
     },
     {
       "key": "finless_fish",
       "name": "Finless Fish",
-      "name_id": 1775121672,
-      "type_id": 1023,
+      "name_id": 99919,
+      "type_id": 68046,
       "minimum_level": 14,
       "rarity": 3,
       "difficulty": 3,
@@ -895,19 +939,21 @@
         11
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4263
     },
     {
       "key": "peachy_perch",
       "name": "Peachy Perch",
-      "name_id": 382076945,
-      "type_id": 1024,
+      "name_id": 99920,
+      "type_id": 68051,
       "minimum_level": 10,
       "rarity": 3,
       "difficulty": 2,
@@ -923,19 +969,21 @@
         11
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4341
     },
     {
       "key": "calico_catfish",
       "name": "Calico Catfish",
-      "name_id": 3019459429,
-      "type_id": 1025,
+      "name_id": 6171,
+      "type_id": 2149,
       "minimum_level": 1,
       "rarity": 1,
       "difficulty": 1,
@@ -951,19 +999,21 @@
         3
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4255
     },
     {
       "key": "lady_tetra",
       "name": "Lady Tetra",
-      "name_id": 3183599288,
-      "type_id": 1026,
+      "name_id": 99922,
+      "type_id": 68061,
       "minimum_level": 17,
       "rarity": 4,
       "difficulty": 3,
@@ -979,19 +1029,21 @@
         16
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4270
     },
     {
       "key": "toothy_tetra",
       "name": "Toothy Tetra",
-      "name_id": 3105715660,
-      "type_id": 1027,
+      "name_id": 99923,
+      "type_id": 68066,
       "minimum_level": 5,
       "rarity": 2,
       "difficulty": 2,
@@ -1007,19 +1059,21 @@
         5
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4281
     },
     {
       "key": "winter_piranha",
       "name": "Winter Piranha",
-      "name_id": 520427170,
-      "type_id": 1028,
+      "name_id": 99942,
+      "type_id": 68022,
       "minimum_level": 1,
       "rarity": 1,
       "difficulty": 1,
@@ -1035,19 +1089,21 @@
         3
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat (client lure text spells Pirahna)",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4282
     },
     {
       "key": "frostgill_smelt",
       "name": "Frostgill Smelt",
-      "name_id": 1298061048,
-      "type_id": 1029,
+      "name_id": 23274,
+      "type_id": 2864,
       "minimum_level": 5,
       "rarity": 2,
       "difficulty": 2,
@@ -1063,19 +1119,21 @@
         5
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4265
     },
     {
       "key": "coach_loach",
       "name": "Coach Loach",
-      "name_id": 596154789,
-      "type_id": 1030,
+      "name_id": 99944,
+      "type_id": 68024,
       "minimum_level": 17,
       "rarity": 4,
       "difficulty": 4,
@@ -1091,19 +1149,21 @@
         17
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4259
     },
     {
       "key": "frozen_char",
       "name": "Frozen Char",
-      "name_id": 604305585,
-      "type_id": 1031,
+      "name_id": 99945,
+      "type_id": 68027,
       "minimum_level": 1,
       "rarity": 1,
       "difficulty": 1,
@@ -1119,19 +1179,21 @@
         3
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4266
     },
     {
       "key": "ferocious_fangler",
       "name": "Ferocious Fangler",
-      "name_id": 2666854879,
-      "type_id": 1032,
+      "name_id": 99970,
+      "type_id": 68008,
       "minimum_level": 20,
       "rarity": 5,
       "difficulty": 5,
@@ -1147,19 +1209,21 @@
         25
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4419
     },
     {
       "key": "blubracuda",
       "name": "Blubracuda",
-      "name_id": 293056293,
-      "type_id": 1033,
+      "name_id": 99946,
+      "type_id": 68036,
       "minimum_level": 14,
       "rarity": 3,
       "difficulty": 3,
@@ -1175,19 +1239,21 @@
         11
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat (spelling confirmed against client)",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4252
     },
     {
       "key": "spineless_stickleback",
       "name": "Spineless Stickleback",
-      "name_id": 3504078607,
-      "type_id": 1034,
+      "name_id": 99947,
+      "type_id": 68039,
       "minimum_level": 10,
       "rarity": 3,
       "difficulty": 3,
@@ -1203,19 +1269,21 @@
         11
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4277
     },
     {
       "key": "chilly_grouper",
       "name": "Chilly Grouper",
-      "name_id": 2457750639,
-      "type_id": 1035,
+      "name_id": 99948,
+      "type_id": 68011,
       "minimum_level": 1,
       "rarity": 1,
       "difficulty": 1,
@@ -1231,19 +1299,21 @@
         3
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4267
     },
     {
       "key": "blue_thornfin",
       "name": "Blue Thornfin",
-      "name_id": 2669055528,
-      "type_id": 1036,
+      "name_id": 99949,
+      "type_id": 68014,
       "minimum_level": 10,
       "rarity": 3,
       "difficulty": 3,
@@ -1259,19 +1329,21 @@
         11
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4253
     },
     {
       "key": "talking_bass",
       "name": "Talking Bass",
-      "name_id": 1925930408,
-      "type_id": 1037,
+      "name_id": 99950,
+      "type_id": 68019,
       "minimum_level": 17,
       "rarity": 4,
       "difficulty": 4,
@@ -1287,19 +1359,21 @@
         18
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4279
     },
     {
       "key": "pacu_pacu",
       "name": "Pacu Pacu",
-      "name_id": 3217487345,
-      "type_id": 1038,
+      "name_id": 99951,
+      "type_id": 68028,
       "minimum_level": 5,
       "rarity": 2,
       "difficulty": 2,
@@ -1315,19 +1389,21 @@
         5
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4272
     },
     {
       "key": "goofy_grouper",
       "name": "Goofy Grouper",
-      "name_id": 4219774350,
-      "type_id": 1039,
+      "name_id": 99952,
+      "type_id": 68030,
       "minimum_level": 14,
       "rarity": 3,
       "difficulty": 3,
@@ -1343,19 +1419,21 @@
         11
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4269
     },
     {
       "key": "plattypus",
       "name": "Plattypus",
-      "name_id": 3336696870,
-      "type_id": 1040,
+      "name_id": 99953,
+      "type_id": 68033,
       "minimum_level": 20,
       "rarity": 5,
       "difficulty": 4,
@@ -1371,13 +1449,15 @@
         25
       ],
       "source_tags": {
-        "name_id": "client locale en_us_data.dat",
+        "name_id": "client locale en_us_data.dat: numeric Global.Text.<id> for the plain species name (row set recovered in Lxzxrus FishTables.cs, data only)",
         "area": "client Fish Finder table",
         "minimum_level": "wiki",
         "type_id_rarity_difficulty_selection_weight_weight_size_weights": "R",
-        "icon_id": "R: unresolved client icon mapping; placeholder zero",
-        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero"
-      }
+        "icon_id": "client Resources/Images/ImageSets.txt: the species fish_* image set id the Fish Finder shows",
+        "lure_hint_id": "R: unresolved text id and field meaning; placeholder zero",
+        "type_id": "client item definition id of the fish (row set recovered in Lxzxrus FishTables.cs, data only); the client drops a Fish Finder row whose type it has listed already"
+      },
+      "icon_id": 4273
     }
   ],
   "lures": [

@@ -114,3 +114,64 @@ pub fn encounter_close(instance: i32) -> Vec<u8> {
     packet.extend(instance.to_le_bytes());
     packet
 }
+
+/// One Fish Finder row, as the client reads it (`0x00b673b0`): three u32, a skip byte, the
+/// FishSpecial byte, the lure-hint id, an i32-length string, then a u32, the catchable byte
+/// and a u32. The first u32 is the row's type; the client drops a row whose type it has
+/// already listed (`0x00b65ed0`).
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub struct FishRow {
+    pub type_id: u32,
+    pub name_id: u32,
+    pub icon_id: u32,
+    pub special: bool,
+    pub lure_hint_id: u32,
+    /// `fisherman_level >= minimum_level`; the client's FishCatchable column.
+    pub catchable: bool,
+}
+
+/// The fish rows of a 138/3: the list follows the 16 player words, the underwater-sky string,
+/// the 5 zone words and the u32 model-id array (`0x00b65880`, `0x00b67240`, `0x008dab40`,
+/// `0x00b691d0`).
+pub fn register_fish_rows(packet: &[u8]) -> Vec<FishRow> {
+    let body = &packet[4..];
+    let mut at = 16 * 4;
+    let sky = u32::from_le_bytes(body[at..at + 4].try_into().unwrap()) as usize;
+    at += 4 + sky;
+    at += 5 * 4;
+    let models = u32::from_le_bytes(body[at..at + 4].try_into().unwrap()) as usize;
+    at += 4 + models * 4;
+    fish_rows(&body[at..])
+}
+
+/// The fish rows of a 138/4 FishInfoUpdate: a count then the same rows.
+pub fn fish_info_rows(packet: &[u8]) -> Vec<FishRow> {
+    fish_rows(&packet[4..])
+}
+
+fn fish_rows(body: &[u8]) -> Vec<FishRow> {
+    let word = |at: usize| u32::from_le_bytes(body[at..at + 4].try_into().unwrap());
+    let count = word(0) as usize;
+    let mut at = 4;
+    let mut rows = Vec::with_capacity(count);
+    for _ in 0..count {
+        let name_id = word(at + 4);
+        let icon_id = word(at + 8);
+        let special = body[at + 13] != 0;
+        let lure_hint_id = word(at + 14);
+        let string = word(at + 18) as usize;
+        let next = at + 22 + string;
+        let catchable = body[next + 4] != 0;
+        rows.push(FishRow {
+            type_id: word(at),
+            name_id,
+            icon_id,
+            special,
+            lure_hint_id,
+            catchable,
+        });
+        at = next + 9;
+    }
+    assert_eq!(at, body.len(), "the fish rows consume the body");
+    rows
+}
