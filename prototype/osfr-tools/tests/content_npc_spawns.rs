@@ -307,8 +307,9 @@ fn npc_spawn_models_names_positions_and_capture_matches_are_valid() {
     // pruned as misplaced to npc_spawns_retired.json (2,675). T470 drew 90 named
     // Sanctuary-main NPCs as extras (2,765); T500 already draws Dani and Honey as
     // `legacy_data` regional rows, so they must not gain a second body. T536 drew Sanctuary's two
-    // permanent-dance radios (2,767).
-    assert_eq!(extra_rows.len(), 2767);
+    // permanent-dance radios (2,767); T546 drew the Sanctuary, Lakeshore and Snowhill warpstone
+    // actors Sanctuary-main places at those three hubs (2,770).
+    assert_eq!(extra_rows.len(), 2770);
     assert_eq!(captured_actors.len(), 9);
     println!(
         "NPC placements: {regional_legacy} Legacy, {regional_reconstructed} reconstructed; {} extra spawns, {} capture-confirmed",

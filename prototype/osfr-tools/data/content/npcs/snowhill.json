@@ -45050,9 +45050,20 @@
             "kind": "reference",
             "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3823 spawnNpcWithGuid(33601); src/Resources/Npcs.json Id=33601"
           }
+        ],
+        "greeting_string_id": [
+          {
+            "kind": "client",
+            "evidence": "T546: Global.Text.385679 = Vaelen Warpwatcher's Sanctuary Warp Tests offer (lab/reports/locale-id-to-text.json); JenkinsLookup2 hash 652874222; en_us_data.dat line 17287; speaker proof: the offer precedes quest 385680 'Sanctuary Warp Tests', whose giver is Vaelen (385681: 'Vaelen Warpwatcher is testing out a new spell with his brother Kellin'). Region guide notes/Build Guides/Content/NPCs/NPCs - Snowhill.md:97."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) The offer line is bound as this row's fixed default Talk greeting until a freestanding greeting node is recovered; no capture shows Vaelen greeting the player."
+          }
         ]
       },
-      "heading": 2.65564989
+      "heading": 2.65564989,
+      "greeting_string_id": 385679
     },
     {
       "npc_id": 9500000779,

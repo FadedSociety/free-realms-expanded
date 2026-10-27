@@ -236,8 +236,9 @@ const TARGETS: [Target; 20] = [
 ];
 
 /// The W126/T246 bindings that this slice must not touch, plus the three T378
-/// Snowhill bindings recovered after this suite was written.
-const EXISTING_GREETINGS: [(&str, u64, u32); 22] = [
+/// Snowhill bindings recovered after this suite was written and T546's Vaelen
+/// Warpwatcher binding (`tests/npc_greetings_warpwatchers.rs`).
+const EXISTING_GREETINGS: [(&str, u64, u32); 23] = [
     ("cobblestone_village.json", 9000000021, 4420092),
     ("cobblestone_village.json", 9000000120, 94293),
     ("cobblestone_village.json", 9000000121, 94297),
@@ -257,6 +258,7 @@ const EXISTING_GREETINGS: [(&str, u64, u32); 22] = [
     ("snowhill.json", 9000000217, 413741), // T378: Therin
     ("snowhill.json", 9500000731, 139675), // T378: Burt 'Wrecking' Crewe
     ("snowhill.json", 9500000759, 117327), // T378: Mustang Alli
+    ("snowhill.json", 9500000778, 385679), // T546: Vaelen Warpwatcher
     ("stillwater_crossing.json", 9500000786, 116463),
     ("sunstone_valley.json", 9500000824, 413082),
     ("merry_vale.json", 9500000430, 41268),

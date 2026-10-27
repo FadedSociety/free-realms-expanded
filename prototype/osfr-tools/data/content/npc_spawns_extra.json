@@ -64116,6 +64116,96 @@
         }
       ],
       "position_w": null
+    },
+    {
+      "spawn_guid": 100000033167,
+      "legacy_npc_id": null,
+      "model_id": 280,
+      "model_file_name": "sg_warpstone_01.adr",
+      "name": "Sanctuary Warpstone",
+      "name_string_id": 20831,
+      "position": [
+        -1418.3218,
+        -27.002932,
+        347.82056
+      ],
+      "heading": -0.0622950028,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3458 spawnNpcWithGuid(33167); src/Resources/Npcs.json Id=33167 (CaptureGuid 14293651161170, ModelId 280, ModelFileName sg_warpstone_01.adr, NameId 20831, OpensAtlas true, AutoSelectSingleInteraction true, CursorId 17, NotificationType 6, IconId 3)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.20831 = Sanctuary Warpstone (lab/reports/locale-id-to-text.json); Models.txt 280 = sg_warpstone_01.adr (Warpstone)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) spawn_guid 100000033167 is the Lua capture guid (100000000000 + Npcs.json Id), not a captured actor id; legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033558,
+      "legacy_npc_id": null,
+      "model_id": 280,
+      "model_file_name": "sg_warpstone_01.adr",
+      "name": "Lakeshore Warpstone",
+      "name_string_id": 41298,
+      "position": [
+        -721.7169,
+        9.560479,
+        948.71606
+      ],
+      "heading": -1.81613004,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3780 spawnNpcWithGuid(33558); src/Resources/Npcs.json Id=33558 (CaptureGuid 23983097380882, ModelId 280, ModelFileName sg_warpstone_01.adr, NameId 41298, OpensAtlas true, AutoSelectSingleInteraction true, CursorId 17, NotificationType 6, IconId 3)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.41298 = Lakeshore Warpstone (lab/reports/locale-id-to-text.json); Models.txt 280 = sg_warpstone_01.adr (Warpstone)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) spawn_guid 100000033558 is the Lua capture guid (100000000000 + Npcs.json Id), not a captured actor id; legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values"
+        }
+      ],
+      "position_w": null
+    },
+    {
+      "spawn_guid": 100000033602,
+      "legacy_npc_id": null,
+      "model_id": 280,
+      "model_file_name": "sg_warpstone_01.adr",
+      "name": "Snowhill Warpstone",
+      "name_string_id": 20830,
+      "position": [
+        50.92852,
+        32.425617,
+        370.30267
+      ],
+      "heading": 1.21874107,
+      "capture_match": null,
+      "source": [
+        {
+          "kind": "reference",
+          "evidence": "Sanctuary-main-20261019@10f129e src/Scripts/Zone/FabledRealms.lua:3824 spawnNpcWithGuid(33602); src/Resources/Npcs.json Id=33602 (CaptureGuid 7215545057314, ModelId 280, ModelFileName sg_warpstone_01.adr, NameId 20830, OpensAtlas true, AutoSelectSingleInteraction true, CursorId 17, NotificationType 6, IconId 3)"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text.20830 = Snowhill Warpstone (lab/reports/locale-id-to-text.json); Models.txt 280 = sg_warpstone_01.adr (Warpstone)"
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) spawn_guid 100000033602 is the Lua capture guid (100000000000 + Npcs.json Id), not a captured actor id; legacy_npc_id is null because this is a 2014 zone placement, not a Legacy NPC. Position and heading are the Lua line's own values"
+        }
+      ],
+      "position_w": null
     }
   ]
 }
