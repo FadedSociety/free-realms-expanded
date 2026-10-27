@@ -349,6 +349,31 @@ fn ping_echo(body: &[u8]) -> io::Result<Vec<u8>> {
 pub const ADD_GROUPS: i32 = 94;
 pub const JOIN: i32 = 92;
 pub const CHANGE_LOBBY_DISPLAY: i32 = 291;
+/// T825: `LobbyCommand_ChangeStatus` and the `SynchronizationCommand` family the collection sync
+/// uses: Start, StartInstances, SendInstances, Complete, Update.
+pub const CHANGE_STATUS: i32 = 137;
+pub const SYNC_START: i32 = 83;
+pub const SYNC_START_INSTANCES: i32 = 84;
+pub const SYNC_SEND_INSTANCES: i32 = 85;
+pub const SYNC_COMPLETE: i32 = 86;
+pub const SYNC_UPDATE: i32 = 87;
+/// T825: `AccountCommand_UploadAvatarImage` (creator `10016720`, reader `10016810`: the account
+/// level, a byte count, the image bytes). The client sends its avatar picture when it learns the
+/// root group (`102a9710`, from `10371960`); its execute is a no-op (`100165d0`) and no response
+/// class exists, so the server answers by silence. The image is not kept until other players
+/// can fetch it (`AccountCommand_RequestAvatarImages` -> `SendAvatarImage`).
+pub const UPLOAD_AVATAR_IMAGE: i32 = 503;
+/// (R) The one delivery a starter sync makes; nothing compares it (`101db550`).
+const DELIVERY: i32 = 1;
+
+/// The LobbyCommand level (reader `10156340`, writer `10156390`): the three class headers, then
+/// the account the command is about.
+fn lobby_level(id: i32, version: i32, account: i32) -> Vec<u8> {
+    let mut body = Vec::new();
+    put_headers(&mut body, id, version);
+    put_int(&mut body, account);
+    body
+}
 
 /// T813: the bodies that take a logged-in card window from "Entering main lobby..." to the
 /// lobby screen, in order. The screen dereferences its group without a null check
@@ -369,12 +394,7 @@ pub const CHANGE_LOBBY_DISPLAY: i32 = 291;
 /// - 291 v1 (`1015e5f0`, execute `1015e400`): the group id; event 70 opens the lobby screen for it
 ///   (`10372d70` -> `1037e5a0`).
 pub fn lobby_entry(account: i32, lobby: &crate::card_game::Lobby, name: &str) -> [Vec<u8>; 3] {
-    let level = |id, version| {
-        let mut body = Vec::new();
-        put_headers(&mut body, id, version);
-        put_int(&mut body, account);
-        body
-    };
+    let level = |id, version| lobby_level(id, version, account);
     let mut groups = level(ADD_GROUPS, 1);
     // One group: class 103 v3, five absent property sets, five empty role lists.
     let lobby_object = [1, 103, 3, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0];
@@ -396,6 +416,99 @@ pub fn lobby_entry(account: i32, lobby: &crate::card_game::Lobby, name: &str) ->
     let mut display = level(CHANGE_LOBBY_DISPLAY, 1);
     put_int(&mut display, lobby.group_id);
     [groups, join, display]
+}
+
+/// T825: the client's lobby status, echoed. 137 `LobbyCommand_ChangeStatus` v1 (reader
+/// `1015ea00`, writer `1015ea60`): the LobbyCommand level, then the status. The client sends one
+/// on every screen change (`1037c540`: 3 hub, 2 lobby, 7 collection, ...); a server copy sets the
+/// player's status and raises event 25 (`1015e810`). With one player the server's broadcast is
+/// this echo, always for the connection's own `account`.
+pub fn change_status(account: i32, body: &[u8]) -> io::Result<Vec<u8>> {
+    let mut reader = Reader::new(body);
+    reader.headers(CHANGE_STATUS)?;
+    reader.int()?;
+    let status = reader.int()?;
+    if !reader.finished() {
+        return Err(invalid("card status has trailing bytes"));
+    }
+    let mut echo = lobby_level(CHANGE_STATUS, 1, account);
+    put_int(&mut echo, status);
+    Ok(echo)
+}
+
+/// T825: the group and role a client 92 Join request asks for (the Join reader `10163b20`: the
+/// LobbyCommand level, then group and role; the rest stays empty in a request). The client sends
+/// one for the root group 1 as soon as it learns it (`10371960`), and others from its lobby list
+/// (`1036fff0`), as an observer (`103717e0`, role 3) and back from a game (`1032dde0`).
+pub fn join_request(body: &[u8]) -> io::Result<(i32, i32)> {
+    let mut reader = Reader::new(body);
+    reader.headers(JOIN)?;
+    reader.int()?;
+    Ok((reader.int()?, reader.int()?))
+}
+
+/// T825: the collection sync, server-driven (`SynchronizationService`): every command has the
+/// three class headers (family level `101d7090`/`101d70d0`) and no account level. The cards are
+/// owned as `InstanceID`s (class 350 v1, one header, reader `101476a0`): archetype, series 0 and
+/// instance numbers 0.. per archetype, as the client's own `default.cln` numbers them, so the
+/// same starter always has the same ids and nothing needs saving.
+fn sync_command(id: i32, version: i32, values: impl IntoIterator<Item = i32>) -> Vec<u8> {
+    let mut body = Vec::new();
+    put_headers(&mut body, id, version);
+    for value in values {
+        put_int(&mut body, value);
+    }
+    body
+}
+
+fn instances(cards: &[crate::card_game::StarterCard]) -> i32 {
+    cards.iter().map(|card| card.copies).sum()
+}
+
+/// The collection's ModID: a stable hash of the starter list, positive and never 0. The client
+/// caches a synced collection with it (`1006f1c0`) and skips the next sync when it matches.
+pub fn collection_mod_id(cards: &[crate::card_game::StarterCard]) -> i32 {
+    let hash = cards.iter().fold(0, |acc, card| {
+        crate::hash::mix64(acc ^ ((card.archetype_id as u64) << 8) ^ card.copies as u64)
+    });
+    (hash >> 33) as i32 | 1
+}
+
+/// 83 `SynchronizationCommand_Start` v3 (reader `101da040`, execute `101d9e70` -> `101dbbb0`):
+/// the instance count, the ModID, the account, 0. The client answers with Complete when its
+/// cached collection has that count and ModID, else with Update.
+pub fn sync_start(account: i32, cards: &[crate::card_game::StarterCard]) -> Vec<u8> {
+    let values = [instances(cards), collection_mod_id(cards), account, 0];
+    sync_command(SYNC_START, 3, values)
+}
+
+/// 84 `SynchronizationCommand_StartInstances` v2 (reader `101dadf0`, execute -> `101dbc80`):
+/// account, collection type 1 (online), the count, the ModID. The client clears the collection
+/// and answers with Update.
+pub fn sync_start_instances(account: i32, cards: &[crate::card_game::StarterCard]) -> Vec<u8> {
+    let values = [account, 1, instances(cards), collection_mod_id(cards)];
+    sync_command(SYNC_START_INSTANCES, 2, values)
+}
+
+/// 85 `SynchronizationCommand_SendInstances` v2 (reader `101d94c0`, execute -> `101dc290`): base
+/// archetype 0, the count, the instances (`10077f00`: count, then each `InstanceID`), no
+/// non-tradable ones, the delivery id. The client adds them and answers with Update.
+pub fn sync_send_instances(cards: &[crate::card_game::StarterCard]) -> Vec<u8> {
+    let count = instances(cards);
+    let ids = cards.iter().flat_map(|card| {
+        (0..card.copies).flat_map(move |number| [350, 1, card.archetype_id, 0, number])
+    });
+    let values = [0, count, count]
+        .into_iter()
+        .chain(ids)
+        .chain([0, DELIVERY]);
+    sync_command(SYNC_SEND_INSTANCES, 2, values)
+}
+
+/// 86 `SynchronizationCommand_Complete` v2 (reader `101d77c0`, execute -> `101db550`): the
+/// delivery id. The client stamps the ModID and caches the collection.
+pub fn sync_complete() -> Vec<u8> {
+    sync_command(SYNC_COMPLETE, 2, [DELIVERY])
 }
 
 /// The refusal of a ticket no live session holds: never minted, already spent, or its session

@@ -3,13 +3,17 @@
 //! then logs in with 411; the login's launch ticket and character id are redeemed once in the
 //! session that minted the ticket (T764/T765). T808: a refused login is closed once its 81 is
 //! written; after login the client's ping (112) is echoed. T813: a login pushes the launch
-//! block's lobby (94 -> 92 -> 291), which opens the lobby screen. Other commands are logged, not
-//! answered yet. Off unless the card content's launch block names a port.
+//! block's lobby (94 -> 92 -> 291), which opens the lobby screen. T825: then the starter
+//! collection sync (83, and per client Update 84, 85, 86); the client's status (137) is echoed and
+//! its own Join requests (92) are logged, not answered. Other commands are logged, not answered
+//! yet. Off unless the card content's launch block names a port.
 //!
 //! T782: every step prints one JSON event line (`events`, drained by `Server::poll_card`):
 //! `card_connected`, `card_gateway_request` (a 414 answered), `card_login` (a 411: `ok`, the
 //! character on success, else the refusal `reason`; T805: also the 411's `version` and field
-//! `lengths`), `card_lobby` (T813: the lobby pushed, once per connection: ids only), `card_ping`
+//! `lengths`), `card_lobby` (T813: the lobby pushed, once per connection: ids only),
+//! `card_join_request` (T825: the group and role a client Join asks for), `card_sync` (T825: the
+//! collection synced, or already cached by the client), `card_ping`
 //! (T808: a ping echoed), `card_command_unhandled` and `card_closed` with its reason. A ticket or
 //! session id is never in an event.
 use super::*;
@@ -38,23 +42,36 @@ pub(super) struct CardListener {
     lobby: Option<osfr_tools::card_game::Lobby>,
 }
 
+/// T825: where a connection's collection sync stands; each client Update advances it.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum SyncStep {
+    Off,
+    Started,
+    InstancesStarted,
+    InstancesSent,
+    Done,
+}
+
 struct Connection {
     stream: TcpStream,
     peer: SocketAddr,
     inbox: Vec<u8>,
     opened_ms: u64,
     character: Option<u64>,
+    sync: SyncStep,
     unhandled: u32,
     answered: Answered,
 }
 
 /// The answered-event counters, one budget each (T782 review): a client retrying 414 or pinging
-/// cannot spend the single `card_login` line the login diagnosis needs.
+/// cannot spend the single `card_login` line the login diagnosis needs. T825: the client's Join
+/// requests have their own.
 #[derive(Default)]
 struct Answered {
     gateway_requests: u32,
     logins: u32,
     pings: u32,
+    join_requests: u32,
 }
 
 impl Answered {
@@ -63,6 +80,7 @@ impl Answered {
             AnsweredKind::GatewayRequest => &mut self.gateway_requests,
             AnsweredKind::Login => &mut self.logins,
             AnsweredKind::Ping => &mut self.pings,
+            AnsweredKind::JoinRequest => &mut self.join_requests,
         }
     }
 }
@@ -72,6 +90,7 @@ enum AnsweredKind {
     GatewayRequest,
     Login,
     Ping,
+    JoinRequest,
 }
 
 /// The listener the card content asks for, on the gateway's own address (loopback, or the
@@ -147,6 +166,7 @@ impl CardListener {
                     inbox: Vec::new(),
                     opened_ms: now_ms,
                     character: None,
+                    sync: SyncStep::Off,
                     unhandled: 0,
                     answered: Answered::default(),
                 });
@@ -203,6 +223,14 @@ impl Connection {
                 Ok(None) => return None,
                 Err(_) => return Some("bad_frame"),
             };
+            match self.lobby_command(&body, lobby, events) {
+                Some(Ok(reply)) if reply.is_empty() || self.stream.write_all(&reply).is_ok() => {
+                    continue;
+                }
+                Some(Ok(_)) => return Some("write_failed"),
+                Some(Err(_)) => return Some("bad_message"),
+                None => {}
+            }
             let (mut login, mut name) = (None, String::new());
             let logged_in = self.character.is_some();
             let reply = card_service::reply(&body, host, port, logged_in, |l| {
@@ -264,7 +292,13 @@ impl Connection {
         events: &mut Vec<Value>,
     ) -> bool {
         let account = card_service::account_id(character);
-        for body in card_service::lobby_entry(account, lobby, name) {
+        let mut bodies = card_service::lobby_entry(account, lobby, name).to_vec();
+        // T825: the collection sync starts right after the lobby.
+        if !lobby.collection.is_empty() {
+            bodies.push(card_service::sync_start(account, &lobby.collection));
+            self.sync = SyncStep::Started;
+        }
+        for body in bodies {
             if self
                 .stream
                 .write_all(&card_service::server_frame(&body))
@@ -280,10 +314,83 @@ impl Connection {
         true
     }
 
+    /// T825: the client's lobby and collection commands once logged in: the server frames to
+    /// write (none for a command answered by silence), or `None` for anything else.
+    /// - 137 status: echoed for this connection's account (`card_service::change_status`).
+    /// - 92 Join request: logged, not answered. The server knows one group, the root group 1,
+    ///   whose membership it pushed at login; a server Join for it sends the client to its hub
+    ///   screen 2 (event 5, `10371cd0`), away from the lobby it is in.
+    /// - 503 avatar picture: answered by silence (`card_service::UPLOAD_AVATAR_IMAGE`).
+    /// - 87 Update: the next sync step (StartInstances, SendInstances, Complete); 86 Complete
+    ///   from the client: its cached collection matched the Start, nothing to send.
+    fn lobby_command(
+        &mut self,
+        body: &[u8],
+        lobby: Option<&osfr_tools::card_game::Lobby>,
+        events: &mut Vec<Value>,
+    ) -> Option<io::Result<Vec<u8>>> {
+        let account = card_service::account_id(self.character?);
+        let cards = lobby.map_or(&[][..], |lobby| &lobby.collection[..]);
+        let reply = match card_service::class_id(body).ok()? {
+            card_service::CHANGE_STATUS => card_service::change_status(account, body),
+            card_service::JOIN => card_service::join_request(body).map(|_| {
+                self.log_answer(body, None, "", 0, events);
+                Vec::new()
+            }),
+            card_service::SYNC_UPDATE => {
+                let (next, step) = match self.sync {
+                    SyncStep::Started => (
+                        card_service::sync_start_instances(account, cards),
+                        SyncStep::InstancesStarted,
+                    ),
+                    SyncStep::InstancesStarted => (
+                        card_service::sync_send_instances(cards),
+                        SyncStep::InstancesSent,
+                    ),
+                    SyncStep::InstancesSent => (card_service::sync_complete(), SyncStep::Done),
+                    SyncStep::Off | SyncStep::Done => return Some(Ok(Vec::new())),
+                };
+                if step == SyncStep::Done {
+                    self.synced("sent", cards, events);
+                }
+                self.sync = step;
+                Ok(next)
+            }
+            card_service::SYNC_COMPLETE if self.sync == SyncStep::Started => {
+                self.sync = SyncStep::Done;
+                self.synced("cached", cards, events);
+                Ok(Vec::new())
+            }
+            // The client's own Complete after the sync, and its avatar picture: no reply.
+            card_service::SYNC_COMPLETE | card_service::UPLOAD_AVATAR_IMAGE => Ok(Vec::new()),
+            _ => return None,
+        };
+        Some(reply.map(|body| {
+            (!body.is_empty())
+                .then(|| card_service::server_frame(&body))
+                .unwrap_or_default()
+        }))
+    }
+
+    /// One `card_sync` event per connection: the collection sent, or already cached.
+    fn synced(
+        &mut self,
+        how: &str,
+        cards: &[osfr_tools::card_game::StarterCard],
+        events: &mut Vec<Value>,
+    ) {
+        events.push(json!({
+            "event":"card_sync","peer":self.peer.to_string(),"character":self.character,
+            "collection":how,"archetypes":cards.len(),
+            "instances":cards.iter().map(|card| card.copies).sum::<i32>()
+        }));
+    }
+
     /// The event for an answered 414 (the address it sent the client to), 411 (`login`: the
     /// character its ticket was redeemed for, or the refusal word, plus the 411's version and
-    /// field lengths) or ping. Neither the ticket nor the session id is named. The kind and its
-    /// budget are decided before any event is built, so a capped frame allocates nothing.
+    /// field lengths), ping or (T825) client Join request (the group and role it asks for).
+    /// Neither the ticket nor the session id is named. The kind and its budget are decided before
+    /// any event is built, so a capped frame allocates nothing.
     fn log_answer(
         &mut self,
         body: &[u8],
@@ -296,6 +403,7 @@ impl Connection {
             (Ok(card_service::GET_CONNECTION_SERVER), _) => AnsweredKind::GatewayRequest,
             (Ok(card_service::SEND_SESSION_ID), Some(_)) => AnsweredKind::Login,
             (Ok(card_service::PING), _) => AnsweredKind::Ping,
+            (Ok(card_service::JOIN), _) => AnsweredKind::JoinRequest,
             _ => return,
         };
         let answered = self.answered.count(kind);
@@ -319,6 +427,12 @@ impl Connection {
             }
             AnsweredKind::Ping => {
                 json!({"event":"card_ping","peer":peer,"character":self.character})
+            }
+            AnsweredKind::JoinRequest => {
+                let Ok((group, role)) = card_service::join_request(body) else {
+                    return;
+                };
+                json!({"event":"card_join_request","peer":peer,"group":group,"role":role})
             }
         };
         events.push(event);
@@ -626,6 +740,7 @@ pub(super) mod tests {
             group_id: 1,
             lobby_type: 1,
             role: 1,
+            collection: Vec::new(),
         };
         card.lobby = Some(lobby.clone());
         let mut refused = client(&card);
@@ -658,6 +773,180 @@ pub(super) mod tests {
                 "character":guid,"account":account,"group":1
             })]
         );
+    }
+
+    /// T825: the client side of one command, routed like the client's (`101921e0`).
+    fn send(card: &mut CardListener, client: &mut TcpStream, body: &[u8]) {
+        client.write_all(&frame(true, body)).unwrap();
+        for _ in 0..20 {
+            card.poll(3, refuse);
+            std::thread::sleep(Duration::from_millis(5));
+        }
+    }
+
+    /// Whether the client has a frame waiting, without blocking.
+    fn waiting(client: &TcpStream) -> bool {
+        client.set_nonblocking(true).unwrap();
+        let ready = client.peek(&mut [0; 4]).map(|n| n > 0).unwrap_or(false);
+        client.set_nonblocking(false).unwrap();
+        ready
+    }
+
+    /// T825: login -> lobby -> collection sync over the real socket. After the lobby comes the
+    /// Start; each client Update gets the next step (StartInstances, SendInstances, Complete),
+    /// byte-equal to the codec, then one `card_sync`. The client's status (137) comes back for
+    /// its own account; its Join request (92) gets no answer, only a `card_join_request` event.
+    #[test]
+    fn a_card_login_syncs_the_starter_collection() {
+        if !test_support::bin_test_target("card") {
+            return;
+        }
+        let mut card = listener();
+        let cards = vec![
+            osfr_tools::card_game::StarterCard {
+                archetype_id: 100009946,
+                copies: 2,
+            },
+            osfr_tools::card_game::StarterCard {
+                archetype_id: 100010026,
+                copies: 1,
+            },
+        ];
+        let lobby = osfr_tools::card_game::Lobby {
+            group_id: 1,
+            lobby_type: 1,
+            role: 1,
+            collection: cards.clone(),
+        };
+        card.lobby = Some(lobby);
+        let guid = 5041u64;
+        let account = card_service::account_id(guid);
+        let mut player = client(&card);
+        let (ok, ..) = log_in(&mut card, &mut player, "", "78", Ok(guid));
+        assert!(ok);
+        let pushed: Vec<_> = (0..4).map(|_| answer(&mut card, &mut player, 3)).collect();
+        assert_eq!(
+            pushed[3],
+            card_service::sync_start(account, &cards),
+            "the Start follows the lobby"
+        );
+        let update = {
+            let mut body = Vec::new();
+            card_service::put_headers(&mut body, card_service::SYNC_UPDATE, 1);
+            body
+        };
+        let steps = [
+            card_service::sync_start_instances(account, &cards),
+            card_service::sync_send_instances(&cards),
+            card_service::sync_complete(),
+        ];
+        for step in steps {
+            player.write_all(&frame(true, &update)).unwrap();
+            assert_eq!(answer(&mut card, &mut player, 3), step);
+        }
+        // Done: a further Update is answered by silence.
+        send(&mut card, &mut player, &update);
+        assert!(!waiting(&player));
+        let synced: Vec<_> = card
+            .events
+            .iter()
+            .filter(|e| e["event"] == "card_sync")
+            .collect();
+        assert_eq!(synced.len(), 1);
+        assert_eq!(
+            (&synced[0]["collection"], &synced[0]["instances"]),
+            (&json!("sent"), &json!(3))
+        );
+
+        // The status the client reports for itself comes back for this connection's account.
+        let mut status = Vec::new();
+        card_service::put_headers(&mut status, card_service::CHANGE_STATUS, 1);
+        status.extend(int(99));
+        status.extend(int(7));
+        player.write_all(&frame(true, &status)).unwrap();
+        assert_eq!(
+            answer(&mut card, &mut player, 3),
+            card_service::change_status(account, &status).unwrap()
+        );
+        // Its own Join request: no answer, one event with the group and role.
+        let mut join = Vec::new();
+        card_service::put_headers(&mut join, card_service::JOIN, 4);
+        for value in [
+            int(account),
+            int(1),
+            int(1),
+            text(""),
+            int(0),
+            text(""),
+            int(1),
+            int(0),
+        ] {
+            join.extend(value);
+        }
+        send(&mut card, &mut player, &join);
+        // Its avatar picture (account level, byte count, bytes): no answer either.
+        let mut avatar = Vec::new();
+        card_service::put_headers(&mut avatar, card_service::UPLOAD_AVATAR_IMAGE, 1);
+        avatar.extend([int(account), int(3), vec![1, 2, 3]].concat());
+        send(&mut card, &mut player, &avatar);
+        assert!(!waiting(&player));
+        let requests: Vec<_> = card
+            .events
+            .iter()
+            .filter(|e| e["event"] == "card_join_request")
+            .collect();
+        assert_eq!(
+            (&requests[0]["group"], &requests[0]["role"]),
+            (&json!(1), &json!(1))
+        );
+        assert!(
+            !card
+                .events
+                .iter()
+                .any(|e| e["event"] == "card_command_unhandled"),
+            "{:?}",
+            card.events
+        );
+    }
+
+    /// T825: a client whose cached collection matches the Start answers with Complete; the
+    /// server sends nothing more and logs the collection as cached.
+    #[test]
+    fn a_cached_card_collection_is_not_sent_again() {
+        if !test_support::bin_test_target("card") {
+            return;
+        }
+        let mut card = listener();
+        let cards = vec![osfr_tools::card_game::StarterCard {
+            archetype_id: 100009946,
+            copies: 2,
+        }];
+        card.lobby = Some(osfr_tools::card_game::Lobby {
+            group_id: 1,
+            lobby_type: 1,
+            role: 1,
+            collection: cards,
+        });
+        let mut player = client(&card);
+        log_in(&mut card, &mut player, "", "78", Ok(5041));
+        for _ in 0..4 {
+            answer(&mut card, &mut player, 3);
+        }
+        let mut complete = Vec::new();
+        card_service::put_headers(&mut complete, card_service::SYNC_COMPLETE, 2);
+        complete.extend(int(0));
+        send(&mut card, &mut player, &complete);
+        let mut update = Vec::new();
+        card_service::put_headers(&mut update, card_service::SYNC_UPDATE, 1);
+        send(&mut card, &mut player, &update);
+        assert!(!waiting(&player), "nothing after the client's Complete");
+        let synced: Vec<_> = card
+            .events
+            .iter()
+            .filter(|e| e["event"] == "card_sync")
+            .collect();
+        assert_eq!(synced.len(), 1);
+        assert_eq!(synced[0]["collection"], "cached");
     }
 
     #[test]

@@ -133,6 +133,21 @@ pub struct Lobby {
     /// The player's role in it: 1 general, 2 player, 3 observer, 4 moderator, 5 staff (the
     /// `Lobby` writer's role lists, `101558e0`); 0 is the client's invalid role.
     pub role: i32,
+    /// T825: the starter collection the card service syncs after the lobby (empty: no sync). R:
+    /// the client data holds no starter deck list (the skirmish's "Digital Starter" decks,
+    /// `104ab920`, are not in `tcg/data/decks`), so the ids are chosen from the client's own card
+    /// data: archetypes of `tcg/data/archetypes/storage.dat` that its `default.cln` collection
+    /// also lists.
+    #[serde(default)]
+    pub collection: Vec<StarterCard>,
+}
+
+/// T825: one card archetype of the starter collection and how many copies of it the player owns.
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct StarterCard {
+    pub archetype_id: i32,
+    pub copies: i32,
 }
 
 fn default_preload_file() -> String {
@@ -332,6 +347,29 @@ impl Content {
         {
             return Err(invalid(
                 "card lobby needs a positive group, a role 1 to 5 and a type 0 to 255",
+            ));
+        }
+        // (R) bounds: the client's default collection holds 16 copies of a card; 100 archetypes
+        // keep the one SendInstances small.
+        let collection = self
+            .launch
+            .iter()
+            .flat_map(|l| &l.lobby)
+            .flat_map(|l| &l.collection);
+        let mut seen = std::collections::BTreeSet::new();
+        for card in collection {
+            if card.archetype_id < 1
+                || !(1..=16).contains(&card.copies)
+                || !seen.insert(card.archetype_id)
+            {
+                return Err(invalid(
+                    "card starter collection needs distinct positive archetypes, 1 to 16 copies each",
+                ));
+            }
+        }
+        if seen.len() > 100 {
+            return Err(invalid(
+                "card starter collection has at most 100 archetypes",
             ));
         }
         Ok(())

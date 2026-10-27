@@ -357,6 +357,7 @@ fn the_lobby_bodies_match_the_client_readers() {
         group_id: 12,
         lobby_type: 5,
         role: 2,
+        collection: Vec::new(),
     };
     let [groups, join, display] = card_service::lobby_entry(7, &lobby, "Tester");
     // 94 v1 (`101583f0`): headers, account, one group (`10158350`), then the `Lobby` (`10155710`):
@@ -398,6 +399,108 @@ fn the_lobby_bodies_match_the_client_readers() {
         display,
         [&headers(&[0x23, 0x12], 1)[..], &[0x07, 0x0C]].concat()
     );
+}
+
+/// T825: the collection sync bodies, spelled out in the client readers' order (account 7; the
+/// starter: archetype 900001 twice, archetype 5 once). Compact ids: 83 = `23 05`, 84 = `24 05`,
+/// 85 = `25 05`, 86 = `26 05`, `InstanceID` 350 = `2E 15`; 900001 = `41 BA DB`. Each instance
+/// reads like the first one of the client's own `tcg/data/collections/default.cln`
+/// (`2E 15 01 41 BA DB 00 00`: class, version, archetype, series 0, instance number 0).
+#[test]
+fn the_collection_sync_bodies_match_the_client_readers() {
+    use osfr_tools::card_game::StarterCard;
+    let cards = [
+        StarterCard {
+            archetype_id: 900001,
+            copies: 2,
+        },
+        StarterCard {
+            archetype_id: 5,
+            copies: 1,
+        },
+    ];
+    let modid = int(card_service::collection_mod_id(&cards));
+    // 83 Start v3 (`101da040`): headers, instance count 3, ModID, account, 0.
+    assert_eq!(
+        card_service::sync_start(7, &cards),
+        [
+            &headers(&[0x23, 0x05], 3)[..],
+            &[0x03],
+            &modid,
+            &[0x07, 0x00]
+        ]
+        .concat()
+    );
+    // 84 StartInstances v2 (`101dadf0`): headers, account, type 1 (online), count, ModID.
+    assert_eq!(
+        card_service::sync_start_instances(7, &cards),
+        [&headers(&[0x24, 0x05], 2)[..], &[0x07, 0x01, 0x03], &modid].concat()
+    );
+    // 85 SendInstances v2 (`101d94c0`): headers, base archetype 0, count 3, three instances,
+    // no non-tradable ones, delivery 1.
+    let instance = |archetype: &[u8], number: u8| {
+        [&[0x2E, 0x15, 0x01][..], archetype, &[0x00, number]].concat()
+    };
+    assert_eq!(
+        card_service::sync_send_instances(&cards),
+        [
+            &headers(&[0x25, 0x05], 2)[..],
+            &[0x00, 0x03, 0x03],
+            &instance(&[0x41, 0xBA, 0xDB], 0),
+            &instance(&[0x41, 0xBA, 0xDB], 1),
+            &instance(&[0x05], 0),
+            &[0x00, 0x01],
+        ]
+        .concat()
+    );
+    // 86 Complete v2 (`101d77c0`): headers, delivery 1.
+    assert_eq!(
+        card_service::sync_complete(),
+        [&headers(&[0x26, 0x05], 2)[..], &[0x01]].concat()
+    );
+}
+
+/// T825: the ModID is stable, positive and never 0, and moves when the starter changes.
+#[test]
+fn the_collection_mod_id_follows_the_starter() {
+    use osfr_tools::card_game::StarterCard;
+    let one = [StarterCard {
+        archetype_id: 100009946,
+        copies: 2,
+    }];
+    let other = [StarterCard {
+        archetype_id: 100009946,
+        copies: 3,
+    }];
+    let id = card_service::collection_mod_id(&one);
+    assert!(id > 0);
+    assert_eq!(id, card_service::collection_mod_id(&one));
+    assert_ne!(id, card_service::collection_mod_id(&other));
+    assert!(card_service::collection_mod_id(&[]) > 0);
+}
+
+/// T825: the client's status (137 v1: LobbyCommand level, status) comes back for the account the
+/// server names; the client's Join request yields its group and role.
+#[test]
+fn the_client_status_and_join_request_decode() {
+    let status = [&headers(&[0x29, 0x08], 1)[..], &[0x0C, 0x07]].concat();
+    assert_eq!(
+        card_service::change_status(5, &status).unwrap(),
+        [&headers(&[0x29, 0x08], 1)[..], &[0x05, 0x07]].concat()
+    );
+    assert!(card_service::change_status(5, &[status.clone(), vec![0]].concat()).is_err());
+    // A request as the client's Join writer (`101638d0`) builds it: account, group 1, role 3,
+    // empty string, empty list, empty name, no property set (1), 0.
+    let join = [
+        &headers(&[0x2C, 0x05], 4)[..],
+        &[0x07, 0x01, 0x03],
+        &text(""),
+        &[0x00],
+        &text(""),
+        &[0x01, 0x00],
+    ]
+    .concat();
+    assert_eq!(card_service::join_request(&join).unwrap(), (1, 3));
 }
 
 #[test]

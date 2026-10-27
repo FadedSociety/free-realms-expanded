@@ -209,7 +209,8 @@ fn a_launch_block_names_the_lobby_within_bounds() {
         Some(card_game::Lobby {
             group_id: 1,
             lobby_type: 1,
-            role: 1
+            role: 1,
+            collection: Vec::new()
         })
     );
     assert_eq!(with_launch(120_000).unwrap().launch().unwrap().lobby, None);
@@ -218,6 +219,34 @@ fn a_launch_block_names_the_lobby_within_bounds() {
             lobby(group, lobby_type, role).is_err(),
             "{group} {lobby_type} {role}"
         );
+    }
+}
+
+/// T825: the starter collection lives in the lobby block (R ids), with sanity bounds.
+#[test]
+fn a_lobby_names_its_starter_collection_within_bounds() {
+    let starter = |cards: Value, tag: &str| {
+        let mut content = launch_json(120_000);
+        content["launch"]["lobby"] =
+            json!({"group_id": 1, "lobby_type": 1, "role": 1, "collection": cards});
+        load(&content, &format!("starter-{tag}"))
+    };
+    let loaded = starter(json!([{"archetype_id": 100009946, "copies": 2}]), "good").unwrap();
+    assert_eq!(
+        loaded.launch().unwrap().lobby.as_ref().unwrap().collection,
+        [card_game::StarterCard {
+            archetype_id: 100009946,
+            copies: 2
+        }]
+    );
+    let bad = [
+        json!([{"archetype_id": 0, "copies": 1}]),
+        json!([{"archetype_id": 100009946, "copies": 0}]),
+        json!([{"archetype_id": 100009946, "copies": 17}]),
+        json!([{"archetype_id": 100009946, "copies": 1}, {"archetype_id": 100009946, "copies": 1}]),
+    ];
+    for (index, cards) in bad.into_iter().enumerate() {
+        assert!(starter(cards, &format!("bad-{index}")).is_err(), "{index}");
     }
 }
 
