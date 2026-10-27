@@ -178,7 +178,7 @@ Thank you to everyone who kept the game alive after 2014.
 
 ## Licence
 
-A licence has not been chosen yet.
+Our code, tools and notes are dual-licensed under [MIT](LICENSE-MIT) or [Apache 2.0](LICENSE-APACHE), at your option. Use them for anything you like, as long as the credit (the copyright notice and licence text) comes along. Game text and data from the original client, data rows derived from community projects, and wiki text keep their own terms; [NOTICE](NOTICE) lists what those are.
 
 ## Legal
 
