@@ -12,6 +12,7 @@
 //! shared `tests/common/gateway_vendor.rs` ones.
 #![allow(dead_code)]
 
+use gateway_packets::{marketplace_order, order_result, wallet_balance};
 use gateway_vendor::{
     NOW, buy_back_packet, completions, count_definition, inner_packets, inventory_of, sell_packet,
     send, wrap,
@@ -552,23 +553,8 @@ fn sc_put_string(bytes: &mut Vec<u8>, value: &str) {
     bytes.extend_from_slice(value.as_bytes());
 }
 
-/// The client order serializer `00b3fc60`/`00b3af80` (66/3), with one detail.
 fn sc_order(tracking: u32, bundle: u32, quantity: u32) -> Vec<u8> {
-    let mut bytes = vec![66, 0, 3, 0];
-    sc_put_string(&mut bytes, "");
-    sc_put_string(&mut bytes, "");
-    bytes.extend(tracking.to_le_bytes());
-    sc_put_string(&mut bytes, "en_US");
-    sc_put_string(&mut bytes, "");
-    sc_put_string(&mut bytes, "");
-    sc_put_string(&mut bytes, "");
-    bytes.extend(1u32.to_le_bytes());
-    bytes.extend(bundle.to_le_bytes());
-    bytes.extend(1u32.to_le_bytes());
-    bytes.extend(quantity.to_le_bytes());
-    sc_put_string(&mut bytes, "0");
-    sc_put_string(&mut bytes, "");
-    bytes
+    marketplace_order(tracking, bundle, quantity, "0")
 }
 
 fn sc_preview(tracking: u32, bundle: u32, quantity: u32) -> Vec<u8> {
@@ -576,23 +562,6 @@ fn sc_preview(tracking: u32, bundle: u32, quantity: u32) -> Vec<u8> {
     bytes[2] = 1;
     sc_put_string(&mut bytes, "");
     bytes
-}
-
-/// The 66/4 result: the second dword after the header (`00b2ded0` obj+0x1C, T453).
-fn order_result(packets: &[Vec<u8>]) -> u32 {
-    packets
-        .iter()
-        .find(|packet| packet.starts_with(&[66, 0, 4, 0]))
-        .map(|packet| u32::from_le_bytes(packet[8..12].try_into().unwrap()))
-        .expect("order response exists")
-}
-
-fn wallet_balance(packets: &[Vec<u8>]) -> u32 {
-    packets
-        .iter()
-        .find(|packet| packet.starts_with(&[66, 0, 11, 0]))
-        .map(|packet| u32::from_le_bytes(packet[9..13].try_into().unwrap()))
-        .expect("wallet response exists")
 }
 
 fn locale_request(sub: u16, locale: &str) -> Vec<u8> {

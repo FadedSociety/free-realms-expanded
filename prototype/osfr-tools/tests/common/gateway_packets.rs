@@ -237,3 +237,50 @@ pub fn definition_batch(packet: &[u8]) -> (i32, Vec<u8>) {
     assert!(count >= 1, "an empty batch is never emitted");
     (count, packet[12..].to_vec())
 }
+
+/// A Marketplace 66/3 place-order request with one detail, as the client's order serializer
+/// `00b3fc60`/`00b3af80` writes it: two empty strings, the tracking id, the locale, three more
+/// strings, one detail (bundle id, store 1, quantity, tint string) and a trailing string. The
+/// shipped bundle id is the item id.
+#[allow(dead_code)] // Included by suites that never order from the Marketplace.
+pub fn marketplace_order(tracking: u32, bundle: u32, quantity: u32, tint: &str) -> Vec<u8> {
+    fn put_string(bytes: &mut Vec<u8>, value: &str) {
+        bytes.extend((value.len() as i32).to_le_bytes());
+        bytes.extend_from_slice(value.as_bytes());
+    }
+    let mut bytes = vec![66, 0, 3, 0];
+    put_string(&mut bytes, "");
+    put_string(&mut bytes, "");
+    bytes.extend(tracking.to_le_bytes());
+    put_string(&mut bytes, "en_US");
+    put_string(&mut bytes, "");
+    put_string(&mut bytes, "");
+    put_string(&mut bytes, "");
+    bytes.extend(1u32.to_le_bytes());
+    bytes.extend(bundle.to_le_bytes());
+    bytes.extend(1u32.to_le_bytes());
+    bytes.extend(quantity.to_le_bytes());
+    put_string(&mut bytes, tint);
+    put_string(&mut bytes, "");
+    bytes
+}
+
+/// The 66/4 result: the second dword after the header (`00b2ded0` obj+0x1C, T453).
+#[allow(dead_code)] // Included by suites that never read a Marketplace order reply.
+pub fn order_result(packets: &[Vec<u8>]) -> u32 {
+    packets
+        .iter()
+        .find(|packet| packet.starts_with(&[66, 0, 4, 0]))
+        .map(|packet| u32::from_le_bytes(packet[8..12].try_into().unwrap()))
+        .expect("order response exists")
+}
+
+/// The Station Cash balance in a 66/11 wallet reply (`00b3e120`).
+#[allow(dead_code)] // Included by suites that never read a wallet reply.
+pub fn wallet_balance(packets: &[Vec<u8>]) -> u32 {
+    packets
+        .iter()
+        .find(|packet| packet.starts_with(&[66, 0, 11, 0]))
+        .map(|packet| u32::from_le_bytes(packet[9..13].try_into().unwrap()))
+        .expect("wallet response exists")
+}

@@ -337,11 +337,30 @@ impl Gameplay {
             return Ok(());
         }
         let granted = std::mem::take(&mut out.granted_items);
+        // Units of adoption items granted, read before adoption consumes them.
+        let wanted: usize = granted
+            .iter()
+            .filter(|&&(id, _)| {
+                self.inventory
+                    .state()
+                    .items
+                    .iter()
+                    .any(|item| item.id == id && self.pets.is_adoption_item(item.definition_id))
+            })
+            .map(|&(_, units)| units as usize)
+            .sum();
+        let room_before = self.pets.room();
         let replies = self
             .pets
             .adopt_granted(&granted, &mut self.inventory, now_ms / 1_000)?;
         out.changed |= !replies.is_empty();
         out.replies.extend(replies);
+        // T486: a Station Cash order is not refused for a full roster (R), so a pet unit can be
+        // left in the bag; say so. A coin buy and `realm give` are refused before they grant.
+        if wanted > room_before - self.pets.room() {
+            out.replies
+                .push(chat::system("Your pet list is full; use the item later."));
+        }
         Ok(())
     }
 

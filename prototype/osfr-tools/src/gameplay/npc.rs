@@ -995,9 +995,11 @@ impl Gameplay {
             if outcome.changed {
                 self.inventory = shop.inventory().clone();
             }
+            // T486: a bought pet bundle becomes a pet in `handle_npc_packet`, as a coin buy does.
             return Ok(Some(Outcome {
                 replies: outcome.replies,
                 changed: outcome.changed,
+                granted_items: outcome.granted,
                 ..Outcome::default()
             }));
         }

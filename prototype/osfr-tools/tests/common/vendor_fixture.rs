@@ -308,18 +308,7 @@ impl VendorFixture {
             entry.item_id = 0;
         }
         state.inventory.coins = coins;
-        let item = |id: i32| InventoryItem {
-            definition_id: SEEDED_ITEM,
-            tint: 0,
-            id,
-            count: 1,
-            consumed_count: 0,
-            stored_count: 0,
-            last_cast_time: 0,
-            rental: None,
-            ability_count: 0,
-            activate_enabled: false,
-        };
+        let item = |id: i32| bag_item(SEEDED_ITEM, 0, id, 1);
         if full_bag {
             for id in 100_000..100_100 {
                 state.inventory.items.push(item(id));
@@ -330,6 +319,22 @@ impl VendorFixture {
             state.inventory.next_instance_id = Some(2);
         }
         state
+    }
+}
+
+/// One bag stack of `count` units of `definition_id` with the given tint and instance id.
+pub fn bag_item(definition_id: i32, tint: i32, id: i32, count: u32) -> InventoryItem {
+    InventoryItem {
+        definition_id,
+        tint,
+        id,
+        count,
+        consumed_count: 0,
+        stored_count: 0,
+        last_cast_time: 0,
+        rental: None,
+        ability_count: 0,
+        activate_enabled: false,
     }
 }
 

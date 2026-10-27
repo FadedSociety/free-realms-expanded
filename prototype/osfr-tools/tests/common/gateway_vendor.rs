@@ -28,6 +28,7 @@ use osfr_tools::{
     inventory::InventoryState,
     npc_interaction::{MerchantBuyRequestV2, encode_merchant_buy_66_43},
 };
+use serde_json::Value;
 use std::path::{Path, PathBuf};
 
 pub const NOW: u64 = 10_000;
@@ -83,6 +84,39 @@ pub fn connect_with(
             .expect("initialization message handles");
     }
     gateway
+}
+
+/// One request through the gateway: the inner replies and the outcome flags.
+#[allow(dead_code)] // Only the suites that assert on the outcome flags use this.
+pub fn handled(gateway: &mut Gateway, packet: &[u8]) -> (Vec<Vec<u8>>, GatewayOutcome) {
+    let outcome = gateway
+        .handle_at(&wrap(packet), NOW)
+        .expect("gateway handles the request");
+    (inner_packets(&outcome), outcome)
+}
+
+/// T772: the saved roster's pets, from the gateway's save document.
+#[allow(dead_code)] // Only the pet suites read the roster.
+pub fn roster(gateway: &Gateway) -> Vec<Value> {
+    gateway
+        .snapshot()
+        .pets
+        .and_then(|document| document["pets"].as_array().cloned())
+        .unwrap_or_default()
+}
+
+/// A reconnect through the save document: the gameplay half and the pet roster reload into a
+/// fresh gateway for the same content.
+#[allow(dead_code)] // Only the pet suites reconnect.
+pub fn reload_saved(reference: &Path, gateway: &Gateway, content: &Path) -> Gateway {
+    let saved = gateway.snapshot();
+    let mut restored =
+        Gateway::load_gameplay(reference, gateway.state().clone(), content, saved.gameplay)
+            .expect("the saved gameplay reloads");
+    restored
+        .adopt_pets(saved.pets)
+        .expect("the saved roster reloads");
+    restored
 }
 
 pub fn inventory_of(gateway: &Gateway) -> InventoryState {

@@ -1191,6 +1191,7 @@ impl CoinShop {
         }
         let mut changed = false;
         let mut transaction_id = 0;
+        let mut granted = Vec::new();
         let (result_code, replies) = match opcode {
             1 => {
                 if !self.sc_catalogue.config().enabled {
@@ -1237,6 +1238,7 @@ impl CoinShop {
                         grant_lot,
                     );
                     changed = outcome.changed;
+                    granted = outcome.granted;
                     let mut replies = outcome.replies;
                     if changed && self.marketplace_enabled() {
                         // T484: grey the bought ride out without reopening the store.
@@ -1342,7 +1344,7 @@ impl CoinShop {
             transaction_id,
             replies,
             changed,
-            ..CoinShopOutcome::default()
+            granted,
         })
     }
 }

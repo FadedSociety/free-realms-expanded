@@ -69,6 +69,9 @@
 //! L046 (R): a listed lot deed (item Type 16) is paid like a ride but delivers the lot itself
 //! through the caller's [`LotGrant`]; the deed item is never granted.
 //!
+//! T486: a paid order reports the stacks it granted (`OrderOutcome::granted`); the gameplay layer
+//! turns a bought pet bundle into a pet through the same settlement the coin store uses.
+//!
 //! Slice 2 adds the earned source: `sc_rewards.json` names one verified completion's payout (kart
 //! race, derby match, soccer match, chess game, quest turn-in, dungeon clear and the first
 //! completed activity of the UTC day). `EarnTable` only decides an amount; the completion hook
@@ -1139,10 +1142,15 @@ pub struct OrderRequest {
     pub gift: bool,
 }
 
+#[derive(Default)]
 pub struct OrderOutcome {
     pub result_code: u32,
     pub replies: Vec<Vec<u8>>,
     pub changed: bool,
+    /// T486: the inventory stacks a paid order added, as `(instance id, units)`, so the caller can
+    /// adopt a bought pet item at once (`PetService::adopt_granted`). A preview, refusal, deed or
+    /// replayed order adds none.
+    pub granted: Vec<(i32, u32)>,
 }
 
 /// Read one Marketplace order. `preview` expects the extra trailing string of 66/1.
@@ -1293,7 +1301,7 @@ pub fn preview(
     OrderOutcome {
         result_code: result,
         replies: vec![preview_packet(order.tracking_id, result, total)],
-        changed: false,
+        ..OrderOutcome::default()
     }
 }
 
@@ -1329,16 +1337,16 @@ pub fn place_order(
                     old_total,
                 ),
             ],
-            changed: false,
+            ..OrderOutcome::default()
         };
     }
     if wallet.balance < total {
         return refusal(order, ORDER_INSUFFICIENT_SC);
     }
-    let granted = if listing.deed {
+    let (granted, added) = if listing.deed {
         // L046: a deed never enters the inventory; no lot for it means no sale.
         match grant_lot(listing.item_id, true) {
-            Some(replies) => replies,
+            Some(replies) => (replies, Vec::new()),
             None => return refusal(order, ORDER_FAILURE),
         }
     } else {
@@ -1351,7 +1359,7 @@ pub fn place_order(
             return refusal(order, ORDER_FAILURE);
         }
         *inventory = staged;
-        granted.replies
+        (granted.replies, granted.granted)
     };
     let balance = wallet.balance - total;
     wallet.balance = balance;
@@ -1379,6 +1387,7 @@ pub fn place_order(
         result_code: ORDER_SUCCESS,
         replies,
         changed: true,
+        granted: added,
     }
 }
 
@@ -1431,7 +1440,7 @@ fn refusal(order: &OrderRequest, result: u32) -> OrderOutcome {
             &order.tracking_id.to_string(),
             0,
         )],
-        changed: false,
+        ..OrderOutcome::default()
     }
 }
 

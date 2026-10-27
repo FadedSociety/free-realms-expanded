@@ -29,9 +29,9 @@ mod round70_content;
 mod vendor_fixture;
 
 use gateway_vendor::{
-    NOW, buy_back_packet, buy_back_result, coin_buy_packet, completions, connect_with,
-    count_definition, fixture_root, inner_packets, interact, inventory_of, merchant_status, select,
-    sell_packet, send, vendor_buy_packet, wrap,
+    buy_back_packet, buy_back_result, coin_buy_packet, completions, connect_with, count_definition,
+    fixture_root, handled, interact, inventory_of, merchant_status, reload_saved, roster, select,
+    sell_packet, send, vendor_buy_packet,
 };
 use osfr_tools::{
     account_store::AccountRole,
@@ -39,7 +39,7 @@ use osfr_tools::{
     coin_shop::{self, CoinShop, StoreCatalogue},
     game_store::Snapshot,
     gameplay::GameplayState,
-    gateway::{Gateway, GatewayOutcome},
+    gateway::Gateway,
     inventory::Inventory,
     npc_interaction::decode_coin_merchant_list_165_10,
     pets::PetService,
@@ -137,13 +137,6 @@ fn seed_buy_back(gateway: &mut Gateway) -> u32 {
         .expect("the seeded item sells");
     assert_eq!(sale.result, coin_shop::RESULT_SUCCESS);
     sale.transaction
-}
-
-fn handled(gateway: &mut Gateway, packet: &[u8]) -> (Vec<Vec<u8>>, GatewayOutcome) {
-    let outcome = gateway
-        .handle_at(&wrap(packet), NOW)
-        .expect("gateway handles the request");
-    (inner_packets(&outcome), outcome)
 }
 
 fn assert_unbound_pet_item_is_still_unbound() {
@@ -316,15 +309,6 @@ fn a_pet_item_bound_by_pets_content_is_sold() {
     assert_adopted(&gateway, &replies, BOUND_PET, 1);
 }
 
-/// T772: the saved roster's pets, from the gateway's save document.
-fn roster(gateway: &Gateway) -> Vec<Value> {
-    gateway
-        .snapshot()
-        .pets
-        .and_then(|document| document["pets"].as_array().cloned())
-        .unwrap_or_default()
-}
-
 /// T772: `count` pets adopted from `item`, and the reply carried the 53/5 roster.
 fn assert_adopted(gateway: &Gateway, replies: &[Vec<u8>], item: i32, count: usize) {
     let pets = roster(gateway);
@@ -442,18 +426,8 @@ fn the_shipped_crab_buy_is_adopted_and_the_roster_survives_reconnect() {
     );
     assert_eq!(pets[0]["model"].as_str(), Some(definition.model.as_str()));
 
-    let saved = gateway.snapshot();
-    let saved_pets = saved.pets.clone().expect("the adopted pet is saved");
-    let mut restored = Gateway::load_gameplay(
-        fixture.reference(),
-        gateway.state().clone(),
-        fixture.content(),
-        saved.gameplay,
-    )
-    .expect("the saved gameplay reloads");
-    restored
-        .adopt_pets(saved.pets)
-        .expect("the saved roster reloads");
+    let saved_pets = gateway.snapshot().pets.expect("the adopted pet is saved");
+    let restored = reload_saved(fixture.reference(), &gateway, fixture.content());
     let restored_pets = roster(&restored);
     assert_eq!(restored_pets.len(), 1, "reconnect keeps the bought pet");
     assert_eq!(
@@ -495,18 +469,8 @@ fn realm_give_adopts_a_pet_item_and_the_roster_survives_reconnect() {
     assert_eq!(count_definition(&inventory_of(&gateway), 70352), 0);
     assert_adopted(&gateway, &replies, 70352, 1);
 
-    let saved = gateway.snapshot();
-    let saved_pets = saved.pets.clone().expect("the adopted pet is saved");
-    let mut restored = Gateway::load_gameplay(
-        fixture.reference(),
-        gateway.state().clone(),
-        fixture.content(),
-        saved.gameplay,
-    )
-    .expect("the saved gameplay reloads");
-    restored
-        .adopt_pets(saved.pets)
-        .expect("the saved roster reloads");
+    let saved_pets = gateway.snapshot().pets.expect("the adopted pet is saved");
+    let restored = reload_saved(fixture.reference(), &gateway, fixture.content());
     assert_eq!(
         roster(&restored).len(),
         1,
