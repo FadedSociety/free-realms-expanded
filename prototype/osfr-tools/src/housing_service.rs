@@ -847,7 +847,7 @@ impl ServiceError {
                 HousingError::InvalidPlacement
                 | HousingError::NonFiniteTransform
                 | HousingError::TransformOutOfBounds
-                | HousingError::NonUnitRotation,
+                | HousingError::NonUnitFacing,
             ) => "That placement is not valid.",
             Self::UnknownInstance { .. } => "That item is not in this character's inventory.",
             Self::StackedInstanceUnsupported { .. } => "That item cannot be placed from a stack.",
@@ -1847,15 +1847,28 @@ impl HousingService {
         Some(house_guid)
     }
 
+    /// Leaving removes every fixture's actor (35/3) the visit spawned, so none is left behind in the
+    /// zone the player returns to (T806 review finding 3).
     fn leave(&mut self, actor_guid: u64) -> Result<ServiceOutcome, ServiceError> {
         let house_guid = self
             .end_visit(actor_guid)
             .ok_or(ServiceError::NotInHouse { actor_guid })?;
+        let actors = self
+            .housing
+            .saved_fixtures(house_guid)
+            .map(|lot| {
+                lot.fixtures
+                    .iter()
+                    .map(|fixture| FixtureActor::Remove(fixture_actor_guid(fixture.fixture_guid)))
+                    .collect()
+            })
+            .unwrap_or_default();
         Ok(ServiceOutcome {
             zone_change: Some(HousingZoneChange::ReturnToPreviousZone {
                 actor_guid,
                 house_guid,
             }),
+            actors,
             ..ServiceOutcome::default()
         })
     }

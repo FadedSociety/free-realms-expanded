@@ -303,7 +303,7 @@ fn placement_rejects_non_finite_and_out_of_range_transforms() {
                 tilt: [0.25, 0.0, 0.0, 0.0],
                 ..transform(400.0, 4.0, 410.0)
             },
-            HousingError::NonUnitRotation,
+            HousingError::NonUnitFacing,
         ),
         (
             "rotation angle out of bounds",

@@ -222,6 +222,8 @@ impl Gameplay {
                     .ok_or_else(|| invalid("left a house with no saved world pose"))?;
                 session.pending.clear();
                 session.scene = None;
+                // The fixtures' 35/3s go out before the zone change, so no actor outlives the visit.
+                out.replies = encode_replies(&outcome)?;
                 out.scene_zoning = Some(self.world_zoning(&back)?);
             }
             None => out.replies = encode_replies(&outcome)?,

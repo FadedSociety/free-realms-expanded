@@ -42,7 +42,7 @@ use std::{
 /// not a recovered world or angle limit.
 pub const MAX_FIXTURE_MAGNITUDE: f32 = 1_000_000.0;
 /// RECONSTRUCTED tolerance for a stored unit facing vector.
-pub const QUATERNION_TOLERANCE: f32 = 1e-3;
+pub const FACING_TOLERANCE: f32 = 1e-3;
 /// RECONSTRUCTED snapshot bound, in the same spirit as `character_store::MAX_FILE_BYTES`.
 pub const MAX_SNAPSHOT_BYTES: usize = 1024 * 1024;
 /// RECONSTRUCTED schema version for the local housing snapshot.
@@ -312,7 +312,7 @@ pub enum HousingError {
     InvalidPlacement,
     NonFiniteTransform,
     TransformOutOfBounds,
-    NonUnitRotation,
+    NonUnitFacing,
     DuplicateFixture,
     DuplicateProperty { property_id: i32 },
     CorruptSnapshot,
@@ -1418,14 +1418,14 @@ fn validate_transform(transform: &FixtureTransform) -> Result<(), HousingError> 
     }
     // The rotation lanes are angles, any finite value; only the facing they imply is a unit vector.
     if !is_unit_vector(transform.tilt) {
-        return Err(HousingError::NonUnitRotation);
+        return Err(HousingError::NonUnitFacing);
     }
     Ok(())
 }
 
 fn is_unit_vector(vector: [f32; 4]) -> bool {
     let norm = vector.iter().map(|value| value * value).sum::<f32>();
-    (norm - 1.0).abs() <= QUATERNION_TOLERANCE
+    (norm - 1.0).abs() <= FACING_TOLERANCE
 }
 
 /// Same-directory atomic replacement, matching the `character_store` contract: a synced temporary

@@ -390,12 +390,20 @@ fn leaving_returns_to_the_world_pose() {
     let lot = granted(&mut game);
     game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000)
         .unwrap();
-    game.initialize_world(&character(), 3_000).unwrap();
+    let entry = game.initialize_world(&character(), 3_000).unwrap();
+    let spawned: Vec<u64> = actors(&entry.replies).iter().map(|npc| npc.actor_id).collect();
+    assert!(!spawned.is_empty(), "the lot stands its kit");
     // Inside the lot the client reports lot coordinates; the return still uses the entry pose.
     let mut inside = character();
     inside.zone_id = 1;
     inside.position = [440.0, 5.0, 430.0];
     let out = game.handle_in_world(&LEAVE, &inside, 4_000).unwrap();
+    // T806 review finding 3: every actor the visit spawned is removed (35/3) before the zone change.
+    let removed: Vec<u64> = (out.replies.iter())
+        .filter(|r| r.starts_with(&[35, 0, 3, 0]))
+        .map(|r| u64::from_le_bytes(r[6..14].try_into().unwrap()))
+        .collect();
+    assert_eq!(removed, spawned, "no fixture actor outlives the visit");
     let scene = out.scene_zoning.expect("leaving moves the client back");
     assert_eq!(&scene.position[..3], &character().position);
     assert_eq!(scene.id, 0);

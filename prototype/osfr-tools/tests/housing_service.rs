@@ -2050,6 +2050,39 @@ fn leave_clears_session_selection_and_blocks_further_edits() {
 }
 
 #[test]
+fn leaving_removes_every_fixture_actor_the_visit_spawned() {
+    let mut service = service_with_lot();
+    let mut stock = TestStock::new(vec![owned(INSTANCE, BLOCK_ITEM, 1)]);
+    enter(&mut service, &mut stock);
+    service.offer(OWNER, SELECTION, INSTANCE, &stock).unwrap();
+    service
+        .handle(
+            OWNER,
+            &place_frame(SELECTION, &block_transform(position(), ZERO_ROTATION, 1.0)),
+            &mut stock,
+        )
+        .unwrap();
+    let fixtures: Vec<u64> = service
+        .lot(HOUSE)
+        .unwrap()
+        .fixtures
+        .iter()
+        .map(|fixture| housing_service::fixture_actor_guid(fixture.fixture_guid))
+        .collect();
+    assert!(!fixtures.is_empty());
+    let outcome = service.handle(OWNER, &leave_frame(), &mut stock).unwrap();
+    let removed: Vec<u64> = outcome
+        .actors
+        .iter()
+        .map(|actor| match actor {
+            housing_service::FixtureActor::Remove(guid) => *guid,
+            other => panic!("leaving only removes actors: {other:?}"),
+        })
+        .collect();
+    assert_eq!(removed, fixtures, "one 35/3 per fixture actor, none left in the world");
+}
+
+#[test]
 fn pickup_all_returns_every_owned_item_or_keeps_both_sides_unchanged() {
     let mut service = service_with_lot();
     let mut stock = TestStock::new(vec![
