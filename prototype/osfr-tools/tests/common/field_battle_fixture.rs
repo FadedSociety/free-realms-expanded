@@ -34,12 +34,34 @@ mod gateway_packets;
 
 #[allow(unused_imports)] // Each suite uses the subset its route needs.
 pub use gateway_packets::{
-    body as unframe, chat, dialogue_choice, interact, melee, move_to, quest_end_reply, quest_reply,
-    wrap,
+    body as unframe, bundle, chat, dialogue_choice, interact, melee, move_to, quest_end_reply,
+    quest_reply, wrap,
 };
 
 pub const RUNTIME_CONTENT: &str = "../../../lab/reports/round70-native-20261016T061000Z/content";
 pub const REFERENCE: &str = "../../../lab/references/rust-gateway-reference";
+
+/// The private content base the fixture loads. A checkout without the lab data can point this
+/// at its own round70-shaped package; `available()` decides whether the fixture can load.
+fn runtime_content() -> PathBuf {
+    std::env::var_os("OSFR_ROUND70_CONTENT")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| manifest_dir().join(RUNTIME_CONTENT))
+}
+
+/// The gateway startup reference (`OSFR_GATEWAY_REFERENCE` overrides the lab default).
+fn gateway_reference() -> PathBuf {
+    std::env::var_os("OSFR_GATEWAY_REFERENCE")
+        .map(PathBuf::from)
+        .unwrap_or_else(|| manifest_dir().join(REFERENCE))
+}
+
+/// Whether both private inputs are present. A public checkout has neither, so a suite that
+/// loads the full production fixture skips; the tests that need no private content still run.
+pub fn available() -> bool {
+    runtime_content().join("inventory.json").is_file()
+        && gateway_reference().join("manifest.json").is_file()
+}
 
 static SERIAL: AtomicU64 = AtomicU64::new(0);
 static RUNTIME_INVENTORY: OnceLock<Inventory> = OnceLock::new();
@@ -69,7 +91,7 @@ impl Fixture {
             SERIAL.fetch_add(1, Ordering::Relaxed)
         ));
         fs::create_dir_all(&root).unwrap();
-        let reference = manifest_dir().join(REFERENCE);
+        let reference = gateway_reference();
         let version = read_json(&reference.join("manifest.json"))["client_version"]
             .as_str()
             .unwrap()
@@ -77,7 +99,7 @@ impl Fixture {
         Self {
             root,
             reference,
-            content: manifest_dir().join(RUNTIME_CONTENT),
+            content: runtime_content(),
             version,
         }
     }
@@ -926,8 +948,7 @@ pub fn nearest_other_battle_marker(marker: [f32; 3], battle: u32) -> f32 {
 
 pub fn runtime_inventory() -> &'static Inventory {
     RUNTIME_INVENTORY.get_or_init(|| {
-        Inventory::load(&manifest_dir().join(RUNTIME_CONTENT), None)
-            .expect("the round70 runtime item catalogue loads")
+        Inventory::load(&runtime_content(), None).expect("the round70 runtime item catalogue loads")
     })
 }
 

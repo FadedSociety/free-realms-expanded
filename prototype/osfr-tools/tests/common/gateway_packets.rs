@@ -143,6 +143,28 @@ pub fn blocked_families(target: u64) -> [Vec<u8>; 5] {
     ]
 }
 
+/// The client's combined application datagram (Group writer `010e6910`, child prefix
+/// `010dae40`): `[0, 25]` then each tunnel-wrapped child with a variable-length prefix.
+/// `Gateway::handle_at` decodes every child before committing, so one malformed child rejects
+/// the whole bundle.
+#[allow(dead_code)] // Included by sites that send no combined datagram.
+pub fn bundle(messages: &[Vec<u8>]) -> Vec<u8> {
+    let mut bytes = vec![0, 25];
+    for message in messages {
+        if message.len() < 254 {
+            bytes.push(message.len() as u8);
+        } else if message.len() < 65_535 {
+            bytes.push(255);
+            bytes.extend_from_slice(&(message.len() as u16).to_be_bytes());
+        } else {
+            bytes.extend_from_slice(&[255, 255, 255]);
+            bytes.extend_from_slice(&(message.len() as u32).to_be_bytes());
+        }
+        bytes.extend_from_slice(message);
+    }
+    bytes
+}
+
 /// The `005` application tunnel a client uses for its initialization and movement
 /// messages: `[5, 0, 1]`, the inner length, then the body.
 #[allow(dead_code)] // Included by sites that only read the bodies.

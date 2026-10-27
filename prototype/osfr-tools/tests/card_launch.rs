@@ -12,7 +12,14 @@ use osfr_tools::{
     gateway::{Gateway, GatewayOutcome},
 };
 use serde_json::{Value, json};
-use std::{fs, path::PathBuf, sync::Arc};
+use std::{
+    fs,
+    path::PathBuf,
+    sync::{
+        Arc,
+        atomic::{AtomicU64, Ordering},
+    },
+};
 
 #[path = "common/content_copy.rs"]
 #[allow(dead_code)] // this suite only overlays and links; the helper also has `copy_tree`
@@ -21,7 +28,9 @@ mod content_copy;
 mod field_battle_fixture;
 #[path = "support/json.rs"]
 mod json;
-use field_battle_fixture::{Fixture, content_dir, portal_play, send, unframe};
+use field_battle_fixture::{Fixture, bundle, content_dir, portal_play, send, unframe, wrap};
+
+static FIXTURE_SERIAL: AtomicU64 = AtomicU64::new(0);
 
 const TCG_ROW: u32 = 490;
 const TUTORIAL_ROW: u32 = 1049;
@@ -53,9 +62,11 @@ fn with_launch(ttl_ms: u64) -> std::io::Result<Content> {
 }
 
 fn load(content: &Value, tag: &str) -> std::io::Result<Content> {
+    // The serial keeps parallel tests of this binary (and their remove_file) apart.
     let path = std::env::temp_dir().join(format!(
-        "osfr-card-launch-{}-{tag}.json",
-        std::process::id()
+        "osfr-card-launch-{}-{}-{tag}.json",
+        std::process::id(),
+        FIXTURE_SERIAL.fetch_add(1, Ordering::Relaxed)
     ));
     fs::write(&path, serde_json::to_vec(content).unwrap()).unwrap();
     let loaded = Content::load(&path);
@@ -85,9 +96,21 @@ fn card_fixture(card: &Value) -> Fixture {
     fixture
 }
 
-/// `card_fixture` with a launch block.
-fn launch_fixture() -> Fixture {
-    card_fixture(&launch_json(120_000))
+/// The full fixture loads the private round70 content base and gateway reference; a public
+/// checkout has neither and skips with this one message. `OSFR_ROUND70_CONTENT` and
+/// `OSFR_GATEWAY_REFERENCE` point a checkout at its own package.
+fn private_fixture_available() -> bool {
+    if field_battle_fixture::available() {
+        return true;
+    }
+    eprintln!("skipped: private round70 content and gateway reference are absent");
+    false
+}
+
+/// `card_fixture` with a launch block; `None` when the private inputs are absent (the wire and
+/// run rules are still covered by the `with_launch`/`Launches` tests).
+fn launch_fixture() -> Option<Fixture> {
+    private_fixture_available().then(|| card_fixture(&launch_json(120_000)))
 }
 
 /// An ordinary player in a production-shaped gateway session.
@@ -327,7 +350,9 @@ fn the_type_16_handshake_sends_a_one_time_ticket_in_39_28() {
 /// Start leaves the run where it was.
 #[test]
 fn the_card_start_order_runs_end_to_end_through_the_gateway() {
-    let fixture = launch_fixture();
+    let Some(fixture) = launch_fixture() else {
+        return;
+    };
     let mut gateway = player(&fixture, 5_064);
     gateway.set_trace_enabled(true);
 
@@ -393,8 +418,9 @@ fn card_runs_use_the_client_game_type_and_their_own_instance_range() {
 }
 
 /// What the native client sends when its card start screen is closed (X): the generic 26/42
-/// Close, then 39/6 (CancelMiniGame) and 39/7, the order three native plays showed. The binary
-/// hands each message of a combined datagram to the Gateway one at a time, as here.
+/// Close, then 39/6 (CancelMiniGame) and 39/7, the order three native plays showed. The native
+/// cancel can put 39/6 and 39/7 in one combined datagram; this test sends them one at a time and
+/// `a_combined_datagram_...` sends the pair in one bundle.
 #[test]
 fn the_clients_close_of_the_start_screen_retires_the_offered_run_once() {
     // The bytes the native client sent for the first run (instance 61,000,001).
@@ -402,7 +428,9 @@ fn the_clients_close_of_the_start_screen_retires_the_offered_run_once() {
     assert_eq!(client(6, FIRST_INSTANCE_ID), captured(6));
     assert_eq!(client(7, FIRST_INSTANCE_ID), captured(7));
 
-    let fixture = launch_fixture();
+    let Some(fixture) = launch_fixture() else {
+        return;
+    };
     for (n, row) in [TCG_ROW, TUTORIAL_ROW].into_iter().enumerate() {
         let mut gateway = player(&fixture, 5_061 + n as u64);
         gateway.set_trace_enabled(true);
@@ -454,11 +482,65 @@ fn the_clients_close_of_the_start_screen_retires_the_offered_run_once() {
     }
 }
 
+/// T782 review: the native cancel can put 39/6 and 39/7 in one combined datagram. The Gateway
+/// decodes every child before committing, so the pair retires the run once; a malformed child
+/// (here a 16-byte 39/6) rejects the whole bundle before the staged cancel lands, leaving the
+/// run offered so the player can cancel for real.
+#[test]
+fn a_combined_datagram_retires_the_run_and_a_malformed_child_changes_nothing() {
+    let Some(fixture) = launch_fixture() else {
+        return;
+    };
+    let offer_of = |out: &GatewayOutcome| {
+        bodies(out)
+            .into_iter()
+            .find(|p| p.starts_with(&[39, 0, 16]))
+    };
+    let mut gateway = player(&fixture, 5_065);
+    gateway.set_trace_enabled(true);
+    let offer = offer_of(&send(&mut gateway, &portal_play(TCG_ROW), 1_000)).expect("39/16 offer");
+    let instance = i32_at(&offer, 3);
+    let before = gateway.snapshot();
+
+    let pair = bundle(&[wrap(&client(6, instance)), wrap(&client(7, instance))]);
+    let out = gateway.handle_at(&pair, 2_000).unwrap();
+    assert_eq!(subs(&bodies(&out)), vec![(39, 19)]);
+    assert_eq!(
+        out.trace.iter().filter(|event| event.combined).count(),
+        2,
+        "both children are traced as part of one bundle: {:?}",
+        out.trace
+    );
+    assert_eq!(gateway.snapshot(), before, "the pair marks no save");
+    let again = offer_of(&send(&mut gateway, &portal_play(TCG_ROW), 2_500)).expect("next offer");
+    assert_eq!(i32_at(&again, 3), FIRST_INSTANCE_ID + 1, "the run retired");
+
+    // A malformed child refuses the whole bundle; the run is still offered and cancellable.
+    let mut broken = player(&fixture, 5_066);
+    let offer = offer_of(&send(&mut broken, &portal_play(TCG_ROW), 3_000)).expect("39/16 offer");
+    let instance = i32_at(&offer, 3);
+    let before = broken.snapshot();
+    let malformed = [client(6, instance), vec![0]].concat();
+    let pair = bundle(&[wrap(&client(6, instance)), wrap(&malformed)]);
+    assert!(broken.handle_at(&pair, 3_100).is_err());
+    assert_eq!(broken.snapshot(), before, "the staged cancel is discarded");
+    let busy = send(&mut broken, &portal_play(TCG_ROW), 3_200);
+    assert!(
+        field_battle_fixture::chat_text(&busy).contains("Finish what you are doing"),
+        "the run is still offered"
+    );
+    let good = bundle(&[wrap(&client(6, instance)), wrap(&client(7, instance))]);
+    let out = broken.handle_at(&good, 3_300).unwrap();
+    assert_eq!(subs(&bodies(&out)), vec![(39, 19)]);
+}
+
 /// The cancel pair on its own (no 26/42 before it): 39/6 retires the offered run with the
 /// state-remove reply and 39/7 is understood, not traced as an unknown message.
 #[test]
 fn the_cancel_pair_alone_retires_the_offered_run_and_is_understood() {
-    let fixture = launch_fixture();
+    let Some(fixture) = launch_fixture() else {
+        return;
+    };
     let mut gateway = player(&fixture, 5_063);
     gateway.set_trace_enabled(true);
     let offered = bodies(&send(&mut gateway, &portal_play(TCG_ROW), 1_000));
@@ -596,7 +678,9 @@ fn session_ticket(login: &GatewayOutcome) -> Option<String> {
 /// last, once, as 32 fresh random hex characters; a second login gets a different one.
 #[test]
 fn a_card_login_sends_one_fresh_session_ticket_last() {
-    let fixture = launch_fixture();
+    let Some(fixture) = launch_fixture() else {
+        return;
+    };
     let (mut first, login) = fixture.login_session(LAKESHORE, 5_098);
     let ticket = session_ticket(&login).expect("a card login sends the 82");
     assert!(
@@ -615,6 +699,9 @@ fn a_card_login_sends_one_fresh_session_ticket_last() {
 /// T798: without a launch block the card windows stay closed, so a login is what it was: no 82.
 #[test]
 fn a_login_without_a_card_launch_block_sends_no_session_ticket() {
+    if !private_fixture_available() {
+        return;
+    }
     let no_card_file = Fixture::new();
     let shipped_card_file = card_fixture(&shipped());
     for (fixture, name) in [
@@ -626,7 +713,7 @@ fn a_login_without_a_card_launch_block_sends_no_session_ticket() {
     }
     // The launch block is the only difference: the same login gains the 82 at its end.
     let (_, plain) = shipped_card_file.login_session(LAKESHORE, 5_097);
-    let (_, card) = launch_fixture().login_session(LAKESHORE, 5_097);
+    let (_, card) = card_fixture(&launch_json(120_000)).login_session(LAKESHORE, 5_097);
     assert_eq!(card.replies.len(), plain.replies.len() + 1);
     assert_eq!(card.replies[..plain.replies.len()], plain.replies[..]);
 }
@@ -637,7 +724,9 @@ fn a_login_without_a_card_launch_block_sends_no_session_ticket() {
 /// afterwards. A trace never shows the 82's body as hex.
 #[test]
 fn the_session_ticket_authorises_nothing_and_is_never_traced() {
-    let fixture = launch_fixture();
+    let Some(fixture) = launch_fixture() else {
+        return;
+    };
     let (mut gateway, login) = fixture.login_session(LAKESHORE, 5_096);
     let ticket = session_ticket(&login).unwrap();
     let packet = login

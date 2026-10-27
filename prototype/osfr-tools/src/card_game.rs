@@ -31,7 +31,7 @@
 
 use crate::activity_portal::{Activity, Kind};
 use crate::card_service::LaunchTickets;
-use crate::minigame::{MinigameRuns, RunMode, RunOutcome, RunSpec, card_start_packet};
+use crate::minigame::{MinigameRuns, RunMode, RunOutcome, RunSpec, RunState, card_start_packet};
 use crate::startup_messages;
 use serde::Deserialize;
 use std::{
@@ -148,6 +148,10 @@ pub const PRELOAD_FILE: &str = "TradingCardGameAssets.txt";
 /// (R) Card runs take their own instance range, apart from chess (1), soccer (47,000,001)
 /// and harvesting (58,000,001).
 pub const FIRST_INSTANCE_ID: i32 = 61_000_001;
+/// The client's results Close (`CommandPacketClosedMinigameEndScreen`, constructor `008a2eb0`):
+/// the same 26/42 a shared run retires on after a win or loss. (R) that a terminal card run's
+/// results window sends this one; the card results path does not exist yet.
+const RESULTS_CLOSE: [u8; 4] = [26, 0, 42, 0];
 
 /// T765: one session's card launches: the type-16 run lifecycle and the one-time tickets its
 /// 39/37 mints. Session-only; never saved.
@@ -171,10 +175,20 @@ impl Launches {
         self.runs.current_instance_id().is_some()
     }
 
-    /// Whether `packet` is a lifecycle packet (39/x) of this session's current or just-ended run.
-    /// Nothing else is the run's: the generic 26/42 Close the client sends first when its start
-    /// screen is closed would retire an offered run before the 39/6 cancel that follows (T782).
+    /// Whether `packet` belongs to this session's current or just-ended run. Nothing else is the
+    /// run's: the generic 26/42 Close the client sends first when its start screen is closed would
+    /// retire an offered run before the 39/6 cancel that follows (T782). The 26/42 *is* the run's
+    /// once the run is terminal (Won/Lost): it is the client's results Close, and a run that no
+    /// owner retires would stay current and keep the player busy for the rest of the session.
     pub fn owns(&self, packet: &[u8]) -> bool {
+        if packet == RESULTS_CLOSE {
+            return self.runs.current_instance_id().is_some_and(|instance| {
+                matches!(
+                    self.runs.state(instance),
+                    Some(RunState::Won | RunState::Lost)
+                )
+            });
+        }
         self.runs.names_run(packet)
     }
 
@@ -363,4 +377,78 @@ fn is_name(name: &str) -> bool {
 
 fn invalid(message: &str) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, message.to_owned())
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::minigame::{Activity, ActivityFinish};
+
+    struct Loss;
+
+    impl Activity for Loss {
+        fn score(&self) -> u32 {
+            0
+        }
+
+        fn finish(&self) -> Option<ActivityFinish> {
+            Some(ActivityFinish {
+                won: false,
+                stars: 0,
+                elapsed_seconds: 1,
+            })
+        }
+    }
+
+    fn client(sub: u8, instance: i32) -> Vec<u8> {
+        let mut packet = vec![39, 0, sub];
+        for value in [instance, -1, -1] {
+            packet.extend(value.to_le_bytes());
+        }
+        packet
+    }
+
+    fn launches() -> Launches {
+        let launch: Launch = serde_json::from_value(serde_json::json!({
+            "ticket_ttl_ms": 120_000,
+            "source": [{"kind": "reconstructed", "evidence": "F800 test"}]
+        }))
+        .unwrap();
+        Launches::new(&launch).unwrap()
+    }
+
+    /// T782 review: a card run that reached Won/Lost owns the client's results Close (26/42) and
+    /// retires on it; while it is offered or playing that same Close is still not the run's.
+    #[test]
+    fn a_terminal_card_run_owns_the_results_close_once() {
+        let shipped = crate::content::bundled_content().join(CONTENT_FILE);
+        let cards = Content::load(&shipped).unwrap();
+        let row = cards.row(490).expect("the Trading Card Game row");
+        let mut launches = launches();
+        let offer = launches.begin(row).unwrap();
+        let instance = i32::from_le_bytes(offer.replies[0][3..7].try_into().unwrap());
+        assert!(
+            !launches.owns(&RESULTS_CLOSE),
+            "offered: the start-screen close is not the run's (T782)"
+        );
+        launches.route(&client(37, instance), 1, 1_000).unwrap();
+        launches.route(&client(5, instance), 1, 1_100).unwrap();
+        assert!(
+            !launches.owns(&RESULTS_CLOSE),
+            "playing: there is no result to close yet"
+        );
+
+        launches.runs.started(instance);
+        launches.runs.finish(instance, &Loss, None).unwrap();
+        assert!(launches.owns(&RESULTS_CLOSE));
+        let close = launches.route(&RESULTS_CLOSE, 1, 1_200).unwrap();
+        assert!(close.accepted && close.changed && close.replies.is_empty());
+        assert!(!launches.is_active(), "the next Play is free again");
+        assert!(
+            !launches.owns(&RESULTS_CLOSE),
+            "a repeated results close is not the run's"
+        );
+        let repeat = launches.route(&RESULTS_CLOSE, 1, 1_300).unwrap();
+        assert!(!repeat.accepted && !repeat.changed);
+    }
 }

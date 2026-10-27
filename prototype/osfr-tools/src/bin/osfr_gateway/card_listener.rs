@@ -45,7 +45,33 @@ struct Connection {
     opened_ms: u64,
     character: Option<u64>,
     unhandled: u32,
-    answered: u32,
+    answered: Answered,
+}
+
+/// The answered-event counters, one budget each (T782 review): a client retrying 414 or pinging
+/// cannot spend the single `card_login` line the login diagnosis needs.
+#[derive(Default)]
+struct Answered {
+    gateway_requests: u32,
+    logins: u32,
+    pings: u32,
+}
+
+impl Answered {
+    fn count(&mut self, kind: AnsweredKind) -> &mut u32 {
+        match kind {
+            AnsweredKind::GatewayRequest => &mut self.gateway_requests,
+            AnsweredKind::Login => &mut self.logins,
+            AnsweredKind::Ping => &mut self.pings,
+        }
+    }
+}
+
+#[derive(Clone, Copy)]
+enum AnsweredKind {
+    GatewayRequest,
+    Login,
+    Ping,
 }
 
 /// The listener the card content asks for, on the gateway's own address (loopback, or the
@@ -122,7 +148,7 @@ impl CardListener {
                     opened_ms: now_ms,
                     character: None,
                     unhandled: 0,
-                    answered: 0,
+                    answered: Answered::default(),
                 });
                 self.events
                     .push(json!({"event":"card_connected","peer":peer.to_string()}));
@@ -254,9 +280,10 @@ impl Connection {
         true
     }
 
-    /// The event for an answered 414 (the address it sent the client to) or 411 (`login`: the
+    /// The event for an answered 414 (the address it sent the client to), 411 (`login`: the
     /// character its ticket was redeemed for, or the refusal word, plus the 411's version and
-    /// field lengths). Neither the ticket nor the session id is named.
+    /// field lengths) or ping. Neither the ticket nor the session id is named. The kind and its
+    /// budget are decided before any event is built, so a capped frame allocates nothing.
     fn log_answer(
         &mut self,
         body: &[u8],
@@ -265,24 +292,36 @@ impl Connection {
         port: u16,
         events: &mut Vec<Value>,
     ) {
-        let peer = self.peer.to_string();
-        let event = match (card_service::class_id(body), login) {
-            (Ok(card_service::GET_CONNECTION_SERVER), _) => {
-                json!({"event":"card_gateway_request","peer":peer,"host":host,"port":port})
-            }
-            (Ok(card_service::SEND_SESSION_ID), Some((redeemed, version, lengths))) => json!({
-                "event":"card_login","peer":peer,"ok":redeemed.is_ok(),"character":redeemed.ok(),
-                "reason":redeemed.err(),"version":version,"lengths":lengths
-            }),
-            (Ok(card_service::PING), _) => {
-                json!({"event":"card_ping","peer":peer,"character":self.character})
-            }
+        let kind = match (card_service::class_id(body), login.as_ref()) {
+            (Ok(card_service::GET_CONNECTION_SERVER), _) => AnsweredKind::GatewayRequest,
+            (Ok(card_service::SEND_SESSION_ID), Some(_)) => AnsweredKind::Login,
+            (Ok(card_service::PING), _) => AnsweredKind::Ping,
             _ => return,
         };
-        self.answered += 1;
-        if self.answered <= LOGGED_PER_KIND {
-            events.push(event);
+        let answered = self.answered.count(kind);
+        *answered += 1;
+        if *answered > LOGGED_PER_KIND {
+            return;
         }
+        let peer = self.peer.to_string();
+        let event = match kind {
+            AnsweredKind::GatewayRequest => {
+                json!({"event":"card_gateway_request","peer":peer,"host":host,"port":port})
+            }
+            AnsweredKind::Login => {
+                let Some((redeemed, version, lengths)) = login else {
+                    return;
+                };
+                json!({
+                    "event":"card_login","peer":peer,"ok":redeemed.is_ok(),"character":redeemed.ok(),
+                    "reason":redeemed.err(),"version":version,"lengths":lengths
+                })
+            }
+            AnsweredKind::Ping => {
+                json!({"event":"card_ping","peer":peer,"character":self.character})
+            }
+        };
+        events.push(event);
     }
 }
 
@@ -386,6 +425,11 @@ pub(super) mod tests {
         closed
             .map(|e| e["reason"].as_str().unwrap().to_owned())
             .collect()
+    }
+
+    /// How many events named `name` were logged so far.
+    fn count(card: &CardListener, name: &str) -> usize {
+        card.events.iter().filter(|e| e["event"] == name).count()
     }
 
     /// Poll until an event named `name` is logged.
@@ -857,13 +901,49 @@ pub(super) mod tests {
             card.poll(1, refuse);
             std::thread::sleep(Duration::from_millis(5));
         }
-        let count = |name: &str| card.events.iter().filter(|e| e["event"] == name).count();
-        assert_eq!(count("card_gateway_request"), LOGGED_PER_KIND as usize);
-        assert_eq!(count("card_command_unhandled"), LOGGED_PER_KIND as usize);
+        let unhandled = count(&card, "card_command_unhandled");
+        assert_eq!(
+            count(&card, "card_gateway_request"),
+            LOGGED_PER_KIND as usize
+        );
+        assert_eq!(unhandled, LOGGED_PER_KIND as usize);
         assert_eq!(
             card.connections.len(),
             1,
             "the chatty client stays connected"
         );
+    }
+
+    /// T782 review: every answered kind has its own budget, so a client that retries 414 sixteen
+    /// times on one connection still gets its `card_login` line, the event the native diagnosis
+    /// reads.
+    #[test]
+    fn the_answered_event_caps_are_per_kind() {
+        if !test_support::bin_test_target("card") {
+            return;
+        }
+        let mut card = listener();
+        let mut chatty = client(&card);
+        for _ in 0..(LOGGED_PER_KIND + 1) {
+            chatty.write_all(&frame(false, &gateway_request())).unwrap();
+        }
+        // The 411 on the same connection: a shared counter would spend its budget on the 414s.
+        chatty
+            .write_all(&frame(true, &session_login("", "79")))
+            .unwrap();
+        for _ in 0..40 {
+            card.poll(1, refuse);
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        assert_eq!(
+            count(&card, "card_gateway_request"),
+            LOGGED_PER_KIND as usize
+        );
+        assert_eq!(
+            count(&card, "card_login"),
+            1,
+            "the login has its own budget"
+        );
+        assert_eq!(closed(&card), ["login_refused"]);
     }
 }
