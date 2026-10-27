@@ -49,6 +49,8 @@ use delivery::{
 };
 #[path = "osfr_gateway/boombox_routing.rs"]
 mod boombox_routing;
+#[path = "osfr_gateway/card_listener.rs"]
+mod card_listener;
 #[path = "osfr_gateway/client_area_routing.rs"]
 mod client_area_routing;
 #[path = "osfr_gateway/moderation.rs"]
@@ -2974,6 +2976,7 @@ pub struct Server {
     trace: Option<trace::Trace>,
     tick_stats: tick_stats::TickStats,
     studio: Option<TcpListener>,
+    card: Option<card_listener::CardListener>,
     // Studio asset browser: index files loaded on first search.
     studio_assets: BTreeMap<String, Vec<serde_json::Value>>,
 }
@@ -3362,6 +3365,7 @@ impl Server {
         } else {
             None
         };
+        let card = card_listener::open(&options)?;
         let mut world = SharedWorld::new();
         world
             .social
@@ -3399,6 +3403,7 @@ impl Server {
             trace: None,
             tick_stats: tick_stats::TickStats::new(Duration::ZERO),
             studio,
+            card,
             studio_assets: BTreeMap::new(),
             faulted_fields: BTreeSet::new(),
             dormant_fields: BTreeSet::new(),
@@ -3675,6 +3680,7 @@ impl Server {
         let now_ms = self.start.elapsed().as_millis() as u64;
         self.membership.collect_empty_instances(now_ms);
         self.poll_studio(now_ms);
+        self.poll_card(now_ms);
         if self.security_flushed.elapsed() >= Duration::from_secs(5) {
             self.flush_security();
             self.security_flushed = Instant::now();

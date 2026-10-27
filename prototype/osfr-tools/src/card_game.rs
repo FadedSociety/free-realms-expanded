@@ -97,6 +97,10 @@ pub struct Content {
 pub struct Launch {
     /// How long a 39/0x28 launch ticket stays redeemable by the card login.
     pub ticket_ttl_ms: u64,
+    /// T770: the card service's TCP port beside the gateway (the client's `host.svr` `gport`);
+    /// 0 keeps it off, and the card window then reports the service unreachable.
+    #[serde(default)]
+    pub port: u16,
     pub source: Vec<Source>,
 }
 

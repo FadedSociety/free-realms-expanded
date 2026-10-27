@@ -935,6 +935,11 @@ impl Gateway {
         self.gameplay.as_ref()
     }
 
+    /// The live gameplay engine, for host services beside the UDP session (T770 card service).
+    pub fn gameplay_mut(&mut self) -> Option<&mut Gameplay> {
+        self.gameplay.as_mut()
+    }
+
     /// Restore the host-owned rolling-hour fishing ledger for this character. A fresh
     /// `Gameplay` starts empty, so the gateway calls this from its character-scoped state after
     /// loading a save; the timestamps never enter the save envelope.
