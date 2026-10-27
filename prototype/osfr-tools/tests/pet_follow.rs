@@ -277,3 +277,42 @@ fn follow_frames_use_the_enemy_movement_layout() {
         "only its own owner"
     );
 }
+
+/// F833: a follow click is bounded around the owner (the client's own sender `00b5fcf0` reports
+/// only targets 8-40 m away), so a forged coordinate cannot park the pet.
+#[test]
+fn a_follow_click_is_bounded_around_the_owner() {
+    let cfg = config();
+    assert_eq!(cfg.click_max_m, 40.0, "the client's own maximum");
+    let owner = [10.0, 0.0, 10.0];
+    let pet = spawn(&cfg, owner);
+    assert_eq!(
+        pet.owner_position(),
+        pet.position,
+        "before the first owner update the spawn stands in for the owner"
+    );
+    assert!(
+        cfg.admits_click(owner, [owner[0] + cfg.click_max_m, owner[1], owner[2]]),
+        "the boundary itself is admitted"
+    );
+    assert!(!cfg.admits_click(
+        owner,
+        [owner[0] + cfg.click_max_m + 0.5, owner[1], owner[2]]
+    ));
+    assert!(!cfg.admits_click(
+        owner,
+        [owner[0], owner[1] + cfg.click_max_m + 0.5, owner[2]]
+    ));
+    assert!(!cfg.admits_click(owner, [1e38, 1e38, 1e38]));
+    let (stepped, _) = step(
+        &cfg,
+        OwnerPose {
+            position: owner,
+            at_ms: 100,
+        },
+        pet,
+        flat,
+        false,
+    );
+    assert_eq!(stepped.owner_position(), owner, "after an owner update");
+}

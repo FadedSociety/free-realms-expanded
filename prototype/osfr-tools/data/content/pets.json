@@ -54164,6 +54164,7 @@
     "warp_far_m": 100.0,
     "warp_far_ms": 5000,
     "warp_climb_m": 6.0,
+    "click_max_m": 40.0,
     "send_ms": 500
   },
   "care": {

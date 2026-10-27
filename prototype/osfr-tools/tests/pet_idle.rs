@@ -553,18 +553,9 @@ fn a_pet_lies_down_after_its_delay_fidgets_and_stands_when_the_owner_moves() {
         let moved_at = START + 6 * 60_000 + TICK;
         session.owner = [4.0, 0.0, 0.0];
         let up = session.tick(moved_at);
+        assert_stand_up(&up);
         assert_eq!(
-            up.plays,
-            [
-                Play {
-                    animation: ANIM_ID_STAND,
-                    base: true
-                },
-                Play {
-                    animation: posture.exit.animation_id,
-                    base: false
-                },
-            ],
+            up.plays[1].animation, posture.exit.animation_id,
             "seed {seed}"
         );
         let after_up = session.run(moved_at + TICK, moved_at + 3 * 60_000);
@@ -608,17 +599,37 @@ fn a_follow_click_wakes_a_lying_pet_and_pauses_its_idle_life() {
             .is_err()
     );
     assert_eq!(session.service.view(OWNER).unwrap(), before);
-    // Click "go there" far from the owner: the client walks the pet, so the rest posture ends on
-    // the next tick instead of fidgeting on in place.
+    // F833: a finite target beyond the follow rules is refused as well, before the pose or the
+    // pending target move; the next tick still finds the pet lying where it was.
+    for target in [[1e38, 1e38, 1e38], [0.0, 1e38, 0.0], [100.0, 0.0, 0.0]] {
+        assert!(
+            session.service.follow_location(target).is_err(),
+            "{target:?}"
+        );
+        assert_eq!(session.service.view(OWNER).unwrap(), before, "{target:?}");
+    }
+    let still = session.tick(lying.at + TICK);
+    assert!(
+        still.plays.is_empty() && still.bubbles.is_empty(),
+        "a refused click leaves the rest in place: {:?}",
+        still.plays
+    );
+    assert_eq!(
+        session.service.view(OWNER).unwrap().base_animation,
+        before.base_animation
+    );
+    // Click "go there", within the click bound (40 m, the client's own maximum) but far from the
+    // settle spot: the client walks the pet, so the rest posture ends on the next tick instead of
+    // fidgeting on in place.
     session
         .service
-        .follow_location([30.0, 0.0, 30.0])
+        .follow_location([20.0, 0.0, 20.0])
         .expect("the active pet can go there");
-    let up = session.tick(lying.at + TICK);
+    let up = session.tick(lying.at + 2 * TICK);
     assert_stand_up(&up);
     assert_eq!(session.service.view(OWNER).unwrap().base_animation, None);
     // It walks back to its owner, so no rest pose resumes while the walk runs.
-    let walked = session.run(lying.at + 2 * TICK, lying.at + 6_000);
+    let walked = session.run(lying.at + 3 * TICK, lying.at + 6_000);
     assert!(
         walked
             .iter()
@@ -843,17 +854,34 @@ fn a_model_that_cannot_shake_never_does_and_one_without_rows_is_quiet_but_still_
     );
 }
 
-/// F809: a clock that ran backwards (a restart or a spammed timestamp) shows no bubble and never
-/// errors the tick.
+/// F809/F833: a clock that ran backwards (a restart or a replayed timestamp) shows no bubble and
+/// never errors or saves the tick, even when the bubble is due at that earlier time.
 #[test]
 fn a_backwards_clock_shows_no_bubble_and_never_errors() {
-    let mut session = Session::dog_with(PetContent::bundled().unwrap(), [10.0, 90.0, 90.0], 13);
-    session.run(START, START + 2_000);
+    let content = content_with(|document| {
+        document["care"]["idle"]["bubble_min_ms"] = json!(1_000);
+        document["care"]["idle"]["bubble_max_ms"] = json!(1_000);
+    });
+    let mut session = Session::dog_with(content, [10.0, 90.0, 90.0], 13);
+    // The pet's needs clock is `START` (its summon). Tick a full bubble gap behind it: the first
+    // tick schedules the bubble for `earlier + 1 s`, and the second one is due then, so only the
+    // backwards guard in `decayed` can keep the hungry pet quiet. A zero-elapsed regression would
+    // show the hunger icon here.
+    let earlier = START - 10_000;
+    let schedule = session
+        .service
+        .care_tick(&mut session.fixture.inventory, earlier);
+    assert!(bubbles(&schedule.private, session.actor).is_empty());
     let care = session
         .service
-        .care_tick(&mut session.fixture.inventory, START - 1_000);
-    assert!(!care.changed);
+        .care_tick(&mut session.fixture.inventory, earlier + 1_000);
+    assert!(!care.changed, "a backwards clock saves nothing");
     assert!(bubbles(&care.private, session.actor).is_empty());
+    assert!(
+        care.private.is_empty() && care.shared.is_empty(),
+        "no bubble and no live-needs status: {:?}",
+        care.private
+    );
 }
 
 #[test]

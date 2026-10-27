@@ -112,7 +112,7 @@ fn deliver(
 mod tests {
     use super::super::f120_fishing_hour_reconnect::drain_replies;
     use super::super::tests::f161_pet_adoption_persist::{
-        ADOPTION_ITEM, grant_certificate, pet_wire,
+        ADOPTION_ITEM, grant_certificate, grant_certificate_for, pet_wire,
     };
     use super::super::tests::test_support::{self, Scene, Scratch, bin_test_target};
     use super::*;
@@ -1154,8 +1154,9 @@ mod tests {
 
     /// F762 (T455 review, real path): A summons a pet and walks; viewer B receives the pet's 125
     /// moves through the gateway's nearby path and the world tick; a late viewer C is sent the
-    /// pet's AddNpc where it stands (`with_pets`), not on A; the walk saves nothing. Reuses
-    /// this module's `Rig` (owner, viewers, ticks, drains).
+    /// pet's AddNpc where it stands (`with_pets`), not on A; the walk saves nothing. F833: the pet
+    /// then settles and lies down, so C's delivery carries the base rest loop right after the
+    /// AddNpc. Reuses this module's `Rig` (owner, viewers, ticks, drains).
     #[test]
     fn f762_a_walking_owners_pet_moves_for_viewers_and_a_late_viewer_sees_it_where_it_stands() {
         let Some(mut rig) = Rig::new("f762-pet", RAINBOW) else {
@@ -1214,30 +1215,69 @@ mod tests {
             "following saves no pet state"
         );
 
+        // F833 (review 2): the dragon from `ADOPTION_ITEM` has no rest posture (pets.json model
+        // 1756), so adopt the Labrador item (model 515, which rests) and let it settle and lie
+        // down on the world tick. The owner's next message then refreshes the shared presence with
+        // the rest loop, and a viewer who joins goes through the real `with_pets` fanout, so this
+        // covers the hub's delivery, not only the service.
+        grant_certificate_for(&mut rig.scene.session, 2_644);
+        let adopt = pet_wire::summon_by_item(2_644, 0);
+        rig.scene.send(&rig.options, &adopt, 6_100).unwrap();
+        let parked = rig.scene.world.players.get(me).unwrap().position;
+        for at in [7_500, 8_000, 8_500, 9_000, 100_000] {
+            rig.scene.tick(&rig.options, at);
+        }
+        let still = super::super::tests::l039_login_pose::step(owner, parked);
+        rig.scene.dispatch(&rig.options, &still, 100_100).unwrap();
+        let pet = rig.scene.world.pets.get(&owner).cloned().unwrap();
+        let looped = pet
+            .base_animation
+            .expect("the pet lies down on the world tick");
+        let mut base = vec![35, 0, 8, 0];
+        base.extend(pet.actor_guid.to_le_bytes());
+        base.extend(looped.to_le_bytes());
+        base.extend([0u8; 4]);
+        base.push(1);
+        assert_eq!(base.len(), 21);
+
         let (late, joined) = rig.viewer_as(3, 8.0, 1);
         let late_id = rig.scene.sessions[&late].id;
-        let pet = rig.scene.world.pets.get(&owner).cloned().unwrap();
         let owner_at = rig.scene.world.players.get(me).unwrap().position;
-        let deliveries = joined
-            .into_iter()
-            // `super::super`, not `crate`: integration harnesses embed the gateway as a module.
-            .map(|message| super::super::Delivery {
-                recipient: message.recipient,
-                bytes: message.bytes,
-            })
+        let delivered = rig.scene.world.with_pets(
+            joined
+                .into_iter()
+                // `super::super`, not `crate`: integration harnesses embed the gateway as a module.
+                .map(|message| super::super::Delivery {
+                    recipient: message.recipient,
+                    bytes: message.bytes,
+                })
+                .collect(),
+        );
+        let mine: Vec<_> = delivered
+            .iter()
+            .filter(|delivery| delivery.recipient == late_id)
             .collect();
-        let spawn = rig
-            .scene
-            .world
-            .with_pets(deliveries)
-            .into_iter()
-            .find(|d| d.recipient == late_id && d.bytes.get(7..19) == Some(add_npc.as_slice()))
+        let spawn_at = mine
+            .iter()
+            .position(|delivery| delivery.bytes.get(7..19) == Some(add_npc.as_slice()))
             .expect("the late viewer is sent the pet's AddNpc");
         let xyz: Vec<u8> = pet.position.iter().flat_map(|v| v.to_le_bytes()).collect();
         assert!(
-            spawn.bytes.windows(12).any(|w| w == xyz.as_slice()),
+            mine[spawn_at]
+                .bytes
+                .windows(12)
+                .any(|w| w == xyz.as_slice()),
             // (the pet has moved since the summon: this is its current pose)
             "the AddNpc carries the pet's pose"
+        );
+        let base_at = mine
+            .iter()
+            .position(|delivery| delivery.bytes.get(7..28) == Some(base.as_slice()))
+            .expect("the late viewer is sent the base rest loop");
+        assert_eq!(
+            base_at,
+            spawn_at + 1,
+            "the AddNpc comes first, then the rest loop"
         );
         assert!(apart(pet.position, owner_at) >= 1.0, "not on its owner");
     }

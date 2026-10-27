@@ -31,6 +31,11 @@ pub struct FollowConfig {
     pub warp_far_m: f32,
     pub warp_far_ms: u64,
     pub warp_climb_m: f32,
+    /// F833 (R): how far a follow click may land from its owner (and how far its height may
+    /// differ) before it is refused. The client's own sender `00b5fcf0` reports only a target
+    /// 8-40 m from the point it tracks, so 40 m admits every real click; reachability itself is
+    /// still unrecovered.
+    pub click_max_m: f32,
     pub send_ms: u64,
 }
 
@@ -62,9 +67,19 @@ impl FollowConfig {
             && self.settle_max_deg <= 180.0
             && self.settle_delay_ms <= 60_000
             && (1..=60_000).contains(&self.warp_far_ms)
+            && (1.0..=100.0).contains(&self.click_max_m)
+            && self.click_max_m <= self.warp_far_m
             && (50..=10_000).contains(&self.send_ms)
             && self.catch_up_start_m > self.behind_m
             && self.warp_far_m > self.catch_up_start_m
+    }
+
+    /// F833 (R): a follow click is admitted only within `click_max_m` of the owner, in both the
+    /// ground plane and height, so a forged coordinate cannot park the pet on the far side of the
+    /// world. The client's own bound is 8-40 m (`00b5fcf0`); this one only rejects what the client
+    /// would not send.
+    pub fn admits_click(&self, owner: [f32; 3], target: [f32; 3]) -> bool {
+        dist(owner, target) <= self.click_max_m && (target[1] - owner[1]).abs() <= self.click_max_m
     }
 }
 
@@ -113,6 +128,13 @@ impl PetPose {
     /// runs only while this holds; a walk, a warp or the pet window clears it).
     pub fn settled(&self) -> bool {
         self.settled
+    }
+
+    /// The owner's last accepted position, which bounds a follow click; before the first owner
+    /// update it is the pet's spawn, already beside the owner.
+    pub fn owner_position(&self) -> [f32; 3] {
+        self.last_owner
+            .map_or(self.position, |owner| owner.position)
     }
 
     /// A follow click places the pet at `target`: it is no longer settled beside its owner, so the

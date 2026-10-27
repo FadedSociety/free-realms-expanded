@@ -2418,8 +2418,10 @@ impl PetService {
         bytes
     }
 
-    /// Store a finite follow destination and return the client acknowledgement
-    /// plus a world-adapter event. Reachability thresholds remain unrecovered.
+    /// Store a follow destination and return the client acknowledgement plus a world-adapter
+    /// event. F833 (R): a target farther from the owner than `follow.click_max_m` (ground plane or
+    /// height) is refused before anything moves, so a forged coordinate cannot park the pet there;
+    /// reachability itself remains unrecovered.
     pub fn follow_location(&mut self, target: [f32; 3]) -> io::Result<PetTransition> {
         if !target.iter().all(|value| value.is_finite()) {
             return Err(invalid("invalid pet follow location"));
@@ -2428,6 +2430,15 @@ impl PetService {
             .active
             .as_mut()
             .ok_or_else(|| invalid("no active pet"))?;
+        // Without follow rules there is no anchor to bound the click against, so it fails closed.
+        let follow = self
+            .content
+            .follow
+            .as_ref()
+            .ok_or_else(|| invalid("no pet follow rules"))?;
+        if !follow.admits_click(active.pose.owner_position(), target) {
+            return Err(invalid("pet follow location out of range"));
+        }
         active.follow_target = Some(target);
         // T531: the click's 125 already moves the client pet to `target`; move the server pose too
         // and stop it counting as settled, so the idle life pauses until the follow step parks it.

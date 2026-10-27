@@ -31,7 +31,9 @@ pub(crate) fn grant_certificate(session: &mut Session) {
     grant_certificate_for(session, ADOPTION_ITEM);
 }
 
-fn grant_certificate_for(session: &mut Session, definition: i32) {
+/// Add one owned adoption certificate for `definition` to the live inventory, as a purchase or
+/// reward would (F833 reuses this for the lab in the gateway late-viewer test).
+pub(crate) fn grant_certificate_for(session: &mut Session, definition: i32) {
     let mut state = session
         .gateway
         .inventory_state()
