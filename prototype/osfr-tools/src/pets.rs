@@ -427,6 +427,8 @@ struct PetCareItem {
 #[serde(deny_unknown_fields)]
 struct NeedPolicy {
     maximum: f32,
+    /// Where a newly adopted pet's food, groom and play bars start (R), so care has work to do.
+    initial: f32,
     idle_decay_per_second: f32,
     summoned_decay_per_second: f32,
     source: SourceTag,
@@ -555,6 +557,8 @@ impl PetContent {
             || !self.need_policy.summoned_decay_per_second.is_finite()
             || self.need_policy.idle_decay_per_second <= 0.0
             || self.need_policy.summoned_decay_per_second < self.need_policy.idle_decay_per_second
+            || self.need_policy.summoned_decay_per_second > 1.0
+            || !(1.0..=self.need_policy.maximum).contains(&self.need_policy.initial)
             || !self.movement_speed.speed.is_finite()
             || !(0.1..=20.0).contains(&self.movement_speed.speed)
         {
@@ -2615,10 +2619,10 @@ fn insert_pet(
         name: String::new(),
         // (R) Need range and initial fullness are not present in client tables.
         needs: PetNeeds {
-            food: 100.0,
-            groom: 100.0,
-            play: 100.0,
-            mood: 100.0,
+            food: content.need_policy.initial,
+            groom: content.need_policy.initial,
+            play: content.need_policy.initial,
+            mood: content.need_policy.initial,
         },
         learned_tricks: definition.initial_tricks.iter().copied().collect(),
         favorite_tricks: [None; 4],

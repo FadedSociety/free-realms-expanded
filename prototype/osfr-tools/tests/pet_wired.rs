@@ -580,6 +580,13 @@ fn a_groom_ends_through_the_gameplay_fanout_tick_and_zoning_with_kind_4() {
     let ended = ended.expect("the bar fills before the timeout");
     assert_eq!(notify_kind(&ended.replies), Some(4), "the session ends");
     assert!(
+        ended
+            .replies
+            .iter()
+            .any(|p| body(p).starts_with(&[15, 0, 3, 0])),
+        "T812: a full bar also tells the owner in chat"
+    );
+    assert!(
         ended.replies.iter().any(|packet| body(packet) == dry_off),
         "the owner sees the dry-off"
     );

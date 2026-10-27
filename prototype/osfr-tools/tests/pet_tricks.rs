@@ -26,8 +26,8 @@ use pet_inventory::InventoryFixture;
 use pet_wire::{favorite, feed, groom, perform_trick, summon, trick_result, water};
 use serde_json::{Value, json};
 
-/// 6,000 s after adoption: the same base the grooming suite uses.
-const START: u64 = 6_000_000;
+/// 1,000 s after adoption: the same base the grooming suite uses.
+const START: u64 = 1_000_000;
 /// Model 364 (the dog) lists this trick and has an animation row for it.
 const TRICK: u32 = 11;
 /// A vanity Pet Pal (T454).

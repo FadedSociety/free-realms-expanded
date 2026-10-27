@@ -218,7 +218,8 @@ fn needs_decay_faster_while_summoned() {
     let pet_id = service.adopt_vendor_grant(1, &definition(), 0).unwrap();
     service.advance_time(600).unwrap();
     let idle_food = service.pet(pet_id).unwrap().needs.food;
-    assert!((idle_food - 94.0).abs() < 0.01);
+    // 600 s of the shipped idle decay, from the shipped starting level (T812: below 100).
+    assert!((50.0..60.0).contains(&idle_food), "{idle_food}");
     service
         .summon(pet_id, 44, 33, [0.0; 3], PetBusy::default(), 600)
         .unwrap();

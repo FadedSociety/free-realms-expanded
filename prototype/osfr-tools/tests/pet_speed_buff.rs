@@ -216,7 +216,7 @@ fn below_the_threshold_there_is_no_row_and_no_refresh() {
 fn a_mood_drop_below_the_threshold_ends_the_buff() {
     let mut game = game(roster(false, 100.0));
     game.handle_in_world(&summon(1), &who(), NOW).unwrap();
-    // Summoned needs decay 0.02/s: 3,800 s takes the mood below 25.
+    // Summoned needs decay 0.04/s: 3,800 s takes the mood far below 25.
     let ended = game.pet_tick(&who(), NOW + 3_800_000).unwrap();
     assert_eq!(removes(&ended.replies).len(), 1, "38/17");
     assert_eq!(speeds(&ended.replies), vec![ON_FOOT], "speed restored");

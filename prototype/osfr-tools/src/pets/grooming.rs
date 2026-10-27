@@ -31,6 +31,9 @@ const TACTILE_PET: u32 = 0;
 const SHAMPOO_SLOT: usize = 1;
 const CONDITIONER_SLOT: usize = 2;
 const BRUSH_SLOT: usize = 4;
+/// The chat line when a full bar ends the session: no client string says it (R, T812; the
+/// locale has only quest-specific lines), so the owner is told in chat.
+const GROOM_DONE: &str = "Your pet is squeaky clean!";
 /// The per-second gain cap counts in fixed windows this long. A span that straddles a boundary
 /// can see up to two caps (worst case 2x over one second), accepted and pinned by
 /// `a_stroke_span_across_a_window_boundary_sees_at_most_two_caps`: a session is 60 s and only
@@ -255,7 +258,10 @@ impl PetService {
                 .raise_need(pet_id, Need::Groom, points, now_ms)
                 .is_some_and(|needs| needs.groom >= self.content.need_policy.maximum);
         if full {
-            self.finish_groom(groom, now_ms)
+            PetWire {
+                notice: Some(GROOM_DONE),
+                ..self.finish_groom(groom, now_ms)
+            }
         } else {
             PetWire::default()
         }

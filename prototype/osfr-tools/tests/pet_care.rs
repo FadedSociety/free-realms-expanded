@@ -351,8 +351,8 @@ fn live_needs_reach_the_owner_at_most_every_1_5_s_without_a_save() {
     let mut fixture = kit();
     send(&mut service, &mut fixture, &summon(pet), T0);
     let roster = service.document_value();
-    // 60 s at the shipped 0.02/s summoned decay moves the bars by 1.2; the 0.5 epsilon is
-    // crossed twice, so the gap and the value change are both exercised (F778: 10 s was below
+    // 60 s at the shipped 0.04/s summoned decay moves the bars by 2.4; the 0.5 epsilon is
+    // crossed four times, so the gap and the value change are both exercised (F778: 10 s was below
     // the epsilon and never tested either).
     let mut sent: Vec<(u64, f32)> = Vec::new();
     for step in 1..=600u64 {
@@ -381,4 +381,58 @@ fn live_needs_reach_the_owner_at_most_every_1_5_s_without_a_save() {
         roster,
         "the live view writes no roster"
     );
+}
+
+/// The four floats of a 53/3 (food, groom, play, mood).
+fn bars(status: &[u8]) -> [f32; 4] {
+    std::array::from_fn(|i| f32::from_le_bytes(status[7 + 4 * i..11 + 4 * i].try_into().unwrap()))
+}
+
+#[test]
+fn a_new_pet_starts_below_full_and_the_start_level_is_bounded() {
+    let (service, pet) = dog();
+    let needs = service.pet(pet).unwrap().needs;
+    let start = pets_json()["need_policy"]["initial"].as_f64().unwrap() as f32;
+    assert!(start > 0.0 && start < 100.0, "care has work to do: {start}");
+    assert_eq!(
+        [needs.food, needs.groom, needs.play, needs.mood],
+        [start; 4]
+    );
+    // Sanity bounds, not pinned values: the level and the summoned rate stay inside the range
+    // the bars can show, and a bad file fails at load.
+    for (key, bad) in [("initial", 0.0), ("initial", 101.0)] {
+        let refused = loads(|doc| doc["need_policy"][key] = bad.into());
+        assert!(refused.is_err(), "{key} {bad}");
+    }
+    assert!(loads(|doc| doc["need_policy"]["summoned_decay_per_second"] = 5.0.into()).is_err());
+    assert!(loads(|doc| doc["need_policy"]["initial"] = 100.0.into()).is_ok());
+}
+
+/// the owner, native 2026-10-27: nobody could tell the bars fall. Over three minutes of play the
+/// summoned pet's live 53/3 must show every bar a few points lower, and the bars never leave
+/// 0..=100 however long the pet stays out.
+#[test]
+fn a_summoned_pets_bars_fall_visibly_within_three_minutes_and_stay_in_range() {
+    let (mut service, pet) = dog();
+    let mut fixture = kit();
+    let start = service.pet(pet).unwrap().needs.food;
+    send(&mut service, &mut fixture, &summon(pet), 1_000);
+    let (mut last, mut sent) = ([start; 4], 0);
+    for step in 1..=180u64 {
+        let wire = service.care_tick(&mut fixture.inventory, 1_000 + step * 1_000);
+        for status in statuses(&wire.private) {
+            last = bars(status);
+            sent += 1;
+        }
+    }
+    assert!(sent >= 5, "the bars are refreshed as they fall: {sent}");
+    for (name, now) in ["food", "groom", "play", "mood"].into_iter().zip(last) {
+        assert!(
+            start - now >= 5.0,
+            "{name} fell {start} -> {now} in 3 minutes"
+        );
+    }
+    // Two hours later every bar is empty, not negative.
+    let wire = service.care_tick(&mut fixture.inventory, 1_000 + 7_200_000);
+    assert_eq!(bars(statuses(&wire.private)[0]), [0.0; 4]);
 }

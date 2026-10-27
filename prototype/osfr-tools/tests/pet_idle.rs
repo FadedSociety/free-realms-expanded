@@ -28,8 +28,8 @@ use pet_inventory::InventoryFixture;
 use pet_wire::{perform_trick, summon, water};
 use serde_json::{Value, json};
 
-/// 6,000 s after adoption: the same base the other pet suites use.
-const START: u64 = 6_000_000;
+/// 1,000 s after adoption: the same base the other pet suites use.
+const START: u64 = 1_000_000;
 /// The world tick, in ms.
 const TICK: u64 = 500;
 /// The follow rule's stillness before a pet walks to its settle spot (`follow.settle_delay_ms`).

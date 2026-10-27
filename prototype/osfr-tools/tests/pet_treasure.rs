@@ -45,7 +45,7 @@ use std::{
     path::Path,
 };
 
-/// One second after the dog's adoption: every need is still about 100, so its mood is high.
+/// One second after the dog's adoption: every need is still at its starting level (60, above the 25 mood threshold).
 const START: u64 = 1_000;
 /// 8,000 s after adoption: the idle decay (0.01 per second) has taken every need down to 20.
 const SAD_START: u64 = 8_000_000;
@@ -448,8 +448,9 @@ fn a_pet_with_a_low_mood_a_vanity_pet_and_a_busy_one_never_dig() {
 #[test]
 fn the_mood_threshold_and_the_find_chance_are_live_data() {
     for seed in SEEDS {
-        // Mood starts at 99.99 and falls 0.02 per second: a threshold of 95 holds for four minutes,
-        // one of 100 never.
+        // Mood starts at the shipped starting level and falls while summoned: a threshold a few
+        // points under it holds for the first minute, one at the starting level never.
+        let start = pets_json()["need_policy"]["initial"].as_f64().unwrap();
         let digs_at = |min_mood: f64| {
             Dig::on(
                 tuned(|treasure| treasure["min_mood"] = json!(min_mood)),
@@ -458,8 +459,8 @@ fn the_mood_threshold_and_the_find_chance_are_live_data() {
             .until_chest(5 * 60_000)
             .is_some()
         };
-        assert!(digs_at(95.0), "seed {seed}");
-        assert!(!digs_at(100.0), "seed {seed}");
+        assert!(digs_at(start - 5.0), "seed {seed}");
+        assert!(!digs_at(start), "seed {seed}");
     }
     // A find chance under 1 makes a roll fail now and then and wait again; the pet still digs (this
     // pet never lies down, which would end a hunt).

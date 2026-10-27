@@ -3085,10 +3085,11 @@
   "need_policy": {
     "source": {
       "kind": "reconstructed",
-      "evidence": "Need range and rates are reconstructed server policy (R); client defines food, groom, play and mood fields but no decay table."
+      "evidence": "Need range, starting level and rates are reconstructed server policy (R); client defines food, groom, play and mood fields but no decay table. T812: a pet starts at 60 so a first groom or feed has room, and a summoned pet loses 0.04 a second (2.4 a minute) so a bar visibly falls within a few minutes of play."
     },
     "idle_decay_per_second": 0.01,
-    "summoned_decay_per_second": 0.02,
+    "summoned_decay_per_second": 0.04,
+    "initial": 60,
     "maximum": 100
   },
   "movement_speed": {

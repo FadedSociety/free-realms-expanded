@@ -22,8 +22,8 @@ use pet_wire::{feed, groom, summon, summon_by_item, tactile, water};
 use serde_json::Value;
 use std::path::Path;
 
-/// 6,000 s after adoption: idle decay has taken the needs from 100 to 40, so a brushing has room.
-const START: u64 = 6_000_000;
+/// 1,000 s after adoption: idle decay has taken the needs from 60 to 50, so a brushing has room.
+const START: u64 = 1_000_000;
 /// The CRAB item (a vanity Pet Pal, T454).
 const CRAB_ITEM: i32 = 7885;
 /// Brisk strokes: 300 ms and a movement sum of 15,000 is a speed of 50, the most one message may claim.
@@ -177,6 +177,8 @@ fn strokes_raise_groom_and_a_full_bar_ends_the_session_with_status_dry_off_and_k
     }
     let wire = ended.expect("the bar fills before the time runs out");
     assert!(at - start < number("seconds") as u64 * 1_000);
+    // T812: a new pet is not already near full, so a groom is real scrubbing, not a few strokes.
+    assert!(at - start >= 10_000, "{} ms", at - start);
     let dry_off = animation_packet(
         PetService::pet_guid(OWNER),
         number("dry_off_animation") as i32,
@@ -192,6 +194,8 @@ fn strokes_raise_groom_and_a_full_bar_ends_the_session_with_status_dry_off_and_k
     assert_eq!(wire.private[2], notify(pet, 4, 0));
     assert_eq!(wire.shared, vec![dry_off], "viewers see the dry-off too");
     assert!(wire.changed);
+    // T812: the session did not just stop; the owner is told it finished.
+    assert!(wire.notice.is_some_and(|text| !text.is_empty()));
     assert_eq!(groom_need(&service, pet), 100.0);
 
     // The session is over: later strokes only unlock a stale client mode and add nothing.
@@ -223,6 +227,7 @@ fn a_timeout_ends_the_session_with_kind_4() {
     assert_eq!(ended.private[2], notify(pet, 4, 0));
     assert_eq!(ended.shared.len(), 1, "the dry-off reaches the viewers");
     assert!(ended.changed, "the gains so far are saved");
+    assert!(ended.notice.is_none(), "only a full bar claims a clean pet");
 
     // No further gain, and the end is sent once.
     let roster = service.document_value();
@@ -293,13 +298,16 @@ fn every_groom_refusal_sends_kind_6_and_changes_nothing() {
     assert_eq!(service.document_value(), roster);
     assert_eq!(fixture.inventory.state(), &bag);
 
-    // (R) A pet already at the maximum is not shampooed: nothing is wasted. Adopted at time 0, it
-    // has not decayed yet.
+    // (R) A pet already at the maximum is not shampooed: nothing is wasted. A new pet starts
+    // below it (T812), so its saved groom bar is filled and the roster reloaded; no time passes.
     let (mut service, pet) = dog();
     let mut fixture = kit();
     for (slot, item) in [(1, SHAMPOO_ITEM), (4, BRUSH_ITEM)] {
         send(&mut service, &mut fixture, &fit(pet, slot, item), 0);
     }
+    let mut document = service.document_value().unwrap();
+    document["pets"][0]["needs"]["groom"] = 100.0.into();
+    service = PetService::from_document(PetContent::bundled().unwrap(), Some(document)).unwrap();
     send(&mut service, &mut fixture, &summon(pet), 0);
     let (roster, bag) = (service.document_value(), fixture.inventory.state().clone());
     let clean = send(&mut service, &mut fixture, &groom(pet), 0);
