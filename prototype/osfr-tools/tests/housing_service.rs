@@ -918,6 +918,17 @@ fn fixture_asset_request_resolves_only_a_bound_owned_selection() {
     assert_eq!(asset.definition.id, BLOCK_FIXTURE);
     assert_eq!(asset.definition.item_definition_id, BLOCK_ITEM);
     assert_eq!(asset.definition.model_id, BLOCK_MODEL);
+    // T783: the client's validity check (`sub_ABB630` `0x00ABB6AD`) needs placement type 1, 0xE
+    // or 0xF, or no preview is ever valid and no 127/2 is sent; retail sent 1.
+    assert_eq!(asset.definition.unknown3, 1, "placement type");
+    assert_eq!(
+        asset.definition.flags,
+        [false, false, false, true, false, false]
+    );
+    assert_eq!(
+        (asset.definition.unknown14, asset.definition.unknown15),
+        (1.0, 1.0)
+    );
     assert_eq!(
         stock.instances.len(),
         1,

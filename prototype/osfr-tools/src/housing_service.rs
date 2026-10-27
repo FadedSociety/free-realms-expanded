@@ -2301,19 +2301,23 @@ impl HousingService {
     }
 }
 
+/// T783: `unknown3` is the placement type. The client's per-frame validity check (`sub_ABB630`,
+/// `0x00ABB6AD`) gives up unless it is 1, 0xE or 0xF, which left every preview invalid ("That
+/// fixture can not be placed there.", `sub_AC8940` `0x00AC899E`) and sent no 127/2. All 18
+/// captured retail definitions carry 1, flag 3 set and both scales 1.0.
 fn fixture_definition_from_row(row: &FixtureConfigRow) -> FixtureDefinition {
     FixtureDefinition {
         id: row.fixture_definition_id,
         item_definition_id: row.item_definition_id,
-        unknown3: 0,
+        unknown3: 1,
         model_id: row.model_id,
-        flags: [false; 6],
+        flags: [false, false, false, true, false, false],
         category: row.category.clone(),
         lua_call: row.lua_call.clone(),
         actions: Vec::new(),
         composite_effect_id: 0,
-        unknown14: 0.0,
-        unknown15: 0.0,
+        unknown14: 1.0,
+        unknown15: 1.0,
         flags2: [false; 4],
     }
 }
