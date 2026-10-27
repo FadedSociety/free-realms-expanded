@@ -44,7 +44,7 @@ pub struct PetAnimation {
 }
 
 impl PetAnimation {
-    fn valid(&self) -> bool {
+    pub(super) fn valid(&self) -> bool {
         self.animation_id > 0 && (1..=MAX_ANIMATION_MS).contains(&self.duration_ms)
     }
 }
@@ -247,6 +247,11 @@ impl IdleState {
     /// "out" with no water before) does not.
     pub(super) fn water(&mut self, was_in_water: bool, in_water: bool) {
         self.dry_off = (was_in_water || self.dry_off) && !in_water;
+    }
+
+    /// The pet lies in a rest posture (T533: it does not hunt until it stands again).
+    pub(super) fn resting(&self) -> bool {
+        self.rest.is_some()
     }
 
     /// Something is due, so the model's rows are worth a look.

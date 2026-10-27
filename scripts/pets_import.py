@@ -12,6 +12,8 @@ Client evidence wins: an item whose model is not in Models.txt, or whose name id
 T531: each model's `idle` object (idle, bathroom and rest animations; Pets.json IdleAnimations, BathroomAnimations,
 RestPostures) is checked the same way as the trick animations, and a model gets a `shake_off` row when its ADR declares
 the client slot `pet_dry_off` (20 of the 21 dog ADRs and all 4 cat ADRs do; no other pet ADR does).
+T533: a model gets `"digs": true` when its ADR declares both `pet_sniff` and `pet_digging` (16 of the 152 ADRs in the
+lab do), so only those pets play the treasure-hunt animations. The top-level `treasure` block is hand-kept and survives.
 (R) Two client item rows name a model Models.txt does not spell the same way: firefly.adr has two client ids and
 no Pets.json row (the lower id is used), and Candy Corn's vanitypet_candycorn_critter.adr names the candycorn
 critter by its item TextureAlias (candycorn-critter -> candycorn_critter.adr, which Models.txt row 1530
@@ -105,6 +107,14 @@ def trick_animation_rows(row, model_id, adr, slots, adr_paths, dropped):
 # cat; the longer one serves both, since no client table holds the run time.
 SHAKE_OFF_MS = 1400
 DRY_OFF_SLOT = "pet_dry_off"
+# T533: the two pet slots the treasure hunt plays (AnimationTypes.xml 5520 and 5525).
+DIG_SLOTS = {"pet_sniff", "pet_digging"}
+
+
+def digs(adr, adr_paths):
+    """T533: the model's ADR declares both hunt slots (False when the ADR is not in the lab: unchecked, so no animation)."""
+    names = adr_slot_names(adr, adr_paths)
+    return names is not None and DIG_SLOTS <= names
 
 
 def idle_set(row, model_id, adr, slots, adr_paths, dropped):
@@ -232,10 +242,12 @@ def main():
                                         for c in row.get("ItemClasses") or []],
                        **({"trick_animations": animations} if animations else {}),
                        **({"idle": idle} if idle else {}),
+                       **({"digs": True} if digs(adr, adr_paths) else {}),
                        "src": f"Pets.json Id={mid}; Models.txt {mid}"}
     for adr, mid in EXTRA_MODELS.items():
         if mid not in models and client_models.get(mid, ("",))[0] == adr:
             models[mid] = {"model_id": mid, "adr": adr, "src": f"Models.txt {mid}",
+                           **({"digs": True} if digs(adr, adr_paths) else {}),
                            "unknown_reasons": {"pet_row": "(R) Pets.json has no row for this model; a bound ADR "
                                                           "or a Type-2 item needs it, so it keeps model_id and "
                                                           "adr only"}}
@@ -274,6 +286,7 @@ def main():
                       "dropped_trick_animations": dropped_animations,
                       "idle_models": sum(1 for m in models.values() if "idle" in m),
                       "shake_off_models": sum(1 for m in models.values() if "shake_off" in m.get("idle", {})),
+                      "digging_models": sum(1 for m in models.values() if m.get("digs")),
                       "dropped_idle_animations": dropped_idle}))
 
 

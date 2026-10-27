@@ -854,10 +854,16 @@ fn a_pet_idles_and_shows_bubbles_through_gameplay_for_the_owner_and_the_viewers(
     for _ in 0..(45_000 / TICK) {
         at += TICK;
         let out = game.pet_tick(&who, at).expect("a pet is out");
-        assert!(!out.changed, "idle visuals save nothing");
+        // T533: a settled dog also hunts (sniff 5520, dig 5525), and its find saves the cooldown.
+        let found = out.replies.iter().any(|p| p.starts_with(&[35, 0, 2, 0]));
+        assert!(!out.changed || found, "idle visuals save nothing");
         assert_eq!(visual(&out.replies), visual(&out.nearby));
         for play in plays(&out.nearby, actor) {
-            assert!(idle.contains(&play.animation) || bathroom.contains(&play.animation));
+            assert!(
+                idle.contains(&play.animation)
+                    || bathroom.contains(&play.animation)
+                    || [5520, 5525].contains(&play.animation)
+            );
             animated = true;
         }
         for bubble in bubbles(&out.nearby, actor) {

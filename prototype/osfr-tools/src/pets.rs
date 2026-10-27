@@ -17,7 +17,10 @@ use std::{
 
 mod grooming;
 mod idle;
+mod treasure;
 mod tricks;
+
+pub use treasure::TreasureRefusal;
 
 const PET_FAMILY: u16 = 53;
 /// (R) Hard ceiling on a saved roster; the client can display a bounded list.
@@ -84,6 +87,9 @@ pub struct PetContent {
     /// T485: care timings and the live-needs refresh; without it feeding is refused.
     #[serde(default)]
     care: Option<CareTiming>,
+    /// T533: the pet treasure hunt, its chests and its reward tables; without it a pet never digs.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    treasure: Option<treasure::TreasureConfig>,
 }
 
 /// T485: when a feed applies and ends after its 53/20 begin, and how often live 53/3 needs go
@@ -157,6 +163,10 @@ pub struct PetModel {
     /// T531: the model's idle, bathroom and rest animations and its shake-off.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub idle: Option<idle::PetIdleSet>,
+    /// T533: the model's ADR declares `pet_sniff` and `pet_digging`, so its pet plays the hunt
+    /// animations (the importer checks it); any other pet hunts without them.
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub digs: bool,
     src: String,
     #[serde(default)]
     unknown_reasons: BTreeMap<String, String>,
@@ -577,6 +587,13 @@ impl PetContent {
         if self.care.as_ref().is_some_and(|care| !care.valid()) {
             return Err(invalid("invalid pet care content"));
         }
+        if self
+            .treasure
+            .as_ref()
+            .is_some_and(|treasure| !treasure.valid())
+        {
+            return Err(invalid("invalid pet treasure content"));
+        }
         let mut model_ids = BTreeSet::new();
         for model in &self.models {
             if model.model_id <= 0
@@ -708,6 +725,10 @@ pub struct Pet {
     /// the save when unset, so an older roster round-trips byte for byte (l043 admin move).
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub tint: Option<i32>,
+    /// T533: when this pet last unearthed a treasure chest (Unix seconds, the wall clock, not the
+    /// session clock, so the cooldown survives a restart). Left out of the save until it digs.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub treasure_found_at: Option<u64>,
     updated_at: u64,
 }
 
@@ -1035,12 +1056,19 @@ struct ActivePet {
     trick: tricks::TrickState,
     /// T531: idle animations, rest posture, shake-off and thought-bubble timers (session only).
     idle: idle::IdleState,
+    /// T533: where the pet is in its treasure hunt (session only).
+    treasure: treasure::Hunt,
 }
 
 impl ActivePet {
-    /// A feed, a grooming session or a trick is running: no other care action may start.
-    fn interacting(&self) -> bool {
+    /// A feed, a grooming session or a trick is running.
+    fn caring(&self) -> bool {
         self.feeding.is_some() || self.grooming.is_some() || self.trick.running()
+    }
+
+    /// Care, or (T533) a sniff or a dig: no other care action may start.
+    fn interacting(&self) -> bool {
+        self.caring() || self.treasure.working()
     }
 }
 
@@ -1064,6 +1092,8 @@ pub struct PetService {
     remembered: Option<u32>,
     /// T531: seeds the idle choices of the next summon (`set_idle_seed`).
     idle_seed: u64,
+    /// T533: the treasure generator and the live chest (session only).
+    treasure: treasure::State,
 }
 
 impl PetService {
@@ -1080,6 +1110,7 @@ impl PetService {
             ui_mode: 0,
             remembered: None,
             idle_seed: IDLE_SEED,
+            treasure: treasure::State::new(),
         })
     }
 
@@ -1094,6 +1125,7 @@ impl PetService {
             ui_mode: 0,
             remembered: None,
             idle_seed: IDLE_SEED,
+            treasure: treasure::State::new(),
         })
     }
 
@@ -1201,6 +1233,8 @@ impl PetService {
         self.active = None;
         self.ui_mode = 0;
         self.remembered = None;
+        // T533: a chest belongs to one connection; the pet's cooldown stays in the roster.
+        self.clear_treasure();
     }
 
     /// A save may carry a later monotonic clock than a restarted server. Needs
@@ -1451,6 +1485,7 @@ impl PetService {
             petted_ms: None,
             trick: tricks::TrickState::Idle,
             idle: idle::IdleState::new(self.idle_seed ^ owner_guid.rotate_left(32) ^ now),
+            treasure: treasure::Hunt::default(),
         });
         let model_id = self.content.model_id(&model);
         broadcasts.push(PetPresenceEvent::Spawn(PetPresence {
@@ -2420,6 +2455,7 @@ fn insert_pet(
         equipment: PetEquipment::default(),
         adoption_item_definition_id: definition.adoption_item_definition_id,
         tint: None,
+        treasure_found_at: None,
         updated_at: now,
     });
     Ok(id)

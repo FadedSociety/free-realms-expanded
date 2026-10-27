@@ -3,6 +3,16 @@
 use super::*;
 use crate::item_bar::use_wire;
 
+mod pet_treasure;
+
+/// The terrain height under (x, z) in `zone`: the pet's follow step and its chest stand on it.
+fn terrain_height(
+    terrain: Option<std::sync::Arc<crate::terrain::Terrain>>,
+    zone: u32,
+) -> impl Fn(f32, f32) -> Option<f32> {
+    move |x, z| terrain.as_ref()?.height_at(zone, x, z)
+}
+
 impl Gameplay {
     /// World entry (T424): the pet roster and the owned-ride roster (168/5). The ride roster is
     /// always sent, so a character without rides gets count 0, which also replaces the captured
@@ -330,9 +340,7 @@ impl Gameplay {
         if self.pets.active_pet_id().is_none() && !self.resummon_pet(character, now_ms, out) {
             return;
         }
-        let zone = character.zone_id;
-        let terrain = self.terrain.clone();
-        let ground = move |x: f32, z: f32| terrain.as_ref()?.height_at(zone, x, z);
+        let ground = terrain_height(self.terrain.clone(), character.zone_id);
         let wire = self
             .pets
             .follow_owner(character.guid, character.position, ground, now_ms);
@@ -343,24 +351,38 @@ impl Gameplay {
     /// T455: the world tick for a summoned pet (a still owner settles it); `None` without one.
     /// T485: also its care timers and live needs; only a feed's apply step marks a save.
     /// T487: the first tick after a race or battle ends is also where a remembered pet returns
-    /// (`follow_pet` covers both cases), so `None` means there is still nothing to send.
+    /// (`follow_pet` covers both cases). T533: and its treasure hunt, which also runs for a chest
+    /// still waiting after its pet is gone; a find marks the save (the cooldown). `None` means
+    /// there is still nothing to send.
     pub fn pet_tick(&mut self, character: &CharacterState, now_ms: u64) -> Option<Outcome> {
         let mut out = Outcome::default();
         self.follow_pet(character, now_ms, &mut out);
-        self.pets.active_pet_id()?;
-        let care = self.pets.care_tick(&mut self.inventory, now_ms);
-        out.changed |= care.changed;
-        out.replies.extend(care.private);
-        // T488: a grooming session that times out plays its dry-off animation for the viewers.
-        out.nearby.extend(care.shared);
+        if self.pets.active_pet_id().is_some() {
+            let care = self.pets.care_tick(&mut self.inventory, now_ms);
+            out.changed |= care.changed;
+            out.replies.extend(care.private);
+            // T488: a grooming session that times out plays its dry-off animation for the viewers.
+            out.nearby.extend(care.shared);
+        } else if !self.pets.has_treasure() {
+            return None;
+        }
+        self.tick_pet_treasure(character, now_ms, &mut out);
         Some(out)
     }
 
     /// W177 (R): a pet does not zone with its owner; T487 remembers it so the destination's
     /// loaded signal (`enter_world`) or the first update there can summon it again.
     pub fn settle_pets(&mut self, zoned: bool, now_ms: u64) -> io::Result<Outcome> {
-        if !zoned || self.pets.active_pet_id().is_none() {
+        if !zoned {
             return Ok(Outcome::default());
+        }
+        // T533: the chest does not zone either; the cooldown it started stays.
+        let chest = self.pets.clear_treasure();
+        if self.pets.active_pet_id().is_none() {
+            return Ok(Outcome {
+                replies: chest,
+                ..Outcome::default()
+            });
         }
         let mut pets = self.pets.clone();
         let care_end = pets.care_end_packets();
@@ -369,6 +391,7 @@ impl Gameplay {
         self.pets = pets;
         let mut out = Self::pet_outcome(self.pets.wire(transition));
         out.replies.extend(care_end);
+        out.replies.splice(0..0, chest);
         Ok(out)
     }
 }

@@ -32275,6 +32275,7 @@
         },
         "src": "Pets.json Id=169 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_large_floppy.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=169; Models.txt 169"
     },
     {
@@ -32575,6 +32576,7 @@
         },
         "src": "Pets.json Id=170 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_large_pointy.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=170; Models.txt 170"
     },
     {
@@ -32875,6 +32877,7 @@
         },
         "src": "Pets.json Id=171 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_large_shortears.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=171; Models.txt 171"
     },
     {
@@ -33175,6 +33178,7 @@
         },
         "src": "Pets.json Id=172 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_small_floppy.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=172; Models.txt 172"
     },
     {
@@ -33475,6 +33479,7 @@
         },
         "src": "Pets.json Id=173 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_small_pointy.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=173; Models.txt 173"
     },
     {
@@ -34285,6 +34290,7 @@
         },
         "src": "Pets.json Id=364 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_small_fluffy.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=364; Models.txt 364"
     },
     {
@@ -35129,6 +35135,7 @@
         },
         "src": "Pets.json Id=514 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_large_dalmation.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=514; Models.txt 514"
     },
     {
@@ -35429,6 +35436,7 @@
         },
         "src": "Pets.json Id=515 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_large_lab.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=515; Models.txt 515"
     },
     {
@@ -36770,6 +36778,7 @@
         },
         "src": "Pets.json Id=941 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_small_pug.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=941; Models.txt 941"
     },
     {
@@ -37124,6 +37133,7 @@
         },
         "src": "Pets.json Id=972 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_large_floppy.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=972; Models.txt 972"
     },
     {
@@ -37424,6 +37434,7 @@
         },
         "src": "Pets.json Id=977 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_large_dalmation.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=977; Models.txt 977"
     },
     {
@@ -37724,6 +37735,7 @@
         },
         "src": "Pets.json Id=980 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_small_fluffy.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=980; Models.txt 980"
     },
     {
@@ -38024,6 +38036,7 @@
         },
         "src": "Pets.json Id=981 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_large_floppy.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=981; Models.txt 981"
     },
     {
@@ -39394,6 +39407,7 @@
         },
         "src": "Pets.json Id=1018 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_large_pointyghost.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=1018; Models.txt 1018"
     },
     {
@@ -39694,6 +39708,7 @@
         },
         "src": "Pets.json Id=1022 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_small_fluffyghost.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=1022; Models.txt 1022"
     },
     {
@@ -40086,6 +40101,7 @@
         },
         "src": "Pets.json Id=1035 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_large_pointyghost.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=1035; Models.txt 1035"
     },
     {
@@ -40386,6 +40402,7 @@
         },
         "src": "Pets.json Id=1406 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_large_doberman.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=1406; Models.txt 1406"
     },
     {
@@ -40686,6 +40703,7 @@
         },
         "src": "Pets.json Id=1454 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_large_husky.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=1454; Models.txt 1454"
     },
     {
@@ -41766,6 +41784,7 @@
         },
         "src": "Pets.json Id=1693 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_small_pugmummy.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=1693; Models.txt 1693"
     },
     {
@@ -45919,6 +45938,7 @@
         },
         "src": "Pets.json Id=3793 IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot names; ADR dog_large_dukey.adr declares every slot; shake_off is the pet_dry_off slot its ADR declares, run time (R)"
       },
+      "digs": true,
       "src": "Pets.json Id=3793; Models.txt 3793"
     },
     {
@@ -46290,6 +46310,7 @@
       "model_id": 4109,
       "adr": "dog_large_stbernard.adr",
       "src": "Models.txt 4109",
+      "digs": true,
       "unknown_reasons": {
         "pet_row": "(R) Pets.json has no row for this model; a bound ADR or a Type-2 item needs it, so it keeps model_id and adr only"
       }
@@ -52901,6 +52922,175 @@
     "source": {
       "kind": "reconstructed",
       "evidence": "T485: feed apply and end delays after 53/20 begin, and the live 53/3 refresh gap and threshold, are server policy (R); the client sends 53/19 and waits for 53/20 kinds 1, 2 or 6 (00b5ce60)"
+    }
+  },
+  "treasure": {
+    "min_mood": 25.0,
+    "find_min_ms": 15000,
+    "find_max_ms": 50000,
+    "find_chance": 1.0,
+    "cooldown_ms": 28800000,
+    "lifetime_ms": 60000,
+    "chest_model_id": 151,
+    "spawn_distance": 2.0,
+    "open_range": 5.0,
+    "sniff": {
+      "animation_id": 5520,
+      "duration_ms": 3000
+    },
+    "dig": {
+      "animation_id": 5525,
+      "duration_ms": 4000
+    },
+    "tiers": [
+      {
+        "key": "common",
+        "weight": 80,
+        "name_id": 140227,
+        "texture_alias": "Default1",
+        "coins": 15,
+        "items": [
+          {
+            "definition_id": 1835,
+            "count": 1,
+            "weight": 3
+          },
+          {
+            "definition_id": 1836,
+            "count": 1,
+            "weight": 3
+          },
+          {
+            "definition_id": 3146,
+            "count": 1,
+            "weight": 1
+          },
+          {
+            "definition_id": 3147,
+            "count": 1,
+            "weight": 1
+          },
+          {
+            "definition_id": 3148,
+            "count": 1,
+            "weight": 1
+          },
+          {
+            "definition_id": 3149,
+            "count": 1,
+            "weight": 1
+          },
+          {
+            "definition_id": 3150,
+            "count": 1,
+            "weight": 1
+          },
+          {
+            "definition_id": 3151,
+            "count": 1,
+            "weight": 1
+          },
+          {
+            "definition_id": 3152,
+            "count": 1,
+            "weight": 1
+          },
+          {
+            "definition_id": 3153,
+            "count": 1,
+            "weight": 1
+          }
+        ]
+      },
+      {
+        "key": "rare",
+        "weight": 18,
+        "name_id": 140234,
+        "texture_alias": "Default2",
+        "coins": 250,
+        "items": [
+          {
+            "definition_id": 17107,
+            "count": 1,
+            "weight": 1
+          },
+          {
+            "definition_id": 15482,
+            "count": 1,
+            "weight": 1
+          },
+          {
+            "definition_id": 14954,
+            "count": 1,
+            "weight": 2
+          }
+        ]
+      },
+      {
+        "key": "elite",
+        "weight": 2,
+        "name_id": 140235,
+        "texture_alias": "Default3",
+        "coins": 500,
+        "items": [
+          {
+            "definition_id": 17107,
+            "count": 1,
+            "weight": 1
+          },
+          {
+            "definition_id": 15482,
+            "count": 1,
+            "weight": 1
+          },
+          {
+            "definition_id": 14954,
+            "count": 1,
+            "weight": 1
+          }
+        ]
+      }
+    ],
+    "bonus": {
+      "chance": 0.1,
+      "items": [
+        23427,
+        23428,
+        23429,
+        23430,
+        23431,
+        23432,
+        23433,
+        23434,
+        23435,
+        23436,
+        23437,
+        23438,
+        23439,
+        23440,
+        23441,
+        23442,
+        23443,
+        23444,
+        23445,
+        23446,
+        23447,
+        23448,
+        23449,
+        23450,
+        23451,
+        23452,
+        23453,
+        23454,
+        23455,
+        23456,
+        23457,
+        23458
+      ]
+    },
+    "source": {
+      "kind": "reconstructed",
+      "evidence": "T533: every number and reward row is server policy (R); the starting values are OSFR PR 152's pet treasure (read for behaviour and data only, no code copied): mood 25, a find after 15 to 50 s, an 8 h cooldown per pet, chest model 151 with tier weights 80/18/2, a 60 s lifetime, a chest 2 m from the pet, an open range of 5, a 4 s dig, coins 15/250/500 per tier, the tier item tables, and a 10% chance of one Treasure Spring item (23427 to 23458) in place of the tier item. Tune any of them here. Client facts: Models.txt 151 sg_treasure_chest_01.adr, whose ADR declares the texture aliases Default1 to Default3 (one per tier) and no open animation; locale 140227, 140234 and 140235 name the three tiers; AnimationTypes.xml 5520 pet_sniff and 5525 pet_digging are pet animation slots (5525 is also the PLAYER_DRAW_EFFECT id in PetTrickGestureSettings.txt, an effect, not this animation); only the 21 models marked digs declare both slots. A click on the chest is 26/8 (ctor 008b6bc0). The sniff run time is a first choice (R). find_chance is the number a treasure-hunting vitamin would raise (out of scope). Every reward item is in the shipped item catalogue."
     }
   }
 }
