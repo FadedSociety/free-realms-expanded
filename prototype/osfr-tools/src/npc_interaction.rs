@@ -65,12 +65,17 @@ const MAX_MERCHANT_STRING_BYTES: usize = 64 * 1024;
 const MAX_QUEST_BUNDLE_BYTES: usize = 1024 * 1024;
 
 /// (R) 26/6 response ids of a greeter's explainer rows (T773). 300 is the Goodbye row and
-/// 301 the quest-offer row, so the free ids start above both; the client echoes dword 1 of
-/// the clicked 26/3 row (`009f5890`).
+/// 301 the quest-offer row, so the free ids start above both; the client stores the clicked
+/// row's dword 1 and echoes it (`009f6aa0` reads `this+4+index`).
 pub const EXPLAIN_CHOICE_RESPONSE_BASE: i32 = 310;
-/// Five response buttons exist in the client dialog window (`wndDialog.xml` btn0..btn4), so
-/// four pages fit beside the Goodbye row; a quest offer's row replaces the pages instead.
+/// (R) Content bound on a greeter's pages: a dialog without a quest row has five response
+/// buttons (`wndDialog.xml` btn0..btn4), one of them Goodbye, so four pages fit.
 pub const MAX_EXPLAIN_TOPICS: usize = 4;
+/// The client dialog window has five response buttons (`wndDialog.xml` btn0..btn4) and
+/// `009f5ae0` stops filling them after five. Every 26/3 row budget is measured against it.
+const MAX_DIALOGUE_CHOICES: usize = 5;
+/// (R) The Goodbye row's response id; 300 is the close row the client echoes in 26/6.
+pub const GOODBYE_CHOICE_RESPONSE: i32 = 300;
 
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum NpcAction {
@@ -135,6 +140,20 @@ pub struct ExplainTopic {
     pub label_string_id: u32,
     /// `Global.Text` id of the body shown when the row is chosen.
     pub body_string_id: u32,
+}
+
+/// One greeter page the open dialogue offered: the body to show and the exact 26/3 rows
+/// to re-send, so a replay cannot invent or drop a row.
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub(crate) struct DialoguePage {
+    /// The content NPC key, for the trace event.
+    pub(crate) content_key: u64,
+    /// The runtime actor the Talk named; the replay's dialog camera target.
+    pub(crate) runtime_guid: u64,
+    /// `Global.Text` id of the page body the client shows.
+    pub(crate) body_string_id: u32,
+    /// The rows the client already has, in wire order.
+    pub(crate) rows: Vec<[u32; 5]>,
 }
 
 #[derive(Clone, Debug, Default, Eq, PartialEq)]
@@ -262,9 +281,21 @@ struct ActiveInteraction {
     npc_id: u64,
     options: Vec<InteractionOption>,
     shop_open: bool,
-    /// (R) The explainer rows this dialogue offered, so a 26/6 can only re-read a page the
-    /// server sent. Cleared with the interaction.
-    topics: Vec<ExplainTopic>,
+    /// (R) The 26/3 this Talk actually sent, so a 26/6 can only replay what the client was
+    /// shown. Cleared with the interaction.
+    dialogue: Option<OpenDialogue>,
+}
+
+/// The rows one Talk 26/3 carried and the page body behind each explainer row.
+#[derive(Clone)]
+struct OpenDialogue {
+    /// The runtime actor the Talk named. The client clicked that actor, so the replay's
+    /// dialog camera target must stay on it even when it differs from the content key.
+    runtime_guid: u64,
+    /// The rows exactly as encoded, in wire order.
+    rows: Vec<[u32; 5]>,
+    /// The explainer rows among them, with the body each one opens.
+    pages: Vec<ExplainTopic>,
 }
 
 /// The loaded NPC, price and vendor-stock tables. Immutable after [`NpcInteraction::load`];
@@ -521,7 +552,7 @@ impl NpcInteraction {
             npc_id,
             options: options.clone(),
             shop_open: false,
-            topics: Vec::new(),
+            dialogue: None,
         });
         Ok(InteractionMenu {
             npc_id,
@@ -563,17 +594,9 @@ impl NpcInteraction {
             .ok_or(NpcInteractionError::InvalidOption)?
             .action
             .clone();
-        // (R) T773: remember the explainer rows this dialogue sends, so a later 26/6 can
-        // only re-open a page the server offered. Built before the mutable borrow below.
-        let context = (action == NpcAction::Talk).then(|| self.dialogue_context(npc));
-        if let (Some(context), Some(active)) = (&context, self.active.as_mut()) {
-            active.topics = context.explainer_topics.clone();
-        }
 
         match action {
-            NpcAction::Talk => Ok(NpcSelection::Talk(
-                context.expect("Talk builds its dialogue context"),
-            )),
+            NpcAction::Talk => Ok(NpcSelection::Talk(self.dialogue_context(npc))),
             NpcAction::Shop => {
                 if let Some(active) = self.active.as_mut() {
                     active.shop_open = true;
@@ -776,19 +799,42 @@ impl NpcInteraction {
         }
     }
 
-    /// (R) T773: the page for one explainer response id on the open dialogue. Read-only:
-    /// the id must be one this dialogue sent, so a hostile 26/6 can only re-read an offered
-    /// locale text, never a page, item or effect of its choosing.
-    pub fn explainer_page(&self, response_id: i32) -> Option<(u64, DialogueContext)> {
+    /// (R) T773: remember the 26/3 a Talk actually sent: its exact rows and the page body
+    /// behind each explainer row. A later Talk replaces them and closing the interaction
+    /// clears them, so a 26/6 can only replay what the client was shown.
+    pub(crate) fn record_dialogue(
+        &mut self,
+        runtime_guid: u64,
+        rows: Vec<[u32; 5]>,
+        pages: Vec<ExplainTopic>,
+    ) {
+        if let Some(active) = self.active.as_mut() {
+            active.dialogue = Some(OpenDialogue {
+                runtime_guid,
+                rows,
+                pages,
+            });
+        }
+    }
+
+    /// (R) T773: the page for one explainer response id on the open dialogue, with the
+    /// exact rows the client was shown. Read-only: the id must be one this dialogue sent,
+    /// so a hostile 26/6 can only re-read an offered locale text, never a page, item or
+    /// effect of its choosing. Replaying the stored rows keeps the dialog's quest row and
+    /// its old labels stable even if the content reloads.
+    pub(crate) fn explainer_page(&self, response_id: i32) -> Option<DialoguePage> {
         let active = self.active.as_ref()?;
-        let topic = active
-            .topics
+        let dialogue = active.dialogue.as_ref()?;
+        let topic = dialogue
+            .pages
             .iter()
             .find(|topic| topic.response_id == response_id)?;
-        let npc = self.content.npcs.get(&active.npc_id)?;
-        let mut context = self.dialogue_context(npc);
-        context.body_string_id = Some(topic.body_string_id);
-        Some((active.npc_id, context))
+        Some(DialoguePage {
+            content_key: active.npc_id,
+            runtime_guid: dialogue.runtime_guid,
+            body_string_id: topic.body_string_id,
+            rows: dialogue.rows.clone(),
+        })
     }
 
     /// End the offered menu once its choice committed. Refused choices keep it
@@ -1179,7 +1225,7 @@ pub fn decode_dialogue_26_3(packet: &[u8]) -> Result<DialoguePacket26_3, NpcInte
     let initial_flag = cursor.boolean()?;
     let initial_float_bits = cursor.u32()?;
     let count = cursor.u32()? as usize;
-    if count > 5 || packet.len() != 93 + count * 20 {
+    if count > MAX_DIALOGUE_CHOICES || packet.len() != 93 + count * 20 {
         return Err(NpcInteractionError::InvalidPacket);
     }
     let mut choices = Vec::with_capacity(count);
@@ -1209,7 +1255,9 @@ pub fn decode_dialogue_26_3(packet: &[u8]) -> Result<DialoguePacket26_3, NpcInte
     })
 }
 
-/// Client selection response: reader `009f5890` stores one i32 (R dialog index).
+/// Client 26/6 dialogue response: one i32, the clicked row's stored id (the row's dword 1;
+/// `009f6aa0` reads it from the dialog's `this+4+index` table and sends it). The quest row
+/// was also captured as index 0, so the router accepts that form for it (R).
 pub fn decode_dialogue_response_26_6(packet: &[u8]) -> Result<i32, NpcInteractionError> {
     if packet.len() != 8 || packet[..4] != [26, 0, 6, 0] {
         return Err(NpcInteractionError::InvalidPacket);
@@ -1228,23 +1276,50 @@ pub fn encode_dialogue_close_26_4() -> Vec<u8> {
 /// and image IDs. Lua `DialogTest` uses response background set 18. `300` and
 /// `17` remain reconstructed response/opaque fields (R); image ID 0 means no
 /// separate image, and locale row 8075 is "Goodbye".
+fn dialogue_choice(response_id: i32, label_string_id: u32) -> [u32; 5] {
+    [response_id as u32, 17, label_string_id, 0, 18]
+}
+
 /// (R) Response id for a dialog row that opens a quest offer.
 pub const QUEST_CHOICE_RESPONSE: i32 = 301;
 
 /// Dialog row that leads to a quest offer, labelled with the quest title.
-/// Same five-dword layout as [`goodbye_dialogue_choice`].
 pub fn quest_dialogue_choice(title_string_id: u32) -> [u32; 5] {
-    [QUEST_CHOICE_RESPONSE as u32, 17, title_string_id, 0, 18]
+    dialogue_choice(QUEST_CHOICE_RESPONSE, title_string_id)
 }
 
 pub fn goodbye_dialogue_choice() -> [u32; 5] {
-    [300, 17, GOODBYE_STRING_ID, 0, 18]
+    dialogue_choice(GOODBYE_CHOICE_RESPONSE, GOODBYE_STRING_ID)
 }
 
-/// (R) Dialog row that opens one greeter explainer page (T773); same five-dword layout as
-/// [`goodbye_dialogue_choice`], and the client echoes dword 1 in 26/6.
-pub fn explainer_dialogue_choice(topic: &ExplainTopic) -> [u32; 5] {
-    [topic.response_id as u32, 17, topic.label_string_id, 0, 18]
+/// (R) Dialog row that opens one greeter explainer page (T773), labelled with its own
+/// `Global.Text` id; the client echoes dword 1 in 26/6.
+pub fn explainer_dialogue_choice(response_id: i32, label_string_id: u32) -> [u32; 5] {
+    dialogue_choice(response_id, label_string_id)
+}
+
+/// The response rows one 26/3 carries: the quest row when the same Talk offers a quest,
+/// then as many explainer pages as the five-button window leaves room for, then Goodbye.
+/// Also returns the pages that got a row so the caller records exactly those.
+pub(crate) fn dialogue_rows(
+    context: &DialogueContext,
+    quest_choice: Option<[u32; 5]>,
+) -> (Vec<[u32; 5]>, Vec<ExplainTopic>) {
+    let room = MAX_DIALOGUE_CHOICES.saturating_sub(1 + usize::from(quest_choice.is_some()));
+    let pages: Vec<ExplainTopic> = context
+        .explainer_topics
+        .iter()
+        .take(room)
+        .cloned()
+        .collect();
+    let mut rows: Vec<[u32; 5]> = quest_choice.into_iter().collect();
+    rows.extend(
+        pages
+            .iter()
+            .map(|topic| explainer_dialogue_choice(topic.response_id, topic.label_string_id)),
+    );
+    rows.push(goodbye_dialogue_choice());
+    (rows, pages)
 }
 
 /// Client quest accept/decline: native `QuestReply` stores quest id and bool.

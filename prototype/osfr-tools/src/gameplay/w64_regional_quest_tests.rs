@@ -374,19 +374,24 @@ fn offer_chat(text: &str) -> Vec<u8> {
 }
 
 fn expected_samantha_dialogue() -> Vec<u8> {
-    // Quest choice row ("Introduce Yourself") first, then Goodbye. Dwords 2-3
-    // carry Samantha's GUID as the dialog camera target.
+    // Quest choice row ("Introduce Yourself") first, then the two T773 greeter pages
+    // (Cooking 386023, Harvesting 31023), then Goodbye; all five dwords pinned so the
+    // response-row layout stays client-exact. Dwords 2-3 carry Samantha's GUID as the
+    // dialog camera target.
     let mut packet = vec![26, 0, 3, 0];
     packet.extend(24_940_u32.to_le_bytes()); // Samantha's greeting
     packet.extend([0; 4]);
     packet.extend(SAMANTHA_ID.to_le_bytes());
     packet.extend([0; 5]);
-    packet.extend(2_u32.to_le_bytes());
-    for value in [301_u32, 17, 94_247, 0, 18, 300, 17, 8075, 0, 18] {
+    packet.extend(4_u32.to_le_bytes());
+    for value in [
+        301_u32, 17, 94_247, 0, 18, 310, 17, 386_023, 0, 18, 311, 17, 31_023, 0, 18, 300, 17, 8075,
+        0, 18,
+    ] {
         packet.extend(value.to_le_bytes());
     }
     packet.extend([0; 64]);
-    assert_eq!(packet.len(), 133);
+    assert_eq!(packet.len(), 173);
     packet
 }
 

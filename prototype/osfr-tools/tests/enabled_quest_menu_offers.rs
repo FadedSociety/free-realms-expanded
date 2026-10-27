@@ -718,9 +718,15 @@ fn the_offer_menu_does_not_consume_the_quest_or_the_actor() {
     let goodbye = goodbye_dialogue_choice()[0] as i32;
     let (rows, closed) = client.talk(actor, goodbye).expect("the giver talks");
     let title = shipped.title(quest);
+    // The greeter's T773 pages may sit between them; this suite owns the offer's
+    // quest row and the close, and `town_greeter_explainers` pins the pages.
     assert_eq!(
-        rows,
-        [quest_dialogue_choice(title), goodbye_dialogue_choice()]
+        (rows.first(), rows.last()),
+        (
+            Some(&quest_dialogue_choice(title)),
+            Some(&goodbye_dialogue_choice())
+        ),
+        "the quest row leads and Goodbye ends the offer dialog"
     );
     assert_eq!(closed.replies, [[26, 0, 4, 0]]);
     assert_eq!(client.game.state(), before.0, "Goodbye changed the state");

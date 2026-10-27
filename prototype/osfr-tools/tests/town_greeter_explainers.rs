@@ -4,45 +4,51 @@
 //! `+0x10` and a count-prefixed linked list of 0x1c-byte response rows at `+0x20`;
 //! `009f5ae0` passes `*(payload+0x10)` and each row's `+0x10` text id through
 //! `0097c1e0` (`Global.Text.<id>`) into `HandlerDialog:SetDialogText`/`:SetChoiceText`,
-//! hides unused rows, and keeps at most five (`wndDialog.xml` btn0..btn4). The client
-//! sends the clicked row's id (`009f5890`) back in 26/6, so a second 26/3 re-renders
+//! hides unused rows, and stops after five (`wndDialog.xml` btn0..btn4). The display
+//! stores each row's first dword in the dialog's `this+4+index` table; `009f6aa0` reads
+//! that slot for the clicked button and sends it in 26/6, so a second 26/3 re-renders
 //! the open dialog with another body.
 //!
-//! The data rows live on the NPC record (`explainer_topics`); this suite walks the
-//! real request path gateway -> Gameplay -> gameplay/npc.rs -> npc_interaction and
-//! asserts the ids the client reads, plus that a refused row changes no saved state.
+//! The pages live on the NPC record (`explainer_topics`). A Talk that also offers a
+//! quest sends the quest row first, then the pages, then Goodbye. This suite walks the
+//! real request path gateway -> Gameplay -> gameplay/npc.rs -> npc_interaction with the
+//! bundled quest catalogue bound, so the production quest givers are covered; it asserts
+//! the ids the client reads, that a page replay keeps the same rows, and that a refused
+//! row leaves the saved character untouched.
 
 #[path = "common/npc_greetings.rs"]
 mod npc_greetings;
 
 use npc_greetings::{
-    GREETING_HEADER, character_at, dialogue_choice, gameplay_dir, gameplay_talk_packet,
-    locale_rows, npc_position, npc_record, select, service,
+    GREETING_HEADER, character_at, content_dir, dialogue_choice, gameplay_dir,
+    gameplay_talk_packet, locale_rows, npc_position, npc_record,
 };
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::Gameplay,
     npc_interaction::{
-        DialoguePacket26_3, EXPLAIN_CHOICE_RESPONSE_BASE, MAX_EXPLAIN_TOPICS, NpcAction,
-        NpcSelection, decode_dialogue_26_3, encode_dialogue_close_26_4, goodbye_dialogue_choice,
+        DialoguePacket26_3, EXPLAIN_CHOICE_RESPONSE_BASE, decode_dialogue_26_3,
+        encode_dialogue_close_26_4, explainer_dialogue_choice, goodbye_dialogue_choice,
+        quest_dialogue_choice,
     },
     world_text::locale_hash,
 };
 use std::collections::{BTreeMap, BTreeSet};
 
 /// The first explainer row's response id on the wire. The client echoes the clicked
-/// row's id back in 26/6 (`009f5890`); 300 is Goodbye and 301 the quest row, so a tips
-/// row must stay clear of both. Pinned here so the production id base cannot drift
-/// without this suite noticing.
+/// row's stored id (`009f6aa0`); 300 is Goodbye and 301 the quest row, so a tips row
+/// must stay clear of both. Pinned here so the production id base cannot drift.
 const FIRST_PAGE_ROW: i32 = 310;
 
-/// One town greeter: the row that carries `greeting_string_id` and the explainer
-/// pages in its `explainer_topics` order (the order fixes the response id).
+/// One town greeter: the row that carries `greeting_string_id`, the quest its Talk can
+/// offer (quest id + title locale id), and the explainer pages in `explainer_topics`
+/// order (the order fixes the response id).
 struct Greeter {
     file: &'static str,
     npc_id: u64,
     name: &'static str,
     greeting: u32,
+    offer: Option<(u32, u32)>,
     topics: &'static [(u32, u32)],
 }
 
@@ -52,6 +58,9 @@ const GREETERS: &[Greeter] = &[
         npc_id: 9_000_000_093,
         name: "Frostpetal",
         greeting: 430_860,
+        // Her quest 3110012 is defined but disabled with an unmet prerequisite
+        // (data/content/quests/ninja.json), so this Talk carries no quest row.
+        offer: None,
         topics: &[(37933, 37936), (31328, 37942), (37945, 37948), (7910, 7911)],
     },
     Greeter {
@@ -59,6 +68,7 @@ const GREETERS: &[Greeter] = &[
         npc_id: 9_000_000_189,
         name: "Samantha",
         greeting: 24_940,
+        offer: Some((3_000_021, 94_247)),
         topics: &[(386_023, 20_520), (31023, 35603)],
     },
     Greeter {
@@ -66,6 +76,7 @@ const GREETERS: &[Greeter] = &[
         npc_id: 9_000_000_402,
         name: "Merigold",
         greeting: 80,
+        offer: Some((3_000_020, 94_247)),
         topics: &[(386_023, 20_520), (104138, 115_776)],
     },
 ];
@@ -75,19 +86,32 @@ fn character(greeter: &Greeter) -> CharacterState {
     character_at(npc_position(&record, greeter.npc_id))
 }
 
+/// The real request path with the bundled split quest content bound, so a quest_giver
+/// greeter's Talk builds its quest row exactly as production does.
 fn new_game() -> Gameplay {
-    Gameplay::load(&gameplay_dir(), None).expect("gameplay content loads")
+    let mut game = Gameplay::load(&gameplay_dir(), None).expect("gameplay content loads");
+    game.bind_npc_quest_catalogue(&content_dir(), 1)
+        .expect("bundled quest content binds");
+    game
 }
 
-/// The dialogue rows a greeter's greeting should carry: one row per explainer page
-/// in content order, then Goodbye.
+/// The dialogue rows a greeter's Talk should carry: the quest row when the same Talk
+/// offers one, then one row per explainer page in content order, then Goodbye.
 fn expected_rows(greeter: &Greeter) -> Vec<[u32; 5]> {
     let mut rows: Vec<[u32; 5]> = greeter
-        .topics
-        .iter()
-        .enumerate()
-        .map(|(index, (label, _))| [(FIRST_PAGE_ROW + index as i32) as u32, 17, *label, 0, 18])
+        .offer
+        .into_iter()
+        .map(|(_, title)| quest_dialogue_choice(title))
         .collect();
+    rows.extend(
+        greeter
+            .topics
+            .iter()
+            .enumerate()
+            .map(|(index, (label, _))| {
+                explainer_dialogue_choice(FIRST_PAGE_ROW + index as i32, *label)
+            }),
+    );
     rows.push(goodbye_dialogue_choice());
     rows
 }
@@ -97,7 +121,8 @@ fn talk(game: &mut Gameplay, greeter: &Greeter) -> DialoguePacket26_3 {
     gameplay_talk_packet(game, greeter.file, greeter.npc_id)
 }
 
-/// The 26/3(body, rows) reply to one 26/6 row, if the server sent one.
+/// The 26/3(body, rows) reply to one 26/6 row, if the server sent one, and whether the
+/// reply was the ordinary 26/4 close.
 fn choose(game: &mut Gameplay, greeter: &Greeter, response_id: i32) -> (Option<Vec<u8>>, bool) {
     let character = character(greeter);
     let outcome = game
@@ -115,61 +140,21 @@ fn choose(game: &mut Gameplay, greeter: &Greeter, response_id: i32) -> (Option<V
     (dialogue, closed)
 }
 
+fn saved(game: &Gameplay) -> serde_json::Value {
+    serde_json::to_value(game.state()).expect("state snapshot")
+}
+
 /// Every greeter answers Talk with its recovered greeting as the 26/3 body and its
-/// explainer pages as the response rows the client can click.
+/// explainer pages as the response rows the client can click. A greeter whose Talk also
+/// offers a quest keeps that row, so the pages are not dropped for the offer window.
 #[test]
 fn every_town_greeter_offers_its_explainer_rows_behind_the_greeting() {
     let mut game = new_game();
-    let mut service = service();
+    assert_eq!(
+        EXPLAIN_CHOICE_RESPONSE_BASE, FIRST_PAGE_ROW,
+        "the production response-id base is the pinned wire id"
+    );
     for greeter in GREETERS {
-        // Service path: the context the router copies into the 26/3 rows.
-        let (zone, position) = service
-            .location(greeter.npc_id)
-            .expect("the greeter has a location");
-        let menu = service
-            .interact(greeter.npc_id, zone, position, None)
-            .expect("the greeter offers its menu");
-        let talk_option = menu
-            .options
-            .iter()
-            .find(|option| option.action == NpcAction::Talk)
-            .expect("the greeter offers Talk")
-            .id;
-        let chosen = u32::try_from(talk_option).expect("menu option id fits u32");
-        let NpcSelection::Talk(context) = service
-            .select(&select(greeter.npc_id, chosen), zone, position, None)
-            .expect("Talk returns the dialogue context")
-        else {
-            panic!(
-                "NPC {}: Talk must not return another selection",
-                greeter.npc_id
-            );
-        };
-        assert_eq!(context.body_string_id, Some(greeter.greeting));
-        let topics: Vec<(i32, u32, u32)> = context
-            .explainer_topics
-            .iter()
-            .map(|topic| {
-                (
-                    topic.response_id,
-                    topic.label_string_id,
-                    topic.body_string_id,
-                )
-            })
-            .collect();
-        let expected: Vec<(i32, u32, u32)> = greeter
-            .topics
-            .iter()
-            .enumerate()
-            .map(|(index, (label, body))| (FIRST_PAGE_ROW + index as i32, *label, *body))
-            .collect();
-        assert_eq!(topics, expected, "NPC {}: the context rows", greeter.npc_id);
-        assert_eq!(
-            EXPLAIN_CHOICE_RESPONSE_BASE, FIRST_PAGE_ROW,
-            "the production response-id base is the pinned wire id"
-        );
-
-        // Dispatch path: gateway -> Gameplay -> gameplay/npc.rs -> dialogue_packet_with.
         let dialogue = talk(&mut game, greeter);
         assert_eq!(
             dialogue.initial_dwords[0], greeter.greeting,
@@ -179,27 +164,16 @@ fn every_town_greeter_offers_its_explainer_rows_behind_the_greeting() {
         assert_eq!(
             dialogue.choices,
             expected_rows(greeter),
-            "NPC {} ({}): the response rows are the explainer pages then Goodbye",
-            greeter.npc_id,
-            greeter.name
-        );
-        assert!(
-            dialogue.choices.len() <= 5,
-            "NPC {} ({}): the client dialog window has five buttons",
-            greeter.npc_id,
-            greeter.name
-        );
-        assert!(
-            !greeter.topics.is_empty() && greeter.topics.len() <= MAX_EXPLAIN_TOPICS,
-            "NPC {} ({}): one to four explainer pages",
+            "NPC {} ({}): the quest row, the explainer pages, then Goodbye",
             greeter.npc_id,
             greeter.name
         );
     }
 }
 
-/// Choosing an explainer row replays the same dialogue with that page's body; the
-/// rows stay clickable, so a player can read another page, and Goodbye still closes.
+/// Choosing an explainer row replays the same dialogue with that page's body; the rows
+/// stay clickable (including a pending quest row), so a player can read another page,
+/// and Goodbye still closes.
 #[test]
 fn choosing_an_explainer_row_replays_the_dialogue_with_that_page() {
     let mut game = new_game();
@@ -221,12 +195,20 @@ fn choosing_an_explainer_row_replays_the_dialogue_with_that_page() {
                 "NPC {} ({}): row {response_id} body",
                 greeter.npc_id, greeter.name
             );
+            let row = dialogue
+                .choices
+                .iter()
+                .find(|row| row[0] == response_id as u32)
+                .unwrap_or_else(|| {
+                    panic!(
+                        "NPC {} ({}): the replay keeps row {response_id}",
+                        greeter.npc_id, greeter.name
+                    )
+                });
             assert_eq!(
-                dialogue.choices[response_id as usize - FIRST_PAGE_ROW as usize][2],
-                *label,
+                row[2], *label,
                 "NPC {} ({}): the label the client reads back",
-                greeter.npc_id,
-                greeter.name
+                greeter.npc_id, greeter.name
             );
             assert_eq!(
                 dialogue.choices,
@@ -369,67 +351,72 @@ fn each_explainer_id_resolves_to_a_stock_client_line() {
     );
 }
 
-/// A response id the dialogue never offered changes no saved state and does not
-/// leak a page: the server answers the ordinary close and the NPC reopens.
+/// A row the dialogue never sent is answered with the ordinary 26/4 close: it changes no
+/// saved state, ends only this session's dialog, and the NPC reopens with its rows. No
+/// page, quest, item or coin is invented by a refused row.
 #[test]
-fn a_refused_explainer_row_changes_nothing_and_keeps_the_npc_usable() {
+fn a_refused_row_changes_no_saved_state_and_the_npc_reopens() {
     let mut game = new_game();
-    let mut fresh = new_game();
     for greeter in GREETERS {
         talk(&mut game, greeter);
-        let before = serde_json::to_value(game.state()).expect("state snapshot");
+        let before = saved(&game);
         let (packet, closed) = choose(&mut game, greeter, i32::MAX);
         assert!(packet.is_none(), "an unoffered row sends no dialogue");
-        assert!(closed, "an unoffered row is answered with the 26/4 close");
-        let after = serde_json::to_value(game.state()).expect("state snapshot");
-        assert_eq!(
-            before, after,
-            "NPC {} ({}): a refused row changes no inventory, coin, quest or profile state",
-            greeter.npc_id, greeter.name
-        );
-        // The refusal must not leave the NPC stuck: interact and Talk still work.
-        let dialogue = talk(&mut game, greeter);
-        assert_eq!(
-            dialogue.initial_dwords[0], greeter.greeting,
-            "NPC {} ({}): the NPC answers a fresh Talk after a refused row",
-            greeter.npc_id, greeter.name
-        );
-
-        // A greeter row selected with no dialogue open is the same ordinary close.
-        let character = character(greeter);
-        let before = serde_json::to_value(fresh.state()).expect("state snapshot");
-        let outcome = fresh
-            .handle_in_world(&dialogue_choice(FIRST_PAGE_ROW), &character, 1_200)
-            .expect("26/6 is accepted");
         assert!(
-            outcome
-                .replies
-                .iter()
-                .all(|packet| *packet == encode_dialogue_close_26_4()),
-            "NPC {} ({}): a row with no open dialogue only closes",
-            greeter.npc_id,
-            greeter.name
+            closed,
+            "an unoffered row is answered with the ordinary 26/4 close"
         );
         assert_eq!(
             before,
-            serde_json::to_value(fresh.state()).expect("state snapshot"),
-            "NPC {} ({}): a row with no open dialogue changes no state",
+            saved(&game),
+            "NPC {} ({}): a refused row changes no saved state",
+            greeter.npc_id,
+            greeter.name
+        );
+        // The close leaves nothing stuck: a fresh Talk reopens the greeting and rows.
+        let dialogue = talk(&mut game, greeter);
+        assert_eq!(
+            dialogue.initial_dwords[0], greeter.greeting,
+            "NPC {} ({}): a fresh Talk answers after a refused row",
+            greeter.npc_id, greeter.name
+        );
+        assert_eq!(
+            dialogue.choices,
+            expected_rows(greeter),
+            "NPC {} ({}): the refused row did not consume a page",
             greeter.npc_id,
             greeter.name
         );
     }
+
+    // A row sent with no dialogue open is the same ordinary close and changes nothing.
+    let mut fresh = new_game();
+    let before = saved(&fresh);
+    let (packet, closed) = choose(&mut fresh, &GREETERS[0], FIRST_PAGE_ROW);
+    assert!(
+        packet.is_none(),
+        "a row with no open dialogue sends no 26/3"
+    );
+    assert!(closed, "a row with no open dialogue is the ordinary close");
+    assert_eq!(
+        before,
+        saved(&fresh),
+        "a row with no open dialogue changes no saved state"
+    );
 }
 
 /// A drawable NPC with no `explainer_topics` keeps the one-row Goodbye dialog, so the
 /// feature cannot leak into every NPC.
 #[test]
 fn an_npc_without_explainer_rows_keeps_the_plain_dialogue() {
-    // Bowawow shares Merigold's file and region but recovered no greeting and no tips.
+    // Bowawow shares Merigold's file and region but recovered no greeting, no tips and
+    // no quest.
     let blank = Greeter {
         file: "highroad_junction.json",
         npc_id: 9_500_000_328,
         name: "Bowawow",
         greeting: 0,
+        offer: None,
         topics: &[],
     };
     let record = npc_record(blank.file, blank.npc_id);
@@ -448,7 +435,7 @@ fn an_npc_without_explainer_rows_keeps_the_plain_dialogue() {
     assert_eq!(dialogue.initial_dwords[0], 0, "no body without a greeting");
     assert_eq!(
         dialogue.choices,
-        vec![osfr_tools::npc_interaction::goodbye_dialogue_choice()],
+        vec![goodbye_dialogue_choice()],
         "NPC {}: no explainer rows leak into an unpatched NPC",
         blank.npc_id
     );

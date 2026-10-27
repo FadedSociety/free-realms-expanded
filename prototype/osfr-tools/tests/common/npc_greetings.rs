@@ -131,6 +131,7 @@ pub fn assert_drawable(record: &Value, npc_id: u64) {
     );
 }
 
+#[allow(dead_code)] // T773 drives only the dispatch path; other suites call the service.
 pub fn service() -> NpcInteraction {
     let data = content_dir();
     NpcInteraction::load(&data.join("npcs"), &data.join("stores.json"))

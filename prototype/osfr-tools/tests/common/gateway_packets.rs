@@ -8,7 +8,8 @@
 //! constructor is 26/8 `008b6bc0` (u64 target + bool); the menu selection
 //! constructor is 26/10 `00a36f80` (u64 target + i32 choice); 26/13
 //! `CommandPacketSetProfile` sender `00938e10` (constructor `008a29f0`, body one
-//! i32 profile); 26/6 dialogue response reader `009f5890` (one i32 row); 36/10
+//! i32 profile); 26/6 dialogue response `009f6aa0` (the clicked row's stored id at
+//! `this+4+index`; packet constructor `009f5890`); 36/10
 //! ability writer `00a342e0` (i32 bar, i32 slot, i32 target mode, then a u64
 //! target when mode 0); 42/3 `InventoryPacketEquipByGuid` writer `00bdb450`
 //! (sender `00bda510`: i32 instance, i32 profile, i32 slot); 49/2 `QuestReply`
@@ -79,7 +80,8 @@ pub fn login_with_version(guid: u64, version: &str) -> Vec<u8> {
     bytes
 }
 
-/// Client 26/6 dialogue response reader `009f5890`: one i32 row.
+/// Client 26/6 dialogue response: the clicked row's stored id (`009f6aa0` reads
+/// `this+4+index`; `009f5890` constructs the packet), one i32.
 #[allow(dead_code)] // Included by sites that do not open a quest dialogue.
 pub fn dialogue_choice(row: i32) -> Vec<u8> {
     [vec![26, 0, 6, 0], row.to_le_bytes().to_vec()].concat()

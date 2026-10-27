@@ -208,26 +208,20 @@ impl Gameplay {
             }
             // T773: a greeter tips row re-renders the same dialogue with that page's
             // body. It is read-only, so the interaction (and its offered rows) stays
-            // open for another page or Goodbye.
-            if let Some((key, context)) = self
+            // open for another page or Goodbye. `record_dialogue` stored the exact rows
+            // and the runtime actor, so the replay keeps a quest row and the camera
+            // target on the NPC the player clicked.
+            if let Some(page) = self
                 .npc_interaction
                 .as_ref()
                 .and_then(|interaction| interaction.explainer_page(selected))
             {
-                let mut dialogue = dialogue_packet_with(&context, None)
+                let mut dialogue = dialogue_packet_rows(page.body_string_id, page.rows)
                     .map_err(|_| invalid("NPC dialogue could not be encoded"))?;
-                // The dialog camera target stays on the actor this player clicked; the
-                // last Talk recorded it, because 26/6 carries only the response id.
-                let runtime_guid = self
-                    .last_npc_dialogue
-                    .as_ref()
-                    .filter(|(_, _, last_key, _)| *last_key == key)
-                    .map(|(_, guid, _, _)| *guid)
-                    .unwrap_or(key);
-                patch_npc_actor(&mut dialogue, runtime_guid);
+                patch_npc_actor(&mut dialogue, page.runtime_guid);
                 npc_event(serde_json::json!({
                     "event": "greeter_tips",
-                    "content_key": key,
+                    "content_key": page.content_key,
                     "response_id": selected
                 }));
                 return Ok(Some(Outcome {
@@ -270,6 +264,9 @@ impl Gameplay {
                     return Ok(Some(out));
                 }
             }
+            // A row this dialog did not send is answered with the ordinary close. That
+            // is session-only: `pending_quest_choice` is this session's dialog state and
+            // the saved character is untouched, which the T773 suite asserts.
             self.pending_quest_choice = None;
             self.pending_choice_packets.clear();
             if let Some(interaction) = &mut self.npc_interaction {
@@ -1301,8 +1298,10 @@ impl Gameplay {
             }
         }
         if !started_conversation {
-            let mut dialogue = dialogue_packet_with(&context, quest_choice)
-                .map_err(|_| invalid("NPC dialogue could not be encoded"))?;
+            let (rows, pages) = npc_interaction::dialogue_rows(&context, quest_choice);
+            let mut dialogue =
+                dialogue_packet_rows(context.body_string_id.unwrap_or(0), rows.clone())
+                    .map_err(|_| invalid("NPC dialogue could not be encoded"))?;
             patch_npc_actor(&mut dialogue, runtime_guid);
             self.last_npc_dialogue = Some((zone_id, runtime_guid, key, dialogue.clone()));
             // A quest offer is shown alone, like the original: the 49/1 window
@@ -1310,6 +1309,10 @@ impl Gameplay {
             // because 49/1 was 120 bytes, not for lack of a 26/3; a leading 26/3
             // left a blank bubble and "Goodbye" behind the quest window.)
             if offer_outcome != "offer" {
+                // T773: only the rows the client actually received can answer a 26/6.
+                if let Some(interaction) = self.npc_interaction.as_mut() {
+                    interaction.record_dialogue(runtime_guid, rows, pages);
+                }
                 out.replies.push(dialogue);
             }
         }
@@ -1439,30 +1442,11 @@ pub(super) fn patch_npc_actor(packet: &mut [u8], npc_guid: u64) {
 pub(super) fn dialogue_packet(
     context: &DialogueContext,
 ) -> Result<Vec<u8>, npc_interaction::NpcInteractionError> {
-    dialogue_packet_with(context, None)
-}
-
-pub(super) fn dialogue_packet_with(
-    context: &DialogueContext,
-    quest_choice: Option<[u32; 5]>,
-) -> Result<Vec<u8>, npc_interaction::NpcInteractionError> {
-    // The locale export maps 8075 to "Goodbye". The five-word response row is
-    // client-reader-backed; its 300/17/3 close tuple follows Lua's AddResponseNode
-    // convention (notes/Research/Pieces/071 NPC dialogue branching.md). The body
-    // field is a locale greeting when one is recovered; it is never the NPC name.
-    // T773: a greeter's tips rows follow the greeting. A quest offer keeps its row
-    // alone, because the 49/1 window draws its own speech bubble.
-    let mut choices: Vec<[u32; 5]> = quest_choice.into_iter().collect();
-    if choices.is_empty() {
-        choices.extend(
-            context
-                .explainer_topics
-                .iter()
-                .map(npc_interaction::explainer_dialogue_choice),
-        );
-    }
-    choices.push(npc_interaction::goodbye_dialogue_choice());
-    dialogue_packet_rows(context.body_string_id.unwrap_or(0), choices)
+    // The body field is a locale greeting when one is recovered; it is never the NPC name.
+    // T773: a greeter's tips rows follow the greeting, subject to the client window's
+    // five-button budget (`npc_interaction::dialogue_rows`).
+    let (rows, _) = npc_interaction::dialogue_rows(context, None);
+    dialogue_packet_rows(context.body_string_id.unwrap_or(0), rows)
 }
 
 /// T543: one conversation line. Its rows are numbered from 1 and it carries no

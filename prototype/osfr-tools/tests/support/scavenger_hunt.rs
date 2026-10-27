@@ -11,7 +11,8 @@
 //! Client evidence (2014 client, checked with `lab/autopilot/ida_query.py`):
 //! - 26/8 NPC interact constructor `008b6bc0`: two GUID dwords + one bool.
 //! - 26/10 menu select constructor `00a36f80`: two GUID dwords + i32 choice.
-//! - 26/6 dialogue response `009f5890`: i32 row (301 is the quest row).
+//! - 26/6 dialogue response: clicked row id (`009f6aa0`; constructor `009f5890`),
+//!   one i32 (301 is the quest row).
 //! - 49/2 QuestReply constructor `00a86400`: quest id + accept byte.
 //! - 49/14 QuestEndReply constructor `00a864c0`: one quest id.
 //! - 49/13 QuestEnd reader `00c7b990`: u64 actor at 6..14, quest 14..18, end text
