@@ -43147,6 +43147,20 @@
     "feed_end_ms": 6000,
     "status_interval_ms": 1500,
     "status_epsilon": 0.5,
+    "groom": {
+      "seconds": 60,
+      "stroke_gain": 0.02,
+      "max_stroke_speed": 50,
+      "max_gain_per_message": 1.0,
+      "max_gain_per_second": 3.0,
+      "petting_gain": 1.0,
+      "petting_min_interval_ms": 500,
+      "dry_off_animation": 5505,
+      "source": {
+        "kind": "reconstructed",
+        "evidence": "T488: the session length, the gain per stroke speed and its caps, the petting gain and rate limit are server policy (R). Client facts: 53/18 sender 00b5f8c0; 53/20 kind 3 timer word in seconds (00b5ec14, FlashTimerSetTimer 00a8eff0), kind 4 end (00b56920); 53/22 sender 00ccebc0 (mode = pet handler state word, 2 while grooming; time in ms; movement sum). The locale says the pet only holds still for a minute. The dry-off animation 5505 and the petting-to-play idea come from OSFR PR 152, read for behaviour only."
+      }
+    },
     "source": {
       "kind": "reconstructed",
       "evidence": "T485: feed apply and end delays after 53/20 begin, and the live 53/3 refresh gap and threshold, are server policy (R); the client sends 53/19 and waits for 53/20 kinds 1, 2 or 6 (00b5ce60)"

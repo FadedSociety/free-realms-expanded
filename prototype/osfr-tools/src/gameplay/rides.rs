@@ -304,6 +304,8 @@ impl Gameplay {
         let care = self.pets.care_tick(&mut self.inventory, now_ms);
         out.changed |= care.changed;
         out.replies.extend(care.private);
+        // T488: a grooming session that times out plays its dry-off animation for the viewers.
+        out.nearby.extend(care.shared);
         Some(out)
     }
 

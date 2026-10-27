@@ -1,0 +1,123 @@
+//! T485/T488: the fixtures the pet care suites share (`tests/pet_care.rs`, `tests/pet_grooming.rs`):
+//! the shipped kit rows, a bag holding them, a dog and the 53/* packet readers. Includers declare
+//! `pet_inventory` and `pet_wire` first (`use super::...` below).
+#![allow(dead_code)] // each includer uses a subset
+
+use super::{pet_inventory::InventoryFixture, pet_wire};
+use osfr_tools::pets::{PetBusy, PetContent, PetService, PetWire};
+
+/// Shipped catalogue rows (lab/reports/item-catalogue-20261015), all class 73: bowl 11 slot 204,
+/// Simple Pet Food 1835 slot 205, Simple Pet Shampoo 1836 slot 200, Basic Pet Conditioner 10521
+/// slot 201, brush 912 slot 203.
+pub const BOWL: i32 = 11;
+pub const FOOD: i32 = 1835;
+pub const SHAMPOO: i32 = 1836;
+pub const CONDITIONER: i32 = 10521;
+pub const BRUSH: i32 = 912;
+pub const KIT: [(i32, i32, i32); 5] = [
+    (BOWL, 204, 73),
+    (FOOD, 205, 73),
+    (SHAMPOO, 200, 73),
+    (CONDITIONER, 201, 73),
+    (BRUSH, 203, 73),
+];
+pub const BOWL_ITEM: i32 = 21;
+pub const FOOD_ITEM: i32 = 22;
+pub const SHAMPOO_ITEM: i32 = 23;
+pub const PLAIN_ITEM: i32 = 24;
+pub const CONDITIONER_ITEM: i32 = 25;
+pub const BRUSH_ITEM: i32 = 26;
+pub const OWNER: u64 = 33;
+/// 3,000 s after adoption: idle decay has lowered the needs, so a feed or a brushing visibly
+/// raises them.
+pub const T0: u64 = 3_000_000;
+
+/// A bag with the whole kit: a bowl, two food, two shampoo, a conditioner, a brush and a plain item.
+pub fn kit() -> InventoryFixture {
+    InventoryFixture::with_kit_items(
+        &[
+            (BOWL_ITEM, BOWL, 1),
+            (FOOD_ITEM, FOOD, 2),
+            (SHAMPOO_ITEM, SHAMPOO, 2),
+            (PLAIN_ITEM, 9001, 1),
+            (CONDITIONER_ITEM, CONDITIONER, 1),
+            (BRUSH_ITEM, BRUSH, 1),
+        ],
+        &KIT,
+    )
+}
+
+/// A dog (model 364, which lists item class 73) adopted at time 0.
+pub fn dog() -> (PetService, u32) {
+    let content = PetContent::bundled().unwrap();
+    let mut service = PetService::new(content.clone()).unwrap();
+    let mut definition = content.definition(1_000_015).unwrap();
+    definition.model = content.model(364).unwrap().adr.clone();
+    let id = service.adopt_vendor_grant(1, &definition, 0).unwrap();
+    (service, id)
+}
+
+pub fn send(
+    service: &mut PetService,
+    fixture: &mut InventoryFixture,
+    packet: &[u8],
+    now_ms: u64,
+) -> PetWire {
+    service
+        .handle_at_ms(
+            packet,
+            OWNER,
+            [0.0; 3],
+            &mut fixture.inventory,
+            PetBusy::default(),
+            now_ms,
+        )
+        .unwrap()
+        .unwrap()
+}
+
+/// An expected server packet (or a malformed request): a header, then u32 words.
+pub fn words(head: &[u8], values: &[u32]) -> Vec<u8> {
+    let mut bytes = head.to_vec();
+    for value in values {
+        bytes.extend(value.to_le_bytes());
+    }
+    bytes
+}
+
+pub fn fit(pet: u32, slot: u32, item: i32) -> Vec<u8> {
+    pet_wire::utility(false, pet, slot, item as u32)
+}
+
+pub fn u32_at(packet: &[u8], at: usize) -> u32 {
+    u32::from_le_bytes(packet[at..at + 4].try_into().unwrap())
+}
+
+/// The kinds of every 53/20 PetUtilityNotify (pet, kind, four words).
+pub fn notify_kinds(packets: &[Vec<u8>]) -> Vec<u32> {
+    packets
+        .iter()
+        .filter(|packet| packet.starts_with(&[53, 0, 20]))
+        .map(|packet| {
+            assert_eq!(packet.len(), 3 + 24, "six u32");
+            u32_at(packet, 7)
+        })
+        .collect()
+}
+
+pub fn statuses(packets: &[Vec<u8>]) -> Vec<&Vec<u8>> {
+    packets
+        .iter()
+        .filter(|packet| packet.starts_with(&[53, 0, 3]))
+        .collect()
+}
+
+pub fn count(fixture: &InventoryFixture, item: i32) -> u32 {
+    fixture
+        .inventory
+        .state()
+        .items
+        .iter()
+        .find(|owned| owned.id == item)
+        .map_or(0, |owned| owned.count)
+}

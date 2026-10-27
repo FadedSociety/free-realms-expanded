@@ -2,117 +2,20 @@
 //! `Gameplay::handle_pets` calls) and the world tick (`care_tick`, which `Gameplay::pet_tick`
 //! calls): fit kit items (53/16), feed (53/19) with the 53/20 lifecycle, water (53/28) and live
 //! 53/3 needs.
+#[path = "support/pet_care.rs"]
+mod care;
 #[path = "support/pet_inventory.rs"]
 mod pet_inventory;
 #[path = "../src/bin/osfr_gateway/pet_wire.rs"]
 mod pet_wire;
 
-use osfr_tools::pets::{PetBusy, PetContent, PetRequest, PetService, PetWire};
+use care::*;
+use osfr_tools::pets::{PetContent, PetRequest, PetService};
 use pet_inventory::InventoryFixture;
 use pet_wire::{feed, summon, water};
 
-/// Shipped catalogue rows (lab/reports/item-catalogue-20261015): bowl 11 slot 204, Simple Pet
-/// Food 1835 slot 205, Simple Pet Shampoo 1836 slot 200, all class 73.
-const BOWL: i32 = 11;
-const FOOD: i32 = 1835;
-const SHAMPOO: i32 = 1836;
-const KIT: [(i32, i32, i32); 3] = [(BOWL, 204, 73), (FOOD, 205, 73), (SHAMPOO, 200, 73)];
-const BOWL_ITEM: i32 = 21;
-const FOOD_ITEM: i32 = 22;
-const SHAMPOO_ITEM: i32 = 23;
-const PLAIN_ITEM: i32 = 24;
 /// Crab, a vanity Pet Pal (T454).
 const CRAB_ITEM: i32 = 7885;
-const OWNER: u64 = 33;
-/// 3,000 s after adoption: idle decay has lowered the food bar, so a feed visibly raises it.
-const T0: u64 = 3_000_000;
-
-fn kit() -> InventoryFixture {
-    InventoryFixture::with_kit_items(
-        &[
-            (BOWL_ITEM, BOWL, 1),
-            (FOOD_ITEM, FOOD, 2),
-            (SHAMPOO_ITEM, SHAMPOO, 1),
-            (PLAIN_ITEM, 9001, 1),
-        ],
-        &KIT,
-    )
-}
-
-/// A dog (model 364, which lists item class 73) adopted at time 0.
-fn dog() -> (PetService, u32) {
-    let content = PetContent::bundled().unwrap();
-    let mut service = PetService::new(content.clone()).unwrap();
-    let mut definition = content.definition(1_000_015).unwrap();
-    definition.model = content.model(364).unwrap().adr.clone();
-    let id = service.adopt_vendor_grant(1, &definition, 0).unwrap();
-    (service, id)
-}
-
-fn send(
-    service: &mut PetService,
-    fixture: &mut InventoryFixture,
-    packet: &[u8],
-    now_ms: u64,
-) -> PetWire {
-    service
-        .handle_at_ms(
-            packet,
-            OWNER,
-            [0.0; 3],
-            &mut fixture.inventory,
-            PetBusy::default(),
-            now_ms,
-        )
-        .unwrap()
-        .unwrap()
-}
-
-/// An expected server packet (or a malformed request): a header, then u32 words.
-fn words(head: &[u8], values: &[u32]) -> Vec<u8> {
-    let mut bytes = head.to_vec();
-    for value in values {
-        bytes.extend(value.to_le_bytes());
-    }
-    bytes
-}
-
-fn fit(pet: u32, slot: u32, item: i32) -> Vec<u8> {
-    pet_wire::utility(false, pet, slot, item as u32)
-}
-
-fn u32_at(packet: &[u8], at: usize) -> u32 {
-    u32::from_le_bytes(packet[at..at + 4].try_into().unwrap())
-}
-
-/// The kinds of every 53/20 PetUtilityNotify (pet, kind, four words).
-fn notify_kinds(packets: &[Vec<u8>]) -> Vec<u32> {
-    packets
-        .iter()
-        .filter(|packet| packet.starts_with(&[53, 0, 20]))
-        .map(|packet| {
-            assert_eq!(packet.len(), 3 + 24, "six u32");
-            u32_at(packet, 7)
-        })
-        .collect()
-}
-
-fn statuses(packets: &[Vec<u8>]) -> Vec<&Vec<u8>> {
-    packets
-        .iter()
-        .filter(|packet| packet.starts_with(&[53, 0, 3]))
-        .collect()
-}
-
-fn count(fixture: &InventoryFixture, item: i32) -> u32 {
-    fixture
-        .inventory
-        .state()
-        .items
-        .iter()
-        .find(|owned| owned.id == item)
-        .map_or(0, |owned| owned.count)
-}
 
 /// A summoned dog with the bowl and food fitted.
 fn ready_to_feed() -> (PetService, InventoryFixture, u32) {

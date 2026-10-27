@@ -5,6 +5,7 @@
 //! definition (`+4`) and tint (`+8`) that `00a1ec00` pushes at `00a1f2c2`-`00a1f2d2`;
 //! the summon request is `00b5a650` (u32 id then action byte).
 //! T485: the care panel's utility (53/16), feed (53/19) and water (53/28) bodies.
+//! T488: groom (53/18) and the tactile stroke report (53/22).
 #![allow(dead_code)] // each includer uses a subset
 
 /// Client `SendPetSummon` (`00b5a650`): `53 00 | 4 | u32 pet id | action 1`.
@@ -41,4 +42,20 @@ pub fn feed(pet_id: u32) -> Vec<u8> {
 /// Client 53/28 (`00b60350`): `53 00 | 28 | u8 in water`.
 pub fn water(in_water: bool) -> Vec<u8> {
     vec![53, 0, 28, u8::from(in_water)]
+}
+
+/// Client `Pet.StartGroom` (`00b5f8c0`, packet ctor `00b51610`): `53 00 | 18 | u32 active pet id |
+/// u32 0`.
+pub fn groom(pet_id: u32) -> Vec<u8> {
+    [vec![53, 0, 18], pet_id.to_le_bytes().to_vec(), vec![0; 4]].concat()
+}
+
+/// Client PetTactileNotify (ctor `00ccdb70`, writer `00ccea80` after the header): `53 00 | 22 | u32
+/// mode (the pet handler's state word) | u32 3 | u32 stroke time ms | u32 movement`.
+pub fn tactile(mode: u32, duration_ms: u32, movement: u32) -> Vec<u8> {
+    let mut bytes = vec![53, 0, 22];
+    for value in [mode, 3, duration_ms, movement] {
+        bytes.extend(value.to_le_bytes());
+    }
+    bytes
 }

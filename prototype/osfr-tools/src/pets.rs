@@ -15,6 +15,8 @@ use std::{
     sync::Arc,
 };
 
+mod grooming;
+
 const PET_FAMILY: u16 = 53;
 /// (R) Hard ceiling on a saved roster; the client can display a bounded list.
 const MAX_PETS: usize = 50;
@@ -22,7 +24,8 @@ const PET_CONTENT: &str = include_str!("../data/content/pets.json");
 /// (R) One active pet per owner, so an owner-derived actor id is unique while summoned.
 const PET_GUID_TAG: u64 = 0x4000_0000_0000_0000;
 /// T485: the pet subtypes `PetRequest::decode` accepts; the gateway's pet label reads this list.
-pub const DECODED_SUBTYPES: [u8; 7] = [4, 6, 16, 19, 24, 28, 32];
+/// T488: 18 (groom) and 22 (tactile stroke) join them.
+pub const DECODED_SUBTYPES: [u8; 9] = [4, 6, 16, 18, 19, 22, 24, 28, 32];
 /// T485: the client's utility slots are the kit item's definition slot minus 199 (`00c077a0`):
 /// shampoo 200 -> 1 .. vitamins 206 -> 7. Feeding needs the bowl (204) and the food (205).
 const UTILITY_SLOT_OFFSET: i32 = 199;
@@ -34,6 +37,10 @@ const PET_KIT_TYPE: i32 = 4;
 const NOTIFY_BEGIN: u32 = 1;
 const NOTIFY_END: u32 = 2;
 const NOTIFY_UNLOCK: u32 = 6;
+/// T488: kind 3 starts a grooming session (state word 2, `PetTactile::RefreshSpots`, a timer in
+/// seconds: `00b5ec14`); kind 4 ends it and releases the spots (`00b56920`).
+const NOTIFY_GROOM: u32 = 3;
+const NOTIFY_GROOM_END: u32 = 4;
 /// Sanity cap on a care item's restore: Legacy food Param2 runs 50..400 on an unrecovered scale,
 /// and the bar itself clamps at `need_policy.maximum`.
 const MAX_CARE_RESTORE: f32 = 1_000.0;
@@ -78,6 +85,10 @@ struct CareTiming {
     feed_end_ms: u64,
     status_interval_ms: u64,
     status_epsilon: f32,
+    /// T488: the grooming session and petting rules; without them 53/18 is refused and 53/22
+    /// does nothing.
+    #[serde(default)]
+    groom: Option<grooming::GroomConfig>,
     source: SourceTag,
 }
 
@@ -88,6 +99,7 @@ impl CareTiming {
             && (100..=60_000).contains(&self.status_interval_ms)
             && self.status_epsilon.is_finite()
             && (0.01..=50.0).contains(&self.status_epsilon)
+            && self.groom.as_ref().is_none_or(grooming::GroomConfig::valid)
     }
 }
 
@@ -744,6 +756,18 @@ pub enum PetRequest {
     },
     /// T485 53/28 (`00b60350`/`00b60420`): the owner entered (true) or left water.
     Water(bool),
+    /// T488 `Pet.StartGroom` (`00b5f8c0`, packet ctor `00b51610`): the active pet id and a zero word.
+    Groom {
+        pet_id: u32,
+    },
+    /// T488 53/22 PetTactileNotify (sender `00ccebc0`, packet ctor `00ccdb70`): the client's
+    /// stroke report. Four u32: the pet handler's state word (`mode`: 2 while grooming, else 0), a
+    /// constant 3, the stroke time in ms and the movement sum, raw (the handler clamps them).
+    Tactile {
+        mode: u32,
+        duration_ms: u32,
+        movement: u32,
+    },
 }
 
 impl PetRequest {
@@ -852,6 +876,24 @@ impl PetRequest {
                 [1] => Ok(Some(PetRequest::Water(true))),
                 _ => Err(invalid("pet water request has the wrong length or value")),
             },
+            18 => {
+                if body.len() != 8 {
+                    return Err(invalid("pet groom request has the wrong length"));
+                }
+                let pet_id = word(0).ok_or_else(|| invalid("short pet groom request"))?;
+                Ok(Some(PetRequest::Groom { pet_id }))
+            }
+            22 => {
+                if body.len() != 16 {
+                    return Err(invalid("pet tactile request has the wrong length"));
+                }
+                let word = |offset: usize| word(offset).ok_or_else(|| invalid("short pet tactile"));
+                Ok(Some(PetRequest::Tactile {
+                    mode: word(0)?,
+                    duration_ms: word(8)?,
+                    movement: word(12)?,
+                }))
+            }
             // Other client-bound pet subtypes are not enabled without a recovered layout.
             _ => Ok(None),
         }
@@ -882,6 +924,10 @@ struct ActivePet {
     feeding: Option<Feeding>,
     /// T485: the needs last sent as a live 53/3, and when (ms).
     shown: Option<(PetNeeds, u64)>,
+    /// T488: the running grooming session (session only, like `feeding`).
+    grooming: Option<grooming::Grooming>,
+    /// T488: when petting last raised play (ms); the rate limit reads it. Session only.
+    petted_ms: Option<u64>,
 }
 
 /// T485: a feed between its 53/20 begin and end.
@@ -1273,6 +1319,8 @@ impl PetService {
             pose,
             feeding: None,
             shown: None,
+            grooming: None,
+            petted_ms: None,
         });
         let model_id = self.content.model_id(&model);
         broadcasts.push(PetPresenceEvent::Spawn(PetPresence {
@@ -1400,15 +1448,22 @@ impl PetService {
                 Err(invalid("pet adoption requires the live inventory"))
             }
             // T485: fitting and feeding read and spend the live inventory (`handle_at_ms`).
-            PetRequest::Utility { .. } | PetRequest::Feed { .. } => {
-                Err(invalid("pet care requires the live inventory"))
-            }
+            // T488: so do grooming and tactile strokes (`handle_at_ms`).
+            PetRequest::Utility { .. }
+            | PetRequest::Feed { .. }
+            | PetRequest::Groom { .. }
+            | PetRequest::Tactile { .. } => Err(invalid("pet care requires the live inventory")),
             // The client reports water whether or not a pet is out; only a summoned pet keeps it.
+            // T488: entering water ends a grooming session.
             PetRequest::Water(in_water) => {
+                let mut wire = PetWire::default();
                 if self.active.is_some() {
                     self.set_in_water(in_water)?;
+                    if in_water {
+                        wire = self.stop_groom();
+                    }
                 }
-                return Ok(Some(PetWire::default()));
+                return Ok(Some(wire));
             }
             PetRequest::Rename { name } => {
                 let Some(active) = next.active else {
@@ -1512,6 +1567,22 @@ impl PetService {
             } => return Ok(Some(self.utility(remove, pet_id, slot, item, inventory))),
             PetRequest::Feed { pet_id } => {
                 return Ok(Some(self.start_feed(pet_id, inventory, busy, now_ms)));
+            }
+            PetRequest::Groom { pet_id } => {
+                return Ok(Some(self.start_groom(pet_id, inventory, busy, now_ms)));
+            }
+            PetRequest::Tactile {
+                mode,
+                duration_ms,
+                movement,
+            } => {
+                return Ok(Some(self.tactile(
+                    mode,
+                    duration_ms,
+                    movement,
+                    busy,
+                    now_ms,
+                )));
             }
             _ => return self.handle(inner, owner_guid, owner_position, busy, now),
         };
@@ -1707,7 +1778,7 @@ impl PetService {
             NOTIFY_UNLOCK
         };
         PetWire {
-            private: vec![pet_utility_notify_packet(pet_id, kind)],
+            private: vec![pet_utility_notify_packet(pet_id, kind, 0)],
             ..PetWire::default()
         }
     }
@@ -1720,6 +1791,7 @@ impl PetService {
             || busy.minigame_active
             || active.in_water
             || active.feeding.is_some()
+            || active.grooming.is_some()
         {
             return None;
         }
@@ -1731,21 +1803,17 @@ impl PetService {
         {
             return None;
         }
-        let fitted = |index: usize| {
-            let id = pet.equipment.utilities[index]?;
-            inventory
-                .state()
-                .items
-                .iter()
-                .find(|item| item.id == id && item.count > 0)
-        };
-        fitted(BOWL_SLOT)?;
-        let food = fitted(FOOD_SLOT)?;
+        fitted_item(pet, inventory, BOWL_SLOT)?;
+        let food = fitted_item(pet, inventory, FOOD_SLOT)?;
+        self.is_care(food.definition_id, "feed").then_some(food.id)
+    }
+
+    /// Whether `definition_id` is a configured care consumable for `action` ("feed" or "groom").
+    fn is_care(&self, definition_id: i32, action: &str) -> bool {
         self.content
             .care_items
             .iter()
-            .any(|rule| rule.definition_id == food.definition_id && rule.action == "feed")
-            .then_some(food.id)
+            .any(|rule| rule.definition_id == definition_id && rule.action == action)
     }
 
     /// T485: the summoned pet's care on the world tick. A feed applies at `feed_effect_ms` (one
@@ -1784,11 +1852,14 @@ impl PetService {
             let running = elapsed < care.feed_end_ms;
             if !running {
                 wire.private
-                    .push(pet_utility_notify_packet(active.pet_id, NOTIFY_END));
+                    .push(pet_utility_notify_packet(active.pet_id, NOTIFY_END, 0));
             }
             if let Some(active) = self.active.as_mut() {
                 active.feeding = running.then_some(feeding);
             }
+        }
+        if let Some(groom) = care.groom.as_ref() {
+            self.groom_tick(groom, &mut wire, now_ms);
         }
         if let Some(status) = self.live_needs(care, now_ms) {
             wire.private.push(status);
@@ -1822,10 +1893,16 @@ impl PetService {
         Some(pet_status_packet(active.pet_id, &needs))
     }
 
-    /// T485: 53/20 end for a feed still running (a dismiss, re-summon or zone change ends it).
+    /// T485: the 53/20 end for a feed (kind 2) or, T488, a grooming session (kind 4) still running
+    /// (a dismiss, re-summon or zone change ends it).
     pub fn care_end_packet(&self) -> Option<Vec<u8>> {
-        let active = self.active.filter(|active| active.feeding.is_some())?;
-        Some(pet_utility_notify_packet(active.pet_id, NOTIFY_END))
+        let active = self.active?;
+        let kind = match (active.grooming, active.feeding) {
+            (Some(_), _) => NOTIFY_GROOM_END,
+            (None, Some(_)) => NOTIFY_END,
+            (None, None) => return None,
+        };
+        Some(pet_utility_notify_packet(active.pet_id, kind, 0))
     }
 
     pub fn list_packet(&self) -> Vec<u8> {
@@ -2007,22 +2084,12 @@ impl PetService {
         validate_roster(&self.content, &next_roster)?;
 
         let mut next_inventory = inventory.clone();
-        let item_result = next_inventory.consume(item_instance_id, 1)?;
-        if !next_inventory
-            .state()
-            .items
-            .iter()
-            .any(|item| item.id == item_instance_id)
-        {
-            for pet in &mut next_roster.pets {
-                clear_equipped_instance(&mut pet.equipment, item_instance_id);
-            }
-        }
+        let replies = spend_one(&mut next_roster, &mut next_inventory, item_instance_id)?;
         let status = pet_status_packet(pet_id, &pet_mut(&mut next_roster, pet_id)?.needs);
         self.roster = next_roster;
         *inventory = next_inventory;
         Ok(PetCareOutcome {
-            inventory_replies: item_result.replies,
+            inventory_replies: replies,
             pet_status_packet: status,
         })
     }
@@ -2278,6 +2345,41 @@ fn add_need(needs: &mut PetNeeds, which: Need, amount: f32, maximum: f32) {
     *value = (*value + amount).min(maximum);
 }
 
+/// Consume one unit of an owned care item on staged copies; when the stack empties, clear the item
+/// from every pet's slots. Returns the inventory replies.
+fn spend_one(
+    roster: &mut PetRoster,
+    inventory: &mut Inventory,
+    instance: i32,
+) -> io::Result<Vec<Vec<u8>>> {
+    let outcome = inventory.consume(instance, 1)?;
+    if !inventory
+        .state()
+        .items
+        .iter()
+        .any(|item| item.id == instance)
+    {
+        for pet in &mut roster.pets {
+            clear_equipped_instance(&mut pet.equipment, instance);
+        }
+    }
+    Ok(outcome.replies)
+}
+
+/// The owned item fitted in utility slot `index` of `pet`, when the bag still holds it.
+fn fitted_item<'a>(
+    pet: &Pet,
+    inventory: &'a Inventory,
+    index: usize,
+) -> Option<&'a crate::inventory::InventoryItem> {
+    let id = pet.equipment.utilities[index]?;
+    inventory
+        .state()
+        .items
+        .iter()
+        .find(|item| item.id == id && item.count > 0)
+}
+
 fn clear_equipped_instance(equipment: &mut PetEquipment, item_instance_id: i32) {
     for slot in [
         &mut equipment.head,
@@ -2504,11 +2606,12 @@ fn pet_utility_packet(removed: bool, pet_id: u32, slot: u32, item: u32) -> Vec<u
     bytes
 }
 
-/// T485: 53/20 PetUtilityNotify (reader `00b55cc0`): six u32, the pet id and the kind, then four
-/// words this server leaves 0 (R; kinds 1, 2 and 6 carry no timer).
-fn pet_utility_notify_packet(pet_id: u32, kind: u32) -> Vec<u8> {
+/// T485: 53/20 PetUtilityNotify (reader `00b55cc0`): six u32, the pet id, the kind and a timer in
+/// seconds (T488: only kind 3 reads it, `00b5ec68` -> `FlashTimerSetTimer` `00a8eff0`), then
+/// three words this server leaves 0 (R).
+fn pet_utility_notify_packet(pet_id: u32, kind: u32, timer: u32) -> Vec<u8> {
     let mut bytes = pet_header(20);
-    for value in [pet_id, kind, 0, 0, 0, 0] {
+    for value in [pet_id, kind, timer, 0, 0, 0] {
         bytes.extend(value.to_le_bytes());
     }
     bytes
