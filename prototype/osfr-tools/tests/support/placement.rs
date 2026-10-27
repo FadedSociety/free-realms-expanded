@@ -64,6 +64,11 @@ pub fn distance(left: [f32; 3], right: [f32; 3]) -> f64 {
         .sqrt()
 }
 
+/// Distance in the X/Z plane, the metric `piece_077` uses for warpstone attunement.
+pub fn planar_distance(left: [f32; 3], right: [f32; 3]) -> f32 {
+    (left[0] - right[0]).hypot(left[2] - right[2])
+}
+
 /// The CartoonMMO root, the parent of the repository checkout and `lab/`.
 pub fn project_parent() -> PathBuf {
     Path::new(env!("CARGO_MANIFEST_DIR"))
