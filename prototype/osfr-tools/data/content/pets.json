@@ -30119,6 +30119,12 @@
       "sha256": "0bad5a154c3ef855744349eb03eb3ab02e7d8dfc3d29fd0f601257fce95076be"
     },
     {
+      "name": "animations",
+      "path": "lab/working/OSFR.Client/OSFR Client/Resources/AnimationTypes.xml",
+      "commit": null,
+      "sha256": "20c55ba0a78171635431cf2d2e84c3d342812eda6079777b41db6af640c90441"
+    },
+    {
       "name": "locale",
       "path": "lab/reports/locale-id-to-text.json",
       "commit": null,
@@ -30294,6 +30300,64 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 3000,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=50 TrickAnimations 3000; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR cat_shorthair.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 3001,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 2000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=50 TrickAnimations 3001; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR cat_shorthair.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 3002,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 6000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=50 TrickAnimations 3002; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR cat_shorthair.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 3003,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=50 TrickAnimations 3003; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR cat_shorthair.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 3004,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=50 TrickAnimations 3004; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR cat_shorthair.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 3005,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 8000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=50 TrickAnimations 3005; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR cat_shorthair.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 3006,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 4467,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=50 TrickAnimations 3006; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR cat_shorthair.adr declares pet_trick_07_level4"
         }
       ],
       "src": "Pets.json Id=50; Models.txt 50"
@@ -31221,6 +31285,64 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=169 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_large_floppy.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=169 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_large_floppy.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=169 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_large_floppy.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=169 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_large_floppy.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=169 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_large_floppy.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=169 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_large_floppy.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=169 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_large_floppy.adr declares pet_trick_07_level4"
+        }
+      ],
       "src": "Pets.json Id=169; Models.txt 169"
     },
     {
@@ -31286,6 +31408,64 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=170 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_large_pointy.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=170 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_large_pointy.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=170 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_large_pointy.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=170 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_large_pointy.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=170 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_large_pointy.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=170 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_large_pointy.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=170 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_large_pointy.adr declares pet_trick_07_level4"
         }
       ],
       "src": "Pets.json Id=170; Models.txt 170"
@@ -31355,6 +31535,64 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=171 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_large_shortears.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=171 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_large_shortears.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=171 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_large_shortears.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=171 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_large_shortears.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=171 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_large_shortears.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=171 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_large_shortears.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=171 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_large_shortears.adr declares pet_trick_07_level4"
+        }
+      ],
       "src": "Pets.json Id=171; Models.txt 171"
     },
     {
@@ -31422,6 +31660,64 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=172 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_small_floppy.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=172 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_small_floppy.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=172 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_small_floppy.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=172 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_small_floppy.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=172 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_small_floppy.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=172 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_small_floppy.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=172 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_small_floppy.adr declares pet_trick_07_level4"
+        }
+      ],
       "src": "Pets.json Id=172; Models.txt 172"
     },
     {
@@ -31487,6 +31783,64 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=173 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_small_pointy.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=173 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_small_pointy.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=173 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_small_pointy.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=173 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_small_pointy.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=173 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_small_pointy.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=173 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_small_pointy.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=173 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_small_pointy.adr declares pet_trick_07_level4"
         }
       ],
       "src": "Pets.json Id=173; Models.txt 173"
@@ -31766,6 +32120,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 3007,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 3500,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=343 TrickAnimations 3007; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR vulture.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3008,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 6000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=343 TrickAnimations 3008; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR vulture.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3009,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 12167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=343 TrickAnimations 3009; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR vulture.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=343; Models.txt 343"
     },
     {
@@ -31899,6 +32279,64 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=364 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_small_fluffy.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=364 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_small_fluffy.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=364 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_small_fluffy.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=364 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_small_fluffy.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=364 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_small_fluffy.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=364 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_small_fluffy.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=364 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_small_fluffy.adr declares pet_trick_07_level4"
+        }
+      ],
       "src": "Pets.json Id=364; Models.txt 364"
     },
     {
@@ -31943,6 +32381,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 2048,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 5667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=376 TrickAnimations 2048; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR treeble.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2049,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 1500,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=376 TrickAnimations 2049; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR treeble.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2050,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 3333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=376 TrickAnimations 2050; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR treeble.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=376; Models.txt 376"
@@ -32317,6 +32781,64 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=514 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_large_dalmation.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=514 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_large_dalmation.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=514 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_large_dalmation.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=514 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_large_dalmation.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=514 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_large_dalmation.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=514 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_large_dalmation.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=514 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_large_dalmation.adr declares pet_trick_07_level4"
+        }
+      ],
       "src": "Pets.json Id=514; Models.txt 514"
     },
     {
@@ -32382,6 +32904,64 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=515 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_large_lab.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=515 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_large_lab.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=515 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_large_lab.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=515 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_large_lab.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=515 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_large_lab.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=515 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_large_lab.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=515 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_large_lab.adr declares pet_trick_07_level4"
         }
       ],
       "src": "Pets.json Id=515; Models.txt 515"
@@ -32484,6 +33064,64 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 3000,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=540 TrickAnimations 3000; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR cat_longhair.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 3001,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 2000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=540 TrickAnimations 3001; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR cat_longhair.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 3002,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 6000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=540 TrickAnimations 3002; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR cat_longhair.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 3003,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=540 TrickAnimations 3003; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR cat_longhair.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 3004,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=540 TrickAnimations 3004; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR cat_longhair.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 3005,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 8000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=540 TrickAnimations 3005; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR cat_longhair.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 3006,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 4467,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=540 TrickAnimations 3006; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR cat_longhair.adr declares pet_trick_07_level4"
+        }
+      ],
       "src": "Pets.json Id=540; Models.txt 540"
     },
     {
@@ -32561,6 +33199,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 3046,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 4067,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=741 TrickAnimations 3046; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR unicorn_m_pinatapet.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3047,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 4067,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=741 TrickAnimations 3047; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR unicorn_m_pinatapet.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3048,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 7533,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=741 TrickAnimations 3048; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR unicorn_m_pinatapet.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=741; Models.txt 741"
@@ -32741,6 +33405,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 3049,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 3867,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=778 TrickAnimations 3049; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR dwarfhog_m_basic.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3050,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 6667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=778 TrickAnimations 3050; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR dwarfhog_m_basic.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3051,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=778 TrickAnimations 3051; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR dwarfhog_m_basic.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=778; Models.txt 778"
     },
     {
@@ -32785,6 +33475,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 3010,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 5933,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=939 TrickAnimations 3010; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR monkey_clockwork_m.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3011,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 4967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=939 TrickAnimations 3011; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR monkey_clockwork_m.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3012,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 5133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=939 TrickAnimations 3012; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR monkey_clockwork_m.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=939; Models.txt 939"
@@ -32852,6 +33568,64 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=941 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_small_pug.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=941 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_small_pug.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=941 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_small_pug.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=941 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_small_pug.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=941 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_small_pug.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=941 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_small_pug.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=941 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_small_pug.adr declares pet_trick_07_level4"
         }
       ],
       "src": "Pets.json Id=941; Models.txt 941"
@@ -32954,6 +33728,64 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=972 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_large_floppy.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=972 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_large_floppy.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=972 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_large_floppy.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=972 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_large_floppy.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=972 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_large_floppy.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=972 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_large_floppy.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=972 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_large_floppy.adr declares pet_trick_07_level4"
+        }
+      ],
       "src": "Pets.json Id=972; Models.txt 972"
     },
     {
@@ -33019,6 +33851,64 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=977 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_large_dalmation.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=977 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_large_dalmation.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=977 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_large_dalmation.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=977 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_large_dalmation.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=977 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_large_dalmation.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=977 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_large_dalmation.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=977 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_large_dalmation.adr declares pet_trick_07_level4"
         }
       ],
       "src": "Pets.json Id=977; Models.txt 977"
@@ -33088,6 +33978,64 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=980 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_small_fluffy.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=980 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_small_fluffy.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=980 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_small_fluffy.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=980 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_small_fluffy.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=980 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_small_fluffy.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=980 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_small_fluffy.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=980 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_small_fluffy.adr declares pet_trick_07_level4"
+        }
+      ],
       "src": "Pets.json Id=980; Models.txt 980"
     },
     {
@@ -33153,6 +34101,64 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=981 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_large_floppy.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=981 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_large_floppy.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=981 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_large_floppy.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=981 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_large_floppy.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=981 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_large_floppy.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=981 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_large_floppy.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=981 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_large_floppy.adr declares pet_trick_07_level4"
         }
       ],
       "src": "Pets.json Id=981; Models.txt 981"
@@ -33321,6 +34327,64 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 3000,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1013 TrickAnimations 3000; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR cat_longhairghost.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 3001,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 2000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1013 TrickAnimations 3001; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR cat_longhairghost.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 3002,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 6000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1013 TrickAnimations 3002; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR cat_longhairghost.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 3003,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1013 TrickAnimations 3003; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR cat_longhairghost.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 3004,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1013 TrickAnimations 3004; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR cat_longhairghost.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 3005,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 8000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1013 TrickAnimations 3005; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR cat_longhairghost.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 3006,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 4467,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1013 TrickAnimations 3006; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR cat_longhairghost.adr declares pet_trick_07_level4"
+        }
+      ],
       "src": "Pets.json Id=1013; Models.txt 1013"
     },
     {
@@ -33386,6 +34450,64 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 3000,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1014 TrickAnimations 3000; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR cat_shorthairghost.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 3001,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 2000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1014 TrickAnimations 3001; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR cat_shorthairghost.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 3002,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 6000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1014 TrickAnimations 3002; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR cat_shorthairghost.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 3003,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1014 TrickAnimations 3003; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR cat_shorthairghost.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 3004,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1014 TrickAnimations 3004; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR cat_shorthairghost.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 3005,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 8000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1014 TrickAnimations 3005; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR cat_shorthairghost.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 3006,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 4467,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1014 TrickAnimations 3006; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR cat_shorthairghost.adr declares pet_trick_07_level4"
         }
       ],
       "src": "Pets.json Id=1014; Models.txt 1014"
@@ -33455,6 +34577,64 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1018 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_large_pointyghost.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1018 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_large_pointyghost.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1018 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_large_pointyghost.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1018 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_large_pointyghost.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1018 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_large_pointyghost.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1018 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_large_pointyghost.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1018 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_large_pointyghost.adr declares pet_trick_07_level4"
+        }
+      ],
       "src": "Pets.json Id=1018; Models.txt 1018"
     },
     {
@@ -33520,6 +34700,64 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1022 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_small_fluffyghost.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1022 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_small_fluffyghost.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1022 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_small_fluffyghost.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1022 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_small_fluffyghost.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1022 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_small_fluffyghost.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1022 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_small_fluffyghost.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1022 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_small_fluffyghost.adr declares pet_trick_07_level4"
         }
       ],
       "src": "Pets.json Id=1022; Models.txt 1022"
@@ -33655,6 +34893,64 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1035 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_large_pointyghost.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1035 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_large_pointyghost.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1035 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_large_pointyghost.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1035 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_large_pointyghost.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1035 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_large_pointyghost.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1035 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_large_pointyghost.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1035 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_large_pointyghost.adr declares pet_trick_07_level4"
+        }
+      ],
       "src": "Pets.json Id=1035; Models.txt 1035"
     },
     {
@@ -33722,6 +35018,64 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1406 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_large_doberman.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1406 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_large_doberman.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1406 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_large_doberman.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1406 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_large_doberman.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1406 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_large_doberman.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1406 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_large_doberman.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1406 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_large_doberman.adr declares pet_trick_07_level4"
+        }
+      ],
       "src": "Pets.json Id=1406; Models.txt 1406"
     },
     {
@@ -33787,6 +35141,64 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1454 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_large_husky.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1454 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_large_husky.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5023,
+          "owner_animation_id": 5021,
+          "duration_ms": 6000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1454 TrickAnimations 13; AnimationTypes.xml 5023 pet_trick_03_level3, 5021 pet_trick_03_level1; ADR dog_large_husky.adr declares pet_trick_03_level3"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1454 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_large_husky.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1454 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_large_husky.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1454 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_large_husky.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1454 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_large_husky.adr declares pet_trick_07_level4"
         }
       ],
       "src": "Pets.json Id=1454; Models.txt 1454"
@@ -33901,6 +35313,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 3052,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 4333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1521 TrickAnimations 3052; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR wolf_coyote.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3053,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 10000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1521 TrickAnimations 3053; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR wolf_coyote.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3054,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 7667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1521 TrickAnimations 3054; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR wolf_coyote.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=1521; Models.txt 1521"
     },
     {
@@ -33945,6 +35383,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 3055,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 1667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1522 TrickAnimations 3055; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR robgoblin_mechpet.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3056,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 1000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1522 TrickAnimations 3056; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR robgoblin_mechpet.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3057,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 2000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1522 TrickAnimations 3057; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR robgoblin_mechpet.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=1522; Models.txt 1522"
@@ -34057,6 +35521,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 3058,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 6567,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1566 TrickAnimations 3058; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR bear_m_druid.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3059,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 3067,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1566 TrickAnimations 3059; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR bear_m_druid.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3060,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 5467,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1566 TrickAnimations 3060; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR bear_m_druid.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=1566; Models.txt 1566"
@@ -34324,6 +35814,64 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 11,
+          "animation_id": 5004,
+          "owner_animation_id": 5001,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1693 TrickAnimations 11; AnimationTypes.xml 5004 pet_trick_01_level4, 5001 pet_trick_01_level1; ADR dog_small_pugmummy.adr declares pet_trick_01_level4"
+        },
+        {
+          "trick_id": 12,
+          "animation_id": 5014,
+          "owner_animation_id": 5011,
+          "duration_ms": 5917,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1693 TrickAnimations 12; AnimationTypes.xml 5014 pet_trick_02_level4, 5011 pet_trick_02_level1; ADR dog_small_pugmummy.adr declares pet_trick_02_level4"
+        },
+        {
+          "trick_id": 13,
+          "animation_id": 5024,
+          "owner_animation_id": 5021,
+          "duration_ms": 4583,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1693 TrickAnimations 13; AnimationTypes.xml 5024 pet_trick_03_level4, 5021 pet_trick_03_level1; ADR dog_small_pugmummy.adr declares pet_trick_03_level4"
+        },
+        {
+          "trick_id": 14,
+          "animation_id": 5034,
+          "owner_animation_id": 5031,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1693 TrickAnimations 14; AnimationTypes.xml 5034 pet_trick_04_level4, 5031 pet_trick_04_level1; ADR dog_small_pugmummy.adr declares pet_trick_04_level4"
+        },
+        {
+          "trick_id": 15,
+          "animation_id": 5044,
+          "owner_animation_id": 5041,
+          "duration_ms": 10667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1693 TrickAnimations 15; AnimationTypes.xml 5044 pet_trick_05_level4, 5041 pet_trick_05_level1; ADR dog_small_pugmummy.adr declares pet_trick_05_level4"
+        },
+        {
+          "trick_id": 16,
+          "animation_id": 5054,
+          "owner_animation_id": 5051,
+          "duration_ms": 5333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1693 TrickAnimations 16; AnimationTypes.xml 5054 pet_trick_06_level4, 5051 pet_trick_06_level1; ADR dog_small_pugmummy.adr declares pet_trick_06_level4"
+        },
+        {
+          "trick_id": 17,
+          "animation_id": 5064,
+          "owner_animation_id": 5061,
+          "duration_ms": 1167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1693 TrickAnimations 17; AnimationTypes.xml 5064 pet_trick_07_level4, 5061 pet_trick_07_level1; ADR dog_small_pugmummy.adr declares pet_trick_07_level4"
+        }
+      ],
       "src": "Pets.json Id=1693; Models.txt 1693"
     },
     {
@@ -34368,6 +35916,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 2000,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 2667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1756 TrickAnimations 2000; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR dragon_m_basic.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2001,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 2500,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1756 TrickAnimations 2001; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR dragon_m_basic.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2002,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1756 TrickAnimations 2002; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR dragon_m_basic.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=1756; Models.txt 1756"
@@ -34416,6 +35990,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 2009,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 2667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1759 TrickAnimations 2009; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR tyrannosaurus_m.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2010,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 10333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1759 TrickAnimations 2010; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR tyrannosaurus_m.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2011,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1759 TrickAnimations 2011; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR tyrannosaurus_m.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=1759; Models.txt 1759"
     },
     {
@@ -34462,6 +36062,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 3013,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 7500,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1760 TrickAnimations 3013; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR triceratops_m_basic.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3014,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 8300,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1760 TrickAnimations 3014; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR triceratops_m_basic.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3015,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1760 TrickAnimations 3015; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR triceratops_m_basic.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=1760; Models.txt 1760"
     },
     {
@@ -34506,6 +36132,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 3016,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 3300,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1769 TrickAnimations 3016; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR raptor_m.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3017,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 5000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1769 TrickAnimations 3017; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR raptor_m.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3018,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 5667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1769 TrickAnimations 3018; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR raptor_m.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=1769; Models.txt 1769"
@@ -34587,6 +36239,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 3019,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 6467,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1771 TrickAnimations 3019; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR pegasus_m.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3020,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 3133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1771 TrickAnimations 3020; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR pegasus_m.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3021,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 2133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1771 TrickAnimations 3021; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR pegasus_m.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=1771; Models.txt 1771"
     },
     {
@@ -34631,6 +36309,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 3019,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 6467,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1772 TrickAnimations 3019; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR pony_f.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3020,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 3133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1772 TrickAnimations 3020; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR pony_f.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3021,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 2133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1772 TrickAnimations 3021; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR pony_f.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=1772; Models.txt 1772"
@@ -34679,6 +36383,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 3019,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 6467,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1773 TrickAnimations 3019; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR pony_m.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3020,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 3133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1773 TrickAnimations 3020; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR pony_m.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3021,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 2133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1773 TrickAnimations 3021; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR pony_m.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=1773; Models.txt 1773"
     },
     {
@@ -34723,6 +36453,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 3019,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 6467,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1774 TrickAnimations 3019; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR unicorn_f.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3020,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 3133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1774 TrickAnimations 3020; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR unicorn_f.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3021,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 2133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1774 TrickAnimations 3021; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR unicorn_f.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=1774; Models.txt 1774"
@@ -34771,6 +36527,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 2000,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 2667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1778 TrickAnimations 2000; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR dragon_m_spikes.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2001,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 2500,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1778 TrickAnimations 2001; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR dragon_m_spikes.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2002,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1778 TrickAnimations 2002; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR dragon_m_spikes.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=1778; Models.txt 1778"
     },
     {
@@ -34815,6 +36597,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 2000,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 2667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1779 TrickAnimations 2000; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR dragon_m_basic.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2001,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 2500,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1779 TrickAnimations 2001; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR dragon_m_basic.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2002,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1779 TrickAnimations 2002; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR dragon_m_basic.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=1779; Models.txt 1779"
@@ -34863,6 +36671,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 3022,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 3100,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1921 TrickAnimations 3022; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR duckbill_m.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3023,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 4333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1921 TrickAnimations 3023; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR duckbill_m.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3024,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 4733,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1921 TrickAnimations 3024; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR duckbill_m.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=1921; Models.txt 1921"
     },
     {
@@ -34909,6 +36743,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 2018,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 6833,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1924 TrickAnimations 2018; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR spider_m.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2019,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 3333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1924 TrickAnimations 2019; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR spider_m.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2020,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 5667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1924 TrickAnimations 2020; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR spider_m.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=1924; Models.txt 1924"
     },
     {
@@ -34953,6 +36813,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 2012,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 4433,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1934 TrickAnimations 2012; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR reindeer_m.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2013,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 4133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1934 TrickAnimations 2013; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR reindeer_m.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2014,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 7567,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1934 TrickAnimations 2014; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR reindeer_m.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=1934; Models.txt 1934"
@@ -35034,6 +36920,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 3025,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 3000,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1967 TrickAnimations 3025; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR hippo_m_basic.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3026,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 8433,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1967 TrickAnimations 3026; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR hippo_m_basic.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3027,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 9133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1967 TrickAnimations 3027; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR hippo_m_basic.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=1967; Models.txt 1967"
     },
     {
@@ -35078,6 +36990,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 2012,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 4433,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1968 TrickAnimations 2012; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR reindeer_m_rednose.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2013,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 4133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1968 TrickAnimations 2013; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR reindeer_m_rednose.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2014,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 7567,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=1968 TrickAnimations 2014; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR reindeer_m_rednose.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=1968; Models.txt 1968"
@@ -35126,6 +37064,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 3028,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 6667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2001 TrickAnimations 3028; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR babypenguin_m.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3029,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 3592,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2001 TrickAnimations 3029; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR babypenguin_m.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3030,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 5667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2001 TrickAnimations 3030; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR babypenguin_m.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=2001; Models.txt 2001"
     },
     {
@@ -35170,6 +37134,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 2033,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 3533,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2029 TrickAnimations 2033; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR tiger_m.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2034,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 5167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2029 TrickAnimations 2034; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR tiger_m.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2035,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 2633,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2029 TrickAnimations 2035; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR tiger_m.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=2029; Models.txt 2029"
@@ -35251,6 +37241,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 2039,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 6667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2036 TrickAnimations 2039; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR groundhog_m.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2040,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 8333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2036 TrickAnimations 2040; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR groundhog_m.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2041,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 6667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2036 TrickAnimations 2041; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR groundhog_m.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=2036; Models.txt 2036"
     },
     {
@@ -35330,6 +37346,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 3031,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 7533,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2052 TrickAnimations 3031; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR owl_m.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3032,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 8333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2052 TrickAnimations 3032; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR owl_m.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3033,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 9800,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2052 TrickAnimations 3033; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR owl_m.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=2052; Models.txt 2052"
     },
     {
@@ -35374,6 +37416,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 2027,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 8333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2057 TrickAnimations 2027; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR beetle_pincher.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2028,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 8875,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2057 TrickAnimations 2028; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR beetle_pincher.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2029,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 5800,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2057 TrickAnimations 2029; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR beetle_pincher.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=2057; Models.txt 2057"
@@ -35488,6 +37556,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 2009,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 2667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2131 TrickAnimations 2009; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR tyrannosaurus_m.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2010,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 10333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2131 TrickAnimations 2010; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR tyrannosaurus_m.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2011,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 4667,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2131 TrickAnimations 2011; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR tyrannosaurus_m.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=2131; Models.txt 2131"
     },
     {
@@ -35570,6 +37664,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 3034,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 4967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2151 TrickAnimations 3034; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR dog_large_balloondog.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3035,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 6633,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2151 TrickAnimations 3035; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR dog_large_balloondog.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3036,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 4967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=2151 TrickAnimations 3036; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR dog_large_balloondog.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=2151; Models.txt 2151"
@@ -35684,6 +37804,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 2051,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 3967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3030 TrickAnimations 2051; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR groundhog_m_sharkfin.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2052,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 5967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3030 TrickAnimations 2052; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR groundhog_m_sharkfin.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2053,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 14967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3030 TrickAnimations 2053; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR groundhog_m_sharkfin.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=3030; Models.txt 3030"
     },
     {
@@ -35761,6 +37907,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 3010,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 5933,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3169 TrickAnimations 3010; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR monkey_m.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3011,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 4967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3169 TrickAnimations 3011; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR monkey_m.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3012,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 5133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3169 TrickAnimations 3012; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR monkey_m.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=3169; Models.txt 3169"
@@ -35875,6 +38047,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 2057,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 7967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3284 TrickAnimations 2057; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR wolf_generic.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2058,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 4633,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3284 TrickAnimations 2058; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR wolf_generic.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2059,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 5233,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3284 TrickAnimations 2059; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR wolf_generic.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=3284; Models.txt 3284"
     },
     {
@@ -35919,6 +38117,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 3037,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 4967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3286 TrickAnimations 3037; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR pig_m_basic.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3038,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 4967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3286 TrickAnimations 3038; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR pig_m_basic.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3039,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 4967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3286 TrickAnimations 3039; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR pig_m_basic.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=3286; Models.txt 3286"
@@ -35967,6 +38191,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 3040,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 9967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3287 TrickAnimations 3040; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR rofle_m.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3041,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 4967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3287 TrickAnimations 3041; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR rofle_m.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3042,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 13300,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3287 TrickAnimations 3042; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR rofle_m.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=3287; Models.txt 3287"
     },
     {
@@ -36011,6 +38261,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 3043,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 9633,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3305 TrickAnimations 3043; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR halloweenbat_01.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3044,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 6633,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3305 TrickAnimations 3044; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR halloweenbat_01.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3045,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 4967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3305 TrickAnimations 3045; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR halloweenbat_01.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=3305; Models.txt 3305"
@@ -36059,6 +38335,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 22,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 4967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3358 TrickAnimations 22; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR dragon_m_phoenix.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 23,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 4967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3358 TrickAnimations 23; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR dragon_m_phoenix.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 24,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 4967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3358 TrickAnimations 24; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR dragon_m_phoenix.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=3358; Models.txt 3358"
     },
     {
@@ -36105,6 +38407,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 3061,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 7300,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3405 TrickAnimations 3061; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR hydra_basic.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3062,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 4967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3405 TrickAnimations 3062; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR hydra_basic.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3063,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 6967,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3405 TrickAnimations 3063; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR hydra_basic.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=3405; Models.txt 3405"
     },
     {
@@ -36149,6 +38477,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 3019,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 6467,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3426 TrickAnimations 3019; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR pony_m_nightmare.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3020,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 3133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3426 TrickAnimations 3020; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR pony_m_nightmare.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3021,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 2133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3426 TrickAnimations 3021; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR pony_m_nightmare.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=3426; Models.txt 3426"
@@ -36296,6 +38650,32 @@
           "unknown": 0
         }
       ],
+      "trick_animations": [
+        {
+          "trick_id": 3019,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 6467,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3432 TrickAnimations 3019; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR pony_pegasus_m_fire.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 3020,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 3133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3432 TrickAnimations 3020; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR pony_pegasus_m_fire.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 3021,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 2133,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3432 TrickAnimations 3021; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR pony_pegasus_m_fire.adr declares pet_trick_03_level2"
+        }
+      ],
       "src": "Pets.json Id=3432; Models.txt 3432"
     },
     {
@@ -36340,6 +38720,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 2033,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 3533,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3479 TrickAnimations 2033; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR tiger_m_lava.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2034,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 5167,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3479 TrickAnimations 2034; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR tiger_m_lava.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2035,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 2633,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3479 TrickAnimations 2035; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR tiger_m_lava.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=3479; Models.txt 3479"
@@ -36584,6 +38990,32 @@
           "key": 146,
           "id": 146,
           "unknown": 0
+        }
+      ],
+      "trick_animations": [
+        {
+          "trick_id": 2027,
+          "animation_id": 5002,
+          "owner_animation_id": 5001,
+          "duration_ms": 8333,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3885 TrickAnimations 2027; AnimationTypes.xml 5002 pet_trick_01_level2, 5001 pet_trick_01_level1; ADR beetle_clockwork.adr declares pet_trick_01_level2"
+        },
+        {
+          "trick_id": 2028,
+          "animation_id": 5012,
+          "owner_animation_id": 5011,
+          "duration_ms": 8875,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3885 TrickAnimations 2028; AnimationTypes.xml 5012 pet_trick_02_level2, 5011 pet_trick_02_level1; ADR beetle_clockwork.adr declares pet_trick_02_level2"
+        },
+        {
+          "trick_id": 2029,
+          "animation_id": 5022,
+          "owner_animation_id": 5021,
+          "duration_ms": 5800,
+          "start_delay_ms": 3500,
+          "src": "Pets.json Id=3885 TrickAnimations 2029; AnimationTypes.xml 5022 pet_trick_03_level2, 5021 pet_trick_03_level1; ADR beetle_clockwork.adr declares pet_trick_03_level2"
         }
       ],
       "src": "Pets.json Id=3885; Models.txt 3885"
@@ -43159,6 +45591,15 @@
       "source": {
         "kind": "reconstructed",
         "evidence": "T488: the session length, the gain per stroke speed and its caps, the petting gain and rate limit are server policy (R). Client facts: 53/18 sender 00b5f8c0; 53/20 kind 3 timer word in seconds (00b5ec14, FlashTimerSetTimer 00a8eff0), kind 4 end (00b56920); 53/22 sender 00ccebc0 (mode = pet handler state word, 2 while grooming; time in ms; movement sum). The locale says the pet only holds still for a minute. The dry-off animation 5505 and the petting-to-play idea come from OSFR PR 152, read for behaviour only."
+      }
+    },
+    "trick": {
+      "gesture_grace_ms": 20000,
+      "result_text_id": 90163,
+      "result_value": 0,
+      "source": {
+        "kind": "reconstructed",
+        "evidence": "T489: the grace window, the result text and the value are server policy (R). Client facts: 53/7 writer 00b5ff50 and 53/8 writer 00b5ffe0 (one u32 trick id each; 00cc7420 sends them back to back, BeginPetGestureRound 00cc9330 sends 53/7 and FinishPetGestureState 00cc9a90 sends 53/8); 53/15 PetTrickNotify reader 00b55ab0, handler 00b5ce60 case 15 (kind 1 trick-name line from the fourth word, kind 2 TrickSuccessResult with that text id and the fifth word, kind 3 UnlockTricks 00b59070); 53/20 kind 5 marks the pet actor (00b5ecef), kind 6 clears it and the state word (00b56a00). The grace window is the drawing round's force-end time (PetTrickGestureSettings.txt FORCE_END_MILLISECONDS 20000). 90163 is that file's RESULT_GREAT string, the one result text the locale has for a trick that succeeded (the locale lacks 90157 and 90161); the grade is computed on the client and never sent, and no Lua handler consumes the kind 2 event, so the choice is inert today. The per-model animation rows (animation ids, owner animation ids, run times and start delays) come from the OSFR reference Pets.json TrickAnimations (commit 10f129e7f3e2094304d20ccee6e3f7136a5e889d, sha256 06b120e38296143633e1485b394f162ea7199767e8fdfbe9aeadbc6a952dfaec; read for data, not code); scripts/pets_import.py checks every animation id against the client's AnimationTypes.xml and the pet slot against the model's ADR, and the run times and start delays stay (R), since no client table holds them. OSFR also plays an idea effect and an owner cheer; neither is built."
       }
     },
     "source": {

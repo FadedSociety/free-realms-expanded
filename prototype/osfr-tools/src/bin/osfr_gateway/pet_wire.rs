@@ -6,6 +6,7 @@
 //! the summon request is `00b5a650` (u32 id then action byte).
 //! T485: the care panel's utility (53/16), feed (53/19) and water (53/28) bodies.
 //! T488: groom (53/18) and the tactile stroke report (53/22).
+//! T489: perform trick (53/7), gesture result (53/8) and favourite trick (53/14).
 #![allow(dead_code)] // each includer uses a subset
 
 /// Client `SendPetSummon` (`00b5a650`): `53 00 | 4 | u32 pet id | action 1`.
@@ -55,6 +56,27 @@ pub fn groom(pet_id: u32) -> Vec<u8> {
 pub fn tactile(mode: u32, duration_ms: u32, movement: u32) -> Vec<u8> {
     let mut bytes = vec![53, 0, 22];
     for value in [mode, 3, duration_ms, movement] {
+        bytes.extend(value.to_le_bytes());
+    }
+    bytes
+}
+
+/// Client `Pet.PerformTrick` writer (`00b5ff50`, ctor `00b50a10`): `53 00 | 7 | u32 trick id`.
+pub fn perform_trick(trick_id: u32) -> Vec<u8> {
+    [vec![53, 0, 7], trick_id.to_le_bytes().to_vec()].concat()
+}
+
+/// Client `PetTrickGestureResult` writer (`00b5ffe0`, ctor `00b50c20`): `53 00 | 8 | u32 trick id`,
+/// no grade.
+pub fn trick_result(trick_id: u32) -> Vec<u8> {
+    [vec![53, 0, 8], trick_id.to_le_bytes().to_vec()].concat()
+}
+
+/// Client `Pet.SetFavoriteTrick` (`00b5f670`, ctor `00b51290`): `53 00 | 14 | u32 active pet id |
+/// u32 slot (the one-based UI slot minus one) | u32 trick id`.
+pub fn favorite(pet_id: u32, slot: u32, trick_id: u32) -> Vec<u8> {
+    let mut bytes = vec![53, 0, 14];
+    for value in [pet_id, slot, trick_id] {
         bytes.extend(value.to_le_bytes());
     }
     bytes

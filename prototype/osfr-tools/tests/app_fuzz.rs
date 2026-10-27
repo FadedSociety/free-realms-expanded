@@ -798,6 +798,10 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     // T488: groom and the tactile stroke report.
     result.push(("pets", [vec![53, 0, 18], vec![0xff; 8]].concat()));
     result.push(("pets", [vec![53, 0, 22], vec![0xff; 16]].concat()));
+    // T489: perform trick, gesture result and favourite trick.
+    result.push(("pets", [vec![53, 0, 7], vec![0xff; 4]].concat()));
+    result.push(("pets", [vec![53, 0, 8], vec![0xff; 4]].concat()));
+    result.push(("pets", [vec![53, 0, 14], vec![0xff; 12]].concat()));
     result.push(("gameplay.handle_in_world", vec![53, 0, 0xff, 0xff]));
     // T765: the card manager's ticket request (39/37), ignored without a started card run.
     result.push(("card_game", [vec![39, 0, 37], vec![0xff; 12]].concat()));

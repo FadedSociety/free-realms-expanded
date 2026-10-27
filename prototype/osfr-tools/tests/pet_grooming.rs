@@ -67,11 +67,6 @@ fn groom_need(service: &PetService, pet: u32) -> f32 {
     service.pet(pet).unwrap().needs.groom
 }
 
-/// A 53/20 notify for `pet`: the kind, the timer word, three zero words.
-fn notify(pet: u32, kind: u32, timer: u32) -> Vec<u8> {
-    words(&[53, 0, 20], &[pet, kind, timer, 0, 0, 0])
-}
-
 /// `wire` is the lone kind-6 unlock and the roster and bag are exactly as before.
 fn assert_refused(
     service: &mut PetService,
@@ -512,7 +507,7 @@ fn a_dismiss_water_a_new_summon_and_zoning_end_the_session_with_kind_4_and_no_mo
 
     // Zoning: the gateway sends this packet before it dismisses the pet.
     let (service, _, pet) = session();
-    assert_eq!(service.care_end_packet(), Some(notify(pet, 4, 0)));
+    assert_eq!(service.care_end_packets(), vec![notify(pet, 4, 0)]);
 
     // A dismiss and a replacing summon.
     let (mut service, mut fixture, pet) = session();

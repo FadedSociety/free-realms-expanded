@@ -16,6 +16,7 @@ use std::{
 };
 
 mod grooming;
+mod tricks;
 
 const PET_FAMILY: u16 = 53;
 /// (R) Hard ceiling on a saved roster; the client can display a bounded list.
@@ -25,7 +26,8 @@ const PET_CONTENT: &str = include_str!("../data/content/pets.json");
 const PET_GUID_TAG: u64 = 0x4000_0000_0000_0000;
 /// T485: the pet subtypes `PetRequest::decode` accepts; the gateway's pet label reads this list.
 /// T488: 18 (groom) and 22 (tactile stroke) join them.
-pub const DECODED_SUBTYPES: [u8; 9] = [4, 6, 16, 18, 19, 22, 24, 28, 32];
+/// T489: 7 (perform trick), 8 (gesture result) and 14 (favourite trick) join them.
+pub const DECODED_SUBTYPES: [u8; 12] = [4, 6, 7, 8, 14, 16, 18, 19, 22, 24, 28, 32];
 /// T485: the client's utility slots are the kit item's definition slot minus 199 (`00c077a0`):
 /// shampoo 200 -> 1 .. vitamins 206 -> 7. Feeding needs the bowl (204) and the food (205).
 const UTILITY_SLOT_OFFSET: i32 = 199;
@@ -41,6 +43,10 @@ const NOTIFY_UNLOCK: u32 = 6;
 /// seconds: `00b5ec14`); kind 4 ends it and releases the spots (`00b56920`).
 const NOTIFY_GROOM: u32 = 3;
 const NOTIFY_GROOM_END: u32 = 4;
+/// T489: kind 5 marks the pet's actor for a trick (`00b53710(1)` at `00b5ecef`; kind 6 clears it).
+const NOTIFY_TRICK: u32 = 5;
+/// T489 (R): sanity bound on a trick's start delay plus its run time, in ms.
+const MAX_TRICK_MS: u32 = 30_000;
 /// Sanity cap on a care item's restore: Legacy food Param2 runs 50..400 on an unrecovered scale,
 /// and the bar itself clamps at `need_policy.maximum`.
 const MAX_CARE_RESTORE: f32 = 1_000.0;
@@ -89,6 +95,9 @@ struct CareTiming {
     /// does nothing.
     #[serde(default)]
     groom: Option<grooming::GroomConfig>,
+    /// T489: the trick session rules; without them 53/7 is refused with the unlocks.
+    #[serde(default)]
+    trick: Option<tricks::TrickConfig>,
     source: SourceTag,
 }
 
@@ -100,6 +109,7 @@ impl CareTiming {
             && self.status_epsilon.is_finite()
             && (0.01..=50.0).contains(&self.status_epsilon)
             && self.groom.as_ref().is_none_or(grooming::GroomConfig::valid)
+            && self.trick.as_ref().is_none_or(tricks::TrickConfig::valid)
     }
 }
 
@@ -133,9 +143,29 @@ pub struct PetModel {
     pub tricks: Vec<PetModelTrick>,
     #[serde(default)]
     pub item_classes: Vec<PetItemClass>,
+    /// T489: how each of the model's tricks plays (owner and pet animation groups and timing).
+    #[serde(default)]
+    pub trick_animations: Vec<PetTrickAnimation>,
     src: String,
     #[serde(default)]
     unknown_reasons: BTreeMap<String, String>,
+}
+
+impl PetModel {
+    /// Every animation row names one of the model's tricks, once, with positive ids and a delay
+    /// plus run time within `MAX_TRICK_MS`.
+    fn animations_valid(&self) -> bool {
+        let mut seen = BTreeSet::new();
+        self.trick_animations.iter().all(|row| {
+            self.tricks.iter().any(|trick| trick.id == row.trick_id)
+                && seen.insert(row.trick_id)
+                && row.animation_id > 0
+                && row.owner_animation_id > 0
+                && !row.src.is_empty()
+                && (1..=MAX_TRICK_MS).contains(&row.duration_ms)
+                && row.start_delay_ms <= MAX_TRICK_MS - row.duration_ms
+        })
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -143,6 +173,20 @@ pub struct PetModel {
 pub struct PetModelTrick {
     pub id: u32,
     pub known: bool,
+}
+
+/// One trick of a model: the animation group the pet plays after `start_delay_ms`, the group the
+/// owner plays at once, and how long the pet's animation runs. Ids are client animation slots
+/// (`AnimationTypes.xml`); `scripts/pets_import.py` checks them against the model's ADR.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct PetTrickAnimation {
+    pub trick_id: u32,
+    pub animation_id: i32,
+    pub owner_animation_id: i32,
+    pub duration_ms: u32,
+    pub start_delay_ms: u32,
+    src: String,
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -530,6 +574,7 @@ impl PetContent {
                 || !model_ids.insert(model.model_id)
                 || model.tricks.len() > 16
                 || model.item_classes.len() > 16
+                || !model.animations_valid()
                 || model
                     .tricks
                     .iter()
@@ -768,6 +813,25 @@ pub enum PetRequest {
         duration_ms: u32,
         movement: u32,
     },
+    /// T489 `Pet.PerformTrick` (`00c06890` -> `00b5fb30` -> `UnlockPetTricksAfterGesture`
+    /// `00cc7420`, or `BeginPetGestureRound` `00cc9330`; writer `00b5ff50`, ctor `00b50a10`): the
+    /// trick id. No pet id: the active pet performs it.
+    PerformTrick {
+        trick_id: u32,
+    },
+    /// T489 53/8 `PetTrickGestureResult` (writer `00b5ffe0`, ctor `00b50c20`; sent right after 53/7
+    /// by `00cc7420` and at the end of the drawing round by `FinishPetGestureState` `00cc9a90`):
+    /// the trick id and no grade.
+    TrickResult {
+        trick_id: u32,
+    },
+    /// T489 `Pet.SetFavoriteTrick` (`00b5f670`, ctor `00b51290`): the active pet id, the slot as
+    /// the sender computed it (the one-based UI slot minus one, so 0 to 3) and the trick id.
+    Favorite {
+        pet_id: u32,
+        slot: u32,
+        trick_id: u32,
+    },
 }
 
 impl PetRequest {
@@ -894,6 +958,29 @@ impl PetRequest {
                     movement: word(12)?,
                 }))
             }
+            7 | 8 => {
+                if body.len() != 4 {
+                    return Err(invalid("pet trick request has the wrong length"));
+                }
+                let trick_id = word(0).ok_or_else(|| invalid("short pet trick request"))?;
+                Ok(Some(if subtype == 7 {
+                    PetRequest::PerformTrick { trick_id }
+                } else {
+                    PetRequest::TrickResult { trick_id }
+                }))
+            }
+            14 => {
+                if body.len() != 12 {
+                    return Err(invalid("pet favorite request has the wrong length"));
+                }
+                let word =
+                    |offset: usize| word(offset).ok_or_else(|| invalid("short pet favorite"));
+                Ok(Some(PetRequest::Favorite {
+                    pet_id: word(0)?,
+                    slot: word(4)?,
+                    trick_id: word(8)?,
+                }))
+            }
             // Other client-bound pet subtypes are not enabled without a recovered layout.
             _ => Ok(None),
         }
@@ -908,6 +995,10 @@ pub struct PetWire {
     pub shared: Vec<Vec<u8>>,
     pub notice: Option<&'static str>,
     pub changed: bool,
+    /// T489: the trick id of a 53/7 the server accepted, set when it is accepted, not when the
+    /// animation ends. A refusal, a late 53/8 and every tick leave it `None`, so a caller (the
+    /// T788 quest objective) can credit exactly the accepted performs.
+    pub accepted_trick: Option<u32>,
 }
 
 #[derive(Clone, Copy)]
@@ -928,6 +1019,15 @@ struct ActivePet {
     grooming: Option<grooming::Grooming>,
     /// T488: when petting last raised play (ms); the rate limit reads it. Session only.
     petted_ms: Option<u64>,
+    /// T489: the running trick, or the one that just ended (session only, like `feeding`).
+    trick: tricks::TrickState,
+}
+
+impl ActivePet {
+    /// A feed, a grooming session or a trick is running: no other care action may start.
+    fn interacting(&self) -> bool {
+        self.feeding.is_some() || self.grooming.is_some() || self.trick.running()
+    }
 }
 
 /// T485: a feed between its 53/20 begin and end.
@@ -1331,6 +1431,7 @@ impl PetService {
             shown: None,
             grooming: None,
             petted_ms: None,
+            trick: tricks::TrickState::Idle,
         });
         let model_id = self.content.model_id(&model);
         broadcasts.push(PetPresenceEvent::Spawn(PetPresence {
@@ -1489,9 +1590,10 @@ impl PetService {
         let mut next = self.clone();
         let summoning = matches!(request, PetRequest::Summon { .. });
         // T485: replacing or dismissing the active pet ends its feed (nothing more is consumed).
-        let feed_end = (summoning || matches!(request, PetRequest::Dismiss))
-            .then(|| self.care_end_packet())
-            .flatten();
+        // T488: a grooming session. T489: a trick (the unlocks).
+        let care_end = (summoning || matches!(request, PetRequest::Dismiss))
+            .then(|| self.care_end_packets())
+            .unwrap_or_default();
         let applied = match request {
             PetRequest::Summon { pet_id } => {
                 next.rebase_clock(now);
@@ -1509,19 +1611,24 @@ impl PetService {
                 Err(invalid("pet adoption requires the live inventory"))
             }
             // T485: fitting and feeding read and spend the live inventory (`handle_at_ms`).
-            // T488: so do grooming and tactile strokes (`handle_at_ms`).
+            // T488: so do grooming and tactile strokes (`handle_at_ms`). T489: tricks and
+            // favourites run on the same route, with the millisecond clock.
             PetRequest::Utility { .. }
             | PetRequest::Feed { .. }
             | PetRequest::Groom { .. }
-            | PetRequest::Tactile { .. } => Err(invalid("pet care requires the live inventory")),
+            | PetRequest::Tactile { .. }
+            | PetRequest::PerformTrick { .. }
+            | PetRequest::TrickResult { .. }
+            | PetRequest::Favorite { .. } => Err(invalid("pet care requires the live inventory")),
             // The client reports water whether or not a pet is out; only a summoned pet keeps it.
-            // T488: entering water ends a grooming session.
+            // T488: entering water ends a grooming session. T489: and a trick.
             PetRequest::Water(in_water) => {
                 let mut wire = PetWire::default();
                 if self.active.is_some() {
                     self.set_in_water(in_water)?;
                     if in_water {
                         wire = self.stop_groom();
+                        wire.private.extend(self.stop_trick());
                     }
                 }
                 return Ok(Some(wire));
@@ -1567,7 +1674,7 @@ impl PetService {
                 if summoning {
                     wire.private.push(self.list_packet());
                 }
-                wire.private.extend(feed_end);
+                wire.private.extend(care_end);
                 Ok(Some(wire))
             }
             Err(error) => Ok(Some(PetWire {
@@ -1643,6 +1750,27 @@ impl PetService {
                     movement,
                     busy,
                     now_ms,
+                )));
+            }
+            PetRequest::PerformTrick { trick_id } => {
+                return Ok(Some(self.perform_trick(trick_id, busy, now_ms)));
+            }
+            PetRequest::TrickResult { trick_id } => {
+                return Ok(Some(self.trick_result(trick_id, now_ms)));
+            }
+            // A refused favourite sends nothing: the client sets the slot only from the echo.
+            PetRequest::Favorite {
+                pet_id,
+                slot,
+                trick_id,
+            } => {
+                return Ok(Some(self.set_favorite(pet_id, slot, trick_id).map_or_else(
+                    |_| PetWire::default(),
+                    |echo| PetWire {
+                        private: vec![echo],
+                        changed: true,
+                        ..PetWire::default()
+                    },
                 )));
             }
             _ => return self.handle(inner, owner_guid, owner_position, busy, now),
@@ -1851,8 +1979,7 @@ impl PetService {
         if self.content.care.is_none()
             || busy.minigame_active
             || active.in_water
-            || active.feeding.is_some()
-            || active.grooming.is_some()
+            || active.interacting()
         {
             return None;
         }
@@ -1922,6 +2049,9 @@ impl PetService {
         if let Some(groom) = care.groom.as_ref() {
             self.groom_tick(groom, &mut wire, now_ms);
         }
+        if let Some(trick) = care.trick.as_ref() {
+            self.trick_tick(trick, &mut wire, now_ms);
+        }
         if let Some(status) = self.live_needs(care, now_ms) {
             wire.private.push(status);
         }
@@ -1954,16 +2084,21 @@ impl PetService {
         Some(pet_status_packet(active.pet_id, &needs))
     }
 
-    /// T485: the 53/20 end for a feed (kind 2) or, T488, a grooming session (kind 4) still running
-    /// (a dismiss, re-summon or zone change ends it).
-    pub fn care_end_packet(&self) -> Option<Vec<u8>> {
-        let active = self.active?;
-        let kind = match (active.grooming, active.feeding) {
-            (Some(_), _) => NOTIFY_GROOM_END,
-            (None, Some(_)) => NOTIFY_END,
-            (None, None) => return None,
+    /// T485: the 53/20 end for a feed (kind 2) or, T488, a grooming session (kind 4) still running,
+    /// and, T489, the unlocks of a running trick (a dismiss, re-summon or zone change ends it).
+    pub fn care_end_packets(&self) -> Vec<Vec<u8>> {
+        let Some(active) = self.active else {
+            return Vec::new();
         };
-        Some(pet_utility_notify_packet(active.pet_id, kind, 0))
+        let kind = match (active.grooming, active.feeding) {
+            (Some(_), _) => Some(NOTIFY_GROOM_END),
+            (None, Some(_)) => Some(NOTIFY_END),
+            (None, None) => None,
+        };
+        kind.map(|kind| pet_utility_notify_packet(active.pet_id, kind, 0))
+            .into_iter()
+            .chain(self.trick_end_packets())
+            .collect()
     }
 
     pub fn list_packet(&self) -> Vec<u8> {
@@ -2181,22 +2316,26 @@ impl PetService {
         Ok(())
     }
 
-    /// `client_slot` is one-based. Client sender 00b5f670 converts it to the
-    /// zero-based slot stored by the server-side pet record.
-    pub fn set_favorite(
-        &mut self,
-        pet_id: u32,
-        client_slot: u8,
-        trick_id: u32,
-    ) -> io::Result<Vec<u8>> {
-        if !(1..=4).contains(&client_slot) || !self.content.has_trick(trick_id) {
-            return Err(invalid("invalid pet favorite slot or trick"));
-        }
-        let pet = pet_mut(&mut self.roster, pet_id)?;
-        if !pet.learned_tricks.contains(&trick_id) {
+    /// `slot` is the wire value, 0 to 3: the client sender `00b5f670` sends the one-based UI slot
+    /// minus one (it refuses anything outside 1 to 4 itself). The inbound handler (`00b5ce60`
+    /// case 14) also stores slot 4, which addresses the first utility slot (+0x98), so 4 and more
+    /// are refused here and never echoed. The trick must be one the pet knows.
+    pub fn set_favorite(&mut self, pet_id: u32, slot: u32, trick_id: u32) -> io::Result<Vec<u8>> {
+        let slot = usize::try_from(slot)
+            .ok()
+            .filter(|slot| *slot < 4)
+            .ok_or_else(|| invalid("invalid pet favorite slot"))?;
+        let known = self.content.has_trick(trick_id)
+            && self
+                .pet(pet_id)
+                .is_some_and(|pet| self.trick_known(pet, trick_id));
+        if !known {
             return Err(invalid("pet does not know favorite trick"));
         }
-        let slot = usize::from(client_slot - 1);
+        let pet = pet_mut(&mut self.roster, pet_id)?;
+        // A trick the model lists as known counts as learned from now on, so the roster check
+        // (a favourite is a learned trick) holds for a pet saved before its model row existed.
+        pet.learned_tricks.insert(trick_id);
         pet.favorite_tricks[slot] = Some(trick_id);
         Ok(pet_favorite_packet(pet_id, slot as u32, trick_id))
     }
@@ -2674,6 +2813,25 @@ fn pet_utility_notify_packet(pet_id: u32, kind: u32, timer: u32) -> Vec<u8> {
     let mut bytes = pet_header(20);
     for value in [pet_id, kind, timer, 0, 0, 0] {
         bytes.extend(value.to_le_bytes());
+    }
+    bytes
+}
+
+/// T489: 53/15 PetTrickNotify (reader `00b55ab0`, handler `00b5ce60` case 15): five u32, the pet id,
+/// the kind (1 trick-name line, 2 result, 3 unlock), the trick id, a text id (kind 1: the trick's
+/// name for `PetOrderDoTrick`; kind 2: the result text) and a value (kind 2). The client's handler
+/// reads only the kind, the text id and the value (it takes the pet from its own state); the pet
+/// and trick words are filled for any reader that wants them (R).
+fn pet_trick_notify_packet(
+    pet_id: u32,
+    kind: u32,
+    trick_id: u32,
+    text_id: u32,
+    value: u32,
+) -> Vec<u8> {
+    let mut bytes = pet_header(15);
+    for word in [pet_id, kind, trick_id, text_id, value] {
+        bytes.extend(word.to_le_bytes());
     }
     bytes
 }

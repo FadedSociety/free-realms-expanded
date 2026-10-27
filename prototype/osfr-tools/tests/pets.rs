@@ -231,7 +231,8 @@ fn trick_list_favourite_and_roster_reload_persist() {
     let mut service = PetService::new(PetService::bundled_content().unwrap()).unwrap();
     let pet_id = service.adopt_vendor_grant(2, &definition(), 0).unwrap();
     service.learn_trick(pet_id, 1).unwrap();
-    let favorite = service.set_favorite(pet_id, 1, 1).unwrap();
+    // The wire slot is zero-based (the client sender subtracts one from the UI slot).
+    let favorite = service.set_favorite(pet_id, 0, 1).unwrap();
     assert_eq!(
         favorite,
         [

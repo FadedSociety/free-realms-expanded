@@ -159,11 +159,7 @@ impl PetService {
         now_ms: u64,
     ) -> Option<(i32, Option<i32>)> {
         let active = self.active.filter(|active| active.pet_id == pet_id)?;
-        if busy.minigame_active
-            || active.in_water
-            || active.feeding.is_some()
-            || active.grooming.is_some()
-        {
+        if busy.minigame_active || active.in_water || active.interacting() {
             return None;
         }
         let pet = self.pet(pet_id)?;

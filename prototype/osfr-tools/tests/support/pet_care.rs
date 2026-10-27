@@ -49,7 +49,11 @@ pub fn kit() -> InventoryFixture {
 
 /// A dog (model 364, which lists item class 73) adopted at time 0.
 pub fn dog() -> (PetService, u32) {
-    let content = PetContent::bundled().unwrap();
+    dog_with(PetContent::bundled().unwrap())
+}
+
+/// `dog` on edited content (T489: trick rules and animation rows).
+pub fn dog_with(content: PetContent) -> (PetService, u32) {
     let mut service = PetService::new(content.clone()).unwrap();
     let mut definition = content.definition(1_000_015).unwrap();
     definition.model = content.model(364).unwrap().adr.clone();
@@ -83,6 +87,11 @@ pub fn words(head: &[u8], values: &[u32]) -> Vec<u8> {
         bytes.extend(value.to_le_bytes());
     }
     bytes
+}
+
+/// A 53/20 notify for `pet`: the kind, the timer word, three zero words.
+pub fn notify(pet: u32, kind: u32, timer: u32) -> Vec<u8> {
+    words(&[53, 0, 20], &[pet, kind, timer, 0, 0, 0])
 }
 
 pub fn fit(pet: u32, slot: u32, item: i32) -> Vec<u8> {

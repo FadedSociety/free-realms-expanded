@@ -363,12 +363,12 @@ impl Gameplay {
             return Ok(Outcome::default());
         }
         let mut pets = self.pets.clone();
-        let feed_end = pets.care_end_packet();
+        let care_end = pets.care_end_packets();
         pets.rebase_clock(now_ms / 1_000);
         let transition = pets.zone_away(now_ms / 1_000)?;
         self.pets = pets;
         let mut out = Self::pet_outcome(self.pets.wire(transition));
-        out.replies.extend(feed_end);
+        out.replies.extend(care_end);
         Ok(out)
     }
 }

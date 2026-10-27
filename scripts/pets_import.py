@@ -5,6 +5,8 @@ Sources (data facts only; the AGPL reference's code is not copied):
   Pets.json             lab/references/Sanctuary-main-20261019/src/Resources/Pets.json (per-model rows)
   ClientItemDefinitions lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (Type 2 = pet items)
   Models.txt            lab/working/OSFR.Client/OSFR Client/Resources/Models.txt (client model ids)
+  AnimationTypes.xml    lab/working/OSFR.Client/OSFR Client/Resources/AnimationTypes.xml (animation slot id -> name; T489)
+  ADR files             lab/extracted/named/*/*/<model>.adr (a model's animation slot names; T489)
   locale                lab/reports/locale-id-to-text.json (item display names; a name id the client lacks drops it)
 Client evidence wins: an item whose model is not in Models.txt, or whose name id the locale lacks, is dropped.
 (R) Two client item rows name a model Models.txt does not spell the same way: firefly.adr has two client ids and
@@ -12,8 +14,10 @@ no Pets.json row (the lower id is used), and Candy Corn's vanitypet_candycorn_cr
 critter by its item TextureAlias (candycorn-critter -> candycorn_critter.adr, which Models.txt row 1530
 describes as "halloween candy corn pet pal"). Both are bound so every client Type-2 item can be adopted.
 """
+import glob
 import hashlib
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -29,6 +33,7 @@ SOURCES = {
     "items": (LAB / "references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json",
               "9e082025391177d5a33ee18c714ddd06b457a695"),
     "models": (LAB / "working/OSFR.Client/OSFR Client/Resources/Models.txt", None),
+    "animations": (LAB / "working/OSFR.Client/OSFR Client/Resources/AnimationTypes.xml", None),
     "locale": (LOCALE, None),
     "catalogue": (CATALOGUE, None),
 }
@@ -58,6 +63,40 @@ def models_txt(path):
     return out
 
 
+def animation_slot_names(path):
+    """animation slot id -> slot name (AnimationTypes.xml: the ids the 35/8 animation message carries)."""
+    text = path.read_text(encoding="utf-8", errors="replace")
+    return {int(m.group(2)): m.group(1) for m in re.finditer(r'<AnimationSlot name="([^"]+)" id="(\d+)"', text)}
+
+
+def adr_slot_names(adr, adr_paths):
+    """The animation slot names an ADR declares, by the pattern piece_098's scan_animation_slots reads (0x01, a
+    length byte, the slot name, 0x00, 0x02, then the .gr2 clip); None when the ADR file is not in the lab."""
+    path = adr_paths.get(adr.lower())
+    if path is None:
+        return None
+    return {m.group(1).decode() for m in re.finditer(rb"\x01[\x01-\x7f]([ -~]{3,63})\x00\x02", path.read_bytes())}
+
+
+def trick_animation_rows(row, model_id, adr, slots, adr_paths, dropped):
+    """T489: a model's Pets.json TrickAnimations as rows, each checked against the client: the pet and the owner
+    animation ids must be AnimationTypes.xml slots and the model's ADR must declare the pet slot's name. A row that
+    fails is dropped and listed; when the ADR is not in the lab the row is kept and marked (R)."""
+    names = adr_slot_names(adr, adr_paths)
+    rows = []
+    for trick_id, a in sorted((int(k), v) for k, v in (row.get("TrickAnimations") or {}).items()):
+        pet, owner = slots.get(a["AnimationId"]), slots.get(a["OwnerAnimationId"])
+        if pet is None or owner is None or (names is not None and pet not in names):
+            dropped.append([model_id, trick_id, a["AnimationId"], a["OwnerAnimationId"]])
+            continue
+        check = f"ADR {adr} declares {pet}" if names is not None else f"(R) ADR {adr} not in the lab, slot unchecked"
+        rows.append({"trick_id": trick_id, "animation_id": a["AnimationId"], "owner_animation_id": a["OwnerAnimationId"],
+                     "duration_ms": a["DurationMs"], "start_delay_ms": a["StartDelayMs"],
+                     "src": f"Pets.json Id={model_id} TrickAnimations {trick_id}; AnimationTypes.xml "
+                            f"{a['AnimationId']} {pet}, {a['OwnerAnimationId']} {owner}; {check}"})
+    return rows
+
+
 def resolved_model_ids(item, by_adr, models):
     """The item's Models.txt model ids among the `models` rows. (R) When its ModelName has no entry
     (Candy Corn: vanitypet_candycorn_critter.adr), the ADR its client TextureAlias names
@@ -77,6 +116,11 @@ def main():
     content = json.loads(PETS_JSON.read_text(encoding="utf-8"))
     pets, items_all = read_json(SOURCES["pets"][0]), read_json(SOURCES["items"][0])
     client_models = models_txt(SOURCES["models"][0])
+    slots = animation_slot_names(SOURCES["animations"][0])
+    adr_paths = {}
+    for found in sorted(glob.glob(str(LAB / "extracted/named/*/*/*.adr"))):
+        adr_paths.setdefault(Path(found).name.lower(), Path(found))
+    dropped_animations = []
     texts = {r["id"]: r["text"] for r in json.loads(LOCALE.read_text(encoding="utf-8"))}
     # Icon tint from the shipped client catalogue (hex at the definition's +0x10, the field
     # `Inventory::presentation` reads); the Legacy row is the fallback for an id it lacks.
@@ -122,6 +166,7 @@ def main():
         if mid not in client_models:
             continue
         adr, gender = client_models[mid]
+        animations = trick_animation_rows(row, mid, adr, slots, adr_paths, dropped_animations)
         order = sorted((t for t in row.get("PetTricks") or [] if t["Id"] not in dropped_tricks),
                        key=lambda t: (t["Unknown8"], t["Id"]))
         models[mid] = {"model_id": mid, "adr": adr, "gender": gender, "icon_id": row.get("IconId"),
@@ -130,6 +175,7 @@ def main():
                        "tricks": [{"id": t["Id"], "known": t["Known"]} for t in order],
                        "item_classes": [{"key": c["Key"], "id": c["Value"]["Id"], "unknown": c["Value"]["Unknown"]}
                                         for c in row.get("ItemClasses") or []],
+                       **({"trick_animations": animations} if animations else {}),
                        "src": f"Pets.json Id={mid}; Models.txt {mid}"}
     for adr, mid in EXTRA_MODELS.items():
         if mid not in models and client_models.get(mid, ("",))[0] == adr:
@@ -167,7 +213,9 @@ def main():
     print(json.dumps({"models": len(models), "vanity": sum(1 for m in models.values() if m.get("vanity")),
                       "items": len(items), "type2_items": len(items) + len(unresolved),
                       "unresolved_items": unresolved, "tricks": len(content["tricks"]),
-                      "dropped_tricks": dropped_tricks}))
+                      "dropped_tricks": dropped_tricks,
+                      "trick_animation_rows": sum(len(m.get("trick_animations", [])) for m in models.values()),
+                      "dropped_trick_animations": dropped_animations}))
 
 
 if __name__ == "__main__":
