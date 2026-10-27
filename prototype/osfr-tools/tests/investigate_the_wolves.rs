@@ -752,7 +752,7 @@ fn premature_and_forged_turnins_change_nothing() {
     let before = saved(&game);
     assert!(
         game.handle_in_world(&npc_interact(ANNE), &far, now)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "an out-of-range Anne click is refused"
     );
     assert_eq!(

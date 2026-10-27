@@ -1024,7 +1024,7 @@ fn refusals_and_replay_change_nothing() {
     assert!(
         other
             .handle_in_world(&npc_select(CARLOS, i32::MAX), &outsider, at)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "an option outside the open menu is refused"
     );
     assert_eq!(saved(&other), before_unoffered);

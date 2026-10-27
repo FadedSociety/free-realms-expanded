@@ -435,7 +435,7 @@ fn an_admitted_learn_starts_with_end_dialog_and_commits() {
     );
     assert!(
         game.handle_in_world(&select(MINER_TRAINER, choice as u32), &character, NOW + 2)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "an admitted learn must consume its menu"
     );
 }
@@ -633,7 +633,7 @@ fn a_refused_go_fish_sends_no_offer_or_ready() {
     let before = state_bytes(&game);
     assert!(
         game.handle_in_world(&select(FISH_GATE, choice as u32), &far, NOW + 1)
-            .is_err()
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed)
     );
     assert!(game.fishing.is_empty());
     assert_eq!(state_bytes(&game), before, "too far");
@@ -714,7 +714,7 @@ fn a_standalone_26_4_close_clears_the_menu_without_a_reply() {
     assert_eq!(state_bytes(&game), before);
     assert!(
         game.handle_in_world(&select(KART_GATE, 1), &character, NOW + 2)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "the standalone close must clear the open menu"
     );
 }
@@ -778,7 +778,7 @@ fn two_players_do_not_share_one_npc_menu() {
     assert!(
         second
             .handle_in_world(&select(KART_GATE, 1), &second_character, NOW + 1)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "a second session must not read the first session's menu"
     );
     let talked = first

@@ -593,7 +593,10 @@ fn a_far_or_wrong_zone_click_changes_nothing() {
     wrong_zone_character.zone_id = 1;
     let before = game.state();
     let outcome = game.handle_in_world(&interact(FLORINA), &wrong_zone_character, NOW);
-    assert!(outcome.is_err(), "a wrong-zone click must be refused");
+    assert!(
+        outcome.is_ok_and(|out| out.replies.is_empty() && !out.changed),
+        "a wrong-zone click must be refused"
+    );
     assert_eq!(game.state(), before, "a wrong-zone click changed state");
 }
 

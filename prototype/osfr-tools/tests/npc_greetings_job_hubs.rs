@@ -417,7 +417,7 @@ fn a_zero_or_missing_greeting_falls_back_to_no_body() {
     );
     assert!(
         game.handle_in_world(&select(9000000206, i32::MAX as u32), &character, 2_100)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "an out-of-list choice is refused"
     );
     let after = game

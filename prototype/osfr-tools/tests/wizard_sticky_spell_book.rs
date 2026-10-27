@@ -466,7 +466,7 @@ fn refusals_and_objective_order_change_nothing() {
     let before = saved(&game);
     assert!(
         game.handle_in_world(&npc_interact(FIZZLESTICKS), &far, now + 1)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "an out-of-range interaction must be refused"
     );
     assert_eq!(

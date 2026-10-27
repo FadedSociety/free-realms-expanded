@@ -642,7 +642,7 @@ fn refusals_and_replay_change_nothing() {
     assert!(
         brawler
             .handle_in_world(&npc_interact(THERIN), &far, now + 200)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "an out-of-range 26/8 is refused"
     );
     assert_eq!(saved(&brawler), before);
@@ -728,7 +728,7 @@ fn two_miners_progress_independently() {
     let b_range_before = saved(&b);
     assert!(
         b.handle_in_world(&npc_interact(THERIN), &far, 1_005)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "an out-of-range 26/8 is refused"
     );
     assert_eq!(
@@ -1369,7 +1369,7 @@ fn refusals_wrong_target_and_replay_change_nothing() {
     let before_save = save_envelope(&fixture, &game, &character);
     assert!(
         game.handle_in_world(&npc_interact(TRIXI), &far, now + 200)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "an out-of-range 26/8 is refused"
     );
     assert_eq!(saved(&game), before);
@@ -1523,7 +1523,7 @@ fn two_miners_progress_independently_on_all_i_got() {
     let b_before = saved(&b);
     assert!(
         b.handle_in_world(&npc_interact(THERIN), &far, now + 100)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "an out-of-range 26/8 is refused"
     );
     assert_eq!(
@@ -1992,7 +1992,7 @@ fn a_non_miner_wrong_npc_or_forged_request_changes_nothing() {
     let before = save_envelope(&fixture, &game, &character);
     assert!(
         game.handle_in_world(&npc_interact(SMITTY), &outside, later + 10)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "a 26/8 30 m outside the interaction radius is refused"
     );
     assert_eq!(save_envelope(&fixture, &game, &character), before);
@@ -2187,7 +2187,7 @@ fn two_miners_progress_independently_on_rush_order() {
     let [x, y, z] = smitty_position();
     assert!(
         b.handle_in_world(&npc_interact(SMITTY), &at(SECOND, [x + 42.0, y, z]), ms)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "B's out-of-range click is refused"
     );
     assert_packet_changes_nothing(

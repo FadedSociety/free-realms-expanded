@@ -66,7 +66,12 @@ fn send_error(
 ) {
     let before = saved(game);
     let refused = game.handle_in_world(packet, character, now);
-    assert!(refused.is_err(), "{label}: the request must be refused");
+    assert!(
+        refused
+            .as_ref()
+            .map_or(true, |out| out.replies.is_empty() && !out.changed),
+        "{label}: the request must be refused"
+    );
     assert_eq!(saved(game), before, "{label}: a refusal changed the save");
 }
 

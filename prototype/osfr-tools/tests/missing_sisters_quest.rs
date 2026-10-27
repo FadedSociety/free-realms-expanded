@@ -609,7 +609,7 @@ fn refusals_and_reconnect_change_nothing() {
     let before = capture(&game);
     assert!(
         game.handle_in_world(&npc_interact(GEOFFREY), &far, now)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "an out-of-range Geoffrey click is refused"
     );
     assert_unchanged(&game, &before, "an out-of-range click");

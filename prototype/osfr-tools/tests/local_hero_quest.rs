@@ -386,7 +386,10 @@ fn a_refused_or_out_of_range_request_changes_nothing() {
     );
     let before = saved(&game);
     let refused = game.handle_in_world(&npc_interact(COURIER), &far, now + 3);
-    assert!(refused.is_err(), "the out-of-range interact is refused");
+    assert!(
+        refused.is_ok_and(|out| out.replies.is_empty() && !out.changed),
+        "the out-of-range interact is refused"
+    );
     assert_eq!(
         saved(&game),
         before,

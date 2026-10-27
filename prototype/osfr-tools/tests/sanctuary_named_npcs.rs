@@ -262,15 +262,16 @@ fn click_works_only_at_the_new_position(npc: u64, old_position: [f32; 3]) {
     let state = game.state();
     let bytes = saved(&game);
     let far = character_at_for(CHARACTER, 0, old_position);
-    for (packet, message) in [
-        (npc_interact(npc), "NPC interaction is unavailable"),
-        (npc_select(npc, talk), "NPC menu choice is unavailable"),
-    ] {
+    // T836: a refusal answers nothing and keeps the session (an error used to end it).
+    for packet in [npc_interact(npc), npc_select(npc, talk)] {
         let refusal = game
             .handle_in_world(&packet, &far, NOW + 1)
-            .err()
-            .expect("a far click is refused");
-        assert_eq!(refusal.to_string(), message, "{:?}", &packet[..4]);
+            .expect("a far click is refused without ending the session");
+        assert!(
+            refusal.replies.is_empty() && !refusal.changed,
+            "{:?}",
+            &packet[..4]
+        );
     }
     assert_eq!(game.state(), state, "a refused far click changes nothing");
     assert_eq!(saved(&game), bytes, "nor the serialized state");

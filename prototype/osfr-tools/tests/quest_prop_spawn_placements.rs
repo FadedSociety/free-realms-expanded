@@ -205,7 +205,8 @@ fn a_click_on_a_placed_prop_reaches_the_npc_router() {
         let before = game.state();
         let far = character_at([position[0] + 20.0, position[1], position[2]]);
         assert!(
-            game.handle_in_world(&interact(id), &far, 1_100).is_err(),
+            game.handle_in_world(&interact(id), &far, 1_100)
+                .is_ok_and(|out| out.replies.is_empty() && !out.changed),
             "{owner}: a click from 20 m is accepted"
         );
         assert_eq!(

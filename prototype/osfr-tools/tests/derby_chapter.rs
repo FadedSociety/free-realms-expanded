@@ -1155,7 +1155,7 @@ fn forged_requests_and_gated_refusals_change_nothing() {
     now += 10;
     assert!(
         game.handle_in_world(&npc_interact(CRASH), &far, now)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "an out-of-range 26/8 is refused"
     );
     assert_eq!(

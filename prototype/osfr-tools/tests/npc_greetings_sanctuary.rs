@@ -480,7 +480,7 @@ fn a_refused_choice_leaves_the_menu_usable() {
         .expect("in-world interact");
     assert!(
         game.handle_in_world(&select(npc_id, i32::MAX as u32), &character, 2_100)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "an invalid 26/10 choice must be refused"
     );
     let outcome = game

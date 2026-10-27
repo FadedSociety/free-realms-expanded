@@ -237,7 +237,7 @@ pub fn refused_interaction(
     let before_bytes = saved(game);
     assert!(
         game.handle_in_world(&npc_interact(target), speaker, now)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "{label} must be refused"
     );
     assert_eq!(game.state(), before_state, "{label} changed the state");

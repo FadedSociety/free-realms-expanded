@@ -652,7 +652,10 @@ fn refusals_and_replay_change_nothing() {
     };
     let before = saved(&game);
     let refused = game.handle_in_world(&npc_interact(DEWEY), &far, now + 20);
-    assert!(refused.is_err(), "an out-of-range 26/8 must be refused");
+    assert!(
+        refused.is_ok_and(|out| out.replies.is_empty() && !out.changed),
+        "an out-of-range 26/8 must be refused"
+    );
     assert_eq!(
         saved(&game),
         before,

@@ -491,7 +491,7 @@ fn authored_interact_actor_advances_only_the_matching_active_quest() {
     wrong_zone.zone_id = ENCOUNTER;
     assert!(
         game.handle_in_world(&interact_packet(INTERACT_ACTOR), &wrong_zone, now)
-            .is_err()
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed)
     );
     assert_eq!(count(&game.state(), INTERACT_QUEST), 0);
 

@@ -380,7 +380,7 @@ fn a_far_or_wrong_target_refusal_changes_nothing() {
     let far = character_at([at[0] + 1_000.0, at[1], at[2]]);
     assert!(
         game.handle_in_world(&interact(spawn_guid), &far, NOW + 100)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "a far click is refused"
     );
     assert_eq!(game.state(), before, "far click: whole GameplayState");
@@ -506,7 +506,7 @@ fn the_repair_guy_is_not_a_kart_gate() {
         // A forged second choice (the race slot on a real gate) is refused and changes nothing.
         assert!(
             game.handle_in_world(&select(spawn_guid, 2), &character, NOW + 150)
-                .is_err(),
+                .is_ok_and(|out| out.replies.is_empty() && !out.changed),
             "actor {spawn_guid}: selecting an unoffered race option is refused"
         );
         assert_eq!(

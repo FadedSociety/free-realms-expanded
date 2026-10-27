@@ -661,14 +661,23 @@ impl Gameplay {
                 }));
                 return Ok(None);
             };
-            let menu = interaction
-                .interact(
-                    key,
-                    character.zone_id,
-                    character.position,
-                    self.npc_quests.as_ref(),
-                )
-                .map_err(|_| invalid("NPC interaction is unavailable"))?;
+            // T836: a refused click (unknown NPC, out of range) answers nothing and keeps the
+            // session; it used to end it (native 2026-10-27, Samantha).
+            let menu = match interaction.interact(
+                key,
+                character.zone_id,
+                character.position,
+                self.npc_quests.as_ref(),
+            ) {
+                Ok(menu) => menu,
+                Err(error) => {
+                    npc_event(serde_json::json!({
+                        "event": "npc_menu", "guid": request.target, "content_key": key,
+                        "options": [], "outcome": "refused", "reason": format!("{error:?}")
+                    }));
+                    return Ok(None);
+                }
+            };
             // T543: an accepted interaction ends the open conversation. A busy or
             // failed interaction returned above, so it changes nothing.
             self.quest_conversation = None;
@@ -906,7 +915,8 @@ impl Gameplay {
                         "none",
                         Some("selection_rejected"),
                     ));
-                    return Err(invalid("NPC menu choice is unavailable"));
+                    // T836: refused (stale or far): nothing happens and the session stays.
+                    return Ok(None);
                 }
             }
             if consume_menu && out.changed {

@@ -1070,7 +1070,10 @@ fn unoffered_menu_choice_changes_nothing_and_keeps_the_menu_open() {
     interact_npc(&mut game, &character, CARLOS, 1_000);
     let before = saved(&game);
     let refused = game.handle_in_world(&npc_select(CARLOS, i32::MAX), &character, 1_001);
-    assert!(refused.is_err(), "an unoffered menu choice is refused");
+    assert!(
+        refused.is_ok_and(|out| out.replies.is_empty() && !out.changed),
+        "an unoffered menu choice is refused without ending the session (T836)"
+    );
     assert_eq!(
         saved(&game),
         before,
@@ -1687,7 +1690,7 @@ fn refusals_wrong_target_and_replay_change_nothing() {
     let before_far = saved(&game);
     assert!(
         game.handle_in_world(&npc_interact(PETRA), &far, now)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "a far interact must be refused"
     );
     assert_eq!(

@@ -1117,7 +1117,7 @@ fn gameplay_routes_the_npc_offer_and_closes_a_fabricated_contact_without_paying(
     assert!(menu.replies.iter().any(|packet| packet[..3] == [26, 0, 9]));
     assert!(
         game.handle_in_world(&npc_choice(99), &character, 1_100)
-            .is_err()
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed)
     );
     assert!(!game.derby_active());
     assert_eq!(game.state(), before);
@@ -1174,7 +1174,7 @@ fn gameplay_routes_the_offer_pays_one_completion_and_ignores_replays() {
     assert!(menu.replies.iter().any(|packet| packet[..3] == [26, 0, 9]));
     assert!(
         game.handle_in_world(&npc_choice(99), &character, 1_100)
-            .is_err()
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed)
     );
     assert!(!game.derby_active());
     assert_eq!(game.state(), before);

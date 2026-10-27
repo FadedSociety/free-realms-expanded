@@ -674,7 +674,7 @@ fn refused_turn_in_changes_nothing() {
     let before_far = saved(&game);
     assert!(
         game.handle_in_world(&npc_interact(AUGUSTE), &far, now)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "a far interact must be refused"
     );
     assert_eq!(saved(&game), before_far);
@@ -716,7 +716,7 @@ fn refused_turn_in_changes_nothing() {
     now += 10;
     assert!(
         game.handle_in_world(&npc_select(AUGUSTE, 1), &far, now)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "a far menu selection must be refused"
     );
     assert_eq!(saved(&game), held);

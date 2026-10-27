@@ -787,7 +787,7 @@ fn refusals_change_nothing() {
     let range_before = saved(&game);
     assert!(
         game.handle_in_world(&npc_interact(STEELE), &far, now + 30)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "an out-of-range 26/8 must be refused"
     );
     assert_eq!(saved(&game), range_before);

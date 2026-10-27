@@ -922,7 +922,8 @@ fn dialogue_close_26_4_consumes_only_that_menu() {
     let before_stale = saved(&game);
     assert!(
         game.handle_in_world(&npc_select(SAMANTHA, choice), &samantha, NOW + 2)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
+        // T836: refused without an error, so the session is not ended.
         "the closed menu still accepted its stale choice"
     );
     assert_eq!(
@@ -932,7 +933,7 @@ fn dialogue_close_26_4_consumes_only_that_menu() {
     );
     assert!(
         game.handle_in_world(&npc_select(SAMANTHA, choice), &samantha, NOW + 3)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "a refused stale choice must not reopen the closed menu"
     );
     assert_eq!(
@@ -1371,7 +1372,8 @@ fn a_two_session_refusal_does_not_change_the_other_players_state() {
     assert!(
         second
             .handle_in_world(&npc_select(SAMANTHA, choice), &samantha, NOW + 1)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
+        // T836: refused without an error, so the session is not ended.
         "a session without the menu must not read it"
     );
     assert_eq!(saved(&second), second_before);

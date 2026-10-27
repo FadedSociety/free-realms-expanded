@@ -233,7 +233,7 @@ fn ty_offers_the_stealth_referral_after_stolen_away() {
         session
             .game
             .handle_in_world(&npc_select(TY, i32::MAX), &session.character, NOW)
-            .is_err()
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed)
     );
     assert_eq!(session.game.state(), before);
 

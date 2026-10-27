@@ -593,7 +593,7 @@ fn wrong_job_wrong_target_and_replay_change_nothing() {
     assert!(
         brawler
             .handle_in_world(&npc_interact(CLEETUS), &far, now + 200)
-            .is_err(),
+            .is_ok_and(|out| out.replies.is_empty() && !out.changed),
         "an out-of-range NPC interaction is refused"
     );
     assert_eq!(saved(&brawler), before);
