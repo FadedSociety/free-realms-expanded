@@ -196,3 +196,20 @@ pub fn marketplace_content(entries: &[(u32, u32, &[u32])]) -> Vec<u8> {
     }
     bytes
 }
+
+/// A 35/37 item-definition batch (`sub_8BFC00` reads the payload byte length; `00a3db70` reads
+/// the count and the records). Rows carry no per-record length, so the caller compares the
+/// concatenated payload with the expected records.
+#[allow(dead_code)] // Included by suites that never read a definition batch.
+pub fn definition_batch(packet: &[u8]) -> (i32, Vec<u8>) {
+    assert_eq!(&packet[..4], &[35, 0, 37, 0], "35/37 header");
+    let length = i32::from_le_bytes(packet[4..8].try_into().unwrap());
+    let count = i32::from_le_bytes(packet[8..12].try_into().unwrap());
+    assert_eq!(
+        length as usize,
+        packet.len() - 8,
+        "35/37 payload length counts the record-count dword"
+    );
+    assert!(count >= 1, "an empty batch is never emitted");
+    (count, packet[12..].to_vec())
+}

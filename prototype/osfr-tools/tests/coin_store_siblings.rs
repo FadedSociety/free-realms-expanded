@@ -529,17 +529,6 @@ fn parse_definitions(packet: &[u8]) -> (bool, Vec<u32>) {
     (packet[4] == 1, ids)
 }
 
-/// A 35/37 batch. Rows have no per-record length, so the test fixture retains the expected
-/// records separately and compares the concatenated payload.
-fn parse_definition_batch(packet: &[u8]) -> (i32, Vec<u8>) {
-    assert_eq!(&packet[..4], &[35, 0, 37, 0]);
-    let payload_len = i32::from_le_bytes(packet[4..8].try_into().unwrap());
-    let count = i32::from_le_bytes(packet[8..12].try_into().unwrap());
-    assert_eq!(payload_len as usize + 8, packet.len());
-    assert!(count >= 1, "an empty batch is never emitted");
-    (count, packet[12..].to_vec())
-}
-
 fn gift_packet() -> Vec<u8> {
     let mut packet = vec![165, 0, 14, 0];
     packet.extend(VENDOR_ID.to_le_bytes());
@@ -1637,15 +1626,10 @@ fn gateway_sc_content_request_carries_item_definitions_and_the_content_pair() {
         gateway_packets::marketplace_content(&[(1, SC_RIDE_ITEM as u32, &[SC_RIDE_ITEM as u32])]);
     let packets = send(&mut gateway, &request);
     assert_eq!(packets.len(), 2, "definitions then the content pair");
-    // 35/37 (`00a3db70`): payload byte length, record count, then the serialized rows.
-    let definitions = &packets[0];
-    assert_eq!(&definitions[..4], &[35, 0, 37, 0]);
-    let length = i32::from_le_bytes(definitions[4..8].try_into().unwrap());
-    let count = i32::from_le_bytes(definitions[8..12].try_into().unwrap());
+    let (count, records) = gateway_packets::definition_batch(&packets[0]);
     assert_eq!(count, 1, "one definition for the one listed bundle");
-    assert_eq!(length as usize, definitions.len() - 8, "35/37 length");
     assert_eq!(
-        &definitions[12..16],
+        &records[..4],
         &SC_RIDE_ITEM.to_le_bytes(),
         "the requested bundle's item definition id"
     );
@@ -1915,7 +1899,7 @@ fn catalogue_only_definition_is_delivered_before_the_coin_store_ack() {
     );
     assert_eq!(replies.len(), 2, "definition batch, then 165/3");
     assert_eq!(
-        parse_definition_batch(&replies[0]),
+        gateway_packets::definition_batch(&replies[0]),
         (1, record),
         "the uncaptured row precedes the acknowledgement"
     );
@@ -1957,7 +1941,7 @@ fn multiple_definition_batches_follow_request_order() {
         "two 40 KiB rows cannot share a 60 KiB batch"
     );
     for (index, reply) in replies[..2].iter().enumerate() {
-        let (_, payload) = parse_definition_batch(reply);
+        let (_, payload) = gateway_packets::definition_batch(reply);
         assert_eq!(
             payload,
             inventory.definition_record(ids[index] as i32).unwrap(),
@@ -1982,7 +1966,7 @@ fn one_definition_batch_sorts_rows_but_the_id_list_follows_request_order() {
 
     let replies = send(&mut gateway, &definitions_packet(&ids));
     assert_eq!(replies.len(), 2, "two tiny rows share one 35/37 batch");
-    let (count, payload) = parse_definition_batch(&replies[0]);
+    let (count, payload) = gateway_packets::definition_batch(&replies[0]);
     assert_eq!(count, 2);
     // The existing encoder writes records in id order inside one batch (record ids are the
     // definition ids); the batch sequence and the 165/3 list follow the request order.

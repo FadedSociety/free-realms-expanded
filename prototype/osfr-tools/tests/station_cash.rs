@@ -111,20 +111,6 @@ fn buy(tracking: u32) -> Vec<u8> {
     order_packet(3, tracking, RIDE_ITEM as u32, STORE, 1, "", "", "", "0")
 }
 
-/// The 35/37 batch body (`00a3db70`): payload byte length (the count plus the records), record
-/// count, then the serialized records back to back. Returns `(count, records bytes)`.
-fn definition_batch(packet: &[u8]) -> (i32, &[u8]) {
-    assert_eq!(&packet[..4], &[35, 0, 37, 0], "35/37 header");
-    let length = i32::from_le_bytes(packet[4..8].try_into().unwrap());
-    let count = i32::from_le_bytes(packet[8..12].try_into().unwrap());
-    assert_eq!(
-        length as usize,
-        packet.len() - 8,
-        "35/37 payload length counts the record-count dword"
-    );
-    (count, &packet[12..])
-}
-
 /// The 66/28 reply (`00b2e2d0`): counted (store id, bundle id) pairs.
 fn content_pairs(packet: &[u8]) -> Vec<(u32, u32)> {
     assert_eq!(&packet[..4], &[66, 0, 28, 0], "66/28 header");
@@ -1541,13 +1527,14 @@ fn store_packet_matches_the_client_reader_field_for_field() {
 /// (their definitions were absent from its local map), and the tile stayed on its "profile"
 /// placeholder because the server never answered. The 66/27 reply now carries the 35/37 item
 /// definitions first and the 66/28 pending-clearing pairs second, through the same
-/// `CoinShop::handle` entry the gateway uses.
+/// `CoinShop::handle` entry the gateway uses. The batch is the canonical 35/37 encoder's,
+/// requested here in descending order to show the rows are not sent in request order.
 #[test]
 fn content_request_sends_the_item_definitions_then_the_66_28_pairs() {
     let mut shop = new_shop(Wallet::default(), usize::MAX);
     let before = snapshot(&shop);
     let request =
-        gateway_packets::marketplace_content(&[(STORE, 878, &[878]), (STORE, 76_927, &[76_927])]);
+        gateway_packets::marketplace_content(&[(STORE, 76_927, &[76_927]), (STORE, 878, &[878])]);
     let outcome = shop.handle(&request).expect("content request parses");
     assert_eq!(outcome.result_code, 1);
     assert!(!outcome.changed, "definitions are presentation, not state");
@@ -1556,18 +1543,28 @@ fn content_request_sends_the_item_definitions_then_the_66_28_pairs() {
         2,
         "the definitions must precede the 66/28 pending clear"
     );
-    let (count, records) = definition_batch(&outcome.replies[0]);
+    let (count, records) = gateway_packets::definition_batch(&outcome.replies[0]);
     assert_eq!(count, 2);
     let expected = [
-        shop.inventory().definition_record(878).expect("item 878"),
+        shop.inventory()
+            .definition_record(878)
+            .expect("item 878")
+            .to_vec(),
         shop.inventory()
             .definition_record(76_927)
-            .expect("item 76927"),
+            .expect("item 76927")
+            .to_vec(),
     ];
     assert_eq!(
         records,
-        expected.concat().as_slice(),
-        "the two requested rows, in request order"
+        expected.concat(),
+        "the two rows in id order (the shared 35/37 encoder sorts)"
+    );
+    assert_eq!(
+        outcome.replies[0],
+        osfr_tools::inventory_v2_fixes::encode_definition_batch_v2(&expected, &[])
+            .expect("the rows encode"),
+        "the reply is the canonical 35/37 batch, not a second encoder"
     );
     assert_eq!(
         content_pairs(&outcome.replies[1]),
@@ -1581,29 +1578,37 @@ fn content_request_sends_the_item_definitions_then_the_66_28_pairs() {
 }
 
 /// T744: a hostile or stale 66/27 cannot select content, cannot grow the reply and changes nothing.
-/// Only a listed bundle of the configured store is confirmed, and the item ids in the request are
-/// never used to choose a definition.
+/// Only a listed bundle of the configured store is confirmed, the item ids in the request are
+/// never used to choose a definition, and an empty set gets no reply: the client's 66/28 base
+/// parse rejects a count-zero packet.
 #[test]
 fn content_request_refusals_and_unknown_bundles_change_nothing() {
     let mut shop = new_shop(Wallet::default(), usize::MAX);
     let before = snapshot(&shop);
-    let empty = station_cash::content_response_packet(&[]);
-    // A count above the parser bound, a truncated entry and a trailing byte are refused.
+    // A count above the parser bound, a truncated entry, an over-claimed item list and a trailing
+    // byte are refused.
     assert!(shop.handle(&[66, 0, 27, 0, 9, 0, 0, 0]).is_err());
     let mut truncated = gateway_packets::marketplace_content(&[(STORE, 878, &[878])]);
     truncated.truncate(truncated.len() - 1);
     assert!(shop.handle(&truncated).is_err());
+    let mut over_claimed = gateway_packets::marketplace_content(&[(STORE, 878, &[])]);
+    over_claimed[16..20].copy_from_slice(&1000u32.to_le_bytes());
+    assert!(shop.handle(&over_claimed).is_err());
     let mut trailing = gateway_packets::marketplace_content(&[(STORE, 878, &[878])]);
     trailing.push(0);
     assert!(shop.handle(&trailing).is_err());
-    // An unlisted bundle and a bundle from another store are not confirmed.
+    // An unlisted bundle and a bundle from another store are not confirmed, and the reply is
+    // silence rather than a count-zero 66/28 (`sub_B40050` fails the 12-byte base parse first).
     for request in [
         gateway_packets::marketplace_content(&[(STORE, 999_999_999, &[1])]),
         gateway_packets::marketplace_content(&[(STORE + 1, 878, &[878])]),
     ] {
         let outcome = shop.handle(&request).expect("bounded request parses");
         assert!(!outcome.changed);
-        assert_eq!(outcome.replies, vec![empty.clone()]);
+        assert!(
+            outcome.replies.is_empty(),
+            "an empty content set gets no packet"
+        );
     }
     // A listed bundle's reply is the server's item, not the client's ids: a bogus id list still
     // gets item 878's definition because 878 is what the bundle contains.
@@ -1613,7 +1618,7 @@ fn content_request_refusals_and_unknown_bundles_change_nothing() {
         station_cash::content_response_packet(&[(STORE, 878)]),
         outcome.replies[1]
     );
-    let (count, records) = definition_batch(&outcome.replies[0]);
+    let (count, records) = gateway_packets::definition_batch(&outcome.replies[0]);
     assert_eq!(count, 1);
     assert_eq!(
         &records[..4],
@@ -1644,14 +1649,18 @@ fn captured_66_27_requests_decode_and_are_answered() {
     ];
     for (body, item) in captured.into_iter().zip([878i32, 76_927, 76_928]) {
         let decoded = station_cash::decode_content_request(&body).expect("captured request");
-        assert_eq!(decoded.len(), 1);
-        assert_eq!(decoded[0].store_id, STORE);
-        assert_eq!(decoded[0].bundle_id, item as u32);
-        assert_eq!(decoded[0].item_ids, vec![item as u32]);
+        assert_eq!(
+            decoded,
+            vec![station_cash::ContentRequest {
+                store_id: STORE,
+                bundle_id: item as u32,
+            }],
+            "the id list is consumed and left out of the entry"
+        );
         let mut shop = new_shop(Wallet::default(), usize::MAX);
         let outcome = shop.handle(&body).expect("captured request is answered");
         assert_eq!(outcome.replies.len(), 2);
-        let (count, records) = definition_batch(&outcome.replies[0]);
+        let (count, records) = gateway_packets::definition_batch(&outcome.replies[0]);
         assert_eq!(count, 1);
         assert_eq!(records, shop.inventory().definition_record(item).unwrap());
         assert_eq!(

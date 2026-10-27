@@ -114,10 +114,9 @@ const MAX_ORDER_STRING: usize = 256;
 const MAX_LOCALE_STRING: usize = 32;
 const MAX_DETAIL_STRING: usize = 64;
 const MAX_ORDER_DETAILS: usize = 16;
-/// T744: the client streams two bundles per 66/27 request (`00b48120`); these only bound a
-/// hostile body.
+/// T744: the client streams two bundles per 66/27 request (`00b48120`); this bounds the entry
+/// vector a hostile body can ask for.
 const MAX_CONTENT_REQUESTS: usize = 8;
-const MAX_CONTENT_REQUEST_ITEMS: usize = 32;
 /// Sanity bounds for the data-configured values.
 pub const MAX_PRICE_SC: u32 = 10_000_000;
 const MAX_WALLET_BALANCE: u32 = i32::MAX as u32;
@@ -1210,20 +1209,20 @@ pub fn decode_order(inner: &[u8], preview: bool) -> io::Result<OrderRequest> {
     })
 }
 
-/// One 66/27 store-bundle content request entry. The client sends the store, the bundle and the
-/// marketing item ids it read from that bundle's entry list (`00b3dd80`/`00b37140`). The ids are
-/// a hint only: the reply is driven by the server's listing, never by a client id (T744).
+/// One 66/27 store-bundle content request entry: the store and the bundle whose content the
+/// client asked for. The client also sends the marketing item ids it read from that bundle's
+/// entry list (`00b3dd80`/`00b37140`); they are consumed and discarded, because the reply is
+/// driven by the server's listing, never by a client id (T744).
 #[derive(Clone, Debug, PartialEq, Eq)]
 pub struct ContentRequest {
     pub store_id: u32,
     pub bundle_id: u32,
-    pub item_ids: Vec<u32>,
 }
 
 /// Read a 66/27 content request: a count, then per entry a store id, a bundle id, an item-id
 /// count and that many ids. The client's serializer is `00b41a30` -> `00b3dd80` -> `00b37140`;
-/// the Legacy reference names the same three fields (behaviour reference only). A negative
-/// count, a count that cannot fit in the body or any trailing byte is refused.
+/// the Legacy reference names the same three fields (behaviour reference only). A count above
+/// the bound, an entry that runs past the body or any trailing byte is refused.
 pub fn decode_content_request(inner: &[u8]) -> io::Result<Vec<ContentRequest>> {
     if inner.len() < 8
         || inner.len() > MAX_ORDER_PACKET
@@ -1244,18 +1243,13 @@ pub fn decode_content_request(inner: &[u8]) -> io::Result<Vec<ContentRequest>> {
     for _ in 0..count {
         let store_id = reader.u32()?;
         let bundle_id = reader.u32()?;
-        let items = reader.u32()? as usize;
-        if items > MAX_CONTENT_REQUEST_ITEMS {
-            return Err(invalid("too many Marketplace content items"));
-        }
-        let mut item_ids = Vec::with_capacity(items);
-        for _ in 0..items {
-            item_ids.push(reader.u32()?);
+        // The ids are a hint: consume them so the frame must end exactly, but never keep them.
+        for _ in 0..reader.u32()? {
+            reader.u32()?;
         }
         requests.push(ContentRequest {
             store_id,
             bundle_id,
-            item_ids,
         });
     }
     reader.finish()?;
@@ -1264,7 +1258,10 @@ pub fn decode_content_request(inner: &[u8]) -> io::Result<Vec<ContentRequest>> {
 
 /// 66/28: the counted `(store id, bundle id)` pairs whose item definitions the reply carries.
 /// Client reader `00b2e2d0` reads the count and the eight-byte records into the response
-/// object; `00b40050` then clears each bundle's pending-content entry.
+/// object; `00b40050` then clears each bundle's pending-content entry. Send it only for a
+/// non-empty set: the handler's base parse (`00b40050` -> `sub_B2DFD0`: two u16 then two u32)
+/// needs 12 bytes, so a count-zero 8-byte reply is logged as a bad
+/// `InGamePurchaseStoreBundlesBasePacket` and ignored.
 pub fn content_response_packet(entries: &[(u32, u32)]) -> Vec<u8> {
     let mut bytes = header(OP_CONTENT_RESPONSE);
     put_i32(&mut bytes, entries.len() as i32);
@@ -1273,23 +1270,6 @@ pub fn content_response_packet(entries: &[(u32, u32)]) -> Vec<u8> {
         put_u32(&mut bytes, *bundle_id);
     }
     bytes
-}
-
-/// The 35/37 item-definition batch for a 66/27 reply, before the caller's world-packet wrap.
-/// The framing is the startup catalogue's (`00a3db70`): payload byte length, record count, then
-/// the serialized `ClientItemDefinition` rows. `(id, record)` pairs come from the server's
-/// listing and its loaded catalogue, so the record already starts with the id.
-pub fn item_definitions_packet(records: &[(i32, &[u8])]) -> Vec<u8> {
-    let definitions = records
-        .iter()
-        .map(
-            |(id, serialized_record)| crate::startup_catalogues::ItemDefinition {
-                id: *id,
-                serialized_record,
-            },
-        )
-        .collect::<Vec<_>>();
-    crate::startup_catalogues::build_item_definitions_inner(&definitions)
 }
 
 /// Price and validate an order without changing anything; 66/2 reply. A new deed order also asks

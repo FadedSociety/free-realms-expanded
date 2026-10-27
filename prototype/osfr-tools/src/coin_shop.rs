@@ -1275,16 +1275,24 @@ impl CoinShop {
                         continue;
                     };
                     if seen.insert(listing.item_id) {
-                        records.push((listing.item_id, record));
+                        records.push(record.to_vec());
                     }
                     confirmed.insert((request.store_id, request.bundle_id));
                 }
                 let mut replies = Vec::new();
                 if !records.is_empty() {
-                    replies.push(station_cash::item_definitions_packet(&records));
+                    // The canonical 35/37 encoder writes the startup catalogue's framing.
+                    replies.push(
+                        crate::inventory_v2_fixes::encode_definition_batch_v2(&records, &[])
+                            .map_err(|error| io::Error::new(io::ErrorKind::InvalidData, error))?,
+                    );
                 }
+                // A count-zero 66/28 (8 bytes) is rejected by the client's 12-byte base parse
+                // (`sub_B40050` -> `sub_B2DFD0`), so an empty set gets no reply at all.
                 let confirmed = confirmed.into_iter().collect::<Vec<_>>();
-                replies.push(station_cash::content_response_packet(&confirmed));
+                if !confirmed.is_empty() {
+                    replies.push(station_cash::content_response_packet(&confirmed));
+                }
                 (1, replies)
             }
             // Bundle content with the Marketplace off, and 66/38 with it off: no reply.
