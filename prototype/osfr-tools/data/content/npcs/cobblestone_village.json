@@ -8640,12 +8640,32 @@
             "kind": "client",
             "evidence": "guide quote hash 1591220599 'Hello, traveler. Welcome to Cobblestone Village...' = locale id 24940 (lab/reports/locale-id-map.json)"
           }
+        ],
+        "explainer_topics": [
+          {
+            "kind": "client",
+            "evidence": "Resources/MiniGameData.txt rows 46 (name 386023, description 20520) and 58 (31023/35603): the client's own game names and descriptions, resolved through Global.Text.<id>."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T773: Cobblestone Village offers cooking (chef trainer Simone, client locale 140471) and harvesting at nearby Farnum Farmstead (client locale 401238); the original greeter binding is not recovered. Array order fixes response ids 310-311."
+          }
         ]
       },
       "heading": -2.257661,
       "model_id": 958,
       "model_file_name": "fairy_f_merigold.agr",
-      "greeting_string_id": 24940
+      "greeting_string_id": 24940,
+      "explainer_topics": [
+        {
+          "label_string_id": 386023,
+          "body_string_id": 20520
+        },
+        {
+          "label_string_id": 31023,
+          "body_string_id": 35603
+        }
+      ]
     },
     {
       "npc_id": 9500000256,

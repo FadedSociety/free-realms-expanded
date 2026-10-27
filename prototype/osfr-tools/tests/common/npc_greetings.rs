@@ -22,12 +22,15 @@
 #[path = "gateway_packets.rs"]
 mod gateway_packets;
 
-pub use gateway_packets::{interact, select};
+#[allow(unused_imports)] // Each including suite uses a different subset of the builders.
+pub use gateway_packets::{dialogue_choice, interact, select};
 
 use osfr_tools::{
     character_store::CharacterState,
     gameplay::Gameplay,
-    npc_interaction::{NpcAction, NpcInteraction, NpcSelection},
+    npc_interaction::{
+        DialoguePacket26_3, NpcAction, NpcInteraction, NpcSelection, decode_dialogue_26_3,
+    },
 };
 use serde_json::Value;
 use std::{
@@ -135,6 +138,7 @@ pub fn service() -> NpcInteraction {
 }
 
 /// Real Talk selection through the service the router calls.
+#[allow(dead_code)] // T773 reads the whole context instead; the body-only suites use this.
 pub fn service_talk_body(service: &mut NpcInteraction, npc_id: u64) -> Option<u32> {
     let (zone, position) = service
         .location(npc_id)
@@ -168,7 +172,7 @@ pub fn character_at(position: [f32; 3]) -> CharacterState {
 
 /// Real in-world Talk: 26/8 opens the menu, 26/10 selects Talk, and the 26/3
 /// reply is decoded from the production packet.
-pub fn gameplay_talk_body(game: &mut Gameplay, file: &str, npc_id: u64) -> u32 {
+pub fn gameplay_talk_packet(game: &mut Gameplay, file: &str, npc_id: u64) -> DialoguePacket26_3 {
     let character = character_at(npc_position(&npc_record(file, npc_id), npc_id));
     let menu = game
         .handle_in_world(&interact(npc_id), &character, 1_000)
@@ -187,7 +191,13 @@ pub fn gameplay_talk_body(game: &mut Gameplay, file: &str, npc_id: u64) -> u32 {
         .into_iter()
         .find(|packet| packet.starts_with(&GREETING_HEADER))
         .unwrap_or_else(|| panic!("NPC {npc_id} Talk must answer 26/3"));
-    u32::from_le_bytes(dialogue[4..8].try_into().unwrap())
+    decode_dialogue_26_3(&dialogue).unwrap_or_else(|error| panic!("NPC {npc_id} 26/3: {error:?}"))
+}
+
+/// The [`gameplay_talk_packet`] body dword: the `Global.Text` id the client reads.
+#[allow(dead_code)] // T773 decodes the rows too; the body-only suites use this.
+pub fn gameplay_talk_body(game: &mut Gameplay, file: &str, npc_id: u64) -> u32 {
+    gameplay_talk_packet(game, file, npc_id).initial_dwords[0]
 }
 
 /// Physical stock-locale rows for the wanted key hashes: one-based line and

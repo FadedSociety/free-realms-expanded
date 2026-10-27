@@ -6978,12 +6978,32 @@
             "kind": "client",
             "evidence": "(R) locale row 80 'Hey there! Welcome to Free Realms. My name is Merigold...'; row 401 is an alternate greeting with no recovered condition"
           }
+        ],
+        "explainer_topics": [
+          {
+            "kind": "client",
+            "evidence": "Resources/MiniGameData.txt rows 46 (name 386023, description 20520) and 539 (104138/115776): the client's own game names and descriptions, resolved through Global.Text.<id>."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T773: Highroad Junction's cooking teacher Auguste Frydaze (client locale 140471) and the Highroad Junction fireworks game (row 539) are the town's two recovered activities; the original greeter binding is not recovered. Array order fixes response ids 310-311."
+          }
         ]
       },
       "heading": -1.199926,
       "model_id": 431,
       "model_file_name": "human_f_samantha.agr",
-      "greeting_string_id": 80
+      "greeting_string_id": 80,
+      "explainer_topics": [
+        {
+          "label_string_id": 386023,
+          "body_string_id": 20520
+        },
+        {
+          "label_string_id": 104138,
+          "body_string_id": 115776
+        }
+      ]
     },
     {
       "npc_id": 9000000177,

@@ -3938,11 +3938,8 @@ impl Gameplay {
             };
             Some(match cached_dialogue {
                 Some(packet) => packet,
-                None => dialogue_packet(&DialogueContext {
-                    body_string_id: None,
-                    quest_title_string_ids: Vec::new(),
-                })
-                .map_err(|_| invalid("NPC dialogue could not be encoded"))?,
+                None => dialogue_packet(&DialogueContext::default())
+                    .map_err(|_| invalid("NPC dialogue could not be encoded"))?,
             })
         } else {
             None

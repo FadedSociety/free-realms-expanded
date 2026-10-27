@@ -17540,6 +17540,16 @@
             "evidence": "(R) W126: use this verified speaker's locale speech as the fixed Talk greeting. The original server greeting/phase binding is not recovered; no text is invented."
           }
         ],
+        "explainer_topics": [
+          {
+            "kind": "client",
+            "evidence": "Resources/MiniGameData.txt rows 37 (name 37933, description 37936), 40 (31328/37942), 43 (37945/37948) and 18 (7910/7911): the client's own game names and descriptions, resolved through Global.Text.<id>."
+          },
+          {
+            "kind": "reconstructed",
+            "evidence": "(R) T773: Frostpetal's original tips menu is not recovered; these four Snowhill activities are the ones this server offers in zone 13 (data/content/kart_gates.json Mustang Alli, derby_gates.json Burt 'Wrecking' Crewe, soccer.json game 43, mining_nodes.json snowhill-copper). Array order fixes response ids 310-313."
+          }
+        ],
         "heading": [
           {
             "kind": "reference",
@@ -17548,6 +17558,24 @@
         ]
       },
       "greeting_string_id": 430860,
+      "explainer_topics": [
+        {
+          "label_string_id": 37933,
+          "body_string_id": 37936
+        },
+        {
+          "label_string_id": 31328,
+          "body_string_id": 37942
+        },
+        {
+          "label_string_id": 37945,
+          "body_string_id": 37948
+        },
+        {
+          "label_string_id": 7910,
+          "body_string_id": 7911
+        }
+      ],
       "heading": -2.29090002
     },
     {

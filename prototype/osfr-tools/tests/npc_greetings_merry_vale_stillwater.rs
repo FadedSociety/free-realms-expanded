@@ -518,6 +518,15 @@ fn is_quest_binding_and_greeting_change_between(old: &Value, new: &Value) -> boo
     })
 }
 
+/// T773: a foreign row may gain a greeter's `explainer_topics` list and its
+/// `field_sources` entry. Every other field (identity, greeting, quests, placement)
+/// must stay put; the T773 suite pins the ids, the locus and the 26/3 rows.
+fn is_explainer_topics_change_between(old: &Value, new: &Value) -> bool {
+    changed_rows_are(old, new, false, |old, new| {
+        without_fields(old, &["explainer_topics"]) == without_fields(new, &["explainer_topics"])
+    })
+}
+
 /// T698's provenance marker: only rows a name-matched reference spawn placed
 /// carry it, so a foreign NPC file may carry exactly those rows' placement change.
 const REFERENCE_SPAWN_MARKER: &str = "matched by the spawn's client name (talk_spawns.py) (R)";
@@ -946,7 +955,8 @@ fn the_existing_greetings_and_other_regions_are_unchanged() {
             is_quest_binding_change_between(path, &old, &new)
                 || (working_tree
                     && (is_greeting_only_change_between(&old, &new)
-                        || is_quest_binding_and_greeting_change_between(&old, &new))),
+                        || is_quest_binding_and_greeting_change_between(&old, &new)
+                        || is_explainer_topics_change_between(&old, &new))),
             "{path} changed: this slice owns only merry_vale.json and stillwater_crossing.json"
         );
     }

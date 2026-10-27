@@ -64,6 +64,14 @@ const MAX_WIRE_PACKET_BYTES: usize = 16 * 1024 * 1024;
 const MAX_MERCHANT_STRING_BYTES: usize = 64 * 1024;
 const MAX_QUEST_BUNDLE_BYTES: usize = 1024 * 1024;
 
+/// (R) 26/6 response ids of a greeter's explainer rows (T773). 300 is the Goodbye row and
+/// 301 the quest-offer row, so the free ids start above both; the client echoes dword 1 of
+/// the clicked 26/3 row (`009f5890`).
+pub const EXPLAIN_CHOICE_RESPONSE_BASE: i32 = 310;
+/// Five response buttons exist in the client dialog window (`wndDialog.xml` btn0..btn4), so
+/// four pages fit beside the Goodbye row; a quest offer's row replaces the pages instead.
+pub const MAX_EXPLAIN_TOPICS: usize = 4;
+
 #[derive(Clone, Debug, Eq, PartialEq)]
 pub enum NpcAction {
     Talk,
@@ -114,11 +122,27 @@ pub struct MerchantWindow {
     pub items: Vec<MerchantItem>,
 }
 
+/// One greeter explainer page: a short row label and the dialog body it opens. Both are
+/// `Global.Text` ids from the stock client locale; the server never sends the text. Which
+/// pages a greeter offers is a data decision (R).
 #[derive(Clone, Debug, Eq, PartialEq)]
+pub struct ExplainTopic {
+    /// Response id the client echoes in 26/6.
+    pub response_id: i32,
+    /// `Global.Text` id of the response row's label.
+    pub label_string_id: u32,
+    /// `Global.Text` id of the body shown when the row is chosen.
+    pub body_string_id: u32,
+}
+
+#[derive(Clone, Debug, Default, Eq, PartialEq)]
 pub struct DialogueContext {
     pub body_string_id: Option<u32>,
     /// Content-backed quest title IDs the client can resolve; no generic dialogue body was found.
     pub quest_title_string_ids: Vec<u32>,
+    /// (R) A greeter's explainer rows (T773), in `explainer_topics` content order; empty for
+    /// an NPC with no such rows.
+    pub explainer_topics: Vec<ExplainTopic>,
 }
 
 #[derive(Debug, Eq, PartialEq)]
@@ -180,6 +204,17 @@ struct NpcRecord {
     /// speaks (e.g. Samantha 24940 = guide hash 1591220599, via lab/reports/locale-id-map.json).
     #[serde(default)]
     greeting_string_id: Option<u32>,
+    /// (R) T773: the greeter's tips pages, sent as extra 26/3 response rows after the
+    /// greeting. Array order fixes each row's response id.
+    #[serde(default)]
+    explainer_topics: Vec<NpcExplainTopic>,
+}
+
+/// One `explainer_topics` row: the label of a tips row and the page it opens.
+#[derive(Clone, Deserialize)]
+struct NpcExplainTopic {
+    label_string_id: u32,
+    body_string_id: u32,
 }
 
 #[derive(Clone, Deserialize)]
@@ -225,6 +260,9 @@ struct ActiveInteraction {
     npc_id: u64,
     options: Vec<InteractionOption>,
     shop_open: bool,
+    /// (R) The explainer rows this dialogue offered, so a 26/6 can only re-read a page the
+    /// server sent. Cleared with the interaction.
+    topics: Vec<ExplainTopic>,
 }
 
 /// The loaded NPC, price and vendor-stock tables. Immutable after [`NpcInteraction::load`];
@@ -481,6 +519,7 @@ impl NpcInteraction {
             npc_id,
             options: options.clone(),
             shop_open: false,
+            topics: Vec::new(),
         });
         Ok(InteractionMenu {
             npc_id,
@@ -515,16 +554,28 @@ impl NpcInteraction {
         if active.npc_id != npc_id {
             return Err(NpcInteractionError::NoInteraction);
         }
-        let option = active
+        let action = active
             .options
             .iter()
             .find(|option| option.id == choice_id)
-            .ok_or(NpcInteractionError::InvalidOption)?;
+            .ok_or(NpcInteractionError::InvalidOption)?
+            .action
+            .clone();
+        // (R) T773: remember the explainer rows this dialogue sends, so a later 26/6 can
+        // only re-open a page the server offered. Built before the mutable borrow below.
+        let context = (action == NpcAction::Talk).then(|| self.dialogue_context(npc));
+        if let (Some(context), Some(active)) = (&context, self.active.as_mut()) {
+            active.topics = context.explainer_topics.clone();
+        }
 
-        match option.action {
-            NpcAction::Talk => Ok(NpcSelection::Talk(self.dialogue_context(npc))),
+        match action {
+            NpcAction::Talk => Ok(NpcSelection::Talk(
+                context.expect("Talk builds its dialogue context"),
+            )),
             NpcAction::Shop => {
-                active.shop_open = true;
+                if let Some(active) = self.active.as_mut() {
+                    active.shop_open = true;
+                }
                 Ok(NpcSelection::Shop(self.merchant_window(npc)))
             }
             NpcAction::Race => Ok(NpcSelection::Race),
@@ -723,6 +774,21 @@ impl NpcInteraction {
         }
     }
 
+    /// (R) T773: the page for one explainer response id on the open dialogue. Read-only:
+    /// the id must be one this dialogue sent, so a hostile 26/6 can only re-read an offered
+    /// locale text, never a page, item or effect of its choosing.
+    pub fn explainer_page(&self, response_id: i32) -> Option<(u64, DialogueContext)> {
+        let active = self.active.as_ref()?;
+        let topic = active
+            .topics
+            .iter()
+            .find(|topic| topic.response_id == response_id)?;
+        let npc = self.content.npcs.get(&active.npc_id)?;
+        let mut context = self.dialogue_context(npc);
+        context.body_string_id = Some(topic.body_string_id);
+        Some((active.npc_id, context))
+    }
+
     /// End the offered menu once its choice committed. Refused choices keep it
     /// open so the player can pick another option from the same list.
     pub fn consume_active(&mut self) {
@@ -882,6 +948,17 @@ impl NpcInteraction {
             // NPCs without a recovered greeting stay empty.
             body_string_id: npc.greeting_string_id,
             quest_title_string_ids: title_ids,
+            explainer_topics: npc
+                .explainer_topics
+                .iter()
+                .take(MAX_EXPLAIN_TOPICS)
+                .enumerate()
+                .map(|(index, topic)| ExplainTopic {
+                    response_id: EXPLAIN_CHOICE_RESPONSE_BASE + index as i32,
+                    label_string_id: topic.label_string_id,
+                    body_string_id: topic.body_string_id,
+                })
+                .collect(),
         }
     }
 
@@ -992,6 +1069,13 @@ fn validate_npc(npc: &NpcRecord) -> io::Result<()> {
         || npc
             .position
             .is_some_and(|position| position.iter().any(|value| !value.is_finite()))
+        // A zero id would ask the client for no text and a longer list would not fit the
+        // dialog's five buttons; both are content bugs, refused at load.
+        || npc.explainer_topics.len() > MAX_EXPLAIN_TOPICS
+        || npc
+            .explainer_topics
+            .iter()
+            .any(|topic| topic.label_string_id == 0 || topic.body_string_id == 0)
     {
         return Err(invalid("invalid NPC content record"));
     }
@@ -1148,6 +1232,12 @@ pub fn quest_dialogue_choice(title_string_id: u32) -> [u32; 5] {
 
 pub fn goodbye_dialogue_choice() -> [u32; 5] {
     [300, 17, GOODBYE_STRING_ID, 0, 18]
+}
+
+/// (R) Dialog row that opens one greeter explainer page (T773); same five-dword layout as
+/// [`goodbye_dialogue_choice`], and the client echoes dword 1 in 26/6.
+pub fn explainer_dialogue_choice(topic: &ExplainTopic) -> [u32; 5] {
+    [topic.response_id as u32, 17, topic.label_string_id, 0, 18]
 }
 
 /// Client quest accept/decline: native `QuestReply` stores quest id and bool.

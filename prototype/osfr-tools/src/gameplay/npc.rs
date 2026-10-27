@@ -170,6 +170,35 @@ impl Gameplay {
             let selected = npc_interaction::decode_dialogue_response_26_6(inner)
                 .map_err(|_| invalid("invalid dialogue response"))?;
             npc_event(serde_json::json!({"event": "dialogue_choice", "value": selected}));
+            // T773: a greeter tips row re-renders the same dialogue with that page's
+            // body. It is read-only, so the interaction (and its offered rows) stays
+            // open for another page or Goodbye.
+            if let Some((key, context)) = self
+                .npc_interaction
+                .as_ref()
+                .and_then(|interaction| interaction.explainer_page(selected))
+            {
+                let mut dialogue = dialogue_packet_with(&context, None)
+                    .map_err(|_| invalid("NPC dialogue could not be encoded"))?;
+                // The dialog camera target stays on the actor this player clicked; the
+                // last Talk recorded it, because 26/6 carries only the response id.
+                let runtime_guid = self
+                    .last_npc_dialogue
+                    .as_ref()
+                    .filter(|(_, _, last_key, _)| *last_key == key)
+                    .map(|(_, guid, _, _)| *guid)
+                    .unwrap_or(key);
+                patch_npc_actor(&mut dialogue, runtime_guid);
+                npc_event(serde_json::json!({
+                    "event": "greeter_tips",
+                    "content_key": key,
+                    "response_id": selected
+                }));
+                return Ok(Some(Outcome {
+                    replies: vec![dialogue],
+                    ..Outcome::default()
+                }));
+            }
             // (R) The choice reply carries the row's response id (or its index);
             // the quest row is first, so accept either form.
             if selected == npc_interaction::QUEST_CHOICE_RESPONSE || selected == 0 {
@@ -1257,7 +1286,17 @@ pub(super) fn dialogue_packet_with(
     // client-reader-backed; its 300/17/3 close tuple follows Lua's AddResponseNode
     // convention (notes/Research/Pieces/071 NPC dialogue branching.md). The body
     // field is a locale greeting when one is recovered; it is never the NPC name.
+    // T773: a greeter's tips rows follow the greeting. A quest offer keeps its row
+    // alone, because the 49/1 window draws its own speech bubble.
     let mut choices: Vec<[u32; 5]> = quest_choice.into_iter().collect();
+    if choices.is_empty() {
+        choices.extend(
+            context
+                .explainer_topics
+                .iter()
+                .map(npc_interaction::explainer_dialogue_choice),
+        );
+    }
     choices.push(npc_interaction::goodbye_dialogue_choice());
     npc_interaction::encode_dialogue_26_3(&npc_interaction::DialoguePacket26_3 {
         initial_dwords: [context.body_string_id.unwrap_or(0), 0, 0, 0],
