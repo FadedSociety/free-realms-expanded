@@ -52,6 +52,7 @@ mod derby_session;
 mod encounter_rewards;
 mod field_battle;
 mod fishing_scene;
+mod group_arena;
 mod housing;
 mod item_requests;
 mod item_use;

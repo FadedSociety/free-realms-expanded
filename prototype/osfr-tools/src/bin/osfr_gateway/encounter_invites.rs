@@ -47,7 +47,7 @@ pub(super) fn run(
     Ok(())
 }
 
-fn session_of<'a>(
+pub(super) fn session_of<'a>(
     world: &SharedWorld,
     sessions: &'a mut SessionMap,
     guid: u64,
@@ -132,10 +132,10 @@ fn answer(
         membership.invites_mut().answer(guid, now_ms); // The party is not touched.
         return Ok(());
     }
-    let grouped = world
+    let group = world
         .social
         .group_of(guid)
-        .is_some_and(|group| world.social.group_of(row.inviter) == Some(group));
+        .filter(|group| world.social.group_of(row.inviter) == Some(*group));
     let run_live = membership.instance(row.run).is_some()
         && membership
             .player_location(row.inviter)
@@ -145,17 +145,24 @@ fn answer(
             inviter.gateway.joinable_run().map(|(e, r, _)| (e, r)) == Some((row.encounter, row.run))
         });
     let in_run = membership.player_location(guid).map(|at| at.instance_id) == Some(row.run);
-    if !grouped || !run_live || in_run {
+    // T441: the arena this joiner enters, when it admits; a full, won, lost or faulted arena
+    // takes nobody, so the joiner plays their own run (the brief's solo fallback).
+    let (Some(_), true, false) = (group, run_live, in_run) else {
         return Ok(());
-    }
+    };
+    let arena = group_arena::prepare(world, sessions, membership, row.inviter, row.run);
     let mut staged = me.gateway.clone();
     let Ok(outcome) = staged.stage_encounter_join(row.encounter, row.run, now_ms) else {
         return Ok(());
     };
     let previous = me.gateway.state().clone();
-    me.commit_outcome(
+    if me.commit_outcome(
         staged, previous, outcome, world, membership, sessions, now_ms,
-    )?;
+    )? {
+        if let Some(arena) = arena {
+            group_arena::attach(membership, arena, row.run, guid);
+        }
+    }
     Ok(())
 }
 

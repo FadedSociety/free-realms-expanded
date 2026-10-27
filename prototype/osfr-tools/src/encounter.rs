@@ -29,6 +29,7 @@ mod revive;
 mod shared;
 mod skills;
 use self::arena::{ArenaSim, ArenaTick};
+pub use self::arena::{MAX_MEMBERS, SharedArena};
 use self::combat_scale::CombatScale;
 pub(crate) use self::field::level_refusal;
 use self::revive::{AUTO_REVIVE_MS, respawn_hide};
@@ -85,6 +86,10 @@ pub const GUIDE_GUID: u64 = 0x4f50_454e_0000_f001;
 /// Power-up pickup actors get `"PWUP"` plus a per-player serial (R). They are
 /// personal to the killer, so the serial only has to be unique per engine.
 const PICKUP_GUID_BASE: u64 = 0x5057_5550_0000_0000;
+/// True for a power-up pickup actor guid; those live in one engine only (never fanned out).
+pub fn is_pickup_guid(guid: u64) -> bool {
+    guid & 0xFFFF_FFFF_0000_0000 == PICKUP_GUID_BASE
+}
 /// SFX_PowerUp_Pickup composite (ActorCompositeEffectDefinitions.xml 15509,
 /// Combat Power-ups note 1.1); played at the pickup when it is collected.
 const POWER_UP_PICKUP_EFFECT: i32 = 15509;
@@ -693,7 +698,7 @@ pub struct EncounterEngine {
     // Where a dropped saved battle started; the gateway moves the character
     // there on login (its saved location is still inside the arena).
     dropped_return: Option<CharacterState>,
-    /// One run's enemy clocks and walks; swapped as one value (`with_arena`).
+    /// One run's enemy clocks and walks; moved in and out with `enter_arena` / `leave_arena`.
     arena: ArenaSim,
     // Readiness is local to the connection. Rejoining never resumes attacks
     // while the client is still loading its scene and models.
@@ -1907,6 +1912,9 @@ impl EncounterEngine {
         };
         let dealt = damage.min(health);
         let hp = health - dealt;
+        if let (Some(member), true) = (self.arena.acting, dealt > 0) {
+            self.arena.last_hit.insert(guid, member);
+        }
         if let (Some(sender), true) = (self.shared_sender, dealt > 0) {
             self.field_sim
                 .kills
@@ -1987,7 +1995,7 @@ impl EncounterEngine {
             if definition > 0 {
                 out.defeated.push(definition);
             }
-            self.arena.kiting.remove(&guid);
+            self.arena.forget(guid);
             if let Some(i) = field_index {
                 self.field_sim.moving.remove(&guid);
                 self.field_sim.attacks.remove(&guid);
@@ -1998,63 +2006,7 @@ impl EncounterEngine {
                 let (count, goal) = goal_progress(d, active);
                 out.replies.push(objective(2, d.objective_id, count));
                 if count >= goal {
-                    // The goal is down: summoned minions still standing leave.
-                    for (a, s) in d.enemies.iter().zip(&active.enemies) {
-                        if a.summon_below_percent.is_some() && s.health > 0 && !s.dormant {
-                            out.replies.push(remove(a.guid));
-                        }
-                    }
-                    // One prize from the battle's wheel (R: uniform pick), granted
-                    // and shown as the loot wheel's landing slot.
-                    let prize = (!d.prizes.is_empty())
-                        .then(|| d.prizes[(now_ms % d.prizes.len() as u64) as usize].clone());
-                    let (id, instance, objective_id, mut reward) = (
-                        d.id,
-                        active.instance_id,
-                        d.objective_id,
-                        EncounterReward {
-                            // (R) 50 job XP per battle win (half a rank on the
-                            // local 100-XP curve); the cave's XP stays with the
-                            // opening's own rewards.
-                            job_xp: if d.guide.is_none() { BATTLE_JOB_XP } else { 0 },
-                            coins: d.reward_coins,
-                            items: d
-                                .reward_items
-                                .iter()
-                                .copied()
-                                .chain(prize.iter().map(|p| (p.item_id, p.quantity)))
-                                .collect(),
-                            ..Default::default()
-                        },
-                    );
-                    let repeatable = d.guide.is_none();
-                    reward.bonus_items = self.roll_battle_drops(id);
-                    self.state.active.as_mut().unwrap().phase = EncounterPhase::Won;
-                    out.win_completed = Some(id);
-                    // The cave rewards once; overworld battles every win (R).
-                    // Repeatable battles are never recorded: their ids are not in the
-                    // opening content that validates `rewarded` at load.
-                    if repeatable || self.state.rewarded.insert(id) {
-                        out.rewards.push(reward);
-                    }
-                    out.replies.push(objective_complete(objective_id));
-                    out.replies.push(game_over(true, instance, id));
-                    if let Some(prize) = &prize {
-                        // 39/45 MiniGameLootWheelSetItemToLandOn: the wheel lands
-                        // on the preview entry with this name id (native
-                        // StopMiniGameLootWheelAt 009b6da0); the client answers
-                        // 39/46 when the spin stops, then shows the scores.
-                        let mut wheel = minigame(45, instance, id);
-                        wheel.extend(prize_bundle(std::slice::from_ref(prize)));
-                        out.replies.push(wheel);
-                    }
-                    out.replies.push(rules(false));
-                    out.replies.push(combat_flag(133, id, instance, false));
-                    out.feedback = Some(if repeatable {
-                        "Battle won. Close the results to return.".into()
-                    } else {
-                        "Darkthorne's defense is complete. Close the results to return. This encounter uses reconstructed combat rules.".into()
-                    });
+                    self.win_run(now_ms, &mut out);
                 }
             } else if !self.world_stage_fighting() && !self.field_combat {
                 out.replies.extend([
@@ -2406,8 +2358,14 @@ impl EncounterEngine {
             max_health: self.max_health,
             now_ms,
             elapsed,
+            backup: arena::summoner_backup(&actors, states),
         };
-        let mut total_damage = self.arena.tick_enemies(actors, states, &tick, &mut out);
+        // A shared run's enemies tick once per instance in the driver (`tick_arena_enemies`).
+        let mut total_damage = if self.arena.acting.is_none() {
+            self.arena.tick_enemies(actors, states, &tick, &mut out)
+        } else {
+            0
+        };
         if !self.active() && self.shared_fields.is_none() {
             self.tick_field(
                 position,
@@ -2425,47 +2383,7 @@ impl EncounterEngine {
                 &mut out,
             );
         }
-        if total_damage > 0 {
-            self.log_fight(now_ms, "taken", "enemies", "you", i64::from(total_damage));
-        }
-        if self.god && total_damage > 0 {
-            total_damage = 0;
-            out.replies
-                .push(player_hp(self.state.player_health, self.max_health));
-        }
-        if total_damage > 0 {
-            let dealt = total_damage.min(self.state.player_health);
-            self.state.player_health -= dealt;
-            out.changed = true;
-            out.replies
-                .push(player_hp(self.state.player_health, self.max_health));
-            if self.state.player_health == 0 {
-                self.skills.clear();
-                if let Some(a) = &mut self.state.active {
-                    a.phase = EncounterPhase::Lost;
-                    out.replies
-                        .push(game_over(false, a.instance_id, a.encounter_id));
-                    out.replies.push(rules(false));
-                    out.replies
-                        .push(combat_flag(133, a.encounter_id, a.instance_id, false));
-                    out.feedback = Some("Knocked out. Close the results to leave.".into());
-                } else if self.world_stage_fighting() {
-                    self.state.player_health = self.max_health;
-                    out.replies
-                        .push(player_hp(self.max_health, self.max_health));
-                    let mut z = self.content.world.clone();
-                    z.position = self.content.world.position;
-                    out.zoning = Some(z);
-                    out.feedback =
-                        Some("Knocked out; returning to the local opening checkpoint.".into());
-                } else {
-                    // (R) Overworld knockout: stay down and show the recovered
-                    // respawn window; 41/122 (`resume`) revives the player.
-                    out.replies.push(self.respawn_window());
-                    out.feedback = Some("Knocked out.".into());
-                }
-            }
-        }
+        self.take_enemy_damage(total_damage, now_ms, &mut out);
         self.present_results(&mut out);
         Ok(out)
     }

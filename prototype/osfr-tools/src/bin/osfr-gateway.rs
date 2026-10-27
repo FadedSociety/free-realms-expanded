@@ -43,6 +43,8 @@ mod ambient;
 mod delivery;
 #[path = "osfr_gateway/encounter_invites.rs"]
 mod encounter_invites;
+#[path = "osfr_gateway/group_arena.rs"]
+mod group_arena;
 use delivery::{
     chat_error_delivery, field_packet, field_packets_for, field_recipient_matches, queue_delivery,
     refresh_public_look, rider_event, wrap_application,
@@ -1659,6 +1661,8 @@ impl Session {
         }
         let previous = self.gateway.state().clone();
         let mut staged_gateway = self.gateway.clone();
+        let mut held =
+            group_arena::Held::enter(&mut staged_gateway, membership, self.character_guid);
         let mut outcome = match staged_gateway.handle_at(message, now_ms) {
             Ok(outcome) => outcome,
             Err(error) => {
@@ -1676,6 +1680,7 @@ impl Session {
                 return Err(error.into());
             }
         };
+        held.leave(&mut staged_gateway, &outcome, combat);
         if let Some(trace) = &self.trace {
             for detail in &outcome.trace {
                 trace_gateway_message(trace, self.id.0, self.peer, transport, detail)?;
@@ -1702,6 +1707,7 @@ impl Session {
             now_ms,
         )?;
         if committed {
+            held.publish(self, sessions, world, membership);
             delivery::post_commit(self, sessions, world, broadcast, jump)?;
             if let Some(definition) = boombox {
                 boombox_routing::place(self, sessions, world, now_ms, definition);
@@ -2481,8 +2487,11 @@ impl Session {
         }
         let previous = self.gateway.state().clone();
         let mut staged_gateway = self.gateway.clone();
+        let mut held =
+            group_arena::Held::enter(&mut staged_gateway, membership, self.character_guid);
         let outcome = staged_gateway.tick_at(now_ms)?;
-        self.commit_outcome(
+        held.leave(&mut staged_gateway, &outcome, true);
+        let committed = self.commit_outcome(
             staged_gateway,
             previous,
             outcome,
@@ -2491,6 +2500,7 @@ impl Session {
             sessions,
             now_ms,
         )?;
+        committed.then(|| held.publish(self, sessions, world, membership));
         self.flush_position(now_ms)
     }
 
@@ -3790,6 +3800,7 @@ impl Server {
         if tick_due {
             self.next_tick_ms = now_ms.saturating_add(50);
             self.tick_shared_fields(now_ms);
+            group_arena::tick(self, now_ms);
             let unix_ms = osfr_tools::client_areas::unix_now_ms();
             client_area_routing::season_tick(&mut self.world, &mut self.sessions, unix_ms);
             world_event_routing::tick(&mut self.world, &mut self.sessions, now_ms, unix_ms);

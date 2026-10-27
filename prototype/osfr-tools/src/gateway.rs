@@ -31,6 +31,7 @@ mod admin_move;
 mod application_preload;
 mod companions;
 mod encounter_join;
+mod group_arena;
 mod staff;
 mod startup_stream;
 mod trade_bridge;

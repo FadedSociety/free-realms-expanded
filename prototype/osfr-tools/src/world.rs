@@ -1174,6 +1174,8 @@ pub struct World {
     group_heals: std::collections::VecDeque<(InstanceId, u64, u64)>,
     // T440: outstanding group-encounter invites; cleared when a player or a run goes away.
     invites: crate::encounter_invite::Invites,
+    // T441: shared battle runs by run instance (the same single-writer rule as `fields`).
+    arenas: BTreeMap<InstanceId, crate::encounter::SharedArena>,
 }
 
 /// (R) Only touched membership data is staged. No packets or world-wide clone.
@@ -1448,11 +1450,39 @@ impl World {
             empty_instance_grace_ms,
             group_heals: std::collections::VecDeque::new(),
             invites: Default::default(),
+            arenas: BTreeMap::new(),
         }
     }
 
     pub fn invites_mut(&mut self) -> &mut crate::encounter_invite::Invites {
         &mut self.invites
+    }
+
+    /// T441: the shared battle run this player is a member of, by its run instance. The player
+    /// must also stand in that instance, so a stale member row never reaches a stranger's action.
+    pub fn arena_of(
+        &self,
+        player: PlayerId,
+    ) -> Option<(InstanceId, &crate::encounter::SharedArena)> {
+        let at = self.players.get(&player)?.instance_id;
+        let arena = self.arenas.get(&at)?;
+        arena.members.contains(&player).then_some((at, arena))
+    }
+
+    pub fn arena(&self, instance: InstanceId) -> Option<&crate::encounter::SharedArena> {
+        self.arenas.get(&instance)
+    }
+
+    pub fn arena_instances(&self) -> Vec<InstanceId> {
+        self.arenas.keys().copied().collect()
+    }
+
+    pub fn install_arena(&mut self, instance: InstanceId, arena: crate::encounter::SharedArena) {
+        self.arenas.insert(instance, arena);
+    }
+
+    pub fn remove_arena(&mut self, instance: InstanceId) {
+        self.arenas.remove(&instance);
     }
 
     pub fn player_location(&self, player: PlayerId) -> Option<&PlayerLocation> {
@@ -1725,6 +1755,7 @@ impl World {
             for id in candidates {
                 self.instances.remove(&id);
                 self.fields.remove(&id);
+                self.arenas.remove(&id);
                 self.field_packets.remove(&id);
                 removed.push(id);
             }
