@@ -2,7 +2,7 @@
 //!
 //! ORIGINAL facts implemented here (provenance in
 //! `notes/Research/Pieces/050 Character naming/select lifecycle.md` and re-extracted by
-//! `scripts/pieces/piece_050.py`):
+//! the private recovery checker `piece_050.py`):
 //!
 //! * `decompiled/client/FreeRealms/pseudocode.c` constructs `PacketCheckNameRequest` with
 //!   opcode 0xd2 (210) and `PacketCheckNameReply` with 0xd3 (211). Both are length-prefixed

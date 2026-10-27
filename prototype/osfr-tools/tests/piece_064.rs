@@ -26,7 +26,7 @@
 //! NOT CLAIMED: that the parsed prefix is the complete collision mesh, that a
 //! route is natively walkable, or that GCNK collision payloads are decoded.
 //! The 456 recorded native cave positions are compared with this module by
-//! `scripts/pieces/piece_064.py`, not here.
+//! the private recovery checker `piece_064.py`, not here.
 // The module is not registered in `src/lib.rs` (lead-owned). Including the exact
 // source file keeps this target compiling against the real artifact. Integration
 // step for the lead: register the module and drop this `#[path]` include.

@@ -26,7 +26,7 @@
 //!   types that resolve at least one other `Param1` value. Types that resolve none stay coverage.
 //!
 //! ponytail: one pass over each table, `BTreeMap`/`BTreeSet` only, no index files and no embedded
-//! catalogue dump. The Python checker `scripts/pieces/piece_097.py` is the independent oracle over
+//! catalogue dump. The Python checker the private recovery checker `piece_097.py` is the independent oracle over
 //! the same inputs.
 
 use serde::Deserialize;

@@ -406,7 +406,7 @@ pub fn driver_job(job: i32) -> Option<&'static DriverJobDefinition> {
 }
 
 /// Structure checks over the recovered tables. The full corpus cross-check lives in
-/// `scripts/pieces/piece_041.py`; this keeps the constants self-consistent in-tree.
+/// the private recovery checker `piece_041.py`; this keeps the constants self-consistent in-tree.
 pub fn validate() -> Result<(), ProgressionError> {
     for job in DRIVER_JOBS {
         if job.activity.owning_job() != job.job {

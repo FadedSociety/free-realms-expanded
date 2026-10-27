@@ -235,7 +235,7 @@ def copy_fixed_inputs(target: Path) -> tuple[int, int, int]:
 def copy_client_overlay(target: Path) -> str:
     """Build client-overlay/, the W121 patch folder a private realm serves; return its pin.
 
-    Private realms only (lead, 2026-10-22; launcher/README.md "Licence"). The two
+    Private realms only (lead, 2026-10-22; the launcher repo's README "Licence"). The two
     customization tables also go to the login-resources root, where osfr-login checks
     their pins and refuses the looks they hide (identity.rs PINNED_CREATOR_TABLES).
     """

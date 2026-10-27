@@ -2,7 +2,7 @@
 //!
 //! Recovered original facts, all copied from the preserved client tables under
 //! `lab/working/OSFR.Client/OSFR Client/Resources` and re-checked by
-//! `scripts/pieces/piece_049.py`:
+//! the private recovery checker `piece_049.py`:
 //!
 //! * Four creator character types exist (`CharacterCreateCharacterTypes.txt`): Human/Pixie x
 //!   Male/Female with locale name ids 430557-430560. They bind one-to-one to the four

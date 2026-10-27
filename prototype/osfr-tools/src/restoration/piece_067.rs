@@ -12,7 +12,7 @@
 //!   - "Player must own a usable glide-trainable ride ...",
 //!   - "Player must achieve at least one Level 8 or higher Combat Job",
 //!   - "... only available during ... Community Events".
-//!   `scripts/pieces/piece_067.py` re-derives all 36 requirement rows from that
+//!   the private recovery checker `piece_067.py` re-derives all 36 requirement rows from that
 //!   corpus and fails on drift; the two Farnum's Farm rows are embedded below.
 //! * First-party client locale 401549 "In order to accept more quests, you must
 //!   first become a member." and 71311 "Sorry, you don't meet the requirements
@@ -426,7 +426,7 @@ pub const OPENING_QUEST_PREREQUISITES: [QuestRow<&'static str>; 2] = [
 pub const OPENING_UNRESOLVED_PREREQUISITES: [&str; 1] = ["Quest:Learn to Mine & Smelt Ore"];
 
 /// Builds the pinned opening-arc table. The constants above are asserted by
-/// `tests/piece_067.rs`; `scripts/pieces/piece_067.py` re-derives them from the
+/// `tests/piece_067.rs`; the private recovery checker `piece_067.py` re-derives them from the
 /// corpus, so a drift in either place fails a real check.
 pub fn opening_table() -> PrerequisiteTable<&'static str> {
     PrerequisiteTable::new(

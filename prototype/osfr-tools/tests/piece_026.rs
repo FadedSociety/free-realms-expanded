@@ -756,7 +756,7 @@ fn unknown_or_duplicate_pool_rows_are_rejected() {
 }
 
 /// Writes the durable pair and the conservation report for the independent checker in
-/// `scripts/pieces/piece_026.py`. The evidence directory is private lab state, so the test skips the
+/// the private recovery checker `piece_026.py`. The evidence directory is private lab state, so the test skips the
 /// export when the environment variable is absent.
 #[test]
 fn evidence_export_writes_the_durable_pair() {

@@ -29,7 +29,7 @@
 //! GAPS: the predicate's match rule (case folding, substring vs prefix, which
 //! field is compared) is not recovered, so this module never reproduces a
 //! filtered result set and never claims the crash cause. It grants nothing and
-//! changes no content. `scripts/pieces/piece_082.py` runs the same model over the
+//! changes no content. the private recovery checker `piece_082.py` runs the same model over the
 //! preserved crash-run inputs and cross-checks the fingerprint produced here.
 
 use sha2::{Digest, Sha256};

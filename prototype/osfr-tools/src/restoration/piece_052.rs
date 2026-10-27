@@ -3,7 +3,7 @@
 //!
 //! ORIGINAL facts implemented here (provenance in
 //! `notes/Research/Native NPC Motion and Animation.md`, re-derived against the
-//! preserved inputs by `scripts/pieces/piece_052.py`):
+//! preserved inputs by the private recovery checker `piece_052.py`):
 //!
 //! * Movement is the standalone opcode 125 application message,
 //!   `u16 opcode, u64 guid, 3f position, 3f rotation, u8 state, u8 unknown`
@@ -31,7 +31,7 @@
 //!
 //! NOT CLAIMED: rendered native playback, per-model animation support, or that a
 //! recovered enemy historically patrolled this way. The native gate belongs to
-//! the lead; the replay checker in `scripts/pieces/piece_052.py --run <capture>`
+//! the lead; the replay checker in `the private recovery checker piece_052.py --run <capture>`
 //! is the intended evidence tool for it.
 
 /// Standalone movement application message opcode (native reader `008e5940`).

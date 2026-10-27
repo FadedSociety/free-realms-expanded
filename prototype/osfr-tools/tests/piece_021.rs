@@ -431,7 +431,7 @@ fn corrupted_catalogue_bytes_are_refused() {
     ));
 }
 
-/// The real extractor output: `scripts/pieces/piece_021.py` writes
+/// The real extractor output: the private recovery checker `piece_021.py` writes
 /// `lab/reports/piece-021-<UTC>/property-acquisition.json` from the pinned lab corpus. This is
 /// opt-in because the lab is private, so the vector is ignored unless the environment names the
 /// file:

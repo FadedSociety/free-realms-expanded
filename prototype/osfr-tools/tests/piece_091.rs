@@ -3,7 +3,7 @@
 //! Evidence boundary, read this before the assertions:
 //!
 //! ORIGINAL (first-party client inputs plus the recovered managed server serializer;
-//! paths and hashes are pinned by `scripts/pieces/piece_091.py` and the research note):
+//! paths and hashes are pinned by the private recovery checker `piece_091.py` and the research note):
 //! * Packet family: base opcode 53 (`FUN_00b50670` writes `param_1[1] = 0x35`,
 //!   `param_1[2] = subtype`), 35 named subtypes. Sanctuary's reader
 //!   (`53 => reader.Read<byte>() switch { ... }`) and the community `PetBasePackets`

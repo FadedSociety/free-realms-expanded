@@ -5,7 +5,7 @@
 //!
 //! ORIGINAL (first-party native code and shipped resources; hashes and offsets
 //! in `notes/Research/Native NPC Motion and Animation.md` and re-verified by
-//! `scripts/pieces/piece_052.py` against the preserved lab inputs):
+//! the private recovery checker `piece_052.py` against the preserved lab inputs):
 //! * Movement is the standalone opcode 125 application message,
 //!   `u16 opcode, u64 guid, 3f position, 3f rotation, u8 state, u8 unknown`
 //!   = 36 bytes (native reader 008e5940; no timestamp field). The three rotation
@@ -27,7 +27,7 @@
 //! NOT CLAIMED: rendered native idle/run playback, per-model animation support,
 //! or that any recovered enemy historically patrolled this way. The native gate
 //! stays with the lead and the replay checker
-//! (`scripts/pieces/piece_052.py --run <capture>`).
+//! (`the private recovery checker piece_052.py --run <capture>`).
 // The module is not registered in `src/lib.rs` (lead-owned). Including the exact
 // source file keeps this target compiling against the real artifact. Integration
 // step for the lead: register the module and drop this `#[path]` include.

@@ -217,9 +217,9 @@ fn recovered_native_constants_stay_pinned() {
 
 /// Private oracle: run the preflight over the exact preserved crash-run inputs
 /// and cross-check the counts and fingerprint produced by
-/// `scripts/pieces/piece_082.py` (the two implementations must agree).
+/// the private recovery checker `piece_082.py` (the two implementations must agree).
 #[test]
-#[ignore = "requires the private preflight-input.json produced by scripts/pieces/piece_082.py"]
+#[ignore = "requires the private preflight-input.json produced by the private recovery checker piece_082.py"]
 fn private_crash_run_preflight_matches_the_python_checker() {
     let path = std::path::PathBuf::from(
         std::env::var_os("OSFR_PIECE_082_PREFLIGHT").expect("private preflight input required"),

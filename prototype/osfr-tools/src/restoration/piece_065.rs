@@ -10,7 +10,7 @@
 //!
 //! ORIGINAL facts used here (provenance in
 //! `notes/Research/Pieces/065 Dungeon native replay.md`, hashes re-derived by
-//! `scripts/pieces/piece_065.py`):
+//! the private recovery checker `piece_065.py`):
 //!
 //! * the encounter family is base opcode 41 with `EncounterDetailsResponsePacket` 114,
 //!   `EncounterZoneIsReadyPacket` 107, `EncounterStatePacket` 106,
@@ -80,7 +80,7 @@ pub struct ReplayWire {
 }
 
 /// ORIGINAL: every row here is either re-derived from a pinned community writer or
-/// observed in a preserved native capture. `scripts/pieces/piece_065.py` fails when
+/// observed in a preserved native capture. the private recovery checker `piece_065.py` fails when
 /// one of these drifts from its source.
 pub const REPLAY_WIRE: &[ReplayWire] = &[
     ReplayWire {

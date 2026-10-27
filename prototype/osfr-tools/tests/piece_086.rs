@@ -4,7 +4,7 @@
 //! Evidence boundary, read before the assertions:
 //!
 //! ORIGINAL (supplied client / supplied server builds, hashes pinned by
-//! `scripts/pieces/piece_086.py`):
+//! the private recovery checker `piece_086.py`):
 //! * `decompiled/client-ui/ScriptsBase.lua` data-source rows: PlayerInfo
 //!   `NumCoins = 2` / `Wallet = 3` / `CoinCount = 16` / `SCCount = 17`,
 //!   `_getCoinCount() = GetData(0, 2)`, `_getStationCashCount() =

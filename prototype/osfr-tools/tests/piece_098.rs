@@ -31,7 +31,7 @@ use std::fs;
 use std::path::{Path, PathBuf};
 
 /// Environment variable used by the private gate: path to the oracle JSON produced by
-/// `scripts/pieces/piece_098.py` from the preserved lab inputs.
+/// the private recovery checker `piece_098.py` from the preserved lab inputs.
 const ORACLE_ENV: &str = "OSFR_RENDER_SLICE";
 
 /// Optional override for the private gate's evidence output path; defaults to

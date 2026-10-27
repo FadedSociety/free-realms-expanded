@@ -3,7 +3,7 @@
 It holds the community character-creator tables and the custom/ dressing-room scene,
 at the paths the client opens. The native harness installs the same files through
 install() (scripts/run-local-baseline.py). Provenance and the pending distribution
-decision: launcher/README.md.
+decision: the launcher repo's README (github.com/FadedSociety/free-realms-launcher).
 """
 
 from __future__ import annotations

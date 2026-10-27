@@ -6,7 +6,7 @@
 //!
 //! ORIGINAL facts (supplied client and supplied server builds; every path and
 //! hash is pinned in `notes/Research/Pieces/086 Currency and economy audit.md`
-//! and re-verified by `scripts/pieces/piece_086.py`):
+//! and re-verified by the private recovery checker `piece_086.py`):
 //!
 //! * Coins are the character currency. `ScriptsBase.lua` stores the count in
 //!   `PlayerInfo_DS.NumCoins = 2` (`_getCoinCount()` reads row 2),

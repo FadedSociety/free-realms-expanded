@@ -12,7 +12,7 @@
 //!   and eight all-zero (Type 0) slots. The community reconstruction agrees: eight slots, positional.
 //!
 //! COMMUNITY-RECOVERED data, pinned under `lab/references` and verified by
-//! `scripts/pieces/piece_036.py`:
+//! the private recovery checker `piece_036.py`:
 //! * `Sanctuary/src/Resources/CombatJobs.json` profile 12 "Wizard": ranged, auto-target reach 20,
 //!   wield type 10, basic/special slot definitions 4895/4899, basic recast 600 ms, fallback basic
 //!   4010, energy 100 max with 4 per second, and Student Wizard Wand 4914 -> basic 4011 Zap /

@@ -3,7 +3,7 @@
 //!
 //! ORIGINAL facts implemented here (provenance in
 //! `notes/Research/Pieces/062 Boss behaviors.md` and re-read from the preserved lab evidence by
-//! `scripts/pieces/piece_062.py`):
+//! the private recovery checker `piece_062.py`):
 //!
 //! * Identity: the community NPC row 3283 carries name id 440729 `Necronomicus` and model
 //!   `necronomicus_m.adr`; the client's own `Resources/Models.txt` maps model id 4220 to the same

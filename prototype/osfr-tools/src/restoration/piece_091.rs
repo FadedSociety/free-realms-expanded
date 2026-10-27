@@ -2,7 +2,7 @@
 //! definitions, plus the preserved pet profile state.
 //!
 //! Provenance lives in `notes/Research/Pieces/091 Pets and companions.md`; the corpus
-//! cross-check is `scripts/pieces/piece_091.py`. Raw/decompiled inputs stay in the lab.
+//! cross-check is the private recovery checker `piece_091.py`. Raw/decompiled inputs stay in the lab.
 //!
 //! ORIGINAL facts implemented here:
 //!

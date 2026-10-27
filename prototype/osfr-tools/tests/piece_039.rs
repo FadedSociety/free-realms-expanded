@@ -23,7 +23,7 @@
 //!
 //! The Miner xp *thresholds* are an explicit gap: the client ships no profile rank table (it
 //! loads `FactoryRanks.txt` and reads `RankExperience`/`RankMaxExperience` from the server), so
-//! only the farm/ranch ladder is recoverable. `scripts/pieces/piece_039.py` records the same gap.
+//! only the farm/ranch ladder is recoverable. the private recovery checker `piece_039.py` records the same gap.
 //!
 //! This file is a `#[path]` include so it compiles and exercises the real module before the lead
 //! registers `pub mod piece_039;` under `src/restoration/mod.rs`/`src/lib.rs`.

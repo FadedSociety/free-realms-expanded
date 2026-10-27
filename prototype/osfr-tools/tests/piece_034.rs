@@ -405,7 +405,7 @@ fn the_cast_state_survives_a_restart() {
     assert!(cast_basic(&mut restarted, 1_600).is_ok());
 }
 
-/// Reads the real catalogue emitted by `scripts/pieces/piece_034.py` and validates the recovered
+/// Reads the real catalogue emitted by the private recovery checker `piece_034.py` and validates the recovered
 /// job/equipment facts end to end. The lab is private state, so the check is skipped without the
 /// environment variable.
 #[test]

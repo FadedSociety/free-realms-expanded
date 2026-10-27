@@ -18,7 +18,7 @@
 //! rename `defeat` -> kill and `dungeon_completed` -> game, the exact-identifier match
 //! rule, quantity clamping, and every 910xxx stage id, objective key, actor GUID,
 //! resource id 1001-1003, recipe id 2001-2003 and the zone 0 visit sentinel. The
-//! checker `scripts/pieces/piece_068.py` re-derives the table from the pinned sources
+//! checker the private recovery checker `piece_068.py` re-derives the table from the pinned sources
 //! and records the evidence class of every identifier; the lead owns integration with
 //! the journal writer and the gameplay engines.
 //!
@@ -35,7 +35,7 @@ pub const SCHEMA_VERSION: u32 = 1;
 /// Largest finite position component accepted from a local event or route.
 const LOCAL_COMPONENT_BOUND: f32 = 1_000_000.0;
 
-/// Exact extraction output of `scripts/pieces/piece_068.py`, embedded so the
+/// Exact extraction output of the private recovery checker `piece_068.py`, embedded so the
 /// router works without a private lab path. `tests/piece_068.rs` compares this
 /// table against the independent extraction; never hand-edit a row.
 pub const RECOVERED_ROUTES_JSON: &str = r#"{

@@ -3,7 +3,7 @@
 //! Evidence boundary, read before the assertions:
 //!
 //! ORIGINAL (first-party / pinned-community sources; hashes pinned by
-//! `scripts/pieces/piece_065.py`):
+//! the private recovery checker `piece_065.py`):
 //! * the encounter family base opcode 41 and the `EncounterDetailsResponsePacket`
 //!   (114), `EncounterZoneIsReadyPacket` (107), `EncounterStatePacket` (106) and
 //!   `EncounterPacketPlayerEnter` (2) writers are pinned community sources under

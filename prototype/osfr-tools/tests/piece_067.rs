@@ -8,7 +8,7 @@
 //! verbatim, e.g. "Player must complete Quest:Learn to Mine & Smelt Ore in order
 //! to do Quest:Your First Weapon" (rev 27815) and "Player must complete
 //! Quest:Your First Weapon in order to do Quest:Fighting off the Pack"
-//! (rev 28955). The corpus checker in `scripts/pieces/piece_067.py` re-derives
+//! (rev 28955). The corpus checker in the private recovery checker `piece_067.py` re-derives
 //! all 36 requirement rows and fails on drift.
 //!
 //! ORIGINAL (first-party client locale): 401549 "In order to accept more quests,

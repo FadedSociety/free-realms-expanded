@@ -311,7 +311,7 @@ pub fn item_bound_mount(item_definition_id: i32) -> Option<&'static MountOwnersh
         .next_back()
 }
 
-/// Structure checks over the captured rows. Corpus cross-checks live in `scripts/pieces/piece_092.py`.
+/// Structure checks over the captured rows. Corpus cross-checks live in the private recovery checker `piece_092.py`.
 pub fn validate() -> Result<(), &'static str> {
     let mut seen = [0i32; CAPTURED_MOUNTS.len()];
     for (index, row) in CAPTURED_MOUNTS.iter().enumerate() {

@@ -1,6 +1,6 @@
 //! Work item 084 - vendor selling and buyback.
 //!
-//! Recovered original material (pinned, hashed and re-checked by `scripts/pieces/piece_084.py`):
+//! Recovered original material (pinned, hashed and re-checked by the private recovery checker `piece_084.py`):
 //!
 //! * `lab/decompiled/client/FreeRealms/pseudocode.c` is the shipped client. Its packet
 //!   constructors call `FUN_00c6e960(<opcode>)` under `BaseCoinStore` (165), which fixes the

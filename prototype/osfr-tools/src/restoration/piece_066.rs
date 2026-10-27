@@ -5,7 +5,7 @@
 //! The catalogue is recovered evidence, not a reconstructed quest system. This
 //! module reads `notes/Research/original-quest-coverage.json` (produced from the
 //! pinned supplied/community/wiki sources, see
-//! `scripts/pieces/piece_066.py`) and gives the lead a typed, validated view of
+//! the private recovery checker `piece_066.py`) and gives the lead a typed, validated view of
 //! what is original, what is community evidence and what is missing:
 //!
 //! * ORIGINAL: 25 supplied numeric quest records, 13 region-1 journal hub

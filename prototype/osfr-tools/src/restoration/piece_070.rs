@@ -11,7 +11,7 @@
 //!
 //! This module owns that tail as typed, validated data plus the field writer, so the remaining
 //! captured bytes become writer output. The byte layout is verified against the supplied compiled
-//! serializer in `scripts/pieces/piece_070.py`; the two values are emitted for reconstructed
+//! serializer in the private recovery checker `piece_070.py`; the two values are emitted for reconstructed
 //! campaigns because every preserved self input declares `10`/`30`.
 //!
 //! ORIGINAL: field order and native destinations, the captured reference tail `241, 2513, true,

@@ -2,7 +2,7 @@
 //! weighted-drop schema and a reconstructed once-only kill/loot grant ledger.
 //!
 //! Provenance, hashes and the independent re-derivation live in
-//! `notes/Research/Pieces/057 Loot and enemy rewards.md` and `scripts/pieces/piece_057.py`.
+//! `notes/Research/Pieces/057 Loot and enemy rewards.md` and the private recovery checker `piece_057.py`.
 //!
 //! ORIGINAL facts carried here:
 //! * The player-update loot sub-opcode 29. The original client binary's

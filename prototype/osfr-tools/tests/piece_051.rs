@@ -2,7 +2,7 @@
 //!
 //! Evidence boundary, read before the assertions:
 //!
-//! ORIGINAL (first-party client files; sha256s re-verified by `scripts/pieces/piece_051.py`
+//! ORIGINAL (first-party client files; sha256s re-verified by the private recovery checker `piece_051.py`
 //! and recorded in `notes/Research/Pieces/051 Enemy catalogue.md`):
 //! * `Resources/Models.txt` declares 17 columns in this order: Id, ModelFileName, RaceId,
 //!   Scale, Description, Gender, Age, Descriptor, MaterialType, WaterDisplacement,

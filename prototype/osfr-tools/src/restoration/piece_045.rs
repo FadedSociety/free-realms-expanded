@@ -41,7 +41,7 @@ pub use inventory::{Inventory, InventoryState};
 /// with the number of recovered rows in that pair. Slots 7+ (tools, weapons, shards, jewelry) are
 /// deliberately absent: they are gear mechanics, owned by other work items. The declared pair is
 /// one category per slot; slot 17 also carries 541 `Shirts & Dresses` and 55 `Hats` costume
-/// overrides, which `scripts/pieces/piece_045.py` reports instead of hiding behind the dominant
+/// overrides, which the private recovery checker `piece_045.py` reports instead of hiding behind the dominant
 /// count.
 #[derive(Clone, Copy, Debug, PartialEq, Eq)]
 pub struct CosmeticSlot {

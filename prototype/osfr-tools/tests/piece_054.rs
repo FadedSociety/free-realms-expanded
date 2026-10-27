@@ -209,7 +209,7 @@ fn swing_animation_follows_the_recovered_wield_table() {
 #[test]
 fn animation_and_timing_evidence_matches_the_original_client_resources() {
     // Values re-read from the preserved original Resources by
-    // `scripts/pieces/piece_054.py`; these constants pin the same rows.
+    // the private recovery checker `piece_054.py`; these constants pin the same rows.
     assert_eq!(COM_SWING_GROUP_ID, 1099);
     assert_eq!(COM_SWING_FALLBACK_ID, 1000);
     assert_eq!(COM_H2H_ATTACK_GROUP_ID, 1000);

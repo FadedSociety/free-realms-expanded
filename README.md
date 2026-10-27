@@ -111,7 +111,6 @@ Building an MMO's worth of content takes good tools. The server includes a devel
 - **Gameplay data.** `prototype/osfr-tools/data/content` holds NPC tables, quests, stores, vendors, pets, rides and more as JSON. It was built from the original client's data files, so it includes quoted in-game text such as item names, dialog lines and quest text. Some rows were derived from community projects (FreeRealms-Legacy and Sanctuary) and from the Free Realms Wiki, and each row's provenance fields say where it came from. Numbers we had to invent are marked **(R)**, for reconstructed.
 - **Notes on how the client works.** The notes under [notes/Native Map](notes/Native%20Map/Native%20Map.md) and [notes/Build Guides](notes/Build%20Guides/Build%20Guides.md) are our own descriptions of how the original client behaves.
 - **What it does not contain:** no game binaries, no asset packs and no extracted art. You need your own legally obtained copy of the original client to play.
-- **Old copy of the launcher.** The `launcher/` folder is a previous copy, kept for now and due to be removed. See [Launcher](#launcher).
 
 ```text
 prototype/osfr-tools/   Rust server: gateway, login, encounter engine, quest engine, Studio, bot, terrain
@@ -121,12 +120,11 @@ prototype/osfr-tools/   Rust server: gateway, login, encounter engine, quest eng
 scripts/                Content checker, data builders, test bundles, stress harness, research tools
 notes/                  Design and research notes (open in Obsidian, or read as Markdown)
 tests/                  Python checks for scripts and coverage
-launcher/               Old launcher copy (see below)
 ```
 
 ## Launcher
 
-The launcher now lives in its own repository: <https://github.com/FadedSociety/free-realms-launcher>. The `launcher/` folder here is the old copy and will be removed.
+The launcher lives in its own repository: <https://github.com/FadedSociety/free-realms-launcher>.
 
 ## Getting started
 

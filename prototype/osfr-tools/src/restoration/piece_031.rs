@@ -17,7 +17,7 @@
 //! membership/trial flags come from `lab/references/Sanctuary/src/Resources/Profiles.json`; the
 //! combat/crafting/freestyle split and the retired Pet Trainer job come from the read-only wiki
 //! corpus. Both are cross-checked against the original locale by `validate_locale`, and the Python
-//! checker `scripts/pieces/piece_031.py` performs the same cross-check against all pinned inputs.
+//! checker the private recovery checker `piece_031.py` performs the same cross-check against all pinned inputs.
 //!
 //! BOUNDARIES: this catalogue is recovery metadata. It grants no job, defines no XP curve and
 //! claims no native activation. The server-side profile rows and the ActivityFinder rows that map

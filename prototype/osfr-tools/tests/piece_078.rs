@@ -5,7 +5,7 @@
 //!
 //! ORIGINAL, preserved community capture `p2.pcap` (sha256
 //! `65ac0801bf49fa9af4ee0bc95568b751392ec4d594fe6ac4e89605f9ee0d0108`), re-derived by
-//! `scripts/pieces/piece_078.py`; the same session is preserved as `p12.pcap`
+//! the private recovery checker `piece_078.py`; the same session is preserved as `p12.pcap`
 //! (`99309eb5...`) and `packets_2.pcapng` (`221b8d54...`), which repeat all four transitions:
 //! * every zone entry is server inner opcode 31 (`ClientBeginZoning`) followed by client 13
 //!   (`ClientIsReady`), server 14 (`ZoneDoneSendingInitialData`), client 10

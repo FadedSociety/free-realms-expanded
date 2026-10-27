@@ -27,7 +27,7 @@
 //!
 //! Evidence: `notes/Research/Pieces/018 Minigame native test routes.md`,
 //! `notes/Research/original-activity-coverage.json` (item 015) and the bound
-//! private content checked by `scripts/pieces/piece_018.py`.
+//! private content checked by the private recovery checker `piece_018.py`.
 
 /// Chat-body keyword under `realm `, matching the `realm goto` convention.
 pub const COMMAND: &str = "game";

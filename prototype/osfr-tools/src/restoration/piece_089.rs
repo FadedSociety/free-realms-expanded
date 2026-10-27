@@ -16,7 +16,7 @@
 //! * the sub-opcode table below is read from the constructors themselves: every derived class is
 //!   `FUN_008a35c0(<sub>)` immediately before its `::vftable` store. That yields 15 rows. The older
 //!   community enum (`OpenSourceFreeRealms/.../PacketCodes.cs`, `BaseGroupPackets`) declares the
-//!   same 15 names at the same numbers. The client stays the authority: `scripts/pieces/piece_089.py`
+//!   same 15 names at the same numbers. The client stays the authority: the private recovery checker `piece_089.py`
 //!   re-derives the table from the binary and fails if the two ever disagree.
 //! * the envelope is `u16 outer | u8 flag | u32 inner length | u16 opcode | sub | body`, where
 //!   `inner length` counts from the opcode (the same convention as piece 020, which the original

@@ -2,7 +2,7 @@
 //!
 //! ORIGINAL facts carried by this module (provenance in
 //! `notes/Research/Pieces/051 Enemy catalogue.md`, re-verified against the preserved inputs by
-//! `scripts/pieces/piece_051.py`):
+//! the private recovery checker `piece_051.py`):
 //!
 //! * `Resources/Models.txt` (preserved original client table, 3743 rows) declares
 //!   [`MODELS_TXT_COLUMNS`]. Exactly 27 of its rows carry a combat actor descriptor:

@@ -44,7 +44,7 @@ parser.add_argument("--character-select-title", type=Path, help="Opt-in versione
 parser.add_argument("--lua-probe", action="store_true", help="Replace per-run UI/ScriptsBase.bin with syntax-checked Lua source and an automatic quest-offer probe")
 parser.add_argument("--live-capture", action="store_true", help="Publish a non-authoritative live UDP prefix in the new run via a background writer")
 parser.add_argument("--keep-client", action="store_true", help="Keep the full per-run client copy (default: delete it after the run, keeping client/Logs)")
-parser.add_argument("--gamepad", action="store_true", help="Drive this run's client with an XInput controller (launcher/gamepad_bridge.py, layout in launcher/gamepad.json)")
+parser.add_argument("--gamepad", action="store_true", help="Drive this run's client with an XInput controller (scripts/launcher/gamepad_bridge.py, layout in scripts/launcher/gamepad.json)")
 parser.add_argument("--native-hook", metavar="SET", help="Attach the Frida native hook set (see native_hook.py --list) to this run's client")
 parser.add_argument("--live-log", action=argparse.BooleanOptionalAction, default=True, help="Write server/login packet traces and open the merged live log in a console beside the client (default on; --no-live-log to disable)")
 parser.add_argument("--dev-tools", action="store_true", help="Opt in to local developer entity teleport commands for this test run")

@@ -5,7 +5,7 @@
 //! Evidence boundary, read before the assertions:
 //!
 //! ORIGINAL (supplied client binary and decompiled client Lua; every hash is
-//! re-checked by `scripts/pieces/piece_058.py`):
+//! re-checked by the private recovery checker `piece_058.py`):
 //! * `EncounterShowRespawnWindowPacket` is the encounter family
 //!   (`BaseEncounterPacket` = outer opcode 41) sub-opcode **125**: the client constructor
 //!   `FUN_008a33b0` passes `0x7d` to the family base constructor `FUN_008a2fd0` (which writes

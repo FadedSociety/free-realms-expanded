@@ -3,7 +3,7 @@
 //!
 //! ORIGINAL facts implemented here (provenance in
 //! `notes/Research/Pieces/054 Melee attacks.md` and re-read from the preserved
-//! original `Resources/` by `scripts/pieces/piece_054.py`):
+//! original `Resources/` by the private recovery checker `piece_054.py`):
 //!
 //! * `CodeAnimationMappings.txt`: `33^1000^com_h2h_attack`,
 //!   `26^1001^com_h2h_attack_01` and `121^1099^com_swing`.
@@ -178,7 +178,7 @@ pub struct AnimationSlotSpec {
 }
 
 /// `com_h2h_attack_01` row, re-read from the preserved original XML by
-/// `scripts/pieces/piece_054.py`.
+/// the private recovery checker `piece_054.py`.
 pub const COM_H2H_ATTACK_01_SLOT: AnimationSlotSpec = AnimationSlotSpec {
     name: "com_h2h_attack_01",
     id: COM_H2H_ATTACK_01_SLOT_ID,

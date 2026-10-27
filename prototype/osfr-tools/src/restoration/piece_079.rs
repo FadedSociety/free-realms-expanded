@@ -197,7 +197,7 @@ impl TerrainSurvey {
 }
 
 /// Structure checks over the recovered inventory. The corpus-wide derivation lives in
-/// `tests/piece_079.rs` and `scripts/pieces/piece_079.py`; this keeps the constants self-consistent.
+/// `tests/piece_079.rs` and the private recovery checker `piece_079.py`; this keeps the constants self-consistent.
 pub fn validate() -> Result<(), &'static str> {
     let decoded: usize = VERSION_HISTOGRAM.iter().map(|(_, count)| count).sum();
     if decoded + PLACEHOLDER_CHUNK_COUNT != PRESERVED_CHUNK_COUNT {

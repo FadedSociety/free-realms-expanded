@@ -2,7 +2,7 @@
 //! abilities and authored attack timing.
 //!
 //! ORIGINAL evidence used by these vectors (all outside this test, re-read by
-//! `scripts/pieces/piece_062.py`):
+//! the private recovery checker `piece_062.py`):
 //! * `lab/reports/job-catalogue-20261009T022023Z/locale-en_us.json` - the preserved original
 //!   locale export. Encounter 432 (`Encounter 432 - Necronomicus' Lair`, 5100662), the
 //!   `Destroy Zombie Portal 1..8` objectives (5100669-5100683), the three barks (5100650,
