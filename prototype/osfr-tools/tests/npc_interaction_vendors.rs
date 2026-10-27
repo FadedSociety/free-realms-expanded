@@ -293,3 +293,26 @@ fn vendor_stock_is_loadable_and_supported_by_content_evidence() {
         coverage["items_unmatched"].as_u64().unwrap_or_default()
     );
 }
+
+/// F803: the 165/12 skip in `gameplay/npc.rs` now uses the Coin Store route's own predicate, so a
+/// moved subtype or a new 165/x packet is decided in one place. The client request writer is
+/// `00c759c0` and the sender `00c76600`; the 12-byte body is the sale transaction id and one
+/// context dword.
+#[test]
+fn the_buy_back_predicate_matches_only_the_165_12_header() {
+    let request = [165, 0, 12, 0, 7, 0, 0, 0, 0, 0, 0, 0];
+    assert!(npc_interaction::is_coin_store_buy_back(&request));
+    for other in [
+        &[165, 0, 4, 0][..],
+        &[165, 0, 5, 0][..],
+        &[165, 0, 13, 0][..],
+        &[66, 0, 43, 0][..],
+        &[165, 0, 12][..],
+        &[][..],
+    ] {
+        assert!(
+            !npc_interaction::is_coin_store_buy_back(other),
+            "a non-buy-back header must not skip the collect event: {other:?}"
+        );
+    }
+}

@@ -640,7 +640,7 @@ impl NpcInteraction {
         position: [f32; 3],
     ) -> Result<CoinShopOutcome, NpcInteractionError> {
         let is = |subtype: u16| packet.starts_with(&[COIN_STORE_FAMILY as u8, 0, subtype as u8, 0]);
-        let (is_sell, is_buy_back) = (is(COIN_STORE_SELL), is(COIN_STORE_BUY_BACK));
+        let (is_sell, is_buy_back) = (is(COIN_STORE_SELL), is_coin_store_buy_back(packet));
         // 2 definitions, 8 list update and 14 gift need no session; anything else (including an
         // unknown subtype) must pass the checks, which refuse what they do not know.
         let session_free = [2, 8, 14].into_iter().any(is);
@@ -1051,6 +1051,12 @@ impl NpcInteraction {
             items,
         }
     }
+}
+
+/// (R) The Coin Store 165/12 buy-back header. The client's request writer is `00c759c0` and the
+/// sender `00c76600`; the 12-byte layout is checked by `check_coin_store`.
+pub(crate) fn is_coin_store_buy_back(packet: &[u8]) -> bool {
+    packet.starts_with(&[COIN_STORE_FAMILY as u8, 0, COIN_STORE_BUY_BACK as u8, 0])
 }
 
 fn has_role(npc: &NpcRecord, role: NpcRole) -> bool {

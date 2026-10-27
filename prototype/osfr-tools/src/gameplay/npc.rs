@@ -120,13 +120,15 @@ impl Gameplay {
             return Ok(None);
         };
         // T794: a 165/12 buy-back returns what a 165/5 sale took, at the sale price. It is no new
-        // item, and counting it would let sell + buy-back loop a collect objective for free. A
-        // sale needs no case: `npc_inventory_events` counts gains only, so a loss lowers nothing.
+        // item, and counting it would let sell + buy-back loop a collect objective for free. The
+        // wire predicate is owned by the Coin Store route (`is_coin_store_buy_back`: client request
+        // writer `0x00c759c0`, sender `0x00c76600`, R). A sale needs no case:
+        // `npc_inventory_events` counts gains only, so a loss lowers nothing.
         // T772: every NPC path that can add a pet adoption item (a coin or vendor buy, a
         // buy-back) settles it into the roster here, once, before the collect events: an adopted
         // item never sits in the bag, so it counts for nothing.
         self.settle_granted_pets(now_ms, &mut out)?;
-        if !inner.starts_with(&[165, 0, 12, 0]) {
+        if !crate::npc_interaction::is_coin_store_buy_back(inner) {
             self.npc_inventory_events(&before, &mut out)?;
         }
         Ok(Some(out))

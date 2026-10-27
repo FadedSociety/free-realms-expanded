@@ -18,7 +18,7 @@ use osfr_tools::{
     npc_interaction::{NpcAction, NpcInteraction, NpcSelection},
     opening_abilities::OpeningAbilities,
     profiles::{LearnDenied, ProfileState, Profiles, Trainer},
-    quest_engine::{CharacterEligibility, QuestEngine, QuestState},
+    quest_engine::QuestState,
 };
 use serde_json::Value;
 use std::{
@@ -28,6 +28,8 @@ use std::{
     sync::atomic::{AtomicU64, Ordering},
 };
 
+#[path = "common/collect_quest.rs"]
+mod collect_quest;
 #[path = "common/job_playtest.rs"]
 mod job_playtest;
 
@@ -103,85 +105,19 @@ impl Content {
     }
 
     /// Add one active collect goal. Its item is a trainer starter definition, so
-    /// one grant must raise the count once.
+    /// one grant must raise the count once. The writer is the shared `collect_quest::install`,
+    /// also used by `tests/common/vendor_fixture.rs` (F803).
     fn install_collect_quest(&self, npc: u64, item_id: i32, quantity: u32) -> QuestState {
-        let source = serde_json::json!([{
-            "kind": "reconstructed",
-            "evidence": "F110 synthetic trainer collect objective"
-        }]);
-        fs::create_dir_all(self.0.join("quests")).unwrap();
-        fs::write(
-            self.0.join("quests/f110_collect.json"),
-            serde_json::to_vec(&serde_json::json!({
-                "schema_version": 1,
-                "records": [{
-                    "id": COLLECT_QUEST,
-                    "title_string_id": 1,
-                    "giver_npc_id": npc,
-                    "prerequisite_quest_ids": [],
-                    "objectives": [{
-                        "kind": "collect_item",
-                        "id": 1,
-                        "item_id": item_id,
-                        "quantity": quantity,
-                        "source": source.clone()
-                    }],
-                    "rewards": [],
-                    "source": source.clone()
-                }]
-            }))
-            .unwrap(),
-        )
-        .unwrap();
-        fs::write(
-            self.0.join("jobs.json"),
-            serde_json::to_vec(&serde_json::json!({
-                "schema_version": 1,
-                "records": [{
-                    "id": "f110_synthetic",
-                    "name": "Synthetic",
-                    "profile_id": null,
-                    "category": "freestyle",
-                    "max_level": 20,
-                    "members_only": false,
-                    "trainer_npc_ids": [],
-                    "quest_ids": [COLLECT_QUEST],
-                    "abilities": [],
-                    "source": source
-                }]
-            }))
-            .unwrap(),
-        )
-        .unwrap();
-        fs::create_dir_all(self.0.join("npcs")).unwrap();
-        fs::write(
-            self.0.join("npcs/f110_collect.json"),
-            serde_json::to_vec(&serde_json::json!({
-                "schema_version": 1,
-                "records": [{
-                    "npc_id": npc,
-                    "quest_ids_given": [COLLECT_QUEST]
-                }]
-            }))
-            .unwrap(),
-        )
-        .unwrap();
-        let mut engine = QuestEngine::from_split_content(
+        collect_quest::install(
             &self.0,
+            COLLECT_QUEST,
+            npc,
+            item_id,
+            quantity,
             1,
-            CharacterEligibility {
-                player_level: 1,
-                member: true,
-                nonmember_quest_limit: 10,
-                member_quest_limit: 10,
-                ..CharacterEligibility::default()
-            },
-            None,
+            true,
+            "F110 synthetic trainer collect objective",
         )
-        .unwrap();
-        assert!(engine.offer(COLLECT_QUEST, npc).changed);
-        assert!(engine.accept(COLLECT_QUEST).changed);
-        engine.state().clone()
     }
 
     /// Make the trainer's starter grant fail after the unlock commits in the

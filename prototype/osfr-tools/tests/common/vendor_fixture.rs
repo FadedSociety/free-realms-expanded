@@ -15,7 +15,7 @@ use osfr_tools::{
     gateway::Gateway,
     inventory::InventoryItem,
     npc_interaction::{NpcAction, NpcInteraction},
-    quest_engine::{CharacterEligibility, QuestEngine, QuestState},
+    quest_engine::QuestState,
 };
 use serde_json::json;
 use std::{
@@ -23,6 +23,8 @@ use std::{
     path::{Path, PathBuf},
 };
 
+#[path = "collect_quest.rs"]
+mod collect_quest;
 #[path = "item_catalogue.rs"]
 mod item_catalogue;
 #[path = "round70_content.rs"]
@@ -204,7 +206,8 @@ impl VendorFixture {
     /// T794: add one accepted "collect `quantity` of `item`" quest, given by `giver`, to this
     /// fixture's own content and return the quest save that holds it active (put it in
     /// `GameplayState::npc_quests`). The gateway then binds the fixture's split catalogue instead
-    /// of the shipped one. The shipped content files are never written.
+    /// of the shipped one. The shipped content files are never written. F803: the writer is the
+    /// shared `collect_quest::install`, so this and `job_trainers` cannot drift apart.
     pub fn install_collect_quest(
         &self,
         quest: u32,
@@ -212,54 +215,16 @@ impl VendorFixture {
         item: i32,
         quantity: u32,
     ) -> QuestState {
-        let source =
-            json!([{"kind": "reconstructed", "evidence": "(R) T794 synthetic collect objective"}]);
-        let write = |path: &str, document: serde_json::Value| {
-            fs::write(
-                self.content.join(path),
-                serde_json::to_vec(&document).expect("fixture quest content serializes"),
-            )
-            .expect("fixture quest content writes");
-        };
-        fs::create_dir_all(self.content.join("quests")).expect("fixture quests dir creates");
-        write(
-            "quests/t794_collect.json",
-            json!({"schema_version": 1, "records": [{
-                "id": quest,
-                "title_string_id": 1,
-                "giver_npc_id": giver,
-                "prerequisite_quest_ids": [],
-                "objectives": [{
-                    "kind": "collect_item", "id": 1, "item_id": item,
-                    "quantity": quantity, "source": source.clone()
-                }],
-                "rewards": [],
-                "source": source.clone()
-            }]}),
-        );
-        write(
-            "jobs.json",
-            json!({"schema_version": 1, "records": [{
-                "id": "t794_synthetic", "name": "Synthetic", "profile_id": null,
-                "category": "freestyle", "max_level": 20, "members_only": false,
-                "trainer_npc_ids": [], "quest_ids": [quest], "abilities": [], "source": source
-            }]}),
-        );
-        let mut engine = QuestEngine::from_split_content(
+        collect_quest::install(
             &self.content,
+            quest,
+            giver,
+            item,
+            quantity,
             self.character().guid,
-            CharacterEligibility {
-                player_level: 1,
-                member: true,
-                member_quest_limit: 10,
-                ..CharacterEligibility::default()
-            },
-            None,
+            false,
+            "(R) T794 synthetic collect objective",
         )
-        .expect("fixture quest catalogue loads");
-        assert!(engine.offer(quest, giver).changed);
-        assert!(engine.accept(quest).changed);
-        engine.state().clone()
     }
 
     pub fn content(&self) -> &Path {
