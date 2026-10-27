@@ -791,7 +791,7 @@ impl SharedWorld {
                     return Some(vec![pet_removal_packet(pet.actor_guid)]);
                 }
                 // T455: the pet's own (followed) position, not its owner's.
-                pet.spawn_packet().map(|packet| vec![packet])
+                pet.spawn_packets()
             });
             out.push(delivery);
             out.extend(extra.into_iter().flatten().map(|packet| Delivery {

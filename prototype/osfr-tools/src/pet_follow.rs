@@ -114,6 +114,15 @@ impl PetPose {
     pub fn settled(&self) -> bool {
         self.settled
     }
+
+    /// A follow click places the pet at `target`: it is no longer settled beside its owner, so the
+    /// idle life stops until the follow step parks it again. The click's 125 already moved the
+    /// client pet there, so the server pose follows it instead of walking back from the old spot.
+    pub fn goto(&mut self, target: [f32; 3]) {
+        self.position = target;
+        self.moving = false;
+        self.settled = false;
+    }
 }
 
 /// A fresh pose `side_m` to the owner's side (+x until a walk shows the owner's facing (R)).

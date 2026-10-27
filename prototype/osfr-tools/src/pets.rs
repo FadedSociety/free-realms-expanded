@@ -21,6 +21,7 @@ mod idle;
 mod treasure;
 mod tricks;
 
+pub use idle::{PetAnimation, PetIdleSet, PetRestPosture};
 pub use treasure::TreasureRefusal;
 
 const PET_FAMILY: u16 = 53;
@@ -205,7 +206,7 @@ pub struct PetModel {
     pub trick_animations: Vec<PetTrickAnimation>,
     /// T531: the model's idle, bathroom and rest animations and its shake-off.
     #[serde(default, skip_serializing_if = "Option::is_none")]
-    pub idle: Option<idle::PetIdleSet>,
+    pub idle: Option<PetIdleSet>,
     /// T533: the model's ADR declares `pet_sniff` and `pet_digging`, so its pet plays the hunt
     /// animations (the importer checks it); any other pet hunts without them.
     #[serde(default, skip_serializing_if = "std::ops::Not::not")]
@@ -813,6 +814,9 @@ pub struct PetPresence {
     /// Package-configured actor speed copied from the pet content.
     pub speed: f32,
     pub position: [f32; 3],
+    /// T531: the rest loop the pet is lying in, as a base animation; a late viewer is sent it
+    /// with the spawn so it does not see a standing pet during the rest. `None` while standing.
+    pub base_animation: Option<i32>,
 }
 
 #[derive(Clone, Debug, PartialEq)]
@@ -1286,6 +1290,7 @@ impl PetService {
             name: self.display_name(pet),
             speed: self.content.movement_speed.speed,
             position: active.position,
+            base_animation: active.idle.base_animation(),
         })
     }
 
@@ -1562,6 +1567,8 @@ impl PetService {
             speed: self.content.movement_speed.speed,
             // F762: the AddNpc places the pet where its pose is (beside the owner), not on them.
             position: pose.position,
+            // A new summon stands, so it has no rest loop to replay.
+            base_animation: None,
         }));
         Ok(PetTransition {
             owner_message: pet_active_packet(pet_id, actor_guid),
@@ -2343,6 +2350,11 @@ impl PetService {
             .as_mut()
             .ok_or_else(|| invalid("no active pet"))?;
         active.follow_target = Some(target);
+        // T531: the click's 125 already moves the client pet to `target`; move the server pose too
+        // and stop it counting as settled, so the idle life pauses until the follow step parks it.
+        // `active.position` stays behind until that step copies the pose, so `wire` still derives
+        // the 125 heading from the pet's position before the click.
+        active.pose.goto(target);
         // (R) No distance constants were recovered; a finite target receives an allow reply here.
         Ok(PetTransition {
             owner_message: pet_can_go_packet(active.actor_guid, true),
@@ -2855,6 +2867,16 @@ impl PetPresence {
             ..world::content_spawn_template()
         };
         world::unframe_tunnel(&startup_world::build_add_npc(&npc)).ok()
+    }
+
+    /// T531: the AddNpc and, while the pet lies in a rest posture, the base loop it is playing, so
+    /// a viewer who arrives mid-rest does not see it standing (`with_pets`).
+    pub fn spawn_packets(&self) -> Option<Vec<Vec<u8>>> {
+        let spawn = self.spawn_packet()?;
+        let base = self.base_animation.map(|animation_id| {
+            crate::world_events::piece_052::animation_packet(self.actor_guid, animation_id, true)
+        });
+        Some(std::iter::once(spawn).chain(base).collect())
     }
 }
 

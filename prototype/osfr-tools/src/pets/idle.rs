@@ -16,9 +16,12 @@
 //! (`00960300`), and, when the flag is 0, plays the icon id as an actor composite effect
 //! (`00960170` -> `00bf6770`, which looks the id up in the effect table `01025390`) while it keeps
 //! the icon, the seconds and the start time on the actor (+0x5f8, +0x5fc, +0x600). So the icon
-//! must be an id of `ActorCompositeEffectDefinitions.xml`. The shipped ids are OSFR's and (R), and
-//! unverified: in that table 39, 40 and 42 are unrelated particle effects and 41 is undefined
-//! (see `care.idle.source` in `pets.json`), so they need a native check and a tune.
+//! must be an id of `ActorCompositeEffectDefinitions.xml`. The four `care.idle` icons are client
+//! rows (F809): 5524 `PFX_petbubble_bone_loop` (a thought balloon with a dog bone, hunger), 5241
+//! `PFX_dirt_brown_dog_dirt-indicator_loop` (dirty), 10 `PFX_emo_question-marks_red_head` (bored)
+//! and 5099 `PFX_emo_grumble_red_head` (bad mood, also `PetEffects.txt` Bad). 5524 is also an
+//! unrelated `pet_confused` animation slot, but this id is only looked up in the composite-effect
+//! table (`00bf6770`). The ids are data in `care.idle`, so a different client build retunes there.
 //!
 //! Everything here is a session-only visual: nothing is saved, no coins, items or XP move. All
 //! timings, chances, thresholds and icon ids are reconstructed (R) and live in `care.idle` and in
@@ -157,18 +160,16 @@ impl IdleConfig {
     }
 }
 
-/// A small seeded generator (SplitMix64): the idle choices are visual, not security. The seed is
-/// injected (`PetService::set_idle_seed`), so a test replays any session.
+/// A small seeded stream over the project's one SplitMix64 mixer (`crate::hash`): the idle
+/// choices are visual, not security. The seed is injected (`PetService::set_idle_seed`), so a
+/// test replays any session.
 #[derive(Clone, Copy)]
 struct Rng(u64);
 
 impl Rng {
     fn next(&mut self) -> u64 {
-        self.0 = self.0.wrapping_add(0x9E37_79B9_7F4A_7C15);
-        let mut z = self.0;
-        z = (z ^ (z >> 30)).wrapping_mul(0xBF58_476D_1CE4_E5B9);
-        z = (z ^ (z >> 27)).wrapping_mul(0x94D0_49BB_1331_11EB);
-        z ^ (z >> 31)
+        self.0 = self.0.wrapping_add(crate::hash::GOLDEN_GAMMA);
+        crate::hash::finish64(self.0)
     }
 
     /// A value in `low..=high` (callers pass `low <= high`).
@@ -223,6 +224,9 @@ pub(super) struct IdleState {
     busy_until_ms: u64,
     /// The index of the rest posture it lies in.
     rest: Option<usize>,
+    /// The rest posture's loop, playing as the base animation while it lies; a late viewer is sent
+    /// this so it sees the pose too (`PetService::view`).
+    looped: Option<i32>,
     /// The owner left water: a dog or cat shakes once it stands still.
     dry_off: bool,
     /// The next thought bubble; scheduled by the first tick.
@@ -238,6 +242,7 @@ impl IdleState {
             rest_at_ms: u64::MAX,
             busy_until_ms: 0,
             rest: None,
+            looped: None,
             dry_off: false,
             bubble_at_ms: None,
         }
@@ -252,6 +257,11 @@ impl IdleState {
     /// The pet lies in a rest posture (T533: it does not hunt until it stands again).
     pub(super) fn resting(&self) -> bool {
         self.rest.is_some()
+    }
+
+    /// The rest loop now playing as the base animation, for a late viewer's spawn.
+    pub(super) fn base_animation(&self) -> Option<i32> {
+        self.looped
     }
 
     /// Something is due, so the model's rows are worth a look.
@@ -302,6 +312,7 @@ impl IdleState {
                     .index(posture.loops.len())
                     .map(|i| posture.loops[i]);
                 self.rest = Some(index);
+                self.looped = looped;
                 self.busy_until_ms = now_ms.saturating_add(u64::from(posture.enter.duration_ms));
                 self.animation_at_ms = self.busy_until_ms.saturating_add(self.gap(config));
                 // The loop is the base animation; the enter transition plays over it.
@@ -344,6 +355,7 @@ impl IdleState {
     fn stand_up(&mut self, set: Option<&PetIdleSet>, now_ms: u64) -> Vec<Play> {
         self.animation_at_ms = u64::MAX;
         self.rest_at_ms = u64::MAX;
+        self.looped = None;
         let Some(index) = self.rest.take() else {
             return Vec::new();
         };
@@ -456,5 +468,22 @@ impl PetService {
             icon,
             config.bubble_seconds,
         ))
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    /// The idle stream is the project's one mixer (`crate::hash`), not a copy: a change to the
+    /// shared SplitMix64 reaches this stream with fishing, the ambient schedule and power-ups.
+    #[test]
+    fn the_idle_stream_is_the_shared_splitmix64() {
+        let mut rng = Rng(0x5EED);
+        let mut state = 0x5EED;
+        for _ in 0..8 {
+            assert_eq!(rng.next(), crate::hash::mix64(state));
+            state = state.wrapping_add(crate::hash::GOLDEN_GAMMA);
+        }
     }
 }

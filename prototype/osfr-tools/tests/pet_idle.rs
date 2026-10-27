@@ -119,6 +119,20 @@ struct Seen {
     raw: Vec<Vec<u8>>,
 }
 
+/// A pet standing up: the base returns to standing, then the posture's exit transition plays.
+fn assert_stand_up(seen: &Seen) {
+    assert_eq!(
+        seen.plays.first(),
+        Some(&Play {
+            animation: ANIM_ID_STAND,
+            base: true
+        }),
+        "the base returns to standing"
+    );
+    assert_eq!(seen.plays.len(), 2, "then the exit transition");
+    assert!(!seen.plays[1].base);
+}
+
 /// The owner's pet summoned at `START`: the tick below does what `Gameplay::pet_tick` does.
 struct Session {
     service: PetService,
@@ -178,6 +192,19 @@ impl Session {
             .map(|at| self.tick(at))
             .filter(|seen| !seen.plays.is_empty() || !seen.bubbles.is_empty())
             .collect()
+    }
+
+    /// Ticks until the pet lies down (`rest_after_ms` must already be due) and returns that tick.
+    fn lie_down(&mut self) -> Seen {
+        let mut at = START;
+        loop {
+            at += TICK;
+            let seen = self.tick(at);
+            if seen.plays.iter().any(|play| play.base) {
+                return seen;
+            }
+            assert!(at < START + 10_000, "the pet lies down");
+        }
     }
 
     fn send(&mut self, packet: &[u8], at: u64) {
@@ -242,6 +269,20 @@ fn the_thought_bubble_bytes_match_the_client_reader() {
     expected.push(0);
     assert_eq!(expected.len(), 21);
     assert_eq!(first.raw, [expected]);
+}
+
+/// F809: the four bubble ids are client `ActorCompositeEffectDefinitions.xml` rows, not OSFR's
+/// 39/40/41/42 (three unrelated particle effects and one undefined): 5524
+/// `PFX_petbubble_bone_loop` (a thought balloon with a dog bone), 5241
+/// `PFX_dirt_brown_dog_dirt-indicator_loop` (dirty), 10 `PFX_emo_question-marks_red_head`
+/// (bored) and 5099 `PFX_emo_grumble_red_head` (bad mood). A data edit drops one of these only
+/// with new client evidence.
+#[test]
+fn the_bubble_icons_are_client_thought_and_emote_effects() {
+    assert_eq!(icon("hunger_icon"), 5524);
+    assert_eq!(icon("hygiene_icon"), 5241);
+    assert_eq!(icon("play_icon"), 10);
+    assert_eq!(icon("sad_icon"), 5099);
 }
 
 #[test]
@@ -536,6 +577,107 @@ fn a_pet_lies_down_after_its_delay_fidgets_and_stands_when_the_owner_moves() {
     }
 }
 
+/// F809: a follow click moves the pet to the clicked spot, so the server pose follows it and
+/// stops counting as settled; otherwise a pet that lay down keeps its rest and fidgets while the
+/// client walks it.
+#[test]
+fn a_follow_click_wakes_a_lying_pet_and_pauses_its_idle_life() {
+    let content = content_with(|document| {
+        document["care"]["idle"]["rest_after_ms"] = json!(0);
+        document["care"]["idle"]["idle_after_ms"] = json!(3_600_000);
+        document["care"]["idle"]["idle_min_ms"] = json!(1_000);
+        document["care"]["idle"]["idle_max_ms"] = json!(1_000);
+    });
+    let mut session = Session::dog_with(content, [95.0; 3], 11);
+    let lying = session.lie_down();
+    assert!(
+        session
+            .service
+            .view(OWNER)
+            .unwrap()
+            .base_animation
+            .is_some()
+    );
+    // A refused click changes nothing: the pet stays where it lies, still settled.
+    let before = session.service.view(OWNER).unwrap();
+    assert!(
+        session
+            .service
+            .follow_location([f32::NAN, 0.0, 0.0])
+            .is_err()
+    );
+    assert_eq!(session.service.view(OWNER).unwrap(), before);
+    // Click "go there" far from the owner: the client walks the pet, so the rest posture ends on
+    // the next tick instead of fidgeting on in place.
+    session
+        .service
+        .follow_location([30.0, 0.0, 30.0])
+        .expect("the active pet can go there");
+    let up = session.tick(lying.at + TICK);
+    assert_stand_up(&up);
+    assert_eq!(session.service.view(OWNER).unwrap().base_animation, None);
+    // It walks back to its owner, so no rest pose resumes while the walk runs.
+    let walked = session.run(lying.at + 2 * TICK, lying.at + 6_000);
+    assert!(
+        walked
+            .iter()
+            .all(|seen| seen.plays.iter().all(|play| !play.base)),
+        "a walking pet does not lie down"
+    );
+}
+
+/// F809: a viewer who arrives while the pet lies down is sent the rest loop as a base animation
+/// after the AddNpc, so it does not see a standing pet through the rest.
+#[test]
+fn a_late_viewer_is_sent_the_rest_loop_with_the_pet_spawn() {
+    let content = content_with(|document| {
+        document["care"]["idle"]["rest_after_ms"] = json!(0);
+        document["care"]["idle"]["idle_after_ms"] = json!(3_600_000);
+    });
+    let mut session = Session::dog_with(content, [95.0; 3], 12);
+    let looped = session
+        .lie_down()
+        .plays
+        .into_iter()
+        .find(|play| play.base)
+        .expect("the lying tick has a base loop")
+        .animation;
+    let view = session.service.view(OWNER).expect("the pet is out");
+    assert_eq!(view.base_animation, Some(looped));
+    let packets = view.spawn_packets().expect("the AddNpc builds");
+    assert_eq!(packets.len(), 2, "the AddNpc and the base loop");
+    assert_eq!(packets[0], view.spawn_packet().unwrap());
+    let mut expected = vec![35, 0, 8, 0];
+    expected.extend(session.actor.to_le_bytes());
+    expected.extend(looped.to_le_bytes());
+    expected.extend([0u8; 4]);
+    expected.push(1);
+    assert_eq!(
+        packets[1], expected,
+        "the base rest loop the pose is playing"
+    );
+}
+
+/// F809: the rest ends on every way out of "settled", not only the owner moving: entering water
+/// and starting a care action stand a lying pet up too.
+#[test]
+fn water_or_a_care_action_also_stands_a_lying_pet_up() {
+    let content = content_with(|document| {
+        document["care"]["idle"]["rest_after_ms"] = json!(0);
+        document["care"]["idle"]["idle_after_ms"] = json!(3_600_000);
+    });
+
+    let mut session = Session::dog_with(content.clone(), [95.0; 3], 14);
+    let lying = session.lie_down();
+    session.send(&water(true), lying.at + TICK);
+    assert_stand_up(&session.tick(lying.at + 2 * TICK));
+
+    let mut session = Session::dog_with(content, [95.0; 3], 15);
+    let lying = session.lie_down();
+    session.send(&perform_trick(TRICK), lying.at + TICK);
+    assert_stand_up(&session.tick(lying.at + 2 * TICK));
+}
+
 #[test]
 fn care_pauses_the_idle_life_and_restarts_its_delay() {
     // A groom or a trick running is not "settled": the idle clock starts over when it ends.
@@ -606,6 +748,23 @@ fn leaving_water_shakes_a_dog_or_cat_once_it_stands_still() {
             session.send(&water(false), at);
         }
         assert!(session.run(at, at + 30_000).is_empty(), "model {model}");
+        // Rapid in/out toggling arms at most one shake, and it still plays at most once.
+        for step in 0..100 {
+            session.send(&water(step % 2 == 0), at + step);
+        }
+        let shakes = session.run(at + 100, at + 30_000);
+        assert_eq!(
+            shakes.len(),
+            1,
+            "model {model}: one shake from the toggle spam"
+        );
+        assert_eq!(
+            shakes[0].plays,
+            [Play {
+                animation: shake,
+                base: false
+            }]
+        );
     }
 }
 
@@ -681,6 +840,19 @@ fn a_model_that_cannot_shake_never_does_and_one_without_rows_is_quiet_but_still_
         seen.iter().any(|seen| !seen.bubbles.is_empty()),
         "the bubble needs no rows"
     );
+}
+
+/// F809: a clock that ran backwards (a restart or a spammed timestamp) shows no bubble and never
+/// errors the tick.
+#[test]
+fn a_backwards_clock_shows_no_bubble_and_never_errors() {
+    let mut session = Session::dog_with(PetContent::bundled().unwrap(), [10.0, 90.0, 90.0], 13);
+    session.run(START, START + 2_000);
+    let care = session
+        .service
+        .care_tick(&mut session.fixture.inventory, START - 1_000);
+    assert!(!care.changed);
+    assert!(bubbles(&care.private, session.actor).is_empty());
 }
 
 #[test]
@@ -832,7 +1004,7 @@ fn a_pet_idles_and_shows_bubbles_through_gameplay_for_the_owner_and_the_viewers(
     let (idle, bathroom, _) = rows(364);
 
     // Walking: no animation, even for ten minutes. (A hungry pet's bubble needs no stillness.)
-    let (mut animated, mut bubbled) = (false, false);
+    let mut bubbled = false;
     let mut at = START;
     while at < START + 10 * 60_000 {
         at += TICK;
@@ -850,7 +1022,10 @@ fn a_pet_idles_and_shows_bubbles_through_gameplay_for_the_owner_and_the_viewers(
         );
         bubbled |= !bubbles(&out.nearby, actor).is_empty();
     }
-    // Standing still: the pet animates (before it lies down), for both audiences.
+    // Standing still: the pet animates (before it lies down), for both audiences. `idle_seen`
+    // accepts only the model's own idle/bathroom rows; T533's hunt animations are allowed beside
+    // them but never count as the idle life.
+    let mut idle_seen = false;
     for _ in 0..(45_000 / TICK) {
         at += TICK;
         let out = game.pet_tick(&who, at).expect("a pet is out");
@@ -859,20 +1034,21 @@ fn a_pet_idles_and_shows_bubbles_through_gameplay_for_the_owner_and_the_viewers(
         assert!(!out.changed || found, "idle visuals save nothing");
         assert_eq!(visual(&out.replies), visual(&out.nearby));
         for play in plays(&out.nearby, actor) {
-            assert!(
-                idle.contains(&play.animation)
-                    || bathroom.contains(&play.animation)
-                    || [5520, 5525].contains(&play.animation)
-            );
-            animated = true;
+            if idle.contains(&play.animation) || bathroom.contains(&play.animation) {
+                assert!(!play.base, "an idle animation is a one-shot");
+                idle_seen = true;
+            } else {
+                assert!(
+                    [5520, 5525].contains(&play.animation),
+                    "unexpected animation {}",
+                    play.animation
+                );
+            }
         }
         for bubble in bubbles(&out.nearby, actor) {
             assert_eq!(bubble.icon, icon("hunger_icon"));
             bubbled = true;
         }
     }
-    assert!(
-        animated && bubbled,
-        "animated {animated}, bubbled {bubbled}"
-    );
+    assert!(idle_seen && bubbled, "idle {idle_seen}, bubbled {bubbled}");
 }
