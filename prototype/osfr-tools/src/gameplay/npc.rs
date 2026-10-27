@@ -143,6 +143,8 @@ impl Gameplay {
                 encounter.is_field_actor(u64::from_le_bytes(inner[4..12].try_into().unwrap()))
             })
         {
+            // T543: another actor's menu ends the open NPC conversation.
+            self.quest_conversation = None;
             return Ok(None);
         }
         if let Some(out) = self.npc_dialogue_26_6(inner)? {
@@ -192,6 +194,11 @@ impl Gameplay {
             let selected = npc_interaction::decode_dialogue_response_26_6(inner)
                 .map_err(|_| invalid("invalid dialogue response"))?;
             npc_event(serde_json::json!({"event": "dialogue_choice", "value": selected}));
+            // T543: an open conversation answers its own 26/3 rows (ids 1..=5) before
+            // any explainer or quest-offer handling; those rows never use 300/301/0.
+            if self.quest_conversation.is_some() {
+                return Ok(Some(self.npc_conversation_answer(selected)?));
+            }
             // T773: a greeter tips row re-renders the same dialogue with that page's
             // body. It is read-only, so the interaction (and its offered rows) stays
             // open for another page or Goodbye.
@@ -269,11 +276,75 @@ impl Gameplay {
         Ok(None)
     }
 
+    /// T543: answer the open conversation's 26/3. `Next` shows the next line;
+    /// `Finished` closes it and credits a `complete_after_dialogue` step through the
+    /// quest engine; `Abandoned` (an answer the question does not offer) closes it
+    /// and changes no quest or saved state. The cursor was already taken out of
+    /// `self`, so every arm leaves the dialog closed unless it puts it back.
+    fn npc_conversation_answer(&mut self, selected: i32) -> io::Result<Outcome> {
+        let mut open = self
+            .quest_conversation
+            .take()
+            .expect("the caller checked an open conversation");
+        let mut out = Outcome::default();
+        match open.conversation.answer(selected) {
+            crate::quest_dialogue::ConversationStep::Next => {
+                let line = open
+                    .conversation
+                    .line()
+                    .ok_or_else(|| invalid("a continued conversation has no line"))?;
+                let mut packet = conversation_packet(line)
+                    .map_err(|_| invalid("NPC conversation could not be encoded"))?;
+                patch_npc_actor(&mut packet, open.actor_id);
+                npc_event(serde_json::json!({
+                    "event": "conversation_line",
+                    "quest_id": open.quest_id,
+                    "objective_id": open.objective_id,
+                    "text_id": line.text_id
+                }));
+                out.replies.push(packet);
+                self.quest_conversation = Some(open);
+            }
+            crate::quest_dialogue::ConversationStep::Finished => {
+                out.replies.push(END_DIALOG_26_4.to_vec());
+                npc_event(serde_json::json!({
+                    "event": "conversation_end",
+                    "quest_id": open.quest_id,
+                    "objective_id": open.objective_id,
+                    "outcome": "finished"
+                }));
+                if open.complete_after_dialogue {
+                    self.npc_quest_event(
+                        crate::quest_engine::QuestEvent::DialogueFinished {
+                            quest_id: open.quest_id,
+                            objective_id: open.objective_id,
+                            npc_id: open.npc_id,
+                        },
+                        &mut out,
+                    )?;
+                }
+            }
+            crate::quest_dialogue::ConversationStep::Abandoned => {
+                out.replies.push(END_DIALOG_26_4.to_vec());
+                npc_event(serde_json::json!({
+                    "event": "conversation_end",
+                    "quest_id": open.quest_id,
+                    "objective_id": open.objective_id,
+                    "outcome": "abandoned"
+                }));
+            }
+        }
+        Ok(out)
+    }
+
     fn npc_dialogue_close_26_4(&mut self, inner: &[u8]) -> io::Result<Option<Outcome>> {
         if inner.starts_with(&[26, 0, 4, 0]) {
             if inner.len() != 4 {
                 return Err(invalid("invalid dialogue close request"));
             }
+            // T543: the player closed the dialog; a complete_after_dialogue step stays
+            // open and its next Talk starts the conversation again at the first line.
+            self.quest_conversation = None;
             // (R) Also accept an inbound empty 26/4 if the client mirrors EndDialog.
             if let Some(interaction) = &mut self.npc_interaction {
                 interaction.close_dialogue();
@@ -483,8 +554,19 @@ impl Gameplay {
                 .npc_quests
                 .as_mut()
                 .map(|engine| engine.abandon(quest_id));
+            let abandoned = result.as_ref().is_some_and(|result| result.changed);
             if let Some(result) = result {
                 self.append_npc_quest_outcome(result, &mut out)?;
+            }
+            // T543: an abandoned quest cannot be completed by a conversation it had
+            // open; clear only on a real abandon, so a refused 26/23 changes nothing.
+            if abandoned
+                && self
+                    .quest_conversation
+                    .as_ref()
+                    .is_some_and(|open| open.quest_id == quest_id)
+            {
+                self.quest_conversation = None;
             }
             return Ok(Some(out));
         }
@@ -543,6 +625,9 @@ impl Gameplay {
                     self.npc_quests.as_ref(),
                 )
                 .map_err(|_| invalid("NPC interaction is unavailable"))?;
+            // T543: an accepted interaction ends the open conversation. A busy or
+            // failed interaction returned above, so it changes nothing.
+            self.quest_conversation = None;
             let options: Vec<_> = menu
                 .options
                 .iter()
@@ -645,6 +730,9 @@ impl Gameplay {
             // Refusals change nothing: a selection the service rejected must not commit the
             // staged clone (it can carry menu/shop mutations made before the error).
             if selected.is_ok() {
+                // T543: an accepted menu action ends the open conversation; `talk_to_npc`
+                // starts the new step's conversation when it has one.
+                self.quest_conversation = None;
                 self.npc_interaction = Some(interaction);
             }
             let mut out = Outcome::default();
@@ -1086,6 +1174,11 @@ impl Gameplay {
             .npc_quests
             .as_ref()
             .and_then(|engine| engine.state().pending_turnin);
+        // T543: read the open step's conversation before `on_event` completes it.
+        let conversation = self
+            .npc_quests
+            .as_ref()
+            .and_then(|engine| engine.conversation_for_talk(key));
         if let Some(engine) = &mut self.npc_quests {
             let quest =
                 engine.on_event(crate::quest_engine::QuestEvent::TalkToNpc { npc_id: key })?;
@@ -1189,16 +1282,29 @@ impl Gameplay {
             }
             _ => None,
         };
-        let mut dialogue = dialogue_packet_with(&context, quest_choice)
-            .map_err(|_| invalid("NPC dialogue could not be encoded"))?;
-        patch_npc_actor(&mut dialogue, runtime_guid);
-        self.last_npc_dialogue = Some((zone_id, runtime_guid, key, dialogue.clone()));
-        // A quest offer is shown alone, like the original: the 49/1 window
-        // draws its own speech bubble. (Earlier runs were silently ignored
-        // because 49/1 was 120 bytes, not for lack of a 26/3; a leading 26/3
-        // left a blank bubble and "Goodbye" behind the quest window.)
-        if offer_outcome != "offer" {
-            out.replies.push(dialogue);
+        // T543: a Talk at a step with lines starts its conversation instead of the
+        // single-line dialog. Quest offers and turn-in dialogs keep their own path,
+        // so their windows are unchanged.
+        let mut started_conversation = false;
+        if offer_outcome == "dialogue" {
+            if let Some(talk) = conversation {
+                let packet = self.start_quest_conversation(talk, runtime_guid, key, zone_id)?;
+                out.replies.push(packet);
+                started_conversation = true;
+            }
+        }
+        if !started_conversation {
+            let mut dialogue = dialogue_packet_with(&context, quest_choice)
+                .map_err(|_| invalid("NPC dialogue could not be encoded"))?;
+            patch_npc_actor(&mut dialogue, runtime_guid);
+            self.last_npc_dialogue = Some((zone_id, runtime_guid, key, dialogue.clone()));
+            // A quest offer is shown alone, like the original: the 49/1 window
+            // draws its own speech bubble. (Earlier runs were silently ignored
+            // because 49/1 was 120 bytes, not for lack of a 26/3; a leading 26/3
+            // left a blank bubble and "Goodbye" behind the quest window.)
+            if offer_outcome != "offer" {
+                out.replies.push(dialogue);
+            }
         }
         let reason = if offer_outcome == "offer" {
             None
@@ -1217,6 +1323,35 @@ impl Gameplay {
             reason,
         ));
         Ok(())
+    }
+
+    /// T543: install the cursor and return its first 26/3. The actor is patched to the
+    /// runtime GUID the client clicked, like every other server-built NPC packet.
+    fn start_quest_conversation(
+        &mut self,
+        talk: crate::quest_dialogue::TalkDialogue,
+        actor_id: u64,
+        npc_id: u64,
+        zone_id: u32,
+    ) -> io::Result<Vec<u8>> {
+        let conversation = crate::quest_dialogue::Conversation::start(&talk.lines)
+            .ok_or_else(|| invalid("a quest conversation needs a line"))?;
+        let line = conversation
+            .line()
+            .ok_or_else(|| invalid("a quest conversation needs a line"))?;
+        let mut packet = conversation_packet(line)
+            .map_err(|_| invalid("NPC conversation could not be encoded"))?;
+        patch_npc_actor(&mut packet, actor_id);
+        self.last_npc_dialogue = Some((zone_id, actor_id, npc_id, packet.clone()));
+        self.quest_conversation = Some(crate::quest_dialogue::OpenConversation {
+            quest_id: talk.quest_id,
+            objective_id: talk.objective_id,
+            npc_id,
+            actor_id,
+            complete_after_dialogue: talk.complete_after_dialogue,
+            conversation,
+        });
+        Ok(packet)
     }
 }
 
@@ -1320,8 +1455,25 @@ pub(super) fn dialogue_packet_with(
         );
     }
     choices.push(npc_interaction::goodbye_dialogue_choice());
+    dialogue_packet_rows(context.body_string_id.unwrap_or(0), choices)
+}
+
+/// T543: one conversation line. Its rows are numbered from 1 and it carries no
+/// Goodbye row; the last line's own button leaves.
+fn conversation_packet(
+    line: &crate::quest_dialogue::DialogueLine,
+) -> Result<Vec<u8>, npc_interaction::NpcInteractionError> {
+    dialogue_packet_rows(line.text_id, line.response_rows())
+}
+
+/// Encode one 26/3 with the existing body and choice fields. Both the single-line
+/// NPC dialog and a quest conversation call this, so the writer layout cannot drift.
+fn dialogue_packet_rows(
+    body_string_id: u32,
+    choices: Vec<[u32; 5]>,
+) -> Result<Vec<u8>, npc_interaction::NpcInteractionError> {
     npc_interaction::encode_dialogue_26_3(&npc_interaction::DialoguePacket26_3 {
-        initial_dwords: [context.body_string_id.unwrap_or(0), 0, 0, 0],
+        initial_dwords: [body_string_id, 0, 0, 0],
         initial_flag: false,
         initial_float_bits: 0,
         choices,

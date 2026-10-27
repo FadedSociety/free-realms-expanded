@@ -196,6 +196,14 @@ pub enum ContentGoal {
         /// "Tell Ricky I'll come fix his car", 94258).
         #[serde(default, skip_serializing_if = "Option::is_none")]
         dialogue_string_id: Option<u32>,
+        /// T543: the step's multi-line conversation. A step without lines keeps the
+        /// single `dialogue_string_id` behavior.
+        #[serde(default, skip_serializing_if = "Vec::is_empty")]
+        lines: Vec<crate::quest_dialogue::DialogueLine>,
+        /// T543: the Talk starts the conversation but does not complete the step; the
+        /// finished conversation does (`QuestEvent::DialogueFinished`).
+        #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+        complete_after_dialogue: bool,
         source: Vec<SourceTag>,
     },
     CollectItem {
@@ -943,12 +951,31 @@ fn validate_goal(
 ) -> Result<(), ContentError> {
     match goal {
         ContentGoal::Defeat { .. } => Ok(()),
-        ContentGoal::TalkToNpc { npc_id, .. } => reference(
-            owner,
-            "goal.npc_id",
+        ContentGoal::TalkToNpc {
             npc_id,
-            npcs.contains(&npc_id.to_string()),
-        ),
+            lines,
+            complete_after_dialogue,
+            ..
+        } => {
+            crate::quest_dialogue::validate(lines).map_err(|detail| {
+                ContentError::InvalidRecord {
+                    record: owner.to_owned(),
+                    detail: detail.to_owned(),
+                }
+            })?;
+            if *complete_after_dialogue && lines.is_empty() {
+                return Err(ContentError::InvalidRecord {
+                    record: owner.to_owned(),
+                    detail: "complete_after_dialogue requires lines".to_owned(),
+                });
+            }
+            reference(
+                owner,
+                "goal.npc_id",
+                npc_id,
+                npcs.contains(&npc_id.to_string()),
+            )
+        }
         ContentGoal::CollectItem { item_id, .. } => reference(
             owner,
             "goal.item_id",

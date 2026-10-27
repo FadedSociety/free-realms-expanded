@@ -18,10 +18,10 @@ mod npc_quest_chain;
 
 use npc_quest_chain::{
     CHARACTER, Fixture, accept, active_job, assert_no_offer, assert_packet_changes_nothing,
-    character_at_for, coins, content_position, counts, end_screen_reward, finish_quest, has_family,
-    interact, menu_option, npc_select, objective_complete, offer, pending_turnin, profile_xp,
-    quest_end_reply, quest_reply, quest_status, release_end_screen, saved, seed_active_profile,
-    talk,
+    character_at_for, coins, content_position, counts, dialogue_choice, end_screen_reward,
+    finish_quest, has_family, interact, menu_option, npc_select, objective_complete, offer,
+    pending_turnin, profile_xp, quest_end_reply, quest_reply, quest_status, release_end_screen,
+    saved, seed_active_profile, send, talk,
 };
 use osfr_tools::{
     character_store::CharacterState,
@@ -53,6 +53,8 @@ enum Step {
     Visit([f32; 3]),
     /// A talk goal and the 26/3 body its NPC speaks when the step completes (0: none).
     Talk(u64, u32),
+    /// T543: a talk step that completes only after its conversation ends.
+    Conversation(u64, u32),
 }
 
 struct Quest {
@@ -102,7 +104,7 @@ const TESTING: Quest = Quest {
     id: 3_000_323,
     giver: COLE,
     card: [93_447, 93_449, 93_454],
-    steps: &[Step::Talk(BRENNA, 93_464)],
+    steps: &[Step::Conversation(BRENNA, 93_464)],
     turnin: COLE,
     end_text: 93_451,
     xp: 30,
@@ -182,6 +184,21 @@ fn do_step(game: &mut Gameplay, guid: u64, quest: &Quest, index: usize, now: &mu
             );
             talked
         }
+        Step::Conversation(npc, body) => {
+            let talked = talk(game, &at(guid, npc), npc, *now);
+            assert_eq!(
+                dialogue_body(&talked),
+                body,
+                "quest {} step {}: the NPC's first conversation line",
+                quest.id,
+                index + 1
+            );
+            // T543: the Talk opens the quiz; the last answer completes the step.
+            answer_quiz(game, &at(guid, npc), *now + 2);
+            assert_eq!(counts(game, quest.id)[index], 1);
+            *now += 10;
+            return;
+        }
     };
     assert!(
         outcome.changed,
@@ -191,6 +208,42 @@ fn do_step(game: &mut Gameplay, guid: u64, quest: &Quest, index: usize, now: &mu
     );
     assert_eq!(counts(game, quest.id)[index], 1);
     *now += 10;
+}
+
+/// T543: Brenna's quiz (3000323 goal 1). Line 93464's continue row is 1, the
+/// Diggy question's correct row is 2, its "correct" line is row 1, and the
+/// Seaspray question's correct row is 3.
+fn answer_quiz(game: &mut Gameplay, character: &CharacterState, now: u64) {
+    for (index, (row, text_id)) in [(1, 93_466), (2, 93_470), (1, 93_474)]
+        .into_iter()
+        .enumerate()
+    {
+        let answered = send(game, character, &dialogue_choice(row), now + index as u64);
+        assert_eq!(
+            dialogue_body(&answered),
+            text_id,
+            "Brenna's next line after answer {index}"
+        );
+    }
+    let finished = send(game, character, &dialogue_choice(3), now + 3);
+    assert!(
+        finished
+            .replies
+            .iter()
+            .any(|packet| packet == &[26, 0, 4, 0]),
+        "the last answer closes Brenna's dialog"
+    );
+    assert!(
+        objective_complete(&finished, 3_000_323, 1),
+        "the quiz completes objective 1 only after its last line"
+    );
+    assert!(
+        finished
+            .replies
+            .iter()
+            .all(|packet| !has_family(packet, 49, 3, None)),
+        "a conversation never adds a quest"
+    );
 }
 
 fn turn_in(game: &mut Gameplay, guid: u64, quest: &Quest, now: &mut u64) {

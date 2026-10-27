@@ -33,11 +33,47 @@
           "id": 2,
           "npc_id": 9500000629,
           "dialogue_string_id": 93316,
+          "lines": [
+            {
+              "text_id": 93316,
+              "choices": [
+                {
+                  "response_text_id": 93320,
+                  "then": [
+                    {
+                      "text_id": 93324
+                    }
+                  ]
+                },
+                {
+                  "response_text_id": 93322,
+                  "then": [
+                    {
+                      "text_id": 93324
+                    }
+                  ]
+                },
+                {
+                  "response_text_id": 93323,
+                  "then": [
+                    {
+                      "text_id": 93325,
+                      "response_text_id": 93326
+                    }
+                  ]
+                }
+              ]
+            }
+          ],
           "text_string_id": 93310,
           "source": [
             {
               "kind": "legacy-data",
-              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3020 goal 2: NameId 93310; TargetGuid 100000001885 = definition 1885 (Spritzy, NameId 21292, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:612), bound to npcs/seaside.json 9500000629 at the same spawn; its Dialogue array has no DialogueId, so dialogue_string_id is the first entry's TextId 93316 (R); talk-dialogue-chains adds the rest later"
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3020 goal 2: NameId 93310; TargetGuid 100000001885 = definition 1885 (Spritzy, NameId 21292, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:612), bound to npcs/seaside.json 9500000629 at the same spawn; its Dialogue array has no DialogueId, so dialogue_string_id is the first entry's TextId 93316 (R)"
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@5e3f831 src/Resources/Quests.json QuestId=3020 Goals[1] (fork goal index 1): the Dialogue array TextId 93316 has Choices ResponseTextId 93320/93322/93323; their Then lines are TextId 93324, 93324 and 93325 (ResponseTextId 93326); ids only, the text comes from the client locale"
             }
           ]
         },
@@ -281,11 +317,84 @@
           "id": 1,
           "npc_id": 9500000562,
           "dialogue_string_id": 93464,
+          "complete_after_dialogue": true,
+          "lines": [
+            {
+              "text_id": 93464,
+              "response_text_id": 93465
+            },
+            {
+              "text_id": 93466,
+              "choices": [
+                {
+                  "response_text_id": 21311,
+                  "retry": true,
+                  "then": [
+                    {
+                      "text_id": 93471,
+                      "response_text_id": 93472
+                    }
+                  ]
+                },
+                {
+                  "response_text_id": 21302,
+                  "then": [
+                    {
+                      "text_id": 93470,
+                      "response_text_id": 93473
+                    }
+                  ]
+                },
+                {
+                  "response_text_id": 93337,
+                  "retry": true,
+                  "then": [
+                    {
+                      "text_id": 93471,
+                      "response_text_id": 93472
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "text_id": 93474,
+              "choices": [
+                {
+                  "response_text_id": 93475,
+                  "retry": true,
+                  "then": [
+                    {
+                      "text_id": 93479,
+                      "response_text_id": 93472
+                    }
+                  ]
+                },
+                {
+                  "response_text_id": 93476,
+                  "retry": true,
+                  "then": [
+                    {
+                      "text_id": 93479,
+                      "response_text_id": 93472
+                    }
+                  ]
+                },
+                {
+                  "response_text_id": 93477
+                }
+              ]
+            }
+          ],
           "text_string_id": 93454,
           "source": [
             {
               "kind": "legacy-data",
-              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3023 goal 1: NameId 93454; TargetGuid 100000001749 = definition 1749 (Brenna, NameId 93463, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:488), bound to npcs/seaside.json 9500000562 at the same spawn; its Dialogue array has no DialogueId, so dialogue_string_id is the first entry's TextId 93464 (R); talk-dialogue-chains adds the rest later; the fork marks this goal CompleteAfterDialogue (her two quiz questions 93466 and 93474), so this slice credits the Talk alone (R)"
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3023 goal 1: NameId 93454; TargetGuid 100000001749 = definition 1749 (Brenna, NameId 93463, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:488), bound to npcs/seaside.json 9500000562 at the same spawn; its Dialogue array has no DialogueId, so dialogue_string_id is the first entry's TextId 93464 (R); the fork marks this goal CompleteAfterDialogue (her two quiz questions 93466 and 93474)"
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@5e3f831 src/Resources/Quests.json QuestId=3023 Goals[0] (fork goal index 0): CompleteAfterDialogue true; Dialogue TextId 93464 (ResponseTextId 93465), 93466 (Choices 21311 Retry Then 93471/93472, 21302 Then 93470/93473, 93337 Retry Then 93471/93472) and 93474 (Choices 93475 Retry Then 93479/93472, 93476 Retry Then 93479/93472, 93477 Then complete); ids only"
             }
           ]
         },
@@ -350,11 +459,21 @@
           "id": 1,
           "npc_id": 9500000633,
           "dialogue_string_id": 101412,
+          "lines": [
+            {
+              "text_id": 101412,
+              "response_text_id": 101413
+            }
+          ],
           "text_string_id": 101402,
           "source": [
             {
               "kind": "legacy-data",
-              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3060 goal 1: NameId 101402; TargetGuid 100000001777 = definition 1777 (Tazinna, NameId 45815, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:514), bound to npcs/seaside.json 9500000633 at the same spawn; its Dialogue array has no DialogueId, so dialogue_string_id is the first entry's TextId 101412 (R); talk-dialogue-chains adds the rest later"
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3060 goal 1: NameId 101402; TargetGuid 100000001777 = definition 1777 (Tazinna, NameId 45815, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:514), bound to npcs/seaside.json 9500000633 at the same spawn; its Dialogue array has no DialogueId, so dialogue_string_id is the first entry's TextId 101412 (R)"
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@5e3f831 src/Resources/Quests.json QuestId=3060 Goals[0] (fork goal index 0): Dialogue line TextId 101412 with ResponseTextId 101413; ids only"
             }
           ]
         },
@@ -363,11 +482,25 @@
           "id": 2,
           "npc_id": 9500000580,
           "dialogue_string_id": 101414,
+          "lines": [
+            {
+              "text_id": 101414,
+              "response_text_id": 101415
+            },
+            {
+              "text_id": 101416,
+              "response_text_id": 103597
+            }
+          ],
           "text_string_id": 101404,
           "source": [
             {
               "kind": "legacy-data",
-              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3060 goal 2: NameId 101404; TargetGuid 100000001758 = definition 1758 (Emuzz, NameId 45586, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:497), bound to npcs/seaside.json 9500000580 at the same spawn; its Dialogue array has no DialogueId, so dialogue_string_id is the first entry's TextId 101414 (R); talk-dialogue-chains adds the rest later"
+              "evidence": "Lxzxrus-Free-Realms-Server@37ef175 src/Resources/Quests.json QuestId=3060 goal 2: NameId 101404; TargetGuid 100000001758 = definition 1758 (Emuzz, NameId 45586, Lxzxrus-Free-Realms-Server@37ef175 src/Scripts/Zone/FabledRealms.lua:497), bound to npcs/seaside.json 9500000580 at the same spawn; its Dialogue array has no DialogueId, so dialogue_string_id is the first entry's TextId 101414 (R)"
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "Lxzxrus-Free-Realms-Server@5e3f831 src/Resources/Quests.json QuestId=3060 Goals[1] (fork goal index 1): Dialogue lines TextId 101414 (ResponseTextId 101415) then 101416 (ResponseTextId 103597); ids only"
             }
           ]
         },

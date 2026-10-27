@@ -85,6 +85,7 @@ pub mod players;
 pub mod power_ups;
 pub mod profiles;
 pub mod progression_extras;
+pub mod quest_dialogue;
 pub mod quest_engine;
 pub mod quest_journal;
 pub mod quest_markers;

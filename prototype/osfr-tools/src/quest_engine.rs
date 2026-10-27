@@ -725,6 +725,14 @@ pub enum QuestEvent {
     ClientReported {
         client_id: u32,
     },
+    /// T543: the player answered the last line of `npc_id`'s conversation for this
+    /// step. Only a step whose content sets `complete_after_dialogue` accepts it;
+    /// every other talk step still completes from [`Self::TalkToNpc`].
+    DialogueFinished {
+        quest_id: u32,
+        objective_id: u32,
+        npc_id: u64,
+    },
 }
 
 impl From<OpeningTrigger> for ObjectiveKind {
@@ -800,6 +808,9 @@ pub struct QuestEngine {
     split_locale_fields: BTreeMap<u32, QuestLocaleFields>,
     /// (quest id, objective id) -> what the NPC says when that talk step is done.
     step_dialogue: BTreeMap<(u32, u32), u32>,
+    /// T543: (quest id, objective id) -> the talk step's conversation and whether it
+    /// completes when the lines end. One entry per step, so the two facts cannot drift.
+    conversations: BTreeMap<(u32, u32), StepConversation>,
     /// (quest id, objective id) -> goal line locale id (content `text_string_id`).
     objective_text: BTreeMap<(u32, u32), u32>,
     job_profile_ids: BTreeMap<String, i32>,
@@ -1105,6 +1116,7 @@ impl QuestEngine {
                 })
             })
             .collect();
+        let conversations = conversation_steps(&quests);
         let mut engine =
             Self::new_with_disabled(character_id, definitions, eligibility, state, disabled)?;
         engine.poi_locations = poi_locations;
@@ -1125,6 +1137,7 @@ impl QuestEngine {
         engine.job_profile_ids = job_profile_ids;
         engine.split_locale_fields = split_locale_fields;
         engine.step_dialogue = step_dialogue;
+        engine.conversations = conversations;
         engine.objective_text = objective_text;
         Ok(engine)
     }
@@ -1145,7 +1158,10 @@ impl QuestEngine {
             .iter()
             .map(|quest| definition_from_content(quest, character_id, &job_profile_ids))
             .collect::<io::Result<Vec<_>>>()?;
-        Self::new(character_id, definitions, eligibility, state)
+        let conversations = conversation_steps(&content.quests);
+        let mut engine = Self::new(character_id, definitions, eligibility, state)?;
+        engine.conversations = conversations;
+        Ok(engine)
     }
 
     /// Transitional adapter for the reviewed 17-stage opening content. The old
@@ -1305,6 +1321,7 @@ impl QuestEngine {
             definitions: indexed,
             split_locale_fields: BTreeMap::new(),
             step_dialogue: BTreeMap::new(),
+            conversations: BTreeMap::new(),
             objective_text: BTreeMap::new(),
             job_profile_ids: BTreeMap::new(),
             dev_offer: None,
@@ -1524,6 +1541,35 @@ impl QuestEngine {
             }) => self.step_dialogue.get(&(*quest_id, *objective_id)).copied(),
             _ => None,
         })
+    }
+
+    /// T543: the open talk step at `npc_id` that has a conversation, if any. Only a
+    /// currently open objective can start one (`current_objectives`), so a later
+    /// step of an ordered quest cannot be talked into early.
+    pub fn conversation_for_talk(
+        &self,
+        npc_id: u64,
+    ) -> Option<crate::quest_dialogue::TalkDialogue> {
+        for quest_id in self.state.quests.keys().copied() {
+            for objective in self.current_objectives(quest_id) {
+                if !matches!(
+                    &objective.kind,
+                    ObjectiveKind::TalkToNpc { npc_id: target } if *target == npc_id
+                ) {
+                    continue;
+                }
+                let Some(step) = self.conversations.get(&(quest_id, objective.id)) else {
+                    continue;
+                };
+                return Some(crate::quest_dialogue::TalkDialogue {
+                    quest_id,
+                    objective_id: objective.id,
+                    complete_after_dialogue: step.complete_after_dialogue,
+                    lines: step.lines.clone(),
+                });
+            }
+        }
+        None
     }
 
     pub fn end_text_string_id(&self, quest_id: u32) -> Option<u32> {
@@ -2006,6 +2052,7 @@ impl QuestEngine {
             .iter()
             .filter(|(_, progress)| progress.status == QuestStatus::Active)
             .filter(|(id, _)| match &event {
+                QuestEvent::DialogueFinished { quest_id, .. } => *id == quest_id,
                 QuestEvent::VisitPosition { zone_id, .. } => self
                     .location_quests
                     .get(zone_id)
@@ -2039,6 +2086,32 @@ impl QuestEngine {
                     continue;
                 }
                 let increment = match (&objective.kind, &event) {
+                    // T543: this step finishes with its conversation, not the Talk.
+                    (ObjectiveKind::TalkToNpc { .. }, QuestEvent::TalkToNpc { .. })
+                        if self
+                            .conversations
+                            .get(&(quest_id, objective.id))
+                            .is_some_and(|step| step.complete_after_dialogue) =>
+                    {
+                        0
+                    }
+                    (
+                        ObjectiveKind::TalkToNpc { npc_id },
+                        QuestEvent::DialogueFinished {
+                            quest_id: finished_quest,
+                            objective_id: finished_objective,
+                            npc_id: finished_npc,
+                        },
+                    ) if *finished_quest == quest_id
+                        && *finished_objective == objective.id
+                        && finished_npc == npc_id
+                        && self
+                            .conversations
+                            .get(&(quest_id, objective.id))
+                            .is_some_and(|step| step.complete_after_dialogue) =>
+                    {
+                        1
+                    }
                     (
                         ObjectiveKind::EnterArea { area_id },
                         QuestEvent::VisitPosition { zone_id, .. },
@@ -2110,33 +2183,38 @@ impl QuestEngine {
                     .all(|(count, objective)| *count == objective.required);
             // T743: in an ordered quest only the final step's NPC is a named end-screen target;
             // an earlier step's NPC (3090027: Beth, then a rank goal) is not where it ends.
-            let named_objective_target =
-                match &event {
-                    QuestEvent::TalkToNpc { npc_id } => definition
-                        .objectives
-                        .iter()
-                        .enumerate()
-                        .any(|(index, objective)| {
-                            matches!(
-                                &objective.kind,
-                                ObjectiveKind::TalkToNpc { npc_id: target } if target == npc_id
-                            ) && (!definition.ordered || index + 1 == definition.objectives.len())
-                        }),
-                    _ => false,
-                };
+            // T543: a finished conversation names the same NPC its Talk did.
+            let event_npc = match &event {
+                QuestEvent::TalkToNpc { npc_id } | QuestEvent::DialogueFinished { npc_id, .. } => {
+                    Some(*npc_id)
+                }
+                _ => None,
+            };
+            let named_objective_target = event_npc.is_some_and(|npc_id| {
+                definition
+                    .objectives
+                    .iter()
+                    .enumerate()
+                    .any(|(index, objective)| {
+                        matches!(
+                            &objective.kind,
+                            ObjectiveKind::TalkToNpc { npc_id: target } if *target == npc_id
+                        ) && (!definition.ordered || index + 1 == definition.objectives.len())
+                    })
+            });
             if ready
                 && self.state.pending_turnin.is_none()
-                && (event_is_talk_to(&event, definition.turnin_npc_id) || named_objective_target)
+                && (event_npc == Some(definition.turnin_npc_id) || named_objective_target)
             {
-                // Both conditions are Talk-only, so this records the NPC the player talked to.
-                if let QuestEvent::TalkToNpc { npc_id: actor_id } = &event {
-                    self.state.open_pending_turnin(quest_id, *actor_id);
+                // The screen opens at the NPC the player talked to.
+                if let Some(actor_id) = event_npc {
+                    self.state.open_pending_turnin(quest_id, actor_id);
                     outcome.changed = true;
                     outcome
                         .outbound
                         .push(OutboundMessage::Quest(QuestMessage::QuestEnd {
                             quest_id,
-                            actor_id: *actor_id,
+                            actor_id,
                         }));
                 }
             }
@@ -2402,6 +2480,43 @@ impl QuestEngine {
     }
 }
 
+/// T543: one talk step's conversation.
+#[derive(Clone, Debug)]
+struct StepConversation {
+    lines: Vec<crate::quest_dialogue::DialogueLine>,
+    /// The Talk starts the conversation but the last line completes the step.
+    complete_after_dialogue: bool,
+}
+
+/// T543: every talk step that has a conversation, keyed by (quest, objective).
+fn conversation_steps(quests: &[crate::content::Quest]) -> BTreeMap<(u32, u32), StepConversation> {
+    let mut conversations = BTreeMap::new();
+    for quest in quests {
+        for goal in &quest.objectives {
+            let ContentGoal::TalkToNpc {
+                id,
+                lines,
+                complete_after_dialogue,
+                ..
+            } = goal
+            else {
+                continue;
+            };
+            if lines.is_empty() && !*complete_after_dialogue {
+                continue;
+            }
+            conversations.insert(
+                (quest.id, *id),
+                StepConversation {
+                    lines: lines.clone(),
+                    complete_after_dialogue: *complete_after_dialogue,
+                },
+            );
+        }
+    }
+    conversations
+}
+
 fn definition_from_content(
     quest: &crate::content::Quest,
     character_id: u64,
@@ -2426,6 +2541,18 @@ fn definition_from_content(
         .transpose()?;
     for goal in &quest.objectives {
         match goal {
+            // T543: both content paths share these bounds; `content::validate_goal` checks
+            // the same rules for the unsplit `ContentDb` loader.
+            ContentGoal::TalkToNpc {
+                lines,
+                complete_after_dialogue,
+                ..
+            } => {
+                crate::quest_dialogue::validate(lines).map_err(invalid)?;
+                if *complete_after_dialogue && lines.is_empty() {
+                    return Err(invalid("complete_after_dialogue requires a conversation"));
+                }
+            }
             ContentGoal::InteractActor {
                 actor_guid, source, ..
             } => {
@@ -2968,6 +3095,11 @@ fn validate_event(event: &QuestEvent) -> io::Result<()> {
         QuestEvent::EquipItem { definition_id } => *definition_id > 0,
         QuestEvent::CompleteDungeon { encounter_id } => *encounter_id != 0,
         QuestEvent::ClientReported { client_id } => (1..=i32::MAX as u32).contains(client_id),
+        QuestEvent::DialogueFinished {
+            quest_id,
+            objective_id,
+            npc_id,
+        } => *quest_id != 0 && *objective_id != 0 && *npc_id != 0,
         QuestEvent::VisitPosition { position, .. } => position
             .iter()
             .all(|value| value.is_finite() && value.abs() <= 1_000_000.0),
@@ -3200,10 +3332,6 @@ impl ClientObjectives {
         self.armed = open.into_iter().map(|(client_id, _)| client_id).collect();
         packets
     }
-}
-
-fn event_is_talk_to(event: &QuestEvent, npc_id: u64) -> bool {
-    matches!(event, QuestEvent::TalkToNpc { npc_id: id } if *id == npc_id)
 }
 
 fn within(a: [f32; 3], b: [f32; 3], radius: f32) -> bool {
