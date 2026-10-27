@@ -1,0 +1,27 @@
+{
+  "client_version": "1.910.1.530630",
+  "initial_state": {
+    "guid": 1,
+    "position": [
+      -1414.6434326171875,
+      -27.634824752807617,
+      351.5563659667969
+    ],
+    "rotation": [
+      0.3574598431587219,
+      0.0,
+      -0.9339284896850586
+    ],
+    "zone_id": 0
+  },
+  "provenance": [
+    "Typed fields of the 46 startup messages an original 1.910.1.530630 client received in a session against a community server on 2026-10-08. The capture stays in the lab and is not shipped.",
+    "self_data.json: message 7 (opcode 12) parsed by startup_selfdata::parse_self, then reduced to a fresh character by scrub_self in tests/startup_content.rs.",
+    "snapshot.json: the typed startup snapshot of the other 45 messages, with the two texts of scrub_snapshot replaced.",
+    "(R) The motd text, the default name 'New Player' and the 'Happy Halloween!' nameplate are ours, not the capture's.",
+    "(R) account.birthday (1240963200, 2009-04-29 00:00 UTC) and identity.unknown_identity_u64 (0) are neutral stand-ins; the capture account's own numbers are not kept. The client reader (00944fe0) stores the identity u64 without checking it.",
+    "(R) Unnamed spans stay as hex, as startup_selfdata and startup_snapshot read them; nothing here is replayed bytes.",
+    "Refresh: OSFR_GATEWAY_REFERENCE=<capture folder> cargo test --test startup_content -- --ignored export_scrubbed_startup_content"
+  ],
+  "schema_version": 1
+}

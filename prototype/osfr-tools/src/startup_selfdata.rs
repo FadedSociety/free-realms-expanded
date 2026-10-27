@@ -4,7 +4,9 @@
 //! readers. Unnamed records remain bounded byte spans marked `(R)`; this is
 //! capture preservation, not an assertion about server policy.
 
+use crate::startup_snapshot::{decode_hex, encode_hex};
 use osfr_tools::{inventory, quests};
+use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
 const TUNNEL_PREFIX: [u8; 3] = [5, 0, 1];
@@ -12,6 +14,49 @@ const OPCODE: u16 = 12;
 const REWARD_BUNDLE_FIXED_BYTES: usize = 60;
 const ACTION_SLOT_BYTES: usize = 51;
 const EFFECT_PAYLOAD_BYTES: usize = 81;
+
+/// JSON form of the opaque byte spans (`[u8; N]` and `Vec<u8>` fields): one hex string each.
+mod hex {
+    use super::{decode_hex, encode_hex};
+    use serde::{Deserialize, Deserializer, Serializer, de::Error};
+
+    pub fn serialize<S: Serializer>(bytes: &impl AsRef<[u8]>, out: S) -> Result<S::Ok, S::Error> {
+        out.serialize_str(&encode_hex(bytes.as_ref()))
+    }
+
+    pub fn deserialize<'de, D: Deserializer<'de>, T: TryFrom<Vec<u8>>>(
+        input: D,
+    ) -> Result<T, D::Error> {
+        let bytes = decode_hex(&String::deserialize(input)?).map_err(D::Error::custom)?;
+        T::try_from(bytes).map_err(|_| D::Error::custom("wrong byte count in a hex field"))
+    }
+}
+
+/// The same, for a list of fixed-size spans.
+mod hex_rows {
+    use super::{decode_hex, encode_hex};
+    use serde::{Deserialize, Deserializer, Serializer, de::Error, ser::SerializeSeq};
+
+    pub fn serialize<S: Serializer, T: AsRef<[u8]>>(rows: &[T], out: S) -> Result<S::Ok, S::Error> {
+        let mut seq = out.serialize_seq(Some(rows.len()))?;
+        for row in rows {
+            seq.serialize_element(&encode_hex(row.as_ref()))?;
+        }
+        seq.end()
+    }
+
+    pub fn deserialize<'de, D: Deserializer<'de>, T: TryFrom<Vec<u8>>>(
+        input: D,
+    ) -> Result<Vec<T>, D::Error> {
+        Vec::<String>::deserialize(input)?
+            .iter()
+            .map(|row| {
+                let bytes = decode_hex(row).map_err(D::Error::custom)?;
+                T::try_from(bytes).map_err(|_| D::Error::custom("wrong byte count in a hex row"))
+            })
+            .collect()
+    }
+}
 
 /// (R) The local quest-content binding used by the gateway's original journal
 /// patch. Its offset is relative to the quest span beginning after gender.
@@ -22,7 +67,7 @@ const CAPTURE_QUEST_BINDINGS: [QuestWireBinding; 1] = [QuestWireBinding {
     offset: 4112,
 }];
 
-#[derive(Clone, Debug, PartialEq)]
+#[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct SelfData {
     pub identity: Identity,
     pub appearance: Appearance,
@@ -59,10 +104,11 @@ pub struct SelfData {
     pub effects: Vec<EffectRecord>,
     /// (R) Exact bytes after the decoded effect records. The captured next
     /// count is 268, which cannot fit the native minimum row size in the span.
+    #[serde(with = "hex")]
     pub post_effect_tail: Vec<u8>,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Identity {
     /// (R) Captured value stored at client object +0x3c0; its meaning is unknown.
     pub unknown_identity_u64: u64,
@@ -70,7 +116,7 @@ pub struct Identity {
     pub model: u32,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Appearance {
     pub head: String,
     pub hair: String,
@@ -82,7 +128,7 @@ pub struct Appearance {
     pub customization_ids: [u32; 5],
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct Transform {
     /// IEEE-754 component bit patterns, retained without float normalization.
     pub position: [u32; 4],
@@ -90,14 +136,14 @@ pub struct Transform {
     pub rotation: [u32; 4],
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct CharacterName {
     pub fields: [u32; 3],
     pub first: String,
     pub last: String,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct AccountState {
     pub birthday: u64,
     pub age: u32,
@@ -115,18 +161,19 @@ pub struct AccountState {
     pub active_vehicle_loadouts: [u32; 2],
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct JobState {
     pub profiles: Vec<JobProfile>,
     pub active_profile_id: u32,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct JobProfile {
     /// The profile map key in the first wire dword, read by `00a18990`.
     pub map_key: u32,
     /// (R) Profile bytes before the equipment keyed list, with the map key
     /// removed so it can be changed independently.
+    #[serde(with = "hex")]
     pub opaque_before_equipment_without_key: Vec<u8>,
     /// (R) Final dword read by `00911d60`; meaning unresolved.
     pub after_equipment_value: u32,
@@ -136,7 +183,7 @@ pub struct JobProfile {
     pub trailing_records: Vec<ProfileTrailingRecord>,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ProfileAbility {
     pub kind: u32,
     /// (R) Conditional words read for kinds 1/3 (two) or 2 (one).
@@ -148,14 +195,15 @@ pub struct ProfileAbility {
     pub common_flag: Option<u8>,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ProfileTrailingRecord {
     pub key: u32,
     /// (R) Native row payload: one flag byte and eight dwords.
+    #[serde(with = "hex")]
     pub payload: [u8; 33],
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct CollectionRecord {
     /// Seven dwords consumed by `009099d0`; meanings remain unresolved (R).
     pub prefix: [u32; 7],
@@ -163,56 +211,66 @@ pub struct CollectionRecord {
     pub keyed_rows: Vec<CollectionKeyedRow>,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct RewardBundle {
     /// Native success byte; retained without bool normalization.
     pub success: u8,
     /// Nine dwords, two u64 pairs and two scalars (`008e7930`); meanings R.
+    #[serde(with = "hex")]
     pub fixed_fields: [u8; REWARD_BUNDLE_FIXED_BYTES],
     pub entries: Vec<RewardEntry>,
     /// Trailing dword consumed by the reward-bundle reader; meaning R.
     pub trailing_value: u32,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct RewardEntry {
     pub kind: u32,
     /// Native hidden byte; retained without bool normalization.
     pub hidden: u8,
     /// (R) Paired IDs and four common dwords.
+    #[serde(with = "hex")]
     pub common_fields: [u8; 24],
     /// Counted client string bytes; not assumed to be UTF-8.
+    #[serde(with = "hex")]
     pub display_bytes: Vec<u8>,
     /// (R) Text color and member-only bytes.
+    #[serde(with = "hex")]
     pub display_fields: [u8; 5],
     /// (R) Type/success-dependent final dword, when the reader consumes one.
+    #[serde(with = "hex")]
     pub kind_fields: Vec<u8>,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct CollectionKeyedRow {
     pub key: u32,
     /// Seven dwords and bool consumed by `008dacc0`; meanings R.
+    #[serde(with = "hex")]
     pub payload: [u8; 29],
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct QuestRecords {
     pub first: Vec<QuestFirstRecord>,
     /// (R) Fixed 17-byte tail after the first list.
+    #[serde(with = "hex")]
     pub first_tail: [u8; 17],
     pub second: Vec<QuestSecondRecord>,
     /// (R) Fixed four-byte tail after the second list.
+    #[serde(with = "hex")]
     pub second_tail: [u8; 4],
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct QuestFirstRecord {
     /// (R) Fixed 34-byte prefix read before the reward bundle.
+    #[serde(with = "hex")]
     pub prefix: [u8; 34],
     pub reward: RewardBundle,
     pub objectives: Vec<QuestObjectiveRecord>,
     /// (R) Fixed six-byte record tail.
+    #[serde(with = "hex")]
     pub tail: [u8; 6],
 }
 
@@ -223,27 +281,31 @@ impl QuestFirstRecord {
     }
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct QuestSecondRecord {
     /// (R) Fixed 33-byte prefix read before the reward bundle.
+    #[serde(with = "hex")]
     pub prefix: [u8; 33],
     pub reward: RewardBundle,
     pub objectives: Vec<QuestObjectiveRecord>,
     /// (R) Fixed 21-byte record tail.
+    #[serde(with = "hex")]
     pub tail: [u8; 21],
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct QuestObjectiveRecord {
     pub key: u32,
     /// (R) Fixed 13-byte objective prefix.
+    #[serde(with = "hex")]
     pub prefix: [u8; 13],
     pub reward: RewardBundle,
     /// (R) Fixed 21-byte objective tail.
+    #[serde(with = "hex")]
     pub tail: [u8; 21],
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct PostQuestRecords {
     pub keyed_strings: Vec<KeyedStringRecord>,
     pub recipes: Vec<RecipeRecord>,
@@ -257,56 +319,72 @@ pub struct PostQuestRecords {
     pub pre_action_records: Vec<PreActionRecord>,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct KeyedStringRecord {
     /// (R) Key pair read by `008e73b0`.
+    #[serde(with = "hex")]
     pub key_fields: [u8; 8],
+    #[serde(with = "hex")]
     pub value_bytes: Vec<u8>,
     /// (R) Two dwords and a flag.
+    #[serde(with = "hex")]
     pub tail: [u8; 13],
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct RecipeRecord {
     /// (R) Fixed fields read by `0090b930`.
+    #[serde(with = "hex")]
     pub prefix: [u8; 29],
+    #[serde(with = "hex_rows")]
     pub components: Vec<[u8; 32]>,
     /// (R) Fixed recipe tail.
+    #[serde(with = "hex")]
     pub tail: [u8; 9],
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct VariableRecord {
     /// (R) Fixed prefix before three nested arrays.
+    #[serde(with = "hex")]
     pub prefix: [u8; 26],
+    #[serde(with = "hex_rows")]
     pub first_rows: Vec<[u8; 37]>,
     pub second_rows: Vec<u32>,
+    #[serde(with = "hex_rows")]
     pub third_rows: Vec<[u8; 12]>,
+    #[serde(with = "hex")]
     pub first_string: Vec<u8>,
     /// (R) Fixed eight-byte field between counted strings.
+    #[serde(with = "hex")]
     pub middle: [u8; 8],
+    #[serde(with = "hex")]
     pub second_string: Vec<u8>,
     /// (R) Fixed tail read by `00912cf0`.
+    #[serde(with = "hex")]
     pub tail: [u8; 58],
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct PreActionRecord {
     /// (R) Fixed fields before the counted string.
+    #[serde(with = "hex")]
     pub prefix: [u8; 25],
+    #[serde(with = "hex")]
     pub string_bytes: Vec<u8>,
     /// (R) Two bool bytes.
+    #[serde(with = "hex")]
     pub tail: [u8; 2],
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct QuestWireBinding {
     pub quest_id: u32,
     pub objective_index: usize,
     pub offset: usize,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ActionBar {
     pub key: u32,
     /// Native `0091a9b0` reads this scalar before the slot-list reader.
@@ -314,19 +392,21 @@ pub struct ActionBar {
     pub slots: Vec<ActionBarSlot>,
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct ActionBarSlot {
     pub key: u32,
     /// (R) The native reader consumes 51 fixed bytes; field meanings remain
     /// unresolved, so the byte payload is preserved exactly.
+    #[serde(with = "hex")]
     pub fields: [u8; ACTION_SLOT_BYTES],
 }
 
-#[derive(Clone, Debug, Eq, PartialEq)]
+#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
 pub struct EffectRecord {
     pub key: u32,
     /// (R) Native `00a18cc0` consumes this 81-byte record; most fields are
     /// unnamed here and therefore remain exact bytes.
+    #[serde(with = "hex")]
     pub payload: Vec<u8>,
 }
 

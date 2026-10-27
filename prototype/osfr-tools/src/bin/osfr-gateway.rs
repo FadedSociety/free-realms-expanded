@@ -59,6 +59,8 @@ mod client_area_routing;
 mod moderation;
 #[path = "osfr_gateway/paths.rs"]
 mod paths;
+#[path = "osfr_gateway/startup_source.rs"]
+mod startup_source;
 #[path = "osfr_gateway/t006_guilds.rs"]
 mod t006_guilds;
 #[path = "osfr_gateway/tick_stats.rs"]
@@ -298,6 +300,7 @@ fn trace_gateway_rejected(
 
 pub struct Options {
     pub bind: SocketAddr,
+    /// Empty without `--reference`: the startup comes from `<content>/startup/` (`startup_source`).
     pub reference: PathBuf,
     pub state: PathBuf,
     pub content: Option<PathBuf>,
@@ -334,7 +337,7 @@ impl Options {
         let mut args = env::args().skip(1);
         let bind: SocketAddr = args
             .next()
-            .ok_or("usage: osfr-gateway 127.0.0.1:PORT --reference DIR --state FILE [--content DIR] [--identity FILE] [--account-store FILE] [--seconds N] [--trace FILE] [--tick-stats-seconds N] [--security-log FILE] [--group-invite-ttl-ms N] [--guild-invite-ttl-ms N] [--dev-tools]")?
+            .ok_or("usage: osfr-gateway 127.0.0.1:PORT --state FILE [--reference DIR] [--content DIR] [--identity FILE] [--account-store FILE] [--seconds N] [--trace FILE] [--tick-stats-seconds N] [--security-log FILE] [--group-invite-ttl-ms N] [--guild-invite-ttl-ms N] [--dev-tools]")?
             .parse()?;
         let (mut reference, mut state, mut seconds, mut content, mut identity, mut account_store) =
             (None, None, 0, None, None, None);
@@ -407,6 +410,9 @@ impl Options {
                 "a non-loopback gateway needs --account-store and refuses --dev-tools".into(),
             );
         }
+        if reference.is_none() && content.is_none() {
+            return Err("without --reference the startup messages come from --content".into());
+        }
         let handoff_key = handoff_key_file
             .map(fs::read)
             .transpose()?
@@ -416,7 +422,7 @@ impl Options {
         }
         Ok(Self {
             bind,
-            reference: reference.ok_or("--reference is required")?,
+            reference: reference.unwrap_or_default(),
             state: state.ok_or("--state is required")?,
             content,
             identity,
@@ -945,12 +951,7 @@ fn load_gateway_from(
         {
             snapshot.character = initial;
         }
-        Gateway::load_gameplay(
-            &options.reference,
-            snapshot.character,
-            content,
-            snapshot.gameplay,
-        )?
+        startup_source::load_gameplay(options, snapshot.character, content, snapshot.gameplay)?
     } else if snapshot.gameplay.is_some() {
         return Err("a gameplay snapshot requires --content; refusing to discard progress".into());
     } else {
@@ -986,19 +987,16 @@ fn load_gateway_from(
 }
 
 fn load_gateway(options: &Options) -> Result<Gateway, Box<dyn std::error::Error>> {
-    let initial = Gateway::reference_state(&options.reference)?;
+    let initial = startup_source::initial_state(options)?;
     load_gateway_from(options, &options.state, initial)
 }
 
 fn load_gateway_template(options: &Options) -> Result<Gateway, Box<dyn std::error::Error>> {
-    let initial = Gateway::reference_state(&options.reference)?;
+    let initial = startup_source::initial_state(options)?;
     if let Some(content) = &options.content {
         let initial = Gameplay::initial_character(content, initial)?;
-        Ok(Gateway::load_gameplay(
-            &options.reference,
-            initial,
-            content,
-            None,
+        Ok(startup_source::load_gameplay(
+            options, initial, content, None,
         )?)
     } else {
         Ok(Gateway::load(&options.reference, initial)?)
@@ -1154,7 +1152,7 @@ impl Session {
         let mut initial = record
             .world_state
             .clone()
-            .unwrap_or(Gateway::reference_state(&options.reference)?);
+            .unwrap_or(startup_source::initial_state(options)?);
         initial.guid = guid;
         let path = character_state_path(&options.state, guid);
         if !path.exists() && options.state.is_file() {
@@ -4520,7 +4518,7 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     server.trace = trace_path.as_deref().map(trace::Trace::open).transpose()?;
     server.tick_stats = tick_stats::TickStats::new(tick_window);
     event(
-        json!({"event":"listening","address":server.local_addr()?.to_string(),"reference":server.options.reference,"dev_tools":server.options.dev_tools}),
+        json!({"event":"listening","address":server.local_addr()?.to_string(),"reference":server.options.reference_dir(),"dev_tools":server.options.dev_tools}),
     );
     while server.options.seconds == 0
         || server.start.elapsed() < Duration::from_secs(server.options.seconds)

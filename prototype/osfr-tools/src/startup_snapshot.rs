@@ -899,7 +899,7 @@ fn read_coin_entries(reader: &mut Reader<'_>) -> io::Result<Vec<CoinStoreEntrySn
     Ok(entries)
 }
 
-fn decode_hex(value: &str) -> io::Result<Vec<u8>> {
+pub(crate) fn decode_hex(value: &str) -> io::Result<Vec<u8>> {
     if value.len() % 2 != 0 {
         return Err(invalid("odd-length startup hex field"));
     }
@@ -920,7 +920,7 @@ fn decode_hex(value: &str) -> io::Result<Vec<u8>> {
         .collect()
 }
 
-fn encode_hex(bytes: &[u8]) -> String {
+pub(crate) fn encode_hex(bytes: &[u8]) -> String {
     const DIGITS: &[u8; 16] = b"0123456789abcdef";
     let mut out = String::with_capacity(bytes.len() * 2);
     for byte in bytes {

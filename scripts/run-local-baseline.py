@@ -35,6 +35,7 @@ from client_overlay import install as install_client_overlay
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--seconds", type=int, default=90)
 parser.add_argument("--rust-reference", type=Path, help="Use the Rust gateway with a prepared private reference directory")
+parser.add_argument("--rust-gateway", action="store_true", help="Use the Rust gateway without a reference directory: its startup messages come from <content>/startup (needs --content)")
 parser.add_argument("--state-file", type=Path, help="Rust character save file, outside the source repository")
 parser.add_argument("--content", type=Path, help="Private gameplay content for the Rust gateway")
 parser.add_argument("--native-login", action="store_true", help="Use loopback Rust login and the original character creator/selection UI")
@@ -50,10 +51,15 @@ parser.add_argument("--live-log", action=argparse.BooleanOptionalAction, default
 parser.add_argument("--dev-tools", action="store_true", help="Opt in to local developer entity teleport commands for this test run")
 parser.add_argument("--drop-server-sequence", type=int, help="Drop the first transmission of this reliable sequence to test recovery")
 run_options = parser.parse_args()
-if run_options.native_login and (not run_options.rust_reference or not run_options.content):
-    parser.error("--native-login requires --rust-reference and --content")
-if run_options.dev_tools and (not run_options.rust_reference or not run_options.content):
-    parser.error("--dev-tools requires --rust-reference and --content")
+use_rust = bool(run_options.rust_reference) or run_options.rust_gateway
+if run_options.rust_reference and run_options.rust_gateway:
+    parser.error("--rust-gateway runs without a reference directory; drop --rust-reference")
+if run_options.rust_gateway and not run_options.content:
+    parser.error("--rust-gateway requires --content")
+if run_options.native_login and (not use_rust or not run_options.content):
+    parser.error("--native-login requires --rust-reference (or --rust-gateway) and --content")
+if run_options.dev_tools and (not use_rust or not run_options.content):
+    parser.error("--dev-tools requires --rust-reference (or --rust-gateway) and --content")
 if not 10 <= run_options.seconds <= 3600:
     parser.error("--seconds must be between 10 and 3600")
 if run_options.drop_server_sequence is not None and not 0 <= run_options.drop_server_sequence <= 65535:
@@ -85,7 +91,7 @@ if run_options.native_login:
     # unsupported skin7/8 and extra faces, where the client opens them, plus the custom/
     # dressing room. Future choices only; saved identities remain untouched.
     install_client_overlay(client)
-if run_options.rust_reference:
+if use_rust:
     server.mkdir()
 else:
     shutil.copytree(lab / "working/OSFR.Server/OSFR Server", server)
@@ -112,10 +118,11 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as reserve:
     reserve.bind(("127.0.0.1", 0))
     server_port = reserve.getsockname()[1]
 state_file = (run_options.state_file or lab / "state/character.json").resolve()
-if run_options.rust_reference:
-    reference = run_options.rust_reference.resolve()
+if use_rust:
+    reference = run_options.rust_reference.resolve() if run_options.rust_reference else None
     gateway_binary = lab.parent / "project/prototype/osfr-tools/target/release/osfr-gateway.exe"
-    server_command = [str(gateway_binary), f"127.0.0.1:{server_port}", "--reference", str(reference),
+    server_command = [str(gateway_binary), f"127.0.0.1:{server_port}",
+                      *(["--reference", str(reference)] if reference else []),
                       "--state", str(state_file), "--seconds", str(run_options.seconds + 10),
                       # The client's own tables: style cards (42/10, 42/12) refuse without them.
                       "--resources", str(client / "Resources")]
@@ -251,7 +258,7 @@ startup.wShowWindow = 0
 processes, handles, frames, frame_bytes, screenshots = [], [], [], [], []
 captured_bytes = 0
 result = {"run_directory": str(run), "started_utc": datetime.now(timezone.utc).isoformat(),
-          "server_kind": "rust_gateway" if run_options.rust_reference else "supplied_emulator",
+          "server_kind": "rust_gateway" if use_rust else "supplied_emulator",
           "server_executable_sha256": hashlib.sha256(Path(server_command[0]).read_bytes()).hexdigest(),
           "client_endpoint": endpoint, "server_port": server_port,
           "asset_url": asset_url, "asset_manifest_crc": manifest_crc.decode("ascii").strip(),
@@ -262,8 +269,8 @@ result["developer_tools_enabled"] = run_options.dev_tools
 if run_options.live_log:
     result["live_log_enabled"] = True
     result["live_log"] = str(run / "live.log")
-if run_options.rust_reference:
-    result.update(state_file=str(state_file), reference_directory=str(reference))
+if use_rust:
+    result.update(state_file=str(state_file), reference_directory=str(reference) if reference else None)
     if run_options.content:
         result["content_directory"] = str(run_options.content.resolve())
 if run_options.native_login:
@@ -324,7 +331,7 @@ try:
                 creationflags=subprocess.CREATE_NEW_CONSOLE,
                 startupinfo=viewer_startup,
             )
-        if run_options.rust_reference and name in ("server", "login"):
+        if use_rust and name in ("server", "login"):
             deadline = time.monotonic() + 10
             while True:
                 if process.poll() is not None:
@@ -341,7 +348,7 @@ try:
     capture_times = iter([12, 30, 50, 80])
     next_capture = next(capture_times, 999)
     while time.monotonic() - started < run_options.seconds:
-        if run_options.rust_reference:
+        if use_rust:
             for service_name, service_process in processes:
                 if service_name != "client" and service_process.poll() is not None:
                     raise RuntimeError(f"{service_name} exited during preview; see its logs in {run}")
@@ -446,7 +453,7 @@ finally:
             print(live_error)
     for record, data in zip(frames, frame_bytes):
         (run / record["path"]).write_bytes(data)
-    if run_options.rust_reference and state_file.exists():
+    if use_rust and state_file.exists():
         shutil.copy2(state_file, run / "character-after.json")
     result["frames"] = frames
     result["screenshots"] = screenshots

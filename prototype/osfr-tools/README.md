@@ -30,6 +30,8 @@ The private reference directory is `../lab/references/rust-gateway-reference`. I
 
 `scripts/prepare-gateway-reference.py` prepares a **new** reference directory from the verified original-client trace and recovered character data. It rejects incomplete streams and existing output directories. The current prepared reference is for client version `1.910.1.530630`, GUID 1, zone 0; a different character or zone needs further implementation and evidence.
 
+**No reference folder (T807).** `--reference` is optional. Without it the gateway builds the same 46 startup messages from `data/content/startup/`: `manifest.json` (client version, initial character), `self_data.json` (typed defaults of the self-data message) and `snapshot.json` (the typed startup snapshot). These are typed JSON fields, not replayed bytes, scrubbed of the capturing server's own text and of the capture character's names; `tests/startup_content.rs` holds the scrub, a golden digest per message (`tests/fixtures/startup_golden.json`) and the lab comparison against the capture. Without `--reference` the gateway needs `--content` (a content directory that contains `startup/`): `osfr-gateway 127.0.0.1:20260 --state <save> --content <content>`. With `--reference` the old full validation of the 46 templates still runs (lab use).
+
 Start a service for manual use:
 
 ```powershell

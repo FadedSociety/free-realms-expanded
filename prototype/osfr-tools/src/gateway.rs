@@ -15,9 +15,7 @@ use crate::movement::{
     self, Decision as MovementDecision, ExpectedDiscontinuity, MovementState, MovementUpdate,
 };
 use crate::{
-    players::PlayerPresentation,
-    startup_selfdata::{self, SelfData},
-    startup_snapshot::{StartupSnapshot, configured_path},
+    players::PlayerPresentation, startup_selfdata::SelfData, startup_snapshot::StartupSnapshot,
 };
 use serde::Deserialize;
 use sha2::{Digest, Sha256};
@@ -33,6 +31,7 @@ mod companions;
 mod encounter_join;
 mod group_arena;
 mod staff;
+mod startup_source;
 mod startup_stream;
 mod trade_bridge;
 
@@ -836,23 +835,24 @@ impl Gateway {
         Self::load_internal(directory, state, Some(gameplay), None, profile_rank_offsets)
     }
 
-    fn load_internal(
-        directory: &Path,
+    fn load_internal<'a>(
+        source: impl Into<startup_source::Source<'a>>,
         mut state: CharacterState,
         mut gameplay: Option<Gameplay>,
         snapshot_override: Option<StartupSnapshot>,
         profile_rank_offsets: BTreeMap<i32, usize>,
     ) -> io::Result<Self> {
         state.validate()?;
-        let (manifest, self_bytes) = load_reference(directory)?;
+        let source = source.into();
+        let base = source.base()?;
         // (R) The local account-store path assigns a distinct GUID to each character;
         // the shared startup template is patched with that GUID at send time.
         let startup_snapshot = if let Some(snapshot) = snapshot_override {
             snapshot.validate()?;
             snapshot
         } else {
-            let snapshot = StartupSnapshot::load(&configured_path(directory)?)?;
-            if snapshot.login.zone.zone_id != manifest.initial_state.zone_id {
+            let snapshot = StartupSnapshot::load(&source.snapshot_path()?)?;
+            if snapshot.login.zone.zone_id != base.initial_state.zone_id {
                 return Err(invalid("startup snapshot belongs to another initial zone"));
             }
             snapshot
@@ -866,9 +866,6 @@ impl Gateway {
                     .map(|npc| npc.actor_id),
             );
         }
-        let self_data_template =
-            std::panic::catch_unwind(|| startup_selfdata::parse_self(&self_bytes))
-                .map_err(|_| invalid("invalid typed self-data reference template"))?;
         if let Some(game) = &mut gameplay {
             if let Some(return_location) = game.abandon_battle_for_reconnect() {
                 if state.guid != return_location.guid {
@@ -892,7 +889,7 @@ impl Gateway {
         if gameplay
             .as_ref()
             .is_some_and(|g| !g.supports_location(&state))
-            || (gameplay.is_none() && state.zone_id != manifest.initial_state.zone_id)
+            || (gameplay.is_none() && state.zone_id != base.initial_state.zone_id)
         {
             return Err(invalid(
                 "unsupported saved zone: reference supports only its initial zone",
@@ -901,9 +898,9 @@ impl Gateway {
         let movement_state = MovementState::new(state.zone_id, state.position, state.rotation);
         Ok(Self {
             state,
-            version: manifest.client_version,
+            version: base.version,
             startup_snapshot,
-            self_data_template,
+            self_data_template: base.self_data,
             profile_rank_offsets,
             logged_in: false,
             ready: false,

@@ -199,7 +199,8 @@ ITEM_CANDIDATE_KEYS = {"item_definition_id_candidates", "candidate_item_ids",
                        "candidate_recipe_item_definition_id", "candidate_output_definition_id"}
 DEFINITION_FILES = ("inventory.json", "item-catalogue.json")
 # Runtime-package files that hold saved states, proofs or definition rows, not consumers.
-NOT_CONSUMERS = re.compile(r"(prior|before-default|quest-inventory|proof|report|repairs|item-definitions)")
+# `startup/` is the gateway's typed startup snapshot (tests/startup_content.rs), not authored records.
+NOT_CONSUMERS = re.compile(r"(^startup/|prior|before-default|quest-inventory|proof|report|repairs|item-definitions)")
 _ROW_INTS = ("id", "slot", "class_id", "default_tint", "max_stack", "effect", "wield_type")
 _ROW_STRS = ("model", "texture", "tint_alias", "serialized_hex", "sha256")
 _LOWER_HEX = re.compile(r"[0-9a-f]*")
@@ -1602,6 +1603,8 @@ def main():
     files = []
     for path in sorted(CONTENT.rglob("*.json")):
         rel = path.relative_to(CONTENT).as_posix()
+        if rel.startswith("startup/"):
+            continue
         try:
             files.append((rel, json.loads(path.read_text(encoding="utf-8"))))
         except (OSError, ValueError) as exc:

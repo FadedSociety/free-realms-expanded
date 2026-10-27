@@ -308,6 +308,8 @@ def main():
             row, reconstructed = candidates[item_id]
             definitions.append(content_row(row, wield_types, "legacy+client-if-present", reconstructed))
     for path in sorted(checker.CONTENT.rglob("*.json")):
+        if path.relative_to(checker.CONTENT).parts[0] == "startup":
+            continue
         read_input(path, inputs, "content/" + path.relative_to(checker.CONTENT).as_posix())
     # Non-candidate item references of the same content, by the checker's own key rules.
     references = [r for r in checker.item_references(checker.CONTENT) if not r["candidate"]]
