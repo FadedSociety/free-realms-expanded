@@ -9,6 +9,7 @@ import csv
 import hashlib
 import json
 import os
+import re
 import struct
 import threading
 import zlib
@@ -31,9 +32,36 @@ def _canonical_name(value):
     return name[:-2] if name.endswith(".z") else name
 
 
+def manifest_wire(manifest: bytes) -> bytes:
+    """`manifest.txt.z`: the same envelope as a compressed asset (native readers 010ebd70/010ebee0)."""
+    return struct.pack(">II", 0xA1B2C3D4, len(manifest)) + zlib.compress(manifest, 6)
+
+
+def manifest_crc_body(manifest: bytes) -> bytes:
+    """`manifest.crc`: `crc32,length` of the raw manifest. Native `010a1980` splits it at the comma;
+    `0109bd00` compares the CRC with its local `<set>_manifest.txt`, and a match needs no manifest
+    download."""
+    return f"{zlib.crc32(manifest)},{len(manifest)}\r\n".encode("ascii")
+
+
+def baseline_ini(ini: str, endpoint: str, asset_url: str) -> str:
+    """The harness's offline `Baseline.ini` from `ClientConfig.ini`: every URL goes to a refusing
+    sink except the two asset servers. The main set is `IndirectServerAddress`; the card window's
+    own set ("Free Realms TCG", `00ad3670`) reads `TcgServerAddress` (`0092daa0`) and, without an
+    answer to `manifest.crc`, never finishes its download, so the card manager's 39/37 ticket
+    request (`00ad4f50`) never comes. Both live on the one harness server, the card set under
+    `/tcg`. Like the stock address it has no trailing slash, so the client's `<base>/manifest.crc`
+    is `/tcg/manifest.crc` (a trailing slash would give `/tcg//manifest.crc`)."""
+    ini = re.sub(r"(?m)^Server=.*$", "Server=" + endpoint, ini)
+    ini = re.sub(r"https?://[^\s\r\n]+", "http://127.0.0.1:9/", ini)
+    ini = re.sub(r"(?m)^IndirectServerAddress=.*$", "IndirectServerAddress=" + asset_url, ini)
+    ini = re.sub(r"(?m)^TcgServerAddress=.*$", "TcgServerAddress=" + asset_url + "tcg", ini)
+    return re.sub(r"(?m)^Address=lvsadp[^\r\n]+", "Address=127.0.0.1", ini)
+
+
 class AssetDelivery:
     def __init__(self, lab: Path, manifest: bytes):
-        self.manifest_wire = struct.pack(">II", 0xA1B2C3D4, len(manifest)) + zlib.compress(manifest, 6)
+        self.manifest_wire = manifest_wire(manifest)
         self.manifest = {}
         # R: index both community bare names and local .z names by one asset name.
         for row in csv.reader(manifest.decode("utf-8-sig").splitlines()):

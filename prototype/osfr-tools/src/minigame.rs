@@ -41,8 +41,12 @@ pub enum RunMode {
         player_guid: u64,
     },
     /// T765: a type-16 Trading Card Game run. The client hosts the card DLL itself
-    /// (`ClientTradingCardGameManager`): 39/5 is answered with 39/17 alone, and its 39/37
-    /// (`009bf590`, sent at manager state 5 by `00ad4f50`) asks for the launch ticket.
+    /// (`ClientTradingCardGameManager`). T795, in the client's order: the 39/16 offer names a
+    /// card asset list, which starts the client's loader (`009beb70`); once the card assets are
+    /// loaded the manager asks for the launch ticket with 39/37 (`009bf590`, sent by `00ad4f50`
+    /// state 2), still while the run is offered, and the 39/0x28 answer (slot 25 `00ad32e0`)
+    /// stores the ticket and enables the Start button; 39/5 is then answered with 39/17 alone,
+    /// which runs `Startup` (`00ad47f0`) on the stored ticket.
     CardClient,
 }
 
@@ -98,7 +102,9 @@ impl RunSpec {
             || self.objectives.len() % INFO_OBJECTIVE_BYTES != 0
             || self.objectives.len() / INFO_OBJECTIVE_BYTES > 4096
             || self.flags.iter().any(|flag| *flag > 1)
-            || self.flags[4] != 1
+            // Flag `+616` asks for the end-of-game dialog on 39/19 (`009bf190`). Only a card run
+            // may drop it: its result belongs to the card window, not to a 39/18 result record.
+            || (self.flags[4] != 1 && self.mode != RunMode::CardClient)
             || self.preload_file.len() > 1024
             || self
                 .preload_file
@@ -144,6 +150,10 @@ struct Run {
     score: u32,
     wheel_entry: Option<WheelEntry>,
     wheel_stopped: bool,
+    /// T795: a card run's ticket request (39/37) was answered. 39/17 starts the card DLL on the
+    /// ticket 39/0x28 stored (`00ad47f0`), so a card run starts only after one.
+    #[serde(default)]
+    ticketed: bool,
 }
 
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
@@ -307,6 +317,7 @@ impl MinigameRuns {
             score: 0,
             wheel_entry: None,
             wheel_stopped: false,
+            ticketed: false,
         });
         Ok(RunOutcome {
             accepted: true,
@@ -377,17 +388,24 @@ impl MinigameRuns {
             }
             return match sub {
                 5 => self.start(id),
-                // T765: only a started card run asks for a ticket; anything else ignores it.
+                // T765/T795: a card run's manager asks for its ticket while the run is still
+                // offered (before the Start click) and may ask again; anything else ignores it.
                 37 if run.spec.mode == RunMode::CardClient
-                    && matches!(run.state, RunState::Starting | RunState::Playing) =>
+                    && matches!(
+                        run.state,
+                        RunState::Offered | RunState::Starting | RunState::Playing
+                    ) =>
                 {
+                    let request = CardTicketRequest {
+                        instance_id: id,
+                        game_id: run.spec.game_id,
+                    };
+                    let state = run.state;
+                    self.current.as_mut().unwrap().ticketed = true;
                     Ok(RunOutcome {
                         accepted: true,
-                        state: Some(run.state),
-                        card_ticket: Some(CardTicketRequest {
-                            instance_id: id,
-                            game_id: run.spec.game_id,
-                        }),
+                        state: Some(state),
+                        card_ticket: Some(request),
                         ..Default::default()
                     })
                 }
@@ -648,7 +666,10 @@ impl MinigameRuns {
         let Some(run) = self.current.as_ref() else {
             return Ok(RunOutcome::default());
         };
-        if run.instance_id != instance_id || run.state != RunState::Offered {
+        if run.instance_id != instance_id
+            || run.state != RunState::Offered
+            || (run.spec.mode == RunMode::CardClient && !run.ticketed)
+        {
             return Ok(RunOutcome::default());
         }
         let replies = match &run.spec.mode {
@@ -668,7 +689,7 @@ impl MinigameRuns {
                 // (`008a8a30`).
                 start_ack_packet(run.instance_id, run.spec.game_id),
             ],
-            // The client's card manager starts on 39/17 and asks for its ticket with 39/37.
+            // 39/17 runs the card manager's `Startup` (`00ad47f0`) on the ticket 39/0x28 stored.
             RunMode::CardClient => vec![start_ack_packet(run.instance_id, run.spec.game_id)],
         };
         self.current.as_mut().unwrap().state = RunState::Starting;

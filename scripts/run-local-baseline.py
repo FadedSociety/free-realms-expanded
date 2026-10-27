@@ -24,7 +24,7 @@ from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 
 from um import win
-from asset_delivery import AssetDelivery
+from asset_delivery import AssetDelivery, baseline_ini, manifest_crc_body, manifest_wire
 from journal_text_overlay import (validate_journal_text, apply_journal_text,
                                   validate_character_select_title, apply_character_select_title)
 from lua_probe_overlay import validate_lua_probe, apply_lua_probe
@@ -155,7 +155,14 @@ endpoint = f"127.0.0.1:{front.getsockname()[1]}"
 # CRC/length pair matches zlib.crc32(Assets_manifest.txt); use this run's own
 # preserved manifest so the client does not request an unrelated asset set.
 manifest_bytes = (client / "Assets_manifest.txt").read_bytes()
-manifest_crc = f"{zlib.crc32(manifest_bytes)},{len(manifest_bytes)}\r\n".encode("ascii")
+manifest_crc = manifest_crc_body(manifest_bytes)
+# The card window's own asset set (`tcg/AssetsTcg_manifest.txt`) is answered under /tcg/: its CRC
+# check passes against this run's local copy, and the local TCG pack already holds every file.
+tcg_routes = {}
+if (client / "tcg/AssetsTcg_manifest.txt").is_file():
+    tcg_manifest = (client / "tcg/AssetsTcg_manifest.txt").read_bytes()
+    tcg_routes = {"/tcg/manifest.crc": manifest_crc_body(tcg_manifest),
+                  "/tcg/manifest.txt.z": manifest_wire(tcg_manifest)}
 http_requests = []
 http_counts = Counter()
 asset_delivery = AssetDelivery(lab, manifest_bytes)
@@ -168,7 +175,7 @@ class AssetsHandler(BaseHTTPRequestHandler):
         path = self.path.split("?", 1)[0]
         body = {"/manifest.crc": manifest_crc,
                 "/Assets_manifest.txt": manifest_bytes,
-                "/manifest.txt.z": asset_delivery.manifest_wire}.get(path)
+                "/manifest.txt.z": asset_delivery.manifest_wire, **tcg_routes}.get(path)
         if body is None:
             try:
                 delivered = asset_delivery.get(self.path)
@@ -206,11 +213,7 @@ class AssetServer(ThreadingHTTPServer):
 asset_http = AssetServer(("127.0.0.1", 0), AssetsHandler)
 threading.Thread(target=asset_http.serve_forever, daemon=True).start()
 asset_url = f"http://127.0.0.1:{asset_http.server_port}/"
-ini = (client / "ClientConfig.ini").read_text(encoding="utf-8-sig")
-ini = re.sub(r"(?m)^Server=.*$", "Server=" + endpoint, ini)
-ini = re.sub(r"https?://[^\s\r\n]+", "http://127.0.0.1:9/", ini)
-ini = re.sub(r"(?m)^IndirectServerAddress=.*$", "IndirectServerAddress=" + asset_url, ini)
-ini = re.sub(r"(?m)^Address=lvsadp[^\r\n]+", "Address=127.0.0.1", ini)
+ini = baseline_ini((client / "ClientConfig.ini").read_text(encoding="utf-8-sig"), endpoint, asset_url)
 (client / "Baseline.ini").write_text(ini, encoding="utf-8")
 options = (client / "UserOptions.ini").read_text(encoding="utf-8-sig")
 for key, value in {"WindowedWidth": "1024", "WindowedHeight": "768", "Mode": "Windowed",

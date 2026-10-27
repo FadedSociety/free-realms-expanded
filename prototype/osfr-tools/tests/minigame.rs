@@ -528,6 +528,47 @@ fn prize_wheel_landing_is_server_selected_and_stop_report_cannot_pay() {
     assert!(duplicate.reward_packets.is_empty());
 }
 
+/// T795: flag `+616` (end-of-game dialog on 39/19, `009bf190`) stays on for every shared run;
+/// only a card run, whose result belongs to the card window, may leave it off. A card run's
+/// start waits for its ticket request (39/37), which the offered run already answers.
+#[test]
+fn only_a_card_run_may_skip_the_end_dialog_and_it_starts_after_its_ticket() {
+    let mut dialogless = spec();
+    dialogless.flags[4] = 0;
+    assert!(MinigameRuns::new(1).unwrap().offer(dialogless).is_err());
+
+    let mut card = RunSpec::empty(500, 16, RunMode::CardClient);
+    card.flags[4] = 0;
+    let mut runs = MinigameRuns::new(61_000_001).unwrap();
+    assert!(runs.offer(card).unwrap().accepted);
+    let before = runs.snapshot().unwrap();
+    let early = runs.handle_client(&request(5, 61_000_001)).unwrap();
+    assert!(!early.accepted && early.replies.is_empty());
+    assert_eq!(
+        runs.snapshot().unwrap(),
+        before,
+        "a refused start changes nothing"
+    );
+
+    let asked = runs.handle_client(&request(37, 61_000_001)).unwrap();
+    assert_eq!(asked.state, Some(RunState::Offered));
+    assert_eq!(asked.card_ticket.map(|t| t.game_id), Some(500));
+    let started = runs.handle_client(&request(5, 61_000_001)).unwrap();
+    assert_eq!(started.state, Some(RunState::Starting));
+    assert_eq!(started.replies.len(), 1, "39/17 alone");
+
+    // Another mode never answers 39/37.
+    let mut shared = MinigameRuns::new(1).unwrap();
+    shared.offer(spec()).unwrap();
+    assert!(
+        shared
+            .handle_client(&request(37, 1))
+            .unwrap()
+            .card_ticket
+            .is_none()
+    );
+}
+
 #[test]
 fn persisted_counter_never_reuses_ids_and_wrong_instance_is_rejected() {
     let mut runs = MinigameRuns::new(128).unwrap();

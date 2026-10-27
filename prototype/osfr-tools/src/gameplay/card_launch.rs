@@ -1,9 +1,10 @@
 //! T765: Trading Card Game launch glue for `Gameplay`; the run and ticket rules live in
-//! `crate::card_game::Launches`. Play on an admitted card row offers a type-16 run (39/16); the
-//! client starts it (39/5 -> 39/17), its card manager asks for the launch ticket (39/37) and
-//! gets it in 39/0x28; leaving the card window (39/6, then its 39/7 ack) ends the run, and the
-//! generic 26/42 Close sent just before is not the run's (T782). Session-only: nothing here marks
-//! a save.
+//! `crate::card_game::Launches`. Play on an admitted card row offers a type-16 run (39/16, naming
+//! the card asset list); once the client has loaded its card assets its card manager asks for the
+//! launch ticket (39/37) and gets it in 39/0x28, which enables the Start button; the click
+//! (39/5) is answered with 39/17 (T795: the client's order). Leaving the card window (39/6, then
+//! its 39/7 ack) ends the run, and the generic 26/42 Close sent just before is not the run's
+//! (T782). Session-only: nothing here marks a save.
 use super::*;
 
 impl Gameplay {

@@ -1,7 +1,9 @@
 //! T765: a Trading Card Game row with a launch block is admitted and runs the client's type-16
-//! handshake: 39/16 offer, 39/5 -> 39/17 (no Flash launch), 39/37 -> 39/0x28 with a one-time
-//! launch ticket the card login redeems once, 39/6 leave. Packets are shaped like the client's
-//! (`009bdc60`: sub, instance id, -1, -1).
+//! handshake. T795 (client order: `ClientTradingCardGameManager` update `00ad4f50`, dispatcher
+//! `009bf890`): the 39/16 offer carries the card asset list, the client's 39/37 ticket request is
+//! answered while the run is offered with 39/0x28 (a one-time launch ticket the card login
+//! redeems once), the Start click 39/5 is answered with 39/17 (no Flash launch), 39/6 leaves.
+//! Packets are shaped like the client's (`009bdc60`: sub, instance id, -1, -1).
 //! T782: the client's close of the start screen (26/42, then 39/6 and 39/7) through the Gateway.
 use osfr_tools::{
     account_store::AccountRole,
@@ -46,11 +48,15 @@ fn launch_json(ttl_ms: u64) -> Value {
 
 /// `launch_json` loaded through the real loader.
 fn with_launch(ttl_ms: u64) -> std::io::Result<Content> {
+    load(&launch_json(ttl_ms), &ttl_ms.to_string())
+}
+
+fn load(content: &Value, tag: &str) -> std::io::Result<Content> {
     let path = std::env::temp_dir().join(format!(
-        "osfr-card-launch-{}-{ttl_ms}.json",
+        "osfr-card-launch-{}-{tag}.json",
         std::process::id()
     ));
-    fs::write(&path, serde_json::to_vec(&launch_json(ttl_ms)).unwrap()).unwrap();
+    fs::write(&path, serde_json::to_vec(content).unwrap()).unwrap();
     let loaded = Content::load(&path);
     let _ = fs::remove_file(&path);
     loaded
@@ -104,6 +110,30 @@ fn i32_at(packet: &[u8], at: usize) -> i32 {
     i32::from_le_bytes(packet[at..at + 4].try_into().unwrap())
 }
 
+/// The card asset list a 39/16 offer names. Layout (reader `009bdd70`): the 15-byte header, six
+/// i32 (name, icon, description, difficulty, profile, type), the members byte, three 69-byte
+/// reward bundles, the goal count (0 goals here), five flag bytes, then the preload string
+/// (i32 length, bytes).
+fn offer_preload(offer: &[u8]) -> String {
+    let at = 15 + 6 * 4 + 1 + 3 * 69 + 4 + 5;
+    assert_eq!(i32_at(offer, 15 + 5 * 4), 16, "the card game type");
+    let len = i32_at(offer, at) as usize;
+    String::from_utf8(offer[at + 4..at + 4 + len].to_vec()).unwrap()
+}
+
+/// The five flag bytes of a 39/16 offer (`+612..+616` of the client's info struct).
+fn offer_flags(offer: &[u8]) -> [u8; 5] {
+    let at = 15 + 6 * 4 + 1 + 3 * 69 + 4;
+    offer[at..at + 5].try_into().unwrap()
+}
+
+/// The 64-bit ticket a 39/0x28 carries (two i32 halves after the run header, low then high).
+fn ticket_of(packet: &[u8]) -> u64 {
+    assert_eq!((packet[0], packet[2], packet.len()), (39, 0x28, 15 + 8));
+    (u64::from(u32::from_le_bytes(packet[19..23].try_into().unwrap())) << 32)
+        | u64::from(u32::from_le_bytes(packet[15..19].try_into().unwrap()))
+}
+
 fn subs(packets: &[Vec<u8>]) -> Vec<(u8, u8)> {
     packets.iter().map(|p| (p[0], p[2])).collect()
 }
@@ -142,80 +172,166 @@ fn the_type_16_handshake_sends_a_one_time_ticket_in_39_28() {
     let mut launches = Launches::new(cards.launch().unwrap()).unwrap();
     assert!(!launches.is_active());
 
+    // 39/16 names the card asset list: the client starts its loader only for a non-empty one
+    // (`009beb70`), and nothing else makes its Start button ready.
     let offer = launches.begin(row).unwrap();
     assert_eq!(subs(&offer.replies), vec![(39, 16)]);
+    assert_eq!(
+        offer_preload(&offer.replies[0]),
+        "TradingCardGameAssets.txt"
+    );
+    assert_eq!(
+        offer.replies[0].len(),
+        281 + 25,
+        "an empty list is 281 bytes"
+    );
     let instance = i32_at(&offer.replies[0], 3);
     assert_eq!(instance, FIRST_INSTANCE_ID);
     assert!(launches.is_active());
 
-    // A ticket request before the run starts is ignored.
+    // The Start click cannot beat the ticket: 39/17 starts the card DLL with the ticket 39/0x28
+    // stored (`00ad47f0`), so 39/5 is ignored until one was sent.
     let early = launches
-        .route(&client(37, instance), CHARACTER, 1_000)
+        .route(&client(5, instance), CHARACTER, 1_000)
         .unwrap();
-    assert!(!early.accepted && early.replies.is_empty());
+    assert!(!early.accepted && !early.changed && early.replies.is_empty());
 
-    // 39/5 is answered with 39/17 alone: the client hosts the card DLL itself.
-    let start = launches
-        .route(&client(5, instance), CHARACTER, 1_100)
-        .unwrap();
-    assert_eq!(subs(&start.replies), vec![(39, 17)]);
-
-    // Another instance's request is ignored; the run's own gets 39/0x28.
+    // Another instance's request is ignored; the run's own, while it is still offered, gets
+    // 39/0x28.
     let stray = launches
-        .route(&client(37, instance + 1), CHARACTER, 1_200)
+        .route(&client(37, instance + 1), CHARACTER, 1_100)
         .unwrap();
-    assert!(stray.replies.is_empty());
+    assert!(!stray.accepted && stray.replies.is_empty());
     let asked = launches
-        .route(&client(37, instance), CHARACTER, 1_300)
+        .route(&client(37, instance), CHARACTER, 1_200)
         .unwrap();
     assert!(asked.accepted && !asked.changed, "a ticket marks no save");
-    assert_eq!(asked.replies.len(), 1);
+    assert_eq!(subs(&asked.replies), vec![(39, 0x28)]);
     let packet = &asked.replies[0];
-    assert_eq!(packet.len(), 15 + 8, "the run header, then two i32 halves");
-    assert_eq!(
-        (packet[0], packet[2]),
-        (39, 0x28),
-        "TradingCardStartGamePacket"
-    );
     assert_eq!(
         (i32_at(packet, 3), i32_at(packet, 7), i32_at(packet, 11)),
         (instance, -1, row.minigame_id as i32)
     );
-    let low = u32::from_le_bytes(packet[15..19].try_into().unwrap());
-    let high = u32::from_le_bytes(packet[19..23].try_into().unwrap());
-    let ticket = (u64::from(high) << 32) | u64::from(low);
-    assert_ne!(ticket, 0);
+    let first = ticket_of(packet);
+    assert_ne!(first, 0);
 
-    // The card login redeems it once, for this character only.
-    let character = CHARACTER.to_string();
-    assert_eq!(launches.redeem(&ticket.to_string(), "1", 2_000), None);
+    // A repeated request (a second launch in one client session asks again) gets a fresh ticket
+    // that replaces the character's earlier one.
     let again = launches
-        .route(&client(37, instance), CHARACTER, 2_100)
+        .route(&client(37, instance), CHARACTER, 2_000)
         .unwrap();
-    let ticket = {
-        let p = &again.replies[0];
-        (u64::from(u32::from_le_bytes(p[19..23].try_into().unwrap())) << 32)
-            | u64::from(u32::from_le_bytes(p[15..19].try_into().unwrap()))
-    };
+    let second = ticket_of(&again.replies[0]);
+    assert_ne!(second, first);
+    let character = CHARACTER.to_string();
+    assert_eq!(launches.redeem(&first.to_string(), &character, 2_050), None);
+
+    // Start, now that a ticket was sent: 39/17 alone, the client hosts the card DLL itself.
+    let start = launches
+        .route(&client(5, instance), CHARACTER, 2_100)
+        .unwrap();
+    assert_eq!(subs(&start.replies), vec![(39, 17)]);
+
+    // The card login redeems a ticket once, for its own character only: a wrong guess spends it.
+    assert_eq!(launches.redeem(&second.to_string(), "1", 2_200), None);
     assert_eq!(
-        launches.redeem(&ticket.to_string(), &character, 2_200),
+        launches.redeem(&second.to_string(), &character, 2_250),
+        None
+    );
+    let spent = launches
+        .route(&client(37, instance), CHARACTER, 2_300)
+        .unwrap();
+    assert_eq!(
+        subs(&spent.replies),
+        vec![(39, 0x28)],
+        "still answered once started"
+    );
+    let last = ticket_of(&spent.replies[0]);
+    assert_eq!(
+        launches.redeem(&last.to_string(), &character, 2_500),
         Some(CHARACTER)
     );
+    assert_eq!(launches.redeem(&last.to_string(), &character, 2_600), None);
+
+    // A ticket expires after the launch block's lifetime.
+    let late = launches
+        .route(&client(37, instance), CHARACTER, 3_000)
+        .unwrap();
+    let late = ticket_of(&late.replies[0]);
     assert_eq!(
-        launches.redeem(&ticket.to_string(), &character, 2_300),
+        launches.redeem(&late.to_string(), &character, 3_000 + 120_000),
         None
     );
 
     // Leaving the card window ends the run (39/19); later requests are ignored.
     let left = launches
-        .route(&client(6, instance), CHARACTER, 3_000)
+        .route(&client(6, instance), CHARACTER, 4_000)
         .unwrap();
     assert_eq!(subs(&left.replies), vec![(39, 19)]);
     assert!(!launches.is_active());
     let after = launches
-        .route(&client(37, instance), CHARACTER, 3_100)
+        .route(&client(37, instance), CHARACTER, 4_100)
         .unwrap();
     assert!(after.replies.is_empty());
+}
+
+/// The whole order through a production-shaped session, as the client sends it: Play, the
+/// ticket request while the run is offered, the Start click, the window close. The refused early
+/// Start leaves the run where it was.
+#[test]
+fn the_card_start_order_runs_end_to_end_through_the_gateway() {
+    let fixture = launch_fixture();
+    let mut gateway = player(&fixture, 5_064);
+    gateway.set_trace_enabled(true);
+
+    let offered = bodies(&send(&mut gateway, &portal_play(TCG_ROW), 1_000));
+    let offer = offered
+        .iter()
+        .find(|p| p.starts_with(&[39, 0, 16]))
+        .expect("39/16 offer");
+    let instance = i32_at(offer, 3);
+    assert_eq!(offer_preload(offer), "TradingCardGameAssets.txt");
+    // The start screen waits for the Start click, and no end-of-game dialog follows the card
+    // window (`009bf190` reads game bytes `+2311` and `+2312`, set from these flags).
+    assert_eq!(offer_flags(offer), [1, 1, 1, 1, 0]);
+
+    // Start before the ticket: nothing is sent and nothing is saved.
+    let before = gateway.snapshot();
+    let early = send(&mut gateway, &client(5, instance), 1_500);
+    assert!(early.replies.is_empty() && !early.state_changed && !early.gameplay_changed);
+    assert_eq!(gateway.snapshot(), before);
+
+    // The card manager's 39/37, while the run is offered, gets 39/0x28.
+    let asked = send(&mut gateway, &client(37, instance), 2_000);
+    assert_eq!(asked.trace[0].outcome, "handled", "{:?}", asked.trace);
+    let ticket = match bodies(&asked).as_slice() {
+        [packet] => ticket_of(packet),
+        other => panic!("one 39/0x28 expected, got {:?}", subs(other)),
+    };
+    assert_eq!(gateway.snapshot(), before, "a ticket marks no save");
+
+    // 39/5 is answered with 39/17 alone; the run is still the player's (busy).
+    let started = bodies(&send(&mut gateway, &client(5, instance), 2_500));
+    assert_eq!(subs(&started), vec![(39, 17)]);
+    let busy = send(&mut gateway, &portal_play(TCG_ROW), 2_600);
+    assert!(field_battle_fixture::chat_text(&busy).contains("Finish what you are doing"));
+
+    // The card login redeems the ticket in this session, once.
+    let character = 5_064.to_string();
+    let service = gateway.gameplay_mut().unwrap();
+    assert_eq!(
+        service.redeem_card_ticket(&ticket.to_string(), &character, 3_000),
+        Some(5_064)
+    );
+    assert_eq!(
+        service.redeem_card_ticket(&ticket.to_string(), &character, 3_100),
+        None
+    );
+
+    // Closing the card window: 39/6 -> 39/19, then the client's 39/7 ack.
+    let left = bodies(&send(&mut gateway, &client(6, instance), 4_000));
+    assert_eq!(subs(&left), vec![(39, 19)]);
+    let ack = send(&mut gateway, &client(7, instance), 4_010);
+    assert!(ack.replies.is_empty());
 }
 
 #[test]
@@ -329,11 +445,20 @@ fn only_the_cancel_ends_a_card_run_and_only_by_its_own_instance() {
     ] {
         assert!(!launches.owns(&stranger), "{stranger:02x?}");
     }
-    // A cancel for another game, a sub the run does not take, and wrong lengths: ignored or
-    // refused while offered, and again once started.
-    let mut other_game = client(6, instance);
-    other_game[11..15].copy_from_slice(&500i32.to_le_bytes());
-    let ignored = [other_game, client(46, instance), client(14, instance)];
+    // The run's own subs for another game, a sub the run does not take, and wrong lengths:
+    // ignored or refused while offered, and again once started.
+    let other_game = |sub| {
+        let mut packet = client(sub, instance);
+        packet[11..15].copy_from_slice(&500i32.to_le_bytes());
+        packet
+    };
+    let ignored = [
+        other_game(5),
+        other_game(6),
+        other_game(37),
+        client(46, instance),
+        client(14, instance),
+    ];
     let malformed = [
         client(6, instance)[..14].to_vec(),
         [client(6, instance), vec![0]].concat(),
@@ -350,6 +475,14 @@ fn only_the_cancel_ends_a_card_run_and_only_by_its_own_instance() {
         }
         assert!(launches.is_active());
         if !started {
+            // The ignored requests above asked for no ticket, so the Start click still waits.
+            let early = launches
+                .route(&client(5, instance), CHARACTER, 1_050)
+                .unwrap();
+            assert!(!early.accepted && early.replies.is_empty());
+            launches
+                .route(&client(37, instance), CHARACTER, 1_075)
+                .unwrap();
             let start = launches
                 .route(&client(5, instance), CHARACTER, 1_100)
                 .unwrap();
@@ -372,4 +505,23 @@ fn only_the_cancel_ends_a_card_run_and_only_by_its_own_instance() {
         .route(&client(6, instance), CHARACTER, 2_020)
         .unwrap();
     assert!(!repeat.accepted && repeat.replies.is_empty());
+}
+
+/// The card asset list is data with a default, and an empty one is refused: the client starts
+/// its loader only for a non-empty list, so an empty one leaves the start screen on Loading.
+#[test]
+fn the_card_asset_list_is_data_and_never_empty() {
+    let named = |name: &str| {
+        let mut content = launch_json(60_000);
+        content["launch"]["preload_file"] = json!(name);
+        load(&content, &format!("preload-{}", name.len()))
+    };
+    let custom = named("OtherCardAssets.txt").unwrap();
+    let mut launches = Launches::new(custom.launch().unwrap()).unwrap();
+    let offer = launches.begin(custom.row(TCG_ROW).unwrap()).unwrap();
+    assert_eq!(offer_preload(&offer.replies[0]), "OtherCardAssets.txt");
+    for bad in ["", &"x".repeat(65), "Caf\u{e9}.txt"] {
+        let error = named(bad).unwrap_err().to_string();
+        assert!(error.contains("asset list"), "{bad:?}: {error}");
+    }
 }

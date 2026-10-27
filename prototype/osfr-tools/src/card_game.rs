@@ -17,6 +17,14 @@
 //!   (`activity_portal::Refusal`). With one (T765), Play on a Trading Card Game row starts a
 //!   type-16 run (`Launches`) whose 39/37 gets a one-time launch ticket in 39/0x28; Treasure
 //!   War (type 23) stays refused.
+//! * T795, the start order the client's own code follows (`ClientTradingCardGameManager`):
+//!   39/16 (naming the card asset list, which is what starts the client's loader) -> the client
+//!   downloads its card assets and sends 39/37 (`00ad4f50` state 2, `009bf590`), answered while
+//!   the run is still offered with 39/0x28 (slot 25 `00ad32e0`: stores the ticket, enables the
+//!   Start button) -> the Start click 39/5 -> 39/17 (`009b9550` runs `Startup` `00ad47f0` on the
+//!   stored ticket) -> the card window's close, 39/6 -> 39/19, and the client's 39/7. The card
+//!   window's own asset download needs the client's `[AssetDelivery] TcgServerAddress` to answer
+//!   `manifest.crc` (`0109bd00`); `scripts/asset_delivery.py` serves it for the local harness.
 //! * Rows publish entry type 1 (the world tunnel); `server_type` (Legacy's 2, the client tunnel
 //!   `00be78c0`) stays in data for the launch slice.
 //! * The row's MiniGameData link (`minigame_id`) stays in data; no wire field is known to hold it.
@@ -101,11 +109,22 @@ pub struct Launch {
     /// 0 keeps it off, and the card window then reports the service unreachable.
     #[serde(default)]
     pub port: u16,
+    /// T795: the asset list the offer names (default [`PRELOAD_FILE`]); never empty.
+    #[serde(default = "default_preload_file")]
+    pub preload_file: String,
     pub source: Vec<Source>,
+}
+
+fn default_preload_file() -> String {
+    PRELOAD_FILE.to_owned()
 }
 
 /// The client's mini-game type of the DLL card game (`MiniGameTypeData` 16; `00ad47f0`).
 pub const CARD_GAME_TYPE: i32 = 16;
+/// (R) The card asset list the 39/16 offer names: the client manifest's `<Game>Assets.txt`
+/// entry for this game, a client pack entry. `009beb70` starts the client's loader only for a
+/// non-empty name; the list's own contents do not matter to the order.
+pub const PRELOAD_FILE: &str = "TradingCardGameAssets.txt";
 /// (R) Card runs take their own instance range, apart from chess (1), soccer (47,000,001)
 /// and harvesting (58,000,001).
 pub const FIRST_INSTANCE_ID: i32 = 61_000_001;
@@ -116,6 +135,7 @@ pub const FIRST_INSTANCE_ID: i32 = 61_000_001;
 pub struct Launches {
     runs: MinigameRuns,
     tickets: LaunchTickets,
+    preload_file: String,
 }
 
 impl Launches {
@@ -123,6 +143,7 @@ impl Launches {
         Ok(Self {
             runs: MinigameRuns::new(FIRST_INSTANCE_ID)?,
             tickets: LaunchTickets::new(launch.ticket_ttl_ms),
+            preload_file: launch.preload_file.clone(),
         })
     }
 
@@ -137,16 +158,22 @@ impl Launches {
         self.runs.names_run(packet)
     }
 
-    /// Offer the row's run (39/16); the client answers 39/5.
+    /// Offer the row's run (39/16). The card asset list in it starts the client's loader, which
+    /// ends in the client's 39/37 ticket request and then its 39/5 Start click. Flag `+616` is
+    /// off: the card window owns the result, so 39/19 must not open an empty end-of-game dialog
+    /// (`009bf190`) (R).
     pub fn begin(&mut self, row: &Row) -> io::Result<RunOutcome> {
         let game_id = i32::try_from(row.minigame_id)
             .map_err(|_| invalid("card mini-game id is out of range"))?;
-        self.runs
-            .offer(RunSpec::empty(game_id, CARD_GAME_TYPE, RunMode::CardClient))
+        let mut spec = RunSpec::empty(game_id, CARD_GAME_TYPE, RunMode::CardClient);
+        spec.preload_file.clone_from(&self.preload_file);
+        spec.flags[4] = 0;
+        self.runs.offer(spec)
     }
 
-    /// The run's lifecycle packets (39/5 start, 39/6 leave, 39/7 ack). A 39/37 mints the
-    /// character's launch ticket and answers 39/0x28.
+    /// The run's lifecycle packets (39/5 start, 39/6 leave, 39/7 ack). A 39/37, while the run is
+    /// offered or later, mints the character's launch ticket and answers 39/0x28; the Start
+    /// click is refused until one was sent.
     pub fn route(&mut self, packet: &[u8], character: u64, now_ms: u64) -> io::Result<RunOutcome> {
         let mut outcome = self.runs.handle_client(packet)?;
         if let Some(request) = outcome.card_ticket {
@@ -199,10 +226,11 @@ impl Content {
             if ![TRADING_CARD_CATEGORY, TREASURE_WAR_CATEGORY].contains(&row.category) {
                 return Err(invalid("card game rows are category 11 or 26"));
             }
-            for name in [&row.detail_image, &row.thumbnail_image] {
-                if name.is_empty() || name.len() > MAX_IMAGE_NAME || !name.is_ascii() {
-                    return Err(invalid("card game image names are 1 to 64 ASCII bytes"));
-                }
+            if ![&row.detail_image, &row.thumbnail_image]
+                .into_iter()
+                .all(|name| is_name(name))
+            {
+                return Err(invalid("card game image names are 1 to 64 ASCII bytes"));
             }
             if row.source.is_empty() {
                 return Err(invalid("card game rows need a source"));
@@ -222,6 +250,14 @@ impl Content {
             return Err(invalid(
                 "card launch ticket lifetime is 1 s to 10 min, with a source",
             ));
+        }
+        // An empty list never starts the client's loader: the start screen stays on "Loading...".
+        if self
+            .launch
+            .as_ref()
+            .is_some_and(|launch| !is_name(&launch.preload_file))
+        {
+            return Err(invalid("card launch asset list is 1 to 64 ASCII bytes"));
         }
         Ok(())
     }
@@ -258,6 +294,10 @@ impl Content {
             })
             .collect()
     }
+}
+
+fn is_name(name: &str) -> bool {
+    !name.is_empty() && name.len() <= MAX_IMAGE_NAME && name.is_ascii()
 }
 
 fn invalid(message: &str) -> io::Error {

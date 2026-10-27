@@ -8,7 +8,7 @@ import unittest
 import zlib
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
-from asset_delivery import AssetDelivery
+from asset_delivery import AssetDelivery, baseline_ini, manifest_crc_body, manifest_wire
 
 
 class AssetDeliveryTests(unittest.TestCase):
@@ -82,6 +82,33 @@ class AssetDeliveryTests(unittest.TestCase):
         (self.cache / 'index.json').write_text(json.dumps(doc))
         with self.assertRaises(ValueError):
             AssetDelivery(self.root, self.manifest)
+
+
+class CardAssetSetTests(unittest.TestCase):
+    """The card window's own asset set (`TcgServerAddress`) is answered by the harness server."""
+
+    CONFIG = (
+        '[Network]\nServer=old.example:1\n[AssetDelivery]\n'
+        'IndirectServerAddress=http://assets.example/assets\n'
+        'TcgServerAddress=http://patch.example/freerealmstcg/live/client\n'
+        '[Portrait]\nUploadUrl=http://portrait.example/upload\n[CrashReporter]\nAddress=lvsadp-x.example\n'
+    )
+
+    def test_card_assets_point_at_the_harness_server_and_every_other_url_stays_offline(self):
+        lines = baseline_ini(self.CONFIG, '127.0.0.1:4000', 'http://127.0.0.1:5000/').splitlines()
+        self.assertIn('Server=127.0.0.1:4000', lines)
+        self.assertIn('IndirectServerAddress=http://127.0.0.1:5000/', lines)
+        self.assertIn('TcgServerAddress=http://127.0.0.1:5000/tcg', lines)
+        self.assertIn('UploadUrl=http://127.0.0.1:9/', lines)
+        self.assertIn('Address=127.0.0.1', lines)
+
+    def test_manifest_crc_is_the_raw_manifest_crc_and_length_the_client_compares_locally(self):
+        manifest = b'a.dat.z,1,2\r\nb.dat.z,3,4\r\n'
+        crc, length = manifest_crc_body(manifest).decode('ascii').strip().split(',')
+        self.assertEqual((int(crc), int(length)), (zlib.crc32(manifest), len(manifest)))
+        magic, raw_length = struct.unpack('>II', manifest_wire(manifest)[:8])
+        self.assertEqual((magic, raw_length), (0xA1B2C3D4, len(manifest)))
+        self.assertEqual(zlib.decompress(manifest_wire(manifest)[8:]), manifest)
 
 
 if __name__ == '__main__':
