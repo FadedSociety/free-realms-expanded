@@ -19,6 +19,7 @@ const CRAB_ITEM: i32 = 7885;
 #[derive(Debug)]
 struct Record {
     id: u32,
+    sex_04: bool,
     icon_08: u32,
     members_30: bool,
     tricks_34: Vec<[u32; 9]>,
@@ -52,7 +53,7 @@ impl Reader<'_> {
     /// `00912cf0`, field by field.
     fn record(&mut self) -> Record {
         let id = self.u32();
-        let _sex_04 = self.u8();
+        let sex_04 = self.u8() != 0;
         let icon_08 = self.u32();
         for _ in 0..4 {
             self.u32(); // needs +0x20..+0x2c
@@ -88,6 +89,7 @@ impl Reader<'_> {
         }
         Record {
             id,
+            sex_04,
             icon_08,
             members_30,
             tricks_34,
@@ -240,6 +242,15 @@ fn a_crab_record_is_vanity_with_no_tricks() {
     let (_, record) = adopt(CRAB_ITEM, 0);
     assert!(record.vanity_104);
     assert!(record.tricks_34.is_empty());
+}
+
+/// F767: the sex column is the client's bool: Models.txt GENDER 2 (female) is true, 1 (male) and
+/// none false. York (item 23930, model 364) is the recorded sample's female pet.
+#[test]
+fn the_sex_column_is_true_only_for_a_female_model() {
+    assert!(!adopt(CHAR_ITEM, 0).1.sex_04, "Char, model 1756, GENDER 1");
+    assert!(!adopt(CRAB_ITEM, 0).1.sex_04, "Crab, model 1667, no GENDER");
+    assert!(adopt(23_930, 0).1.sex_04, "York, model 364, GENDER 2");
 }
 
 #[test]

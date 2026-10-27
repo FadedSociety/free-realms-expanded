@@ -2768,8 +2768,13 @@ impl Gameplay {
                     say(out, "Usage: realm give <item id> [count]".into());
                     return Ok(true);
                 };
+                let before = self.inventory.state().clone();
                 match self.grant_reward(0, &[(item, count.clamp(1, 999))], out) {
-                    Ok(()) => say(out, format!("Gave {count} x item {item}.")),
+                    // T772: a pet item becomes a pet at once.
+                    Ok(()) => {
+                        self.adopt_gained_pets(&before, now_ms, out)?;
+                        say(out, format!("Gave {count} x item {item}."));
+                    }
                     Err(error) => say(out, format!("Could not give item {item}: {error}")),
                 }
             }

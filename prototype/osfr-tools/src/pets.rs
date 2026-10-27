@@ -1083,9 +1083,14 @@ impl PetService {
         if item.definition_id != item_definition_id {
             return Err(invalid("owned item is not this pet's adoption item"));
         }
+        let item_tint = item.tint;
         let mut next = self.roster.clone();
         let id = next.next_pet_id;
         insert_pet(&self.content, &mut next, definition, now)?;
+        // F767: the owned unit is the tint's source, so every adoption path keeps it.
+        if let Some(pet) = next.pets.last_mut() {
+            pet.tint = (item_tint != 0).then_some(item_tint);
+        }
         validate_roster(&self.content, &next)?;
         let mut next_inventory = inventory.clone();
         let consumed = next_inventory.consume(item_instance_id, 1)?;
@@ -1095,6 +1100,64 @@ impl PetService {
         self.roster = next;
         *inventory = next_inventory;
         Ok((id, consumed.replies))
+    }
+
+    /// T772: how many more pets the roster holds.
+    pub fn room(&self) -> usize {
+        MAX_PETS.saturating_sub(self.roster.pets.len())
+    }
+
+    /// T772: adoption items gained since `before` become pets at once. The original created the
+    /// pet at purchase; here the bag hides category-200 rows (`00a6d9b0`) and the Pets window
+    /// reads only the 53/5 roster (`00b596f0`). Each unit is consumed as it is adopted; units
+    /// past the roster's room stay owned (R). Returns the inventory replies and the 53/5 roster,
+    /// or nothing when no pet was adopted.
+    pub fn adopt_gained(
+        &mut self,
+        before: &InventoryState,
+        inventory: &mut Inventory,
+        now: u64,
+    ) -> io::Result<Vec<Vec<u8>>> {
+        let units = |state: &InventoryState, definition: i32| -> u32 {
+            state
+                .items
+                .iter()
+                .filter(|item| item.definition_id == definition)
+                .map(|item| item.count)
+                .sum()
+        };
+        let held: BTreeSet<i32> = inventory
+            .state()
+            .items
+            .iter()
+            .map(|i| i.definition_id)
+            .collect();
+        let mut replies = Vec::new();
+        for item_definition in held {
+            let gained = units(inventory.state(), item_definition)
+                .saturating_sub(units(before, item_definition));
+            let Some(mut definition) = self.content.definition_for_item(item_definition) else {
+                continue;
+            };
+            definition.adoption_item_definition_id = Some(item_definition);
+            for _ in 0..gained.min(self.room() as u32) {
+                let instance = inventory
+                    .state()
+                    .items
+                    .iter()
+                    .filter(|item| item.definition_id == item_definition)
+                    .map(|item| item.id)
+                    .max()
+                    .ok_or_else(|| invalid("a gained pet item is not owned"))?;
+                let (_, adopted) =
+                    self.adopt_with_replies(inventory, instance, &definition, now)?;
+                replies.extend(adopted);
+            }
+        }
+        if !replies.is_empty() {
+            replies.push(self.list_packet());
+        }
+        Ok(replies)
     }
 
     /// (R) A vendor/reward grant creates a pet directly; grant ids deduplicate retries.
@@ -1471,13 +1534,6 @@ impl PetService {
             Ok((transition, inventory_replies)) => {
                 *self = next;
                 *inventory = next_inventory;
-                // T456: a pet adopted from a tinted item keeps that tint in its record.
-                let adopted = self.active.map(|active| active.pet_id);
-                if let Some(pet) = self.roster.pets.iter_mut().find(|p| Some(p.id) == adopted) {
-                    if pet.tint.is_none() && tint != 0 {
-                        pet.tint = i32::try_from(tint).ok();
-                    }
-                }
                 // Actor creation precedes both the roster (whose trailing active
                 // pair activates the pet) and the explicit activation.
                 let mut wire = self.wire(transition.clone());
@@ -2309,8 +2365,9 @@ fn append_pet_record(out: &mut Vec<u8>, pet: &Pet, content: &PetContent) {
         .find(|species| species.species_id == Some(pet.species_id))
         .and_then(|species| species.icon.as_ref());
     put_u32(out, pet.id);
-    // (R) The client column is the sex; the model's Models.txt GENDER value fills it.
-    out.push(model.and_then(|m| m.gender).map_or(0, |g| g as u8));
+    // The sex column is a bool (`00912cf0` stores `value != 0`, shown as "0"/"1"); Models.txt
+    // GENDER 2 (female) is true, as in the recorded sample (model 364), and 1 or none false (F767).
+    out.push(u8::from(model.and_then(|m| m.gender) == Some(2)));
     put_u32(out, model.and_then(|m| m.icon_id).unwrap_or(0) as u32);
     for value in [
         pet.needs.food,

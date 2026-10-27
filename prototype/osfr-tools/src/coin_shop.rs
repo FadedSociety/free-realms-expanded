@@ -235,6 +235,9 @@ pub struct CoinShop {
     /// coin store refuses it; a later pets-content binding makes the row sellable with no code
     /// change.
     pet_items: BTreeSet<i32>,
+    /// T772: how many more pets the session's roster holds; a bought pet item is adopted at once,
+    /// so a buy of more is refused before money moves. Unlimited until the session sets it.
+    pet_room: usize,
     vendor_transactions: BTreeMap<u32, (u32, Vec<u8>)>,
     sales: VecDeque<SaleRecord>,
     next_transaction_id: u32,
@@ -306,6 +309,7 @@ impl CoinShop {
             // `load` fills this from the NPC content; `new` alone keeps earning off.
             sc_earn: None,
             pet_items,
+            pet_room: usize::MAX,
             vendor_transactions: BTreeMap::new(),
             sales: VecDeque::new(),
             next_transaction_id: 1,
@@ -352,6 +356,11 @@ impl CoinShop {
     /// since the shop was created must not be lost or ignored on a purchase.
     pub fn sync_inventory(&mut self, inventory: Inventory) {
         self.inventory = inventory;
+    }
+
+    /// T772: the session's free pet roster slots, set beside `sync_inventory` before a buy.
+    pub fn sync_pet_room(&mut self, room: usize) {
+        self.pet_room = room;
     }
 
     pub fn set_member_status(&mut self, is_member: bool) {
@@ -557,7 +566,10 @@ impl CoinShop {
                 merchant_id,
             ));
         }
-        if quantity == 0 || quantity > i32::MAX as u32 {
+        // T772: a bought pet item becomes a pet at once, so more than the roster holds is refused
+        // like any impossible quantity, before money moves.
+        let over_roster = self.pet_items.contains(&item_id) && quantity as usize > self.pet_room;
+        if quantity == 0 || quantity > i32::MAX as u32 || over_roster {
             return Ok(self.failure(
                 1,
                 RESULT_INVALID_QUANTITY,

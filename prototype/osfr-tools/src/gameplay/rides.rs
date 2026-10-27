@@ -261,6 +261,22 @@ impl Gameplay {
         Ok(wire.map(Self::pet_outcome))
     }
 
+    /// T772: pet adoption items this transaction added (a coin buy, a grant) become pets at once,
+    /// with the 53/5 roster after them.
+    pub(super) fn adopt_gained_pets(
+        &mut self,
+        before: &crate::inventory::InventoryState,
+        now_ms: u64,
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        let replies = self
+            .pets
+            .adopt_gained(before, &mut self.inventory, now_ms / 1_000)?;
+        out.changed |= !replies.is_empty();
+        out.replies.extend(replies);
+        Ok(())
+    }
+
     /// T455: the summoned pet follows its owner after an accepted owner move or a world tick.
     /// Frames go to the owner (replies) and to viewers (nearby); a follow step never saves.
     pub(super) fn follow_pet(

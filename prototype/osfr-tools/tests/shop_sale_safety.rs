@@ -301,7 +301,75 @@ fn a_pet_item_bound_by_pets_content_is_sold() {
     assert_eq!(done[0].definition, BOUND_PET);
     assert_eq!(done[0].price, 432);
     assert_eq!(inventory_of(&gateway).coins, 1_000 - 432);
-    assert_eq!(count_definition(&inventory_of(&gateway), BOUND_PET), 1);
+    // T772: the bought item is adopted at once: a pet in the roster (and its 53/5), none in the bag.
+    assert_eq!(count_definition(&inventory_of(&gateway), BOUND_PET), 0);
+    assert_adopted(&gateway, &replies, 1);
+}
+
+/// T772: the saved roster's pets, from the gateway's save document.
+fn roster(gateway: &Gateway) -> Vec<Value> {
+    gateway
+        .snapshot()
+        .pets
+        .and_then(|document| document["pets"].as_array().cloned())
+        .unwrap_or_default()
+}
+
+/// T772: `count` pets adopted from `BOUND_PET`, and the reply carried the 53/5 roster.
+fn assert_adopted(gateway: &Gateway, replies: &[Vec<u8>], count: usize) {
+    let pets = roster(gateway);
+    assert_eq!(pets.len(), count, "the roster holds every bought pet");
+    assert!(
+        pets.iter()
+            .all(|pet| pet["adoption_item_definition_id"] == BOUND_PET),
+        "each pet records the item it was adopted from"
+    );
+    assert!(
+        replies.iter().any(|p| p.starts_with(&[53, 0, 5])),
+        "the Pets window gets the 53/5 roster at once"
+    );
+}
+
+#[test]
+fn a_pet_item_bought_through_the_66_43_vendor_buy_is_adopted() {
+    let fixture = gloria_fixture("t772-66-43");
+    fixture.stock_price_coins(&[(BOUND_PET, 432)]);
+    let mut gateway = connect(&fixture, fixture.state(1_000, false));
+    open_shop(&fixture, &mut gateway);
+    let (replies, outcome) = handled(&mut gateway, &vendor_buy_packet(7, BOUND_PET, 1));
+    assert!(
+        outcome.gameplay_changed,
+        "the adoption is saved with the buy"
+    );
+    assert_eq!(inventory_of(&gateway).coins, 1_000 - 432);
+    assert_eq!(count_definition(&inventory_of(&gateway), BOUND_PET), 0);
+    assert_adopted(&gateway, &replies, 1);
+}
+
+#[test]
+fn a_full_roster_refuses_a_pet_buy_before_money_moves() {
+    let fixture = gloria_fixture("t772-full");
+    fixture.stock_price_coins(&[(BOUND_PET, 10)]);
+    let mut gateway = connect(&fixture, fixture.state(10_000, false));
+    open_shop(&fixture, &mut gateway);
+    // Fill the roster (50 pets) through the real buy.
+    for n in 0..50 {
+        let (replies, _) = handled(&mut gateway, &buy_165_4(n, BOUND_PET));
+        assert_eq!(
+            completions(&replies)[0].result,
+            coin_shop::RESULT_SUCCESS,
+            "buy {n}"
+        );
+    }
+    assert_eq!(roster(&gateway).len(), 50);
+    let before = gateway.snapshot();
+    let (replies, outcome) = handled(&mut gateway, &buy_165_4(99, BOUND_PET));
+    let done = completions(&replies);
+    assert_eq!(done[0].result, coin_shop::RESULT_INVALID_QUANTITY);
+    assert!(!outcome.gameplay_changed && !outcome.state_changed);
+    assert_unchanged(&gateway, &before, "full roster");
+    assert_eq!(inventory_of(&gateway).coins, 10_000 - 50 * 10);
+    assert_eq!(count_definition(&inventory_of(&gateway), BOUND_PET), 0);
 }
 
 #[test]
