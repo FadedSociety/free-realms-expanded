@@ -8,6 +8,7 @@ use crate::{
     abilities::{build_effect_tag, effect_packets::encode_remove_effect_tag},
     inventory::{Inventory, InventoryState},
     startup_world, world,
+    world_events::piece_052,
 };
 use serde::{Deserialize, Serialize};
 use std::{
@@ -71,6 +72,8 @@ pub struct PetContent {
     definition_gap: DefinitionGap,
     names: PetNameParts,
     tricks: Vec<PetTrickDefinition>,
+    /// T797: every client item definition with `Type` 4 (the pet kit) in its care-panel slot, with the
+    /// client locale name and `Param2`; the care path accepts only items recorded here.
     care_items: Vec<PetCareItem>,
     need_policy: NeedPolicy,
     movement_speed: MovementSpeed,
@@ -104,6 +107,11 @@ pub struct PetContent {
 struct CareTiming {
     feed_effect_ms: u64,
     feed_end_ms: u64,
+    /// T797: the animation the pet actor plays when the food is applied. The client's 53/20
+    /// begin only fires its `PetsHandler:BeginInteraction` event (`00b5ce60` case 20 kind 1);
+    /// the server orders the eat animation itself, as grooming orders its dry-off. 5507 is the
+    /// client `Resources/AnimationTypes.xml` slot `pet_feed`.
+    feed_animation: i32,
     status_interval_ms: u64,
     status_epsilon: f32,
     /// T488: the grooming session and petting rules; without them 53/18 is refused and 53/22
@@ -123,6 +131,7 @@ impl CareTiming {
     fn valid(&self) -> bool {
         self.feed_effect_ms <= self.feed_end_ms
             && (1..=60_000).contains(&self.feed_end_ms)
+            && (1..=4_000_000).contains(&self.feed_animation)
             && (100..=60_000).contains(&self.status_interval_ms)
             && self.status_epsilon.is_finite()
             && (0.01..=50.0).contains(&self.status_epsilon)
@@ -411,16 +420,65 @@ struct PetTrickDefinition {
     source: Vec<SourceTag>,
 }
 
+/// T797: one client pet kit item (`data/content/pets.json` `care_items`): a type-4 inventory
+/// definition in one of the client care-panel slots. A row copies the client definition's `Slot`
+/// and `Param2` and the client locale text at `name_id`; the slot decides the panel tab, the
+/// action and whether the care path spends the item, so a new slot needs a decision in
+/// [`KitRole`] rather than another flag on this row.
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(deny_unknown_fields)]
 struct PetCareItem {
     definition_id: i32,
+    /// The client locale id the client displays for the item.
+    name_id: i32,
+    /// The client locale text at `name_id`, verbatim (52 kit names carry the client's
+    /// `{n}Name{pl="Plural"}` markup).
     label: String,
-    action: String,
-    need: String,
+    /// The client item definition `Slot` field (200..206); the utility slot is this minus 199
+    /// (`00c077a0`).
+    slot: i32,
+    /// The client item definition `Param2` (only foods use it: the need points one food
+    /// restores). Kept as the client value; a food's must be positive.
     restore: f32,
-    consumes: bool,
-    source: Vec<SourceTag>,
+    /// Where the row came from (client item definition row and locale id).
+    src: String,
+}
+
+/// T797: the client care-panel slots, named by the panel tab each one fills
+/// (`BaseClient.PetInventory` data sources `ShampooData`, `ConditionerData`, `BrushData`,
+/// `FoodBowlData`, `FoodData` and `VitaminData`; locale 17765/17766/17767 name the food-bowl,
+/// food and vitamin tabs). The slot is the client item definition's `Slot` field. The bowl is
+/// the feed's prerequisite and the brush the grooming session's; neither is spent. A food raises
+/// the food need, the grooming kit (and vitamins, per the client text at locale 35839) the groom
+/// need; vitamins' own action is not routed yet (R).
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+enum KitRole {
+    Shampoo,
+    Conditioner,
+    Brush,
+    Bowl,
+    Food,
+    Vitamin,
+}
+
+impl KitRole {
+    fn from_slot(slot: i32) -> Option<Self> {
+        match slot {
+            200 => Some(Self::Shampoo),
+            201 => Some(Self::Conditioner),
+            203 => Some(Self::Brush),
+            204 => Some(Self::Bowl),
+            205 => Some(Self::Food),
+            206 => Some(Self::Vitamin),
+            _ => None,
+        }
+    }
+}
+
+impl PetCareItem {
+    fn role(&self) -> Option<KitRole> {
+        KitRole::from_slot(self.slot)
+    }
 }
 
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
@@ -684,16 +742,19 @@ impl PetContent {
         }
         let mut item_ids = BTreeSet::new();
         for item in &self.care_items {
+            let role = item.role();
             if item.definition_id <= 0
-                || !item.consumes
+                || item.name_id <= 0
+                || item.label.is_empty()
+                || item.label.chars().count() > 200
+                || item.label.chars().any(char::is_control)
+                || role.is_none()
                 || !item.restore.is_finite()
                 || !(0.0..=MAX_CARE_RESTORE).contains(&item.restore)
-                || !matches!(
-                    (item.action.as_str(), item.need.as_str()),
-                    ("feed", "food") | ("groom", "groom") | ("play", "play")
-                )
+                // Only a food's Param2 is applied; a food with no restore would be a no-op.
+                || (role == Some(KitRole::Food) && item.restore <= 0.0)
+                || item.src.is_empty()
                 || !item_ids.insert(item.definition_id)
-                || item.source.is_empty()
             {
                 return Err(invalid("invalid pet care item"));
             }
@@ -2112,7 +2173,9 @@ impl PetService {
     }
 
     /// The fitted food a feed would eat: the pet summoned and not vanity (R), the owner not in
-    /// water or busy, no feed running, a bowl in slot 5 and a configured food in slot 6.
+    /// water or busy, no feed running, a recorded bowl in slot 5 and a recorded food in slot 6.
+    /// T797: both must be client kit rows in their slot, so a stale save that left some other
+    /// item in a utility slot cannot feed it.
     fn feedable(&self, pet_id: u32, inventory: &Inventory, busy: PetBusy) -> Option<i32> {
         let active = self.active.filter(|active| active.pet_id == pet_id)?;
         if self.content.care.is_none()
@@ -2130,23 +2193,27 @@ impl PetService {
         {
             return None;
         }
-        fitted_item(pet, inventory, BOWL_SLOT)?;
+        let bowl = fitted_item(pet, inventory, BOWL_SLOT)?;
+        self.is_kit(bowl.definition_id, KitRole::Bowl)
+            .then_some(())?;
         let food = fitted_item(pet, inventory, FOOD_SLOT)?;
-        self.is_care(food.definition_id, "feed").then_some(food.id)
+        self.is_kit(food.definition_id, KitRole::Food)
+            .then_some(food.id)
     }
 
-    /// Whether `definition_id` is a configured care consumable for `action` ("feed" or "groom").
-    fn is_care(&self, definition_id: i32, action: &str) -> bool {
+    /// Whether `definition_id` is a recorded kit item of `role`.
+    fn is_kit(&self, definition_id: i32, role: KitRole) -> bool {
         self.content
             .care_items
             .iter()
-            .any(|rule| rule.definition_id == definition_id && rule.action == action)
+            .any(|rule| rule.definition_id == definition_id && rule.role() == Some(role))
     }
 
     /// T485: the summoned pet's care on the world tick. A feed applies at `feed_effect_ms` (one
-    /// food consumed through `care`, `changed` set) and ends with 53/20 kind 2 at
-    /// `feed_end_ms`. T488: a grooming session that ran out its time ends here with its final
-    /// needs, the dry-off animation and 53/20 kind 4 (`changed`, the gains are saved). Live needs:
+    /// food consumed through `care`, the client's `pet_feed` animation ordered, `changed` set) and
+    /// ends with 53/20 kind 2 at `feed_end_ms`. T488: a grooming session that ran out its time
+    /// ends here with its final needs, the dry-off animation and 53/20 kind 4 (`changed`, the
+    /// gains are saved). Live needs:
     /// a decayed view (the roster is not written) goes out as 53/3
     /// once it moved by `status_epsilon` and `status_interval_ms` has passed. T531: a settled pet's
     /// idle animations and its thought bubbles ride the same tick (`idle_tick`). F778: an apply that
@@ -2175,6 +2242,14 @@ impl PetService {
                 ) {
                     wire.private.extend(outcome.inventory_replies);
                     wire.private.push(outcome.pet_status_packet);
+                    // T797: the 53/20 begin only fires the client's own
+                    // `PetsHandler:BeginInteraction` (`00b5ce60` case 20 kind 1), so the server
+                    // orders the eat animation with the apply, like grooming's dry-off. It goes
+                    // to the owner and to the viewers of the pet actor.
+                    let eat =
+                        piece_052::animation_packet(active.actor_guid, care.feed_animation, false);
+                    wire.private.push(eat.clone());
+                    wire.shared.push(eat);
                     wire.changed = true;
                     // F778: the last unit clears its fitted slot in `care` (`spend_one`); the
                     // care panel still shows the food the 53/16 echo told it about (`00b5ce60`
@@ -2456,8 +2531,9 @@ impl PetService {
         Ok(())
     }
 
-    /// Consume exactly one configured care item through Inventory's
-    /// staged transaction, then return the client-shaped status update.
+    /// Consume exactly one recorded food through Inventory's staged transaction, then return the
+    /// client-shaped status update. T797: the row is a kit item in the client food slot, and the
+    /// client `Param2` restore applies to the food need.
     pub fn care(
         &mut self,
         pet_id: u32,
@@ -2492,9 +2568,10 @@ impl PetService {
             .content
             .care_items
             .iter()
-            .find(|rule| rule.definition_id == item.definition_id && rule.consumes)
-            .ok_or_else(|| invalid("item is not a configured pet care consumable"))?;
-        let need = parse_need(&rule.need)?;
+            .find(|rule| rule.definition_id == item.definition_id)
+            .filter(|rule| rule.role() == Some(KitRole::Food))
+            .ok_or_else(|| invalid("item is not a recorded pet food"))?;
+        let need = Need::Food;
         let mut next_roster = self.roster.clone();
         advance_roster(
             &self.content.need_policy,
@@ -2759,15 +2836,6 @@ fn valid_model(model: &str) -> bool {
 
 fn valid_name_or_empty(name: &str) -> bool {
     name.is_empty() || validate_name(name).is_ok()
-}
-
-fn parse_need(value: &str) -> io::Result<Need> {
-    match value {
-        "food" => Ok(Need::Food),
-        "groom" => Ok(Need::Groom),
-        "play" => Ok(Need::Play),
-        _ => Err(invalid("unknown pet need")),
-    }
 }
 
 fn add_need(needs: &mut PetNeeds, which: Need, amount: f32, maximum: f32) {

@@ -3016,70 +3016,1364 @@
   ],
   "care_items": [
     {
-      "action": "feed",
+      "definition_id": 8,
+      "name_id": 2252,
+      "label": "Red Bones Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 8 (Type 4, Slot 204, Cost 15, Param2 0); locale 2252"
+    },
+    {
+      "definition_id": 9,
+      "name_id": 2256,
+      "label": "Green Bones Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 9 (Type 4, Slot 204, Cost 15, Param2 0); locale 2256"
+    },
+    {
+      "definition_id": 10,
+      "name_id": 2254,
+      "label": "Blue Bones Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10 (Type 4, Slot 204, Cost 15, Param2 0); locale 2254"
+    },
+    {
+      "definition_id": 11,
+      "name_id": 20241,
+      "label": "Yellow Bones Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 11 (Type 4, Slot 204, Cost 15, Param2 0); locale 20241"
+    },
+    {
+      "definition_id": 12,
+      "name_id": 2255,
+      "label": "Purple Bones Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 12 (Type 4, Slot 204, Cost 15, Param2 0); locale 2255"
+    },
+    {
+      "definition_id": 13,
+      "name_id": 2253,
+      "label": "Pink Bones Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 13 (Type 4, Slot 204, Cost 15, Param2 0); locale 2253"
+    },
+    {
+      "definition_id": 14,
+      "name_id": 2258,
+      "label": "Red Daisies Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 14 (Type 4, Slot 204, Cost 15, Param2 0); locale 2258"
+    },
+    {
+      "definition_id": 15,
+      "name_id": 2259,
+      "label": "Green Daisies Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 15 (Type 4, Slot 204, Cost 15, Param2 0); locale 2259"
+    },
+    {
+      "definition_id": 16,
+      "name_id": 2257,
+      "label": "Blue Daisies Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 16 (Type 4, Slot 204, Cost 15, Param2 0); locale 2257"
+    },
+    {
+      "definition_id": 17,
+      "name_id": 2260,
+      "label": "Yellow Daisies Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 17 (Type 4, Slot 204, Cost 15, Param2 0); locale 2260"
+    },
+    {
+      "definition_id": 18,
+      "name_id": 20242,
+      "label": "Purple Daisies Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 18 (Type 4, Slot 204, Cost 15, Param2 0); locale 20242"
+    },
+    {
+      "definition_id": 19,
+      "name_id": 2261,
+      "label": "Pink Daisies Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 19 (Type 4, Slot 204, Cost 15, Param2 0); locale 2261"
+    },
+    {
+      "definition_id": 20,
+      "name_id": 156,
+      "label": "Red Paws Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 20 (Type 4, Slot 204, Cost 15, Param2 0); locale 156"
+    },
+    {
+      "definition_id": 21,
+      "name_id": 2265,
+      "label": "Green Paws Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 21 (Type 4, Slot 204, Cost 15, Param2 0); locale 2265"
+    },
+    {
+      "definition_id": 22,
+      "name_id": 2264,
+      "label": "Blue Paws Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 22 (Type 4, Slot 204, Cost 15, Param2 0); locale 2264"
+    },
+    {
+      "definition_id": 23,
+      "name_id": 2263,
+      "label": "Yellow Paws Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 23 (Type 4, Slot 204, Cost 15, Param2 0); locale 2263"
+    },
+    {
+      "definition_id": 24,
+      "name_id": 2262,
+      "label": "Purple Paws Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 24 (Type 4, Slot 204, Cost 15, Param2 0); locale 2262"
+    },
+    {
+      "definition_id": 25,
+      "name_id": 2266,
+      "label": "Pink Paws Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 25 (Type 4, Slot 204, Cost 15, Param2 0); locale 2266"
+    },
+    {
+      "definition_id": 26,
+      "name_id": 2268,
+      "label": "Red Stars Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 26 (Type 4, Slot 204, Cost 15, Param2 0); locale 2268"
+    },
+    {
+      "definition_id": 27,
+      "name_id": 2267,
+      "label": "Green Stars Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 27 (Type 4, Slot 204, Cost 15, Param2 0); locale 2267"
+    },
+    {
+      "definition_id": 28,
+      "name_id": 157,
+      "label": "Blue Stars Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 28 (Type 4, Slot 204, Cost 15, Param2 0); locale 157"
+    },
+    {
+      "definition_id": 29,
+      "name_id": 2269,
+      "label": "Yellow Stars Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 29 (Type 4, Slot 204, Cost 15, Param2 0); locale 2269"
+    },
+    {
+      "definition_id": 900,
+      "name_id": 2271,
+      "label": "Purple Stars Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 900 (Type 4, Slot 204, Cost 15, Param2 0); locale 2271"
+    },
+    {
+      "definition_id": 901,
+      "name_id": 2270,
+      "label": "Pink Stars Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 901 (Type 4, Slot 204, Cost 15, Param2 0); locale 2270"
+    },
+    {
+      "definition_id": 902,
+      "name_id": 20243,
+      "label": "Dry Food",
+      "slot": 205,
+      "restore": 100.0,
+      "src": "T797 ClientItemDefinitions.json Id 902 (Type 4, Slot 205, Cost 0, Param2 100); locale 20243"
+    },
+    {
+      "definition_id": 903,
+      "name_id": 20244,
+      "label": "Canned Food",
+      "slot": 205,
+      "restore": 150.0,
+      "src": "T797 ClientItemDefinitions.json Id 903 (Type 4, Slot 205, Cost 0, Param2 150); locale 20244"
+    },
+    {
+      "definition_id": 904,
+      "name_id": 20245,
+      "label": "{n}Pet Plus Vitamins{pl=\"Pet Plus Vitamins\"}",
+      "slot": 206,
+      "restore": 25.0,
+      "src": "T797 ClientItemDefinitions.json Id 904 (Type 4, Slot 206, Cost 0, Param2 25); locale 20245"
+    },
+    {
+      "definition_id": 905,
+      "name_id": 20246,
+      "label": "{n}Dogaroo Vitamins{pl=\"Dogaroo Vitamins\"}",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 905 (Type 4, Slot 206, Cost 0, Param2 50); locale 20246"
+    },
+    {
+      "definition_id": 906,
+      "name_id": 20248,
+      "label": "Regular Conditioner Bottle",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 906 (Type 4, Slot 201, Cost 0, Param2 0); locale 20248"
+    },
+    {
+      "definition_id": 907,
+      "name_id": 20249,
+      "label": "Scented Conditioner Bottle",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 907 (Type 4, Slot 201, Cost 0, Param2 0); locale 20249"
+    },
+    {
+      "definition_id": 908,
+      "name_id": 20250,
+      "label": "{n}Natural Oatmeal Shampoo{pl=\"Natural Oatmeal Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 908 (Type 4, Slot 200, Cost 0, Param2 0); locale 20250"
+    },
+    {
+      "definition_id": 909,
+      "name_id": 20251,
+      "label": "{n}Tangles-Away Shampoo{pl=\"Tangles-Away Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 909 (Type 4, Slot 200, Cost 0, Param2 0); locale 20251"
+    },
+    {
+      "definition_id": 910,
+      "name_id": 4540,
+      "label": "Wheeler Conditioner",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 910 (Type 4, Slot 201, Cost 150, Param2 0); locale 4540"
+    },
+    {
+      "definition_id": 911,
+      "name_id": 4541,
+      "label": "{n}Wheeler Tidbits{pl=\"Wheeler Tidbits\"}",
+      "slot": 205,
+      "restore": 225.0,
+      "src": "T797 ClientItemDefinitions.json Id 911 (Type 4, Slot 205, Cost 10, Param2 225); locale 4541"
+    },
+    {
+      "definition_id": 912,
+      "name_id": 20254,
+      "label": "Bristle Brush",
+      "slot": 203,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 912 (Type 4, Slot 203, Cost 15, Param2 0); locale 20254"
+    },
+    {
+      "definition_id": 913,
+      "name_id": 20255,
+      "label": "Wire-Pin Brush",
+      "slot": 203,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 913 (Type 4, Slot 203, Cost 15, Param2 0); locale 20255"
+    },
+    {
+      "definition_id": 1505,
+      "name_id": 116296,
+      "label": "{n}Lights, Camera, Action! Shampoo{pl=\"Lights, Camera, Action! Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 1505 (Type 4, Slot 200, Cost 90, Param2 0); locale 116296"
+    },
+    {
+      "definition_id": 1506,
+      "name_id": 116298,
+      "label": "{n}Halo Shampoo{pl=\"Halo Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 1506 (Type 4, Slot 200, Cost 90, Param2 0); locale 116298"
+    },
+    {
+      "definition_id": 1507,
+      "name_id": 116301,
+      "label": "{n}Starshine Shampoo{pl=\"Starshine Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 1507 (Type 4, Slot 200, Cost 90, Param2 0); locale 116301"
+    },
+    {
+      "definition_id": 1508,
+      "name_id": 116303,
+      "label": "{n}Autumn Shampoo{pl=\"Autumn Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 1508 (Type 4, Slot 200, Cost 90, Param2 0); locale 116303"
+    },
+    {
+      "definition_id": 1835,
+      "name_id": 426492,
       "label": "Simple Pet Food",
-      "source": [
-        {
-          "kind": "reference",
-          "evidence": "FreeRealms-Legacy src/Resources/ClientItemDefinitions.json at 9e082025391177d5a33ee18c714ddd06b457a695 sha256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025, row Id 1835: Type 4, Slot 205, Param1 6 (the utility slot), Param2 120 (the restore; foods run 50..400 on a scale not recovered)"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Gameplay/Pets.md care section: food, shampoo, conditioner are consumed"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "Param2 is applied as need points on the 0-100 bar and clamps at the maximum (R)"
-        }
-      ],
-      "restore": 120,
-      "consumes": true,
-      "need": "food",
-      "definition_id": 1835
+      "slot": 205,
+      "restore": 120.0,
+      "src": "T797 ClientItemDefinitions.json Id 1835 (Type 4, Slot 205, Cost 0, Param2 120); locale 426492"
     },
     {
-      "action": "groom",
-      "label": "Simple Pet Shampoo",
-      "source": [
-        {
-          "kind": "reference",
-          "evidence": "FreeRealms-Legacy data only: src/Resources/ClientItemDefinitions.json at 9e082025391177d5a33ee18c714ddd06b457a695 sha256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; item ids require client confirmation"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Gameplay/Pets.md care section and notes/Build Guides/Content/Jobs/Pet Trainer.md care item table: food, shampoo, conditioner are consumed"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "Per-item need restore amount and action binding are server policy (R); use 0-100 need scale"
-        }
-      ],
-      "restore": 25,
-      "consumes": true,
-      "need": "groom",
-      "definition_id": 1836
+      "definition_id": 1836,
+      "name_id": 426490,
+      "label": "{n}Simple Pet Shampoo{pl=\"Simple Pet Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 1836 (Type 4, Slot 200, Cost 0, Param2 0); locale 426490"
     },
     {
-      "action": "groom",
+      "definition_id": 2201,
+      "name_id": 4244,
+      "label": "{n}Wheeler Shampoo{pl=\"Wheeler Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 2201 (Type 4, Slot 200, Cost 10, Param2 0); locale 4244"
+    },
+    {
+      "definition_id": 2202,
+      "name_id": 4245,
+      "label": "{n}Wheeler Vitamins{pl=\"Wheeler Vitamins\"}",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 2202 (Type 4, Slot 206, Cost 150, Param2 50); locale 4245"
+    },
+    {
+      "definition_id": 2672,
+      "name_id": 11463,
+      "label": "{n}Morphing Ball of Yarn Vitamins{pl=\"Morphing Ball of Yarn Vitamins\"}",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 2672 (Type 4, Slot 206, Cost 1174, Param2 50); locale 11463"
+    },
+    {
+      "definition_id": 2673,
+      "name_id": 11464,
+      "label": "{n}Morphing Dog Bone Vitamins{pl=\"Morphing Dog Bone Vitamins\"}",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 2673 (Type 4, Slot 206, Cost 1174, Param2 50); locale 11464"
+    },
+    {
+      "definition_id": 10501,
+      "name_id": 24589,
+      "label": "Plain Kibbles",
+      "slot": 205,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 10501 (Type 4, Slot 205, Cost 1, Param2 50); locale 24589"
+    },
+    {
+      "definition_id": 10502,
+      "name_id": 24590,
+      "label": "Flavored Kibbles",
+      "slot": 205,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 10502 (Type 4, Slot 205, Cost 2, Param2 75); locale 24590"
+    },
+    {
+      "definition_id": 10503,
+      "name_id": 24591,
+      "label": "Small Canned Dog Food",
+      "slot": 205,
+      "restore": 100.0,
+      "src": "T797 ClientItemDefinitions.json Id 10503 (Type 4, Slot 205, Cost 3, Param2 100); locale 24591"
+    },
+    {
+      "definition_id": 10504,
+      "name_id": 24592,
+      "label": "Large Canned Dog Food",
+      "slot": 205,
+      "restore": 140.0,
+      "src": "T797 ClientItemDefinitions.json Id 10504 (Type 4, Slot 205, Cost 5, Param2 140); locale 24592"
+    },
+    {
+      "definition_id": 10505,
+      "name_id": 24593,
+      "label": "Pawesome Doggie Biscuits",
+      "slot": 205,
+      "restore": 170.0,
+      "src": "T797 ClientItemDefinitions.json Id 10505 (Type 4, Slot 205, Cost 1, Param2 170); locale 24593"
+    },
+    {
+      "definition_id": 10511,
+      "name_id": 24594,
+      "label": "{n}Daily Dog Vitamin Balls{pl=\"Daily Dog Vitamin Balls\"}",
+      "slot": 206,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10511 (Type 4, Slot 206, Cost 2, Param2 0); locale 24594"
+    },
+    {
+      "definition_id": 10512,
+      "name_id": 24595,
+      "label": "Amazing Coat - Dog Supplement",
+      "slot": 206,
+      "restore": 20.0,
+      "src": "T797 ClientItemDefinitions.json Id 10512 (Type 4, Slot 206, Cost 4, Param2 20); locale 24595"
+    },
+    {
+      "definition_id": 10513,
+      "name_id": 24596,
+      "label": "Amazing Coat Plus - Dog Supplement",
+      "slot": 206,
+      "restore": 20.0,
+      "src": "T797 ClientItemDefinitions.json Id 10513 (Type 4, Slot 206, Cost 1, Param2 20); locale 24596"
+    },
+    {
+      "definition_id": 10514,
+      "name_id": 20246,
+      "label": "{n}Dogaroo Vitamins{pl=\"Dogaroo Vitamins\"}",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 10514 (Type 4, Slot 206, Cost 1, Param2 50); locale 20246"
+    },
+    {
+      "definition_id": 10515,
+      "name_id": 24598,
+      "label": "{n}Dogaroo Vitamins Extra{pl=\"Dogaroo Vitamins Extra\"}",
+      "slot": 206,
+      "restore": 70.0,
+      "src": "T797 ClientItemDefinitions.json Id 10515 (Type 4, Slot 206, Cost 2, Param2 70); locale 24598"
+    },
+    {
+      "definition_id": 10521,
+      "name_id": 24599,
       "label": "Basic Pet Conditioner",
-      "source": [
-        {
-          "kind": "reference",
-          "evidence": "FreeRealms-Legacy data only: src/Resources/ClientItemDefinitions.json at 9e082025391177d5a33ee18c714ddd06b457a695 sha256 40a3cc79cfd8adfd50dc689e58de18dc14e21bedd73993b6eab0a43d3d95f025; item ids require client confirmation"
-        },
-        {
-          "kind": "client",
-          "evidence": "notes/Build Guides/Gameplay/Pets.md care section and notes/Build Guides/Content/Jobs/Pet Trainer.md care item table: food, shampoo, conditioner are consumed"
-        },
-        {
-          "kind": "reconstructed",
-          "evidence": "Per-item need restore amount and action binding are server policy (R); use 0-100 need scale"
-        }
-      ],
-      "restore": 35,
-      "consumes": true,
-      "need": "groom",
-      "definition_id": 10521
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10521 (Type 4, Slot 201, Cost 1, Param2 0); locale 24599"
+    },
+    {
+      "definition_id": 10522,
+      "name_id": 24600,
+      "label": "Advanced Pet Conditioner",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10522 (Type 4, Slot 201, Cost 2, Param2 0); locale 24600"
+    },
+    {
+      "definition_id": 10523,
+      "name_id": 24601,
+      "label": "Scented Pet Conditioner",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10523 (Type 4, Slot 201, Cost 3, Param2 0); locale 24601"
+    },
+    {
+      "definition_id": 10524,
+      "name_id": 24602,
+      "label": "Coat Guard - Pet Conditioner",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10524 (Type 4, Slot 201, Cost 1, Param2 0); locale 24602"
+    },
+    {
+      "definition_id": 10525,
+      "name_id": 24603,
+      "label": "Coat Guard Ultra - Pet Conditioner",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10525 (Type 4, Slot 201, Cost 1, Param2 0); locale 24603"
+    },
+    {
+      "definition_id": 10531,
+      "name_id": 24604,
+      "label": "{n}Basic Pet Shampoo{pl=\"Basic Pet Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10531 (Type 4, Slot 200, Cost 50, Param2 0); locale 24604"
+    },
+    {
+      "definition_id": 10532,
+      "name_id": 24605,
+      "label": "{n}Advanced Pet Shampoo{pl=\"Advanced Pet Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10532 (Type 4, Slot 200, Cost 100, Param2 0); locale 24605"
+    },
+    {
+      "definition_id": 10533,
+      "name_id": 24606,
+      "label": "{n}Scented Pet Shampoo{pl=\"Scented Pet Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10533 (Type 4, Slot 200, Cost 4, Param2 0); locale 24606"
+    },
+    {
+      "definition_id": 10534,
+      "name_id": 24607,
+      "label": "{n}Medicated Pet Shampoo{pl=\"Medicated Pet Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10534 (Type 4, Slot 200, Cost 1, Param2 0); locale 24607"
+    },
+    {
+      "definition_id": 10535,
+      "name_id": 24608,
+      "label": "{n}Intensive Cleansing Pet Shampoo{pl=\"Intensive Cleansing Pet Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10535 (Type 4, Slot 200, Cost 1, Param2 0); locale 24608"
+    },
+    {
+      "definition_id": 10551,
+      "name_id": 24617,
+      "label": "Pin Pet Brush",
+      "slot": 203,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10551 (Type 4, Slot 203, Cost 15, Param2 0); locale 24617"
+    },
+    {
+      "definition_id": 10552,
+      "name_id": 24614,
+      "label": "Soft Bristle Pet Brush",
+      "slot": 203,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10552 (Type 4, Slot 203, Cost 15, Param2 0); locale 24614"
+    },
+    {
+      "definition_id": 10553,
+      "name_id": 24615,
+      "label": "Slicker Wire Pet Brush",
+      "slot": 203,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10553 (Type 4, Slot 203, Cost 15, Param2 0); locale 24615"
+    },
+    {
+      "definition_id": 10554,
+      "name_id": 24616,
+      "label": "Dematter Pet Brush",
+      "slot": 203,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 10554 (Type 4, Slot 203, Cost 15, Param2 0); locale 24616"
+    },
+    {
+      "definition_id": 21800,
+      "name_id": 37034,
+      "label": "Average Shampoo (TEST)",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 21800 (Type 4, Slot 200, Cost 1, Param2 0); locale 37034"
+    },
+    {
+      "definition_id": 21801,
+      "name_id": 37035,
+      "label": "Average Conditioner (TEST)",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 21801 (Type 4, Slot 201, Cost 90, Param2 0); locale 37035"
+    },
+    {
+      "definition_id": 21803,
+      "name_id": 37037,
+      "label": "Average Brush (TEST)",
+      "slot": 203,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 21803 (Type 4, Slot 203, Cost 15, Param2 0); locale 37037"
+    },
+    {
+      "definition_id": 21804,
+      "name_id": 37038,
+      "label": "Average Bowl (TEST)",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 21804 (Type 4, Slot 204, Cost 15, Param2 0); locale 37038"
+    },
+    {
+      "definition_id": 21805,
+      "name_id": 37039,
+      "label": "Average Food (TEST)",
+      "slot": 205,
+      "restore": 100.0,
+      "src": "T797 ClientItemDefinitions.json Id 21805 (Type 4, Slot 205, Cost 1, Param2 100); locale 37039"
+    },
+    {
+      "definition_id": 21806,
+      "name_id": 37040,
+      "label": "{n}Average Vitamins (TEST){pl=\"Average Vitamins (TEST)\"}",
+      "slot": 206,
+      "restore": 100.0,
+      "src": "T797 ClientItemDefinitions.json Id 21806 (Type 4, Slot 206, Cost 1, Param2 100); locale 37040"
+    },
+    {
+      "definition_id": 24095,
+      "name_id": 24589,
+      "label": "Plain Kibbles",
+      "slot": 205,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 24095 (Type 4, Slot 205, Cost 1, Param2 50); locale 24589"
+    },
+    {
+      "definition_id": 24096,
+      "name_id": 78514,
+      "label": "Small Canned Cat Food",
+      "slot": 205,
+      "restore": 100.0,
+      "src": "T797 ClientItemDefinitions.json Id 24096 (Type 4, Slot 205, Cost 3, Param2 100); locale 78514"
+    },
+    {
+      "definition_id": 24097,
+      "name_id": 78515,
+      "label": "Large Canned Cat Food",
+      "slot": 205,
+      "restore": 140.0,
+      "src": "T797 ClientItemDefinitions.json Id 24097 (Type 4, Slot 205, Cost 5, Param2 140); locale 78515"
+    },
+    {
+      "definition_id": 24098,
+      "name_id": 78516,
+      "label": "Kitteriffic Cat Treats",
+      "slot": 205,
+      "restore": 170.0,
+      "src": "T797 ClientItemDefinitions.json Id 24098 (Type 4, Slot 205, Cost 1, Param2 170); locale 78516"
+    },
+    {
+      "definition_id": 24099,
+      "name_id": 78517,
+      "label": "{n}Purrky Cat Vitamin Balls{pl=\"Purrky Cat Vitamin Balls\"}",
+      "slot": 206,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 24099 (Type 4, Slot 206, Cost 2, Param2 0); locale 78517"
+    },
+    {
+      "definition_id": 24100,
+      "name_id": 78518,
+      "label": "Mewtiful Coat - Cat Supplement",
+      "slot": 206,
+      "restore": 20.0,
+      "src": "T797 ClientItemDefinitions.json Id 24100 (Type 4, Slot 206, Cost 4, Param2 20); locale 78518"
+    },
+    {
+      "definition_id": 24101,
+      "name_id": 78519,
+      "label": "Mewtiful Coat Plus - Cat Supplement",
+      "slot": 206,
+      "restore": 20.0,
+      "src": "T797 ClientItemDefinitions.json Id 24101 (Type 4, Slot 206, Cost 1, Param2 20); locale 78519"
+    },
+    {
+      "definition_id": 24102,
+      "name_id": 78520,
+      "label": "{n}Kittikins Vitamins{pl=\"Kittikins Vitamins\"}",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 24102 (Type 4, Slot 206, Cost 1, Param2 50); locale 78520"
+    },
+    {
+      "definition_id": 24103,
+      "name_id": 78521,
+      "label": "{n}Kittikins Vitamins Extra{pl=\"Kittikins Vitamins Extra\"}",
+      "slot": 206,
+      "restore": 70.0,
+      "src": "T797 ClientItemDefinitions.json Id 24103 (Type 4, Slot 206, Cost 2, Param2 70); locale 78521"
+    },
+    {
+      "definition_id": 30566,
+      "name_id": 20254,
+      "label": "Bristle Brush",
+      "slot": 203,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 30566 (Type 4, Slot 203, Cost 15, Param2 0); locale 20254"
+    },
+    {
+      "definition_id": 30567,
+      "name_id": 20243,
+      "label": "Dry Food",
+      "slot": 205,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 30567 (Type 4, Slot 205, Cost 0, Param2 75); locale 20243"
+    },
+    {
+      "definition_id": 30568,
+      "name_id": 24594,
+      "label": "{n}Daily Dog Vitamin Balls{pl=\"Daily Dog Vitamin Balls\"}",
+      "slot": 206,
+      "restore": 25.0,
+      "src": "T797 ClientItemDefinitions.json Id 30568 (Type 4, Slot 206, Cost 0, Param2 25); locale 24594"
+    },
+    {
+      "definition_id": 30570,
+      "name_id": 24599,
+      "label": "Basic Pet Conditioner",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 30570 (Type 4, Slot 201, Cost 1500, Param2 0); locale 24599"
+    },
+    {
+      "definition_id": 30571,
+      "name_id": 2252,
+      "label": "Red Bones Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 30571 (Type 4, Slot 204, Cost 15, Param2 0); locale 2252"
+    },
+    {
+      "definition_id": 30572,
+      "name_id": 20250,
+      "label": "{n}Natural Oatmeal Shampoo{pl=\"Natural Oatmeal Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 30572 (Type 4, Slot 200, Cost 0, Param2 0); locale 20250"
+    },
+    {
+      "definition_id": 37011,
+      "name_id": 116274,
+      "label": "Undercoat Rake",
+      "slot": 203,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37011 (Type 4, Slot 203, Cost 15, Param2 0); locale 116274"
+    },
+    {
+      "definition_id": 37012,
+      "name_id": 116275,
+      "label": "Pin Brush",
+      "slot": 203,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37012 (Type 4, Slot 203, Cost 15, Param2 0); locale 116275"
+    },
+    {
+      "definition_id": 37013,
+      "name_id": 116276,
+      "label": "Detangling Brush",
+      "slot": 203,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37013 (Type 4, Slot 203, Cost 15, Param2 0); locale 116276"
+    },
+    {
+      "definition_id": 37014,
+      "name_id": 116277,
+      "label": "Slicker Brush",
+      "slot": 203,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37014 (Type 4, Slot 203, Cost 15, Param2 0); locale 116277"
+    },
+    {
+      "definition_id": 37015,
+      "name_id": 20254,
+      "label": "Bristle Brush",
+      "slot": 203,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37015 (Type 4, Slot 203, Cost 15, Param2 0); locale 20254"
+    },
+    {
+      "definition_id": 37016,
+      "name_id": 116279,
+      "label": "Massage Brush",
+      "slot": 203,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37016 (Type 4, Slot 203, Cost 15, Param2 0); locale 116279"
+    },
+    {
+      "definition_id": 37017,
+      "name_id": 116280,
+      "label": "{n}Buddy Bubbles Shampoo{pl=\"Buddy Bubbles Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37017 (Type 4, Slot 200, Cost 15, Param2 0); locale 116280"
+    },
+    {
+      "definition_id": 37018,
+      "name_id": 116281,
+      "label": "{n}Super Buddy Bubbles Shampoo{pl=\"Super Buddy Bubbles Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37018 (Type 4, Slot 200, Cost 30, Param2 0); locale 116281"
+    },
+    {
+      "definition_id": 37019,
+      "name_id": 116282,
+      "label": "{n}Aromatherapy Pet Shampoo{pl=\"Aromatherapy Pet Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37019 (Type 4, Slot 200, Cost 15, Param2 0); locale 116282"
+    },
+    {
+      "definition_id": 37020,
+      "name_id": 116283,
+      "label": "{n}Super Aromatherapy Shampoo{pl=\"Super Aromatherapy Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37020 (Type 4, Slot 200, Cost 30, Param2 0); locale 116283"
+    },
+    {
+      "definition_id": 37021,
+      "name_id": 116284,
+      "label": "{n}Kung Fu Pet Shampoo{pl=\"Kung Fu Pet Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37021 (Type 4, Slot 200, Cost 15, Param2 0); locale 116284"
+    },
+    {
+      "definition_id": 37022,
+      "name_id": 116285,
+      "label": "{n}Super Kung Fu Pet Shampoo{pl=\"Super Kung Fu Pet Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37022 (Type 4, Slot 200, Cost 30, Param2 0); locale 116285"
+    },
+    {
+      "definition_id": 37023,
+      "name_id": 116286,
+      "label": "{n}Oatmeal Shampoo{pl=\"Oatmeal Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37023 (Type 4, Slot 200, Cost 15, Param2 0); locale 116286"
+    },
+    {
+      "definition_id": 37024,
+      "name_id": 116287,
+      "label": "{n}Super Oatmeal Shampoo{pl=\"Super Oatmeal Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37024 (Type 4, Slot 200, Cost 30, Param2 0); locale 116287"
+    },
+    {
+      "definition_id": 37025,
+      "name_id": 116288,
+      "label": "{n}Purrfect Luxury Shampoo{pl=\"Purrfect Luxury Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37025 (Type 4, Slot 200, Cost 15, Param2 0); locale 116288"
+    },
+    {
+      "definition_id": 37026,
+      "name_id": 116289,
+      "label": "{n}Super Purrfect Luxury Shampoo{pl=\"Super Purrfect Luxury Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37026 (Type 4, Slot 200, Cost 30, Param2 0); locale 116289"
+    },
+    {
+      "definition_id": 37027,
+      "name_id": 116290,
+      "label": "{n}Renew Shampoo{pl=\"Renew Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37027 (Type 4, Slot 200, Cost 15, Param2 0); locale 116290"
+    },
+    {
+      "definition_id": 37028,
+      "name_id": 116291,
+      "label": "{n}Super Renew Shampoo{pl=\"Super Renew Shampoos\"}",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37028 (Type 4, Slot 200, Cost 30, Param2 0); locale 116291"
+    },
+    {
+      "definition_id": 37029,
+      "name_id": 24599,
+      "label": "Basic Pet Conditioner",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37029 (Type 4, Slot 201, Cost 1500, Param2 0); locale 24599"
+    },
+    {
+      "definition_id": 37030,
+      "name_id": 116293,
+      "label": "Super Pet Conditioner",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37030 (Type 4, Slot 201, Cost 2250, Param2 0); locale 116293"
+    },
+    {
+      "definition_id": 37031,
+      "name_id": 100912,
+      "label": "Bee Mine Conditioner",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37031 (Type 4, Slot 201, Cost 1350, Param2 0); locale 100912"
+    },
+    {
+      "definition_id": 37032,
+      "name_id": 116295,
+      "label": "Valentine Conditioner",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37032 (Type 4, Slot 201, Cost 1350, Param2 0); locale 116295"
+    },
+    {
+      "definition_id": 37033,
+      "name_id": 116296,
+      "label": "{n}Lights, Camera, Action! Shampoo{pl=\"Lights, Camera, Action! Shampoos\"}",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37033 (Type 4, Slot 201, Cost 90, Param2 0); locale 116296"
+    },
+    {
+      "definition_id": 37034,
+      "name_id": 116297,
+      "label": "Daredevil Conditioner",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37034 (Type 4, Slot 201, Cost 1350, Param2 0); locale 116297"
+    },
+    {
+      "definition_id": 37035,
+      "name_id": 116298,
+      "label": "{n}Halo Shampoo{pl=\"Halo Shampoos\"}",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37035 (Type 4, Slot 201, Cost 90, Param2 0); locale 116298"
+    },
+    {
+      "definition_id": 37036,
+      "name_id": 116299,
+      "label": "Snowflake Conditioner",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37036 (Type 4, Slot 201, Cost 1350, Param2 0); locale 116299"
+    },
+    {
+      "definition_id": 37037,
+      "name_id": 116300,
+      "label": "Electric Crackle Conditioner",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37037 (Type 4, Slot 201, Cost 1350, Param2 0); locale 116300"
+    },
+    {
+      "definition_id": 37038,
+      "name_id": 116301,
+      "label": "{n}Starshine Shampoo{pl=\"Starshine Shampoos\"}",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37038 (Type 4, Slot 201, Cost 90, Param2 0); locale 116301"
+    },
+    {
+      "definition_id": 37039,
+      "name_id": 116302,
+      "label": "Party Conditioner",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37039 (Type 4, Slot 201, Cost 1350, Param2 0); locale 116302"
+    },
+    {
+      "definition_id": 37040,
+      "name_id": 116303,
+      "label": "{n}Autumn Shampoo{pl=\"Autumn Shampoos\"}",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 37040 (Type 4, Slot 201, Cost 90, Param2 0); locale 116303"
+    },
+    {
+      "definition_id": 37041,
+      "name_id": 116304,
+      "label": "{n}Little Squirt Vitamins{pl=\"Little Squirt Vitamins\"}",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 37041 (Type 4, Slot 206, Cost 1350, Param2 50); locale 116304"
+    },
+    {
+      "definition_id": 37042,
+      "name_id": 116305,
+      "label": "{n}Growth Spurt Vitamins{pl=\"Growth Spurt Vitamins\"}",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 37042 (Type 4, Slot 206, Cost 1350, Param2 50); locale 116305"
+    },
+    {
+      "definition_id": 37043,
+      "name_id": 116306,
+      "label": "{n}Red Hot Vitamins{pl=\"Red Hot Vitamins\"}",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 37043 (Type 4, Slot 206, Cost 1350, Param2 50); locale 116306"
+    },
+    {
+      "definition_id": 37044,
+      "name_id": 116307,
+      "label": "{n}Green with Envy Vitamins{pl=\"Green with Envy Vitamins\"}",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 37044 (Type 4, Slot 206, Cost 1350, Param2 50); locale 116307"
+    },
+    {
+      "definition_id": 37045,
+      "name_id": 116308,
+      "label": "{n}Blue for You Vitamins{pl=\"Blue for You Vitamins\"}",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 37045 (Type 4, Slot 206, Cost 1350, Param2 50); locale 116308"
+    },
+    {
+      "definition_id": 37046,
+      "name_id": 116309,
+      "label": "{n}Orange You Glad Vitamins{pl=\"Orange You Glad Vitamins\"}",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 37046 (Type 4, Slot 206, Cost 1350, Param2 50); locale 116309"
+    },
+    {
+      "definition_id": 37047,
+      "name_id": 116310,
+      "label": "{n}Yellow Fellow Vitamins{pl=\"Yellow Fellow Vitamins\"}",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 37047 (Type 4, Slot 206, Cost 1350, Param2 50); locale 116310"
+    },
+    {
+      "definition_id": 37048,
+      "name_id": 116311,
+      "label": "{n}Purple Pretties Vitamins{pl=\"Purple Pretties Vitamins\"}",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 37048 (Type 4, Slot 206, Cost 1350, Param2 50); locale 116311"
+    },
+    {
+      "definition_id": 37049,
+      "name_id": 116312,
+      "label": "Krunchy Kibble Kake",
+      "slot": 205,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 37049 (Type 4, Slot 205, Cost 15, Param2 75); locale 116312"
+    },
+    {
+      "definition_id": 37050,
+      "name_id": 116313,
+      "label": "Super Krunchy Kibble Kake",
+      "slot": 205,
+      "restore": 225.0,
+      "src": "T797 ClientItemDefinitions.json Id 37050 (Type 4, Slot 205, Cost 30, Param2 225); locale 116313"
+    },
+    {
+      "definition_id": 37051,
+      "name_id": 116314,
+      "label": "Mystery Meat Treats",
+      "slot": 205,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 37051 (Type 4, Slot 205, Cost 15, Param2 75); locale 116314"
+    },
+    {
+      "definition_id": 37052,
+      "name_id": 116315,
+      "label": "Super Mystery Meat Treats",
+      "slot": 205,
+      "restore": 225.0,
+      "src": "T797 ClientItemDefinitions.json Id 37052 (Type 4, Slot 205, Cost 30, Param2 225); locale 116315"
+    },
+    {
+      "definition_id": 37053,
+      "name_id": 116316,
+      "label": "Munchie Cake",
+      "slot": 205,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 37053 (Type 4, Slot 205, Cost 15, Param2 75); locale 116316"
+    },
+    {
+      "definition_id": 37054,
+      "name_id": 116317,
+      "label": "Super Munchie Cake",
+      "slot": 205,
+      "restore": 225.0,
+      "src": "T797 ClientItemDefinitions.json Id 37054 (Type 4, Slot 205, Cost 30, Param2 225); locale 116317"
+    },
+    {
+      "definition_id": 37055,
+      "name_id": 116318,
+      "label": "Piggie Pie",
+      "slot": 205,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 37055 (Type 4, Slot 205, Cost 15, Param2 75); locale 116318"
+    },
+    {
+      "definition_id": 37056,
+      "name_id": 116319,
+      "label": "Super Piggie Pie",
+      "slot": 205,
+      "restore": 225.0,
+      "src": "T797 ClientItemDefinitions.json Id 37056 (Type 4, Slot 205, Cost 30, Param2 225); locale 116319"
+    },
+    {
+      "definition_id": 37057,
+      "name_id": 116320,
+      "label": "Succulent Squeaky Snacks",
+      "slot": 205,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 37057 (Type 4, Slot 205, Cost 15, Param2 75); locale 116320"
+    },
+    {
+      "definition_id": 37058,
+      "name_id": 116321,
+      "label": "Super Succulent Squeaky Snacks",
+      "slot": 205,
+      "restore": 225.0,
+      "src": "T797 ClientItemDefinitions.json Id 37058 (Type 4, Slot 205, Cost 30, Param2 225); locale 116321"
+    },
+    {
+      "definition_id": 37059,
+      "name_id": 116322,
+      "label": "Protein Pup Pops",
+      "slot": 205,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 37059 (Type 4, Slot 205, Cost 15, Param2 75); locale 116322"
+    },
+    {
+      "definition_id": 37060,
+      "name_id": 116323,
+      "label": "Super Protein Pup Pops",
+      "slot": 205,
+      "restore": 225.0,
+      "src": "T797 ClientItemDefinitions.json Id 37060 (Type 4, Slot 205, Cost 30, Param2 225); locale 116323"
+    },
+    {
+      "definition_id": 37061,
+      "name_id": 116324,
+      "label": "Basic Pet Food",
+      "slot": 205,
+      "restore": 200.0,
+      "src": "T797 ClientItemDefinitions.json Id 37061 (Type 4, Slot 205, Cost 50, Param2 200); locale 116324"
+    },
+    {
+      "definition_id": 37062,
+      "name_id": 116325,
+      "label": "Super Pet Food",
+      "slot": 205,
+      "restore": 400.0,
+      "src": "T797 ClientItemDefinitions.json Id 37062 (Type 4, Slot 205, Cost 100, Param2 400); locale 116325"
+    },
+    {
+      "definition_id": 37063,
+      "name_id": 116326,
+      "label": "Tasty Mouse Fondu",
+      "slot": 205,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 37063 (Type 4, Slot 205, Cost 15, Param2 75); locale 116326"
+    },
+    {
+      "definition_id": 37064,
+      "name_id": 116327,
+      "label": "Super Tasty Mouse Fondu",
+      "slot": 205,
+      "restore": 225.0,
+      "src": "T797 ClientItemDefinitions.json Id 37064 (Type 4, Slot 205, Cost 30, Param2 225); locale 116327"
+    },
+    {
+      "definition_id": 37065,
+      "name_id": 116328,
+      "label": "Sweetened Salmon Snacks",
+      "slot": 205,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 37065 (Type 4, Slot 205, Cost 15, Param2 75); locale 116328"
+    },
+    {
+      "definition_id": 37066,
+      "name_id": 116329,
+      "label": "Super Sweetened Salmon Snacks",
+      "slot": 205,
+      "restore": 225.0,
+      "src": "T797 ClientItemDefinitions.json Id 37066 (Type 4, Slot 205, Cost 30, Param2 225); locale 116329"
+    },
+    {
+      "definition_id": 37067,
+      "name_id": 116330,
+      "label": "Flavory Fish Vittles",
+      "slot": 205,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 37067 (Type 4, Slot 205, Cost 15, Param2 75); locale 116330"
+    },
+    {
+      "definition_id": 37068,
+      "name_id": 116331,
+      "label": "Super Flavory Fish Vittles",
+      "slot": 205,
+      "restore": 225.0,
+      "src": "T797 ClientItemDefinitions.json Id 37068 (Type 4, Slot 205, Cost 30, Param2 225); locale 116331"
+    },
+    {
+      "definition_id": 37069,
+      "name_id": 116332,
+      "label": "Bird Bits",
+      "slot": 205,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 37069 (Type 4, Slot 205, Cost 15, Param2 75); locale 116332"
+    },
+    {
+      "definition_id": 37070,
+      "name_id": 116333,
+      "label": "Super Bird Bits",
+      "slot": 205,
+      "restore": 225.0,
+      "src": "T797 ClientItemDefinitions.json Id 37070 (Type 4, Slot 205, Cost 30, Param2 225); locale 116333"
+    },
+    {
+      "definition_id": 37071,
+      "name_id": 116334,
+      "label": "Roast Rabbit Ribs",
+      "slot": 205,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 37071 (Type 4, Slot 205, Cost 15, Param2 75); locale 116334"
+    },
+    {
+      "definition_id": 37072,
+      "name_id": 116335,
+      "label": "Super Roast Rabbit Ribs",
+      "slot": 205,
+      "restore": 225.0,
+      "src": "T797 ClientItemDefinitions.json Id 37072 (Type 4, Slot 205, Cost 30, Param2 225); locale 116335"
+    },
+    {
+      "definition_id": 37073,
+      "name_id": 116336,
+      "label": "Tuna Chunk Chow",
+      "slot": 205,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 37073 (Type 4, Slot 205, Cost 15, Param2 75); locale 116336"
+    },
+    {
+      "definition_id": 37074,
+      "name_id": 116337,
+      "label": "Super Tuna Chunk Chow",
+      "slot": 205,
+      "restore": 225.0,
+      "src": "T797 ClientItemDefinitions.json Id 37074 (Type 4, Slot 205, Cost 30, Param2 225); locale 116337"
+    },
+    {
+      "definition_id": 37075,
+      "name_id": 116338,
+      "label": "Basic Cat Food",
+      "slot": 205,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 37075 (Type 4, Slot 205, Cost 15, Param2 75); locale 116338"
+    },
+    {
+      "definition_id": 37076,
+      "name_id": 116339,
+      "label": "Super Cat Food",
+      "slot": 205,
+      "restore": 225.0,
+      "src": "T797 ClientItemDefinitions.json Id 37076 (Type 4, Slot 205, Cost 30, Param2 225); locale 116339"
+    },
+    {
+      "definition_id": 56777,
+      "name_id": 393195,
+      "label": "Deep Blue Stars Bowl",
+      "slot": 204,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 56777 (Type 4, Slot 204, Cost 15, Param2 0); locale 393195"
+    },
+    {
+      "definition_id": 56778,
+      "name_id": 393207,
+      "label": "Heavy Duty Scrub Brush",
+      "slot": 203,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 56778 (Type 4, Slot 203, Cost 15, Param2 0); locale 393207"
+    },
+    {
+      "definition_id": 56779,
+      "name_id": 393208,
+      "label": "Super Cleansing Shampoo",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 56779 (Type 4, Slot 200, Cost 30, Param2 0); locale 393208"
+    },
+    {
+      "definition_id": 56780,
+      "name_id": 393213,
+      "label": "Celebration Conditioner",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 56780 (Type 4, Slot 201, Cost 1350, Param2 0); locale 393213"
+    },
+    {
+      "definition_id": 56781,
+      "name_id": 393198,
+      "label": "BIG Vitamins",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 56781 (Type 4, Slot 206, Cost 1350, Param2 50); locale 393198"
+    },
+    {
+      "definition_id": 56782,
+      "name_id": 393205,
+      "label": "Super Delectable Treats",
+      "slot": 205,
+      "restore": 225.0,
+      "src": "T797 ClientItemDefinitions.json Id 56782 (Type 4, Slot 205, Cost 30, Param2 225); locale 393205"
+    },
+    {
+      "definition_id": 57012,
+      "name_id": 394789,
+      "label": "Bait",
+      "slot": 205,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 57012 (Type 4, Slot 205, Cost 0, Param2 50); locale 394789"
+    },
+    {
+      "definition_id": 59785,
+      "name_id": 399647,
+      "label": "Vita-Fortune Basic",
+      "slot": 206,
+      "restore": 25.0,
+      "src": "T797 ClientItemDefinitions.json Id 59785 (Type 4, Slot 206, Cost 750, Param2 25); locale 399647"
+    },
+    {
+      "definition_id": 59786,
+      "name_id": 399648,
+      "label": "Vita-Fortune Plus",
+      "slot": 206,
+      "restore": 50.0,
+      "src": "T797 ClientItemDefinitions.json Id 59786 (Type 4, Slot 206, Cost 1350, Param2 50); locale 399648"
+    },
+    {
+      "definition_id": 59787,
+      "name_id": 399649,
+      "label": "Vita-Fortune Ultra",
+      "slot": 206,
+      "restore": 75.0,
+      "src": "T797 ClientItemDefinitions.json Id 59787 (Type 4, Slot 206, Cost 1950, Param2 75); locale 399649"
+    },
+    {
+      "definition_id": 62530,
+      "name_id": 407465,
+      "label": "Confetti Shampoo",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 62530 (Type 4, Slot 201, Cost 0, Param2 0); locale 407465"
+    },
+    {
+      "definition_id": 62536,
+      "name_id": 407465,
+      "label": "Confetti Shampoo",
+      "slot": 200,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 62536 (Type 4, Slot 200, Cost 120, Param2 0); locale 407465"
+    },
+    {
+      "definition_id": 68931,
+      "name_id": 407465,
+      "label": "Confetti Shampoo",
+      "slot": 201,
+      "restore": 0.0,
+      "src": "T797 ClientItemDefinitions.json Id 68931 (Type 4, Slot 201, Cost 120, Param2 0); locale 407465"
     }
   ],
   "need_policy": {
@@ -52875,6 +54169,7 @@
   "care": {
     "feed_effect_ms": 900,
     "feed_end_ms": 6000,
+    "feed_animation": 5507,
     "status_interval_ms": 1500,
     "status_epsilon": 0.5,
     "groom": {
@@ -52922,7 +54217,7 @@
     },
     "source": {
       "kind": "reconstructed",
-      "evidence": "T485: feed apply and end delays after 53/20 begin, and the live 53/3 refresh gap and threshold, are server policy (R); the client sends 53/19 and waits for 53/20 kinds 1, 2 or 6 (00b5ce60)"
+      "evidence": "T485: feed apply and end delays after 53/20 begin, and the live 53/3 refresh gap and threshold, are server policy (R); the client sends 53/19 and waits for 53/20 kinds 1, 2 or 6 (00b5ce60); T797: feed_animation 5507 is the client Resources/AnimationTypes.xml slot pet_feed, ordered by the server because 53/20 kind 1 only fires BeginInteraction (00b5ce60 case 20)"
     }
   },
   "treasure": {

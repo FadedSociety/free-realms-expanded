@@ -15,9 +15,9 @@
 //! values are reconstructed (R) and live in the `pets.json` `care.groom` block.
 
 use super::{
-    NOTIFY_GROOM, NOTIFY_GROOM_END, NOTIFY_UNLOCK, Need, PetBusy, PetNeeds, PetService, PetWire,
-    SourceTag, add_need, decayed, fitted_item, pet_status_packet, pet_utility_notify_packet,
-    spend_one,
+    KitRole, NOTIFY_GROOM, NOTIFY_GROOM_END, NOTIFY_UNLOCK, Need, PetBusy, PetNeeds, PetService,
+    PetWire, SourceTag, add_need, decayed, fitted_item, pet_status_packet,
+    pet_utility_notify_packet, spend_one,
 };
 use crate::{inventory::Inventory, world_events::piece_052};
 use serde::{Deserialize, Serialize};
@@ -182,12 +182,18 @@ impl PetService {
         if decayed(policy, pet, true, now_ms / 1_000)?.groom >= policy.maximum {
             return None;
         }
-        fitted_item(pet, inventory, BRUSH_SLOT)?;
-        let consumable = |slot| {
+        fitted_item(pet, inventory, BRUSH_SLOT)
+            .filter(|brush| self.is_kit(brush.definition_id, KitRole::Brush))?;
+        // T797: the shampoo and conditioner must be recorded kit items in their slots; the brush
+        // above is kept, these two are spent.
+        let consumable = |slot, role| {
             let item = fitted_item(pet, inventory, slot)?;
-            self.is_care(item.definition_id, "groom").then_some(item.id)
+            self.is_kit(item.definition_id, role).then_some(item.id)
         };
-        Some((consumable(SHAMPOO_SLOT)?, consumable(CONDITIONER_SLOT)))
+        Some((
+            consumable(SHAMPOO_SLOT, KitRole::Shampoo)?,
+            consumable(CONDITIONER_SLOT, KitRole::Conditioner),
+        ))
     }
 
     /// 53/22: a stroke report. While grooming, mode 2 raises the groom bar; with no session,
