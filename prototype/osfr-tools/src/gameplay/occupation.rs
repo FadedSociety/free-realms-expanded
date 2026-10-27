@@ -31,6 +31,8 @@ occupations!(
     Mining,
     Harvesting,
     Chess,
+    // T765: a Trading Card Game run (the client's card DLL window is open).
+    CardGame,
     Encounter,
     Derby,
     Fishing,
@@ -72,9 +74,9 @@ impl Occupation {
     pub(super) const fn gates(self) -> Gates {
         use Occupation::*;
         let (start, warp, ride, pets, location) = match self {
-            Forging | Smelting | Cooking | Mining | Harvesting | Chess | Fishing | Encounter => {
-                (true, true, true, true, false)
-            }
+            // (R) A card run closes the same gates as chess (T765).
+            Forging | Smelting | Cooking | Mining | Harvesting | Chess | CardGame | Fishing
+            | Encounter => (true, true, true, true, false),
             Derby | Soccer | Kart => (true, true, true, true, true),
             FieldEngaged => (false, false, true, false, false),
             // (R) A lot is its own scene: leave it before travelling, riding or starting an
@@ -103,6 +105,10 @@ impl Gameplay {
             Occupation::Mining => self.mining.as_ref().is_some_and(Type8Engine::active),
             Occupation::Harvesting => self.harvesting.as_ref().is_some_and(Type8Engine::active),
             Occupation::Chess => self.chess.as_ref().is_some_and(ChessService::is_active),
+            Occupation::CardGame => self
+                .card_launches
+                .as_ref()
+                .is_some_and(crate::card_game::Launches::is_active),
             Occupation::Encounter => self.encounter.as_ref().is_some_and(EncounterEngine::active),
             Occupation::Derby => self
                 .derby
@@ -149,15 +155,15 @@ mod tests {
         assert_eq!(
             members(|g| g.start),
             [
-                Forging, Smelting, Cooking, Mining, Harvesting, Chess, Encounter, Derby, Fishing,
-                Soccer, Kart, Housing
+                Forging, Smelting, Cooking, Mining, Harvesting, Chess, CardGame, Encounter, Derby,
+                Fishing, Soccer, Kart, Housing
             ]
         );
         assert_eq!(
             members(|g| g.warp),
             [
-                Forging, Smelting, Cooking, Mining, Harvesting, Chess, Encounter, Derby, Fishing,
-                Soccer, Kart, Housing
+                Forging, Smelting, Cooking, Mining, Harvesting, Chess, CardGame, Encounter, Derby,
+                Fishing, Soccer, Kart, Housing
             ]
         );
         assert_eq!(
@@ -169,6 +175,7 @@ mod tests {
                 Mining,
                 Harvesting,
                 Chess,
+                CardGame,
                 Encounter,
                 Derby,
                 Fishing,
@@ -181,8 +188,8 @@ mod tests {
         assert_eq!(
             members(|g| g.pets),
             [
-                Forging, Smelting, Cooking, Mining, Harvesting, Chess, Encounter, Derby, Fishing,
-                Soccer, Kart
+                Forging, Smelting, Cooking, Mining, Harvesting, Chess, CardGame, Encounter, Derby,
+                Fishing, Soccer, Kart
             ]
         );
         assert_eq!(members(|g| g.location), [Derby, Soccer, Kart, Housing]);
@@ -190,8 +197,8 @@ mod tests {
         assert_eq!(
             members(|g| g.style_card),
             [
-                Forging, Smelting, Cooking, Mining, Harvesting, Chess, Encounter, Derby, Fishing,
-                Soccer, Kart
+                Forging, Smelting, Cooking, Mining, Harvesting, Chess, CardGame, Encounter, Derby,
+                Fishing, Soccer, Kart
             ]
         );
     }

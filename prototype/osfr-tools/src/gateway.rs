@@ -549,6 +549,8 @@ fn application_handler(body: &[u8]) -> &'static str {
         {
             "pets"
         }
+        // T765: the card manager's ticket request (39/37); gameplay answers it for a card run.
+        (Some(39), _) if body.get(2) == Some(&37) => "card_game",
         // W174: handled in gameplay.rs, where a refusal can send nothing. Naming them keeps
         // the gateway from logging an understood request as "unknown application message".
         (Some(26), Some(13)) => "class_selection",
@@ -2008,6 +2010,7 @@ mod radial_routing {
         assert_eq!(application_handler(&[53, 0, 4, 0, 0, 0, 0, 1]), "pets");
         assert_eq!(application_handler(&[53, 0, 6, 1, 0, 0, 0, b'A']), "pets");
         assert_eq!(application_handler(&[53, 0, 24, 2, 0, 0, 0]), "pets");
+        assert_eq!(application_handler(&[39, 0, 37, 1, 0, 0, 0]), "card_game");
         assert_eq!(
             application_handler(&[53, 0, 19, 1, 0, 0, 0, 0, 0, 0, 0]),
             "pets"

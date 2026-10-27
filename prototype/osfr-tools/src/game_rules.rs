@@ -253,7 +253,7 @@ pub fn encode_trade_allowed_flag_entries(
     bytes
 }
 
-fn append_serial_integer(out: &mut Vec<u8>, value: u32, encoding: IntegerEncoding) {
+pub(crate) fn append_serial_integer(out: &mut Vec<u8>, value: u32, encoding: IntegerEncoding) {
     if encoding == IntegerEncoding::NetworkByteOrder {
         out.extend_from_slice(&value.to_be_bytes());
         return;

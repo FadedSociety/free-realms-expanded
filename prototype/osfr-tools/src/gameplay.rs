@@ -43,6 +43,7 @@ use std::{
 
 mod admin_move;
 pub use admin_move::{AdminMove, MoveTarget};
+mod card_launch;
 mod coin_authoring;
 mod collection_pickup;
 mod content_reload;
@@ -219,6 +220,8 @@ pub struct Gameplay {
     /// is session-only, but its daily reward ledger is restored from
     /// `GameplayState::chess`, so a reconnect cannot reset the cap.
     chess: Option<ChessService>,
+    /// T765: the session's Trading Card Game launches (type-16 runs and one-time tickets).
+    card_launches: Option<crate::card_game::Launches>,
     /// Last answered 167/1/4 refresh: a 4-byte request returns up to ~6.7 KB,
     /// so refreshes are answered at most once per `PORTAL_REFRESH_MS` (R).
     portal_refreshed_ms: Option<u64>,
@@ -969,6 +972,9 @@ impl Gameplay {
             soccer_content.as_ref(),
             crate::card_game::Content::load_optional(npc_content)?.as_ref(),
         )?;
+        let card_launches = (activities.cards().and_then(|cards| cards.launch()))
+            .map(crate::card_game::Launches::new)
+            .transpose()?;
         let mut npc_interaction = if crate::content::npc_shop_enabled(npc_content) {
             Some(NpcInteraction::load(
                 &npc_content.join("npcs"),
@@ -1201,6 +1207,7 @@ impl Gameplay {
             soccer_content,
             soccer: None,
             chess,
+            card_launches,
             portal_refreshed_ms: None,
             kart_entry,
             derby,
@@ -2086,6 +2093,9 @@ impl Gameplay {
             return Ok(out);
         }
         if let Some(out) = self.handle_progression_extras(inner)? {
+            return Ok(out);
+        }
+        if let Some(out) = self.handle_card_game(inner, character, now_ms)? {
             return Ok(out);
         }
         if let Some(out) = self.handle_chess(inner, character, now_ms)? {
@@ -3260,8 +3270,10 @@ impl Gameplay {
                     Ok((soccer, crate::activity_portal::Kind::Soccer)) => {
                         self.begin_soccer(soccer, character, &mut out)?;
                     }
-                    // `admit` refuses every card row (no card service yet).
-                    Ok((_, crate::activity_portal::Kind::CardGame { .. })) => {}
+                    // T765: `admit` lets a Trading Card Game row through only with a launch block.
+                    Ok((card, crate::activity_portal::Kind::CardGame { .. })) => {
+                        self.begin_card_game(card, &mut out)?;
+                    }
                     Ok((battle, crate::activity_portal::Kind::Battle)) => {
                         match self.begin_field_battle(battle, character, &mut out)? {
                             field_battle::BattleStart::Started => {}

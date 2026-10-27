@@ -796,6 +796,9 @@ fn seeds() -> Vec<(&'static str, Vec<u8>)> {
     result.push(("pets", [vec![53, 0, 19], vec![0xff; 8]].concat()));
     result.push(("pets", vec![53, 0, 28, 0xff]));
     result.push(("gameplay.handle_in_world", vec![53, 0, 0xff, 0xff]));
+    // T765: the card manager's ticket request (39/37), ignored without a started card run.
+    result.push(("card_game", [vec![39, 0, 37], vec![0xff; 12]].concat()));
+    result.push(("gameplay.handle_in_world", vec![39, 0, 0xff, 0xff]));
     result.push(("combat", words(36, 10, &[1, 0, 0, u32::MAX, u32::MAX])));
     result.push(("combat", words(36, 12, &[u32::MAX])));
     for (sub, length) in [(2, 2), (3, 3), (8, 4), (15, 1), (16, 1)] {

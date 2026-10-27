@@ -13,13 +13,17 @@
 //!
 //! # Reconstructed policy (R)
 //!
-//! * There is no card service yet: the portal lists these rows so the client can ask, and
-//!   answers Play with a chat refusal (`activity_portal::Refusal`). Nothing else changes.
+//! * Without a `launch` block the portal lists these rows and answers Play with a chat refusal
+//!   (`activity_portal::Refusal`). With one (T765), Play on a Trading Card Game row starts a
+//!   type-16 run (`Launches`) whose 39/37 gets a one-time launch ticket in 39/0x28; Treasure
+//!   War (type 23) stays refused.
 //! * Rows publish entry type 1 (the world tunnel); `server_type` (Legacy's 2, the client tunnel
 //!   `00be78c0`) stays in data for the launch slice.
 //! * The row's MiniGameData link (`minigame_id`) stays in data; no wire field is known to hold it.
 
 use crate::activity_portal::{Activity, Kind};
+use crate::card_service::LaunchTickets;
+use crate::minigame::{MinigameRuns, RunMode, RunOutcome, RunSpec, card_start_packet};
 use serde::Deserialize;
 use std::{
     collections::BTreeSet,
@@ -82,6 +86,69 @@ pub struct Content {
     #[serde(rename = "source")]
     _source: String,
     rows: Vec<Row>,
+    /// T765: present once a card service runs; until then every card row stays refused.
+    #[serde(default)]
+    launch: Option<Launch>,
+}
+
+/// T765: how a Trading Card Game row launches (R values, bounded in `validate`).
+#[derive(Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct Launch {
+    /// How long a 39/0x28 launch ticket stays redeemable by the card login.
+    pub ticket_ttl_ms: u64,
+    pub source: Vec<Source>,
+}
+
+/// The client's mini-game type of the DLL card game (`MiniGameTypeData` 16; `00ad47f0`).
+pub const CARD_GAME_TYPE: i32 = 16;
+/// (R) Card runs take their own instance range, apart from chess (1), soccer (47,000,001)
+/// and harvesting (58,000,001).
+pub const FIRST_INSTANCE_ID: i32 = 61_000_001;
+
+/// T765: one session's card launches: the type-16 run lifecycle and the one-time tickets its
+/// 39/37 mints. Session-only; never saved.
+#[derive(Clone, Debug)]
+pub struct Launches {
+    runs: MinigameRuns,
+    tickets: LaunchTickets,
+}
+
+impl Launches {
+    pub fn new(launch: &Launch) -> io::Result<Self> {
+        Ok(Self {
+            runs: MinigameRuns::new(FIRST_INSTANCE_ID)?,
+            tickets: LaunchTickets::new(launch.ticket_ttl_ms),
+        })
+    }
+
+    pub fn is_active(&self) -> bool {
+        self.runs.current_instance_id().is_some()
+    }
+
+    /// Offer the row's run (39/16); the client answers 39/5.
+    pub fn begin(&mut self, row: &Row) -> io::Result<RunOutcome> {
+        let game_id = i32::try_from(row.minigame_id)
+            .map_err(|_| invalid("card mini-game id is out of range"))?;
+        self.runs
+            .offer(RunSpec::empty(game_id, CARD_GAME_TYPE, RunMode::CardClient))
+    }
+
+    /// The run's lifecycle packets (39/5 start, 39/6 leave, 39/7 ack). A 39/37 mints the
+    /// character's launch ticket and answers 39/0x28.
+    pub fn route(&mut self, packet: &[u8], character: u64, now_ms: u64) -> io::Result<RunOutcome> {
+        let mut outcome = self.runs.handle_client(packet)?;
+        if let Some(request) = outcome.card_ticket {
+            let ticket = self.tickets.mint(character, now_ms)?;
+            outcome.replies.push(card_start_packet(request, ticket));
+        }
+        Ok(outcome)
+    }
+
+    /// The card login's ticket and character id (T766's listener): the character on success.
+    pub fn redeem(&mut self, ticket: &str, character: &str, now_ms: u64) -> Option<u64> {
+        self.tickets.redeem(ticket, character, now_ms)
+    }
 }
 
 impl Content {
@@ -138,11 +205,28 @@ impl Content {
         {
             return Err(invalid("card game tutorial id is not a row of the file"));
         }
+        if self.launch.as_ref().is_some_and(|launch| {
+            !(1_000..=600_000).contains(&launch.ticket_ttl_ms) || launch.source.is_empty()
+        }) {
+            return Err(invalid(
+                "card launch ticket lifetime is 1 s to 10 min, with a source",
+            ));
+        }
         Ok(())
     }
 
     pub fn rows(&self) -> &[Row] {
         &self.rows
+    }
+
+    /// T765: the launch settings, when Trading Card Game rows may start.
+    pub fn launch(&self) -> Option<&Launch> {
+        self.launch.as_ref()
+    }
+
+    /// The row behind activity `id`.
+    pub fn row(&self, id: u32) -> Option<&Row> {
+        self.rows.iter().find(|row| row.id == id)
     }
 
     /// The catalogue rows (ids, names, image, difficulty); the rest of each wire row is read

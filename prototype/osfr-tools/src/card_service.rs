@@ -24,21 +24,10 @@ pub const MAX_FRAME: usize = 64 * 1024;
 /// Compact integer writer `10097a40` (the codec's big-endian mode byte `1080205c` is never
 /// set): a value above `!value` is complemented and flagged; the first byte carries the low
 /// nibble, the flag (0x10) and the count of following bytes (bits 5-7), which hold the rest
-/// little-endian.
+/// little-endian. The same writer as the trade flags' (F766: one implementation).
 pub fn put_int(out: &mut Vec<u8>, value: i32) {
-    let mut value = value as u32;
-    let complemented = !value < value;
-    if complemented {
-        value = !value;
-    }
-    let mut bytes = vec![(value & 0xF) as u8];
-    let mut rest = value >> 4;
-    while rest != 0 {
-        bytes.push(rest as u8);
-        rest >>= 8;
-    }
-    bytes[0] |= (u8::from(complemented) << 4) | (((bytes.len() - 1) as u8) << 5);
-    out.extend(bytes);
+    use crate::game_rules::{IntegerEncoding, append_serial_integer};
+    append_serial_integer(out, value as u32, IntegerEncoding::Compact);
 }
 
 /// String writer `10097b40`: the length, then the text and its NUL.
@@ -315,7 +304,7 @@ pub fn login_results(success: bool, code: i32, account_id: i32, session_id: &str
 /// T764: one-time card launch tickets (lead security). The game server mints one per launch and
 /// sends it in 39/0x28; the card login (411) must present it with the same character id before
 /// it expires, and it works once.
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct LaunchTickets {
     ttl_ms: u64,
     /// ticket -> (character guid, expiry ms); at most one outstanding ticket per character.

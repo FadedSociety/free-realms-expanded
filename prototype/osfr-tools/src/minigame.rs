@@ -33,8 +33,17 @@ pub enum RunState {
 /// belong to its owning service and are never read from a minigame score.
 #[derive(Clone, Debug, PartialEq, Eq, Serialize, Deserialize)]
 pub enum RunMode {
-    Flash { movie: String },
-    Encounter { encounter_id: i32, player_guid: u64 },
+    Flash {
+        movie: String,
+    },
+    Encounter {
+        encounter_id: i32,
+        player_guid: u64,
+    },
+    /// T765: a type-16 Trading Card Game run. The client hosts the card DLL itself
+    /// (`ClientTradingCardGameManager`): 39/5 is answered with 39/17 alone, and its 39/37
+    /// (`009bf590`, sent at manager state 5 by `00ad4f50`) asks for the launch ticket.
+    CardClient,
 }
 
 /// Fields needed to emit the shared 39/16 info record. The reward bundles are
@@ -106,7 +115,7 @@ impl RunSpec {
             } if *encounter_id <= 0 || *player_guid == 0 => {
                 return Err(invalid("invalid encounter launch identity"));
             }
-            RunMode::Encounter { .. } => {}
+            RunMode::Encounter { .. } | RunMode::CardClient => {}
         }
         Ok(())
     }
@@ -163,6 +172,16 @@ pub struct RunOutcome {
     pub replies: Vec<Vec<u8>>,
     pub reward_packets: Vec<Vec<u8>>,
     pub reward_state: Option<RewardState>,
+    /// T765: a card run's client asked for its launch ticket (39/37); the owner mints it and
+    /// answers with `card_start_packet`.
+    pub card_ticket: Option<CardTicketRequest>,
+}
+
+/// T765: the run a card launch ticket is for.
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct CardTicketRequest {
+    pub instance_id: i32,
+    pub game_id: i32,
 }
 
 impl Default for RunOutcome {
@@ -174,6 +193,7 @@ impl Default for RunOutcome {
             replies: Vec::new(),
             reward_packets: Vec::new(),
             reward_state: None,
+            card_ticket: None,
         }
     }
 }
@@ -295,7 +315,7 @@ impl MinigameRuns {
     pub fn handle_client(&mut self, packet: &[u8]) -> io::Result<RunOutcome> {
         if packet.len() >= 3 && packet[..2] == FAMILY_MINIGAME.to_le_bytes() {
             let sub = packet[2];
-            if !matches!(sub, 5 | 6 | 7 | 46) {
+            if !matches!(sub, 5 | 6 | 7 | 37 | 46) {
                 return Ok(RunOutcome::default());
             }
             if packet.len() != HEADER_LEN {
@@ -350,6 +370,20 @@ impl MinigameRuns {
             }
             return match sub {
                 5 => self.start(id),
+                // T765: only a started card run asks for a ticket; anything else ignores it.
+                37 if run.spec.mode == RunMode::CardClient
+                    && matches!(run.state, RunState::Starting | RunState::Playing) =>
+                {
+                    Ok(RunOutcome {
+                        accepted: true,
+                        state: Some(run.state),
+                        card_ticket: Some(CardTicketRequest {
+                            instance_id: id,
+                            game_id: run.spec.game_id,
+                        }),
+                        ..Default::default()
+                    })
+                }
                 6 if matches!(
                     run.state,
                     RunState::Offered | RunState::Starting | RunState::Playing
@@ -599,6 +633,7 @@ impl MinigameRuns {
             replies,
             reward_packets,
             reward_state,
+            card_ticket: None,
         })
     }
 
@@ -626,6 +661,8 @@ impl MinigameRuns {
                 // (`008a8a30`).
                 start_ack_packet(run.instance_id, run.spec.game_id),
             ],
+            // The client's card manager starts on 39/17 and asks for its ticket with 39/37.
+            RunMode::CardClient => vec![start_ack_packet(run.instance_id, run.spec.game_id)],
         };
         self.current.as_mut().unwrap().state = RunState::Starting;
         Ok(RunOutcome {
@@ -702,6 +739,18 @@ fn info_packet(instance_id: i32, spec: &RunSpec) -> io::Result<Vec<u8>> {
 /// Server acknowledgement 39/17; client reader `009b9550`.
 fn start_ack_packet(instance_id: i32, game_id: i32) -> Vec<u8> {
     family39_header(17, instance_id, game_id)
+}
+
+/// T765: 39/0x28 `TradingCardStartGamePacket` (reader `009b7f30`): the run's header, then the
+/// 64-bit launch ticket as two i32 halves, low then high. `DispatchMiniGamePacket`
+/// (`009bf890`) finds the run by instance id and, for type 16, hands both halves to the card
+/// manager (slot 25 `00ad32e0`: +0x2ba98, +0x2ba9c), which passes them to the DLL as
+/// `--ticket=%llu`.
+pub fn card_start_packet(request: CardTicketRequest, ticket: u64) -> Vec<u8> {
+    let mut bytes = family39_header(0x28, request.instance_id, request.game_id);
+    bytes.extend((ticket as u32).to_le_bytes());
+    bytes.extend(((ticket >> 32) as u32).to_le_bytes());
+    bytes
 }
 
 /// Client Flash launch 26/12; handler `00aa0a10` and `StartFlashMiniGameUi` `009bd650`.

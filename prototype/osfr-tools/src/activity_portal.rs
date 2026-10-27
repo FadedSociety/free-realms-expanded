@@ -172,7 +172,7 @@ pub enum Refusal {
     Busy,
     NotCombatJob,
     LevelTooLow(u32),
-    /// No card server exists yet (T504).
+    /// The card content has no launch block (T504; T765 opens it).
     CardGameClosed,
     TreasureWarClosed,
 }
@@ -323,15 +323,21 @@ impl Catalogue {
                     return Err(Refusal::LevelTooLow(activity.required_level));
                 }
             }
-            // (R) No card server yet: every card row is refused, before any state changes.
+            // (R) Treasure War has no service; a Trading Card Game row starts only when the card
+            // content has a launch block (T765). A refusal comes before any state changes.
             Kind::CardGame { .. } => {
-                return Err(match self.card(id) {
+                let launching = self
+                    .cards
+                    .as_ref()
+                    .is_some_and(|cards| cards.launch().is_some());
+                match self.card(id) {
                     Some(card) if card.category == card_game::TREASURE_WAR_CATEGORY => {
-                        Refusal::TreasureWarClosed
+                        return Err(Refusal::TreasureWarClosed);
                     }
-                    Some(_) => Refusal::CardGameClosed,
-                    None => Refusal::Unknown,
-                });
+                    Some(_) if launching => {}
+                    Some(_) => return Err(Refusal::CardGameClosed),
+                    None => return Err(Refusal::Unknown),
+                }
             }
         }
         Ok(activity)
@@ -339,9 +345,8 @@ impl Catalogue {
 
     /// The card-game data row behind a `Kind::CardGame` activity id.
     fn card(&self, id: u32) -> Option<&card_game::Row> {
-        self.cards.as_ref()?.rows().iter().find(|row| row.id == id)
+        self.cards.as_ref()?.row(id)
     }
-
     /// The values of row `index` that differ per kind; `None` when its data row is missing.
     fn wire(&self, index: usize, a: &Activity, viewer: Viewer) -> Option<Wire<'_>> {
         let plain = Wire {
