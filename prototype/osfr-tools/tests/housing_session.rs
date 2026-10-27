@@ -18,8 +18,9 @@ use osfr_tools::{
         FixtureAsset, FixtureItemList, FixtureRemove, FixtureUpdate, HouseInfo, InstanceData,
         InstanceList, PlacementDenied, PlayerHousingInstanceInfo, ZoneData,
     },
-    housing_service::HousingContent,
+    housing_service::{HousingContent, fixture_actor_guid},
     inventory::{InventoryItem, MAX_ITEMS},
+    startup_world::{self, NpcSpawn},
     zone_transition,
 };
 use std::{
@@ -259,9 +260,11 @@ fn entering_changes_scene_and_the_house_packets_wait_for_the_load() {
     let order: Vec<_> = loaded.replies.iter().map(|r| subtype(r)).collect();
     let mut expected = vec![Some(45), Some(28), Some(44), Some(43)];
     expected.extend([Some(40); KIT_BLOCKS]);
+    // Then each standing fixture's actor, a 35/2 and so no housing subtype.
+    expected.extend([None; KIT_BLOCKS]);
     assert_eq!(
         order, expected,
-        "zone data, then the house record before any 127/4x, then the standing kit"
+        "zone data, then the house record before any 127/4x, then the standing kit and its actors"
     );
     let zone = ZoneData::decode(&loaded.replies[0][2..]).unwrap();
     assert_eq!(zone.instance, lot);
@@ -527,6 +530,13 @@ fn updates(replies: &[Vec<u8>]) -> Vec<FixtureUpdate> {
         .collect()
 }
 
+/// The fixtures' actors among `replies`: their 35/2 AddNpcs.
+fn actors(replies: &[Vec<u8>]) -> Vec<NpcSpawn> {
+    let adds = replies.iter().filter(|r| r.starts_with(&[35, 0, 2, 0]));
+    adds.map(|r| startup_world::parse_add_npc(r).unwrap())
+        .collect()
+}
+
 /// Item ids the client is told about: 38/2 adds (payload: definition, tint, id) and 38/4 removals.
 fn backpack(replies: &[Vec<u8>], op: u8) -> Vec<i32> {
     let at = if op == 2 { 16 } else { 4 };
@@ -733,8 +743,18 @@ fn the_generated_fixture_table_lists_an_owned_block_and_chair_on_entry() {
     assert_eq!(updates.len(), KIT_BLOCKS);
     let kit = &updates[0];
     assert_eq!(kit.definition.model_id, 1_926);
-    assert_eq!(kit.instance.customization.texture_alias, "fun-block-L1");
-    assert_eq!(kit.instance.customization.tint_alias, "dyetint");
+    // The look rides the fixture's actor; retail leaves the 127/40 customization empty.
+    assert_eq!(kit.instance.customization.texture_alias, "");
+    let actor = actors(&loaded.replies)
+        .into_iter()
+        .find(|npc| npc.actor_id == kit.instance.npc_guid)
+        .expect("the block's actor");
+    assert_eq!(actor.model_id, 1_926);
+    assert_eq!(
+        (actor.texture_alias.as_str(), actor.tint_alias.as_str()),
+        ("fun-block-L1", "dyetint")
+    );
+    assert_eq!(actor.tint_id, 227, "the item's own default tint");
 }
 
 #[test]
@@ -1318,4 +1338,144 @@ fn the_gateway_answers_the_rating_probe_instead_of_logging_unknown_application_m
         out.trace
     );
     assert_eq!(gateway.snapshot(), before, "the probe is read-only");
+}
+
+/// T806 (native 2026-10-27): the client placed the Chicken and it "disappeared into the void". It
+/// draws a fixture only from the NPC a 35/2 spawns, which retail sends after the 127/40 and 127/44
+/// and links by the record's NPC guid; there was none, so nothing was ever drawn.
+#[test]
+fn a_placed_fixture_is_drawn_by_its_own_actor() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let (_, item) = decorating(&mut game);
+    game.handle_in_world(&ask(item), &character(), 5_000)
+        .unwrap();
+    let placed = game
+        .handle_in_world(&place(item), &character(), 6_000)
+        .unwrap();
+    assert_eq!(housing(&placed.replies), [40, 44]);
+    let update = FixtureUpdate::decode(reply(&placed.replies, 40)).unwrap();
+    let npcs = actors(&placed.replies);
+    let [npc] = &npcs[..] else {
+        panic!("one AddNpc for the chicken: {npcs:?}")
+    };
+    assert_ne!(update.instance.npc_guid, 0);
+    assert_eq!(
+        npc.actor_id, update.instance.npc_guid,
+        "the record names the actor"
+    );
+    assert_eq!(npc.actor_id, fixture_actor_guid(update.instance.guid));
+    assert_eq!(npc.model_id, update.definition.model_id);
+    assert_eq!(npc.position, update.instance.position);
+    // The pairing of every retail fixture: the actor faces the record's tilt and tilts by its rotation.
+    assert_eq!(
+        (npc.rotation, npc.tilt),
+        (update.instance.tilt, update.instance.rotation)
+    );
+    // The client sent no rotation: zeros, facing +Z (it was identity-mapped to a 1 radian yaw).
+    assert_eq!(update.instance.rotation, [0.0; 4]);
+    assert_eq!(update.instance.tilt, [0.0, 0.0, 1.0, 0.0]);
+    // What the retail fixture AddNpcs of p2.pcap share (the content NPC template differs).
+    assert_eq!(
+        (npc.hide_nameplate, npc.is_interactable, npc.has_tilt),
+        (1, 1, 1)
+    );
+    assert_eq!(
+        (npc.scale, npc.interact_range, npc.active_profile),
+        (1.0, 100, 144)
+    );
+    assert_eq!(
+        (
+            npc.movement_type,
+            npc.unknown_field_68,
+            npc.sub_text_name_string_id
+        ),
+        (0, 0, 0)
+    );
+    let add = placed
+        .replies
+        .iter()
+        .position(|r| r.starts_with(&[35, 0, 2, 0]))
+        .unwrap();
+    let last_record = placed.replies.iter().rposition(|r| subtype(r).is_some());
+    assert!(
+        last_record.is_some_and(|record| add > record),
+        "the actor follows the housing records, as in retail"
+    );
+}
+
+#[test]
+fn entering_draws_every_standing_fixture_from_the_127_28_list() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let lot = granted(&mut game);
+    game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000)
+        .unwrap();
+    let loaded = game.initialize_world(&character(), 3_000).unwrap();
+    let record = InstanceData::decode(reply(&loaded.replies, 28)).unwrap();
+    let npcs = actors(&loaded.replies);
+    assert_eq!(npcs.len(), KIT_BLOCKS);
+    let listed: BTreeSet<u64> = record.fixtures.iter().map(|(_, f)| f.npc_guid).collect();
+    let drawn: BTreeSet<u64> = npcs.iter().map(|npc| npc.actor_id).collect();
+    assert_eq!(drawn.len(), KIT_BLOCKS);
+    assert_eq!(
+        drawn, listed,
+        "each 127/28 instance names the actor that draws it"
+    );
+    assert!(!listed.contains(&0));
+    for update in updates(&loaded.replies) {
+        assert!(drawn.contains(&update.instance.npc_guid));
+    }
+}
+
+#[test]
+fn a_pickup_removes_the_fixtures_actor() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let (_, item) = decorating(&mut game);
+    let fixture = place_item(&mut game, item);
+    let picked = game
+        .handle_in_world(&pickup(fixture), &character(), 7_000)
+        .unwrap();
+    assert_eq!(housing(&picked.replies), [41, 44]);
+    let removal = picked
+        .replies
+        .iter()
+        .find(|r| r.starts_with(&[35, 0, 3, 0]))
+        .expect("the actor's removal");
+    // 35/3 submode 1, then the actor's guid: the fixture's NPC, not the fixture.
+    assert_eq!(removal[..6], [35, 0, 3, 0, 1, 0]);
+    assert_eq!(removal[6..14], fixture_actor_guid(fixture).to_le_bytes());
+    let all = game
+        .handle_in_world(&PICKUP_ALL, &character(), 8_000)
+        .unwrap();
+    let removals = all.replies.iter().filter(|r| r.starts_with(&[35, 0, 3, 0]));
+    assert_eq!(
+        removals.count(),
+        KIT_BLOCKS,
+        "pickup all removes each standing actor"
+    );
+}
+
+/// A turn the client sends as Euler lanes (retail p2.pcap: 1.5708 = a quarter turn) was refused
+/// as a non-unit quaternion, so no fixture could ever be turned.
+#[test]
+fn a_turned_fixture_places_and_its_actor_turns_with_it() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let (_, item) = decorating(&mut game);
+    game.handle_in_world(&ask(item), &character(), 5_000)
+        .unwrap();
+    let mut turned = place(item);
+    // The rotation group follows the selection and the position group.
+    turned[24..28].copy_from_slice(&1.5708_f32.to_le_bytes());
+    let placed = game.handle_in_world(&turned, &character(), 6_000).unwrap();
+    assert_eq!(housing(&placed.replies), [40, 44]);
+    let update = FixtureUpdate::decode(reply(&placed.replies, 40)).unwrap();
+    assert_eq!(update.instance.rotation, [1.5708, 0.0, 0.0, 0.0]);
+    assert!((update.instance.tilt[0] - 1.0).abs() < 1e-3 && update.instance.tilt[2].abs() < 1e-3);
+    let [npc] = &actors(&placed.replies)[..] else {
+        panic!("one AddNpc")
+    };
+    assert_eq!(npc.rotation, update.instance.tilt);
 }

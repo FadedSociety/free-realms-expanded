@@ -1131,11 +1131,14 @@ impl FixtureItemList {
     }
 }
 
-/// Client 127/51 transform update from `00ab2d10`: guid followed by two float4 values. The names
-/// position/orientation are local projections of fields whose semantics are not fully proven.
+/// Client 127/51 transform update from `00ab2d10`: guid followed by two float4 values. The guid is
+/// the fixture's world actor, the NPC a 35/2 spawned (handler `00ab8dc0` finds an entity by it with
+/// `00984960`), not the fixture guid; p2.pcap's 127/51 carries the NPC guid of the fixture it moves
+/// (T806). The names position/orientation are local projections of fields whose semantics are not
+/// fully proven; the orientation lanes are the fixture's Euler rotation.
 #[derive(Clone, Debug, PartialEq)]
 pub struct PositionUpdate {
-    pub fixture_guid: u64,
+    pub actor_guid: u64,
     pub position: [f32; 4],
     pub orientation: [f32; 4],
 }
@@ -1143,7 +1146,7 @@ pub struct PositionUpdate {
 impl PositionUpdate {
     pub fn encode(&self) -> io::Result<Vec<u8>> {
         let mut writer = Writer::new(SUB_POSITION);
-        writer.u64(self.fixture_guid);
+        writer.u64(self.actor_guid);
         writer.f32x4(self.position)?;
         writer.f32x4(self.orientation)?;
         Ok(writer.finish())
@@ -1155,7 +1158,7 @@ impl PositionUpdate {
             return Err(invalid("not a 127/51 position payload"));
         }
         let value = Self {
-            fixture_guid: reader.u64()?,
+            actor_guid: reader.u64()?,
             position: reader.f32x4()?,
             orientation: reader.f32x4()?,
         };

@@ -41,7 +41,7 @@ use std::{
 /// RECONSTRUCTED local defensive bound, matching the existing `character_store` convention. This is
 /// not a recovered world or angle limit.
 pub const MAX_FIXTURE_MAGNITUDE: f32 = 1_000_000.0;
-/// RECONSTRUCTED tolerance for a stored unit quaternion.
+/// RECONSTRUCTED tolerance for a stored unit facing vector.
 pub const QUATERNION_TOLERANCE: f32 = 1e-3;
 /// RECONSTRUCTED snapshot bound, in the same spirit as `character_store::MAX_FILE_BYTES`.
 pub const MAX_SNAPSHOT_BYTES: usize = 1024 * 1024;
@@ -60,6 +60,11 @@ pub const PERMISSION_CAN_EDIT: i32 = 3;
 pub const PERMISSION_CAN_VISIT: i32 = 1;
 
 /// Local transform projection based on the Legacy `FixtureInstance` reference shape.
+///
+/// `rotation` is the client's own form, Euler angles in radians: yaw, pitch, roll, then 0. The
+/// client sends those lanes in 127/2 and a retail 127/28 carries them (1.5708, 3.1416, ...), never
+/// a quaternion. `tilt` is the facing they imply, `(sin yaw cos pitch, -sin pitch, cos yaw cos
+/// pitch, 0)`; all 2015 retail instances satisfy it (T806).
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(deny_unknown_fields)]
 pub struct FixtureTransform {
@@ -80,8 +85,8 @@ impl Default for FixtureTransform {
     fn default() -> Self {
         Self {
             position: [0.0, 0.0, 0.0],
-            rotation: [1.0, 0.0, 0.0, 0.0],
-            tilt: [1.0, 0.0, 0.0, 0.0],
+            rotation: [0.0; 4],
+            tilt: [0.0, 0.0, 1.0, 0.0],
             scale: 1.0,
             tint_id: 0,
         }
@@ -1399,21 +1404,22 @@ fn validate_transform(transform: &FixtureTransform) -> Result<(), HousingError> 
     if transform
         .position
         .iter()
-        .chain(transform.tilt.iter())
+        .chain(transform.rotation.iter())
         .any(|value| value.abs() > MAX_FIXTURE_MAGNITUDE)
         || transform.scale <= 0.0
         || transform.scale > MAX_FIXTURE_MAGNITUDE
     {
         return Err(HousingError::TransformOutOfBounds);
     }
-    if !is_unit_quaternion(transform.rotation) || !is_unit_quaternion(transform.tilt) {
+    // The rotation lanes are angles, any finite value; only the facing they imply is a unit vector.
+    if !is_unit_vector(transform.tilt) {
         return Err(HousingError::NonUnitRotation);
     }
     Ok(())
 }
 
-fn is_unit_quaternion(quaternion: [f32; 4]) -> bool {
-    let norm = quaternion.iter().map(|value| value * value).sum::<f32>();
+fn is_unit_vector(vector: [f32; 4]) -> bool {
+    let norm = vector.iter().map(|value| value * value).sum::<f32>();
     (norm - 1.0).abs() <= QUATERNION_TOLERANCE
 }
 

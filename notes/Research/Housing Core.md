@@ -208,9 +208,10 @@ policy, not an original server value.
   icon/count and lock state; flags, display strings, scores, ratings, timestamps and other unknown
   values use R defaults.
 - **127/51 transform update** — handler `00ab8dc0`, nested reader `00ab2d10`. It reads two u32
-  words (the client record's 64-bit GUID pair), then two float4 blocks. The service sends the saved
-  fixture GUID, `[x,y,z,1]`, and its stored rotation. The semantic projection and position w value
-  are R; all values must be finite under the local codec.
+  words (a 64-bit GUID pair), then two float4 blocks. The GUID is the fixture's world actor (the
+  NPC of its 35/2), not the fixture: the handler finds an entity with `00984960`, and the 127/51
+  of p2.pcap carries the NPC guid of the fixture it moves (T806). The service sends that actor
+  guid, `[x,y,z,1]`, and the stored Euler rotation; position w is R.
 - **127/44 house info** remains the existing fixed writer. The local `unused = 10` and flora=true
   values remain R; the client guide does not recover their server values.
 
@@ -377,3 +378,37 @@ enabled `(property_id, scene)` pairs from `data/content/houses.json`, so its lot
 cannot drift apart; its totals are re-pinned to the T516 rows. The lead still runs the script to
 rewrite `missing.json` and records the native result.
 
+## Fixture actors and the Euler rotation (T806, native 2026-10-27)
+
+The client draws a fixture only from the NPC a 35/2 AddNpc spawns; the 127/28 instance and the
+127/40 hold the fixture's data and name that NPC by the record's NPC-guid field (`FixtureInstance`
++216; `sub_AC8340` indexes the record by it through `sub_105DE10`, and `sub_9E9060` finds the fixture
+of an actor back through `sub_105C8C0`). A placed Chicken vanished because the server sent the
+127/40 and 127/44 and never the actor.
+
+Evidence (retail `p2.pcap`, the 127/28 of 2015 fixtures and its 9 placements; decoded with the
+instance layout of `00ab6f40`):
+
+- Every fixture in the 127/28 has its own 35/2 whose actor id is the record's NPC guid (2015 of 2015
+  paired). On entry they arrive before the 127/45, 127/28 and 127/43; a placement answers 127/40,
+  127/44, then 35/2, 35/9, 35/20, and a pickup 127/41, 127/44, then the 35/3 of that NPC.
+- The 35/2 of a fixture: model, texture alias, tint alias and tint (the item's default, or the dye)
+  of the item; the record's position; `rotation` equal to the record's `tilt`, and the actor's own
+  `tilt` equal to the record's `rotation` (2015 of 2015, rotated or not); scale 1, nameplate hidden,
+  interactable, range 100, `active_profile` 144. A 35/2 rebuilt from these values matches the
+  retail bytes except the item's name string id, which the server has no table for (R: 0).
+- The record's customization block is empty in all 9 placements and all 2015 instances; the look is
+  on the actor. (Before T806 the 127/40 carried the item's aliases there.)
+- `rotation` is Euler (yaw, pitch, roll in radians, then 0), not a quaternion (values 1.5708, 3.1416,
+  -0.3285); the client's 127/2 sends the same lanes (zeros for an unrotated item), and `tilt` is the
+  facing `(sin yaw cos pitch, -sin pitch, cos yaw cos pitch, 0)` (2015 of 2015, to rounding). The
+  client derives the same tilt from the rotation (`sub_105CD30` -> `sub_776970`).
+- A retail 127/51 carries the NPC guid; the client sends the fixture guid in its 127/3 and 127/5.
+
+Before T806 an unrotated placement was identity-mapped to `[1, 0, 0, 0]`, which as Euler is a one
+radian yaw, and any real turn was refused as a non-unit quaternion.
+
+Open (R): the actor's name string id, the 35/9 (three 100s) and 35/20 (status 1) the retail server
+sends after each 35/2, the 35/16 effect after a move, and a live 127/51 to the NPC for a fixture
+another visitor moves. Lots saved before T806 keep their stored `[1, 0, 0, 0]` and show a one radian
+yaw until the item is turned.

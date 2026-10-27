@@ -45,6 +45,8 @@ use crate::housing_native::{
 use crate::inventory::{
     Inventory, InventoryItem, InventoryState, instance_ids::allocate_from_snapshot,
 };
+use crate::startup_world::{self, ActorLook, NpcSpawn};
+use crate::world;
 use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -119,8 +121,29 @@ const RECONSTRUCTED_FLORA_ALLOWED: bool = true;
 /// `00ab6c80` and applied through `CuteMode:SetSizeInstant` (`00ac36c0` -> `00ab96e0`); 0 hides
 /// the head. A future tunable should stay within about 1..60 (`CuteMode:Inflate` reaches 5.2).
 const HOUSE_HEAD_SIZE_TENTHS: i32 = 10;
-/// (R) Identity tilt because the client `127/2` body has no separate tilt field.
-const IDENTITY_TILT: [f32; 4] = [1.0, 0.0, 0.0, 0.0];
+/// `Housing::mint_fixture_guid` always leaves this bit clear; set, it names the fixture's actor.
+const FIXTURE_ACTOR_BIT: u64 = 1 << 55;
+
+/// The guid of the NPC that draws a fixture (T806). The client keeps a fixture record and draws
+/// nothing from it: a retail server sends each fixture's world actor as a 35/2 AddNpc and puts its
+/// guid in the record's NPC field (`FixtureInstance` +216; `sub_AC8340` indexes the record by it,
+/// `sub_105DE10`), and moves it with a 127/51 addressed to that guid (handler `00ab8dc0`, entity
+/// lookup `sub_984960`). Derived from the fixture guid, so a saved lot needs no second id.
+pub fn fixture_actor_guid(fixture_guid: u64) -> u64 {
+    fixture_guid | FIXTURE_ACTOR_BIT
+}
+
+/// The facing a client-form rotation (yaw, pitch, roll in radians) implies. A retail record carries
+/// it as `tilt`, and its AddNpc as `rotation` (p2.pcap: all 2015 instances).
+fn facing(rotation: [f32; 4]) -> [f32; 4] {
+    let [yaw, pitch, ..] = rotation;
+    [
+        yaw.sin() * pitch.cos(),
+        0.0 - pitch.sin(),
+        yaw.cos() * pitch.cos(),
+        0.0,
+    ]
+}
 
 /// Client `127/2` body projection, without the family prefix: an uninterpreted selection dword, two
 /// 16-byte transform groups and a final dword. Mapping these groups to this server transform is R.
@@ -923,6 +946,28 @@ impl HousingReply {
     }
 }
 
+/// A fixture's world actor (T806): the NPC the client draws it as, in the opcode-35 family, not
+/// the housing family. See [`fixture_actor_guid`].
+#[derive(Clone, Debug, PartialEq)]
+pub enum FixtureActor {
+    /// 35/2 AddNpc.
+    Spawn(Box<NpcSpawn>),
+    /// 35/3 RemoveNpc of this actor guid.
+    Remove(u64),
+}
+
+impl FixtureActor {
+    /// The complete inner game packet.
+    pub fn encode_inner(&self) -> io::Result<Vec<u8>> {
+        match self {
+            Self::Spawn(npc) => world::unframe_tunnel(&startup_world::build_add_npc(npc)),
+            Self::Remove(guid) => Ok(crate::abilities::effect_packets::encode_remove_gracefully(
+                *guid, 0,
+            )),
+        }
+    }
+}
+
 /// The reply set and change flag for one request. `changed` means the caller must persist
 /// `HousingService::state()` again; a denied or unrecovered request never sets it.
 #[derive(Clone, Debug, Default, PartialEq)]
@@ -930,6 +975,9 @@ pub struct ServiceOutcome {
     /// An outer scene change that the gateway must begin before sending `replies`.
     pub zone_change: Option<HousingZoneChange>,
     pub replies: Vec<HousingReply>,
+    /// The fixtures' actors, sent after `replies`: a retail placement answers 127/40, 127/44,
+    /// then the 35/2, and a pickup 127/41, 127/44, then the 35/3.
+    pub actors: Vec<FixtureActor>,
     pub changed: bool,
 }
 
@@ -938,6 +986,7 @@ impl ServiceOutcome {
         Self {
             zone_change: None,
             replies: vec![HousingReply::Unrecovered { opcode }],
+            actors: Vec::new(),
             changed: false,
         }
     }
@@ -1593,8 +1642,7 @@ impl HousingService {
             .find(|fixture| fixture.fixture_guid == fixture_guid)
             .cloned()
             .ok_or(ServiceError::Housing(HousingError::UnknownFixture))?;
-        let housing_transform =
-            housing_transform(&transform, placed.transform.tint_id, placed.transform.tilt)?;
+        let housing_transform = housing_transform(&transform, placed.transform.tint_id)?;
         let mut staged = self.housing.clone();
         let mut ledger = self.derive_ledger(&lot, stock);
         staged.move_fixture(
@@ -1616,7 +1664,7 @@ impl HousingService {
             zone_change: None,
             replies: vec![
                 HousingReply::PositionUpdate(PositionUpdate {
-                    fixture_guid,
+                    actor_guid: fixture_actor_guid(fixture_guid),
                     position: [
                         moved.transform.position[0],
                         moved.transform.position[1],
@@ -1629,6 +1677,7 @@ impl HousingService {
                     self.house_info(actor_guid, &self.housing.saved_fixtures(house_guid)?),
                 ),
             ],
+            actors: Vec::new(),
             changed: true,
         })
     }
@@ -1660,11 +1709,13 @@ impl HousingService {
             HousingReply::HouseInfo(self.house_info(actor_guid, &lot)),
             HousingReply::FixtureItemList(self.fixture_item_list(stock)?),
         ];
+        let mut actors = Vec::with_capacity(lot.fixtures.len());
         for saved in &lot.fixtures {
             let placed = placed_from_saved(saved);
             replies.push(HousingReply::FixtureUpdate(
                 self.fixture_update(&placed, saved.fixture_definition_id)?,
             ));
+            actors.push(self.fixture_actor(&placed, saved.fixture_definition_id)?);
         }
         self.entered.insert(actor_guid, house_guid);
         self.edit_mode.insert(actor_guid, false);
@@ -1678,6 +1729,7 @@ impl HousingService {
                 spawn_rotation: definition.spawn_rotation,
             }),
             replies,
+            actors,
             changed: false,
         })
     }
@@ -1773,6 +1825,7 @@ impl HousingService {
                 records,
                 owner_guid,
             })],
+            actors: Vec::new(),
             changed: false,
         })
     }
@@ -1819,6 +1872,7 @@ impl HousingService {
         Ok(ServiceOutcome {
             zone_change: None,
             replies: vec![HousingReply::HouseInfo(self.house_info(actor_guid, &lot))],
+            actors: Vec::new(),
             changed: false,
         })
     }
@@ -1851,7 +1905,7 @@ impl HousingService {
             .row_for_item_definition(instance.definition_id)?;
         let fixture_definition_id = row.fixture_definition_id;
         let lot = self.housing.saved_fixtures(house_guid)?;
-        let housing_transform = housing_transform(&transform, instance.tint_id, IDENTITY_TILT)?;
+        let housing_transform = housing_transform(&transform, instance.tint_id)?;
 
         // Stage the whole housing side first. A refusal anywhere below leaves the live state and
         // the live inventory untouched, because the staged clone is dropped.
@@ -1871,6 +1925,7 @@ impl HousingService {
         // Build the reply before anything commits, so no fallible step can run after the state
         // changed. The record only needs the configuration row and the staged fixture.
         let update = self.fixture_update(&outcome.placed, fixture_definition_id)?;
+        let actor = self.fixture_actor(&outcome.placed, fixture_definition_id)?;
         // The live inventory stays the single owner of the item: mutate it last, and only after
         // every housing check passed. `Inventory::consume` is internally atomic, so a refusal here
         // drops the staged lot and leaves both sides exactly as they were.
@@ -1883,6 +1938,7 @@ impl HousingService {
                 HousingReply::FixtureUpdate(update),
                 HousingReply::HouseInfo(self.house_info(actor_guid, &saved)),
             ],
+            actors: vec![actor],
             changed: true,
         })
     }
@@ -1919,6 +1975,7 @@ impl HousingService {
                 HousingReply::FixtureRemove(FixtureRemove { fixture_guid }),
                 HousingReply::HouseInfo(self.house_info(actor_guid, &saved)),
             ],
+            actors: vec![FixtureActor::Remove(fixture_actor_guid(fixture_guid))],
             changed: true,
         })
     }
@@ -1936,6 +1993,7 @@ impl HousingService {
             return Ok(ServiceOutcome {
                 zone_change: None,
                 replies: vec![HousingReply::HouseInfo(self.house_info(actor_guid, &lot))],
+                actors: Vec::new(),
                 changed: false,
             });
         }
@@ -1944,6 +2002,7 @@ impl HousingService {
         let mut ledger = self.derive_ledger(&lot, stock);
         let mut returns = Vec::with_capacity(lot.fixtures.len());
         let mut removed = Vec::with_capacity(lot.fixtures.len());
+        let mut actors = Vec::with_capacity(lot.fixtures.len());
         for fixture in &lot.fixtures {
             let outcome =
                 staged.pickup_fixture(actor_guid, house_guid, fixture.fixture_guid, &mut ledger)?;
@@ -1957,6 +2016,9 @@ impl HousingService {
             removed.push(HousingReply::FixtureRemove(FixtureRemove {
                 fixture_guid: fixture.fixture_guid,
             }));
+            actors.push(FixtureActor::Remove(fixture_actor_guid(
+                fixture.fixture_guid,
+            )));
         }
 
         // The live inventory performs a single staged batch so a later return cannot leave a
@@ -1968,6 +2030,7 @@ impl HousingService {
         Ok(ServiceOutcome {
             zone_change: None,
             replies: removed,
+            actors,
             changed: true,
         })
     }
@@ -2242,13 +2305,16 @@ impl HousingService {
                 unknown_d: 0,
                 flag: false,
             })],
+            actors: Vec::new(),
             changed: false,
         })
     }
 
-    /// Build a `127/40` fixture record using the current local codec. The customization block
-    /// carries the row's texture and tint aliases; unresolved definition and tail fields use
-    /// empty/zero placeholders (R); successful encoding is not client-acceptance proof.
+    /// Build a `127/40` fixture record using the current local codec. The record carries no look:
+    /// all 9 retail 127/40s and all 2015 retail 127/28 instances leave the customization block
+    /// empty (p2.pcap), and the model, texture alias and tint ride the fixture's actor
+    /// ([`Self::fixture_actor`]). Unresolved definition and tail fields use empty/zero
+    /// placeholders (R); successful encoding is not client-acceptance proof.
     fn fixture_update(
         &self,
         placed: &PlacedFixture,
@@ -2266,16 +2332,17 @@ impl HousingService {
                 unknown4: 0,
                 position: [x, y, z, 1.0],
                 rotation: placed.transform.rotation,
-                tilt: placed.transform.tilt,
-                npc_guid: 0,
+                // Derived, so a lot saved before T806 (which stored a wrong tilt) is sent right.
+                tilt: facing(placed.transform.rotation),
+                npc_guid: fixture_actor_guid(placed.fixture_guid),
                 tint_id: placed.transform.tint_id,
                 unknown10: 0,
+                // Client 127/40 reader sub_AB6F40 -> sub_8E8510: kind dword, texture alias, tint
+                // alias, tint dword, override string; all empty, as retail sends them.
                 customization: Customization {
                     kind: 0,
-                    // Client 127/40 reader sub_AB6F40 -> sub_8E8510: kind dword, texture alias,
-                    // tint alias, tint dword, override string. The alias values are the item's.
-                    texture_alias: row.texture_alias.clone(),
-                    tint_alias: row.tint_alias.clone(),
+                    texture_alias: String::new(),
+                    tint_alias: String::new(),
                     tint_id: 0,
                     texture_override: String::new(),
                 },
@@ -2301,6 +2368,51 @@ impl HousingService {
             unknown_guids: Vec::new(),
             words: [0, 0, 0],
         })
+    }
+
+    /// The NPC that draws a placed fixture (T806), the 35/2 a retail server sends beside its
+    /// 127/40. Values are those of the 2015 fixture AddNpcs in p2.pcap: the fixture's position,
+    /// `rotation` the facing and `tilt` the Euler rotation (the pairing held for every one,
+    /// rotated or not), scale 1, the item's model, aliases and tint (the dyed tint when the item
+    /// has one, else the item's own default), nameplate hidden and interactable. Name id, status
+    /// and health follow-ups (35/9, 35/20) are not sent (R): the actor draws without them.
+    fn fixture_actor(
+        &self,
+        placed: &PlacedFixture,
+        fixture_definition_id: i32,
+    ) -> Result<FixtureActor, ServiceError> {
+        let row = self
+            .config
+            .row_for_fixture_definition(fixture_definition_id)?;
+        let [x, y, z] = placed.transform.position;
+        let tint_id = match placed.transform.tint_id {
+            0 => row.default_tint_id,
+            dyed => dyed,
+        };
+        let mut npc = NpcSpawn {
+            actor_id: fixture_actor_guid(placed.fixture_guid),
+            model_id: row.model_id,
+            scale: placed.transform.scale,
+            position: [x, y, z, 1.0],
+            rotation: facing(placed.transform.rotation),
+            tilt: placed.transform.rotation,
+            has_tilt: 1,
+            hide_nameplate: 1,
+            sub_text_name_string_id: 0,
+            movement_type: 0,
+            unknown_flag_33: 1,
+            unknown_flag_34: 1,
+            active_profile: 144,
+            unknown_field_68: 0,
+            ..world::content_spawn_template()
+        };
+        ActorLook {
+            texture_alias: row.texture_alias.clone(),
+            tint_alias: row.tint_alias.clone(),
+            tint_id,
+        }
+        .apply(&mut npc);
+        Ok(FixtureActor::Spawn(Box::new(npc)))
     }
 }
 
@@ -2335,13 +2447,12 @@ fn placed_from_saved(saved: &SavedFixture) -> PlacedFixture {
     }
 }
 
-/// Map the client wire transform onto the housing model under reconstructed policy (R): drop the
-/// position w component, map an all-zero rotation block to identity to satisfy the local unit-
-/// quaternion invariant, and validate every other rotation through the housing state machine.
+/// Map the client wire transform onto the housing model: drop the position w component, keep the
+/// rotation lanes as the client sent them (Euler radians, see [`FixtureTransform`]) and derive the
+/// tilt they imply. The all-zero block the client sends for an unrotated fixture stays zero.
 fn housing_transform(
     transform: &WireTransform,
     tint_id: i32,
-    tilt: [f32; 4],
 ) -> Result<FixtureTransform, ServiceError> {
     if transform
         .position
@@ -2352,19 +2463,14 @@ fn housing_transform(
     {
         return Err(ServiceError::Housing(HousingError::NonFiniteTransform));
     }
-    let rotation = if transform.rotation == [0.0; 4] {
-        [1.0, 0.0, 0.0, 0.0]
-    } else {
-        transform.rotation
-    };
     Ok(FixtureTransform {
         position: [
             transform.position[0],
             transform.position[1],
             transform.position[2],
         ],
-        rotation,
-        tilt,
+        rotation: transform.rotation,
+        tilt: facing(transform.rotation),
         scale: transform.scale,
         tint_id,
     })

@@ -107,12 +107,12 @@ pub(super) fn scene_zone(
     })
 }
 
+/// The housing records, then the fixtures' actors: the client draws a fixture only from its NPC
+/// (35/2), which a retail server sends after the 127/40 and 127/44, and removes with a 35/3.
 fn encode_replies(outcome: &ServiceOutcome) -> io::Result<Vec<Vec<u8>>> {
-    outcome
-        .replies
-        .iter()
-        .map(|reply| reply.encode_inner())
-        .collect()
+    let records = outcome.replies.iter().map(|reply| reply.encode_inner());
+    let actors = outcome.actors.iter().map(|actor| actor.encode_inner());
+    records.chain(actors).collect()
 }
 
 impl Gameplay {

@@ -577,7 +577,9 @@ fn a_native_placement_consumes_the_real_inventory_instance() {
     assert_eq!(lot.fixtures[0].fixture_definition_id, BLOCK_FIXTURE);
     assert_eq!(lot.fixtures[0].item_instance_id, INSTANCE);
     assert_eq!(lot.fixtures[0].transform.position, [10.0, 0.0, 20.0]);
-    assert_eq!(lot.fixtures[0].transform.rotation, [1.0, 0.0, 0.0, 0.0]);
+    // The client sent no rotation, and retail keeps that as zeros facing +Z (T806).
+    assert_eq!(lot.fixtures[0].transform.rotation, [0.0; 4]);
+    assert_eq!(lot.fixtures[0].transform.tilt, [0.0, 0.0, 1.0, 0.0]);
     assert_eq!(
         units(&inventory, BLOCK_ITEM),
         0,
@@ -994,7 +996,7 @@ fn a_denied_request_encodes_the_recovered_53_body() {
 }
 
 #[test]
-fn a_non_unit_rotation_is_refused_and_rolled_back() {
+fn a_non_finite_rotation_is_refused_and_rolled_back() {
     let mut service = service_with_lot();
     let mut stock = TestStock::new(vec![owned(INSTANCE, BLOCK_ITEM, 1)]);
     enter(&mut service, &mut stock);
@@ -1004,14 +1006,59 @@ fn a_non_unit_rotation_is_refused_and_rolled_back() {
             OWNER,
             &place_frame(
                 SELECTION,
-                &block_transform(position(), [1.0, 1.0, 0.0, 0.0], 1.0),
+                &block_transform(position(), [f32::NAN, 0.0, 0.0, 0.0], 1.0),
             ),
             &mut stock,
         )
         .unwrap_err();
-    assert_eq!(error, ServiceError::Housing(HousingError::NonUnitRotation));
+    assert_eq!(
+        error,
+        ServiceError::MalformedRequest(RequestError::BodyRejected)
+    );
     assert_eq!(service.lot(HOUSE).unwrap().count, 0);
     assert_eq!(stock.instances.len(), 1);
+}
+
+/// The client's rotation lanes are Euler angles, not a quaternion: a quarter turn and a tipped
+/// turn place (T806; both were refused as a "non-unit rotation"), the record keeps the lanes and
+/// the tilt is the facing they imply, as in all 2015 retail instances of p2.pcap.
+#[test]
+fn a_client_euler_rotation_places_and_the_tilt_is_its_facing() {
+    for (yaw, pitch, facing) in [
+        (
+            std::f32::consts::FRAC_PI_2,
+            0.0_f32,
+            [1.0_f32, 0.0, 0.0, 0.0],
+        ),
+        (0.2618, 0.0, [0.2588, 0.0, 0.9659, 0.0]),
+        (-1.5708, -0.3285, [-0.9465, 0.3226, 0.0, 0.0]),
+    ] {
+        let mut service = service_with_lot();
+        let mut stock = TestStock::new(vec![owned(INSTANCE, BLOCK_ITEM, 1)]);
+        enter(&mut service, &mut stock);
+        service.offer(OWNER, SELECTION, INSTANCE, &stock).unwrap();
+        let rotation = [yaw, pitch, 0.0, 0.0];
+        let placed = service
+            .handle(
+                OWNER,
+                &place_frame(SELECTION, &block_transform(position(), rotation, 1.0)),
+                &mut stock,
+            )
+            .unwrap();
+        let update =
+            housing_native::FixtureUpdate::decode(&placed.replies[0].encode().unwrap()).unwrap();
+        assert_eq!(update.instance.rotation, rotation);
+        for (lane, (got, want)) in update.instance.tilt.iter().zip(facing).enumerate() {
+            assert!(
+                (got - want).abs() < 1e-3,
+                "{rotation:?} tilt lane {lane}: {got} vs {want}"
+            );
+        }
+        let [housing_service::FixtureActor::Spawn(npc)] = &placed.actors[..] else {
+            panic!("one AddNpc: {:?}", placed.actors)
+        };
+        assert_eq!((npc.rotation, npc.tilt), (update.instance.tilt, rotation));
+    }
 }
 
 #[test]
@@ -1037,9 +1084,14 @@ fn a_typed_move_stages_the_transform_and_keeps_the_item_placed() {
     assert_eq!(opcodes(&outcome), vec![REPLY_POSITION, REPLY_HOUSE_INFO]);
     let position =
         housing_native::PositionUpdate::decode(&outcome.replies[0].encode().unwrap()).unwrap();
-    assert_eq!(position.fixture_guid, guid);
+    // Retail's 127/51 names the NPC that draws the fixture, not the fixture (T806).
+    assert_eq!(
+        position.actor_guid,
+        housing_service::fixture_actor_guid(guid)
+    );
+    assert_ne!(position.actor_guid, guid);
     assert_eq!(position.position, [11.0, 0.0, 21.0, 1.0]);
-    assert_eq!(position.orientation, [1.0, 0.0, 0.0, 0.0]);
+    assert_eq!(position.orientation, ZERO_ROTATION);
     let lot = service.lot(HOUSE).unwrap();
     assert_eq!(lot.count, 1);
     assert_eq!(lot.fixtures[0].transform.position, [11.0, 0.0, 21.0]);
@@ -1380,7 +1432,7 @@ fn a_127_42_for_a_generated_row_carries_its_model_aliases_and_tint() {
     assert_eq!(asset.texture_alias, "fun-block-L1");
     assert_eq!(asset.tint_alias, "dyetint");
     assert_eq!(asset.tint_id, 227);
-    // The same row feeds the 127/40 customization block.
+    // The same row dresses the fixture's actor; the 127/40 record itself carries no look.
     let placed = service
         .handle(
             OWNER,
@@ -1394,8 +1446,19 @@ fn a_127_42_for_a_generated_row_carries_its_model_aliases_and_tint() {
     );
     let update =
         housing_native::FixtureUpdate::decode(&placed.replies[0].encode().unwrap()).unwrap();
-    assert_eq!(update.instance.customization.texture_alias, "fun-block-L1");
-    assert_eq!(update.instance.customization.tint_alias, "dyetint");
+    assert_eq!(update.instance.customization.texture_alias, "");
+    assert_eq!(update.instance.customization.tint_alias, "");
+    let [housing_service::FixtureActor::Spawn(npc)] = &placed.actors[..] else {
+        panic!("one AddNpc: {:?}", placed.actors)
+    };
+    assert_eq!(
+        (npc.texture_alias.as_str(), npc.tint_alias.as_str()),
+        ("fun-block-L1", "dyetint")
+    );
+    assert_eq!(
+        npc.tint_id, 227,
+        "the item's default tint, as retail's fun-block actors"
+    );
 }
 
 #[test]

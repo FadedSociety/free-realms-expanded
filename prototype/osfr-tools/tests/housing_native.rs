@@ -534,7 +534,7 @@ fn every_subtype_uses_the_same_explicit_family_boundary() {
             },
         }),
         HousingPacket::PositionUpdate(PositionUpdate {
-            fixture_guid: 13,
+            actor_guid: 13,
             position: [1.0, 2.0, 3.0, 1.0],
             orientation: [0.0, 0.0, 0.0, 1.0],
         }),
