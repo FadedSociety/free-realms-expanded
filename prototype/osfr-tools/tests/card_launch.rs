@@ -170,6 +170,33 @@ fn a_launch_block_admits_trading_card_rows_but_not_treasure_war() {
     assert!(with_launch(600_001).is_err());
 }
 
+/// T813: the lobby a card login enters lives in the launch block (R values), with sanity bounds.
+#[test]
+fn a_launch_block_names_the_lobby_within_bounds() {
+    let lobby = |group: i32, lobby_type: i32, role: i32| {
+        let mut content = launch_json(120_000);
+        content["launch"]["lobby"] =
+            json!({"group_id": group, "lobby_type": lobby_type, "role": role});
+        load(&content, &format!("lobby-{group}-{lobby_type}-{role}"))
+    };
+    let loaded = lobby(1, 1, 1).unwrap();
+    assert_eq!(
+        loaded.launch().unwrap().lobby,
+        Some(card_game::Lobby {
+            group_id: 1,
+            lobby_type: 1,
+            role: 1
+        })
+    );
+    assert_eq!(with_launch(120_000).unwrap().launch().unwrap().lobby, None);
+    for (group, lobby_type, role) in [(0, 1, 1), (1, 1, 0), (1, 1, 6), (1, -1, 1), (1, 256, 1)] {
+        assert!(
+            lobby(group, lobby_type, role).is_err(),
+            "{group} {lobby_type} {role}"
+        );
+    }
+}
+
 #[test]
 fn the_type_16_handshake_sends_a_one_time_ticket_in_39_28() {
     let cards = with_launch(120_000).unwrap();

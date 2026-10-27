@@ -113,7 +113,26 @@ pub struct Launch {
     /// T795: the asset list the offer names (default [`PRELOAD_FILE`]); never empty.
     #[serde(default = "default_preload_file")]
     pub preload_file: String,
+    /// T813: the lobby a card login enters; without it the card window stays on "Entering main
+    /// lobby..." after its login.
+    #[serde(default)]
+    pub lobby: Option<Lobby>,
     pub source: Vec<Source>,
+}
+
+/// T813: the one lobby group the card service defines for a logged-in card window (R: the
+/// client data names no lobby; bounded in `validate`). Group 1 is the client's root lobby: on
+/// learning it the client asks to join it itself (`10371960`).
+#[derive(Clone, Debug, Deserialize, PartialEq, Eq)]
+#[serde(deny_unknown_fields)]
+pub struct Lobby {
+    /// The group id (`Lobby` GroupID), the key every lobby lookup uses (`101717d0`).
+    pub group_id: i32,
+    /// `eLobbyTypeID` (R).
+    pub lobby_type: i32,
+    /// The player's role in it: 1 general, 2 player, 3 observer, 4 moderator, 5 staff (the
+    /// `Lobby` writer's role lists, `101558e0`); 0 is the client's invalid role.
+    pub role: i32,
 }
 
 fn default_preload_file() -> String {
@@ -285,6 +304,21 @@ impl Content {
             .is_some_and(|launch| !is_name(&launch.preload_file))
         {
             return Err(invalid("card launch asset list is 1 to 64 ASCII bytes"));
+        }
+        // (R) sanity bounds: a positive group, a known role, a small type.
+        if self
+            .launch
+            .as_ref()
+            .and_then(|l| l.lobby.as_ref())
+            .is_some_and(|lobby| {
+                lobby.group_id < 1
+                    || !(1..=5).contains(&lobby.role)
+                    || !(0..=255).contains(&lobby.lobby_type)
+            })
+        {
+            return Err(invalid(
+                "card lobby needs a positive group, a role 1 to 5 and a type 0 to 255",
+            ));
         }
         Ok(())
     }

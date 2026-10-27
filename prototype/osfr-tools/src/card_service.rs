@@ -345,6 +345,59 @@ fn ping_echo(body: &[u8]) -> io::Result<Vec<u8>> {
     Ok(echo)
 }
 
+/// T813: `LobbyCommand_AddGroups`, `LobbyCommand_Join` and `LobbyCommand_ChangeLobbyDisplay`.
+pub const ADD_GROUPS: i32 = 94;
+pub const JOIN: i32 = 92;
+pub const CHANGE_LOBBY_DISPLAY: i32 = 291;
+
+/// T813: the bodies that take a logged-in card window from "Entering main lobby..." to the
+/// lobby screen, in order. The screen dereferences its group without a null check
+/// (`102b9930`, called from setup `102b9500`), so the group is defined (94) before the screen
+/// opens (291). Every lobby command starts with the LobbyCommand level (reader `10156340`,
+/// writer `10156390`): the three class headers, then the account id it is about, here the
+/// player's own (the 81's), so Join takes the client's own-account path.
+/// - 94 v1 (`101583f0`, execute `101578b0`): a list (`10158350`) of one polymorphic `Lobby`, class
+///   103 v3 with one header (reader `10155710`): five optional property sets (1 = absent; the
+///   lobby's property reads `1014ba30`/`1014fcb0` treat an absent set as empty), five role lists
+///   (count 0), containing group 0, the group id, the lobby type, no deck (1), tournament round
+///   0 and sub-state 0. Its execute files the group (`10171b60`).
+/// - 92 v4 (`10163b20`, execute `10163220`): group, role, a string (R, empty), an int list (empty),
+///   the player's name, its property set (0 = present: an empty `PropertySet`, class 23 v1, map
+///   count 0, reader `101ba700`; required once the name is set), and an int (R, 0). For the
+///   client's own account it makes the group current (`10068cd0`) and adds the member
+///   (`10155590`, role must not be 0).
+/// - 291 v1 (`1015e5f0`, execute `1015e400`): the group id; event 70 opens the lobby screen for it
+///   (`10372d70` -> `1037e5a0`).
+pub fn lobby_entry(account: i32, lobby: &crate::card_game::Lobby, name: &str) -> [Vec<u8>; 3] {
+    let level = |id, version| {
+        let mut body = Vec::new();
+        put_headers(&mut body, id, version);
+        put_int(&mut body, account);
+        body
+    };
+    let mut groups = level(ADD_GROUPS, 1);
+    // One group: class 103 v3, five absent property sets, five empty role lists.
+    let lobby_object = [1, 103, 3, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0];
+    // Containing group, group, type, no deck, tournament round, sub-state.
+    let ids = [0, lobby.group_id, lobby.lobby_type, 1, 0, 0];
+    for value in lobby_object.into_iter().chain(ids) {
+        put_int(&mut groups, value);
+    }
+    let mut join = level(JOIN, 4);
+    put_int(&mut join, lobby.group_id);
+    put_int(&mut join, lobby.role);
+    put_string(&mut join, "");
+    put_int(&mut join, 0);
+    put_string(&mut join, name);
+    // The property set is present (0): `PropertySet` 23 v1, no entries; then the trailing int.
+    for value in [0, 23, 1, 0, 0] {
+        put_int(&mut join, value);
+    }
+    let mut display = level(CHANGE_LOBBY_DISPLAY, 1);
+    put_int(&mut display, lobby.group_id);
+    [groups, join, display]
+}
+
 /// The refusal of a ticket no live session holds: never minted, already spent, or its session
 /// ended.
 pub const UNKNOWN_TICKET: &str = "unknown_ticket";

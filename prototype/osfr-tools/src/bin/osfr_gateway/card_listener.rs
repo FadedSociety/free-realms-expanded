@@ -2,14 +2,16 @@
 //! (`tcg/FreeRealmsTCG.dll`) asks 414 for its connection server (answered with this listener),
 //! then logs in with 411; the login's launch ticket and character id are redeemed once in the
 //! session that minted the ticket (T764/T765). T808: a refused login is closed once its 81 is
-//! written; after login the client's ping (112) is echoed. Other commands are logged, not
+//! written; after login the client's ping (112) is echoed. T813: a login pushes the launch
+//! block's lobby (94 -> 92 -> 291), which opens the lobby screen. Other commands are logged, not
 //! answered yet. Off unless the card content's launch block names a port.
 //!
 //! T782: every step prints one JSON event line (`events`, drained by `Server::poll_card`):
 //! `card_connected`, `card_gateway_request` (a 414 answered), `card_login` (a 411: `ok`, the
 //! character on success, else the refusal `reason`; T805: also the 411's `version` and field
-//! `lengths`), `card_ping` (T808: a ping echoed), `card_command_unhandled` and `card_closed` with
-//! its reason. A ticket or session id is never in an event.
+//! `lengths`), `card_lobby` (T813: the lobby pushed, once per connection: ids only), `card_ping`
+//! (T808: a ping echoed), `card_command_unhandled` and `card_closed` with its reason. A ticket or
+//! session id is never in an event.
 use super::*;
 use osfr_tools::card_service;
 use serde_json::Value;
@@ -32,6 +34,8 @@ pub(super) struct CardListener {
     connections: Vec<Connection>,
     /// The event lines of the polls since the last drain.
     events: Vec<Value>,
+    /// T813: the lobby a login enters, from the launch block (none: the login stops there).
+    lobby: Option<osfr_tools::card_game::Lobby>,
 }
 
 struct Connection {
@@ -51,15 +55,18 @@ pub(super) fn open(options: &Options) -> io::Result<Option<CardListener>> {
         return Ok(None);
     };
     let dir = osfr_tools::content::npc_content(dir);
-    let port = osfr_tools::card_game::Content::load_optional(&dir)?
-        .and_then(|cards| cards.launch().map(|launch| launch.port))
-        .unwrap_or(0);
-    if port == 0 {
+    let launch = osfr_tools::card_game::Content::load_optional(&dir)?.and_then(|cards| {
+        cards
+            .launch()
+            .map(|launch| (launch.port, launch.lobby.clone()))
+    });
+    let Some((port @ 1.., lobby)) = launch else {
         return Ok(None);
-    }
+    };
     Ok(match CardListener::bind(options.bind.ip(), port) {
-        Ok(card) => {
+        Ok(mut card) => {
             println!("{}", json!({"event":"card_listening","port":card.port}));
+            card.lobby = lobby;
             Some(card)
         }
         Err(error) => {
@@ -83,6 +90,7 @@ impl CardListener {
             port: local.port(),
             connections: Vec::new(),
             events: Vec::new(),
+            lobby: None,
         })
     }
 
@@ -121,9 +129,9 @@ impl CardListener {
             }
         }
         let (host, port) = (self.host.clone(), self.port);
-        let events = &mut self.events;
+        let (events, lobby) = (&mut self.events, self.lobby.as_ref());
         self.connections.retain_mut(|c| {
-            let Some(reason) = c.serve(&host, port, now_ms, &mut redeem, events) else {
+            let Some(reason) = c.serve(&host, port, now_ms, lobby, &mut redeem, events) else {
                 return true;
             };
             events.push(json!({
@@ -141,6 +149,7 @@ impl Connection {
         host: &str,
         port: u16,
         now_ms: u64,
+        lobby: Option<&osfr_tools::card_game::Lobby>,
         redeem: &mut impl FnMut(&str, &str) -> Result<u64, &'static str>,
         events: &mut Vec<Value>,
     ) -> Option<&'static str> {
@@ -168,7 +177,7 @@ impl Connection {
                 Ok(None) => return None,
                 Err(_) => return Some("bad_frame"),
             };
-            let mut login = None;
+            let (mut login, mut name) = (None, String::new());
             let logged_in = self.character.is_some();
             let reply = card_service::reply(&body, host, port, logged_in, |l| {
                 let redeemed = redeem(&l.ticket, &l.character_id);
@@ -178,6 +187,7 @@ impl Connection {
                     "character_id":l.character_id.len(),"ticket":l.ticket.len()
                 });
                 login = Some((redeemed, l.version, lengths));
+                name = l.character_name.clone();
                 redeemed.ok()
             });
             match reply {
@@ -192,8 +202,15 @@ impl Connection {
                     match redeemed {
                         // T808: the refused 81 is written; the client shows it, nothing follows.
                         Some(Err(_)) => return Some("login_refused"),
-                        Some(Ok(character)) => self.character = self.character.or(Some(character)),
-                        None => {}
+                        Some(Ok(character)) if self.character.is_none() => {
+                            self.character = Some(character);
+                            if let Some(lobby) = lobby {
+                                if !self.enter_lobby(character, lobby, &name, events) {
+                                    return Some("write_failed");
+                                }
+                            }
+                        }
+                        _ => {}
                     }
                 }
                 Ok(None) => {
@@ -208,6 +225,33 @@ impl Connection {
                 Err(_) => return Some("bad_message"),
             }
         }
+    }
+
+    /// T813: push the lobby after the first successful login (the 81 is already written): the
+    /// three frames of `card_service::lobby_entry`, then one `card_lobby` event. False when the
+    /// peer cannot take them.
+    fn enter_lobby(
+        &mut self,
+        character: u64,
+        lobby: &osfr_tools::card_game::Lobby,
+        name: &str,
+        events: &mut Vec<Value>,
+    ) -> bool {
+        let account = card_service::account_id(character);
+        for body in card_service::lobby_entry(account, lobby, name) {
+            if self
+                .stream
+                .write_all(&card_service::server_frame(&body))
+                .is_err()
+            {
+                return false;
+            }
+        }
+        events.push(json!({
+            "event":"card_lobby","peer":self.peer.to_string(),"character":character,
+            "account":account,"group":lobby.group_id
+        }));
+        true
     }
 
     /// The event for an answered 414 (the address it sent the client to) or 411 (`login`: the
@@ -522,6 +566,53 @@ pub(super) mod tests {
         assert_eq!(
             pings.map(|e| &e["character"]).collect::<Vec<_>>(),
             [&json!(5041)]
+        );
+    }
+
+    /// T813: login -> lobby over the real socket: after the 81 come 94, 92 and 291, exactly the
+    /// bodies `lobby_entry` builds for this account, group and the 411's name, then one
+    /// `card_lobby` event with ids only. A refused login gets no lobby.
+    #[test]
+    fn a_card_login_enters_the_lobby_in_order() {
+        if !test_support::bin_test_target("card") {
+            return;
+        }
+        let mut card = listener();
+        let lobby = osfr_tools::card_game::Lobby {
+            group_id: 1,
+            lobby_type: 1,
+            role: 1,
+        };
+        card.lobby = Some(lobby.clone());
+        let mut refused = client(&card);
+        log_in(&mut card, &mut refused, "", "77", refuse("", ""));
+        let guid = 5041u64;
+        let mut player = client(&card);
+        let (ok, ..) = log_in(&mut card, &mut player, "", "78", Ok(guid));
+        assert!(ok);
+        let account = card_service::account_id(guid);
+        let pushed: Vec<_> = (0..3).map(|_| answer(&mut card, &mut player, 3)).collect();
+        assert_eq!(
+            pushed,
+            card_service::lobby_entry(account, &lobby, "Tester"),
+            "AddGroups, Join, ChangeLobbyDisplay, in that order"
+        );
+        let classes: Vec<_> = pushed
+            .iter()
+            .map(|b| card_service::class_id(b).unwrap())
+            .collect();
+        assert_eq!(classes, [94, 92, 291]);
+        let lobbies: Vec<_> = card
+            .events
+            .iter()
+            .filter(|e| e["event"] == "card_lobby")
+            .collect();
+        assert_eq!(
+            lobbies,
+            [&json!({
+                "event":"card_lobby","peer":player.local_addr().unwrap().to_string(),
+                "character":guid,"account":account,"group":1
+            })]
         );
     }
 

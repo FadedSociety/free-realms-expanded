@@ -348,6 +348,58 @@ fn every_character_gets_a_non_zero_account_id() {
 /// T808: the client's ping (writer `10190020`: one header, then the spoof value) is echoed once
 /// logged in, byte for byte as the client's reader `1018ffe0` reads it; before login it is left
 /// to the caller.
+/// T813: the lobby bodies, spelled out field by field in the client readers' order (account 7,
+/// group 12, type 5, role 2, name "Tester"). Compact ids: 94 = `2E 05`, 92 = `2C 05`, 291 =
+/// `23 12`, Lobby 103 = `27 06`, PropertySet 23 = `27 01`.
+#[test]
+fn the_lobby_bodies_match_the_client_readers() {
+    let lobby = osfr_tools::card_game::Lobby {
+        group_id: 12,
+        lobby_type: 5,
+        role: 2,
+    };
+    let [groups, join, display] = card_service::lobby_entry(7, &lobby, "Tester");
+    // 94 v1 (`101583f0`): headers, account, one group (`10158350`), then the `Lobby` (`10155710`):
+    // its header (103 v3), five absent property sets, five empty role lists, containing group 0,
+    // group, type, no deck, tournament round 0, sub-state 0.
+    let lobby_object = [
+        &[0x01][..],
+        &[0x27, 0x06, 0x03],
+        &[0x01; 5],
+        &[0x00; 5],
+        &[0x00, 0x0C, 0x05, 0x01, 0x00, 0x00],
+    ];
+    assert_eq!(
+        groups,
+        [
+            &headers(&[0x2E, 0x05], 1)[..],
+            &[0x07],
+            &lobby_object.concat()
+        ]
+        .concat()
+    );
+    // 92 v4 (`10163b20`): headers, account, group, role, empty string, empty int list, the name,
+    // a present (0) empty `PropertySet` (23 v1, no entries), the trailing int.
+    assert_eq!(
+        join,
+        [
+            &headers(&[0x2C, 0x05], 4)[..],
+            &[0x07, 0x0C, 0x02],
+            &text(""),
+            &[0x00],
+            &text("Tester"),
+            &[0x00, 0x27, 0x01, 0x01, 0x00],
+            &[0x00],
+        ]
+        .concat()
+    );
+    // 291 v1 (`1015e5f0`): headers, account, group.
+    assert_eq!(
+        display,
+        [&headers(&[0x23, 0x12], 1)[..], &[0x07, 0x0C]].concat()
+    );
+}
+
 #[test]
 fn a_ping_is_echoed_only_after_login() {
     // Compact 112 = `20 07`, version `01`, spoof 1234 = `22 4D`.
