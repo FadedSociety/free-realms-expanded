@@ -43,6 +43,18 @@ the owner's Codex weekly limit was reached; Claude Code is now the lead. DeepSee
 
 Codex hit its usage limit (resets October 22). Workers now run as Claude subagents on **Sonnet** (scoped builds and research) or **Haiku** (mechanical work), never Opus. Each worker reads `lab/runs/claude/subagent-rules.md` and then its brief in `lab/runs/luna/prompts/`. The rules cover exclusive file ownership, no git stash/reset/commit, preserving line endings, a private build dir, and disk cleanup. Workers write patches for shared files instead of editing them. **The lead does all security work personally** (auth, login broker, transport, roles, admission, inspect privacy), and reviews every worker with the full suite in a clean worktree before committing. At most five workers at once.
 
+## Publishing, October 26
+
+This repository is going public: everything committed here is published, history included. Only the lead pushes, tags, publishes releases or changes visibility; workers never commit to a remote, push or publish. Every commit is authored as `FadedSociety <FadedSociety@users.noreply.github.com>`. Never commit:
+- secrets, tokens, private keys or per-device state (launcher profiles, handoff keys, server ids, identity and account stores, saves);
+- personal emails or names, or absolute home paths (write repo-relative paths);
+- anything from `../lab`, as files or as prose copied from the wiki, article and forum research: carry ids, numbers and dates with a citation;
+- client binaries, packs, extracted assets, game screenshots or decompiler output (cite the client function name and address instead);
+- code or test fixtures copied from AGPL projects (Sanctuary, FreeRealms-Legacy);
+- build output, logs, scratch scripts, or any file over 10 MB.
+
+Before each push the lead runs the upload gate (`../lab/autopilot/publish-check.sh`) over every new commit. Players supply their own game client; release downloads carry only our server builds and content.
+
 ## Current state and plan (read first)
 
 Start with `notes/Project Map.md`, which maps where every module, binary, test gate, script and lab folder lives.
