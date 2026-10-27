@@ -1,13 +1,15 @@
 //! T491 (R): a content row may name a `client_areas.json` season; `NpcVisibility` drops it when
-//! that season is over. T468 retired the 12 Halloween decoration rows to
-//! `npc_spawns_retired.json` as out-of-bounds housing-demo props, and `world.rs` never reads that
-//! archive, so production draws none of them today. These tests copy the real live table and add
-//! those archived rows, so the rule is proven on the shipped 2,675 rows plus the 12 candidates.
-//! No test reads today's date: every clock below is fixed.
-use osfr_tools::{gameplay::Gameplay, world::NpcVisibility};
+//! that season is over. T775 keeps the rows in the play-time table instead and hides a tagged row
+//! at view time, so the same rule runs again when the clock crosses the boundary; this suite also
+//! pins that the live table's tags name shipped seasons. T468 retired the 12 Halloween decoration
+//! rows to `npc_spawns_retired.json` as out-of-bounds housing-demo props, and `world.rs` never
+//! reads that archive, so production draws none of them today. These tests copy the real live
+//! table and add those archived rows, so the rule is proven on the shipped 2,775 rows plus the 12
+//! candidates. No test reads today's date: every clock below is fixed.
+use osfr_tools::{client_areas::ClientAreas, gameplay::Gameplay, world::NpcVisibility};
 use serde_json::{Value, json};
 use std::{
-    collections::BTreeSet,
+    collections::{BTreeMap, BTreeSet},
     fs,
     path::{Path, PathBuf},
     sync::atomic::{AtomicU64, Ordering},
@@ -65,16 +67,35 @@ fn archived_halloween_rows() -> Vec<Value> {
     rows
 }
 
-/// The 12 shipped rows, tagged, unique, and absent from the live table (T468).
+/// Every row that names a season, live or archived, as GUID -> season name.
+fn seasonal_rows(live: &[Value], archived: &[Value]) -> BTreeMap<u64, String> {
+    live.iter()
+        .chain(archived)
+        .filter_map(|row| {
+            let season = row["season"].as_str()?;
+            Some((guid(row), season.to_owned()))
+        })
+        .collect()
+}
+
+/// The 12 shipped rows, tagged, unique, and absent from the live table (T468). T775 tags the
+/// live seasonal rows too, so the live tags are checked against the shipped season table here.
 fn tagged_rows(live: &[Value], archived: &[Value]) -> BTreeSet<u64> {
     assert_eq!(
         archived.len(),
         12,
         "the archive holds the 12 Halloween decoration rows"
     );
+    let areas = ClientAreas::load(&bundled()).unwrap();
+    let live_seasons: BTreeSet<&str> = live
+        .iter()
+        .filter_map(|row| row["season"].as_str())
+        .collect();
     assert!(
-        live.iter().all(|row| row.get("season").is_none()),
-        "the live table carries no season tag: production draws none of these props (T468)"
+        live_seasons
+            .iter()
+            .all(|season| areas.season_state(season, 0).is_some()),
+        "a live season tag names a season client_areas.json does not define: {live_seasons:?}"
     );
     let tagged: BTreeSet<u64> = archived.iter().map(guid).collect();
     assert_eq!(tagged.len(), 12, "a Halloween spawn GUID repeats");
@@ -165,6 +186,7 @@ fn the_twelve_halloween_rows_are_tagged_and_leave_only_when_the_season_is_over()
         tagged.is_subset(&shown),
         "every archived row loads before the filter"
     );
+    let seasonal = seasonal_rows(&live, &archived);
 
     let mut active = loaded.clone();
     active.retain_in_season(|_| Some(true)).unwrap();
@@ -177,9 +199,14 @@ fn the_twelve_halloween_rows_are_tagged_and_leave_only_when_the_season_is_over()
     let mut over = loaded.clone();
     over.retain_in_season(|_| Some(false)).unwrap();
     let dropped: BTreeSet<u64> = shown.difference(&present(&over, &guids)).copied().collect();
+    let expected: BTreeSet<u64> = seasonal.keys().copied().collect();
+    assert!(
+        tagged.is_subset(&expected),
+        "the 12 archived rows are seasonal"
+    );
     assert_eq!(
-        dropped, tagged,
-        "the over season drops exactly the tagged rows and leaves every live row"
+        dropped, expected,
+        "the over season drops exactly the tagged rows and leaves every untagged row"
     );
     assert_eq!(active.content_key(CAKE), Some(CAKE_KEY));
     assert_eq!(over.content_key(CAKE), None);
@@ -199,7 +226,9 @@ fn the_twelve_halloween_rows_are_tagged_and_leave_only_when_the_season_is_over()
 fn an_unknown_season_fails_naming_the_row_and_drops_nothing() {
     let live = live_rows();
     let archived = archived_halloween_rows();
-    let first = guid(&archived[0]);
+    // Rows are sorted by actor id, so this is the first seasonal row the check sees (a live row
+    // now precedes the archive; T775 tags both).
+    let first = *seasonal_rows(&live, &archived).keys().next().unwrap();
     let guids: BTreeSet<u64> = live.iter().chain(&archived).map(guid).collect();
     let fixture = Fixture::new("unknown", &live, &archived);
     let mut visibility = NpcVisibility::load(fixture.path()).unwrap();
@@ -223,25 +252,43 @@ fn loading_for_play_follows_the_shipped_season_dates() {
     let fixture = Fixture::new("dates", &live, &archived);
 
     let loaded = NpcVisibility::load(fixture.path()).unwrap();
+    let loaded_shown = present(&loaded, &guids);
+    let seasonal = seasonal_rows(&live, &archived);
+    let areas = ClientAreas::load(&bundled()).unwrap();
     let in_season = NpcVisibility::load_in_season_at(fixture.path(), IN_SEASON_MS).unwrap();
     assert_eq!(in_season.model_of(CAKE), Some(3202));
     assert_eq!(in_season.content_key(CAKE), Some(CAKE_KEY));
+    let expected_in: BTreeSet<u64> = loaded_shown
+        .iter()
+        .copied()
+        .filter(|guid| {
+            seasonal
+                .get(guid)
+                .is_none_or(|season| areas.is_season_active(season, IN_SEASON_MS))
+        })
+        .collect();
     assert_eq!(
         present(&in_season, &guids),
-        present(&loaded, &guids),
-        "the shipped dates keep every row inside Halloween"
+        expected_in,
+        "inside Halloween every row of an active season (not just the 12) is drawn"
+    );
+    assert!(
+        tagged.is_subset(&expected_in),
+        "the 12 archived rows are drawn at Halloween"
     );
 
     let off_season = NpcVisibility::load_in_season_at(fixture.path(), OFF_SEASON_MS).unwrap();
     assert!(off_season.model_of(CAKE).is_none());
     assert_eq!(off_season.content_key(CAKE), None);
-    let dropped: BTreeSet<u64> = present(&loaded, &guids)
-        .difference(&present(&off_season, &guids))
+    let expected_off: BTreeSet<u64> = loaded_shown
+        .iter()
         .copied()
+        .filter(|guid| !seasonal.contains_key(guid))
         .collect();
     assert_eq!(
-        dropped, tagged,
-        "outside the shipped dates exactly the tagged rows go"
+        present(&off_season, &guids),
+        expected_off,
+        "outside every shipped date exactly the seasonal rows go"
     );
 
     // The production caller loads the same tree (either side of the season); the undefined-season

@@ -43730,6 +43730,7 @@
     },
     {
       "spawn_guid": 100000004059,
+      "season": "Birthday Bash",
       "legacy_npc_id": 4059,
       "model_id": 315,
       "model_file_name": "evnt_anniversary_fireworks_wagon_01.adr",
@@ -58777,6 +58778,7 @@
     },
     {
       "spawn_guid": 100000031334,
+      "season": "Halloween",
       "legacy_npc_id": 31334,
       "model_id": 1702,
       "model_file_name": "pumpkinprince_m_boss.adr",
@@ -58799,6 +58801,7 @@
     },
     {
       "spawn_guid": 100000031425,
+      "season": "Snow Days",
       "legacy_npc_id": 31425,
       "model_id": 1776,
       "model_file_name": "evnt_winter_holiday_tree_presents_03.adr",
@@ -58821,6 +58824,7 @@
     },
     {
       "spawn_guid": 100000031427,
+      "season": "Snow Days",
       "legacy_npc_id": 31427,
       "model_id": 17,
       "model_file_name": "present_01.adr",
@@ -58843,6 +58847,7 @@
     },
     {
       "spawn_guid": 100000031428,
+      "season": "Snow Days",
       "legacy_npc_id": 31428,
       "model_id": 18,
       "model_file_name": "present_02.adr",
@@ -58865,6 +58870,7 @@
     },
     {
       "spawn_guid": 100000031443,
+      "season": "Snow Days",
       "legacy_npc_id": 31443,
       "model_id": 1907,
       "model_file_name": "snowman_present.adr",
@@ -58887,6 +58893,7 @@
     },
     {
       "spawn_guid": 100000031445,
+      "season": "Snow Days",
       "legacy_npc_id": 31445,
       "model_id": 1907,
       "model_file_name": "snowman_present.adr",
@@ -58909,6 +58916,7 @@
     },
     {
       "spawn_guid": 100000031455,
+      "season": "Festival of Hearts",
       "legacy_npc_id": 31455,
       "model_id": 2035,
       "model_file_name": "heart_critter.adr",
@@ -58931,6 +58939,7 @@
     },
     {
       "spawn_guid": 100000031456,
+      "season": "Festival of Hearts",
       "legacy_npc_id": 31456,
       "model_id": 2035,
       "model_file_name": "heart_critter.adr",
@@ -58953,6 +58962,7 @@
     },
     {
       "spawn_guid": 100000031457,
+      "season": "Festival of Hearts",
       "legacy_npc_id": 31457,
       "model_id": 2035,
       "model_file_name": "heart_critter.adr",
@@ -58975,6 +58985,7 @@
     },
     {
       "spawn_guid": 100000031459,
+      "season": "Festival of Hearts",
       "legacy_npc_id": 31459,
       "model_id": 2035,
       "model_file_name": "heart_critter.adr",
@@ -58997,6 +59008,7 @@
     },
     {
       "spawn_guid": 100000031460,
+      "season": "Festival of Hearts",
       "legacy_npc_id": 31460,
       "model_id": 2035,
       "model_file_name": "heart_critter.adr",
@@ -59019,6 +59031,7 @@
     },
     {
       "spawn_guid": 100000031480,
+      "season": "Halloween",
       "legacy_npc_id": 31480,
       "model_id": 751,
       "model_file_name": "wraith_m_cloakedskelly.adr",
@@ -59041,6 +59054,7 @@
     },
     {
       "spawn_guid": 100000031482,
+      "season": "Halloween",
       "legacy_npc_id": 31482,
       "model_id": 751,
       "model_file_name": "wraith_m_cloakedskelly.adr",

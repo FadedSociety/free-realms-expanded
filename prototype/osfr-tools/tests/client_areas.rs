@@ -271,17 +271,29 @@ fn a_season_without_client_areas_gates_by_date_and_switches_nothing() {
             pad,
             "{name}"
         );
-        // Crossing either edge changes no area, so no packet.
+        // Crossing either edge changes no area, so no packet. T775: the boundary is still
+        // reported, so seasonal NPCs that are not client areas follow the same clock.
         assert!(areas.season_changes(first - 60_000).is_empty());
+        assert!(
+            !areas.season_changed(),
+            "{name}: the baseline reports nothing"
+        );
         assert!(areas.season_changes(first).is_empty(), "{name} opens");
+        assert!(areas.season_changed(), "{name} opens without an area");
+        assert!(areas.season_changes(first + 30_000).is_empty());
+        assert!(
+            !areas.season_changed(),
+            "{name}: the same minute reports once"
+        );
         assert!(
             areas.season_changes(last + 60_000).is_empty(),
             "{name} closes"
         );
+        assert!(areas.season_changed(), "{name} closes without an area");
     }
 
     // The loader takes an empty list too, whatever the shipped rows are.
-    let (_dir, areas) = custom(
+    let (_dir, mut areas) = custom(
         "quiet",
         0,
         serde_json::json!([{"name": "Quiet", "start_month": 3, "start_day": 1, "end_month": 3,
@@ -289,6 +301,13 @@ fn a_season_without_client_areas_gates_by_date_and_switches_nothing() {
     );
     assert!(areas.is_season_active("Quiet", at(2026, 3, 1, 12, 0)));
     assert!(areas.world_ready_packets(at(2026, 3, 1, 12, 0)).is_empty());
+    assert!(areas.season_changes(at(2026, 2, 28, 23, 59)).is_empty());
+    assert!(!areas.season_changed(), "the first call is the baseline");
+    assert!(areas.season_changes(at(2026, 3, 1, 0, 0)).is_empty());
+    assert!(
+        areas.season_changed(),
+        "the opening boundary is reported without an area"
+    );
 }
 
 #[test]

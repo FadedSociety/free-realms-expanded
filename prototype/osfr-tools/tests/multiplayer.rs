@@ -1293,6 +1293,7 @@ impl PlaytestContent {
                 "jobs.json",
                 "field_kill_rewards.json",
                 "npc_spawns_extra.json",
+                "client_areas.json",
                 "boomboxes.json",
             ],
         );

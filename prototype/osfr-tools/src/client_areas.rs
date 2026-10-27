@@ -158,6 +158,9 @@ pub struct ClientAreas {
     active: u64,
     /// Unix minute of that evaluation; `None` until the first call records the baseline.
     checked_minute: Option<u64>,
+    /// T775: whether the last `season_changes` call moved the active season set, even when those
+    /// seasons hold no client area (so no packet was sent). Read with [`Self::season_changed`].
+    season_changed: bool,
 }
 
 impl ClientAreas {
@@ -287,8 +290,11 @@ impl ClientAreas {
     /// Evaluates at most once per wall-clock minute; the first call only records the baseline
     /// (clients that loaded before it got the clock's areas from `world_ready_packets`). A clock
     /// that moves backwards is just another date, so an area is never enabled twice in a row.
-    /// No seasons: no work and no allocation.
+    /// No seasons: no work and no allocation. A boundary with no area to switch is reported by
+    /// [`Self::season_changed`] instead, so seasonal content that is not a client area follows
+    /// the same clock.
     pub fn season_changes(&mut self, unix_ms: u64) -> Vec<Vec<u8>> {
+        self.season_changed = false;
         let minute = unix_ms / 60_000;
         if self.content.seasons.is_empty() || self.checked_minute == Some(minute) {
             return Vec::new();
@@ -299,6 +305,7 @@ impl ClientAreas {
             self.active = active;
             return Vec::new();
         }
+        self.season_changed = true;
         let (before, after) = (self.held(self.active), self.held(active));
         self.active = active;
         before
@@ -306,5 +313,11 @@ impl ClientAreas {
             .map(|id| packet(*id, false, 0))
             .chain(after.difference(&before).map(|id| packet(*id, true, 0)))
             .collect()
+    }
+
+    /// T775: whether the last [`Self::season_changes`] call moved the active season set. The
+    /// caller re-evaluates season-gated content when it did, even if no area changed.
+    pub fn season_changed(&self) -> bool {
+        self.season_changed
     }
 }

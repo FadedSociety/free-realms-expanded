@@ -68,7 +68,9 @@ struct VisibleNpc {
     position: [f32; 3],
     /// (R) Content yaw the actor faces; `None` when the row carries no transform.
     heading: Option<f32>,
-    /// T491: the client season this prop belongs to; `None` rows show all year.
+    /// T491/T775: the `client_areas.json` season this row belongs to; `None` rows show all
+    /// year. A table loaded for play ([`NpcVisibility::load_in_season`]) hides the row while
+    /// the season is inactive at the view clock.
     season: Option<String>,
 }
 
@@ -91,6 +93,13 @@ pub struct NpcVisibility {
     /// T753: world zone/region/place table from `regions.json`; `None` when the
     /// content set has no file.
     regions: Option<Arc<crate::world_regions::RegionTable>>,
+    /// T775: the season table the row tags resolve against; `None` in [`Self::load`], whose
+    /// rows are season-independent (T491). A table loaded for play keeps every row and hides
+    /// a tagged one at view time, so a season boundary spawns/despawns it through the normal
+    /// 35/2/35/3 diff.
+    seasons: Option<Arc<crate::client_areas::ClientAreas>>,
+    /// T775: a pinned unix-ms clock for tests and clock checks; `None` follows the wall clock.
+    season_clock: Option<u64>,
 }
 
 /// (R) One candidate in the common passive/hostile NPC budget. Engaged actors
@@ -275,12 +284,10 @@ impl NpcVisibility {
         if !position.iter().all(|v| v.is_finite()) {
             return Err(invalid("NPC visibility position is not finite"));
         }
-        let passive = self
-            .by_zone
-            .get(&zone)
-            .into_iter()
-            .flatten()
-            .filter(|npc| !self.excluded.contains(&npc.spawn.actor_id));
+        let now_ms = self.season_now_ms();
+        let passive = self.by_zone.get(&zone).into_iter().flatten().filter(|npc| {
+            !self.excluded.contains(&npc.spawn.actor_id) && self.season_shown(npc, now_ms)
+        });
         let mut candidates: Vec<_> = passive
             .clone()
             .map(|npc| NpcInterest {
@@ -338,7 +345,19 @@ impl NpcVisibility {
 
     /// Loads regional NPC rows and the zone-less Legacy placement table.
     /// Extra spawn zones use nearest positioned regional NPC as local policy (R).
+    /// Season tags are inert here: use [`Self::load_in_season`] for play.
     pub fn load(content_dir: &Path) -> io::Result<Self> {
+        Self::load_with_seasons(content_dir, None, None)
+    }
+
+    /// [`Self::load`] with the season table the row tags resolve against and the clock views
+    /// are judged at (`None` follows the wall clock). Every tag is validated up front, so an
+    /// unknown season refuses the load naming the row before anything can be drawn.
+    fn load_with_seasons(
+        content_dir: &Path,
+        seasons: Option<Arc<crate::client_areas::ClientAreas>>,
+        season_clock: Option<u64>,
+    ) -> io::Result<Self> {
         let regions = crate::world_regions::RegionTable::load(content_dir)?.map(Arc::new);
         let zones: Rows<ZoneName> = read_rows(&content_dir.join("zones.json"))?;
         let zone_ids: HashMap<_, _> = zones
@@ -362,6 +381,8 @@ impl NpcVisibility {
 
         let mut result = Self {
             regions,
+            seasons,
+            season_clock,
             ..Self::default()
         };
         let mut anchors = Vec::new();
@@ -492,28 +513,78 @@ impl NpcVisibility {
         for npcs in Arc::make_mut(&mut result.by_zone).values_mut() {
             npcs.sort_by_key(|npc| npc.spawn.actor_id);
         }
+        if let Some(areas) = &result.seasons {
+            result.validate_seasons(areas)?;
+        }
         Ok(result)
     }
 
-    /// T491: [`Self::load`] for play: the props of a `client_areas.json` season that is not
-    /// active now are dropped. The table is per session: one that runs across a season end
-    /// keeps them until a restart (R), because `realm reload` never re-reads
-    /// `npc_spawns_extra.json`; a session that starts after it follows the load clock.
+    /// T491/T775: [`Self::load`] for play. Rows tagged with a `client_areas.json` season stay
+    /// in the table; every view shows them only while that season is active at the wall clock,
+    /// so a season boundary spawns or despawns them through the normal 35/2 / 35/3 diff without
+    /// a reload. The gateway season tick forces the next shared view to re-diff when a season
+    /// changes (`bin/osfr_gateway/client_area_routing.rs`).
     pub fn load_in_season(content_dir: &Path) -> io::Result<Self> {
-        Self::load_in_season_at(content_dir, crate::client_areas::unix_now_ms())
+        let areas = crate::client_areas::ClientAreas::load(content_dir)?;
+        Self::load_with_seasons(content_dir, Some(Arc::new(areas)), None)
     }
 
-    /// [`Self::load_in_season`] with an explicit clock, so tests pass a fixed instant.
+    /// [`Self::load_in_season`] with a pinned clock, so tests pass a fixed instant.
     pub fn load_in_season_at(content_dir: &Path, unix_ms: u64) -> io::Result<Self> {
         let areas = crate::client_areas::ClientAreas::load(content_dir)?;
-        let mut result = Self::load(content_dir)?;
-        result.retain_in_season(|season| areas.season_state(season, unix_ms))?;
-        Ok(result)
+        Self::load_with_seasons(content_dir, Some(Arc::new(areas)), Some(unix_ms))
+    }
+
+    /// T775: pin the clock seasonal rows are judged at (`None` follows the wall clock) and make
+    /// the next view re-diff. Nothing is saved; a reconnect follows the wall clock again.
+    pub fn set_season_clock(&mut self, unix_ms: Option<u64>) {
+        self.season_clock = unix_ms;
+        self.revision = self.revision.wrapping_add(1);
+    }
+
+    /// The clock a tagged row is judged at. Zero (no clock read) when the table has no season
+    /// table: [`Self::load`] keeps every row, as T491's archive rule requires.
+    fn season_now_ms(&self) -> u64 {
+        if self.seasons.is_none() {
+            return 0;
+        }
+        self.season_clock
+            .unwrap_or_else(crate::client_areas::unix_now_ms)
+    }
+
+    /// T775: whether `npc` is drawn at `now_ms`. An untagged row always is; a tagged one only
+    /// while its season is active. An undefined season is not active (fail closed; the loader
+    /// refuses such a tag before this can see it).
+    fn season_shown(&self, npc: &VisibleNpc, now_ms: u64) -> bool {
+        let Some(season) = npc.season.as_deref() else {
+            return true;
+        };
+        self.seasons
+            .as_ref()
+            .is_none_or(|areas| areas.is_season_active(season, now_ms))
+    }
+
+    /// Every `season` tag must name a `client_areas.json` row; a typo refuses the whole table
+    /// naming the spawn, as [`Self::retain_in_season`] did for the load-time rule.
+    fn validate_seasons(&self, areas: &crate::client_areas::ClientAreas) -> io::Result<()> {
+        for npc in self.by_zone.values().flatten() {
+            let Some(season) = npc.season.as_deref() else {
+                continue;
+            };
+            if areas.season_state(season, 0).is_none() {
+                return Err(invalid(format!(
+                    "NPC spawn {} names season {season:?}, which client_areas.json does not define",
+                    npc.spawn.actor_id
+                )));
+            }
+        }
+        Ok(())
     }
 
     /// Drops the rows of seasons `active` reports as over; `None` means the season is not
-    /// defined, which fails the call (naming the row) and drops nothing. Call it on the freshly
-    /// loaded table: a row a viewer already knows leaves on the next update's 35/3 diff.
+    /// defined, which fails the call (naming the row) and drops nothing. This is the load-time
+    /// physical rule before T775's view gate; the live path keeps the rows and
+    /// [`Self::season_shown`] hides them, so they return when the season does.
     pub fn retain_in_season(&mut self, active: impl Fn(&str) -> Option<bool>) -> io::Result<()> {
         let mut over = BTreeSet::new();
         for npc in self.by_zone.values().flatten() {
@@ -687,7 +758,8 @@ impl NpcVisibility {
     }
 
     /// Model of a visible content actor, for content-defined fixtures such as
-    /// crafting stations and the T507 ambient pass. Excluded actors have none.
+    /// crafting stations and the T507 ambient pass. Excluded actors, and a
+    /// season-gated actor whose season is over, have none.
     /// Every `by_zone` row list is sorted by actor id (load and `place`), so a
     /// lookup is one binary search per zone until the actor's zone is reached.
     /// Every insert uses `OPEN_WORLD_ZONE` today, so the T507 pass pays one
@@ -696,27 +768,33 @@ impl NpcVisibility {
         if self.excluded.contains(&actor_id) {
             return None;
         }
+        let now_ms = self.season_now_ms();
         self.by_zone.values().find_map(|npcs| {
             let index = npcs
                 .binary_search_by_key(&actor_id, |npc| npc.spawn.actor_id)
                 .ok()?;
-            u32::try_from(npcs[index].spawn.model_id).ok()
+            let npc = &npcs[index];
+            self.season_shown(npc, now_ms)
+                .then(|| u32::try_from(npc.spawn.model_id).ok())
+                .flatten()
         })
     }
 
     /// Model and position of a loaded actor, including one hidden from this
     /// viewer (a collected or replaced coin, or a field actor): the authoring
     /// commands need the content row, not this viewer's filtered view (T525).
+    /// A season-gated row whose season is over is not loaded for play.
     pub fn authored_spawn(&self, actor_id: u64) -> Option<(u32, [f32; 3])> {
         let npc = self.find_actor(actor_id)?;
         Some((u32::try_from(npc.spawn.model_id).ok()?, npc.position))
     }
 
     fn find_actor(&self, actor_id: u64) -> Option<&VisibleNpc> {
+        let now_ms = self.season_now_ms();
         self.by_zone
             .values()
             .flatten()
-            .find(|npc| npc.spawn.actor_id == actor_id)
+            .find(|npc| npc.spawn.actor_id == actor_id && self.season_shown(npc, now_ms))
     }
 
     /// Where a content actor stands, for click reach checks. Excluded and removed actors have
@@ -746,10 +824,11 @@ impl NpcVisibility {
         self.excluded.extend(actor_guids);
     }
 
+    /// A shown actor's content key. An excluded actor, or one whose season is over, has none:
+    /// a client cannot interact with an actor the server is not drawing.
     pub fn content_key(&self, runtime_guid: u64) -> Option<u64> {
-        (!self.excluded.contains(&runtime_guid))
-            .then(|| self.content_keys.get(&runtime_guid).copied())
-            .flatten()
+        self.shown(runtime_guid)
+            .and_then(|_| self.content_keys.get(&runtime_guid).copied())
     }
 
     /// The actors this tracker has sent and not removed (empty in shared mode).
@@ -763,39 +842,56 @@ impl NpcVisibility {
         &'a self,
         guids: &'a BTreeSet<u64>,
     ) -> impl Iterator<Item = (u64, u64, i32)> + 'a {
+        let now_ms = self.season_now_ms();
         let shown = self.by_zone.values().flatten();
         shown
-            .filter(|npc| guids.contains(&npc.spawn.actor_id))
-            .filter_map(|npc| {
+            .filter(move |npc| {
+                guids.contains(&npc.spawn.actor_id)
+                    && !self.excluded.contains(&npc.spawn.actor_id)
+                    && self.season_shown(npc, now_ms)
+            })
+            .filter_map(move |npc| {
                 let guid = npc.spawn.actor_id;
-                Some((guid, self.content_key(guid)?, npc.spawn.name_string_id))
+                Some((
+                    guid,
+                    *self.content_keys.get(&guid)?,
+                    npc.spawn.name_string_id,
+                ))
             })
     }
 
     /// Placed actor model ids and positions, for content-defined scene fixtures
     /// such as crafting stations. Zones use the open-world label recorded by
-    /// the loader.
+    /// the loader. A season-gated row is absent while its season is over.
     pub fn model_actors(&self) -> impl Iterator<Item = (u32, u32, [f32; 3])> + '_ {
-        self.by_zone.iter().flat_map(|(&zone_id, actors)| {
-            actors.iter().map(move |actor| {
-                (
-                    zone_id,
-                    u32::try_from(actor.spawn.model_id).unwrap_or(0),
-                    actor.position,
-                )
-            })
+        let now_ms = self.season_now_ms();
+        self.by_zone.iter().flat_map(move |(&zone_id, actors)| {
+            actors
+                .iter()
+                .filter(move |actor| self.season_shown(actor, now_ms))
+                .map(move |actor| {
+                    (
+                        zone_id,
+                        u32::try_from(actor.spawn.model_id).unwrap_or(0),
+                        actor.position,
+                    )
+                })
         })
     }
 
     /// Content NPC targets for the developer teleport index. The same rows
     /// back 35/2 visibility: regional `legacy_data` placements and renderable
-    /// extra spawns only. Runtime-excluded startup actors stay excluded.
+    /// extra spawns only. Runtime-excluded startup actors and out-of-season rows
+    /// stay out.
     pub fn teleport_targets(&self, zone_id: u32) -> Vec<crate::dev_teleport::Target> {
+        let now_ms = self.season_now_ms();
         self.by_zone
             .get(&zone_id)
             .into_iter()
             .flatten()
-            .filter(|npc| !self.excluded.contains(&npc.spawn.actor_id))
+            .filter(|npc| {
+                !self.excluded.contains(&npc.spawn.actor_id) && self.season_shown(npc, now_ms)
+            })
             .map(|npc| {
                 crate::dev_teleport::Target::content_npc(
                     npc.spawn.actor_id,
@@ -821,12 +917,15 @@ impl NpcVisibility {
             self.zone_id = Some(zone_id);
         }
         self.last_position = Some(position);
+        let now_ms = self.season_now_ms();
         let mut candidates: Vec<_> = self
             .by_zone
             .get(&zone_id)
             .into_iter()
             .flatten()
-            .filter(|npc| !self.excluded.contains(&npc.spawn.actor_id))
+            .filter(|npc| {
+                !self.excluded.contains(&npc.spawn.actor_id) && self.season_shown(npc, now_ms)
+            })
             .map(|npc| (distance_squared(position, npc.position), npc))
             .filter(|(distance, _)| *distance <= NPC_VISIBILITY_RADIUS * NPC_VISIBILITY_RADIUS)
             .collect();

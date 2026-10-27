@@ -89,6 +89,7 @@ impl Fixture {
             content_copy::copy_tree(&bundled().join("npcs"), &dir.join("npcs"));
             for file in [
                 "npc_spawns_extra.json",
+                "client_areas.json",
                 "collection_coins.json",
                 "zones.json",
                 "boomboxes.json",

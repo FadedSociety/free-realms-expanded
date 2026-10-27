@@ -167,6 +167,7 @@ impl Fixture {
         for name in [
             "zones.json",
             "npc_spawns_extra.json",
+            "client_areas.json",
             "stores.json",
             "vendors.json",
             "field_kill_rewards.json",
