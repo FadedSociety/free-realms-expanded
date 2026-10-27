@@ -19,6 +19,8 @@ use std::{fs, path::PathBuf, sync::Arc};
 mod content_copy;
 #[path = "common/field_battle_fixture.rs"]
 mod field_battle_fixture;
+#[path = "support/json.rs"]
+mod json;
 use field_battle_fixture::{Fixture, content_dir, portal_play, send, unframe};
 
 const TCG_ROW: u32 = 490;
@@ -32,8 +34,7 @@ const VIEWER: Viewer = Viewer {
 };
 
 fn shipped() -> Value {
-    let path = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/card_game.json");
-    serde_json::from_slice(&fs::read(path).unwrap()).unwrap()
+    json::read(&PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content/card_game.json"))
 }
 
 /// The shipped card rows plus a launch block (the shipped file has none).
