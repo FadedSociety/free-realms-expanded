@@ -3,33 +3,43 @@
 //! then logs in with 411; the login's launch ticket and character id are redeemed once in the
 //! session that minted the ticket (T764/T765). Commands after login are logged, not answered
 //! yet. Off unless the card content's launch block names a port.
+//!
+//! T782: every step prints one JSON event line (`events`, drained by `Server::poll_card`):
+//! `card_connected`, `card_gateway_request` (a 414 answered), `card_login` (a 411: `ok`, and the
+//! character on success), `card_command_unhandled` and `card_closed` with its reason. A ticket or
+//! session id is never in an event.
 use super::*;
 use osfr_tools::card_service;
+use serde_json::Value;
 use std::io::{ErrorKind, Read, Write};
-use std::net::{IpAddr, TcpStream};
+use std::net::{IpAddr, SocketAddr, TcpStream};
 
 /// (R) The gateway's own player ceilings: a stranger cannot hold more sockets than players.
 const MAX_CONNECTIONS: usize = 16;
 const MAX_PER_ADDRESS: usize = 4;
 /// (R) A connection that has not logged in this long after opening is closed.
 const LOGIN_DEADLINE_MS: u64 = 30_000;
-/// (R) Unhandled commands logged per connection, so a chatty client cannot fill the log.
-const LOGGED_UNHANDLED: u32 = 16;
+/// (R) Unhandled commands, and answered 414/411 requests, logged per connection (each count
+/// apart), so a chatty client cannot fill the log.
+const LOGGED_PER_KIND: u32 = 16;
 
 pub(super) struct CardListener {
     listener: TcpListener,
     host: String,
     port: u16,
     connections: Vec<Connection>,
+    /// The event lines of the polls since the last drain.
+    events: Vec<Value>,
 }
 
 struct Connection {
     stream: TcpStream,
-    peer: IpAddr,
+    peer: SocketAddr,
     inbox: Vec<u8>,
     opened_ms: u64,
     character: Option<u64>,
     unhandled: u32,
+    answered: u32,
 }
 
 /// The listener the card content asks for, on the gateway's own address (loopback, or the
@@ -70,6 +80,7 @@ impl CardListener {
             host: local.ip().to_string(),
             port: local.port(),
             connections: Vec::new(),
+            events: Vec::new(),
         })
     }
 
@@ -83,7 +94,7 @@ impl CardListener {
             let from_peer = self
                 .connections
                 .iter()
-                .filter(|c| c.peer == peer.ip())
+                .filter(|c| c.peer.ip() == peer.ip())
                 .count();
             // Dropping a refused stream closes it.
             if self.connections.len() < MAX_CONNECTIONS
@@ -92,41 +103,53 @@ impl CardListener {
             {
                 self.connections.push(Connection {
                     stream,
-                    peer: peer.ip(),
+                    peer,
                     inbox: Vec::new(),
                     opened_ms: now_ms,
                     character: None,
                     unhandled: 0,
+                    answered: 0,
                 });
+                self.events
+                    .push(json!({"event":"card_connected","peer":peer.to_string()}));
             }
         }
         let (host, port) = (self.host.clone(), self.port);
-        self.connections
-            .retain_mut(|c| c.serve(&host, port, now_ms, &mut redeem));
+        let events = &mut self.events;
+        self.connections.retain_mut(|c| {
+            let Some(reason) = c.serve(&host, port, now_ms, &mut redeem, events) else {
+                return true;
+            };
+            events.push(json!({
+                "event":"card_closed","peer":c.peer.to_string(),"reason":reason,"character":c.character
+            }));
+            false
+        });
     }
 }
 
 impl Connection {
-    /// Read what arrived and answer each whole frame; `false` closes the connection.
+    /// Read what arrived and answer each whole frame; `Some(reason)` closes the connection.
     fn serve(
         &mut self,
         host: &str,
         port: u16,
         now_ms: u64,
         redeem: &mut impl FnMut(&str, &str) -> Option<u64>,
-    ) -> bool {
+        events: &mut Vec<Value>,
+    ) -> Option<&'static str> {
         if self.character.is_none() && now_ms.saturating_sub(self.opened_ms) > LOGIN_DEADLINE_MS {
-            return false;
+            return Some("deadline");
         }
         // At most 64 KiB per poll, so the inbox stays near one frame (`client_frame` refuses
         // longer ones).
         let mut chunk = [0; 4096];
         for _ in 0..16 {
             match self.stream.read(&mut chunk) {
-                Ok(0) => return false,
+                Ok(0) => return Some("eof"),
                 Ok(n) => self.inbox.extend_from_slice(&chunk[..n]),
                 Err(error) if error.kind() == ErrorKind::WouldBlock => break,
-                Err(_) => return false,
+                Err(_) => return Some("read_failed"),
             }
         }
         loop {
@@ -136,8 +159,8 @@ impl Connection {
                     self.inbox.drain(..used);
                     body
                 }
-                Ok(None) => return true,
-                Err(_) => return false,
+                Ok(None) => return None,
+                Err(_) => return Some("bad_frame"),
             };
             let mut login = None;
             let reply = card_service::reply(&body, host, port, |l| {
@@ -149,23 +172,49 @@ impl Connection {
                 // ponytail: replies are a few dozen bytes, so a full send buffer means a dead
                 // peer; a write queue comes with the lobby's larger messages.
                 Ok(Some(frame)) => {
+                    self.log_answer(&body, login, host, port, events);
                     if self.stream.write_all(&frame).is_err() {
-                        return false;
+                        return Some("write_failed");
                     }
                     self.character = self.character.or(login);
                 }
                 Ok(None) => {
                     self.unhandled += 1;
-                    if self.unhandled <= LOGGED_UNHANDLED {
+                    if self.unhandled <= LOGGED_PER_KIND {
                         let class = card_service::class_id(&body).ok();
-                        println!(
-                            "{}",
-                            json!({"event":"card_command_unhandled","class":class,"character":self.character})
-                        );
+                        events.push(json!({
+                            "event":"card_command_unhandled","class":class,"character":self.character
+                        }));
                     }
                 }
-                Err(_) => return false,
+                Err(_) => return Some("bad_message"),
             }
+        }
+    }
+
+    /// The event for an answered 414 (the address it sent the client to) or 411 (`login`: the
+    /// character its ticket was redeemed for). Neither the ticket nor the session id is named.
+    fn log_answer(
+        &mut self,
+        body: &[u8],
+        login: Option<u64>,
+        host: &str,
+        port: u16,
+        events: &mut Vec<Value>,
+    ) {
+        let peer = self.peer.to_string();
+        let event = match card_service::class_id(body) {
+            Ok(card_service::GET_CONNECTION_SERVER) => {
+                json!({"event":"card_gateway_request","peer":peer,"host":host,"port":port})
+            }
+            Ok(card_service::SEND_SESSION_ID) => {
+                json!({"event":"card_login","peer":peer,"ok":login.is_some(),"character":login})
+            }
+            _ => return,
+        };
+        self.answered += 1;
+        if self.answered <= LOGGED_PER_KIND {
+            events.push(event);
         }
     }
 }
@@ -179,6 +228,9 @@ impl Server {
         card.poll(now_ms, |ticket, character| {
             self.redeem_card_ticket(ticket, character, now_ms)
         });
+        for event in card.events.drain(..) {
+            println!("{event}");
+        }
         self.card = Some(card);
     }
 
@@ -243,6 +295,27 @@ pub(super) mod tests {
 
     fn listener() -> CardListener {
         CardListener::bind("127.0.0.1".parse().unwrap(), 0).unwrap()
+    }
+
+    /// The reasons of the `card_closed` events so far.
+    fn closed(card: &CardListener) -> Vec<String> {
+        let events = card.events.iter();
+        let closed = events.filter(|e| e["event"] == "card_closed");
+        closed
+            .map(|e| e["reason"].as_str().unwrap().to_owned())
+            .collect()
+    }
+
+    /// Poll until an event named `name` is logged.
+    fn wait_for(card: &mut CardListener, name: &str) {
+        for _ in 0..200 {
+            card.poll(1, |_, _| None);
+            if card.events.iter().any(|e| e["event"] == name) {
+                return;
+            }
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        panic!("no {name} event");
     }
 
     fn client(card: &CardListener) -> TcpStream {
@@ -385,6 +458,7 @@ pub(super) mod tests {
         assert_eq!(card.connections.len(), 1, "the deadline is inclusive");
         card.poll(2 + LOGIN_DEADLINE_MS, |_, _| None);
         assert!(card.connections.is_empty());
+        assert_eq!(closed(&card), ["deadline"]);
     }
 
     #[test]
@@ -416,6 +490,7 @@ pub(super) mod tests {
             card.poll(1, |_, _| None);
             std::thread::sleep(Duration::from_millis(5));
             if card.connections.is_empty() {
+                assert_eq!(closed(&card), ["bad_frame"]);
                 return;
             }
         }
@@ -436,5 +511,98 @@ pub(super) mod tests {
         assert_eq!(server.redeem_card_ticket("77", "5041", 1), None);
         assert_eq!(server.redeem_card_ticket("77", "not-a-guid", 1), None);
         assert!(server.card.is_none(), "no launch block, no card service");
+    }
+
+    #[test]
+    fn card_events_follow_a_connection_from_connect_to_close() {
+        if !test_support::bin_test_target("card") {
+            return;
+        }
+        let mut card = listener();
+        let mut client = client(&card);
+        let peer = client.local_addr().unwrap().to_string();
+        client.write_all(&frame(false, &gateway_request())).unwrap();
+        answer(&mut card, &mut client, 1);
+        // A half-close is the client's orderly end; the listener sees eof.
+        client.shutdown(std::net::Shutdown::Write).unwrap();
+        wait_for(&mut card, "card_closed");
+        assert_eq!(
+            card.events,
+            [
+                json!({"event":"card_connected","peer":peer}),
+                json!({"event":"card_gateway_request","peer":peer,"host":"127.0.0.1","port":card.port}),
+                json!({"event":"card_closed","peer":peer,"reason":"eof","character":null}),
+            ]
+        );
+    }
+
+    #[test]
+    fn card_login_events_name_the_character_never_the_ticket() {
+        if !test_support::bin_test_target("card") {
+            return;
+        }
+        let mut card = listener();
+        let mut client = client(&card);
+        let guid = (1u64 << 40) | 5041;
+        log_in(&mut card, &mut client, "5041", "271828182845", None);
+        log_in(
+            &mut card,
+            &mut client,
+            &guid.to_string(),
+            "314159265358",
+            Some(guid),
+        );
+        let logins: Vec<_> = card
+            .events
+            .iter()
+            .filter(|e| e["event"] == "card_login")
+            .collect();
+        assert_eq!(logins.len(), 2);
+        assert_eq!(
+            (&logins[0]["ok"], &logins[0]["character"]),
+            (&json!(false), &Value::Null)
+        );
+        assert_eq!(
+            (&logins[1]["ok"], &logins[1]["character"]),
+            (&json!(true), &json!(guid))
+        );
+        // Neither ticket nor the session id the login carries is logged.
+        let text = serde_json::to_string(&card.events).unwrap();
+        for secret in ["271828182845", "314159265358", "w-session"] {
+            assert!(!text.contains(secret), "{secret} in {text}");
+        }
+    }
+
+    #[test]
+    fn card_close_reasons_name_a_bad_message_and_logged_events_are_capped() {
+        if !test_support::bin_test_target("card") {
+            return;
+        }
+        // A routed frame with no body has no class id.
+        let mut card = listener();
+        let mut silent = client(&card);
+        silent.write_all(&frame(true, &[])).unwrap();
+        wait_for(&mut card, "card_closed");
+        assert_eq!(closed(&card), ["bad_message"]);
+
+        // One connection repeating 414s and unknown commands logs 16 of each, then stays quiet.
+        let mut card = listener();
+        let mut chatty = client(&card);
+        for _ in 0..(LOGGED_PER_KIND + 4) {
+            chatty.write_all(&frame(false, &gateway_request())).unwrap();
+            chatty.write_all(&frame(true, &int(1234))).unwrap();
+        }
+        for _ in 0..40 {
+            card.poll(1, |_, _| None);
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        let count = |name: &str| card.events.iter().filter(|e| e["event"] == name).count();
+        assert_eq!(count("card_gateway_request"), LOGGED_PER_KIND as usize);
+        assert_eq!(count("card_command_unhandled"), LOGGED_PER_KIND as usize);
+        assert_eq!(
+            card.connections.len(),
+            1,
+            "the chatty client stays connected"
+        );
     }
 }

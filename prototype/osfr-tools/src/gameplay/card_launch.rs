@@ -1,8 +1,9 @@
 //! T765: Trading Card Game launch glue for `Gameplay`; the run and ticket rules live in
 //! `crate::card_game::Launches`. Play on an admitted card row offers a type-16 run (39/16); the
 //! client starts it (39/5 -> 39/17), its card manager asks for the launch ticket (39/37) and
-//! gets it in 39/0x28; leaving the card window (39/6) ends the run. Session-only: nothing here
-//! marks a save.
+//! gets it in 39/0x28; leaving the card window (39/6, then its 39/7 ack) ends the run, and the
+//! generic 26/42 Close sent just before is not the run's (T782). Session-only: nothing here marks
+//! a save.
 use super::*;
 
 impl Gameplay {
@@ -19,14 +20,15 @@ impl Gameplay {
         Ok(())
     }
 
-    /// The lifecycle packets of an active card run; `None` leaves the packet to later owners.
+    /// The lifecycle packets of the card run (live, or just ended for its 39/7 ack); `None`
+    /// leaves the packet to later owners.
     pub(super) fn handle_card_game(
         &mut self,
         inner: &[u8],
         character: &CharacterState,
         now_ms: u64,
     ) -> io::Result<Option<Outcome>> {
-        let Some(launches) = self.card_launches.as_mut().filter(|l| l.is_active()) else {
+        let Some(launches) = self.card_launches.as_mut().filter(|l| l.owns(inner)) else {
             return Ok(None);
         };
         let run = launches.route(inner, character.guid, now_ms)?;

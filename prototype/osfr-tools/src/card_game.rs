@@ -130,6 +130,13 @@ impl Launches {
         self.runs.current_instance_id().is_some()
     }
 
+    /// Whether `packet` is a lifecycle packet (39/x) of this session's current or just-ended run.
+    /// Nothing else is the run's: the generic 26/42 Close the client sends first when its start
+    /// screen is closed would retire an offered run before the 39/6 cancel that follows (T782).
+    pub fn owns(&self, packet: &[u8]) -> bool {
+        self.runs.names_run(packet)
+    }
+
     /// Offer the row's run (39/16); the client answers 39/5.
     pub fn begin(&mut self, row: &Row) -> io::Result<RunOutcome> {
         let game_id = i32::try_from(row.minigame_id)

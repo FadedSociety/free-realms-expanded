@@ -220,6 +220,13 @@ impl MinigameRuns {
         self.current.as_ref().map(|run| run.instance_id)
     }
 
+    /// Whether `packet` is a lifecycle packet (family 39) naming the current or the last run.
+    pub fn names_run(&self, packet: &[u8]) -> bool {
+        packet.starts_with(&FAMILY_MINIGAME.to_le_bytes())
+            && packet.len() >= 7
+            && self.state(read_i32(packet, 3)).is_some()
+    }
+
     pub fn state(&self, instance_id: i32) -> Option<RunState> {
         self.current
             .as_ref()

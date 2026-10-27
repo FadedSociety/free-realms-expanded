@@ -549,8 +549,8 @@ fn application_handler(body: &[u8]) -> &'static str {
         {
             "pets"
         }
-        // T765: the card manager's ticket request (39/37); gameplay answers it for a card run.
-        (Some(39), _) if body.get(2) == Some(&37) => "card_game",
+        // T765/T782: the card manager's ticket request (39/37) and the cancel's ack (39/7).
+        (Some(39), _) if matches!(body.get(2), Some(7 | 37)) => "card_game",
         // W174: handled in gameplay.rs, where a refusal can send nothing. Naming them keeps
         // the gateway from logging an understood request as "unknown application message".
         (Some(26), Some(13)) => "class_selection",
