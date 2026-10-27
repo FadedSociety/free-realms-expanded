@@ -327,6 +327,48 @@ fn a_win_pays_every_member_once_and_a_close_returns_only_that_member() {
     assert_eq!(econ(&rig, A, &prizes), settled);
 }
 
+/// F839: the win fan-out commits each member alone. B's save fails: B keeps nothing, sees no
+/// results and the run is not frozen; once B's save works again, a later tick pays B once.
+#[test]
+fn a_member_whose_win_save_fails_is_paid_once_on_a_later_tick() {
+    let mut rig = Rig::fighters(2, BRAWLER, 16);
+    let battles = field_battle_fixture::battles();
+    let row = field_battle_fixture::battle(&battles, BATTLE).clone();
+    let prizes = prize_ids(&row);
+    join(&mut rig, A, B);
+    rig.land(A, SUMMONER);
+    for _ in 0..MINIONS.len() {
+        let (_, arena) = arena_of(&rig, B).unwrap();
+        let Some(target) = awake(&arena).first().copied() else {
+            break;
+        };
+        rig.land(B, target);
+    }
+    let before_b = econ(&rig, B, &prizes);
+    let real = rig.host(|s| {
+        let path = s.test_state_path(B);
+        let real = path.clone();
+        *path = real.join("blocked.json"); // under B's save file: every save fails
+        real
+    });
+    clear_inboxes(&mut rig);
+    rig.land(A, SUMMONER);
+    rig.until("A's results", |rig| game_overs(&rig.inbox[0]) > 0);
+    rig.pump(Duration::from_millis(500)); // several ticks; B's fan-out fails on each
+    assert_eq!(game_overs(&rig.take(1)), 0, "B was shown a win it could not keep");
+    assert_eq!(phase(&rig, B), Some(EncounterPhase::Fighting));
+    assert_eq!(econ(&rig, B, &prizes), before_b, "B's failed save changed B");
+    let (_, arena) = arena_of(&rig, B).expect("B is still a member");
+    assert!(arena.won() && !arena.faulted, "a save failure froze the run");
+
+    rig.host(move |s| *s.test_state_path(B) = real);
+    rig.until("B's results", |rig| game_overs(&rig.inbox[1]) > 0);
+    rig.pump(Duration::from_millis(500));
+    assert_eq!(game_overs(&rig.take(1)), 1, "B's results once");
+    assert_eq!(phase(&rig, B), Some(EncounterPhase::Won));
+    assert_payout(&before_b, &econ(&rig, B, &prizes), &row, &prizes, WIN_XP);
+}
+
 #[test]
 fn two_parties_at_one_marker_run_apart() {
     let mut rig = Rig::fighters(4, BRAWLER, 16);

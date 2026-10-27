@@ -167,6 +167,42 @@ fn key_of(server: &Server, guid: u64) -> Option<SessionKey> {
     server.world.session_keys.get(id).copied()
 }
 
+/// One member's step inside the arena loan, committed for that member alone: it runs on a copy
+/// of their gateway, a changed copy is saved, then installed. A refused step or a failed save
+/// changes nothing for the member and steps the arena back (`None`); a pending win retries on the
+/// next tick. `Some(changed)` when it went through.
+fn step(
+    server: &mut Server,
+    key: SessionKey,
+    arena: &mut SharedArena,
+    work: &mut dyn FnMut(&mut Gateway) -> io::Result<bool>,
+) -> Option<bool> {
+    let session = server.sessions.get_mut(&key)?;
+    let (mut gateway, saved) = (session.gateway.clone(), arena.clone());
+    if !gateway.enter_arena(arena) {
+        return None;
+    }
+    let result = work(&mut gateway);
+    gateway.leave_arena(arena);
+    let result = result.and_then(|changed| {
+        if changed {
+            save(&session.state_path, &gateway.snapshot())?;
+        }
+        Ok(changed)
+    });
+    match result {
+        Ok(changed) => {
+            session.gateway = gateway;
+            Some(changed)
+        }
+        Err(error) => {
+            *arena = saved;
+            event(json!({"event":"arena_member_refused","reason":error.to_string()}));
+            None
+        }
+    }
+}
+
 fn tick_arena(
     server: &mut Server,
     instance: i32,
@@ -201,34 +237,8 @@ fn tick_arena(
     if !arena.won() {
         arena.set_lost(!standing(server, &live)); // every member knocked out or gone
     }
-    let mut staged: BTreeMap<SessionKey, Gateway> = BTreeMap::new();
-    let mut changed = BTreeSet::new();
     let mut private: BTreeMap<SessionKey, Vec<Vec<u8>>> = BTreeMap::new();
     let mut public = Vec::new();
-    // One member's step on their staged gateway, inside the arena loan; `Some(changed)` when it ran.
-    let run = |key: SessionKey,
-               work: &mut dyn FnMut(&mut Gateway) -> io::Result<bool>,
-               arena: &mut SharedArena,
-               staged: &mut BTreeMap<SessionKey, Gateway>| {
-        let gateway = staged
-            .entry(key)
-            .or_insert_with(|| server.sessions[&key].gateway.clone());
-        let (before, saved) = (gateway.clone(), arena.clone());
-        if !gateway.enter_arena(arena) {
-            return None;
-        }
-        let result = work(gateway);
-        gateway.leave_arena(arena);
-        match result {
-            Ok(changed) => Some(changed),
-            Err(error) => {
-                // One member's failure never stops the run: their copy and the arena step back.
-                (*gateway, *arena) = (before, saved);
-                event(json!({"event":"arena_member_refused","reason":error.to_string()}));
-                None
-            }
-        }
-    };
     if arena.won() {
         // The goal is down: each member still in the run gets their own results and payout.
         for (_, key) in &active {
@@ -240,23 +250,17 @@ fn tick_arena(
                 continue;
             }
             let mut replies = Vec::new();
-            let done = run(
-                *key,
-                &mut |gateway| {
-                    let out = gateway.finish_arena_win(now_ms)?;
-                    replies = out.replies;
-                    Ok(out.changed)
-                },
-                &mut arena,
-                &mut staged,
-            );
-            if done == Some(true) {
-                changed.insert(*key);
+            let done = step(server, *key, &mut arena, &mut |gateway| {
+                let out = gateway.finish_arena_win(now_ms)?;
+                replies = out.replies;
+                Ok(out.changed)
+            });
+            if done.is_some() {
+                private
+                    .entry(*key)
+                    .or_default()
+                    .extend(replies.iter().map(|reply| wrap_application(reply)));
             }
-            private
-                .entry(*key)
-                .or_default()
-                .extend(replies.iter().map(|reply| wrap_application(reply)));
         }
     } else if !arena.lost() {
         if let Some(elapsed) = arena.due(now_ms) {
@@ -266,15 +270,10 @@ fn tick_arena(
                 .collect();
             if let (Some(&(_, driver)), false) = (active.first(), players.is_empty()) {
                 let mut hits = Vec::new();
-                run(
-                    driver,
-                    &mut |gateway| {
-                        hits = gateway.tick_arena_enemies(&players, now_ms, elapsed);
-                        Ok(false)
-                    },
-                    &mut arena,
-                    &mut staged,
-                );
+                step(server, driver, &mut arena, &mut |gateway| {
+                    hits = gateway.tick_arena_enemies(&players, now_ms, elapsed);
+                    Ok(false)
+                });
                 for (guid, damage, replies) in hits {
                     let Some((_, key)) = active.iter().find(|(g, _)| *g == guid) else {
                         continue;
@@ -293,33 +292,20 @@ fn tick_arena(
                         continue;
                     }
                     let mut received = Vec::new();
-                    let done = run(
-                        *key,
-                        &mut |gateway| {
-                            let out = gateway.receive_arena_damage(damage, now_ms)?;
-                            received = out.replies;
-                            Ok(out.changed)
-                        },
-                        &mut arena,
-                        &mut staged,
-                    );
-                    if done == Some(true) {
-                        changed.insert(*key);
+                    let done = step(server, *key, &mut arena, &mut |gateway| {
+                        let out = gateway.receive_arena_damage(damage, now_ms)?;
+                        received = out.replies;
+                        Ok(out.changed)
+                    });
+                    if done.is_some() {
+                        private
+                            .entry(*key)
+                            .or_default()
+                            .extend(received.iter().map(|reply| wrap_application(reply)));
                     }
-                    private
-                        .entry(*key)
-                        .or_default()
-                        .extend(received.iter().map(|reply| wrap_application(reply)));
                 }
             }
         }
-    }
-    // Saves first, then the world sees the change.
-    for key in &changed {
-        save(&server.sessions[key].state_path, &staged[key].snapshot())?;
-    }
-    for (key, gateway) in staged {
-        server.sessions.get_mut(&key).unwrap().gateway = gateway;
     }
     server.membership.install_arena(instance, arena);
     for (key, replies) in private {
@@ -372,6 +358,12 @@ impl Server {
     pub fn test_gateway(&self, guid: u64) -> Option<&Gateway> {
         let key = key_of(self, guid)?;
         self.sessions.get(&key).map(|session| &session.gateway)
+    }
+
+    /// Where the character's saves go (tests only: a path under a file makes every save fail).
+    pub fn test_state_path(&mut self, guid: u64) -> &mut PathBuf {
+        let key = key_of(self, guid).unwrap();
+        &mut self.sessions.get_mut(&key).unwrap().state_path
     }
 
     /// Knock the character out through the arena path, as the driver would (tests only).
