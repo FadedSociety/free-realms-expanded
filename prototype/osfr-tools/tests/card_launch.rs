@@ -239,14 +239,20 @@ fn the_type_16_handshake_sends_a_one_time_ticket_in_39_28() {
         .unwrap();
     assert_eq!(subs(&start.replies), vec![(39, 17)]);
 
-    // The card login redeems a ticket once, for its own character only: a wrong guess spends it.
+    // The card login redeems a ticket once, for its own character; a wrong id is refused and
+    // (T764 fix) does not spend the ticket. The retail 411's id is empty (T804).
     assert_eq!(
         launches.redeem(&second.to_string(), "1", 2_200),
         Err("character_mismatch")
     );
     assert_eq!(
         launches.redeem(&second.to_string(), &character, 2_250),
-        Err("unknown_ticket")
+        Ok(CHARACTER)
+    );
+    assert_eq!(
+        launches.redeem(&second.to_string(), &character, 2_275),
+        Err("unknown_ticket"),
+        "single use"
     );
     let spent = launches
         .route(&client(37, instance), CHARACTER, 2_300)

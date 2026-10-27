@@ -1,9 +1,11 @@
 //! T763: the Card Duelist (TCG) service wire, decoded from `tcg/FreeRealmsTCG.dll`
 //! (lab/content/tcg/analysis/lead-login-decode-2026-10-26.md): the compact integer and string
 //! codec, the per-level class header, client frames, the gateway (414) and the session login
-//! (411 -> 81). Pure: the TCP listener and the one-time ticket check live with their callers.
+//! (411 -> 81). T764 adds the one-time launch ticket store the login is checked against; no
+//! socket lives here: the TCP listener is `bin/osfr_gateway/card_listener.rs` and the session's
+//! own store rides in `Gameplay` (`gameplay/card_launch.rs`).
 
-use std::{collections::BTreeMap, io};
+use std::{collections::BTreeMap, fmt, io};
 
 /// `GatewayCommand_GetConnectionServer`: request and reply share the layout.
 pub const GET_CONNECTION_SERVER: i32 = 414;
@@ -313,16 +315,37 @@ pub fn login_results(success: bool, code: i32, account_id: i32, session_id: &str
 pub const UNKNOWN_TICKET: &str = "unknown_ticket";
 
 /// T764: one-time card launch tickets (lead security). The game server mints one per launch and
-/// sends it in 39/0x28; the card login (411) must present it with the same character id before
-/// it expires, and it works once.
-#[derive(Clone, Debug)]
+/// sends it in 39/0x28; the card login (411) must present it (with the same character id when
+/// its 411 carries one) before it expires, and it works once. (R) The store is per session (one
+/// card character, one live launch), and `now_ms` is the caller's monotonic clock, the same one
+/// for mint and redeem.
+#[derive(Clone)]
 pub struct LaunchTickets {
     ttl_ms: u64,
     /// ticket -> (character guid, expiry ms); at most one outstanding ticket per character.
     issued: BTreeMap<u64, (u64, u64)>,
 }
 
+/// (R) Ceiling on held tickets, expired ones included until the next mint sweeps them. A session
+/// has one card character, so this only bounds a store shared by many, like
+/// `login_auth::MAX_TOKENS`.
+pub const MAX_TICKETS: usize = 64;
+/// (R) Draws before a random source that keeps returning zero or a held ticket is called broken.
+const TICKET_DRAWS: usize = 4;
+
+impl fmt::Debug for LaunchTickets {
+    /// Redacted: a ticket is a bearer credential, so it must never reach a trace.
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        f.debug_struct("LaunchTickets")
+            .field("ttl_ms", &self.ttl_ms)
+            .field("outstanding", &self.issued.len())
+            .finish_non_exhaustive()
+    }
+}
+
 impl LaunchTickets {
+    /// `ttl_ms` is the card content's `launch.ticket_ttl_ms`, bounded 1 s to 10 min there
+    /// (`card_game::Content::validate`).
     pub fn new(ttl_ms: u64) -> Self {
         Self {
             ttl_ms,
@@ -330,31 +353,30 @@ impl LaunchTickets {
         }
     }
 
-    /// A fresh non-zero random ticket for `character`. It replaces any the character still
-    /// holds, and expired tickets are dropped, so the table stays bounded by live launches.
+    /// A fresh non-zero random ticket for `character`. It drops expired tickets and replaces any
+    /// the character still holds, so the table stays bounded by live launches. A full table is
+    /// refused, and a broken random source (zero or a repeat on every draw) is refused after four
+    /// draws rather than retried forever.
     pub fn mint(&mut self, character: u64, now_ms: u64) -> io::Result<u64> {
         self.issued
             .retain(|_, (owner, expires)| *expires > now_ms && *owner != character);
-        loop {
-            let mut bytes = [0; 8];
-            getrandom::getrandom(&mut bytes)
-                .map_err(|_| invalid("no OS randomness for a card launch ticket"))?;
-            let ticket = u64::from_le_bytes(bytes);
-            if ticket != 0 && !self.issued.contains_key(&ticket) {
-                let expires = now_ms.saturating_add(self.ttl_ms);
-                self.issued.insert(ticket, (character, expires));
-                return Ok(ticket);
-            }
+        if self.outstanding() >= MAX_TICKETS {
+            return Err(io::Error::other("card launch ticket table is full"));
         }
+        let ticket = draw_ticket(&self.issued, random_ticket)?;
+        let expires = now_ms.saturating_add(self.ttl_ms);
+        self.issued.insert(ticket, (character, expires));
+        Ok(ticket)
     }
 
     /// Redeem the ticket and character id a 411 carries (decimal text, the client's `%llu`):
     /// the character the ticket was issued to, while it has not expired. The random, single-use
     /// ticket is the credential; the retail client sends no character id (empty), and a
-    /// non-empty one must name the owner. A presented ticket is spent whether or not it
-    /// matched, so one guess never gets a second try. A refusal is the fixed word the card
-    /// listener logs (T805): `no_ticket_field`, `ticket_not_decimal`, [`UNKNOWN_TICKET`],
-    /// `expired` or `character_mismatch`.
+    /// non-empty one must name the owner. A refusal changes nothing: only a matching, unexpired
+    /// ticket is spent, so a wrong id leaves the ticket as it was (and an expired one stays until
+    /// the next mint sweeps it). A refusal is the fixed word the card listener logs (T805):
+    /// `no_ticket_field`, `ticket_not_decimal`, [`UNKNOWN_TICKET`], `expired` or
+    /// `character_mismatch`.
     pub fn redeem(
         &mut self,
         ticket: &str,
@@ -365,19 +387,43 @@ impl LaunchTickets {
             return Err("no_ticket_field");
         }
         let ticket = decimal(ticket).ok_or("ticket_not_decimal")?;
-        let (owner, expires) = self.issued.remove(&ticket).ok_or(UNKNOWN_TICKET)?;
+        let (owner, expires) = self.issued.get(&ticket).copied().ok_or(UNKNOWN_TICKET)?;
         if now_ms >= expires {
             return Err("expired");
         }
         if !character.is_empty() && decimal(character) != Some(owner) {
             return Err("character_mismatch");
         }
+        self.issued.remove(&ticket);
         Ok(owner)
     }
 
+    /// Tickets still held, expired ones included until the next [`Self::mint`] sweeps them.
     pub fn outstanding(&self) -> usize {
         self.issued.len()
     }
+}
+
+/// A non-zero ticket not already held, from at most [`TICKET_DRAWS`] draws. A source that keeps
+/// returning zero or a held value is broken, not unlucky: refuse rather than loop.
+fn draw_ticket(
+    held: &BTreeMap<u64, (u64, u64)>,
+    mut next: impl FnMut() -> io::Result<u64>,
+) -> io::Result<u64> {
+    for _ in 0..TICKET_DRAWS {
+        let ticket = next()?;
+        if ticket != 0 && !held.contains_key(&ticket) {
+            return Ok(ticket);
+        }
+    }
+    Err(invalid("no usable random card launch ticket"))
+}
+
+fn random_ticket() -> io::Result<u64> {
+    let mut bytes = [0; 8];
+    getrandom::getrandom(&mut bytes)
+        .map_err(|_| invalid("no OS randomness for a card launch ticket"))?;
+    Ok(u64::from_le_bytes(bytes))
 }
 
 /// A strict unsigned decimal: digits only, no sign, spaces or overflow.
@@ -424,4 +470,34 @@ pub fn reply(
 
 fn invalid(message: &'static str) -> io::Error {
     io::Error::new(io::ErrorKind::InvalidData, message)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn a_broken_random_source_is_refused_after_four_draws() {
+        let held = BTreeMap::from([(7, (1, u64::MAX))]);
+        let mut draws = 0;
+        let error = draw_ticket(&held, || {
+            draws += 1;
+            Ok(if draws == 1 { 7 } else { 0 })
+        })
+        .unwrap_err();
+        assert_eq!(draws, TICKET_DRAWS, "no unbounded retry");
+        assert_eq!(error.kind(), io::ErrorKind::InvalidData);
+
+        // Zero and a held ticket are skipped; the next fresh value is used.
+        let mut draws = 0;
+        let ticket = draw_ticket(&held, || {
+            draws += 1;
+            Ok(if draws < 3 { 0 } else { 9 })
+        })
+        .unwrap();
+        assert_eq!((ticket, draws), (9, 3));
+
+        // A random-source error is the caller's, not a retry.
+        assert!(draw_ticket(&held, || Err(io::Error::other("unavailable"))).is_err());
+    }
 }

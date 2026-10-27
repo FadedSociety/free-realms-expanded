@@ -2,8 +2,8 @@
 //! (lab/content/tcg/analysis/lead-login-decode-2026-10-26.md), not from this crate's encoder,
 //! and the one-time launch tickets the session login is checked against.
 use osfr_tools::card_service::{
-    self, ConnectionServer, LaunchTickets, MAX_FRAME, Reader, SessionLogin, UNKNOWN_TICKET,
-    client_frame, put_int, reply,
+    self, ConnectionServer, LaunchTickets, MAX_FRAME, MAX_TICKETS, Reader, SessionLogin,
+    UNKNOWN_TICKET, client_frame, put_int, reply,
 };
 
 fn int(value: i32) -> Vec<u8> {
@@ -229,8 +229,32 @@ fn a_launch_ticket_logs_its_own_character_in_once() {
 }
 
 #[test]
+fn a_refused_card_login_changes_nothing_and_the_next_one_still_logs_in() {
+    // The real 411 path: a name-valued CharacterID (the client's `--character` value, never its
+    // guid) is refused without spending the launch ticket, so the correct login still works.
+    let mut tickets = LaunchTickets::new(TTL_MS);
+    let ticket = tickets.mint(CHARACTER, 1_000).unwrap().to_string();
+    let refused = login_with(&mut tickets, "Tester", &ticket, 2_000);
+    assert_eq!(read_results(&refused[4..]), (false, 1, 0, String::new()));
+    assert_eq!(tickets.outstanding(), 1, "the refusal spent nothing");
+    let accepted = login_with(&mut tickets, "", &ticket, 2_500);
+    assert_eq!(
+        read_results(&accepted[4..]),
+        (true, 0, 42, "w-session".into())
+    );
+    let again = login_with(&mut tickets, "", &ticket, 3_000);
+    assert_eq!(
+        read_results(&again[4..]),
+        (false, 1, 0, String::new()),
+        "single use"
+    );
+}
+
+#[test]
 fn the_retail_login_without_a_character_id_redeems_by_ticket_alone() {
-    // Native 2026-10-27: the exe passes `--character=<name> --ticket=<n>` and no `--characterID`.
+    // Native 2026-10-27: the exe passes `--character=<name> --ticket=<n>` and no `--characterID`
+    // (the exe's only argument builders are 0x10D2240, 0x10D2160, 0x10D21D0, 0x10D22B0 and
+    // 0x10D2450; its strings have no `--characterID`), so the 411's CharacterID is empty.
     let mut tickets = LaunchTickets::new(TTL_MS);
     let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
     assert_eq!(tickets.redeem(&ticket, "", 1), Ok(CHARACTER));
@@ -239,14 +263,19 @@ fn the_retail_login_without_a_character_id_redeems_by_ticket_alone() {
         Err(UNKNOWN_TICKET),
         "single use"
     );
+    // A non-empty id must be the owner's decimal, and a refusal leaves the ticket usable.
+    let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
+    for bad in [" ", "Tester", "12x", "+123456789"] {
+        assert_eq!(
+            tickets.redeem(&ticket, bad, 1),
+            Err("character_mismatch"),
+            "{bad:?}"
+        );
+        assert_eq!(tickets.outstanding(), 1, "a refusal changes nothing");
+    }
+    assert_eq!(tickets.redeem(&ticket, "", 2), Ok(CHARACTER));
     let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
     assert_eq!(tickets.redeem(&ticket, "", TTL_MS), Err("expired"));
-    let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
-    assert_eq!(
-        tickets.redeem(&ticket, " ", 1),
-        Err("character_mismatch"),
-        "a non-empty id must be a decimal"
-    );
     assert_eq!(tickets.redeem("", "", 1), Err("no_ticket_field"));
 }
 
@@ -255,14 +284,16 @@ fn a_wrong_character_expired_replaced_or_malformed_ticket_is_refused() {
     let mut tickets = LaunchTickets::new(TTL_MS);
     let character = CHARACTER.to_string();
 
-    // Another character's id spends the ticket: the right character cannot use it after.
+    // A refused login changes nothing: after the wrong character, the right one still redeems.
     let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
     assert_eq!(tickets.redeem(&ticket, "5", 1), Err("character_mismatch"));
-    assert_eq!(tickets.redeem(&ticket, &character, 2), Err(UNKNOWN_TICKET));
+    assert_eq!(tickets.outstanding(), 1, "the ticket was not spent");
+    assert_eq!(tickets.redeem(&ticket, &character, 2), Ok(CHARACTER));
 
-    // Expired.
+    // Expired: refused without spending; the next mint sweeps the dead ticket.
     let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
     assert_eq!(tickets.redeem(&ticket, &character, TTL_MS), Err("expired"));
+    assert_eq!(tickets.outstanding(), 1);
 
     // A second launch replaces the first ticket.
     let first = tickets.mint(CHARACTER, 0).unwrap().to_string();
@@ -286,6 +317,7 @@ fn a_wrong_character_expired_replaced_or_malformed_ticket_is_refused() {
             "{bad:?}"
         );
     }
+    assert_eq!(tickets.outstanding(), 1);
     assert_eq!(
         tickets.redeem(&ticket.to_string(), &character, 2),
         Ok(CHARACTER)
@@ -296,6 +328,34 @@ fn a_wrong_character_expired_replaced_or_malformed_ticket_is_refused() {
     tickets.mint(2, 0).unwrap();
     tickets.mint(3, TTL_MS + 1).unwrap();
     assert_eq!(tickets.outstanding(), 1);
+}
+
+#[test]
+fn a_full_ticket_table_refuses_and_the_next_mint_sweeps_expired_ones() {
+    let mut tickets = LaunchTickets::new(TTL_MS);
+    for character in 1..=MAX_TICKETS as u64 {
+        tickets.mint(character, 0).unwrap();
+    }
+    assert_eq!(tickets.outstanding(), MAX_TICKETS);
+    let error = tickets.mint(MAX_TICKETS as u64 + 1, 1).unwrap_err();
+    assert_eq!(error.kind(), std::io::ErrorKind::Other);
+    assert_eq!(
+        tickets.outstanding(),
+        MAX_TICKETS,
+        "a refusal changes nothing"
+    );
+    // At the lifetime boundary the sweep makes room again.
+    assert_ne!(tickets.mint(MAX_TICKETS as u64 + 1, TTL_MS).unwrap(), 0);
+    assert_eq!(tickets.outstanding(), 1);
+}
+
+#[test]
+fn the_ticket_store_debug_never_names_a_ticket() {
+    let mut tickets = LaunchTickets::new(TTL_MS);
+    let ticket = tickets.mint(CHARACTER, 0).unwrap();
+    let text = format!("{tickets:?}");
+    assert!(text.contains("outstanding: 1"), "{text}");
+    assert!(!text.contains(&ticket.to_string()), "{text}");
 }
 
 #[test]
