@@ -62,15 +62,15 @@ fn load(content: &Value, tag: &str) -> std::io::Result<Content> {
     loaded
 }
 
-/// A production-shaped session root whose card file has a launch block: the runtime content,
-/// the bundled content over it, and `launch_json`.
-fn launch_fixture() -> Fixture {
+/// A production-shaped session root whose card file is `card`: the runtime content, the bundled
+/// content over it, and `card`.
+fn card_fixture(card: &Value) -> Fixture {
     let mut fixture = Fixture::new();
     let root = fixture.root.join("content");
     fs::create_dir_all(&root).unwrap();
     fs::write(
         root.join("card_game.json"),
-        serde_json::to_vec(&launch_json(120_000)).unwrap(),
+        serde_json::to_vec(card).unwrap(),
     )
     .unwrap();
     for entry in fs::read_dir(&fixture.content).unwrap() {
@@ -82,6 +82,11 @@ fn launch_fixture() -> Fixture {
     content_copy::copy_missing(&content_dir(), &root);
     fixture.content = root;
     fixture
+}
+
+/// `card_fixture` with a launch block.
+fn launch_fixture() -> Fixture {
+    card_fixture(&launch_json(120_000))
 }
 
 /// An ordinary player in a production-shaped gateway session.
@@ -524,4 +529,103 @@ fn the_card_asset_list_is_data_and_never_empty() {
         let error = named(bad).unwrap_err().to_string();
         assert!(error.contains("asset list"), "{bad:?}: {error}");
     }
+}
+
+/// T798: the 82 (`PacketUpdateClientSessionData`) a login sends. Its ticket, after checking the
+/// layout around it (reader `008e4e40`: the opcode, the ticket as the first of four counted
+/// strings, then the station name and two realms, all empty here); `None` when the login sent
+/// none. A login never sends two.
+fn session_ticket(login: &GatewayOutcome) -> Option<String> {
+    let sent: Vec<_> = bodies(login)
+        .into_iter()
+        .filter(|body| body.starts_with(&[82, 0]))
+        .collect();
+    assert!(sent.len() <= 1, "one 82 per login, got {}", sent.len());
+    sent.first().map(|body| {
+        assert_eq!((body.len(), i32_at(body, 2)), (2 + 4 + 32 + 3 * 4, 32));
+        assert_eq!(body[38..], [0; 12], "station and realms stay empty");
+        String::from_utf8(body[6..38].to_vec()).unwrap()
+    })
+}
+
+/// T798: the card window logs itself in only when the client holds a session ticket, and the
+/// client holds one only from the 82 (`009485f9`). A login with a card launch block sends it
+/// last, once, as 32 fresh random hex characters; a second login gets a different one.
+#[test]
+fn a_card_login_sends_one_fresh_session_ticket_last() {
+    let fixture = launch_fixture();
+    let (mut first, login) = fixture.login_session(LAKESHORE, 5_098);
+    let ticket = session_ticket(&login).expect("a card login sends the 82");
+    assert!(
+        ticket
+            .bytes()
+            .all(|b| b.is_ascii_digit() || (b'a'..=b'f').contains(&b))
+    );
+    assert!(bodies(&login).last().unwrap().starts_with(&[82, 0]));
+    // Once per login: a repeated login message on the same session sends nothing more.
+    assert!(fixture.login(&mut first).replies.is_empty());
+
+    let (_, other) = fixture.login_session(LAKESHORE, 5_099);
+    assert_ne!(session_ticket(&other).unwrap(), ticket);
+}
+
+/// T798: without a launch block the card windows stay closed, so a login is what it was: no 82.
+#[test]
+fn a_login_without_a_card_launch_block_sends_no_session_ticket() {
+    let no_card_file = Fixture::new();
+    let shipped_card_file = card_fixture(&shipped());
+    for (fixture, name) in [
+        (&no_card_file, "no card file"),
+        (&shipped_card_file, "no launch"),
+    ] {
+        let (_, login) = fixture.login_session(LAKESHORE, 5_097);
+        assert_eq!(session_ticket(&login), None, "{name}");
+    }
+    // The launch block is the only difference: the same login gains the 82 at its end.
+    let (_, plain) = shipped_card_file.login_session(LAKESHORE, 5_097);
+    let (_, card) = launch_fixture().login_session(LAKESHORE, 5_097);
+    assert_eq!(card.replies.len(), plain.replies.len() + 1);
+    assert_eq!(card.replies[..plain.replies.len()], plain.replies[..]);
+}
+
+/// T798: the session ticket is not a credential. The card login is authorised by the one-time
+/// launch ticket and its character id only: the 82's ticket redeems nothing, with the right
+/// character id and while a launch ticket is outstanding, and the launch ticket still works
+/// afterwards. A trace never shows the 82's body as hex.
+#[test]
+fn the_session_ticket_authorises_nothing_and_is_never_traced() {
+    let fixture = launch_fixture();
+    let (mut gateway, login) = fixture.login_session(LAKESHORE, 5_096);
+    let ticket = session_ticket(&login).unwrap();
+    let packet = login
+        .replies
+        .iter()
+        .find(|reply| unframe(reply).starts_with(&[82, 0]))
+        .unwrap();
+    let summary = osfr_tools::trace::protocol_summary(packet);
+    assert!(summary.sensitive);
+    assert_eq!(
+        osfr_tools::trace::hex_prefix(summary.body, summary.sensitive),
+        None
+    );
+
+    send(&mut gateway, &13_u16.to_le_bytes(), 100);
+    send(&mut gateway, &10_u16.to_le_bytes(), 200);
+    let offered = bodies(&send(&mut gateway, &portal_play(TCG_ROW), 1_000));
+    let instance = i32_at(
+        offered
+            .iter()
+            .find(|p| p.starts_with(&[39, 0, 16]))
+            .unwrap(),
+        3,
+    );
+    let launch = ticket_of(&bodies(&send(&mut gateway, &client(37, instance), 2_000))[0]);
+
+    let character = 5_096.to_string();
+    let service = gateway.gameplay_mut().unwrap();
+    assert_eq!(service.redeem_card_ticket(&ticket, &character, 3_000), None);
+    assert_eq!(
+        service.redeem_card_ticket(&launch.to_string(), &character, 3_100),
+        Some(5_096)
+    );
 }

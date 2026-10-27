@@ -39,6 +39,13 @@ impl Gameplay {
         }))
     }
 
+    /// T798: the login's session-data packet for the card window; `None` without a launch block.
+    pub fn card_session_data(&self) -> io::Result<Option<Vec<u8>>> {
+        (self.card_launches.is_some())
+            .then(crate::card_game::session_data_packet)
+            .transpose()
+    }
+
     /// T766's card listener: redeem a card login's launch ticket and character id in the
     /// session that minted it. `Some(character)` once; never again for that ticket.
     pub fn redeem_card_ticket(

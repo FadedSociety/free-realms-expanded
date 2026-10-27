@@ -121,10 +121,14 @@ pub fn family_subtype_name(family: u16, subtype: u16) -> Option<&'static str> {
 
 /// The one rule for which packet bodies a trace must never show as hex (credentials, chat,
 /// friends, mail and other player text). Every tracer uses it; do not copy it. Family 129 is
-/// here because its roster, invite and MOTD messages carry player names and player-written text.
+/// here because its roster, invite and MOTD messages carry player names and player-written text;
+/// 82 because it carries the card window's session ticket (T798).
 pub fn sensitive_payload(family: u16, subtype: u16) -> bool {
     family == 1
-        || matches!(family, 15 | 22 | 40 | 68 | 74 | 109 | 112 | 129 | 149 | 175)
+        || matches!(
+            family,
+            15 | 22 | 40 | 68 | 74 | 82 | 109 | 112 | 129 | 149 | 175
+        )
         || (family == 26 && matches!(subtype, 14 | 15 | 16 | 17 | 30))
         || (family == 53 && subtype == 6)
 }
@@ -245,6 +249,8 @@ mod tests {
             (129, 22),
             (129, 24),
             (129, 27),
+            // T798: the card window's session ticket.
+            (82, 32),
         ] {
             assert!(
                 sensitive_payload(family, subtype),

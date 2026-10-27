@@ -1462,6 +1462,9 @@ impl Gateway {
                             gameplay.as_ref(),
                             welcomed,
                         )?);
+                        // T798: the card window's session ticket, with a card launch block only.
+                        let card = gameplay.as_ref().map(Gameplay::card_session_data);
+                        outcome.replies.extend(card.transpose()?.flatten());
                         logged_in = true;
                     }
                 }

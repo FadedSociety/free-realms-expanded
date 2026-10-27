@@ -44,6 +44,26 @@ pub fn build_login_reply(result: u8) -> Vec<u8> {
     tunnel(&[2, 0, result])
 }
 
+/// PacketUpdateClientSessionData (gateway opcode 82): four strings, each an i32 length and the raw
+/// bytes, no terminator (reader `008e4e40`; handled at `009485f9` in the receive switch
+/// `009471a0`). The client copies them into the play client's session ticket (+0x30C), station
+/// name (+0x450) and two realm strings (+0x3E8, +0x41C); the card windows read them back
+/// (`00ad47f0`). The names come from those readers, the packet has none (R). The packet class
+/// holds each string in a 256-byte inline buffer (field stride 0x114, R), so each stays under 256.
+pub fn build_update_client_session_data(
+    session: &str,
+    station: &str,
+    realm_a: &str,
+    realm_b: &str,
+) -> Vec<u8> {
+    let mut inner = 82u16.to_le_bytes().to_vec();
+    for value in [session, station, realm_a, realm_b] {
+        assert!(value.len() < 256, "session data string over 255 bytes");
+        counted_string(&mut inner, value);
+    }
+    tunnel(&inner)
+}
+
 /// Opcode 166 carries a NUL-terminated environment string.
 pub fn build_initialization_parameters(environment: &str) -> Vec<u8> {
     assert!(

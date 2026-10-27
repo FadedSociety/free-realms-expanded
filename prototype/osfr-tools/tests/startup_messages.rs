@@ -153,3 +153,34 @@ fn synthetic_journal_size_and_values_change_the_message() {
     assert_eq!((u32_at(bytes, 10), u32_at(bytes, 14)), (101, 3));
     assert_eq!((u32_at(bytes, 18), u32_at(bytes, 22)), (205, 9));
 }
+
+/// T798: PacketUpdateClientSessionData (reader `008e4e40`): the opcode, then four strings in the
+/// order the client copies them (session ticket, station name, realm, realm), each an i32 length
+/// and raw bytes with no terminator.
+#[test]
+fn update_client_session_data_is_four_counted_strings_after_opcode_82() {
+    let mut golden = vec![5, 0, 1, 23, 0, 0, 0, 82, 0];
+    golden.extend([2, 0, 0, 0, b'a', b'b', 1, 0, 0, 0, b'c']);
+    golden.extend([0, 0, 0, 0, 2, 0, 0, 0, b'd', b'e']);
+    assert_eq!(
+        startup_messages::build_update_client_session_data("ab", "c", "", "de"),
+        golden
+    );
+    // All four empty is the client's own default state: the opcode and four zero lengths.
+    let mut empty = vec![5, 0, 1, 18, 0, 0, 0, 82, 0];
+    empty.extend([0; 16]);
+    assert_eq!(
+        startup_messages::build_update_client_session_data("", "", "", ""),
+        empty
+    );
+    // The largest string the client's packet holds (R) goes out whole.
+    let longest = "x".repeat(255);
+    let packet = startup_messages::build_update_client_session_data(&longest, "", "", "");
+    assert_eq!(inner(&packet).len(), 2 + 4 + 255 + 12);
+}
+
+#[test]
+#[should_panic(expected = "over 255 bytes")]
+fn update_client_session_data_refuses_a_string_the_client_cannot_hold() {
+    startup_messages::build_update_client_session_data("", "", &"x".repeat(256), "");
+}

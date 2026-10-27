@@ -87,9 +87,9 @@ impl Fixture {
         gateway.handle_at(&login, 0).unwrap()
     }
 
-    /// A logged-in session at `position`, including the 10/13 world-entry
-    /// replies (AddNpc visibility, portal list and the encounter state).
-    pub fn session(&self, position: [f32; 3], guid: u64) -> (Gateway, GatewayOutcome) {
+    /// A session at `position` that has logged in but not yet entered the world, with the
+    /// login's own replies.
+    pub fn login_session(&self, position: [f32; 3], guid: u64) -> (Gateway, GatewayOutcome) {
         let mut character = Gateway::reference_state(&self.reference).unwrap();
         character.guid = guid;
         character.zone_id = 0;
@@ -99,7 +99,14 @@ impl Fixture {
             Gateway::load_gameplay(&self.reference, character, &self.content, None).unwrap();
         gateway.set_dev_tools(true);
         gateway.set_role(AccountRole::Admin);
-        self.login(&mut gateway);
+        let login = self.login(&mut gateway);
+        (gateway, login)
+    }
+
+    /// A logged-in session at `position`, including the 10/13 world-entry
+    /// replies (AddNpc visibility, portal list and the encounter state).
+    pub fn session(&self, position: [f32; 3], guid: u64) -> (Gateway, GatewayOutcome) {
+        let (mut gateway, _) = self.login_session(position, guid);
         send(&mut gateway, &13_u16.to_le_bytes(), 100);
         let loaded = send(&mut gateway, &10_u16.to_le_bytes(), 200);
         (gateway, loaded)

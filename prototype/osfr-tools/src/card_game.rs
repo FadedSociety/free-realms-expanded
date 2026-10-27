@@ -32,6 +32,7 @@
 use crate::activity_portal::{Activity, Kind};
 use crate::card_service::LaunchTickets;
 use crate::minigame::{MinigameRuns, RunMode, RunOutcome, RunSpec, card_start_packet};
+use crate::startup_messages;
 use serde::Deserialize;
 use std::{
     collections::BTreeSet,
@@ -187,6 +188,24 @@ impl Launches {
     pub fn redeem(&mut self, ticket: &str, character: &str, now_ms: u64) -> Option<u64> {
         self.tickets.redeem(ticket, character, now_ms)
     }
+}
+
+/// T798: the 82 a card-enabled session sends once per login (`PacketUpdateClientSessionData`).
+/// The card window starts its session login only for a non-empty session ticket (DLL
+/// `1037b5f0`), and the exe's card manager (`00ad47f0`) takes that ticket and the station name
+/// from this packet only. The ticket is a fresh random value that is not a credential: the card
+/// login is authorised by the one-time launch ticket and character id (`LaunchTickets`), and the
+/// card service only echoes the session id back. The client logs it and the DLL sends it in
+/// plain TCP, so it is never the launcher session, the gateway ticket or a launch ticket. The
+/// station name and realms stay empty (R): the card service needs none of them.
+pub fn session_data_packet() -> io::Result<Vec<u8>> {
+    let mut bytes = [0; 16];
+    getrandom::getrandom(&mut bytes)
+        .map_err(|_| invalid("no OS randomness for a card session ticket"))?;
+    let ticket = format!("{:032x}", u128::from_le_bytes(bytes));
+    Ok(startup_messages::build_update_client_session_data(
+        &ticket, "", "", "",
+    ))
 }
 
 impl Content {
