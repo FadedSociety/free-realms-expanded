@@ -1479,3 +1479,83 @@ fn a_turned_fixture_places_and_its_actor_turns_with_it() {
     };
     assert_eq!(npc.rotation, update.instance.tilt);
 }
+
+/// T826: the selected fixture's guid reaches the radial menu's Lua as a signed `%lld` print and
+/// every `House.*Fixture` binding reads a string that starts with `-` as guid 0, so with a guid of
+/// bit 63 set, Rotate looked the fixture up as 0, created no edit object and read through it
+/// (`00ab2112`/`00ab2118`): the client stalled and died with an access violation. Every guid the
+/// server sends for a fixture must print positive.
+#[test]
+fn every_fixture_guid_the_client_is_sent_prints_positive() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let (lot, item) = decorating(&mut game);
+    place_item(&mut game, item);
+    let mut relogged = Gameplay::load(&content.0, Some(game.state())).unwrap();
+    relogged
+        .handle_in_world(&enter(lot), &character(), 8_000)
+        .unwrap();
+    let loaded = relogged.initialize_world(&character(), 9_000).unwrap();
+    let records = updates(&loaded.replies);
+    assert_eq!(records.len(), KIT_BLOCKS + 1);
+    let record = InstanceData::decode(reply(&loaded.replies, 28)).unwrap();
+    let guids = records
+        .iter()
+        .flat_map(|u| [u.instance.guid, u.instance.npc_guid, u.info.fixture_guid])
+        .chain(
+            record
+                .fixtures
+                .iter()
+                .flat_map(|(_, f)| [f.guid, f.npc_guid]),
+        )
+        .chain(actors(&loaded.replies).into_iter().map(|npc| npc.actor_id));
+    for guid in guids {
+        let printed = format!("{}", guid as i64);
+        assert!(!printed.starts_with('-'), "{guid:#x} prints as {printed}");
+    }
+}
+
+/// T826: the owner's lot, saved before the fix, has fixture guids with bit 63 set and the old
+/// `[1, 0, 0, 0]` rotation pair. Through the real `Gameplay`, the lot loads in the current form,
+/// the client is sent positive guids and the unrotated facing, and a relog changes nothing.
+#[test]
+fn a_lot_saved_before_the_fix_is_sent_with_positive_guids_and_no_turn() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    let (lot, item) = decorating(&mut game);
+    let chicken = place_item(&mut game, item);
+    let current = game.state();
+    let mut save = serde_json::to_value(&current).unwrap();
+    for fixture in save["housing"]["lots"][0]["fixtures"]
+        .as_array_mut()
+        .unwrap()
+    {
+        let guid = fixture["fixture_guid"].as_u64().unwrap();
+        fixture["fixture_guid"] = serde_json::json!(guid | (1 << 63));
+        fixture["transform"]["rotation"] = serde_json::json!([1.0, 0.0, 0.0, 0.0]);
+        fixture["transform"]["tilt"] = serde_json::json!([1.0, 0.0, 0.0, 0.0]);
+    }
+    let old = serde_json::from_value(save).unwrap();
+
+    let mut migrated = Gameplay::load(&content.0, Some(old)).unwrap();
+    assert_eq!(migrated.state().housing, current.housing);
+    assert!(
+        standing(&migrated)
+            .iter()
+            .any(|f| f.fixture_guid == chicken)
+    );
+    migrated
+        .handle_in_world(&enter(lot), &character(), 8_000)
+        .unwrap();
+    let loaded = migrated.initialize_world(&character(), 9_000).unwrap();
+    let records = updates(&loaded.replies);
+    assert_eq!(records.len(), KIT_BLOCKS + 1);
+    for update in &records {
+        assert_eq!(update.instance.guid >> 63, 0);
+        assert_eq!(update.instance.rotation, [0.0; 4]);
+        assert_eq!(update.instance.tilt, [0.0, 0.0, 1.0, 0.0]);
+    }
+    assert!(records.iter().any(|u| u.instance.guid == chicken));
+    let relogged = Gameplay::load(&content.0, Some(migrated.state())).unwrap();
+    assert_eq!(relogged.state().housing, migrated.state().housing);
+}

@@ -410,5 +410,25 @@ radian yaw, and any real turn was refused as a non-unit quaternion.
 
 Open (R): the actor's name string id, the 35/9 (three 100s) and 35/20 (status 1) the retail server
 sends after each 35/2, the 35/16 effect after a move, and a live 127/51 to the NPC for a fixture
-another visitor moves. Lots saved before T806 keep their stored `[1, 0, 0, 0]` and show a one radian
-yaw until the item is turned.
+another visitor moves. Lots saved before T806 stored `[1, 0, 0, 0]`; T826 reads that pair back as
+unrotated on load.
+
+## The radial menu's guid (T826, native 2026-10-27)
+
+The decorate radial menu (Move, Up, Rotate Left/Right, Remove) is Lua (`ScriptsBase.lua`,
+`Housing:OnRadialMenuClick`). It takes `currentItemGuid` from the
+`BaseClient.Housing.Instance.SelectedFixture` data source and passes that string to
+`House.PickupFixture`, `MoveFixture`, `MoveFixtureVertically` and `RotateFixture(Counter)Clockwise`.
+The data source prints the 64-bit guid with `%lld` (`SelectedFixtureDataSource::GetValue`
+`00cbd700`, wide format at `01817394`), and every one of those bindings reads it with `sub_BFEA90`
+(`00bfea90`), which returns 0 for a string that starts with `-`. So a fixture guid with bit 63 set
+reached the client's housing code as guid 0. Selection itself is by actor (`sub_AB5910` through the
+NPC-guid index), which is why the menu opened. With guid 0, `sub_AB1E30` (rotate, `00ab1e30`)
+finds no fixture, `sub_AAB230` (`00aab230`) builds no edit object, and `00ab2112`/`00ab2118` read
+`[this+0x40bc]+0x16c` through the missing object: an access violation. The client stalled about
+30 s in its exception path and exited by itself with 0xC0000005 (run manifest `client_exit_code`
+3221225477; its session disconnects at 70.7 s and 87.8 s). Move (`00ab0d60`) and Up (`00ab2250`)
+with guid 0 do nothing and are null-safe; Remove sends a 127/3 for guid 0.
+
+Fixture guids are now minted below 2^63 (top byte `7f`, bit 55 still the actor's), as retail's
+(`07f5...`). Lots saved with the old `ff...` guids load with bit 63 cleared (`migrated_lot`).

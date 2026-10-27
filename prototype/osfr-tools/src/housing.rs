@@ -50,7 +50,12 @@ pub const SNAPSHOT_SCHEMA_VERSION: u32 = 1;
 /// RECONSTRUCTED fixture-guid namespace. Real fixture guids are server-assigned and unknown; this
 /// block keeps generated guids distinguishable from character, item and zone guids in a local test.
 pub const HOUSE_GUID_BASE: u64 = 0x0f00_0000_0000_0000;
-const FIXTURE_GUID_MASK: u64 = 0xff00_0000_0000_0000;
+/// The namespace of minted fixture guids. Bit 63 stays clear: the client formats the selected
+/// fixture's guid with `%lld` (`SelectedFixtureDataSource::GetValue`, `00cbd700`) and the Lua
+/// guid reader `00bfea90` returns 0 for a string that starts with `-`, so a guid with bit 63 set
+/// reached every radial-menu action (move, rotate, remove) as guid 0 (T826). Bit 55 stays clear
+/// too: the fixture's actor guid sets it (`housing_service::fixture_actor_guid`).
+const FIXTURE_GUID_MASK: u64 = 0x7f00_0000_0000_0000;
 static TEMP_SEQUENCE: AtomicU64 = AtomicU64::new(0);
 
 /// Legacy reference: its packet model assigns level 3 to edit permission. Retail semantics remain

@@ -1433,7 +1433,7 @@ impl HousingService {
         }
         let mut housing = Housing::new();
         housing
-            .restore_lots(state.lots.clone())
+            .restore_lots(state.lots.iter().cloned().map(migrated_lot).collect())
             .map_err(StateError::Housing)?;
         let owned: BTreeSet<u32> = inventory
             .items
@@ -2445,6 +2445,29 @@ fn placed_from_saved(saved: &SavedFixture) -> PlacedFixture {
         fixture_definition_id: saved.fixture_definition_id,
         transform: saved.transform.clone(),
     }
+}
+
+/// A lot saved before T806/T826, brought to the current fixture records. Idempotent, and keyed on
+/// the old shapes themselves, so the schema version stays:
+/// * a fixture guid with bit 63 set (the old namespace, top byte `ff`) loses that bit: the client
+///   prints it as a negative decimal and its Lua guid reader turns that into guid 0, so no radial
+///   menu action (move, rotate, remove) reached the fixture and rotating crashed the client;
+/// * the pair rotation `[1, 0, 0, 0]` with tilt `[1, 0, 0, 0]` is what the old identity mapping
+///   stored for a fixture the client placed unrotated. As Euler lanes it is a one radian yaw, and
+///   no placement made since can have it (the tilt is always the facing of the rotation).
+fn migrated_lot(mut lot: LotSnapshot) -> LotSnapshot {
+    for fixture in &mut lot.fixtures {
+        fixture.fixture_guid &= !(1 << 63);
+        let transform = &mut fixture.transform;
+        if transform.rotation == [1.0, 0.0, 0.0, 0.0] && transform.tilt == [1.0, 0.0, 0.0, 0.0] {
+            *transform = FixtureTransform {
+                rotation: [0.0; 4],
+                tilt: facing([0.0; 4]),
+                ..transform.clone()
+            };
+        }
+    }
+    lot
 }
 
 /// Map the client wire transform onto the housing model: drop the position w component, keep the

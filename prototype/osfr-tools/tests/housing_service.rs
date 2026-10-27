@@ -1128,6 +1128,79 @@ fn a_typed_move_stages_the_transform_and_keeps_the_item_placed() {
     );
 }
 
+/// T826 (native 2026-10-27): every radial-menu action (move, rotate, remove) reached the client's
+/// housing code as guid 0 and rotating crashed it. The menu's Lua gets the selected fixture's guid
+/// as the data source's `%lld` print (`00cbd700`) and its guid reader `00bfea90` returns 0 for a
+/// string that starts with `-`, so a guid with bit 63 set can never be acted on. Bit 55 is the
+/// actor's (`fixture_actor_guid`).
+#[test]
+fn a_minted_fixture_guid_prints_as_a_positive_decimal() {
+    let content = Content::new(vec![item(INSTANCE as i32, BLOCK_ITEM, 1)], &[BLOCK_ITEM]);
+    let mut inventory = content.inventory();
+    let mut service = service_with_lot();
+    enter(&mut service, &mut inventory);
+    place(&mut service, &mut inventory);
+    let guid = placed_guid(&service);
+    assert_eq!(guid >> 63, 0, "bit 63 clear: {guid:#x}");
+    assert_eq!((guid >> 55) & 1, 0, "bit 55 is the actor's: {guid:#x}");
+    let printed = format!("{}", guid as i64);
+    assert!(!printed.starts_with('-'), "the client prints {printed}");
+    let actor = housing_service::fixture_actor_guid(guid);
+    assert!(!format!("{}", actor as i64).starts_with('-'));
+    assert_ne!(actor, guid);
+}
+
+/// A lot saved before T806/T826 holds guids with bit 63 set and, for a fixture the client placed
+/// unrotated, the identity-mapped pair rotation `[1, 0, 0, 0]` / tilt `[1, 0, 0, 0]`. Loading
+/// brings both to the current records, keeps everything else, and a second load changes nothing.
+#[test]
+fn a_lot_saved_with_the_old_guids_and_rotation_loads_in_the_current_form() {
+    let content = Content::new(vec![item(INSTANCE as i32, BLOCK_ITEM, 1)], &[BLOCK_ITEM]);
+    let mut inventory = content.inventory();
+    let mut service = service_with_lot();
+    enter(&mut service, &mut inventory);
+    place(&mut service, &mut inventory);
+    let current = service.state();
+    let new_guid = current.lots[0].fixtures[0].fixture_guid;
+
+    let mut old = current.clone();
+    old.lots[0].fixtures[0].fixture_guid = new_guid | (1 << 63);
+    old.lots[0].fixtures[0].transform.rotation = [1.0, 0.0, 0.0, 0.0];
+    old.lots[0].fixtures[0].transform.tilt = [1.0, 0.0, 0.0, 0.0];
+    let restored =
+        HousingService::from_state(FixtureConfig::capture_defaults(), &old, inventory.state())
+            .unwrap();
+    assert_eq!(
+        restored.state(),
+        current,
+        "the old form loads as the current one"
+    );
+    let fixture = &restored.lot(HOUSE).unwrap().fixtures[0];
+    assert_eq!(fixture.fixture_guid, new_guid);
+    assert_eq!(fixture.transform.rotation, [0.0; 4]);
+    assert_eq!(fixture.transform.tilt, [0.0, 0.0, 1.0, 0.0]);
+    let again = HousingService::from_state(
+        FixtureConfig::capture_defaults(),
+        &restored.state(),
+        inventory.state(),
+    )
+    .unwrap();
+    assert_eq!(again.state(), restored.state());
+
+    // A rotation the client really sent is never mistaken for the old pair: one radian of yaw
+    // comes with its own facing, not the tilt [1, 0, 0, 0].
+    let mut turned = current.clone();
+    turned.lots[0].fixtures[0].transform.rotation = [1.0, 0.0, 0.0, 0.0];
+    turned.lots[0].fixtures[0].transform.tilt = [1.0_f32.sin(), 0.0, 1.0_f32.cos(), 0.0];
+    let kept = HousingService::from_state(
+        FixtureConfig::capture_defaults(),
+        &turned,
+        inventory.state(),
+    )
+    .unwrap();
+    assert_eq!(kept.state(), turned);
+}
+
 #[test]
 fn the_serialized_service_state_round_trips_and_rejects_invalid_documents() {
     let content = Content::new(vec![item(INSTANCE as i32, BLOCK_ITEM, 1)], &[BLOCK_ITEM]);
