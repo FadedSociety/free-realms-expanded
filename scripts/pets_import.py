@@ -5,10 +5,13 @@ Sources (data facts only; the AGPL reference's code is not copied):
   Pets.json             lab/references/Sanctuary-main-20261019/src/Resources/Pets.json (per-model rows)
   ClientItemDefinitions lab/references/FreeRealms-Legacy/src/Resources/ClientItemDefinitions.json (Type 2 = pet items)
   Models.txt            lab/working/OSFR.Client/OSFR Client/Resources/Models.txt (client model ids)
-  AnimationTypes.xml    lab/working/OSFR.Client/OSFR Client/Resources/AnimationTypes.xml (animation slot id -> name; T489)
+  AnimationTypes.xml    lab/working/OSFR.Client/OSFR Client/Resources/AnimationTypes.xml (animation slot id -> name; T489, T531)
   ADR files             lab/extracted/named/*/*/<model>.adr (a model's animation slot names; T489)
   locale                lab/reports/locale-id-to-text.json (item display names; a name id the client lacks drops it)
 Client evidence wins: an item whose model is not in Models.txt, or whose name id the locale lacks, is dropped.
+T531: each model's `idle` object (idle, bathroom and rest animations; Pets.json IdleAnimations, BathroomAnimations,
+RestPostures) is checked the same way as the trick animations, and a model gets a `shake_off` row when its ADR declares
+the client slot `pet_dry_off` (20 of the 21 dog ADRs and all 4 cat ADRs do; no other pet ADR does).
 (R) Two client item rows name a model Models.txt does not spell the same way: firefly.adr has two client ids and
 no Pets.json row (the lower id is used), and Candy Corn's vanitypet_candycorn_critter.adr names the candycorn
 critter by its item TextureAlias (candycorn-critter -> candycorn_critter.adr, which Models.txt row 1530
@@ -66,7 +69,8 @@ def models_txt(path):
 def animation_slot_names(path):
     """animation slot id -> slot name (AnimationTypes.xml: the ids the 35/8 animation message carries)."""
     text = path.read_text(encoding="utf-8", errors="replace")
-    return {int(m.group(2)): m.group(1) for m in re.finditer(r'<AnimationSlot name="([^"]+)" id="(\d+)"', text)}
+    # Some rows put two spaces before the id (pet_stand_fidget_1), so the gap is `\s+`.
+    return {int(m.group(2)): m.group(1) for m in re.finditer(r'<AnimationSlot\s+name="([^"]+)"\s+id="(\d+)"', text)}
 
 
 def adr_slot_names(adr, adr_paths):
@@ -97,6 +101,55 @@ def trick_animation_rows(row, model_id, adr, slots, adr_paths, dropped):
     return rows
 
 
+# (R) How long the shake-off blocks the next idle animation. OSFR PR 152 runs it 1200 ms for a dog and 1400 ms for a
+# cat; the longer one serves both, since no client table holds the run time.
+SHAKE_OFF_MS = 1400
+DRY_OFF_SLOT = "pet_dry_off"
+
+
+def idle_set(row, model_id, adr, slots, adr_paths, dropped):
+    """T531: a model's Pets.json idle life as one `idle` object (or None when it has none), each animation id checked
+    against the client: it must be an AnimationTypes.xml slot and the model's ADR must declare the slot's name. An
+    animation that fails is dropped and listed; a rest posture needs a valid enter, exit and at least one valid loop.
+    When the ADR is not in the lab the rows are kept and marked (R). `shake_off` is the `pet_dry_off` slot, for the
+    models whose ADR declares it."""
+    names = adr_slot_names(adr, adr_paths)
+
+    def good(animation_id):
+        slot = slots.get(animation_id)
+        if slot is None or (names is not None and slot not in names):
+            dropped.append([model_id, animation_id])
+            return False
+        return True
+
+    def animation(a):
+        return {"animation_id": a["AnimationId"], "duration_ms": a["DurationMs"]}
+
+    def rows(items):
+        return [animation(a) for a in items or [] if good(a["AnimationId"])]
+
+    postures = []
+    for p in row.get("RestPostures") or []:
+        loops = [i for i in p["LoopAnimationIds"] if good(i)]
+        enter = {"animation_id": p["EnterAnimationId"], "duration_ms": p["EnterDurationMs"]}
+        leave = {"animation_id": p["ExitAnimationId"], "duration_ms": p["ExitDurationMs"]}
+        if loops and good(enter["animation_id"]) and good(leave["animation_id"]):
+            postures.append({"enter": enter, "exit": leave, "loops": loops, "fidgets": rows(p["FidgetAnimations"])})
+    idle = {"animations": rows(row.get("IdleAnimations")), "bathroom": rows(row.get("BathroomAnimations")),
+            "rest_postures": postures}
+    dry = next((i for i, name in slots.items() if name == DRY_OFF_SLOT), None)
+    if dry is not None and names is not None and DRY_OFF_SLOT in names:
+        idle["shake_off"] = {"animation_id": dry, "duration_ms": SHAKE_OFF_MS}
+    idle = {k: v for k, v in idle.items() if v}
+    if not idle:
+        return None
+    check = f"ADR {adr} declares every slot" if names is not None else f"(R) ADR {adr} not in the lab, slots unchecked"
+    shake = f"; shake_off is the {DRY_OFF_SLOT} slot its ADR declares, run time (R)" if "shake_off" in idle else ""
+    idle["src"] = (f"Pets.json Id={model_id} IdleAnimations, BathroomAnimations, RestPostures; AnimationTypes.xml slot "
+                   f"names; {check}{shake}")
+    return idle
+
+
 def resolved_model_ids(item, by_adr, models):
     """The item's Models.txt model ids among the `models` rows. (R) When its ModelName has no entry
     (Candy Corn: vanitypet_candycorn_critter.adr), the ADR its client TextureAlias names
@@ -121,6 +174,7 @@ def main():
     for found in sorted(glob.glob(str(LAB / "extracted/named/*/*/*.adr"))):
         adr_paths.setdefault(Path(found).name.lower(), Path(found))
     dropped_animations = []
+    dropped_idle = []
     texts = {r["id"]: r["text"] for r in json.loads(LOCALE.read_text(encoding="utf-8"))}
     # Icon tint from the shipped client catalogue (hex at the definition's +0x10, the field
     # `Inventory::presentation` reads); the Legacy row is the fallback for an id it lacks.
@@ -167,6 +221,7 @@ def main():
             continue
         adr, gender = client_models[mid]
         animations = trick_animation_rows(row, mid, adr, slots, adr_paths, dropped_animations)
+        idle = idle_set(row, mid, adr, slots, adr_paths, dropped_idle)
         order = sorted((t for t in row.get("PetTricks") or [] if t["Id"] not in dropped_tricks),
                        key=lambda t: (t["Unknown8"], t["Id"]))
         models[mid] = {"model_id": mid, "adr": adr, "gender": gender, "icon_id": row.get("IconId"),
@@ -176,6 +231,7 @@ def main():
                        "item_classes": [{"key": c["Key"], "id": c["Value"]["Id"], "unknown": c["Value"]["Unknown"]}
                                         for c in row.get("ItemClasses") or []],
                        **({"trick_animations": animations} if animations else {}),
+                       **({"idle": idle} if idle else {}),
                        "src": f"Pets.json Id={mid}; Models.txt {mid}"}
     for adr, mid in EXTRA_MODELS.items():
         if mid not in models and client_models.get(mid, ("",))[0] == adr:
@@ -215,7 +271,10 @@ def main():
                       "unresolved_items": unresolved, "tricks": len(content["tricks"]),
                       "dropped_tricks": dropped_tricks,
                       "trick_animation_rows": sum(len(m.get("trick_animations", [])) for m in models.values()),
-                      "dropped_trick_animations": dropped_animations}))
+                      "dropped_trick_animations": dropped_animations,
+                      "idle_models": sum(1 for m in models.values() if "idle" in m),
+                      "shake_off_models": sum(1 for m in models.values() if "shake_off" in m.get("idle", {})),
+                      "dropped_idle_animations": dropped_idle}))
 
 
 if __name__ == "__main__":

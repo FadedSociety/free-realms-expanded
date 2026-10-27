@@ -16,6 +16,7 @@ use std::{
 };
 
 mod grooming;
+mod idle;
 mod tricks;
 
 const PET_FAMILY: u16 = 53;
@@ -47,6 +48,9 @@ const NOTIFY_GROOM_END: u32 = 4;
 const NOTIFY_TRICK: u32 = 5;
 /// T489 (R): sanity bound on a trick's start delay plus its run time, in ms.
 const MAX_TRICK_MS: u32 = 30_000;
+/// T531: the idle seed of a service that never called `set_idle_seed`; each summon mixes its
+/// owner and time into it.
+const IDLE_SEED: u64 = 0x5EED_1D1E;
 /// Sanity cap on a care item's restore: Legacy food Param2 runs 50..400 on an unrecovered scale,
 /// and the bar itself clamps at `need_policy.maximum`.
 const MAX_CARE_RESTORE: f32 = 1_000.0;
@@ -98,6 +102,9 @@ struct CareTiming {
     /// T489: the trick session rules; without them 53/7 is refused with the unlocks.
     #[serde(default)]
     trick: Option<tricks::TrickConfig>,
+    /// T531: idle life and thought bubbles; without it a pet only follows.
+    #[serde(default)]
+    idle: Option<idle::IdleConfig>,
     source: SourceTag,
 }
 
@@ -110,6 +117,7 @@ impl CareTiming {
             && (0.01..=50.0).contains(&self.status_epsilon)
             && self.groom.as_ref().is_none_or(grooming::GroomConfig::valid)
             && self.trick.as_ref().is_none_or(tricks::TrickConfig::valid)
+            && self.idle.as_ref().is_none_or(idle::IdleConfig::valid)
     }
 }
 
@@ -146,6 +154,9 @@ pub struct PetModel {
     /// T489: how each of the model's tricks plays (owner and pet animation groups and timing).
     #[serde(default)]
     pub trick_animations: Vec<PetTrickAnimation>,
+    /// T531: the model's idle, bathroom and rest animations and its shake-off.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub idle: Option<idle::PetIdleSet>,
     src: String,
     #[serde(default)]
     unknown_reasons: BTreeMap<String, String>,
@@ -575,6 +586,7 @@ impl PetContent {
                 || model.tricks.len() > 16
                 || model.item_classes.len() > 16
                 || !model.animations_valid()
+                || !model.idle.as_ref().is_none_or(idle::PetIdleSet::valid)
                 || model
                     .tricks
                     .iter()
@@ -1021,6 +1033,8 @@ struct ActivePet {
     petted_ms: Option<u64>,
     /// T489: the running trick, or the one that just ended (session only, like `feeding`).
     trick: tricks::TrickState,
+    /// T531: idle animations, rest posture, shake-off and thought-bubble timers (session only).
+    idle: idle::IdleState,
 }
 
 impl ActivePet {
@@ -1048,6 +1062,8 @@ pub struct PetService {
     /// Session only: never saved and never sent. `Some` means no pet is active, because a summon
     /// and a dismiss both clear it; `reset_session` drops it with the connection.
     remembered: Option<u32>,
+    /// T531: seeds the idle choices of the next summon (`set_idle_seed`).
+    idle_seed: u64,
 }
 
 impl PetService {
@@ -1063,6 +1079,7 @@ impl PetService {
             active: None,
             ui_mode: 0,
             remembered: None,
+            idle_seed: IDLE_SEED,
         })
     }
 
@@ -1076,6 +1093,7 @@ impl PetService {
             active: None,
             ui_mode: 0,
             remembered: None,
+            idle_seed: IDLE_SEED,
         })
     }
 
@@ -1432,6 +1450,7 @@ impl PetService {
             grooming: None,
             petted_ms: None,
             trick: tricks::TrickState::Idle,
+            idle: idle::IdleState::new(self.idle_seed ^ owner_guid.rotate_left(32) ^ now),
         });
         let model_id = self.content.model_id(&model);
         broadcasts.push(PetPresenceEvent::Spawn(PetPresence {
@@ -2007,7 +2026,8 @@ impl PetService {
     /// T485: the summoned pet's care on the world tick. A feed applies at `feed_effect_ms` (one
     /// food consumed through `care`, `changed` set) and ends with 53/20 kind 2 at
     /// `feed_end_ms`. Live needs: a decayed view (the roster is not written) goes out as 53/3
-    /// once it moved by `status_epsilon` and `status_interval_ms` has passed. A failure is a
+    /// once it moved by `status_epsilon` and `status_interval_ms` has passed. T531: a settled pet's
+    /// idle animations and its thought bubbles ride the same tick (`idle_tick`). A failure is a
     /// refusal for this player, never an error out of the tick.
     pub fn care_tick(&mut self, inventory: &mut Inventory, now_ms: u64) -> PetWire {
         let mut wire = PetWire::default();
@@ -2051,6 +2071,9 @@ impl PetService {
         }
         if let Some(trick) = care.trick.as_ref() {
             self.trick_tick(trick, &mut wire, now_ms);
+        }
+        if let Some(idle) = care.idle.as_ref() {
+            self.idle_tick(idle, &mut wire, now_ms);
         }
         if let Some(status) = self.live_needs(care, now_ms) {
             wire.private.push(status);
@@ -2143,6 +2166,7 @@ impl PetService {
             .active
             .as_mut()
             .ok_or_else(|| invalid("no active pet"))?;
+        active.idle.water(active.in_water, in_water);
         active.in_water = in_water;
         Ok(())
     }

@@ -25,7 +25,6 @@ use osfr_tools::{
 use pet_inventory::InventoryFixture;
 use pet_wire::{favorite, feed, groom, perform_trick, summon, trick_result, water};
 use serde_json::{Value, json};
-use std::path::Path;
 
 /// 6,000 s after adoption: the same base the grooming suite uses.
 const START: u64 = 6_000_000;
@@ -34,25 +33,6 @@ const TRICK: u32 = 11;
 /// A vanity Pet Pal (T454).
 const CRAB_ITEM: i32 = 7885;
 const DISMISS: [u8; 8] = [53, 0, 4, 0, 0, 0, 0, 0];
-
-fn pets_json() -> Value {
-    json::read(&Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/pets.json"))
-}
-
-fn content_with(edit: impl FnOnce(&mut Value)) -> PetContent {
-    let mut document = pets_json();
-    edit(&mut document);
-    PetContent::from_json(&serde_json::to_vec(&document).unwrap()).unwrap()
-}
-
-fn model_row(document: &mut Value, model_id: i64) -> &mut Value {
-    document["models"]
-        .as_array_mut()
-        .unwrap()
-        .iter_mut()
-        .find(|model| model["model_id"] == model_id)
-        .unwrap()
-}
 
 /// The shipped animation row of the dog for `trick`.
 fn row(trick: u32) -> PetTrickAnimation {

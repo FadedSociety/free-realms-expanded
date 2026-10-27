@@ -4,6 +4,8 @@
 //! 53/3 needs.
 #[path = "support/pet_care.rs"]
 mod care;
+#[path = "support/json.rs"]
+mod json;
 #[path = "support/pet_inventory.rs"]
 mod pet_inventory;
 #[path = "../src/bin/osfr_gateway/pet_wire.rs"]

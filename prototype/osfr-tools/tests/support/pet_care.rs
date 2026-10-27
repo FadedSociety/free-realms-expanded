@@ -1,10 +1,13 @@
 //! T485/T488: the fixtures the pet care suites share (`tests/pet_care.rs`, `tests/pet_grooming.rs`):
-//! the shipped kit rows, a bag holding them, a dog and the 53/* packet readers. Includers declare
-//! `pet_inventory` and `pet_wire` first (`use super::...` below).
+//! the shipped kit rows, a bag holding them, a dog and the 53/* packet readers. T489/T531: edited
+//! content and model rows. Includers declare `json`, `pet_inventory` and `pet_wire` first (`use
+//! super::...` below).
 #![allow(dead_code)] // each includer uses a subset
 
-use super::{pet_inventory::InventoryFixture, pet_wire};
+use super::{json, pet_inventory::InventoryFixture, pet_wire};
 use osfr_tools::pets::{PetBusy, PetContent, PetService, PetWire};
+use serde_json::Value;
+use std::{io, path::Path};
 
 /// Shipped catalogue rows (lab/reports/item-catalogue-20261015), all class 73: bowl 11 slot 204,
 /// Simple Pet Food 1835 slot 205, Simple Pet Shampoo 1836 slot 200, Basic Pet Conditioner 10521
@@ -54,11 +57,43 @@ pub fn dog() -> (PetService, u32) {
 
 /// `dog` on edited content (T489: trick rules and animation rows).
 pub fn dog_with(content: PetContent) -> (PetService, u32) {
+    model_pet(content, 364)
+}
+
+/// A pet of client model `model_id` adopted at time 0 (T531: a cat, a bird, the dog without rows).
+pub fn model_pet(content: PetContent, model_id: i32) -> (PetService, u32) {
     let mut service = PetService::new(content.clone()).unwrap();
     let mut definition = content.definition(1_000_015).unwrap();
-    definition.model = content.model(364).unwrap().adr.clone();
+    definition.model = content.model(model_id).unwrap().adr.clone();
     let id = service.adopt_vendor_grant(1, &definition, 0).unwrap();
     (service, id)
+}
+
+/// The shipped `pets.json` document.
+pub fn pets_json() -> Value {
+    json::read(&Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/pets.json"))
+}
+
+/// The shipped content after `edit`, or why it refuses to load.
+pub fn loads(edit: impl FnOnce(&mut Value)) -> io::Result<PetContent> {
+    let mut document = pets_json();
+    edit(&mut document);
+    PetContent::from_json(&serde_json::to_vec(&document).unwrap())
+}
+
+/// The shipped content after `edit` (it must load).
+pub fn content_with(edit: impl FnOnce(&mut Value)) -> PetContent {
+    loads(edit).unwrap()
+}
+
+/// The `models` row of client model `model_id` in a `pets.json` document.
+pub fn model_row(document: &mut Value, model_id: i64) -> &mut Value {
+    document["models"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|model| model["model_id"] == model_id)
+        .unwrap()
 }
 
 pub fn send(

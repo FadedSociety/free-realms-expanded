@@ -108,6 +108,14 @@ pub struct PetPose {
     paused: bool,
 }
 
+impl PetPose {
+    /// The pet has walked to its spot beside a still owner and stands there (T531: its idle life
+    /// runs only while this holds; a walk, a warp or the pet window clears it).
+    pub fn settled(&self) -> bool {
+        self.settled
+    }
+}
+
 /// A fresh pose `side_m` to the owner's side (+x until a walk shows the owner's facing (R)).
 pub fn spawn(config: &FollowConfig, owner: [f32; 3]) -> PetPose {
     PetPose {
