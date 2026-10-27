@@ -11,10 +11,11 @@
 //!
 //! Resolved objective kinds: `talk_to_npc`, `interact_actor`, `reach_poi`,
 //! `defeat`, `collect_item`, `equip_item`, `craft_recipe`, `complete_dungeon`,
-//! `finish_minigame`, `gather_resource`, `collect_node` and `job_level`. The item,
-//! recipe, dungeon, minigame, gather and quest-pickup kinds additionally resolve
-//! their target ids in the id sets owned by `tests/support/quest_target_sets.rs`,
-//! which names the owning loader and every `FinishMinigame` emitter. A
+//! `finish_minigame`, `gather_resource`, `collect_node`, `job_level` and
+//! `perform_pet_trick`. The item, recipe, dungeon, minigame, gather, quest-pickup and
+//! pet-trick kinds additionally resolve their target ids in the id sets owned by
+//! `tests/support/quest_target_sets.rs`, which names the owning loader and every
+//! `FinishMinigame` emitter. A
 //! `collect_node` node type must have at least one placed spawn in
 //! `quest_nodes.json` (`harvest_nodes::GatheringNodes::load`, T503). A `job_level`
 //! profile must be declared by the loaded profile content (`Targets::profiles`);
@@ -65,7 +66,8 @@ use osfr_tools::{
 };
 use quest_catalogue_fixture::{
     Defect, FIXTURE_BATTLE, FIXTURE_DEFECT, FIXTURE_GATHER_RESOURCE, FIXTURE_ITEM,
-    FIXTURE_MINIGAME, FIXTURE_NODE_TYPE, FIXTURE_QUEST, FIXTURE_RECIPE, Scratch, fixture,
+    FIXTURE_MINIGAME, FIXTURE_NODE_TYPE, FIXTURE_PET_TRICK, FIXTURE_QUEST, FIXTURE_RECIPE, Scratch,
+    fixture,
 };
 use quest_records::{RawQuest, as_u32, read_quests, sorted_json_paths};
 use quest_target_sets::Targets;
@@ -228,7 +230,7 @@ impl Catalogue {
     /// Objective kinds whose target this gate resolves. Everything else is only
     /// bounded by the split loader; the target test prints the gap.
     fn unchecked_objective_kinds(&self) -> BTreeSet<&str> {
-        const CHECKED: [&str; 12] = [
+        const CHECKED: [&str; 13] = [
             "talk_to_npc",
             "interact_actor",
             "reach_poi",
@@ -241,6 +243,7 @@ impl Catalogue {
             "gather_resource",
             "collect_node",
             "job_level",
+            "perform_pet_trick",
         ];
         self.enabled()
             .flat_map(|quest| quest.objectives.iter())
@@ -385,6 +388,14 @@ impl Catalogue {
                         if !self.targets.profiles.contains(&profile) {
                             violations.push(format!(
                                 "{owner} (job_level): profile {profile} is not declared by the loaded profile content"
+                            ));
+                        }
+                    }
+                    "perform_pet_trick" => {
+                        let trick = as_u32(&goal["trick_id"]).unwrap_or(0);
+                        if !self.targets.pet_tricks.contains(&trick) {
+                            violations.push(format!(
+                                "{owner} (perform_pet_trick): trick {trick} is not a pets.json trick id"
                             ));
                         }
                     }
@@ -928,6 +939,60 @@ fn graded_target_kinds_fail_on_a_scratch_tree() {
             && violations[0].contains("collect_node")
             && violations[0].contains("missing-node"),
         "canary H did not report the unknown node type: {violations:?}"
+    );
+}
+
+/// T788: a `perform_pet_trick` target must be a `pets.json` trick id. The gate resolves it in
+/// `Targets::pet_tricks`, so an id no trick row declares is refused instead of certifying a quest
+/// no perform can ever credit. A zero id is refused earlier by the production split loader
+/// (`valid_objective_kind`). Canary: remove the gate arm and the unknown id passes, failing here.
+#[test]
+fn unknown_trick_id_is_rejected_at_load() {
+    let clean = fixture("pet-trick-clean", Defect::None);
+    let catalogue = Catalogue::load(clean.path()).expect("the clean fixture loads");
+    assert!(
+        catalogue.targets.pet_tricks.contains(&FIXTURE_PET_TRICK),
+        "the fixture pets.json declares its trick id"
+    );
+    assert!(
+        catalogue.target_violations().is_empty(),
+        "the clean pet-trick target must resolve: {:?}",
+        catalogue.target_violations()
+    );
+
+    // A trick id no pets.json row declares: the quest stays reachable, so the reward gate
+    // cannot hide it and only the pet-trick check can report it.
+    let unknown = fixture("pet-trick-unknown", Defect::None);
+    patch_fixture_objective(
+        &unknown,
+        FIXTURE_QUEST,
+        "perform_pet_trick",
+        "trick_id",
+        999_999,
+    );
+    let catalogue = Catalogue::load(unknown.path()).expect("the altered quest still loads");
+    assert!(
+        catalogue
+            .reachable_enabled()
+            .iter()
+            .any(|quest| quest.id == FIXTURE_QUEST),
+        "the altered quest must stay reachable"
+    );
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains(&format!("quest {FIXTURE_QUEST} objective 10 (#8)"))
+            && violations[0].contains("perform_pet_trick")
+            && violations[0].contains("999999"),
+        "the unknown pet trick was not reported: {violations:?}"
+    );
+
+    // The loader's own sanity bound (non-zero) is the production refusal, not the audit's.
+    let zero = fixture("pet-trick-zero", Defect::None);
+    patch_fixture_objective(&zero, FIXTURE_QUEST, "perform_pet_trick", "trick_id", 0);
+    assert!(
+        Catalogue::load(zero.path()).is_err(),
+        "from_split_content must reject a zero trick id"
     );
 }
 

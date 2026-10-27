@@ -263,6 +263,14 @@ pub enum ContentGoal {
         count: u32,
         source: Vec<SourceTag>,
     },
+    /// (R) T788: the owner's pet performs a trick the client names by id. `trick_id` is a
+    /// `pets.json` `tricks[].id`; the event is the server accepting that 53/7, never a grade.
+    PerformPetTrick {
+        id: u32,
+        trick_id: u32,
+        count: u32,
+        source: Vec<SourceTag>,
+    },
     EquipItem {
         id: u32,
         definition_id: i32,
@@ -310,6 +318,7 @@ impl ContentGoal {
             | Self::CollectNode { id, .. }
             | Self::CraftRecipe { id, .. }
             | Self::FinishMinigame { id, .. }
+            | Self::PerformPetTrick { id, .. }
             | Self::EquipItem { id, .. }
             | Self::VisitPosition { id, .. }
             | Self::ClientReported { id, .. }
@@ -907,6 +916,7 @@ fn check_goal_sources(owner: &str, goal: &ContentGoal) -> Result<(), ContentErro
         | ContentGoal::CollectNode { id, source, .. }
         | ContentGoal::CraftRecipe { id, source, .. }
         | ContentGoal::FinishMinigame { id, source, .. }
+        | ContentGoal::PerformPetTrick { id, source, .. }
         | ContentGoal::EquipItem { id, source, .. }
         | ContentGoal::VisitPosition { id, source, .. }
         | ContentGoal::ClientReported { id, source, .. }
@@ -1036,6 +1046,22 @@ fn validate_goal(
             }
             // The node type resolves against quest_nodes.json in the enabled-quest
             // reachability gate, not in this id-reference pass.
+            Ok(())
+        }
+        // T788: the trick id must be a real row; the enabled-quest reachability gate
+        // resolves it in pets.json (the quest engine does not load pet content).
+        ContentGoal::PerformPetTrick {
+            trick_id, count, ..
+        } => {
+            if *trick_id == 0 || !(1..=crate::quest_engine::MAX_COUNT).contains(count) {
+                return Err(ContentError::InvalidRecord {
+                    record: owner.to_owned(),
+                    detail: format!(
+                        "goal.trick_id must be positive and goal.count 1..={}",
+                        crate::quest_engine::MAX_COUNT
+                    ),
+                });
+            }
             Ok(())
         }
         // The quest engine validates resource, recipe, minigame and geometry bindings.

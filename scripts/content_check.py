@@ -1319,6 +1319,7 @@ class Checker:
             "visit_zone": ("zone_id", None), "gather_resource": ("resource_id", "quantity"),
             "collect_node": ("node_type", "quantity"),
             "craft_recipe": ("recipe_id", "quantity"), "finish_minigame": ("minigame_id", "count"),
+            "perform_pet_trick": ("trick_id", "count"),
             "equip_item": ("definition_id", None), "visit_position": ("zone_id", None),
             "interact_actor": ("actor_guid", None), "complete_dungeon": ("encounter_id", None),
             "client_reported": ("client_id", None), "job_level": ("profile_id", None),

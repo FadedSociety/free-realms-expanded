@@ -42,6 +42,9 @@
 //! * `profiles`: the `profiles.json` `profiles[].id` rows `Profiles::load` owns
 //!   (it exposes no id list), read from the profile content root: the opening
 //!   content the session ranks jobs from, not the quest catalogue root.
+//! * `pet_tricks`: the `pets.json` `tricks[].id` rows `PetContent` loads (its
+//!   trick rows are private to the crate, so the raw authored ids are read, like
+//!   `encounters.json` above). A `perform_pet_trick` target must be one of them.
 
 use super::quest_records::as_u32;
 use osfr_tools::{
@@ -82,6 +85,8 @@ pub struct Targets {
     /// Profiles the loaded profile content declares; a `job_level` rank is only
     /// real for one of them.
     pub profiles: BTreeSet<u32>,
+    /// `pets.json` trick ids a `perform_pet_trick` step may name.
+    pub pet_tricks: BTreeSet<u32>,
 }
 
 impl Targets {
@@ -225,6 +230,13 @@ impl Targets {
                 .nodes
                 .extend(nodes.pickup_kinds().into_iter().map(str::to_owned));
         }
+        // T788: `PetContent` owns `pets.json` but keeps its trick rows private, so the
+        // authored trick ids are read raw; an absent file yields none (every target fails).
+        targets
+            .pet_tricks
+            .extend(read_ids(root, "pets.json", |document| {
+                array_ids(document, "tricks", "id")
+            }));
         Ok(targets)
     }
 }

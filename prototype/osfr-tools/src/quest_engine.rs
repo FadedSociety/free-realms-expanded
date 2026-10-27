@@ -22,7 +22,7 @@ use std::{
 
 const MAX_OBJECTIVES: usize = 64;
 const MAX_QUESTS: usize = 1024;
-const MAX_COUNT: u32 = 1_000_000;
+pub(crate) const MAX_COUNT: u32 = 1_000_000;
 /// Local bound on one quest's `excludes_quest_ids` (R; no recovered retail table).
 const MAX_EXCLUSIONS: usize = 16;
 /// Local bound on a registered UI event name (R; the native limit is not recovered).
@@ -301,6 +301,11 @@ pub enum ObjectiveKind {
     },
     FinishMinigame {
         minigame_id: u32,
+    },
+    /// T788: the owner's pet performs the trick the client names by its `pets.json` id.
+    /// The server accepts the 53/7 request; the client-computed grade is never sent.
+    PetTrick {
+        trick_id: u32,
     },
     UseItem {
         item_id: i32,
@@ -680,6 +685,10 @@ pub enum QuestEvent {
     },
     FinishMinigame {
         minigame_id: u32,
+    },
+    /// T788: one accepted 53/7 for this trick on the owner's summoned pet.
+    PetTrick {
+        trick_id: u32,
     },
     UseItem {
         item_id: i32,
@@ -2589,6 +2598,18 @@ fn definition_from_content(
                     ));
                 }
             }
+            ContentGoal::PerformPetTrick {
+                trick_id,
+                count,
+                source,
+                ..
+            } => {
+                if *trick_id == 0 || !(1..=MAX_COUNT).contains(count) || source.is_empty() {
+                    return Err(invalid(
+                        "perform_pet_trick objective requires a positive trick, count 1..=MAX_COUNT and provenance",
+                    ));
+                }
+            }
             _ => {}
         }
     }
@@ -2690,6 +2711,19 @@ fn definition_from_content(
                 description: format!("Objective {}", id),
                 kind: ObjectiveKind::FinishMinigame {
                     minigame_id: *minigame_id,
+                },
+            },
+            ContentGoal::PerformPetTrick {
+                id,
+                trick_id,
+                count,
+                ..
+            } => QuestObjective {
+                id: *id,
+                required: *count,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::PetTrick {
+                    trick_id: *trick_id,
                 },
             },
             ContentGoal::EquipItem {
@@ -3019,6 +3053,7 @@ fn valid_objective_kind(kind: &ObjectiveKind) -> bool {
         ObjectiveKind::EnterArea { .. } => true,
         ObjectiveKind::ReachPoi { poi_id } => *poi_id != 0,
         ObjectiveKind::FinishMinigame { minigame_id } => *minigame_id != 0,
+        ObjectiveKind::PetTrick { trick_id } => *trick_id != 0,
         ObjectiveKind::GatherResource { resource_id } => *resource_id != 0,
         ObjectiveKind::CollectNode { node_type } => crate::content::valid_node_type(node_type),
         ObjectiveKind::CraftRecipe { recipe_id } => *recipe_id != 0,
@@ -3078,6 +3113,7 @@ fn validate_event(event: &QuestEvent) -> io::Result<()> {
         QuestEvent::EnterArea { .. } => true,
         QuestEvent::ReachPoi { poi_id } => *poi_id != 0,
         QuestEvent::FinishMinigame { minigame_id } => *minigame_id != 0,
+        QuestEvent::PetTrick { trick_id } => *trick_id != 0,
         QuestEvent::GatherResource {
             resource_id,
             quantity,
@@ -3140,6 +3176,11 @@ fn event_matches(kind: &ObjectiveKind, event: &QuestEvent) -> u32 {
             ObjectiveKind::FinishMinigame { minigame_id: a },
             QuestEvent::FinishMinigame { minigame_id: b },
         ) if a == b => 1,
+        (ObjectiveKind::PetTrick { trick_id: a }, QuestEvent::PetTrick { trick_id: b })
+            if a == b =>
+        {
+            1
+        }
         (
             ObjectiveKind::UseItem { item_id: a },
             QuestEvent::UseItem {

@@ -297,6 +297,7 @@ impl Gameplay {
     /// W177: summon, dismiss and UI mode (family 53). Ownership comes only from the saved
     /// roster loaded by `adopt_pets`; the actor GUID is derived from the authenticated
     /// character, never from request bytes. T532: the happy-speed buff follows the pet.
+    /// T788: an accepted 53/7 also credits a `perform_pet_trick` quest objective.
     pub(super) fn handle_pets(
         &mut self,
         inner: &[u8],
@@ -320,8 +321,11 @@ impl Gameplay {
         let Some(wire) = wire else {
             return Ok(None);
         };
+        // T788: only an accepted 53/7 carries the trick, so a refusal or a 53/8 credits no quest.
+        let accepted_trick = wire.accepted_trick;
         let mut out = Self::pet_outcome(wire);
         self.sync_happy_buff(character, now_ms, &mut out);
+        self.pet_trick_quest_event(accepted_trick, &mut out)?;
         Ok(Some(out))
     }
 

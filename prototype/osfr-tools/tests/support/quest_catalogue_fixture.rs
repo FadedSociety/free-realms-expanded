@@ -28,6 +28,8 @@ pub const FIXTURE_BATTLE: u32 = 9_100_200;
 pub const FIXTURE_GATHER_RESOURCE: u32 = 1_001;
 /// T503: the node type `quest_nodes.json` places for the graded `collect_node` goal.
 pub const FIXTURE_NODE_TYPE: &str = "fixture-node";
+/// T788: the trick id the fixture `pets.json` declares (a `perform_pet_trick` target).
+pub const FIXTURE_PET_TRICK: u32 = 11;
 const FIXTURE_GIVER: u64 = 9_000_100_001;
 const FIXTURE_TARGET: u64 = 9_000_100_002;
 const FIXTURE_MISSING_GIVER: u64 = 9_000_100_099;
@@ -171,6 +173,13 @@ fn fixture_objectives() -> Value {
                 "id": 8,
                 "node_type": FIXTURE_NODE_TYPE,
                 "quantity": 1,
+                "source": fixture_source(),
+            }),
+            json!({
+                "kind": "perform_pet_trick",
+                "id": 10,
+                "trick_id": FIXTURE_PET_TRICK,
+                "count": 1,
                 "source": fixture_source(),
             }),
         ]);
@@ -447,6 +456,13 @@ pub fn fixture(name: &str, defect: Defect) -> Scratch {
     write_json(&root.join("recipes.json"), &fixture_recipe_book());
     write_json(&root.join("field_battles.json"), &fixture_field_battles());
     write_json(&root.join("quest_nodes.json"), &fixture_quest_nodes());
+    // T788: the pet trick table the reachability gate resolves `perform_pet_trick` in.
+    // Only the trick ids are read (raw, like `encounters.json`), so the fixture needs no
+    // pet catalogue rows.
+    write_json(
+        &root.join("pets.json"),
+        &json!({"schema_version": 1, "tricks": [{"id": FIXTURE_PET_TRICK}]}),
+    );
     write_json(
         &root.join("quests/fixture.json"),
         &json!({"schema_version": 1, "records": quests}),

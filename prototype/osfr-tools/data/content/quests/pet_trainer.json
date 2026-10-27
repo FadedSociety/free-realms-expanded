@@ -200,7 +200,29 @@
       "title_string_id": 90019,
       "giver_npc_id": 9000000368,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "perform_pet_trick",
+          "id": 1,
+          "trick_id": 17,
+          "count": 1,
+          "text_string_id": 90020,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 90020 (../lab/reports/locale-id-to-text.json) is this step's objective line and names the trick 'Speak'. data/content/pets.json trick id 17 has name_id 22714, which the same locale report resolves to 'Speak'; 19 pet model rows carry id 17."
+            },
+            {
+              "kind": "client",
+              "evidence": "53/7 PetPerformTrick body is one u32 trick id: client Pet.PerformTrick 00c06890 -> DispatchPetActionRecord 00b5fb30 (finds the trick row on the summoned pet) -> UnlockPetTricksAfterGesture 00cc7420 -> sub_B5FF50. 53/8 (sub_B5FFE0) carries the same id and no grade, so the server credits acceptance, never quality."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says 'your pet', so this id is the classic dog row; the same-named rows other species carry (their own ids) are not covered by one trick id, which is the documented gap."
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -221,7 +243,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T788 authors this record's perform_pet_trick steps from the client objective text and the pets.json trick rows; the quest stays disabled (see notes/Autopilot/T788.md for the species and reward gaps)"
         },
         {
           "kind": "reconstructed",
@@ -300,7 +322,29 @@
       "title_string_id": 90031,
       "giver_npc_id": 9000000184,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "perform_pet_trick",
+          "id": 1,
+          "trick_id": 11,
+          "count": 1,
+          "text_string_id": 90032,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 90032 (../lab/reports/locale-id-to-text.json) is this step's objective line and names the trick 'Sit Up'. data/content/pets.json trick id 11 has name_id 62, which the same locale report resolves to 'Sit Up'; 19 pet model rows carry id 11."
+            },
+            {
+              "kind": "client",
+              "evidence": "53/7 PetPerformTrick body is one u32 trick id: client Pet.PerformTrick 00c06890 -> DispatchPetActionRecord 00b5fb30 (finds the trick row on the summoned pet) -> UnlockPetTricksAfterGesture 00cc7420 -> sub_B5FF50. 53/8 (sub_B5FFE0) carries the same id and no grade, so the server credits acceptance, never quality."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says dog, and id 11 is the dog rows' 'Sit Up'."
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -321,7 +365,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T788 authors this record's perform_pet_trick steps from the client objective text and the pets.json trick rows; the quest stays disabled (see notes/Autopilot/T788.md for the species and reward gaps)"
         },
         {
           "kind": "reconstructed",
@@ -350,7 +394,29 @@
       "title_string_id": 90035,
       "giver_npc_id": 9000000184,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "perform_pet_trick",
+          "id": 1,
+          "trick_id": 3001,
+          "count": 1,
+          "text_string_id": 90036,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 90036 (../lab/reports/locale-id-to-text.json) is this step's objective line and names the trick 'Jump'. data/content/pets.json trick id 3001 has name_id 4147, which the same locale report resolves to 'Jump'; 4 pet model rows carry id 3001."
+            },
+            {
+              "kind": "client",
+              "evidence": "53/7 PetPerformTrick body is one u32 trick id: client Pet.PerformTrick 00c06890 -> DispatchPetActionRecord 00b5fb30 (finds the trick row on the summoned pet) -> UnlockPetTricksAfterGesture 00cc7420 -> sub_B5FF50. 53/8 (sub_B5FFE0) carries the same id and no grade, so the server credits acceptance, never quality."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says cat, and id 3001 is the cat rows' 'Jump'."
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -371,7 +437,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T788 authors this record's perform_pet_trick steps from the client objective text and the pets.json trick rows; the quest stays disabled (see notes/Autopilot/T788.md for the species and reward gaps)"
         },
         {
           "kind": "reconstructed",
@@ -517,7 +583,45 @@
       "title_string_id": 90043,
       "giver_npc_id": 9000000231,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "perform_pet_trick",
+          "id": 1,
+          "trick_id": 16,
+          "count": 1,
+          "text_string_id": 90044,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 90044 (../lab/reports/locale-id-to-text.json) is this step's objective line and names the trick 'Peek-a-boo'. data/content/pets.json trick id 16 has name_id 22713, which the same locale report resolves to 'Peek-a-boo'; 19 pet model rows carry id 16."
+            },
+            {
+              "kind": "client",
+              "evidence": "53/7 PetPerformTrick body is one u32 trick id: client Pet.PerformTrick 00c06890 -> DispatchPetActionRecord 00b5fb30 (finds the trick row on the summoned pet) -> UnlockPetTricksAfterGesture 00cc7420 -> sub_B5FF50. 53/8 (sub_B5FFE0) carries the same id and no grade, so the server credits acceptance, never quality."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says dog, and id 16 is the dog rows' 'Peek-a-boo'."
+            }
+          ]
+        },
+        {
+          "kind": "talk_to_npc",
+          "id": 2,
+          "npc_id": 9000000231,
+          "text_string_id": 90555,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 90555: return to Vidor Stormshroud in Shrouded Glade. NPC 9000000231 is Vidor (data/content/npcs/shrouded_glade.json) and this quest's giver, so the turn-in defaults to him."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T788: the how-to step between them (locale 90554, equip the trick and start the trick game) names no server-side event and is not authored."
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -538,7 +642,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T788 authors this record's perform_pet_trick steps from the client objective text and the pets.json trick rows; the quest stays disabled (see notes/Autopilot/T788.md for the species and reward gaps)"
         },
         {
           "kind": "reconstructed",
@@ -567,7 +671,29 @@
       "title_string_id": 90047,
       "giver_npc_id": 9000000231,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "perform_pet_trick",
+          "id": 1,
+          "trick_id": 12,
+          "count": 1,
+          "text_string_id": 90048,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 90048 (../lab/reports/locale-id-to-text.json) is this step's objective line and names the trick 'Roll Over'. data/content/pets.json trick id 12 has name_id 61, which the same locale report resolves to 'Roll Over'; 19 pet model rows carry id 12."
+            },
+            {
+              "kind": "client",
+              "evidence": "53/7 PetPerformTrick body is one u32 trick id: client Pet.PerformTrick 00c06890 -> DispatchPetActionRecord 00b5fb30 (finds the trick row on the summoned pet) -> UnlockPetTricksAfterGesture 00cc7420 -> sub_B5FF50. 53/8 (sub_B5FFE0) carries the same id and no grade, so the server credits acceptance, never quality."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says dog, and id 12 is the dog rows' 'Roll Over'. June Bug is a dog, so the same id covers the borrowed pet."
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -588,7 +714,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T788 authors this record's perform_pet_trick steps from the client objective text and the pets.json trick rows; the quest stays disabled (see notes/Autopilot/T788.md for the species and reward gaps)"
         },
         {
           "kind": "reconstructed",
@@ -617,7 +743,29 @@
       "title_string_id": 90051,
       "giver_npc_id": 9000000231,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "perform_pet_trick",
+          "id": 1,
+          "trick_id": 3003,
+          "count": 1,
+          "text_string_id": 90052,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 90052 (../lab/reports/locale-id-to-text.json) is this step's objective line and names the trick 'Box'. data/content/pets.json trick id 3003 has name_id 73630, which the same locale report resolves to 'Box'; 4 pet model rows carry id 3003."
+            },
+            {
+              "kind": "client",
+              "evidence": "53/7 PetPerformTrick body is one u32 trick id: client Pet.PerformTrick 00c06890 -> DispatchPetActionRecord 00b5fb30 (finds the trick row on the summoned pet) -> UnlockPetTricksAfterGesture 00cc7420 -> sub_B5FF50. 53/8 (sub_B5FFE0) carries the same id and no grade, so the server credits acceptance, never quality."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says cat, and id 3003 is the cat rows' 'Box'."
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -638,7 +786,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T788 authors this record's perform_pet_trick steps from the client objective text and the pets.json trick rows; the quest stays disabled (see notes/Autopilot/T788.md for the species and reward gaps)"
         },
         {
           "kind": "reconstructed",
@@ -830,7 +978,29 @@
       "title_string_id": 90063,
       "giver_npc_id": 9000000228,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "perform_pet_trick",
+          "id": 1,
+          "trick_id": 14,
+          "count": 1,
+          "text_string_id": 90064,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 90064 (../lab/reports/locale-id-to-text.json) is this step's objective line and names the trick 'Handstand'. data/content/pets.json trick id 14 has name_id 7210, which the same locale report resolves to 'Handstand'; 19 pet model rows carry id 14."
+            },
+            {
+              "kind": "client",
+              "evidence": "53/7 PetPerformTrick body is one u32 trick id: client Pet.PerformTrick 00c06890 -> DispatchPetActionRecord 00b5fb30 (finds the trick row on the summoned pet) -> UnlockPetTricksAfterGesture 00cc7420 -> sub_B5FF50. 53/8 (sub_B5FFE0) carries the same id and no grade, so the server credits acceptance, never quality."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective says 'your pet' and the offer text says both cats and dogs can do Handstand; id 14 is the dog rows' Handstand (cats use 3000), so a cat cannot credit this id (documented gap)."
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -851,7 +1021,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T788 authors this record's perform_pet_trick steps from the client objective text and the pets.json trick rows; the quest stays disabled (see notes/Autopilot/T788.md for the species and reward gaps)"
         },
         {
           "kind": "reconstructed",
@@ -880,7 +1050,29 @@
       "title_string_id": 90067,
       "giver_npc_id": 9000000228,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "perform_pet_trick",
+          "id": 1,
+          "trick_id": 3004,
+          "count": 1,
+          "text_string_id": 90068,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 90068 (../lab/reports/locale-id-to-text.json) is this step's objective line and names the trick 'Spin'. data/content/pets.json trick id 3004 has name_id 4757, which the same locale report resolves to 'Spin'; 4 pet model rows carry id 3004."
+            },
+            {
+              "kind": "client",
+              "evidence": "53/7 PetPerformTrick body is one u32 trick id: client Pet.PerformTrick 00c06890 -> DispatchPetActionRecord 00b5fb30 (finds the trick row on the summoned pet) -> UnlockPetTricksAfterGesture 00cc7420 -> sub_B5FF50. 53/8 (sub_B5FFE0) carries the same id and no grade, so the server credits acceptance, never quality."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says cat, and id 3004 is the cat rows' 'Spin'. The offer text calls Spin cat-only."
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -901,7 +1093,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T788 authors this record's perform_pet_trick steps from the client objective text and the pets.json trick rows; the quest stays disabled (see notes/Autopilot/T788.md for the species and reward gaps)"
         },
         {
           "kind": "reconstructed",
@@ -1147,7 +1339,29 @@
       "title_string_id": 90098,
       "giver_npc_id": 9000000153,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "perform_pet_trick",
+          "id": 1,
+          "trick_id": 13,
+          "count": 1,
+          "text_string_id": 90099,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 90099 (../lab/reports/locale-id-to-text.json) is this step's objective line and names the trick 'Dance'. data/content/pets.json trick id 13 has name_id 60, which the same locale report resolves to 'Dance'; 19 pet model rows carry id 13."
+            },
+            {
+              "kind": "client",
+              "evidence": "53/7 PetPerformTrick body is one u32 trick id: client Pet.PerformTrick 00c06890 -> DispatchPetActionRecord 00b5fb30 (finds the trick row on the summoned pet) -> UnlockPetTricksAfterGesture 00cc7420 -> sub_B5FF50. 53/8 (sub_B5FFE0) carries the same id and no grade, so the server credits acceptance, never quality."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T788: count 1 from the singular trick in the objective text. The objective text says 'your pet', so this id is the classic dog row; the same-named rows other species carry (their own ids) are not covered by one trick id, which is the documented gap."
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -1168,7 +1382,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T788 authors this record's perform_pet_trick steps from the client objective text and the pets.json trick rows; the quest stays disabled (see notes/Autopilot/T788.md for the species and reward gaps)"
         },
         {
           "kind": "reconstructed",
@@ -1317,7 +1531,92 @@
       "title_string_id": 90110,
       "giver_npc_id": 9000000130,
       "prerequisite_quest_ids": [],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "perform_pet_trick",
+          "id": 1,
+          "trick_id": 17,
+          "count": 1,
+          "text_string_id": 90111,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 90111 (../lab/reports/locale-id-to-text.json) is this step's objective line and names the trick 'Speak'. data/content/pets.json trick id 17 has name_id 22714, which the same locale report resolves to 'Speak'; 19 pet model rows carry id 17."
+            },
+            {
+              "kind": "client",
+              "evidence": "53/7 PetPerformTrick body is one u32 trick id: client Pet.PerformTrick 00c06890 -> DispatchPetActionRecord 00b5fb30 (finds the trick row on the summoned pet) -> UnlockPetTricksAfterGesture 00cc7420 -> sub_B5FF50. 53/8 (sub_B5FFE0) carries the same id and no grade, so the server credits acceptance, never quality."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T788: count 1 from the singular trick in the objective text. Part 1 of 4 in the objective text's order (Speak, Handstand, Play Dead, Dance); the split loader runs steps in order."
+            }
+          ]
+        },
+        {
+          "kind": "perform_pet_trick",
+          "id": 2,
+          "trick_id": 14,
+          "count": 1,
+          "text_string_id": 90111,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 90111 (../lab/reports/locale-id-to-text.json) is this step's objective line and names the trick 'Handstand'. data/content/pets.json trick id 14 has name_id 7210, which the same locale report resolves to 'Handstand'; 19 pet model rows carry id 14."
+            },
+            {
+              "kind": "client",
+              "evidence": "53/7 PetPerformTrick body is one u32 trick id: client Pet.PerformTrick 00c06890 -> DispatchPetActionRecord 00b5fb30 (finds the trick row on the summoned pet) -> UnlockPetTricksAfterGesture 00cc7420 -> sub_B5FF50. 53/8 (sub_B5FFE0) carries the same id and no grade, so the server credits acceptance, never quality."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T788: count 1 from the singular trick in the objective text. Part 2 of 4; id 14 is the dog rows' Handstand."
+            }
+          ]
+        },
+        {
+          "kind": "perform_pet_trick",
+          "id": 3,
+          "trick_id": 15,
+          "count": 1,
+          "text_string_id": 90111,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 90111 (../lab/reports/locale-id-to-text.json) is this step's objective line and names the trick 'Play Dead'. data/content/pets.json trick id 15 has name_id 6518, which the same locale report resolves to 'Play Dead'; 19 pet model rows carry id 15."
+            },
+            {
+              "kind": "client",
+              "evidence": "53/7 PetPerformTrick body is one u32 trick id: client Pet.PerformTrick 00c06890 -> DispatchPetActionRecord 00b5fb30 (finds the trick row on the summoned pet) -> UnlockPetTricksAfterGesture 00cc7420 -> sub_B5FF50. 53/8 (sub_B5FFE0) carries the same id and no grade, so the server credits acceptance, never quality."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T788: count 1 from the singular trick in the objective text. Part 3 of 4; id 15 is the dog rows' Play Dead."
+            }
+          ]
+        },
+        {
+          "kind": "perform_pet_trick",
+          "id": 4,
+          "trick_id": 13,
+          "count": 1,
+          "text_string_id": 90111,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 90111 (../lab/reports/locale-id-to-text.json) is this step's objective line and names the trick 'Dance'. data/content/pets.json trick id 13 has name_id 60, which the same locale report resolves to 'Dance'; 19 pet model rows carry id 13."
+            },
+            {
+              "kind": "client",
+              "evidence": "53/7 PetPerformTrick body is one u32 trick id: client Pet.PerformTrick 00c06890 -> DispatchPetActionRecord 00b5fb30 (finds the trick row on the summoned pet) -> UnlockPetTricksAfterGesture 00cc7420 -> sub_B5FF50. 53/8 (sub_B5FFE0) carries the same id and no grade, so the server credits acceptance, never quality."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T788: count 1 from the singular trick in the objective text. Part 4 of 4; id 13 is the dog rows' Dance."
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -1338,7 +1637,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T788 authors this record's perform_pet_trick steps from the client objective text and the pets.json trick rows; the quest stays disabled (see notes/Autopilot/T788.md for the species and reward gaps)"
         },
         {
           "kind": "reconstructed",

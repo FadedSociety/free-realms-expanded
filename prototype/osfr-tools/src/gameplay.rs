@@ -65,6 +65,8 @@ mod npc;
 mod npc_quests;
 mod npc_turnin;
 mod occupation;
+/// T788: an accepted 53/7 pet trick credits the owner's `perform_pet_trick` objective.
+mod pet_quest;
 /// Warpstone definitions, attunement and validated travel (W142).
 #[path = "restoration/piece_077.rs"]
 #[allow(dead_code)]
