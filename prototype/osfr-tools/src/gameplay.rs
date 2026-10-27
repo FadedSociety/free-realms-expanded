@@ -1722,7 +1722,7 @@ impl Gameplay {
             self.append_warp_definitions(character, &mut out);
             self.append_activity_list(&mut out);
             self.append_item_bar(character.guid, now_ms, &mut out)?;
-            self.push_rosters(&mut out);
+            self.enter_world(character, now_ms, &mut out);
             self.sync_client_objectives(&mut out);
             self.sync_achievement_progress(&mut out, None)?;
             return Ok(out);
@@ -1812,7 +1812,7 @@ impl Gameplay {
         self.append_activity_list(&mut out);
         self.append_item_bar(character.guid, now_ms, &mut out)?;
         out.replies.push(self.recipe_replace_all_packet()?);
-        self.push_rosters(&mut out);
+        self.enter_world(character, now_ms, &mut out);
         self.sync_client_objectives(&mut out);
         self.sync_achievement_progress(&mut out, None)?;
         Ok(out)

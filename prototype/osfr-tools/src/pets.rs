@@ -944,6 +944,10 @@ pub struct PetService {
     roster: PetRoster,
     active: Option<ActivePet>,
     ui_mode: u32,
+    /// T487: the pet a zone change left behind, for the destination's loaded signal to bring back.
+    /// Session only: never saved and never sent. `Some` means no pet is active, because a summon
+    /// and a dismiss both clear it; `reset_session` drops it with the connection.
+    remembered: Option<u32>,
 }
 
 impl PetService {
@@ -958,6 +962,7 @@ impl PetService {
             roster: PetRoster::default(),
             active: None,
             ui_mode: 0,
+            remembered: None,
         })
     }
 
@@ -970,6 +975,7 @@ impl PetService {
             roster,
             active: None,
             ui_mode: 0,
+            remembered: None,
         })
     }
 
@@ -1071,10 +1077,12 @@ impl PetService {
         })
     }
 
-    /// Reset only the connection-scoped actor state; the saved roster stays.
+    /// Reset only the connection-scoped actor state; the saved roster stays. T487: the pet a zone
+    /// change left behind is session state too, so a disconnect or reconnect forgets it.
     pub fn reset_session(&mut self) {
         self.active = None;
         self.ui_mode = 0;
+        self.remembered = None;
     }
 
     /// A save may carry a later monotonic clock than a restarted server. Needs
@@ -1309,6 +1317,8 @@ impl PetService {
             || crate::pet_follow::spawn_at(owner_position),
             |follow| crate::pet_follow::spawn(follow, owner_position),
         );
+        // T487: a summoned pet is out, so nothing is left behind for a zone change to bring back.
+        self.remembered = None;
         self.active = Some(ActivePet {
             pet_id,
             owner_guid,
@@ -1344,6 +1354,9 @@ impl PetService {
     }
 
     pub fn dismiss(&mut self, now: u64) -> io::Result<PetTransition> {
+        // T487: a dismiss is explicit or forced (a recalled pet, a disconnect), so it also drops
+        // the pet a zone change would bring back.
+        self.remembered = None;
         if self.active.is_none() {
             return Ok(PetTransition {
                 owner_message: pet_active_packet(0, 0),
@@ -1366,11 +1379,59 @@ impl PetService {
         })
     }
 
+    /// T487: the pet a zone change left behind and the destination has not summoned back. Session
+    /// state only (never saved); the tests read it to pin the forget rules.
+    pub fn remembered_pet_id(&self) -> Option<u32> {
+        self.remembered
+    }
+
     pub fn recall(&mut self, pet_id: u32, now: u64) -> io::Result<PetTransition> {
         if self.active.map(|active| active.pet_id) != Some(pet_id) {
             return Err(invalid("that pet is not summoned"));
         }
         self.dismiss(now)
+    }
+
+    /// T487: a zone change dismisses the active pet as before but remembers it, so the
+    /// destination's loaded signal can bring it back (`resummon`). `settle_pets` is the only
+    /// caller: an explicit or forced dismiss (`dismiss`, `recall`) still forgets it.
+    pub fn zone_away(&mut self, now: u64) -> io::Result<PetTransition> {
+        let remembered = self.active.map(|active| active.pet_id);
+        let transition = self.dismiss(now)?;
+        self.remembered = remembered;
+        Ok(transition)
+    }
+
+    /// T487: bring back the pet a zone change left behind through the normal summon path, beside
+    /// its owner. `None` while a pet is out, while an activity closes the pets gate (the memory is
+    /// then kept for the first update or tick after it ends), for a pet the roster no longer holds
+    /// (forgotten silently) and with nothing remembered. The wire is the summon's own plus the
+    /// roster a summon sends, and it never marks a save: only the session remembers the pet.
+    pub fn resummon(
+        &mut self,
+        actor_guid: u64,
+        owner_guid: u64,
+        owner_position: [f32; 3],
+        busy: PetBusy,
+        now: u64,
+    ) -> io::Result<Option<PetWire>> {
+        let Some(pet_id) = self.remembered else {
+            return Ok(None);
+        };
+        if busy.minigame_active || self.active.is_some() {
+            return Ok(None);
+        }
+        // Taken before the attempt: a pet the roster lost, or a summon the server cannot place
+        // (an unusable owner pose), must not be retried on every tick.
+        self.remembered = None;
+        if self.pet(pet_id).is_none() {
+            return Ok(None);
+        }
+        let transition = self.summon(pet_id, actor_guid, owner_guid, owner_position, busy, now)?;
+        let mut wire = self.wire(transition);
+        wire.private.push(self.list_packet());
+        wire.changed = false;
+        Ok(Some(wire))
     }
 
     /// Route subtype 32 through the live inventory. The client sends the

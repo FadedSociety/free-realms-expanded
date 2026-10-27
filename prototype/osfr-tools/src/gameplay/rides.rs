@@ -7,12 +7,19 @@ impl Gameplay {
     /// World entry (T424): the pet roster and the owned-ride roster (168/5). The ride roster is
     /// always sent, so a character without rides gets count 0, which also replaces the captured
     /// ride rows of the login self data (`startup_selfdata` `pre_action_records`). Later
-    /// ownership changes are sent by `settle_mounts`.
-    pub(super) fn push_rosters(&mut self, out: &mut Outcome) {
+    /// ownership changes are sent by `settle_mounts`. T487: the loaded signal then brings back the
+    /// pet a zone change left behind, after the rosters the client reads it from.
+    pub(super) fn enter_world(
+        &mut self,
+        character: &CharacterState,
+        now_ms: u64,
+        out: &mut Outcome,
+    ) {
         out.replies.push(self.pets.list_packet());
         if let Some(mounts) = &mut self.mounts {
             out.replies.push(mounts.list_packet(self.inventory.state()));
         }
+        self.resummon_pet(character, now_ms, out);
     }
 
     /// W162: true while the rider sits on a ride (the emote rules refuse emotes then).
@@ -277,14 +284,52 @@ impl Gameplay {
         Ok(())
     }
 
+    /// T487: the pet a zone change left behind comes back through the normal summon path, beside
+    /// its owner, once the destination allows pets. A pets-blocking activity (a race, a battle)
+    /// keeps it for the first update or tick after the block ends. The transition is session-only,
+    /// so it never marks a save; a summon the server cannot place is logged for that player and
+    /// never an `Err` out of the loaded path or the world tick. Nothing is remembered on almost
+    /// every tick, so the memory is checked before the occupation table is asked.
+    fn resummon_pet(&mut self, character: &CharacterState, now_ms: u64, out: &mut Outcome) -> bool {
+        if self.pets.remembered_pet_id().is_none() {
+            return false;
+        }
+        let busy = crate::pets::PetBusy {
+            minigame_active: self.blocks(|gates| gates.pets),
+        };
+        let guid = character.guid;
+        match self.pets.resummon(
+            crate::pets::PetService::pet_guid(guid),
+            guid,
+            character.position,
+            busy,
+            now_ms / 1_000,
+        ) {
+            Ok(Some(wire)) => {
+                out.replies.extend(wire.private);
+                out.nearby.extend(wire.shared);
+                true
+            }
+            Ok(None) => false,
+            Err(error) => {
+                eprintln!("pet: no pet came back for character {guid}: {error}");
+                false
+            }
+        }
+    }
+
     /// T455: the summoned pet follows its owner after an accepted owner move or a world tick.
     /// Frames go to the owner (replies) and to viewers (nearby); a follow step never saves.
+    /// T487: with no pet out, the first accepted move is also where a remembered one returns.
     pub(super) fn follow_pet(
         &mut self,
         character: &CharacterState,
         now_ms: u64,
         out: &mut Outcome,
     ) {
+        if self.pets.active_pet_id().is_none() && !self.resummon_pet(character, now_ms, out) {
+            return;
+        }
         let zone = character.zone_id;
         let terrain = self.terrain.clone();
         let ground = move |x: f32, z: f32| terrain.as_ref()?.height_at(zone, x, z);
@@ -297,10 +342,12 @@ impl Gameplay {
 
     /// T455: the world tick for a summoned pet (a still owner settles it); `None` without one.
     /// T485: also its care timers and live needs; only a feed's apply step marks a save.
+    /// T487: the first tick after a race or battle ends is also where a remembered pet returns
+    /// (`follow_pet` covers both cases), so `None` means there is still nothing to send.
     pub fn pet_tick(&mut self, character: &CharacterState, now_ms: u64) -> Option<Outcome> {
-        self.pets.active_pet_id()?;
         let mut out = Outcome::default();
         self.follow_pet(character, now_ms, &mut out);
+        self.pets.active_pet_id()?;
         let care = self.pets.care_tick(&mut self.inventory, now_ms);
         out.changed |= care.changed;
         out.replies.extend(care.private);
@@ -309,7 +356,8 @@ impl Gameplay {
         Some(out)
     }
 
-    /// W177 (R): a pet does not zone with its owner; a fresh summon is required.
+    /// W177 (R): a pet does not zone with its owner; T487 remembers it so the destination's
+    /// loaded signal (`enter_world`) or the first update there can summon it again.
     pub fn settle_pets(&mut self, zoned: bool, now_ms: u64) -> io::Result<Outcome> {
         if !zoned || self.pets.active_pet_id().is_none() {
             return Ok(Outcome::default());
@@ -317,7 +365,7 @@ impl Gameplay {
         let mut pets = self.pets.clone();
         let feed_end = pets.care_end_packet();
         pets.rebase_clock(now_ms / 1_000);
-        let transition = pets.dismiss(now_ms / 1_000)?;
+        let transition = pets.zone_away(now_ms / 1_000)?;
         self.pets = pets;
         let mut out = Self::pet_outcome(self.pets.wire(transition));
         out.replies.extend(feed_end);
