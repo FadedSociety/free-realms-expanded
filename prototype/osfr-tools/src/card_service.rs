@@ -222,9 +222,13 @@ impl ConnectionServer {
 /// exe `00ad47f0`); `ticket` is the 64-bit launch ticket the server sent in 39/0x28
 /// (`--ticket=%llu`), and `character_id` the character guid, both as decimal text. The retail
 /// exe passes no `--characterID` (native 2026-10-27: its command line carries `--character=<name>`
-/// and `--ticket` only), so `character_id` arrives empty.
+/// and `--ticket` only), so `character_id` arrives empty. T805: the session dialog `103c9140`
+/// builds the command with ctor `1017bac0`, which copies the DLL's launch arguments (stored by
+/// `1037bba0` before it opens the dialog) into CharacterName, CharacterID and Ticket.
 #[derive(Clone, Debug, Default, PartialEq, Eq)]
 pub struct SessionLogin {
+    /// The most-derived header version, the one the reader's gates use.
+    pub version: i32,
     pub session_id: String,
     /// The client's local data versions ({1: 1314, 2: archetypes, 4: rules}).
     pub data_versions: Vec<(i32, i32)>,
@@ -245,6 +249,7 @@ impl SessionLogin {
         let mut reader = Reader::new(body);
         let version = reader.headers(SEND_SESSION_ID)?;
         let mut login = Self {
+            version,
             session_id: reader.string()?,
             ..Self::default()
         };
@@ -303,6 +308,10 @@ pub fn login_results(success: bool, code: i32, account_id: i32, session_id: &str
     body
 }
 
+/// The refusal of a ticket no live session holds: never minted, already spent, or its session
+/// ended.
+pub const UNKNOWN_TICKET: &str = "unknown_ticket";
+
 /// T764: one-time card launch tickets (lead security). The game server mints one per launch and
 /// sends it in 39/0x28; the card login (411) must present it with the same character id before
 /// it expires, and it works once.
@@ -343,12 +352,27 @@ impl LaunchTickets {
     /// the character the ticket was issued to, while it has not expired. The random, single-use
     /// ticket is the credential; the retail client sends no character id (empty), and a
     /// non-empty one must name the owner. A presented ticket is spent whether or not it
-    /// matched, so one guess never gets a second try.
-    pub fn redeem(&mut self, ticket: &str, character: &str, now_ms: u64) -> Option<u64> {
-        let ticket = decimal(ticket)?;
-        let (owner, expires) = self.issued.remove(&ticket)?;
-        let named = character.is_empty() || decimal(character) == Some(owner);
-        (now_ms < expires && named).then_some(owner)
+    /// matched, so one guess never gets a second try. A refusal is the fixed word the card
+    /// listener logs (T805): `no_ticket_field`, `ticket_not_decimal`, [`UNKNOWN_TICKET`],
+    /// `expired` or `character_mismatch`.
+    pub fn redeem(
+        &mut self,
+        ticket: &str,
+        character: &str,
+        now_ms: u64,
+    ) -> Result<u64, &'static str> {
+        if ticket.is_empty() {
+            return Err("no_ticket_field");
+        }
+        let ticket = decimal(ticket).ok_or("ticket_not_decimal")?;
+        let (owner, expires) = self.issued.remove(&ticket).ok_or(UNKNOWN_TICKET)?;
+        if now_ms >= expires {
+            return Err("expired");
+        }
+        if !character.is_empty() && decimal(character) != Some(owner) {
+            return Err("character_mismatch");
+        }
+        Ok(owner)
     }
 
     pub fn outstanding(&self) -> usize {

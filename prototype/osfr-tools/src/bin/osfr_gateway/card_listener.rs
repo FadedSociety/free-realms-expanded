@@ -5,9 +5,10 @@
 //! yet. Off unless the card content's launch block names a port.
 //!
 //! T782: every step prints one JSON event line (`events`, drained by `Server::poll_card`):
-//! `card_connected`, `card_gateway_request` (a 414 answered), `card_login` (a 411: `ok`, and the
-//! character on success), `card_command_unhandled` and `card_closed` with its reason. A ticket or
-//! session id is never in an event.
+//! `card_connected`, `card_gateway_request` (a 414 answered), `card_login` (a 411: `ok`, the
+//! character on success, else the refusal `reason`; T805: also the 411's `version` and field
+//! `lengths`), `card_command_unhandled` and `card_closed` with its reason. A ticket or session id
+//! is never in an event.
 use super::*;
 use osfr_tools::card_service;
 use serde_json::Value;
@@ -85,8 +86,12 @@ impl CardListener {
     }
 
     /// Accept and answer what has arrived. `redeem(ticket, character_id)` names the character a
-    /// login's launch ticket was minted for, once.
-    fn poll(&mut self, now_ms: u64, mut redeem: impl FnMut(&str, &str) -> Option<u64>) {
+    /// login's launch ticket was minted for, once, else the refusal word.
+    fn poll(
+        &mut self,
+        now_ms: u64,
+        mut redeem: impl FnMut(&str, &str) -> Result<u64, &'static str>,
+    ) {
         for _ in 0..4 {
             let Ok((stream, peer)) = self.listener.accept() else {
                 break;
@@ -135,7 +140,7 @@ impl Connection {
         host: &str,
         port: u16,
         now_ms: u64,
-        redeem: &mut impl FnMut(&str, &str) -> Option<u64>,
+        redeem: &mut impl FnMut(&str, &str) -> Result<u64, &'static str>,
         events: &mut Vec<Value>,
     ) -> Option<&'static str> {
         if self.character.is_none() && now_ms.saturating_sub(self.opened_ms) > LOGIN_DEADLINE_MS {
@@ -164,19 +169,26 @@ impl Connection {
             };
             let mut login = None;
             let reply = card_service::reply(&body, host, port, |l| {
-                login = redeem(&l.ticket, &l.character_id);
+                let redeemed = redeem(&l.ticket, &l.character_id);
+                // T805: the 411's shape for its event: lengths only, never a value.
+                let lengths = json!({
+                    "session_id":l.session_id.len(),"character_name":l.character_name.len(),
+                    "character_id":l.character_id.len(),"ticket":l.ticket.len()
+                });
+                login = Some((redeemed, l.version, lengths));
                 // (R) The account id the 81 carries: the character's 31-bit slot.
-                login.map(|guid| (guid & 0x7fff_ffff) as i32)
+                redeemed.ok().map(|guid| (guid & 0x7fff_ffff) as i32)
             });
             match reply {
                 // ponytail: replies are a few dozen bytes, so a full send buffer means a dead
                 // peer; a write queue comes with the lobby's larger messages.
                 Ok(Some(frame)) => {
+                    let character = login.as_ref().and_then(|(redeemed, ..)| redeemed.ok());
                     self.log_answer(&body, login, host, port, events);
                     if self.stream.write_all(&frame).is_err() {
                         return Some("write_failed");
                     }
-                    self.character = self.character.or(login);
+                    self.character = self.character.or(character);
                 }
                 Ok(None) => {
                     self.unhandled += 1;
@@ -193,23 +205,25 @@ impl Connection {
     }
 
     /// The event for an answered 414 (the address it sent the client to) or 411 (`login`: the
-    /// character its ticket was redeemed for). Neither the ticket nor the session id is named.
+    /// character its ticket was redeemed for, or the refusal word, plus the 411's version and
+    /// field lengths). Neither the ticket nor the session id is named.
     fn log_answer(
         &mut self,
         body: &[u8],
-        login: Option<u64>,
+        login: Option<(Result<u64, &'static str>, i32, Value)>,
         host: &str,
         port: u16,
         events: &mut Vec<Value>,
     ) {
         let peer = self.peer.to_string();
-        let event = match card_service::class_id(body) {
-            Ok(card_service::GET_CONNECTION_SERVER) => {
+        let event = match (card_service::class_id(body), login) {
+            (Ok(card_service::GET_CONNECTION_SERVER), _) => {
                 json!({"event":"card_gateway_request","peer":peer,"host":host,"port":port})
             }
-            Ok(card_service::SEND_SESSION_ID) => {
-                json!({"event":"card_login","peer":peer,"ok":login.is_some(),"character":login})
-            }
+            (Ok(card_service::SEND_SESSION_ID), Some((redeemed, version, lengths))) => json!({
+                "event":"card_login","peer":peer,"ok":redeemed.is_ok(),"character":redeemed.ok(),
+                "reason":redeemed.err(),"version":version,"lengths":lengths
+            }),
             _ => return,
         };
         self.answered += 1;
@@ -234,17 +248,27 @@ impl Server {
         self.card = Some(card);
     }
 
-    /// The live session of the character a card login names redeems its launch ticket. No
-    /// session, a logged-out character or a ticket that session never minted refuses.
-    fn redeem_card_ticket(&mut self, ticket: &str, character: &str, now_ms: u64) -> Option<u64> {
-        let guid: u64 = character.parse().ok()?;
-        let id = self.world.active_sessions.get(&guid)?;
-        let key = self.world.session_keys.get(id)?;
-        self.sessions
-            .get_mut(key)?
-            .gateway
-            .gameplay_mut()?
-            .redeem_card_ticket(ticket, character, now_ms)
+    /// The live session that minted a card login's launch ticket redeems it. T805: the retail
+    /// 411 carries no character id, so the ticket alone finds its session; a ticket no live
+    /// session holds is `unknown_ticket`.
+    // ponytail: one scan of the live sessions per card login (one login per launch); a
+    // server-wide ticket index if the player count ever makes it show.
+    fn redeem_card_ticket(
+        &mut self,
+        ticket: &str,
+        character: &str,
+        now_ms: u64,
+    ) -> Result<u64, &'static str> {
+        for session in self.sessions.values_mut() {
+            let Some(game) = session.gateway.gameplay_mut() else {
+                continue;
+            };
+            match game.redeem_card_ticket(ticket, character, now_ms) {
+                Err(card_service::UNKNOWN_TICKET) => {}
+                redeemed => return redeemed,
+            }
+        }
+        Err(card_service::UNKNOWN_TICKET)
     }
 }
 
@@ -297,6 +321,11 @@ pub(super) mod tests {
         CardListener::bind("127.0.0.1".parse().unwrap(), 0).unwrap()
     }
 
+    /// A redeem that knows no ticket.
+    fn refuse(_: &str, _: &str) -> Result<u64, &'static str> {
+        Err(card_service::UNKNOWN_TICKET)
+    }
+
     /// The reasons of the `card_closed` events so far.
     fn closed(card: &CardListener) -> Vec<String> {
         let events = card.events.iter();
@@ -309,7 +338,7 @@ pub(super) mod tests {
     /// Poll until an event named `name` is logged.
     fn wait_for(card: &mut CardListener, name: &str) {
         for _ in 0..200 {
-            card.poll(1, |_, _| None);
+            card.poll(1, refuse);
             if card.events.iter().any(|e| e["event"] == name) {
                 return;
             }
@@ -329,7 +358,7 @@ pub(super) mod tests {
     /// Poll until the client has a whole server frame, then return its body.
     fn answer(card: &mut CardListener, client: &mut TcpStream, now: u64) -> Vec<u8> {
         for _ in 0..200 {
-            card.poll(now, |_, _| None);
+            card.poll(now, refuse);
             client.set_nonblocking(true).unwrap();
             let mut length = [0; 4];
             let ready = client.peek(&mut length).map(|n| n == 4).unwrap_or(false);
@@ -389,7 +418,7 @@ pub(super) mod tests {
         client: &mut TcpStream,
         character_id: &str,
         ticket: &str,
-        accept: Option<u64>,
+        accept: Result<u64, &'static str>,
     ) -> (bool, i32, Vec<(String, String)>) {
         client
             .write_all(&frame(true, &session_login(character_id, ticket)))
@@ -423,14 +452,14 @@ pub(super) mod tests {
         }
         let mut card = listener();
         let mut client = client(&card);
-        let (ok, account, seen) = log_in(&mut card, &mut client, "5041", "77", None);
+        let (ok, account, seen) = log_in(&mut card, &mut client, "5041", "77", refuse("", ""));
         assert!(!ok, "a ticket no session minted is refused");
         assert_eq!(account, 0);
         assert_eq!(seen, [("77".to_owned(), "5041".to_owned())]);
         assert_eq!(card.connections[0].character, None);
 
         let guid = (1u64 << 40) | 5041;
-        let (ok, account, _) = log_in(&mut card, &mut client, &guid.to_string(), "78", Some(guid));
+        let (ok, account, _) = log_in(&mut card, &mut client, &guid.to_string(), "78", Ok(guid));
         assert!(ok);
         assert_eq!(
             account, 5041,
@@ -447,16 +476,16 @@ pub(super) mod tests {
         let mut card = listener();
         let _client = client(&card);
         for _ in 0..200 {
-            card.poll(1, |_, _| None);
+            card.poll(1, refuse);
             if !card.connections.is_empty() {
                 break;
             }
             std::thread::sleep(Duration::from_millis(5));
         }
         assert_eq!(card.connections.len(), 1);
-        card.poll(1 + LOGIN_DEADLINE_MS, |_, _| None);
+        card.poll(1 + LOGIN_DEADLINE_MS, refuse);
         assert_eq!(card.connections.len(), 1, "the deadline is inclusive");
-        card.poll(2 + LOGIN_DEADLINE_MS, |_, _| None);
+        card.poll(2 + LOGIN_DEADLINE_MS, refuse);
         assert!(card.connections.is_empty());
         assert_eq!(closed(&card), ["deadline"]);
     }
@@ -469,7 +498,7 @@ pub(super) mod tests {
         let mut card = listener();
         let clients: Vec<_> = (0..6).map(|_| client(&card)).collect();
         for _ in 0..50 {
-            card.poll(1, |_, _| None);
+            card.poll(1, refuse);
             std::thread::sleep(Duration::from_millis(5));
         }
         assert_eq!(card.connections.len(), MAX_PER_ADDRESS);
@@ -487,7 +516,7 @@ pub(super) mod tests {
             .write_all(&((card_service::MAX_FRAME as u32 + 1).to_be_bytes()))
             .unwrap();
         for _ in 0..200 {
-            card.poll(1, |_, _| None);
+            card.poll(1, refuse);
             std::thread::sleep(Duration::from_millis(5));
             if card.connections.is_empty() {
                 assert_eq!(closed(&card), ["bad_frame"]);
@@ -508,9 +537,81 @@ pub(super) mod tests {
             return;
         }
         let mut server = Server::new(options).unwrap();
-        assert_eq!(server.redeem_card_ticket("77", "5041", 1), None);
-        assert_eq!(server.redeem_card_ticket("77", "not-a-guid", 1), None);
+        for character in ["5041", "", "not-a-guid"] {
+            assert_eq!(
+                server.redeem_card_ticket("77", character, 1),
+                Err(card_service::UNKNOWN_TICKET)
+            );
+        }
         assert!(server.card.is_none(), "no launch block, no card service");
+    }
+
+    /// The launch ticket of the 39/0x28 among `replies`: two i32 halves after the 15-byte run
+    /// header, low then high.
+    fn ticket_in(replies: &[Vec<u8>]) -> u64 {
+        let mut head = vec![39, 0, 0x28];
+        head.extend(osfr_tools::card_game::FIRST_INSTANCE_ID.to_le_bytes());
+        let found = replies.iter().find_map(|reply| {
+            let at = reply.windows(head.len()).position(|w| w == head)?;
+            let half = |o: usize| reply[at + o..at + o + 4].try_into().map(u32::from_le_bytes);
+            Some(u64::from(half(15).ok()?) | u64::from(half(19).ok()?) << 32)
+        });
+        found.expect("a 39/0x28 answers the 39/37")
+    }
+
+    /// T805 (native 2026-10-27): the retail 411 names no character id, so the server finds the
+    /// session that minted a launch ticket by the ticket alone. Two in-world sessions each mint
+    /// one through the real Play -> 39/37 path; each redeems once with an empty id.
+    #[test]
+    fn a_card_login_without_a_character_id_redeems_in_the_minting_session() {
+        if !test_support::bin_test_target("card") {
+            return;
+        }
+        let scratch = test_support::Scratch::new("t805-card-redeem");
+        let mut options = test_support::options(scratch.state());
+        if !test_support::fixtures_present(&options) {
+            return;
+        }
+        let content = test_support::vendor_content(&scratch);
+        let shipped = PathBuf::from(env!("CARGO_MANIFEST_DIR")).join("data/content");
+        let mut cards: Value =
+            serde_json::from_slice(&fs::read(shipped.join("card_game.json")).unwrap()).unwrap();
+        cards["launch"] = json!({"ticket_ttl_ms":60_000,
+            "source":[{"kind":"reconstructed","evidence":"T805 test"}]});
+        fs::write(content.join("card_game.json"), cards.to_string()).unwrap();
+        options.content = Some(content);
+        let mut server = Server::new(options).unwrap();
+        let mut minted = Vec::new();
+        for id in [805, 806] {
+            let options = &server.options;
+            let mut scene = test_support::Scene::new(options, id);
+            scene.send(options, &[13, 0], 1_000).unwrap();
+            scene.send(options, &[10, 0], 1_001).unwrap();
+            // Play on the Trading Card Game row (167/1/2, row 490), then the card manager's 39/37.
+            let mut play = vec![167, 0, 1, 2];
+            play.extend(490u32.to_le_bytes());
+            play.extend(0u32.to_le_bytes());
+            scene.exchange(options, &play, 1_100);
+            let mut ask = vec![39, 0, 37];
+            for value in [osfr_tools::card_game::FIRST_INSTANCE_ID, -1, -1] {
+                ask.extend(value.to_le_bytes());
+            }
+            let ticket = ticket_in(&scene.exchange(options, &ask, 1_200));
+            minted.push((ticket.to_string(), scene.session.gateway.state().guid));
+            let key = SessionKey {
+                peer: scene.session.peer,
+                connection_id: scene.session.request.id,
+            };
+            server.sessions.insert(key, scene.session);
+        }
+        for (ticket, guid) in &minted {
+            assert_eq!(server.redeem_card_ticket(ticket, "", 2_000), Ok(*guid));
+            assert_eq!(
+                server.redeem_card_ticket(ticket, "", 2_001),
+                Err(card_service::UNKNOWN_TICKET),
+                "single use"
+            );
+        }
     }
 
     #[test]
@@ -544,13 +645,13 @@ pub(super) mod tests {
         let mut card = listener();
         let mut client = client(&card);
         let guid = (1u64 << 40) | 5041;
-        log_in(&mut card, &mut client, "5041", "271828182845", None);
+        log_in(&mut card, &mut client, "", "271828182845", Err("expired"));
         log_in(
             &mut card,
             &mut client,
             &guid.to_string(),
             "314159265358",
-            Some(guid),
+            Ok(guid),
         );
         let logins: Vec<_> = card
             .events
@@ -565,6 +666,16 @@ pub(super) mod tests {
         assert_eq!(
             (&logins[1]["ok"], &logins[1]["character"]),
             (&json!(true), &json!(guid))
+        );
+        // T805: a refusal names its reason, with the 411's version and field lengths.
+        assert_eq!(
+            (&logins[0]["reason"], &logins[1]["reason"]),
+            (&json!("expired"), &Value::Null)
+        );
+        assert_eq!(logins[0]["version"], 8);
+        assert_eq!(
+            logins[0]["lengths"],
+            json!({"session_id":9,"character_name":6,"character_id":0,"ticket":12})
         );
         // Neither ticket nor the session id the login carries is logged.
         let text = serde_json::to_string(&card.events).unwrap();
@@ -593,7 +704,7 @@ pub(super) mod tests {
             chatty.write_all(&frame(true, &int(1234))).unwrap();
         }
         for _ in 0..40 {
-            card.poll(1, |_, _| None);
+            card.poll(1, refuse);
             std::thread::sleep(Duration::from_millis(5));
         }
         let count = |name: &str| card.events.iter().filter(|e| e["event"] == name).count();

@@ -184,8 +184,14 @@ impl Launches {
         Ok(outcome)
     }
 
-    /// The card login's ticket and character id (T766's listener): the character on success.
-    pub fn redeem(&mut self, ticket: &str, character: &str, now_ms: u64) -> Option<u64> {
+    /// The card login's ticket and character id (T766's listener): the character on success,
+    /// else the refusal word (`LaunchTickets::redeem`).
+    pub fn redeem(
+        &mut self,
+        ticket: &str,
+        character: &str,
+        now_ms: u64,
+    ) -> Result<u64, &'static str> {
         self.tickets.redeem(ticket, character, now_ms)
     }
 }

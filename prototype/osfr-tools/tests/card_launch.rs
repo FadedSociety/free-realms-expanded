@@ -228,7 +228,10 @@ fn the_type_16_handshake_sends_a_one_time_ticket_in_39_28() {
     let second = ticket_of(&again.replies[0]);
     assert_ne!(second, first);
     let character = CHARACTER.to_string();
-    assert_eq!(launches.redeem(&first.to_string(), &character, 2_050), None);
+    assert_eq!(
+        launches.redeem(&first.to_string(), &character, 2_050),
+        Err("unknown_ticket")
+    );
 
     // Start, now that a ticket was sent: 39/17 alone, the client hosts the card DLL itself.
     let start = launches
@@ -237,10 +240,13 @@ fn the_type_16_handshake_sends_a_one_time_ticket_in_39_28() {
     assert_eq!(subs(&start.replies), vec![(39, 17)]);
 
     // The card login redeems a ticket once, for its own character only: a wrong guess spends it.
-    assert_eq!(launches.redeem(&second.to_string(), "1", 2_200), None);
+    assert_eq!(
+        launches.redeem(&second.to_string(), "1", 2_200),
+        Err("character_mismatch")
+    );
     assert_eq!(
         launches.redeem(&second.to_string(), &character, 2_250),
-        None
+        Err("unknown_ticket")
     );
     let spent = launches
         .route(&client(37, instance), CHARACTER, 2_300)
@@ -253,9 +259,12 @@ fn the_type_16_handshake_sends_a_one_time_ticket_in_39_28() {
     let last = ticket_of(&spent.replies[0]);
     assert_eq!(
         launches.redeem(&last.to_string(), &character, 2_500),
-        Some(CHARACTER)
+        Ok(CHARACTER)
     );
-    assert_eq!(launches.redeem(&last.to_string(), &character, 2_600), None);
+    assert_eq!(
+        launches.redeem(&last.to_string(), &character, 2_600),
+        Err("unknown_ticket")
+    );
 
     // A ticket expires after the launch block's lifetime.
     let late = launches
@@ -264,7 +273,7 @@ fn the_type_16_handshake_sends_a_one_time_ticket_in_39_28() {
     let late = ticket_of(&late.replies[0]);
     assert_eq!(
         launches.redeem(&late.to_string(), &character, 3_000 + 120_000),
-        None
+        Err("expired")
     );
 
     // Leaving the card window ends the run (39/19); later requests are ignored.
@@ -325,11 +334,11 @@ fn the_card_start_order_runs_end_to_end_through_the_gateway() {
     let service = gateway.gameplay_mut().unwrap();
     assert_eq!(
         service.redeem_card_ticket(&ticket.to_string(), &character, 3_000),
-        Some(5_064)
+        Ok(5_064)
     );
     assert_eq!(
         service.redeem_card_ticket(&ticket.to_string(), &character, 3_100),
-        None
+        Err("unknown_ticket")
     );
 
     // Closing the card window: 39/6 -> 39/19, then the client's 39/7 ack.
@@ -623,9 +632,12 @@ fn the_session_ticket_authorises_nothing_and_is_never_traced() {
 
     let character = 5_096.to_string();
     let service = gateway.gameplay_mut().unwrap();
-    assert_eq!(service.redeem_card_ticket(&ticket, &character, 3_000), None);
+    assert_eq!(
+        service.redeem_card_ticket(&ticket, &character, 3_000),
+        Err("ticket_not_decimal")
+    );
     assert_eq!(
         service.redeem_card_ticket(&launch.to_string(), &character, 3_100),
-        Some(5_096)
+        Ok(5_096)
     );
 }

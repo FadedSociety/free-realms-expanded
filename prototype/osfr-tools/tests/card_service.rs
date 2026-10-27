@@ -2,8 +2,8 @@
 //! (lab/content/tcg/analysis/lead-login-decode-2026-10-26.md), not from this crate's encoder,
 //! and the one-time launch tickets the session login is checked against.
 use osfr_tools::card_service::{
-    self, ConnectionServer, LaunchTickets, MAX_FRAME, Reader, SessionLogin, client_frame, put_int,
-    reply,
+    self, ConnectionServer, LaunchTickets, MAX_FRAME, Reader, SessionLogin, UNKNOWN_TICKET,
+    client_frame, put_int, reply,
 };
 
 fn int(value: i32) -> Vec<u8> {
@@ -179,6 +179,7 @@ fn login_with(tickets: &mut LaunchTickets, character_id: &str, ticket: &str, now
     let check = |login: &SessionLogin| {
         tickets
             .redeem(&login.ticket, &login.character_id, now)
+            .ok()
             .map(|_| 42)
     };
     reply(&body, "127.0.0.1", 17782, check).unwrap().unwrap()
@@ -194,6 +195,7 @@ fn a_routed_session_login_names_every_field() {
     assert_eq!(
         SessionLogin::decode(parsed.body).unwrap(),
         SessionLogin {
+            version: 8,
             session_id: "w-session".into(),
             data_versions: vec![(1, 1314), (2, 7), (4, 9)],
             platform: "winXP".into(),
@@ -231,13 +233,21 @@ fn the_retail_login_without_a_character_id_redeems_by_ticket_alone() {
     // Native 2026-10-27: the exe passes `--character=<name> --ticket=<n>` and no `--characterID`.
     let mut tickets = LaunchTickets::new(TTL_MS);
     let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
-    assert_eq!(tickets.redeem(&ticket, "", 1), Some(CHARACTER));
-    assert_eq!(tickets.redeem(&ticket, "", 2), None, "single use");
+    assert_eq!(tickets.redeem(&ticket, "", 1), Ok(CHARACTER));
+    assert_eq!(
+        tickets.redeem(&ticket, "", 2),
+        Err(UNKNOWN_TICKET),
+        "single use"
+    );
     let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
-    assert_eq!(tickets.redeem(&ticket, "", TTL_MS), None, "expired");
+    assert_eq!(tickets.redeem(&ticket, "", TTL_MS), Err("expired"));
     let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
-    assert_eq!(tickets.redeem(&ticket, " ", 1), None, "a non-empty id must be a decimal");
-    assert_eq!(tickets.redeem("", "", 1), None);
+    assert_eq!(
+        tickets.redeem(&ticket, " ", 1),
+        Err("character_mismatch"),
+        "a non-empty id must be a decimal"
+    );
+    assert_eq!(tickets.redeem("", "", 1), Err("no_ticket_field"));
 }
 
 #[test]
@@ -247,34 +257,38 @@ fn a_wrong_character_expired_replaced_or_malformed_ticket_is_refused() {
 
     // Another character's id spends the ticket: the right character cannot use it after.
     let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
-    assert_eq!(tickets.redeem(&ticket, "5", 1), None);
-    assert_eq!(tickets.redeem(&ticket, &character, 2), None);
+    assert_eq!(tickets.redeem(&ticket, "5", 1), Err("character_mismatch"));
+    assert_eq!(tickets.redeem(&ticket, &character, 2), Err(UNKNOWN_TICKET));
 
     // Expired.
     let ticket = tickets.mint(CHARACTER, 0).unwrap().to_string();
-    assert_eq!(tickets.redeem(&ticket, &character, TTL_MS), None);
+    assert_eq!(tickets.redeem(&ticket, &character, TTL_MS), Err("expired"));
 
     // A second launch replaces the first ticket.
     let first = tickets.mint(CHARACTER, 0).unwrap().to_string();
     let second = tickets.mint(CHARACTER, 1).unwrap().to_string();
     assert_eq!(tickets.outstanding(), 1);
-    assert_eq!(tickets.redeem(&first, &character, 2), None);
-    assert_eq!(tickets.redeem(&second, &character, 3), Some(CHARACTER));
+    assert_eq!(tickets.redeem(&first, &character, 2), Err(UNKNOWN_TICKET));
+    assert_eq!(tickets.redeem(&second, &character, 3), Ok(CHARACTER));
 
     // Malformed decimals never match, and do not spend a real ticket.
     let ticket = tickets.mint(CHARACTER, 0).unwrap();
+    assert_eq!(tickets.redeem("", &character, 1), Err("no_ticket_field"));
     for bad in [
-        String::new(),
         format!("+{ticket}"),
         format!(" {ticket}"),
         format!("{ticket}x"),
         "18446744073709551616".into(),
     ] {
-        assert_eq!(tickets.redeem(&bad, &character, 1), None, "{bad:?}");
+        assert_eq!(
+            tickets.redeem(&bad, &character, 1),
+            Err("ticket_not_decimal"),
+            "{bad:?}"
+        );
     }
     assert_eq!(
         tickets.redeem(&ticket.to_string(), &character, 2),
-        Some(CHARACTER)
+        Ok(CHARACTER)
     );
 
     // Expired tickets are dropped when a new one is minted.
