@@ -365,13 +365,16 @@ fn the_collection_sync_bodies_match_the_client_readers() {
         ]
         .concat()
     );
-    // 84 StartInstances v2 (`101dadf0`): headers, account, type 1 (online), count, ModID.
+    // 84 StartInstances v2 (`101dadf0`; the writer `101dae80` labels the third field
+    // "Archetype Count"): headers, account, type 1 (online), 2 archetypes, ModID. The count is
+    // the archetype count, not the 3 instances.
     assert_eq!(
         card_service::sync_start_instances(7, &cards),
-        [&headers(&[0x24, 0x05], 2)[..], &[0x07, 0x01, 0x03], &modid].concat()
+        [&headers(&[0x24, 0x05], 2)[..], &[0x07, 0x01, 0x02], &modid].concat()
     );
-    // 85 SendInstances v2 (`101d94c0`): headers, base archetype 0, count 3, three instances,
-    // no non-tradable ones, delivery 1.
+    // 85 SendInstances v2 (`101d94c0`; the writer `101d8d70` labels the field after the base
+    // archetype "Archetype Count"): headers, base archetype 0, 2 archetypes, the instance count
+    // 3, three instances, no non-tradable ones, delivery 1.
     let instance = |archetype: &[u8], number: u8| {
         [&[0x2E, 0x15, 0x01][..], archetype, &[0x00, number]].concat()
     };
@@ -379,7 +382,7 @@ fn the_collection_sync_bodies_match_the_client_readers() {
         card_service::sync_send_instances(&cards),
         [
             &headers(&[0x25, 0x05], 2)[..],
-            &[0x00, 0x03, 0x03],
+            &[0x00, 0x02, 0x03],
             &instance(&[0x41, 0xBA, 0xDB], 0),
             &instance(&[0x41, 0xBA, 0xDB], 1),
             &instance(&[0x05], 0),

@@ -349,8 +349,10 @@ impl Content {
                 "card lobby needs a positive group, a role 1 to 5 and a type 0 to 255",
             ));
         }
-        // (R) bounds: the client's default collection holds 16 copies of a card; 100 archetypes
-        // keep the one SendInstances small.
+        // (R) bounds: distinct positive archetypes (at most 100, so one SendInstances stays
+        // small) and 1..=16 copies each. The 16 is a server choice for a small starter, not a
+        // client limit: the client's default collection lists 16 instances of a card (two have
+        // 100).
         let collection = self
             .launch
             .iter()

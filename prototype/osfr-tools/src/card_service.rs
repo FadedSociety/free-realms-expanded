@@ -366,15 +366,6 @@ pub const UPLOAD_AVATAR_IMAGE: i32 = 503;
 /// (R) The one delivery a starter sync makes; nothing compares it (`101db550`).
 const DELIVERY: i32 = 1;
 
-/// The LobbyCommand level (reader `10156340`, writer `10156390`): the three class headers, then
-/// the account the command is about.
-fn lobby_level(id: i32, version: i32, account: i32) -> Vec<u8> {
-    let mut body = Vec::new();
-    put_headers(&mut body, id, version);
-    put_int(&mut body, account);
-    body
-}
-
 /// T813: the bodies that take a logged-in card window from "Entering main lobby..." to the
 /// lobby screen, in order. The screen dereferences its group without a null check
 /// (`102b9930`, called from setup `102b9500`), so the group is defined (94) before the screen
@@ -394,7 +385,7 @@ fn lobby_level(id: i32, version: i32, account: i32) -> Vec<u8> {
 /// - 291 v1 (`1015e5f0`, execute `1015e400`): the group id; event 70 opens the lobby screen for it
 ///   (`10372d70` -> `1037e5a0`).
 pub fn lobby_entry(account: i32, lobby: &crate::card_game::Lobby, name: &str) -> [Vec<u8>; 3] {
-    let level = |id, version| lobby_level(id, version, account);
+    let level = |id, version| sync_command(id, version, [account]);
     let mut groups = level(ADD_GROUPS, 1);
     // One group: class 103 v3, five absent property sets, five empty role lists.
     let lobby_object = [1, 103, 3, 1, 1, 1, 1, 1, 0, 0, 0, 0, 0];
@@ -431,7 +422,7 @@ pub fn change_status(account: i32, body: &[u8]) -> io::Result<Vec<u8>> {
     if !reader.finished() {
         return Err(invalid("card status has trailing bytes"));
     }
-    let mut echo = lobby_level(CHANGE_STATUS, 1, account);
+    let mut echo = sync_command(CHANGE_STATUS, 1, [account]);
     put_int(&mut echo, status);
     Ok(echo)
 }
@@ -451,7 +442,8 @@ pub fn join_request(body: &[u8]) -> io::Result<(i32, i32)> {
 /// three class headers (family level `101d7090`/`101d70d0`) and no account level. The cards are
 /// owned as `InstanceID`s (class 350 v1, one header, reader `101476a0`): archetype, series 0 and
 /// instance numbers 0.. per archetype, as the client's own `default.cln` numbers them, so the
-/// same starter always has the same ids and nothing needs saving.
+/// same starter always has the same ids and nothing needs saving. The LobbyCommand level is the
+/// same shape (reader `10156340`, writer `10156390`): its one value is the account.
 fn sync_command(id: i32, version: i32, values: impl IntoIterator<Item = i32>) -> Vec<u8> {
     let mut body = Vec::new();
     put_headers(&mut body, id, version);
@@ -482,23 +474,26 @@ pub fn sync_start(account: i32, cards: &[crate::card_game::StarterCard]) -> Vec<
     sync_command(SYNC_START, 3, values)
 }
 
-/// 84 `SynchronizationCommand_StartInstances` v2 (reader `101dadf0`, execute -> `101dbc80`):
-/// account, collection type 1 (online), the count, the ModID. The client clears the collection
-/// and answers with Update.
+/// 84 `SynchronizationCommand_StartInstances` v2 (reader `101dadf0`, the vtable `1067266c` +0x24
+/// slot; writer/describe `101dae80`, execute `101dbc80`): account, collection type 1 (online), the
+/// archetype count (the writer's `Archetype Count` label; the execute stores it and reports it in
+/// event 27), the ModID. The client clears the collection and answers with Update.
 pub fn sync_start_instances(account: i32, cards: &[crate::card_game::StarterCard]) -> Vec<u8> {
-    let values = [account, 1, instances(cards), collection_mod_id(cards)];
+    let values = [account, 1, cards.len() as i32, collection_mod_id(cards)];
     sync_command(SYNC_START_INSTANCES, 2, values)
 }
 
-/// 85 `SynchronizationCommand_SendInstances` v2 (reader `101d94c0`, execute -> `101dc290`): base
-/// archetype 0, the count, the instances (`10077f00`: count, then each `InstanceID`), no
-/// non-tradable ones, the delivery id. The client adds them and answers with Update.
+/// 85 `SynchronizationCommand_SendInstances` v2 (reader `101d94c0`, writer/describe `101d8d70`,
+/// execute `101dc290`): base archetype 0, the archetype count (the writer's `Archetype Count`
+/// label; `101dc290` adds it to the collection counter), the instances (`10077f00`: count, then
+/// each `InstanceID`), no non-tradable ones, the delivery id. The client adds them and answers
+/// with Update.
 pub fn sync_send_instances(cards: &[crate::card_game::StarterCard]) -> Vec<u8> {
     let count = instances(cards);
     let ids = cards.iter().flat_map(|card| {
         (0..card.copies).flat_map(move |number| [350, 1, card.archetype_id, 0, number])
     });
-    let values = [0, count, count]
+    let values = [0, cards.len() as i32, count]
         .into_iter()
         .chain(ids)
         .chain([0, DELIVERY]);

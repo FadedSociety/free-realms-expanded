@@ -248,6 +248,16 @@ fn a_lobby_names_its_starter_collection_within_bounds() {
     for (index, cards) in bad.into_iter().enumerate() {
         assert!(starter(cards, &format!("bad-{index}")).is_err(), "{index}");
     }
+    // The 100-archetype cap is the server's: 100 loads, one more is refused.
+    let archetypes = |count: i32| {
+        json!(
+            (1..=count)
+                .map(|n| json!({"archetype_id": 100_000_000 + n, "copies": 1}))
+                .collect::<Vec<_>>()
+        )
+    };
+    assert!(starter(archetypes(100), "archetypes-100").is_ok());
+    assert!(starter(archetypes(101), "archetypes-101").is_err());
 }
 
 #[test]

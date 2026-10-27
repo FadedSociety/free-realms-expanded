@@ -366,9 +366,11 @@ impl Connection {
             _ => return None,
         };
         Some(reply.map(|body| {
-            (!body.is_empty())
-                .then(|| card_service::server_frame(&body))
-                .unwrap_or_default()
+            if body.is_empty() {
+                Vec::new()
+            } else {
+                card_service::server_frame(&body)
+            }
         }))
     }
 
