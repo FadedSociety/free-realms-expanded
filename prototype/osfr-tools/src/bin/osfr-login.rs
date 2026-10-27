@@ -101,7 +101,10 @@ impl Options {
         }
         // L053: every client is sent the gateway address; loopback, or a private/VPN one with --allow-lan.
         if let Some(gateway) = &gateway {
-            let ip = gateway.parse::<SocketAddr>().map_err(|_| "invalid --gateway address")?.ip();
+            let ip = gateway
+                .parse::<SocketAddr>()
+                .map_err(|_| "invalid --gateway address")?
+                .ip();
             if !osfr_tools::net_policy::allowed(ip, allow_lan) {
                 return Err("login hands players to a loopback gateway, or a private-network one with --allow-lan".into());
             }
@@ -894,12 +897,12 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
         }
         sessions.retain(|_, session| {
             let age = instant.saturating_duration_since(session.born);
-            if age >= Duration::from_secs(600)
-                || session.last.elapsed() > Duration::from_secs(120)
-                || (options.authenticated
-                    && session.principal.is_none()
-                    && age >= Duration::from_secs(30))
-            {
+            if expired(
+                age,
+                session.last.elapsed(),
+                options.authenticated && session.principal.is_none(),
+                session.service.logged_in(),
+            ) {
                 return false;
             }
             match session.sender.poll(now) {
@@ -912,6 +915,24 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     }
     Ok(())
 }
+/// (R) Login transport lifetimes. A peer must authenticate within 30 s (key-pair mode) and stay
+/// idle no longer than 120 s; the client's keep-alive (opcode 6, about every 29 s) counts. Before
+/// login a session lives at most 10 minutes; after login (character select) up to 4 hours, so a
+/// player browsing characters is not cut off at 10 minutes (native 2026-10-27, T818).
+const PRE_AUTH_DEADLINE: Duration = Duration::from_secs(30);
+const IDLE_TIMEOUT: Duration = Duration::from_secs(120);
+const PRE_LOGIN_LIFETIME: Duration = Duration::from_secs(600);
+const LOGGED_IN_LIFETIME: Duration = Duration::from_secs(4 * 3600);
+
+fn expired(age: Duration, idle: Duration, awaiting_auth: bool, logged_in: bool) -> bool {
+    let lifetime = if logged_in {
+        LOGGED_IN_LIFETIME
+    } else {
+        PRE_LOGIN_LIFETIME
+    };
+    age >= lifetime || idle > IDLE_TIMEOUT || (awaiting_auth && age >= PRE_AUTH_DEADLINE)
+}
+
 fn main() {
     if let Err(e) = run() {
         eprintln!("osfr-login: {e}");
@@ -922,6 +943,32 @@ fn main() {
 #[cfg(test)]
 mod tests {
     use super::*;
+
+    #[test]
+    fn a_logged_in_session_outlives_the_pre_login_lifetime_while_it_keeps_alive() {
+        let min = |m: u64| Duration::from_secs(m * 60);
+        let alive = Duration::from_secs(29);
+        // Native 2026-10-27: character select was cut off ~10 minutes after login.
+        assert!(!expired(min(11), alive, false, true));
+        assert!(!expired(min(239), alive, false, true));
+        assert!(
+            expired(min(240), alive, false, true),
+            "the logged-in cap still holds"
+        );
+        assert!(
+            expired(min(10), alive, false, false),
+            "pre-login cap unchanged"
+        );
+        assert!(
+            expired(min(11), Duration::from_secs(121), false, true),
+            "idle still expires"
+        );
+        assert!(
+            expired(Duration::from_secs(30), alive, true, false),
+            "pre-auth deadline unchanged"
+        );
+        assert!(!expired(Duration::from_secs(29), alive, true, false));
+    }
 
     #[test]
     fn native_login_parser_rejects_all_truncations_trailing_and_oversized_lengths() {

@@ -193,6 +193,12 @@ impl LoginService {
             authenticated_session: None,
         })
     }
+    /// T818: the client has completed its login (opcode 1 accepted); the transport keeps a
+    /// logged-in session (character select) alive past the pre-login lifetime.
+    pub fn logged_in(&self) -> bool {
+        self.logged_in
+    }
+
     pub fn reset_connection(&mut self) {
         self.logged_in = false;
         self.account_store = None;
