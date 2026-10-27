@@ -3,77 +3,11 @@
 //! and the one-time launch tickets the session login is checked against.
 use osfr_tools::card_service::{
     self, ConnectionServer, LaunchTickets, MAX_FRAME, MAX_TICKETS, Reader, SessionLogin,
-    UNKNOWN_TICKET, client_frame, put_int, reply,
+    UNKNOWN_TICKET, client_frame, reply,
 };
-
-fn int(value: i32) -> Vec<u8> {
-    let mut out = Vec::new();
-    put_int(&mut out, value);
-    out
-}
-
-/// A client string as `10097b40` writes it: length, text, NUL. The compact length is spelled
-/// out by hand: one byte below 16, else `0x20 | low nibble` and the rest.
-fn text(value: &str) -> Vec<u8> {
-    let length = value.len();
-    assert!(length < 256, "fixture strings stay short");
-    let prefix = if length < 16 {
-        vec![length as u8]
-    } else {
-        vec![0x20 | (length & 0xF) as u8, (length >> 4) as u8]
-    };
-    [prefix, value.as_bytes().to_vec(), vec![0]].concat()
-}
-
-/// Three class levels of `[id, version]` as the client writes them (`1019de90`).
-fn headers(id: &[u8], version: u8) -> Vec<u8> {
-    [id, &[version], id, &[version], id, &[version]].concat()
-}
-
-/// The client's 414 (`101935d0` -> `10121d20`): session id, user name, empty host, 0, false, 87.
-fn gateway_request() -> Vec<u8> {
-    [
-        headers(&[0x2E, 0x19], 1),
-        text("w-ticket"),
-        text("tester"),
-        text(""),
-        vec![0x00, 0x00, 0x27, 0x05],
-    ]
-    .concat()
-}
-
-/// The client's 411 at version 8 (`103c9140` -> `1017b700`), fields in the writer's order with
-/// the names from `1017b4b0`.
-fn session_login(character_id: &str, ticket: &str) -> Vec<u8> {
-    [
-        headers(&[0x2B, 0x19], 8),
-        text("w-session"), // SessionID (the game's --sessionID)
-        // {1: 1314, 2: 7, 4: 9}: count 3, then key/value pairs.
-        vec![0x03, 0x01, 0x22, 0x52, 0x02, 0x07, 0x04, 0x09],
-        text("winXP"),  // Platform
-        text(""),       // Match Challenge Key
-        vec![0x01],     // Is Parent Session ID (the exe passes --host=fr)
-        text("FR"),     // Login Client
-        text("en_US"),  // Locale
-        text("Tester"), // CharacterName
-        text(character_id),
-        text(ticket),
-        text("STATION"), // Login Namespace
-    ]
-    .concat()
-}
-
-fn frame(routing: Option<[u32; 3]>, body: &[u8]) -> Vec<u8> {
-    let words: Vec<u8> = routing
-        .into_iter()
-        .flatten()
-        .flat_map(u32::to_be_bytes)
-        .collect();
-    let mut out = ((words.len() + body.len()) as u32).to_be_bytes().to_vec();
-    out.extend(words);
-    out.extend(body);
-    out
-}
+#[path = "support/card_packets.rs"]
+mod card_packets;
+use card_packets::{frame, gateway_request, headers, int, session_login, text};
 
 #[test]
 fn compact_integers_match_the_dll_writer() {

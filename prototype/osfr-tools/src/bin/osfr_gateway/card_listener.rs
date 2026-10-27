@@ -268,7 +268,7 @@ impl Connection {
                     }
                 }
                 Ok(None) => {
-                    self.unhandled += 1;
+                    self.unhandled = self.unhandled.saturating_add(1);
                     if self.unhandled <= LOGGED_PER_KIND {
                         let class = card_service::class_id(&body).ok();
                         events.push(json!({
@@ -407,7 +407,7 @@ impl Connection {
             _ => return,
         };
         let answered = self.answered.count(kind);
-        *answered += 1;
+        *answered = answered.saturating_add(1);
         if *answered > LOGGED_PER_KIND {
             return;
         }
@@ -478,50 +478,17 @@ impl Server {
     }
 }
 
+/// F785: the client's request bytes, shared with `tests/card_service.rs`.
+#[cfg(test)]
+#[path = "../../../tests/support/card_packets.rs"]
+mod card_packets;
+
 #[cfg(test)]
 pub(super) mod tests {
     use super::super::tests::test_support;
+    use super::card_packets::{ROUTING, frame, gateway_request, int, ping, session_login, text};
     use super::*;
     use std::time::Duration;
-
-    fn int(value: i32) -> Vec<u8> {
-        let mut out = Vec::new();
-        card_service::put_int(&mut out, value);
-        out
-    }
-
-    fn text(value: &str) -> Vec<u8> {
-        let mut out = Vec::new();
-        card_service::put_string(&mut out, value);
-        out
-    }
-
-    /// A 414 body as the DLL writes it (`10121d20`): session id, user name, empty host, port 0,
-    /// false, error 87.
-    fn gateway_request() -> Vec<u8> {
-        let mut body = Vec::new();
-        card_service::put_headers(&mut body, 414, 1);
-        body.extend(text("session"));
-        body.extend(text("player"));
-        body.extend(text(""));
-        for value in [0, 0, 87] {
-            body.extend(int(value));
-        }
-        body
-    }
-
-    fn frame(routed: bool, body: &[u8]) -> Vec<u8> {
-        let mut payload = Vec::new();
-        if routed {
-            for word in [1_000_000_000u32, 0, 0] {
-                payload.extend(word.to_be_bytes());
-            }
-        }
-        payload.extend(body);
-        let mut out = (payload.len() as u32).to_be_bytes().to_vec();
-        out.extend(payload);
-        out
-    }
 
     fn listener() -> CardListener {
         CardListener::bind("127.0.0.1".parse().unwrap(), 0).unwrap()
@@ -592,7 +559,7 @@ pub(super) mod tests {
         }
         let mut card = listener();
         let mut client = client(&card);
-        client.write_all(&frame(false, &gateway_request())).unwrap();
+        client.write_all(&frame(None, &gateway_request())).unwrap();
         let reply =
             card_service::ConnectionServer::decode(&answer(&mut card, &mut client, 1)).unwrap();
         assert!(reply.ok);
@@ -601,26 +568,9 @@ pub(super) mod tests {
             ("127.0.0.1", i32::from(card.port))
         );
         assert_eq!(
-            reply.session_id, "session",
+            reply.session_id, "w-ticket",
             "the request's own fields come back"
         );
-    }
-
-    /// The client's 411 at version 8 in the writer's field order (`103c9140` -> `1017b700`), as
-    /// tests/card_service.rs builds it.
-    fn session_login(character_id: &str, ticket: &str) -> Vec<u8> {
-        let mut body = Vec::new();
-        card_service::put_headers(&mut body, 411, 8);
-        body.extend(text("w-session"));
-        body.extend([0x03, 0x01, 0x22, 0x52, 0x02, 0x07, 0x04, 0x09]);
-        for field in ["winXP", ""] {
-            body.extend(text(field));
-        }
-        body.push(0x01);
-        for field in ["FR", "en_US", "Tester", character_id, ticket, "STATION"] {
-            body.extend(text(field));
-        }
-        body
     }
 
     /// Send one login and return the 81's success flag, code and account id, plus what redeem
@@ -633,7 +583,7 @@ pub(super) mod tests {
         accept: Result<u64, &'static str>,
     ) -> (bool, i32, i32, Vec<(String, String)>) {
         client
-            .write_all(&frame(true, &session_login(character_id, ticket)))
+            .write_all(&frame(Some(ROUTING), &session_login(character_id, ticket)))
             .unwrap();
         let mut seen = Vec::new();
         let mut body = None;
@@ -691,12 +641,6 @@ pub(super) mod tests {
         assert_eq!(card.connections[0].character, Some(guid));
     }
 
-    /// T808: the client's ping as its writer `10190020` builds it: one header (112, 1), then the
-    /// spoof value.
-    fn ping(spoof: i32) -> Vec<u8> {
-        [int(112), int(1), int(spoof)].concat()
-    }
-
     #[test]
     fn a_card_ping_is_echoed_once_logged_in() {
         if !test_support::bin_test_target("card") {
@@ -704,7 +648,7 @@ pub(super) mod tests {
         }
         let mut card = listener();
         let mut stranger = client(&card);
-        stranger.write_all(&frame(true, &ping(7))).unwrap();
+        stranger.write_all(&frame(Some(ROUTING), &ping(7))).unwrap();
         wait_for(&mut card, "card_command_unhandled");
         let unhandled = card
             .events
@@ -714,7 +658,9 @@ pub(super) mod tests {
 
         let mut player = client(&card);
         log_in(&mut card, &mut player, "", "78", Ok(5041));
-        player.write_all(&frame(true, &ping(1234))).unwrap();
+        player
+            .write_all(&frame(Some(ROUTING), &ping(1234)))
+            .unwrap();
         // Compact 112 = `20 07`, version `01`, spoof 1234 = `22 4D`.
         assert_eq!(
             answer(&mut card, &mut player, 3),
@@ -777,7 +723,7 @@ pub(super) mod tests {
 
     /// T825: the client side of one command, routed like the client's (`101921e0`).
     fn send(card: &mut CardListener, client: &mut TcpStream, body: &[u8]) {
-        client.write_all(&frame(true, body)).unwrap();
+        client.write_all(&frame(Some(ROUTING), body)).unwrap();
         for _ in 0..20 {
             card.poll(3, refuse);
             std::thread::sleep(Duration::from_millis(5));
@@ -841,7 +787,7 @@ pub(super) mod tests {
             card_service::sync_complete(),
         ];
         for step in steps {
-            player.write_all(&frame(true, &update)).unwrap();
+            player.write_all(&frame(Some(ROUTING), &update)).unwrap();
             assert_eq!(answer(&mut card, &mut player, 3), step);
         }
         // Done: a further Update is answered by silence.
@@ -863,7 +809,7 @@ pub(super) mod tests {
         card_service::put_headers(&mut status, card_service::CHANGE_STATUS, 1);
         status.extend(int(99));
         status.extend(int(7));
-        player.write_all(&frame(true, &status)).unwrap();
+        player.write_all(&frame(Some(ROUTING), &status)).unwrap();
         assert_eq!(
             answer(&mut card, &mut player, 3),
             card_service::change_status(account, &status).unwrap()
@@ -1103,7 +1049,7 @@ pub(super) mod tests {
         let mut card = listener();
         let mut client = client(&card);
         let peer = client.local_addr().unwrap().to_string();
-        client.write_all(&frame(false, &gateway_request())).unwrap();
+        client.write_all(&frame(None, &gateway_request())).unwrap();
         answer(&mut card, &mut client, 1);
         // A half-close is the client's orderly end; the listener sees eof.
         client.shutdown(std::net::Shutdown::Write).unwrap();
@@ -1175,7 +1121,7 @@ pub(super) mod tests {
         // A routed frame with no body has no class id.
         let mut card = listener();
         let mut silent = client(&card);
-        silent.write_all(&frame(true, &[])).unwrap();
+        silent.write_all(&frame(Some(ROUTING), &[])).unwrap();
         wait_for(&mut card, "card_closed");
         assert_eq!(closed(&card), ["bad_message"]);
 
@@ -1183,8 +1129,8 @@ pub(super) mod tests {
         let mut card = listener();
         let mut chatty = client(&card);
         for _ in 0..(LOGGED_PER_KIND + 4) {
-            chatty.write_all(&frame(false, &gateway_request())).unwrap();
-            chatty.write_all(&frame(true, &int(1234))).unwrap();
+            chatty.write_all(&frame(None, &gateway_request())).unwrap();
+            chatty.write_all(&frame(Some(ROUTING), &int(1234))).unwrap();
         }
         for _ in 0..40 {
             card.poll(1, refuse);
@@ -1203,6 +1149,33 @@ pub(super) mod tests {
         );
     }
 
+    /// F785 (T770 review): a logged-in or silent-but-chatty connection can send frames for as long
+    /// as it likes, so its counters stop at `u32::MAX` instead of overflowing (a debug-build
+    /// panic outside `contain` would stop the whole gateway).
+    #[test]
+    fn a_connections_counters_saturate_instead_of_overflowing() {
+        if !test_support::bin_test_target("card") {
+            return;
+        }
+        let mut card = listener();
+        let mut chatty = client(&card);
+        wait_for(&mut card, "card_connected");
+        card.connections[0].unhandled = u32::MAX - 1;
+        card.connections[0].answered.gateway_requests = u32::MAX - 1;
+        for _ in 0..3 {
+            chatty.write_all(&frame(Some(ROUTING), &int(1234))).unwrap();
+            chatty.write_all(&frame(None, &gateway_request())).unwrap();
+        }
+        for _ in 0..40 {
+            card.poll(1, refuse);
+            std::thread::sleep(Duration::from_millis(5));
+        }
+        assert_eq!(card.connections.len(), 1, "the connection survives");
+        assert!(closed(&card).is_empty());
+        assert_eq!(card.connections[0].unhandled, u32::MAX);
+        assert_eq!(card.connections[0].answered.gateway_requests, u32::MAX);
+    }
+
     /// T782 review: every answered kind has its own budget, so a client that retries 414 sixteen
     /// times on one connection still gets its `card_login` line, the event the native diagnosis
     /// reads.
@@ -1214,11 +1187,11 @@ pub(super) mod tests {
         let mut card = listener();
         let mut chatty = client(&card);
         for _ in 0..(LOGGED_PER_KIND + 1) {
-            chatty.write_all(&frame(false, &gateway_request())).unwrap();
+            chatty.write_all(&frame(None, &gateway_request())).unwrap();
         }
         // The 411 on the same connection: a shared counter would spend its budget on the 414s.
         chatty
-            .write_all(&frame(true, &session_login("", "79")))
+            .write_all(&frame(Some(ROUTING), &session_login("", "79")))
             .unwrap();
         for _ in 0..40 {
             card.poll(1, refuse);
