@@ -45,8 +45,9 @@ impl Gateway {
     /// W177 (R): a zone transition dismisses the active pet and removes its actor.
     pub fn settle_pets(&mut self, zoned: bool, now_ms: u64) -> io::Result<GatewayOutcome> {
         let mut outcome = GatewayOutcome::default();
+        let state = &self.state;
         if let Some(game) = self.gameplay.as_mut() {
-            let ended = game.settle_pets(zoned, now_ms)?;
+            let ended = game.settle_pets(state, zoned, now_ms)?;
             outcome.state_changed = ended.changed;
             outcome.gameplay_changed = ended.changed;
             outcome.replies = ended.replies.iter().map(|r| wrapped(r)).collect();

@@ -526,7 +526,7 @@ fn the_first_tick_after_a_destination_that_skips_the_loaded_stream_brings_the_pe
     let actor = actor();
     let summoned = game.handle_in_world(&summon(PET), &who(), 1_000).unwrap();
     assert_eq!(adds(&summoned.replies, actor).len(), 1);
-    let ended = game.settle_pets(true, 1_100).unwrap();
+    let ended = game.settle_pets(&who(), true, 1_100).unwrap();
     assert!(ended.changed);
     assert_eq!(removals(&ended.nearby, actor), 1);
     assert!(game.pet_view(GUID).is_none());

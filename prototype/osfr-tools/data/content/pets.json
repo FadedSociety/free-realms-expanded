@@ -53092,5 +53092,18 @@
       "kind": "reconstructed",
       "evidence": "T533: every number and reward row is server policy (R); the starting values are OSFR PR 152's pet treasure (read for behaviour and data only, no code copied): mood 25, a find after 15 to 50 s, an 8 h cooldown per pet, chest model 151 with tier weights 80/18/2, a 60 s lifetime, a chest 2 m from the pet, an open range of 5, a 4 s dig, coins 15/250/500 per tier, the tier item tables, and a 10% chance of one Treasure Spring item (23427 to 23458) in place of the tier item. Tune any of them here. Client facts: Models.txt 151 sg_treasure_chest_01.adr, whose ADR declares the texture aliases Default1 to Default3 (one per tier) and no open animation; locale 140227, 140234 and 140235 name the three tiers; AnimationTypes.xml 5520 pet_sniff and 5525 pet_digging are pet animation slots (5525 is also the PLAYER_DRAW_EFFECT id in PetTrickGestureSettings.txt, an effect, not this animation); only the 21 models marked digs declare both slots. A click on the chest is 26/8 (ctor 008b6bc0). The sniff run time is a first choice (R). find_chance is the number a treasure-hunting vitamin would raise (out of scope). Every reward item is in the shipped item catalogue."
     }
+  },
+  "happy_buff": {
+    "happy_mood": 25.0,
+    "speed_bonus": 3.0,
+    "duration_ms": 10000,
+    "refresh_ms": 4000,
+    "tag_id": 1800000000,
+    "icon_id": 3851,
+    "name_id": 116881,
+    "source": {
+      "kind": "reconstructed",
+      "evidence": "T532 (R): mood 25, +3 units/s, 10 s duration and 4 s refresh are server policy; name_id 116881 is the client locale row 'Pet Happiness Speed Buff' (Global.Text.116881 -> locale hash 1121068295); icon 3851 is Resources/Images/Images.txt row 3851 icon_status_sprint_32.dds, and icon 0 draws no row in GroupHandler:AddAbilityEffect. tag_id is server-assigned above the consumable effect ids. 57918 is NOT an effect definition: ClientItemDefinitions row 57918 is the Yeti Mask item, so it is not used. 15216 is ActorCompositeEffectDefinitions row PFX_beam_white_feet_speed-run_loop, the visible foot beam; it is not sent because this rule has no 35/41 world-effect path."
+    }
   }
 }

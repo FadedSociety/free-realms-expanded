@@ -14,6 +14,12 @@ pub fn summon(pet_id: u32) -> Vec<u8> {
     [vec![53, 0, 4], pet_id.to_le_bytes().to_vec(), vec![1]].concat()
 }
 
+/// Client `Pet.Dismiss` (`00c07420`): action 0 with an id word it never writes, so any id is
+/// carried and the action alone decides (`PetRequest::decode`).
+pub fn dismiss(pet_id: u32) -> Vec<u8> {
+    [vec![53, 0, 4], pet_id.to_le_bytes().to_vec(), vec![0]].concat()
+}
+
 /// Client `SendPetSummonByItemId` (`00b60110`): `53 00 | 32 | definition u32 | tint u32`,
 /// never a pet or instance id.
 pub fn summon_by_item(definition_id: u32, tint: u32) -> Vec<u8> {

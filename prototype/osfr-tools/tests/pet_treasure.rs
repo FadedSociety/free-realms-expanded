@@ -1454,7 +1454,7 @@ fn a_zone_change_takes_the_chest_and_keeps_the_cooldown() {
     let stamp = found_at(&game.pets_document().unwrap(), pet);
     assert!(stamp.is_some());
     // Zoning with the pet out: its actor and the chest go, and only to the owner (the chest).
-    let ended = game.settle_pets(true, at + 1_000).unwrap();
+    let ended = game.settle_pets(&owner, true, at + 1_000).unwrap();
     assert_eq!(removals(&ended.replies, guid), 1);
     assert_eq!(removals(&ended.nearby, guid), 0);
     assert_eq!(
@@ -1476,7 +1476,7 @@ fn a_zone_change_takes_the_chest_and_keeps_the_cooldown() {
     let (mut second, _) = session(&fixture, None);
     let (at, _, spawn) = dig_up(&mut second, &owner, START);
     second.handle_in_world(&DISMISS, &owner, at + 100).unwrap();
-    let ended = second.settle_pets(true, at + 200).unwrap();
+    let ended = second.settle_pets(&owner, true, at + 200).unwrap();
     assert_eq!(removals(&ended.replies, spawn.actor_id), 1);
     assert!(!ended.changed);
     // Not zoning leaves everything as it is.
@@ -1484,7 +1484,7 @@ fn a_zone_change_takes_the_chest_and_keeps_the_cooldown() {
     let (at, _, _) = dig_up(&mut third, &owner, START);
     assert!(
         third
-            .settle_pets(false, at + 100)
+            .settle_pets(&owner, false, at + 100)
             .unwrap()
             .replies
             .is_empty()

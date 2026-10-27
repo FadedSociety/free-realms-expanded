@@ -209,7 +209,7 @@ fn zoning_dismisses_without_persisting_the_actor_and_reload_keeps_roster() {
     let actor = PetService::pet_guid(who().guid);
     game.handle_in_world(&summon(1), &who(), NOW).unwrap();
     assert!(game.pet_view(1).is_some());
-    let ended = game.settle_pets(true, NOW + 1).unwrap();
+    let ended = game.settle_pets(&who(), true, NOW + 1).unwrap();
     assert!(ended.changed);
     assert!(has(&ended.replies, 53, 9));
     assert!(removal_packet(&ended.nearby, actor));

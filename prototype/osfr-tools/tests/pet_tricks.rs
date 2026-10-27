@@ -963,6 +963,6 @@ fn a_trick_runs_through_gameplay_for_the_owner_and_the_viewers() {
     // Zoning ends a running trick with the unlocks before the pet is dismissed.
     game.handle_in_world(&perform_trick(TRICK), &who, start + 1_000_000)
         .unwrap();
-    let zoned = game.settle_pets(true, start + 1_000_100).unwrap();
+    let zoned = game.settle_pets(&who, true, start + 1_000_100).unwrap();
     assert_eq!(traffic(&zoned.replies), unlocks(pet, TRICK));
 }

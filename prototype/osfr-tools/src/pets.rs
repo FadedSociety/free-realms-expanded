@@ -5,6 +5,7 @@
 //! because no original pet datagram was recovered.
 
 use crate::{
+    abilities::{build_effect_tag, effect_packets::encode_remove_effect_tag},
     inventory::{Inventory, InventoryState},
     startup_world, world,
 };
@@ -90,6 +91,9 @@ pub struct PetContent {
     /// T533: the pet treasure hunt, its chests and its reward tables; without it a pet never digs.
     #[serde(default, skip_serializing_if = "Option::is_none")]
     treasure: Option<treasure::TreasureConfig>,
+    /// T532: the happy-pet speed buff; without it a summoned pet never speeds its owner up.
+    #[serde(default)]
+    happy_buff: Option<HappyBuff>,
 }
 
 /// T485: when a feed applies and ends after its 53/20 begin, and how often live 53/3 needs go
@@ -124,6 +128,45 @@ impl CareTiming {
             && self.groom.as_ref().is_none_or(grooming::GroomConfig::valid)
             && self.trick.as_ref().is_none_or(tricks::TrickConfig::valid)
             && self.idle.as_ref().is_none_or(idle::IdleConfig::valid)
+    }
+}
+
+/// T532: the happy-pet speed buff. Every value is server policy (R) except `name_id`, the
+/// client locale row (116881 "Pet Happiness Speed Buff", hash of `Global.Text.116881`);
+/// `tag_id` is server-assigned and `icon_id` is a client `Resources/Images/Images.txt` image.
+/// The client draws no buff row for icon 0, and one row per `tag_id`, so a refresh replaces it.
+#[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+struct HappyBuff {
+    /// The decayed mood at which the buff holds (0..=100).
+    happy_mood: f32,
+    /// The owner's speed bonus in world units per second.
+    speed_bonus: f32,
+    /// The buff row's duration; the client counts it down.
+    duration_ms: u64,
+    /// How often the row is re-sent while the rule holds; under `duration_ms`.
+    refresh_ms: u64,
+    /// The row's instance id; above the consumable effect ids so it can never alias one.
+    tag_id: i32,
+    /// The client image the buff bar draws; zero draws no row at all.
+    icon_id: i32,
+    /// The client locale row the buff bar shows as the row's name.
+    name_id: i32,
+    source: SourceTag,
+}
+
+impl HappyBuff {
+    fn valid(&self) -> bool {
+        self.happy_mood.is_finite()
+            && (0.0..=100.0).contains(&self.happy_mood)
+            && self.speed_bonus.is_finite()
+            && (0.1..=10.0).contains(&self.speed_bonus)
+            && (1_000..=600_000).contains(&self.duration_ms)
+            && (100..self.duration_ms).contains(&self.refresh_ms)
+            // `consumable_effects` owns 1.0e9..1.5e9 and job/power-up rows use definition ids.
+            && self.tag_id > 1_500_000_000
+            && self.icon_id != 0
+            && self.name_id != 0
     }
 }
 
@@ -586,6 +629,9 @@ impl PetContent {
         }
         if self.care.as_ref().is_some_and(|care| !care.valid()) {
             return Err(invalid("invalid pet care content"));
+        }
+        if self.happy_buff.as_ref().is_some_and(|buff| !buff.valid()) {
+            return Err(invalid("invalid pet happy-buff content"));
         }
         if self
             .treasure
@@ -1072,6 +1118,13 @@ impl ActivePet {
     }
 }
 
+/// T532: the live happy-speed buff (session-only; never saved, dropped on reconnect).
+#[derive(Clone, Copy, Debug, PartialEq)]
+struct HappyBuffLive {
+    /// When the next row refresh is due (ms). The row itself already carries its duration.
+    refresh_at_ms: u64,
+}
+
 /// T485: a feed between its 53/20 begin and end.
 #[derive(Clone, Copy, Debug, PartialEq)]
 struct Feeding {
@@ -1094,6 +1147,8 @@ pub struct PetService {
     idle_seed: u64,
     /// T533: the treasure generator and the live chest (session only).
     treasure: treasure::State,
+    /// T532: the live happy-speed buff; session-only, so `reset_session` drops it.
+    happy: Option<HappyBuffLive>,
 }
 
 impl PetService {
@@ -1111,6 +1166,7 @@ impl PetService {
             remembered: None,
             idle_seed: IDLE_SEED,
             treasure: treasure::State::new(),
+            happy: None,
         })
     }
 
@@ -1126,6 +1182,7 @@ impl PetService {
             remembered: None,
             idle_seed: IDLE_SEED,
             treasure: treasure::State::new(),
+            happy: None,
         })
     }
 
@@ -1228,11 +1285,13 @@ impl PetService {
     }
 
     /// Reset only the connection-scoped actor state; the saved roster stays. T487: the pet a zone
-    /// change left behind is session state too, so a disconnect or reconnect forgets it.
+    /// change left behind is session state too, so a disconnect or reconnect forgets it. T532: the
+    /// happy pet's buff is connection-scoped too, so a reconnect starts without it.
     pub fn reset_session(&mut self) {
         self.active = None;
         self.ui_mode = 0;
         self.remembered = None;
+        self.happy = None;
         // T533: a chest belongs to one connection; the pet's cooldown stays in the roster.
         self.clear_treasure();
     }
@@ -2187,6 +2246,70 @@ impl PetService {
             .into_iter()
             .chain(self.trick_end_packets())
             .collect()
+    }
+
+    /// T532: the live happy-pet speed bonus in world units per second, `None` without the buff.
+    /// The movement validator's buff factor and the character speed stat read this one value.
+    pub fn happy_speed_bonus(&self) -> Option<f32> {
+        self.happy.and(
+            self.content
+                .happy_buff
+                .as_ref()
+                .map(|buff| buff.speed_bonus),
+        )
+    }
+
+    /// T532: one happy-speed-buff step. The rule (R): the summoned pet is not vanity and its
+    /// decayed mood is at least `happy_mood`; while it holds, one buff-bar row (38/16, reader
+    /// `008d8870`) is refreshed every `refresh_ms`, and when it stops the row is removed (38/17).
+    /// Returns the rows it sent, so the caller re-sends its speed stat then and reads the new value
+    /// from [`Self::happy_speed_bonus`]. Session-only: nothing here marks a save. `None` when
+    /// nothing is due, so an idle tick allocates nothing.
+    pub fn happy_buff_tick(&mut self, now_ms: u64) -> Option<Vec<Vec<u8>>> {
+        // Without a pet the rule cannot hold, and without a live buff there is nothing to end, so
+        // the ordinary tick is these two checks: no content borrow, no allocation.
+        if self.active.is_none() && self.happy.is_none() {
+            return None;
+        }
+        // The content is shared (`Arc`): holding it costs no copy on this per-tick path.
+        let content = Arc::clone(&self.content);
+        let config = content.happy_buff.as_ref()?;
+        if !self.happy_rule_holds(config, now_ms) {
+            return self
+                .happy
+                .take()
+                .map(|_| vec![encode_remove_effect_tag(config.tag_id)]);
+        }
+        if self.happy.is_some_and(|live| now_ms < live.refresh_at_ms) {
+            return None;
+        }
+        // One row per tag id, so a refresh replaces the client's row and never stacks.
+        self.happy = Some(HappyBuffLive {
+            refresh_at_ms: now_ms.saturating_add(config.refresh_ms),
+        });
+        Some(vec![build_effect_tag(
+            config.tag_id,
+            config.duration_ms,
+            config.icon_id,
+            config.name_id,
+        )])
+    }
+
+    /// T532 (R): the summoned pet is not vanity and its decayed mood is at least `happy_mood`.
+    /// The decayed view is the one the client's live 53/3 carries (`live_needs`), not the saved
+    /// copy, so a pet that starves below the threshold loses the buff on the same clock.
+    fn happy_rule_holds(&self, config: &HappyBuff, now_ms: u64) -> bool {
+        let Some(active) = self.active else {
+            return false;
+        };
+        let Some(pet) = self.pet(active.pet_id) else {
+            return false;
+        };
+        if self.content.is_vanity(self.content.model_id(&pet.model)) {
+            return false;
+        }
+        decayed(&self.content.need_policy, pet, true, now_ms / 1_000)
+            .is_some_and(|needs| needs.mood >= config.happy_mood)
     }
 
     pub fn list_packet(&self) -> Vec<u8> {

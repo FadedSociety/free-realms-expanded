@@ -96,6 +96,17 @@ impl SpeedModifiers {
         }
     }
 
+    /// (R) Fold a flat speed bonus in world units per second (a happy pet's) into the buff
+    /// factor as base plus bonus, held to the same 1.0..=10.0 range `effective_speed` enforces.
+    /// A non-finite or negative bonus is ignored, so a bad data value never refuses every move.
+    pub fn with_speed_bonus(mut self, bonus: f32) -> Self {
+        let base = self.base_speed_per_second;
+        if bonus.is_finite() && bonus > 0.0 && base.is_finite() && base > 0.0 {
+            self.buff_multiplier = ((base + bonus) / base).clamp(1.0, 10.0);
+        }
+        self
+    }
+
     fn effective_speed(self, state: u8) -> Option<f64> {
         let base = f64::from(self.base_speed_per_second);
         let mount = f64::from(self.mount_multiplier);

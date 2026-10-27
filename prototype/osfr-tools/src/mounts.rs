@@ -641,6 +641,22 @@ impl MountService {
         Some(self.catalog.mount(ride.mount_id)?.max_movement_speed)
     }
 
+    /// T532: the character speed stat the client's own motion reads (38/7, stat id 2), as the
+    /// unframed inner packet a session reply carries. `bonus` is a live happy pet's speed (R);
+    /// with 0 it is the on-foot value a ride end restores. `None` for an unusable speed, so a bad
+    /// data value never reaches the client's stat reader (which rejects NaN).
+    pub fn speed_stat(&self, rider_guid: u64, bonus: f32) -> Option<Vec<u8>> {
+        let speed = self.catalog.on_foot_speed + bonus;
+        if !speed.is_finite() || speed <= 0.0 {
+            return None;
+        }
+        world::unframe_tunnel(&startup_catalogues::build_stat_update(StatUpdate {
+            target_guid: rider_guid,
+            stats: &[float_stat(MAX_MOVEMENT_SPEED, speed)],
+        }))
+        .ok()
+    }
+
     /// A new network session starts with no ride out (the actor does not survive a disconnect).
     pub fn reset(&mut self) {
         self.state = MountState::Empty;

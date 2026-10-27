@@ -55,6 +55,42 @@ impl Gameplay {
         self.mounts.as_ref()?.mounted_speed()
     }
 
+    /// T532: the gateway's movement speed policy: a boarded ride's speed plus a live happy pet's
+    /// bonus. `None` (no gameplay yet) is the plain on-foot (R) policy the gateway literal built.
+    pub fn speed_modifiers(gameplay: Option<&Gameplay>) -> crate::movement::SpeedModifiers {
+        let Some(gameplay) = gameplay else {
+            return crate::movement::SpeedModifiers::riding(None);
+        };
+        crate::movement::SpeedModifiers::riding(gameplay.mounted_speed())
+            .with_speed_bonus(gameplay.happy_pet_speed_bonus())
+    }
+
+    /// T532: the live happy-pet bonus for the movement allowance; 0 without the buff.
+    fn happy_pet_speed_bonus(&self) -> f32 {
+        self.pets.happy_speed_bonus().unwrap_or(0.0)
+    }
+
+    /// T532: one happy-speed-buff step. The buff-bar row goes to the owner, and the character
+    /// speed stat follows so the client's own motion matches the server's allowance (the stat is
+    /// the live bonus, so a row that just ended restores the on-foot value). A ride's own 38/7
+    /// owns the speed while seated, so the stat waits for the next refresh on foot.
+    fn sync_happy_buff(&mut self, character: &CharacterState, now_ms: u64, out: &mut Outcome) {
+        let Some(rows) = self.pets.happy_buff_tick(now_ms) else {
+            return;
+        };
+        out.replies.extend(rows);
+        if self.is_mounted() {
+            return;
+        }
+        if let Some(stat) = self
+            .mounts
+            .as_ref()
+            .and_then(|mounts| mounts.speed_stat(character.guid, self.happy_pet_speed_bonus()))
+        {
+            out.replies.push(stat);
+        }
+    }
+
     /// (R) No per-zone riding data was recovered, so every zone allows rides; fights (an instance
     /// battle or a field enemy chasing the player), kart races and a knockout do not.
     fn ride_restrictions(&self) -> crate::mounts::RideRestrictions {
@@ -260,7 +296,7 @@ impl Gameplay {
 
     /// W177: summon, dismiss and UI mode (family 53). Ownership comes only from the saved
     /// roster loaded by `adopt_pets`; the actor GUID is derived from the authenticated
-    /// character, never from request bytes.
+    /// character, never from request bytes. T532: the happy-speed buff follows the pet.
     pub(super) fn handle_pets(
         &mut self,
         inner: &[u8],
@@ -281,7 +317,12 @@ impl Gameplay {
             busy,
             now_ms,
         )?;
-        Ok(wire.map(Self::pet_outcome))
+        let Some(wire) = wire else {
+            return Ok(None);
+        };
+        let mut out = Self::pet_outcome(wire);
+        self.sync_happy_buff(character, now_ms, &mut out);
+        Ok(Some(out))
     }
 
     /// T772: pet adoption items this transaction added (a coin buy, a grant) become pets at once,
@@ -358,11 +399,13 @@ impl Gameplay {
     /// T485: also its care timers and live needs; only a feed's apply step marks a save.
     /// T487: the first tick after a race or battle ends is also where a remembered pet returns
     /// (`follow_pet` covers both cases). T533: and its treasure hunt, which also runs for a chest
-    /// still waiting after its pet is gone; a find marks the save (the cooldown). `None` means
-    /// there is still nothing to send.
+    /// still waiting after its pet is gone; a find marks the save (the cooldown). T532: the
+    /// happy-speed buff ticks too, so a mood drop or dismissal ends it here. `None` means there is
+    /// still nothing to send.
     pub fn pet_tick(&mut self, character: &CharacterState, now_ms: u64) -> Option<Outcome> {
         let mut out = Outcome::default();
         self.follow_pet(character, now_ms, &mut out);
+        self.sync_happy_buff(character, now_ms, &mut out);
         if self.pets.active_pet_id().is_some() {
             let care = self.pets.care_tick(&mut self.inventory, now_ms);
             out.changed |= care.changed;
@@ -370,7 +413,7 @@ impl Gameplay {
             // T488: a grooming session that times out plays its dry-off animation for the viewers.
             out.nearby.extend(care.shared);
         } else if !self.pets.has_treasure() {
-            return None;
+            return (!out.replies.is_empty()).then_some(out);
         }
         self.tick_pet_treasure(character, now_ms, &mut out);
         Some(out)
@@ -395,8 +438,14 @@ impl Gameplay {
     }
 
     /// W177 (R): a pet does not zone with its owner; T487 remembers it so the destination's
-    /// loaded signal (`enter_world`) or the first update there can summon it again.
-    pub fn settle_pets(&mut self, zoned: bool, now_ms: u64) -> io::Result<Outcome> {
+    /// loaded signal (`enter_world`) or the first update there can summon it again. T532: the
+    /// happy pet's buff ends with the pet, so the zone change also drops its speed.
+    pub fn settle_pets(
+        &mut self,
+        character: &CharacterState,
+        zoned: bool,
+        now_ms: u64,
+    ) -> io::Result<Outcome> {
         if !zoned {
             return Ok(Outcome::default());
         }
@@ -416,6 +465,7 @@ impl Gameplay {
         let mut out = Self::pet_outcome(self.pets.wire(transition));
         out.replies.extend(care_end);
         out.replies.splice(0..0, chest);
+        self.sync_happy_buff(character, now_ms, &mut out);
         Ok(out)
     }
 }

@@ -13,7 +13,6 @@ use crate::gameplay::{Gameplay, GameplayState};
 use crate::identity::CharacterIdentity;
 use crate::movement::{
     self, Decision as MovementDecision, ExpectedDiscontinuity, MovementState, MovementUpdate,
-    SpeedModifiers,
 };
 use crate::{
     players::PlayerPresentation,
@@ -1539,7 +1538,7 @@ impl Gateway {
                         update,
                         state.zone_id,
                         elapsed,
-                        SpeedModifiers::riding(gameplay.as_ref().and_then(Gameplay::mounted_speed)),
+                        Gameplay::speed_modifiers(gameplay.as_ref()),
                         expected_discontinuity,
                     );
                     expected_discontinuity = validated.expected_discontinuity;
