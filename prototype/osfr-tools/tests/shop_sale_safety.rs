@@ -14,6 +14,9 @@
 //! - type 29 (furniture): stays on sale (R). OSFR keeps 185 coin furniture rows and the items
 //!   wait in the bag until housing decoration lands.
 //!
+//! T794: a bought item counts for a "collect item" quest objective, exactly once per purchase, and a
+//! refused buy, a sell or a buy-back counts for nothing (see `buy_credits_the_collect_objective`).
+//!
 //! Every request here goes through the real gateway dispatch: 26/8 + 26/10 open the shipped
 //! Gloria vendor, 165/4 is the client's direct coin buy and 66/43 the vendor buy. A refusal must
 //! change neither the snapshot/save nor the buy-back ledger.
@@ -38,6 +41,7 @@ use osfr_tools::{
     inventory::Inventory,
     npc_interaction::decode_coin_merchant_list_165_10,
     pets::PetService,
+    quest_engine::QuestState,
     station_cash::{DEED_ITEM_TYPE, Wallet},
 };
 use serde_json::Value;
@@ -65,6 +69,8 @@ const FURNITURE: i32 = 10_472;
 /// An id no shipped catalogue defines; the unreadable-definition test gives it a truncated row.
 const TRUNCATED: i32 = 1_999_999_001;
 const START_COINS: u32 = 100_000;
+/// T794: the synthetic collect quest the fixture installs.
+const COLLECT_QUEST: u32 = 9_900_794;
 
 /// Every vendor-stocked row the coin store refuses on the integration tip, with the reason it is
 /// blocked. The content test fails if this list and the shipped `vendors.json` disagree in either
@@ -502,4 +508,122 @@ fn a_priced_item_with_an_unreadable_definition_is_refused_and_not_advertised() {
     assert_unchanged(&gateway, &before, "unreadable definition");
     assert_eq!(inventory_of(&gateway).coins, 1_000);
     assert_eq!(count_definition(&inventory_of(&gateway), TRUNCATED), 0);
+}
+
+/// T794: the collect objective's count, read from the gateway's save document.
+fn collected(gateway: &Gateway) -> u32 {
+    let state = gateway.snapshot().gameplay.expect("gameplay state exists");
+    state.npc_quests.expect("the quest save exists").quests[&COLLECT_QUEST].counts[0]
+}
+
+/// T794: a Gloria gateway selling `stock` (item, price) and holding an accepted "collect 5 of
+/// `item`" quest with `counted` already earned. The fixture owns the content directory the
+/// gateway reads at every buy, so it is returned and must outlive the gateway.
+fn collect_gateway(
+    label: &str,
+    item: i32,
+    stock: (i32, u32),
+    coins: u32,
+    counted: u32,
+) -> (VendorFixture, Gateway) {
+    let fixture = gloria_fixture(label);
+    fixture.stock_price_coins(&[stock]);
+    let mut quests: QuestState = fixture.install_collect_quest(COLLECT_QUEST, GLORIA, item, 5);
+    quests.quests.get_mut(&COLLECT_QUEST).unwrap().counts[0] = counted;
+    let mut state = fixture.state(coins, false);
+    state.npc_quests = Some(quests);
+    let mut gateway = connect(&fixture, state);
+    open_shop(&fixture, &mut gateway);
+    (fixture, gateway)
+}
+
+/// The two buy requests the client sends: 165/4 (coin store) and 66/43 (vendor).
+const BUYS: [(&str, fn(u32, i32, u32) -> Vec<u8>); 2] = [
+    ("165-4", |transaction, item, quantity| {
+        coin_buy_packet(GLORIA, transaction, item, quantity)
+    }),
+    ("66-43", vendor_buy_packet),
+];
+
+/// T794: both buy paths credit the objective by the bought quantity, once. (A second raise on the
+/// same purchase would show here as double the quantity.)
+#[test]
+fn buy_credits_the_collect_objective_exactly_once() {
+    for (label, buy) in BUYS {
+        let (_fixture, mut gateway) = collect_gateway(
+            &format!("t794-buy-{label}"),
+            FURNITURE,
+            (FURNITURE, 200),
+            1_000,
+            0,
+        );
+        let (_, outcome) = handled(&mut gateway, &buy(1, FURNITURE, 2));
+        assert!(outcome.gameplay_changed, "{label}: the buy saves");
+        assert_eq!(inventory_of(&gateway).coins, 600, "{label}: the buy paid");
+        assert_eq!(collected(&gateway), 2, "{label}: two bought, two counted");
+        handled(&mut gateway, &buy(2, FURNITURE, 1));
+        assert_eq!(collected(&gateway), 3, "{label}: the next buy adds its own");
+    }
+}
+
+/// T794: a refused buy (here: not enough coins) credits nothing and changes nothing. The player
+/// already holds one of the objective's item (`SEEDED_ITEM`), so a count taken against a stale or
+/// empty baseline would show as a credit.
+#[test]
+fn a_refused_buy_credits_nothing() {
+    for (label, buy) in BUYS {
+        let (_fixture, mut gateway) = collect_gateway(
+            &format!("t794-refused-{label}"),
+            SEEDED_ITEM,
+            (SEEDED_ITEM, 200),
+            150,
+            0,
+        );
+        let before = gateway.snapshot();
+        let (_, outcome) = handled(&mut gateway, &buy(1, SEEDED_ITEM, 1));
+        assert!(
+            !outcome.gameplay_changed && !outcome.state_changed,
+            "{label}"
+        );
+        assert_unchanged(&gateway, &before, label);
+        assert_eq!(collected(&gateway), 0, "{label}: a refused buy counted");
+    }
+}
+
+/// T794: a bought pet item is adopted at once (T772), so the bag never holds it and nothing counts.
+#[test]
+fn a_bought_pet_item_credits_nothing() {
+    for (label, buy) in BUYS {
+        let (_fixture, mut gateway) = collect_gateway(
+            &format!("t794-pet-{label}"),
+            BOUND_PET,
+            (BOUND_PET, 432),
+            1_000,
+            0,
+        );
+        let (replies, _) = handled(&mut gateway, &buy(1, BOUND_PET, 1));
+        assert_adopted(&gateway, &replies, 1);
+        assert_eq!(collected(&gateway), 0, "{label}: an adopted pet counted");
+    }
+}
+
+/// T794: a sell lowers no count (`CollectItem` only counts gains), and a buy-back hands back what
+/// the sale took at the sale price, so sell + buy-back must not count: it would loop the objective
+/// for free. The quest starts at 1 of 5 with the fixture's seeded stack (never counted) in the bag.
+#[test]
+fn selling_and_buying_back_leave_the_count_alone() {
+    let (_fixture, mut gateway) =
+        collect_gateway("t794-sell", SEEDED_ITEM, (FURNITURE, 200), 1_000, 1);
+    let sale = seed_buy_back(&mut gateway);
+    assert_eq!(count_definition(&inventory_of(&gateway), SEEDED_ITEM), 0);
+    assert_eq!(collected(&gateway), 1, "a sale lowered the count");
+    let restored = send(&mut gateway, &buy_back_packet(sale, 0));
+    assert_eq!(buy_back_result(&restored), coin_shop::RESULT_SUCCESS);
+    assert_eq!(count_definition(&inventory_of(&gateway), SEEDED_ITEM), 1);
+    assert_eq!(
+        inventory_of(&gateway).coins,
+        1_000,
+        "the round trip is free"
+    );
+    assert_eq!(collected(&gateway), 1, "a buy-back counted as a new item");
 }

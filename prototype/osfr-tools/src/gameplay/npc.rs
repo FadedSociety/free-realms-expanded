@@ -106,7 +106,29 @@ impl Gameplay {
         Ok(out)
     }
 
+    /// Route one NPC-family packet, then raise the item events its inventory change earned, so a
+    /// bought item counts for a "collect item" objective. This is the one raise: the buy paths
+    /// themselves raise nothing, or a purchase would count twice.
     pub(super) fn handle_npc_packet(
+        &mut self,
+        inner: &[u8],
+        character: &CharacterState,
+        now_ms: u64,
+    ) -> io::Result<Option<Outcome>> {
+        let before = self.inventory.state().clone();
+        let Some(mut out) = self.route_npc_packet(inner, character, now_ms)? else {
+            return Ok(None);
+        };
+        // T794: a 165/12 buy-back returns what a 165/5 sale took, at the sale price. It is no new
+        // item, and counting it would let sell + buy-back loop a collect objective for free. A
+        // sale needs no case: `npc_inventory_events` counts gains only, so a loss lowers nothing.
+        if !inner.starts_with(&[165, 0, 12, 0]) {
+            self.npc_inventory_events(&before, &mut out)?;
+        }
+        Ok(Some(out))
+    }
+
+    fn route_npc_packet(
         &mut self,
         inner: &[u8],
         character: &CharacterState,

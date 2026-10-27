@@ -2200,9 +2200,7 @@ impl Gameplay {
         if let Some(outcome) = self.handle_collection_coin(inner, character)? {
             return Ok(outcome);
         }
-        let inventory_before = self.inventory.state().clone();
-        if let Some(mut outcome) = self.handle_npc_packet(inner, character, now_ms)? {
-            self.npc_inventory_events(&inventory_before, &mut outcome)?;
+        if let Some(outcome) = self.handle_npc_packet(inner, character, now_ms)? {
             return Ok(outcome);
         }
         if self.opening.is_none() {
