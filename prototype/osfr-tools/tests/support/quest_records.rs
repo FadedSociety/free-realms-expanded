@@ -3,13 +3,22 @@
 //! the job and level gate, objective target fields and the authored title id). The loader
 //! stays the authority for rewards, bounds and the enabled/offer rules.
 //!
+//! [`shipped_quests`]/[`find_quest`]/[`shipped_quest`] are the one shipped-record finder
+//! every zone suite uses, and [`ZoneQuest::from_record`] is the one `RawQuest` ->
+//! `ZoneQuest` card/payout mapping (it lives here because this module already depends
+//! on `npc_quest_chain` for `read_json`; the reverse would not compile in the suites
+//! that include `npc_quest_chain` alone).
+//!
 //! Test-only. Include it next to `npc_quest_chain` (for `read_json`):
 //! `enabled_quest_reachability.rs` and `enabled_quest_menu_offers.rs` do.
 #![allow(dead_code)]
 
-use super::npc_quest_chain::read_json;
+use super::npc_quest_chain::{ZoneQuest, content_dir, read_json};
 use serde_json::Value;
-use std::path::{Path, PathBuf};
+use std::{
+    path::{Path, PathBuf},
+    sync::OnceLock,
+};
 
 pub fn as_u32(value: &Value) -> Option<u32> {
     value.as_u64().and_then(|value| u32::try_from(value).ok())
@@ -64,6 +73,19 @@ impl RawQuest {
             .map(sum)
             .fold((0, 0), |a, b| (a.0 + b.0, a.1 + b.1));
         (coins as u32, xp as u32)
+    }
+
+    /// The 49/13 star word: every profile's job XP summed, the way production's
+    /// `encode_quest_reward_bundle` builds the bundle. [`Self::reward_totals`] is one
+    /// profile's share; a multi-profile record has a larger star word.
+    pub fn reward_stars(&self) -> u32 {
+        let stars = self
+            .rewards
+            .iter()
+            .flat_map(|row| row["job_xp"].as_object().into_iter().flatten())
+            .filter_map(|(_, amount)| amount.as_u64())
+            .sum::<u64>();
+        u32::try_from(stars).expect("the quest star total fits the 49/13 wire field")
     }
 }
 
@@ -142,4 +164,49 @@ pub fn read_quests(root: &Path) -> Vec<RawQuest> {
         }
     }
     quests
+}
+
+/// The shipped records, read once per test binary.
+pub fn shipped_quests() -> &'static [RawQuest] {
+    static RECORDS: OnceLock<Vec<RawQuest>> = OnceLock::new();
+    RECORDS.get_or_init(|| read_quests(&content_dir()))
+}
+
+/// The record `id` in `quests`, for a suite that patched its own private catalogue.
+pub fn find_quest(quests: &[RawQuest], id: u32) -> &RawQuest {
+    quests
+        .iter()
+        .find(|quest| quest.id == id)
+        .unwrap_or_else(|| panic!("the shipped quest record {id}"))
+}
+
+/// The shipped record `id`.
+pub fn shipped_quest(id: u32) -> &'static RawQuest {
+    find_quest(shipped_quests(), id)
+}
+
+impl ZoneQuest {
+    /// The shared zone-quest record for one shipped quest. `giver` and `turnin` are
+    /// the clicked NPC rows (a record carries the giver and objectives, not the
+    /// engine's named end-screen actor); `profile` names the job-XP profile whose
+    /// share `finish_quest` credits. The 49/13 star word (`xp`) is every profile's
+    /// XP, so a record paying two profiles has `xp > profile_xp`.
+    pub fn from_record(record: &RawQuest, giver: u64, turnin: u64, profile: i32) -> Self {
+        let (coins, profile_xp) = record.reward_totals(profile);
+        Self {
+            id: record.id,
+            giver,
+            card: [
+                u32::try_from(record.title_string_id).expect("quest title id fits u32"),
+                record.intro_text_string_id,
+                record.description_string_id,
+            ],
+            steps: &[],
+            turnin,
+            end_text: record.end_text_string_id,
+            coins,
+            xp: record.reward_stars(),
+            profile_xp,
+        }
+    }
 }

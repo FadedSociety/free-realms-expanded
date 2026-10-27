@@ -54,6 +54,7 @@ fn record() -> Value {
 fn iou() -> ZoneQuest {
     let record = record();
     let reward = &record["rewards"][0];
+    let xp = reward["job_xp"][BRAWLER.to_string()].as_u64().unwrap() as u32;
     ZoneQuest {
         id: IOU,
         giver: ANDREW,
@@ -66,7 +67,8 @@ fn iou() -> ZoneQuest {
         turnin: NURBLE,
         end_text: record["end_text_string_id"].as_u64().unwrap() as u32,
         coins: reward["coins"].as_u64().unwrap() as u32,
-        xp: reward["job_xp"][BRAWLER.to_string()].as_u64().unwrap() as u32,
+        xp,
+        profile_xp: xp,
     }
 }
 
@@ -111,7 +113,7 @@ fn iou_is_offered_by_andrew_and_handed_in_to_nurble() {
 
     assert_eq!(quest_status(&game, IOU), QuestStatus::Completed);
     assert_eq!(coins(&game), coins_before + quest.coins);
-    assert_eq!(profile_xp(&game, BRAWLER), xp_before + quest.xp);
+    assert_eq!(profile_xp(&game, BRAWLER), xp_before + quest.profile_xp);
 
     // Done is done: neither NPC offers it again and a repeated 49/14 pays nothing.
     let coins_done = coins(&game);

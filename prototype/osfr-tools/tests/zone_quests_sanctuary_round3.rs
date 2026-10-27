@@ -120,7 +120,8 @@ fn quest(id: u32) -> ZoneQuest {
         turnin: named_turnin(record),
         end_text: record.end_text_string_id,
         coins,
-        xp,
+        xp: record.reward_stars(),
+        profile_xp: xp,
     }
 }
 

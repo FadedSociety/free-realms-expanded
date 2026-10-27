@@ -94,7 +94,8 @@ fn quest() -> ZoneQuest {
         turnin: TARGET,
         end_text: shipped.end_text_string_id,
         coins,
-        xp,
+        xp: shipped.reward_stars(),
+        profile_xp: xp,
     }
 }
 
@@ -233,7 +234,10 @@ fn xp_goes_to_adventurer_with_another_job_active() {
         miner_before,
         "the referral must not pay the active job"
     );
-    assert_eq!(profile_xp(&game, ADVENTURER), adventurer_before + quest.xp);
+    assert_eq!(
+        profile_xp(&game, ADVENTURER),
+        adventurer_before + quest.profile_xp
+    );
 }
 
 #[test]

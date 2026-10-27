@@ -17,7 +17,6 @@ use crate::npc_quest_chain::{
 };
 use osfr_tools::{
     character_store::CharacterState,
-    game_store,
     gameplay::{Gameplay, GameplayState, Outcome},
     harvest_nodes::GatheringNodes,
     inventory::{InventoryItem, InventoryState, MAX_ITEMS},
@@ -192,20 +191,10 @@ impl Fixture {
         self.game_with_state(state)
     }
 
-    /// The production save envelope, not a `GameplayState` proxy. Reload under the same
-    /// character id the session used, not the fixture's default character.
+    /// The production save envelope, not a `GameplayState` proxy. Delegates to the
+    /// canonical fixture helper, including its serialized-state round-trip check.
     pub fn save_and_reload(&self, game: &Gameplay, character: &CharacterState) -> Gameplay {
-        let path = self.path().join("character.json");
-        let snapshot = game_store::Snapshot {
-            character: character.clone(),
-            gameplay: Some(game.state()),
-            pets: None,
-        };
-        game_store::save(&path, &snapshot).expect("the save envelope writes");
-        let loaded =
-            game_store::load_or_create(&path, character.clone()).expect("the envelope loads");
-        assert_eq!(loaded.character, *character);
-        self.0.game_as(character.guid, loaded.gameplay)
+        self.0.save_and_reload(game, character)
     }
 }
 

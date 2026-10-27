@@ -80,6 +80,7 @@ impl Case {
             .expect("the quest record ships");
         let id = |key: &str| record[key].as_u64().unwrap_or(0) as u32;
         let reward = &record["rewards"][0];
+        let xp = reward["job_xp"][DERBY_DRIVER.to_string()].as_u64().unwrap() as u32;
         let quest = ZoneQuest {
             id: self.quest,
             giver: CRASH,
@@ -92,7 +93,8 @@ impl Case {
             turnin: self.target,
             end_text: id("end_text_string_id"),
             coins: reward["coins"].as_u64().unwrap() as u32,
-            xp: reward["job_xp"][DERBY_DRIVER.to_string()].as_u64().unwrap() as u32,
+            xp,
+            profile_xp: xp,
         };
         assert!(quest.coins > 0 && quest.xp > 0, "the quest pays something");
         quest
@@ -141,7 +143,10 @@ fn each_quest_is_offered_by_crash_ended_by_its_npc_and_pays_once() {
         MAP.turn_in(&mut game, CHARACTER, &quest, DERBY_DRIVER, &mut now);
 
         assert_eq!(coins(&game), coins_before + quest.coins);
-        assert_eq!(profile_xp(&game, DERBY_DRIVER), xp_before + quest.xp);
+        assert_eq!(
+            profile_xp(&game, DERBY_DRIVER),
+            xp_before + quest.profile_xp
+        );
         assert_eq!(quest_status(&game, case.quest), QuestStatus::Completed);
 
         // Replays and a second Talk change nothing.

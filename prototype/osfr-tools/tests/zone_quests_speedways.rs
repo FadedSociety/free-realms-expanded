@@ -86,7 +86,8 @@ fn sponsorship() -> ZoneQuest {
         turnin: PETAL,
         end_text: END_TEXT,
         coins,
-        xp,
+        xp: record.reward_stars(),
+        profile_xp: xp,
     }
 }
 
@@ -103,7 +104,7 @@ fn a_kart_driver_is_offered_the_sponsorship_by_petal_and_paid_once() {
     assert_eq!(counts(&game, QUEST), [0]);
     MAP.turn_in(&mut game, CHARACTER, &quest, KART_DRIVER, &mut now);
     assert_eq!(coins(&game), coins_before + quest.coins);
-    assert_eq!(profile_xp(&game, KART_DRIVER), xp_before + quest.xp);
+    assert_eq!(profile_xp(&game, KART_DRIVER), xp_before + quest.profile_xp);
 
     // Done once: no second offer, and a replayed 49/14 or 49/2 changes nothing.
     assert_no_offer(&mut game, &petal, PETAL, &mut now, "Petal after the quest");
@@ -307,7 +308,7 @@ fn the_sponsorship_survives_a_reconnect() {
         QUEST,
         KART_DRIVER,
         quest.coins,
-        quest.xp,
+        quest.profile_xp,
         now + 4,
     );
 }

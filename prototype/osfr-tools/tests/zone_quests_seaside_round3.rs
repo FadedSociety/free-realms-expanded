@@ -57,6 +57,7 @@ fn gate() -> ZoneQuest {
         .expect("the level-20 record is authored");
     assert_eq!(record["enabled"], true, "the quest ships enabled");
     let reward = &record["rewards"][0];
+    let xp = reward["job_xp"]["11"].as_u64().unwrap() as u32;
     ZoneQuest {
         id: LEVEL_TWENTY,
         giver: CALLAHAN,
@@ -67,7 +68,8 @@ fn gate() -> ZoneQuest {
         turnin: CALLAHAN,
         end_text: 387_579,
         coins: reward["coins"].as_u64().unwrap() as u32,
-        xp: reward["job_xp"]["11"].as_u64().unwrap() as u32,
+        xp,
+        profile_xp: xp,
     }
 }
 
@@ -112,7 +114,7 @@ fn turn_in_at_callahan(game: &mut Gameplay, quest: &ZoneQuest, now: &mut u64) {
     MAP.turn_in(game, CHARACTER, quest, MEDIC, now);
     assert_eq!(quest_status(game, LEVEL_TWENTY), QuestStatus::Completed);
     assert_eq!(coins(game), coins_before + quest.coins);
-    assert_eq!(profile_xp(game, MEDIC), xp_before + quest.xp);
+    assert_eq!(profile_xp(game, MEDIC), xp_before + quest.profile_xp);
 }
 
 #[test]

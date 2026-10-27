@@ -68,6 +68,7 @@ const AIDING: ZoneQuest = ZoneQuest {
     end_text: 440_468,
     coins: 50,
     xp: 15,
+    profile_xp: 15,
 };
 const MISPLACED: ZoneQuest = ZoneQuest {
     id: 3_000_390,
@@ -78,6 +79,7 @@ const MISPLACED: ZoneQuest = ZoneQuest {
     end_text: 46_252,
     coins: 15,
     xp: 15,
+    profile_xp: 15,
 };
 const HOW_BAD: ZoneQuest = ZoneQuest {
     id: 3_000_391,
@@ -88,6 +90,7 @@ const HOW_BAD: ZoneQuest = ZoneQuest {
     end_text: 390_261,
     coins: 2,
     xp: 15,
+    profile_xp: 15,
 };
 const NOT_SO_BAD: ZoneQuest = ZoneQuest {
     id: 3_000_392,
@@ -98,6 +101,7 @@ const NOT_SO_BAD: ZoneQuest = ZoneQuest {
     end_text: 390_591,
     coins: 2,
     xp: 30,
+    profile_xp: 30,
 };
 const JOIN_PARTY: ZoneQuest = ZoneQuest {
     id: 3_000_400,
@@ -108,6 +112,7 @@ const JOIN_PARTY: ZoneQuest = ZoneQuest {
     end_text: 385_981,
     coins: 4,
     xp: 15,
+    profile_xp: 15,
 };
 
 /// Every NPC row in `data/content/npcs`, as the production content loader reads
@@ -206,7 +211,7 @@ fn aiding_our_allies_ends_at_merk() {
     assert_eq!(coins(&game), coins_before + AIDING.coins);
     assert_eq!(
         profile_xp(&game, ADVENTURER),
-        xp_before + AIDING.xp,
+        xp_before + AIDING.profile_xp,
         "the quest pays 50 coins and 15 Adventurer XP"
     );
     assert_packet_changes_nothing(

@@ -270,7 +270,8 @@ impl Fixture {
     }
 
     /// The production save envelope, not a `GameplayState` proxy: `game_store::save`
-    /// -> `load_or_create` -> the same split-catalogue bind a login performs.
+    /// -> `load_or_create` -> the same split-catalogue bind a login performs. The
+    /// reload must carry the serialized state, not just the character it was given.
     pub fn save_and_reload(&self, game: &Gameplay, character: &CharacterState) -> Gameplay {
         let path = self.path.join("character-save.json");
         let snapshot = osfr_tools::game_store::Snapshot {
@@ -281,8 +282,13 @@ impl Fixture {
         osfr_tools::game_store::save(&path, &snapshot).expect("the character save writes");
         let loaded = osfr_tools::game_store::load_or_create(&path, character.clone())
             .expect("the character save loads");
-        assert_eq!(loaded.character, *character);
-        self.game_as(character.guid, loaded.gameplay)
+        let reloaded = self.game_as(character.guid, loaded.gameplay);
+        assert_eq!(
+            saved(&reloaded),
+            saved(game),
+            "the save round trip preserved the serialized state"
+        );
+        reloaded
     }
 }
 
@@ -726,14 +732,15 @@ pub fn end_screen_reward(end: &[u8]) -> (u32, u32) {
 }
 
 /// The ending profile is explicit: a quest's reward map names its own job, which
-/// need not be the profile the character has active at turn-in.
+/// need not be the profile the character has active at turn-in. `expected_profile_xp`
+/// is that profile's share, not the 49/13 star word (every profile summed).
 pub fn finish_quest(
     game: &mut Gameplay,
     character: &CharacterState,
     quest_id: u32,
     profile: i32,
     expected_coins: u32,
-    expected_xp: u32,
+    expected_profile_xp: u32,
     now: u64,
 ) -> Outcome {
     let coins_before = coins(game);
@@ -751,7 +758,7 @@ pub fn finish_quest(
         "quest {quest_id} did not complete"
     );
     assert_eq!(coins(game), coins_before + expected_coins);
-    assert_eq!(profile_xp(game, profile), xp_before + expected_xp);
+    assert_eq!(profile_xp(game, profile), xp_before + expected_profile_xp);
     assert_eq!(quest_status(game, quest_id), QuestStatus::Completed);
     assert_eq!(pending_offer(game), None);
     assert_eq!(pending_turnin(game), None);
@@ -769,8 +776,14 @@ pub struct ZoneQuest {
     pub steps: &'static [(u64, u32)],
     pub turnin: u64,
     pub end_text: u32,
+    /// The 49/13 reward bundle's coin word.
     pub coins: u32,
+    /// The 49/13 reward bundle's star word: every `job_xp` profile's XP summed
+    /// (production's `encode_quest_reward_bundle`).
     pub xp: u32,
+    /// What `finish_quest` expects the turn-in's named `profile` to gain. A record
+    /// that pays one profile sets it equal to `xp`; a multi-profile record does not.
+    pub profile_xp: u32,
 }
 
 /// A zone's quest runner: where its NPC rows live, the runtime actor the client
@@ -876,7 +889,8 @@ impl ZoneQuests {
     }
 
     /// With the hand-in already held (the final Talk done, possibly before a reload), the
-    /// 26/6 that releases the 49/13 and the 49/14 that pays.
+    /// 26/6 that releases the 49/13 and the 49/14 that pays. The end screen carries the
+    /// record's coin word and star total; the grant pays `profile` only its share.
     pub fn pay_held_turnin(
         &self,
         game: &mut Gameplay,
@@ -902,7 +916,7 @@ impl ZoneQuests {
             quest.id,
             profile,
             quest.coins,
-            quest.xp,
+            quest.profile_xp,
             *now + 4,
         );
         *now += 10;
@@ -941,8 +955,19 @@ pub fn dialogue_body(outcome: &Outcome) -> u32 {
 /// A player on the Adventurer ladder with `active` as the saved job, so the XP
 /// destination is observable. The fixture owns the quest and reward ledger.
 pub fn zone_player(fixture: &Fixture, guid: u64, active: i32) -> Gameplay {
+    zone_player_unlocked(fixture, guid, active, &[ADVENTURER])
+}
+
+/// [`zone_player`] with the jobs `unlocked` learned while `active` stays selected, so
+/// a test can prove a quest gate reads the *active* job and not merely a learned one.
+pub fn zone_player_unlocked(
+    fixture: &Fixture,
+    guid: u64,
+    active: i32,
+    unlocked: &[i32],
+) -> Gameplay {
     let mut state = fixture.game_as(guid, None).state();
-    seed_active_profile(&mut state, active, &[ADVENTURER]);
+    seed_active_profile(&mut state, active, unlocked);
     fixture.game_as(guid, Some(state))
 }
 

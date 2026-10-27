@@ -38,9 +38,8 @@ use npc_quest_chain::{
     release_end_screen, saved, talk, zone_player,
 };
 use osfr_tools::quest_engine::QuestStatus;
-use quest_records::{RawQuest, read_quests};
+use quest_records::shipped_quest;
 use serde_json::json;
-use std::sync::OnceLock;
 
 const KART: i32 = 48;
 const TR: u32 = 3_080_007;
@@ -58,46 +57,12 @@ const MAP: ZoneQuests = ZoneQuests {
     runtime: &[],
 };
 
-/// The shipped quest records, for the values these tests must not pin.
-fn records() -> &'static [RawQuest] {
-    static RECORDS: OnceLock<Vec<RawQuest>> = OnceLock::new();
-    RECORDS.get_or_init(|| read_quests(&content_dir()))
-}
-
-fn record(id: u32) -> &'static RawQuest {
-    records()
-        .iter()
-        .find(|quest| quest.id == id)
-        .unwrap_or_else(|| panic!("the shipped quest record {id}"))
-}
-
-/// The quest with its card, end text and payout (coins, Kart Driver XP) read from
-/// the shipped record, never pinned here.
-fn quest(id: u32, giver: u64, turnin: u64) -> ZoneQuest {
-    let record = record(id);
-    let (coins, xp) = record.reward_totals(KART);
-    ZoneQuest {
-        id,
-        giver,
-        card: [
-            u32::try_from(record.title_string_id).expect("title id fits u32"),
-            record.intro_text_string_id,
-            record.description_string_id,
-        ],
-        steps: &[],
-        turnin,
-        end_text: record.end_text_string_id,
-        coins,
-        xp,
-    }
-}
-
 fn challenge() -> ZoneQuest {
-    quest(TR, LINX, TR_WALKER)
+    ZoneQuest::from_record(shipped_quest(TR), LINX, TR_WALKER, KART)
 }
 
 fn sponsorship() -> ZoneQuest {
-    quest(LEAGUE, BLAMMO, BLAMMO)
+    ZoneQuest::from_record(shipped_quest(LEAGUE), BLAMMO, BLAMMO, KART)
 }
 
 #[test]
@@ -110,7 +75,10 @@ fn challenging_tr_is_offered_by_linx_and_paid_once() {
     let (coins_before, xp_before) = (coins(&game), profile_xp(&game, KART));
     MAP.accept(&mut game, CHARACTER, &quest, &mut now);
     assert_eq!(counts(&game, TR), [0]);
-    assert_eq!(record(TR).objectives[0]["npc_id"].as_u64(), Some(TR_WALKER));
+    assert_eq!(
+        shipped_quest(TR).objectives[0]["npc_id"].as_u64(),
+        Some(TR_WALKER)
+    );
 
     // T.R. has no hand-in before the challenge is spoken.
     assert_packet_changes_nothing(
@@ -125,7 +93,7 @@ fn challenging_tr_is_offered_by_linx_and_paid_once() {
     assert_eq!(counts(&game, TR), [1]);
     assert_eq!(quest_status(&game, TR), QuestStatus::Completed);
     assert_eq!(coins(&game), coins_before + quest.coins);
-    assert_eq!(profile_xp(&game, KART), xp_before + quest.xp);
+    assert_eq!(profile_xp(&game, KART), xp_before + quest.profile_xp);
 
     assert_packet_changes_nothing(
         &mut game,
@@ -160,7 +128,7 @@ fn exploders_league_sponsorship_is_offered_and_paid_once() {
     assert_eq!(counts(&game, LEAGUE), [1]);
     assert_eq!(quest_status(&game, LEAGUE), QuestStatus::Completed);
     assert_eq!(coins(&game), coins_before + quest.coins);
-    assert_eq!(profile_xp(&game, KART), xp_before + quest.xp);
+    assert_eq!(profile_xp(&game, KART), xp_before + quest.profile_xp);
 
     assert_packet_changes_nothing(
         &mut game,
@@ -271,7 +239,7 @@ fn progress_survives_reconnect_and_players_are_independent() {
         TR,
         KART,
         challenge.coins,
-        challenge.xp,
+        challenge.profile_xp,
         now + 4,
     );
     now += 10;
@@ -303,7 +271,7 @@ fn shipped_records_keep_the_checked_objectives_and_payouts() {
         (LEAGUE, BLAMMO, BLAMMO, 394_484, 394_486, 394_485),
     ];
     for (quest, giver, target, title, intro, description) in checked {
-        let record = record(quest);
+        let record = shipped_quest(quest);
         assert!(record.enabled, "quest {quest} is enabled");
         assert_eq!(record.job, Some(KART));
         assert_eq!(record.giver_npc_id, giver);
@@ -339,7 +307,7 @@ fn shipped_records_keep_the_checked_objectives_and_payouts() {
         );
     }
     for disabled in [3_080_004, 3_080_011, 3_080_012] {
-        let record = record(disabled);
+        let record = shipped_quest(disabled);
         assert!(
             !record.enabled && record.objectives.is_empty(),
             "quest {disabled} waits on a race id no server path emits"

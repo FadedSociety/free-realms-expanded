@@ -54,6 +54,7 @@ const LITTLE_BROTHER: ZoneQuest = ZoneQuest {
     end_text: 73_239,
     coins: 20,
     xp: 20,
+    profile_xp: 20,
 };
 const LAVENDER: ZoneQuest = ZoneQuest {
     id: 3_000_310,
@@ -64,6 +65,7 @@ const LAVENDER: ZoneQuest = ZoneQuest {
     end_text: 390_789,
     coins: 36,
     xp: 30,
+    profile_xp: 30,
 };
 const SOURCE: ZoneQuest = ZoneQuest {
     id: 3_000_311,
@@ -74,6 +76,7 @@ const SOURCE: ZoneQuest = ZoneQuest {
     end_text: 390_847,
     coins: 24,
     xp: 20,
+    profile_xp: 20,
 };
 
 #[test]

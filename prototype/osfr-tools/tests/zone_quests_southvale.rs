@@ -8,14 +8,15 @@
 //! decoded with the production reader), the 49/2 accept, the `job_level` goal
 //! (T361, completed by a real `realm level`), the Talk that holds the 49/13, the
 //! 26/6 that releases it and the 49/14 turn-in. The quest records, cards, end
-//! texts and payouts come from `tests/support/quest_records.rs`, so the reward sum
-//! is the loader's (every row, the Miner profile's XP), not one row's. The only
-//! pinned values are the two level gates the client text names.
+//! texts and payouts come from `tests/support/quest_records.rs` through
+//! `ZoneQuest::from_record`: the 49/13 coin word and star total are the record's,
+//! and the Miner's share is what the grant credits. The only pinned values are the
+//! two level gates the client text names.
 //!
 //! Client readers (IDA, 2014 client; no new wire): 49/1 `0x00c7b7a0`, 49/2
 //! `0x00a86400`, 49/13 `QuestEndPacket::ReadFields` `0x00c7b990` (actor `6..14`,
 //! quest `14..18`, end text `18..22`, one dword, then the reward bundle
-//! `0x008e7930`), 49/14 `0x00a864c0`.
+//! `0x008e7930`: bool at `26`, coins `27..31`, stars `31..35`), 49/14 `0x00a864c0`.
 
 #[path = "support/npc_quest_chain.rs"]
 mod npc_quest_chain;
@@ -24,12 +25,13 @@ mod quest_records;
 
 use npc_quest_chain::{
     ADVENTURER, CHARACTER, Fixture, ZoneQuest, ZoneQuests, assert_no_offer,
-    assert_packet_changes_nothing, coins, content_dir, counts, objective_complete, pending_turnin,
-    profile_xp, quest_end_reply, quest_reply, quest_status, realm_level, talk, zone_player,
+    assert_packet_changes_nothing, coins, counts, objective_complete, pending_turnin, profile_xp,
+    quest_end_reply, quest_reply, quest_status, read_json, realm_level, talk, zone_player,
+    zone_player_unlocked,
 };
 use osfr_tools::quest_engine::QuestStatus;
-use quest_records::{RawQuest, as_u32, read_quests};
-use std::sync::OnceLock;
+use quest_records::{as_u32, find_quest, read_quests, shipped_quest};
+use serde_json::json;
 
 const DERP: u64 = 9_000_000_069;
 const MILI: u64 = 9_000_000_405;
@@ -57,51 +59,17 @@ const MAP: ZoneQuests = ZoneQuests {
     runtime: &[],
 };
 
-/// The shipped quest records, read once through the shared record reader.
-fn shipped_quests() -> &'static [RawQuest] {
-    static RECORDS: OnceLock<Vec<RawQuest>> = OnceLock::new();
-    RECORDS.get_or_init(|| read_quests(&content_dir()))
-}
-
-fn record(id: u32) -> &'static RawQuest {
-    shipped_quests()
-        .iter()
-        .find(|quest| quest.id == id)
-        .unwrap_or_else(|| panic!("the shipped quest record {id}"))
-}
-
-/// The quest with its card, end text and payout read from the shipped record.
-fn quest(id: u32, giver: u64, turnin: u64) -> ZoneQuest {
-    let shipped = record(id);
-    let (coins, xp) = shipped.reward_totals(MINER);
-    assert!(coins > 0, "quest {id} has a real payout");
-    ZoneQuest {
-        id,
-        giver,
-        card: [
-            u32::try_from(shipped.title_string_id).expect("quest title id fits u32"),
-            shipped.intro_text_string_id,
-            shipped.description_string_id,
-        ],
-        steps: &[],
-        turnin,
-        end_text: shipped.end_text_string_id,
-        coins,
-        xp,
-    }
-}
-
 #[test]
 fn a_miner_walks_the_level_ten_gate_then_finds_mili_and_is_paid_once_each() {
     let fixture = Fixture::new();
     let mut game = zone_player(&fixture, CHARACTER, MINER);
-    let level_ten = quest(LEVEL_TEN, DERP, DERP);
-    let southvale = quest(SOUTHVALE, DERP, MILI);
+    let level_ten = ZoneQuest::from_record(shipped_quest(LEVEL_TEN), DERP, DERP, MINER);
+    let southvale = ZoneQuest::from_record(shipped_quest(SOUTHVALE), DERP, MILI, MINER);
     let (derp, mili) = (MAP.at(CHARACTER, DERP), MAP.at(CHARACTER, MILI));
     let mut now = 1_000;
 
     assert_eq!(
-        as_u32(&record(LEVEL_TEN).objectives[0]["level"]),
+        as_u32(&shipped_quest(LEVEL_TEN).objectives[0]["level"]),
         Some(LEVEL_TEN_GATE),
         "the shipped level gate is the client text's level 10"
     );
@@ -158,7 +126,7 @@ fn a_miner_walks_the_level_ten_gate_then_finds_mili_and_is_paid_once_each() {
     let (coins_before, xp_before) = (coins(&game), profile_xp(&game, MINER));
     MAP.turn_in(&mut game, CHARACTER, &southvale, MINER, &mut now);
     assert_eq!(coins(&game), coins_before + southvale.coins);
-    assert_eq!(profile_xp(&game, MINER), xp_before + southvale.xp);
+    assert_eq!(profile_xp(&game, MINER), xp_before + southvale.profile_xp);
 
     // Replays and a second offer change nothing.
     now += 100;
@@ -177,13 +145,15 @@ fn a_miner_walks_the_level_ten_gate_then_finds_mili_and_is_paid_once_each() {
 fn grumpore_holds_the_level_fifteen_gate_until_the_rank_is_real() {
     let fixture = Fixture::new();
     let mut game = zone_player(&fixture, CHARACTER, MINER);
-    let level_fifteen = quest(LEVEL_FIFTEEN, GRUMPORE, GRUMPORE);
-    let see_for_yourself = quest(SEE_FOR_YOURSELF, GRUMPORE, SILVERRAY);
+    let level_fifteen =
+        ZoneQuest::from_record(shipped_quest(LEVEL_FIFTEEN), GRUMPORE, GRUMPORE, MINER);
+    let see_for_yourself =
+        ZoneQuest::from_record(shipped_quest(SEE_FOR_YOURSELF), GRUMPORE, SILVERRAY, MINER);
     let grumpore = MAP.at(CHARACTER, GRUMPORE);
     let mut now = 1_000;
 
     assert_eq!(
-        as_u32(&record(LEVEL_FIFTEEN).objectives[0]["level"]),
+        as_u32(&shipped_quest(LEVEL_FIFTEEN).objectives[0]["level"]),
         Some(LEVEL_FIFTEEN_GATE),
         "the shipped level gate is the client text's level 15"
     );
@@ -245,7 +215,10 @@ fn grumpore_holds_the_level_fifteen_gate_until_the_rank_is_real() {
     let (coins_before, xp_before) = (coins(&game), profile_xp(&game, MINER));
     MAP.turn_in(&mut game, CHARACTER, &see_for_yourself, MINER, &mut now);
     assert_eq!(coins(&game), coins_before + see_for_yourself.coins);
-    assert_eq!(profile_xp(&game, MINER), xp_before + see_for_yourself.xp);
+    assert_eq!(
+        profile_xp(&game, MINER),
+        xp_before + see_for_yourself.profile_xp
+    );
     assert_eq!(pending_turnin(&game), None);
     now += 100;
     assert_no_offer(
@@ -260,7 +233,18 @@ fn grumpore_holds_the_level_fifteen_gate_until_the_rank_is_real() {
 #[test]
 fn only_the_active_miner_is_offered_the_gates() {
     let fixture = Fixture::new();
-    let mut game = zone_player(&fixture, CHARACTER, ADVENTURER);
+    // Miner is learned but Adventurer is the active job, so the refusal below comes
+    // from the active-job gate and not from a missing job.
+    let mut game = zone_player_unlocked(&fixture, CHARACTER, ADVENTURER, &[ADVENTURER, MINER]);
+    assert!(
+        game.state()
+            .profiles
+            .as_ref()
+            .unwrap()
+            .unlocked
+            .contains(&MINER),
+        "the character learned Miner while Adventurer is active"
+    );
     let mut now = 1_000;
     assert_no_offer(
         &mut game,
@@ -292,7 +276,8 @@ fn progress_survives_a_reconnect_and_players_are_independent() {
     let fixture = Fixture::new();
     let mut game = zone_player(&fixture, CHARACTER, MINER);
     let mut other = zone_player(&fixture, OTHER, MINER);
-    let level_fifteen = quest(LEVEL_FIFTEEN, GRUMPORE, GRUMPORE);
+    let level_fifteen =
+        ZoneQuest::from_record(shipped_quest(LEVEL_FIFTEEN), GRUMPORE, GRUMPORE, MINER);
     let grumpore = MAP.at(CHARACTER, GRUMPORE);
     let mut now = 1_000;
     MAP.accept(&mut game, CHARACTER, &level_fifteen, &mut now);
@@ -331,8 +316,8 @@ fn progress_survives_a_reconnect_and_players_are_independent() {
 fn finding_southvale_reopens_at_mili_after_the_real_save_envelope() {
     let fixture = Fixture::new();
     let mut game = zone_player(&fixture, CHARACTER, MINER);
-    let level_ten = quest(LEVEL_TEN, DERP, DERP);
-    let southvale = quest(SOUTHVALE, DERP, MILI);
+    let level_ten = ZoneQuest::from_record(shipped_quest(LEVEL_TEN), DERP, DERP, MINER);
+    let southvale = ZoneQuest::from_record(shipped_quest(SOUTHVALE), DERP, MILI, MINER);
     let (derp, mili) = (MAP.at(CHARACTER, DERP), MAP.at(CHARACTER, MILI));
     let mut now = 1_000;
 
@@ -355,5 +340,54 @@ fn finding_southvale_reopens_at_mili_after_the_real_save_envelope() {
     now += 10;
     talk(&mut game, &mili, MILI, now);
     MAP.pay_held_turnin(&mut game, CHARACTER, &southvale, MINER, &mut now);
+    assert_eq!(quest_status(&game, SOUTHVALE), QuestStatus::Completed);
+}
+
+/// F761 finding 3: the 49/13 star word is every `job_xp` profile summed, while the
+/// profile named at turn-in is credited only its share. The shipped records pay one
+/// profile, so the test patches its private fixture catalogue (never `data/content`)
+/// to add Adventurer XP to Finding Southvale and drives the real loader, end screen
+/// and grant.
+#[test]
+fn the_star_word_sums_every_profile_and_the_miner_is_paid_only_its_share() {
+    let fixture = Fixture::new();
+    let catalogue = fixture.quest_catalogue();
+    let path = catalogue.join("quests/miner.json");
+    let mut document = read_json(&path);
+    let row = document["records"]
+        .as_array_mut()
+        .expect("the fixture catalogue has quest records")
+        .iter_mut()
+        .find(|row| row["id"].as_u64() == Some(u64::from(SOUTHVALE)))
+        .expect("Finding Southvale is in the shipped catalogue");
+    row["rewards"][0]["job_xp"] = json!({"14": 15, "1": 5});
+    std::fs::write(&path, serde_json::to_vec(&document).unwrap())
+        .expect("the private catalogue writes");
+
+    let mut game = zone_player_unlocked(&fixture, CHARACTER, MINER, &[ADVENTURER, MINER]);
+    let patched = read_quests(&catalogue);
+    let level_ten = ZoneQuest::from_record(find_quest(&patched, LEVEL_TEN), DERP, DERP, MINER);
+    let southvale = ZoneQuest::from_record(find_quest(&patched, SOUTHVALE), DERP, MILI, MINER);
+    assert_eq!(
+        (southvale.coins, southvale.xp, southvale.profile_xp),
+        (5, 20, 15),
+        "5 coins, a 20-star total and the Miner's 15 XP share"
+    );
+    let mut now = 1_000;
+
+    MAP.accept(&mut game, CHARACTER, &level_ten, &mut now);
+    let derp = MAP.at(CHARACTER, DERP);
+    realm_level(&mut game, &derp, LEVEL_TEN_GATE, now);
+    now += 10;
+    MAP.turn_in(&mut game, CHARACTER, &level_ten, MINER, &mut now);
+    let adventurer_before = profile_xp(&game, ADVENTURER);
+
+    MAP.accept(&mut game, CHARACTER, &southvale, &mut now);
+    MAP.turn_in(&mut game, CHARACTER, &southvale, MINER, &mut now);
+    assert_eq!(
+        profile_xp(&game, ADVENTURER),
+        adventurer_before + 5,
+        "the same grant pays the other profile its share"
+    );
     assert_eq!(quest_status(&game, SOUTHVALE), QuestStatus::Completed);
 }

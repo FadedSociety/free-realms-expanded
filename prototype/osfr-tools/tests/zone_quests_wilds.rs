@@ -57,6 +57,7 @@ const WHO_DONE_IT: ZoneQuest = ZoneQuest {
     end_text: 389_953,
     coins: 5,
     xp: 30,
+    profile_xp: 30,
 };
 const AMENDS: ZoneQuest = ZoneQuest {
     id: 3_000_333,
@@ -67,6 +68,7 @@ const AMENDS: ZoneQuest = ZoneQuest {
     end_text: 2_134,
     coins: 2,
     xp: 20,
+    profile_xp: 20,
 };
 const LAZY_TROLLS: ZoneQuest = ZoneQuest {
     id: 3_000_340,
@@ -83,6 +85,7 @@ const LAZY_TROLLS: ZoneQuest = ZoneQuest {
     end_text: 9_585,
     coins: 30,
     xp: 30,
+    profile_xp: 30,
 };
 const QUARRY: ZoneQuest = ZoneQuest {
     id: 3_000_341,
@@ -93,6 +96,7 @@ const QUARRY: ZoneQuest = ZoneQuest {
     end_text: 70_105,
     coins: 30,
     xp: 15,
+    profile_xp: 15,
 };
 
 #[test]

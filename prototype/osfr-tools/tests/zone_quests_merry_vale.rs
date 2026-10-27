@@ -64,6 +64,7 @@ const PARTY_POOPER: ZoneQuest = ZoneQuest {
     end_text: 385_599,
     coins: 6,
     xp: 15,
+    profile_xp: 15,
 };
 const SERENITY: ZoneQuest = ZoneQuest {
     id: 3_000_371,
@@ -79,6 +80,7 @@ const SERENITY: ZoneQuest = ZoneQuest {
     end_text: 74_201,
     coins: 30,
     xp: 30,
+    profile_xp: 30,
 };
 const PICKING_PETALS: ZoneQuest = ZoneQuest {
     id: 3_000_375,
@@ -89,6 +91,7 @@ const PICKING_PETALS: ZoneQuest = ZoneQuest {
     end_text: 387_036,
     coins: 10,
     xp: 15,
+    profile_xp: 15,
 };
 const BIRTHDAY_SURPRISES: ZoneQuest = ZoneQuest {
     id: 3_000_376,
@@ -99,6 +102,7 @@ const BIRTHDAY_SURPRISES: ZoneQuest = ZoneQuest {
     end_text: 387_046,
     coins: 24,
     xp: 30,
+    profile_xp: 30,
 };
 const PERFECT_PRESENT: ZoneQuest = ZoneQuest {
     id: 3_000_377,
@@ -109,6 +113,7 @@ const PERFECT_PRESENT: ZoneQuest = ZoneQuest {
     end_text: 387_069,
     coins: 18,
     xp: 30,
+    profile_xp: 30,
 };
 
 #[test]
