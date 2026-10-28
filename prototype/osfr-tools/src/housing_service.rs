@@ -146,12 +146,17 @@ fn facing(rotation: [f32; 4]) -> [f32; 4] {
     ]
 }
 
-/// Client `127/2` body projection, without the family prefix: an uninterpreted selection dword, two
-/// 16-byte transform groups and a final dword. Mapping these groups to this server transform is R.
+/// Client transform projection: two 16-byte groups and a final dword. `127/2` (place) sends an
+/// uninterpreted selection dword before the groups; `127/5` (move, writer `00abf620`) sends the
+/// fixture guid instead. Mapping these groups to this server transform is R.
 #[derive(Clone, Copy, Debug, PartialEq)]
 pub struct WireTransform {
     pub position: [f32; 4],
     pub rotation: [f32; 4],
+    /// `127/2`'s final dword is the placement scale (retail capture `p2.pcap` frame 31494). `127/5`
+    /// puts 0 at the same offset in every real move (`p2.pcap` frames 32782 and 33039; the live
+    /// 2026-10-27 client), so a move is not a rescale: [`HousingService::move_fixture`] keeps the
+    /// placed fixture's scale.
     pub scale: f32,
 }
 
@@ -568,8 +573,9 @@ pub fn decode_request(inner: &[u8]) -> Result<Request, RequestError> {
         });
     }
     if opcode == OP_SAVE {
-        // Client writer FUN_00abf620 emits the fixture key, two four-float groups, scale, then
-        // an opaque nested block. Only the prefix used for transform validation is interpreted.
+        // Client writer FUN_00abf620: fixture key, two four-float groups, then a 24-byte block
+        // whose dword is 0 in every real move (not the 127/2 scale; see `WireTransform::scale`).
+        // Only the transform prefix is interpreted.
         let body = &inner[HEADER_LEN..];
         if body.len() < 44 || body.len() > 64 * 1024 {
             return Err(RequestError::BodyRejected);
@@ -1623,9 +1629,10 @@ impl HousingService {
         }
     }
 
-    /// The typed move command. The recovered `127/5` body carries no fixture identity and no
-    /// proven position, so the wire path cannot call this yet; the gateway/lead supplies the
-    /// resolved fixture guid and transform.
+    /// The typed move command. `127/5` carries the fixture guid and the two transform groups; its
+    /// final dword is not `127/2`'s scale (see [`WireTransform::scale`]), so the placement's scale
+    /// carries over and the position and rotation are applied. The client applies the confirmed
+    /// transform from the `127/51` reply (handler `00ab8dc0`).
     pub fn move_fixture(
         &mut self,
         actor_guid: u64,
@@ -1643,7 +1650,11 @@ impl HousingService {
             .find(|fixture| fixture.fixture_guid == fixture_guid)
             .cloned()
             .ok_or(ServiceError::Housing(HousingError::UnknownFixture))?;
-        let housing_transform = housing_transform(&transform, placed.transform.tint_id)?;
+        let housing_transform = FixtureTransform {
+            // A move never rescales: the real 127/5 dword is 0 (`WireTransform::scale`).
+            scale: placed.transform.scale,
+            ..housing_transform(&transform, placed.transform.tint_id)?
+        };
         let mut staged = self.housing.clone();
         let mut ledger = self.derive_ledger(&lot, stock);
         staged.move_fixture(

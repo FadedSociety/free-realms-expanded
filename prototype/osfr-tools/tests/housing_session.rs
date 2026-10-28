@@ -6,6 +6,8 @@
 //! a relog, and every refusal answered by 127/53. A new Condo comes with its starter kit (L040):
 //! a Chicken in the bag and Basic Square Blocks already standing. Raw inner packets as the client
 //! sends them; no player data.
+#[path = "support/housing_move.rs"]
+mod housing_move;
 #[path = "common/item_catalogue.rs"]
 mod item_catalogue;
 
@@ -16,7 +18,7 @@ use osfr_tools::{
     housing::{FixtureTransform, SavedFixture},
     housing_native::{
         FixtureAsset, FixtureItemList, FixtureRemove, FixtureUpdate, HouseInfo, InstanceData,
-        InstanceList, PlacementDenied, PlayerHousingInstanceInfo, ZoneData,
+        InstanceList, PlacementDenied, PlayerHousingInstanceInfo, PositionUpdate, ZoneData,
     },
     housing_service::{HousingContent, fixture_actor_guid},
     inventory::{InventoryItem, MAX_ITEMS},
@@ -391,7 +393,10 @@ fn leaving_returns_to_the_world_pose() {
     game.handle_in_world(&enter(lot.instance_guid), &character(), 2_000)
         .unwrap();
     let entry = game.initialize_world(&character(), 3_000).unwrap();
-    let spawned: Vec<u64> = actors(&entry.replies).iter().map(|npc| npc.actor_id).collect();
+    let spawned: Vec<u64> = actors(&entry.replies)
+        .iter()
+        .map(|npc| npc.actor_id)
+        .collect();
     assert!(!spawned.is_empty(), "the lot stands its kit");
     // Inside the lot the client reports lot coordinates; the return still uses the entry pose.
     let mut inside = character();
@@ -674,6 +679,92 @@ fn a_standing_block_picks_up_as_one_block_and_the_save_reloads() {
     let relogged = Gameplay::load(&content.0, Some(game.state())).unwrap();
     assert_eq!(owned(&relogged, KIT_BLOCK), [(back, 1)]);
     assert_eq!(standing(&relogged), standing(&game));
+}
+
+/// T847 (native 2026-10-27 23:30Z): the radial's one vertical button (`Housing_Radial_Up`,
+/// `ScriptsBase.lua` `MakeHousingRadialMenu`) enters a mouse-follow vertical mode (`sub_AB2250`
+/// sets edit mode 2; `sub_ABB630` moves from the mouse ray) and commits with 127/5 (`00abf620`).
+/// That frame puts 0 where `127/2` carries the scale, so the old service read scale 0, refused
+/// every move as out of bounds, and the fixture's record stayed at ground: each new vertical drag
+/// started at ground and could only rise. A raised fixture now lowers again through the real
+/// dispatch, the refusal still changes nothing, and the lowered transform survives a relog.
+#[test]
+fn a_raised_fixture_lowers_again_through_the_real_move_path() {
+    let content = Content::with_houses();
+    let mut game = content.game();
+    decorating(&mut game);
+    let block = standing(&game)[0].clone();
+    let guid = block.fixture_guid;
+    let [x, ground, z] = block.transform.position;
+    let rotation = block.transform.rotation;
+
+    let raised = [x, ground + 3.0, z, 1.0];
+    let up = game
+        .handle_in_world(
+            &housing_move::move_frame(guid, raised, rotation),
+            &character(),
+            7_000,
+        )
+        .unwrap();
+    assert!(up.changed, "a move is saved");
+    assert_eq!(housing(&up.replies), [51, 44]);
+    let update = PositionUpdate::decode(reply(&up.replies, 51)).unwrap();
+    assert_eq!(update.actor_guid, fixture_actor_guid(guid));
+    assert_eq!(update.position, raised);
+    assert_eq!(update.orientation, rotation);
+    let saved = standing(&game)
+        .into_iter()
+        .find(|fixture| fixture.fixture_guid == guid)
+        .unwrap();
+    assert_eq!(saved.transform.position, [x, raised[1], z]);
+    assert_eq!(saved.transform.scale, block.transform.scale);
+
+    // The raised fixture comes back down through the same path.
+    let lowered = [x, ground, z, 1.0];
+    let down = game
+        .handle_in_world(
+            &housing_move::move_frame(guid, lowered, rotation),
+            &character(),
+            8_000,
+        )
+        .unwrap();
+    assert!(down.changed, "a lower move is accepted");
+    let update = PositionUpdate::decode(reply(&down.replies, 51)).unwrap();
+    assert_eq!(update.position, lowered);
+    let saved = standing(&game)
+        .into_iter()
+        .find(|fixture| fixture.fixture_guid == guid)
+        .unwrap();
+    assert_eq!(saved.transform.position, [x, ground, z]);
+
+    // A refused move (outside the lot's build area) changes nothing: no lot write, no reply.
+    let before = serde_json::to_vec(&game.state()).unwrap();
+    let refused = game
+        .handle_in_world(
+            &housing_move::move_frame(guid, [900.0, ground, z, 1.0], rotation),
+            &character(),
+            9_000,
+        )
+        .unwrap();
+    assert!(!refused.changed);
+    assert!(
+        housing(&refused.replies).is_empty(),
+        "a move refusal is a chat line, not a 127 reply"
+    );
+    assert_eq!(
+        serde_json::to_vec(&game.state()).unwrap(),
+        before,
+        "a refused move changes nothing"
+    );
+
+    // The saved lot holds the lowered transform, not an old snapshot.
+    let relogged = Gameplay::load(&content.0, Some(game.state())).unwrap();
+    let saved = standing(&relogged)
+        .into_iter()
+        .find(|fixture| fixture.fixture_guid == guid)
+        .unwrap();
+    assert_eq!(saved.transform.position, [x, ground, z]);
+    assert_eq!(saved.transform.scale, block.transform.scale);
 }
 
 /// One single unit of `definition_id` under item id `id`, as a save holds it.

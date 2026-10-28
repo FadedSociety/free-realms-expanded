@@ -8,6 +8,9 @@
 //!
 //! This target imports the registered housing service and its shared crate types.
 
+#[path = "support/housing_move.rs"]
+mod housing_move;
+
 use osfr_tools::{housing, housing_native, housing_service, inventory, zone_transition};
 
 use housing::{
@@ -152,7 +155,8 @@ fn preview_frame(item_definition_id: u32) -> Vec<u8> {
     bytes
 }
 
-/// The recovered `127/5` prefix: fixture guid, two four-float groups and scale. The rest is opaque.
+/// A legacy test move frame: fixture guid, two four-float groups and a 1.0 dword (the `127/2`
+/// placement shape). A real move sends 0 there; use `housing_move::move_frame` for that shape.
 fn save_frame(fixture_guid: u64) -> Vec<u8> {
     let mut bytes = BASE_OPCODE.to_le_bytes().to_vec();
     bytes.extend_from_slice(&5u16.to_le_bytes());
@@ -163,6 +167,19 @@ fn save_frame(fixture_guid: u64) -> Vec<u8> {
     bytes.extend_from_slice(&0u32.to_le_bytes());
     bytes
 }
+
+/// The live client's `127/5` body, byte for byte from the community-preserved client capture
+/// `p2.pcap` (frame 32782; `lab/references/OpenSourceFreeRealms/ofrserver/Packets/p2.pcap`, sha256
+/// `65ac0801bf49fa9af4ee0bc95568b751392ec4d594fe6ac4e89605f9ee0d0108`). After the two transform
+/// groups the client sends a zero dword (where `127/2` carries the placement scale) and a 24-byte
+/// tail whose last float is 1.0.
+const RETAIL_MOVE: [u8; 72] = [
+    0x7f, 0x00, 0x05, 0x00, 0x09, 0xc0, 0xf5, 0x7b, 0xa1, 0x4c, 0xf5, 0x07, 0xff, 0xbf, 0xdb, 0x43,
+    0xff, 0xc7, 0xe2, 0xbd, 0xff, 0x7f, 0xd5, 0x43, 0x00, 0x00, 0x80, 0x3f, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00,
+    0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x80, 0x3f,
+];
 
 fn property() -> PropertyDefinition {
     PropertyDefinition {
@@ -535,6 +552,40 @@ fn decode_request_keeps_the_selection_id_separate_from_the_transform() {
             ..
         })
     ));
+}
+
+/// T847: the live client's `127/5`, byte for byte from the retail capture, decodes to the move's
+/// transform with a zero dword, not the `127/2` placement scale.
+#[test]
+fn a_captured_move_frame_decodes_its_transform_and_zero_dword() {
+    let request = decode_request(&RETAIL_MOVE).unwrap();
+    let Request::Move {
+        fixture_guid,
+        transform,
+    } = request
+    else {
+        panic!("a captured 127/5 is a move: {request:?}");
+    };
+    assert_eq!(fixture_guid, 0x07f5_4ca1_7bf5_c009);
+    assert_eq!(transform.position[0], f32::from_bits(0x43db_bfff));
+    assert_eq!(transform.position[1], f32::from_bits(0xbde2_c7ff));
+    assert_eq!(transform.position[2], f32::from_bits(0x43d5_7fff));
+    assert_eq!(transform.position[3], 1.0);
+    assert_eq!(transform.rotation, [0.0; 4]);
+    assert_eq!(
+        transform.scale, 0.0,
+        "the move dword is not a placement scale"
+    );
+    // The same captured tail in this suite's shape: the scale lane is not read from the frame.
+    let frame = housing_move::move_frame(9, [10.0, 3.0, 20.0, 1.0], ZERO_ROTATION);
+    assert_eq!(frame.len(), RETAIL_MOVE.len());
+    assert_eq!(
+        decode_request(&frame).unwrap(),
+        Request::Move {
+            fixture_guid: 9,
+            transform: block_transform([10.0, 3.0, 20.0, 1.0], ZERO_ROTATION, 0.0),
+        }
+    );
 }
 
 #[test]
@@ -1127,6 +1178,55 @@ fn a_typed_move_stages_the_transform_and_keeps_the_item_placed() {
         service.lot(HOUSE).unwrap().fixtures[0].transform.position,
         [11.0, 0.0, 21.0]
     );
+}
+
+/// T847: the live client's move dword is 0 where `127/2` carries the scale. The service must keep
+/// the placed fixture's scale (a 0 scale is out of bounds), so a real frame moves the fixture and
+/// the same fixture can then be lowered again.
+#[test]
+fn a_real_move_frame_with_its_zero_dword_moves_and_keeps_the_placed_scale() {
+    let content = Content::new(vec![item(INSTANCE as i32, BLOCK_ITEM, 1)], &[BLOCK_ITEM]);
+    let mut inventory = content.inventory();
+    let mut service = service_with_lot();
+    enter(&mut service, &mut inventory);
+    place(&mut service, &mut inventory);
+    let guid = placed_guid(&service);
+
+    let raised = [11.0, 5.0, 21.0, 1.0];
+    let up = service
+        .handle(
+            OWNER,
+            &housing_move::move_frame(guid, raised, ZERO_ROTATION),
+            &mut inventory,
+        )
+        .unwrap();
+    assert!(up.changed);
+    assert_eq!(opcodes(&up), vec![REPLY_POSITION, REPLY_HOUSE_INFO]);
+    let position =
+        housing_native::PositionUpdate::decode(&up.replies[0].encode().unwrap()).unwrap();
+    assert_eq!(position.position, raised);
+    let lot = service.lot(HOUSE).unwrap();
+    assert_eq!(lot.fixtures[0].transform.position, [11.0, 5.0, 21.0]);
+    assert_eq!(
+        lot.fixtures[0].transform.scale, 1.0,
+        "a move keeps the scale it was placed with"
+    );
+
+    // The raised fixture can come down again through the same path.
+    let lowered = [11.0, 0.0, 21.0, 1.0];
+    let down = service
+        .handle(
+            OWNER,
+            &housing_move::move_frame(guid, lowered, ZERO_ROTATION),
+            &mut inventory,
+        )
+        .unwrap();
+    assert!(down.changed);
+    assert_eq!(
+        service.lot(HOUSE).unwrap().fixtures[0].transform.position,
+        [11.0, 0.0, 21.0]
+    );
+    assert_eq!(units(&inventory, BLOCK_ITEM), 0, "the item stays placed");
 }
 
 /// T826 (native 2026-10-27): every radial-menu action (move, rotate, remove) reached the client's
@@ -2180,7 +2280,10 @@ fn leaving_removes_every_fixture_actor_the_visit_spawned() {
             other => panic!("leaving only removes actors: {other:?}"),
         })
         .collect();
-    assert_eq!(removed, fixtures, "one 35/3 per fixture actor, none left in the world");
+    assert_eq!(
+        removed, fixtures,
+        "one 35/3 per fixture actor, none left in the world"
+    );
 }
 
 #[test]
