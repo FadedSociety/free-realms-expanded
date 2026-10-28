@@ -31,7 +31,7 @@
 //! block of `pets.json` with their provenance.
 
 use super::{
-    ActivePet, PetService, PetWire, SourceTag, decayed, idle::PetAnimation, pet_mut,
+    ActivePet, PetModel, PetService, PetWire, SourceTag, decayed, idle::PetAnimation, pet_mut,
     pet_removal_packet,
 };
 use crate::{
@@ -80,6 +80,10 @@ struct TreasureTier {
     name_id: i32,
     /// The ADR texture alias (`Default1` to `Default3`).
     texture_alias: String,
+    /// T828: the actor composite effect the chest spawns with, so the find is visible even when the
+    /// pet's model declares no animation. The client's chest-reward sparkles: 5595 small, 5596
+    /// medium, 5597 large (`ActorCompositeEffectDefinitions.xml`).
+    effect_id: i32,
     coins: u32,
     items: Vec<TreasureItem>,
 }
@@ -92,6 +96,7 @@ impl TreasureTier {
             && self.name_id > 0
             && !self.texture_alias.is_empty()
             && self.texture_alias.len() <= 64
+            && (1..=100_000).contains(&self.effect_id)
             && self.coins <= MAX_COINS
             && self.items.len() <= MAX_ROWS
             && (self.coins > 0 || !self.items.is_empty())
@@ -294,8 +299,9 @@ impl PetService {
     /// `busy` the caller's start-activity gate (the one `open_treasure`'s caller refuses with, so
     /// the hunt cannot produce a chest the owner may not open). Only the moment the chest appears
     /// marks a save (the cooldown). Costs a few comparisons and up to two linear scans of the
-    /// model rows (vanity, and the ADR's `digs` when an animation plays) per settled tick;
-    /// nothing is rolled or allocated unless a timer is due.
+    /// model rows (vanity, and the ADR's `digs` when an animation plays) per settled tick, plus
+    /// one more only when a chest appears (T828's find animation); nothing is rolled or allocated
+    /// unless a timer is due.
     pub fn treasure_tick(
         &mut self,
         busy: bool,
@@ -352,6 +358,9 @@ impl PetService {
                     {
                         wire.private.push(spawn);
                         wire.changed = true;
+                        // T828: the chest's sparkle rides the spawn; a pet without the hunt slots
+                        // also plays one of its own animations, so its find is visible too.
+                        self.animate_find(&active, &mut wire);
                     }
                     Hunt::Idle
                 }
@@ -416,6 +425,24 @@ impl PetService {
             wire.private.push(packet.clone());
             wire.shared.push(packet);
         }
+    }
+
+    /// T828: a pet whose model has no sniff or dig slot still shows its find: one of its own
+    /// declared animations (the first trick animation, else the first idle one) plays for the
+    /// owner and the viewers as the chest appears. A model with neither keeps the chest's
+    /// composite effect as its only sign.
+    fn animate_find(&self, active: &ActivePet, wire: &mut PetWire) {
+        let Some(animation) = self
+            .pet(active.pet_id)
+            .and_then(|pet| self.content.model(self.content.model_id(&pet.model)))
+            .filter(|model| !model.digs)
+            .and_then(PetModel::find_animation_id)
+        else {
+            return;
+        };
+        let packet = piece_052::animation_packet(active.actor_guid, animation, false);
+        wire.private.push(packet.clone());
+        wire.shared.push(packet);
     }
 
     /// The chest appears: roll the tier and the prize, start the pet's cooldown, keep the chest.
@@ -539,7 +566,8 @@ fn chest_position(
 }
 
 /// The chest's AddNpc (35/2, reader `00921a10`) for the owner alone: the tier's name and texture,
-/// clickable, with the open range as the X-prompt radius.
+/// clickable, with the open range as the X-prompt radius, and (T828) the tier's reward sparkle
+/// attached so the find is visible even when the pet has no animation to play.
 fn spawn_packet(
     guid: u64,
     tier: &TreasureTier,
@@ -551,6 +579,7 @@ fn spawn_packet(
         name_string_id: tier.name_id,
         model_id: config.chest_model_id,
         texture_alias: tier.texture_alias.clone(),
+        composite_effect_id: tier.effect_id,
         position: [position[0], position[1], position[2], 1.0],
         rotation: [0.0, 0.0, 1.0, 0.0],
         is_interactable: 1,

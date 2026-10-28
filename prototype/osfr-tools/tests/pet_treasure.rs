@@ -281,21 +281,28 @@ fn a_happy_settled_dog_sniffs_digs_and_unearths_a_chest_for_its_owner_alone() {
     let sniff_ms = treasure()["sniff"]["duration_ms"].as_u64().unwrap();
     let dig_ms = treasure()["dig"]["duration_ms"].as_u64().unwrap();
     let (find_min, find_max) = (rule("find_min_ms"), rule("find_max_ms"));
+    // T828: a digging pet keeps its own sniff and dig, never the generic find animation.
+    let dog_find = PetContent::bundled()
+        .unwrap()
+        .model(364)
+        .unwrap()
+        .find_animation_id()
+        .unwrap();
     for seed in SEEDS {
         let mut dog = Dig::dog(seed);
         let seen = dog.run(find_max + sniff_ms + dig_ms + 15_000);
         let chest = seen.iter().position(|tick| tick.chest().is_some()).unwrap();
         let spawn = seen[chest].chest().unwrap();
         // Sniff then dig, in that order, for the owner and the viewers alike.
-        let animations: Vec<(u64, i32)> = seen
+        let hunt: Vec<(u64, i32)> = seen
             .iter()
             .flat_map(|tick| slots(&tick.private).into_iter().map(|slot| (tick.at, slot)))
             .collect();
-        let slot_ids: Vec<i32> = animations.iter().map(|(_, slot)| *slot).collect();
+        let slot_ids: Vec<i32> = hunt.iter().map(|(_, slot)| *slot).collect();
         assert_eq!(slot_ids, [SNIFF, DIG], "seed {seed}");
         let shared: Vec<i32> = seen.iter().flat_map(|tick| slots(&tick.shared)).collect();
         assert_eq!(shared, [SNIFF, DIG], "the viewers see the dig, seed {seed}");
-        let (sniff_at, dig_at) = (animations[0].0, animations[1].0);
+        let (sniff_at, dig_at) = (hunt[0].0, hunt[1].0);
         assert!(
             (sniff_ms..sniff_ms + TICK).contains(&(dig_at - sniff_at)),
             "seed {seed}: sniff at {sniff_at}, dig at {dig_at}"
@@ -321,6 +328,10 @@ fn a_happy_settled_dog_sniffs_digs_and_unearths_a_chest_for_its_owner_alone() {
             seen.iter().filter(|tick| tick.changed).count() == 1,
             "only the find marks a save"
         );
+        assert!(
+            !animations(&seen[chest].private, dog.actor).contains(&dog_find),
+            "a digging pet plays no generic find animation"
+        );
         // The owner alone gets the chest: never a viewer, never a packet for any model-151 actor.
         for tick in &seen {
             assert!(
@@ -338,6 +349,11 @@ fn a_happy_settled_dog_sniffs_digs_and_unearths_a_chest_for_its_owner_alone() {
         // What the client is told: the tier's name and texture, clickable, a unique guid.
         let tier = tier_of(&spawn);
         assert_eq!(spawn.texture_alias, tier["texture_alias"].as_str().unwrap());
+        assert_eq!(
+            spawn.composite_effect_id,
+            tier["effect_id"].as_i64().unwrap() as i32,
+            "T828: the chest carries the tier's reward sparkle"
+        );
         assert_eq!(spawn.is_interactable, 1);
         assert_eq!(spawn.model_id, CHEST_MODEL);
         assert_eq!(
@@ -364,17 +380,61 @@ fn a_happy_settled_dog_sniffs_digs_and_unearths_a_chest_for_its_owner_alone() {
 
 #[test]
 fn a_pet_whose_model_declares_no_dig_hunts_without_the_animations() {
-    // The importer marks the models whose ADR declares both slots; a cat's does not.
+    // The importer marks the models whose ADR declares both slots; a cat's does not, so it never
+    // plays sniff/dig. T828: it still shows the find, playing its first declared trick animation
+    // as the chest appears.
     let content = PetContent::bundled().unwrap();
-    assert!(content.model(364).unwrap().digs && !content.model(CAT).unwrap().digs);
+    let cat_model = content.model(CAT).unwrap();
+    assert!(!cat_model.digs);
+    let find = cat_model.find_animation_id().unwrap();
+    assert_eq!(find, 5004, "the cat's first PetTricks animation row");
     let (service, pet) = model_pet(content, CAT);
     let mut cat = Dig::new(service, pet, 3, START);
     let seen = cat.run(90_000);
+    let found = seen.iter().position(|tick| tick.chest().is_some()).unwrap();
     assert_eq!(seen.iter().filter(|tick| tick.chest().is_some()).count(), 1);
     assert!(
         seen.iter()
             .all(|tick| slots(&tick.private).is_empty() && slots(&tick.shared).is_empty()),
         "no hunt animation without the slots"
+    );
+    assert!(
+        animations(&seen[found].private, cat.actor).contains(&find),
+        "the owner sees the find"
+    );
+    assert!(
+        animations(&seen[found].shared, cat.actor).contains(&find),
+        "the viewers see the find"
+    );
+    let spawn = seen[found].chest().unwrap();
+    let tier = tier_of(&spawn);
+    assert_eq!(
+        spawn.composite_effect_id,
+        tier["effect_id"].as_i64().unwrap() as i32
+    );
+}
+
+#[test]
+fn a_pet_with_no_declared_animation_finds_by_the_chests_effect_alone() {
+    // The sparkle is the one sign every model can show; a model with no animation row at all
+    // still gets it.
+    let content = content_with(|document| {
+        let model = model_row(document, i64::from(CAT));
+        let model = model.as_object_mut().unwrap();
+        model.remove("idle");
+        model.remove("trick_animations");
+    });
+    assert!(content.model(CAT).unwrap().find_animation_id().is_none());
+    let (service, pet) = model_pet(content, CAT);
+    let mut cat = Dig::new(service, pet, 3, START);
+    let seen = cat.run(90_000);
+    let found = seen.iter().position(|tick| tick.chest().is_some()).unwrap();
+    assert!(animations(&seen[found].private, cat.actor).is_empty());
+    assert!(animations(&seen[found].shared, cat.actor).is_empty());
+    let spawn = seen[found].chest().unwrap();
+    assert!(
+        spawn.composite_effect_id > 0,
+        "the chest itself marks the find"
     );
 }
 
@@ -1010,6 +1070,14 @@ fn bad_treasure_content_is_refused_at_load() {
             Box::new(|t| t["tiers"][0]["texture_alias"] = json!("")),
         ),
         (
+            "a chest effect of 0",
+            Box::new(|t| t["tiers"][0]["effect_id"] = json!(0)),
+        ),
+        (
+            "a chest effect over the sanity bound",
+            Box::new(|t| t["tiers"][0]["effect_id"] = json!(100_001)),
+        ),
+        (
             "a tier paying nothing",
             Box::new(|t| {
                 t["tiers"][0]["coins"] = json!(0);
@@ -1096,6 +1164,10 @@ fn bad_treasure_content_is_refused_at_load() {
                 t["find_max_ms"] = json!(1_000);
             }),
         ),
+        (
+            "another chest sparkle",
+            Box::new(|t| t["tiers"][0]["effect_id"] = json!(5596)),
+        ),
     ] {
         assert!(
             loads(|document| edit(&mut document["treasure"])).is_ok(),
@@ -1133,6 +1205,20 @@ fn every_reward_item_is_in_the_client_catalogue() {
         .collect();
     assert!(undefined.is_empty(), "paid but undefined: {undefined:?}");
     assert_eq!(table["tiers"].as_array().unwrap().len(), 3);
+}
+
+/// T828: the shipped tier effects are the client's chest-reward sparkles
+/// (`ActorCompositeEffectDefinitions.xml`: 5595 small, 5596 medium, 5597 large), so a find is
+/// visible with no pet animation.
+#[test]
+fn the_tier_effects_are_the_clients_chest_reward_sparkles() {
+    let ids: Vec<i64> = treasure()["tiers"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|tier| tier["effect_id"].as_i64().unwrap())
+        .collect();
+    assert_eq!(ids, [5595, 5596, 5597]);
 }
 
 // ---- Gameplay ----

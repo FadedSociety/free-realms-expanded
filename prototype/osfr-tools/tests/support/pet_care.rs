@@ -202,6 +202,21 @@ pub fn statuses(packets: &[Vec<u8>]) -> Vec<&Vec<u8>> {
         .collect()
 }
 
+/// T828: the 35/8 animation slots a packet list plays on `actor` (u16 35, u16 8, u64 guid, i32
+/// slot, i32 0, u8 flag; native reader `00908a50`).
+pub fn animations(packets: &[Vec<u8>], actor: u64) -> Vec<i32> {
+    packets
+        .iter()
+        .filter(|packet| packet.starts_with(&[35, 0, 8, 0]))
+        .map(|packet| {
+            assert_eq!(packet.len(), 21, "one animation frame");
+            packet
+        })
+        .filter(|packet| u64::from_le_bytes(packet[4..12].try_into().unwrap()) == actor)
+        .map(|packet| u32_at(packet, 12) as i32)
+        .collect()
+}
+
 pub fn count(fixture: &InventoryFixture, item: i32) -> u32 {
     fixture
         .inventory

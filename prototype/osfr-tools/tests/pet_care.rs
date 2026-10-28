@@ -18,6 +18,11 @@ use pet_wire::{feed, summon, water};
 
 /// Crab, a vanity Pet Pal (T454).
 const CRAB_ITEM: i32 = 7885;
+/// T828: AnimationTypes.xml line 1590, `pet_feed` (the pet one-shot block, type 4); the shipped
+/// `care.feed_animation`.
+const EAT: i32 = 5507;
+/// T828 (R): the one line a feed that ate sends its owner.
+const FEED_DONE: &str = "Your pet has finished eating.";
 
 /// A summoned dog with the bowl and food fitted.
 fn ready_to_feed() -> (PetService, InventoryFixture, u32) {
@@ -144,9 +149,10 @@ fn a_feed_begins_applies_one_food_once_and_ends() {
     let (mut service, mut fixture, pet) = ready_to_feed();
     let before = service.pet(pet).unwrap().needs.food;
     let wire = send(&mut service, &mut fixture, &feed(pet), T0 + 1_000);
-    assert_eq!(wire.private.len(), 1);
+    assert_eq!(wire.private.len(), 1, "the 53/20 begin only");
     assert_eq!(notify_kinds(&wire.private), vec![1]);
     assert!(!wire.changed, "starting a feed spends nothing");
+    assert_eq!(wire.notice, None, "starting is not completing");
 
     let early = service.care_tick(&mut fixture.inventory, T0 + 1_500);
     assert!(!early.changed);
@@ -185,17 +191,94 @@ fn feeding_without_a_bowl_only_unlocks_and_spends_nothing() {
     send(&mut service, &mut fixture, &fit(pet, 6, FOOD_ITEM), T0);
     send(&mut service, &mut fixture, &summon(pet), T0);
     let roster = service.document_value();
+    let inventory = fixture.inventory.state().clone();
     let wire = send(&mut service, &mut fixture, &feed(pet), T0 + 1_000);
     assert_eq!(
         wire.private,
         vec![words(&[53, 0, 20], &[pet, 6, 0, 0, 0, 0])]
     );
     assert!(!wire.changed);
+    assert_eq!(wire.notice, None, "a refused feed never announces a meal");
+    assert!(
+        wire.shared.is_empty(),
+        "a refused feed shows the viewers nothing"
+    );
+    assert!(
+        animations(&wire.private, PetService::pet_guid(OWNER)).is_empty(),
+        "and plays no eat animation"
+    );
     for at in [T0 + 2_000, T0 + 8_000] {
         assert!(!service.care_tick(&mut fixture.inventory, at).changed);
     }
     assert_eq!(count(&fixture, FOOD_ITEM), 2);
     assert_eq!(service.document_value(), roster);
+    assert_eq!(fixture.inventory.state(), &inventory, "nothing was fitted");
+}
+
+#[test]
+fn a_feed_plays_the_eat_animation_for_the_owner_and_the_viewers() {
+    assert_eq!(pets_json()["care"]["feed_animation"], EAT);
+    let (mut service, mut fixture, pet) = ready_to_feed();
+    let actor = PetService::pet_guid(OWNER);
+    let eat = osfr_tools::world_events::piece_052::animation_packet(actor, EAT, false);
+    let started = send(&mut service, &mut fixture, &feed(pet), T0 + 1_000);
+    assert_eq!(started.private, vec![notify(pet, 1, 0)], "the begin only");
+    assert!(started.shared.is_empty(), "nothing plays yet");
+    // T797/T828: the apply plays the one eat animation for the owner and the viewers, and says
+    // the feed's one completion line to the owner (the client's 53/20 kind 2 only unlocks).
+    let applied = service.care_tick(&mut fixture.inventory, T0 + 2_000);
+    assert_eq!(animations(&applied.private, actor), vec![EAT]);
+    assert_eq!(applied.shared, vec![eat], "the viewers see the pet eat");
+    assert_eq!(
+        applied
+            .private
+            .iter()
+            .filter(|packet| packet.starts_with(&[35, 0, 8]))
+            .count(),
+        1,
+        "one eat animation"
+    );
+    assert_eq!(applied.notice, Some(FEED_DONE), "the owner is told it ate");
+    // The end only unlocks the panel: no second animation and no second line.
+    let ended = service.care_tick(&mut fixture.inventory, T0 + 7_000);
+    assert_eq!(notify_kinds(&ended.private), vec![2]);
+    assert!(
+        animations(&ended.private, actor).is_empty(),
+        "the eat plays once"
+    );
+    assert!(ended.shared.is_empty());
+    assert_eq!(ended.notice, None, "the completion is said once");
+}
+
+#[test]
+fn a_feed_announces_the_meal_once_and_a_food_that_left_the_bag_says_nothing() {
+    let (mut service, mut fixture, pet) = ready_to_feed();
+    let started = send(&mut service, &mut fixture, &feed(pet), T0 + 1_000);
+    assert_eq!(started.notice, None, "starting is not completing");
+    let applied = service.care_tick(&mut fixture.inventory, T0 + 2_000);
+    assert!(applied.changed);
+    assert_eq!(applied.notice, Some(FEED_DONE));
+    assert_eq!(count(&fixture, FOOD_ITEM), 1, "exactly one food is eaten");
+    let after = service.care_tick(&mut fixture.inventory, T0 + 3_000);
+    assert_eq!(after.notice, None, "the completion is said once");
+
+    // A food that left the bag before the apply step consumes nothing, so it is not a meal and
+    // the feed says nothing when it ends.
+    let (mut service, mut fixture, pet) = ready_to_feed();
+    let before = service.pet(pet).unwrap().needs.food;
+    send(&mut service, &mut fixture, &feed(pet), T0 + 1_000);
+    fixture.inventory.consume(FOOD_ITEM, 2).unwrap();
+    let applied = service.care_tick(&mut fixture.inventory, T0 + 2_000);
+    assert!(!applied.changed, "nothing was eaten");
+    assert_eq!(applied.notice, None, "nothing was eaten, nothing is said");
+    assert!(
+        animations(&applied.private, PetService::pet_guid(OWNER)).is_empty(),
+        "no eat animation either"
+    );
+    let ended = service.care_tick(&mut fixture.inventory, T0 + 7_000);
+    assert_eq!(notify_kinds(&ended.private), vec![2]);
+    assert_eq!(ended.notice, None, "the feed still ends silently");
+    assert_eq!(service.pet(pet).unwrap().needs.food, before);
 }
 
 #[test]
@@ -207,6 +290,8 @@ fn in_water_a_feed_is_refused_and_after_leaving_it_works() {
     );
     let wire = send(&mut service, &mut fixture, &feed(pet), T0 + 1_000);
     assert_eq!(notify_kinds(&wire.private), vec![6]);
+    assert_eq!(wire.notice, None, "a refused feed says nothing");
+    assert!(wire.shared.is_empty());
     send(&mut service, &mut fixture, &water(false), T0 + 1_500);
     let wire = send(&mut service, &mut fixture, &feed(pet), T0 + 2_000);
     assert_eq!(notify_kinds(&wire.private), vec![1]);
@@ -218,6 +303,8 @@ fn a_second_feed_during_one_and_a_dismiss_spend_nothing_more() {
     send(&mut service, &mut fixture, &feed(pet), T0 + 1_000);
     let duplicate = send(&mut service, &mut fixture, &feed(pet), T0 + 1_200);
     assert_eq!(notify_kinds(&duplicate.private), vec![6]);
+    assert_eq!(duplicate.notice, None, "a refused feed says nothing");
+    assert!(duplicate.shared.is_empty());
     service.care_tick(&mut fixture.inventory, T0 + 2_000);
     assert_eq!(count(&fixture, FOOD_ITEM), 1, "one feed, one food");
 
@@ -264,6 +351,7 @@ fn adopting_a_pet_during_a_feed_ends_the_feed_without_spending_the_food() {
     // on a re-summon; the client's care panel only unlocks on 53/20 kinds 2, 4 and 6.
     assert_eq!(notify_kinds(&adopted.private), vec![2]);
     assert!(adopted.changed);
+    assert_eq!(adopted.notice, None, "a feed that never ate says nothing");
     assert_eq!(service.active_pet_id(), Some(2), "the adopted pet is out");
     assert!(
         fixture

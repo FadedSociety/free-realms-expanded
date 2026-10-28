@@ -24,7 +24,8 @@ mod pet_wire;
 mod round70_content;
 
 use care::{
-    OWNER, T0, content_dir, fit, lab, locale, notify_kinds, pets_json, send, statuses, words,
+    OWNER, T0, animations, content_dir, fit, lab, locale, notify_kinds, pets_json, send, statuses,
+    words,
 };
 use osfr_tools::{
     inventory::Inventory,
@@ -113,23 +114,6 @@ fn real_kit() -> InventoryFixture {
             (SHAMPOO_DEF, 200, 73),
         ],
     )
-}
-
-/// The guid/animation/flags of every 35/8 animation packet: `u16 35, u16 8, u64 guid,
-/// i32 animation, i32 unknown, u8 flags` (native reader `00908a50`).
-fn animations(packets: &[Vec<u8>]) -> Vec<(u64, i32, u8)> {
-    packets
-        .iter()
-        .filter(|packet| packet.starts_with(&[35, 0, 8, 0]))
-        .map(|packet| {
-            assert_eq!(packet.len(), 21, "one animation frame");
-            (
-                u64::from_le_bytes(packet[4..12].try_into().unwrap()),
-                i32::from_le_bytes(packet[12..16].try_into().unwrap()),
-                packet[20],
-            )
-        })
-        .collect()
 }
 
 #[test]
@@ -352,27 +336,32 @@ fn a_real_bowl_and_real_food_fit_feed_and_play_the_pet_feed_animation() {
     }
     send(&mut service, &mut fixture, &pet_wire::summon(pet), T0);
     let before = service.pet(pet).unwrap().needs.food;
+    let actor = PetService::pet_guid(OWNER);
 
     let started = send(&mut service, &mut fixture, &pet_wire::feed(pet), T0 + 1_000);
     assert_eq!(notify_kinds(&started.private), vec![1]);
     assert!(
-        animations(&started.private).is_empty(),
+        animations(&started.private, actor).is_empty(),
         "the feed has begun only"
     );
 
     let early = service.care_tick(&mut fixture.inventory, T0 + 1_500);
-    assert!(animations(&early.private).is_empty());
+    assert!(animations(&early.private, actor).is_empty());
     assert_eq!(care::count(&fixture, FOOD_INSTANCE), 2);
 
     let applied = service.care_tick(&mut fixture.inventory, T0 + 1_900);
     assert!(applied.changed);
-    let expected = vec![(PetService::pet_guid(OWNER), PET_FEED_ANIMATION, 0)];
+    let expected = vec![PET_FEED_ANIMATION];
     assert_eq!(
-        animations(&applied.private),
+        animations(&applied.private, actor),
         expected,
         "the owner sees the eat"
     );
-    assert_eq!(animations(&applied.shared), expected, "viewers see the eat");
+    assert_eq!(
+        animations(&applied.shared, actor),
+        expected,
+        "viewers see the eat"
+    );
     assert_eq!(care::count(&fixture, FOOD_INSTANCE), 1, "one food is eaten");
     assert_eq!(care::count(&fixture, BOWL_INSTANCE), 1, "the bowl is kept");
     let status = statuses(&applied.private);
@@ -382,7 +371,10 @@ fn a_real_bowl_and_real_food_fit_feed_and_play_the_pet_feed_animation() {
 
     let ended = service.care_tick(&mut fixture.inventory, T0 + 7_000);
     assert_eq!(notify_kinds(&ended.private), vec![2]);
-    assert!(animations(&ended.private).is_empty(), "the eat plays once");
+    assert!(
+        animations(&ended.private, actor).is_empty(),
+        "the eat plays once"
+    );
 }
 
 #[test]
@@ -412,7 +404,7 @@ fn a_non_bowl_in_the_bowl_slot_is_refused_and_changes_nothing() {
     );
     let tick = service.care_tick(&mut fixture.inventory, T0 + 2_000);
     assert!(!tick.changed);
-    assert!(animations(&tick.private).is_empty());
+    assert!(animations(&tick.private, PetService::pet_guid(OWNER)).is_empty());
     assert_eq!(service.document_value(), roster);
     assert_eq!(fixture.inventory.state(), &inventory);
     assert_eq!(care::count(&fixture, FOOD_INSTANCE), 2);

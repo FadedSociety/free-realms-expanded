@@ -57,6 +57,10 @@ const NOTIFY_GROOM_END: u32 = 4;
 const NOTIFY_TRICK: u32 = 5;
 /// T489 (R): sanity bound on a trick's start delay plus its run time, in ms.
 const MAX_TRICK_MS: u32 = 30_000;
+/// T828 (R): the one line a feed that ate sends its owner when the food applies. The client has no
+/// feed-completion locale row and 53/20 kind 2 only unlocks the care panel (`00b5ce60`), so it is a
+/// chat notice.
+const FEED_FINISHED: &str = "Your pet has finished eating.";
 /// T531: the idle seed of a service that never called `set_idle_seed`; each summon mixes its
 /// owner and time into it.
 const IDLE_SEED: u64 = 0x5EED_1D1E;
@@ -246,6 +250,23 @@ impl PetModel {
                 && (1..=MAX_TRICK_MS).contains(&row.duration_ms)
                 && row.start_delay_ms <= MAX_TRICK_MS - row.duration_ms
         })
+    }
+
+    /// T828: the animation a pet without the hunt slots plays when its treasure appears: the first
+    /// trick animation its row carries, else the first idle animation. The importer checks both
+    /// against the model's ADR, so a slot the model does not declare is never sent. `None` means
+    /// the chest's own composite effect is the only sign of the find.
+    pub fn find_animation_id(&self) -> Option<i32> {
+        self.trick_animations
+            .first()
+            .map(|row| row.animation_id)
+            .or_else(|| {
+                self.idle
+                    .as_ref()?
+                    .animations
+                    .first()
+                    .map(|row| row.animation_id)
+            })
     }
 }
 
@@ -1194,6 +1215,8 @@ impl PetRequest {
 pub struct PetWire {
     pub private: Vec<Vec<u8>>,
     pub shared: Vec<Vec<u8>>,
+    /// A server chat line for the owner alone: a refusal's reason (T489/T531) or, T828, a feed's
+    /// one completion line. `None` when the request says nothing to the owner.
     pub notice: Option<&'static str>,
     pub changed: bool,
     /// T489: the trick id of a 53/7 the server accepted, set when it is accepted, not when the
@@ -2273,8 +2296,9 @@ impl PetService {
     /// once it moved by `status_epsilon` and `status_interval_ms` has passed. T531: a settled pet's
     /// idle animations and its thought bubbles ride the same tick (`idle_tick`). F778: an apply that
     /// emptied the fitted food's stack also echoes that slot as a 53/16 clear, so the care panel
-    /// does not keep a ghost food. A failure is a refusal for this player, never an error out of the
-    /// tick.
+    /// does not keep a ghost food. T828: the apply also sets `notice` (the feed's one completion
+    /// line) next to the eat animation. A failure is a refusal for this player, never an error out
+    /// of the tick.
     pub fn care_tick(&mut self, inventory: &mut Inventory, now_ms: u64) -> PetWire {
         let mut wire = PetWire::default();
         // The content is shared (`Arc`): holding it costs no copy on this per-tick path.
@@ -2305,6 +2329,10 @@ impl PetService {
                         piece_052::animation_packet(active.actor_guid, care.feed_animation, false);
                     wire.private.push(eat.clone());
                     wire.shared.push(eat);
+                    // T828: the client's own 53/20 kind 2 branch only unlocks the care panel and
+                    // no locale row names a feed completion, so the server says it here, with the
+                    // eat (R). A food that left the bag reaches no `care`, so it says nothing.
+                    wire.notice = Some(FEED_FINISHED);
                     wire.changed = true;
                     // F778: the last unit clears its fitted slot in `care` (`spend_one`); the
                     // care panel still shows the food the 53/16 echo told it about (`00b5ce60`

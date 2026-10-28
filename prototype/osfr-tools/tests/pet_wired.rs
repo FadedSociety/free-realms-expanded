@@ -14,7 +14,7 @@ mod pet_wire;
 use gateway_packets::{body, wrap};
 use osfr_tools::{
     character_store::CharacterState,
-    game_store,
+    chat, game_store,
     gameplay::Gameplay,
     gateway::Gateway,
     pets::{PetService, pet_removal_packet},
@@ -497,6 +497,29 @@ fn a_feed_apply_sets_both_save_flags_and_survives_a_whole_document_reload() {
     assert!(
         applied.state_changed && applied.gameplay_changed,
         "the apply marks both save flags"
+    );
+    // T828: the apply tells the owner it ate; the viewers get no chat line, and the end does not
+    // repeat it.
+    let line = chat::system("Your pet has finished eating.");
+    assert!(
+        applied.replies.iter().any(|packet| body(packet) == line),
+        "the completion notice reaches the owner"
+    );
+    assert!(
+        !applied.nearby.iter().any(|packet| body(packet) == line),
+        "the completion notice stays private"
+    );
+    let ended = gateway.tick_at(NOW + 7_000).unwrap();
+    assert!(
+        !ended.replies.iter().any(|packet| body(packet) == line),
+        "the completion is said once"
+    );
+    assert!(
+        ended
+            .replies
+            .iter()
+            .any(|packet| body(packet).starts_with(&[53, 0, 20])),
+        "the ended feed still unlocks the care panel"
     );
     let live = gateway.gameplay().unwrap().inventory_state();
     assert_eq!(

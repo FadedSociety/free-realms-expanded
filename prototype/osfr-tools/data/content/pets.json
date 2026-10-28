@@ -54258,6 +54258,7 @@
         "weight": 80,
         "name_id": 140227,
         "texture_alias": "Default1",
+        "effect_id": 5595,
         "coins": 15,
         "items": [
           {
@@ -54317,6 +54318,7 @@
         "weight": 18,
         "name_id": 140234,
         "texture_alias": "Default2",
+        "effect_id": 5596,
         "coins": 250,
         "items": [
           {
@@ -54341,6 +54343,7 @@
         "weight": 2,
         "name_id": 140235,
         "texture_alias": "Default3",
+        "effect_id": 5597,
         "coins": 500,
         "items": [
           {
@@ -54400,7 +54403,7 @@
     },
     "source": {
       "kind": "reconstructed",
-      "evidence": "T533: every number and reward row is server policy (R); the starting values are the Sanctuary (AGPL) pet treasure, pinned lab/references/Sanctuary-main-20261019 (2026-10-19, commit 10f129e) and read for data only with no code copied: src/Sanctuary.Game/Entities/PlayerPet.cs (the pet-treasure constants) and src/Sanctuary.Game/Helpers/PetHelper.cs (RollTreasureSpring, RollTreasureItem, TryOpenTreasureChest), with the item rows in src/Resources/Rewards.json keys pet-treasure-common/rare/elite. Values: mood 25, a find after 15 to 50 s, an 8 h cooldown per pet, chest model 151 with tier weights 80/18/2, a 60 s lifetime, a chest 2 m from the pet, an open range of 5, a 4 s dig (Sanctuary's PetDigDurationMs; its separate PetTreasureChestDigDelayMs is 3670 ms, so using the 4 s as the chest delay is a first choice), coins 15/250/500 per tier, the tier item tables, and a 10% chance of one Treasure Spring item (23427 to 23458) in place of the tier item. Tune any of them here. Client facts: Models.txt 151 sg_treasure_chest_01.adr, whose ADR declares the texture aliases Default1 to Default3 (one per tier) and the com_cast_01/com_cast_02 open and close slots (AnimationTypes.xml ids 1111 and 1112; opening does not play them, the actor is just removed); locale 140227, 140234 and 140235 name the three tiers; AnimationTypes.xml 5520 pet_sniff and 5525 pet_digging are pet animation slots (5525 is also the PLAYER_DRAW_EFFECT id in PetTrickGestureSettings.txt, an effect, not this animation); 16 of the 152 pet ADRs declare both slots, which marks the 21 model rows with digs. A click on the chest is 26/8 (ctor 008b6bc0). The sniff run time and the chest delay are first choices (R). find_chance is the number a treasure-hunting vitamin would raise (out of scope). Every reward item is in the shipped item catalogue."
+      "evidence": "T533: every number and reward row is server policy (R); the starting values are the Sanctuary (AGPL) pet treasure, pinned lab/references/Sanctuary-main-20261019 (2026-10-19, commit 10f129e) and read for data only with no code copied: src/Sanctuary.Game/Entities/PlayerPet.cs (the pet-treasure constants) and src/Sanctuary.Game/Helpers/PetHelper.cs (RollTreasureSpring, RollTreasureItem, TryOpenTreasureChest), with the item rows in src/Resources/Rewards.json keys pet-treasure-common/rare/elite. Values: mood 25, a find after 15 to 50 s, an 8 h cooldown per pet, chest model 151 with tier weights 80/18/2, a 60 s lifetime, a chest 2 m from the pet, an open range of 5, a 4 s dig (Sanctuary's PetDigDurationMs; its separate PetTreasureChestDigDelayMs is 3670 ms, so using the 4 s as the chest delay is a first choice), coins 15/250/500 per tier, the tier item tables, and a 10% chance of one Treasure Spring item (23427 to 23458) in place of the tier item. Tune any of them here. Client facts: Models.txt 151 sg_treasure_chest_01.adr, whose ADR declares the texture aliases Default1 to Default3 (one per tier) and the com_cast_01/com_cast_02 open and close slots (AnimationTypes.xml ids 1111 and 1112; opening does not play them, the actor is just removed); locale 140227, 140234 and 140235 name the three tiers; AnimationTypes.xml 5520 pet_sniff and 5525 pet_digging are pet animation slots (5525 is also the PLAYER_DRAW_EFFECT id in PetTrickGestureSettings.txt, an effect, not this animation); 16 of the 152 pet ADRs declare both slots, which marks the 21 model rows with digs. A click on the chest is 26/8 (ctor 008b6bc0). The sniff run time and the chest delay are first choices (R). find_chance is the number a treasure-hunting vitamin would raise (out of scope). Every reward item is in the shipped item catalogue. T828: the chest's composite effect is the tier's reward sparkle (ActorCompositeEffectDefinitions.xml 5595 PFX_sparkles_gold_treasure-chest-reward_small, 5596 medium, 5597 large), set in the AddNpc composite-effect field (writer startup_world::write_npc_body, reader 00921a10; the field harvest nodes sparkle with). A model without the hunt slots plays its first trick animation, else its first idle animation, as the find (both importer-checked against its ADR; the dragon model 1756 plays 5002 pet_trick_01_level2), so the dragon's find is visible; a model with neither is marked by the sparkle alone."
     }
   },
   "happy_buff": {

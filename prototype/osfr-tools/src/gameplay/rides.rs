@@ -474,11 +474,13 @@ impl Gameplay {
         self.follow_pet(character, now_ms, &mut out);
         self.sync_happy_buff(character, now_ms, &mut out);
         if self.pets.active_pet_id().is_some() {
-            let care = self.pets.care_tick(&mut self.inventory, now_ms);
+            // T828: the feed's completion notice rides the same `PetWire::notice` hand-off as
+            // every other pet request.
+            let care = Self::pet_outcome(self.pets.care_tick(&mut self.inventory, now_ms));
             out.changed |= care.changed;
-            out.replies.extend(care.private);
+            out.replies.extend(care.replies);
             // T488: a grooming session that times out plays its dry-off animation for the viewers.
-            out.nearby.extend(care.shared);
+            out.nearby.extend(care.nearby);
         } else if !self.pets.has_treasure() {
             return (!out.replies.is_empty()).then_some(out);
         }
@@ -635,6 +637,25 @@ mod tests {
             started.replies,
             vec![notify(pet, 1)],
             "free again, the feed begins"
+        );
+        assert!(started.nearby.is_empty(), "the begin plays nothing yet");
+        // T828: the apply step (900 ms after the begin) plays the eat for the owner and the
+        // viewers and says the feed's one completion line on the world tick.
+        let applied = game.pet_tick(&who(), 4_000).unwrap_or_default();
+        assert!(
+            applied
+                .nearby
+                .iter()
+                .any(|packet| packet.starts_with(&[35, 0, 8, 0])),
+            "viewers see the pet eat: {:?}",
+            applied.nearby
+        );
+        assert!(
+            applied
+                .replies
+                .contains(&chat::system("Your pet has finished eating.")),
+            "the owner is told: {:?}",
+            applied.replies
         );
     }
 
