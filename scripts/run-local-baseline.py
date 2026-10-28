@@ -48,6 +48,7 @@ parser.add_argument("--keep-client", action="store_true", help="Keep the full pe
 parser.add_argument("--gamepad", action="store_true", help="Drive this run's client with an XInput controller (scripts/launcher/gamepad_bridge.py, layout in scripts/launcher/gamepad.json)")
 parser.add_argument("--native-hook", metavar="SET", help="Attach the Frida native hook set (see native_hook.py --list) to this run's client")
 parser.add_argument("--live-log", action=argparse.BooleanOptionalAction, default=True, help="Write server/login packet traces and open the merged live log in a console beside the client (default on; --no-live-log to disable)")
+parser.add_argument("--bin-dir", type=Path, help="Directory holding osfr-gateway.exe and osfr-login.exe (default: the source checkout's target/release)")
 parser.add_argument("--dev-tools", action="store_true", help="Opt in to local developer entity teleport commands for this test run")
 parser.add_argument("--drop-server-sequence", type=int, help="Drop the first transmission of this reliable sequence to test recovery")
 run_options = parser.parse_args()
@@ -120,7 +121,7 @@ with socket.socket(socket.AF_INET, socket.SOCK_DGRAM) as reserve:
 state_file = (run_options.state_file or lab / "state/character.json").resolve()
 if use_rust:
     reference = run_options.rust_reference.resolve() if run_options.rust_reference else None
-    gateway_binary = lab.parent / "project/prototype/osfr-tools/target/release/osfr-gateway.exe"
+    gateway_binary = (run_options.bin_dir or lab.parent / "project/prototype/osfr-tools/target/release") / "osfr-gateway.exe"
     server_command = [str(gateway_binary), f"127.0.0.1:{server_port}",
                       *(["--reference", str(reference)] if reference else []),
                       "--state", str(state_file), "--seconds", str(run_options.seconds + 10),
@@ -242,11 +243,11 @@ if run_options.native_login:
     login_back = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
     login_back.bind(("127.0.0.1", 0))
     login_endpoint = f"127.0.0.1:{login_front.getsockname()[1]}"
-    login_command = [str(lab.parent / "project/prototype/osfr-tools/target/release/osfr-login.exe"),
+    login_command = [str((run_options.bin_dir or lab.parent / "project/prototype/osfr-tools/target/release") / "osfr-login.exe"),
                      "--bind", f"127.0.0.1:{login_port}", "--gateway", endpoint,
                      "--resources", str(client / "Resources"), "--identity", str(identity_file),
                      "--key-file", str(lab / "references/rust-login/client-login-key.bin"),
-                     "--state", str(state_file), "--account-store", str(account_store_file),
+                     "--state", str(state_file),
                      "--handoff-key-file", str(handoff_key_file),
                      "--seconds", str(run_options.seconds + 10)]
     if run_options.live_log:
