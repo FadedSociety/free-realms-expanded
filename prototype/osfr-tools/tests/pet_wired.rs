@@ -321,10 +321,10 @@ fn a_walking_owner_moves_the_summoned_pet_for_viewers_without_a_save() {
         assert!(!out.changed);
         settled += pet_moves(&out.nearby, actor);
     }
-    // Walk and stop frames share the wire layout; T827: it walks to the spot at one frame per
-    // `send_ms` (100 ms) and the pure test pins the stop frames.
+    // Walk and stop frames share the wire layout; it walks to the spot at one frame per
+    // `send_ms` (500 ms, the T455 accepted rate) and the pure test pins the stop frames.
     assert!(
-        (4..=9).contains(&settled),
+        (1..=4).contains(&settled),
         "{settled} frames while settling"
     );
     for step in 61..=80u64 {
@@ -375,7 +375,8 @@ fn a_walking_pet_keeps_its_gait_between_the_owners_reports() {
         stands += out.nearby.iter().filter(|p| **p == stand).count();
         moves += pet_moves(&out.nearby, actor);
     }
-    assert!(moves > 100, "the pet trails the owner: {moves} frames");
+    // One frame per `send_ms` (500 ms) over the 20 s walk.
+    assert!(moves > 20, "the pet trails the owner: {moves} frames");
     assert_eq!(stands, 0, "the pet never stands while the owner walks");
     for tick in 401..=500u64 {
         let out = game

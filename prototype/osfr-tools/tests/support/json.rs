@@ -17,6 +17,12 @@ pub fn read(path: &Path) -> Value {
     .unwrap_or_else(|error| panic!("{}: {error}", path.display()))
 }
 
+/// The shipped `pets.json` document (the pet suites read the same file).
+#[allow(dead_code)] // Some suites include this reader only for other content.
+pub fn pets_json() -> Value {
+    read(&Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content/pets.json"))
+}
+
 /// Write a JSON document in the shipped two-space form with a trailing newline.
 #[allow(dead_code)] // Some suites include this reader only to read content.
 pub fn write_pretty(path: &Path, value: &impl Serialize) {

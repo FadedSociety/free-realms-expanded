@@ -54177,7 +54177,7 @@
     "min_click_interval_ms": 200,
     "resume_m": 3.0,
     "go_timeout_ms": 10000,
-    "send_ms": 100
+    "send_ms": 500
   },
   "care": {
     "feed_effect_ms": 900,

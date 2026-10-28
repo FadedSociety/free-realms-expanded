@@ -94,7 +94,7 @@ pub fn trick_row(trick: u32) -> PetTrickAnimation {
 
 /// The shipped `pets.json` document.
 pub fn pets_json() -> Value {
-    json::read(&content_dir().join("pets.json"))
+    json::pets_json()
 }
 
 /// The shipped `data/content` root.

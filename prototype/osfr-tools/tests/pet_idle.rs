@@ -675,15 +675,40 @@ fn a_follow_click_wakes_a_lying_pet_and_pauses_its_idle_life() {
     assert_eq!(up.plays.len(), 1, "the exit transition still plays");
     assert!(!up.plays[0].base);
     assert_eq!(session.service.view(OWNER).unwrap().base_animation, None);
-    // It walks to the clicked spot, so no idle life (and no rest pose) resumes while it walks.
-    for step in 3..=4u64 {
+    // It walks to the clicked spot for six seconds, so no idle life (and no rest pose) resumes
+    // while it walks. `Seen.plays` is the care tick only; the follow step's gait is in `gait`.
+    // At the pet's 5 m/s pace the 18 m walk arrives inside those six seconds and a pet waiting
+    // at the clicked spot may rest again, so only the ticks before arrival are checked.
+    let mut walked = 0;
+    for step in 3..=12u64 {
         let walking = session.tick(lying.at + TICK * step);
-        assert!(
-            walking.plays.is_empty(),
-            "a walking pet does not idle: {:?}",
-            walking.plays
-        );
+        let position = session
+            .service
+            .view(OWNER)
+            .expect("the pet is out")
+            .position;
+        if position[0] < 19.8 {
+            walked += 1;
+            assert!(
+                walking.plays.iter().all(|play| !play.base),
+                "a walking pet does not lie down: {:?} at {position:?}",
+                walking.plays
+            );
+        }
     }
+    assert!(
+        walked > 0,
+        "the pet is still walking inside the six seconds"
+    );
+    assert!(
+        session
+            .service
+            .view(OWNER)
+            .expect("the pet is out")
+            .position[0]
+            > 19.8,
+        "the click walk reaches its spot"
+    );
 }
 
 /// F809: a viewer who arrives while the pet lies down is sent the rest loop as a base animation

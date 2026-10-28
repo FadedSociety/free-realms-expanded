@@ -39,6 +39,13 @@ pub struct FollowConfig {
     pub catch_up_start_m: f32,
     pub catch_up_gain: f32,
     pub max_speed_multiplier: f32,
+    /// T827 removed these two pace bounds (the pet now uses its `movement_speed`). They are
+    /// accepted and ignored so a content package cut before T827 still loads; drop after one
+    /// release once private packages are regenerated.
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    min_speed: Option<f32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    max_speed: Option<f32>,
     /// T827: must outlast `OWNER_UPDATE_MS`, or a walking owner would settle between reports.
     pub settle_delay_ms: u64,
     pub settle_radius_m: f32,
@@ -73,8 +80,9 @@ pub struct FollowConfig {
     pub resume_m: f32,
     /// T490: how long the pet waits at a clicked spot after reaching it (R).
     pub go_timeout_ms: u64,
-    /// T827: the walk frame interval; 100 ms at the shipped value makes 0.5 m steps at the pet's
-    /// 5 m/s pace instead of the old one-frame-per-500 ms 5-6 m hop (R).
+    /// The walk frame interval. 500 ms is the T455 sign-off's bound (at most 2 frames/s per
+    /// pet); T827 removed the old speed guess, so a frame is the pet's own pace (2.5 m at 5 m/s,
+    /// R) instead of the old 5-6 m hop. A gait change may be sent between due frames.
     pub send_ms: u64,
 }
 
@@ -614,6 +622,9 @@ fn advance(
     }
 }
 
+/// A walk frame is due every `send_ms`; a gait change is sent as it happens, between due frames,
+/// because the client needs the base animation with the move that starts it. Both reset the
+/// cadence, so a steady walk stays at 2/s and a transition adds at most one frame.
 fn walk_if_due(config: &FollowConfig, p: &mut PetPose, now: u64, gait: Gait) -> Option<Move> {
     let due = p
         .last_sent_ms

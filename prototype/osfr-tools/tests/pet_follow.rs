@@ -2,13 +2,12 @@
 //! and the 125 frames `PetService::follow_owner` sends. The real gameplay path (owner moves,
 //! viewers get the frames, a late viewer sees the pet where it stands) is in `pet_wired.rs`.
 use osfr_tools::pet_follow::{FollowConfig, Gait, Move, MoveKind, OwnerPose, PetPose, spawn, step};
-use osfr_tools::pets::{PetBusy, PetService};
+use osfr_tools::pets::{PetBusy, PetContent, PetService};
 use osfr_tools::world_events::piece_052::ANIM_ID_WALK;
+use serde_json::json;
 
 #[path = "support/json.rs"]
 mod json;
-#[path = "support/npc_visibility.rs"]
-mod npc_visibility;
 
 /// The shipped follow block and the pet's walking speed (the `movement_speed` its actor spawns
 /// with), read from `pets.json` once per test.
@@ -18,7 +17,7 @@ struct Shipped {
 }
 
 fn shipped() -> Shipped {
-    let content = json::read(&npc_visibility::content_dir().join("pets.json"));
+    let content = json::pets_json();
     Shipped {
         cfg: serde_json::from_value(content["follow"].clone()).expect("shipped follow block"),
         pace: content["movement_speed"]["speed"].as_f64().unwrap() as f32,
@@ -142,6 +141,17 @@ fn the_shipped_follow_block_is_valid() {
     assert!(shipped().cfg.valid());
 }
 
+/// T827 removed `min_speed`/`max_speed` from the follow block. A content package cut before
+/// T827 still loads whole: the two old keys are accepted and ignored.
+#[test]
+fn a_pre_t827_content_package_still_loads() {
+    let mut document = json::pets_json();
+    document["follow"]["min_speed"] = json!(2.0);
+    document["follow"]["max_speed"] = json!(12.0);
+    let bytes = serde_json::to_vec(&document).unwrap();
+    PetContent::from_json(&bytes).expect("a package cut before T827 still loads");
+}
+
 #[test]
 fn a_walking_owner_is_followed_on_flat_and_sloped_ground() {
     let sh = shipped();
@@ -247,18 +257,27 @@ fn a_teleport_warps_the_pet_beside_the_owner_once() {
 
 #[test]
 fn walking_sends_at_most_two_frames_a_second() {
-    // T827: the name is the protected one from before the change; the cadence is now one frame
-    // per `send_ms` (100 ms) so the pet trails smoothly instead of hopping once per 500 ms.
+    // T455/T827: one frame per `send_ms` at the shipped 500 ms, driven at the real client
+    // cadence (the owner reports every 500 ms, the world tick steps the pet every 50 ms). The
+    // sign-off names 500 ms, so the ceiling is pinned instead of derived from the data it
+    // protects; a faster cadence is a lead rate decision.
     let sh = shipped();
-    let cfg = &sh.cfg;
-    let start = [0.0, 0.0, 0.0];
-    let (_, _, frames) = walk(&sh, spawn(cfg, start), start, 5.0, 10_000, 0, flat);
-    let most = 10_000 / cfg.send_ms as usize + 4; // plus the start, the stop and gait changes
-    assert!(frames.len() <= most, "{} frames in 10 s", frames.len());
+    assert_eq!(sh.cfg.send_ms, 500, "the T455 accepted cadence");
+    let (_, _, frames, _) = walk_at_client_cadence(&sh, 5.0, 10_000);
+    let due = 10_000 / 500 + 1; // plus the t = 0 frame
     assert!(
-        frames.len() >= 10_000 / (cfg.send_ms as usize * 2),
+        frames.len() <= due,
+        "{} frames in 10 s, due at most {due}",
+        frames.len()
+    );
+    assert!(
+        frames.len() >= 10_000 / (500 * 2),
         "a walking owner's pet moves on every send interval, not only after a stop: {} frames",
         frames.len()
+    );
+    assert!(
+        frames.iter().all(|frame| frame.kind == MoveKind::Walk),
+        "a steady walk has no stop frame"
     );
 }
 
@@ -399,12 +418,11 @@ fn the_pet_walks_runs_and_stands_with_its_movement() {
     let (_, rest) = hold(&sh, pet, owner, 3_000, 8_000, 100);
     frames.extend(rest);
     let gaits: Vec<_> = frames.iter().filter_map(|f| f.gait).collect();
-    assert_eq!(gaits.first(), Some(&Gait::Walk), "{gaits:?}");
-    assert!(gaits.contains(&Gait::Run), "{gaits:?}");
-    assert_eq!(gaits.last(), Some(&Gait::Stand), "{gaits:?}");
-    assert!(
-        gaits.windows(2).all(|w| w[0] != w[1]),
-        "a gait is sent once: {gaits:?}"
+    assert_eq!(
+        gaits,
+        [Gait::Walk, Gait::Run, Gait::Walk, Gait::Stand],
+        "one base animation per real gait change: walk, run while catching up, walk back to \
+         the settle spot, stand"
     );
 }
 
