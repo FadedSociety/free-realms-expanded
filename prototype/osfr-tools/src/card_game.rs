@@ -25,6 +25,8 @@
 //!   stored ticket) -> the card window's close, 39/6 -> 39/19, and the client's 39/7. The card
 //!   window's own asset download needs the client's `[AssetDelivery] TcgServerAddress` to answer
 //!   `manifest.crc` (`0109bd00`); `scripts/asset_delivery.py` serves it for the local harness.
+//!   T849: the card manager's state 1 loads `TradingCardAssets.txt` (`00ad4f50`), the client's
+//!   `Resources` list of the TCG `.lst` and `.dds` art; that is the 39/16 preload name too.
 //! * Rows publish entry type 1 (the world tunnel); `server_type` (Legacy's 2, the client tunnel
 //!   `00be78c0`) stays in data for the launch slice.
 //! * The row's MiniGameData link (`minigame_id`) stays in data; no wire field is known to hold it.
@@ -110,7 +112,8 @@ pub struct Launch {
     /// 0 keeps it off, and the card window then reports the service unreachable.
     #[serde(default)]
     pub port: u16,
-    /// T795: the asset list the offer names (default [`PRELOAD_FILE`]); never empty.
+    /// T795: the asset list the offer names (default [`PRELOAD_FILE`], the client's
+    /// `TradingCardAssets.txt` card art list); never empty.
     #[serde(default = "default_preload_file")]
     pub preload_file: String,
     /// T813: the lobby a card login enters; without it the card window stays on "Entering main
@@ -156,10 +159,15 @@ fn default_preload_file() -> String {
 
 /// The client's mini-game type of the DLL card game (`MiniGameTypeData` 16; `00ad47f0`).
 pub const CARD_GAME_TYPE: i32 = 16;
-/// (R) The card asset list the 39/16 offer names: the client manifest's `<Game>Assets.txt`
-/// entry for this game, a client pack entry. `009beb70` starts the client's loader only for a
-/// non-empty name; the list's own contents do not matter to the order.
-pub const PRELOAD_FILE: &str = "TradingCardGameAssets.txt";
+/// The card art list the 39/16 offer names. T849 recovered the client's own name: its card
+/// manager loads `TradingCardAssets.txt` in state 1 (`00ad4f50`, string at `00ad4f9e`; the
+/// loader is `00ae7950`). The client's `Resources/TradingCardAssets.txt` (3,864 bytes) names 45
+/// TCG `.lst` UI lists and 151 `.dds` card images. The previous value,
+/// `TradingCardGameAssets.txt`, is a real main-pack list (`Assets_009.pack` entry 3,843,
+/// 1,523 bytes) but it holds 77 `TCGNarrator*.mp3` narration files, so the 39/16 loader never
+/// loaded card art. (R) that the retail server named this list; the client's card manager
+/// hardcodes it and `MiniGameData`'s `PRELOAD_FILE` column is empty on every row.
+pub const PRELOAD_FILE: &str = "TradingCardAssets.txt";
 /// (R) Card runs take their own instance range, apart from chess (1), soccer (47,000,001)
 /// and harvesting (58,000,001).
 pub const FIRST_INSTANCE_ID: i32 = 61_000_001;

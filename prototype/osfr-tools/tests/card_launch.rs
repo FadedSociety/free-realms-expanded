@@ -263,17 +263,15 @@ fn the_type_16_handshake_sends_a_one_time_ticket_in_39_28() {
     let mut launches = Launches::new(cards.launch().unwrap()).unwrap();
     assert!(!launches.is_active());
 
-    // 39/16 names the card asset list: the client starts its loader only for a non-empty one
-    // (`009beb70`), and nothing else makes its Start button ready.
+    // 39/16 names the card art list: the client starts its loader only for a non-empty one
+    // (`009beb70`), and its card manager itself loads `TradingCardAssets.txt` (`00ad4f50` state
+    // 1, string `00ad4f9e`). The narration-audio list (`TradingCardGameAssets.txt`) carries no art.
     let offer = launches.begin(row).unwrap();
     assert_eq!(subs(&offer.replies), vec![(39, 16)]);
-    assert_eq!(
-        offer_preload(&offer.replies[0]),
-        "TradingCardGameAssets.txt"
-    );
+    assert_eq!(offer_preload(&offer.replies[0]), "TradingCardAssets.txt");
     assert_eq!(
         offer.replies[0].len(),
-        281 + 25,
+        281 + "TradingCardAssets.txt".len(),
         "an empty list is 281 bytes"
     );
     let instance = i32_at(&offer.replies[0], 3);
@@ -395,7 +393,7 @@ fn the_card_start_order_runs_end_to_end_through_the_gateway() {
         .find(|p| p.starts_with(&[39, 0, 16]))
         .expect("39/16 offer");
     let instance = i32_at(offer, 3);
-    assert_eq!(offer_preload(offer), "TradingCardGameAssets.txt");
+    assert_eq!(offer_preload(offer), "TradingCardAssets.txt");
     // The start screen waits for the Start click, and no end-of-game dialog follows the card
     // window (`009bf190` reads game bytes `+2311` and `+2312`, set from these flags).
     assert_eq!(offer_flags(offer), [1, 1, 1, 1, 0]);
@@ -674,6 +672,11 @@ fn only_the_cancel_ends_a_card_run_and_only_by_its_own_instance() {
 /// its loader only for a non-empty list, so an empty one leaves the start screen on Loading.
 #[test]
 fn the_card_asset_list_is_data_and_never_empty() {
+    // T849: the default is the client's own card art list, not the narration-audio list
+    // (`Assets_009.pack` entry 3,843) that the old name happened to be. The client's card
+    // manager loads `TradingCardAssets.txt` (`00ad4f50` state 1, string `00ad4f9e`).
+    assert_eq!(card_game::PRELOAD_FILE, "TradingCardAssets.txt");
+
     let named = |name: &str| {
         let mut content = launch_json(60_000);
         content["launch"]["preload_file"] = json!(name);
