@@ -1682,6 +1682,7 @@ impl Session {
             }
         };
         held.leave(&mut staged_gateway, &outcome, combat);
+        house_visits::settle(&mut staged_gateway);
         if let Some(trace) = &self.trace {
             for detail in &outcome.trace {
                 trace_gateway_message(trace, self.id.0, self.peer, transport, detail)?;

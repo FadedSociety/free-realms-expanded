@@ -1548,35 +1548,30 @@ impl HousingService {
         }
     }
 
-    /// T872: serve another character's lot to a visitor. The copy is rebuilt with a restore's
-    /// checks and replaces any older copy (the gateway refreshes it after each owner edit). A
-    /// lot of this character's own is never replaced. `visit_pass` adds a level-1 permission for
-    /// the visitor to this copy only (a friend of the owner; reference HouseAccess).
+    /// T872: serve another character's lot to a visitor the gateway has already let in (F874:
+    /// only then is a copy made). The copy is rebuilt with a restore's checks and replaces any
+    /// older copy (the gateway refreshes it after each owner edit). It is read-only, unlocked and
+    /// carries a level-1 pass for this visitor only. A lot this character owns is never replaced.
     pub fn admit_foreign_lot(
         &mut self,
         mut lot: LotSnapshot,
         visitor: u64,
-        visit_pass: bool,
     ) -> Result<(), ServiceError> {
-        if lot.owner_guid == visitor
-            || (self.housing.saved_fixtures(lot.lot_guid).is_ok()
-                && !self.foreign.contains(&lot.lot_guid))
-        {
+        if lot.owner_guid == visitor || self.has_own_lot(lot.lot_guid) {
             return Err(HousingError::NotPermitted.into());
         }
         // A copy is read-only: an edit would move the visitor's furniture into a lot that is never
-        // saved. The owner's real lot keeps its levels.
+        // saved. The owner's real lot keeps its levels and its lock.
         for permission in &mut lot.permissions {
             permission.level = permission.level.min(PERMISSION_CAN_VISIT);
         }
-        if visit_pass {
-            lot.permissions
-                .retain(|permission| permission.guid != visitor);
-            lot.permissions.push(LotPermission {
-                guid: visitor,
-                level: PERMISSION_CAN_VISIT,
-            });
-        }
+        lot.permissions
+            .retain(|permission| permission.guid != visitor);
+        lot.permissions.push(LotPermission {
+            guid: visitor,
+            level: PERMISSION_CAN_VISIT,
+        });
+        lot.locked = false;
         let guid = lot.lot_guid;
         self.housing.admit_lot(lot)?;
         self.foreign.insert(guid);
@@ -1588,8 +1583,15 @@ impl HousingService {
         self.foreign.contains(&house_guid)
     }
 
-    /// Drop every foreign copy except the one being visited (a visit keeps its own lot).
-    fn forget_foreign_lots(&mut self, keep: Option<u64>) {
+    /// F874: whether this character owns the lot (never a visit's copy); a cheap check before
+    /// the gateway clones one lot for a visitor.
+    pub fn has_own_lot(&self, house_guid: u64) -> bool {
+        !self.foreign.contains(&house_guid) && self.housing.has_lot(house_guid)
+    }
+
+    /// Drop every foreign copy except the one being visited (a visit keeps its own lot). F874:
+    /// the gateway calls this after every message, so a listing or a refused enter keeps nothing.
+    pub fn forget_foreign_lots(&mut self, keep: Option<u64>) {
         for guid in std::mem::take(&mut self.foreign) {
             if Some(guid) == keep {
                 self.foreign.insert(guid);
@@ -1961,10 +1963,11 @@ impl HousingService {
     /// Forget the actor's visit: the entered lot, edit mode and selections. Leave uses it, and so
     /// does a reconnect, which ends the visit without a 127/10.
     pub fn end_visit(&mut self, actor_guid: u64) -> Option<u64> {
+        // F874: copies go even when the actor never entered (a listing, a refused enter).
+        self.forget_foreign_lots(None);
         let house_guid = self.entered.remove(&actor_guid)?;
         self.edit_mode.remove(&actor_guid);
         self.selections.retain(|(owner, _), _| *owner != actor_guid);
-        self.forget_foreign_lots(None);
         Some(house_guid)
     }
 

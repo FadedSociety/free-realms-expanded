@@ -1709,38 +1709,73 @@ fn enter_failed(code: u8) -> Vec<u8> {
     vec![127, 0, 46, 0, code, 0, 0, 0]
 }
 
-/// A house whose owner is not online (no copy) is refused with 127/46 code 1, a stranger's
-/// copy with code 2 (reader `0x00ab9080` clears the client's enter busy flag), and neither
-/// enters, moves or saves anything.
+/// A lot this session holds no copy of (a stranger's, which the gateway never copies, or one
+/// whose owner is not online) is refused with 127/46 code 1 (reader `0x00ab9080` clears the
+/// client's enter busy flag), and nothing enters, moves or saves.
 #[test]
 fn a_stranger_is_refused_with_127_46_and_nothing_is_kept() {
     let content = Content::with_houses();
     let mut owner = content.game();
     let lot = granted(&mut owner).instance_guid;
     let mut guest = content.game();
-    let offline = guest
+    let refused = guest
         .handle_in_world(&enter(lot), &visitor(), 1_000)
         .unwrap();
     assert!(
-        offline.replies.contains(&enter_failed(1)),
-        "{:?}",
-        offline.replies
-    );
-    assert!(guest.admit_foreign_lot(owner.own_house_lots()[0].clone(), VISITOR, false));
-    let refused = guest
-        .handle_in_world(&enter(lot), &visitor(), 2_000)
-        .unwrap();
-    assert!(
-        refused.replies.contains(&enter_failed(2)),
+        refused.replies.contains(&enter_failed(1)),
         "{:?}",
         refused.replies
     );
     assert!(refused.scene_zoning.is_none());
     assert_eq!(guest.visiting_house(), None);
-    assert!(guest.state().housing.is_none(), "a copy is never saved");
+    assert!(guest.state().housing.is_none(), "nothing is saved");
 }
 
-/// A friend's copy carries a pass: the friend enters the owner's lot and is served its standing
+/// F874 (T872 review): a copy outlives only the visit it serves. After a listing of the
+/// owner's houses, `drop_unvisited_foreign_lots` (the gateway's after-message step) leaves no
+/// copy, so a later enter without a fresh copy is refused; a copy of the lot the visitor is
+/// inside survives it.
+#[test]
+fn a_listing_keeps_no_copy_and_a_visit_keeps_only_its_own() {
+    let content = Content::with_houses();
+    let mut owner = content.game();
+    let lot = granted(&mut owner).instance_guid;
+    let mut guest = content.game();
+    assert!(guest.admit_foreign_lot(owner.own_house_lot(lot).unwrap(), VISITOR));
+    let listed = guest
+        .handle_in_world(&list_request(OWNER), &visitor(), 1_000)
+        .unwrap();
+    assert_eq!(
+        only_list(&listed.replies).records.len(),
+        1,
+        "the copy is listed"
+    );
+    guest.drop_unvisited_foreign_lots();
+    let refused = guest
+        .handle_in_world(&enter(lot), &visitor(), 2_000)
+        .unwrap();
+    assert!(refused.replies.contains(&enter_failed(1)), "no copy left");
+
+    assert!(guest.admit_foreign_lot(owner.own_house_lot(lot).unwrap(), VISITOR));
+    guest
+        .handle_in_world(&enter(lot), &visitor(), 3_000)
+        .unwrap();
+    guest.drop_unvisited_foreign_lots();
+    assert_eq!(guest.visiting_house(), Some(lot));
+    let loaded = guest.initialize_world(&visitor(), 4_000).unwrap();
+    assert_eq!(
+        updates(&loaded.replies).len(),
+        KIT_BLOCKS,
+        "the visit keeps its copy"
+    );
+    assert_eq!(
+        owner.own_house_lot(lot ^ 1),
+        None,
+        "only a lot the owner holds"
+    );
+}
+
+/// A copy the gateway admitted (a house friend) carries a pass: the friend enters the owner's lot and is served its standing
 /// fixtures, cannot decorate, gets the owner's pickup (the record and the actor's removal, not
 /// the owner's bag or house info), and leaves removing only what still stands. Nothing of the
 /// visit is saved, and the owner's lot is untouched by it.
@@ -1758,7 +1793,7 @@ fn a_friend_visits_sees_the_owners_edit_and_leaves_without_a_trace() {
         .unwrap();
 
     let mut guest = content.game();
-    assert!(guest.admit_foreign_lot(owner.own_house_lots()[0].clone(), VISITOR, true));
+    assert!(guest.admit_foreign_lot(owner.own_house_lot(lot).unwrap(), VISITOR));
     let entered = guest
         .handle_in_world(&enter(lot), &visitor(), 5_000)
         .unwrap();
@@ -1830,7 +1865,7 @@ fn a_copy_of_a_lot_is_read_only_even_for_an_editor() {
         level: 3,
     });
     let mut guest = content.game();
-    assert!(guest.admit_foreign_lot(copy, VISITOR, false));
+    assert!(guest.admit_foreign_lot(copy, VISITOR));
     let entered = guest
         .handle_in_world(&enter(lot), &visitor(), 1_000)
         .unwrap();

@@ -752,6 +752,10 @@ impl Housing {
         Ok(())
     }
 
+    pub fn has_lot(&self, house_guid: u64) -> bool {
+        self.lots.contains_key(&house_guid)
+    }
+
     pub fn saved_fixtures(&self, house_guid: u64) -> Result<LotSnapshot, HousingError> {
         self.lots
             .get(&house_guid)

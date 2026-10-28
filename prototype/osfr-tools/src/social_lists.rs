@@ -1066,7 +1066,16 @@ impl SocialService {
             .collect())
     }
 
-    fn ignores_either(&self, a: u64, b: u64) -> bool {
+    /// F874 (T872 review): `visitor` may visit `owner`'s house as a friend only while both list
+    /// each other, so either side's removal revokes it, and neither ignores the other.
+    pub fn house_friends(&self, owner: u64, visitor: u64) -> bool {
+        let lists = |a: u64, b: u64| {
+            (self.profiles.get(&a)).is_some_and(|profile| profile.friends.contains_key(&b))
+        };
+        lists(owner, visitor) && lists(visitor, owner) && !self.ignores_either(owner, visitor)
+    }
+
+    pub fn ignores_either(&self, a: u64, b: u64) -> bool {
         let ignores = |owner: u64, other: u64| {
             self.profiles
                 .get(&owner)
@@ -1722,5 +1731,44 @@ mod tests {
         assert_eq!(social.group_invitee(303), Some((group_id, 101)));
         assert_eq!(social.group_of(303), None);
         assert_eq!(social.group_members(group_id), Some(members.as_slice()));
+    }
+
+    /// F874: a house friend is a mutual friend whom neither side ignores, so the owner revokes
+    /// a visit by removing the friend even though the visitor's own list keeps the owner.
+    #[test]
+    fn house_friends_are_mutual_and_not_ignored() {
+        let mut social = SocialService::new(8).unwrap();
+        social.register(profile(10, 101, "Owner")).unwrap();
+        social.register(profile(20, 202, "Guest")).unwrap();
+        let name = SocialName::new("Fixture", "Name").unwrap();
+        let befriend = |social: &mut SocialService, a: u64, b: u64| {
+            social
+                .profile_mut(a)
+                .unwrap()
+                .friends
+                .insert(b, name.clone());
+        };
+        befriend(&mut social, 202, 101);
+        assert!(
+            !social.house_friends(101, 202),
+            "the guest's list alone grants nothing"
+        );
+        befriend(&mut social, 101, 202);
+        assert!(social.house_friends(101, 202));
+        social.profile_mut(101).unwrap().friends.remove(&202);
+        assert!(
+            !social.house_friends(101, 202),
+            "the owner's removal revokes it"
+        );
+        befriend(&mut social, 101, 202);
+        social
+            .profile_mut(101)
+            .unwrap()
+            .ignored
+            .insert(202, name.clone());
+        assert!(
+            !social.house_friends(101, 202),
+            "an ignored friend is refused"
+        );
     }
 }

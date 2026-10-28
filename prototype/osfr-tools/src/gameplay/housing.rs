@@ -324,19 +324,26 @@ impl Gameplay {
             .unwrap_or_default()
     }
 
-    /// T872: serve another character's lot to this visitor (`HousingService::admit_foreign_lot`).
-    /// False when this session has no housing or the copy is refused.
-    pub fn admit_foreign_lot(
-        &mut self,
-        lot: crate::housing::LotSnapshot,
-        visitor: u64,
-        visit_pass: bool,
-    ) -> bool {
-        (self.housing.as_mut()).is_some_and(|s| {
-            s.service
-                .admit_foreign_lot(lot, visitor, visit_pass)
-                .is_ok()
-        })
+    /// F874: one lot this character owns (never a visit's copy), cloned only when it is theirs.
+    pub fn own_house_lot(&self, house_guid: u64) -> Option<crate::housing::LotSnapshot> {
+        let session = (self.housing.as_ref()).filter(|s| s.service.has_own_lot(house_guid))?;
+        session.service.lot(house_guid).ok()
+    }
+
+    /// T872: serve another character's lot to a visitor the gateway let in
+    /// (`HousingService::admit_foreign_lot`). False when this session has no housing or the copy is
+    /// refused.
+    pub fn admit_foreign_lot(&mut self, lot: crate::housing::LotSnapshot, visitor: u64) -> bool {
+        (self.housing.as_mut()).is_some_and(|s| s.service.admit_foreign_lot(lot, visitor).is_ok())
+    }
+
+    /// F874: after each message, keep only the copy of the lot this visitor is inside; a listing or
+    /// a refused enter leaves nothing behind.
+    pub fn drop_unvisited_foreign_lots(&mut self) {
+        if let Some(session) = self.housing.as_mut() {
+            let keep = session.house.filter(|_| session.in_house());
+            session.service.forget_foreign_lots(keep);
+        }
     }
 
     /// T872: an owner's edit reaching a visitor inside that lot: its copy is replaced, and the
@@ -354,7 +361,7 @@ impl Gameplay {
             return Vec::new();
         };
         if (session.service)
-            .admit_foreign_lot(broadcast.lot.clone(), visitor, true)
+            .admit_foreign_lot(broadcast.lot.clone(), visitor)
             .is_err()
         {
             return Vec::new();
