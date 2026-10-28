@@ -479,6 +479,11 @@ impl Gameplay {
                 out,
             )?;
             self.npc_minigame_win(&result.replies, out)?;
+        } else {
+            // T787: forging defers its winning 39/18 record to the client's
+            // `FRServer_GameOver`; the win outcome already credited the id-only event,
+            // so only the run's facts are new (the same split as the Type8 gather path).
+            self.npc_minigame_result(&result.replies, out)?;
         }
         out.changed |= result.changed;
         out.replies.extend(result.replies);
@@ -552,6 +557,10 @@ impl Gameplay {
             if let Some(nodes) = self.gathering_nodes.as_mut() {
                 nodes.paid();
             }
+        } else {
+            // T787: the client's `FRServer_GameOver` presents the 39/18 record after
+            // the win already credited the id-only event; only its facts are new.
+            self.npc_minigame_result(&result.replies, out)?;
         }
         out.changed |= result.changed;
         out.replies.extend(result.replies);

@@ -23,7 +23,9 @@
 //! its level bound (1..=20) and its jobs.json profile are the split loader's. A
 //! `finish_minigame` id no server path emits is refused instead of being
 //! certified, and `shipped_minigame_producers_are_pinned` fails if the accepted
-//! set drifts.
+//! set drifts. T787: a `require` on the step must name only result facts that id's
+//! own producer reports (score/time for the 39/18 paths, placement/knock-outs for
+//! the derby, time for kart, nothing for a paid fishing catch).
 //!
 //! `visit_position` geometry is rejected by `QuestEngine::from_split_content`
 //! (`valid_objective_kind`), the bound's only authority; the audit does not
@@ -71,7 +73,7 @@ use quest_catalogue_fixture::{
     FIXTURE_QUEST, FIXTURE_RECIPE, FIXTURE_USE_ITEM, Scratch, fixture,
 };
 use quest_records::{RawQuest, as_u32, read_quests, sorted_json_paths};
-use quest_target_sets::Targets;
+use quest_target_sets::{MinigameFact, Targets};
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -369,6 +371,28 @@ impl Catalogue {
                                 "{owner} (finish_minigame): minigame {minigame} is not a shipped minigame id"
                             ));
                         }
+                        // T787: an enabled `require` must name only facts the id's own
+                        // producer reports. A bound on a fact it cannot report is a quest
+                        // no result can ever credit.
+                        if let Some(require) = goal.get("require") {
+                            for (field, fact) in [
+                                ("min_score", MinigameFact::Score),
+                                ("max_elapsed_seconds", MinigameFact::Elapsed),
+                                ("max_placement", MinigameFact::Placement),
+                                ("no_knockout", MinigameFact::Knockout),
+                            ] {
+                                let demanded = if field == "no_knockout" {
+                                    require[field].as_bool() == Some(true)
+                                } else {
+                                    require.get(field).is_some_and(|value| !value.is_null())
+                                };
+                                if demanded && !self.targets.reports(minigame, fact) {
+                                    violations.push(format!(
+                                        "{owner} (finish_minigame): {field} needs a fact the producer for minigame {minigame} does not report"
+                                    ));
+                                }
+                            }
+                        }
                     }
                     "gather_resource" => {
                         let resource = as_u32(&goal["resource_id"]).unwrap_or(0);
@@ -617,6 +641,16 @@ fn shipped_minigame_producers_are_pinned() {
         ],
         "the finish_minigame producer set changed; update the producer table and this pin"
     );
+    assert_eq!(
+        catalogue.targets.facts.len(),
+        catalogue.targets.minigames.len(),
+        "every finish_minigame producer must declare its result facts"
+    );
+    assert!(catalogue.targets.reports(39, MinigameFact::Placement));
+    assert!(!catalogue.targets.reports(39, MinigameFact::Elapsed));
+    assert!(catalogue.targets.reports(46, MinigameFact::Score));
+    assert!(!catalogue.targets.reports(46, MinigameFact::Placement));
+    assert!(!catalogue.targets.reports(599, MinigameFact::Score));
 }
 
 #[test]
@@ -1057,6 +1091,84 @@ fn every_authored_pet_trick_step_names_a_bundled_trick() {
     assert!(
         steps >= 13,
         "the authored pet-trick steps shrank to {steps}; the disabled records are no longer covered"
+    );
+}
+
+/// T787: an enabled `finish_minigame` may only require result facts its own producer
+/// reports. The fixture's target is a recipe's game id (a craft producer: score and
+/// elapsed), never a placement or a knock-out; the derby canary's id reports score,
+/// placement and knock-outs but no elapsed time. Both directions are checked, so a
+/// gate that ignored the producer table would fail either accepted bound. Canary:
+/// treat an unreportable field as acceptable and the placement case passes instead.
+#[test]
+fn requirement_needs_a_fact_the_producer_reports() {
+    // The fixture's finish_minigame target resolves to a craft win.
+    let craft = fixture("requirement-craft", Defect::None);
+    patch_fixture_field(
+        &craft,
+        FIXTURE_QUEST,
+        "finish_minigame",
+        "require",
+        json!({"min_score": 20000, "max_elapsed_seconds": 90}),
+    );
+    let catalogue = Catalogue::load(craft.path()).expect("the craft requirement loads");
+    assert!(
+        catalogue.target_violations().is_empty(),
+        "craft reports the score and elapsed bounds: {:?}",
+        catalogue.target_violations()
+    );
+
+    patch_fixture_field(
+        &craft,
+        FIXTURE_QUEST,
+        "finish_minigame",
+        "require",
+        json!({"max_placement": 1}),
+    );
+    let catalogue = Catalogue::load(craft.path()).expect("the craft requirement loads");
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains(&format!("quest {FIXTURE_QUEST} objective 5 (#4)"))
+            && violations[0].contains("max_placement")
+            && violations[0].contains("does not report"),
+        "the craft producer cannot report a placement: {violations:?}"
+    );
+
+    // The derby's own producer reports placement, score and knock-outs, but not a
+    // finish time (its elapsed fact is never claimed).
+    let derby = fixture("requirement-derby", Defect::None);
+    let path = derby.path().join("derby_entry.json");
+    fs::write(&path, br#"{"schema_version":1,"game_id":39}"#)
+        .unwrap_or_else(|error| panic!("{}: {error}", path.display()));
+    patch_fixture_objective(&derby, FIXTURE_QUEST, "finish_minigame", "minigame_id", 39);
+    patch_fixture_field(
+        &derby,
+        FIXTURE_QUEST,
+        "finish_minigame",
+        "require",
+        json!({"max_placement": 1, "no_knockout": true}),
+    );
+    let catalogue = Catalogue::load(derby.path()).expect("the derby requirement loads");
+    assert!(
+        catalogue.target_violations().is_empty(),
+        "the derby reports placement and knock-outs: {:?}",
+        catalogue.target_violations()
+    );
+
+    patch_fixture_field(
+        &derby,
+        FIXTURE_QUEST,
+        "finish_minigame",
+        "require",
+        json!({"max_elapsed_seconds": 60}),
+    );
+    let catalogue = Catalogue::load(derby.path()).expect("the derby requirement loads");
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains("max_elapsed_seconds") && violations[0].contains("minigame 39"),
+        "the derby reports no elapsed time: {violations:?}"
     );
 }
 

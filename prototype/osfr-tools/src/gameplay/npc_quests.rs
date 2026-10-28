@@ -377,21 +377,47 @@ impl Gameplay {
         replies: &[Vec<u8>],
         out: &mut Outcome,
     ) -> io::Result<()> {
-        if let Some(packet) = replies.iter().find(|p| {
-            (p.len() >= 16 && p.starts_with(&[39, 0, 18]) && p[15] == 1)
-                || (p.len() >= 19 && p.starts_with(&[39, 0, 14]) && &p[19..] == b"OnGameWonMsg\0")
-        }) {
-            let id = i32::from_le_bytes(packet[11..15].try_into().unwrap());
-            if id > 0 {
+        // Prefer the 39/18 result record when the same outcome also carries the
+        // movie's 39/14 win message: only the record has the run's facts.
+        let packet = winning_game_over(replies).or_else(|| winning_movie_message(replies));
+        if let Some(packet) = packet {
+            let Some(id) = game_over_game_id(packet) else {
+                return Ok(());
+            };
+            if packet.starts_with(&[39, 0, 18]) {
+                self.credit_minigame(id, game_over_result(packet), out)?;
+            } else {
                 self.npc_quest_event(
-                    crate::quest_engine::QuestEvent::FinishMinigame {
-                        minigame_id: id as u32,
-                    },
+                    crate::quest_engine::QuestEvent::FinishMinigame { minigame_id: id },
                     out,
                 )?;
             }
         }
         Ok(())
+    }
+
+    /// The result record of a run whose id-only credit already happened on the
+    /// earlier 39/14 win message (Forging, Mining and Harvesting present the record
+    /// only after the client's `FRServer_GameOver`). Sends only `MinigameResult`, so
+    /// a multi-completion id-only objective cannot count the same run twice.
+    pub(super) fn npc_minigame_result(
+        &mut self,
+        replies: &[Vec<u8>],
+        out: &mut Outcome,
+    ) -> io::Result<()> {
+        let Some(packet) = winning_game_over(replies) else {
+            return Ok(());
+        };
+        let Some(id) = game_over_game_id(packet) else {
+            return Ok(());
+        };
+        self.npc_quest_event(
+            crate::quest_engine::QuestEvent::MinigameResult {
+                minigame_id: id,
+                result: game_over_result(packet),
+            },
+            out,
+        )
     }
 
     pub(super) fn append_npc_quest_login_sync(&mut self, out: &mut Outcome) -> io::Result<()> {
@@ -543,4 +569,52 @@ impl Gameplay {
             })
             .collect()
     }
+}
+
+/// The server-built winning `39/18` result record. Body: shared header, `u8 won`
+/// at 15, then stars, elapsed seconds and score at 16/20/24 (client 39/18 reader
+/// 0x009b7ec0 -> `ApplyMiniGameGameOverResult` 0x009ad480; field body 0x009b48b0).
+fn winning_game_over(replies: &[Vec<u8>]) -> Option<&Vec<u8>> {
+    replies
+        .iter()
+        .find(|packet| packet.len() >= 28 && packet.starts_with(&[39, 0, 18]) && packet[15] == 1)
+}
+
+/// The movie's `39/14` `OnGameWonMsg` (client reader 0x009b89e0); it carries no
+/// result facts.
+fn winning_movie_message(replies: &[Vec<u8>]) -> Option<&Vec<u8>> {
+    replies.iter().find(|packet| {
+        packet.len() >= 19 && packet.starts_with(&[39, 0, 14]) && &packet[19..] == b"OnGameWonMsg\0"
+    })
+}
+
+/// The game id at bytes 11..15 of either winning message. Only a positive id can
+/// name an objective.
+fn game_over_game_id(packet: &[u8]) -> Option<u32> {
+    packet
+        .get(11..15)
+        .and_then(|bytes| <[u8; 4]>::try_from(bytes).ok())
+        .map(i32::from_le_bytes)
+        .and_then(|id| u32::try_from(id).ok())
+        .filter(|id| *id > 0)
+}
+
+fn game_over_result(packet: &[u8]) -> crate::quest_engine::MinigameResult {
+    crate::quest_engine::MinigameResult {
+        won: true,
+        elapsed_seconds: game_over_field(packet, 20, crate::content::MAX_MINIGAME_ELAPSED_SECONDS),
+        score: game_over_field(packet, 24, crate::content::MAX_MINIGAME_SCORE),
+        placement: None,
+        knocked_out: false,
+    }
+}
+
+/// One `39/18` result dword at `offset`, reported only when it is a non-negative
+/// value inside `max`. A value outside the sanity bound is not reported rather than
+/// failing the quest event and the settled match.
+fn game_over_field(packet: &[u8], offset: usize, max: u32) -> Option<u32> {
+    let bytes: [u8; 4] = packet.get(offset..offset + 4)?.try_into().ok()?;
+    u32::try_from(i32::from_le_bytes(bytes))
+        .ok()
+        .filter(|value| *value <= max)
 }

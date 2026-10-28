@@ -767,10 +767,22 @@ pub struct DerbyDriverState {
     pub score: u32,
     pub damage_dealt: u32,
     pub damage_received: u32,
+    /// (R) T787: how many times a contact reduced this driver to zero health in this
+    /// match. Not part of any packet; a quest `no_knockout` bound reads it.
+    pub knockouts_taken: u32,
     pub boost: f32,
     pub shield_until_ms: Option<u64>,
     pub attack_until_ms: Option<u64>,
     pub ultimate_until_ms: Option<u64>,
+}
+
+#[derive(Clone, Copy, Debug, PartialEq, Eq)]
+pub struct DerbyParticipantResult {
+    pub score: u32,
+    /// (R) T787: the Results ordering by score; equal scores share the better rank.
+    pub placement: u8,
+    /// Any contact reduced this driver to zero health during the match.
+    pub knocked_out: bool,
 }
 
 #[derive(Clone)]
@@ -880,6 +892,7 @@ impl DerbyService {
                     score: 0,
                     damage_dealt: 0,
                     damage_received: 0,
+                    knockouts_taken: 0,
                     boost: 0.0,
                     shield_until_ms: None,
                     attack_until_ms: None,
@@ -946,6 +959,29 @@ impl DerbyService {
         self.drivers.get(&key).map(|driver| &driver.state)
     }
 
+    /// (R) T787: one connected participant's completed result, only at the Results
+    /// phase. Placement follows the Results ordering by score (higher is better);
+    /// tied scores share the better rank, so two leaders are both first.
+    pub fn participant_result(&self, key: ParticipantKey) -> Option<DerbyParticipantResult> {
+        if self.phase != DerbyPhase::Results {
+            return None;
+        }
+        let driver = self
+            .drivers
+            .get(&key)
+            .filter(|driver| driver.state.connected)?;
+        let place = 1 + self
+            .drivers
+            .values()
+            .filter(|other| other.state.connected && other.state.score > driver.state.score)
+            .count();
+        Some(DerbyParticipantResult {
+            score: driver.state.score,
+            placement: u8::try_from(place).ok()?,
+            knocked_out: driver.state.knockouts_taken > 0,
+        })
+    }
+
     pub fn add_human(
         &mut self,
         key: ParticipantKey,
@@ -977,6 +1013,7 @@ impl DerbyService {
                     score: 0,
                     damage_dealt: 0,
                     damage_received: 0,
+                    knockouts_taken: 0,
                     boost: 0.0,
                     shield_until_ms: None,
                     attack_until_ms: None,
@@ -1192,6 +1229,7 @@ impl DerbyService {
                         score: 0,
                         damage_dealt: 0,
                         damage_received: 0,
+                        knockouts_taken: 0,
                         boost: 0.0,
                         shield_until_ms: None,
                         attack_until_ms: None,
@@ -1438,6 +1476,8 @@ impl DerbyService {
                 .saturating_sub(self.rules.knockout_point_loss);
             self.drivers.get_mut(&report.other).unwrap().respawn_at_ms =
                 Some(now_ms.saturating_add(self.rules.respawn_delay_ms));
+            let victim = self.drivers.get_mut(&report.other).unwrap();
+            victim.state.knockouts_taken = victim.state.knockouts_taken.saturating_add(1);
         }
         self.push_broadcast(&mut actions, self.state_message(sender))?;
         self.push_broadcast(&mut actions, self.state_message(report.other))?;

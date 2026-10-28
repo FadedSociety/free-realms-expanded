@@ -482,6 +482,15 @@ impl RaceSession {
         self.best_lap_ms
     }
 
+    /// (R) T787: elapsed seconds of a race whose every lap is counted. The last
+    /// completed lap's timestamp is the finish time, and it survives a snapshot
+    /// restore, so a reconnect before the claim keeps the same elapsed result.
+    pub fn finish_elapsed_seconds(&self) -> Option<u32> {
+        (self.phase == Phase::Finished)
+            .then(|| self.lap_started_ms.saturating_sub(self.started_ms) / 1_000)
+            .and_then(|seconds| u32::try_from(seconds).ok())
+    }
+
     pub fn next_checkpoint(&self) -> Option<u32> {
         self.layout.checkpoints.get(self.next_index).copied()
     }

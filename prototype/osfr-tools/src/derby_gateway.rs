@@ -17,8 +17,8 @@
 use crate::{
     character_store::CharacterState,
     derby::{
-        DEMO_DERBY_LOBBY_NAME_ID, DerbyAction, DerbyError, DerbyPhase, DerbyPickup, DerbyRules,
-        DerbyService, DerbyVehicleTemplate, ParticipantKey,
+        DEMO_DERBY_LOBBY_NAME_ID, DerbyAction, DerbyError, DerbyParticipantResult, DerbyPhase,
+        DerbyPickup, DerbyRules, DerbyService, DerbyVehicleTemplate, ParticipantKey,
     },
     rewards::{RewardDisplay, RewardGrant},
 };
@@ -461,6 +461,17 @@ impl DerbyGateway {
             self.paid_matches.remove(0);
         }
         Some(instance)
+    }
+
+    /// (R) T787: the owner's own result facts once the match is showing Results.
+    /// `None` before Results or for a foreign key; the quest credit then carries no
+    /// score, placement or knock-out claim.
+    pub fn completion_result(&self, guid: u64) -> Option<DerbyParticipantResult> {
+        let key = ParticipantKey(guid);
+        if self.owner != Some(key) {
+            return None;
+        }
+        self.service.as_ref()?.participant_result(key)
     }
 
     /// The one flat completion grant this package pays. It never carries items and never derives

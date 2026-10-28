@@ -269,6 +269,24 @@ fn accept_license(fixture: &Fixture, game: &mut Gameplay, now: &mut u64) {
     assert_eq!(counts(game, LICENSE_TO_DRIVE), vec![0, 0]);
 }
 
+/// T787: give the license quest's finish objective a result requirement (and a count)
+/// before the session binds the catalogue. The shipped file in `data/content` is never
+/// touched; `patch_quest` writes the fixture's narrowed copy.
+fn patch_license_require(fixture: &Fixture, count: u32, require: Value) {
+    fixture
+        .inner
+        .patch_quest("demo_derby_driver.json", LICENSE_TO_DRIVE, |record| {
+            let goal = record["objectives"]
+                .as_array_mut()
+                .expect("license objectives")
+                .iter_mut()
+                .find(|goal| goal["kind"] == "finish_minigame")
+                .expect("the license finish objective");
+            goal["count"] = json!(count);
+            goal["require"] = require;
+        });
+}
+
 fn start_request(instance: i32) -> Vec<u8> {
     let mut bytes = vec![39, 0, 5];
     bytes.extend(instance.to_le_bytes());
@@ -694,6 +712,110 @@ fn the_chapter_plays_and_credits_one_finished_derby_exactly_once() {
         "a replayed 49/2 accept",
     );
     assert_eq!(coins(&game), live_coins + LICENSE_COINS);
+}
+
+/// T787: the derby reports this participant's own placement and knock-out record to a
+/// `require` objective, and one settled instance credits it once even when the objective
+/// still needs a second match. A replayed 34/16 in the Results phase is not a second
+/// settle (`take_completion`'s `paid_matches` ledger), and a real save/reload keeps the
+/// credit without persisting any result fact.
+#[test]
+fn second_settlement_of_same_instance_credits_once() {
+    let fixture = Fixture::new(CHARACTER);
+    patch_license_require(
+        &fixture,
+        2,
+        json!({"max_placement": 1, "no_knockout": true}),
+    );
+    let mut game = fixture.game();
+    let mut now = NOW;
+    learn_and_activate(&fixture, &mut game, &mut now);
+    rules_of_the_road(&fixture, &mut game, &mut now);
+    accept_license(&fixture, &mut game, &mut now);
+
+    let finished = play_to_results(&fixture, &mut game, MAD_JACK, &mut now);
+    assert_eq!(
+        counts(&game, LICENSE_TO_DRIVE),
+        vec![1, 0],
+        "one finished match credits the two-completion objective once"
+    );
+    assert_eq!(
+        count_quest_packets(&finished.results, LICENSE_TO_DRIVE, 9),
+        1,
+        "one 49/9 objective update: {}",
+        replies_text(&finished.results)
+    );
+    assert!(objective_update(&finished.results, LICENSE_TO_DRIVE, 1, 1));
+    assert!(
+        !objective_complete(&finished.results, LICENSE_TO_DRIVE, 1),
+        "the objective still needs a second match"
+    );
+    let credited = game.state().npc_quests.clone();
+
+    // A repeated result record for the same instance must not count again.
+    let replay = send(
+        &mut game,
+        &fixture.character(MAD_JACK),
+        &hit_for(ParticipantKey(fixture.guid), finished.npcs[0], 100.0),
+        now + 100,
+    );
+    assert!(!replay.changed);
+    assert!(replay.replies.is_empty());
+    assert_eq!(game.state().npc_quests, credited);
+    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![1, 0]);
+
+    // The counters are saved quest progress; the result facts are not saved at all.
+    let bytes = serde_json::to_vec(&game.state()).unwrap();
+    assert!(
+        !bytes
+            .windows(b"knocked_out".len())
+            .any(|window| window == b"knocked_out"),
+        "the derby result facts were written into the save"
+    );
+    let reloaded = save_and_reload(&fixture, &game);
+    assert_eq!(counts(&reloaded, LICENSE_TO_DRIVE), vec![1, 0]);
+    assert_eq!(
+        quest_status(&reloaded, LICENSE_TO_DRIVE),
+        QuestStatus::Active
+    );
+}
+
+/// T787: the same derby path reports a score, so a `min_score` the finished run did not
+/// reach leaves the quest state byte-equal and sends no quest packet while the match
+/// still settles and pays. Canary: ignore `min_score` in `event_matches` and this fails.
+#[test]
+fn result_below_threshold_changes_nothing() {
+    let fixture = Fixture::new(CHARACTER);
+    patch_license_require(&fixture, 1, json!({"min_score": 1_000_000_000}));
+    let mut game = fixture.game();
+    let mut now = NOW;
+    learn_and_activate(&fixture, &mut game, &mut now);
+    rules_of_the_road(&fixture, &mut game, &mut now);
+    accept_license(&fixture, &mut game, &mut now);
+    assert_eq!(counts(&game, LICENSE_TO_DRIVE), vec![0, 0]);
+    let before = game.state().npc_quests.clone();
+
+    let finished = play_to_results(&fixture, &mut game, MAD_JACK, &mut now);
+    assert_eq!(
+        game.derby_phase(),
+        Some(DerbyPhase::Results),
+        "the match still reaches its results phase"
+    );
+    assert_eq!(
+        count_quest_packets(&finished.results, LICENSE_TO_DRIVE, 9),
+        0,
+        "no objective update: {}",
+        replies_text(&finished.results)
+    );
+    assert_eq!(
+        count_quest_packets(&finished.results, LICENSE_TO_DRIVE, 10),
+        0
+    );
+    assert_eq!(
+        game.state().npc_quests,
+        before,
+        "a result below the bound changes no quest state"
+    );
 }
 
 #[test]

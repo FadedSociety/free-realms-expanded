@@ -386,6 +386,49 @@ fn contacts_apply_server_damage_knockout_scores_and_four_second_respawn() {
 }
 
 #[test]
+fn each_participant_gets_their_own_placement() {
+    let mut derby = service(&[OWNER, OTHER], Vec::new());
+    run_to_live(&mut derby, &[OWNER, OTHER]);
+    for key in [OWNER, OTHER] {
+        derby
+            .handle_client(key, &pose(key, [0.0, 0.0, 0.0]), 5_000)
+            .unwrap();
+    }
+    let hit = encode_inner(&DerbyMessage::VehicleHit(VehicleHitReport {
+        reporter: OWNER,
+        other: OTHER,
+        impact_bits: 25.0_f32.to_bits(),
+    }))
+    .unwrap();
+    derby.handle_client(OWNER, &hit, 6_000).unwrap();
+    assert_eq!(derby.driver(OTHER).unwrap().health, 0);
+    assert!(
+        derby.participant_result(OWNER).is_none(),
+        "not finished yet"
+    );
+
+    derby.finish_match(7_000).unwrap();
+    let owner = derby.participant_result(OWNER).unwrap();
+    assert_eq!(owner.score, 2);
+    assert_eq!(owner.placement, 1);
+    assert!(!owner.knocked_out);
+    let other = derby.participant_result(OTHER).unwrap();
+    assert_eq!(other.score, 0);
+    assert_eq!(other.placement, 2);
+    assert!(
+        other.knocked_out,
+        "the victim's own knock-out is not the reporter's"
+    );
+
+    // Equal scores share the better rank instead of being ordered by damage.
+    let mut tied = service(&[OWNER, OTHER], Vec::new());
+    run_to_live(&mut tied, &[OWNER, OTHER]);
+    tied.finish_match(7_000).unwrap();
+    assert_eq!(tied.participant_result(OWNER).unwrap().placement, 1);
+    assert_eq!(tied.participant_result(OTHER).unwrap().placement, 1);
+}
+
+#[test]
 fn each_powerup_type_applies_once_and_expiry_uses_client_categories() {
     let pickups = vec![
         pickup(1, PickupKind::Health, 0.0),

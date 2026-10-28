@@ -220,8 +220,23 @@ impl Gameplay {
         out.changed = true;
         let derby = self.derby.as_ref().unwrap();
         let (minigame_id, grant) = (derby.game_id(), derby.completion_grant(character.guid));
-        self.npc_quest_event(
-            crate::quest_engine::QuestEvent::FinishMinigame { minigame_id },
+        // T787: this participant's own score, placement and knock-outs, never another
+        // driver's. A missing result (a phase race) claims no fact, so no bound the
+        // producer can report is met by accident; `knocked_out` stays conservative.
+        let facts = derby.completion_result(character.guid);
+        self.credit_minigame(
+            minigame_id,
+            crate::quest_engine::MinigameResult {
+                won: true,
+                elapsed_seconds: None,
+                // An out-of-range score is reported as absent rather than failing the
+                // event: the match has already settled and paid.
+                score: facts
+                    .map(|facts| facts.score)
+                    .filter(|score| *score <= crate::content::MAX_MINIGAME_SCORE),
+                placement: facts.map(|facts| facts.placement),
+                knocked_out: facts.is_none_or(|facts| facts.knocked_out),
+            },
             out,
         )?;
         // T229: the same handover pays the derby's Station Cash kind, whatever the coin grant does.

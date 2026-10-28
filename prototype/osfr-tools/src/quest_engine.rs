@@ -64,6 +64,8 @@ enum RuntimeGoal {
         id: u32,
         minigame_id: u32,
         count: u32,
+        #[serde(default)]
+        require: Option<crate::content::MinigameRequirement>,
         source: Vec<crate::content::SourceTag>,
     },
     EquipItem {
@@ -128,13 +130,18 @@ fn runtime_objective(
             id,
             minigame_id,
             count,
+            require,
             source,
-        } => (
-            id,
-            count,
-            ObjectiveKind::FinishMinigame { minigame_id },
-            source,
-        ),
+        } => {
+            let kind = match require {
+                Some(require) => ObjectiveKind::MinigameResult {
+                    minigame_id,
+                    require,
+                },
+                None => ObjectiveKind::FinishMinigame { minigame_id },
+            };
+            (id, count, kind, source)
+        }
         RuntimeGoal::EquipItem {
             id,
             definition_id,
@@ -301,6 +308,12 @@ pub enum ObjectiveKind {
     },
     FinishMinigame {
         minigame_id: u32,
+    },
+    /// (R) T787: one settled result for this minigame must also meet every authored
+    /// bound. A goal with no `require` keeps [`Self::FinishMinigame`].
+    MinigameResult {
+        minigame_id: u32,
+        require: crate::content::MinigameRequirement,
     },
     /// T788: the owner's pet performs the trick the client names by its `pets.json` id.
     /// The server accepts the 53/7 request; the client-computed grade is never sent.
@@ -666,6 +679,35 @@ pub enum OutboundMessage {
     Reward(Vec<u8>),
 }
 
+/// (R) T787: the server-observed facts of one settled minigame. `None` means the
+/// producer did not report that fact; a requirement bound on it is not met.
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub struct MinigameResult {
+    pub won: bool,
+    pub elapsed_seconds: Option<u32>,
+    pub score: Option<u32>,
+    pub placement: Option<u8>,
+    pub knocked_out: bool,
+}
+
+impl MinigameResult {
+    /// (R) T787: every authored bound holds for this result. A bound on a fact the
+    /// result does not carry is not met. Exact bounds count.
+    pub fn meets(&self, require: &crate::content::MinigameRequirement) -> bool {
+        self.won
+            && require
+                .min_score
+                .is_none_or(|min| self.score.is_some_and(|score| score >= min))
+            && require
+                .max_elapsed_seconds
+                .is_none_or(|max| self.elapsed_seconds.is_some_and(|elapsed| elapsed <= max))
+            && require
+                .max_placement
+                .is_none_or(|max| self.placement.is_some_and(|placement| placement <= max))
+            && (!require.no_knockout || !self.knocked_out)
+    }
+}
+
 #[derive(Clone, Debug, PartialEq)]
 pub enum QuestEvent {
     TalkToNpc {
@@ -687,6 +729,13 @@ pub enum QuestEvent {
     },
     FinishMinigame {
         minigame_id: u32,
+    },
+    /// (R) T787: the facts of one settled server minigame. Both this and
+    /// [`Self::FinishMinigame`] are emitted for the same settle; an objective matches
+    /// only one of them, so a result never counts twice.
+    MinigameResult {
+        minigame_id: u32,
+        result: MinigameResult,
     },
     /// T788: one accepted 53/7 for this trick on the owner's summoned pet.
     PetTrick {
@@ -2746,13 +2795,20 @@ fn definition_from_content(
                 id,
                 minigame_id,
                 count,
+                require,
                 ..
             } => QuestObjective {
                 id: *id,
                 required: *count,
                 description: format!("Objective {}", id),
-                kind: ObjectiveKind::FinishMinigame {
-                    minigame_id: *minigame_id,
+                kind: match require {
+                    Some(require) => ObjectiveKind::MinigameResult {
+                        minigame_id: *minigame_id,
+                        require: *require,
+                    },
+                    None => ObjectiveKind::FinishMinigame {
+                        minigame_id: *minigame_id,
+                    },
                 },
             },
             ContentGoal::PerformPetTrick {
@@ -3118,6 +3174,10 @@ fn valid_objective_kind(kind: &ObjectiveKind) -> bool {
         ObjectiveKind::EnterArea { .. } => true,
         ObjectiveKind::ReachPoi { poi_id } => *poi_id != 0,
         ObjectiveKind::FinishMinigame { minigame_id } => *minigame_id != 0,
+        ObjectiveKind::MinigameResult {
+            minigame_id,
+            require,
+        } => *minigame_id != 0 && require.valid(),
         ObjectiveKind::PetTrick { trick_id } => *trick_id != 0,
         ObjectiveKind::GatherResource { resource_id } => *resource_id != 0,
         ObjectiveKind::CollectNode { node_type } => crate::content::valid_node_type(node_type),
@@ -3181,6 +3241,23 @@ fn validate_event(event: &QuestEvent) -> io::Result<()> {
         QuestEvent::EnterArea { .. } => true,
         QuestEvent::ReachPoi { poi_id } => *poi_id != 0,
         QuestEvent::FinishMinigame { minigame_id } => *minigame_id != 0,
+        // (R) T787: the producers are server-side, so these are sanity nets against a
+        // malformed report, not a client check.
+        QuestEvent::MinigameResult {
+            minigame_id,
+            result,
+        } => {
+            *minigame_id != 0
+                && result
+                    .score
+                    .is_none_or(|score| score <= crate::content::MAX_MINIGAME_SCORE)
+                && result
+                    .elapsed_seconds
+                    .is_none_or(|elapsed| elapsed <= crate::content::MAX_MINIGAME_ELAPSED_SECONDS)
+                && result.placement.is_none_or(|placement| {
+                    (1..=crate::content::MAX_MINIGAME_PLACEMENT).contains(&placement)
+                })
+        }
         QuestEvent::PetTrick { trick_id } => *trick_id != 0,
         QuestEvent::GatherResource {
             resource_id,
@@ -3245,6 +3322,16 @@ fn event_matches(kind: &ObjectiveKind, event: &QuestEvent) -> u32 {
             ObjectiveKind::FinishMinigame { minigame_id: a },
             QuestEvent::FinishMinigame { minigame_id: b },
         ) if a == b => 1,
+        (
+            ObjectiveKind::MinigameResult {
+                minigame_id: a,
+                require,
+            },
+            QuestEvent::MinigameResult {
+                minigame_id: b,
+                result,
+            },
+        ) if a == b && result.meets(require) => 1,
         (ObjectiveKind::PetTrick { trick_id: a }, QuestEvent::PetTrick { trick_id: b })
             if a == b =>
         {

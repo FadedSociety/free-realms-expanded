@@ -701,6 +701,10 @@ fn ordinary_entry_finishes_pays_exactly_once_and_returns_in_the_prior_job() {
         Some(31),
         "the stable speedway id is the quest completion identity"
     );
+    assert!(
+        paid.elapsed_seconds.is_some(),
+        "T787: a paid finish reports its own elapsed seconds"
+    );
     assert_eq!((coins(&inventory), xp(&profiles)), (40, 60));
 
     // Replays and later claims pay nothing.

@@ -7,7 +7,8 @@
 //!   encounter engine converts into battles) plus the raw `encounters.json`
 //!   `dungeons[].id` rows the encounter loader owns but exposes no id list for.
 //! * `minigames`: the game id of every server path that can emit a
-//!   `FinishMinigame` quest event, one row per emitter:
+//!   `FinishMinigame` quest event, one row per emitter, plus the result facts
+//!   that emitter reports (`facts`, T787):
 //!
 //!   | Emitter | Id | Source |
 //!   |---|---|---|
@@ -27,7 +28,10 @@
 //!   `recipes.json` rows carry all three ids. A finished derby credits the
 //!   package's MiniGameData row (`DerbyGateway::game_id`, 39 "Wildwood Demo
 //!   Derby"), never its type id 11, which is MiniGameData row 11 (the Trading
-//!   Card Game).
+//!   Card Game). Craft, mining, harvesting, chess and soccer read their elapsed
+//!   seconds and score from the server-built 39/18; kart reports its own elapsed
+//!   time and no placement (a single-player time trial); the derby reports score,
+//!   placement and knock-outs; a paid fishing catch reports no result fact.
 //! * `items`: `Inventory::load`'s merged `inventory.json` +
 //!   `item-catalogue.json` definitions. An absent catalogue is an empty set, so
 //!   a graded item target fails loudly instead of passing vacuously.
@@ -66,7 +70,11 @@ use osfr_tools::{
     soccer_entry,
 };
 use serde_json::Value;
-use std::{collections::BTreeSet, fs, io, path::Path};
+use std::{
+    collections::{BTreeMap, BTreeSet},
+    fs, io,
+    path::Path,
+};
 
 /// `src/gameplay.rs`'s private `HARVESTING_GAME_ID`: the one harvesting game the
 /// server loads, so the only harvesting id `finish_minigame` can receive.
@@ -74,6 +82,24 @@ pub const HARVESTING_GAME_ID: u32 = 111;
 /// `Gameplay::local_gather_drop` match keys for the opening local drops. These
 /// are gather event resource keys, not item definition ids.
 pub const LOCAL_GATHER_RESOURCES: [u32; 3] = [1_001, 1_002, 1_003];
+
+/// What the 39/18 result path reports for craft, mining, harvesting, chess and soccer.
+const SCORE_AND_ELAPSED: [MinigameFact; 2] = [MinigameFact::Score, MinigameFact::Elapsed];
+/// The derby's own per-driver result facts.
+const DERBY_FACTS: [MinigameFact; 3] = [
+    MinigameFact::Score,
+    MinigameFact::Placement,
+    MinigameFact::Knockout,
+];
+
+/// One fact a producer reports on its `MinigameResult` event (T787).
+#[derive(Clone, Copy, Debug, Eq, Ord, PartialEq, PartialOrd)]
+pub enum MinigameFact {
+    Score,
+    Elapsed,
+    Placement,
+    Knockout,
+}
 
 /// Target-id sets a graded objective must resolve in, loaded once from the same
 /// content root as the quest catalogue.
@@ -83,6 +109,9 @@ pub struct Targets {
     pub dungeons: BTreeSet<u32>,
     /// The ids a server path can emit as a `FinishMinigame` event.
     pub minigames: BTreeSet<u32>,
+    /// What the producer for each `minigames` id can report; an id with no row
+    /// reports nothing (an empty set).
+    pub facts: BTreeMap<u32, BTreeSet<MinigameFact>>,
     /// The merged `inventory.json` + `item-catalogue.json` definitions.
     pub items: BTreeSet<i32>,
     /// The loaded recipe book's stable server ids.
@@ -103,6 +132,22 @@ pub struct Targets {
 }
 
 impl Targets {
+    /// Register one producer: its id is a `finish_minigame` target and `facts` are
+    /// the result facts it reports. Re-registering an id unions the facts, so an id
+    /// two loaders can send never loses a reportable fact.
+    fn producer(&mut self, id: u32, facts: impl IntoIterator<Item = MinigameFact>) {
+        self.minigames.insert(id);
+        self.facts.entry(id).or_default().extend(facts);
+    }
+
+    /// Whether the producer for `minigame` reports `fact`.
+    #[allow(dead_code)]
+    pub fn reports(&self, minigame: u32, fact: MinigameFact) -> bool {
+        self.facts
+            .get(&minigame)
+            .is_some_and(|facts| facts.contains(&fact))
+    }
+
     pub fn load(root: &Path, profile_root: &Path) -> io::Result<Self> {
         let mut targets = Self {
             gather: LOCAL_GATHER_RESOURCES.into_iter().collect(),
@@ -134,36 +179,31 @@ impl Targets {
         let chess = root.join(chess_service::CONTENT_FILE);
         if chess.is_file() {
             // `run_spec` sends `row_id` as the game id; the loader validates it.
-            targets.minigames.extend(
-                chess_service::ChessContent::load(&chess)?
-                    .rows
-                    .iter()
-                    .map(|row| row.row_id),
-            );
+            for row in chess_service::ChessContent::load(&chess)?.rows.iter() {
+                targets.producer(row.row_id, SCORE_AND_ELAPSED);
+            }
         }
         // `KartGateway::load` owns the file; the kart claim credits the authored
-        // speedway id, and the service exposes no id accessor.
-        targets
-            .minigames
-            .extend(read_ids(root, "kart_entry.json", |document| {
-                as_u32(&document["race"]["speedway"]).into_iter().collect()
-            }));
+        // speedway id, and the service exposes no id accessor. A time trial has no
+        // rival, so no placement is reported.
+        for speedway in read_ids(root, "kart_entry.json", |document| {
+            as_u32(&document["race"]["speedway"]).into_iter().collect()
+        }) {
+            targets.producer(speedway, [MinigameFact::Elapsed]);
+        }
         let soccer = root.join(soccer_entry::CONTENT_FILE);
         if soccer.is_file() {
-            targets.minigames.extend(
-                soccer_entry::Content::load(&soccer)?
-                    .games()
-                    .iter()
-                    .map(|game| game.id),
-            );
+            for game in soccer_entry::Content::load(&soccer)?.games() {
+                targets.producer(game.id, SCORE_AND_ELAPSED);
+            }
         }
         // `FishingSpots::load` owns the file; a paid catch credits the spot's
-        // `game_id` to `finish_minigame`.
-        targets
-            .minigames
-            .extend(read_ids(root, "fishing_spots.json", |document| {
-                array_ids(document, "spots", "game_id")
-            }));
+        // `game_id` to `finish_minigame` and reports no result fact.
+        for spot in read_ids(root, "fishing_spots.json", |document| {
+            array_ids(document, "spots", "game_id")
+        }) {
+            targets.producer(spot, []);
+        }
 
         let mining = root.join(mining::CONTENT_FILE);
         if mining.is_file() {
@@ -174,7 +214,7 @@ impl Targets {
                 mining::FIRST_MINING_INSTANCE,
                 None,
             )?;
-            targets.minigames.insert(mining::MINING_GAME_ID as u32);
+            targets.producer(mining::MINING_GAME_ID as u32, SCORE_AND_ELAPSED);
             targets.gather.extend(
                 engine
                     .spec()
@@ -192,7 +232,7 @@ impl Targets {
                 harvesting::FIRST_INSTANCE_ID,
                 None,
             )?;
-            targets.minigames.insert(HARVESTING_GAME_ID);
+            targets.producer(HARVESTING_GAME_ID, SCORE_AND_ELAPSED);
             targets.gather.extend(
                 engine
                     .spec()
@@ -221,20 +261,21 @@ impl Targets {
             CraftingJob::Miner.opening_recipe_id(),
         ]);
         // A selected recipe's minigame id is the 39/18 game id a craft win sends.
-        targets.minigames.extend(
-            recipes
-                .records
-                .iter()
-                .filter_map(|recipe| recipe.minigame_id),
-        );
+        for minigame in recipes
+            .records
+            .iter()
+            .filter_map(|recipe| recipe.minigame_id)
+        {
+            targets.producer(minigame, SCORE_AND_ELAPSED);
+        }
 
         // `DerbyGateway::load` owns the file; a finished match credits its
-        // `game_id` whatever the flat payout.
-        targets
-            .minigames
-            .extend(read_ids(root, "derby_entry.json", |document| {
-                as_u32(&document["game_id"]).into_iter().collect()
-            }));
+        // `game_id` whatever the flat payout and reports its own driver's result.
+        for game in read_ids(root, "derby_entry.json", |document| {
+            as_u32(&document["game_id"]).into_iter().collect()
+        }) {
+            targets.producer(game, DERBY_FACTS);
+        }
 
         // T503: the loader owns `quest_nodes.json`; only placed pickups count, so a
         // configured type with no spawn is not reachable.

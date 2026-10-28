@@ -60,6 +60,7 @@ mod jobs;
 mod knockout;
 mod live_events;
 mod matchmaking_route;
+mod minigame_credit;
 mod movie;
 mod npc;
 mod npc_quests;
@@ -1982,8 +1983,15 @@ impl Gameplay {
                 ..Default::default()
             };
             if let Some(minigame_id) = claim.minigame_id {
-                staged.npc_quest_event(
-                    crate::quest_engine::QuestEvent::FinishMinigame { minigame_id },
+                staged.credit_minigame(
+                    minigame_id,
+                    crate::quest_engine::MinigameResult {
+                        won: true,
+                        elapsed_seconds: claim.elapsed_seconds,
+                        score: None,
+                        placement: None,
+                        knocked_out: false,
+                    },
                     &mut out,
                 )?;
                 staged.npc_quest_profiles_changed(&mut out)?;
@@ -2555,16 +2563,23 @@ impl Gameplay {
             let kart = self.kart_entry.as_mut().unwrap();
             let before = kart.state().clone();
             out.replies = kart.handle(inner, now_ms)?;
-            let mut minigame_id = None;
+            let mut minigame = None;
             if let Some(profiles) = &mut self.profiles {
                 let claim = kart.claim_reward_with_event(&mut self.inventory, profiles)?;
-                minigame_id = claim.minigame_id;
+                minigame = claim.minigame_id.map(|id| (id, claim.elapsed_seconds));
                 out.replies.extend(claim.replies);
             }
             out.changed = before.changed_for_save(kart.state());
-            if let Some(minigame_id) = minigame_id {
-                self.npc_quest_event(
-                    crate::quest_engine::QuestEvent::FinishMinigame { minigame_id },
+            if let Some((minigame_id, elapsed_seconds)) = minigame {
+                self.credit_minigame(
+                    minigame_id,
+                    crate::quest_engine::MinigameResult {
+                        won: true,
+                        elapsed_seconds,
+                        score: None,
+                        placement: None,
+                        knocked_out: false,
+                    },
                     &mut out,
                 )?;
                 self.npc_quest_profiles_changed(&mut out)?;

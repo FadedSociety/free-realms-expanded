@@ -180,6 +180,42 @@ pub struct RewardGrant {
     pub source: Vec<SourceTag>,
 }
 
+/// (R) T787: an authored bound on one settled minigame result. Every unset field is
+/// unconstrained; a bound on a fact the producer does not report cannot be met.
+#[derive(Clone, Copy, Debug, Default, Deserialize, Eq, PartialEq, Serialize)]
+#[serde(deny_unknown_fields)]
+pub struct MinigameRequirement {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub min_score: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_elapsed_seconds: Option<u32>,
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub max_placement: Option<u8>,
+    #[serde(default, skip_serializing_if = "std::ops::Not::not")]
+    pub no_knockout: bool,
+}
+
+/// (R) T787 sanity bounds for authored `finish_minigame` requirements. They are not
+/// retail values; they keep a content typo from authoring an unreachable goal.
+pub(crate) const MAX_MINIGAME_SCORE: u32 = 1_000_000_000;
+pub(crate) const MAX_MINIGAME_ELAPSED_SECONDS: u32 = 86_400;
+/// One derby results list (`derby::MAX_DERBY_DRIVERS`): the most placements a match
+/// can report.
+pub(crate) const MAX_MINIGAME_PLACEMENT: u8 = crate::derby::MAX_DERBY_DRIVERS as u8;
+
+impl MinigameRequirement {
+    pub(crate) fn valid(&self) -> bool {
+        self.min_score
+            .is_none_or(|score| (1..=MAX_MINIGAME_SCORE).contains(&score))
+            && self
+                .max_elapsed_seconds
+                .is_none_or(|seconds| (1..=MAX_MINIGAME_ELAPSED_SECONDS).contains(&seconds))
+            && self
+                .max_placement
+                .is_none_or(|placement| (1..=MAX_MINIGAME_PLACEMENT).contains(&placement))
+    }
+}
+
 #[derive(Clone, Debug, Deserialize, PartialEq, Serialize)]
 #[serde(tag = "kind", rename_all = "snake_case", deny_unknown_fields)]
 pub enum ContentGoal {
@@ -261,6 +297,10 @@ pub enum ContentGoal {
         id: u32,
         minigame_id: u32,
         count: u32,
+        /// (R) T787: a settled result must also meet these facts. Absent keeps the
+        /// id-only objective the server has always credited.
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        require: Option<MinigameRequirement>,
         source: Vec<SourceTag>,
     },
     /// (R) T788: the owner's pet performs a trick the client names by id. `trick_id` is a
@@ -1085,10 +1125,34 @@ fn validate_goal(
             }
             Ok(())
         }
-        // The quest engine validates resource, recipe, minigame and geometry bindings.
+        // (R) T787: every authored bound must be within the documented sanity range,
+        // so a typo cannot make an objective no result can ever meet.
+        ContentGoal::FinishMinigame {
+            minigame_id,
+            require,
+            ..
+        } => {
+            if *minigame_id == 0 {
+                return Err(ContentError::InvalidRecord {
+                    record: owner.to_owned(),
+                    detail: "goal.minigame_id must be positive".to_owned(),
+                });
+            }
+            if require.is_some_and(|require| !require.valid()) {
+                return Err(ContentError::InvalidRecord {
+                    record: owner.to_owned(),
+                    detail: format!(
+                        "goal.require bounds must be min_score 1..={MAX_MINIGAME_SCORE}, \
+                         max_elapsed_seconds 1..={MAX_MINIGAME_ELAPSED_SECONDS} and \
+                         max_placement 1..={MAX_MINIGAME_PLACEMENT}"
+                    ),
+                });
+            }
+            Ok(())
+        }
+        // The quest engine validates resource, recipe and geometry bindings.
         ContentGoal::GatherResource { .. }
         | ContentGoal::CraftRecipe { .. }
-        | ContentGoal::FinishMinigame { .. }
         | ContentGoal::VisitPosition { .. }
         | ContentGoal::ClientReported { .. } => Ok(()),
         ContentGoal::InteractActor { actor_guid, .. } => {

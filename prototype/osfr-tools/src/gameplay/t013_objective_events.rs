@@ -981,6 +981,159 @@ fn ordinary_mining_node_advances_gather_and_minigame_through_gameplay() {
 }
 
 #[test]
+fn mining_result_reports_elapsed_to_a_required_objective() {
+    let (mut game, _scratch) = gathering_game(
+        crate::mining::MINER_PROFILE_ID,
+        1,
+        definition_many(
+            1,
+            vec![(
+                1,
+                ObjectiveKind::MinigameResult {
+                    minigame_id: 18,
+                    require: crate::content::MinigameRequirement {
+                        max_elapsed_seconds: Some(180),
+                        ..Default::default()
+                    },
+                },
+                1,
+            )],
+            false,
+        ),
+    );
+    let (node_guid, character) = gather_node(&game, "Copper Vein", 0);
+    game.tick(&character, 1_000).unwrap();
+    select(&mut game, crate::mining::MINER_PROFILE_ID);
+    send(&mut game, &character, &node_click(node_guid), 1_200);
+    let instance = game
+        .mining
+        .as_ref()
+        .unwrap()
+        .state()
+        .active
+        .as_ref()
+        .expect("mining run")
+        .instance_id;
+    finish_type8(&mut game, &character, instance, 1, 2_000);
+    // The client's result acknowledgement is what makes the engine present the
+    // server-built 39/18 result record that carries the elapsed time.
+    let result = send(
+        &mut game,
+        &character,
+        &type8_payload(instance, "FRServer_GameOver"),
+        3_000,
+    );
+    assert!(
+        result
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[39, 0, 18]) && packet.get(15) == Some(&1)),
+        "the client acknowledgement presents the server-built winning 39/18 record"
+    );
+    assert_eq!(
+        game.npc_quests
+            .as_ref()
+            .unwrap()
+            .progress(1)
+            .unwrap()
+            .counts,
+        vec![1],
+        "the mining win reports an elapsed time the bound accepts"
+    );
+}
+
+#[test]
+fn forging_result_reports_elapsed_to_a_required_objective() {
+    // The forging tutorial's own movie id (the blacksmith row in recipes.json).
+    const FORGING_GAME_ID: u32 = 139;
+    // The reference forging board's quota: a won run has collected exactly this.
+    const FORGING_QUOTA: u32 = 5;
+    let mut case = tutorial_case(TutorialStep::Craft(2003), 16, true);
+    grant_requirements(&mut case.game, CraftingJob::Blacksmith);
+    case.game
+        .handle_in_world(&choose(case.actor), &case.character, 1_000)
+        .unwrap();
+    let instance = case
+        .game
+        .forging
+        .as_ref()
+        .unwrap()
+        .state()
+        .active
+        .as_ref()
+        .expect("forging run")
+        .instance_id;
+    // Reach Playing through the original handshake: the board exists only after it.
+    let mut start = vec![39, 0, 5];
+    for word in [instance, -1, -1] {
+        start.extend(word.to_le_bytes());
+    }
+    send(&mut case.game, &case.character, &start, 1_100);
+    for (step, message) in ["OnConnectMsg", "OnStartGameMsg\t0", "OnStartLevelMsg\t0"]
+        .iter()
+        .enumerate()
+    {
+        send(
+            &mut case.game,
+            &case.character,
+            &forging_payload(instance, message),
+            1_200 + step as u64 * 100,
+        );
+    }
+    // Forging defers its 39/18 to the client's GameOver, in an outcome with no reward
+    // transaction, so the win already credited the id-only event before the facts.
+    let mut state = case.game.forging.as_ref().unwrap().state().clone();
+    let run = state.active.as_mut().unwrap();
+    run.phase = crate::forging::ForgingPhase::Won;
+    run.collected = FORGING_QUOTA;
+    state.completed = 1;
+    case.game.forging = Some(Forging::load(&reference(), Some(state)).unwrap());
+    install(
+        &mut case.game,
+        ObjectiveKind::MinigameResult {
+            minigame_id: FORGING_GAME_ID,
+            require: crate::content::MinigameRequirement {
+                max_elapsed_seconds: Some(180),
+                ..Default::default()
+            },
+        },
+        1,
+    );
+    let result = send(
+        &mut case.game,
+        &case.character,
+        &forging_payload(instance, "FRServer_GameOver"),
+        2_000,
+    );
+    assert!(
+        result
+            .replies
+            .iter()
+            .any(|packet| packet.starts_with(&[39, 0, 18]) && packet.get(15) == Some(&1)),
+        "the client acknowledgement presents the server-built winning 39/18 record"
+    );
+    assert_eq!(
+        case.game
+            .npc_quests
+            .as_ref()
+            .unwrap()
+            .progress(1)
+            .unwrap()
+            .counts,
+        vec![1],
+        "the forging win reports its own elapsed time"
+    );
+}
+
+/// The native client's 39/14 message keeps the shared constructor's two sentinels
+/// (test driver `tests/common/forging_movie.rs` does the same).
+fn forging_payload(instance: i32, message: &str) -> Vec<u8> {
+    let mut packet = crate::forging::payload_packet(instance, message).unwrap();
+    packet[11..15].copy_from_slice(&(-1i32).to_le_bytes());
+    packet
+}
+
+#[test]
 fn kart_completion_reaches_quests_only_after_a_paid_claim() {
     let scratch = Scratch::new("kart");
     let character = kart_character();

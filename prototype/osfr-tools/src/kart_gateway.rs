@@ -149,6 +149,9 @@ pub struct KartRewardClaim {
     pub replies: Vec<Vec<u8>>,
     /// (R) The speedway id is the stable, content-authored race identity.
     pub minigame_id: Option<u32>,
+    /// (R) T787: the finished race's own elapsed time. The course has no rivals, so
+    /// a placement is never reported.
+    pub elapsed_seconds: Option<u32>,
 }
 
 #[derive(Clone)]
@@ -739,6 +742,12 @@ impl KartGateway {
             return Ok(KartRewardClaim::default());
         }
         let guid = race.player_guid().unwrap();
+        // T787: read the elapsed fact from the session's own finish time before the
+        // one-shot handover consumes the finish offer.
+        let elapsed_seconds = race
+            .session()
+            .and_then(crate::kart_racing::RaceSession::finish_elapsed_seconds)
+            .filter(|seconds| *seconds <= crate::content::MAX_MINIGAME_ELAPSED_SECONDS);
         let finished = race.take_finished_session().unwrap();
         let payout = match crate::kart_rewards::claim_race_reward(
             &staged.rewards,
@@ -761,6 +770,7 @@ impl KartGateway {
         Ok(KartRewardClaim {
             replies: payout.replies,
             minigame_id: Some(u32::from(payout.speedway)),
+            elapsed_seconds,
         })
     }
     pub fn race_ready(&mut self) -> io::Result<Vec<Vec<u8>>> {
