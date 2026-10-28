@@ -303,6 +303,23 @@ pub enum ContentGoal {
         encounter_id: u32,
         source: Vec<SourceTag>,
     },
+    /// T789: (R) one accepted job-ability cast from the toolbar. `target_actor_kind_id` is an
+    /// `enemies.json` `definition_id`; absent means any target (and none for a self cast).
+    UseAbility {
+        id: u32,
+        ability_id: i32,
+        count: u32,
+        #[serde(default, skip_serializing_if = "Option::is_none")]
+        target_actor_kind_id: Option<u32>,
+        source: Vec<SourceTag>,
+    },
+    /// T789: (R) one single-use item actually spent from the item bar.
+    UseItem {
+        id: u32,
+        item_id: i32,
+        count: u32,
+        source: Vec<SourceTag>,
+    },
 }
 
 impl ContentGoal {
@@ -323,7 +340,9 @@ impl ContentGoal {
             | Self::VisitPosition { id, .. }
             | Self::ClientReported { id, .. }
             | Self::InteractActor { id, .. }
-            | Self::CompleteDungeon { id, .. } => *id,
+            | Self::CompleteDungeon { id, .. }
+            | Self::UseAbility { id, .. }
+            | Self::UseItem { id, .. } => *id,
         }
     }
 }
@@ -921,7 +940,9 @@ fn check_goal_sources(owner: &str, goal: &ContentGoal) -> Result<(), ContentErro
         | ContentGoal::VisitPosition { id, source, .. }
         | ContentGoal::ClientReported { id, source, .. }
         | ContentGoal::InteractActor { id, source, .. }
-        | ContentGoal::CompleteDungeon { id, source, .. } => (id, source),
+        | ContentGoal::CompleteDungeon { id, source, .. }
+        | ContentGoal::UseAbility { id, source, .. }
+        | ContentGoal::UseItem { id, source, .. } => (id, source),
     };
     check_sources(&format!("{owner} goal {id}"), source)
 }
@@ -1076,7 +1097,44 @@ fn validate_goal(
         ContentGoal::CompleteDungeon { encounter_id, .. } => {
             positive_goal_field(owner, "goal.encounter_id", u64::from(*encounter_id))
         }
+        // T789: sanity bounds only here. The enabled-quest reachability gate resolves the
+        // ability id in `job_abilities.json`, the target in `enemies.json` and the item in the
+        // shipped catalogue, because the quest engine loads none of those tables.
+        ContentGoal::UseAbility {
+            ability_id,
+            count,
+            target_actor_kind_id,
+            ..
+        } => {
+            positive_goal_field(
+                owner,
+                "goal.ability_id",
+                u64::try_from(*ability_id).unwrap_or(0),
+            )?;
+            use_goal_count(owner, count)?;
+            if target_actor_kind_id.is_some_and(|target| target == 0) {
+                return Err(ContentError::InvalidRecord {
+                    record: owner.to_owned(),
+                    detail: "goal.target_actor_kind_id must be positive or absent".to_owned(),
+                });
+            }
+            Ok(())
+        }
+        ContentGoal::UseItem { item_id, count, .. } => {
+            positive_goal_field(owner, "goal.item_id", u64::try_from(*item_id).unwrap_or(0))?;
+            use_goal_count(owner, count)
+        }
     }
+}
+
+fn use_goal_count(owner: &str, count: &u32) -> Result<(), ContentError> {
+    if !(1..=crate::quest_engine::MAX_COUNT).contains(count) {
+        return Err(ContentError::InvalidRecord {
+            record: owner.to_owned(),
+            detail: format!("goal.count must be 1..={}", crate::quest_engine::MAX_COUNT),
+        });
+    }
+    Ok(())
 }
 
 fn positive_goal_field(owner: &str, field: &str, value: u64) -> Result<(), ContentError> {

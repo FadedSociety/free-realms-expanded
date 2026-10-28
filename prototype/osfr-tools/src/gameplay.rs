@@ -77,6 +77,8 @@ mod profile_outfit;
 /// Progress-driven achievement observation over authoritative gameplay state.
 mod progression;
 mod quest_pickups;
+/// T789: an accepted job-ability cast or a spent single-use item credits a `use_*` objective.
+mod quest_use;
 mod rides;
 /// Station Cash earned by server-verified activity completions (T229).
 mod sc_earnings;
@@ -4654,6 +4656,7 @@ impl Gameplay {
                 }
             }
         }
+        self.emit_ability_uses(result.abilities_used, out)?;
         if let Some(id) = result.win_completed {
             self.npc_quest_event(
                 crate::quest_engine::QuestEvent::CompleteDungeon { encounter_id: id },

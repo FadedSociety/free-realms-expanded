@@ -98,6 +98,7 @@ pub(super) fn merge_skill_outcome(out: &mut EncounterOutcome, other: EncounterOu
     out.replies.extend(other.replies);
     out.rewards.extend(other.rewards);
     out.defeated.extend(other.defeated);
+    out.abilities_used.extend(other.abilities_used);
     out.completed = other.completed.or(out.completed);
     out.win_completed = other.win_completed.or(out.win_completed);
     if other.feedback.is_some() {
@@ -233,6 +234,15 @@ impl EncounterEngine {
                 }
             }
         }
+        // T789: the primary target's enemy definition for a `use_ability` objective. The
+        // definition comes from the resolved actor, never from the client's target field; an
+        // area cast names the selected target, not every splash victim.
+        let target_actor_kind_id = targets
+            .first()
+            .and_then(|guid| self.enemy(*guid))
+            .map(|(actor, _)| actor.definition_id)
+            .filter(|definition| *definition > 0)
+            .and_then(|definition| u32::try_from(definition).ok());
         if ability.heal > 0 {
             let before = self.state.player_health;
             // (R) Heals follow the damage tier ladder (live Triage 254 / 444 / 776 /
@@ -321,6 +331,10 @@ impl EncounterEngine {
             ability.definition_id,
             now_ms.saturating_add(ability.cooldown_ms),
         );
+        // T789: one entry per accepted cast, after every refusal above: nothing is credited
+        // for 285/286/287/288.
+        out.abilities_used
+            .push((ability.definition_id, target_actor_kind_id));
         Ok(out)
     }
 

@@ -1324,6 +1324,7 @@ class Checker:
             "equip_item": ("definition_id", None), "visit_position": ("zone_id", None),
             "interact_actor": ("actor_guid", None), "complete_dungeon": ("encounter_id", None),
             "client_reported": ("client_id", None), "job_level": ("profile_id", None),
+            "use_ability": ("ability_id", "count"), "use_item": ("item_id", "count"),
         }
         seen = set()
         for index, goal in enumerate(goals):
@@ -1366,6 +1367,13 @@ class Checker:
                 level = goal.get("level")
                 if not (type(level) is int and 1 <= level <= 20):
                     error(field + ".level", level, "job_level level must be 1..=20")
+            if goal["kind"] == "use_ability":
+                # Optional: absent means any enemy (or a self cast). Present, it must be a
+                # positive definition; the reachability gate resolves it in enemies.json.
+                target = goal.get("target_actor_kind_id")
+                if target is not None and not identity(target):
+                    error(field + ".target_actor_kind_id", target,
+                          "use_ability target must be a positive enemy definition id or absent")
             if goal["kind"] in ("visit_position", "reach_poi"):
                 position, radius, zone = goal.get("position"), goal.get("radius"), goal.get("zone_id")
                 if not (type(zone) is int and 0 <= zone <= 0xffffffff

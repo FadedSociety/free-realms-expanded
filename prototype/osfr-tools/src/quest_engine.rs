@@ -340,6 +340,8 @@ pub enum ObjectiveKind {
     },
     UseAbility {
         ability_id: i32,
+        /// T789: the enemy definition the cast landed on; absent matches any target.
+        target_actor_kind_id: Option<u32>,
     },
     VisitPosition {
         zone_id: u32,
@@ -726,6 +728,8 @@ pub enum QuestEvent {
     },
     UseAbility {
         ability_id: i32,
+        /// T789: the enemy definition the accepted cast targeted, `None` for a self cast.
+        target_actor_kind_id: Option<u32>,
     },
     VisitPosition {
         zone_id: u32,
@@ -768,7 +772,10 @@ impl From<OpeningTrigger> for ObjectiveKind {
             OpeningTrigger::DungeonCompleted { encounter_id } => {
                 Self::CompleteDungeon { encounter_id }
             }
-            OpeningTrigger::AbilityUsed { ability_id } => Self::UseAbility { ability_id },
+            OpeningTrigger::AbilityUsed { ability_id } => Self::UseAbility {
+                ability_id,
+                target_actor_kind_id: None,
+            },
         }
     }
 }
@@ -798,7 +805,13 @@ impl From<OpeningTrigger> for QuestEvent {
             ObjectiveKind::CompleteDungeon { encounter_id } => {
                 Self::CompleteDungeon { encounter_id }
             }
-            ObjectiveKind::UseAbility { ability_id } => Self::UseAbility { ability_id },
+            ObjectiveKind::UseAbility {
+                ability_id,
+                target_actor_kind_id,
+            } => Self::UseAbility {
+                ability_id,
+                target_actor_kind_id,
+            },
             _ => unreachable!("opening trigger adapter only creates opening objective kinds"),
         }
     }
@@ -2610,6 +2623,35 @@ fn definition_from_content(
                     ));
                 }
             }
+            ContentGoal::UseAbility {
+                ability_id,
+                count,
+                target_actor_kind_id,
+                source,
+                ..
+            } => {
+                if *ability_id <= 0
+                    || !(1..=MAX_COUNT).contains(count)
+                    || target_actor_kind_id.is_some_and(|target| target == 0)
+                    || source.is_empty()
+                {
+                    return Err(invalid(
+                        "use_ability objective requires a positive ability, count 1..=MAX_COUNT, a positive target or none, and provenance",
+                    ));
+                }
+            }
+            ContentGoal::UseItem {
+                item_id,
+                count,
+                source,
+                ..
+            } => {
+                if *item_id <= 0 || !(1..=MAX_COUNT).contains(count) || source.is_empty() {
+                    return Err(invalid(
+                        "use_item objective requires a positive item, count 1..=MAX_COUNT and provenance",
+                    ));
+                }
+            }
             _ => {}
         }
     }
@@ -2783,6 +2825,29 @@ fn definition_from_content(
                 kind: ObjectiveKind::CompleteDungeon {
                     encounter_id: *encounter_id,
                 },
+            },
+            ContentGoal::UseAbility {
+                id,
+                ability_id,
+                count,
+                target_actor_kind_id,
+                ..
+            } => QuestObjective {
+                id: *id,
+                required: *count,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::UseAbility {
+                    ability_id: *ability_id,
+                    target_actor_kind_id: *target_actor_kind_id,
+                },
+            },
+            ContentGoal::UseItem {
+                id, item_id, count, ..
+            } => QuestObjective {
+                id: *id,
+                required: *count,
+                description: format!("Objective {}", id),
+                kind: ObjectiveKind::UseItem { item_id: *item_id },
             },
             ContentGoal::JobLevel {
                 id,
@@ -3063,7 +3128,10 @@ fn valid_objective_kind(kind: &ObjectiveKind) -> bool {
         }
         ObjectiveKind::EquipItem { definition_id } => *definition_id > 0,
         ObjectiveKind::CompleteDungeon { encounter_id } => *encounter_id != 0,
-        ObjectiveKind::UseAbility { ability_id } => *ability_id > 0,
+        ObjectiveKind::UseAbility {
+            ability_id,
+            target_actor_kind_id,
+        } => *ability_id > 0 && target_actor_kind_id.is_none_or(|target| target != 0),
         ObjectiveKind::ClientReported { client_id, trigger } => {
             (1..=i32::MAX as u32).contains(client_id)
                 && match trigger {
@@ -3123,10 +3191,11 @@ fn validate_event(event: &QuestEvent) -> io::Result<()> {
             recipe_id,
             quantity,
         } => *recipe_id != 0 && (1..=MAX_COUNT).contains(quantity),
-        QuestEvent::SelectJob { profile_id }
-        | QuestEvent::UseAbility {
-            ability_id: profile_id,
-        } => *profile_id > 0,
+        QuestEvent::SelectJob { profile_id } => *profile_id > 0,
+        QuestEvent::UseAbility {
+            ability_id,
+            target_actor_kind_id,
+        } => *ability_id > 0 && target_actor_kind_id.is_none_or(|target| target != 0),
         QuestEvent::JobLevel { profile_id, level } => *profile_id > 0 && (1..=20).contains(level),
         QuestEvent::EquipItem { definition_id } => *definition_id > 0,
         QuestEvent::CompleteDungeon { encounter_id } => *encounter_id != 0,
@@ -3225,11 +3294,16 @@ fn event_matches(kind: &ObjectiveKind, event: &QuestEvent) -> u32 {
             ObjectiveKind::CompleteDungeon { encounter_id: a },
             QuestEvent::CompleteDungeon { encounter_id: b },
         ) if a == b => 1,
-        (ObjectiveKind::UseAbility { ability_id: a }, QuestEvent::UseAbility { ability_id: b })
-            if a == b =>
-        {
-            1
-        }
+        (
+            ObjectiveKind::UseAbility {
+                ability_id: a,
+                target_actor_kind_id: wanted,
+            },
+            QuestEvent::UseAbility {
+                ability_id: b,
+                target_actor_kind_id: actual,
+            },
+        ) if a == b && wanted.is_none_or(|wanted| *actual == Some(wanted)) => 1,
         (
             ObjectiveKind::VisitPosition {
                 zone_id: a,

@@ -629,7 +629,55 @@
       "prerequisite_quest_ids": [
         3010009
       ],
-      "objectives": [],
+      "objectives": [
+        {
+          "kind": "defeat",
+          "id": 1,
+          "model_id": 1294,
+          "count": 1,
+          "text_string_id": 383176,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "locale 383176 'Take out the remaining Robgoblin Pondblasters to the north of Hilforn.' (lab/references/quest-lines/objective-specs-fixed.json q3010011 objective 0)"
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "data/content/enemies.json definition 1294 robgoblin_pondblaster (FreeRealms-Legacy Npcs.json row 1294, model 4); data/content/field_enemies.json spawns it for quest 3010011. definition_id is the id the encounter engine reports on a kill."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) count 1: the text says 'the remaining' with no number, matching the spec's (R) choice"
+            }
+          ]
+        },
+        {
+          "kind": "use_ability",
+          "id": 2,
+          "ability_id": 62019,
+          "count": 1,
+          "target_actor_kind_id": 1294,
+          "text_string_id": 383181,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "locale 383181 'Use your Explosive Arrows on the Robgoblin Pondblasters to the north.'"
+            },
+            {
+              "kind": "client",
+              "evidence": "data/content/job_abilities.json definition 62019 has name_id 4830; client locale 4830 is 'Explosive Arrow' (Archer profile 35, toolbar 2, min level 5) (lab/reports/locale-id-to-text.json)"
+            },
+            {
+              "kind": "legacy-data",
+              "evidence": "target 1294 is the data/content/enemies.json robgoblin_pondblaster definition_id (FreeRealms-Legacy Npcs.json row 1294, model 4), the same row objective 1 kills"
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) count 1: one cast step; the text does not set a number"
+            }
+          ]
+        }
+      ],
       "rewards": [],
       "source": [
         {
@@ -650,7 +698,7 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
+          "evidence": "(R) T789: the two cited steps (defeat definition 1294 and Explosive Arrow 62019 on definition 1294) are authored; the quest stays disabled because its prerequisite 3010009 is still a hollow record (enabled false, empty objectives)"
         },
         {
           "kind": "reconstructed",

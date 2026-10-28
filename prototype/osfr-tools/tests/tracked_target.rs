@@ -187,7 +187,10 @@ fn objectives_without_a_known_place_locate_nothing() {
         ObjectiveKind::SelectJob { profile_id: 5 },
         ObjectiveKind::EquipItem { definition_id: 5 },
         ObjectiveKind::CompleteDungeon { encounter_id: 5 },
-        ObjectiveKind::UseAbility { ability_id: 5 },
+        ObjectiveKind::UseAbility {
+            ability_id: 5,
+            target_actor_kind_id: None,
+        },
     ] {
         assert_eq!(locate_kind(kind.clone()), None, "{kind:?}");
     }

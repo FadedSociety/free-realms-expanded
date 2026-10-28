@@ -11,9 +11,10 @@
 //!
 //! Resolved objective kinds: `talk_to_npc`, `interact_actor`, `reach_poi`,
 //! `defeat`, `collect_item`, `equip_item`, `craft_recipe`, `complete_dungeon`,
-//! `finish_minigame`, `gather_resource`, `collect_node`, `job_level` and
-//! `perform_pet_trick`. The item, recipe, dungeon, minigame, gather, quest-pickup and
-//! pet-trick kinds additionally resolve their target ids in the id sets owned by
+//! `finish_minigame`, `gather_resource`, `collect_node`, `job_level`,
+//! `perform_pet_trick`, `use_ability` and `use_item`. The item, recipe, dungeon,
+//! minigame, gather, quest-pickup, pet-trick, ability and enemy kinds additionally
+//! resolve their target ids in the id sets owned by
 //! `tests/support/quest_target_sets.rs`, which names the owning loader and every
 //! `FinishMinigame` emitter. A
 //! `collect_node` node type must have at least one placed spawn in
@@ -65,9 +66,9 @@ use osfr_tools::{
     world::NpcVisibility,
 };
 use quest_catalogue_fixture::{
-    Defect, FIXTURE_BATTLE, FIXTURE_DEFECT, FIXTURE_GATHER_RESOURCE, FIXTURE_ITEM,
-    FIXTURE_MINIGAME, FIXTURE_NODE_TYPE, FIXTURE_PET_TRICK, FIXTURE_QUEST, FIXTURE_RECIPE, Scratch,
-    fixture,
+    Defect, FIXTURE_ABILITY, FIXTURE_BATTLE, FIXTURE_DEFECT, FIXTURE_ENEMY,
+    FIXTURE_GATHER_RESOURCE, FIXTURE_ITEM, FIXTURE_MINIGAME, FIXTURE_NODE_TYPE, FIXTURE_PET_TRICK,
+    FIXTURE_QUEST, FIXTURE_RECIPE, FIXTURE_USE_ITEM, Scratch, fixture,
 };
 use quest_records::{RawQuest, as_u32, read_quests, sorted_json_paths};
 use quest_target_sets::Targets;
@@ -230,7 +231,7 @@ impl Catalogue {
     /// Objective kinds whose target this gate resolves. Everything else is only
     /// bounded by the split loader; the target test prints the gap.
     fn unchecked_objective_kinds(&self) -> BTreeSet<&str> {
-        const CHECKED: [&str; 13] = [
+        const CHECKED: [&str; 15] = [
             "talk_to_npc",
             "interact_actor",
             "reach_poi",
@@ -244,6 +245,8 @@ impl Catalogue {
             "collect_node",
             "job_level",
             "perform_pet_trick",
+            "use_ability",
+            "use_item",
         ];
         self.enabled()
             .flat_map(|quest| quest.objectives.iter())
@@ -396,6 +399,38 @@ impl Catalogue {
                         if !self.targets.pet_tricks.contains(&trick) {
                             violations.push(format!(
                                 "{owner} (perform_pet_trick): trick {trick} is not a pets.json trick id"
+                            ));
+                        }
+                    }
+                    "use_ability" => {
+                        let ability = as_u32(&goal["ability_id"]).unwrap_or(0);
+                        if !self.targets.abilities.contains(&ability) {
+                            violations.push(format!(
+                                "{owner} (use_ability): ability {ability} is not a job_abilities.json definition id"
+                            ));
+                        }
+                        // An absent target is legal: a self cast, or a goal that counts the
+                        // ability on any enemy. Present, it must name a shipped definition.
+                        if let Some(target) = goal.get("target_actor_kind_id") {
+                            let target = as_u32(target).unwrap_or(0);
+                            if !self.targets.enemy_kinds.contains(&target) {
+                                violations.push(format!(
+                                    "{owner} (use_ability): target {target} is not an enemies.json definition id"
+                                ));
+                            }
+                        }
+                    }
+                    "use_item" => {
+                        let item = goal["item_id"]
+                            .as_i64()
+                            .and_then(|id| i32::try_from(id).ok())
+                            .unwrap_or(0);
+                        if item <= 0 {
+                            violations.push(format!("{owner}: use_item target must be positive"));
+                        }
+                        if item > 0 && !self.targets.items.contains(&item) {
+                            violations.push(format!(
+                                "{owner} (use_item): item {item} is not defined by the shipped item catalogue"
                             ));
                         }
                     }
@@ -1092,4 +1127,139 @@ fn visit_geometry_bounds_are_enforced() {
             "{name}: from_split_content must reject out-of-range visit geometry"
         );
     }
+}
+
+/// T789: a `use_ability` step must name a `job_abilities.json` definition id and, when it binds a
+/// target, an `enemies.json` `definition_id`. The gate resolves both in
+/// `Targets::{abilities, enemy_kinds}`, so a typo is refused instead of certifying a step no
+/// accepted cast can credit. A zero id is refused earlier by the production split loader
+/// (`valid_objective_kind`). Canary: patch either id and the clean fixture's empty report fails.
+#[test]
+fn unknown_ability_is_rejected_at_load() {
+    let clean = fixture("use-ability-clean", Defect::None);
+    let catalogue = Catalogue::load(clean.path()).expect("the clean fixture loads");
+    assert!(catalogue.targets.abilities.contains(&FIXTURE_ABILITY));
+    assert!(catalogue.targets.enemy_kinds.contains(&FIXTURE_ENEMY));
+    assert!(
+        catalogue.target_violations().is_empty(),
+        "{:?}",
+        catalogue.target_violations()
+    );
+
+    // An ability id no job_abilities.json row declares. The quest stays reachable, so only the
+    // use_ability arm can report it.
+    let unknown_ability = fixture("use-ability-unknown", Defect::None);
+    patch_fixture_objective(
+        &unknown_ability,
+        FIXTURE_QUEST,
+        "use_ability",
+        "ability_id",
+        999_999,
+    );
+    let catalogue = Catalogue::load(unknown_ability.path()).expect("the altered quest loads");
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains(&format!("quest {FIXTURE_QUEST} objective 11 (#9)"))
+            && violations[0].contains("use_ability")
+            && violations[0].contains("999999"),
+        "the unknown ability was not reported: {violations:?}"
+    );
+
+    // A target that is not an enemies.json definition id (a field actor with no catalogue row).
+    let unknown_target = fixture("use-ability-target", Defect::None);
+    patch_fixture_objective(
+        &unknown_target,
+        FIXTURE_QUEST,
+        "use_ability",
+        "target_actor_kind_id",
+        999_999,
+    );
+    let catalogue = Catalogue::load(unknown_target.path()).expect("the altered quest loads");
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains(&format!("quest {FIXTURE_QUEST} objective 11 (#9)"))
+            && violations[0].contains("use_ability")
+            && violations[0].contains("target 999999"),
+        "the unknown ability target was not reported: {violations:?}"
+    );
+}
+
+/// T789: a `use_item` step must name a shipped catalogue item. The fixture's own second item
+/// resolves, so only the patch can fail.
+#[test]
+fn unknown_use_item_is_rejected_at_load() {
+    let clean = fixture("use-item-clean", Defect::None);
+    let catalogue = Catalogue::load(clean.path()).expect("the clean fixture loads");
+    assert!(catalogue.targets.items.contains(&FIXTURE_USE_ITEM));
+    assert!(
+        catalogue.target_violations().is_empty(),
+        "{:?}",
+        catalogue.target_violations()
+    );
+
+    let unknown = fixture("use-item-unknown", Defect::None);
+    patch_fixture_objective(&unknown, FIXTURE_QUEST, "use_item", "item_id", 999_999);
+    let catalogue = Catalogue::load(unknown.path()).expect("the altered quest loads");
+    let violations = catalogue.target_violations();
+    assert_eq!(violations.len(), 1, "{violations:?}");
+    assert!(
+        violations[0].contains(&format!("quest {FIXTURE_QUEST} objective 12 (#10)"))
+            && violations[0].contains("use_item")
+            && violations[0].contains("999999"),
+        "the unknown use item was not reported: {violations:?}"
+    );
+}
+
+/// T789: every authored `use_ability` step, including the disabled records the enabled gate
+/// skips (3010011 still waits behind its hollow prerequisite chain), names a shipped ability and
+/// enemy definition. Without this, a typo in a disabled record would ship unseen.
+#[test]
+fn every_authored_use_goal_resolves_in_the_shipped_tables() {
+    let root = content_dir();
+    let targets = Targets::load(&root, &reference_content()).expect("the target sets load");
+    let mut ability_steps = 0;
+    for quest in read_quests(&root) {
+        for goal in &quest.objectives {
+            match goal["kind"].as_str() {
+                Some("use_ability") => {
+                    ability_steps += 1;
+                    let ability = as_u32(&goal["ability_id"]).unwrap_or(0);
+                    assert!(
+                        targets.abilities.contains(&ability),
+                        "quest {} objective {}: ability {ability} is not a job_abilities.json definition id",
+                        quest.id,
+                        goal["id"].as_u64().unwrap_or(0)
+                    );
+                    if let Some(target) = goal.get("target_actor_kind_id") {
+                        let target = as_u32(target).unwrap_or(0);
+                        assert!(
+                            targets.enemy_kinds.contains(&target),
+                            "quest {} objective {}: target {target} is not an enemies.json definition id",
+                            quest.id,
+                            goal["id"].as_u64().unwrap_or(0)
+                        );
+                    }
+                }
+                Some("use_item") => {
+                    let item = goal["item_id"]
+                        .as_i64()
+                        .and_then(|id| i32::try_from(id).ok())
+                        .unwrap_or(0);
+                    assert!(
+                        targets.items.contains(&item),
+                        "quest {} objective {}: item {item} is not a shipped catalogue item",
+                        quest.id,
+                        goal["id"].as_u64().unwrap_or(0)
+                    );
+                }
+                _ => {}
+            }
+        }
+    }
+    assert!(
+        ability_steps >= 1,
+        "the authored use_ability steps shrank to {ability_steps}; the disabled records are no longer covered"
+    );
 }

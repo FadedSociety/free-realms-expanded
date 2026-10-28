@@ -651,6 +651,9 @@ pub struct EncounterOutcome {
     pub win_completed: Option<u32>,
     /// Positive definition ids defeated here; `0` names no quest target.
     pub defeated: Vec<i32>,
+    /// T789: accepted job-ability casts as (ability definition id, the primary target's
+    /// enemy definition id; `None` for a cast with no enemy target). Refusals add nothing.
+    pub abilities_used: Vec<(i32, Option<u32>)>,
     pub feedback: Option<String>,
     /// A group heal power-up was picked up (the engine heals only its own
     /// player; the gateway heals the rest of the group, once per kill).

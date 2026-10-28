@@ -31,6 +31,13 @@ pub const FIXTURE_NODE_TYPE: &str = "fixture-node";
 /// T788: a bundled `pets.json` trick id (11, the dog's "Sit Up"), used as a
 /// `perform_pet_trick` target the reachability gate resolves.
 pub const FIXTURE_PET_TRICK: u32 = 11;
+/// T789: a `job_abilities.json` definition id and an `enemies.json` `definition_id`
+/// a graded `use_ability` step names.
+pub const FIXTURE_ABILITY: u32 = 9_100_103;
+pub const FIXTURE_ENEMY: u32 = 9_100_104;
+/// T789: a second catalogue item, so Canary C (which removes `FIXTURE_ITEM`) keeps
+/// its exact collect_item/equip_item violation count.
+pub const FIXTURE_USE_ITEM: i32 = 9_100_105;
 const FIXTURE_GIVER: u64 = 9_000_100_001;
 const FIXTURE_TARGET: u64 = 9_000_100_002;
 const FIXTURE_MISSING_GIVER: u64 = 9_000_100_099;
@@ -183,6 +190,21 @@ fn fixture_objectives() -> Value {
                 "count": 1,
                 "source": fixture_source(),
             }),
+            json!({
+                "kind": "use_ability",
+                "id": 11,
+                "ability_id": FIXTURE_ABILITY,
+                "count": 1,
+                "target_actor_kind_id": FIXTURE_ENEMY,
+                "source": fixture_source(),
+            }),
+            json!({
+                "kind": "use_item",
+                "id": 12,
+                "item_id": FIXTURE_USE_ITEM,
+                "count": 1,
+                "source": fixture_source(),
+            }),
         ]);
     objectives
 }
@@ -298,6 +320,47 @@ fn fixture_quest_nodes() -> Value {
             "zone_definition_id": 1,
             "position": [0.0, 0.0, 0.0],
             "heading": 0.0,
+        }],
+    })
+}
+
+/// T789: the one authored ability the graded `use_ability` step names. Production
+/// `OpeningAbilities::load_job_abilities` validates this file; the audit reads its ids. The row
+/// keeps a positive damage multiplier so that loader would accept it.
+fn fixture_job_abilities() -> Value {
+    json!({
+        "schema_version": 1,
+        "jobs": [{
+            "profile_id": 4,
+            "slots": [{
+                "slot": 1,
+                "definition_id": FIXTURE_ABILITY,
+                "name_id": 700_010,
+                "icon_id": 1,
+                "damage_multiplier": 1.0,
+                "cooldown_ms": 1000,
+                "min_level": 1,
+            }],
+        }],
+    })
+}
+
+/// T789: the one enemy definition the graded `use_ability` step targets. `enemies::EnemyEngine`
+/// owns this file but is not bound by this audit; only `definitions[].definition_id` is read.
+fn fixture_enemies() -> Value {
+    json!({
+        "schema_version": 1,
+        "definitions": [{
+            "id": "fixture_enemy",
+            "kind": "Fixture Enemy",
+            "actor_kind_id": FIXTURE_ENEMY,
+            "definition_id": FIXTURE_ENEMY,
+            "model_id": 3,
+            "name_string_id": 700_011,
+            "texture_alias": "",
+            "max_health": 100,
+            "damage": 1,
+            "source": "(R) T789 scratch enemy definition",
         }],
     })
 }
@@ -452,11 +515,14 @@ pub fn fixture(name: &str, defect: Defect) -> Scratch {
         &[
             item_catalogue::sized_row(FIXTURE_ITEM as u32, 8),
             item_catalogue::sized_row(FIXTURE_RECIPE, 8),
+            item_catalogue::sized_row(FIXTURE_USE_ITEM as u32, 8),
         ],
     );
     write_json(&root.join("recipes.json"), &fixture_recipe_book());
     write_json(&root.join("field_battles.json"), &fixture_field_battles());
     write_json(&root.join("quest_nodes.json"), &fixture_quest_nodes());
+    write_json(&root.join("job_abilities.json"), &fixture_job_abilities());
+    write_json(&root.join("enemies.json"), &fixture_enemies());
     write_json(
         &root.join("quests/fixture.json"),
         &json!({"schema_version": 1, "records": quests}),

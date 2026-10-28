@@ -370,6 +370,10 @@ pub struct Reply {
     pub heal_percent: u32,
     pub boombox: Option<i32>,
     pub effect: Option<consumable_effects::Spec>,
+    /// T789: the definition of a single-use item actually spent, for a `use_item` objective.
+    /// It is the same `Use.spent` flag that sets `changed`; a boombox press and every refusal
+    /// leave it `None`.
+    pub used_definition: Option<i32>,
 }
 
 /// One accepted use. The item was spent when `spent` is set and the cooldown stamped; the caller
@@ -379,6 +383,7 @@ struct Use {
     heal_percent: u32,
     effect: Option<consumable_effects::Spec>,
     spent: bool,
+    definition: i32,
 }
 
 /// The persisted item bar: four slots of owned consumable instances.
@@ -645,6 +650,7 @@ impl ItemBar {
                     changed: used.spent,
                     heal_percent: used.heal_percent,
                     effect: used.effect,
+                    used_definition: used.spent.then_some(used.definition),
                     ..Reply::default()
                 })
             }
@@ -695,6 +701,7 @@ impl ItemBar {
                     changed: used.spent,
                     heal_percent: used.heal_percent,
                     effect: used.effect,
+                    used_definition: used.spent.then_some(used.definition),
                     ..Reply::default()
                 })
             }
@@ -737,6 +744,7 @@ impl ItemBar {
             heal_percent,
             effect: spec,
             spent,
+            definition,
         })
     }
 

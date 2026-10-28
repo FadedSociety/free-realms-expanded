@@ -144,6 +144,8 @@ impl Gameplay {
                 out.absorb(applied);
             }
         }
+        // T789: only a single-use item that was actually spent credits a `use_item` objective.
+        self.emit_item_use(reply.used_definition, &mut out)?;
         Ok(Some(out))
     }
 

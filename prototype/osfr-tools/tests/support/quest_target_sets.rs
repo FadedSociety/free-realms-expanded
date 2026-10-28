@@ -45,6 +45,14 @@
 //! * `pet_tricks`: `PetContent`'s authored `tricks[].id` rows, read through its
 //!   accessor from the bundled `pets.json` the pet service serves. A
 //!   `perform_pet_trick` target must be one of them.
+//! * `abilities`: the `job_abilities.json` `jobs[].slots[].definition_id` rows
+//!   `OpeningAbilities::load_job_abilities` validates. That loader exposes no id
+//!   list, so the same authored file is read raw; a `use_ability` goal must name
+//!   one of them.
+//! * `enemy_kinds`: the `enemies.json` `definitions[].definition_id` rows
+//!   `enemies::EnemyEngine::load` owns (it exposes no id list). The encounter
+//!   engine reports this definition id on a kill and on an accepted cast, so a
+//!   `use_ability` target must be one of them.
 
 use super::quest_records::as_u32;
 use osfr_tools::{
@@ -88,6 +96,10 @@ pub struct Targets {
     pub profiles: BTreeSet<u32>,
     /// `pets.json` trick ids a `perform_pet_trick` step may name.
     pub pet_tricks: BTreeSet<u32>,
+    /// `job_abilities.json` definition ids a `use_ability` step may name.
+    pub abilities: BTreeSet<u32>,
+    /// `enemies.json` definition ids a `use_ability` target may name.
+    pub enemy_kinds: BTreeSet<u32>,
 }
 
 impl Targets {
@@ -236,6 +248,24 @@ impl Targets {
         targets
             .pet_tricks
             .extend(PetContent::bundled()?.trick_ids());
+        // T789: the ability roster and the enemy catalogue own these files but expose no id
+        // list, so the raw rows their loaders validate are read here.
+        targets
+            .abilities
+            .extend(read_ids(root, "job_abilities.json", |document| {
+                document["jobs"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .flat_map(|job| job["slots"].as_array().into_iter().flatten())
+                    .filter_map(|slot| as_u32(&slot["definition_id"]))
+                    .collect()
+            }));
+        targets
+            .enemy_kinds
+            .extend(read_ids(root, "enemies.json", |document| {
+                array_ids(document, "definitions", "definition_id")
+            }));
         Ok(targets)
     }
 }
