@@ -20081,50 +20081,6 @@
       ],
       "quests_given": [
         {
-          "quest_id": 3130001,
-          "title": "Become a Postman",
-          "title_string_id": 412445,
-          "relation": "gives",
-          "source": [
-            {
-              "kind": "client",
-              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Entry quests, row E1; name 'Become a Postman'; title id cell 2603863993 ucdt; 1520984500 ugdt"
-            },
-            {
-              "kind": "wiki",
-              "evidence": "notes/Build Guides/Content/Jobs/Postman.md: Quest line > Entry quests, row E1; name 'Become a Postman'; title id cell 2603863993 ucdt; 1520984500 ugdt"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) quest id 3130001 is a stable batch key; the guide does not provide a numeric server quest id"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) order is preserved by this records array; ContentDb v1 has no explicit order field"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 has no free-text objective field; no stable target IDs are inferred, so objectives is empty"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) ContentDb v1 cannot store a quest display name; exact page title is retained in the source evidence tags"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
-            },
-            {
-              "kind": "reconstructed",
-              "evidence": "(R) reward values are unknown, qualitative, non-coin, or ambiguous in this schema; rewards left empty"
-            },
-            {
-              "kind": "client",
-              "evidence": "title_string_id corrected from raw locale hash 2603863993 to Global.Text id 412445 (content_check text_raw_hash, 2026-10-15)"
-            }
-          ]
-        },
-        {
           "quest_id": 3130003,
           "title": "Can You Deliver?",
           "title_string_id": 93381,
@@ -20402,7 +20358,6 @@
         }
       ],
       "quest_ids_given": [
-        3130001,
         3130003,
         3130004,
         3130005,
@@ -22775,7 +22730,8 @@
       "quest_ids_given": [
         3130006,
         3130007,
-        3130008
+        3130008,
+        3130001
       ],
       "quests_given_text": [
         "Birthday Invitation (Birthday Bash daily; client title 1512697018, wiki); Sanctuary Mail Sorting minigame (262167511); tutorial walk of Sunrise and Sunset Boulevards (403291592)"
@@ -39948,7 +39904,8 @@
         3090002,
         3090003,
         3090009,
-        3090011
+        3090011,
+        3090034
       ],
       "quests_given_text": [
         "Medic: So You Want to be a Medic? (2991926009); Medic: Operation: Revival; Medic: House Call (wiki gives her; Gordon named in text); Medic: Supply Recovery; Medic: Tummies in Turmoil (Medic)"
@@ -54097,7 +54054,9 @@
         "At the cafe's cooking table, \"to the north\" (1322711683, 2118187567), \"to the Northwest of here\" (609555893), \"north of Samantha\" (3602865719). Wiki: Crossroads Cafe \"Northwest of the center of town\". One client line puts her \"in Sanctuary\" (293476933, see Conflicts 6)."
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3050034
+      ],
       "quests_given_text": [
         "Chef: Cobblestone Village Cafe (unlocks the job; Spiralmint Steak), Chef: Delivery Derailed, and the Jonelle and Honey follow-ups (below). A cluster of client-only Simone titles on the Chef page: Chef: Assistant Needed, Chef: Anyone Can Cook!, Chef: Simone's Famous Spiralmint Steak, Chef: Preparation, Chef: Savory Goodness, Chef: Royally Large Order, Chef: A Sweet Treat. Simone's Shopping List (Farmer's Market customer order; video completion card \"You receive 675 coins\", pjvw6oAT-zQ/00078). An untitled ingredient pick-up: she sends the player to Bartle (800284964, 3432279268). Receives a recipe from Glerga to be returned (3564357491, Robgoblin Camp). Listed as a source in a fishing-teacher hook (3614772560, see Part F)."
       ],

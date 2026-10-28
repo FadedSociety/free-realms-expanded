@@ -35,6 +35,9 @@ const BECOME_A_ROWS: usize = 12;
 const FISHERMAN_ORIGINAL: i32 = 1968;
 const FISHERMAN_REGIONAL: u32 = 3_070_001;
 const ARCHER_ORIGINAL: i32 = 1952;
+const ARCHER_REGIONAL: u32 = 3_010_035;
+/// An original id no crosswalk lists (T542 mapped every shipped Jobs-window row).
+const UNMAPPED_ORIGINAL: i32 = 1969;
 /// A quest that is active in the fixture's saved state, so the login sync sends a 49/3.
 const ACTIVE_QUEST: u32 = 3_050_004;
 
@@ -141,8 +144,16 @@ fn shipped_rows_resolve() {
         BTreeMap::from([
             (1968, 3_070_001),
             (1965, 3_140_001),
+            (1960, 3_060_047),
+            (1961, 3_080_050),
+            (1978, 3_050_034),
+            (1952, 3_010_035),
+            (1966, 3_150_025),
             (1979, 3_100_001),
-            (1964, 3_130_001)
+            (1967, 3_160_035),
+            (1962, 3_090_034),
+            (1964, 3_130_001),
+            (1963, 3_110_026),
         ])
     );
 }
@@ -227,14 +238,32 @@ fn two_players_each_get_their_own_147_1() {
 
 #[test]
 fn start_quest_with_a_disabled_or_unmapped_id() {
+    // Every shipped row now maps to an enabled quest (T542), so the mapped-but-disabled
+    // refusal runs on a scratch copy whose Archer record stays disabled; 1969 is in no
+    // crosswalk at all.
+    let scratch = Scratch::new();
+    scratch.write("job_browser.json", &shipped_file());
+    scratch.write(
+        "breadcrumb_quests.json",
+        &json!({"schema_version": 1, "records": []}),
+    );
+    let path = scratch.0.join("quests/archer.json");
+    let mut file: Value = serde_json::from_slice(&fs::read(&path).unwrap()).unwrap();
+    let quest = file["records"]
+        .as_array_mut()
+        .unwrap()
+        .iter_mut()
+        .find(|quest| quest["id"] == ARCHER_REGIONAL)
+        .unwrap();
+    quest["enabled"] = json!(false);
+    fs::write(&path, serde_json::to_vec(&file).unwrap()).unwrap();
+
     let fixture = Fixture::new();
-    let mut game = fixture.game(None);
+    let mut game = Gameplay::load(fixture.path(), None).unwrap();
+    game.bind_npc_quest_catalogue(&scratch.0, CHARACTER)
+        .unwrap();
     let refusal = vec![osfr_tools::chat::system(BREADCRUMB_REFUSED)];
-    // 1968 maps to 3070001, which is disabled today; 1952 (Archer) has no regional quest.
-    for (step, id) in [FISHERMAN_ORIGINAL, ARCHER_ORIGINAL]
-        .into_iter()
-        .enumerate()
-    {
+    for (step, id) in [ARCHER_ORIGINAL, UNMAPPED_ORIGINAL].into_iter().enumerate() {
         let before = saved(&game);
         let out = send(
             &mut game,
@@ -267,7 +296,7 @@ fn zero_or_negative_breadcrumb_is_refused_politely() {
         send(
             &mut game,
             &character(),
-            &breadcrumb_start(ARCHER_ORIGINAL),
+            &breadcrumb_start(UNMAPPED_ORIGINAL),
             300
         )
         .replies,
@@ -421,7 +450,11 @@ fn bad_job_browser_data_is_refused() {
     );
     fails(
         with(&|rows| {
-            let first = rows[0].clone();
+            // Short provenance keeps the file under 64 KiB, so the row-count bound is
+            // the one that refuses, not the byte bound.
+            let mut first = rows[0].clone();
+            first["source"] =
+                json!([{"kind": "reconstructed", "evidence": "(R) synthetic test row"}]);
             rows.extend(vec![first; 60]);
         }),
         &none,

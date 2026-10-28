@@ -12499,7 +12499,8 @@
         }
       ],
       "quest_ids_given": [
-        3150001
+        3150001,
+        3150025
       ],
       "quests_given_text": [
         "Becoming a Warrior, Warrior: Warrior Warm-up, Warrior: Warrior's Rites (wiki). Unlocks the Warrior job."
@@ -23693,7 +23694,8 @@
       ],
       "quest_ids_given": [
         3140004,
-        3140005
+        3140005,
+        3140001
       ],
       "quests_given_text": [
         "Starts Soccer Star; the Soccer Star line includes Soccer Star: Snowy Scrimmage (client 2487084498). Exact per-quest givers are on the Soccer Star page."

@@ -4,8 +4,9 @@
 //! `data/content/npcs/stillwater_crossing.json`, it has no prerequisite, and its
 //! objective is the same one-talk referral shape as the two sibling versions.
 //! This slice binds the client's Stillwater offer text (116460) as its
-//! `intro_text_string_id`; the other four stay disabled, and the last test
-//! proves why through the shipped records.
+//! `intro_text_string_id`; T542 later enables Become a Fisherman (3070001) as the Jobs
+//! window's Start quest, and the last test proves the remaining blockers through the
+//! shipped records.
 //!
 //! Every test drives the production paths in `tests/support/npc_quest_chain.rs`:
 //! the 26/8 interact, 26/10 Talk row, 26/6 quest row, 49/1 offer (decoded with
@@ -52,9 +53,9 @@ const BRAWLER_QUEST: u32 = 3_030_016;
 const CHEF_QUEST: u32 = 3_050_016;
 const FISHER_ENTRY: u32 = 3_070_001;
 const FISHER_ADVANCE: u32 = 3_070_002;
-/// The givers the two fisherman records name; neither id is an `npcs/*.json` row
-/// (the guide calls them Message Board objects), so no menu can offer them.
-const FISHER_ENTRY_GIVER: u64 = 9_000_000_148;
+/// The fisherman follow-up's giver: not an `npcs/*.json` row (the guide calls it a
+/// Message Board object), so no menu can offer it. T542 moved the entry record to Reed
+/// Stillwater.
 const FISHER_ADVANCE_GIVER: u64 = 9_000_000_149;
 
 /// Every row these tests click is in `stillwater_crossing.json`, and no NPC has an
@@ -242,11 +243,17 @@ fn xp_goes_to_adventurer_with_another_job_active() {
 
 #[test]
 fn the_four_round_three_quests_without_a_runnable_chain_stay_disabled() {
-    // Each disabled, and each blocker named by the record it points at.
+    // T542 enables Become a Fisherman (3070001) for the Jobs window: Reed Stillwater, a
+    // drawn trainer row, is its giver, one talk target and the turn-in. The test name
+    // keeps the round-3 count for the protected test list.
+    let entry = record(FISHER_ENTRY);
+    assert!(entry.enabled, "T542 enables Become a Fisherman");
+    assert_eq!(entry.giver_npc_id, 9_000_000_181);
+
+    // The other three stay disabled, each with the blocker named by its record.
     for (id, prerequisite) in [
         (BRAWLER_QUEST, Some(3_030_015)),
         (CHEF_QUEST, Some(3_050_015)),
-        (FISHER_ENTRY, None),
         (FISHER_ADVANCE, Some(FISHER_ENTRY)),
     ] {
         let shipped = record(id);
@@ -259,21 +266,23 @@ fn the_four_round_three_quests_without_a_runnable_chain_stay_disabled() {
                 shipped.prerequisite_quest_ids.contains(&prerequisite),
                 "quest {id} keeps its authored prerequisite {prerequisite}"
             );
-            assert!(
-                !record(prerequisite).enabled,
-                "quest {id} is unreachable while its prerequisite {prerequisite} is disabled"
-            );
+            // The two job chains are also cut upstream; the fisherman follow-up's own
+            // `enabled: false` is its blocker, since T542 enabled 3070001.
+            if [BRAWLER_QUEST, CHEF_QUEST].contains(&id) {
+                assert!(
+                    !record(prerequisite).enabled,
+                    "quest {id} is unreachable while its prerequisite {prerequisite} is disabled"
+                );
+            }
         }
     }
 
-    // The two fisherman records name givers that are not authored NPC rows, so no
-    // drawable actor can ever open their menu.
+    // The fisherman follow-up still names a giver that is not an authored NPC row, so no
+    // drawable actor can open its menu.
     let visibility = NpcVisibility::load(&content_dir()).expect("NPC visibility loads");
-    for giver in [FISHER_ENTRY_GIVER, FISHER_ADVANCE_GIVER] {
-        assert_eq!(
-            visibility.content_key(giver),
-            None,
-            "giver {giver} must not be a drawn NPC row"
-        );
-    }
+    assert_eq!(
+        visibility.content_key(FISHER_ADVANCE_GIVER),
+        None,
+        "giver {FISHER_ADVANCE_GIVER} must not be a drawn NPC row"
+    );
 }

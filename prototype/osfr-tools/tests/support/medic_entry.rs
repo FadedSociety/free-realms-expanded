@@ -27,6 +27,8 @@ pub const LEVEL_TWENTY: u32 = 3_090_027;
 /// The next Medic record; it stays disabled in this slice (no friendly-NPC
 /// Target Vitals path), and no later record may become offerable by accident.
 pub const SURGICAL_PRECISION: u32 = 3_090_008;
+/// T542's Jobs-window record: Nurse Naia is its giver, its one talk target and the turn-in.
+pub const BECOME_A_MEDIC: u32 = 3_090_034;
 pub const SUNFLOWER: u64 = 9_500_000_536;
 pub const EXAM_COINS: u32 = 5;
 pub const EXAM_XP: u32 = 15;
@@ -65,6 +67,9 @@ pub fn assert_enabled_medic_chapter_records() {
     let enabled: Vec<&Value> = records
         .iter()
         .filter(|record| record["enabled"].as_bool().unwrap_or(false))
+        // T542 enables the ungated Become a Medic (3090034): the Jobs-window record, not
+        // part of the chapter shape these checks pin.
+        .filter(|record| record["id"].as_u64() != Some(u64::from(BECOME_A_MEDIC)))
         .collect();
     let enabled_ids: Vec<u64> = enabled
         .iter()
@@ -372,7 +377,10 @@ pub fn assert_enabled_medic_chapter_records() {
     for record in records {
         let id = record["id"].as_u64().unwrap();
         // T743 enables Callahan's Seaside level-20 gate (3090027); its own suite covers it.
-        if id == u64::from(3_090_002_u32) || (id >= 3_090_007 && id != u64::from(LEVEL_TWENTY)) {
+        // T542 enables the Jobs-window Become a Medic (3090034).
+        if id == u64::from(3_090_002_u32)
+            || (id >= 3_090_007 && id != u64::from(LEVEL_TWENTY) && id != u64::from(BECOME_A_MEDIC))
+        {
             assert_eq!(
                 record["enabled"].as_bool(),
                 Some(false),

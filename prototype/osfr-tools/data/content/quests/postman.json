@@ -4,27 +4,39 @@
     {
       "id": 3130001,
       "title_string_id": 412445,
-      "giver_npc_id": 9000000086,
+      "giver_npc_id": 9000000091,
       "prerequisite_quest_ids": [],
       "objectives": [
         {
           "kind": "talk_to_npc",
           "id": 1,
-          "npc_id": 9000000086,
-          "text_string_id": 412451,
+          "npc_id": 9000000091,
+          "text_string_id": 412446,
           "source": [
             {
               "kind": "client",
-              "evidence": "Global.Text 412451 (lab/reports/locale-id-to-text.json): 'Speak to Felipe' (quest-lines/quests.json q3130001 objective; Felipe 9000000086 is the Sanctuary courier, a drawn reference_data row at the FabledRealms.lua:3614 spawn)"
+              "evidence": "Global.Text 412446 'Learn how to be a postman by finding Felipe in Sanctuary.' (lab/reports/locale-id-to-text.json) sends the player to the trainer; the target is that job_trainers.json row, npc 9000000091."
             },
             {
               "kind": "reconstructed",
-              "evidence": "(R) T723: talk target npc 9000000086 is a drawn row (placement legacy_data, or a reference_data row drawn by its npc_spawns_extra.json body), so the Talk can run; the final Talk to a named objective target opens the 49/13 end screen at that NPC."
+              "evidence": "(R) T542: one talk_to_npc step (id 1) at the trainer; its goal line is the Jobs-window description 412446 (an enabled step needs a resolving text id, T403), and no dialogue line is bound because the original step dialogue is not recovered."
             }
           ]
         }
       ],
-      "rewards": [],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T542: five coins, the W110 fallback for an unknown quest payout; no job XP is paid (a locked job must not block the turn-in), no item and no membership bonus is inferred."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -59,12 +71,20 @@
           "evidence": "Global.Text 412445 title 'Become a Postman', 412446 description 'Learn how to be a postman by finding Felipe in Sanctuary.', 412451 objective 'Speak to Felipe', 384165 'Find Felipe in Sanctuary and become a postman!' (lab/reports/locale-id-to-text.json)."
         },
         {
+          "kind": "client",
+          "evidence": "Global.Text 412445 'Become a Postman' and 412446 'Learn how to be a postman by finding Felipe in Sanctuary.' (lab/reports/locale-id-to-text.json); Flitter is the job_trainers.json trainer for profile 4 (npc 9000000091)."
+        },
+        {
           "kind": "reconstructed",
-          "evidence": "(R) T723/F751: kept disabled. The answer's reward is the Postman job unlock (quest-lines/quests.json q3130001) and no quest turn-in can grant a profile (the only Postman unlock path is the trainer menu), so nothing can pay the cited reward; the 49/1 intro and 49/13 end text are also unbound (dialogs q3130001 has no offer, progress or complete line). Do not substitute coins for the unlock (review 605e90c finding 1): the 49/15 Jobs-window Start is refused and unlocks nothing until a completion path grants profile 4."
+          "evidence": "(R) T542: the original was started from the Jobs window (147/1 row, then 49/15 with original quest id 1964); the giver is the trainer Flitter (9000000091), the single talk target is the same trainer, and the turn-in is the giver, so one Talk to the trainer completes the step and opens the end screen there. Reward: 5 coins (the W110 fallback for an unknown payout) and no job XP, so a locked profile can never block the turn-in. No intro, prerequisite or job gate is bound; because the giver is the trainer, the trainer's own menu also offers it."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T542: the client description 412446 names Felipe (9000000086), a poi_anchor row the 35/2 draw set omits; the job_trainers.json profile 4 trainer is Flitter (9000000091), T407's reachable Sanctuary postmaster, so giver, target and turn-in are Flitter."
         }
       ],
       "description_string_id": 412446,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3130002,

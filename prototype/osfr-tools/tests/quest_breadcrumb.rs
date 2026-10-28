@@ -145,8 +145,13 @@ fn the_shipped_crosswalk_loads_and_points_at_real_quests() {
         starter["objectives"][1]["trigger"],
         json!({"type": "first_movement", "mouse": false})
     );
+    // The crosswalk entries that reach a real, enabled quest: the Cooking starter (1811)
+    // and, since T542, the Soccer Star POI 1881 -> 3140001 (the same record the Jobs window
+    // maps 1965 to). Every other target must stay hollow, so a mapping to an unbuilt record
+    // cannot be started from a POI.
+    const SUPPORTED: [u32; 2] = [1811, 1881];
     for (original, regional) in &crosswalk {
-        if *original != 1811 {
+        if !SUPPORTED.contains(original) {
             let (enabled, objectives) = offerable[&u64::from(*regional)];
             assert!(
                 !enabled || objectives == 0,

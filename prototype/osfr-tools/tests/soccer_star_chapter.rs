@@ -74,6 +74,8 @@ const LANDON_MODEL: i32 = 1_457;
 const LANDON_NAME: i32 = 401_744;
 /// Client locale 412463 "Become a Soccer Star".
 const BECOME_A_SOCCER_STAR: u32 = 412_463;
+/// T542's Jobs-window record: Landon is its giver, its one talk target and the turn-in.
+const BECOME_A_SOCCER_STAR_QUEST: u32 = 3_140_001;
 const TITLE: u32 = 407_408;
 const INTRO: u32 = 418_984;
 const DESCRIPTION: u32 = 402_583;
@@ -128,7 +130,16 @@ struct Player {
 
 impl Player {
     fn join(fixture: &Fixture, guid: u64) -> Self {
-        let mut game = fixture.game_as(guid, None);
+        // T542: Landon's menu also offers the ungated Become a Soccer Star; complete it in
+        // the saved state so the chapter's Talk checks see only the scrimmage line.
+        let mut state = fixture.game_as(guid, None).state();
+        seed_quest(
+            &mut state,
+            BECOME_A_SOCCER_STAR_QUEST,
+            QuestStatus::Completed,
+            &[1],
+        );
+        let mut game = fixture.game_as(guid, Some(state));
         let character = character_at_for(guid, 0, landon_position());
         game.initialize_world(&character, 1_000).unwrap();
         Self {

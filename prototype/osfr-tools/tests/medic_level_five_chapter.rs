@@ -150,7 +150,11 @@ fn medic_ready(
     let naia = npc_character_for(guid, NAIA);
     let greyli = npc_character_for(guid, GREYLI);
     let gordon = npc_character_for(guid, GORDON);
-    let mut game = fixture.game_as(guid, None);
+    // T542: Naia's menu also offers the ungated Become a Medic; complete it in the saved
+    // state so the chapter's Naia Talk checks see only the chapter quests.
+    let mut state = fixture.game_as(guid, None).state();
+    seed_quest(&mut state, BECOME_A_MEDIC, QuestStatus::Completed, &[1]);
+    let mut game = fixture.game_as(guid, Some(state));
     learn_medic(&mut game, &naia, now);
     complete_exam(&mut game, &naia, now);
     complete_house_call(&mut game, &naia, &greyli, now);
@@ -878,8 +882,9 @@ fn surgical_precision_stays_disabled() {
     let document = read_json(&content_dir().join("quests/medic.json"));
     for record in document["records"].as_array().unwrap() {
         let id = record["id"].as_u64().unwrap();
-        // T743 enables Callahan's Seaside level-20 gate; the rest stay off.
-        if id >= 3_090_007 && id != u64::from(LEVEL_TWENTY) {
+        // T743 enables Callahan's Seaside level-20 gate and T542 the Jobs-window
+        // Become a Medic; the rest stay off.
+        if id >= 3_090_007 && id != u64::from(LEVEL_TWENTY) && id != u64::from(BECOME_A_MEDIC) {
             assert_eq!(
                 record["enabled"].as_bool(),
                 Some(false),

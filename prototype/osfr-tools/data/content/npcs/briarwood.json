@@ -7645,7 +7645,9 @@
         "\"Speak to Cale Yardbird at Tangletrack\" (client 1230727406). [video: nameplate title \"Kart Driver Trainer\", VRT9aP_N9ic/00008, 0mJBW1a0EIc/00204]"
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3080050
+      ],
       "quests_given_text": [
         "Starts the Tangletrack tier of Kart Driver."
       ],

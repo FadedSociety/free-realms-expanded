@@ -327,6 +327,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
         "Beth Callahan (T743 talk target of 3090027): the client names her only in third person (387592 'Speak to Beth Callahan', the objective text, and Doctor Callahan's offer speech 387576 that sends the player to her); quest-lines/objective-specs-fixed.json q3090027 records no first-person line, so none is recovered.",
     ),
     (
+        9000000039,
+        "Cale Yardbird (T542 giver and talk target of Become a Kart Driver 3080050): the client lines naming him are third-person objectives (1230727406 'Speak to Cale Yardbird at Tangletrack', 3977947908 'Return to Cale Yardbird') and the trainer menu label 407752; the Kart Driver guide quotes no first-person line of his own, so none is recovered.",
+    ),
+    (
         9000000069,
         "Derp Axemaker (T729 giver of 3100012 and 3100013): the only first-person lines of his enabled quests are their offer intros 387452 and 77415, and quest-lines/dialogs.json leaves both speakers unattributed; binding a QuestOffer greeting moves the Snowhill bound-row pins in the region greeting tests, which this quest-data change does not touch, so he stays unbound. His disabled quests carry other first-person intros, but a disabled quest offers no proof and is not a greeting source.",
     ),
@@ -365,6 +369,10 @@ const BLANK_WITH_REASON: &[(u64, &str)] = &[
     (
         9000000227,
         "Valerie: only third-person tutorial and objective text; the untied Welcome window 3453817544 is not attributed to her, so no first-person line is recovered.",
+    ),
+    (
+        9000000391,
+        "Mad Jack (T542 giver and talk target of Become a Demo Derby Driver 3060047): the client lines naming him are third-person objectives (379927456 'Speak with Mad Jack at the Wildwood Speedway to learn how to become a Demo Derby Driver', 1574840783 'Talk to Mad Jack to learn about Demolition Derby Driver') and the trainer menu label 412342; the Demolition Derby Driver guide quotes no first-person line of his own, so none is recovered.",
     ),
     (
         9000000495,

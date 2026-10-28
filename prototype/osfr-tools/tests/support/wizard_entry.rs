@@ -16,6 +16,7 @@ use osfr_tools::{
     gameplay::{Gameplay, GameplayState},
     npc_interaction::{QuestOfferPacket49_1, decode_quest_offer_49_1},
     profiles::ProfileState,
+    quest_engine::QuestStatus,
 };
 use std::collections::{BTreeMap, BTreeSet};
 
@@ -46,6 +47,9 @@ pub const STICKY_INTRO: u32 = 24_949;
 pub const STICKY_END_TEXT: u32 = 22_373;
 pub const REWARD_COINS: u32 = 5;
 pub const REWARD_XP: u32 = 25;
+/// T542's Jobs-window record: Fizzlesticks is its giver, its one talk target and the
+/// turn-in.
+pub const BECOME_A_WIZARD: u32 = 3_160_035;
 pub const WIZARD: i32 = 12;
 pub const BRAWLER: i32 = 43;
 /// The open continent is world zone 0; regional zone ids are content labels.
@@ -83,8 +87,16 @@ pub fn unlocked_wizard_state(fixture: &Fixture) -> GameplayState {
     state
 }
 
+/// T542: Fizzlesticks' menu also offers the ungated Become a Wizard (3160035). A chapter
+/// test completes it in the saved state, so his Talk offers only the chapter quests.
+pub fn chapter_game_for(fixture: &Fixture, guid: u64, state: GameplayState) -> Gameplay {
+    let mut state = fixture.game_as(guid, Some(state)).state();
+    seed_quest(&mut state, BECOME_A_WIZARD, QuestStatus::Completed, &[1]);
+    fixture.game_as(guid, Some(state))
+}
+
 pub fn wizard_game(fixture: &Fixture) -> Gameplay {
-    fixture.game(Some(wizard_state(fixture)))
+    chapter_game_for(fixture, CHARACTER, wizard_state(fixture))
 }
 
 /// Talk to the giver and decode the single 49/1 offer with the production reader.

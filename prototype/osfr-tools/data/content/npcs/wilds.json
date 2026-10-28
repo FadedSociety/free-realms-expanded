@@ -16004,7 +16004,8 @@
       "quest_ids_given": [
         3160003,
         3160004,
-        3160005
+        3160005,
+        3160035
       ],
       "quests_given_text": [
         "Wizard: How to be a Wizard, Wizard: I Can't Read This!, Sticky Spell Book, Wizard: Lightning Bolt!, Wizard: The First Rule of Being a Wizard..., Wizard: Market Wizards, Wizard: Student Profits, Wizard: Reach Level 5, Wizard: An Icy Mistake, Being a Better Wizard. The grenade-recovery and glasses errands (1226440549, 370084981) have no title match."
@@ -27268,7 +27269,9 @@
         "Wildwood Speedway (\"Mad Jack in Wildwood is the craziest Demo Derby Driver around!\", 878609031). [video: nameplate title \"Demolition Derby Trainer\", aveqYa4AVk8/00000, /00020]"
       ],
       "quests_given": [],
-      "quest_ids_given": [],
+      "quest_ids_given": [
+        3060047
+      ],
       "quests_given_text": [
         "Unlocks the job (379927456); Fighting for Funds (inferred); sent to by Shakey (435085027) and as the destination of Demo Derby: Wildwood Derby 1000 (Crash Davis sends the player)."
       ],

@@ -56,6 +56,8 @@ const STEELE: u64 = 9_000_000_208;
 const WARRIOR: i32 = 32;
 const BRAWLER: i32 = 43;
 const W1: u32 = 3_150_001;
+/// T542's Jobs-window record: Dewey is its giver, its one talk target and the turn-in.
+const BECOME_A_WARRIOR: u32 = 3_150_025;
 const W2: u32 = 3_150_002;
 const W3: u32 = 3_150_003;
 const W4: u32 = 3_150_004;
@@ -135,12 +137,27 @@ fn brawler_rank_five_state(fixture: &Fixture) -> GameplayState {
     state
 }
 
+/// T542: Dewey's menu also offers the ungated Become a Warrior (3150025). A chapter test
+/// completes it in the saved state, so his Talk offers only the chapter quests.
+fn complete_become_a(fixture: &Fixture, guid: u64, state: GameplayState) -> GameplayState {
+    let mut state = fixture.game_as(guid, Some(state)).state();
+    seed_quest(&mut state, BECOME_A_WARRIOR, QuestStatus::Completed, &[1]);
+    state
+}
+
 fn warrior_game(fixture: &Fixture) -> Gameplay {
-    fixture.game(Some(warrior_state(fixture)))
+    fixture.game(Some(complete_become_a(
+        fixture,
+        CHARACTER,
+        warrior_state(fixture),
+    )))
 }
 
 fn warrior_game_for(fixture: &Fixture, guid: u64) -> Gameplay {
-    fixture.game_as(guid, Some(warrior_state(fixture)))
+    fixture.game_as(
+        guid,
+        Some(complete_become_a(fixture, guid, warrior_state(fixture))),
+    )
 }
 
 fn pending_offer(game: &Gameplay) -> Option<u32> {
@@ -302,7 +319,11 @@ fn dewey_offers_becoming_a_warrior_only_to_warriors() {
     let mut now = 1_000;
 
     // A default Adventurer gets no W1 offer and no state change.
-    let mut ordinary = fixture.game(None);
+    let mut ordinary = fixture.game(Some(complete_become_a(
+        &fixture,
+        CHARACTER,
+        fixture.game(None).state(),
+    )));
     assert_no_offer(
         &mut ordinary,
         &dewey,
@@ -314,13 +335,21 @@ fn dewey_offers_becoming_a_warrior_only_to_warriors() {
     assert_eq!(pending_offer(&ordinary), None);
 
     // An unlocked Warrior that is not the active job is refused by the job gate.
-    let mut inactive = fixture.game(Some(inactive_warrior_state(&fixture)));
+    let mut inactive = fixture.game(Some(complete_become_a(
+        &fixture,
+        CHARACTER,
+        inactive_warrior_state(&fixture),
+    )));
     assert_no_offer(&mut inactive, &dewey, DEWEY, &mut now, "inactive Warrior");
     assert!(!has_quest(&inactive, W1));
     assert!(!has_quest(&inactive, W4));
 
     // The trainer menu still offers "Become a Warrior" once the rank gate is met (T201).
-    let mut trainer = fixture.game(Some(brawler_rank_five_state(&fixture)));
+    let mut trainer = fixture.game(Some(complete_become_a(
+        &fixture,
+        CHARACTER,
+        brawler_rank_five_state(&fixture),
+    )));
     let menu = interact(&mut trainer, &dewey, DEWEY, now + 10);
     let learn = menu_option(&menu, LEARN_LABEL);
     let learned = send(&mut trainer, &dewey, &npc_select(DEWEY, learn), now + 20);
@@ -849,6 +878,9 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
     let enabled: Vec<&Value> = records
         .iter()
         .filter(|row| row["enabled"].as_bool().unwrap_or(false))
+        // T542 enables the ungated Become a Warrior (3150025): the Jobs-window record, not
+        // part of the W1/W4 dialogue-record shape below.
+        .filter(|row| row["id"].as_u64() != Some(u64::from(BECOME_A_WARRIOR)))
         .collect();
     assert_eq!(
         enabled
@@ -958,7 +990,7 @@ fn the_two_spawns_and_quests_load_with_real_targets() {
     // generated content already carried.
     for record in records {
         let id = record["id"].as_u64().unwrap();
-        if [W1, W4, W5, W16].contains(&(id as u32)) {
+        if [W1, W4, W5, W16, BECOME_A_WARRIOR].contains(&(id as u32)) {
             continue;
         }
         assert_eq!(record["enabled"].as_bool(), Some(false), "quest {id}");

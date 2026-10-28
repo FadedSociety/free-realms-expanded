@@ -83,7 +83,11 @@ fn fizzlesticks_offers_the_first_wizard_chapter_to_an_eligible_wizard() {
     let mut now = 1_000;
 
     // An Adventurer sees no Wizard chapter; the open menu survives the refusal.
-    let mut game = fixture.game(None);
+    let mut game = chapter_game_for(
+        &fixture,
+        CHARACTER,
+        fixture.game_as(CHARACTER, None).state(),
+    );
     assert_no_offer(
         &mut game,
         &character,
@@ -107,7 +111,7 @@ fn fizzlesticks_offers_the_first_wizard_chapter_to_an_eligible_wizard() {
     );
 
     // A Wizard the player has unlocked but is not playing is refused by the same job gate.
-    let mut inactive = fixture.game(Some(unlocked_wizard_state(&fixture)));
+    let mut inactive = chapter_game_for(&fixture, CHARACTER, unlocked_wizard_state(&fixture));
     assert_no_offer(
         &mut inactive,
         &character,
@@ -834,9 +838,11 @@ fn enabled_wizard_chapter_records_are_complete_and_drawable() {
         .iter()
         .filter(|record| record["enabled"].as_bool().unwrap_or(false))
         // T723 enables Osgood's level gates and Helping a Friend (tests/zone_quests_sanctuary_round3.rs);
-        // this test covers Fizzlesticks' Robgoblin Camp chapter.
+        // this test covers Fizzlesticks' Robgoblin Camp chapter. T542's Become a Wizard
+        // (3160035) is the Jobs-window record, not part of that chapter shape.
         .filter(|record| {
-            ![3_160_017, 3_160_019, 3_160_024].contains(&record["id"].as_u64().unwrap())
+            ![3_160_017, 3_160_019, 3_160_024, u64::from(BECOME_A_WIZARD)]
+                .contains(&record["id"].as_u64().unwrap())
         })
         .collect();
     assert_eq!(

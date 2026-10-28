@@ -1968,6 +1968,59 @@
         }
       ],
       "enabled": false
+    },
+    {
+      "id": 3090034,
+      "title_string_id": 412422,
+      "giver_npc_id": 9000000161,
+      "prerequisite_quest_ids": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000161,
+          "text_string_id": 412423,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 412423 'Learn how to be a medic by finding Nurse Naia in Sanctuary.' (lab/reports/locale-id-to-text.json) sends the player to the trainer; the target is that job_trainers.json row, npc 9000000161."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T542: one talk_to_npc step (id 1) at the trainer; its goal line is the Jobs-window description 412423 (an enabled step needs a resolving text id, T403), and no dialogue line is bound because the original step dialogue is not recovered."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T542: five coins, the W110 fallback for an unknown quest payout; no job XP is paid (a locked job must not block the turn-in), no item and no membership bonus is inferred."
+            }
+          ]
+        }
+      ],
+      "source": [
+        {
+          "kind": "client",
+          "evidence": "lab/reports/original-minigame-packets/demoderby-23083-flow0-frame5077-op147-sub1.bin (434 bytes, sha256 ab3ec4f7878d3eb0acf69eaf1b0d5f3c2e2c051eb577f6f2559156026c712d3e): row 10 of 15, Medic; the 147/1 ActivityProfileList row whose QuestId is the original quest id 1962 that 49/15 carries (client reader 0x00be6f20, Jobs window sender 0x00c18aa0); the title and description ids resolve in lab/reports/locale-id-to-text.json."
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 412422 'Become a Medic' and 412423 'Learn how to be a medic by finding Nurse Naia in Sanctuary.' (lab/reports/locale-id-to-text.json); Nurse Naia is the job_trainers.json trainer for profile 11 (npc 9000000161)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T542: the original was started from the Jobs window (147/1 row, then 49/15 with original quest id 1962); the giver is the trainer Nurse Naia (9000000161), the single talk target is the same trainer, and the turn-in is the giver, so one Talk to the trainer completes the step and opens the end screen there. Reward: 5 coins (the W110 fallback for an unknown payout) and no job XP, so a locked profile can never block the turn-in. No intro, prerequisite or job gate is bound; because the giver is the trainer, the trainer's own menu also offers it."
+        }
+      ],
+      "description_string_id": 412423,
+      "enabled": true
     }
   ]
 }

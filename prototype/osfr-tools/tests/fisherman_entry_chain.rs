@@ -70,6 +70,8 @@ const NEWMAN: u64 = 9_500_000_793;
 const DEFAULT_PROFILE: i32 = 1;
 const BRAWLER_PROFILE: i32 = 43;
 const FISHERMAN_PROFILE: i32 = 137;
+/// T542's Jobs-window record: Reed is its giver, its one talk target and the turn-in.
+const BECOME_A_FISHERMAN: u32 = 3_070_001;
 const LEARN_TO_FISH: u32 = 3_070_003;
 const TESTING_THE_WATERS: u32 = 3_070_004;
 const SACRED_GROVE_GAME_ID: i32 = 599;
@@ -220,7 +222,11 @@ impl Rig {
         )
         .unwrap();
         add_fish_definitions(fixture.path());
-        let game = fixture.game_as(guid, None);
+        // T542: Reed's menu also offers the ungated Become a Fisherman (3070001);
+        // complete it in the fixture state so each Talk sees only the chapter quests.
+        let mut state = fixture.game_as(guid, None).state();
+        seed_quest(&mut state, BECOME_A_FISHERMAN, QuestStatus::Completed, &[1]);
+        let game = fixture.game_as(guid, Some(state));
         Self {
             game,
             character: character_at_for(guid, STILLWATER_ZONE, reed_position()),
@@ -950,8 +956,9 @@ fn the_two_records_load_with_the_real_game_id_and_giver() {
     assert_eq!(objectives[1]["npc_id"], json!(REED));
     assert_reward_shape(testing);
 
-    // The two alternatives stay unpublished; this task only enables E3/E4.
-    assert_eq!(find_record(3_070_001)["enabled"], json!(false));
+    // T542 enables the Jobs-window record 3070001 (Reed, one Talk, five coins); the
+    // narrative alternative 3070002 stays unpublished.
+    assert_eq!(find_record(BECOME_A_FISHERMAN)["enabled"], json!(true));
     assert_eq!(find_record(3_070_002)["enabled"], json!(false));
 
     // Reed's fishing spot is the real game id 599, not the framework type 21.

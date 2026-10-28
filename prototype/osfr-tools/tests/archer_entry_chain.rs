@@ -30,7 +30,7 @@ use osfr_tools::quest_engine::QuestStatus;
 #[test]
 fn lugabow_offers_path_only_to_archers() {
     let fixture = Fixture::new();
-    let mut game = fixture.game(None);
+    let mut game = chapter_game(&fixture);
     let mut now = 1_000;
     let lugabow = content_position("greenwood_forest.json", LUGABOW);
     let character = character_at(GREENWOOD, lugabow);
@@ -146,7 +146,7 @@ fn path_chapter_completes_in_order_and_pays_once() {
 #[test]
 fn oath_chapter_requires_path_and_talks_to_hilforn() {
     let fixture = Fixture::new();
-    let mut game = fixture.game(None);
+    let mut game = chapter_game(&fixture);
     let mut now = 3_000;
     let lugabow = content_position("greenwood_forest.json", LUGABOW);
     let character = character_at(GREENWOOD, lugabow);
@@ -277,7 +277,7 @@ fn wrong_npc_and_replay_do_not_advance_or_pay() {
 #[test]
 fn relog_keeps_completed_history_and_no_duplicate_reward() {
     let fixture = Fixture::new();
-    let mut game = fixture.game(None);
+    let mut game = chapter_game(&fixture);
     let mut now = 5_000;
     let lugabow = content_position("greenwood_forest.json", LUGABOW);
     let character = character_at(GREENWOOD, lugabow);
@@ -503,7 +503,7 @@ fn relog_replays_the_held_end_screen_at_its_speaker() {
 #[test]
 fn non_archer_is_refused_with_no_state_change() {
     let fixture = Fixture::new();
-    let mut game = fixture.game(None);
+    let mut game = chapter_game(&fixture);
     let mut now = 6_000;
     let lugabow = content_position("greenwood_forest.json", LUGABOW);
     let character = character_at(GREENWOOD, lugabow);

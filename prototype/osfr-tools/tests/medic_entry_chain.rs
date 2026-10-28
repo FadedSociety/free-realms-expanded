@@ -57,6 +57,14 @@ fn npc_character_for(guid: u64, npc_id: u64) -> CharacterState {
     character_at_for(guid, SANCTUARY, content_position("sanctuary.json", npc_id))
 }
 
+/// T542: Naia's menu also offers the ungated Become a Medic (3090034); complete it in the
+/// saved state so the chapter's Talks at Naia offer only the chapter quests.
+fn chapter_game(fixture: &Fixture) -> Gameplay {
+    let mut state = fixture.game(None).state();
+    seed_quest(&mut state, BECOME_A_MEDIC, QuestStatus::Completed, &[1]);
+    fixture.game(Some(state))
+}
+
 fn send_error(
     game: &mut Gameplay,
     character: &CharacterState,
@@ -247,7 +255,7 @@ fn medic_xp(game: &Gameplay) -> u32 {
 #[test]
 fn naia_offers_the_medic_exam_only_to_medics() {
     let fixture = Fixture::new();
-    let mut game = fixture.game(None);
+    let mut game = chapter_game(&fixture);
     let mut now = 1_000;
     let naia = npc_character(NAIA);
 
@@ -387,7 +395,7 @@ fn exam_and_house_call_complete_in_order() {
 #[test]
 fn take_your_vitamins_requires_house_call() {
     let fixture = Fixture::new();
-    let mut game = fixture.game(None);
+    let mut game = chapter_game(&fixture);
     let mut now = 3_000;
     let naia = npc_character(NAIA);
     let gordon = npc_character(GORDON);
@@ -702,7 +710,7 @@ fn refusals_and_replay_change_nothing() {
 #[test]
 fn relog_preserves_completed_history() {
     let fixture = Fixture::new();
-    let mut game = fixture.game(None);
+    let mut game = chapter_game(&fixture);
     let mut now = 6_000;
     let naia = npc_character(NAIA);
     let greyli = npc_character(GREYLI);

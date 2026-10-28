@@ -991,9 +991,10 @@ fn therin_is_drawable_and_the_quest_content_resolves() {
     );
 
     // The neighbouring records keep their recovered titles. T334 enabled 3100003 and T411
-    // enables 3100004 ("Rush Order"); 3100001 and 3100005 ("Gem Appraisal") stay disabled.
+    // enables 3100004 ("Rush Order"); T542 enables 3100001 (Become a Miner) and 3100005
+    // ("Gem Appraisal") stays disabled.
     for (id, title, enabled) in [
-        (3_100_001_u32, 139_748_u32, false),
+        (3_100_001_u32, 139_748_u32, true),
         (RUSH_ORDER, RUSH_ORDER_TITLE, true),
         (3_100_005, 76_770, false),
     ] {

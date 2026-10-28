@@ -16713,7 +16713,8 @@
       ],
       "quest_ids_given": [
         3010003,
-        3010006
+        3010006,
+        3010035
       ],
       "quests_given_text": [
         "Full line on Archer: Path of the Archer (unlocks the job), Archer: Test of Agility, Archer: Taking Aim, Archer: Oath of Honor; entry quests \"Being a Better Archer\" and \"Aiming For Archery\" point to her. The wiki also lists the quest Thugawugs under her and names her in Lofty Letter (an Adventurer side quest); a letter to her from a guard named Trusty is in the client (3739059730, 2181619100) and is not tied to a title. Weapon-testing text: \"Help Lugabow with her weapons testing in the Greenwood Camp.\" (3032659489, title not found). Related: Miner: Arrowheads for Lugabow; blacksmith bow orders (2576706017)."
@@ -17892,7 +17893,8 @@
         3020019,
         3100014,
         3100015,
-        3100016
+        3100016,
+        3100001
       ],
       "quests_given_text": [
         "Miner: Finding Southvale (hand-in), Miner: Gems For Good Luck, Miner: Marriage Proposal, Miner: Checking the Chug; Blacksmith: Bolstering the Bows, Blacksmith: Chivalrous Carlos, Blacksmith: Local Bonesaw Shortage, Blacksmith: Breaking Bank, Blacksmith: Reach Level 15; receiver of Scalpel for Mili (client title 541505727; no description matched)."

@@ -30,6 +30,8 @@ pub const JONES: u64 = 9_000_000_121;
 pub const BARTLE: u64 = 9_000_000_021;
 pub const PATH: u32 = 3_010_003;
 pub const OATH: u32 = 3_010_006;
+/// T542's Jobs-window record: the trainer is its giver and one talk target, ungated.
+pub const BECOME_A_ARCHER: u32 = 3_010_035;
 pub const ARCHER: i32 = 35;
 pub const BRAWLER: i32 = 43;
 /// `job_trainers.json` row for Lugabow (profile 35).
@@ -65,6 +67,14 @@ pub fn recruit_spawn(content_key: u64) -> (u64, [f32; 3]) {
         row["spawn_guid"].as_u64().expect("bound spawn GUID"),
         serde_json::from_value(row["position"].clone()).expect("bound spawn position"),
     )
+}
+
+/// T542: Lugabow's Talk also offers the ungated Become an Archer (3010035). A chapter test
+/// completes it in the saved state, so Lugabow offers only the quests the test walks.
+pub fn chapter_game(fixture: &Fixture) -> Gameplay {
+    let mut state = fixture.game(None).state();
+    seed_quest(&mut state, BECOME_A_ARCHER, QuestStatus::Completed, &[1]);
+    fixture.game(Some(state))
 }
 
 pub fn learn_archer(game: &mut Gameplay, character: &CharacterState, now: &mut u64) {
@@ -210,6 +220,9 @@ pub fn assert_enabled_archer_chapter_records() {
     let enabled: Vec<&Value> = records
         .iter()
         .filter(|record| record["enabled"].as_bool().unwrap_or(false))
+        // T542 enables the ungated Become an Archer (3010035): the Jobs-window record,
+        // not part of the Path/Oath chapter shape this check pins.
+        .filter(|record| record["id"].as_u64() != Some(u64::from(BECOME_A_ARCHER)))
         .collect();
     let enabled_ids: Vec<u64> = enabled
         .iter()

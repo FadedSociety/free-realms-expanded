@@ -2,10 +2,12 @@
 //! `lab/references/quest-lines/wiring/round3/sanctuary.json` run end to end on this tip and are
 //! enabled in `data/content/quests/{chef,warrior,wizard}.json`: Chef: Reach Level 5, Warrior:
 //! Achieve Level 15 and the Wizard line (Reach Level 10, Helping a Friend, Reach Level 15).
-//! Become a Postman (3130001) stays disabled: its cited reward is the Postman job unlock, which
-//! no quest turn-in can grant (F751 finding 1), and its 49/1 intro and 49/13 end text are
-//! unbound. The other fifteen stay disabled; `the_other_fifteen_still_have_a_blocker` lists
-//! every blocker and fails when any named blocker lifts.
+//! Become a Postman (3130001) is enabled by T542 as the Jobs window's Start quest: Flitter, the
+//! drawn Postman trainer, is giver, one talk target and turn-in, and the turn-in pays five
+//! coins; the Postman unlock itself stays the trainer menu's job, so completing it unlocks no
+//! job (F751 finding 1 was about substituting a coin reward for the unlock). The other
+//! fourteen stay disabled; `the_other_fifteen_still_have_a_blocker` lists every blocker and
+//! fails when any named blocker lifts.
 //!
 //! Every test drives the production paths in `tests/support/npc_quest_chain.rs`: the 26/8 ->
 //! 26/10 -> 26/6 offer (49/1, decoded with the production reader), the 49/2 accept,
@@ -31,7 +33,7 @@ mod quest_records;
 mod quest_target_sets;
 
 use npc_quest_chain::{
-    ADVENTURER, CHARACTER, Fixture, ZoneQuest, ZoneQuests, assert_no_offer,
+    ADVENTURER, CHARACTER, Fixture, ZoneQuest, ZoneQuests, accept, assert_no_offer,
     assert_packet_changes_nothing, breadcrumb_start, character_at_for, coins, content_dir, counts,
     finish_quest, objective_complete, pending_offer, pending_turnin, quest_end_reply, quest_reply,
     quest_status, read_json, realm_level, reference_content, release_end_screen, saved,
@@ -318,12 +320,11 @@ fn progress_survives_a_reconnect_and_players_are_independent() {
 }
 
 /// The Jobs window's Start quest button (49/15) maps original 1964 to Become a Postman.
-/// The quest is disabled: its cited reward is the Postman job unlock, no quest-completion
-/// path grants a profile (the Postman unlock is the trainer menu's), and its 49/1/49/13
-/// texts are unbound.
-/// F751 finding 1: the start is refused, pays nothing and unlocks nothing. When a
-/// completion path grants profile 4, replace this pin with an end-to-end test that asserts
-/// `profiles.unlocked.contains(&POSTMAN_PROFILE)` after the 49/14.
+/// T542 enabled the record: Flitter, the drawn Postman trainer, is giver, one talk target
+/// and turn-in, so the Start offers it and the turn-in pays five coins with no job XP. The
+/// quest grants no job - the Postman unlock stays the trainer menu's (F751 finding 1 was
+/// about substituting a coin reward for the unlock). The 49/1 intro and 49/13 end text stay
+/// unbound. A second Start is refused, pays nothing and unlocks nothing.
 #[test]
 fn the_jobs_window_postman_start_is_refused_and_unlocks_no_job() {
     let browser = read_json(&content_dir().join("job_browser.json"));
@@ -335,13 +336,18 @@ fn the_jobs_window_postman_start_is_refused_and_unlocks_no_job() {
         .map(|row| row["original_quest_id"].as_i64().unwrap() as i32)
         .expect("the Jobs window maps a Start quest id to Become a Postman");
     let postman = record(POSTMAN_QUEST);
-    assert!(
-        !postman.enabled,
-        "3130001 stays disabled until completion unlocks the job"
+    assert!(postman.enabled, "T542 enables Become a Postman");
+    assert_eq!(postman.rewards.len(), 1, "one reward row");
+    assert_eq!(
+        postman.rewards[0]["coins"].as_u64(),
+        Some(5),
+        "the W110 five-coin fallback"
     );
     assert!(
-        postman.rewards.is_empty(),
-        "3130001 must not substitute a coin or item reward for the cited job unlock"
+        postman.rewards[0]["job_xp"]
+            .as_object()
+            .is_some_and(|xp| xp.is_empty()),
+        "no job XP, so a locked profile cannot block the turn-in"
     );
     assert_eq!(
         postman.intro_text_string_id, 0,
@@ -354,15 +360,44 @@ fn the_jobs_window_postman_start_is_refused_and_unlocks_no_job() {
 
     let fixture = Fixture::new();
     let mut game = zone_player(&fixture, CHARACTER, ADVENTURER);
-    let felipe = MAP.at(CHARACTER, postman.giver_npc_id);
+    let flitter = MAP.at(CHARACTER, postman.giver_npc_id);
+    let started = send(&mut game, &flitter, &breadcrumb_start(original), 1_000);
+    assert!(
+        started.changed,
+        "the Jobs window Start must offer Become a Postman"
+    );
+    assert_eq!(pending_offer(&game), Some(POSTMAN_QUEST));
+    let mut now = 1_010;
+    accept(&mut game, &flitter, POSTMAN_QUEST, now);
+    now += 10;
+    MAP.turn_in(
+        &mut game,
+        CHARACTER,
+        &quest(POSTMAN_QUEST),
+        ADVENTURER,
+        &mut now,
+    );
+    assert_eq!(quest_status(&game, POSTMAN_QUEST), QuestStatus::Completed);
+    assert!(
+        !game
+            .state()
+            .profiles
+            .as_ref()
+            .unwrap()
+            .unlocked
+            .contains(&POSTMAN_PROFILE),
+        "the turn-in unlocked the Postman job; the trainer menu owns that"
+    );
+
+    // A second Start is refused, pays nothing and unlocks nothing.
     let before = saved(&game);
     let coins_before = coins(&game);
-    let started = send(&mut game, &felipe, &breadcrumb_start(original), 1_000);
+    let refused = send(&mut game, &flitter, &breadcrumb_start(original), now + 10);
     assert!(
-        !started.changed,
-        "the disabled quest was started from the Jobs window"
+        !refused.changed,
+        "the completed quest was started from the Jobs window"
     );
-    assert_eq!(started.replies, vec![chat::system(BREADCRUMB_REFUSED)]);
+    assert_eq!(refused.replies, vec![chat::system(BREADCRUMB_REFUSED)]);
     assert_eq!(saved(&game), before, "the refused 49/15 changed the save");
     assert_eq!(coins(&game), coins_before, "the refused 49/15 paid coins");
     assert!(
@@ -376,22 +411,12 @@ fn the_jobs_window_postman_start_is_refused_and_unlocks_no_job() {
         "the refused 49/15 unlocked the Postman job"
     );
     assert_eq!(pending_offer(&game), None);
-    assert!(
-        !game
-            .state()
-            .npc_quests
-            .as_ref()
-            .unwrap()
-            .quests
-            .contains_key(&POSTMAN_QUEST),
-        "the refused 49/15 added the quest"
-    );
     assert_packet_changes_nothing(
         &mut game,
-        &felipe,
+        &flitter,
         &quest_reply(POSTMAN_QUEST, true),
-        1_010,
-        "a forged accept for the never-offered quest",
+        now + 20,
+        "a forged accept for the completed quest",
     );
 }
 
@@ -413,19 +438,18 @@ enum Blocker {
     NoJobGate(i32),
     /// The job can be unlocked but the 26/13 switch is refused (no starter outfit).
     Unselectable(i32),
-    /// The cited reward is a job unlock and no quest-completion path grants one; a reward
-    /// row here would be a substitute for it.
-    JobUnlock(i32),
 }
 
-use Blocker::{Giver, JobUnlock, Minigame, NoJobGate, NoProfile, Prerequisite, Unselectable};
+use Blocker::{Giver, Minigame, NoJobGate, NoProfile, Prerequisite, Unselectable};
 
-/// The fifteen round-3 quests that stay disabled. Each row lists every blocker that still
-/// holds; the test fails when one lifts, so the next builder re-checks the others before
-/// wiring it (some are one content edit away, others need a mechanic the server lacks).
+/// The round-3 quests that stay disabled. Each row lists every blocker that still holds;
+/// the test fails when one lifts, so the next builder re-checks the others before wiring it
+/// (some are one content edit away, others need a mechanic the server lacks). T542 enabled
+/// Become a Postman (3130001), so the list is fourteen now; the test name keeps the T723
+/// count for the protected test list.
 #[test]
 fn the_other_fifteen_still_have_a_blocker() {
-    const OFF: [(u32, &[Blocker]); 15] = [
+    const OFF: [(u32, &[Blocker]); 14] = [
         (3_000_039, &[Giver, Prerequisite]),
         (3_020_031, &[Giver, Prerequisite]),
         (3_040_003, &[NoJobGate(120), Unselectable(120)]),
@@ -435,7 +459,6 @@ fn the_other_fifteen_still_have_a_blocker() {
         (3_050_018, &[Prerequisite]),
         (3_070_026, &[Giver]),
         (3_120_010, &[NoJobGate(121), NoProfile(121)]),
-        (3_130_001, &[JobUnlock(POSTMAN_PROFILE)]),
         (3_130_007, &[Minigame(376)]),
         (3_150_014, &[Prerequisite]),
         (3_150_015, &[Prerequisite]),
@@ -483,16 +506,6 @@ fn the_other_fifteen_still_have_a_blocker() {
                         "quest {id}: the refused switch changed the save"
                     );
                     game.state().profiles.unwrap().active != profile
-                }
-                JobUnlock(profile) => {
-                    !profile_fixture
-                        .game(None)
-                        .state()
-                        .profiles
-                        .unwrap()
-                        .unlocked
-                        .contains(&profile)
-                        && quest.rewards.is_empty()
                 }
             };
             assert!(

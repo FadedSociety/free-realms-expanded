@@ -4,10 +4,39 @@
     {
       "id": 3140001,
       "title_string_id": 412463,
-      "giver_npc_id": 9000000547,
+      "giver_npc_id": 9000000140,
       "prerequisite_quest_ids": [],
-      "objectives": [],
-      "rewards": [],
+      "objectives": [
+        {
+          "kind": "talk_to_npc",
+          "id": 1,
+          "npc_id": 9000000140,
+          "text_string_id": 412464,
+          "source": [
+            {
+              "kind": "client",
+              "evidence": "Global.Text 412464 'Learn how to be a soccer star by finding Manager Landon in Snowhill.' (lab/reports/locale-id-to-text.json) sends the player to the trainer; the target is that job_trainers.json row, npc 9000000140."
+            },
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T542: one talk_to_npc step (id 1) at the trainer; its goal line is the Jobs-window description 412464 (an enabled step needs a resolving text id, T403), and no dialogue line is bound because the original step dialogue is not recovered."
+            }
+          ]
+        }
+      ],
+      "rewards": [
+        {
+          "coins": 5,
+          "items": [],
+          "job_xp": {},
+          "source": [
+            {
+              "kind": "reconstructed",
+              "evidence": "(R) T542: five coins, the W110 fallback for an unknown quest payout; no job XP is paid (a locked job must not block the turn-in), no item and no membership bonus is inferred."
+            }
+          ]
+        }
+      ],
       "source": [
         {
           "kind": "client",
@@ -31,10 +60,6 @@
         },
         {
           "kind": "reconstructed",
-          "evidence": "(R) giver name is unresolved or ambiguous; see npcs_unresolved.json for the explicit reference and reason"
-        },
-        {
-          "kind": "reconstructed",
           "evidence": "(R) no numeric predecessor was mapped; narrative/order-only prerequisites remain in the guide"
         },
         {
@@ -44,10 +69,18 @@
         {
           "kind": "reconstructed",
           "evidence": "(R) intro/description/end-text ids from the client locale block around the title (T-1/T+1/T+2), filled by scripts/quest_text_backfill.py where unambiguous"
+        },
+        {
+          "kind": "client",
+          "evidence": "Global.Text 412463 'Become a Soccer Star' and 412464 'Learn how to be a soccer star by finding Manager Landon in Snowhill.' (lab/reports/locale-id-to-text.json); Manager Landon is the job_trainers.json trainer for profile 52 (npc 9000000140)."
+        },
+        {
+          "kind": "reconstructed",
+          "evidence": "(R) T542: the original was started from the Jobs window (147/1 row, then 49/15 with original quest id 1965); the giver is the trainer Manager Landon (9000000140), the single talk target is the same trainer, and the turn-in is the giver, so one Talk to the trainer completes the step and opens the end screen there. Reward: 5 coins (the W110 fallback for an unknown payout) and no job XP, so a locked profile can never block the turn-in. No intro, prerequisite or job gate is bound; because the giver is the trainer, the trainer's own menu also offers it."
         }
       ],
       "description_string_id": 412464,
-      "enabled": false
+      "enabled": true
     },
     {
       "id": 3140002,

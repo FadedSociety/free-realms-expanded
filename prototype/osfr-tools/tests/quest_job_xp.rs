@@ -31,7 +31,7 @@ use npc_quest_chain::{
     character_at_for as character_in_zone, coins, content_dir, copy_tree, counts, finish_quest,
     interact, menu_option, npc_interact, npc_select, offer, pending_turnin, profile_xp,
     quest_abandon, quest_end_reply, quest_reply, quest_status, saved, seed_active_profile,
-    select_job, send, talk, talk_step,
+    seed_quest, select_job, send, talk, talk_step,
 };
 use osfr_tools::{
     character_store::CharacterState,
@@ -74,6 +74,8 @@ const INTRODUCE_YOURSELF: u32 = 3_000_020;
 const BURDEN_OF_FAME: u32 = 3_080_001;
 const RANGER_REQUISITION: u32 = 3_050_011;
 const NINJA_PATH: u32 = 3_110_001;
+/// T542's Jobs-window record: Ty is its giver, its one talk target and the turn-in.
+const BECOME_A_NINJA: u32 = 3_110_026;
 
 /// The 49/13 end text (`end_text_string_id`) of each quest, from `data/content/quests`.
 const INTRODUCE_END_TEXT: u32 = 0;
@@ -428,6 +430,11 @@ fn xp_follows_the_quest_job_not_the_active_job() {
 fn job_locked_quest_is_not_offered() {
     let fixture = Fixture::for_character(CHARACTER);
     let mut game = seeded(&fixture, ADVENTURER, &[1, BRAWLER]);
+    // T542: Ty's menu also offers the ungated Become a Ninja; complete it in the saved
+    // state so his Talk is the no-offer case the locked-job gate needs.
+    let mut state = game.state();
+    seed_quest(&mut state, BECOME_A_NINJA, QuestStatus::Completed, &[1]);
+    game = fixture.game_as(CHARACTER, Some(state));
     let mut now = 6_000;
     let raina = character_at(RAINA);
 
@@ -780,7 +787,11 @@ fn xp_survives_relog_and_is_not_repaid() {
     assert_eq!(quest_status(&game, NINJA_PATH), QuestStatus::Completed);
     assert_eq!(pending_turnin(&game), None);
 
-    // The completed quest is not offered again, and old packets pay nothing.
+    // The completed quest is not offered again, and old packets pay nothing. T542: Ty's
+    // menu also offers the ungated Become a Ninja, so that one is completed here too.
+    let mut state = game.state();
+    seed_quest(&mut state, BECOME_A_NINJA, QuestStatus::Completed, &[1]);
+    game = fixture.game_as(CHARACTER, Some(state));
     assert_no_offer(
         &mut game,
         &ty,

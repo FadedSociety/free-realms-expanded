@@ -96,7 +96,7 @@ fn play_chapter(
 
 /// A Wizard who has completed 3160003 and 3160004, standing at Fizzlesticks.
 fn sticky_ready(fixture: &Fixture, character: &CharacterState) -> (Gameplay, u64) {
-    let mut game = fixture.game_as(character.guid, Some(wizard_state(fixture)));
+    let mut game = chapter_game_for(fixture, character.guid, wizard_state(fixture));
     let mut now = 1_000;
     play_chapter(
         &mut game,
@@ -596,7 +596,7 @@ fn a_non_wizard_or_missing_prerequisite_is_not_offered_and_changes_nothing() {
     assert!(!has_quest(&game, STICKY));
 
     // A Wizard whose 3160004 is still in progress is not offered the next record.
-    let mut game = fixture.game_as(CHARACTER, Some(wizard_state(&fixture)));
+    let mut game = chapter_game_for(&fixture, CHARACTER, wizard_state(&fixture));
     let mut now = 2_000;
     play_chapter(
         &mut game,
