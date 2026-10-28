@@ -1106,6 +1106,60 @@ fn an_unclosed_mining_run_refuses_recipe_start_without_a_save() {
     assert!(active(&gateway, MINING).is_some());
 }
 
+/// The first T550 harvest plant: its actor guid and position. The row is content data, so the
+/// test follows a shipped row rather than hard-coding one region's coordinates.
+fn t550_plant() -> (u64, [f32; 3]) {
+    let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let extras: Value =
+        serde_json::from_slice(&fs::read(content.join("npc_spawns_extra.json")).unwrap()).unwrap();
+    let row = extras["records"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|row| {
+            row["model_file_name"]
+                .as_str()
+                .is_some_and(|model| model.to_ascii_lowercase().contains("harvestable"))
+                && row["source"].as_array().is_some_and(|sources| {
+                    sources.iter().any(|source| {
+                        source["evidence"]
+                            .as_str()
+                            .is_some_and(|evidence| evidence.starts_with("(R) T550:"))
+                    })
+                })
+        })
+        .expect("a T550 plant row");
+    let position: [f32; 3] = serde_json::from_value(row["position"].clone()).unwrap();
+    (row["spawn_guid"].as_u64().unwrap(), position)
+}
+
+#[test]
+fn a_plant_click_opens_nothing_and_changes_nothing() {
+    let (guid, at) = t550_plant();
+    let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
+    let nodes = GatheringNodes::load(&content).unwrap().unwrap();
+    assert!(!nodes.is_node(guid), "a harvest plant became a gather node");
+
+    let fixture = Fixture::new(MINING);
+    let mut gateway = fixture.near(fixture.state(true, true));
+    // Stand on the plant; the click is the same 26/8 an ordinary player sends
+    // (client constructor 0x008b6bc0 stores the u64 target and one trailing byte).
+    move_pose(&mut gateway, at, 2_000);
+    let before = gateway.snapshot();
+    let before_bytes = serde_json::to_vec(&before).unwrap();
+    let clicked = click(&mut gateway, guid, 2_100);
+    assert!(clicked.replies.is_empty(), "a decoration click replied");
+    assert!(!clicked.gameplay_changed, "a decoration click persisted");
+    assert_eq!(gateway.snapshot(), before, "a plant click changed state");
+    assert_eq!(
+        serde_json::to_vec(&gateway.snapshot()).unwrap(),
+        before_bytes,
+        "a plant click changed the save bytes"
+    );
+    assert!(active(&gateway, MINING).is_none());
+    assert!(active(&gateway, HARVEST).is_none());
+}
+
 #[test]
 fn node_content_is_bounded_and_unique() {
     let content = Path::new(env!("CARGO_MANIFEST_DIR")).join("data/content");
